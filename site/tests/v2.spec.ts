@@ -1,12 +1,12 @@
 // v2.spec.ts: Block V2 — the /stack interactive layer-flow diagram and the
 // home "The stack" evidence pulse. Structural/interaction assertions run in the
 // default project; the review screenshots (motion on for the pulse, both colour
-// schemes) are written to tests/__screenshots__/V2/.
+// schemes) are written to tests/__screenshots__/V2b/.
 import { test, expect } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-const DIR = join('tests', '__screenshots__', 'V2');
+const DIR = join('tests', '__screenshots__', 'V2b');
 
 test.describe('/stack layer-flow diagram', () => {
   test('renders five bands with role=button, all tabbable', async ({ page }) => {

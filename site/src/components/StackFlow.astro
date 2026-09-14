@@ -3,10 +3,11 @@
  * StackFlow — the five-layer stack as an interactive layer-flow diagram.
  *
  * On wide screens, an SVG shows the five layers as horizontal bands (05 at the
- * top, 01 at the foot, so evidence flows up) with thin ink paths tracing each
- * layer's artefact into assurance (and into the layer it also feeds). Clicking
- * or keyboard-activating a band (role="button") highlights it, dims the rest,
- * redraws its paths and reveals that layer's detail panel beside the diagram.
+ * top, 01 at the foot, so evidence flows up) on the left, and a clean flow lane
+ * on the right where each artefact rides its own vertical lane up into the
+ * layer(s) it feeds. Clicking or keyboard-activating a band (role="button")
+ * highlights it, dims the rest, redraws its paths and reveals that layer's
+ * detail panel beside the diagram.
  *
  * On narrow screens the SVG is replaced by a simplified stacked list of the
  * same bands (real <button>s), with the detail panel below. Both band sets
@@ -17,14 +18,15 @@ import { layers } from '../data/stack';
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
-// SVG geometry (viewBox 0 0 1140 420). Bands sit on the left; artefact paths
-// bow out into the empty right gutter, where their mono labels stay legible.
-const BAND_X = 64;
-const BAND_W = 720;
+// SVG geometry (viewBox 0 0 900 420). Bands fill the left column; the right is a
+// flow lane where each artefact gets its own vertical x-lane, so orthogonal
+// paths and mono labels never overlap.
+const BAND_X = 56;
+const BAND_W = 520;
 const BAND_H = 58;
 const TOP = 29;
 const PITCH = 76;
-const RIGHT = BAND_X + BAND_W; // 784 — the bands' right edge, where flows start.
+const RIGHT = BAND_X + BAND_W; // 576 — bands' right edge, where every flow starts/ends.
 
 /** Vertical centre of a layer's band. 05 is at the top, 01 at the foot. */
 const cy = (n: number) => TOP + (5 - n) * PITCH + BAND_H / 2;
@@ -40,33 +42,75 @@ const artefact: Record<number, string> = {
   4: 'guardrail decision',
 };
 
-// Artefact flows. The four into-05 edges carry the mono label at their apex;
-// the two short intra-stack hops (02→03, 03→04) are unlabelled thin connectors.
-// `ctrl` is the bezier control x (bow depth); `sOff`/`eOff` spread the ends so
-// arrowheads do not stack on a single point of a band's edge.
-const rawEdges = [
-  { from: 1, to: 5, ctrl: 1170, sOff: 0, eOff: 16, label: true },
-  { from: 2, to: 5, ctrl: 1075, sOff: 8, eOff: 6, label: true },
-  { from: 3, to: 5, ctrl: 985, sOff: 8, eOff: -4, label: true },
-  { from: 4, to: 5, ctrl: 905, sOff: 0, eOff: -14, label: true },
-  { from: 2, to: 3, ctrl: 836, sOff: -8, eOff: 10, label: false },
-  { from: 3, to: 4, ctrl: 836, sOff: -8, eOff: 10, label: false },
+// Each producing layer's vertical lane, left→right in artefact order (policy
+// verdict nearest the bands). 05 is the assurance sink every artefact reaches;
+// 02/03 also feed the next layer up, so those two lanes branch.
+const LANE_X: Record<number, number> = { 1: 630, 2: 692, 3: 754, 4: 816 };
+
+// Where each lane leaves its source band's right edge. 03 and 04 are also the
+// target of a lower lane, so their exit sits just above the incoming arrow.
+const SRC_Y: Record<number, number> = { 1: cy(1), 2: cy(2), 3: cy(3) - 12, 4: cy(4) - 12 };
+
+// Rotated lane-label anchor: to the right of each lane, in its clear lower run.
+const LABEL_Y: Record<number, number> = { 1: 346, 2: 256, 3: 170, 4: 84 };
+
+// The four 05 collectors nest without crossing: the further-right lane enters
+// higher. 03/04 entries sit below their band centre, clear of that band's exit.
+const lanes: { from: number; text: string; targets: { to: number; ey: number }[] }[] = [
+  { from: 1, text: artefact[1], targets: [{ to: 5, ey: 73 }] },
+  { from: 2, text: artefact[2], targets: [{ to: 3, ey: cy(3) + 12 }, { to: 5, ey: 63 }] },
+  { from: 3, text: artefact[3], targets: [{ to: 4, ey: cy(4) + 12 }, { to: 5, ey: 53 }] },
+  { from: 4, text: artefact[4], targets: [{ to: 5, ey: 43 }] },
 ];
 
-const edges = rawEdges.map((e) => {
-  const y0 = cy(e.from) + e.sOff;
-  const y1 = cy(e.to) + e.eOff;
-  return {
-    from: e.from,
-    to: e.to,
-    label: e.label,
-    text: artefact[e.from],
-    d: `M ${RIGHT} ${y0} C ${e.ctrl} ${y0}, ${e.ctrl} ${y1}, ${RIGHT} ${y1}`,
-    // Apex x/y of the symmetric bow (x0 = x1 = RIGHT), where the label sits.
-    lx: 0.25 * RIGHT + 0.75 * e.ctrl,
-    ly: (y0 + y1) / 2,
-  };
+const r2 = (v: number) => Math.round(v * 100) / 100;
+
+/** An orthogonal polyline through `pts` with `r`-radius rounded corners. */
+function roundedPath(pts: number[][], r: number): string {
+  let d = `M ${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i - 1];
+    const [x1, y1] = pts[i];
+    const [x2, y2] = pts[i + 1];
+    const d1 = Math.hypot(x1 - x0, y1 - y0) || 1;
+    const d2 = Math.hypot(x2 - x1, y2 - y1) || 1;
+    const rr = Math.min(r, d1 / 2, d2 / 2);
+    const ax = r2(x1 - ((x1 - x0) / d1) * rr);
+    const ay = r2(y1 - ((y1 - y0) / d1) * rr);
+    const bx = r2(x1 + ((x2 - x1) / d2) * rr);
+    const by = r2(y1 + ((y2 - y1) / d2) * rr);
+    d += ` L ${ax} ${ay} Q ${x1} ${y1} ${bx} ${by}`;
+  }
+  const [lx, ly] = pts[pts.length - 1];
+  d += ` L ${lx} ${ly}`;
+  return d;
+}
+
+// One orthogonal path per source→target edge (horizontal out of the source,
+// vertical up the lane, horizontal into the target). A branch that leaves a
+// still-climbing lane is marked with a junction dot.
+const flows = lanes.flatMap((lane) => {
+  const sy = SRC_Y[lane.from];
+  const x = LANE_X[lane.from];
+  const topEy = Math.min(...lane.targets.map((t) => t.ey));
+  return lane.targets.map((t) => ({
+    from: lane.from,
+    to: t.to,
+    d: roundedPath([[RIGHT, sy], [x, sy], [x, t.ey], [RIGHT, t.ey]], 8),
+    dot: t.ey !== topEy ? { x, y: t.ey } : null,
+  }));
 });
+
+const dots = flows
+  .map((f) => f.dot)
+  .filter((d): d is { x: number; y: number } => d !== null);
+
+const laneLabels = lanes.map((lane) => ({
+  from: lane.from,
+  x: LANE_X[lane.from] + 16,
+  y: LABEL_Y[lane.from],
+  text: lane.text,
+}));
 
 // "Evidence flows up" axis in the left gutter.
 const AXIS_X = 34;
@@ -80,7 +124,7 @@ const axisBottom = cy(1) - 12;
       <svg
         class="flow-svg"
         data-flow-svg
-        viewBox="0 0 1140 420"
+        viewBox="0 0 900 420"
         role="group"
         aria-label="Layer flow diagram: each layer's artefact flows up into continuous assurance. Activate a layer for its detail."
         preserveAspectRatio="xMidYMid meet"
@@ -109,9 +153,10 @@ const axisBottom = cy(1) - 12;
           text-anchor="middle"
           transform="rotate(-90 18 210)">Evidence flows up</text>
 
-        {/* Artefact flows (drawn over the bands so arrowheads meet each edge) */}
+        {/* Artefact flows: one vertical lane per artefact, drawn over the bands
+            so arrowheads meet each band edge. */}
         <g class="flows" aria-hidden="true">
-          {edges.map((edge) => (
+          {flows.map((edge) => (
             <path
               class="flow-path"
               data-from={edge.from}
@@ -121,14 +166,18 @@ const axisBottom = cy(1) - 12;
               marker-end="url(#flow-arrow)"
             />
           ))}
-          {edges.filter((e) => e.label).map((edge) => (
+          {dots.map((dot) => (
+            <circle class="flow-dot" cx={dot.x} cy={dot.y} r="3" />
+          ))}
+          {laneLabels.map((lab) => (
             <text
               class="flow-label"
-              data-from={edge.from}
-              data-to={edge.to}
-              x={edge.lx}
-              y={edge.ly}
-              text-anchor="middle">{edge.text}</text>
+              data-from={lab.from}
+              data-to="5"
+              x={lab.x}
+              y={lab.y}
+              text-anchor="middle"
+              transform={`rotate(-90 ${lab.x} ${lab.y})`}>{lab.text}</text>
           ))}
         </g>
 
@@ -288,22 +337,30 @@ const axisBottom = cy(1) - 12;
 
   .flow-path {
     fill: none;
-    stroke: var(--ink);
+    stroke: var(--muted);
     stroke-width: 1.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
     stroke-dasharray: 1;
     stroke-dashoffset: 0;
-    opacity: 0.34;
+    opacity: 0.7;
   }
 
   .flow-arrow-head {
+    /* Follow the owning path's stroke: --muted by default, --ink when lit. */
+    fill: context-stroke;
+  }
+
+  .flow-dot {
     fill: var(--ink);
   }
 
   .flow-label {
-    fill: var(--muted);
+    fill: var(--ink-2);
     font-family: var(--font-mono);
-    font-size: 14px;
-    letter-spacing: 0.03em;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    dominant-baseline: middle;
   }
 
   .flow-axis-line {
@@ -323,27 +380,24 @@ const axisBottom = cy(1) - 12;
     text-transform: uppercase;
   }
 
-  /* Active state (JS only): dim the rest, light the active layer's flows. */
+  /* Active state (JS only): dim the rest, light the active layer's flows. The
+     lane labels stay at full --ink-2 strength so every lane stays named. */
   .flow.flow-js.has-active [data-band]:not(.is-active) {
     opacity: 0.4;
   }
 
   .flow.flow-js.has-active .flow-path {
-    opacity: 0.14;
+    opacity: 0.25;
   }
 
   .flow.flow-js.has-active .flow-path.is-lit {
+    stroke: var(--ink);
     opacity: 1;
     stroke-width: 1.6;
   }
 
-  .flow.flow-js.has-active .flow-label {
-    opacity: 0.2;
-  }
-
-  .flow.flow-js.has-active .flow-label.is-lit {
+  .flow-label.is-lit {
     fill: var(--ink);
-    opacity: 1;
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -353,6 +407,7 @@ const axisBottom = cy(1) - 12;
     .nband {
       transition:
         opacity var(--dur) var(--ease),
+        stroke var(--dur) var(--ease),
         stroke-width var(--dur) var(--ease);
     }
 
