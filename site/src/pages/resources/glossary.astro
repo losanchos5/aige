@@ -1,0 +1,32 @@
+---
+import Base from '../../layouts/Base.astro';
+import Kicker from '../../components/Kicker.astro';
+import GlossaryIndex from '../../components/GlossaryIndex.astro';
+import { site } from '../../data/site';
+import { getGlossary, getGlossaryLetters } from '../../lib/glossary';
+import '../../styles/resources.css';
+
+const entries = getGlossary();
+const letters = getGlossaryLetters();
+---
+
+<Base
+  title={`Glossary · ${site.name}`}
+  description="The canonical glossary for AI governance engineering: every term defined once, alphabetically, and cross-referenced to the chapter that treats it in full."
+>
+  <div class="container res-page">
+    <header class="res-head">
+      <Kicker rule swatch="var(--l3)">Resources · Glossary</Kicker>
+      <h1 class="res-title">Every term, defined once.</h1>
+      <p class="res-lede">
+        {entries.length} terms, alphabetical, each one to three sentences and cross-referenced to the
+        chapter that develops it. Where a term has a canonical spelling in the style guide, that
+        spelling is used here and everywhere in the book.
+      </p>
+    </header>
+
+    <div class="res-section">
+      <GlossaryIndex entries={entries} letters={letters} />
+    </div>
+  </div>
+</Base>

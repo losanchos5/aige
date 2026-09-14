@@ -1,0 +1,106 @@
+---
+/**
+ * ObligationTable — the obligation → artefact → layer rows, grouped by the
+ * framework they belong to. Each group has a sticky header; each row shows the
+ * obligation, the engineering artefact, the stack layer(s) as colour ticks and
+ * a link back to the row's anchor in chapter 08. A pure-CSS radio filter (no JS)
+ * narrows the list to a single layer. Below 720px rows become stacked cards.
+ */
+import type { Obligation, StackLayer } from '../data/frameworks';
+
+interface Props {
+  obligations: readonly Obligation[];
+}
+
+const { obligations } = Astro.props;
+
+// Group by framework, preserving first-seen order.
+const groups: { framework: string; rows: Obligation[] }[] = [];
+for (const row of obligations) {
+  let group = groups.find((g) => g.framework === row.framework);
+  if (!group) {
+    group = { framework: row.framework, rows: [] };
+    groups.push(group);
+  }
+  group.rows.push(row);
+}
+
+// Chapter 08 is the source of every obligation anchor.
+const chapterBase = '/bok/regulatory-map';
+
+const filters: { id: string; value: string; label: string }[] = [
+  { id: 'lf-all', value: 'all', label: 'All layers' },
+  { id: 'lf-1', value: '1', label: 'L1' },
+  { id: 'lf-2', value: '2', label: 'L2' },
+  { id: 'lf-3', value: '3', label: 'L3' },
+  { id: 'lf-4', value: '4', label: 'L4' },
+  { id: 'lf-5', value: '5', label: 'L5' },
+];
+
+const layerClass = (layerN: readonly StackLayer[]) =>
+  layerN.map((n) => `has-l${n}`).join(' ');
+---
+
+<div class="ob-list">
+  <fieldset class="ob-filter">
+    <legend>Filter by layer</legend>
+    <div class="ob-chips">
+      {
+        filters.map((f, i) => (
+          <span>
+            <input
+              class="ob-radio"
+              type="radio"
+              name="ob-layer-filter"
+              id={f.id}
+              value={f.value}
+              checked={i === 0}
+            />
+            <label class="ob-chip" for={f.id}>{f.label}</label>
+          </span>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  {
+    groups.map((group) => (
+      <section class="ob-group">
+        <div class="ob-group-head">
+          <h3>{group.framework}</h3>
+          <span class="ob-group-count">{group.rows.length} rows</span>
+        </div>
+        <div class="res-tablewrap">
+          <table class="res-table">
+            <thead>
+              <tr>
+                <th scope="col">Obligation</th>
+                <th scope="col">Artefact</th>
+                <th scope="col">Layers</th>
+                <th scope="col">Chapter</th>
+              </tr>
+            </thead>
+            <tbody>
+              {group.rows.map((row) => (
+                <tr data-obligation-row class:list={[layerClass(row.layerN)]}>
+                  <td class="c-oblig" data-label="Obligation">{row.obligation}</td>
+                  <td class="c-artefact" data-label="Artefact">{row.artefact}</td>
+                  <td class="c-layers" data-label="Layers">
+                    <span class="ticks" role="img" aria-label={`Layers ${row.layerN.join(', ')}`}>
+                      {row.layerN.map((n) => (
+                        <span class="tk" data-l={n} aria-hidden="true" />
+                      ))}
+                    </span>
+                  </td>
+                  <td class="c-chapter" data-label="Chapter">
+                    <a href={`${chapterBase}#${row.anchor}`}>ch. 08 →</a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    ))
+  }
+</div>

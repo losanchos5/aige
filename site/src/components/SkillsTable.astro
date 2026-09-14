@@ -1,0 +1,122 @@
+---
+/**
+ * SkillsTable — the skills behind the role, grouped by workflow area, split
+ * into core (load-bearing) and supporting skills rendered as chips. A three-
+ * column grid (area · core · supporting) on wide screens that collapses to a
+ * stack of labelled cards on narrow ones. Areas whose supporting list is empty
+ * render an em dash.
+ */
+import type { SkillArea } from '../data/role';
+
+interface Props {
+  skills: readonly SkillArea[];
+}
+
+const { skills } = Astro.props;
+---
+
+<div class="skills">
+  <div class="shead" aria-hidden="true">
+    <span class="field-label">Area</span>
+    <span class="field-label">Core skills</span>
+    <span class="field-label">Supporting skills</span>
+  </div>
+  {
+    skills.map((area) => (
+      <div class="srow">
+        <div class="area">
+          <span class="cell-label">Area</span>
+          <span class="area-text">{area.area}</span>
+        </div>
+        <div class="cell">
+          <span class="cell-label">Core</span>
+          <ul class="chips">
+            {area.core.map((s) => (
+              <li class="chip chip-core">{s}</li>
+            ))}
+          </ul>
+        </div>
+        <div class="cell">
+          <span class="cell-label">Supporting</span>
+          {area.supporting.length > 0 ? (
+            <ul class="chips">
+              {area.supporting.map((s) => (
+                <li class="chip">{s}</li>
+              ))}
+            </ul>
+          ) : (
+            <span class="none" aria-hidden="true">
+              —
+            </span>
+          )}
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .skills {
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+
+  .shead {
+    display: none;
+  }
+
+  .srow {
+    display: grid;
+    gap: var(--s-3);
+    padding: var(--s-5);
+  }
+
+  .srow + .srow {
+    border-top: 1px solid var(--line);
+  }
+
+  .cell-label {
+    display: block;
+    margin-bottom: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .area-text {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .chip-core {
+    color: var(--ink);
+    border-color: color-mix(in srgb, var(--ink) 28%, var(--line));
+  }
+
+  .none {
+    color: var(--muted);
+  }
+
+  @media (min-width: 760px) {
+    .shead,
+    .srow {
+      display: grid;
+      grid-template-columns: minmax(9rem, 13rem) 1fr 1fr;
+      gap: var(--s-5);
+      align-items: start;
+    }
+
+    .shead {
+      padding: var(--s-4) var(--s-5);
+      background: color-mix(in srgb, var(--ink) 4%, var(--bg));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cell-label {
+      display: none;
+    }
+  }
+</style>

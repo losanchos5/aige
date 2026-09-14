@@ -1,0 +1,4 @@
+# content-lint allow list — one substring per line.
+# Any forbidden match whose surrounding text contains a line below is ignored.
+# Use this only for genuine false positives (e.g. a quoted, correctly-qualified
+# mention). Lines starting with # are comments; blank lines are ignored.

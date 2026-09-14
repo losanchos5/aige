@@ -1,0 +1,36 @@
+---
+import Base from '../../layouts/Base.astro';
+import Kicker from '../../components/Kicker.astro';
+import ReadingList from '../../components/ReadingList.astro';
+import { site } from '../../data/site';
+import { getReadingList } from '../../lib/reading-list';
+import '../../styles/resources.css';
+
+const groups = getReadingList();
+const itemCount = groups.reduce((n, group) => n + group.items.length, 0);
+---
+
+<Base
+  title={`Reading list · ${site.name}`}
+  description="The annotated bibliography that formed AI governance engineering — grouped by theme, each source with a verified URL and a one-line note on why it matters."
+>
+  <div class="container res-page">
+    <header class="res-head">
+      <Kicker rule swatch="var(--l5)">Resources · Reading list</Kicker>
+      <h1 class="res-title">The sources that formed the discipline.</h1>
+      <p class="res-lede">
+        A working bibliography, not a canon. {itemCount} sources across {groups.length} themes, each
+        annotated in one line, each with a verified URL and a verification tag drawn from the book's
+        research digest.
+      </p>
+      <p class="res-note">
+        Verification tags: <strong>primary</strong> — the source itself; <strong>secondary</strong> —
+        a reliable account of it; <strong>reported</strong> — awaiting a primary confirmation.
+      </p>
+    </header>
+
+    <div class="res-section">
+      <ReadingList groups={groups} />
+    </div>
+  </div>
+</Base>

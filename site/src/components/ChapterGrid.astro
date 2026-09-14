@@ -1,0 +1,124 @@
+---
+/**
+ * ChapterGrid — the Body of Knowledge as a grid of bordered chapter cards, each
+ * with a mono index, title, one-line summary and a trailing arrow. Links to the
+ * chapter under /bok/. Flat, 1px border, matte; hover lifts the border only.
+ */
+import type { Chapter } from '../data/chapters';
+
+interface Props {
+  chapters: readonly Chapter[];
+  class?: string;
+}
+
+const { chapters, class: className } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+const strip = (title: string) => title.replace(/^\d+\.\s*/, '');
+---
+
+<ol class:list={['grid', className]}>
+  {
+    chapters.map((chapter) => (
+      <li>
+        <a class="card" href={`/bok/${chapter.slug}`} data-testid="chapter-card">
+          <span class="idx">{pad(chapter.order)}</span>
+          <span class="title">{strip(chapter.title)}</span>
+          <span class="summary">{chapter.summary}</span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 600px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 960px) {
+    .grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'idx title'
+      'idx summary'
+      'idx arrow';
+    column-gap: var(--s-4);
+    row-gap: var(--s-2);
+    height: 100%;
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .idx {
+    grid-area: idx;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--muted);
+    padding-top: 0.2em;
+  }
+
+  .title {
+    grid-area: title;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .summary {
+    grid-area: summary;
+    font-size: var(--fs-small);
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  .arrow {
+    grid-area: arrow;
+    align-self: end;
+    color: var(--muted);
+    font-size: var(--fs-body);
+  }
+
+  a.card:hover {
+    border-color: var(--ink-2);
+  }
+
+  a.card:hover .title {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  a.card:hover .arrow {
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    a.card {
+      transition: border-color var(--dur) var(--ease);
+    }
+  }
+</style>

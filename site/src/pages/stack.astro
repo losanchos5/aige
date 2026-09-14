@@ -1,0 +1,270 @@
+---
+/**
+ * /stack — the five-layer stack as an editorial landing page: how to read it,
+ * a panel per layer, the inherited/new split, the minimum viable stack, and the
+ * illustrative tool catalogue. Content comes from src/data/stack.ts; every
+ * section links back to its heading in chapter 04.
+ */
+import Marketing from '../layouts/Marketing.astro';
+import '../styles/pages.css';
+import Kicker from '../components/Kicker.astro';
+import RegisterList from '../components/RegisterList.astro';
+import StackLayerPanel from '../components/StackLayerPanel.astro';
+import ToolsTable from '../components/ToolsTable.astro';
+import Callout from '../components/Callout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { layers, minimumViableStack, toolsByCategory } from '../data/stack';
+
+const tools = toolsByCategory();
+const stackHref = (anchor: string) => `/bok/the-stack#${anchor}`;
+
+const howToRead = [
+  {
+    title: 'A build order, not an org chart',
+    description:
+      'Each layer produces an artefact the layer above consumes: Policy → Inventory → Evals → Runtime → Assurance.',
+    swatch: 'var(--l1)',
+  },
+  {
+    title: 'Evidence flows up',
+    description:
+      'A policy verdict, a registry entry, an eval result and a guardrail decision are structured artefacts that layer 05 aggregates into audit-ready evidence.',
+    swatch: 'var(--l5)',
+  },
+  {
+    title: 'It answers the three questions',
+    description:
+      'What AI is running, what it is allowed to do, and what evidence proves it — kept true as the system changes underneath.',
+    swatch: 'var(--l3)',
+  },
+];
+
+const mvsItems = minimumViableStack.steps.map((step) => ({
+  title: step.title,
+  description: step.summary,
+  swatch: `var(--l${step.layerN})`,
+}));
+---
+
+<Marketing
+  title="The stack · AI Governance Engineer"
+  description="The five-layer stack of AI governance engineering: govern-as-code, inventory, evals as evidence, runtime control and continuous assurance."
+>
+  <section class="hero section">
+    <div class="container page-hero reveal">
+      <Kicker swatch="var(--l3)" rule>The stack</Kicker>
+      <h1 class="display">Five layers. One evidence chain.</h1>
+      <p class="lede">
+        The reference architecture of AI governance engineering: five layers that
+        turn governance from a stack of parallel documents into one system with a
+        data path from policy to proof.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l1)">How to read it</Kicker>
+      <h2 class="section-title display">A build order, from policy to proof.</h2>
+      <div class="well"><RegisterList items={howToRead} /></div>
+      <p class="section-foot">
+        <a class="chapter-link" href={stackHref('how-to-read-the-stack')}>
+          Read in chapter 04 <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l2)">The five layers</Kicker>
+      <h2 class="section-title display">Policy, inventory, evals, runtime, assurance.</h2>
+      <div class="panels">
+        {layers.map((layer) => <StackLayerPanel layer={layer} href={stackHref(layer.chapterAnchor)} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l4)">Inherited and new</Kicker>
+      <h2 class="section-title display">Three layers inherited, two the AI forces.</h2>
+      <div class="split">
+        <ol class="barmark" aria-hidden="true">
+          {
+            layers.map((layer) => (
+              <li class:list={['bar-row', layer.inherited ? 'is-inherited' : 'is-new']}>
+                <span class="bar" style={`background: var(${layer.colorVar})`} />
+                <span class="bar-n">{String(layer.n).padStart(2, '0')}</span>
+                <span class="bar-name">{layer.name}</span>
+                <span class="bar-tag">{layer.inherited ? 'Inherited' : 'New'}</span>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="split-notes well">
+          <div>
+            <h3 class="split-h">Inherited from GRC engineering</h3>
+            <p>
+              Govern-as-Code (01), machine-readable evidence and Assurance &amp;
+              Continuous Compliance (05) come almost unchanged from GRC
+              engineering — a specialisation of a method that already works.
+            </p>
+          </div>
+          <div>
+            <h3 class="split-h">New, forced by AI</h3>
+            <p>
+              Evals and red-teaming as controls (03) and agent identity and
+              runtime control (04) are what AI forces the discipline to add: a
+              model whose behaviour must be tested and an autonomous actor acting
+              under delegated authority have no analogue in classic GRC.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l5)">Minimum viable stack</Kicker>
+      <h2 class="section-title display">The spine, thinly, for a team of one.</h2>
+      <p class="lede well">{minimumViableStack.intro}</p>
+      <div class="well mvs"><RegisterList items={mvsItems} /></div>
+      <p class="section-foot">
+        <a class="chapter-link" href={stackHref(minimumViableStack.anchor)}>
+          Read in chapter 04 <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l1)">The tools</Kicker>
+      <h2 class="section-title display">Categories are the substance; brands are illustrative.</h2>
+      <Callout kind="note" title="Illustrative, not an endorsement">
+        <p>
+          Every tool named is an example of a category, not a recommendation. The
+          categories are the substance; the brands are illustrative and
+          interchangeable.
+        </p>
+      </Callout>
+      <ToolsTable rows={tools} />
+    </div>
+  </section>
+
+  <CtaBand
+    title="Read the stack in full."
+    sub="The full reference architecture, layer by layer, with the mappings and the evidence."
+    primary={{ label: 'Read chapter 04 in full', href: '/bok/the-stack' }}
+    secondary={{ label: 'Open the Body of Knowledge', href: '/bok' }}
+  />
+</Marketing>
+
+<style>
+  .hero h1 {
+    font-size: var(--fs-display);
+  }
+
+  .panels {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  /* Inherited/new split: the five-bar register mark beside two short notes. */
+  .split {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .barmark {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    align-self: start;
+  }
+
+  .bar-row {
+    display: grid;
+    grid-template-columns: 64px auto 1fr auto;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-2) var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+
+  .bar {
+    height: 10px;
+    width: 100%;
+    border-radius: 2px;
+    border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  }
+
+  .bar-n {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--muted);
+  }
+
+  .bar-name {
+    font-weight: 600;
+    font-size: var(--fs-small);
+    min-width: 0;
+  }
+
+  .bar-tag {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .is-new {
+    border-color: var(--ink);
+  }
+
+  .is-new .bar-tag {
+    color: var(--ink);
+  }
+
+  .is-inherited .bar {
+    opacity: 0.5;
+  }
+
+  .split-notes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+  }
+
+  .split-h {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h3);
+    letter-spacing: var(--tracking-display);
+    margin-bottom: var(--s-2);
+  }
+
+  .split-notes p {
+    color: var(--ink-2);
+    max-width: 52ch;
+  }
+
+  .mvs {
+    margin-top: var(--s-5);
+  }
+
+  @media (min-width: 900px) {
+    .split {
+      grid-template-columns: minmax(0, 20rem) 1fr;
+      align-items: start;
+      gap: var(--s-7);
+    }
+  }
+</style>

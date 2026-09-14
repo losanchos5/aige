@@ -1,0 +1,32 @@
+---
+/**
+ * ResourceCard — a linked card for the Resources hub: a mono index and layer
+ * tick, a display title, a one-line description and a mono count line pinned to
+ * the foot. Flat, 1px border, no shadow.
+ */
+interface Props {
+  title: string;
+  href: string;
+  description: string;
+  /** Count line, e.g. "14 frameworks · 43 obligations". */
+  count: string;
+  /** Mono index label, e.g. "01". */
+  index?: string;
+  /** Layer colour for the tick, e.g. `var(--l1)`. */
+  swatch?: string;
+}
+
+const { title, href, description, count, index, swatch = 'var(--ink)' } = Astro.props;
+---
+
+<li>
+  <a class="rc-card" href={href} data-resource-card style={`--tint:${swatch}`}>
+    <span class="rc-top">
+      {index && <span class="rc-index">{index}</span>}
+      <span class="rc-tick" aria-hidden="true"></span>
+    </span>
+    <span class="rc-title">{title}</span>
+    <span class="rc-desc">{description}</span>
+    <span class="rc-count" data-resource-count>{count}</span>
+  </a>
+</li>

@@ -1,0 +1,51 @@
+---
+/**
+ * FrameworkTable — the frameworks, standards, codes and laws the regulatory map
+ * is drawn against. A semantic table on wide screens; below 720px each row
+ * becomes a stacked card (see resources.css). The name links out where the data
+ * gives a URL, with a small mono "↗" marker; external links carry rel="noopener".
+ */
+import type { Framework } from '../data/frameworks';
+
+interface Props {
+  frameworks: readonly Framework[];
+}
+
+const { frameworks } = Astro.props;
+---
+
+<div class="res-tablewrap">
+  <table class="res-table">
+    <thead>
+      <tr>
+        <th scope="col">Framework</th>
+        <th scope="col">Type</th>
+        <th scope="col">Issuer</th>
+        <th scope="col">Summary</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        frameworks.map((fw) => (
+          <tr data-framework-row>
+            <td class="c-name" data-label="Framework">
+              {fw.url ? (
+                <a href={fw.url} target="_blank" rel="noopener">
+                  {fw.name}
+                  <span class="ext" aria-hidden="true">↗</span>
+                </a>
+              ) : (
+                fw.name
+              )}
+            </td>
+            <td class="c-type" data-label="Type">
+              <span class="type-tag" data-type={fw.type}>{fw.type}</span>
+            </td>
+            <td class="c-issuer" data-label="Issuer">{fw.issuer}</td>
+            <td class="c-summary" data-label="Summary">{fw.summary}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

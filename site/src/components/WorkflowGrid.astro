@@ -1,0 +1,153 @@
+---
+/**
+ * WorkflowGrid — the seven workflows the role owns, as register cards. Each
+ * card carries a mono index, the workflow name, the stack layer it maps to (a
+ * colour tick, or "all layers" for regulatory translation), a summary, and a
+ * back-link to the workflow's heading in chapter 06.
+ */
+import type { Workflow } from '../data/role';
+
+interface Props {
+  workflows: readonly Workflow[];
+  /** Builds the chapter href from a workflow anchor. */
+  hrefFor: (anchor: string) => string;
+}
+
+const { workflows, hrefFor } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<ol class="workflows">
+  {
+    workflows.map((wf, i) => (
+      <li
+        class="workflow-item"
+        style={wf.layerN === 'all' ? undefined : `--c: var(--l${wf.layerN})`}
+      >
+        <div class="head">
+          <span class="index" aria-hidden="true">
+            {pad(i + 1)}
+          </span>
+          {wf.layerN === 'all' ? (
+            <span class="layer layer-all">
+              <span class="bars" aria-hidden="true">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <span class="bar" style={`background: var(--l${n})`} />
+                ))}
+              </span>
+              All layers
+            </span>
+          ) : (
+            <span class="layer">
+              <span class="dot" aria-hidden="true" />
+              Layer {pad(wf.layerN)}
+            </span>
+          )}
+        </div>
+        <h3 class="name">{wf.name}</h3>
+        <p class="summary">{wf.summary}</p>
+        <a class="chapter-link" href={hrefFor(wf.anchor)}>
+          Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .workflows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .workflow-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+
+  .index {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--muted);
+  }
+
+  .layer {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: var(--c);
+    border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  }
+
+  .bars {
+    display: inline-flex;
+    gap: 2px;
+  }
+
+  .bar {
+    width: 4px;
+    height: 12px;
+    border-radius: 1px;
+    border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  }
+
+  .name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h3);
+    line-height: 1.15;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .summary {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: var(--fs-small);
+    text-wrap: pretty;
+  }
+
+  .chapter-link {
+    margin-top: auto;
+    padding-top: var(--s-2);
+  }
+
+  @media (min-width: 720px) {
+    .workflows {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1080px) {
+    .workflows {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

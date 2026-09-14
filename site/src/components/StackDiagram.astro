@@ -1,0 +1,369 @@
+---
+/**
+ * StackDiagram — the five-layer stack, in two modes.
+ *
+ * `static`  — a large, RegisterMark-style graphic: five inline-SVG bars, each
+ *   filled with its layer pastel and hairline-outlined, labelled with the mono
+ *   index and layer name. A subtle, staggered draw-in plays on load (CSS only,
+ *   reduced-motion safe). Used as the hero graphic.
+ *
+ * `interactive` — five register rows (index, name, tagline, artefact chips).
+ *   Hovering or focusing a row tints its index cell with the layer pastel and,
+ *   via `:has()`, highlights the matching bar in a small side mark. A thin
+ *   vertical rule with an arrowhead reads "Evidence flows up". Pure CSS.
+ */
+import { layers } from '../data/stack';
+
+interface Props {
+  mode?: 'static' | 'interactive';
+  class?: string;
+}
+
+const { mode = 'static', class: className } = Astro.props;
+
+const pad = (n: number) => String(n).padStart(2, '0');
+
+// Trim a full artefact sentence down to a short, chip-sized head phrase. This is
+// a mechanical cut at the first natural break (comma, colon, dash, parenthesis,
+// or a relative/prepositional joint) with a word-boundary length cap and a
+// trailing stop-word strip — no new wording is introduced.
+function chip(text: string): string {
+  const seps = [',', ':', ';', '(', '—', ' that ', ' under ', ' tied ', ' linked '];
+  let cut = -1;
+  for (const sep of seps) {
+    const i = text.indexOf(sep);
+    if (i > 0 && (cut === -1 || i < cut)) cut = i;
+  }
+  let out = (cut > 0 ? text.slice(0, cut) : text).trim();
+  const CAP = 32;
+  if (out.length > CAP) {
+    out = out.slice(0, CAP);
+    const sp = out.lastIndexOf(' ');
+    if (sp > 8) out = out.slice(0, sp);
+  }
+  out = out.replace(/[,.\s]+$/, '');
+  const stop = new Set(['a', 'an', 'the', 'of', 'in', 'on', 'to', 'and', 'from', 'for', 'with']);
+  let words = out.split(' ');
+  while (words.length > 1 && stop.has(words[words.length - 1].toLowerCase())) {
+    words = words.slice(0, -1);
+  }
+  return words.join(' ');
+}
+
+// Static-mode SVG geometry.
+const BAR_H = 44;
+const PITCH = 56;
+const WIDTH = 460;
+const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
+---
+
+{
+  mode === 'static' ? (
+    <svg
+      class:list={['diagram-static', className]}
+      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+      role="img"
+      aria-label="The five-layer AI governance engineering stack, from Govern-as-Code to Assurance."
+      preserveAspectRatio="xMidYMid meet"
+    >
+      {layers.map((layer, i) => (
+        <g
+          class="bar"
+          style={`--i:${i}; --fill:var(${layer.colorVar}); --lk:var(${layer.colorVar}-ink)`}
+        >
+          <rect x="0" y={i * PITCH} width={WIDTH} height={BAR_H} rx="6" />
+          <text class="b-idx" x="18" y={i * PITCH + BAR_H / 2}>
+            {pad(layer.n)}
+          </text>
+          <text class="b-name" x="58" y={i * PITCH + BAR_H / 2}>
+            {layer.name}
+          </text>
+        </g>
+      ))}
+    </svg>
+  ) : (
+    <div class:list={['diagram-int', className]}>
+      <ol class="rows">
+        {layers.map((layer) => (
+          <li
+            class="drow"
+            data-layer={layer.n}
+            data-testid="stack-row"
+            style={`--tint:var(${layer.colorVar})`}
+          >
+            <span class="d-idx" aria-hidden="true">
+              {pad(layer.n)}
+            </span>
+            <span class="d-body">
+              <span class="d-head">
+                <span class="d-name">{layer.name}</span>
+                <span class="d-flag">
+                  {layer.inherited ? 'inherited from GRC engineering' : 'new'}
+                </span>
+              </span>
+              <span class="d-tagline">{layer.tagline}</span>
+              <span class="d-chips">
+                {layer.artefacts.map((artefact) => (
+                  <span class="chip">{chip(artefact)}</span>
+                ))}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ol>
+
+      <aside class="d-aside" aria-hidden="true">
+        <div class="d-flow">
+          <span class="d-arrow" />
+          <span class="d-rule" />
+          <span class="d-flow-label">Evidence flows up</span>
+        </div>
+        <div class="d-mark">
+          {layers.map((layer) => (
+            <span class="d-bar" data-layer={layer.n} style={`--c:var(${layer.colorVar})`} />
+          ))}
+        </div>
+      </aside>
+    </div>
+  )
+}
+
+<style>
+  /* ---- static ---- */
+  .diagram-static {
+    width: 100%;
+    height: auto;
+    max-width: 480px;
+  }
+
+  .diagram-static rect {
+    fill: var(--fill);
+    stroke: color-mix(in srgb, var(--ink) 24%, transparent);
+    stroke-width: 1;
+  }
+
+  .diagram-static text {
+    dominant-baseline: middle;
+  }
+
+  .b-idx {
+    fill: var(--lk);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+  }
+
+  .b-name {
+    fill: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .diagram-static .bar {
+      opacity: 0;
+      transform: translateX(-8px);
+      animation: bar-in var(--dur) var(--ease) both;
+      animation-delay: calc(var(--i) * 90ms + 60ms);
+    }
+
+    @keyframes bar-in {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  }
+
+  /* ---- interactive ---- */
+  .diagram-int {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
+  }
+
+  @media (min-width: 840px) {
+    .diagram-int {
+      grid-template-columns: 1fr 132px;
+      gap: var(--s-6);
+      align-items: stretch;
+    }
+  }
+
+  .rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .drow {
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    align-items: start;
+    gap: var(--s-4);
+    padding: var(--s-4) var(--s-2) var(--s-4) 0;
+  }
+
+  .d-idx {
+    align-self: stretch;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 0.15em;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--muted);
+  }
+
+  .d-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    min-width: 0;
+  }
+
+  .d-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-3);
+  }
+
+  .d-name {
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .d-flag {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .d-tagline {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .d-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-top: var(--s-1);
+  }
+
+  .chip {
+    padding: 2px var(--s-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* row-local tint on hover/focus */
+  .drow:hover .d-idx,
+  .drow:focus-within .d-idx {
+    background: color-mix(in srgb, var(--tint) 45%, var(--bg));
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .d-idx {
+      transition:
+        background-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+    }
+  }
+
+  /* side mark + evidence flow */
+  .d-aside {
+    display: none;
+  }
+
+  @media (min-width: 840px) {
+    .d-aside {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--s-3);
+      align-items: stretch;
+    }
+  }
+
+  .d-flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .d-arrow {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 7px solid var(--muted);
+  }
+
+  .d-rule {
+    flex: 1;
+    width: 1px;
+    background: var(--line);
+  }
+
+  .d-flow-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .d-mark {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--s-2);
+  }
+
+  .d-bar {
+    height: 10px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--c) 55%, var(--bg));
+    border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+    transform-origin: right center;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .d-bar {
+      transition:
+        background-color var(--dur) var(--ease),
+        transform var(--dur) var(--ease);
+    }
+  }
+
+  /* :has() cross-highlight — a hovered/focused row lights its matching bar */
+  .diagram-int:has(.drow[data-layer='1']:hover) .d-bar[data-layer='1'],
+  .diagram-int:has(.drow[data-layer='1']:focus-within) .d-bar[data-layer='1'],
+  .diagram-int:has(.drow[data-layer='2']:hover) .d-bar[data-layer='2'],
+  .diagram-int:has(.drow[data-layer='2']:focus-within) .d-bar[data-layer='2'],
+  .diagram-int:has(.drow[data-layer='3']:hover) .d-bar[data-layer='3'],
+  .diagram-int:has(.drow[data-layer='3']:focus-within) .d-bar[data-layer='3'],
+  .diagram-int:has(.drow[data-layer='4']:hover) .d-bar[data-layer='4'],
+  .diagram-int:has(.drow[data-layer='4']:focus-within) .d-bar[data-layer='4'],
+  .diagram-int:has(.drow[data-layer='5']:hover) .d-bar[data-layer='5'],
+  .diagram-int:has(.drow[data-layer='5']:focus-within) .d-bar[data-layer='5'] {
+    background: var(--c);
+    transform: scaleX(1.14);
+  }
+</style>

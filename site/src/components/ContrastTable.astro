@@ -1,0 +1,111 @@
+---
+/**
+ * ContrastTable — the analyst-versus-engineer contrast, one row per dimension.
+ * A three-column grid (dimension · analyst · engineer) on wide screens that
+ * collapses to a stack of labelled cards on narrow ones. Semantic <table> is
+ * avoided so the responsive collapse stays clean; a header row plus per-cell
+ * labels carry the column meaning at both sizes.
+ */
+import type { AnalystEngineerRow } from '../data/role';
+
+interface Props {
+  rows: readonly AnalystEngineerRow[];
+}
+
+const { rows } = Astro.props;
+---
+
+<div class="contrast">
+  <div class="chead" aria-hidden="true">
+    <span class="field-label">Dimension</span>
+    <span class="field-label">AI governance analyst</span>
+    <span class="field-label">AI governance engineer</span>
+  </div>
+  {
+    rows.map((row) => (
+      <div class="crow">
+        <div class="dimension">
+          <span class="cell-label">Dimension</span>
+          <span class="dimension-text">{row.dimension}</span>
+        </div>
+        <div class="analyst">
+          <span class="cell-label">Analyst</span>
+          <span>{row.analyst}</span>
+        </div>
+        <div class="engineer">
+          <span class="cell-label">Engineer</span>
+          <span>{row.engineer}</span>
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .contrast {
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+
+  .chead {
+    display: none;
+  }
+
+  .crow {
+    display: grid;
+    gap: var(--s-3);
+    padding: var(--s-5);
+  }
+
+  .crow + .crow {
+    border-top: 1px solid var(--line);
+  }
+
+  .cell-label {
+    display: block;
+    margin-bottom: var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .dimension-text {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .analyst,
+  .engineer {
+    color: var(--ink-2);
+    font-size: var(--fs-small);
+    text-wrap: pretty;
+  }
+
+  .engineer {
+    color: var(--ink);
+  }
+
+  /* Wide: a real three-column grid with a shared header row. */
+  @media (min-width: 760px) {
+    .chead,
+    .crow {
+      display: grid;
+      grid-template-columns: minmax(9rem, 12rem) 1fr 1fr;
+      gap: var(--s-5);
+      align-items: start;
+    }
+
+    .chead {
+      padding: var(--s-4) var(--s-5);
+      background: color-mix(in srgb, var(--ink) 4%, var(--bg));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .cell-label {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,131 @@
+---
+/**
+ * ToolsTable — the flattened tool catalogue: one row per illustrative tool,
+ * grouped by category, with the stack layer(s) the category belongs to shown
+ * as colour ticks. Brands are illustrative, not endorsed (see the note above
+ * this table on the page). Matches the house table style: 1px rules, mono
+ * uppercase header, no shadow. Scrolls horizontally on narrow screens.
+ */
+import type { FlattenedToolCategory } from '../data/stack';
+
+interface Props {
+  rows: FlattenedToolCategory[];
+}
+
+const { rows } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<div class="tools-scroll" role="region" aria-label="Reference tools by category" tabindex="0">
+  <table class="tools-table">
+    <thead>
+      <tr>
+        <th scope="col">Category</th>
+        <th scope="col">Tool</th>
+        <th scope="col">Layer</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((cat) =>
+          cat.examples.map((tool, i) => (
+            <tr>
+              {i === 0 && (
+                <th scope="rowgroup" rowspan={cat.examples.length} class="cat">
+                  {cat.category}
+                </th>
+              )}
+              <td class="tool">{tool}</td>
+              {i === 0 && (
+                <td rowspan={cat.examples.length} class="layers">
+                  <span class="ticks">
+                    {cat.layers.map((n) => (
+                      <span class="tick" style={`--c: var(--l${n})`}>
+                        <span class="dot" aria-hidden="true" />
+                        {pad(n)}
+                      </span>
+                    ))}
+                  </span>
+                </td>
+              )}
+            </tr>
+          )),
+        )
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .tools-scroll {
+    margin-top: var(--s-5);
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+  }
+
+  .tools-scroll:focus-visible {
+    outline: 2px solid var(--l1-ink);
+    outline-offset: 2px;
+  }
+
+  .tools-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+  }
+
+  .tools-table th,
+  .tools-table td {
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .tools-table thead th {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 4%, var(--bg));
+  }
+
+  .cat {
+    font-weight: 600;
+    color: var(--ink);
+    background: color-mix(in srgb, var(--ink) 2%, var(--bg));
+    max-width: 22ch;
+  }
+
+  .tool {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .ticks {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+
+  .tick {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--ink-2);
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: var(--c);
+    border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  }
+</style>

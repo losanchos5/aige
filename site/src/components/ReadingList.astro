@@ -1,0 +1,49 @@
+---
+/**
+ * ReadingList — the annotated bibliography as numbered register sections. Each
+ * group is a numbered section; each item carries its title (a link out where a
+ * URL exists, with a mono "↗" and rel="noopener"), a one-line note and a mono
+ * "verified" chip when the source is tagged.
+ */
+import type { ReadingGroup } from '../lib/reading-list';
+
+interface Props {
+  groups: ReadingGroup[];
+}
+
+const { groups } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<ol class="rd-list">
+  {
+    groups.map((group, i) => (
+      <li class="rd-group">
+        <div class="rd-group-head">
+          <span class="rd-num">{pad(i + 1)}</span>
+          <h2>{group.group}</h2>
+        </div>
+        <ul class="rd-items">
+          {group.items.map((item) => (
+            <li class="rd-item">
+              <div class="rd-item-top">
+                <span class="rd-title">
+                  {item.url ? (
+                    <a href={item.url} target="_blank" rel="noopener" data-reading-item>
+                      {item.title}
+                      <span class="ext" aria-hidden="true">↗</span>
+                    </a>
+                  ) : (
+                    item.title
+                  )}
+                </span>
+                {item.verified && <span class="vchip">verified: {item.verified}</span>}
+              </div>
+              {item.note && <p class="rd-note">{item.note}</p>}
+            </li>
+          ))}
+        </ul>
+      </li>
+    ))
+  }
+</ol>

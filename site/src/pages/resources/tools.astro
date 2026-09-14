@@ -1,0 +1,84 @@
+---
+import Base from '../../layouts/Base.astro';
+import Kicker from '../../components/Kicker.astro';
+import Callout from '../../components/Callout.astro';
+import { site } from '../../data/site';
+import { layers, toolsByCategory } from '../../data/stack';
+import '../../styles/resources.css';
+
+const groups = toolsByCategory();
+---
+
+<Base
+  title={`Tools · ${site.name}`}
+  description="Reference tool categories for each layer of the AI governance engineering stack, with illustrative examples — the substance, not an endorsement of any brand."
+>
+  <div class="container res-page">
+    <header class="res-head">
+      <Kicker rule swatch="var(--l4)">Resources · Tools</Kicker>
+      <h1 class="res-title">Tool categories, by layer.</h1>
+      <p class="res-lede">
+        The reference tool categories that fill each layer of the stack, with the examples the Body
+        of Knowledge names. The category is the substance; the brands are illustrative. See how they
+        fit together in <a href="/stack">the stack</a>.
+      </p>
+    </header>
+
+    <div class="res-section">
+      <Callout kind="note" title="Illustrative, not an endorsement">
+        <p>Tools are named as category examples to make the substance concrete. Naming a tool is not
+        a recommendation, and the list is neither exhaustive nor current — treat it as a map of the
+        category, not a shortlist.</p>
+      </Callout>
+    </div>
+
+    <section class="res-section" aria-labelledby="tl-heading">
+      <div class="res-section-head">
+        <h2 id="tl-heading">The five layers</h2>
+        <p>Each category is keyed to the layer it serves. The colour ticks throughout follow this
+        legend.</p>
+      </div>
+
+      <ul class="tl-legend" aria-label="Stack layers">
+        {
+          layers.map((layer) => (
+            <li>
+              <span class="tk tk-lg" data-l={layer.n} aria-hidden="true" />
+              <span class="tl-ln">L{layer.n}</span>
+              <span>{layer.name}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <ul class="tl-groups">
+        {
+          groups.map((group) => (
+            <li class="tl-group">
+              <div class="tl-group-head">
+                <h3>{group.category}</h3>
+                <span class="ticks" role="img" aria-label={`Layers ${group.layers.join(', ')}`}>
+                  {group.layers.map((n) => (
+                    <span class="tk" data-l={n} aria-hidden="true" />
+                  ))}
+                </span>
+              </div>
+              <ul class="tl-tools">
+                {group.examples.map((example) => (
+                  <li class="tl-tool" data-tool>
+                    <span class="tl-name">{example}</span>
+                    <span class="ticks" role="img" aria-label={`Layers ${group.layers.join(', ')}`}>
+                      {group.layers.map((n) => (
+                        <span class="tk" data-l={n} aria-hidden="true" />
+                      ))}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</Base>

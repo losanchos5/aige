@@ -1,0 +1,318 @@
+---
+/**
+ * /role — the AI governance engineer as a concrete role: the seven workflows it
+ * owns, the skills behind them, the analyst/engineer contrast, three ways in,
+ * what employers get wrong, the market (primary medians only), and the maturity
+ * ladder. Content comes from src/data/role.ts and src/data/maturity.ts; every
+ * section links back to its heading in chapter 06 (or the maturity model).
+ */
+import Marketing from '../layouts/Marketing.astro';
+import '../styles/pages.css';
+import Kicker from '../components/Kicker.astro';
+import WorkflowGrid from '../components/WorkflowGrid.astro';
+import SkillsTable from '../components/SkillsTable.astro';
+import ContrastTable from '../components/ContrastTable.astro';
+import MaturityLadder from '../components/MaturityLadder.astro';
+import StatTile from '../components/StatTile.astro';
+import VerdictStamp from '../components/VerdictStamp.astro';
+import CtaBand from '../components/CtaBand.astro';
+import {
+  capabilityStatement,
+  analystDistinction,
+  workflows,
+  skills,
+  analystVsEngineer,
+  waysIn,
+  employerMistakes,
+  market,
+} from '../data/role';
+import { levels } from '../data/maturity';
+
+const roleHref = (anchor: string) => `/bok/the-role#${anchor}`;
+const maturityHref = `/bok/maturity-model#${levels[0].anchor}`;
+
+const primaryStats = market.filter((stat) => stat.primary);
+const reportedStats = market.filter((stat) => !stat.primary);
+
+const mistakes = employerMistakes.map((text) => {
+  const at = text.indexOf(': ');
+  return at > 0
+    ? { lead: text.slice(0, at), body: text.slice(at + 2) }
+    : { lead: '', body: text };
+});
+const pad = (n: number) => String(n).padStart(2, '0');
+
+// A single reported-only sentence for the non-primary demand signal(s). Em
+// dashes separate the source so the source's own parentheses do not nest.
+const reportedText = reportedStats
+  .map((stat) => {
+    const label = stat.label.replace(' (reported demand signal — not a stat tile)', '');
+    return `${label}, up ${stat.value} — ${stat.source}`;
+  })
+  .join('; ');
+---
+
+<Marketing
+  title="The role · AI Governance Engineer"
+  description="What an AI Governance Engineer does: the seven workflows it owns, the skills behind them, and how the role differs from the AI governance analyst."
+>
+  <section class="hero section">
+    <div class="container page-hero reveal">
+      <Kicker swatch="var(--l3)" rule>The role</Kicker>
+      <h1 class="display">What an AI Governance Engineer does.</h1>
+      <p class="lede">{capabilityStatement}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l2)">The workflows</Kicker>
+      <h2 class="section-title display">Seven workflows the role owns.</h2>
+      <p class="lede well">The engineer owns workflows, not documents — each a running system with inputs, outputs and a stack layer it maps to.</p>
+      <WorkflowGrid workflows={workflows} hrefFor={roleHref} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l3)">The skills</Kicker>
+      <h2 class="section-title display">Core and supporting skills, by workflow.</h2>
+      <SkillsTable skills={skills} />
+      <p class="section-foot">
+        <a class="chapter-link" href={roleHref('skills-by-workflow')}>
+          Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l1)">Analyst versus engineer</Kicker>
+      <h2 class="section-title display">One line separates the two.</h2>
+      <p class="lede well">{analystDistinction}</p>
+      <ContrastTable rows={analystVsEngineer} />
+      <p class="section-foot">
+        <a class="chapter-link" href={roleHref('analyst-versus-engineer')}>
+          Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l5)">Three ways in</Kicker>
+      <h2 class="section-title display">Convert from an adjacent discipline.</h2>
+      <ul class="ways">
+        {
+          waysIn.map((way, i) => (
+            <li class="way card">
+              <span class="way-index" aria-hidden="true">{pad(i + 1)}</span>
+              <h3 class="way-title">{way.title}</h3>
+              <p class="way-summary">{way.summary}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="section-foot">
+        <a class="chapter-link" href={roleHref('three-ways-in')}>
+          Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l3)">What employers get wrong</Kicker>
+      <h2 class="section-title display">Three tells in the job description.</h2>
+      <ol class="mistakes">
+        {
+          mistakes.map((m, i) => (
+            <li class="mistake">
+              <span class="mistake-index" aria-hidden="true">{pad(i + 1)}</span>
+              <div class="mistake-body">
+                <div class="mistake-head">
+                  <VerdictStamp verdict="block" />
+                  {m.lead && <span class="mistake-lead">{m.lead}</span>}
+                </div>
+                <p class="mistake-text">{m.body}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="section-foot">
+        <a class="chapter-link" href={roleHref('what-employers-get-wrong-in-the-job-description')}>
+          Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l4)">The market</Kicker>
+      <h2 class="section-title display">What the primary sources report.</h2>
+      <div class="stats">
+        {
+          primaryStats.map((stat) => (
+            <StatTile value={stat.value} label={stat.label} source={stat.source} href={stat.sourceUrl} />
+          ))
+        }
+      </div>
+      {
+        reportedStats.length > 0 && (
+          <p class="footnote well">
+            Also reported, as a demand signal rather than a headline figure: {reportedText}.
+          </p>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l5)">The maturity ladder</Kicker>
+      <h2 class="section-title display">From paper to production, in five levels.</h2>
+      <p class="lede well">Each level is assessed across all five stack layers; the overall level is the weakest layer.</p>
+      <MaturityLadder levels={levels} />
+      <p class="section-foot">
+        <a class="chapter-link" href={maturityHref}>
+          Read the maturity model in chapter 07 <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Own the capability, not the title."
+    sub="The role in full — workflows, skills, the ladder and the market, against the manifesto that frames it."
+    primary={{ label: 'Read chapter 06 in full', href: '/bok/the-role' }}
+    secondary={{ label: 'Read the Manifesto', href: '/manifesto' }}
+  />
+</Marketing>
+
+<style>
+  .hero h1 {
+    font-size: var(--fs-display);
+  }
+
+  /* Three ways in */
+  .ways {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .way {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    background: var(--bg);
+  }
+
+  .way-index {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--muted);
+  }
+
+  .way-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h3);
+    letter-spacing: var(--tracking-display);
+    line-height: 1.15;
+  }
+
+  .way-summary {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: var(--fs-small);
+    text-wrap: pretty;
+  }
+
+  /* Employer mistakes: register rows with a BLOCK verdict per row. */
+  .mistakes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .mistake {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: var(--s-4);
+    padding: var(--s-5) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mistake-index {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--muted);
+    padding-top: 0.35em;
+  }
+
+  .mistake-body {
+    min-width: 0;
+  }
+
+  .mistake-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3);
+    margin-bottom: var(--s-2);
+  }
+
+  .mistake-lead {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h3);
+    letter-spacing: var(--tracking-display);
+    line-height: 1.2;
+  }
+
+  .mistake-text {
+    margin: 0;
+    color: var(--ink-2);
+    max-width: 68ch;
+    text-wrap: pretty;
+  }
+
+  /* Market */
+  .stats {
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .footnote {
+    margin-top: var(--s-5);
+    color: var(--muted);
+    font-size: var(--fs-small);
+    text-wrap: pretty;
+  }
+
+  .footnote strong {
+    color: var(--ink-2);
+  }
+
+  @media (min-width: 720px) {
+    .ways {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .stats {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

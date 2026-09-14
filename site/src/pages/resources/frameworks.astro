@@ -1,0 +1,54 @@
+---
+import Base from '../../layouts/Base.astro';
+import Kicker from '../../components/Kicker.astro';
+import Callout from '../../components/Callout.astro';
+import FrameworkTable from '../../components/FrameworkTable.astro';
+import ObligationTable from '../../components/ObligationTable.astro';
+import { site } from '../../data/site';
+import { frameworks, obligations, disclaimer } from '../../data/frameworks';
+import '../../styles/resources.css';
+---
+
+<Base
+  title={`Frameworks · ${site.name}`}
+  description="The laws, standards, codes and control sets AI governance engineering maps against, with the obligation → artefact → stack-layer index from chapter 08."
+>
+  <div class="container res-page">
+    <header class="res-head">
+      <Kicker rule swatch="var(--l1)">Resources · Frameworks</Kicker>
+      <h1 class="res-title">The instruments, and what answers them.</h1>
+      <p class="res-lede">
+        The horizontal law, the management standards, the voluntary codes and the control sets the
+        discipline is built against — then the reverse index that names, for each obligation, the
+        engineering artefact that evidences it and the layer it lives in.
+      </p>
+    </header>
+
+    <div class="res-section">
+      <Callout kind="note" title="Illustrative mapping, not a conformity assessment">
+        <p>{disclaimer} No artefact named here guarantees compliance, and no standard cited confers a
+        presumption of conformity. An artefact supports and evidences an obligation; the legal
+        judgement of conformity stays with lawyers, notified bodies and authorities.</p>
+      </Callout>
+    </div>
+
+    <section class="res-section" aria-labelledby="fw-heading">
+      <div class="res-section-head">
+        <h2 id="fw-heading">Frameworks</h2>
+        <p>{frameworks.length} instruments — laws, standards, codes and control sets. External links
+        open the canonical source.</p>
+      </div>
+      <FrameworkTable frameworks={frameworks} />
+    </section>
+
+    <section class="res-section" aria-labelledby="ob-heading">
+      <div class="res-section-head">
+        <h2 id="ob-heading">Obligation → artefact → layer</h2>
+        <p>{obligations.length} rows, grouped by framework. Read each as a sentence: this obligation
+        is answered by this artefact, which lives in this layer. Filter by the layer you are
+        building.</p>
+      </div>
+      <ObligationTable obligations={obligations} />
+    </section>
+  </div>
+</Base>

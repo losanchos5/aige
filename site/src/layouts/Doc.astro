@@ -1,8 +1,9 @@
 ---
 // Doc: the reading layout for the Manifesto, the Body of Knowledge and the meta
-// pages. Wraps Base (unmodified) and lays out a chapter rail, the prose well and
-// an on-this-page TOC — three columns ≥1100px, two ≥840px, one below with the
+// pages. Wraps Base and lays out a chapter rail, the prose well and an
+// on-this-page TOC — three columns ≥1100px, two ≥840px, one below with the
 // rail as an off-canvas drawer. All behaviour lives in /ui-doc.js (CSP-safe).
+// The search dialog now lives in Base, so it is available on every page.
 import type { MarkdownHeading } from 'astro';
 import Base from './Base.astro';
 import { site } from '../data/site';
@@ -12,7 +13,6 @@ import Toc from '../components/Toc.astro';
 import PrevNext from '../components/PrevNext.astro';
 import EditOnGitHub from '../components/EditOnGitHub.astro';
 import Citation from '../components/Citation.astro';
-import SearchDialog from '../components/SearchDialog.astro';
 
 interface Adjacent {
   slug: string;
@@ -119,7 +119,6 @@ const pageTitle = `${title} · ${site.name}`;
 
   {withSidebar && <div class="doc-scrim" data-drawer-close hidden />}
 
-  <SearchDialog />
   <script is:inline src="/ui-doc.js" defer></script>
 </Base>
 

@@ -1,0 +1,104 @@
+---
+/**
+ * DefinitionCards — a small row of bordered cards, each with a mono index, a
+ * short title and a one-to-two-sentence body. Flat, 1px border, matte. Used on
+ * the home page for the discipline's three core questions.
+ */
+export interface DefinitionItem {
+  /** Mono index label, e.g. `01`. */
+  index: string;
+  /** Card title. */
+  title: string;
+  /** One-to-two-sentence body. */
+  body: string;
+  /** Layer colour for the index swatch, e.g. `var(--l1)`. */
+  swatch?: string;
+}
+
+interface Props {
+  items: DefinitionItem[];
+  class?: string;
+}
+
+const { items, class: className } = Astro.props;
+---
+
+<ol class:list={['cards', className]}>
+  {
+    items.map((item) => (
+      <li class="card" style={`--tint:${item.swatch ?? 'var(--ink)'}`}>
+        <p class="head">
+          <span class="square" aria-hidden="true" />
+          <span class="idx">{item.index}</span>
+        </p>
+        <h3 class="title">{item.title}</h3>
+        <p class="body">{item.body}</p>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 720px) {
+    .cards {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0;
+  }
+
+  .square {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--tint);
+    border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  }
+
+  .idx {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--muted);
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .body {
+    margin: 0;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+</style>

@@ -1,0 +1,109 @@
+---
+/**
+ * ResourceTiles — a row of bordered tiles linking to the resource indexes, each
+ * with a title, a one-line description and a trailing arrow. Flat, 1px border.
+ */
+export interface ResourceTile {
+  label: string;
+  href: string;
+  desc: string;
+}
+
+interface Props {
+  tiles: ResourceTile[];
+  class?: string;
+}
+
+const { tiles, class: className } = Astro.props;
+---
+
+<ul class:list={['tiles', className]}>
+  {
+    tiles.map((tile) => (
+      <li>
+        <a class="tile" href={tile.href}>
+          <span class="label">
+            {tile.label}
+            <span class="arrow" aria-hidden="true">
+              →
+            </span>
+          </span>
+          <span class="desc">{tile.desc}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .tiles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 600px) {
+    .tiles {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 960px) {
+    .tiles {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    height: 100%;
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .arrow {
+    color: var(--muted);
+    font-size: var(--fs-body);
+  }
+
+  .desc {
+    font-size: var(--fs-small);
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  a.tile:hover {
+    border-color: var(--ink-2);
+  }
+
+  a.tile:hover .arrow {
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    a.tile {
+      transition: border-color var(--dur) var(--ease);
+    }
+  }
+</style>

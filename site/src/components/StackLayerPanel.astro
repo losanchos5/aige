@@ -1,0 +1,234 @@
+---
+/**
+ * StackLayerPanel — one layer of the five-layer stack. A bordered panel with a
+ * pastel band down the left edge (the layer colour), a big mono index, the
+ * name + tagline, an inherited/new tag, and a labelled grid of the layer's
+ * evidence: the question it answers, what it proves, its artefacts, tool
+ * categories with illustrative examples, and the frameworks it maps to. Closes
+ * with a back-link to the layer's heading in chapter 04.
+ */
+import type { Layer } from '../data/stack';
+
+interface Props {
+  layer: Layer;
+  /** Full href to the layer's heading in the chapter. */
+  href: string;
+}
+
+const { layer, href } = Astro.props;
+const index = String(layer.n).padStart(2, '0');
+---
+
+<article class="layer-panel" style={`--band: var(${layer.colorVar});`}>
+  <div class="band" aria-hidden="true"></div>
+  <div class="body">
+    <header class="head">
+      <span class="index" aria-hidden="true">{index}</span>
+      <div class="name-wrap">
+        <h3 class="name">{layer.name}</h3>
+        <p class="tagline">{layer.tagline}</p>
+      </div>
+      <span class:list={['tag', layer.inherited ? 'tag-inherited' : 'tag-new']}>
+        {layer.inherited ? 'Inherited' : 'New'}
+      </span>
+    </header>
+
+    <dl class="grid">
+      {
+        layer.question && (
+          <div class="field">
+            <dt class="field-label">Question it answers</dt>
+            <dd>{layer.question}</dd>
+          </div>
+        )
+      }
+      <div class="field">
+        <dt class="field-label">What it proves</dt>
+        <dd>{layer.proves}</dd>
+      </div>
+
+      <div class="field field-wide">
+        <dt class="field-label">Artefacts</dt>
+        <dd>
+          <ul class="chips">
+            {layer.artefacts.map((a) => <li class="chip">{a}</li>)}
+          </ul>
+        </dd>
+      </div>
+
+      <div class="field field-wide">
+        <dt class="field-label">Tool categories</dt>
+        <dd>
+          <ul class="tool-cats">
+            {
+              layer.toolCategories.map((tc) => (
+                <li class="tool-cat">
+                  <span class="tool-cat-name">{tc.category}</span>
+                  <ul class="chips">
+                    {tc.examples.map((e) => (
+                      <li class="chip chip-mono">{e}</li>
+                    ))}
+                  </ul>
+                </li>
+              ))
+            }
+          </ul>
+        </dd>
+      </div>
+
+      <div class="field field-wide">
+        <dt class="field-label">Maps to</dt>
+        <dd>
+          <ul class="chips">
+            {layer.mapsTo.map((m) => <li class="chip">{m}</li>)}
+          </ul>
+        </dd>
+      </div>
+    </dl>
+
+    <a class="chapter-link" href={href}>
+      Read layer {index} in chapter 04 <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+</article>
+
+<style>
+  .layer-panel {
+    display: flex;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+    overflow: hidden;
+  }
+
+  .band {
+    flex: none;
+    width: 8px;
+    background: var(--band);
+  }
+
+  .body {
+    flex: 1;
+    min-width: 0;
+    padding: var(--s-5);
+  }
+
+  .head {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: var(--s-4);
+    padding-bottom: var(--s-4);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .index {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--muted);
+  }
+
+  .name-wrap {
+    min-width: 0;
+  }
+
+  .name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h3);
+    line-height: 1.15;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .tagline {
+    margin: 2px 0 0;
+    color: var(--muted);
+    font-size: var(--fs-small);
+  }
+
+  .tag {
+    flex: none;
+    align-self: start;
+    padding: 0.3em 0.6em;
+    border: 1px solid;
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .tag-inherited {
+    color: var(--muted);
+    border-color: var(--line);
+  }
+
+  .tag-new {
+    color: var(--ink);
+    border-color: var(--ink);
+    background: var(--band);
+  }
+
+  .grid {
+    margin: var(--s-5) 0 0;
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .field {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .field dd {
+    margin: 0;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .tool-cats {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .tool-cat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .tool-cat-name {
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .chapter-link {
+    margin-top: var(--s-5);
+  }
+
+  @media (min-width: 680px) {
+    .body {
+      padding: var(--s-6);
+    }
+
+    .grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .field-wide {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

@@ -1,0 +1,61 @@
+---
+/**
+ * GlossaryIndex — the canonical glossary with an A–Z jump bar (only the letters
+ * that exist), terms grouped by letter under `id` anchors, and `<dl>` semantics.
+ * Each "ch. NN" cross-reference links to the chapter that develops the term.
+ * The term block carries `data-pagefind-body` so entries are searchable.
+ */
+import type { GlossaryEntry } from '../lib/glossary';
+import { chapters } from '../data/chapters';
+
+interface Props {
+  entries: GlossaryEntry[];
+  letters: string[];
+}
+
+const { entries, letters } = Astro.props;
+
+const byLetter = (letter: string) => entries.filter((e) => e.letter === letter);
+
+/** Map a zero-padded chapter number (e.g. "08") to its /bok/<slug> path. */
+const chapterHref = (ref: string): string => {
+  const chapter = chapters.find((c) => c.order === Number(ref));
+  return chapter ? `/bok/${chapter.slug}` : '/bok';
+};
+
+const termId = (term: string): string =>
+  `t-${term.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`;
+---
+
+<nav class="gl-jumpbar" aria-label="Jump to letter">
+  {
+    letters.map((letter) => (
+      <a class="gl-jump" data-jump href={`#gl-${letter}`}>
+        {letter}
+      </a>
+    ))
+  }
+</nav>
+
+<div class="gl-body" data-pagefind-body>
+  {
+    letters.map((letter) => (
+      <section class="gl-letter" id={`gl-${letter}`} aria-labelledby={`gl-${letter}-h`}>
+        <h2 class="gl-letter-head" id={`gl-${letter}-h`}>{letter}</h2>
+        <dl class="gl-dl">
+          {byLetter(letter).map((entry) => (
+            <div class="gl-entry">
+              <dt id={termId(entry.term)}>{entry.term}</dt>
+              <dd>
+                {entry.definition}
+                {entry.chapterRefs.map((ref) => (
+                  <a class="gl-ch" href={chapterHref(ref)}>ch. {ref}</a>
+                ))}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    ))
+  }
+</div>

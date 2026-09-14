@@ -1,0 +1,113 @@
+/* pages.css: shared primitives for the editorial landing pages (/stack, /role).
+   Imported by those pages only; tokens-driven so light and dark both follow.
+   Flat and matte — 1px rules, radii 10/6, mono labels, no shadows or gradients. */
+
+/* Page hero: eyebrow (Kicker) + display H1 + lede, left-aligned with air. */
+.page-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s-4);
+}
+
+.page-hero h1 {
+  font-size: var(--fs-display);
+  max-width: 20ch;
+  margin: 0;
+}
+
+.page-hero .lede {
+  max-width: 60ch;
+  font-size: 1.125rem;
+  color: var(--ink-2);
+}
+
+/* Section heading: display H2 under a Kicker eyebrow. */
+.section-title {
+  font-size: var(--fs-h2);
+  max-width: 22ch;
+  margin: var(--s-3) 0 var(--s-6);
+}
+
+/* A reading well: keep prose-like content within a comfortable measure. */
+.well {
+  max-width: var(--prose);
+}
+
+/* Chips: bordered, matte tags. Body variant for phrases, mono for tool names. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chip {
+  display: inline-block;
+  padding: var(--s-1) var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+  line-height: 1.4;
+  text-wrap: pretty;
+}
+
+.chip-mono {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+/* Field label inside panels and cards: the mono eyebrow at a small size. */
+.field-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* The "read in chapter N →" back-link: mono, understated, with a moving arrow. */
+.chapter-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.chapter-link .arrow {
+  transition: transform var(--dur) var(--ease);
+}
+
+.chapter-link:hover {
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .chapter-link:hover .arrow {
+    transform: translateX(3px);
+  }
+}
+
+/* A generic bordered card. */
+.card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  padding: var(--s-5);
+}
+
+/* Section footer holding a single chapter back-link, right-aligned on wide. */
+.section-foot {
+  margin-top: var(--s-6);
+}

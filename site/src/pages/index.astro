@@ -1,119 +1,360 @@
 ---
 /**
- * Home — placeholder that exercises the shell (Kicker, RegisterMark, RegisterList,
- * CtaBand). The real home page is built in a later block; keep this clean.
+ * Home — the discipline, defined. Hero, the three questions, the five-layer
+ * stack, the eight values, the role, a verdict beat, the Body of Knowledge, the
+ * resources and a closing CTA. All copy and every figure come from the typed
+ * content modules; no number appears here that a primary source does not carry.
  */
 import Marketing from '../layouts/Marketing.astro';
 import Kicker from '../components/Kicker.astro';
-import RegisterMark from '../components/RegisterMark.astro';
 import RegisterList from '../components/RegisterList.astro';
+import StatTile from '../components/StatTile.astro';
+import VerdictStamp from '../components/VerdictStamp.astro';
 import CtaBand from '../components/CtaBand.astro';
+import StackDiagram from '../components/StackDiagram.astro';
+import DefinitionCards from '../components/DefinitionCards.astro';
+import ValuePair from '../components/ValuePair.astro';
+import ChapterGrid from '../components/ChapterGrid.astro';
+import ResourceTiles from '../components/ResourceTiles.astro';
 import { site } from '../data/site';
+import { definition, values } from '../data/values';
+import { capabilityStatement, workflows, market } from '../data/role';
+import { chaptersOrdered } from '../data/chapters';
 
-const layers = [
+const seoTitle = 'AI Governance Engineer — the discipline, defined';
+const seoDesc =
+  'AI governance engineering turns governance into policy-as-code, eval gates and machine-readable evidence you can run, not just read.';
+
+// The three questions that define the discipline. Stated verbatim in
+// role.capabilityStatement and as the stack layers' `question` fields; the
+// bodies paraphrase the corresponding stack layers (inventory, govern-as-code,
+// evals/assurance).
+const questions = [
   {
-    title: 'Govern-as-Code',
-    description: 'Governance rules as executable policy, evaluated in CI/CD and at runtime.',
-    swatch: 'var(--l1)',
-    href: '/bok/the-stack',
-  },
-  {
-    title: 'Inventory & Transparency',
-    description: 'A runtime-aware registry of every model, service and agent.',
+    index: '01',
+    title: 'What AI is running?',
+    body: 'A runtime-aware registry of every model, service and agent — each with an owner, a scope and a status — written by the deployment pipeline, not typed into a spreadsheet.',
     swatch: 'var(--l2)',
-    href: '/bok/the-stack',
   },
   {
-    title: 'Evals & Red Teaming as Evidence',
-    description: 'Tests that can fail the build, not reviews that can only recommend.',
+    index: '02',
+    title: 'What is it allowed to do?',
+    body: 'Governance rules expressed as executable policy that evaluates in CI/CD and at runtime, so a bad release is blocked at the earliest point it can be — not discouraged in a review.',
+    swatch: 'var(--l1)',
+  },
+  {
+    index: '03',
+    title: 'What evidence proves it?',
+    body: 'Structured eval results and machine-readable evidence emitted as the build runs, so assurance is a live query rather than a point-in-time attestation assembled by hand.',
     swatch: 'var(--l3)',
-    href: '/bok/the-stack',
+  },
+];
+
+// Seven workflows as a register list: index (auto), name and the layer tick
+// colour. 'all' (regulatory translation) carries the neutral ink tick.
+const workflowItems = workflows.map((workflow) => ({
+  title: workflow.name,
+  swatch: workflow.layerN === 'all' ? 'var(--ink)' : `var(--l${workflow.layerN})`,
+}));
+
+// Only primary-sourced figures are tile-safe (the +150% demand signal is not).
+const primaryStats = market.filter((stat) => stat.primary);
+
+const resources = [
+  {
+    label: 'Frameworks',
+    href: '/resources/frameworks',
+    desc: 'The obligations — EU AI Act, ISO/IEC 42001, NIST AI RMF — mapped to the artefacts that satisfy them.',
   },
   {
-    title: 'Runtime Controls & Observability',
-    description: 'Guardrails that keep the answers true as the system changes underneath them.',
-    swatch: 'var(--l4)',
-    href: '/bok/the-stack',
+    label: 'Tools',
+    href: '/resources/tools',
+    desc: 'Reference tool categories per layer, from policy engines to eval harnesses and evidence formats.',
   },
   {
-    title: 'Assurance & Continuous Compliance',
-    description: 'Signed, queryable, audit-ready evidence emitted as a by-product of the build.',
-    swatch: 'var(--l5)',
-    href: '/bok/the-stack',
+    label: 'Reading list',
+    href: '/resources/reading-list',
+    desc: 'The sources that formed the discipline, each with a verified link and a one-line note.',
+  },
+  {
+    label: 'Glossary',
+    href: '/resources/glossary',
+    desc: 'Every term defined once, cross-referenced to the chapter that treats it in full.',
   },
 ];
 ---
 
-<Marketing title={site.name}>
+<Marketing title={seoTitle} description={seoDesc}>
   <section class="hero section">
-    <div class="container hero-inner reveal">
-      <Kicker swatch="var(--l1)" rule
-        >Manifesto &amp; Body of Knowledge · v{site.bokVersion}</Kicker
-      >
-      <RegisterMark size="lg" label={site.name} />
-      <h1 class="display">The engineering discipline for governing AI systems.</h1>
-      <p class="lede">
-        AI governance engineering is the application of engineering practice —
-        systems thinking, product thinking and code — to the governance of AI
-        systems. Governance you can run, test and prove, not a document you sign.
-      </p>
-      <div class="cta">
-        <a class="btn btn-primary" href="/bok">Read the Body of Knowledge</a>
-        <a class="btn btn-secondary" href="/manifesto">Read the Manifesto</a>
+    <div class="container hero-grid">
+      <div class="hero-copy reveal">
+        <Kicker swatch="var(--l1)" rule>A discipline, defined</Kicker>
+        <h1 class="display hero-h1">Governance you can run, not just read.</h1>
+        <p class="lede">{definition}</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="/manifesto">Read the Manifesto</a>
+          <a class="btn btn-secondary" href="/bok">Open the Body of Knowledge</a>
+        </div>
+      </div>
+      <div class="hero-art reveal">
+        <StackDiagram mode="static" />
       </div>
     </div>
   </section>
 
   <section class="section">
     <div class="container reveal">
-      <Kicker swatch="var(--l3)">The stack · five layers</Kicker>
-      <h2 class="section-title display">A build order, from policy to proof.</h2>
-      <div class="well"><RegisterList items={layers} /></div>
+      <div class="sec-head">
+        <Kicker swatch="var(--l2)">The three questions</Kicker>
+        <h2 class="sec-title display">Three questions define the discipline.</h2>
+        <p class="sec-lede lede">
+          Legacy AI governance leaves them unanswered because nothing is
+          connected to production. The engineer answers all three from the
+          running system.
+        </p>
+      </div>
+      <DefinitionCards items={questions} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <div class="sec-head">
+        <Kicker swatch="var(--l3)">The stack · five layers</Kicker>
+        <h2 class="sec-title display">A build order, from policy to proof.</h2>
+        <p class="sec-lede lede">
+          Five layers that answer the three questions. Evidence is produced at
+          the bottom and flows up; three layers are inherited from GRC
+          engineering, two are new to AI.
+        </p>
+      </div>
+      <StackDiagram mode="interactive" />
+      <p class="sec-link"><a href="/stack">Explore the stack →</a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <div class="sec-head">
+        <Kicker swatch="var(--l4)">Values</Kicker>
+        <h2 class="sec-title display">Eight values, each a trade made on purpose.</h2>
+      </div>
+      <div class="values-grid">
+        {values.map((value) => <ValuePair over={value.over} under={value.under} note={value.note} />)}
+      </div>
+      <p class="sec-link"><a href="/manifesto#principles">Read the principles →</a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <div class="sec-head">
+        <Kicker swatch="var(--l5)">The role</Kicker>
+        <h2 class="sec-title display">A capability first, a job title second.</h2>
+      </div>
+      <blockquote class="pullquote display">{capabilityStatement}</blockquote>
+      <div class="role-flows">
+        <p class="role-eyebrow mono muted">Seven workflows</p>
+        <RegisterList items={workflowItems} />
+      </div>
+      <div class="stats-row">
+        {
+          primaryStats.map((stat) => (
+            <StatTile value={stat.value} label={stat.label} source={stat.source} href={stat.sourceUrl} />
+          ))
+        }
+      </div>
+      <p class="sec-link"><a href="/role">What the role does →</a></p>
+    </div>
+  </section>
+
+  <section class="verdict-beat">
+    <div class="container vb-inner reveal">
+      <p class="vb-line display">A policy is not a control. An eval that can fail the build is.</p>
+      <div class="vb-stamps">
+        <VerdictStamp verdict="block" />
+        <VerdictStamp verdict="pass" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <div class="sec-head">
+        <Kicker swatch="var(--l1)">Body of Knowledge · v{site.bokVersion} · {site.license}</Kicker>
+        <h2 class="sec-title display">Eleven chapters, versioned and open.</h2>
+      </div>
+      <ChapterGrid chapters={chaptersOrdered} />
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <div class="sec-head">
+        <Kicker swatch="var(--l4)">Resources</Kicker>
+        <h2 class="sec-title display">Curated, cross-referenced, in the open.</h2>
+      </div>
+      <ResourceTiles tiles={resources} />
     </div>
   </section>
 
   <CtaBand
-    title="Build governance you can run."
-    sub="An open Body of Knowledge for the discipline, curated in the open."
-    primary={{ label: 'Read the Body of Knowledge', href: '/bok' }}
-    secondary={{ label: 'Read the Manifesto', href: '/manifesto' }}
+    title="Open, versioned, contributable."
+    sub="The Manifesto and Body of Knowledge are CC BY 4.0. Read them, use them, send a pull request."
+    primary={{ label: 'Contribute on GitHub', href: site.github }}
+    secondary={{ label: 'Follow on LinkedIn', href: site.linkedin }}
   />
 </Marketing>
 
 <style>
-  .hero-inner {
+  /* Hero */
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-6);
+    align-items: center;
+  }
+
+  @media (min-width: 840px) {
+    .hero-grid {
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: var(--s-7);
+    }
+  }
+
+  .hero-copy {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--s-5);
   }
 
-  .hero h1 {
+  .hero-h1 {
     font-size: var(--fs-display);
-    max-width: 18ch;
+    max-width: 16ch;
     margin: 0;
   }
 
-  .lede {
-    max-width: 60ch;
-    font-size: 1.125rem;
-    color: var(--ink-2);
+  .hero-copy .lede {
+    max-width: 54ch;
   }
 
-  .cta {
+  .hero-cta {
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-3);
     margin-top: var(--s-2);
   }
 
-  .section-title {
-    font-size: var(--fs-h2);
-    max-width: 20ch;
-    margin: var(--s-3) 0 var(--s-6);
+  .hero-art {
+    justify-self: center;
+    width: 100%;
+    max-width: 480px;
   }
 
-  .well {
+  /* Section heads */
+  .sec-head {
+    max-width: 62ch;
+    margin-bottom: var(--s-6);
+  }
+
+  .sec-title {
+    font-size: var(--fs-h2);
+    max-width: 22ch;
+    margin: var(--s-3) 0 0;
+  }
+
+  .sec-lede {
+    margin-top: var(--s-4);
+  }
+
+  .sec-link {
+    margin-top: var(--s-6);
+  }
+
+  .sec-link a {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    letter-spacing: 0.02em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .sec-link a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  /* Values */
+  .values-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    column-gap: var(--s-7);
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (min-width: 720px) {
+    .values-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Role */
+  .pullquote {
+    margin: 0 0 var(--s-6);
+    padding-left: var(--s-5);
+    border-left: 3px solid var(--ink);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+    line-height: 1.3;
+    color: var(--ink);
+    max-width: 46ch;
+    text-wrap: pretty;
+  }
+
+  .role-eyebrow {
+    margin: 0 0 var(--s-3);
+  }
+
+  .role-flows {
     max-width: 72ch;
+    margin-bottom: var(--s-6);
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-4);
+  }
+
+  @media (min-width: 720px) {
+    .stats-row {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Verdict beat */
+  .verdict-beat {
+    background: color-mix(in srgb, var(--ink) 3.5%, var(--bg));
+  }
+
+  .vb-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-5) var(--s-6);
+    padding-block: clamp(48px, 7vw, 88px);
+  }
+
+  .vb-line {
+    margin: 0;
+    font-size: var(--fs-h2);
+    max-width: 24ch;
+  }
+
+  .vb-stamps {
+    display: flex;
+    gap: var(--s-3);
   }
 </style>

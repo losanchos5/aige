@@ -7,6 +7,7 @@ import '../styles/prose.css';
 import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import SearchDialog from '../components/SearchDialog.astro';
 
 interface Props {
   title: string;
@@ -27,6 +28,13 @@ const { title, description, image } = Astro.props;
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="AI Governance Engineer — Changelog"
+      href="/rss.xml"
+    />
 
     <link
       rel="preload"
@@ -60,6 +68,10 @@ const { title, description, image } = Astro.props;
     </main>
 
     <Footer />
+
+    <!-- Global search dialog: opened by the header's [data-search-open] button
+         (and Ctrl/Cmd+K) on every page. Loads Pagefind lazily on first open. -->
+    <SearchDialog />
 
     <!-- Progressive enhancement: theme toggle, reveal-on-scroll, menu. -->
     <script is:inline defer src="/ui.js"></script>
