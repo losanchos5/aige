@@ -14,13 +14,34 @@ interface Props {
 
 const { value, label, source, href, class: className } = Astro.props;
 const Tag = href ? 'a' : 'div';
+
+// Parse the first numeric token so public/countup.js can count up to it. The
+// rendered text stays the final value (SEO, no layout shift); non-numeric values
+// carry no data-countup and are left untouched.
+const match = value.match(/\d[\d,]*(?:\.\d+)?/);
+const countup = match
+  ? {
+      number: match[0].replace(/,/g, ''),
+      prefix: value.slice(0, match.index),
+      suffix: value.slice((match.index ?? 0) + match[0].length),
+    }
+  : null;
 ---
 
 <Tag
   class:list={['tile', className]}
   {...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : {})}
 >
-  <span class="value">{value}</span>
+  <span
+    class="value"
+    {...(countup
+      ? {
+          'data-countup': countup.number,
+          'data-cu-prefix': countup.prefix,
+          'data-cu-suffix': countup.suffix,
+        }
+      : {})}>{value}</span
+  >
   <span class="label">{label}</span>
   <span class="source">{source}</span>
 </Tag>
@@ -44,6 +65,8 @@ const Tag = href ? 'a' : 'div';
     letter-spacing: var(--tracking-display);
     line-height: 1;
     font-size: var(--fs-h1);
+    /* Tabular figures so the counting number keeps a steady width. */
+    font-variant-numeric: tabular-nums;
   }
 
   .label {

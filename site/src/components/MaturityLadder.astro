@@ -4,7 +4,10 @@
  * right on wide screens and stacked on narrow ones. Each step carries a mono
  * index, a rising n-of-5 meter, the level name, a summary and its typical
  * signals. The overall level is the weakest layer, so the ladder reads as a
- * climb from paper (Documented) to production (Continuous).
+ * climb from paper (Documented) to production (Continuous). A thin ink baseline
+ * carries a mono "Level" axis label; public/countup.js draws the steps in on
+ * first view (riser, then label, then meter), with the finished ladder as the
+ * static no-JS / reduced-motion state.
  */
 import type { MaturityLevel } from '../data/maturity';
 
@@ -16,10 +19,15 @@ const { levels } = Astro.props;
 const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<ol class="ladder">
+<div class="ladder-axis">
+  <span class="axis-label">Level</span>
+  <span class="axis-line" aria-hidden="true"></span>
+</div>
+<ol class="ladder" data-ladder>
   {
     levels.map((level) => (
       <li class="maturity-step">
+        <span class="riser" aria-hidden="true" />
         <div class="step-head">
           <span class="index" aria-hidden="true">
             {pad(level.n)}
@@ -43,6 +51,28 @@ const pad = (n: number) => String(n).padStart(2, '0');
 </ol>
 
 <style>
+  /* Axis: a mono "Level" label against a thin ink baseline. */
+  .ladder-axis {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    margin-bottom: var(--s-4);
+  }
+
+  .axis-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .axis-line {
+    flex: 1;
+    height: 1px;
+    background: var(--ink);
+  }
+
   .ladder {
     list-style: none;
     margin: 0;
@@ -52,6 +82,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
   }
 
   .maturity-step {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--s-3);
@@ -59,6 +90,14 @@ const pad = (n: number) => String(n).padStart(2, '0');
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
     background: var(--bg);
+  }
+
+  /* Riser: a short ink stroke that grows in as the step draws. */
+  .riser {
+    width: 2px;
+    height: 22px;
+    background: var(--ink);
+    transform-origin: top;
   }
 
   .step-head {
@@ -137,4 +176,76 @@ const pad = (n: number) => String(n).padStart(2, '0');
       align-items: stretch;
     }
   }
+
+  /* Draw-on. Opt-in via `.anim` (added by countup.js only when motion is
+     allowed); `.drawn` runs the transitions to the finished, default state.
+     The riser grows first, then the label appears, then the meter fills; steps
+     stagger in ascending order for ~1.2s. No-JS / reduced-motion skip `.anim`
+     entirely and show the finished ladder. */
+  .ladder.anim .riser {
+    transform: scaleY(0);
+  }
+
+  .ladder.anim .name,
+  .ladder.anim .summary,
+  .ladder.anim .signals {
+    opacity: 0;
+  }
+
+  .ladder.anim .seg-on {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ladder.anim .riser {
+      transition: transform 180ms var(--ease);
+    }
+
+    .ladder.anim .name,
+    .ladder.anim .summary,
+    .ladder.anim .signals,
+    .ladder.anim .seg-on {
+      transition: opacity 180ms var(--ease);
+    }
+  }
+
+  .ladder.anim.drawn .riser {
+    transform: scaleY(1);
+  }
+
+  .ladder.anim.drawn .name,
+  .ladder.anim.drawn .summary,
+  .ladder.anim.drawn .signals,
+  .ladder.anim.drawn .seg-on {
+    opacity: 1;
+  }
+
+  /* Ascending stagger: each step ~200ms after the one below it. */
+  .ladder.anim.drawn .maturity-step:nth-child(1) .riser { transition-delay: 0ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(2) .riser { transition-delay: 200ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(3) .riser { transition-delay: 400ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(4) .riser { transition-delay: 600ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(5) .riser { transition-delay: 800ms; }
+
+  .ladder.anim.drawn .maturity-step:nth-child(1) .name,
+  .ladder.anim.drawn .maturity-step:nth-child(1) .summary,
+  .ladder.anim.drawn .maturity-step:nth-child(1) .signals { transition-delay: 120ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(2) .name,
+  .ladder.anim.drawn .maturity-step:nth-child(2) .summary,
+  .ladder.anim.drawn .maturity-step:nth-child(2) .signals { transition-delay: 320ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(3) .name,
+  .ladder.anim.drawn .maturity-step:nth-child(3) .summary,
+  .ladder.anim.drawn .maturity-step:nth-child(3) .signals { transition-delay: 520ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(4) .name,
+  .ladder.anim.drawn .maturity-step:nth-child(4) .summary,
+  .ladder.anim.drawn .maturity-step:nth-child(4) .signals { transition-delay: 720ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(5) .name,
+  .ladder.anim.drawn .maturity-step:nth-child(5) .summary,
+  .ladder.anim.drawn .maturity-step:nth-child(5) .signals { transition-delay: 920ms; }
+
+  .ladder.anim.drawn .maturity-step:nth-child(1) .seg-on { transition-delay: 200ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(2) .seg-on { transition-delay: 400ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(3) .seg-on { transition-delay: 600ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(4) .seg-on { transition-delay: 800ms; }
+  .ladder.anim.drawn .maturity-step:nth-child(5) .seg-on { transition-delay: 1000ms; }
 </style>

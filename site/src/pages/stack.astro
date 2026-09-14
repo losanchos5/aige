@@ -10,6 +10,7 @@ import '../styles/pages.css';
 import Kicker from '../components/Kicker.astro';
 import RegisterList from '../components/RegisterList.astro';
 import StackLayerPanel from '../components/StackLayerPanel.astro';
+import StackFlow from '../components/StackFlow.astro';
 import ToolsTable from '../components/ToolsTable.astro';
 import Callout from '../components/Callout.astro';
 import CtaBand from '../components/CtaBand.astro';
@@ -60,6 +61,14 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
         turn governance from a stack of parallel documents into one system with a
         data path from policy to proof.
       </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l5)">Layer flow</Kicker>
+      <h2 class="section-title display">Follow one artefact from policy to proof.</h2>
+      <StackFlow />
     </div>
   </section>
 
@@ -161,6 +170,8 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     primary={{ label: 'Read chapter 04 in full', href: '/bok/the-stack' }}
     secondary={{ label: 'Open the Body of Knowledge', href: '/bok' }}
   />
+
+  <script is:inline defer src="/stack.js"></script>
 </Marketing>
 
 <style>

@@ -337,3 +337,75 @@
 .prose td {
   color: var(--ink-2);
 }
+
+/* ---- V4: glossary term links + hover cards ----
+   Terms are wrapped in-prose by rehype-glossary; the dotted underline keeps the
+   ink colour so reading rhythm is undisturbed. The card is appended to <body>
+   by public/glossary-cards.js, so it is styled globally here (not scoped). */
+.prose a.term {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dotted var(--muted);
+}
+
+.prose a.term:hover,
+.prose a.term:focus-visible {
+  border-bottom-color: var(--ink);
+}
+
+.term-card {
+  position: absolute;
+  z-index: 60;
+  max-width: 22rem;
+  width: max-content;
+  padding: var(--s-3) var(--s-4);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink-2);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .term-card {
+    transition: opacity 160ms var(--ease);
+  }
+}
+
+.term-card.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.term-card .tc-term {
+  margin: 0 0 var(--s-1);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem; /* 16px */
+  color: var(--ink);
+}
+
+.term-card .tc-def {
+  margin: 0;
+}
+
+.term-card .tc-link {
+  display: inline-block;
+  margin-top: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.term-card .tc-link:hover {
+  text-decoration: underline;
+}

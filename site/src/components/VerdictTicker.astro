@@ -1,0 +1,132 @@
+---
+/**
+ * VerdictTicker — a thin, 1px-ruled strip of mono verdicts that translates
+ * slowly under the verdict-beat sentence, like a compliance ticker. The content
+ * is duplicated so the translateX loop wraps seamlessly; it pauses on hover and
+ * holds still under reduced motion. Generic, illustrative items only — no vendor
+ * names. Decorative, so the whole strip is aria-hidden.
+ */
+interface Item {
+  id: string;
+  verdict: 'pass' | 'block';
+  detail: string;
+}
+
+const items: readonly Item[] = [
+  { id: '#4821', verdict: 'pass', detail: 'eval.safety 0.97' },
+  { id: '#4822', verdict: 'block', detail: 'pii.leak detected' },
+  { id: '#4823', verdict: 'pass', detail: 'aibom.signed' },
+  { id: '#4824', verdict: 'pass', detail: 'scope.bound · trace ok' },
+  { id: '#4825', verdict: 'block', detail: 'eval.jailbreak 0.71' },
+  { id: '#4826', verdict: 'pass', detail: 'policy.allow deploy' },
+  { id: '#4827', verdict: 'pass', detail: 'oscal.evidence written' },
+  { id: '#4828', verdict: 'block', detail: 'owner missing' },
+  { id: '#4829', verdict: 'pass', detail: 'kill-switch armed' },
+  { id: '#4830', verdict: 'pass', detail: 'eval.groundedness 0.96' },
+];
+---
+
+<div class="vt" aria-hidden="true">
+  <div class="vt-track">
+    {
+      [0, 1].map((copy) => (
+        <ul class="vt-list" data-copy={copy}>
+          {items.map((item) => (
+            <li class="vt-item">
+              <span class:list={['vt-chip', `vt-${item.verdict}`]}>{item.verdict === 'pass' ? 'PASS' : 'BLOCK'}</span>
+              <span class="vt-id">{item.id}</span>
+              <span class="vt-detail">{item.detail}</span>
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .vt {
+    border-top: 1px solid var(--line);
+    overflow: hidden;
+    /* fade the two edges so items enter and leave cleanly */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+
+  .vt-track {
+    display: flex;
+    width: max-content;
+    padding-block: var(--s-3);
+  }
+
+  .vt-list {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    margin: 0;
+    padding: 0 calc(var(--s-5) / 2);
+    list-style: none;
+    flex: none;
+  }
+
+  .vt-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    white-space: nowrap;
+  }
+
+  .vt-chip {
+    padding: 0.12em 0.45em;
+    border: 1px solid;
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .vt-pass {
+    color: var(--l5-ink);
+    border-color: var(--l5-ink);
+    background: color-mix(in srgb, var(--l5) 55%, var(--bg));
+  }
+
+  .vt-block {
+    color: var(--l3-ink);
+    border-color: var(--l3-ink);
+    background: color-mix(in srgb, var(--l3) 55%, var(--bg));
+  }
+
+  .vt-id {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .vt-detail {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  /* Motion only: translate one full copy's width and loop; hovering the strip
+     pauses it. Under reduced motion the strip holds still and stays legible. */
+  @media (prefers-reduced-motion: no-preference) {
+    .vt-track {
+      animation: vt-scroll 42s linear infinite;
+    }
+
+    .vt:hover .vt-track {
+      animation-play-state: paused;
+    }
+  }
+
+  @keyframes vt-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>

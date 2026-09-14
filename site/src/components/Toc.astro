@@ -15,15 +15,18 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
   items.length > 0 && (
     <nav class="toc" aria-label="On this page">
       <p class="toc-label">On this page</p>
-      <ul>
-        {items.map((heading) => (
-          <li class={`toc-h${heading.depth}`}>
-            <a href={`#${heading.slug}`} data-toc-link={heading.slug}>
-              {heading.text}
-            </a>
-          </li>
-        ))}
-      </ul>
+      <div class="toc-list">
+        <span class="toc-marker" data-toc-marker aria-hidden="true" />
+        <ul>
+          {items.map((heading) => (
+            <li class={`toc-h${heading.depth}`}>
+              <a href={`#${heading.slug}`} data-toc-link={heading.slug}>
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </nav>
   )
 }
@@ -42,6 +45,30 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
     text-transform: uppercase;
     color: var(--muted);
     margin-bottom: var(--s-3);
+  }
+
+  /* The active marker is a single 2px rule that slides between entries rather
+     than a per-link border that jumps. */
+  .toc-list {
+    position: relative;
+  }
+
+  .toc-marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2px;
+    height: 0;
+    background: var(--ink);
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .toc-marker {
+      transition:
+        transform 200ms var(--ease),
+        height 200ms var(--ease);
+    }
   }
 
   .toc ul {
@@ -75,8 +102,12 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
     color: var(--ink);
   }
 
+  /* Entries scrolled past fade back to muted; the active one takes the ink. */
+  .toc a.is-past {
+    color: var(--muted);
+  }
+
   .toc a[aria-current='true'] {
     color: var(--ink);
-    border-left-color: var(--ink);
   }
 </style>

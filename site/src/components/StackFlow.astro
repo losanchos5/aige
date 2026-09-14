@@ -1,0 +1,508 @@
+---
+/**
+ * StackFlow — the five-layer stack as an interactive layer-flow diagram.
+ *
+ * On wide screens, an SVG shows the five layers as horizontal bands (05 at the
+ * top, 01 at the foot, so evidence flows up) with thin ink paths tracing each
+ * layer's artefact into assurance (and into the layer it also feeds). Clicking
+ * or keyboard-activating a band (role="button") highlights it, dims the rest,
+ * redraws its paths and reveals that layer's detail panel beside the diagram.
+ *
+ * On narrow screens the SVG is replaced by a simplified stacked list of the
+ * same bands (real <button>s), with the detail panel below. Both band sets
+ * carry data-band/data-layer, so public/stack.js drives them with one handler.
+ * With no JS every band and path is static and layer 01's panel is shown.
+ */
+import { layers } from '../data/stack';
+
+const pad = (n: number) => String(n).padStart(2, '0');
+
+// SVG geometry (viewBox 0 0 1140 420). Bands sit on the left; artefact paths
+// bow out into the empty right gutter, where their mono labels stay legible.
+const BAND_X = 64;
+const BAND_W = 720;
+const BAND_H = 58;
+const TOP = 29;
+const PITCH = 76;
+const RIGHT = BAND_X + BAND_W; // 784 — the bands' right edge, where flows start.
+
+/** Vertical centre of a layer's band. 05 is at the top, 01 at the foot. */
+const cy = (n: number) => TOP + (5 - n) * PITCH + BAND_H / 2;
+
+// Bands top-to-bottom: 05, 04, 03, 02, 01.
+const bandsOrder = [...layers].sort((a, b) => b.n - a.n);
+
+// The one artefact each producing layer emits (05 is the sink; it emits none).
+const artefact: Record<number, string> = {
+  1: 'policy verdict',
+  2: 'registry entry',
+  3: 'eval result',
+  4: 'guardrail decision',
+};
+
+// Artefact flows. The four into-05 edges carry the mono label at their apex;
+// the two short intra-stack hops (02→03, 03→04) are unlabelled thin connectors.
+// `ctrl` is the bezier control x (bow depth); `sOff`/`eOff` spread the ends so
+// arrowheads do not stack on a single point of a band's edge.
+const rawEdges = [
+  { from: 1, to: 5, ctrl: 1170, sOff: 0, eOff: 16, label: true },
+  { from: 2, to: 5, ctrl: 1075, sOff: 8, eOff: 6, label: true },
+  { from: 3, to: 5, ctrl: 985, sOff: 8, eOff: -4, label: true },
+  { from: 4, to: 5, ctrl: 905, sOff: 0, eOff: -14, label: true },
+  { from: 2, to: 3, ctrl: 836, sOff: -8, eOff: 10, label: false },
+  { from: 3, to: 4, ctrl: 836, sOff: -8, eOff: 10, label: false },
+];
+
+const edges = rawEdges.map((e) => {
+  const y0 = cy(e.from) + e.sOff;
+  const y1 = cy(e.to) + e.eOff;
+  return {
+    from: e.from,
+    to: e.to,
+    label: e.label,
+    text: artefact[e.from],
+    d: `M ${RIGHT} ${y0} C ${e.ctrl} ${y0}, ${e.ctrl} ${y1}, ${RIGHT} ${y1}`,
+    // Apex x/y of the symmetric bow (x0 = x1 = RIGHT), where the label sits.
+    lx: 0.25 * RIGHT + 0.75 * e.ctrl,
+    ly: (y0 + y1) / 2,
+  };
+});
+
+// "Evidence flows up" axis in the left gutter.
+const AXIS_X = 34;
+const axisTop = cy(5) + 12; // just below the top band's centre
+const axisBottom = cy(1) - 12;
+---
+
+<figure class="flow" data-flow>
+  <div class="flow-grid">
+    <div class="flow-stage">
+      <svg
+        class="flow-svg"
+        data-flow-svg
+        viewBox="0 0 1140 420"
+        role="group"
+        aria-label="Layer flow diagram: each layer's artefact flows up into continuous assurance. Activate a layer for its detail."
+        preserveAspectRatio="xMidYMid meet"
+      >
+        <defs>
+          <marker
+            id="flow-arrow"
+            markerUnits="userSpaceOnUse"
+            markerWidth="9"
+            markerHeight="9"
+            refX="7"
+            refY="4"
+            orient="auto"
+          >
+            <path class="flow-arrow-head" d="M0,0 L8,4 L0,8 Z" />
+          </marker>
+        </defs>
+
+        {/* Evidence-flows-up axis */}
+        <line class="flow-axis-line" x1={AXIS_X} y1={axisBottom} x2={AXIS_X} y2={axisTop} />
+        <path class="flow-axis-arrow" d={`M ${AXIS_X} ${axisTop - 8} L ${AXIS_X - 4} ${axisTop} L ${AXIS_X + 4} ${axisTop} Z`} />
+        <text
+          class="flow-axis"
+          x="18"
+          y="210"
+          text-anchor="middle"
+          transform="rotate(-90 18 210)">Evidence flows up</text>
+
+        {/* Artefact flows (drawn over the bands so arrowheads meet each edge) */}
+        <g class="flows" aria-hidden="true">
+          {edges.map((edge) => (
+            <path
+              class="flow-path"
+              data-from={edge.from}
+              data-to={edge.to}
+              d={edge.d}
+              pathLength="1"
+              marker-end="url(#flow-arrow)"
+            />
+          ))}
+          {edges.filter((e) => e.label).map((edge) => (
+            <text
+              class="flow-label"
+              data-from={edge.from}
+              data-to={edge.to}
+              x={edge.lx}
+              y={edge.ly}
+              text-anchor="middle">{edge.text}</text>
+          ))}
+        </g>
+
+        {/* Bands: interactive, top (05) to foot (01) */}
+        <g class="bands">
+          {bandsOrder.map((layer) => (
+            <g
+              class:list={['band', layer.n === 1 && 'is-active']}
+              data-band
+              data-layer={layer.n}
+              role="button"
+              tabindex="0"
+              aria-pressed={layer.n === 1 ? 'true' : 'false'}
+              aria-label={`Layer ${pad(layer.n)}: ${layer.name}. Show details.`}
+            >
+              <rect
+                class="band-rect"
+                x={BAND_X}
+                y={cy(layer.n) - BAND_H / 2}
+                width={BAND_W}
+                height={BAND_H}
+                rx="10"
+                style={`fill: var(${layer.colorVar})`}
+              />
+              <text class="band-idx" x={BAND_X + 24} y={cy(layer.n)} style={`fill: var(${layer.colorVar}-ink)`}>
+                {pad(layer.n)}
+              </text>
+              <text class="band-name" x={BAND_X + 64} y={cy(layer.n)}>{layer.name}</text>
+            </g>
+          ))}
+        </g>
+      </svg>
+
+      {/* Narrow, simplified layout: the same bands as a stacked button list. */}
+      <ul class="flow-narrow">
+        {bandsOrder.map((layer) => (
+          <li>
+            <button
+              type="button"
+              class:list={['nband', layer.n === 1 && 'is-active']}
+              data-band
+              data-layer={layer.n}
+              aria-pressed={layer.n === 1 ? 'true' : 'false'}
+            >
+              <span class="nband-sq" aria-hidden="true" style={`background: var(${layer.colorVar})`}></span>
+              <span class="nband-idx">{pad(layer.n)}</span>
+              <span class="nband-body">
+                <span class="nband-name">{layer.name}</span>
+                <span class="nband-tag">{layer.tagline}</span>
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    {/* Detail panels, pre-rendered for every layer; only the active one shows. */}
+    <div class="flow-panels">
+      {layers.map((layer) => (
+        <div class="flow-panel" data-panel={layer.n} hidden={layer.n !== 1}>
+          <p class="fp-eyebrow">
+            <span class="fp-sq" aria-hidden="true" style={`background: var(${layer.colorVar})`}></span>
+            Layer {pad(layer.n)} · {layer.name}
+          </p>
+          <p class="fp-proves">{layer.proves}</p>
+          <div class="fp-field">
+            <p class="fp-label">Artefacts</p>
+            <ul class="chips">
+              {layer.artefacts.map((a) => <li class="chip">{a}</li>)}
+            </ul>
+          </div>
+          <div class="fp-field">
+            <p class="fp-label">Maps to</p>
+            <ul class="chips">
+              {layer.mapsTo.map((m) => <li class="chip">{m}</li>)}
+            </ul>
+          </div>
+          <a class="chapter-link" href={`/bok/the-stack#${layer.chapterAnchor}`}>
+            Read layer {pad(layer.n)} in chapter 04 <span class="arrow" aria-hidden="true">→</span>
+          </a>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <figcaption class="flow-cap">
+    Evidence flows up: each layer emits a structured artefact that layer 05
+    aggregates into audit-ready assurance.
+  </figcaption>
+</figure>
+
+<style>
+  .flow {
+    margin: 0;
+  }
+
+  .flow-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
+  }
+
+  @media (min-width: 840px) {
+    .flow-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+      align-items: start;
+      gap: var(--s-6);
+    }
+  }
+
+  /* ---- diagram ---- */
+  .flow-svg {
+    display: none;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (min-width: 840px) {
+    .flow-svg {
+      display: block;
+    }
+  }
+
+  .band-rect {
+    stroke: var(--ink);
+    stroke-width: 1;
+  }
+
+  .band-idx {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    dominant-baseline: middle;
+  }
+
+  .band-name {
+    fill: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 20px;
+    dominant-baseline: middle;
+  }
+
+  .band {
+    cursor: pointer;
+  }
+
+  .band:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .band.is-active .band-rect,
+  .band:focus-visible .band-rect {
+    stroke-width: 2;
+  }
+
+  .flow-path {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.25;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    opacity: 0.34;
+  }
+
+  .flow-arrow-head {
+    fill: var(--ink);
+  }
+
+  .flow-label {
+    fill: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    letter-spacing: 0.03em;
+  }
+
+  .flow-axis-line {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+
+  .flow-axis-arrow {
+    fill: var(--muted);
+  }
+
+  .flow-axis {
+    fill: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  /* Active state (JS only): dim the rest, light the active layer's flows. */
+  .flow.flow-js.has-active [data-band]:not(.is-active) {
+    opacity: 0.4;
+  }
+
+  .flow.flow-js.has-active .flow-path {
+    opacity: 0.14;
+  }
+
+  .flow.flow-js.has-active .flow-path.is-lit {
+    opacity: 1;
+    stroke-width: 1.6;
+  }
+
+  .flow.flow-js.has-active .flow-label {
+    opacity: 0.2;
+  }
+
+  .flow.flow-js.has-active .flow-label.is-lit {
+    fill: var(--ink);
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .band,
+    .flow-path,
+    .flow-label,
+    .nband {
+      transition:
+        opacity var(--dur) var(--ease),
+        stroke-width var(--dur) var(--ease);
+    }
+
+    .flow.flow-js .flow-path.is-lit.draw {
+      animation: flow-draw 400ms var(--ease) both;
+    }
+
+    @keyframes flow-draw {
+      from {
+        stroke-dashoffset: 1;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  }
+
+  /* ---- narrow band list ---- */
+  .flow-narrow {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (min-width: 840px) {
+    .flow-narrow {
+      display: none;
+    }
+  }
+
+  .nband {
+    display: grid;
+    grid-template-columns: 10px auto 1fr;
+    align-items: center;
+    gap: var(--s-3);
+    width: 100%;
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .nband.is-active {
+    border-color: var(--ink);
+  }
+
+  .flow.flow-js.has-active .nband:not(.is-active) {
+    opacity: 0.4;
+  }
+
+  .nband-sq {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  }
+
+  .nband-idx {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--muted);
+  }
+
+  .nband-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .nband-name {
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .nband-tag {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  /* ---- panels ---- */
+  .flow-panels {
+    min-width: 0;
+  }
+
+  .flow-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+  }
+
+  /* The class's display would otherwise defeat the [hidden] attribute that JS
+     (and the no-JS default) toggles to reveal one panel at a time. */
+  .flow-panel[hidden] {
+    display: none;
+  }
+
+  .fp-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .fp-sq {
+    width: 8px;
+    height: 8px;
+    flex: none;
+  }
+
+  .fp-proves {
+    margin: 0;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .fp-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .fp-label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .flow-cap {
+    margin-top: var(--s-5);
+    max-width: 60ch;
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+</style>

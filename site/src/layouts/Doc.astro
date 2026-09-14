@@ -13,6 +13,9 @@ import Toc from '../components/Toc.astro';
 import PrevNext from '../components/PrevNext.astro';
 import EditOnGitHub from '../components/EditOnGitHub.astro';
 import Citation from '../components/Citation.astro';
+import { getChapterBySlug } from '../data/chapters';
+import { readSource } from '../lib/md-parse';
+import { wordCount, readingTime } from '../lib/reading';
 
 interface Adjacent {
   slug: string;
@@ -59,9 +62,26 @@ const withSidebar = sidebar && !wide;
 const withToc = !wide && headings.some((h) => h.depth === 2 || h.depth === 3);
 const mode = wide ? 'wide' : withSidebar ? 'chapter' : 'doc';
 const pageTitle = `${title} · ${site.name}`;
+
+// Reading estimate for BoK chapters, from the raw Markdown (reading.ts). Only
+// computed when the slug is a known chapter; other Doc pages get no estimate.
+let words: number | undefined;
+let minutes: number | undefined;
+const statsChapter = slug ? getChapterBySlug(slug) : undefined;
+if (statsChapter) {
+  try {
+    const markdown = readSource(`bok/${statsChapter.id}.md`);
+    words = wordCount(markdown);
+    minutes = readingTime(markdown);
+  } catch {
+    // Source unreadable (e.g. a shallow checkout); skip the estimate silently.
+  }
+}
 ---
 
 <Base title={pageTitle} description={summary} image={image}>
+  <div class="doc-progress" data-doc-progress aria-hidden="true"></div>
+
   <div class="doc container" data-mode={mode}>
     {
       withSidebar && (
@@ -93,7 +113,14 @@ const pageTitle = `${title} · ${site.name}`;
 
       <div class="doc-main">
         <article class="prose" data-pagefind-body>
-          <ChapterHeader kicker={kicker} title={title} summary={summary} updated={updated} />
+          <ChapterHeader
+            kicker={kicker}
+            title={title}
+            summary={summary}
+            updated={updated}
+            words={words}
+            minutes={minutes}
+          />
           <slot />
         </article>
 
@@ -122,9 +149,26 @@ const pageTitle = `${title} · ${site.name}`;
   {withSidebar && <div class="doc-scrim" data-drawer-close hidden />}
 
   <script is:inline src="/ui-doc.js" defer></script>
+  <script is:inline src="/glossary-cards.js" defer></script>
 </Base>
 
 <style>
+  /* Per-page reading hairline: pinned just under the sticky header (ui-doc.js
+     sets `top` to the header height) and scaled on scroll to the read fraction. */
+  .doc-progress {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 19;
+    width: 100%;
+    height: 1px;
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left;
+    will-change: transform;
+    pointer-events: none;
+  }
+
   .doc {
     padding-block: var(--s-6) var(--s-8);
   }

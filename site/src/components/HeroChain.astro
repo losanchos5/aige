@@ -1,0 +1,402 @@
+---
+/**
+ * HeroChain — the hero graphic: an animated "evidence chain" that demonstrates
+ * the discipline and loops. Five layer bands (L1..L5) with mono indices 01..05,
+ * aligned like the RegisterMark bars they replace, each filled by one step:
+ *
+ *   01 Policy     — a rule types out in mono
+ *   02 Inventory  — a registry line fills in
+ *   03 Eval       — a meter fills to a value; the mono number counts up
+ *   04 Runtime    — a guardrail decision line
+ *   05 Assurance  — a PASS/BLOCK verdict is stamped (the one playful moment)
+ *
+ * The complete final PASS state is server-rendered, so no-JS and reduced-motion
+ * users see the finished chain. When motion is allowed, public/hero.js adds
+ * `.is-live`, resets `data-step` to 0 and steps it 1→5 on a setTimeout chain
+ * (paused when the tab is hidden), rotating the scenario each loop. The whole
+ * graphic is aria-hidden; a visually-hidden sentence describes it for AT.
+ *
+ * The server default below is scenario A and MUST match scenarios[0] in
+ * public/hero.js so the first live loop is continuous with the rendered state.
+ */
+
+// Scenario A — the server-rendered final state (a PASS).
+const rule = 'deny model.deploy unless eval.safety >= 0.95';
+const chars = rule.length;
+const inv = 'agent: support-bot · model: gpt-class · owner: platform';
+const metric = 'eval.safety';
+const val = 97;
+const thr = 95;
+const runtime = 'allow · guardrails on · tools scoped · trace ok';
+const verdictId = '#4821';
+
+const rows = [
+  { n: '01', label: 'Policy', v: '--l1' },
+  { n: '02', label: 'Inventory', v: '--l2' },
+  { n: '03', label: 'Eval', v: '--l3' },
+  { n: '04', label: 'Runtime', v: '--l4' },
+  { n: '05', label: 'Assurance', v: '--l5' },
+];
+---
+
+<div class="hc" data-step="5" aria-hidden="true">
+  <ol class="hc-rows">
+    <li class="hc-row r1" style={`--band:var(${rows[0].v});--ink-band:var(${rows[0].v}-ink)`}>
+      <span class="hc-head"><span class="hc-idx">{rows[0].n}</span><span class="hc-label">{rows[0].label}</span></span>
+      <span class="hc-content">
+        <span class="hc-type" style={`--chars:${chars};--steps:${chars}`}>{rule}</span><span
+          class="hc-caret"
+          aria-hidden="true"></span>
+      </span>
+    </li>
+
+    <li class="hc-row r2" style={`--band:var(${rows[1].v});--ink-band:var(${rows[1].v}-ink)`}>
+      <span class="hc-head"><span class="hc-idx">{rows[1].n}</span><span class="hc-label">{rows[1].label}</span></span>
+      <span class="hc-content"><span class="hc-inv hc-mono-line">{inv}</span></span>
+    </li>
+
+    <li class="hc-row r3" style={`--band:var(${rows[2].v});--ink-band:var(${rows[2].v}-ink)`}>
+      <span class="hc-head"><span class="hc-idx">{rows[2].n}</span><span class="hc-label">{rows[2].label}</span></span>
+      <span class="hc-content hc-eval">
+        <span class="hc-metric">{metric}</span>
+        <span class="hc-meter">
+          <span class="hc-meter-track"><span class="hc-meter-fill is-pass" style={`--to:${val}`}></span></span>
+          <span class="hc-thr" style={`--thr:${thr}`}></span>
+        </span>
+        <span class="hc-num is-pass" style={`--to:${val}`}></span>
+        <span class="hc-thr-label">≥ 0.{thr}</span>
+      </span>
+    </li>
+
+    <li class="hc-row r4" style={`--band:var(${rows[3].v});--ink-band:var(${rows[3].v}-ink)`}>
+      <span class="hc-head"><span class="hc-idx">{rows[3].n}</span><span class="hc-label">{rows[3].label}</span></span>
+      <span class="hc-content"><span class="hc-runtime hc-mono-line">{runtime}</span></span>
+    </li>
+
+    <li class="hc-row r5" style={`--band:var(${rows[4].v});--ink-band:var(${rows[4].v}-ink)`}>
+      <span class="hc-head"><span class="hc-idx">{rows[4].n}</span><span class="hc-label">{rows[4].label}</span></span>
+      <span class="hc-content hc-assure">
+        <span class="hc-vid">{verdictId}</span>
+        <span class="hc-stamp stamp stamp-pass">PASS</span>
+      </span>
+    </li>
+  </ol>
+</div>
+
+<p class="visually-hidden">
+  An evidence chain: a policy denies model deployment unless the safety eval
+  scores at least 0.95; the registry lists agent support-bot, model gpt-class,
+  owner platform; the safety eval scores 0.97; runtime guardrails hold the line;
+  and assurance stamps the verdict PASS.
+</p>
+
+<style>
+  /* Registered so the eval number can count up: an <integer> custom property
+     driven through a counter. Degrades to the resting (final) value where
+     @property is unsupported. */
+  @property --hc-n {
+    syntax: '<integer>';
+    inherits: false;
+    initial-value: 0;
+  }
+
+  .hc {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .hc-rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  /* A layer band: pastel fill, hairline outline, radius 6 — matching the
+     RegisterMark bars this replaces. Two mono lines: an index/label header and
+     the step's content. */
+  .hc-row {
+    display: grid;
+    gap: 3px;
+    align-content: center;
+    min-height: 52px;
+    padding: 8px 12px;
+    background: var(--band);
+    border: 1px solid color-mix(in srgb, var(--ink) 24%, transparent);
+    border-radius: var(--r-sm);
+  }
+
+  .hc-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .hc-idx {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.08em;
+    color: var(--ink-band);
+  }
+
+  .hc-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-band);
+  }
+
+  .hc-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    color: var(--ink);
+  }
+
+  .hc-mono-line,
+  .hc-type,
+  .hc-metric,
+  .hc-num,
+  .hc-thr-label,
+  .hc-vid {
+    font-family: var(--font-mono);
+    font-size: clamp(0.6875rem, 0.63rem + 0.28vw, 0.75rem);
+    letter-spacing: 0.01em;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
+
+  .hc-mono-line {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Typewriter: the element rests at its full mono width; live typing animates
+     width from 0 with a per-character steps() (JS sets --chars/--steps). */
+  .hc-type {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    letter-spacing: 0; /* keep the box exactly --chars wide so nothing clips */
+    width: calc(var(--chars, 40) * 1ch + 2px);
+  }
+
+  .hc-caret {
+    display: none;
+    width: 0.55ch;
+    height: 1em;
+    margin-left: 1px;
+    background: var(--ink-band);
+    vertical-align: text-bottom;
+  }
+
+  /* Eval meter */
+  .hc-eval {
+    flex-wrap: wrap;
+  }
+
+  .hc-metric {
+    color: var(--ink);
+  }
+
+  .hc-meter {
+    position: relative;
+    flex: 1 1 90px;
+    min-width: 64px;
+    height: 6px;
+  }
+
+  .hc-meter-track {
+    display: block;
+    height: 6px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--ink) 14%, transparent);
+  }
+
+  .hc-meter-fill {
+    display: block;
+    height: 100%;
+    width: calc(var(--to, 0) * 1%);
+    background: var(--ink-band);
+  }
+
+  .hc-meter-fill.is-pass {
+    background: var(--l5-ink);
+  }
+
+  .hc-meter-fill.is-block {
+    background: var(--l3-ink);
+  }
+
+  .hc-thr {
+    position: absolute;
+    top: -3px;
+    height: 12px;
+    width: 1px;
+    left: calc(var(--thr, 0) * 1%);
+    background: var(--ink);
+    opacity: 0.55;
+  }
+
+  .hc-num {
+    counter-reset: hcnum var(--hc-n);
+    --hc-n: var(--to, 0);
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .hc-num::after {
+    content: '0.' counter(hcnum);
+  }
+
+  .hc-num.is-pass {
+    color: var(--l5-ink);
+  }
+
+  .hc-num.is-block {
+    color: var(--l3-ink);
+  }
+
+  .hc-thr-label {
+    color: var(--muted);
+  }
+
+  /* Assurance verdict */
+  .hc-assure {
+    justify-content: flex-start;
+  }
+
+  .hc-vid {
+    color: var(--muted);
+  }
+
+  .stamp {
+    display: inline-block;
+    padding: 0.2em 0.5em;
+    border: 1px solid;
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .stamp-pass {
+    color: var(--l5-ink);
+    border-color: var(--l5-ink);
+    background: color-mix(in srgb, var(--l5) 60%, var(--bg));
+  }
+
+  .stamp-block {
+    color: var(--l3-ink);
+    border-color: var(--l3-ink);
+    background: color-mix(in srgb, var(--l3) 60%, var(--bg));
+  }
+
+  /* ---- Live animation (motion only). Rows rest full above for the static
+     fallback; here inactive rows ghost out and each step reactivates one. ---- */
+  @media (prefers-reduced-motion: no-preference) {
+    .hc.is-live .hc-row {
+      background: color-mix(in srgb, var(--band) 32%, var(--bg));
+      transition: background var(--dur) var(--ease);
+    }
+
+    .hc.is-live .hc-head,
+    .hc.is-live .hc-content {
+      opacity: 0;
+      transform: translateY(3px);
+      transition:
+        opacity var(--dur) var(--ease),
+        transform var(--dur) var(--ease);
+    }
+
+    /* Cumulative activation: at step N, rows 1..N are lit. */
+    .hc.is-live[data-step='1'] .r1,
+    .hc.is-live[data-step='2'] :is(.r1, .r2),
+    .hc.is-live[data-step='3'] :is(.r1, .r2, .r3),
+    .hc.is-live[data-step='4'] :is(.r1, .r2, .r3, .r4),
+    .hc.is-live[data-step='5'] :is(.r1, .r2, .r3, .r4, .r5) {
+      background: var(--band);
+    }
+
+    .hc.is-live[data-step='1'] .r1 :is(.hc-head, .hc-content),
+    .hc.is-live[data-step='2'] :is(.r1, .r2) :is(.hc-head, .hc-content),
+    .hc.is-live[data-step='3'] :is(.r1, .r2, .r3) :is(.hc-head, .hc-content),
+    .hc.is-live[data-step='4'] :is(.r1, .r2, .r3, .r4) :is(.hc-head, .hc-content),
+    .hc.is-live[data-step='5'] :is(.r1, .r2, .r3, .r4, .r5) :is(.hc-head, .hc-content) {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Per-row inner motion, played once as its step lands. */
+    .hc.is-live[data-step='1'] .r1 .hc-type {
+      animation: hc-type var(--hc-type-dur, 1000ms) steps(var(--steps, 40), end) both;
+    }
+
+    .hc.is-live[data-step='1'] .hc-caret {
+      display: inline-block;
+      animation: hc-blink 1s steps(1, end) infinite;
+    }
+
+    .hc.is-live[data-step='3'] .r3 .hc-meter-fill {
+      animation: hc-fill 520ms var(--ease) both;
+    }
+
+    .hc.is-live[data-step='3'] .r3 .hc-num {
+      animation: hc-count 650ms var(--ease) both;
+    }
+
+    .hc.is-live[data-step='5'] .r5 .hc-stamp {
+      animation: hc-stamp 240ms var(--ease) both;
+    }
+  }
+
+  @keyframes hc-type {
+    from {
+      width: 0;
+    }
+    to {
+      width: calc(var(--chars, 40) * 1ch + 2px);
+    }
+  }
+
+  @keyframes hc-blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes hc-fill {
+    from {
+      width: 0;
+    }
+    to {
+      width: calc(var(--to, 0) * 1%);
+    }
+  }
+
+  @keyframes hc-count {
+    from {
+      --hc-n: 0;
+    }
+    to {
+      --hc-n: var(--to, 0);
+    }
+  }
+
+  @keyframes hc-stamp {
+    from {
+      transform: scale(1.06);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+</style>

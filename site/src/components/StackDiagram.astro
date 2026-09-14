@@ -90,7 +90,7 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
             class="drow"
             data-layer={layer.n}
             data-testid="stack-row"
-            style={`--tint:var(${layer.colorVar})`}
+            style={`--i:${i}; --tint:var(${layer.colorVar}); --tint-ink:var(${layer.colorVar}-ink)`}
           >
             <span class="d-idx" aria-hidden="true">
               {i === 0 && <span class="d-arrow" />}
@@ -117,6 +117,7 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
           </li>
         ))}
       </ol>
+      <span class="d-pulse" data-testid="stack-pulse" aria-hidden="true"></span>
     </div>
   )
 }
@@ -270,6 +271,41 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
     border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
   }
 
+  /* Evidence-pulse fill: a layer-ink overlay on the bar, briefly raised to
+     opacity as the axis pulse passes this row. Independent of the hover tint
+     (which drives .d-bar's own background), so hovering still works. */
+  .d-bar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--tint-ink);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Evidence pulse: a 6px ink square that travels up the row axis from 05 to
+     01. Positioned on the axis (centred in the 56px index column) and hidden by
+     default so reduced-motion users see a static register. */
+  .d-pulse {
+    position: absolute;
+    left: 28px;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    background: var(--ink);
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  @media (min-width: 560px) {
+    .d-pulse {
+      left: 62px;
+    }
+  }
+
   .d-num {
     position: relative;
     z-index: 1;
@@ -360,6 +396,50 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
         background-color var(--dur) var(--ease),
         border-color var(--dur) var(--ease),
         color var(--dur) var(--ease);
+    }
+
+    /* One 4s cycle: the pulse climbs from below row 05 (top: 100%) to the
+       arrowhead above row 01 (top: 0%), fading in and out at the ends. */
+    .d-pulse {
+      display: block;
+      animation: pulse-up 4s linear infinite;
+    }
+
+    @keyframes pulse-up {
+      0% {
+        top: 100%;
+        opacity: 0;
+      }
+      6% {
+        opacity: 1;
+      }
+      92% {
+        opacity: 1;
+      }
+      100% {
+        top: 0%;
+        opacity: 0;
+      }
+    }
+
+    /* Each bar flashes its ink colour as the pulse reaches its row. The delay
+       (4.5 - row index) * 0.8s aligns the flash with the pulse's top position:
+       row 05 (--i:4) at 0.4s, row 01 (--i:0) at 3.6s. */
+    .d-bar::after {
+      animation: bar-flash 4s var(--ease) infinite;
+      animation-delay: calc((4.5 - var(--i)) * 0.8s);
+    }
+
+    @keyframes bar-flash {
+      0% {
+        opacity: 0.9;
+      }
+      14% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 0;
+      }
     }
   }
 </style>

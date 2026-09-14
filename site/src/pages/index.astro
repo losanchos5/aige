@@ -12,6 +12,8 @@ import StatTile from '../components/StatTile.astro';
 import VerdictStamp from '../components/VerdictStamp.astro';
 import CtaBand from '../components/CtaBand.astro';
 import StackDiagram from '../components/StackDiagram.astro';
+import HeroChain from '../components/HeroChain.astro';
+import VerdictTicker from '../components/VerdictTicker.astro';
 import DefinitionCards from '../components/DefinitionCards.astro';
 import ValuePair from '../components/ValuePair.astro';
 import ChapterGrid from '../components/ChapterGrid.astro';
@@ -88,7 +90,6 @@ const resources = [
   <section class="hero section">
     <div class="container hero-grid">
       <div class="hero-copy reveal">
-        <Kicker swatch="var(--l1)" rule>A discipline, defined</Kicker>
         <h1 class="display hero-h1">Governance you can run, not just read.</h1>
         <p class="lede">{definition}</p>
         <div class="hero-cta">
@@ -97,9 +98,11 @@ const resources = [
         </div>
       </div>
       <div class="hero-art reveal">
-        <StackDiagram mode="static" />
+        <HeroChain />
       </div>
     </div>
+    <script is:inline defer src="/hero.js"></script>
+    <script is:inline defer src="/countup.js"></script>
   </section>
 
   <section class="section">
@@ -176,6 +179,7 @@ const resources = [
         <VerdictStamp verdict="pass" />
       </div>
     </div>
+    <VerdictTicker />
   </section>
 
   <section class="section">

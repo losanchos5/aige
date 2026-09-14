@@ -38,8 +38,12 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
           <a
             href={`/bok/${chapter.slug}`}
             class={`nav-item ${layers[i % layers.length]}`}
+            data-chapter-slug={chapter.slug}
             aria-current={activeSlug === chapter.slug ? 'page' : undefined}
           >
+            <span class="nav-track" aria-hidden="true">
+              <span class="nav-fill" />
+            </span>
             <span class="nav-num">{String(chapter.order).padStart(2, '0')}</span>
             <span class="nav-title">{chapter.shortTitle}</span>
           </a>
@@ -103,6 +107,7 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
   }
 
   .nav-item {
+    position: relative;
     display: flex;
     align-items: baseline;
     gap: var(--s-3);
@@ -115,6 +120,39 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
     transition:
       color var(--dur) var(--ease),
       background-color var(--dur) var(--ease);
+  }
+
+  /* Reading "register": a 3px track per chapter row. The current page fills as
+     it is read; chapters marked read in localStorage show a muted full bar. */
+  .nav-track {
+    position: absolute;
+    left: var(--s-1);
+    top: var(--s-1);
+    bottom: var(--s-1);
+    width: 3px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+    overflow: hidden;
+  }
+
+  .nav-fill {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: scaleY(var(--np, 0));
+    transform-origin: top;
+    background: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .nav-fill {
+      transition: transform 160ms linear;
+    }
+  }
+
+  .nav-item.is-read .nav-fill {
+    transform: scaleY(1);
+    background: var(--muted);
   }
 
   .nav-item:hover {

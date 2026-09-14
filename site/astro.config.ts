@@ -7,6 +7,7 @@ import remarkLead from './src/lib/remark-lead';
 import remarkCallouts from './src/lib/remark-callouts';
 import rehypeCitations from './src/lib/rehype-citations';
 import rehypeTables from './src/lib/rehype-tables';
+import rehypeGlossary from './src/lib/rehype-glossary';
 
 // https://astro.build/config
 export default defineConfig({
@@ -21,6 +22,7 @@ export default defineConfig({
       [rehypeAutolinkHeadings, { behavior: 'wrap' }],
       rehypeCitations,
       rehypeTables,
+      rehypeGlossary,
       [rehypeExternalLinks, { rel: ['noopener'] }],
     ],
   },

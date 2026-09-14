@@ -85,9 +85,30 @@
   var headings = Array.prototype.slice.call(
     document.querySelectorAll('.prose h2[id], .prose h3[id]'),
   );
+  var tocMarker = document.querySelector('[data-toc-marker]');
+  var tocList = document.querySelector('.toc-list');
+
+  // Index of a heading id within the document-order headings list (-1 if none).
+  function headingIndex(id) {
+    for (var k = 0; k < headings.length; k++) {
+      if (headings[k].id === id) return k;
+    }
+    return -1;
+  }
 
   if (links.size && headings.length && 'IntersectionObserver' in window) {
     var visible = new Set();
+
+    // Slide the 2px marker to the active entry and size it to that entry.
+    function moveMarker(activeId) {
+      if (!tocMarker || !tocList || !activeId) return;
+      var link = links.get(activeId);
+      if (!link) return;
+      var lr = link.getBoundingClientRect();
+      var cr = tocList.getBoundingClientRect();
+      tocMarker.style.height = lr.height + 'px';
+      tocMarker.style.transform = 'translateY(' + (lr.top - cr.top) + 'px)';
+    }
 
     function setActive() {
       var activeId = null;
@@ -102,11 +123,18 @@
           if (headings[j].getBoundingClientRect().top < 120) activeId = headings[j].id;
         }
       }
+      var activeIdx = headingIndex(activeId);
       links.forEach(function (a, slug) {
         if (slug === activeId) a.setAttribute('aria-current', 'true');
         else a.removeAttribute('aria-current');
+        var idx = headingIndex(slug);
+        if (activeIdx !== -1 && idx !== -1 && idx < activeIdx) a.classList.add('is-past');
+        else a.classList.remove('is-past');
       });
+      moveMarker(activeId);
     }
+
+    window.addEventListener('resize', setActive, { passive: true });
 
     var io = new IntersectionObserver(
       function (entries) {
@@ -143,4 +171,88 @@
       );
     });
   });
+
+  /* ---- Reading progress: top hairline, sidebar register, read state ---- */
+  (function () {
+    var article = document.querySelector('.prose');
+    var bar = document.querySelector('[data-doc-progress]');
+    var header = document.querySelector('.site-header');
+    var current = document.querySelector('.nav-item[aria-current="page"]');
+    var slug = current && current.getAttribute('data-chapter-slug');
+    var READ_KEY = 'aige.read';
+
+    function readList() {
+      try {
+        var raw = JSON.parse(localStorage.getItem(READ_KEY) || '[]');
+        return Array.isArray(raw) ? raw : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    // Cosmetic "read" state for other chapters, from localStorage.
+    var read = readList();
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.nav-item[data-chapter-slug]'),
+      function (el) {
+        var s = el.getAttribute('data-chapter-slug');
+        if (s !== slug && read.indexOf(s) !== -1) el.classList.add('is-read');
+      },
+    );
+
+    function place() {
+      if (bar && header) bar.style.top = header.getBoundingClientRect().height + 'px';
+    }
+
+    var marked = false;
+    var ticking = false;
+
+    function update() {
+      ticking = false;
+      var doc = document.documentElement;
+      var max = doc.scrollHeight - window.innerHeight;
+      var docFrac = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      if (bar) bar.style.transform = 'scaleX(' + docFrac.toFixed(4) + ')';
+
+      if (article && current) {
+        var top = article.getBoundingClientRect().top + window.scrollY;
+        var h = article.offsetHeight || 1;
+        var artFrac = Math.min(1, Math.max(0, (window.scrollY + window.innerHeight - top) / h));
+        current.style.setProperty('--np', artFrac.toFixed(3));
+        if (!marked && slug && artFrac >= 0.9) {
+          marked = true;
+          try {
+            var list = readList();
+            if (list.indexOf(slug) === -1) {
+              list.push(slug);
+              localStorage.setItem(READ_KEY, JSON.stringify(list));
+            }
+          } catch (e) {
+            /* storage blocked; the register is purely cosmetic */
+          }
+        }
+      }
+    }
+
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }
+
+    if (bar || (article && current)) {
+      place();
+      update();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener(
+        'resize',
+        function () {
+          place();
+          update();
+        },
+        { passive: true },
+      );
+    }
+  })();
 })();

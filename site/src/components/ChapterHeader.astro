@@ -4,33 +4,54 @@
 // a meta line. Renders its own kicker markup; the lead may later swap it for the
 // Block A <Kicker> component.
 import { site } from '../data/site';
+import RegisterMark from './RegisterMark.astro';
 
 interface Props {
   kicker?: string;
   title: string;
   summary?: string;
   updated?: string;
+  words?: number;
+  minutes?: number;
 }
 
-const { kicker, title, summary, updated } = Astro.props;
+const { kicker, title, summary, updated, words, minutes } = Astro.props;
+
+// One meta line, joined by middots: version/date, reading estimate, licence.
+const metaBits: string[] = [];
+if (updated) metaBits.push(`v${site.bokVersion}`, `Updated ${updated}`);
+if (minutes && words) metaBits.push(`${minutes} min read`, `${words.toLocaleString('en-US')} words`);
+if (updated) metaBits.push(site.license);
 ---
 
 <header class="chapter-header">
-  {kicker && <p class="kicker">{kicker}</p>}
-  <h1 data-pagefind-meta="title">{title}</h1>
-  {summary && <p class="lede">{summary}</p>}
   {
-    updated && (
-      <p class="chapter-meta">
-        v{site.bokVersion} · Updated {updated} · {site.license}
-      </p>
+    kicker && (
+      <div class="kicker-row">
+        <RegisterMark size="sm" class="kicker-mark" label={site.name} />
+        <p class="kicker">{kicker}</p>
+      </div>
     )
   }
+  <h1 data-pagefind-meta="title">{title}</h1>
+  {summary && <p class="lede">{summary}</p>}
+  {metaBits.length > 0 && <p class="chapter-meta">{metaBits.join(' · ')}</p>}
 </header>
 
 <style>
   .chapter-header {
     margin-bottom: var(--s-6);
+  }
+
+  .kicker-row {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    margin-bottom: var(--s-3);
+  }
+
+  .kicker-mark {
+    flex: none;
   }
 
   .kicker {
@@ -39,7 +60,7 @@ const { kicker, title, summary, updated } = Astro.props;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: var(--s-3);
+    margin: 0;
   }
 
   .chapter-header h1 {

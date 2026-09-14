@@ -1,0 +1,452 @@
+---
+/**
+ * ObligationMatrix — a heat grid above the ObligationTable: framework rows
+ * (grouped by family) against the five stack layers as columns. Each cell shows
+ * how many obligations of that framework map to that layer as a filled square —
+ * the layer pastel at an opacity scaled by count, with an ink number — and is a
+ * button that filters the table below. Column headers filter by layer only, row
+ * headers by framework only. No-JS: the grid is static and the table unfiltered
+ * (public/matrix.js wires the filtering, staggered reveal and status line).
+ *
+ * A framework here is finer than the ObligationTable's group: the compound
+ * groups (CSA, OWASP, US laws) fan out to their catalogue frameworks, so the
+ * grid reads as a proper index. The join back to the table rows is by obligation
+ * text, carried in a JSON payload matrix.js reads — the table markup is left
+ * untouched (it already carries the obligation text and its layer classes).
+ */
+import type { Framework, Obligation, StackLayer } from '../data/frameworks';
+
+interface Props {
+  frameworks: readonly Framework[];
+  obligations: readonly Obligation[];
+}
+
+const { frameworks, obligations } = Astro.props;
+
+const layers: StackLayer[] = [1, 2, 3, 4, 5];
+const layerNames = ['Govern', 'Inventory', 'Evals', 'Runtime', 'Assurance'];
+const pad = (n: number) => String(n).padStart(2, '0');
+
+// Resolve an obligation to a single catalogue framework id. The plain groups
+// map straight through; the compound groups split on a marker in the obligation.
+function resolveFwId(o: Obligation): string {
+  const f = o.framework;
+  const t = o.obligation;
+  if (f === 'EU AI Act') return 'eu-ai-act';
+  if (f === 'GPAI Code of Practice') return 'gpai-code-of-practice';
+  if (f === 'ISO/IEC 42001') return 'iso-42001';
+  if (f === 'NIST AI RMF') return 'nist-ai-rmf';
+  if (f === 'CSA AICM / STAR for AI')
+    return /star/i.test(t) ? 'csa-star-for-ai' : 'csa-aicm';
+  if (f === 'OWASP GenAI Security Project') {
+    if (/agentic/i.test(t)) return 'owasp-agentic-top-10';
+    if (/llm/i.test(t)) return 'owasp-llm-top-10';
+    if (/acs|agent control/i.test(t)) return 'owasp-acs';
+    if (/aibom/i.test(t)) return 'owasp-aibom';
+    return 'owasp-llm-top-10';
+  }
+  if (f === 'US frontier-developer laws')
+    return /raise/i.test(t) ? 'ny-raise-act' : 'ca-sb-53';
+  return f;
+}
+
+// Short row label and family band for each catalogue framework id.
+const shortName: Record<string, string> = {
+  'eu-ai-act': 'EU AI Act',
+  'gpai-code-of-practice': 'GPAI Code',
+  'iso-42001': 'ISO 42001',
+  'nist-ai-rmf': 'NIST AI RMF',
+  'csa-aicm': 'CSA AICM',
+  'csa-star-for-ai': 'CSA STAR',
+  'owasp-agentic-top-10': 'OWASP Agentic',
+  'owasp-llm-top-10': 'OWASP LLM',
+  'owasp-acs': 'OWASP ACS',
+  'owasp-aibom': 'OWASP AIBOM',
+  'ca-sb-53': 'California SB 53',
+  'ny-raise-act': 'New York RAISE',
+};
+const band: Record<string, string> = {
+  'eu-ai-act': 'EU AI Act',
+  'gpai-code-of-practice': 'Codes',
+  'iso-42001': 'Standards',
+  'nist-ai-rmf': 'Frameworks',
+  'csa-aicm': 'CSA',
+  'csa-star-for-ai': 'CSA',
+  'owasp-agentic-top-10': 'OWASP',
+  'owasp-llm-top-10': 'OWASP',
+  'owasp-acs': 'OWASP',
+  'owasp-aibom': 'OWASP',
+  'ca-sb-53': 'US frontier laws',
+  'ny-raise-act': 'US frontier laws',
+};
+
+// Rows: catalogue frameworks that carry at least one obligation, in catalogue
+// order. Each row is a full name (for the status line) plus its five counts.
+const counts = new Map<string, number[]>();
+const index: { t: string; f: string; l: number[] }[] = [];
+for (const o of obligations) {
+  const id = resolveFwId(o);
+  if (!counts.has(id)) counts.set(id, [0, 0, 0, 0, 0]);
+  const row = counts.get(id)!;
+  for (const l of o.layerN) row[l - 1] += 1;
+  index.push({ t: o.obligation, f: id, l: [...o.layerN] });
+}
+
+const fwName = new Map(frameworks.map((fw) => [fw.id, fw.name] as const));
+const rows = frameworks
+  .filter((fw) => counts.has(fw.id))
+  .map((fw) => ({
+    id: fw.id,
+    name: fwName.get(fw.id) ?? fw.id,
+    short: shortName[fw.id] ?? fw.name,
+    band: band[fw.id] ?? '',
+    cells: counts.get(fw.id)!,
+  }));
+
+const max = Math.max(1, ...rows.flatMap((r) => r.cells));
+// Opacity percentage for a cell fill: 0 stays empty, anything ≥1 reads clearly.
+const fillPct = (n: number) =>
+  n === 0 ? 0 : Math.max(24, Math.round((n / max) * 100));
+
+let prevBand = '';
+const rowsWithFlags = rows.map((r) => {
+  const start = r.band !== prevBand;
+  prevBand = r.band;
+  return { ...r, bandStart: start };
+});
+---
+
+<figure class="mx" aria-labelledby="mx-cap">
+  <figcaption id="mx-cap" class="mx-cap">
+    <span class="mono">Heat index</span>
+    <span class="mx-cap-text"
+      >Obligations mapped, framework × stack layer. Select a cell, a row or a
+      column to filter the table below.</span
+    >
+  </figcaption>
+
+  <div class="mx-scroll" role="group" aria-label="Obligation heat matrix">
+    <table class="mx-grid" data-mx-grid>
+      <thead>
+        <tr>
+          <th class="mx-corner" scope="col"><span class="mono">Framework</span></th>
+          {
+            layers.map((l, i) => (
+              <th class="mx-colh-cell" scope="col" data-l={l}>
+                <button
+                  type="button"
+                  class="mx-colh"
+                  data-mx-layer={l}
+                  aria-pressed="false"
+                  aria-label={`Filter by layer ${l}, ${layerNames[i]}`}
+                >
+                  <span class="mono mx-colh-n">{pad(l)}</span>
+                  <span class="mx-colh-name">{layerNames[i]}</span>
+                </button>
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rowsWithFlags.map((r) => (
+            <tr class:list={['mx-row', r.bandStart && 'mx-band-start']}>
+              <th scope="row" class="mx-rowh-cell">
+                <button
+                  type="button"
+                  class="mx-rowh"
+                  data-mx-fw={r.id}
+                  aria-pressed="false"
+                  aria-label={`Filter by ${r.name}`}
+                >
+                  {r.short}
+                </button>
+              </th>
+              {r.cells.map((n, i) => (
+                <td class="mx-td" data-l={layers[i]}>
+                  <button
+                    type="button"
+                    class:list={['mx-cell', n > 0 && 'is-set']}
+                    data-mx-fw={r.id}
+                    data-mx-layer={layers[i]}
+                    aria-pressed="false"
+                    aria-label={`${r.name}, layer ${layers[i]}: ${n} ${n === 1 ? 'obligation' : 'obligations'}`}
+                    style={`background:${n > 0 ? `color-mix(in srgb, var(--l${layers[i]}) ${fillPct(n)}%, transparent)` : 'transparent'}`}
+                  >
+                    <span class="mx-n" aria-hidden="true">{n > 0 ? n : ''}</span>
+                  </button>
+                </td>
+              ))}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mx-status" data-mx-status role="status" aria-live="polite" hidden>
+    <span class="mono mx-status-text"></span>
+    <button type="button" class="mx-clear" data-mx-clear>Clear</button>
+  </div>
+
+  <script
+    is:inline
+    type="application/json"
+    data-mx-index
+    set:html={JSON.stringify(index)}
+  />
+</figure>
+
+<style>
+  .mx {
+    margin: 0 0 var(--s-6);
+  }
+
+  .mx-cap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-3);
+    margin-bottom: var(--s-4);
+    color: var(--muted);
+  }
+
+  .mx-cap .mono {
+    color: var(--ink-2);
+  }
+
+  .mx-cap-text {
+    font-size: var(--fs-small);
+    text-wrap: pretty;
+  }
+
+  /* Horizontal scroll container; the first column stays put (sticky). */
+  .mx-scroll {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+  }
+
+  .mx-grid {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .mx-grid th,
+  .mx-grid td {
+    padding: 6px;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  /* Sticky first column, on the header row and every body row. */
+  .mx-corner,
+  .mx-rowh-cell {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--bg);
+    text-align: left;
+    width: 9.5rem;
+    min-width: 9.5rem;
+    border-right: 1px solid var(--line);
+  }
+
+  .mx-corner {
+    color: var(--muted);
+  }
+
+  .mx-colh-cell {
+    width: auto;
+  }
+
+  /* Column headers: a pastel cell with a mono index and a small layer name. */
+  .mx-colh {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+    width: 100%;
+    padding: var(--s-2) var(--s-1);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .mx-colh[data-mx-layer='1'] { background: var(--l1); color: var(--l1-ink); }
+  .mx-colh[data-mx-layer='2'] { background: var(--l2); color: var(--l2-ink); }
+  .mx-colh[data-mx-layer='3'] { background: var(--l3); color: var(--l3-ink); }
+  .mx-colh[data-mx-layer='4'] { background: var(--l4); color: var(--l4-ink); }
+  .mx-colh[data-mx-layer='5'] { background: var(--l5); color: var(--l5-ink); }
+
+  .mx-colh-n {
+    font-size: var(--fs-label);
+    line-height: 1;
+  }
+
+  .mx-colh-name {
+    font-size: 0.625rem;
+    letter-spacing: 0.02em;
+    opacity: 0.85;
+  }
+
+  /* Row headers: mono-adjacent name, understated. */
+  .mx-rowh {
+    display: block;
+    width: 100%;
+    padding: var(--s-2);
+    border: 1px solid transparent;
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.01em;
+    text-align: left;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  /* Cells: 1px outline when empty, pastel fill (inline) with an ink number set. */
+  .mx-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 3rem;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .mx-cell.is-set {
+    border-color: transparent;
+  }
+
+  .mx-n {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+
+  /* Family separator: a heavier rule where a new band begins. */
+  .mx-band-start th,
+  .mx-band-start td {
+    border-top: 2px solid var(--line);
+    padding-top: var(--s-3);
+  }
+
+  /* Focus + hover affordances. */
+  .mx-cell:focus-visible,
+  .mx-colh:focus-visible,
+  .mx-rowh:focus-visible,
+  .mx-clear:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .mx-rowh:hover {
+    color: var(--ink);
+    border-color: var(--line);
+  }
+
+  /* Pressed state: an ink ring, no colour change (keeps the heat readable). */
+  .mx-cell[aria-pressed='true'],
+  .mx-colh[aria-pressed='true'],
+  .mx-rowh[aria-pressed='true'] {
+    outline: 2px solid var(--ink);
+    outline-offset: 1px;
+  }
+
+  /* Status line under the grid: mono, with an inline Clear control. The flex
+     display would otherwise beat the [hidden] UA rule, so guard it explicitly. */
+  .mx-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+    color: var(--ink-2);
+  }
+
+  .mx-status[hidden] {
+    display: none;
+  }
+
+  .mx-status-text {
+    color: var(--ink-2);
+    text-transform: none;
+  }
+
+  .mx-clear {
+    padding: 2px var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .mx-clear:hover {
+    border-color: var(--ink-2);
+  }
+
+  /* Staggered reveal: opt-in only when matrix.js confirms motion is allowed, so
+     no-JS and reduced-motion users get the static grid. */
+  .mx-grid.mx-anim .mx-cell,
+  .mx-grid.mx-anim .mx-colh {
+    opacity: 0;
+  }
+
+  .mx-grid.mx-anim .mx-cell.mx-in,
+  .mx-grid.mx-anim .mx-colh.mx-in {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mx-grid.mx-anim .mx-cell,
+    .mx-grid.mx-anim .mx-colh {
+      transition: opacity var(--dur) var(--ease);
+    }
+
+    .mx-cell,
+    .mx-colh,
+    .mx-rowh {
+      transition:
+        outline-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease);
+    }
+  }
+
+  /* Rows the filter hides. A class beats the table's own display rules on
+     mobile (where res-table rows are display:block). */
+  :global([data-obligation-row].mx-hidden),
+  :global(.ob-group.mx-hidden) {
+    display: none !important;
+  }
+
+  @media (max-width: 560px) {
+    .mx-corner,
+    .mx-rowh-cell {
+      width: 7rem;
+      min-width: 7rem;
+    }
+
+    .mx-colh-name {
+      display: none;
+    }
+  }
+</style>
