@@ -1,9 +1,16 @@
 // reading.ts: build-time helpers for the Body of Knowledge — word counts,
 // reading-time estimates, and the last-updated date from git history.
 
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const WORDS_PER_MINUTE = 200;
+
+const HERE = dirname(fileURLToPath(import.meta.url));
+// site/src/lib → repo root is three levels up.
+const CHANGELOG = resolve(HERE, '..', '..', '..', 'bok', 'CHANGELOG.md');
 
 /** Count words in a raw Markdown string, ignoring code fences and syntax noise. */
 export function wordCount(markdown: string): number {
@@ -20,21 +27,43 @@ export function readingTime(markdown: string): number {
   return Math.max(1, Math.round(wordCount(markdown) / WORDS_PER_MINUTE));
 }
 
+let changelogDateCache: string | undefined;
+
+/**
+ * The date (YYYY-MM-DD) of the latest entry in bok/CHANGELOG.md, whose headings
+ * read `## [0.2] — 2026-09-10`. Read once and memoised. Returns undefined only
+ * if the file is missing or has no dated entry.
+ */
+function changelogDate(): string | undefined {
+  if (changelogDateCache !== undefined) return changelogDateCache || undefined;
+  try {
+    const text = readFileSync(CHANGELOG, 'utf8');
+    // First `## [version] — YYYY-MM-DD` heading (em/en dash or hyphen).
+    const match = text.match(/^##\s*\[[^\]]+\]\s*[—–-]\s*(\d{4}-\d{2}-\d{2})/m);
+    changelogDateCache = match ? match[1] : '';
+  } catch {
+    changelogDateCache = '';
+  }
+  return changelogDateCache || undefined;
+}
+
 /**
  * Last commit date (YYYY-MM-DD) that touched `file`, read from git at build.
- * Falls back to today's date when git is unavailable (e.g. a shallow CI clone
- * or an unstaged working copy).
+ * When git returns nothing — a shallow clone with no history for the file, or
+ * git being unavailable — falls back to the date of the latest CHANGELOG entry
+ * rather than the build date, so pages stay stable across environments. Never
+ * throws.
  */
 export function gitDate(file: string): string {
   try {
-    const out = execSync(`git log -1 --format=%cs -- "${file}"`, {
+    const out = execFileSync('git', ['log', '-1', '--format=%cs', '--', file], {
       cwd: process.cwd(),
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();
     if (/^\d{4}-\d{2}-\d{2}$/.test(out)) return out;
   } catch {
-    // git missing or path outside a repository; fall through to build date.
+    // git missing or path outside a repository; fall through to the changelog.
   }
-  return new Date().toISOString().slice(0, 10);
+  return changelogDate() ?? new Date().toISOString().slice(0, 10);
 }

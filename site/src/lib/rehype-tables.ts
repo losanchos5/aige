@@ -3,11 +3,7 @@
 
 import type { Root, Element } from 'hast';
 import { visit, SKIP } from 'unist-util-visit';
-
-function hasClass(node: Element, name: string): boolean {
-  const value = node.properties?.className;
-  return Array.isArray(value) && value.includes(name);
-}
+import { hasClass } from './hast-utils';
 
 export default function rehypeTables() {
   return (tree: Root): void => {

@@ -281,7 +281,10 @@
 .prose pre code {
   padding: 0;
   background: none;
-  color: var(--ink-2);
+  /* Inherit Shiki's own foreground (set inline on the dark `astro-code` pre).
+     Overriding it with a theme ink turns plaintext blocks dark-on-dark in light
+     mode — unreadable, and a serious contrast failure. */
+  color: inherit;
 }
 
 /* ---- Rule as the register line ---- */

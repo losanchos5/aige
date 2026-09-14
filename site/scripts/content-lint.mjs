@@ -95,6 +95,33 @@ function toText(html) {
     .trim();
 }
 
+function countMatches(raw, regex) {
+  const matches = raw.match(regex);
+  return matches ? matches.length : 0;
+}
+
+// Every `href="#src-N"` in a document must have a matching `id="src-N"` in the
+// same document. Returns one violation per dangling anchor.
+function danglingSrcAnchors(file, raw) {
+  const hrefs = new Set();
+  let m;
+  const hrefRe = /href="#(src-\d+)"/g;
+  while ((m = hrefRe.exec(raw)) !== null) hrefs.add(m[1]);
+  if (!hrefs.size) return [];
+
+  const ids = new Set();
+  const idRe = /id="(src-\d+)"/g;
+  while ((m = idRe.exec(raw)) !== null) ids.add(m[1]);
+
+  const out = [];
+  for (const id of hrefs) {
+    if (!ids.has(id)) {
+      out.push({ file, label: 'dangling citation anchor', snippet: `href="#${id}" has no matching id="${id}"` });
+    }
+  }
+  return out;
+}
+
 function main() {
   if (!existsSync(targetDir)) {
     console.error(`content-lint: directory not found: ${targetDir}`);
@@ -105,9 +132,14 @@ function main() {
   const allow = loadAllow();
   const files = htmlFiles(targetDir);
   const violations = [];
+  const structural = [];
+
+  let glossarySeen = false;
+  let readingListSeen = false;
 
   for (const file of files) {
-    const text = toText(readFileSync(file, 'utf8'));
+    const raw = readFileSync(file, 'utf8');
+    const text = toText(raw);
     for (const { label, regex } of PATTERNS) {
       regex.lastIndex = 0;
       let match;
@@ -119,13 +151,50 @@ function main() {
         if (match[0].length === 0) regex.lastIndex++; // guard against zero-width
       }
     }
+
+    // Structural: every citation link `href="#src-N"` must resolve to an
+    // `id="src-N"` in the same document, or the footnote jump is dead.
+    structural.push(...danglingSrcAnchors(file, raw));
+
+    // Structural: the two resource landing pages must ship their full content.
+    const rel = file.replace(/\\/g, '/');
+    if (rel.endsWith('/resources/glossary.html')) {
+      glossarySeen = true;
+      const dt = countMatches(raw, /<dt[\s>]/g);
+      if (dt < 50) {
+        structural.push({ file, label: 'glossary too small', snippet: `${dt} <dt> found, expected >= 50` });
+      }
+    }
+    if (rel.endsWith('/resources/reading-list.html')) {
+      readingListSeen = true;
+      const links = countMatches(raw, /data-reading-item/g);
+      if (links < 30) {
+        structural.push({ file, label: 'reading list too small', snippet: `${links} links found, expected >= 30` });
+      }
+    }
   }
 
-  if (violations.length) {
-    console.error(`content-lint: ${violations.length} forbidden match(es) found:\n`);
-    for (const v of violations) {
-      console.error(`  ${v.file}`);
-      console.error(`    [${v.label}] …${v.snippet}…\n`);
+  if (!glossarySeen) {
+    structural.push({ file: join(targetDir, 'resources', 'glossary.html'), label: 'missing page', snippet: '/resources/glossary was not built' });
+  }
+  if (!readingListSeen) {
+    structural.push({ file: join(targetDir, 'resources', 'reading-list.html'), label: 'missing page', snippet: '/resources/reading-list was not built' });
+  }
+
+  if (violations.length || structural.length) {
+    if (violations.length) {
+      console.error(`content-lint: ${violations.length} forbidden match(es) found:\n`);
+      for (const v of violations) {
+        console.error(`  ${v.file}`);
+        console.error(`    [${v.label}] …${v.snippet}…\n`);
+      }
+    }
+    if (structural.length) {
+      console.error(`content-lint: ${structural.length} structural problem(s) found:\n`);
+      for (const v of structural) {
+        console.error(`  ${v.file}`);
+        console.error(`    [${v.label}] ${v.snippet}\n`);
+      }
     }
     process.exit(1);
   }

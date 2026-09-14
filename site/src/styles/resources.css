@@ -275,7 +275,9 @@
 .c-chapter a {
   font-family: var(--font-mono);
   font-size: 0.8125rem;
-  color: var(--muted);
+  /* --ink-2, not --muted: these mono links sit on zebra-striped rows where
+     --muted (#6B7079) drops to 4.25:1, just under AA. */
+  color: var(--ink-2);
   text-decoration: none;
 }
 

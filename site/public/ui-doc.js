@@ -7,19 +7,51 @@
   var sidebar = document.getElementById('doc-sidebar');
   var scrim = document.querySelector('.doc-scrim');
   var openBtn = document.querySelector('[data-drawer-open]');
+  var lastFocused = null;
 
-  function onEsc(e) {
-    if (e.key === 'Escape') closeDrawer();
+  // Visible, tabbable elements inside the open drawer, for the focus trap.
+  function focusables() {
+    if (!sidebar) return [];
+    var nodes = sidebar.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+    return Array.prototype.filter.call(nodes, function (el) {
+      return el.getClientRects().length > 0;
+    });
+  }
+
+  // Esc closes; Tab / Shift+Tab wrap so focus stays within the drawer.
+  function onKeydown(e) {
+    if (e.key === 'Escape') {
+      closeDrawer();
+      return;
+    }
+    if (e.key !== 'Tab' || !sidebar) return;
+    var items = focusables();
+    if (!items.length) return;
+    var first = items[0];
+    var last = items[items.length - 1];
+    var active = document.activeElement;
+    if (e.shiftKey) {
+      if (active === first || !sidebar.contains(active)) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else if (active === last || !sidebar.contains(active)) {
+      e.preventDefault();
+      first.focus();
+    }
   }
 
   function openDrawer() {
     if (!sidebar) return;
+    lastFocused = document.activeElement;
     sidebar.classList.add('is-open');
     if (scrim) scrim.hidden = false;
     if (openBtn) openBtn.setAttribute('aria-expanded', 'true');
     var first = sidebar.querySelector('a, button');
     if (first) first.focus();
-    document.addEventListener('keydown', onEsc);
+    document.addEventListener('keydown', onKeydown);
   }
 
   function closeDrawer() {
@@ -27,8 +59,11 @@
     sidebar.classList.remove('is-open');
     if (scrim) scrim.hidden = true;
     if (openBtn) openBtn.setAttribute('aria-expanded', 'false');
-    document.removeEventListener('keydown', onEsc);
-    if (openBtn) openBtn.focus();
+    document.removeEventListener('keydown', onKeydown);
+    // Restore focus to whatever opened the drawer (normally the toggle button).
+    var restore = lastFocused && lastFocused.focus ? lastFocused : openBtn;
+    if (restore) restore.focus();
+    lastFocused = null;
   }
 
   if (openBtn) openBtn.addEventListener('click', openDrawer);

@@ -15,17 +15,13 @@
 import type { Root, Element, ElementContent, Text } from 'hast';
 import { visitParents, SKIP } from 'unist-util-visit-parents';
 import { toString } from 'hast-util-to-string';
+import { hasClass } from './hast-utils';
 
 const CITE_RE = /\[(\d+)\]/g;
 
 interface SourceEntry {
   num: string;
   nodes: ElementContent[];
-}
-
-function hasClass(node: Element, name: string): boolean {
-  const value = node.properties?.className;
-  return Array.isArray(value) && value.includes(name);
 }
 
 function text(value: string): Text {

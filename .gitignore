@@ -20,3 +20,7 @@ Thumbs.db
 # Test artifacts
 test-results
 playwright-report
+
+# Lighthouse CI reports
+.lighthouseci
+site/.lighthouseci
