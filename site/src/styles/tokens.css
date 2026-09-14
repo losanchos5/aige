@@ -1,0 +1,97 @@
+/* Design tokens. Light-first; dark overrides swap the five pastel layers
+   with their inks and darken the surface set. */
+
+:root {
+  /* Surfaces & ink */
+  --bg: #F6F4EE;
+  --surface: rgba(255, 255, 255, 0.6);
+  --line: #E3DFD5;
+  --ink: #15171C;
+  --ink-2: #3C4048;
+  --muted: #6B7079;
+
+  /* Five stack layers (pastel + readable ink) */
+  --l1: #CBD8F0;
+  --l1-ink: #1F3A63;
+  --l2: #CFDCD3;
+  --l2-ink: #25463F;
+  --l3: #EDD4D8;
+  --l3-ink: #5C2B3B;
+  --l4: #F1DAB4;
+  --l4-ink: #5A3D15;
+  --l5: #D1E4BC;
+  --l5-ink: #2E4A22;
+
+  /* Semantic aliases (follow the layer inks across themes) */
+  --ok: var(--l5-ink);
+  --block: var(--l3-ink);
+
+  /* Radii */
+  --r-lg: 10px;
+  --r-sm: 6px;
+
+  /* Spacing scale */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 64px;
+  --s-8: 128px;
+
+  /* Layout & motion */
+  --container: 1200px;
+  --prose: 72ch;
+  --dur: 180ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  /* Typography */
+  --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  --font-body: 'Instrument Sans Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+}
+
+/* Dark, explicit toggle */
+:root[data-theme='dark'] {
+  --bg: #121417;
+  --surface: rgba(255, 255, 255, 0.04);
+  --line: #2A2D33;
+  --ink: #ECEAE3;
+  --ink-2: #C5C3BC;
+  --muted: #8E9199;
+
+  --l1: color-mix(in srgb, #1F3A63 45%, #121417);
+  --l1-ink: #CBD8F0;
+  --l2: color-mix(in srgb, #25463F 45%, #121417);
+  --l2-ink: #CFDCD3;
+  --l3: color-mix(in srgb, #5C2B3B 45%, #121417);
+  --l3-ink: #EDD4D8;
+  --l4: color-mix(in srgb, #5A3D15 45%, #121417);
+  --l4-ink: #F1DAB4;
+  --l5: color-mix(in srgb, #2E4A22 45%, #121417);
+  --l5-ink: #D1E4BC;
+}
+
+/* Dark, system preference (unless explicitly forced light) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #121417;
+    --surface: rgba(255, 255, 255, 0.04);
+    --line: #2A2D33;
+    --ink: #ECEAE3;
+    --ink-2: #C5C3BC;
+    --muted: #8E9199;
+
+    --l1: color-mix(in srgb, #1F3A63 45%, #121417);
+    --l1-ink: #CBD8F0;
+    --l2: color-mix(in srgb, #25463F 45%, #121417);
+    --l2-ink: #CFDCD3;
+    --l3: color-mix(in srgb, #5C2B3B 45%, #121417);
+    --l3-ink: #EDD4D8;
+    --l4: color-mix(in srgb, #5A3D15 45%, #121417);
+    --l4-ink: #F1DAB4;
+    --l5: color-mix(in srgb, #2E4A22 45%, #121417);
+    --l5-ink: #D1E4BC;
+  }
+}

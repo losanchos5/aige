@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+import { chaptersOrdered } from '../data/chapters';
+---
+
+<Base title={site.name}>
+  <section class="hero container">
+    <p class="eyebrow">Manifesto &amp; Body of Knowledge · v{site.bokVersion}</p>
+    <h1>AI Governance Engineer</h1>
+    <p class="lede">
+      Turning AI governance obligations into policy-as-code, eval gates and
+      machine-readable evidence — the founding text and working reference for
+      engineering the governance of AI systems.
+    </p>
+    <div class="cta">
+      <a class="btn btn-primary" href="/bok">Read the Body of Knowledge</a>
+      <a class="btn" href="/manifesto">Read the Manifesto</a>
+    </div>
+  </section>
+
+  <section id="about" class="container about">
+    <h2>About</h2>
+    <p>
+      The Body of Knowledge is {chaptersOrdered.length} chapters, curated by
+      {site.author}. Everything here is licensed {site.license}.
+    </p>
+  </section>
+
+  <style>
+    .hero {
+      padding-block: var(--s-8) var(--s-6);
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      margin-bottom: var(--s-4);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      max-width: 14ch;
+    }
+
+    .lede {
+      margin-top: var(--s-4);
+      max-width: var(--prose);
+      font-size: 1.125rem;
+      color: var(--ink-2);
+    }
+
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-3);
+      margin-top: var(--s-6);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: var(--s-3) var(--s-5);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      background: var(--surface);
+      color: var(--ink);
+      text-decoration: none;
+      transition: border-color var(--dur) var(--ease);
+    }
+
+    .btn:hover {
+      border-color: var(--ink-2);
+    }
+
+    .btn-primary {
+      background: var(--l1);
+      color: var(--l1-ink);
+      border-color: transparent;
+    }
+
+    .about {
+      padding-block: var(--s-6) var(--s-8);
+    }
+
+    .about h2 {
+      font-size: 1.5rem;
+      margin-bottom: var(--s-3);
+    }
+
+    .about p {
+      max-width: var(--prose);
+      color: var(--ink-2);
+    }
+  </style>
+</Base>

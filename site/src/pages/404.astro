@@ -1,0 +1,52 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+---
+
+<Base title={`Page not found · ${site.name}`}>
+  <section class="container notfound">
+    <p class="eyebrow">404</p>
+    <h1>Page not found</h1>
+    <p class="lede">That page does not exist. Start from the Body of Knowledge.</p>
+    <div class="cta">
+      <a class="btn" href="/">Home</a>
+      <a class="btn" href="/bok">Body of Knowledge</a>
+    </div>
+  </section>
+
+  <style>
+    .notfound {
+      padding-block: var(--s-8);
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      color: var(--muted);
+      margin-bottom: var(--s-3);
+    }
+
+    .lede {
+      margin-top: var(--s-3);
+      color: var(--ink-2);
+    }
+
+    .cta {
+      display: flex;
+      gap: var(--s-3);
+      margin-top: var(--s-6);
+    }
+
+    .btn {
+      display: inline-block;
+      padding: var(--s-3) var(--s-5);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      border-color: var(--ink-2);
+    }
+  </style>
+</Base>

@@ -1,0 +1,33 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+
+const entry = await getEntry('manifesto', 'manifesto');
+if (!entry) {
+  throw new Error('manifesto collection entry not found');
+}
+const { Content } = await render(entry);
+---
+
+<Base title={`Manifesto · ${site.name}`}>
+  <article class="container manifesto">
+    <p class="eyebrow">The Manifesto</p>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+
+  <style>
+    .manifesto {
+      padding-block: var(--s-6) var(--s-8);
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--muted);
+      margin-bottom: var(--s-4);
+    }
+  </style>
+</Base>

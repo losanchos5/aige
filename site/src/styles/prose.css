@@ -1,0 +1,138 @@
+/* Prose: readable defaults for rendered Markdown. Tokens-based; polish later. */
+
+.prose {
+  max-width: var(--prose);
+  color: var(--ink);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+
+.prose > * + * {
+  margin-top: var(--s-4);
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  color: var(--ink);
+  margin-top: var(--s-7);
+  margin-bottom: var(--s-3);
+}
+
+.prose h1 {
+  font-size: 2rem;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  padding-bottom: var(--s-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.prose h3 {
+  font-size: 1.25rem;
+}
+
+.prose h4 {
+  font-size: 1.0625rem;
+}
+
+/* rehype-autolink-headings (behavior: 'wrap') wraps heading text in <a>. */
+.prose :is(h1, h2, h3, h4) a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.prose :is(h1, h2, h3, h4) a:hover {
+  text-decoration: underline;
+}
+
+.prose p {
+  color: var(--ink-2);
+}
+
+.prose a {
+  color: var(--l1-ink);
+}
+
+.prose strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: var(--s-5);
+}
+
+.prose li + li {
+  margin-top: var(--s-2);
+}
+
+.prose li > ul,
+.prose li > ol {
+  margin-top: var(--s-2);
+}
+
+.prose blockquote {
+  padding: var(--s-3) var(--s-4);
+  border-left: 3px solid var(--l3-ink);
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  color: var(--ink-2);
+}
+
+.prose blockquote > * + * {
+  margin-top: var(--s-3);
+}
+
+.prose code {
+  font-size: 0.9em;
+  padding: 0.15em 0.4em;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+}
+
+.prose pre {
+  padding: var(--s-4);
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.prose pre code {
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin-block: var(--s-6);
+}
+
+/* Tables scroll horizontally on narrow viewports. */
+.prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.prose th,
+.prose td {
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose thead th {
+  background: var(--surface);
+  font-weight: 600;
+}

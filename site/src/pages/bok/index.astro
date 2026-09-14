@@ -1,0 +1,115 @@
+---
+import Base from '../../layouts/Base.astro';
+import { site } from '../../data/site';
+import { chaptersOrdered } from '../../data/chapters';
+
+const layerClass = ['l1', 'l2', 'l3', 'l4', 'l5'];
+---
+
+<Base title={`Body of Knowledge · ${site.name}`}>
+  <div class="container bok-index">
+    <header class="bok-head">
+      <p class="eyebrow">Body of Knowledge · v{site.bokVersion}</p>
+      <h1>The Body of Knowledge</h1>
+      <p class="lede">
+        {chaptersOrdered.length} chapters, from the definition to the reading list.
+      </p>
+    </header>
+
+    <ol class="chapter-list">
+      {
+        chaptersOrdered.map((chapter, i) => (
+          <li>
+            <a
+              class={`chapter-card ${layerClass[i % layerClass.length]}`}
+              href={`/bok/${chapter.slug}`}
+            >
+              <span class="num">{String(chapter.order).padStart(2, '0')}</span>
+              <span class="body">
+                <span class="title">{chapter.shortTitle}</span>
+                <span class="summary">{chapter.summary}</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <style>
+    .bok-index {
+      padding-block: var(--s-7) var(--s-8);
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--muted);
+      margin-bottom: var(--s-3);
+    }
+
+    .bok-head h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+    }
+
+    .lede {
+      margin-top: var(--s-3);
+      color: var(--ink-2);
+    }
+
+    .chapter-list {
+      list-style: none;
+      margin: var(--s-6) 0 0;
+      padding: 0;
+      display: grid;
+      gap: var(--s-3);
+    }
+
+    .chapter-card {
+      display: flex;
+      gap: var(--s-4);
+      align-items: flex-start;
+      padding: var(--s-4);
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      text-decoration: none;
+      color: var(--ink);
+      transition: border-color var(--dur) var(--ease);
+    }
+
+    .chapter-card:hover {
+      border-color: var(--ink-2);
+    }
+
+    .num {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: var(--s-1) var(--s-2);
+      border-radius: var(--r-sm);
+    }
+
+    .chapter-card.l1 .num { background: var(--l1); color: var(--l1-ink); }
+    .chapter-card.l2 .num { background: var(--l2); color: var(--l2-ink); }
+    .chapter-card.l3 .num { background: var(--l3); color: var(--l3-ink); }
+    .chapter-card.l4 .num { background: var(--l4); color: var(--l4-ink); }
+    .chapter-card.l5 .num { background: var(--l5); color: var(--l5-ink); }
+
+    .body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-1);
+    }
+
+    .title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 1.125rem;
+    }
+
+    .summary {
+      color: var(--ink-2);
+      font-size: 0.9375rem;
+    }
+  </style>
+</Base>

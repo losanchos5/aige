@@ -13,7 +13,7 @@ incomplete, written by one practitioner and open to many. If you do this work, y
 co-author and to sign.
 
 **Home:** https://aigovernanceengineer.com — manifesto at `/manifesto`, Body of Knowledge at `/bok`.
-Source repository: `github.com/<org>/aige` (to be created).
+Source repository: `github.com/losanchos5/aige` (to be created).
 
 ## Start here
 
