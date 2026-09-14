@@ -1,0 +1,22 @@
+# Dependencies
+node_modules
+
+# Build output
+dist
+.astro
+site/dist
+
+# Python
+build/__pycache__
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env*
+
+# Test artifacts
+test-results
+playwright-report
