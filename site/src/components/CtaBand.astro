@@ -1,0 +1,113 @@
+---
+/**
+ * CtaBand — a full-width ink block with ground-coloured text, a headline and up
+ * to two buttons. Primary = ground fill on ink; secondary = 1px ground border.
+ * Place as a direct child of <main> (outside .container) so it spans full width.
+ */
+interface Cta {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  title: string;
+  sub?: string;
+  primary: Cta;
+  secondary?: Cta;
+  class?: string;
+}
+
+const { title, sub, primary, secondary, class: className } = Astro.props;
+---
+
+<section class:list={['band', className]}>
+  <div class="container inner">
+    <div class="copy">
+      <h2 class="title">{title}</h2>
+      {sub && <p class="sub">{sub}</p>}
+    </div>
+    <div class="actions">
+      <a class="cta cta-primary" href={primary.href}>{primary.label}</a>
+      {secondary && <a class="cta cta-secondary" href={secondary.href}>{secondary.label}</a>}
+    </div>
+  </div>
+</section>
+
+<style>
+  .band {
+    background: var(--ink);
+    color: var(--bg);
+    padding-block: clamp(48px, 7vw, 96px);
+  }
+
+  .inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-6);
+  }
+
+  .copy {
+    max-width: 40ch;
+  }
+
+  .title {
+    margin: 0;
+    color: var(--bg);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h2);
+    line-height: 1.1;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .sub {
+    margin: var(--s-3) 0 0;
+    color: color-mix(in srgb, var(--bg) 82%, var(--ink));
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 var(--s-5);
+    border: 1px solid var(--bg);
+    border-radius: var(--r-sm);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .cta-primary {
+    background: var(--bg);
+    color: var(--ink);
+  }
+
+  .cta-secondary {
+    background: transparent;
+    color: var(--bg);
+  }
+
+  .cta:focus-visible {
+    outline: 2px solid var(--bg);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cta {
+      transition:
+        background-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+    }
+  }
+
+  .cta-secondary:hover {
+    background: color-mix(in srgb, var(--bg) 14%, transparent);
+  }
+</style>

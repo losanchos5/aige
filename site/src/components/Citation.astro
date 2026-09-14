@@ -1,0 +1,87 @@
+---
+// Citation: a "Cite this chapter" disclosure with a ready-to-copy APA-ish
+// reference. The copy button is wired by ui-doc.js (CSP-safe, no inline JS).
+import { site } from '../data/site';
+
+interface Props {
+  title: string;
+  slug: string;
+}
+
+const { title, slug } = Astro.props;
+const cleanTitle = title.replace(/^\d+\.\s*/, '');
+const url = `${site.url}/bok/${slug}`;
+const reference = `García Aibar, J. (2026). ${cleanTitle}. In AI Governance Engineering: Manifesto & Body of Knowledge (v${site.bokVersion}). ${url}. ${site.license}`;
+---
+
+<details class="cite-box">
+  <summary>Cite this chapter</summary>
+  <div class="cite-body">
+    <p class="cite-apa" data-cite-text>
+      García Aibar, J. (2026). <em>{cleanTitle}</em>. In <em>AI Governance
+      Engineering: Manifesto &amp; Body of Knowledge</em> (v{site.bokVersion}).{' '}
+      {url}. {site.license}
+    </p>
+    <button type="button" class="cite-copy" data-copy-cite={reference}>Copy</button>
+  </div>
+</details>
+
+<style>
+  .cite-box {
+    font-size: 0.9375rem;
+  }
+
+  .cite-box > summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+    list-style: none;
+  }
+
+  .cite-box > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .cite-box > summary::before {
+    content: '+ ';
+  }
+
+  .cite-box[open] > summary::before {
+    content: '– ';
+  }
+
+  .cite-box > summary:hover {
+    color: var(--ink);
+  }
+
+  .cite-body {
+    margin-top: var(--s-3);
+    padding: var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+  }
+
+  .cite-apa {
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  .cite-copy {
+    margin-top: var(--s-3);
+    padding: var(--s-1) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: border-color var(--dur) var(--ease);
+  }
+
+  .cite-copy:hover {
+    border-color: var(--ink-2);
+  }
+</style>

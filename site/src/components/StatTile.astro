@@ -1,0 +1,69 @@
+---
+/**
+ * StatTile — a bordered figure card: a large value, a label, and a required
+ * source line rendered small underneath. Flat, 1px border, no shadow.
+ */
+interface Props {
+  value: string;
+  label: string;
+  /** Provenance for the figure. Required: no unsourced numbers. */
+  source: string;
+  href?: string;
+  class?: string;
+}
+
+const { value, label, source, href, class: className } = Astro.props;
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag
+  class:list={['tile', className]}
+  {...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : {})}
+>
+  <span class="value">{value}</span>
+  <span class="label">{label}</span>
+  <span class="source">{source}</span>
+</Tag>
+
+<style>
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .value {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: var(--tracking-display);
+    line-height: 1;
+    font-size: var(--fs-h1);
+  }
+
+  .label {
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+
+  .source {
+    font-size: var(--fs-small);
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  a.tile:hover {
+    border-color: var(--ink-2);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    a.tile {
+      transition: border-color var(--dur) var(--ease);
+    }
+  }
+</style>

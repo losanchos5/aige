@@ -1,8 +1,8 @@
 ---
 import { getCollection, render } from 'astro:content';
-import Base from '../../layouts/Base.astro';
-import { site } from '../../data/site';
+import Doc from '../../layouts/Doc.astro';
 import { chaptersOrdered } from '../../data/chapters';
+import { gitDate } from '../../lib/reading';
 
 export async function getStaticPaths() {
   const entries = await getCollection('bok');
@@ -39,90 +39,27 @@ export async function getStaticPaths() {
 }
 
 const { entry, chapter, prev, next } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings, remarkPluginFrontmatter } = await render(entry);
+
+const title = (remarkPluginFrontmatter.title as string | undefined) ?? chapter.title;
+const summary = (remarkPluginFrontmatter.summary as string | undefined) ?? chapter.summary;
+const editPath = `bok/${chapter.id}.md`;
+const updated = gitDate(`../${editPath}`);
+const kicker = `Body of Knowledge · Chapter ${String(chapter.order).padStart(2, '0')}`;
 ---
 
-<Base title={`${chapter.title} · ${site.name}`} description={chapter.summary}>
-  <article class="container chapter">
-    <p class="eyebrow">Body of Knowledge · Chapter {String(chapter.order).padStart(2, '0')}</p>
-    <div class="prose">
-      <Content />
-    </div>
-
-    <nav class="pager" aria-label="Chapter navigation">
-      {
-        prev ? (
-          <a class="pager-link prev" href={`/bok/${prev.slug}`}>
-            <span class="dir">Previous</span>
-            <span class="name">{prev.shortTitle}</span>
-          </a>
-        ) : (
-          <span />
-        )
-      }
-      {
-        next ? (
-          <a class="pager-link next" href={`/bok/${next.slug}`}>
-            <span class="dir">Next</span>
-            <span class="name">{next.shortTitle}</span>
-          </a>
-        ) : (
-          <span />
-        )
-      }
-    </nav>
-  </article>
-
-  <style>
-    .chapter {
-      padding-block: var(--s-6) var(--s-8);
-    }
-
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      color: var(--muted);
-      margin-bottom: var(--s-4);
-    }
-
-    .pager {
-      display: flex;
-      justify-content: space-between;
-      gap: var(--s-4);
-      margin-top: var(--s-8);
-      padding-top: var(--s-5);
-      border-top: 1px solid var(--line);
-    }
-
-    .pager-link {
-      display: flex;
-      flex-direction: column;
-      gap: var(--s-1);
-      padding: var(--s-3) var(--s-4);
-      border: 1px solid var(--line);
-      border-radius: var(--r-lg);
-      text-decoration: none;
-      color: var(--ink);
-      transition: border-color var(--dur) var(--ease);
-    }
-
-    .pager-link:hover {
-      border-color: var(--ink-2);
-    }
-
-    .pager-link.next {
-      text-align: right;
-      margin-left: auto;
-    }
-
-    .dir {
-      font-size: 0.8125rem;
-      color: var(--muted);
-    }
-
-    .name {
-      font-family: var(--font-display);
-      font-weight: 600;
-    }
-  </style>
-</Base>
+<Doc
+  title={title}
+  summary={summary}
+  kicker={kicker}
+  headings={headings}
+  prev={prev}
+  next={next}
+  editPath={editPath}
+  slug={chapter.slug}
+  updated={updated}
+  activeSlug={chapter.slug}
+  cite={true}
+>
+  <Content />
+</Doc>

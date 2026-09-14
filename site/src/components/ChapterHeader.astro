@@ -1,0 +1,68 @@
+---
+// ChapterHeader: the register that opens every Doc page — a kicker, the H1 (the
+// page's only H1, since remark-lead strips the Markdown one), a summary lede and
+// a meta line. Renders its own kicker markup; the lead may later swap it for the
+// Block A <Kicker> component.
+import { site } from '../data/site';
+
+interface Props {
+  kicker?: string;
+  title: string;
+  summary?: string;
+  updated?: string;
+}
+
+const { kicker, title, summary, updated } = Astro.props;
+---
+
+<header class="chapter-header">
+  {kicker && <p class="kicker">{kicker}</p>}
+  <h1 data-pagefind-meta="title">{title}</h1>
+  {summary && <p class="lede">{summary}</p>}
+  {
+    updated && (
+      <p class="chapter-meta">
+        v{site.bokVersion} · Updated {updated} · {site.license}
+      </p>
+    )
+  }
+</header>
+
+<style>
+  .chapter-header {
+    margin-bottom: var(--s-6);
+  }
+
+  .kicker {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: var(--s-3);
+  }
+
+  .chapter-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    line-height: 1.1;
+    color: var(--ink);
+  }
+
+  .lede {
+    margin-top: var(--s-4);
+    max-width: 60ch;
+    font-size: 1.25rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .chapter-meta {
+    margin-top: var(--s-4);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+</style>

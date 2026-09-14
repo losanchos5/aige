@@ -1,0 +1,51 @@
+---
+/**
+ * Kicker — a mono eyebrow label: a small square (layer colour or ink) then the
+ * text, with an optional hairline rule that fills the remaining width.
+ */
+interface Props {
+  /** CSS colour for the 4px square. Pass a layer var, e.g. `var(--l3)`. */
+  swatch?: string;
+  /** Draw a trailing 1px rule after the text. */
+  rule?: boolean;
+  class?: string;
+}
+
+const { swatch = 'var(--ink)', rule = false, class: className } = Astro.props;
+---
+
+<p class:list={['kicker', className]}>
+  <span class="square" style={`background:${swatch}`} aria-hidden="true"></span>
+  <span class="label"><slot /></span>
+  {rule && <span class="rule" aria-hidden="true"></span>}
+</p>
+
+<style>
+  .kicker {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .square {
+    flex: none;
+    width: 4px;
+    height: 4px;
+  }
+
+  .label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    line-height: 1;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .rule {
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+</style>

@@ -1,0 +1,227 @@
+---
+/**
+ * Header — sticky, ground colour, 1px bottom line (no blur). Left: RegisterMark
+ * + wordmark. Right: primary nav, a search placeholder button (wired by the
+ * search block) and the theme toggle. At >=840px the desktop nav shows inline;
+ * below that it is replaced by a native <details> disclosure — keyboard
+ * accessible, no JS framework. Only one nav is in the a11y tree at a time.
+ */
+import RegisterMark from './RegisterMark.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { site } from '../data/site';
+
+const nav = [
+  { label: 'Manifesto', href: '/manifesto' },
+  { label: 'Body of Knowledge', href: '/bok' },
+  { label: 'The Role', href: '/bok/the-role' },
+  { label: 'The Stack', href: '/bok/the-stack' },
+  { label: 'Resources', href: '/bok/reading-list' },
+  { label: 'About', href: '/about' },
+];
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => path === href || (href !== '/' && path.startsWith(href + '/'));
+const current = (href: string) => (isCurrent(href) ? 'page' : undefined);
+---
+
+<header class="site-header">
+  <div class="container bar">
+    <a class="brand" href="/">
+      <RegisterMark size="sm" label={site.name} />
+      <span class="wordmark">{site.name}</span>
+    </a>
+
+    <div class="right">
+      <nav class="nav-desktop" aria-label="Primary">
+        <ul>
+          {
+            nav.map((item) => (
+              <li>
+                <a href={item.href} aria-current={current(item.href)}>
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <button
+        type="button"
+        class="icon-btn search-btn"
+        data-search-open
+        aria-label="Search"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+          <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
+          <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+        </svg>
+      </button>
+
+      <ThemeToggle />
+
+      <details class="nav-disc">
+        <summary class="icon-btn burger" aria-label="Menu">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+          </svg>
+        </summary>
+        <nav class="nav-panel" aria-label="Primary menu">
+          <ul>
+            {
+              nav.map((item) => (
+                <li>
+                  <a href={item.href} aria-current={current(item.href)}>
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding-block: var(--s-3);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.125rem;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  /* Desktop nav */
+  .nav-desktop {
+    display: none;
+  }
+
+  .nav-desktop ul {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-desktop a,
+  .nav-panel a {
+    color: var(--ink-2);
+    text-decoration: none;
+    font-size: 0.9375rem;
+  }
+
+  .nav-desktop a:hover,
+  .nav-panel a:hover {
+    color: var(--ink);
+  }
+
+  .nav-desktop a[aria-current='page'],
+  .nav-panel a[aria-current='page'] {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* Icon buttons (search, burger) */
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .icon-btn:hover {
+    border-color: var(--ink-2);
+  }
+
+  .burger::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Mobile disclosure dropdown */
+  .nav-disc {
+    position: relative;
+  }
+
+  .nav-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + var(--s-3));
+    min-width: 15rem;
+    padding: var(--s-3);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    z-index: 30;
+  }
+
+  .nav-panel ul {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-panel li + li {
+    border-top: 1px solid var(--line);
+  }
+
+  .nav-panel a {
+    display: block;
+    padding: var(--s-3) var(--s-2);
+    font-size: 1rem;
+  }
+
+  @media (min-width: 840px) {
+    .nav-desktop {
+      display: block;
+    }
+    .nav-disc {
+      display: none;
+    }
+  }
+</style>

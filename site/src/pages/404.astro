@@ -1,52 +1,52 @@
 ---
 import Base from '../layouts/Base.astro';
+import Kicker from '../components/Kicker.astro';
+import VerdictStamp from '../components/VerdictStamp.astro';
 import { site } from '../data/site';
 ---
 
-<Base title={`Page not found · ${site.name}`}>
-  <section class="container notfound">
-    <p class="eyebrow">404</p>
-    <h1>Page not found</h1>
-    <p class="lede">That page does not exist. Start from the Body of Knowledge.</p>
+<Base title={`Verdict: BLOCK · ${site.name}`} description="This route is not registered.">
+  <section class="section container notfound">
+    <Kicker swatch="var(--l3)">Error 404</Kicker>
+    <h1 class="display heading">
+      Verdict: <VerdictStamp verdict="block" />
+    </h1>
+    <p class="lede">Route not registered.</p>
     <div class="cta">
-      <a class="btn" href="/">Home</a>
-      <a class="btn" href="/bok">Body of Knowledge</a>
+      <a class="btn btn-primary" href="/">Home</a>
+      <a class="btn btn-secondary" href="/bok">Body of Knowledge</a>
     </div>
   </section>
 
   <style>
     .notfound {
-      padding-block: var(--s-8);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--s-4);
+      min-height: 52vh;
+      justify-content: center;
     }
 
-    .eyebrow {
-      font-family: var(--font-mono);
-      color: var(--muted);
-      margin-bottom: var(--s-3);
+    .heading {
+      display: flex;
+      align-items: center;
+      gap: var(--s-3);
+      flex-wrap: wrap;
+      font-size: var(--fs-h1);
+      margin: 0;
     }
 
     .lede {
-      margin-top: var(--s-3);
+      margin: 0;
       color: var(--ink-2);
     }
 
     .cta {
       display: flex;
+      flex-wrap: wrap;
       gap: var(--s-3);
-      margin-top: var(--s-6);
-    }
-
-    .btn {
-      display: inline-block;
-      padding: var(--s-3) var(--s-5);
-      border: 1px solid var(--line);
-      border-radius: var(--r-lg);
-      color: var(--ink);
-      text-decoration: none;
-    }
-
-    .btn:hover {
-      border-color: var(--ink-2);
+      margin-top: var(--s-2);
     }
   </style>
 </Base>

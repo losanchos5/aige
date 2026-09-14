@@ -1,0 +1,248 @@
+---
+// Doc: the reading layout for the Manifesto, the Body of Knowledge and the meta
+// pages. Wraps Base (unmodified) and lays out a chapter rail, the prose well and
+// an on-this-page TOC — three columns ≥1100px, two ≥840px, one below with the
+// rail as an off-canvas drawer. All behaviour lives in /ui-doc.js (CSP-safe).
+import type { MarkdownHeading } from 'astro';
+import Base from './Base.astro';
+import { site } from '../data/site';
+import ChapterHeader from '../components/ChapterHeader.astro';
+import SidebarNav from '../components/SidebarNav.astro';
+import Toc from '../components/Toc.astro';
+import PrevNext from '../components/PrevNext.astro';
+import EditOnGitHub from '../components/EditOnGitHub.astro';
+import Citation from '../components/Citation.astro';
+import SearchDialog from '../components/SearchDialog.astro';
+
+interface Adjacent {
+  slug: string;
+  shortTitle: string;
+}
+
+interface Props {
+  title: string;
+  summary?: string;
+  kicker?: string;
+  headings?: MarkdownHeading[];
+  prev?: Adjacent;
+  next?: Adjacent;
+  editPath?: string;
+  slug?: string;
+  updated?: string;
+  sidebar?: boolean;
+  wide?: boolean;
+  activeSlug?: string;
+  activeManifesto?: boolean;
+  cite?: boolean;
+}
+
+const {
+  title,
+  summary,
+  kicker,
+  headings = [],
+  prev,
+  next,
+  editPath,
+  slug,
+  updated,
+  sidebar = true,
+  wide = false,
+  activeSlug,
+  activeManifesto = false,
+  cite = false,
+} = Astro.props;
+
+const withSidebar = sidebar && !wide;
+const withToc = !wide && headings.some((h) => h.depth === 2 || h.depth === 3);
+const mode = wide ? 'wide' : withSidebar ? 'chapter' : 'doc';
+const pageTitle = `${title} · ${site.name}`;
+---
+
+<Base title={pageTitle} description={summary}>
+  <div class="doc container" data-mode={mode}>
+    {
+      withSidebar && (
+        <div class="doc-drawerbar">
+          <button
+            type="button"
+            class="drawer-btn"
+            data-drawer-open
+            aria-expanded="false"
+            aria-controls="doc-sidebar"
+          >
+            Chapters
+          </button>
+          <button type="button" class="drawer-btn" data-search-open>
+            Search
+          </button>
+        </div>
+      )
+    }
+
+    <div class="doc-layout">
+      {
+        withSidebar && (
+          <aside id="doc-sidebar" class="doc-sidebar" data-pagefind-ignore>
+            <SidebarNav activeSlug={activeSlug} activeManifesto={activeManifesto} />
+          </aside>
+        )
+      }
+
+      <div class="doc-main">
+        <article class="prose" data-pagefind-body>
+          <ChapterHeader kicker={kicker} title={title} summary={summary} updated={updated} />
+          <slot />
+        </article>
+
+        {
+          (editPath || (cite && slug)) && (
+            <footer class="doc-foot">
+              {editPath && <EditOnGitHub path={editPath} />}
+              {cite && slug && <Citation title={title} slug={slug} />}
+            </footer>
+          )
+        }
+
+        {(prev || next) && <PrevNext prev={prev} next={next} />}
+      </div>
+
+      {
+        withToc && (
+          <aside class="doc-toc" data-pagefind-ignore>
+            <Toc headings={headings} />
+          </aside>
+        )
+      }
+    </div>
+  </div>
+
+  {withSidebar && <div class="doc-scrim" data-drawer-close hidden />}
+
+  <SearchDialog />
+  <script is:inline src="/ui-doc.js" defer></script>
+</Base>
+
+<style>
+  .doc {
+    padding-block: var(--s-6) var(--s-8);
+  }
+
+  .doc-drawerbar {
+    display: flex;
+    gap: var(--s-3);
+    margin-bottom: var(--s-5);
+  }
+
+  .drawer-btn {
+    padding: var(--s-2) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    cursor: pointer;
+  }
+
+  .drawer-btn:hover {
+    border-color: var(--ink-2);
+  }
+
+  .doc-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-6);
+    align-items: start;
+  }
+
+  .doc-main {
+    min-width: 0;
+    max-width: 72ch;
+    margin-inline: auto;
+  }
+
+  .doc-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--s-4);
+    margin-top: var(--s-7);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  /* On-this-page: only from 1100px up. */
+  .doc-toc {
+    display: none;
+  }
+
+  /* Chapter rail: off-canvas drawer below 840px. */
+  .doc-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 40;
+    width: min(320px, 86vw);
+    padding: var(--s-6) var(--s-5);
+    background: var(--bg);
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .doc-sidebar.is-open {
+    transform: none;
+  }
+
+  .doc-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  @media (min-width: 840px) {
+    .doc-drawerbar {
+      display: none;
+    }
+
+    .doc-sidebar {
+      position: sticky;
+      top: var(--s-6);
+      inset: auto;
+      z-index: auto;
+      width: auto;
+      max-height: calc(100dvh - var(--s-7));
+      padding: 0;
+      background: none;
+      border-right: 0;
+      transform: none;
+    }
+
+    .doc-scrim {
+      display: none;
+    }
+
+    [data-mode='chapter'] .doc-layout {
+      grid-template-columns: 240px minmax(0, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .doc-toc {
+      display: block;
+    }
+
+    [data-mode='chapter'] .doc-layout {
+      grid-template-columns: 260px minmax(0, 72ch) 220px;
+      justify-content: center;
+    }
+
+    [data-mode='doc'] .doc-layout {
+      grid-template-columns: minmax(0, 72ch) 220px;
+      justify-content: center;
+    }
+  }
+</style>

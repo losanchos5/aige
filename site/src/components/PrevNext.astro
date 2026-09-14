@@ -1,0 +1,82 @@
+---
+// PrevNext: chapter pager. prev / next are chapter-shaped records; either may be
+// absent at the ends of the sequence.
+interface Adjacent {
+  slug: string;
+  shortTitle: string;
+}
+
+interface Props {
+  prev?: Adjacent;
+  next?: Adjacent;
+}
+
+const { prev, next } = Astro.props;
+---
+
+<nav class="pager" aria-label="Chapter navigation">
+  {
+    prev ? (
+      <a class="pager-link prev" href={`/bok/${prev.slug}`}>
+        <span class="dir">Previous</span>
+        <span class="name">{prev.shortTitle}</span>
+      </a>
+    ) : (
+      <span />
+    )
+  }
+  {
+    next ? (
+      <a class="pager-link next" href={`/bok/${next.slug}`}>
+        <span class="dir">Next</span>
+        <span class="name">{next.shortTitle}</span>
+      </a>
+    ) : (
+      <span />
+    )
+  }
+</nav>
+
+<style>
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--s-4);
+    margin-top: var(--s-7);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .pager-link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    text-decoration: none;
+    color: var(--ink);
+    transition: border-color var(--dur) var(--ease);
+    max-width: 48%;
+  }
+
+  .pager-link:hover {
+    border-color: var(--ink-2);
+  }
+
+  .pager-link.next {
+    text-align: right;
+    margin-left: auto;
+  }
+
+  .dir {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .name {
+    font-family: var(--font-display);
+    font-weight: 600;
+  }
+</style>

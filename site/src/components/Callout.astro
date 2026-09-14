@@ -1,0 +1,76 @@
+---
+/**
+ * Callout — an editorial aside with a 3px ink bar on the left and a matte tint
+ * keyed to its kind. No rounded pill, no shadow.
+ *   practice -> L2, example -> L1, anti -> L3, note -> neutral surface.
+ */
+interface Props {
+  kind: 'practice' | 'example' | 'anti' | 'note';
+  title: string;
+  class?: string;
+}
+
+const { kind, title, class: className } = Astro.props;
+const tags: Record<Props['kind'], string> = {
+  practice: 'Practice',
+  example: 'Example',
+  anti: 'Anti-pattern',
+  note: 'Note',
+};
+---
+
+<aside class:list={['callout', `callout-${kind}`, className]}>
+  <p class="tag">{tags[kind]}</p>
+  <p class="title">{title}</p>
+  <div class="body"><slot /></div>
+</aside>
+
+<style>
+  .callout {
+    --tint: var(--surface);
+    border-left: 3px solid var(--ink);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    background: var(--tint);
+    padding: var(--s-4) var(--s-5);
+  }
+
+  .callout-practice {
+    --tint: color-mix(in srgb, var(--l2) 45%, var(--bg));
+  }
+  .callout-example {
+    --tint: color-mix(in srgb, var(--l1) 45%, var(--bg));
+  }
+  .callout-anti {
+    --tint: color-mix(in srgb, var(--l3) 45%, var(--bg));
+  }
+  .callout-note {
+    --tint: color-mix(in srgb, var(--ink) 4%, var(--bg));
+  }
+
+  .tag {
+    margin: 0 0 var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .body {
+    margin-top: var(--s-2);
+    color: var(--ink-2);
+  }
+
+  .body :global(> :first-child) {
+    margin-top: 0;
+  }
+</style>

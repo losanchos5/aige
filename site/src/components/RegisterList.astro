@@ -1,0 +1,131 @@
+---
+/**
+ * RegisterList — the "register" motif as a list. Each row carries a mono index,
+ * a title, an optional description and a layer-colour tick. Rows are separated
+ * by 1px rules; on hover the row's swatch tint fills the left index cell.
+ * Used for nav-like lists, layer lists and principle lists.
+ */
+export interface RegisterItem {
+  title: string;
+  description?: string;
+  href?: string;
+  /** Layer colour for the tick + hover tint, e.g. `var(--l1)`. */
+  swatch?: string;
+  /** Mono index label; auto-numbered from 01 when omitted. */
+  index?: string;
+}
+
+interface Props {
+  items: RegisterItem[];
+  class?: string;
+}
+
+const { items, class: className } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+
+<ol class:list={['register', className]}>
+  {
+    items.map((item, i) => {
+      const idx = item.index ?? pad(i + 1);
+      const swatch = item.swatch ?? 'var(--ink)';
+      const Inner = item.href ? 'a' : 'div';
+      return (
+        <li class="row" style={`--tint:${swatch}`}>
+          <Inner class="rowlink" {...(item.href ? { href: item.href } : {})}>
+            <span class="cell idx" aria-hidden="true">
+              {idx}
+            </span>
+            <span class="body">
+              <span class="title">{item.title}</span>
+              {item.description && <span class="desc">{item.description}</span>}
+            </span>
+            <span class="tick" aria-hidden="true"></span>
+          </Inner>
+        </li>
+      );
+    })
+  }
+</ol>
+
+<style>
+  .register {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .row {
+    border-top: 1px solid var(--line);
+  }
+
+  .rowlink {
+    display: grid;
+    grid-template-columns: 3rem 1fr auto;
+    align-items: center;
+    gap: var(--s-4);
+    padding: var(--s-4) var(--s-2) var(--s-4) 0;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .cell {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .idx {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--muted);
+    padding-block: var(--s-3);
+  }
+
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .title {
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .desc {
+    font-size: var(--fs-small);
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  .tick {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--tint);
+    border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  }
+
+  a.rowlink:hover .idx {
+    background: color-mix(in srgb, var(--tint) 30%, var(--bg));
+    color: var(--ink);
+  }
+
+  a.rowlink:hover .title {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .idx {
+      transition:
+        background-color var(--dur) var(--ease),
+        color var(--dur) var(--ease);
+    }
+  }
+</style>

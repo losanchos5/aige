@@ -50,6 +50,20 @@
   --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
   --font-body: 'Instrument Sans Variable', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* Type scale (fluid). Ranges match the design brief in px. */
+  --fs-display: clamp(3.25rem, 2.72rem + 2.25vw, 4.75rem); /* 52 -> 76 */
+  --fs-h1: clamp(2.5rem, 2.24rem + 1.13vw, 3.25rem); /* 40 -> 52 */
+  --fs-h2: clamp(1.75rem, 1.62rem + 0.56vw, 2.125rem); /* 28 -> 34 */
+  --fs-h3: clamp(1.25rem, 1.21rem + 0.19vw, 1.375rem); /* 20 -> 22 */
+  --fs-body: 1.0625rem; /* 17 */
+  --fs-small: 0.875rem; /* 14 */
+  --fs-label: 0.75rem; /* 12, mono uppercase labels */
+
+  /* Display lettering defaults */
+  --tracking-display: -0.02em;
+  --tracking-label: 0.1em;
+  --leading-display: 1.05;
 }
 
 /* Dark, explicit toggle */

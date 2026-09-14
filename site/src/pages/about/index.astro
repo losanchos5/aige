@@ -1,0 +1,60 @@
+---
+import Doc from '../../layouts/Doc.astro';
+import { site } from '../../data/site';
+---
+
+<Doc
+  title="About this site"
+  summary="What this is, who curates it, and how to contribute."
+  kicker="About"
+  sidebar={false}
+  wide={true}
+>
+  <p>
+    <strong>{site.name}</strong> is the home of <em>AI Governance Engineering: A Manifesto &amp; Body
+    of Knowledge</em> — a founding text and working reference for turning AI governance obligations
+    into policy-as-code, eval gates, agent registries and machine-readable evidence. It treats
+    governance as a system to be built, run and measured, not a document to be signed.
+  </p>
+
+  <h2>Who curates it</h2>
+  <p>
+    Curated by {site.author}, AI Governance &amp; Privacy Engineer; author of the Manifesto &amp;
+    Body of Knowledge v{site.bokVersion}. The text is written to be co-authored: it is a first public
+    draft, deliberately incomplete, and it invites practitioners who build governance for AI systems
+    to sharpen it.
+  </p>
+
+  <h2>How to contribute</h2>
+  <p>
+    Everything here lives in a public repository. Propose a change, add a pattern, sharpen an
+    argument or fix a fact by opening a pull request — every factual claim needs a sourced, verified
+    citation, following the style guide. Co-authors and contributors are credited by name.
+  </p>
+  <ul>
+    <li>
+      <a href="/about/contributors">Contributors and signatories</a> — who has written, revised or
+      signed.
+    </li>
+    <li>
+      <a href="/about/changelog">Changelog</a> — what changed in each version.
+    </li>
+    <li>
+      <a href={`${site.github}`} target="_blank" rel="noopener noreferrer">Source repository on
+      GitHub</a> — open an issue or a pull request.
+    </li>
+  </ul>
+
+  <h2>Licence</h2>
+  <p>
+    This work is licensed under <strong>{site.license}</strong>. It may be freely copied and shared
+    with attribution to {site.author} and contributors.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    Discuss the discipline on{' '}
+    <a href={site.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>, or on{' '}
+    <a href={site.github} target="_blank" rel="noopener noreferrer">GitHub</a>.
+  </p>
+</Doc>

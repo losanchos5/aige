@@ -1,9 +1,19 @@
 ---
+import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import { site } from '../../data/site';
-import { chaptersOrdered } from '../../data/chapters';
+import { chaptersOrdered, getChapter } from '../../data/chapters';
+import { readingTime } from '../../lib/reading';
 
-const layerClass = ['l1', 'l2', 'l3', 'l4', 'l5'];
+const entries = await getCollection('bok');
+const minutes = new Map(entries.map((entry) => [entry.id, readingTime(entry.body ?? '')]));
+
+const preface = getChapter('00-preface');
+const intro =
+  preface?.summary ??
+  'The founding text and working reference for engineering the governance of AI systems.';
+
+const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
 ---
 
 <Base title={`Body of Knowledge · ${site.name}`}>
@@ -11,24 +21,24 @@ const layerClass = ['l1', 'l2', 'l3', 'l4', 'l5'];
     <header class="bok-head">
       <p class="eyebrow">Body of Knowledge · v{site.bokVersion}</p>
       <h1>The Body of Knowledge</h1>
-      <p class="lede">
-        {chaptersOrdered.length} chapters, from the definition to the reading list.
+      <p class="lede">{intro}</p>
+      <p class="sub">
+        {chaptersOrdered.length} chapters, from the definition to the reading list. Read them in
+        order or jump to the layer you are building.
       </p>
     </header>
 
-    <ol class="chapter-list">
+    <ol class="chapter-grid">
       {
         chaptersOrdered.map((chapter, i) => (
           <li>
-            <a
-              class={`chapter-card ${layerClass[i % layerClass.length]}`}
-              href={`/bok/${chapter.slug}`}
-            >
-              <span class="num">{String(chapter.order).padStart(2, '0')}</span>
-              <span class="body">
-                <span class="title">{chapter.shortTitle}</span>
-                <span class="summary">{chapter.summary}</span>
+            <a class={`chapter-card ${layers[i % layers.length]}`} href={`/bok/${chapter.slug}`}>
+              <span class="card-top">
+                <span class="num">{String(chapter.order).padStart(2, '0')}</span>
+                <span class="time">{minutes.get(chapter.id) ?? 1} min</span>
               </span>
+              <span class="title">{chapter.shortTitle}</span>
+              <span class="summary">{chapter.summary}</span>
             </a>
           </li>
         ))
@@ -43,47 +53,70 @@ const layerClass = ['l1', 'l2', 'l3', 'l4', 'l5'];
 
     .eyebrow {
       font-family: var(--font-mono);
-      font-size: 0.8125rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
       color: var(--muted);
       margin-bottom: var(--s-3);
     }
 
     .bok-head h1 {
+      font-family: var(--font-display);
       font-size: clamp(2rem, 5vw, 3rem);
     }
 
     .lede {
-      margin-top: var(--s-3);
+      margin-top: var(--s-4);
+      max-width: 60ch;
+      font-size: 1.25rem;
       color: var(--ink-2);
     }
 
-    .chapter-list {
+    .sub {
+      margin-top: var(--s-3);
+      max-width: 60ch;
+      color: var(--muted);
+    }
+
+    .chapter-grid {
       list-style: none;
-      margin: var(--s-6) 0 0;
+      margin: var(--s-7) 0 0;
       padding: 0;
       display: grid;
-      gap: var(--s-3);
+      gap: var(--s-4);
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
     }
 
     .chapter-card {
       display: flex;
-      gap: var(--s-4);
-      align-items: flex-start;
+      flex-direction: column;
+      gap: var(--s-2);
+      height: 100%;
       padding: var(--s-4);
       border: 1px solid var(--line);
       border-radius: var(--r-lg);
       text-decoration: none;
       color: var(--ink);
-      transition: border-color var(--dur) var(--ease);
+      background: var(--surface);
+      transition:
+        border-color var(--dur) var(--ease),
+        transform var(--dur) var(--ease);
     }
 
     .chapter-card:hover {
       border-color: var(--ink-2);
+      transform: translateY(-2px);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .num {
       font-family: var(--font-mono);
-      font-size: 0.875rem;
+      font-size: 0.8125rem;
       font-weight: 600;
       padding: var(--s-1) var(--s-2);
       border-radius: var(--r-sm);
@@ -95,21 +128,23 @@ const layerClass = ['l1', 'l2', 'l3', 'l4', 'l5'];
     .chapter-card.l4 .num { background: var(--l4); color: var(--l4-ink); }
     .chapter-card.l5 .num { background: var(--l5); color: var(--l5-ink); }
 
-    .body {
-      display: flex;
-      flex-direction: column;
-      gap: var(--s-1);
+    .time {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--muted);
     }
 
     .title {
       font-family: var(--font-display);
       font-weight: 600;
       font-size: 1.125rem;
+      margin-top: var(--s-1);
     }
 
     .summary {
       color: var(--ink-2);
       font-size: 0.9375rem;
+      line-height: 1.5;
     }
   </style>
 </Base>

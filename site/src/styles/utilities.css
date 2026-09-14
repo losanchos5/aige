@@ -1,0 +1,109 @@
+/* Utilities: spacing helpers, text helpers, responsive grids, section rhythm,
+   full-bleed breakout and the reveal-on-scroll motif. Composable, low-specificity. */
+
+/* Vertical rhythm on a flow container: children share a top margin. */
+.stack > * + * {
+  margin-top: var(--s-4);
+}
+.stack-1 > * + * {
+  margin-top: var(--s-1);
+}
+.stack-2 > * + * {
+  margin-top: var(--s-2);
+}
+.stack-3 > * + * {
+  margin-top: var(--s-3);
+}
+.stack-4 > * + * {
+  margin-top: var(--s-4);
+}
+.stack-5 > * + * {
+  margin-top: var(--s-5);
+}
+.stack-6 > * + * {
+  margin-top: var(--s-6);
+}
+
+/* Text helpers */
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+  text-wrap: balance;
+}
+
+.lede {
+  font-size: 1.125rem;
+  color: var(--ink-2);
+  max-width: var(--prose);
+}
+
+/* Section rhythm */
+.section {
+  padding-block: clamp(64px, 10vw, 128px);
+}
+
+/* Full-bleed breakout to the viewport width from inside a centred container. */
+.full-bleed {
+  width: 100vw;
+  margin-inline: calc(50% - 50vw);
+}
+
+/* Responsive grids: collapse to one column on narrow screens. */
+.grid-2,
+.grid-3,
+.grid-4 {
+  display: grid;
+  gap: var(--s-5);
+}
+@media (min-width: 600px) {
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 720px) {
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 960px) {
+  .grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Reveal-on-scroll. Content is visible by default so no-JS and reduced-motion
+   users always see it; ui.js opts in by adding `js-reveal` to <html> only when
+   motion is allowed, and toggles `is-visible` as elements enter the viewport. */
+:root.js-reveal .reveal {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+:root.js-reveal .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root.js-reveal .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

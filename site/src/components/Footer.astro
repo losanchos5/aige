@@ -1,0 +1,144 @@
+---
+/**
+ * Footer — three columns (about line, Read links, Project links) over a meta
+ * line. All identity values come from data/site.ts.
+ */
+import RegisterMark from './RegisterMark.astro';
+import { site } from '../data/site';
+
+const domain = new URL(site.url).host;
+
+const read = [
+  { label: 'Manifesto', href: '/manifesto' },
+  { label: 'Body of Knowledge', href: '/bok' },
+  { label: 'The Role', href: '/bok/the-role' },
+  { label: 'The Stack', href: '/bok/the-stack' },
+  { label: 'Resources', href: '/bok/reading-list' },
+];
+
+const project = [
+  { label: 'About', href: '/about' },
+  { label: 'Contributors', href: '/about/contributors' },
+  { label: 'Changelog', href: '/about/changelog' },
+  { label: 'GitHub', href: site.github, external: true },
+  { label: 'LinkedIn', href: site.linkedin, external: true },
+];
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="cols">
+      <div class="about">
+        <RegisterMark size="sm" label={site.name} />
+        <p>
+          An open Body of Knowledge for the discipline of AI Governance
+          Engineering. Curated by {site.author}.
+        </p>
+      </div>
+
+      <nav class="group" aria-label="Read">
+        <p class="group-title">Read</p>
+        <ul>
+          {read.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <nav class="group" aria-label="Project">
+        <p class="group-title">Project</p>
+        <ul>
+          {
+            project.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </div>
+
+    <p class="meta">{site.license} · v{site.bokVersion} · {domain}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--line);
+    margin-top: clamp(64px, 10vw, 128px);
+    padding-block: var(--s-7);
+    color: var(--muted);
+    font-size: var(--fs-small);
+  }
+
+  .cols {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  @media (min-width: 720px) {
+    .cols {
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: var(--s-7);
+    }
+  }
+
+  .about {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    max-width: 40ch;
+  }
+
+  .about p {
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  .group-title {
+    margin: 0 0 var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .group a {
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .group a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .meta {
+    margin: var(--s-6) 0 0;
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+</style>

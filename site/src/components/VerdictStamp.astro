@@ -1,0 +1,43 @@
+---
+/**
+ * VerdictStamp — the "verdict" micro-motif. A small rectangular stamp in mono
+ * uppercase with a 1px border, coloured from L5 (pass) or L3 (block).
+ */
+interface Props {
+  verdict: 'pass' | 'block';
+  label?: string;
+  class?: string;
+}
+
+const { verdict, label, class: className } = Astro.props;
+const text = label ?? (verdict === 'pass' ? 'PASS' : 'BLOCK');
+---
+
+<span class:list={['stamp', `stamp-${verdict}`, className]}>{text}</span>
+
+<style>
+  .stamp {
+    display: inline-block;
+    padding: 0.35em 0.6em;
+    border: 1px solid;
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .stamp-pass {
+    color: var(--l5-ink);
+    border-color: var(--l5-ink);
+    background: var(--l5);
+  }
+
+  .stamp-block {
+    color: var(--l3-ink);
+    border-color: var(--l3-ink);
+    background: var(--l3);
+  }
+</style>

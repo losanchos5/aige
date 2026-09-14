@@ -1,0 +1,82 @@
+---
+// Toc: on-this-page navigation built from the rendered headings (H2/H3). Sticky
+// on wide viewports; ui-doc.js adds aria-current to the section in view.
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  items.length > 0 && (
+    <nav class="toc" aria-label="On this page">
+      <p class="toc-label">On this page</p>
+      <ul>
+        {items.map((heading) => (
+          <li class={`toc-h${heading.depth}`}>
+            <a href={`#${heading.slug}`} data-toc-link={heading.slug}>
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .toc {
+    position: sticky;
+    top: var(--s-7);
+    font-size: 0.875rem;
+  }
+
+  .toc-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: var(--s-3);
+  }
+
+  .toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-left: 1px solid var(--line);
+  }
+
+  .toc li {
+    margin: 0;
+  }
+
+  .toc a {
+    display: block;
+    padding: var(--s-1) var(--s-3);
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    color: var(--muted);
+    text-decoration: none;
+    line-height: 1.35;
+    transition: color var(--dur) var(--ease);
+  }
+
+  .toc-h3 a {
+    padding-left: var(--s-5);
+    font-size: 0.8125rem;
+  }
+
+  .toc a:hover {
+    color: var(--ink);
+  }
+
+  .toc a[aria-current='true'] {
+    color: var(--ink);
+    border-left-color: var(--ink);
+  }
+</style>

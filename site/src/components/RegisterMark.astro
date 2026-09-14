@@ -1,0 +1,57 @@
+---
+/**
+ * RegisterMark — the brand logo. Five stacked, rounded horizontal bars, one per
+ * stack layer (L1..L5), reading like a control register. Flat and matte: each
+ * bar is a layer pastel with a 1px hairline outline, no shadow.
+ */
+interface Props {
+  size?: 'sm' | 'md' | 'lg';
+  label?: string;
+  class?: string;
+}
+
+const { size = 'md', label = 'AI Governance Engineer', class: className } = Astro.props;
+const layers = ['--l1', '--l2', '--l3', '--l4', '--l5'];
+---
+
+<span class:list={['mark', `mark-${size}`, className]} role="img" aria-label={label}>
+  {layers.map((token) => <span class="bar" style={`background:var(${token})`}></span>)}
+</span>
+
+<style>
+  .mark {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--gap);
+    vertical-align: middle;
+  }
+
+  .bar {
+    width: var(--w);
+    height: var(--h);
+    border-radius: var(--br);
+    border: 1px solid color-mix(in srgb, var(--ink) 24%, transparent);
+  }
+
+  .mark-sm {
+    --w: 30px;
+    --h: 3px;
+    --gap: 2px;
+    --br: 2px;
+  }
+
+  .mark-md {
+    --w: 48px;
+    --h: 5px;
+    --gap: 3px;
+    --br: 3px;
+  }
+
+  .mark-lg {
+    --w: 76px;
+    --h: 8px;
+    --gap: 5px;
+    --br: 4px;
+  }
+</style>

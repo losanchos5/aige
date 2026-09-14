@@ -2,25 +2,19 @@
 import '../styles/tokens.css';
 import '../styles/fonts.css';
 import '../styles/base.css';
+import '../styles/utilities.css';
 import '../styles/prose.css';
-import { site } from '../data/site';
+import Seo from '../components/Seo.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 
 interface Props {
   title: string;
   description?: string;
+  image?: string;
 }
 
-const { title, description = site.description } = Astro.props;
-const canonical = new URL(Astro.url.pathname, site.url).href;
-
-const nav = [
-  { label: 'Manifesto', href: '/manifesto' },
-  { label: 'Body of Knowledge', href: '/bok' },
-  { label: 'The Role', href: '/bok/the-role' },
-  { label: 'The Stack', href: '/bok/the-stack' },
-  { label: 'Resources', href: '/bok/reading-list' },
-  { label: 'About', href: '/#about' },
-];
+const { title, description, image } = Astro.props;
 ---
 
 <!doctype html>
@@ -28,18 +22,12 @@ const nav = [
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content={site.name} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
-    <meta name="twitter:card" content="summary" />
+    <Seo title={title} description={description} image={image} />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
     <link
       rel="preload"
       href="/fonts/instrument-sans-latin-wght-normal.woff2"
@@ -55,107 +43,25 @@ const nav = [
       crossorigin
     />
 
+    <!-- Apply persisted theme before paint; exposes window.__setTheme. -->
     <script is:inline src="/theme.js"></script>
+
+    <!-- CF_BEACON: Cloudflare Web Analytics beacon injected here in production.
+    <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"REPLACE_ME"}'></script>
+    -->
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <header class="site-header">
-      <div class="container header-inner">
-        <a class="brand" href="/">{site.name}</a>
-        <nav aria-label="Primary">
-          <ul>
-            {
-              nav.map((item) => (
-                <li>
-                  <a href={item.href}>{item.label}</a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
-      </div>
-    </header>
+    <Header />
 
     <main id="main">
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <div class="container">
-        <p>
-          Curated by {site.author} · {site.license} ·{' '}
-          <a href={site.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a> ·{' '}
-          <a href={site.github} target="_blank" rel="noopener noreferrer">GitHub</a>
-        </p>
-      </div>
-    </footer>
+    <Footer />
 
-    <style>
-      .site-header {
-        border-bottom: 1px solid var(--line);
-        background: var(--surface);
-        backdrop-filter: blur(8px);
-        position: sticky;
-        top: 0;
-        z-index: 10;
-      }
-
-      .header-inner {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--s-3);
-        padding-block: var(--s-3);
-      }
-
-      .brand {
-        font-family: var(--font-display);
-        font-weight: 700;
-        font-size: 1.0625rem;
-        color: var(--ink);
-        text-decoration: none;
-      }
-
-      nav ul {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--s-4);
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-
-      nav a {
-        color: var(--ink-2);
-        text-decoration: none;
-        font-size: 0.9375rem;
-      }
-
-      nav a:hover {
-        color: var(--ink);
-      }
-
-      main {
-        min-height: 60vh;
-      }
-
-      .site-footer {
-        border-top: 1px solid var(--line);
-        margin-top: var(--s-8);
-        padding-block: var(--s-6);
-        color: var(--muted);
-        font-size: 0.9375rem;
-      }
-
-      .site-footer a {
-        color: var(--muted);
-      }
-
-      .site-footer a:hover {
-        color: var(--ink);
-      }
-    </style>
+    <!-- Progressive enhancement: theme toggle, reveal-on-scroll, menu. -->
+    <script is:inline defer src="/ui.js"></script>
   </body>
 </html>

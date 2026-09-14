@@ -1,97 +1,119 @@
 ---
-import Base from '../layouts/Base.astro';
+/**
+ * Home — placeholder that exercises the shell (Kicker, RegisterMark, RegisterList,
+ * CtaBand). The real home page is built in a later block; keep this clean.
+ */
+import Marketing from '../layouts/Marketing.astro';
+import Kicker from '../components/Kicker.astro';
+import RegisterMark from '../components/RegisterMark.astro';
+import RegisterList from '../components/RegisterList.astro';
+import CtaBand from '../components/CtaBand.astro';
 import { site } from '../data/site';
-import { chaptersOrdered } from '../data/chapters';
+
+const layers = [
+  {
+    title: 'Govern-as-Code',
+    description: 'Governance rules as executable policy, evaluated in CI/CD and at runtime.',
+    swatch: 'var(--l1)',
+    href: '/bok/the-stack',
+  },
+  {
+    title: 'Inventory & Transparency',
+    description: 'A runtime-aware registry of every model, service and agent.',
+    swatch: 'var(--l2)',
+    href: '/bok/the-stack',
+  },
+  {
+    title: 'Evals & Red Teaming as Evidence',
+    description: 'Tests that can fail the build, not reviews that can only recommend.',
+    swatch: 'var(--l3)',
+    href: '/bok/the-stack',
+  },
+  {
+    title: 'Runtime Controls & Observability',
+    description: 'Guardrails that keep the answers true as the system changes underneath them.',
+    swatch: 'var(--l4)',
+    href: '/bok/the-stack',
+  },
+  {
+    title: 'Assurance & Continuous Compliance',
+    description: 'Signed, queryable, audit-ready evidence emitted as a by-product of the build.',
+    swatch: 'var(--l5)',
+    href: '/bok/the-stack',
+  },
+];
 ---
 
-<Base title={site.name}>
-  <section class="hero container">
-    <p class="eyebrow">Manifesto &amp; Body of Knowledge · v{site.bokVersion}</p>
-    <h1>AI Governance Engineer</h1>
-    <p class="lede">
-      Turning AI governance obligations into policy-as-code, eval gates and
-      machine-readable evidence — the founding text and working reference for
-      engineering the governance of AI systems.
-    </p>
-    <div class="cta">
-      <a class="btn btn-primary" href="/bok">Read the Body of Knowledge</a>
-      <a class="btn" href="/manifesto">Read the Manifesto</a>
+<Marketing title={site.name}>
+  <section class="hero section">
+    <div class="container hero-inner reveal">
+      <Kicker swatch="var(--l1)" rule
+        >Manifesto &amp; Body of Knowledge · v{site.bokVersion}</Kicker
+      >
+      <RegisterMark size="lg" label={site.name} />
+      <h1 class="display">The engineering discipline for governing AI systems.</h1>
+      <p class="lede">
+        AI governance engineering is the application of engineering practice —
+        systems thinking, product thinking and code — to the governance of AI
+        systems. Governance you can run, test and prove, not a document you sign.
+      </p>
+      <div class="cta">
+        <a class="btn btn-primary" href="/bok">Read the Body of Knowledge</a>
+        <a class="btn btn-secondary" href="/manifesto">Read the Manifesto</a>
+      </div>
     </div>
   </section>
 
-  <section id="about" class="container about">
-    <h2>About</h2>
-    <p>
-      The Body of Knowledge is {chaptersOrdered.length} chapters, curated by
-      {site.author}. Everything here is licensed {site.license}.
-    </p>
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l3)">The stack · five layers</Kicker>
+      <h2 class="section-title display">A build order, from policy to proof.</h2>
+      <div class="well"><RegisterList items={layers} /></div>
+    </div>
   </section>
 
-  <style>
-    .hero {
-      padding-block: var(--s-8) var(--s-6);
-    }
+  <CtaBand
+    title="Build governance you can run."
+    sub="An open Body of Knowledge for the discipline, curated in the open."
+    primary={{ label: 'Read the Body of Knowledge', href: '/bok' }}
+    secondary={{ label: 'Read the Manifesto', href: '/manifesto' }}
+  />
+</Marketing>
 
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      letter-spacing: 0.02em;
-      color: var(--muted);
-      margin-bottom: var(--s-4);
-    }
+<style>
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-5);
+  }
 
-    .hero h1 {
-      font-size: clamp(2.5rem, 6vw, 4rem);
-      max-width: 14ch;
-    }
+  .hero h1 {
+    font-size: var(--fs-display);
+    max-width: 18ch;
+    margin: 0;
+  }
 
-    .lede {
-      margin-top: var(--s-4);
-      max-width: var(--prose);
-      font-size: 1.125rem;
-      color: var(--ink-2);
-    }
+  .lede {
+    max-width: 60ch;
+    font-size: 1.125rem;
+    color: var(--ink-2);
+  }
 
-    .cta {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--s-3);
-      margin-top: var(--s-6);
-    }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-2);
+  }
 
-    .btn {
-      display: inline-block;
-      padding: var(--s-3) var(--s-5);
-      border: 1px solid var(--line);
-      border-radius: var(--r-lg);
-      background: var(--surface);
-      color: var(--ink);
-      text-decoration: none;
-      transition: border-color var(--dur) var(--ease);
-    }
+  .section-title {
+    font-size: var(--fs-h2);
+    max-width: 20ch;
+    margin: var(--s-3) 0 var(--s-6);
+  }
 
-    .btn:hover {
-      border-color: var(--ink-2);
-    }
-
-    .btn-primary {
-      background: var(--l1);
-      color: var(--l1-ink);
-      border-color: transparent;
-    }
-
-    .about {
-      padding-block: var(--s-6) var(--s-8);
-    }
-
-    .about h2 {
-      font-size: 1.5rem;
-      margin-bottom: var(--s-3);
-    }
-
-    .about p {
-      max-width: var(--prose);
-      color: var(--ink-2);
-    }
-  </style>
-</Base>
+  .well {
+    max-width: 72ch;
+  }
+</style>

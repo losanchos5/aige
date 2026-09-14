@@ -1,0 +1,158 @@
+---
+// SidebarNav: the chapter rail. Manifesto on top, then the eleven BoK chapters
+// with mono 00–10 indices. The active row carries aria-current and shows its
+// layer swatch as a tick.
+import { chaptersOrdered } from '../data/chapters';
+
+interface Props {
+  activeSlug?: string;
+  activeManifesto?: boolean;
+}
+
+const { activeSlug, activeManifesto = false } = Astro.props;
+const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
+---
+
+<nav class="sidebar-nav" aria-label="Chapters">
+  <div class="sidebar-tools">
+    <button type="button" class="sidebar-search" data-search-open>
+      <span>Search</span>
+      <kbd>Ctrl K</kbd>
+    </button>
+  </div>
+
+  <a
+    href="/manifesto"
+    class="nav-item nav-manifesto"
+    aria-current={activeManifesto ? 'page' : undefined}
+  >
+    <span class="nav-num">§</span>
+    <span class="nav-title">Manifesto</span>
+  </a>
+
+  <p class="nav-label">Body of Knowledge</p>
+  <ol class="nav-list">
+    {
+      chaptersOrdered.map((chapter, i) => (
+        <li>
+          <a
+            href={`/bok/${chapter.slug}`}
+            class={`nav-item ${layers[i % layers.length]}`}
+            aria-current={activeSlug === chapter.slug ? 'page' : undefined}
+          >
+            <span class="nav-num">{String(chapter.order).padStart(2, '0')}</span>
+            <span class="nav-title">{chapter.shortTitle}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .sidebar-nav {
+    font-size: 0.9375rem;
+  }
+
+  .sidebar-tools {
+    margin-bottom: var(--s-4);
+  }
+
+  .sidebar-search {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    width: 100%;
+    padding: var(--s-2) var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: border-color var(--dur) var(--ease);
+  }
+
+  .sidebar-search:hover {
+    border-color: var(--ink-2);
+    color: var(--ink);
+  }
+
+  .sidebar-search kbd {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    padding: 2px 6px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+
+  .nav-label {
+    margin: var(--s-5) 0 var(--s-2);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-3);
+    padding: var(--s-2) var(--s-2) var(--s-2) var(--s-3);
+    margin-inline: calc(var(--s-2) * -1);
+    border-radius: var(--r-sm);
+    text-decoration: none;
+    color: var(--ink-2);
+    border-left: 2px solid transparent;
+    transition:
+      color var(--dur) var(--ease),
+      background-color var(--dur) var(--ease);
+  }
+
+  .nav-item:hover {
+    color: var(--ink);
+    background: var(--surface);
+  }
+
+  .nav-num {
+    flex: none;
+    width: 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .nav-title {
+    line-height: 1.3;
+  }
+
+  .nav-manifesto {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .nav-item[aria-current='page'] {
+    color: var(--ink);
+    font-weight: 600;
+    background: var(--surface);
+  }
+
+  /* Active row shows its layer swatch as a left tick. */
+  .nav-item.l1[aria-current='page'] { border-left-color: var(--l1-ink); }
+  .nav-item.l2[aria-current='page'] { border-left-color: var(--l2-ink); }
+  .nav-item.l3[aria-current='page'] { border-left-color: var(--l3-ink); }
+  .nav-item.l4[aria-current='page'] { border-left-color: var(--l4-ink); }
+  .nav-item.l5[aria-current='page'] { border-left-color: var(--l5-ink); }
+  .nav-manifesto[aria-current='page'] { border-left-color: var(--ink); }
+
+  .nav-item[aria-current='page'] .nav-num { color: var(--ink); }
+</style>

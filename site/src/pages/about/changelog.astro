@@ -1,0 +1,28 @@
+---
+import { getEntry, render } from 'astro:content';
+import Doc from '../../layouts/Doc.astro';
+import { gitDate } from '../../lib/reading';
+
+const entry = await getEntry('meta', 'changelog');
+if (!entry) {
+  throw new Error('meta collection entry "changelog" not found');
+}
+const { Content, headings, remarkPluginFrontmatter } = await render(entry);
+
+const title = (remarkPluginFrontmatter.title as string | undefined) ?? 'Changelog';
+const summary = (remarkPluginFrontmatter.summary as string | undefined) ?? undefined;
+const editPath = 'bok/CHANGELOG.md';
+const updated = gitDate(`../${editPath}`);
+---
+
+<Doc
+  title={title}
+  summary={summary}
+  kicker="About"
+  headings={headings}
+  editPath={editPath}
+  updated={updated}
+  sidebar={false}
+>
+  <Content />
+</Doc>
