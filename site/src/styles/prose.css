@@ -8,6 +8,9 @@
   font-family: var(--font-body);
   font-size: 1.0625rem; /* 17px */
   line-height: 1.6;
+  /* Long unbreakable tokens (bare URLs in citations, identifiers) break rather
+     than push the reading well past its column and under the TOC. */
+  overflow-wrap: break-word;
 }
 
 .prose > * + * {

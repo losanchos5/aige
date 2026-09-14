@@ -56,6 +56,10 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
 <style>
   .sidebar-nav {
     font-size: 0.9375rem;
+    /* Absorb the rows' negative inline margins (their active/hover fill bleeds
+       to the rail edge) so nothing extends past the nav box and forces a
+       horizontal scrollbar on the sticky sidebar. */
+    padding-inline: var(--s-2);
   }
 
   .sidebar-tools {

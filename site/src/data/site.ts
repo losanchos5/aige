@@ -18,7 +18,7 @@ export const site: SiteConfig = {
     'The Manifesto and Body of Knowledge for AI governance engineering — turning AI governance obligations into policy-as-code, eval gates and machine-readable evidence.',
   linkedin: 'https://www.linkedin.com/in/jorgara',
   github: 'https://github.com/losanchos5/aige',
-  author: 'Jorge García Aibar',
+  author: 'Jorge García',
   license: 'CC BY 4.0',
   bokVersion: '0.2',
 };

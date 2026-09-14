@@ -273,6 +273,15 @@ if (statsChapter) {
     [data-mode='chapter'] .doc-layout {
       grid-template-columns: 240px minmax(0, 1fr);
     }
+
+    /* With a chapter rail the well fills its column instead of re-centring a
+       72ch cap inside it: when the rail leaves less than 72ch, the auto margins
+       otherwise let the well overflow its track and push a horizontal scrollbar.
+       The single-column doc mode keeps its centred cap until the TOC appears. */
+    [data-mode='chapter'] .doc-main {
+      max-width: none;
+      margin-inline: 0;
+    }
   }
 
   @media (min-width: 1100px) {
@@ -288,6 +297,16 @@ if (statsChapter) {
     [data-mode='doc'] .doc-layout {
       grid-template-columns: minmax(0, 72ch) 220px;
       justify-content: center;
+    }
+
+    /* The doc mode gains its TOC rail here, so its well now fills the 72ch
+       track too (the chapter well already does, from 840px up). The 72ch cap +
+       auto margins resolve against the well's own font — wider than the space
+       the rails leave for the track — so left in place they let the well spill
+       past the track and under the "On this page" TOC. */
+    [data-mode='doc'] .doc-main {
+      max-width: none;
+      margin-inline: 0;
     }
   }
 </style>
