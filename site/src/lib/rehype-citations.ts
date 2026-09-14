@@ -129,28 +129,53 @@ function transformSources(tree: Root): void {
   };
 }
 
+// Closing punctuation that should sit tight against a citation marker. When a
+// marker is immediately followed by one of these, the whitespace *before* the
+// marker is dropped so the number hugs the preceding word and the punctuation
+// stays tight after it ("text³." rather than "text ³ .").
+const CITE_TIGHT = /[.,;:)]/;
+
+function citeAnchor(n: string): Element {
+  return {
+    type: 'element',
+    tagName: 'a',
+    properties: { className: ['cite'], href: `#src-${n}`, 'aria-label': `Source ${n}` },
+    children: [text(n)],
+  };
+}
+
 function buildCiteNodes(value: string): ElementContent[] {
+  const matches = [...value.matchAll(/\[(\d+)\]/g)];
+  if (matches.length === 0) return [text(value)];
+
   const out: ElementContent[] = [];
   let last = 0;
-  let match: RegExpExecArray | null;
-  CITE_RE.lastIndex = 0;
-  while ((match = CITE_RE.exec(value)) !== null) {
-    if (match.index > last) out.push(text(value.slice(last, match.index)));
-    const n = match[1];
-    out.push({
-      type: 'element',
-      tagName: 'sup',
-      properties: {},
-      children: [
-        {
-          type: 'element',
-          tagName: 'a',
-          properties: { className: ['cite'], href: `#src-${n}`, 'aria-label': `Source ${n}` },
-          children: [text(n)],
-        },
-      ],
-    });
-    last = match.index + match[0].length;
+  let i = 0;
+  while (i < matches.length) {
+    const start = matches[i];
+    const startIndex = start.index ?? 0;
+
+    // Fold a run of adjacent markers ([1][2][3]) into one <sup> so they read as
+    // a single grouped citation, not a stack of chips.
+    const nums = [start[1]];
+    let runEnd = startIndex + start[0].length;
+    let j = i + 1;
+    while (j < matches.length && matches[j].index === runEnd) {
+      nums.push(matches[j][1]);
+      runEnd += matches[j][0].length;
+      j++;
+    }
+
+    // Text before the run; trim only the whitespace immediately preceding the
+    // marker, and only when a closing punctuation mark follows it.
+    let before = value.slice(last, startIndex);
+    if (CITE_TIGHT.test(value[runEnd] ?? '')) before = before.replace(/\s+$/, '');
+    if (before) out.push(text(before));
+
+    out.push({ type: 'element', tagName: 'sup', properties: {}, children: nums.map(citeAnchor) });
+
+    last = runEnd;
+    i = j;
   }
   if (last < value.length) out.push(text(value.slice(last)));
   return out;
@@ -182,9 +207,40 @@ function linkCitations(tree: Root): void {
   });
 }
 
+function isCiteSup(node: ElementContent): node is Element {
+  return (
+    node.type === 'element' &&
+    node.tagName === 'sup' &&
+    node.children.some((c) => c.type === 'element' && c.tagName === 'a' && hasClass(c, 'cite'))
+  );
+}
+
+const PUNCT_HEAD = /^[.,;:)]/;
+
+// After citations are linked, drop the space that sits between a word and a
+// citation marker when the marker is immediately followed by closing
+// punctuation, so prose reads "word¹." not "word ¹ .". SmartyPants splits a
+// paragraph into several text nodes, so the space and the punctuation can end
+// up in the siblings on either side of the <sup>; work at the element level to
+// reach them.
+function tightenCitations(tree: Root): void {
+  visitParents(tree, 'element', (node: Element) => {
+    const kids = node.children;
+    for (let i = 0; i < kids.length; i++) {
+      if (!isCiteSup(kids[i])) continue;
+      const next = kids[i + 1];
+      const followedByPunct = next?.type === 'text' && PUNCT_HEAD.test(next.value);
+      if (!followedByPunct) continue;
+      const prev = kids[i - 1];
+      if (prev?.type === 'text') prev.value = prev.value.replace(/\s+$/, '');
+    }
+  });
+}
+
 export default function rehypeCitations() {
   return (tree: Root): void => {
     transformSources(tree);
     linkCitations(tree);
+    tightenCitations(tree);
   };
 }

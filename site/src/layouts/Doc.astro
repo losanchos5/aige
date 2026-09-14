@@ -34,6 +34,7 @@ interface Props {
   activeSlug?: string;
   activeManifesto?: boolean;
   cite?: boolean;
+  image?: string;
 }
 
 const {
@@ -51,6 +52,7 @@ const {
   activeSlug,
   activeManifesto = false,
   cite = false,
+  image,
 } = Astro.props;
 
 const withSidebar = sidebar && !wide;
@@ -59,7 +61,7 @@ const mode = wide ? 'wide' : withSidebar ? 'chapter' : 'doc';
 const pageTitle = `${title} · ${site.name}`;
 ---
 
-<Base title={pageTitle} description={summary}>
+<Base title={pageTitle} description={summary} image={image}>
   <div class="doc container" data-mode={mode}>
     {
       withSidebar && (

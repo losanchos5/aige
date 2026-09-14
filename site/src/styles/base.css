@@ -172,3 +172,25 @@ samp {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
+
+/* Anchor targets: clear the sticky header, and flash a pastel highlight when a
+   fragment link lands on them. The scroll offset is a token so prose headings,
+   marketing headings and source anchors all clear the same amount. */
+:where(h1, h2, h3, h4, h5, h6, [id]) {
+  scroll-margin-top: var(--anchor-offset);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :target {
+    animation: target-flash 1.5s var(--ease);
+  }
+
+  @keyframes target-flash {
+    from {
+      background-color: color-mix(in srgb, var(--l1) 65%, transparent);
+    }
+    to {
+      background-color: transparent;
+    }
+  }
+}

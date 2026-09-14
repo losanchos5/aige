@@ -20,7 +20,7 @@
 .prose h4 {
   color: var(--ink);
   font-family: var(--font-display);
-  scroll-margin-top: var(--s-7);
+  scroll-margin-top: var(--anchor-offset);
 }
 
 .prose h2 {
@@ -174,25 +174,38 @@
 }
 
 /* ---- Inline citations (sup > a.cite) ---- */
+/* The <sup> is a neutral wrapper: line-height 0 keeps the raised chip from
+   growing the line box, and the chip itself carries the superscript offset. */
 .prose sup:has(> .cite) {
+  vertical-align: baseline;
   line-height: 0;
+  font-size: inherit;
 }
 
 .prose .cite {
   display: inline-block;
-  min-width: 1.1em;
-  padding: 0 0.35em;
+  padding: 2px;
+  border: 1px solid color-mix(in srgb, var(--l1-ink) 30%, transparent);
   border-radius: var(--r-sm);
   background: color-mix(in srgb, var(--l1) 55%, var(--bg));
   color: var(--l1-ink);
   font-family: var(--font-mono);
-  font-size: 0.6875rem; /* 11px */
+  font-size: 11px;
   font-weight: 600;
-  text-align: center;
+  line-height: 1;
   text-decoration: none;
+  vertical-align: super;
 }
 
-.prose .cite:hover {
+/* Grouped citations: adjacent chips (one <sup>, or adjacent <sup>s from a
+   [1][2] run split across text nodes) keep a 2px gap. */
+.prose .cite + .cite,
+.prose sup:has(> .cite) + sup:has(> .cite) {
+  margin-left: 2px;
+}
+
+.prose .cite:hover,
+.prose .cite:focus-visible {
   background: var(--l1);
   text-decoration: none;
 }
@@ -209,7 +222,7 @@
   padding: var(--s-2) 0;
   border-top: 1px solid var(--line);
   color: var(--ink-2);
-  scroll-margin-top: var(--s-7);
+  scroll-margin-top: var(--anchor-offset);
 }
 
 .prose .sources li:target {

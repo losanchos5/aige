@@ -83,8 +83,9 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
     </svg>
   ) : (
     <div class:list={['diagram-int', className]}>
+      <span class="d-flow-label" aria-hidden="true">Evidence flows up</span>
       <ol class="rows">
-        {layers.map((layer) => (
+        {layers.map((layer, i) => (
           <li
             class="drow"
             data-layer={layer.n}
@@ -92,13 +93,18 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
             style={`--tint:var(${layer.colorVar})`}
           >
             <span class="d-idx" aria-hidden="true">
-              {pad(layer.n)}
+              {i === 0 && <span class="d-arrow" />}
+              <span class="d-bar" />
+              <span class="d-num">{pad(layer.n)}</span>
             </span>
             <span class="d-body">
               <span class="d-head">
                 <span class="d-name">{layer.name}</span>
-                <span class="d-flag">
-                  {layer.inherited ? 'inherited from GRC engineering' : 'new'}
+                <span
+                  class="d-flag"
+                  title={layer.inherited ? 'Inherited from GRC engineering' : 'New to AI governance engineering'}
+                >
+                  {layer.inherited ? 'inherited' : 'new'}
                 </span>
               </span>
               <span class="d-tagline">{layer.tagline}</span>
@@ -111,19 +117,6 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
           </li>
         ))}
       </ol>
-
-      <aside class="d-aside" aria-hidden="true">
-        <div class="d-flow">
-          <span class="d-arrow" />
-          <span class="d-rule" />
-          <span class="d-flow-label">Evidence flows up</span>
-        </div>
-        <div class="d-mark">
-          {layers.map((layer) => (
-            <span class="d-bar" data-layer={layer.n} style={`--c:var(${layer.colorVar})`} />
-          ))}
-        </div>
-      </aside>
     </div>
   )
 }
@@ -178,16 +171,39 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
 
   /* ---- interactive ---- */
   .diagram-int {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--s-5);
   }
 
-  @media (min-width: 840px) {
+  @media (min-width: 560px) {
     .diagram-int {
-      grid-template-columns: 1fr 132px;
-      gap: var(--s-6);
+      grid-template-columns: 18px 1fr;
+      gap: var(--s-4);
       align-items: stretch;
+    }
+  }
+
+  /* "Evidence flows up": a mono label rotated up the left gutter, paired with
+     the arrowed axis that threads the five row marks. Hidden on the narrowest
+     screens, where the gutter would crowd the rows. */
+  .d-flow-label {
+    display: none;
+  }
+
+  @media (min-width: 560px) {
+    .d-flow-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
     }
   }
 
@@ -199,20 +215,66 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
   }
 
   .drow {
+    position: relative;
     border-top: 1px solid var(--line);
     display: grid;
-    grid-template-columns: 3rem 1fr;
-    align-items: start;
+    grid-template-columns: 56px 1fr;
+    align-items: stretch;
     gap: var(--s-4);
     padding: var(--s-4) var(--s-2) var(--s-4) 0;
   }
 
+  /* Left cell: the row's register mark (a pastel bar) joined with its mono
+     index, both centred; a hairline axis threads vertically through every cell
+     so the five read as one arrowed 5-bar mark. */
   .d-idx {
-    align-self: stretch;
+    position: relative;
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    padding-top: 0.15em;
+    gap: var(--s-2);
+    border-radius: var(--r-sm);
+  }
+
+  .d-idx::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    transform: translateX(-50%);
+    background: var(--line);
+  }
+
+  .d-arrow {
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 6px solid var(--muted);
+  }
+
+  .d-bar {
+    position: relative;
+    z-index: 1;
+    width: 40px;
+    height: 8px;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--tint) 55%, var(--bg));
+    border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  }
+
+  .d-num {
+    position: relative;
+    z-index: 1;
+    padding: 0 var(--s-1);
+    background: var(--bg);
     font-family: var(--font-mono);
     font-size: var(--fs-label);
     letter-spacing: var(--tracking-label);
@@ -224,6 +286,7 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
     flex-direction: column;
     gap: var(--s-2);
     min-width: 0;
+    padding-block: var(--s-1);
   }
 
   .d-head {
@@ -244,6 +307,7 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--muted);
+    cursor: help;
   }
 
   .d-tagline {
@@ -269,101 +333,33 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
     white-space: nowrap;
   }
 
-  /* row-local tint on hover/focus */
+  /* Row-local tint on hover/focus: the left cell and its bar take the layer
+     pastel. */
   .drow:hover .d-idx,
   .drow:focus-within .d-idx {
-    background: color-mix(in srgb, var(--tint) 45%, var(--bg));
+    background: color-mix(in srgb, var(--tint) 40%, var(--bg));
+  }
+
+  .drow:hover .d-num,
+  .drow:focus-within .d-num {
+    background: transparent;
     color: var(--ink);
   }
 
+  .drow:hover .d-bar,
+  .drow:focus-within .d-bar {
+    background: var(--tint);
+    border-color: color-mix(in srgb, var(--ink) 24%, transparent);
+  }
+
   @media (prefers-reduced-motion: no-preference) {
-    .d-idx {
+    .d-idx,
+    .d-bar,
+    .d-num {
       transition:
         background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
         color var(--dur) var(--ease);
     }
-  }
-
-  /* side mark + evidence flow */
-  .d-aside {
-    display: none;
-  }
-
-  @media (min-width: 840px) {
-    .d-aside {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: var(--s-3);
-      align-items: stretch;
-    }
-  }
-
-  .d-flow {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--s-2);
-  }
-
-  .d-arrow {
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-bottom: 7px solid var(--muted);
-  }
-
-  .d-rule {
-    flex: 1;
-    width: 1px;
-    background: var(--line);
-  }
-
-  .d-flow-label {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .d-mark {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: var(--s-2);
-  }
-
-  .d-bar {
-    height: 10px;
-    border-radius: 3px;
-    background: color-mix(in srgb, var(--c) 55%, var(--bg));
-    border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
-    transform-origin: right center;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .d-bar {
-      transition:
-        background-color var(--dur) var(--ease),
-        transform var(--dur) var(--ease);
-    }
-  }
-
-  /* :has() cross-highlight — a hovered/focused row lights its matching bar */
-  .diagram-int:has(.drow[data-layer='1']:hover) .d-bar[data-layer='1'],
-  .diagram-int:has(.drow[data-layer='1']:focus-within) .d-bar[data-layer='1'],
-  .diagram-int:has(.drow[data-layer='2']:hover) .d-bar[data-layer='2'],
-  .diagram-int:has(.drow[data-layer='2']:focus-within) .d-bar[data-layer='2'],
-  .diagram-int:has(.drow[data-layer='3']:hover) .d-bar[data-layer='3'],
-  .diagram-int:has(.drow[data-layer='3']:focus-within) .d-bar[data-layer='3'],
-  .diagram-int:has(.drow[data-layer='4']:hover) .d-bar[data-layer='4'],
-  .diagram-int:has(.drow[data-layer='4']:focus-within) .d-bar[data-layer='4'],
-  .diagram-int:has(.drow[data-layer='5']:hover) .d-bar[data-layer='5'],
-  .diagram-int:has(.drow[data-layer='5']:focus-within) .d-bar[data-layer='5'] {
-    background: var(--c);
-    transform: scaleX(1.14);
   }
 </style>
