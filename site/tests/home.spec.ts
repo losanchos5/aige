@@ -65,9 +65,10 @@ test.describe('home page', () => {
   });
 });
 
-// Design-review shots for Block B (the new hero): the home page at three widths
-// in both colour schemes, written to tests/__screenshots__/I/.
-const widths = [390, 834, 1440];
+// Design-review shots for Block B (the new hero): the home page at four widths
+// (including 1900 to check the hero no longer bleeds to the viewport edge) in
+// both colour schemes, written to tests/__screenshots__/I/.
+const widths = [390, 834, 1440, 1900];
 const schemes = ['light', 'dark'] as const;
 
 for (const scheme of schemes) {

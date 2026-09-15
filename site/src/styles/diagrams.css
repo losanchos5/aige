@@ -551,3 +551,73 @@
     transform: none;
   }
 }
+
+/* ------------------------------------------ homepage hero loop (scoped) --- */
+/* The hero "governance loop" (public/hero.js) drives a travelling packet and a
+   walking lit trail, so it needs a lit state that reads at a glance — heavier
+   than the subtle in-prose highlight above. Everything here is scoped to
+   .hero--loop, so chapter/page diagrams keep the default look unchanged. */
+
+/* Hover/focus note: taken out of flow and overlaid on the foot of the diagram,
+   so opening it never changes the figure's height or the canvas position — the
+   centred art would otherwise jump up. Anchored bottom-left as an opaque panel
+   (the .hero-art ancestor in index.astro is the positioned containing block);
+   the lower-right corner is left free for the verdict stamp, and a tall note
+   scrolls inside its cap rather than growing the figure. Lives here rather than
+   in the page's scoped <style> because the note is injected via set:html and so
+   carries no data-astro-cid for a scoped selector to match. */
+.hero--loop .diagram-note {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+  max-width: min(32rem, calc(100% - 8.5rem));
+  max-height: 66%;
+  overflow-y: auto;
+  background: var(--bg);
+  box-shadow: 0 10px 30px -14px rgb(0 0 0 / 0.35);
+}
+
+/* Lit node: a heavier ink outline with a soft ink glow. */
+.hero--loop .diagram [data-node-id].is-lit rect:not(.c-mask) {
+  stroke: var(--ink);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--ink) 35%, transparent));
+}
+
+/* Lit edge: the route <path> itself carries data-edge-id (no wrapping group),
+   so stroke it directly — the shared `.is-lit text` rule lights the label. */
+.hero--loop .diagram path[data-edge-id].is-lit {
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+/* The travelling packet, appended into the visible SVG by hero.js and moved
+   along each edge with requestAnimationFrame. A small ink dot with a soft halo. */
+.hero--loop .diagram .hero-packet {
+  fill: var(--ink);
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--ink) 45%, transparent));
+  pointer-events: none;
+}
+
+.hero--loop .diagram .hero-packet.is-hidden {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Idle "marching ants" on the dashed closing edge, so the loop is never fully
+     static between packet runs. The delay lets diagram.js's one-time draw-on
+     (a stroke-dashoffset transition set inline) run and clear its inline dash
+     styles first; starting the animation immediately would mask that transition,
+     its transitionend cleanup would never fire, and the leftover inline
+     stroke-dasharray (the full path length) would render the edge solid. */
+  .hero--loop .diagram path[data-edge-id='closes-loop'] {
+    animation: hero-closes-march 1.5s linear 1.3s infinite;
+  }
+
+  @keyframes hero-closes-march {
+    to {
+      stroke-dashoffset: -16;
+    }
+  }
+}

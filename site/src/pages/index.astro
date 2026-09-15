@@ -242,9 +242,13 @@ const resources = [
     pointer-events: none;
   }
 
+  /* The hero runs on a wider well than the body sections so the diagram sits
+     next to the copy instead of bleeding to the viewport edge. Capped, centred
+     and gutter-padded like any container; the body's 1200px is unchanged. */
   .hero--loop > .container {
     position: relative;
     z-index: 1;
+    max-width: min(1440px, 100%);
   }
 
   .hero-grid {
@@ -278,6 +282,10 @@ const resources = [
     margin-top: var(--s-2);
   }
 
+  /* position: relative makes this the containing block for the hover note,
+     which is taken out of flow and overlaid on the foot of the diagram (rule in
+     diagrams.css under .hero--loop, since the note is injected via set:html and
+     carries no scoped cid, so a scoped selector here would never match it). */
   .hero-art {
     position: relative;
     width: 100%;
@@ -327,11 +335,9 @@ const resources = [
     }
   }
 
-  /* Desktop: two columns, copy left, art bleeding to the viewport's right edge.
-     The art stretches to fill its grid area, then a negative right margin —
-     the container's side gutter plus any outer auto-margin — pulls its edge to
-     the viewport, computed so it lands exactly there (no horizontal scrollbar,
-     with overflow-x: hidden on the section as a belt-and-braces guard). */
+  /* Desktop: two columns, copy left, art right, both inside the wider hero
+     well. The art fills its grid track (no viewport bleed), so it sits beside
+     the copy at every width rather than pinned to the screen edge. */
   @media (min-width: 1024px) {
     .hero-grid {
       grid-template-columns: minmax(0, 4.5fr) minmax(0, 7.5fr);
@@ -340,17 +346,12 @@ const resources = [
       min-height: min(72vh, 680px);
     }
 
-    /* Scale the headline down so its longest line fits the narrower copy
-       column, and balance it to three lines. */
+    /* Scale the headline down so its longest line fits the copy column, and
+       balance it to three lines ("Governance / you can run, / not just read."). */
     .hero-h1 {
       font-size: calc(var(--fs-display) * 0.76);
-      max-width: 18ch;
+      max-width: 15ch;
       text-wrap: balance;
-    }
-
-    .hero-art {
-      width: auto;
-      margin-right: calc(-1 * (max(0px, (100vw - var(--container)) / 2) + var(--s-4)));
     }
   }
 

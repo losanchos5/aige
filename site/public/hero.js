@@ -2,17 +2,19 @@
    script-src 'self' holds (no inline JS). Progressive enhancement: the diagram
    is fully legible without this file, and the verdict stamp is server-rendered.
 
-   When motion is allowed this walks a pulse around the loop: every ~900ms it
-   lights the next node in data-hero-sequence and the edge arriving at it, keeps
-   a short trail of two lit steps, and pops the PASS stamp as the loop closes on
-   the auditor. It drives whichever of the two diagrams (wide / tall) is visible
-   at the current breakpoint, re-picks on resize, and pauses while the tab is
-   hidden or while the user is hovering/focusing a node (diagram.js adds
-   `has-active` to the figure), resuming from a clean state afterwards. It never
-   adds `is-dim` or `has-active` itself — those belong to the hover interaction.
-
-   Timers are cancelled to pause (no busy loops); a MutationObserver on the
-   figure's class watches the hover state so nothing polls. */
+   When motion is allowed a small "packet" (an ink dot with a soft halo, appended
+   into the visible SVG) travels each edge of the loop in turn with rAF, easing
+   in and out (~700ms per edge). As it reaches a node that node lights up; a short
+   trail of two lit steps (node + the edge just travelled) follows the packet, and
+   nothing else is dimmed. When the packet reaches the auditor the PASS stamp pops,
+   then after ~1.2s the loop restarts — it never stops while the tab is visible.
+   The dashed "closes the loop" edge keeps a slow marching idle (CSS) so the figure
+   is never fully static. The dot drives whichever of the two diagrams (wide/tall)
+   is visible at the current breakpoint, re-picks on resize, and pauses (dot hidden,
+   rAF cancelled) while the tab is hidden or while the user is hovering/focusing a
+   node (diagram.js adds `has-active`), resuming from a clean state afterwards. It
+   never adds `is-dim` or `has-active` itself — those belong to the hover
+   interaction — and under reduced motion it does nothing at all. */
 (function () {
   'use strict';
 
@@ -31,7 +33,7 @@
       return s.trim();
     })
     .filter(Boolean);
-  if (!sequence.length) return;
+  if (sequence.length < 2) return;
 
   var stamp = host.querySelector('.hero-stamp');
   if (stamp) {
@@ -41,15 +43,24 @@
   }
 
   var START_DELAY = 1400; // let diagram.js's draw-on finish first.
-  var STEP_MS = 900;
-  var HOLD_MS = 2500;
-  var TRAIL = 2;
+  var EDGE_MS = 700; // one edge traversal.
+  var HOLD_MS = 1200; // pause on the closed loop before restarting.
+  var TRAIL = 2; // lit steps kept behind the packet.
   var RESIZE_DEBOUNCE = 200;
+  var SVG_NS = 'http://www.w3.org/2000/svg';
 
   var figure = null; // the currently visible figure being driven.
-  var timer = null; // the single pending step/hold timer.
+  var svg = null; // its <svg> root (where the packet lives).
+  var edges = []; // { path, id, to } in packet-travel order.
+  var packet = null; // the travelling dot, moved between the wide/tall svgs.
+
+  var raf = null; // the pending animation frame.
+  var holdTimer = null; // the pending restart timer at the closed loop.
   var trail = []; // recent lit steps, each an array of elements.
   var started = false; // the initial start delay has elapsed.
+  var ei = 0; // index of the edge currently being travelled.
+  var edgeLen = 0; // cached length of that edge.
+  var t0 = 0; // timestamp the current edge started (0 = not yet).
 
   // The visible figure is the one with layout (offsetParent is null for the
   // display:none variant at this breakpoint).
@@ -61,43 +72,76 @@
     return null;
   }
 
-  // The node for `id` plus the edge arriving at it (data-edge-to === id).
-  function stepEls(fig, id) {
-    var els = [];
-    var node = fig.querySelector('[data-node-id="' + id + '"]');
-    if (node) els.push(node);
-    var edges = fig.querySelectorAll('[data-edge-to="' + id + '"]');
-    for (var i = 0; i < edges.length; i++) els.push(edges[i]);
-    return els;
+  function svgOf(fig) {
+    return fig ? fig.querySelector('svg') : null;
   }
 
-  function clearAll(fig) {
-    trail = [];
-    if (!fig) return;
-    var lit = fig.querySelectorAll('.is-lit, .is-dim');
-    for (var i = 0; i < lit.length; i++) {
-      lit[i].classList.remove('is-lit', 'is-dim');
+  // Every element carrying this edge id: the route <path> and the label <g>.
+  function edgeElsById(fig, id) {
+    return Array.prototype.slice.call(fig.querySelectorAll('[data-edge-id="' + id + '"]'));
+  }
+
+  // The route <path> from node a to node b (it carries the from/to endpoints).
+  function routePath(fig, a, b) {
+    return fig.querySelector('path[data-edge-from="' + a + '"][data-edge-to="' + b + '"]');
+  }
+
+  // Ordered, measurable edges connecting consecutive nodes in the sequence.
+  function buildEdges(fig) {
+    var arr = [];
+    if (!fig) return arr;
+    for (var i = 0; i < sequence.length - 1; i++) {
+      var p = routePath(fig, sequence[i], sequence[i + 1]);
+      if (p && typeof p.getTotalLength === 'function') {
+        arr.push({ path: p, id: p.getAttribute('data-edge-id'), to: sequence[i + 1] });
+      }
     }
+    return arr;
   }
 
-  function cancelTimer() {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
-    }
+  function nodeEl(fig, id) {
+    return fig ? fig.querySelector('[data-node-id="' + id + '"]') : null;
   }
 
-  // Pause while hidden or while the user is interacting with a node.
-  function shouldPause() {
-    if (document.hidden) return true;
-    if (figure && figure.classList.contains('has-active')) return true;
-    return false;
+  function makePacket() {
+    var c = document.createElementNS(SVG_NS, 'circle');
+    c.setAttribute('r', '5');
+    c.setAttribute('class', 'hero-packet is-hidden');
+    c.setAttribute('aria-hidden', 'true');
+    return c;
   }
 
-  function lightStep(index) {
-    if (!figure) return;
-    var id = sequence[index];
-    var els = stepEls(figure, id);
+  function attachPacket(sv) {
+    if (!sv || !packet) return;
+    if (packet.parentNode !== sv) sv.appendChild(packet); // last child paints on top.
+  }
+
+  function showPacket() {
+    if (packet) packet.classList.remove('is-hidden');
+  }
+
+  function hidePacket() {
+    if (packet) packet.classList.add('is-hidden');
+  }
+
+  function movePacket(len) {
+    if (!packet || !edges[ei]) return;
+    var pt = edges[ei].path.getPointAtLength(len);
+    packet.setAttribute('cx', String(pt.x));
+    packet.setAttribute('cy', String(pt.y));
+  }
+
+  // Light an edge (route + label) as the packet begins to travel it; the arrival
+  // step below folds it into the trail so it is unlit when the trail passes.
+  function litEdge(id) {
+    edgeElsById(figure, id).forEach(function (el) {
+      el.classList.remove('is-dim');
+      el.classList.add('is-lit');
+    });
+  }
+
+  // Push one lit step (a set of elements) and trim the trail to TRAIL steps.
+  function litStep(els) {
     els.forEach(function (el) {
       el.classList.remove('is-dim');
       el.classList.add('is-lit');
@@ -109,40 +153,110 @@
         el.classList.remove('is-lit');
       });
     }
-    if (id === 'auditor' && stamp) {
-      // Restart the pop cleanly if it is somehow mid-flight.
-      stamp.classList.remove('is-pop');
-      void stamp.offsetWidth;
-      stamp.classList.add('is-pop');
+  }
+
+  function popStamp() {
+    if (!stamp) return;
+    stamp.classList.remove('is-pop');
+    void stamp.offsetWidth; // restart the animation cleanly.
+    stamp.classList.add('is-pop');
+  }
+
+  function clearAll(fig) {
+    trail = [];
+    if (!fig) return;
+    var lit = fig.querySelectorAll('.is-lit, .is-dim');
+    for (var i = 0; i < lit.length; i++) {
+      lit[i].classList.remove('is-lit', 'is-dim');
     }
   }
 
-  function tick(index) {
-    timer = null;
-    lightStep(index);
-    var last = index >= sequence.length - 1;
-    timer = setTimeout(
-      function () {
-        if (last) {
-          clearAll(figure);
-          timer = setTimeout(function () {
-            tick(0);
-          }, STEP_MS);
-        } else {
-          tick(index + 1);
-        }
-      },
-      last ? HOLD_MS : STEP_MS,
-    );
+  function cancelAll() {
+    if (raf) {
+      cancelAnimationFrame(raf);
+      raf = null;
+    }
+    if (holdTimer) {
+      clearTimeout(holdTimer);
+      holdTimer = null;
+    }
   }
 
-  // Start (or restart) the loop from a clean state.
+  // Pause while hidden or while the user is interacting with a node.
+  function shouldPause() {
+    if (document.hidden) return true;
+    if (figure && figure.classList.contains('has-active')) return true;
+    return false;
+  }
+
+  function easeInOut(t) {
+    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  }
+
+  // Begin travelling edge `ei` (already selected): light it, snap the packet to
+  // its start, reset the clock and run frames.
+  function beginEdge() {
+    if (!edges[ei]) return;
+    edgeLen = edges[ei].path.getTotalLength();
+    litEdge(edges[ei].id);
+    movePacket(0);
+    t0 = 0;
+    raf = requestAnimationFrame(frame);
+  }
+
+  function frame(ts) {
+    raf = null;
+    if (!edges[ei] || shouldPause()) return; // reconcile() handles the resume.
+    if (!t0) t0 = ts;
+    var p = (ts - t0) / EDGE_MS;
+    if (p > 1) p = 1;
+    movePacket(easeInOut(p) * edgeLen);
+    if (p < 1) {
+      raf = requestAnimationFrame(frame);
+      return;
+    }
+    arrive();
+  }
+
+  // The packet reached the end of edge `ei`: light the destination node (folding
+  // in the edge just travelled), pop the stamp at the auditor, then advance.
+  function arrive() {
+    var e = edges[ei];
+    var els = edgeElsById(figure, e.id);
+    var node = nodeEl(figure, e.to);
+    if (node) els = [node].concat(els);
+    litStep(els);
+    if (e.to === 'auditor') popStamp();
+
+    ei += 1;
+    if (ei < edges.length) {
+      beginEdge();
+    } else {
+      // Loop closed on the auditor: rest briefly (the dashed edge keeps marching),
+      // then restart from a clean state — never stopping while the tab is visible.
+      hidePacket();
+      holdTimer = setTimeout(function () {
+        holdTimer = null;
+        if (!shouldPause()) startLoop();
+      }, HOLD_MS);
+    }
+  }
+
+  // Start (or restart) the loop from a clean state, packet at the first node.
   function startLoop() {
-    cancelTimer();
+    cancelAll();
     clearAll(figure);
-    timer = setTimeout(function () {
-      tick(0);
-    }, STEP_MS);
+    if (!figure || !edges.length) return;
+    attachPacket(svg);
+    litStep(nodeAsStep(sequence[0]));
+    showPacket();
+    ei = 0;
+    beginEdge();
+  }
+
+  function nodeAsStep(id) {
+    var n = nodeEl(figure, id);
+    return n ? [n] : [];
   }
 
   // Single reconcile point: cancel when we should pause, (re)start when we may
@@ -150,8 +264,10 @@
   function reconcile() {
     if (!started || !figure) return;
     if (shouldPause()) {
-      cancelTimer();
-    } else if (!timer) {
+      cancelAll();
+      hidePacket();
+      // Leave the classes alone: while hovering, diagram.js owns is-lit/is-dim.
+    } else if (!raf && !holdTimer) {
       startLoop();
     }
   }
@@ -164,6 +280,10 @@
   }
 
   figure = visibleFigure();
+  svg = svgOf(figure);
+  edges = buildEdges(figure);
+  packet = makePacket();
+  attachPacket(svg);
   watch(figure);
 
   document.addEventListener('visibilitychange', reconcile);
@@ -174,10 +294,14 @@
     resizeTimer = setTimeout(function () {
       var next = visibleFigure();
       if (next === figure) return;
-      cancelTimer();
+      cancelAll();
       clearAll(figure);
       observer.disconnect();
       figure = next;
+      svg = svgOf(figure);
+      edges = buildEdges(figure);
+      attachPacket(svg); // move the packet into the newly visible SVG.
+      hidePacket();
       watch(figure);
       reconcile(); // start the loop on the newly visible figure.
     }, RESIZE_DEBOUNCE);
