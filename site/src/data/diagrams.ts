@@ -3,12 +3,13 @@
 // curated title and caption shown in its <figcaption>, and where in the Body of
 // Knowledge (chapter slug + exact heading text) the figure is placed.
 //
-// The figure is inserted at the END of the named (sub)section — that is, just
-// before the next heading of depth ≤ the target heading (see
+// Each placement's `at` picks where the figure lands: 'lead' opens the chapter
+// (before its first H2, after the intro), 'head' sits immediately under the
+// anchor heading, and 'foot' (the default) goes at the END of the named
+// (sub)section — just before the next heading of depth ≤ the anchor (see
 // src/lib/rehype-diagrams.ts). Chapter slugs match src/data/chapters.ts; the
 // `section`/`sub` strings must match the chapter's real H2/H3 heading text,
-// because rehype-diagrams resolves them through slugify() (github-slugger), the
-// same slugger rehype-slug uses for the on-page `id`.
+// because rehype-diagrams matches them by normalised heading text.
 //
 // Some diagrams also appear on a standalone page (see src/components/Diagram.astro
 // usage): those placements live in the page, not here.
@@ -23,8 +24,19 @@ export type DiagramType =
 export interface DiagramPlacement {
   /** Chapter URL slug (src/data/chapters.ts `slug`). */
   chapter: string;
-  /** Exact text of the H2 heading whose section holds the figure. */
-  section: string;
+  /**
+   * Where the figure is inserted relative to its anchor (default `'foot'`):
+   * - `'lead'` — before the chapter's first H2, as an opening figure after the
+   *   intro. `section`/`sub` are ignored.
+   * - `'head'` — immediately after the anchor heading (`section`, plus `sub`
+   *   when the anchor is an H3 inside that section).
+   * - `'foot'` — at the foot of the anchor (sub)section, i.e. just before the
+   *   next heading of depth ≤ the anchor.
+   */
+  at?: 'lead' | 'head' | 'foot';
+  /** Exact text of the H2 heading whose section holds the figure. Required for
+   *  `'head'` and `'foot'`; ignored for `'lead'`. */
+  section?: string;
   /** Exact text of an H3 heading within that section, when the figure sits
    *  inside a sub-section rather than at the foot of the whole H2. */
   sub?: string;
@@ -54,7 +66,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'How a model or prompt change moves through an eval gate in CI — capability and adversarial evals against a versioned suite, a threshold that ships the release or blocks it and files the result against the registry — generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Eval Gate in CI', sub: 'Solution' },
+      { chapter: 'patterns', section: 'Pattern: Eval Gate in CI', at: 'head' },
     ],
   },
   {
@@ -64,7 +76,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'The runtime incident pipeline and kill switch: a signal trips a circuit breaker that revokes one agent’s scope without breaking the fleet, while triage opens a reportable incident on the statutory clock — generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Incident Pipeline', sub: 'Solution' },
+      { chapter: 'patterns', section: 'Pattern: Incident Pipeline', at: 'head' },
     ],
   },
   {
@@ -74,7 +86,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'How the deploy pipeline registers each agent, issues it a scoped workload identity, and files signed evidence an auditor can attribute — with a policy gate that denies the unregistered — generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Agent Registry', sub: 'Solution' },
+      { chapter: 'patterns', section: 'Pattern: Agent Registry', at: 'head' },
     ],
   },
   {
@@ -83,9 +95,7 @@ export const diagrams: readonly DiagramDef[] = [
     title: 'How the AI governance engineer works',
     caption:
       'The sequence an AI governance engineer runs across the workflows it owns, from intake and inventory through evals, gates and runtime to assurance evidence — generated from the Body of Knowledge.',
-    placements: [
-      { chapter: 'the-role', section: 'What the role owns, by workflow' },
-    ],
+    placements: [{ chapter: 'the-role', at: 'lead' }],
   },
   {
     id: 'maturity-levels',
@@ -93,9 +103,7 @@ export const diagrams: readonly DiagramDef[] = [
     title: 'The five maturity levels',
     caption:
       'The five maturity levels from Documented to Continuous, each proven by what the running systems show — with the trap that stalls the climb between them — generated from the Body of Knowledge.',
-    placements: [
-      { chapter: 'maturity-model', section: 'The five levels' },
-    ],
+    placements: [{ chapter: 'maturity-model', at: 'lead' }],
   },
   {
     id: 'obligation-to-evidence',
@@ -103,9 +111,7 @@ export const diagrams: readonly DiagramDef[] = [
     title: 'From obligation to evidence',
     caption:
       'How a regulatory obligation flows to the engineering artefact that satisfies or supports it and the stack layer that artefact lives in — the reverse index made visible — generated from the Body of Knowledge.',
-    placements: [
-      { chapter: 'regulatory-map', section: 'How to read this map' },
-    ],
+    placements: [{ chapter: 'regulatory-map', at: 'lead' }],
   },
   {
     id: 'aige-in-the-org',
@@ -113,9 +119,7 @@ export const diagrams: readonly DiagramDef[] = [
     title: 'Where AI governance engineering sits',
     caption:
       'Where AI governance engineering sits among the adjacent roles — analyst, platform and assurance — turning governance intent into running controls and evidence — generated from the Body of Knowledge.',
-    placements: [
-      { chapter: 'definition', section: 'The disambiguation cluster' },
-    ],
+    placements: [{ chapter: 'definition', at: 'lead' }],
   },
   {
     id: 'reference-toolchain',

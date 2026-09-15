@@ -165,14 +165,14 @@ test.describe('interaction (eval-gate-ci on /bok/patterns)', () => {
 });
 
 // ---- 6. In-chapter placement ----------------------------------------------
-// The eval-gate-ci figure sits at the foot of the Eval Gate "Solution"
-// sub-section: its nearest preceding heading is that "Solution" and its nearest
-// following heading is the pattern's "Consequences".
-test('eval-gate-ci sits between its Solution and Consequences headings', async ({ page }) => {
+// The eval-gate-ci figure opens its pattern ('head' placement): its nearest
+// preceding heading is the H2 "Pattern: Eval Gate in CI" and the next heading
+// is that pattern's first H3, "Objectives".
+test('eval-gate-ci opens its pattern, under the H2 and above the first H3', async ({ page }) => {
   await page.goto('/bok/patterns');
   const rel = await page.evaluate(() => {
     const fig = document.querySelector('figure.diagram[data-diagram="eval-gate-ci"]');
-    if (!fig) return { prev: null as string | null, next: null as string | null };
+    if (!fig) return { prev: null as string | null, next: null as string | null, nextTag: null as string | null };
     const heads = Array.from(document.querySelectorAll('article h2, article h3'));
     let prev: Element | null = null;
     let next: Element | null = null;
@@ -182,10 +182,98 @@ test('eval-gate-ci sits between its Solution and Consequences headings', async (
       else if (pos & Node.DOCUMENT_POSITION_FOLLOWING && !next) next = h;
     }
     const txt = (el: Element | null) => (el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : null);
-    return { prev: txt(prev), next: txt(next) };
+    return { prev: txt(prev), next: txt(next), nextTag: next ? next.tagName.toLowerCase() : null };
   });
-  expect(rel.prev).toBe('Solution');
-  expect(rel.next).toBe('Consequences');
+  expect(rel.prev).toBe('Pattern: Eval Gate in CI');
+  expect(rel.next).toBe('Objectives');
+  expect(rel.nextTag).toBe('h3');
+});
+
+// ---- 6b. Lead figures open the chapter -------------------------------------
+// A 'lead' placement inserts the figure before the chapter's first H2, so it is
+// the opening figure after the intro.
+const LEAD: ReadonlyArray<{ route: string; id: string }> = [
+  { route: '/bok/the-role', id: 'role-workflows' },
+  { route: '/bok/maturity-model', id: 'maturity-levels' },
+  { route: '/bok/regulatory-map', id: 'obligation-to-evidence' },
+  { route: '/bok/definition', id: 'aige-in-the-org' },
+];
+test.describe('lead placement', () => {
+  for (const { route, id } of LEAD) {
+    test(`${id} precedes the first h2 on ${route}`, async ({ page }) => {
+      await page.goto(route);
+      const ok = await page.evaluate((diagId) => {
+        const article = document.querySelector('article.prose');
+        if (!article) return false;
+        const fig = article.querySelector(`figure.diagram[data-diagram="${diagId}"]`);
+        const firstH2 = article.querySelector('h2');
+        if (!fig || !firstH2) return false;
+        const pos = fig.compareDocumentPosition(firstH2);
+        return Boolean(pos & Node.DOCUMENT_POSITION_FOLLOWING);
+      }, id);
+      expect(ok, `${id} should sit before the first h2 on ${route}`).toBe(true);
+    });
+  }
+});
+
+// ---- 6c. Desktop breakout / mobile parity ----------------------------------
+// On desktop the figure breaks out of the 72ch reading column to fill the well
+// without colliding with the on-this-page TOC rail; the thesis figure renders
+// wide; and on a narrow phone the figure never exceeds the article width.
+function rectsIntersect(
+  a: { x: number; y: number; width: number; height: number },
+  b: { x: number; y: number; width: number; height: number },
+): boolean {
+  return !(
+    a.x + a.width <= b.x ||
+    b.x + b.width <= a.x ||
+    a.y + a.height <= b.y ||
+    b.y + b.height <= a.y
+  );
+}
+
+test.describe('breakout', () => {
+  test('the patterns figure is wider than the reading column and clears the TOC', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/bok/patterns');
+
+    const figure = page.locator('figure.diagram').first();
+    await expect(figure).toBeVisible();
+    const figBox = await figure.boundingBox();
+
+    // The figure breaks out past the 72ch reading column (article.prose).
+    const proseBox = await page.locator('article.prose').boundingBox();
+    expect(figBox!.width).toBeGreaterThan(proseBox!.width);
+
+    // The figure must not overlap the on-this-page TOC rail.
+    const toc = page.locator('.doc-toc');
+    await expect(toc).toBeVisible();
+    const tocBox = await toc.boundingBox();
+    expect(rectsIntersect(figBox!, tocBox!), 'figure overlaps the TOC rail').toBe(false);
+  });
+
+  test('the thesis figure canvas renders wide', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/thesis');
+    const canvas = page.locator(
+      'figure.diagram[data-diagram="aige-in-the-org"] .diagram-canvas',
+    );
+    await expect(canvas).toBeVisible();
+    const box = await canvas.boundingBox();
+    expect(box!.width).toBeGreaterThanOrEqual(1000);
+  });
+
+  test('on a narrow phone the figure is not wider than the article', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/bok/patterns');
+    const figure = page.locator('figure.diagram').first();
+    await expect(figure).toBeVisible();
+    const figBox = await figure.boundingBox();
+    const artBox = await page.locator('article.prose').boundingBox();
+    expect(figBox!.width).toBeLessThanOrEqual(artBox!.width + 1);
+  });
 });
 
 // ---- 7. Accessibility (axe) ------------------------------------------------

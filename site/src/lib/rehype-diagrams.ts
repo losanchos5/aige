@@ -1,12 +1,17 @@
 // rehype-diagrams: at build, insert the interactive diagram figures declared in
 // src/data/diagrams.ts into the Body of Knowledge chapters. The markdown file is
 // mapped to its chapter slug from the vfile path (basename `NN-slug.md` ->
-// chapters.ts id -> slug); for each placement the plugin finds the heading whose
-// `id` is slugify(section) (and, when a `sub` is given, the H3 inside that
-// section whose id is slugify(sub)), then walks to the next heading of depth ≤
-// the target and inserts the figure hast there — i.e. at the foot of that
-// (sub)section. rehype-autolink-headings wraps heading text in an <a>, but the
-// `id` stays on the <h2>/<h3>, so the lookup is unaffected.
+// chapters.ts id -> slug); for each placement the plugin resolves the anchor by
+// matching heading TEXT (normalised) and inserts the figure hast at the point
+// named by `at`:
+//   - 'lead' — before the chapter's first H2 (an opening figure after the intro);
+//   - 'head' — immediately after the anchor heading (the H2 `section`, or the H3
+//     `sub` inside it when given);
+//   - 'foot' (default) — before the next heading of depth ≤ the anchor, i.e. at
+//     the foot of that (sub)section.
+// Matching on text (not the slug id) avoids github-slugger's `-1`/`-2` dedup
+// suffixes; rehype-autolink-headings wraps heading text in an <a>, so nodeText
+// gathers it recursively.
 //
 // A placement whose heading cannot be found is a build error (better than a
 // silently missing figure). A diagram that is not yet in the generated manifest
@@ -61,6 +66,34 @@ function chapterSlugForFile(file: VFile | undefined): string | undefined {
 
 function insertFigure(tree: Root, def: DiagramDef, placement: DiagramPlacement): void {
   const children = tree.children;
+  const at = placement.at ?? 'foot';
+  const fragment = fromHtml(renderDiagramFigure(def.id), { fragment: true });
+
+  // 'lead': open the chapter with the figure, just before its first H2 (after
+  // whatever intro prose precedes the first section).
+  if (at === 'lead') {
+    let firstH2 = -1;
+    for (let i = 0; i < children.length; i += 1) {
+      if (headingDepth(children[i]) === 2) {
+        firstH2 = i;
+        break;
+      }
+    }
+    if (firstH2 < 0) {
+      throw new Error(
+        `rehype-diagrams: no H2 heading found in chapter "${placement.chapter}" for lead diagram "${def.id}".`,
+      );
+    }
+    children.splice(firstH2, 0, ...fragment.children);
+    return;
+  }
+
+  // 'head'/'foot' both anchor on the H2 `section` (and optional H3 `sub`).
+  if (!placement.section) {
+    throw new Error(
+      `rehype-diagrams: placement for diagram "${def.id}" in chapter "${placement.chapter}" needs a "section" for at="${at}".`,
+    );
+  }
   const wantSection = placement.section.replace(/\s+/g, ' ').trim();
 
   let sectionIndex = -1;
@@ -102,7 +135,13 @@ function insertFigure(tree: Root, def: DiagramDef, placement: DiagramPlacement):
     targetIndex = found;
   }
 
-  // Insert before the next heading of depth ≤ the target — i.e. the foot of the
+  // 'head': immediately after the anchor heading.
+  if (at === 'head') {
+    children.splice(targetIndex + 1, 0, ...fragment.children);
+    return;
+  }
+
+  // 'foot': before the next heading of depth ≤ the target — i.e. the foot of the
   // (sub)section — or at the end of the document when there is none.
   let insertAt = children.length;
   for (let i = targetIndex + 1; i < children.length; i += 1) {
@@ -113,7 +152,6 @@ function insertFigure(tree: Root, def: DiagramDef, placement: DiagramPlacement):
     }
   }
 
-  const fragment = fromHtml(renderDiagramFigure(def.id), { fragment: true });
   children.splice(insertAt, 0, ...fragment.children);
 }
 

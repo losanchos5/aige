@@ -16,7 +16,19 @@
   gap: var(--s-4);
 }
 
+/* Full-bleed within the reading well: the chapter/thesis prose stays at 72ch
+   but .doc-main is a container (container-type: inline-size, set in Doc.astro),
+   so the figure widens to the whole well with the classic centred-breakout
+   formula in cq units. When the well equals the prose column (mobile/tablet, or
+   any page whose .doc-main is not widened) 100cqw == the column, 50cqw == 50%,
+   and the negative margins resolve to 0 — so nothing moves. */
+.prose > .diagram {
+  width: 100cqw;
+  margin-inline: calc(50% - 50cqw);
+}
+
 .diagram-canvas {
+  position: relative;
   padding: var(--s-4);
   background: var(--bg);
   border: 1px solid var(--line);
@@ -28,6 +40,29 @@
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* Cap the SVG at its natural pixel width (--vb-w on the figure) so a well wider
+   than the diagram centres it rather than upscaling its text past 1:1. The bare
+   hero frame opts out (the host page sizes it). The enlarge dialog re-opens the
+   cap below so the SVG can fill/scroll at natural width. */
+.diagram:not(.diagram--bare) .diagram-canvas svg {
+  max-width: calc(var(--vb-w, 100000) * 1px);
+  margin-inline: auto;
+}
+
+/* Bare variant: frame-only figure (canvas + note, no figcaption/dialog) for a
+   host that supplies its own chrome. Strip the canvas frame and figure margin so
+   the SVG sits flush. */
+.diagram--bare {
+  margin: 0;
+}
+
+.diagram--bare .diagram-canvas {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0;
 }
 
 /* Note panel: filled by diagram.js from the active node, static-hidden without
@@ -366,14 +401,21 @@
 }
 
 /* --------------------------------------------------------- enlarge dialog -- */
-/* In a chapter's 72ch prose column the SVG scales to ~0.5 and its node text
-   turns illegible. The Enlarge button (revealed by diagram.js) opens a near
+/* Even in the widened well a large SVG can still read below 1:1, and on mobile
+   it shrinks hard. The Enlarge button (revealed by diagram.js) opens a near
    full-screen <dialog> and moves the canvas into it at natural pixel width, so
-   the text reads at 1:1 on desktop and scrolls horizontally on mobile. Styled to
-   match the secondary .diagram-open link. */
+   the text reads at 1:1 on desktop and scrolls horizontally on mobile. The
+   button overlays the canvas top-right; styled to match the secondary
+   .diagram-open link. */
 .diagram-enlarge {
-  align-self: flex-start;
-  padding: var(--s-2) var(--s-4);
+  position: absolute;
+  top: var(--s-3);
+  right: var(--s-3);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-3);
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
   background: var(--surface);
@@ -383,6 +425,12 @@
   cursor: pointer;
 }
 
+/* The inline-flex display would beat the [hidden] UA rule, so guard it (the
+   button ships hidden until diagram.js reveals it). */
+.diagram-enlarge[hidden] {
+  display: none;
+}
+
 .diagram-enlarge:hover {
   border-color: var(--ink-2);
 }
@@ -390,6 +438,17 @@
 .diagram-enlarge:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
+}
+
+.diagram-enlarge-icon {
+  font-size: 1.05em;
+  line-height: 1;
+}
+
+/* Inside the dialog the canvas already fills the screen, so the overlaid button
+   (moved in with the canvas) is redundant — and would sit over the SVG. */
+.diagram-dialog .diagram-enlarge {
+  display: none;
 }
 
 .diagram-dialog {
@@ -465,6 +524,7 @@
 
 .diagram-dialog .diagram-canvas svg {
   width: max(100%, calc(var(--vb-w, 0) * 1px));
+  max-width: none;
   height: auto;
 }
 

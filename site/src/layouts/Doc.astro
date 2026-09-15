@@ -206,6 +206,10 @@ if (statsChapter) {
   }
 
   .doc-layout {
+    /* Max width of the central reading well on desktop. The prose column stays
+       at 72ch inside it; the extra room is what lets a diagram figure break out
+       (see .diagram in diagrams.css). Only consumed by the ≥1100px rules. */
+    --doc-well: min(1100px, 100%);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--s-6);
@@ -214,19 +218,32 @@ if (statsChapter) {
 
   .doc-main {
     min-width: 0;
-    max-width: 72ch;
-    margin-inline: auto;
+    /* Query container for the full-bleed diagram breakout: the figure reads the
+       well width from here, so the prose can stay narrow while the figure widens.
+       .doc-main always stretches to fill its grid track — the 72ch reading
+       measure is capped on the prose/footer/pager inside, NOT here, because auto
+       margins on a size-contained (container-type) box collapse it to zero width. */
+    container-type: inline-size;
   }
 
+  /* The reading chrome (footer, pager) tracks the 72ch prose measure, centred in
+     the well, so it does not stretch to the full breakout width on desktop. */
   .doc-foot {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     gap: var(--s-4);
+    max-width: 72ch;
     margin-top: var(--s-7);
+    margin-inline: auto;
     padding-top: var(--s-5);
     border-top: 1px solid var(--line);
+  }
+
+  .doc-main :global(.pager) {
+    max-width: 72ch;
+    margin-inline: auto;
   }
 
   /* On-this-page: only from 1100px up. */
@@ -284,15 +301,6 @@ if (statsChapter) {
     [data-mode='chapter'] .doc-layout {
       grid-template-columns: 240px minmax(0, 1fr);
     }
-
-    /* With a chapter rail the well fills its column instead of re-centring a
-       72ch cap inside it: when the rail leaves less than 72ch, the auto margins
-       otherwise let the well overflow its track and push a horizontal scrollbar.
-       The single-column doc mode keeps its centred cap until the TOC appears. */
-    [data-mode='chapter'] .doc-main {
-      max-width: none;
-      margin-inline: 0;
-    }
   }
 
   @media (min-width: 1100px) {
@@ -300,24 +308,29 @@ if (statsChapter) {
       display: block;
     }
 
+    /* Grow the reading container past the 1200px site width so the rails leave a
+       real well for a full-bleed figure (well ≈ 1440 − 260 − 220 − gaps ≈ 880px
+       in chapter mode). The site header stays at 1200px, which is accepted. */
+    .doc {
+      max-width: 1440px;
+    }
+
     [data-mode='chapter'] .doc-layout {
-      grid-template-columns: 260px minmax(0, 72ch) 220px;
+      grid-template-columns: 260px minmax(0, var(--doc-well)) 220px;
       justify-content: center;
     }
 
     [data-mode='doc'] .doc-layout {
-      grid-template-columns: minmax(0, 72ch) 220px;
+      grid-template-columns: minmax(0, var(--doc-well)) 220px;
       justify-content: center;
     }
 
-    /* The doc mode gains its TOC rail here, so its well now fills the 72ch
-       track too (the chapter well already does, from 840px up). The 72ch cap +
-       auto margins resolve against the well's own font — wider than the space
-       the rails leave for the track — so left in place they let the well spill
-       past the track and under the "On this page" TOC. */
-    [data-mode='doc'] .doc-main {
-      max-width: none;
-      margin-inline: 0;
+    /* Wide pages (the Thesis) have no rails: the single track carries the well
+       and is centred in the container, so .doc-main fills it (stretched, not
+       auto-margined — see .doc-main) and the prose still holds at 72ch inside. */
+    [data-mode='wide'] .doc-layout {
+      grid-template-columns: minmax(0, var(--doc-well));
+      justify-content: center;
     }
   }
 </style>

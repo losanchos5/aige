@@ -100,8 +100,16 @@ function loadNotes(id: string, type: string): Record<string, string> {
 /**
  * Render the <figure> for diagram `id` at build time. Throws a clear, actionable
  * error when the generated SVG is missing (regenerate with the build script).
+ *
+ * With `opts.bare`, the figure gets the extra `diagram--bare` class and emits
+ * only the canvas, the note panel and the notes payload — no figcaption and no
+ * enlarge dialog. It is the frame-only variant used where the surrounding page
+ * supplies its own chrome (e.g. the homepage hero). public/diagram.js still
+ * wires the hover/note highlight and the draw-on; it already guards the missing
+ * figcaption/enlarge/dialog.
  */
-export function renderDiagramFigure(id: string): string {
+export function renderDiagramFigure(id: string, opts?: { bare?: boolean }): string {
+  const bare = opts?.bare === true;
   const entry = loadManifest().find((item) => item.id === id);
   const svgPath = resolve(GENERATED_DIR, `${id}.svg`);
   if (!entry || !existsSync(svgPath)) {
@@ -145,21 +153,40 @@ export function renderDiagramFigure(id: string): string {
   // Escape `<` (covers `</script>`) so the JSON stays inside the script element.
   const notesJson = JSON.stringify(payload).replace(/</g, '\\u003c');
 
+  const openTag = `<figure class="diagram${bare ? ' diagram--bare' : ''}" data-diagram="${id}"${vbStyle}>`;
+  const canvas = `<div class="diagram-canvas">${svg}</div>`;
+  const notePanel = `<div class="diagram-note" aria-live="polite" hidden></div>`;
+  const notesScript = `<script type="application/json" data-diagram-notes>${notesJson}</script>`;
+
+  // Enlarge is a no-op without JS (a bare button with no target), so it ships
+  // hidden; public/diagram.js reveals it and moves the canvas (button and all)
+  // into the dialog, where diagrams.css hides the button again. It overlays the
+  // canvas top-right, so it lives inside .diagram-canvas — the frame-only `bare`
+  // variant leaves it out and lets the host page own the enlarge chrome.
+  const enlargeBtn =
+    `<button type="button" class="diagram-enlarge" aria-haspopup="dialog" hidden>` +
+    `<span class="diagram-enlarge-icon" aria-hidden="true">⤢</span> Enlarge` +
+    `</button>`;
+  const canvasWithEnlarge = `<div class="diagram-canvas">${svg}${enlargeBtn}</div>`;
+
+  // Bare: frame only — canvas, note panel and the notes payload, no figcaption
+  // and no enlarge dialog. The host page owns the caption/enlarge chrome.
+  if (bare) {
+    return openTag + canvas + notePanel + notesScript + `</figure>`;
+  }
+
   return (
-    `<figure class="diagram" data-diagram="${id}"${vbStyle}>` +
-    `<div class="diagram-canvas">${svg}</div>` +
-    `<div class="diagram-note" aria-live="polite" hidden></div>` +
+    openTag +
+    canvasWithEnlarge +
+    notePanel +
     `<figcaption class="diagram-figcaption">` +
     `<span class="diagram-fig-title">${escapeHtml(title)}</span>` +
     `<span class="diagram-fig-desc">${escapeHtml(caption)}</span>` +
     `<a class="diagram-open" href="/diagrams/${id}.html" target="_blank" rel="noopener">` +
     `Open interactive diagram<span class="diagram-open-hint"> (opens in a new tab)</span>` +
     `</a>` +
-    // Enlarge is a no-op without JS (a bare button with no target), so it ships
-    // hidden; public/diagram.js reveals it and moves the canvas into the dialog.
-    `<button type="button" class="diagram-enlarge" aria-haspopup="dialog" hidden>Enlarge</button>` +
     `</figcaption>` +
-    `<script type="application/json" data-diagram-notes>${notesJson}</script>` +
+    notesScript +
     // Empty enlarge dialog; diagram.js relocates .diagram-canvas and .diagram-note
     // into it on open and returns them to the figure on close.
     `<dialog class="diagram-dialog" aria-label="${escapeAttr(title)} (enlarged)"></dialog>` +

@@ -4,6 +4,9 @@
 
 .prose {
   max-width: 72ch;
+  /* Centre the reading column inside .doc-main, which on desktop widens past
+     72ch to give diagram figures room to break out (see Doc.astro). */
+  margin-inline: auto;
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 1.0625rem; /* 17px */
