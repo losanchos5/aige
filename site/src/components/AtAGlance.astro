@@ -1,0 +1,90 @@
+---
+/**
+ * AtAGlance — the opening register of a chapter: three or four one-sentence
+ * takeaways in a numbered grid, rendered between the ChapterHeader and the
+ * prose. On desktop it bleeds to the reading well like a diagram figure
+ * (container-query full-bleed, see diagrams.css) so the first viewport has a
+ * structured block before the text starts. Items come from `chapter.glance`
+ * in src/data/chapters.ts.
+ */
+interface Props {
+  items?: readonly string[];
+  class?: string;
+}
+
+const { items, class: className } = Astro.props;
+---
+
+{
+  items && items.length > 0 && (
+    <aside class:list={['glance', className]} aria-labelledby="glance-label">
+      <p class="glance-label" id="glance-label">At a glance</p>
+      <ol class="glance-list">
+        {items.map((item, i) => (
+          <li class="glance-item">
+            <span class="glance-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <span class="glance-text">{item}</span>
+          </li>
+        ))}
+      </ol>
+    </aside>
+  )
+}
+
+<style>
+  .glance {
+    margin: var(--s-5) 0 var(--s-6);
+    padding: var(--s-4) var(--s-5) var(--s-5);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--ink);
+    border-radius: 0 var(--r-lg) var(--r-lg) 0;
+    background: color-mix(in srgb, var(--l1) 30%, var(--bg));
+  }
+
+  /* Same bleed as .prose > .diagram: take the whole well, not the 72ch column. */
+  :global(.prose) > .glance {
+    width: 100cqw;
+    margin-inline: calc(50% - 50cqw);
+  }
+
+  .glance-label {
+    margin: 0 0 var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .glance-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: var(--s-4) var(--s-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .glance-item {
+    display: flex;
+    gap: var(--s-3);
+    align-items: flex-start;
+    margin: 0;
+    padding: 0;
+  }
+
+  .glance-num {
+    flex: none;
+    padding-top: 0.2em;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .glance-text {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+</style>

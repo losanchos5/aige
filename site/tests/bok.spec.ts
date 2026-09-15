@@ -10,6 +10,29 @@ test.describe('Body of Knowledge chapters', () => {
       expect(await page.locator('.prose h2').count()).toBeGreaterThanOrEqual(1);
     });
   }
+
+  for (const chapter of chaptersOrdered) {
+    const expected = chapter.glance?.length ?? 0;
+    test(`/bok/${chapter.slug} ${expected ? 'opens with an At a glance block' : 'has no At a glance block'}`, async ({
+      page,
+    }) => {
+      await page.goto(`/bok/${chapter.slug}`);
+      const glance = page.locator('article.prose > .glance');
+      if (!expected) {
+        await expect(glance).toHaveCount(0);
+        return;
+      }
+      await expect(glance).toHaveCount(1);
+      await expect(glance.locator('.glance-item')).toHaveCount(expected);
+      // It sits under the header, before the prose and its first H2.
+      const order = await page.evaluate(() => {
+        const g = document.querySelector('article.prose > .glance');
+        const h2 = document.querySelector('article.prose h2');
+        return g && h2 ? g.compareDocumentPosition(h2) & Node.DOCUMENT_POSITION_FOLLOWING : 0;
+      });
+      expect(order).toBeTruthy();
+    });
+  }
 });
 
 test.describe('the-stack pipeline output', () => {

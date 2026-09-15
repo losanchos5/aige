@@ -333,4 +333,16 @@ if (statsChapter) {
       justify-content: center;
     }
   }
+
+  /* On large desktops grow container and well once more so a chapter figure
+     reaches its natural width (~1200px): 1680 − 260 − 220 − gaps ≈ 1130px. */
+  @media (min-width: 1600px) {
+    .doc {
+      max-width: 1680px;
+    }
+
+    .doc-layout {
+      --doc-well: min(1300px, 100%);
+    }
+  }
 </style>

@@ -17,6 +17,13 @@ export interface Chapter {
   shortTitle: string;
   /** One-line summary, <=160 chars, from the opening blockquote. */
   summary: string;
+  /**
+   * "At a glance": three or four one-sentence takeaways rendered as an opening
+   * block under the chapter header, before the prose. Editorial, written for the
+   * site from the chapter's own claims; omitted for the preface, glossary and
+   * reading list.
+   */
+  glance?: readonly string[];
 }
 
 export const chapters: readonly Chapter[] = [
@@ -36,6 +43,12 @@ export const chapters: readonly Chapter[] = [
     shortTitle: 'Definition',
     summary:
       'AI governance engineering is the application of engineering practice — systems thinking, product thinking and code — to the governance of AI systems.',
+    glance: [
+      'Engineering practice — systems thinking, product thinking and code — applied to the governance of AI systems, agents included.',
+      'A capability, not a job title: measured by realised risk reduction and audit-ready evidence.',
+      'Three questions any function must answer from live systems: what AI is running, what it is allowed to do, what evidence proves it.',
+      'The eval gate is necessary but not sufficient: it is point-in-time and sampling-bound.',
+    ],
   },
   {
     id: '02-why-now',
@@ -45,6 +58,12 @@ export const chapters: readonly Chapter[] = [
     shortTitle: 'Why Now',
     summary:
       'AI governance engineering is forming now because the thing being governed changed shape, the market renamed the role before the profession named itself…',
+    glance: [
+      'Five problems share one root: governance that describes instead of runs.',
+      'The object changed shape: agents that browse, execute code and act under delegated authority are what legacy governance can least see.',
+      'The market renamed the role before the profession named itself, and the law began asking for engineered evidence.',
+      'Engineered governance turns the quarterly guess into a live query and the end-of-line gate into a control that fires where the system changes.',
+    ],
   },
   {
     id: '03-values-principles',
@@ -54,6 +73,12 @@ export const chapters: readonly Chapter[] = [
     shortTitle: 'Values & Principles',
     summary:
       'The eight values and six principles of the Thesis, each expanded with what it means in practice and the anti-pattern it rejects.',
+    glance: [
+      'Eight values say which way to lean; six principles say what to do on Monday.',
+      'A value is a preference stated as an affirmation; a principle is a commitment to act, with no vocabulary borrowed from the values.',
+      'Evals that fail builds and agents that carry their own identity and scope are what AI forces us to add to established practice.',
+      'Every value names the artefact it builds toward and the anti-pattern it rejects.',
+    ],
   },
   {
     id: '04-the-stack',
@@ -63,6 +88,12 @@ export const chapters: readonly Chapter[] = [
     shortTitle: 'The Stack',
     summary:
       'The reference architecture of AI governance engineering: five layers that answer the three questions, where evidence is produced at the bottom…',
+    glance: [
+      'Five layers in build order along one spine: Policy → Inventory → Evals → Runtime → Assurance.',
+      'Each layer produces an artefact the layer above consumes; evidence flows up into audit-ready proof.',
+      'The stack is not an org chart and not a maturity ladder.',
+      'A team of one builds the spine thinly, end to end: one vertical slice beats one layer built out and four left on paper.',
+    ],
   },
   {
     id: '05-patterns',
@@ -72,6 +103,12 @@ export const chapters: readonly Chapter[] = [
     shortTitle: 'Patterns',
     summary:
       'A catalogue of reusable AI governance engineering patterns, each named to a layer of the stack, in the CSIRO Responsible AI Pattern Catalogue structure.',
+    glance: [
+      'Fifteen reusable patterns, each named to one of the five stack layers.',
+      'The CSIRO Responsible AI Pattern Catalogue structure — context, problem, solution, consequences — plus a Maps to line naming standards and articles.',
+      'Every pattern realises one or more of the six principles and cites the OWASP agentic threats and NIST AI RMF functions it serves.',
+      'Examples are illustrative sketches; EU AI Act mappings are not claims of conformity.',
+    ],
   },
   {
     id: '06-the-role',
@@ -81,6 +118,12 @@ export const chapters: readonly Chapter[] = [
     shortTitle: 'The Role',
     summary:
       'The AI governance engineer as a concrete role: a capability first and a job title second, defined by the workflows it owns and the evidence it produces…',
+    glance: [
+      'The person, on whatever org chart, accountable for the three questions in production.',
+      'Defined by the workflows it owns — intake, registry, evals, gates, runtime, assurance, regulatory translation — and the evidence each produces.',
+      'Analyst and engineer are both needed; the engineer does different work and is measured differently.',
+      'A career ladder, three ways in, and what employers get wrong in the job description.',
+    ],
   },
   {
     id: '07-maturity-model',
@@ -90,6 +133,12 @@ export const chapters: readonly Chapter[] = [
     shortTitle: 'Maturity Model',
     summary:
       'A ladder from paper to production — Documented, Inventoried, Tested, Enforced, Continuous — where each level is proven by what the running systems show…',
+    glance: [
+      'Five levels: Documented, Inventoried, Tested, Enforced, Continuous.',
+      'A level is a state you demonstrate by querying the registry, running the gate and reading the evidence store, not a score you award yourself.',
+      'Assessed across all five layers; you are at a level only when every layer has reached it.',
+      'Observable criteria, metrics per level and a self-assessment checklist.',
+    ],
   },
   {
     id: '08-regulatory-map',
@@ -99,6 +148,12 @@ export const chapters: readonly Chapter[] = [
     shortTitle: 'Regulatory Map',
     summary:
       'The reverse index of every "Maps to" line in the book: for each obligation it names the engineering artefact that satisfies or supports it…',
+    glance: [
+      'The reverse index of every Maps to line: obligation → artefact → stack layer.',
+      'Mappings are illustrative, not a claim of conformity; every EU AI Act date is the post-Omnibus date.',
+      'The authority differs by regime: the AI Office for general-purpose AI, national market-surveillance authorities for high-risk systems.',
+      "No harmonised standard is yet cited in the Official Journal, so Article 40's presumption of conformity is available to no one.",
+    ],
   },
   {
     id: '09-glossary',

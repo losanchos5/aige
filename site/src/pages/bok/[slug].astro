@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Doc from '../../layouts/Doc.astro';
+import AtAGlance from '../../components/AtAGlance.astro';
 import { chaptersOrdered } from '../../data/chapters';
 import { gitDate } from '../../lib/reading';
 
@@ -62,5 +63,6 @@ const kicker = `Body of Knowledge · Chapter ${String(chapter.order).padStart(2,
   image={`/og/bok-${chapter.slug}.png`}
   cite={true}
 >
+  <AtAGlance items={chapter.glance} />
   <Content />
 </Doc>
