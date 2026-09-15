@@ -12,7 +12,7 @@ import StatTile from '../components/StatTile.astro';
 import VerdictStamp from '../components/VerdictStamp.astro';
 import CtaBand from '../components/CtaBand.astro';
 import StackDiagram from '../components/StackDiagram.astro';
-import HeroChain from '../components/HeroChain.astro';
+import Diagram from '../components/Diagram.astro';
 import VerdictTicker from '../components/VerdictTicker.astro';
 import DefinitionCards from '../components/DefinitionCards.astro';
 import ValuePair from '../components/ValuePair.astro';
@@ -87,7 +87,7 @@ const resources = [
 ---
 
 <Marketing title={seoTitle} description={seoDesc} image="/og/default.png">
-  <section class="hero section">
+  <section class="hero section hero--loop">
     <div class="container hero-grid">
       <div class="hero-copy reveal">
         <h1 class="display hero-h1">Governance you can run, not just read.</h1>
@@ -97,8 +97,17 @@ const resources = [
           <a class="btn btn-secondary" href="/bok">Open the Body of Knowledge</a>
         </div>
       </div>
-      <div class="hero-art reveal">
-        <HeroChain />
+      <div
+        class="hero-art reveal"
+        data-hero-loop
+        data-hero-sequence="obligation,policy,inventory,eval,runtime,evidence,auditor"
+      >
+        <div class="hero-art-wide"><Diagram id="hero-loop" bare /></div>
+        <div class="hero-art-tall"><Diagram id="hero-loop-tall" bare /></div>
+        <div class="hero-stamp">
+          <VerdictStamp verdict="pass" class="hero-stamp-badge" />
+          <span class="hero-attn mono">attestation #4821</span>
+        </div>
       </div>
     </div>
     <script is:inline defer src="/hero.js"></script>
@@ -211,19 +220,38 @@ const resources = [
 </Marketing>
 
 <style>
-  /* Hero */
+  /* Hero — the archify "governance loop". The copy sits left; the diagram is
+     the art. One diagram renders per breakpoint (the other is display:none so
+     the observer/hover never touch it): portrait on phones, landscape above. */
+  .hero--loop {
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Dot-grid backdrop, faded toward the edges with a radial mask so it never
+     fights the copy. Behind the content; tokens keep it right in dark mode. */
+  .hero--loop::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image: radial-gradient(var(--line) 1px, transparent 1px);
+    background-size: 24px 24px;
+    -webkit-mask-image: radial-gradient(ellipse at 70% 50%, #000 40%, transparent 80%);
+    mask-image: radial-gradient(ellipse at 70% 50%, #000 40%, transparent 80%);
+    pointer-events: none;
+  }
+
+  .hero--loop > .container {
+    position: relative;
+    z-index: 1;
+  }
+
   .hero-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--s-6);
     align-items: center;
-  }
-
-  @media (min-width: 840px) {
-    .hero-grid {
-      grid-template-columns: 1.05fr 0.95fr;
-      gap: var(--s-7);
-    }
   }
 
   .hero-copy {
@@ -251,9 +279,95 @@ const resources = [
   }
 
   .hero-art {
-    justify-self: center;
+    position: relative;
     width: 100%;
-    max-width: 480px;
+  }
+
+  /* Phones: the portrait variant, capped and centred; hide the landscape one. */
+  .hero-art-wide {
+    display: none;
+  }
+
+  .hero-art-tall {
+    display: block;
+    max-width: 420px;
+    margin-inline: auto;
+  }
+
+  /* The verdict flourish, pinned to the art's lower-right and cocked slightly.
+     Server-rendered, so no-JS and reduced-motion users see it at rest. */
+  .hero-stamp {
+    position: absolute;
+    right: var(--s-3);
+    bottom: var(--s-3);
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--s-1);
+    transform: rotate(-6deg);
+    transform-origin: bottom right;
+    pointer-events: none;
+  }
+
+  .hero-attn {
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--muted);
+  }
+
+  /* Tablet: single column, the landscape variant full width. */
+  @media (min-width: 640px) {
+    .hero-art-tall {
+      display: none;
+    }
+
+    .hero-art-wide {
+      display: block;
+    }
+  }
+
+  /* Desktop: two columns, copy left, art bleeding to the viewport's right edge.
+     The art stretches to fill its grid area, then a negative right margin —
+     the container's side gutter plus any outer auto-margin — pulls its edge to
+     the viewport, computed so it lands exactly there (no horizontal scrollbar,
+     with overflow-x: hidden on the section as a belt-and-braces guard). */
+  @media (min-width: 1024px) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 4.5fr) minmax(0, 7.5fr);
+      gap: var(--s-8);
+      align-items: center;
+      min-height: min(72vh, 680px);
+    }
+
+    /* Scale the headline down so its longest line fits the narrower copy
+       column, and balance it to three lines. */
+    .hero-h1 {
+      font-size: calc(var(--fs-display) * 0.76);
+      max-width: 18ch;
+      text-wrap: balance;
+    }
+
+    .hero-art {
+      width: auto;
+      margin-right: calc(-1 * (max(0px, (100vw - var(--container)) / 2) + var(--s-4)));
+    }
+  }
+
+  /* Motion-only polish: the pop when the loop closes on the auditor. */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-stamp.is-pop {
+      animation: hero-stamp-pop 260ms var(--ease);
+    }
+
+    @keyframes hero-stamp-pop {
+      from {
+        transform: rotate(-6deg) scale(1.18);
+      }
+      to {
+        transform: rotate(-6deg) scale(1);
+      }
+    }
   }
 
   /* Section heads */

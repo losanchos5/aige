@@ -194,6 +194,9 @@
     // (not clone) .diagram-canvas and .diagram-note into the dialog so their
     // listeners and pinned state survive. The dialog is a descendant of the
     // figure, so the node listeners keep firing while it is open.
+    // Bare figures (.diagram--bare) ship no figcaption, enlarge button or
+    // dialog, so every one of these can be null; the guard below skips the whole
+    // enlarge wiring while the hover/note and draw-on above still run.
     var dialog = figure.querySelector('.diagram-dialog');
     var enlargeBtn = figure.querySelector('.diagram-enlarge');
     var canvas = figure.querySelector('.diagram-canvas');

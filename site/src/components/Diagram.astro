@@ -16,11 +16,14 @@ import { renderDiagramFigure, diagramIds } from '../lib/diagrams';
 
 interface Props {
   id: string;
+  /** Frame-only variant: emit the canvas/note/notes but no figcaption or
+   *  enlarge dialog, for hosts that supply their own chrome (e.g. the hero). */
+  bare?: boolean;
 }
 
-const { id } = Astro.props;
+const { id, bare } = Astro.props;
 const available = diagramIds().includes(id);
-const html = available ? renderDiagramFigure(id) : '';
+const html = available ? renderDiagramFigure(id, { bare }) : '';
 
 const emitScript = available && !Astro.locals.diagramScript;
 if (emitScript) Astro.locals.diagramScript = true;

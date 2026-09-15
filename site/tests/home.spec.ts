@@ -12,6 +12,32 @@ test.describe('home page', () => {
     ).toBeVisible();
   });
 
+  test('the hero embeds both governance-loop diagrams', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('.hero figure.diagram[data-diagram="hero-loop"]')).toHaveCount(1);
+    await expect(page.locator('.hero figure.diagram[data-diagram="hero-loop-tall"]')).toHaveCount(1);
+  });
+
+  test('at desktop the wide loop shows and the tall one is hidden', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    await expect(page.locator('.hero-art-wide figure[data-diagram="hero-loop"]')).toBeVisible();
+    await expect(page.locator('.hero-art-tall figure[data-diagram="hero-loop-tall"]')).toBeHidden();
+  });
+
+  test('at phone width the tall loop shows and the wide one is hidden', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 900 });
+    await page.goto('/');
+    await expect(page.locator('.hero-art-tall figure[data-diagram="hero-loop-tall"]')).toBeVisible();
+    await expect(page.locator('.hero-art-wide figure[data-diagram="hero-loop"]')).toBeHidden();
+  });
+
+  test('the verdict stamp is visible in the static state', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/');
+    await expect(page.locator('.hero-stamp')).toBeVisible();
+  });
+
   test('the stack renders five register rows', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('[data-testid="stack-row"]')).toHaveCount(5);
@@ -39,8 +65,8 @@ test.describe('home page', () => {
   });
 });
 
-// Design-review shots for Block C: the home page at three widths in both colour
-// schemes, written to tests/__screenshots__/C/.
+// Design-review shots for Block B (the new hero): the home page at three widths
+// in both colour schemes, written to tests/__screenshots__/I/.
 const widths = [390, 834, 1440];
 const schemes = ['light', 'dark'] as const;
 
@@ -55,7 +81,7 @@ for (const scheme of schemes) {
       await page.goto('/');
       await page.waitForLoadState('networkidle');
       await page.screenshot({
-        path: `tests/__screenshots__/C/home-${width}-${scheme}.png`,
+        path: `tests/__screenshots__/I/home-${width}-${scheme}.png`,
         fullPage: true,
       });
     });

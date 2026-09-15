@@ -2,40 +2,42 @@ import { test, expect } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-// V1 — the hero "evidence chain" (HeroChain) and the verdict ticker
-// (VerdictTicker). The finished PASS state is server-rendered; motion users get
-// the looping state machine driven by public/hero.js.
+// V1 — the hero "governance loop" (two archify diagrams driven by public/hero.js)
+// and the verdict ticker (VerdictTicker). The diagram is fully legible without
+// JS; motion users get a pulse that walks the loop and pops the PASS stamp.
 
-test.describe('hero chain', () => {
-  test('renders five layer rows with a server-rendered verdict stamp', async ({ page }) => {
+test.describe('hero loop', () => {
+  test('renders the loop diagram with its seven nodes and the verdict stamp', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
-    await expect(page.locator('.hc .hc-row')).toHaveCount(5);
-    const stamp = page.locator('.hc .hc-stamp');
+    // The landscape variant is the one visible at desktop width.
+    await expect(page.locator('.hero-art-wide [data-node-id]')).toHaveCount(7);
+    const stamp = page.locator('.hero-stamp');
     await expect(stamp).toBeVisible();
-    await expect(stamp).toHaveText(/PASS|BLOCK/);
+    await expect(stamp).toContainText(/PASS/);
   });
 
-  test('stays at the final step under reduced motion', async ({ page }) => {
+  test('stays static under reduced motion (no pulse)', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
-    const hc = page.locator('.hc');
-    // hero.js bails out under reduced motion, leaving the rendered final state.
+    // hero.js bails out under reduced motion, so nothing is ever lit.
     await page.waitForTimeout(1200);
-    await expect(hc).toHaveAttribute('data-step', '5');
-    await expect(hc).not.toHaveClass(/is-live/);
+    await expect(page.locator('.hero-art-wide [data-node-id].is-lit')).toHaveCount(0);
   });
 
-  test('advances the step within 3s when motion is allowed', async ({ page }) => {
+  test('walks a pulse around the loop when motion is allowed', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
-    const hc = page.locator('.hc');
-    await expect(hc).toHaveClass(/is-live/, { timeout: 3000 });
-    // From the step-0 reset the machine climbs; it reaches the eval row (3) well
-    // inside 3s.
+    // The loop starts after the draw-on settles (~1.4s) then lights a node
+    // every ~0.9s; at least one node is lit well inside the window.
     await expect
-      .poll(async () => Number(await hc.getAttribute('data-step')), { timeout: 3000 })
-      .toBeGreaterThanOrEqual(3);
+      .poll(async () => page.locator('.hero-art-wide [data-node-id].is-lit').count(), {
+        timeout: 6000,
+      })
+      .toBeGreaterThanOrEqual(1);
   });
 });
 
