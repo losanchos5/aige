@@ -1,7 +1,7 @@
 // values.ts: the Thesis's definition, five problems, eight values, six
 // principles and the "what AI governance engineers build" list, faithful to
 // THESIS.md. Each value is stated as an affirmation using the Thesis's exact
-// wording; notes flag which values are inherited from GRC engineering and which
+// wording; notes flag which values are established engineering practice and which
 // are new to AI.
 
 export interface Value {
@@ -11,7 +11,7 @@ export interface Value {
   title: string;
   /** One sentence: what we build away from and why. */
   summary: string;
-  /** Inherited from GRC engineering / new to AI (unchanged notes). */
+  /** Established engineering practice / new to AI. */
   note?: string;
 }
 
@@ -33,7 +33,7 @@ export interface Problem {
   summary: string;
 }
 
-const INHERITED = 'Inherited from GRC engineering.';
+const ESTABLISHED = 'Established engineering practice, applied to AI governance.';
 const NEW = 'New: what AI forces us to add.';
 
 /** The Thesis's one-sentence definition of the discipline. */
@@ -81,7 +81,7 @@ export const values: readonly Value[] = [
     title: 'Governance is code, not a document',
     summary:
       'Policy documents describe a control; code runs it, versioned and enforced without anyone remembering to, and only what runs can be measured.',
-    note: INHERITED,
+    note: ESTABLISHED,
   },
   {
     n: 2,
@@ -108,7 +108,7 @@ export const values: readonly Value[] = [
     title: 'Evidence is machine-readable or it is not evidence',
     summary:
       'Screenshots and exported spreadsheets cannot be queried or verified at speed; only machine-readable artefacts turn the audit into a query.',
-    note: INHERITED,
+    note: ESTABLISHED,
   },
   {
     n: 6,
@@ -121,7 +121,7 @@ export const values: readonly Value[] = [
     title: 'Success is measured in realised risk reduction, not framework coverage',
     summary:
       'Framework coverage proves you have read the framework, not that any risk fell; success is the failure mode dropping, the blast radius shrinking, the incident caught earlier.',
-    note: INHERITED,
+    note: ESTABLISHED,
   },
   {
     n: 8,

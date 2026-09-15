@@ -2,7 +2,7 @@
 /**
  * ValuePair — one value of the Thesis, typeset as a big mono index, the value
  * stated as an affirmation, and a one-sentence gloss of what it builds away
- * from. An optional mono tag flags whether the value is inherited from GRC
+ * from. An optional mono tag flags whether the value is established practice or new to AI
  * engineering or new to AI. (Name kept for import stability.)
  */
 import type { Value } from '../data/values';
@@ -15,8 +15,8 @@ interface Props {
 const { value, class: className } = Astro.props;
 const index = String(value.n).padStart(2, '0');
 const tag = value.note
-  ? /^inherited/i.test(value.note)
-    ? 'inherited'
+  ? /^established/i.test(value.note)
+    ? 'established'
     : 'new'
   : undefined;
 ---
