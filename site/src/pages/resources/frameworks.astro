@@ -5,6 +5,7 @@ import Callout from '../../components/Callout.astro';
 import FrameworkTable from '../../components/FrameworkTable.astro';
 import ObligationMatrix from '../../components/ObligationMatrix.astro';
 import ObligationTable from '../../components/ObligationTable.astro';
+import Diagram from '../../components/Diagram.astro';
 import { site } from '../../data/site';
 import { frameworks, obligations, disclaimer } from '../../data/frameworks';
 import '../../styles/resources.css';
@@ -50,6 +51,7 @@ import '../../styles/resources.css';
         is answered by this artefact, which lives in this layer. Filter by the layer you are
         building.</p>
       </div>
+      <Diagram id="obligation-to-evidence" />
       <ObligationMatrix frameworks={frameworks} obligations={obligations} />
       <ObligationTable obligations={obligations} />
     </section>

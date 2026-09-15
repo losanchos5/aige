@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "How the AI governance engineer works",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [920, 860],
+    "views": [
+      {
+        "id": "intake-to-registry",
+        "label": "Intake to registry",
+        "focus": ["team", "engineer", "registry", "cicd"],
+        "note": "A system enters through intake and lands as a registered, classified entry fed by the pipeline."
+      },
+      {
+        "id": "gates-in-cicd",
+        "label": "Gates in CI/CD",
+        "focus": ["engineer", "cicd"],
+        "note": "Evals and policy-as-code both resolve to a merge blocked or allowed with a logged reason."
+      },
+      {
+        "id": "runtime-to-audit",
+        "label": "Runtime to audit",
+        "focus": ["engineer", "runtime", "auditor", "registry"],
+        "note": "Runtime signals, incident reports and audit-ready evidence close the loop to auditors and Legal."
+      }
+    ]
+  },
+  "participants": [
+    { "id": "team", "type": "external", "label": "Product/ML team", "sublabel": "brings systems" },
+    { "id": "engineer", "type": "backend", "label": "The engineer", "sublabel": "owns workflows" },
+    { "id": "registry", "type": "database", "label": "Agent registry", "sublabel": "non-human actors" },
+    { "id": "cicd", "type": "backend", "label": "CI/CD", "sublabel": "gates release" },
+    { "id": "runtime", "type": "cloud", "label": "Runtime", "sublabel": "guardrails, drift" },
+    { "id": "auditor", "type": "security", "label": "Auditor/Legal", "sublabel": "to obligation" }
+  ],
+  "segments": [
+    { "from": 165, "to": 251, "label": "Intake & classification" },
+    { "from": 251, "to": 335, "label": "Inventory & registry" },
+    { "from": 335, "to": 419, "label": "Evals & red teaming" },
+    { "from": 419, "to": 503, "label": "Policy-as-code & gates" },
+    { "from": 503, "to": 587, "label": "Runtime monitoring & incidents" },
+    { "from": 587, "to": 671, "label": "Assurance & audit evidence" },
+    { "from": 671, "to": 756, "label": "Regulatory translation" }
+  ],
+  "messages": [
+    { "id": "submit-system", "from": "team", "to": "engineer", "y": 188, "label": "submit AI system", "variant": "emphasis" },
+    { "id": "scaffold-entry", "from": "engineer", "to": "registry", "y": 230, "label": "scaffold entry, classify", "variant": "default" },
+    { "id": "register-deploy", "from": "cicd", "to": "registry", "y": 272, "label": "register at deploy", "variant": "emphasis" },
+    { "id": "discovery", "from": "runtime", "to": "registry", "y": 314, "label": "discovery vs production", "variant": "dashed" },
+    { "id": "wire-eval-gate", "from": "engineer", "to": "cicd", "y": 356, "label": "wire eval + red-team gate", "variant": "default" },
+    { "id": "eval-blocks", "from": "cicd", "to": "engineer", "y": 398, "label": "failing eval blocks release", "variant": "return" },
+    { "id": "policy-as-code", "from": "engineer", "to": "cicd", "y": 440, "label": "policy-as-code (OPA/Rego, Cedar)", "variant": "security" },
+    { "id": "merge-decision", "from": "cicd", "to": "engineer", "y": 482, "label": "merge blocked/allowed, logged reason", "variant": "return" },
+    { "id": "instrument-runtime", "from": "engineer", "to": "runtime", "y": 524, "label": "instrument guardrails, kill switch", "variant": "emphasis" },
+    { "id": "incident-report", "from": "runtime", "to": "auditor", "y": 566, "label": "incident report, Art. 73", "variant": "dashed" },
+    { "id": "emit-evidence", "from": "engineer", "to": "auditor", "y": 608, "label": "emit OSCAL evidence, signed logs", "variant": "default" },
+    { "id": "audit-query", "from": "auditor", "to": "engineer", "y": 650, "label": "audit is a query", "variant": "return" },
+    { "id": "confirm-obligation", "from": "auditor", "to": "engineer", "y": 692, "label": "confirm obligation (Legal)", "variant": "dashed" },
+    { "id": "translate-obligation", "from": "engineer", "to": "cicd", "y": 734, "label": "obligation to gate, registry field", "variant": "emphasis" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Owned as workflows", "items": ["The engineer owns workflows, not documents", "You own a workflow when you can be paged for it", "Each workflow maps to a layer of the stack"] },
+    { "dot": "emerald", "title": "Everything becomes code", "items": ["Intake is a form-plus-code path, not a meeting", "Governance rules run as policy in CI/CD and at admission", "A failing eval or blocked merge carries a logged reason"] },
+    { "dot": "rose", "title": "Evidence by construction", "items": ["Audit-ready evidence is a by-product of the build", "Serious incidents follow the Article 73 clock", "Regulatory translation ties each control back to its obligation"] }
+  ]
+}

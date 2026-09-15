@@ -1,5 +1,6 @@
 // a11y.spec.ts: axe-core sweep over every built route (dist/**/*.html, minus
-// the /og image endpoints), in light and dark, at 1440 and 390. The gate is
+// the /og image endpoints and the third-party archify viewers under
+// /diagrams/, which ship their own styles), in light and dark, at 1440 and 390. The gate is
 // zero violations of impact serious/critical; moderate/minor findings are
 // reported to the console for follow-up but do not fail the run.
 //
@@ -32,7 +33,7 @@ function toRoute(file: string): string {
 
 const routes = htmlFiles(DIST)
   .map(toRoute)
-  .filter((route) => !route.startsWith('/og/'))
+  .filter((route) => !route.startsWith('/og/') && !route.startsWith('/diagrams/'))
   .sort();
 
 const schemes = ['light', 'dark'] as const;

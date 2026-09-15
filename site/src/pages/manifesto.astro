@@ -1,6 +1,7 @@
 ---
 import { getEntry, render } from 'astro:content';
 import Doc from '../layouts/Doc.astro';
+import Diagram from '../components/Diagram.astro';
 import { site } from '../data/site';
 import { gitDate } from '../lib/reading';
 
@@ -38,6 +39,7 @@ const signUrl = `${site.github}/blob/main/bok/CONTRIBUTORS.md`;
     </p>
   </aside>
   <Content />
+  <Diagram id="aige-in-the-org" />
 </Doc>
 
 <style>

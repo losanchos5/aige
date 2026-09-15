@@ -8,17 +8,22 @@
 //   npm run check:links            # scan ./dist
 //   node scripts/check-links.mjs <dir>
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
-import { join, dirname, resolve } from 'node:path';
+import { join, dirname, resolve, relative } from 'node:path';
 
 const dist = resolve(process.cwd(), process.argv[2] ?? 'dist');
 
-function htmlFiles(dir) {
+// The /diagrams/* pages are third-party archify viewers with their own scripts
+// and internal anchors; we skip them as link sources. Links *to* them from our
+// pages still resolve normally, since the files exist on disk.
+function htmlFiles(dir, root = dir) {
   const out = [];
   for (const name of readdirSync(dir)) {
     const full = join(dir, name);
     const st = statSync(full);
-    if (st.isDirectory()) out.push(...htmlFiles(full));
-    else if (name.endsWith('.html')) out.push(full);
+    if (st.isDirectory()) {
+      if (relative(root, full) === 'diagrams') continue; // top-level dist/diagrams
+      out.push(...htmlFiles(full, root));
+    } else if (name.endsWith('.html')) out.push(full);
   }
   return out;
 }

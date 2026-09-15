@@ -5,6 +5,10 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
+    "predev": "node scripts/diagrams-build.mjs",
+    "diagrams:fetch": "node scripts/archify-fetch.mjs",
+    "diagrams:build": "node scripts/diagrams-build.mjs",
+    "prebuild": "node scripts/diagrams-build.mjs",
     "build": "astro check && astro build && npm run lint:content && npm run check:links",
     "postbuild": "pagefind --site dist",
     "lint:content": "node scripts/content-lint.mjs",
@@ -40,6 +44,7 @@
     "@fontsource/jetbrains-mono": "^5.3.0",
     "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.55.0",
+    "hast-util-from-html": "^2.0.3",
     "pagefind": "^1.4.0"
   }
 }

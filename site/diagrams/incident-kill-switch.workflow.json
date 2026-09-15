@@ -1,0 +1,103 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Incident Pipeline and Kill Switch",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "contain",
+        "label": "Contain the agent",
+        "focus": ["signal", "detect", "breaker", "revoke", "fleet"],
+        "note": "Trip the breaker at the tool-call boundary and revoke one agent's scope while the fleet runs on."
+      },
+      {
+        "id": "report",
+        "label": "Report on the clock",
+        "focus": ["signal", "detect", "triage", "decision", "incident", "report", "notify"],
+        "note": "Turn the runtime signal into a reported obligation within the legal window."
+      },
+      {
+        "id": "assurance",
+        "label": "Evidence + drill",
+        "focus": ["drill", "breaker", "report", "record"],
+        "note": "An untested kill switch is not a control; the incident record is machine-readable evidence."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "breaker", "label": "Kill Switch (Layer 04)", "variant": "exception" },
+    { "id": "signals", "label": "Runtime Signals" },
+    { "id": "incident", "label": "Incident Pipeline" },
+    { "id": "evidence", "label": "Report & Evidence (Layer 05)" },
+    { "id": "regulator", "label": "Regulator" }
+  ],
+  "phases": [
+    { "id": "detect", "label": "Detect", "fromCol": 0, "toCol": 1 },
+    { "id": "contain-triage", "label": "Contain + triage", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "report", "label": "Report + evidence", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "groups": [
+    { "id": "kill_switch", "label": "Kill switch: revoke per agent", "lane": "breaker", "fromCol": 1, "toCol": 4, "variant": "security" },
+    { "id": "obligation", "label": "Art. 72 / 73 obligation", "lane": "evidence", "fromCol": 4, "toCol": 5, "variant": "emphasis" }
+  ],
+  "mainPath": ["signal", "detect", "triage", "decision", "incident", "report", "notify"],
+  "nodes": [
+    { "id": "signal", "lane": "signals", "col": 0, "type": "messagebus", "label": "Runtime Signal", "sublabel": "agent tool call", "width": 132 },
+    { "id": "detect", "lane": "signals", "col": 1, "type": "backend", "label": "Detection", "sublabel": "obs + guardrails", "width": 132 },
+    { "id": "drill", "lane": "breaker", "col": 1, "type": "security", "label": "Scheduled Drill", "sublabel": "drilled monthly", "width": 132 },
+    { "id": "breaker", "lane": "breaker", "col": 2, "type": "security", "label": "Circuit Breaker", "sublabel": "tool-call boundary", "tag": "auto or manual", "width": 140 },
+    { "id": "revoke", "lane": "breaker", "col": 3, "type": "security", "label": "Revoke Scope", "sublabel": "halt tool calls", "width": 132 },
+    { "id": "fleet", "lane": "breaker", "col": 4, "type": "cloud", "label": "Fleet Runs On", "sublabel": "rest unaffected", "width": 132 },
+    { "id": "triage", "lane": "incident", "col": 2, "type": "backend", "label": "Triage", "sublabel": "classify severity", "width": 132 },
+    { "id": "decision", "lane": "incident", "col": 3, "type": "security", "label": "Reportable?", "sublabel": "severity criteria", "width": 132 },
+    { "id": "incident", "lane": "incident", "col": 4, "type": "backend", "label": "Open Incident", "sublabel": "Art. 73 timer", "width": 140 },
+    { "id": "report", "lane": "evidence", "col": 4, "type": "backend", "label": "Draft Report", "sublabel": "against template", "width": 132 },
+    { "id": "record", "lane": "evidence", "col": 5, "type": "database", "label": "Incident Record", "sublabel": "machine-readable", "width": 132 },
+    { "id": "notify", "lane": "regulator", "col": 5, "type": "external", "label": "Notify Regulator", "sublabel": "legal window", "width": 140 }
+  ],
+  "edges": [
+    { "id": "signal-detect", "from": "signal", "to": "detect", "label": "flag", "variant": "default" },
+    { "id": "detect-breaker", "from": "detect", "to": "breaker", "label": "auto-trip", "variant": "security", "role": "branch" },
+    { "id": "breaker-revoke", "from": "breaker", "to": "revoke", "label": "revoke scope", "variant": "security" },
+    { "id": "revoke-fleet", "from": "revoke", "to": "fleet", "variant": "dashed" },
+    { "id": "drill-breaker", "from": "drill", "to": "breaker", "label": "drill", "variant": "dashed", "role": "branch" },
+    { "id": "detect-triage", "from": "detect", "to": "triage", "label": "raise", "variant": "emphasis" },
+    { "id": "triage-decision", "from": "triage", "to": "decision", "label": "severity", "variant": "emphasis" },
+    { "id": "decision-incident", "from": "decision", "to": "incident", "label": "reportable", "variant": "emphasis" },
+    { "id": "incident-report", "from": "incident", "to": "report", "label": "pre-fill", "variant": "emphasis" },
+    { "id": "report-notify", "from": "report", "to": "notify", "label": "on the clock", "variant": "emphasis" },
+    { "id": "report-record", "from": "report", "to": "record", "label": "as evidence", "variant": "dashed", "role": "branch" }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Autonomy is withdrawable",
+      "items": [
+        "The circuit breaker sits at the tool-call boundary",
+        "It trips on a threshold breach, an anomaly, or a manual pull",
+        "Revocation stops one agent's scope while the fleet keeps running",
+        "An untested kill switch is not a control"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Detection wired to reporting",
+      "items": [
+        "Runtime detection connects to triage and severity classification",
+        "A reportable event opens an incident and starts the Art. 73 timer",
+        "The report is pre-filled from the trace and registry entry"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Evidence on time",
+      "items": [
+        "The incident record is held as machine-readable evidence",
+        "The reported obligation is met within the legal window",
+        "Impact is contained to one agent and recovery is fast"
+      ]
+    }
+  ]
+}

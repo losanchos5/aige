@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Agent Registry and Scoped Identity",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "register-path",
+        "label": "Register before production",
+        "focus": ["pipeline", "registry", "gate", "agent"],
+        "note": "Registration at deploy is the precondition for an artefact reaching production."
+      },
+      {
+        "id": "scoped-identity",
+        "label": "Scoped identity in effect",
+        "focus": ["registry", "identity", "agent", "tools"],
+        "note": "The registry issues a scoped workload identity the agent carries as it acts."
+      },
+      {
+        "id": "attribution-and-drift",
+        "label": "Attribution and drift",
+        "focus": ["agent", "log", "auditor", "reconcile", "registry"],
+        "note": "Every action is attributable, and reconciliation flags drift back to the registry."
+      }
+    ]
+  },
+  "components": [
+    { "id": "owner", "type": "external", "label": "Model Owner", "sublabel": "renew or entry expires", "pos": [360, 150], "size": [150, 64] },
+    { "id": "pipeline", "type": "backend", "label": "Deploy Pipeline", "sublabel": "registers at deploy", "pos": [60, 340], "size": [150, 64] },
+    { "id": "registry", "type": "database", "label": "Agent Registry", "sublabel": "owner, scope, expiry", "pos": [360, 340], "size": [150, 64] },
+    { "id": "identity", "type": "security", "label": "Workload Identity", "sublabel": "scoped credential", "pos": [660, 340], "size": [150, 64], "tag": "SPIFFE/SPIRE" },
+    { "id": "agent", "type": "backend", "label": "Agent", "sublabel": "delegated authority", "pos": [960, 340], "size": [150, 64] },
+    { "id": "tools", "type": "external", "label": "APIs, Tools, Agents", "sublabel": "channel auth (MCP)", "pos": [960, 150], "size": [150, 64] },
+    { "id": "gate", "type": "security", "label": "Policy Gate", "sublabel": "deny unregistered", "pos": [360, 530], "size": [150, 64] },
+    { "id": "reconcile", "type": "backend", "label": "Shadow-AI Reconcile", "sublabel": "flag runtime drift", "pos": [60, 530], "size": [150, 64] },
+    { "id": "log", "type": "database", "label": "Evidence Log", "sublabel": "signed, per identity", "pos": [960, 530], "size": [150, 64] },
+    { "id": "auditor", "type": "external", "label": "Auditor", "sublabel": "attributes actions", "pos": [960, 720], "size": [150, 64] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Governance plane: register, scope, evaluate", "wraps": ["pipeline", "registry", "identity", "gate", "reconcile"], "pad": 20 },
+    { "kind": "security-group", "label": "Runtime plane: agent acts under scoped identity", "wraps": ["agent", "log"], "pad": 16 }
+  ],
+  "connections": [
+    { "id": "register-at-deploy", "from": "pipeline", "to": "registry", "label": "register at deploy", "variant": "emphasis" },
+    { "id": "issue-credential", "from": "registry", "to": "identity", "label": "issue scoped credential", "variant": "emphasis" },
+    { "id": "carry-identity", "from": "identity", "to": "agent", "label": "carry workload identity", "variant": "emphasis" },
+    { "id": "act-least-privilege", "from": "agent", "to": "tools", "label": "act, least privilege", "variant": "emphasis", "fromSide": "top", "toSide": "bottom", "labelDy": -70 },
+    { "id": "own-renew", "from": "owner", "to": "registry", "label": "renew, 90-day expiry", "fromSide": "bottom", "toSide": "top", "labelDy": 70 },
+    { "id": "evaluate-entry", "from": "registry", "to": "gate", "label": "evaluate entry", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelDy": 70 },
+    { "id": "admit-or-deny", "from": "gate", "to": "agent", "label": "admit, deny unregistered", "variant": "security", "fromSide": "right", "toSide": "bottom" },
+    { "id": "log-actions", "from": "agent", "to": "log", "label": "log actions", "fromSide": "bottom", "toSide": "top", "labelDy": 70 },
+    { "id": "attribute", "from": "log", "to": "auditor", "label": "attribute", "fromSide": "bottom", "toSide": "top", "labelDy": 70 },
+    { "id": "reconcile-drift", "from": "reconcile", "to": "registry", "label": "reconcile vs running, flag drift", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Register before it runs", "items": ["The deploy pipeline registers every model, service and agent", "Each entry carries an owner, a scope and an expiry", "Unregistered artefacts are denied production access"] },
+    { "dot": "rose", "title": "Identity and scope", "items": ["Each agent carries a distinct workload identity", "Credentials are scoped to least privilege", "Channel authentication and workload identity stay separate"] },
+    { "dot": "emerald", "title": "Attribution and lifecycle", "items": ["Actions are logged under the agent's own identity", "Entries expire and must be renewed or are deactivated", "Reconciliation flags drift against what is actually running"] }
+  ]
+}

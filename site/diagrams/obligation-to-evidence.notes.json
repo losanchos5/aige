@@ -1,0 +1,12 @@
+{
+  "eu-ai-act": "The EU's horizontal, risk-tiered law (Reg. (EU) 2024/1689 as amended by the Digital Omnibus); high-risk Annex III obligations apply from 2 December 2027 and GPAI obligations have applied since 2 August 2025.",
+  "iso-42001": "The AI management-system (AIMS) standard whose Annex A groups control objectives into nine areas (A.2–A.10); a management-system standard, not the Article 17 QMS, and its European adoption confers no presumption of conformity.",
+  "nist-rmf": "The voluntary NIST AI Risk Management Framework 1.0, organising risk work into four functions — Govern, Map, Measure, Manage — that map cleanly onto the five-layer stack.",
+  "crosswalk": "The reverse index that names, for each obligation, the engineering artefact that produces its evidence and the stack layer the artefact lives in, maintained as a machine-readable file emitted as OSCAL component definitions.",
+  "l1": "Layer 01 Govern-as-Code: policy-as-code and QMS-as-code answering obligations such as EU AI Act Art. 9 (risk management) and Art. 17 (quality management system).",
+  "l2": "Layer 02 Inventory & Transparency: the registry, AIBOM and model/data cards answering technical-documentation, registration and transparency obligations (Art. 11, Art. 49/71, Art. 50).",
+  "l3": "Layer 03 Evals & Red Teaming as Evidence: the eval gate and adversarial red-team suite answering accuracy, robustness and GPAI systemic-risk evaluation obligations (Art. 15, Art. 55).",
+  "l4": "Layer 04 Runtime Controls & Observability: guardrails, human oversight, kill switch and logging answering human-oversight, logging and content-marking obligations (Art. 12, Art. 14, Art. 50).",
+  "l5": "Layer 05 Assurance & Continuous Compliance: the live assurance store any lower layer writes into, meeting post-market monitoring and serious-incident-reporting obligations (Art. 72, Art. 73).",
+  "evidence": "Machine-readable evidence emitted continuously as OSCAL and signed logs, turning the audit question into a query against the crosswalk rather than a hunt through a wiki."
+}

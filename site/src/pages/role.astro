@@ -13,6 +13,7 @@ import WorkflowGrid from '../components/WorkflowGrid.astro';
 import SkillsTable from '../components/SkillsTable.astro';
 import ContrastTable from '../components/ContrastTable.astro';
 import MaturityLadder from '../components/MaturityLadder.astro';
+import Diagram from '../components/Diagram.astro';
 import StatTile from '../components/StatTile.astro';
 import VerdictStamp from '../components/VerdictStamp.astro';
 import CtaBand from '../components/CtaBand.astro';
@@ -71,6 +72,7 @@ const reportedText = reportedStats
       <h2 class="section-title display">Seven workflows the role owns.</h2>
       <p class="lede well">The engineer owns workflows, not documents — each a running system with inputs, outputs and a stack layer it maps to.</p>
       <WorkflowGrid workflows={workflows} hrefFor={roleHref} />
+      <Diagram id="role-workflows" />
     </div>
   </section>
 

@@ -2,6 +2,7 @@
 import Base from '../../layouts/Base.astro';
 import Kicker from '../../components/Kicker.astro';
 import Callout from '../../components/Callout.astro';
+import Diagram from '../../components/Diagram.astro';
 import { site } from '../../data/site';
 import { layers, toolsByCategory } from '../../data/stack';
 import '../../styles/resources.css';
@@ -51,6 +52,8 @@ const groups = toolsByCategory();
           ))
         }
       </ul>
+
+      <Diagram id="reference-toolchain" />
 
       <ul class="tl-groups">
         {

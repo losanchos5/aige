@@ -1,0 +1,98 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Eval Gate in CI",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "happy-path",
+        "label": "Passes and ships",
+        "focus": ["change", "pipeline", "suite", "capability", "threshold", "ship"],
+        "note": "A change clears the eval suite above threshold and ships to production."
+      },
+      {
+        "id": "gate-fails",
+        "label": "Fails and blocks",
+        "focus": ["suite", "capability", "adversarial", "threshold", "blocked"],
+        "note": "A score below the threshold fails the pipeline; the release does not ship."
+      },
+      {
+        "id": "evidence",
+        "label": "Evidence trail",
+        "focus": ["threshold", "evidence", "registry"],
+        "note": "The eval run emits a structured result filed against the registry entry."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "dev", "label": "Development" },
+    { "id": "ci", "label": "CI / CD Pipeline" },
+    { "id": "evals", "label": "Eval Suite (Layer 03)" },
+    { "id": "evidence", "label": "Registry & Evidence" },
+    { "id": "blocked", "label": "Blocked Release", "variant": "exception" }
+  ],
+  "phases": [
+    { "id": "trigger", "label": "Change", "fromCol": 0, "toCol": 1 },
+    { "id": "evaluate", "label": "Run evals", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "decide", "label": "Gate + record", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "groups": [
+    { "id": "eval_run", "label": "Eval run in CI", "lane": "evals", "fromCol": 2, "toCol": 4, "variant": "emphasis" },
+    { "id": "stop", "label": "Below threshold", "lane": "blocked", "fromCol": 4, "toCol": 5, "variant": "security" }
+  ],
+  "mainPath": ["change", "pipeline", "suite", "capability", "threshold", "ship"],
+  "nodes": [
+    { "id": "change", "lane": "dev", "col": 0, "type": "external", "label": "Model / Prompt Change", "sublabel": "retrained · new tool", "width": 156 },
+    { "id": "pipeline", "lane": "ci", "col": 1, "type": "backend", "label": "CI Pipeline", "sublabel": "already runs tests", "width": 152 },
+    { "id": "suite", "lane": "evals", "col": 2, "type": "database", "label": "Versioned Eval Suite", "sublabel": "versioned with model", "width": 156 },
+    { "id": "capability", "lane": "evals", "col": 3, "type": "backend", "label": "Capability Eval", "sublabel": "coverage floor", "tag": "e.g. promptfoo", "width": 152 },
+    { "id": "adversarial", "lane": "evals", "col": 4, "type": "security", "label": "Adversarial Eval", "sublabel": "injection-resistance", "tag": "e.g. Garak", "width": 156 },
+    { "id": "threshold", "lane": "evals", "col": 5, "type": "security", "label": "Threshold Gate", "sublabel": "traces to failure mode", "tag": "pass / fail", "width": 160 },
+    { "id": "ship", "lane": "ci", "col": 5, "type": "backend", "label": "Ship Release", "sublabel": "deploy to prod", "width": 152 },
+    { "id": "evidence", "lane": "evidence", "col": 4, "type": "database", "label": "Structured Result", "sublabel": "score · verdict · time", "width": 156 },
+    { "id": "registry", "lane": "evidence", "col": 5, "type": "database", "label": "Registry Entry", "sublabel": "evidence accrues", "width": 152 },
+    { "id": "blocked", "lane": "blocked", "col": 5, "type": "security", "label": "Pipeline Blocked", "sublabel": "does not ship", "width": 152 }
+  ],
+  "edges": [
+    { "id": "change-pipeline", "from": "change", "to": "pipeline", "label": "triggers CI", "variant": "default" },
+    { "id": "pipeline-suite", "from": "pipeline", "to": "suite", "label": "load suite", "variant": "emphasis" },
+    { "id": "suite-capability", "from": "suite", "to": "capability", "label": "capability eval", "variant": "emphasis" },
+    { "id": "suite-adversarial", "from": "suite", "to": "adversarial", "label": "adversarial eval", "variant": "security", "role": "branch" },
+    { "id": "capability-threshold", "from": "capability", "to": "threshold", "label": "score", "variant": "emphasis" },
+    { "id": "adversarial-threshold", "from": "adversarial", "to": "threshold", "label": "score", "variant": "default", "role": "branch" },
+    { "id": "threshold-ship", "from": "threshold", "to": "ship", "label": "above threshold", "variant": "emphasis" },
+    { "id": "threshold-blocked", "from": "threshold", "to": "blocked", "label": "below threshold", "variant": "security", "role": "error" },
+    { "id": "threshold-evidence", "from": "threshold", "to": "evidence", "label": "emit result", "variant": "dashed", "role": "branch" },
+    { "id": "evidence-registry", "from": "evidence", "to": "registry", "label": "file against entry", "variant": "dashed" }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Give every control teeth",
+      "items": [
+        "A failing eval blocks the build instead of filing a finding",
+        "The threshold traces to a named failure mode or obligation",
+        "The gate is built at the earliest point it can block"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Evidence accrues automatically",
+      "items": [
+        "Structured result: suite id, model version, score, threshold, verdict, timestamp",
+        "Filed against the registry entry for the model",
+        "Regressions are caught before production"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Trade-offs",
+      "items": [
+        "Eval maintenance and run-time cost in CI",
+        "Thresholds tuned to avoid flaky gates"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Reference toolchain by stack layer",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "views": [
+      {
+        "id": "evidence-spine",
+        "label": "The evidence spine",
+        "focus": ["policy-engines", "registry", "eval-frameworks", "guardrails", "evidence-store", "assurance-suites"],
+        "note": "Policy, Inventory, Evals, Runtime, Assurance — each layer's artefact feeds the one above."
+      },
+      {
+        "id": "minimum-viable-stack",
+        "label": "Minimum viable stack",
+        "focus": ["registry", "policy-engines", "eval-frameworks", "agent-identity", "evidence-store"],
+        "note": "The thin vertical slice a team of one builds first: see it, rule it, test it, contain it, prove it."
+      },
+      {
+        "id": "what-ai-adds",
+        "label": "What AI forces us to add",
+        "focus": ["eval-frameworks", "adversarial-probes", "guardrails", "agent-identity"],
+        "note": "Layers 03-04 — evals as evidence and agent runtime control — have no analogue in classic GRC."
+      }
+    ]
+  },
+  "components": [
+    { "id": "evidence-store", "type": "database", "label": "Evidence store", "sublabel": "OSCAL evidence", "pos": [420, 97], "size": [190, 66] },
+    { "id": "assurance-suites", "type": "external", "label": "AI-governance suites", "sublabel": "aggregate & present", "pos": [760, 97], "size": [190, 66] },
+
+    { "id": "guardrails", "type": "security", "label": "Guardrail frameworks", "sublabel": "tool-call mediation", "pos": [420, 237], "size": [190, 66] },
+    { "id": "agent-identity", "type": "security", "label": "Agent workload identity", "sublabel": "identity + kill switch", "pos": [80, 237], "size": [190, 66] },
+    { "id": "observability", "type": "backend", "label": "Observability", "sublabel": "trace agent runs", "pos": [760, 237], "size": [190, 66] },
+
+    { "id": "eval-frameworks", "type": "backend", "label": "Evaluation frameworks", "sublabel": "eval gate in CI", "pos": [420, 377], "size": [190, 66] },
+    { "id": "adversarial-probes", "type": "backend", "label": "Adversarial probes", "sublabel": "red-team & vuln probes", "pos": [80, 377], "size": [190, 66] },
+
+    { "id": "registry", "type": "database", "label": "Agent registry", "sublabel": "runtime-aware inventory", "pos": [420, 517], "size": [190, 66] },
+    { "id": "discovery", "type": "backend", "label": "Agent-discovery tools", "sublabel": "reconcile & flag drift", "pos": [80, 517], "size": [190, 66] },
+    { "id": "aibom", "type": "database", "label": "AIBOM formats", "sublabel": "bill of materials", "pos": [760, 517], "size": [190, 66] },
+
+    { "id": "policy-engines", "type": "security", "label": "Policy engines", "sublabel": "allow/deny logic", "pos": [420, 657], "size": [190, 66] },
+    { "id": "policy-cards", "type": "security", "label": "Policy Cards", "sublabel": "proposed policy artefact", "pos": [80, 657], "size": [190, 66] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "05 Assurance & Continuous Compliance", "wraps": ["evidence-store", "assurance-suites"], "pad": 18 },
+    { "kind": "region", "label": "04 Runtime Controls & Observability", "wraps": ["guardrails", "agent-identity", "observability"], "pad": 18 },
+    { "kind": "region", "label": "03 Evals & Red Teaming as Evidence", "wraps": ["eval-frameworks", "adversarial-probes"], "pad": 18 },
+    { "kind": "region", "label": "02 Inventory & Transparency", "wraps": ["registry", "discovery", "aibom"], "pad": 18 },
+    { "kind": "region", "label": "01 Govern-as-Code", "wraps": ["policy-engines", "policy-cards"], "pad": 18 }
+  ],
+  "connections": [
+    { "id": "spine-01-02", "from": "policy-engines", "to": "registry", "label": "gate deploy on registration", "variant": "emphasis", "fromSide": "top", "toSide": "bottom" },
+    { "id": "spine-02-03", "from": "registry", "to": "eval-frameworks", "label": "names object under test", "variant": "emphasis", "fromSide": "top", "toSide": "bottom" },
+    { "id": "spine-03-04", "from": "eval-frameworks", "to": "guardrails", "label": "carries thresholds to runtime", "variant": "emphasis", "fromSide": "top", "toSide": "bottom" },
+    { "id": "spine-04-05", "from": "guardrails", "to": "evidence-store", "label": "streams decisions & traces", "variant": "emphasis", "fromSide": "top", "toSide": "bottom" },
+    { "id": "spine-05-out", "from": "evidence-store", "to": "assurance-suites", "label": "aggregated as OSCAL evidence", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
+
+    { "id": "policycards-in", "from": "policy-cards", "to": "policy-engines", "label": "rule as data", "variant": "dashed", "fromSide": "right", "toSide": "left" },
+    { "id": "discovery-in", "from": "discovery", "to": "registry", "label": "reconciles, flags drift", "fromSide": "right", "toSide": "left" },
+    { "id": "aibom-in", "from": "registry", "to": "aibom", "label": "AIBOM per entry", "fromSide": "right", "toSide": "left" },
+    { "id": "adversarial-in", "from": "adversarial-probes", "to": "eval-frameworks", "label": "red-team evals", "fromSide": "right", "toSide": "left" },
+    { "id": "identity-in", "from": "agent-identity", "to": "guardrails", "label": "identity & scope", "variant": "security", "fromSide": "right", "toSide": "left" },
+    { "id": "observability-in", "from": "guardrails", "to": "observability", "label": "verdicts traced", "variant": "dashed", "fromSide": "right", "toSide": "left" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Read it as one spine", "items": ["Policy → Inventory → Evals → Runtime → Assurance", "Each layer produces an artefact the next consumes", "Evidence is produced at the bottom and proven at the top"] },
+    { "dot": "emerald", "title": "Minimum viable stack (team of one)", "items": ["Layer 02 first: a registry a deploy writes to", "One policy with teeth, one eval gate, identity + kill switch", "Evidence as a by-product, into one store"] },
+    { "dot": "slate", "title": "Categories, not brands", "items": ["Every tool is an example of a category, interchangeable", "The AIBOM tells the eval layer what to test", "Runtime signals compared against the eval baseline"] }
+  ]
+}

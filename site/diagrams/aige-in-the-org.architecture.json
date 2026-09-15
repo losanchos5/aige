@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Where AI governance engineering sits",
+    "quality_profile": "showcase",
+    "locale": "en",
+    "views": [
+      {
+        "id": "disambiguation",
+        "label": "Against its neighbours",
+        "focus": ["aige", "mlops", "mrm", "ai-security", "grc-engineering"],
+        "note": "The discipline is defined as much by what it is not: MLOps, model risk management, the GRC parent and the security sibling."
+      },
+      {
+        "id": "rules-into-controls",
+        "label": "Rules into controls",
+        "focus": ["compliance-legal", "responsible-ai", "ai-safety", "aige"],
+        "note": "Governance functions set the obligations, values and research; AIGE turns them into running controls and proves them."
+      },
+      {
+        "id": "object-and-proof",
+        "label": "Object and proof",
+        "focus": ["aige", "ai-systems", "evidence", "auditors"],
+        "note": "What AIGE governs in production and the audit-ready evidence an auditor or regulator can query."
+      }
+    ]
+  },
+  "components": [
+    { "id": "compliance-legal", "type": "external", "label": "AI compliance / legal", "sublabel": "interprets obligations", "pos": [60, 140], "size": [190, 60] },
+    { "id": "responsible-ai", "type": "external", "label": "Responsible AI / ethics", "sublabel": "sets values & principles", "pos": [60, 250], "size": [190, 60] },
+    { "id": "ai-safety", "type": "external", "label": "AI safety research", "sublabel": "studies models in principle", "pos": [60, 360], "size": [190, 60] },
+    { "id": "grc-engineering", "type": "external", "label": "GRC engineering", "sublabel": "the parent discipline", "pos": [60, 470], "size": [190, 60] },
+
+    { "id": "mlops", "type": "backend", "label": "MLOps / LLMOps", "sublabel": "builds, deploys, serves", "pos": [470, 150], "size": [190, 60] },
+    { "id": "aige", "type": "backend", "label": "AI Governance Engineering", "sublabel": "governance as engineered systems", "pos": [470, 300], "size": [220, 90] },
+    { "id": "ai-security", "type": "security", "label": "AI security engineering", "sublabel": "the sibling — defends", "pos": [470, 470], "size": [190, 60] },
+
+    { "id": "ai-systems", "type": "cloud", "label": "AI systems & agents", "sublabel": "the object, in production", "pos": [800, 250], "size": [210, 72] },
+    { "id": "mrm", "type": "external", "label": "Model risk management", "sublabel": "validates models (SR 11-7)", "pos": [800, 440], "size": [190, 60] },
+    { "id": "evidence", "type": "database", "label": "Audit-ready evidence", "sublabel": "machine-readable proof", "pos": [1095, 250], "size": [190, 62] },
+    { "id": "auditors", "type": "external", "label": "Auditors / regulators", "sublabel": "read & query the proof", "pos": [1095, 440], "size": [190, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Governance functions", "wraps": ["compliance-legal", "responsible-ai", "ai-safety", "grc-engineering"], "pad": 18 },
+    { "kind": "region", "label": "Build & run", "wraps": ["mlops", "aige", "ai-security"], "pad": 18 }
+  ],
+  "connections": [
+    { "id": "obligation", "from": "compliance-legal", "to": "aige", "label": "obligation → control", "labelAt": [304, 170] },
+    { "id": "values", "from": "responsible-ai", "to": "aige", "label": "values → controls", "labelAt": [304, 280] },
+    { "id": "safety", "from": "ai-safety", "to": "aige", "label": "consumes research", "labelAt": [304, 390] },
+    { "id": "parent", "from": "grc-engineering", "to": "aige", "label": "AI specialisation", "variant": "emphasis", "labelAt": [304, 500] },
+
+    { "id": "sibling", "from": "ai-security", "to": "aige", "label": "defended system as input", "variant": "security", "fromSide": "top", "toSide": "bottom" },
+    { "id": "gates", "from": "aige", "to": "mlops", "label": "gates the pipeline", "variant": "emphasis", "fromSide": "top", "toSide": "bottom" },
+    { "id": "ships", "from": "mlops", "to": "ai-systems", "label": "builds & serves", "fromSide": "right", "toSide": "top" },
+
+    { "id": "governs", "from": "aige", "to": "ai-systems", "label": "governs continuously", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
+    { "id": "validates", "from": "mrm", "to": "ai-systems", "label": "validates the model", "fromSide": "top", "toSide": "bottom" },
+    { "id": "emits", "from": "ai-systems", "to": "evidence", "label": "emits runtime evidence", "variant": "emphasis", "fromSide": "right", "toSide": "left", "labelDy": 80 },
+    { "id": "query", "from": "evidence", "to": "auditors", "label": "audit is a query", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelAt": [1190, 376] }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "The definition", "items": ["Engineering practice applied to the governance of AI systems", "A capability, not a job title", "Measured by realised risk reduction and audit-ready evidence"] },
+    { "dot": "violet", "title": "Distinct from its neighbours", "items": ["Governs what MLOps ships; gates the same pipeline", "Extends model risk management to runtime and agents", "Sibling of AI security engineering — often the same person"] },
+    { "dot": "emerald", "title": "The object and the proof", "items": ["Models, systems, agents, data and the organisation", "Agents acting under delegated authority are the hardest object", "Evidence an auditor or regulator can query, not a screenshot"] }
+  ]
+}

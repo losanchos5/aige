@@ -7,6 +7,7 @@ import remarkLead from './src/lib/remark-lead';
 import remarkCallouts from './src/lib/remark-callouts';
 import rehypeCitations from './src/lib/rehype-citations';
 import rehypeTables from './src/lib/rehype-tables';
+import rehypeDiagrams from './src/lib/rehype-diagrams';
 import rehypeGlossary from './src/lib/rehype-glossary';
 
 // https://astro.build/config
@@ -24,6 +25,11 @@ export default defineConfig({
       rehypeTables,
       rehypeGlossary,
       [rehypeExternalLinks, { rel: ['noopener'] }],
+      // Last: the injected diagram figures are self-contained SVG; running after
+      // glossary/external-links keeps those plugins from walking into the SVG
+      // (e.g. wrapping a term like "MCP" in a link inside a role="button" node,
+      // which would be an axe nested-interactive violation).
+      rehypeDiagrams,
     ],
   },
 });

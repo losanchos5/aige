@@ -1,0 +1,30 @@
+---
+/**
+ * Diagram — drops an interactive diagram figure (id) onto a standalone page.
+ * The figure markup is rendered at build from the generated SVG + manifest by
+ * renderDiagramFigure(); public/diagram.js wires the hover/focus highlight, the
+ * note panel and the draw-on. Chapters get their figures from rehype-diagrams
+ * instead, so this component is only for the hand-placed page figures.
+ *
+ * The `/diagram.js` tag is emitted at most once per page: Doc.astro emits it for
+ * markdown pages, and this component emits it for Base/Marketing pages, both
+ * guarding on the same Astro.locals flag so a page never loads it twice. A
+ * diagram whose IR is not yet built (absent from the manifest) renders nothing,
+ * so a page keeps its <Diagram> in place without breaking the build.
+ */
+import { renderDiagramFigure, diagramIds } from '../lib/diagrams';
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const available = diagramIds().includes(id);
+const html = available ? renderDiagramFigure(id) : '';
+
+const emitScript = available && !Astro.locals.diagramScript;
+if (emitScript) Astro.locals.diagramScript = true;
+---
+
+{available && <Fragment set:html={html} />}
+{emitScript && <script is:inline src="/diagram.js" defer></script>}

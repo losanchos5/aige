@@ -1,0 +1,14 @@
+{
+  "policy-engines": "Policy engines express allow/deny logic, evaluating a governance rule written as code and returning a machine-readable verdict tied to a commit, pull request or deploy.",
+  "policy-cards": "Policy Cards are a proposed machine-readable, deployment-layer artefact that encodes an agent's operational, regulatory and ethical constraints and links them to enforcement and audit pipelines, so the rule travels with the agent as data.",
+  "registry": "The agent registry is the runtime-aware inventory of every model, service and agent, each with an owner, a scope and a status, ideally written by the deployment pipeline rather than typed by hand.",
+  "discovery": "Agent-discovery tools find AI the inventory did not know about and periodically reconcile the registry against what is actually running, flagging drift.",
+  "aibom": "The AIBOM is the bill of materials for an AI system, recording models, datasets, weights and their provenance in CycloneDX ML-BOM or the SPDX 3.0 AI profile, generated at build and stored with the registry entry.",
+  "eval-frameworks": "Evaluation frameworks run capability and regression suites in an eval gate wired into CI, so an eval below its agreed threshold fails the build and the release does not ship.",
+  "adversarial-probes": "Adversarial and vulnerability probes run red-team evals against jailbreaks, prompt injection and tool misuse, producing the structured adversarial evidence the eval gate enforces.",
+  "guardrails": "Guardrail frameworks are the runtime enforcement point where a policy fires against a live request, mediating tool calls and input/output for each agent.",
+  "observability": "Observability builds on OpenTelemetry to trace and monitor agent runs, turning production behaviour into a control signal compared against the eval baseline.",
+  "agent-identity": "Agent workload identity gives every non-human actor its own durable, attributable identity with a bounded scope and a tested kill switch that revokes access without breaking the fleet.",
+  "evidence-store": "The assurance store holds machine-readable, audit-ready evidence emitted as OSCAL component and assessment artefacts, that any lower layer writes into and an auditor can read from.",
+  "assurance-suites": "GRC and AI-governance suites aggregate and present the emitted evidence and generate framework mappings from it, so the audit becomes a query rather than a project."
+}

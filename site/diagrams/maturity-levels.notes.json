@@ -1,0 +1,10 @@
+{
+  "documented": "Level 1 Documented: governance exists as artefacts a human maintains — a policy PDF, a spreadsheet inventory, a risk register, a review before launch — but nothing executes.",
+  "inventoried": "Level 2 Inventoried: a real inventory of models and an agent registry, fed by a runtime data path rather than typed by hand, so a deploy registers a system with an owner, a scope and a status.",
+  "tested": "Level 3 Tested: systems are evaluated against capability, safety and adversarial evals and the results are recorded as evidence, but a failing eval does not yet stop anything.",
+  "enforced": "Level 4 Enforced: policy-as-code and eval gates run in CI/CD and at admission and a failing control blocks the merge or the deploy, with the gating suite's own coverage and adversarial quality assessed, not just its existence.",
+  "continuous": "Level 5 Continuous: assurance is produced continuously from the runtime data path, evidence is emitted as machine-readable artefacts as the pipeline and runtime operate, and the audit is a query.",
+  "stale-eval": "The Level 3 trap: the eval is run once before launch, pasted into a slide, and never re-run when the model or its prompts change.",
+  "framework-theatre": "The Level 4 trap: a gate that blocks on a trivial or stale suite is Level 4 by the letter and framework theatre in fact — a green build that proves nothing.",
+  "decay": "The Level 5 trap: telemetry that is collected but never wired to a decision — observability without enforcement decays back to Level 3 dressed up as Level 5."
+}

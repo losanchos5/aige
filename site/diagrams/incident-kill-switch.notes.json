@@ -1,0 +1,14 @@
+{
+  "signal": "A runtime signal — such as a guardrail flagging a data-exfiltration attempt or an agent's unauthorised-tool-call rate crossing a threshold — starts the flow.",
+  "detect": "Runtime detection comes from observability and guardrails.",
+  "drill": "The kill switch is tested on a schedule — the pull is drilled monthly — because an untested kill switch is not a control.",
+  "breaker": "A circuit breaker at the tool-call boundary trips on a defined signal — a threshold breach, an anomaly, or a manual pull.",
+  "revoke": "Tripping revokes just that agent's scope and halts its tool calls.",
+  "fleet": "Containment stops one agent without breaking the rest of the fleet, which keeps running.",
+  "triage": "Runtime detection is wired to a triage workflow that classifies severity.",
+  "decision": "Triage decides whether the event is reportable against the severity criteria.",
+  "incident": "A reportable event opens an incident and starts the statutory timer, encoding the EU AI Act Art. 73 timeline.",
+  "report": "The report is drafted against the required template and pre-filled from the trace and registry entry.",
+  "record": "The incident record is held as machine-readable evidence.",
+  "notify": "The pipeline turns the runtime signal into a reported obligation delivered within the legal window."
+}

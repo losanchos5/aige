@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "From obligation to evidence",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [940, 730],
+    "views": [
+      {
+        "id": "read-a-row",
+        "label": "Read a row",
+        "focus": ["eu-ai-act", "crosswalk", "l3", "evidence"],
+        "note": "One obligation, the artefact that answers it, the layer it lives in, the evidence it emits."
+      },
+      {
+        "id": "one-reverse-index",
+        "label": "One reverse index",
+        "focus": ["eu-ai-act", "iso-42001", "nist-rmf", "crosswalk"],
+        "note": "Every framework's obligations resolve backward through one crosswalk."
+      },
+      {
+        "id": "audit-is-a-query",
+        "label": "Audit becomes a query",
+        "focus": ["crosswalk", "l5", "evidence"],
+        "note": "Continuous assurance emits machine-readable evidence; the audit is a query, not a hunt."
+      }
+    ]
+  },
+  "stages": [
+    { "label": "Frameworks" },
+    { "label": "Crosswalk" },
+    { "label": "Stack layers" },
+    { "label": "Evidence" }
+  ],
+  "nodes": [
+    { "id": "eu-ai-act", "type": "external", "label": "EU AI Act", "sublabel": "post-Omnibus", "stage": 0, "row": 1, "tag": "law" },
+    { "id": "iso-42001", "type": "external", "label": "ISO/IEC 42001", "sublabel": "AIMS · Annex A", "stage": 0, "row": 2, "tag": "standard" },
+    { "id": "nist-rmf", "type": "external", "label": "NIST AI RMF", "sublabel": "four functions", "stage": 0, "row": 3, "tag": "framework" },
+    { "id": "crosswalk", "type": "backend", "label": "Obligation crosswalk", "sublabel": "obligation → artefact → layer", "stage": 1, "row": 2, "tag": "OSCAL", "width": 150, "height": 150, "yOffset": -46 },
+    { "id": "l1", "type": "security", "label": "Govern-as-Code", "sublabel": "policy-as-code, QMS", "stage": 2, "row": 0, "tag": "Layer 01", "width": 150 },
+    { "id": "l2", "type": "database", "label": "Inventory & Transparency", "sublabel": "registry · AIBOM · cards", "stage": 2, "row": 1, "tag": "Layer 02", "width": 150 },
+    { "id": "l3", "type": "backend", "label": "Evals & Red Teaming", "sublabel": "eval gate · red-team", "stage": 2, "row": 2, "tag": "Layer 03", "width": 150 },
+    { "id": "l4", "type": "security", "label": "Runtime Controls", "sublabel": "guardrails · kill switch", "stage": 2, "row": 3, "tag": "Layer 04", "width": 150 },
+    { "id": "l5", "type": "cloud", "label": "Assurance & Compliance", "sublabel": "assurance telemetry", "stage": 2, "row": 4, "tag": "Layer 05", "width": 150 },
+    { "id": "evidence", "type": "database", "label": "Machine-readable evidence", "sublabel": "OSCAL · audit = query", "stage": 3, "row": 4, "tag": "assurance", "width": 150 }
+  ],
+  "flows": [
+    { "id": "eu-to-crosswalk", "from": "eu-ai-act", "to": "crosswalk", "label": "Arts. 9–73", "variant": "emphasis", "route": "top-channel" },
+    { "id": "iso-to-crosswalk", "from": "iso-42001", "to": "crosswalk", "label": "Annex A", "variant": "default", "labelAt": [190, 385] },
+    { "id": "nist-to-crosswalk", "from": "nist-rmf", "to": "crosswalk", "label": "four functions", "variant": "default", "route": "bottom-channel" },
+    { "id": "cross-l1", "from": "crosswalk", "to": "l1", "label": "Art. 9", "variant": "emphasis", "route": "vertical-channel", "channelX": 400, "labelAt": [429, 157] },
+    { "id": "cross-l2", "from": "crosswalk", "to": "l2", "label": "Art. 11", "variant": "default", "route": "vertical-channel", "channelX": 400, "labelAt": [429, 271] },
+    { "id": "cross-l3", "from": "crosswalk", "to": "l3", "label": "Art. 15", "variant": "default", "route": "vertical-channel", "channelX": 400, "labelAt": [429, 385] },
+    { "id": "cross-l4", "from": "crosswalk", "to": "l4", "label": "Art. 14", "variant": "default", "route": "vertical-channel", "channelX": 400, "labelAt": [429, 499] },
+    { "id": "cross-l5", "from": "crosswalk", "to": "l5", "label": "Art. 72", "variant": "emphasis", "route": "vertical-channel", "channelX": 400, "labelAt": [429, 613] },
+    { "id": "l5-evidence", "from": "l5", "to": "evidence", "label": "OSCAL logs", "variant": "emphasis", "route": "straight" }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Read each row as a sentence",
+      "items": [
+        "This obligation is answered by this artefact, which lives in this layer",
+        "The map is a crosswalk for finding the artefact, not a certificate of compliance",
+        "Mappings are illustrative, not a claim of conformity"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "One reverse index",
+      "items": [
+        "Every 'Maps to' line in the book resolves backward through the crosswalk",
+        "Maintained as a machine-readable file, emitted as OSCAL component definitions",
+        "When the Omnibus moved a date, the change was a diff to one field per row"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Audit = query",
+      "items": [
+        "Each layer's artefact produces machine-readable evidence for its obligation",
+        "'Show me what answers Article 15' becomes a query against the crosswalk",
+        "Continuous assurance makes evidence cheap to produce and hard to fake"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "The five maturity levels",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [900, 660],
+    "views": [
+      {
+        "id": "the-ladder",
+        "label": "The ladder",
+        "focus": ["documented", "inventoried", "tested", "enforced", "continuous"],
+        "note": "Five levels from paper to production, each proven by what the running systems can show."
+      },
+      {
+        "id": "measuring-to-blocking",
+        "label": "Measuring becomes blocking",
+        "focus": ["tested", "enforced", "continuous"],
+        "note": "Evals stop being a report and start blocking the build; then assurance runs off the runtime telemetry."
+      },
+      {
+        "id": "regression-traps",
+        "label": "Regression traps",
+        "focus": ["tested", "stale-eval", "enforced", "framework-theatre", "continuous", "decay"],
+        "note": "Where a level is claimed but the systems cannot show it: stale evals, framework theatre, telemetry never wired to a decision."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "main", "label": "Maturity ladder" },
+    { "id": "stalls", "label": "Stalls that cap the level" },
+    { "id": "terminal", "label": "Regression" }
+  ],
+  "states": [
+    { "id": "documented", "type": "start", "label": "Documented", "sublabel": "policy PDF + spreadsheet", "lane": "main", "col": 0, "step": "01", "tag": "Level 1" },
+    { "id": "inventoried", "type": "active", "label": "Inventoried", "sublabel": "registry fed by deploy", "lane": "main", "col": 1, "step": "02", "tag": "Level 2" },
+    { "id": "tested", "type": "active", "label": "Tested", "sublabel": "evals stored as evidence", "lane": "main", "col": 2, "step": "03", "tag": "Level 3" },
+    { "id": "enforced", "type": "decision", "label": "Enforced", "sublabel": "gate blocks the build", "lane": "main", "col": 3, "step": "04", "tag": "Level 4" },
+    { "id": "continuous", "type": "success", "label": "Continuous", "sublabel": "audit is a query", "lane": "main", "col": 4, "step": "05", "tag": "Level 5" },
+    { "id": "stale-eval", "type": "failure", "label": "Stale Eval", "sublabel": "slide, never re-run", "lane": "stalls", "col": 0, "width": 118, "tag": "Level 3 trap" },
+    { "id": "framework-theatre", "type": "failure", "label": "Framework Theatre", "sublabel": "trivial or stale suite", "lane": "stalls", "col": 1, "width": 118, "tag": "Level 4 trap" },
+    { "id": "decay", "type": "failure", "label": "Decay to Level 3", "sublabel": "telemetry, no decision", "lane": "terminal", "col": 2, "tag": "Level 5 trap" }
+  ],
+  "transitions": [
+    { "id": "trap-stale", "from": "tested", "to": "stale-eval", "label": "run once before launch", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelAt": [402, 226] },
+    { "id": "trap-theatre", "from": "enforced", "to": "framework-theatre", "label": "gate on a trivial suite", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelAt": [556, 226] },
+    { "id": "trap-decay", "from": "continuous", "to": "decay", "label": "never wired to a decision", "variant": "security", "fromSide": "bottom", "toSide": "top", "labelAt": [710, 226] }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "A ladder from paper to production",
+      "items": [
+        "A level is a state you demonstrate by querying the registry, running the gate and reading the evidence store",
+        "Each level is assessed across all five stack layers; the overall level is the weakest layer",
+        "The rail's five steps carry the observable signal that proves each level"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Rising confidence, three questions",
+      "items": [
+        "Documented and Inventoried answer what AI is running",
+        "Tested and Enforced answer what it is allowed to do",
+        "Continuous answers what evidence proves it — from telemetry"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Traps that move you back",
+      "items": [
+        "Stale eval: run once before launch, pasted into a slide, never re-run",
+        "Framework theatre: a gate on a trivial or stale suite is a green build that proves nothing",
+        "Observability without enforcement decays back to Level 3 dressed up as Level 5"
+      ]
+    }
+  ]
+}
