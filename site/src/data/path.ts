@@ -11,8 +11,8 @@
 //
 // Resources policy: external URLs are curated, illustrative and not
 // endorsements. A URL drawn from bok/10-reading-list.md is trusted as verified;
-// every other external URL carries a `// REVIEW` comment so it can be checked by
-// hand before merge. No tool is named that the Body of Knowledge does not treat.
+// every other external URL was checked by hand on 2026-09-15 (status, redirects,
+// relevance). No tool is named that the Body of Knowledge does not treat.
 
 import type { LayerNumber } from './stack';
 
@@ -134,7 +134,7 @@ export const stages: readonly PathStage[] = [
 /**
  * The path's nodes, in reading order within each stage. `layerN` colours a node
  * by stack layer; nodes without one are cross-cutting. Every external resource
- * not drawn from bok/10-reading-list.md carries a `// REVIEW` marker above it.
+ * not drawn from bok/10-reading-list.md was reviewed by hand on 2026-09-15.
  */
 export const nodes: readonly PathNode[] = [
   // ── 1 Foundations ────────────────────────────────────────────────────────
