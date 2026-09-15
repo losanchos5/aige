@@ -11,8 +11,17 @@ import { layers, minimumViableStack, toolsByCategory } from '../src/data/stack';
 import { workflows, market } from '../src/data/role';
 import { levels } from '../src/data/maturity';
 import { frameworks, obligations, disclaimer } from '../src/data/frameworks';
-import { getGlossary } from '../src/lib/glossary';
+import { getGlossary, termId } from '../src/lib/glossary';
 import { getReadingList } from '../src/lib/reading-list';
+import { getChapterBySlug } from '../src/data/chapters';
+import {
+  stages,
+  nodes,
+  entries,
+  nodesByStage,
+  crossStageEdges,
+} from '../src/data/path';
+import type { PathKind, PathStageId } from '../src/data/path';
 
 /** Slugs of every heading in a chapter, as rehype-slug would emit them. */
 function headingSlugs(relativeToRoot: string): Set<string> {
@@ -150,4 +159,159 @@ test('no forbidden claim appears in any data module', () => {
   for (const needle of forbidden) {
     expect(modules.includes(needle)).toBe(false);
   }
+});
+
+// ── The learning path data (src/data/path.ts) ──────────────────────────────
+test.describe('path data', () => {
+  const KINDS = new Set<PathKind>(['core', 'alternative', 'optional']);
+  const STAGE_IDS = new Set<PathStageId>([
+    'foundations',
+    'see-and-rule',
+    'test-and-contain',
+    'prove-and-specialise',
+  ]);
+  const RESOURCE_TYPES = new Set(['article', 'video', 'course', 'official', 'tool']);
+  const RESOURCE_COSTS = new Set(['free', 'paid']);
+  // The two capstones may carry 0-1 resources; every other node carries 2-4.
+  const CAPSTONES = new Set(['maturity-self-assessment', 'minimum-viable-stack']);
+  // A fragment-less internal href must point at one of these known routes.
+  const KNOWN_ROUTES = new Set([
+    '/manifesto',
+    '/role',
+    '/stack',
+    '/resources/frameworks',
+    '/resources/tools',
+    '/resources/reading-list',
+    '/resources/glossary',
+  ]);
+
+  const nodeIds = new Set(nodes.map((node) => node.id));
+  const stageOrder = new Map(
+    nodes.map((node) => [node.id, stages.find((s) => s.id === node.stage)!.n]),
+  );
+  const glossaryIds = new Set(getGlossary().map((entry) => termId(entry.term)));
+
+  test('has four stages, 1..4, whose ids partition every node', () => {
+    expect(stages).toHaveLength(4);
+    expect(stages.map((stage) => stage.n)).toEqual([1, 2, 3, 4]);
+    for (const stage of stages) {
+      expect(STAGE_IDS.has(stage.id)).toBe(true);
+    }
+    const counted = [...STAGE_IDS].reduce(
+      (sum, id) => sum + nodesByStage(id).length,
+      0,
+    );
+    expect(counted).toBe(nodes.length);
+  });
+
+  test('node ids are unique', () => {
+    expect(nodeIds.size).toBe(nodes.length);
+    expect(nodes.length).toBeGreaterThanOrEqual(34);
+  });
+
+  test('every node has a valid kind, stage, layer and summary', () => {
+    for (const node of nodes) {
+      expect(KINDS.has(node.kind), `${node.id} kind`).toBe(true);
+      expect(STAGE_IDS.has(node.stage), `${node.id} stage`).toBe(true);
+      if (node.layerN !== undefined) {
+        expect(node.layerN, `${node.id} layerN`).toBeGreaterThanOrEqual(1);
+        expect(node.layerN, `${node.id} layerN`).toBeLessThanOrEqual(5);
+      }
+      expect(node.links.length, `${node.id} links`).toBeGreaterThanOrEqual(1);
+      expect(node.summary.trim().length, `${node.id} summary`).toBeGreaterThan(0);
+    }
+  });
+
+  test('resource counts, types, costs and https urls hold', () => {
+    for (const node of nodes) {
+      const count = node.resources.length;
+      if (CAPSTONES.has(node.id)) {
+        expect(count, `${node.id} capstone resources`).toBeLessThanOrEqual(1);
+      } else {
+        expect(count, `${node.id} resources`).toBeGreaterThanOrEqual(2);
+        expect(count, `${node.id} resources`).toBeLessThanOrEqual(4);
+      }
+      for (const resource of node.resources) {
+        expect(resource.url.startsWith('https://'), `${node.id} ${resource.url}`).toBe(
+          true,
+        );
+        expect(RESOURCE_TYPES.has(resource.type), `${node.id} ${resource.type}`).toBe(
+          true,
+        );
+        expect(RESOURCE_COSTS.has(resource.cost), `${node.id} ${resource.cost}`).toBe(
+          true,
+        );
+        expect(resource.title.trim().length, `${node.id} resource title`).toBeGreaterThan(
+          0,
+        );
+      }
+    }
+  });
+
+  test('every internal link resolves to a real anchor or known route', () => {
+    const slugCache = new Map<string, Set<string>>();
+    const slugsForChapter = (slugName: string): Set<string> => {
+      const chapter = getChapterBySlug(slugName);
+      expect(chapter, `chapter for /bok/${slugName}`).toBeTruthy();
+      const file = `bok/${chapter!.id}.md`;
+      if (!slugCache.has(file)) slugCache.set(file, headingSlugs(file));
+      return slugCache.get(file)!;
+    };
+
+    for (const node of nodes) {
+      for (const link of node.links) {
+        const [target, frag] = link.href.split('#');
+        if (target.startsWith('/bok/')) {
+          expect(frag, `${link.href} needs a fragment`).toBeTruthy();
+          const slugName = target.slice('/bok/'.length);
+          expect(slugsForChapter(slugName).has(frag), `${link.href} should resolve`).toBe(
+            true,
+          );
+        } else if (target === '/resources/glossary') {
+          expect(frag, `${link.href} needs a term`).toBeTruthy();
+          expect(glossaryIds.has(frag), `${link.href} should resolve`).toBe(true);
+        } else {
+          expect(frag, `${link.href} should carry no fragment`).toBeFalsy();
+          expect(KNOWN_ROUTES.has(target), `${link.href} is a known route`).toBe(true);
+        }
+      }
+    }
+  });
+
+  test('prereqs reference existing nodes in the same or an earlier stage', () => {
+    for (const node of nodes) {
+      for (const prereq of node.prereqs ?? []) {
+        expect(nodeIds.has(prereq), `${node.id} prereq ${prereq}`).toBe(true);
+        expect(
+          stageOrder.get(prereq)!,
+          `${node.id} prereq ${prereq} stage order`,
+        ).toBeLessThanOrEqual(stageOrder.get(node.id)!);
+      }
+    }
+  });
+
+  test('entry start points exist as nodes', () => {
+    expect(entries.length).toBeGreaterThan(0);
+    for (const entry of entries) {
+      expect(entry.startAt.length).toBeGreaterThan(0);
+      for (const id of entry.startAt) {
+        expect(nodeIds.has(id), `${entry.id} startAt ${id}`).toBe(true);
+      }
+    }
+  });
+
+  test('crossStageEdges only connects nodes in different stages', () => {
+    const edges = crossStageEdges();
+    expect(edges.length).toBeGreaterThan(0);
+    for (const edge of edges) {
+      expect(nodeIds.has(edge.from), `edge from ${edge.from}`).toBe(true);
+      expect(nodeIds.has(edge.to), `edge to ${edge.to}`).toBe(true);
+      expect(stageOrder.get(edge.from)).not.toBe(stageOrder.get(edge.to));
+    }
+  });
+
+  test('no forbidden tool name appears in the path data', () => {
+    const serialized = JSON.stringify({ stages, nodes, entries });
+    expect(serialized.includes('LiteLLM')).toBe(false);
+  });
 });

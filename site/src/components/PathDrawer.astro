@@ -1,0 +1,212 @@
+---
+/**
+ * PathDrawer — the side panel path.js opens for a node. It ships empty and
+ * hidden; on open, path.js fills the title, the kind/layer chips and a clone of
+ * the node's .pn-body, and wires the three progress buttons (done / learning /
+ * skipped). It is a modal dialog with a focus trap, Esc-to-close and a scrim,
+ * mirroring the doc drawer in public/ui-doc.js. Pagefind ignores it (its content
+ * already lives, indexable, in the stage sections).
+ */
+---
+
+<aside
+  id="path-drawer"
+  class="path-drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="path-drawer-title"
+  hidden
+  data-pagefind-ignore
+>
+  <header class="pd-head">
+    <p class="pd-chips">
+      <span class="pd-kind mono" data-drawer-kind></span>
+      <span class="pd-layer mono" data-drawer-layer hidden></span>
+    </p>
+    <h2 id="path-drawer-title" class="pd-title"></h2>
+    <button type="button" class="pd-close" data-path-close aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </header>
+
+  <div class="pd-progress" role="group" aria-label="Your progress">
+    <button type="button" class="pd-state" data-path-state="done" aria-pressed="false">Done</button>
+    <button type="button" class="pd-state" data-path-state="learning" aria-pressed="false">Learning</button>
+    <button type="button" class="pd-state" data-path-state="skipped" aria-pressed="false">Skipped</button>
+  </div>
+
+  <div class="pd-body" data-drawer-body></div>
+</aside>
+
+<div class="path-scrim" data-path-close hidden></div>
+
+<style>
+  .path-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    width: min(440px, 100vw);
+    height: 100%;
+    padding: var(--s-5);
+    border-left: 1px solid var(--line);
+    background: var(--bg);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* The flex display would otherwise beat the [hidden] UA rule. */
+  .path-drawer[hidden] {
+    display: none;
+  }
+
+  @media (max-width: 839px) {
+    .path-drawer {
+      inset: 0;
+      width: 100vw;
+      border-left: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .path-drawer {
+      transform: translateX(100%);
+      transition: transform var(--dur) var(--ease);
+    }
+
+    .path-drawer.is-open {
+      transform: none;
+    }
+  }
+
+  .pd-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: var(--s-2) var(--s-3);
+  }
+
+  .pd-chips {
+    grid-column: 1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0;
+  }
+
+  .pd-kind,
+  .pd-layer {
+    padding: 1px var(--s-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    color: var(--ink-2);
+  }
+
+  .pd-layer[hidden] {
+    display: none;
+  }
+
+  .pd-title {
+    grid-column: 1;
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h2);
+    line-height: 1.1;
+    letter-spacing: var(--tracking-display);
+    /* Accent underline in the node's colour, if any. */
+    border-bottom: 3px solid var(--c, var(--line));
+    padding-bottom: var(--s-2);
+  }
+
+  .pd-close {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: start;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--ink);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .pd-close:hover {
+    border-color: var(--ink-2);
+  }
+
+  .pd-close:focus-visible,
+  .pd-state:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .pd-progress {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+
+  .pd-state {
+    flex: 1 1 auto;
+    min-height: 40px;
+    padding: 0 var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--ink);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .pd-state:hover {
+    border-color: var(--ink-2);
+  }
+
+  .pd-state[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  .pd-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .path-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: color-mix(in srgb, var(--ink) 45%, transparent);
+  }
+
+  .path-scrim[hidden] {
+    display: none;
+  }
+
+  /* Lock the page behind the open drawer (set on <body> by path.js). */
+  :global(body.path-lock) {
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pd-state {
+      transition:
+        background-color var(--dur) var(--ease),
+        color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease);
+    }
+  }
+</style>

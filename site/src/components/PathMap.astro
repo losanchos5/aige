@@ -1,0 +1,489 @@
+---
+/**
+ * PathMap — the learning path itself: a sticky toolbar (overall progress meter,
+ * legend and a two-step reset), four stacked stages each with a node grid, an
+ * SVG overlay that path.js fills with the cross-stage prerequisite edges, and a
+ * closing "three ways in" strip.
+ *
+ * The stacked stages read as a flow without JS thanks to a CSS spine between
+ * them; path.js adds the coloured progress, the drawer and the edges. The edge
+ * list travels to the client as a JSON payload (non-executable, CSP-safe); the
+ * SVG ships empty and is drawn only at >=840px.
+ */
+import type { PathStage, PathNode, PathEntry } from '../data/path';
+import { nodesByStage, nodeHref } from '../data/path';
+import PathNodeCard from './PathNode.astro';
+
+interface Props {
+  stages: readonly PathStage[];
+  nodes: readonly PathNode[];
+  edges: { from: string; to: string }[];
+  entries: readonly PathEntry[];
+}
+
+const { stages, nodes, edges, entries } = Astro.props as Props;
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const titleById = new Map(nodes.map((n) => [n.id, n.title] as const));
+
+// Dependents, computed in build: for each node, the nodes whose `prereqs`
+// include it. Feeds the "Leads to" list in each node body (the mirror of the
+// node's own `prereqs`, which feed "Builds on").
+const dependentsById = new Map<string, string[]>();
+for (const node of nodes) {
+  for (const prereq of node.prereqs ?? []) {
+    const list = dependentsById.get(prereq) ?? [];
+    list.push(node.id);
+    dependentsById.set(prereq, list);
+  }
+}
+const relatedLinks = (ids: readonly string[]) =>
+  ids.map((id) => ({ id, title: titleById.get(id) ?? id }));
+---
+
+<div class="path" data-path>
+  <div class="path-bar">
+    <div class="path-total">
+      <span class="path-total-label mono">Your progress</span>
+      <div
+        class="meter path-total-meter"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="0"
+        aria-label="Overall path progress"
+        data-path-total
+      >
+      </div>
+      <span class="path-total-pct mono" data-path-total-text>0%</span>
+    </div>
+
+    <ul class="path-legend" aria-label="Legend">
+      <li><span class="lg lg-core" aria-hidden="true"></span>core</li>
+      <li><span class="lg lg-alt" aria-hidden="true"></span>alternative</li>
+      <li><span class="lg lg-opt" aria-hidden="true"></span>optional</li>
+    </ul>
+
+    <button type="button" class="path-reset" data-path-reset>Reset progress</button>
+  </div>
+
+  <p class="path-note">
+    Progress counts the nodes you have marked <strong>done</strong> against the
+    nodes you have not <strong>skipped</strong>.
+  </p>
+
+  <p class="path-edges-hint mono">Hover or open a node to see what it builds on.</p>
+
+  <div class="path-stages">
+    <svg class="path-edges" data-path-edges aria-hidden="true" preserveAspectRatio="none"></svg>
+
+    {
+      stages.map((stage) => (
+        <section
+          class="path-stage"
+          data-stage={stage.id}
+          aria-labelledby={`stage-${stage.id}`}
+          data-pagefind-body
+        >
+          <header class="stage-head">
+            <span class="stage-n mono" aria-hidden="true">{pad(stage.n)}</span>
+            <div class="stage-copy">
+              <h2 id={`stage-${stage.id}`} class="stage-title display">{stage.title}</h2>
+              <p class="stage-tagline">{stage.tagline}</p>
+              <p class="stage-summary">{stage.summary}</p>
+            </div>
+            <div class="stage-progress">
+              <span class="stage-pct mono" data-stage-progress={stage.id}>0%</span>
+              <div
+                class="meter stage-meter"
+                role="progressbar"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0"
+                aria-label={`${stage.title} progress`}
+                data-stage-meter={stage.id}
+              >
+              </div>
+            </div>
+          </header>
+
+          <ol class="path-grid">
+            {nodesByStage(stage.id).map((node, i) => (
+              <PathNodeCard
+                node={node}
+                index={i}
+                builtOn={relatedLinks(node.prereqs ?? [])}
+                leadsTo={relatedLinks(dependentsById.get(node.id) ?? [])}
+              />
+            ))}
+          </ol>
+        </section>
+      ))
+    }
+  </div>
+
+  <script
+    is:inline
+    type="application/json"
+    data-path-edges-index
+    set:html={JSON.stringify(edges)}
+  />
+
+  <section class="path-entries" aria-labelledby="path-entries-title">
+    <h2 id="path-entries-title" class="entries-title display">Three ways in</h2>
+    <p class="entries-lede">
+      Coming from an adjacent discipline? Start where your existing skills carry
+      the most, then fan out.
+    </p>
+    <ul class="entries-grid">
+      {
+        entries.map((entry) => (
+          <li class="entry card">
+            <h3 class="entry-title">{entry.title}</h3>
+            <ul class="entry-links">
+              {entry.startAt.map((id) => (
+                <li>
+                  <a class="entry-link" href={nodeHref(id)}>
+                    {titleById.get(id) ?? id}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</div>
+
+<style>
+  .path {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+  }
+
+  /* ---- sticky toolbar ---- */
+  .path-bar {
+    position: sticky;
+    top: var(--anchor-offset);
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-4);
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+  }
+
+  .path-total {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-width: 0;
+    flex: 1 1 12rem;
+  }
+
+  .path-total-label {
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .path-total-meter {
+    flex: 1 1 6rem;
+    min-width: 4rem;
+  }
+
+  .path-total-pct {
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .path-legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .path-legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-1);
+  }
+
+  .lg {
+    width: 14px;
+    height: 14px;
+    border-radius: var(--r-sm);
+    border: 1px solid var(--ink);
+  }
+
+  .lg-alt {
+    border-color: var(--line);
+    background: color-mix(in srgb, var(--ink) 12%, transparent);
+  }
+
+  .lg-opt {
+    border-style: dashed;
+    border-color: var(--line);
+  }
+
+  .path-reset {
+    margin-left: auto;
+    padding: var(--s-2) var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .path-reset:hover {
+    border-color: var(--ink-2);
+  }
+
+  .path-reset.is-armed {
+    border-color: var(--block);
+    color: var(--block);
+  }
+
+  .path-reset:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .path-note {
+    margin: 0;
+    max-width: var(--prose);
+    font-size: var(--fs-small);
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  .path-note strong {
+    color: var(--ink-2);
+  }
+
+  /* Only meaningful where the connectors draw (>=840px), so hidden below it. */
+  .path-edges-hint {
+    display: none;
+    margin: 0;
+    color: var(--muted);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  @media (min-width: 840px) {
+    .path-edges-hint {
+      display: block;
+    }
+  }
+
+  /* ---- stages ---- */
+  .path-stages {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+
+  .path-edges {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 0;
+    display: none;
+  }
+
+  @media (min-width: 840px) {
+    .path-edges {
+      display: block;
+    }
+  }
+
+  .path-stage {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+  }
+
+  /* The spine: a hairline connector between consecutive stages, so the flow
+     reads top-to-bottom even with no JS and no edges. */
+  .path-stage + .path-stage::before {
+    content: '';
+    position: absolute;
+    left: 0.6rem;
+    top: calc(var(--s-6) * -1);
+    height: var(--s-6);
+    width: 1px;
+    background: var(--line);
+  }
+
+  .stage-head {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: var(--s-3) var(--s-4);
+  }
+
+  .stage-n {
+    font-size: 1.5rem;
+    line-height: 1;
+    color: var(--muted);
+  }
+
+  .stage-copy {
+    min-width: 0;
+  }
+
+  .stage-title {
+    margin: 0;
+    font-size: var(--fs-h2);
+  }
+
+  .stage-tagline {
+    margin: var(--s-1) 0 0;
+    color: var(--ink-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .stage-summary {
+    margin: var(--s-2) 0 0;
+    max-width: var(--prose);
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .stage-progress {
+    grid-column: 2;
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    max-width: 22rem;
+  }
+
+  .stage-pct {
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stage-meter {
+    flex: 1;
+  }
+
+  /* ---- node grid ---- */
+  .path-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-4);
+  }
+
+  @media (min-width: 600px) {
+    .path-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .path-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .path-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  /* Edge <path>s are created and styled by path.js (runtime nodes carry no
+     scope attribute, so their paint cannot live in this scoped block). */
+
+  /* ---- three ways in ---- */
+  .path-entries {
+    margin-top: var(--s-5);
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--line);
+  }
+
+  .entries-title {
+    margin: 0;
+    font-size: var(--fs-h2);
+  }
+
+  .entries-lede {
+    margin: var(--s-3) 0 var(--s-5);
+    max-width: var(--prose);
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .entries-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  @media (min-width: 720px) {
+    .entries-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .entry {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    background: var(--bg);
+  }
+
+  .entry-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h3);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .entry-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .entry-link {
+    color: var(--ink);
+    text-underline-offset: 0.15em;
+  }
+</style>

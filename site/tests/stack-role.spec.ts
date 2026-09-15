@@ -3,30 +3,8 @@
 // a check that every chapter back-link resolves to a real #id in its target
 // /bok page, and reading-comfort screenshots into tests/__screenshots__/D/.
 
-import { test, expect, type Page } from '@playwright/test';
-
-/** Collect every distinct /bok/...#anchor link rendered on a page. */
-async function bokAnchorLinks(page: Page): Promise<string[]> {
-  const hrefs = await page
-    .locator('a[href^="/bok/"]')
-    .evaluateAll((els) => els.map((el) => el.getAttribute('href') ?? ''));
-  return [...new Set(hrefs.filter((href) => href.includes('#')))];
-}
-
-/** Assert every chapter back-link on `path` points at an id that exists. */
-async function assertChapterLinksResolve(page: Page, path: string): Promise<void> {
-  await page.goto(path);
-  const links = await bokAnchorLinks(page);
-  expect(links.length).toBeGreaterThan(0);
-
-  for (const link of links) {
-    const [target, frag] = link.split('#');
-    const response = await page.request.get(target);
-    expect(response.ok(), `${target} should serve 200`).toBeTruthy();
-    const html = await response.text();
-    expect(html.includes(`id="${frag}"`), `${link} should resolve`).toBe(true);
-  }
-}
+import { test, expect } from '@playwright/test';
+import { assertChapterLinksResolve } from './helpers/links';
 
 test.describe('/stack', () => {
   test('shows five layer panels', async ({ page }) => {

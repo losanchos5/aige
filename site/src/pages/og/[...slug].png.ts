@@ -12,6 +12,7 @@ const ROUTES: Record<string, string> = {
   bok: 'Body of Knowledge',
   role: 'The AI Governance Engineer',
   stack: 'The five-layer stack',
+  path: 'The AIGE learning path',
   resources: 'Resources & reading list',
   about: 'About this site',
 };

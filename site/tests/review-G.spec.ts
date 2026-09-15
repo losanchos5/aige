@@ -15,6 +15,7 @@ const pages = [
   { name: 'role', path: '/role' },
   { name: 'frameworks', path: '/resources/frameworks' },
   { name: 'glossary', path: '/resources/glossary' },
+  { name: 'path', path: '/path' },
 ];
 
 test.beforeAll(() => mkdirSync(DIR, { recursive: true }));

@@ -31,3 +31,12 @@ export function getGlossary(): GlossaryEntry[] {
 export function getGlossaryLetters(): string[] {
   return [...new Set(getGlossary().map((entry) => entry.letter))].sort();
 }
+
+/**
+ * The DOM id for a glossary term's `<dt>`, so an in-page `#anchor` can point at
+ * it. The rule mirrors the on-page ids: `t-` plus the term lowercased with each
+ * run of non-alphanumerics collapsed to a single hyphen and the ends trimmed.
+ */
+export function termId(term: string): string {
+  return `t-${term.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`;
+}

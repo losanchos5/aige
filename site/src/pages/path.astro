@@ -1,0 +1,110 @@
+---
+/**
+ * /path — the AI Governance Engineer learning path, roadmap-style. Four stacked
+ * stages (foundations → prove it), each a grid of nodes that link back into the
+ * Body of Knowledge and out to curated resources. The reader marks each node
+ * done / learning / skipped; progress persists per browser. Content comes from
+ * src/data/path.ts; the map, drawer and progress live in PathMap / PathDrawer /
+ * public/path.js. With no JS every node body is a native <details> and every
+ * link is in the DOM.
+ */
+import Marketing from '../layouts/Marketing.astro';
+import '../styles/pages.css';
+import Kicker from '../components/Kicker.astro';
+import RegisterList from '../components/RegisterList.astro';
+import PathMap from '../components/PathMap.astro';
+import PathDrawer from '../components/PathDrawer.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { stages, nodes, entries, crossStageEdges } from '../data/path';
+
+const edges = crossStageEdges();
+
+const legend = [
+  {
+    title: 'Core',
+    description: 'The spine of the path. Work these in order.',
+    swatch: 'var(--ink)',
+  },
+  {
+    title: 'Alternative',
+    description: 'A swap-in for the core node beside it — pick the one that fits your stack.',
+    swatch: 'var(--l1)',
+  },
+  {
+    title: 'Optional',
+    description: 'Deepens a stage; safe to skip on a first pass.',
+    swatch: 'var(--muted)',
+  },
+  {
+    title: 'Done',
+    description: 'You have worked through it; it counts toward your progress.',
+    swatch: 'var(--l5)',
+  },
+  {
+    title: 'Learning',
+    description: 'In progress — you have started but not finished.',
+    swatch: 'var(--l4)',
+  },
+  {
+    title: 'Skipped',
+    description: 'Not on your route; it drops out of the progress denominator.',
+    swatch: 'var(--muted)',
+  },
+];
+---
+
+<Marketing
+  title="The learning path · AI Governance Engineer"
+  description="A staged learning path for the AI Governance Engineer: four stages from foundations to proof, each a grid of nodes that link into the Body of Knowledge and out to curated resources — with your own progress."
+  image="/og/path.png"
+>
+  <section class="hero section">
+    <div class="container page-hero reveal">
+      <Kicker swatch="var(--l2)" rule>The learning path</Kicker>
+      <h1 class="display">Learn the role, one stage at a time.</h1>
+      <p class="lede">
+        A build order for the AI Governance Engineer: four stages from
+        foundations to proof, each a grid of nodes that map back to the Body of
+        Knowledge and out to the tools and reading behind them. Mark what you
+        have done; the path remembers.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l3)">How to read it</Kicker>
+      <h2 class="section-title display">Three kinds of node, three states.</h2>
+      <p class="lede well">
+        Each stage builds on the one above it. Nodes are marked as core,
+        alternative or optional; you mark your own as done, learning or skipped.
+      </p>
+      <div class="well"><RegisterList items={legend} /></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container reveal">
+      <Kicker swatch="var(--l1)">The path</Kicker>
+      <h2 class="section-title display">Four stages, from foundations to proof.</h2>
+      <PathMap stages={stages} nodes={nodes} edges={edges} entries={entries} />
+    </div>
+  </section>
+
+  <CtaBand
+    title="Own the role, not just the reading."
+    sub="The path maps to chapter 06 — the role in full, workflow by workflow, against the stack that carries it."
+    primary={{ label: 'Read the role in full', href: '/bok/the-role' }}
+    secondary={{ label: 'See the stack', href: '/stack' }}
+  />
+
+  <PathDrawer />
+
+  <script is:inline defer src="/path.js"></script>
+</Marketing>
+
+<style>
+  .hero h1 {
+    font-size: var(--fs-display);
+  }
+</style>

@@ -1,0 +1,363 @@
+---
+/**
+ * PathNode — one node of the learning path, as a register card in a stage grid.
+ *
+ * The card is a button (opens the side drawer when path.js is present) plus a
+ * native <details> that carries the full body — summary, "In the Body of
+ * Knowledge" links and curated "Resources" with type/cost badges. With no JS
+ * the <details> is the whole interaction; with JS the details are hidden and
+ * path.js shows a clone of the .pn-body inside the drawer. Every href is in the
+ * DOM either way, so link-checking and Pagefind both see them.
+ *
+ * The layer colour (if the node maps to a stack layer) rides on --c / --c-ink,
+ * used by the done/learning state styles; transversal nodes leave them unset and
+ * the styles fall back to ink.
+ */
+import type { PathNode } from '../data/path';
+import { nodeHref } from '../data/path';
+
+/** A resolved link to a related node, for the "Builds on"/"Leads to" lists. */
+interface RelatedLink {
+  id: string;
+  title: string;
+}
+
+interface Props {
+  node: PathNode;
+  /** Position within its stage, for the mono index. */
+  index: number;
+  /** The node's prerequisites, resolved to {id,title} — the "Builds on" list. */
+  builtOn?: readonly RelatedLink[];
+  /** Nodes that list this one as a prerequisite — the "Leads to" list. */
+  leadsTo?: readonly RelatedLink[];
+}
+
+const { node, index, builtOn = [], leadsTo = [] } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const layerStyle = node.layerN
+  ? `--c: var(--l${node.layerN}); --c-ink: var(--l${node.layerN}-ink)`
+  : undefined;
+---
+
+<li
+  class="path-node"
+  id={`node-${node.id}`}
+  data-node={node.id}
+  data-kind={node.kind}
+  data-state=""
+  data-layer={node.layerN ?? undefined}
+  style={layerStyle}
+>
+  <button
+    type="button"
+    class="pn-btn"
+    data-node-open={node.id}
+    aria-haspopup="dialog"
+    aria-controls="path-drawer"
+    aria-expanded="false"
+  >
+    <span class="pn-top">
+      <span class="pn-index mono" aria-hidden="true">{pad(index + 1)}</span>
+      <span class="pn-kind mono">{node.kind}</span>
+      <span class="pn-mark mono" aria-hidden="true"></span>
+    </span>
+    <span class="pn-title">{node.title}</span>
+    <span class="visually-hidden" data-node-status>Not started</span>
+  </button>
+
+  <details class="pn-details">
+    <summary>Details</summary>
+    <div class="pn-body" data-node-body={node.id}>
+      <p class="pn-summary">{node.summary}</p>
+
+      {builtOn.length > 0 && (
+        <div class="pn-section">
+          <p class="pn-label mono">Builds on</p>
+          <ul class="pn-links">
+            {builtOn.map((rel) => (
+              <li>
+                <a href={nodeHref(rel.id)}>{rel.title}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {leadsTo.length > 0 && (
+        <div class="pn-section">
+          <p class="pn-label mono">Leads to</p>
+          <ul class="pn-links">
+            {leadsTo.map((rel) => (
+              <li>
+                <a href={nodeHref(rel.id)}>{rel.title}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <div class="pn-section">
+        <p class="pn-label mono">In the Body of Knowledge</p>
+        <ul class="pn-links">
+          {node.links.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {node.resources.length > 0 && (
+        <div class="pn-section">
+          <p class="pn-label mono">Resources</p>
+          <ul class="pn-resources">
+            {node.resources.map((res) => (
+              <li class="pn-res">
+                <a class="pn-res-link" href={res.url} target="_blank" rel="noopener noreferrer">
+                  <span class="pn-res-title">{res.title}</span>
+                  <span class="pn-res-arrow" aria-hidden="true">↗</span>
+                </a>
+                <span class="pn-res-meta">
+                  <span class="badge">{res.type}</span>
+                  <span class="badge">{res.cost}</span>
+                  {res.note && <span class="pn-res-note">{res.note}</span>}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  </details>
+</li>
+
+<style>
+  .path-node {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+    /* A left tick in the node/layer colour (transversal nodes fall back to line). */
+    border-left: 3px solid var(--c, var(--line));
+  }
+
+  /* Kind cues. */
+  .path-node[data-kind='core'] {
+    border-color: var(--ink);
+    border-left-color: var(--c, var(--ink));
+  }
+
+  .path-node[data-kind='optional'] {
+    border-style: dashed;
+  }
+
+  .pn-btn {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    width: 100%;
+    padding: var(--s-4);
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .pn-top {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  .pn-index {
+    color: var(--muted);
+  }
+
+  .pn-kind {
+    color: var(--ink-2);
+  }
+
+  .path-node[data-kind='optional'] .pn-kind {
+    color: var(--muted);
+  }
+
+  .path-node[data-kind='alternative'] .pn-kind {
+    padding: 1px var(--s-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    color: var(--ink-2);
+  }
+
+  .pn-mark {
+    margin-left: auto;
+    color: var(--muted);
+  }
+
+  .pn-mark::before {
+    content: '';
+  }
+
+  .path-node[data-state='done'] .pn-mark::before {
+    content: '\2713 done';
+  }
+
+  .path-node[data-state='learning'] .pn-mark::before {
+    content: 'learning';
+  }
+
+  .path-node[data-state='skipped'] .pn-mark::before {
+    content: 'skipped';
+  }
+
+  .pn-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h3);
+    line-height: 1.15;
+    letter-spacing: var(--tracking-display);
+  }
+
+  /* ---- states (data-state on the li; --c/--c-ink from the layer) ---- */
+  .path-node[data-state='done'] {
+    background: var(--c, var(--ink));
+    border-color: var(--c, var(--ink));
+  }
+
+  .path-node[data-state='done'] .pn-btn,
+  .path-node[data-state='done'] .pn-index,
+  .path-node[data-state='done'] .pn-kind,
+  .path-node[data-state='done'] .pn-mark,
+  .path-node[data-state='done'] .pn-title {
+    color: var(--c-ink, var(--bg));
+  }
+
+  .path-node[data-state='learning'] {
+    border: 1px dashed var(--ink);
+    border-left-width: 3px;
+    background: color-mix(in srgb, var(--c, var(--ink)) 35%, transparent);
+  }
+
+  .path-node[data-state='skipped'] .pn-title,
+  .path-node[data-state='skipped'] .pn-summary {
+    color: var(--muted);
+  }
+
+  /* ---- related: prereqs/dependents of the active node, while its edges show.
+     A subtle ink outline and left tick only; the state background colours (set
+     above) are deliberately left untouched. */
+  .path-node[data-related] {
+    border-color: var(--ink);
+    border-left-color: var(--ink);
+  }
+
+  /* ---- body: shared by the inline <details> and the drawer clone ---- */
+  .pn-details {
+    border-top: 1px solid var(--line);
+  }
+
+  /* When path.js runs the drawer replaces the inline body. */
+  :global(.path.path-js) .pn-details {
+    display: none;
+  }
+
+  .pn-details > summary {
+    padding: var(--s-2) var(--s-4);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .pn-details > summary:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .pn-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    padding: 0 var(--s-4) var(--s-4);
+  }
+
+  .pn-summary {
+    margin: 0;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .pn-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .pn-label {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .pn-links,
+  .pn-resources {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .pn-links a {
+    color: var(--ink);
+    text-underline-offset: 0.15em;
+  }
+
+  .pn-res {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-3);
+  }
+
+  .pn-res-link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-1);
+    color: var(--ink);
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .pn-res-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .pn-res-arrow {
+    color: var(--muted);
+    font-size: var(--fs-small);
+  }
+
+  .pn-res-meta {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2);
+  }
+
+  .pn-res-note {
+    font-size: var(--fs-small);
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+</style>

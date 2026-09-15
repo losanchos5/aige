@@ -18,6 +18,7 @@ module.exports = {
         'http://localhost:4321/bok/the-stack',
         'http://localhost:4321/role',
         'http://localhost:4321/stack',
+        'http://localhost:4321/path',
         'http://localhost:4321/resources/glossary',
       ],
       settings: {

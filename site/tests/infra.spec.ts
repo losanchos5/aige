@@ -18,7 +18,7 @@ function pngWidth(buf: Buffer): number {
 test.describe('OG images', () => {
   test.beforeAll(() => mkdirSync(SHOT_DIR, { recursive: true }));
 
-  for (const slug of ['default', 'bok-the-stack']) {
+  for (const slug of ['default', 'bok-the-stack', 'path']) {
     test(`/og/${slug}.png is a 1200px-wide PNG`, async ({ request }) => {
       const res = await request.get(`/og/${slug}.png`);
       expect(res.status()).toBe(200);

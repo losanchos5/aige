@@ -111,3 +111,43 @@
 .section-foot {
   margin-top: var(--s-6);
 }
+
+/* A mono, bordered tag — used for resource type/cost labels on the path page. */
+.badge {
+  display: inline-block;
+  padding: 1px var(--s-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  line-height: 1.6;
+}
+
+/* A thin progress meter. The fill scales from --pct (a 0..1 fraction) in --ink,
+   over a hairline track. JS sets --pct and the owning element's aria-valuenow. */
+.meter {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+
+.meter::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform: scaleX(var(--pct, 0));
+  background: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .meter::before {
+    transition: transform var(--dur) var(--ease);
+  }
+}

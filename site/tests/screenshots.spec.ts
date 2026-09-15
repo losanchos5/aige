@@ -5,6 +5,7 @@ import { test } from '@playwright/test';
 const pages = [
   { name: 'the-stack', path: '/bok/the-stack' },
   { name: 'manifesto', path: '/manifesto' },
+  { name: 'path', path: '/path' },
 ];
 const widths = [390, 834, 1440];
 const schemes = ['light', 'dark'] as const;
