@@ -182,7 +182,6 @@ export const nodes: readonly PathNode[] = [
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'NIST AI RMF Playbook',
         url: 'https://airc.nist.gov/airmf-resources/playbook/',
@@ -208,7 +207,7 @@ export const nodes: readonly PathNode[] = [
     resources: [
       {
         title: 'IAPP AI Governance Profession Report',
-        url: 'https://iapp.org/resources/article/ai-governance-profession-report/',
+        url: 'https://iapp.org/resources/article/ai-governance-profession-report',
         type: 'official',
         cost: 'free',
       },
@@ -321,14 +320,12 @@ export const nodes: readonly PathNode[] = [
       { label: 'Skills by workflow', href: '/bok/the-role#skills-by-workflow' },
     ],
     resources: [
-      // REVIEW
       {
         title: 'The Python Tutorial',
         url: 'https://docs.python.org/3/tutorial/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'Automate the Boring Stuff with Python',
         url: 'https://automatetheboringstuff.com/',
@@ -352,17 +349,15 @@ export const nodes: readonly PathNode[] = [
       },
     ],
     resources: [
-      // REVIEW
       {
         title: 'Pro Git (book)',
         url: 'https://git-scm.com/book',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'GitHub Actions documentation',
-        url: 'https://docs.github.com/actions',
+        url: 'https://docs.github.com/en/actions',
         type: 'official',
         cost: 'free',
       },
@@ -409,14 +404,12 @@ export const nodes: readonly PathNode[] = [
       },
     ],
     resources: [
-      // REVIEW
       {
         title: 'Building effective agents',
-        url: 'https://www.anthropic.com/research/building-effective-agents',
+        url: 'https://www.anthropic.com/engineering/building-effective-agents',
         type: 'article',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'Model Context Protocol',
         url: 'https://modelcontextprotocol.io/',
@@ -446,14 +439,12 @@ export const nodes: readonly PathNode[] = [
       },
     ],
     resources: [
-      // REVIEW
       {
         title: 'EU AI Act Annex III (high-risk use cases)',
         url: 'https://artificialintelligenceact.eu/annex/3/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'ISO/IEC 42005 (AI system impact assessment)',
         url: 'https://www.iso.org/standard/44545.html',
@@ -515,21 +506,18 @@ export const nodes: readonly PathNode[] = [
       },
     ],
     resources: [
-      // REVIEW
       {
         title: 'CycloneDX ML-BOM',
         url: 'https://cyclonedx.org/capabilities/mlbom/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'SPDX 3.0 specification',
         url: 'https://spdx.github.io/spdx-spec/v3.0.1/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'Model Cards for Model Reporting',
         url: 'https://arxiv.org/abs/1810.03993',
@@ -588,25 +576,22 @@ export const nodes: readonly PathNode[] = [
       { label: 'Policy-as-code', href: '/resources/glossary#t-policy-as-code' },
     ],
     resources: [
-      // REVIEW
       {
         title: 'Open Policy Agent documentation',
         url: 'https://www.openpolicyagent.org/docs',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'The Rego Playground',
         url: 'https://play.openpolicyagent.org/',
         type: 'tool',
         cost: 'free',
       },
-      // REVIEW
       {
-        title: 'Styra Academy',
-        url: 'https://academy.styra.com/',
-        type: 'course',
+        title: 'OPA policy language (Rego) guide',
+        url: 'https://www.openpolicyagent.org/docs/policy-language',
+        type: 'official',
         cost: 'free',
       },
     ],
@@ -632,14 +617,12 @@ export const nodes: readonly PathNode[] = [
       { label: 'Policy-as-code', href: '/resources/glossary#t-policy-as-code' },
     ],
     resources: [
-      // REVIEW
       {
         title: 'Cedar policy language',
-        url: 'https://www.cedarpolicy.com/',
+        url: 'https://cedarpolicy.com/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'Cedar documentation',
         url: 'https://docs.cedarpolicy.com/',
@@ -694,21 +677,18 @@ export const nodes: readonly PathNode[] = [
       },
     ],
     resources: [
-      // REVIEW
       {
         title: 'Conftest',
         url: 'https://www.conftest.dev/',
         type: 'tool',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'OPA Gatekeeper',
         url: 'https://open-policy-agent.github.io/gatekeeper/website/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'Kyverno',
         url: 'https://kyverno.io/',
@@ -731,14 +711,12 @@ export const nodes: readonly PathNode[] = [
       { label: 'FRIA', href: '/resources/glossary#t-fria' },
     ],
     resources: [
-      // REVIEW
       {
         title: 'EU AI Act Article 27 (FRIA)',
         url: 'https://artificialintelligenceact.eu/article/27/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'ISO/IEC 42005 (AI system impact assessment)',
         url: 'https://www.iso.org/standard/44545.html',
@@ -775,21 +753,18 @@ export const nodes: readonly PathNode[] = [
         type: 'tool',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'Inspect AI documentation',
         url: 'https://inspect.aisi.org.uk/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'promptfoo documentation',
         url: 'https://www.promptfoo.dev/docs/intro/',
         type: 'tool',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'DeepEval',
         url: 'https://deepeval.com/',
@@ -822,11 +797,10 @@ export const nodes: readonly PathNode[] = [
         type: 'tool',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'promptfoo in CI/CD',
         url: 'https://www.promptfoo.dev/docs/integrations/ci-cd/',
-        type: 'official',
+        type: 'tool',
         cost: 'free',
       },
     ],
@@ -848,14 +822,12 @@ export const nodes: readonly PathNode[] = [
       { label: 'Red teaming', href: '/resources/glossary#t-red-teaming' },
     ],
     resources: [
-      // REVIEW
       {
         title: 'OWASP Top 10 for LLM Applications',
         url: 'https://genai.owasp.org/llm-top-10/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'garak (LLM vulnerability scanner)',
         url: 'https://github.com/NVIDIA/garak',
@@ -918,14 +890,12 @@ export const nodes: readonly PathNode[] = [
       },
     ],
     resources: [
-      // REVIEW
       {
         title: 'NVIDIA NeMo Guardrails',
         url: 'https://docs.nvidia.com/nemo/guardrails/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'Meta LlamaFirewall',
         url: 'https://meta-llama.github.io/PurpleLlama/LlamaFirewall/',
@@ -954,21 +924,18 @@ export const nodes: readonly PathNode[] = [
       },
     ],
     resources: [
-      // REVIEW
       {
         title: 'OpenTelemetry documentation',
         url: 'https://opentelemetry.io/docs/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'OpenTelemetry GenAI semantic conventions',
-        url: 'https://opentelemetry.io/docs/specs/semconv/gen-ai/',
+        url: 'https://github.com/open-telemetry/semantic-conventions-genai',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'Langfuse documentation',
         url: 'https://langfuse.com/docs',
@@ -997,7 +964,6 @@ export const nodes: readonly PathNode[] = [
       { label: 'NHI', href: '/resources/glossary#t-nhi' },
     ],
     resources: [
-      // REVIEW
       {
         title: 'SPIFFE documentation',
         url: 'https://spiffe.io/docs/',
@@ -1036,7 +1002,6 @@ export const nodes: readonly PathNode[] = [
       },
     ],
     resources: [
-      // REVIEW
       {
         title: 'EU AI Act Article 14 (human oversight)',
         url: 'https://artificialintelligenceact.eu/article/14/',
@@ -1065,7 +1030,6 @@ export const nodes: readonly PathNode[] = [
       { label: 'MCP', href: '/resources/glossary#t-mcp' },
     ],
     resources: [
-      // REVIEW
       {
         title: 'Model Context Protocol specification',
         url: 'https://modelcontextprotocol.io/specification',
@@ -1100,7 +1064,6 @@ export const nodes: readonly PathNode[] = [
       { label: 'Serious incident', href: '/resources/glossary#t-serious-incident' },
     ],
     resources: [
-      // REVIEW
       {
         title: 'EU AI Act Article 73 (serious-incident reporting)',
         url: 'https://artificialintelligenceact.eu/article/73/',
@@ -1138,7 +1101,6 @@ export const nodes: readonly PathNode[] = [
       { label: 'OSCAL', href: '/resources/glossary#t-oscal' },
     ],
     resources: [
-      // REVIEW
       {
         title: 'OSCAL (NIST)',
         url: 'https://pages.nist.gov/OSCAL/',
@@ -1173,14 +1135,12 @@ export const nodes: readonly PathNode[] = [
       },
     ],
     resources: [
-      // REVIEW
       {
         title: 'Sigstore documentation',
         url: 'https://docs.sigstore.dev/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'in-toto',
         url: 'https://in-toto.io/',
@@ -1209,21 +1169,18 @@ export const nodes: readonly PathNode[] = [
       { label: 'Frameworks', href: '/resources/frameworks' },
     ],
     resources: [
-      // REVIEW
       {
         title: 'ISO/IEC 42001',
         url: 'https://www.iso.org/standard/81230.html',
         type: 'official',
         cost: 'paid',
       },
-      // REVIEW
       {
         title: 'NIST AI RMF Playbook',
         url: 'https://airc.nist.gov/airmf-resources/playbook/',
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'CSA AI Controls Matrix (AICM)',
         url: 'https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1',
@@ -1289,7 +1246,6 @@ export const nodes: readonly PathNode[] = [
         type: 'official',
         cost: 'free',
       },
-      // REVIEW
       {
         title: 'EU AI Act Article 55 (GPAI systemic risk)',
         url: 'https://artificialintelligenceact.eu/article/55/',
