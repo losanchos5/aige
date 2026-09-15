@@ -53,7 +53,7 @@ export const chapters: readonly Chapter[] = [
     title: '03. Values and principles',
     shortTitle: 'Values & Principles',
     summary:
-      'The eight values and six principles of the manifesto, each expanded with what it means in practice and the anti-pattern it rejects.',
+      'The eight values and six principles of the Thesis, each expanded with what it means in practice and the anti-pattern it rejects.',
   },
   {
     id: '04-the-stack',

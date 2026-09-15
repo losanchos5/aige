@@ -15,10 +15,10 @@ export const site: SiteConfig = {
   name: 'AI Governance Engineer',
   url: 'https://aigovernanceengineer.com',
   description:
-    'The Manifesto and Body of Knowledge for AI governance engineering — turning AI governance obligations into policy-as-code, eval gates and machine-readable evidence.',
+    'The Thesis and Body of Knowledge for AI governance engineering — turning AI governance obligations into policy-as-code, eval gates and machine-readable evidence.',
   linkedin: 'https://www.linkedin.com/in/jorgara',
   github: 'https://github.com/losanchos5/aige',
   author: 'Jorge García',
   license: 'CC BY 4.0',
-  bokVersion: '0.2',
+  bokVersion: '0.3',
 };

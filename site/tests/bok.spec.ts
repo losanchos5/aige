@@ -42,8 +42,8 @@ test.describe('the-stack pipeline output', () => {
   });
 });
 
-test('the manifesto renders', async ({ page }) => {
-  const response = await page.goto('/manifesto');
+test('the thesis renders', async ({ page }) => {
+  const response = await page.goto('/thesis');
   expect(response?.status()).toBe(200);
   await expect(page.locator('h1').first()).toBeVisible();
   await expect(page.getByText('Sign it')).toBeVisible();

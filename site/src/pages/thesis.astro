@@ -5,32 +5,32 @@ import Diagram from '../components/Diagram.astro';
 import { site } from '../data/site';
 import { gitDate } from '../lib/reading';
 
-const entry = await getEntry('manifesto', 'manifesto');
+const entry = await getEntry('thesis', 'thesis');
 if (!entry) {
-  throw new Error('manifesto collection entry not found');
+  throw new Error('thesis collection entry not found');
 }
 const { Content, headings, remarkPluginFrontmatter } = await render(entry);
 
-const title = (remarkPluginFrontmatter.title as string | undefined) ?? 'The AI Governance Engineering Manifesto';
+const title = (remarkPluginFrontmatter.title as string | undefined) ?? 'The AI Governance Engineering Thesis';
 const summary =
   (remarkPluginFrontmatter.summary as string | undefined) ??
   'Governance as a system to be built, run and measured — not a document to be signed.';
-const editPath = 'MANIFESTO.md';
-const updated = gitDate('../MANIFESTO.md');
+const editPath = 'THESIS.md';
+const updated = gitDate('../THESIS.md');
 const signUrl = `${site.github}/blob/main/bok/CONTRIBUTORS.md`;
 ---
 
 <Doc
   title={title}
   summary={summary}
-  kicker="The Manifesto"
+  kicker="The Thesis"
   headings={headings}
   editPath={editPath}
   updated={updated}
   sidebar={false}
   wide={true}
-  activeManifesto={true}
-  image="/og/manifesto.png"
+  activeThesis={true}
+  image="/og/thesis.png"
 >
   <aside class="sign-note">
     <p>

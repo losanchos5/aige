@@ -19,7 +19,7 @@ signed and queryable, so you close with continuous assurance (layer 05).
 **Evidence flows up.** A policy verdict from layer 01, a registry entry from layer 02, an eval result
 from layer 03 and a guardrail decision from layer 04 are not four disconnected records. Each is a
 structured artefact with a timestamp and an owner, and layer 05 is where they are aggregated into
-audit-ready evidence. The test of the whole stack is the test from the manifesto: as Ayoub Fandi puts
+audit-ready evidence. The test of the whole stack is the test from the Thesis: as Ayoub Fandi puts
 it, a green dashboard over a broken control is "theatre with extra steps" [1]. The stack is the
 plumbing that makes the dashboard mean something — every green cell traces to a running control and the
 evidence it emitted.

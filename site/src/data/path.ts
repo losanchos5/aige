@@ -147,7 +147,7 @@ export const nodes: readonly PathNode[] = [
       'AI governance engineering applies engineering practice — systems thinking, product thinking and code — to the governance of AI. Start here, and learn what separates it from AI safety, MLOps and compliance.',
     links: [
       { label: 'The definition', href: '/bok/definition#the-definition' },
-      { label: 'The manifesto', href: '/manifesto' },
+      { label: 'The Thesis', href: '/thesis' },
     ],
     resources: [
       {
@@ -225,7 +225,7 @@ export const nodes: readonly PathNode[] = [
     stage: 'foundations',
     kind: 'core',
     summary:
-      'The eight values and six principles the manifesto commits to, each paired with the anti-pattern it rejects. This is the value grammar the rest of the path builds on.',
+      'The eight values and six principles the thesis commits to, each paired with the anti-pattern it rejects. This is the value grammar the rest of the path builds on.',
     links: [
       {
         label: 'The eight values',
@@ -958,8 +958,8 @@ export const nodes: readonly PathNode[] = [
         href: '/bok/patterns#pattern-agent-identity--scoped-credentials',
       },
       {
-        label: 'Agent identity and scope over shared credentials',
-        href: '/bok/values-and-principles#4-agent-identity-and-scope-over-shared-credentials',
+        label: 'Every agent carries its own identity and scope',
+        href: '/bok/values-and-principles#4-every-agent-carries-its-own-identity-and-scope',
       },
       { label: 'NHI', href: '/resources/glossary#t-nhi' },
     ],

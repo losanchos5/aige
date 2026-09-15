@@ -93,7 +93,7 @@ const resources = [
         <h1 class="display hero-h1">Governance you can run, not just read.</h1>
         <p class="lede">{definition}</p>
         <div class="hero-cta">
-          <a class="btn btn-primary" href="/manifesto">Read the Manifesto</a>
+          <a class="btn btn-primary" href="/thesis">Read the Thesis</a>
           <a class="btn btn-secondary" href="/bok">Open the Body of Knowledge</a>
         </div>
       </div>
@@ -140,12 +140,12 @@ const resources = [
     <div class="container reveal">
       <div class="sec-head">
         <Kicker swatch="var(--l4)">Values</Kicker>
-        <h2 class="sec-title display">Eight values, each a trade made on purpose.</h2>
+        <h2 class="sec-title display">Eight values, each a commitment made on purpose.</h2>
       </div>
       <div class="values-grid">
-        {values.map((value) => <ValuePair over={value.over} under={value.under} note={value.note} />)}
+        {values.map((value) => <ValuePair value={value} />)}
       </div>
-      <p class="sec-link"><a href="/manifesto#principles">Read the principles →</a></p>
+      <p class="sec-link"><a href="/thesis#principles">Read the principles →</a></p>
     </div>
   </section>
 
@@ -204,7 +204,7 @@ const resources = [
 
   <CtaBand
     title="Open, versioned, contributable."
-    sub="The Manifesto and Body of Knowledge are CC BY 4.0. Read them, use them, send a pull request."
+    sub="The Thesis and Body of Knowledge are CC BY 4.0. Read them, use them, send a pull request."
     primary={{ label: 'Contribute on GitHub', href: site.github }}
     secondary={{ label: 'Follow on LinkedIn', href: site.linkedin }}
   />

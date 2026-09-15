@@ -1,23 +1,23 @@
-# AI Governance Engineering: A Manifesto & Body of Knowledge
+# AI Governance Engineering: The Thesis & Body of Knowledge
 
 **AI governance engineering is the application of engineering practice — systems thinking, product
 thinking and code — to the governance of AI systems.**
 
-This repository is the founding text of that discipline: a short **manifesto** and a growing **body of
+This repository is the founding text of that discipline: a short **Thesis** and a growing **body of
 knowledge**. It is written by and for practitioners who build governance for AI systems — policy-as-
 code, agent registries, eval gates, runtime guardrails, machine-readable evidence — and who measure
 their work by realised risk reduction and audit-ready evidence, not by framework coverage.
 
-It is **version 0.2**: a peer-reviewed revision of the first public draft, still deliberately
+It is **version 0.3**: the Thesis restated as affirmations over a peer-reviewed revision of the first public draft, still deliberately
 incomplete, written by one practitioner and open to many. If you do this work, you are invited to
 co-author and to sign.
 
-**Home:** https://aigovernanceengineer.com — manifesto at `/manifesto`, Body of Knowledge at `/bok`.
+**Home:** https://aigovernanceengineer.com — the Thesis at `/thesis`, Body of Knowledge at `/bok`.
 Source repository: `github.com/losanchos5/aige` (to be created).
 
 ## Start here
 
-- **[MANIFESTO.md](MANIFESTO.md)** — the founding statement: definition, the five problems with legacy
+- **[THESIS.md](THESIS.md)** — the founding statement: definition, the five problems with legacy
   AI governance, eight values, six principles, what AI governance engineers build.
 - **[bok/01-definition.md](bok/01-definition.md)** — what the discipline is, and the eight neighbours
   it is not.
@@ -27,7 +27,7 @@ Source repository: `github.com/losanchos5/aige` (to be created).
 
 ```
 aige/
-├── MANIFESTO.md           The founding statement (one page)
+├── THESIS.md              The founding statement (one page)
 ├── STYLEGUIDE.md          Voice, formatting, templates, citation format, terminology
 ├── OUTLINE.md             Full table of contents with per-chapter briefs
 ├── README.md              This file
@@ -75,12 +75,12 @@ The artefacts an AI governance engineer ships map onto five layers, always named
 
 ## How to sign
 
-Sign the manifesto by opening a pull request that adds your name (and optionally a LinkedIn or GitHub
+Sign the Thesis by opening a pull request that adds your name (and optionally a LinkedIn or GitHub
 link) to the **SIGNATORIES** section of **[bok/CONTRIBUTORS.md](bok/CONTRIBUTORS.md)**.
 
 ## Licence
 
 This work is licensed under **[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)**. It may be
 freely copied and shared, but only in its entirety and including this notice, so that it continues to
-identify *AI Governance Engineering: A Manifesto & Body of Knowledge* as the source. Attribution:
+identify *AI Governance Engineering: The Thesis & Body of Knowledge* as the source. Attribution:
 Jorge García Aibar and contributors.

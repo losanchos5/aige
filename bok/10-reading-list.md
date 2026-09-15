@@ -15,8 +15,8 @@ edition. Tools are named as category examples, illustrative and not endorsements
 - **"What is GRC Engineering" (Ayoub Fandi)** — the clearest definition of the parent method and the
   source of the "green dashboard over a broken control is theatre" test. `https://grcengineer.com/what-is-grc-engineering/`
   (verified: primary)
-- **The Agile Manifesto** — the "X over Y" value grammar and the signatory model this book borrows.
-  `https://agilemanifesto.org/` (verified: primary)
+- **The Agile Manifesto** — the numbered values-and-principles form and the signatory model this book
+  borrows. `https://agilemanifesto.org/` (verified: primary)
 - **The Twelve-Factor App** — the template for a numbered, practitioner-facing body of practice with a
   "who should read this" framing. `https://12factor.net/` (verified: primary)
 - **CSIRO Responsible AI Pattern Catalogue** — the pattern template (chapter 05) and proof that

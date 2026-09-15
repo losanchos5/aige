@@ -6,7 +6,7 @@
 
 Disciplines do not appear on a schedule. They appear when an old way of working visibly stops holding
 and enough people, in enough places, start building the replacement at once. That is happening to AI
-governance now. The manifesto states five fundamental problems with legacy AI governance; this chapter
+governance now. The Thesis states five fundamental problems with legacy AI governance; this chapter
 takes each in turn, attaches the evidence, and then lays out the market, regulatory and technical
 signals that together explain the timing. The claim is narrow and falsifiable: not that governance
 suddenly matters, but that the *engineering* of governance has become the constraint, and that the

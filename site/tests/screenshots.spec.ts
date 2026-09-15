@@ -1,10 +1,10 @@
 import { test } from '@playwright/test';
 
-// Reading-comfort review shots for Block B: /bok/the-stack and /manifesto at
+// Reading-comfort review shots for Block B: /bok/the-stack and /thesis at
 // three widths in both colour schemes, written to tests/__screenshots__/B/.
 const pages = [
   { name: 'the-stack', path: '/bok/the-stack' },
-  { name: 'manifesto', path: '/manifesto' },
+  { name: 'thesis', path: '/thesis' },
   { name: 'path', path: '/path' },
 ];
 const widths = [390, 834, 1440];

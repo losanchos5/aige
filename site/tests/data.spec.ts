@@ -11,6 +11,7 @@ import { layers, minimumViableStack, toolsByCategory } from '../src/data/stack';
 import { workflows, market } from '../src/data/role';
 import { levels } from '../src/data/maturity';
 import { frameworks, obligations, disclaimer } from '../src/data/frameworks';
+import { values } from '../src/data/values';
 import { getGlossary, termId } from '../src/lib/glossary';
 import { getReadingList } from '../src/lib/reading-list';
 import { getChapterBySlug } from '../src/data/chapters';
@@ -161,6 +162,22 @@ test('no forbidden claim appears in any data module', () => {
   }
 });
 
+test('the eight values are numbered 1..8 and match the H3s of chapter 03', () => {
+  const slugs = headingSlugs('bok/03-values-principles.md');
+  expect(values).toHaveLength(8);
+  expect(values.map((value) => value.n)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+  for (const value of values) {
+    expect(value.n, `${value.title} n`).toBeGreaterThanOrEqual(1);
+    expect(value.n, `${value.title} n`).toBeLessThanOrEqual(8);
+    // Each affirmation is a numbered H3 in the chapter: "### <n>. <title>".
+    expect(
+      slugs.has(slugify(`${value.n}. ${value.title}`)),
+      `value ${value.n} "${value.title}" resolves to an H3`,
+    ).toBe(true);
+    expect(value.summary.trim().length, `${value.title} summary`).toBeGreaterThan(0);
+  }
+});
+
 // ── The learning path data (src/data/path.ts) ──────────────────────────────
 test.describe('path data', () => {
   const KINDS = new Set<PathKind>(['core', 'alternative', 'optional']);
@@ -176,7 +193,7 @@ test.describe('path data', () => {
   const CAPSTONES = new Set(['maturity-self-assessment', 'minimum-viable-stack']);
   // A fragment-less internal href must point at one of these known routes.
   const KNOWN_ROUTES = new Set([
-    '/manifesto',
+    '/thesis',
     '/role',
     '/stack',
     '/resources/frameworks',

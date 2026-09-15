@@ -9,8 +9,8 @@ const bok = defineCollection({
   schema,
 });
 
-const manifesto = defineCollection({
-  loader: glob({ pattern: 'MANIFESTO.md', base: '..' }),
+const thesis = defineCollection({
+  loader: glob({ pattern: 'THESIS.md', base: '..' }),
   schema,
 });
 
@@ -19,4 +19,4 @@ const meta = defineCollection({
   schema,
 });
 
-export const collections = { bok, manifesto, meta };
+export const collections = { bok, thesis, meta };

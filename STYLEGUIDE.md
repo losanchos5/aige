@@ -1,4 +1,4 @@
-# Style guide — AI Governance Engineering: Manifesto & Body of Knowledge
+# Style guide — AI Governance Engineering: The Thesis & Body of Knowledge
 
 This guide governs every file in this repository. It exists so that chapters written by different
 people, at different times, read as one book. Read it before you write. If a rule here conflicts with
@@ -222,5 +222,5 @@ with any of these.
 ## 11. Licence and copy notice (put at the foot of every standalone document)
 
 > This work is licensed under **CC BY 4.0**. It may be freely copied and shared, but only in its
-> entirety and including this notice, so that it continues to identify AI Governance Engineering: A
-> Manifesto & Body of Knowledge as the source. Attribution: Jorge García Aibar and contributors.
+> entirety and including this notice, so that it continues to identify AI Governance Engineering: The
+> Thesis & Body of Knowledge as the source. Attribution: Jorge García Aibar and contributors.

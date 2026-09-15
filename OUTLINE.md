@@ -1,4 +1,4 @@
-# Outline — AI Governance Engineering: A Manifesto & Body of Knowledge
+# Outline — AI Governance Engineering: The Thesis & Body of Knowledge
 
 Version 0.1 · 2026-09-10. This is the full table of contents. Each chapter has a short brief so that
 parallel writers stay consistent. Follow `STYLEGUIDE.md` for voice, templates and citations. Chapters
@@ -6,7 +6,7 @@ marked **[drafted in v0.1]** exist; the rest are open for co-authors.
 
 The book has two front-matter pieces outside the numbered chapters:
 
-- **`MANIFESTO.md`** — the founding statement (definition, five problems, eight values, six
+- **`THESIS.md`** — the founding statement (definition, five problems, eight values, six
   principles, what we build, authors, licence). The single quotable page. **[drafted in v0.1]**
 - **`STYLEGUIDE.md`** — voice, formatting, chapter and pattern templates, citation format,
   terminology, words to avoid. **[drafted in v0.1]**
@@ -38,7 +38,7 @@ figure — reported). Keep every figure sourced; respect the BRIEF blocklist. 3�
 target ~1,500 words. **Reuse `posts/01`, `posts/02`, `posts/03`, `posts/05` sources.md.**
 
 ### 03 — Values and principles **[drafted in v0.1]**
-The eight values and six principles from the manifesto, each expanded with 2–3 paragraphs, an "In
+The eight values and six principles from the Thesis, each expanded with 2–3 paragraphs, an "In
 practice" example and an anti-pattern. The values are trade-offs; the principles are commitments.
 ~2,500 words.
 
@@ -97,7 +97,7 @@ annotated line per item, grouped by theme, each with a verified URL.
 ## Consistency rules for parallel writers
 
 - The **five layers** are named exactly as in §8 of the style guide, always in the same order.
-- The **eight values and six principles** are quoted verbatim from the manifesto; do not reword them.
+- The **eight values and six principles** are quoted verbatim from the Thesis; do not reword them.
 - The **three questions** (what AI is running · what is it allowed to do · what evidence proves it)
   recur; keep the wording identical.
 - Every factual claim is cited `[n]` and added to `sources/SOURCES.md` under the chapter's section.

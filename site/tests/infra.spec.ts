@@ -18,7 +18,7 @@ function pngWidth(buf: Buffer): number {
 test.describe('OG images', () => {
   test.beforeAll(() => mkdirSync(SHOT_DIR, { recursive: true }));
 
-  for (const slug of ['default', 'bok-the-stack', 'path']) {
+  for (const slug of ['default', 'thesis', 'bok-the-stack', 'path']) {
     test(`/og/${slug}.png is a 1200px-wide PNG`, async ({ request }) => {
       const res = await request.get(`/og/${slug}.png`);
       expect(res.status()).toBe(200);
@@ -48,11 +48,11 @@ test('/rss.xml is well-formed XML with at least one item', async ({ request, pag
 });
 
 test.describe('site-wide search', () => {
-  // Home is a Marketing page and Manifesto is a Doc page: both must open the
+  // Home is a Marketing page and the Thesis is a Doc page: both must open the
   // dialog from the header button, proving the dialog now lives in Base. The
   // Resources landing page is owned by a parallel block, so it is checked only
   // when it exists in this build.
-  for (const path of ['/', '/manifesto', '/resources']) {
+  for (const path of ['/', '/thesis', '/resources']) {
     test(`the header search button opens the dialog on ${path}`, async ({ page }) => {
       const res = await page.goto(path);
       test.skip(!res || res.status() === 404, `${path} is not built in this run`);

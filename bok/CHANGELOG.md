@@ -1,8 +1,26 @@
 # Changelog
 
-All notable changes to *AI Governance Engineering: A Manifesto & Body of Knowledge* are recorded here.
+All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledge* are recorded here.
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
+
+## [0.3] — 2026-09-15
+
+Editorial pass. The founding document is retitled and its values restated; the substance of the
+discipline is unchanged.
+
+### Changed
+- `THESIS.md` — the founding document is now **The AI Governance Engineering Thesis** ("the Thesis"),
+  and the work is *AI Governance Engineering: The Thesis & Body of Knowledge*. Its file is `THESIS.md`
+  and its canonical route is `/thesis`. Bumped to v0.3.
+- `THESIS.md`, `bok/03-values-principles.md` — the eight values drop the Agile "X over Y" grammar and
+  are stated as affirmations (e.g. "Governance is code, not a document"); their bodies, anti-patterns
+  and citations are unchanged. The GRC engineering precedent is folded into a short list of influences
+  (SRE, DevSecOps, policy-as-code, software supply-chain security) and no longer leads the document.
+- `bok/00-preface.md`, `bok/02-why-now.md`, `bok/04-the-stack.md`, `bok/06-the-role.md`,
+  `bok/10-reading-list.md`, `bok/CONTRIBUTORS.md`, `README.md`, `OUTLINE.md`, `STYLEGUIDE.md`,
+  `sources/SOURCES.md`, `build/build_pdf.py` — refer to the document as "the Thesis" throughout;
+  external work titles (GRC Engineering Manifesto, The Agile Manifesto) are left intact.
 
 ## [0.2] — 2026-09-10
 
@@ -10,14 +28,14 @@ Peer-review revision. Applies the HIGH and MEDIUM findings of **peer review roun
 practitioner review and an adversarial fact-check), plus the cheap LOW findings.
 
 ### Changed
-- `bok/03-values-principles.md`, `MANIFESTO.md` — reworked the six principles into strict commitments
+- `bok/03-values-principles.md`, `THESIS.md` — reworked the six principles into strict commitments
   to action with no lexical overlap with the eight values (principles renamed accordingly); reframed
   value 6 from "Practitioner-built open tooling over closed platforms" to "**Inspectable, composable
   tooling** over black boxes"; noted which values are inherited from GRC engineering.
 - `bok/01-definition.md` — added "the limits of the eval gate" (evals necessary, not sufficient;
   point-in-time, Goodhartable, blind to novelty); strengthened the AI-security-engineering boundary
   (the deliverable is a governed, evidenced system; overlap is a feature).
-- `MANIFESTO.md`, `bok/01-definition.md`, `bok/04-the-stack.md` — conceded that three of the five
+- `THESIS.md`, `bok/01-definition.md`, `bok/04-the-stack.md` — conceded that three of the five
   layers are inherited from GRC engineering and two (evals-as-controls, agent identity/runtime) are
   what AI forces us to add.
 - `bok/04-the-stack.md` — distinguished MCP channel authentication from agent workload identity;
@@ -46,7 +64,7 @@ practitioner review and an adversarial fact-check), plus the cheap LOW findings.
   (the enumerated list is in the downloadable PDF, and the web-search budget was exhausted).
 
 ### Added
-- `MANIFESTO.md` — a second, independent source (IBM/Gartner Magic Quadrant, 2026) hedging the Kosmoy
+- `THESIS.md` — a second, independent source (IBM/Gartner Magic Quadrant, 2026) hedging the Kosmoy
   "no runtime data path" thesis.
 
 ## [0.1] — 2026-09
@@ -54,7 +72,7 @@ practitioner review and an adversarial fact-check), plus the cheap LOW findings.
 First public draft. Founding release.
 
 ### Added
-- `MANIFESTO.md` — the founding statement: definition and "more than X" clarifier; five fundamental
+- `THESIS.md` — the founding statement: definition and "more than X" clarifier; five fundamental
   problems with legacy AI governance; eight values (Agile grammar); six principles; what AI governance
   engineers build; authors and "co-authors wanted"; sign / get involved; CC BY 4.0 licence.
 - `STYLEGUIDE.md` — voice and formatting rules; chapter template; CSIRO pattern template; citation

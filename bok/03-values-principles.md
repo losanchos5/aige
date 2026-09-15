@@ -1,29 +1,31 @@
 # 03. Values and principles
 
-> The eight values and six principles of the manifesto, each expanded with what it means in practice
+> The eight values and six principles of the Thesis, each expanded with what it means in practice
 > and the anti-pattern it rejects.
 
-The manifesto states eight values and six principles in one line each. This chapter expands them. The
+The Thesis states eight values and six principles in one line each. This chapter expands them. The
 two are deliberately different kinds of thing, and the difference is what keeps them from being the
 same list told twice. A **value** is a preference — a trade-off, what we lean toward when we cannot
-have both (`X` over `Y`). A **principle** is a commitment to *act* — a rule of method, phrased as
-something we do, that holds regardless of preference. So the values name the artefacts and outcomes we
-build toward; the principles name how we work, and they carry no vocabulary borrowed from the values.
-Read the values to know which way to lean; read the principles to know what to do on Monday.
+have both; it is stated as an affirmation, and naming what we build *toward* also names what we build
+*away from*. A **principle** is a commitment to *act* — a rule of method, phrased as something we do,
+that holds regardless of preference. So the values name the artefacts and outcomes we build toward;
+the principles name how we work, and they carry no vocabulary borrowed from the values. Read the
+values to know which way to lean; read the principles to know what to do on Monday.
 
-Not all of the values are new to AI. Governance-as-code (1), machine-readable evidence (5) and
-measured risk reduction (7) are inherited from GRC engineering, the parent discipline. Evals that can
-fail the build (2) and agent identity and scope (4) are what AI forces us to add — the model that must
+Not all of the values are new to AI. Governance as code (1), machine-readable evidence (5) and
+measured risk reduction (7) are inherited from GRC engineering, the parent discipline. Evals that fail
+the build (2) and agent identity and scope (4) are what AI forces us to add — the model that must
 be tested and the autonomous actor that must be bounded have no analogue in classic GRC.
 
 ---
 
 ## The eight values
 
-Each value is stated in the Agile grammar "**X** over Y", after the GRC Engineering Manifesto that is
-this book's precedent [1]. We still use Y; we build toward X.
+Each value is stated as an affirmation — what we build toward, which by naming it also names what we
+build away from. The values-and-principles form follows the GRC Engineering Manifesto that is this
+book's precedent [1].
 
-### 1. Governance-as-code over policy documents
+### 1. Governance is code, not a document
 
 A policy in a PDF is a statement of intent that a human must read, remember and apply. A policy as
 code is a control that executes: it evaluates a pull request, a deployment or a runtime call and
@@ -42,7 +44,7 @@ documentation — not the other way around.
 > **Anti-pattern** The "policy library" that is a folder of Word documents nobody can query, whose
 > enforcement is an email and whose compliance is self-attested.
 
-### 2. Evals that can fail the build over reviews that can only recommend
+### 2. Evals fail builds; reviews only recommend
 
 A review produces a recommendation; someone may act on it, later, or not. An eval produces a verdict
 with consequences: the model or agent passed or failed a defined test, and a failure blocks the
@@ -58,7 +60,7 @@ instead of an eval gate is a choice to be able to recommend but not to stop.
 > **Anti-pattern** A "model risk review board" that meets monthly, writes findings rated
 > low/medium/high, and has no mechanism to stop a launch already scheduled.
 
-### 3. Runtime evidence over point-in-time attestations
+### 3. Evidence comes from runtime, not from a point-in-time attestation
 
 An attestation says a control was in place when someone looked. Runtime evidence shows the control
 working continuously, from the system itself. AI systems change between reviews — a model is
@@ -71,7 +73,7 @@ a signature dated last quarter.
 > **Anti-pattern** A SOC-style attestation binder assembled the week before an audit, describing
 > controls as they were imagined to be, not as production actually behaved.
 
-### 4. Agent identity and scope over shared credentials
+### 4. Every agent carries its own identity and scope
 
 An agent acting on a shared service account or a static key is ungovernable: you cannot attribute its
 actions, revoke its access precisely, or bound what it may do. We prefer every non-human actor to have
@@ -84,7 +86,7 @@ act. Identity is the precondition of accountability; scope is the precondition o
 > **Anti-pattern** A fleet of agents sharing one API key and one privileged service account, where an
 > incident means rotating one secret and breaking everything, and attribution is impossible.
 
-### 5. Machine-readable evidence over screenshots
+### 5. Evidence is machine-readable or it is not evidence
 
 Evidence a human must produce, format and file by hand does not scale and cannot be verified at speed.
 Machine-readable evidence — `OSCAL`, structured eval results, signed logs — can be queried, diffed,
@@ -96,7 +98,7 @@ becomes a query and the same evidence feeds continuous assurance rather than a o
 > **Anti-pattern** A shared drive of screenshots and exported spreadsheets, re-collected from scratch
 > for every audit, unverifiable and out of date the moment it is saved.
 
-### 6. Inspectable, composable tooling over black boxes
+### 6. Tooling must be inspectable and composable
 
 The point is not who built the tool or whether it is open source; it is whether you can see inside it.
 You cannot trust a verdict you cannot trace. Inspectable tooling lets you follow a decision to the
@@ -117,7 +119,7 @@ take on faith.
 > **Anti-pattern** A six-figure governance platform whose "compliance score" cannot be traced to a
 > single running control, and whose data path stops at the spreadsheet import.
 
-### 7. Measured risk reduction over framework coverage
+### 7. Success is measured in realised risk reduction, not framework coverage
 
 Mapping every control to NIST AI RMF and ISO 42001 proves you have read the frameworks; it does not
 prove any risk fell. We prefer to measure the thing itself: did the rate of the failure mode drop, did
@@ -130,7 +132,7 @@ reduction is the outcome. A green mapping matrix over a broken control is theatr
 > **Anti-pattern** A 300-row traceability matrix mapping controls to five frameworks, presented as
 > maturity, with no measurement of whether any of the mapped controls actually reduces risk.
 
-### 8. Shared ownership with engineering over gatekeeping
+### 8. Governance is owned with engineering, not enforced from outside
 
 Governance that sits apart and grants or denies passage is a bottleneck engineers route around.
 Governance owned jointly with engineering — built into the paved path, adopted because it is the
@@ -144,7 +146,7 @@ not a meeting one side dreads.
 > **Anti-pattern** A governance team that reviews and sign-offs releases from the outside, measured by
 > how many it stops, while engineering builds a shadow process to avoid it.
 
-**While there is value in the items on the right, we value the items on the left more.**
+**We still use the practices each value builds away from; we build toward the affirmation.**
 
 ---
 

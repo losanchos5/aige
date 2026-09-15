@@ -5,7 +5,7 @@
 
 ## Capability first, title second
 
-The manifesto insists that AI governance engineering is a capability, not a job title — the same claim
+The Thesis insists that AI governance engineering is a capability, not a job title — the same claim
 the parent discipline makes for GRC engineering, a capability anyone close to the build can develop
 [11]. This chapter makes it concrete without contradicting that: a capability still lives in someone's
 week — the tickets they own, the pipelines they maintain, the incidents they are paged for. So we

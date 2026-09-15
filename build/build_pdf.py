@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Assemble the AI Governance Engineering Manifesto & Body of Knowledge into PDFs and a site preview.
+"""Assemble the AI Governance Engineering Thesis & Body of Knowledge into PDFs and a site preview.
 
 Pipeline: Markdown -> one HTML (python-markdown: tables, fenced_code, toc, attr_list) -> PDF via
 Playwright/Chromium page.pdf (A4, print_background, ~18mm margins, page numbers in the footer).
 
 Outputs (written to aige/dist/):
-  - AI-Governance-Engineering-BoK-v0.1.pdf        cover + TOC + manifesto + chapters 00-10 + contributors + changelog
-  - AI-Governance-Engineering-Manifesto-v0.1.pdf  cover + manifesto only
+  - AI-Governance-Engineering-BoK-v0.1.pdf        cover + TOC + thesis + chapters 00-10 + contributors + changelog
+  - AI-Governance-Engineering-Thesis-v0.1.pdf     cover + thesis only
   - site-preview.html                             light theme, sticky left TOC, max-width 780px (website preview)
 
 Run:  python build/build_pdf.py            (from the aige/ directory, or any cwd; paths are resolved from this file)
@@ -25,15 +25,15 @@ DIST = AIGE / "dist"
 BOK = AIGE / "bok"
 
 TITLE = "AI Governance Engineering"
-SUBTITLE_BOK = "Manifesto &amp; Body of Knowledge · v0.2 · September 2026"
-SUBTITLE_MAN = "The Manifesto · v0.2 · September 2026"
+SUBTITLE_BOK = "The Thesis &amp; Body of Knowledge · v0.3 · September 2026"
+SUBTITLE_MAN = "The Thesis · v0.3 · September 2026"
 AUTHOR = "Jorge García Aibar"
 HOME = "aigovernanceengineer.com"
 LICENCE = "CC BY 4.0"
 
 # Order of documents in the full Body-of-Knowledge PDF. (key, path, short TOC label)
 DOCS: list[tuple[str, Path, str]] = [
-    ("manifesto", AIGE / "MANIFESTO.md", "The Manifesto"),
+    ("thesis", AIGE / "THESIS.md", "The Thesis"),
     ("ch00", BOK / "00-preface.md", "00 · Preface"),
     ("ch01", BOK / "01-definition.md", "01 · The definition"),
     ("ch02", BOK / "02-why-now.md", "02 · Why now"),
@@ -210,7 +210,7 @@ def html_doc(body: str, extra_css: str = "") -> str:
     return (
         "<!doctype html>\n<html lang=\"en\"><head>\n<meta charset=\"utf-8\">\n"
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        f"<title>{TITLE} — Manifesto &amp; Body of Knowledge</title>\n"
+        f"<title>{TITLE} — The Thesis &amp; Body of Knowledge</title>\n"
         f"<style>{CSS}\n{extra_css}</style>\n</head>\n<body>\n{body}\n</body></html>\n"
     )
 
@@ -220,7 +220,7 @@ def build_preview(content: str) -> str:
     sidebar = (
         '<nav class="sidebar">'
         f'<div class="brand">{TITLE}</div>'
-        '<div class="brandsub">Manifesto &amp; Body of Knowledge · v0.2</div>'
+        '<div class="brandsub">The Thesis &amp; Body of Knowledge · v0.3</div>'
         f"<ol>{nav_rows}</ol></nav>"
     )
     body = (
@@ -235,7 +235,7 @@ def build_preview(content: str) -> str:
 FOOTER = (
     '<div style="width:100%;font-size:7pt;color:#8a95a3;padding:0 14mm;'
     'font-family:Inter,Segoe UI,sans-serif;display:flex;justify-content:space-between;">'
-    '<span>AI Governance Engineering · v0.2</span>'
+    '<span>AI Governance Engineering · v0.3</span>'
     '<span class="pageNumber"></span></div>'
 )
 HEADER = '<div></div>'
@@ -267,10 +267,10 @@ def main(html_only: bool = False) -> None:
 
     # Full Body of Knowledge: cover + TOC + everything.
     bok_html = html_doc(cover(SUBTITLE_BOK) + build_toc() + content)
-    # Manifesto only: cover + the manifesto section.
-    man_text = (AIGE / "MANIFESTO.md").read_text(encoding="utf-8")
-    man_chunk = decorate(prefix_ids(render_markdown(man_text), "manifesto"))
-    man_section = f'<section class="chapter" id="manifesto">\n{man_chunk}\n</section>'
+    # Thesis only: cover + the thesis section.
+    man_text = (AIGE / "THESIS.md").read_text(encoding="utf-8")
+    man_chunk = decorate(prefix_ids(render_markdown(man_text), "thesis"))
+    man_section = f'<section class="chapter" id="thesis">\n{man_chunk}\n</section>'
     man_html = html_doc(cover(SUBTITLE_MAN) + man_section)
 
     from playwright.sync_api import sync_playwright
@@ -279,12 +279,12 @@ def main(html_only: bool = False) -> None:
         browser = p.chromium.launch()
         page = browser.new_page()
         to_pdf(page, bok_html, DIST / "AI-Governance-Engineering-BoK-v0.1.pdf")
-        to_pdf(page, man_html, DIST / "AI-Governance-Engineering-Manifesto-v0.1.pdf")
+        to_pdf(page, man_html, DIST / "AI-Governance-Engineering-Thesis-v0.1.pdf")
         browser.close()
 
     print("Wrote:")
     for f in ("AI-Governance-Engineering-BoK-v0.1.pdf",
-              "AI-Governance-Engineering-Manifesto-v0.1.pdf"):
+              "AI-Governance-Engineering-Thesis-v0.1.pdf"):
         print("  ", DIST / f)
 
 

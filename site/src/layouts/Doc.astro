@@ -1,5 +1,5 @@
 ---
-// Doc: the reading layout for the Manifesto, the Body of Knowledge and the meta
+// Doc: the reading layout for the Thesis, the Body of Knowledge and the meta
 // pages. Wraps Base and lays out a chapter rail, the prose well and an
 // on-this-page TOC — three columns ≥1100px, two ≥840px, one below with the
 // rail as an off-canvas drawer. All behaviour lives in /ui-doc.js (CSP-safe).
@@ -35,7 +35,7 @@ interface Props {
   sidebar?: boolean;
   wide?: boolean;
   activeSlug?: string;
-  activeManifesto?: boolean;
+  activeThesis?: boolean;
   cite?: boolean;
   image?: string;
 }
@@ -53,7 +53,7 @@ const {
   sidebar = true,
   wide = false,
   activeSlug,
-  activeManifesto = false,
+  activeThesis = false,
   cite = false,
   image,
 } = Astro.props;
@@ -106,7 +106,7 @@ if (statsChapter) {
       {
         withSidebar && (
           <aside id="doc-sidebar" class="doc-sidebar" data-pagefind-ignore>
-            <SidebarNav activeSlug={activeSlug} activeManifesto={activeManifesto} />
+            <SidebarNav activeSlug={activeSlug} activeThesis={activeThesis} />
           </aside>
         )
       }
@@ -154,7 +154,7 @@ if (statsChapter) {
   {/* Diagram behaviour, loaded once per page. A <Diagram> component (Base /
       Marketing pages) may have already emitted this via the same locals flag;
       here it covers chapter figures injected by rehype-diagrams and the
-      manifesto. The file is tiny and no-ops when the page has no figures. */}
+      thesis. The file is tiny and no-ops when the page has no figures. */}
   {
     !Astro.locals.diagramScript &&
       (Astro.locals.diagramScript = true) && (

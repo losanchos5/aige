@@ -12,7 +12,7 @@ Home: https://aigovernanceengineer.com · source repository `github.com/<org>/ai
 
 ## How to become a co-author
 
-Co-authors write or substantially revise a chapter, a pattern, or the manifesto, and are credited by
+Co-authors write or substantially revise a chapter, a pattern, or the Thesis, and are credited by
 name. To co-author:
 
 1. Read `STYLEGUIDE.md`. Chapters 00–10 are drafted in v0.1; co-authors extend and sharpen them, add
@@ -36,7 +36,7 @@ _None yet. This section lists people who have made substantive corrections or ad
 
 ## Signatories
 
-Signing the manifesto means you endorse *The AI Governance Engineering Manifesto* — its definition,
+Signing the Thesis means you endorse *The AI Governance Engineering Thesis* — its definition,
 values and principles. Signatories are practitioners and organisations who support the discipline;
 signing does not require writing a chapter.
 
@@ -56,5 +56,5 @@ own name and that the entry contains nothing confidential.
 ## Licence
 
 This work is licensed under **CC BY 4.0**. It may be freely copied and shared, but only in its
-entirety and including this notice, so that it continues to identify *AI Governance Engineering: A
-Manifesto & Body of Knowledge* as the source. Attribution: Jorge García Aibar and contributors.
+entirety and including this notice, so that it continues to identify *AI Governance Engineering: The
+Thesis & Body of Knowledge* as the source. Attribution: Jorge García Aibar and contributors.

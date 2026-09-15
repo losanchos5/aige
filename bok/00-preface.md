@@ -53,11 +53,11 @@ finished. Version 0.1 is a first public draft with deliberate gaps for co-author
 
 ## How to cite
 
-> García Aibar, J. and contributors. *AI Governance Engineering: A Manifesto & Body of Knowledge*,
+> García Aibar, J. and contributors. *AI Governance Engineering: The Thesis & Body of Knowledge*,
 > v0.1. 2026. https://aigovernanceengineer.com. Licensed CC BY 4.0.
 
 Cite a specific chapter by its number and title (for example, "chapter 01, The definition"). The
-canonical home of the manifesto is https://aigovernanceengineer.com/manifesto and of the Body of
+canonical home of the Thesis is https://aigovernanceengineer.com/thesis and of the Body of
 Knowledge https://aigovernanceengineer.com/bok. Each chapter carries its own numbered source list;
 the consolidated table lives in `sources/SOURCES.md`.
 
@@ -77,7 +77,7 @@ This book is meant to be co-authored. To contribute:
 1. Read `STYLEGUIDE.md` and follow the chapter or pattern template exactly.
 2. Source every factual claim. Use the `[n]` citation format, tag each source `primary`, `secondary`
    or `reported`, and add the row to `sources/SOURCES.md` under your chapter's section.
-3. Open a pull request. To sign the manifesto, add your name to `bok/CONTRIBUTORS.md`.
+3. Open a pull request. To sign the Thesis, add your name to `bok/CONTRIBUTORS.md`.
 
 The rules exist so that many hands produce one coherent book. Everything else — the arguments, the
 patterns, the mappings — is open for you to improve.

@@ -5,7 +5,7 @@ test('header shows the primary nav', async ({ page }) => {
   const header = page.locator('header.site-header');
   await expect(header).toBeVisible();
   await expect(header.getByRole('link', { name: 'Body of Knowledge' })).toBeVisible();
-  await expect(header.getByRole('link', { name: 'Manifesto' })).toBeVisible();
+  await expect(header.getByRole('link', { name: 'The Thesis' })).toBeVisible();
 });
 
 test('theme toggle flips data-theme and back', async ({ page }) => {

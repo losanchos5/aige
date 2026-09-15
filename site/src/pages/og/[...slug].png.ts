@@ -8,7 +8,7 @@ import { chaptersOrdered } from '../../data/chapters';
 // Top-level routes -> card title.
 const ROUTES: Record<string, string> = {
   default: 'AI Governance Engineering',
-  manifesto: 'The Manifesto',
+  thesis: 'The Thesis',
   bok: 'Body of Knowledge',
   role: 'The AI Governance Engineer',
   stack: 'The five-layer stack',

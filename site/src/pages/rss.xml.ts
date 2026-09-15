@@ -60,7 +60,7 @@ export const GET: APIRoute = (context) => {
   return rss({
     title: `${site.name} — Changelog`,
     description:
-      'Releases of the AI Governance Engineering Manifesto & Body of Knowledge, newest first.',
+      'Releases of the AI Governance Engineering Thesis & Body of Knowledge, newest first.',
     site: context.site ?? site.url,
     // The site uses trailingSlash: 'never'; without this, rss appends a slash
     // after each link's #anchor (…#02--2026-09-10/) and the anchor stops

@@ -17,7 +17,7 @@ const VIEWPORTS = [
 ];
 
 const CHAPTER_PAGES = ['/bok/why-now', '/bok/the-stack'];
-const OTHER_PAGES = ['/manifesto', '/about', '/resources/glossary'];
+const OTHER_PAGES = ['/thesis', '/about', '/resources/glossary'];
 
 async function measure(page: import('@playwright/test').Page) {
   return page.evaluate(() => {

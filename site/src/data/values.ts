@@ -1,14 +1,17 @@
-// values.ts: the manifesto's definition, five problems, eight values, six
+// values.ts: the Thesis's definition, five problems, eight values, six
 // principles and the "what AI governance engineers build" list, faithful to
-// MANIFESTO.md. The eight "X over Y" pairs use the manifesto's exact wording;
-// notes flag which values are inherited from GRC engineering and which are new.
+// THESIS.md. Each value is stated as an affirmation using the Thesis's exact
+// wording; notes flag which values are inherited from GRC engineering and which
+// are new to AI.
 
 export interface Value {
-  /** The item we value more (the left-hand side). */
-  over: string;
-  /** The item we still use but build away from (the right-hand side). */
-  under: string;
-  /** Whether the value is inherited from GRC engineering or new to AI. */
+  /** 1-8. */
+  n: number;
+  /** The value, stated as an affirmation (exact wording of THESIS.md). */
+  title: string;
+  /** One sentence: what we build away from and why. */
+  summary: string;
+  /** Inherited from GRC engineering / new to AI (unchanged notes). */
   note?: string;
 }
 
@@ -17,7 +20,7 @@ export interface Principle {
   n: number;
   /** The principle, stated as a rule of action. */
   title: string;
-  /** One-to-two-sentence gloss, faithful to the manifesto. */
+  /** One-to-two-sentence gloss, faithful to the Thesis. */
   summary: string;
 }
 
@@ -26,14 +29,14 @@ export interface Problem {
   n: number;
   /** The failure of legacy AI governance. */
   title: string;
-  /** One-to-two-sentence summary, faithful to the manifesto. */
+  /** One-to-two-sentence summary, faithful to the Thesis. */
   summary: string;
 }
 
 const INHERITED = 'Inherited from GRC engineering.';
 const NEW = 'New: what AI forces us to add.';
 
-/** The manifesto's one-sentence definition of the discipline. */
+/** The Thesis's one-sentence definition of the discipline. */
 export const definition =
   'AI governance engineering is the application of engineering practice — systems thinking, product thinking and code — to the governance of AI systems.';
 
@@ -71,20 +74,61 @@ export const problems: readonly Problem[] = [
   },
 ] as const;
 
-/** The eight values: the items on the left, valued over the items on the right. */
+/** The eight values, each stated as an affirmation (see THESIS.md / chapter 03). */
 export const values: readonly Value[] = [
-  { over: 'Governance-as-code', under: 'policy documents', note: INHERITED },
   {
-    over: 'Evals that can fail the build',
-    under: 'reviews that can only recommend',
+    n: 1,
+    title: 'Governance is code, not a document',
+    summary:
+      'Policy documents describe a control; code runs it, versioned and enforced without anyone remembering to, and only what runs can be measured.',
+    note: INHERITED,
+  },
+  {
+    n: 2,
+    title: 'Evals fail builds; reviews only recommend',
+    summary:
+      'A review can only recommend; an eval returns a verdict with consequences, and a failure blocks the release the system did not pass.',
     note: NEW,
   },
-  { over: 'Runtime evidence', under: 'point-in-time attestations' },
-  { over: 'Agent identity and scope', under: 'shared credentials', note: NEW },
-  { over: 'Machine-readable evidence', under: 'screenshots', note: INHERITED },
-  { over: 'Inspectable, composable tooling', under: 'black boxes' },
-  { over: 'Measured risk reduction', under: 'framework coverage', note: INHERITED },
-  { over: 'Shared ownership with engineering', under: 'gatekeeping' },
+  {
+    n: 3,
+    title: 'Evidence comes from runtime, not from a point-in-time attestation',
+    summary:
+      'A point-in-time attestation says a control was in place when someone looked; runtime evidence shows it working continuously, emitted by the system as it runs.',
+  },
+  {
+    n: 4,
+    title: 'Every agent carries its own identity and scope',
+    summary:
+      'Shared credentials make an actor ungovernable; a distinct identity and a declared scope are what make its actions attributable and its access revocable.',
+    note: NEW,
+  },
+  {
+    n: 5,
+    title: 'Evidence is machine-readable or it is not evidence',
+    summary:
+      'Screenshots and exported spreadsheets cannot be queried or verified at speed; only machine-readable artefacts turn the audit into a query.',
+    note: INHERITED,
+  },
+  {
+    n: 6,
+    title: 'Tooling must be inspectable and composable',
+    summary:
+      'A black box asks you to trust a verdict you cannot trace; inspectable, composable tooling lets you follow the decision and wire it into your own pipeline.',
+  },
+  {
+    n: 7,
+    title: 'Success is measured in realised risk reduction, not framework coverage',
+    summary:
+      'Framework coverage proves you have read the framework, not that any risk fell; success is the failure mode dropping, the blast radius shrinking, the incident caught earlier.',
+    note: INHERITED,
+  },
+  {
+    n: 8,
+    title: 'Governance is owned with engineering, not enforced from outside',
+    summary:
+      'Gatekeeping from outside is a bottleneck engineers route around; governance owned jointly with engineering becomes the paved path, part of how things are made.',
+  },
 ] as const;
 
 /** The six principles: rules of action, not restatements of the values. */

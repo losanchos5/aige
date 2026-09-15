@@ -14,7 +14,7 @@ module.exports = {
       numberOfRuns: 1,
       url: [
         'http://localhost:4321/',
-        'http://localhost:4321/manifesto',
+        'http://localhost:4321/thesis',
         'http://localhost:4321/bok/the-stack',
         'http://localhost:4321/role',
         'http://localhost:4321/stack',

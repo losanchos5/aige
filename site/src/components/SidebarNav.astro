@@ -1,15 +1,15 @@
 ---
-// SidebarNav: the chapter rail. Manifesto on top, then the eleven BoK chapters
+// SidebarNav: the chapter rail. The Thesis on top, then the eleven BoK chapters
 // with mono 00–10 indices. The active row carries aria-current and shows its
 // layer swatch as a tick.
 import { chaptersOrdered } from '../data/chapters';
 
 interface Props {
   activeSlug?: string;
-  activeManifesto?: boolean;
+  activeThesis?: boolean;
 }
 
-const { activeSlug, activeManifesto = false } = Astro.props;
+const { activeSlug, activeThesis = false } = Astro.props;
 const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
 ---
 
@@ -22,12 +22,12 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
   </div>
 
   <a
-    href="/manifesto"
-    class="nav-item nav-manifesto"
-    aria-current={activeManifesto ? 'page' : undefined}
+    href="/thesis"
+    class="nav-item nav-thesis"
+    aria-current={activeThesis ? 'page' : undefined}
   >
     <span class="nav-num">§</span>
-    <span class="nav-title">Manifesto</span>
+    <span class="nav-title">The Thesis</span>
   </a>
 
   <p class="nav-label">Body of Knowledge</p>
@@ -176,7 +176,7 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
     line-height: 1.3;
   }
 
-  .nav-manifesto {
+  .nav-thesis {
     font-family: var(--font-display);
     font-weight: 600;
     color: var(--ink);
@@ -194,7 +194,7 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
   .nav-item.l3[aria-current='page'] { border-left-color: var(--l3-ink); }
   .nav-item.l4[aria-current='page'] { border-left-color: var(--l4-ink); }
   .nav-item.l5[aria-current='page'] { border-left-color: var(--l5-ink); }
-  .nav-manifesto[aria-current='page'] { border-left-color: var(--ink); }
+  .nav-thesis[aria-current='page'] { border-left-color: var(--ink); }
 
   .nav-item[aria-current='page'] .nav-num { color: var(--ink); }
 </style>

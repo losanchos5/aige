@@ -40,7 +40,7 @@ const PLACEMENTS: ReadonlyArray<{ id: string; route: string }> = [
   { id: 'obligation-to-evidence', route: '/bok/regulatory-map' },
   { id: 'obligation-to-evidence', route: '/resources/frameworks' },
   { id: 'aige-in-the-org', route: '/bok/definition' },
-  { id: 'aige-in-the-org', route: '/manifesto' },
+  { id: 'aige-in-the-org', route: '/thesis' },
   { id: 'reference-toolchain', route: '/resources/tools' },
 ];
 

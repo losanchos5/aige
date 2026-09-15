@@ -5,7 +5,7 @@ test.describe('home page', () => {
     await page.goto('/');
     await expect(page.locator('h1')).toHaveText('Governance you can run, not just read.');
     await expect(
-      page.getByRole('link', { name: 'Read the Manifesto', exact: true }),
+      page.getByRole('link', { name: 'Read the Thesis', exact: true }),
     ).toBeVisible();
     await expect(
       page.getByRole('link', { name: 'Open the Body of Knowledge', exact: true }),
