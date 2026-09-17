@@ -181,7 +181,7 @@ of the discipline concentrates in those two layers.
 AI governance engineering is not AI safety research, MLOps, model risk management, AI compliance or
 legal work, or Responsible AI ethics; it is the engineering that turns all of those into running
 controls and readable evidence. It is the AI-era sibling of AI security engineering, the direct
-descendant of GRC engineering, and the opposite of what some vendors call "AI governance
+descendant of GRC engineering, and the opposite of what some vendors call "governed AI
 engineering" — governing the AI that engineers use inside their workflows [9]. Chapter 01 draws every
 one of these lines in full.
 
@@ -189,6 +189,8 @@ one of these lines in full.
 
 **Jorge García Aibar (v0.1–v0.3)** — AI Governance & Privacy Engineer. LinkedIn:
 https://www.linkedin.com/in/jorgara
+**Aurélie Pols (v0.1–v0.3)** — Responsible AI (EU/Global), Privacy & Data Governance. LinkedIn:
+https://www.linkedin.com/in/aureliepols
 
 **Co-authors wanted.** This is version 0.3: a public draft, deliberately incomplete. It was
 written by one practitioner and it needs many. If you build governance for AI systems — policy-as-
