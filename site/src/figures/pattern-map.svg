@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 624" class="figc" role="group" aria-labelledby="fig-pattern-map-t fig-pattern-map-d">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 684" class="figc" role="group" aria-labelledby="fig-pattern-map-t fig-pattern-map-d">
   <title id="fig-pattern-map-t">The pattern map</title>
   <desc id="fig-pattern-map-d">Five bands, one per stack layer in canonical order, each holding the patterns whose home layer it is, as links.</desc>
   <text class="mono muted" x="16" y="20" font-size="13.5">THE PATTERN CATALOGUE, BY LAYER</text>
@@ -47,32 +47,40 @@
     <rect class="l3-bg" x="16" y="324" width="128" height="24" rx="6"/>
     <text class="l3-tx" x="26" y="341" font-size="13.5">Eval Gate in CI</text>
   </a>
-  <rect class="l4-band" x="8" y="360" width="344" height="26" rx="6" stroke-width="1"/>
-  <text class="l4-tx disp" x="16" y="378" font-size="13.5">Layer 04 Runtime Controls &amp; Observability</text>
+  <a href="#pattern-adversarial-red-team-suite">
+    <rect class="l3-bg" x="16" y="354" width="207" height="24" rx="6"/>
+    <text class="l3-tx" x="26" y="371" font-size="13.5">Adversarial Red-Team Suite</text>
+  </a>
+  <rect class="l4-band" x="8" y="390" width="344" height="26" rx="6" stroke-width="1"/>
+  <text class="l4-tx disp" x="16" y="408" font-size="13.5">Layer 04 Runtime Controls &amp; Observability</text>
+  <a href="#pattern-runtime-guardrail">
+    <rect class="l4-bg" x="16" y="424" width="142" height="24" rx="6"/>
+    <text class="l4-tx" x="26" y="441" font-size="13.5">Runtime Guardrail</text>
+  </a>
   <a href="#pattern-kill-switch--circuit-breaker">
-    <rect class="l4-bg" x="16" y="394" width="228" height="24" rx="6"/>
-    <text class="l4-tx" x="26" y="411" font-size="13.5">Kill Switch / Circuit Breaker</text>
+    <rect class="l4-bg" x="16" y="454" width="228" height="24" rx="6"/>
+    <text class="l4-tx" x="26" y="471" font-size="13.5">Kill Switch / Circuit Breaker</text>
   </a>
   <a href="#pattern-agent-identity--scoped-credentials">
-    <rect class="l4-bg" x="16" y="424" width="271" height="24" rx="6"/>
-    <text class="l4-tx" x="26" y="441" font-size="13.5">Agent Identity &amp; Scoped Credentials</text>
+    <rect class="l4-bg" x="16" y="484" width="271" height="24" rx="6"/>
+    <text class="l4-tx" x="26" y="501" font-size="13.5">Agent Identity &amp; Scoped Credentials</text>
   </a>
   <a href="#pattern-human-in-the-loop-gate">
-    <rect class="l4-bg" x="16" y="454" width="178" height="24" rx="6"/>
-    <text class="l4-tx" x="26" y="471" font-size="13.5">Human-in-the-loop Gate</text>
+    <rect class="l4-bg" x="16" y="514" width="178" height="24" rx="6"/>
+    <text class="l4-tx" x="26" y="531" font-size="13.5">Human-in-the-loop Gate</text>
   </a>
-  <rect class="l5-band" x="8" y="490" width="344" height="26" rx="6" stroke-width="1"/>
-  <text class="l5-tx disp" x="16" y="508" font-size="13.5">Layer 05 Assurance &amp; Continuous Compliance</text>
+  <rect class="l5-band" x="8" y="550" width="344" height="26" rx="6" stroke-width="1"/>
+  <text class="l5-tx disp" x="16" y="568" font-size="13.5">Layer 05 Assurance &amp; Continuous Compliance</text>
   <a href="#pattern-continuous-assurance-telemetry">
-    <rect class="l5-bg" x="16" y="524" width="235" height="24" rx="6"/>
-    <text class="l5-tx" x="26" y="541" font-size="13.5">Continuous Assurance Telemetry</text>
+    <rect class="l5-bg" x="16" y="584" width="235" height="24" rx="6"/>
+    <text class="l5-tx" x="26" y="601" font-size="13.5">Continuous Assurance Telemetry</text>
   </a>
   <a href="#pattern-incident-pipeline">
-    <rect class="l5-bg" x="16" y="554" width="142" height="24" rx="6"/>
-    <text class="l5-tx" x="26" y="571" font-size="13.5">Incident Pipeline</text>
+    <rect class="l5-bg" x="16" y="614" width="142" height="24" rx="6"/>
+    <text class="l5-tx" x="26" y="631" font-size="13.5">Incident Pipeline</text>
   </a>
   <a href="#pattern-machine-readable-evidence-oscal">
-    <rect class="l5-bg" x="16" y="584" width="257" height="24" rx="6"/>
-    <text class="l5-tx" x="26" y="601" font-size="13.5">Machine-Readable Evidence (OSCAL)</text>
+    <rect class="l5-bg" x="16" y="644" width="257" height="24" rx="6"/>
+    <text class="l5-tx" x="26" y="661" font-size="13.5">Machine-Readable Evidence (OSCAL)</text>
   </a>
 </svg>
