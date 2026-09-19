@@ -15,7 +15,7 @@ test('hub renders four resource cards, each with a count', async ({ page }) => {
   }
 
   // Counts are computed from the data, not hard-coded prose.
-  await expect(page.locator('body')).toContainText('14 frameworks · 44 obligations');
+  await expect(page.locator('body')).toContainText('25 frameworks · 61 obligations');
 });
 
 test('frameworks page renders the frameworks and the obligation index', async ({ page }) => {
