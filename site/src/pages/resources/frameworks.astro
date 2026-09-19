@@ -49,7 +49,15 @@ import '../../styles/resources.css';
         <h2 id="ob-heading">Obligation → artefact → layer</h2>
         <p>{obligations.length} rows, grouped by framework. Read each as a sentence: this obligation
         is answered by this artefact, which lives in this layer. Filter by the layer you are
-        building.</p>
+        building, or by EU AI Act duty holder.</p>
+        <p class="ob-xref">
+          Cross-reference: <a href="/resources/tools">tools by layer</a> ·
+          <a href="/bok/patterns">the pattern catalogue</a>.
+        </p>
+        <p class="ob-export">
+          <a class="ob-dl" href="/resources/obligations.csv" download>Download CSV</a>
+          <a class="ob-dl" href="/resources/obligations.json" download>Download JSON</a>
+        </p>
       </div>
       <Diagram id="obligation-to-evidence" />
       <ObligationMatrix frameworks={frameworks} obligations={obligations} />
@@ -59,3 +67,48 @@ import '../../styles/resources.css';
 
   <script is:inline defer src="/matrix.js"></script>
 </Base>
+
+<style>
+  .ob-xref {
+    margin-top: var(--s-3);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .ob-xref a {
+    color: var(--ink);
+    text-decoration: none;
+    text-underline-offset: 0.15em;
+  }
+
+  .ob-xref a:hover {
+    text-decoration: underline;
+  }
+
+  /* Build-time exports of the obligation index, generated from the same data. */
+  .ob-export {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+  }
+
+  .ob-dl {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .ob-dl:hover {
+    border-color: var(--ink-2);
+  }
+</style>

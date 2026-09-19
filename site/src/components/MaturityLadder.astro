@@ -10,6 +10,7 @@
  * static no-JS / reduced-motion state.
  */
 import type { MaturityLevel } from '../data/maturity';
+import { slugify } from '../lib/md-parse';
 
 interface Props {
   levels: readonly MaturityLevel[];
@@ -17,6 +18,17 @@ interface Props {
 
 const { levels } = Astro.props;
 const pad = (n: number) => String(n).padStart(2, '0');
+
+// The chapter-05 pattern whose adoption gets a function to each level. Level 1
+// is paper, so it carries no pattern. Anchors use the same slugger rehype-slug
+// uses, so they match the built /bok/patterns page.
+const levelPattern: Record<number, string> = {
+  2: 'Agent Registry',
+  3: 'Eval Gate in CI',
+  4: 'Policy Card',
+  5: 'Continuous Assurance Telemetry',
+};
+const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}`)}`;
 ---
 
 <div class="ladder-axis">
@@ -45,6 +57,11 @@ const pad = (n: number) => String(n).padStart(2, '0');
             <li>{s}</li>
           ))}
         </ul>
+        {levelPattern[level.n] && (
+          <a class="step-pattern" href={patternHref(levelPattern[level.n])}>
+            Pattern for this level →
+          </a>
+        )}
       </li>
     ))
   }
@@ -162,6 +179,23 @@ const pad = (n: number) => String(n).padStart(2, '0');
     color: var(--muted);
     font-size: var(--fs-small);
     text-wrap: pretty;
+  }
+
+  /* Cross-link to the pattern that gets a function to this level. */
+  .step-pattern {
+    margin-top: auto;
+    padding-top: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.02em;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .step-pattern:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
   }
 
   @media (min-width: 640px) {

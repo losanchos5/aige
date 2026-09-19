@@ -176,7 +176,11 @@ const resources = [
           ))
         }
       </div>
-      <p class="sec-link"><a href="/role">What the role does →</a></p>
+      <p class="sec-link">
+        <a href="/role">What the role does →</a>
+        <span class="sec-link-sep" aria-hidden="true">·</span>
+        <a href="/path">Start the learning path →</a>
+      </p>
     </div>
   </section>
 
@@ -402,6 +406,11 @@ const resources = [
   .sec-link a:hover {
     text-decoration: underline;
     text-underline-offset: 0.15em;
+  }
+
+  .sec-link-sep {
+    margin: 0 var(--s-3);
+    color: var(--muted);
   }
 
   /* Values */

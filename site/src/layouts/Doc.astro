@@ -112,6 +112,23 @@ if (statsChapter) {
       }
 
       <div class="doc-main">
+        {
+          withToc && (
+            <details class="doc-toc-m" data-toc-mobile data-pagefind-ignore>
+              <summary>On this page</summary>
+              <ul>
+                {headings
+                  .filter((h) => h.depth === 2 || h.depth === 3)
+                  .map((h) => (
+                    <li class={`toc-m-h${h.depth}`}>
+                      <a href={`#${h.slug}`}>{h.text}</a>
+                    </li>
+                  ))}
+              </ul>
+            </details>
+          )
+        }
+
         <article class="prose" data-pagefind-body>
           <ChapterHeader
             kicker={kicker}
@@ -251,6 +268,59 @@ if (statsChapter) {
     display: none;
   }
 
+  /* Compact, collapsible on-this-page for narrow viewports (below 1100px, where
+     the sidebar TOC is hidden). Pure HTML/CSS via <details>; hidden once the
+     sticky sidebar TOC takes over. */
+  .doc-toc-m {
+    margin-bottom: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+  }
+
+  .doc-toc-m > summary {
+    padding: var(--s-3) var(--s-4);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .doc-toc-m > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .doc-toc-m ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 var(--s-4) var(--s-4);
+    border-top: 1px solid var(--line);
+  }
+
+  .doc-toc-m li {
+    margin: 0;
+  }
+
+  .doc-toc-m a {
+    display: block;
+    padding: var(--s-2) 0;
+    color: var(--ink-2);
+    text-decoration: none;
+    line-height: 1.35;
+  }
+
+  .doc-toc-m a:hover {
+    color: var(--ink);
+  }
+
+  .doc-toc-m .toc-m-h3 a {
+    padding-left: var(--s-4);
+    font-size: 0.9375rem;
+  }
+
   /* Chapter rail: off-canvas drawer below 840px. */
   .doc-sidebar {
     position: fixed;
@@ -306,6 +376,11 @@ if (statsChapter) {
   @media (min-width: 1100px) {
     .doc-toc {
       display: block;
+    }
+
+    /* The sticky sidebar TOC takes over here. */
+    .doc-toc-m {
+      display: none;
     }
 
     /* Grow the reading container past the 1200px site width so the rails leave a
