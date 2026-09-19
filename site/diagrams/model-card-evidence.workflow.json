@@ -1,0 +1,83 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Model Card as Evidence",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "generated-not-written",
+        "label": "Generated, not written",
+        "focus": ["outputs", "card"],
+        "note": "The card is generated from real training and eval outputs, not written by hand."
+      },
+      {
+        "id": "validated-at-gate",
+        "label": "Validated at one gate",
+        "focus": ["card", "gate", "release", "rejected"],
+        "note": "A schema check is the single gate; a card that fails it is rejected, not attached."
+      },
+      {
+        "id": "cited-as-evidence",
+        "label": "Cited as evidence",
+        "focus": ["release", "evidence"],
+        "note": "The attached card is cited by the evidence record the assurance layer reads."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "l2", "label": "Layer 02 Inventory & Transparency" },
+    { "id": "evidence", "label": "Evidence" },
+    { "id": "rejected", "label": "Rejected", "variant": "exception" }
+  ],
+  "phases": [
+    { "id": "generate", "label": "Generate from outputs", "fromCol": 0, "toCol": 1, "variant": "emphasis" },
+    { "id": "validate", "label": "Validate at the gate", "fromCol": 2, "toCol": 3 },
+    { "id": "cite", "label": "Cite as evidence", "fromCol": 4, "toCol": 4, "variant": "dashed" }
+  ],
+  "mainPath": ["outputs", "card", "gate", "release", "evidence"],
+  "nodes": [
+    { "id": "outputs", "lane": "l2", "col": 0, "type": "database", "label": "Training & eval outputs", "sublabel": "scores, datasets", "width": 176 },
+    { "id": "card", "lane": "l2", "col": 1, "type": "database", "label": "Model card", "sublabel": "generated, structured", "width": 160 },
+    { "id": "gate", "lane": "l2", "col": 2, "type": "security", "label": "Schema check", "sublabel": "valid / invalid", "width": 152 },
+    { "id": "release", "lane": "l2", "col": 3, "type": "backend", "label": "Attached to release", "sublabel": "versioned", "width": 164 },
+    { "id": "evidence", "lane": "evidence", "col": 4, "type": "database", "label": "Evidence record", "sublabel": "read by assurance", "width": 160 },
+    { "id": "rejected", "lane": "rejected", "col": 3, "type": "backend", "label": "Rejected", "sublabel": "not attached", "width": 148 }
+  ],
+  "edges": [
+    { "id": "outputs-card", "from": "outputs", "to": "card", "label": "generate", "variant": "emphasis" },
+    { "id": "card-gate", "from": "card", "to": "gate", "label": "validate", "variant": "emphasis" },
+    { "id": "gate-release", "from": "gate", "to": "release", "label": "valid", "variant": "emphasis" },
+    { "id": "gate-rejected", "from": "gate", "to": "rejected", "label": "invalid", "variant": "security", "role": "error" },
+    { "id": "release-evidence", "from": "release", "to": "evidence", "label": "cite", "variant": "dashed", "role": "branch" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Generated from the pipeline",
+      "items": [
+        "Intended use, eval results, datasets, limitations and owner",
+        "Rebuilt on each significant change and versioned with the model",
+        "The card an auditor reads is the card production produced"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Validated, so it is a control",
+      "items": [
+        "One schema check decides whether the card is attached",
+        "Stored as structured data, both human-readable and machine-consumable",
+        "Cited by the evidence record, so transparency doubles as evidence"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "The distinction",
+      "items": [
+        "A hand-written card is documentation",
+        "A generated, validated card is a control"
+      ]
+    }
+  ]
+}

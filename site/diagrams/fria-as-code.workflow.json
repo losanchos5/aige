@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "FRIA-as-Code",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "intake-as-data",
+        "label": "Intake as data",
+        "focus": ["intake", "dpia", "assessment"],
+        "note": "The assessment starts from a structured questionnaire and reuses the DPIA cross-reference."
+      },
+      {
+        "id": "assess-mitigate",
+        "label": "Assess and mitigate",
+        "focus": ["assessment", "mitigations", "gate"],
+        "note": "Risks to rights are assessed and each is met by a mitigation before the approval gate."
+      },
+      {
+        "id": "approve-record",
+        "label": "Approve and record",
+        "focus": ["reviewer", "gate", "record"],
+        "note": "A named reviewer signs off at the gate, producing a machine-readable FRIA record."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "l2", "label": "Layer 02 Inventory & Transparency" },
+    { "id": "l1", "label": "Layer 01 Govern-as-Code" },
+    { "id": "reviewer", "label": "Reviewer" },
+    { "id": "dpia", "label": "DPIA cross-reference" }
+  ],
+  "phases": [
+    { "id": "capture", "label": "Capture as data", "fromCol": 0, "toCol": 0 },
+    { "id": "assess", "label": "Assess and mitigate", "fromCol": 1, "toCol": 2, "variant": "emphasis" },
+    { "id": "approve", "label": "Approve and record", "fromCol": 3, "toCol": 4, "variant": "dashed" }
+  ],
+  "mainPath": ["intake", "assessment", "mitigations", "gate", "record"],
+  "nodes": [
+    { "id": "intake", "lane": "l2", "col": 0, "type": "database", "label": "Intake data", "sublabel": "questionnaire", "width": 152 },
+    { "id": "dpia", "lane": "dpia", "col": 0, "type": "database", "label": "DPIA", "sublabel": "GDPR Art. 35", "width": 150 },
+    { "id": "assessment", "lane": "l1", "col": 1, "type": "backend", "label": "Risk assessment", "sublabel": "risks to rights", "width": 160 },
+    { "id": "mitigations", "lane": "l1", "col": 2, "type": "backend", "label": "Mitigations", "sublabel": "one per risk", "width": 152 },
+    { "id": "gate", "lane": "l1", "col": 3, "type": "security", "label": "Approval gate", "sublabel": "sign-off", "width": 152 },
+    { "id": "reviewer", "lane": "reviewer", "col": 3, "type": "external", "label": "Reviewer", "sublabel": "human role", "width": 148 },
+    { "id": "record", "lane": "l2", "col": 4, "type": "database", "label": "FRIA record", "sublabel": "machine-readable", "width": 160 }
+  ],
+  "edges": [
+    { "id": "intake-assessment", "from": "intake", "to": "assessment", "label": "assess", "variant": "emphasis" },
+    { "id": "dpia-assessment", "from": "dpia", "to": "assessment", "label": "reuse", "variant": "dashed", "role": "branch" },
+    { "id": "assessment-mitigations", "from": "assessment", "to": "mitigations", "label": "mitigate", "variant": "emphasis" },
+    { "id": "mitigations-gate", "from": "mitigations", "to": "gate", "label": "review", "variant": "emphasis" },
+    { "id": "reviewer-gate", "from": "reviewer", "to": "gate", "label": "decides", "variant": "default" },
+    { "id": "gate-record", "from": "gate", "to": "record", "label": "record", "variant": "emphasis" }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "A rights assessment that lives",
+      "items": [
+        "Intended use, affected groups and risks to rights as structured data",
+        "Re-opened on significant change, not filed once as a document",
+        "The EU AI Act Art. 27 FRIA and its DPIA cross-reference set the scope"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Mitigations tie to controls",
+      "items": [
+        "Every risk links to the control that implements its mitigation",
+        "The DPIA cross-reference means shared elements are written once",
+        "A named reviewer signs off residual risk at one gate"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "First step",
+      "items": [
+        "Run it before deploying a high-risk system",
+        "Keep the record where the auditor looks"
+      ]
+    }
+  ]
+}

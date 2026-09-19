@@ -1,0 +1,10 @@
+{
+  "catalogue": "The control catalogue — the controls the organisation implements — expressed as OSCAL catalog and profile content.",
+  "assessments": "Assessment results, such as eval-gate runs, that record how each control was tested.",
+  "records": "The evidence records the controls emit — verdicts and metrics — that back each assessment.",
+  "oscal": "Layer 05 Assurance & Continuous Compliance: the OSCAL component-definition and assessment-results documents generated from that data, with traceability from a result back to the control it tested.",
+  "validator": "The single gate: a validator that checks the OSCAL documents against the NIST JSON schema, so evidence is verifiable rather than hand-formatted.",
+  "auditor": "The auditor, whose request for evidence becomes a filter over the store returned in minutes rather than a re-collection from scratch.",
+  "compliance": "A continuous-compliance tooling category that ingests the OSCAL documents and tracks control status over time.",
+  "regulator": "A regulator submission that reads the same documents, so evidence composes across tools and jurisdictions."
+}

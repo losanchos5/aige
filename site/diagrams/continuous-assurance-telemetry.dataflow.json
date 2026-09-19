@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Continuous Assurance Telemetry",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [980, 540],
+    "views": [
+      {
+        "id": "signals-checked",
+        "label": "Signals checked continuously",
+        "focus": ["traces", "guardrail", "regstate", "checks"],
+        "note": "Traces, guardrail events and registry state are checked against controls as they run."
+      },
+      {
+        "id": "every-check-records",
+        "label": "Every check records",
+        "focus": ["checks", "records"],
+        "note": "Each control check writes a timestamped evidence record on one schema."
+      },
+      {
+        "id": "read-not-assembled",
+        "label": "Read, not assembled",
+        "focus": ["records", "dashboard", "auditor"],
+        "note": "A dashboard tile and an auditor read the records live, not from a quarterly binder."
+      }
+    ]
+  },
+  "stages": [
+    { "label": "Runtime signals" },
+    { "label": "Control checks" },
+    { "label": "Evidence store" },
+    { "label": "Consumers" }
+  ],
+  "nodes": [
+    { "id": "traces", "type": "external", "label": "Traces", "sublabel": "runs, spans", "tag": "Layer 04", "stage": 0, "row": 0, "width": 150, "height": 64 },
+    { "id": "guardrail", "type": "external", "label": "Guardrail events", "sublabel": "blocked calls", "tag": "Layer 04", "stage": 0, "row": 1, "width": 152, "height": 64 },
+    { "id": "regstate", "type": "external", "label": "Registry state", "sublabel": "scope, status", "tag": "Layer 04", "stage": 0, "row": 2, "width": 150, "height": 64 },
+    { "id": "checks", "type": "backend", "label": "Control checks", "sublabel": "continuous", "tag": "Layer 05", "stage": 1, "row": 1, "width": 150, "height": 64 },
+    { "id": "records", "type": "database", "label": "Evidence records", "sublabel": "one schema", "tag": "Layer 05", "stage": 2, "row": 1, "width": 156, "height": 64 },
+    { "id": "dashboard", "type": "external", "label": "Dashboard", "sublabel": "status tile", "stage": 3, "row": 0, "width": 150, "height": 64 },
+    { "id": "auditor", "type": "external", "label": "Auditor", "sublabel": "audit = query", "stage": 3, "row": 2, "width": 150, "height": 64 }
+  ],
+  "flows": [
+    { "id": "traces-checks", "from": "traces", "to": "checks", "label": "emit", "variant": "default", "route": "top-channel" },
+    { "id": "guardrail-checks", "from": "guardrail", "to": "checks", "label": "emit", "variant": "default", "route": "straight" },
+    { "id": "regstate-checks", "from": "regstate", "to": "checks", "label": "emit", "variant": "default", "route": "bottom-channel" },
+    { "id": "checks-records", "from": "checks", "to": "records", "label": "record", "variant": "emphasis" },
+    { "id": "records-dashboard", "from": "records", "to": "dashboard", "label": "live query", "variant": "default" },
+    { "id": "records-auditor", "from": "records", "to": "auditor", "label": "query", "variant": "default" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Evidence from the data path",
+      "items": [
+        "Traces, guardrail events and registry state are checked as the system runs",
+        "Each check writes a timestamped, structured record on one schema",
+        "Point-in-time attestation is replaced by a continuous signal"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "One queryable store",
+      "items": [
+        "control_id, subject, decision, metric, threshold, actor, timestamp, signature",
+        "Records are keyed on the registry id so status is a live query",
+        "A control that stops firing turns its dashboard tile red in minutes"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Why continuous",
+      "items": [
+        "The evidence is produced by the data path, not a quarterly exercise",
+        "The cost is the ingest pipeline and a common evidence schema"
+      ]
+    }
+  ]
+}

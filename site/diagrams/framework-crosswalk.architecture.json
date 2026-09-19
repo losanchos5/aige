@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Framework Crosswalk",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "hub-and-spokes",
+        "label": "One hub, many frameworks",
+        "focus": ["hub", "eu", "iso", "nist", "csa", "owasp"],
+        "note": "One internal control set is the hub that external frameworks map onto."
+      },
+      {
+        "id": "evidence-once",
+        "label": "Evidence attached once",
+        "focus": ["hub", "evidence"],
+        "note": "Evidence is attached to the hub, not to the spokes, and reused for every framework."
+      },
+      {
+        "id": "index-not-end",
+        "label": "An index, not the end",
+        "focus": ["hub", "evidence", "nist"],
+        "note": "The crosswalk is an index for finding controls; the hub is what you maintain."
+      }
+    ]
+  },
+  "components": [
+    { "id": "hub", "type": "backend", "label": "Control set", "sublabel": "Policy Cards · Eval Gates", "pos": [320, 300], "size": [180, 80] },
+    { "id": "evidence", "type": "database", "label": "Evidence store", "sublabel": "attached once", "pos": [335, 470], "size": [150, 72] },
+    { "id": "eu", "type": "external", "label": "EU AI Act", "sublabel": "clauses", "pos": [720, 90], "size": [150, 64] },
+    { "id": "iso", "type": "external", "label": "ISO/IEC 42001", "sublabel": "Annex A", "pos": [720, 210], "size": [150, 64] },
+    { "id": "nist", "type": "external", "label": "NIST AI RMF", "sublabel": "four functions", "pos": [720, 330], "size": [150, 64] },
+    { "id": "csa", "type": "external", "label": "CSA AICM", "sublabel": "control objectives", "pos": [720, 450], "size": [150, 64] },
+    { "id": "owasp", "type": "external", "label": "OWASP", "sublabel": "Agent Control Standard", "pos": [720, 570], "size": [150, 64] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Layer 01 Govern-as-Code", "wraps": ["hub"], "pad": 22 },
+    { "kind": "region", "label": "Layer 05 Assurance & Continuous Compliance", "wraps": ["evidence"], "pad": 18 }
+  ],
+  "connections": [
+    { "id": "hub-eu", "from": "hub", "to": "eu", "variant": "default" },
+    { "id": "hub-iso", "from": "hub", "to": "iso", "variant": "default" },
+    { "id": "hub-nist", "from": "hub", "to": "nist", "variant": "emphasis" },
+    { "id": "hub-csa", "from": "hub", "to": "csa", "variant": "default" },
+    { "id": "hub-owasp", "from": "hub", "to": "owasp", "variant": "default" },
+    { "id": "hub-evidence", "from": "hub", "to": "evidence", "label": "attach once", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelAt": [410, 420] }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "One hub, many frameworks",
+      "items": [
+        "Each Policy Card and Eval Gate declares the clauses it maps to",
+        "The crosswalk is the aggregation of those declarations, not a separate spreadsheet",
+        "One control can satisfy several frameworks at once"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Evidence attached once",
+      "items": [
+        "Evidence is attached to the hub and reused for every framework",
+        "Every mapping cell must resolve to a running control and its emitted evidence",
+        "A cell with no evidence behind it is flagged, not counted"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "An index, not the end state",
+      "items": [
+        "A crosswalk proves you read the framework; it does not prove the control fires",
+        "Use it to find gaps and reuse controls, not to report compliance",
+        "The hub is what you maintain"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "AIBOM at Build",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [1076, 540],
+    "views": [
+      {
+        "id": "compose-at-build",
+        "label": "Composed at build",
+        "focus": ["model", "datasets", "dependencies", "build", "aibom"],
+        "note": "The build step captures the model, datasets, prompts and dependencies into one AIBOM."
+      },
+      {
+        "id": "stored-with-entry",
+        "label": "Stored with the entry",
+        "focus": ["aibom", "registry"],
+        "note": "The AIBOM lands on the registry entry and is regenerated on each build."
+      },
+      {
+        "id": "answers-what-runs",
+        "label": "Answers what is running",
+        "focus": ["registry", "vuln", "docs"],
+        "note": "Vulnerability matching and regulator-facing documentation read the entry, not a wiki."
+      }
+    ]
+  },
+  "stages": [
+    { "label": "Sources" },
+    { "label": "Build" },
+    { "label": "AIBOM" },
+    { "label": "Registry (Layer 02)" },
+    { "label": "Consumers" }
+  ],
+  "nodes": [
+    { "id": "model", "type": "external", "label": "Foundation model", "sublabel": "+ fine-tunes", "stage": 0, "row": 0, "width": 150, "height": 64 },
+    { "id": "datasets", "type": "external", "label": "Datasets & prompts", "sublabel": "corpus, templates", "stage": 0, "row": 1, "width": 152, "height": 64 },
+    { "id": "dependencies", "type": "external", "label": "Dependencies", "sublabel": "libraries", "stage": 0, "row": 2, "width": 150, "height": 64 },
+    { "id": "build", "type": "backend", "label": "Build pipeline", "sublabel": "instrumented", "stage": 1, "row": 1, "width": 150, "height": 64 },
+    { "id": "aibom", "type": "database", "label": "AIBOM artefact", "sublabel": "provenance", "tag": "CycloneDX / SPDX", "stage": 2, "row": 1, "width": 160, "height": 64 },
+    { "id": "registry", "type": "database", "label": "Registry entry", "sublabel": "store", "stage": 3, "row": 1, "width": 150, "height": 64 },
+    { "id": "vuln", "type": "external", "label": "Vulnerability match", "sublabel": "supply-chain risk", "stage": 4, "row": 0, "width": 152, "height": 64 },
+    { "id": "docs", "type": "external", "label": "Regulator docs", "sublabel": "transparency", "stage": 4, "row": 2, "width": 152, "height": 64 }
+  ],
+  "flows": [
+    { "id": "model-build", "from": "model", "to": "build", "label": "collect", "variant": "default", "route": "top-channel" },
+    { "id": "datasets-build", "from": "datasets", "to": "build", "label": "collect", "variant": "default", "route": "straight" },
+    { "id": "dependencies-build", "from": "dependencies", "to": "build", "label": "collect", "variant": "default", "route": "bottom-channel" },
+    { "id": "build-aibom", "from": "build", "to": "aibom", "label": "emit", "variant": "emphasis" },
+    { "id": "aibom-registry", "from": "aibom", "to": "registry", "label": "attach", "variant": "emphasis" },
+    { "id": "registry-vuln", "from": "registry", "to": "vuln", "label": "match", "variant": "default" },
+    { "id": "registry-docs", "from": "registry", "to": "docs", "label": "document", "variant": "default" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "A bill of materials for AI",
+      "items": [
+        "Models, datasets, prompts and dependencies with their provenance and licences",
+        "Emitted at build and labelled CycloneDX ML-BOM or the SPDX 3.0 AI profile",
+        "Regenerated on each build so it never drifts from the deployed system"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Stored with the registry entry",
+      "items": [
+        "Attached to the entry the transparency and eval layers read",
+        "A changed corpus licence surfaces as a diff in the next build's AIBOM",
+        "Supply-chain and provenance questions become queries"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Why it matters",
+      "items": [
+        "If your build does not emit it, you cannot answer what is running",
+        "The cost is toolchain integration and accurate provenance metadata"
+      ]
+    }
+  ]
+}
