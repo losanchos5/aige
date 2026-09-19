@@ -1,7 +1,9 @@
 // stack.ts: the five-layer AI governance engineering stack, faithful to
-// bok/04-the-stack.md. Layer names, taglines, artefacts, tool categories and
-// "Maps to" lines are taken verbatim (Markdown stripped) from the chapter; no
-// tool appears here that the chapter (or SOURCES.md) does not name.
+// bok/04-the-stack.md. Layer names, taglines, artefacts and "Maps to" lines are
+// taken verbatim (Markdown stripped) from the chapter. Tool categories seed from
+// the chapter (and SOURCES.md); Block E (2026-09-19) added further illustrative
+// examples per category, each an open-source or official project verified alive
+// on that date. Brands are examples of a category, never an endorsement.
 //
 // `chapterAnchor` is the `#slug` rehype-slug produces for each layer's H2 (see
 // src/lib/md-parse.ts `slugify`); em dashes and ampersands are dropped, which
@@ -66,10 +68,10 @@ export const layers: readonly Layer[] = [
       'A structured policy verdict (allow/deny, rule id, input hash, timestamp) per evaluation',
     ],
     toolCategories: [
-      { category: 'Policy engines', examples: ['OPA/Rego', 'Cedar'] },
+      { category: 'Policy engines', examples: ['OPA/Rego', 'Cedar', 'OPAL'] },
       {
         category: 'Machine-readable policy artefacts (proposed)',
-        examples: ['Policy Cards'],
+        examples: ['Policy Cards', 'OWASP Agent Control Standard'],
       },
     ],
     mapsTo: [
@@ -109,7 +111,20 @@ export const layers: readonly Layer[] = [
           'CycloneDX ML-BOM',
           'SPDX 3.0 AI profile',
           'OWASP AIBOM generator',
+          'AIsbom',
         ],
+      },
+      {
+        category: 'Model and data card tooling',
+        examples: ['Hugging Face model cards', 'Croissant (ML dataset metadata)'],
+      },
+      {
+        category: 'FRIA/DPIA tooling',
+        examples: ['CNIL PIA', 'Canada Algorithmic Impact Assessment'],
+      },
+      {
+        category: 'PII detection and redaction',
+        examples: ['Presidio'],
       },
     ],
     mapsTo: [
@@ -142,11 +157,15 @@ export const layers: readonly Layer[] = [
     toolCategories: [
       {
         category: 'Evaluation frameworks',
-        examples: ['Inspect', 'promptfoo', 'DeepEval'],
+        examples: ['Inspect', 'promptfoo', 'DeepEval', 'HELM'],
       },
       {
         category: 'Adversarial and vulnerability probes',
-        examples: ['Garak', 'Mindgard', 'Giskard'],
+        examples: ['Garak', 'Mindgard', 'Giskard', 'PyRIT'],
+      },
+      {
+        category: 'Safety and red-team benchmarks',
+        examples: ['MLCommons AILuminate', 'HarmBench', 'JailbreakBench'],
       },
       { category: 'Retrieval-augmented quality', examples: ['Ragas'] },
     ],
@@ -176,11 +195,33 @@ export const layers: readonly Layer[] = [
     toolCategories: [
       {
         category: 'Guardrail frameworks',
-        examples: ['NVIDIA NeMo Guardrails', 'Meta LlamaFirewall', 'Lakera'],
+        examples: [
+          'NVIDIA NeMo Guardrails',
+          'Meta LlamaFirewall',
+          'Lakera',
+          'Guardrails AI',
+          'Llama Guard',
+        ],
       },
       {
         category: 'Observability',
-        examples: ['Langfuse', 'Arize Phoenix', 'OpenTelemetry'],
+        examples: [
+          'Langfuse',
+          'Arize Phoenix',
+          'OpenTelemetry (GenAI semantic conventions)',
+        ],
+      },
+      {
+        category: 'MCP / tool-call security',
+        examples: ['MCP Inspector', 'mcp-scan', 'mcp-context-protector'],
+      },
+      {
+        category: 'Kill switch / circuit breaker',
+        examples: [
+          'Feature-flag kill switches',
+          'Workload-identity revocation',
+          'API-gateway circuit breakers',
+        ],
       },
       {
         category: 'Agent workload identity',
@@ -214,7 +255,14 @@ export const layers: readonly Layer[] = [
       'Incident and reporting plumbing that meets obligations on the clock',
     ],
     toolCategories: [
-      { category: 'Evidence format', examples: ['OSCAL'] },
+      {
+        category: 'Evidence format',
+        examples: ['OSCAL', 'CSA AICM OSCAL bundle'],
+      },
+      {
+        category: 'OSCAL tooling (open source)',
+        examples: ['compliance-trestle', 'NIST oscal-cli', 'Lula'],
+      },
       {
         category: 'GRC and AI-governance suites',
         examples: [

@@ -187,7 +187,14 @@ test.describe('path data', () => {
     'test-and-contain',
     'prove-and-specialise',
   ]);
-  const RESOURCE_TYPES = new Set(['article', 'video', 'course', 'official', 'tool']);
+  const RESOURCE_TYPES = new Set([
+    'article',
+    'video',
+    'course',
+    'official',
+    'tool',
+    'template',
+  ]);
   const RESOURCE_COSTS = new Set(['free', 'paid']);
   // The two capstones may carry 0-1 resources; every other node carries 2-4.
   const CAPSTONES = new Set(['maturity-self-assessment', 'minimum-viable-stack']);
