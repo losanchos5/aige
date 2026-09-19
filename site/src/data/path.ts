@@ -11,7 +11,8 @@
 //
 // Resources policy: external URLs are curated, illustrative and not
 // endorsements. A URL drawn from bok/10-reading-list.md is trusted as verified;
-// every other external URL was checked by hand on 2026-09-15 (status, redirects,
+// every other external URL was checked by hand on 2026-09-15, and the Block E
+// additions and replacements were verified on 2026-09-19 (status, redirects,
 // relevance). No tool is named that the Body of Knowledge does not treat.
 
 import type { LayerNumber } from './stack';
@@ -19,7 +20,13 @@ import type { LayerNumber } from './stack';
 /** roadmap.sh-style track for a node: load-bearing, an alternative, or optional. */
 export type PathKind = 'core' | 'alternative' | 'optional';
 /** The medium of an external resource. */
-export type ResourceType = 'article' | 'video' | 'course' | 'official' | 'tool';
+export type ResourceType =
+  | 'article'
+  | 'video'
+  | 'course'
+  | 'official'
+  | 'tool'
+  | 'template';
 /** Whether the external resource is free or paid. */
 export type ResourceCost = 'free' | 'paid';
 /** The four stages of the path, in build order. */
@@ -134,7 +141,8 @@ export const stages: readonly PathStage[] = [
 /**
  * The path's nodes, in reading order within each stage. `layerN` colours a node
  * by stack layer; nodes without one are cross-cutting. Every external resource
- * not drawn from bok/10-reading-list.md was reviewed by hand on 2026-09-15.
+ * not drawn from bok/10-reading-list.md was reviewed by hand on 2026-09-15;
+ * Block E additions and replacements were verified on 2026-09-19.
  */
 export const nodes: readonly PathNode[] = [
   // ── 1 Foundations ────────────────────────────────────────────────────────
@@ -273,8 +281,8 @@ export const nodes: readonly PathNode[] = [
         cost: 'free',
       },
       {
-        title: 'awesome-ai-agent-governance',
-        url: 'https://github.com/systempromptio/awesome-ai-agent-governance',
+        title: 'Awesome Responsible AI (curated list)',
+        url: 'https://github.com/AthenaCore/AwesomeResponsibleAI',
         type: 'tool',
         cost: 'free',
       },
@@ -387,6 +395,12 @@ export const nodes: readonly PathNode[] = [
         type: 'official',
         cost: 'free',
       },
+      {
+        title: 'IAPP AIGP certification',
+        url: 'https://iapp.org/certify/aigp/',
+        type: 'course',
+        cost: 'paid',
+      },
     ],
   },
   {
@@ -414,6 +428,12 @@ export const nodes: readonly PathNode[] = [
         title: 'Model Context Protocol',
         url: 'https://modelcontextprotocol.io/',
         type: 'official',
+        cost: 'free',
+      },
+      {
+        title: 'Stanford CS120: Introduction to AI Safety',
+        url: 'https://web.stanford.edu/class/cs120/',
+        type: 'course',
         cost: 'free',
       },
     ],
@@ -549,8 +569,8 @@ export const nodes: readonly PathNode[] = [
         cost: 'free',
       },
       {
-        title: 'awesome-ai-agent-governance',
-        url: 'https://github.com/systempromptio/awesome-ai-agent-governance',
+        title: 'Awesome Production Machine Learning',
+        url: 'https://github.com/EthicalML/awesome-production-machine-learning',
         type: 'tool',
         cost: 'free',
       },
@@ -723,6 +743,12 @@ export const nodes: readonly PathNode[] = [
         type: 'official',
         cost: 'paid',
       },
+      {
+        title: 'CNIL PIA template and open-source software',
+        url: 'https://www.cnil.fr/en/privacy-impact-assessment-pia',
+        type: 'template',
+        cost: 'free',
+      },
     ],
     prereqs: ['risk-tiers-intake'],
   },
@@ -840,6 +866,12 @@ export const nodes: readonly PathNode[] = [
         type: 'official',
         cost: 'free',
       },
+      {
+        title: 'PyRIT (Python Risk Identification Tool)',
+        url: 'https://github.com/microsoft/PyRIT',
+        type: 'tool',
+        cost: 'free',
+      },
     ],
   },
   {
@@ -867,6 +899,18 @@ export const nodes: readonly PathNode[] = [
         title: 'OWASP Top 10 for Agentic Applications',
         url: 'https://genai.owasp.org/',
         type: 'official',
+        cost: 'free',
+      },
+      {
+        title: 'Gandalf by Lakera (prompt-injection game)',
+        url: 'https://gandalf.lakera.ai/',
+        type: 'tool',
+        cost: 'free',
+      },
+      {
+        title: 'Trail of Bits: machine learning / AI security writing',
+        url: 'https://blog.trailofbits.com/categories/machine-learning/',
+        type: 'article',
         cost: 'free',
       },
     ],
@@ -1113,6 +1157,12 @@ export const nodes: readonly PathNode[] = [
         type: 'article',
         cost: 'free',
       },
+      {
+        title: 'NIST OSCAL learning resources',
+        url: 'https://pages.nist.gov/OSCAL/learn/',
+        type: 'official',
+        cost: 'free',
+      },
     ],
     prereqs: ['eval-gate-ci', 'gates-admission'],
   },
@@ -1252,6 +1302,12 @@ export const nodes: readonly PathNode[] = [
         type: 'official',
         cost: 'free',
       },
+      {
+        title: 'MLCommons AILuminate benchmark',
+        url: 'https://mlcommons.org/ailuminate/',
+        type: 'tool',
+        cost: 'free',
+      },
     ],
   },
   {
@@ -1326,8 +1382,8 @@ export const nodes: readonly PathNode[] = [
     ],
     resources: [
       {
-        title: 'awesome-ai-agent-governance',
-        url: 'https://github.com/systempromptio/awesome-ai-agent-governance',
+        title: 'Awesome OSCAL',
+        url: 'https://github.com/oscal-club/awesome-oscal',
         type: 'tool',
         cost: 'free',
       },

@@ -65,6 +65,32 @@ edition. Tools are named as category examples, illustrative and not endorsements
   (S6953B), signed 19 December 2025 and effective 1 January 2027 after a March 2026 chapter amendment,
   with an oversight office in the Department of Financial Services. `https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models`
   (verified: primary)
+- **NIST AI 800-1, "Managing Misuse Risk for Dual-Use Foundation Models" (second public draft)** —
+  US NIST/CAISI voluntary guidance on identifying, measuring and mitigating misuse risk across the
+  model lifecycle; still a draft. `https://www.nist.gov/news-events/news/2025/01/updated-guidelines-managing-misuse-risk-dual-use-foundation-models`
+  (verified: primary)
+- **NIST ARIA (Assessing Risks and Impacts of AI)** — NIST's evaluation environment that tests model
+  risks and impacts through model testing, red teaming and field testing; a reference for layer 03.
+  `https://ai-challenges.nist.gov/aria` (verified: primary)
+- **UK AI Security Institute** — the UK government institute that evaluates advanced-AI risks and
+  publishes the Inspect eval framework this book uses as the layer-03 reference. `https://www.aisi.gov.uk/`
+  (verified: primary)
+- **US Center for AI Standards and Innovation (CAISI)** — NIST's center for AI standards, testing and
+  security, formerly the US AI Safety Institute; the US government's point of contact for industry.
+  `https://www.nist.gov/caisi` (verified: primary)
+
+## Frontier safety frameworks (the labs' own commitments)
+
+- **Anthropic Responsible Scaling Policy** — Anthropic's own frontier-safety framework of capability
+  thresholds and required safeguards; the page states version 3.4, effective 8 July 2026.
+  `https://www.anthropic.com/responsible-scaling-policy` (verified: primary)
+- **OpenAI Preparedness Framework** — OpenAI's own framework for tracking and preparing for frontier
+  capabilities that could cause severe harm; the document states Version 2, last updated 15 April
+  2025. `https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf`
+  (verified: primary)
+- **Google DeepMind Frontier Safety Framework** — DeepMind's own framework of critical capability
+  levels and mitigations; the page states version 3.1, updated 17 April 2026. `https://deepmind.google/discover/blog/strengthening-our-frontier-safety-framework/`
+  (verified: primary)
 
 ## Papers (machine-readable evidence and agent governance)
 
@@ -103,15 +129,37 @@ edition. Tools are named as category examples, illustrative and not endorsements
   autonomous agents" figure; read as reported. `https://www.hiddenlayer.com/report-and-guide/threatreport2026`
   (verified: reported)
 
+## Incident and risk repositories (the empirical record)
+
+- **AI Incident Database** — the Responsible AI Collaborative's catalogue of real-world AI harms and
+  near-harms; a reference corpus for threat modelling and post-market monitoring. `https://incidentdatabase.ai/`
+  (verified: primary)
+- **AIAAIC Repository** — an independent, open register of AI, algorithmic and automation incidents
+  and controversies across sectors. `https://www.aiaaic.org/aiaaic-repository` (verified: primary)
+- **OECD.AI Incidents & Hazards Monitor (AIM)** — the OECD's live monitor of AI incidents and hazards
+  drawn from global media, built to inform policy. `https://oecd.ai/en/incidents` (verified: primary)
+- **AI Vulnerability Database (AVID)** — the AI Risk and Vulnerability Alliance's open knowledge base
+  of failure modes for general-purpose AI systems. `https://avidml.org/` (verified: primary)
+- **MIT AI Risk Repository** — MIT FutureTech's living database of 1,700+ AI risks classified across
+  65 frameworks; a taxonomy for intake and risk tiers. `https://airisk.mit.edu/` (verified: primary)
+
 ## Tools (illustrative categories, not endorsements)
 
 - **Inspect AI (UK AI Security Institute)** — an open eval framework, the reference example for
   evals-as-evidence and eval gates. `https://github.com/UKGovernmentBEIS/inspect_ai` (verified:
   primary)
-- **awesome-ai-agent-governance** — a curated index that catalogues the tool categories this book
-  names — eval frameworks (promptfoo, DeepEval, Ragas, Giskard, Garak), policy engines (OPA/Rego,
-  Cedar), guardrails (NeMo Guardrails, Guardrails AI, LlamaFirewall), observability (Langfuse, Arize
-  Phoenix) and AIBOM formats (CycloneDX ML-BOM, SPDX 3.0). `https://github.com/systempromptio/awesome-ai-agent-governance`
+- **Awesome Responsible AI (AthenaCore)** — a broad, maintained index of responsible-, trustworthy-
+  and human-centred-AI resources spanning every layer of the stack. `https://github.com/AthenaCore/AwesomeResponsibleAI`
+  (verified: primary)
+- **Awesome Production Machine Learning (EthicalML)** — the reference index of open-source libraries
+  to deploy, monitor, version and scale ML; the tooling map for layers 02 and 04. `https://github.com/EthicalML/awesome-production-machine-learning`
+  (verified: primary)
+- **awesome-opa (Open Policy Agent)** — the OPA ecosystem's own index of policy-as-code tools and
+  integrations for layer 01. `https://github.com/open-policy-agent/awesome-opa` (verified: primary)
+- **Awesome OSCAL (OSCAL Club)** — a curated index of OSCAL tools and resources for the
+  machine-readable evidence of layer 05. `https://github.com/oscal-club/awesome-oscal` (verified: primary)
+- **awesome-ml-security (Trail of Bits)** — a curated index of machine-learning security resources
+  feeding layer 03 red teaming and layer 04 runtime controls. `https://github.com/trailofbits/awesome-ml-security`
   (verified: primary)
 
 ## Communities and newsletters
