@@ -1,0 +1,8 @@
+{
+  "pkg": "The provider's package — its documentation, model card and contract terms — for a model or tool you consume but do not own.",
+  "checks": "A structured due-diligence assessment on a versioned template: the provider's evaluations and red-team evidence, the documentation and any AIBOM, the lawful basis and data flows, the tool scopes granted, incident-reporting commitments and the right to audit.",
+  "gate": "The gate a procured or integrated AI system must pass before it reaches production — approve, reject, or approve with conditions.",
+  "rejected": "A system that fails the due-diligence gate is not deployed.",
+  "registry": "An approved system enters the inventory as a registry entry with an owner, a scope and its conditions, re-opened on renewal or a material model change.",
+  "record": "The whole assessment is filed as evidence, with any reliance on provider-supplied evidence flagged rather than hidden."
+}

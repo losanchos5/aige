@@ -1,0 +1,9 @@
+{
+  "guardrail": "A runtime guardrail flags the call — a threshold breach or an anomaly at the tool-call boundary — that can trip the breaker.",
+  "telemetry": "Observability turns the agent's behaviour into a signal, so a defined anomaly or threshold breach, or a manual pull, trips the breaker.",
+  "breaker": "A circuit breaker at the tool-call boundary trips on a defined signal — a threshold breach, an anomaly, or a manual pull — and is tested on a schedule.",
+  "agentA": "The misbehaving or compromised agent whose scope is revoked, halting just its tool calls because it is bound to its own identity.",
+  "agentB": "Another agent in the fleet, unaffected by the revocation, which keeps running.",
+  "agentC": "A further agent in the fleet, also unaffected, so containment stops one agent without breaking the rest.",
+  "record": "The trip is logged as a machine-readable incident record, so containing the agent is itself an evidence event."
+}
