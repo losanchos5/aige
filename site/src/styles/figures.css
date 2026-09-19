@@ -1,0 +1,326 @@
+/* figures.css — the conceptual infographics (src/figures/*.svg) and the figure
+   that wraps them, plus the reading-paths map on the /bok index. Imported once
+   from diagrams.css (which Base.astro loads on every page), so both the chapter
+   pipeline (rehype-diagrams) and <Figure> get these styles.
+
+   The inline SVGs carry semantic class names but map every colour to a site
+   token here, so light and dark fall out of the tokens and no figure hard-codes
+   a hex. Never dim text with opacity (the contrast gate fails): use --muted. */
+
+/* --------------------------------------------------------------- figure -- */
+.figure--infographic {
+  margin: var(--s-6) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+/* Full-bleed within the reading well, exactly like .diagram: the prose stays at
+   72ch but .doc-main is a container, so the figure widens to the whole well with
+   the centred-breakout formula in cq units. Off the chapters (e.g. /bok index)
+   the rule does not apply and the figure sits in normal flow. */
+.prose > .figure--infographic {
+  width: 100cqw;
+  margin-inline: calc(50% - 50cqw);
+}
+
+.figure--infographic .figure-canvas {
+  padding: var(--s-3);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+/* Cap the SVG near its natural width so a wide well centres it instead of
+   upscaling its text far past 1:1; on a phone it shrinks to fit the column. */
+.figure--infographic .figure-canvas > svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 560px;
+  margin-inline: auto;
+}
+
+.figure-figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.figure-fig-title {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.figure-fig-desc {
+  max-width: 72ch;
+  font-size: var(--fs-small);
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+/* Text alternative: a plain, collapsible full description in the chapter's
+   words for anyone the graphic does not reach. */
+.figure-alt {
+  border-top: 1px solid var(--line);
+  padding-top: var(--s-3);
+}
+
+.figure-alt-summary {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.figure-alt-summary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.figure-alt > p {
+  margin: var(--s-3) 0 0;
+  max-width: 72ch;
+  font-size: var(--fs-small);
+  line-height: 1.55;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+/* --------------------------------------------------- inline-SVG tokens -- */
+/* Every figure SVG carries class="figc" on its root; text inherits ink and the
+   body font, and the helpers below map structure to tokens. */
+.figc {
+  color: var(--ink);
+}
+
+.figc text {
+  fill: var(--ink);
+  font-family: var(--font-body);
+}
+
+.figc .disp {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.figc .mono {
+  font-family: var(--font-mono);
+}
+
+.figc .muted {
+  fill: var(--muted);
+}
+
+.figc .ink2 {
+  fill: var(--ink-2);
+}
+
+/* Panels and rules */
+.figc .panel {
+  fill: color-mix(in srgb, var(--ink) 3%, var(--bg));
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.figc .rule {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.figc .axis {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.figc .arrow {
+  fill: var(--muted);
+}
+
+.figc .stroke-arrow {
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+/* Glyphs share one vocabulary (VISUAL-GUIDE §1.7): registry = cylinder,
+   gate = diamond, policy = card, evidence = document with a check,
+   agent = hexagon, human = person. Drawn with currentColor strokes. */
+.figc .glyph {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.figc .glyph-fill {
+  fill: currentColor;
+  stroke: none;
+}
+
+.figc .glyph-check {
+  fill: none;
+  stroke: var(--l5-ink);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Five stack layers: fill (pastel), tx (readable ink) and st (ink stroke). */
+.figc .l1-bg { fill: var(--l1); }
+.figc .l2-bg { fill: var(--l2); }
+.figc .l3-bg { fill: var(--l3); }
+.figc .l4-bg { fill: var(--l4); }
+.figc .l5-bg { fill: var(--l5); }
+
+.figc .l1-tx { fill: var(--l1-ink); }
+.figc .l2-tx { fill: var(--l2-ink); }
+.figc .l3-tx { fill: var(--l3-ink); }
+.figc .l4-tx { fill: var(--l4-ink); }
+.figc .l5-tx { fill: var(--l5-ink); }
+
+.figc .l1-st { stroke: var(--l1-ink); }
+.figc .l2-st { stroke: var(--l2-ink); }
+.figc .l3-st { stroke: var(--l3-ink); }
+.figc .l4-st { stroke: var(--l4-ink); }
+.figc .l5-st { stroke: var(--l5-ink); }
+
+/* Layer band tint (pattern-map / maturity rows): a soft wash of the layer over
+   the surface, hairlined with its ink. */
+.figc .l1-band { fill: color-mix(in srgb, var(--l1) 34%, var(--bg)); stroke: var(--l1-ink); }
+.figc .l2-band { fill: color-mix(in srgb, var(--l2) 34%, var(--bg)); stroke: var(--l2-ink); }
+.figc .l3-band { fill: color-mix(in srgb, var(--l3) 34%, var(--bg)); stroke: var(--l3-ink); }
+.figc .l4-band { fill: color-mix(in srgb, var(--l4) 34%, var(--bg)); stroke: var(--l4-ink); }
+.figc .l5-band { fill: color-mix(in srgb, var(--l5) 34%, var(--bg)); stroke: var(--l5-ink); }
+
+/* Chips: a pill filled with the layer pastel, its label in the layer ink. */
+.figc .chip-bg { rx: 5; }
+.figc .cell { stroke: var(--line); stroke-width: 1; }
+.figc .cell-empty { fill: color-mix(in srgb, var(--ink) 4%, var(--bg)); }
+
+/* Links inside a figure SVG (pattern-map): the label is the visible text, the
+   whole <a> is the target. Keep the ink colour; underline on hover/focus. */
+.figc a text {
+  fill: var(--ink);
+  text-decoration: none;
+}
+
+.figc a:hover text,
+.figc a:focus-visible text {
+  text-decoration: underline;
+}
+
+.figc a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ------------------------------------------------- reading-paths (HTML) -- */
+/* Three persona columns of real chapter links on the /bok index; stacks to one
+   column on a phone. */
+.reading-paths .figure-canvas {
+  padding: var(--s-4);
+}
+
+.rp-cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s-5);
+}
+
+@media (min-width: 720px) {
+  .rp-cols {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.rp-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.rp-persona {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.rp-sub {
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.rp-list {
+  list-style: none;
+  margin: var(--s-1) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.rp-list a {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    border-color var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.rp-list a:hover {
+  border-color: var(--ink-2);
+  transform: translateX(2px);
+}
+
+.rp-list a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.rp-num {
+  flex: none;
+  min-width: 2.1em;
+  padding: 2px var(--s-2);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  text-align: center;
+}
+
+.rp-num.l1 { background: var(--l1); color: var(--l1-ink); }
+.rp-num.l2 { background: var(--l2); color: var(--l2-ink); }
+.rp-num.l3 { background: var(--l3); color: var(--l3-ink); }
+.rp-num.l4 { background: var(--l4); color: var(--l4-ink); }
+.rp-num.l5 { background: var(--l5); color: var(--l5-ink); }
+
+.rp-node-title {
+  font-size: var(--fs-small);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* The newcomer route's terminal link into the learning path. */
+.rp-list a.rp-path .rp-num {
+  background: var(--ink);
+  color: var(--bg);
+}

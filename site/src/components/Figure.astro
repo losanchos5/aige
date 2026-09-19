@@ -1,0 +1,43 @@
+---
+/**
+ * Figure — the conceptual-infographic figure for editorial pages, with the same
+ * markup the chapter pipeline emits (src/lib/rehype-diagrams.ts): a framed
+ * canvas, a two-sentence figcaption and an optional <details> text alternative.
+ * The canvas holds slotted content — an inline <svg> from src/figures, or, when
+ * real navigation links are more accessible than SVG links, plain HTML (see the
+ * reading-paths map on the /bok index). Styling comes from the global
+ * figures.css (imported via diagrams.css in Base.astro), so light and dark both
+ * follow the tokens.
+ */
+interface Props {
+  /** Short title (≤ 6 words) shown in the figcaption. */
+  title: string;
+  /** Two-sentence caption ending "— drawn from chapter NN". */
+  caption?: string;
+  /** Fuller text alternative rendered in a <details>; omit when the slotted
+   *  content is already accessible text (e.g. real links). */
+  description?: string;
+  /** Extra class on the <figure> (e.g. a figure-specific layout hook). */
+  class?: string;
+  /** Optional data-figure id for styling/testing hooks. */
+  id?: string;
+}
+
+const { title, caption, description, class: className, id } = Astro.props;
+---
+
+<figure class:list={['figure', 'figure--infographic', className]} data-figure={id}>
+  <div class="figure-canvas"><slot /></div>
+  <figcaption class="figure-figcaption">
+    <span class="figure-fig-title">{title}</span>
+    {caption && <span class="figure-fig-desc">{caption}</span>}
+  </figcaption>
+  {
+    description && (
+      <details class="figure-alt">
+        <summary class="figure-alt-summary">Text description</summary>
+        <p>{description}</p>
+      </details>
+    )
+  }
+</figure>

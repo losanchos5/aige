@@ -8,10 +8,11 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "predev": "node scripts/diagrams-build.mjs",
+    "predev": "node scripts/diagrams-build.mjs && node scripts/figures-build.mjs",
     "diagrams:fetch": "node scripts/archify-fetch.mjs",
     "diagrams:build": "node scripts/diagrams-build.mjs",
-    "prebuild": "node scripts/diagrams-build.mjs",
+    "figures:build": "node scripts/figures-build.mjs",
+    "prebuild": "node scripts/diagrams-build.mjs && node scripts/figures-build.mjs",
     "build": "astro check && astro build && npm run lint:content && npm run check:links",
     "postbuild": "pagefind --site dist",
     "lint:content": "node scripts/content-lint.mjs",

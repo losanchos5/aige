@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 624" class="figc" role="group" aria-labelledby="fig-pattern-map-t fig-pattern-map-d">
+  <title id="fig-pattern-map-t">The pattern map</title>
+  <desc id="fig-pattern-map-d">Five bands, one per stack layer in canonical order, each holding the patterns whose home layer it is, as links.</desc>
+  <text class="mono muted" x="16" y="20" font-size="13.5">THE PATTERN CATALOGUE, BY LAYER</text>
+  <rect class="l1-band" x="8" y="30" width="344" height="26" rx="6" stroke-width="1"/>
+  <text class="l1-tx disp" x="16" y="48" font-size="13.5">Layer 01 Govern-as-Code</text>
+  <a href="#pattern-policy-card">
+    <rect class="l1-bg" x="16" y="64" width="99" height="24" rx="6"/>
+    <text class="l1-tx" x="26" y="81" font-size="13.5">Policy Card</text>
+  </a>
+  <a href="#pattern-fria-as-code">
+    <rect class="l1-bg" x="123" y="64" width="141" height="24" rx="6"/>
+    <text class="l1-tx" x="133" y="81" font-size="13.5">FRIA-as-Code</text>
+    <text class="l2-tx mono" x="225" y="81" font-size="12.5">· 02</text>
+  </a>
+  <a href="#pattern-framework-crosswalk">
+    <rect class="l1-bg" x="16" y="94" width="191" height="24" rx="6"/>
+    <text class="l1-tx" x="26" y="111" font-size="13.5">Framework Crosswalk</text>
+    <text class="l5-tx mono" x="168" y="111" font-size="12.5">· 05</text>
+  </a>
+  <rect class="l2-band" x="8" y="130" width="344" height="26" rx="6" stroke-width="1"/>
+  <text class="l2-tx disp" x="16" y="148" font-size="13.5">Layer 02 Inventory &amp; Transparency</text>
+  <a href="#pattern-agent-registry">
+    <rect class="l2-bg" x="16" y="164" width="121" height="24" rx="6"/>
+    <text class="l2-tx" x="26" y="181" font-size="13.5">Agent Registry</text>
+  </a>
+  <a href="#pattern-aibom">
+    <rect class="l2-bg" x="145" y="164" width="56" height="24" rx="6"/>
+    <text class="l2-tx" x="155" y="181" font-size="13.5">AIBOM</text>
+  </a>
+  <a href="#pattern-model-card-as-control-evidence">
+    <rect class="l2-bg" x="16" y="194" width="235" height="24" rx="6"/>
+    <text class="l2-tx" x="26" y="211" font-size="13.5">Model Card as Control Evidence</text>
+  </a>
+  <a href="#pattern-shadow-ai-discovery">
+    <rect class="l2-bg" x="16" y="224" width="156" height="24" rx="6"/>
+    <text class="l2-tx" x="26" y="241" font-size="13.5">Shadow-AI Discovery</text>
+  </a>
+  <a href="#pattern-vendor--model-due-diligence-gate">
+    <rect class="l2-bg" x="16" y="254" width="291" height="24" rx="6"/>
+    <text class="l2-tx" x="26" y="271" font-size="13.5">Vendor / Model Due-Diligence Gate</text>
+    <text class="l5-tx mono" x="268" y="271" font-size="12.5">· 05</text>
+  </a>
+  <rect class="l3-band" x="8" y="290" width="344" height="26" rx="6" stroke-width="1"/>
+  <text class="l3-tx disp" x="16" y="308" font-size="13.5">Layer 03 Evals &amp; Red Teaming as Evidence</text>
+  <a href="#pattern-eval-gate-in-ci">
+    <rect class="l3-bg" x="16" y="324" width="128" height="24" rx="6"/>
+    <text class="l3-tx" x="26" y="341" font-size="13.5">Eval Gate in CI</text>
+  </a>
+  <rect class="l4-band" x="8" y="360" width="344" height="26" rx="6" stroke-width="1"/>
+  <text class="l4-tx disp" x="16" y="378" font-size="13.5">Layer 04 Runtime Controls &amp; Observability</text>
+  <a href="#pattern-kill-switch--circuit-breaker">
+    <rect class="l4-bg" x="16" y="394" width="228" height="24" rx="6"/>
+    <text class="l4-tx" x="26" y="411" font-size="13.5">Kill Switch / Circuit Breaker</text>
+  </a>
+  <a href="#pattern-agent-identity--scoped-credentials">
+    <rect class="l4-bg" x="16" y="424" width="271" height="24" rx="6"/>
+    <text class="l4-tx" x="26" y="441" font-size="13.5">Agent Identity &amp; Scoped Credentials</text>
+  </a>
+  <a href="#pattern-human-in-the-loop-gate">
+    <rect class="l4-bg" x="16" y="454" width="178" height="24" rx="6"/>
+    <text class="l4-tx" x="26" y="471" font-size="13.5">Human-in-the-loop Gate</text>
+  </a>
+  <rect class="l5-band" x="8" y="490" width="344" height="26" rx="6" stroke-width="1"/>
+  <text class="l5-tx disp" x="16" y="508" font-size="13.5">Layer 05 Assurance &amp; Continuous Compliance</text>
+  <a href="#pattern-continuous-assurance-telemetry">
+    <rect class="l5-bg" x="16" y="524" width="235" height="24" rx="6"/>
+    <text class="l5-tx" x="26" y="541" font-size="13.5">Continuous Assurance Telemetry</text>
+  </a>
+  <a href="#pattern-incident-pipeline">
+    <rect class="l5-bg" x="16" y="554" width="142" height="24" rx="6"/>
+    <text class="l5-tx" x="26" y="571" font-size="13.5">Incident Pipeline</text>
+  </a>
+  <a href="#pattern-machine-readable-evidence-oscal">
+    <rect class="l5-bg" x="16" y="584" width="257" height="24" rx="6"/>
+    <text class="l5-tx" x="26" y="601" font-size="13.5">Machine-Readable Evidence (OSCAL)</text>
+  </a>
+</svg>

@@ -1,5 +1,6 @@
 // rehype-diagrams: at build, insert the interactive diagram figures declared in
-// src/data/diagrams.ts into the Body of Knowledge chapters. The markdown file is
+// src/data/diagrams.ts AND the hand-made conceptual infographics declared in
+// src/data/figures.ts into the Body of Knowledge chapters. The markdown file is
 // mapped to its chapter slug from the vfile path (basename `NN-slug.md` ->
 // chapters.ts id -> slug); for each placement the plugin resolves the anchor by
 // matching heading TEXT (normalised) and inserts the figure hast at the point
@@ -14,16 +15,23 @@
 // gathers it recursively.
 //
 // A placement whose heading cannot be found is a build error (better than a
-// silently missing figure). A diagram that is not yet in the generated manifest
-// (its IR is still being authored) is skipped, so the build does not depend on
-// every diagram existing at once.
+// silently missing figure). A diagram not yet in the generated manifest, or an
+// infographic whose src/figures/<id>.svg has not been authored/generated yet, is
+// skipped, so the build does not depend on every figure existing at once.
 
 import type { Root, RootContent, ElementContent } from 'hast';
 import type { VFile } from 'vfile';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { fromHtml } from 'hast-util-from-html';
 import { getChapter } from '../data/chapters';
-import { diagramsForChapter, type DiagramDef, type DiagramPlacement } from '../data/diagrams';
+import { diagramsForChapter, type DiagramPlacement } from '../data/diagrams';
+import { figuresForChapter, type FigureDef } from '../data/figures';
 import { diagramIds, renderDiagramFigure } from './diagrams';
+
+// The hand-made infographic SVGs live under site/src/figures, resolved from the
+// build cwd (the site directory) like the generated diagram SVGs.
+const FIGURES_DIR = resolve(process.cwd(), 'src/figures');
 
 /** Heading depth (1-6) for a top-level node, or null when it is not a heading. */
 function headingDepth(node: RootContent): number | null {
@@ -64,10 +72,49 @@ function chapterSlugForFile(file: VFile | undefined): string | undefined {
   return getChapter(id)?.slug;
 }
 
-function insertFigure(tree: Root, def: DiagramDef, placement: DiagramPlacement): void {
+function escapeHtml(value: string): string {
+  return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/**
+ * The <figure> HTML for a conceptual infographic: the self-contained inline SVG
+ * (which carries its own role/aria/<title>/<desc>) in a framed canvas, the
+ * two-sentence figcaption, and a <details> text alternative in the chapter's
+ * words. Returns '' when the SVG has not been authored/generated yet, so the
+ * build tolerates a figure whose art is not on disk.
+ */
+function renderFigureFigure(def: FigureDef): string {
+  const svgPath = resolve(FIGURES_DIR, `${def.id}.svg`);
+  if (!existsSync(svgPath)) return '';
+  const svg = readFileSync(svgPath, 'utf8').trim();
+  return (
+    `<figure class="figure figure--infographic" data-figure="${def.id}">` +
+    `<div class="figure-canvas">${svg}</div>` +
+    `<figcaption class="figure-figcaption">` +
+    `<span class="figure-fig-title">${escapeHtml(def.title)}</span>` +
+    `<span class="figure-fig-desc">${escapeHtml(def.caption)}</span>` +
+    `</figcaption>` +
+    `<details class="figure-alt">` +
+    `<summary class="figure-alt-summary">Text description</summary>` +
+    `<p>${escapeHtml(def.description)}</p>` +
+    `</details>` +
+    `</figure>`
+  );
+}
+
+/**
+ * Splice a rendered figure fragment into `tree` at `placement`. `label` names the
+ * figure in build errors. Shared by the diagram and infographic passes.
+ */
+function insertFragment(
+  tree: Root,
+  fragmentHtml: string,
+  placement: DiagramPlacement,
+  label: string,
+): void {
   const children = tree.children;
   const at = placement.at ?? 'foot';
-  const fragment = fromHtml(renderDiagramFigure(def.id), { fragment: true });
+  const fragment = fromHtml(fragmentHtml, { fragment: true });
 
   // 'lead': open the chapter with the figure, just before its first H2 (after
   // whatever intro prose precedes the first section).
@@ -81,7 +128,7 @@ function insertFigure(tree: Root, def: DiagramDef, placement: DiagramPlacement):
     }
     if (firstH2 < 0) {
       throw new Error(
-        `rehype-diagrams: no H2 heading found in chapter "${placement.chapter}" for lead diagram "${def.id}".`,
+        `rehype-diagrams: no H2 heading found in chapter "${placement.chapter}" for lead figure "${label}".`,
       );
     }
     children.splice(firstH2, 0, ...fragment.children);
@@ -91,7 +138,7 @@ function insertFigure(tree: Root, def: DiagramDef, placement: DiagramPlacement):
   // 'head'/'foot' both anchor on the H2 `section` (and optional H3 `sub`).
   if (!placement.section) {
     throw new Error(
-      `rehype-diagrams: placement for diagram "${def.id}" in chapter "${placement.chapter}" needs a "section" for at="${at}".`,
+      `rehype-diagrams: placement for figure "${label}" in chapter "${placement.chapter}" needs a "section" for at="${at}".`,
     );
   }
   const wantSection = placement.section.replace(/\s+/g, ' ').trim();
@@ -108,7 +155,7 @@ function insertFigure(tree: Root, def: DiagramDef, placement: DiagramPlacement):
   }
   if (sectionIndex < 0) {
     throw new Error(
-      `rehype-diagrams: heading "${placement.section}" not found in chapter "${placement.chapter}" for diagram "${def.id}".`,
+      `rehype-diagrams: heading "${placement.section}" not found in chapter "${placement.chapter}" for figure "${label}".`,
     );
   }
 
@@ -129,7 +176,7 @@ function insertFigure(tree: Root, def: DiagramDef, placement: DiagramPlacement):
     }
     if (found < 0) {
       throw new Error(
-        `rehype-diagrams: sub-heading "${placement.sub}" not found under "${placement.section}" in chapter "${placement.chapter}" for diagram "${def.id}".`,
+        `rehype-diagrams: sub-heading "${placement.sub}" not found under "${placement.section}" in chapter "${placement.chapter}" for figure "${label}".`,
       );
     }
     targetIndex = found;
@@ -160,16 +207,25 @@ export default function rehypeDiagrams() {
     const slug = chapterSlugForFile(file);
     if (!slug) return;
 
+    // Pass 1: interactive archify diagrams.
     const defs = diagramsForChapter(slug);
-    if (!defs.length) return;
-
     const available = new Set(diagramIds());
     for (const def of defs) {
       // Skip diagrams whose IR has not been built into an SVG yet.
       if (!available.has(def.id)) continue;
       for (const placement of def.placements) {
         if (placement.chapter !== slug) continue;
-        insertFigure(tree, def, placement);
+        insertFragment(tree, renderDiagramFigure(def.id), placement, def.id);
+      }
+    }
+
+    // Pass 2: hand-made conceptual infographics.
+    for (const figure of figuresForChapter(slug)) {
+      const html = renderFigureFigure(figure);
+      if (!html) continue; // SVG not authored/generated yet
+      for (const placement of figure.placements) {
+        if (placement.chapter !== slug) continue;
+        insertFragment(tree, html, placement, figure.id);
       }
     }
   };

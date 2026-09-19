@@ -8,6 +8,10 @@
    plus `.is-lit`/`.is-dim` on nodes ([data-node-id]) and edges ([data-edge-id]);
    without JS every node and edge is static and legible. */
 
+/* The hand-made conceptual infographics (src/figures/*.svg, <Figure>) share this
+   global stylesheet, so they are styled on every page that loads diagrams.css. */
+@import './figures.css';
+
 /* ---------------------------------------------------------------- figure -- */
 .diagram {
   margin: var(--s-6) 0;
