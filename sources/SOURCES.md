@@ -133,6 +133,7 @@ _IAPP is the **2025** Profession Report. Respect the BRIEF blocklist._
 | 22 | ISO/IEC 42001:2023 Annex A.10 — third-party and customer relationships (supplier controls) | ISO/IEC 42001:2023 | ISO/IEC | 2023 | https://www.iso.org/standard/81230.html | secondary | Vendor / Model Due-Diligence Gate |
 | 23 | EU AI Act Arts. 25 (value-chain responsibilities), 26 (deployer obligations), 27 (FRIA) — provider vs deployer duties | AI Act Arts. 25/26/27 | AI Act (Reg. (EU) 2024/1689) | 2024 | https://artificialintelligenceact.eu/article/25/ | primary | Vendor / Model Due-Diligence Gate |
 | 24 | GPAI Code of Practice (published 10 Jul 2025; voluntary; provider transparency documentation for downstream deployers) | Introduction to the Code of Practice | European Commission / AI Act Explorer | 2025-07-10 | https://artificialintelligenceact.eu/introduction-to-code-of-practice/ | primary | Vendor / Model Due-Diligence Gate |
+| 25 | MITRE ATLAS: adversarial tactics & techniques knowledge base for AI systems (incl. agents) | MITRE ATLAS | MITRE | 2026 | https://atlas.mitre.org/ | primary | Adversarial Red-Team Suite |
 
 ### bok/06-the-role.md
 

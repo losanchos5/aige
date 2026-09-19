@@ -93,9 +93,10 @@ vocabulary to map against [5]. Vendors are illustrative; the standards are not.
 only meaningful against a known object: "deny deploy of model X" presumes the stack knows model X
 exists, who owns it and what it is. That object is what layer 02 supplies.
 
-> **In practice** In a large telco, a data-residency rule written as `OPA/Rego` ran at both CI and
-> admission and blocked any deployment routing inference outside the permitted region. The value was
-> not the rule but that the enforced version emitted a verdict every engineer could see before merge.
+> **In practice** For `csa-01`, a customer-service assistant in a large telco, a data-residency rule
+> written as `OPA/Rego` ran at both CI and admission and blocked any deployment routing its inference
+> outside the permitted region. The value was not the rule but that the enforced version emitted a
+> verdict every engineer could see before merge.
 
 **Maps to:** EU AI Act Art. 9 (risk management) · ISO/IEC 42001 · NIST AI RMF (Govern) · CSA AICM ·
 OWASP Agentic ASI02/ASI03. Mappings are illustrative, not a claim of conformity.
@@ -144,9 +145,9 @@ run *against a registered version* and its result is filed *against that entry*,
 this model tested?" is answered by a join, not a search. The AIBOM tells the eval layer what to test —
 which model, which datasets, which provenance claims need adversarial probing.
 
-> **In practice** Wiring the registry to the deployment pipeline — so a new model or agent registered
-> itself, with an owner and a scope, at deploy time — turned "documented" into "governed" in the
-> telco. The document became a query answered from production, not from a slide.
+> **In practice** Wiring the registry to the deployment pipeline — so `csa-01` registered itself, with
+> an owner and a scope, at deploy time — turned "documented" into "governed". Its registry entry became
+> a query answered from production, not from a slide.
 
 **Maps to:** EU AI Act Art. 11 (technical documentation), Art. 49/71 (registration and the EU
 database), Art. 50 (transparency) · ISO/IEC 42001 · NIST AI RMF (Map) · CSA AICM · OWASP Agentic
@@ -199,8 +200,8 @@ meets inputs no eval anticipated. Layer 04 carries the same thresholds into prod
 guardrails, and the eval result becomes the baseline that runtime telemetry is compared against — a
 drop in live injection-resistance against the tested baseline is a signal, not a surprise.
 
-> **In practice** A red-team eval suite combining Inspect and Garak ran in CI for an internal agent; a
-> release that dropped injection resistance below the agreed floor failed the pipeline until fixed. The
+> **In practice** A red-team eval suite combining Inspect and Garak ran in CI for `csa-01`; a release
+> that dropped its injection resistance below the agreed floor failed the pipeline until fixed. The
 > eval's output — not a reviewer's opinion — was the assurance evidence filed against the model version.
 
 **Maps to:** EU AI Act Art. 15 (accuracy, robustness, cybersecurity), Art. 55 (GPAI systemic-risk
@@ -264,9 +265,10 @@ structured record. Layer 05 does not re-collect this evidence; it subscribes to 
 continuous assurance gets its continuity — the difference between an attestation that a control existed
 and evidence that it fired, on a specific call, at a specific time.
 
-> **In practice** Each agent in the telco was issued a distinct workload identity with an owner and a
-> declared scope; a misbehaving agent was traced to its identity and revoked without touching the
-> others. The kill switch was tested on a schedule — an untested kill switch is a claim, not a control.
+> **In practice** `csa-01` was issued a distinct workload identity with an owner and a declared scope,
+> as was every other agent in the telco; when it misbehaved it was traced to its identity and revoked
+> without touching the others. The kill switch was tested on a schedule — an untested kill switch is a
+> claim, not a control.
 
 **Maps to:** EU AI Act Art. 14 (human oversight), Art. 15 (robustness, cybersecurity), Art. 12
 (logging) · ISO/IEC 42001 · NIST AI RMF (Manage) · CSA AICM · OWASP Agentic ASI02/ASI03/ASI10.
@@ -324,10 +326,10 @@ does not by itself satisfy it, and confers no presumption of conformity under Ar
 feeds back to layer 03 as a new eval, to layer 01 as a tightened policy, and to layer 02 as a registry
 flag. The stack is a loop that happens to be drawn as a ladder.
 
-> **In practice** Guardrail decisions, eval results and policy verdicts streamed into an assurance
-> store with timestamps, so a control's status was a live query, not an annual sign-off. When an
-> auditor asked what the data-residency control did in the second quarter, the answer was a filter over
-> emitted evidence, produced in minutes.
+> **In practice** `csa-01`'s guardrail decisions, eval results and policy verdicts streamed into an
+> assurance store with timestamps, so a control's status was a live query, not an annual sign-off. When
+> an auditor asked what its data-residency control did in the second quarter, the answer was a filter
+> over emitted evidence, produced in minutes.
 
 **Maps to:** EU AI Act Art. 17 (quality management), Art. 72 (post-market monitoring), Art. 73 (serious
 incident reporting) · ISO/IEC 42001, ISO/IEC 42005 · NIST AI RMF (Govern, Manage) · CSA AICM.
@@ -362,8 +364,8 @@ a reviewer who sees a confident machine output will tend to confirm it, so overs
 "approve/reject" on the model's proposal is oversight in name only. **Oversight that degrades**: a gate
 that a person can clear in two seconds under load will be cleared in two seconds, and its quality falls
 silently as volume rises. The engineering answer is to classify actions by consequence and place a
-designed checkpoint only where the stakes justify the latency — the **Human-in-the-loop Gate** pattern
-(chapter 05) — giving the reviewer enough context to disagree, logging the approver and the decision as
+designed checkpoint only where the stakes justify the latency — the
+[**Human-in-the-loop Gate**](/bok/patterns#pattern-human-in-the-loop-gate) pattern (chapter 05) — giving the reviewer enough context to disagree, logging the approver and the decision as
 evidence, and monitoring the oversight itself (approval rate, time-to-decide, override rate) as a
 signal that can degrade. Oversight you do not measure is oversight you cannot claim.
 
@@ -379,8 +381,9 @@ behaviour. The layers do not disappear, but layer 03 shrinks to boundary evals a
 vendor's own evidence, and layer 04 shrinks to the perimeter you control. What grows to compensate is
 inventory and assurance: the vendor's system still needs a registry entry, an owner and a scope; its
 supplier documentation, model card and any AIBOM become evidence you collect rather than produce; and
-the due-diligence itself becomes a gate. This is the **Vendor / Model Due-Diligence Gate** pattern
-(chapter 05), anchored in ISO/IEC 42001 Annex A.10 (third-party and customer relationships) and the EU
+the due-diligence itself becomes a gate. This is the
+[**Vendor / Model Due-Diligence Gate**](/bok/patterns#pattern-vendor--model-due-diligence-gate)
+pattern (chapter 05), anchored in ISO/IEC 42001 Annex A.10 (third-party and customer relationships) and the EU
 AI Act's split of duties between provider and deployer (see chapter 08). The rule of thumb: the less of
 the model you own, the more of your control budget moves from testing it to bounding it and evidencing
 the supplier.
@@ -424,6 +427,50 @@ The order is deliberate: see it, rule it, test it, contain it, prove it. A thin 
 all three questions for one system today and widens as the team grows. The alternative — a thick layer
 01 of policies with no inventory beneath them — answers none of the three questions, and is exactly the
 framework theatre the discipline exists to end.
+
+## One system through the five layers
+
+`csa-01`, the customer-service assistant from the boxes above, is one system, not five. Below is the
+single artefact it produces at each layer — short excerpts of the schemas defined in chapter 05, each
+illustrative.
+
+**Layer 01 — Govern-as-Code** — a Policy Card verdict (illustrative):
+
+```json
+{ "rule_id": "residency.eu-only.v3", "decision": "deny",
+  "input_hash": "sha256:9f2b…", "timestamp": "2026-09-18T14:07:11Z" }
+```
+
+**Layer 02 — Inventory & Transparency** — its registry entry (illustrative):
+
+```json
+{ "id": "csa-01", "owner": "team-support-platform",
+  "scope": ["refunds:read", "orders:read"], "expiry": "2026-12-17" }
+```
+
+**Layer 03 — Evals & Red Teaming as Evidence** — an eval-gate result (illustrative):
+
+```json
+{ "suite_id": "injection-resistance.v4", "model_version": "csa-01@2026-09-18",
+  "score": 0.982, "threshold": 0.95, "result": "pass" }
+```
+
+**Layer 04 — Runtime Controls & Observability** — a guardrail event (illustrative):
+
+```json
+{ "agent": "csa-01", "direction": "output", "rule_id": "output.pii.v2",
+  "decision": "block", "timestamp": "2026-09-18T14:31:52Z" }
+```
+
+**Layer 05 — Assurance & Continuous Compliance** — the evidence record it emits (illustrative):
+
+```json
+{ "control_id": "guardrail.output.pii.v2", "subject": "csa-01@2026-09-18",
+  "decision": "alert", "obligation": "EU AI Act Art. 15",
+  "timestamp": "2026-09-18T14:31:52Z" }
+```
+
+The five excerpts are one data path from policy to proof, keyed on the same registry id.
 
 ## Sources
 
