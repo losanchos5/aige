@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
@@ -37,6 +37,10 @@ jobs:
           path: site/.archify
           key: archify-v2.16.0
       - run: npm run build
+        env:
+          # Owner adds a repository secret named CF_BEACON_TOKEN to activate
+          # Cloudflare Web Analytics; empty → Base.astro renders no beacon.
+          PUBLIC_CF_BEACON_TOKEN: ${{ secrets.CF_BEACON_TOKEN }}
       - name: Deploy
         uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
         with:
@@ -44,3 +48,25 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: site
           command: pages deploy dist --project-name aige --branch main
+      # Post-deploy smoke test: the production site must serve each key page with
+      # HTTP 200 and the expected marker string, or the deploy is flagged failed.
+      - name: Post-deploy smoke test
+        run: |
+          set -euo pipefail
+          marker='AI Governance Engineer'
+          for path in / /thesis /bok/the-stack; do
+            url="https://aigovernanceengineer.com${path}"
+            echo "Checking ${url}"
+            status=$(curl --silent --show-error --location \
+              --retry 5 --retry-delay 10 --retry-all-errors \
+              --output /tmp/smoke-body.html --write-out '%{http_code}' "${url}")
+            if [ "${status}" != "200" ]; then
+              echo "::error::${url} returned HTTP ${status}"
+              exit 1
+            fi
+            if ! grep -qF "${marker}" /tmp/smoke-body.html; then
+              echo "::error::Marker '${marker}' not found at ${url}"
+              exit 1
+            fi
+          done
+          echo "Smoke test passed."

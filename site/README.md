@@ -7,6 +7,17 @@ The Astro 5 static site for AI Governance Engineering, deployed to Cloudflare Pa
   (runs `prebuild` → the diagram build first).
 - `npm test` — Playwright default project.
 
+## Analytics
+
+Cloudflare Web Analytics is off by default and needs no code change to turn on.
+`Base.astro` renders the beacon only when the build-time env var
+`PUBLIC_CF_BEACON_TOKEN` is non-empty; otherwise nothing is emitted. The deploy
+workflow passes it from a repository secret named **`CF_BEACON_TOKEN`**, so the
+owner activates analytics by adding that secret (its value is the Cloudflare Web
+Analytics site token) — no redeploy of the code is required beyond the next push.
+The beacon loads from `static.cloudflareinsights.com`, already allow-listed in
+`public/_headers`, so the strict CSP keeps working.
+
 ## Diagrams
 
 Architecture, workflow, sequence, dataflow and lifecycle diagrams are authored as

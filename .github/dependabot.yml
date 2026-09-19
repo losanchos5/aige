@@ -1,0 +1,24 @@
+# Dependabot keeps npm dependencies (in site/) and the GitHub Actions used by the
+# workflows (in .github/workflows/, rooted at /) up to date. Minor and patch
+# updates are grouped into a single PR per ecosystem to cut review noise; major
+# updates still arrive as their own PRs.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /site
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch

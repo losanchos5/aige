@@ -17,6 +17,10 @@ interface Props {
 }
 
 const { title, description, image } = Astro.props;
+
+// Cloudflare Web Analytics: only injected when a token is provided at build time
+// via PUBLIC_CF_BEACON_TOKEN (a Cloudflare secret). No token → no beacon.
+const cfBeaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
 ---
 
 <!doctype html>
@@ -55,9 +59,16 @@ const { title, description, image } = Astro.props;
     <!-- Apply persisted theme before paint; exposes window.__setTheme. -->
     <script is:inline src="/theme.js"></script>
 
-    <!-- CF_BEACON: Cloudflare Web Analytics beacon injected here in production.
-    <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"REPLACE_ME"}'></script>
-    -->
+    {
+      cfBeaconToken && (
+        <script
+          is:inline
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
+        />
+      )
+    }
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>

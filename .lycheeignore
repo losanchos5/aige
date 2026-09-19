@@ -1,0 +1,11 @@
+# lychee ignore list (regular expressions matched against each URL).
+# Sites that block bots or require a login return spurious 403/999s, so we skip
+# them rather than let them create false "link rot" reports.
+linkedin\.com
+(^|//|\.)x\.com
+twitter\.com
+
+# Local and placeholder URLs that never resolve on the public internet.
+localhost
+127\.0\.0\.1
+(^|\.)example\.(com|org|net)
