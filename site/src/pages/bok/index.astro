@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import Figure from '../../components/Figure.astro';
 import { site } from '../../data/site';
 import { chaptersOrdered, getChapter } from '../../data/chapters';
 import { readingTime } from '../../lib/reading';
@@ -14,6 +15,39 @@ const intro =
   'The founding text and working reference for engineering the governance of AI systems.';
 
 const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
+
+// Reading paths by reader (VISUAL-GUIDE §2.3 reading-paths): three routes through
+// the book as real links. Chapter titles come from chapters.ts; the newcomer
+// route ends in the learning path. Headings and subtitles use the preface's own
+// framing of who the book is for.
+const byOrder = new Map(chaptersOrdered.map((chapter) => [chapter.order, chapter]));
+const node = (order: number) => {
+  const chapter = byOrder.get(order)!;
+  return {
+    href: `/bok/${chapter.slug}`,
+    num: String(order).padStart(2, '0'),
+    title: chapter.shortTitle,
+    cls: `l${(order % 5) + 1}`,
+  };
+};
+const readingPaths = [
+  {
+    heading: 'Building this month',
+    sub: 'stop shipping documents, start shipping controls',
+    nodes: [node(4), node(5), node(8)],
+  },
+  {
+    heading: 'Assuring & advising',
+    sub: 'extend the threat model to models and agents',
+    nodes: [node(1), node(2), node(8), node(7)],
+  },
+  {
+    heading: 'New to the discipline',
+    sub: 'the founding text, in order',
+    nodes: [node(0), node(1), node(6)],
+    tail: { href: '/path', title: 'The learning path' },
+  },
+];
 ---
 
 <Base title={`Body of Knowledge · ${site.name}`} image="/og/bok.png">
@@ -44,6 +78,41 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
         ))
       }
     </ol>
+
+    <Figure
+      class="reading-paths"
+      title="Reading paths"
+      caption="Three routes through the Body of Knowledge, one per reader, as real links. Pick your column and start at its first node. — drawn from chapter 00"
+    >
+      <div class="rp-cols">
+        {
+          readingPaths.map((path) => (
+            <div class="rp-col">
+              <p class="rp-persona">{path.heading}</p>
+              <p class="rp-sub">{path.sub}</p>
+              <ol class="rp-list">
+                {path.nodes.map((n) => (
+                  <li>
+                    <a href={n.href}>
+                      <span class:list={['rp-num', n.cls]}>{n.num}</span>
+                      <span class="rp-node-title">{n.title}</span>
+                    </a>
+                  </li>
+                ))}
+                {path.tail && (
+                  <li>
+                    <a class="rp-path" href={path.tail.href}>
+                      <span class="rp-num">→</span>
+                      <span class="rp-node-title">{path.tail.title}</span>
+                    </a>
+                  </li>
+                )}
+              </ol>
+            </div>
+          ))
+        }
+      </div>
+    </Figure>
   </div>
 
   <style>

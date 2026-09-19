@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 340" class="figc" role="img" aria-labelledby="fig-three-questions-t fig-three-questions-d">
+  <title id="fig-three-questions-t">The three questions</title>
+  <desc id="fig-three-questions-d">Three panels — what AI is running, what it is allowed to do, and what evidence proves it — each with the stack layers that answer it.</desc>
+
+  <text class="mono muted" x="16" y="20" font-size="13.5">THE SPINE OF THE BODY OF KNOWLEDGE</text>
+
+  <!-- Panel 1: What AI is running? — registry cylinder — Layer 02 -->
+  <rect class="panel" x="8" y="34" width="344" height="76" rx="10"/>
+  <g>
+    <ellipse class="glyph" cx="32" cy="50" rx="13" ry="4.5"/>
+    <path class="glyph" d="M19 50 L19 70 A13 4.5 0 0 0 45 70 L45 50"/>
+  </g>
+  <text class="disp" x="62" y="63" font-size="15.5">What AI is running?</text>
+  <g>
+    <rect class="l2-bg" x="20" y="80" width="243" height="22" rx="5"/>
+    <text class="l2-tx" x="30" y="95" font-size="13.5">Layer 02 Inventory &amp; Transparency</text>
+  </g>
+
+  <!-- Panel 2: What is it allowed to do? — policy card + gate — Layers 01, 04 -->
+  <rect class="panel" x="8" y="118" width="344" height="102" rx="10"/>
+  <g>
+    <rect class="glyph" x="19" y="130" width="20" height="26" rx="3"/>
+    <line class="glyph" x1="23" y1="138" x2="35" y2="138"/>
+    <line class="glyph" x1="23" y1="144" x2="35" y2="144"/>
+    <line class="glyph" x1="23" y1="150" x2="31" y2="150"/>
+    <path class="glyph" d="M42 150 l6 -6 l6 6 l-6 6 z"/>
+  </g>
+  <text class="disp" x="62" y="148" font-size="15.5">What is it allowed to do?</text>
+  <g>
+    <rect class="l1-bg" x="20" y="164" width="175" height="22" rx="5"/>
+    <text class="l1-tx" x="30" y="179" font-size="13.5">Layer 01 Govern-as-Code</text>
+  </g>
+  <g>
+    <rect class="l4-bg" x="20" y="190" width="297" height="22" rx="5"/>
+    <text class="l4-tx" x="30" y="205" font-size="13.5">Layer 04 Runtime Controls &amp; Observability</text>
+  </g>
+
+  <!-- Panel 3: What evidence proves it? — evidence document — Layers 03, 05 -->
+  <rect class="panel" x="8" y="228" width="344" height="102" rx="10"/>
+  <g>
+    <path class="glyph" d="M22 240 h18 l8 8 v26 h-26 z"/>
+    <path class="glyph" d="M40 240 v8 h8"/>
+    <line class="glyph" x1="27" y1="262" x2="43" y2="262"/>
+    <line class="glyph" x1="27" y1="268" x2="43" y2="268"/>
+    <path class="glyph-check" d="M26 256 l4 4 l8 -9"/>
+  </g>
+  <text class="disp" x="62" y="258" font-size="15.5">What evidence proves it?</text>
+  <g>
+    <rect class="l3-bg" x="20" y="274" width="290" height="22" rx="5"/>
+    <text class="l3-tx" x="30" y="289" font-size="13.5">Layer 03 Evals &amp; Red Teaming as Evidence</text>
+  </g>
+  <g>
+    <rect class="l5-bg" x="20" y="300" width="304" height="22" rx="5"/>
+    <text class="l5-tx" x="30" y="315" font-size="13.5">Layer 05 Assurance &amp; Continuous Compliance</text>
+  </g>
+</svg>
