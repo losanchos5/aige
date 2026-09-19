@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Machine-Readable Evidence",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [980, 540],
+    "views": [
+      {
+        "id": "generated-from-data",
+        "label": "Generated from data",
+        "focus": ["catalogue", "assessments", "records", "oscal"],
+        "note": "Controls, assessments and evidence become OSCAL documents from data you already hold."
+      },
+      {
+        "id": "validated-once",
+        "label": "Validated once",
+        "focus": ["oscal", "validator"],
+        "note": "A validator checks the documents against the schema, at one gate."
+      },
+      {
+        "id": "read-not-retyped",
+        "label": "Read, not re-typed",
+        "focus": ["validator", "auditor", "compliance", "regulator"],
+        "note": "Auditor, compliance tooling and regulator read the same documents without re-typing."
+      }
+    ]
+  },
+  "stages": [
+    { "label": "Sources" },
+    { "label": "OSCAL (Layer 05)" },
+    { "label": "Validator" },
+    { "label": "Consumers" }
+  ],
+  "nodes": [
+    { "id": "catalogue", "type": "external", "label": "Control catalogue", "sublabel": "controls", "stage": 0, "row": 0, "width": 150, "height": 64 },
+    { "id": "assessments", "type": "external", "label": "Assessment results", "sublabel": "eval runs", "stage": 0, "row": 1, "width": 152, "height": 64 },
+    { "id": "records", "type": "external", "label": "Evidence records", "sublabel": "verdicts", "stage": 0, "row": 2, "width": 150, "height": 64 },
+    { "id": "oscal", "type": "database", "label": "OSCAL documents", "sublabel": "component / assessment", "tag": "Layer 05", "stage": 1, "row": 1, "width": 160, "height": 64 },
+    { "id": "validator", "type": "security", "label": "Validator", "sublabel": "schema-checked", "stage": 2, "row": 1, "width": 150, "height": 64 },
+    { "id": "auditor", "type": "external", "label": "Auditor", "sublabel": "reads directly", "stage": 3, "row": 0, "width": 150, "height": 64 },
+    { "id": "compliance", "type": "external", "label": "Compliance tooling", "sublabel": "continuous", "stage": 3, "row": 1, "width": 156, "height": 64 },
+    { "id": "regulator", "type": "external", "label": "Regulator", "sublabel": "submission", "stage": 3, "row": 2, "width": 150, "height": 64 }
+  ],
+  "flows": [
+    { "id": "catalogue-oscal", "from": "catalogue", "to": "oscal", "label": "map", "variant": "default", "route": "top-channel" },
+    { "id": "assessments-oscal", "from": "assessments", "to": "oscal", "label": "map", "variant": "default", "route": "straight" },
+    { "id": "records-oscal", "from": "records", "to": "oscal", "label": "map", "variant": "default", "route": "bottom-channel" },
+    { "id": "oscal-validator", "from": "oscal", "to": "validator", "label": "check", "variant": "emphasis" },
+    { "id": "validator-auditor", "from": "validator", "to": "auditor", "label": "read", "variant": "default", "route": "top-channel" },
+    { "id": "validator-compliance", "from": "validator", "to": "compliance", "label": "read", "variant": "default", "route": "straight" },
+    { "id": "validator-regulator", "from": "validator", "to": "regulator", "label": "submit", "variant": "default", "route": "bottom-channel" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Evidence as data, not screenshots",
+      "items": [
+        "Control catalogue, assessment results and evidence records become OSCAL",
+        "Component-definition and assessment-results carry the traceability to controls",
+        "Emitted from the same data you already hold, so nothing is re-typed"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Validated, then read",
+      "items": [
+        "A validator checks the documents against the schema at one gate",
+        "Auditor, compliance tooling and regulator read the same documents",
+        "The audit becomes a query and evidence composes across tools"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "First step",
+      "items": [
+        "Choose the format your assessor can ingest",
+        "Generate it from the data you already hold"
+      ]
+    }
+  ]
+}

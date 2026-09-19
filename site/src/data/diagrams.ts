@@ -129,6 +129,86 @@ export const diagrams: readonly DiagramDef[] = [
       'The reference toolchain mapped to the five stack layers, from policy engines and the agent registry up to guardrails, observability and the assurance store — generated from the Body of Knowledge.',
     placements: [],
   },
+  {
+    id: 'policy-card',
+    type: 'workflow',
+    title: 'Policy Card',
+    caption:
+      'A governance rule travels as a versioned policy card that a policy engine evaluates at one gate, recording an allow-or-deny verdict against every change. Start by writing one card for one obligation and wiring it to that gate — generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', section: 'Pattern: Policy Card', at: 'head' },
+    ],
+  },
+  {
+    id: 'aibom-at-build',
+    type: 'dataflow',
+    title: 'AIBOM at Build',
+    caption:
+      'The build step emits an AI bill of materials that lands on the registry entry and feeds the vulnerability-matching and documentation consumers. If your build does not emit it, you cannot answer what is running — generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', section: 'Pattern: AIBOM', at: 'head' }],
+  },
+  {
+    id: 'model-card-evidence',
+    type: 'workflow',
+    title: 'Model Card as Evidence',
+    caption:
+      'The model card is generated from real training and eval outputs, checked against a schema at one gate, and attached to the release as control evidence. A hand-written card is documentation; a generated, validated one is a control — generated from the Body of Knowledge.',
+    placements: [
+      {
+        chapter: 'patterns',
+        section: 'Pattern: Model Card as Control Evidence',
+        at: 'head',
+      },
+    ],
+  },
+  {
+    id: 'continuous-assurance-telemetry',
+    type: 'dataflow',
+    title: 'Continuous Assurance Telemetry',
+    caption:
+      'Runtime signals are checked against controls continuously, and every check writes an evidence record an auditor can read from the assurance store. Continuous means the evidence is produced by the data path, not a quarterly exercise — generated from the Body of Knowledge.',
+    placements: [
+      {
+        chapter: 'patterns',
+        section: 'Pattern: Continuous Assurance Telemetry',
+        at: 'head',
+      },
+    ],
+  },
+  {
+    id: 'fria-as-code',
+    type: 'workflow',
+    title: 'FRIA-as-Code',
+    caption:
+      'The fundamental-rights impact assessment is captured as data at intake, assessed and mitigated, then approved at a human gate and stored machine-readable beside the DPIA. Run it before deploying a high-risk system and keep the record where the auditor looks — generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', section: 'Pattern: FRIA-as-Code', at: 'head' },
+    ],
+  },
+  {
+    id: 'framework-crosswalk',
+    type: 'architecture',
+    title: 'Framework Crosswalk',
+    caption:
+      'One internal control set is the hub that external frameworks map onto, with evidence attached once to the hub and reused for all of them. The crosswalk is an index, not the end state — the hub is what you maintain — generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', section: 'Pattern: Framework Crosswalk', at: 'head' },
+    ],
+  },
+  {
+    id: 'machine-readable-evidence',
+    type: 'dataflow',
+    title: 'Machine-Readable Evidence',
+    caption:
+      'Controls, assessments and evidence become OSCAL documents that a validator checks and assurance consumers read without anyone re-typing them. Choose the format your assessor can ingest and generate it from data you already hold — generated from the Body of Knowledge.',
+    placements: [
+      {
+        chapter: 'patterns',
+        section: 'Pattern: Machine-Readable Evidence (OSCAL)',
+        at: 'head',
+      },
+    ],
+  },
 ] as const;
 
 /** Look up a diagram definition by id. */

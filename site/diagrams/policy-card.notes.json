@@ -1,0 +1,9 @@
+{
+  "owner": "The policy owner, accountable for the rule, who authors and maintains the card rather than filing it as prose.",
+  "card": "The policy card: a structured, versioned artefact in the repo that encodes allow/deny logic, the failure mode it addresses and the framework clauses it maps to, stored with the system it governs.",
+  "engine": "A policy engine that reads the card and evaluates it, returning a machine-readable decision tied to the change.",
+  "gate": "The single gate where the engine's decision blocks or admits the change — built at the earliest point it can block.",
+  "proceed": "A change that satisfies the card proceeds, merged and deployed along the governed path.",
+  "blocked": "A change outside the policy is blocked at the gate rather than depending on someone remembering the rule.",
+  "verdict": "The verdict record emitted on every evaluation — rule id, input hash, decision and timestamp — so the control leaves auditable evidence."
+}

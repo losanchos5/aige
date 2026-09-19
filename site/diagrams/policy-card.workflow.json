@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Policy Card",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "rule-as-code",
+        "label": "Rule becomes a card",
+        "focus": ["owner", "card", "engine"],
+        "note": "An owner authors one governance rule as a versioned policy card the engine can read."
+      },
+      {
+        "id": "one-gate",
+        "label": "One gate decides",
+        "focus": ["engine", "gate", "proceed", "blocked"],
+        "note": "The engine evaluates the card at a single gate that allows or denies the change."
+      },
+      {
+        "id": "verdict-recorded",
+        "label": "Verdict recorded",
+        "focus": ["proceed", "blocked", "verdict"],
+        "note": "Every evaluation records a verdict against the change, whichever way it goes."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "owner", "label": "Owner" },
+    { "id": "govern", "label": "Layer 01 Govern-as-Code" },
+    { "id": "evidence", "label": "Evidence" },
+    { "id": "blocked", "label": "Blocked", "variant": "exception" }
+  ],
+  "phases": [
+    { "id": "author", "label": "Author as code", "fromCol": 0, "toCol": 1 },
+    { "id": "evaluate", "label": "Evaluate at the gate", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "record", "label": "Record verdict", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["card", "engine", "gate", "proceed", "verdict"],
+  "nodes": [
+    { "id": "owner", "lane": "owner", "col": 0, "type": "external", "label": "Policy owner", "sublabel": "accountable", "width": 150 },
+    { "id": "card", "lane": "govern", "col": 1, "type": "database", "label": "Policy card", "sublabel": "versioned, in repo", "width": 156 },
+    { "id": "engine", "lane": "govern", "col": 2, "type": "backend", "label": "Policy engine", "sublabel": "evaluates the card", "width": 156 },
+    { "id": "gate", "lane": "govern", "col": 3, "type": "security", "label": "Policy gate", "sublabel": "allow / deny", "width": 150 },
+    { "id": "proceed", "lane": "govern", "col": 4, "type": "backend", "label": "Change proceeds", "sublabel": "merged, deployed", "width": 160 },
+    { "id": "verdict", "lane": "evidence", "col": 5, "type": "database", "label": "Verdict record", "sublabel": "rule · decision · time", "width": 168 },
+    { "id": "blocked", "lane": "blocked", "col": 4, "type": "backend", "label": "Change blocked", "sublabel": "outside policy", "width": 156 }
+  ],
+  "edges": [
+    { "id": "owner-card", "from": "owner", "to": "card", "label": "authors", "variant": "default" },
+    { "id": "card-engine", "from": "card", "to": "engine", "label": "load", "variant": "emphasis" },
+    { "id": "engine-gate", "from": "engine", "to": "gate", "label": "evaluate", "variant": "emphasis" },
+    { "id": "gate-proceed", "from": "gate", "to": "proceed", "label": "allow", "variant": "emphasis" },
+    { "id": "gate-blocked", "from": "gate", "to": "blocked", "label": "deny", "variant": "security", "role": "error" },
+    { "id": "proceed-verdict", "from": "proceed", "to": "verdict", "label": "record", "variant": "dashed", "role": "branch" },
+    { "id": "blocked-verdict", "from": "blocked", "to": "verdict", "label": "record", "variant": "dashed", "role": "branch", "route": "outside-right" }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "A rule that executes",
+      "items": [
+        "One machine-readable card per obligation, versioned as a reviewable diff",
+        "It encodes allow/deny logic, the failure mode and the clauses it maps to",
+        "Stored in the repo with the system it governs"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "One gate, one verdict",
+      "items": [
+        "A policy engine evaluates the card at a single gate",
+        "The change proceeds or is blocked outside the policy",
+        "Each evaluation records a verdict against the change"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "First step",
+      "items": [
+        "Write one card for one obligation",
+        "Wire it to one gate before adding more"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "hub": "Layer 01 Govern-as-Code: the internal control set — the Policy Cards and Eval Gates the organisation maintains — each declaring the framework clauses it maps to, so the crosswalk is generated from the controls rather than kept beside them.",
+  "evidence": "Layer 05 Assurance & Continuous Compliance: the evidence store attached to the hub, so a mapping cell resolves to a running control and its emitted evidence, and the same evidence is reused for every framework.",
+  "eu": "The EU AI Act, one of the overlapping frameworks the control set maps to; a label on the crosswalk, not a claim of conformity.",
+  "iso": "ISO/IEC 42001 and its Annex A control objectives, mapped to from the same internal controls.",
+  "nist": "The NIST AI Risk Management Framework and its four functions, mapped to from the same internal controls.",
+  "csa": "The CSA AI Controls Matrix (247 control objectives across 18 domains), one of the reference vocabularies the crosswalk anchors on.",
+  "owasp": "The OWASP Agent Control Standard, an agent-specific vocabulary the crosswalk maps to."
+}

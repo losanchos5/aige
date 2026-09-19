@@ -1,0 +1,9 @@
+{
+  "traces": "Layer 04 Runtime Controls & Observability: execution traces — agent runs and spans emitted as the system operates.",
+  "guardrail": "Layer 04 Runtime Controls & Observability: guardrail events, such as blocked tool calls, emitted at the point of action.",
+  "regstate": "Layer 04 Runtime Controls & Observability: registry state — the scope and status of each registered model, agent and system.",
+  "checks": "Layer 05 Assurance & Continuous Compliance: the control checks that run continuously against the signals rather than at a quarterly review.",
+  "records": "Layer 05 Assurance & Continuous Compliance: the evidence records each check writes on one schema — control_id, subject and version, decision, metric, threshold, actor, timestamp and signature — keyed on the registry id.",
+  "dashboard": "A live dashboard whose control-status tile is backed by a query over the records; if a control stops firing the tile goes red within minutes.",
+  "auditor": "The auditor, for whom the audit becomes a query over the store and drift is visible in near real time."
+}
