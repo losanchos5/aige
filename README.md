@@ -8,12 +8,12 @@ knowledge**. It is written by and for practitioners who build governance for AI 
 code, agent registries, eval gates, runtime guardrails, machine-readable evidence — and who measure
 their work by realised risk reduction and audit-ready evidence, not by framework coverage.
 
-It is **version 0.3**: the Thesis restated as affirmations over a peer-reviewed revision of the first public draft, still deliberately
-incomplete, written by one practitioner and open to many. If you do this work, you are invited to
+It is **version 0.3.1**: the Thesis restated as affirmations over a peer-reviewed revision of the first public draft, still deliberately
+incomplete, started by one practitioner and open to many. If you do this work, you are invited to
 co-author and to sign.
 
 **Home:** https://aigovernanceengineer.com — the Thesis at `/thesis`, Body of Knowledge at `/bok`.
-Source repository: `github.com/losanchos5/aige` (to be created).
+Source repository: `github.com/losanchos5/aige`.
 
 ## Start here
 
@@ -51,7 +51,7 @@ aige/
     └── build_pdf.py       Assembles the Markdown into dist/site-preview.html (PDF export optional)
 ```
 
-Chapters 00–10 are drafted in v0.1; the catalogue, mappings and arguments are open for co-authors to
+Chapters 00–10 are drafted; the catalogue, mappings and arguments are open for co-authors to
 extend.
 
 ## The five-layer stack
@@ -66,6 +66,8 @@ The artefacts an AI governance engineer ships map onto five layers, always named
    serious-incident reporting.
 
 ## How to contribute
+
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the full contribution guide. In short:
 
 1. Read **[STYLEGUIDE.md](STYLEGUIDE.md)** and follow the chapter or pattern template exactly.
 2. Source every factual claim with a `[n]` citation, tag it `primary` / `secondary` / `reported`, and

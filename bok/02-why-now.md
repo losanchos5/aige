@@ -45,7 +45,7 @@ difference between a control that describes risk and one that prevents it.
 ### 4. Framework theatre
 
 Mapping to NIST AI RMF or ISO/IEC 42001 becomes the end state instead of the starting point, and a
-green mapping matrix is mistaken for a working control. Yet as of 2026-09-10 no harmonised standard is
+green mapping matrix is mistaken for a working control. Yet as of 2026-09-19 no harmonised standard is
 cited in the EU's Official Journal, so there is no Article 40 presumption of conformity for the AI
 Act [4]. Even EN ISO/IEC 42001, the AI management-system standard, is not the Article 17 quality
 management system the Act requires and confers no presumption of conformity on its own [5]. Coverage
@@ -81,11 +81,12 @@ observability and monitoring, in roughly 41% of postings, with Python in about 2
 named frameworks [8]. These are build-and-run skills, not review skills. Live "AI Governance Engineer"
 postings ask for the same substance under the new title: an enterprise agent registry, threat
 modelling, red teams, non-human-identity controls and NIST AI RMF alignment, at a large family
-office; AI intake and classification aligned to NIST AI RMF, at a global custodian bank; security
-controls, threat models and incident response for LLM systems, at a mid-market employer [9]. And at
+office [9]; AI intake and classification aligned to NIST AI RMF, at a global custodian bank [10];
+security controls, threat models and incident response for LLM systems, at a mid-market employer [11].
+And at
 the frontier, Anthropic has advertised an Engineering Manager for GRC tasked with building an
 "AI-forward GRC engineering function", translating "policies into policy-as-code", and deploying
-agentic workflows that use Claude "to serve as a virtual GRC analyst" [10]. The market has been
+agentic workflows that use Claude "to serve as a virtual GRC analyst" [12]. The market has been
 describing AI governance engineering for a year; it simply had not agreed on the name.
 
 ### Registry versus runtime
@@ -93,9 +94,9 @@ describing AI governance engineering for a year; it simply had not agreed on the
 The tooling market tells the same story from the supply side. Gartner published its first Magic
 Quadrant for AI Governance Platforms in June 2026, and its inclusion criteria are revealing: AI
 discovery and registry, compliance risk management, policy management, dynamic risk scoring, evidence
-collection, workflow and approvals, and an audit trail [11]. Every one of those sits at the program
+collection, workflow and approvals, and an audit trail [13]. Every one of those sits at the program
 layer. The market for these platforms is real and growing fast — Gartner puts it at roughly USD 65
-million in 2024, rising to more than USD 1.4 billion by 2030 [12] — but growth in program-layer
+million in 2024, rising to more than USD 1.4 billion by 2030 [14] — but growth in program-layer
 tooling does not close the runtime gap. As one review of the category puts it, most of it manages the
 program "without any runtime data path" [6]. The category is maturing around inventories and evidence
 workflows precisely while the risk is migrating to runtime and to agents. That mismatch is the space
@@ -103,13 +104,13 @@ the discipline occupies.
 
 ### The standards gap
 
-The framework-theatre problem has a hard deadline attached to it. As of 2026-09-10, zero harmonised
+The framework-theatre problem has a hard deadline attached to it. As of 2026-09-19, zero harmonised
 standards are cited in the Official Journal, so Article 40's presumption of conformity is not yet
 available to anyone [4]. EN 18286, the quality-management standard aimed at Article 17, was published
 in July 2026 — the first JTC 21 AI Act standard to reach publication — but it is not yet cited in the
-Official Journal, so it carries no presumption of conformity [13]. The Article 9 risk-management,
+Official Journal, so it carries no presumption of conformity [15]. The Article 9 risk-management,
 Article 12 logging and Article 15 cybersecurity standards were still at the Enquiry stage, targeting
-the end of 2026 [13]. EN ISO/IEC 42001:2026, the European adoption of the AI management-system
+the end of 2026 [15]. EN ISO/IEC 42001:2026, the European adoption of the AI management-system
 standard, is not the Article 17 QMS and does not by itself evidence conformity [5]. The practical
 consequence for a governance function: for the period covered by this edition, there is no standard
 you can certify against to buy a legal presumption. You have to build the controls and the evidence
@@ -121,14 +122,14 @@ The law moved twice in the same summer, in opposite directions, and both moves p
 First, the Digital Omnibus — Regulation (EU) 2026/1744 — entered into force on 27 July 2026, six days
 before the 2 August high-risk deadline, and reset the clock: Annex III high-risk obligations moved
 from 2 August 2026 to 2 December 2027, and Annex I embedded high-risk from 2 August 2027 to 2 August
-2028 [14]. The extra time is real, but it is not relief from the engineering; it is more runway to do
+2028 [16]. The extra time is real, but it is not relief from the engineering; it is more runway to do
 it. Second, and unmoved by the Omnibus, GPAI enforcement went live on 2 August 2026: the AI Office can
 now demand documentation, evaluate models and require measures, and the Commission can fine providers
 of general-purpose models up to 3% of global annual turnover or EUR 15 million, whichever is higher,
-under Article 101 [15]. Trade press reported that the AI Office sent its first Requests for Information
+under Article 101 [17]. Trade press reported that the AI Office sent its first Requests for Information
 to frontier labs on 29 August 2026, covering model security, external evaluations and post-market
 monitoring; that specific report is not independently confirmed in a primary source and is carried
-here only as reported [16]. What the enforceable obligations ask for — model evaluations, adversarial
+here only as reported [18]. What the enforceable obligations ask for — model evaluations, adversarial
 testing, incident reporting, weight security — is an engineering programme, not a policy binder.
 
 ### The agent shift
@@ -140,11 +141,11 @@ successful attacks on AI agents will exploit access-control weaknesses and promp
 identity and injection — runtime concerns — as the dominant attack surface. The identity problem is
 concrete: NIST's National Cybersecurity Center of Excellence published a 2026 concept paper on
 identity and authorisation for software and AI agents, which is reported to flag that agents today are
-commonly run on generic, shared service accounts rather than distinct, attributable identities [17]
+commonly run on generic, shared service accounts rather than distinct, attributable identities [19]
 (reported) — the exact condition that makes an agent's actions impossible to trace or revoke
 precisely. OWASP's Top 10 for Agentic Applications 2026 catalogues the failure modes that follow, from
 agent goal hijack (ASI01) through tool misuse (ASI02) and agent identity and privilege abuse (ASI03)
-to rogue agents (ASI10) [18]. And HiddenLayer's 2026 threat reporting puts roughly one in eight
+to rogue agents (ASI10) [20]. And HiddenLayer's 2026 threat reporting puts roughly one in eight
 reported AI breaches at the feet of autonomous agents [7] (reported). The threat model has moved to
 the layer the paper registry cannot reach.
 
@@ -193,15 +194,17 @@ all layers. Mappings are illustrative, not a claim of conformity.
 [6] "Best AI Governance Platforms 2026" (category manages the program "without any runtime data path"). Kosmoy. 2026. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
 [7] Threat Report 2026 (\~1 in 8 reported AI breaches involve autonomous agents). HiddenLayer. 2026. https://www.hiddenlayer.com/report-and-guide/threatreport2026 (verified: reported)
 [8] "AI Governance Jobs" insights (US postings: observability/monitoring \~41%, Python \~28%). Axial Search. 2026-08-04. https://axialsearch.com/insights/ai-governance-jobs (verified: secondary)
-[9] Live "AI Governance Engineer" postings, Sept 2026 (Dalio Family Office; State Street; Bright Vision). SimplyHired. 2026. https://www.simplyhired.com/job/vKibNHPKReLf8h5PgcPxYjWZOx1ctDsml8sjzydKbSpd6ZoNoNvP-Q (verified: secondary)
-[10] "Engineering Manager, GRC" (build an "AI-forward GRC engineering function"; "translate policies into policy-as-code"; Claude "as a virtual GRC analyst"). Anthropic (via General Catalyst jobs). 2026. https://jobs.generalcatalyst.com/companies/anthropic/jobs/78167778-engineering-manager-grc (verified: primary)
-[11] "IBM recognized as a Leader in the Gartner Magic Quadrant for AI Governance Platforms" (first MQ, June 2026; inclusion criteria: discovery & registry, compliance risk mgmt, policy management, dynamic risk scoring, evidence collection, workflow & approvals, audit trail). IBM / Gartner. 2026-06. https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms (verified: secondary)
-[12] "Global AI Regulations Fuel Billion-Dollar Market for AI Governance Platforms" (\~$65M in 2024 → >$1.4B by 2030). Gartner. 2026-02-17. https://www.gartner.com/en/newsroom/press-releases/2026-02-17-gartner-global-ai-regulations-fuel-billion-dollar-market-for-ai-governance-platforms (verified: primary)
-[13] EN 18286:2026 (Art. 17 QMS) published July 2026, not yet cited in the OJ; risk/logging/cybersecurity standards at Enquiry (Q4 2026 target). CEN-CENELEC news / JTC 21 tracker. 2026-07-30. https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/ (verified: secondary)
-[14] "AI Omnibus enters into force" (Reg. (EU) 2026/1744, in force 2026-07-27; Annex III high-risk → 2 Dec 2027; Annex I → 2 Aug 2028). European Commission. 2026-07-27. https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force (verified: primary)
-[15] Commission enforcement powers over GPAI providers apply from 2 August 2026 (fines up to 3% of worldwide turnover or EUR 15M under Art. 101). European Commission — AI Act Service Desk. 2026-08-02. https://ai-act-service-desk.ec.europa.eu/en/ai-act/faq/commissions-enforcement-powers-related-ai-act-obligations-providers-most-advanced-models (verified: primary)
-[16] Reported first AI Office Requests for Information to GPAI providers on 29 Aug 2026 (model security, external evaluations, post-market monitoring); not independently confirmed in a primary source. Trade press. 2026-08-29. https://tokenstead.ai/guides/eu-ai-act-first-enforcement-security-rfis (verified: reported)
-[17] Concept paper "Software and AI Agent Identity and Authorization" (agents commonly run on generic/shared service accounts rather than distinct identities). NIST NCCoE. 2026-02-05. https://www.nccoe.nist.gov/news-insights/new-concept-paper-identity-and-authority-software-agents (verified: reported)
-[18] Top 10 for Agentic Applications 2026 (ASI01 Agent Goal Hijack, ASI02 Tool Misuse, ASI03 Agent Identity & Privilege Abuse, … ASI10 Rogue Agents). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
+[9] "AI Governance Engineer" posting, Sept 2026 (enterprise agent registry, threat modelling, red teams, non-human-identity controls, NIST AI RMF). Dalio Family Office (via SimplyHired). 2026-09. https://www.simplyhired.com/job/vKibNHPKReLf8h5PgcPxYjWZOx1ctDsml8sjzydKbSpd6ZoNoNvP-Q (verified: secondary)
+[10] "AI Governance VP" posting, Sept 2026 (AI intake and classification aligned to NIST AI RMF). State Street (via SimplyHired). 2026-09. https://www.simplyhired.com/job/iy04VeXdd9DR3vffvKZvupPCsoZtHi405zOLc_RMSJXOSRJVqLbhmw (verified: secondary)
+[11] "AI Governance Engineer" posting, Sept 2026 (security controls, threat models, incident response for LLM systems). Bright Vision (via SimplyHired). 2026-09. https://www.simplyhired.com/job/s2v6mqCI9KO8Xldf5enD0Z46iDqIBLdwS0jqZlgtO8YhD-DU_4XDog (verified: secondary)
+[12] "Engineering Manager, GRC" (build an "AI-forward GRC engineering function"; "translate policies into policy-as-code"; Claude "as a virtual GRC analyst"). Anthropic (via General Catalyst jobs). 2026. https://jobs.generalcatalyst.com/companies/anthropic/jobs/78167778-engineering-manager-grc (verified: primary)
+[13] "IBM recognized as a Leader in the Gartner Magic Quadrant for AI Governance Platforms" (first MQ, June 2026; inclusion criteria: discovery & registry, compliance risk mgmt, policy management, dynamic risk scoring, evidence collection, workflow & approvals, audit trail). IBM / Gartner. 2026-06. https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms (verified: secondary)
+[14] "Global AI Regulations Fuel Billion-Dollar Market for AI Governance Platforms" (\~$65M in 2024 → >$1.4B by 2030). Gartner. 2026-02-17. https://www.gartner.com/en/newsroom/press-releases/2026-02-17-gartner-global-ai-regulations-fuel-billion-dollar-market-for-ai-governance-platforms (verified: primary)
+[15] EN 18286:2026 (Art. 17 QMS) published July 2026, not yet cited in the OJ; risk/logging/cybersecurity standards at Enquiry (Q4 2026 target). CEN-CENELEC news / JTC 21 tracker. 2026-07-30. https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/ (verified: secondary)
+[16] "AI Omnibus enters into force" (Reg. (EU) 2026/1744, in force 2026-07-27; Annex III high-risk → 2 Dec 2027; Annex I → 2 Aug 2028). European Commission. 2026-07-27. https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force (verified: primary)
+[17] Commission enforcement powers over GPAI providers apply from 2 August 2026 (fines up to 3% of worldwide turnover or EUR 15M under Art. 101). European Commission — AI Act Service Desk. 2026-08-02. https://ai-act-service-desk.ec.europa.eu/en/ai-act/faq/commissions-enforcement-powers-related-ai-act-obligations-providers-most-advanced-models (verified: primary)
+[18] Reported first AI Office Requests for Information to GPAI providers on 29 Aug 2026 (model security, external evaluations, post-market monitoring); not independently confirmed in a primary source. Trade press. 2026-08-29. https://tokenstead.ai/guides/eu-ai-act-first-enforcement-security-rfis (verified: reported)
+[19] Concept paper "Software and AI Agent Identity and Authorization" (agents commonly run on generic/shared service accounts rather than distinct identities). NIST NCCoE. 2026-02-05. https://www.nccoe.nist.gov/news-insights/new-concept-paper-identity-and-authority-software-agents (verified: reported)
+[20] Top 10 for Agentic Applications 2026 (ASI01 Agent Goal Hijack, ASI02 Tool Misuse, ASI03 Agent Identity & Privilege Abuse, … ASI10 Rogue Agents). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 </content>
 </invoke>

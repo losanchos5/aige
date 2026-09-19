@@ -17,11 +17,12 @@ engineering, applied to governance. This book is its founding text and its worki
 
 ## Who wrote it, and from what
 
-Version 0.1 was written by Jorge García Aibar, an AI Governance & Privacy Engineer, drawing on two and
-a half years designing and operating an AI governance framework inside a large telco — sitting between
-Legal, Security and Engineering, and covering the governance, security, compliance, business and
-model-performance dimensions of AI risk. Nothing in this book discloses any employer's internal
-detail; where practice is described it is generic ("in a large telco").
+The Thesis and Body of Knowledge were written by Jorge García Aibar, an AI Governance & Privacy
+Engineer — drawing on two and a half years designing and operating an AI governance framework inside a
+large telco, sitting between Legal, Security and Engineering, and covering the governance, security,
+compliance, business and model-performance dimensions of AI risk — with Aurélie Pols, working in
+Responsible AI, Privacy and Data Governance, as co-author. Nothing in this book discloses any
+employer's internal detail; where practice is described it is generic ("in a large telco").
 
 It is built from three things. First, that operating experience: what actually held up when a model
 changed on a Friday and an agent gained a new tool over the weekend. Second, the **GRC Engineering**
@@ -49,12 +50,12 @@ This is not a compliance checklist, and it is not legal advice. It does not tell
 system is compliant; it tells you how to build the controls and the evidence that let someone qualified
 make that call. It is not an AI safety research agenda, an MLOps handbook, or a vendor buyer's guide —
 tools are named only as illustrative examples of a category, never as endorsements. And it is not
-finished. Version 0.1 is a first public draft with deliberate gaps for co-authors to fill.
+finished. Version 0.3.1 is a public draft with deliberate gaps for co-authors to fill.
 
 ## How to cite
 
-> García Aibar, J. and contributors. *AI Governance Engineering: The Thesis & Body of Knowledge*,
-> v0.1. 2026. https://aigovernanceengineer.com. Licensed CC BY 4.0.
+> García Aibar, J., Pols, A. and contributors. *AI Governance Engineering: The Thesis & Body of
+> Knowledge*, v0.3.1. 2026. https://aigovernanceengineer.com. Licensed CC BY 4.0.
 
 Cite a specific chapter by its number and title (for example, "chapter 01, The definition"). The
 canonical home of the Thesis is https://aigovernanceengineer.com/thesis and of the Body of
@@ -63,7 +64,7 @@ the consolidated table lives in `sources/SOURCES.md`.
 
 ## Versioning
 
-This is **v0.1** — the first public draft. Versioning is semantic in spirit: patch releases fix facts
+This is **v0.3.1** — a public draft. Versioning is semantic in spirit: patch releases fix facts
 and typos, minor releases add chapters or patterns, and a 1.0 will mark the point at which the core
 chapters (00–10) are complete and reviewed. Every change is recorded in `bok/CHANGELOG.md`. Because
 the regulatory and standards landscape moves — the Digital Omnibus reform, harmonised standards under

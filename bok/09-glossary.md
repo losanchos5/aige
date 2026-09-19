@@ -51,6 +51,10 @@ AI security and governance programme across domains [5]. (ch. 07)
 loop that ISO/IEC 42001 certifies. An AIMS is not the AI Act's Article 17 quality management system.
 (ch. 07, 08)
 
+**Annex I (EU AI Act).** The AI Act annex listing the Union harmonisation legislation under which AI is
+embedded in regulated products (machinery, medical devices, toys and the like); obligations for these
+high-risk embedded systems phase in from 2 August 2028 under the Digital Omnibus timeline [2]. (ch. 08)
+
 **Annex III.** The AI Act annex listing high-risk use cases (biometrics, critical infrastructure,
 employment, essential services, law enforcement, migration, justice); obligations for these phase in
 under the Digital Omnibus timeline [2]. (ch. 08)
@@ -65,6 +69,9 @@ of adversary tactics and techniques against AI, including agent-specific techniq
 **Audit-ready evidence.** Evidence emitted as a by-product of the build in a form an auditor can read
 directly — machine-readable, signed, timestamped — so the audit is a query, not a collection project.
 (ch. 01, 04)
+
+**Cedar.** An open-source policy language for fine-grained authorization, used as a policy-as-code
+engine for runtime access decisions; a schema-typed, analysable alternative to `OPA/Rego`. (ch. 04, 05)
 
 **CIMD.** Client ID Metadata Document: the MCP mechanism (2026 spec) by which a client identifies
 itself via a URL-addressable metadata document, replacing deprecated Dynamic Client Registration [8].
@@ -87,6 +94,14 @@ one-off document. (ch. 04, 05)
 
 **Drift.** The gradual divergence of a model's inputs, outputs or performance from its validated
 baseline over time; a runtime signal that a control or eval must catch. (ch. 04)
+
+**Duty holder.** Who an obligation legally binds — under the EU AI Act, the provider, the deployer or
+both — as distinct from who enforces it; chapter 08 carries a duty-holder column so an engineer can
+tell which artefacts their organisation is responsible for producing. (ch. 08)
+
+**EN 18286.** The European standard for the AI Act's Article 17 quality management system, published by
+CEN-CENELEC in July 2026 — the first JTC 21 AI Act standard to reach publication — but not yet cited in
+the Official Journal, so it confers no presumption of conformity [10]. (ch. 08)
 
 **Eval gate.** A pipeline stage that fails the build when an eval fails; the mechanism that turns an
 evaluation into an enforced control rather than a report. (ch. 04, 05)
@@ -111,12 +126,21 @@ CI/CD subset. (ch. 03, 04)
 obligations (transparency, copyright, and for systemic-risk models, evaluation and incident reporting)
 enforced by the AI Office from 2 Aug 2026 [2]. (ch. 08)
 
+**GPAI Code of Practice.** The voluntary instrument (published 10 July 2025) that general-purpose-AI
+providers use to demonstrate compliance with their AI Act obligations until harmonised standards exist;
+three chapters — Transparency, Copyright, and Safety and Security (the last for systemic-risk models)
+[16]. (ch. 08)
+
 **Guardian agent.** An AI agent whose job is to supervise, check or constrain other agents at runtime;
 Gartner is reported to project guardian agents as a material share of the agentic market by 2030 [9]. (ch. 04, 05)
 
 **Harmonised standard.** A European standard cited in the Official Journal that, once cited, grants a
 presumption of conformity with a specific AI Act requirement. As of the book's date, none is yet cited
 [10]. (ch. 08)
+
+**ISO/IEC 42005.** ISO/IEC 42005:2025, the AI system impact-assessment standard — a companion to the AI
+Act's Article 27 FRIA and to ISO/IEC 42001 Annex A.5 — giving a structured method for assessing an AI
+system's impacts on people and society [17]. (ch. 08)
 
 **Kill switch.** A tested mechanism to stop an agent or system from acting; a precondition of granting
 autonomy, registered against the agent's identity. (ch. 03, 05)
@@ -141,6 +165,10 @@ and back-testing them; a neighbour of this discipline, extended here to runtime 
 
 **NHI.** Non-human identity: the identity of an agent, service account or machine actor. Every NHI gets
 a registry entry, an owner and a scope before it is allowed to act. (ch. 04, 05)
+
+**OPA/Rego.** The Open Policy Agent and its Rego policy language, a general-purpose policy-as-code
+engine that evaluates governance rules in CI/CD and at runtime admission; the canonical example of
+executable policy-as-code. (ch. 04, 05)
 
 **OSCAL.** The Open Security Controls Assessment Language, a NIST machine-readable format for controls,
 assessments and evidence, used here as the format for audit-ready evidence [3]. (ch. 04, 10)
@@ -167,9 +195,10 @@ taken as meeting the corresponding AI Act requirement; unavailable until a stand
 providers; distinct from an ISO/IEC 42001 AIMS, which certifies a management system but is not
 harmonised [2][10]. (ch. 08)
 
-**RAISE Act.** New York's Responsible AI Safety and Education Act, a frontier-AI safety law reported to
-take effect 1 Jan 2027 (status: verify enactment at time of writing; the cited source describes it as
-awaiting final state action) [12]. (ch. 08)
+**RAISE Act.** New York's Responsible AI Safety and Education Act, a frontier-AI safety law binding
+large frontier developers to publish a safety framework and disclose incidents; signed 19 December 2025
+and taking effect 1 January 2027 after a March 2026 chapter amendment that placed oversight in an office
+within the Department of Financial Services (DFS) [12][15]. (ch. 08)
 
 **Realised risk reduction.** The measured drop in a named failure mode's rate or blast radius in
 production — one of the two tests of the discipline, against framework coverage. (ch. 01, 03)
@@ -214,6 +243,9 @@ triggering extra evaluation, adversarial-testing and incident-reporting duties o
 [9] Guardian agents reported as a material share (reported figure: 10-15%) of the agentic AI market by 2030 — a separate Gartner guardian-agent prediction; the figure is not stated in the June 2025 project-cancellation release. Gartner (reported). 2025. https://www.gartner.com/en/newsroom (verified: reported)
 [10] No harmonised standard cited in the OJ → no presumption of conformity; ISO/IEC 42001 not harmonised. JTC 21 standards tracker. 2026. https://kla.digital/blog/jtc-21-standards-tracker (verified: secondary)
 [11] Policy Cards: machine-readable runtime governance artefacts for agents. arXiv 2510.24383. 2025-10. https://arxiv.org/abs/2510.24383 (verified: primary)
-[12] New York RAISE Act (frontier-developer safety and disclosure duties; reported to take effect 1 Jan 2027; source describes it as pending/awaiting final state action). Future of Privacy Forum. 2026. https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ (verified: reported)
+[12] "Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models" (RAISE Act, S6953B/A6453B, signed 19 Dec 2025; oversight office within the Department of Financial Services). Governor Kathy Hochul (New York State). 2025-12-19. https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models (verified: primary)
 [13] Runtime data path critique of the AI-governance platform category. Kosmoy. 2026. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
 [14] California SB 53 / TFAIA (in force 1 Jan 2026; models above 10^26 FLOP; large frontier developers). Future of Privacy Forum. 2026. https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ (verified: secondary)
+[15] "New York Finalizes RAISE Act for Frontier AI Models; Law Takes Effect January 1, 2027" (chapter amendment signed 27 Mar 2026; effective 1 Jan 2027; DFS oversight office). Wiley. 2026. https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027 (verified: secondary)
+[16] GPAI Code of Practice (published 10 Jul 2025; voluntary; three chapters: Transparency, Copyright, Safety and Security). AI Act Explorer / European Commission. 2025-07-10. https://artificialintelligenceact.eu/introduction-to-code-of-practice/ (verified: primary)
+[17] ISO/IEC 42005:2025 — AI system impact assessment (companion to Art. 27 and ISO 42001 Annex A.5). ISO/IEC. 2025-05. https://www.iso.org/standard/44545.html (verified: secondary)

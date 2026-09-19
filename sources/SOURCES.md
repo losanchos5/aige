@@ -2,14 +2,13 @@
 
 Single verified source table for the whole Body of Knowledge. Each chapter has its own section; the
 `#` column matches that chapter's `[n]` citation markers. Parallel writers **append their own
-section** (or add rows to an existing one) so there are no merge conflicts. Reuse the already-verified
-rows in `posts/0N-*/sources.md` and `RESEARCH-DIGEST.md`; carry their verification tag.
+section** (or add rows to an existing one) so there are no merge conflicts.
 
 Verification tags: **primary** = official primary source opened; **secondary** = reputable outlet
 reporting a primary fact; **reported** = carried only by secondary sources or not stated verbatim in
 the primary (copy must say "reported").
 
-Verification date for v0.1: 2026-09-10.
+Verification date: v0.1 baseline 2026-09-10; v0.3.1 pass 2026-09-19.
 
 Columns: `# | Claim | Source | Publisher | Date | URL | Verified | Used in`
 
@@ -58,11 +57,10 @@ Columns: `# | Claim | Source | Publisher | Date | URL | Verified | Used in`
 
 ---
 
-## Chapters (all drafted in v0.1; append rows as chapters are extended)
+## Chapters (all drafted; append rows as chapters are extended)
 
 ### bok/02-why-now.md
-_Reuse `posts/01`, `posts/02`, `posts/03`, `posts/05` sources.md. IAPP is the **2025** Profession
-Report. Respect the BRIEF blocklist._
+_IAPP is the **2025** Profession Report. Respect the BRIEF blocklist._
 
 | # | Claim | Source | Publisher | Date | URL | Verified | Used in |
 |---|---|---|---|---|---|---|---|
@@ -74,16 +72,18 @@ Report. Respect the BRIEF blocklist._
 | 6 | AI governance platform category "manages the program … without any runtime data path" | Best AI Governance Platforms 2026 | Kosmoy | 2026 | https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ | secondary | Why now (problem 5, registry vs runtime) |
 | 7 | ~1 in 8 reported AI breaches involve autonomous agents | Threat Report 2026 | HiddenLayer | 2026 | https://www.hiddenlayer.com/report-and-guide/threatreport2026 | reported | Why now (problem 5, agents) |
 | 8 | US AI-governance postings: observability/monitoring ~41%, Python ~28% | AI Governance Jobs insights | Axial Search | 2026-08-04 | https://axialsearch.com/insights/ai-governance-jobs | secondary | Why now (market renamed the role) |
-| 9 | Live "AI Governance Engineer" postings (agent registry, threat modelling, red teams, NHI, NIST AI RMF) | Live postings (Dalio FO; State Street; Bright Vision) | SimplyHired | 2026 | https://www.simplyhired.com/job/vKibNHPKReLf8h5PgcPxYjWZOx1ctDsml8sjzydKbSpd6ZoNoNvP-Q | secondary | Why now (market renamed the role) |
-| 10 | Anthropic "Engineering Manager, GRC": AI-forward GRC engineering; "translate policies into policy-as-code"; Claude as virtual GRC analyst | Engineering Manager, GRC | Anthropic (via General Catalyst) | 2026 | https://jobs.generalcatalyst.com/companies/anthropic/jobs/78167778-engineering-manager-grc | primary | Why now (market renamed the role) |
-| 11 | First Gartner Magic Quadrant for AI Governance Platforms (Jun 2026); inclusion criteria are program-layer (discovery/registry, assessments, evidence workflows, audit trail) | MQ leader announcement | IBM / Gartner | 2026-06 | https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms | secondary | Why now (registry vs runtime) |
-| 12 | AI governance platform market ~$65M (2024) → >$1.4B by 2030 | Press release | Gartner | 2026-02-17 | https://www.gartner.com/en/newsroom/press-releases/2026-02-17-gartner-global-ai-regulations-fuel-billion-dollar-market-for-ai-governance-platforms | primary | Why now (registry vs runtime) |
-| 13 | EN 18286 (Art. 17 QMS) published Jul 2026, not yet OJ-cited; risk/logging/cybersecurity standards at Enquiry (Q4 2026) | CEN-CENELEC news / JTC 21 tracker | CEN-CENELEC | 2026-07-30 | https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/ | secondary | Why now (standards gap) |
-| 14 | Digital Omnibus (Reg. (EU) 2026/1744) in force 27 Jul 2026; Annex III → 2 Dec 2027; Annex I → 2 Aug 2028 | AI Omnibus enters into force | European Commission | 2026-07-27 | https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force | primary | Why now (regulatory wave) |
-| 15 | GPAI enforcement powers live 2 Aug 2026; Commission fines up to 3% turnover or €15M (Art. 101) | AI Act Service Desk FAQ | European Commission | 2026-08-02 | https://ai-act-service-desk.ec.europa.eu/en/ai-act/faq/commissions-enforcement-powers-related-ai-act-obligations-providers-most-advanced-models | primary | Why now (regulatory wave) |
-| 16 | Reported first AI Office RFIs to GPAI providers 29 Aug 2026 (not independently confirmed in a primary source) | Trade press | tokenstead.ai / deniz.in | 2026-08-29 | https://tokenstead.ai/guides/eu-ai-act-first-enforcement-security-rfis | reported | Why now (regulatory wave) |
-| 17 | NCCoE concept paper on software & AI agent identity (agents commonly run on generic/shared service accounts) | Software and AI Agent Identity and Authorization | NIST NCCoE | 2026-02-05 | https://www.nccoe.nist.gov/news-insights/new-concept-paper-identity-and-authority-software-agents | reported | Why now (agent shift) |
-| 18 | OWASP Top 10 for Agentic Applications 2026 (ASI01 Agent Goal Hijack … ASI10 Rogue Agents) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Why now (agent shift) |
+| 9 | "AI Governance Engineer" posting: enterprise agent registry, threat modelling, red teams, NHI, NIST AI RMF | Live posting | Dalio Family Office (via SimplyHired) | 2026-09 | https://www.simplyhired.com/job/vKibNHPKReLf8h5PgcPxYjWZOx1ctDsml8sjzydKbSpd6ZoNoNvP-Q | secondary | Why now (market renamed the role) |
+| 10 | "AI Governance VP" posting: AI intake and classification aligned to NIST AI RMF | Live posting | State Street (via SimplyHired) | 2026-09 | https://www.simplyhired.com/job/iy04VeXdd9DR3vffvKZvupPCsoZtHi405zOLc_RMSJXOSRJVqLbhmw | secondary | Why now (market renamed the role) |
+| 11 | "AI Governance Engineer" posting: security controls, threat models, incident response for LLM systems | Live posting | Bright Vision (via SimplyHired) | 2026-09 | https://www.simplyhired.com/job/s2v6mqCI9KO8Xldf5enD0Z46iDqIBLdwS0jqZlgtO8YhD-DU_4XDog | secondary | Why now (market renamed the role) |
+| 12 | Anthropic "Engineering Manager, GRC": AI-forward GRC engineering; "translate policies into policy-as-code"; Claude as virtual GRC analyst | Engineering Manager, GRC | Anthropic (via General Catalyst) | 2026 | https://jobs.generalcatalyst.com/companies/anthropic/jobs/78167778-engineering-manager-grc | primary | Why now (market renamed the role) |
+| 13 | First Gartner Magic Quadrant for AI Governance Platforms (Jun 2026); inclusion criteria are program-layer (discovery/registry, assessments, evidence workflows, audit trail) | MQ leader announcement | IBM / Gartner | 2026-06 | https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms | secondary | Why now (registry vs runtime) |
+| 14 | AI governance platform market ~$65M (2024) → >$1.4B by 2030 | Press release | Gartner | 2026-02-17 | https://www.gartner.com/en/newsroom/press-releases/2026-02-17-gartner-global-ai-regulations-fuel-billion-dollar-market-for-ai-governance-platforms | primary | Why now (registry vs runtime) |
+| 15 | EN 18286 (Art. 17 QMS) published Jul 2026, not yet OJ-cited; risk/logging/cybersecurity standards at Enquiry (Q4 2026) | CEN-CENELEC news / JTC 21 tracker | CEN-CENELEC | 2026-07-30 | https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/ | secondary | Why now (standards gap) |
+| 16 | Digital Omnibus (Reg. (EU) 2026/1744) in force 27 Jul 2026; Annex III → 2 Dec 2027; Annex I → 2 Aug 2028 | AI Omnibus enters into force | European Commission | 2026-07-27 | https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force | primary | Why now (regulatory wave) |
+| 17 | GPAI enforcement powers live 2 Aug 2026; Commission fines up to 3% turnover or €15M (Art. 101) | AI Act Service Desk FAQ | European Commission | 2026-08-02 | https://ai-act-service-desk.ec.europa.eu/en/ai-act/faq/commissions-enforcement-powers-related-ai-act-obligations-providers-most-advanced-models | primary | Why now (regulatory wave) |
+| 18 | Reported first AI Office RFIs to GPAI providers 29 Aug 2026 (not independently confirmed in a primary source) | Trade press | tokenstead.ai / deniz.in | 2026-08-29 | https://tokenstead.ai/guides/eu-ai-act-first-enforcement-security-rfis | reported | Why now (regulatory wave) |
+| 19 | NCCoE concept paper on software & AI agent identity (agents commonly run on generic/shared service accounts) | Software and AI Agent Identity and Authorization | NIST NCCoE | 2026-02-05 | https://www.nccoe.nist.gov/news-insights/new-concept-paper-identity-and-authority-software-agents | reported | Why now (agent shift) |
+| 20 | OWASP Top 10 for Agentic Applications 2026 (ASI01 Agent Goal Hijack … ASI10 Rogue Agents) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Why now (agent shift) |
 
 ### bok/04-the-stack.md
 
@@ -147,7 +147,7 @@ Report. Respect the BRIEF blocklist._
 | 7 | US AI-governance postings since Jan 2026: observability 41-42%, Python 27-28%, NIST ~27%, foundation models 25.6%, cloud 18.2%; median pay USD 169,000; median 5 yrs; certs each <11% | AI Governance Jobs insights | Axial Search | 2026-08-04 | https://axialsearch.com/insights/ai-governance-jobs | secondary | Role (skills; JD mistakes; market) |
 | 8 | OWASP Top 10 for Agentic Applications 2026 (threat context for the role) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Role (entry path from Security/GRC; Maps to) |
 | 9 | Technical AI-gov in tech median USD 221,000 (highest band); AI governance only 151,800; privacy + AI governance 169,700 | Salary & Jobs Report 2025-26 | IAPP | 2025-08-03 | https://iapp.org/resources/article/salary-survey-summary/ | primary | Role (market: survey bands) |
-| 10 | LinkedIn 2026 Skills on the Rise: AI governance reported +150% YoY | 2026 Skills on the Rise | LinkedIn (reported via EdTech Innovation Hub) | 2026 | https://www.edtechinnovationhub.com/news/linkedins-2026-skills-on-the-rise-shows-global-ai-driving-hiring-shifts | reported | Role (market: demand signal) |
+| 10 | LinkedIn 2026 Skills on the Rise: governance and responsible-AI skills among the fastest-rising clusters (no per-skill percentage published) | 2026 Skills on the Rise | LinkedIn (via EdTech Innovation Hub) | 2026 | https://www.edtechinnovationhub.com/news/linkedins-2026-skills-on-the-rise-shows-global-ai-driving-hiring-shifts | secondary | Role (market: demand signal) |
 | 11 | GRC engineering is a capability, not a job title | What is GRC Engineering | GRC Engineer | 2025 | https://grcengineer.com/what-is-grc-engineering/ | primary | Role (capability first) |
 
 ### bok/07-maturity-model.md
@@ -161,7 +161,6 @@ Report. Respect the BRIEF blocklist._
 | 5 | STAR for AI: three levels; Level 2 = third-party ISO/IEC 42001 + Valid-AI-ted; built on the AICM | STAR for AI | Cloud Security Alliance | 2026 | https://cloudsecurityalliance.org/star/ai | primary | Maturity (relation to CSA STAR for AI) |
 
 ### bok/08-regulatory-map.md
-_Reuse `posts/02` and `posts/03` sources.md for EU AI Act / Digital Omnibus articles and dates._
 
 | # | Claim | Source | Publisher | Date | URL | Verified | Used in |
 |---|---|---|---|---|---|---|---|
@@ -183,10 +182,13 @@ _Reuse `posts/02` and `posts/03` sources.md for EU AI Act / Digital Omnibus arti
 | 16 | OWASP Top 10 for Agentic Applications 2026 (ASI01 … ASI10) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Reg. map (OWASP) |
 | 17 | 2026 Top 10 for LLM Applications (Excessive Agency #3), Agent Control Standard (ACS) and AIBOM | OWASP GenAI release wave | OWASP GenAI Security Project | 2026-09-01 | https://genai.owasp.org/2026/09/01/owasp-genai-security-project-unveils-2026-top-10-for-llm-applications-new-agent-control-standard-and-sponsors-as-community-tops-30000-members/ | primary | Reg. map (OWASP) |
 | 18 | California SB 53 (TFAIA) in force 1 Jan 2026; frontier developers >$500M revenue, ~10^26 FLOP; up to $1M/violation; AG-enforced | California's SB 53 explained | Future of Privacy Forum | 2026 | https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ | secondary | Reg. map (US frontier laws) |
-| 19 | New York RAISE Act — frontier-developer duties; reported to take effect 1 Jan 2027 | California's SB 53 explained / trade press | Future of Privacy Forum | 2026 | https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ | reported | Reg. map (US frontier laws) |
+| 19 | New York RAISE Act (S6953B/A6453B) signed 19 Dec 2025; agreed chapter amendment; oversight office within the Department of Financial Services; 72-hour incident reporting | Governor signs nation-leading AI-frameworks legislation | Governor Kathy Hochul (New York State) | 2025-12-19 | https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models | primary | Reg. map (US frontier laws) |
 | 20 | No harmonised standard cited in the OJ → no Art. 40 presumption; risk/logging/cybersecurity standards at Enquiry (Q4 2026) | JTC 21 standards tracker | CEN-CENELEC JTC 21 (via kla.digital) | 2026 | https://kla.digital/blog/jtc-21-standards-tracker | secondary | Reg. map (what is NOT harmonised) |
 | 21 | EN 18286:2026 (Art. 17 QMS) published July 2026, not yet OJ-cited | CEN-CENELEC news | CEN-CENELEC | 2026-07-30 | https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/ | secondary | Reg. map (what is NOT harmonised) |
 | 22 | Regulation (EU) 2026/1744 (Digital Omnibus on AI), of 8 Jul 2026, amending Reg. (EU) 2024/1689 et al.; OJ L, 24 Jul 2026; in force 27 Jul 2026 — OJ number verified on EUR-Lex | Regulation (EU) 2026/1744 | Publications Office of the EU (EUR-Lex) | 2026-07-24 | https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng | primary | Reg. map (Omnibus number verified) |
+| 23 | EU AI Act Art. 25 — responsibilities along the AI value chain (when a value-chain actor becomes a provider; information flow to downstream) | AI Act Art. 25 | AI Act (Reg. (EU) 2024/1689) | 2024 | https://artificialintelligenceact.eu/article/25/ | primary | Reg. map (Art. 25) |
+| 24 | New York RAISE Act (S6953B) signed 19 Dec 2025 as Chapter 699; frontier model = over 10^26 operations costing over USD 100M; safety protocols and 72-hour incident disclosure; AG and DHSES | NY State Senate Bill 2025-S6953B | New York State Senate | 2025-12-19 | https://www.nysenate.gov/legislation/bills/2025/S6953/amendment/B | primary | Reg. map (US frontier laws) |
+| 25 | New York RAISE Act chapter amendment introduced 6 Jan 2026, passed 11 Mar 2026, signed 27 Mar 2026; effective 1 Jan 2027; DFS oversight office | New York Finalizes RAISE Act for Frontier AI Models | Wiley | 2026 | https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027 | secondary | Reg. map (US frontier laws) |
 
 ### bok/09-glossary.md
 
@@ -203,9 +205,12 @@ _Reuse `posts/02` and `posts/03` sources.md for EU AI Act / Digital Omnibus arti
 | 9 | Guardian agents reported as a material share (reported figure: 10-15%) of the agentic AI market by 2030 — a separate Gartner guardian-agent prediction; figure NOT stated in the June 2025 project-cancellation release | Gartner (reported) | Gartner | 2025 | https://www.gartner.com/en/newsroom | reported | Glossary (guardian agent) |
 | 10 | No harmonised standard cited in the OJ → no presumption of conformity; ISO/IEC 42001 not harmonised | JTC 21 standards tracker | CEN-CENELEC JTC 21 (via kla.digital) | 2026 | https://kla.digital/blog/jtc-21-standards-tracker | secondary | Glossary (harmonised standard, presumption of conformity) |
 | 11 | Policy Cards: JSON-schema machine-readable runtime governance artefacts for agents | Policy Cards (arXiv 2510.24383) | Wong et al. | 2025-10 | https://arxiv.org/abs/2510.24383 | primary | Glossary (Policy Card) |
-| 12 | New York RAISE Act — reported to take effect 1 Jan 2027; source describes it as pending / awaiting final state action (date not stated verbatim) | California's SB 53 explained | Future of Privacy Forum | 2026 | https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ | reported | Glossary (RAISE Act) |
+| 12 | New York RAISE Act (S6953B/A6453B) signed 19 Dec 2025; oversight office within the Department of Financial Services | Governor signs nation-leading AI-frameworks legislation | Governor Kathy Hochul (New York State) | 2025-12-19 | https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models | primary | Glossary (RAISE Act) |
 | 13 | AI-governance platform category "manages the program … without any runtime data path" | Best AI Governance Platforms 2026 | Kosmoy | 2026 | https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ | secondary | Glossary (runtime data path) |
 | 14 | California SB 53 / TFAIA in force 1 Jan 2026; models above 10^26 FLOP; large frontier developers | California's SB 53 explained | Future of Privacy Forum | 2026 | https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ | secondary | Glossary (SB 53) |
+| 15 | New York RAISE Act chapter amendment signed 27 Mar 2026; effective 1 Jan 2027; DFS oversight office | New York Finalizes RAISE Act for Frontier AI Models | Wiley | 2026 | https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027 | secondary | Glossary (RAISE Act) |
+| 16 | GPAI Code of Practice (published 10 Jul 2025; voluntary; three chapters: Transparency, Copyright, Safety and Security) | Introduction to the Code of Practice | AI Act Explorer / European Commission | 2025-07-10 | https://artificialintelligenceact.eu/introduction-to-code-of-practice/ | primary | Glossary (GPAI Code of Practice) |
+| 17 | ISO/IEC 42005:2025 — AI system impact assessment (companion to Art. 27 and ISO 42001 Annex A.5) | ISO/IEC 42005:2025 | ISO/IEC | 2025-05 | https://www.iso.org/standard/44545.html | secondary | Glossary (ISO/IEC 42005) |
 
 ### bok/10-reading-list.md
 
@@ -231,7 +236,7 @@ chapter and recorded once below._
 | 15 | CSA AI Controls Matrix and STAR for AI (mapped to ISO 42001, NIST AI RMF) | STAR for AI | Cloud Security Alliance | 2026 | https://cloudsecurityalliance.org/star/ai | primary | Reading list (standards) |
 | 16 | MITRE ATLAS: adversarial tactics & techniques for AI (incl. agents) | MITRE ATLAS | MITRE | 2026 | https://atlas.mitre.org/ | primary | Reading list (standards) |
 | 17 | NSA CSI "MCP: Security Design Considerations" | MCP: Security Design Considerations | NSA | 2026-05-20 | https://www.nsa.gov/Press-Room/Press-Releases-Statements/Press-Release-View/Article/4496698/ | primary | Reading list (standards) |
-| 18 | California SB 53 / New York RAISE Act explainer | California's SB 53 explained | Future of Privacy Forum | 2026 | https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ | secondary | Reading list (standards) |
+| 18 | California SB 53 (TFAIA) explainer — the first US frontier-AI transparency law | California's SB 53 explained | Future of Privacy Forum | 2026 | https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ | secondary | Reading list (standards) |
 | 19 | Making AI compliance evidence machine-readable (OSCAL for AI) | arXiv 2604.13767 | UC3M | 2026-04-15 | https://arxiv.org/html/2604.13767v1 | primary | Reading list (papers) |
 | 20 | Audit-as-code: assured readiness score, proceed/remediate/block gates | Frontiers in AI | Frontiers | 2026-02-26 | https://pubmed.ncbi.nlm.nih.gov/41837238/ | primary | Reading list (papers) |
 | 21 | Policy Cards: machine-readable runtime governance artefacts for agents | arXiv 2510.24383 | Wong et al. | 2025-10 | https://arxiv.org/abs/2510.24383 | primary | Reading list (papers) |
@@ -248,3 +253,4 @@ chapter and recorded once below._
 | 32 | Curated index of AI agent governance tools (evals, policy engines, guardrails, observability, AIBOM) | awesome-ai-agent-governance | systempromptio (GitHub) | 2026 | https://github.com/systempromptio/awesome-ai-agent-governance | primary | Reading list (tools) |
 | 33 | blog.grc.engineering "GRC Engineering in 2026": policy-as-code guardrails in CI/CD, trust ops centres, agentic extensions | GRC Engineering in 2026 | Justin Pagano | 2026-01-05 | https://blog.grc.engineering/p/grc-engineering-in-2026 | primary | Reading list (communities) |
 | 34 | IAPP: professional body mapping the AI governance profession | IAPP | IAPP | 2026 | https://iapp.org/ | primary | Reading list (communities) |
+| 35 | New York RAISE Act — Governor's signing announcement (S6953B signed 19 Dec 2025; effective 1 Jan 2027 via the Mar 2026 chapter amendment; DFS oversight office) | Governor signs nation-leading AI-frameworks legislation | Governor Kathy Hochul (New York State) | 2025-12-19 | https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models | primary | Reading list (standards) |

@@ -4,9 +4,10 @@
 //
 // Numbers policy: `market` carries only figures the chapter attributes to a
 // primary source (the IAPP Salary & Jobs Report medians), each `primary: true`.
-// The LinkedIn "+150%" demand signal is kept but flagged `primary: false` and
-// must never be shown as a headline stat tile. Employer names from the
-// postings footnote, and every forbidden claim, are deliberately omitted.
+// LinkedIn's "Skills on the Rise" demand signal is qualitative — no per-skill
+// percentage is stated in a primary source — so it lives in the chapter prose,
+// not as a figure here. Employer names from the postings footnote, and every
+// forbidden claim, are deliberately omitted.
 
 export type WorkflowLayer = 1 | 2 | 3 | 4 | 5 | 'all';
 
@@ -293,13 +294,5 @@ export const market: readonly MarketStat[] = [
     source: 'IAPP Salary & Jobs Report 2025-26',
     sourceUrl: 'https://iapp.org/resources/article/salary-survey-summary/',
     primary: true,
-  },
-  {
-    value: '+150%',
-    label: 'AI governance, year over year (reported demand signal — not a stat tile)',
-    source: 'LinkedIn 2026 Skills on the Rise (reported via EdTech Innovation Hub)',
-    sourceUrl:
-      'https://www.edtechinnovationhub.com/news/linkedins-2026-skills-on-the-rise-shows-global-ai-driving-hiring-shifts',
-    primary: false,
   },
 ] as const;

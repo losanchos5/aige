@@ -4,10 +4,10 @@
 Pipeline: Markdown -> one HTML (python-markdown: tables, fenced_code, toc, attr_list) -> PDF via
 Playwright/Chromium page.pdf (A4, print_background, ~18mm margins, page numbers in the footer).
 
-Outputs (written to aige/dist/):
-  - AI-Governance-Engineering-BoK-v0.1.pdf        cover + TOC + thesis + chapters 00-10 + contributors + changelog
-  - AI-Governance-Engineering-Thesis-v0.1.pdf     cover + thesis only
-  - site-preview.html                             light theme, sticky left TOC, max-width 780px (website preview)
+Outputs (written to aige/dist/), where <v> is `bokVersion` read from site/src/data/site.ts:
+  - AI-Governance-Engineering-BoK-v<v>.pdf         cover + TOC + thesis + chapters 00-10 + contributors + changelog
+  - AI-Governance-Engineering-Thesis-v<v>.pdf      cover + thesis only
+  - site-preview.html                              light theme, sticky left TOC, max-width 780px (website preview)
 
 Run:  python build/build_pdf.py            (from the aige/ directory, or any cwd; paths are resolved from this file)
 """
@@ -23,6 +23,22 @@ import markdown
 AIGE = Path(__file__).resolve().parent.parent          # .../aige
 DIST = AIGE / "dist"
 BOK = AIGE / "bok"
+
+
+def _read_bok_version(default: str = "0.3.1") -> str:
+    """Read `bokVersion` from site/src/data/site.ts so the PDF filenames track the
+    single source of truth. Falls back to `default` if the file or field is missing."""
+    site_ts = AIGE / "site" / "src" / "data" / "site.ts"
+    try:
+        match = re.search(r"bokVersion:\s*'([^']+)'", site_ts.read_text(encoding="utf-8"))
+        return match.group(1) if match else default
+    except OSError:
+        return default
+
+
+BOK_VERSION = _read_bok_version()
+BOK_PDF = f"AI-Governance-Engineering-BoK-v{BOK_VERSION}.pdf"
+THESIS_PDF = f"AI-Governance-Engineering-Thesis-v{BOK_VERSION}.pdf"
 
 TITLE = "AI Governance Engineering"
 SUBTITLE_BOK = "The Thesis &amp; Body of Knowledge · v0.3 · September 2026"
@@ -278,13 +294,12 @@ def main(html_only: bool = False) -> None:
     with sync_playwright() as p:
         browser = p.chromium.launch()
         page = browser.new_page()
-        to_pdf(page, bok_html, DIST / "AI-Governance-Engineering-BoK-v0.1.pdf")
-        to_pdf(page, man_html, DIST / "AI-Governance-Engineering-Thesis-v0.1.pdf")
+        to_pdf(page, bok_html, DIST / BOK_PDF)
+        to_pdf(page, man_html, DIST / THESIS_PDF)
         browser.close()
 
     print("Wrote:")
-    for f in ("AI-Governance-Engineering-BoK-v0.1.pdf",
-              "AI-Governance-Engineering-Thesis-v0.1.pdf"):
+    for f in (BOK_PDF, THESIS_PDF):
         print("  ", DIST / f)
 
 

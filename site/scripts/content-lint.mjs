@@ -126,6 +126,60 @@ function danglingSrcAnchors(file, raw) {
   return out;
 }
 
+// ── Version single-source check ──────────────────────────────────────────
+// The canonical book version lives in site/src/data/site.ts (`bokVersion`).
+// Any explicit "current version" statement in the front-matter files below must
+// agree with it. bok/CHANGELOG.md is excluded on purpose (it records historical
+// versions), and version *ranges* like `v0.1–v0.3` are not matched — only the
+// lead-ins below, which mark a statement of the current version.
+const REPO_ROOT = resolve(HERE, '..', '..');
+const SITE_TS = resolve(HERE, '..', 'src', 'data', 'site.ts');
+const VERSIONED_FILES = ['THESIS.md', 'README.md', 'bok/00-preface.md', 'OUTLINE.md'];
+
+// Each regex captures (group 1) the version number of an explicit current-version claim.
+const VERSION_CLAIMS = [
+  /(?:This|It) is (?:\*\*)?v(?:ersion)? ?(\d+\.\d+(?:\.\d+)?)/g, // "This is v0.3.1" / "It is version 0.3.1"
+  /^Version (\d+\.\d+(?:\.\d+)?) ·/gm, //                          "Version 0.3.1 · <date>"
+  /Version (\d+\.\d+(?:\.\d+)?) was written/g, //                  "Version 0.1 was written by …"
+  /\bv(\d+\.\d+(?:\.\d+)?)\. 20\d\d\./g, //                        how-to-cite "v0.3.1. 2026."
+];
+
+function readBokVersion() {
+  try {
+    const m = /bokVersion:\s*'([^']+)'/.exec(readFileSync(SITE_TS, 'utf8'));
+    return m ? m[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+// One violation per current-version statement that disagrees with bokVersion.
+function versionMismatches() {
+  const expected = readBokVersion();
+  if (!expected) return [];
+  const out = [];
+  for (const rel of VERSIONED_FILES) {
+    const full = join(REPO_ROOT, rel);
+    if (!existsSync(full)) continue;
+    const text = readFileSync(full, 'utf8');
+    for (const base of VERSION_CLAIMS) {
+      const regex = new RegExp(base.source, base.flags);
+      let match;
+      while ((match = regex.exec(text)) !== null) {
+        if (match[1] !== expected) {
+          out.push({
+            file: full,
+            label: 'version statement disagrees with bokVersion',
+            snippet: `"${match[0].trim()}" states v${match[1]}, but site.ts bokVersion is ${expected}`,
+          });
+        }
+        if (match[0].length === 0) regex.lastIndex++;
+      }
+    }
+  }
+  return out;
+}
+
 function main() {
   if (!existsSync(targetDir)) {
     console.error(`content-lint: directory not found: ${targetDir}`);
@@ -137,6 +191,7 @@ function main() {
   const files = htmlFiles(targetDir);
   const violations = [];
   const structural = [];
+  const versionIssues = versionMismatches();
 
   let glossarySeen = false;
   let readingListSeen = false;
@@ -185,7 +240,7 @@ function main() {
     structural.push({ file: join(targetDir, 'resources', 'reading-list.html'), label: 'missing page', snippet: '/resources/reading-list was not built' });
   }
 
-  if (violations.length || structural.length) {
+  if (violations.length || structural.length || versionIssues.length) {
     if (violations.length) {
       console.error(`content-lint: ${violations.length} forbidden match(es) found:\n`);
       for (const v of violations) {
@@ -196,6 +251,13 @@ function main() {
     if (structural.length) {
       console.error(`content-lint: ${structural.length} structural problem(s) found:\n`);
       for (const v of structural) {
+        console.error(`  ${v.file}`);
+        console.error(`    [${v.label}] ${v.snippet}\n`);
+      }
+    }
+    if (versionIssues.length) {
+      console.error(`content-lint: ${versionIssues.length} version mismatch(es) found:\n`);
+      for (const v of versionIssues) {
         console.error(`  ${v.file}`);
         console.error(`    [${v.label}] ${v.snippet}\n`);
       }

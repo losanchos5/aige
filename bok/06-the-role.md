@@ -189,9 +189,10 @@ is exactly the role this chapter describes.
 **Skills in demand.** Analysis of US postings since January 2026 (Axial Search) reports
 observability/monitoring in 41-42% of AI-governance listings, Python in 27-28%, NIST frameworks in
 about 27%, foundation-model familiarity in 25.6% and cloud in 18.2%; median advertised pay was USD
-169,000 and median required experience five years [7]. And the demand signal is steep: LinkedIn's 2026
-Skills on the Rise placed AI governance at a reported +150% year over year [10]. The load-bearing
-signal is the skills mix — observability, Python, the runtime data path — not the salary headline.
+169,000 and median required experience five years [7]. And the demand signal is broad: LinkedIn's 2026
+Skills on the Rise lists governance and responsible-AI skills among its fastest-rising clusters,
+alongside the technical AI capabilities [10]. The load-bearing signal is the skills mix —
+observability, Python, the runtime data path — not the salary headline.
 
 > **Postings (footnote).** Individual September 2026 postings corroborate the bands across seniorities
 > — an "AI Governance Engineer" at USD 175,000-260,000 [4], a governance VP at USD 120,000-202,500 [3],
@@ -239,5 +240,5 @@ Mappings are illustrative, not a claim of conformity.
 [7] AI governance jobs analysis (US postings since Jan 2026: observability 41-42%, Python 27-28%, NIST ~27%, foundation models 25.6%, cloud 18.2%; median pay USD 169,000; median 5 yrs). Axial Search. 2026-08-04. https://axialsearch.com/insights/ai-governance-jobs (verified: secondary)
 [8] Top 10 for Agentic Applications 2026. OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [9] Salary & Jobs Report 2025-26 (technical AI-gov in tech median USD 221,000; AI governance only 151,800; privacy + AI governance 169,700). IAPP. 2025-08-03. https://iapp.org/resources/article/salary-survey-summary/ (verified: primary)
-[10] LinkedIn 2026 Skills on the Rise (AI governance reported +150% YoY). LinkedIn (reported via EdTech Innovation Hub). 2026. https://www.edtechinnovationhub.com/news/linkedins-2026-skills-on-the-rise-shows-global-ai-driving-hiring-shifts (verified: reported)
+[10] LinkedIn 2026 Skills on the Rise (governance and responsible-AI skills among the fastest-rising clusters; no per-skill percentage published). LinkedIn, via EdTech Innovation Hub. 2026. https://www.edtechinnovationhub.com/news/linkedins-2026-skills-on-the-rise-shows-global-ai-driving-hiring-shifts (verified: secondary)
 [11] "What is GRC Engineering" (capability, not a job title). GRC Engineer. 2025. https://grcengineer.com/what-is-grc-engineering/ (verified: primary)

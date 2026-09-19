@@ -174,9 +174,9 @@ export const frameworks: readonly Framework[] = [
     name: 'New York RAISE Act',
     type: 'law',
     issuer: 'State of New York',
-    url: 'https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/',
+    url: 'https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models',
     summary:
-      'Frontier-developer safety and disclosure duties for large frontier developers; reported to take effect 1 January 2027 (verify enactment: awaiting final state action at time of writing).',
+      'A frontier-AI safety law (S6953B) binding large frontier developers to publish a safety framework and disclose incidents. Signed 19 December 2025 and effective 1 January 2027 after a March 2026 chapter amendment, with oversight in an office within the New York Department of Financial Services (DFS).',
   },
   {
     id: 'en-18286',
@@ -300,6 +300,16 @@ export const obligations: readonly Obligation[] = [
     layerN: [1, 5],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
+    applies: '2027-12-02 (Annex III)',
+  },
+  {
+    framework: 'EU AI Act',
+    obligation: 'EU AI Act Art. 25 responsibilities along the AI value chain',
+    artefact:
+      'Value-chain due-diligence gate; provider/deployer responsibility allocation; AIBOM and model/data cards collected from upstream providers',
+    layerN: [2, 5],
+    anchor: EU_ANCHOR,
+    dutyHolder: 'Provider + value-chain actors',
     applies: '2027-12-02 (Annex III)',
   },
   {
@@ -565,9 +575,10 @@ export const obligations: readonly Obligation[] = [
   },
   {
     framework: 'US frontier-developer laws',
-    obligation: 'New York RAISE Act',
-    artefact: 'Safety framework; incident and disclosure pipeline',
-    layerN: [5],
+    obligation: 'New York RAISE Act (signed 2025-12-19; effective 2027-01-01)',
+    artefact:
+      'Published frontier AI safety framework; 72-hour incident and disclosure pipeline reporting to the state; DFS oversight office',
+    layerN: [5, 4],
     anchor: US_ANCHOR,
   },
 ] as const;

@@ -1,6 +1,6 @@
 # The AI Governance Engineering Thesis
 
-Version 0.3 · 2026-09-15 · Jorge García Aibar
+Version 0.3.1 · 2026-09-19 · Jorge García Aibar and Aurélie Pols
 
 ---
 
@@ -188,14 +188,14 @@ Chapter 01 draws every one of these lines in full.
 
 ## Authors
 
-**Jorge García Aibar (v0.1–v0.3)** — AI Governance & Privacy Engineer. LinkedIn:
+**Jorge García Aibar (v0.1–v0.3.1)** — AI Governance & Privacy Engineer. LinkedIn:
 https://www.linkedin.com/in/jorgara
 
-**Aurélie Pols (v0.1–v0.3)** — Responsible AI (EU/Global), Privacy & Data Governance. LinkedIn:
+**Aurélie Pols (v0.1–v0.3.1)** — Responsible AI (EU/Global), Privacy & Data Governance. LinkedIn:
 https://www.linkedin.com/in/aureliepols
 
-**Co-authors wanted.** This is version 0.3: a public draft, deliberately incomplete. It was
-written by one practitioner and it needs many. If you build governance for AI systems — policy-as-
+**Co-authors wanted.** This is version 0.3.1: a public draft, deliberately incomplete. It was
+started by one practitioner and it needs many. If you build governance for AI systems — policy-as-
 code, agent registries, eval gates, runtime guardrails, continuous assurance — and you can bring a
 verified fact, a pattern that worked, or a sharper argument, you are invited to co-author. The
 discipline is a capability anyone can develop, and this text belongs to everyone who does the work.
@@ -205,7 +205,7 @@ discipline is a capability anyone can develop, and this text belongs to everyone
 - **Read it** at https://aigovernanceengineer.com/thesis and the Body of Knowledge at
   https://aigovernanceengineer.com/bok
 - **Sign the Thesis** by opening a pull request that adds your name to `bok/CONTRIBUTORS.md`
-  (SIGNATORIES section) in the repository, `github.com/<org>/aige` (to be created).
+  (SIGNATORIES section) in the repository, `github.com/losanchos5/aige`.
 - **Contribute a chapter or a pattern** following `STYLEGUIDE.md`; every factual claim needs a
   sourced, verified citation.
 - **Discuss it** on LinkedIn with Jorge García Aibar (https://www.linkedin.com/in/jorgara), naming

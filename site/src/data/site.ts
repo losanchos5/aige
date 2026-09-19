@@ -7,6 +7,7 @@ export interface SiteConfig {
   linkedin: string;
   github: string;
   author: string;
+  authors: readonly string[];
   license: string;
   bokVersion: string;
 }
@@ -19,6 +20,7 @@ export const site: SiteConfig = {
   linkedin: 'https://www.linkedin.com/in/jorgara',
   github: 'https://github.com/losanchos5/aige',
   author: 'Jorge García',
+  authors: ['Jorge García Aibar', 'Aurélie Pols'],
   license: 'CC BY 4.0',
-  bokVersion: '0.3',
+  bokVersion: '0.3.1',
 };

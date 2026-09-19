@@ -11,14 +11,14 @@ interface Props {
 const { title, slug } = Astro.props;
 const cleanTitle = title.replace(/^\d+\.\s*/, '');
 const url = `${site.url}/bok/${slug}`;
-const reference = `García Aibar, J. (2026). ${cleanTitle}. In AI Governance Engineering: The Thesis & Body of Knowledge (v${site.bokVersion}). ${url}. ${site.license}`;
+const reference = `García Aibar, J., & Pols, A. (2026). ${cleanTitle}. In AI Governance Engineering: The Thesis & Body of Knowledge (v${site.bokVersion}). ${url}. ${site.license}`;
 ---
 
 <details class="cite-box">
   <summary>Cite this chapter</summary>
   <div class="cite-body">
     <p class="cite-apa" data-cite-text>
-      García Aibar, J. (2026). <em>{cleanTitle}</em>. In <em>AI Governance
+      García Aibar, J., &amp; Pols, A. (2026). <em>{cleanTitle}</em>. In <em>AI Governance
       Engineering: The Thesis &amp; Body of Knowledge</em> (v{site.bokVersion}).{' '}
       {url}. {site.license}
     </p>

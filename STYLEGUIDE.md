@@ -4,7 +4,7 @@ This guide governs every file in this repository. It exists so that chapters wri
 people, at different times, read as one book. Read it before you write. If a rule here conflicts with
 your instinct, follow the rule or open a pull request to change the rule — do not quietly diverge.
 
-Version 0.1 · 2026-09. Maintainer: Jorge García Aibar.
+Version 0.3.1 · 2026-09-19. Maintainer: Jorge García Aibar.
 
 ---
 
@@ -43,7 +43,7 @@ We write as practitioners, for practitioners. The reader is building something o
   cells short; put prose in the paragraphs around the table, not inside it.
 - **Callout boxes** are plain blockquotes with a bold label (see §4 and §5).
 - **Dates.** Write `2 Aug 2026` in prose, `2026-08-02` in tables and front matter. Today's reference
-  date for v0.1 is 2026-09-10.
+  date for v0.3.1 is 2026-09-19.
 - **Numbers.** Spell out one to nine in prose unless paired with a unit or a percentage; use figures
   for 10 and above and for all money, versions and article numbers.
 
@@ -151,8 +151,8 @@ to so the catalogue and the stack (chapter 04) stay consistent.
     verbatim. Copy that uses a `reported` fact must say "reported" in the sentence.
 - Every `[n]` in a chapter must also exist as a row in `sources/SOURCES.md`, under that chapter's
   section, so the consolidated table stays complete. Add the row when you add the citation.
-- Reuse the already-verified rows in `posts/0N-*/sources.md` and `aige/RESEARCH-DIGEST.md`. Do not
-  re-verify what a sibling file already verified; cite it and carry its tag.
+- Reuse an already-verified row rather than re-verifying: cite the existing `sources/SOURCES.md` row
+  and carry its verification tag.
 
 ## 7. Handling unverified figures
 

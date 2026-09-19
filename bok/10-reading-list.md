@@ -58,9 +58,13 @@ edition. Tools are named as category examples, illustrative and not endorsements
 - **NSA CSI, "MCP: Security Design Considerations"** — government guidance on securing the Model
   Context Protocol that connects agents to tools. `https://www.nsa.gov/Press-Room/Press-Releases-Statements/Press-Release-View/Article/4496698/`
   (verified: primary)
-- **"California's SB 53: the first frontier-AI law explained" (FPF)** — the clearest read on SB 53 and,
-  in the same source family, New York's RAISE Act. `https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/`
+- **"California's SB 53: the first frontier-AI law explained" (FPF)** — the clearest read on
+  California's SB 53 (TFAIA), the first US frontier-AI transparency law. `https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/`
   (verified: secondary)
+- **New York RAISE Act — Governor's signing announcement** — New York's frontier-AI safety law
+  (S6953B), signed 19 December 2025 and effective 1 January 2027 after a March 2026 chapter amendment,
+  with an oversight office in the Department of Financial Services. `https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models`
+  (verified: primary)
 
 ## Papers (machine-readable evidence and agent governance)
 

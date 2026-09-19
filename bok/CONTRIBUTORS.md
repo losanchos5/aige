@@ -8,7 +8,7 @@ LinkedIn: https://www.linkedin.com/in/jorgara
 
 Version 0.1 was written by one practitioner as a first public draft; version 0.2 applies the findings
 of a first peer-review round. It is meant to be co-authored.
-Home: https://aigovernanceengineer.com · source repository `github.com/<org>/aige` (to be created).
+Home: https://aigovernanceengineer.com · source repository `github.com/losanchos5/aige`.
 
 ## How to become a co-author
 
@@ -28,7 +28,9 @@ Substantive fixes — a corrected fact, a sharper argument, a better source — 
 
 ### Co-authors
 
-_None yet. This section lists people who have written or substantially revised a chapter or pattern._
+**Aurélie Pols** — Responsible AI (EU/Global), Privacy & Data Governance. Co-author of the Thesis and
+Body of Knowledge (v0.1–v0.3.1).
+LinkedIn: https://www.linkedin.com/in/aureliepols
 
 ### Contributors
 

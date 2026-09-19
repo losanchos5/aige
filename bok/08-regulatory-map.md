@@ -30,7 +30,7 @@ Three cautions apply throughout.
 
 ## EU AI Act, post-Omnibus
 
-High-risk obligations (Articles 9–15, 17, 26, 27, 49, 71, 72, 73) apply to Annex III systems from
+High-risk obligations (Articles 9–15, 17, 25, 26, 27, 49, 71, 72, 73) apply to Annex III systems from
 **2 December 2027** and to Annex I embedded systems from **2 August 2028**, both deferred by the
 Omnibus from 2 August 2026 and 2 August 2027 respectively [1][2]. The GPAI obligations (Articles 53,
 55) have applied since 2 August 2025, with Commission enforcement powers live since 2 August 2026 [3].
@@ -40,7 +40,9 @@ high-risk systems keep their original 2 August 2030 date [2].
 The **Duty holder** column names who the obligation binds, which is a different axis from who enforces
 it. The high-risk design-and-build duties — Articles 9 to 15 and 17 — fall on the **provider**;
 Articles 26 and 27 fall on the **deployer**; Articles 4, 5 and 50 bind **both**; and Articles 53 and
-55 bind the **GPAI provider**. This matters for the engineer because the artefacts you can produce
+55 bind the **GPAI provider**. Article 25 sits across the value chain: it sets the conditions under
+which a distributor, importer or deployer itself becomes a **provider** and inherits the provider
+duties. This matters for the engineer because the artefacts you can produce
 depend on which hat your organisation wears: a deployer cannot draw up the provider's technical
 documentation, but it must run the Article 26 monitoring and the Article 27 FRIA — and when the model
 is procured, most of the provider-side evidence becomes something you collect rather than produce (see
@@ -59,6 +61,7 @@ the Vendor / Model Due-Diligence Gate in chapter 05).
 | `Art. 14` | Human oversight designed into the system | Human-in-the-loop checkpoints; kill switch; override and escalation paths | 4 | Provider | 2027-12-02 (Annex III) [1] | National MSA |
 | `Art. 15` | Accuracy, robustness and cybersecurity | Eval gate; adversarial red-team suite; robustness and security controls; regression evals | 3 · 4 | Provider | 2027-12-02 (Annex III) [1] | National MSA |
 | `Art. 17` | Quality management system | QMS-as-code; versioned policies; pipeline controls and change management | 1 · 5 | Provider | 2027-12-02 (Annex III) [1] | National MSA |
+| `Art. 25` | Responsibilities along the AI value chain: when a distributor, importer or deployer becomes a provider, and the information a provider must pass to actors downstream | Value-chain due-diligence gate; provider/deployer responsibility allocation; AIBOM and model/data cards collected from upstream providers | 2 · 5 | Provider + value-chain actors | 2027-12-02 (Annex III) [23] | National MSA |
 | `Art. 26` | Deployer obligations for high-risk systems (use per instructions, monitoring, human oversight) | Deployment registry; monitoring hooks; assigned oversight and logging retention | 2 · 4 | Deployer | 2027-12-02 (Annex III) [1] | National MSA |
 | `Art. 27` | Fundamental Rights Impact Assessment (FRIA) for deployers of Annex III systems | FRIA-as-code from a template; cross-reference to a GDPR `Art. 35` DPIA | 1 · 2 | Deployer | 2027-12-02 (Annex III) [7] | National MSA |
 | `Art. 49` / `Art. 71` | Registration of high-risk systems in the EU database | Agent/model registry with an API that feeds registration; owner and status per entry | 2 | Provider; public-authority deployer | 2027-12-02 (Annex III) [1] | National MSA; Commission (database) |
@@ -159,13 +162,13 @@ critical incidents to the state [18][19].
 | Law | Scope | Obligation | Engineering artefact | Layer |
 |---|---|---|---|---|
 | California SB 53 (TFAIA), in force 2026-01-01 | Large frontier developers (models trained above ~10^26 FLOP; developer revenue over USD 500M) | Publish a safety and security framework; report critical safety incidents to the state; whistleblower protection; up to USD 1M per violation, AG-enforced | Published safety framework; incident pipeline reporting to the state; transparency artefacts | 5 · 4 |
-| New York RAISE Act | Large frontier developers | Frontier safety and disclosure duties; reported to take effect 2027-01-01 (verify enactment: awaiting final state action at time of writing) | Safety framework; incident and disclosure pipeline | 5 |
+| New York RAISE Act (S6953B), signed 2025-12-19 | Large frontier developers (frontier models trained with over 10^26 operations, cost over USD 100M) | Publish a frontier AI safety and security framework; disclose safety incidents within 72 hours. A chapter amendment signed 2026-03-27 sets the effective date at 2027-01-01 and creates an oversight office within the New York Department of Financial Services (DFS) [19][24][25] | Published safety framework; incident and disclosure pipeline reporting to the state | 5 · 4 |
 
 ## What is NOT harmonised yet
 
 The map has a hole, and it is important to state it plainly rather than paper over it.
 
-- **No harmonised standard is cited in the Official Journal.** As of 2026-09-10, Article 40's
+- **No harmonised standard is cited in the Official Journal.** As of 2026-09-19, Article 40's
   presumption of conformity is available to no one, because no harmonised standard has been OJ-cited
   [20].
 - **EN 18286 is published but not cited.** The Article 17 QMS standard EN 18286:2026 was published in
@@ -216,8 +219,11 @@ frontier laws named above map onto the five-layer stack (chapter 04) and the pat
 [16] Top 10 for Agentic Applications 2026 (ASI01 … ASI10). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [17] 2026 Top 10 for LLM Applications, Agent Control Standard (ACS) and AIBOM release wave. OWASP GenAI Security Project. 2026-09-01. https://genai.owasp.org/2026/09/01/owasp-genai-security-project-unveils-2026-top-10-for-llm-applications-new-agent-control-standard-and-sponsors-as-community-tops-30000-members/ (verified: primary)
 [18] "California's SB 53: the first frontier AI law explained" (in force 1 Jan 2026; frontier developers over USD 500M revenue and ~10^26 FLOP; up to USD 1M/violation; AG enforcement). Future of Privacy Forum. 2026. https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ (verified: secondary)
-[19] New York RAISE Act — frontier-developer safety and disclosure duties; reported to take effect 1 Jan 2027. Future of Privacy Forum / trade press. 2026. https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ (verified: reported)
+[19] "Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models" (RAISE Act, S6953B/A6453B, signed 19 Dec 2025; agreed chapter amendment; creates an oversight office within the Department of Financial Services; 72-hour incident reporting). Governor Kathy Hochul (New York State). 2025-12-19. https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models (verified: primary)
 [20] CEN-CENELEC JTC 21 standards tracker (no harmonised standard cited in the OJ → no Art. 40 presumption; risk/logging/cybersecurity standards at Enquiry, Q4 2026 target). CEN-CENELEC JTC 21 (via kla.digital). 2026. https://kla.digital/blog/jtc-21-standards-tracker (verified: secondary)
 [21] EN 18286:2026 (Art. 17 QMS) published July 2026, not yet OJ-cited. CEN-CENELEC news. 2026-07-30. https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/ (verified: secondary)
 [22] Regulation (EU) 2026/1744 (Digital Omnibus on AI), of 8 July 2026, amending Reg. (EU) 2024/1689 et al.; OJ L, 24 July 2026; in force 27 Jul 2026. Publications Office of the EU (EUR-Lex). 2026-07-24. https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng (verified: primary)
+[23] EU AI Act Art. 25 (responsibilities along the AI value chain; conditions under which a value-chain actor becomes a provider; information flow to downstream actors). AI Act (Reg. (EU) 2024/1689). 2024. https://artificialintelligenceact.eu/article/25/ (verified: primary)
+[24] NY State Senate Bill 2025-S6953B (RAISE Act; signed 19 Dec 2025 as Chapter 699; frontier model = trained with over 10^26 operations costing over USD 100M; safety protocols and 72-hour incident disclosure; Attorney General and Division of Homeland Security and Emergency Services). New York State Senate. 2025-12-19. https://www.nysenate.gov/legislation/bills/2025/S6953/amendment/B (verified: primary)
+[25] "New York Finalizes RAISE Act for Frontier AI Models; Law Takes Effect January 1, 2027" (chapter amendment introduced 6 Jan 2026, passed 11 Mar 2026, signed 27 Mar 2026; effective 1 Jan 2027; DFS oversight office). Wiley. 2026. https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027 (verified: secondary)
 </content>

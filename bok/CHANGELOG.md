@@ -4,6 +4,49 @@ All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledg
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
 
+## [0.3.1] — 2026-09-19
+
+Patch release: a credibility pass. Facts corrected and re-sourced, co-authorship recorded, and the
+version single-sourced. No change to the definition, values or principles.
+
+### Changed
+- `THESIS.md`, `bok/00-preface.md`, `bok/CONTRIBUTORS.md`, `site/src/data/site.ts`,
+  `site/src/components/Citation.astro`, `site/src/pages/about/index.astro` — Aurélie Pols added as
+  co-author (matching the Thesis Authors section and LinkedIn); the suggested citation now lists both
+  authors. "written by one practitioner" reworded to "started by one practitioner".
+- `site/src/data/site.ts` and everywhere the current version is stated — bumped to **v0.3.1**; the
+  version is now single-sourced from `bokVersion`, with prose pointing at this changelog.
+- `OUTLINE.md`, `STYLEGUIDE.md`, `sources/SOURCES.md` — all chapters 00–10 marked `**[drafted]**`;
+  dead `posts/…` and `RESEARCH-DIGEST.md` pointers removed; the chapter-04 brief lists its five extra
+  sections and its word target updated to ~5,000.
+- `THESIS.md`, `bok/CONTRIBUTORS.md`, `README.md` — the placeholder repository URL replaced with the
+  live `github.com/losanchos5/aige`; `README.md` links `CONTRIBUTING.md`.
+- `build/build_pdf.py` — PDF output filenames now read the version from `site/src/data/site.ts`, so
+  they carry v0.3.1.
+- `site/scripts/content-lint.mjs` — new rule: fail the build when a current-version statement in
+  `THESIS.md`, `README.md`, `bok/00-preface.md` or `OUTLINE.md` disagrees with `bokVersion`.
+
+### Fixed (fact-check)
+- `bok/08-regulatory-map.md`, `bok/09-glossary.md`, `bok/10-reading-list.md`,
+  `site/src/data/frameworks.ts`, `sources/SOURCES.md` — the New York RAISE Act status corrected: it is
+  enacted (S6953B, signed 19 Dec 2025), effective 1 Jan 2027 after a March 2026 chapter amendment,
+  with oversight in an office within the NY Department of Financial Services. The earlier
+  provisional-status hedge is gone; retagged to primary/secondary and cited to the Governor's release,
+  the NY Senate bill and a law-firm alert.
+- `bok/02-why-now.md`, `sources/SOURCES.md` — citation `[9]`, which attributed three job postings to
+  one URL, split into three per-posting citations; downstream markers renumbered.
+- `bok/06-the-role.md`, `site/src/data/role.ts`, `sources/SOURCES.md` — the unsourced LinkedIn
+  "+150% YoY" figure removed (it is not in the cited article, nor stated per-skill in a LinkedIn
+  primary); the qualitative demand signal kept.
+- `bok/02-why-now.md`, `bok/08-regulatory-map.md` — "as of 2026-09-10" currency markers re-verified
+  and moved to "as of 2026-09-19" (no harmonised standard is yet OJ-cited).
+
+### Added
+- `bok/09-glossary.md` — seven glossary terms: OPA/Rego, Cedar, GPAI Code of Practice, ISO/IEC 42005,
+  Annex I (EU AI Act), Duty holder, EN 18286.
+- `bok/08-regulatory-map.md`, `site/src/data/frameworks.ts` — an EU AI Act **Art. 25** (value-chain
+  responsibilities) row, mirroring the pattern in chapter 05.
+
 ## [0.3] — 2026-09-15
 
 Editorial pass. The founding document is retitled and its values restated; the substance of the
@@ -54,8 +97,8 @@ practitioner review and an adversarial fact-check), plus the cheap LOW findings.
   the FRIA layer placement with chapter 05.
 
 ### Fixed (fact-check round 1)
-- `bok/09-glossary.md` — RAISE Act date softened to "reported to take effect 1 Jan 2027 (verify
-  enactment)"; guardian-agent figure decoupled from the June 2025 project-cancellation release (now a
+- `bok/09-glossary.md` — RAISE Act date softened to a reported 1 Jan 2027, pending confirmation of
+  enactment; guardian-agent figure decoupled from the June 2025 project-cancellation release (now a
   separate Gartner prediction, reported).
 - `bok/08-regulatory-map.md` — Regulation (EU) 2026/1744 verified on EUR-Lex and cited as primary.
 - `bok/04-the-stack.md` — GPAI Code of Practice source date corrected to 10 Jul 2025.
