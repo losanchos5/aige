@@ -8,7 +8,7 @@ Verification tags: **primary** = official primary source opened; **secondary** =
 reporting a primary fact; **reported** = carried only by secondary sources or not stated verbatim in
 the primary (copy must say "reported").
 
-Verification date: v0.1 baseline 2026-09-10; v0.3.1 pass 2026-09-19.
+Verification date: v0.1 baseline 2026-09-10; v0.3.1 and v0.4.0 passes 2026-09-19.
 
 Columns: `# | Claim | Source | Publisher | Date | URL | Verified | Used in`
 

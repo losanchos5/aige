@@ -5,41 +5,142 @@
     "title": "The regulatory wave",
     "locale": "en",
     "quality_profile": "showcase",
-    "viewBox": [820, 600],
+    "viewBox": [
+      900,
+      660
+    ],
     "views": [
       {
         "id": "the-window",
         "label": "A short window",
-        "focus": ["omnibus", "gpai", "annex3", "annex1"],
+        "focus": [
+          "omnibus",
+          "gpai",
+          "annex3",
+          "annex1"
+        ],
         "note": "Obligations arrive in stages over a short window, so the stack has to exist before the dates."
       },
       {
         "id": "live-now",
         "label": "Live now",
-        "focus": ["omnibus", "gpai"],
+        "focus": [
+          "omnibus",
+          "gpai"
+        ],
         "note": "The Digital Omnibus is in force and GPAI enforcement is live, both since summer 2026."
       },
       {
         "id": "the-deadlines",
         "label": "The deferred deadlines",
-        "focus": ["annex3", "annex1"],
+        "focus": [
+          "annex3",
+          "annex1"
+        ],
         "note": "The Omnibus deferred the high-risk obligations to 2027 and 2028, giving runway, not relief."
       }
     ]
   },
   "lanes": [
-    { "id": "main", "label": "EU AI Act, post-Omnibus" }
+    {
+      "id": "main",
+      "label": "Live now"
+    },
+    {
+      "id": "deferred",
+      "label": "Deferred by the Omnibus"
+    },
+    {
+      "id": "terminal",
+      "label": "What the dates demand"
+    }
   ],
   "states": [
-    { "id": "omnibus", "type": "neutral", "label": "Digital Omnibus", "sublabel": "in force", "tag": "27 July 2026", "step": "01", "lane": "main", "col": 0, "width": 118 },
-    { "id": "gpai", "type": "neutral", "label": "GPAI", "sublabel": "enforcement live", "tag": "2 August 2026", "step": "02", "lane": "main", "col": 1, "width": 118 },
-    { "id": "annex3", "type": "neutral", "label": "Annex III", "sublabel": "high-risk applies", "tag": "2 December 2027", "step": "03", "lane": "main", "col": 2, "width": 118 },
-    { "id": "annex1", "type": "neutral", "label": "Annex I", "sublabel": "embedded high-risk", "tag": "2 August 2028", "step": "04", "lane": "main", "col": 3, "width": 118 }
+    {
+      "id": "omnibus",
+      "type": "neutral",
+      "label": "Digital Omnibus",
+      "sublabel": "in force",
+      "tag": "27 July 2026",
+      "step": "01",
+      "lane": "main",
+      "col": 0,
+      "width": 118
+    },
+    {
+      "id": "gpai",
+      "type": "neutral",
+      "label": "GPAI",
+      "sublabel": "enforcement live",
+      "tag": "2 August 2026",
+      "step": "02",
+      "lane": "main",
+      "col": 1,
+      "width": 118
+    },
+    {
+      "id": "annex3",
+      "type": "neutral",
+      "label": "Annex III",
+      "sublabel": "high-risk applies",
+      "tag": "2 December 2027",
+      "step": "03",
+      "lane": "deferred",
+      "col": 1,
+      "width": 118
+    },
+    {
+      "id": "annex1",
+      "type": "neutral",
+      "label": "Annex I",
+      "sublabel": "embedded high-risk",
+      "tag": "2 August 2028",
+      "step": "04",
+      "lane": "deferred",
+      "col": 2,
+      "width": 118
+    },
+    {
+      "id": "stack",
+      "lane": "terminal",
+      "label": "Stack before the dates",
+      "sublabel": "build in order now",
+      "type": "success",
+      "col": 2,
+      "width": 150,
+      "step": "05",
+      "tag": "build order, ch. 04"
+    }
   ],
   "transitions": [
-    { "id": "t-omnibus-gpai", "from": "omnibus", "to": "gpai" },
-    { "id": "t-gpai-annex3", "from": "gpai", "to": "annex3" },
-    { "id": "t-annex3-annex1", "from": "annex3", "to": "annex1" }
+    {
+      "id": "t1",
+      "from": "omnibus",
+      "to": "gpai"
+    },
+    {
+      "id": "t2",
+      "from": "gpai",
+      "to": "annex3",
+      "label": "deferred to",
+      "labelDy": -25
+    },
+    {
+      "id": "t3",
+      "from": "annex3",
+      "to": "annex1"
+    },
+    {
+      "id": "t4",
+      "from": "annex1",
+      "to": "stack",
+      "label": "build before",
+      "variant": "emphasis",
+      "labelAt": [
+        710,
+        350
+      ]
+    }
   ],
   "cards": [
     {

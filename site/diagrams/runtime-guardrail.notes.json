@@ -1,0 +1,10 @@
+{
+  "policy": "The Policy Card written in Layer 01 and evaluated in CI; the guardrails enforce the same card at runtime, so the pipeline decision and the live decision share one rule.",
+  "request": "A live request: the prompt and any retrieved context, including inputs no eval anticipated.",
+  "input": "The input guardrail screens prompts and retrieved context for injection and policy-violating requests before they reach the model, and blocks what the card forbids.",
+  "agent": "The model or agent acting on the call; the guardrails sit on both sides of it in the request path.",
+  "output": "The output guardrail screens generations and tool calls for unsafe content, data leakage and out-of-scope actions before they take effect, allowing, blocking or redacting.",
+  "response": "The response or tool call that leaves the system only after the output guardrail has allowed it.",
+  "store": "The assurance store that receives a structured event on every call — agent, direction, rule id, decision, timestamp — so each enforcement leaves evidence.",
+  "breaker": "The circuit breaker signalled on a defined breach; the guardrail decides one call at a time, the breaker withdraws the agent's autonomy wholesale."
+}

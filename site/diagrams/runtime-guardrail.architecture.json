@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Runtime Guardrail",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "both-sides",
+        "label": "Both sides of the path",
+        "focus": [
+          "request",
+          "input",
+          "agent",
+          "output",
+          "response"
+        ],
+        "note": "An input guardrail screens prompts and retrieved context; an output guardrail screens generations and tool calls before they take effect."
+      },
+      {
+        "id": "same-card",
+        "label": "The same policy card",
+        "focus": [
+          "policy",
+          "input",
+          "output"
+        ],
+        "note": "Both guardrails enforce the Policy Card evaluated in CI, so the runtime decision and the pipeline decision share one rule."
+      },
+      {
+        "id": "every-call-emits",
+        "label": "Every call emits",
+        "focus": [
+          "input",
+          "output",
+          "store",
+          "breaker"
+        ],
+        "note": "Each decision is a structured event for the assurance store, and a burst of blocks signals the circuit breaker."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "policy",
+      "type": "database",
+      "label": "Policy card",
+      "sublabel": "same rule as CI",
+      "pos": [
+        440,
+        40
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "request",
+      "type": "external",
+      "label": "Request",
+      "sublabel": "prompt, context",
+      "pos": [
+        40,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "input",
+      "type": "security",
+      "label": "Input guardrail",
+      "sublabel": "allow / block",
+      "pos": [
+        250,
+        194
+      ],
+      "size": [
+        176,
+        76
+      ]
+    },
+    {
+      "id": "agent",
+      "type": "backend",
+      "label": "Model or agent",
+      "sublabel": "acts on the call",
+      "pos": [
+        486,
+        200
+      ],
+      "size": [
+        168,
+        64
+      ]
+    },
+    {
+      "id": "output",
+      "type": "security",
+      "label": "Output guardrail",
+      "sublabel": "allow / block / redact",
+      "pos": [
+        714,
+        194
+      ],
+      "size": [
+        184,
+        76
+      ]
+    },
+    {
+      "id": "response",
+      "type": "external",
+      "label": "Response",
+      "sublabel": "or tool call",
+      "pos": [
+        958,
+        200
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "Assurance store",
+      "sublabel": "decision events",
+      "pos": [
+        364,
+        392
+      ],
+      "size": [
+        184,
+        68
+      ]
+    },
+    {
+      "id": "breaker",
+      "type": "external",
+      "label": "Circuit breaker",
+      "sublabel": "on a defined breach",
+      "pos": [
+        676,
+        392
+      ],
+      "size": [
+        184,
+        68
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Layer 01 Govern-as-Code",
+      "wraps": [
+        "policy"
+      ],
+      "pad": 16
+    },
+    {
+      "kind": "region",
+      "label": "Layer 04 Runtime Controls & Observability",
+      "wraps": [
+        "input",
+        "agent",
+        "output",
+        "breaker"
+      ],
+      "pad": 22
+    },
+    {
+      "kind": "region",
+      "label": "Layer 05 Assurance & Continuous Compliance",
+      "wraps": [
+        "store"
+      ],
+      "pad": 16
+    }
+  ],
+  "connections": [
+    {
+      "id": "request-input",
+      "from": "request",
+      "to": "input",
+      "variant": "default",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "input-agent",
+      "from": "input",
+      "to": "agent",
+      "label": "allow",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "agent-output",
+      "from": "agent",
+      "to": "output",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "output-response",
+      "from": "output",
+      "to": "response",
+      "label": "allow",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "policy-input",
+      "from": "policy",
+      "to": "input",
+      "label": "enforce",
+      "variant": "default",
+      "fromSide": "left",
+      "toSide": "top"
+    },
+    {
+      "id": "policy-output",
+      "from": "policy",
+      "to": "output",
+      "label": "enforce",
+      "variant": "default",
+      "fromSide": "right",
+      "toSide": "top"
+    },
+    {
+      "id": "input-store",
+      "from": "input",
+      "to": "store",
+      "label": "event",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "output-store",
+      "from": "output",
+      "to": "store",
+      "label": "event",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "output-breaker",
+      "from": "output",
+      "to": "breaker",
+      "label": "breach",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Enforce at the point of action",
+      "items": [
+        "The input guardrail screens prompts and retrieved context before the model sees them",
+        "The output guardrail screens generations and tool calls before they take effect",
+        "A guardrail that only logs is observability mistaken for control"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "One rule, many events",
+      "items": [
+        "Both sides enforce the Policy Card that CI evaluated",
+        "Every call emits agent, direction, rule, decision and time to the assurance store",
+        "A defined breach signals the breaker, which withdraws the agent's autonomy wholesale"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "First step",
+      "items": [
+        "Put one guardrail on each side of one agent",
+        "Make it emit before you make it clever"
+      ]
+    }
+  ]
+}

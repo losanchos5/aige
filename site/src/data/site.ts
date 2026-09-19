@@ -22,5 +22,5 @@ export const site: SiteConfig = {
   author: 'Jorge García',
   authors: ['Jorge García Aibar', 'Aurélie Pols'],
   license: 'CC BY 4.0',
-  bokVersion: '0.3.1',
+  bokVersion: '0.4.0',
 };

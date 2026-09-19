@@ -1,0 +1,238 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Adversarial Red-Team Suite",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "suite-from-taxonomy",
+        "label": "Suite from a taxonomy",
+        "focus": [
+          "taxonomy",
+          "suite",
+          "run"
+        ],
+        "note": "Each adversarial case traces to a named technique in a threat taxonomy, and the suite is versioned with the model."
+      },
+      {
+        "id": "triage-every-finding",
+        "label": "Triage every finding",
+        "focus": [
+          "run",
+          "triage",
+          "fixed",
+          "accepted"
+        ],
+        "note": "Every finding is fixed or accepted with an owner and a rationale; nothing lapses into a slide deck."
+      },
+      {
+        "id": "closed-stays-closed",
+        "label": "Closed stays closed",
+        "focus": [
+          "fixed",
+          "suite",
+          "record"
+        ],
+        "note": "A confirmed finding becomes a regression case, and the outcome is filed as evidence against the registry entry."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "taxonomy",
+      "label": "Threat taxonomy"
+    },
+    {
+      "id": "evals",
+      "label": "Layer 03 Evals & Red Teaming as Evidence"
+    },
+    {
+      "id": "evidence",
+      "label": "Evidence"
+    },
+    {
+      "id": "accepted",
+      "label": "Accepted risk",
+      "variant": "exception"
+    }
+  ],
+  "phases": [
+    {
+      "id": "build",
+      "label": "Build and version",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "run",
+      "label": "Run and triage",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "close",
+      "label": "Close and record",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "dashed"
+    }
+  ],
+  "mainPath": [
+    "suite",
+    "run",
+    "triage",
+    "fixed",
+    "record"
+  ],
+  "nodes": [
+    {
+      "id": "taxonomy",
+      "lane": "taxonomy",
+      "col": 0,
+      "type": "external",
+      "label": "Threat taxonomy",
+      "sublabel": "named techniques",
+      "width": 160
+    },
+    {
+      "id": "suite",
+      "lane": "evals",
+      "col": 1,
+      "type": "database",
+      "label": "Red-team suite",
+      "sublabel": "versioned with model",
+      "width": 164
+    },
+    {
+      "id": "run",
+      "lane": "evals",
+      "col": 2,
+      "type": "backend",
+      "label": "Run the suite",
+      "sublabel": "findings per technique",
+      "width": 164
+    },
+    {
+      "id": "triage",
+      "lane": "evals",
+      "col": 3,
+      "type": "security",
+      "label": "Triage",
+      "sublabel": "fix / accept",
+      "width": 150
+    },
+    {
+      "id": "fixed",
+      "lane": "evals",
+      "col": 4,
+      "type": "backend",
+      "label": "Fix shipped",
+      "sublabel": "regression case",
+      "width": 156
+    },
+    {
+      "id": "accepted",
+      "lane": "accepted",
+      "col": 4,
+      "type": "backend",
+      "label": "Risk accepted",
+      "sublabel": "owner, rationale",
+      "width": 156
+    },
+    {
+      "id": "record",
+      "lane": "evidence",
+      "col": 5,
+      "type": "database",
+      "label": "Evidence record",
+      "sublabel": "against registry",
+      "width": 164
+    }
+  ],
+  "edges": [
+    {
+      "id": "taxonomy-suite",
+      "from": "taxonomy",
+      "to": "suite",
+      "label": "derive",
+      "variant": "default"
+    },
+    {
+      "id": "suite-run",
+      "from": "suite",
+      "to": "run",
+      "label": "run",
+      "variant": "emphasis"
+    },
+    {
+      "id": "run-triage",
+      "from": "run",
+      "to": "triage",
+      "label": "triage",
+      "variant": "emphasis"
+    },
+    {
+      "id": "triage-fixed",
+      "from": "triage",
+      "to": "fixed",
+      "label": "fix",
+      "variant": "emphasis"
+    },
+    {
+      "id": "triage-accepted",
+      "from": "triage",
+      "to": "accepted",
+      "label": "accept",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "id": "fixed-record",
+      "from": "fixed",
+      "to": "record",
+      "label": "record",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "id": "accepted-record",
+      "from": "accepted",
+      "to": "record",
+      "label": "record",
+      "variant": "dashed",
+      "role": "branch",
+      "route": "outside-right"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "A standing adversary",
+      "items": [
+        "Cases are drawn from a threat taxonomy, so each traces to a named technique",
+        "The suite is versioned alongside the model and run against the registered version",
+        "The Eval Gate enforces a threshold; the suite finds the input it never anticipated"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Every finding is closed",
+      "items": [
+        "Fix, or accept with a recorded owner and rationale",
+        "Confirmed findings become regression cases, so a closed attack stays closed",
+        "The outcome is filed as evidence against the registry entry"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "First step",
+      "items": [
+        "Treat red-team findings like test failures: an owner and a deadline",
+        "Start with the techniques your system is exposed to today"
+      ]
+    }
+  ]
+}

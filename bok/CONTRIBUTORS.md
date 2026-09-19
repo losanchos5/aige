@@ -29,7 +29,7 @@ Substantive fixes — a corrected fact, a sharper argument, a better source — 
 ### Co-authors
 
 **Aurélie Pols** — Responsible AI (EU/Global), Privacy & Data Governance. Co-author of the Thesis and
-Body of Knowledge (v0.1–v0.3.1).
+Body of Knowledge (v0.1–v0.4.0).
 LinkedIn: https://www.linkedin.com/in/aureliepols
 
 ### Contributors

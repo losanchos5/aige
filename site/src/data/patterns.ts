@@ -58,6 +58,17 @@ export const patterns: readonly PatternDef[] = [
     ],
   },
   {
+    id: 'pattern-adversarial-red-team-suite',
+    title: 'Adversarial Red-Team Suite',
+    layer: 3,
+    mapsTo: [
+      'EU AI Act Art. 9, Art. 15, Art. 55 (GPAI)',
+      'ISO/IEC 42001',
+      'NIST AI RMF (Measure)',
+      'OWASP Agentic ASI01/ASI02',
+    ],
+  },
+  {
     id: 'pattern-agent-registry',
     title: 'Agent Registry',
     layer: 2,
@@ -99,6 +110,17 @@ export const patterns: readonly PatternDef[] = [
       'ISO/IEC 42001',
       'NIST AI RMF (Manage, Govern)',
       'CSA AICM',
+    ],
+  },
+  {
+    id: 'pattern-runtime-guardrail',
+    title: 'Runtime Guardrail',
+    layer: 4,
+    mapsTo: [
+      'EU AI Act Art. 14, Art. 15',
+      'ISO/IEC 42001',
+      'NIST AI RMF (Manage)',
+      'OWASP Agentic ASI02/ASI03',
     ],
   },
   {

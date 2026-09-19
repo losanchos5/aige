@@ -8,7 +8,7 @@ knowledge**. It is written by and for practitioners who build governance for AI 
 code, agent registries, eval gates, runtime guardrails, machine-readable evidence — and who measure
 their work by realised risk reduction and audit-ready evidence, not by framework coverage.
 
-It is **version 0.3.1**: the Thesis restated as affirmations over a peer-reviewed revision of the first public draft, still deliberately
+It is **version 0.4.0**: the Thesis restated as affirmations over a peer-reviewed revision of the first public draft, still deliberately
 incomplete, started by one practitioner and open to many. If you do this work, you are invited to
 co-author and to sign.
 

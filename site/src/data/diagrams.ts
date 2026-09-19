@@ -127,7 +127,7 @@ export const diagrams: readonly DiagramDef[] = [
     title: 'Reference toolchain by stack layer',
     caption:
       'The reference toolchain mapped to the five stack layers, from policy engines and the agent registry up to guardrails, observability and the assurance store — generated from the Body of Knowledge.',
-    placements: [],
+    placements: [{ chapter: 'the-stack', section: 'The cost of the stack', at: 'foot' }],
   },
   {
     id: 'policy-card',
@@ -208,6 +208,108 @@ export const diagrams: readonly DiagramDef[] = [
         at: 'head',
       },
     ],
+  },
+  {
+    id: 'adversarial-red-team-suite',
+    type: 'workflow',
+    title: 'Adversarial Red-Team Suite',
+    caption:
+      'A versioned adversarial suite built from a threat taxonomy runs in CI or on a schedule, and every finding is fixed or accepted on the record and filed as evidence, with fixes feeding back into the suite. Treat red-team findings like test failures, with an owner and a deadline — generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', section: 'Pattern: Adversarial Red-Team Suite', at: 'head' },
+    ],
+  },
+  {
+    id: 'runtime-guardrail',
+    type: 'architecture',
+    title: 'Runtime Guardrail',
+    caption:
+      'Input and output guardrails on the model or agent path enforce the same policy card that CI evaluated and emit a decision event on every call to the assurance store and, on a breach, to the circuit breaker. A guardrail without events is a filter, not a control — generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', section: 'Pattern: Runtime Guardrail', at: 'head' },
+    ],
+  },
+  {
+    id: 'kill-switch-circuit-breaker',
+    type: 'architecture',
+    title: 'Kill Switch and Circuit Breaker',
+    caption:
+      'A breaker trips on a signal and revokes one agent’s scope while the rest of the fleet keeps running, and the trip itself becomes an incident record. Design the breaker per agent scope before you need it and test the trip in staging — generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', section: 'Pattern: Kill Switch / Circuit Breaker', at: 'head' },
+    ],
+  },
+  {
+    id: 'agent-identity-scoped-credentials',
+    type: 'sequence',
+    title: 'Agent Identity and Scoped Credentials',
+    caption:
+      'An agent receives a short-lived, scoped credential from its registry entry at deploy time, and every downstream call is verified and attributed in the audit log. No registry entry, no credential, no access — generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', section: 'Pattern: Agent Identity & Scoped Credentials', at: 'head' },
+    ],
+  },
+  {
+    id: 'hitl-gate',
+    type: 'sequence',
+    title: 'Human-in-the-loop Gate',
+    caption:
+      'For the actions the policy marks as needing a human, the agent pauses, a named reviewer decides within a time box, and the decision is logged as evidence. Define which actions need a human by policy, not by habit — generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', section: 'Pattern: Human-in-the-loop Gate', at: 'head' },
+    ],
+  },
+  {
+    id: 'shadow-ai-discovery',
+    type: 'workflow',
+    title: 'Shadow-AI Discovery',
+    caption:
+      'Discovery scans the places AI hides, matches each finding against the registry, and turns unknowns into registry entries or blocks, leaving a discovery report. Run it before you claim your inventory is complete — generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', section: 'Pattern: Shadow-AI Discovery', at: 'head' },
+    ],
+  },
+  {
+    id: 'vendor-due-diligence-gate',
+    type: 'workflow',
+    title: 'Vendor and Model Due-Diligence Gate',
+    caption:
+      'A procured model or tool enters the inventory only after a gate that checks its documentation, evals and contract terms, and the outcome is recorded with any conditions. The gate is where deployer duties start, so keep its checklist versioned — generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', section: 'Pattern: Vendor / Model Due-Diligence Gate', at: 'head' },
+    ],
+  },
+  {
+    id: 'the-stack-layers',
+    type: 'architecture',
+    title: 'The five layers and their artefacts',
+    caption:
+      'The five layers of the stack in their canonical order, each holding the artefacts it produces, with evidence flowing up into assurance. Read the chapter layer by layer, then build in the order it gives for a team of one — generated from the Body of Knowledge.',
+    placements: [{ chapter: 'the-stack', at: 'lead' }],
+  },
+  {
+    id: 'regulatory-wave',
+    type: 'lifecycle',
+    title: 'The regulatory window',
+    caption:
+      'The obligations that are live now and the deferred deadlines that follow them, as the chapter states them as of 2026-09-19. Pick the next stage and map its obligations to artefacts in chapter 08 — generated from the Body of Knowledge.',
+    placements: [{ chapter: 'why-now', at: 'lead' }],
+  },
+  // The two hero diagrams are placed by the home page (src/pages/index.astro),
+  // not by a chapter; they are listed here so the manifest is the full inventory.
+  {
+    id: 'hero-loop',
+    type: 'dataflow',
+    title: 'The evidence loop',
+    caption: 'The evidence loop on the home page — generated from the Body of Knowledge.',
+    placements: [],
+  },
+  {
+    id: 'hero-loop-tall',
+    type: 'dataflow',
+    title: 'The evidence loop (tall)',
+    caption: 'The evidence loop, stacked for narrow screens — generated from the Body of Knowledge.',
+    placements: [],
   },
 ] as const;
 

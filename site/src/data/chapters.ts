@@ -104,7 +104,7 @@ export const chapters: readonly Chapter[] = [
     summary:
       'A catalogue of reusable AI governance engineering patterns, each named to a layer of the stack, in the CSIRO Responsible AI Pattern Catalogue structure.',
     glance: [
-      'Fifteen reusable patterns, each named to one of the five stack layers.',
+      'Seventeen reusable patterns, each named to one of the five stack layers.',
       'The CSIRO Responsible AI Pattern Catalogue structure — context, problem, solution, consequences — plus a Maps to line naming standards and articles.',
       'Every pattern realises one or more of the six principles and cites the OWASP agentic threats and NIST AI RMF functions it serves.',
       'Examples are illustrative sketches; EU AI Act mappings are not claims of conformity.',

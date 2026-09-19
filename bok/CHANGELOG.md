@@ -4,6 +4,50 @@ All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledg
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
 
+## [0.4.0] — 2026-09-19
+
+Minor release: two new patterns, a fuller regulatory map, curated resources, and a visual layer for
+the whole book. No change to the definition, values or principles.
+
+### Added
+- `bok/05-patterns.md` — two patterns the outline had promised: **Adversarial Red-Team Suite**
+  (Layer 03) and **Runtime Guardrail** (Layer 04, distinct from Kill Switch / Circuit Breaker). The
+  catalogue now has 17 patterns; `OUTLINE.md` updated. Four illustrative JSON schemas (Policy Card
+  verdict, Eval Gate result, Continuous Assurance evidence record, Agent Registry entry) placed where
+  the prose already specified their fields.
+- `bok/04-the-stack.md` — one named, anonymised system carried through the five "In practice" boxes
+  and a short "One system through the five layers" section after the minimum viable stack; bold
+  pattern names now link to the catalogue.
+- `bok/08-regulatory-map.md`, `site/src/data/frameworks.ts` — EU AI Act rows for Arts. 6, 43, 47 and
+  60; the Commission's Art. 55(1)(c) serious-incident template as the named artefact on the Art. 55
+  row; the Art. 73 windows as a standalone decision table; ISO/IEC 42006:2025 and ISO/IEC 23894;
+  NIST AI Agent Standards Initiative, NIST IR 8596 and NIST AI 800-1 (drafts flagged); CSA AICM
+  supplements; South Korea AI Basic Act, Texas TRAIGA, Colorado, a UK subsection and Singapore's
+  IMDA framework, each dated "as of 2026-09-19" and hedged where rules are still in draft.
+- `bok/10-reading-list.md`, `sources/SOURCES.md` — incident and risk repositories (AIID, AIAAIC,
+  OECD.AI, AVID, MIT AI Risk Repository), NIST AI 800-1 and ARIA, UK AISI, US CAISI, and the three
+  frontier-lab safety frameworks; the tools index rebuilt on five verified curated lists.
+- `site/src/data/stack.ts`, `site/src/data/path.ts` — illustrative tool names per layer (incl. new
+  categories for MCP / tool-call security, kill switches, model and data cards, FRIA/DPIA tooling
+  and open-source OSCAL tooling) and learning-path resources (IAPP AIGP, Stanford CS120, hands-on
+  labs, a first `template` resource), every URL fetched on 2026-09-19.
+- Figures — an archify figure at the head of every pattern (17), openers for chapters 02 and 04, and
+  seven hand-drawn infographics (the three questions, values and principles, the minimum viable
+  stack, the maturity grid, the Art. 73 clock, the pattern map, reading paths by persona), all
+  governed by `site/VISUAL-GUIDE.md`.
+- Site — duty-holder and applies-from columns with a duty-holder filter on the obligation table;
+  "Patterns" in the navigation with cross-links between tools, obligations and patterns; CSV/JSON
+  export of the obligation index; a mobile table of contents; pattern links from the maturity
+  model; accessibility and Lighthouse gates in CI; a weekly external link-rot check; opt-in
+  cookieless analytics; `CONTRIBUTING.md`.
+
+### Removed
+- `github.com/systempromptio/awesome-ai-agent-governance` — cited five times as a curated index; on
+  inspection it is a promotional fork-farm list (64 forks for 41 stars, one-commit contributors each
+  adding their own tool). Replaced by AthenaCore/AwesomeResponsibleAI, EthicalML/awesome-production-
+  machine-learning, open-policy-agent/awesome-opa, oscal-club/awesome-oscal and
+  trailofbits/awesome-ml-security.
+
 ## [0.3.1] — 2026-09-19
 
 Patch release: a credibility pass. Facts corrected and re-sourced, co-authorship recorded, and the
