@@ -29,3 +29,10 @@ playwright-report
 # Lighthouse CI reports
 .lighthouseci
 site/.lighthouseci
+
+# HyperFrames video projects (source is versioned; heavy artefacts are not)
+videos/*/capture
+videos/*/.media
+videos/*/renders
+videos/*/snapshots
+videos/*/node_modules
