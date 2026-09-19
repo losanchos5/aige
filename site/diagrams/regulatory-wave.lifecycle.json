@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "The regulatory wave",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [820, 600],
+    "views": [
+      {
+        "id": "the-window",
+        "label": "A short window",
+        "focus": ["omnibus", "gpai", "annex3", "annex1"],
+        "note": "Obligations arrive in stages over a short window, so the stack has to exist before the dates."
+      },
+      {
+        "id": "live-now",
+        "label": "Live now",
+        "focus": ["omnibus", "gpai"],
+        "note": "The Digital Omnibus is in force and GPAI enforcement is live, both since summer 2026."
+      },
+      {
+        "id": "the-deadlines",
+        "label": "The deferred deadlines",
+        "focus": ["annex3", "annex1"],
+        "note": "The Omnibus deferred the high-risk obligations to 2027 and 2028, giving runway, not relief."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "main", "label": "EU AI Act, post-Omnibus" }
+  ],
+  "states": [
+    { "id": "omnibus", "type": "neutral", "label": "Digital Omnibus", "sublabel": "in force", "tag": "27 July 2026", "step": "01", "lane": "main", "col": 0, "width": 118 },
+    { "id": "gpai", "type": "neutral", "label": "GPAI", "sublabel": "enforcement live", "tag": "2 August 2026", "step": "02", "lane": "main", "col": 1, "width": 118 },
+    { "id": "annex3", "type": "neutral", "label": "Annex III", "sublabel": "high-risk applies", "tag": "2 December 2027", "step": "03", "lane": "main", "col": 2, "width": 118 },
+    { "id": "annex1", "type": "neutral", "label": "Annex I", "sublabel": "embedded high-risk", "tag": "2 August 2028", "step": "04", "lane": "main", "col": 3, "width": 118 }
+  ],
+  "transitions": [
+    { "id": "t-omnibus-gpai", "from": "omnibus", "to": "gpai" },
+    { "id": "t-gpai-annex3", "from": "gpai", "to": "annex3" },
+    { "id": "t-annex3-annex1", "from": "annex3", "to": "annex1" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Two moves in one summer",
+      "items": [
+        "The Digital Omnibus entered into force on 27 July 2026 and reset the high-risk clock",
+        "GPAI enforcement went live on 2 August 2026, with fines up to 3% of turnover or EUR 15 million",
+        "The law began asking for engineered evidence"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Runway, not relief",
+      "items": [
+        "Annex III high-risk obligations moved to 2 December 2027",
+        "Annex I embedded high-risk moved to 2 August 2028",
+        "The extra time is more runway to do the engineering, not less of it"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "What to do with it",
+      "items": [
+        "Pick the next stage and map its obligations to artefacts in chapter 08",
+        "Build the stack before the dates, not after them"
+      ]
+    }
+  ]
+}

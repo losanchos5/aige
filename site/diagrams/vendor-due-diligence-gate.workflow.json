@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Vendor / Model Due-Diligence Gate",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "assess-the-package",
+        "label": "Assess the package",
+        "focus": ["pkg", "checks", "gate"],
+        "note": "A procured model or tool is assessed on a versioned template before it can reach production."
+      },
+      {
+        "id": "gate-the-entry",
+        "label": "Gate the entry",
+        "focus": ["gate", "registry", "rejected"],
+        "note": "The gate approves with conditions, rejects, and re-opens on renewal or a material change."
+      },
+      {
+        "id": "record-the-limits",
+        "label": "Record the limits",
+        "focus": ["registry", "record"],
+        "note": "The assessment is filed as evidence, with reliance on provider-supplied evidence made explicit."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "provider", "label": "Provider" },
+    { "id": "assess", "label": "Due-diligence gate" },
+    { "id": "rejected", "label": "Rejected", "variant": "exception" },
+    { "id": "l2", "label": "Layer 02 Inventory & Transparency" },
+    { "id": "l5", "label": "Layer 05 Assurance & Continuous Compliance" }
+  ],
+  "phases": [
+    { "id": "submit", "label": "Submit", "fromCol": 0, "toCol": 0 },
+    { "id": "decide", "label": "Assess + gate", "fromCol": 1, "toCol": 2, "variant": "emphasis" },
+    { "id": "file", "label": "Register + evidence", "fromCol": 3, "toCol": 4, "variant": "dashed" }
+  ],
+  "mainPath": ["pkg", "checks", "gate", "registry", "record"],
+  "nodes": [
+    { "id": "pkg", "lane": "provider", "col": 0, "type": "external", "label": "Vendor package", "sublabel": "docs, model card, terms", "width": 172 },
+    { "id": "checks", "lane": "assess", "col": 1, "type": "backend", "label": "Due-diligence checks", "sublabel": "docs, evals, contract", "width": 174 },
+    { "id": "gate", "lane": "assess", "col": 2, "type": "security", "label": "Due-diligence gate", "sublabel": "approve / reject", "tag": "or conditions", "width": 170 },
+    { "id": "rejected", "lane": "rejected", "col": 2, "type": "backend", "label": "Rejected", "sublabel": "not deployed", "width": 150 },
+    { "id": "registry", "lane": "l2", "col": 3, "type": "database", "label": "Registry entry", "sublabel": "with conditions", "width": 158 },
+    { "id": "record", "lane": "l5", "col": 4, "type": "database", "label": "Evidence record", "sublabel": "assessment filed", "width": 160 }
+  ],
+  "edges": [
+    { "id": "pkg-checks", "from": "pkg", "to": "checks", "label": "submit", "variant": "default" },
+    { "id": "checks-gate", "from": "checks", "to": "gate", "label": "assess", "variant": "emphasis" },
+    { "id": "gate-registry", "from": "gate", "to": "registry", "label": "approve, conditions", "variant": "emphasis" },
+    { "id": "gate-rejected", "from": "gate", "to": "rejected", "label": "reject", "variant": "security", "role": "error" },
+    { "id": "registry-record", "from": "registry", "to": "record", "label": "file assessment", "variant": "emphasis" },
+    { "id": "registry-checks", "from": "registry", "to": "checks", "label": "re-open on change", "variant": "dashed", "role": "branch" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "A gate for what you do not own",
+      "items": [
+        "When you cannot red-team the weights, the gate replaces the test you cannot run",
+        "Assess evals and red-team evidence, documentation and AIBOM, data flows, tool scopes, incident commitments and the right to audit",
+        "Structure it on a versioned template, not an ad-hoc questionnaire"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Inventoried and bounded",
+      "items": [
+        "An approved system enters the registry with an owner, a scope and its conditions",
+        "Where a control cannot be verified, record that and bound the integration",
+        "Re-open the gate on renewal or a material model change"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "The limits are explicit",
+      "items": [
+        "The gate is where deployer duties start; keep the checklist versioned",
+        "Reliance on provider-supplied evidence is flagged, not hidden"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Human-in-the-loop Gate",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [920, 640],
+    "views": [
+      {
+        "id": "classify",
+        "label": "Classify by consequence",
+        "focus": ["agent", "policy", "target"],
+        "note": "Actions are classified by consequence; routine actions stay autonomous under guardrails."
+      },
+      {
+        "id": "human-decides",
+        "label": "Human decides in a time box",
+        "focus": ["policy", "reviewer"],
+        "note": "A high-consequence action pauses for a named reviewer to approve or reject within a time box."
+      },
+      {
+        "id": "execute-or-drop",
+        "label": "Execute or drop, then log",
+        "focus": ["policy", "target", "log"],
+        "note": "Approved actions execute, rejected or timed-out actions are dropped, and the decision is logged."
+      }
+    ]
+  },
+  "participants": [
+    { "id": "agent", "type": "external", "label": "Agent", "sublabel": "proposes action" },
+    { "id": "policy", "type": "security", "label": "Policy check", "sublabel": "human required?" },
+    { "id": "reviewer", "type": "external", "label": "Reviewer", "sublabel": "named human" },
+    { "id": "target", "type": "external", "label": "Action target", "sublabel": "payment, denial" },
+    { "id": "log", "type": "database", "label": "Evidence log", "sublabel": "approver, decision" }
+  ],
+  "segments": [
+    { "from": 150, "to": 262, "label": "Classify by consequence" },
+    { "from": 262, "to": 432, "label": "Human decides in a time box" },
+    { "from": 432, "to": 566, "label": "Execute or drop, then log" }
+  ],
+  "messages": [
+    { "id": "propose", "from": "agent", "to": "policy", "y": 200, "label": "propose action", "variant": "default" },
+    { "id": "routine", "from": "agent", "to": "target", "y": 240, "label": "routine: auto under guardrails", "variant": "dashed" },
+    { "id": "require", "from": "policy", "to": "reviewer", "y": 320, "label": "high-consequence: human required", "variant": "security" },
+    { "id": "approve", "from": "reviewer", "to": "policy", "y": 372, "label": "approve within time box", "variant": "return" },
+    { "id": "execute", "from": "policy", "to": "target", "y": 470, "label": "execute action", "variant": "emphasis" },
+    { "id": "drop", "from": "policy", "to": "agent", "y": 510, "label": "reject or timeout: drop", "variant": "dashed" },
+    { "id": "record", "from": "policy", "to": "log", "y": 550, "label": "log approver, context, decision", "variant": "default" }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Oversight by design",
+      "items": [
+        "Classify actions by consequence, not by habit",
+        "Gate only the irreversible or high-impact class behind a human",
+        "Keep the routine class autonomous under guardrails"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "A decision in a time box",
+      "items": [
+        "The agent pauses and the action is blocked until a named reviewer decides",
+        "The reviewer gets enough context to decide",
+        "A timeout drops the action rather than letting it through"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Recorded as evidence",
+      "items": [
+        "The approver, the context and the decision are logged",
+        "This realises the EU AI Act Art. 14 human-oversight duty at the point of action",
+        "The approval is auditable"
+      ]
+    }
+  ]
+}

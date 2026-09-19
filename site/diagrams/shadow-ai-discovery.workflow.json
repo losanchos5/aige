@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Shadow-AI Discovery",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "scan-the-hiding-places",
+        "label": "Scan where AI hides",
+        "focus": ["idp", "cloud", "egress", "repos", "scan"],
+        "note": "Discovery scans the environments where AI appears rather than trusting voluntary declaration."
+      },
+      {
+        "id": "match-and-triage",
+        "label": "Match, then triage",
+        "focus": ["scan", "match", "triage"],
+        "note": "Findings are reconciled against the registry and each unknown is triaged for an owner to claim."
+      },
+      {
+        "id": "entry-or-frozen",
+        "label": "Registered or frozen",
+        "focus": ["registered", "blocked", "report"],
+        "note": "An unknown becomes a registry entry or has its scope frozen, and the reconciliation is evidence."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "sources", "label": "Where AI hides" },
+    { "id": "discover", "label": "Layer 02 Inventory & Transparency" },
+    { "id": "registry", "label": "Registry" },
+    { "id": "frozen", "label": "Frozen", "variant": "exception" },
+    { "id": "evidence", "label": "Evidence" }
+  ],
+  "phases": [
+    { "id": "scan", "label": "Scan", "fromCol": 0, "toCol": 1 },
+    { "id": "reconcile", "label": "Match + triage", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "resolve", "label": "Register + evidence", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["scan", "match", "triage", "registered", "report"],
+  "nodes": [
+    { "id": "idp", "lane": "sources", "col": 0, "type": "external", "label": "Identity providers", "sublabel": "agent logins", "yOffset": -132, "width": 162 },
+    { "id": "cloud", "lane": "sources", "col": 0, "type": "external", "label": "Cloud accounts", "sublabel": "running services", "yOffset": -44, "width": 162 },
+    { "id": "egress", "lane": "sources", "col": 0, "type": "external", "label": "Network egress", "sublabel": "external API calls", "yOffset": 44, "width": 162 },
+    { "id": "repos", "lane": "sources", "col": 0, "type": "external", "label": "Code repos", "sublabel": "SDK, prompt use", "yOffset": 132, "width": 162 },
+    { "id": "scan", "lane": "discover", "col": 1, "type": "backend", "label": "Discovery scan", "sublabel": "finds models, agents", "width": 162 },
+    { "id": "match", "lane": "discover", "col": 2, "type": "security", "label": "Match vs registry", "sublabel": "known / unknown", "width": 162 },
+    { "id": "triage", "lane": "discover", "col": 3, "type": "backend", "label": "Triage & claim", "sublabel": "assign an owner", "width": 156 },
+    { "id": "registered", "lane": "registry", "col": 4, "type": "database", "label": "Registry entry", "sublabel": "owner, scope", "width": 156 },
+    { "id": "blocked", "lane": "frozen", "col": 4, "type": "backend", "label": "Scope frozen", "sublabel": "until claimed", "width": 150 },
+    { "id": "report", "lane": "evidence", "col": 5, "type": "database", "label": "Discovery report", "sublabel": "reconciliation", "width": 162 }
+  ],
+  "edges": [
+    { "id": "idp-scan", "from": "idp", "to": "scan" },
+    { "id": "cloud-scan", "from": "cloud", "to": "scan" },
+    { "id": "egress-scan", "from": "egress", "to": "scan" },
+    { "id": "repos-scan", "from": "repos", "to": "scan" },
+    { "id": "scan-match", "from": "scan", "to": "match", "label": "reconcile", "variant": "emphasis" },
+    { "id": "match-triage", "from": "match", "to": "triage", "label": "unknown", "variant": "emphasis", "role": "branch" },
+    { "id": "triage-registered", "from": "triage", "to": "registered", "label": "open entry, claim", "variant": "emphasis" },
+    { "id": "triage-blocked", "from": "triage", "to": "blocked", "label": "unclaimed: freeze", "variant": "security", "role": "error" },
+    { "id": "registered-report", "from": "registered", "to": "report", "label": "as evidence", "variant": "dashed", "role": "branch" },
+    { "id": "blocked-report", "from": "blocked", "to": "report", "variant": "dashed", "role": "branch" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "You cannot govern what you cannot see",
+      "items": [
+        "A registry fed only by voluntary declaration is always behind",
+        "Discovery scans identity providers, cloud accounts, network egress and code repos",
+        "Run it before you claim your inventory is complete"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Unknowns become governed",
+      "items": [
+        "Findings are reconciled against the registry as known or unknown",
+        "Each unknown opens an entry with an owner to claim it",
+        "The unclaimed are escalated and their scope frozen"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "The result is evidence",
+      "items": [
+        "The reconciliation feeds the registry's drift check",
+        "The discovery report is the machine-readable proof the inventory was tested against reality"
+      ]
+    }
+  ]
+}

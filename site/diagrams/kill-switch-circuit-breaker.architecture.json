@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Kill Switch / Circuit Breaker",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "trip-one-agent",
+        "label": "Trip one agent",
+        "focus": ["guardrail", "telemetry", "breaker", "agentA"],
+        "note": "A defined signal trips the breaker at the tool-call boundary, which revokes just one agent's scope."
+      },
+      {
+        "id": "fleet-runs-on",
+        "label": "Fleet keeps running",
+        "focus": ["breaker", "agentB", "agentC"],
+        "note": "Containment is per agent: the rest of the fleet keeps running instead of a fleet-wide stop."
+      },
+      {
+        "id": "trip-is-evidence",
+        "label": "The trip is evidence",
+        "focus": ["breaker", "record"],
+        "note": "Every trip is logged as a machine-readable incident record, so containing the agent is itself evidence."
+      }
+    ]
+  },
+  "components": [
+    { "id": "guardrail", "type": "external", "label": "Guardrail events", "sublabel": "flagged calls", "pos": [60, 120], "size": [172, 64] },
+    { "id": "telemetry", "type": "external", "label": "Telemetry", "sublabel": "anomaly, threshold", "pos": [60, 264], "size": [172, 64] },
+    { "id": "breaker", "type": "security", "label": "Circuit breaker", "sublabel": "tool-call boundary", "tag": "auto or manual", "pos": [368, 180], "size": [184, 76] },
+    { "id": "agentA", "type": "external", "label": "Agent A", "sublabel": "scope revoked", "pos": [724, 80], "size": [176, 64] },
+    { "id": "agentB", "type": "external", "label": "Agent B", "sublabel": "runs on", "pos": [724, 204], "size": [176, 64] },
+    { "id": "agentC", "type": "external", "label": "Agent C", "sublabel": "runs on", "pos": [724, 328], "size": [176, 64] },
+    { "id": "record", "type": "database", "label": "Incident record", "sublabel": "trip logged", "pos": [366, 440], "size": [188, 72] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Layer 04 Runtime Controls & Observability", "wraps": ["guardrail", "telemetry", "breaker", "agentA", "agentB", "agentC"], "pad": 22 },
+    { "kind": "region", "label": "Layer 05 Assurance & Continuous Compliance", "wraps": ["record"], "pad": 18 }
+  ],
+  "connections": [
+    { "id": "guardrail-breaker", "from": "guardrail", "to": "breaker", "label": "signal", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
+    { "id": "telemetry-breaker", "from": "telemetry", "to": "breaker", "variant": "default", "fromSide": "right", "toSide": "left" },
+    { "id": "breaker-agentA", "from": "breaker", "to": "agentA", "label": "revoke scope", "variant": "security", "fromSide": "right", "toSide": "left" },
+    { "id": "breaker-agentB", "from": "breaker", "to": "agentB", "variant": "dashed", "fromSide": "right", "toSide": "left" },
+    { "id": "breaker-agentC", "from": "breaker", "to": "agentC", "variant": "dashed", "fromSide": "right", "toSide": "left" },
+    { "id": "breaker-record", "from": "breaker", "to": "record", "label": "trip = evidence", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelAt": [508, 348] }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Autonomy is withdrawable",
+      "items": [
+        "The breaker sits at the tool-call boundary",
+        "It trips on a threshold breach, an anomaly, or a manual pull",
+        "An untested kill switch is not a control"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Contained to one agent",
+      "items": [
+        "Each agent is bound to its own identity, so scope is revoked per agent",
+        "Revocation halts that agent's tool calls while the fleet keeps running"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "First step",
+      "items": [
+        "Design the breaker per agent scope before you need it",
+        "Test the trip on a schedule, in staging"
+      ]
+    }
+  ]
+}

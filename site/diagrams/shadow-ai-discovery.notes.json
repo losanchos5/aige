@@ -1,0 +1,12 @@
+{
+  "idp": "Identity providers, one of the environments discovery scans, where agent and tool logins reveal AI the registry did not know about.",
+  "cloud": "Cloud accounts, scanned for running services and agents that were never declared.",
+  "egress": "Network egress, scanned for external API calls that betray an unregistered agent.",
+  "repos": "Code repositories and SaaS integrations, scanned for the SDK and prompt use that shows an AI system in production.",
+  "scan": "Discovery runs against the environments where AI appears, using discovery tooling to find the models and agents the inventory missed.",
+  "match": "Findings are reconciled against the Agent Registry, sorting each into known or unknown.",
+  "triage": "Each unknown opens an entry with an owner to claim it, and the unclaimed are escalated.",
+  "registered": "An unknown is auto-registered as an unclaimed entry until its owner claims it, and the result feeds the registry's drift check.",
+  "blocked": "An unclaimed agent has its scope frozen until an owner claims it.",
+  "report": "The reconciliation produces a discovery report — the machine-readable evidence that the inventory was checked against reality."
+}

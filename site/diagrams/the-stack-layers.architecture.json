@@ -1,0 +1,92 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "The stack, layer by layer",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "five-bands",
+        "label": "Five layers, in order",
+        "focus": ["policy-library", "registry", "eval-gate", "guardrails", "evidence-store"],
+        "note": "Five layers in canonical order, each holding the named artefacts it produces."
+      },
+      {
+        "id": "artefacts-per-layer",
+        "label": "Artefacts in each layer",
+        "focus": ["crosswalks", "aibom", "eval-suites", "identity", "mappings"],
+        "note": "Each band names two artefacts, not tools, so you build the layer by producing them."
+      },
+      {
+        "id": "evidence-up",
+        "label": "Evidence flows up",
+        "focus": ["guardrails", "evidence-store", "mappings"],
+        "note": "Runtime records flow up into Layer 05, where they are aggregated into audit-ready evidence."
+      }
+    ]
+  },
+  "components": [
+    { "id": "evidence-store", "type": "database", "label": "Evidence store", "sublabel": "OSCAL, queryable", "pos": [150, 88], "size": [204, 66] },
+    { "id": "mappings", "type": "database", "label": "Framework mappings", "sublabel": "generated from evidence", "pos": [470, 88], "size": [204, 66] },
+
+    { "id": "guardrails", "type": "security", "label": "Runtime guardrails", "sublabel": "mediate tool calls", "pos": [150, 250], "size": [204, 66] },
+    { "id": "identity", "type": "security", "label": "Agent identity", "sublabel": "scope + kill switch", "pos": [470, 250], "size": [204, 66] },
+
+    { "id": "eval-gate", "type": "security", "label": "Eval gate", "sublabel": "fails the build", "pos": [150, 412], "size": [204, 66] },
+    { "id": "eval-suites", "type": "database", "label": "Eval suites", "sublabel": "capability, adversarial", "pos": [470, 412], "size": [204, 66] },
+
+    { "id": "registry", "type": "database", "label": "Agent registry", "sublabel": "owner, scope, status", "pos": [150, 574], "size": [204, 66] },
+    { "id": "aibom", "type": "database", "label": "AIBOM", "sublabel": "bill of materials", "pos": [470, 574], "size": [204, 66] },
+
+    { "id": "policy-library", "type": "database", "label": "Policy library", "sublabel": "versioned rules", "pos": [150, 736], "size": [204, 66] },
+    { "id": "crosswalks", "type": "database", "label": "Crosswalks", "sublabel": "policy to framework", "pos": [470, 736], "size": [204, 66] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Layer 05 Assurance & Continuous Compliance", "wraps": ["evidence-store", "mappings"], "pad": 18 },
+    { "kind": "region", "label": "Layer 04 Runtime Controls & Observability", "wraps": ["guardrails", "identity"], "pad": 18 },
+    { "kind": "region", "label": "Layer 03 Evals & Red Teaming as Evidence", "wraps": ["eval-gate", "eval-suites"], "pad": 18 },
+    { "kind": "region", "label": "Layer 02 Inventory & Transparency", "wraps": ["registry", "aibom"], "pad": 18 },
+    { "kind": "region", "label": "Layer 01 Govern-as-Code", "wraps": ["policy-library", "crosswalks"], "pad": 18 }
+  ],
+  "connections": [
+    { "id": "spine-01-02", "from": "policy-library", "to": "registry", "variant": "default", "fromSide": "top", "toSide": "bottom" },
+    { "id": "spine-02-03", "from": "registry", "to": "eval-gate", "variant": "default", "fromSide": "top", "toSide": "bottom" },
+    { "id": "spine-03-04", "from": "eval-gate", "to": "guardrails", "variant": "default", "fromSide": "top", "toSide": "bottom" },
+    { "id": "spine-04-05", "from": "guardrails", "to": "evidence-store", "label": "evidence", "variant": "emphasis", "fromSide": "top", "toSide": "bottom", "labelAt": [305, 200] },
+
+    { "id": "l01-pair", "from": "crosswalks", "to": "policy-library", "label": "map policies", "variant": "default", "fromSide": "left", "toSide": "right" },
+    { "id": "l02-pair", "from": "aibom", "to": "registry", "label": "per entry", "variant": "default", "fromSide": "left", "toSide": "right" },
+    { "id": "l03-pair", "from": "eval-suites", "to": "eval-gate", "label": "run in CI", "variant": "default", "fromSide": "left", "toSide": "right" },
+    { "id": "l04-pair", "from": "identity", "to": "guardrails", "label": "scope", "variant": "default", "fromSide": "left", "toSide": "right" },
+    { "id": "l05-pair", "from": "evidence-store", "to": "mappings", "label": "generated from", "variant": "default", "fromSide": "right", "toSide": "left" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "A build order, not a chart",
+      "items": [
+        "Read it bottom to top: Policy, Inventory, Evals, Runtime, Assurance",
+        "Each layer produces an artefact the layer above consumes",
+        "This map is the artefacts, not the tools that make them"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Evidence flows up",
+      "items": [
+        "A policy verdict, a registry entry, an eval result and a guardrail decision are structured records",
+        "Layer 05 aggregates them into audit-ready evidence",
+        "Every green cell traces to a running control and the evidence it emitted"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "How to read it",
+      "items": [
+        "Build in the order chapter 04 gives for a team of one",
+        "Start at Layer 02: a registry a deploy writes to"
+      ]
+    }
+  ]
+}
