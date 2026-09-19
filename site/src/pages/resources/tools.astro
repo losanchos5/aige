@@ -5,9 +5,22 @@ import Callout from '../../components/Callout.astro';
 import Diagram from '../../components/Diagram.astro';
 import { site } from '../../data/site';
 import { layers, toolsByCategory } from '../../data/stack';
+import { slugify } from '../../lib/md-parse';
 import '../../styles/resources.css';
 
 const groups = toolsByCategory();
+
+// The representative chapter-05 pattern for each layer, used for the "Patterns
+// for this layer" cross-link. The anchor is computed with the same slugger
+// rehype-slug uses, so it always matches the built /bok/patterns page.
+const layerPattern: Record<number, string> = {
+  1: 'Policy Card',
+  2: 'Agent Registry',
+  3: 'Eval Gate in CI',
+  4: 'Kill Switch / Circuit Breaker',
+  5: 'Continuous Assurance Telemetry',
+};
+const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}`)}`;
 ---
 
 <Base
@@ -79,6 +92,14 @@ const groups = toolsByCategory();
                   </li>
                 ))}
               </ul>
+              <p class="tl-xref">
+                <a href={`/resources/frameworks#ob-layer-${group.layers[0]}`}>
+                  Obligations this answers →
+                </a>
+                <a href={patternHref(layerPattern[group.layers[0]])}>
+                  Patterns for this layer →
+                </a>
+              </p>
             </li>
           ))
         }
@@ -86,3 +107,30 @@ const groups = toolsByCategory();
     </section>
   </div>
 </Base>
+
+<style>
+  /* Reciprocal cross-links in each category card: to the obligations that layer
+     answers and to the layer's patterns. */
+  .tl-xref {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+    margin: var(--s-4) 0 0;
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--line);
+  }
+
+  .tl-xref a {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.02em;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .tl-xref a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+</style>

@@ -4,9 +4,16 @@
  * framework they belong to. Each group has a sticky header; each row shows the
  * obligation, the engineering artefact, the stack layer(s) as colour ticks and
  * a link back to the row's anchor in chapter 08. A pure-CSS radio filter (no JS)
- * narrows the list to a single layer. Below 720px rows become stacked cards.
+ * narrows the list to a single layer, and a second one to a single EU AI Act
+ * duty holder. Below 720px rows become stacked cards.
+ *
+ * The EU AI Act group alone carries a duty holder and an applies-from date (the
+ * voluntary frameworks bind no one), so those two columns and the duty-holder
+ * filter render for that group only. Where an obligation maps one-to-one onto a
+ * pattern from chapter 05, its artefact cell links to that pattern's anchor.
  */
 import type { Obligation, StackLayer } from '../data/frameworks';
+import { slugify } from '../lib/md-parse';
 
 interface Props {
   obligations: readonly Obligation[];
@@ -28,7 +35,11 @@ for (const row of obligations) {
 // Chapter 08 is the source of every obligation anchor.
 const chapterBase = '/bok/regulatory-map';
 
-const filters: { id: string; value: string; label: string }[] = [
+// Only EU AI Act obligations carry dutyHolder / applies in the data.
+const EU_FRAMEWORK = 'EU AI Act';
+const hasDutyColumns = (framework: string) => framework === EU_FRAMEWORK;
+
+const layerFilters: { id: string; value: string; label: string }[] = [
   { id: 'lf-all', value: 'all', label: 'All layers' },
   { id: 'lf-1', value: '1', label: 'L1' },
   { id: 'lf-2', value: '2', label: 'L2' },
@@ -37,8 +48,46 @@ const filters: { id: string; value: string; label: string }[] = [
   { id: 'lf-5', value: '5', label: 'L5' },
 ];
 
+const dutyFilters: { id: string; value: string; label: string }[] = [
+  { id: 'df-all', value: 'all', label: 'All duty holders' },
+  { id: 'df-provider', value: 'provider', label: 'Provider' },
+  { id: 'df-deployer', value: 'deployer', label: 'Deployer' },
+  { id: 'df-gpai', value: 'gpai', label: 'GPAI provider' },
+];
+
 const layerClass = (layerN: readonly StackLayer[]) =>
   layerN.map((n) => `has-l${n}`).join(' ');
+
+// Classify a duty-holder string into the filter buckets it belongs to. A GPAI
+// provider is filtered as GPAI, not as a general provider; a row can bind both
+// a provider and a deployer (e.g. "Provider + deployer").
+const dutyClass = (dutyHolder?: string): string => {
+  if (!dutyHolder) return '';
+  const d = dutyHolder.toLowerCase();
+  const out: string[] = [];
+  if (d.includes('gpai')) out.push('has-duty-gpai');
+  else if (d.includes('provider')) out.push('has-duty-provider');
+  if (d.includes('deployer')) out.push('has-duty-deployer');
+  return out.join(' ');
+};
+
+// Obligations that map one-to-one onto a chapter-05 pattern. The value is the
+// pattern's H2 name; the anchor is computed with the same slugger rehype-slug
+// uses, so it always matches the built page (verified by check-links).
+const artefactPattern: Record<string, string> = {
+  'EU AI Act Art. 11 technical documentation (Annex IV)': 'AIBOM',
+  'EU AI Act Art. 13 transparency and information to deployers':
+    'Model Card as Control Evidence',
+  'EU AI Act Art. 14 human oversight': 'Human-in-the-loop Gate',
+  'EU AI Act Art. 15 accuracy, robustness and cybersecurity': 'Eval Gate in CI',
+  'EU AI Act Art. 27 Fundamental Rights Impact Assessment (FRIA)': 'FRIA-as-Code',
+  'EU AI Act Art. 49/71 registration of high-risk systems in the EU database':
+    'Agent Registry',
+  'EU AI Act Art. 72 post-market monitoring': 'Continuous Assurance Telemetry',
+  'EU AI Act Art. 73 serious-incident reporting': 'Incident Pipeline',
+};
+
+const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}`)}`;
 ---
 
 <div class="ob-list">
@@ -46,12 +95,33 @@ const layerClass = (layerN: readonly StackLayer[]) =>
     <legend>Filter by layer</legend>
     <div class="ob-chips">
       {
-        filters.map((f, i) => (
-          <span>
+        layerFilters.map((f, i) => (
+          <span id={f.value === 'all' ? undefined : `ob-layer-${f.value}`}>
             <input
               class="ob-radio"
               type="radio"
               name="ob-layer-filter"
+              id={f.id}
+              value={f.value}
+              checked={i === 0}
+            />
+            <label class="ob-chip" for={f.id}>{f.label}</label>
+          </span>
+        ))
+      }
+    </div>
+  </fieldset>
+
+  <fieldset class="ob-filter ob-filter-duty">
+    <legend>Filter by EU AI Act duty holder</legend>
+    <div class="ob-chips">
+      {
+        dutyFilters.map((f, i) => (
+          <span>
+            <input
+              class="ob-radio"
+              type="radio"
+              name="ob-duty-filter"
               id={f.id}
               value={f.value}
               checked={i === 0}
@@ -75,16 +145,30 @@ const layerClass = (layerN: readonly StackLayer[]) =>
             <thead>
               <tr>
                 <th scope="col">Obligation</th>
+                {hasDutyColumns(group.framework) && <th scope="col">Duty holder</th>}
                 <th scope="col">Artefact</th>
                 <th scope="col">Layers</th>
+                {hasDutyColumns(group.framework) && <th scope="col">Applies from</th>}
                 <th scope="col">Chapter</th>
               </tr>
             </thead>
             <tbody>
               {group.rows.map((row) => (
-                <tr data-obligation-row class:list={[layerClass(row.layerN)]}>
+                <tr
+                  data-obligation-row
+                  class:list={[layerClass(row.layerN), dutyClass(row.dutyHolder)]}
+                >
                   <td class="c-oblig" data-label="Obligation">{row.obligation}</td>
-                  <td class="c-artefact" data-label="Artefact">{row.artefact}</td>
+                  {hasDutyColumns(group.framework) && (
+                    <td class="c-duty" data-label="Duty holder">{row.dutyHolder}</td>
+                  )}
+                  <td class="c-artefact" data-label="Artefact">
+                    {artefactPattern[row.obligation] ? (
+                      <a href={patternHref(artefactPattern[row.obligation])}>{row.artefact}</a>
+                    ) : (
+                      row.artefact
+                    )}
+                  </td>
                   <td class="c-layers" data-label="Layers">
                     <span class="ticks" role="img" aria-label={`Layers ${row.layerN.join(', ')}`}>
                       {row.layerN.map((n) => (
@@ -92,6 +176,9 @@ const layerClass = (layerN: readonly StackLayer[]) =>
                       ))}
                     </span>
                   </td>
+                  {hasDutyColumns(group.framework) && (
+                    <td class="c-applies" data-label="Applies from">{row.applies}</td>
+                  )}
                   <td class="c-chapter" data-label="Chapter">
                     <a href={`${chapterBase}#${row.anchor}`}>ch. 08 →</a>
                   </td>
@@ -104,3 +191,34 @@ const layerClass = (layerN: readonly StackLayer[]) =>
     ))
   }
 </div>
+
+<style is:global>
+  /* Pure-CSS duty-holder filter via :has(), mirroring the layer filter in
+     resources.css. Only EU AI Act rows carry a duty class, so any non-"all"
+     duty filter collapses the voluntary-framework groups. Default (#df-all)
+     shows everything. */
+  .ob-list:has(#df-provider:checked) .ob-group:not(:has(.has-duty-provider)) { display: none; }
+  .ob-list:has(#df-provider:checked) [data-obligation-row]:not(.has-duty-provider) { display: none; }
+  .ob-list:has(#df-deployer:checked) .ob-group:not(:has(.has-duty-deployer)) { display: none; }
+  .ob-list:has(#df-deployer:checked) [data-obligation-row]:not(.has-duty-deployer) { display: none; }
+  .ob-list:has(#df-gpai:checked) .ob-group:not(:has(.has-duty-gpai)) { display: none; }
+  .ob-list:has(#df-gpai:checked) [data-obligation-row]:not(.has-duty-gpai) { display: none; }
+
+  .ob-filter-duty {
+    margin-top: calc(-1 * var(--s-3));
+  }
+
+  .res-table .c-duty {
+    color: var(--ink-2);
+    min-width: 9rem;
+  }
+
+  /* --ink-2, not --muted: this text sits on zebra-striped rows where --muted
+     drops just under AA (see the note on .c-chapter in resources.css). */
+  .res-table .c-applies {
+    color: var(--ink-2);
+    font-size: 0.8125rem;
+    min-width: 10rem;
+    line-height: 1.4;
+  }
+</style>

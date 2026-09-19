@@ -25,12 +25,13 @@ someone is accountable, but nothing executes. Typical evidence: policy documents
 spreadsheet, meeting minutes. Typical failure that moves you back: the document was last edited a
 quarter ago and no longer matches production — the artefact is stale before it is signed.
 
-**Level 2 — Inventoried.** There is a real inventory of models and an **agent registry**, and it is
+**Level 2 — Inventoried.** There is a real inventory of models and an
+**[agent registry](/bok/patterns#pattern-agent-registry)**, and it is
 fed by a runtime data path rather than typed by hand: a deploy registers a system with an owner, a
 scope and a status. You can answer *what is running* on any given day. Typical evidence: a registry
 with an owner and a class for every system; a discovery job reconciling registry against production.
-Typical failure: shadow AI — a system or agent reaches production without registering, so the
-inventory is complete only for the honest.
+Typical failure: [shadow AI](/bok/patterns#pattern-shadow-ai-discovery) — a system or agent reaches
+production without registering, so the inventory is complete only for the honest.
 
 **Level 3 — Tested.** Systems are evaluated against defined tests — capability, safety and adversarial
 evals — and the results are recorded as evidence. Failures are visible, but a failing eval does not
@@ -39,9 +40,11 @@ consequences. Typical evidence: versioned eval suites; stored, timestamped eval 
 findings. Typical failure: the eval is run once before launch, pasted into a slide, and never re-run
 when the model or its prompts change.
 
-**Level 4 — Enforced.** The tests bite. Policy-as-code and **eval gates** run in CI/CD and at
+**Level 4 — Enforced.** The tests bite. [Policy-as-code](/bok/patterns#pattern-policy-card) and
+**[eval gates](/bok/patterns#pattern-eval-gate-in-ci)** run in CI/CD and at
 admission, and a failing control blocks the merge or the deploy. Identity precedes autonomy: an agent
-with no owner, scope or **kill switch** is denied a workload identity. Governance is now a property of
+with no owner, scope or **[kill switch](/bok/patterns#pattern-kill-switch--circuit-breaker)** is
+denied a workload identity. Governance is now a property of
 the build, not a checkpoint after it. But a blocking gate is only as good as the test behind it, so
 Level 4 has a second condition that is easy to skip: the eval suite's own *quality* is assessed, not
 just its existence and its teeth. A gate that blocks on a trivial or stale suite is Level 4 by the
@@ -55,9 +58,11 @@ governance alone that engineering does not own; or a gate whose suite is trivial
 the block is real but the assurance is not.
 
 **Level 5 — Continuous.** Assurance is produced continuously from the runtime data path. Guardrail
-decisions, tool-call mediation, drift and agent behaviour stream into observability; **continuous
-assurance** turns production behaviour into a live control signal; evidence is emitted as
-machine-readable artefacts (`OSCAL`, signed logs) as the pipeline and runtime operate. The audit is a
+decisions, tool-call mediation, drift and agent behaviour stream into observability;
+**[continuous assurance](/bok/patterns#pattern-continuous-assurance-telemetry)** turns production
+behaviour into a live control signal; evidence is emitted as
+[machine-readable artefacts](/bok/patterns#pattern-machine-readable-evidence-oscal) (`OSCAL`, signed
+logs) as the pipeline and runtime operate. The audit is a
 query. This is the end state most of the AI-governance platform category does not reach, because it
 "manages the program … without any runtime data path" [1]. Typical evidence: a live assurance store;
 streaming eval and guardrail telemetry; an audit answered by running a query. Typical failure:
@@ -71,11 +76,11 @@ its column.
 
 | Layer | 1 Documented | 2 Inventoried | 3 Tested | 4 Enforced | 5 Continuous |
 |---|---|---|---|---|---|
-| **1 Govern-as-Code** | Policies written as prose | Policies indexed, mapped to systems | Policy checks run and report, non-blocking | Policy-as-code blocks merge/deploy | Policy verdicts stream to assurance, versioned |
-| **2 Inventory & Transparency** | Spreadsheet inventory | Registry fed by deploy; owner + scope per system | Registry reconciled against production | Registry gates deployment; no entry, no identity | Registry live off runtime discovery; drift auto-flagged |
-| **3 Evals & Red Teaming as Evidence** | Evals described in a plan | Eval suites exist and are versioned | Evals run, results stored, non-blocking | Eval gate fails the build on regression; suite coverage and adversarial quality assessed | Evals run continuously; results are live evidence |
-| **4 Runtime Controls & Observability** | Guardrails named in a design | Guardrails deployed, not measured | Guardrail decisions logged | Kill switch tested; tool-calls mediated and enforced | Runtime signals drive control decisions in real time |
-| **5 Assurance & Continuous Compliance** | Evidence gathered by hand for audit | Evidence templated per control | Structured evidence produced per run | Evidence required to pass the gate | Machine-readable evidence emitted continuously; audit = query |
+| **1 Govern-as-Code** | Policies written as prose | Policies indexed, mapped to systems | Policy checks run and report, non-blocking | [Policy-as-code](/bok/patterns#pattern-policy-card) blocks merge/deploy | [Policy verdicts](/bok/patterns#pattern-continuous-assurance-telemetry) stream to assurance, versioned |
+| **2 Inventory & Transparency** | Spreadsheet inventory | Registry fed by deploy; owner + scope per system | Registry reconciled against production | [Registry gates deployment](/bok/patterns#pattern-agent-registry); no entry, no identity | Registry live off [runtime discovery](/bok/patterns#pattern-shadow-ai-discovery); drift auto-flagged |
+| **3 Evals & Red Teaming as Evidence** | Evals described in a plan | Eval suites exist and are versioned | Evals run, results stored, non-blocking | [Eval gate](/bok/patterns#pattern-eval-gate-in-ci) fails the build on regression; suite coverage and adversarial quality assessed | Evals run continuously; results are live evidence |
+| **4 Runtime Controls & Observability** | Guardrails named in a design | Guardrails deployed, not measured | Guardrail decisions logged | [Kill switch](/bok/patterns#pattern-kill-switch--circuit-breaker) tested; tool-calls mediated and enforced | Runtime signals drive control decisions in real time |
+| **5 Assurance & Continuous Compliance** | Evidence gathered by hand for audit | Evidence templated per control | Structured evidence produced per run | Evidence required to pass the gate | [Machine-readable evidence](/bok/patterns#pattern-machine-readable-evidence-oscal) emitted continuously; audit = query |
 
 **Partial maturity is the normal state.** Almost no real function sits at one clean level across all
 five layers; the usual picture is a ragged line — inventory at Level 4, evals at Level 2, assurance at
