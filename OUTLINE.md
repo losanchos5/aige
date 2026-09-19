@@ -51,8 +51,8 @@ chapter also covers data governance across the stack, designing human oversight 
 third-party and procured AI, the cost of the stack (FinOps), and the minimum viable stack for a team of
 one. Each layer ends with a "Maps to" line feeding chapter 08. ~5,000 words.
 
-### 05 — Patterns (12–15, CSIRO template) **[drafted]**
-The catalogue. 12–15 reusable patterns, each in the CSIRO structure (Summary, Objectives, Target
+### 05 — Patterns (12–17, CSIRO template) **[drafted]**
+The catalogue. 12–17 reusable patterns, each in the CSIRO structure (Summary, Objectives, Target
 users, Impacted stakeholders, Relevant principles, Context, Problem, Solution, Consequences, Related
 patterns, Maps to). Each pattern names its layer (1–5). Candidate patterns: Policy-as-Code Gate ·
 Agent Registry · AIBOM at Build · Model/Data Card as Code · Eval Gate in CI · Adversarial Red-Team

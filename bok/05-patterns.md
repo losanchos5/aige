@@ -57,6 +57,17 @@ mode it addresses and the framework clauses it maps to. Store it with the system
 it pre-merge, at deploy, and — where the rule is a runtime constraint — at the point of action. Emit a
 verdict (rule id, input hash, decision, timestamp) on every evaluation.
 
+Illustrative schema for the verdict:
+
+```json
+{
+  "rule_id": "residency.eu-only.v3",
+  "decision": "deny",
+  "input_hash": "sha256:9f2b…",
+  "timestamp": "2026-09-18T14:07:11Z"
+}
+```
+
 > **Example (illustrative)** A Policy Card for a customer-service agent declares that it may call the
 > refunds tool only up to a bounded amount and never outside business hours; the same card is evaluated
 > in CI against the agent's declared scope and at runtime by the tool-call guardrail.
@@ -66,8 +77,8 @@ Rules become enforceable and auditable, and the crosswalk generates itself. The 
 maintaining cards, and the discipline to keep the executable version authoritative over the prose.
 
 ### Related patterns
-Framework Crosswalk; Eval Gate in CI; Machine-Readable Evidence (OSCAL); Agent Identity & Scoped
-Credentials.
+Framework Crosswalk; Eval Gate in CI; Runtime Guardrail; Machine-Readable Evidence (OSCAL); Agent
+Identity & Scoped Credentials.
 
 **Maps to:** EU AI Act Art. 9 · ISO/IEC 42001 · NIST AI RMF (Govern) · CSA AICM · OWASP Agentic
 ASI02/ASI03 · Layer 01 Govern-as-Code.
@@ -108,6 +119,19 @@ CI (for example with Inspect, promptfoo, Garak or Giskard — illustrative). Set
 to a named failure mode or obligation. Fail the pipeline below the threshold. Emit a structured result
 (suite id, model version, score, threshold, pass/fail, timestamp) filed against the registry entry.
 
+Illustrative schema for the result:
+
+```json
+{
+  "suite_id": "injection-resistance.v4",
+  "model_version": "csa-01@2026-09-18",
+  "score": 0.982,
+  "threshold": 0.95,
+  "result": "pass",
+  "timestamp": "2026-09-18T14:22:03Z"
+}
+```
+
 > **Example (illustrative)** An internal coding agent must clear an injection-resistance floor and a
 > regression suite before deploy; a release that drops resistance below the floor fails the pipeline and
 > does not ship until fixed.
@@ -117,11 +141,69 @@ Regressions are caught before production and evidence accrues automatically. The
 maintenance, run-time cost in CI, and the need to tune thresholds to avoid flaky gates.
 
 ### Related patterns
-Policy Card; Continuous Assurance Telemetry; Machine-Readable Evidence (OSCAL); Model Card as Control
-Evidence.
+Policy Card; Adversarial Red-Team Suite; Continuous Assurance Telemetry; Machine-Readable Evidence
+(OSCAL); Model Card as Control Evidence.
 
 **Maps to:** EU AI Act Art. 15, Art. 55 · ISO/IEC 42001 · NIST AI RMF (Measure) · OWASP Agentic
 ASI01/ASI02 · Layer 03 Evals & Red Teaming as Evidence.
+
+---
+
+## Pattern: Adversarial Red-Team Suite
+
+**Summary** — Maintain a versioned adversarial test suite, built from a threat taxonomy and run in CI
+or on a schedule, whose findings are triaged into fixes or accepted risks, recorded as evidence, and
+fed back into the suite. Where an Eval Gate proves a threshold still holds, the red-team suite is the
+standing adversary that keeps finding the inputs the threshold never anticipated.
+
+### Objectives
+Turn adversarial testing from a one-off exercise into a maintained, versioned control that discovers
+failure modes before an attacker does and leaves a triaged, auditable record of every finding.
+
+### Target users
+AI governance engineer, security engineer, ML engineer, red-team lead.
+
+### Impacted stakeholders
+Model owners, users exposed to the system, incident responders, auditors, regulators.
+
+### Relevant principles
+Start from a named failure mode or harm; give every control teeth.
+
+### Context
+A model or agent whose exposure grows as it gains tools, prompts and reach, in an organisation that
+already runs an Eval Gate for regression and wants a standing adversary rather than a single
+pre-launch penetration test.
+
+### Problem
+A one-off red-team is out of date the moment the system changes, and its findings — a slide of
+jailbreaks — leave no trace that they were fixed or accepted. Without a versioned suite and a triage
+record, the same attack is rediscovered every quarter and no one can prove which findings were closed.
+
+### Solution
+Build the suite from a threat taxonomy rather than intuition: draw techniques from MITRE ATLAS's
+adversarial tactics and techniques for AI systems [25] and the agentic attack classes in the OWASP Top
+10 for Agentic Applications [3], so each test traces to a named technique. Version the suite alongside
+the model and run it in CI or on a schedule against the registered version. Route each finding through
+triage — fix, or accept with a recorded rationale and owner — and file the outcome as a structured
+evidence record against the registry entry. Feed every confirmed finding back into the suite as a
+regression test, so a closed attack stays closed. The suite complements the Eval Gate: the gate
+enforces a threshold on each release, the suite is the adversary that generates the next one.
+
+> **Example (illustrative)** A red-team suite for a customer-service assistant runs a versioned set of
+> prompt-injection and tool-abuse cases drawn from ATLAS and the OWASP agentic classes; a new
+> tool-exfiltration finding is triaged, fixed and added to the suite, so the next release must pass it.
+
+### Consequences
+Adversarial coverage grows over time instead of resetting each launch, and the triage record shows what
+was found, fixed or accepted. The cost is maintaining the taxonomy and suite, the compute to run
+adversarial cases often, and the discipline to triage every finding rather than let it lapse.
+
+### Related patterns
+Eval Gate in CI; Runtime Guardrail; Continuous Assurance Telemetry; Incident Pipeline; Vendor / Model
+Due-Diligence Gate.
+
+**Maps to:** EU AI Act Art. 9, Art. 15, Art. 55 (GPAI) · ISO/IEC 42001 · NIST AI RMF (Measure) · OWASP
+Agentic ASI01/ASI02 · Layer 03 Evals & Red Teaming as Evidence.
 
 ---
 
@@ -157,6 +239,18 @@ Make the registry an API the deploy pipeline writes to: a new model or agent reg
 with an owner, a declared scope and an expiry after which the entry must be renewed or is deactivated.
 Deny production access to unregistered artefacts. Reconcile periodically against what is actually
 running (see Shadow-AI Discovery) and flag drift.
+
+Illustrative schema for a registry entry:
+
+```json
+{
+  "id": "csa-01",
+  "version": "2026-09-18",
+  "owner": "team-support-platform",
+  "scope": ["refunds:read", "orders:read"],
+  "expiry": "2026-12-17"
+}
+```
 
 > **Example (illustrative)** Each agent's registry entry expires after 90 days; an owner who does not
 > renew loses the agent's workload identity, so abandoned agents fall out of production automatically.
@@ -307,7 +401,25 @@ Fix the schema first: a minimum useful evidence record is `{control_id, subject 
 + version from the registry), decision (pass/fail/allow/deny/alert), metric + value + threshold,
 failure_mode/obligation ref, input_hash, actor, timestamp, signature}`. Normalise every tool's output
 into that shape on ingest, so heterogeneous sources compose into one queryable store keyed on the
-registry id. Two research proposals point at the same idea and are worth watching, not adopting whole:
+registry id.
+
+Illustrative schema for the evidence record:
+
+```json
+{
+  "control_id": "guardrail.output.pii.v2",
+  "subject": "csa-01@2026-09-18",
+  "decision": "alert",
+  "metric": "pii_leak_rate", "value": 0.004, "threshold": 0.0,
+  "obligation": "EU AI Act Art. 15",
+  "input_hash": "sha256:1c7d…",
+  "actor": "csa-01",
+  "timestamp": "2026-09-18T14:31:52Z",
+  "signature": "ed25519:5a…"
+}
+```
+
+Two research proposals point at the same idea and are worth watching, not adopting whole:
 TAIP treats NIST TEVV outputs as reusable AI Assurance Objects that compose across systems [5], and
 AAGATE operationalises a control plane aligning the NIST AI RMF functions for agents in production [6];
 both are single preprints. Expose the current status of each control as a query over the store.
@@ -321,10 +433,73 @@ The audit becomes a query and drift is visible in near real time. The cost is bu
 storage, and defining a common evidence schema across tools.
 
 ### Related patterns
-Machine-Readable Evidence (OSCAL); Eval Gate in CI; Incident Pipeline; Kill Switch / Circuit Breaker.
+Machine-Readable Evidence (OSCAL); Eval Gate in CI; Runtime Guardrail; Incident Pipeline; Kill Switch
+/ Circuit Breaker.
 
 **Maps to:** EU AI Act Art. 72 · ISO/IEC 42001 · NIST AI RMF (Manage, Govern) · CSA AICM · Layer 05
 Assurance & Continuous Compliance.
+
+---
+
+## Pattern: Runtime Guardrail
+
+**Summary** — Place input and output guardrails on the model or agent's runtime path that enforce its
+Policy Card on every live request and emit a decision to telemetry and to the circuit breaker. The
+guardrail is where a policy written in layer 01 and a threshold tested in layer 03 become an action
+taken on a real call, not a claim about one.
+
+### Objectives
+Enforce policy at the point of action, on inputs and outputs no eval anticipated, and make each
+enforcement a structured event the assurance and incident layers can consume.
+
+### Target users
+AI governance engineer, ML engineer, security engineer, platform team.
+
+### Impacted stakeholders
+Users, model owners, affected persons, incident responders, auditors.
+
+### Relevant principles
+Give every control teeth; instrument the build to produce its own proof.
+
+### Context
+An agent or model in production, acting on live inputs, whose Policy Card and eval thresholds exist but
+have no runtime enforcement point — so a rule proven in CI is unguarded the moment the system meets an
+input no test covered.
+
+### Problem
+Policies and evals are point-in-time; the system then meets prompt injection, unsafe outputs and tool
+calls no one reviewed. A guardrail that only logs is observability mistaken for control — the system
+watches itself fail in high resolution. Without an enforcement point that can block and emit, the
+runtime is the gap between a tested control and an uncontrolled action.
+
+### Solution
+Put a guardrail on both sides of the model/agent path. The input guardrail screens prompts and
+retrieved context for injection and policy-violating requests before they reach the model; the output
+guardrail screens generations and tool calls for unsafe content, data leakage and out-of-scope actions
+before they take effect. Enforce the same Policy Card evaluated in CI [2], so the runtime decision and
+the pipeline decision share one rule. On every call emit a structured event — `{agent, direction
+(input/output), rule_id, decision (allow/block/redact), timestamp}` — to the assurance store
+(Continuous Assurance Telemetry) and, on a defined breach, signal the circuit breaker (Kill Switch /
+Circuit Breaker). Guardrail frameworks realise this as a category; the OWASP Agent Control Standard
+names the runtime-control surface [11]. This is distinct from the kill switch: the guardrail decides one
+call at a time and stays in the request path; the breaker withdraws the agent's autonomy wholesale when
+the guardrail's signals cross a threshold.
+
+> **Example (illustrative)** A customer-service assistant's input guardrail blocks a prompt-injection
+> attempt and its output guardrail redacts an account number the model was about to return; both
+> decisions are emitted to the assurance store, and a burst of blocks trips the circuit breaker.
+
+### Consequences
+The tested control holds on live traffic and every enforcement leaves evidence; the guardrail is also
+the sensor the breaker and the incident pipeline read. The cost is per-call latency, false positives to
+tune, and keeping the runtime rule in sync with the Policy Card and eval thresholds.
+
+### Related patterns
+Policy Card; Kill Switch / Circuit Breaker; Agent Identity & Scoped Credentials; Continuous Assurance
+Telemetry; Human-in-the-loop Gate; Eval Gate in CI.
+
+**Maps to:** EU AI Act Art. 14, Art. 15 · ISO/IEC 42001 · NIST AI RMF (Manage) · OWASP Agentic
+ASI02/ASI03 · Layer 04 Runtime Controls & Observability.
 
 ---
 
@@ -422,7 +597,8 @@ Reporting happens on time and the record is audit-ready. The cost is cross-funct
 keeping the severity criteria and templates current with the law.
 
 ### Related patterns
-Continuous Assurance Telemetry; Kill Switch / Circuit Breaker; Machine-Readable Evidence (OSCAL).
+Continuous Assurance Telemetry; Runtime Guardrail; Kill Switch / Circuit Breaker; Machine-Readable
+Evidence (OSCAL).
 
 **Maps to:** EU AI Act Art. 72, Art. 73, Art. 55 (GPAI) · ISO/IEC 42001 · NIST AI RMF (Manage) · Layer
 05 Assurance & Continuous Compliance.
@@ -473,7 +649,8 @@ Rights assessment stays current and traceable to controls, and overlaps with the
 duplicated. The cost is templating and the discipline to treat the assessment as living.
 
 ### Related patterns
-Model Card as Control Evidence; Policy Card; Machine-Readable Evidence (OSCAL); Human-in-the-loop Gate.
+Model Card as Control Evidence; Policy Card; Runtime Guardrail; Machine-Readable Evidence (OSCAL);
+Human-in-the-loop Gate.
 
 **Maps to:** EU AI Act Art. 27 (FRIA), Art. 9 · GDPR Art. 35 (DPIA) · ISO/IEC 42005 · NIST AI RMF
 (Map) · Layer 01 Govern-as-Code / Layer 02 Inventory & Transparency.
@@ -525,7 +702,7 @@ assurance. The trade-off is the discipline to keep cells honest and to resist re
 outcome.
 
 ### Related patterns
-Policy Card; Machine-Readable Evidence (OSCAL); Continuous Assurance Telemetry.
+Policy Card; Runtime Guardrail; Machine-Readable Evidence (OSCAL); Continuous Assurance Telemetry.
 
 **Maps to:** EU AI Act (cross-cutting) · ISO/IEC 42001 · NIST AI RMF (Govern) · CSA AICM · OWASP Agent
 Control Standard · Layer 01 Govern-as-Code / Layer 05 Assurance & Continuous Compliance.
@@ -685,7 +862,8 @@ Oversight lands where it matters without throttling routine work, and the approv
 cost is designing the consequence classification and the latency it adds to gated actions.
 
 ### Related patterns
-Kill Switch / Circuit Breaker; Policy Card; Agent Identity & Scoped Credentials; FRIA-as-Code.
+Kill Switch / Circuit Breaker; Runtime Guardrail; Policy Card; Agent Identity & Scoped Credentials;
+FRIA-as-Code.
 
 **Maps to:** EU AI Act Art. 14 · ISO/IEC 42001 · NIST AI RMF (Manage) · OWASP Agentic ASI02 · Layer 04
 Runtime Controls & Observability.
@@ -804,8 +982,8 @@ rather than hidden. The cost is real: layers 03 and 04 give less assurance over 
 and the gate depends on provider cooperation and contract terms you may not fully win.
 
 ### Related patterns
-Agent Registry; AIBOM; Model Card as Control Evidence; Agent Identity & Scoped Credentials; Shadow-AI
-Discovery.
+Agent Registry; AIBOM; Adversarial Red-Team Suite; Model Card as Control Evidence; Agent Identity &
+Scoped Credentials; Shadow-AI Discovery.
 
 **Maps to:** EU AI Act Art. 25 (value-chain responsibilities), Art. 26 (deployer duties), Art. 27
 (FRIA), Art. 53 (GPAI documentation) · ISO/IEC 42001 Annex A.10 · GPAI Code of Practice · NIST AI RMF
@@ -839,3 +1017,4 @@ Discovery.
 [22] ISO/IEC 42001:2023 Annex A.10 (third-party and customer relationships; supplier controls). ISO/IEC. 2023. https://www.iso.org/standard/81230.html (verified: secondary)
 [23] EU AI Act Arts. 25 (value-chain responsibilities), 26 (deployer obligations), 27 (FRIA) — allocation of duties between provider and deployer. AI Act (Reg. (EU) 2024/1689). 2024. https://artificialintelligenceact.eu/article/25/ (verified: primary)
 [24] GPAI Code of Practice (published 10 Jul 2025; voluntary; transparency documentation providers supply to downstream deployers). European Commission / AI Act Explorer. 2025-07-10. https://artificialintelligenceact.eu/introduction-to-code-of-practice/ (verified: primary)
+[25] MITRE ATLAS: adversarial tactics and techniques knowledge base for AI systems (incl. agents). MITRE. 2026. https://atlas.mitre.org/ (verified: primary)
