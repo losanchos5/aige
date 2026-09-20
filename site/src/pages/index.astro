@@ -4,9 +4,13 @@
  * stack, the eight values, the role, a verdict beat, the Body of Knowledge, the
  * resources and a closing CTA. All copy and every figure come from the typed
  * content modules; no number appears here that a primary source does not carry.
+ *
+ * The body sections are built on <Section>, which supplies the tinted/mesh/dark
+ * bands, the textures and the shared heads. The hero keeps its own scoped layout
+ * (the governance-loop art, the panel and the proof strip) — see the <style>.
  */
 import Marketing from '../layouts/Marketing.astro';
-import Kicker from '../components/Kicker.astro';
+import Section from '../components/Section.astro';
 import RegisterList from '../components/RegisterList.astro';
 import StatTile from '../components/StatTile.astro';
 import VerdictStamp from '../components/VerdictStamp.astro';
@@ -22,6 +26,7 @@ import { site } from '../data/site';
 import { definition, values } from '../data/values';
 import { capabilityStatement, workflows, market } from '../data/role';
 import { chaptersOrdered } from '../data/chapters';
+import { layers } from '../data/stack';
 
 const seoTitle = 'AI Governance Engineer — the discipline, defined';
 const seoDesc =
@@ -84,136 +89,203 @@ const resources = [
     desc: 'Every term defined once, cross-referenced to the chapter that treats it in full.',
   },
 ];
+
+// Proof strip: only counts drawn from the typed content plus the licence — no
+// invented numbers. countup.js counts each numeric to its rendered value.
+const proof = [
+  { label: 'Layers', value: String(layers.length) },
+  { label: 'Workflows', value: String(workflows.length) },
+  { label: 'Chapters', value: String(chaptersOrdered.length) },
+];
 ---
 
 <Marketing title={seoTitle} description={seoDesc} image="/og/default.png">
   <section class="hero section hero--loop">
+    <div class="bg-mesh hero-mesh" aria-hidden="true"></div>
+    <div class="hero-tex bg-grid bg-fade" aria-hidden="true"></div>
+
     <div class="container hero-grid">
-      <div class="hero-copy reveal">
-        <h1 class="display hero-h1">Governance you can run, not just read.</h1>
-        <p class="lede">{definition}</p>
-        <div class="hero-cta">
-          <a class="btn btn-primary" href="/thesis">Read the Thesis</a>
+      <div class="hero-copy hero-in">
+        <p class="meta hero-eyebrow" style="--i:0">
+          <span class="meta-dot" aria-hidden="true"></span>AI governance engineering · BoK v{site.bokVersion}
+        </p>
+        <h1 class="display hero-h1" style="--i:1">Governance you can run, not just read.</h1>
+        <p class="lede" style="--i:2">{definition}</p>
+        <div class="hero-cta" style="--i:3">
+          <a class="btn btn-primary btn-glow" href="/thesis">Read the Thesis</a>
           <a class="btn btn-secondary" href="/bok">Open the Body of Knowledge</a>
         </div>
+        <ul class="hero-layers" style="--i:4" aria-label="The five stack layers">
+          {
+            layers.map((layer) => (
+              <li class="hero-layer" style={`--tint:var(${layer.colorVar})`}>
+                <span class="hero-layer-dot" aria-hidden="true" />
+                {layer.name}
+              </li>
+            ))
+          }
+        </ul>
       </div>
+
       <div
-        class="hero-art reveal"
+        class="hero-art"
         data-hero-loop
         data-hero-sequence="obligation,policy,inventory,eval,runtime,evidence,auditor"
       >
-        <div class="hero-art-wide"><Diagram id="hero-loop" bare /></div>
-        <div class="hero-art-tall"><Diagram id="hero-loop-tall" bare /></div>
+        <div class="hero-panel card-lum">
+          <div class="hero-panel-bar">
+            <span class="meta"><span class="meta-dot" aria-hidden="true"></span>governance-loop · run #4821</span>
+            <span class="meta hero-live"><span class="meta-dot" aria-hidden="true"></span>live</span>
+          </div>
+          <div class="hero-art-wide"><Diagram id="hero-loop" bare /></div>
+          <div class="hero-art-tall"><Diagram id="hero-loop-tall" bare /></div>
+        </div>
         <div class="hero-stamp">
           <VerdictStamp verdict="pass" class="hero-stamp-badge" />
           <span class="hero-attn mono">attestation #4821</span>
         </div>
       </div>
     </div>
+
+    <div class="container proof-wrap">
+      <dl class="proof">
+        {
+          proof.map((item) => (
+            <div class="proof-item">
+              <dt class="proof-label">{item.label}</dt>
+              <dd class="proof-num" data-countup={item.value}>
+                {item.value}
+              </dd>
+            </div>
+          ))
+        }
+        <div class="proof-item">
+          <dt class="proof-label">Licence</dt>
+          <dd class="proof-num proof-license">{site.license}</dd>
+        </div>
+      </dl>
+    </div>
+
     <script is:inline defer src="/hero.js"></script>
     <script is:inline defer src="/countup.js"></script>
   </section>
 
-  <section class="section">
-    <div class="container reveal">
-      <div class="sec-head">
-        <Kicker swatch="var(--l2)">The three questions</Kicker>
-        <h2 class="sec-title display">Three questions define the discipline.</h2>
-        <p class="sec-lede lede">
-          Legacy AI governance leaves them unanswered because nothing is
-          connected to production. The engineer answers all three from the
-          running system.
-        </p>
-      </div>
-      <DefinitionCards items={questions} />
-    </div>
-  </section>
+  <Section
+    tone="plain"
+    texture="dots"
+    rule
+    kicker="The three questions"
+    kickerSwatch="var(--l2)"
+    title="Three questions define the discipline."
+    lede="Legacy AI governance leaves them unanswered because nothing is connected to production. The engineer answers all three from the running system."
+  >
+    <DefinitionCards items={questions} class="reveal-stagger" />
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <div class="sec-head">
-        <Kicker swatch="var(--l3)">The stack · five layers</Kicker>
-        <h2 class="sec-title display">A build order, from policy to proof.</h2>
-        <p class="sec-lede lede">
-          Five layers that answer the three questions. Evidence is produced at
-          the bottom and flows up; three layers are established engineering
-          practice, two are new to AI.
-        </p>
+  <Section
+    tone="tint"
+    headSize="xl"
+    kicker="The stack · five layers"
+    kickerSwatch="var(--l3)"
+    title="A build order, from policy to proof."
+    lede="Five layers that answer the three questions. Evidence is produced at the bottom and flows up; three layers are established engineering practice, two are new to AI."
+  >
+    <div class="story" data-story>
+      <div class="story-pin stack-pin">
+        <p class="meta"><span class="meta-dot" aria-hidden="true"></span>Build order</p>
+        <StackDiagram mode="static" data-story-mark class="stack-mark" />
       </div>
-      <StackDiagram mode="interactive" />
-      <p class="sec-link"><a href="/stack">Explore the stack →</a></p>
+      <div class="stack-rows reveal-stagger">
+        <StackDiagram mode="interactive" />
+      </div>
     </div>
-  </section>
+    <p class="sec-link" slot="foot"><a href="/stack">Explore the stack →</a></p>
+  </Section>
+  <script is:inline defer src="/story.js"></script>
 
-  <section class="section">
-    <div class="container reveal">
-      <div class="sec-head">
-        <Kicker swatch="var(--l4)">Values</Kicker>
-        <h2 class="sec-title display">Eight values, each a commitment made on purpose.</h2>
-      </div>
-      <div class="values-grid">
-        {values.map((value) => <ValuePair value={value} />)}
-      </div>
-      <p class="sec-link"><a href="/thesis#principles">Read the principles →</a></p>
+  <Section
+    tone="plain"
+    kicker="Values"
+    kickerSwatch="var(--l4)"
+    title="Eight values, each a commitment made on purpose."
+  >
+    <div class="bento reveal-stagger">
+      {
+        values.map((value) => (
+          <ValuePair
+            value={value}
+            variant="bento"
+            class={value.n === 1 ? 'bento-2x bento-2y' : value.n === 6 ? 'bento-2x' : undefined}
+          />
+        ))
+      }
     </div>
-  </section>
+    <p class="sec-link" slot="foot"><a href="/thesis#principles">Read the principles →</a></p>
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <div class="sec-head">
-        <Kicker swatch="var(--l5)">The role</Kicker>
-        <h2 class="sec-title display">A capability first, a job title second.</h2>
-      </div>
-      <blockquote class="pullquote display">{capabilityStatement}</blockquote>
-      <div class="role-flows">
-        <p class="role-eyebrow mono muted">Seven workflows</p>
-        <RegisterList items={workflowItems} />
-      </div>
-      <div class="stats-row">
-        {
-          primaryStats.map((stat) => (
-            <StatTile value={stat.value} label={stat.label} source={stat.source} href={stat.sourceUrl} />
-          ))
-        }
-      </div>
-      <p class="sec-link">
-        <a href="/role">What the role does →</a>
-        <span class="sec-link-sep" aria-hidden="true">·</span>
-        <a href="/path">Start the learning path →</a>
-      </p>
+  <Section
+    tone="mesh"
+    class="role-sec"
+    kicker="The role"
+    kickerSwatch="var(--l5)"
+    title="A capability first, a job title second."
+  >
+    <blockquote class="pullquote display">{capabilityStatement}</blockquote>
+    <div class="role-flows">
+      <p class="role-eyebrow meta"><span class="meta-dot" aria-hidden="true"></span>Seven workflows</p>
+      <RegisterList items={workflowItems} />
     </div>
-  </section>
+    <div class="stats-row">
+      {
+        primaryStats.map((stat) => (
+          <StatTile
+            value={stat.value}
+            label={stat.label}
+            source={stat.source}
+            href={stat.sourceUrl}
+            class="card-lum lift"
+          />
+        ))
+      }
+    </div>
+    <p class="sec-link" slot="foot">
+      <a href="/role">What the role does →</a>
+      <span class="sec-link-sep" aria-hidden="true">·</span>
+      <a href="/path">Start the learning path →</a>
+    </p>
+  </Section>
 
-  <section class="verdict-beat">
-    <div class="container vb-inner reveal">
+  <Section tone="dark" class="verdict-beat">
+    <div class="vb-inner">
       <p class="vb-line display">A policy is not a control. An eval that can fail the build is.</p>
       <div class="vb-stamps">
         <VerdictStamp verdict="block" />
         <VerdictStamp verdict="pass" />
       </div>
     </div>
-    <VerdictTicker />
-  </section>
-
-  <section class="section">
-    <div class="container reveal">
-      <div class="sec-head">
-        <Kicker swatch="var(--l1)">Body of Knowledge · v{site.bokVersion} · {site.license}</Kicker>
-        <h2 class="sec-title display">Eleven chapters, versioned and open.</h2>
-      </div>
-      <ChapterGrid chapters={chaptersOrdered} />
+    <div class="full-bleed vb-ticker">
+      <VerdictTicker size="lg" />
     </div>
-  </section>
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <div class="sec-head">
-        <Kicker swatch="var(--l4)">Resources</Kicker>
-        <h2 class="sec-title display">Curated, cross-referenced, in the open.</h2>
-      </div>
-      <ResourceTiles tiles={resources} />
-    </div>
-  </section>
+  <Section
+    tone="plain"
+    texture="grid"
+    kicker={`Body of Knowledge · v${site.bokVersion} · ${site.license}`}
+    kickerSwatch="var(--l1)"
+    title="Eleven chapters, versioned and open."
+  >
+    <ChapterGrid chapters={chaptersOrdered} class="reveal-stagger" />
+  </Section>
+
+  <Section
+    tone="tint"
+    kicker="Resources"
+    kickerSwatch="var(--l4)"
+    title="Curated, cross-referenced, in the open."
+  >
+    <ResourceTiles tiles={resources} class="reveal-stagger" />
+  </Section>
 
   <CtaBand
     title="Open, versioned, contributable."
@@ -225,30 +297,31 @@ const resources = [
 
 <style>
   /* Hero — the archify "governance loop". The copy sits left; the diagram is
-     the art. One diagram renders per breakpoint (the other is display:none so
-     the observer/hover never touch it): portrait on phones, landscape above. */
+     the art, wrapped in a luminous panel. One diagram renders per breakpoint
+     (the other is display:none so the observer/hover never touch it): portrait
+     on phones, landscape above. */
   .hero--loop {
     position: relative;
-    overflow-x: hidden;
+    isolation: isolate;
+    overflow: hidden;
+    contain: paint;
   }
 
-  /* Dot-grid backdrop, faded toward the edges with a radial mask so it never
-     fights the copy. Behind the content; tokens keep it right in dark mode. */
-  .hero--loop::before {
-    content: '';
-    position: absolute;
-    inset: 0;
+  /* Soft gradient mesh + a faint grid, faded toward the panel, replace the old
+     dot backdrop. Both are inert decorative layers behind the content. */
+  .hero-mesh {
     z-index: 0;
-    background-image: radial-gradient(var(--line) 1px, transparent 1px);
-    background-size: 24px 24px;
-    -webkit-mask-image: radial-gradient(ellipse at 70% 50%, #000 40%, transparent 80%);
-    mask-image: radial-gradient(ellipse at 70% 50%, #000 40%, transparent 80%);
-    pointer-events: none;
+  }
+
+  .hero-tex {
+    z-index: 0;
+    -webkit-mask-image: radial-gradient(62% 62% at 72% 45%, #000 40%, transparent 82%);
+    mask-image: radial-gradient(62% 62% at 72% 45%, #000 40%, transparent 82%);
   }
 
   /* The hero runs on a wider well than the body sections so the diagram sits
-     next to the copy instead of bleeding to the viewport edge. Capped, centred
-     and gutter-padded like any container; the body's 1200px is unchanged. */
+     next to the copy instead of bleeding to the viewport edge. Both containers
+     (the grid and the proof strip) sit above the backdrop. */
   .hero--loop > .container {
     position: relative;
     z-index: 1;
@@ -269,6 +342,10 @@ const resources = [
     gap: var(--s-5);
   }
 
+  .hero-eyebrow {
+    margin: 0;
+  }
+
   .hero-h1 {
     font-size: var(--fs-display);
     max-width: 16ch;
@@ -277,6 +354,7 @@ const resources = [
 
   .hero-copy .lede {
     max-width: 54ch;
+    margin: 0;
   }
 
   .hero-cta {
@@ -286,22 +364,89 @@ const resources = [
     margin-top: var(--s-2);
   }
 
-  /* position: relative makes this the containing block for the hover note,
-     which is taken out of flow and overlaid on the foot of the diagram (rule in
-     diagrams.css under .hero--loop, since the note is injected via set:html and
-     carries no scoped cid, so a scoped selector here would never match it). */
+  /* Layer chips: mono, each tinted by its layer swatch. Hidden on the narrowest
+     screens, where the copy needs the whole column. */
+  .hero-layers {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .hero-layer {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding: 4px var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .hero-layer-dot {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--tint);
+  }
+
+  @media (min-width: 640px) {
+    .hero-layers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-2);
+      margin-top: var(--s-1);
+    }
+  }
+
+  /* position: relative makes .hero-art the containing block for the diagram's
+     hover note (rule in diagrams.css under .hero--loop). */
   .hero-art {
     position: relative;
     width: 100%;
   }
 
-  /* Phones: the portrait variant, capped and centred; hide the landscape one. */
+  /* The luminous panel wraps both diagram variants. Its gradient border ring is
+     kept always-on here (card-lum shows it on hover only), with a deep shadow
+     and a soft glow. No overflow:hidden — the hover note overlays the foot. */
+  .hero-panel {
+    padding: var(--s-3);
+    box-shadow: var(--shadow-3), 0 0 40px var(--glow-1);
+  }
+
+  .hero-panel::before {
+    opacity: 1;
+  }
+
+  .hero-panel-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    padding: 0 var(--s-1) var(--s-3);
+    margin-bottom: var(--s-1);
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* The "live" pip reads green from the L5 ink. */
+  .hero-live .meta-dot {
+    background: var(--l5-ink);
+  }
+
+  /* Reserve the diagram's box so the inline SVG never shifts layout (CLS). */
   .hero-art-wide {
     display: none;
+    aspect-ratio: 864 / 508;
   }
 
   .hero-art-tall {
     display: block;
+    aspect-ratio: 436 / 612;
     max-width: 420px;
     margin-inline: auto;
   }
@@ -340,8 +485,7 @@ const resources = [
   }
 
   /* Desktop: two columns, copy left, art right, both inside the wider hero
-     well. The art fills its grid track (no viewport bleed), so it sits beside
-     the copy at every width rather than pinned to the screen edge. */
+     well. The art fills its grid track (no viewport bleed). */
   @media (min-width: 1024px) {
     .hero-grid {
       grid-template-columns: minmax(0, 4.5fr) minmax(0, 7.5fr);
@@ -350,8 +494,7 @@ const resources = [
       min-height: min(72vh, 680px);
     }
 
-    /* Scale the headline down so its longest line fits the copy column, and
-       balance it to three lines ("Governance / you can run, / not just read."). */
+    /* Scale the headline down so its longest line fits the copy column. */
     .hero-h1 {
       font-size: calc(var(--fs-display) * 0.76);
       max-width: 15ch;
@@ -359,8 +502,26 @@ const resources = [
     }
   }
 
-  /* Motion-only polish: the pop when the loop closes on the auditor. */
+  /* Hero entrance: a short, staggered rise on load (not scroll-driven), motion
+     only. Reduced-motion users get the resting state. */
   @media (prefers-reduced-motion: no-preference) {
+    .hero-in > * {
+      animation: hero-up 0.6s var(--ease) both;
+      animation-delay: calc(var(--i, 0) * 70ms);
+    }
+
+    @keyframes hero-up {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* The pop when the loop closes on the auditor. */
     .hero-stamp.is-pop {
       animation: hero-stamp-pop 260ms var(--ease);
     }
@@ -375,69 +536,99 @@ const resources = [
     }
   }
 
-  /* Section heads */
-  .sec-head {
-    max-width: 62ch;
-    margin-bottom: var(--s-6);
+  /* Proof strip under the hero: counts from the typed content plus the licence. */
+  .proof-wrap {
+    margin-top: var(--s-7);
   }
 
-  .sec-title {
-    font-size: var(--fs-h2);
-    max-width: 22ch;
-    margin: var(--s-3) 0 0;
-  }
-
-  .sec-lede {
-    margin-top: var(--s-4);
-  }
-
-  .sec-link {
-    margin-top: var(--s-6);
-  }
-
-  .sec-link a {
-    font-family: var(--font-mono);
-    font-size: var(--fs-small);
-    letter-spacing: 0.02em;
-    color: var(--ink);
-    text-decoration: none;
-  }
-
-  .sec-link a:hover {
-    text-decoration: underline;
-    text-underline-offset: 0.15em;
-  }
-
-  .sec-link-sep {
-    margin: 0 var(--s-3);
-    color: var(--muted);
-  }
-
-  /* Values */
-  .values-grid {
+  .proof {
     display: grid;
-    grid-template-columns: 1fr;
-    column-gap: var(--s-7);
-    border-bottom: 1px solid var(--line);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-5) var(--s-4);
+    margin: 0;
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
   }
 
-  @media (min-width: 720px) {
-    .values-grid {
-      grid-template-columns: repeat(2, 1fr);
+  @media (min-width: 640px) {
+    .proof {
+      grid-template-columns: repeat(4, 1fr);
     }
   }
 
-  /* Role */
+  .proof-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    margin: 0;
+  }
+
+  .proof-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .proof-num {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h2);
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  .proof-license {
+    font-size: var(--fs-h3);
+  }
+
+  /* Stack story: the static mark and its caption pin on the left; the
+     interactive rows scroll on the right. Grid + sticky live in effects.css. */
+  .stack-pin {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .stack-mark {
+    width: 100%;
+    max-width: 460px;
+  }
+
+  /* Values live in the bento grid (effects.css); the reveal cascades by index. */
+
+  /* Role — a mesh band. The mesh reads at 60% of the section default so the
+     pullquote leads (the mesh div belongs to Section, so target it globally). */
+  :global(.role-sec > .bg-mesh) {
+    opacity: calc(var(--mesh-alpha) * 0.6);
+  }
+
   .pullquote {
+    position: relative;
     margin: 0 0 var(--s-6);
     padding-left: var(--s-5);
-    border-left: 3px solid var(--ink);
     font-weight: 600;
     font-size: var(--fs-h3);
     line-height: 1.3;
     color: var(--ink);
     max-width: 46ch;
     text-wrap: pretty;
+  }
+
+  /* Gradient rule down the quote, from the L5 ink to the L5 pastel. */
+  .pullquote::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--l5-ink), var(--l5));
   }
 
   .role-eyebrow {
@@ -461,18 +652,15 @@ const resources = [
     }
   }
 
-  /* Verdict beat */
-  .verdict-beat {
-    background: color-mix(in srgb, var(--ink) 3.5%, var(--bg));
-  }
-
+  /* Verdict beat — a dark band (tone="dark" re-scopes the dark tokens). The
+     sentence and stamps sit in the container; the ticker breaks full-bleed. */
   .vb-inner {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: var(--s-5) var(--s-6);
-    padding-block: clamp(48px, 7vw, 88px);
+    padding-bottom: var(--s-6);
   }
 
   .vb-line {
