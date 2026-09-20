@@ -43,7 +43,8 @@ for (const route of routes) {
   for (const scheme of schemes) {
     for (const width of widths) {
       test(`a11y ${route} ${scheme} ${width}`, async ({ page }) => {
-        await page.emulateMedia({ colorScheme: scheme });
+        // reducedMotion: axe must judge the settled page, not mid-reveal opacity.
+        await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
         await page.setViewportSize({ width, height: 900 });
         await page.goto(route);
         await page.waitForLoadState('domcontentloaded');
