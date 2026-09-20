@@ -1,6 +1,52 @@
 import { test, expect } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { frameworks, obligations } from '../src/data/frameworks';
+
+// An independent copy of ObligationMatrix's obligation → framework-id join, used
+// only as a test oracle: it lets us compute, straight from the data, exactly
+// which frameworks the matrix's inclusion rule (a framework gets a row iff at
+// least one obligation resolves to it) should select. If the component's join and
+// this one ever drift, the row-count assertion below fails.
+function resolveFwId(framework: string, obligation: string): string {
+  const f = framework;
+  const t = obligation;
+  if (f === 'EU AI Act') return 'eu-ai-act';
+  if (f === 'GPAI Code of Practice') return 'gpai-code-of-practice';
+  if (f === 'ISO/IEC 42001') return 'iso-42001';
+  if (f === 'ISO/IEC 42006') return 'iso-42006';
+  if (f === 'ISO/IEC 23894') return 'iso-23894';
+  if (f === 'NIST AI RMF') return 'nist-ai-rmf';
+  if (f === 'NIST (agent, cyber and misuse work)') {
+    if (/agent standards/i.test(t)) return 'nist-ai-agent-standards';
+    if (/8596/.test(t)) return 'nist-ir-8596';
+    return 'nist-ai-800-1';
+  }
+  if (f === 'CSA AICM / STAR for AI')
+    return /star/i.test(t) ? 'csa-star-for-ai' : 'csa-aicm';
+  if (f === 'OWASP GenAI Security Project') {
+    if (/agentic/i.test(t)) return 'owasp-agentic-top-10';
+    if (/llm/i.test(t)) return 'owasp-llm-top-10';
+    if (/acs|agent control/i.test(t)) return 'owasp-acs';
+    if (/aibom/i.test(t)) return 'owasp-aibom';
+    return 'owasp-llm-top-10';
+  }
+  if (f === 'US frontier-developer laws')
+    return /raise/i.test(t) ? 'ny-raise-act' : 'ca-sb-53';
+  if (f === 'US state AI laws')
+    return /texas|traiga/i.test(t) ? 'tx-traiga' : 'co-ai-act';
+  if (f === 'Other jurisdictions') {
+    if (/korea/i.test(t)) return 'kr-ai-basic-act';
+    if (/singapore|imda/i.test(t)) return 'sg-genai-framework';
+    if (/etsi|304 223/i.test(t)) return 'etsi-en-304-223';
+    return 'uk-duaa';
+  }
+  return f;
+}
+
+const includedFwIds = new Set(
+  obligations.map((o) => resolveFwId(o.framework, o.obligation)),
+);
 
 // Block V3 — the obligation heat matrix (/resources/frameworks), StatTile
 // count-up and the MaturityLadder draw-on (/role). Acceptance assertions plus
@@ -17,6 +63,31 @@ test.describe('obligation matrix', () => {
     await expect(page.locator('[data-mx-grid] .mx-colh')).toHaveCount(5);
     const rows = page.locator('[data-mx-grid] tbody tr.mx-row');
     expect(await rows.count()).toBeGreaterThanOrEqual(8);
+  });
+
+  // The rows are derived from frameworks.ts, so every framework the inclusion
+  // rule selects gets a row — including the ones the old hard-coded id map dropped
+  // (ISO/IEC 42006, ISO/IEC 23894, the newer NIST work, US state laws, and the
+  // other-jurisdiction instruments).
+  test('derives one row per framework with obligations, incl. new frameworks', async ({ page }) => {
+    await page.goto(FRAMEWORKS);
+
+    // A row for ISO/IEC 42006 and for at least one US state law (Texas TRAIGA).
+    await expect(page.locator('.mx-rowh[data-mx-fw="iso-42006"]')).toHaveCount(1);
+    await expect(page.locator('.mx-rowh[data-mx-fw="tx-traiga"]')).toHaveCount(1);
+
+    // One row per framework the inclusion rule selects — no more, no fewer.
+    const rowHeads = page.locator('[data-mx-grid] tbody tr.mx-row .mx-rowh');
+    expect(await rowHeads.count()).toBe(includedFwIds.size);
+
+    // Every framework id shown is a real id from frameworks.ts.
+    const ids = new Set(frameworks.map((fw) => fw.id));
+    const shown = await rowHeads.evaluateAll((els) =>
+      els.map((el) => el.getAttribute('data-mx-fw')),
+    );
+    for (const id of shown) {
+      expect(ids.has(id as string)).toBe(true);
+    }
   });
 
   test('clicking a cell filters the table and shows the status line', async ({ page }) => {

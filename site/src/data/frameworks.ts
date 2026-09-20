@@ -22,6 +22,8 @@ export interface Framework {
   id: string;
   /** Framework name. */
   name: string;
+  /** Short label for compact UI (e.g. the obligation-matrix row headers). */
+  short: string;
   /** What kind of instrument it is. */
   type: FrameworkType;
   /** The body that issues or maintains it. */
@@ -67,6 +69,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'eu-ai-act',
     name: 'EU AI Act (post-Omnibus)',
+    short: 'EU AI Act',
     type: 'law',
     issuer: 'European Union',
     url: 'https://artificialintelligenceact.eu/ai-act-explorer/digital-omnibus/',
@@ -76,6 +79,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'gpai-code-of-practice',
     name: 'GPAI Code of Practice',
+    short: 'GPAI Code',
     type: 'code',
     issuer: 'European Commission',
     url: 'https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai',
@@ -85,6 +89,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'iso-42001',
     name: 'ISO/IEC 42001',
+    short: 'ISO 42001',
     type: 'standard',
     issuer: 'ISO/IEC',
     summary:
@@ -93,6 +98,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'iso-42005',
     name: 'ISO/IEC 42005',
+    short: 'ISO 42005',
     type: 'standard',
     issuer: 'ISO/IEC',
     url: 'https://www.iso.org/standard/44545.html',
@@ -102,6 +108,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'iso-42006',
     name: 'ISO/IEC 42006:2025',
+    short: 'ISO 42006',
     type: 'standard',
     issuer: 'ISO/IEC',
     url: 'https://www.iso.org/standard/42006',
@@ -111,6 +118,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'iso-23894',
     name: 'ISO/IEC 23894:2023',
+    short: 'ISO 23894',
     type: 'standard',
     issuer: 'ISO/IEC',
     url: 'https://www.iso.org/standard/77304.html',
@@ -120,6 +128,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'nist-ai-rmf',
     name: 'NIST AI RMF',
+    short: 'NIST AI RMF',
     type: 'framework',
     issuer: 'NIST',
     url: 'https://www.nist.gov/itl/ai-risk-management-framework',
@@ -129,6 +138,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'nist-ai-agent-standards',
     name: 'NIST AI Agent Standards Initiative',
+    short: 'NIST Agents',
     type: 'framework',
     issuer: 'NIST (CAISI)',
     url: 'https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure',
@@ -138,6 +148,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'nist-ir-8596',
     name: 'NIST IR 8596 Cyber AI Profile (draft)',
+    short: 'NIST IR 8596',
     type: 'framework',
     issuer: 'NIST',
     url: 'https://csrc.nist.gov/pubs/ir/8596/iprd',
@@ -147,6 +158,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'nist-ai-800-1',
     name: 'NIST AI 800-1 (draft)',
+    short: 'NIST AI 800-1',
     type: 'framework',
     issuer: 'NIST',
     url: 'https://www.nist.gov/news-events/news/2025/01/updated-guidelines-managing-misuse-risk-dual-use-foundation-models',
@@ -156,6 +168,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'csa-aicm',
     name: 'CSA AI Controls Matrix (AICM) v1.1',
+    short: 'CSA AICM',
     type: 'controls',
     issuer: 'Cloud Security Alliance',
     url: 'https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1',
@@ -165,6 +178,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'csa-star-for-ai',
     name: 'CSA STAR for AI',
+    short: 'CSA STAR',
     type: 'framework',
     issuer: 'Cloud Security Alliance',
     url: 'https://cloudsecurityalliance.org/star/ai',
@@ -174,6 +188,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'owasp-agentic-top-10',
     name: 'OWASP Top 10 for Agentic Applications 2026',
+    short: 'OWASP Agentic',
     type: 'framework',
     issuer: 'OWASP GenAI Security Project',
     url: 'https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/',
@@ -183,6 +198,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'owasp-llm-top-10',
     name: 'OWASP Top 10 for LLM Applications 2026',
+    short: 'OWASP LLM',
     type: 'framework',
     issuer: 'OWASP GenAI Security Project',
     url: 'https://genai.owasp.org/',
@@ -192,6 +208,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'owasp-acs',
     name: 'OWASP Agent Control Standard (ACS)',
+    short: 'OWASP ACS',
     type: 'standard',
     issuer: 'OWASP GenAI Security Project',
     url: 'https://genai.owasp.org/',
@@ -201,6 +218,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'owasp-aibom',
     name: 'OWASP AIBOM',
+    short: 'OWASP AIBOM',
     type: 'standard',
     issuer: 'OWASP GenAI Security Project',
     url: 'https://genai.owasp.org/',
@@ -210,6 +228,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'ca-sb-53',
     name: 'California SB 53 (TFAIA)',
+    short: 'California SB 53',
     type: 'law',
     issuer: 'State of California',
     url: 'https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/',
@@ -219,6 +238,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'ny-raise-act',
     name: 'New York RAISE Act',
+    short: 'New York RAISE',
     type: 'law',
     issuer: 'State of New York',
     url: 'https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models',
@@ -228,6 +248,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'tx-traiga',
     name: 'Texas TRAIGA (HB 149)',
+    short: 'Texas TRAIGA',
     type: 'law',
     issuer: 'State of Texas',
     url: 'https://capitol.texas.gov/tlodocs/89R/billtext/pdf/HB00149F.pdf',
@@ -237,6 +258,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'co-ai-act',
     name: 'Colorado AI Act (SB 24-205)',
+    short: 'Colorado AI Act',
     type: 'law',
     issuer: 'State of Colorado',
     url: 'https://leg.colorado.gov/bills/sb24-205',
@@ -246,6 +268,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'kr-ai-basic-act',
     name: 'South Korea AI Basic Act',
+    short: 'Korea AI Act',
     type: 'law',
     issuer: 'Republic of Korea',
     url: 'https://www.trade.gov/market-intelligence/south-korea-ai-basic-act',
@@ -255,6 +278,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'uk-duaa',
     name: 'UK Data (Use and Access) Act 2025',
+    short: 'UK DUAA',
     type: 'law',
     issuer: 'United Kingdom',
     url: 'https://www.legislation.gov.uk/ukpga/2025/18/section/80',
@@ -264,6 +288,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'sg-genai-framework',
     name: 'Singapore Model AI Governance Framework for Generative AI',
+    short: 'Singapore GenAI',
     type: 'framework',
     issuer: 'IMDA / AI Verify Foundation',
     url: 'https://aiverifyfoundation.sg/wp-content/uploads/2024/05/Model-AI-Governance-Framework-for-Generative-AI-May-2024-1-1.pdf',
@@ -273,6 +298,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'etsi-en-304-223',
     name: 'ETSI EN 304 223',
+    short: 'ETSI EN 304 223',
     type: 'standard',
     issuer: 'ETSI',
     url: 'https://www.etsi.org/newsroom/press-releases/2627-etsi-releases-world-leading-standard-for-securing-ai/',
@@ -282,6 +308,7 @@ export const frameworks: readonly Framework[] = [
   {
     id: 'en-18286',
     name: 'EN 18286:2026',
+    short: 'EN 18286',
     type: 'standard',
     issuer: 'CEN-CENELEC',
     url: 'https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/',
