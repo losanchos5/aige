@@ -64,8 +64,8 @@ Reglas de trabajo: Fable planifica, revisa figuras y verifica; subagentes `imple
 - [ ] Posicionamiento frente a competidores y agregadores (plataformas comerciales, IAPP, OECD.AI,
       FPF, Stanford HAI) y oportunidades de enlace/colaboración.
 - [ ] Auditoría de contenido de `/path` y de la home (nunca se revisaron como páginas).
-- [ ] Ámbito regulatorio: China (solo fuentes secundarias encontradas), GDPR Art. 22 con FRIA/DPIA,
-      sectoriales (DORA, FDA).
+- [ ] Ámbito regulatorio: GDPR Art. 22 con FRIA/DPIA, sectoriales (DORA, FDA).
+- [x] China: cap. 08 (subsección + tabla + cruce agéntico TC260 3.0), catálogo del sitio, lecturas y glosario — 2026-09-20
 - [ ] Propuestas para las otras audiencias del prefacio (security, privacy/DPO, MLOps, juristas).
 - [ ] Cadencia de LinkedIn y motor de contenido corto («Field notes»); optimizar OG para LinkedIn.
 - [ ] Extender diagramas a más secciones (hoy: patrones y aperturas).
