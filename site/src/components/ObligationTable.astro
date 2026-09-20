@@ -156,6 +156,7 @@ const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}
               {group.rows.map((row) => (
                 <tr
                   data-obligation-row
+                  id={`ob-${slugify(row.obligation)}`}
                   class:list={[layerClass(row.layerN), dutyClass(row.dutyHolder)]}
                 >
                   <td class="c-oblig" data-label="Obligation">{row.obligation}</td>
@@ -193,6 +194,12 @@ const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}
 </div>
 
 <style is:global>
+  /* Each row is an anchor target for the crosswalk's "Obligation row →" links;
+     clear the sticky header when jumped to. */
+  [data-obligation-row] {
+    scroll-margin-top: var(--anchor-offset);
+  }
+
   /* Pure-CSS duty-holder filter via :has(), mirroring the layer filter in
      resources.css. Only EU AI Act rows carry a duty class, so any non-"all"
      duty filter collapses the voluntary-framework groups. Default (#df-all)

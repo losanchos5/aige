@@ -2,20 +2,93 @@
 // reading-comfort review shots at 390/1440 in light (and glossary in dark),
 // written to tests/__screenshots__/E/.
 import { test, expect } from '@playwright/test';
+import { frameworks, obligations } from '../src/data/frameworks';
+import { topics, columns } from '../src/data/crosswalk';
 
-test('hub renders four resource cards, each with a count', async ({ page }) => {
+test('hub renders five resource cards, each with a count', async ({ page }) => {
   await page.goto('/resources');
   const cards = page.locator('[data-resource-card]');
-  await expect(cards).toHaveCount(4);
+  await expect(cards).toHaveCount(5);
 
   const counts = page.locator('[data-resource-count]');
-  await expect(counts).toHaveCount(4);
-  for (let i = 0; i < 4; i++) {
+  await expect(counts).toHaveCount(5);
+  for (let i = 0; i < 5; i++) {
     await expect(counts.nth(i)).not.toHaveText('');
   }
 
   // Counts are computed from the data, not hard-coded prose.
-  await expect(page.locator('body')).toContainText('25 frameworks · 61 obligations');
+  await expect(page.locator('body')).toContainText(
+    `${frameworks.length} frameworks · ${obligations.length} obligations`,
+  );
+});
+
+test('crosswalk renders a row per topic and a column per framework family', async ({ page }) => {
+  await page.goto('/resources/crosswalk');
+  await expect(page.locator('tr.cw-row')).toHaveCount(topics.length);
+  await expect(page.locator('th.cw-colh')).toHaveCount(columns.length);
+});
+
+test('crosswalk cell opens the drawer on Enter and closes on Escape', async ({ page }) => {
+  await page.goto('/resources/crosswalk');
+  const cell = page.locator('.cw-cell').first();
+  // The topic name is the row header of the row the first cell belongs to.
+  const topicName = (
+    await cell.locator('xpath=ancestor::tr[1]').locator('.cw-rowh').textContent()
+  )?.trim();
+
+  await cell.focus();
+  await page.keyboard.press('Enter');
+  const drawer = page.locator('#cw-drawer');
+  await expect(drawer).toBeVisible();
+  await expect(drawer).toContainText(topicName as string);
+  await expect(drawer.locator('[data-drawer-body] li[data-fw]').first()).toBeVisible();
+
+  await page.keyboard.press('Escape');
+  await expect(drawer).toBeHidden();
+  await expect(cell).toBeFocused();
+});
+
+test('crosswalk CSV and JSON export the data with the notice', async ({ page }) => {
+  const notice = 'not a claim of conformity';
+
+  const csv = await page.request.get('/resources/crosswalk.csv');
+  expect(csv.status()).toBe(200);
+  expect(await csv.text()).toContain(notice);
+
+  const json = await page.request.get('/resources/crosswalk.json');
+  expect(json.status()).toBe(200);
+  expect(await json.text()).toContain(notice);
+});
+
+test('every crosswalk "Obligation row →" link resolves on the frameworks page', async ({
+  page,
+}) => {
+  await page.goto('/resources/crosswalk');
+  const links = page.locator('a[href^="/resources/frameworks#ob-"]');
+  const count = await links.count();
+
+  const frameworksHtml = await (await page.request.get('/resources/frameworks')).text();
+  const seen = new Set<string>();
+  for (let i = 0; i < count; i++) {
+    const href = await links.nth(i).getAttribute('href');
+    const id = (href as string).split('#')[1];
+    if (seen.has(id)) continue;
+    seen.add(id);
+    expect(frameworksHtml).toContain(`id="${id}"`);
+  }
+});
+
+test.describe('crosswalk without JavaScript', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('a topic row header is a native jump to its section', async ({ page }) => {
+    await page.goto('/resources/crosswalk');
+    const rowh = page.locator('.cw-rowh').first();
+    const href = await rowh.getAttribute('href');
+    expect(href).toMatch(/^#topic-/);
+    await rowh.click();
+    expect(new URL(page.url()).hash).toBe(href);
+  });
 });
 
 test('frameworks page renders the frameworks and the obligation index', async ({ page }) => {
@@ -62,6 +135,7 @@ const routes = [
   { name: 'tools', path: '/resources/tools' },
   { name: 'reading-list', path: '/resources/reading-list' },
   { name: 'glossary', path: '/resources/glossary' },
+  { name: 'crosswalk', path: '/resources/crosswalk' },
 ];
 const widths = [390, 1440];
 

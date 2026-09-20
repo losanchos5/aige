@@ -1,0 +1,114 @@
+---
+/**
+ * CrosswalkMatrix — the topic × framework grid: one row per Body-of-Knowledge
+ * topic, one column per framework family (EU, ISO, NIST and the China group),
+ * each cell a stack of clause chips. Every trigger is a link, not a button: with
+ * JS off the row header and each cell jump natively to the topic's <article>
+ * further down the page; public/crosswalk.js upgrades them to open the drawer.
+ * Unlike ObligationMatrix it carries no JSON payload — the drawer clones the
+ * server-rendered topic section — and no opacity stagger. Mirrors the
+ * sticky-first-column horizontal scroll of ObligationMatrix. Pagefind indexes
+ * the topic sections, not this grid.
+ */
+import { topicMatrix, chipLabel, frameworkById } from '../data/crosswalk';
+
+interface Props {
+  matrix?: ReturnType<typeof topicMatrix>;
+}
+
+const { matrix = topicMatrix() } = Astro.props;
+const { columns, rows } = matrix;
+---
+
+<figure class="cw" aria-labelledby="cw-cap">
+  <figcaption id="cw-cap" class="cw-cap">
+    <span class="mono">Crosswalk</span>
+    <span class="cw-cap-text"
+      >One topic per row, one framework family per column. Select a topic or a
+      cell to read the mapped references.</span
+    >
+  </figcaption>
+
+  <div class="cw-scroll" role="group" aria-label="Topic by framework crosswalk">
+    <table class="cw-grid" data-cw-grid>
+      <thead>
+        <tr>
+          <th scope="col" class="cw-corner"><span class="visually-hidden">Topic</span></th>
+          {
+            columns.map((col) => (
+              <th
+                scope="col"
+                class="cw-colh"
+                data-cw-col={col.id}
+                data-fws={col.frameworks.join(' ')}
+              >
+                <span class="cw-colh-label">{col.label}</span>
+                {col.frameworks.length === 1 && col.fws[0] ? (
+                  <span class="type-tag" data-type={col.fws[0].type}>{col.fws[0].type}</span>
+                ) : (
+                  <span class="cw-col-count mono">{col.frameworks.length} instruments</span>
+                )}
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map(({ topic, cells }) => (
+            <tr class="cw-row" data-cw-topic={topic.id}>
+              <th scope="row" class="cw-rowh-cell">
+                <a class="cw-rowh" href={`#topic-${topic.id}`} data-cw-open={topic.id}>
+                  {topic.name}
+                </a>
+              </th>
+              {cells.map((refs, i) => (
+                <td class="cw-td">
+                  {refs.length > 0 ? (
+                    <a
+                      class="cw-cell"
+                      href={`#topic-${topic.id}`}
+                      data-cw-open={topic.id}
+                      data-cw-col={columns[i].id}
+                      aria-label={`${topic.name}, ${columns[i].label}: ${refs
+                        .map(
+                          (r) =>
+                            `${chipLabel(r)}${r.strength === 'related' ? ' (related)' : ''}${
+                              r.verified === false ? ' (unverified)' : ''
+                            }`,
+                        )
+                        .join(', ')}`}
+                    >
+                      {refs.map((r) => (
+                        <span
+                          class:list={[
+                            'cw-chip',
+                            r.strength === 'related' && 'is-related',
+                            r.verified === false && 'is-unverified',
+                          ]}
+                          data-strength={r.strength}
+                          data-fw={r.framework}
+                          data-type={frameworkById(r.framework)?.type}
+                          title={
+                            r.verified === false
+                              ? 'Not yet verified against the source'
+                              : undefined
+                          }
+                        >
+                          {chipLabel(r)}
+                          {r.verified === false ? ' ?' : ''}
+                        </span>
+                      ))}
+                    </a>
+                  ) : (
+                    <span class="cw-empty" aria-hidden="true">—</span><span class="visually-hidden">no mapping</span>
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</figure>
