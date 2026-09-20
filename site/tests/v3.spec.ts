@@ -35,6 +35,15 @@ function resolveFwId(framework: string, obligation: string): string {
     return /raise/i.test(t) ? 'ny-raise-act' : 'ca-sb-53';
   if (f === 'US state AI laws')
     return /texas|traiga/i.test(t) ? 'tx-traiga' : 'co-ai-act';
+  if (f === 'China') {
+    if (/algorithmic recommendation/i.test(t)) return 'cn-algo-recommendation';
+    if (/deep synthesis/i.test(t)) return 'cn-deep-synthesis';
+    if (/45654/.test(t)) return 'cn-gbt-45654';
+    if (/generative ai services/i.test(t)) return 'cn-genai-measures';
+    if (/45438|labelling/i.test(t)) return 'cn-content-labelling';
+    if (/tc260|framework 3\.0/i.test(t)) return 'cn-tc260-framework';
+    return 'cn-tc260-framework';
+  }
   if (f === 'Other jurisdictions') {
     if (/korea/i.test(t)) return 'kr-ai-basic-act';
     if (/singapore|imda/i.test(t)) return 'sg-genai-framework';

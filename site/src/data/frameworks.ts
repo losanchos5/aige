@@ -63,6 +63,7 @@ const CSA_ANCHOR = 'csa-aicm-and-star-for-ai';
 const OWASP_ANCHOR = 'owasp-genai-security-project';
 const US_ANCHOR = 'us-federal-and-state-laws';
 const OTHER_ANCHOR = 'other-jurisdictions';
+const CHINA_ANCHOR = 'china';
 
 /** The frameworks, standards, codes and laws the chapter maps against. */
 export const frameworks: readonly Framework[] = [
@@ -294,6 +295,66 @@ export const frameworks: readonly Framework[] = [
     url: 'https://aiverifyfoundation.sg/wp-content/uploads/2024/05/Model-AI-Governance-Framework-for-Generative-AI-May-2024-1-1.pdf',
     summary:
       "Singapore's voluntary Model AI Governance Framework for Generative AI (IMDA and the AI Verify Foundation, May 2024). It sets out governance dimensions — testing, transparency, incident reporting, security and content provenance — as guidance, not law.",
+  },
+  {
+    id: 'cn-algo-recommendation',
+    name: 'China Provisions on Algorithmic Recommendation (2022)',
+    short: 'China Algo. Rec.',
+    type: 'law',
+    issuer: 'CAC, MIIT, MPS and SAMR (China)',
+    url: 'https://www.cac.gov.cn/2022-01/04/c_1642894606364259.htm',
+    summary:
+      "China's binding Provisions on Algorithmic Recommendation (CAC, MIIT, MPS and SAMR, Order No. 9), in force 1 March 2022. Algorithm filing for services with public-opinion or social-mobilisation capacity, a security assessment, display of the filing number, and a user option to switch off personalised recommendation.",
+  },
+  {
+    id: 'cn-deep-synthesis',
+    name: 'China Provisions on Deep Synthesis (2023)',
+    short: 'China Deep Synthesis',
+    type: 'law',
+    issuer: 'CAC, MIIT and MPS (China)',
+    url: 'https://www.cac.gov.cn/2022-12/11/c_1672221949354811.htm',
+    summary:
+      "China's binding Provisions on Deep Synthesis (CAC, MIIT and MPS, Order No. 12), in force 10 January 2023. Conspicuous labels where synthetic content could mislead the public and non-removable technical marks, training-data management, separate consent for face and voice editing, and filing plus a security assessment for opinion-shaping functions.",
+  },
+  {
+    id: 'cn-genai-measures',
+    name: 'China Interim Measures for Generative AI Services (2023)',
+    short: 'China GenAI Measures',
+    type: 'law',
+    issuer: 'CAC and six other bodies (China)',
+    url: 'https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm',
+    summary:
+      "China's binding Interim Measures for Generative AI Services (CAC and six other bodies, Order No. 15), in force 15 August 2023, for services offered to the public within the PRC. Lawful-source training data and foundation models, content labelling under the deep-synthesis rules, a security assessment and algorithm filing for opinion-shaping services, and a duty to stop, remove, retrain and report on illegal content.",
+  },
+  {
+    id: 'cn-content-labelling',
+    name: 'China Measures for Labelling AI-Generated Synthetic Content (2025)',
+    short: 'China AI Labelling',
+    type: 'law',
+    issuer: 'CAC, MIIT, MPS and NRTA (China)',
+    url: 'https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm',
+    summary:
+      "China's binding Measures for Labelling AI-Generated Synthetic Content (CAC, MIIT, MPS and NRTA), in force 1 September 2025 alongside the mandatory standard GB 45438-2025. Explicit labels (text, audio or graphic) and implicit metadata labels carrying the provider's name or code and a content number; distribution platforms verify the metadata and flag suspected AI content.",
+  },
+  {
+    id: 'cn-gbt-45654',
+    name: 'GB/T 45654-2025 Basic security requirements for generative AI services',
+    short: 'GB/T 45654',
+    type: 'standard',
+    issuer: 'SAMR / SAC, drafted by TC260 (China)',
+    url: 'https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=F67D3F376E0A0A0FF5317FB36B32A30A',
+    summary:
+      'GB/T 45654-2025 Basic security requirements for generative AI services (SAMR / SAC, drafted by TC260), a recommended (voluntary) national standard implemented 1 November 2025. Training-corpus source and content screening, model-safety requirements and the evaluation methods that underpin the security assessment.',
+  },
+  {
+    id: 'cn-tc260-framework',
+    name: 'TC260 AI Safety Governance Framework 3.0',
+    short: 'TC260 Framework 3.0',
+    type: 'framework',
+    issuer: 'TC260 under CAC guidance (China)',
+    url: 'https://www.cac.gov.cn/rootimages/uploadimg/1791137114683961/1791137114683961.pdf',
+    summary:
+      "China's voluntary AI safety governance framework (14 September 2026, building on 1.0 in 2024 and 2.0 in 2025): a three-block risk taxonomy, technological and governance countermeasures and role-based guidelines. Appendix 2 is an agentic AI risk-management framework covering identity, human checkpoints, tool control, runtime guardrails, memory, auditing and decommissioning.",
   },
   {
     id: 'etsi-en-304-223',
@@ -865,5 +926,67 @@ export const obligations: readonly Obligation[] = [
       'AI-system security controls across the lifecycle; supply-chain and AIBOM checks; runtime hardening',
     layerN: [4],
     anchor: OTHER_ANCHOR,
+  },
+
+  // China
+  {
+    framework: 'China',
+    obligation: 'Provisions on Algorithmic Recommendation (in force 2022-03-01)',
+    artefact:
+      'Algorithm inventory with filing record and number; security-assessment evidence pack; opt-out control at runtime',
+    layerN: [1, 2, 4],
+    anchor: CHINA_ANCHOR,
+  },
+  {
+    framework: 'China',
+    obligation: 'Provisions on Deep Synthesis (in force 2023-01-10)',
+    artefact:
+      'Content-provenance pipeline (visible label plus metadata mark); training-data governance record; consent gate; pre-release security assessment',
+    layerN: [2, 3, 4],
+    anchor: CHINA_ANCHOR,
+  },
+  {
+    framework: 'China',
+    obligation: 'Interim Measures for Generative AI Services (in force 2023-08-15)',
+    artefact:
+      'Data-lineage and licensing record; eval gate on generated content; incident pipeline with a retraining loop; filing record',
+    layerN: [2, 3, 4, 5],
+    anchor: CHINA_ANCHOR,
+  },
+  {
+    framework: 'China',
+    obligation:
+      'Measures for Labelling AI-Generated Synthetic Content with GB 45438-2025 (in force 2025-09-01)',
+    artefact:
+      'Provenance and watermarking pipeline emitting the GB 45438 metadata fields; platform-side detection and flagging',
+    layerN: [3, 4],
+    anchor: CHINA_ANCHOR,
+  },
+  {
+    framework: 'China',
+    obligation:
+      'GB/T 45654-2025 Basic security requirements for generative AI services (voluntary; implemented 2025-11-01)',
+    artefact:
+      'Corpus-screening record; eval question banks; security-assessment report',
+    layerN: [3, 5],
+    anchor: CHINA_ANCHOR,
+  },
+  {
+    framework: 'China',
+    obligation:
+      'TC260 AI Safety Governance Framework 3.0 — operators\' guidelines §5.3 (voluntary; 2026-09-14)',
+    artefact:
+      'Risk register keyed to the framework\'s taxonomy; log-retention policy (six months) with audit; real-time risk monitoring; resilience assessment',
+    layerN: [1, 4, 5],
+    anchor: CHINA_ANCHOR,
+  },
+  {
+    framework: 'China',
+    obligation:
+      'TC260 Framework 3.0 Appendix 2 — agentic AI risk management (voluntary; 2026-09-14)',
+    artefact:
+      'Agent registry with identity and scope; approval-log store; tool allow-list with integrity checks; runtime guardrails and kill switch; memory-scope policy; decommissioning runbook',
+    layerN: [2, 3, 4, 5],
+    anchor: CHINA_ANCHOR,
   },
 ] as const;
