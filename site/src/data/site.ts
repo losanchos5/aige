@@ -23,6 +23,15 @@ export interface SiteConfig {
   authorDetails: readonly Author[];
   license: string;
   bokVersion: string;
+  /**
+   * Newsletter sign-up, handled entirely by a third party (no backend here).
+   * `action` is the form's POST target; an empty string disables the form, so
+   * <NewsletterForm> renders nothing until a real endpoint is set.
+   */
+  newsletter: {
+    provider: string;
+    action: string;
+  };
 }
 
 export const site: SiteConfig = {
@@ -40,4 +49,5 @@ export const site: SiteConfig = {
   ],
   license: 'CC BY 4.0',
   bokVersion: '0.4.0',
+  newsletter: { provider: 'buttondown', action: '' },
 };

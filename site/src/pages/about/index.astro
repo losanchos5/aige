@@ -1,6 +1,27 @@
 ---
+import fs from 'node:fs';
+import { resolve } from 'node:path';
 import Doc from '../../layouts/Doc.astro';
+import NewsletterForm from '../../components/NewsletterForm.astro';
 import { site } from '../../data/site';
+
+// Link the built Body-of-Knowledge PDF only when it exists at build time, so a
+// checkout without the generated file (build/build_pdf.py not run) still builds.
+// The file lives at site/public/downloads; the build runs from the site dir
+// (like reading.ts, which reads git and the sources relative to process.cwd()).
+const pdfName = `aige-bok-v${site.bokVersion}.pdf`;
+const pdfHref = `/downloads/${pdfName}`;
+const pdfPath = resolve(process.cwd(), 'public', 'downloads', pdfName);
+let pdfSize = '';
+try {
+  const bytes = fs.statSync(pdfPath).size;
+  pdfSize =
+    bytes >= 1024 * 1024
+      ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+      : `${Math.round(bytes / 1024)} KB`;
+} catch {
+  // No PDF in this environment; the download link is omitted below.
+}
 ---
 
 <Doc
@@ -45,6 +66,26 @@ import { site } from '../../data/site';
       GitHub</a> — open an issue or a pull request.
     </li>
   </ul>
+
+  {
+    pdfSize && (
+      <Fragment>
+        <h2>Download</h2>
+        <p>
+          The full Body of Knowledge — the Thesis and all eleven chapters, contributors and
+          changelog — is available as a single PDF.{' '}
+          <a href={pdfHref}>Download the PDF (v{site.bokVersion}, {pdfSize})</a>.
+        </p>
+      </Fragment>
+    )
+  }
+
+  <h2>Stay updated</h2>
+  <p>
+    New and updated chapters, and each released version, are announced in the{' '}
+    <a href="/rss.xml">RSS feed</a>.
+  </p>
+  <NewsletterForm />
 
   <h2>Licence</h2>
   <p>

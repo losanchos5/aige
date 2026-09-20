@@ -1,0 +1,89 @@
+---
+/**
+ * NewsletterForm — a plain, backend-free sign-up that posts straight to the
+ * newsletter provider named in data/site.ts. The browser does the POST; there
+ * is no script and no tracking here. It renders nothing while
+ * `site.newsletter.action` is empty, so the feature stays dark until a real
+ * endpoint is configured.
+ */
+import { site } from '../data/site';
+
+const { action } = site.newsletter;
+---
+
+{
+  action && (
+    <form class="newsletter" method="post" action={action}>
+      <label class="nl-label" for="nl-email">
+        Get an email when a chapter changes
+      </label>
+      <div class="nl-row">
+        <input
+          class="nl-input"
+          id="nl-email"
+          type="email"
+          name="email"
+          autocomplete="email"
+          placeholder="you@example.com"
+          required
+        />
+        <button class="btn btn-primary nl-submit" type="submit">
+          Subscribe
+        </button>
+      </div>
+      <p class="nl-note">
+        Occasional updates when a chapter changes. No tracking; the form posts to Buttondown.
+      </p>
+    </form>
+  )
+}
+
+<style>
+  .newsletter {
+    max-width: 32rem;
+  }
+
+  .nl-label {
+    display: block;
+    margin-bottom: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--ink);
+  }
+
+  .nl-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+
+  .nl-input {
+    flex: 1 1 14rem;
+    min-height: 44px;
+    padding: 0 var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  .nl-input::placeholder {
+    color: var(--muted);
+  }
+
+  .nl-input:focus-visible {
+    border-color: var(--ink-2);
+    outline: 2px solid var(--l1-ink);
+    outline-offset: 2px;
+  }
+
+  .nl-submit {
+    flex: 0 0 auto;
+  }
+
+  .nl-note {
+    margin-top: var(--s-3);
+    font-size: 0.875rem;
+    color: var(--muted);
+  }
+</style>
