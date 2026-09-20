@@ -87,6 +87,16 @@ try {
   </p>
   <NewsletterForm />
 
+  <h2>Cite</h2>
+  <p>
+    Each release is archived on Zenodo. This version (v{site.bokVersion}) has the DOI{' '}
+    <a href={`https://doi.org/${site.doi}`}>{site.doi}</a>; the concept DOI{' '}
+    <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a> always resolves to the
+    latest one. Machine-readable metadata lives in{' '}
+    <a href={`${site.github}/blob/main/CITATION.cff`}>CITATION.cff</a>; every chapter offers a
+    ready-made citation and BibTeX entry.
+  </p>
+
   <h2>Licence</h2>
   <p>
     This work is licensed under <strong>{site.license}</strong>. It may be freely copied and shared

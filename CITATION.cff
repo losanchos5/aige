@@ -15,7 +15,11 @@ date-released: "2026-09-20"
 url: "https://aigovernanceengineer.com"
 repository-code: "https://github.com/losanchos5/aige"
 license: CC-BY-4.0
-# doi: 10.5281/zenodo.XXXXXXX  # Zenodo DOI — add on first archived release
+doi: 10.5281/zenodo.22857086  # this version (v0.4.0)
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22857084
+    description: "Concept DOI: resolves to the latest archived version"
 keywords:
   - "AI governance"
   - "AI governance engineering"

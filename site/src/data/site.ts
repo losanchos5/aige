@@ -23,6 +23,10 @@ export interface SiteConfig {
   authorDetails: readonly Author[];
   license: string;
   bokVersion: string;
+  /** Zenodo DOI of the current archived release (bokVersion). */
+  doi: string;
+  /** Zenodo concept DOI: always resolves to the latest archived version. */
+  conceptDoi: string;
   /**
    * Newsletter sign-up, handled entirely by a third party (no backend here).
    * `action` is the form's POST target; an empty string disables the form, so
@@ -49,5 +53,7 @@ export const site: SiteConfig = {
   ],
   license: 'CC BY 4.0',
   bokVersion: '0.4.0',
+  doi: '10.5281/zenodo.22857086',
+  conceptDoi: '10.5281/zenodo.22857084',
   newsletter: { provider: 'buttondown', action: '' },
 };
