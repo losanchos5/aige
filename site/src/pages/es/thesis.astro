@@ -1,0 +1,85 @@
+---
+import Doc from '../../layouts/Doc.astro';
+import Diagram from '../../components/Diagram.astro';
+import { site } from '../../data/site';
+import { gitDate } from '../../lib/reading';
+// THESIS.es.md sits at the repo root, next to THESIS.md. Imported directly so it
+// goes through the same Astro Markdown pipeline (remark-lead, callouts, citations,
+// diagrams, glossary) that the content collection applies to the English thesis,
+// keeping this page's rendering identical to /thesis.
+import { Content, getHeadings, frontmatter } from '../../../../THESIS.es.md';
+
+const headings = getHeadings();
+const title = (frontmatter.title as string | undefined) ?? 'La Tesis de la Ingeniería de Gobernanza de IA';
+const summary =
+  (frontmatter.summary as string | undefined) ??
+  'La gobernanza como un sistema que se construye, se ejecuta y se mide, no un documento que se firma.';
+const updated = gitDate('../THESIS.es.md');
+const signUrl = `${site.github}/blob/main/bok/CONTRIBUTORS.md`;
+---
+
+{/* TODO(F4): pass locale="es_ES" and alternates once Seo supports them */}
+<Doc
+  title={title}
+  summary={summary}
+  kicker="La Tesis"
+  headings={headings}
+  editPath="THESIS.es.md"
+  updated={updated}
+  sidebar={false}
+  wide={true}
+  activeThesis={true}
+  image="/og/thesis.png"
+>
+  {/* Base.astro hard-codes <html lang="en"> and takes no lang prop (owned by
+      another block). As a fallback we mark this subtree lang="es" so assistive
+      tech switches language for the translated body. */}
+  <div lang="es" class="thesis-es">
+    <p class="lang-switch">
+      <a href="/thesis">Read in English</a>
+    </p>
+    <aside class="sign-note">
+      <p>
+        Este es un documento vivo. <a href={signUrl} target="_blank" rel="noopener noreferrer">Fírmalo</a>
+        añadiendo tu nombre en un pull request a <code>bok/CONTRIBUTORS.md</code>.
+      </p>
+    </aside>
+    <Diagram id="aige-in-the-org" />
+    <Content />
+  </div>
+</Doc>
+
+<style>
+  .lang-switch {
+    margin-bottom: var(--s-4);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .lang-switch a {
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+
+  .lang-switch a:hover {
+    color: var(--ink);
+  }
+
+  .sign-note {
+    margin-bottom: var(--s-5);
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: color-mix(in srgb, var(--l5) 40%, var(--bg));
+    font-size: 0.9375rem;
+  }
+
+  .sign-note p {
+    color: var(--ink-2);
+  }
+
+  .sign-note a {
+    color: var(--ink);
+    font-weight: 600;
+  }
+</style>
