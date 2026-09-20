@@ -19,7 +19,7 @@ const { layer, href } = Astro.props;
 const index = String(layer.n).padStart(2, '0');
 ---
 
-<article class="layer-panel" style={`--band: var(${layer.colorVar});`}>
+<article class="layer-panel card-lum" style={`--band: var(${layer.colorVar});`}>
   <div class="band" aria-hidden="true"></div>
   <div class="body">
     <header class="head">
@@ -93,11 +93,10 @@ const index = String(layer.n).padStart(2, '0');
 </article>
 
 <style>
+  /* Surface (border, radius, background, shadow) comes from .card-lum in
+     effects.css; this rule keeps the panel's flex layout and edge clip. */
   .layer-panel {
     display: flex;
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--bg);
     overflow: hidden;
   }
 

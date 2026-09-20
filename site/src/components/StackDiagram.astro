@@ -17,9 +17,11 @@ import { layers } from '../data/stack';
 interface Props {
   mode?: 'static' | 'interactive';
   class?: string;
+  /** Pass-through attributes (e.g. `data-story-mark`) forwarded to the root. */
+  [key: string]: unknown;
 }
 
-const { mode = 'static', class: className } = Astro.props;
+const { mode = 'static', class: className, ...rest } = Astro.props;
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -65,10 +67,12 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
       role="img"
       aria-label="The five-layer AI governance engineering stack, from Govern-as-Code to Assurance."
       preserveAspectRatio="xMidYMid meet"
+      {...rest}
     >
       {layers.map((layer, i) => (
         <g
           class="bar"
+          data-n={layer.n}
           style={`--i:${i}; --fill:var(${layer.colorVar}); --lk:var(${layer.colorVar}-ink)`}
         >
           <rect x="0" y={i * PITCH} width={WIDTH} height={BAR_H} rx="6" />
@@ -90,6 +94,8 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
             class="drow"
             data-layer={layer.n}
             data-testid="stack-row"
+            data-story-row
+            data-n={layer.n}
             style={`--i:${i}; --tint:var(${layer.colorVar}); --tint-ink:var(${layer.colorVar}-ink)`}
           >
             <span class="d-idx" aria-hidden="true">
@@ -138,6 +144,27 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
 
   .diagram-static text {
     dominant-baseline: middle;
+  }
+
+  /* Story link: as the reader scrolls the interactive rows, story.js writes
+     [data-active="N"] on the [data-story] host; the matching bar in this static
+     mark gets an ink outline. The ancestor is a page element, so it is left
+     global; only .bar/rect stay component-scoped. */
+  :global([data-story][data-active='1']) .bar[data-n='1'] rect,
+  :global([data-story][data-active='2']) .bar[data-n='2'] rect,
+  :global([data-story][data-active='3']) .bar[data-n='3'] rect,
+  :global([data-story][data-active='4']) .bar[data-n='4'] rect,
+  :global([data-story][data-active='5']) .bar[data-n='5'] rect {
+    stroke: var(--ink);
+    stroke-width: 2;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .diagram-static rect {
+      transition:
+        stroke var(--dur) var(--ease),
+        stroke-width var(--dur) var(--ease);
+    }
   }
 
   .b-idx {

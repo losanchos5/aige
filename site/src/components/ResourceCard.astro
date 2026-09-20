@@ -20,7 +20,7 @@ const { title, href, description, count, index, swatch = 'var(--ink)' } = Astro.
 ---
 
 <li>
-  <a class="rc-card" href={href} data-resource-card style={`--tint:${swatch}`}>
+  <a class="rc-card card-lum lift" href={href} data-resource-card style={`--tint:${swatch}`}>
     <span class="rc-top">
       {index && <span class="rc-index">{index}</span>}
       <span class="rc-tick" aria-hidden="true"></span>

@@ -104,6 +104,12 @@ const { rows } = Astro.props;
       border-bottom: 1px solid var(--line);
     }
 
+    /* Header labels use --ink-2 (not the global --muted) so the row clears
+       4.5:1 against the tinted header background in both themes. */
+    .chead .field-label {
+      color: var(--ink-2);
+    }
+
     .cell-label {
       display: none;
     }

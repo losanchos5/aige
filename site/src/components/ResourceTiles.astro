@@ -19,9 +19,9 @@ const { tiles, class: className } = Astro.props;
 
 <ul class:list={['tiles', className]}>
   {
-    tiles.map((tile) => (
-      <li>
-        <a class="tile" href={tile.href}>
+    tiles.map((tile, i) => (
+      <li style={`--i:${i}`}>
+        <a class="tile card-lum lift" href={tile.href}>
           <span class="label">
             {tile.label}
             <span class="arrow" aria-hidden="true">
@@ -57,15 +57,14 @@ const { tiles, class: className } = Astro.props;
     }
   }
 
+  /* Surface (border, radius, background, shadow) comes from .card-lum in
+     effects.css; this rule keeps only the tile's layout and ink colour. */
   .tile {
     display: flex;
     flex-direction: column;
     gap: var(--s-2);
     height: 100%;
     padding: var(--s-5);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--bg);
     color: var(--ink);
     text-decoration: none;
   }

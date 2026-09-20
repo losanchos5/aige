@@ -29,7 +29,7 @@ const countup = match
 ---
 
 <Tag
-  class:list={['tile', className]}
+  class:list={['tile', 'card-lum', 'lift', className]}
   {...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : {})}
 >
   <span
@@ -47,14 +47,13 @@ const countup = match
 </Tag>
 
 <style>
+  /* Surface (border, radius, background, shadow) comes from .card-lum in
+     effects.css; this rule keeps only the tile's layout and ink colour. */
   .tile {
     display: flex;
     flex-direction: column;
     gap: var(--s-2);
     padding: var(--s-5);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--bg);
     color: var(--ink);
     text-decoration: none;
   }
@@ -67,6 +66,21 @@ const countup = match
     font-size: var(--fs-h1);
     /* Tabular figures so the counting number keeps a steady width. */
     font-variant-numeric: tabular-nums;
+    /* Fallback: solid ink. The gradient below only applies where the text can
+       be clipped to it, so contrast never depends on the gradient. */
+    color: var(--ink);
+  }
+
+  /* Gradient value text, ink-derived so it stays high-contrast in both themes.
+     Guarded by @supports and paired with the --ink fallback above. */
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    .value {
+      background-image: var(--grad-cta);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
   }
 
   .label {

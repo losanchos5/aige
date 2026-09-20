@@ -6,11 +6,19 @@
  * holds still under reduced motion. Generic, illustrative items only — no vendor
  * names. Decorative, so the whole strip is aria-hidden.
  */
+interface Props {
+  /** `lg` enlarges the chips and speeds the loop to 30s (used on the home
+   *  verdict beat); `md` (default) keeps the thin strip. */
+  size?: 'md' | 'lg';
+}
+
 interface Item {
   id: string;
   verdict: 'pass' | 'block';
   detail: string;
 }
+
+const { size = 'md' } = Astro.props;
 
 const items: readonly Item[] = [
   { id: '#4821', verdict: 'pass', detail: 'eval.safety 0.97' },
@@ -26,11 +34,11 @@ const items: readonly Item[] = [
 ];
 ---
 
-<div class="vt" aria-hidden="true">
+<div class:list={['vt', size === 'lg' && 'vt-lg']} aria-hidden="true">
   <div class="vt-track">
     {
       [0, 1].map((copy) => (
-        <ul class="vt-list" data-copy={copy}>
+        <ul class="vt-list" data-copy={copy} aria-hidden={copy === 1 ? 'true' : undefined}>
           {items.map((item) => (
             <li class="vt-item">
               <span class:list={['vt-chip', `vt-${item.verdict}`]}>{item.verdict === 'pass' ? 'PASS' : 'BLOCK'}</span>
@@ -112,11 +120,33 @@ const items: readonly Item[] = [
     color: var(--ink-2);
   }
 
+  /* Large size: bigger chips and labels, used on the home verdict beat. Every
+     colour token here is re-scoped by .sec--dark, so it reads correctly on the
+     dark band too. */
+  .vt-lg .vt-list {
+    gap: var(--s-6);
+  }
+
+  .vt-lg .vt-chip {
+    padding: 0.2em 0.6em;
+    font-size: var(--fs-small);
+  }
+
+  .vt-lg .vt-id,
+  .vt-lg .vt-detail {
+    font-size: var(--fs-body);
+  }
+
   /* Motion only: translate one full copy's width and loop; hovering the strip
      pauses it. Under reduced motion the strip holds still and stays legible. */
   @media (prefers-reduced-motion: no-preference) {
     .vt-track {
       animation: vt-scroll 42s linear infinite;
+    }
+
+    /* lg runs the loop faster (30s) so the larger chips keep pace. */
+    .vt-lg .vt-track {
+      animation-duration: 30s;
     }
 
     .vt:hover .vt-track {

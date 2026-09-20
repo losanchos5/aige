@@ -9,19 +9,28 @@ import type { Value } from '../data/values';
 
 interface Props {
   value: Value;
+  /** `row` (default) keeps the original ruled-row rendering; `bento` renders a
+   *  luminous card with a large decorative index for the values bento grid. */
+  variant?: 'row' | 'bento';
   class?: string;
 }
 
-const { value, class: className } = Astro.props;
+const { value, variant = 'row', class: className } = Astro.props;
 const index = String(value.n).padStart(2, '0');
 const tag = value.note
   ? /^established/i.test(value.note)
     ? 'established'
     : 'new'
   : undefined;
+// Cycle the five layer pastels so each card's big index carries a tint.
+const tint = `var(--l${((value.n - 1) % 5) + 1})`;
 ---
 
-<div class:list={['pair', className]} data-testid="value-pair">
+<div
+  class:list={['pair', variant === 'bento' && 'pair-bento card-lum lift', className]}
+  style={`--tint:${tint}`}
+  data-testid="value-pair"
+>
   <span class="index" aria-hidden="true">{index}</span>
   <div class="body">
     <p class="title">{value.title}</p>
@@ -71,5 +80,37 @@ const tag = value.note
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
     color: var(--muted);
+  }
+
+  /* Bento variant: a luminous card (surface + shadow come from .card-lum) with a
+     large tinted index, a display-font title and an --ink-2 summary. Overrides
+     the row layout defined above. */
+  .pair-bento {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--s-3);
+    padding: var(--s-5);
+    height: 100%;
+  }
+
+  .pair-bento .index {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.5rem, 1.9rem + 3vw, 4rem);
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+    color: color-mix(in srgb, var(--tint) 70%, var(--bg));
+  }
+
+  .pair-bento .title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .pair-bento .summary {
+    color: var(--ink-2);
   }
 </style>

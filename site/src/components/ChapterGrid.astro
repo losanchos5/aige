@@ -18,9 +18,9 @@ const strip = (title: string) => title.replace(/^\d+\.\s*/, '');
 
 <ol class:list={['grid', className]}>
   {
-    chapters.map((chapter) => (
-      <li>
-        <a class="card" href={`/bok/${chapter.slug}`} data-testid="chapter-card">
+    chapters.map((chapter, i) => (
+      <li style={`--i:${i}`}>
+        <a class="card card-lum lift" href={`/bok/${chapter.slug}`} data-testid="chapter-card">
           <span class="idx">{pad(chapter.order)}</span>
           <span class="title">{strip(chapter.title)}</span>
           <span class="summary">{chapter.summary}</span>
@@ -53,6 +53,8 @@ const strip = (title: string) => title.replace(/^\d+\.\s*/, '');
     }
   }
 
+  /* Surface (border, radius, background, shadow) comes from .card-lum in
+     effects.css; this rule keeps only the card's layout and ink colour. */
   .card {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -64,9 +66,6 @@ const strip = (title: string) => title.replace(/^\d+\.\s*/, '');
     row-gap: var(--s-2);
     height: 100%;
     padding: var(--s-5);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--bg);
     color: var(--ink);
     text-decoration: none;
   }

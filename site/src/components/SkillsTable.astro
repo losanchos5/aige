@@ -65,6 +65,9 @@ const { skills } = Astro.props;
   .shead {
     display: none;
   }
+  .shead .field-label {
+    color: var(--ink-2); /* --muted fails AA on the mixed header bg */
+  }
 
   .srow {
     display: grid;

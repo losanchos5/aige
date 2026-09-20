@@ -25,8 +25,8 @@ const { items, class: className } = Astro.props;
 
 <ol class:list={['cards', className]}>
   {
-    items.map((item) => (
-      <li class="card" style={`--tint:${item.swatch ?? 'var(--ink)'}`}>
+    items.map((item, i) => (
+      <li class="card card-lum lift" style={`--i:${i}; --tint:${item.swatch ?? 'var(--ink)'}`}>
         <p class="head">
           <span class="square" aria-hidden="true" />
           <span class="idx">{item.index}</span>
@@ -54,14 +54,13 @@ const { items, class: className } = Astro.props;
     }
   }
 
+  /* Surface (border, radius, background, shadow) comes from .card-lum in
+     effects.css; this rule keeps only the card's own layout. */
   .card {
     display: flex;
     flex-direction: column;
     gap: var(--s-3);
     padding: var(--s-5);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--bg);
   }
 
   .head {

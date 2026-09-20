@@ -11,18 +11,22 @@ interface Props {
   workflows: readonly Workflow[];
   /** Builds the chapter href from a workflow anchor. */
   hrefFor: (anchor: string) => string;
+  class?: string;
 }
 
-const { workflows, hrefFor } = Astro.props;
+const { workflows, hrefFor, class: className } = Astro.props;
 const pad = (n: number) => String(n).padStart(2, '0');
+// When the page opts into the global .bento layout, hand it the grid and let
+// the "all layers" workflow (the 7th, n === 7) span two columns.
+const isBento = (className ?? '').split(/\s+/).includes('bento');
 ---
 
-<ol class="workflows">
+<ol class:list={['workflows', className]}>
   {
     workflows.map((wf, i) => (
       <li
-        class="workflow-item"
-        style={wf.layerN === 'all' ? undefined : `--c: var(--l${wf.layerN})`}
+        class:list={['workflow-item card-lum lift', { 'bento-2x': isBento && wf.layerN === 'all' }]}
+        style={`--i:${i};${wf.layerN === 'all' ? '' : ` --c: var(--l${wf.layerN});`}`}
       >
         <div class="head">
           <span class="index" aria-hidden="true">
@@ -59,18 +63,24 @@ const pad = (n: number) => String(n).padStart(2, '0');
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+
+  /* The component owns the grid only when the page does not opt into the
+     global .bento layout (site/src/styles/effects.css). Gating on
+     :not(.bento) keeps this scoped rule from outranking .bento on
+     specificity when class="bento …" is passed (e.g. /role). */
+  .workflows:not(.bento) {
     display: grid;
     gap: var(--s-4);
   }
 
+  /* Surface (border, radius, background, shadow) comes from .card-lum in
+     effects.css; this rule keeps only the item's layout. */
   .workflow-item {
     display: flex;
     flex-direction: column;
     gap: var(--s-3);
     padding: var(--s-5);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--bg);
   }
 
   .head {
@@ -140,13 +150,13 @@ const pad = (n: number) => String(n).padStart(2, '0');
   }
 
   @media (min-width: 720px) {
-    .workflows {
+    .workflows:not(.bento) {
       grid-template-columns: repeat(2, 1fr);
     }
   }
 
   @media (min-width: 1080px) {
-    .workflows {
+    .workflows:not(.bento) {
       grid-template-columns: repeat(3, 1fr);
     }
   }

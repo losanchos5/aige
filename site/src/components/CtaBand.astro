@@ -21,6 +21,7 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
 ---
 
 <section class:list={['band', className]}>
+  <div class="bg-mesh" aria-hidden="true"></div>
   <div class="container inner">
     <div class="copy">
       <h2 class="title">{title}</h2>
@@ -35,12 +36,35 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
 
 <style>
   .band {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     background: var(--ink);
     color: var(--bg);
     padding-block: clamp(48px, 7vw, 96px);
   }
 
+  /* 2px gradient hairline along the top edge. */
+  .band::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: var(--grad-border);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Faint mesh behind the copy; --mesh-alpha dialled right down so it reads as
+     a whisper of depth, not colour. */
+  .band .bg-mesh {
+    --mesh-alpha: 0.25;
+    z-index: 0;
+  }
+
   .inner {
+    position: relative;
+    z-index: 1;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
