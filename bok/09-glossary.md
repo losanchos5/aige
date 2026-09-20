@@ -70,6 +70,11 @@ of adversary tactics and techniques against AI, including agent-specific techniq
 directly — machine-readable, signed, timestamped — so the audit is a query, not a collection project.
 (ch. 01, 04)
 
+**CAC (Cyberspace Administration of China).** China's internet regulator (国家互联网信息办公室),
+lead issuer of the binding AI rules — algorithmic recommendation, deep synthesis, generative AI
+services and AI-content labelling — and the body under whose guidance TC260 publishes the AI Safety
+Governance Framework [18]. (ch. 08)
+
 **Cedar.** An open-source policy language for fine-grained authorization, used as a policy-as-code
 engine for runtime access decisions; a schema-typed, analysable alternative to `OPA/Rego`. (ch. 04, 05)
 
@@ -230,6 +235,11 @@ validated assessment [4]. (ch. 07, 08)
 triggering extra evaluation, adversarial-testing and incident-reporting duties on their providers [2].
 (ch. 08)
 
+**TC260.** The National Technical Committee 260 on Cybersecurity of the Standardization
+Administration of China (全国网络安全标准化技术委员会), which drafts China's cybersecurity and AI
+national standards (GB and GB/T) and publishes the voluntary AI Safety Governance Framework (1.0 in
+2024, 2.0 in 2025, 3.0 on 14 September 2026) [19]. (ch. 08)
+
 ## Sources
 
 [1] AESIA (first operational national AI supervisor; sanctioning powers 2025). Research digest / AESIA. 2026. https://www.aesia.gob.es/ (verified: secondary)
@@ -249,3 +259,5 @@ triggering extra evaluation, adversarial-testing and incident-reporting duties o
 [15] "New York Finalizes RAISE Act for Frontier AI Models; Law Takes Effect January 1, 2027" (chapter amendment signed 27 Mar 2026; effective 1 Jan 2027; DFS oversight office). Wiley. 2026. https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027 (verified: secondary)
 [16] GPAI Code of Practice (published 10 Jul 2025; voluntary; three chapters: Transparency, Copyright, Safety and Security). AI Act Explorer / European Commission. 2025-07-10. https://artificialintelligenceact.eu/introduction-to-code-of-practice/ (verified: primary)
 [17] ISO/IEC 42005:2025 — AI system impact assessment (companion to Art. 27 and ISO 42001 Annex A.5). ISO/IEC. 2025-05. https://www.iso.org/standard/44545.html (verified: secondary)
+[18] 《人工智能安全治理框架3.0》发布 — announcement of the AI Safety Governance Framework 3.0 (TC260 under CAC guidance). Cyberspace Administration of China. 2026-09-14. https://www.cac.gov.cn/2026-09/14/c_1791137092283345.htm (verified: primary)
+[19] AI Safety Governance Framework 3.0 (人工智能安全治理框架3.0), bilingual PDF. TC260 / CAC. 2026-09-14. https://www.cac.gov.cn/rootimages/uploadimg/1791137114683961/1791137114683961.pdf (verified: primary)
