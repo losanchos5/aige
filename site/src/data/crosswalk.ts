@@ -44,8 +44,7 @@ export type RefStrength = 'core' | 'related';
 export interface CrosswalkRef {
   /** Topic id. */
   topic: string;
-  /** Framework id (must exist in frameworks.ts, or in cnFallback until the
-   *  China block lands those ids). */
+  /** Framework id (must exist in frameworks.ts). */
   framework: string;
   /** Clause id WITHOUT the instrument prefix, e.g. 'Art. 9', '6.1.2', 'A.5',
    *  'MAP 1', 'App. 2 II.5'. */
@@ -60,7 +59,7 @@ export interface CrosswalkRef {
   /** 'core' = the clause is primarily about the topic; 'related' = it touches it. */
   strength: RefStrength;
   /** Exact text of an obligations[].obligation row in frameworks.ts, to link the
-   *  obligation-matrix row. Unset where no row exists (ISO clauses, all cn-*). */
+   *  obligation-matrix row. Unset where no row exists (ISO clauses). */
   obligation?: string;
   /** false = could not be checked against the source; then `note` is required. */
   verified?: boolean;
@@ -192,73 +191,6 @@ export const columns: readonly CrosswalkColumn[] = [
   { id: 'cn', label: 'China', frameworks: Object.keys(chipPrefix) },
 ];
 
-/**
- * Local stubs for the five CAC instruments plus GB/T 45654, used only until the
- * China block adds these exact ids to frameworks.ts. Same shape as Framework.
- * TC260 3.0 is voluntary guidance; the four CAC measures are departmental rules.
- */
-const cnFallback: readonly Framework[] = [
-  {
-    id: 'cn-tc260-framework',
-    name: 'TC260 AI Safety Governance Framework 3.0',
-    short: 'TC260 3.0',
-    type: 'framework',
-    issuer: 'TC260 (China, under the CAC)',
-    url: 'https://www.cac.gov.cn/2026-09/14/c_1791137092283345.htm',
-    summary:
-      'Voluntary guidance (version 3.0, published 2026-09-14) that classifies AI safety risks and pairs them with technological and governance countermeasures; Appendix 2 adds an agentic-AI risk-management framework.',
-  },
-  {
-    id: 'cn-genai-measures',
-    name: 'Interim Measures for the Management of Generative AI Services',
-    short: 'CN GenAI Measures',
-    type: 'law',
-    issuer: 'Cyberspace Administration of China',
-    url: GENAI_URL,
-    summary:
-      'Departmental rules (in force 2023-08-15) for public-facing generative-AI services: lawful training data, content and labelling duties, user protection and security assessment/filing.',
-  },
-  {
-    id: 'cn-deep-synthesis',
-    name: 'Provisions on the Administration of Deep Synthesis in Internet Information Services',
-    short: 'CN Deep Synthesis',
-    type: 'law',
-    issuer: 'Cyberspace Administration of China',
-    url: DEEPSYN_URL,
-    summary:
-      'Departmental rules (in force 2023-01-10) requiring management systems, real-identity verification, content labelling and security assessment for deep-synthesis (synthetic-media) services.',
-  },
-  {
-    id: 'cn-algo-recommendation',
-    name: 'Provisions on the Administration of Algorithmic Recommendation in Internet Information Services',
-    short: 'CN Algo Rec',
-    type: 'law',
-    issuer: 'Cyberspace Administration of China',
-    url: ALGOREC_URL,
-    summary:
-      'Departmental rules (in force 2022-03-01) governing algorithmic recommendation services, with user-choice, transparency, algorithm review and filing obligations.',
-  },
-  {
-    id: 'cn-content-labelling',
-    name: 'Measures for Labelling AI-Generated and Synthetic Content',
-    short: 'CN Labelling',
-    type: 'law',
-    issuer: 'Cyberspace Administration of China',
-    url: LABEL_URL,
-    summary:
-      'Departmental rules (issued 2025-03-14, in force 2025-09-01) requiring explicit and implicit (metadata) labels on AI-generated and synthetic content.',
-  },
-  {
-    id: 'cn-gbt-45654',
-    name: 'GB/T 45654-2025 Basic security requirements for generative AI services',
-    short: 'GB/T 45654',
-    type: 'standard',
-    issuer: 'TC260 / SAC (China)',
-    summary:
-      'Recommended national standard (implemented 2025-11-01, successor to the TC260-003 practice) setting baseline security requirements for generative-AI services: training-corpus security, model security and content-safety assessment.',
-  },
-];
-
 // Exact obligation-row texts reused across topics, verbatim from frameworks.ts.
 const OBL_EU_9 = 'EU AI Act Art. 9 risk management system';
 const OBL_EU_26 = 'EU AI Act Art. 26 deployer obligations for high-risk systems';
@@ -266,6 +198,14 @@ const OBL_EU_55 = 'EU AI Act Art. 55 GPAI models with systemic risk';
 const OBL_EU_4971 =
   'EU AI Act Art. 49/71 registration of high-risk systems in the EU database';
 const OBL_A6 = 'A.6 AI system life cycle';
+// China obligation-row texts, verbatim from frameworks.ts (em-dash U+2014, section sign U+00A7).
+const OBL_CN_ALGOREC = 'Provisions on Algorithmic Recommendation (in force 2022-03-01)';
+const OBL_CN_DEEPSYN = 'Provisions on Deep Synthesis (in force 2023-01-10)';
+const OBL_CN_GENAI = 'Interim Measures for Generative AI Services (in force 2023-08-15)';
+const OBL_CN_LABEL = 'Measures for Labelling AI-Generated Synthetic Content with GB 45438-2025 (in force 2025-09-01)';
+const OBL_CN_GBT = 'GB/T 45654-2025 Basic security requirements for generative AI services (voluntary; implemented 2025-11-01)';
+const OBL_CN_TC260 = 'TC260 AI Safety Governance Framework 3.0 — operators\' guidelines §5.3 (voluntary; 2026-09-14)';
+const OBL_CN_TC260_APP2 = 'TC260 Framework 3.0 Appendix 2 — agentic AI risk management (voluntary; 2026-09-14)';
 
 /** The topic → framework clause refs, grouped by topic in display order. */
 export const refs: readonly CrosswalkRef[] = [
@@ -380,6 +320,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Three-way taxonomy: inherent / application / secondary (derivative) safety risks; printed p. 54.',
     strength: 'core',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -390,6 +331,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Maps each risk class to its countermeasures; printed pp. 107-108.',
     strength: 'core',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -400,6 +342,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Re-run the risk assessment when the system materially changes; printed p. 104.',
     strength: 'related',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -410,6 +353,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Security assessment for services with public-opinion attributes; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -420,6 +364,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Security assessment for recommendation services with public-opinion or social-mobilization capacity; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_ALGOREC,
     verified: true,
   },
 
@@ -523,6 +468,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Organisational and institutional governance measures; printed p. 85.',
     strength: 'core',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -533,6 +479,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'A traceable responsibility chain across the lifecycle; printed p. 103.',
     strength: 'core',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -543,6 +490,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Providers bear network-information content-producer responsibility; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -553,6 +501,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Providers establish algorithm-security management systems; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_ALGOREC,
     verified: true,
   },
   {
@@ -563,6 +512,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Providers establish management systems (registration, review, ethics, data and personal-information protection); CAC text.',
     strength: 'core',
+    obligation: OBL_CN_DEEPSYN,
     verified: true,
   },
 
@@ -648,6 +598,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Grading principles for classifying risk; printed pp. 109-112.',
     strength: 'core',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -658,6 +609,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Application-layer risks to assess (agentic, embodied, cybersecurity, content, personal information, real-world); printed p. 60.',
     strength: 'related',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -668,6 +620,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Pre-deployment security assessment for public-opinion services; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
 
@@ -754,6 +707,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Inherent data risks (quality, poisoning, leakage); printed p. 57.',
     strength: 'core',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -764,6 +718,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Training-data governance during model R&D; printed p. 95.',
     strength: 'related',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -774,6 +729,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Lawful sources, IP and personal-information compliance for training data; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -784,6 +740,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Clear, specific annotation rules and quality checks; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -794,6 +751,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'No unlawful retention of user input and usage records; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -804,6 +762,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Providers and technical supporters secure training data and personal information; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -813,6 +772,7 @@ export const refs: readonly CrosswalkRef[] = [
     title: 'Training-corpus (data) security requirements',
     note: 'GB/T 45654-2025 corpus-security requirements (TC260-003 predecessor §5); section id not verified against the published standard.',
     strength: 'core',
+    obligation: OBL_CN_GBT,
     verified: false,
   },
 
@@ -921,6 +881,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: LABEL_URL,
     note: 'Visible labels on AI-generated and synthetic content; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_LABEL,
     verified: true,
   },
   {
@@ -931,6 +892,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: LABEL_URL,
     note: 'Implicit labels embedded in file metadata; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_LABEL,
     verified: true,
   },
   {
@@ -941,6 +903,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Label generated images and video per the Deep Synthesis rules; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -951,6 +914,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Disclose training-data sources, scale and labelling mechanisms on request; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -961,6 +925,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Non-disruptive technical marks on synthetic content; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -971,6 +936,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Prominent labels where synthetic media could mislead; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -981,6 +947,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Conspicuously inform users that algorithmic recommendation is in use; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_ALGOREC,
     verified: true,
   },
   {
@@ -990,6 +957,7 @@ export const refs: readonly CrosswalkRef[] = [
     title: 'Generated-content labelling requirements',
     note: 'GB/T 45654-2025 content-labelling requirements (aligned with the 2025 Labelling Measures); section id not verified against the published standard.',
     strength: 'related',
+    obligation: OBL_CN_GBT,
     verified: false,
   },
 
@@ -1059,6 +1027,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'File within ten working days via the algorithm-filing system (public-opinion services); CAC text.',
     strength: 'core',
+    obligation: OBL_CN_ALGOREC,
     verified: true,
   },
   {
@@ -1069,6 +1038,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Filing per the Algorithm Recommendation rules; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -1079,6 +1049,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Algorithm filing alongside the security assessment; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1089,6 +1060,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Identity and permissions per agent; printed pp. 120-121.',
     strength: 'related',
+    obligation: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1099,6 +1071,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Registration/filing for critical information infrastructure; printed p. 91.',
     strength: 'related',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
 
@@ -1165,6 +1138,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Log management and auditing for agents; printed pp. 124-125.',
     strength: 'core',
+    obligation: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1175,6 +1149,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Keep logs at least six months and audit them; printed p. 102.',
     strength: 'core',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1185,6 +1160,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: LABEL_URL,
     note: 'Metadata labels support content traceability; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_LABEL,
     verified: true,
   },
 
@@ -1253,6 +1229,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Human approval checkpoints, tamper-proof approval logs, deny-by-default; printed pp. 121-122.',
     strength: 'core',
+    obligation: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1263,6 +1240,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Users can opt out of algorithmic recommendation; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_ALGOREC,
     verified: true,
   },
   {
@@ -1273,6 +1251,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Disclose scope of use and protect minors from over-reliance; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
 
@@ -1341,6 +1320,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Runtime guardrails, memory isolation and sandbox isolation for agents; printed pp. 123-124.',
     strength: 'core',
+    obligation: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1351,6 +1331,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Agentic-AI technical countermeasures; printed p. 77.',
     strength: 'core',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1361,6 +1342,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Bound the service scope and guide reasonable use; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1371,6 +1353,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Stop generation and transmission of unlawful content; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1381,6 +1364,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Technical or manual review of user inputs and synthetic outputs; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -1391,6 +1375,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Regularly review the algorithm mechanisms, models and data; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_ALGOREC,
     verified: true,
   },
   {
@@ -1401,6 +1386,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Maintain a feature library to identify unlawful and harmful information; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_ALGOREC,
     verified: true,
   },
 
@@ -1478,6 +1464,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Technical measures across model, algorithm and data; printed p. 73.',
     strength: 'core',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1488,6 +1475,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Sandbox validation, red teaming and auditing for agents; printed pp. 124-125.',
     strength: 'core',
+    obligation: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1498,6 +1486,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'System resilience requirement; printed p. 103.',
     strength: 'related',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1508,6 +1497,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Regular audit, assessment and verification of the synthesis-algorithm mechanisms; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -1518,6 +1508,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Security assessment before launching public-opinion products; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -1528,6 +1519,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Pre-deployment security assessment; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1537,6 +1529,7 @@ export const refs: readonly CrosswalkRef[] = [
     title: 'Security-assessment requirements for generative AI services',
     note: 'GB/T 45654-2025 security-assessment requirements (TC260-003 predecessor §8 and Annex A risk list); section id not verified against the published standard.',
     strength: 'core',
+    obligation: OBL_CN_GBT,
     verified: false,
   },
 
@@ -1614,6 +1607,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Real-time monitoring of AI risks in operation; printed p. 102.',
     strength: 'core',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1624,6 +1618,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Report safety incidents; printed p. 104.',
     strength: 'core',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1634,6 +1629,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Emergency plans within continuous monitoring for agents; printed pp. 124-125.',
     strength: 'related',
+    obligation: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1644,6 +1640,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Stop, rectify and report unlawful content and optimise the model; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1654,6 +1651,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Accessible complaint and report channels with published timelines; CAC text.',
     strength: 'core',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1664,6 +1662,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Management systems include emergency response; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_ALGOREC,
     verified: true,
   },
 
@@ -1740,6 +1739,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Supply-chain and tool-invocation management for agents; printed pp. 122-123.',
     strength: 'core',
+    obligation: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1750,6 +1750,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Governance of the open-source AI ecosystem; printed p. 92.',
     strength: 'related',
+    obligation: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1760,6 +1761,7 @@ export const refs: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Upstream training-data (and model) sourcing must be lawful; CAC text.',
     strength: 'related',
+    obligation: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1770,16 +1772,16 @@ export const refs: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Providers and their technical supporters share training-data duties (a value-chain relationship); CAC text. Draft mapped this to Art. 7, but Art. 14 is the article that names technical supporters.',
     strength: 'related',
+    obligation: OBL_CN_DEEPSYN,
     verified: true,
   },
 ];
 
 const byId = new Map<string, Framework>(frameworks.map((f) => [f.id, f]));
-const cnById = new Map<string, Framework>(cnFallback.map((f) => [f.id, f]));
 
-/** Look up a framework, falling back to the local China stubs. */
+/** Look up a framework by id. */
 export function frameworkById(id: string): Framework | undefined {
-  return byId.get(id) ?? cnById.get(id);
+  return byId.get(id);
 }
 
 /** `${prefix} ${ref}` for the China column's chips, `${ref}` otherwise. */

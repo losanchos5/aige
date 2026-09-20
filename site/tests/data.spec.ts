@@ -378,8 +378,8 @@ test.describe('crosswalk data', () => {
     }
   });
 
-  // Flips on once frameworks.ts gains the cn-* ids the China block adds.
-  test.fixme(
+  // Active now that frameworks.ts carries the cn-* ids the China block added.
+  test(
     'every ref.framework exists in frameworks.ts (cn-* entries land with the China block)',
     () => {
       const frameworkIds = new Set(frameworks.map((framework) => framework.id));
