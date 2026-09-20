@@ -1,41 +1,44 @@
-# Pendiente tras la v0.4.0 (escrito 2026-09-20 para la próxima sesión)
+# Pendiente tras la v0.4.0 (actualizado 2026-09-20 tras el bloque F)
 
 Contexto rápido: el plan aprobado está en
-`C:\Users\Jordi\.claude\plans\como-podemos-mejorar-la-keen-globe.md`. Bloques 0, A, B, C, D, E y G
-están en producción (`main` en `20fc4ce`, deploy automático con smoke). Memorias útiles:
+`C:\Users\Jordi\.claude\plans\como-podemos-mejorar-la-keen-globe.md`. Bloques 0, A, B, C, D, E, F y G
+están en producción (`main` en `dde6bbc`, deploy automático con smoke). Memorias útiles:
 `aige-parallel-worktree-agents`, `aige-site-test-order`, `aige-diagrams-archify-pipeline`.
 Reglas de trabajo: Fable planifica, revisa figuras y verifica; subagentes `implementador`
 (Opus 4.8) implementan; un build por worktree, tests una sola vez en `main`, `lhci` el último.
 
 ## 1. Acciones de Jordi (no las puede hacer Claude)
-- [ ] Crear el secret de repositorio `CF_BEACON_TOKEN` (token de Cloudflare Web Analytics) para
+- [x] Crear el secret de repositorio `CF_BEACON_TOKEN` (token de Cloudflare Web Analytics) para
       activar la analítica sin cookies; el siguiente deploy la inyecta.
-- [ ] Decidir sobre `videos/` y `A new role is appearing in every co.txt` en la raíz (mover fuera
-      del repo o versionar; hoy siguen sin versionar).
-- [ ] Activar GitHub Discussions en `losanchos5/aige` (ajuste del repo, ver bloque F).
-- [ ] Cuenta Zenodo si se quiere DOI (bloque F).
+- [x] `videos/` y el texto del post movidos a `D:\Documentsige-media` (2026-09-20).
+- [x] Activar GitHub Discussions en `losanchos5/aige` (ajuste del repo, ver bloque F).
+- [x] Zenodo conectado al repo (2026-09-20). Falta: crear la release `v0.4.0` en GitHub, recoger
+      el DOI y ponerlo en `CITATION.cff`, `Citation.astro` (BibTeX) y /about.
 
-## 2. Bloque F — Crecimiento y rigor (sin empezar)
-- [ ] JSON-LD acotado: `Book` + `TechArticle` en `/bok/[slug]` (pasar `jsonLd` por `Doc.astro`),
+## 2. Bloque F — Crecimiento y rigor (hecho 2026-09-20, commits d8f642a..dde6bbc)
+- [x] JSON-LD acotado: `Book` + `TechArticle` en `/bok/[slug]` (pasar `jsonLd` por `Doc.astro`),
       `Person` mínimo con `authors` de `site.ts` (sin jobTitle/worksFor), `BreadcrumbList` desde
       `chapters.ts`; `og:locale` en `Seo.astro`; `site.webmanifest`.
-- [ ] Firma sin fricción: `thesis.astro` de `blob/` a `edit/main/bok/CONTRIBUTORS.md`; Issue Form
+- [x] Firma sin fricción: `thesis.astro` de `blob/` a `edit/main/bok/CONTRIBUTORS.md`; Issue Form
       `.github/ISSUE_TEMPLATE/sign-the-thesis.yml`; extraer `SignNote.astro` y mostrarlo también en
       `/bok/index.astro`.
-- [ ] Comunidad con asks pequeños: 2-3 issues «help wanted» reales (filas internacionales
-      pendientes, términos de glosario, fuentes) y plantilla «suggest a source».
-- [ ] Compartir y citar: fila LinkedIn + copiar enlace junto a `Citation`; `CITATION.cff` y bloque
+- [x] Comunidad con asks pequeños: issues #10, #11, #12 abiertos; plantillas `sign-the-thesis`,
+      `suggest-a-source` y `config.yml` (Discussions activas).
+- [x] Compartir y citar: fila LinkedIn + copiar enlace junto a `Citation`; `CITATION.cff` y bloque
       BibTeX en `Citation.astro`; DOI si Jordi abre Zenodo.
-- [ ] RSS con contenido: un item por capítulo modificado usando `gitDate` de `lib/reading.ts`.
-- [ ] PDF v0.4.0: regenerar con `build/build_pdf.py` (ya lee la versión de `site.ts`), enlazar desde
+- [x] RSS con contenido: un item por capítulo modificado usando `gitDate` de `lib/reading.ts`.
+- [x] PDF v0.4.0: regenerar con `build/build_pdf.py` (ya lee la versión de `site.ts`), enlazar desde
       /about o /resources; hoja `@media print` mínima en `prose.css`.
-- [ ] Newsletter sin backend (formulario a Buttondown o similar) junto al RSS.
-- [ ] Thesis en español en `/es/thesis` (solo la Thesis, no el BoK).
+- [~] Newsletter sin backend (formulario a Buttondown o similar) junto al RSS.
+      Implementado pero oculto: Jordi decidió no abrir newsletter de momento (`site.newsletter.action` vacío).
+- [x] Thesis en español en `/es/thesis` (solo la Thesis, no el BoK).
 
 ## 3. Flecos de los bloques ya publicados
-- [ ] `ObligationMatrix.astro`: su mapa de ids (`resolveFwId`/`shortName`/`band`) es fijo y no
-      muestra los marcos nuevos de D1 (ISO 42006, ISO 23894, NIST nuevos, leyes estatales, «Other
-      jurisdictions»). Sí aparecen en FrameworkTable, ObligationTable y en los exports CSV/JSON.
+- [ ] Seo/hreflang: la página /es/thesis usa `lang`/`locale`/`alternates` vía Doc→Base→Seo; el
+      «Updated» de ChapterHeader sigue en inglés en /es/thesis.
+- [ ] Feed RSS: el título sigue siendo «Changelog» aunque ya lleva capítulos (título en Base.astro).
+- [x] `ObligationMatrix.astro` derivado de `frameworks.ts` (23 filas; ISO 42005 y EN 18286 quedan
+      fuera porque ninguna obligación las referencia).
 - [ ] Dogfooding (D8, sin hacer): publicar el AIBOM del sitio (CycloneDX en build),
       `/.well-known/security.txt` y un registro de evidencia JSON del build (versión, commit,
       resultados de a11y y lhci), enlazados desde /about.
@@ -50,8 +53,10 @@ Reglas de trabajo: Fable planifica, revisa figuras y verifica; subagentes `imple
 - [ ] `values-principles.svg` es una sola columna; a ≥834 px podría ir a dos columnas.
 - [ ] Un `Co-Authored-By` del commit `897e6da` lleva una dirección noreply inventada para Aurélie
       (su autoría real está en su commit `8cd50c1`). No se reescribe historia; solo constancia.
-- [ ] Ramas `worktree-agent-*` (7) y worktrees bajo `.claude/worktrees/` sin borrar del todo:
-      `git worktree prune` y `git branch -D worktree-agent-*` cuando no haya procesos de node.
+- [ ] Quedan 5 carpetas `.claude/worktrees/agent-*` de sesiones anteriores (bloqueadas por procesos
+      de node) y las ramas `worktree-agent-a1b64…`, `…aef56…` (ya fusionadas) y `…a429f…` (su delta se
+      rehízo en main): borrar tras reiniciar o cerrar los node. Truco: quitar antes la junction `site/node_modules`
+      con `cmd /c rmdir` y luego `rm -rf` de la carpeta + `git worktree prune`.
 - [ ] Capturas regeneradas en `site/tests/__screenshots__` sin commitear (decisión: no se
       commitean las de otros; si se quiere fijar la línea base nueva, regenerar y revisar).
 
