@@ -78,6 +78,29 @@ edition. Tools are named as category examples, illustrative and not endorsements
 - **US Center for AI Standards and Innovation (CAISI)** — NIST's center for AI standards, testing and
   security, formerly the US AI Safety Institute; the US government's point of contact for industry.
   `https://www.nist.gov/caisi` (verified: primary)
+- **AI Safety Governance Framework 3.0 (TC260, under CAC guidance)** — China's voluntary framework,
+  bilingual PDF; Appendix 2 is the agentic AI risk-management framework (identity, human checkpoints,
+  guardrails, memory, decommissioning). `https://www.cac.gov.cn/rootimages/uploadimg/1791137114683961/1791137114683961.pdf`
+  (verified: primary)
+- **Interim Measures for the Administration of Generative AI Services** — China's binding rule for
+  generative AI offered to the public within the PRC, in force 2023-08-15; official Chinese text.
+  `https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm` (verified: primary)
+- **Provisions on the Administration of Deep Synthesis in Internet Information Services** — labelling,
+  training-data and consent duties for deep synthesis, in force 2023-01-10; official Chinese text.
+  `https://www.cac.gov.cn/2022-12/11/c_1672221949354811.htm` (verified: primary)
+- **Provisions on the Administration of Algorithmic Recommendation in Internet Information Services** —
+  algorithm filing, security assessment and user opt-out, in force 2022-03-01; official Chinese text.
+  `https://www.cac.gov.cn/2022-01/04/c_1642894606364259.htm` (verified: primary)
+- **Measures for Labelling AI-Generated Synthetic Content** — explicit and implicit labels, in force
+  2025-09-01 alongside the mandatory standard GB 45438-2025; official Chinese text.
+  `https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm` (verified: primary)
+- **South Korea AI Basic Act** — the framework Act in force 2026-01-22, with heightened duties for
+  high-impact AI; the source chapter 08 already cites. `https://www.trade.gov/market-intelligence/south-korea-ai-basic-act`
+  (verified: secondary)
+- **Model AI Governance Framework for Generative AI (IMDA / AI Verify Foundation)** — Singapore's
+  voluntary framework (May 2024): testing, transparency, incident reporting, security and content
+  provenance. `https://aiverifyfoundation.sg/wp-content/uploads/2024/05/Model-AI-Governance-Framework-for-Generative-AI-May-2024-1-1.pdf`
+  (verified: primary)
 
 ## Frontier safety frameworks (the labs' own commitments)
 
