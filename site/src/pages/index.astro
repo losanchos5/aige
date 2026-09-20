@@ -7,7 +7,7 @@
  *
  * The body sections are built on <Section>, which supplies the tinted/mesh/dark
  * bands, the textures and the shared heads. The hero keeps its own scoped layout
- * (the governance-loop art, the panel and the proof strip) — see the <style>.
+ * (the governance-loop art and the panel) — see the <style>.
  */
 import Marketing from '../layouts/Marketing.astro';
 import Section from '../components/Section.astro';
@@ -26,7 +26,6 @@ import { site } from '../data/site';
 import { definition, values } from '../data/values';
 import { capabilityStatement, workflows, market } from '../data/role';
 import { chaptersOrdered } from '../data/chapters';
-import { layers } from '../data/stack';
 
 const seoTitle = 'AI Governance Engineer — the discipline, defined';
 const seoDesc =
@@ -89,14 +88,6 @@ const resources = [
     desc: 'Every term defined once, cross-referenced to the chapter that treats it in full.',
   },
 ];
-
-// Proof strip: only counts drawn from the typed content plus the licence — no
-// invented numbers. countup.js counts each numeric to its rendered value.
-const proof = [
-  { label: 'Layers', value: String(layers.length) },
-  { label: 'Workflows', value: String(workflows.length) },
-  { label: 'Chapters', value: String(chaptersOrdered.length) },
-];
 ---
 
 <Marketing title={seoTitle} description={seoDesc} image="/og/default.png">
@@ -106,25 +97,12 @@ const proof = [
 
     <div class="container hero-grid">
       <div class="hero-copy hero-in">
-        <p class="meta hero-eyebrow" style="--i:0">
-          <span class="meta-dot" aria-hidden="true"></span>AI governance engineering · BoK v{site.bokVersion}
-        </p>
-        <h1 class="display hero-h1" style="--i:1">Governance you can run, not just read.</h1>
-        <p class="lede" style="--i:2">{definition}</p>
-        <div class="hero-cta" style="--i:3">
+        <h1 class="display hero-h1" style="--i:0">Governance you can run, not just read.</h1>
+        <p class="lede" style="--i:1">{definition}</p>
+        <div class="hero-cta" style="--i:2">
           <a class="btn btn-primary btn-glow" href="/thesis">Read the Thesis</a>
           <a class="btn btn-secondary" href="/bok">Open the Body of Knowledge</a>
         </div>
-        <ul class="hero-layers" style="--i:4" aria-label="The five stack layers">
-          {
-            layers.map((layer) => (
-              <li class="hero-layer" style={`--tint:var(${layer.colorVar})`}>
-                <span class="hero-layer-dot" aria-hidden="true" />
-                {layer.name}
-              </li>
-            ))
-          }
-        </ul>
       </div>
 
       <div
@@ -145,25 +123,6 @@ const proof = [
           <span class="hero-attn mono">attestation #4821</span>
         </div>
       </div>
-    </div>
-
-    <div class="container proof-wrap">
-      <dl class="proof">
-        {
-          proof.map((item) => (
-            <div class="proof-item">
-              <dt class="proof-label">{item.label}</dt>
-              <dd class="proof-num" data-countup={item.value}>
-                {item.value}
-              </dd>
-            </div>
-          ))
-        }
-        <div class="proof-item">
-          <dt class="proof-label">Licence</dt>
-          <dd class="proof-num proof-license">{site.license}</dd>
-        </div>
-      </dl>
     </div>
 
     <script is:inline defer src="/hero.js"></script>
@@ -320,8 +279,8 @@ const proof = [
   }
 
   /* The hero runs on a wider well than the body sections so the diagram sits
-     next to the copy instead of bleeding to the viewport edge. Both containers
-     (the grid and the proof strip) sit above the backdrop. */
+     next to the copy instead of bleeding to the viewport edge. Its container
+     sits above the backdrop. */
   .hero--loop > .container {
     position: relative;
     z-index: 1;
@@ -342,10 +301,6 @@ const proof = [
     gap: var(--s-5);
   }
 
-  .hero-eyebrow {
-    margin: 0;
-  }
-
   .hero-h1 {
     font-size: var(--fs-display);
     max-width: 16ch;
@@ -362,46 +317,6 @@ const proof = [
     flex-wrap: wrap;
     gap: var(--s-3);
     margin-top: var(--s-2);
-  }
-
-  /* Layer chips: mono, each tinted by its layer swatch. Hidden on the narrowest
-     screens, where the copy needs the whole column. */
-  .hero-layers {
-    display: none;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  .hero-layer {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--s-2);
-    padding: 4px var(--s-3);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--ink-2);
-  }
-
-  .hero-layer-dot {
-    flex: none;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--tint);
-  }
-
-  @media (min-width: 640px) {
-    .hero-layers {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--s-2);
-      margin-top: var(--s-1);
-    }
   }
 
   /* position: relative makes .hero-art the containing block for the diagram's
@@ -534,56 +449,6 @@ const proof = [
         transform: rotate(-6deg) scale(1);
       }
     }
-  }
-
-  /* Proof strip under the hero: counts from the typed content plus the licence. */
-  .proof-wrap {
-    margin-top: var(--s-7);
-  }
-
-  .proof {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--s-5) var(--s-4);
-    margin: 0;
-    padding-top: var(--s-5);
-    border-top: 1px solid var(--line);
-  }
-
-  @media (min-width: 640px) {
-    .proof {
-      grid-template-columns: repeat(4, 1fr);
-    }
-  }
-
-  .proof-item {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
-    margin: 0;
-  }
-
-  .proof-label {
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .proof-num {
-    margin: 0;
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: var(--fs-h2);
-    line-height: 1;
-    letter-spacing: var(--tracking-display);
-    font-variant-numeric: tabular-nums;
-    color: var(--ink);
-  }
-
-  .proof-license {
-    font-size: var(--fs-h3);
   }
 
   /* Stack story: the static mark and its caption pin on the left; the

@@ -102,6 +102,12 @@ const project = [
     pointer-events: none;
   }
 
+  /* Query container for the wordmark below: its font-size is sized in cqw so
+     the whole name always fits this wrapper (max 1200px) at every viewport. */
+  .container {
+    container-type: inline-size;
+  }
+
   .cols {
     display: grid;
     gap: var(--s-6);
@@ -168,13 +174,15 @@ const project = [
   }
 
   /* Big display wordmark as a faint watermark closing the footer. aria-hidden
-     and decorative, so its low-contrast ink is out of the a11y tree; clipped
-     (overflow:hidden + nowrap) so a long name never forces horizontal scroll. */
+     and decorative, so its low-contrast ink is out of the a11y tree. Sized in
+     container-query units against .container so the whole name always fits its
+     width (was clipped on the right at 1440); overflow:hidden + nowrap stay as
+     a safety net. */
   .foot-wordmark {
     margin: var(--s-6) 0 0;
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: clamp(2.5rem, 8vw, 7rem);
+    font-size: clamp(1.75rem, 5.6cqw, 5.5rem);
     line-height: 1;
     letter-spacing: var(--tracking-display);
     color: color-mix(in srgb, var(--ink) 10%, var(--bg));
