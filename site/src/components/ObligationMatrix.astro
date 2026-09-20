@@ -27,15 +27,25 @@ const layers: StackLayer[] = [1, 2, 3, 4, 5];
 const layerNames = ['Govern', 'Inventory', 'Evals', 'Runtime', 'Assurance'];
 const pad = (n: number) => String(n).padStart(2, '0');
 
-// Resolve an obligation to a single catalogue framework id. The plain groups
-// map straight through; the compound groups split on a marker in the obligation.
+// Resolve an obligation to a single catalogue framework id. The obligations data
+// keys rows by a group name (a legacy alias, e.g. "EU AI Act" or "US state AI
+// laws"), never by the framework id, and several groups fan out to more than one
+// catalogue framework — so this join is still needed. Plain groups map straight
+// through; compound groups split on a marker in the obligation text.
 function resolveFwId(o: Obligation): string {
   const f = o.framework;
   const t = o.obligation;
   if (f === 'EU AI Act') return 'eu-ai-act';
   if (f === 'GPAI Code of Practice') return 'gpai-code-of-practice';
   if (f === 'ISO/IEC 42001') return 'iso-42001';
+  if (f === 'ISO/IEC 42006') return 'iso-42006';
+  if (f === 'ISO/IEC 23894') return 'iso-23894';
   if (f === 'NIST AI RMF') return 'nist-ai-rmf';
+  if (f === 'NIST (agent, cyber and misuse work)') {
+    if (/agent standards/i.test(t)) return 'nist-ai-agent-standards';
+    if (/8596/.test(t)) return 'nist-ir-8596';
+    return 'nist-ai-800-1';
+  }
   if (f === 'CSA AICM / STAR for AI')
     return /star/i.test(t) ? 'csa-star-for-ai' : 'csa-aicm';
   if (f === 'OWASP GenAI Security Project') {
@@ -47,41 +57,63 @@ function resolveFwId(o: Obligation): string {
   }
   if (f === 'US frontier-developer laws')
     return /raise/i.test(t) ? 'ny-raise-act' : 'ca-sb-53';
+  if (f === 'US state AI laws')
+    return /texas|traiga/i.test(t) ? 'tx-traiga' : 'co-ai-act';
+  if (f === 'Other jurisdictions') {
+    if (/korea/i.test(t)) return 'kr-ai-basic-act';
+    if (/singapore|imda/i.test(t)) return 'sg-genai-framework';
+    if (/etsi|304 223/i.test(t)) return 'etsi-en-304-223';
+    return 'uk-duaa';
+  }
   return f;
 }
 
-// Short row label and family band for each catalogue framework id.
-const shortName: Record<string, string> = {
-  'eu-ai-act': 'EU AI Act',
-  'gpai-code-of-practice': 'GPAI Code',
-  'iso-42001': 'ISO 42001',
-  'nist-ai-rmf': 'NIST AI RMF',
-  'csa-aicm': 'CSA AICM',
-  'csa-star-for-ai': 'CSA STAR',
-  'owasp-agentic-top-10': 'OWASP Agentic',
-  'owasp-llm-top-10': 'OWASP LLM',
-  'owasp-acs': 'OWASP ACS',
-  'owasp-aibom': 'OWASP AIBOM',
-  'ca-sb-53': 'California SB 53',
-  'ny-raise-act': 'New York RAISE',
-};
-const band: Record<string, string> = {
-  'eu-ai-act': 'EU AI Act',
-  'gpai-code-of-practice': 'Codes',
-  'iso-42001': 'Standards',
-  'nist-ai-rmf': 'Frameworks',
-  'csa-aicm': 'CSA',
-  'csa-star-for-ai': 'CSA',
-  'owasp-agentic-top-10': 'OWASP',
-  'owasp-llm-top-10': 'OWASP',
-  'owasp-acs': 'OWASP',
-  'owasp-aibom': 'OWASP',
-  'ca-sb-53': 'US frontier laws',
-  'ny-raise-act': 'US frontier laws',
+// Row grouping + order, derived from the framework's issuer (a real field on the
+// data), not a per-id table: frameworks from the same body/jurisdiction share a
+// band, so any framework added to frameworks.ts joins its band automatically. The
+// band string is never rendered — it only sets the row order and where the family
+// separator rule falls. Old frameworks keep the exact grouping and order they had
+// (EU AI Act · GPAI · ISO · NIST · CSA · OWASP · US frontier laws); the newer ones
+// slot in behind their family and, for the trailing jurisdictions, in the order
+// EU → standards → US federal → US state → UK → Asia-Pacific → other.
+const BAND_ORDER = [
+  'EU AI Act',
+  'Codes',
+  'Standards',
+  'Frameworks',
+  'CSA',
+  'OWASP',
+  'US frontier laws',
+  'US state laws',
+  'UK',
+  'Asia-Pacific',
+  'Other',
+];
+
+function bandOf(fw: Framework): string {
+  const issuer = fw.issuer;
+  if (issuer === 'European Union') return 'EU AI Act';
+  if (issuer === 'European Commission') return 'Codes';
+  if (issuer === 'ISO/IEC') return 'Standards';
+  if (issuer.startsWith('NIST')) return 'Frameworks';
+  if (issuer === 'Cloud Security Alliance') return 'CSA';
+  if (issuer === 'OWASP GenAI Security Project') return 'OWASP';
+  if (issuer === 'State of California' || issuer === 'State of New York')
+    return 'US frontier laws';
+  if (issuer.startsWith('State of')) return 'US state laws';
+  if (issuer === 'United Kingdom') return 'UK';
+  if (issuer === 'Republic of Korea' || issuer.startsWith('IMDA'))
+    return 'Asia-Pacific';
+  return 'Other'; // ETSI, CEN-CENELEC and any future body without its own band
+}
+
+const bandRank = (b: string) => {
+  const i = BAND_ORDER.indexOf(b);
+  return i === -1 ? BAND_ORDER.length : i;
 };
 
-// Rows: catalogue frameworks that carry at least one obligation, in catalogue
-// order. Each row is a full name (for the status line) plus its five counts.
+// Tally obligations per catalogue framework id, and build the by-text index the
+// client uses to join the grid to the table rows.
 const counts = new Map<string, number[]>();
 const index: { t: string; f: string; l: number[] }[] = [];
 for (const o of obligations) {
@@ -92,16 +124,26 @@ for (const o of obligations) {
   index.push({ t: o.obligation, f: id, l: [...o.layerN] });
 }
 
-const fwName = new Map(frameworks.map((fw) => [fw.id, fw.name] as const));
+// Inclusion rule (unchanged): a framework gets a row iff at least one obligation
+// resolves to it. Frameworks that carry no obligation row (currently ISO/IEC
+// 42005 and EN 18286) are omitted — the grid has no empty-row or "n/a"
+// affordance, so this is deliberate, not an oversight. Rows come straight from
+// frameworks.ts (single source of truth): name and short label from the data,
+// band from the issuer, ordered by band then by declaration order within a band.
+const fwOrder = new Map(frameworks.map((fw, i) => [fw.id, i] as const));
 const rows = frameworks
   .filter((fw) => counts.has(fw.id))
   .map((fw) => ({
     id: fw.id,
-    name: fwName.get(fw.id) ?? fw.id,
-    short: shortName[fw.id] ?? fw.name,
-    band: band[fw.id] ?? '',
+    name: fw.name,
+    short: fw.short,
+    band: bandOf(fw),
     cells: counts.get(fw.id)!,
-  }));
+  }))
+  .sort((a, b) => {
+    const d = bandRank(a.band) - bandRank(b.band);
+    return d !== 0 ? d : fwOrder.get(a.id)! - fwOrder.get(b.id)!;
+  });
 
 const max = Math.max(1, ...rows.flatMap((r) => r.cells));
 // Opacity percentage for a cell fill: 0 stays empty, anything ≥1 reads clearly.
