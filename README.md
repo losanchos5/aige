@@ -1,6 +1,6 @@
 # AI Governance Engineering: The Thesis & Body of Knowledge
 
-[![DOI](https://zenodo.org/badge/1370408745.svg)](https://doi.org/10.5281/zenodo.22857084)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22857084.svg)](https://doi.org/10.5281/zenodo.22857084)
 
 **AI governance engineering is the application of engineering practice — systems thinking, product
 thinking and code — to the governance of AI systems.**
