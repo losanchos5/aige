@@ -38,6 +38,8 @@ content; a figure never adds facts, numbers, dates or vendors that the chapter d
 9. **Tokens, not colours.** No hard-coded hex in infographics: `currentColor`, `var(--fg)`,
    `var(--muted)`, `var(--l1)`…; fonts `var(--font-body)` and `var(--font-mono)` for identifiers.
    Never dim text with opacity (the contrast gate fails). Both themes must read well.
+   Figures stay flat: shadows and gradients on the site come only through the
+   `effects.css` tokens (page chrome), never baked into a figure.
 10. **Accessibility.** `role="img"` with `aria-labelledby` pointing at an SVG `<title>` and
     `<desc>`; a visible or `<details>` text alternative that lets a screen-reader user answer the
     same question the figure answers. Minimum rendered text size 12 px at 390 px width.

@@ -32,11 +32,16 @@
   }
 
   function initReveal() {
+    // Modern browsers drive the reveal off the scroll position in CSS
+    // (animation-timeline: view()); leave those alone.
+    try {
+      if (window.CSS && CSS.supports && CSS.supports('animation-timeline: view()')) return;
+    } catch (e) {}
     var reduce = false;
     try {
       reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch (e) {}
-    var items = document.querySelectorAll('.reveal');
+    var items = document.querySelectorAll('.reveal, .reveal-stagger > *');
     if (reduce || !('IntersectionObserver' in window) || !items.length) return;
     document.documentElement.classList.add('js-reveal');
     var io = new IntersectionObserver(
@@ -53,6 +58,28 @@
     items.forEach(function (el) {
       io.observe(el);
     });
+  }
+
+  function initHeader() {
+    var header = document.querySelector('.site-header');
+    if (!header) return;
+    var scrolled = false;
+    var ticking = false;
+    function apply() {
+      ticking = false;
+      var next = window.scrollY > 8;
+      if (next === scrolled) return;
+      scrolled = next;
+      header.classList.toggle('is-scrolled', scrolled);
+    }
+    function onScroll() {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(apply);
+      }
+    }
+    apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
   }
 
   function initMenu() {
@@ -74,6 +101,7 @@
     initTheme();
     initReveal();
     initMenu();
+    initHeader();
   }
 
   if (document.readyState === 'loading') {

@@ -88,22 +88,57 @@
 }
 
 /* Reveal-on-scroll. Content is visible by default so no-JS and reduced-motion
-   users always see it; ui.js opts in by adding `js-reveal` to <html> only when
-   motion is allowed, and toggles `is-visible` as elements enter the viewport. */
-:root.js-reveal .reveal {
-  opacity: 0;
-  transform: translateY(8px);
-  transition:
-    opacity var(--dur) var(--ease),
-    transform var(--dur) var(--ease);
+   users always see it. Modern browsers drive the reveal off the scroll position
+   (animation-timeline: view()); older ones fall back to ui.js, which adds
+   `js-reveal` to <html> only when motion is allowed and toggles `is-visible` as
+   elements enter the viewport. `.reveal-stagger > *` cascades by --i in both
+   paths. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal,
+    .reveal-stagger > * {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 5% entry 35%;
+    }
+    /* Stagger: nudge each item's range down the timeline by its index. */
+    .reveal-stagger > * {
+      animation-range: entry calc(5% + var(--i, 0) * 6%) entry calc(35% + var(--i, 0) * 6%);
+    }
+    /* Transform only: a scroll-driven opacity ramp leaves elements that
+       straddle the fold at fractional opacity, which axe/Lighthouse blend
+       into the contrast ratio. Translate is invisible to contrast checks. */
+    @keyframes reveal-in {
+      from {
+        transform: translateY(16px);
+      }
+      to {
+        transform: none;
+      }
+    }
+  }
 }
-:root.js-reveal .reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
-@media (prefers-reduced-motion: reduce) {
-  :root.js-reveal .reveal {
+
+@supports not (animation-timeline: view()) {
+  :root.js-reveal .reveal,
+  :root.js-reveal .reveal-stagger > * {
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+    transition-delay: calc(var(--i, 0) * 60ms);
+  }
+  :root.js-reveal .reveal.is-visible,
+  :root.js-reveal .reveal-stagger > *.is-visible {
     opacity: 1;
     transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :root.js-reveal .reveal,
+    :root.js-reveal .reveal-stagger > * {
+      opacity: 1;
+      transform: none;
+    }
   }
 }

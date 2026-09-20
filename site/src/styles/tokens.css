@@ -65,6 +65,24 @@
   --tracking-display: -0.02em;
   --tracking-label: 0.1em;
   --leading-display: 1.05;
+
+  /* Depth & effects (Editorial+; consumed by effects.css). Light: soft pastel
+     glows from the layer fills, faint ink shadows, ink-derived textures. */
+  --glow-1: color-mix(in srgb, var(--l1) 85%, transparent);
+  --glow-2: color-mix(in srgb, var(--l2) 85%, transparent);
+  --glow-3: color-mix(in srgb, var(--l3) 85%, transparent);
+  --glow-4: color-mix(in srgb, var(--l4) 85%, transparent);
+  --glow-5: color-mix(in srgb, var(--l5) 85%, transparent);
+  --mesh-alpha: 1;
+  --texture-alpha: 1;
+  --shadow-1: 0 1px 2px rgb(21 23 28 / 0.05), 0 2px 8px rgb(21 23 28 / 0.06);
+  --shadow-2: 0 2px 6px rgb(21 23 28 / 0.06), 0 10px 28px rgb(21 23 28 / 0.09);
+  --shadow-3: 0 6px 16px rgb(21 23 28 / 0.08), 0 22px 56px rgb(21 23 28 / 0.13);
+  --grad-border: linear-gradient(135deg, var(--l1), var(--l3), var(--l4));
+  --grad-cta: linear-gradient(135deg, var(--l1-ink), var(--ink));
+  --tint-bg: color-mix(in srgb, var(--l1) 18%, var(--bg));
+  --band-bg: #15171c;
+  --tex-line: color-mix(in srgb, var(--ink) 9%, transparent);
 }
 
 /* Dark, explicit toggle */
@@ -86,6 +104,29 @@
   --l4-ink: #F1DAB4;
   --l5: color-mix(in srgb, #2E4A22 45%, #121417);
   --l5-ink: #D1E4BC;
+
+  /* Depth & effects (dark): glows come from the layer inks (the bright pastels
+     in dark), shadows go opaque-black, textures dim. */
+  --glow-1: color-mix(in srgb, var(--l1-ink) 38%, transparent);
+  --glow-2: color-mix(in srgb, var(--l2-ink) 38%, transparent);
+  --glow-3: color-mix(in srgb, var(--l3-ink) 38%, transparent);
+  --glow-4: color-mix(in srgb, var(--l4-ink) 38%, transparent);
+  --glow-5: color-mix(in srgb, var(--l5-ink) 38%, transparent);
+  --mesh-alpha: 0.55;
+  --texture-alpha: 0.5;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.5);
+  --shadow-2: 0 2px 6px rgb(0 0 0 / 0.55), 0 10px 28px rgb(0 0 0 / 0.6);
+  --shadow-3: 0 6px 16px rgb(0 0 0 / 0.6), 0 22px 56px rgb(0 0 0 / 0.7);
+  --grad-border: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--l1-ink) 45%, transparent),
+    color-mix(in srgb, var(--l3-ink) 45%, transparent),
+    color-mix(in srgb, var(--l4-ink) 45%, transparent)
+  );
+  --grad-cta: linear-gradient(135deg, var(--l1-ink), var(--ink));
+  --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
+  --band-bg: #0b0d10;
+  --tex-line: color-mix(in srgb, var(--ink) 8%, transparent);
 }
 
 /* Dark, system preference (unless explicitly forced light) */
@@ -108,5 +149,27 @@
     --l4-ink: #F1DAB4;
     --l5: color-mix(in srgb, #2E4A22 45%, #121417);
     --l5-ink: #D1E4BC;
+
+    /* Depth & effects (dark): mirror the [data-theme='dark'] block. */
+    --glow-1: color-mix(in srgb, var(--l1-ink) 38%, transparent);
+    --glow-2: color-mix(in srgb, var(--l2-ink) 38%, transparent);
+    --glow-3: color-mix(in srgb, var(--l3-ink) 38%, transparent);
+    --glow-4: color-mix(in srgb, var(--l4-ink) 38%, transparent);
+    --glow-5: color-mix(in srgb, var(--l5-ink) 38%, transparent);
+    --mesh-alpha: 0.55;
+    --texture-alpha: 0.5;
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.5);
+    --shadow-2: 0 2px 6px rgb(0 0 0 / 0.55), 0 10px 28px rgb(0 0 0 / 0.6);
+    --shadow-3: 0 6px 16px rgb(0 0 0 / 0.6), 0 22px 56px rgb(0 0 0 / 0.7);
+    --grad-border: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--l1-ink) 45%, transparent),
+      color-mix(in srgb, var(--l3-ink) 45%, transparent),
+      color-mix(in srgb, var(--l4-ink) 45%, transparent)
+    );
+    --grad-cta: linear-gradient(135deg, var(--l1-ink), var(--ink));
+    --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
+    --band-bg: #0b0d10;
+    --tex-line: color-mix(in srgb, var(--ink) 8%, transparent);
   }
 }

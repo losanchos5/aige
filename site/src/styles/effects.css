@@ -1,0 +1,386 @@
+/* effects.css: the Editorial+ depth layer. Every value comes from a token in
+   tokens.css so light and dark both follow, and every decorative surface is
+   inert (aria-hidden in markup, pointer-events:none here). No `filter: blur()`
+   anywhere — the mesh reads soft because its gradient stops are soft, and it
+   only drifts via translate/scale under prefers-reduced-motion: no-preference.
+   Imported after utilities.css so it can layer on the flat base. */
+
+/* ---------------------------------------------------------------- Backgrounds */
+
+/* Gradient mesh: five soft radial glows split across two pseudo-elements that
+   drift slowly. Absolute, contained and inert; the host clips the overflow. */
+.bg-mesh {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  contain: strict;
+  opacity: var(--mesh-alpha);
+  pointer-events: none;
+}
+
+.bg-mesh::before,
+.bg-mesh::after {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  background-repeat: no-repeat;
+}
+
+.bg-mesh::before {
+  background-image:
+    radial-gradient(40% 50% at 15% 20%, var(--glow-1), transparent 70%),
+    radial-gradient(45% 55% at 82% 15%, var(--glow-3), transparent 70%),
+    radial-gradient(52% 52% at 58% 88%, var(--glow-5), transparent 72%);
+}
+
+.bg-mesh::after {
+  background-image:
+    radial-gradient(42% 46% at 86% 68%, var(--glow-4), transparent 70%),
+    radial-gradient(46% 50% at 22% 82%, var(--glow-2), transparent 72%);
+}
+
+/* Dot and line textures. Sized in px per the plan; faded at the edges by
+   .bg-fade. Both are inert overlays behind the section's content. */
+.bg-dots,
+.bg-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: var(--texture-alpha);
+  pointer-events: none;
+}
+
+.bg-dots {
+  background-image: radial-gradient(var(--tex-line) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(to right, var(--tex-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--tex-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* Radial mask so a texture fades out toward the edges instead of hard-cropping. */
+.bg-fade {
+  -webkit-mask-image: radial-gradient(100% 80% at 50% 40%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(100% 80% at 50% 40%, #000 55%, transparent 100%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bg-mesh::before {
+    animation: mesh-drift-a 34s ease-in-out infinite alternate;
+  }
+  .bg-mesh::after {
+    animation: mesh-drift-b 42s ease-in-out infinite alternate;
+  }
+
+  @keyframes mesh-drift-a {
+    from {
+      translate: -2% -1%;
+      scale: 1;
+    }
+    to {
+      translate: 2% 1%;
+      scale: 1.06;
+    }
+  }
+
+  @keyframes mesh-drift-b {
+    from {
+      translate: 1% 2%;
+      scale: 1.04;
+    }
+    to {
+      translate: -1% -2%;
+      scale: 1;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------- Cards */
+
+/* Luminous card: a 1px line at rest with a soft shadow; a gradient border ring
+   fades in on hover/focus-within. isolation keeps the ring's stacking local. */
+.card-lum {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  transition:
+    box-shadow var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.card-lum::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--grad-border);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+  pointer-events: none;
+}
+
+.card-lum:hover::before,
+.card-lum:focus-within::before {
+  opacity: 1;
+}
+
+/* Hover lift, motion only. Pairs with .card-lum to deepen the shadow. */
+@media (prefers-reduced-motion: no-preference) {
+  .lift {
+    transition:
+      transform var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+  .lift:hover {
+    transform: translateY(-3px);
+  }
+  .card-lum.lift:hover {
+    box-shadow: var(--shadow-2);
+  }
+}
+
+/* --------------------------------------------------------------------- Button */
+
+/* Glowing CTA: composes with .btn/.btn-primary. Gradient fill + soft glow;
+   the label keeps --bg over the ink-derived gradient (same as .btn-primary). */
+.btn-glow {
+  background: var(--grad-cta);
+  border-color: transparent;
+  color: var(--bg);
+  box-shadow: 0 2px 12px var(--glow-1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn-glow:hover {
+    background: var(--grad-cta);
+    border-color: transparent;
+    box-shadow: 0 8px 24px var(--glow-1);
+    transform: translateY(-1px);
+  }
+}
+
+/* ---------------------------------------------------------------------- Meta */
+
+/* Mono uppercase status label with a small layer-ink dot. */
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  line-height: 1;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.meta-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--l5-ink);
+}
+
+/* ------------------------------------------------------------- Section heads */
+/* Copied from index.astro so every page shares them; block C removes the
+   originals from index.astro's scoped <style>. Kept as global rules. */
+.sec-head {
+  max-width: 62ch;
+  margin-bottom: var(--s-6);
+}
+
+.sec-title {
+  font-size: var(--fs-h2);
+  max-width: 22ch;
+  margin: var(--s-3) 0 0;
+}
+
+.sec-lede {
+  margin-top: var(--s-4);
+}
+
+.sec-link {
+  margin-top: var(--s-6);
+}
+
+.sec-link a {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.sec-link a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.sec-link-sep {
+  margin: 0 var(--s-3);
+  color: var(--muted);
+}
+
+/* Head modifiers. --rule lets the kicker's hairline span the full width;
+   --xl bumps the title to the H1 scale for anchor sections. */
+.sec-head--rule {
+  max-width: none;
+}
+
+.sec-head--xl .sec-title {
+  font-size: var(--fs-h1);
+  max-width: 18ch;
+}
+
+/* --------------------------------------------------------------------- Bento */
+
+/* Editorial bento grid: one column on phones, two by 600, four by 960.
+   .bento-2x doubles the column span; .bento-2y doubles the row span. */
+.bento {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s-5);
+}
+
+@media (min-width: 600px) {
+  .bento {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bento-2x {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 960px) {
+  .bento {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .bento-2x {
+    grid-column: span 2;
+  }
+  .bento-2y {
+    grid-row: span 2;
+  }
+}
+
+/* --------------------------------------------------------------------- Story */
+
+/* Sticky-scroll story: two columns from 1024, the left pinned below the header.
+   No ancestor of .story-pin may carry .reveal or a transform (it would break
+   position: sticky). story.js sets [data-story][data-active] as rows enter. */
+.story {
+  display: grid;
+  gap: var(--s-6);
+}
+
+@media (min-width: 1024px) {
+  .story {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-7);
+    align-items: start;
+  }
+  .story-pin {
+    position: sticky;
+    top: calc(var(--anchor-offset) + var(--s-5));
+  }
+}
+
+/* ------------------------------------------------------ Section tones (Section.astro) */
+
+/* Every Section is a positioning context; its background layers sit at z-index
+   0 and the content wrapper at 1. --sec-bg tells the Marketing register rule
+   what colour to notch its number against. */
+.sec {
+  position: relative;
+}
+
+.sec-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.sec-inner--wide {
+  max-width: 1360px;
+}
+
+.sec--plain {
+  --sec-bg: var(--bg);
+}
+
+.sec--mesh {
+  --sec-bg: var(--bg);
+}
+
+.sec--tint {
+  background: var(--tint-bg);
+  --sec-bg: var(--tint-bg);
+  /* Muted text drops below AA on the tint (as on .sec--dark): re-scope it.
+     Lives here, not in pages.css, so the home page gets it too. */
+  --muted: var(--ink-2);
+}
+
+/* Dark band. Re-scopes the full dark token set (surfaces, ink, lines, the five
+   layers and their inks, plus the effect tokens) so children render with the
+   already-audited dark contrast regardless of the page's own theme. The band
+   itself follows --band-bg (deep slate on light pages, near-black on dark). */
+.sec--dark {
+  background: var(--band-bg);
+  color: var(--ink);
+  --sec-bg: var(--band-bg);
+
+  --bg: #121417;
+  --surface: rgba(255, 255, 255, 0.04);
+  --line: #2a2d33;
+  --ink: #eceae3;
+  --ink-2: #c5c3bc;
+  --muted: #8e9199;
+
+  --l1: color-mix(in srgb, #1f3a63 45%, #121417);
+  --l1-ink: #cbd8f0;
+  --l2: color-mix(in srgb, #25463f 45%, #121417);
+  --l2-ink: #cfdcd3;
+  --l3: color-mix(in srgb, #5c2b3b 45%, #121417);
+  --l3-ink: #edd4d8;
+  --l4: color-mix(in srgb, #5a3d15 45%, #121417);
+  --l4-ink: #f1dab4;
+  --l5: color-mix(in srgb, #2e4a22 45%, #121417);
+  --l5-ink: #d1e4bc;
+
+  --glow-1: color-mix(in srgb, var(--l1-ink) 38%, transparent);
+  --glow-2: color-mix(in srgb, var(--l2-ink) 38%, transparent);
+  --glow-3: color-mix(in srgb, var(--l3-ink) 38%, transparent);
+  --glow-4: color-mix(in srgb, var(--l4-ink) 38%, transparent);
+  --glow-5: color-mix(in srgb, var(--l5-ink) 38%, transparent);
+  --mesh-alpha: 0.55;
+  --texture-alpha: 0.5;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.5);
+  --shadow-2: 0 2px 6px rgb(0 0 0 / 0.55), 0 10px 28px rgb(0 0 0 / 0.6);
+  --shadow-3: 0 6px 16px rgb(0 0 0 / 0.6), 0 22px 56px rgb(0 0 0 / 0.7);
+  --grad-border: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--l1-ink) 45%, transparent),
+    color-mix(in srgb, var(--l3-ink) 45%, transparent),
+    color-mix(in srgb, var(--l4-ink) 45%, transparent)
+  );
+  --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
+  --tex-line: color-mix(in srgb, var(--ink) 8%, transparent);
+}
