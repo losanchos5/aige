@@ -1,6 +1,9 @@
 ---
 // Citation: a "Cite this chapter" disclosure with a ready-to-copy APA-ish
-// reference. The copy button is wired by ui-doc.js (CSP-safe, no inline JS).
+// reference and a BibTeX entry, plus a small share row (LinkedIn + copy link).
+// The copy buttons are wired by ui-doc.js (CSP-safe, no inline JS); the share
+// link and copy button work without it (the copy button is a harmless no-op if
+// the clipboard API is unavailable).
 import { site } from '../data/site';
 
 interface Props {
@@ -12,19 +15,44 @@ const { title, slug } = Astro.props;
 const cleanTitle = title.replace(/^\d+\.\s*/, '');
 const url = `${site.url}/bok/${slug}`;
 const reference = `García Aibar, J., & Pols, A. (2026). ${cleanTitle}. In AI Governance Engineering: The Thesis & Body of Knowledge (v${site.bokVersion}). ${url}. ${site.license}`;
+
+// BibTeX for the whole work; the chapter and its canonical URL identify the page
+// being cited. The literal backslash escapes the ampersand for BibTeX.
+const bibtex = `@misc{aige2026bok,
+  author  = {${site.authors.join(' and ')}},
+  title   = {{AI Governance Engineering: The Thesis \\& Body of Knowledge}},
+  chapter = {${cleanTitle}},
+  year    = {2026},
+  version = {${site.bokVersion}},
+  url     = {${url}},
+  note    = {Version ${site.bokVersion}}
+}`;
+
+const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
 ---
 
-<details class="cite-box">
-  <summary>Cite this chapter</summary>
-  <div class="cite-body">
-    <p class="cite-apa" data-cite-text>
-      García Aibar, J., &amp; Pols, A. (2026). <em>{cleanTitle}</em>. In <em>AI Governance
-      Engineering: The Thesis &amp; Body of Knowledge</em> (v{site.bokVersion}).{' '}
-      {url}. {site.license}
-    </p>
-    <button type="button" class="cite-copy" data-copy-cite={reference}>Copy</button>
+<div class="cite-wrap">
+  <details class="cite-box">
+    <summary>Cite this chapter</summary>
+    <div class="cite-body">
+      <p class="cite-apa" data-cite-text>
+        García Aibar, J., &amp; Pols, A. (2026). <em>{cleanTitle}</em>. In <em>AI Governance
+        Engineering: The Thesis &amp; Body of Knowledge</em> (v{site.bokVersion}).{' '}
+        {url}. {site.license}
+      </p>
+      <button type="button" class="cite-copy" data-copy-cite={reference}>Copy</button>
+
+      <p class="cite-label">BibTeX</p>
+      <pre class="cite-bibtex"><code>{bibtex}</code></pre>
+      <button type="button" class="cite-copy bibtex-copy" data-copy-cite={bibtex}>Copy BibTeX</button>
+    </div>
+  </details>
+
+  <div class="share-row">
+    <a class="share-link" href={linkedInUrl} target="_blank" rel="noopener">Share on LinkedIn</a>
+    <button type="button" class="share-copy" data-copy-cite={url}>Copy link</button>
   </div>
-</details>
+</div>
 
 <style>
   .cite-box {
@@ -68,6 +96,33 @@ const reference = `García Aibar, J., & Pols, A. (2026). ${cleanTitle}. In AI Go
     line-height: 1.5;
   }
 
+  .cite-label {
+    margin-top: var(--s-4);
+    margin-bottom: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .cite-bibtex {
+    margin: var(--s-2) 0 0;
+    padding: var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .cite-bibtex code {
+    font-family: inherit;
+  }
+
   .cite-copy {
     margin-top: var(--s-3);
     padding: var(--s-1) var(--s-4);
@@ -83,5 +138,42 @@ const reference = `García Aibar, J., & Pols, A. (2026). ${cleanTitle}. In AI Go
 
   .cite-copy:hover {
     border-color: var(--ink-2);
+  }
+
+  .share-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+  }
+
+  .share-link,
+  .share-copy {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: var(--s-1) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color var(--dur) var(--ease);
+  }
+
+  .share-link:hover,
+  .share-copy:hover {
+    border-color: var(--ink-2);
+  }
+
+  .cite-copy:focus-visible,
+  .share-link:focus-visible,
+  .share-copy:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
   }
 </style>

@@ -1,0 +1,48 @@
+name: Suggest a source
+description: Suggest a source (regulation, standard, paper, report or tool) for the Body of Knowledge.
+title: "[Source] "
+labels: ["source"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Sources anchor every claim in the book. See `STYLEGUIDE.md` §6 for the citation format and
+        the `primary` / `secondary` / `reported` verification tags. Accepted sources are added to the
+        relevant chapter and to `sources/SOURCES.md`.
+  - type: input
+    id: url
+    attributes:
+      label: URL
+      description: A link to the source.
+    validations:
+      required: true
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      description: The title of the source, as it should appear in the reading list or sources table.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it belongs
+      description: What this source adds that the book does not already cover.
+    validations:
+      required: true
+  - type: input
+    id: chapter
+    attributes:
+      label: Which chapter / section
+      description: The chapter or section it supports (e.g. "08 regulatory map", "10 reading list").
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Primary or secondary source
+      options:
+        - Primary — the official text, standard, report, or the vendor's own release
+        - Secondary — a reputable outlet reporting a primary fact
+    validations:
+      required: true

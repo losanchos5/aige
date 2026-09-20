@@ -2,6 +2,7 @@
 import { getEntry, render } from 'astro:content';
 import Doc from '../layouts/Doc.astro';
 import Diagram from '../components/Diagram.astro';
+import SignNote from '../components/SignNote.astro';
 import { site } from '../data/site';
 import { gitDate } from '../lib/reading';
 
@@ -17,7 +18,8 @@ const summary =
   'Governance as a system to be built, run and measured — not a document to be signed.';
 const editPath = 'THESIS.md';
 const updated = gitDate('../THESIS.md');
-const signUrl = `${site.github}/blob/main/bok/CONTRIBUTORS.md`;
+const signUrl = `${site.github}/edit/main/bok/CONTRIBUTORS.md`;
+const issueUrl = `${site.github}/issues/new?template=sign-the-thesis.yml`;
 ---
 
 <Doc
@@ -32,32 +34,7 @@ const signUrl = `${site.github}/blob/main/bok/CONTRIBUTORS.md`;
   activeThesis={true}
   image="/og/thesis.png"
 >
-  <aside class="sign-note">
-    <p>
-      This is a living document. <a href={signUrl} target="_blank" rel="noopener noreferrer">Sign
-      it</a> by adding your name in a pull request to <code>bok/CONTRIBUTORS.md</code>.
-    </p>
-  </aside>
+  <SignNote signUrl={signUrl} issueUrl={issueUrl} />
   <Diagram id="aige-in-the-org" />
   <Content />
 </Doc>
-
-<style>
-  .sign-note {
-    margin-bottom: var(--s-5);
-    padding: var(--s-3) var(--s-4);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: color-mix(in srgb, var(--l5) 40%, var(--bg));
-    font-size: 0.9375rem;
-  }
-
-  .sign-note p {
-    color: var(--ink-2);
-  }
-
-  .sign-note a {
-    color: var(--ink);
-    font-weight: 600;
-  }
-</style>

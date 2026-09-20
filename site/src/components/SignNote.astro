@@ -1,0 +1,48 @@
+---
+/**
+ * SignNote — the "sign the thesis" aside. Two ways to sign: a one-click edit of
+ * bok/CONTRIBUTORS.md (GitHub opens a fork and its editor in a single click), or
+ * a short issue form for people who would rather not open a pull request.
+ */
+interface Props {
+  signUrl: string;
+  issueUrl: string;
+  class?: string;
+}
+
+const { signUrl, issueUrl, class: className } = Astro.props;
+---
+
+<aside class:list={['sign-note', className]}>
+  <p>
+    This is a living document. <a href={signUrl} target="_blank" rel="noopener noreferrer">Sign
+    it</a> by adding your name in a pull request to <code>bok/CONTRIBUTORS.md</code>, or
+    <a href={issueUrl} target="_blank" rel="noopener noreferrer">use the sign-the-thesis form</a>
+    if you would rather not open a pull request.
+  </p>
+</aside>
+
+<style>
+  .sign-note {
+    margin-bottom: var(--s-5);
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: color-mix(in srgb, var(--l5) 40%, var(--bg));
+    font-size: 0.9375rem;
+  }
+
+  .sign-note p {
+    color: var(--ink-2);
+  }
+
+  .sign-note a {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .sign-note a:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+</style>
