@@ -8,16 +8,7 @@
 import type { APIRoute } from 'astro';
 import { obligations } from '../../data/frameworks';
 import { site } from '../../data/site';
-
-/** RFC 4180: quote a field that contains a comma, quote or newline, doubling
- *  any embedded quote. */
-function csvField(value: string): string {
-  const needsQuote = /[",\r\n]/.test(value);
-  const escaped = value.replace(/"/g, '""');
-  return needsQuote ? `"${escaped}"` : escaped;
-}
-
-const csvRow = (cells: readonly string[]) => cells.map(csvField).join(',');
+import { csvRow } from '../../lib/csv';
 
 export const GET: APIRoute = () => {
   const notice = `Illustrative mapping from the AI Governance Engineer Body of Knowledge v${site.bokVersion} — not a claim of conformity`;

@@ -723,3 +723,49 @@
   color: var(--ink);
   border-color: var(--ink-2);
 }
+
+/* ---- Cross-references + data exports (frameworks + crosswalk) ------------- */
+/* Shared by /resources/frameworks and /resources/crosswalk: the "Cross-reference"
+   line and the CSV/JSON download buttons under a section head. */
+.ob-xref {
+  margin-top: var(--s-3);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.ob-xref a {
+  color: var(--ink);
+  text-decoration: none;
+  text-underline-offset: 0.15em;
+}
+
+.ob-xref a:hover {
+  text-decoration: underline;
+}
+
+/* Build-time exports of the index, generated from the same data. */
+.ob-export {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  margin-top: var(--s-4);
+}
+
+.ob-dl {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.ob-dl:hover {
+  border-color: var(--ink-2);
+}

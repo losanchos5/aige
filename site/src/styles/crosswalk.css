@@ -1,0 +1,375 @@
+/* crosswalk.css: the topic × framework crosswalk grid, the per-topic reference
+   lists and the reference drawer (/resources/crosswalk). Flat and matte — tokens
+   only, so light and dark both follow. Class names are prefixed (cw-, cwd-) to
+   stay out of the way of the shared resources styles. Text keeps ink/ink-2 (not
+   --muted) so it clears 4.5:1 on the pale chip fills in both themes. */
+
+/* ---- Grid ----------------------------------------------------------------- */
+.cw {
+  margin: 0 0 var(--s-6);
+}
+
+.cw-cap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2) var(--s-3);
+  margin-bottom: var(--s-4);
+  color: var(--muted);
+}
+
+.cw-cap .mono {
+  color: var(--ink-2);
+}
+
+.cw-cap-text {
+  font-size: var(--fs-small);
+  text-wrap: pretty;
+}
+
+/* Horizontal scroll container; the first column stays put (sticky). */
+.cw-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+}
+
+.cw-grid {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+.cw-grid th,
+.cw-grid td {
+  padding: var(--s-2);
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Sticky first column, on the header row and every body row. */
+.cw-corner,
+.cw-rowh-cell {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 9.5rem;
+  min-width: 9.5rem;
+  background: var(--bg);
+  border-right: 1px solid var(--line);
+}
+
+/* Column headers: a display label with a type tag or an instrument count. */
+.cw-colh {
+  min-width: 7.5rem;
+  vertical-align: bottom;
+  border-bottom: 2px solid var(--line);
+}
+
+.cw-colh-label {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-h3);
+  letter-spacing: var(--tracking-display);
+  color: var(--ink);
+}
+
+.cw-colh .type-tag {
+  margin-top: var(--s-1);
+}
+
+.cw-col-count {
+  display: block;
+  margin-top: var(--s-1);
+  font-size: var(--fs-label);
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+}
+
+.cw-td {
+  min-width: 7.5rem;
+}
+
+/* Row header: the topic name, a link into its section (or drawer with JS). */
+.cw-rowh {
+  display: block;
+  min-height: 40px;
+  color: var(--ink);
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: none;
+  text-underline-offset: 0.15em;
+}
+
+.cw-rowh:hover {
+  text-decoration: underline;
+}
+
+.cw-rowh:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* A cell wraps its chips in one link into the topic section (or drawer). */
+.cw-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-1);
+  min-height: 40px;
+  padding: var(--s-1);
+  border-radius: var(--r-sm);
+  text-decoration: none;
+}
+
+.cw-cell:hover {
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
+}
+
+.cw-cell:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.cw-empty {
+  display: inline-block;
+  min-height: 40px;
+  color: var(--ink-2);
+}
+
+/* ---- Chips ---------------------------------------------------------------- */
+/* Coloured by the framework's type, mirroring .type-tag: ink text on a pale
+   fill. Related refs lose the fill and take a dashed border; unverified refs
+   carry a dotted underline and a visible "?" (never dimmed — opacity would
+   drop contrast below AA). */
+.cw-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15em 0.5em;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--ink) 5%, var(--bg));
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.cw-chip[data-type='law'] { color: var(--l1-ink); border-color: color-mix(in srgb, var(--l1-ink) 40%, transparent); background: color-mix(in srgb, var(--l1) 45%, var(--bg)); }
+.cw-chip[data-type='code'] { color: var(--l2-ink); border-color: color-mix(in srgb, var(--l2-ink) 40%, transparent); background: color-mix(in srgb, var(--l2) 45%, var(--bg)); }
+.cw-chip[data-type='standard'] { color: var(--l4-ink); border-color: color-mix(in srgb, var(--l4-ink) 40%, transparent); background: color-mix(in srgb, var(--l4) 45%, var(--bg)); }
+.cw-chip[data-type='framework'] { color: var(--l5-ink); border-color: color-mix(in srgb, var(--l5-ink) 40%, transparent); background: color-mix(in srgb, var(--l5) 45%, var(--bg)); }
+.cw-chip[data-type='controls'] { color: var(--l3-ink); border-color: color-mix(in srgb, var(--l3-ink) 40%, transparent); background: color-mix(in srgb, var(--l3) 45%, var(--bg)); }
+
+/* Related: dashed outline, no fill (keeps the type-keyed border colour). */
+.cw-chip.is-related {
+  background: transparent;
+  border-style: dashed;
+}
+
+/* Unverified: a dotted underline flags the visible "?" suffix. */
+.cw-chip.is-unverified {
+  text-decoration: underline dotted;
+  text-underline-offset: 0.2em;
+}
+
+/* ---- Hide the header secondary line on the narrowest screens -------------- */
+@media (max-width: 560px) {
+  .cw-colh .type-tag,
+  .cw-colh .cw-col-count {
+    display: none;
+  }
+}
+
+/* ---- By-topic sections ---------------------------------------------------- */
+.cw-topic {
+  padding-top: var(--s-5);
+  margin-top: var(--s-5);
+  border-top: 1px solid var(--line);
+  scroll-margin-top: var(--anchor-offset);
+}
+
+.cw-topic h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  letter-spacing: var(--tracking-display);
+  color: var(--ink);
+}
+
+.cw-topic > p {
+  margin-top: var(--s-2);
+  max-width: var(--prose);
+  color: var(--ink-2);
+}
+
+.cw-topic .ticks {
+  margin-top: var(--s-3);
+}
+
+.cw-refs {
+  list-style: none;
+  margin: var(--s-4) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-3);
+}
+
+.cw-refs > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-2) var(--s-3);
+  padding-bottom: var(--s-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.cw-ref-title {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.cw-ref-note {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+.cw-ref-link,
+.cw-ref-oblig {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.03em;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.cw-ref-link:hover,
+.cw-ref-oblig:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* The references that belong to the column the reader came from, highlighted in
+   the drawer's clone. ink-2 sits on a pale tint here — clears AA in both themes. */
+.cwd-body .cw-refs > li[data-active] {
+  padding-left: var(--s-3);
+  border-left: 3px solid var(--l1-ink);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  background: color-mix(in srgb, var(--l1) 22%, transparent);
+}
+
+/* ---- Reference drawer (ported from PathDrawer) ---------------------------- */
+.cw-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  width: min(480px, 100vw);
+  height: 100%;
+  padding: var(--s-5);
+  border-left: 1px solid var(--line);
+  background: var(--bg);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* The flex display would otherwise beat the [hidden] UA rule. */
+.cw-drawer[hidden] {
+  display: none;
+}
+
+@media (max-width: 839px) {
+  .cw-drawer {
+    inset: 0;
+    width: 100vw;
+    border-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cw-drawer {
+    transform: translateX(100%);
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .cw-drawer.is-open {
+    transform: none;
+  }
+}
+
+.cwd-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: var(--s-2) var(--s-3);
+}
+
+.cwd-title {
+  grid-column: 1;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-h2);
+  line-height: 1.1;
+  letter-spacing: var(--tracking-display);
+  border-bottom: 3px solid var(--line);
+  padding-bottom: var(--s-2);
+}
+
+.cwd-close {
+  grid-column: 2;
+  align-self: start;
+  min-height: 40px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cwd-close:hover {
+  border-color: var(--ink-2);
+}
+
+.cwd-close:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.cwd-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.cw-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 39;
+  background: color-mix(in srgb, var(--ink) 45%, transparent);
+}
+
+.cw-scrim[hidden] {
+  display: none;
+}
+
+/* Lock the page behind the open drawer (set on <body> by crosswalk.js). */
+body.cw-lock {
+  overflow: hidden;
+}

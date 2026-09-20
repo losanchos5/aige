@@ -1,0 +1,128 @@
+---
+import Base from '../../layouts/Base.astro';
+import Kicker from '../../components/Kicker.astro';
+import Callout from '../../components/Callout.astro';
+import CrosswalkMatrix from '../../components/CrosswalkMatrix.astro';
+import CrosswalkDrawer from '../../components/CrosswalkDrawer.astro';
+import { site } from '../../data/site';
+import { disclaimer } from '../../data/frameworks';
+import { topics, columns, refs, topicMatrix, chipLabel, frameworkById } from '../../data/crosswalk';
+import { slugify } from '../../lib/md-parse';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+import '../../styles/crosswalk.css';
+
+const matrix = topicMatrix();
+---
+
+<Base
+  title={`Crosswalk · ${site.name}`}
+  description="A crosswalk from each Body-of-Knowledge topic to the EU AI Act, ISO, NIST and Chinese instruments that govern it, clause by clause."
+  image="/og/resources.png"
+>
+  <div class="container res-page">
+    <div class="res-hero">
+      <div class="bg-mesh" aria-hidden="true"></div>
+      <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
+      <header class="res-head">
+        <Kicker rule swatch="var(--l1)">Resources · Crosswalk</Kicker>
+        <h1 class="res-title">One topic, every framework.</h1>
+        <p class="res-lede">
+          Start from a governance topic, read across to the instrument that governs it, and land on the
+          exact article, clause or control — each with a link back to the obligation it evidences.
+        </p>
+      </header>
+    </div>
+
+    <div class="res-section">
+      <Callout kind="note" title="Illustrative mapping, not a conformity assessment">
+        <p>{disclaimer}</p>
+        <p>A mapping cell is not evidence — see the <a href="/bok/patterns#pattern-framework-crosswalk"
+        >Framework Crosswalk pattern</a> for what turns a crosswalk into an auditable control.</p>
+        <p>The Chinese references were checked against the CAC texts on 2026-09-20; any chip marked
+        “?” is not yet verified against its source.</p>
+      </Callout>
+    </div>
+
+    <section class="res-section" aria-labelledby="cw-heading">
+      <div class="res-section-head">
+        <h2 id="cw-heading">Topic × framework</h2>
+        <p>{topics.length} topics · {columns.length} columns · {refs.length} references. Read each row
+        across: this topic is governed here, and there, down to the clause.</p>
+        <p class="ob-xref">
+          Cross-reference: <a href="/resources/frameworks">the obligation index</a> ·
+          <a href="/bok/patterns#pattern-framework-crosswalk">the Framework Crosswalk pattern</a>.
+        </p>
+        <p class="ob-export">
+          <a class="ob-dl" href="/resources/crosswalk.csv" download>Download CSV</a>
+          <a class="ob-dl" href="/resources/crosswalk.json" download>Download JSON</a>
+        </p>
+      </div>
+      <CrosswalkMatrix matrix={matrix} />
+    </section>
+
+    <section class="res-section" aria-labelledby="cw-topics-heading">
+      <div class="res-section-head">
+        <h2 id="cw-topics-heading">By topic</h2>
+        <p>Each topic, its summary and stack layers, then every mapped reference in full.</p>
+      </div>
+      {
+        matrix.rows.map(({ topic, cells }) => (
+          <article id={`topic-${topic.id}`} class="cw-topic" data-cw-topic>
+            <h3>{topic.name}</h3>
+            <p>{topic.summary}</p>
+            {topic.layerN && topic.layerN.length > 0 && (
+              <span class="ticks" role="img" aria-label={`Layers ${topic.layerN.join(', ')}`}>
+                {topic.layerN.map((n) => (
+                  <span class="tk" data-l={n} aria-hidden="true" />
+                ))}
+              </span>
+            )}
+            <ul class="cw-refs">
+              {cells.flat().map((r) => (
+                <li data-fw={r.framework}>
+                  <span
+                    class:list={[
+                      'cw-chip',
+                      r.strength === 'related' && 'is-related',
+                      r.verified === false && 'is-unverified',
+                    ]}
+                    data-strength={r.strength}
+                    data-type={frameworkById(r.framework)?.type}
+                    title={r.verified === false ? 'Not yet verified against the source' : undefined}
+                  >
+                    {chipLabel(r)}
+                    {r.verified === false ? ' ?' : ''}
+                  </span>
+                  {r.strength === 'related' && <span class="visually-hidden"> related</span>}
+                  {r.verified === false && (
+                    <span class="visually-hidden"> not yet verified against the source</span>
+                  )}
+                  <span class="cw-ref-title">{r.title}</span>
+                  {r.note && <span class="cw-ref-note">{r.note}</span>}
+                  {r.url && (
+                    <a class="cw-ref-link" href={r.url} rel="noopener">
+                      Source ↗
+                    </a>
+                  )}
+                  {r.obligation && (
+                    <a
+                      class="cw-ref-oblig"
+                      href={`/resources/frameworks#ob-${slugify(r.obligation)}`}
+                    >
+                      Obligation row →
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+    </section>
+  </div>
+
+  <CrosswalkDrawer />
+
+  <script is:inline defer src="/crosswalk.js"></script>
+</Base>

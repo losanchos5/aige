@@ -4,6 +4,7 @@ import Kicker from '../../components/Kicker.astro';
 import ResourceCard from '../../components/ResourceCard.astro';
 import { site } from '../../data/site';
 import { frameworks, obligations } from '../../data/frameworks';
+import { topics, columns } from '../../data/crosswalk';
 import { toolsByCategory } from '../../data/stack';
 import { getReadingList } from '../../lib/reading-list';
 import { getGlossary } from '../../lib/glossary';
@@ -53,6 +54,15 @@ const cards = [
       'Every term defined once, alphabetically, and cross-referenced to the chapter that treats it in full.',
     count: `${glossaryCount} terms`,
   },
+  {
+    index: '05',
+    title: 'Crosswalk',
+    href: '/resources/crosswalk',
+    swatch: 'var(--l2)',
+    description:
+      'One governance topic per row, read across to the EU, ISO, NIST and Chinese instruments that bind it — down to the article, clause or control.',
+    count: `${topics.length} topics · ${columns.length} columns`,
+  },
 ];
 ---
 
@@ -69,9 +79,9 @@ const cards = [
         <Kicker rule>Resources</Kicker>
         <h1 class="res-title">Curated, sourced, versioned.</h1>
         <p class="res-lede">
-          Four references drawn straight from the Body of Knowledge: the frameworks the discipline maps
-          against, the tool categories that fill each layer, the sources that formed it and the terms
-          it uses.
+          Five references drawn straight from the Body of Knowledge: the frameworks the discipline maps
+          against, the tool categories that fill each layer, the sources that formed it, the terms it
+          uses and the crosswalk that maps each topic to every framework.
         </p>
         <p class="res-note">
           Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync
@@ -118,8 +128,13 @@ const cards = [
   .rc-bento > :global(li:nth-child(4)) {
     --i: 3;
   }
+  .rc-bento > :global(li:nth-child(5)) {
+    --i: 4;
+  }
 
   @media (min-width: 600px) {
+    /* Two columns: the first card spans both (a full row), so the remaining
+       four tile a clean 2×2 below it — no orphaned fifth card at this width. */
     .rc-bento > :global(li:first-child) {
       grid-column: span 2;
     }

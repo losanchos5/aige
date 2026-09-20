@@ -11,6 +11,15 @@ import { layers, minimumViableStack, toolsByCategory } from '../src/data/stack';
 import { workflows, market } from '../src/data/role';
 import { levels } from '../src/data/maturity';
 import { frameworks, obligations, disclaimer } from '../src/data/frameworks';
+import {
+  topics,
+  columns,
+  refs,
+  chipLabel,
+  chipPrefix,
+  topicMatrix,
+  frameworkById,
+} from '../src/data/crosswalk';
 import { values } from '../src/data/values';
 import { getGlossary, termId } from '../src/lib/glossary';
 import { getReadingList } from '../src/lib/reading-list';
@@ -138,6 +147,7 @@ test('no forbidden claim appears in any data module', () => {
     'site/src/data/role.ts',
     'site/src/data/maturity.ts',
     'site/src/data/frameworks.ts',
+    'site/src/data/crosswalk.ts',
     'site/src/data/values.ts',
     'site/src/lib/md-parse.ts',
     'site/src/lib/glossary.ts',
@@ -337,5 +347,129 @@ test.describe('path data', () => {
   test('no forbidden tool name appears in the path data', () => {
     const serialized = JSON.stringify({ stages, nodes, entries });
     expect(serialized.includes('LiteLLM')).toBe(false);
+  });
+});
+
+// ── The topic crosswalk data (src/data/crosswalk.ts) ───────────────────────
+test.describe('crosswalk data', () => {
+  const cnIds = columns.find((column) => column.id === 'cn')!.frameworks;
+
+  test('refs reference known topics; topic ids are unique; 40+ refs', () => {
+    const topicIds = topics.map((topic) => topic.id);
+    expect(new Set(topicIds).size).toBe(topicIds.length);
+    const topicIdSet = new Set(topicIds);
+    for (const ref of refs) {
+      expect(topicIdSet.has(ref.topic), ref.topic).toBe(true);
+    }
+    expect(refs.length).toBeGreaterThan(40);
+  });
+
+  test('every ref.framework is a known framework or a cn column id', () => {
+    const frameworkIds = new Set(frameworks.map((framework) => framework.id));
+    const allowed = new Set([...frameworkIds, ...cnIds]);
+    for (const ref of refs) {
+      expect(allowed.has(ref.framework), ref.framework).toBe(true);
+    }
+    // The China block lands all cn-* ids together: if one is in frameworks.ts,
+    // they all must be.
+    const present = cnIds.filter((id) => frameworkIds.has(id));
+    if (present.length > 0) {
+      expect(present.length).toBe(cnIds.length);
+    }
+  });
+
+  // Flips on once frameworks.ts gains the cn-* ids the China block adds.
+  test.fixme(
+    'every ref.framework exists in frameworks.ts (cn-* entries land with the China block)',
+    () => {
+      const frameworkIds = new Set(frameworks.map((framework) => framework.id));
+      for (const ref of refs) {
+        expect(frameworkIds.has(ref.framework), ref.framework).toBe(true);
+      }
+    },
+  );
+
+  test('columns are eu/iso/nist/cn; each is referenced; topics span 2+ columns', () => {
+    expect(columns.map((column) => column.id)).toEqual(['eu', 'iso', 'nist', 'cn']);
+
+    const referenced = new Set(refs.map((ref) => ref.framework));
+    for (const column of columns) {
+      for (const frameworkId of column.frameworks) {
+        expect(referenced.has(frameworkId), frameworkId).toBe(true);
+      }
+    }
+
+    for (const topic of topics) {
+      const topicRefs = refs.filter((ref) => ref.topic === topic.id);
+      const spannedColumns = columns.filter((column) =>
+        topicRefs.some((ref) => column.frameworks.includes(ref.framework)),
+      );
+      expect(spannedColumns.length, `${topic.id} columns`).toBeGreaterThanOrEqual(2);
+      expect(
+        topicRefs.some((ref) => ref.strength === 'core'),
+        `${topic.id} core`,
+      ).toBe(true);
+    }
+  });
+
+  test('every obligation join exists verbatim in the obligation matrix', () => {
+    const obligationTexts = new Set(obligations.map((o) => o.obligation));
+    for (const ref of refs) {
+      if (ref.obligation !== undefined) {
+        expect(obligationTexts.has(ref.obligation), ref.obligation).toBe(true);
+      }
+    }
+  });
+
+  test('urls are https; unverified refs carry a note; chips prefix only cn refs', () => {
+    const cnIdSet = new Set(cnIds);
+    for (const ref of refs) {
+      if (ref.url !== undefined) {
+        expect(ref.url.startsWith('https://'), ref.url).toBe(true);
+      }
+      if (ref.verified === false) {
+        expect((ref.note ?? '').trim().length, `${ref.framework} ${ref.ref}`).toBeGreaterThan(
+          0,
+        );
+      }
+      const label = chipLabel(ref);
+      if (cnIdSet.has(ref.framework)) {
+        expect(label, `${ref.framework} ${ref.ref}`).not.toBe(ref.ref);
+        expect(label.endsWith(ref.ref)).toBe(true);
+      } else {
+        expect(label).toBe(ref.ref);
+      }
+    }
+    // chipPrefix holds exactly the cn column ids.
+    expect(new Set(Object.keys(chipPrefix))).toEqual(cnIdSet);
+  });
+
+  test('topicMatrix is 12 rows x 4 columns with cells sorted core-first', () => {
+    const matrix = topicMatrix();
+    expect(matrix.rows).toHaveLength(12);
+    expect(matrix.columns).toHaveLength(4);
+    for (const column of matrix.columns) {
+      // Every column framework resolves, via the cn fallback where needed.
+      expect(column.fws.length, column.id).toBe(column.frameworks.length);
+    }
+    for (const row of matrix.rows) {
+      expect(row.cells, row.topic.id).toHaveLength(4);
+      for (const cell of row.cells) {
+        const ranks = cell.map((ref) => (ref.strength === 'core' ? 0 : 1));
+        const sorted = [...ranks].sort((a, b) => a - b);
+        expect(ranks, row.topic.id).toEqual(sorted);
+      }
+    }
+  });
+
+  test('frameworkById resolves cn stub ids even before frameworks.ts has them', () => {
+    for (const id of cnIds) {
+      const framework = frameworkById(id);
+      expect(framework, id).toBeTruthy();
+      expect(framework!.id).toBe(id);
+      expect(framework!.name.trim().length, id).toBeGreaterThan(0);
+    }
+    // Never claim TC260 3.0 is a binding rule.
+    expect(frameworkById('cn-tc260-framework')!.summary.includes('binding')).toBe(false);
   });
 });
