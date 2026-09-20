@@ -1,6 +1,6 @@
-/* pages.css: shared primitives for the editorial landing pages (/stack, /role).
-   Imported by those pages only; tokens-driven so light and dark both follow.
-   Flat and matte — 1px rules, radii 10/6, mono labels, no shadows or gradients. */
+/* pages.css: shared primitives for the editorial landing pages (/stack, /role,
+   /path, /resources). Tokens-driven so light and dark both follow. 1px rules,
+   radii 10/6, mono labels; shadows/gradients only through effects.css tokens. */
 
 /* Page hero: eyebrow (Kicker) + display H1 + lede, left-aligned with air. */
 .page-hero {
@@ -20,13 +20,6 @@
   max-width: 60ch;
   font-size: 1.125rem;
   color: var(--ink-2);
-}
-
-/* Section heading: display H2 under a Kicker eyebrow. */
-.section-title {
-  font-size: var(--fs-h2);
-  max-width: 22ch;
-  margin: var(--s-3) 0 var(--s-6);
 }
 
 /* A reading well: keep prose-like content within a comfortable measure. */
@@ -150,4 +143,96 @@
   .meter::before {
     transition: transform var(--dur) var(--ease);
   }
+}
+
+/* --------------------------------------------------------- Editorial hero */
+
+/* Landing-page hero band (/stack, /role, /path, /resources). Relative and
+   clipped so its two inert background layers — a soft gradient mesh and a faded
+   dot grid, both defined in effects.css — sit behind the content, which is
+   raised above them. The mesh runs a touch softer here via a local --mesh-alpha
+   override. isolation keeps the mesh's stacking local to the hero. */
+.hero--page {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 40vh;
+  --mesh-alpha: 0.7;
+}
+
+.hero--page > .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* The hero's dot/grid texture: the same inert overlay as .bg-dots / .bg-grid,
+   named for the hero so its role reads clearly in the markup. */
+.hero-tex {
+  z-index: 0;
+}
+
+/* Timed entrance for a hero's content, staggered top-to-bottom by source order.
+   Opacity + lift, motion only; the reduced-motion kill switch in base.css stops
+   it so no-JS and reduced-motion readers see the text painted and never dimmed
+   by us. Time-based (not scroll-based): the hero is above the fold. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-in > * {
+    animation: hero-up 0.6s var(--ease) both;
+  }
+  .hero-in > *:nth-child(1) {
+    animation-delay: 0ms;
+  }
+  .hero-in > *:nth-child(2) {
+    animation-delay: 70ms;
+  }
+  .hero-in > *:nth-child(3) {
+    animation-delay: 140ms;
+  }
+  .hero-in > *:nth-child(4) {
+    animation-delay: 210ms;
+  }
+  .hero-in > *:nth-child(5) {
+    animation-delay: 280ms;
+  }
+}
+
+@keyframes hero-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Resources sub-page hero: the existing .res-head lifted onto the same mesh +
+   dot bed as .hero--page, but lighter (these are dense reference pages, and the
+   glossary is a Lighthouse route that keeps only the dot texture). Inert bg
+   layers behind; the head raised above. */
+.res-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-block: var(--s-4);
+  margin-bottom: var(--s-2);
+  --mesh-alpha: 0.6;
+}
+
+.res-hero > .res-head {
+  position: relative;
+  z-index: 1;
+}
+
+/* -------------------------------------------------- Tinted-band contrast fix */
+
+/* ---------------------------------------------------------------- Story rows */
+
+/* Right-hand rows of a sticky-scroll story (effects.css owns .story/.story-pin).
+   Each row is a [data-story-row] that story.js watches; they carry no transform
+   themselves — only their .reveal-stagger children do — so the pinned column's
+   ancestors stay transform-free and position: sticky holds. */
+.story-row + .story-row {
+  margin-top: var(--s-5);
 }

@@ -8,8 +8,10 @@
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/pages.css';
 import Kicker from '../components/Kicker.astro';
+import Section from '../components/Section.astro';
 import RegisterList from '../components/RegisterList.astro';
 import StackLayerPanel from '../components/StackLayerPanel.astro';
+import StackDiagram from '../components/StackDiagram.astro';
 import StackFlow from '../components/StackFlow.astro';
 import ToolsTable from '../components/ToolsTable.astro';
 import Callout from '../components/Callout.astro';
@@ -52,8 +54,11 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
   description="The five-layer stack of AI governance engineering: govern-as-code, inventory, evals as evidence, runtime control and continuous assurance."
   image="/og/stack.png"
 >
-  <section class="hero section">
-    <div class="container page-hero reveal">
+  <section class="hero section hero--page">
+    <div class="bg-mesh" aria-hidden="true"></div>
+    <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
+    <div class="container page-hero hero-in">
+      <p class="meta"><span class="meta-dot" aria-hidden="true"></span>Chapter 04 · Body of Knowledge</p>
       <Kicker swatch="var(--l3)" rule>The stack</Kicker>
       <h1 class="display">Five layers. One evidence chain.</h1>
       <p class="lede">
@@ -64,110 +69,103 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     </div>
   </section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l5)">Layer flow</Kicker>
-      <h2 class="section-title display">Follow one artefact from policy to proof.</h2>
-      <StackFlow />
-    </div>
-  </section>
+  <Section tone="plain" rule kicker="Layer flow" kickerSwatch="var(--l5)" title="Follow one artefact from policy to proof.">
+    <div class="reveal"><StackFlow /></div>
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l1)">How to read it</Kicker>
-      <h2 class="section-title display">A build order, from policy to proof.</h2>
-      <div class="well"><RegisterList items={howToRead} /></div>
-      <p class="section-foot">
-        <a class="chapter-link" href={stackHref('how-to-read-the-stack')}>
-          Read in chapter 04 <span class="arrow" aria-hidden="true">→</span>
-        </a>
-      </p>
-    </div>
-  </section>
+  <Section tone="plain" kicker="How to read it" kickerSwatch="var(--l1)" title="A build order, from policy to proof.">
+    <div class="well reveal"><RegisterList items={howToRead} /></div>
+    <p class="section-foot">
+      <a class="chapter-link" href={stackHref('how-to-read-the-stack')}>
+        Read in chapter 04 <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l2)">The five layers</Kicker>
-      <h2 class="section-title display">Policy, inventory, evals, runtime, assurance.</h2>
-      <div class="panels">
-        {layers.map((layer) => <StackLayerPanel layer={layer} href={stackHref(layer.chapterAnchor)} />)}
+  <Section tone="tint" class="story-section">
+    <div class="story" data-story>
+      <div class="story-pin">
+        <div class="sec-head">
+          <Kicker swatch="var(--l2)">The five layers</Kicker>
+          <h2 class="sec-title display">Policy, inventory, evals, runtime, assurance.</h2>
+        </div>
+        <div class="story-mark" data-story-mark>
+          <StackDiagram mode="static" />
+        </div>
+      </div>
+      <div class="story-right reveal-stagger">
+        {
+          layers.map((layer, i) => (
+            <div class="story-row" data-story-row data-n={layer.n} style={`--i:${i}`}>
+              <StackLayerPanel layer={layer} href={stackHref(layer.chapterAnchor)} />
+            </div>
+          ))
+        }
       </div>
     </div>
-  </section>
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l4)">Established and new</Kicker>
-      <h2 class="section-title display">Three layers established, two the AI forces.</h2>
-      <div class="split">
-        <ol class="barmark" aria-hidden="true">
-          {
-            layers.map((layer) => (
-              <li class:list={['bar-row', layer.inherited ? 'is-inherited' : 'is-new']}>
-                <span class="bar" style={`background: var(${layer.colorVar})`} />
-                <span class="bar-n">{String(layer.n).padStart(2, '0')}</span>
-                <span class="bar-name">{layer.name}</span>
-                <span class="bar-tag">{layer.inherited ? 'Established' : 'New'}</span>
-              </li>
-            ))
-          }
-        </ol>
-        <div class="split-notes well">
-          <div>
-            <h3 class="split-h">Established engineering practice</h3>
-            <p>
-              Govern-as-Code (01), machine-readable evidence and Assurance &amp;
-              Continuous Compliance (05) come almost unchanged from GRC
-              engineering — a specialisation of a method that already works.
-            </p>
-          </div>
-          <div>
-            <h3 class="split-h">New, forced by AI</h3>
-            <p>
-              Evals and red-teaming as controls (03) and agent identity and
-              runtime control (04) are what AI forces the discipline to add: a
-              model whose behaviour must be tested and an autonomous actor acting
-              under delegated authority have no analogue in classic GRC.
-            </p>
-          </div>
+  <Section tone="dark" rule kicker="Established and new" kickerSwatch="var(--l4)" title="Three layers established, two the AI forces.">
+    <div class="split">
+      <ol class="barmark" aria-hidden="true">
+        {
+          layers.map((layer) => (
+            <li class:list={['bar-row', layer.inherited ? 'is-inherited' : 'is-new']}>
+              <span class="bar" style={`background: var(${layer.colorVar})`} />
+              <span class="bar-n">{String(layer.n).padStart(2, '0')}</span>
+              <span class="bar-name">{layer.name}</span>
+              <span class="bar-tag">{layer.inherited ? 'Established' : 'New'}</span>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="split-notes well">
+        <div>
+          <h3 class="split-h">Established engineering practice</h3>
+          <p>
+            Govern-as-Code (01), machine-readable evidence and Assurance &amp;
+            Continuous Compliance (05) come almost unchanged from GRC
+            engineering — a specialisation of a method that already works.
+          </p>
+        </div>
+        <div>
+          <h3 class="split-h">New, forced by AI</h3>
+          <p>
+            Evals and red-teaming as controls (03) and agent identity and
+            runtime control (04) are what AI forces the discipline to add: a
+            model whose behaviour must be tested and an autonomous actor acting
+            under delegated authority have no analogue in classic GRC.
+          </p>
         </div>
       </div>
     </div>
-  </section>
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l5)">Minimum viable stack</Kicker>
-      <h2 class="section-title display">The spine, thinly, for a team of one.</h2>
-      <p class="lede well">{minimumViableStack.intro}</p>
-      <div class="well mvs"><RegisterList items={mvsItems} /></div>
-      <p class="section-foot">
-        <a class="chapter-link" href={stackHref(minimumViableStack.anchor)}>
-          Read in chapter 04 <span class="arrow" aria-hidden="true">→</span>
-        </a>
-      </p>
-    </div>
-  </section>
+  <Section tone="plain" kicker="Minimum viable stack" kickerSwatch="var(--l5)" title="The spine, thinly, for a team of one.">
+    <p class="lede well">{minimumViableStack.intro}</p>
+    <div class="well mvs reveal"><RegisterList items={mvsItems} /></div>
+    <p class="section-foot">
+      <a class="chapter-link" href={stackHref(minimumViableStack.anchor)}>
+        Read in chapter 04 <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l1)">The tools</Kicker>
-      <h2 class="section-title display">Categories are the substance; brands are illustrative.</h2>
-      <Callout kind="note" title="Illustrative, not an endorsement">
-        <p>
-          Every tool named is an example of a category, not a recommendation. The
-          categories are the substance; the brands are illustrative and
-          interchangeable.
-        </p>
-      </Callout>
-      <ToolsTable rows={tools} />
-      <p class="section-foot">
-        <a class="chapter-link" href="/bok/patterns">
-          See the pattern catalogue <span class="arrow" aria-hidden="true">→</span>
-        </a>
+  <Section tone="plain" texture="grid" rule kicker="The tools" kickerSwatch="var(--l1)" title="Categories are the substance; brands are illustrative.">
+    <Callout kind="note" title="Illustrative, not an endorsement">
+      <p>
+        Every tool named is an example of a category, not a recommendation. The
+        categories are the substance; the brands are illustrative and
+        interchangeable.
       </p>
-    </div>
-  </section>
+    </Callout>
+    <ToolsTable rows={tools} />
+    <p class="section-foot">
+      <a class="chapter-link" href="/bok/patterns">
+        See the pattern catalogue <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
 
   <CtaBand
     title="Read the stack in full."
@@ -177,16 +175,12 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
   />
 
   <script is:inline defer src="/stack.js"></script>
+  <script is:inline defer src="/story.js"></script>
 </Marketing>
 
 <style>
   .hero h1 {
     font-size: var(--fs-display);
-  }
-
-  .panels {
-    display: grid;
-    gap: var(--s-5);
   }
 
   /* Inherited/new split: the five-bar register mark beside two short notes. */

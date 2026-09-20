@@ -9,6 +9,7 @@ import Diagram from '../../components/Diagram.astro';
 import { site } from '../../data/site';
 import { frameworks, obligations, disclaimer } from '../../data/frameworks';
 import '../../styles/resources.css';
+import '../../styles/pages.css';
 ---
 
 <Base
@@ -17,15 +18,19 @@ import '../../styles/resources.css';
   image="/og/resources.png"
 >
   <div class="container res-page">
-    <header class="res-head">
-      <Kicker rule swatch="var(--l1)">Resources · Frameworks</Kicker>
-      <h1 class="res-title">The instruments, and what answers them.</h1>
-      <p class="res-lede">
-        The horizontal law, the management standards, the voluntary codes and the control sets the
-        discipline is built against — then the reverse index that names, for each obligation, the
-        engineering artefact that evidences it and the layer it lives in.
-      </p>
-    </header>
+    <div class="res-hero">
+      <div class="bg-mesh" aria-hidden="true"></div>
+      <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
+      <header class="res-head">
+        <Kicker rule swatch="var(--l1)">Resources · Frameworks</Kicker>
+        <h1 class="res-title">The instruments, and what answers them.</h1>
+        <p class="res-lede">
+          The horizontal law, the management standards, the voluntary codes and the control sets the
+          discipline is built against — then the reverse index that names, for each obligation, the
+          engineering artefact that evidences it and the layer it lives in.
+        </p>
+      </header>
+    </div>
 
     <div class="res-section">
       <Callout kind="note" title="Illustrative mapping, not a conformity assessment">

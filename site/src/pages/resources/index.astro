@@ -1,5 +1,5 @@
 ---
-import Base from '../../layouts/Base.astro';
+import Marketing from '../../layouts/Marketing.astro';
 import Kicker from '../../components/Kicker.astro';
 import ResourceCard from '../../components/ResourceCard.astro';
 import { site } from '../../data/site';
@@ -8,6 +8,7 @@ import { toolsByCategory } from '../../data/stack';
 import { getReadingList } from '../../lib/reading-list';
 import { getGlossary } from '../../lib/glossary';
 import '../../styles/resources.css';
+import '../../styles/pages.css';
 
 const tools = toolsByCategory();
 const toolCount = tools.reduce((n, group) => n + group.examples.length, 0);
@@ -55,39 +56,72 @@ const cards = [
 ];
 ---
 
-<Base
+<Marketing
   title={`Resources · ${site.name}`}
   description="Curated, sourced and versioned resources for AI governance engineering: frameworks, tools, a reading list and a glossary, all extracted from the Body of Knowledge."
   image="/og/resources.png"
 >
-  <div class="container res-page">
-    <header class="res-head">
-      <Kicker rule>Resources</Kicker>
-      <h1 class="res-title">Curated, sourced, versioned.</h1>
-      <p class="res-lede">
-        Four references drawn straight from the Body of Knowledge: the frameworks the discipline maps
-        against, the tool categories that fill each layer, the sources that formed it and the terms
-        it uses.
-      </p>
-      <p class="res-note">
-        Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync
-        with it.
-      </p>
-    </header>
+  <section class="hero section hero--page">
+    <div class="bg-mesh" aria-hidden="true"></div>
+    <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
+    <div class="container">
+      <header class="res-head hero-in">
+        <Kicker rule>Resources</Kicker>
+        <h1 class="res-title">Curated, sourced, versioned.</h1>
+        <p class="res-lede">
+          Four references drawn straight from the Body of Knowledge: the frameworks the discipline maps
+          against, the tool categories that fill each layer, the sources that formed it and the terms
+          it uses.
+        </p>
+        <p class="res-note">
+          Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync
+          with it.
+        </p>
+      </header>
+    </div>
+  </section>
 
-    <ul class="rc-grid">
-      {
-        cards.map((card) => (
-          <ResourceCard
-            title={card.title}
-            href={card.href}
-            description={card.description}
-            count={card.count}
-            index={card.index}
-            swatch={card.swatch}
-          />
-        ))
-      }
-    </ul>
-  </div>
-</Base>
+  <section class="section">
+    <div class="container">
+      <ul class="bento reveal-stagger rc-bento">
+        {
+          cards.map((card) => (
+            <ResourceCard
+              title={card.title}
+              href={card.href}
+              description={card.description}
+              count={card.count}
+              index={card.index}
+              swatch={card.swatch}
+            />
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</Marketing>
+
+<style>
+  /* The hub cards as a bento: the first card (Frameworks) spans two columns,
+     and each card enters on its own beat. --i drives .reveal-stagger; the span
+     and stagger live here (not on ResourceCard) so they hold whatever markup
+     the card renders. */
+  .rc-bento > :global(li:nth-child(1)) {
+    --i: 0;
+  }
+  .rc-bento > :global(li:nth-child(2)) {
+    --i: 1;
+  }
+  .rc-bento > :global(li:nth-child(3)) {
+    --i: 2;
+  }
+  .rc-bento > :global(li:nth-child(4)) {
+    --i: 3;
+  }
+
+  @media (min-width: 600px) {
+    .rc-bento > :global(li:first-child) {
+      grid-column: span 2;
+    }
+  }
+</style>

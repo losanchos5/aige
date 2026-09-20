@@ -7,6 +7,7 @@ import { site } from '../../data/site';
 import { layers, toolsByCategory } from '../../data/stack';
 import { slugify } from '../../lib/md-parse';
 import '../../styles/resources.css';
+import '../../styles/pages.css';
 
 const groups = toolsByCategory();
 
@@ -29,15 +30,19 @@ const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}
   image="/og/resources.png"
 >
   <div class="container res-page">
-    <header class="res-head">
-      <Kicker rule swatch="var(--l4)">Resources · Tools</Kicker>
-      <h1 class="res-title">Tool categories, by layer.</h1>
-      <p class="res-lede">
-        The reference tool categories that fill each layer of the stack, with the examples the Body
-        of Knowledge names. The category is the substance; the brands are illustrative. See how they
-        fit together in <a href="/stack">the stack</a>.
-      </p>
-    </header>
+    <div class="res-hero">
+      <div class="bg-mesh" aria-hidden="true"></div>
+      <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
+      <header class="res-head">
+        <Kicker rule swatch="var(--l4)">Resources · Tools</Kicker>
+        <h1 class="res-title">Tool categories, by layer.</h1>
+        <p class="res-lede">
+          The reference tool categories that fill each layer of the stack, with the examples the Body
+          of Knowledge names. The category is the substance; the brands are illustrative. See how they
+          fit together in <a href="/stack">the stack</a>.
+        </p>
+      </header>
+    </div>
 
     <div class="res-section">
       <Callout kind="note" title="Illustrative, not an endorsement">

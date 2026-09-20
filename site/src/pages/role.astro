@@ -9,6 +9,7 @@
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/pages.css';
 import Kicker from '../components/Kicker.astro';
+import Section from '../components/Section.astro';
 import WorkflowGrid from '../components/WorkflowGrid.astro';
 import SkillsTable from '../components/SkillsTable.astro';
 import ContrastTable from '../components/ContrastTable.astro';
@@ -58,141 +59,133 @@ const reportedText = reportedStats
   description="What an AI Governance Engineer does: the seven workflows it owns, the skills behind them, and how the role differs from the AI governance analyst."
   image="/og/role.png"
 >
-  <section class="hero section">
-    <div class="container page-hero reveal">
+  <section class="hero section hero--page">
+    <div class="bg-mesh" aria-hidden="true"></div>
+    <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
+    <div class="container page-hero hero-in">
+      <p class="meta"><span class="meta-dot" aria-hidden="true"></span>Chapter 06 · Body of Knowledge</p>
       <Kicker swatch="var(--l3)" rule>The role</Kicker>
       <h1 class="display">What an AI Governance Engineer does.</h1>
       <p class="lede">{capabilityStatement}</p>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l2)">The workflows</Kicker>
-      <h2 class="section-title display">Seven workflows the role owns.</h2>
-      <p class="lede well">The engineer owns workflows, not documents — each a running system with inputs, outputs and a stack layer it maps to.</p>
-      <WorkflowGrid workflows={workflows} hrefFor={roleHref} />
-      <Diagram id="role-workflows" />
-    </div>
-  </section>
+  <Section
+    tone="plain"
+    texture="dots"
+    kicker="The workflows"
+    kickerSwatch="var(--l2)"
+    title="Seven workflows the role owns."
+    lede="The engineer owns workflows, not documents — each a running system with inputs, outputs and a stack layer it maps to."
+  >
+    <WorkflowGrid workflows={workflows} hrefFor={roleHref} class="bento reveal-stagger" />
+    <Diagram id="role-workflows" />
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l3)">The skills</Kicker>
-      <h2 class="section-title display">Core and supporting skills, by workflow.</h2>
-      <SkillsTable skills={skills} />
-      <p class="section-foot">
-        <a class="chapter-link" href={roleHref('skills-by-workflow')}>
-          Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
-        </a>
-      </p>
-    </div>
-  </section>
+  <Section tone="plain" rule kicker="The skills" kickerSwatch="var(--l3)" title="Core and supporting skills, by workflow.">
+    <SkillsTable skills={skills} />
+    <p class="section-foot">
+      <a class="chapter-link" href={roleHref('skills-by-workflow')}>
+        Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l1)">Analyst versus engineer</Kicker>
-      <h2 class="section-title display">One line separates the two.</h2>
-      <p class="lede well">{analystDistinction}</p>
-      <ContrastTable rows={analystVsEngineer} />
-      <p class="section-foot">
-        <a class="chapter-link" href={roleHref('analyst-versus-engineer')}>
-          Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
-        </a>
-      </p>
-    </div>
-  </section>
+  <Section
+    tone="plain"
+    kicker="Analyst versus engineer"
+    kickerSwatch="var(--l1)"
+    title="One line separates the two."
+    lede={analystDistinction}
+  >
+    <ContrastTable rows={analystVsEngineer} />
+    <p class="section-foot">
+      <a class="chapter-link" href={roleHref('analyst-versus-engineer')}>
+        Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l5)">Three ways in</Kicker>
-      <h2 class="section-title display">Convert from an adjacent discipline.</h2>
-      <ul class="ways">
-        {
-          waysIn.map((way, i) => (
-            <li class="way card">
-              <span class="way-index" aria-hidden="true">{pad(i + 1)}</span>
-              <h3 class="way-title">{way.title}</h3>
-              <p class="way-summary">{way.summary}</p>
-            </li>
-          ))
-        }
-      </ul>
-      <p class="section-foot">
-        <a class="chapter-link" href={roleHref('three-ways-in')}>
-          Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
-        </a>
-      </p>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l3)">What employers get wrong</Kicker>
-      <h2 class="section-title display">Three tells in the job description.</h2>
-      <ol class="mistakes">
-        {
-          mistakes.map((m, i) => (
-            <li class="mistake">
-              <span class="mistake-index" aria-hidden="true">{pad(i + 1)}</span>
-              <div class="mistake-body">
-                <div class="mistake-head">
-                  <VerdictStamp verdict="block" />
-                  {m.lead && <span class="mistake-lead">{m.lead}</span>}
-                </div>
-                <p class="mistake-text">{m.body}</p>
-              </div>
-            </li>
-          ))
-        }
-      </ol>
-      <p class="section-foot">
-        <a class="chapter-link" href={roleHref('what-employers-get-wrong-in-the-job-description')}>
-          Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
-        </a>
-      </p>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l4)">The market</Kicker>
-      <h2 class="section-title display">What the primary sources report.</h2>
-      <div class="stats">
-        {
-          primaryStats.map((stat) => (
-            <StatTile value={stat.value} label={stat.label} source={stat.source} href={stat.sourceUrl} />
-          ))
-        }
-      </div>
+  <Section tone="plain" rule kicker="Three ways in" kickerSwatch="var(--l5)" title="Convert from an adjacent discipline.">
+    <ul class="ways reveal-stagger">
       {
-        reportedStats.length > 0 && (
-          <p class="footnote well">
-            Also reported, as a demand signal rather than a headline figure: {reportedText}.
-          </p>
-        )
+        waysIn.map((way, i) => (
+          <li class="way card-lum" style={`--i:${i}`}>
+            <span class="way-index" aria-hidden="true">{pad(i + 1)}</span>
+            <h3 class="way-title">{way.title}</h3>
+            <p class="way-summary">{way.summary}</p>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="section-foot">
+      <a class="chapter-link" href={roleHref('three-ways-in')}>
+        Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
+
+  <Section tone="plain" kicker="What employers get wrong" kickerSwatch="var(--l3)" title="Three tells in the job description.">
+    <ol class="mistakes">
+      {
+        mistakes.map((m, i) => (
+          <li class="mistake">
+            <span class="mistake-index" aria-hidden="true">{pad(i + 1)}</span>
+            <div class="mistake-body">
+              <div class="mistake-head">
+                <VerdictStamp verdict="block" />
+                {m.lead && <span class="mistake-lead">{m.lead}</span>}
+              </div>
+              <p class="mistake-text">{m.body}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="section-foot">
+      <a class="chapter-link" href={roleHref('what-employers-get-wrong-in-the-job-description')}>
+        Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
+
+  <Section tone="tint" kicker="The market" kickerSwatch="var(--l4)" title="What the primary sources report.">
+    <div class="stats">
+      {
+        primaryStats.map((stat) => (
+          <StatTile value={stat.value} label={stat.label} source={stat.source} href={stat.sourceUrl} />
+        ))
       }
     </div>
-  </section>
+    {
+      reportedStats.length > 0 && (
+        <p class="footnote well">
+          Also reported, as a demand signal rather than a headline figure: {reportedText}.
+        </p>
+      )
+    }
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l5)">The maturity ladder</Kicker>
-      <h2 class="section-title display">From paper to production, in five levels.</h2>
-      <p class="lede well">Each level is assessed across all five stack layers; the overall level is the weakest layer.</p>
-      <MaturityLadder levels={levels} />
-      <p class="section-foot">
-        <a class="chapter-link" href={maturityHref}>
-          Read the maturity model in chapter 07 <span class="arrow" aria-hidden="true">→</span>
-        </a>
-      </p>
-      <p class="section-foot">
-        <a class="chapter-link" href="/path">
-          New to the field? Start the learning path <span class="arrow" aria-hidden="true">→</span>
-        </a>
-      </p>
-    </div>
-  </section>
+  <Section
+    tone="dark"
+    rule
+    kicker="The maturity ladder"
+    kickerSwatch="var(--l5)"
+    title="From paper to production, in five levels."
+    lede="Each level is assessed across all five stack layers; the overall level is the weakest layer."
+  >
+    <MaturityLadder levels={levels} />
+    <p class="section-foot">
+      <a class="chapter-link" href={maturityHref}>
+        Read the maturity model in chapter 07 <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+    <p class="section-foot">
+      <a class="chapter-link" href="/path">
+        New to the field? Start the learning path <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
 
   <CtaBand
     title="Own the capability, not the title."
@@ -218,10 +211,13 @@ const reportedText = reportedStats
     gap: var(--s-4);
   }
 
+  /* .way pairs with .card-lum (border, radius, shadow, hover ring); it keeps
+     the base bg and supplies its own padding, since it no longer uses .card. */
   .way {
     display: flex;
     flex-direction: column;
     gap: var(--s-2);
+    padding: var(--s-5);
     background: var(--bg);
   }
 

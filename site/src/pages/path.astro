@@ -11,6 +11,7 @@
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/pages.css';
 import Kicker from '../components/Kicker.astro';
+import Section from '../components/Section.astro';
 import RegisterList from '../components/RegisterList.astro';
 import PathMap from '../components/PathMap.astro';
 import PathDrawer from '../components/PathDrawer.astro';
@@ -58,8 +59,11 @@ const legend = [
   description="A staged learning path for the AI Governance Engineer: four stages from foundations to proof, each a grid of nodes that link into the Body of Knowledge and out to curated resources — with your own progress."
   image="/og/path.png"
 >
-  <section class="hero section">
-    <div class="container page-hero reveal">
+  <section class="hero section hero--page">
+    <div class="bg-mesh" aria-hidden="true"></div>
+    <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
+    <div class="container page-hero hero-in">
+      <p class="meta"><span class="meta-dot" aria-hidden="true"></span>Chapter 06 · Body of Knowledge</p>
       <Kicker swatch="var(--l2)" rule>The learning path</Kicker>
       <h1 class="display">Learn the role, one stage at a time.</h1>
       <p class="lede">
@@ -71,25 +75,19 @@ const legend = [
     </div>
   </section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l3)">How to read it</Kicker>
-      <h2 class="section-title display">Three kinds of node, three states.</h2>
-      <p class="lede well">
-        Each stage builds on the one above it. Nodes are marked as core,
-        alternative or optional; you mark your own as done, learning or skipped.
-      </p>
-      <div class="well"><RegisterList items={legend} /></div>
-    </div>
-  </section>
+  <Section
+    tone="tint"
+    kicker="How to read it"
+    kickerSwatch="var(--l3)"
+    title="Three kinds of node, three states."
+    lede="Each stage builds on the one above it. Nodes are marked as core, alternative or optional; you mark your own as done, learning or skipped."
+  >
+    <div class="well reveal"><RegisterList items={legend} /></div>
+  </Section>
 
-  <section class="section">
-    <div class="container reveal">
-      <Kicker swatch="var(--l1)">The path</Kicker>
-      <h2 class="section-title display">Four stages, from foundations to proof.</h2>
-      <PathMap stages={stages} nodes={nodes} edges={edges} entries={entries} />
-    </div>
-  </section>
+  <Section tone="plain" texture="grid" kicker="The path" kickerSwatch="var(--l1)" title="Four stages, from foundations to proof.">
+    <PathMap stages={stages} nodes={nodes} edges={edges} entries={entries} />
+  </Section>
 
   <CtaBand
     title="Own the role, not just the reading."
