@@ -11,6 +11,12 @@ interface Props {
   description?: string;
   canonical?: string;
   image?: string;
+  /** Open Graph locale, e.g. `en_US` (default) or `es_ES`. */
+  locale?: string;
+  /** JSON-LD structured data, emitted as a single ld+json script. */
+  jsonLd?: Record<string, unknown> | unknown[];
+  /** hreflang alternates, e.g. Spanish translations of the page. */
+  alternates?: { hreflang: string; href: string }[];
 }
 
 const {
@@ -18,6 +24,9 @@ const {
   description = site.description,
   canonical = new URL(Astro.url.pathname, site.url).href,
   image = '/og/default.png',
+  locale = 'en_US',
+  jsonLd,
+  alternates,
 } = Astro.props;
 
 const ogImage = new URL(image, site.url).href;
@@ -27,14 +36,25 @@ const ogImage = new URL(image, site.url).href;
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
 
+{alternates?.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={site.name} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
+<meta property="og:locale" content={locale} />
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImage} />
+
+{
+  jsonLd && (
+    /* JSON-LD is a data block, not executable script, so CSP script-src does
+       not apply; `<` is still escaped so page content can never break out. */
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />
+  )
+}

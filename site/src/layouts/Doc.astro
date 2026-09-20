@@ -38,6 +38,7 @@ interface Props {
   activeThesis?: boolean;
   cite?: boolean;
   image?: string;
+  jsonLd?: Record<string, unknown> | unknown[];
 }
 
 const {
@@ -56,6 +57,7 @@ const {
   activeThesis = false,
   cite = false,
   image,
+  jsonLd,
 } = Astro.props;
 
 const withSidebar = sidebar && !wide;
@@ -79,7 +81,7 @@ if (statsChapter) {
 }
 ---
 
-<Base title={pageTitle} description={summary} image={image}>
+<Base title={pageTitle} description={summary} image={image} jsonLd={jsonLd}>
   <div class="doc-progress" data-doc-progress aria-hidden="true"></div>
 
   <div class="doc container" data-mode={mode}>

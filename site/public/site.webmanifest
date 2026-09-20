@@ -1,0 +1,23 @@
+{
+  "name": "AI Governance Engineer",
+  "short_name": "AIGE",
+  "description": "The Thesis and Body of Knowledge for AI governance engineering.",
+  "start_url": "/",
+  "display": "minimal-ui",
+  "background_color": "#F6F4EE",
+  "theme_color": "#F6F4EE",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
