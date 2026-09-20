@@ -4,6 +4,23 @@ All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledg
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
 
+## [Unreleased] — 2026-09-20
+
+Pending patch, folded into the next tagged release (version 0.4.0 stays as is in CITATION.cff,
+README and the site): China added to the regulatory map. No change to the definition, values or
+principles; THESIS unchanged.
+
+### Added
+- `bok/08-regulatory-map.md`, `sources/SOURCES.md` — a **China** subsection under "Other
+  jurisdictions": the two-tier picture (four binding CAC rules — algorithmic recommendation, deep
+  synthesis, generative AI services and AI-content labelling — plus the mandatory standard GB
+  45438-2025; the voluntary GB/T 45654-2025 and the TC260 **AI Safety Governance Framework 3.0**), a
+  seven-row obligation-to-artefact table stamped "as of 2026-09-20", and a crosswalk of the
+  framework's **Appendix 2** (agentic AI risk management) against the OWASP Top 10 for Agentic
+  Applications 2026 and the NIST AI Agent Standards Initiative. A new "What is NOT harmonised yet"
+  bullet notes that the TC260 framework cross-references neither the Western instruments nor China's
+  own binding rules. Sources `[41]`–`[51]` (ten `primary`, one `reported`).
+
 ## [0.4.0] — 2026-09-19
 
 Minor release: two new patterns, a fuller regulatory map, curated resources, and a visual layer for
