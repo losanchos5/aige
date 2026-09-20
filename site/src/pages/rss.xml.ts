@@ -1,11 +1,18 @@
-// rss.xml: a "changelog" feed. One item per released version in
-// bok/CHANGELOG.md (`## [x.y] — date` headings), each linking to its anchor on
-// the /about/changelog page. The anchor is slugified with the same slugger
-// rehype-slug uses, so the link resolves to the real heading id on that page.
+// rss.xml: the site feed. It carries two kinds of items, newest first:
+//   - one per released version in bok/CHANGELOG.md (`## [x.y] — date` headings),
+//     each linking to its anchor on the /about/changelog page;
+//   - one per Body of Knowledge chapter (data/chapters.ts), linking to the
+//     chapter page, dated by the last git commit that touched the chapter source
+//     (reading.ts `gitDate`) so an edit resurfaces the chapter as a fresh item.
+// Changelog anchors are slugified with the same slugger rehype-slug uses, so the
+// link resolves to the real heading id on that page.
 import rss from '@astrojs/rss';
+import type { RSSFeedItem } from '@astrojs/rss';
 import type { APIRoute } from 'astro';
+import { chaptersOrdered } from '../data/chapters';
 import { site } from '../data/site';
 import { readSource, slugify, stripInline } from '../lib/md-parse';
+import { gitDate } from '../lib/reading';
 
 interface ChangelogItem {
   version: string;
@@ -55,23 +62,85 @@ function parseChangelog(markdown: string): ChangelogItem[] {
   return items;
 }
 
+/**
+ * The chapter lead: the opening blockquote between the H1 and the first section,
+ * with inline Markdown stripped. Every chapter opens with one; if a source has
+ * none, the caller falls back to the chapter's stored summary.
+ */
+function chapterLead(markdown: string): string {
+  const quote: string[] = [];
+  let started = false;
+  for (const line of markdown.split(/\r?\n/)) {
+    if (/^\s*>/.test(line)) {
+      started = true;
+      quote.push(line.replace(/^\s*>\s?/, '').trim());
+    } else if (started) {
+      break; // a blank or plain line ends the first blockquote
+    }
+  }
+  return stripInline(quote.join(' '));
+}
+
+interface FeedEntry {
+  /** Sort key: newest first across versions and chapters. */
+  date: Date;
+  item: RSSFeedItem;
+}
+
 export const GET: APIRoute = (context) => {
-  const changelog = parseChangelog(readSource('bok/CHANGELOG.md'));
+  // Absolute origin for stable guids, without a trailing slash.
+  const origin = (context.site?.toString() ?? site.url).replace(/\/+$/, '');
+
+  const versionEntries: FeedEntry[] = parseChangelog(readSource('bok/CHANGELOG.md')).map(
+    (entry) => ({
+      date: entry.date,
+      item: {
+        title: `v${entry.version}`,
+        link: `/about/changelog#${slugify(entry.heading)}`,
+        pubDate: entry.date,
+        description: entry.summary || `Version ${entry.version} of the Body of Knowledge.`,
+      },
+    }),
+  );
+
+  const chapterEntries: FeedEntry[] = chaptersOrdered.map((chapter) => {
+    const iso = gitDate(`../bok/${chapter.id}.md`);
+    let lead = '';
+    try {
+      lead = chapterLead(readSource(`bok/${chapter.id}.md`));
+    } catch {
+      // Source unreadable (e.g. a shallow checkout); fall back to the summary.
+    }
+    const link = `/bok/${chapter.slug}`;
+    return {
+      date: new Date(iso),
+      item: {
+        title: chapter.title,
+        link,
+        pubDate: new Date(iso),
+        description: lead || chapter.summary,
+        // Stable guid per chapter + date: a new git date (an edit) surfaces the
+        // chapter as a new item; an unchanged chapter keeps its guid across
+        // builds. isPermaLink="false" — this is an identity, not a fetchable URL.
+        customData: `<guid isPermaLink="false">${origin}${link}#${iso}</guid>`,
+      },
+    };
+  });
+
+  const items = [...versionEntries, ...chapterEntries]
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .map((entry) => entry.item);
+
   return rss({
     title: `${site.name} — Changelog`,
     description:
-      'Releases of the AI Governance Engineering Thesis & Body of Knowledge, newest first.',
+      'The AI Governance Engineering Thesis & Body of Knowledge: new and updated chapters and each released version, newest first.',
     site: context.site ?? site.url,
     // The site uses trailingSlash: 'never'; without this, rss appends a slash
     // after each link's #anchor (…#02--2026-09-10/) and the anchor stops
     // resolving to the heading id on the changelog page.
     trailingSlash: false,
-    items: changelog.map((entry) => ({
-      title: `v${entry.version}`,
-      link: `/about/changelog#${slugify(entry.heading)}`,
-      pubDate: entry.date,
-      description: entry.summary || `Version ${entry.version} of the Body of Knowledge.`,
-    })),
+    items,
     customData: '<language>en</language>',
   });
 };

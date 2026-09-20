@@ -415,3 +415,77 @@
 .term-card .tc-link:hover {
   text-decoration: underline;
 }
+
+/* ---- Print ----
+   A minimal stylesheet for paper and "Save as PDF". Screen styles are untouched;
+   everything here is scoped to @media print. It strips the interactive chrome so
+   only the reading content prints, forces black-on-white for ink economy and
+   contrast, reveals external link targets (there is no hover on paper) and keeps
+   figures, tables and callouts from splitting across a page break. */
+@media print {
+  /* Interactive / navigational chrome: header, nav, chapter rail, on-this-page,
+     footer, theme toggle, search, drawer bar, reading progress and CTA bands. */
+  .site-header,
+  .site-footer,
+  .doc-sidebar,
+  .doc-toc,
+  .doc-toc-m,
+  .doc-drawerbar,
+  .doc-scrim,
+  .doc-progress,
+  .skip-link,
+  .theme-toggle,
+  .search-dialog,
+  .search-btn,
+  .pager,
+  .band {
+    display: none !important;
+  }
+
+  /* Black on white; let the reading serif carry the body. */
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  .prose,
+  .prose :is(p, li, td, th, h1, h2, h3, h4, strong, blockquote, blockquote p) {
+    color: #000 !important;
+  }
+
+  /* The reading rails are gone, so let the content use the full page width. */
+  .doc,
+  .doc-layout,
+  .doc-main,
+  .prose {
+    max-width: none !important;
+    width: auto !important;
+    margin: 0 !important;
+    grid-template-columns: none !important;
+  }
+
+  /* Reveal external link targets — there is no hover or click on paper. */
+  .prose a[href^="http"]::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+
+  /* Keep atomic blocks whole across page breaks. */
+  .prose figure,
+  .figure,
+  .prose table,
+  .prose .table-scroll,
+  .prose tr,
+  .prose .callout {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Diagrams and figures scale down to the printable width. */
+  figure svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
