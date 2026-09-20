@@ -1,0 +1,49 @@
+name: Sign the Thesis
+description: Add your name to the signatories of the AI Governance Engineering Thesis.
+title: "[Sign] "
+labels: ["signatory"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Signing endorses *The AI Governance Engineering Thesis* — its definition, values and
+        principles. It does not require writing a chapter.
+
+        **Prefer to do it yourself?** Edit `bok/CONTRIBUTORS.md` directly (one click opens a fork
+        and GitHub's editor) and add your line at the end of the **Signatories** list, in this form:
+
+        ```
+        - Name — role / organisation (optional) — LinkedIn or GitHub link (optional)
+        ```
+
+        Otherwise, fill this form and a maintainer will add the line for you.
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      description: The name to list you under.
+      placeholder: Ada Lovelace
+    validations:
+      required: true
+  - type: input
+    id: affiliation
+    attributes:
+      label: Role / organisation or URL (optional)
+      description: A role, an organisation, or a LinkedIn/GitHub link. Leave blank to sign with your name only.
+      placeholder: AI Governance Engineer, Example Ltd — https://www.linkedin.com/in/example
+    validations:
+      required: false
+  - type: input
+    id: note
+    attributes:
+      label: One-line note (optional)
+      description: An optional single line on why you sign.
+    validations:
+      required: false
+  - type: checkboxes
+    id: agree
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have read THESIS.md and agree with it.
+          required: true

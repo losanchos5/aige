@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it using the metadata below."
+type: dataset
+title: "AI Governance Engineering: The Thesis & Body of Knowledge"
+abstract: >-
+  The founding text and working reference for AI governance engineering: turning AI governance
+  obligations into policy-as-code, eval gates and machine-readable evidence.
+authors:
+  - family-names: "García Aibar"
+    given-names: "Jorge"
+  - family-names: "Pols"
+    given-names: "Aurélie"
+version: "0.4.0"
+date-released: "2026-09-20"
+url: "https://aigovernanceengineer.com"
+repository-code: "https://github.com/losanchos5/aige"
+license: CC-BY-4.0
+# doi: 10.5281/zenodo.XXXXXXX  # Zenodo DOI — add on first archived release
+keywords:
+  - "AI governance"
+  - "AI governance engineering"
+  - "governance-as-code"
+  - "EU AI Act"
+  - "evals as evidence"
+preferred-citation:
+  type: book
+  title: "AI Governance Engineering: The Thesis & Body of Knowledge"
+  authors:
+    - family-names: "García Aibar"
+      given-names: "Jorge"
+    - family-names: "Pols"
+      given-names: "Aurélie"
+  year: 2026
+  version: "0.4.0"
+  url: "https://aigovernanceengineer.com"
+  license: CC-BY-4.0
