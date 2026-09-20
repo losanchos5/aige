@@ -17,8 +17,10 @@ const { prev, next } = Astro.props;
 <nav class="pager" aria-label="Chapter navigation">
   {
     prev ? (
-      <a class="pager-link prev" href={`/bok/${prev.slug}`}>
-        <span class="dir">Previous</span>
+      <a class="pager-link prev card-lum" href={`/bok/${prev.slug}`}>
+        <span class="dir">
+          <span class="arrow" aria-hidden="true">←</span> Previous
+        </span>
         <span class="name">{prev.shortTitle}</span>
       </a>
     ) : (
@@ -27,8 +29,10 @@ const { prev, next } = Astro.props;
   }
   {
     next ? (
-      <a class="pager-link next" href={`/bok/${next.slug}`}>
-        <span class="dir">Next</span>
+      <a class="pager-link next card-lum" href={`/bok/${next.slug}`}>
+        <span class="dir">
+          Next <span class="arrow" aria-hidden="true">→</span>
+        </span>
         <span class="name">{next.shortTitle}</span>
       </a>
     ) : (
@@ -47,21 +51,15 @@ const { prev, next } = Astro.props;
     border-top: 1px solid var(--line);
   }
 
+  /* card-lum (global) supplies border, soft shadow and the hover ring. */
   .pager-link {
     display: flex;
     flex-direction: column;
     gap: var(--s-1);
     padding: var(--s-3) var(--s-4);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
     text-decoration: none;
     color: var(--ink);
-    transition: border-color var(--dur) var(--ease);
     max-width: 48%;
-  }
-
-  .pager-link:hover {
-    border-color: var(--ink-2);
   }
 
   .pager-link.next {
@@ -69,10 +67,33 @@ const { prev, next } = Astro.props;
     margin-left: auto;
   }
 
+  .pager-link.next .dir {
+    justify-content: flex-end;
+  }
+
   .dir {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
     font-family: var(--font-mono);
     font-size: 0.75rem;
     color: var(--muted);
+  }
+
+  .arrow {
+    display: inline-block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .arrow {
+      transition: transform var(--dur) var(--ease);
+    }
+    .pager-link.prev:hover .arrow {
+      transform: translateX(-4px);
+    }
+    .pager-link.next:hover .arrow {
+      transform: translateX(4px);
+    }
   }
 
   .name {

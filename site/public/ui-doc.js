@@ -172,6 +172,26 @@
     });
   });
 
+  /* ---- Sidebar rail: slide an accent onto the current chapter row ---- */
+  (function () {
+    var nav = document.querySelector('.sidebar-nav');
+    var rail = nav && nav.querySelector('[data-nav-rail]');
+    var currentRow = nav && nav.querySelector('.nav-item[aria-current="page"]');
+    if (!nav || !rail || !currentRow) return;
+
+    function placeRail() {
+      var nr = nav.getBoundingClientRect();
+      var cr = currentRow.getBoundingClientRect();
+      rail.style.height = cr.height + 'px';
+      rail.style.transform = 'translateY(' + (cr.top - nr.top) + 'px)';
+      var ink = getComputedStyle(currentRow).getPropertyValue('--layer-ink').trim();
+      if (ink) rail.style.background = ink;
+    }
+
+    placeRail();
+    window.addEventListener('resize', placeRail, { passive: true });
+  })();
+
   /* ---- Reading progress: top hairline, sidebar register, read state ---- */
   (function () {
     var article = document.querySelector('.prose');
@@ -180,6 +200,13 @@
     var current = document.querySelector('.nav-item[aria-current="page"]');
     var slug = current && current.getAttribute('data-chapter-slug');
     var READ_KEY = 'aige.read';
+
+    // On browsers with a scroll-progress timeline the CSS animation drives the
+    // hairline, so leave style.transform untouched (they must not fight).
+    var cssScroll = false;
+    try {
+      cssScroll = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline: scroll()'));
+    } catch (e) {}
 
     function readList() {
       try {
@@ -212,7 +239,7 @@
       var doc = document.documentElement;
       var max = doc.scrollHeight - window.innerHeight;
       var docFrac = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
-      if (bar) bar.style.transform = 'scaleX(' + docFrac.toFixed(4) + ')';
+      if (bar && !cssScroll) bar.style.transform = 'scaleX(' + docFrac.toFixed(4) + ')';
 
       if (article && current) {
         var top = article.getBoundingClientRect().top + window.scrollY;

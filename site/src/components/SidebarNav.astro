@@ -14,6 +14,8 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
 ---
 
 <nav class="sidebar-nav" aria-label="Chapters">
+  <span class="nav-rail" data-nav-rail aria-hidden="true"></span>
+
   <div class="sidebar-tools">
     <button type="button" class="sidebar-search" data-search-open>
       <span>Search</span>
@@ -55,11 +57,37 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
 
 <style>
   .sidebar-nav {
+    position: relative;
     font-size: 0.9375rem;
     /* Absorb the rows' negative inline margins (their active/hover fill bleeds
        to the rail edge) so nothing extends past the nav box and forces a
        horizontal scrollbar on the sticky sidebar. */
     padding-inline: var(--s-2);
+  }
+
+  /* A single accent that ui-doc.js slides onto the current row (mirrors the TOC
+     marker). Sits at the rows' left bleed edge (x=0 of the nav's border box, so
+     it never widens the box — layout.spec forbids horizontal overflow here) and
+     takes the current layer's ink. Height/transform/background are set by JS;
+     with no JS it stays 0-height and the active row's fill carries the state. */
+  .nav-rail {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2px;
+    height: 0;
+    border-radius: 2px;
+    background: var(--ink);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--ink) 35%, transparent);
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .nav-rail {
+      transition:
+        transform 200ms var(--ease),
+        height 200ms var(--ease);
+    }
   }
 
   .sidebar-tools {
@@ -111,6 +139,7 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
   }
 
   .nav-item {
+    --layer-ink: var(--ink-2);
     position: relative;
     display: flex;
     align-items: baseline;
@@ -120,11 +149,18 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
     border-radius: var(--r-sm);
     text-decoration: none;
     color: var(--ink-2);
-    border-left: 2px solid transparent;
     transition:
       color var(--dur) var(--ease),
       background-color var(--dur) var(--ease);
   }
+
+  /* Each row carries its layer's ink, used by the hover tint and copied onto the
+     rail by ui-doc.js when the row is current. */
+  .nav-item.l1 { --layer-ink: var(--l1-ink); }
+  .nav-item.l2 { --layer-ink: var(--l2-ink); }
+  .nav-item.l3 { --layer-ink: var(--l3-ink); }
+  .nav-item.l4 { --layer-ink: var(--l4-ink); }
+  .nav-item.l5 { --layer-ink: var(--l5-ink); }
 
   /* Reading "register": a 3px track per chapter row. The current page fills as
      it is read; chapters marked read in localStorage show a muted full bar. */
@@ -161,7 +197,7 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
 
   .nav-item:hover {
     color: var(--ink);
-    background: var(--surface);
+    background: color-mix(in srgb, var(--layer-ink) 10%, transparent);
   }
 
   .nav-num {
@@ -177,24 +213,19 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
   }
 
   .nav-thesis {
+    --layer-ink: var(--ink);
     font-family: var(--font-display);
     font-weight: 600;
     color: var(--ink);
   }
 
+  /* The current row: a soft fill and heavier weight (the no-JS active state);
+     the sliding .nav-rail is layered on top when JS runs. */
   .nav-item[aria-current='page'] {
     color: var(--ink);
     font-weight: 600;
     background: var(--surface);
   }
-
-  /* Active row shows its layer swatch as a left tick. */
-  .nav-item.l1[aria-current='page'] { border-left-color: var(--l1-ink); }
-  .nav-item.l2[aria-current='page'] { border-left-color: var(--l2-ink); }
-  .nav-item.l3[aria-current='page'] { border-left-color: var(--l3-ink); }
-  .nav-item.l4[aria-current='page'] { border-left-color: var(--l4-ink); }
-  .nav-item.l5[aria-current='page'] { border-left-color: var(--l5-ink); }
-  .nav-thesis[aria-current='page'] { border-left-color: var(--ink); }
 
   .nav-item[aria-current='page'] .nav-num { color: var(--ink); }
 </style>

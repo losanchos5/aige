@@ -28,9 +28,12 @@ const tags: Record<Props['kind'], string> = {
 <style>
   .callout {
     --tint: var(--surface);
-    border-left: 3px solid var(--ink);
+    --rail: var(--ink);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--rail);
     border-radius: 0 var(--r-sm) var(--r-sm) 0;
     background: var(--tint);
+    box-shadow: var(--shadow-1);
     padding: var(--s-4) var(--s-5);
   }
 

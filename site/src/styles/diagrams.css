@@ -40,6 +40,13 @@
   overflow: hidden;
 }
 
+/* Framed like a card-lum for in-prose chapter/thesis figures. Scoped to .prose
+   so the hero loop (.hero--loop) and the enlarge dialog (appended to <body>)
+   keep their own chrome. */
+.prose .diagram:not(.diagram--bare) .diagram-canvas {
+  box-shadow: var(--shadow-1);
+}
+
 .diagram-canvas svg {
   width: 100%;
   height: auto;

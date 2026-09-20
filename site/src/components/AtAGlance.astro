@@ -17,7 +17,7 @@ const { items, class: className } = Astro.props;
 
 {
   items && items.length > 0 && (
-    <aside class:list={['glance', className]} aria-labelledby="glance-label">
+    <aside class:list={['glance', 'card-lum', className]} aria-labelledby="glance-label">
       <p class="glance-label" id="glance-label">At a glance</p>
       <ol class="glance-list">
         {items.map((item, i) => (
@@ -32,13 +32,32 @@ const { items, class: className } = Astro.props;
 }
 
 <style>
+  /* card-lum (global) supplies the frame, soft shadow and hover ring; here we
+     add the layout and a five-layer accent rule running l1→l5 down the left. */
   .glance {
+    --lumin: linear-gradient(
+      180deg,
+      var(--l1-ink),
+      var(--l2-ink),
+      var(--l3-ink),
+      var(--l4-ink),
+      var(--l5-ink)
+    );
     margin: var(--s-5) 0 var(--s-6);
-    padding: var(--s-4) var(--s-5) var(--s-5);
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--ink);
-    border-radius: 0 var(--r-lg) var(--r-lg) 0;
-    background: color-mix(in srgb, var(--l1) 30%, var(--bg));
+    padding: var(--s-5) var(--s-5) var(--s-5) var(--s-6);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+
+  .glance::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--lumin);
+    pointer-events: none;
   }
 
   /* Same bleed as .prose > .diagram: take the whole well, not the 72ch column. */

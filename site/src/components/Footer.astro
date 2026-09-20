@@ -70,16 +70,36 @@ const project = [
     </div>
 
     <p class="meta">{site.license} · v{site.bokVersion} · {domain}</p>
+
+    <p class="foot-wordmark" aria-hidden="true">{site.name}</p>
   </div>
 </footer>
 
 <style>
   .site-footer {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     border-top: 1px solid var(--line);
     margin-top: clamp(64px, 10vw, 128px);
     padding-block: var(--s-7);
+    background: color-mix(in srgb, var(--l2) 18%, var(--bg));
     color: var(--muted);
     font-size: var(--fs-small);
+  }
+
+  /* Faint 48px grid over the band, behind the content and dimmer in dark. */
+  .site-footer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(to right, var(--tex-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--tex-line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: var(--texture-alpha);
+    pointer-events: none;
   }
 
   .cols {
@@ -112,7 +132,8 @@ const project = [
     font-size: var(--fs-label);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--muted);
+    /* --ink-2, not --muted: the footer is now a tinted band. */
+    color: var(--ink-2);
   }
 
   .group ul {
@@ -142,6 +163,22 @@ const project = [
     font-family: var(--font-mono);
     font-size: var(--fs-label);
     letter-spacing: 0.04em;
-    color: var(--muted);
+    /* --ink-2, not --muted: the footer is now a tinted band. */
+    color: var(--ink-2);
+  }
+
+  /* Big display wordmark as a faint watermark closing the footer. aria-hidden
+     and decorative, so its low-contrast ink is out of the a11y tree; clipped
+     (overflow:hidden + nowrap) so a long name never forces horizontal scroll. */
+  .foot-wordmark {
+    margin: var(--s-6) 0 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.5rem, 8vw, 7rem);
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+    color: color-mix(in srgb, var(--ink) 10%, var(--bg));
+    white-space: nowrap;
+    overflow: hidden;
   }
 </style>

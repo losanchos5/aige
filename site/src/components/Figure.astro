@@ -29,6 +29,7 @@ const { title, caption, description, class: className, id } = Astro.props;
 <figure class:list={['figure', 'figure--infographic', className]} data-figure={id}>
   <div class="figure-canvas"><slot /></div>
   <figcaption class="figure-figcaption">
+    <span class="figure-fig-chip">Figure</span>
     <span class="figure-fig-title">{title}</span>
     {caption && <span class="figure-fig-desc">{caption}</span>}
   </figcaption>

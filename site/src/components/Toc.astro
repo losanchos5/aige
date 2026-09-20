@@ -60,6 +60,7 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
     width: 2px;
     height: 0;
     background: var(--ink);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--ink) 40%, transparent);
     transform: translateY(0);
   }
 
@@ -93,6 +94,17 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
     transition: color var(--dur) var(--ease);
   }
 
+  @media (prefers-reduced-motion: no-preference) {
+    .toc a {
+      transition:
+        color var(--dur) var(--ease),
+        transform var(--dur) var(--ease);
+    }
+    .toc a:hover {
+      transform: translateX(2px);
+    }
+  }
+
   .toc-h3 a {
     padding-left: var(--s-5);
     font-size: 0.8125rem;
@@ -109,5 +121,6 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
   .toc a[aria-current='true'] {
     color: var(--ink);
+    font-weight: 600;
   }
 </style>

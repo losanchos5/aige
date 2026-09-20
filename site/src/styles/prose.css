@@ -37,6 +37,17 @@
   line-height: 1.15;
 }
 
+/* A short layer-ink dash above each section title, under the register rule. */
+.prose h2::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 3px;
+  margin-bottom: var(--s-3);
+  border-radius: 2px;
+  background: var(--l1-ink);
+}
+
 .prose h3 {
   margin-top: var(--s-6);
   margin-bottom: var(--s-3);
@@ -55,18 +66,19 @@
   text-decoration: none;
 }
 
+/* Anchor marker: a faint § that darkens on hover/focus. Colour, never opacity
+   (dimming text via opacity fails the contrast gate). */
 .prose :is(h2, h3, h4) > a::after {
-  content: ' #';
-  color: var(--muted);
-  opacity: 0;
+  content: ' §';
+  color: var(--line);
   font-family: var(--font-mono);
   font-weight: 400;
-  transition: opacity var(--dur) var(--ease);
+  transition: color var(--dur) var(--ease);
 }
 
 .prose :is(h2, h3, h4) > a:hover::after,
 .prose :is(h2, h3, h4) > a:focus-visible::after {
-  opacity: 1;
+  color: var(--muted);
 }
 
 /* ---- Body copy ---- */
@@ -116,13 +128,32 @@
   color: var(--muted);
 }
 
-/* ---- Callouts (aside.callout[data-kind]) ---- */
+/* ---- Callouts (aside.callout[data-kind]) ----
+   A framed card with a soft shadow, a left rail keyed to the kind (--rail) and a
+   mono glyph set in the gutter via ::before content per data-kind. */
 .prose .callout {
+  --rail: var(--ink-2);
+  --callout-glyph: '•';
+  position: relative;
   margin-top: var(--s-5);
-  padding: var(--s-4) var(--s-4) var(--s-4) var(--s-5);
-  border-left: 3px solid var(--ink-2);
+  padding: var(--s-4) var(--s-4) var(--s-4) var(--s-6);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--rail);
   border-radius: 0 var(--r-sm) var(--r-sm) 0;
   background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.prose .callout::before {
+  content: var(--callout-glyph);
+  position: absolute;
+  left: var(--s-3);
+  top: var(--s-4);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.2;
+  color: var(--rail);
+  pointer-events: none;
 }
 
 .prose .callout > * + * {
@@ -143,19 +174,23 @@
 }
 
 .prose .callout[data-kind='practice'] {
-  border-left-color: var(--l2-ink);
+  --rail: var(--l2-ink);
+  --callout-glyph: '✓';
   background: color-mix(in srgb, var(--l2) 45%, var(--bg));
 }
 .prose .callout[data-kind='example'] {
-  border-left-color: var(--l1-ink);
+  --rail: var(--l1-ink);
+  --callout-glyph: '→';
   background: color-mix(in srgb, var(--l1) 45%, var(--bg));
 }
 .prose .callout[data-kind='anti'] {
-  border-left-color: var(--l3-ink);
+  --rail: var(--l3-ink);
+  --callout-glyph: '✕';
   background: color-mix(in srgb, var(--l3) 45%, var(--bg));
 }
 .prose .callout[data-kind='note'] {
-  border-left-color: var(--ink-2);
+  --rail: var(--ink-2);
+  --callout-glyph: '§';
   background: var(--surface);
 }
 
@@ -253,13 +288,28 @@
 
 /* ---- Pull-quote blockquotes (non-callout) ---- */
 .prose blockquote {
+  position: relative;
   margin-top: var(--s-5);
-  padding-left: var(--s-5);
-  border-left: 3px solid var(--line);
+  padding-left: var(--s-6);
+  border-left: 3px solid var(--l3-ink);
   font-family: var(--font-display);
   font-size: 1.375rem;
   line-height: 1.4;
   color: var(--ink);
+}
+
+/* Oversized decorative opening quote in the layer pastel (ornamental, not the
+   quote's text — that stays --ink below). */
+.prose blockquote::before {
+  content: '\201C';
+  position: absolute;
+  left: var(--s-3);
+  top: 0.05em;
+  font-family: var(--font-display);
+  font-size: 2.75rem;
+  line-height: 1;
+  color: var(--l3);
+  pointer-events: none;
 }
 
 .prose blockquote p {
@@ -271,12 +321,14 @@
   font-family: var(--font-mono);
   font-size: 0.875em;
   padding: 0.15em 0.4em;
+  border: 1px solid color-mix(in srgb, var(--l1-ink) 18%, transparent);
   border-radius: var(--r-sm);
   background: color-mix(in srgb, var(--l1) 40%, var(--bg));
   color: var(--ink);
 }
 
 .prose pre {
+  position: relative;
   padding: var(--s-4);
   overflow-x: auto;
   background: var(--surface);
@@ -284,8 +336,32 @@
   border-radius: var(--r-lg);
 }
 
+/* Language chip, top-right, from Shiki's data-language (omitted for plaintext).
+   Neutral grey that reads in both themes; text follows the block's foreground. */
+.prose pre[data-language]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 2px var(--s-2);
+  border-bottom-left-radius: var(--r-sm);
+  background: rgba(127, 127, 127, 0.25);
+  color: inherit;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.prose pre[data-language='plaintext']::before,
+.prose pre[data-language='text']::before,
+.prose pre[data-language='txt']::before {
+  content: none;
+}
+
 .prose pre code {
   padding: 0;
+  border: 0;
   background: none;
   /* Inherit Shiki's own foreground (set inline on the dark `astro-code` pre).
      Overriding it with a theme ink turns plaintext blocks dark-on-dark in light
@@ -300,10 +376,15 @@
   margin-block: var(--s-6);
 }
 
-/* ---- Tables (rehype-tables -> div.table-scroll > table) ---- */
+/* ---- Tables (rehype-tables -> div.table-scroll > table) ----
+   The scroll region already carries tabindex/role=region (rehype-tables), so
+   capping its height and letting it scroll vertically adds no new unlabelled
+   scroller; the thead sticks to its top as rows scroll under it. */
 .prose .table-scroll {
   margin-top: var(--s-5);
+  max-height: 70dvh;
   overflow-x: auto;
+  overflow-y: auto;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
 }
@@ -328,11 +409,15 @@
 }
 
 .prose thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ink);
+  /* Opaque so scrolled rows never show through the sticky header. */
   background: color-mix(in srgb, var(--ink) 4%, var(--bg));
 }
 

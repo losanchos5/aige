@@ -76,6 +76,12 @@ const pageTitle = `${title} · ${site.name}`;
 let words: number | undefined;
 let minutes: number | undefined;
 const statsChapter = slug ? getChapterBySlug(slug) : undefined;
+// Layer tint for the ChapterHeader band: chapter.order % 5 (the same rotation
+// SidebarNav uses). Thesis / meta pages are not chapters → no layer → neutral.
+const headerLayers = ['l1', 'l2', 'l3', 'l4', 'l5'];
+const headerLayer = statsChapter
+  ? headerLayers[statsChapter.order % headerLayers.length]
+  : undefined;
 if (statsChapter) {
   try {
     const markdown = readSource(`bok/${statsChapter.id}.md`);
@@ -153,6 +159,7 @@ if (statsChapter) {
             updated={updated}
             words={words}
             minutes={minutes}
+            layer={headerLayer}
           />
           <slot />
         </article>
@@ -205,12 +212,32 @@ if (statsChapter) {
     top: 0;
     z-index: 19;
     width: 100%;
-    height: 1px;
-    background: var(--ink);
+    height: 2px;
+    background: linear-gradient(to right, var(--l1-ink), var(--l5-ink));
     transform: scaleX(0);
     transform-origin: left;
     will-change: transform;
     pointer-events: none;
+  }
+
+  /* Where the browser supports a scroll-progress timeline, drive the fill in CSS
+     off the root scroller. ui-doc.js detects the same support and stops writing
+     style.transform, so the two never fight; v4.spec still reads a computed
+     scaleX near 1 at the foot of the page. */
+  @supports (animation-timeline: scroll()) {
+    .doc-progress {
+      animation: doc-progress-grow linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+
+  @keyframes doc-progress-grow {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
   }
 
   .doc {
@@ -378,6 +405,11 @@ if (statsChapter) {
       background: none;
       border-right: 0;
       transform: none;
+      /* Soft fade where the rail scrolls under the viewport foot. Purely visual
+         (mask does not touch layout, so the layout.spec no-overflow checks and
+         computed contrast are unaffected). */
+      -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent);
+      mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent);
     }
 
     .doc-scrim {

@@ -93,8 +93,23 @@ const current = (href: string) => (isCurrent(href) ? 'page' : undefined);
     position: sticky;
     top: 0;
     z-index: 20;
-    background: var(--bg);
-    border-bottom: 1px solid var(--line);
+    /* Frosted bar (the 68px strip only): a translucent ground with a backdrop
+       blur so content reads faintly beneath it. The hairline + faint shadow are
+       held back until scrolled (added by initHeader in ui.js), so the top of the
+       page stays clean. The 1px border is always present but transparent, so the
+       bar height — and the reading-progress bar's computed top — never shifts. */
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid transparent;
+    transition:
+      border-color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease);
+  }
+
+  .site-header.is-scrolled {
+    border-bottom-color: var(--line);
+    box-shadow: 0 1px 12px color-mix(in srgb, var(--ink) 6%, transparent);
   }
 
   .bar {
@@ -157,6 +172,36 @@ const current = (href: string) => (isCurrent(href) ? 'page' : undefined);
   .nav-panel a[aria-current='page'] {
     color: var(--ink);
     font-weight: 600;
+  }
+
+  /* Desktop nav underline: a 2px rule that grows from the left on
+     hover/focus-visible and stays out for the current page. */
+  .nav-desktop a {
+    position: relative;
+  }
+
+  .nav-desktop a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    height: 2px;
+    background: var(--ink);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .nav-desktop a::after {
+      transition: transform var(--dur) var(--ease);
+    }
+  }
+
+  .nav-desktop a:hover::after,
+  .nav-desktop a:focus-visible::after,
+  .nav-desktop a[aria-current='page']::after {
+    transform: scaleX(1);
   }
 
   /* Icon buttons (search, burger) */
