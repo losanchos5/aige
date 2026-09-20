@@ -31,11 +31,6 @@ playwright-report
 site/.lighthouseci
 
 # HyperFrames video projects (source is versioned; heavy artefacts are not)
-videos/*/capture
-videos/*/.media
-videos/*/renders
-videos/*/snapshots
-videos/*/node_modules
 
 # Claude Code agent worktrees
 .claude/worktrees/

@@ -18,7 +18,6 @@ const updated = gitDate('../THESIS.es.md');
 const signUrl = `${site.github}/blob/main/bok/CONTRIBUTORS.md`;
 ---
 
-{/* TODO(F4): pass locale="es_ES" and alternates once Seo supports them */}
 <Doc
   title={title}
   summary={summary}
@@ -30,11 +29,15 @@ const signUrl = `${site.github}/blob/main/bok/CONTRIBUTORS.md`;
   wide={true}
   activeThesis={true}
   image="/og/thesis.png"
+  lang="es"
+  locale="es_ES"
+  alternates={[
+    { hreflang: 'en', href: `${site.url}/thesis` },
+    { hreflang: 'es', href: `${site.url}/es/thesis` },
+    { hreflang: 'x-default', href: `${site.url}/thesis` },
+  ]}
 >
-  {/* Base.astro hard-codes <html lang="en"> and takes no lang prop (owned by
-      another block). As a fallback we mark this subtree lang="es" so assistive
-      tech switches language for the translated body. */}
-  <div lang="es" class="thesis-es">
+  <div class="thesis-es">
     <p class="lang-switch">
       <a href="/thesis">Read in English</a>
     </p>

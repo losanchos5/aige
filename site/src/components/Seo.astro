@@ -22,7 +22,9 @@ interface Props {
 const {
   title,
   description = site.description,
-  canonical = new URL(Astro.url.pathname, site.url).href,
+  // build.format is 'file', so Astro.url.pathname carries a `.html` suffix;
+  // the canonical mirrors the clean URLs used by the nav, sitemap and JSON-LD.
+  canonical = new URL(Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '/'), site.url).href,
   image = '/og/default.png',
   locale = 'en_US',
   jsonLd,

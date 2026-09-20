@@ -14,12 +14,13 @@ interface Props {
   title: string;
   description?: string;
   image?: string;
+  lang?: string;
   locale?: string;
   jsonLd?: Record<string, unknown> | unknown[];
   alternates?: { hreflang: string; href: string }[];
 }
 
-const { title, description, image, locale, jsonLd, alternates } = Astro.props;
+const { title, description, image, lang = 'en', locale, jsonLd, alternates } = Astro.props;
 
 // Cloudflare Web Analytics: only injected when a token is provided at build time
 // via PUBLIC_CF_BEACON_TOKEN (a Cloudflare secret). No token → no beacon.
@@ -27,7 +28,7 @@ const cfBeaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

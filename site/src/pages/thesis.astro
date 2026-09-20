@@ -33,8 +33,31 @@ const issueUrl = `${site.github}/issues/new?template=sign-the-thesis.yml`;
   wide={true}
   activeThesis={true}
   image="/og/thesis.png"
+  alternates={[
+    { hreflang: 'en', href: `${site.url}/thesis` },
+    { hreflang: 'es', href: `${site.url}/es/thesis` },
+    { hreflang: 'x-default', href: `${site.url}/thesis` },
+  ]}
 >
+  <p class="lang-switch"><a href="/es/thesis" hreflang="es" lang="es">Leer en español</a></p>
   <SignNote signUrl={signUrl} issueUrl={issueUrl} />
   <Diagram id="aige-in-the-org" />
   <Content />
 </Doc>
+
+<style>
+  .lang-switch {
+    margin-bottom: var(--s-4);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .lang-switch a {
+    color: var(--ink-2);
+    font-weight: 600;
+  }
+
+  .lang-switch a:hover {
+    color: var(--ink);
+  }
+</style>
