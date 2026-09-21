@@ -51,3 +51,21 @@ for (const scheme of schemes) {
     await page.screenshot({ path: `tests/__screenshots__/N/drawer-390-${scheme}.png` });
   });
 }
+
+// Block M: the discipline map (/map) at three widths in both colour schemes,
+// full-page so the map canvas, legend and content-by-cluster index all show,
+// written to tests/__screenshots__/M/.
+for (const scheme of schemes) {
+  for (const width of widths) {
+    test(`map ${width} ${scheme}`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
+      await page.setViewportSize({ width, height: 1200 });
+      await page.goto('/map');
+      await page.waitForLoadState('networkidle');
+      await page.screenshot({
+        path: `tests/__screenshots__/M/map-${width}-${scheme}.png`,
+        fullPage: true,
+      });
+    });
+  }
+}
