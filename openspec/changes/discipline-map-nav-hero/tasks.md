@@ -41,15 +41,15 @@ en el puerto 4321 antes de lanzar tests.
 
 ## 5. Kit LinkedIn (código, en `D:\Documents\aige-media\linkedin`)
 
-- [ ] 5.1 Crear `src/sync-map.mjs` (ejecuta el generador portrait del sitio a `src/generated/`, escribe `discipline-map.meta.json` con versión BoK, `gitSha`, `dirty`, `renderedAt`, `svgSha256`; `--publish` copia el PNG a `site/public/downloads/aige-discipline-map-v{bokVersion}.png` y escribe `site/src/data/map-export.json`); verificar con `node src/sync-map.mjs` y comprobando que existen SVG y meta.
-- [ ] 5.2 Crear el esqueleto de `src/mindmap.html` (marcadores `<!--MAP-->` y `{{bokVersion}}`, clases `.frame/.frame-head/.map-slot/.mark/.frame-foot/.font-probe`, `@font-face` de las tres fuentes, `window.__ready`) sin diseño final; verificar abriéndolo en Chromium sin errores de consola.
-- [ ] 5.3 Ampliar `src/render.mjs` (`--only`, target `mindmap` 1200×1500 @2x que inyecta SVG y meta y escribe `src/generated/mindmap.built.html`, comprobación de las tres familias, `guardMindmap`: dimensiones, viewBox, nº de textos, área segura, sin solape con la marca, fuente ≥ 14 px (aviso < 16), `dirty`, peso < 3 MB); verificar con `node src/render.mjs --only mindmap` produciendo `out/mindmap-1200x1500@2x.png` con guardas en verde.
-- [ ] 5.4 Documentar en `README.md` y `BRIEF.md` del kit el checklist de render y publicación; verificar que el README describe `sync-map`, `render --only mindmap` y `--publish`.
+- [x] 5.1 Crear `src/sync-map.mjs` (ejecuta el generador portrait del sitio a `src/generated/`, escribe `discipline-map.meta.json` con versión BoK, `gitSha`, `dirty`, `renderedAt`, `svgSha256`; `--publish` copia el PNG a `site/public/downloads/aige-discipline-map-v{bokVersion}.png` y escribe `site/src/data/map-export.json`); verificar con `node src/sync-map.mjs` y comprobando que existen SVG y meta.
+- [x] 5.2 Crear el esqueleto de `src/mindmap.html` (marcadores `<!--MAP-->` y `{{bokVersion}}`, clases `.frame/.frame-head/.map-slot/.mark/.frame-foot/.font-probe`, `@font-face` de las tres fuentes, `window.__ready`) sin diseño final; verificar abriéndolo en Chromium sin errores de consola.
+- [x] 5.3 Ampliar `src/render.mjs` (`--only`, target `mindmap` 1200×1500 @2x que inyecta SVG y meta y escribe `src/generated/mindmap.built.html`, comprobación de las tres familias, `guardMindmap`: dimensiones, viewBox, nº de textos, área segura, sin solape con la marca, fuente ≥ 14 px (aviso < 16), `dirty`, peso < 3 MB); verificar con `node src/render.mjs --only mindmap` produciendo `out/mindmap-1200x1500@2x.png` con guardas en verde.
+- [x] 5.4 Documentar en `README.md` y `BRIEF.md` del kit el checklist de render y publicación; verificar que el README describe `sync-map`, `render --only mindmap` y `--publish`.
 
 ## 6. Infografía (Fable)
 
-- [ ] 6.1 Escribir el marco de `src/mindmap.html` (CSS y copy: kicker, título "The discipline on one page.", subtítulo, register mark 56-64 px en la esquina superior derecha, pie con URL y versión) iterando con `generated/mindmap.built.html`; verificar con `node src/render.mjs --only mindmap` en verde y revisión del PNG a 100 % y 33 %.
-- [ ] 6.2 Publicar con `node src/sync-map.mjs --publish` y dejar `mindmap-post.md` junto al PNG con el texto sugerido; verificar con `npx playwright test tests/map-page.spec.ts` (descarga 200, dimensiones y versión coinciden).
+- [x] 6.1 Escribir el marco de `src/mindmap.html` (CSS y copy: kicker, título "The discipline on one page.", subtítulo, register mark 56-64 px en la esquina superior derecha, pie con URL y versión) iterando con `generated/mindmap.built.html`; verificar con `node src/render.mjs --only mindmap` en verde y revisión del PNG a 100 % y 33 %.
+- [x] 6.2 Publicar con `node src/sync-map.mjs --publish` y dejar `mindmap-post.md` junto al PNG con el texto sugerido; verificar con `npx playwright test tests/map-page.spec.ts` (descarga 200, dimensiones y versión coinciden).
 
 ## 7. Verificación, revisión y cierre
 
