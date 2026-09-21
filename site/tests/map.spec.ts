@@ -250,8 +250,11 @@ test('the portrait variant is a standalone light-theme SVG with matching meta', 
     .find((b) => b.id === 'patterns')!
     .leaves.flatMap((leaf) => leaf.children ?? []);
   expect(patternNodes).toHaveLength(patterns.length); // all 17
+  // The generator XML-escapes labels (scripts/lib/svg-text.mjs esc), so compare escaped text.
+  const escXml = (s: string) =>
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   for (const node of patternNodes) {
-    const shown = svg.includes(node.label) || (node.short != null && svg.includes(node.short));
+    const shown = svg.includes(escXml(node.label)) || (node.short != null && svg.includes(escXml(node.short)));
     expect(shown, `pattern "${node.label}" (or its short) is in the portrait`).toBe(true);
   }
   expect((svg.match(/Layer 01 Govern-as-Code/g) ?? []).length).toBe(1);

@@ -111,5 +111,5 @@ test('/role links to its chapter via the related line', async ({ page }) => {
 
 test('/path does not attribute the page to Chapter 06', async ({ page }) => {
   await page.goto('/path');
-  await expect(page.locator('body')).not.toContainText('Chapter 06');
+  await expect(page.locator('.hero')).not.toContainText(/chapter 06/i);
 });

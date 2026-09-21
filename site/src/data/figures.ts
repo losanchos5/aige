@@ -121,7 +121,7 @@ export const figures: readonly FigureDef[] = [
     id: 'discipline-map',
     title: 'The map of the discipline',
     caption:
-      'The whole discipline on one canvas: a central node and eight branches — foundations, values, the stack, patterns, the role, obligations, maturity and the learning path — every node a link. Follow the branch you are weakest in, or read the same map as a list below. — drawn from chapters 01–08',
+      'The whole discipline on one canvas: a central node and eight branches — foundations, values, the stack, patterns, the role, obligations, maturity and the learning path — every node a link. Follow the branch you are weakest in, or read the same map as a list below — drawn from chapters 01–08',
     alt: 'A two-sided mind map with a central AI Governance Engineer node and eight branches, each with its second-level topics as links.',
     description:
       'A two-sided mind map. The centre is the AI Governance Engineer. Four branches sit on the left — Foundations (the definition, the three questions, the disambiguation cluster, the five problems), Values and principles, The Stack (five layers and the minimum viable stack) and Patterns (the catalogue by layer) — and four on the right — The Role (seven workflows, the career ladder, three ways in), Obligations (the topic crosswalk, the frameworks and the reverse index), Maturity (the five levels, metrics and the self-assessment) and the Learning path (four stages of nodes). Every node links to the page or on-page anchor that develops it; the list under the map is the same content as text.',
