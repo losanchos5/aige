@@ -510,6 +510,10 @@ function roleBranch(src: MapSources): MapBranch {
 }
 
 function obligationsBranch(src: MapSources): MapBranch {
+  // Risk management is the first crosswalk topic and the thread GRC readers look for first;
+  // it is promoted to a second-level leaf so it shows in the portrait variant too.
+  const riskTopic = src.topics.find((t) => t.id === 'risk-management');
+  if (!riskTopic) throw new Error('map: crosswalk topic "risk-management" is missing');
   const familyChips: MapNode[] = FRAMEWORK_FAMILIES.map((family) => ({
     id: `obligations:family:${family.anchor}`,
     label: family.label,
@@ -538,6 +542,11 @@ function obligationsBranch(src: MapSources): MapBranch {
       { label: 'Topic crosswalk', href: '/resources/crosswalk' },
     ],
     leaves: [
+      {
+        id: 'obligations:risk-management',
+        label: riskTopic.name,
+        href: `/resources/crosswalk#topic-${riskTopic.id}`,
+      },
       {
         id: 'obligations:crosswalk',
         label: 'Topic crosswalk',
