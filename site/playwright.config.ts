@@ -1,6 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
-const PORT = 4321;
+// PW_PORT lets parallel worktrees run their own preview server (default 4321).
+const PORT = Number(process.env.PW_PORT) || 4321;
 const baseURL = `http://localhost:${PORT}`;
 
 // Pure-visual screenshot specs and the axe a11y sweep are heavy and produce no
@@ -37,7 +38,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run preview',
+    command: `npm run preview -- --port ${PORT}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

@@ -10,7 +10,7 @@
  */
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/pages.css';
-import Kicker from '../components/Kicker.astro';
+import PageHero from '../components/PageHero.astro';
 import Section from '../components/Section.astro';
 import RegisterList from '../components/RegisterList.astro';
 import PathMap from '../components/PathMap.astro';
@@ -59,21 +59,13 @@ const legend = [
   description="A staged learning path for the AI Governance Engineer: four stages from foundations to proof, each a grid of nodes that link into the Body of Knowledge and out to curated resources — with your own progress."
   image="/og/path.png"
 >
-  <section class="hero section hero--page">
-    <div class="bg-mesh" aria-hidden="true"></div>
-    <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
-    <div class="container page-hero hero-in">
-      <p class="meta"><span class="meta-dot" aria-hidden="true"></span>Chapter 06 · Body of Knowledge</p>
-      <Kicker swatch="var(--l2)" rule>The learning path</Kicker>
-      <h1 class="display">Learn the role, one stage at a time.</h1>
-      <p class="lede">
-        A build order for the AI Governance Engineer: four stages from
-        foundations to proof, each a grid of nodes that map back to the Body of
-        Knowledge and out to the tools and reading behind them. Mark what you
-        have done; the path remembers.
-      </p>
-    </div>
-  </section>
+  <PageHero
+    variant="page"
+    kicker="The learning path"
+    swatch="var(--l2)"
+    title="Learn the role, one stage at a time."
+    lede="A build order for the AI Governance Engineer: four stages from foundations to proof, each a grid of nodes that map back to the Body of Knowledge and out to the tools and reading behind them. Mark what you have done; the path remembers."
+  />
 
   <Section
     tone="tint"
@@ -100,9 +92,3 @@ const legend = [
 
   <script is:inline defer src="/path.js"></script>
 </Marketing>
-
-<style>
-  .hero h1 {
-    font-size: var(--fs-display);
-  }
-</style>

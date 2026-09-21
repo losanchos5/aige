@@ -19,6 +19,7 @@ const updated = gitDate(`../${editPath}`);
   title={title}
   summary={summary}
   kicker="About"
+  crumbs={[{ label: 'About', href: '/about' }, { label: title }]}
   headings={headings}
   editPath={editPath}
   updated={updated}

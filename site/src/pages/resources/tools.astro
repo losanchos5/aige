@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Kicker from '../../components/Kicker.astro';
+import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import Diagram from '../../components/Diagram.astro';
 import { site } from '../../data/site';
@@ -29,21 +29,20 @@ const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}
   description="Reference tool categories for each layer of the AI governance engineering stack, with illustrative examples — the substance, not an endorsement of any brand."
   image="/og/resources.png"
 >
-  <div class="container res-page">
-    <div class="res-hero">
-      <div class="bg-mesh" aria-hidden="true"></div>
-      <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
-      <header class="res-head">
-        <Kicker rule swatch="var(--l4)">Resources · Tools</Kicker>
-        <h1 class="res-title">Tool categories, by layer.</h1>
-        <p class="res-lede">
-          The reference tool categories that fill each layer of the stack, with the examples the Body
-          of Knowledge names. The category is the substance; the brands are illustrative. See how they
-          fit together in <a href="/stack">the stack</a>.
-        </p>
-      </header>
-    </div>
+  <PageHero
+    variant="res"
+    swatch="var(--l4)"
+    crumbs={[{ label: 'Resources', href: '/resources' }, { label: 'Tools' }]}
+    title="Tool categories, by layer."
+  >
+    <p class="lede" slot="lede">
+      The reference tool categories that fill each layer of the stack, with the examples the Body
+      of Knowledge names. The category is the substance; the brands are illustrative. See how they
+      fit together in <a href="/stack">the stack</a>.
+    </p>
+  </PageHero>
 
+  <div class="container res-page">
     <div class="res-section">
       <Callout kind="note" title="Illustrative, not an endorsement">
         <p>Tools are named as category examples to make the substance concrete. Naming a tool is not

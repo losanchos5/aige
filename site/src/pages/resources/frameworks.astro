@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Kicker from '../../components/Kicker.astro';
+import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import FrameworkTable from '../../components/FrameworkTable.astro';
 import ObligationMatrix from '../../components/ObligationMatrix.astro';
@@ -17,21 +17,15 @@ import '../../styles/pages.css';
   description="The laws, standards, codes and control sets AI governance engineering maps against, with the obligation → artefact → stack-layer index from chapter 08."
   image="/og/resources.png"
 >
-  <div class="container res-page">
-    <div class="res-hero">
-      <div class="bg-mesh" aria-hidden="true"></div>
-      <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
-      <header class="res-head">
-        <Kicker rule swatch="var(--l1)">Resources · Frameworks</Kicker>
-        <h1 class="res-title">The instruments, and what answers them.</h1>
-        <p class="res-lede">
-          The horizontal law, the management standards, the voluntary codes and the control sets the
-          discipline is built against — then the reverse index that names, for each obligation, the
-          engineering artefact that evidences it and the layer it lives in.
-        </p>
-      </header>
-    </div>
+  <PageHero
+    variant="res"
+    swatch="var(--l1)"
+    crumbs={[{ label: 'Resources', href: '/resources' }, { label: 'Frameworks' }]}
+    title="The instruments, and what answers them."
+    lede="The horizontal law, the management standards, the voluntary codes and the control sets the discipline is built against — then the reverse index that names, for each obligation, the engineering artefact that evidences it and the layer it lives in."
+  />
 
+  <div class="container res-page">
     <div class="res-section">
       <Callout kind="note" title="Illustrative mapping, not a conformity assessment">
         <p>{disclaimer} No artefact named here guarantees compliance, and no standard cited confers a

@@ -220,6 +220,39 @@ appear once, in their first layer, with a small secondary-layer mark. So what: s
 layer you are weakest in (chapter 07) and open its patterns. Avoid: obligations on this map (that
 is chapter 08's job); more than one line of text per chip.
 
+### 2.4 The discipline map (generated SVG, `map.ts` + `map-build.mjs`)
+
+**discipline-map** (`/map`, no chapter placement, generated from `src/data/map.ts` by
+`scripts/map-build.mjs`) — the one figure that is an *index of the whole book*, not a diagram of a
+single mechanism, so it is exempt from the two limits in §1: it carries far more than nine nodes,
+and its own budget is **≤ 48 KB** (`emit(name, svg, 48)` in `figures-build.mjs`) rather than 12 KB.
+Everything else in §1 still holds: colour comes only from the layer tokens (no hex in the web
+variant), the SVG carries `role`, `<title>` and `<desc>`, and every label is verbatim from a data
+module or a `bok/*.md` heading (checked in `tests/map.spec.ts`).
+
+- **Shape.** A deterministic two-sided tree: a central node (`AI Governance Engineer` → `/thesis`)
+  with four branches on each side. Left: Foundations, Values & principles, The Stack, Patterns.
+  Right: The Role, Obligations, Maturity, Learning path. Each branch has second-level leaves and,
+  where the design calls for it, third-level chips (disambiguation neighbours, the five problems,
+  patterns per layer, the three ways in, the twelve crosswalk topics, the eight framework families).
+- **Palette.** The eight branches borrow the five layer tokens (no repeat within a side): left
+  `--l1/--l2/--l3/--l4`, right `--l3/--l5/--l4/--l2`. Stack and Patterns leaves override with their
+  *real* layer colour, so the layer palette stays legible across the map.
+- **Two variants, one layout.** The **web** variant colours by class (light/dark from the tokens)
+  and is inlined on `/map`; the **portrait** variant (for the LinkedIn infographic) is a standalone
+  SVG with light-theme hex inline, a 1200-wide `viewBox`, the three font families in a `<style>`
+  block, no background rect and no title/footer (the kit's frame supplies those), and absolute links.
+  In the portrait, the Patterns branch renders its 17 pattern names as layer-coloured chips
+  (`portrait: 'chips-only'` on the layer nodes) instead of repeating the five layer headers that
+  The Stack branch already shows; its chips stay ≥ 14px so they survive the frame's scale-to-fit.
+- **Responsive.** On phones the web canvas scrolls sideways inside a focusable, labelled region;
+  the collapsible **index by cluster** below the map is the same content as a text list, so nothing
+  is lost without the scroll.
+- **Overflow is fatal.** Text is measured with a per-character width table (`svg-text.mjs`); a label
+  that needs more than two lines, or a chip wider than its column, throws
+  `map-build: label too long for column: <id>` at build time. The fix is a `short` on the node
+  (a verbatim substring), never a smaller font or a clipped label.
+
 ## 3. Review checklist (run by the orchestrator before merge)
 
 - [ ] Message stated in one sentence; caption follows the formula.

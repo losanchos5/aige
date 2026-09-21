@@ -8,7 +8,7 @@
  */
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/pages.css';
-import Kicker from '../components/Kicker.astro';
+import PageHero from '../components/PageHero.astro';
 import Section from '../components/Section.astro';
 import WorkflowGrid from '../components/WorkflowGrid.astro';
 import SkillsTable from '../components/SkillsTable.astro';
@@ -59,16 +59,14 @@ const reportedText = reportedStats
   description="What an AI Governance Engineer does: the seven workflows it owns, the skills behind them, and how the role differs from the AI governance analyst."
   image="/og/role.png"
 >
-  <section class="hero section hero--page">
-    <div class="bg-mesh" aria-hidden="true"></div>
-    <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
-    <div class="container page-hero hero-in">
-      <p class="meta"><span class="meta-dot" aria-hidden="true"></span>Chapter 06 · Body of Knowledge</p>
-      <Kicker swatch="var(--l3)" rule>The role</Kicker>
-      <h1 class="display">What an AI Governance Engineer does.</h1>
-      <p class="lede">{capabilityStatement}</p>
-    </div>
-  </section>
+  <PageHero
+    variant="page"
+    kicker="The role"
+    swatch="var(--l3)"
+    related={{ label: 'Chapter 06 · Body of Knowledge', href: '/bok/the-role' }}
+    title="What an AI Governance Engineer does."
+    lede={capabilityStatement}
+  />
 
   <Section
     tone="plain"
@@ -198,10 +196,6 @@ const reportedText = reportedStats
 </Marketing>
 
 <style>
-  .hero h1 {
-    font-size: var(--fs-display);
-  }
-
   /* Three ways in */
   .ways {
     list-style: none;

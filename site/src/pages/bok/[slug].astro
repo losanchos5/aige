@@ -49,6 +49,13 @@ const editPath = `bok/${chapter.id}.md`;
 const updated = gitDate(`../${editPath}`);
 const kicker = `Body of Knowledge · Chapter ${String(chapter.order).padStart(2, '0')}`;
 
+// Visible breadcrumb: Body of Knowledge › NN · Title. The BreadcrumbList JSON-LD
+// is already carried in this page's @graph below, so the crumb suppresses its own.
+const crumbs = [
+  { label: 'Body of Knowledge', href: '/bok' },
+  { label: `${String(chapter.order).padStart(2, '0')} · ${title}` },
+];
+
 // JSON-LD @graph for the chapter. Absolute URLs are built on the site's canonical
 // origin with the same technique as Seo.astro (new URL(path, site.url)), using the
 // clean, extensionless paths the sitemap and every internal link use (/bok,
@@ -119,6 +126,8 @@ const jsonLd = {
   title={title}
   summary={summary}
   kicker={kicker}
+  crumbs={crumbs}
+  crumbsJsonLd={false}
   headings={headings}
   prev={prev}
   next={next}

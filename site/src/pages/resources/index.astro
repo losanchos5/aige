@@ -1,6 +1,6 @@
 ---
 import Marketing from '../../layouts/Marketing.astro';
-import Kicker from '../../components/Kicker.astro';
+import PageHero from '../../components/PageHero.astro';
 import ResourceCard from '../../components/ResourceCard.astro';
 import { site } from '../../data/site';
 import { frameworks, obligations } from '../../data/frameworks';
@@ -63,6 +63,15 @@ const cards = [
       'One governance topic per row, read across to the EU, ISO, NIST and Chinese instruments that bind it — down to the article, clause or control.',
     count: `${topics.length} topics · ${columns.length} columns`,
   },
+  {
+    index: '06',
+    title: 'The map',
+    href: '/map',
+    swatch: 'var(--l1)',
+    description:
+      'The whole discipline on one canvas — every chapter, layer, pattern, obligation and learning stage as a navigable mind map, with the same map as a linked index.',
+    count: '8 branches · one page',
+  },
 ];
 ---
 
@@ -71,25 +80,17 @@ const cards = [
   description="Curated, sourced and versioned resources for AI governance engineering: frameworks, tools, a reading list and a glossary, all extracted from the Body of Knowledge."
   image="/og/resources.png"
 >
-  <section class="hero section hero--page">
-    <div class="bg-mesh" aria-hidden="true"></div>
-    <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
-    <div class="container">
-      <header class="res-head hero-in">
-        <Kicker rule>Resources</Kicker>
-        <h1 class="res-title">Curated, sourced, versioned.</h1>
-        <p class="res-lede">
-          Five references drawn straight from the Body of Knowledge: the frameworks the discipline maps
-          against, the tool categories that fill each layer, the sources that formed it, the terms it
-          uses and the crosswalk that maps each topic to every framework.
-        </p>
-        <p class="res-note">
-          Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync
-          with it.
-        </p>
-      </header>
-    </div>
-  </section>
+  <PageHero
+    variant="res"
+    kicker="Resources"
+    title="Curated, sourced, versioned."
+    lede="Five references drawn straight from the Body of Knowledge: the frameworks the discipline maps against, the tool categories that fill each layer, the sources that formed it, the terms it uses and the crosswalk that maps each topic to every framework."
+  >
+    <p slot="note">
+      Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync
+      with it.
+    </p>
+  </PageHero>
 
   <section class="section">
     <div class="container">
@@ -131,11 +132,15 @@ const cards = [
   .rc-bento > :global(li:nth-child(5)) {
     --i: 4;
   }
+  .rc-bento > :global(li:nth-child(6)) {
+    --i: 5;
+  }
 
   @media (min-width: 600px) {
-    /* Two columns: the first card spans both (a full row), so the remaining
-       four tile a clean 2×2 below it — no orphaned fifth card at this width. */
-    .rc-bento > :global(li:first-child) {
+    /* Two columns: the first card and the last (the map) each span both (a full
+       row), so the four references between them tile a clean 2×2 — no orphan. */
+    .rc-bento > :global(li:first-child),
+    .rc-bento > :global(li:nth-child(6)) {
       grid-column: span 2;
     }
   }

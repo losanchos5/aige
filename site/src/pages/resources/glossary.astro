@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Kicker from '../../components/Kicker.astro';
+import PageHero from '../../components/PageHero.astro';
 import GlossaryIndex from '../../components/GlossaryIndex.astro';
 import { site } from '../../data/site';
 import { getGlossary, getGlossaryLetters } from '../../lib/glossary';
@@ -16,22 +16,18 @@ const letters = getGlossaryLetters();
   description="The canonical glossary for AI governance engineering: every term defined once, alphabetically, and cross-referenced to the chapter that treats it in full."
   image="/og/resources.png"
 >
-  <div class="container res-page">
-    <div class="res-hero">
-      {/* Glossary is a Lighthouse route: keep it light — the dot texture only,
-          no animated gradient mesh. */}
-      <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
-      <header class="res-head">
-        <Kicker rule swatch="var(--l3)">Resources · Glossary</Kicker>
-        <h1 class="res-title">Every term, defined once.</h1>
-        <p class="res-lede">
-          {entries.length} terms, alphabetical, each one to three sentences and cross-referenced to the
-          chapter that develops it. Where a term has a canonical spelling in the style guide, that
-          spelling is used here and everywhere in the book.
-        </p>
-      </header>
-    </div>
+  {/* Glossary is a Lighthouse route: keep it light — the dot texture only, no
+      animated gradient mesh (mesh={false}). */}
+  <PageHero
+    variant="res"
+    mesh={false}
+    swatch="var(--l3)"
+    crumbs={[{ label: 'Resources', href: '/resources' }, { label: 'Glossary' }]}
+    title="Every term, defined once."
+    lede={`${entries.length} terms, alphabetical, each one to three sentences and cross-referenced to the chapter that develops it. Where a term has a canonical spelling in the style guide, that spelling is used here and everywhere in the book.`}
+  />
 
+  <div class="container res-page">
     <div class="res-section">
       <GlossaryIndex entries={entries} letters={letters} />
     </div>

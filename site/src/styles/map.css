@@ -1,0 +1,343 @@
+/* map.css: the /map page — the discipline mind map (a wide SVG in a sideways
+   scroll region), its legend, and the per-cluster index of <details>. Loaded
+   only by src/pages/map.astro. The focus ring on a pill lives in figures.css
+   (.map-svg a:focus-visible > rect); the branch-dimming :has() rules and the
+   scroll/index layout live here. */
+
+/* -- the canvas ---------------------------------------------------------- */
+
+/* The map is drawn wide, so the framed canvas gets a tighter pad than the
+   default infographic and the SVG is allowed past the 560px figure cap: it
+   fills the scroll region and never shrinks below its legible width. */
+.map-figure .figure-canvas {
+  padding: var(--s-2);
+}
+
+.map-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.map-scroll > svg {
+  display: block;
+  width: 100%;
+  min-width: 980px;
+  max-width: none;
+  height: auto;
+  margin: 0;
+}
+
+/* The scroll region is focusable (WCAG scrollable-region), so give it the same
+   visible focus ring as the rest of the site. */
+.map-scroll:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Branch highlight: hovering or focusing one branch dims the others. Progressive
+   (no :has() support = no dimming), and never touches the static state, so the
+   audited contrast is the resting contrast. Disabled where there is no hover. */
+.map-svg .branch {
+  transition: opacity var(--dur) var(--ease);
+}
+
+.map-svg:has(.branch:hover, .branch:focus-within) .branch:not(:hover, :focus-within) {
+  opacity: 0.4;
+}
+
+@media (hover: none) {
+  .map-svg .branch {
+    transition: none;
+  }
+  .map-svg:has(.branch:hover, .branch:focus-within) .branch:not(:hover, :focus-within) {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-svg .branch {
+    transition: none;
+  }
+}
+
+/* -- legend -------------------------------------------------------------- */
+
+.map-legend {
+  list-style: none;
+  margin: var(--s-5) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-2) var(--s-5);
+  grid-template-columns: 1fr;
+}
+
+.map-legend-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+}
+
+.map-legend-sw {
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+  background: var(--sw, var(--ink));
+  transform: translateY(0.1em);
+}
+
+.map-legend-link {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.map-legend-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.map-legend-ch {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--muted);
+}
+
+.map-note {
+  margin: var(--s-4) 0 0;
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+/* A phones-only cue that the canvas scrolls and a list follows. */
+.map-hint {
+  display: none;
+  margin: 0 0 var(--s-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--muted);
+}
+
+@media (min-width: 720px) {
+  .map-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .map-hint {
+    display: block;
+  }
+}
+
+/* -- the cluster index --------------------------------------------------- */
+
+.cluster-tools {
+  display: flex;
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+
+.cluster-tool {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: var(--s-1) var(--s-3);
+  cursor: pointer;
+}
+
+.cluster-tool:hover {
+  color: var(--ink);
+  border-color: var(--ink-2);
+}
+
+.cluster-tool:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.clusters {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.cluster {
+  border-bottom: 1px solid var(--line);
+}
+
+.cluster-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-4) 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.cluster-summary::-webkit-details-marker {
+  display: none;
+}
+
+.cluster-sw {
+  flex: none;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+  background: var(--sw, var(--ink));
+}
+
+.cluster-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--fs-h3);
+  letter-spacing: var(--tracking-display);
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.cluster-chaps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+  margin-left: auto;
+}
+
+.cluster-chip {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 1px var(--s-2);
+  white-space: nowrap;
+}
+
+/* A rotating chevron replaces the native marker. */
+.cluster-summary::after {
+  content: '';
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-left: var(--s-2);
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform var(--dur) var(--ease);
+}
+
+.cluster[open] > .cluster-summary::after {
+  transform: rotate(-135deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cluster-summary::after {
+    transition: none;
+  }
+}
+
+.cluster-summary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.cluster-body {
+  padding: 0 0 var(--s-5);
+  display: grid;
+  gap: var(--s-5);
+}
+
+.cluster-group-h {
+  margin: 0 0 var(--s-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.cluster-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-2);
+}
+
+.cluster-list li {
+  break-inside: avoid;
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+}
+
+.cluster-list a {
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.cluster-list a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.cluster-meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  color: var(--muted);
+}
+
+.map-download {
+  margin: var(--s-6) 0 0;
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-small);
+}
+
+.map-download a {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.map-download-meta {
+  color: var(--muted);
+}
+
+@media (min-width: 900px) {
+  .cluster-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-2) var(--s-5);
+  }
+}
+
+/* -- print --------------------------------------------------------------- */
+
+@media print {
+  .site-header,
+  .site-footer,
+  #nav-drawer,
+  .cluster-tools {
+    display: none !important;
+  }
+
+  /* Show the whole canvas (map.js opens every <details> on beforeprint). */
+  .map-scroll {
+    overflow: visible !important;
+  }
+
+  .map-hint {
+    display: none !important;
+  }
+}

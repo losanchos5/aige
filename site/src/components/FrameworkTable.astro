@@ -27,7 +27,7 @@ const { frameworks } = Astro.props;
     <tbody>
       {
         frameworks.map((fw) => (
-          <tr data-framework-row>
+          <tr id={`fw-${fw.id}`} data-framework-row>
             <td class="c-name" data-label="Framework">
               {fw.url ? (
                 <a href={fw.url} target="_blank" rel="noopener">

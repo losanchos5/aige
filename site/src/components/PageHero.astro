@@ -1,0 +1,216 @@
+---
+/**
+ * PageHero — the single full-bleed page hero shared by the editorial landings
+ * (/role, /stack, /path, /map) and the reference pages (/resources and its
+ * sub-pages). It renders a `<section>` that is a direct child of <main>/.marketing,
+ * so its two inert background layers (a gradient mesh and a faded dot grid, both
+ * defined in effects.css) sit at inset:0 and reach both viewport edges, while the
+ * content stays inside the centred `.container`. No `100vw`, so no horizontal
+ * scroll (layout.spec guards this).
+ *
+ * Two variants: `page` (a display title on a ~40vh band, for the landings) and
+ * `res` (an H1-scale title on a tighter band with a softer mesh, for reference
+ * pages). The eyebrow is either a Kicker (`kicker`) or a Breadcrumb (`crumbs`);
+ * `related` renders a `.meta` line linking the related chapter; the `lede` and
+ * `note` slots take copy that carries inline markup.
+ */
+import Kicker from './Kicker.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import type { Crumb } from '../lib/breadcrumbs';
+
+interface Props {
+  title: string;
+  lede?: string;
+  kicker?: string;
+  /** CSS colour for the eyebrow square, e.g. `var(--l3)`. */
+  swatch?: string;
+  /** When present, a Breadcrumb replaces the Kicker eyebrow. */
+  crumbs?: Crumb[];
+  /** A `.meta` line linking the related chapter (landings only). */
+  related?: { label: string; href: string };
+  /** Draw the gradient mesh layer (default true; false on Lighthouse routes). */
+  mesh?: boolean;
+  /** Texture overlay behind the content. */
+  texture?: 'dots' | 'none';
+  variant?: 'page' | 'res';
+}
+
+const {
+  title,
+  lede,
+  kicker,
+  swatch,
+  crumbs,
+  related,
+  mesh = true,
+  texture = 'dots',
+  variant = 'page',
+} = Astro.props;
+---
+
+<section class:list={['hero', 'section', 'hero--page', `hero--${variant}`]}>
+  {mesh && <div class="bg-mesh" aria-hidden="true"></div>}
+  {texture === 'dots' && <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>}
+  <div class="container">
+    <header class="hero-head hero-in">
+      {
+        related && (
+          <p class="meta">
+            <span class="meta-dot" aria-hidden="true" />
+            <a href={related.href}>{related.label}</a>
+          </p>
+        )
+      }
+      {
+        crumbs ? (
+          <Breadcrumb items={crumbs} swatch={swatch} rule />
+        ) : (
+          kicker && (
+            <Kicker swatch={swatch} rule>
+              {kicker}
+            </Kicker>
+          )
+        )
+      }
+      <h1 class="hero-title">{title}</h1>
+      {lede && <p class="hero-lede">{lede}</p>}
+      <slot name="lede" />
+      {
+        Astro.slots.has('note') && (
+          <div class="hero-note">
+            <slot name="note" />
+          </div>
+        )
+      }
+    </header>
+  </div>
+</section>
+
+<style>
+  /* The full-bleed band: relative + isolated + clipped so the two inert bg
+     layers stay behind the raised content. A softer mesh runs via a local
+     --mesh-alpha override. (Moved here from the .hero--page / .res-hero rules
+     that used to live in pages.css.) */
+  .hero--page {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 40vh;
+    --mesh-alpha: 0.7;
+  }
+
+  .hero--page > .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* The hero's dot texture: the same inert overlay as .bg-dots, named for the
+     hero so its role reads clearly in the markup. */
+  .hero-tex {
+    z-index: 0;
+  }
+
+  /* The head: eyebrow (Kicker or Breadcrumb) + title + lede, left-aligned. */
+  .hero-head {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-4);
+    max-width: var(--prose);
+  }
+
+  .hero-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-display);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    color: var(--ink);
+    max-width: 20ch;
+    text-wrap: balance;
+  }
+
+  .hero-lede {
+    margin: 0;
+    max-width: 60ch;
+    font-size: 1.125rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .meta a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .meta a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .hero-note {
+    max-width: 62ch;
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .hero-note :global(p) {
+    margin: 0;
+  }
+
+  .hero-note :global(p + p) {
+    margin-top: var(--s-3);
+  }
+
+  /* Reference variant: dense pages get an H1-scale title, a tighter band and a
+     softer mesh. (Moved here from .res-hero / .res-head / .res-title in the page
+     and resources stylesheets.) */
+  .hero--res {
+    min-height: 0;
+    padding-block: var(--s-6) var(--s-5);
+    --mesh-alpha: 0.6;
+  }
+
+  .hero--res .hero-title {
+    font-size: var(--fs-h1);
+    max-width: var(--prose);
+  }
+
+  /* Timed entrance for the hero content, staggered top-to-bottom by source
+     order. Opacity + lift, motion only; the reduced-motion kill switch in
+     base.css stops it so no-JS and reduced-motion readers see the text painted
+     and never dimmed by us. (Moved here from pages.css.) */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-in > * {
+      animation: hero-up 0.6s var(--ease) both;
+    }
+    .hero-in > *:nth-child(1) {
+      animation-delay: 0ms;
+    }
+    .hero-in > *:nth-child(2) {
+      animation-delay: 70ms;
+    }
+    .hero-in > *:nth-child(3) {
+      animation-delay: 140ms;
+    }
+    .hero-in > *:nth-child(4) {
+      animation-delay: 210ms;
+    }
+    .hero-in > *:nth-child(5) {
+      animation-delay: 280ms;
+    }
+  }
+
+  @keyframes hero-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>

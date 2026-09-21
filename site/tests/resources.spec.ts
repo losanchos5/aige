@@ -5,14 +5,14 @@ import { test, expect } from '@playwright/test';
 import { frameworks, obligations } from '../src/data/frameworks';
 import { topics, columns } from '../src/data/crosswalk';
 
-test('hub renders five resource cards, each with a count', async ({ page }) => {
+test('hub renders six resource cards, each with a count', async ({ page }) => {
   await page.goto('/resources');
   const cards = page.locator('[data-resource-card]');
-  await expect(cards).toHaveCount(5);
+  await expect(cards).toHaveCount(6);
 
   const counts = page.locator('[data-resource-count]');
-  await expect(counts).toHaveCount(5);
-  for (let i = 0; i < 5; i++) {
+  await expect(counts).toHaveCount(6);
+  for (let i = 0; i < 6; i++) {
     await expect(counts.nth(i)).not.toHaveText('');
   }
 
