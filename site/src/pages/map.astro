@@ -1,40 +1,248 @@
 ---
 /**
- * Placeholder for /map. Exists so links to /map resolve (check-links, nav.spec)
- * while the real discipline-map page is built by a later block. Uses Base
- * directly to keep it minimal.
+ * /map — the discipline of the AI Governance Engineer as one navigable mind map
+ * plus a per-cluster index. The SVG is generated from the same data modules as
+ * the rest of the site (scripts/map-build.mjs writes src/figures/discipline-map.svg)
+ * and imported here raw; the index under it (buildClusterIndex) is the textual,
+ * JavaScript-free alternative — eight <details>, one per branch, each with the
+ * map tree, the chapter sections and the diagrams/nodes/resources that reach the
+ * branch. Every node in both halves is a link. The scroll region carries the
+ * wide canvas sideways on a phone; public/map.js only adds expand/collapse-all
+ * and deep-linking, so the page works with no JS. When the LinkedIn kit has
+ * published a PNG (src/data/map-export.json + the file under public/), a download
+ * link is shown; a fresh checkout has neither, and the block is omitted.
  */
-import Base from '../layouts/Base.astro';
+import fs from 'node:fs';
+import { resolve } from 'node:path';
+import Marketing from '../layouts/Marketing.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import Figure from '../components/Figure.astro';
+import '../styles/pages.css';
+import '../styles/map.css';
+import mapSvg from '../figures/discipline-map.svg?raw';
+import { buildMap } from '../data/map';
+import { buildClusterIndex } from '../lib/map-index';
+import { readSource, getHeadings } from '../lib/md-parse';
+import { getChapterBySlug } from '../data/chapters';
 import { site } from '../data/site';
+import { values, principles, problems } from '../data/values';
+import { layers, minimumViableStack } from '../data/stack';
+import { patterns } from '../data/patterns';
+import { workflows, waysIn } from '../data/role';
+import { levels } from '../data/maturity';
+import { frameworks } from '../data/frameworks';
+import { topics, columns } from '../data/crosswalk';
+import { stages, nodes } from '../data/path';
+import { diagrams } from '../data/diagrams';
+import { figures, getFigure } from '../data/figures';
+
+const figure = getFigure('discipline-map')!;
+
+const map = buildMap({
+  site: { name: site.name, url: site.url },
+  values,
+  principles,
+  problems,
+  layers,
+  minimumViableStack,
+  patterns,
+  workflows,
+  waysIn,
+  levels,
+  frameworks,
+  topics,
+  columns,
+  stages,
+  nodes,
+});
+
+// Headings of every chapter the map touches, keyed by chapter slug, read from
+// the Markdown at the repo root exactly as tests/map.spec.ts does.
+const chapterSlugs = [...new Set(map.branches.flatMap((branch) => branch.chapters))];
+const headings = Object.fromEntries(
+  chapterSlugs.map((slugName) => {
+    const chapter = getChapterBySlug(slugName)!;
+    return [slugName, getHeadings(readSource(`bok/${chapter.id}.md`))];
+  }),
+);
+
+const clusters = buildClusterIndex(map, { headings, diagrams, figures, nodes, stages });
+
+const pad2 = (n: number): string => String(n).padStart(2, '0');
+
+// A mono note naming the chapters a branch draws from (e.g. "ch. 01–02"); the
+// learning path draws from no chapter, so it names its page instead.
+function chapterNote(branchChapters: readonly string[]): string {
+  const orders = branchChapters
+    .map((slugName) => getChapterBySlug(slugName)?.order)
+    .filter((order): order is number => order !== undefined)
+    .sort((a, b) => a - b);
+  if (orders.length === 0) return 'Learning path';
+  const lo = pad2(orders[0]);
+  const hi = pad2(orders[orders.length - 1]);
+  return lo === hi ? `ch. ${lo}` : `ch. ${lo}–${hi}`;
+}
+
+// The published-PNG download, only when both the export manifest and the file it
+// names exist (the LinkedIn kit writes them). Guarded so a checkout without them
+// still builds — the precedent is the About-page PDF link.
+interface MapDownload {
+  href: string;
+  size: string;
+  width: number;
+  height: number;
+  bokVersion: string;
+}
+let download: MapDownload | null = null;
+try {
+  const manifest = JSON.parse(
+    fs.readFileSync(resolve(process.cwd(), 'src/data/map-export.json'), 'utf8'),
+  );
+  const rel = String(manifest.file ?? '').replace(/^\/+/, '');
+  const candidates = rel.startsWith('downloads/') ? [rel] : [`downloads/${rel}`, rel];
+  const found = candidates.find(
+    (candidate) => candidate && fs.existsSync(resolve(process.cwd(), 'public', candidate)),
+  );
+  if (found) {
+    const bytes = Number(manifest.bytes ?? fs.statSync(resolve(process.cwd(), 'public', found)).size);
+    const size =
+      bytes >= 1024 * 1024
+        ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+        : `${Math.round(bytes / 1024)} KB`;
+    download = {
+      href: `/${found}`,
+      size,
+      width: Number(manifest.width ?? 2400),
+      height: Number(manifest.height ?? 3000),
+      bokVersion: String(manifest.bokVersion ?? site.bokVersion),
+    };
+  }
+} catch {
+  // No published map export in this environment; the download block is omitted.
+}
 ---
 
-<Base
+<Marketing
   title={`The map · ${site.name}`}
-  description="The discipline as a mind map: chapters, layers and patterns on one canvas."
+  description="The whole discipline of the AI Governance Engineer on one page: a navigable mind map of every chapter, layer, pattern, workflow, obligation, maturity level and learning stage, with the same map as a linked list."
+  image="/og/map.png"
 >
-  <section class="section">
-    <div class="container">
-      <h1>The map</h1>
-      <p>The discipline as a mind map. Coming with the next build.</p>
+  <PageHero
+    variant="page"
+    kicker="The map"
+    swatch="var(--l1)"
+    related={{ label: `Body of Knowledge · v${site.bokVersion}`, href: '/bok' }}
+    title="The discipline on one page."
+    lede="Every chapter, layer, pattern, workflow, obligation, maturity level and learning stage the site covers, as one map of links. Start at the branch you need and follow it into the text."
+  />
+
+  <Section
+    id="the-map"
+    tone="plain"
+    texture="dots"
+    wide
+    kicker="One canvas"
+    kickerSwatch="var(--l1)"
+    title="A central node and eight branches."
+    lede="Four branches on the left, four on the right, each with its second-level topics and, where they fit, third-level chips — every one a link into the text."
+  >
+    <p class="map-hint">Scroll sideways, or use the list below.</p>
+    <Figure
+      class="map-figure"
+      id="discipline-map"
+      title={figure.title}
+      caption={figure.caption}
+      description={figure.description}
+    >
+      <div
+        class="map-scroll"
+        role="region"
+        aria-label="The map of the discipline (scrolls sideways on small screens)"
+        tabindex="0"
+      >
+        <Fragment set:html={mapSvg} />
+      </div>
+    </Figure>
+
+    <ul class="map-legend">
+      {
+        map.branches.map((branch) => (
+          <li class="map-legend-item" style={`--sw: var(${branch.color})`}>
+            <span class="map-legend-sw" aria-hidden="true" />
+            <a class="map-legend-link" href={branch.href}>
+              {branch.label}
+            </a>
+            <span class="map-legend-ch">{chapterNote(branch.chapters)}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="map-note">
+      Every node is a link. <a href="#index">The list below is the same map as text.</a>
+    </p>
+  </Section>
+
+  <Section id="index" tone="tint" kicker="The index" kickerSwatch="var(--l2)" title="Content by cluster.">
+    <div class="cluster-tools" hidden>
+      <button type="button" class="cluster-tool" data-cluster-expand>Expand all</button>
+      <button type="button" class="cluster-tool" data-cluster-collapse>Collapse all</button>
     </div>
-  </section>
-</Base>
 
-<style>
-  .section {
-    padding-block: var(--s-7);
-  }
+    <div class="clusters">
+      {
+        clusters.map((cluster) => (
+          <details
+            class="cluster"
+            id={`cluster-${cluster.branch}`}
+            data-branch={cluster.branch}
+            style={`--sw: var(${cluster.color})`}
+          >
+            <summary class="cluster-summary">
+              <span class="cluster-sw" aria-hidden="true" />
+              <span class="cluster-label">{cluster.label}</span>
+              <span class="cluster-chaps">
+                {cluster.chapters.map((slugName) => {
+                  const chapter = getChapterBySlug(slugName);
+                  return chapter ? <span class="cluster-chip">{chapter.shortTitle}</span> : null;
+                })}
+              </span>
+            </summary>
+            <div class="cluster-body">
+              {cluster.groups.map((group) => (
+                <div class="cluster-group">
+                  <h3 class="cluster-group-h">{group.heading}</h3>
+                  <ul class="cluster-list">
+                    {group.items.map((item) => (
+                      <li>
+                        <a href={item.href}>{item.label}</a>
+                        {item.meta && <span class="cluster-meta">{item.meta}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </details>
+        ))
+      }
+    </div>
 
-  h1 {
-    font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: var(--tracking-display);
-    margin: 0 0 var(--s-4);
-  }
+    {
+      download && (
+        <p class="map-download">
+          <a href={download.href} download>
+            Download the map (PNG, {download.width}×{download.height}, {download.size})
+          </a>
+          <span class="map-download-meta">
+            {' '}
+            · rendered from Body of Knowledge v{download.bokVersion}
+          </span>
+        </p>
+      )
+    }
+  </Section>
 
-  p {
-    margin: 0;
-    color: var(--ink-2);
-    max-width: 60ch;
-  }
-</style>
+  <script is:inline defer src="/map.js"></script>
+</Marketing>

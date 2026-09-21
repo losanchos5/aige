@@ -63,6 +63,15 @@ const cards = [
       'One governance topic per row, read across to the EU, ISO, NIST and Chinese instruments that bind it — down to the article, clause or control.',
     count: `${topics.length} topics · ${columns.length} columns`,
   },
+  {
+    index: '06',
+    title: 'The map',
+    href: '/map',
+    swatch: 'var(--l1)',
+    description:
+      'The whole discipline on one canvas — every chapter, layer, pattern, obligation and learning stage as a navigable mind map, with the same map as a linked index.',
+    count: '8 branches · one page',
+  },
 ];
 ---
 
@@ -123,11 +132,15 @@ const cards = [
   .rc-bento > :global(li:nth-child(5)) {
     --i: 4;
   }
+  .rc-bento > :global(li:nth-child(6)) {
+    --i: 5;
+  }
 
   @media (min-width: 600px) {
-    /* Two columns: the first card spans both (a full row), so the remaining
-       four tile a clean 2×2 below it — no orphaned fifth card at this width. */
-    .rc-bento > :global(li:first-child) {
+    /* Two columns: the first card and the last (the map) each span both (a full
+       row), so the four references between them tile a clean 2×2 — no orphan. */
+    .rc-bento > :global(li:first-child),
+    .rc-bento > :global(li:nth-child(6)) {
       grid-column: span 2;
     }
   }

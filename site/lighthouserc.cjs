@@ -19,6 +19,7 @@ module.exports = {
         'http://localhost:4321/role',
         'http://localhost:4321/stack',
         'http://localhost:4321/path',
+        'http://localhost:4321/map',
         'http://localhost:4321/resources/glossary',
         'http://localhost:4321/resources/crosswalk',
       ],
