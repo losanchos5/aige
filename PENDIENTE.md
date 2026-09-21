@@ -38,6 +38,12 @@ Reglas de trabajo: Fable planifica, revisa figuras y verifica; subagentes `imple
       índice por cluster y variante web del SVG en producción. Pendiente: renderizar el PNG vertical
       para LinkedIn con el kit `aige-media/linkedin` (`sync-map --publish` → `map-export.json` + PNG en
       `public/downloads/`); hasta entonces el bloque de descarga de `/map` se omite solo.
+- [ ] Riesgo como tema explícito (acordado 2026-09-21): el BoK trata el riesgo como hilo transversal (~200
+      menciones, solo dos encabezados: valor 7 y «Incident and risk repositories»). Pendiente una sección
+      «Where risk management sits» (identificar → evaluar → tratar → monitorizar y las funciones Govern/Map/
+      Measure/Manage del NIST AI RMF proyectadas sobre las cinco capas y los siete workflows) + término de
+      glosario; entonces el mapa gana un nodo Risk propio en Foundations. Mientras tanto «Risk management»
+      es hoja de Obligations en `/map` y en la infografía.
 - [ ] Seo/hreflang: la página /es/thesis usa `lang`/`locale`/`alternates` vía Doc→Base→Seo; el
       «Updated» de ChapterHeader sigue en inglés en /es/thesis.
 - [ ] Feed RSS: el título sigue siendo «Changelog» aunque ya lleva capítulos (título en Base.astro).
