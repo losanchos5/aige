@@ -1,6 +1,6 @@
 // svg-text.mjs: text helpers for the SVG generators. SVG cannot measure text,
 // so textW approximates the advance width of a string in Instrument Sans with a
-// per-character-class width table (calibrated against the real font, +6%). wrap
+// per-character-class width table (calibrated against the real font, +10 %). wrap
 // greedily breaks a label into lines that fit a pixel budget. Shared by the map
 // generator; kept dependency-free.
 
@@ -35,7 +35,7 @@ function charFactor(ch) {
 export function textW(text, fontPx) {
   let sum = 0;
   for (const ch of String(text)) sum += charFactor(ch);
-  return sum * fontPx * 1.06;
+  return sum * fontPx * 1.10;
 }
 
 /**
