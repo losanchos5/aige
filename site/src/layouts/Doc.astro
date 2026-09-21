@@ -7,6 +7,8 @@
 import type { MarkdownHeading } from 'astro';
 import Base from './Base.astro';
 import { site } from '../data/site';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import type { Crumb } from '../lib/breadcrumbs';
 import ChapterHeader from '../components/ChapterHeader.astro';
 import SidebarNav from '../components/SidebarNav.astro';
 import Toc from '../components/Toc.astro';
@@ -26,6 +28,12 @@ interface Props {
   title: string;
   summary?: string;
   kicker?: string;
+  /** Breadcrumb trail rendered above the chapter header (parent crumbs only;
+      Home is prepended in the JSON-LD). */
+  crumbs?: Crumb[];
+  /** Emit the BreadcrumbList JSON-LD for `crumbs` (default true). Pages whose
+      own graph already carries a BreadcrumbList pass false to avoid a duplicate. */
+  crumbsJsonLd?: boolean;
   headings?: MarkdownHeading[];
   prev?: Adjacent;
   next?: Adjacent;
@@ -48,6 +56,8 @@ const {
   title,
   summary,
   kicker,
+  crumbs,
+  crumbsJsonLd = true,
   headings = [],
   prev,
   next,
@@ -134,6 +144,17 @@ if (statsChapter) {
       }
 
       <div class="doc-main">
+        {
+          crumbs && (
+            <div class="doc-crumbs" data-pagefind-ignore>
+              <Breadcrumb
+                items={crumbs}
+                swatch={headerLayer ? `var(--${headerLayer})` : undefined}
+                jsonLd={crumbsJsonLd}
+              />
+            </div>
+          )
+        }
         {
           withToc && (
             <details class="doc-toc-m" data-toc-mobile data-pagefind-ignore>
@@ -274,6 +295,11 @@ if (statsChapter) {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--s-6);
     align-items: start;
+  }
+
+  /* Breadcrumb trail above the chapter header (chapters and About sub-pages). */
+  .doc-crumbs {
+    margin-bottom: var(--s-5);
   }
 
   .doc-main {

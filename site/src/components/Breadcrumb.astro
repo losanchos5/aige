@@ -1,0 +1,125 @@
+---
+/**
+ * Breadcrumb — a mono, uppercase trail styled after Kicker: an optional layer
+ * square, then an ordered list of crumbs separated by aria-hidden chevrons. The
+ * last crumb is the current page (`aria-current="page"`, no link). By default it
+ * also emits a schema.org BreadcrumbList (Home first, absolute URLs); pass
+ * `jsonLd={false}` where the page already carries breadcrumb data in its graph.
+ */
+import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
+
+interface Props {
+  items: Crumb[];
+  /** CSS colour for the 4px square. Pass a layer var, e.g. `var(--l1)`. */
+  swatch?: string;
+  /** Draw a trailing 1px rule after the trail, like Kicker's `rule`. */
+  rule?: boolean;
+  /** Emit the BreadcrumbList JSON-LD (default true). */
+  jsonLd?: boolean;
+  class?: string;
+}
+
+const {
+  items,
+  swatch = 'var(--ink)',
+  rule = false,
+  jsonLd = true,
+  class: className,
+} = Astro.props;
+
+// JSON-LD is a data block, not executable script, so CSP script-src does not
+// apply; `<` is escaped exactly as in Seo.astro so content can never break out.
+const json = jsonLd
+  ? JSON.stringify(breadcrumbJsonLd(items)).replace(/</g, '\\u003c')
+  : null;
+---
+
+<nav class:list={['crumbs', className]} aria-label="Breadcrumb">
+  <span class="square" style={`background:${swatch}`} aria-hidden="true"></span>
+  <ol>
+    {
+      items.map((crumb, i) => (
+        <li>
+          {i > 0 && (
+            <span class="sep" aria-hidden="true">
+              ›
+            </span>
+          )}
+          {crumb.href ? (
+            <a href={crumb.href}>{crumb.label}</a>
+          ) : (
+            <span aria-current="page">{crumb.label}</span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+  {rule && <span class="rule" aria-hidden="true"></span>}
+  {json && <script type="application/ld+json" set:html={json} />}
+</nav>
+
+<style>
+  .crumbs {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .square {
+    flex: none;
+    width: 4px;
+    height: 4px;
+  }
+
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .crumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .crumbs a,
+  .crumbs [aria-current='page'],
+  .sep {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    line-height: 1;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .crumbs a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .crumbs a:hover {
+    color: var(--ink);
+  }
+
+  /* The current page's crumb: a touch stronger than the muted links. */
+  .crumbs [aria-current='page'] {
+    color: var(--ink-2);
+  }
+
+  .sep {
+    color: var(--muted);
+  }
+
+  .rule {
+    flex: 1;
+    height: 1px;
+    background: var(--line);
+  }
+</style>
