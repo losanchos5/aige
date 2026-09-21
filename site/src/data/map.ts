@@ -60,6 +60,13 @@ export interface MapNode {
   children?: MapNode[];
   /** When true, `children` render as chips inside the leaf's column. */
   inlineChildren?: boolean;
+  /**
+   * Portrait-only rendering mode (the web variant ignores it):
+   * - 'pill' (default) — draw the node's own pill, no chips.
+   * - 'chips-only' — draw only the node's inline children as chips (no pill,
+   *   no badge), so the portrait shows the members rather than the group header.
+   */
+  portrait?: 'pill' | 'chips-only';
 }
 
 /** A page link surfaced under a branch's "Resources" index group. */
@@ -157,6 +164,19 @@ const PROBLEM_SHORT: Record<number, string> = {
   3: 'Governance as a gate',
   4: 'Framework theatre',
   5: 'No runtime data path',
+};
+
+// Shorts (verbatim substrings) for the longest pattern names, used only when the
+// full title does not fit the portrait chip column at one-per-row; the wider web
+// chips always show the full title, so this never changes the web variant.
+const PATTERN_SHORT: Record<string, string> = {
+  'pattern-model-card-as-control-evidence': 'Model Card as Control',
+  'pattern-vendor--model-due-diligence-gate': 'Due-Diligence Gate',
+  'pattern-adversarial-red-team-suite': 'Adversarial Red-Team',
+  'pattern-kill-switch--circuit-breaker': 'Circuit Breaker',
+  'pattern-agent-identity--scoped-credentials': 'Scoped Credentials',
+  'pattern-continuous-assurance-telemetry': 'Assurance Telemetry',
+  'pattern-machine-readable-evidence-oscal': 'Machine-Readable Evidence',
 };
 
 // ----------------------------------------------------------- hand-written -- //
@@ -447,9 +467,14 @@ function patternsBranch(src: MapSources): MapBranch {
       color: layer.colorVar as MapColor,
       badge: inLayer.length,
       inlineChildren: true,
+      // In the portrait the Stack branch already shows the five layer headers,
+      // so Patterns shows the pattern names themselves (as layer-coloured chips)
+      // rather than repeating the headers.
+      portrait: 'chips-only',
       children: inLayer.map((p) => ({
         id: `patterns:${p.id}`,
         label: p.title,
+        short: PATTERN_SHORT[p.id],
         href: BOK('patterns', p.id),
         color: layer.colorVar as MapColor,
       })),

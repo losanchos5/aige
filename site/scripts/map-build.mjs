@@ -56,6 +56,7 @@ export const WEB_OPTS = {
   fsChip: 12,
   pillH: 28,
   chipH: 20,
+  chipRow: 24,
   leafGap: 8,
   branchGap: 36,
   showChips: true,
@@ -76,11 +77,16 @@ export const PORTRAIT_OPTS = {
   fsCenter: 24,
   fsBranch: 17,
   fsLeaf: 15,
-  fsChip: 12,
+  // Portrait chips (only the Patterns branch uses them) must stay >= 14px: the
+  // LinkedIn frame's render guard fails below 14. Height 24, row pitch 28.
+  fsChip: 14,
   pillH: 34,
-  chipH: 20,
-  leafGap: 10,
-  branchGap: 40,
+  chipH: 24,
+  chipRow: 28,
+  // Tightened from 10/40 so the taller Patterns-as-chips side keeps the whole
+  // portrait within the 1185px frame slot (chips must not be scaled below 14px).
+  leafGap: 8,
+  branchGap: 32,
   showChips: false,
 };
 
@@ -89,7 +95,6 @@ const PAD_X = 11;
 const BADGE_W = 22;
 const CHIP_PAD_X = 8;
 const CHIP_GAP = 6;
-const CHIP_ROW = 24;
 
 const round = (n) => Math.round(n * 10) / 10;
 const clsOf = (colorVar) => (colorVar ? colorVar.slice(2) : ''); // '--l3' -> 'l3'
@@ -204,19 +209,32 @@ function layoutChips(children, opts) {
   return { chips, rows: children.length ? row + 1 : 0 };
 }
 
-/** Measure one leaf: its pill lines, height and (web) chips. */
+/** Measure one leaf: its pill lines, height and chips. */
 function measureLeaf(node, opts) {
-  const usableW = opts.leafW - 2 * PAD_X - (node.badge != null ? BADGE_W : 0);
-  const lines = fitLines(node, usableW, opts.fsLeaf);
-  const pillH = lines.length >= 2 ? opts.pillH + 16 : opts.pillH;
+  // Portrait 'chips-only' nodes draw their children as chips instead of a pill,
+  // even though the portrait variant otherwise hides chips (showChips: false).
+  const isChipsOnly =
+    !opts.showChips && node.portrait === 'chips-only' && (node.children?.length ?? 0) > 0;
+  const drawChips =
+    isChipsOnly || (opts.showChips && node.inlineChildren && (node.children?.length ?? 0) > 0);
+
+  let lines = [];
+  let pillH = 0;
+  if (!isChipsOnly) {
+    const usableW = opts.leafW - 2 * PAD_X - (node.badge != null ? BADGE_W : 0);
+    lines = fitLines(node, usableW, opts.fsLeaf);
+    pillH = lines.length >= 2 ? opts.pillH + 16 : opts.pillH;
+  }
+
   let chips = [];
   let chipsH = 0;
-  if (opts.showChips && node.inlineChildren && node.children?.length) {
+  if (drawChips) {
     const laid = layoutChips(node.children, opts);
     chips = laid.chips;
-    chipsH = laid.rows > 0 ? laid.rows * CHIP_ROW + 6 : 0;
+    // No top gap when the chips stand alone (no pill above them).
+    chipsH = laid.rows > 0 ? laid.rows * opts.chipRow + (isChipsOnly ? 0 : 6) : 0;
   }
-  return { node, lines, pillH, chips, chipsH, blockH: pillH + chipsH };
+  return { node, lines, pillH, chips, chipsH, drawPill: !isChipsOnly, blockH: pillH + chipsH };
 }
 
 /** Measure a branch pill (short label, up to two lines). */
@@ -303,8 +321,10 @@ export function layoutMap(map, opts) {
 
       let ly = branchTop;
       const leaves = block.leaves.map((leaf) => {
+        const chipTop = leaf.drawPill ? ly + leaf.pillH + 6 : ly;
         const box = {
           node: leaf.node,
+          drawPill: leaf.drawPill,
           x: sideCols.leafLeft,
           y: ly,
           w: opts.leafW,
@@ -315,17 +335,18 @@ export function layoutMap(map, opts) {
             node: chip.node,
             text: chip.text,
             x: sideCols.leafLeft + chip.dx,
-            y: ly + leaf.pillH + 6 + chip.row * CHIP_ROW,
+            y: chipTop + chip.row * opts.chipRow,
             w: chip.w,
             color: chip.node.color ?? block.branch.color,
           })),
         };
-        // branch -> leaf
+        // branch -> leaf (to the pill's centre, or the chip block's centre for
+        // a chips-only leaf so the edge lands in the middle of its rows).
         edges.push({
           x1: isLeft ? sideCols.branchLeft : sideCols.branchLeft + opts.branchW,
           y1: branchMidY,
           x2: isLeft ? sideCols.leafLeft + opts.leafW : sideCols.leafLeft,
-          y2: ly + leaf.pillH / 2,
+          y2: leaf.drawPill ? ly + leaf.pillH / 2 : ly + leaf.blockH / 2,
           color: leaf.node.color ?? block.branch.color,
           weight: 1.5,
         });
@@ -412,7 +433,16 @@ function pillEl(variant, site, box, colorVar, fontPx, { disp, panel } = {}) {
 function chipEl(variant, site, chip, opts) {
   const box = { x: chip.x, y: chip.y, w: chip.w, h: opts.chipH };
   const parts = [`<a href="${esc(href(variant, site, chip.node.href))}">`];
-  parts.push(rectEl(variant, box, chip.color, 'band', 6));
+  if (variant === 'portrait') {
+    // Filled layer pastel with an ink hairline, so the colour alone reads the
+    // layer (the Stack branch above is the legend).
+    const geo = `x="${round(box.x)}" y="${round(box.y)}" width="${round(box.w)}" height="${round(box.h)}" rx="6"`;
+    parts.push(
+      `<rect fill="${HEX[chip.color]}" stroke="${HEX[`${chip.color}-ink`]}" stroke-width="1" ${geo}/>`,
+    );
+  } else {
+    parts.push(rectEl(variant, box, chip.color, 'band', 6));
+  }
   parts.push(
     textEl(variant, chip.x + CHIP_PAD_X, chip.y + opts.chipH / 2, chip.color, [chip.text], opts.fsChip),
   );
@@ -448,7 +478,9 @@ export function renderMap(map, variant, { site } = {}) {
     out.push(pillEl(variant, s, b.pill.node ? b.pill : { ...b.pill, node: { href: b.branch.href } }, b.branch.color, opts.fsBranch, { disp: true }));
     for (const leaf of b.leaves) {
       leaves += 1;
-      out.push(pillEl(variant, s, leaf, leaf.node.color ?? b.branch.color, opts.fsLeaf));
+      if (leaf.drawPill !== false) {
+        out.push(pillEl(variant, s, leaf, leaf.node.color ?? b.branch.color, opts.fsLeaf));
+      }
       for (const chip of leaf.chips) out.push(chipEl(variant, s, chip, opts));
     }
     out.push('</g>');

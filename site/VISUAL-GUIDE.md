@@ -242,6 +242,9 @@ module or a `bok/*.md` heading (checked in `tests/map.spec.ts`).
   and is inlined on `/map`; the **portrait** variant (for the LinkedIn infographic) is a standalone
   SVG with light-theme hex inline, a 1200-wide `viewBox`, the three font families in a `<style>`
   block, no background rect and no title/footer (the kit's frame supplies those), and absolute links.
+  In the portrait, the Patterns branch renders its 17 pattern names as layer-coloured chips
+  (`portrait: 'chips-only'` on the layer nodes) instead of repeating the five layer headers that
+  The Stack branch already shows; its chips stay ≥ 14px so they survive the frame's scale-to-fit.
 - **Responsive.** On phones the web canvas scrolls sideways inside a focusable, labelled region;
   the collapsible **index by cluster** below the map is the same content as a text list, so nothing
   is lost without the scroll.

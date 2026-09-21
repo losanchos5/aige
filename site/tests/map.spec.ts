@@ -243,4 +243,16 @@ test('the portrait variant is a standalone light-theme SVG with matching meta', 
   expect(meta.viewBox).toBe(`0 0 1200 ${meta.height}`);
   expect(meta.counts.branches).toBe(8);
   expect((svg.match(/<text/g) ?? []).length).toBe(meta.counts.texts);
+
+  // Patterns branch shows the 17 pattern names (or their shorts), not the layer
+  // headers, which The Stack branch already carries exactly once.
+  const patternNodes = map.branches
+    .find((b) => b.id === 'patterns')!
+    .leaves.flatMap((leaf) => leaf.children ?? []);
+  expect(patternNodes).toHaveLength(patterns.length); // all 17
+  for (const node of patternNodes) {
+    const shown = svg.includes(node.label) || (node.short != null && svg.includes(node.short));
+    expect(shown, `pattern "${node.label}" (or its short) is in the portrait`).toBe(true);
+  }
+  expect((svg.match(/Layer 01 Govern-as-Code/g) ?? []).length).toBe(1);
 });
