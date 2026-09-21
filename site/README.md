@@ -66,6 +66,34 @@ All three output locations (`site/.archify`, `site/public/diagrams`,
 3. Inline the SVG (or link `/diagrams/<id>.html`) in a page; `manifest.json`
    exposes `{ id, type, title, nodes, viewBox }` for build-time use.
 
+### Regenerating the figures / the map
+
+The conceptual infographics under `src/figures/*.svg` are generated from the typed
+data modules (not hand-edited) by `scripts/figures-build.mjs`, which runs in
+`prebuild` and `predev`:
+
+- `npm run figures:build` (re)writes `values-principles.svg`, `maturity-grid.svg`,
+  `pattern-map.svg` and `discipline-map.svg`.
+- `node scripts/figures-build.mjs --check` verifies they are byte-for-byte current
+  and exits non-zero if a data change was not regenerated (so `npm run build`
+  fails loudly on drift). Commit the regenerated `discipline-map.svg`.
+
+**The discipline map** (`/map`) is the largest figure, built by
+`scripts/map-build.mjs` from `src/data/map.ts` (pure: only `import type`, loaded via
+`scripts/lib/load-ts.mjs`). Its layout engine measures text with
+`scripts/lib/svg-text.mjs` and throws if a label does not fit its column — fix the
+offending node with a `short` (a verbatim substring), never a smaller font. It emits
+two variants:
+
+- **web** — inlined on `/map` and re-emitted as `src/figures/discipline-map.svg`
+  (class-based colour, ≤ 48 KB budget). Debug it with
+  `node scripts/map-build.mjs --web --out test-results/map-web.svg`.
+- **portrait** — a standalone, light-theme-hex SVG for the LinkedIn infographic
+  kit (not versioned in the repo):
+  `node scripts/map-build.mjs --portrait --out <path.svg> --meta <path.json>`.
+  The `--meta` JSON carries the BoK version, `viewBox` and node/leaf/text counts
+  the kit's render guards check.
+
 ### Pagefind exclusion
 
 Pagefind's `--glob` is include-only (it cannot negate a subtree), so the diagram
