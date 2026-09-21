@@ -92,13 +92,15 @@ test.describe('obligation export endpoints', () => {
 });
 
 test('the header exposes the Patterns nav item', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto('/');
   const header = page.locator('header.site-header');
-  await expect(header.getByRole('link', { name: 'Patterns' })).toBeVisible();
-  await expect(header.locator('a[href="/bok/patterns"]').first()).toHaveAttribute(
-    'href',
-    '/bok/patterns',
-  );
+  // Patterns now lives inside the Practice disclosure panel: open it first.
+  await header.getByRole('button', { name: 'Practice' }).click();
+  const practice = header.locator('[data-nav-group="practice"]');
+  const patterns = practice.getByRole('link', { name: 'Patterns' });
+  await expect(patterns).toBeVisible();
+  await expect(patterns).toHaveAttribute('href', '/bok/patterns');
 
   const res = await page.goto('/bok/patterns');
   expect(res?.status()).toBe(200);

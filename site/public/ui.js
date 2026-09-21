@@ -82,25 +82,9 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  function initMenu() {
-    var disc = document.querySelector('.nav-disc');
-    if (!disc) return;
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && disc.open) {
-        disc.open = false;
-        var s = disc.querySelector('summary');
-        if (s) s.focus();
-      }
-    });
-    document.addEventListener('click', function (e) {
-      if (disc.open && !disc.contains(e.target)) disc.open = false;
-    });
-  }
-
   function init() {
     initTheme();
     initReveal();
-    initMenu();
     initHeader();
   }
 
