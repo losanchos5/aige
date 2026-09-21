@@ -67,6 +67,32 @@ The artefacts an AI governance engineer ships map onto five layers, always named
 5. **Assurance & Continuous Compliance** — machine-readable evidence (OSCAL), continuous assurance,
    serious-incident reporting.
 
+## Open datasets
+
+The site publishes two reusable datasets, generated from the same source as its reference pages:
+
+| Dataset | JSON | CSV | Versioned source |
+|---|---|---|---|
+| Framework crosswalk | [JSON](https://aigovernanceengineer.com/resources/crosswalk.json) | [CSV](https://aigovernanceengineer.com/resources/crosswalk.csv) | [crosswalk.ts](site/src/data/crosswalk.ts) |
+| Obligation → artefact → layer mappings | [JSON](https://aigovernanceengineer.com/resources/obligations.json) | [CSV](https://aigovernanceengineer.com/resources/obligations.csv) | [frameworks.ts](site/src/data/frameworks.ts) |
+
+These are curated reference mappings. They are illustrative, not a claim of conformity or a
+substitute for reading the underlying instruments. The live exports can change as the site evolves;
+record the retrieval date and source commit when using them in research.
+
+### How to cite the datasets
+
+Cite the parent work, name the dataset you used, and include its URL and retrieval date:
+
+> García Aibar, J., & Pols, A. *AI Governance Engineering: The Thesis & Body of Knowledge*
+> (v0.4.0). https://doi.org/10.5281/zenodo.22857086. Dataset: Framework crosswalk / Obligation
+> mappings. [Dataset URL; retrieval date; source commit].
+
+The DOI identifies the archived parent release, not a separately deposited dataset. For a fixed
+reference use the version DOI above; the [concept DOI](https://doi.org/10.5281/zenodo.22857084)
+resolves to the latest archived release. See [CITATION.cff](CITATION.cff) for citation metadata.
+Reuse is covered by this repository’s [licence](LICENSE).
+
 ## How to contribute
 
 See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the full contribution guide. In short:

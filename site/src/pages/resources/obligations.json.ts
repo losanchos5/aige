@@ -16,6 +16,13 @@ export const GET: APIRoute = () => {
     version: site.bokVersion,
     license: site.license,
     source: `${site.url}/resources/frameworks`,
+    // Identifies the parent archived work, not a separate dataset deposit.
+    citation: {
+      title: 'AI Governance Engineering: The Thesis & Body of Knowledge',
+      authors: site.authors,
+      parentDoi: `https://doi.org/${site.doi}`,
+      conceptDoi: `https://doi.org/${site.conceptDoi}`,
+    },
     obligations: obligations.map((row) => ({
       framework: row.framework,
       obligation: row.obligation,

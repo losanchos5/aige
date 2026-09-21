@@ -17,6 +17,13 @@ export const GET: APIRoute = () => {
     version: site.bokVersion,
     license: site.license,
     source: `${site.url}/resources/crosswalk`,
+    // Identifies the parent archived work, not a separate dataset deposit.
+    citation: {
+      title: 'AI Governance Engineering: The Thesis & Body of Knowledge',
+      authors: site.authors,
+      parentDoi: `https://doi.org/${site.doi}`,
+      conceptDoi: `https://doi.org/${site.conceptDoi}`,
+    },
     topics: topics.map((t) => ({
       id: t.id,
       name: t.name,

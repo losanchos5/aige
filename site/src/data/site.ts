@@ -16,6 +16,7 @@ export interface SiteConfig {
   url: string;
   description: string;
   linkedin: string;
+  email: string;
   github: string;
   author: string;
   authors: readonly string[];
@@ -44,6 +45,7 @@ export const site: SiteConfig = {
   description:
     'The Thesis and Body of Knowledge for AI governance engineering — turning AI governance obligations into policy-as-code, eval gates and machine-readable evidence.',
   linkedin: 'https://www.linkedin.com/in/jorgara',
+  email: 'jorgegarciaaibar@gmail.com',
   github: 'https://github.com/losanchos5/aige',
   author: 'Jorge García',
   authors: ['Jorge García Aibar', 'Aurélie Pols'],
@@ -55,5 +57,8 @@ export const site: SiteConfig = {
   bokVersion: '0.4.0',
   doi: '10.5281/zenodo.22857086',
   conceptDoi: '10.5281/zenodo.22857084',
-  newsletter: { provider: 'buttondown', action: '' },
+  newsletter: {
+    provider: 'buttondown',
+    action: 'https://buttondown.com/api/emails/embed-subscribe/AI_Governance_Engineer',
+  },
 };
