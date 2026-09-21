@@ -238,6 +238,14 @@
   outline-offset: 2px;
 }
 
+/* The discipline map (src/figures/discipline-map.svg, class="map-svg"): the
+   pills are large hit targets, so ring the pill's own rect on focus rather than
+   the whole <a> box. The /map page adds the branch-dimming :has() rules. */
+.map-svg a:focus-visible > rect {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
 /* ------------------------------------------------- reading-paths (HTML) -- */
 /* Three persona columns of real chapter links on the /bok index; stacks to one
    column on a phone. */

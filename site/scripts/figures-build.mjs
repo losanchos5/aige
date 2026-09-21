@@ -4,6 +4,7 @@
 //   - src/figures/values-principles.svg  (from src/data/values.ts)
 //   - src/figures/maturity-grid.svg      (from src/data/maturity.ts + stack.ts)
 //   - src/figures/pattern-map.svg        (from src/data/patterns.ts + stack.ts)
+//   - src/figures/discipline-map.svg     (the whole discipline map; see map-build.mjs)
 // The other figures under src/figures are hand-authored. All figures are inlined
 // into the chapters by src/lib/rehype-diagrams.ts and declared in
 // src/data/figures.ts.
@@ -12,26 +13,19 @@
 //   node scripts/figures-build.mjs --check   # verify they are up to date (no writes)
 //
 // The data modules are TypeScript; they carry no runtime imports (only type-only
-// imports, which erase), so we transpile each with the installed `typescript`
-// and import it from a data: URL — no extra tooling, version-independent.
+// imports, which erase), so scripts/lib/load-ts.mjs transpiles each with the
+// installed `typescript` and imports it from a data: URL — no extra tooling.
 import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync, rmSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import ts from 'typescript';
+import { loadTs } from './lib/load-ts.mjs';
+import { loadMap, renderMap } from './map-build.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE = resolve(HERE, '..');
 const DATA = join(SITE, 'src', 'data');
 const OUT = join(SITE, 'src', 'figures');
 const CHECK = process.argv.slice(2).includes('--check');
-
-async function loadTs(relPath) {
-  const src = readFileSync(join(SITE, relPath), 'utf8');
-  const js = ts.transpileModule(src, {
-    compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
-  }).outputText;
-  return import(`data:text/javascript;base64,${Buffer.from(js).toString('base64')}`);
-}
 
 const esc = (s) =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -59,12 +53,23 @@ const pad2 = (n) => String(n).padStart(2, '0');
 const textW = (s, size) => s.length * size * 0.53;
 
 /** Open a figure SVG with the shared a11y contract (role img/group + title/desc). */
-function open(width, height, role, id, title, desc) {
+function open(width, height, role, id, title, desc, extraClass = '') {
+  const cls = extraClass ? `figc ${extraClass}` : 'figc';
   return (
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" class="figc" ` +
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" class="${cls}" ` +
     `role="${role}" aria-labelledby="fig-${id}-t fig-${id}-d">\n` +
     `  <title id="fig-${id}-t">${esc(title)}</title>\n` +
     `  <desc id="fig-${id}-d">${esc(desc)}</desc>\n`
+  );
+}
+
+/** The whole discipline map (web variant), wrapped with the a11y contract. */
+function buildDisciplineMap(map, fig) {
+  const r = renderMap(map, 'web');
+  return (
+    open(r.width, r.height, 'group', 'discipline-map', fig.title, fig.alt, 'map-svg') +
+    r.body +
+    `\n</svg>\n`
   );
 }
 
@@ -225,7 +230,7 @@ function buildPatternMap(patterns, layers, fig) {
   return open(W, H, 'group', 'pattern-map', fig.title, fig.alt) + parts.join('\n') + `\n</svg>\n`;
 }
 
-function emit(name, svg) {
+function emit(name, svg, budgetKb = 12) {
   const dest = join(OUT, name);
   if (CHECK) {
     if (!existsSync(dest)) {
@@ -239,8 +244,8 @@ function emit(name, svg) {
     return 0;
   }
   const size = Buffer.byteLength(svg, 'utf8');
-  if (size > 12 * 1024) {
-    console.error(`figures-build: ${name} is ${(size / 1024).toFixed(1)} KB, over the 12 KB budget.`);
+  if (size > budgetKb * 1024) {
+    console.error(`figures-build: ${name} is ${(size / 1024).toFixed(1)} KB, over the ${budgetKb} KB budget.`);
     process.exit(1);
   }
   const changed = !existsSync(dest) || readFileSync(dest, 'utf8') !== svg;
@@ -254,26 +259,28 @@ function emit(name, svg) {
 async function main() {
   if (!CHECK) mkdirSync(OUT, { recursive: true });
 
-  const [{ values, principles }, { layers }, { levels }, { patterns }, { figures }] =
+  const [{ values, principles }, { layers }, { levels }, { patterns }, { figures }, { map }] =
     await Promise.all([
-      loadTs('src/data/values.ts'),
-      loadTs('src/data/stack.ts'),
-      loadTs('src/data/maturity.ts'),
-      loadTs('src/data/patterns.ts'),
-      loadTs('src/data/figures.ts'),
+      loadTs('src/data/values.ts', SITE),
+      loadTs('src/data/stack.ts', SITE),
+      loadTs('src/data/maturity.ts', SITE),
+      loadTs('src/data/patterns.ts', SITE),
+      loadTs('src/data/figures.ts', SITE),
+      loadMap(SITE),
     ]);
   const fig = (id) => figures.find((f) => f.id === id);
 
   const outputs = [
-    ['values-principles.svg', buildValuesPrinciples(values, principles, fig('values-principles'))],
-    ['maturity-grid.svg', buildMaturityGrid(layers, levels, fig('maturity-grid'))],
-    ['pattern-map.svg', buildPatternMap(patterns, layers, fig('pattern-map'))],
+    ['values-principles.svg', buildValuesPrinciples(values, principles, fig('values-principles')), 12],
+    ['maturity-grid.svg', buildMaturityGrid(layers, levels, fig('maturity-grid')), 12],
+    ['pattern-map.svg', buildPatternMap(patterns, layers, fig('pattern-map')), 12],
+    ['discipline-map.svg', buildDisciplineMap(map, fig('discipline-map')), 48],
   ];
 
   let problems = 0;
   let changed = 0;
-  for (const [name, svg] of outputs) {
-    const r = emit(name, svg);
+  for (const [name, svg, budget] of outputs) {
+    const r = emit(name, svg, budget);
     if (CHECK) problems += r;
     else changed += r;
   }

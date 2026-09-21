@@ -14,10 +14,13 @@
 // `description` is the fuller text alternative rendered in a <details> under the
 // figure, in the chapter's own words.
 //
-// Two figures (values-principles, pattern-map) are generated from data by
-// scripts/figures-build.mjs; the rest are hand-authored. reading-paths lives on
-// the /bok index page (src/pages/bok/index.astro), not here, because it has no
-// chapter placement and is rendered as accessible HTML links.
+// Three figures (values-principles, pattern-map, discipline-map) are generated
+// from data by scripts/figures-build.mjs; the rest are hand-authored.
+// discipline-map is the whole "map of the discipline" (scripts/map-build.mjs):
+// it carries no chapter placement (placements: []) because it lives on /map, and
+// it is exempt from the usual figure budget — see VISUAL-GUIDE.md §2.4.
+// reading-paths lives on the /bok index page (src/pages/bok/index.astro), not
+// here, because it has no chapter placement and is rendered as accessible HTML.
 
 import type { DiagramPlacement } from './diagrams';
 
@@ -113,6 +116,16 @@ export const figures: readonly FigureDef[] = [
     description:
       'Five bands, one per stack layer in canonical order — Govern-as-Code, Inventory & Transparency, Evals & Red Teaming as Evidence, Runtime Controls & Observability, Assurance & Continuous Compliance — each holding the patterns whose home layer it is, as links to the pattern in this chapter. A pattern that maps to two layers appears once, in its first layer, marked with its second.',
     placements: [{ chapter: 'patterns', at: 'lead' }],
+  },
+  {
+    id: 'discipline-map',
+    title: 'The map of the discipline',
+    caption:
+      'The whole discipline on one canvas: a central node and eight branches — foundations, values, the stack, patterns, the role, obligations, maturity and the learning path — every node a link. Follow the branch you are weakest in, or read the same map as a list below. — drawn from chapters 01–08',
+    alt: 'A two-sided mind map with a central AI Governance Engineer node and eight branches, each with its second-level topics as links.',
+    description:
+      'A two-sided mind map. The centre is the AI Governance Engineer. Four branches sit on the left — Foundations (the definition, the three questions, the disambiguation cluster, the five problems), Values and principles, The Stack (five layers and the minimum viable stack) and Patterns (the catalogue by layer) — and four on the right — The Role (seven workflows, the career ladder, three ways in), Obligations (the topic crosswalk, the frameworks and the reverse index), Maturity (the five levels, metrics and the self-assessment) and the Learning path (four stages of nodes). Every node links to the page or on-page anchor that develops it; the list under the map is the same content as text.',
+    placements: [],
   },
 ] as const;
 
