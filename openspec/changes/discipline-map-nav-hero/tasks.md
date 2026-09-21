@@ -53,7 +53,7 @@ en el puerto 4321 antes de lanzar tests.
 
 ## 7. Verificación, revisión y cierre
 
-- [ ] 7.1 Revisión con `code-reviewer` del diff completo y corrección de hallazgos CRITICAL/HIGH; verificar que el informe no deja hallazgos abiertos de esos niveles.
-- [ ] 7.2 Gates completos en orden: `npm run build` → `npm test` → `npm run test:a11y` → `npm run lhci`; verificar todo en verde y revisar `git diff --stat` y las capturas E/D/B/N/M.
+- [x] 7.1 Revisión con `code-reviewer` del diff completo y corrección de hallazgos CRITICAL/HIGH; verificar que el informe no deja hallazgos abiertos de esos niveles.
+- [x] 7.2 Gates completos en orden: `npm run build` → `npm test` → `npm run test:a11y` → `npm run lhci`; verificar todo en verde y revisar `git diff --stat` y las capturas E/D/B/N/M.
 - [ ] 7.3 Commits por tipo (`fix(site): hero full-bleed…`, `feat(site): navegación por grupos…`, `feat(site): mapa de la disciplina…`, `test(site): …`, `docs: …`), merge a `main` y comprobación de producción con `curl -sI https://aigovernanceengineer.com/map` y `/resources/frameworks` (200); verificar el run de `deploy.yml` en verde.
 - [ ] 7.4 Archivar la change con `/opsx:archive` y actualizar la memoria de sesión; verificar con `openspec list` que la change ya no está en curso.
