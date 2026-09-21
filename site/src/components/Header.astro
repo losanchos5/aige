@@ -1,29 +1,34 @@
 ---
 /**
  * Header — sticky, ground colour, 1px bottom line (no blur). Left: RegisterMark
- * + wordmark. Right: primary nav, a search placeholder button (wired by the
- * search block) and the theme toggle. At >=840px the desktop nav shows inline;
- * below that it is replaced by a native <details> disclosure — keyboard
- * accessible, no JS framework. Only one nav is in the a11y tree at a time.
+ * + wordmark. Right: the grouped desktop nav (WAI-ARIA disclosure navigation),
+ * a search button, the theme toggle and a burger. At >=840px the group bar
+ * shows inline; below that it collapses into a modal <dialog> drawer (a sibling
+ * of the header, so the header still holds exactly one search button and one
+ * theme toggle). All behaviour is in /nav.js (CSP script-src 'self').
  */
 import RegisterMark from './RegisterMark.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { site } from '../data/site';
+import { nav, resolveCurrent, type NavGroup, type NavItem } from '../data/nav';
 
-const nav = [
-  { label: 'The Thesis', href: '/thesis' },
-  { label: 'Body of Knowledge', href: '/bok' },
-  { label: 'The Role', href: '/bok/the-role' },
-  { label: 'The Stack', href: '/bok/the-stack' },
-  { label: 'Patterns', href: '/bok/patterns' },
-  { label: 'Learning path', href: '/path' },
-  { label: 'Resources', href: '/resources' },
-  { label: 'About', href: '/about' },
-];
+const current = resolveCurrent(Astro.url.pathname);
+const currentHref = current.href;
+const currentGroup = current.groupId;
 
-const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const isCurrent = (href: string) => path === href || (href !== '/' && path.startsWith(href + '/'));
-const current = (href: string) => (isCurrent(href) ? 'page' : undefined);
+const slugify = (text: string) =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+const itemId = (groupId: string, item: NavItem) => `nav-${groupId}-${slugify(item.label)}`;
+const isCurrentLink = (href: string, groupId: string) =>
+  currentHref === href && currentGroup === groupId;
+const leadLabel = (group: NavGroup) => (group.id === 'reference' ? 'All resources →' : group.label);
+const panelItems = (group: NavGroup) => group.items.filter((i) => i.placement !== 'footer');
+const rowItems = (group: NavGroup) => panelItems(group).filter((i) => !i.num);
+const chapterOf = (group: NavGroup) => panelItems(group).filter((i) => i.num);
+const isDirect = (group: NavGroup) => panelItems(group).length === 0;
 ---
 
 <header class="site-header">
@@ -35,15 +40,115 @@ const current = (href: string) => (isCurrent(href) ? 'page' : undefined);
 
     <div class="right">
       <nav class="nav-desktop" aria-label="Primary">
-        <ul>
+        <ul class="nav-top">
           {
-            nav.map((item) => (
-              <li>
-                <a href={item.href} aria-current={current(item.href)}>
-                  {item.label}
-                </a>
-              </li>
-            ))
+            nav.map((group) =>
+              isDirect(group) ? (
+                <li class="nav-item" data-current={currentGroup === group.id ? '' : undefined}>
+                  <a
+                    class="nav-link"
+                    href={group.href}
+                    aria-current={isCurrentLink(group.href!, group.id) ? 'page' : undefined}
+                  >
+                    {group.label}
+                  </a>
+                </li>
+              ) : (
+                <li
+                  class="nav-group"
+                  data-nav-group={group.id}
+                  data-current={currentGroup === group.id ? '' : undefined}
+                >
+                  <button
+                    type="button"
+                    class="nav-trigger"
+                    aria-expanded="false"
+                    aria-controls={`nav-menu-${group.id}`}
+                    data-nav-trigger
+                  >
+                    {group.label}
+                    <svg
+                      class="chev"
+                      viewBox="0 0 24 24"
+                      width="14"
+                      height="14"
+                      fill="none"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="m6 9 6 6 6-6"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </button>
+
+                  <div class="nav-menu" id={`nav-menu-${group.id}`} hidden data-nav-menu>
+                    <div class="container nav-menu-in">
+                      <p class="nav-menu-kicker">{group.label}</p>
+
+                      {group.href && (
+                        <a
+                          class="nav-lead"
+                          href={group.href}
+                          aria-describedby={`${group.id}-lead-d`}
+                          aria-current={isCurrentLink(group.href, group.id) ? 'page' : undefined}
+                        >
+                          {leadLabel(group)}
+                        </a>
+                      )}
+                      {group.href && (
+                        <p class="nav-lead-d" id={`${group.id}-lead-d`}>
+                          {group.description}
+                        </p>
+                      )}
+
+                      {rowItems(group).length > 0 && (
+                        <ul class="nav-menu-list">
+                          {rowItems(group).map((item) => (
+                            <li>
+                              <a
+                                id={itemId(group.id, item)}
+                                href={item.href}
+                                aria-describedby={`${itemId(group.id, item)}-d`}
+                                aria-current={
+                                  isCurrentLink(item.href, group.id) ? 'page' : undefined
+                                }
+                              >
+                                {item.label}
+                              </a>
+                              <p id={`${itemId(group.id, item)}-d`}>{item.description}</p>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
+                      {chapterOf(group).length > 0 && (
+                        <ol class="nav-menu-chapters" aria-label="Chapters">
+                          {chapterOf(group).map((item) => (
+                            <li>
+                              <a
+                                href={item.href}
+                                aria-current={
+                                  isCurrentLink(item.href, group.id) ? 'page' : undefined
+                                }
+                              >
+                                <span class="num" aria-hidden="true">
+                                  {item.num}
+                                </span>
+                                <span class="ch-label">{item.label}</span>
+                              </a>
+                            </li>
+                          ))}
+                        </ol>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              )
+            )
           }
         </ul>
       </nav>
@@ -64,40 +169,129 @@ const current = (href: string) => (isCurrent(href) ? 'page' : undefined);
 
       <ThemeToggle />
 
-      <details class="nav-disc">
-        <summary class="icon-btn burger" aria-label="Menu">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
-            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-          </svg>
-        </summary>
-        <nav class="nav-panel" aria-label="Primary menu">
-          <ul>
-            {
-              nav.map((item) => (
-                <li>
-                  <a href={item.href} aria-current={current(item.href)}>
-                    {item.label}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
-      </details>
+      <button
+        type="button"
+        class="icon-btn burger"
+        data-nav-open
+        aria-expanded="false"
+        aria-controls="nav-drawer"
+        aria-label="Menu"
+      >
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+        </svg>
+      </button>
     </div>
   </div>
 </header>
+
+<dialog id="nav-drawer" class="nav-drawer" aria-label="Menu">
+  <div class="nav-drawer-in">
+    <div class="nav-drawer-bar">
+      <span class="nav-drawer-brand">
+        <RegisterMark size="sm" label={site.name} />
+        <span class="nav-drawer-title">Menu</span>
+      </span>
+      <button type="button" class="icon-btn" data-nav-close aria-label="Close menu">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </div>
+
+    <button type="button" class="nav-drawer-search" data-search-open>
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+        <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
+        <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+      </svg>
+      <span>Search</span>
+      <kbd>Ctrl K</kbd>
+    </button>
+
+    <nav class="nav-panel" aria-label="Menu">
+      {
+        nav.map((group) => (
+          <section class="nav-drawer-group">
+            {isDirect(group) ? (
+              <>
+                <a class="nav-drawer-lead" href={group.href} aria-describedby={`d-${group.id}-lead-d`}>
+                  {group.label}
+                </a>
+                <p id={`d-${group.id}-lead-d`} class="nav-drawer-desc">
+                  {group.description}
+                </p>
+              </>
+            ) : (
+              <>
+                <p class="nav-menu-kicker">{group.label}</p>
+                {group.href && (
+                  <>
+                    <a
+                      class="nav-drawer-lead"
+                      href={group.href}
+                      aria-describedby={`d-${group.id}-lead-d`}
+                    >
+                      {leadLabel(group)}
+                    </a>
+                    <p id={`d-${group.id}-lead-d`} class="nav-drawer-desc">
+                      {group.description}
+                    </p>
+                  </>
+                )}
+                {rowItems(group).length > 0 && (
+                  <ul class="nav-drawer-list">
+                    {rowItems(group).map((item) => (
+                      <li>
+                        <a href={item.href} aria-describedby={`d-${itemId(group.id, item)}-d`}>
+                          {item.label}
+                        </a>
+                        <p id={`d-${itemId(group.id, item)}-d`} class="nav-drawer-desc">
+                          {item.description}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {chapterOf(group).length > 0 && (
+                  <details class="nav-drawer-chapters">
+                    <summary>Chapters 00–10</summary>
+                    <ol>
+                      {chapterOf(group).map((item) => (
+                        <li>
+                          <a href={item.href}>
+                            <span class="num" aria-hidden="true">
+                              {item.num}
+                            </span>
+                            <span>{item.label}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ol>
+                  </details>
+                )}
+              </>
+            )}
+          </section>
+        ))
+      }
+    </nav>
+
+    <div class="nav-drawer-foot">
+      <a href={site.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </div>
+</dialog>
+
+<script is:inline defer src="/nav.js"></script>
 
 <style>
   .site-header {
     position: sticky;
     top: 0;
     z-index: 20;
-    /* Frosted bar (the 68px strip only): a translucent ground with a backdrop
-       blur so content reads faintly beneath it. The hairline + faint shadow are
-       held back until scrolled (added by initHeader in ui.js), so the top of the
-       page stays clean. The 1px border is always present but transparent, so the
-       bar height — and the reading-progress bar's computed top — never shifts. */
+    /* Frosted bar: translucent ground + backdrop blur. The hairline + faint
+       shadow are held back until scrolled (initHeader in ui.js). The 1px border
+       is always present but transparent so the bar height never shifts. */
     background: color-mix(in srgb, var(--bg) 82%, transparent);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
@@ -142,12 +336,12 @@ const current = (href: string) => (isCurrent(href) ? 'page' : undefined);
     gap: var(--s-3);
   }
 
-  /* Desktop nav */
+  /* ---------- Desktop group bar (>=840px) ---------- */
   .nav-desktop {
     display: none;
   }
 
-  .nav-desktop ul {
+  .nav-top {
     display: flex;
     align-items: center;
     gap: var(--s-5);
@@ -156,36 +350,65 @@ const current = (href: string) => (isCurrent(href) ? 'page' : undefined);
     padding: 0;
   }
 
-  .nav-desktop a,
-  .nav-panel a {
-    color: var(--ink-2);
-    text-decoration: none;
-    font-size: 0.9375rem;
+  /* The group li stays static so its panel anchors to the sticky header, not to
+     the (narrower, centred) container. */
+  .nav-group {
+    position: static;
   }
 
-  .nav-desktop a:hover,
-  .nav-panel a:hover {
+  .nav-link,
+  .nav-trigger {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink-2);
+    font-family: inherit;
+    font-size: 0.9375rem;
+    line-height: 1;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .nav-link:hover,
+  .nav-trigger:hover {
     color: var(--ink);
   }
 
-  .nav-desktop a[aria-current='page'],
-  .nav-panel a[aria-current='page'] {
+  .nav-link[aria-current='page'],
+  .nav-item[data-current] .nav-link,
+  .nav-group[data-current] .nav-trigger {
     color: var(--ink);
     font-weight: 600;
   }
 
-  /* Desktop nav underline: a 2px rule that grows from the left on
-     hover/focus-visible and stays out for the current page. */
-  .nav-desktop a {
-    position: relative;
+  .chev {
+    color: var(--muted);
   }
 
-  .nav-desktop a::after {
+  @media (prefers-reduced-motion: no-preference) {
+    .chev {
+      transition: transform var(--dur) var(--ease);
+    }
+  }
+
+  .nav-trigger[aria-expanded='true'] .chev {
+    transform: rotate(180deg);
+  }
+
+  /* Underline that grows from the left on hover/focus, on the open trigger and
+     on the current link/group. */
+  .nav-link::after,
+  .nav-trigger::after {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -4px;
+    bottom: -6px;
     height: 2px;
     background: var(--ink);
     transform: scaleX(0);
@@ -193,18 +416,169 @@ const current = (href: string) => (isCurrent(href) ? 'page' : undefined);
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .nav-desktop a::after {
+    .nav-link::after,
+    .nav-trigger::after {
       transition: transform var(--dur) var(--ease);
     }
   }
 
-  .nav-desktop a:hover::after,
-  .nav-desktop a:focus-visible::after,
-  .nav-desktop a[aria-current='page']::after {
+  .nav-link:hover::after,
+  .nav-link:focus-visible::after,
+  .nav-link[aria-current='page']::after,
+  .nav-item[data-current] .nav-link::after,
+  .nav-trigger:hover::after,
+  .nav-trigger:focus-visible::after,
+  .nav-trigger[aria-expanded='true']::after,
+  .nav-group[data-current] .nav-trigger::after {
     transform: scaleX(1);
   }
 
-  /* Icon buttons (search, burger) */
+  /* The panel: anchored to the sticky header, spanning its full width; hidden
+     keeps it out of the a11y tree and out of scrollWidth. */
+  .nav-menu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    z-index: 30;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--ink) 8%, transparent);
+    padding-block: var(--s-5) var(--s-6);
+  }
+
+  .nav-menu[hidden] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .nav-menu:not([hidden]) .nav-menu-in {
+      animation: nav-in var(--dur) var(--ease);
+    }
+  }
+
+  @keyframes nav-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .nav-menu-kicker {
+    margin: 0 0 var(--s-4);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .nav-lead {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-lead:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .nav-lead-d {
+    margin: 2px 0 var(--s-5);
+    max-width: 64ch;
+    color: var(--ink-2);
+    font-size: 0.9375rem;
+  }
+
+  .nav-menu-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-2) var(--s-6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-menu-list li {
+    position: relative;
+    padding: var(--s-2) 0;
+  }
+
+  .nav-menu-list a {
+    display: inline-block;
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+  }
+
+  /* Whole row clickable: the link's overlay covers the li (label + description);
+     the accessible name stays just the label. */
+  .nav-menu-list a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .nav-menu-list a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .nav-menu-list li p {
+    margin: 2px 0 0;
+    color: var(--ink-2);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .nav-menu-chapters {
+    columns: 2;
+    column-gap: var(--s-6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-menu-chapters li {
+    break-inside: avoid;
+  }
+
+  .nav-menu-chapters a {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    padding: var(--s-1) 0;
+    color: var(--ink);
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+
+  .nav-menu-chapters a:hover .ch-label {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .nav-menu-chapters a[aria-current='page'] {
+    font-weight: 600;
+  }
+
+  .nav-menu-chapters .num {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--muted);
+  }
+
+  /* ---------- Icon buttons + burger ---------- */
   .icon-btn {
     display: inline-flex;
     align-items: center;
@@ -216,58 +590,219 @@ const current = (href: string) => (isCurrent(href) ? 'page' : undefined);
     background: transparent;
     color: var(--ink);
     cursor: pointer;
-    list-style: none;
   }
 
   .icon-btn:hover {
     border-color: var(--ink-2);
   }
 
-  .burger::-webkit-details-marker {
-    display: none;
+  .burger {
+    display: inline-flex;
   }
 
-  /* Mobile disclosure dropdown */
-  .nav-disc {
-    position: relative;
+  /* ---------- Mobile drawer (<840px) ---------- */
+  .nav-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: min(100%, 26rem);
+    /* Override the UA `dialog:modal` max-width/max-height caps that otherwise
+       shrink the panel and knock it off the right edge. */
+    max-width: 100%;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    overflow-y: auto;
+  }
+
+  .nav-drawer::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .nav-drawer[open] {
+      animation: drawer-in var(--dur) var(--ease);
+    }
+  }
+
+  @keyframes drawer-in {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  .nav-drawer-in {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    min-height: 100%;
+    padding: var(--s-4);
+  }
+
+  .nav-drawer-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-drawer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  .nav-drawer-title {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .nav-drawer-search {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    width: 100%;
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--ink-2);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .nav-drawer-search span {
+    flex: 1;
+  }
+
+  .nav-drawer-search kbd {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 2px 6px;
   }
 
   .nav-panel {
-    position: absolute;
-    right: 0;
-    top: calc(100% + var(--s-3));
-    min-width: 15rem;
-    padding: var(--s-3);
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    z-index: 30;
-  }
-
-  .nav-panel ul {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    list-style: none;
+    gap: var(--s-5);
+  }
+
+  .nav-drawer-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+  }
+
+  .nav-drawer-group .nav-menu-kicker {
     margin: 0;
+  }
+
+  .nav-drawer-lead {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-drawer-desc {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .nav-drawer-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    list-style: none;
+    margin: var(--s-2) 0 0;
     padding: 0;
   }
 
-  .nav-panel li + li {
+  .nav-drawer-list a {
+    color: var(--ink);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .nav-drawer-chapters summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .nav-drawer-chapters ol {
+    list-style: none;
+    margin: var(--s-2) 0 0;
+    padding: 0;
+    columns: 2;
+  }
+
+  .nav-drawer-chapters a {
+    display: flex;
+    gap: var(--s-2);
+    padding: var(--s-1) 0;
+    color: var(--ink);
+    font-size: 0.9375rem;
+    text-decoration: none;
+  }
+
+  .nav-drawer-chapters .num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--muted);
+  }
+
+  .nav-drawer-foot {
+    margin-top: auto;
+    padding-top: var(--s-4);
     border-top: 1px solid var(--line);
   }
 
-  .nav-panel a {
-    display: block;
-    padding: var(--s-3) var(--s-2);
-    font-size: 1rem;
+  .nav-drawer-foot a {
+    color: var(--ink-2);
+    text-decoration: none;
   }
 
+  .nav-drawer-foot a:hover {
+    color: var(--ink);
+  }
+
+  /* Scroll lock while the drawer is open (nav.js toggles the class on <html>). */
+  :global(html.nav-locked) {
+    overflow: hidden;
+  }
+
+  /* ---------- Breakpoint ---------- */
   @media (min-width: 840px) {
     .nav-desktop {
       display: block;
     }
-    .nav-disc {
+    .burger {
+      display: none;
+    }
+    .nav-drawer {
       display: none;
     }
   }

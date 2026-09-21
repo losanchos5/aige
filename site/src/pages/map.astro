@@ -1,0 +1,40 @@
+---
+/**
+ * Placeholder for /map. Exists so links to /map resolve (check-links, nav.spec)
+ * while the real discipline-map page is built by a later block. Uses Base
+ * directly to keep it minimal.
+ */
+import Base from '../layouts/Base.astro';
+import { site } from '../data/site';
+---
+
+<Base
+  title={`The map · ${site.name}`}
+  description="The discipline as a mind map: chapters, layers and patterns on one canvas."
+>
+  <section class="section">
+    <div class="container">
+      <h1>The map</h1>
+      <p>The discipline as a mind map. Coming with the next build.</p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .section {
+    padding-block: var(--s-7);
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: var(--tracking-display);
+    margin: 0 0 var(--s-4);
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-2);
+    max-width: 60ch;
+  }
+</style>

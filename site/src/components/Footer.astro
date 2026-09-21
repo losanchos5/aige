@@ -1,73 +1,125 @@
 ---
 /**
- * Footer — three columns (about line, Read links, Project links) over a meta
- * line. All identity values come from data/site.ts.
+ * Footer — a full site map built from data/nav.ts (brand + Read/Practice/
+ * Reference/About columns, the eleven chapters, feeds & data, and the project
+ * links) over a meta line. Identity values come from data/site.ts. The tinted
+ * band, grid texture and display watermark are kept.
  */
 import RegisterMark from './RegisterMark.astro';
 import { site } from '../data/site';
+import { nav, feeds, project, type NavGroup } from '../data/nav';
 
 const domain = new URL(site.url).host;
-
-const read = [
-  { label: 'The Thesis', href: '/thesis' },
-  { label: 'Body of Knowledge', href: '/bok' },
-  { label: 'The Role', href: '/bok/the-role' },
-  { label: 'The Stack', href: '/bok/the-stack' },
-  { label: 'Patterns', href: '/bok/patterns' },
-  { label: 'Learning path', href: '/path' },
-  { label: 'Resources', href: '/resources' },
-];
-
-const project = [
-  { label: 'About', href: '/about' },
-  { label: 'Contributors', href: '/about/contributors' },
-  { label: 'Changelog', href: '/about/changelog' },
-  { label: 'GitHub', href: site.github, external: true },
-  { label: 'LinkedIn', href: site.linkedin, external: true },
-];
+const byId = (id: NavGroup['id']) => nav.find((g) => g.id === id)!;
+const thesis = byId('thesis');
+const bok = byId('bok');
+const practice = byId('practice');
+const reference = byId('reference');
+const map = byId('map');
+const about = byId('about');
 ---
 
 <footer class="site-footer">
   <div class="container">
-    <div class="cols">
-      <div class="about">
+    <nav class="sitemap" aria-label="Site map">
+      <div class="col col-brand">
         <RegisterMark size="sm" label={site.name} />
-        <p>
+        <p class="blurb">
           An open Body of Knowledge for the discipline of AI Governance
           Engineering. Written and maintained by {site.author} · AI Governance
           Engineer.
         </p>
+        <ul class="brand-links" aria-label="Site">
+          <li><a href="/">Home</a></li>
+          <li><a href={map.href}>{map.label}</a></li>
+        </ul>
       </div>
 
-      <nav class="group" aria-label="Read">
-        <p class="group-title">Read</p>
-        <ul>
-          {read.map((item) => (
+      <div class="col">
+        <p class="group-title" id="fg-read">Read</p>
+        <ul aria-labelledby="fg-read">
+          <li><a href={thesis.href}>{thesis.label}</a></li>
+          {thesis.items.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
+          <li><a href={bok.href}>{bok.label}</a></li>
+        </ul>
+        <ol class="fchap" aria-label="Chapters">
+          {bok.items.map((item) => (
+            <li>
+              <a href={item.href}>
+                <span class="num" aria-hidden="true">{item.num}</span>
+                <span>{item.label}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div class="col">
+        <p class="group-title" id="fg-practice">Practice</p>
+        <ul aria-labelledby="fg-practice">
+          {practice.items.map((item) => (
             <li>
               <a href={item.href}>{item.label}</a>
             </li>
           ))}
         </ul>
-      </nav>
+      </div>
 
-      <nav class="group" aria-label="Project">
-        <p class="group-title">Project</p>
-        <ul>
-          {
-            project.map((item) => (
-              <li>
-                <a
-                  href={item.href}
-                  {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))
-          }
+      <div class="col">
+        <p class="group-title" id="fg-reference">Reference</p>
+        <ul aria-labelledby="fg-reference">
+          <li><a href={reference.href}>All resources</a></li>
+          {reference.items.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
         </ul>
-      </nav>
-    </div>
+      </div>
+
+      <div class="col">
+        <p class="group-title" id="fg-about">About</p>
+        <ul aria-labelledby="fg-about">
+          <li><a href={about.href}>About</a></li>
+          {about.items.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="col">
+        <p class="group-title" id="fg-feeds">Feeds &amp; data</p>
+        <ul aria-labelledby="fg-feeds">
+          {feeds.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="col">
+        <p class="group-title" id="fg-project">Project</p>
+        <ul aria-labelledby="fg-project">
+          {project.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </nav>
 
     <p class="meta">{site.license} · v{site.bokVersion} · {domain}</p>
 
@@ -108,26 +160,32 @@ const project = [
     container-type: inline-size;
   }
 
-  .cols {
+  .sitemap {
     display: grid;
     gap: var(--s-6);
   }
 
   @media (min-width: 720px) {
-    .cols {
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: var(--s-7);
+    .sitemap {
+      grid-template-columns: 2fr repeat(3, 1fr);
+      gap: var(--s-6) var(--s-7);
     }
   }
 
-  .about {
+  @media (min-width: 1100px) {
+    .sitemap {
+      grid-template-columns: 1.6fr repeat(5, 1fr);
+    }
+  }
+
+  .col-brand {
     display: flex;
     flex-direction: column;
     gap: var(--s-3);
     max-width: 40ch;
   }
 
-  .about p {
+  .blurb {
     margin: 0;
     color: var(--ink-2);
   }
@@ -138,11 +196,12 @@ const project = [
     font-size: var(--fs-label);
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    /* --ink-2, not --muted: the footer is now a tinted band. */
+    /* --ink-2, not --muted: the footer is a tinted band. */
     color: var(--ink-2);
   }
 
-  .group ul {
+  .col ul,
+  .brand-links {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -151,12 +210,37 @@ const project = [
     gap: var(--s-2);
   }
 
-  .group a {
+  .fchap {
+    list-style: none;
+    margin: var(--s-3) 0 0;
+    padding: 0;
+    columns: 2;
+    column-gap: var(--s-5);
+  }
+
+  .fchap li {
+    break-inside: avoid;
+  }
+
+  .fchap a {
+    display: flex;
+    gap: var(--s-2);
+    padding: 2px 0;
+  }
+
+  .num {
+    font-family: var(--font-mono);
+    color: var(--muted);
+  }
+
+  .col a,
+  .brand-links a {
     color: var(--ink-2);
     text-decoration: none;
   }
 
-  .group a:hover {
+  .col a:hover,
+  .brand-links a:hover {
     color: var(--ink);
     text-decoration: underline;
     text-underline-offset: 0.15em;
@@ -169,15 +253,13 @@ const project = [
     font-family: var(--font-mono);
     font-size: var(--fs-label);
     letter-spacing: 0.04em;
-    /* --ink-2, not --muted: the footer is now a tinted band. */
+    /* --ink-2, not --muted: the footer is a tinted band. */
     color: var(--ink-2);
   }
 
   /* Big display wordmark as a faint watermark closing the footer. aria-hidden
-     and decorative, so its low-contrast ink is out of the a11y tree. Sized in
-     container-query units against .container so the whole name always fits its
-     width (was clipped on the right at 1440); overflow:hidden + nowrap stay as
-     a safety net. */
+     and decorative. Sized in container-query units against .container so the
+     whole name always fits its width; overflow:hidden + nowrap as a safety net. */
   .foot-wordmark {
     margin: var(--s-6) 0 0;
     font-family: var(--font-display);
