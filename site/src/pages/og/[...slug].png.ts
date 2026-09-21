@@ -14,6 +14,7 @@ const ROUTES: Record<string, string> = {
   stack: 'The five-layer stack',
   path: 'The AIGE learning path',
   resources: 'Resources & reading list',
+  map: 'The map of the discipline',
   about: 'About this site',
 };
 

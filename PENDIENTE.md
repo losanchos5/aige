@@ -34,6 +34,10 @@ Reglas de trabajo: Fable planifica, revisa figuras y verifica; subagentes `imple
 - [x] Thesis en español en `/es/thesis` (solo la Thesis, no el BoK).
 
 ## 3. Flecos de los bloques ya publicados
+- [~] Mapa de la disciplina en `/map` (change `discipline-map-nav-hero`, 2026-09-21): página, leyenda,
+      índice por cluster y variante web del SVG en producción. Pendiente: renderizar el PNG vertical
+      para LinkedIn con el kit `aige-media/linkedin` (`sync-map --publish` → `map-export.json` + PNG en
+      `public/downloads/`); hasta entonces el bloque de descarga de `/map` se omite solo.
 - [ ] Seo/hreflang: la página /es/thesis usa `lang`/`locale`/`alternates` vía Doc→Base→Seo; el
       «Updated» de ChapterHeader sigue en inglés en /es/thesis.
 - [ ] Feed RSS: el título sigue siendo «Changelog» aunque ya lleva capítulos (título en Base.astro).
@@ -67,7 +71,8 @@ Reglas de trabajo: Fable planifica, revisa figuras y verifica; subagentes `imple
 - [ ] Ámbito regulatorio: GDPR Art. 22 con FRIA/DPIA, sectoriales (DORA, FDA).
 - [x] China: cap. 08 (subsección + tabla + cruce agéntico TC260 3.0), catálogo del sitio, lecturas y glosario — 2026-09-20
 - [ ] Propuestas para las otras audiencias del prefacio (security, privacy/DPO, MLOps, juristas).
-- [ ] Cadencia de LinkedIn y motor de contenido corto («Field notes»); optimizar OG para LinkedIn.
+- [ ] Cadencia de LinkedIn y motor de contenido corto («Field notes»). (OG/infografía para LinkedIn:
+      resuelto vía la infografía vertical del mapa `/map`, kit `aige-media/linkedin`, 2026-09-21.)
 - [ ] Extender diagramas a más secciones (hoy: patrones y aperturas).
 - [ ] 14 propuestas brutas descartadas en la fusión del workflow sin evaluar (journal del run
       `wf_e00fdbee-4e2`).
