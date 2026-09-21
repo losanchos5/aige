@@ -26,3 +26,28 @@ for (const scheme of schemes) {
     }
   }
 }
+
+// Block N: grouped-navigation review shots — the Body of Knowledge disclosure
+// panel open at 1440 and the mobile drawer open at 390, both colour schemes,
+// written to tests/__screenshots__/N/. Viewport (not full-page) shots so the
+// panel/drawer are the subject.
+for (const scheme of schemes) {
+  test(`nav panel 1440 ${scheme}`, async ({ page }) => {
+    // reducedMotion: capture the settled panel/drawer, not a mid-animation frame.
+    await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    await page.locator('header.site-header').getByRole('button', { name: 'Body of Knowledge' }).click();
+    await page.locator('#nav-menu-bok').waitFor({ state: 'visible' });
+    await page.screenshot({ path: `tests/__screenshots__/N/panel-1440-${scheme}.png` });
+  });
+
+  test(`nav drawer 390 ${scheme}`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto('/');
+    await page.locator('.burger').click();
+    await page.locator('#nav-drawer').waitFor({ state: 'visible' });
+    await page.screenshot({ path: `tests/__screenshots__/N/drawer-390-${scheme}.png` });
+  });
+}
