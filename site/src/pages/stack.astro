@@ -7,6 +7,7 @@
  */
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/pages.css';
+import PageHero from '../components/PageHero.astro';
 import Kicker from '../components/Kicker.astro';
 import Section from '../components/Section.astro';
 import RegisterList from '../components/RegisterList.astro';
@@ -54,20 +55,14 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
   description="The five-layer stack of AI governance engineering: govern-as-code, inventory, evals as evidence, runtime control and continuous assurance."
   image="/og/stack.png"
 >
-  <section class="hero section hero--page">
-    <div class="bg-mesh" aria-hidden="true"></div>
-    <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
-    <div class="container page-hero hero-in">
-      <p class="meta"><span class="meta-dot" aria-hidden="true"></span>Chapter 04 · Body of Knowledge</p>
-      <Kicker swatch="var(--l3)" rule>The stack</Kicker>
-      <h1 class="display">Five layers. One evidence chain.</h1>
-      <p class="lede">
-        The reference architecture of AI governance engineering: five layers that
-        turn governance from a stack of parallel documents into one system with a
-        data path from policy to proof.
-      </p>
-    </div>
-  </section>
+  <PageHero
+    variant="page"
+    kicker="The stack"
+    swatch="var(--l3)"
+    related={{ label: 'Chapter 04 · Body of Knowledge', href: '/bok/the-stack' }}
+    title="Five layers. One evidence chain."
+    lede="The reference architecture of AI governance engineering: five layers that turn governance from a stack of parallel documents into one system with a data path from policy to proof."
+  />
 
   <Section tone="plain" rule kicker="Layer flow" kickerSwatch="var(--l5)" title="Follow one artefact from policy to proof.">
     <div class="reveal"><StackFlow /></div>
@@ -179,10 +174,6 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
 </Marketing>
 
 <style>
-  .hero h1 {
-    font-size: var(--fs-display);
-  }
-
   /* Inherited/new split: the five-bar register mark beside two short notes. */
   .split {
     display: grid;

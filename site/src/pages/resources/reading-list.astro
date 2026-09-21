@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Kicker from '../../components/Kicker.astro';
+import PageHero from '../../components/PageHero.astro';
 import ReadingList from '../../components/ReadingList.astro';
 import { site } from '../../data/site';
 import { getReadingList } from '../../lib/reading-list';
@@ -16,25 +16,24 @@ const itemCount = groups.reduce((n, group) => n + group.items.length, 0);
   description="The annotated bibliography that formed AI governance engineering — grouped by theme, each source with a verified URL and a one-line note on why it matters."
   image="/og/resources.png"
 >
-  <div class="container res-page">
-    <div class="res-hero">
-      <div class="bg-mesh" aria-hidden="true"></div>
-      <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
-      <header class="res-head">
-        <Kicker rule swatch="var(--l5)">Resources · Reading list</Kicker>
-        <h1 class="res-title">The sources that formed the discipline.</h1>
-        <p class="res-lede">
-          A working bibliography, not a canon. {itemCount} sources across {groups.length} themes, each
-          annotated in one line, each with a verified URL and a verification tag drawn from the book's
-          research digest.
-        </p>
-        <p class="res-note">
-          Verification tags: <strong>primary</strong> — the source itself; <strong>secondary</strong> —
-          a reliable account of it; <strong>reported</strong> — awaiting a primary confirmation.
-        </p>
-      </header>
-    </div>
+  <PageHero
+    variant="res"
+    swatch="var(--l5)"
+    crumbs={[{ label: 'Resources', href: '/resources' }, { label: 'Reading list' }]}
+    title="The sources that formed the discipline."
+  >
+    <p class="lede" slot="lede">
+      A working bibliography, not a canon. {itemCount} sources across {groups.length} themes, each
+      annotated in one line, each with a verified URL and a verification tag drawn from the book's
+      research digest.
+    </p>
+    <p slot="note">
+      Verification tags: <strong>primary</strong> — the source itself; <strong>secondary</strong> —
+      a reliable account of it; <strong>reported</strong> — awaiting a primary confirmation.
+    </p>
+  </PageHero>
 
+  <div class="container res-page">
     <div class="res-section">
       <ReadingList groups={groups} />
     </div>

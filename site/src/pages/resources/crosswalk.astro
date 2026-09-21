@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import Kicker from '../../components/Kicker.astro';
+import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import CrosswalkMatrix from '../../components/CrosswalkMatrix.astro';
 import CrosswalkDrawer from '../../components/CrosswalkDrawer.astro';
@@ -20,20 +20,15 @@ const matrix = topicMatrix();
   description="A crosswalk from each Body-of-Knowledge topic to the EU AI Act, ISO, NIST and Chinese instruments that govern it, clause by clause."
   image="/og/resources.png"
 >
-  <div class="container res-page">
-    <div class="res-hero">
-      <div class="bg-mesh" aria-hidden="true"></div>
-      <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
-      <header class="res-head">
-        <Kicker rule swatch="var(--l1)">Resources · Crosswalk</Kicker>
-        <h1 class="res-title">One topic, every framework.</h1>
-        <p class="res-lede">
-          Start from a governance topic, read across to the instrument that governs it, and land on the
-          exact article, clause or control — each with a link back to the obligation it evidences.
-        </p>
-      </header>
-    </div>
+  <PageHero
+    variant="res"
+    swatch="var(--l1)"
+    crumbs={[{ label: 'Resources', href: '/resources' }, { label: 'Crosswalk' }]}
+    title="One topic, every framework."
+    lede="Start from a governance topic, read across to the instrument that governs it, and land on the exact article, clause or control — each with a link back to the obligation it evidences."
+  />
 
+  <div class="container res-page">
     <div class="res-section">
       <Callout kind="note" title="Illustrative mapping, not a conformity assessment">
         <p>{disclaimer}</p>

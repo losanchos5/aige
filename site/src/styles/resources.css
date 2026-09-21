@@ -4,37 +4,11 @@
    tl-, rd-, gl-) to stay out of the way of the prose and component styles. */
 
 /* ---- Page chrome ---------------------------------------------------------- */
+/* The hero head rules now live in src/components/PageHero.astro; this class
+   keeps only the content padding below the hero. The top gap tightened from
+   --s-7 to --s-5 since the hero now owns the air above the content. */
 .res-page {
-  padding-block: var(--s-7) var(--s-8);
-}
-
-.res-head {
-  max-width: var(--prose);
-}
-
-.res-head .res-title {
-  margin-top: var(--s-4);
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--fs-h1);
-  line-height: var(--leading-display);
-  letter-spacing: var(--tracking-display);
-  color: var(--ink);
-}
-
-.res-lede {
-  margin-top: var(--s-4);
-  max-width: 60ch;
-  font-size: 1.125rem;
-  line-height: 1.5;
-  color: var(--ink-2);
-}
-
-.res-note {
-  margin-top: var(--s-4);
-  max-width: 62ch;
-  font-size: var(--fs-small);
-  color: var(--muted);
+  padding-block: var(--s-5) var(--s-8);
 }
 
 /* Sub-section rhythm: a running register rule between stacked blocks. */

@@ -1,6 +1,6 @@
 ---
 import Marketing from '../../layouts/Marketing.astro';
-import Kicker from '../../components/Kicker.astro';
+import PageHero from '../../components/PageHero.astro';
 import ResourceCard from '../../components/ResourceCard.astro';
 import { site } from '../../data/site';
 import { frameworks, obligations } from '../../data/frameworks';
@@ -71,25 +71,17 @@ const cards = [
   description="Curated, sourced and versioned resources for AI governance engineering: frameworks, tools, a reading list and a glossary, all extracted from the Body of Knowledge."
   image="/og/resources.png"
 >
-  <section class="hero section hero--page">
-    <div class="bg-mesh" aria-hidden="true"></div>
-    <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>
-    <div class="container">
-      <header class="res-head hero-in">
-        <Kicker rule>Resources</Kicker>
-        <h1 class="res-title">Curated, sourced, versioned.</h1>
-        <p class="res-lede">
-          Five references drawn straight from the Body of Knowledge: the frameworks the discipline maps
-          against, the tool categories that fill each layer, the sources that formed it, the terms it
-          uses and the crosswalk that maps each topic to every framework.
-        </p>
-        <p class="res-note">
-          Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync
-          with it.
-        </p>
-      </header>
-    </div>
-  </section>
+  <PageHero
+    variant="res"
+    kicker="Resources"
+    title="Curated, sourced, versioned."
+    lede="Five references drawn straight from the Body of Knowledge: the frameworks the discipline maps against, the tool categories that fill each layer, the sources that formed it, the terms it uses and the crosswalk that maps each topic to every framework."
+  >
+    <p slot="note">
+      Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync
+      with it.
+    </p>
+  </PageHero>
 
   <section class="section">
     <div class="container">
