@@ -105,7 +105,7 @@ registrada en los metadatos MUST coincidir con la versión del sitio.
 El kit externo SHALL producir un PNG vertical de 2400×3000 px (marco de 1200×1500 a escala 2) a
 partir de la variante vertical del SVG, con las tres fuentes de marca cargadas, la marca "register
 mark" pequeña en una esquina, la URL del mapa y la versión del BoK al pie, todo el texto dentro de
-un área segura, sin solapes con la marca, tamaño de fuente efectivo mínimo de 22 px y peso inferior a
+un área segura, sin solapes con la marca, tamaño de fuente efectivo mínimo de 14 px a escala 1 (28 px en el PNG a 2x) y peso inferior a
 3 MB. El render MUST fallar si alguna guarda no se cumple o si los datos fuente tienen cambios sin
 confirmar (salvo indicación explícita).
 
