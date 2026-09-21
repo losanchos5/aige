@@ -174,7 +174,7 @@ const PATTERN_SHORT: Record<string, string> = {
   'pattern-vendor--model-due-diligence-gate': 'Due-Diligence Gate',
   'pattern-adversarial-red-team-suite': 'Adversarial Red-Team',
   'pattern-kill-switch--circuit-breaker': 'Circuit Breaker',
-  'pattern-agent-identity--scoped-credentials': 'Scoped Credentials',
+  'pattern-agent-identity--scoped-credentials': 'Agent Identity',
   'pattern-continuous-assurance-telemetry': 'Assurance Telemetry',
   'pattern-machine-readable-evidence-oscal': 'Machine-Readable Evidence',
 };
