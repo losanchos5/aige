@@ -18,6 +18,14 @@ Analytics site token) — no redeploy of the code is required beyond the next pu
 The beacon loads from `static.cloudflareinsights.com`, already allow-listed in
 `public/_headers`, so the strict CSP keeps working.
 
+Umami (self-hosted, cookieless) works the same way: off by default, needs no code
+change to turn on. `Base.astro` renders the tracking script only when the
+build-time env var `PUBLIC_UMAMI_WEBSITE_ID` is non-empty. The deploy workflow
+passes it from a repository secret named **`UMAMI_WEBSITE_ID`** (the website id
+from the Umami instance at `admin.stocktcg.net`), so the owner activates
+analytics by adding that secret. The script loads from `admin.stocktcg.net`,
+already allow-listed in `public/_headers` for `script-src` and `connect-src`.
+
 ## Diagrams
 
 Architecture, workflow, sequence, dataflow and lifecycle diagrams are authored as

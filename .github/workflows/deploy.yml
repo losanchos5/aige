@@ -41,6 +41,10 @@ jobs:
           # Owner adds a repository secret named CF_BEACON_TOKEN to activate
           # Cloudflare Web Analytics; empty → Base.astro renders no beacon.
           PUBLIC_CF_BEACON_TOKEN: ${{ secrets.CF_BEACON_TOKEN }}
+          # Owner adds a repository secret named UMAMI_WEBSITE_ID (the website
+          # created in the self-hosted Umami instance at admin.stocktcg.net)
+          # to activate analytics; empty → Base.astro renders no script.
+          PUBLIC_UMAMI_WEBSITE_ID: ${{ secrets.UMAMI_WEBSITE_ID }}
       - name: Deploy
         uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
         with:

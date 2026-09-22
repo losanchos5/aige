@@ -26,6 +26,11 @@ const { title, description, image, lang = 'en', locale, jsonLd, alternates } = A
 // Cloudflare Web Analytics: only injected when a token is provided at build time
 // via PUBLIC_CF_BEACON_TOKEN (a Cloudflare secret). No token → no beacon.
 const cfBeaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
+
+// Umami (self-hosted, cookieless): only injected when a website id is provided
+// at build time via PUBLIC_UMAMI_WEBSITE_ID. No id → no script.
+const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
+const umamiSrc = 'https://admin.stocktcg.net/script.js';
 ---
 
 <!doctype html>
@@ -80,6 +85,12 @@ const cfBeaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
           src="https://static.cloudflareinsights.com/beacon.min.js"
           data-cf-beacon={JSON.stringify({ token: cfBeaconToken })}
         />
+      )
+    }
+
+    {
+      umamiWebsiteId && (
+        <script is:inline defer src={umamiSrc} data-website-id={umamiWebsiteId} />
       )
     }
   </head>
