@@ -4,12 +4,12 @@ type: dataset
 title: "AI Governance Engineering: The Thesis & Body of Knowledge"
 abstract: >-
   The founding text and working reference for AI governance engineering: turning AI governance
-  obligations into policy-as-code, eval gates and machine-readable evidence.
+  obligations into policy-as-code, eval gates and machine-readable evidence. Jorge García Aibar is
+  the author of the Body of Knowledge, website, datasets and project materials. The Thesis is the
+  sole exception and is co-authored by Jorge García Aibar and Aurélie Pols.
 authors:
   - family-names: "García Aibar"
     given-names: "Jorge"
-  - family-names: "Pols"
-    given-names: "Aurélie"
 version: "0.4.0"
 date-released: "2026-09-20"
 url: "https://aigovernanceengineer.com"
@@ -32,8 +32,6 @@ preferred-citation:
   authors:
     - family-names: "García Aibar"
       given-names: "Jorge"
-    - family-names: "Pols"
-      given-names: "Aurélie"
   year: 2026
   version: "0.4.0"
   url: "https://aigovernanceengineer.com"

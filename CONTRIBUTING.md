@@ -1,7 +1,9 @@
 # Contributing
 
-This is a living Thesis and Body of Knowledge for **AI governance engineering**, meant to be
-co-authored by practitioners. Corrections, sources and chapters are all welcome. Start small.
+This is a living Thesis and Body of Knowledge for **AI governance engineering**. Corrections,
+sources and chapter proposals are all welcome. Start small. Contributions are credited, while
+authorship of the Body of Knowledge and the rest of the project remains with Jorge García Aibar;
+the Thesis is co-authored by Jorge García Aibar and Aurélie Pols.
 
 ## Three ways to contribute
 
@@ -10,9 +12,9 @@ co-authored by practitioners. Corrections, sources and chapters are all welcome.
   anything else.
 - **Suggest a source.** Found a stronger primary source, or a claim that needs one? Add a row to
   `sources/SOURCES.md` under the relevant chapter section and reference it from the copy.
-- **Co-author a chapter or pattern.** Extend or sharpen a chapter, add a pattern to
-  `bok/05-patterns.md`, or propose a new chapter from `OUTLINE.md`. Follow `STYLEGUIDE.md` and add
-  yourself to the co-authors list in the same PR.
+- **Contribute to a chapter or pattern.** Extend or sharpen a chapter, add a pattern to
+  `bok/05-patterns.md`, or propose a new chapter from `OUTLINE.md`. Follow `STYLEGUIDE.md`; accepted
+  substantive contributions are credited in `bok/CONTRIBUTORS.md` but do not confer co-authorship.
 
 ## Rules every PR must follow
 
@@ -44,4 +46,6 @@ not a failure on your side. After the first approval, later pushes run automatic
 ## Licence
 
 This work is licensed under **CC BY 4.0**. By contributing you agree that your contribution is
-licensed the same way, and that you are adding your own work with nothing confidential in it.
+licensed the same way, that it may be incorporated under the project's stated authorship and
+attribution policy, and that you are adding your own work with nothing confidential in it. You retain
+credit for accepted substantive contributions; contribution does not by itself confer co-authorship.

@@ -6,13 +6,14 @@
 thinking and code — to the governance of AI systems.**
 
 This repository is the founding text of that discipline: a short **Thesis** and a growing **body of
-knowledge**. It is written by and for practitioners who build governance for AI systems — policy-as-
+knowledge**. It is written for practitioners who build governance for AI systems — policy-as-
 code, agent registries, eval gates, runtime guardrails, machine-readable evidence — and who measure
 their work by realised risk reduction and audit-ready evidence, not by framework coverage.
 
-It is **version 0.4.0**: the Thesis restated as affirmations over a peer-reviewed revision of the first public draft, still deliberately
-incomplete, started by one practitioner and open to many. If you do this work, you are invited to
-co-author and to sign.
+It is **version 0.4.0**: the Thesis restated as affirmations over a peer-reviewed revision of the
+first public draft, still deliberately incomplete and open to contributions. The Body of Knowledge,
+website, datasets and project materials are authored by **Jorge García Aibar**. The Thesis is the sole
+exception: it is co-authored by **Jorge García Aibar and Aurélie Pols** and is open for signatures.
 
 **Home:** https://aigovernanceengineer.com — the Thesis at `/thesis`, Body of Knowledge at `/bok`.
 Source repository: `github.com/losanchos5/aige`.
@@ -45,7 +46,7 @@ aige/
 │   ├── 08-regulatory-map.md   Obligation → artefact → layer reverse index
 │   ├── 09-glossary.md         Canonical definitions, alphabetical
 │   ├── 10-reading-list.md     Annotated bibliography
-│   ├── CONTRIBUTORS.md        Authors, how to co-author, SIGNATORIES
+│   ├── CONTRIBUTORS.md        Authorship, contributors, SIGNATORIES
 │   └── CHANGELOG.md           Version history
 ├── sources/
 │   └── SOURCES.md         Consolidated, verified source table (one section per chapter)
@@ -53,8 +54,8 @@ aige/
     └── build_pdf.py       Assembles the Markdown into dist/site-preview.html (PDF export optional)
 ```
 
-Chapters 00–10 are drafted; the catalogue, mappings and arguments are open for co-authors to
-extend.
+Chapters 00–10 are drafted; contributions that extend the catalogue, mappings and arguments are
+welcome and credited.
 
 ## The five-layer stack
 
@@ -84,7 +85,7 @@ record the retrieval date and source commit when using them in research.
 
 Cite the parent work, name the dataset you used, and include its URL and retrieval date:
 
-> García Aibar, J., & Pols, A. *AI Governance Engineering: The Thesis & Body of Knowledge*
+> García Aibar, J. *AI Governance Engineering: The Thesis & Body of Knowledge*
 > (v0.4.0). https://doi.org/10.5281/zenodo.22857086. Dataset: Framework crosswalk / Obligation
 > mappings. [Dataset URL; retrieval date; source commit].
 
@@ -110,7 +111,8 @@ link) to the **SIGNATORIES** section of **[bok/CONTRIBUTORS.md](bok/CONTRIBUTORS
 
 ## Licence
 
-This work is licensed under **[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)**. It may be
-freely copied and shared, but only in its entirety and including this notice, so that it continues to
-identify *AI Governance Engineering: The Thesis & Body of Knowledge* as the source. Attribution:
-Jorge García Aibar and contributors.
+Except where otherwise noted, this work is licensed under
+**[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)**. You may share and adapt it provided
+you give appropriate credit, link to the licence and indicate changes. Attribute the Body of
+Knowledge, website, datasets and project materials to **Jorge García Aibar**. Attribute the Thesis to
+**Jorge García Aibar and Aurélie Pols**.

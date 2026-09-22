@@ -14,7 +14,7 @@ interface Props {
 const { title, slug } = Astro.props;
 const cleanTitle = title.replace(/^\d+\.\s*/, '');
 const url = `${site.url}/bok/${slug}`;
-const reference = `García Aibar, J., & Pols, A. (2026). ${cleanTitle}. In AI Governance Engineering: The Thesis & Body of Knowledge (v${site.bokVersion}). https://doi.org/${site.doi}. ${url}. ${site.license}`;
+const reference = `García Aibar, J. (2026). ${cleanTitle}. In AI Governance Engineering: The Thesis & Body of Knowledge (v${site.bokVersion}). https://doi.org/${site.doi}. ${url}. ${site.license}`;
 
 // BibTeX for the whole work; the chapter and its canonical URL identify the page
 // being cited. The literal backslash escapes the ampersand for BibTeX.
@@ -37,7 +37,7 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
     <summary>Cite this chapter</summary>
     <div class="cite-body">
       <p class="cite-apa" data-cite-text>
-        García Aibar, J., &amp; Pols, A. (2026). <em>{cleanTitle}</em>. In <em>AI Governance
+        García Aibar, J. (2026). <em>{cleanTitle}</em>. In <em>AI Governance
         Engineering: The Thesis &amp; Body of Knowledge</em> (v{site.bokVersion}).{' '}
         <a href={`https://doi.org/${site.doi}`}>https://doi.org/{site.doi}</a>. {url}. {site.license}
       </p>

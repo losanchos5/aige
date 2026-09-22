@@ -221,6 +221,10 @@ with any of these.
 
 ## 11. Licence and copy notice (put at the foot of every standalone document)
 
-> This work is licensed under **CC BY 4.0**. It may be freely copied and shared, but only in its
-> entirety and including this notice, so that it continues to identify AI Governance Engineering: The
-> Thesis & Body of Knowledge as the source. Attribution: Jorge García Aibar and contributors.
+For every standalone document other than the Thesis:
+
+> This work is licensed under **CC BY 4.0**. You may share and adapt it provided you give appropriate
+> credit, link to the licence and indicate changes. Attribution: Jorge García Aibar.
+
+For the Thesis only, replace the final sentence with: "Attribution: Jorge García Aibar and Aurélie
+Pols."

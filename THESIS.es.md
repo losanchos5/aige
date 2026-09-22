@@ -235,9 +235,9 @@ hacen el trabajo.
 
 ## Licencia
 
-Esta obra está publicada bajo licencia **CC BY 4.0**. Puede copiarse y compartirse libremente, pero solo
-en su totalidad e incluyendo este aviso, de modo que siga identificando a *AI Governance Engineering: The
-Thesis & Body of Knowledge* como la fuente. Atribución: Jorge García Aibar y colaboradores.
+Esta Tesis está publicada bajo licencia **CC BY 4.0**. Puede compartirse y adaptarse siempre que se dé
+el crédito adecuado, se incluya un enlace a la licencia y se indiquen los cambios. Atribución: Jorge
+García Aibar y Aurélie Pols.
 
 ## Sources
 

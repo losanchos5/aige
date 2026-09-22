@@ -2,7 +2,7 @@
 
 Version 0.4.0 · 2026-09-19. This is the full table of contents. Each chapter has a short brief so that
 parallel writers stay consistent. Follow `STYLEGUIDE.md` for voice, templates and citations. All
-chapters are marked **[drafted]**; co-authors extend and sharpen them and may propose new ones.
+chapters are marked **[drafted]**; contributors may propose extensions, corrections and new ones.
 
 The book has two front-matter pieces outside the numbered chapters:
 

@@ -17,12 +17,13 @@ engineering, applied to governance. This book is its founding text and its worki
 
 ## Who wrote it, and from what
 
-The Thesis and Body of Knowledge were written by Jorge García Aibar, an AI Governance & Privacy
-Engineer — drawing on two and a half years designing and operating an AI governance framework inside a
-large telco, sitting between Legal, Security and Engineering, and covering the governance, security,
-compliance, business and model-performance dimensions of AI risk — with Aurélie Pols, working in
-Responsible AI, Privacy and Data Governance, as co-author. Nothing in this book discloses any
-employer's internal detail; where practice is described it is generic ("in a large telco").
+The Body of Knowledge was written by Jorge García Aibar, an AI Governance & Privacy Engineer —
+drawing on two and a half years designing and operating an AI governance framework inside a large
+telco, sitting between Legal, Security and Engineering, and covering the governance, security,
+compliance, business and model-performance dimensions of AI risk. The Thesis is the sole co-authored
+part of the project, written by Jorge García Aibar and Aurélie Pols, who works in Responsible AI,
+Privacy and Data Governance. Nothing in this book discloses any employer's internal detail; where
+practice is described it is generic ("in a large telco").
 
 It is built from three things. First, that operating experience: what actually held up when a model
 changed on a Friday and an agent gained a new tool over the weekend. Second, the **GRC Engineering**
@@ -50,12 +51,17 @@ This is not a compliance checklist, and it is not legal advice. It does not tell
 system is compliant; it tells you how to build the controls and the evidence that let someone qualified
 make that call. It is not an AI safety research agenda, an MLOps handbook, or a vendor buyer's guide —
 tools are named only as illustrative examples of a category, never as endorsements. And it is not
-finished. Version 0.4.0 is a public draft with deliberate gaps for co-authors to fill.
+finished. Version 0.4.0 is a public draft with deliberate gaps open to contributions.
 
 ## How to cite
 
-> García Aibar, J., Pols, A. and contributors. *AI Governance Engineering: The Thesis & Body of
-> Knowledge*, v0.4.0. 2026. https://aigovernanceengineer.com. Licensed CC BY 4.0.
+> García Aibar, J. *AI Governance Engineering: The Body of Knowledge*, v0.4.0. 2026.
+> https://aigovernanceengineer.com/bok. Licensed CC BY 4.0.
+
+For the Thesis, cite both co-authors:
+
+> García Aibar, J., & Pols, A. *The AI Governance Engineering Thesis*, v0.4.0. 2026.
+> https://aigovernanceengineer.com/thesis. Licensed CC BY 4.0.
 
 Cite a specific chapter by its number and title (for example, "chapter 01, The definition"). The
 canonical home of the Thesis is https://aigovernanceengineer.com/thesis and of the Body of
@@ -73,7 +79,7 @@ revised.
 
 ## How to contribute
 
-This book is meant to be co-authored. To contribute:
+This book welcomes credited contributions. To contribute:
 
 1. Read `STYLEGUIDE.md` and follow the chapter or pattern template exactly.
 2. Source every factual claim. Use the `[n]` citation format, tag each source `primary`, `secondary`

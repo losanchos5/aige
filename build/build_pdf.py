@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import html
 import re
+import shutil
 from pathlib import Path
 
 import markdown
@@ -41,9 +42,13 @@ BOK_PDF = f"AI-Governance-Engineering-BoK-v{BOK_VERSION}.pdf"
 THESIS_PDF = f"AI-Governance-Engineering-Thesis-v{BOK_VERSION}.pdf"
 
 TITLE = "AI Governance Engineering"
-SUBTITLE_BOK = "The Thesis &amp; Body of Knowledge · v0.3 · September 2026"
-SUBTITLE_MAN = "The Thesis · v0.3 · September 2026"
-AUTHOR = "Jorge García Aibar"
+SUBTITLE_BOK = f"The Thesis &amp; Body of Knowledge · v{BOK_VERSION} · September 2026"
+SUBTITLE_MAN = f"The Thesis · v{BOK_VERSION} · September 2026"
+BOK_CREDITS = (
+    "Body of Knowledge · Jorge García Aibar",
+    "Thesis · Jorge García Aibar & Aurélie Pols",
+)
+THESIS_CREDITS = ("Jorge García Aibar & Aurélie Pols",)
 HOME = "aigovernanceengineer.com"
 LICENCE = "CC BY 4.0"
 
@@ -120,14 +125,17 @@ def build_toc() -> str:
     )
 
 
-def cover(subtitle: str) -> str:
+def cover(subtitle: str, credits: tuple[str, ...]) -> str:
+    credit_lines = "\n".join(
+        f'  <p class="cover-author">{html.escape(credit)}</p>' for credit in credits
+    )
     return (
         '<section class="cover" id="cover">\n'
         f'  <div class="cover-rule"></div>\n'
         f"  <h1 class=\"cover-title\">{TITLE}</h1>\n"
         f'  <p class="cover-subtitle">{subtitle}</p>\n'
         f'  <div class="cover-rule"></div>\n'
-        f'  <p class="cover-author">{html.escape(AUTHOR)}</p>\n'
+        f"{credit_lines}\n"
         f'  <p class="cover-meta">{HOME}</p>\n'
         f'  <p class="cover-meta">Licensed {LICENCE}</p>\n'
         "</section>"
@@ -236,13 +244,13 @@ def build_preview(content: str) -> str:
     sidebar = (
         '<nav class="sidebar">'
         f'<div class="brand">{TITLE}</div>'
-        '<div class="brandsub">The Thesis &amp; Body of Knowledge · v0.3</div>'
+        f'<div class="brandsub">The Thesis &amp; Body of Knowledge · v{BOK_VERSION}</div>'
         f"<ol>{nav_rows}</ol></nav>"
     )
     body = (
         '<div class="layout">'
         f"{sidebar}"
-        f'<main class="reading"><div class="doc">{cover(SUBTITLE_BOK)}{content}</div></main>'
+        f'<main class="reading"><div class="doc">{cover(SUBTITLE_BOK, BOK_CREDITS)}{content}</div></main>'
         "</div>"
     )
     return html_doc(body, PREVIEW_CSS)
@@ -251,7 +259,7 @@ def build_preview(content: str) -> str:
 FOOTER = (
     '<div style="width:100%;font-size:7pt;color:#8a95a3;padding:0 14mm;'
     'font-family:Inter,Segoe UI,sans-serif;display:flex;justify-content:space-between;">'
-    '<span>AI Governance Engineering · v0.3</span>'
+    f'<span>AI Governance Engineering · v{BOK_VERSION}</span>'
     '<span class="pageNumber"></span></div>'
 )
 HEADER = '<div></div>'
@@ -282,17 +290,32 @@ def main(html_only: bool = False) -> None:
         return
 
     # Full Body of Knowledge: cover + TOC + everything.
-    bok_html = html_doc(cover(SUBTITLE_BOK) + build_toc() + content)
+    bok_html = html_doc(cover(SUBTITLE_BOK, BOK_CREDITS) + build_toc() + content)
     # Thesis only: cover + the thesis section.
     man_text = (AIGE / "THESIS.md").read_text(encoding="utf-8")
     man_chunk = decorate(prefix_ids(render_markdown(man_text), "thesis"))
     man_section = f'<section class="chapter" id="thesis">\n{man_chunk}\n</section>'
-    man_html = html_doc(cover(SUBTITLE_MAN) + man_section)
+    man_html = html_doc(cover(SUBTITLE_MAN, THESIS_CREDITS) + man_section)
 
-    from playwright.sync_api import sync_playwright
+    from playwright.sync_api import Error as PlaywrightError, sync_playwright
 
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+        try:
+            browser = p.chromium.launch()
+        except PlaywrightError:
+            # Reuse a system Chromium browser when Playwright's managed browser
+            # is not installed (common in clean Windows workspaces).
+            candidates = [
+                shutil.which("google-chrome"),
+                shutil.which("chromium"),
+                shutil.which("msedge"),
+                r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+            ]
+            executable = next((path for path in candidates if path and Path(path).is_file()), None)
+            if not executable:
+                raise
+            browser = p.chromium.launch(executable_path=executable)
         page = browser.new_page()
         to_pdf(page, bok_html, DIST / BOK_PDF)
         to_pdf(page, man_html, DIST / THESIS_PDF)

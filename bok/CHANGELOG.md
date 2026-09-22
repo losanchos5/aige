@@ -6,9 +6,15 @@ a completed, reviewed core (1.0).
 
 ## [Unreleased] — 2026-09-20
 
-Pending patch, folded into the next tagged release (version 0.4.0 stays as is in CITATION.cff,
-README and the site): China added to the regulatory map. No change to the definition, values or
-principles; THESIS unchanged.
+Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the
+regulatory map, and authorship and attribution clarified across the project. The Thesis wording,
+definition, values and principles are unchanged; only its CC BY attribution notice is clarified.
+
+### Changed
+- Authorship and CC BY attribution are now explicit by scope: Jorge García Aibar is the sole author
+  of the Body of Knowledge, website, datasets and project materials; the Thesis remains co-authored
+  by Jorge García Aibar and Aurélie Pols. Chapter citations, BibTeX, JSON-LD, dataset metadata,
+  `CITATION.cff`, contribution guidance and the downloadable PDF now follow that distinction.
 
 ### Added
 - `bok/08-regulatory-map.md`, `sources/SOURCES.md` — a **China** subsection under "Other

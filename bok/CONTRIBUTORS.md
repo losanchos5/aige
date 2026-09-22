@@ -1,38 +1,36 @@
 # Contributors and signatories
 
-## Initial author
+## Authorship
 
-**Jorge García Aibar** — AI Governance & Privacy Engineer. Author of version 0.1; editor of version
-0.2 (peer-review round 1 revisions).
+**Jorge García Aibar** — AI Governance & Privacy Engineer. Sole author of the Body of Knowledge,
+website, datasets and project materials.
 LinkedIn: https://www.linkedin.com/in/jorgara
 
-Version 0.1 was written by one practitioner as a first public draft; version 0.2 applies the findings
-of a first peer-review round. It is meant to be co-authored.
+**The Thesis is the sole exception.** It is co-authored by Jorge García Aibar and **Aurélie Pols** —
+Responsible AI (EU/Global), Privacy & Data Governance (v0.1–v0.4.0).
+LinkedIn: https://www.linkedin.com/in/aureliepols
+
+Accepted substantive contributions are credited below but do not change the authorship of the Body
+of Knowledge or other project materials.
 Home: https://aigovernanceengineer.com · source repository `github.com/losanchos5/aige`.
 
-## How to become a co-author
+## How to contribute
 
-Co-authors write or substantially revise a chapter, a pattern, or the Thesis, and are credited by
-name. To co-author:
+Contributors may correct or substantially revise a chapter or pattern and are credited by name. To
+contribute:
 
-1. Read `STYLEGUIDE.md`. Chapters 00–10 are drafted in v0.1; co-authors extend and sharpen them, add
+1. Read `STYLEGUIDE.md`. Chapters 00–10 are drafted; contributors extend and sharpen them, add
    patterns to `bok/05-patterns.md`, or propose new chapters from `OUTLINE.md`.
 2. Write it to the template. Every factual claim needs a `[n]` citation tagged `primary`, `secondary`
    or `reported`, with a matching row in `sources/SOURCES.md` under that chapter's section.
-3. Open a pull request. Add yourself to the **Co-authors** list below in the same PR.
+3. Open a pull request. Add yourself to the **Contributors** list below in the same PR.
 4. Keep the voice practitioner-direct, name categories rather than vendors, and never invent a figure.
    Respect the BRIEF blocklist recorded in `STYLEGUIDE.md` §7.
 
 Substantive fixes — a corrected fact, a sharper argument, a better source — are also credited, in the
 **Contributors** list.
 
-### Co-authors
-
-**Aurélie Pols** — Responsible AI (EU/Global), Privacy & Data Governance. Co-author of the Thesis and
-Body of Knowledge (v0.1–v0.4.0).
-LinkedIn: https://www.linkedin.com/in/aureliepols
-
-### Contributors
+## Contributors
 
 _None yet. This section lists people who have made substantive corrections or additions._
 
@@ -57,6 +55,7 @@ own name and that the entry contains nothing confidential.
 
 ## Licence
 
-This work is licensed under **CC BY 4.0**. It may be freely copied and shared, but only in its
-entirety and including this notice, so that it continues to identify *AI Governance Engineering: The
-Thesis & Body of Knowledge* as the source. Attribution: Jorge García Aibar and contributors.
+Except where otherwise noted, this work is licensed under **CC BY 4.0**. You may share and adapt it
+provided you give appropriate credit, link to the licence and indicate changes. Attribute the Body of
+Knowledge, website, datasets and project materials to Jorge García Aibar. Attribute the Thesis to
+Jorge García Aibar and Aurélie Pols.

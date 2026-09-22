@@ -213,9 +213,8 @@ discipline is a capability anyone can develop, and this text belongs to everyone
 
 ## Licence
 
-This work is licensed under **CC BY 4.0**. It may be freely copied and shared, but only in its
-entirety and including this notice, so that it continues to identify *AI Governance Engineering: The
-Thesis & Body of Knowledge* as the source. Attribution: Jorge García Aibar and contributors.
+This Thesis is licensed under **CC BY 4.0**. You may share and adapt it provided you give appropriate
+credit, link to the licence and indicate changes. Attribution: Jorge García Aibar and Aurélie Pols.
 
 ## Sources
 

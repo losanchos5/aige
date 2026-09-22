@@ -48,10 +48,9 @@ export const site: SiteConfig = {
   email: 'jorgegarciaaibar@gmail.com',
   github: 'https://github.com/losanchos5/aige',
   author: 'Jorge García',
-  authors: ['Jorge García Aibar', 'Aurélie Pols'],
+  authors: ['Jorge García Aibar'],
   authorDetails: [
     { name: 'Jorge García Aibar', sameAs: ['https://www.linkedin.com/in/jorgara'] },
-    { name: 'Aurélie Pols' },
   ],
   license: 'CC BY 4.0',
   bokVersion: '0.4.0',
