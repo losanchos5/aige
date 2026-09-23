@@ -16,6 +16,23 @@ export default defineConfig({
   trailingSlash: 'never',
   build: { format: 'file' },
   integrations: [sitemap()],
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          // The client entry that bundles src/scripts/motion-ui.ts (imported by
+          // Base.astro) ships as /_astro/motion-ui.[hash].js instead of the
+          // virtual `Base.astro_astro_type_script_…` id, so the Motion weight
+          // budget has a stable file to measure. Only the client build reads
+          // this: Astro's SSR build sets its own entryFileNames after it.
+          entryFileNames: (chunk) =>
+            chunk.moduleIds.some((id) => id.endsWith('/src/scripts/motion-ui.ts'))
+              ? '_astro/motion-ui.[hash].js'
+              : '_astro/[name].[hash].js',
+        },
+      },
+    },
+  },
   markdown: {
     remarkPlugins: [remarkLead, remarkCallouts],
     rehypePlugins: [
