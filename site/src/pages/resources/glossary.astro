@@ -2,19 +2,21 @@
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import GlossaryIndex from '../../components/GlossaryIndex.astro';
-import { site } from '../../data/site';
 import { getGlossary, getGlossaryLetters } from '../../lib/glossary';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
 const entries = getGlossary();
 const letters = getGlossaryLetters();
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Glossary' }];
 ---
 
 <Base
-  title={`Glossary · ${site.name}`}
+  title="Glossary"
   description="The canonical glossary for AI governance engineering: every term defined once, alphabetically, and cross-referenced to the chapter that treats it in full."
   image="/og/resources.png"
+  jsonLd={breadcrumbJsonLd(crumbs)}
 >
   {/* Glossary is a Lighthouse route: keep it light — the dot texture only, no
       animated gradient mesh (mesh={false}). */}

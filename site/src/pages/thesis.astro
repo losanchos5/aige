@@ -4,7 +4,8 @@ import Doc from '../layouts/Doc.astro';
 import Diagram from '../components/Diagram.astro';
 import SignNote from '../components/SignNote.astro';
 import { site } from '../data/site';
-import { gitDate } from '../lib/reading';
+import { gitCreated, gitDate } from '../lib/reading';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
 
 const entry = await getEntry('thesis', 'thesis');
 if (!entry) {
@@ -20,6 +21,28 @@ const editPath = 'THESIS.md';
 const updated = gitDate('../THESIS.md');
 const signUrl = `${site.github}/edit/main/bok/CONTRIBUTORS.md`;
 const issueUrl = `${site.github}/issues/new?template=sign-the-thesis.yml`;
+
+// The Thesis as a TechArticle, dated from the git history of THESIS.md. The
+// Person nodes and the Organization / WebSite ids come from lib/jsonld.ts, which
+// merges this into the page's single ld+json graph.
+const thesisUrl = new URL('/thesis', site.url).href;
+const jsonLd = [
+  {
+    '@type': 'TechArticle',
+    '@id': `${thesisUrl}#article`,
+    headline: title,
+    description: summary,
+    url: thesisUrl,
+    inLanguage: 'en',
+    datePublished: gitCreated('../THESIS.md'),
+    dateModified: updated,
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.license ? { license: site.license } : {}),
+  },
+  ...authorNodes,
+];
 ---
 
 <Doc
@@ -33,6 +56,7 @@ const issueUrl = `${site.github}/issues/new?template=sign-the-thesis.yml`;
   wide={true}
   activeThesis={true}
   image="/og/thesis.png"
+  jsonLd={jsonLd}
   alternates={[
     { hreflang: 'en', href: `${site.url}/thesis` },
     { hreflang: 'es', href: `${site.url}/es/thesis` },

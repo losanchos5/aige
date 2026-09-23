@@ -5,6 +5,7 @@ import AtAGlance from '../../components/AtAGlance.astro';
 import { chaptersOrdered } from '../../data/chapters';
 import { site } from '../../data/site';
 import { gitDate } from '../../lib/reading';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 
 export async function getStaticPaths() {
   const entries = await getCollection('bok');
@@ -60,29 +61,13 @@ const crumbs = [
 // origin with the same technique as Seo.astro (new URL(path, site.url)), using the
 // clean, extensionless paths the sitemap and every internal link use (/bok,
 // /bok/<slug>) so the graph is internally consistent. The Body of Knowledge landing
-// lives at /bok (trailingSlash: 'never'). Person nodes are minimal: name plus any
-// known url / sameAs; never jobTitle or worksFor.
+// lives at /bok (trailingSlash: 'never'). The Person nodes come from lib/jsonld.ts,
+// which keeps them minimal: name plus any known url / sameAs, never jobTitle or
+// worksFor. Seo.astro merges this graph with the site-wide Organization / WebSite.
 const chapterUrl = new URL(`/bok/${chapter.slug}`, site.url).href;
 const bokUrl = new URL('/bok', site.url).href;
 const homeUrl = new URL('/', site.url).href;
 const bookId = `${bokUrl}#book`;
-
-const personSlug = (name: string): string =>
-  name
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-const persons = site.authorDetails.map((author) => ({
-  '@type': 'Person',
-  '@id': `${bokUrl}#person-${personSlug(author.name)}`,
-  name: author.name,
-  ...(author.url ? { url: author.url } : {}),
-  ...(author.sameAs && author.sameAs.length ? { sameAs: [...author.sameAs] } : {}),
-}));
-const authorRefs = persons.map((person) => ({ '@id': person['@id'] }));
 
 const book = {
   '@type': 'Book',
@@ -91,7 +76,9 @@ const book = {
   url: bokUrl,
   version: site.bokVersion,
   inLanguage: 'en',
-  author: authorRefs,
+  author: [...authorRefs],
+  publisher: { '@id': ORG_ID },
+  isPartOf: { '@id': WEBSITE_ID },
   ...(site.license ? { license: site.license } : {}),
 };
 
@@ -103,7 +90,7 @@ const article = {
   inLanguage: 'en',
   dateModified: updated,
   isPartOf: { '@id': bookId },
-  author: authorRefs,
+  author: [...authorRefs],
 };
 
 const breadcrumb = {
@@ -118,13 +105,14 @@ const breadcrumb = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@graph': [book, article, ...persons, breadcrumb],
+  '@graph': [book, article, ...authorNodes, breadcrumb],
 };
 ---
 
 <Doc
   title={title}
   summary={summary}
+  description={chapter.summary}
   kicker={kicker}
   crumbs={crumbs}
   crumbsJsonLd={false}

@@ -67,3 +67,25 @@ export function gitDate(file: string): string {
   }
   return changelogDate() ?? new Date().toISOString().slice(0, 10);
 }
+
+/**
+ * Date (YYYY-MM-DD) of the commit that first added `file`, read from git at
+ * build — the `datePublished` of the pages built from it. Falls back to
+ * `gitDate(file)` when git has no add commit for the path (a shallow clone, a
+ * rename, or git being unavailable). Never throws.
+ */
+export function gitCreated(file: string): string {
+  try {
+    const out = execFileSync('git', ['log', '--diff-filter=A', '--format=%cs', '--', file], {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    // Oldest add last: git logs newest first.
+    const first = out.split(/\r?\n/).filter(Boolean).pop();
+    if (first && /^\d{4}-\d{2}-\d{2}$/.test(first)) return first;
+  } catch {
+    // git missing or path outside a repository; fall through to gitDate.
+  }
+  return gitDate(file);
+}

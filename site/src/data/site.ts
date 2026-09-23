@@ -43,7 +43,7 @@ export const site: SiteConfig = {
   name: 'AI Governance Engineer',
   url: 'https://aigovernanceengineer.com',
   description:
-    'The Thesis and Body of Knowledge for AI governance engineering — turning AI governance obligations into policy-as-code, eval gates and machine-readable evidence.',
+    'The Thesis and Body of Knowledge for AI governance engineering — turning governance obligations into policy-as-code, eval gates and machine-readable evidence.',
   linkedin: 'https://www.linkedin.com/in/jorgara',
   email: 'jorgegarciaaibar@gmail.com',
   github: 'https://github.com/losanchos5/aige',

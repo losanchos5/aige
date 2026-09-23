@@ -48,7 +48,9 @@ jobs:
       # Lighthouse CI runs LAST: `lhci autorun` starts its own `astro preview`
       # server (see lighthouserc.cjs) and uses the runner's system Chrome, but its
       # collection wipes dist/pagefind, so no Playwright step may follow it.
-      # Non-blocking: a score regression should not fail the build.
+      # Non-blocking: a score regression should not fail the build. The SEO
+      # category's checks are mirrored as blocking assertions in
+      # site/tests/seo-basics.spec.ts, which the `npm test` step above runs.
       - name: Lighthouse CI
         run: npm run lhci
         continue-on-error: true

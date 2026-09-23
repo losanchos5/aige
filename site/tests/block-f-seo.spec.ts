@@ -1,5 +1,10 @@
 // block-f-seo.spec.ts: acceptance checks for Block F1 — the JSON-LD @graph on a
 // Body of Knowledge chapter, the Open Graph locale, and the web manifest.
+//
+// The chapter's own nodes now share one @graph with the site-wide Organization
+// and WebSite that Seo.astro emits on every page (lib/jsonld.ts); the block is
+// still the only ld+json script on the page. seo-schema.spec.ts covers those two
+// nodes across every route type.
 import { test, expect } from '@playwright/test';
 
 // Loosely typed: the parsed JSON-LD graph is external data, walked by key.
@@ -7,7 +12,7 @@ import { test, expect } from '@playwright/test';
 type JsonLdNode = Record<string, any>;
 
 test.describe('structured data on a chapter page', () => {
-  test('exactly one JSON-LD block carries Book, TechArticle and BreadcrumbList', async ({
+  test('exactly one JSON-LD block carries the site nodes, Book, TechArticle and BreadcrumbList', async ({
     page,
   }) => {
     await page.goto('/bok/definition');
@@ -24,6 +29,10 @@ test.describe('structured data on a chapter page', () => {
     const types = graph.flatMap((node) =>
       Array.isArray(node['@type']) ? node['@type'] : [node['@type']],
     );
+    // The site-wide nodes ride in the same graph, not in a second script.
+    expect(types).toContain('Organization');
+    expect(types).toContain('WebSite');
+
     expect(types).toContain('Book');
     expect(types).toContain('TechArticle');
     expect(types).toContain('BreadcrumbList');

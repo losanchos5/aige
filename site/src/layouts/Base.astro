@@ -10,6 +10,8 @@ import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import SearchDialog from '../components/SearchDialog.astro';
+import { site } from '../data/site';
+import type { JsonLdInput } from '../lib/jsonld';
 
 interface Props {
   title: string;
@@ -17,11 +19,22 @@ interface Props {
   image?: string;
   lang?: string;
   locale?: string;
-  jsonLd?: Record<string, unknown> | unknown[];
+  jsonLd?: JsonLdInput;
   alternates?: { hreflang: string; href: string }[];
+  /** Append ` · {site.name}` to the document title (default true); see Seo. */
+  titleSuffix?: boolean;
 }
 
-const { title, description, image, lang = 'en', locale, jsonLd, alternates } = Astro.props;
+const {
+  title,
+  description,
+  image,
+  lang = 'en',
+  locale,
+  jsonLd,
+  alternates,
+  titleSuffix,
+} = Astro.props;
 
 // Cloudflare Web Analytics: only injected when a token is provided at build time
 // via PUBLIC_CF_BEACON_TOKEN (a Cloudflare secret). No token → no beacon.
@@ -46,18 +59,28 @@ const umamiSrc = 'https://admin.stocktcg.net/script.js';
       locale={locale}
       jsonLd={jsonLd}
       alternates={alternates}
+      titleSuffix={titleSuffix}
     />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
 
+    {/* Browser UI tint. The light value is the manifest's `theme_color`; the
+        dark value is the --bg token of the dark theme (styles/tokens.css). A
+        browser that ignores `media` takes the first, i.e. the manifest colour. */}
+    <meta name="theme-color" content="#F6F4EE" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#121417" media="(prefers-color-scheme: dark)" />
+
     <link
       rel="alternate"
       type="application/rss+xml"
-      title="AI Governance Engineer — Changelog"
+      title={`${site.name} — chapters and releases`}
       href="/rss.xml"
     />
+
+    {/* The site's plain-text summary for language models (src/pages/llms.txt.ts). */}
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
 
     <link
       rel="preload"
