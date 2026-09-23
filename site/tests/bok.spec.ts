@@ -118,11 +118,26 @@ test('the open chapter drawer is a modal dialog and Escape hands focus back', as
   await expect(sidebar).toHaveAttribute('aria-label', 'Chapters');
   expect(await sidebar.evaluate((el) => el.contains(document.activeElement))).toBe(true);
 
+  // TC-15, as on /path and the crosswalk: header, footer and the chapter
+  // behind are inert while the drawer is open; the drawer and scrim are not.
+  const inert = await page.evaluate(() => {
+    const isInert = (sel: string) => !!document.querySelector(sel)?.closest('[inert]');
+    return {
+      header: isInert('header.site-header'),
+      footer: isInert('.site-footer'),
+      main: isInert('.doc-main'),
+      drawer: isInert('#doc-sidebar'),
+      scrim: isInert('.doc-scrim'),
+    };
+  });
+  expect(inert).toEqual({ header: true, footer: true, main: true, drawer: false, scrim: false });
+
   await page.keyboard.press('Escape');
   await expect(toggle).toBeFocused();
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(sidebar).not.toHaveAttribute('role', 'dialog');
   await expect(sidebar).not.toHaveAttribute('aria-modal', 'true');
+  await expect(page.locator('[inert]')).toHaveCount(0);
 });
 
 test('the chapter rail and the TOC stay in view deep into a chapter', async ({ page }) => {

@@ -138,7 +138,7 @@ function buildMaturityGrid(layers, levels, fig) {
   for (let c = 1; c <= 5; c += 1) {
     parts.push(`  <text class="mono muted" x="${colX(c) + CW / 2}" y="58" font-size="13.5" text-anchor="middle">${c}</text>`);
   }
-  parts.push(`  <text class="mono" x="${colX(OVERALL) + CW / 2}" y="268" font-size="13" text-anchor="middle">overall</text>`);
+  parts.push(`  <text class="mono" x="${colX(OVERALL) + CW / 2}" y="268" font-size="13" text-anchor="middle">Overall</text>`);
 
   // Grid cells, row per layer in canonical order.
   for (let r = 1; r <= 5; r += 1) {

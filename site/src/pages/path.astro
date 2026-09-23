@@ -106,6 +106,7 @@ const legend = [
 
   <PathDrawer />
 
+  <script is:inline defer src="/inert.js"></script>
   <script is:inline defer src="/path.js"></script>
 </Marketing>
 
@@ -178,15 +179,18 @@ const legend = [
     border: 1px dashed var(--ink-2);
   }
 
+  /* Done and Learning are states, not layers (SL-06): the samples take the
+     neutral treatment a transversal node gets in PathNode.astro — filled ink,
+     and a dashed ink border over a 35% ink tint. */
   .key-sample[data-sample='done'] {
-    border-color: var(--l2);
-    background: var(--l2);
-    color: var(--l2-ink);
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
   }
 
   .key-sample[data-sample='learning'] {
     border: 1px dashed var(--ink);
-    background: color-mix(in srgb, var(--l2) 35%, var(--bg));
+    background: color-mix(in srgb, var(--ink) 35%, var(--bg));
   }
 
   .key-sample[data-sample='skipped'] {

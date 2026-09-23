@@ -250,6 +250,12 @@ const layerStyle = node.layerN
     color: var(--c-ink, var(--bg));
   }
 
+  /* A done node is filled with its layer colour, which would swallow the
+     layer square: outline it in the node's ink so it still reads. */
+  .path-node[data-state='done'] .pn-sq {
+    box-shadow: inset 0 0 0 1px var(--c-ink);
+  }
+
   .path-node[data-state='learning'] {
     border: 1px dashed var(--ink);
     background: color-mix(in srgb, var(--c, var(--ink)) 35%, transparent);

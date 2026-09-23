@@ -118,6 +118,11 @@
     });
   }
   function onKeydown(e) {
+    // A <dialog> over the drawer (the search) owns the keyboard: no trap, and
+    // its Esc closes only it. Its own Esc handler may already have closed it by
+    // the time the key bubbles here, so a key from inside a dialog counts too.
+    var t = e.target;
+    if (document.querySelector('dialog[open]') || (t && t.closest && t.closest('dialog'))) return;
     if (e.key === 'Escape') {
       closeDrawer();
       return;
@@ -136,28 +141,10 @@
       first.focus();
     }
   }
-  // The page behind the open drawer goes inert (TC-15): aria-modal alone does
-  // not keep a screen reader's virtual cursor inside the dialog. Every sibling
-  // along the drawer's ancestor chain up to <body> (header, footer, the rest of
-  // <main>) is marked inert while it is open. The scrim stays live (a click on
-  // it closes), <dialog>s are skipped (the search dialog can still open over
-  // the drawer), and anything already inert is left as it was.
-  var inertEls = [];
-  function setBackgroundInert(on) {
-    var i;
-    for (i = 0; i < inertEls.length; i++) inertEls[i].removeAttribute('inert');
-    inertEls = [];
-    if (!on || !drawer) return;
-    for (var node = drawer; node !== document.body && node.parentElement; node = node.parentElement) {
-      var parent = node.parentElement;
-      for (var el = parent.firstElementChild; el; el = el.nextElementSibling) {
-        if (el === node || el === scrim || el.hasAttribute('inert')) continue;
-        if (/^(SCRIPT|STYLE|TEMPLATE|DIALOG)$/.test(el.tagName)) continue;
-        el.setAttribute('inert', '');
-        inertEls.push(el);
-      }
-    }
-  }
+  // The page behind the open drawer goes inert (TC-15), through the helper
+  // shared with the other drawers (public/inert.js, loaded first): header,
+  // footer and the rest of <main>, never the scrim or a <dialog>.
+  var setBackgroundInert = window.aigeInert ? window.aigeInert(drawer, scrim) : function () {};
   // Open motion. With the bundled runtime (window.aigeMotion, from
   // src/scripts/motion-ui.ts) aigeMotion.openPanel() springs the panel in from
   // its off-canvas position, then the body's blocks follow with a short
@@ -228,10 +215,18 @@
     setBackgroundInert(true);
     var opener = li.querySelector('[data-node-open]');
     if (opener) opener.setAttribute('aria-expanded', 'true');
-    showDrawer();
+    // Esc and the focus trap are wired before the entrance runs, and a failed
+    // entrance falls back to the CSS slide: the inert page behind is never left
+    // without a way out. (Focus still moves after it: focusing first would
+    // flush styles and let the CSS transition fight the spring.)
+    document.addEventListener('keydown', onKeydown);
+    try {
+      showDrawer();
+    } catch (err) {
+      drawer.classList.add('is-open');
+    }
     var closeBtn = drawer.querySelector('[data-path-close]');
     if (closeBtn) closeBtn.focus();
-    document.addEventListener('keydown', onKeydown);
     refreshEdges();
   }
 

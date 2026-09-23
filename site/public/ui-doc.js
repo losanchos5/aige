@@ -8,6 +8,10 @@
   var scrim = document.querySelector('.doc-scrim');
   var openBtn = document.querySelector('[data-drawer-open]');
   var lastFocused = null;
+  // The page behind the open drawer goes inert (TC-15), through the helper
+  // shared with the other drawers (public/inert.js, loaded first): header,
+  // footer and the rest of <main>, never the scrim or a <dialog>.
+  var setBackgroundInert = window.aigeInert ? window.aigeInert(sidebar, scrim) : function () {};
 
   // Visible, tabbable elements inside the open drawer, for the focus trap.
   function focusables() {
@@ -22,6 +26,12 @@
 
   // Esc closes; Tab / Shift+Tab wrap so focus stays within the drawer.
   function onKeydown(e) {
+    // A <dialog> over the drawer (the search, opened from the rail's own button
+    // or Ctrl+K) owns the keyboard: no trap, and its Esc closes only it. Its own
+    // Esc handler may already have closed it by the time the key bubbles here,
+    // so a key from inside a dialog counts too.
+    var t = e.target;
+    if (document.querySelector('dialog[open]') || (t && t.closest && t.closest('dialog'))) return;
     if (e.key === 'Escape') {
       closeDrawer();
       return;
@@ -43,17 +53,21 @@
     }
   }
 
-  // Open, the drawer is a modal dialog; closed (and on the desktop rail) it is
-  // a plain labelled <aside>. The CSS hides the closed drawer with
-  // visibility, which also takes its links out of the tab order.
+  // Open, the drawer is a named modal dialog with the page behind it inert;
+  // closed (and on the desktop rail) it is a plain <div> whose inner
+  // <nav aria-label="Chapters"> is the landmark (an <aside> may not take
+  // role="dialog"). The CSS hides the closed drawer with visibility, which
+  // also takes its links out of the tab order.
   function openDrawer() {
     if (!sidebar) return;
     lastFocused = document.activeElement;
     sidebar.setAttribute('role', 'dialog');
     sidebar.setAttribute('aria-modal', 'true');
+    sidebar.setAttribute('aria-label', 'Chapters');
     sidebar.classList.add('is-open');
     if (scrim) scrim.hidden = false;
     if (openBtn) openBtn.setAttribute('aria-expanded', 'true');
+    setBackgroundInert(true);
     var first = sidebar.querySelector('a, button');
     if (first) first.focus();
     document.addEventListener('keydown', onKeydown);
@@ -64,9 +78,12 @@
     sidebar.classList.remove('is-open');
     sidebar.removeAttribute('role');
     sidebar.removeAttribute('aria-modal');
+    sidebar.removeAttribute('aria-label');
     if (scrim) scrim.hidden = true;
     if (openBtn) openBtn.setAttribute('aria-expanded', 'false');
     document.removeEventListener('keydown', onKeydown);
+    // Lift inert before handing focus back: an inert trigger cannot take it.
+    setBackgroundInert(false);
     // Restore focus to whatever opened the drawer (normally the toggle button).
     var restore = lastFocused && lastFocused.focus ? lastFocused : openBtn;
     if (restore) restore.focus();

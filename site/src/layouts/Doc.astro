@@ -155,9 +155,9 @@ if (statsChapter) {
     <div class="doc-layout">
       {
         withSidebar && (
-          <aside id="doc-sidebar" class="doc-sidebar" aria-label="Chapters" data-pagefind-ignore>
+          <div id="doc-sidebar" class="doc-sidebar" data-pagefind-ignore>
             <SidebarNav activeSlug={activeSlug} activeThesis={activeThesis} />
-          </aside>
+          </div>
         )
       }
 
@@ -231,6 +231,7 @@ if (statsChapter) {
 
   {withSidebar && <div class="doc-scrim" data-drawer-close hidden />}
 
+  <script is:inline src="/inert.js" defer></script>
   <script is:inline src="/ui-doc.js" defer></script>
   <script is:inline src="/glossary-cards.js" defer></script>
 

@@ -47,13 +47,13 @@
   gap: var(--s-2);
 }
 
-/* A narrow-screen cue that the grid scrolls sideways (as .map-hint on /map). */
+/* A narrow-screen cue that the grid scrolls sideways (as .map-hint on /map).
+   A mixed-case sentence, so no label tracking. */
 .cw-hint {
   display: none;
   margin: 0 0 var(--s-3);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  letter-spacing: var(--tracking-label);
   color: var(--muted);
 }
 

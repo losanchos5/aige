@@ -29,11 +29,12 @@
       navRoot.querySelectorAll('[data-nav-trigger], .nav-link')
     );
 
-    // Hover-intent opens a panel a beat before the pointer's click lands; a
-    // click within this window is the same "point, then click" gesture and
-    // must not toggle shut the panel the hover just opened.
-    var HOVER_CLICK_GRACE_MS = 300;
-    var hoverOpened = { trigger: null, at: 0 };
+    // Hover-intent opens a panel a beat before the pointer's click lands; that
+    // click is the same "point, then click" gesture and must not toggle shut
+    // the panel the hover just opened, however long the pointer lingered. The
+    // trigger whose panel hover opened is remembered until the pointer leaves
+    // its group; a click after leaving and coming back toggles as usual.
+    var openedByHover = null;
 
     function menuFor(trigger) {
       var id = trigger.getAttribute('aria-controls');
@@ -47,6 +48,8 @@
     }
     function close(trigger) {
       var menu = menuFor(trigger);
+      // A panel reopened later (say, by a click after Escape) is not hover's.
+      if (openedByHover === trigger) openedByHover = null;
       trigger.setAttribute('aria-expanded', 'false');
       if (menu) menu.hidden = true;
     }
@@ -74,13 +77,10 @@
 
       trigger.addEventListener('click', function () {
         if (isOpen(trigger)) {
-          var justHovered =
-            hoverOpened.trigger === trigger && Date.now() - hoverOpened.at < HOVER_CLICK_GRACE_MS;
-          if (!justHovered) close(trigger);
+          if (openedByHover !== trigger) close(trigger);
         } else {
           open(trigger);
         }
-        hoverOpened = { trigger: null, at: 0 };
       });
 
       trigger.addEventListener('keydown', function (e) {
@@ -178,11 +178,18 @@
             closeTimer = null;
           }
           openTimer = setTimeout(function () {
-            open(trigger);
-            hoverOpened = { trigger: trigger, at: Date.now() };
+            openTimer = null;
+            // Only a panel this hover actually opened is protected from the
+            // click; one already open (by a click, or a hover re-entered
+            // before it closed) toggles shut as usual.
+            if (!isOpen(trigger)) {
+              open(trigger);
+              openedByHover = trigger;
+            }
           }, 80);
         });
         group.addEventListener('pointerleave', function () {
+          if (openedByHover === trigger) openedByHover = null;
           if (openTimer) {
             clearTimeout(openTimer);
             openTimer = null;
