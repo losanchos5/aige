@@ -387,3 +387,17 @@
   --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
   --tex-line: color-mix(in srgb, var(--ink) 8%, transparent);
 }
+
+/* ------------------------------------------------ Muted text over the mesh */
+
+/* --muted drops below AA over the gradient mesh too (12px mono labels on the
+   glows: kicker, breadcrumb, .meta, hero notes), as it does on .sec--tint.
+   Re-scope it to --ink-2 on every mesh-backed surface: mesh sections, the page
+   heroes and the home hero with its panel. --ink-2 follows the theme, so one
+   rule serves light and dark. Leaves the mesh itself untouched. */
+.sec--mesh,
+.hero--page,
+.hero--loop,
+.hero-panel {
+  --muted: var(--ink-2);
+}

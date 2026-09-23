@@ -1,8 +1,8 @@
 ---
 /**
  * StackLayerPanel — one layer of the five-layer stack. A bordered panel with a
- * pastel band down the left edge (the layer colour), a big mono index, the
- * name + tagline, an inherited/new tag, and a labelled grid of the layer's
+ * big mono index led by an outlined layer-colour square, the name + tagline,
+ * an inherited/new tag, and a labelled grid of the layer's
  * evidence: the question it answers, what it proves, its artefacts, tool
  * categories with illustrative examples, and the frameworks it maps to. Closes
  * with a back-link to the layer's heading in chapter 04.
@@ -20,10 +20,9 @@ const index = String(layer.n).padStart(2, '0');
 ---
 
 <article class="layer-panel card-lum" style={`--band: var(${layer.colorVar});`}>
-  <div class="band" aria-hidden="true"></div>
   <div class="body">
     <header class="head">
-      <span class="index" aria-hidden="true">{index}</span>
+      <span class="index" aria-hidden="true"><span class="sq"></span>{index}</span>
       <div class="name-wrap">
         <h3 class="name">{layer.name}</h3>
         <p class="tagline">{layer.tagline}</p>
@@ -94,20 +93,9 @@ const index = String(layer.n).padStart(2, '0');
 
 <style>
   /* Surface (border, radius, background, shadow) comes from .card-lum in
-     effects.css; this rule keeps the panel's flex layout and edge clip. */
-  .layer-panel {
-    display: flex;
-    overflow: hidden;
-  }
-
-  .band {
-    flex: none;
-    width: 8px;
-    background: var(--band);
-  }
-
+     effects.css. The layer colour is a square beside the index, not a side
+     band: the number and the name already carry the layer. */
   .body {
-    flex: 1;
     min-width: 0;
     padding: var(--s-5);
   }
@@ -122,11 +110,25 @@ const index = String(layer.n).padStart(2, '0');
   }
 
   .index {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
     font-family: var(--font-mono);
     font-size: 2rem;
     line-height: 1;
     letter-spacing: -0.02em;
     color: var(--muted);
+  }
+
+  /* The outlined layer chip, the same mark as the hero and kicker swatches;
+     the ink outline keeps it visible where the dark --lN fills sink. */
+  .sq {
+    flex: none;
+    width: var(--s-3);
+    height: var(--s-3);
+    border-radius: 3px;
+    background: var(--band);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 24%, transparent);
   }
 
   .name-wrap {
@@ -198,7 +200,7 @@ const index = String(layer.n).padStart(2, '0');
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--s-3);
+    gap: var(--s-5);
   }
 
   .tool-cat {

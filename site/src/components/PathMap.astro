@@ -233,9 +233,10 @@ const relatedLinks = (ids: readonly string[]) =>
     background: color-mix(in srgb, var(--ink) 12%, transparent);
   }
 
+  /* Matches the optional node's own border (PathNode): a dashed --ink-2. */
   .lg-opt {
     border-style: dashed;
-    border-color: var(--line);
+    border-color: var(--ink-2);
   }
 
   .path-reset {

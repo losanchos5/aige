@@ -105,14 +105,15 @@ const landing = variant === 'page';
 </section>
 
 <style>
-  /* The full-bleed band: relative + isolated + clipped so the two inert bg
-     layers stay behind the raised content. A softer mesh runs via a local
-     --mesh-alpha override. (Moved here from the .hero--page / .res-hero rules
-     that used to live in pages.css.) */
+  /* The full-bleed band: relative + isolated so the two inert bg layers stay
+     behind the raised content. A softer mesh runs via a local --mesh-alpha
+     override. The band itself does not clip: .bg-mesh clips its own drifting
+     glows (overflow + contain in effects.css), so text enlarged to 200% wraps
+     inside the band instead of being cut at its edge (WCAG 1.4.4). (Moved here
+     from the .hero--page / .res-hero rules that used to live in pages.css.) */
   .hero--page {
     position: relative;
     isolation: isolate;
-    overflow: hidden;
     min-height: 40vh;
     --mesh-alpha: 0.7;
   }
@@ -169,8 +170,11 @@ const landing = variant === 'page';
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 24%, transparent);
   }
 
+  /* Keeps its width, but may shrink and wrap when the row cannot hold it (a
+     phone with text at 200%) instead of pushing past the viewport. */
   .hero--landing .hero-eyebrow > .meta {
-    flex: none;
+    flex: 0 1 auto;
+    min-width: 0;
   }
 
   .hero-title {
@@ -183,6 +187,16 @@ const landing = variant === 'page';
     color: var(--ink);
     max-width: 20ch;
     text-wrap: balance;
+    /* A word wider than the column (a long word at 200% text) breaks rather
+       than overflowing; `anywhere` also lets the flex item shrink to fit. */
+    overflow-wrap: anywhere;
+  }
+
+  /* Landing title on phones: from the display size down to the H1 size, so a
+     long title takes three lines at 390px, not four. It scales with the
+     viewport between ~390 and ~510px and rejoins --fs-display above that. */
+  .hero--landing .hero-title {
+    font-size: min(var(--fs-display), max(var(--fs-h1), 10.25vw));
   }
 
   .hero-lede {

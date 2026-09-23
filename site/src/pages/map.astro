@@ -73,6 +73,10 @@ const clusters = buildClusterIndex(map, { headings, diagrams, figures, nodes, st
 
 const pad2 = (n: number): string => String(n).padStart(2, '0');
 
+/** Case- and space-insensitive label match (a chapter chip vs its cluster row). */
+const sameLabel = (a: string, b: string): boolean =>
+  a.trim().toLowerCase() === b.trim().toLowerCase();
+
 // A mono note naming the chapters a branch draws from (e.g. "ch. 01–02"); the
 // learning path draws from no chapter, so it names its page instead.
 function chapterNote(branchChapters: readonly string[]): string {
@@ -226,7 +230,10 @@ const jsonLd = [
               <span class="cluster-chaps">
                 {cluster.chapters.map((slugName) => {
                   const chapter = getChapterBySlug(slugName);
-                  return chapter ? <span class="cluster-chip">{chapter.shortTitle}</span> : null;
+                  // A chip that only repeats the row's own name says nothing.
+                  return chapter && !sameLabel(chapter.shortTitle, cluster.label) ? (
+                    <span class="cluster-chip">{chapter.shortTitle}</span>
+                  ) : null;
                 })}
               </span>
             </summary>

@@ -167,3 +167,46 @@ test('the download block matches the published export', async ({ page }) => {
     await expect(link).toHaveCount(0);
   }
 });
+
+// --- 10. Target size (WCAG 2.5.8) at a phone width ---------------------------
+// At 390px the canvas sits at its 980px floor (x0.785), so the 20-unit chips
+// are under 24px tall. Each undersized link then needs spacing: a 24px circle
+// on its centre must not touch another link nor another undersized link's
+// circle (audit TC-12).
+test('every map link meets the 24px target size or spacing at 390px', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.goto('/map');
+  const problems = await page.locator('svg.map-svg').evaluate((svg) => {
+    const R = 12;
+    const EPS = 0.01;
+    const boxes = [...svg.querySelectorAll('a[href]')].map((a) => {
+      const r = a.getBoundingClientRect();
+      return {
+        label: a.textContent?.trim() ?? '',
+        l: r.left,
+        t: r.top,
+        r: r.right,
+        b: r.bottom,
+        cx: (r.left + r.right) / 2,
+        cy: (r.top + r.bottom) / 2,
+        small: r.width < 24 || r.height < 24,
+      };
+    });
+    const toBox = (x: number, y: number, b: (typeof boxes)[number]) =>
+      Math.hypot(Math.max(b.l - x, 0, x - b.r), Math.max(b.t - y, 0, y - b.b));
+    const out: string[] = [];
+    boxes.forEach((a, i) => {
+      if (!a.small) return;
+      boxes.forEach((b, j) => {
+        if (i === j) return;
+        if (toBox(a.cx, a.cy, b) < R - EPS) {
+          out.push(`"${a.label}": its 24px circle touches the link "${b.label}"`);
+        } else if (b.small && j > i && Math.hypot(a.cx - b.cx, a.cy - b.cy) < 2 * R - EPS) {
+          out.push(`"${a.label}": its 24px circle overlaps that of "${b.label}"`);
+        }
+      });
+    });
+    return out;
+  });
+  expect(problems, problems.join('\n')).toEqual([]);
+});
