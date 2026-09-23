@@ -100,3 +100,37 @@ test('search opens with Ctrl+K and returns results for "policy"', async ({ page 
   await page.locator('#search-input').fill('policy');
   await expect(page.locator('.search-result').first()).toBeVisible({ timeout: 15000 });
 });
+
+// TC-05: the result rows are built at runtime, so the dialog's styles must
+// reach them — display-font titles, no underline, and a token-tinted <mark>
+// instead of the browser's yellow. TC-17: one Esc closes, even with text typed.
+test('search results are styled and a single Escape closes the dialog', async ({ page }) => {
+  await page.goto('/bok/the-stack');
+  await page.keyboard.press('Control+k');
+  const dialog = page.locator('#search-dialog');
+  await expect(dialog).toBeVisible();
+
+  await page.locator('#search-input').fill('policy');
+  await expect(page.locator('.search-result').first()).toBeVisible({ timeout: 15000 });
+
+  const styles = await page.evaluate(() => {
+    const cs = (sel: string) => {
+      const el = document.querySelector(sel);
+      return el ? getComputedStyle(el) : null;
+    };
+    const mark = cs('.search-result-excerpt mark');
+    return {
+      linkDecoration: cs('.search-result a')?.textDecorationLine,
+      titleFont: cs('.search-result-title')?.fontFamily,
+      markBg: mark?.backgroundColor ?? null,
+    };
+  });
+  expect(styles.linkDecoration).toBe('none');
+  expect(styles.titleFont).toContain('Bricolage');
+  expect(styles.markBg, 'a match is highlighted').not.toBeNull();
+  expect(styles.markBg).not.toBe('rgb(255, 255, 0)');
+
+  await page.locator('#search-input').press('Escape');
+  await expect(dialog).toBeHidden();
+  await expect(page.locator('#search-input')).toHaveValue('');
+});

@@ -29,6 +29,12 @@
       navRoot.querySelectorAll('[data-nav-trigger], .nav-link')
     );
 
+    // Hover-intent opens a panel a beat before the pointer's click lands; a
+    // click within this window is the same "point, then click" gesture and
+    // must not toggle shut the panel the hover just opened.
+    var HOVER_CLICK_GRACE_MS = 300;
+    var hoverOpened = { trigger: null, at: 0 };
+
     function menuFor(trigger) {
       var id = trigger.getAttribute('aria-controls');
       return id ? document.getElementById(id) : null;
@@ -67,8 +73,14 @@
       var menu = menuFor(trigger);
 
       trigger.addEventListener('click', function () {
-        if (isOpen(trigger)) close(trigger);
-        else open(trigger);
+        if (isOpen(trigger)) {
+          var justHovered =
+            hoverOpened.trigger === trigger && Date.now() - hoverOpened.at < HOVER_CLICK_GRACE_MS;
+          if (!justHovered) close(trigger);
+        } else {
+          open(trigger);
+        }
+        hoverOpened = { trigger: null, at: 0 };
       });
 
       trigger.addEventListener('keydown', function (e) {
@@ -167,6 +179,7 @@
           }
           openTimer = setTimeout(function () {
             open(trigger);
+            hoverOpened = { trigger: trigger, at: Date.now() };
           }, 80);
         });
         group.addEventListener('pointerleave', function () {

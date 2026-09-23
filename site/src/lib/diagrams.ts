@@ -163,8 +163,9 @@ export function renderDiagramFigure(id: string, opts?: { bare?: boolean }): stri
   // into the dialog, where diagrams.css hides the button again. It overlays the
   // canvas top-right, so it lives inside .diagram-canvas — the frame-only `bare`
   // variant leaves it out and lets the host page own the enlarge chrome.
+  // data-pagefind-ignore keeps the UI label ("⤢ Enlarge") out of search excerpts.
   const enlargeBtn =
-    `<button type="button" class="diagram-enlarge" aria-haspopup="dialog" hidden>` +
+    `<button type="button" class="diagram-enlarge" aria-haspopup="dialog" hidden data-pagefind-ignore>` +
     `<span class="diagram-enlarge-icon" aria-hidden="true">⤢</span> Enlarge` +
     `</button>`;
   const canvasWithEnlarge = `<div class="diagram-canvas">${svg}${enlargeBtn}</div>`;
@@ -184,7 +185,7 @@ export function renderDiagramFigure(id: string, opts?: { bare?: boolean }): stri
     `<span class="diagram-fig-desc">${escapeHtml(caption)}</span>` +
     // Extensionless: the host serves /diagrams/<id> from diagrams/<id>.html, so
     // linking the bare path avoids a 308 redirect on every in-content link.
-    `<a class="diagram-open" href="/diagrams/${id}" target="_blank" rel="noopener">` +
+    `<a class="diagram-open" href="/diagrams/${id}" target="_blank" rel="noopener" data-pagefind-ignore>` +
     `Open interactive diagram<span class="diagram-open-hint"> (opens in a new tab)</span>` +
     `</a>` +
     `</figcaption>` +

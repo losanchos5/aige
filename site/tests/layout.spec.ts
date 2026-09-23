@@ -86,6 +86,34 @@ for (const path of OTHER_PAGES) {
   }
 }
 
+// TC-02: WCAG 1.4.10 reflow at 320px. The header (wordmark + three 44px
+// buttons) overflowed by 13px and clipped the menu button; below 360px the bar
+// now keeps only the mark, and the brand link stays named by its aria-label.
+const REFLOW_PAGES = ['/about', '/thesis', '/bok/the-stack', '/resources/glossary'];
+
+for (const path of REFLOW_PAGES) {
+  test(`header reflows without horizontal scroll on ${path} at 320px`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto(path);
+    await page.waitForLoadState('networkidle');
+    const m = await page.evaluate(() => {
+      const se = document.scrollingElement as Element;
+      const burger = document.querySelector('.site-header .burger') as Element;
+      return {
+        pageScrollW: se.scrollWidth,
+        pageClientW: se.clientWidth,
+        burgerRight: burger.getBoundingClientRect().right,
+      };
+    });
+
+    expect(m.pageScrollW).toBe(m.pageClientW);
+    expect(m.burgerRight).toBeLessThanOrEqual(m.pageClientW);
+    await expect(
+      page.locator('header.site-header').getByRole('link', { name: 'AI Governance Engineer, home' }),
+    ).toBeVisible();
+  });
+}
+
 // The owner's report shot, at their reported viewport, into H/.
 test('screenshot why-now 1517 light', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });

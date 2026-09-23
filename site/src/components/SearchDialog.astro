@@ -147,7 +147,10 @@
     display: none;
   }
 
-  .search-result a {
+  /* The result rows are built by /search.js at runtime, so they never carry
+     this component's scope attribute: every rule below them goes through
+     :global(), anchored on the (scoped) list so it stays local to the dialog. */
+  .search-results :global(.search-result a) {
     display: block;
     padding: var(--s-3);
     border-radius: var(--r-sm);
@@ -155,27 +158,31 @@
     color: var(--ink);
   }
 
-  .search-result a:hover,
-  .search-result[aria-selected='true'] a {
+  .search-results :global(.search-result a:hover),
+  .search-results :global(.search-result[aria-selected='true'] a) {
     background: var(--surface);
   }
 
-  .search-result-title {
+  .search-results :global(.search-result-title) {
     font-family: var(--font-display);
     font-weight: 600;
     font-size: 1rem;
   }
 
-  .search-result-excerpt {
+  .search-results :global(.search-result-excerpt) {
     margin-top: var(--s-1);
     color: var(--ink-2);
     font-size: 0.875rem;
     line-height: 1.45;
   }
 
-  .search-result-excerpt mark {
-    background: var(--l4);
-    color: var(--l4-ink);
+  /* The matched term: the neutral tint (never a layer hue, which would read as
+     a stack layer) and full --ink over the --ink-2 excerpt, weighted so the
+     match still stands out where the tint is faint. */
+  .search-results :global(.search-result-excerpt mark) {
+    background: var(--tint-bg);
+    color: var(--ink);
+    font-weight: 600;
     padding: 0 2px;
     border-radius: 2px;
   }
