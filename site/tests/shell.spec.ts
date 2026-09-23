@@ -44,6 +44,26 @@ test.describe('desktop grouped nav', () => {
     await expect(page.locator('#nav-menu-reference')).toBeVisible();
   });
 
+  // TC-07: hover-intent opens the panel ~80ms before the click lands; that
+  // click is the same gesture and must not toggle the panel shut.
+  test('a click right after hover-intent keeps the panel open', async ({ page }) => {
+    await page.goto('/');
+    const trigger = page.locator('header.site-header').getByRole('button', { name: 'Practice' });
+    const menu = page.locator('#nav-menu-practice');
+    await trigger.hover();
+    await page.waitForFunction(
+      () =>
+        document
+          .querySelector('[aria-controls="nav-menu-practice"]')
+          ?.getAttribute('aria-expanded') === 'true',
+      null,
+      { polling: 'raf' },
+    );
+    await trigger.click();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(menu).toBeVisible();
+  });
+
   test('Escape closes the panel and returns focus to the trigger', async ({ page }) => {
     await page.goto('/');
     const trigger = page.locator('header.site-header').getByRole('button', { name: 'Practice' });
@@ -122,11 +142,34 @@ test('theme toggle flips data-theme and back', async ({ page }) => {
   expect(second).not.toBe(first);
 });
 
+// TC-16: one fixed name; the state lives in aria-pressed alone.
+test('theme toggle keeps one name and reports its state via aria-pressed', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/');
+  const toggle = page.locator('header.site-header [data-theme-toggle]');
+  await expect(toggle).toHaveAttribute('aria-label', 'Dark theme');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-label', 'Dark theme');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+});
+
 test('404 renders the BLOCK verdict', async ({ page }) => {
   const res = await page.goto('/does-not-exist');
   expect(res?.status()).toBe(404);
   await expect(page.getByText('BLOCK', { exact: false })).toBeVisible();
   await expect(page.getByText('Route not registered.')).toBeVisible();
+});
+
+// 404-1: one primary way out; search is the quiet fallback.
+test('404 offers one primary CTA and a search fallback', async ({ page }) => {
+  await page.goto('/does-not-exist');
+  const cta = page.locator('.nf-cta');
+  await expect(cta.locator('.btn')).toHaveCount(1);
+  await expect(cta.getByRole('link', { name: 'Back to home' })).toBeVisible();
+  await cta.getByRole('button', { name: 'Search the site' }).click();
+  await expect(page.locator('#search-dialog')).toBeVisible();
 });
 
 test.describe('mobile drawer', () => {

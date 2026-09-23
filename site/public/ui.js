@@ -14,10 +14,12 @@
     }
   }
 
+  // A toggle button keeps one fixed name ("Dark theme", set in
+  // ThemeToggle.astro) and carries its state in aria-pressed alone; flipping
+  // the label as well made it announce a double state.
   function syncToggle(btn) {
     var dark = resolvedTheme() === 'dark';
     btn.setAttribute('aria-pressed', dark ? 'true' : 'false');
-    btn.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
   }
 
   function initTheme() {

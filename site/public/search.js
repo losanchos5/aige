@@ -206,9 +206,20 @@ for (const trigger of document.querySelectorAll('[data-search-open]')) {
   });
 }
 
+/** Esc always closes. A type="search" field spends the first Esc clearing its
+    own value and swallows the key, so the dialog needed a second Esc; close
+    straight away instead (the close handler below empties the field, and the
+    field's own clear button still clears it without closing). */
+function onEscape(event) {
+  if (event.key !== 'Escape' || !dialog || !dialog.open) return;
+  event.preventDefault();
+  dialog.close();
+}
+
 if (input) {
   input.addEventListener('input', onInput);
   input.addEventListener('keydown', onResultsKey);
+  input.addEventListener('keydown', onEscape);
 }
 
 // Reset combobox state whenever the dialog closes (Esc or the Esc button).
