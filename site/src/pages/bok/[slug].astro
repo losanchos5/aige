@@ -4,7 +4,7 @@ import Doc from '../../layouts/Doc.astro';
 import AtAGlance from '../../components/AtAGlance.astro';
 import { chaptersOrdered } from '../../data/chapters';
 import { site } from '../../data/site';
-import { gitDate } from '../../lib/reading';
+import { gitCreated, gitDate } from '../../lib/reading';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 
 export async function getStaticPaths() {
@@ -48,7 +48,10 @@ const title = (remarkPluginFrontmatter.title as string | undefined) ?? chapter.t
 const summary = (remarkPluginFrontmatter.summary as string | undefined) ?? chapter.summary;
 const editPath = `bok/${chapter.id}.md`;
 const updated = gitDate(`../${editPath}`);
+const published = gitCreated(`../${editPath}`);
 const kicker = `Body of Knowledge · Chapter ${String(chapter.order).padStart(2, '0')}`;
+// The chapter's own Open Graph card, built by src/pages/og/[...slug].png.ts.
+const ogPath = `/og/bok-${chapter.slug}.png`;
 
 // Visible breadcrumb: Body of Knowledge › NN · Title. The BreadcrumbList JSON-LD
 // is already carried in this page's @graph below, so the crumb suppresses its own.
@@ -79,7 +82,9 @@ const book = {
   author: [...authorRefs],
   publisher: { '@id': ORG_ID },
   isPartOf: { '@id': WEBSITE_ID },
-  ...(site.license ? { license: site.license } : {}),
+  // schema.org types `license` as URL|CreativeWork, so link the deed rather than
+  // repeating the human-readable "CC BY 4.0" label the page chrome carries.
+  ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
 };
 
 const article = {
@@ -88,7 +93,9 @@ const article = {
   headline: title,
   url: chapterUrl,
   inLanguage: 'en',
+  datePublished: published,
   dateModified: updated,
+  image: new URL(ogPath, site.url).href,
   isPartOf: { '@id': bookId },
   author: [...authorRefs],
 };
@@ -123,9 +130,10 @@ const jsonLd = {
   slug={chapter.slug}
   updated={updated}
   activeSlug={chapter.slug}
-  image={`/og/bok-${chapter.slug}.png`}
+  image={ogPath}
   cite={true}
   jsonLd={jsonLd}
+  article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
 >
   <AtAGlance items={chapter.glance} />
   <Content />

@@ -239,7 +239,7 @@ Esta Tesis está publicada bajo licencia **CC BY 4.0**. Puede compartirse y adap
 el crédito adecuado, se incluya un enlace a la licencia y se indiquen los cambios. Atribución: Jorge
 García Aibar y Aurélie Pols.
 
-## Sources
+## Fuentes
 
 [1] GRC Engineering Manifesto. grcengineering. ~2024. https://grc.engineering/ (verified: primary)
 [2] "What is GRC Engineering" (Ayoub Fandi). GRC Engineer. 2025. https://grcengineer.com/what-is-grc-engineering/ (verified: primary)

@@ -182,7 +182,9 @@ export function renderDiagramFigure(id: string, opts?: { bare?: boolean }): stri
     `<figcaption class="diagram-figcaption">` +
     `<span class="diagram-fig-title">${escapeHtml(title)}</span>` +
     `<span class="diagram-fig-desc">${escapeHtml(caption)}</span>` +
-    `<a class="diagram-open" href="/diagrams/${id}.html" target="_blank" rel="noopener">` +
+    // Extensionless: the host serves /diagrams/<id> from diagrams/<id>.html, so
+    // linking the bare path avoids a 308 redirect on every in-content link.
+    `<a class="diagram-open" href="/diagrams/${id}" target="_blank" rel="noopener">` +
     `Open interactive diagram<span class="diagram-open-hint"> (opens in a new tab)</span>` +
     `</a>` +
     `</figcaption>` +

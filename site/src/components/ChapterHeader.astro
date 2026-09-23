@@ -44,14 +44,22 @@ const kickerBook = kickerParts[0];
 const kickerNum = kickerParts.length > 1 ? kickerParts.slice(1).join(' · ') : undefined;
 
 // One meta line, joined into list items: version/date, reading estimate, licence.
-const metaBits: string[] = [];
-if (updated) metaBits.push(`v${site.bokVersion}`, `${labels.updated} ${updated}`);
+// The date bit carries the machine-readable value so it renders inside a <time>
+// element; every other bit is plain text.
+interface MetaBit {
+  text: string;
+  /** YYYY-MM-DD for the <time datetime> attribute; omitted on plain bits. */
+  datetime?: string;
+}
+const metaBits: MetaBit[] = [];
+if (updated)
+  metaBits.push({ text: `v${site.bokVersion}` }, { text: labels.updated, datetime: updated });
 if (minutes && words)
   metaBits.push(
-    `${minutes} ${labels.read}`,
-    `${words.toLocaleString(labels.locale)} ${labels.words}`,
+    { text: `${minutes} ${labels.read}` },
+    { text: `${words.toLocaleString(labels.locale)} ${labels.words}` },
   );
-if (updated) metaBits.push(site.license);
+if (updated) metaBits.push({ text: site.license });
 ---
 
 <header class="chapter-header">
@@ -71,7 +79,18 @@ if (updated) metaBits.push(site.license);
       metaBits.length > 0 && (
         <ul class="ch-meta">
           {metaBits.map((bit) => (
-            <li>{bit}</li>
+            <li>
+              {/* The <li> is a flex container, so the label and the <time> are
+                  kept in one inline wrapper: as two bare flex items the space
+                  between them would be dropped. */}
+              {bit.datetime ? (
+                <span>
+                  {bit.text} <time datetime={bit.datetime}>{bit.datetime}</time>
+                </span>
+              ) : (
+                bit.text
+              )}
+            </li>
           ))}
         </ul>
       )

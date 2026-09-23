@@ -37,6 +37,7 @@ import { stages, nodes } from '../data/path';
 import { diagrams } from '../data/diagrams';
 import { figures, getFigure } from '../data/figures';
 import { WEBSITE_ID } from '../lib/jsonld';
+import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 
 const figure = getFigure('discipline-map')!;
 
@@ -124,21 +125,27 @@ try {
 }
 
 // The map is a collection of the whole site read as one page; Seo.astro merges
-// this node into the page's single ld+json graph.
+// these nodes into the page's single ld+json graph.
 const mapUrl = new URL('/map', site.url).href;
-const jsonLd = {
-  '@type': 'CollectionPage',
-  '@id': `${mapUrl}#page`,
-  name: `The map of the discipline — ${site.name}`,
-  url: mapUrl,
-  inLanguage: 'en',
-  isPartOf: { '@id': WEBSITE_ID },
-};
+const mapDescription =
+  'The whole discipline of the AI Governance Engineer on one page: a navigable mind map of every chapter, layer, pattern, workflow, obligation and learning stage.';
+const jsonLd = [
+  {
+    '@type': 'CollectionPage',
+    '@id': `${mapUrl}#page`,
+    name: `The map of the discipline — ${site.name}`,
+    description: mapDescription,
+    url: mapUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+  },
+  breadcrumbJsonLd([{ label: 'The map' }]),
+];
 ---
 
 <Marketing
   title="The map"
-  description="The whole discipline of the AI Governance Engineer on one page: a navigable mind map of every chapter, layer, pattern, workflow, obligation and learning stage."
+  description={mapDescription}
   image="/og/map.png"
   jsonLd={jsonLd}
 >

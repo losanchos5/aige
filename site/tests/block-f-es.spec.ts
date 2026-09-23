@@ -30,4 +30,25 @@ test.describe('Spanish Thesis at /es/thesis', () => {
     const backLink = page.locator('a[href="/thesis"], a[href="/thesis/"]');
     expect(await backLink.count()).toBeGreaterThan(0);
   });
+
+  test('the updated date is Spanish-labelled and machine-readable', async ({ page }) => {
+    await page.goto('/es/thesis');
+
+    const meta = page.locator('.ch-meta');
+    await expect(meta).toContainText('Actualizado');
+
+    const time = meta.locator('time[datetime]');
+    await expect(time).toHaveCount(1);
+    await expect(time).toHaveAttribute('datetime', /^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  test('the sources back matter is headed in Spanish', async ({ page }) => {
+    await page.goto('/es/thesis');
+
+    // "## Fuentes" in THESIS.es.md. rehype-citations still recognises it, so the
+    // entries are rebuilt into the numbered <ol class="sources"> the citations link to.
+    await expect(page.locator('h2', { hasText: /^Fuentes$/ })).toHaveCount(1);
+    await expect(page.locator('h2', { hasText: /^Sources$/ })).toHaveCount(0);
+    await expect(page.locator('ol.sources')).toHaveCount(1);
+  });
 });

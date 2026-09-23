@@ -21,6 +21,14 @@ interface Props {
   /** Append ` · {site.name}` to the document title (default true). The home
       page and any page whose title already names the site pass false. */
   titleSuffix?: boolean;
+  /** Article metadata. Present on the dated, authored long reads (the Thesis
+      translations and the Body of Knowledge chapters): it switches `og:type` to
+      `article` and adds the `article:*` properties. Dates are ISO 8601. */
+  article?: {
+    publishedTime?: string;
+    modifiedTime?: string;
+    author?: string;
+  };
 }
 
 const {
@@ -34,6 +42,7 @@ const {
   jsonLd,
   alternates,
   titleSuffix = true,
+  article,
 } = Astro.props;
 
 // A search snippet is capped at ~160 characters. Most descriptions are written
@@ -54,6 +63,15 @@ const ogImage = new URL(image, site.url).href;
 // The one place the site name is appended: layouts and pages pass the bare page
 // title, so no title can carry the suffix twice.
 const pageTitle = titleSuffix ? `${title} · ${site.name}` : title;
+// Every OG card this site ships is a 1200x630 PNG (src/pages/og/[...slug].png.ts),
+// so the dimensions and type are stated for the scrapers that pre-allocate the
+// card before fetching the bytes.
+const OG_IMAGE_WIDTH = '1200';
+const OG_IMAGE_HEIGHT = '630';
+const OG_IMAGE_TYPE = 'image/png';
+// The card renders the page title, so the title is also its alternative text.
+const ogImageAlt = pageTitle;
+const articleAuthor = article?.author ?? site.author;
 // Exactly one ld+json block per page: Organization + WebSite + the page's nodes.
 const graph = siteGraph(jsonLd);
 ---
@@ -64,18 +82,37 @@ const graph = siteGraph(jsonLd);
 
 {alternates?.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
 
-<meta property="og:type" content="website" />
+<meta property="og:type" content={article ? 'article' : 'website'} />
 <meta property="og:site_name" content={site.name} />
 <meta property="og:title" content={pageTitle} />
 <meta property="og:description" content={metaDescription} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
+<meta property="og:image:alt" content={ogImageAlt} />
+<meta property="og:image:width" content={OG_IMAGE_WIDTH} />
+<meta property="og:image:height" content={OG_IMAGE_HEIGHT} />
+<meta property="og:image:type" content={OG_IMAGE_TYPE} />
 <meta property="og:locale" content={locale} />
+
+{
+  article && (
+    <>
+      {article.publishedTime && (
+        <meta property="article:published_time" content={article.publishedTime} />
+      )}
+      {article.modifiedTime && (
+        <meta property="article:modified_time" content={article.modifiedTime} />
+      )}
+      <meta property="article:author" content={articleAuthor} />
+    </>
+  )
+}
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={pageTitle} />
 <meta name="twitter:description" content={metaDescription} />
 <meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={ogImageAlt} />
 
 {
   /* JSON-LD is a data block, not executable script, so CSP script-src does

@@ -54,6 +54,9 @@ interface Props {
   lang?: string;
   locale?: string;
   alternates?: { hreflang: string; href: string }[];
+  /** Open Graph `article:*` metadata; set by the dated long reads (chapters,
+      the two Thesis translations). See components/Seo.astro. */
+  article?: { publishedTime?: string; modifiedTime?: string; author?: string };
 }
 
 const {
@@ -79,6 +82,7 @@ const {
   lang,
   locale,
   alternates,
+  article,
 } = Astro.props;
 
 const withSidebar = sidebar && !wide;
@@ -123,6 +127,7 @@ if (statsChapter) {
   lang={lang}
   locale={locale}
   alternates={alternates}
+  article={article}
 >
   <div class="doc-progress" data-doc-progress aria-hidden="true"></div>
 
@@ -166,9 +171,14 @@ if (statsChapter) {
             </div>
           )
         }
+        {/* The compact on-this-page list precedes the <h1> in the source order,
+            so it carries data-nosnippet: a crawler must not open a chapter's
+            search snippet with its navigation. The position is deliberate (the
+            layout puts it above the prose on narrow viewports), so the markup
+            itself is not moved. */}
         {
           withToc && (
-            <details class="doc-toc-m" data-toc-mobile data-pagefind-ignore>
+            <details class="doc-toc-m" data-toc-mobile data-pagefind-ignore data-nosnippet>
               <summary>On this page</summary>
               <ul>
                 {headings
@@ -211,7 +221,7 @@ if (statsChapter) {
 
       {
         withToc && (
-          <aside class="doc-toc" data-pagefind-ignore>
+          <aside class="doc-toc" data-pagefind-ignore data-nosnippet>
             <Toc headings={headings} />
           </aside>
         )

@@ -94,13 +94,17 @@ function buildEntry(entry: SourceEntry): Element {
   };
 }
 
+// Heading labels that open the back-matter source list. The Spanish translation
+// of the Thesis heads it "Fuentes"; the entries themselves are identical.
+const SOURCES_HEADINGS = new Set(['sources', 'fuentes']);
+
 function transformSources(tree: Root): void {
   const kids = tree.children;
   const headingIndex = kids.findIndex(
     (node): node is Element =>
       node.type === 'element' &&
       node.tagName === 'h2' &&
-      toString(node).trim().toLowerCase() === 'sources',
+      SOURCES_HEADINGS.has(toString(node).trim().toLowerCase()),
   );
   if (headingIndex === -1) return;
 
