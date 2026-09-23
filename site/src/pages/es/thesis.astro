@@ -4,6 +4,7 @@ import Diagram from '../../components/Diagram.astro';
 import { site } from '../../data/site';
 import { gitCreated, gitDate } from '../../lib/reading';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 // THESIS.es.md sits at the repo root, next to THESIS.md. Imported directly so it
 // goes through the same Astro Markdown pipeline (remark-lead, callouts, citations,
 // diagrams, glossary) that the content collection applies to the English thesis,
@@ -16,7 +17,13 @@ const summary =
   (frontmatter.summary as string | undefined) ??
   'La gobernanza como un sistema que se construye, se ejecuta y se mide, no un documento que se firma.';
 const updated = gitDate('../THESIS.es.md');
+const published = gitCreated('../THESIS.es.md');
 const signUrl = `${site.github}/blob/main/bok/CONTRIBUTORS.md`;
+// Meta description, in Spanish and to the snippet budget: the same claims the
+// opening paragraph makes (política ejecutable, control en el pipeline, evidencia
+// como subproducto de la construcción). The visible lede stays as it is.
+const metaDescription =
+  'La gobernanza como un sistema que se construye, se ejecuta y se mide: política ejecutable, control en el pipeline y evidencia producida al construir.';
 
 // Same TechArticle as /thesis, in Spanish: `inLanguage: 'es'`, and a translation
 // of the English original (`translationOfWork`). Dates come from the git history
@@ -30,21 +37,25 @@ const jsonLd = [
     description: summary,
     url: thesisUrl,
     inLanguage: 'es',
-    datePublished: gitCreated('../THESIS.es.md'),
+    datePublished: published,
     dateModified: updated,
+    image: new URL('/og/thesis.png', site.url).href,
     author: [...authorRefs],
     publisher: { '@id': ORG_ID },
     isPartOf: { '@id': WEBSITE_ID },
     translationOfWork: { '@id': `${new URL('/thesis', site.url).href}#article` },
-    ...(site.license ? { license: site.license } : {}),
+    // URL, not the "CC BY 4.0" label: schema.org types `license` as URL|CreativeWork.
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
   },
   ...authorNodes,
+  breadcrumbJsonLd([{ label: 'La Tesis' }]),
 ];
 ---
 
 <Doc
   title={title}
   summary={summary}
+  description={metaDescription}
   kicker="La Tesis"
   headings={headings}
   editPath="THESIS.es.md"
@@ -54,6 +65,7 @@ const jsonLd = [
   activeThesis={true}
   image="/og/thesis.png"
   jsonLd={jsonLd}
+  article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
   lang="es"
   locale="es_ES"
   alternates={[

@@ -23,6 +23,7 @@ import ValuePair from '../components/ValuePair.astro';
 import ChapterGrid from '../components/ChapterGrid.astro';
 import ResourceTiles from '../components/ResourceTiles.astro';
 import { site } from '../data/site';
+import { WEBSITE_ID } from '../lib/jsonld';
 import { definition, values } from '../data/values';
 import { capabilityStatement, workflows, market } from '../data/role';
 import { chaptersOrdered } from '../data/chapters';
@@ -32,6 +33,20 @@ import { chaptersOrdered } from '../data/chapters';
 const seoTitle = 'AI Governance Engineer — the discipline, defined';
 const seoDesc =
   'AI governance engineering turns governance into policy-as-code, eval gates and machine-readable evidence you can run, not just read.';
+
+// The WebSite node describes the site; this WebPage describes the landing page
+// itself, so a consumer reading the graph can tell the two apart. Seo.astro
+// merges it into the page's single ld+json block.
+const homeUrl = new URL('/', site.url).href;
+const jsonLd = {
+  '@type': 'WebPage',
+  '@id': `${homeUrl}#webpage`,
+  name: seoTitle,
+  description: seoDesc,
+  url: homeUrl,
+  inLanguage: 'en',
+  isPartOf: { '@id': WEBSITE_ID },
+};
 
 // The three questions that define the discipline. Stated verbatim in
 // role.capabilityStatement and as the stack layers' `question` fields; the
@@ -92,7 +107,13 @@ const resources = [
 ];
 ---
 
-<Marketing title={seoTitle} description={seoDesc} image="/og/default.png" titleSuffix={false}>
+<Marketing
+  title={seoTitle}
+  description={seoDesc}
+  image="/og/default.png"
+  titleSuffix={false}
+  jsonLd={jsonLd}
+>
   <section class="hero section hero--loop">
     <div class="bg-mesh hero-mesh" aria-hidden="true"></div>
     <div class="hero-tex bg-grid bg-fade" aria-hidden="true"></div>

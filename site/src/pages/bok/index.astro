@@ -6,6 +6,7 @@ import SignNote from '../../components/SignNote.astro';
 import { site } from '../../data/site';
 import { chaptersOrdered, getChapter } from '../../data/chapters';
 import { readingTime } from '../../lib/reading';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 
 const entries = await getCollection('bok');
 const minutes = new Map(entries.map((entry) => [entry.id, readingTime(entry.body ?? '')]));
@@ -19,6 +20,10 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
 
 const signUrl = `${site.github}/edit/main/bok/CONTRIBUTORS.md`;
 const issueUrl = `${site.github}/issues/new?template=sign-the-thesis.yml`;
+
+// Its own meta description: without one the landing fell back to the site-wide
+// default, which every other page already carries. Restates the sub-lede below.
+const description = `The Body of Knowledge for AI governance engineering: ${chaptersOrdered.length} chapters, from the definition to the reading list. Read them in order or jump to a layer.`;
 
 // Reading paths by reader (VISUAL-GUIDE §2.3 reading-paths): three routes through
 // the book as real links. Chapter titles come from chapters.ts; the newcomer
@@ -54,7 +59,12 @@ const readingPaths = [
 ];
 ---
 
-<Base title="Body of Knowledge" image="/og/bok.png">
+<Base
+  title="Body of Knowledge"
+  description={description}
+  image="/og/bok.png"
+  jsonLd={breadcrumbJsonLd([{ label: 'Body of Knowledge' }])}
+>
   <div class="container bok-index">
     <header class="bok-head">
       <p class="eyebrow">Body of Knowledge · v{site.bokVersion}</p>

@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import { resolve } from 'node:path';
 import Doc from '../../layouts/Doc.astro';
 import NewsletterForm from '../../components/NewsletterForm.astro';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { site } from '../../data/site';
 
 // Link the built Body-of-Knowledge PDF only when it exists at build time, so a
@@ -27,10 +28,12 @@ try {
 <Doc
   title="About this site"
   summary="What this is, who maintains it, and how to contribute."
+  description="What this site is, who maintains it and how to contribute: the founding text and working reference for engineering the governance of AI systems."
   kicker="About"
   sidebar={false}
   wide={true}
   image="/og/about.png"
+  jsonLd={breadcrumbJsonLd([{ label: 'About' }])}
 >
   <p>
     <strong>{site.name}</strong> is the home of <em>AI Governance Engineering: The Thesis &amp; Body

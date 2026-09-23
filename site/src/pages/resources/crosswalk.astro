@@ -35,7 +35,8 @@ const jsonLd = [
     creator: [...authorRefs],
     publisher: { '@id': ORG_ID },
     isPartOf: { '@id': WEBSITE_ID },
-    ...(site.license ? { license: site.license } : {}),
+    // URL, not the "CC BY 4.0" label: schema.org types `license` as URL|CreativeWork.
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
     distribution: [
       {
         '@type': 'DataDownload',

@@ -29,6 +29,7 @@ import {
   market,
 } from '../data/role';
 import { levels } from '../data/maturity';
+import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 
 const roleHref = (anchor: string) => `/bok/the-role#${anchor}`;
 const maturityHref = `/bok/maturity-model#${levels[0].anchor}`;
@@ -58,6 +59,7 @@ const reportedText = reportedStats
   title="The role"
   description="What an AI Governance Engineer does: the seven workflows it owns, the skills behind them, and how the role differs from the AI governance analyst."
   image="/og/role.png"
+  jsonLd={breadcrumbJsonLd([{ label: 'The role' }])}
 >
   <PageHero
     variant="page"

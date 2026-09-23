@@ -114,6 +114,105 @@ test.describe('page-specific nodes', () => {
     expect(article?.dateModified).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
+  test('/ carries a WebPage node bound to the WebSite', async ({ page }) => {
+    const graph = await graphOf(page, '/');
+    const webPage = graph.find((node) => node['@type'] === 'WebPage');
+
+    expect(webPage?.['@id']).toBe(`${SITE_ORIGIN}/#webpage`);
+    expect(webPage?.url).toBe(`${SITE_ORIGIN}/`);
+    expect(webPage?.name).toBeTruthy();
+    expect(webPage?.description).toBeTruthy();
+    expect(webPage?.inLanguage).toBe('en');
+    expect(webPage?.isPartOf?.['@id']).toBe(`${SITE_ORIGIN}/#website`);
+  });
+
+  test('/thesis carries its BreadcrumbList in the same graph', async ({ page }) => {
+    const graph = await graphOf(page, '/thesis');
+    const crumbs = graph.find((node) => node['@type'] === 'BreadcrumbList');
+
+    expect(crumbs).toBeTruthy();
+    const items = (crumbs?.itemListElement ?? []) as JsonLdNode[];
+    expect(items.map((item) => item.name)).toEqual(['Home', 'The Thesis']);
+    expect(items[0].item).toBe(`${SITE_ORIGIN}/`);
+  });
+
+  test('/map states a description and its breadcrumb trail', async ({ page }) => {
+    const graph = await graphOf(page, '/map');
+
+    const collection = graph.find((node) => node['@type'] === 'CollectionPage');
+    expect(collection?.description).toBeTruthy();
+    expect(collection?.isPartOf?.['@id']).toBe(`${SITE_ORIGIN}/#website`);
+
+    const crumbs = graph.find((node) => node['@type'] === 'BreadcrumbList');
+    const names = (crumbs?.itemListElement ?? []).map((item: JsonLdNode) => item.name);
+    expect(names).toEqual(['Home', 'The map']);
+  });
+
+  test('a chapter TechArticle carries both dates and its own OG image', async ({ page }) => {
+    const graph = await graphOf(page, '/bok/definition');
+    const article = graph.find((node) => node['@type'] === 'TechArticle');
+
+    expect(article?.datePublished).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(article?.dateModified).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(article?.image).toBe(`${SITE_ORIGIN}/og/bok-definition.png`);
+  });
+
+  test('the Thesis TechArticles carry an image', async ({ page }) => {
+    for (const path of ['/thesis', '/es/thesis']) {
+      const graph = await graphOf(page, path);
+      const article = graph.find((node) => node['@type'] === 'TechArticle');
+      expect(article?.image, path).toBe(`${SITE_ORIGIN}/og/thesis.png`);
+    }
+  });
+
+  test('every licensed work links the licence deed rather than naming it', async ({ page }) => {
+    // schema.org types `license` as URL|CreativeWork, so the Text literal
+    // "CC BY 4.0" (still shown in the page chrome) is not a valid value.
+    const LICENSE_URL = 'https://creativecommons.org/licenses/by/4.0/';
+    const licensed: { path: string; type: string }[] = [
+      { path: '/bok/definition', type: 'Book' },
+      { path: '/thesis', type: 'TechArticle' },
+      { path: '/es/thesis', type: 'TechArticle' },
+      { path: '/resources/crosswalk', type: 'Dataset' },
+    ];
+
+    for (const { path, type } of licensed) {
+      const graph = await graphOf(page, path);
+      const node = graph.find((item) => item['@type'] === type);
+      expect(node?.license, `${type} on ${path}`).toBe(LICENSE_URL);
+    }
+  });
+
+  test('the glossary is a DefinedTermSet of anchored terms', async ({ page }) => {
+    const graph = await graphOf(page, '/resources/glossary');
+    const set = graph.find((node) => node['@type'] === 'DefinedTermSet');
+
+    const setId = `${SITE_ORIGIN}/resources/glossary#glossary`;
+    expect(set?.['@id']).toBe(setId);
+
+    const terms = (set?.hasDefinedTerm ?? []) as JsonLdNode[];
+    expect(terms.length).toBeGreaterThan(10);
+    for (const term of terms) {
+      expect(term['@type']).toBe('DefinedTerm');
+      expect(term.name).toBeTruthy();
+      expect(term.description).toBeTruthy();
+      expect(term.inDefinedTermSet?.['@id']).toBe(setId);
+      expect(String(term['@id'])).toMatch(
+        new RegExp(`^${SITE_ORIGIN}/resources/glossary#t-[a-z0-9-]+$`),
+      );
+    }
+
+    // Every term @id points at an anchor the page actually renders.
+    const anchors = await page.locator('.gl-dl dt[id]').evaluateAll((nodes) =>
+      nodes.map((node) => node.id),
+    );
+    const anchored = new Set(anchors);
+    for (const term of terms) {
+      const hash = String(term['@id']).split('#')[1];
+      expect(anchored.has(hash), `no <dt id="${hash}"> for "${term.name}"`).toBe(true);
+    }
+  });
+
   test('the crosswalk Dataset distributes the CSV and the JSON it links', async ({ page }) => {
     const graph = await graphOf(page, '/resources/crosswalk');
     const dataset = graph.find((node) => node['@type'] === 'Dataset');

@@ -21,6 +21,11 @@ const MAX_TITLE = 70;
 const MIN_DESCRIPTION = 50;
 const MAX_DESCRIPTION = 160;
 
+// Every Open Graph card the site ships is a 1200x630 PNG (src/pages/og/[...slug].png.ts).
+const OG_IMAGE_WIDTH = '1200';
+const OG_IMAGE_HEIGHT = '630';
+const OG_IMAGE_TYPE = 'image/png';
+
 const paths: string[] = [
   ...lighthouserc.ci.collect.url.map((url: string) => new URL(url).pathname),
   '/es/thesis',
@@ -125,6 +130,36 @@ for (const path of paths) {
       expect(cards[0].trim().length).toBeGreaterThan(0);
     });
 
+    test('the social card declares its alt text and its dimensions', async ({ page }) => {
+      await page.goto(path);
+
+      // Every card is a 1200x630 PNG built by src/pages/og/[...slug].png.ts, and
+      // the scrapers that pre-allocate the card read these three before fetching.
+      const dimensions: Record<string, string> = {
+        'og:image:width': OG_IMAGE_WIDTH,
+        'og:image:height': OG_IMAGE_HEIGHT,
+        'og:image:type': OG_IMAGE_TYPE,
+      };
+      for (const [property, expected] of Object.entries(dimensions)) {
+        const values = await metaContents(page, `meta[property="${property}"]`);
+        expect(values, `missing ${property}`).toHaveLength(1);
+        expect(values[0]).toBe(expected);
+      }
+
+      // Alt text on both cards, and the two agree.
+      const ogAlt = await metaContents(page, 'meta[property="og:image:alt"]');
+      expect(ogAlt, 'missing og:image:alt').toHaveLength(1);
+      expect(ogAlt[0].trim().length).toBeGreaterThan(0);
+
+      const twitterAlt = await metaContents(page, 'meta[name="twitter:image:alt"]');
+      expect(twitterAlt, 'missing twitter:image:alt').toHaveLength(1);
+      expect(twitterAlt[0]).toBe(ogAlt[0]);
+
+      // The alt text is the page title, which is what the card renders.
+      const titles = await page.locator('head > title').allTextContents();
+      expect(ogAlt[0]).toBe(titles[0].trim());
+    });
+
     test('declares a theme colour', async ({ page }) => {
       await page.goto(path);
 
@@ -150,6 +185,56 @@ for (const path of paths) {
     });
   });
 }
+
+test.describe('og:type', () => {
+  const ISO_DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+
+  test('a dated long read is an article with its article:* dates and author', async ({ page }) => {
+    await page.goto('/bok/the-stack');
+
+    const types = await metaContents(page, 'meta[property="og:type"]');
+    expect(types).toEqual(['article']);
+
+    const published = await metaContents(page, 'meta[property="article:published_time"]');
+    expect(published).toHaveLength(1);
+    expect(published[0]).toMatch(ISO_DATE_TIME);
+
+    const modified = await metaContents(page, 'meta[property="article:modified_time"]');
+    expect(modified).toHaveLength(1);
+    expect(modified[0]).toMatch(ISO_DATE_TIME);
+
+    const author = await metaContents(page, 'meta[property="article:author"]');
+    expect(author).toHaveLength(1);
+    expect(author[0].trim().length).toBeGreaterThan(0);
+  });
+
+  test('the Thesis translations are articles too', async ({ page }) => {
+    for (const path of ['/thesis', '/es/thesis']) {
+      await page.goto(path);
+      expect(await metaContents(page, 'meta[property="og:type"]'), path).toEqual(['article']);
+      const published = await metaContents(page, 'meta[property="article:published_time"]');
+      expect(published[0], path).toMatch(ISO_DATE_TIME);
+    }
+  });
+
+  test('a page that is not a dated read stays a website', async ({ page }) => {
+    await page.goto('/stack');
+    expect(await metaContents(page, 'meta[property="og:type"]')).toEqual(['website']);
+    expect(await metaContents(page, 'meta[property="article:published_time"]')).toEqual([]);
+  });
+});
+
+test.describe('visible dates', () => {
+  test('a chapter renders its updated date in a <time datetime>', async ({ page }) => {
+    await page.goto('/bok/the-stack');
+
+    const time = page.locator('.ch-meta time[datetime]');
+    await expect(time).toHaveCount(1);
+    await expect(time).toHaveAttribute('datetime', /^\d{4}-\d{2}-\d{2}$/);
+    // The machine-readable value is the text the reader sees.
+    expect((await time.textContent())?.trim()).toBe(await time.getAttribute('datetime'));
+  });
+});
 
 test.describe('hreflang', () => {
   const EXPECTED: Record<string, string> = {

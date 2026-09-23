@@ -33,7 +33,12 @@ export const chapters: readonly Chapter[] = [
     slug: 'preface',
     title: '00. Preface',
     shortTitle: 'Preface',
-    summary: 'Why this book exists, who it is for, and how to use it.',
+    // The blockquote alone ("Why this book exists, who it is for, and how to use
+    // it.") is too thin for a search snippet, so it is extended with the
+    // chapter's own framing of what the book is. The visible lede is unaffected:
+    // it still comes from the blockquote via remark-lead.
+    summary:
+      'Why this book exists, who it is for and how to use it: the first attempt to write down how to engineer the governance of AI systems.',
   },
   {
     id: '01-definition',
