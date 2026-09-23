@@ -25,6 +25,8 @@ interface Props {
   titleSuffix?: boolean;
   /** Open Graph `article:*` metadata for dated long reads; see Seo. */
   article?: { publishedTime?: string; modifiedTime?: string; author?: string };
+  /** Emit `<meta name="robots" content="noindex">`; see Seo. */
+  noindex?: boolean;
 }
 
 const {
@@ -37,6 +39,7 @@ const {
   alternates,
   titleSuffix,
   article,
+  noindex,
 } = Astro.props;
 
 // Cloudflare Web Analytics: only injected when a token is provided at build time
@@ -64,6 +67,7 @@ const umamiSrc = 'https://admin.stocktcg.net/script.js';
       alternates={alternates}
       titleSuffix={titleSuffix}
       article={article}
+      noindex={noindex}
     />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

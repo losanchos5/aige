@@ -29,6 +29,10 @@ interface Props {
     modifiedTime?: string;
     author?: string;
   };
+  /** Keep the page out of search indexes. Used by the 404 page: Cloudflare
+      Pages serves it under any missing path, so a header rule keyed on `/404`
+      would not reach real broken links; a meta tag travels with the HTML. */
+  noindex?: boolean;
 }
 
 const {
@@ -43,6 +47,7 @@ const {
   alternates,
   titleSuffix = true,
   article,
+  noindex = false,
 } = Astro.props;
 
 // A search snippet is capped at ~160 characters. Most descriptions are written
@@ -78,6 +83,7 @@ const graph = siteGraph(jsonLd);
 
 <title>{pageTitle}</title>
 <meta name="description" content={metaDescription} />
+{noindex && <meta name="robots" content="noindex" />}
 <link rel="canonical" href={canonical} />
 
 {alternates?.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
