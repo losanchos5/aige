@@ -669,8 +669,13 @@
   text-underline-offset: 0.25em;
 }
 
+/* Clears the sticky jump bar: --gl-bar-h is its stuck bottom edge, published by
+   public/glossary-index.js as the bar wraps (three rows at 390px). The extra
+   --s-2 lands a jumped-to heading exactly on the script's detection line (bar
+   bottom + 8px), so that letter is the one marked current. Without JS the
+   fallback clears the one-row bar. */
 .gl-letter {
-  scroll-margin-top: var(--s-8);
+  scroll-margin-top: calc(var(--gl-bar-h, var(--s-8)) + var(--s-2));
   margin-top: var(--s-6);
 }
 

@@ -111,15 +111,4 @@ const strip = (title: string) => title.replace(/^\d+\.\s*/, '');
   a.card:hover .arrow {
     color: var(--ink);
   }
-
-  /* Keeps .card-lum/.lift's transform and shadow transitions alongside the
-     border colour (a bare border-color transition here would override them). */
-  @media (prefers-reduced-motion: no-preference) {
-    a.card {
-      transition:
-        border-color var(--dur) var(--ease),
-        transform var(--dur) var(--ease),
-        box-shadow var(--dur) var(--ease);
-    }
-  }
 </style>

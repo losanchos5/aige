@@ -99,15 +99,4 @@ const countup = match
   a.tile:hover {
     border-color: var(--ink-2);
   }
-
-  /* Keeps .card-lum/.lift's transform and shadow transitions alongside the
-     border colour (a bare border-color transition here would override them). */
-  @media (prefers-reduced-motion: no-preference) {
-    a.tile {
-      transition:
-        border-color var(--dur) var(--ease),
-        transform var(--dur) var(--ease),
-        box-shadow var(--dur) var(--ease);
-    }
-  }
 </style>

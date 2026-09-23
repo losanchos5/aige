@@ -137,13 +137,13 @@
     }
   }
   // Open motion. With the bundled runtime (window.aigeMotion, from
-  // src/scripts/motion-ui.ts) the panel springs in from its off-canvas position,
-  // then the body's blocks follow with a short translateY stagger: transform
-  // only, never opacity. The body holds one cloned .pn-body, so its blocks (the
-  // summary and each section) are the staggered items. Under reduced motion
-  // aigeMotion.run() skips the animation and the final state stands at once. If
-  // the runtime has not loaded (or never does), the CSS transition on .is-open
-  // is the baseline.
+  // src/scripts/motion-ui.ts) aigeMotion.openPanel() springs the panel in from
+  // its off-canvas position, then the body's blocks follow with a short
+  // translateY stagger: transform only, never opacity. The body holds one cloned
+  // .pn-body, so its blocks (the summary and each section) are the staggered
+  // items. Under reduced motion the final state stands at once. If the runtime
+  // has not loaded (or never does), the CSS transition on .is-open is the
+  // baseline.
   function staggerItems() {
     if (!bodyEl) return [];
     var items = bodyEl.children;
@@ -161,31 +161,7 @@
     // Opened straight from display:none, so .is-open lands without a CSS
     // transition; the spring owns the entrance.
     drawer.classList.add('is-open');
-    m.run(function () {
-      try {
-        m.animate(
-          drawer,
-          { transform: ['translateX(100%)', 'none'] },
-          { type: m.spring, stiffness: 320, damping: 30 },
-        ).then(function () {
-          drawer.style.removeProperty('transform');
-        });
-        var items = staggerItems();
-        if (items.length) {
-          m.animate(
-            items,
-            { transform: ['translateY(10px)', 'none'] },
-            {
-              duration: 0.32,
-              ease: [0.2, 0.7, 0.2, 1],
-              delay: m.stagger(0.04, { startDelay: 0.12 }),
-            },
-          );
-        }
-      } catch (e) {
-        drawer.style.removeProperty('transform');
-      }
-    });
+    m.openPanel(drawer, staggerItems());
   }
 
   function syncStateButtons() {

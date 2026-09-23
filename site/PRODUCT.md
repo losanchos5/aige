@@ -1,4 +1,9 @@
 # AI Governance Engineer
+<!-- impeccable:product-schema 1 -->
+
+## Platform
+
+web
 
 **Positioning:** the reference site for AI Governance Engineering — the discipline that turns AI
 governance into policy-as-code, eval gates and machine-readable evidence you can run, not just read.

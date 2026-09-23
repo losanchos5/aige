@@ -98,22 +98,30 @@
       var box = mark.getBoundingClientRect();
       if (box.top < window.innerHeight && box.bottom > 0) return;
 
+      // Settle on the resting state: drop the offset class and the inline
+      // transform motion commits when it finishes (or never starts).
+      function settle() {
+        mark.classList.remove('is-parked');
+        Array.prototype.forEach.call(bars, function (bar) {
+          bar.style.removeProperty('transform');
+        });
+      }
+
       mark.classList.add('is-staggered', 'is-parked');
       m.inView(
         mark,
         function () {
-          m.animate(
-            bars,
-            { transform: ['translateY(16px)', 'translateY(0)'] },
-            { delay: m.stagger(0.07), duration: 0.5, ease: [0.2, 0.7, 0.2, 1] }
-          ).then(function () {
-            // Settle on the resting state: drop the offset class and the inline
-            // transform motion commits when it finishes.
-            mark.classList.remove('is-parked');
-            Array.prototype.forEach.call(bars, function (bar) {
-              bar.style.removeProperty('transform');
-            });
-          });
+          // If the animation cannot start, settle at once so the bars never
+          // stay parked 16px low.
+          try {
+            m.animate(
+              bars,
+              { transform: ['translateY(16px)', 'translateY(0)'] },
+              { delay: m.stagger(0.07), duration: 0.5, ease: [0.2, 0.7, 0.2, 1] }
+            ).then(settle, settle);
+          } catch (e) {
+            settle();
+          }
         },
         { amount: 0.3 }
       );

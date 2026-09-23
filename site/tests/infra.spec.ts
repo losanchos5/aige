@@ -3,9 +3,10 @@
 // playwright.config; no browser is needed for the request-only checks.
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { gzipSync } from 'node:zlib';
 
 const SHOT_DIR = join('tests', '__screenshots__', 'F');
 
@@ -95,6 +96,16 @@ test.describe('same-origin scripts and CSP', () => {
       expect(html).toMatch(/<script type="module" src="\/_astro\/motion-ui\.[\w-]+\.js">/);
     });
   }
+
+  // The shared motion runtime rides on every page: keep its gzip within 8 KiB.
+  test('dist/_astro/motion-ui*.js gzips to 8192 bytes or less', () => {
+    const dir = join('dist', '_astro');
+    const bundles = readdirSync(dir).filter((name) => /^motion-ui\.[\w-]+\.js$/.test(name));
+    expect(bundles.length).toBeGreaterThan(0);
+    for (const name of bundles) {
+      expect(gzipSync(readFileSync(join(dir, name))).length, name).toBeLessThanOrEqual(8192);
+    }
+  });
 
   test('dist/_headers carries the CSP of public/_headers verbatim', () => {
     const cspLines = (text: string) =>

@@ -2,8 +2,9 @@
 // PrevNext: chapter pager. prev / next are chapter-shaped records; either may be
 // absent at the ends of the sequence. Each link is a luminous card (card-lum +
 // lift from effects.css): a small "Previous" / "Next" kicker over the chapter
-// title. The kicker is aria-hidden so the link's accessible name is exactly the
-// chapter title; aria-describedby still gives assistive tech the direction.
+// title. Only the arrow glyph is aria-hidden, so the link's accessible name is
+// its visible text, "Previous <title>" / "Next <title>" (WCAG 2.5.3 label in
+// name).
 interface Adjacent {
   slug: string;
   shortTitle: string;
@@ -24,11 +25,10 @@ const { prev, next } = Astro.props;
         class="pager-link prev card-lum lift"
         href={`/bok/${prev.slug}`}
         rel="prev"
-        aria-describedby="pager-prev-dir"
       >
-        <span class="dir" aria-hidden="true">
-          <span class="arrow">←</span>
-          <span id="pager-prev-dir">Previous</span>
+        <span class="dir">
+          <span class="arrow" aria-hidden="true">←</span>
+          <span>Previous</span>
         </span>
         <span class="name">{prev.shortTitle}</span>
       </a>
@@ -42,11 +42,10 @@ const { prev, next } = Astro.props;
         class="pager-link next card-lum lift"
         href={`/bok/${next.slug}`}
         rel="next"
-        aria-describedby="pager-next-dir"
       >
-        <span class="dir" aria-hidden="true">
-          <span id="pager-next-dir">Next</span>
-          <span class="arrow">→</span>
+        <span class="dir">
+          <span>Next</span>
+          <span class="arrow" aria-hidden="true">→</span>
         </span>
         <span class="name">{next.shortTitle}</span>
       </a>

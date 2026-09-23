@@ -141,12 +141,15 @@
   opacity: 1;
 }
 
-/* Hover lift, motion only. Pairs with .card-lum to deepen the shadow. */
+/* Hover lift, motion only. Pairs with .card-lum to deepen the shadow; carries
+   border-color too, so a card that tints its border on hover keeps all three
+   transitions without re-declaring the list. */
 @media (prefers-reduced-motion: no-preference) {
   .lift {
     transition:
       transform var(--dur) var(--ease),
-      box-shadow var(--dur) var(--ease);
+      box-shadow var(--dur) var(--ease),
+      border-color var(--dur) var(--ease);
   }
   .lift:hover {
     transform: translateY(-3px);

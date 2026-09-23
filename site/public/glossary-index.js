@@ -27,12 +27,24 @@
   var observer = null;
   var bandY = 0;
 
-  // The band is a 1px line just under the jump bar in its stuck position (its
-  // sticky top plus its own height), so a letter turns current as its heading
-  // slides out from under the bar.
-  function line() {
+  // The bar's bottom edge in its stuck position (its sticky top plus its own
+  // height). Published as --gl-bar-h on the bar's parent, so the letter
+  // sections' scroll-margin-top (resources.css) clears the bar however many rows
+  // it wraps to, and a jump never lands a heading under it.
+  var scope = bar.parentElement || document.documentElement;
+  function barBottom() {
     var top = parseFloat(getComputedStyle(bar).top) || 0;
-    return Math.round(top + bar.getBoundingClientRect().height + 8);
+    var bottom = Math.round(top + bar.getBoundingClientRect().height);
+    scope.style.setProperty('--gl-bar-h', bottom + 'px');
+    return bottom;
+  }
+
+  // The band is a 1px line just under the jump bar, so a letter turns current as
+  // its heading slides out from under the bar. Clamped inside the viewport so a
+  // short window (or a bar wrapped to many rows) still leaves the observer a
+  // band to watch.
+  function line() {
+    return Math.min(barBottom() + 8, window.innerHeight - 2);
   }
 
   function setCurrent(section) {

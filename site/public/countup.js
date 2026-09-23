@@ -98,6 +98,9 @@
             var el = entry.target;
             motion.run(
               function () {
+                // Zero only now, right before the count starts: a tile that
+                // never scrolls into view keeps its server-rendered figure.
+                el.textContent = format(el, 0);
                 count(motion, el);
               },
               function () {
@@ -109,7 +112,6 @@
         { rootMargin: '0px 0px -10% 0px', threshold: 0.2 }
       );
       tiles.forEach(function (el) {
-        el.textContent = format(el, 0);
         io.observe(el);
       });
     });
