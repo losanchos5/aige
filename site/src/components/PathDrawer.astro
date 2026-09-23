@@ -3,9 +3,11 @@
  * PathDrawer — the side panel path.js opens for a node. It ships empty and
  * hidden; on open, path.js fills the title, the kind/layer chips and a clone of
  * the node's .pn-body, and wires the three progress buttons (done / learning /
- * skipped). It is a modal dialog with a focus trap, Esc-to-close and a scrim,
- * mirroring the doc drawer in public/ui-doc.js. Pagefind ignores it (its content
- * already lives, indexable, in the stage sections).
+ * skipped). It is a modal dialog with a focus trap, Esc-to-close, a scrim and
+ * the page behind made inert while it is open (path.js), mirroring the doc
+ * drawer in public/ui-doc.js. Its "×" close is the same button, in the same
+ * place and with the same name as CrosswalkDrawer's. Pagefind ignores it (its
+ * content already lives, indexable, in the stage sections).
  */
 ---
 
@@ -113,6 +115,8 @@
     display: none;
   }
 
+  /* No rule under the title: the layer shows in the chip above it, and both
+     drawers share one head (GLB-1). */
   .pd-title {
     grid-column: 1;
     margin: 0;
@@ -121,11 +125,9 @@
     font-size: var(--fs-h2);
     line-height: 1.1;
     letter-spacing: var(--tracking-display);
-    /* Accent underline in the node's colour, if any. */
-    border-bottom: 3px solid var(--c, var(--line));
-    padding-bottom: var(--s-2);
   }
 
+  /* Kept identical to .cwd-close in crosswalk.css (GLB-1). */
   .pd-close {
     grid-column: 2;
     grid-row: 1 / span 2;

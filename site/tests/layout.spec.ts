@@ -19,6 +19,19 @@ const VIEWPORTS = [
 const CHAPTER_PAGES = ['/bok/why-now', '/bok/the-stack'];
 const OTHER_PAGES = ['/thesis', '/about', '/resources/glossary', '/map'];
 
+// Phone width for the Resources section. /resources/frameworks used to measure
+// 408px here: the visually hidden table head kept `position: sticky` and its th
+// escaped the 1px clip (TC-03). A mobile-emulated context (isMobile) widens the
+// layout viewport to fit the content and hides this, so the check runs in a
+// plain 390px desktop viewport against documentElement.clientWidth.
+const PHONE = { w: 390, h: 844 };
+const PHONE_PAGES = [
+  '/resources',
+  '/resources/frameworks',
+  '/resources/crosswalk',
+  '/resources/glossary',
+];
+
 async function measure(page: import('@playwright/test').Page) {
   return page.evaluate(() => {
     const se = document.scrollingElement as Element;
@@ -35,7 +48,7 @@ async function measure(page: import('@playwright/test').Page) {
 
     return {
       pageScrollW: se.scrollWidth,
-      pageClientW: se.clientWidth,
+      pageClientW: document.documentElement.clientWidth,
       sidebar: sidebar ? { sw: sidebar.scrollWidth, cw: sidebar.clientWidth } : null,
       nav: nav ? { sw: nav.scrollWidth, cw: nav.clientWidth } : null,
       proseRight: right(prose),
@@ -84,6 +97,18 @@ for (const path of OTHER_PAGES) {
       if (m.nav) expect(m.nav.sw).toBe(m.nav.cw);
     });
   }
+}
+
+for (const path of PHONE_PAGES) {
+  test(`no horizontal scroll on ${path} at ${PHONE.w}x${PHONE.h}`, async ({ page }) => {
+    await page.setViewportSize({ width: PHONE.w, height: PHONE.h });
+    await page.goto(path);
+    await page.waitForLoadState('networkidle');
+    const m = await measure(page);
+
+    expect(m.pageClientW).toBe(PHONE.w);
+    expect(m.pageScrollW).toBe(m.pageClientW);
+  });
 }
 
 // The owner's report shot, at their reported viewport, into H/.

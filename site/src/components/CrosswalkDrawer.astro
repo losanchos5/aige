@@ -4,9 +4,11 @@
  * ships empty and hidden; on open, crosswalk.js sets the title and clones the
  * topic's server-rendered <article> content into the body, highlighting the
  * references that belong to the framework column the reader came from. A modal
- * dialog with a focus trap, Esc-to-close and a scrim, mirroring PathDrawer but
- * without the progress buttons. Pagefind ignores it — the same content already
- * lives, indexable, in the "By topic" sections. Styles live in crosswalk.css.
+ * dialog with a focus trap, Esc-to-close, a scrim and the page behind made
+ * inert while it is open, mirroring PathDrawer (same "×" close, same place,
+ * same name) but without the progress buttons. Pagefind ignores it — the same
+ * content already lives, indexable, in the "By topic" sections. Styles live in
+ * crosswalk.css.
  */
 ---
 
@@ -21,7 +23,9 @@
 >
   <header class="cwd-head">
     <h2 id="cw-drawer-title" class="cwd-title"></h2>
-    <button type="button" class="cwd-close" data-cw-close>Close</button>
+    <button type="button" class="cwd-close" data-cw-close aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
   </header>
 
   <div class="cwd-body" data-drawer-body></div>

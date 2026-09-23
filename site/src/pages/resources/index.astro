@@ -136,7 +136,12 @@ const jsonLd = {
   /* The hub cards as a bento: the first card (Frameworks) spans two columns,
      and each card enters on its own beat. --i drives .reveal-stagger; the span
      and stagger live here (not on ResourceCard) so they hold whatever markup
-     the card renders. */
+     the card renders. The <ul> drops its bullets and indent (RES-1). */
+  .rc-bento {
+    list-style: none;
+    padding: 0;
+  }
+
   .rc-bento > :global(li:nth-child(1)) {
     --i: 0;
   }

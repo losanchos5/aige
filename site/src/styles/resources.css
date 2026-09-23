@@ -16,6 +16,13 @@
   margin-top: var(--s-7);
 }
 
+/* The rhythm runs between blocks, not above the first one: the hero already
+   owns the air above the content, so the first block sits one --s-5 under the
+   band (.res-page padding) instead of ~90px of dead space (GLO-1). */
+.res-page > .res-section:first-child {
+  margin-top: 0;
+}
+
 .res-section-head {
   margin-bottom: var(--s-5);
 }
@@ -137,6 +144,24 @@
 .tk[data-l='3'] { background: var(--l3); }
 .tk[data-l='4'] { background: var(--l4); }
 .tk[data-l='5'] { background: var(--l5); }
+
+/* A tick with its layer code printed beside it ("L2"), so the colour is never
+   the only key (WCAG 1.4.1). The accessible name stays on the parent .ticks
+   (role="img" + aria-label); the code is presentational there. */
+.ticks--coded {
+  gap: var(--s-2);
+}
+
+.tk-key {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--ink-2);
+}
 
 /* ---- Type tag (frameworks + crosswalk column heads) ----------------------- */
 /* Category → layer colour key, deterministic and shared with .cw-chip in
@@ -283,6 +308,12 @@
     clip: rect(0, 0, 0, 0);
   }
 
+  /* The visually hidden head must not stay sticky: a sticky th escapes the
+     1px clip and widened the page to 408px at 390 (TC-03). */
+  .res-table thead th {
+    position: static;
+  }
+
   .res-table,
   .res-table tbody,
   .res-table tr,
@@ -299,16 +330,21 @@
     background: var(--surface);
   }
 
+  /* Label, then value, on a wrapping row: a short value stays on the label's
+     line and a long one drops under it at the card's full width, so no fixed
+     label column eats ~30% of the card (FRW-3) and the cards do not grow. */
   .res-table td {
     padding: var(--s-1) 0;
     border: 0;
     display: flex;
-    gap: var(--s-3);
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px var(--s-2);
   }
 
   .res-table td::before {
     content: attr(data-label);
-    flex: 0 0 6rem;
+    flex: none;
     font-family: var(--font-mono);
     font-size: var(--fs-label);
     letter-spacing: var(--tracking-label);
@@ -626,6 +662,8 @@
 }
 
 /* ---- Glossary ------------------------------------------------------------- */
+/* The bar is the first block under the hero, so no top margin (GLO-1), and it
+   runs on the same --prose measure as the entries below it (GLO-2). */
 .gl-jumpbar {
   position: sticky;
   top: var(--s-7);
@@ -633,7 +671,8 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--s-1);
-  margin: var(--s-6) 0 var(--s-6);
+  max-width: var(--prose);
+  margin: 0 0 var(--s-6);
   padding: var(--s-3) 0;
   background: var(--bg);
   border-bottom: 1px solid var(--line);
@@ -677,6 +716,7 @@
 .gl-letter {
   scroll-margin-top: calc(var(--gl-bar-h, var(--s-8)) + var(--s-2));
   margin-top: var(--s-6);
+  max-width: var(--prose);
 }
 
 .gl-letter-head {

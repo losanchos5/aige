@@ -3,9 +3,9 @@
    is a link to that topic's section (#topic-<id>); with JS off they jump there
    natively. Here we intercept the click, clone the section into a modal drawer,
    highlight the references that belong to the framework column the reader came
-   from, trap focus (Esc/scrim/Close close it) and restore focus on close. No
-   opacity animation; the panel slides on transform only. Ported from
-   public/path.js. */
+   from, trap focus (Esc/scrim/Close close it), make the page behind inert while
+   it is open and restore focus on close. No opacity animation; the panel
+   slides on transform only. Ported from public/path.js. */
 (function () {
   'use strict';
 
@@ -55,6 +55,29 @@
     } else if (active === last || !drawer.contains(active)) {
       e.preventDefault();
       first.focus();
+    }
+  }
+
+  // The page behind the open drawer goes inert (TC-15): aria-modal alone does
+  // not keep a screen reader's virtual cursor inside the dialog. Every sibling
+  // along the drawer's ancestor chain up to <body> (header, footer, the rest of
+  // <main>) is marked inert while it is open. The scrim stays live (a click on
+  // it closes), <dialog>s are skipped (the search dialog can still open over
+  // the drawer), and anything already inert is left as it was.
+  var inertEls = [];
+  function setBackgroundInert(on) {
+    var i;
+    for (i = 0; i < inertEls.length; i++) inertEls[i].removeAttribute('inert');
+    inertEls = [];
+    if (!on || !drawer) return;
+    for (var node = drawer; node !== document.body && node.parentElement; node = node.parentElement) {
+      var parent = node.parentElement;
+      for (var el = parent.firstElementChild; el; el = el.nextElementSibling) {
+        if (el === node || el === scrim || el.hasAttribute('inert')) continue;
+        if (/^(SCRIPT|STYLE|TEMPLATE|DIALOG)$/.test(el.tagName)) continue;
+        el.setAttribute('inert', '');
+        inertEls.push(el);
+      }
     }
   }
 
@@ -131,6 +154,7 @@
     drawer.hidden = false;
     if (scrim) scrim.hidden = false;
     document.body.classList.add('cw-lock');
+    setBackgroundInert(true);
     showDrawer();
     var closeBtn = drawer.querySelector('[data-cw-close]');
     if (closeBtn) closeBtn.focus();
@@ -144,6 +168,8 @@
     if (scrim) scrim.hidden = true;
     document.body.classList.remove('cw-lock');
     document.removeEventListener('keydown', onKeydown);
+    // Lift inert before handing focus back: an inert trigger cannot take it.
+    setBackgroundInert(false);
     if (lastFocused && lastFocused.focus) lastFocused.focus();
     lastFocused = null;
   }

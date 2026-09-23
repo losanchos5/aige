@@ -1,10 +1,10 @@
 /* Learning-path behaviour, loaded from a same-origin file so the CSP
    script-src 'self' holds. Tracks per-node progress in localStorage, drives the
    stage/overall meters, opens a focus-trapped modal drawer per node (Esc/scrim
-   close, focus restored), and precomputes the cross-stage prerequisite edges
-   >=840px — kept hidden and revealed only for the node under the pointer/focus
-   or open in the drawer. No-JS falls back to the native <details> bodies and
-   the CSS spine. */
+   close, the page behind inert while open, focus restored), and precomputes
+   the cross-stage prerequisite edges >=840px — kept hidden and revealed only
+   for the node under the pointer/focus or open in the drawer. No-JS falls back
+   to the native <details> bodies and the CSS spine. */
 (function () {
   'use strict';
 
@@ -136,6 +136,28 @@
       first.focus();
     }
   }
+  // The page behind the open drawer goes inert (TC-15): aria-modal alone does
+  // not keep a screen reader's virtual cursor inside the dialog. Every sibling
+  // along the drawer's ancestor chain up to <body> (header, footer, the rest of
+  // <main>) is marked inert while it is open. The scrim stays live (a click on
+  // it closes), <dialog>s are skipped (the search dialog can still open over
+  // the drawer), and anything already inert is left as it was.
+  var inertEls = [];
+  function setBackgroundInert(on) {
+    var i;
+    for (i = 0; i < inertEls.length; i++) inertEls[i].removeAttribute('inert');
+    inertEls = [];
+    if (!on || !drawer) return;
+    for (var node = drawer; node !== document.body && node.parentElement; node = node.parentElement) {
+      var parent = node.parentElement;
+      for (var el = parent.firstElementChild; el; el = el.nextElementSibling) {
+        if (el === node || el === scrim || el.hasAttribute('inert')) continue;
+        if (/^(SCRIPT|STYLE|TEMPLATE|DIALOG)$/.test(el.tagName)) continue;
+        el.setAttribute('inert', '');
+        inertEls.push(el);
+      }
+    }
+  }
   // Open motion. With the bundled runtime (window.aigeMotion, from
   // src/scripts/motion-ui.ts) aigeMotion.openPanel() springs the panel in from
   // its off-canvas position, then the body's blocks follow with a short
@@ -203,6 +225,7 @@
     drawer.hidden = false;
     if (scrim) scrim.hidden = false;
     document.body.classList.add('path-lock');
+    setBackgroundInert(true);
     var opener = li.querySelector('[data-node-open]');
     if (opener) opener.setAttribute('aria-expanded', 'true');
     showDrawer();
@@ -224,6 +247,8 @@
       var opener = li && li.querySelector('[data-node-open]');
       if (opener) opener.setAttribute('aria-expanded', 'false');
     }
+    // Lift inert before handing focus back: an inert trigger cannot take it.
+    setBackgroundInert(false);
     if (lastFocused && lastFocused.focus) lastFocused.focus();
     lastFocused = null;
     currentId = null;

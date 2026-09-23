@@ -105,9 +105,15 @@ const jsonLd = [
             <h3>{topic.name}</h3>
             <p>{topic.summary}</p>
             {topic.layerN && topic.layerN.length > 0 && (
-              <span class="ticks" role="img" aria-label={`Layers ${topic.layerN.join(', ')}`}>
+              <span
+                class="ticks ticks--coded"
+                role="img"
+                aria-label={`Layers ${topic.layerN.join(', ')}`}
+              >
                 {topic.layerN.map((n) => (
-                  <span class="tk" data-l={n} aria-hidden="true" />
+                  <span class="tk-key">
+                    <span class="tk" data-l={n} aria-hidden="true" />L{n}
+                  </span>
                 ))}
               </span>
             )}
