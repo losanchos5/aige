@@ -4,6 +4,8 @@
  * that exist), terms grouped by letter under `id` anchors, and `<dl>` semantics.
  * Each "ch. NN" cross-reference links to the chapter that develops the term.
  * The term block carries `data-pagefind-body` so entries are searchable.
+ * public/glossary-index.js marks the letter being read with aria-current="true"
+ * as the page scrolls; with JS off the jump bar is plain in-page links.
  */
 import type { GlossaryEntry } from '../lib/glossary';
 import { termId } from '../lib/glossary';
@@ -57,3 +59,5 @@ const chapterHref = (ref: string): string => {
     ))
   }
 </div>
+
+<script is:inline defer src="/glossary-index.js"></script>

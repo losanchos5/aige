@@ -178,6 +178,18 @@
             close(trigger);
           }, 200);
         });
+        // A click or Escape while the hover-intent timer is pending must not
+        // reopen the panel after the user has already decided.
+        function cancelPendingOpen() {
+          if (openTimer) {
+            clearTimeout(openTimer);
+            openTimer = null;
+          }
+        }
+        trigger.addEventListener('click', cancelPendingOpen);
+        group.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' || e.key === 'Esc') cancelPendingOpen();
+        });
       });
     }
 

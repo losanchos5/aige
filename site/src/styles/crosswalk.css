@@ -142,10 +142,12 @@
 }
 
 /* ---- Chips ---------------------------------------------------------------- */
-/* Coloured by the framework's type, mirroring .type-tag: ink text on a pale
-   fill. Related refs lose the fill and take a dashed border; unverified refs
-   carry a dotted underline and a visible "?" (never dimmed — opacity would
-   drop contrast below AA). */
+/* Coloured by the framework's type with the .type-tag key in resources.css
+   (law → L1 · code → L2 · controls → L3 · standard → L4 · framework → L5): the
+   layer's --lN fill under its --lN-ink text, border-less (a transparent border
+   keeps every chip the same size). Related refs lose the fill and take a dashed
+   border in the chip's ink; unverified refs carry a dotted underline and a
+   visible "?" (never dimmed — opacity would drop contrast below AA). */
 .cw-chip {
   display: inline-flex;
   align-items: center;
@@ -161,15 +163,17 @@
   white-space: nowrap;
 }
 
-.cw-chip[data-type='law'] { color: var(--l1-ink); border-color: color-mix(in srgb, var(--l1-ink) 40%, transparent); background: color-mix(in srgb, var(--l1) 45%, var(--bg)); }
-.cw-chip[data-type='code'] { color: var(--l2-ink); border-color: color-mix(in srgb, var(--l2-ink) 40%, transparent); background: color-mix(in srgb, var(--l2) 45%, var(--bg)); }
-.cw-chip[data-type='standard'] { color: var(--l4-ink); border-color: color-mix(in srgb, var(--l4-ink) 40%, transparent); background: color-mix(in srgb, var(--l4) 45%, var(--bg)); }
-.cw-chip[data-type='framework'] { color: var(--l5-ink); border-color: color-mix(in srgb, var(--l5-ink) 40%, transparent); background: color-mix(in srgb, var(--l5) 45%, var(--bg)); }
-.cw-chip[data-type='controls'] { color: var(--l3-ink); border-color: color-mix(in srgb, var(--l3-ink) 40%, transparent); background: color-mix(in srgb, var(--l3) 45%, var(--bg)); }
+.cw-chip[data-type] { border-color: transparent; }
+.cw-chip[data-type='law'] { background: var(--l1); color: var(--l1-ink); }
+.cw-chip[data-type='code'] { background: var(--l2); color: var(--l2-ink); }
+.cw-chip[data-type='controls'] { background: var(--l3); color: var(--l3-ink); }
+.cw-chip[data-type='standard'] { background: var(--l4); color: var(--l4-ink); }
+.cw-chip[data-type='framework'] { background: var(--l5); color: var(--l5-ink); }
 
-/* Related: dashed outline, no fill (keeps the type-keyed border colour). */
+/* Related: dashed outline in the chip's own ink, no fill. */
 .cw-chip.is-related {
   background: transparent;
+  border-color: currentColor;
   border-style: dashed;
 }
 
@@ -297,6 +301,9 @@
   }
 }
 
+/* Baseline slide. Once the motion runtime has loaded, crosswalk.js springs the
+   panel in instead and staggers the [data-drawer-body] children (transform
+   only); reduced motion gets neither. */
 @media (prefers-reduced-motion: no-preference) {
   .cw-drawer {
     transform: translateX(100%);

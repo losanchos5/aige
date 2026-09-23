@@ -71,6 +71,9 @@
     }
   }
 
+  /* Baseline slide. Once the motion runtime has loaded, path.js springs the
+     panel in instead and staggers the [data-drawer-body] blocks (transform
+     only); reduced motion gets neither. */
   @media (prefers-reduced-motion: no-preference) {
     .path-drawer {
       transform: translateX(100%);

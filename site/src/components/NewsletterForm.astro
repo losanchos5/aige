@@ -39,6 +39,8 @@ const { action } = site.newsletter;
 }
 
 <style>
+  /* Vertical rhythm on the spacing scale: label → field row --s-2 (the label
+     belongs to the input), row → note --s-3, wrapped input/button --s-3. */
   .newsletter {
     max-width: 32rem;
   }
@@ -73,6 +75,11 @@ const { action } = site.newsletter;
 
   .nl-input:focus-visible {
     border-color: var(--ink-2);
+  }
+
+  /* One ring for both controls; beats the global .btn:focus-visible ink ring. */
+  .nl-input:focus-visible,
+  .nl-submit:focus-visible {
     outline: 2px solid var(--l1-ink);
     outline-offset: 2px;
   }
@@ -81,9 +88,11 @@ const { action } = site.newsletter;
     flex: 0 0 auto;
   }
 
+  /* Helper text in --ink-2 (colour, never opacity): --muted sits at ~4.8:1 on
+     --bg and gives nothing to spare on a tinted surface. */
   .nl-note {
-    margin-top: var(--s-3);
-    font-size: 0.875rem;
-    color: var(--muted);
+    margin: var(--s-3) 0 0;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
   }
 </style>

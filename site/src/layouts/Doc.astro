@@ -108,6 +108,10 @@ const headerLayers = ['l1', 'l2', 'l3', 'l4', 'l5'];
 const headerLayer = statsChapter
   ? headerLayers[statsChapter.order % headerLayers.length]
   : undefined;
+// The same layer's ink colours the reading chrome (prose.css reads it for the
+// h2 dash). Set on the layout root so the prose and both rails inherit it; pages
+// without a layer leave it unset and the consumers fall back to --l1-ink.
+const chapterInk = headerLayer ? `--chapter-ink: var(--${headerLayer}-ink)` : undefined;
 if (statsChapter) {
   try {
     const markdown = readSource(`bok/${statsChapter.id}.md`);
@@ -131,7 +135,7 @@ if (statsChapter) {
 >
   <div class="doc-progress" data-doc-progress aria-hidden="true"></div>
 
-  <div class="doc container" data-mode={mode}>
+  <div class="doc container" data-mode={mode} style={chapterInk}>
     {
       withSidebar && (
         <div class="doc-drawerbar">

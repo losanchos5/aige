@@ -1,6 +1,8 @@
 ---
 // Toc: on-this-page navigation built from the rendered headings (H2/H3). Sticky
-// on wide viewports; ui-doc.js adds aria-current to the section in view.
+// on wide viewports; ui-doc.js adds aria-current to the section in view and
+// .is-past to every entry before it, so each entry reads as current, read or
+// pending — by colour only, never opacity.
 import type { MarkdownHeading } from 'astro';
 
 interface Props {
@@ -38,12 +40,13 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
     font-size: 0.875rem;
   }
 
+  /* Same kicker register as the chapter rail's section label (SidebarNav). */
   .toc-label {
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.08em;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--ink-2);
     margin-bottom: var(--s-3);
   }
 
@@ -110,17 +113,20 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
     font-size: 0.8125rem;
   }
 
-  .toc a:hover {
-    color: var(--ink);
-  }
-
-  /* Entries scrolled past fade back to muted; the active one takes the ink. */
+  /* Three reading states, by colour only (never opacity) and each ≥ 4.5:1 on the
+     page background in both themes: pending entries (the default above) stay
+     --muted, sections already read step up to --ink-2, and the current one takes
+     the full ink plus weight, with the sliding marker beside it. */
   .toc a.is-past {
-    color: var(--muted);
+    color: var(--ink-2);
   }
 
-  .toc a[aria-current='true'] {
+  .toc a:is([aria-current='true'], [aria-current='location']) {
     color: var(--ink);
     font-weight: 600;
+  }
+
+  .toc a:hover {
+    color: var(--ink);
   }
 </style>

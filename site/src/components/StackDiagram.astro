@@ -5,7 +5,8 @@
  * `static`  — a large, RegisterMark-style graphic: five inline-SVG bars, each
  *   filled with its layer pastel and hairline-outlined, labelled with the mono
  *   index and layer name. A subtle, staggered draw-in plays on load (CSS only,
- *   reduced-motion safe). Used as the hero graphic.
+ *   reduced-motion safe). On /stack, public/stack.js swaps that draw-in for a
+ *   scroll-triggered stagger (see `[data-layer-bars]` below).
  *
  * `interactive` — five register rows (index, name, tagline, artefact chips).
  *   Hovering or focusing a row tints its index cell with the layer pastel and,
@@ -67,6 +68,7 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
       role="img"
       aria-label="The five-layer AI governance engineering stack, from Govern-as-Code to Assurance."
       preserveAspectRatio="xMidYMid meet"
+      data-layer-bars
       {...rest}
     >
       {layers.map((layer, i) => (
@@ -194,6 +196,24 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
         opacity: 1;
         transform: translateX(0);
       }
+    }
+
+    /* Scroll-triggered stagger (/stack). stack.js adds .is-staggered once
+       window.aigeMotion is ready, motion is allowed and the diagram sits
+       outside the first viewport: the on-load draw-in is switched off and
+       .is-parked holds each bar 16px low until the diagram scrolls into view,
+       when motion lifts the five bars in order and drops .is-parked. Transform
+       only, on the bars themselves: the diagram lives inside .story-pin, so no
+       ancestor of the pin is ever transformed. No-JS and reduced-motion
+       readers never get either class and see the finished diagram. */
+    .diagram-static.is-staggered .bar {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+
+    .diagram-static.is-staggered.is-parked .bar {
+      transform: translateY(16px);
     }
   }
 

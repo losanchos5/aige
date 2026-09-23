@@ -1,51 +1,61 @@
 ---
 import Base from '../layouts/Base.astro';
+import Section from '../components/Section.astro';
 import Kicker from '../components/Kicker.astro';
 import VerdictStamp from '../components/VerdictStamp.astro';
 ---
 
 <Base title="Verdict: BLOCK" description="This route is not registered." noindex>
-  <section class="section container notfound">
-    <Kicker swatch="var(--l3)">Error 404</Kicker>
-    <h1 class="display heading">
-      Verdict: <VerdictStamp verdict="block" />
-    </h1>
-    <p class="lede">Route not registered.</p>
-    <div class="cta">
-      <a class="btn btn-primary" href="/">Home</a>
-      <a class="btn btn-secondary" href="/bok">Body of Knowledge</a>
+  {/* Section's own head renders an H2; the 404 needs the page H1, so the head is
+      slotted here with the shared .sec-head classes instead of the title prop. */}
+  <Section tone="mesh" class="notfound">
+    <div class="sec-head sec-head--xl nf-head">
+      <Kicker swatch="var(--l3)">Error 404</Kicker>
+      <h1 class="sec-title display nf-title">
+        Verdict: <VerdictStamp verdict="block" />
+      </h1>
+      <p class="sec-lede lede nf-lede">Route not registered.</p>
     </div>
-  </section>
+    <div class="nf-cta">
+      <a class="btn btn-primary btn-glow" href="/">Back to home</a>
+      <a class="btn btn-secondary" href="/bok">Body of Knowledge</a>
+      <a class="btn btn-secondary" href="/resources">Resources</a>
+    </div>
+  </Section>
 
   <style>
-    .notfound {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--s-4);
-      min-height: 52vh;
-      justify-content: center;
+    /* The <section> is rendered by Section.astro, so it takes a global selector;
+       the class is unique to this page. Grid + align-content centres the
+       container vertically while it keeps its full width. */
+    :global(.sec.notfound) {
+      display: grid;
+      align-content: center;
+      min-height: 60vh;
     }
 
-    .heading {
+    /* Over the mesh every text run is --ink: the glows are pastel in light and
+       ink-tinted in dark, so the dimmer tokens are not guaranteed 4.5:1 across
+       the whole gradient. Re-scoping --muted carries that to the Kicker label. */
+    .nf-head {
+      --muted: var(--ink);
+      color: var(--ink);
+    }
+
+    .nf-title {
       display: flex;
       align-items: center;
-      gap: var(--s-3);
       flex-wrap: wrap;
-      font-size: var(--fs-h1);
-      margin: 0;
+      gap: var(--s-3);
     }
 
-    .lede {
-      margin: 0;
-      color: var(--ink-2);
+    .nf-lede {
+      color: var(--ink);
     }
 
-    .cta {
+    .nf-cta {
       display: flex;
       flex-wrap: wrap;
       gap: var(--s-3);
-      margin-top: var(--s-2);
     }
   </style>
 </Base>

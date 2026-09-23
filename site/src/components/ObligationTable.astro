@@ -105,7 +105,13 @@ const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}
               value={f.value}
               checked={i === 0}
             />
-            <label class="ob-chip" for={f.id}>{f.label}</label>
+            <label
+              class="ob-chip"
+              for={f.id}
+              data-l={f.value === 'all' ? undefined : f.value}
+            >
+              {f.label}
+            </label>
           </span>
         ))
       }

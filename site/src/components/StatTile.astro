@@ -90,17 +90,13 @@ const countup = match
 
   .source {
     font-size: var(--fs-small);
-    color: var(--muted);
+    /* --ink-2, not --muted: the tile also sits on mesh and tinted bands, where
+       --muted can drop below AA. Colour only, never opacity. */
+    color: var(--ink-2);
     text-wrap: pretty;
   }
 
   a.tile:hover {
     border-color: var(--ink-2);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    a.tile {
-      transition: border-color var(--dur) var(--ease);
-    }
   }
 </style>

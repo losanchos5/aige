@@ -121,6 +121,13 @@ if (updated) metaBits.push({ text: site.license });
     background: var(--ch-tint);
   }
 
+  /* From tablet up the band gets even padding on all four sides. */
+  @media (min-width: 840px) {
+    .ch-band {
+      padding: var(--s-6);
+    }
+  }
+
   /* Break out to the reading well, exactly like .prose > .glance / .diagram: the
      prose stays at 72ch but .doc-main is a container, so the band widens to the
      whole well. Off a container the cq units resolve to the column and nothing
@@ -207,13 +214,14 @@ if (updated) metaBits.push({ text: site.license });
   }
 
   .ch-kicker-num {
-    padding: 2px var(--s-2);
+    padding: var(--s-1) var(--s-2);
     border-radius: var(--r-sm);
     background: var(--ch-chip-bg);
     color: var(--ch-chip-ink);
     font-family: var(--font-mono);
     font-size: var(--fs-label);
     letter-spacing: 0.04em;
+    line-height: 1;
   }
 
   .chapter-header h1 {

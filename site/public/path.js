@@ -136,6 +136,34 @@
       first.focus();
     }
   }
+  // Open motion. With the bundled runtime (window.aigeMotion, from
+  // src/scripts/motion-ui.ts) aigeMotion.openPanel() springs the panel in from
+  // its off-canvas position, then the body's blocks follow with a short
+  // translateY stagger: transform only, never opacity. The body holds one cloned
+  // .pn-body, so its blocks (the summary and each section) are the staggered
+  // items. Under reduced motion the final state stands at once. If the runtime
+  // has not loaded (or never does), the CSS transition on .is-open is the
+  // baseline.
+  function staggerItems() {
+    if (!bodyEl) return [];
+    var items = bodyEl.children;
+    if (items.length === 1 && items[0].children.length > 1) items = items[0].children;
+    return Array.prototype.slice.call(items);
+  }
+  function showDrawer() {
+    var m = window.aigeMotion;
+    if (!m) {
+      requestAnimationFrame(function () {
+        drawer.classList.add('is-open');
+      });
+      return;
+    }
+    // Opened straight from display:none, so .is-open lands without a CSS
+    // transition; the spring owns the entrance.
+    drawer.classList.add('is-open');
+    m.openPanel(drawer, staggerItems());
+  }
+
   function syncStateButtons() {
     var s = currentId ? state[currentId] : '';
     for (var i = 0; i < stateBtns.length; i++) {
@@ -177,9 +205,7 @@
     document.body.classList.add('path-lock');
     var opener = li.querySelector('[data-node-open]');
     if (opener) opener.setAttribute('aria-expanded', 'true');
-    requestAnimationFrame(function () {
-      drawer.classList.add('is-open');
-    });
+    showDrawer();
     var closeBtn = drawer.querySelector('[data-path-close]');
     if (closeBtn) closeBtn.focus();
     document.addEventListener('keydown', onKeydown);

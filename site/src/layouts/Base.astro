@@ -142,5 +142,11 @@ const umamiSrc = 'https://admin.stocktcg.net/script.js';
 
     <!-- Progressive enhancement: theme toggle, reveal-on-scroll, menu. -->
     <script is:inline defer src="/ui.js"></script>
+
+    <!-- Motion API (window.aigeMotion): bundled by Astro into an external
+         same-origin module under /_astro/, so the CSP script-src 'self' holds. -->
+    <script>
+      import '../scripts/motion-ui.ts';
+    </script>
   </body>
 </html>

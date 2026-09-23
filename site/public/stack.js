@@ -72,3 +72,71 @@
   var initial = root.querySelector('[data-band].is-active');
   activate(initial ? initial.getAttribute('data-layer') : '1');
 })();
+
+/* /stack layer diagram: the five bars of the static StackDiagram (the pinned
+   column of the story) lift in, staggered, when the diagram scrolls into view.
+   Drives window.aigeMotion (the bundled motion-ui module), waiting for its
+   aige:motion-ready event when this file runs first. Progressive enhancement:
+   the 16px offset comes from a class added only once motion is ready, so no-JS
+   readers, reduced-motion readers and a motion runtime that never loads all keep
+   the finished diagram. A diagram already on screen is left at rest (motion only
+   below the fold). Only the bars move; the pin and its ancestors never get a
+   transform, so position: sticky holds. */
+(function () {
+  'use strict';
+
+  var marks = Array.prototype.slice.call(document.querySelectorAll('[data-layer-bars]'));
+  if (!marks.length) return;
+
+  function arm(m) {
+    if (!m || m.reduce) return;
+
+    marks.forEach(function (mark) {
+      var bars = mark.querySelectorAll('.bar');
+      if (!bars.length) return;
+
+      var box = mark.getBoundingClientRect();
+      if (box.top < window.innerHeight && box.bottom > 0) return;
+
+      // Settle on the resting state: drop the offset class and the inline
+      // transform motion commits when it finishes (or never starts).
+      function settle() {
+        mark.classList.remove('is-parked');
+        Array.prototype.forEach.call(bars, function (bar) {
+          bar.style.removeProperty('transform');
+        });
+      }
+
+      mark.classList.add('is-staggered', 'is-parked');
+      m.inView(
+        mark,
+        function () {
+          // If the animation cannot start, settle at once so the bars never
+          // stay parked 16px low.
+          try {
+            m.animate(
+              bars,
+              { transform: ['translateY(16px)', 'translateY(0)'] },
+              { delay: m.stagger(0.07), duration: 0.5, ease: [0.2, 0.7, 0.2, 1] }
+            ).then(settle, settle);
+          } catch (e) {
+            settle();
+          }
+        },
+        { amount: 0.3 }
+      );
+    });
+  }
+
+  if (window.aigeMotion) {
+    arm(window.aigeMotion);
+  } else {
+    document.addEventListener(
+      'aige:motion-ready',
+      function () {
+        arm(window.aigeMotion);
+      },
+      { once: true }
+    );
+  }
+})();

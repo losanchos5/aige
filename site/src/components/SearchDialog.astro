@@ -36,6 +36,11 @@
   .search-dialog {
     width: min(640px, calc(100vw - 2 * var(--s-4)));
     max-height: 70vh;
+    /* The global `* { margin: 0 }` reset (base.css) drops the UA `margin: auto`
+       that places a modal dialog, pinning it to the top-left corner. Centre it
+       horizontally and anchor it near the top so the input stays put while the
+       result list grows below it. */
+    margin: 12vh auto auto;
     padding: 0;
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
@@ -48,6 +53,47 @@
   .search-dialog::backdrop {
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(2px);
+  }
+
+  /* Entry/exit: the panel rises and settles (transform only, its text is never
+     faded); only the text-free scrim fades. @starting-style gives the
+     first-frame state on showModal(); allow-discrete keeps display/overlay
+     alive through the exit so close() animates too. No motion: instant. */
+  @media (prefers-reduced-motion: no-preference) {
+    .search-dialog,
+    .search-dialog::backdrop {
+      transition-duration: var(--dur);
+      transition-timing-function: var(--ease);
+      transition-behavior: allow-discrete;
+    }
+
+    .search-dialog {
+      transition-property: transform, display, overlay;
+      transform: translateY(8px) scale(0.98);
+    }
+
+    .search-dialog[open] {
+      transform: none;
+    }
+
+    .search-dialog::backdrop {
+      transition-property: opacity, display, overlay;
+      opacity: 0;
+    }
+
+    .search-dialog[open]::backdrop {
+      opacity: 1;
+    }
+
+    @starting-style {
+      .search-dialog[open] {
+        transform: translateY(8px) scale(0.98);
+      }
+
+      .search-dialog[open]::backdrop {
+        opacity: 0;
+      }
+    }
   }
 
   .search-form {

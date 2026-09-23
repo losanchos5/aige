@@ -344,6 +344,18 @@ const resources = [
     margin-top: var(--s-2);
   }
 
+  /* Weight contrast: the primary is the glowing fill (.btn-glow); the
+     secondary steps down to a quiet outline — hairline --line border on a
+     transparent ground, --ink-2 on hover — at the same .btn height. */
+  .hero-cta .btn-secondary {
+    border-color: var(--line);
+    background: transparent;
+  }
+
+  .hero-cta .btn-secondary:hover {
+    border-color: var(--ink-2);
+  }
+
   /* position: relative makes .hero-art the containing block for the diagram's
      hover note (rule in diagrams.css under .hero--loop). */
   .hero-art {

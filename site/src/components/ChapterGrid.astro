@@ -1,8 +1,12 @@
 ---
 /**
- * ChapterGrid — the Body of Knowledge as a grid of bordered chapter cards, each
+ * ChapterGrid — the Body of Knowledge as a grid of luminous chapter cards, each
  * with a mono index, title, one-line summary and a trailing arrow. Links to the
- * chapter under /bok/. Flat, 1px border, matte; hover lifts the border only.
+ * chapter under /bok/. Laid out on the shared .bento grid (effects.css), held at
+ * three columns on wide screens so titles keep a readable measure; the first
+ * chapter is the wide entry tile, so eleven cards fill every row (12 cells).
+ * Each <li> carries --i for a .reveal-stagger class passed in; the lift stays
+ * on the link because the reveal animation owns the <li>'s transform.
  */
 import type { Chapter } from '../data/chapters';
 
@@ -16,10 +20,10 @@ const pad = (n: number) => String(n).padStart(2, '0');
 const strip = (title: string) => title.replace(/^\d+\.\s*/, '');
 ---
 
-<ol class:list={['grid', className]}>
+<ol class:list={['grid', 'bento', className]}>
   {
     chapters.map((chapter, i) => (
-      <li style={`--i:${i}`}>
+      <li class:list={[i === 0 && 'bento-2x']} style={`--i:${i}`}>
         <a class="card card-lum lift" href={`/bok/${chapter.slug}`} data-testid="chapter-card">
           <span class="idx">{pad(chapter.order)}</span>
           <span class="title">{strip(chapter.title)}</span>
@@ -32,19 +36,12 @@ const strip = (title: string) => title.replace(/^\d+\.\s*/, '');
 </ol>
 
 <style>
+  /* Gap and the one/two-column steps come from .bento; this resets the list
+     and holds three columns (not bento's four) from 960px. */
   .grid {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    gap: var(--s-4);
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 600px) {
-    .grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
   }
 
   @media (min-width: 960px) {
@@ -113,11 +110,5 @@ const strip = (title: string) => title.replace(/^\d+\.\s*/, '');
 
   a.card:hover .arrow {
     color: var(--ink);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    a.card {
-      transition: border-color var(--dur) var(--ease);
-    }
   }
 </style>

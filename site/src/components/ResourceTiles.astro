@@ -1,7 +1,10 @@
 ---
 /**
- * ResourceTiles — a row of bordered tiles linking to the resource indexes, each
- * with a title, a one-line description and a trailing arrow. Flat, 1px border.
+ * ResourceTiles — a row of luminous tiles linking to the resource indexes, each
+ * with a title, a one-line description and a trailing arrow. Laid out on the
+ * shared .bento grid (effects.css); each <li> carries --i so a .reveal-stagger
+ * class passed in cascades the entrance, while the lift stays on the link (the
+ * reveal animation owns the <li>'s transform).
  */
 export interface ResourceTile {
   label: string;
@@ -17,7 +20,7 @@ interface Props {
 const { tiles, class: className } = Astro.props;
 ---
 
-<ul class:list={['tiles', className]}>
+<ul class:list={['tiles', 'bento', className]}>
   {
     tiles.map((tile, i) => (
       <li style={`--i:${i}`}>
@@ -36,25 +39,11 @@ const { tiles, class: className } = Astro.props;
 </ul>
 
 <style>
+  /* Columns and gap come from .bento; this only resets the list. */
   .tiles {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    gap: var(--s-4);
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 600px) {
-    .tiles {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  }
-
-  @media (min-width: 960px) {
-    .tiles {
-      grid-template-columns: repeat(4, 1fr);
-    }
   }
 
   /* Surface (border, radius, background, shadow) comes from .card-lum in
@@ -98,11 +87,5 @@ const { tiles, class: className } = Astro.props;
 
   a.tile:hover .arrow {
     color: var(--ink);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    a.tile {
-      transition: border-color var(--dur) var(--ease);
-    }
   }
 </style>

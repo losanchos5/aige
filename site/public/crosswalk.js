@@ -58,6 +58,27 @@
     }
   }
 
+  // Open motion, as in public/path.js. With the bundled runtime
+  // (window.aigeMotion, from src/scripts/motion-ui.ts) aigeMotion.openPanel()
+  // springs the panel in from its off-canvas position, then the body's direct
+  // children follow with a short translateY stagger: transform only, never
+  // opacity. Under reduced motion the final state stands at once. If the runtime
+  // has not loaded (or never does), the CSS transition on .is-open is the
+  // baseline.
+  function showDrawer() {
+    var m = window.aigeMotion;
+    if (!m) {
+      requestAnimationFrame(function () {
+        drawer.classList.add('is-open');
+      });
+      return;
+    }
+    // Opened straight from display:none, so .is-open lands without a CSS
+    // transition; the spring owns the entrance.
+    drawer.classList.add('is-open');
+    m.openPanel(drawer, bodyEl ? bodyEl.children : []);
+  }
+
   // The framework ids a column groups, read from that column header's data-fws.
   function colFws(col) {
     if (!grid || !col) return null;
@@ -110,9 +131,7 @@
     drawer.hidden = false;
     if (scrim) scrim.hidden = false;
     document.body.classList.add('cw-lock');
-    requestAnimationFrame(function () {
-      drawer.classList.add('is-open');
-    });
+    showDrawer();
     var closeBtn = drawer.querySelector('[data-cw-close]');
     if (closeBtn) closeBtn.focus();
     document.addEventListener('keydown', onKeydown);
