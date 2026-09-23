@@ -3,9 +3,9 @@ import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import Diagram from '../../components/Diagram.astro';
-import { site } from '../../data/site';
 import { layers, toolsByCategory } from '../../data/stack';
 import { slugify } from '../../lib/md-parse';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
@@ -22,17 +22,19 @@ const layerPattern: Record<number, string> = {
   5: 'Continuous Assurance Telemetry',
 };
 const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}`)}`;
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Tools' }];
 ---
 
 <Base
-  title={`Tools · ${site.name}`}
+  title="Tools"
   description="Reference tool categories for each layer of the AI governance engineering stack, with illustrative examples — the substance, not an endorsement of any brand."
   image="/og/resources.png"
+  jsonLd={breadcrumbJsonLd(crumbs)}
 >
   <PageHero
     variant="res"
     swatch="var(--l4)"
-    crumbs={[{ label: 'Resources', href: '/resources' }, { label: 'Tools' }]}
+    crumbs={crumbs}
     title="Tool categories, by layer."
   >
     <p class="lede" slot="lede">

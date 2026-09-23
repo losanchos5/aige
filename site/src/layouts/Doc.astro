@@ -6,9 +6,9 @@
 // The search dialog now lives in Base, so it is available on every page.
 import type { MarkdownHeading } from 'astro';
 import Base from './Base.astro';
-import { site } from '../data/site';
 import Breadcrumb from '../components/Breadcrumb.astro';
-import type { Crumb } from '../lib/breadcrumbs';
+import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
+import type { JsonLdInput } from '../lib/jsonld';
 import ChapterHeader from '../components/ChapterHeader.astro';
 import SidebarNav from '../components/SidebarNav.astro';
 import Toc from '../components/Toc.astro';
@@ -27,12 +27,16 @@ interface Adjacent {
 interface Props {
   title: string;
   summary?: string;
+  /** Meta description; defaults to `summary`. A chapter passes the manifest's
+      trimmed summary here, because its visible lede is the full blockquote and
+      runs past the ~160 characters a search snippet shows. */
+  description?: string;
   kicker?: string;
   /** Breadcrumb trail rendered above the chapter header (parent crumbs only;
       Home is prepended in the JSON-LD). */
   crumbs?: Crumb[];
-  /** Emit the BreadcrumbList JSON-LD for `crumbs` (default true). Pages whose
-      own graph already carries a BreadcrumbList pass false to avoid a duplicate. */
+  /** Add the BreadcrumbList for `crumbs` to the page graph (default true).
+      Pages whose own graph already carries one pass false to avoid a duplicate. */
   crumbsJsonLd?: boolean;
   headings?: MarkdownHeading[];
   prev?: Adjacent;
@@ -46,7 +50,7 @@ interface Props {
   activeThesis?: boolean;
   cite?: boolean;
   image?: string;
-  jsonLd?: Record<string, unknown> | unknown[];
+  jsonLd?: JsonLdInput;
   lang?: string;
   locale?: string;
   alternates?: { hreflang: string; href: string }[];
@@ -55,6 +59,7 @@ interface Props {
 const {
   title,
   summary,
+  description,
   kicker,
   crumbs,
   crumbsJsonLd = true,
@@ -79,7 +84,14 @@ const {
 const withSidebar = sidebar && !wide;
 const withToc = !wide && headings.some((h) => h.depth === 2 || h.depth === 3);
 const mode = wide ? 'wide' : withSidebar ? 'chapter' : 'doc';
-const pageTitle = `${title} · ${site.name}`;
+
+// The page's own nodes plus, unless the page already carries one, the
+// BreadcrumbList for the visible trail. Seo.astro merges these into the single
+// site graph in the head, so <Breadcrumb> never emits a script of its own.
+const graphNodes = [
+  ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []),
+  ...(crumbs && crumbsJsonLd ? [breadcrumbJsonLd(crumbs)] : []),
+];
 
 // Reading estimate for BoK chapters, from the raw Markdown (reading.ts). Only
 // computed when the slug is a known chapter; other Doc pages get no estimate.
@@ -104,10 +116,10 @@ if (statsChapter) {
 ---
 
 <Base
-  title={pageTitle}
-  description={summary}
+  title={title}
+  description={description ?? summary}
   image={image}
-  jsonLd={jsonLd}
+  jsonLd={graphNodes.length ? graphNodes : undefined}
   lang={lang}
   locale={locale}
   alternates={alternates}
@@ -150,7 +162,6 @@ if (statsChapter) {
               <Breadcrumb
                 items={crumbs}
                 swatch={headerLayer ? `var(--${headerLayer})` : undefined}
-                jsonLd={crumbsJsonLd}
               />
             </div>
           )
@@ -181,6 +192,7 @@ if (statsChapter) {
             words={words}
             minutes={minutes}
             layer={headerLayer}
+            lang={lang}
           />
           <slot />
         </article>

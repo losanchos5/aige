@@ -16,9 +16,20 @@ interface Props {
   minutes?: number;
   /** Layer key (l1..l5) that tints the band; omit for a neutral band. */
   layer?: string;
+  /** Page language, passed down by Doc; drives the meta line's labels. */
+  lang?: string;
 }
 
-const { kicker, title, summary, updated, words, minutes, layer } = Astro.props;
+const { kicker, title, summary, updated, words, minutes, layer, lang = 'en' } = Astro.props;
+
+// The meta line is the only copy this component writes itself, so it is the only
+// thing that has to follow the page language (/es/thesis). Anything not listed
+// here falls back to English.
+const LABELS: Record<string, { updated: string; read: string; words: string; locale: string }> = {
+  en: { updated: 'Updated', read: 'min read', words: 'words', locale: 'en-US' },
+  es: { updated: 'Actualizado', read: 'min de lectura', words: 'palabras', locale: 'es-ES' },
+};
+const labels = LABELS[lang] ?? LABELS.en;
 
 // Split the kicker on the middot: the leading part names the section, any
 // trailing part becomes a mono chip. Meta pages ("About") have only one part
@@ -34,8 +45,12 @@ const kickerNum = kickerParts.length > 1 ? kickerParts.slice(1).join(' · ') : u
 
 // One meta line, joined into list items: version/date, reading estimate, licence.
 const metaBits: string[] = [];
-if (updated) metaBits.push(`v${site.bokVersion}`, `Updated ${updated}`);
-if (minutes && words) metaBits.push(`${minutes} min read`, `${words.toLocaleString('en-US')} words`);
+if (updated) metaBits.push(`v${site.bokVersion}`, `${labels.updated} ${updated}`);
+if (minutes && words)
+  metaBits.push(
+    `${minutes} ${labels.read}`,
+    `${words.toLocaleString(labels.locale)} ${labels.words}`,
+  );
 if (updated) metaBits.push(site.license);
 ---
 

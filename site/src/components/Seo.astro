@@ -5,6 +5,7 @@
  * is produced by a separate build block; this only references it.
  */
 import { site } from '../data/site';
+import { siteGraph, type JsonLdInput } from '../lib/jsonld';
 
 interface Props {
   title: string;
@@ -13,10 +14,13 @@ interface Props {
   image?: string;
   /** Open Graph locale, e.g. `en_US` (default) or `es_ES`. */
   locale?: string;
-  /** JSON-LD structured data, emitted as a single ld+json script. */
-  jsonLd?: Record<string, unknown> | unknown[];
+  /** JSON-LD structured data, merged into the site-wide @graph. */
+  jsonLd?: JsonLdInput;
   /** hreflang alternates, e.g. Spanish translations of the page. */
   alternates?: { hreflang: string; href: string }[];
+  /** Append ` · {site.name}` to the document title (default true). The home
+      page and any page whose title already names the site pass false. */
+  titleSuffix?: boolean;
 }
 
 const {
@@ -29,34 +33,56 @@ const {
   locale = 'en_US',
   jsonLd,
   alternates,
+  titleSuffix = true,
 } = Astro.props;
 
+// A search snippet is capped at ~160 characters. Most descriptions are written
+// to that budget already; a chapter's lede is written for reading, so it is
+// trimmed here on a word boundary with the same `…` the chapter manifest uses
+// (see data/chapters.ts, "summaries … trimmed to <=160 chars").
+const MAX_DESCRIPTION = 160;
+function snippet(text: string): string {
+  const clean = text.replace(/\s+/g, ' ').trim();
+  if (clean.length <= MAX_DESCRIPTION) return clean;
+  const cut = clean.slice(0, MAX_DESCRIPTION - 1);
+  const lastSpace = cut.lastIndexOf(' ');
+  return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:.]+$/, '')}…`;
+}
+
+const metaDescription = snippet(description);
 const ogImage = new URL(image, site.url).href;
+// The one place the site name is appended: layouts and pages pass the bare page
+// title, so no title can carry the suffix twice.
+const pageTitle = titleSuffix ? `${title} · ${site.name}` : title;
+// Exactly one ld+json block per page: Organization + WebSite + the page's nodes.
+const graph = siteGraph(jsonLd);
 ---
 
-<title>{title}</title>
-<meta name="description" content={description} />
+<title>{pageTitle}</title>
+<meta name="description" content={metaDescription} />
 <link rel="canonical" href={canonical} />
 
 {alternates?.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content={site.name} />
-<meta property="og:title" content={title} />
-<meta property="og:description" content={description} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={metaDescription} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
 <meta property="og:locale" content={locale} />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content={title} />
-<meta name="twitter:description" content={description} />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={metaDescription} />
 <meta name="twitter:image" content={ogImage} />
 
 {
-  jsonLd && (
-    /* JSON-LD is a data block, not executable script, so CSP script-src does
-       not apply; `<` is still escaped so page content can never break out. */
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />
-  )
+  /* JSON-LD is a data block, not executable script, so CSP script-src does
+     not apply; `<` is still escaped so page content can never break out. */
 }
+<script
+  is:inline
+  type="application/ld+json"
+  set:html={JSON.stringify(graph).replace(/</g, '\\u003c')}
+/>

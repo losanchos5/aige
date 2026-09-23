@@ -2,7 +2,8 @@
 import Doc from '../../layouts/Doc.astro';
 import Diagram from '../../components/Diagram.astro';
 import { site } from '../../data/site';
-import { gitDate } from '../../lib/reading';
+import { gitCreated, gitDate } from '../../lib/reading';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 // THESIS.es.md sits at the repo root, next to THESIS.md. Imported directly so it
 // goes through the same Astro Markdown pipeline (remark-lead, callouts, citations,
 // diagrams, glossary) that the content collection applies to the English thesis,
@@ -16,6 +17,29 @@ const summary =
   'La gobernanza como un sistema que se construye, se ejecuta y se mide, no un documento que se firma.';
 const updated = gitDate('../THESIS.es.md');
 const signUrl = `${site.github}/blob/main/bok/CONTRIBUTORS.md`;
+
+// Same TechArticle as /thesis, in Spanish: `inLanguage: 'es'`, and a translation
+// of the English original (`translationOfWork`). Dates come from the git history
+// of THESIS.es.md, so the two pages are dated independently.
+const thesisUrl = new URL('/es/thesis', site.url).href;
+const jsonLd = [
+  {
+    '@type': 'TechArticle',
+    '@id': `${thesisUrl}#article`,
+    headline: title,
+    description: summary,
+    url: thesisUrl,
+    inLanguage: 'es',
+    datePublished: gitCreated('../THESIS.es.md'),
+    dateModified: updated,
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    translationOfWork: { '@id': `${new URL('/thesis', site.url).href}#article` },
+    ...(site.license ? { license: site.license } : {}),
+  },
+  ...authorNodes,
+];
 ---
 
 <Doc
@@ -29,6 +53,7 @@ const signUrl = `${site.github}/blob/main/bok/CONTRIBUTORS.md`;
   wide={true}
   activeThesis={true}
   image="/og/thesis.png"
+  jsonLd={jsonLd}
   lang="es"
   locale="es_ES"
   alternates={[

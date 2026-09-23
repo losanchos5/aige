@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
 
+# Plain-text index for LLMs (llmstxt.org): /llms.txt, full corpus at /llms-full.txt
+
 Sitemap: https://aigovernanceengineer.com/sitemap-index.xml

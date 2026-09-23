@@ -1,6 +1,8 @@
 // Lighthouse CI config. Serves the built site with `astro preview` (which knows
-// this project's `format: 'file'` routing over ./dist) and audits the six key
-// pages. Run with `npm run lhci`.
+// this project's `format: 'file'` routing over ./dist) and audits the nine key
+// pages. Run with `npm run lhci`. The `url` list below is also read by
+// tests/seo-basics.spec.ts, which asserts the SEO category's checks in a
+// blocking Playwright suite (the CI lhci step is continue-on-error).
 //
 // Gates: performance >= 0.95, accessibility = 1, best-practices = 1, seo = 1.
 // Desktop preset, so the performance gate reflects the target reading context

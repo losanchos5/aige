@@ -27,6 +27,8 @@ import { definition, values } from '../data/values';
 import { capabilityStatement, workflows, market } from '../data/role';
 import { chaptersOrdered } from '../data/chapters';
 
+// The home title already names the site, so Seo appends no ` · {site.name}`
+// suffix (titleSuffix={false} on <Marketing> below).
 const seoTitle = 'AI Governance Engineer — the discipline, defined';
 const seoDesc =
   'AI governance engineering turns governance into policy-as-code, eval gates and machine-readable evidence you can run, not just read.';
@@ -90,7 +92,7 @@ const resources = [
 ];
 ---
 
-<Marketing title={seoTitle} description={seoDesc} image="/og/default.png">
+<Marketing title={seoTitle} description={seoDesc} image="/og/default.png" titleSuffix={false}>
   <section class="hero section hero--loop">
     <div class="bg-mesh hero-mesh" aria-hidden="true"></div>
     <div class="hero-tex bg-grid bg-fade" aria-hidden="true"></div>
