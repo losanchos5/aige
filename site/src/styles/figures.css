@@ -51,20 +51,6 @@
   gap: var(--s-2);
 }
 
-/* Mono "Figure" chip opening the caption. */
-.figure-fig-chip {
-  align-self: flex-start;
-  width: max-content;
-  padding: 2px var(--s-2);
-  border-radius: var(--r-sm);
-  background: color-mix(in srgb, var(--l1) 45%, var(--bg));
-  color: var(--l1-ink);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
 .figure-fig-title {
   font-weight: 600;
   color: var(--ink);
@@ -125,8 +111,12 @@
   letter-spacing: -0.01em;
 }
 
+/* Mono figure labels keep the face but not the global .mono capitals: several
+   are 30–40 character phrases (audit SL-05), so they read in sentence case. */
 .figc .mono {
   font-family: var(--font-mono);
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .figc .muted {
@@ -271,18 +261,20 @@
   gap: var(--s-3);
 }
 
+/* Reading paths type, on the token scale in steps at least 1.25x apart:
+   --fs-label chips, --fs-body text, --fs-h3 for each reader. */
 .rp-persona {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.0625rem;
+  font-size: var(--fs-h3);
   line-height: 1.2;
   color: var(--ink);
 }
 
 .rp-sub {
   margin: 0;
-  font-size: var(--fs-small);
+  font-size: var(--fs-body);
   color: var(--muted);
   text-wrap: pretty;
 }
@@ -330,16 +322,13 @@
   font-size: var(--fs-label);
   font-weight: 600;
   text-align: center;
+  /* Neutral: a chapter number is not a layer, so no layer colour (SL-06). */
+  background: var(--tint-bg);
+  color: var(--ink-2);
 }
 
-.rp-num.l1 { background: var(--l1); color: var(--l1-ink); }
-.rp-num.l2 { background: var(--l2); color: var(--l2-ink); }
-.rp-num.l3 { background: var(--l3); color: var(--l3-ink); }
-.rp-num.l4 { background: var(--l4); color: var(--l4-ink); }
-.rp-num.l5 { background: var(--l5); color: var(--l5-ink); }
-
 .rp-node-title {
-  font-size: var(--fs-small);
+  font-size: var(--fs-body);
   font-weight: 600;
   line-height: 1.3;
 }

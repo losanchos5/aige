@@ -103,6 +103,27 @@ test('crosswalk key, layer codes and scroll region are visible and named', async
   await expect(firstTicks.locator('.tk-key')).toHaveText(codes);
 });
 
+// SL-06: a layer colour means a stack layer, so the framework-type tags and the
+// crosswalk chips are one neutral chip whatever the type.
+test('framework type tags and crosswalk chips are neutral, one colour for every type', async ({ page }) => {
+  const paints = (sel: string) =>
+    page.evaluate((s) => {
+      const out = new Set<string>();
+      for (const el of document.querySelectorAll(s)) {
+        const cs = getComputedStyle(el);
+        out.add(`${cs.backgroundColor}|${cs.color}`);
+      }
+      return [...out];
+    }, sel);
+
+  await page.goto('/resources/frameworks');
+  expect(await page.locator('.type-tag[data-type]').count()).toBeGreaterThan(1);
+  expect(await paints('.type-tag[data-type]')).toHaveLength(1);
+
+  await page.goto('/resources/crosswalk');
+  expect(await paints('.cw-chip[data-type]:not(.is-related)')).toHaveLength(1);
+});
+
 test('crosswalk CSV and JSON export the data with the notice', async ({ page }) => {
   const notice = 'not a claim of conformity';
 

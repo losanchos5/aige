@@ -164,18 +164,27 @@
   outline-offset: 2px;
 }
 
+/* The index must fit the narrowest phone, text enlarged included: the single
+   track is capped at the container (minmax(0, 1fr)), each cluster may shrink
+   below its content's width, and its summary wraps (the chapter chips drop
+   under the label) instead of summing label + chips + chevron into one
+   unbreakable row. That row made each cluster ~520px wide with text at 200%,
+   so the page scrolled sideways at 320 and 390 (WCAG 1.4.4 / 1.4.10). */
 .clusters {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0;
   border-top: 1px solid var(--line);
 }
 
 .cluster {
+  min-width: 0;
   border-bottom: 1px solid var(--line);
 }
 
 .cluster-summary {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--s-3);
   padding: var(--s-4) 0;
@@ -196,12 +205,14 @@
 }
 
 .cluster-label {
+  min-width: 0;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--fs-h3);
   letter-spacing: var(--tracking-display);
   line-height: 1.15;
   color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
 .cluster-chaps {
@@ -211,15 +222,17 @@
   margin-left: auto;
 }
 
-/* Chapter short titles are mixed case: no label tracking. */
+/* Chapter short titles are mixed case: no label tracking. A chip keeps to one
+   line while its row has room and wraps only when it alone is wider than the
+   row (a phone with text at 200%). */
 .cluster-chip {
+  max-width: 100%;
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   color: var(--muted);
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
   padding: 1px var(--s-2);
-  white-space: nowrap;
 }
 
 /* A rotating chevron replaces the native marker. */

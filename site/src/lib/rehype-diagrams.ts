@@ -91,7 +91,6 @@ function renderFigureFigure(def: FigureDef): string {
     `<figure class="figure figure--infographic" data-figure="${def.id}">` +
     `<div class="figure-canvas">${svg}</div>` +
     `<figcaption class="figure-figcaption">` +
-    `<span class="figure-fig-chip" data-pagefind-ignore>Figure</span>` +
     `<span class="figure-fig-title">${escapeHtml(def.title)}</span>` +
     `<span class="figure-fig-desc">${escapeHtml(def.caption)}</span>` +
     `</figcaption>` +

@@ -217,3 +217,16 @@ test('search results are styled and a single Escape closes the dialog', async ({
   await expect(dialog).toBeHidden();
   await expect(page.locator('#search-input')).toHaveValue('');
 });
+
+// SL-04 / SL-06: the chapter header opens on its H1 (the crumb above already says
+// "Body of Knowledge › 04 · The Stack"), and no chapter header takes a layer
+// colour unless the chapter is about one layer (none is today).
+test('chapter headers carry no eyebrow and stay neutral', async ({ page }) => {
+  for (const chapter of chaptersOrdered) {
+    await page.goto(`/bok/${chapter.slug}`);
+    const band = page.locator('.chapter-header .ch-band');
+    await expect(band).toHaveCount(1);
+    await expect(band.locator('.ch-kicker, .ch-kicker-num')).toHaveCount(0);
+    expect(await band.getAttribute('data-layer')).toBe(chapter.layer ? `l${chapter.layer}` : null);
+  }
+});

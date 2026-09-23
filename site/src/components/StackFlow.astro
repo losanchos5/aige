@@ -238,7 +238,7 @@ const axisBottom = cy(1) - 12;
     <div class="flow-panels">
       {layers.map((layer) => (
         <div class="flow-panel" data-panel={layer.n} hidden={layer.n !== 1}>
-          <p class="fp-eyebrow">
+          <p class="fp-title">
             <span class="fp-sq" aria-hidden="true" style={`background: var(${layer.colorVar})`}></span>
             Layer {pad(layer.n)} · {layer.name}
           </p>
@@ -536,16 +536,17 @@ const axisBottom = cy(1) - 12;
     display: none;
   }
 
-  .fp-eyebrow {
+  /* The panel's title line: its layer square, number and name. Mono in
+     sentence case (the name runs to ~45 characters, audit SL-05), at --ink-2
+     because it heads the panel rather than labelling it. */
+  .fp-title {
     display: flex;
     align-items: center;
     gap: var(--s-2);
     margin: 0;
     font-family: var(--font-mono);
     font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--muted);
+    color: var(--ink-2);
   }
 
   .fp-sq {

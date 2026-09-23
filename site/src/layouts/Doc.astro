@@ -31,7 +31,6 @@ interface Props {
       trimmed summary here, because its visible lede is the full blockquote and
       runs past the ~160 characters a search snippet shows. */
   description?: string;
-  kicker?: string;
   /** Breadcrumb trail rendered above the chapter header (parent crumbs only;
       Home is prepended in the JSON-LD). */
   crumbs?: Crumb[];
@@ -63,7 +62,6 @@ const {
   title,
   summary,
   description,
-  kicker,
   crumbs,
   crumbsJsonLd = true,
   headings = [],
@@ -102,16 +100,15 @@ const graphNodes = [
 let words: number | undefined;
 let minutes: number | undefined;
 const statsChapter = slug ? getChapterBySlug(slug) : undefined;
-// Layer tint for the ChapterHeader band: chapter.order % 5 (the same rotation
-// SidebarNav uses). Thesis / meta pages are not chapters → no layer → neutral.
-const headerLayers = ['l1', 'l2', 'l3', 'l4', 'l5'];
-const headerLayer = statsChapter
-  ? headerLayers[statsChapter.order % headerLayers.length]
-  : undefined;
-// The same layer's ink colours the reading chrome (prose.css reads it for the
-// h2 dash). Set on the layout root so the prose and both rails inherit it; pages
-// without a layer leave it unset and the consumers fall back to --l1-ink.
-const chapterInk = headerLayer ? `--chapter-ink: var(--${headerLayer}-ink)` : undefined;
+// A layer colour means that layer and nothing else (audit SL-06): the
+// ChapterHeader band, the crumb square and the reading chrome take a layer's
+// colour only when the chapter is about one stack layer (chapters.ts `layer`).
+// Every other page — most chapters, the Thesis, the meta pages — stays neutral.
+const headerLayer = statsChapter?.layer ? `l${statsChapter.layer}` : undefined;
+// The ink that colours the reading chrome (prose.css reads it for the h2 dash).
+// Set on the layout root so the prose and both rails inherit it: the layer's ink
+// when there is one, the neutral --ink otherwise.
+const chapterInk = `--chapter-ink: var(--${headerLayer ? `${headerLayer}-ink` : 'ink'})`;
 if (statsChapter) {
   try {
     const markdown = readSource(`bok/${statsChapter.id}.md`);
@@ -199,7 +196,6 @@ if (statsChapter) {
 
         <article class="prose" data-pagefind-body>
           <ChapterHeader
-            kicker={kicker}
             title={title}
             summary={summary}
             updated={updated}

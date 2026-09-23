@@ -1,28 +1,30 @@
 ---
 /**
  * Section — the editorial section shell shared across the landing pages. It
- * renders `<section class="section sec sec--{tone}">` with inert background
- * layers (a gradient mesh and/or a dot/grid texture, all aria-hidden and
- * pointer-events:none via effects.css), an optional head (Kicker + title +
- * lede) and the page content. `tone="dark"` re-scopes the dark token set in
- * effects.css so children render with audited dark contrast.
+ * renders `<section class="section sec sec--{tone}">` with an inert gradient
+ * mesh when `tone="mesh"` (aria-hidden, pointer-events:none via effects.css),
+ * an optional head (title + lede) and the page content. `tone="dark"`
+ * re-scopes the dark token set in effects.css so children render with audited
+ * dark contrast. No eyebrow above the title and no dot/grid texture: the audit
+ * (SL-04, SL-18) retired both.
  *
  * Slots: default (body) and "foot" (a trailing row, e.g. a .sec-link).
  */
-import Kicker from './Kicker.astro';
-
 interface Props {
   /** Background treatment. */
   tone?: 'plain' | 'tint' | 'dark' | 'mesh';
-  /** Overlay texture drawn behind the content. */
+  /** Ignored: the dot/grid texture is gone (SL-18).
+      deprecated: se retira cuando index.astro deje de pasarlos. */
   texture?: 'none' | 'dots' | 'grid';
   /** id for in-page anchors. */
   id?: string;
   /** Extra class(es) on the <section>. */
   class?: string;
-  /** Eyebrow text (rendered through Kicker). */
+  /** Ignored: sections carry no eyebrow (SL-04).
+      deprecated: se retira cuando index.astro deje de pasarlos. */
   kicker?: string;
-  /** CSS colour for the Kicker square, e.g. `var(--l3)`. */
+  /** Ignored, like `kicker`.
+      deprecated: se retira cuando index.astro deje de pasarlos. */
   kickerSwatch?: string;
   /** Section title (H2). */
   title?: string;
@@ -30,7 +32,7 @@ interface Props {
   lede?: string;
   /** Title scale: `md` (H2, default) or `xl` (H1 scale). */
   headSize?: 'md' | 'xl';
-  /** Draw the kicker's trailing hairline and let the head span full width. */
+  /** Let the head span the full width instead of the 62ch measure. */
   rule?: boolean;
   /** Widen the inner container past the default max. */
   wide?: boolean;
@@ -38,11 +40,8 @@ interface Props {
 
 const {
   tone = 'plain',
-  texture = 'none',
   id,
   class: className,
-  kicker,
-  kickerSwatch,
   title,
   lede,
   headSize = 'md',
@@ -50,13 +49,11 @@ const {
   wide = false,
 } = Astro.props;
 
-const hasHead = Boolean(kicker || title || lede);
+const hasHead = Boolean(title || lede);
 ---
 
 <section id={id} class:list={['section', 'sec', `sec--${tone}`, className]}>
   {tone === 'mesh' && <div class="bg-mesh" aria-hidden="true"></div>}
-  {texture === 'dots' && <div class="bg-dots bg-fade" aria-hidden="true"></div>}
-  {texture === 'grid' && <div class="bg-grid bg-fade" aria-hidden="true"></div>}
 
   <div class:list={['container', 'sec-inner', wide && 'sec-inner--wide']}>
     {
@@ -68,11 +65,6 @@ const hasHead = Boolean(kicker || title || lede);
             headSize === 'xl' && 'sec-head--xl',
           ]}
         >
-          {kicker && (
-            <Kicker swatch={kickerSwatch} rule={rule}>
-              {kicker}
-            </Kicker>
-          )}
           {title && <h2 class="sec-title display">{title}</h2>}
           {lede && <p class="sec-lede lede">{lede}</p>}
         </div>

@@ -65,16 +65,12 @@ const legend = [
 >
   <PageHero
     variant="page"
-    kicker="The learning path"
-    swatch="var(--l2)"
     title="Learn the role, one stage at a time."
     lede="A build order for the AI Governance Engineer: four stages from foundations to proof, each a grid of nodes that map back to the Body of Knowledge and out to the tools and reading behind them. Mark what you have done; the path remembers."
   />
 
   <Section
     tone="tint"
-    kicker="How to read it"
-    kickerSwatch="var(--l3)"
     title="Three kinds of node, three states."
     lede="Each stage builds on the one above it. Nodes are marked as core, alternative or optional; you mark your own as done, learning or skipped."
   >
@@ -97,7 +93,7 @@ const legend = [
     </div>
   </Section>
 
-  <Section tone="plain" texture="grid" kicker="The path" kickerSwatch="var(--l1)" title="Four stages, from foundations to proof.">
+  <Section tone="plain" title="Four stages, from foundations to proof.">
     <PathMap stages={stages} nodes={nodes} edges={edges} entries={entries} />
   </Section>
 

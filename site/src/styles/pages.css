@@ -62,16 +62,17 @@
   color: var(--muted);
 }
 
-/* The "read in chapter N →" back-link: mono, understated, with a moving arrow. */
+/* The "Read in chapter N →" back-link: understated, with a moving arrow. Body
+   face at --fs-small in sentence case (audit SL-05): mono capitals are for
+   short labels only, and these links run to 40 characters. */
 .chapter-link {
   display: inline-flex;
   align-items: baseline;
   gap: var(--s-2);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--ink-2);
   text-decoration: none;
 }
 

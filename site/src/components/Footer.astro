@@ -280,9 +280,11 @@ const about = byId('about');
     padding: 2px 0;
   }
 
+  /* --ink-2, not --muted: --muted fell to ~3.8:1 on the tinted band where it
+     crosses the grid lines (audit SL-17); --ink-2 clears 4.5:1 in both themes. */
   .num {
     font-family: var(--font-mono);
-    color: var(--muted);
+    color: var(--ink-2);
   }
 
   .col a,
@@ -308,6 +310,9 @@ const about = byId('about');
     font-family: var(--font-mono);
     font-size: var(--fs-label);
     letter-spacing: 0.04em;
+    /* The colophon runs to ~45 characters (licence, version, domain), so it
+       drops the global .meta capitals (audit SL-05). */
+    text-transform: none;
     /* --ink-2, not --muted: the footer is a tinted band. */
     color: var(--ink-2);
   }

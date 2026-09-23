@@ -164,18 +164,17 @@
 }
 
 /* ---- Type tag (frameworks + crosswalk column heads) ----------------------- */
-/* Category → layer colour key, deterministic and shared with .cw-chip in
-   crosswalk.css:
-     law → L1 · code → L2 · controls → L3 · standard → L4 · framework → L5
-   Each chip is its layer's own pair, --lN fill under --lN-ink text, border-less
-   and never dimmed: tokens.css pairs them at ≥ 4.5:1 in light and dark. */
+/* One neutral tag for every framework type, like .cw-chip in crosswalk.css: a
+   --tint-bg fill, a 1px --line hairline and --ink-2 text (≥ 4.5:1 in light and
+   dark), never dimmed. The type reads from the word itself; the layer colours
+   stay reserved for the five stack layers (audit SL-06). */
 .type-tag {
   display: inline-block;
   padding: 0.3em 0.6em;
-  border: 0;
+  border: 1px solid var(--line);
   border-radius: var(--r-sm);
-  background: color-mix(in srgb, var(--ink) 5%, var(--bg));
-  color: var(--ink);
+  background: var(--tint-bg);
+  color: var(--ink-2);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   letter-spacing: 0.04em;
@@ -183,12 +182,6 @@
   line-height: 1.2;
   white-space: nowrap;
 }
-
-.type-tag[data-type='law'] { background: var(--l1); color: var(--l1-ink); }
-.type-tag[data-type='code'] { background: var(--l2); color: var(--l2-ink); }
-.type-tag[data-type='controls'] { background: var(--l3); color: var(--l3-ink); }
-.type-tag[data-type='standard'] { background: var(--l4); color: var(--l4-ink); }
-.type-tag[data-type='framework'] { background: var(--l5); color: var(--l5-ink); }
 
 /* ---- Editorial tables (frameworks + obligations) -------------------------- */
 .res-tablewrap {
@@ -211,14 +204,16 @@
   border-bottom: 1px solid var(--line);
 }
 
+/* Column heads in sentence case (audit SL-05): the body face at the row size,
+   set apart by weight, the --ink colour and the opaque head fill rather than
+   by mono capitals. */
 .res-table thead th {
   position: sticky;
   top: 0;
   z-index: 1;
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: inherit;
+  font-weight: 600;
   color: var(--ink);
   background: color-mix(in srgb, var(--ink) 5%, var(--bg));
 }
@@ -365,12 +360,12 @@
   border: 0;
 }
 
+/* A 30-character prompt: body face in sentence case (audit SL-05). */
 .ob-filter legend {
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  letter-spacing: var(--tracking-label);
-  text-transform: uppercase;
-  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  color: var(--ink-2);
   margin-bottom: var(--s-3);
   padding: 0;
 }
@@ -643,10 +638,13 @@
   text-underline-offset: 3px;
 }
 
+/* Notes carry slash-joined tokens ("Govern/Map/Measure/Manage") that must
+   break rather than push a phone page sideways at 200% text (WCAG 1.4.4). */
 .rd-note {
   margin-top: var(--s-2);
   color: var(--ink-2);
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .vchip {

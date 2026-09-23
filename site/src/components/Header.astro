@@ -330,7 +330,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--s-4);
+    gap: var(--s-2) var(--s-4);
     padding-block: var(--s-3);
   }
 
@@ -342,18 +342,44 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     text-decoration: none;
   }
 
+  /* break-word, not anywhere: it leaves the min-content width at the longest
+     word, which is what tells the phone bar below to wrap. */
   .wordmark {
     font-family: var(--font-display);
     font-weight: 600;
     font-size: 1.125rem;
     letter-spacing: -0.01em;
     line-height: 1;
+    overflow-wrap: break-word;
   }
 
   .right {
     display: flex;
     align-items: center;
     gap: var(--s-3);
+  }
+
+  /* Phones (the drawer layout). Text enlarged to 200% (WCAG 1.4.4) made the
+     wordmark alone wider than the bar: the page scrolled sideways to ~435px at
+     390 and the menu button left the viewport. Here the bar may wrap. The
+     brand's flex basis is 0, so the row only breaks when the wordmark's longest
+     word cannot sit beside the buttons (enlarged text); at normal sizes it stays
+     one row and the brand grows up to its own width, the wordmark wrapping
+     between words as before. On a second row the buttons stay pinned right.
+     The desktop bar (>=840px) keeps its single-row flex. */
+  @media (max-width: 839px) {
+    .bar {
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      flex: 1 1 0;
+      max-width: max-content;
+    }
+
+    .right {
+      margin-left: auto;
+    }
   }
 
   /* 320px reflow (WCAG 1.4.10): the wordmark plus three 44px buttons overflow

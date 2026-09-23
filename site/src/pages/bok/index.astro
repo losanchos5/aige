@@ -16,8 +16,6 @@ const intro =
   preface?.summary ??
   'The founding text and working reference for engineering the governance of AI systems.';
 
-const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
-
 const signUrl = `${site.github}/edit/main/bok/CONTRIBUTORS.md`;
 const issueUrl = `${site.github}/issues/new?template=sign-the-thesis.yml`;
 
@@ -36,7 +34,6 @@ const node = (order: number) => {
     href: `/bok/${chapter.slug}`,
     num: String(order).padStart(2, '0'),
     title: chapter.shortTitle,
-    cls: `l${(order % 5) + 1}`,
   };
 };
 const readingPaths = [
@@ -67,20 +64,19 @@ const readingPaths = [
 >
   <div class="container bok-index">
     <header class="bok-head">
-      <p class="eyebrow">Body of Knowledge · v{site.bokVersion}</p>
       <h1>The Body of Knowledge</h1>
       <p class="lede">{intro}</p>
       <p class="sub">
-        {chaptersOrdered.length} chapters, from the definition to the reading list. Read them in
-        order or jump to the layer you are building.
+        Version {site.bokVersion}: {chaptersOrdered.length} chapters, from the definition to the
+        reading list. Read them in order or jump to the layer you are building.
       </p>
     </header>
 
     <ol class="chapter-grid">
       {
-        chaptersOrdered.map((chapter, i) => (
+        chaptersOrdered.map((chapter) => (
           <li>
-            <a class={`chapter-card ${layers[i % layers.length]}`} href={`/bok/${chapter.slug}`}>
+            <a class="chapter-card" href={`/bok/${chapter.slug}`}>
               <span class="card-top">
                 <span class="num">{String(chapter.order).padStart(2, '0')}</span>
                 <span class="time">{minutes.get(chapter.id) ?? 1} min</span>
@@ -108,7 +104,7 @@ const readingPaths = [
                 {path.nodes.map((n) => (
                   <li>
                     <a href={n.href}>
-                      <span class:list={['rp-num', n.cls]}>{n.num}</span>
+                      <span class="rp-num">{n.num}</span>
                       <span class="rp-node-title">{n.title}</span>
                     </a>
                   </li>
@@ -147,24 +143,21 @@ const readingPaths = [
       margin-top: var(--s-7);
     }
 
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: var(--s-3);
-    }
 
+    /* Type on this page stays on the token scale, in steps at least 1.25x
+       apart: --fs-label for the mono chips, --fs-body for running text,
+       --fs-h3 for the lede and card titles, --fs-h1 for the title. */
+    /* A long word breaks rather than overflow a phone at 200% text. */
     .bok-head h1 {
       font-family: var(--font-display);
-      font-size: clamp(2rem, 5vw, 3rem);
+      font-size: var(--fs-h1);
+      overflow-wrap: anywhere;
     }
 
     .lede {
       margin-top: var(--s-4);
       max-width: 60ch;
-      font-size: 1.25rem;
+      font-size: var(--fs-h3);
       color: var(--ink-2);
     }
 
@@ -210,36 +203,35 @@ const readingPaths = [
       justify-content: space-between;
     }
 
+    /* The chapter number is a neutral chip: a chapter is not a stack layer,
+       so it takes no layer colour (audit SL-06). */
     .num {
       font-family: var(--font-mono);
-      font-size: 0.8125rem;
+      font-size: var(--fs-label);
       font-weight: 600;
       padding: var(--s-1) var(--s-2);
       border-radius: var(--r-sm);
+      background: var(--tint-bg);
+      color: var(--ink-2);
     }
-
-    .chapter-card.l1 .num { background: var(--l1); color: var(--l1-ink); }
-    .chapter-card.l2 .num { background: var(--l2); color: var(--l2-ink); }
-    .chapter-card.l3 .num { background: var(--l3); color: var(--l3-ink); }
-    .chapter-card.l4 .num { background: var(--l4); color: var(--l4-ink); }
-    .chapter-card.l5 .num { background: var(--l5); color: var(--l5-ink); }
 
     .time {
       font-family: var(--font-mono);
-      font-size: 0.6875rem;
+      font-size: var(--fs-label);
       color: var(--muted);
     }
 
     .title {
       font-family: var(--font-display);
       font-weight: 600;
-      font-size: 1.125rem;
+      font-size: var(--fs-h3);
+      line-height: 1.2;
       margin-top: var(--s-1);
     }
 
     .summary {
       color: var(--ink-2);
-      font-size: 0.9375rem;
+      font-size: var(--fs-body);
       line-height: 1.5;
     }
   </style>

@@ -8,7 +8,6 @@
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/pages.css';
 import PageHero from '../components/PageHero.astro';
-import Kicker from '../components/Kicker.astro';
 import Section from '../components/Section.astro';
 import RegisterList from '../components/RegisterList.astro';
 import StackLayerPanel from '../components/StackLayerPanel.astro';
@@ -57,18 +56,16 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
 >
   <PageHero
     variant="page"
-    kicker="The stack"
-    swatch="var(--l3)"
     related={{ label: 'Chapter 04 · Body of Knowledge', href: '/bok/the-stack' }}
     title="Five layers. One evidence chain."
     lede="The reference architecture of AI governance engineering: five layers that turn governance from a stack of parallel documents into one system with a data path from policy to proof."
   />
 
-  <Section tone="plain" rule kicker="Layer flow" kickerSwatch="var(--l5)" title="Follow one artefact from policy to proof.">
+  <Section tone="plain" rule title="Follow one artefact from policy to proof.">
     <div class="reveal"><StackFlow /></div>
   </Section>
 
-  <Section tone="plain" kicker="How to read it" kickerSwatch="var(--l1)" title="A build order, from policy to proof.">
+  <Section tone="plain" title="A build order, from policy to proof.">
     <div class="well reveal"><RegisterList items={howToRead} /></div>
     <p class="section-foot">
       <a class="chapter-link" href={stackHref('how-to-read-the-stack')}>
@@ -81,7 +78,6 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     <div class="story" data-story>
       <div class="story-pin">
         <div class="sec-head">
-          <Kicker swatch="var(--l2)">The five layers</Kicker>
           <h2 class="sec-title display">Policy, inventory, evals, runtime, assurance.</h2>
         </div>
         <div class="story-mark" data-story-mark>
@@ -100,7 +96,7 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     </div>
   </Section>
 
-  <Section tone="dark" rule kicker="Established and new" kickerSwatch="var(--l4)" title="Three layers established, two the AI forces.">
+  <Section tone="dark" rule title="Three layers established, two the AI forces.">
     <div class="split">
       <ol class="barmark" aria-hidden="true">
         {
@@ -136,7 +132,7 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     </div>
   </Section>
 
-  <Section tone="plain" kicker="Minimum viable stack" kickerSwatch="var(--l5)" title="The spine, thinly, for a team of one.">
+  <Section tone="plain" title="The minimum viable stack, for a team of one.">
     <p class="lede well">{minimumViableStack.intro}</p>
     <div class="well mvs reveal"><RegisterList items={mvsItems} /></div>
     <p class="section-foot">
@@ -146,7 +142,7 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     </p>
   </Section>
 
-  <Section tone="plain" texture="grid" rule kicker="The tools" kickerSwatch="var(--l1)" title="Categories are the substance; brands are illustrative.">
+  <Section tone="plain" rule title="Tool categories are the substance; brands are illustrative.">
     <Callout kind="note" title="Illustrative, not an endorsement">
       <p>
         Every tool named is an example of a category, not a recommendation. The

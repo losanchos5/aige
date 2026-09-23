@@ -8,11 +8,12 @@
  * Unlike ObligationMatrix it carries no JSON payload — the drawer clones the
  * server-rendered topic section — and no opacity stagger. Mirrors the
  * sticky-first-column horizontal scroll of ObligationMatrix. Pagefind indexes
- * the topic sections, not this grid. Column type tags and clause chips share
- * one category → layer colour key (.type-tag in resources.css, .cw-chip in
- * crosswalk.css). A visible key above the grid spells out the chip outlines
- * (solid = maps to, dashed = related, "?" = not yet verified), and the scroll
- * region is focusable and named, with a sideways cue on narrow screens.
+ * the topic sections, not this grid. Column type tags and clause chips are
+ * neutral (.type-tag in resources.css, .cw-chip in crosswalk.css): layer
+ * colours are reserved for the stack layers. A visible key above the grid
+ * spells out the chip outlines (solid = maps to, dashed = related, "?" = not
+ * yet verified), and the scroll region is focusable and named, with a sideways
+ * cue on narrow screens.
  */
 import { topicMatrix, chipLabel, frameworkById } from '../data/crosswalk';
 

@@ -1,7 +1,7 @@
 ---
 // SidebarNav: the chapter rail. The Thesis on top, then the eleven BoK chapters
-// with mono 00–10 indices. The active row carries aria-current and shows its
-// layer swatch as a tick.
+// with mono 00–10 indices. The active row carries aria-current and shows a
+// neutral ink tick. No per-row layer colour: chapters are not layers (SL-06).
 import { chaptersOrdered } from '../data/chapters';
 
 interface Props {
@@ -10,7 +10,6 @@ interface Props {
 }
 
 const { activeSlug, activeThesis = false } = Astro.props;
-const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
 ---
 
 <nav class="sidebar-nav" aria-label="Chapters">
@@ -35,11 +34,11 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
   <p class="nav-label">Body of Knowledge</p>
   <ol class="nav-list">
     {
-      chaptersOrdered.map((chapter, i) => (
+      chaptersOrdered.map((chapter) => (
         <li>
           <a
             href={`/bok/${chapter.slug}`}
-            class={`nav-item ${layers[i % layers.length]}`}
+            class="nav-item"
             data-chapter-slug={chapter.slug}
             aria-current={activeSlug === chapter.slug ? 'page' : undefined}
           >
@@ -142,6 +141,9 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
     padding: 0;
   }
 
+  /* --layer-ink is the row's accent, used by the hover tint and copied onto the
+     rail by ui-doc.js when the row is current. Neutral on every row: the rail
+     rotated the five layer inks by index, which read as a layer code. */
   .nav-item {
     --layer-ink: var(--ink-2);
     position: relative;
@@ -158,13 +160,6 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
       background-color var(--dur) var(--ease);
   }
 
-  /* Each row carries its layer's ink, used by the hover tint and copied onto the
-     rail by ui-doc.js when the row is current. */
-  .nav-item.l1 { --layer-ink: var(--l1-ink); }
-  .nav-item.l2 { --layer-ink: var(--l2-ink); }
-  .nav-item.l3 { --layer-ink: var(--l3-ink); }
-  .nav-item.l4 { --layer-ink: var(--l4-ink); }
-  .nav-item.l5 { --layer-ink: var(--l5-ink); }
 
   /* Reading "register": a 3px track per chapter row. The current page fills as
      it is read; chapters marked read in localStorage show a muted full bar. */

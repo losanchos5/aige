@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 494" class="figc" role="img" aria-labelledby="fig-maturity-grid-t fig-maturity-grid-d">
   <title id="fig-maturity-grid-t">The maturity grid</title>
   <desc id="fig-maturity-grid-d">A five-by-five grid of stack layers against maturity levels, with an illustrative profile whose weakest layer sets the overall level.</desc>
-  <text class="mono muted" x="16" y="18" font-size="13.5">YOUR LEVEL IS THE WEAKEST LAYER</text>
-  <text class="mono muted" x="16" y="36" font-size="13">ILLUSTRATIVE FILL</text>
+  <text class="mono muted" x="16" y="18" font-size="13.5">Your level is the weakest layer</text>
+  <text class="mono muted" x="16" y="36" font-size="13">Illustrative fill</text>
   <rect x="103" y="64" width="52" height="192" rx="6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/>
   <text class="mono muted" x="75" y="58" font-size="13.5" text-anchor="middle">1</text>
   <text class="mono muted" x="129" y="58" font-size="13.5" text-anchor="middle">2</text>

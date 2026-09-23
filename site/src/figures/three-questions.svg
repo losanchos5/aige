@@ -2,7 +2,7 @@
   <title id="fig-three-questions-t">The three questions</title>
   <desc id="fig-three-questions-d">Three panels — what AI is running, what it is allowed to do, and what evidence proves it — each with the stack layers that answer it.</desc>
 
-  <text class="mono muted" x="16" y="20" font-size="13.5">THE SPINE OF THE BODY OF KNOWLEDGE</text>
+  <text class="mono muted" x="16" y="20" font-size="13.5">The spine of the Body of Knowledge</text>
 
   <!-- Panel 1: What AI is running? — registry cylinder — Layer 02 -->
   <rect class="panel" x="8" y="34" width="344" height="76" rx="10"/>

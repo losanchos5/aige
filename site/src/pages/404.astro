@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
-import Kicker from '../components/Kicker.astro';
 import VerdictStamp from '../components/VerdictStamp.astro';
 ---
 
@@ -10,11 +9,10 @@ import VerdictStamp from '../components/VerdictStamp.astro';
       slotted here with the shared .sec-head classes instead of the title prop. */}
   <Section tone="mesh" class="notfound">
     <div class="sec-head sec-head--xl nf-head">
-      <Kicker swatch="var(--l3)">Error 404</Kicker>
       <h1 class="sec-title display nf-title">
         Verdict: <VerdictStamp verdict="block" />
       </h1>
-      <p class="sec-lede lede nf-lede">Route not registered.</p>
+      <p class="sec-lede lede nf-lede">Error 404. Route not registered.</p>
     </div>
     {/* One primary way out; search is the fallback, set as a quiet text
         control. It opens the global search dialog (/search.js binds every
@@ -46,7 +44,7 @@ import VerdictStamp from '../components/VerdictStamp.astro';
 
     /* Over the mesh every text run is --ink: the glows are pastel in light and
        ink-tinted in dark, so the dimmer tokens are not guaranteed 4.5:1 across
-       the whole gradient. Re-scoping --muted carries that to the Kicker label. */
+       the whole gradient. Re-scoping --muted carries that to any muted run. */
     .nf-head {
       --muted: var(--ink);
       color: var(--ink);

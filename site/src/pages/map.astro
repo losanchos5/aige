@@ -155,8 +155,6 @@ const jsonLd = [
 >
   <PageHero
     variant="page"
-    kicker="The map"
-    swatch="var(--l1)"
     related={{ label: `Body of Knowledge · v${site.bokVersion}`, href: '/bok' }}
     title="The discipline on one page."
     lede="Every chapter, layer, pattern, workflow, obligation, maturity level and learning stage the site covers, as one map of links. Start at the branch you need and follow it into the text."
@@ -165,10 +163,7 @@ const jsonLd = [
   <Section
     id="the-map"
     tone="plain"
-    texture="dots"
     wide
-    kicker="One canvas"
-    kickerSwatch="var(--l1)"
     title="A central node and eight branches."
     lede="Four branches on the left, four on the right, each with its second-level topics and, where they fit, third-level chips — every one a link into the text."
   >
@@ -209,7 +204,7 @@ const jsonLd = [
     </p>
   </Section>
 
-  <Section id="index" tone="tint" kicker="The index" kickerSwatch="var(--l2)" title="Content by cluster.">
+  <Section id="index" tone="tint" title="Content by cluster.">
     <div class="cluster-tools" hidden>
       <button type="button" class="cluster-tool" data-cluster-expand>Expand all</button>
       <button type="button" class="cluster-tool" data-cluster-collapse>Collapse all</button>

@@ -193,33 +193,27 @@
 }
 
 /* ---- Chips ---------------------------------------------------------------- */
-/* Coloured by the framework's type with the .type-tag key in resources.css
-   (law → L1 · code → L2 · controls → L3 · standard → L4 · framework → L5): the
-   layer's --lN fill under its --lN-ink text, border-less (a transparent border
-   keeps every chip the same size). Related refs lose the fill and take a dashed
-   border in the chip's ink; unverified refs carry a dotted underline and a
-   visible "?" (never dimmed — opacity would drop contrast below AA). */
+/* One neutral chip for every framework type: a --tint-bg fill, a 1px --line
+   hairline and --ink-2 text (≥ 4.5:1 in light and dark). The layer colours are
+   kept for the layer ticks and codes (audit SL-06): the chip label and the
+   column head name the framework, so its type is not coded in colour. Related
+   refs lose the fill and take a dashed border in the chip's ink; unverified
+   refs carry a dotted underline and a visible "?" (never dimmed — opacity
+   would drop contrast below AA). */
 .cw-chip {
   display: inline-flex;
   align-items: center;
   padding: 0.15em 0.5em;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
-  background: color-mix(in srgb, var(--ink) 5%, var(--bg));
-  color: var(--ink);
+  background: var(--tint-bg);
+  color: var(--ink-2);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   letter-spacing: 0.02em;
   line-height: 1.3;
   white-space: nowrap;
 }
-
-.cw-chip[data-type] { border-color: transparent; }
-.cw-chip[data-type='law'] { background: var(--l1); color: var(--l1-ink); }
-.cw-chip[data-type='code'] { background: var(--l2); color: var(--l2-ink); }
-.cw-chip[data-type='controls'] { background: var(--l3); color: var(--l3-ink); }
-.cw-chip[data-type='standard'] { background: var(--l4); color: var(--l4-ink); }
-.cw-chip[data-type='framework'] { background: var(--l5); color: var(--l5-ink); }
 
 /* Related: dashed outline in the chip's own ink, no fill. */
 .cw-chip.is-related {
