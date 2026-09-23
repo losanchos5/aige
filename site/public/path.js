@@ -136,6 +136,58 @@
       first.focus();
     }
   }
+  // Open motion. With the bundled runtime (window.aigeMotion, from
+  // src/scripts/motion-ui.ts) the panel springs in from its off-canvas position,
+  // then the body's blocks follow with a short translateY stagger: transform
+  // only, never opacity. The body holds one cloned .pn-body, so its blocks (the
+  // summary and each section) are the staggered items. Under reduced motion
+  // aigeMotion.run() skips the animation and the final state stands at once. If
+  // the runtime has not loaded (or never does), the CSS transition on .is-open
+  // is the baseline.
+  function staggerItems() {
+    if (!bodyEl) return [];
+    var items = bodyEl.children;
+    if (items.length === 1 && items[0].children.length > 1) items = items[0].children;
+    return Array.prototype.slice.call(items);
+  }
+  function showDrawer() {
+    var m = window.aigeMotion;
+    if (!m) {
+      requestAnimationFrame(function () {
+        drawer.classList.add('is-open');
+      });
+      return;
+    }
+    // Opened straight from display:none, so .is-open lands without a CSS
+    // transition; the spring owns the entrance.
+    drawer.classList.add('is-open');
+    m.run(function () {
+      try {
+        m.animate(
+          drawer,
+          { transform: ['translateX(100%)', 'none'] },
+          { type: m.spring, stiffness: 320, damping: 30 },
+        ).then(function () {
+          drawer.style.removeProperty('transform');
+        });
+        var items = staggerItems();
+        if (items.length) {
+          m.animate(
+            items,
+            { transform: ['translateY(10px)', 'none'] },
+            {
+              duration: 0.32,
+              ease: [0.2, 0.7, 0.2, 1],
+              delay: m.stagger(0.04, { startDelay: 0.12 }),
+            },
+          );
+        }
+      } catch (e) {
+        drawer.style.removeProperty('transform');
+      }
+    });
+  }
+
   function syncStateButtons() {
     var s = currentId ? state[currentId] : '';
     for (var i = 0; i < stateBtns.length; i++) {
@@ -177,9 +229,7 @@
     document.body.classList.add('path-lock');
     var opener = li.querySelector('[data-node-open]');
     if (opener) opener.setAttribute('aria-expanded', 'true');
-    requestAnimationFrame(function () {
-      drawer.classList.add('is-open');
-    });
+    showDrawer();
     var closeBtn = drawer.querySelector('[data-path-close]');
     if (closeBtn) closeBtn.focus();
     document.addEventListener('keydown', onKeydown);

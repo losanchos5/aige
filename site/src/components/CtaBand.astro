@@ -1,7 +1,8 @@
 ---
 /**
  * CtaBand — a full-width ink block with ground-coloured text, a headline and up
- * to two buttons. Primary = ground fill on ink; secondary = 1px ground border.
+ * to two buttons. Primary = ground fill on ink with the .btn-glow halo;
+ * secondary = a quiet outline (softened ground border) at the same height.
  * Place as a direct child of <main> (outside .container) so it spans full width.
  */
 interface Cta {
@@ -35,23 +36,30 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
 </section>
 
 <style>
+  /* The band's ::before belongs to the Marketing register rule (the numbered
+     notch between sections), so it gets the section contract: --sec-bg notches
+     the number on the ink ground, and --ink-2 (the number's colour) is
+     re-scoped to the softened ground so it reads on ink in both themes. No
+     overflow clip: the notch straddles the top edge like every other section
+     (the mesh clips itself). */
   .band {
     position: relative;
     isolation: isolate;
-    overflow: hidden;
     background: var(--ink);
     color: var(--bg);
     padding-block: clamp(48px, 7vw, 96px);
+    --sec-bg: var(--ink);
+    --ink-2: color-mix(in srgb, var(--bg) 82%, var(--ink));
   }
 
-  /* 2px gradient hairline along the top edge. */
-  .band::before {
+  /* 2px gradient hairline along the top edge, under the register notch. */
+  .band::after {
     content: '';
     position: absolute;
     inset: 0 0 auto;
     height: 2px;
     background: var(--grad-border);
-    z-index: 2;
+    z-index: 1;
     pointer-events: none;
   }
 
@@ -108,14 +116,20 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
     text-decoration: none;
   }
 
+  /* Primary: the ground fill carries the same soft --glow-1 halo as .btn-glow
+     (the gradient itself would vanish on the ink ground). */
   .cta-primary {
     background: var(--bg);
     color: var(--ink);
+    box-shadow: 0 2px 12px var(--glow-1);
   }
 
+  /* Secondary: an outline one weight down — the border is the ground at 45%,
+     so the label (full ground colour) keeps its contrast. */
   .cta-secondary {
     background: transparent;
     color: var(--bg);
+    border-color: color-mix(in srgb, var(--bg) 45%, transparent);
   }
 
   .cta:focus-visible {
@@ -127,11 +141,20 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
     .cta {
       transition:
         background-color var(--dur) var(--ease),
-        color var(--dur) var(--ease);
+        border-color var(--dur) var(--ease),
+        color var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease),
+        transform var(--dur) var(--ease);
+    }
+
+    .cta-primary:hover {
+      box-shadow: 0 8px 24px var(--glow-1);
+      transform: translateY(-1px);
     }
   }
 
   .cta-secondary:hover {
     background: color-mix(in srgb, var(--bg) 14%, transparent);
+    border-color: var(--bg);
   }
 </style>

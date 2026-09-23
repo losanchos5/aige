@@ -90,7 +90,9 @@ const countup = match
 
   .source {
     font-size: var(--fs-small);
-    color: var(--muted);
+    /* --ink-2, not --muted: the tile also sits on mesh and tinted bands, where
+       --muted can drop below AA. Colour only, never opacity. */
+    color: var(--ink-2);
     text-wrap: pretty;
   }
 
@@ -98,9 +100,14 @@ const countup = match
     border-color: var(--ink-2);
   }
 
+  /* Keeps .card-lum/.lift's transform and shadow transitions alongside the
+     border colour (a bare border-color transition here would override them). */
   @media (prefers-reduced-motion: no-preference) {
     a.tile {
-      transition: border-color var(--dur) var(--ease);
+      transition:
+        border-color var(--dur) var(--ease),
+        transform var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease);
     }
   }
 </style>

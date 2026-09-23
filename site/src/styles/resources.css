@@ -138,12 +138,19 @@
 .tk[data-l='4'] { background: var(--l4); }
 .tk[data-l='5'] { background: var(--l5); }
 
-/* ---- Type tag (frameworks) ------------------------------------------------ */
+/* ---- Type tag (frameworks + crosswalk column heads) ----------------------- */
+/* Category → layer colour key, deterministic and shared with .cw-chip in
+   crosswalk.css:
+     law → L1 · code → L2 · controls → L3 · standard → L4 · framework → L5
+   Each chip is its layer's own pair, --lN fill under --lN-ink text, border-less
+   and never dimmed: tokens.css pairs them at ≥ 4.5:1 in light and dark. */
 .type-tag {
   display: inline-block;
-  padding: 0.2em 0.55em;
-  border: 1px solid;
+  padding: 0.3em 0.6em;
+  border: 0;
   border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--ink) 5%, var(--bg));
+  color: var(--ink);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   letter-spacing: 0.04em;
@@ -152,11 +159,11 @@
   white-space: nowrap;
 }
 
-.type-tag[data-type='law'] { color: var(--l1-ink); border-color: color-mix(in srgb, var(--l1-ink) 40%, transparent); background: color-mix(in srgb, var(--l1) 45%, var(--bg)); }
-.type-tag[data-type='code'] { color: var(--l2-ink); border-color: color-mix(in srgb, var(--l2-ink) 40%, transparent); background: color-mix(in srgb, var(--l2) 45%, var(--bg)); }
-.type-tag[data-type='standard'] { color: var(--l4-ink); border-color: color-mix(in srgb, var(--l4-ink) 40%, transparent); background: color-mix(in srgb, var(--l4) 45%, var(--bg)); }
-.type-tag[data-type='framework'] { color: var(--l5-ink); border-color: color-mix(in srgb, var(--l5-ink) 40%, transparent); background: color-mix(in srgb, var(--l5) 45%, var(--bg)); }
-.type-tag[data-type='controls'] { color: var(--l3-ink); border-color: color-mix(in srgb, var(--l3-ink) 40%, transparent); background: color-mix(in srgb, var(--l3) 45%, var(--bg)); }
+.type-tag[data-type='law'] { background: var(--l1); color: var(--l1-ink); }
+.type-tag[data-type='code'] { background: var(--l2); color: var(--l2-ink); }
+.type-tag[data-type='controls'] { background: var(--l3); color: var(--l3-ink); }
+.type-tag[data-type='standard'] { background: var(--l4); color: var(--l4-ink); }
+.type-tag[data-type='framework'] { background: var(--l5); color: var(--l5-ink); }
 
 /* ---- Editorial tables (frameworks + obligations) -------------------------- */
 .res-tablewrap {
@@ -364,6 +371,19 @@
 .ob-chip:hover {
   border-color: var(--ink-2);
 }
+
+/* The L1–L5 filter chips are layer categories: each wears its layer's pair
+   (--lN fill under --lN-ink, the same key as the .tk ticks in the rows), with a
+   transparent border so the chip keeps its size; hover draws the border in the
+   chip's ink. The checked rule below still wins (higher specificity), so the
+   selection reads the same ink fill across every chip. */
+.ob-chip[data-l] { border-color: transparent; }
+.ob-chip[data-l]:hover { border-color: currentColor; }
+.ob-chip[data-l='1'] { background: var(--l1); color: var(--l1-ink); }
+.ob-chip[data-l='2'] { background: var(--l2); color: var(--l2-ink); }
+.ob-chip[data-l='3'] { background: var(--l3); color: var(--l3-ink); }
+.ob-chip[data-l='4'] { background: var(--l4); color: var(--l4-ink); }
+.ob-chip[data-l='5'] { background: var(--l5); color: var(--l5-ink); }
 
 .ob-radio:checked + .ob-chip {
   background: var(--ink);
@@ -636,6 +656,17 @@
 .gl-jump:hover {
   border-color: var(--ink-2);
   color: var(--ink);
+}
+
+/* The letter being read (set by public/glossary-index.js): full ink, an ink
+   border and a 2px underline marker. Colour and weight, never opacity. */
+.gl-jump[aria-current='true'] {
+  border-color: var(--ink);
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.25em;
 }
 
 .gl-letter {

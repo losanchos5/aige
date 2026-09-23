@@ -328,21 +328,23 @@ const relatedLinks = (ids: readonly string[]) =>
   }
 
   /* The spine: a hairline connector between consecutive stages, so the flow
-     reads top-to-bottom even with no JS and no edges. */
+     reads top-to-bottom even with no JS and no edges. It drops from the centre
+     of the stage index above (a two-digit mono numeral, ~--s-4 to its middle). */
   .path-stage + .path-stage::before {
     content: '';
     position: absolute;
-    left: 0.6rem;
+    left: var(--s-4);
     top: calc(var(--s-6) * -1);
     height: var(--s-6);
     width: 1px;
     background: var(--line);
   }
 
+  /* The index sits on the title's first baseline rather than its box top. */
   .stage-head {
     display: grid;
     grid-template-columns: auto 1fr;
-    align-items: start;
+    align-items: baseline;
     gap: var(--s-3) var(--s-4);
   }
 
@@ -362,7 +364,7 @@ const relatedLinks = (ids: readonly string[]) =>
   }
 
   .stage-tagline {
-    margin: var(--s-1) 0 0;
+    margin: var(--s-2) 0 0;
     color: var(--ink-2);
     font-family: var(--font-mono);
     font-size: var(--fs-label);
@@ -371,7 +373,7 @@ const relatedLinks = (ids: readonly string[]) =>
   }
 
   .stage-summary {
-    margin: var(--s-2) 0 0;
+    margin: var(--s-3) 0 0;
     max-width: var(--prose);
     color: var(--ink-2);
     text-wrap: pretty;

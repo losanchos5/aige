@@ -8,9 +8,15 @@
  * content stays inside the centred `.container`. No `100vw`, so no horizontal
  * scroll (layout.spec guards this).
  *
- * Two variants: `page` (a display title on a ~40vh band, for the landings) and
- * `res` (an H1-scale title on a tighter band with a softer mesh, for reference
- * pages). The eyebrow is either a Kicker (`kicker`) or a Breadcrumb (`crumbs`);
+ * Two variants that read differently at a glance:
+ * - `page` (landing): a display-size title on a tall ~40vh band, the full mesh
+ *   over an edge-faded dot field, and a masthead eyebrow row — an outlined
+ *   layer swatch, the kicker, a hairline rule across the measure and, at its
+ *   end, the related-chapter link.
+ * - `res` (reference): an H1-scale title on a tight band, a breadcrumb eyebrow
+ *   with its small square, and a dot-led texture: an even, unfaded dot grid
+ *   under a faint mesh (the mesh stays, so the band still spans the viewport).
+ * The eyebrow is either a Kicker (`kicker`) or a Breadcrumb (`crumbs`);
  * `related` renders a `.meta` line linking the related chapter; the `lede` and
  * `note` slots take copy that carries inline markup.
  */
@@ -46,30 +52,40 @@ const {
   texture = 'dots',
   variant = 'page',
 } = Astro.props;
+
+const landing = variant === 'page';
 ---
 
-<section class:list={['hero', 'section', 'hero--page', `hero--${variant}`]}>
+<section
+  class:list={['hero', 'section', 'hero--page', landing ? 'hero--landing' : 'hero--res']}
+>
   {mesh && <div class="bg-mesh" aria-hidden="true"></div>}
-  {texture === 'dots' && <div class="hero-tex bg-dots bg-fade" aria-hidden="true"></div>}
+  {
+    texture === 'dots' && (
+      <div class:list={['hero-tex', 'bg-dots', landing && 'bg-fade']} aria-hidden="true" />
+    )
+  }
   <div class="container">
     <header class="hero-head hero-in">
       {
-        related && (
-          <p class="meta">
-            <span class="meta-dot" aria-hidden="true" />
-            <a href={related.href}>{related.label}</a>
-          </p>
-        )
-      }
-      {
-        crumbs ? (
-          <Breadcrumb items={crumbs} swatch={swatch} rule />
-        ) : (
-          kicker && (
-            <Kicker swatch={swatch} rule>
-              {kicker}
-            </Kicker>
-          )
+        (crumbs || kicker || related) && (
+          <div class="hero-eyebrow">
+            {crumbs ? (
+              <Breadcrumb items={crumbs} swatch={swatch} rule={landing} />
+            ) : (
+              kicker && (
+                <Kicker swatch={swatch} rule={landing}>
+                  {kicker}
+                </Kicker>
+              )
+            )}
+            {related && (
+              <p class="meta">
+                <span class="meta-dot" aria-hidden="true" />
+                <a href={related.href}>{related.label}</a>
+              </p>
+            )}
+          </div>
         )
       }
       <h1 class="hero-title">{title}</h1>
@@ -119,6 +135,42 @@ const {
     max-width: var(--prose);
   }
 
+  /* The eyebrow row: the Kicker or Breadcrumb, then the related-chapter link.
+     It wraps on phones, the link dropping under the kicker. */
+  .hero-eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-4);
+    max-width: 100%;
+  }
+
+  /* Landing masthead: the row spans the text measure so the kicker's hairline
+     rule runs across it, ending at the related-chapter link; the layer swatch
+     grows from a 4px dot to an outlined chip, the same mark as the stack bars
+     and the map legend; the label steps up from --muted to --ink-2. */
+  .hero--landing .hero-eyebrow {
+    align-self: stretch;
+    margin-bottom: var(--s-2);
+  }
+
+  .hero--landing .hero-eyebrow > :global(.kicker) {
+    flex: 1 1 12rem;
+    gap: var(--s-3);
+    color: var(--ink-2);
+  }
+
+  .hero--landing .hero-eyebrow :global(.kicker .square) {
+    width: var(--s-3);
+    height: var(--s-3);
+    border-radius: 3px;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 24%, transparent);
+  }
+
+  .hero--landing .hero-eyebrow > .meta {
+    flex: none;
+  }
+
   .hero-title {
     margin: 0;
     font-family: var(--font-display);
@@ -164,13 +216,15 @@ const {
     margin-top: var(--s-3);
   }
 
-  /* Reference variant: dense pages get an H1-scale title, a tighter band and a
-     softer mesh. (Moved here from .res-hero / .res-head / .res-title in the page
-     and resources stylesheets.) */
+  /* Reference variant: dense pages get an H1-scale title, a tighter band
+     (--s-6 against the landing's --s-8) and a dot-led texture: the mesh drops
+     to a faint wash and the dot grid runs even, without the edge fade, like
+     ruled paper under an index. (Moved here from .res-hero / .res-head /
+     .res-title in the page and resources stylesheets.) */
   .hero--res {
     min-height: 0;
     padding-block: var(--s-6) var(--s-5);
-    --mesh-alpha: 0.6;
+    --mesh-alpha: 0.35;
   }
 
   .hero--res .hero-title {
@@ -179,9 +233,10 @@ const {
   }
 
   /* Timed entrance for the hero content, staggered top-to-bottom by source
-     order. Opacity + lift, motion only; the reduced-motion kill switch in
-     base.css stops it so no-JS and reduced-motion readers see the text painted
-     and never dimmed by us. (Moved here from pages.css.) */
+     order. A lift only, transform and no opacity: the hero sits in the first
+     viewport, where a fractional opacity would be blended into the contrast
+     ratio by axe and Lighthouse. Motion-gated, so no-JS and reduced-motion
+     readers see the text at rest. (Moved here from pages.css.) */
   @media (prefers-reduced-motion: no-preference) {
     .hero-in > * {
       animation: hero-up 0.6s var(--ease) both;
@@ -205,11 +260,9 @@ const {
 
   @keyframes hero-up {
     from {
-      opacity: 0;
       transform: translateY(10px);
     }
     to {
-      opacity: 1;
       transform: none;
     }
   }

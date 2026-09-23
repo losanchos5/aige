@@ -28,3 +28,18 @@ const updated = gitDate(`../${editPath}`);
 >
   <Content />
 </Doc>
+
+<style>
+  /* Rendered Markdown carries no scope attribute, so these rules are global
+     (page styles ship with this page only); .doc .prose outranks prose.css.
+     prose.css already draws the section gap and --line rule over each h2;
+     these pin the headings to the --fs-* scale. */
+  :global(.doc .prose > h2) {
+    font-size: var(--fs-h2);
+  }
+
+  :global(.doc .prose > h3) {
+    margin-top: var(--s-6);
+    font-size: var(--fs-h3);
+  }
+</style>

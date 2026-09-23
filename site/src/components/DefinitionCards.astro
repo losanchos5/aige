@@ -1,8 +1,13 @@
 ---
 /**
- * DefinitionCards — a small row of bordered cards, each with a mono index, a
- * short title and a one-to-two-sentence body. Flat, 1px border, matte. Used on
- * the home page for the discipline's three core questions.
+ * DefinitionCards — a small row of luminous cards, each with a mono index, a
+ * short title and a one-to-two-sentence body. Used on the home page for the
+ * discipline's three core questions. Laid out on the shared .bento grid
+ * (effects.css), held at three equal columns from 960px (the questions are
+ * peers); in bento's two-column step the last card spans the row so none is
+ * orphaned. Each <li> carries --i for a .reveal-stagger class passed in; the
+ * card (and its lift) sits one level down because the reveal animation owns
+ * the <li>'s transform.
  */
 export interface DefinitionItem {
   /** Mono index label, e.g. `01`. */
@@ -23,32 +28,39 @@ interface Props {
 const { items, class: className } = Astro.props;
 ---
 
-<ol class:list={['cards', className]}>
+<ol class:list={['cards', 'bento', className]}>
   {
     items.map((item, i) => (
-      <li class="card card-lum lift" style={`--i:${i}; --tint:${item.swatch ?? 'var(--ink)'}`}>
-        <p class="head">
-          <span class="square" aria-hidden="true" />
-          <span class="idx">{item.index}</span>
-        </p>
-        <h3 class="title">{item.title}</h3>
-        <p class="body">{item.body}</p>
+      <li style={`--i:${i}`}>
+        <div class="card card-lum lift" style={`--tint:${item.swatch ?? 'var(--ink)'}`}>
+          <p class="head">
+            <span class="square" aria-hidden="true" />
+            <span class="idx">{item.index}</span>
+          </p>
+          <h3 class="title">{item.title}</h3>
+          <p class="body">{item.body}</p>
+        </div>
       </li>
     ))
   }
 </ol>
 
 <style>
+  /* Gap and the one/two-column steps come from .bento; this resets the list
+     and holds three columns (not bento's four) from 960px. */
   .cards {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    gap: var(--s-4);
-    grid-template-columns: 1fr;
   }
 
-  @media (min-width: 720px) {
+  @media (min-width: 600px) and (max-width: 959.98px) {
+    .cards > li:last-child:nth-child(odd) {
+      grid-column: span 2;
+    }
+  }
+
+  @media (min-width: 960px) {
     .cards {
       grid-template-columns: repeat(3, 1fr);
     }
@@ -60,6 +72,7 @@ const { items, class: className } = Astro.props;
     display: flex;
     flex-direction: column;
     gap: var(--s-3);
+    height: 100%;
     padding: var(--s-5);
   }
 

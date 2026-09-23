@@ -133,9 +133,11 @@
 /* ---------------------------------------------------------------- Story rows */
 
 /* Right-hand rows of a sticky-scroll story (effects.css owns .story/.story-pin).
-   Each row is a [data-story-row] that story.js watches; they carry no transform
-   themselves — only their .reveal-stagger children do — so the pinned column's
-   ancestors stay transform-free and position: sticky holds. */
+   Each row is a [data-story-row] that story.js watches. The rows are the
+   .reveal-stagger children, so they do take the reveal transform, but they sit
+   beside .story-pin, never around it: the pinned column's ancestors stay
+   transform-free and position: sticky holds. Spaced on --s-6, the step the
+   /path stages use between them. */
 .story-row + .story-row {
-  margin-top: var(--s-5);
+  margin-top: var(--s-6);
 }

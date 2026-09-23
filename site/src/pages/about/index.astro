@@ -127,3 +127,21 @@ try {
     <a href={site.github} target="_blank" rel="noopener noreferrer">GitHub</a>.
   </p>
 </Doc>
+
+<style>
+  /* About reads as a run of short sections: gaps, rules, heading scale and
+     secondary text pinned to tokens. The h2/p/ul are authored here, so these
+     scoped rules reach them inside Doc's .prose well; :global(.prose) lifts
+     them over prose.css. */
+  :global(.prose) > h2 {
+    margin-top: var(--s-7);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+    font-size: var(--fs-h2);
+  }
+
+  :global(.prose) > p,
+  :global(.prose) > ul {
+    color: var(--ink-2);
+  }
+</style>

@@ -48,6 +48,8 @@ const { title, description, image } = Astro.props;
     font-family: var(--font-mono);
     font-size: var(--fs-label);
     letter-spacing: var(--tracking-label);
-    color: var(--muted);
+    /* --ink-2, not --muted: the number sits on the section's own colour
+       (--sec-bg), and --muted drops below AA on tinted bands. */
+    color: var(--ink-2);
   }
 </style>
