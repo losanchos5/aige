@@ -97,11 +97,11 @@
   text-underline-offset: 0.15em;
 }
 
+/* Mixed-case mono ("ch. 01–02"): the label tracking is for uppercase only. */
 .map-legend-ch {
   margin-left: auto;
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  letter-spacing: var(--tracking-label);
   color: var(--muted);
 }
 
@@ -111,13 +111,13 @@
   font-size: var(--fs-small);
 }
 
-/* A phones-only cue that the canvas scrolls and a list follows. */
+/* A phones-only cue that the canvas scrolls and a list follows. A sentence in
+   mixed case, so no label tracking (that is for uppercase eyebrows). */
 .map-hint {
   display: none;
   margin: 0 0 var(--s-3);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  letter-spacing: var(--tracking-label);
   color: var(--muted);
 }
 
@@ -207,14 +207,14 @@
 .cluster-chaps {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--s-1);
+  gap: var(--s-2);
   margin-left: auto;
 }
 
+/* Chapter short titles are mixed case: no label tracking. */
 .cluster-chip {
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  letter-spacing: var(--tracking-label);
   color: var(--muted);
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
@@ -295,7 +295,6 @@
 .cluster-meta {
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  letter-spacing: var(--tracking-label);
   color: var(--muted);
 }
 

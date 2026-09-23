@@ -56,7 +56,13 @@ export const WEB_OPTS = {
   fsChip: 12,
   pillH: 28,
   chipH: 20,
-  chipRow: 24,
+  // Target size (WCAG 2.5.8): a 20-unit chip is undersized once the canvas
+  // shrinks to its 980px floor (x0.785, ~15.7px), so its 24px spacing circle
+  // must clear the next row and the pill above. Row pitch 32 (--s-2 more than
+  // the old 24) and a gap of 8 under the pill keep every chip centre >= 24px
+  // from its neighbours at that scale.
+  chipRow: 32,
+  chipTop: 8,
   leafGap: 8,
   branchGap: 36,
   showChips: true,
@@ -83,6 +89,7 @@ export const PORTRAIT_OPTS = {
   pillH: 34,
   chipH: 24,
   chipRow: 28,
+  chipTop: 6,
   // Tightened from 10/40 so the taller Patterns-as-chips side keeps the whole
   // portrait within the 1185px frame slot (chips must not be scaled below 14px).
   leafGap: 8,
@@ -232,7 +239,7 @@ function measureLeaf(node, opts) {
     const laid = layoutChips(node.children, opts);
     chips = laid.chips;
     // No top gap when the chips stand alone (no pill above them).
-    chipsH = laid.rows > 0 ? laid.rows * opts.chipRow + (isChipsOnly ? 0 : 6) : 0;
+    chipsH = laid.rows > 0 ? laid.rows * opts.chipRow + (isChipsOnly ? 0 : (opts.chipTop ?? 6)) : 0;
   }
   return { node, lines, pillH, chips, chipsH, drawPill: !isChipsOnly, blockH: pillH + chipsH };
 }
@@ -321,7 +328,7 @@ export function layoutMap(map, opts) {
 
       let ly = branchTop;
       const leaves = block.leaves.map((leaf) => {
-        const chipTop = leaf.drawPill ? ly + leaf.pillH + 6 : ly;
+        const chipTop = leaf.drawPill ? ly + leaf.pillH + (opts.chipTop ?? 6) : ly;
         const box = {
           node: leaf.node,
           drawPill: leaf.drawPill,

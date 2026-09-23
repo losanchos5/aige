@@ -137,9 +137,10 @@ respect `prefers-reduced-motion`.
    failure.
 2. **Never dim text with `opacity`.** Secondary text uses the `--muted` or `--ink-2` color tokens,
    never a reduced-opacity `--ink`.
-3. **`--muted` fails AA on tinted/dark bands.** It is re-scoped to `var(--ink-2)` inside
-   `.sec--tint`, and the full dark token set (including `--muted`) is re-scoped inside `.sec--dark`,
-   both in `effects.css`. Any new tinted or dark surface must go through `<Section tone="tint">` /
+3. **`--muted` fails AA on tinted, dark and mesh bands.** It is re-scoped to `var(--ink-2)` inside
+   `.sec--tint` and over the mesh (`.sec--mesh`, `.hero--page`, `.hero--loop`, `.hero-panel`), and
+   the full dark token set (including `--muted`) is re-scoped inside `.sec--dark`, all in
+   `effects.css`. Any new tinted or dark surface must go through `<Section tone="tint">` /
    `<Section tone="dark">` rather than hand-rolling a background color.
 4. **Never put `.reveal`, a `transform`, or `will-change` on an ancestor of `.story-pin`.** A
    transformed ancestor creates a new containing block and breaks `position: sticky`.

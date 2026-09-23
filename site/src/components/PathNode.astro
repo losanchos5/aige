@@ -10,8 +10,10 @@
  * DOM either way, so link-checking and Pagefind both see them.
  *
  * The layer colour (if the node maps to a stack layer) rides on --c / --c-ink,
- * used by the done/learning state styles; transversal nodes leave them unset and
- * the styles fall back to ink.
+ * shown as a small outlined square beside the kind and used by the
+ * done/learning state styles; transversal nodes leave them unset (no square)
+ * and the styles fall back to ink. The border is uniform: solid ink for core,
+ * dashed --ink-2 for optional, the plain --line for alternative.
  */
 import type { PathNode } from '../data/path';
 import { nodeHref } from '../data/path';
@@ -59,6 +61,7 @@ const layerStyle = node.layerN
   >
     <span class="pn-top">
       <span class="pn-index mono" aria-hidden="true">{pad(index + 1)}</span>
+      {node.layerN && <span class="pn-sq" aria-hidden="true"></span>}
       <span class="pn-kind mono">{node.kind}</span>
       <span class="pn-mark mono" aria-hidden="true"></span>
     </span>
@@ -142,18 +145,16 @@ const layerStyle = node.layerN
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
     background: var(--bg);
-    /* A left tick in the node/layer colour (transversal nodes fall back to line). */
-    border-left: 3px solid var(--c, var(--line));
   }
 
-  /* Kind cues. */
+  /* Kind cues, by border alone (the layer rides on the .pn-sq square). An
+     optional node's dash is --ink-2, so it reads beside the core's ink. */
   .path-node[data-kind='core'] {
     border-color: var(--ink);
-    border-left-color: var(--c, var(--ink));
   }
 
   .path-node[data-kind='optional'] {
-    border-style: dashed;
+    border: 1px dashed var(--ink-2);
   }
 
   .pn-btn {
@@ -179,6 +180,16 @@ const layerStyle = node.layerN
 
   .pn-index {
     color: var(--muted);
+  }
+
+  /* The node's layer: the outlined chip used across the site for a layer. */
+  .pn-sq {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--c);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 24%, transparent);
   }
 
   .pn-kind {
@@ -241,7 +252,6 @@ const layerStyle = node.layerN
 
   .path-node[data-state='learning'] {
     border: 1px dashed var(--ink);
-    border-left-width: 3px;
     background: color-mix(in srgb, var(--c, var(--ink)) 35%, transparent);
   }
 
@@ -250,12 +260,17 @@ const layerStyle = node.layerN
     color: var(--muted);
   }
 
+  /* Skipped is struck through, not only greyed: the state reads by form. */
+  .path-node[data-state='skipped'] .pn-title {
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+
   /* ---- related: prereqs/dependents of the active node, while its edges show.
-     A subtle ink outline and left tick only; the state background colours (set
-     above) are deliberately left untouched. */
+     A subtle ink outline only; the state background colours (set above) are
+     deliberately left untouched. */
   .path-node[data-related] {
     border-color: var(--ink);
-    border-left-color: var(--ink);
   }
 
   /* ---- body: shared by the inline <details> and the drawer clone ---- */

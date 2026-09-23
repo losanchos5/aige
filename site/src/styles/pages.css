@@ -5,6 +5,20 @@
 /* The page hero rules now live in src/components/PageHero.astro, scoped to that
    component (the landings and the reference pages share it). */
 
+/* Section rhythm on the landings (/role, /stack, /path, /map): two plain
+   sections back to back are one argument continued, so their seam closes to
+   --s-7 on each side of the register rule; the full .section padding (up to
+   --s-8) stays where the tone changes (tint, dark, the closing band). Scoped
+   to pages that open with the landing hero; below ~640px .section is already
+   --s-7, so phones are unchanged. */
+.hero--landing ~ .sec--plain:has(+ .sec--plain) {
+  padding-bottom: var(--s-7);
+}
+
+.hero--landing ~ .sec--plain + .sec--plain {
+  padding-top: var(--s-7);
+}
+
 /* A reading well: keep prose-like content within a comfortable measure. */
 .well {
   max-width: var(--prose);
