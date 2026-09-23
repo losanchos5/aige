@@ -128,11 +128,14 @@ if (updated) metaBits.push({ text: site.license });
     }
   }
 
-  /* Break out to the reading well, exactly like .prose > .glance / .diagram: the
-     prose stays at 72ch but .doc-main is a container, so the band widens to the
-     whole well. Off a container the cq units resolve to the column and nothing
-     moves — and the band never exceeds .doc-main, so no page-level scroll. */
-  :global(.prose) > .chapter-header .ch-band {
+  /* In a chapter, break out to the reading well, exactly like .prose > .glance /
+     .diagram: the prose stays at 72ch but .doc-main is a container, so the band
+     widens to the whole well and lines up with the crumbs and the At a glance
+     box. Off a container the cq units resolve to the column and nothing moves —
+     and the band never exceeds .doc-main, so no page-level scroll. The Thesis
+     and the meta pages have no crumbs or glance box: there the band keeps the
+     prose column, so the header, the lede and the text share one left edge. */
+  :global([data-mode='chapter'] .prose) > .chapter-header .ch-band {
     width: 100cqw;
     margin-inline: calc(50% - 50cqw);
   }

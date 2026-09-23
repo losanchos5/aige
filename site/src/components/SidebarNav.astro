@@ -68,25 +68,27 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
   /* A single accent that ui-doc.js slides onto the current row (mirrors the TOC
      marker). Sits at the rows' left bleed edge (x=0 of the nav's border box, so
      it never widens the box — layout.spec forbids horizontal overflow here) and
-     takes the current layer's ink. Height/transform/background are set by JS;
-     with no JS it stays 0-height and the active row's fill carries the state. */
+     takes the current layer's ink. Transform and background are set by JS
+     (translateY to the row, scaleY to its height over this box's height), so it
+     moves without animating layout; with no JS it stays at scaleY(0) and the
+     active row's fill carries the state. */
   .nav-rail {
     position: absolute;
     left: 0;
     top: 0;
     width: 2px;
-    height: 0;
+    height: var(--s-6);
     border-radius: 2px;
     background: var(--ink);
     box-shadow: 0 0 6px color-mix(in srgb, var(--ink) 35%, transparent);
+    transform: scaleY(0);
+    transform-origin: top;
     pointer-events: none;
   }
 
   @media (prefers-reduced-motion: no-preference) {
     .nav-rail {
-      transition:
-        transform 200ms var(--ease),
-        height 200ms var(--ease);
+      transition: transform var(--dur) var(--ease);
     }
   }
 
@@ -188,7 +190,7 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
 
   @media (prefers-reduced-motion: no-preference) {
     .nav-fill {
-      transition: transform 160ms linear;
+      transition: transform var(--dur) var(--ease);
     }
   }
 
@@ -200,6 +202,12 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
   .nav-item:hover {
     color: var(--ink);
     background: color-mix(in srgb, var(--layer-ink) 10%, transparent);
+  }
+
+  /* On the tinted hover fill --muted drops under AA; step the index up to
+     --ink-2 there (the same re-scope every non-flat surface gets). */
+  .nav-item:hover .nav-num {
+    color: var(--ink-2);
   }
 
   .nav-num {

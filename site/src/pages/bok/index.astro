@@ -132,8 +132,19 @@ const readingPaths = [
   </div>
 
   <style>
+    /* The page closes on the sign note's framed box, and the footer opens with
+       its own rule, so the two need only one --s-7 between them (the index's
+       bottom padding and the footer's 64–128px top margin stacked to ~280px). */
     .bok-index {
-      padding-block: var(--s-7) var(--s-8);
+      padding-block: var(--s-7) 0;
+    }
+
+    .bok-index > :global(:last-child) {
+      margin-bottom: 0;
+    }
+
+    :global(#main:has(.bok-index) + .site-footer) {
+      margin-top: var(--s-7);
     }
 
     .eyebrow {

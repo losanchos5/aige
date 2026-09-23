@@ -158,7 +158,7 @@ if (statsChapter) {
     <div class="doc-layout">
       {
         withSidebar && (
-          <aside id="doc-sidebar" class="doc-sidebar" data-pagefind-ignore>
+          <aside id="doc-sidebar" class="doc-sidebar" aria-label="Chapters" data-pagefind-ignore>
             <SidebarNav activeSlug={activeSlug} activeThesis={activeThesis} />
           </aside>
         )
@@ -225,7 +225,7 @@ if (statsChapter) {
 
       {
         withToc && (
-          <aside class="doc-toc" data-pagefind-ignore data-nosnippet>
+          <aside class="doc-toc" aria-label="On this page" data-pagefind-ignore data-nosnippet>
             <Toc headings={headings} />
           </aside>
         )
@@ -317,6 +317,9 @@ if (statsChapter) {
        at 72ch inside it; the extra room is what lets a diagram figure break out
        (see .diagram in diagrams.css). Only consumed by the ≥1100px rules. */
     --doc-well: min(1100px, 100%);
+    /* Where the sticky rails (chapter sidebar, TOC) settle: just under the
+       sticky site header, like the in-page anchors. */
+    --doc-rail-top: calc(var(--anchor-offset) + var(--s-3));
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: var(--s-6);
@@ -416,7 +419,10 @@ if (statsChapter) {
     font-size: 0.9375rem;
   }
 
-  /* Chapter rail: off-canvas drawer below 840px. */
+  /* Chapter rail: off-canvas drawer below 840px. Closed, it is also
+     visibility: hidden, so its links leave the tab order and the accessibility
+     tree instead of sitting off-screen as invisible tab stops. The hide waits
+     one --dur so the slide-out still plays. */
   .doc-sidebar {
     position: fixed;
     inset: 0 auto 0 0;
@@ -427,11 +433,26 @@ if (statsChapter) {
     border-right: 1px solid var(--line);
     overflow-y: auto;
     transform: translateX(-100%);
-    transition: transform var(--dur) var(--ease);
+    visibility: hidden;
   }
 
   .doc-sidebar.is-open {
     transform: none;
+    visibility: visible;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .doc-sidebar {
+      transition:
+        transform var(--dur) var(--ease),
+        visibility 0s linear var(--dur);
+    }
+
+    .doc-sidebar.is-open {
+      transition:
+        transform var(--dur) var(--ease),
+        visibility 0s;
+    }
   }
 
   .doc-scrim {
@@ -446,22 +467,23 @@ if (statsChapter) {
       display: none;
     }
 
+    /* `inset` goes before `top`: written after it, it reset `top` to auto and
+       the rail scrolled away with the page instead of sticking. No mask at the
+       foot either (it made the last chapter read as dimmed text); the bottom
+       padding keeps the last row clear of the edge when the rail scrolls. */
     .doc-sidebar {
       position: sticky;
-      top: var(--s-6);
       inset: auto;
+      top: var(--doc-rail-top);
       z-index: auto;
       width: auto;
-      max-height: calc(100dvh - var(--s-7));
-      padding: 0;
+      max-height: calc(100dvh - var(--doc-rail-top) - var(--s-5));
+      padding: 0 0 var(--s-5);
       background: none;
       border-right: 0;
       transform: none;
-      /* Soft fade where the rail scrolls under the viewport foot. Purely visual
-         (mask does not touch layout, so the layout.spec no-overflow checks and
-         computed contrast are unaffected). */
-      -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent);
-      mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent);
+      visibility: visible;
+      transition: none;
     }
 
     .doc-scrim {
@@ -474,8 +496,18 @@ if (statsChapter) {
   }
 
   @media (min-width: 1100px) {
+    /* The TOC column sticks as a whole (align-self: start keeps the grid item
+       at its content height, so it has the whole row to travel). A TOC taller
+       than the viewport scrolls inside; the inline padding leaves room for the
+       links' focus ring and hover nudge inside that scroll box. */
     .doc-toc {
       display: block;
+      position: sticky;
+      top: var(--doc-rail-top);
+      align-self: start;
+      max-height: calc(100dvh - var(--doc-rail-top) - var(--s-5));
+      overflow-y: auto;
+      padding: 0 var(--s-2) var(--s-2);
     }
 
     /* The sticky sidebar TOC takes over here. */
