@@ -131,17 +131,17 @@
 }
 
 /* ---- Callouts (aside.callout[data-kind]) ----
-   A framed card with a soft shadow, a left rail keyed to the kind (--rail) and a
-   mono glyph set in the gutter via ::before content per data-kind. */
+   A framed card with a soft shadow, a full 1px --line frame (no side rail: the
+   tint and the label already tell the kinds apart) and a mono glyph in the
+   gutter via ::before content, both keyed to the kind (--callout-ink). */
 .prose .callout {
-  --rail: var(--ink-2);
+  --callout-ink: var(--ink-2);
   --callout-glyph: '•';
   position: relative;
   margin-top: var(--s-5);
   padding: var(--s-4) var(--s-4) var(--s-4) var(--s-6);
   border: 1px solid var(--line);
-  border-left: 3px solid var(--rail);
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  border-radius: var(--r-sm);
   background: var(--surface);
   box-shadow: var(--shadow-1);
 }
@@ -154,7 +154,7 @@
   font-family: var(--font-mono);
   font-size: 0.9rem;
   line-height: 1.2;
-  color: var(--rail);
+  color: var(--callout-ink);
   pointer-events: none;
 }
 
@@ -176,22 +176,22 @@
 }
 
 .prose .callout[data-kind='practice'] {
-  --rail: var(--l2-ink);
+  --callout-ink: var(--l2-ink);
   --callout-glyph: '✓';
   background: color-mix(in srgb, var(--l2) 45%, var(--bg));
 }
 .prose .callout[data-kind='example'] {
-  --rail: var(--l1-ink);
+  --callout-ink: var(--l1-ink);
   --callout-glyph: '→';
   background: color-mix(in srgb, var(--l1) 45%, var(--bg));
 }
 .prose .callout[data-kind='anti'] {
-  --rail: var(--l3-ink);
+  --callout-ink: var(--l3-ink);
   --callout-glyph: '✕';
   background: color-mix(in srgb, var(--l3) 45%, var(--bg));
 }
 .prose .callout[data-kind='note'] {
-  --rail: var(--ink-2);
+  --callout-ink: var(--ink-2);
   --callout-glyph: '§';
   background: var(--surface);
 }

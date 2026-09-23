@@ -5,7 +5,8 @@
  * prose. On desktop it bleeds to the reading well like a diagram figure
  * (container-query full-bleed, see diagrams.css) so the first viewport has a
  * structured block before the text starts. Items come from `chapter.glance`
- * in src/data/chapters.ts.
+ * in src/data/chapters.ts. The column count follows the item count, so no
+ * row is left with a single orphan: four items read 2×2, three read 3×1.
  */
 interface Props {
   items?: readonly string[];
@@ -13,13 +14,15 @@ interface Props {
 }
 
 const { items, class: className } = Astro.props;
+const count = items?.length ?? 0;
+const cols = count % 3 === 0 ? 3 : count % 2 === 0 ? 2 : 1;
 ---
 
 {
   items && items.length > 0 && (
-    <aside class:list={['glance', 'card-lum', className]} aria-labelledby="glance-label">
+    <aside class:list={['glance', className]} aria-labelledby="glance-label">
       <p class="glance-label" id="glance-label">At a glance</p>
-      <ol class="glance-list">
+      <ol class="glance-list" data-cols={cols}>
         {items.map((item, i) => (
           <li class="glance-item">
             <span class="glance-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
@@ -32,32 +35,16 @@ const { items, class: className } = Astro.props;
 }
 
 <style>
-  /* card-lum (global) supplies the frame, soft shadow and hover ring; here we
-     add the layout and a five-layer accent rule running l1→l5 down the left. */
+  /* A flat box: --surface fill and a 1px --line frame, no shadow, no hover
+     ring and no accent rule (the list is not a set of layers). It is its own
+     inline-size container so the grid below can size to the box. */
   .glance {
-    --lumin: linear-gradient(
-      180deg,
-      var(--l1-ink),
-      var(--l2-ink),
-      var(--l3-ink),
-      var(--l4-ink),
-      var(--l5-ink)
-    );
+    container-type: inline-size;
     margin: var(--s-5) 0 var(--s-6);
-    padding: var(--s-5) var(--s-5) var(--s-5) var(--s-6);
+    padding: var(--s-5);
+    border: 1px solid var(--line);
     border-radius: var(--r-lg);
-    overflow: hidden;
-  }
-
-  .glance::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--lumin);
-    pointer-events: none;
+    background: var(--surface);
   }
 
   /* Same bleed as .prose > .diagram: take the whole well, not the 72ch column. */
@@ -77,11 +64,23 @@ const { items, class: className } = Astro.props;
 
   .glance-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--s-4) var(--s-5);
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  @container (min-width: 440px) {
+    .glance-list[data-cols='2'] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @container (min-width: 660px) {
+    .glance-list[data-cols='3'] {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
   .glance-item {

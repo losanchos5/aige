@@ -97,9 +97,11 @@ const { items, swatch = 'var(--ink)', rule = false, class: className } = Astro.p
     color: var(--ink);
   }
 
-  /* The current page's crumb: a touch stronger than the muted links. */
+  /* The current page's crumb: a touch stronger than the muted links. It is the
+     one crumb long enough to wrap on a phone, so it gets a real line-height. */
   .crumbs [aria-current='page'] {
     color: var(--ink-2);
+    line-height: 1.3;
   }
 
   .sep {

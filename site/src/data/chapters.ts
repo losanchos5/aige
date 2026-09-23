@@ -2,7 +2,8 @@
 // `id` is the collection entry id Astro's glob loader produces from each
 // file name (github-slugger over the path segment, e.g. `00-preface.md`
 // -> `00-preface`). Titles are the file H1; summaries are the opening
-// blockquote, trimmed to <=160 chars, faithful to the source.
+// blockquote, shortened to one complete sentence of <=160 chars (never cut
+// mid-sentence with an ellipsis), faithful to the source.
 
 export interface Chapter {
   /** Collection entry id (matches the glob loader id). */
@@ -62,7 +63,7 @@ export const chapters: readonly Chapter[] = [
     title: '02. Why now',
     shortTitle: 'Why Now',
     summary:
-      'AI governance engineering is forming now because the thing being governed changed shape, the market renamed the role before the profession named itself…',
+      'AI governance engineering is forming now: the thing being governed changed shape, the market renamed the role and the law began asking for engineered evidence.',
     glance: [
       'Five problems share one root: governance that describes instead of runs.',
       'The object changed shape: agents that browse, execute code and act under delegated authority are what legacy governance can least see.',
@@ -92,7 +93,7 @@ export const chapters: readonly Chapter[] = [
     title: '04. The stack (five layers)',
     shortTitle: 'The Stack',
     summary:
-      'The reference architecture of AI governance engineering: five layers that answer the three questions, where evidence is produced at the bottom…',
+      'The reference architecture: five layers that answer the three questions, where evidence is produced at the bottom and proven at the top.',
     glance: [
       'Five layers in build order along one spine: Policy → Inventory → Evals → Runtime → Assurance.',
       'Each layer produces an artefact the layer above consumes; evidence flows up into audit-ready proof.',
@@ -122,7 +123,7 @@ export const chapters: readonly Chapter[] = [
     title: '06. The role',
     shortTitle: 'The Role',
     summary:
-      'The AI governance engineer as a concrete role: a capability first and a job title second, defined by the workflows it owns and the evidence it produces…',
+      'The AI governance engineer as a concrete role, defined by the workflows it owns and the evidence it produces, not by the certifications on its holder.',
     glance: [
       'The person, on whatever org chart, accountable for the three questions in production.',
       'Defined by the workflows it owns — intake, registry, evals, gates, runtime, assurance, regulatory translation — and the evidence each produces.',
@@ -137,7 +138,7 @@ export const chapters: readonly Chapter[] = [
     title: '07. Maturity model (five levels)',
     shortTitle: 'Maturity Model',
     summary:
-      'A ladder from paper to production — Documented, Inventoried, Tested, Enforced, Continuous — where each level is proven by what the running systems show…',
+      'A ladder from paper to production — Documented, Inventoried, Tested, Enforced, Continuous — where each level is proven by what the running systems show.',
     glance: [
       'Five levels: Documented, Inventoried, Tested, Enforced, Continuous.',
       'A level is a state you demonstrate by querying the registry, running the gate and reading the evidence store, not a score you award yourself.',
@@ -152,7 +153,7 @@ export const chapters: readonly Chapter[] = [
     title: '08. Regulatory map (obligation → artefact → layer)',
     shortTitle: 'Regulatory Map',
     summary:
-      'The reverse index of every "Maps to" line in the book: for each obligation it names the engineering artefact that satisfies or supports it…',
+      'The reverse index of every "Maps to" line in the book: for each obligation, the engineering artefact that satisfies or supports it and its stack layer.',
     glance: [
       'The reverse index of every Maps to line: obligation → artefact → stack layer.',
       'Mappings are illustrative, not a claim of conformity; every EU AI Act date is the post-Omnibus date.',

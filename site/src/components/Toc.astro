@@ -1,6 +1,7 @@
 ---
-// Toc: on-this-page navigation built from the rendered headings (H2/H3). Sticky
-// on wide viewports; ui-doc.js adds aria-current to the section in view and
+// Toc: on-this-page navigation built from the rendered headings (H2/H3). Doc's
+// .doc-toc column holds it sticky on wide viewports; ui-doc.js adds
+// aria-current to the section in view and
 // .is-past to every entry before it, so each entry reads as current, read or
 // pending — by colour only, never opacity.
 import type { MarkdownHeading } from 'astro';
@@ -35,8 +36,6 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
 <style>
   .toc {
-    position: sticky;
-    top: var(--s-7);
     font-size: 0.875rem;
   }
 
@@ -51,7 +50,9 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
   }
 
   /* The active marker is a single 2px rule that slides between entries rather
-     than a per-link border that jumps. */
+     than a per-link border that jumps. Transform-only: ui-doc.js sets
+     translateY(top) scaleY(entry height / this box's height), so the marker
+     moves and resizes without animating layout. Hidden (scaleY 0) until then. */
   .toc-list {
     position: relative;
   }
@@ -61,17 +62,16 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
     left: 0;
     top: 0;
     width: 2px;
-    height: 0;
+    height: var(--s-5);
     background: var(--ink);
     box-shadow: 0 0 6px color-mix(in srgb, var(--ink) 40%, transparent);
-    transform: translateY(0);
+    transform: scaleY(0);
+    transform-origin: top;
   }
 
   @media (prefers-reduced-motion: no-preference) {
     .toc-marker {
-      transition:
-        transform 200ms var(--ease),
-        height 200ms var(--ease);
+      transition: transform var(--dur) var(--ease);
     }
   }
 

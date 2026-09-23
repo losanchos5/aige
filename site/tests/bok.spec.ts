@@ -90,6 +90,89 @@ test('the chapter drawer opens on a phone viewport', async ({ page }) => {
   await expect(sidebar).toBeInViewport();
 });
 
+test('the closed chapter drawer takes no tab stops on a phone viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 780 });
+  await page.goto('/bok/the-stack');
+
+  // Tab from the top of the page well into the prose: no stop may land inside
+  // the off-canvas rail while it is closed.
+  for (let i = 0; i < 30; i++) {
+    await page.keyboard.press('Tab');
+    const inSidebar = await page.evaluate(
+      () => !!document.activeElement?.closest('#doc-sidebar'),
+    );
+    expect(inSidebar, `tab stop ${i + 1} landed in the closed drawer`).toBe(false);
+  }
+});
+
+test('the open chapter drawer is a modal dialog and Escape hands focus back', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 780 });
+  await page.goto('/bok/the-stack');
+
+  const sidebar = page.locator('#doc-sidebar');
+  const toggle = page.locator('[data-drawer-open]');
+  await toggle.click();
+
+  await expect(sidebar).toHaveAttribute('role', 'dialog');
+  await expect(sidebar).toHaveAttribute('aria-modal', 'true');
+  await expect(sidebar).toHaveAttribute('aria-label', 'Chapters');
+  expect(await sidebar.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+
+  await page.keyboard.press('Escape');
+  await expect(toggle).toBeFocused();
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  await expect(sidebar).not.toHaveAttribute('role', 'dialog');
+  await expect(sidebar).not.toHaveAttribute('aria-modal', 'true');
+});
+
+test('the chapter rail and the TOC stay in view deep into a chapter', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/bok/the-stack');
+  await page.evaluate(() => window.scrollTo(0, 5000));
+
+  for (const selector of ['.doc-sidebar', '.doc-toc']) {
+    await expect
+      .poll(() =>
+        page.evaluate((sel) => {
+          const r = document.querySelector(sel)!.getBoundingClientRect();
+          return r.top >= 0 && r.top < window.innerHeight && r.bottom > 0;
+        }, selector),
+        { message: `${selector} scrolled out of view` },
+      )
+      .toBe(true);
+  }
+
+  // Deep in the chapter the TOC shows where the reader is: one current entry
+  // and the entries before it marked as read.
+  await expect(page.locator('nav.toc a[aria-current]')).toHaveCount(1);
+  expect(await page.locator('nav.toc a.is-past').count()).toBeGreaterThanOrEqual(1);
+});
+
+test('opening "Cite this chapter" on a phone adds no horizontal scroll', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 780 });
+  await page.goto('/bok/the-stack');
+
+  await page.locator('.cite-box > summary').click();
+  await expect(page.locator('.cite-bibtex')).toBeVisible();
+
+  const { scrollW, clientW } = await page.evaluate(() => ({
+    scrollW: document.documentElement.scrollWidth,
+    clientW: document.documentElement.clientWidth,
+  }));
+  expect(scrollW).toBeLessThanOrEqual(clientW);
+});
+
+test('the chapter breadcrumb names the chapter number once', async ({ page }) => {
+  await page.goto('/bok/the-stack');
+  await expect(page.locator('.doc-crumbs [aria-current="page"]')).toHaveText('04 · The Stack');
+});
+
+test('chapter summaries end on a full sentence, never an ellipsis', () => {
+  for (const chapter of chaptersOrdered) {
+    expect(chapter.summary.trim(), chapter.slug).not.toMatch(/(…|\.\.\.)$/);
+  }
+});
+
 test('search opens with Ctrl+K and returns results for "policy"', async ({ page }) => {
   await page.goto('/bok/the-stack');
   await page.keyboard.press('Control+k');
