@@ -44,9 +44,11 @@ Reglas de trabajo: Fable planifica, revisa figuras y verifica; subagentes `imple
       Measure/Manage del NIST AI RMF proyectadas sobre las cinco capas y los siete workflows) + término de
       glosario; entonces el mapa gana un nodo Risk propio en Foundations. Mientras tanto «Risk management»
       es hoja de Obligations en `/map` y en la infografía.
-- [ ] Seo/hreflang: la página /es/thesis usa `lang`/`locale`/`alternates` vía Doc→Base→Seo; el
-      «Updated» de ChapterHeader sigue en inglés en /es/thesis.
-- [ ] Feed RSS: el título sigue siendo «Changelog» aunque ya lleva capítulos (título en Base.astro).
+- [x] Seo/hreflang: la página /es/thesis usa `lang`/`locale`/`alternates` vía Doc→Base→Seo; el
+      «Updated» de ChapterHeader ya se traduce (2026-09-23): `lang` llega hasta ChapterHeader y la
+      línea de meta usa «Actualizado».
+- [x] Feed RSS: título del feed y del `<link rel="alternate">` de Base.astro cambiados a
+      «AI Governance Engineer — chapters and releases» (2026-09-23); ya no dice «Changelog».
 - [x] `ObligationMatrix.astro` derivado de `frameworks.ts` (23 filas; ISO 42005 y EN 18286 quedan
       fuera porque ninguna obligación las referencia).
 - [ ] Dogfooding (D8, sin hacer): publicar el AIBOM del sitio (CycloneDX en build),

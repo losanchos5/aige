@@ -63,7 +63,7 @@ test.describe('presence', () => {
 
       // The "open" link points at the standalone viewer, in a new, safe tab.
       const open = figure.locator('a.diagram-open');
-      await expect(open).toHaveAttribute('href', `/diagrams/${id}.html`);
+      await expect(open).toHaveAttribute('href', `/diagrams/${id}`);
       await expect(open).toHaveAttribute('target', '_blank');
       await expect(open).toHaveAttribute('rel', /noopener/);
     });

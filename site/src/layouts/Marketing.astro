@@ -6,17 +6,28 @@
  * `.full-bleed` utility on a section for a tinted, edge-to-edge band.
  */
 import Base from './Base.astro';
+import type { JsonLdInput } from '../lib/jsonld';
 
 interface Props {
   title: string;
   description?: string;
   image?: string;
+  /** Page nodes for the site-wide JSON-LD graph (Seo.astro merges them). */
+  jsonLd?: JsonLdInput;
+  /** Append ` · {site.name}` to the document title (default true); see Seo. */
+  titleSuffix?: boolean;
 }
 
-const { title, description, image } = Astro.props;
+const { title, description, image, jsonLd, titleSuffix } = Astro.props;
 ---
 
-<Base title={title} description={description} image={image}>
+<Base
+  title={title}
+  description={description}
+  image={image}
+  jsonLd={jsonLd}
+  titleSuffix={titleSuffix}
+>
   <div class="marketing">
     <slot />
   </div>

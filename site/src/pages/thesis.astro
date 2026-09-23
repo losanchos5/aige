@@ -4,7 +4,9 @@ import Doc from '../layouts/Doc.astro';
 import Diagram from '../components/Diagram.astro';
 import SignNote from '../components/SignNote.astro';
 import { site } from '../data/site';
-import { gitDate } from '../lib/reading';
+import { gitCreated, gitDate } from '../lib/reading';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
+import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 
 const entry = await getEntry('thesis', 'thesis');
 if (!entry) {
@@ -16,15 +18,47 @@ const title = (remarkPluginFrontmatter.title as string | undefined) ?? 'The AI G
 const summary =
   (remarkPluginFrontmatter.summary as string | undefined) ??
   'Governance as a system to be built, run and measured — not a document to be signed.';
+// The visible lede is one line; the search snippet has ~160 characters to spend,
+// so the meta description restates the same claims the opening paragraph makes
+// (executable policy, a control in the pipeline, evidence produced by the build).
+const metaDescription =
+  'Governance as a system to be built, run and measured: executable policy, controls that run in the pipeline, and evidence produced as the build runs.';
 const editPath = 'THESIS.md';
 const updated = gitDate('../THESIS.md');
+const published = gitCreated('../THESIS.md');
 const signUrl = `${site.github}/edit/main/bok/CONTRIBUTORS.md`;
 const issueUrl = `${site.github}/issues/new?template=sign-the-thesis.yml`;
+
+// The Thesis as a TechArticle, dated from the git history of THESIS.md. The
+// Person nodes and the Organization / WebSite ids come from lib/jsonld.ts, which
+// merges this into the page's single ld+json graph.
+const thesisUrl = new URL('/thesis', site.url).href;
+const jsonLd = [
+  {
+    '@type': 'TechArticle',
+    '@id': `${thesisUrl}#article`,
+    headline: title,
+    description: summary,
+    url: thesisUrl,
+    inLanguage: 'en',
+    datePublished: published,
+    dateModified: updated,
+    image: new URL('/og/thesis.png', site.url).href,
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    // URL, not the "CC BY 4.0" label: schema.org types `license` as URL|CreativeWork.
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+  },
+  ...authorNodes,
+  breadcrumbJsonLd([{ label: 'The Thesis' }]),
+];
 ---
 
 <Doc
   title={title}
   summary={summary}
+  description={metaDescription}
   kicker="The Thesis"
   headings={headings}
   editPath={editPath}
@@ -33,6 +67,8 @@ const issueUrl = `${site.github}/issues/new?template=sign-the-thesis.yml`;
   wide={true}
   activeThesis={true}
   image="/og/thesis.png"
+  jsonLd={jsonLd}
+  article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
   alternates={[
     { hreflang: 'en', href: `${site.url}/thesis` },
     { hreflang: 'es', href: `${site.url}/es/thesis` },

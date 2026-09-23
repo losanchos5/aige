@@ -22,7 +22,11 @@ export interface SiteConfig {
   authors: readonly string[];
   /** Per-author metadata for structured data; keyed by the names in `authors`. */
   authorDetails: readonly Author[];
+  /** Human-readable licence label, shown in the page chrome (e.g. `CC BY 4.0`). */
   license: string;
+  /** Canonical licence URL. schema.org types `license` as URL|CreativeWork, so
+      the structured data links this rather than repeating the label as text. */
+  licenseUrl: string;
   bokVersion: string;
   /** Zenodo DOI of the current archived release (bokVersion). */
   doi: string;
@@ -43,7 +47,7 @@ export const site: SiteConfig = {
   name: 'AI Governance Engineer',
   url: 'https://aigovernanceengineer.com',
   description:
-    'The Thesis and Body of Knowledge for AI governance engineering — turning AI governance obligations into policy-as-code, eval gates and machine-readable evidence.',
+    'The Thesis and Body of Knowledge for AI governance engineering — turning governance obligations into policy-as-code, eval gates and machine-readable evidence.',
   linkedin: 'https://www.linkedin.com/in/jorgara',
   email: 'jorgegarciaaibar@gmail.com',
   github: 'https://github.com/losanchos5/aige',
@@ -53,6 +57,7 @@ export const site: SiteConfig = {
     { name: 'Jorge García Aibar', sameAs: ['https://www.linkedin.com/in/jorgara'] },
   ],
   license: 'CC BY 4.0',
+  licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
   bokVersion: '0.4.0',
   doi: '10.5281/zenodo.22857086',
   conceptDoi: '10.5281/zenodo.22857084',

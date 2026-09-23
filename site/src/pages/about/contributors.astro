@@ -13,11 +13,16 @@ const title = (remarkPluginFrontmatter.title as string | undefined) ?? 'Contribu
 const summary = (remarkPluginFrontmatter.summary as string | undefined) ?? undefined;
 const editPath = 'bok/CONTRIBUTORS.md';
 const updated = gitDate(`../${editPath}`);
+// CONTRIBUTORS.md opens with an H2, not a blockquote, so remark-lead yields no
+// summary and the page fell back to the site-wide description. State its own.
+const description =
+  'Who wrote the Body of Knowledge, who co-authored the Thesis, and who has signed it: the authorship, contributions and signatories of the project.';
 ---
 
 <Doc
   title={title}
   summary={summary}
+  description={description}
   kicker="About"
   crumbs={[{ label: 'About', href: '/about' }, { label: title }]}
   headings={headings}

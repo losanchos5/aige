@@ -30,7 +30,9 @@ interface Props {
   kicker?: string;
   /** CSS colour for the eyebrow square, e.g. `var(--l3)`. */
   swatch?: string;
-  /** When present, a Breadcrumb replaces the Kicker eyebrow. */
+  /** When present, a Breadcrumb replaces the Kicker eyebrow. The matching
+      BreadcrumbList JSON-LD is the page's job: pass `breadcrumbJsonLd(crumbs)`
+      to the layout's `jsonLd`, which lands it in the single head graph. */
   crumbs?: Crumb[];
   /** A `.meta` line linking the related chapter (landings only). */
   related?: { label: string; href: string };

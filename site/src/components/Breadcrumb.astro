@@ -2,11 +2,15 @@
 /**
  * Breadcrumb — a mono, uppercase trail styled after Kicker: an optional layer
  * square, then an ordered list of crumbs separated by aria-hidden chevrons. The
- * last crumb is the current page (`aria-current="page"`, no link). By default it
- * also emits a schema.org BreadcrumbList (Home first, absolute URLs); pass
- * `jsonLd={false}` where the page already carries breadcrumb data in its graph.
+ * last crumb is the current page (`aria-current="page"`, no link).
+ *
+ * This is the visible trail only. The matching schema.org BreadcrumbList is
+ * built with `breadcrumbJsonLd(items)` (lib/breadcrumbs.ts) and handed to the
+ * layout, so it lands in the page's single ld+json graph in the head — see
+ * Doc.astro, which does it for the crumbs it renders, and the pages that render
+ * a PageHero trail.
  */
-import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
+import type { Crumb } from '../lib/breadcrumbs';
 
 interface Props {
   items: Crumb[];
@@ -14,24 +18,10 @@ interface Props {
   swatch?: string;
   /** Draw a trailing 1px rule after the trail, like Kicker's `rule`. */
   rule?: boolean;
-  /** Emit the BreadcrumbList JSON-LD (default true). */
-  jsonLd?: boolean;
   class?: string;
 }
 
-const {
-  items,
-  swatch = 'var(--ink)',
-  rule = false,
-  jsonLd = true,
-  class: className,
-} = Astro.props;
-
-// JSON-LD is a data block, not executable script, so CSP script-src does not
-// apply; `<` is escaped exactly as in Seo.astro so content can never break out.
-const json = jsonLd
-  ? JSON.stringify(breadcrumbJsonLd(items)).replace(/</g, '\\u003c')
-  : null;
+const { items, swatch = 'var(--ink)', rule = false, class: className } = Astro.props;
 ---
 
 <nav class:list={['crumbs', className]} aria-label="Breadcrumb">
@@ -55,7 +45,6 @@ const json = jsonLd
     }
   </ol>
   {rule && <span class="rule" aria-hidden="true"></span>}
-  {json && <script type="application/ld+json" set:html={json} />}
 </nav>
 
 <style>

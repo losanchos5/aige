@@ -13,11 +13,16 @@ const title = (remarkPluginFrontmatter.title as string | undefined) ?? 'Changelo
 const summary = (remarkPluginFrontmatter.summary as string | undefined) ?? undefined;
 const editPath = 'bok/CHANGELOG.md';
 const updated = gitDate(`../${editPath}`);
+// CHANGELOG.md opens with a paragraph, not a blockquote, so remark-lead yields no
+// summary and the page fell back to the site-wide description. State its own.
+const description =
+  'Every notable change to the Thesis and Body of Knowledge, version by version: patch for fact and typo fixes, minor for new chapters and patterns.';
 ---
 
 <Doc
   title={title}
   summary={summary}
+  description={description}
   kicker="About"
   crumbs={[{ label: 'About', href: '/about' }, { label: title }]}
   headings={headings}

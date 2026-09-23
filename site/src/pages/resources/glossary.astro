@@ -2,19 +2,47 @@
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import GlossaryIndex from '../../components/GlossaryIndex.astro';
+import { getGlossary, getGlossaryLetters, termId } from '../../lib/glossary';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { site } from '../../data/site';
-import { getGlossary, getGlossaryLetters } from '../../lib/glossary';
+import { WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
 const entries = getGlossary();
 const letters = getGlossaryLetters();
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Glossary' }];
+
+// The glossary is genuinely structured — term, definition and an on-page anchor
+// per entry (GlossaryIndex renders each <dt id={termId(term)}>) — so it is stated
+// as a DefinedTermSet whose terms @id the anchors a reader can actually follow.
+const glossaryUrl = new URL('/resources/glossary', site.url).href;
+const termSetId = `${glossaryUrl}#glossary`;
+const jsonLd = [
+  {
+    '@type': 'DefinedTermSet',
+    '@id': termSetId,
+    name: `Glossary — ${site.name}`,
+    url: glossaryUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    hasDefinedTerm: entries.map((entry) => ({
+      '@type': 'DefinedTerm',
+      '@id': `${glossaryUrl}#${termId(entry.term)}`,
+      name: entry.term,
+      description: entry.definition,
+      inDefinedTermSet: { '@id': termSetId },
+    })),
+  },
+  breadcrumbJsonLd(crumbs),
+];
 ---
 
 <Base
-  title={`Glossary · ${site.name}`}
+  title="Glossary"
   description="The canonical glossary for AI governance engineering: every term defined once, alphabetically, and cross-referenced to the chapter that treats it in full."
   image="/og/resources.png"
+  jsonLd={jsonLd}
 >
   {/* Glossary is a Lighthouse route: keep it light — the dot texture only, no
       animated gradient mesh (mesh={false}). */}

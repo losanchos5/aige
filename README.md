@@ -2,6 +2,8 @@
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22857084.svg)](https://doi.org/10.5281/zenodo.22857084)
 
+<img width="1128" height="191" alt="cover-headline-1128x191" src="https://github.com/user-attachments/assets/52123838-69ef-4bc1-9814-39ac0354dd6a" />
+
 **AI governance engineering is the application of engineering practice — systems thinking, product
 thinking and code — to the governance of AI systems.**
 

@@ -17,6 +17,7 @@ import PathMap from '../components/PathMap.astro';
 import PathDrawer from '../components/PathDrawer.astro';
 import CtaBand from '../components/CtaBand.astro';
 import { stages, nodes, entries, crossStageEdges } from '../data/path';
+import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 
 const edges = crossStageEdges();
 
@@ -55,9 +56,10 @@ const legend = [
 ---
 
 <Marketing
-  title="The learning path · AI Governance Engineer"
-  description="A staged learning path for the AI Governance Engineer: four stages from foundations to proof, each a grid of nodes that link into the Body of Knowledge and out to curated resources — with your own progress."
+  title="The learning path"
+  description="A staged learning path for the AI Governance Engineer: four stages from foundations to proof, each a grid of nodes linking into the book and its resources."
   image="/og/path.png"
+  jsonLd={breadcrumbJsonLd([{ label: 'The learning path' }])}
 >
   <PageHero
     variant="page"

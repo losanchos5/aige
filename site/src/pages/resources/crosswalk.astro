@@ -8,22 +8,60 @@ import { site } from '../../data/site';
 import { disclaimer } from '../../data/frameworks';
 import { topics, columns, refs, topicMatrix, chipLabel, frameworkById } from '../../data/crosswalk';
 import { slugify } from '../../lib/md-parse';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 import '../../styles/crosswalk.css';
 
 const matrix = topicMatrix();
+const description =
+  'A crosswalk from each Body-of-Knowledge topic to the EU AI Act, ISO, NIST and Chinese instruments that govern it, clause by clause.';
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Crosswalk' }];
+
+// The crosswalk is a dataset, not just a page: the two download endpoints next to
+// it (crosswalk.csv.ts / crosswalk.json.ts) are its distributions.
+const crosswalkUrl = new URL('/resources/crosswalk', site.url).href;
+const jsonLd = [
+  {
+    '@type': 'Dataset',
+    '@id': `${crosswalkUrl}#dataset`,
+    name: `Topic × framework crosswalk — ${site.name}`,
+    description,
+    url: crosswalkUrl,
+    inLanguage: 'en',
+    version: site.bokVersion,
+    keywords: ['AI governance', 'EU AI Act', 'ISO/IEC 42001', 'NIST AI RMF', 'crosswalk'],
+    creator: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    // URL, not the "CC BY 4.0" label: schema.org types `license` as URL|CreativeWork.
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    distribution: [
+      {
+        '@type': 'DataDownload',
+        name: 'Crosswalk (CSV)',
+        encodingFormat: 'text/csv',
+        contentUrl: new URL('/resources/crosswalk.csv', site.url).href,
+      },
+      {
+        '@type': 'DataDownload',
+        name: 'Crosswalk (JSON)',
+        encodingFormat: 'application/json',
+        contentUrl: new URL('/resources/crosswalk.json', site.url).href,
+      },
+    ],
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
 ---
 
-<Base
-  title={`Crosswalk · ${site.name}`}
-  description="A crosswalk from each Body-of-Knowledge topic to the EU AI Act, ISO, NIST and Chinese instruments that govern it, clause by clause."
-  image="/og/resources.png"
->
+<Base title="Crosswalk" description={description} image="/og/resources.png" jsonLd={jsonLd}>
   <PageHero
     variant="res"
     swatch="var(--l1)"
-    crumbs={[{ label: 'Resources', href: '/resources' }, { label: 'Crosswalk' }]}
+    crumbs={crumbs}
     title="One topic, every framework."
     lede="Start from a governance topic, read across to the instrument that governs it, and land on the exact article, clause or control — each with a link back to the obligation it evidences."
   />

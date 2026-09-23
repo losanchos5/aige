@@ -132,7 +132,10 @@ export const GET: APIRoute = (context) => {
     .map((entry) => entry.item);
 
   return rss({
-    title: `${site.name} — Changelog`,
+    // The feed carries both kinds of item, so it is named for the whole site,
+    // not for the changelog alone (the same wording as the <link rel="alternate">
+    // in Base.astro).
+    title: `${site.name} — chapters and releases`,
     description:
       'The AI Governance Engineering Thesis & Body of Knowledge: new and updated chapters and each released version, newest first.',
     site: context.site ?? site.url,

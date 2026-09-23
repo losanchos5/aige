@@ -4,7 +4,8 @@ import Doc from '../../layouts/Doc.astro';
 import AtAGlance from '../../components/AtAGlance.astro';
 import { chaptersOrdered } from '../../data/chapters';
 import { site } from '../../data/site';
-import { gitDate } from '../../lib/reading';
+import { gitCreated, gitDate } from '../../lib/reading';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 
 export async function getStaticPaths() {
   const entries = await getCollection('bok');
@@ -47,7 +48,10 @@ const title = (remarkPluginFrontmatter.title as string | undefined) ?? chapter.t
 const summary = (remarkPluginFrontmatter.summary as string | undefined) ?? chapter.summary;
 const editPath = `bok/${chapter.id}.md`;
 const updated = gitDate(`../${editPath}`);
+const published = gitCreated(`../${editPath}`);
 const kicker = `Body of Knowledge · Chapter ${String(chapter.order).padStart(2, '0')}`;
+// The chapter's own Open Graph card, built by src/pages/og/[...slug].png.ts.
+const ogPath = `/og/bok-${chapter.slug}.png`;
 
 // Visible breadcrumb: Body of Knowledge › NN · Title. The BreadcrumbList JSON-LD
 // is already carried in this page's @graph below, so the crumb suppresses its own.
@@ -60,29 +64,13 @@ const crumbs = [
 // origin with the same technique as Seo.astro (new URL(path, site.url)), using the
 // clean, extensionless paths the sitemap and every internal link use (/bok,
 // /bok/<slug>) so the graph is internally consistent. The Body of Knowledge landing
-// lives at /bok (trailingSlash: 'never'). Person nodes are minimal: name plus any
-// known url / sameAs; never jobTitle or worksFor.
+// lives at /bok (trailingSlash: 'never'). The Person nodes come from lib/jsonld.ts,
+// which keeps them minimal: name plus any known url / sameAs, never jobTitle or
+// worksFor. Seo.astro merges this graph with the site-wide Organization / WebSite.
 const chapterUrl = new URL(`/bok/${chapter.slug}`, site.url).href;
 const bokUrl = new URL('/bok', site.url).href;
 const homeUrl = new URL('/', site.url).href;
 const bookId = `${bokUrl}#book`;
-
-const personSlug = (name: string): string =>
-  name
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-const persons = site.authorDetails.map((author) => ({
-  '@type': 'Person',
-  '@id': `${bokUrl}#person-${personSlug(author.name)}`,
-  name: author.name,
-  ...(author.url ? { url: author.url } : {}),
-  ...(author.sameAs && author.sameAs.length ? { sameAs: [...author.sameAs] } : {}),
-}));
-const authorRefs = persons.map((person) => ({ '@id': person['@id'] }));
 
 const book = {
   '@type': 'Book',
@@ -91,8 +79,12 @@ const book = {
   url: bokUrl,
   version: site.bokVersion,
   inLanguage: 'en',
-  author: authorRefs,
-  ...(site.license ? { license: site.license } : {}),
+  author: [...authorRefs],
+  publisher: { '@id': ORG_ID },
+  isPartOf: { '@id': WEBSITE_ID },
+  // schema.org types `license` as URL|CreativeWork, so link the deed rather than
+  // repeating the human-readable "CC BY 4.0" label the page chrome carries.
+  ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
 };
 
 const article = {
@@ -101,9 +93,11 @@ const article = {
   headline: title,
   url: chapterUrl,
   inLanguage: 'en',
+  datePublished: published,
   dateModified: updated,
+  image: new URL(ogPath, site.url).href,
   isPartOf: { '@id': bookId },
-  author: authorRefs,
+  author: [...authorRefs],
 };
 
 const breadcrumb = {
@@ -118,13 +112,14 @@ const breadcrumb = {
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@graph': [book, article, ...persons, breadcrumb],
+  '@graph': [book, article, ...authorNodes, breadcrumb],
 };
 ---
 
 <Doc
   title={title}
   summary={summary}
+  description={chapter.summary}
   kicker={kicker}
   crumbs={crumbs}
   crumbsJsonLd={false}
@@ -135,9 +130,10 @@ const jsonLd = {
   slug={chapter.slug}
   updated={updated}
   activeSlug={chapter.slug}
-  image={`/og/bok-${chapter.slug}.png`}
+  image={ogPath}
   cite={true}
   jsonLd={jsonLd}
+  article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
 >
   <AtAGlance items={chapter.glance} />
   <Content />

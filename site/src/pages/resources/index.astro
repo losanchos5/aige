@@ -8,6 +8,7 @@ import { topics, columns } from '../../data/crosswalk';
 import { toolsByCategory } from '../../data/stack';
 import { getReadingList } from '../../lib/reading-list';
 import { getGlossary } from '../../lib/glossary';
+import { WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
@@ -73,12 +74,31 @@ const cards = [
     count: '8 branches · one page',
   },
 ];
+
+// The landing is a collection of the six reference pages above; Seo.astro merges
+// this node into the page's single ld+json graph.
+const resourcesUrl = new URL('/resources', site.url).href;
+const jsonLd = {
+  '@type': 'CollectionPage',
+  '@id': `${resourcesUrl}#page`,
+  name: `Resources — ${site.name}`,
+  url: resourcesUrl,
+  inLanguage: 'en',
+  isPartOf: { '@id': WEBSITE_ID },
+  hasPart: cards.map((card) => ({
+    '@type': 'WebPage',
+    name: card.title,
+    url: new URL(card.href, site.url).href,
+    description: card.description,
+  })),
+};
 ---
 
 <Marketing
-  title={`Resources · ${site.name}`}
-  description="Curated, sourced and versioned resources for AI governance engineering: frameworks, tools, a reading list and a glossary, all extracted from the Body of Knowledge."
+  title="Resources"
+  description="Curated, sourced and versioned resources for AI governance engineering: frameworks, tools, a reading list and a glossary, all from the Body of Knowledge."
   image="/og/resources.png"
+  jsonLd={jsonLd}
 >
   <PageHero
     variant="res"
