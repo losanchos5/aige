@@ -28,6 +28,11 @@
       var next = resolvedTheme() === 'dark' ? 'light' : 'dark';
       if (typeof window.__setTheme === 'function') window.__setTheme(next);
       syncToggle(btn);
+      // The bundled motion-ui module animates the incoming icon; the flip
+      // itself (data-theme + CSS icon swap) has already happened above.
+      if (resolvedTheme() === next) {
+        document.dispatchEvent(new CustomEvent('theme:changed', { detail: { theme: next } }));
+      }
     });
   }
 

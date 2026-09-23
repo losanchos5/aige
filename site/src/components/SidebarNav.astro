@@ -106,7 +106,7 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
     background: var(--surface);
     color: var(--muted);
     cursor: pointer;
-    font-size: 0.875rem;
+    font-size: var(--fs-small);
     transition: border-color var(--dur) var(--ease);
   }
 
@@ -123,13 +123,15 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
     border-radius: var(--r-sm);
   }
 
+  /* Section kicker: the site's label register (mono, --fs-label, label
+     tracking) in --ink-2, matching the TOC's "On this page" label. */
   .nav-label {
-    margin: var(--s-5) 0 var(--s-2);
+    margin: var(--s-5) 0 var(--s-3);
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.08em;
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--ink-2);
   }
 
   .nav-list {
@@ -204,7 +206,7 @@ const layers = ['l1', 'l2', 'l3', 'l4', 'l5'];
     flex: none;
     width: 1.75rem;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: var(--fs-label);
     color: var(--muted);
   }
 

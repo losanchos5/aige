@@ -1,6 +1,9 @@
 ---
 // PrevNext: chapter pager. prev / next are chapter-shaped records; either may be
-// absent at the ends of the sequence.
+// absent at the ends of the sequence. Each link is a luminous card (card-lum +
+// lift from effects.css): a small "Previous" / "Next" kicker over the chapter
+// title. The kicker is aria-hidden so the link's accessible name is exactly the
+// chapter title; aria-describedby still gives assistive tech the direction.
 interface Adjacent {
   slug: string;
   shortTitle: string;
@@ -17,9 +20,15 @@ const { prev, next } = Astro.props;
 <nav class="pager" aria-label="Chapter navigation">
   {
     prev ? (
-      <a class="pager-link prev card-lum" href={`/bok/${prev.slug}`}>
-        <span class="dir">
-          <span class="arrow" aria-hidden="true">←</span> Previous
+      <a
+        class="pager-link prev card-lum lift"
+        href={`/bok/${prev.slug}`}
+        rel="prev"
+        aria-describedby="pager-prev-dir"
+      >
+        <span class="dir" aria-hidden="true">
+          <span class="arrow">←</span>
+          <span id="pager-prev-dir">Previous</span>
         </span>
         <span class="name">{prev.shortTitle}</span>
       </a>
@@ -29,9 +38,15 @@ const { prev, next } = Astro.props;
   }
   {
     next ? (
-      <a class="pager-link next card-lum" href={`/bok/${next.slug}`}>
-        <span class="dir">
-          Next <span class="arrow" aria-hidden="true">→</span>
+      <a
+        class="pager-link next card-lum lift"
+        href={`/bok/${next.slug}`}
+        rel="next"
+        aria-describedby="pager-next-dir"
+      >
+        <span class="dir" aria-hidden="true">
+          <span id="pager-next-dir">Next</span>
+          <span class="arrow">→</span>
         </span>
         <span class="name">{next.shortTitle}</span>
       </a>
@@ -42,42 +57,51 @@ const { prev, next } = Astro.props;
 </nav>
 
 <style>
+  /* Two equal tracks: prev always left, next always right (the empty <span>
+     holds the missing side at either end of the sequence). */
   .pager {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--s-4);
     margin-top: var(--s-7);
     padding-top: var(--s-5);
     border-top: 1px solid var(--line);
   }
 
-  /* card-lum (global) supplies border, soft shadow and the hover ring. */
+  /* card-lum (global) supplies border, surface, soft shadow and the hover ring;
+     lift (global) the hover elevation. Only the card's inner layout lives here. */
   .pager-link {
     display: flex;
     flex-direction: column;
-    gap: var(--s-1);
-    padding: var(--s-3) var(--s-4);
+    gap: var(--s-2);
+    padding: var(--s-4);
     text-decoration: none;
     color: var(--ink);
-    max-width: 48%;
+  }
+
+  @media (min-width: 600px) {
+    .pager-link {
+      padding-inline: var(--s-5);
+    }
   }
 
   .pager-link.next {
+    grid-column: 2;
+    align-items: flex-end;
     text-align: right;
-    margin-left: auto;
   }
 
-  .pager-link.next .dir {
-    justify-content: flex-end;
-  }
-
+  /* Kicker line: mono, uppercase, the site's label register. --ink-2 rather than
+     a dimmed ink, so it holds AA on the card surface in both themes. */
   .dir {
     display: inline-flex;
     align-items: center;
     gap: var(--s-2);
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    color: var(--muted);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
   }
 
   .arrow {
@@ -98,6 +122,8 @@ const { prev, next } = Astro.props;
 
   .name {
     font-family: var(--font-display);
+    font-size: var(--fs-h3);
     font-weight: 600;
+    line-height: 1.25;
   }
 </style>

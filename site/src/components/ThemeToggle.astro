@@ -3,7 +3,9 @@
  * ThemeToggle — a button that flips light/dark via window.__setTheme (exposed by
  * /theme.js). The click handler lives in /ui.js to satisfy CSP (no inline JS).
  * It shows a moon in light contexts and a sun in dark ones; ui.js keeps
- * aria-pressed in sync with the resolved theme.
+ * aria-pressed in sync with the resolved theme. The swap itself is pure CSS
+ * (works without JS); on a flip ui.js dispatches `theme:changed` and
+ * src/scripts/motion-ui.ts springs the incoming icon in (transform only).
  */
 ---
 

@@ -28,3 +28,25 @@ declare global {
 
 window.aigeMotion = api;
 document.dispatchEvent(new CustomEvent('aige:motion-ready'));
+
+// Theme toggle: public/ui.js announces each flip with `theme:changed`. The CSS
+// has already revealed the incoming icon (sun for dark, moon for light); it
+// springs in with rotate + scale, transform only. Reduced motion: it simply
+// stays at rest.
+document.addEventListener('theme:changed', (event) => {
+  const theme = (event as CustomEvent<{ theme?: string }>).detail?.theme;
+  const icon = document.querySelector<SVGElement>(
+    `[data-theme-toggle] .i-${theme === 'dark' ? 'sun' : 'moon'}`,
+  );
+  if (!icon) return;
+  run(
+    () => {
+      animate(
+        icon,
+        { transform: ['rotate(-90deg) scale(0.6)', 'rotate(0deg) scale(1)'] },
+        { type: spring, stiffness: 400, damping: 22 },
+      );
+    },
+    () => icon.style.removeProperty('transform'),
+  );
+});

@@ -37,7 +37,9 @@
   line-height: 1.15;
 }
 
-/* A short layer-ink dash above each section title, under the register rule. */
+/* A short layer-ink dash above each section title, under the register rule.
+   --chapter-ink is set by Doc.astro from the chapter's layer (the same one that
+   tints its header band); pages without a layer keep the first layer's ink. */
 .prose h2::before {
   content: '';
   display: block;
@@ -45,7 +47,7 @@
   height: 3px;
   margin-bottom: var(--s-3);
   border-radius: 2px;
-  background: var(--l1-ink);
+  background: var(--chapter-ink, var(--l1-ink));
 }
 
 .prose h3 {

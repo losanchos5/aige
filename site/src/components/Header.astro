@@ -289,21 +289,27 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     position: sticky;
     top: 0;
     z-index: 20;
-    /* Frosted bar: translucent ground + backdrop blur. The hairline + faint
-       shadow are held back until scrolled (initHeader in ui.js). The 1px border
-       is always present but transparent so the bar height never shifts. */
+    /* Frosted bar: translucent ground + backdrop blur. The hairline + the
+       --shadow-1 elevation are held back until the page is scrolled past 8px
+       (initHeader in ui.js: passive, rAF-throttled). The 1px border is always
+       present but transparent so the bar height never shifts. */
     background: color-mix(in srgb, var(--bg) 82%, transparent);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid transparent;
-    transition:
-      border-color var(--dur) var(--ease),
-      box-shadow var(--dur) var(--ease);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .site-header {
+      transition:
+        border-color var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease);
+    }
   }
 
   .site-header.is-scrolled {
     border-bottom-color: var(--line);
-    box-shadow: 0 1px 12px color-mix(in srgb, var(--ink) 6%, transparent);
+    box-shadow: var(--shadow-1);
   }
 
   .bar {
@@ -386,8 +392,10 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     font-weight: 600;
   }
 
+  /* Group chevron: flips to point up while its panel is open (aria-expanded). */
   .chev {
     color: var(--muted);
+    transform-origin: 50% 50%;
   }
 
   @media (prefers-reduced-motion: no-preference) {
