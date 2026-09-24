@@ -11,6 +11,7 @@ import rehypeDiagrams from './src/lib/rehype-diagrams';
 import rehypeGlossary from './src/lib/rehype-glossary';
 import { chaptersOrdered } from './src/data/chapters';
 import { cases } from './src/data/cases';
+import { getGlossary } from './src/lib/glossary';
 import { gitDate } from './src/lib/reading';
 
 // Sitemap URL -> the source file(s) whose last commit dates the page: the page
@@ -54,6 +55,16 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ...chaptersOrdered.map(
     (chapter) => [`/bok/${chapter.slug}`, [`../bok/${chapter.id}.md`]] as [string, string[]],
   ),
+  // Block b-glossary (v0.5.0): one canonical page per glossary term, all rendered
+  // from the same template and the glossary chapter (src/lib/glossary.ts).
+  ...getGlossary().map(
+    (entry) =>
+      [entry.url, ['src/pages/glossary/[slug].astro', '../bok/09-glossary.md']] as [
+        string,
+        string[],
+      ],
+  ),
+
   // One page per incident case, all rendered from the same template and dataset.
   ...cases.map(
     (entry) =>

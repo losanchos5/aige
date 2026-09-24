@@ -2,13 +2,13 @@
 /**
  * GlossaryIndex: the canonical glossary with an A–Z jump bar (only the letters
  * that exist), terms grouped by letter under `id` anchors, and `<dl>` semantics.
- * Each "ch. NN" cross-reference links to the chapter that develops the term.
- * The term block carries `data-pagefind-body` so entries are searchable.
+ * Each term name links to its own page (/glossary/<slug>) and each "ch. NN"
+ * cross-reference to the chapter that develops the term. The term block carries
+ * `data-pagefind-body` so entries are searchable.
  * public/glossary-index.js marks the letter being read with aria-current="true"
  * as the page scrolls; with JS off the jump bar is plain in-page links.
  */
 import type { GlossaryEntry } from '../lib/glossary';
-import { termId } from '../lib/glossary';
 import { chapters } from '../data/chapters';
 
 interface Props {
@@ -41,15 +41,23 @@ const chapterHref = (ref: string): string => {
   {
     letters.map((letter) => (
       <section class="gl-letter" id={`gl-${letter}`} aria-labelledby={`gl-${letter}-h`}>
-        <h2 class="gl-letter-head" id={`gl-${letter}-h`}>{letter}</h2>
+        <h2 class="gl-letter-head" id={`gl-${letter}-h`}>
+          {letter}
+        </h2>
         <dl class="gl-dl">
           {byLetter(letter).map((entry) => (
             <div class="gl-entry">
-              <dt id={termId(entry.term)}>{entry.term}</dt>
+              <dt id={entry.id}>
+                <a class="gl-term" href={entry.url}>
+                  {entry.term}
+                </a>
+              </dt>
               <dd>
                 {entry.definition}
                 {entry.chapterRefs.map((ref) => (
-                  <a class="gl-ch" href={chapterHref(ref)}>ch. {ref}</a>
+                  <a class="gl-ch" href={chapterHref(ref)}>
+                    ch. {ref}
+                  </a>
                 ))}
               </dd>
             </div>
@@ -61,3 +69,18 @@ const chapterHref = (ref: string): string => {
 </div>
 
 <script is:inline defer src="/glossary-index.js"></script>
+
+<style>
+  /* The term name keeps the dt's display type; the underline only on hover so
+     the index still reads as a list of names. */
+  .gl-term {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .gl-term:hover,
+  .gl-term:focus-visible {
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+</style>

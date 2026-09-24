@@ -1,0 +1,432 @@
+---
+/**
+ * /glossary/<slug>: the canonical page of one glossary term, generated from
+ * bok/09-glossary.md (lib/glossary.ts). It carries the definition with its own
+ * numbered sources, the sections that develop the term, the chapters that use
+ * it, contrast cards for commonly confused pairs, related terms and a
+ * ready-made citation. /bok/glossary stays the book's A-Z index.
+ */
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import CitedText from '../../components/CitedText.astro';
+import ContrastCards from '../../components/ContrastCards.astro';
+import TermCitation from '../../components/TermCitation.astro';
+import { site } from '../../data/site';
+import { chaptersOrdered } from '../../data/chapters';
+import {
+  getGlossary,
+  localCitations,
+  contrastPairsFor,
+  termUsage,
+  relatedTerms,
+  firstSentence,
+  type GlossaryEntry,
+} from '../../lib/glossary';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { WEBSITE_ID } from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+
+export function getStaticPaths() {
+  const entries = getGlossary();
+  return entries.map((entry, i) => ({
+    params: { slug: entry.slug },
+    props: {
+      entry,
+      prev: i > 0 ? entries[i - 1] : undefined,
+      next: i < entries.length - 1 ? entries[i + 1] : undefined,
+    },
+  }));
+}
+
+interface Props {
+  entry: GlossaryEntry;
+  prev?: GlossaryEntry;
+  next?: GlossaryEntry;
+}
+
+const { entry, prev, next } = Astro.props;
+const bySlug = new Map(getGlossary().map((e) => [e.slug, e]));
+
+// Build-time integrity: every citation has a source row and every contrast
+// term exists, so a broken chapter edit fails the build here.
+const { text: definition, sources } = localCitations(entry);
+if (sources.length !== entry.sources.length) {
+  throw new Error(`glossary: "${entry.term}" cites a source missing from the Sources list`);
+}
+const contrast = entry.contrast.map((slug) => {
+  const other = bySlug.get(slug);
+  if (!other) throw new Error(`glossary: "${entry.term}" contrasts with unknown term "${slug}"`);
+  return other;
+});
+
+const pairs = contrastPairsFor(entry.slug);
+const usage = termUsage(entry.slug);
+const related = relatedTerms(entry.slug).filter((r) => !entry.contrast.includes(r.slug));
+const chapterLinks = entry.chapterRefs
+  .map((ref) => chaptersOrdered.find((c) => c.order === Number(ref)))
+  .filter((c) => c !== undefined)
+  .map((c) => ({
+    label: `ch. ${String(c.order).padStart(2, '0')}, ${c.shortTitle}`,
+    href: `/bok/${c.slug}`,
+  }));
+
+// Title: "<term>: definition", with the site name when it still fits 70 chars.
+const title = `${entry.term}: definition`;
+const titleSuffix = `${title} · ${site.name}`.length <= 70;
+
+const pageUrl = new URL(entry.url, site.url).href;
+const glossaryUrl = new URL('/bok/glossary', site.url).href;
+const setId = `${glossaryUrl}#glossary`;
+const crumbs = [
+  { label: 'Body of Knowledge', href: '/bok' },
+  { label: 'Glossary', href: '/bok/glossary' },
+  { label: entry.term },
+];
+
+const jsonLd = [
+  {
+    '@type': 'DefinedTerm',
+    '@id': `${pageUrl}#term`,
+    name: entry.term,
+    description: entry.definition,
+    url: pageUrl,
+    inLanguage: 'en',
+    inDefinedTermSet: { '@id': setId },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    ...(sources.length ? { citation: sources.map((s) => s.url).filter(Boolean) } : {}),
+  },
+  {
+    '@type': 'DefinedTermSet',
+    '@id': setId,
+    name: `Glossary · ${site.name}`,
+    url: glossaryUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+  },
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Base
+  title={title}
+  titleSuffix={titleSuffix}
+  description={entry.definition}
+  image="/og/resources.png"
+  jsonLd={jsonLd}
+>
+  <PageHero variant="res" mesh={false} crumbs={crumbs} title={entry.term} />
+
+  <div class="container res-page">
+    <article class="gt-body" data-pagefind-body>
+      <div class="prose">
+        <p class="gt-def"><CitedText text={definition} /></p>
+      </div>
+
+      <dl class="gt-facts">
+        <dt>Developed in</dt>
+        <dd>
+          {
+            entry.see.map((link, i) => (
+              <>
+                {i > 0 && <br />}
+                <a href={link.href}>{link.label}</a>
+              </>
+            ))
+          }
+        </dd>
+        {
+          chapterLinks.length > 0 && (
+            <>
+              <dt>Chapters</dt>
+              <dd>
+                {chapterLinks.map((link, i) => (
+                  <>
+                    {i > 0 && ' · '}
+                    <a href={link.href}>{link.label}</a>
+                  </>
+                ))}
+              </dd>
+            </>
+          )
+        }
+        {
+          contrast.length > 0 && (
+            <>
+              <dt>Contrast with</dt>
+              <dd>
+                {contrast.map((other, i) => (
+                  <>
+                    {i > 0 && ' · '}
+                    <a href={other.url}>{other.term}</a>
+                  </>
+                ))}
+              </dd>
+            </>
+          )
+        }
+        <dt>Source</dt>
+        <dd>
+          {
+            sources.length > 0
+              ? `${sources.length} numbered ${sources.length === 1 ? 'reference' : 'references'}, listed below`
+              : 'Defined by this Body of Knowledge: the section it is developed in is the source'
+          }
+        </dd>
+      </dl>
+
+      {
+        pairs.length > 0 && (
+          <section class="gt-section" aria-labelledby="commonly-confused">
+            <div class="prose">
+              <h2 id="commonly-confused">Commonly confused</h2>
+            </div>
+            <ContrastCards pairs={pairs} current={entry.slug} level={3} />
+          </section>
+        )
+      }
+
+      <section class="gt-section" aria-labelledby="where-used">
+        <div class="prose">
+          <h2 id="where-used">Where it is used</h2>
+          {
+            usage.length > 0 ? (
+              <>
+                <p>
+                  {usage.length === 1
+                    ? 'One chapter of the Body of Knowledge uses the term.'
+                    : `${usage.length} chapters of the Body of Knowledge use the term.`}{' '}
+                  Each link opens the first section that does.
+                </p>
+                <ul class="gt-usage">
+                  {usage.map((use) => (
+                    <li>
+                      <span class="gt-ch">
+                        {use.chapter} · {use.title}
+                      </span>
+                      <a href={use.href}>{use.section}</a>
+                      <span class="gt-count">
+                        {use.count} {use.count === 1 ? 'mention' : 'mentions'}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p>
+                The term is not used under this name in running prose; the sections listed under
+                "Developed in" treat it.
+              </p>
+            )
+          }
+        </div>
+      </section>
+
+      {
+        related.length > 0 && (
+          <section class="gt-section" aria-labelledby="related-terms">
+            <div class="prose">
+              <h2 id="related-terms">Related terms</h2>
+            </div>
+            <ul class="gt-related">
+              {related.map((other) => (
+                <li>
+                  <a href={other.url}>{other.term}</a>
+                  <p>{firstSentence(other.definition, 160)}</p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      <section class="gt-section prose" aria-labelledby="sources">
+        <h2 id="sources">Sources</h2>
+        {
+          sources.length > 0 ? (
+            <ol class="sources">
+              {sources.map((source, i) => (
+                <li id={`src-${i + 1}`}>
+                  <span class="src-num">[{i + 1}]</span> {source.text}{' '}
+                  {source.url && (
+                    <a href={source.url} rel="noopener">
+                      {source.url}
+                    </a>
+                  )}{' '}
+                  <span class="verified">(verified: {source.verified})</span>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p>
+              No external source: the term is coined or used in a specific sense by this Body of
+              Knowledge, and the section linked under "Developed in" is its source.
+            </p>
+          )
+        }
+        <p class="gt-note">
+          Definitions of legal terms paraphrase the cited text, which governs. Dated statements
+          are as of 2026-09-24.
+        </p>
+      </section>
+
+      <footer class="gt-foot">
+        <TermCitation term={entry.term} path={entry.url} />
+      </footer>
+
+      <nav class="gt-nav" aria-label="More terms">
+        {prev ? <a href={prev.url}>← {prev.term}</a> : <span />}
+        <a href={`/bok/glossary#${entry.id}`}>All terms</a>
+        {next ? <a href={next.url}>{next.term} →</a> : <span />}
+      </nav>
+    </article>
+  </div>
+
+  <script is:inline src="/ui-doc.js" defer></script>
+</Base>
+
+<style>
+  .gt-body {
+    max-width: var(--prose);
+  }
+
+  .gt-def {
+    font-size: 1.1875rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .gt-facts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-1) var(--s-4);
+    margin: var(--s-5) 0 var(--s-6);
+    padding: var(--s-4) var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    font-size: var(--fs-small);
+  }
+
+  @media (min-width: 560px) {
+    .gt-facts {
+      grid-template-columns: minmax(8rem, max-content) 1fr;
+    }
+  }
+
+  .gt-facts dt {
+    padding-top: 2px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .gt-facts dd {
+    margin: 0 0 var(--s-2);
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--ink);
+  }
+
+  .gt-body a {
+    color: var(--ink);
+    text-decoration-color: var(--line);
+    text-underline-offset: 0.18em;
+  }
+
+  .gt-body a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .gt-section {
+    margin-top: var(--s-6);
+  }
+
+  .gt-section h2 {
+    scroll-margin-top: var(--anchor-offset);
+  }
+
+  .gt-usage {
+    list-style: none;
+    margin: var(--s-3) 0 0;
+    padding: 0;
+  }
+
+  .gt-usage li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-3);
+    align-items: baseline;
+    padding: var(--s-2) 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .gt-usage li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .gt-ch,
+  .gt-count {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .gt-ch {
+    flex: 0 0 100%;
+  }
+
+  .gt-count {
+    margin-left: auto;
+  }
+
+  .gt-related {
+    list-style: none;
+    margin: var(--s-3) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-3);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+  }
+
+  .gt-related li {
+    min-width: 0;
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+  }
+
+  .gt-related p {
+    margin: var(--s-1) 0 0;
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .gt-note {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .gt-foot {
+    margin-top: var(--s-6);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--line);
+  }
+
+  .gt-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-3);
+    margin-top: var(--s-6);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+</style>
