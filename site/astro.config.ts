@@ -23,6 +23,9 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ['/about', ['src/pages/about/index.astro', 'src/data/site.ts']],
   ['/about/changelog', ['src/pages/about/changelog.astro', '../bok/CHANGELOG.md']],
   ['/about/contributors', ['src/pages/about/contributors.astro', '../bok/CONTRIBUTORS.md']],
+  // Block b-c23-agents: the /agents hub routes into chapter 23 and reads the
+  // runtime tool categories from the stack data.
+  ['/agents', ['src/pages/agents.astro', '../bok/23-governing-agents.md', 'src/data/stack.ts']],
   ['/bok', ['src/pages/bok/index.astro', 'src/data/chapters.ts']],
   ['/cases', ['src/pages/cases/index.astro', 'src/data/cases.ts']],
   ['/map', ['src/pages/map.astro', 'src/data/map.ts']],
