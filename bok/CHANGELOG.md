@@ -4,6 +4,24 @@ All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledg
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
 
+## Unreleased (v0.5.0)
+
+### Added
+- Eleven new figures drawn only from what the chapters already state: the five objects of
+  governance (chapter 01), the profession in numbers (02), human oversight designed and where
+  control moves when you buy AI (04), who enforces and the penalty ceilings (08), the committee
+  decides and the gates enforce (12), the risk loop on the stack, the likelihood-by-severity
+  matrix with the S5 override and the mitigation ladder (13), provenance and lineage (14) and
+  the overlapping incident clocks (17). Each has a text description under it.
+
+### Changed
+- Diagrams: the Framework Crosswalk is drawn as one hub with five spokes and evidence on the hub;
+  the Vendor / Model Due-Diligence Gate puts the registry entry straight under the gate and the
+  rejection path last; the Runtime Guardrail keeps its assurance store outside the runtime layer;
+  the Kill Switch greys the revoked agent while the rest of the fleet runs on. The regulatory
+  wave in chapter 02 gains the 2 Dec 2026 stage (new Article 5 bans and Article 50(2) marking)
+  and the 2 Aug 2030 stage (legacy high-risk systems of public authorities).
+
 ## [Unreleased] - 2026-09-20
 
 Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the
