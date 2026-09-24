@@ -137,15 +137,17 @@ AI-generated non-consensual intimate imagery and child sexual abuse material app
 generative systems placed on the market before 2 August 2026 must meet the Article 50(2) marking duty.
 Annex III high-risk obligations follow on 2 December 2027 and Annex I on 2 August 2028; high-risk
 systems intended for public authorities that were already on the market must comply by 2 August 2030.
-Chapter 08 maps each date to the artefact that answers it.
+[Chapter 08](/bok/regulatory-map#eu-ai-act-post-omnibus) maps each date to the artefact that
+answers it.
 
 The same pull shows up outside the EU. California's SB 53, the Transparency in Frontier Artificial
 Intelligence Act, signed on 29 September 2025 and in force since 1 January 2026, binds large frontier
 developers (models trained with more than 10^26 operations; annual revenue above USD 500 million) to
 publish a frontier AI framework and to report critical safety incidents to the state's Office of
 Emergency Services within 15 days, with civil penalties of up to USD 1 million per violation recovered
-by the Attorney General [17][18]. Its scope is narrow, but what it asks for, a published framework and
-an incident pipeline that runs on a clock, is again an engineering deliverable.
+by the Attorney General [17][18]. Its scope is narrow (chapter 08 sets it beside the other
+[US state laws](/bok/regulatory-map#us-federal-and-state-laws)), but what it asks for, a published
+framework and an incident pipeline that runs on a clock, is again an engineering deliverable.
 
 ### The agent shift
 
