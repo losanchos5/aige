@@ -15,6 +15,7 @@ con `bash D:/Documents/aige-wt/build.sh`.
 - [x] 2.2 Escribir `site/public/toolkit/obligations-planner.js`: validación con resumen de errores, resultado, tablas, deberes fuera del registro, estado en el enlace, descargas, impresión.
 - [x] 2.3 Crear `/toolkit/obligations-planner` con `ToolShell`: formulario, resultado, aviso de lectura, hoja de trabajo sin JavaScript (las 27 filas, fechas, deberes fuera del registro, cómo hacerlo a mano) y fuentes.
 - [x] 2.4 Publicar `/toolkit/obligations-plan.v1.schema.json` generado desde `src/lib/api.ts`.
+- [x] 2.5 Enlazar cada rol de la tabla de roles con su entrada del glosario (`term` en `plannerRoles`) y ocultar sin JavaScript los botones que solo funcionan con él (`.tool-buttons[hidden]`).
 
 ## 3. Páginas de obligación
 

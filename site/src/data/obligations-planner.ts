@@ -40,6 +40,8 @@ export interface PlannerRole {
   ref: string;
   /** Who holds the role, in the Act's terms (Art. 3), shortened. */
   hint: string;
+  /** Slug of the glossary term that defines the role (/glossary/<term>). */
+  term: string;
 }
 
 /** The seven roles, in the order of chapter 18's operator table. */
@@ -50,6 +52,7 @@ export const plannerRoles: readonly PlannerRole[] = [
     label: 'Provider',
     ref: 'Art. 3(3)',
     hint: 'Develops an AI system, or has one developed, and places it on the market or puts it into service under its own name or trademark.',
+    term: 'provider',
   },
   {
     id: 'deployer',
@@ -57,6 +60,7 @@ export const plannerRoles: readonly PlannerRole[] = [
     label: 'Deployer',
     ref: 'Art. 3(4)',
     hint: 'Uses an AI system under its authority, other than in a personal, non-professional activity.',
+    term: 'deployer',
   },
   {
     id: 'importer',
@@ -64,6 +68,7 @@ export const plannerRoles: readonly PlannerRole[] = [
     label: 'Importer',
     ref: 'Art. 3(6)',
     hint: 'Located or established in the Union; places on the market an AI system bearing the name or trademark of someone established outside it.',
+    term: 'importer',
   },
   {
     id: 'distributor',
@@ -71,6 +76,7 @@ export const plannerRoles: readonly PlannerRole[] = [
     label: 'Distributor',
     ref: 'Art. 3(7)',
     hint: 'In the supply chain, other than the provider or the importer; makes an AI system available on the Union market.',
+    term: 'distributor',
   },
   {
     id: 'authorised-representative',
@@ -78,6 +84,7 @@ export const plannerRoles: readonly PlannerRole[] = [
     label: 'Authorised representative',
     ref: 'Art. 3(5)',
     hint: 'Located or established in the Union, with a written mandate from a provider outside it to carry out its obligations on its behalf.',
+    term: 'authorised-representative',
   },
   {
     id: 'gpai-provider',
@@ -85,6 +92,7 @@ export const plannerRoles: readonly PlannerRole[] = [
     label: 'GPAI model provider',
     ref: 'Art. 53',
     hint: 'Provides a general-purpose AI model: the model itself, not a system built on it.',
+    term: 'gpai',
   },
   {
     id: 'gpai-systemic',
@@ -92,6 +100,7 @@ export const plannerRoles: readonly PlannerRole[] = [
     label: 'Provider of a GPAI model with systemic risk',
     ref: 'Art. 55',
     hint: 'Provides a general-purpose AI model with systemic risk; the Art. 53 duties apply as well (Art. 55(1)).',
+    term: 'systemic-risk',
   },
 ];
 

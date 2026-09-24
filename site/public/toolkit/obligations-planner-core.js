@@ -437,7 +437,7 @@ export function timelineSvg(entries, { narrow, ref, asOf, title, idPrefix = 'opl
     out.push(`<line x1="${rx}" y1="${y1}" x2="${rx}" y2="${y2}" style="stroke:var(--ink-2);stroke-width:1.5;stroke-dasharray:4 4"/>`);
   if (narrow) {
     refRule(top - 6, top + 4);
-    entries.forEach((e, i) => refRule(top + 8 + i * rowH + 22, top + 8 + i * rowH + 42));
+    for (let i = 0; i < entries.length; i += 1) refRule(top + 8 + i * rowH + 22, top + 8 + i * rowH + 42);
   } else refRule(top - 6, bottom + 4);
 
   // Legend and source line.

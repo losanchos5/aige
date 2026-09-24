@@ -412,7 +412,7 @@ const sources = [
     <h3 id="opl-roles-guide">The roles, and where their duties sit</h3>
     <div class="tool-table-wrap">
       <table class="tool-table">
-        <caption>Operator roles in the EU AI Act</caption>
+        <caption>Operator roles in the EU AI Act (each name links its glossary entry)</caption>
         <thead>
           <tr>
             <th scope="col">Role</th>
@@ -428,7 +428,8 @@ const sources = [
               return (
                 <tr>
                   <th scope="row">
-                    {role.label} <span class="opl-id">{role.ref}</span>
+                    <a href={`/glossary/${role.term}`}>{role.label}</a>
+                    <span class="opl-id">{role.ref}</span>
                   </th>
                   <td data-label="Who holds it">{role.hint}</td>
                   <td data-label="Rows it binds">
@@ -642,6 +643,13 @@ const sources = [
 
   .opl-date {
     max-width: 22rem;
+  }
+
+  /* toolkit.css gives .tool-buttons display:flex, which beats the [hidden] UA
+     rule: without JavaScript the submit and clear buttons would show and do
+     nothing. mountTool() removes `hidden` once the script runs. */
+  .tool-buttons[hidden] {
+    display: none;
   }
 
   :global(.opl-table th[scope='row']),
