@@ -236,6 +236,16 @@ a completed, reviewed core (1.0).
   URLs: the JSON adds `schemaVersion`, `asOf`, `columns`, `frameworks`, topic `read` links and, per
   reference, `clauseId`, `column`, `frameworkShort` and `see`; the CSV keeps its nine columns in
   order and appends topic, framework, column and clause ids and the BoK section.
+- Wave 1 integration pass (site shell): the navigation reaches every v0.5.0 destination (Practice:
+  Patterns, Toolkit, Agents; Reference: Obligations, Figures, Open data & API, and the glossary at
+  `/bok/glossary`, which also lights `/glossary/<slug>`); the Resources hub, the home page and
+  `llms.txt` list them with counts taken from the data. The crosswalk joins obligation rows by
+  `obligationId` and links `/obligations/<id>`; `crosswalk.json` adds `obligationId` and
+  `obligationUrl` and `crosswalk.csv` an `Obligation ID` column (fields added, same schema
+  version). Every infographic caption carries a `#figure-<id>` anchor and a link to its figure page.
+  Analytics ignore the URL fragment and query, so toolkit answers never leave the browser.
+  `/resources/reading-list` and `/resources/glossary` declare their canonical page and leave the
+  sitemap. Code comments in chapter examples meet WCAG AA contrast.
 
 ## [Unreleased] - 2026-09-20
 
