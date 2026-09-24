@@ -248,7 +248,9 @@ const jsonLd = [
         <code>Cache-Control: public, max-age=3600</code>. There is no key and no authentication.
         Please cache what you fetch; the data changes with releases, not by the minute.
       </p>
-      <pre><code>{`# The catalogue
+      {/* Wider than a phone: a named, focusable scroll region (axe
+          scrollable-region-focusable), like the Shiki blocks in the chapters. */}
+      <pre tabindex="0" role="region" aria-label="Example requests with curl and jq"><code>{`# The catalogue
 curl -s ${site.url}${API_PATH}/index.json
 
 # One obligation, by its id in lower case

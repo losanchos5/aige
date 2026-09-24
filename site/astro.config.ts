@@ -245,6 +245,23 @@ export default defineConfig({
     },
   },
   markdown: {
+    // github-dark (Shiki's default) paints comments #6A737D on #24292e, a 3.04:1
+    // ratio that fails WCAG AA (axe color-contrast, serious) wherever a chapter
+    // shows a commented YAML or JSON block. Lift that one token colour to
+    // #959DA5 (5.3:1); every other github-dark token already clears 4.5:1.
+    shikiConfig: {
+      transformers: [
+        {
+          name: 'aige-comment-contrast',
+          span(node) {
+            const style = node.properties?.style;
+            if (typeof style === 'string' && /#6A737D/i.test(style)) {
+              node.properties.style = style.replace(/#6A737D/gi, '#959DA5');
+            }
+          },
+        },
+      ],
+    },
     remarkPlugins: [remarkLead, remarkCallouts],
     rehypePlugins: [
       rehypeSlug,
