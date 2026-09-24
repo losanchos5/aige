@@ -31,9 +31,9 @@
     { "id": "telemetry", "type": "external", "label": "Telemetry", "sublabel": "anomaly, threshold", "pos": [60, 264], "size": [172, 64] },
     { "id": "breaker", "type": "security", "label": "Circuit breaker", "sublabel": "tool-call boundary", "tag": "auto or manual", "pos": [368, 180], "size": [184, 76] },
     { "id": "agentA", "type": "external", "label": "Agent A", "sublabel": "scope revoked", "pos": [724, 80], "size": [176, 64] },
-    { "id": "agentB", "type": "external", "label": "Agent B", "sublabel": "runs on", "pos": [724, 204], "size": [176, 64] },
-    { "id": "agentC", "type": "external", "label": "Agent C", "sublabel": "runs on", "pos": [724, 328], "size": [176, 64] },
-    { "id": "record", "type": "database", "label": "Incident record", "sublabel": "trip logged", "pos": [366, 440], "size": [188, 72] }
+    { "id": "agentB", "type": "backend", "label": "Agent B", "sublabel": "runs on", "pos": [724, 204], "size": [176, 64] },
+    { "id": "agentC", "type": "backend", "label": "Agent C", "sublabel": "runs on", "pos": [724, 328], "size": [176, 64] },
+    { "id": "record", "type": "database", "label": "Incident record", "sublabel": "trip logged", "pos": [366, 470], "size": [188, 72] }
   ],
   "boundaries": [
     { "kind": "region", "label": "Layer 04 Runtime Controls & Observability", "wraps": ["guardrail", "telemetry", "breaker", "agentA", "agentB", "agentC"], "pad": 22 },
@@ -45,7 +45,7 @@
     { "id": "breaker-agentA", "from": "breaker", "to": "agentA", "label": "revoke scope", "variant": "security", "fromSide": "right", "toSide": "left" },
     { "id": "breaker-agentB", "from": "breaker", "to": "agentB", "variant": "dashed", "fromSide": "right", "toSide": "left" },
     { "id": "breaker-agentC", "from": "breaker", "to": "agentC", "variant": "dashed", "fromSide": "right", "toSide": "left" },
-    { "id": "breaker-record", "from": "breaker", "to": "record", "label": "trip = evidence", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelAt": [508, 348] }
+    { "id": "breaker-record", "from": "breaker", "to": "record", "label": "trip = evidence", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "labelAt": [508, 372] }
   ],
   "cards": [
     {
