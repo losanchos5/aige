@@ -1,0 +1,193 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import {
+  clauses,
+  licenceTypes,
+  references,
+  disclaimer,
+  chapterAnchor,
+} from '../../data/contracts';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Contracts' }];
+---
+
+<Base
+  title="AI contract and licence clauses"
+  description="The clauses to check before you deploy a third-party AI system: what each governs, the red flag, a fallback position and the evidence to keep."
+  image="/og/resources.png"
+  jsonLd={breadcrumbJsonLd(crumbs)}
+>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="The clauses that decide what you can govern."
+  >
+    <p class="lede" slot="lede">
+      When you deploy a model you did not build, the contract or licence sets the limits of your
+      control: what you may test, what you are told when it changes, where your data goes and how
+      you leave. Each row names a clause, the red flag to look for, a fallback position and the
+      evidence to keep. The reasoning is in <a href={chapterAnchor}>chapter 15</a>.
+    </p>
+  </PageHero>
+
+  <div class="container res-page">
+    <div class="res-section">
+      <Callout kind="note" title="Engineering checklist, not legal advice">
+        <p>{disclaimer}</p>
+        <p>Red flags are paraphrased patterns, not quotations from any real contract. Instruments
+        reviewed as of 2026-09-24.</p>
+      </Callout>
+    </div>
+
+    <section class="res-section" aria-labelledby="cl-heading">
+      <div class="res-section-head">
+        <h2 id="cl-heading">Contract clauses</h2>
+        <p>{clauses.length} clauses for AI services, APIs and embedded AI. Read each row as a
+        check: find the clause, test it against the red flag, negotiate towards the fallback, and
+        file the evidence against the system's registry entry.</p>
+        <p class="ob-xref">
+          Cross-reference: <a href="/bok/patterns#pattern-vendor--model-due-diligence-gate">Vendor /
+          Model Due-Diligence Gate</a> ·
+          <a href="/resources/frameworks">frameworks and obligations</a>.
+        </p>
+      </div>
+      <div class="res-tablewrap">
+        <table class="res-table ct-table">
+          <caption class="visually-hidden">
+            AI contract clauses: what each governs, the risk, the red flag, the fallback position,
+            the evidence to keep and the instruments it maps to
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Clause</th>
+              <th scope="col">What it governs</th>
+              <th scope="col">Risk</th>
+              <th scope="col">Red flag</th>
+              <th scope="col">Fallback position</th>
+              <th scope="col">Evidence to keep</th>
+              <th scope="col">Maps to</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              clauses.map((row) => (
+                <tr id={`clause-${row.id}`}>
+                  <th scope="row" class="c-name" data-label="Clause">
+                    {row.clause}
+                  </th>
+                  <td class="c-summary" data-label="Governs">{row.governs}</td>
+                  <td class="c-summary" data-label="Risk">{row.risk}</td>
+                  <td class="c-summary" data-label="Red flag">{row.redFlag}</td>
+                  <td class="c-summary" data-label="Fallback">{row.fallback}</td>
+                  <td class="c-summary" data-label="Evidence">{row.evidence}</td>
+                  <td class="c-maps" data-label="Maps to">
+                    <ul class="ct-refs">
+                      {row.mapsTo.map((ref) => (
+                        <li>
+                          <a href={references[ref].url} target="_blank" rel="noopener">
+                            {references[ref].label}
+                            <span class="ext" aria-hidden="true">↗</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="res-section" aria-labelledby="lt-heading">
+      <div class="res-section-head">
+        <h2 id="lt-heading">Licence families for models and datasets</h2>
+        <p>Open weights are not one licence. Each family asks something different of a deployer,
+        and each leaves a record that belongs in the AIBOM entry of the system that uses it.</p>
+      </div>
+      <div class="res-tablewrap">
+        <table class="res-table ct-table">
+          <caption class="visually-hidden">
+            Licence families: examples, obligations, what to watch in AI use and the AIBOM fields
+            to capture
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Family</th>
+              <th scope="col">Examples</th>
+              <th scope="col">What it asks of you</th>
+              <th scope="col">Watch for</th>
+              <th scope="col">AIBOM fields</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              licenceTypes.map((row) => (
+                <tr id={`licence-${row.id}`}>
+                  <th scope="row" class="c-name" data-label="Family">
+                    {row.family}
+                  </th>
+                  <td class="c-summary" data-label="Examples">{row.examples}</td>
+                  <td class="c-summary" data-label="Asks">{row.obligations}</td>
+                  <td class="c-summary" data-label="Watch">{row.watch}</td>
+                  <td class="c-summary" data-label="AIBOM">{row.aibomFields}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .ct-table th[scope='row'] {
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ct-table tbody tr:last-child th {
+    border-bottom: 0;
+  }
+
+  .ct-refs {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+
+  .ct-refs a {
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 720px) {
+    .ct-table th[scope='row'] {
+      display: block;
+      width: 100%;
+      padding: 0 0 var(--s-2);
+      border: 0;
+    }
+
+    .ct-refs {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: var(--s-1) var(--s-3);
+    }
+
+    .ct-refs a {
+      white-space: normal;
+    }
+  }
+</style>
