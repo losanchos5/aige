@@ -7,11 +7,21 @@
  * group bar shows inline; below that it collapses into a modal <dialog> drawer
  * (a sibling of the header, so the header still holds exactly one search button
  * and one theme toggle). All behaviour is in /nav.js (CSP script-src 'self').
+ * `overlay` (the home) floats the bar over the full-viewport hero: fixed and
+ * fully transparent at the top of the page, it takes the same ground, hairline
+ * and elevation as everywhere else once the page scrolls (.is-scrolled, ui.js).
  */
 import RegisterMark from './RegisterMark.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { site } from '../data/site';
 import { nav, resolveCurrent, type NavGroup, type NavItem } from '../data/nav';
+
+interface Props {
+  /** Float the bar, transparent until scrolled, over a full-viewport hero. */
+  overlay?: boolean;
+}
+
+const { overlay = false } = Astro.props;
 
 const current = resolveCurrent(Astro.url.pathname);
 const currentHref = current.href;
@@ -32,7 +42,7 @@ const chapterOf = (group: NavGroup) => panelItems(group).filter((i) => i.num);
 const isDirect = (group: NavGroup) => panelItems(group).length === 0;
 ---
 
-<header class="site-header">
+<header class="site-header" data-overlay={overlay ? '' : undefined}>
   <div class="container bar">
     <a class="brand" href="/" aria-label={`${site.name}, home`}>
       <RegisterMark size="sm" label={site.name} />
@@ -324,6 +334,40 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
   .site-header.is-scrolled {
     border-bottom-color: var(--line);
     box-shadow: var(--shadow-1);
+  }
+
+  /* Overlay (the home): the bar floats over the hero's gradient field, so the
+     hero starts at the top of the viewport and the brand sits on the field.
+     Unscrolled it has no ground, blur, hairline or elevation (the field keeps
+     the links >= 4.5:1 under the bar, see hero-field.js); once scrolled it
+     falls back to the rules above, frosted on desktop and near-solid below
+     840px or under prefers-reduced-transparency. Fixed, not sticky, so it takes
+     no room in the flow; its height is unchanged. The selector outranks the
+     narrow/reduced-transparency override. */
+  .site-header[data-overlay] {
+    position: fixed;
+    inset: 0 0 auto;
+  }
+
+  .site-header[data-overlay]:not(.is-scrolled) {
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* On the bare field the chevrons (--muted) step up to --ink-2, as muted
+     text does over the mesh; the menus keep their own ground and colours. */
+  .site-header[data-overlay]:not(.is-scrolled) .chev {
+    color: var(--ink-2);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .site-header[data-overlay] {
+      transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease);
+    }
   }
 
   .bar {

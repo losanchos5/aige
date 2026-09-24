@@ -1,4 +1,5 @@
-/* hero.js — demonstrate the homepage "governance loop" once. Loaded same-origin
+/* hero.js — demonstrate the homepage "governance loop" once, when its figure
+   (in the loop section under the home hero) first scrolls into view. Loaded same-origin
    so the CSP script-src 'self' holds (no inline JS). Progressive enhancement: the
    diagram is fully legible without this file.
 
@@ -297,9 +298,28 @@
     }, RESIZE_DEBOUNCE);
   });
 
-  // Kick off after the draw-on has had time to play.
-  setTimeout(function () {
-    started = true;
-    reconcile();
-  }, START_DELAY);
+  // The figure sits below the fold (the home's loop section, under the hero),
+  // so the pass starts once most of it is on screen, after diagram.js's
+  // draw-on (which fires on the same entry) has had time to play. Without
+  // IntersectionObserver it starts after the delay, as it used to on load.
+  function kickOff() {
+    setTimeout(function () {
+      started = true;
+      reconcile();
+    }, START_DELAY);
+  }
+
+  if ('IntersectionObserver' in window) {
+    var inView = new IntersectionObserver(
+      function (entries) {
+        if (!entries.some(function (e) { return e.isIntersecting; })) return;
+        inView.disconnect();
+        kickOff();
+      },
+      { threshold: 0.4 }
+    );
+    inView.observe(host);
+  } else {
+    kickOff();
+  }
 })();

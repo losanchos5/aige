@@ -416,6 +416,16 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
     white-space: nowrap;
   }
 
+  /* With text zoomed to 200% on a phone a long chip ("Incident and reporting
+     plumbing") is wider than the row and pushed the page sideways (TC-11): it
+     may wrap once it would overflow. */
+  @media (max-width: 479px) {
+    .chip {
+      max-width: 100%;
+      white-space: normal;
+    }
+  }
+
   /* Row-local tint on hover/focus: the left cell and its bar take the layer
      pastel. */
   .drow:hover .d-idx,
