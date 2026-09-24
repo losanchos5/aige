@@ -46,10 +46,18 @@ content; a figure never adds facts, numbers, dates or vendors that the chapter d
     same question the figure answers. Minimum rendered text size 12 px at 390 px width.
 11. **Mobile.** Every figure is checked at 390, 834 and 1440 px. Infographics wrap to one column;
     workflows go vertical; nothing scrolls horizontally.
-12. **Weight.** Archify SVGs are inlined: keep node counts down. Infographic SVGs ≤ 12 KB each.
-    If a chapter page passes 450 KB of HTML, flag it: the orchestrator decides on external SVGs.
+12. **Weight.** Archify SVGs are inlined: keep node counts down. Budgets by `kind` in
+    `figures.ts` (`figureBudgetKb`, enforced by `scripts/figures-build.mjs`): infographic and
+    data-viz SVGs ≤ 12 KB each, posters ≤ 48 KB; widget scripts ≤ 15 KB gzip (§6). If a chapter
+    page passes 450 KB of HTML, flag it: the orchestrator decides on external SVGs.
 13. **Dates and numbers** appear only if the chapter states them; any timeline carries
-    "as of <date>" in its caption and points to the chapter's currency marker.
+    "as of <date>" in its caption and points to the chapter's currency marker. A figure whose
+    content can go stale (deadlines, statuses, counts) sets `asOf` and `reviewBy` in `figures.ts`
+    and prints "As of YYYY-MM-DD" inside the SVG itself, so every download keeps its date; the
+    build fails when the stamp is missing and warns once `reviewBy` has passed.
+14. **Every figure is citable.** Each `figures.ts` entry gets a permalink at `/figures/<id>` and
+    versioned downloads (§5). Its `title`, `caption`, `alt` and `description` are reused there
+    and in the JSON-LD, so write them to stand alone, outside the chapter.
 
 ## 2. Briefs per figure
 
@@ -262,3 +270,129 @@ module or a `bok/*.md` heading (checked in `tests/map.spec.ts`).
 - [ ] Layer names exact and in order; layer colours via tokens; glyph vocabulary consistent.
 - [ ] No vendors, products, invented numbers or dates.
 - [ ] Both themes and 390/834/1440 checked; a11y and contrast gates green; size within budget.
+- [ ] Dated content: `asOf` and `reviewBy` set, "As of" printed inside the image (§1.13).
+- [ ] Data-viz: axes, scale, source line and the `data` table fallback in place (§4).
+- [ ] Exports: `/figures/<id>` renders; the light and dark PNGs read well; the attribution band
+      is legible and uncropped (§5).
+- [ ] Widgets: works without JS, carries the notice where it classifies, respects reduced motion,
+      within its script budget (§6).
+
+## 4. Data visualisation
+
+A data-viz figure (`kind: 'data-viz'`) encodes quantities the chapter states: counts, durations,
+deadlines, shares. It is held to everything in §1, plus these rules.
+
+1. **Every number is the chapter's, with its citation.** The chart never computes a figure the
+   chapter does not show; derived values (a difference, a share) show the arithmetic in the text
+   alternative, as STYLEGUIDE §7 asks for prose.
+2. **Axes.** Label each axis with the quantity and its unit ("days after awareness", "share of
+   respondents, %"). Bars and areas start at zero; a truncated axis is a different chart. Ticks at
+   round values, at most six per axis; gridlines hairline (`.rule`), never heavier than the data.
+   Time runs left to right. No dual axes, no 3D, no pie with more than four slices.
+3. **Scales.** Linear unless the axis label says "log scale". Colour encodes a category only when
+   the category is a stack layer (`--l1`…`--l5`); otherwise ink for the data and one accent for
+   the value the caption is about. Never colour alone: label series directly on the chart, and
+   use a legend only when direct labels would collide.
+4. **Source line.** Inside the image, bottom left, mono, muted, at least 12 px at 390 px:
+   "Source: chapter NN [n]" (the chapter's own reference numbers). A reader who crops the chart
+   keeps the provenance.
+5. **As of.** Any value that can change carries "As of YYYY-MM-DD" inside the image next to the
+   source line, and `asOf`/`reviewBy` in `figures.ts` (§1.13).
+6. **HTML table fallback.** Required: the entry's `data` field holds the same numbers as a table
+   (`caption`, `columns`, `rows`, `source`); the permalink renders it as a `<table>` with a
+   caption and column headers, and the build fails without it. The table is the accessible and
+   copyable form of the chart, not a summary of it.
+7. **Numbers in text** use the mono face with tabular figures; percentages carry the % sign on
+   every label, not only in the axis title.
+
+## 5. Posters and exports
+
+**Posters.** A poster (`kind: 'poster'`) is a figure that indexes a whole area of the book, like
+the discipline map (§2.4): it may pass the node budget of §1.4, its budget is 48 KB, and `pages`
+lists the site pages that show it. Lay posters out portrait at the A-series ratio of 1 : √2, so
+one layout prints at any A size [1][2]: A4 is 210 × 297 mm, A3 297 × 420 mm, A2 420 × 594 mm, A1
+594 × 841 mm and A0 841 × 1189 mm [2]. The 3200 px PNG holds about 387 px per inch across an A4
+width (210 mm is 8.27 in; 3200 / 8.27) and about 274 across A3 (297 mm is 11.69 in); for A2 and
+larger, print the SVG.
+
+**What the build exports.** `scripts/figures-build.mjs` writes, for every entry in `figures.ts`,
+seven files under `/downloads/figures/`, named by `figureExports()` so the pages link exactly what
+exists:
+
+| File | What it is |
+|---|---|
+| `<id>-v<version>.svg` | Standalone SVG that follows the viewer's `prefers-color-scheme` |
+| `<id>-v<version>-light.svg`, `-dark.svg` | The same, fixed to one theme (slides, print) |
+| `<id>-v<version>-light-1600.png`, `-3200.png` | Light PNG, 1600 and 3200 px wide |
+| `<id>-v<version>-dark-1600.png`, `-3200.png` | Dark PNG, 1600 and 3200 px wide |
+
+- **Generated, never committed.** The folder is git-ignored like `public/diagrams`; every build
+  rewrites it, and a render cache (`site/.figures-cache`) skips PNGs whose input did not change.
+  `<version>` is `bokVersion` in `src/data/site.ts`; older versions live in the archived releases,
+  not on the site.
+- **Colour.** The exporter reads `tokens.css` and the `.figc` rules of `figures.css` and resolves
+  every `var()` and `color-mix()` to a value per theme, so an export matches the site and a token
+  change reaches it on the next build. Each export carries its own ground (`--bg`), so it reads
+  on any slide background. Never hard-code a colour in a figure to "fix" an export.
+- **Attribution band.** Under a hairline at the foot of every export, in mono and `--muted`:
+  "aigovernanceengineer.com · CC BY 4.0 · v<version>". It is part of the image, not a caption:
+  do not crop it, cover it or shrink it below its computed size. The build fails if the band
+  would be wider than the figure.
+- **Type.** The SVGs declare the three site faces (`@font-face` with `local()` first, then the
+  site's WOFF2 by absolute URL) with system fallbacks and keep the text live. The PNGs are drawn
+  with the same faces, decoded at build from the installed `@fontsource` packages, so they match
+  the site on any machine; a glyph outside those Latin subsets (such as "→") falls back to a system
+  face, and the build warns when none has it. Keep figure text within Latin, "·" and "→".
+- **Links and metadata.** Every link in an export is absolute. The SVG carries `role="img"`, its
+  `<title>` and `<desc>` (with the credit) and Creative Commons RDF metadata; each PNG carries
+  `iTXt` chunks for title, author, description, licence and source URL.
+- **Credit when reused.** CC BY 4.0 lets anyone share and adapt a figure, commercially too, if
+  they give appropriate credit, link to the licence and indicate changes [3]. The permalink page
+  gives a credit line with title, author, source and licence, the four elements Creative Commons
+  recommends [4], and HTML and Markdown embed snippets built from it.
+
+## 6. Interactive widgets
+
+A widget is any figure or tool that runs client-side script: an explorer, a filter, a
+calculator, a drawer. It is progressive enhancement over content that is already on the page.
+
+1. **No-JS fallback.** Without JavaScript the page shows the full content as HTML (a list, a
+   table, the static figure) and every link works; the script only filters, reveals or animates.
+   Check every widget with JavaScript disabled before merge.
+2. **CSP.** Scripts are same-origin files (`public/*.js` or Astro-bundled modules), loaded with
+   `defer`; no inline script, no `eval`, no third-party library without review. Data comes from
+   the same typed module or JSON dataset the static page renders; no fact lives only in the
+   script.
+3. **Not-legal-advice notice.** A widget that classifies, scores or tells a reader which
+   obligations apply shows, next to the result: "A reading aid, not legal advice. Mappings are
+   illustrative, not a claim of conformity." It links the chapter sources behind the result and
+   prints the `asOf` date of its data.
+4. **Motion.** Under `prefers-reduced-motion: reduce` nothing animates: state changes are
+   instant. Otherwise animate `transform` only, with the `--dur`/`--ease` tokens; never dim text
+   with opacity. Nothing that starts on its own moves for more than five seconds without a way
+   to pause it, which WCAG 2.2 criterion 2.2.2 requires [5].
+5. **Input.** Every control is reachable and operable by keyboard with a visible focus ring;
+   pointer targets are at least 24 × 24 CSS px (WCAG 2.2 criterion 2.5.8, level AA) [6]; results
+   are announced through one polite `aria-live` region. Shareable state goes in the URL; no
+   cookies, and `localStorage` only for a preference.
+6. **Budgets.** At most 15 KB gzip per widget script, measured on the built file; the SVGs it
+   drives stay within §1.12 (12 KB per infographic, 48 KB per poster). A widget that needs more
+   is split, or its data moves to a JSON file loaded on demand.
+
+### Sources
+
+[1] ISO 216:2007, Writing paper and certain classes of printed matter: trimmed sizes, A and B
+series (cited by identifier; the A series keeps a 1 : √2 ratio). ISO. 2007.
+https://www.iso.org/standard/36631.html (verified: reported)
+[2] ISO 216 (A-series dimensions in millimetres, A0 to A4, and the √2 ratio). Wikipedia.
+2026-09-24. https://en.wikipedia.org/wiki/ISO_216 (verified: secondary)
+[3] Attribution 4.0 International, deed ("You must give appropriate credit, provide a link to
+the license, and indicate if changes were made"). Creative Commons. 2026-09-24.
+https://creativecommons.org/licenses/by/4.0/ (verified: primary)
+[4] Recommended practices for attribution (TASL: title, author, source, licence). Creative
+Commons. 2026-09-24. https://wiki.creativecommons.org/wiki/Recommended_practices_for_attribution
+(verified: primary)
+[5] Web Content Accessibility Guidelines (WCAG) 2.2, success criterion 2.2.2 Pause, Stop, Hide.
+W3C Recommendation. 2024-12-12. https://www.w3.org/TR/WCAG22/ (verified: primary)
+[6] Understanding success criterion 2.5.8 Target Size (Minimum), level AA. W3C. 2024-12-12.
+https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html (verified: primary)

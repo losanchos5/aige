@@ -4,6 +4,23 @@ All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledg
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
 
+## Unreleased (v0.5.0)
+
+- Figures are citable and reusable: a `/figures` gallery grouped by part and chapter (the
+  infographics and the interactive diagrams) and a `/figures/<id>` permalink per infographic with
+  its text alternative, where it appears, downloads, HTML and Markdown embed snippets with the
+  full CC BY credit, a citation with BibTeX and `ImageObject` structured data.
+- Every figure is exported at build as a standalone SVG (light and dark by colour scheme, plus
+  fixed light and dark) and as light and dark PNGs at 1600 and 3200 px, drawn with the site's
+  typefaces, each with the band "aigovernanceengineer.com · CC BY 4.0 · v<version>" and a
+  versioned file name under `/downloads/figures/`.
+- Figure entries gain `asOf`, `reviewBy`, `license`, `kind`, `pages` and a `data` table
+  fallback; a dated figure prints "As of" inside the image (the Article 73 clock now reads
+  "As of 2026-09-24"), and the build checks budgets, dates and the stamp.
+- `site/VISUAL-GUIDE.md` adds rules for data visualisation, posters and exports, and
+  interactive widgets; the content lint now also scans the published SVG, JSON, CSV, TXT, XML and
+  Markdown files and the text of the PNG downloads.
+
 ## [Unreleased] - 2026-09-20
 
 Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the

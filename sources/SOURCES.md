@@ -420,3 +420,18 @@ chapter and recorded once below._
 | 53 | 6.1 algorithmic impact assessment completed, approved and published on the Open Government Portal before production, updated on a schedule and when functionality or scope changes; 6.3.7 expert review; Appendix B impact levels defined by reversibility and duration | Directive on Automated Decision-Making | Treasury Board of Canada Secretariat | 2025-06-24 | https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=32592 | primary | Impact assessments compared; The technical file |
 | 54 | guidance for assessing impacts on individuals, groups and society throughout the life cycle, updated as needed; complements ISO/IEC 42001 and ISO/IEC 23894 | ISO/IEC 42005:2025, AI system impact assessment | ISO/IEC | 2025-05 | https://www.iso.org/standard/44545.html | primary | Impact assessments compared |
 | 55 | FRIA by deployers that are bodies governed by public law or private entities providing public services, and deployers of Annex III points 5(b) and (c), except point 2 systems; elements (a) to (f); results notified to the market surveillance authority; 27(4) relationship with the DPIA | EU AI Act Art. 27 | AI Act (Reg. (EU) 2024/1689) | 2024 | https://artificialintelligenceact.eu/article/27/ | primary | Impact assessments compared |
+
+## site/VISUAL-GUIDE.md and the /figures pages
+
+Rows [1]–[6] match the `### Sources` list at the foot of `site/VISUAL-GUIDE.md` (sections 5 and 6);
+rows [3] and [4] also back the "Reuse and credit" copy on every `/figures/<id>` page. Verified
+2026-09-24.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | The A series of trimmed paper sizes and its 1 : √2 ratio are defined by ISO 216 (cited by identifier and short title only; the ISO page returned HTTP 403) | ISO 216:2007, Writing paper and certain classes of printed matter: trimmed sizes, A and B series | ISO | 2007 | https://www.iso.org/standard/36631.html | reported | VISUAL-GUIDE §5 (posters) |
+| 2 | A4 210 × 297 mm, A3 297 × 420 mm, A2 420 × 594 mm, A1 594 × 841 mm, A0 841 × 1189 mm; halving a sheet keeps the √2 ratio | ISO 216 | Wikipedia | 2026-09-24 | https://en.wikipedia.org/wiki/ISO_216 | secondary | VISUAL-GUIDE §5 (posters) |
+| 3 | CC BY 4.0 lets anyone share and adapt, for any purpose including commercial use, if they give appropriate credit, provide a link to the licence and indicate if changes were made | Attribution 4.0 International (deed) | Creative Commons | 2026-09-24 | https://creativecommons.org/licenses/by/4.0/ | primary | VISUAL-GUIDE §5; /figures, /figures/<id> (reuse) |
+| 4 | Recommended attribution covers title, author, source and licence (TASL) | Recommended practices for attribution | Creative Commons | 2026-09-24 | https://wiki.creativecommons.org/wiki/Recommended_practices_for_attribution | primary | VISUAL-GUIDE §5; /figures/<id> (credit line) |
+| 5 | Moving content that starts automatically and lasts more than five seconds needs a mechanism to pause, stop or hide it | WCAG 2.2, success criterion 2.2.2 Pause, Stop, Hide | W3C | 2024-12-12 | https://www.w3.org/TR/WCAG22/ | primary | VISUAL-GUIDE §6 (motion) |
+| 6 | Pointer targets are at least 24 by 24 CSS pixels, with listed exceptions (level AA) | Understanding SC 2.5.8 Target Size (Minimum) | W3C | 2024-12-12 | https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html | primary | VISUAL-GUIDE §6 (input) |
