@@ -18,7 +18,8 @@
   ],
   "x-pattern": [
     "https://aigovernanceengineer.com/bok/patterns#pattern-human-in-the-loop-gate",
-    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-identity--scoped-credentials"
+    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-identity--scoped-credentials",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-sanctioned-ai-gateway"
   ],
   "x-lifecycle-stage": "organisation",
   "type": "object",

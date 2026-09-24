@@ -18,7 +18,8 @@
   ],
   "x-pattern": [
     "https://aigovernanceengineer.com/bok/patterns#pattern-continuous-assurance-telemetry",
-    "https://aigovernanceengineer.com/bok/patterns#pattern-incident-pipeline"
+    "https://aigovernanceengineer.com/bok/patterns#pattern-incident-pipeline",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-drift--fairness-monitor"
   ],
   "x-lifecycle-stage": "operate",
   "type": "object",

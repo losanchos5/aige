@@ -18,7 +18,8 @@
   ],
   "x-pattern": [
     "https://aigovernanceengineer.com/bok/patterns#pattern-kill-switch--circuit-breaker",
-    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-registry"
+    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-registry",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-deactivation-localisation--retirement-runbook"
   ],
   "x-lifecycle-stage": "retire",
   "type": "object",

@@ -18,7 +18,8 @@ export const catalogue: readonly TemplateEntry[] = [
     ],
     "patterns": [
       "pattern-fria-as-code",
-      "pattern-agent-registry"
+      "pattern-agent-registry",
+      "pattern-use-case-intake--risk-tiering"
     ],
     "evidences": [
       "EU AI Act Art. 6",
@@ -45,6 +46,49 @@ export const catalogue: readonly TemplateEntry[] = [
         "role": "template",
         "format": "markdown",
         "path": "/templates/use-case-record.md"
+      }
+    ]
+  },
+  {
+    "name": "classification-decision-record",
+    "kind": "schema",
+    "title": "Classification decision record",
+    "description": "The recorded EU AI Act triage of one AI system or model: the question set and version it was answered against, every answer with its article and meaning, the indicative scope, operator roles and risk classes with their reasons, the high-risk screen with the Art. 6(3) condition and the explicit profiling flag, the reviewer, the date, the legal-review state and the events that re-open it.",
+    "stage": "intake",
+    "stageLabel": "Intake and inventory",
+    "layers": [
+      1,
+      2
+    ],
+    "patterns": [
+      "pattern-policy-card",
+      "pattern-agent-registry"
+    ],
+    "evidences": [
+      "EU AI Act Art. 6(3)",
+      "EU AI Act Art. 6(4)",
+      "EU AI Act Art. 49(2)",
+      "EU AI Act Art. 25",
+      "EU AI Act Art. 2",
+      "EU AI Act Art. 5",
+      "EU AI Act Art. 50",
+      "EU AI Act Art. 52"
+    ],
+    "files": [
+      {
+        "role": "schema",
+        "format": "json",
+        "path": "/schemas/classification-decision-record.v1.json"
+      },
+      {
+        "role": "example",
+        "format": "json",
+        "path": "/schemas/examples/classification-decision-record.example.json"
+      },
+      {
+        "role": "template",
+        "format": "markdown",
+        "path": "/templates/classification-decision-record.md"
       }
     ]
   },
@@ -273,7 +317,8 @@ export const catalogue: readonly TemplateEntry[] = [
     ],
     "patterns": [
       "pattern-aibom",
-      "pattern-model-card-as-control-evidence"
+      "pattern-model-card-as-control-evidence",
+      "pattern-training-data-rights-ledger"
     ],
     "evidences": [
       "EU AI Act Art. 10",
@@ -303,6 +348,49 @@ export const catalogue: readonly TemplateEntry[] = [
     ]
   },
   {
+    "name": "model-card",
+    "kind": "schema",
+    "title": "Model card",
+    "description": "A model or system card as a record: what the model is, what it is for and not for, the data it was built and tested on, how it performs across groups and conditions, its limits, and the links to the rest of the technical file. The same record renders a Hugging Face style card and a CycloneDX ML-BOM component, so the card an auditor reads is the card production produced.",
+    "stage": "build",
+    "stageLabel": "Design and data",
+    "layers": [
+      2
+    ],
+    "patterns": [
+      "pattern-model-card-as-control-evidence",
+      "pattern-aibom"
+    ],
+    "evidences": [
+      "EU AI Act Art. 11",
+      "EU AI Act Annex IV",
+      "EU AI Act Art. 13",
+      "EU AI Act Art. 53(1)(a)",
+      "EU AI Act Art. 53(1)(b)",
+      "ISO/IEC 42001 A.6",
+      "ISO/IEC 42001 A.8",
+      "NIST AI RMF MAP 1.1",
+      "NIST AI RMF MEASURE 2.1"
+    ],
+    "files": [
+      {
+        "role": "schema",
+        "format": "json",
+        "path": "/schemas/model-card.v1.json"
+      },
+      {
+        "role": "example",
+        "format": "json",
+        "path": "/schemas/examples/model-card.example.json"
+      },
+      {
+        "role": "template",
+        "format": "markdown",
+        "path": "/templates/model-card.md"
+      }
+    ]
+  },
+  {
     "name": "dataset-admission-record",
     "kind": "schema",
     "title": "Dataset admission record",
@@ -314,7 +402,8 @@ export const catalogue: readonly TemplateEntry[] = [
     ],
     "patterns": [
       "pattern-eval-gate-in-ci",
-      "pattern-aibom"
+      "pattern-aibom",
+      "pattern-dataset-admission-gate"
     ],
     "evidences": [
       "EU AI Act Art. 10",
@@ -393,7 +482,8 @@ export const catalogue: readonly TemplateEntry[] = [
     ],
     "patterns": [
       "pattern-eval-gate-in-ci",
-      "pattern-adversarial-red-team-suite"
+      "pattern-adversarial-red-team-suite",
+      "pattern-fairness-eval-suite"
     ],
     "evidences": [
       "EU AI Act Art. 15",
@@ -474,7 +564,8 @@ export const catalogue: readonly TemplateEntry[] = [
     ],
     "patterns": [
       "pattern-eval-gate-in-ci",
-      "pattern-human-in-the-loop-gate"
+      "pattern-human-in-the-loop-gate",
+      "pattern-staged-rollout-with-rollback-criteria"
     ],
     "evidences": [
       "EU AI Act Art. 9",
@@ -553,7 +644,9 @@ export const catalogue: readonly TemplateEntry[] = [
     ],
     "patterns": [
       "pattern-vendor--model-due-diligence-gate",
-      "pattern-human-in-the-loop-gate"
+      "pattern-human-in-the-loop-gate",
+      "pattern-decision-notice--contest-path",
+      "pattern-disclosure--notification-pipeline"
     ],
     "evidences": [
       "EU AI Act Art. 26",
@@ -594,7 +687,8 @@ export const catalogue: readonly TemplateEntry[] = [
     ],
     "patterns": [
       "pattern-continuous-assurance-telemetry",
-      "pattern-incident-pipeline"
+      "pattern-incident-pipeline",
+      "pattern-drift--fairness-monitor"
     ],
     "evidences": [
       "EU AI Act Art. 72",
@@ -722,7 +816,8 @@ export const catalogue: readonly TemplateEntry[] = [
     ],
     "patterns": [
       "pattern-kill-switch--circuit-breaker",
-      "pattern-agent-registry"
+      "pattern-agent-registry",
+      "pattern-deactivation-localisation--retirement-runbook"
     ],
     "evidences": [
       "NIST AI RMF GOVERN 1.7",
@@ -802,7 +897,8 @@ export const catalogue: readonly TemplateEntry[] = [
     ],
     "patterns": [
       "pattern-human-in-the-loop-gate",
-      "pattern-agent-identity--scoped-credentials"
+      "pattern-agent-identity--scoped-credentials",
+      "pattern-sanctioned-ai-gateway"
     ],
     "evidences": [
       "EU AI Act Art. 4",
@@ -843,7 +939,9 @@ export const catalogue: readonly TemplateEntry[] = [
     ],
     "patterns": [
       "pattern-continuous-assurance-telemetry",
-      "pattern-machine-readable-evidence-oscal"
+      "pattern-machine-readable-evidence-oscal",
+      "pattern-model-artefact-integrity",
+      "pattern-sanctioned-ai-gateway"
     ],
     "evidences": [
       "EU AI Act Art. 12",

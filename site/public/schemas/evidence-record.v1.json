@@ -17,7 +17,9 @@
   ],
   "x-pattern": [
     "https://aigovernanceengineer.com/bok/patterns#pattern-continuous-assurance-telemetry",
-    "https://aigovernanceengineer.com/bok/patterns#pattern-machine-readable-evidence-oscal"
+    "https://aigovernanceengineer.com/bok/patterns#pattern-machine-readable-evidence-oscal",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-model-artefact-integrity",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-sanctioned-ai-gateway"
   ],
   "x-lifecycle-stage": "organisation",
   "type": "object",

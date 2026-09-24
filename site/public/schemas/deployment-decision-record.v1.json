@@ -19,7 +19,9 @@
   ],
   "x-pattern": [
     "https://aigovernanceengineer.com/bok/patterns#pattern-vendor--model-due-diligence-gate",
-    "https://aigovernanceengineer.com/bok/patterns#pattern-human-in-the-loop-gate"
+    "https://aigovernanceengineer.com/bok/patterns#pattern-human-in-the-loop-gate",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-decision-notice--contest-path",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-disclosure--notification-pipeline"
   ],
   "x-lifecycle-stage": "release",
   "type": "object",

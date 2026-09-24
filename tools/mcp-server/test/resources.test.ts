@@ -88,7 +88,12 @@ describe('templates catalogue', () => {
     for (const file of readdirSync(join(site, 'schemas')).filter((f) => f.endsWith('.v1.json'))) {
       assert.ok(names.has(file.replace(/\.v1\.json$/, '')), `schema ${file} is in the catalogue`);
     }
-    for (const file of readdirSync(join(site, 'templates'))) {
+    // Files only: a subfolder (policy-cards/ holds the Policy Card builder's
+    // generated samples) is not a template of the kit.
+    const templateFiles = readdirSync(join(site, 'templates'), { withFileTypes: true })
+      .filter((entry) => entry.isFile())
+      .map((entry) => entry.name);
+    for (const file of templateFiles) {
       assert.ok(paths.has(`/templates/${file}`), `template ${file} is in the catalogue`);
     }
     for (const entry of templates()) {

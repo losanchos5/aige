@@ -18,7 +18,8 @@
   ],
   "x-pattern": [
     "https://aigovernanceengineer.com/bok/patterns#pattern-eval-gate-in-ci",
-    "https://aigovernanceengineer.com/bok/patterns#pattern-human-in-the-loop-gate"
+    "https://aigovernanceengineer.com/bok/patterns#pattern-human-in-the-loop-gate",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-staged-rollout-with-rollback-criteria"
   ],
   "x-lifecycle-stage": "release",
   "type": "object",

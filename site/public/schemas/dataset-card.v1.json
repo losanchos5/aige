@@ -18,7 +18,8 @@
   ],
   "x-pattern": [
     "https://aigovernanceengineer.com/bok/patterns#pattern-aibom",
-    "https://aigovernanceengineer.com/bok/patterns#pattern-model-card-as-control-evidence"
+    "https://aigovernanceengineer.com/bok/patterns#pattern-model-card-as-control-evidence",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-training-data-rights-ledger"
   ],
   "x-lifecycle-stage": "build",
   "type": "object",

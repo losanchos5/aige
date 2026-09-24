@@ -15,7 +15,8 @@
   ],
   "x-pattern": [
     "https://aigovernanceengineer.com/bok/patterns#pattern-eval-gate-in-ci",
-    "https://aigovernanceengineer.com/bok/patterns#pattern-aibom"
+    "https://aigovernanceengineer.com/bok/patterns#pattern-aibom",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-dataset-admission-gate"
   ],
   "x-lifecycle-stage": "build",
   "type": "object",

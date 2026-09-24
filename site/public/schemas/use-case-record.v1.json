@@ -20,7 +20,8 @@
   ],
   "x-pattern": [
     "https://aigovernanceengineer.com/bok/patterns#pattern-fria-as-code",
-    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-registry"
+    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-registry",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-use-case-intake--risk-tiering"
   ],
   "x-lifecycle-stage": "intake",
   "type": "object",

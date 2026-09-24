@@ -17,7 +17,8 @@
   ],
   "x-pattern": [
     "https://aigovernanceengineer.com/bok/patterns#pattern-eval-gate-in-ci",
-    "https://aigovernanceengineer.com/bok/patterns#pattern-adversarial-red-team-suite"
+    "https://aigovernanceengineer.com/bok/patterns#pattern-adversarial-red-team-suite",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-fairness-eval-suite"
   ],
   "x-lifecycle-stage": "test",
   "type": "object",
