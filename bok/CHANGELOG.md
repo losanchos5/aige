@@ -110,6 +110,19 @@ a completed, reviewed core (1.0).
   decides and the gates enforce (12), the risk loop on the stack, the likelihood-by-severity
   matrix with the S5 override and the mitigation ladder (13), provenance and lineage (14) and
   the overlapping incident clocks (17). Each has a text description under it.
+- Four reference posters, generated at build from the data and printable at any A size (portrait,
+  1 : √2): the EU AI Act timeline after the Digital Omnibus, one lane per obligation family from
+  2024 to 2030 (chapters 18 and 08, from the obligation register); the operator roles, seven
+  questions leading to each role with its duties, its evidence and the Article 25 loop (chapter 18);
+  the risk ladder with the Annex I and Annex III routes, the Article 6(3) filter, the GPAI track and
+  notes on Korea, Texas, California and Colorado (chapters 18 and 21); and the model-type by
+  deployment-option matrix (chapter 15). Each carries "As of 2026-09-24" inside the image, sits at
+  the head of its section in a scrollable, labelled region and links to its permalink with SVG and
+  PNG downloads. The timeline and the matrix also publish their data as a table.
+- Spanish editions of the timeline, the roles and the ladder posters (`/figures/eu-ai-act-timeline-es`,
+  `/figures/eu-ai-act-operator-roles-es`, `/figures/eu-ai-act-risk-ladder-es`), with the terms of the
+  Spanish text of the Act and the stamp "A fecha de 2026-09-24"; listed on `/figures`, not placed in
+  the English chapters.
 
 ### Changed
 - Diagrams: the Framework Crosswalk is drawn as one hub with five spokes and evidence on the hub;

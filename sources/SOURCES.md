@@ -2028,3 +2028,15 @@ Commission's AI Act Service Desk, and the Omnibus changes come from chapter 18's
 | 22 | OECD AI Principles 1.1 to 1.5 (the 2024 revision adds sustainability, safe decommissioning, and traceability and risk management under accountability) | Chapter 22 row [7] (OECD/LEGAL/0449) | OECD (via chapter 22) | 2024-05-03 | https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449 | primary | Crosswalk treaty and soft-law column |
 | 23 | G7 Hiroshima Code of Conduct, Actions 1 to 11 (e.g. 7 content authentication and provenance; 11 data input, personal data and IP) | Chapter 22 rows (Hiroshima Process International Code of Conduct for Advanced AI Systems) | European Commission (via chapter 22) | 2023-10-30 | https://digital-strategy.ec.europa.eu/en/library/hiroshima-process-international-code-conduct-advanced-ai-systems | primary | Crosswalk treaty and soft-law column |
 | 24 | JTC 21 stages as of 2026-09-24: EN 18286:2026 published (60.60); prEN 18228 and prEN 18229-1 at Enquiry (40.60); no JTC 21 deliverable cited in the OJ | Chapter 22 rows [52] and [54] | Genorma; CEN-CENELEC (via chapter 22) | 2026-09-24 | https://genorma.com/en/standards/pren-18228 | secondary | Crosswalk CEN-CENELEC column (prEN refs unverified) |
+
+## site/scripts/lib/posters.mjs (reference posters, BoK v0.5.0)
+
+Block w2-fig-posters. The four posters restate chapters 08, 15, 18 and 21 and the data modules
+`frameworks.ts`, `roles.ts` and `deployment-options.ts`; their dates and claims carry the sources of
+those chapters and rows. The one source opened for this block is the Spanish text of the Act, read on
+2026-09-24 for the terms of the three Spanish editions. It is the text as adopted: the Omnibus wording
+of Art. 4 was not checked in Spanish, so the posters say only that Art. 4 was reworded.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | Spanish terms of the Act: proveedor (Art. 3(3)), responsable del despliegue (3(4)), representante autorizado (3(5)), importador (3(6)), distribuidor (3(7)), operador and fabricante del producto (3(8)), modificación sustancial (3(23)), alfabetización en materia de IA (3(56) and Art. 4), ultrasuplantación (3(60)), modelo de IA de uso general (3(63)), sistema de IA de uso general (3(66)), proveedor posterior (3(68)); Art. 5 "Prácticas de IA prohibidas"; Art. 6(3) "tarea de procedimiento limitada" and "tarea preparatoria"; "Oficina de IA"; "riesgo sistémico" | Regulation (EU) 2024/1689 (Reglamento de Inteligencia Artificial), Spanish-language Official Journal text | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=OJ:L_202401689 | primary | Spanish editions of the timeline, roles and ladder posters |
