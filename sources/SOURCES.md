@@ -420,3 +420,25 @@ chapter and recorded once below._
 | 53 | 6.1 algorithmic impact assessment completed, approved and published on the Open Government Portal before production, updated on a schedule and when functionality or scope changes; 6.3.7 expert review; Appendix B impact levels defined by reversibility and duration | Directive on Automated Decision-Making | Treasury Board of Canada Secretariat | 2025-06-24 | https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=32592 | primary | Impact assessments compared; The technical file |
 | 54 | guidance for assessing impacts on individuals, groups and society throughout the life cycle, updated as needed; complements ISO/IEC 42001 and ISO/IEC 23894 | ISO/IEC 42005:2025, AI system impact assessment | ISO/IEC | 2025-05 | https://www.iso.org/standard/44545.html | primary | Impact assessments compared |
 | 55 | FRIA by deployers that are bodies governed by public law or private entities providing public services, and deployers of Annex III points 5(b) and (c), except point 2 systems; elements (a) to (f); results notified to the market surveillance authority; 27(4) relationship with the DPIA | EU AI Act Art. 27 | AI Act (Reg. (EU) 2024/1689) | 2024 | https://artificialintelligenceact.eu/article/27/ | primary | Impact assessments compared |
+
+### site/src/pages/toolkit/index.astro (/toolkit)
+
+Block b-toolkit-foundation, checked 2026-09-24. The `#` column matches the page's `[n]` markers; the
+shared helpers in `site/public/toolkit/lib.js` implement the same rules.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | JSON exchanged between systems outside a closed ecosystem MUST be encoded in UTF-8; STD 90 | RFC 8259, The JavaScript Object Notation (JSON) Data Interchange Format | IETF (RFC Editor) | 2017-12 | https://www.rfc-editor.org/rfc/rfc8259 | primary | Toolkit (open formats); lib.js downloadJson |
+| 2 | CSV records end in CRLF; fields with line breaks, double quotes or commas are enclosed in double quotes; an inner double quote is doubled; registers text/csv with an optional header parameter; Informational | RFC 4180, Common Format and MIME Type for Comma-Separated Values (CSV) Files | IETF (RFC Editor) | 2005-10 | https://www.rfc-editor.org/rfc/rfc4180 | primary | Toolkit (open formats); lib.js toCsv |
+| 3 | content lines end in CRLF and SHOULD NOT exceed 75 octets, folded with CRLF plus one space; TEXT escapes backslash, semicolon, comma and newline; PRODID and VERSION required once per calendar; VEVENT carries UID, DTSTAMP and DTSTART; a DATE DTSTART without DTEND lasts one day, and a DATE DTEND is exclusive | RFC 5545, Internet Calendaring and Scheduling Core Object Specification (iCalendar) | IETF (RFC Editor) | 2009-09 | https://www.rfc-editor.org/rfc/rfc5545 | primary | Toolkit (open formats); lib.js toIcs |
+| 4 | the fragment is separated from the rest of the URI before dereference and handled by the user agent alone; STD 66 | RFC 3986, Uniform Resource Identifier (URI): Generic Syntax, section 3.5 | IETF (RFC Editor) | 2005-01 | https://www.rfc-editor.org/rfc/rfc3986#section-3.5 | primary | Toolkit (state in the link) |
+
+### site/src/pages/toolkit/maturity-self-check.astro (/toolkit/maturity-self-check)
+
+Block b-toolkit-foundation, checked 2026-09-24. The tool renders chapter 07's own text and adds no
+external claim; the chapter's sources stay in its section above.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | the observable criteria by layer and level, the metrics per level, the self-assessment checklist and each level's typical failure, rendered verbatim | 07. Maturity model (five levels) | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/bok/maturity-model | primary | Maturity self-check (form, guide, exports) |
+| 2 | the pattern each next move links to | 05. Patterns | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/bok/patterns | primary | Maturity self-check (next move) |
