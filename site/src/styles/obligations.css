@@ -1,0 +1,219 @@
+/* obligations.css: the obligation register (/obligations) and the per-row
+   pages (/obligations/<id>). The filter chips reuse .ob-filter / .ob-chip /
+   .ob-radio from resources.css; the fact list, evidence list and page nav reuse
+   .cs-* from harms.css. Status tags stay neutral (.type-tag): the layer colours
+   are reserved for the five stack layers (audit SL-06). */
+
+/* ---- Register index ------------------------------------------------------- */
+.obx-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  margin: 0 0 var(--s-6);
+  padding: var(--s-3) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-small);
+}
+
+.obx-jump a {
+  color: var(--ink-2);
+}
+
+.obx-group {
+  margin-top: var(--s-6);
+  scroll-margin-top: var(--anchor-offset);
+}
+
+.obx-group-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-2);
+  padding-bottom: var(--s-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.obx-group-head h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  color: var(--ink);
+}
+
+.obx-count {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+}
+
+.obx-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.obx-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s-2);
+  padding: var(--s-3) 0;
+  border-bottom: 1px solid var(--line);
+  min-width: 0;
+}
+
+@media (min-width: 760px) {
+  .obx-row {
+    grid-template-columns: minmax(0, 1fr) minmax(11rem, max-content) minmax(7rem, max-content);
+    align-items: baseline;
+    column-gap: var(--s-5);
+  }
+}
+
+.obx-name {
+  min-width: 0;
+}
+
+.obx-title {
+  color: var(--ink);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.obx-id {
+  display: block;
+  margin-top: var(--s-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.obx-applies {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+}
+
+.obx-legend {
+  margin: 0 0 var(--s-5);
+  max-width: var(--prose);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+/* Status filter alone. */
+.obx-index:has(#obx-st-in-force:checked) .obx-row:not(.st-in-force) { display: none; }
+.obx-index:has(#obx-st-in-force:checked) .obx-group:not(:has(.st-in-force)) { display: none; }
+.obx-index:has(#obx-st-applies-later:checked) .obx-row:not(.st-applies-later) { display: none; }
+.obx-index:has(#obx-st-applies-later:checked) .obx-group:not(:has(.st-applies-later)) { display: none; }
+.obx-index:has(#obx-st-deferred:checked) .obx-row:not(.st-deferred) { display: none; }
+.obx-index:has(#obx-st-deferred:checked) .obx-group:not(:has(.st-deferred)) { display: none; }
+.obx-index:has(#obx-st-grace:checked) .obx-row:not(.st-grace) { display: none; }
+.obx-index:has(#obx-st-grace:checked) .obx-group:not(:has(.st-grace)) { display: none; }
+.obx-index:has(#obx-st-voluntary:checked) .obx-row:not(.st-voluntary) { display: none; }
+.obx-index:has(#obx-st-voluntary:checked) .obx-group:not(:has(.st-voluntary)) { display: none; }
+.obx-index:has(#obx-st-pending:checked) .obx-row:not(.st-pending) { display: none; }
+.obx-index:has(#obx-st-pending:checked) .obx-group:not(:has(.st-pending)) { display: none; }
+
+/* Layer filter alone. */
+.obx-index:has(#obx-l-1:checked) .obx-row:not(.has-l1) { display: none; }
+.obx-index:has(#obx-l-1:checked) .obx-group:not(:has(.has-l1)) { display: none; }
+.obx-index:has(#obx-l-2:checked) .obx-row:not(.has-l2) { display: none; }
+.obx-index:has(#obx-l-2:checked) .obx-group:not(:has(.has-l2)) { display: none; }
+.obx-index:has(#obx-l-3:checked) .obx-row:not(.has-l3) { display: none; }
+.obx-index:has(#obx-l-3:checked) .obx-group:not(:has(.has-l3)) { display: none; }
+.obx-index:has(#obx-l-4:checked) .obx-row:not(.has-l4) { display: none; }
+.obx-index:has(#obx-l-4:checked) .obx-group:not(:has(.has-l4)) { display: none; }
+.obx-index:has(#obx-l-5:checked) .obx-row:not(.has-l5) { display: none; }
+.obx-index:has(#obx-l-5:checked) .obx-group:not(:has(.has-l5)) { display: none; }
+
+/* Both filters: a group with no row matching both is hidden too. */
+.obx-index:has(#obx-st-in-force:checked):has(#obx-l-1:checked) .obx-group:not(:has(.st-in-force.has-l1)) { display: none; }
+.obx-index:has(#obx-st-in-force:checked):has(#obx-l-2:checked) .obx-group:not(:has(.st-in-force.has-l2)) { display: none; }
+.obx-index:has(#obx-st-in-force:checked):has(#obx-l-3:checked) .obx-group:not(:has(.st-in-force.has-l3)) { display: none; }
+.obx-index:has(#obx-st-in-force:checked):has(#obx-l-4:checked) .obx-group:not(:has(.st-in-force.has-l4)) { display: none; }
+.obx-index:has(#obx-st-in-force:checked):has(#obx-l-5:checked) .obx-group:not(:has(.st-in-force.has-l5)) { display: none; }
+.obx-index:has(#obx-st-applies-later:checked):has(#obx-l-1:checked) .obx-group:not(:has(.st-applies-later.has-l1)) { display: none; }
+.obx-index:has(#obx-st-applies-later:checked):has(#obx-l-2:checked) .obx-group:not(:has(.st-applies-later.has-l2)) { display: none; }
+.obx-index:has(#obx-st-applies-later:checked):has(#obx-l-3:checked) .obx-group:not(:has(.st-applies-later.has-l3)) { display: none; }
+.obx-index:has(#obx-st-applies-later:checked):has(#obx-l-4:checked) .obx-group:not(:has(.st-applies-later.has-l4)) { display: none; }
+.obx-index:has(#obx-st-applies-later:checked):has(#obx-l-5:checked) .obx-group:not(:has(.st-applies-later.has-l5)) { display: none; }
+.obx-index:has(#obx-st-deferred:checked):has(#obx-l-1:checked) .obx-group:not(:has(.st-deferred.has-l1)) { display: none; }
+.obx-index:has(#obx-st-deferred:checked):has(#obx-l-2:checked) .obx-group:not(:has(.st-deferred.has-l2)) { display: none; }
+.obx-index:has(#obx-st-deferred:checked):has(#obx-l-3:checked) .obx-group:not(:has(.st-deferred.has-l3)) { display: none; }
+.obx-index:has(#obx-st-deferred:checked):has(#obx-l-4:checked) .obx-group:not(:has(.st-deferred.has-l4)) { display: none; }
+.obx-index:has(#obx-st-deferred:checked):has(#obx-l-5:checked) .obx-group:not(:has(.st-deferred.has-l5)) { display: none; }
+.obx-index:has(#obx-st-grace:checked):has(#obx-l-1:checked) .obx-group:not(:has(.st-grace.has-l1)) { display: none; }
+.obx-index:has(#obx-st-grace:checked):has(#obx-l-2:checked) .obx-group:not(:has(.st-grace.has-l2)) { display: none; }
+.obx-index:has(#obx-st-grace:checked):has(#obx-l-3:checked) .obx-group:not(:has(.st-grace.has-l3)) { display: none; }
+.obx-index:has(#obx-st-grace:checked):has(#obx-l-4:checked) .obx-group:not(:has(.st-grace.has-l4)) { display: none; }
+.obx-index:has(#obx-st-grace:checked):has(#obx-l-5:checked) .obx-group:not(:has(.st-grace.has-l5)) { display: none; }
+.obx-index:has(#obx-st-voluntary:checked):has(#obx-l-1:checked) .obx-group:not(:has(.st-voluntary.has-l1)) { display: none; }
+.obx-index:has(#obx-st-voluntary:checked):has(#obx-l-2:checked) .obx-group:not(:has(.st-voluntary.has-l2)) { display: none; }
+.obx-index:has(#obx-st-voluntary:checked):has(#obx-l-3:checked) .obx-group:not(:has(.st-voluntary.has-l3)) { display: none; }
+.obx-index:has(#obx-st-voluntary:checked):has(#obx-l-4:checked) .obx-group:not(:has(.st-voluntary.has-l4)) { display: none; }
+.obx-index:has(#obx-st-voluntary:checked):has(#obx-l-5:checked) .obx-group:not(:has(.st-voluntary.has-l5)) { display: none; }
+.obx-index:has(#obx-st-pending:checked):has(#obx-l-1:checked) .obx-group:not(:has(.st-pending.has-l1)) { display: none; }
+.obx-index:has(#obx-st-pending:checked):has(#obx-l-2:checked) .obx-group:not(:has(.st-pending.has-l2)) { display: none; }
+.obx-index:has(#obx-st-pending:checked):has(#obx-l-3:checked) .obx-group:not(:has(.st-pending.has-l3)) { display: none; }
+.obx-index:has(#obx-st-pending:checked):has(#obx-l-4:checked) .obx-group:not(:has(.st-pending.has-l4)) { display: none; }
+.obx-index:has(#obx-st-pending:checked):has(#obx-l-5:checked) .obx-group:not(:has(.st-pending.has-l5)) { display: none; }
+
+/* ---- Per-row page --------------------------------------------------------- */
+.obx-milestones {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.obx-milestones li + li {
+  margin-top: var(--s-1);
+}
+
+.obx-milestones time {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  margin-right: var(--s-2);
+}
+
+.obx-idcode {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  overflow-wrap: anywhere;
+}
+
+.obx-topic + .obx-topic {
+  margin-top: var(--s-5);
+}
+
+.obx-siblings {
+  list-style: none;
+  padding: 0;
+}
+
+.obx-siblings li {
+  padding: var(--s-2) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.obx-sibling-ref {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+  margin-right: var(--s-2);
+}
+
+.obx-cite {
+  margin-top: var(--s-6);
+}
+
+/* The machine-readable links wrap anywhere: an API path has no break points. */
+.obx-data code,
+.obx-data a {
+  overflow-wrap: anywhere;
+}

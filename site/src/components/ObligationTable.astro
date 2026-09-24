@@ -191,7 +191,7 @@ const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}
                     </span>
                   </td>
                   {hasDutyColumns(group.framework) && (
-                    <td class="c-applies" data-label="Applies from">{row.applies}</td>
+                    <td class="c-applies" data-label="Applies from">{row.appliesNote}</td>
                   )}
                   <td class="c-chapter" data-label="Chapter">
                     <a href={`${chapterBase}#${row.anchor}`}>ch. 08 →</a>

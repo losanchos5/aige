@@ -36,3 +36,26 @@
 /schemas/examples/*
   ! Content-Type
   Content-Type: application/json; charset=utf-8
+/api/v1/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/api/v1/schemas/*
+  Content-Type: application/schema+json; charset=utf-8
+/resources/obligations.json
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/resources/obligations.csv
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/resources/crosswalk.json
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/resources/crosswalk.csv
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/resources/harms.json
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/glossary.json
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600

@@ -1,0 +1,341 @@
+---
+// /obligations/<id>: one page per obligation-register row, keyed by its stable
+// id in lower case. Everything on the page is data that already exists: the row
+// (src/data/frameworks.ts, faithful to chapter 08), the patterns it lists, the
+// crosswalk topics that join it, the cases that cite the same EU AI Act article
+// and the section of chapter 08 it comes from. The sitemap dates the page by the
+// row's `reviewed` field (astro.config.ts), not by git.
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import Citation from '../../components/Citation.astro';
+import { site } from '../../data/site';
+import {
+  obligations,
+  disclaimer,
+  appliesStatusLabels,
+  systemClassLabels,
+  obligationSlug,
+  type Obligation,
+} from '../../data/frameworks';
+import { layers } from '../../data/stack';
+import { getHeadings, readSource, slugify } from '../../lib/md-parse';
+import {
+  frameworkOf,
+  patternsFor,
+  crosswalkFor,
+  casesFor,
+  neighbours,
+  obligationPath,
+  obligationApiPath,
+} from '../../lib/obligations';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import {
+  authorNodes,
+  authorRefs,
+  ORG_ID,
+  WEBSITE_ID,
+  OBLIGATION_REGISTER_ID,
+} from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/harms.css';
+import '../../styles/obligations.css';
+
+export function getStaticPaths() {
+  return obligations.map((row) => ({ params: { id: obligationSlug(row) }, props: { row } }));
+}
+
+interface Props {
+  row: Obligation;
+}
+
+const { row } = Astro.props;
+
+// The chapter-08 section the row comes from, by its own heading text.
+const chapterHeadings = getHeadings(readSource('bok/08-regulatory-map.md'));
+const section = chapterHeadings.find((h) => slugify(h.text) === row.anchor);
+if (!section) throw new Error(`frameworks.ts: ${row.id} anchor "${row.anchor}" is not a chapter 08 heading`);
+
+const fw = frameworkOf(row);
+const rowPatterns = patternsFor(row);
+const topics = crosswalkFor(row);
+const relatedCases = casesFor(row);
+const { prev, next } = neighbours(row);
+const layerOf = (n: number) => layers.find((layer) => layer.n === n);
+
+const pagePath = obligationPath(row);
+const pageUrl = new URL(pagePath, site.url).href;
+const apiPath = obligationApiPath(row);
+
+// <title> budget: the suffix " · AI Governance Engineer" takes 25 of ~70
+// characters, so a long obligation name falls back to "<instrument> <clause>".
+const shortTitle =
+  row.obligation.length <= 45 ? row.obligation : `${fw.short} ${row.clause}`.slice(0, 45);
+// Meta description: the requirement, cut on a word boundary to fit 160 chars.
+function clip(text: string, max = 158): string {
+  if (text.length <= max) return text;
+  const cut = text.slice(0, max);
+  return `${cut.slice(0, cut.lastIndexOf(' ')).replace(/[\s,;:]+$/, '')}…`;
+}
+const description = clip(`${fw.short} ${row.clause}: ${row.requirement}. Evidence: ${row.artefact}.`);
+const crumbs = [{ label: 'Obligations', href: '/obligations' }, { label: row.id }];
+
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    name: row.obligation,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+    dateModified: row.reviewed,
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    about: { '@id': `${pageUrl}#obligation` },
+  },
+  {
+    '@type': 'DefinedTerm',
+    '@id': `${pageUrl}#obligation`,
+    termCode: row.id,
+    name: row.obligation,
+    description: row.requirement,
+    url: pageUrl,
+    inDefinedTermSet: { '@id': OBLIGATION_REGISTER_ID },
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Base title={shortTitle} description={description} image="/og/resources.png" jsonLd={jsonLd}>
+  <PageHero variant="res" crumbs={crumbs} title={row.obligation} lede={row.requirement} />
+
+  <div class="container res-page">
+    <div class="cs-body" data-pagefind-body>
+      <dl class="cs-facts">
+        <dt>Id</dt>
+        <dd><code class="obx-idcode">{row.id}</code></dd>
+        <dt>Instrument</dt>
+        <dd>
+          <a href={`/resources/frameworks#fw-${fw.id}`}>{fw.name}</a>
+          <span class="type-tag">{fw.type}</span>
+        </dd>
+        <dt>Clause</dt>
+        <dd>{row.clause}</dd>
+        {
+          row.dutyHolder && (
+            <>
+              <dt>Duty holder</dt>
+              <dd>{row.dutyHolder}</dd>
+            </>
+          )
+        }
+        {
+          row.scope && (
+            <>
+              <dt>In scope</dt>
+              <dd>{row.scope}</dd>
+            </>
+          )
+        }
+        {
+          row.authority && (
+            <>
+              <dt>Authority</dt>
+              <dd>{row.authority}</dd>
+            </>
+          )
+        }
+        <dt>Applies from</dt>
+        <dd>
+          {row.appliesFrom ? <time datetime={row.appliesFrom}>{row.appliesFrom}</time> : 'No date'}{' '}
+          <span class="type-tag">{appliesStatusLabels[row.appliesStatus]}</span>
+          {row.appliesNote && <span> · {row.appliesNote}</span>}
+        </dd>
+        {
+          row.milestones && row.milestones.length > 0 && (
+            <>
+              <dt>Later dates</dt>
+              <dd>
+                <ul class="obx-milestones">
+                  {row.milestones.map((m) => (
+                    <li>
+                      <time datetime={m.date}>{m.date}</time>
+                      {m.note}
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </>
+          )
+        }
+        {
+          row.systemClass && row.systemClass.length > 0 && (
+            <>
+              <dt>System class</dt>
+              <dd>{row.systemClass.map((c) => systemClassLabels[c]).join(' · ')}</dd>
+            </>
+          )
+        }
+        <dt>Layers</dt>
+        <dd>
+          <span
+            class="ticks ticks--coded"
+            role="img"
+            aria-label={`Layers: ${row.layerN.map((n) => `${n} ${layerOf(n)?.name ?? ''}`).join(', ')}`}
+          >
+            {
+              row.layerN.map((n) => (
+                <span class="tk-key">
+                  <span class="tk" data-l={n} aria-hidden="true" />L{n}
+                </span>
+              ))
+            }
+          </span>
+        </dd>
+        <dt>Reviewed</dt>
+        <dd><time datetime={row.reviewed}>{row.reviewed}</time></dd>
+      </dl>
+
+      <div class="prose">
+        <h2 id="artefact">The artefact that evidences it</h2>
+        <p>{row.artefact}.</p>
+      </div>
+      <ul class="cs-evidence">
+        {
+          row.layerN.map((n) => {
+            const layer = layerOf(n);
+            return (
+              <li>
+                <span class="ticks ticks--coded" role="img" aria-label={`Layer ${n}`}>
+                  <span class="tk-key">
+                    <span class="tk" data-l={n} aria-hidden="true" />L{n}
+                  </span>
+                </span>
+                <span>
+                  {layer ? (
+                    <a href={`/bok/the-stack#${layer.chapterAnchor}`}>{layer.name}</a>
+                  ) : (
+                    `Layer ${n}`
+                  )}
+                </span>
+              </li>
+            );
+          })
+        }
+      </ul>
+
+      <div class="prose">
+        <h2 id="patterns">Patterns that build it</h2>
+        {
+          rowPatterns.length > 0 ? (
+            <ul>
+              {rowPatterns.map((p) => (
+                <li>
+                  <a href={`/bok/patterns#${p.id}`}>{p.title}</a>
+                  {` (layer ${p.layer}${p.secondaryLayer ? ` and ${p.secondaryLayer}` : ''})`}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>
+              No pattern in the <a href="/bok/patterns">catalogue</a> names this clause on its
+              "Maps to" line yet; the artefact above is the engineering answer.
+            </p>
+          )
+        }
+
+        {
+          topics.length > 0 && (
+            <>
+              <h2 id="crosswalk">The same topic in other frameworks</h2>
+              <p>
+                From the <a href="/resources/crosswalk">topic crosswalk</a>: the clauses filed
+                under the same topics as this one. Mappings are illustrative, not a claim of
+                conformity.
+              </p>
+              {topics.map((t) => (
+                <div class="obx-topic">
+                  <h3 id={`topic-${t.topic.id}`}>
+                    <a href={`/resources/crosswalk#topic-${t.topic.id}`}>{t.topic.name}</a>
+                  </h3>
+                  <ul class="obx-siblings">
+                    {t.siblings.map((sib) => (
+                      <li>
+                        <span class="obx-sibling-ref">
+                          {sib.frameworkName} {sib.label}
+                        </span>
+                        {sib.obligationPath ? (
+                          <a href={sib.obligationPath}>{sib.ref.title}</a>
+                        ) : sib.ref.url ? (
+                          <a href={sib.ref.url} rel="noopener">
+                            {sib.ref.title}
+                          </a>
+                        ) : (
+                          sib.ref.title
+                        )}
+                        {sib.ref.strength === 'core' ? ' (core)' : ''}
+                        {sib.ref.verified === false ? ' (clause not verified)' : ''}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </>
+          )
+        }
+
+        {
+          relatedCases.length > 0 && (
+            <>
+              <h2 id="cases">Cases that cite this article</h2>
+              <ul>
+                {relatedCases.map((c) => (
+                  <li>
+                    <a href={`/cases/${c.id}`}>{c.title}</a> ({c.year})
+                  </li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+
+        <h2 id="source">Source</h2>
+        <p>
+          Chapter 08, section <a href={`/bok/regulatory-map#${row.anchor}`}>{section.text}</a>.
+          The row was last checked against its sources on <time datetime={row.reviewed}
+            >{row.reviewed}</time
+          >.
+        </p>
+
+        <h2 id="data">Machine-readable</h2>
+        <ul class="obx-data">
+          <li>This obligation: <a href={apiPath}><code>{apiPath}</code></a></li>
+          <li>The register: <a href="/api/v1/obligations.json"><code>/api/v1/obligations.json</code></a> · <a href="/resources/obligations.csv" download>CSV</a></li>
+          <li>Schema and stability promise: <a href="/resources/data">open data and API</a></li>
+        </ul>
+      </div>
+
+      <div class="res-section">
+        <Callout kind="note" title="Illustrative mapping, not a conformity assessment">
+          <p>{disclaimer} An artefact supports and evidences an obligation; the legal judgement of
+          conformity stays with lawyers, notified bodies and authorities.</p>
+        </Callout>
+      </div>
+
+      <div class="obx-cite">
+        <Citation title={`${row.obligation} (${row.id})`} url={pagePath} kind="obligation" />
+      </div>
+
+      <nav class="cs-nav" aria-label="More obligations">
+        {prev ? <a href={obligationPath(prev)}>← {prev.id}</a> : <span />}
+        <a href="/obligations">All obligations</a>
+        {next ? <a href={obligationPath(next)}>{next.id} →</a> : <span />}
+      </nav>
+    </div>
+  </div>
+
+  <script is:inline defer src="/cite.js"></script>
+</Base>

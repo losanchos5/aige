@@ -1,24 +1,56 @@
 ---
-// Citation: a "Cite this chapter" disclosure with a ready-to-copy APA-ish
-// reference and a BibTeX entry, plus a small share row (LinkedIn + copy link).
-// The copy buttons are wired by ui-doc.js (CSP-safe, no inline JS); the share
-// link and copy button work without it (the copy button is a harmless no-op if
-// the clipboard API is unavailable).
+// Citation: a "Cite this …" disclosure with a ready-to-copy APA-ish reference
+// and a BibTeX entry, plus a small share row (LinkedIn + copy link). The copy
+// buttons are wired by ui-doc.js on chapter pages and by cite.js elsewhere
+// (CSP-safe, no inline JS); the share link and copy button work without it (the
+// copy button is a harmless no-op if the clipboard API is unavailable).
+//
+// Props: `title` plus either `slug` (a Body of Knowledge chapter, the original
+// usage: <Citation title slug />) or `url` (any page, absolute or site-relative).
+// `kind` sets the default label ("Cite this obligation") and the BibTeX shape;
+// it defaults to `chapter` when a slug is given and `page` otherwise. `label`
+// overrides the summary text.
 import { site } from '../data/site';
+
+type CitationKind = 'chapter' | 'obligation' | 'figure' | 'dataset' | 'page';
 
 interface Props {
   title: string;
-  slug: string;
+  slug?: string;
+  url?: string;
+  kind?: CitationKind;
+  label?: string;
 }
 
-const { title, slug } = Astro.props;
-const cleanTitle = title.replace(/^\d+\.\s*/, '');
-const url = `${site.url}/bok/${slug}`;
-const reference = `García Aibar, J. (2026). ${cleanTitle}. In AI Governance Engineering: The Thesis & Body of Knowledge (v${site.bokVersion}). https://doi.org/${site.doi}. ${url}. ${site.license}`;
+const { title, slug, url: urlProp, kind: kindProp, label: labelProp } = Astro.props;
+const kind: CitationKind = kindProp ?? (slug ? 'chapter' : 'page');
 
-// BibTeX for the whole work; the chapter and its canonical URL identify the page
-// being cited. The literal backslash escapes the ampersand for BibTeX.
-const bibtex = `@misc{aige2026bok,
+const defaultLabels: Record<CitationKind, string> = {
+  chapter: 'Cite this chapter',
+  obligation: 'Cite this obligation',
+  figure: 'Cite this figure',
+  dataset: 'Cite this dataset',
+  page: 'Cite this page',
+};
+const label = labelProp ?? defaultLabels[kind];
+
+const resolved = urlProp ?? (slug ? `/bok/${slug}` : undefined);
+if (!resolved) throw new Error(`Citation "${title}": pass a slug or a url`);
+const url = new URL(resolved, site.url).href;
+
+// Chapter titles carry their number ("04. The stack"); the citation drops it.
+const cleanTitle = kind === 'chapter' ? title.replace(/^\d+\.\s*/, '') : title;
+// APA marks a data set in square brackets after the title.
+const typeNote = kind === 'dataset' ? ' [Data set]' : '';
+const work = 'AI Governance Engineering: The Thesis & Body of Knowledge';
+const reference = `García Aibar, J. (2026). ${cleanTitle}${typeNote}. In ${work} (v${site.bokVersion}). https://doi.org/${site.doi}. ${url}. ${site.license}`;
+
+// BibTeX for the whole work. A chapter keeps the original entry (the chapter
+// field names it); any other page is cited as its own titled item published in
+// the work. The literal backslash escapes the ampersand for BibTeX.
+const bibtex =
+  kind === 'chapter'
+    ? `@misc{aige2026bok,
   author  = {${site.authors.join(' and ')}},
   title   = {{AI Governance Engineering: The Thesis \\& Body of Knowledge}},
   chapter = {${cleanTitle}},
@@ -27,6 +59,16 @@ const bibtex = `@misc{aige2026bok,
   doi     = {${site.doi}},
   url     = {${url}},
   note    = {Version ${site.bokVersion}}
+}`
+    : `@misc{aige2026${kind},
+  author       = {${site.authors.join(' and ')}},
+  title        = {{${cleanTitle}}},
+  howpublished = {In AI Governance Engineering: The Thesis \\& Body of Knowledge},
+  year         = {2026},
+  version      = {${site.bokVersion}},
+  doi          = {${site.doi}},
+  url          = {${url}},
+  note         = {Version ${site.bokVersion}}
 }`;
 
 const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
@@ -34,10 +76,10 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
 
 <div class="cite-wrap">
   <details class="cite-box">
-    <summary>Cite this chapter</summary>
+    <summary>{label}</summary>
     <div class="cite-body">
       <p class="cite-apa" data-cite-text>
-        García Aibar, J. (2026). <em>{cleanTitle}</em>. In <em>AI Governance
+        García Aibar, J. (2026). <em>{cleanTitle}</em>{typeNote}. In <em>AI Governance
         Engineering: The Thesis &amp; Body of Knowledge</em> (v{site.bokVersion}).{' '}
         <a href={`https://doi.org/${site.doi}`}>https://doi.org/{site.doi}</a>. {url}. {site.license}
       </p>

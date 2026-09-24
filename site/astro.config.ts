@@ -11,6 +11,7 @@ import rehypeDiagrams from './src/lib/rehype-diagrams';
 import rehypeGlossary from './src/lib/rehype-glossary';
 import { chaptersOrdered } from './src/data/chapters';
 import { cases } from './src/data/cases';
+import { obligations, obligationPath } from './src/data/frameworks';
 import { gitDate } from './src/lib/reading';
 
 // Sitemap URL -> the source file(s) whose last commit dates the page: the page
@@ -54,6 +55,14 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ...chaptersOrdered.map(
     (chapter) => [`/bok/${chapter.slug}`, [`../bok/${chapter.id}.md`]] as [string, string[]],
   ),
+  // Block b-ref-ids-api: the obligation register and the open-data
+  // documentation page. The per-obligation pages are dated by REVIEWED_BY_PATH
+  // below, not here.
+  [
+    '/obligations',
+    ['src/pages/obligations/index.astro', 'src/data/frameworks.ts', 'src/lib/obligations.ts'],
+  ],
+  ['/resources/data', ['src/pages/resources/data.astro', 'src/lib/api.ts']],
   // One page per incident case, all rendered from the same template and dataset.
   ...cases.map(
     (entry) =>
@@ -63,6 +72,14 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       ],
   ),
 ]);
+
+// Pages dated by their content rather than by git: each /obligations/<id> page
+// carries the date its register row was last checked against its sources (the
+// row's `reviewed` field), which is the date a reader cares about. These win
+// over SOURCE_BY_PATH; every other page keeps its git date.
+const REVIEWED_BY_PATH = new Map<string, string>(
+  obligations.map((row) => [obligationPath(row), row.reviewed] as [string, string]),
+);
 
 // gitDate shells out to `git log` per file, and several pages share a source
 // (chapters.ts, role.ts, stack.ts), so each path is asked for once per build.
@@ -111,7 +128,10 @@ export default defineConfig({
       // lastmod without a manual step. A path missing from the map gets no
       // lastmod rather than a made-up one.
       serialize: (item) => {
-        const sources = SOURCE_BY_PATH.get(pathnameOf(item.url));
+        const pathname = pathnameOf(item.url);
+        const reviewed = REVIEWED_BY_PATH.get(pathname);
+        if (reviewed) return { ...item, lastmod: reviewed };
+        const sources = SOURCE_BY_PATH.get(pathname);
         return sources ? { ...item, lastmod: lastmodOf(sources) } : item;
       },
     }),

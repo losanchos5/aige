@@ -8,6 +8,35 @@
 // jurisdictions). `layerN` is an array because many rows map to more than one
 // layer. Every anchor is the `#slug` of the table's H2. Mappings are
 // illustrative, not a claim of conformity.
+//
+// STABLE IDS (schema version 2, v0.5.0). Every obligation row carries an `id`
+// that other sites, datasets and citations may rely on. The rule:
+//
+//   AIGE-OBL-<INSTRUMENT>-<CLAUSE>
+//
+// - Upper-case ASCII letters, digits and hyphens only (OBLIGATION_ID_PATTERN).
+// - <INSTRUMENT> is a fixed code per instrument: EUAIA (EU AI Act), GPAICOP
+//   (GPAI Code of Practice), ISO42001, ISO42006, ISO23894, NISTRMF (NIST AI RMF
+//   functions), NIST (newer NIST work), CSA, OWASP, USCA, USNY, USTX, USCO (US
+//   states), KR, SG, UK, ETSI and CN (China).
+// - <CLAUSE> is the article, clause, function or document number the row names
+//   (ART9, ART4A, ART49-71, A5, GOVERN, IR8596) or, where the row stands for the
+//   instrument as a whole, a short mnemonic (SB53, AIBASIC, TC260-OPS, CB). Every
+//   id has both parts, so it has at least four hyphen-separated segments.
+// - An id is assigned once and never changes: new wording, dates, artefacts or
+//   layers keep the id. A row that is removed has its id moved to
+//   `retiredObligationIds` and the id is never reused. A row that is split keeps
+//   its id on the part that carries the original meaning; the new part gets a
+//   new id.
+// - The public page of a row is /obligations/<id in lower case>, and its JSON is
+//   /api/v1/obligations/<id in lower case>.json.
+//
+// `appliesFrom` is the ISO date the row first applies; `appliesStatus` says
+// where it stands on the `reviewed` date; `appliesNote` keeps the chapter's human
+// wording; `milestones` carries the later dated steps chapter 08 states (the
+// Annex I date, the public-authority legacy date, new bans, grace ends).
+// `patterns` lists the chapter-05 patterns whose "Maps to:" line names the row's
+// clause (tests/data.spec.ts checks the EU rows in both directions).
 
 export type StackLayer = 1 | 2 | 3 | 4 | 5;
 export type FrameworkType =
@@ -34,22 +63,114 @@ export interface Framework {
   summary: string;
 }
 
+/**
+ * Where an obligation stands on its `reviewed` date.
+ * - `in-force`: it applies now.
+ * - `applies-later`: enacted, with a future application date that was not moved.
+ * - `deferred`: its application date was moved later by an amending act (the
+ *   Digital Omnibus for the EU high-risk duties).
+ * - `grace`: in force, but enforcement is softened by an announced grace period.
+ * - `voluntary`: a standard, framework or code that binds no one by itself.
+ * - `pending`: a draft, proposal or initiative that is not final.
+ */
+export type AppliesStatus =
+  | 'in-force'
+  | 'applies-later'
+  | 'grace'
+  | 'deferred'
+  | 'voluntary'
+  | 'pending';
+
+/** EU AI Act system classes a row applies to (EU AI Act rows only). */
+export type SystemClass =
+  | 'prohibited'
+  | 'high-risk-annex-iii'
+  | 'high-risk-annex-i'
+  | 'transparency-art50'
+  | 'gpai'
+  | 'gpai-systemic'
+  | 'all-ai-systems';
+
+/** A later dated step in the application of an obligation. */
+export interface Milestone {
+  /** ISO date, YYYY-MM-DD. */
+  date: string;
+  /** The EU AI Act system classes the step concerns, where it concerns some only. */
+  systemClass?: readonly SystemClass[];
+  /** What happens on that date, in chapter 08's terms. */
+  note: string;
+}
+
 export interface Obligation {
-  /** The framework this obligation belongs to. */
+  /** Stable id, `AIGE-OBL-<INSTRUMENT>-<CLAUSE>` (see the rule above). Never reused. */
+  id: string;
+  /** Id of the instrument in `frameworks` the row belongs to. */
+  frameworkId: string;
+  /** The framework group the chapter's table sits under (display label). */
   framework: string;
-  /** The obligation, named (e.g. "EU AI Act Art. 9 risk management"). */
+  /** The article, clause, function or instrument the row names, as a short label. */
+  clause: string;
+  /** The obligation, named (e.g. "EU AI Act Art. 9 risk management system"). */
   obligation: string;
+  /** What the obligation asks for, as the chapter's table states it. */
+  requirement: string;
   /** The engineering artefact that produces the evidence for it. */
   artefact: string;
   /** The stack layer(s) the artefact lives in. */
   layerN: readonly StackLayer[];
   /** `#slug` of the table's section heading. */
   anchor: string;
-  /** Who the obligation binds, where the chapter states it. */
+  /** Who the obligation binds, where the chapter states it (EU AI Act rows). */
   dutyHolder?: string;
-  /** When it applies (post-Omnibus), where the chapter states it. */
-  applies?: string;
+  /** Who is in scope, where the chapter's table states it (US state laws). */
+  scope?: string;
+  /** Who supervises it, where the chapter states it (EU AI Act rows). */
+  authority?: string;
+  /** ISO date (YYYY-MM-DD) the row first applies, where a date exists. */
+  appliesFrom?: string;
+  /** Where the row stands on its `reviewed` date. */
+  appliesStatus: AppliesStatus;
+  /** The chapter's human wording of when it applies. */
+  appliesNote?: string;
+  /** Later dated steps, in date order. */
+  milestones?: readonly Milestone[];
+  /** EU AI Act system classes the row applies to (EU AI Act rows only). */
+  systemClass?: readonly SystemClass[];
+  /** Ids from src/data/patterns.ts whose "Maps to:" line names the row's clause. */
+  patterns?: readonly string[];
+  /** ISO date the row was last checked against its sources. */
+  reviewed: string;
 }
+
+/** The shape every obligation id must match. */
+export const OBLIGATION_ID_PATTERN = /^AIGE-OBL-[A-Z0-9]+(?:-[A-Z0-9]+)+$/;
+
+/**
+ * Ids of rows that were removed. They stay here so they are never reused; an
+ * id in this list must not appear in `obligations`.
+ */
+export const retiredObligationIds: readonly string[] = [];
+
+/** Human labels for the statuses, for badges and filters. */
+export const appliesStatusLabels: Readonly<Record<AppliesStatus, string>> = {
+  'in-force': 'In force',
+  'applies-later': 'Applies later',
+  deferred: 'Deferred',
+  grace: 'Grace period',
+  voluntary: 'Voluntary',
+  pending: 'Draft or proposed',
+};
+
+/** Human labels for the EU AI Act system classes. */
+export const systemClassLabels: Readonly<Record<SystemClass, string>> = {
+  prohibited: 'Prohibited practice',
+  'high-risk-annex-iii': 'High-risk (Annex III)',
+  'high-risk-annex-i': 'High-risk (Annex I)',
+  'transparency-art50': 'Transparency (Art. 50)',
+  gpai: 'GPAI model',
+  'gpai-systemic': 'GPAI model with systemic risk',
+  'all-ai-systems': 'All AI systems',
+};
 
 /** The chapter's caveat, in its own words. */
 export const disclaimer =
@@ -378,615 +499,1388 @@ export const frameworks: readonly Framework[] = [
   },
 ] as const;
 
+// Review stamps: the debt-and-date pass re-verified the EU AI Act dates, the
+// NIST drafts, the OWASP LLM Top 10, the US state dates and the "Other
+// jurisdictions" rows on 2026-09-24; the China rows keep chapter 08's stamp of
+// 2026-09-20; the rest were last checked for v0.4.0 on 2026-09-19.
+const REVIEWED_DEBT_PASS = '2026-09-24';
+const REVIEWED_CHINA = '2026-09-20';
+const REVIEWED_V040 = '2026-09-19';
+
+const HIGH_RISK: readonly SystemClass[] = ['high-risk-annex-iii', 'high-risk-annex-i'];
+const ANNEX_III: readonly SystemClass[] = ['high-risk-annex-iii'];
+
+// The two later high-risk dates chapter 08 states in the section lead.
+const ANNEX_I_STEP: Milestone = {
+  date: '2028-08-02',
+  systemClass: ['high-risk-annex-i'],
+  note: 'Applies to Annex I embedded (product safety-component) systems',
+};
+const PUBLIC_AUTHORITY_STEP: Milestone = {
+  date: '2030-08-02',
+  note: 'Deadline for legacy high-risk systems intended for use by public authorities (Art. 111(2))',
+};
+const HIGH_RISK_STEPS: readonly Milestone[] = [ANNEX_I_STEP, PUBLIC_AUTHORITY_STEP];
+const ANNEX_III_STEPS: readonly Milestone[] = [PUBLIC_AUTHORITY_STEP];
+const GPAI_STEPS: readonly Milestone[] = [
+  { date: '2026-08-02', note: 'Commission enforcement powers apply' },
+];
+
+const EU = 'EU AI Act';
+const EU_ID = 'eu-ai-act';
+const MSA = 'National MSA';
+const ANNEX_III_NOTE = '2027-12-02 (Annex III)';
+
 /** The obligation → artefact → layer rows, faithful to the chapter's tables. */
 export const obligations: readonly Obligation[] = [
   // EU AI Act, post-Omnibus
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART4',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 4',
     obligation: 'EU AI Act Art. 4 AI literacy',
+    requirement:
+      'AI literacy: take measures to support the development of AI literacy among staff and operators',
     artefact:
       'Literacy programme as code; role-based training records; onboarding gates',
     layerN: [1],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider + deployer',
-    applies: '2026-07-27 (reworded, in force)',
+    authority: 'Provider/deployer duty; national MSA',
+    appliesFrom: '2025-02-02',
+    appliesStatus: 'in-force',
+    appliesNote: '2025-02-02; reworded 2026-07-27 (in force)',
+    milestones: [
+      {
+        date: '2026-07-27',
+        note: 'Omnibus rewording in force: providers and deployers take measures to support AI literacy',
+      },
+    ],
+    systemClass: ['all-ai-systems'],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART4A',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 4a',
     obligation:
       'EU AI Act Art. 4a lawful basis for special-category data in bias detection',
+    requirement:
+      'Lawful basis to process special-category data for bias detection in high-risk systems, with pseudonymisation and deletion once bias is corrected',
     artefact:
       'Data governance controls; pseudonymisation and retention-as-code; data card noting basis and deletion',
     layerN: [2],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2026-07-27 (new, in force)',
+    authority: 'National MSA / DPAs',
+    appliesFrom: '2026-07-27',
+    appliesStatus: 'in-force',
+    appliesNote: '2026-07-27 (new, in force)',
+    systemClass: HIGH_RISK,
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART5',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 5',
     obligation: 'EU AI Act Art. 5 prohibited practices (incl. new NCII and CSAM bans)',
+    requirement:
+      'Prohibited practices; new bans on AI-generated non-consensual intimate imagery (NCII) and CSAM',
     artefact:
       'Policy-as-code blocklist; input/output guardrails; refusal and abuse detection',
     layerN: [1, 4],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider + deployer',
-    applies: '2026-12-02 (new bans); earlier prohibitions from 2025-02-02',
+    authority: MSA,
+    appliesFrom: '2025-02-02',
+    appliesStatus: 'in-force',
+    appliesNote: '2026-12-02 (new bans); earlier prohibitions from 2025-02-02',
+    milestones: [
+      {
+        date: '2026-12-02',
+        systemClass: ['prohibited'],
+        note: 'New bans on AI-generated NCII and CSAM apply',
+      },
+    ],
+    systemClass: ['prohibited'],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART6',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 6',
     obligation:
       'EU AI Act Art. 6 classification of high-risk AI systems (incl. the Annex III route)',
+    requirement:
+      'Classification rules for high-risk AI systems, incl. the Annex III (standalone) route and Annex I (safety-component) route',
     artefact:
       'Risk-tiering as code; high-risk classification decision record; register entry flagging Annex III status',
     layerN: [1, 2],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: [
+      {
+        date: '2028-08-02',
+        systemClass: ['high-risk-annex-i'],
+        note: 'The Annex I (safety-component) route applies',
+      },
+    ],
+    systemClass: HIGH_RISK,
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART9',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 9',
     obligation: 'EU AI Act Art. 9 risk management system',
+    requirement: 'Risk management system across the high-risk lifecycle',
     artefact:
       'Risk register as code; threat models; linkage to FRIA and eval results',
     layerN: [1, 3],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    patterns: [
+      'pattern-policy-card',
+      'pattern-adversarial-red-team-suite',
+      'pattern-fria-as-code',
+    ],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART10',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 10',
     obligation: 'EU AI Act Art. 10 data and data governance',
+    requirement:
+      'Data and data governance; representative, relevant, error-checked datasets',
     artefact: 'Data cards; lineage; bias and quality tests in CI',
     layerN: [2, 3],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART11',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 11',
     obligation: 'EU AI Act Art. 11 technical documentation (Annex IV)',
+    requirement: 'Technical documentation (Annex IV) drawn up and kept up to date',
     artefact:
       'AIBOM (CycloneDX ML-BOM, SPDX 3.0 AI); auto-generated technical documentation; model cards',
     layerN: [2],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    patterns: [
+      'pattern-agent-registry',
+      'pattern-aibom',
+      'pattern-model-card-as-control-evidence',
+    ],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART12',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 12',
     obligation: 'EU AI Act Art. 12 record-keeping and logging',
+    requirement:
+      "Record-keeping: automatic logging of events over the system's lifetime",
     artefact:
       'Structured, signed logs; OpenTelemetry traces; tamper-evident event store',
     layerN: [4],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    patterns: [
+      'pattern-machine-readable-evidence-oscal',
+      'pattern-agent-identity--scoped-credentials',
+    ],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART13',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 13',
     obligation: 'EU AI Act Art. 13 transparency and information to deployers',
+    requirement: 'Transparency and provision of information to deployers',
     artefact:
       'Instructions for use as code; model and data cards; capability and limitation notes',
     layerN: [2],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    patterns: ['pattern-model-card-as-control-evidence'],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART14',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 14',
     obligation: 'EU AI Act Art. 14 human oversight',
+    requirement: 'Human oversight designed into the system',
     artefact:
       'Human-in-the-loop checkpoints; kill switch; override and escalation paths',
     layerN: [4],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    patterns: [
+      'pattern-runtime-guardrail',
+      'pattern-kill-switch--circuit-breaker',
+      'pattern-agent-identity--scoped-credentials',
+      'pattern-human-in-the-loop-gate',
+    ],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART15',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 15',
     obligation: 'EU AI Act Art. 15 accuracy, robustness and cybersecurity',
+    requirement: 'Accuracy, robustness and cybersecurity',
     artefact:
       'Eval gate; adversarial red-team suite; robustness and security controls; regression evals',
     layerN: [3, 4],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    patterns: [
+      'pattern-eval-gate-in-ci',
+      'pattern-adversarial-red-team-suite',
+      'pattern-runtime-guardrail',
+      'pattern-kill-switch--circuit-breaker',
+      'pattern-agent-identity--scoped-credentials',
+    ],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART17',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 17',
     obligation: 'EU AI Act Art. 17 quality management system',
+    requirement: 'Quality management system',
     artefact:
       'QMS-as-code; versioned policies; pipeline controls and change management',
     layerN: [1, 5],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    patterns: ['pattern-machine-readable-evidence-oscal'],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART25',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 25',
     obligation: 'EU AI Act Art. 25 responsibilities along the AI value chain',
+    requirement:
+      'Responsibilities along the AI value chain: when a distributor, importer or deployer becomes a provider, and the information a provider must pass to actors downstream',
     artefact:
       'Value-chain due-diligence gate; provider/deployer responsibility allocation; AIBOM and model/data cards collected from upstream providers',
     layerN: [2, 5],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider + value-chain actors',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART26',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 26',
     obligation: 'EU AI Act Art. 26 deployer obligations for high-risk systems',
+    requirement:
+      'Deployer obligations for high-risk systems (use per instructions, monitoring, human oversight)',
     artefact:
       'Deployment registry; monitoring hooks; assigned oversight and logging retention',
     layerN: [2, 4],
     anchor: EU_ANCHOR,
     dutyHolder: 'Deployer',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART27',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 27',
     obligation:
       'EU AI Act Art. 27 Fundamental Rights Impact Assessment (FRIA)',
+    requirement:
+      'Fundamental Rights Impact Assessment (FRIA) for deployers of Annex III systems',
     artefact:
       'FRIA-as-code from a template; cross-reference to a GDPR Art. 35 DPIA',
     layerN: [1, 2],
     anchor: EU_ANCHOR,
     dutyHolder: 'Deployer',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: ANNEX_III_STEPS,
+    systemClass: ANNEX_III,
+    patterns: ['pattern-fria-as-code', 'pattern-vendor--model-due-diligence-gate'],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART43',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 43',
     obligation: 'EU AI Act Art. 43 conformity assessment',
+    requirement:
+      'Conformity assessment before placing on the market (internal control, or a notified body for Annex III point 1 biometrics)',
     artefact:
       'Conformity-assessment workflow; internal-control or notified-body evidence pack; traceability to Annex IV documentation',
     layerN: [1, 5],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART47',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 47',
     obligation: 'EU AI Act Art. 47 EU declaration of conformity',
+    requirement: 'EU declaration of conformity drawn up on completing the assessment',
     artefact:
       'Auto-generated EU declaration of conformity from the evidence; CE-marking record',
     layerN: [2, 5],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART49-71',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 49 / Art. 71',
     obligation:
       'EU AI Act Art. 49/71 registration of high-risk systems in the EU database',
+    requirement: 'Registration of high-risk systems in the EU database',
     artefact:
       'Agent/model registry with an API that feeds registration; owner and status per entry',
     layerN: [2],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider; public-authority deployer',
-    applies: '2027-12-02 (Annex III)',
+    authority: 'National MSA; Commission (database)',
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: ANNEX_III_STEPS,
+    systemClass: ANNEX_III,
+    patterns: ['pattern-agent-registry', 'pattern-shadow-ai-discovery'],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART50',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 50',
     obligation: 'EU AI Act Art. 50 transparency for certain AI systems',
+    requirement:
+      'Transparency for certain AI systems: chatbot disclosure; marking and labelling of synthetic content',
     artefact:
       'Content labelling and machine-readable marking (C2PA-style); chatbot disclosure banner',
     layerN: [4, 2],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider + deployer',
-    applies: '2026-08-02; marking grace for existing systems to 2026-12-02',
+    authority: MSA,
+    appliesFrom: '2026-08-02',
+    appliesStatus: 'in-force',
+    appliesNote: '2026-08-02; marking grace for existing systems to 2026-12-02',
+    milestones: [
+      { date: '2026-12-02', note: 'Marking grace for existing systems ends' },
+    ],
+    systemClass: ['transparency-art50'],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART53',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 53',
     obligation: 'EU AI Act Art. 53 GPAI provider obligations',
+    requirement:
+      'GPAI provider obligations, incl. a public summary of training content on an AI Office template',
     artefact:
       'Model cards; training-content summary; AIBOM and dataset provenance',
     layerN: [2],
     anchor: EU_ANCHOR,
     dutyHolder: 'GPAI provider',
-    applies: 'Obligations from 2025-08-02; enforcement from 2026-08-02',
+    authority: 'AI Office',
+    appliesFrom: '2025-08-02',
+    appliesStatus: 'in-force',
+    appliesNote: 'Obligations from 2025-08-02; enforcement from 2026-08-02',
+    milestones: GPAI_STEPS,
+    systemClass: ['gpai'],
+    patterns: ['pattern-aibom', 'pattern-vendor--model-due-diligence-gate'],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART55',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 55',
     obligation: 'EU AI Act Art. 55 GPAI models with systemic risk',
+    requirement:
+      'GPAI models with systemic risk: model evaluation incl. adversarial testing; Union-level risk assessment; serious-incident reporting; cybersecurity of the model',
     artefact:
       'Eval and red-team suite; incident pipeline on the Commission serious-incident reporting template; weight-security controls; threat model',
     layerN: [3, 4, 5],
     anchor: EU_ANCHOR,
     dutyHolder: 'GPAI provider (systemic risk)',
-    applies: 'Obligations from 2025-08-02; enforcement from 2026-08-02',
+    authority: 'AI Office',
+    appliesFrom: '2025-08-02',
+    appliesStatus: 'in-force',
+    appliesNote: 'Obligations from 2025-08-02; enforcement from 2026-08-02',
+    milestones: GPAI_STEPS,
+    systemClass: ['gpai-systemic'],
+    patterns: [
+      'pattern-eval-gate-in-ci',
+      'pattern-adversarial-red-team-suite',
+      'pattern-incident-pipeline',
+    ],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART60',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 60',
     obligation:
       'EU AI Act Art. 60 testing in real-world conditions outside sandboxes',
+    requirement:
+      'Testing of high-risk (Annex III) AI systems in real-world conditions outside AI regulatory sandboxes',
     artefact:
       'Real-world testing plan; Art. 61 informed-consent records; test monitoring, logging and incident hooks',
     layerN: [3, 4],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider / prospective provider',
-    applies: '2026-08-02',
+    authority: MSA,
+    appliesFrom: '2026-08-02',
+    appliesStatus: 'in-force',
+    appliesNote: '2026-08-02',
+    systemClass: ANNEX_III,
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART72',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 72',
     obligation: 'EU AI Act Art. 72 post-market monitoring',
+    requirement: 'Post-market monitoring for high-risk systems',
     artefact:
       'Continuous assurance telemetry; monitoring plan; drift and performance signals',
     layerN: [5],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    patterns: [
+      'pattern-continuous-assurance-telemetry',
+      'pattern-incident-pipeline',
+      'pattern-machine-readable-evidence-oscal',
+    ],
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
-    framework: 'EU AI Act',
+    id: 'AIGE-OBL-EUAIA-ART73',
+    frameworkId: EU_ID,
+    framework: EU,
+    clause: 'Art. 73',
     obligation: 'EU AI Act Art. 73 serious-incident reporting',
+    requirement:
+      "Serious-incident reporting for high-risk systems, on the deadlines of chapter 08's reporting-clock table",
     artefact:
       'Incident detection and triage pipeline; reporting-clock automation; evidence capture',
     layerN: [5, 4],
     anchor: EU_ANCHOR,
     dutyHolder: 'Provider',
-    applies: '2027-12-02 (Annex III)',
+    authority: MSA,
+    appliesFrom: '2027-12-02',
+    appliesStatus: 'deferred',
+    appliesNote: ANNEX_III_NOTE,
+    milestones: HIGH_RISK_STEPS,
+    systemClass: HIGH_RISK,
+    patterns: ['pattern-incident-pipeline'],
+    reviewed: REVIEWED_DEBT_PASS,
   },
 
   // GPAI Code of Practice
   {
+    id: 'AIGE-OBL-GPAICOP-SAFETY',
+    frameworkId: 'gpai-code-of-practice',
     framework: 'GPAI Code of Practice',
+    clause: 'Safety and Security chapter',
     obligation: 'Safety and Security (systemic-risk models only)',
+    requirement:
+      'A Safety and Security Framework; model evaluations incl. adversarial testing; systemic-risk assessment and mitigation; serious-incident reporting; model and infrastructure security',
     artefact:
       'Eval and red-team suite; adversarial testing harness; incident pipeline; weight-security controls',
     layerN: [3, 4, 5],
     anchor: GPAI_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary; published 2025-07-10',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-GPAICOP-TRANSPARENCY',
+    frameworkId: 'gpai-code-of-practice',
     framework: 'GPAI Code of Practice',
+    clause: 'Transparency chapter',
     obligation: 'Transparency',
+    requirement:
+      'Up-to-date model documentation for the AI Office and downstream deployers',
     artefact: 'Model cards; structured model documentation; AIBOM',
     layerN: [2],
     anchor: GPAI_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary; published 2025-07-10',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-GPAICOP-COPYRIGHT',
+    frameworkId: 'gpai-code-of-practice',
     framework: 'GPAI Code of Practice',
+    clause: 'Copyright chapter',
     obligation: 'Copyright',
+    requirement:
+      'A policy to comply with Union copyright law, incl. respecting reservations of rights',
     artefact:
       'Training-data provenance and licence records; policy-as-code for source filtering',
     layerN: [1, 2],
     anchor: GPAI_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary; published 2025-07-10',
+    reviewed: REVIEWED_V040,
   },
 
   // ISO/IEC 42001 Annex A
   {
+    id: 'AIGE-OBL-ISO42001-A2',
+    frameworkId: 'iso-42001',
     framework: 'ISO/IEC 42001',
+    clause: 'A.2',
     obligation: 'A.2 Policies related to AI',
+    requirement: 'AI policy set and its governance',
     artefact: 'Policy-as-code library; versioned policy repository',
     layerN: [1],
     anchor: ISO_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-ISO42001-A3',
+    frameworkId: 'iso-42001',
     framework: 'ISO/IEC 42001',
+    clause: 'A.3',
     obligation: 'A.3 Internal organization',
+    requirement: 'Roles, responsibilities, reporting',
     artefact: 'Operating model; RACI; ownership in the registry',
     layerN: [1, 2],
     anchor: ISO_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-ISO42001-A4',
+    frameworkId: 'iso-42001',
     framework: 'ISO/IEC 42001',
+    clause: 'A.4',
     obligation: 'A.4 Resources for AI systems',
+    requirement: 'Data, tooling, compute, human resources documented',
     artefact: 'Resource inventory; AIBOM; environment manifests',
     layerN: [2],
     anchor: ISO_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-ISO42001-A5',
+    frameworkId: 'iso-42001',
     framework: 'ISO/IEC 42001',
+    clause: 'A.5',
     obligation: 'A.5 Assessing impacts of AI systems',
+    requirement: 'Impact assessment process',
     artefact: 'Impact assessment as code; FRIA/DPIA linkage (ISO/IEC 42005)',
     layerN: [1, 3],
     anchor: ISO_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-ISO42001-A6',
+    frameworkId: 'iso-42001',
     framework: 'ISO/IEC 42001',
+    clause: 'A.6',
     obligation: 'A.6 AI system life cycle',
+    requirement: 'Responsible design, development, deployment',
     artefact: 'Pipeline controls; eval gates; change management',
     layerN: [1, 3, 4],
     anchor: ISO_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-ISO42001-A7',
+    frameworkId: 'iso-42001',
     framework: 'ISO/IEC 42001',
+    clause: 'A.7',
     obligation: 'A.7 Data for AI systems',
+    requirement: 'Data quality, provenance, preparation',
     artefact: 'Data cards; lineage; data quality tests',
     layerN: [2, 3],
     anchor: ISO_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-ISO42001-A8',
+    frameworkId: 'iso-42001',
     framework: 'ISO/IEC 42001',
+    clause: 'A.8',
     obligation: 'A.8 Information for interested parties',
+    requirement: 'Transparency and reporting to stakeholders',
     artefact: 'Model/data cards; machine-readable disclosures',
     layerN: [2],
     anchor: ISO_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-ISO42001-A9',
+    frameworkId: 'iso-42001',
     framework: 'ISO/IEC 42001',
+    clause: 'A.9',
     obligation: 'A.9 Use of AI systems',
+    requirement: 'Responsible-use controls and monitoring',
     artefact: 'Runtime guardrails; usage telemetry',
     layerN: [4],
     anchor: ISO_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-ISO42001-A10',
+    frameworkId: 'iso-42001',
     framework: 'ISO/IEC 42001',
+    clause: 'A.10',
     obligation: 'A.10 Third-party and customer relationships',
+    requirement: 'Managing supplier and customer responsibilities',
     artefact: 'Supplier AIBOM; contractual and technical control mapping',
     layerN: [2, 5],
     anchor: ISO_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-ISO42006-CB',
+    frameworkId: 'iso-42006',
     framework: 'ISO/IEC 42006',
+    clause: 'ISO/IEC 42006:2025',
     obligation:
       'ISO/IEC 42006:2025 requirements for AIMS certification bodies',
+    requirement:
+      'Requirements for bodies auditing and certifying AI management systems (who may credibly certify you to 42001)',
     artefact:
       'Accredited certification scope; auditor-competence evidence; certificate register',
     layerN: [5],
     anchor: ISO_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary standard (2025)',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-ISO23894-RISK',
+    frameworkId: 'iso-23894',
     framework: 'ISO/IEC 23894',
+    clause: 'ISO/IEC 23894:2023',
     obligation: 'ISO/IEC 23894:2023 guidance on AI risk management',
+    requirement: 'Guidance on AI risk management (companion to ISO 31000)',
     artefact:
       'Risk register as code; AI risk taxonomy; linkage to EU AI Act Art. 9 and the NIST AI RMF',
     layerN: [1, 3],
     anchor: ISO_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary guidance (2023)',
+    reviewed: REVIEWED_V040,
   },
 
   // NIST AI RMF
   {
+    id: 'AIGE-OBL-NISTRMF-GOVERN',
+    frameworkId: 'nist-ai-rmf',
     framework: 'NIST AI RMF',
+    clause: 'GOVERN',
     obligation: 'GOVERN',
+    requirement: 'A culture and structure for managing AI risk',
     artefact: 'Policy-as-code; operating model; registry ownership',
     layerN: [1, 2],
     anchor: NIST_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary (AI RMF 1.0, January 2023)',
+    patterns: [
+      'pattern-policy-card',
+      'pattern-continuous-assurance-telemetry',
+      'pattern-framework-crosswalk',
+      'pattern-machine-readable-evidence-oscal',
+      'pattern-vendor--model-due-diligence-gate',
+    ],
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-NISTRMF-MAP',
+    frameworkId: 'nist-ai-rmf',
     framework: 'NIST AI RMF',
+    clause: 'MAP',
     obligation: 'MAP',
+    requirement: 'Context and risk framing for each AI system',
     artefact: 'Threat models; use-case and impact mapping; data/model cards',
     layerN: [2, 3],
     anchor: NIST_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary (AI RMF 1.0, January 2023)',
+    patterns: [
+      'pattern-agent-registry',
+      'pattern-aibom',
+      'pattern-model-card-as-control-evidence',
+      'pattern-fria-as-code',
+      'pattern-shadow-ai-discovery',
+      'pattern-vendor--model-due-diligence-gate',
+    ],
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-NISTRMF-MEASURE',
+    frameworkId: 'nist-ai-rmf',
     framework: 'NIST AI RMF',
+    clause: 'MEASURE',
     obligation: 'MEASURE',
+    requirement: 'Analyse, benchmark and monitor risk',
     artefact: 'Eval gates; adversarial red-team suite; metrics per failure mode',
     layerN: [3],
     anchor: NIST_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary (AI RMF 1.0, January 2023)',
+    patterns: [
+      'pattern-eval-gate-in-ci',
+      'pattern-adversarial-red-team-suite',
+      'pattern-model-card-as-control-evidence',
+    ],
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-NISTRMF-MANAGE',
+    frameworkId: 'nist-ai-rmf',
     framework: 'NIST AI RMF',
+    clause: 'MANAGE',
     obligation: 'MANAGE',
+    requirement: 'Prioritise, respond and recover',
     artefact: 'Runtime guardrails; incident pipeline; continuous assurance',
     layerN: [4, 5],
     anchor: NIST_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary (AI RMF 1.0, January 2023)',
+    patterns: [
+      'pattern-continuous-assurance-telemetry',
+      'pattern-runtime-guardrail',
+      'pattern-kill-switch--circuit-breaker',
+      'pattern-incident-pipeline',
+      'pattern-machine-readable-evidence-oscal',
+      'pattern-agent-identity--scoped-credentials',
+      'pattern-human-in-the-loop-gate',
+    ],
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-NIST-AGENTS',
+    frameworkId: 'nist-ai-agent-standards',
     framework: 'NIST (agent, cyber and misuse work)',
+    clause: 'AI Agent Standards Initiative',
     obligation: 'NIST AI Agent Standards Initiative (2026)',
+    requirement:
+      'CAISI initiative on interoperable, secure AI agents: identity, authentication, agent security',
     artefact:
       'Agent registry; non-human-identity controls; agent authentication and authorisation; adversarial agent evals',
     layerN: [3, 4],
     anchor: NIST_ANCHOR,
+    appliesStatus: 'pending',
+    appliesNote: 'Initiative launched 2026-02-17 by NIST CAISI',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-NIST-IR8596',
+    frameworkId: 'nist-ir-8596',
     framework: 'NIST (agent, cyber and misuse work)',
+    clause: 'IR 8596',
     obligation: 'NIST IR 8596 Cyber AI Profile (draft)',
+    requirement: 'CSF 2.0 profile for AI (Secure / Defend / Thwart)',
     artefact:
       'AI-system security controls; runtime observability; threat detection mapped to CSF 2.0',
     layerN: [3, 4],
     anchor: NIST_ANCHOR,
+    appliesStatus: 'pending',
+    appliesNote:
+      'Draft: initial preliminary draft 2025-12-16, still the current version as of 2026-09-24',
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
+    id: 'AIGE-OBL-NIST-AI800-1',
+    frameworkId: 'nist-ai-800-1',
     framework: 'NIST (agent, cyber and misuse work)',
+    clause: 'AI 800-1',
     obligation:
       'NIST AI 800-1 misuse risk for dual-use foundation models (draft)',
+    requirement:
+      'Managing Misuse Risk for Dual-Use Foundation Models (voluntary guidance)',
     artefact:
       'Misuse red-team suite; capability and dangerous-capability evals; safety framework',
     layerN: [3],
     anchor: NIST_ANCHOR,
+    appliesStatus: 'pending',
+    appliesNote:
+      'Draft: second public draft January 2025, no final version as of 2026-09-24',
+    reviewed: REVIEWED_DEBT_PASS,
   },
 
   // CSA AICM and STAR for AI
   {
+    id: 'AIGE-OBL-CSA-AICM',
+    frameworkId: 'csa-aicm',
     framework: 'CSA AICM / STAR for AI',
+    clause: 'AICM v1.1',
     obligation: 'AICM v1.1: 247 control objectives across 18 domains',
+    requirement:
+      '247 control objectives across 18 domains, spanning governance, data, model and runtime',
     artefact:
       'Control catalogue mapped to policy-as-code and evals; crosswalk to ISO 42001 / NIST AI RMF',
     layerN: [1, 3, 5],
     anchor: CSA_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary; v1.1 published 2026-06-22',
+    patterns: [
+      'pattern-policy-card',
+      'pattern-agent-registry',
+      'pattern-aibom',
+      'pattern-continuous-assurance-telemetry',
+      'pattern-kill-switch--circuit-breaker',
+      'pattern-framework-crosswalk',
+      'pattern-agent-identity--scoped-credentials',
+      'pattern-shadow-ai-discovery',
+    ],
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-CSA-STAR',
+    frameworkId: 'csa-star-for-ai',
     framework: 'CSA AICM / STAR for AI',
+    clause: 'STAR for AI',
     obligation: 'STAR for AI assurance and certification programme',
+    requirement:
+      'Assurance and certification programme, incl. proposed agent controls',
     artefact:
       'Machine-readable evidence submission; continuous assurance telemetry',
     layerN: [5],
     anchor: CSA_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary assurance and certification programme',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-CSA-AICM-AGENTIC',
+    frameworkId: 'csa-aicm',
     framework: 'CSA AICM / STAR for AI',
+    clause: 'Agentic Control Supplement',
     obligation: 'AICM Agentic Control Supplement (proposed agent controls)',
+    requirement: 'A proposed set of agent-specific controls extending the AICM',
     artefact:
       'Agent-specific control definitions; policy-as-code for agent scope and tools; runtime guardrails',
     layerN: [1, 4],
     anchor: CSA_ANCHOR,
+    appliesStatus: 'pending',
+    appliesNote: 'Proposed',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-CSA-AICM-CATASTROPHIC',
+    frameworkId: 'csa-aicm',
     framework: 'CSA AICM / STAR for AI',
+    clause: 'Catastrophic Risk Annex',
     obligation:
       'AICM Catastrophic Risk Annex (enhanced controls for high-autonomy systems)',
+    requirement:
+      'Enhanced AICM controls for high-autonomy systems with catastrophic-risk potential',
     artefact:
       'Enhanced controls for high-autonomy systems; kill switch and oversight controls; pilot-audit evidence',
     layerN: [4, 5],
     anchor: CSA_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary; meant to be proven through pilot audits',
+    reviewed: REVIEWED_V040,
   },
 
   // OWASP GenAI Security Project
   {
+    id: 'AIGE-OBL-OWASP-AGENTIC',
+    frameworkId: 'owasp-agentic-top-10',
     framework: 'OWASP GenAI Security Project',
+    clause: 'Top 10 for Agentic Applications 2026',
     obligation: 'Top 10 for Agentic Applications 2026',
+    requirement:
+      'Agent threat catalogue (ASI01 Agent Goal Hijack … ASI10 Rogue Agents)',
     artefact:
       'Agent threat model; adversarial evals; runtime guardrails; kill switch',
     layerN: [3, 4],
     anchor: OWASP_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary (2026 edition)',
+    patterns: [
+      'pattern-policy-card',
+      'pattern-eval-gate-in-ci',
+      'pattern-adversarial-red-team-suite',
+      'pattern-agent-registry',
+      'pattern-runtime-guardrail',
+      'pattern-kill-switch--circuit-breaker',
+      'pattern-agent-identity--scoped-credentials',
+      'pattern-human-in-the-loop-gate',
+      'pattern-shadow-ai-discovery',
+    ],
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-OWASP-LLM',
+    frameworkId: 'owasp-llm-top-10',
     framework: 'OWASP GenAI Security Project',
+    clause: 'Top 10 for LLM Applications 2026',
     obligation: 'Top 10 for LLM Applications 2026',
+    requirement: 'LLM threat catalogue (incl. Excessive Agency at #3)',
     artefact: 'Prompt-injection and output-handling controls; eval gate',
     layerN: [3, 4],
     anchor: OWASP_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary (2026 edition)',
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
+    id: 'AIGE-OBL-OWASP-ACS',
+    frameworkId: 'owasp-acs',
     framework: 'OWASP GenAI Security Project',
+    clause: 'ACS',
     obligation: 'Agent Control Standard (ACS)',
+    requirement: 'A standard for expressing agent controls',
     artefact: 'Machine-readable control definitions for agents',
     layerN: [1, 4],
     anchor: OWASP_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary',
+    patterns: ['pattern-framework-crosswalk'],
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-OWASP-AIBOM',
+    frameworkId: 'owasp-aibom',
     framework: 'OWASP GenAI Security Project',
+    clause: 'AIBOM',
     obligation: 'AIBOM',
+    requirement: 'AI bill-of-materials format and generator',
     artefact: 'AIBOM at build (CycloneDX ML-BOM, SPDX 3.0 AI)',
     layerN: [2],
     anchor: OWASP_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary',
+    reviewed: REVIEWED_V040,
   },
 
   // US frontier-developer laws
   {
+    id: 'AIGE-OBL-USCA-SB53',
+    frameworkId: 'ca-sb-53',
     framework: 'US frontier-developer laws',
+    clause: 'SB 53',
     obligation: 'California SB 53 (TFAIA)',
+    requirement:
+      'Publish a frontier AI framework; report critical safety incidents to the Office of Emergency Services within 15 days; whistleblower protection; up to USD 1M per violation, AG-enforced',
     artefact:
       'Published safety framework; incident pipeline reporting to the state; transparency artefacts',
     layerN: [5, 4],
     anchor: US_ANCHOR,
+    scope:
+      'Large frontier developers (models trained above ~10^26 FLOP; developer revenue over USD 500M)',
+    appliesFrom: '2026-01-01',
+    appliesStatus: 'in-force',
+    appliesNote: 'In force 2026-01-01',
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
+    id: 'AIGE-OBL-USNY-RAISE',
+    frameworkId: 'ny-raise-act',
     framework: 'US frontier-developer laws',
+    clause: 'S6953B',
     obligation: 'New York RAISE Act (signed 2025-12-19; effective 2027-01-01)',
+    requirement:
+      'Publish a frontier AI safety and security framework; disclose safety incidents within 72 hours. A chapter amendment signed 2026-03-27 sets the effective date at 2027-01-01 and creates an oversight office within the New York Department of Financial Services (DFS)',
     artefact:
       'Published frontier AI safety framework; 72-hour incident and disclosure pipeline reporting to the state; DFS oversight office',
     layerN: [5, 4],
     anchor: US_ANCHOR,
+    scope:
+      'Large frontier developers (frontier models trained with over 10^26 operations, cost over USD 100M)',
+    appliesFrom: '2027-01-01',
+    appliesStatus: 'applies-later',
+    appliesNote: 'Signed 2025-12-19; effective 2027-01-01',
+    reviewed: REVIEWED_DEBT_PASS,
   },
 
   // US state AI laws (broader than the frontier-developer laws above)
   {
+    id: 'AIGE-OBL-USTX-TRAIGA',
+    frameworkId: 'tx-traiga',
     framework: 'US state AI laws',
+    clause: 'HB 149',
     obligation: 'Texas TRAIGA (HB 149; in force 2026-01-01)',
+    requirement:
+      'Intent-based prohibitions (social scoring, unlawful discrimination); AI-use disclosure; a regulatory sandbox; Attorney-General enforcement; local AI rules preempted',
     artefact:
       'Prohibited-use policy-as-code; AI-use disclosure controls; complaint and incident handling',
     layerN: [1, 4],
     anchor: US_ANCHOR,
+    scope: 'Developers and deployers doing business in Texas',
+    appliesFrom: '2026-01-01',
+    appliesStatus: 'in-force',
+    appliesNote: 'In force 2026-01-01',
+    reviewed: REVIEWED_V040,
   },
   {
+    id: 'AIGE-OBL-USCO-AIACT',
+    frameworkId: 'co-ai-act',
     framework: 'US state AI laws',
+    clause: 'SB 24-205 / SB 26-189',
     obligation:
       'Colorado AI Act (SB 24-205; delayed, then replaced by SB 26-189 effective 2027-01-01)',
+    requirement:
+      'Duty of reasonable care against algorithmic discrimination; risk management and consumer notice. Its 1 Feb 2026 start was delayed to 30 June 2026, then the Act was replaced by SB 26-189 (signed 14 May 2026), a narrower transparency law effective 1 Jan 2027, after a federal court blocked enforcement of the original',
     artefact:
       'High-risk ADM inventory; algorithmic-discrimination impact assessments; consumer disclosure',
     layerN: [1, 2, 5],
     anchor: US_ANCHOR,
+    scope: 'Developers and deployers of high-risk (consequential) automated decisions',
+    appliesFrom: '2027-01-01',
+    appliesStatus: 'applies-later',
+    appliesNote:
+      'SB 24-205 delayed, then replaced by SB 26-189 (signed 2026-05-14), effective 2027-01-01',
+    reviewed: REVIEWED_DEBT_PASS,
   },
 
   // Other jurisdictions
   {
+    id: 'AIGE-OBL-KR-AIBASIC',
+    frameworkId: 'kr-ai-basic-act',
     framework: 'Other jurisdictions',
+    clause: 'AI Basic Act',
     obligation: 'South Korea AI Basic Act (in force 2026-01-22)',
+    requirement:
+      'Baseline duties for AI operators, heightened duties for "high-impact" AI in sensitive sectors, and AI-content labelling',
     artefact:
       'Risk register for high-impact AI; AI-use notification; AI-content labelling',
     layerN: [1, 2, 4],
     anchor: OTHER_ANCHOR,
+    appliesFrom: '2026-01-22',
+    appliesStatus: 'grace',
+    appliesNote:
+      'In force 2026-01-22; the ministry (MSIT) runs a grace period of at least one year in 2026, deferring fact-finding and fines except in serious cases',
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
+    id: 'AIGE-OBL-SG-GENAI',
+    frameworkId: 'sg-genai-framework',
     framework: 'Other jurisdictions',
+    clause: 'Model AI Governance Framework for Generative AI',
     obligation:
       'Singapore IMDA Model AI Governance Framework for Generative AI (voluntary)',
+    requirement:
+      'Governance dimensions incl. testing, transparency, incident reporting, security and content provenance',
     artefact:
       'Eval suite; model cards; content provenance and watermarking',
     layerN: [2, 3, 4],
     anchor: OTHER_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary; published May 2024',
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
+    id: 'AIGE-OBL-UK-ADM',
+    frameworkId: 'uk-duaa',
     framework: 'Other jurisdictions',
+    clause: 'UK GDPR Arts. 22A–22D',
     obligation:
       'UK ADM safeguards: Data (Use and Access) Act 2025, UK GDPR Arts. 22A–22D (in force 2026-02-05)',
+    requirement:
+      'A permission-plus-safeguards model for significant, solely automated decisions, with tighter conditions where special-category data is used',
     artefact:
       'ADM safeguards: meaningful-human-review path, contest and representation channel, decision notice',
     layerN: [4, 2],
     anchor: OTHER_ANCHOR,
+    appliesFrom: '2026-02-05',
+    appliesStatus: 'in-force',
+    appliesNote: 'In force 2026-02-05',
+    reviewed: REVIEWED_DEBT_PASS,
   },
   {
+    id: 'AIGE-OBL-ETSI-304223',
+    frameworkId: 'etsi-en-304-223',
     framework: 'Other jurisdictions',
+    clause: 'EN 304 223',
     obligation:
       'ETSI EN 304 223 baseline cyber-security for AI models and systems',
+    requirement:
+      'Baseline cyber-security requirements across the AI lifecycle (13 principles over five stages)',
     artefact:
       'AI-system security controls across the lifecycle; supply-chain and AIBOM checks; runtime hardening',
     layerN: [4],
     anchor: OTHER_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Published (V2.1.1, Dec 2025); a voluntary standard',
+    reviewed: REVIEWED_DEBT_PASS,
   },
 
   // China
   {
+    id: 'AIGE-OBL-CN-ALGOREC',
+    frameworkId: 'cn-algo-recommendation',
     framework: 'China',
+    clause: 'CAC Order No. 9',
     obligation: 'Provisions on Algorithmic Recommendation (in force 2022-03-01)',
+    requirement:
+      'Algorithm filing for services with public-opinion attributes or social-mobilisation capacity, security assessment, display of the filing number, and a user option to switch off personalised recommendation',
     artefact:
       'Algorithm inventory with filing record and number; security-assessment evidence pack; opt-out control at runtime',
     layerN: [1, 2, 4],
     anchor: CHINA_ANCHOR,
+    appliesFrom: '2022-03-01',
+    appliesStatus: 'in-force',
+    appliesNote: 'Binding; in force 2022-03-01',
+    reviewed: REVIEWED_CHINA,
   },
   {
+    id: 'AIGE-OBL-CN-DEEPSYN',
+    frameworkId: 'cn-deep-synthesis',
     framework: 'China',
+    clause: 'CAC Order No. 12',
     obligation: 'Provisions on Deep Synthesis (in force 2023-01-10)',
+    requirement:
+      'Conspicuous labels where synthetic content could mislead the public and non-removable technical marks; training-data management; separate consent for face and voice editing; filing and security assessment for opinion-shaping functions',
     artefact:
       'Content-provenance pipeline (visible label plus metadata mark); training-data governance record; consent gate; pre-release security assessment',
     layerN: [2, 3, 4],
     anchor: CHINA_ANCHOR,
+    appliesFrom: '2023-01-10',
+    appliesStatus: 'in-force',
+    appliesNote: 'Binding; in force 2023-01-10',
+    reviewed: REVIEWED_CHINA,
   },
   {
+    id: 'AIGE-OBL-CN-GENAI',
+    frameworkId: 'cn-genai-measures',
     framework: 'China',
+    clause: 'CAC Order No. 15',
     obligation: 'Interim Measures for Generative AI Services (in force 2023-08-15)',
+    requirement:
+      'Lawful-source training data and foundation models; content labelling under the deep-synthesis rules; security assessment and algorithm filing for opinion-shaping services; stop, remove, retrain and report on illegal content',
     artefact:
       'Data-lineage and licensing record; eval gate on generated content; incident pipeline with a retraining loop; filing record',
     layerN: [2, 3, 4, 5],
     anchor: CHINA_ANCHOR,
+    appliesFrom: '2023-08-15',
+    appliesStatus: 'in-force',
+    appliesNote:
+      'Binding; in force 2023-08-15; applies to services offered to the public within the PRC',
+    reviewed: REVIEWED_CHINA,
   },
   {
+    id: 'AIGE-OBL-CN-LABEL',
+    frameworkId: 'cn-content-labelling',
     framework: 'China',
+    clause: 'Labelling Measures + GB 45438-2025',
     obligation:
       'Measures for Labelling AI-Generated Synthetic Content with GB 45438-2025 (in force 2025-09-01)',
+    requirement:
+      "Explicit labels (text, audio or graphic) and implicit metadata labels carrying the provider's name or code and a content number; distribution platforms verify metadata and flag suspected AI content",
     artefact:
       'Provenance and watermarking pipeline emitting the GB 45438 metadata fields; platform-side detection and flagging',
     layerN: [3, 4],
     anchor: CHINA_ANCHOR,
+    appliesFrom: '2025-09-01',
+    appliesStatus: 'in-force',
+    appliesNote: 'Binding; in force 2025-09-01, the standard implemented the same day',
+    reviewed: REVIEWED_CHINA,
   },
   {
+    id: 'AIGE-OBL-CN-GBT45654',
+    frameworkId: 'cn-gbt-45654',
     framework: 'China',
+    clause: 'GB/T 45654-2025',
     obligation:
       'GB/T 45654-2025 Basic security requirements for generative AI services (voluntary; implemented 2025-11-01)',
+    requirement:
+      'Training-corpus source and content screening, model-safety requirements and the evaluation methods that underpin the security assessment',
     artefact:
       'Corpus-screening record; eval question banks; security-assessment report',
     layerN: [3, 5],
     anchor: CHINA_ANCHOR,
+    appliesFrom: '2025-11-01',
+    appliesStatus: 'voluntary',
+    appliesNote: 'Recommended (voluntary) national standard; implemented 2025-11-01',
+    reviewed: REVIEWED_CHINA,
   },
   {
+    id: 'AIGE-OBL-CN-TC260-OPS',
+    frameworkId: 'cn-tc260-framework',
     framework: 'China',
+    clause: 'Framework 3.0 §5.3',
     obligation:
       'TC260 AI Safety Governance Framework 3.0: operators\' guidelines §5.3 (voluntary; 2026-09-14)',
+    requirement:
+      'A three-block risk taxonomy (inherent, application, secondary), technological and governance countermeasures and role-based guidelines; operators keep logs for at least six months and audit them, monitor risk in real time, keep a traceable chain of responsibility and assess resilience (§5.3)',
     artefact:
       'Risk register keyed to the framework\'s taxonomy; log-retention policy (six months) with audit; real-time risk monitoring; resilience assessment',
     layerN: [1, 4, 5],
     anchor: CHINA_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote:
+      'Voluntary; published 2026-09-14, building on 1.0 (2024) and 2.0 (2025)',
+    reviewed: REVIEWED_CHINA,
   },
   {
+    id: 'AIGE-OBL-CN-TC260-AGENTS',
+    frameworkId: 'cn-tc260-framework',
     framework: 'China',
+    clause: 'Framework 3.0 Appendix 2',
     obligation:
       'TC260 Framework 3.0 Appendix 2: agentic AI risk management (voluntary; 2026-09-14)',
+    requirement:
+      'Unique identity and least-privilege permissions per agent by decision mode; human checkpoints with tamper-proof approval logs and deny-by-default; tool and skill verification; runtime guardrails (alert, restrict, intercept, suspend, terminate); memory isolation with no credentials in memory; mutual authentication; sandbox validation, red teaming and re-validation on major change; controlled decommissioning',
     artefact:
       'Agent registry with identity and scope; approval-log store; tool allow-list with integrity checks; runtime guardrails and kill switch; memory-scope policy; decommissioning runbook',
     layerN: [2, 3, 4, 5],
     anchor: CHINA_ANCHOR,
+    appliesStatus: 'voluntary',
+    appliesNote: 'Voluntary; published 2026-09-14',
+    reviewed: REVIEWED_CHINA,
   },
 ] as const;
+
+/** The obligation with this stable id, if any (ids are case-insensitive in URLs). */
+export function obligationById(id: string): Obligation | undefined {
+  const wanted = id.toUpperCase();
+  return obligations.find((row) => row.id === wanted);
+}
+
+/** URL slug of a row: its id in lower case (ids never change, so neither does the URL). */
+export function obligationSlug(row: Pick<Obligation, 'id'>): string {
+  return row.id.toLowerCase();
+}
+
+/** Site path of a row's page. */
+export function obligationPath(row: Pick<Obligation, 'id'>): string {
+  return `/obligations/${obligationSlug(row)}`;
+}
