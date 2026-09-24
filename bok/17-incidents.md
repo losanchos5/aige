@@ -4,7 +4,7 @@
 > reported on every clock that applies and explained, with its cause fed back into the controls.
 
 This chapter extends two things the book already has. The
-[**Incident Pipeline**](/bok/patterns#pattern-incident-pipeline) pattern (chapter 05) wires detection
+[**Incident Pipeline**](/patterns/incident-pipeline) pattern (chapter 05) wires detection
 to a report with the statutory timer running; the Article 73 clock table in the
 [regulatory map](/bok/regulatory-map#eu-ai-act-post-omnibus) (chapter 08) says how long that timer
 is. Neither says what counts as an incident below the serious threshold, how to rank severity, who
@@ -103,7 +103,7 @@ Three rules make the scale work under pressure.
    when an incident opens, so the first classification and the clocks it starts are reproducible,
    versioned and auditable. A human can override; the override is logged with a reason.
 
-> **Example (illustrative)** A severity rule written as a [Policy Card](/bok/patterns#pattern-policy-card)
+> **Example (illustrative)** A severity rule written as a [Policy Card](/patterns/policy-card)
 > fires when an incident record has `harm.type` of `fundamental_rights` and `system.ai_act_class` of
 > `high_risk`: it sets `severity: SEV-2`, opens an `ai_act_art73` clock with a 15-day ceiling from
 > the `aware_at` timestamp, and pages the system owner and legal. The verdict itself is stored as
@@ -144,8 +144,8 @@ post-market monitoring plan is a standing source
 chapter 18).
 
 Containment is where the runtime patterns earn their keep. A
-[kill switch](/bok/patterns#pattern-kill-switch--circuit-breaker) that revokes one agent's scope
-without breaking the fleet, a [runtime guardrail](/bok/patterns#pattern-runtime-guardrail) tightened
+[kill switch](/patterns/kill-switch-circuit-breaker) that revokes one agent's scope
+without breaking the fleet, a [runtime guardrail](/patterns/runtime-guardrail) tightened
 by a config push, and a registry that knows the live and the last good version turn "contain" from a
 meeting into a command. The NIST AI RMF names the capability: mechanisms and assigned
 responsibilities to "supersede, disengage, or deactivate" AI systems whose performance or outcomes
@@ -260,7 +260,8 @@ move.
 Two practical points follow. First, a failure mode is a *hypothesis* at triage and a *finding* only
 after root-cause analysis; do not let the first label stick. Second, every row maps to a test that
 could have caught it earlier (an adversarial case, a subgroup eval, a drift threshold), which is why
-the after-action review ends in the eval suite, not in a slide.
+the after-action review ends in the eval suite, not in a slide. For agents, chapter 23 extends the
+table into [the agent incident taxonomy](/bok/governing-agents#an-agent-incident-taxonomy).
 
 ## Root-cause analysis
 
@@ -311,14 +312,14 @@ every confirmed cause against one or more of these classes:
 
 | Cause class | What it means | Control that should have caught it | Layer | Pattern |
 |---|---|---|---|---|
-| **Data** | Poor-quality, unrepresentative, stale or poisoned training or retrieval data | Data card, lineage, data-quality and bias tests | 02 · 03 | [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci) |
-| **Model limits** | Brittleness, lack of robustness, hallucination, capability limits | Capability and robustness evals; red team | 03 | [Adversarial Red-Team Suite](/bok/patterns#pattern-adversarial-red-team-suite) |
-| **Drift** | Data or concept drift after deployment | Monitoring against the eval baseline; retraining triggers | 04 · 05 | [Continuous Assurance Telemetry](/bok/patterns#pattern-continuous-assurance-telemetry) |
-| **Testing gap** | Too little or unrepresentative testing; a suite tuned to its own threshold | Eval-suite coverage review; adversarial case maintenance | 03 | [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci) |
-| **Design or specification** | Misaligned objective, wrong proxy metric, flawed prompt or workflow design | Design review; policy as code on intended use | 01 | [Policy Card](/bok/patterns#pattern-policy-card) |
-| **Integration and tooling** | Excessive tool scope, missing mediation, shared credentials | Scoped identity; tool-call mediation | 04 | [Agent Identity & Scoped Credentials](/bok/patterns#pattern-agent-identity--scoped-credentials) |
-| **Adversarial** | Prompt injection, jailbreak, supply-chain compromise | Red team; input and output guardrails; AIBOM | 03 · 04 | [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) |
-| **Oversight failure** | Automation bias; a reviewer without context, time or authority; no checkpoint | Designed oversight with measured override rates | 04 | [Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate) |
+| **Data** | Poor-quality, unrepresentative, stale or poisoned training or retrieval data | Data card, lineage, data-quality and bias tests | 02 · 03 | [Eval Gate in CI](/patterns/eval-gate-in-ci) |
+| **Model limits** | Brittleness, lack of robustness, hallucination, capability limits | Capability and robustness evals; red team | 03 | [Adversarial Red-Team Suite](/patterns/adversarial-red-team-suite) |
+| **Drift** | Data or concept drift after deployment | Monitoring against the eval baseline; retraining triggers | 04 · 05 | [Continuous Assurance Telemetry](/patterns/continuous-assurance-telemetry) |
+| **Testing gap** | Too little or unrepresentative testing; a suite tuned to its own threshold | Eval-suite coverage review; adversarial case maintenance | 03 | [Eval Gate in CI](/patterns/eval-gate-in-ci) |
+| **Design or specification** | Misaligned objective, wrong proxy metric, flawed prompt or workflow design | Design review; policy as code on intended use | 01 | [Policy Card](/patterns/policy-card) |
+| **Integration and tooling** | Excessive tool scope, missing mediation, shared credentials | Scoped identity; tool-call mediation | 04 | [Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials) |
+| **Adversarial** | Prompt injection, jailbreak, supply-chain compromise | Red team; input and output guardrails; AIBOM | 03 · 04 | [Runtime Guardrail](/patterns/runtime-guardrail) |
+| **Oversight failure** | Automation bias; a reviewer without context, time or authority; no checkpoint | Designed oversight with measured override rates | 04 | [Human-in-the-loop Gate](/patterns/human-in-the-loop-gate) |
 | **Change management** | Unreviewed model, prompt or config change; silent vendor update | Registry versioning; change gate; vendor notice terms | 01 · 02 | [Vendor / Model Due-Diligence Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate) |
 | **Use outside intended purpose** | Deployment beyond the use the system was assessed for | [Intake and classification](/patterns/use-case-intake-risk-tiering); instructions for use | 01 · 02 | [Agent Registry](/bok/patterns#pattern-agent-registry) |
 | **Organisational** | No owner, unclear decision rights, alert fatigue, untrained staff | Operating model, RACI, drills | 05 | [Incident Pipeline](/bok/patterns#pattern-incident-pipeline) |
@@ -358,7 +359,7 @@ market-surveillance authority [3].
 Every closed incident should leave five artefacts behind:
 
 1. **A regression eval.** The incident becomes a test case that fails on the incident version and
-   passes on the fix, wired into the [eval gate](/bok/patterns#pattern-eval-gate-in-ci) so the
+   passes on the fix, wired into the [eval gate](/patterns/eval-gate-in-ci) so the
    failure cannot ship again unnoticed.
 2. **A risk register change.** Either a new risk or a re-scored existing one, with the incident id
    attached. The link runs both ways: the incident record lists the risks it realised, and the risk
@@ -426,7 +427,7 @@ Each duty needs an engineered artefact, and none of them exists by default:
 
 Suspension is a kill switch for a system you do not own. You cannot revoke a vendor's weights, but you
 can stop sending it traffic; test that you can, and how long it takes, before you need it. The
-[Vendor / Model Due-Diligence Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate) is where
+[Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate) is where
 the two-way notification terms belong: the provider tells you about incidents and corrective actions
 that affect your deployment, and you have a named channel to tell the provider. The same logic runs
 further up the chain for GPAI: the Code of Practice asks model providers to tell downstream
@@ -563,7 +564,7 @@ data and input, AI model, task and output, other information) [2].
 Store the record as structured data in the assurance store, and emit its control-relevant parts as
 machine-readable evidence: CAPA items map naturally to an `OSCAL` plan of action and milestones
 (`POA&M`), the native model's place for open findings and their remediation [28]. That is the
-[Machine-Readable Evidence](/bok/patterns#pattern-machine-readable-evidence-oscal) pattern applied to
+[Machine-Readable Evidence](/patterns/machine-readable-evidence-oscal) pattern applied to
 incidents, and it lets an auditor query "all SEV-2 incidents in Q3 with open CAPA" instead of asking
 for a spreadsheet.
 
@@ -591,7 +592,7 @@ maps harms by level to the control that catches each.
 Use them in four ways. **Seed the risk register**: pull the incidents recorded for deployments like
 yours and check that each has a matching risk. **Write the eval before the incident**: turn a public
 incident into a test case against your system, feeding the
-[red-team suite](/bok/patterns#pattern-adversarial-red-team-suite) alongside the MITRE ATLAS
+[red-team suite](/patterns/adversarial-red-team-suite) alongside the MITRE ATLAS
 technique catalogue [33]. **Calibrate the severity scale**: check that real incidents land where your
 harm tests say they should. **Feed GPAI monitoring**: the Code of Practice lists incident databases
 among the sources providers should review [5].

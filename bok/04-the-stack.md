@@ -233,7 +233,8 @@ before it has an identity, an owner and a scope. A **guardian agent**, an agent 
 review, constrain or stop other agents at runtime, is one way to build the mediation point; it is
 itself an agent, so it needs its own identity, scope and kill switch, and its decisions are evidence
 like any other guardrail's [16]. Chapter 23 treats
-[governing AI agents](/bok/governing-agents) end to end.
+[governing AI agents](/bok/governing-agents#what-makes-an-agent-a-governance-object) end to end, including
+[identity, delegation and MCP authorization for agents](/bok/governing-agents#identity-and-short-lived-credentials).
 
 **Reference tools and standards (illustrative).** Guardrail frameworks such as NVIDIA NeMo Guardrails,
 Meta LlamaFirewall and Lakera enforce input/output and tool-call policy; observability tools such as
@@ -388,7 +389,7 @@ a reviewer who sees a confident machine output will tend to confirm it, so overs
 that a person can clear in two seconds under load will be cleared in two seconds, and its quality falls
 silently as volume rises. The engineering answer is to classify actions by consequence and place a
 designed checkpoint only where the stakes justify the latency (the
-[**Human-in-the-loop Gate**](/bok/patterns#pattern-human-in-the-loop-gate) pattern in chapter 05), giving the reviewer enough context to disagree, logging the approver and the decision as
+[**Human-in-the-loop Gate**](/patterns/human-in-the-loop-gate) pattern in chapter 05), giving the reviewer enough context to disagree, logging the approver and the decision as
 evidence, and monitoring the oversight itself (approval rate, time-to-decide, override rate) as a
 signal that can degrade. Oversight you do not measure is oversight you cannot claim. The EU High-Level
 Expert Group's [human-in-the-loop, on-the-loop and in-command](/bok/principles-and-standards#eu-hleg-guidelines-and-altai)
@@ -410,7 +411,7 @@ inventory and assurance: the vendor's system still needs a registry entry, an ow
 supplier documentation, model card and any AIBOM become evidence you collect rather than produce; and
 the due-diligence itself becomes a gate, written into a
 [third-party AI policy](/bok/governance-program#third-party-ai-policy) (chapter 12). This is the
-[**Vendor / Model Due-Diligence Gate**](/bok/patterns#pattern-vendor--model-due-diligence-gate)
+[**Vendor / Model Due-Diligence Gate**](/patterns/vendor-model-due-diligence-gate)
 pattern (chapter 05), anchored in ISO/IEC 42001 Annex A.10 (third-party and customer relationships) and the EU
 AI Act's split of duties between provider and deployer (see chapter 08, and
 [who you are in the value chain](/bok/eu-ai-act#who-you-are-in-the-value-chain) in chapter 18). The
@@ -504,6 +505,20 @@ illustrative. Full JSON Schemas with filled examples for these records, and
 ```
 
 The five excerpts are one data path from policy to proof, keyed on the same registry id.
+
+## What you can do this week
+
+1. **Draw one slice.** Pick one system and write down, for each of the five layers, the one artefact
+   it produces today and the one it lacks. The gaps are your backlog, in build order.
+2. **Wire the registry to the deploy.** Make one deployment pipeline write the registry entry (id,
+   owner, scope, expiry) and fail when a field is empty.
+3. **Give one policy teeth.** Move one rule that matters, a registered owner or a data-residency
+   check, into code in the pipeline, blocking on failure, and log every verdict with its rule id.
+4. **Gate one release on one eval.** Put one adversarial eval against your highest-risk agent in CI,
+   with a threshold traced to a named failure mode, so a regression fails the build.
+5. **Drill one stop and keep the record.** Trip the kill switch on one agent in staging, time the
+   stop, and check that the stop and the guardrail events reached one evidence store, keyed to the
+   registry id.
 
 ## Sources
 

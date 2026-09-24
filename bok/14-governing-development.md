@@ -16,7 +16,7 @@ and releases an AI system or model. [Chapter 15](/bok/governing-deployment#the-d
 use. The split follows the EU AI Act's duty holders (see the
 [regulatory map](/bok/regulatory-map#eu-ai-act-post-omnibus)): most of what follows binds the
 provider, and a deployer that builds on a procured model inherits a thinner version of it through the
-[**Vendor / Model Due-Diligence Gate**](/bok/patterns#pattern-vendor--model-due-diligence-gate).
+[**Vendor / Model Due-Diligence Gate**](/patterns/vendor-model-due-diligence-gate).
 
 The reference texts agree on the stages and say little about the mechanism. ISO/IEC 5338:2023
 defines AI system life cycle processes [1]; ISO/IEC 42001 groups the controls under Annex A.6
@@ -197,9 +197,9 @@ Expert Group names three approaches: human-in-the-loop, human-on-the-loop and hu
 [15]. The design review picks one per class of decision and designs it against automation bias
 and oversight that degrades under load, as set out in
 [designing human oversight](/bok/the-stack#designing-human-oversight-article-14) and the
-[**Human-in-the-loop Gate**](/bok/patterns#pattern-human-in-the-loop-gate) pattern. The same review
+[**Human-in-the-loop Gate**](/patterns/human-in-the-loop-gate) pattern. The same review
 fixes the controls that are cheap now and expensive to retrofit: event logging, a rollback path, a
-shadow mode, and a [**Kill Switch / Circuit Breaker**](/bok/patterns#pattern-kill-switch--circuit-breaker)
+shadow mode, and a [**Kill Switch / Circuit Breaker**](/patterns/kill-switch-circuit-breaker)
 for anything that acts.
 
 The review is a gate with named reviewers: an engineering lead, the AI governance engineer, security,
@@ -239,7 +239,7 @@ cannot. Per dataset, the record answers five questions.
   result per source.
 - **Licences and warranties.** Whether the dataset licence permits training, commercial use and
   distribution of derived models, and what the supplier warrants about lawful collection. The licence
-  goes into the [**AIBOM**](/bok/patterns#pattern-aibom) so a licence change surfaces in the next
+  goes into the [**AIBOM**](/patterns/aibom) so a licence change surfaces in the next
   build.
 
 ### Quality, quantity, representativeness and fitness for purpose
@@ -265,7 +265,9 @@ and governance frameworks [22].
 
 Quantity is not representativeness. A large dataset drawn from the wrong population is precisely
 wrong, and more of it does not cure the bias; it only narrows the confidence interval around the
-wrong answer.
+wrong answer. The tools catalogue lists
+[data-validation tools](/resources/tools#cat-data-validation) as illustrative examples, not
+endorsements.
 
 ### Owners, stewards and the admission gate
 
@@ -293,7 +295,8 @@ provenance is needed where rights attach to records (personal data, per-source l
 Feature-level lineage is needed for sensitive derived features that can act as proxies. The
 human-readable companion is a datasheet: Gebru and colleagues proposed that every dataset carry one
 covering its motivation, composition, collection, preprocessing, uses, distribution and maintenance
-[25].
+[25]. The tools catalogue lists [versioning and lineage tools](/resources/tools#cat-versioning) as
+illustrative examples, not endorsements.
 
 ### Synthetic data, augmentation and privacy-enhancing technologies
 
@@ -372,8 +375,8 @@ requests that users and timeouts actually meet.
 | Human-in-the-loop | Reviewer accuracy with and without the model; override rate | Approval quality under load; automation-bias probes | Oversight test |
 | Regression | Score deltas against the last release | Score deltas against the last model or prompt version | Eval gate verdict |
 
-Each row is a suite behind the [**Eval Gate in CI**](/bok/patterns#pattern-eval-gate-in-ci); the
-security row is the [**Adversarial Red-Team Suite**](/bok/patterns#pattern-adversarial-red-team-suite).
+Each row is a suite behind the [**Eval Gate in CI**](/patterns/eval-gate-in-ci); the
+security row is the [**Adversarial Red-Team Suite**](/patterns/adversarial-red-team-suite).
 Fairness metrics are defined in [chapter 16](/bok/fairness-and-explainability#group-fairness-metrics),
 which also covers [bias and interpretability testing](/bok/fairness-and-explainability#testing-explanation-quality)
 of the explanations themselves.
@@ -438,7 +441,9 @@ The [model artefact itself needs integrity](/patterns/model-artefact-integrity).
 statement listing each model file and its digest, through Sigstore or conventional keys, and
 verification recomputes the hashes [35]. Refuse to load serialised formats that execute code
 from untrusted sources; the Python documentation is blunt that "The pickle module is not secure"
-[36]. Both checks belong in the build next to the [**AIBOM**](/bok/patterns#pattern-aibom).
+[36]. Both checks belong in the build next to the [**AIBOM**](/patterns/aibom). The tools
+catalogue lists [signing and artefact-scanning tools](/resources/tools#cat-signing) as illustrative
+examples, not endorsements.
 
 ### What goes wrong in training and testing
 
@@ -530,7 +535,7 @@ enforcement, migration, asylum and border systems go into a non-public section [
 Omnibus, the Art. 6(3) registration asks for less data, and SMEs and small mid-caps may provide the
 technical documentation in a simplified form the Commission establishes [17]. The engineering
 move is to generate the database payload from the registry entry, so that the registration and the
-[**Agent Registry**](/bok/patterns#pattern-agent-registry) cannot drift apart.
+[**Agent Registry**](/patterns/agent-registry) cannot drift apart.
 
 ### Substantial modification
 
@@ -547,7 +552,9 @@ and threshold ranges. Then classify every change to model, data, prompts, tools 
 merge: inside the envelope (re-run the gates), outside it but compliance unaffected (re-run the
 gates and record the reasoning), or a potential substantial modification (stop, legal review,
 reassessment). A retrained model is a new release. It passes the same gates, gets a new version in
-the registry and regenerates its cards; it does not inherit its predecessor's verdicts.
+the registry and regenerates its cards; it does not inherit its predecessor's verdicts. For agents,
+chapter 23 puts
+[prompt and system-prompt changes under change control](/bok/governing-agents#prompts-as-configuration-under-change-control).
 
 ## The technical file
 
@@ -587,7 +594,7 @@ supply. The table splits it.
 The post-market monitoring plan is part of this file, not a separate document (Art. 72(3))
 [43]. Build the file the way code is built: a documentation job assembles it on every release
 candidate, fails when a generated row is stale or a written row is older than the model version it
-describes, and emits the result as [**Machine-Readable Evidence (OSCAL)**](/bok/patterns#pattern-machine-readable-evidence-oscal)
+describes, and emits the result as [**Machine-Readable Evidence (OSCAL)**](/patterns/machine-readable-evidence-oscal)
 alongside a human-readable rendering.
 
 ### Model cards, system cards and datasheets
@@ -604,7 +611,7 @@ The documents overlap and answer different questions for different readers.
 
 Most risk sits in the system, not the raw model ([chapter 01](/bok/definition#the-object-of-governance)),
 so a model card alone under-describes anything with tools or retrieval. Generate every card from the
-same records, as in the [**Model Card as Control Evidence**](/bok/patterns#pattern-model-card-as-control-evidence)
+same records, as in the [**Model Card as Control Evidence**](/patterns/model-card-as-control-evidence)
 pattern, so the card an auditor reads is the card production produced.
 
 ### The GPAI provider side
@@ -753,7 +760,7 @@ Encode the triggers so that the registry, not a calendar reminder, reopens the a
 widened intended purpose; retraining on a new data source; a new affected population, language or
 jurisdiction; a threshold change; an incident or near miss ([chapter 17](/bok/incidents#capa-from-incident-to-risk-register-and-eval-suite)); a
 monitoring signal outside its band; new law or guidance; and a scheduled review date. The
-[**FRIA-as-Code**](/bok/patterns#pattern-fria-as-code) pattern already does this for the FRIA and
+[**FRIA-as-Code**](/patterns/fria-as-code) pattern already does this for the FRIA and
 its DPIA cross-reference; the same structure generalises to every assessment in the table.
 
 > **In practice (illustrative)**

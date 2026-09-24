@@ -4,6 +4,15 @@ Version 0.4.0 · 2026-09-19. This is the full table of contents. Each chapter ha
 parallel writers stay consistent. Follow `STYLEGUIDE.md` for voice, templates and citations. All
 chapters are marked **[drafted]**; contributors may propose extensions, corrections and new ones.
 
+The Body of Knowledge has 24 chapters (00–23) in five parts, listed below by part. The parts group
+the index and the navigation (`site/src/data/chapters.ts`, field `part`); the reading order stays the
+chapter number, so chapter 23 sits in the lifecycle part but reads last. Most chapters open with an
+"At a glance" block; every chapter except the glossary lists its key terms under it (`keyTerms` in
+`chapters.ts`, glossary slugs); most chapters that describe a practice end with "What you can do this
+week". Links between chapters point at the section
+that treats the topic (`/bok/<slug>#<anchor>`), and links to a pattern point at its own page
+(`/patterns/<slug>`).
+
 The book has two front-matter pieces outside the numbered chapters:
 
 - **`THESIS.md`**: the founding statement (definition, five problems, eight values, six
@@ -13,11 +22,15 @@ The book has two front-matter pieces outside the numbered chapters:
 
 ## Chapters
 
+**Part 1 · The discipline (00–07).** What AI governance engineering is, why it is forming now, and
+how it is built, staffed and measured.
+
 ### 00. Preface **[drafted]**
 Provenance and framing. Why the book exists; who wrote it and from what (2.5 years operating an AI
 governance framework in a large telco, between Legal, Security and Engineering; the GRC Engineering
-precedent; the public record). Who should read it; what it is not; how to cite; versioning and the
-CHANGELOG; how to contribute. ~800 words. No normative claims.
+precedent; the public record). Who should read it, with a route into the book per audience; how to
+use the book, part by part; what it is not; how to cite; versioning and the CHANGELOG; how to
+contribute. ~1,100 words. No normative claims.
 
 ### 01. The definition **[drafted]**
 The one-sentence definition and its three clarifiers (covers governance, risk and assurance including
@@ -59,9 +72,11 @@ Agent Registry · AIBOM at Build · Model/Data Card as Code · Eval Gate in CI �
 Suite · Runtime Guardrail · Agent Kill Switch · Non-Human Identity & Scoped Access · Continuous
 Assurance Telemetry · Machine-Readable Evidence (OSCAL) · Serious-Incident Pipeline (Art. 73) · FRIA/
 DPIA as Code · Human-in-the-Loop Checkpoint · Framework Crosswalk (as index, not end state) · Vendor /
-Model Due-Diligence Gate. Since v0.5.0 each pattern is one file, `bok/patterns/<slug>.md`, published
-at `/patterns/<slug>`; `bok/05-patterns.md` is the catalogue, with one `## Pattern:` section per pattern
-holding its summary and a link to its page. Cite CSIRO as the template source.
+Model Due-Diligence Gate. Each pattern lives in its own file, `bok/patterns/<slug>.md`, and has its
+own page at `/patterns/<slug>`; the frontmatter contract is in
+`openspec/changes/patterns-as-pages/`. `bok/05-patterns.md` keeps the template, the pattern map and
+one `## Pattern: <name>` section per pattern with its summary and a link to the page, so every
+`#pattern-*` anchor stays valid. Cite CSIRO as the template source.
 
 ### 06. The role **[drafted]**
 The capability made concrete as a role (without ever implying a job search). What an AI governance
@@ -75,6 +90,8 @@ A ladder from paper to production. **Documented → Inventoried → Tested → E
 each level: what exists, what is missing, the smallest step to the next level, and how you would prove
 you are there. Level 5 (Continuous) is the runtime-data-path, continuous-assurance end state. Tie each
 level to the three questions and the five layers. ~1,500 words.
+
+**Part 2 · Reference (08–10).** The indexes the rest of the book points into.
 
 ### 08. Regulatory map (obligation → artefact → layer) **[drafted]**
 The reverse index of every "Maps to" line in the book. A table mapping each obligation to the artefact
@@ -94,6 +111,100 @@ com); agilemanifesto.org and 12factor.net as form models; CSIRO Responsible AI P
 AI Act + Digital Omnibus; ISO/IEC 42001/42005; NIST AI RMF; OWASP GenAI/Agentic; CSA AICM; the frontier
 labs' safety frameworks; the machine-readable-evidence research (OSCAL extensions, audit-as-code). One
 annotated line per item, grouped by theme, each with a verified URL.
+
+**Part 3 · Foundations (11–13).** What counts as an AI system, how an organisation runs its
+governance program and where risk management sits.
+
+### 11. AI, defined for governance **[drafted]**
+What an AI system is for governance purposes. The definitions compared element by element (OECD, EU
+AI Act Art. 3(1), ISO/IEC 22989, NIST AI 100-1) and each element turned into a registry field; AI
+versus conventional software; the kinds of AI that change the governance problem; the eight
+characteristics that break classic IT governance, each paired with a control; governing
+probabilistic outputs; responsible-AI principle sets engineered into artefacts.
+
+### 12. Running the AI governance program **[drafted]**
+The organisation as an object of governance: the stakeholder map, a lifecycle RACI, the committee
+that decides what gates cannot, the three lines and internal audit, AI literacy as code, governance
+culture and a channel for raising concerns, KPIs and KRIs for the board, management review, strategy
+and whether to use AI at all, and the policies across the lifecycle (data acquisition, third-party
+AI, acceptable use) compiled into gates.
+
+### 13. Where risk management sits **[drafted]**
+The risk loop (identify, assess, treat, monitor) run on the five layers and the seven workflows:
+risk sources and stakeholders, the likelihood-by-severity matrix with its catastrophic-severity
+override, appetite and tolerance compiled into gates, the mitigation hierarchy, inherent and
+residual risk and who accepts it, the register as an evidence record, proportionate tailoring, and
+the link from incidents back to risks.
+
+**Part 4 · The lifecycle (14–17, 23).** Governing a system from use case to retirement:
+development, deployment, fairness, incidents and agents.
+
+### 14. Governing AI development **[drafted]**
+The build as a chain of gates, each reading a record: the use-case record, design review, data for
+training and testing (the right to use it, quality, the admission gate, provenance and lineage),
+testing and validation (the test plan, statistical validity of evals, independent validation),
+release readiness and conformity, the technical file compiled by the pipeline, and impact
+assessments compared.
+
+### 15. Governing deployment and use **[drafted]**
+The deployer's lifecycle: the deployment decision and its record, choosing the model, model types
+and deployment options, build, buy or adapt, vendor contracts and licences, the go-live review,
+progressive delivery as a control, operating the system (drift, fairness and quality in
+production), periodic assurance, secondary use and downstream harm, external communications, and
+deactivation, localisation and retirement.
+
+### 16. Fairness and explainability for practitioners **[drafted]**
+Fairness and explainability as controls: where bias enters, protected characteristics and proxies,
+disparate treatment and impact, group metrics and the impossibility results, intersectional
+testing, choosing a metric by use case, mitigation, monitoring in production; interpretable models
+versus explanations after the fact, explanation techniques and their tests, the legal hooks, and
+explanation artefacts as evidence records, placed on the five layers.
+
+### 17. Incidents, issues and root causes **[drafted]**
+Incident, hazard, issue and serious incident told apart; a severity scale mapped to the reporting
+clocks; the response lifecycle, playbooks and drills; AI-specific failure modes; root-cause analysis
+and CAPA back into the risk register and the eval suite; deployer duties; the overlapping clocks;
+the incident record; learning from public incident databases.
+
+### 23. Governing AI agents **[drafted]**
+What makes an agent a governance object (delegated authority, tools, memory, autonomy): the agent
+registry, identity and short-lived credentials, tool and MCP server permissions, human checkpoints,
+runtime guardrails for tool calls, kill switches and per-agent circuit breakers, memory governance,
+multi-agent delegation, prompts under change control, agent incidents and telemetry, threats mapped
+to controls, the frameworks written for agents and the EU AI Act hooks. It is numbered 23 and belongs
+to the lifecycle part.
+
+**Part 5 · Law and standards (18–22).** The EU AI Act, data protection, the law that already
+applies, AI laws around the world, and the principles and standards.
+
+### 18. The EU AI Act in one pass **[drafted]**
+The Act as amended by the Digital Omnibus, end to end: scope and reach, the risk ladder, GPAI
+models, the high-risk requirements, provider and deployer duties, who you are in the value chain,
+the FRIA, explanation and notice, AI literacy, sandboxes and real-world testing, governance and
+enforcement, and the post-Omnibus timeline, each duty tied to an artefact.
+
+### 19. Privacy and data protection law applied to AI **[drafted]**
+Data protection duties for training and inference turned into artefacts: principles applied to AI,
+minimisation and PETs, controller duties across the supply chain, automated decision-making, data
+subject rights against trained models, whether a model contains personal data, special categories
+and biometrics, AI-specific breaches, the GDPR side of the Digital Omnibus, the regimes beyond the
+EU, and an obligation-to-artefact map.
+
+### 20. Other law that already applies to AI **[drafted]**
+Intellectual property, non-discrimination, consumer protection, product liability and deepfakes,
+each duty mapped to its evidence artefact and stack layer, closed by one hiring model read through
+all five bodies of law.
+
+### 21. AI-specific laws around the world **[drafted]**
+A dated field guide to the AI-specific regimes beside the EU AI Act (South Korea, the United States
+at federal and state level, Japan, China beyond chapter 08, Brazil, Canada, India, the United
+Kingdom, Italy, Spain, Singapore, Australia), compared, with the sector rules that already reach AI.
+
+### 22. Principles, soft law and standards **[drafted]**
+The instruments in order of force (OECD, UNESCO, the Council of Europe Convention, the G7 Hiroshima
+Process, the EU HLEG guidelines, the NIST AI RMF in depth, the ISO/IEC family, harmonised standards
+under the AI Act, IEEE 7000), each mapped to the stack layer and evidence record that answer it, and
+one control traced across many instruments.
 
 ## Consistency rules for parallel writers
 

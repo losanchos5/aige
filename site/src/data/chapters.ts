@@ -26,6 +26,14 @@ export interface Chapter {
    */
   glance?: readonly string[];
   /**
+   * "Key terms in this chapter": five to ten glossary page slugs
+   * (/glossary/<slug>, see src/lib/glossary.ts), the chapter's central terms
+   * first. Rendered under "At a glance" as links to the term pages; the chapter
+   * page fails the build on a slug the glossary does not define. Omitted for
+   * the glossary itself.
+   */
+  keyTerms?: readonly string[];
+  /**
    * The stack layer (1–5) this chapter is about, when it is about exactly one.
    * Only then does the chapter header take that layer's colour; any other
    * chapter reads neutral, because a layer colour means that layer and nothing
@@ -65,6 +73,10 @@ export const chapters: readonly Chapter[] = [
     // it still comes from the blockquote via remark-lead.
     summary:
       'Why this book exists, who it is for and how to use it: the first attempt to write down how to engineer the governance of AI systems.',
+    keyTerms: [
+      'ai-governance-engineering', 'ai-governance-engineer', 'policy-as-code', 'eval-gate',
+      'agent-registry', 'machine-readable-evidence', 'fria', 'dpia',
+    ],
   },
   {
     id: '01-definition',
@@ -80,6 +92,11 @@ export const chapters: readonly Chapter[] = [
       'A capability, not a job title: measured by realised risk reduction and audit-ready evidence.',
       'Three questions any function must answer from live systems: what AI is running, what it is allowed to do, what evidence proves it.',
       'The eval gate is necessary but not sufficient: it is point-in-time and sampling-bound.',
+    ],
+    keyTerms: [
+      'ai-governance-engineering', 'ai-governance-engineer', 'audit-ready-evidence',
+      'realised-risk-reduction', 'eval-gate', 'model-risk-management', 'prompt-injection',
+      'agent-agentic-ai',
     ],
   },
   {
@@ -97,6 +114,10 @@ export const chapters: readonly Chapter[] = [
       'The market is hiring for engineering skills before the profession has named itself, and the law now asks for engineered evidence on dated deadlines.',
       'Engineered governance turns the quarterly guess into a live query and the end-of-line gate into a control that fires where the system changes.',
     ],
+    keyTerms: [
+      'agent-agentic-ai', 'runtime-data-path', 'policy-as-code', 'eval-gate', 'agent-registry',
+      'ai-act-eu', 'digital-omnibus',
+    ],
   },
   {
     id: '03-values-principles',
@@ -112,6 +133,10 @@ export const chapters: readonly Chapter[] = [
       'A value is a preference stated as an affirmation; a principle is a commitment to act, with no vocabulary borrowed from the values.',
       'Evals that fail builds and agents that carry their own identity and scope are what AI forces us to add to established practice.',
       'Every value names the artefact it builds toward and the anti-pattern it rejects.',
+    ],
+    keyTerms: [
+      'evals-as-evidence', 'eval-gate', 'machine-readable-evidence', 'paved-path', 'kill-switch',
+      'guardrail', 'realised-risk-reduction', 'ai-harm', 'nhi',
     ],
   },
   {
@@ -129,6 +154,10 @@ export const chapters: readonly Chapter[] = [
       'The stack is not an org chart and not a maturity ladder.',
       'A team of one builds the spine thinly, end to end: one vertical slice beats one layer built out and four left on paper.',
     ],
+    keyTerms: [
+      'governance-as-code', 'policy-as-code', 'agent-registry', 'aibom', 'eval-gate', 'red-teaming',
+      'guardrail', 'kill-switch', 'continuous-assurance', 'oscal',
+    ],
   },
   {
     id: '05-patterns',
@@ -144,6 +173,10 @@ export const chapters: readonly Chapter[] = [
       'The CSIRO Responsible AI Pattern Catalogue structure (context, problem, solution, consequences) plus a Maps to line naming standards and articles.',
       'Every pattern realises one or more of the six principles and cites the OWASP agentic threats and NIST AI RMF functions it serves.',
       'Examples are illustrative sketches; EU AI Act mappings are not claims of conformity.',
+    ],
+    keyTerms: [
+      'policy-card', 'eval-gate', 'agent-registry', 'aibom', 'model-card', 'guardrail',
+      'kill-switch', 'fria', 'framework-crosswalk', 'oscal',
     ],
   },
   {
@@ -161,6 +194,10 @@ export const chapters: readonly Chapter[] = [
       'Analyst and engineer are both needed; the engineer does different work and is measured differently.',
       'A career ladder, three ways in, and what employers get wrong in the job description.',
     ],
+    keyTerms: [
+      'ai-governance-engineer', 'paved-path', 'policy-as-code', 'opa-rego', 'cedar',
+      'use-case-record', 'agent-registry',
+    ],
   },
   {
     id: '07-maturity-model',
@@ -177,6 +214,10 @@ export const chapters: readonly Chapter[] = [
       'Assessed across all five layers; you are at a level only when every layer has reached it.',
       'Observable criteria, metrics per level and a self-assessment checklist.',
     ],
+    keyTerms: [
+      'continuous-assurance', 'runtime-data-path', 'shadow-ai', 'iso-iec-42001', 'aims', 'aima',
+      'star-for-ai',
+    ],
   },
   {
     id: '08-regulatory-map',
@@ -192,6 +233,11 @@ export const chapters: readonly Chapter[] = [
       'Mappings are illustrative, not a claim of conformity; every EU AI Act date is the post-Omnibus date.',
       'The authority differs by regime: the AI Office for general-purpose AI, national market-surveillance authorities for high-risk systems.',
       "No harmonised standard is yet cited in the Official Journal, so Article 40's presumption of conformity is available to no one.",
+    ],
+    keyTerms: [
+      'ai-act-eu', 'digital-omnibus', 'gpai', 'harmonised-standard', 'presumption-of-conformity',
+      'nist-ai-rmf', 'iso-iec-42001', 'framework-crosswalk', 'serious-incident',
+      'post-market-monitoring',
     ],
   },
   {
@@ -213,6 +259,9 @@ export const chapters: readonly Chapter[] = [
     shortTitle: 'Reading List',
     summary:
       'The sources that formed the discipline, curated and annotated, each with a verified URL and a one-line note on why it matters.',
+    keyTerms: [
+      'nist-ai-rmf', 'iso-iec-42001', 'oecd-ai-principles', 'atlas', 'oscal', 'policy-card',
+    ],
   },
   {
     id: '11-ai-defined',
@@ -228,6 +277,10 @@ export const chapters: readonly Chapter[] = [
       'The OECD, EU AI Act, ISO/IEC 22989 and NIST definitions converge on inference, outputs and autonomy, and each element becomes a registry field that drives a decision.',
       'A kind of AI matters when it changes a control: predictive, generative, RAG, on-device and agentic systems each need a different control set.',
       'A score is not a decision: thresholds are owned policy, calibrated and set by risk tier, and a published responsible-AI principle counts only when an artefact evidences it.',
+    ],
+    keyTerms: [
+      'ai-system', 'machine-learning', 'foundation-model', 'generative-ai', 'gpai',
+      'agent-agentic-ai', 'autonomy', 'adaptiveness', 'intended-purpose', 'human-oversight',
     ],
   },
   {
@@ -245,6 +298,10 @@ export const chapters: readonly Chapter[] = [
       'AI literacy is a role-based system: structured training records that expire, with attestation as the condition for access to AI tools and override consoles.',
       'Each policy rule is written once as data and compiled into both the prose people read and the policy-engine check the pipeline runs.',
     ],
+    keyTerms: [
+      'ai-governance-committee', 'three-lines-model', 'acceptable-use-policy-aup', 'ai-literacy',
+      'shadow-ai', 'exception-register', 'risk-acceptance', 'key-risk-indicator-kri',
+    ],
   },
   {
     id: '13-risk-management',
@@ -260,6 +317,11 @@ export const chapters: readonly Chapter[] = [
       'Likelihood and severity sit on defined five-level scales, and any catastrophic (S5) scenario is Critical whatever its likelihood.',
       'Risk appetite is compiled into tier tolerances and a deploy gate, and every residual risk needs a named, expiring acceptance.',
       'The risk register is versioned data keyed to the registry, and its intensity is tailored by size, sector, maturity, products, objectives and tolerance.',
+    ],
+    keyTerms: [
+      'risk-management', 'risk-register', 'risk-appetite', 'risk-tolerance', 'inherent-risk',
+      'residual-risk', 'risk-matrix', 'mitigation-hierarchy', 'risk-acceptance',
+      'stakeholder-mapping',
     ],
   },
   {
@@ -277,6 +339,11 @@ export const chapters: readonly Chapter[] = [
       'Freeze the test plan before testing and report intervals: a 0.96 pass rate on 200 cases cannot be told apart from a 0.95 threshold.',
       'Most of Annex IV can be generated from pipeline records; people still write the rationale, the residual-risk judgements and the signatures.',
     ],
+    keyTerms: [
+      'use-case-record', 'dataset-admission-gate', 'data-provenance', 'data-lineage',
+      'datasheet-for-datasets', 'model-card', 'technical-documentation-annex-iv',
+      'substantial-modification', 'go-no-go-decision', 'conformity-assessment',
+    ],
   },
   {
     id: '15-governing-deployment',
@@ -292,6 +359,11 @@ export const chapters: readonly Chapter[] = [
       'Choose models on task-specific evals on your own data: public benchmarks and leaderboards build a shortlist, they do not make the decision.',
       'A deployer becomes a provider by rebranding, substantially modifying or repurposing a high-risk system, and the contract decides what it may test and how it leaves.',
       'Operate with pre-registered rollback criteria, owned drift and fairness signals, tested degraded modes and a retirement runbook.',
+    ],
+    keyTerms: [
+      'deployer', 'provider', 'deployment-decision-record-ddr', 'canary-release',
+      'shadow-deployment', 'rollback-criteria', 'drift', 'version-pinning', 'decommissioning',
+      'open-weight-model',
     ],
   },
   {
@@ -309,6 +381,11 @@ export const chapters: readonly Chapter[] = [
       'An explanation is an output that needs evals: fidelity, stability, sanity, reason-code consistency and comprehension testing with the people who receive it.',
       'One explanation record per decision, pinned to model version, method and baseline, serves Regulation B notices, GDPR Art. 15(1)(h) requests and AI Act Art. 86 requests.',
     ],
+    keyTerms: [
+      'fairness', 'bias', 'disparate-impact', 'adverse-impact-ratio-air', 'demographic-parity',
+      'equalised-odds', 'explainability', 'counterfactual-explanation', 'explanation-record',
+      'contestability',
+    ],
   },
   {
     id: '17-incidents',
@@ -324,6 +401,10 @@ export const chapters: readonly Chapter[] = [
       'Contain first, then freeze the evidence before fixing: the AI Act bars altering a high-risk system in ways that affect the evaluation of causes before authorities are informed.',
       "One event can start several clocks (AI Act, GPAI Code, GDPR, NIS2, DORA, CRA), so keep one incident record and generate each regime's report from it.",
       'Every closed incident leaves a regression eval, a risk-register change and a verified CAPA, coded against a cause taxonomy that names the control that should have caught it.',
+    ],
+    keyTerms: [
+      'ai-incident', 'ai-hazard', 'serious-incident', 'near-miss', 'reporting-clock',
+      'root-cause-analysis-rca', 'capa', 'blameless-post-mortem', 'tabletop-exercise',
     ],
   },
   {
@@ -341,6 +422,10 @@ export const chapters: readonly Chapter[] = [
       'Roles name tasks, not organisations: one organisation can be provider and deployer at once, and Article 25 turns rebranding, substantial modification or a new high-risk purpose into provider duties.',
       'Every duty maps to an artefact: a classification decision record for Article 6(3), registry fields for Article 26, FRIA-as-code for Article 27 and an explanation record for Article 86.',
     ],
+    keyTerms: [
+      'ai-act-eu', 'digital-omnibus', 'provider', 'deployer', 'high-risk-ai-system',
+      'prohibited-practice', 'article-6-3-filter', 'gpai', 'conformity-assessment', 'fria',
+    ],
   },
   {
     id: '19-privacy-and-ai',
@@ -356,6 +441,11 @@ export const chapters: readonly Chapter[] = [
       'The EDPB treats a trained model as anonymous only when extraction and query-based disclosure of training data are insignificant, so privacy attacks belong in the eval gate as evidence.',
       'Rights requests must reach corpus, snapshots, RAG index, logs and weights, answered by suppression, retraining or unlearning and proven by a fulfilment record.',
       'The GDPR part of the Digital Omnibus is still a proposal as of 2026-09-24, so build the controls both versions want and keep breach clocks and thresholds configurable.',
+    ],
+    keyTerms: [
+      'lawful-basis', 'dpia', 'data-minimisation', 'purpose-limitation', 'special-category-data',
+      'automated-decision-making-adm', 'privacy-enhancing-technology-pet', 'machine-unlearning',
+      'membership-inference', 'controller-and-processor',
     ],
   },
   {
@@ -373,6 +463,11 @@ export const chapters: readonly Chapter[] = [
       'Anti-discrimination law reads fairness through tests such as the four-fifths rule, adverse-action reasons and objective justification, so evals must report in those terms.',
       'The EU Product Liability Directive treats software as a product from 9 Dec 2026 and lets courts order disclosure, so every AI release needs a complete defence file.',
     ],
+    keyTerms: [
+      'product-liability-directive-pld', 'design-defect', 'disparate-impact',
+      'indirect-discrimination', 'four-fifths-rule', 'udap', 'ai-washing', 'tdm-exception',
+      'fair-use', 'algorithmic-disgorgement',
+    ],
   },
   {
     id: '21-ai-laws-worldwide',
@@ -388,6 +483,11 @@ export const chapters: readonly Chapter[] = [
       'The US has no federal AI statute for private actors: OMB memoranda bind agencies and their vendors, state laws bind everyone else, and the federal push to preempt those laws was unresolved on 24 September 2026.',
       'Most regimes ask for the same artefacts (inventory, classification record, notice, label, risk assessment, incident report, retained evidence), so build them once and parameterise trigger, clock and recipient per jurisdiction.',
       "Sector rules already reach AI: the Cyber Resilience Act's reporting duties began on 11 September 2026, and SR 26-2 replaced SR 11-7 as US bank model-risk guidance in April 2026.",
+    ],
+    keyTerms: [
+      'sb-53', 'raise-act', 'tc260', 'cac-cyberspace-administration-of-china',
+      'high-impact-ai-korea', 'ai-business-operator-korea',
+      'algorithmic-transparency-recording-standard-atrs', 'ai-regulatory-sandbox', 'frontier-model',
     ],
   },
   {
@@ -405,6 +505,11 @@ export const chapters: readonly Chapter[] = [
       'NIST AI RMF category and subcategory ids and ISO/IEC clause ids work best as control metadata from which profiles and crosswalks are generated.',
       'As of 2026-09-24 we found no AI Act harmonised standard cited in the Official Journal: EN 18286 is published and the other JTC 21 drafts are at or before Enquiry.',
     ],
+    keyTerms: [
+      'oecd-ai-principles', 'nist-ai-rmf', 'ai-rmf-functions', 'iso-iec-42001', 'aims',
+      'harmonised-standard', 'presumption-of-conformity', 'en-18286',
+      'framework-convention-on-ai-cets-no-225', 'hiroshima-code-of-conduct',
+    ],
   },
   {
     id: '23-governing-agents',
@@ -420,6 +525,10 @@ export const chapters: readonly Chapter[] = [
       'Channel authentication is not agent identity: MCP authorization (spec 2026-07-28) secures one hop, while a short-lived workload identity with delegation, never impersonation, makes the agent attributable across all of them.',
       'Every tool call passes a deny-by-default gateway with pinned tool definitions, budgets and checkpoints that show the raw call, and every stop level is drilled and verified to hold.',
       'Memory, prompts and delegation chains are governed like configuration: writes carry provenance, prompts sit behind an eval gate, and scope only narrows from hop to hop.',
+    ],
+    keyTerms: [
+      'agent-agentic-ai', 'agent-registry', 'mcp', 'cimd', 'autonomy', 'human-in-the-loop-hitl',
+      'kill-switch', 'guardian-agent', 'prompt-injection', 'asi01-asi10',
     ],
   },
 ];

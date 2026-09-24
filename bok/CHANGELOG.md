@@ -512,6 +512,32 @@ a completed, reviewed core (1.0).
 - The pattern map and the discipline map draw the new patterns (regenerated `pattern-map.svg` and
   `discipline-map.svg`); `site/src/data/map.ts` gains shorts for the five longest new pattern names.
 
+### Added
+- "Key terms in this chapter" (`keyTerms` in `site/src/data/chapters.ts`): five to ten glossary
+  slugs per chapter (every chapter but the glossary), rendered under "At a glance" as links to
+  `/glossary/<slug>` that open the same hover cards as the terms in the prose. The chapter page
+  fails the build on a slug the glossary does not define.
+- "What you can do this week" closes chapters 04, 06 and 07, five concrete actions each, as in the
+  chapters from 11 on.
+- The preface routes each audience into the book (governance leads, security, privacy, MLOps, risk
+  leads and CISOs, executives and boards, lawyers, the public sector, small organisations) and gains
+  a "How to use this book" section on the five parts, linked to the parts of the `/bok` index.
+
+### Changed
+- Chapters link to each other by section: every remaining chapter-to-chapter link without an anchor
+  in chapters 04, 06 and 11 to 23 now points at the section that treats the topic, and the
+  cross-links left in earlier handoffs for these chapters are applied (chapter 23 to chapters 11, 15
+  and 21 and to the obligation pages of Arts. 12, 14, 15, 25, 26 and 50; chapters 04, 11, 14, 15, 17
+  and 21 to the matching sections of chapter 23; chapter 07 to the maturity self-check; chapters 14,
+  15 and 16 to their tool categories; chapter 22 to the crosswalk explorer).
+- Chapters 01, 02, 03, 06 and 07 link the later chapters where they first introduce a topic now
+  taught in depth (risk, the lifecycle, fairness, incidents, the EU AI Act, privacy, agents), one
+  link per topic.
+- Links from chapters to a pattern point at the pattern's own page (`/patterns/<slug>`) instead of
+  its catalogue anchor, which still resolves.
+- `OUTLINE.md` lists the 24 chapters in five parts, with a brief for chapters 11 to 23, and describes
+  the pattern pages.
+
 ## [Unreleased] - 2026-09-20
 
 Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the

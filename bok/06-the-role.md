@@ -57,7 +57,9 @@ The engineer owns the inventory of models and the **agent registry**, the runtim
 every non-human actor, each with an owner, a declared scope, a status and a kill switch. The
 capability that distinguishes the engineer here is the runtime data path: the registry is fed by the
 deployment pipeline and by discovery against production, not typed into a spreadsheet, and every
-non-human actor in it carries its own identity. **Maps to** Inventory & Transparency.
+non-human actor in it carries its own identity; chapter 23 sets out what
+[an agent's registry entry](/bok/governing-agents#the-agent-registry) has to carry. **Maps to**
+Inventory & Transparency.
 
 ### Evals and red teaming as evidence
 
@@ -102,7 +104,7 @@ article, an ISO/IEC 42001 control or a NIST AI RMF subcategory into a gate, a re
 evidence artefact, and back, so an auditor can trace the control to the obligation. This is
 translation, not legal advice; the engineer depends on Legal to confirm the obligation is read right.
 **Maps to** all five layers; it is the spine that chapter 08 indexes, and chapter 18 reads
-[the EU AI Act in one pass](/bok/eu-ai-act) for the engineer who has to translate it.
+[the EU AI Act in one pass](/bok/eu-ai-act#how-to-read-this-chapter) for the engineer who has to translate it.
 
 ## Skills, by workflow
 
@@ -240,6 +242,20 @@ Reading the postings against the workflows above, three mistakes recur.
 (post-market monitoring), Art. 73 (serious-incident reporting) · ISO/IEC 42001 (roles,
 responsibilities and competence) · NIST AI RMF (Govern) · OWASP Top 10 for Agentic Applications 2026.
 Mappings are illustrative, not a claim of conformity.
+
+## What you can do this week
+
+1. **Map the seven workflows.** Write down who owns intake, inventory, evals, policy-as-code,
+   runtime and incidents, assurance and regulatory translation today, and mark the ones nobody owns.
+2. **Own one workflow outright.** Pick the one with the least build in it (often the registry or
+   the eval gate) and ship one control there that blocks or records, not one that recommends.
+3. **Rewrite one job description.** Replace the list of certifications with the workflows the hire
+   will own and the artefacts they will ship in their first quarter.
+4. **Practise one core skill on a real system.** From the skills table, take the core skill your
+   workflow lacks and use it once on a live pipeline: one policy in `OPA/Rego`, one eval in a
+   harness, one trace in OpenTelemetry.
+5. **Translate one article in a pair.** Sit a lawyer or DPO with an engineer and turn one AI Act
+   article into a gate, a registry field or an evidence artefact, and back again.
 
 ## Sources
 

@@ -7,13 +7,30 @@
  * structured block before the text starts. Items come from `chapter.glance`
  * in src/data/chapters.ts. The column count follows the item count, so no
  * row is left with a single orphan: four items read 2×2, three read 3×1.
+ *
+ * Under it sits "Key terms in this chapter": the chapter's `keyTerms`
+ * (chapters.ts), resolved to glossary entries by the page, as a flat row of
+ * term links to /glossary/<slug>. They carry the same `a.term` class and
+ * `data-term` key as the terms rehype-glossary wraps in the prose, so the
+ * hover cards (public/glossary-cards.js) work on them too. A chapter with key
+ * terms and no glance (the preface) shows the row alone.
  */
+interface KeyTerm {
+  /** Display name, from the glossary entry. */
+  term: string;
+  /** /glossary/<slug>. */
+  url: string;
+  /** The term's `t-` id, the hover cards' key. */
+  id: string;
+}
+
 interface Props {
   items?: readonly string[];
+  terms?: readonly KeyTerm[];
   class?: string;
 }
 
-const { items, class: className } = Astro.props;
+const { items, terms, class: className } = Astro.props;
 const count = items?.length ?? 0;
 const cols = count % 3 === 0 ? 3 : count % 2 === 0 ? 2 : 1;
 ---
@@ -31,6 +48,24 @@ const cols = count % 3 === 0 ? 3 : count % 2 === 0 ? 2 : 1;
         ))}
       </ol>
     </aside>
+  )
+}
+{
+  terms && terms.length > 0 && (
+    <div class:list={['key-terms', !(items && items.length > 0) && className]}>
+      <p class="key-terms-label" id="key-terms-label">
+        Key terms in this chapter
+      </p>
+      <ul class="key-terms-list" aria-labelledby="key-terms-label">
+        {terms.map((t) => (
+          <li>
+            <a class="term" href={t.url} data-term={t.id}>
+              {t.term}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
@@ -104,5 +139,52 @@ const cols = count % 3 === 0 ? 3 : count % 2 === 0 ? 2 : 1;
     line-height: 1.5;
     color: var(--ink);
     text-wrap: pretty;
+  }
+
+  /* Key terms: a hairline-ruled row under the glance box, not a second box.
+     It takes the same bleed so its label lines up with the box's content. */
+  .key-terms {
+    margin: var(--s-5) 0 var(--s-6);
+    padding: var(--s-3) var(--s-5);
+    border-block: 1px solid var(--line);
+  }
+
+  :global(.prose) > .key-terms {
+    width: 100cqw;
+    margin-inline: calc(50% - 50cqw);
+  }
+
+  /* Tuck the row under the glance box: one --s-3 step instead of --s-6. */
+  .glance:has(+ .key-terms) {
+    margin-bottom: var(--s-3);
+  }
+
+  .glance + .key-terms {
+    margin-top: 0;
+  }
+
+  .key-terms-label {
+    margin: 0 0 var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .key-terms-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-small);
+    line-height: 1.5;
+  }
+
+  .key-terms-list li {
+    margin: 0;
+    padding: 0;
   }
 </style>

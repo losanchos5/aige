@@ -345,7 +345,7 @@ downstream" [22]. Most organisations call one through an API or adapt an open-we
 evidence moves from produced to collected: the provider's model card and evaluations become inputs
 to your registry entry, and the version you pin becomes a change you manage (see [Third-party and
 procured AI](/bok/the-stack#third-party-and-procured-ai) and the [Vendor / Model Due-Diligence
-Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate)). GPAI is the AI Act's nearest legal
+Gate](/patterns/vendor-model-due-diligence-gate)). GPAI is the AI Act's nearest legal
 category, with its own duties on the model provider (see [GPAI Code of
 Practice](/bok/regulatory-map#gpai-code-of-practice)).
 
@@ -384,19 +384,19 @@ delegated authority, often over many steps. It changes the governance problem mo
 output is an effect in a system of record, not a recommendation a person reads. The threats are
 catalogued in the OWASP Top 10 for Agentic Applications [25], and the controls are the layer 04 set:
 identity, scope, tool mediation, human gates and a tested stop ([Agent Identity & Scoped
-Credentials](/bok/patterns#pattern-agent-identity--scoped-credentials), [Kill Switch / Circuit
-Breaker](/bok/patterns#pattern-kill-switch--circuit-breaker), [Human-in-the-loop
-Gate](/bok/patterns#pattern-human-in-the-loop-gate)). The full treatment is in [Governing
-agents](/bok/governing-agents).
+Credentials](/patterns/agent-identity-scoped-credentials), [Kill Switch / Circuit
+Breaker](/patterns/kill-switch-circuit-breaker), [Human-in-the-loop
+Gate](/patterns/human-in-the-loop-gate)). The full treatment is in [Governing
+agents](/bok/governing-agents#what-makes-an-agent-a-governance-object).
 
 ### Why the type matters: the control set by kind
 
 | Kind | Distinctive harm | Control that changes | Layer · pattern |
 |---|---|---|---|
-| Predictive or scoring | Wrong or biased allocation | Calibration and subgroup evals; a threshold policy with an owner | 03 · [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci); 01 · [Policy Card](/bok/patterns#pattern-policy-card) |
-| Generative | Confabulation, IP, information integrity, abusive content | Groundedness and red-team evals; output guardrails; content marking | 03 · [Adversarial Red-Team Suite](/bok/patterns#pattern-adversarial-red-team-suite); 04 · [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) |
-| Foundation or GPAI model, procured | Inherited defects; evidence you cannot produce | Due diligence; version pinning; base model in the AIBOM | 02 · [AIBOM](/bok/patterns#pattern-aibom); Vendor / Model Due-Diligence Gate |
-| SLM on device | No central telemetry; update lag | Guardrails shipped with the model; device-level version inventory | 02 · [Agent Registry](/bok/patterns#pattern-agent-registry); 04 · Kill Switch |
+| Predictive or scoring | Wrong or biased allocation | Calibration and subgroup evals; a threshold policy with an owner | 03 · [Eval Gate in CI](/patterns/eval-gate-in-ci); 01 · [Policy Card](/patterns/policy-card) |
+| Generative | Confabulation, IP, information integrity, abusive content | Groundedness and red-team evals; output guardrails; content marking | 03 · [Adversarial Red-Team Suite](/patterns/adversarial-red-team-suite); 04 · [Runtime Guardrail](/patterns/runtime-guardrail) |
+| Foundation or GPAI model, procured | Inherited defects; evidence you cannot produce | Due diligence; version pinning; base model in the AIBOM | 02 · [AIBOM](/patterns/aibom); Vendor / Model Due-Diligence Gate |
+| SLM on device | No central telemetry; update lag | Guardrails shipped with the model; device-level version inventory | 02 · [Agent Registry](/patterns/agent-registry); 04 · Kill Switch |
 | Multimodal | New injection and personal-data channels | Guardrails per modality; cross-modal evals; marking | 04 · Runtime Guardrail; 03 · Red-Team Suite |
 | RAG | Corpus changes behaviour; retrieval leaks | Corpus as governed data; entitlement check at retrieval; groundedness evals | 02 · data card; 04 · Runtime Guardrail |
 | Agentic | Actions under delegated authority | Identity, scope, human gates, tested stop | 04 · Agent Identity & Scoped Credentials; Kill Switch; Human-in-the-loop Gate |
@@ -419,9 +419,9 @@ eight characteristics an engineer has to design for.
 | Characteristic | Why classic IT governance fails | What answers it (layer · pattern) | Evidence it emits |
 |---|---|---|---|
 | **Complexity** | The CMDB records the application; the model, datasets, prompts, retrieval corpus and tool graph inside it are invisible | 02 · AIBOM, Agent Registry | An AIBOM per build; registry links from system to model to data |
-| **Opacity** | Code review assumes the logic is readable; model internals are not | 03 · behavioural evals; 02 · [Model Card as Control Evidence](/bok/patterns#pattern-model-card-as-control-evidence) | Eval results against named failure modes; logged explanations |
+| **Opacity** | Code review assumes the logic is readable; model internals are not | 03 · behavioural evals; 02 · [Model Card as Control Evidence](/patterns/model-card-as-control-evidence) | Eval results against named failure modes; logged explanations |
 | **Autonomy** | Access control and segregation of duties assume a person behind each session | 04 · Agent Identity & Scoped Credentials; Human-in-the-loop Gate; Kill Switch | Identity events; gate decisions with approver; kill-switch drill records |
-| **Speed and scale** | Periodic, sample-based review meets after one error has repeated a million times | 04 · Runtime Guardrail, Kill Switch / Circuit Breaker; 05 · [Continuous Assurance Telemetry](/bok/patterns#pattern-continuous-assurance-telemetry) | Guardrail decisions; breaker trips; rollback records |
+| **Speed and scale** | Periodic, sample-based review meets after one error has repeated a million times | 04 · Runtime Guardrail, Kill Switch / Circuit Breaker; 05 · [Continuous Assurance Telemetry](/patterns/continuous-assurance-telemetry) | Guardrail decisions; breaker trips; rollback records |
 | **Probabilistic outputs** | Tests are pass/fail against a spec; a single wrong answer is a bug | 03 · Eval Gate in CI with thresholds; 01 · Policy Card per risk tier | Calibration and threshold results per version |
 | **Data dependency** | Data governance protects data as records, not as the source of behaviour | 02 · data card and lineage; 03 · data-quality and subgroup tests | Data card; lineage record; test results filed against the dataset version |
 | **Dual use and misuse** | Threat models centre on unauthorised access, not authorised use for a harmful end | 03 · Adversarial Red-Team Suite; 04 · Runtime Guardrail; 01 · acceptable use as code | Red-team findings; misuse detections; policy verdicts |
@@ -480,7 +480,7 @@ where engineering adds the most.
 A predictive model emits a score. A decision is a score, plus a threshold, plus an action taken when
 the score crosses it. The threshold is where risk appetite becomes behaviour, so it is a policy
 decision with an owner, a version and an effective date, not a hyperparameter left at 0.5. Write it
-as a [Policy Card](/bok/patterns#pattern-policy-card) rule, test it in the eval gate and log it with
+as a [Policy Card](/patterns/policy-card) rule, test it in the eval gate and log it with
 every decision it produces. When an auditor asks why an applicant was declined, "the score was 0.41
 and the threshold, owned by credit risk and effective since 1 October, was 0.45" is an answer; "the
 model said no" is not.
@@ -507,7 +507,7 @@ on.
 The certainty a decision needs depends on what being wrong costs, so the runtime rule is set by risk
 tier. Three moves recur. An **abstention band** routes scores that are neither clearly positive nor
 clearly negative to a person through a [Human-in-the-loop
-Gate](/bok/patterns#pattern-human-in-the-loop-gate). An **adverse-outcome rule** sends every
+Gate](/patterns/human-in-the-loop-gate). An **adverse-outcome rule** sends every
 decision that harms the subject to review, however confident the model. An **out-of-distribution
 rule** refuses or escalates inputs unlike anything the system was tested on, because a confident
 score on an unfamiliar input is the least trustworthy output a model produces.
@@ -625,7 +625,7 @@ principle.
 
 | Shared principle | House values | House principles | Artefact that evidences it | Layer · pattern |
 |---|---|---|---|---|
-| Fairness | 2 evals fail builds; 7 realised risk reduction | Start from a named harm; give every control teeth | Subgroup eval results against a declared threshold; data card with representativeness notes; FRIA | 03 · Eval Gate in CI; 01 · [FRIA-as-Code](/bok/patterns#pattern-fria-as-code) |
+| Fairness | 2 evals fail builds; 7 realised risk reduction | Start from a named harm; give every control teeth | Subgroup eval results against a declared threshold; data card with representativeness notes; FRIA | 03 · Eval Gate in CI; 01 · [FRIA-as-Code](/patterns/fria-as-code) |
 | Safety and reliability | 2; 3 evidence from runtime | Build at the earliest point; give every control teeth | Eval-gate and red-team results per version; guardrail decisions; kill-switch drill records | 03 · Adversarial Red-Team Suite; 04 · Runtime Guardrail, Kill Switch |
 | Privacy and security | 1 governance is code; 4 identity and scope | Register and bound every actor; build at the earliest point | Policy verdicts on data class and residency; scoped credentials; DPIA; PII-leakage evals | 01 · Policy Card; 04 · Agent Identity & Scoped Credentials |
 | Transparency and explainability | 5 machine-readable evidence; 6 inspectable tooling | Instrument the build | Model card, data card and AIBOM; disclosure and marking records; [reason codes logged per decision](/patterns/explanation-artefact) | 02 · Model Card as Control Evidence; AIBOM |

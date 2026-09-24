@@ -7,6 +7,7 @@ import { chaptersOrdered } from '../../data/chapters';
 import { site } from '../../data/site';
 import { gitCreated, gitDate } from '../../lib/reading';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { getGlossaryEntry } from '../../lib/glossary';
 
 export async function getStaticPaths() {
   const entries = await getCollection('bok');
@@ -52,6 +53,17 @@ const updated = gitDate(`../${editPath}`);
 const published = gitCreated(`../${editPath}`);
 // The chapter's own Open Graph card, built by src/pages/og/[...slug].png.ts.
 const ogPath = `/og/bok-${chapter.slug}.png`;
+
+// "Key terms in this chapter": each slug in chapters.ts `keyTerms` resolves to
+// its glossary entry here, so a typo or a renamed term fails the build instead
+// of shipping a link to a missing /glossary page.
+const keyTerms = (chapter.keyTerms ?? []).map((slug) => {
+  const entry = getGlossaryEntry(slug);
+  if (!entry) {
+    throw new Error(`chapters.ts: "${chapter.id}" lists key term "${slug}", not in the glossary`);
+  }
+  return { term: entry.term, url: entry.url, id: entry.id };
+});
 
 // Visible breadcrumb: Body of Knowledge › NN · Short title. The full title
 // already opens with "NN.", so the crumb uses the short navigation label to
@@ -137,7 +149,7 @@ const jsonLd = {
   jsonLd={jsonLd}
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
 >
-  <AtAGlance items={chapter.glance} />
+  <AtAGlance items={chapter.glance} terms={keyTerms} />
   <Content />
   {/* After the sources: the sign-up, out of the search index and of snippets so
       it never shows up as chapter text. Renders nothing without an endpoint. */}
