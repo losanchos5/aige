@@ -1,0 +1,72 @@
+name: Propose a case study
+description: Propose a public AI incident to write up as an engineering post-mortem in /cases.
+title: "[Case] "
+labels: ["case"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cases are public AI incidents told as engineering post-mortems: what happened, the failure
+        mode, the control or pattern that would have caught it, the evidence it would have left
+        and the obligations it touches today. A case needs a primary record (a court decision, a
+        regulator's order, an official report or the original paper); a case carried only by the
+        press is marked `reported`. No confidential or private information.
+  - type: input
+    id: title
+    attributes:
+      label: Case
+      description: A short name for the incident.
+    validations:
+      required: true
+  - type: input
+    id: when-where
+    attributes:
+      label: When and where
+      description: The date or period, the jurisdiction and the organisation involved, as the public record states them.
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Two to five sentences, sticking to what the sources state.
+    validations:
+      required: true
+  - type: textarea
+    id: failure-mode
+    attributes:
+      label: Failure mode and the control that would have caught it
+      description: What failed technically or organisationally, and which control or pattern (chapter 05) would have caught it.
+    validations:
+      required: true
+  - type: input
+    id: primary-source
+    attributes:
+      label: Primary source URL
+      description: The court decision, regulator's order, official report or original paper.
+    validations:
+      required: true
+  - type: dropdown
+    id: verified
+    attributes:
+      label: Verification tag
+      options:
+        - "primary: I opened the primary record"
+        - "secondary: a reputable outlet reports it"
+        - "reported: only secondary sources carry it"
+    validations:
+      required: true
+  - type: input
+    id: incident-db
+    attributes:
+      label: Incident database record (optional)
+      description: The matching AI Incident Database, AIAAIC or OECD AIM entry, if there is one.
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: The case is public and the proposal contains nothing confidential.
+          required: true

@@ -4,13 +4,33 @@
 // the files are read from dist, which is what the preview server serves.
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-// Every indexable route: 11 chapters, the two Thesis pages and the 15 hand-built
-// pages. Bump this when a route is added, so a new page without a `lastmod`
-// source in astro.config.ts cannot slip in unnoticed.
-const INDEXABLE_ROUTES = 28;
+// Every indexable route is every HTML page the build writes, less the ones the
+// sitemap filter in astro.config.ts leaves out (the OG cards, the diagram
+// viewers and the 404). Counted from dist rather than typed, so parallel
+// changes that add pages never fight over one number; a new page without a
+// `lastmod` source in SOURCE_BY_PATH still fails the lastmod count below.
+function htmlRoutes(dir: string, root = dir): string[] {
+  const out: string[] = [];
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) out.push(...htmlRoutes(full, root));
+    else if (name.endsWith('.html')) {
+      const route = full
+        .slice(root.length)
+        .replace(/\\/g, '/')
+        .replace(/\.html$/, '')
+        .replace(/\/index$/, '');
+      out.push(route === '' ? '/' : route);
+    }
+  }
+  return out;
+}
+const INDEXABLE_ROUTES = htmlRoutes('dist').filter(
+  (route) => !/^\/(og|diagrams)\//.test(route) && route !== '/404',
+).length;
 
 test.describe('sitemap', () => {
   test(`every one of the ${INDEXABLE_ROUTES} URLs carries a dated lastmod`, async ({ request }) => {

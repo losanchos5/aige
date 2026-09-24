@@ -1,0 +1,53 @@
+name: Report an error on a page
+description: A wrong fact, a dead or wrong source, an outdated date or a broken page on aigovernanceengineer.com.
+title: "[Error] "
+labels: ["correction"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you. Corrections are checked against the primary source and, when they hold, ship
+        as a patch release recorded in the changelog. See the methodology page
+        (https://aigovernanceengineer.com/about/methodology) for how sources are tagged and dated.
+  - type: input
+    id: url
+    attributes:
+      label: Page URL
+      description: The page with the error. Add the section anchor if you can (for example /bok/eu-ai-act#the-risk-ladder).
+      placeholder: https://aigovernanceengineer.com/bok/...
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of error
+      options:
+        - A wrong or unsupported fact
+        - A dead, wrong or weak source
+        - An outdated date or status ("as of")
+        - A broken link, layout or accessibility problem
+        - A typo or unclear wording
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What is wrong
+      description: Quote the sentence or describe the problem as precisely as you can.
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: What it should say (optional)
+      description: The corrected wording or the fix you suggest.
+    validations:
+      required: false
+  - type: input
+    id: source
+    attributes:
+      label: Source (optional)
+      description: A link to the primary source that supports the correction, if there is one.
+    validations:
+      required: false

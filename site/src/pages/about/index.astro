@@ -71,6 +71,10 @@ try {
   </p>
   <ul>
     <li>
+      <a href="/about/methodology">Methodology</a>: how sources are chosen and tagged, how dates are
+      kept current, and how corrections, reviews and releases work.
+    </li>
+    <li>
       <a href="/about/contributors">Contributors and signatories</a>: who has written, revised or
       signed.
     </li>
@@ -88,9 +92,14 @@ try {
       <Fragment>
         <h2>Download</h2>
         <p>
-          The full Body of Knowledge (the Thesis and all eleven chapters, contributors and
-          changelog) is available as a single PDF.{' '}
-          <a href={pdfHref}>Download the PDF (v{site.bokVersion}, {pdfSize})</a>.
+          The Body of Knowledge as released in v{site.bokVersion} (the Thesis, every chapter of that
+          release, contributors and changelog) is available as a single PDF.{' '}
+          <a
+            href={pdfHref}
+            data-umami-event="download"
+            data-umami-event-file={pdfHref}
+            data-umami-event-location="about"
+          >Download the PDF (v{site.bokVersion}, {pdfSize})</a>.
         </p>
       </Fragment>
     )
@@ -101,7 +110,7 @@ try {
     New and updated chapters, and each released version, are announced in the{' '}
     <a href="/rss.xml">RSS feed</a>.
   </p>
-  <NewsletterForm />
+  <NewsletterForm location="about" />
 
   <h2>Cite</h2>
   <p>

@@ -420,3 +420,12 @@ chapter and recorded once below._
 | 53 | 6.1 algorithmic impact assessment completed, approved and published on the Open Government Portal before production, updated on a schedule and when functionality or scope changes; 6.3.7 expert review; Appendix B impact levels defined by reversibility and duration | Directive on Automated Decision-Making | Treasury Board of Canada Secretariat | 2025-06-24 | https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=32592 | primary | Impact assessments compared; The technical file |
 | 54 | guidance for assessing impacts on individuals, groups and society throughout the life cycle, updated as needed; complements ISO/IEC 42001 and ISO/IEC 23894 | ISO/IEC 42005:2025, AI system impact assessment | ISO/IEC | 2025-05 | https://www.iso.org/standard/44545.html | primary | Impact assessments compared |
 | 55 | FRIA by deployers that are bodies governed by public law or private entities providing public services, and deployers of Annex III points 5(b) and (c), except point 2 systems; elements (a) to (f); results notified to the market surveillance authority; 27(4) relationship with the DPIA | EU AI Act Art. 27 | AI Act (Reg. (EU) 2024/1689) | 2024 | https://artificialintelligenceact.eu/article/27/ | primary | Impact assessments compared |
+
+## site/src/pages/about/methodology.astro
+
+A hand-built site page, not a chapter; its numbering is local to the page, as in the chapters.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | MAJOR.MINOR.PATCH: increment MAJOR for incompatible changes, MINOR for backward-compatible additions, PATCH for backward-compatible fixes; the book follows it "in spirit" | Semantic Versioning 2.0.0 | semver.org (originally authored by Tom Preston-Werner) | undated | https://semver.org/spec/v2.0.0.html | primary | Versioning and DOI |
+| 2 | A Version DOI identifies one version of a record; a Concept DOI represents all of its versions | What is DOI versioning? | Zenodo | 2026-04-11 | https://support.zenodo.org/help/en-gb/1-upload-deposit/97-what-is-doi-versioning | primary | Versioning and DOI |

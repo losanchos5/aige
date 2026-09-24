@@ -1,0 +1,315 @@
+---
+/**
+ * /about/methodology: how the book and the site are made. Every statement on
+ * this page is checkable in the repository (STYLEGUIDE.md, CONTRIBUTING.md,
+ * bok/CONTRIBUTORS.md, bok/CHANGELOG.md, sources/SOURCES.md, the source-
+ * integrity spec, site/package.json and the scripts and workflows it names) or
+ * cites a numbered source below. It makes no claim about funding, sponsorship
+ * or independence: that statement is the owner's to write.
+ */
+import Doc from '../../layouts/Doc.astro';
+import { site } from '../../data/site';
+import { chaptersOrdered } from '../../data/chapters';
+import { bookParts, countWord } from '../../data/parts';
+import { gitDate } from '../../lib/reading';
+
+const repo = site.github;
+const blob = (path: string) => `${repo}/blob/main/${path}`;
+const form = (file: string) => `${repo}/issues/new?template=${file}`;
+
+// The issue forms in .github/ISSUE_TEMPLATE, one per kind of contribution.
+const forms = [
+  {
+    label: 'Report an error on a page',
+    href: form('report-an-error.yml'),
+    what: 'a wrong fact, a dead or wrong source, an outdated date or a broken page, with its URL',
+  },
+  {
+    label: 'Suggest a source',
+    href: form('suggest-a-source.yml'),
+    what: 'a stronger primary source, or a claim that needs one',
+  },
+  {
+    label: 'Propose an obligation row',
+    href: form('propose-an-obligation.yml'),
+    what: 'an obligation, the artefact that evidences it and its stack layer, for the regulatory map',
+  },
+  {
+    label: 'Propose a glossary term',
+    href: form('propose-a-glossary-term.yml'),
+    what: 'a term, its one-paragraph definition, its source and the chapter that treats it',
+  },
+  {
+    label: 'Propose a case study',
+    href: form('propose-a-case.yml'),
+    what: 'a public AI incident, its primary record and the control that would have caught it',
+  },
+  {
+    label: 'Sign the Thesis',
+    href: form('sign-the-thesis.yml'),
+    what: 'your name under the definition, values and principles',
+  },
+];
+
+// Numbered sources, in the house format; [n] in the text links #src-n.
+const sources = [
+  {
+    text: 'Semantic Versioning 2.0.0 (MAJOR.MINOR.PATCH: increment MAJOR for incompatible changes, MINOR for backward-compatible additions, PATCH for backward-compatible fixes). semver.org (originally authored by Tom Preston-Werner). Undated.',
+    url: 'https://semver.org/spec/v2.0.0.html',
+    verified: 'primary',
+  },
+  {
+    text: 'What is DOI versioning? (a Version DOI identifies one version of a record; a Concept DOI represents all of its versions). Zenodo. 2026-04-11.',
+    url: 'https://support.zenodo.org/help/en-gb/1-upload-deposit/97-what-is-doi-versioning',
+    verified: 'primary',
+  },
+];
+
+const headings = [
+  { depth: 2, slug: 'how-sources-are-chosen', text: 'How sources are chosen' },
+  { depth: 2, slug: 'how-sources-are-tagged', text: 'How sources are tagged' },
+  { depth: 2, slug: 'how-dates-are-kept-current', text: 'How dates are kept current' },
+  { depth: 2, slug: 'review-cadence', text: 'Review cadence' },
+  { depth: 2, slug: 'what-the-build-checks', text: 'What the build checks' },
+  { depth: 2, slug: 'corrections-and-contributions', text: 'Corrections and contributions' },
+  { depth: 2, slug: 'versioning-and-doi', text: 'Versioning and DOI' },
+  { depth: 2, slug: 'what-this-is-not', text: 'What this is not' },
+  { depth: 2, slug: 'sources', text: 'Sources' },
+];
+
+const title = 'Methodology';
+const summary =
+  'How the Body of Knowledge chooses and tags its sources, keeps its dates current, takes corrections and contributions, and versions its releases.';
+const description =
+  'How AI Governance Engineer chooses and tags sources, re-verifies dated claims, reviews and corrects its chapters, and versions each release with a DOI.';
+const updated = gitDate('src/pages/about/methodology.astro');
+const partsWord = countWord(bookParts.length);
+---
+
+<Doc
+  title={title}
+  summary={summary}
+  description={description}
+  crumbs={[{ label: 'About', href: '/about' }, { label: title }]}
+  headings={headings}
+  updated={updated}
+  sidebar={false}
+  image="/og/about.png"
+>
+  <p>
+    The Body of Knowledge is {chaptersOrdered.length} chapters in {partsWord} parts, plus the
+    Thesis and the datasets the site renders from them. This page says how that text is sourced,
+    dated, checked, corrected and released. The rules themselves live in the repository, in
+    <a href={blob('STYLEGUIDE.md')}>STYLEGUIDE.md</a> and
+    <a href={blob('CONTRIBUTING.md')}>CONTRIBUTING.md</a>; this page is their summary for readers.
+  </p>
+
+  <h2 id="how-sources-are-chosen">How sources are chosen</h2>
+  <ul>
+    <li>
+      <strong>Every number carries a source.</strong> No statistic, date, version or quote appears
+      without a numbered citation. A figure that cannot be sourced is cut, or the sentence is
+      rewritten so it does not need one.
+    </li>
+    <li>
+      <strong>Primary first.</strong> The book cites the official text wherever it can open it: the
+      regulation in the official journal, the legislature's bill, the regulator's own page, the
+      standards body's listing, the original paper. The text of EU law is cited to its EUR-Lex
+      identifier (ELI) or the consolidated text; a third-party explorer or commentary is at most a
+      secondary reading.
+    </li>
+    <li>
+      <strong>Vendor claims are attributed.</strong> A claim carried only by a vendor (a comparison
+      blog, the vendor's own survey, its account of an analyst report) is attributed to that vendor
+      in the sentence, never stated as a fact about the market; the analyst or official source is
+      cited instead or beside it when it exists.
+    </li>
+    <li>
+      <strong>No expiring evidence.</strong> A claim never rests on a job posting or any other URL
+      that expires or gets reassigned. Without stable evidence the claim is removed or reworded.
+    </li>
+    <li>
+      <strong>Paid standards by identifier.</strong> ISO/IEC and other paid standards are cited by
+      identifier and title and paraphrased; the book does not reproduce their text.
+    </li>
+    <li>
+      <strong>Categories, not brands.</strong> Tools are named only as examples of a category, never
+      as a recommendation: every tool list is illustrative, not exhaustive and not an endorsement.
+    </li>
+  </ul>
+
+  <h2 id="how-sources-are-tagged">How sources are tagged</h2>
+  <p>
+    Citations are numbered per chapter and restart at [1] in every file. Each one is listed under
+    the chapter's own <em>Sources</em> heading in the house format (title, publisher, date, URL)
+    with one of three verification tags:
+  </p>
+  <dl class="tags">
+    <dt><code>primary</code></dt>
+    <dd>
+      The official primary source was opened: the regulation text, the standards body, the
+      organisation's own release, the report itself.
+    </dd>
+    <dt><code>secondary</code></dt>
+    <dd>A reputable outlet reporting a primary fact that could not be opened directly.</dd>
+    <dt><code>reported</code></dt>
+    <dd>
+      A claim carried only by secondary sources, or a figure the primary does not state verbatim.
+      Copy that uses a reported fact says "reported" in the sentence.
+    </dd>
+  </dl>
+  <p>
+    Every citation also has a row in the consolidated table,
+    <a href={blob('sources/SOURCES.md')}>sources/SOURCES.md</a>, under its chapter's section and
+    with the same number, so one file lists every source the book relies on. An already verified
+    row is reused rather than re-verified. A crosswalk reference that could not be checked against
+    its source stays marked unverified, with a note saying why.
+  </p>
+
+  <h2 id="how-dates-are-kept-current">How dates are kept current</h2>
+  <p>
+    Anything that can change (the status of a harmonised standard, a draft, a grace period, the
+    application date of a law, the edition of a report) carries an <strong>"as of"</strong> stamp
+    with the date it was last verified online, in the form <code>as of 2026-09-24</code>. The stamp
+    moves only when the claim is re-verified, never when the page is merely edited. The text does
+    not use expressions relative to the time of writing ("in the last two years", "to date") where
+    a date fits. EU AI Act dates are the dates in force after the Digital Omnibus.
+  </p>
+  <p>
+    Separately, every chapter shows the date of its last change, read from the repository's
+    history at build time, so a reader can tell a recent edit from a recent verification.
+  </p>
+
+  <h2 id="review-cadence">Review cadence</h2>
+  <ul>
+    <li>
+      <strong>Release passes.</strong> Before a release, the chapters it touches are fact-checked
+      and their "as of" stamps re-verified. The passes so far are dated in the header of
+      <a href={blob('sources/SOURCES.md')}>sources/SOURCES.md</a>: the v0.1 baseline on 2026-09-10,
+      the v0.3.1 and v0.4.0 passes on 2026-09-19, and a debt and date pass on 2026-09-24.
+    </li>
+    <li>
+      <strong>Weekly link check.</strong> Every Monday a scheduled workflow checks the external
+      links in the Thesis, the chapters, the sources table and the site's data files, and keeps
+      the results in a single open "Link rot report" issue.
+    </li>
+    <li>
+      <strong>On every change.</strong> Each pull request and each push to the main branch runs the
+      build, the test suite and the accessibility audit in continuous integration, followed by a
+      Lighthouse audit that reports without blocking.
+    </li>
+  </ul>
+
+  <h2 id="what-the-build-checks">What the build checks</h2>
+  <p>A change that breaks one of these rules fails the build, so it cannot be published:</p>
+  <ul>
+    <li>
+      <strong>Type check and build</strong> of the whole site, with every chapter matched 1:1 to
+      its entry in the chapter manifest.
+    </li>
+    <li>
+      <strong>Content lint</strong>: the built pages are scanned for the retracted or
+      unverifiable claims on the house blocklist, and for the em dash the house style forbids.
+    </li>
+    <li>
+      <strong>Link check</strong>: every internal link and every <code>#anchor</code> must resolve
+      to a real page and heading.
+    </li>
+    <li>
+      <strong>Schema check</strong>: every JSON Schema in the templates library parses, every
+      filled example validates against its schema, and the schemas stay compatible with the shapes
+      the patterns chapter publishes.
+    </li>
+  </ul>
+  <p>
+    The test suite adds data checks: for example, every anchor a dataset points at must exist as a
+    heading in its chapter, so a renamed heading cannot silently break the map, the stack or the
+    learning path.
+  </p>
+
+  <h2 id="corrections-and-contributions">Corrections and contributions</h2>
+  <p>
+    Everything is in a public repository. Found something wrong? Open the form that fits; each
+    one asks for the page and, for new content, the primary source and its verification tag:
+  </p>
+  <ul class="forms">
+    {
+      forms.map((f) => (
+        <li>
+          <a href={f.href} target="_blank" rel="noopener noreferrer">{f.label}</a>: {f.what}.
+        </li>
+      ))
+    }
+  </ul>
+  <p>
+    Or open a pull request that follows <a href={blob('STYLEGUIDE.md')}>the style guide</a>: every
+    factual claim with a tagged citation and its row in the sources table, categories rather than
+    vendors, no invented figure. A corrected fact ships as a patch release and is recorded in the
+    <a href="/about/changelog">changelog</a>.
+  </p>
+  <p>
+    Authors, reviewers and contributors are defined in
+    <a href={blob('bok/CONTRIBUTORS.md')}>bok/CONTRIBUTORS.md</a> and credited on the
+    <a href="/about/contributors">contributors page</a>: accepted substantive contributions and
+    completed reviews are credited by name, and neither changes the stated authorship unless
+    expressly agreed.
+  </p>
+
+  <h2 id="versioning-and-doi">Versioning and DOI</h2>
+  <p>
+    Versions follow semantic versioning in spirit<sup><a class="cite" href="#src-1">1</a></sup>: a
+    patch release fixes facts and typos, a minor release adds chapters or patterns, and 1.0 will
+    mark a completed, reviewed core. Every change is recorded in the
+    <a href="/about/changelog">changelog</a>. This is v{site.bokVersion}.
+  </p>
+  <p>
+    Releases are archived on Zenodo. v{site.bokVersion} has the DOI{' '}
+    <a href={`https://doi.org/${site.doi}`}>{site.doi}</a>; the concept DOI{' '}
+    <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a> represents every
+    version<sup><a class="cite" href="#src-2">2</a></sup>. Citation metadata lives in
+    <a href={blob('CITATION.cff')}>CITATION.cff</a>, and every chapter offers a ready-made
+    citation and BibTeX entry.
+  </p>
+
+  <h2 id="what-this-is-not">What this is not</h2>
+  <p>
+    The book is not a compliance checklist and not legal advice: it describes how to build the
+    controls and the evidence that let someone qualified decide whether a system complies. Every
+    mapping to a law or a standard is illustrative, not a claim of conformity.
+  </p>
+
+  <h2 id="sources">Sources</h2>
+  <ol class="sources">
+    {
+      sources.map((source, i) => (
+        <li id={`src-${i + 1}`}>
+          <span class="src-num">[{i + 1}]</span> {source.text}{' '}
+          <a href={source.url} rel="noopener">{source.url}</a>{' '}
+          <span class="verified">(verified: {source.verified})</span>
+        </li>
+      ))
+    }
+  </ol>
+</Doc>
+
+<style>
+  /* Authored h2/p/ul/dl in Doc's .prose well: :global(.prose) lifts these
+     over prose.css, as on /about. */
+  :global(.prose) > h2 {
+    font-size: var(--fs-h2);
+  }
+
+  .tags {
+    margin: var(--s-4) 0 0;
+  }
+
+  .tags dt {
+    margin-top: var(--s-3);
+    font-weight: 600;
+  }
+
+  .tags dd {
+    margin: var(--s-1) 0 0;
+    color: var(--ink-2);
+  }
+</style>
