@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 454" class="figc" role="img" aria-labelledby="fig-risk-loop-stack-t fig-risk-loop-stack-d">
+  <title id="fig-risk-loop-stack-t">The risk loop on the stack</title>
+  <desc id="fig-risk-loop-stack-d">The four steps of the risk loop, each with its NIST AI RMF functions and the stack layers that do the work, inside GOVERN, looping back from monitor to identify and writing to one risk register.</desc>
+
+  <text class="mono muted" x="16" y="20" font-size="13.5">One loop, run on the five layers</text>
+
+  <!-- GOVERN applies across the whole process -->
+  <rect x="8" y="30" width="344" height="340" rx="10" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3"/>
+  <text class="mono" x="20" y="50" font-size="13">GOVERN: across the whole loop</text>
+
+  <!-- The loop rail: down through the steps, back up from Monitor -->
+  <path class="stroke-arrow" d="M26 76 V310 H14 V76 H20"/>
+  <path class="arrow" d="M20 70 v12 l8 -6 z"/>
+  <path class="arrow" d="M20 126 h12 l-6 9 z"/>
+  <path class="arrow" d="M20 192 h12 l-6 9 z"/>
+  <path class="arrow" d="M20 284 h12 l-6 9 z"/>
+
+  <!-- Identify: Layer 02 -->
+  <text class="disp" x="40" y="80" font-size="15">Identify</text>
+  <text class="mono" x="340" y="80" font-size="13" text-anchor="end">MAP 1–5 · GOVERN 5</text>
+  <rect class="l2-bg" x="40" y="88" width="243" height="22" rx="5"/>
+  <text class="l2-tx" x="50" y="103" font-size="13.5">Layer 02 Inventory &amp; Transparency</text>
+
+  <!-- Assess: Layer 03 -->
+  <text class="disp" x="40" y="148" font-size="15">Assess</text>
+  <text class="mono" x="340" y="148" font-size="13" text-anchor="end">MAP 5.1 · MEASURE 1–2</text>
+  <rect class="l3-bg" x="40" y="156" width="290" height="22" rx="5"/>
+  <text class="l3-tx" x="50" y="171" font-size="13.5">Layer 03 Evals &amp; Red Teaming as Evidence</text>
+
+  <!-- Treat: Layers 01 and 04 -->
+  <text class="disp" x="40" y="214" font-size="15">Treat</text>
+  <text class="mono" x="340" y="214" font-size="13" text-anchor="end">MANAGE 1–3</text>
+  <rect class="l1-bg" x="40" y="222" width="175" height="22" rx="5"/>
+  <text class="l1-tx" x="50" y="237" font-size="13.5">Layer 01 Govern-as-Code</text>
+  <rect class="l4-bg" x="40" y="248" width="297" height="22" rx="5"/>
+  <text class="l4-tx" x="50" y="263" font-size="13.5">Layer 04 Runtime Controls &amp; Observability</text>
+
+  <!-- Monitor: Layers 04 and 05 -->
+  <text class="disp" x="40" y="306" font-size="15">Monitor</text>
+  <text class="mono" x="340" y="306" font-size="13" text-anchor="end">MEASURE 3–4 · MANAGE 4</text>
+  <rect class="l4-bg" x="40" y="314" width="297" height="22" rx="5"/>
+  <text class="l4-tx" x="50" y="329" font-size="13.5">Layer 04 Runtime Controls &amp; Observability</text>
+  <rect class="l5-bg" x="40" y="340" width="304" height="22" rx="5"/>
+  <text class="l5-tx" x="50" y="355" font-size="13.5">Layer 05 Assurance &amp; Continuous Compliance</text>
+
+  <!-- Evidence: the risk register (store glyph) -->
+  <line class="stroke-arrow" x1="180" y1="370" x2="180" y2="378"/>
+  <path class="arrow" d="M174 378 h12 l-6 9 z"/>
+  <rect class="panel" x="8" y="390" width="344" height="56" rx="10"/>
+  <ellipse class="glyph" cx="30" cy="404" rx="9" ry="3.2"/>
+  <path class="glyph" d="M21 404 v16 a9 3.2 0 0 0 18 0 v-16"/>
+  <text class="disp" x="50" y="412" font-size="14.5">Risk register</text>
+  <text class="ink2" x="50" y="432" font-size="13">History, signed acceptances, review log</text>
+</svg>

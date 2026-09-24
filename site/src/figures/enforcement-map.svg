@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 404" class="figc" role="img" aria-labelledby="fig-enforcement-map-t fig-enforcement-map-d">
+  <title id="fig-enforcement-map-t">Who enforces, and the ceilings</title>
+  <desc id="fig-enforcement-map-d">Three enforcement tracks: GPAI providers and the AI Office, high-risk systems and national market-surveillance authorities, and US frontier developers under SB 53 and the state Attorney General, each with its penalty ceiling.</desc>
+
+  <text class="mono muted" x="16" y="20" font-size="13.5">Duty holder, authority, ceiling</text>
+
+  <!-- Track 1: GPAI providers and the AI Office -->
+  <rect class="panel" x="8" y="34" width="344" height="140" rx="10"/>
+  <text class="disp" x="20" y="57" font-size="14.5">GPAI providers</text>
+  <text class="mono ink2" x="340" y="57" font-size="13" text-anchor="end">since 2 Aug 2026</text>
+  <path class="glyph" d="M20 72 l10 -6 l10 6 z M22 74 v10 M27 74 v10 M33 74 v10 M38 74 v10 M20 86 h20"/>
+  <text x="50" y="83" font-size="13.5">AI Office (European Commission)</text>
+  <text class="ink2" x="20" y="106" font-size="13"><tspan class="mono">Art. 101</tspan> fines: up to 3% of worldwide</text>
+  <text class="ink2" x="20" y="124" font-size="13">annual turnover or EUR 15M, whichever higher</text>
+  <text class="ink2" x="20" y="146" font-size="13"><tspan class="mono">Art. 75a–75d</tspan>: periodic penalties up to 5%</text>
+  <text class="ink2" x="20" y="164" font-size="13">of average daily turnover per day</text>
+
+  <!-- Track 2: high-risk systems and national authorities -->
+  <rect class="panel" x="8" y="184" width="344" height="118" rx="10"/>
+  <text class="disp" x="20" y="207" font-size="14.5">High-risk systems</text>
+  <text class="mono ink2" x="340" y="207" font-size="13" text-anchor="end">per Member State</text>
+  <path class="glyph" d="M20 222 l10 -6 l10 6 z M22 224 v10 M27 224 v10 M33 224 v10 M38 224 v10 M20 236 h20"/>
+  <text x="50" y="233" font-size="13.5">National market-surveillance authority</text>
+  <text class="ink2" x="50" y="251" font-size="13">for example AESIA in Spain</text>
+  <text class="ink2" x="20" y="274" font-size="13"><tspan class="mono">Art. 99</tspan> fines: ceilings of 7%, 3% and 1%</text>
+  <text class="ink2" x="20" y="292" font-size="13">of turnover, depending on the breach</text>
+
+  <!-- Track 3: US frontier developers under SB 53 -->
+  <rect class="panel" x="8" y="312" width="344" height="82" rx="10"/>
+  <text class="disp" x="20" y="335" font-size="14.5">US frontier developers</text>
+  <text class="mono ink2" x="340" y="335" font-size="13" text-anchor="end">SB 53</text>
+  <path class="glyph" d="M20 350 l10 -6 l10 6 z M22 352 v10 M27 352 v10 M33 352 v10 M38 352 v10 M20 364 h20"/>
+  <text x="50" y="361" font-size="13.5">State Attorney General</text>
+  <text class="ink2" x="20" y="384" font-size="13">Up to USD 1M per violation</text>
+
+</svg>

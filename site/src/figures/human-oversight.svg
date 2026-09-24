@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 506" class="figc" role="img" aria-labelledby="fig-human-oversight-t fig-human-oversight-d">
+  <title id="fig-human-oversight-t">Human oversight, designed</title>
+  <desc id="fig-human-oversight-d">Between reviewing every action and rubber-stamping all of them, actions are classified by consequence, a designed checkpoint with context sits only where the stakes justify it, and the oversight leaves evidence that is itself monitored.</desc>
+
+  <text class="mono muted" x="16" y="20" font-size="13">Art. 14: understand, decide against, stop</text>
+
+  <!-- The two failure modes of undifferentiated oversight -->
+  <text class="mono muted" x="16" y="44" font-size="13">Undifferentiated, it fails both ways</text>
+  <rect x="8" y="54" width="168" height="48" rx="6" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3"/>
+  <text class="disp" x="20" y="74" font-size="14">Review every action</text>
+  <text class="ink2" x="20" y="93" font-size="13">destroys the value</text>
+  <rect x="184" y="54" width="168" height="48" rx="6" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3"/>
+  <text class="disp" x="196" y="74" font-size="14">Nominal review</text>
+  <text class="ink2" x="196" y="93" font-size="13">a rubber stamp</text>
+
+  <!-- Proposed action (agent hexagon) -->
+  <rect class="panel" x="100" y="118" width="160" height="30" rx="6"/>
+  <path class="glyph" d="M109 133 l4.5 -7.8 h9 l4.5 7.8 l-4.5 7.8 h-9 z"/>
+  <text x="136" y="138" font-size="13.5">Proposed action</text>
+  <line class="stroke-arrow" x1="180" y1="148" x2="180" y2="162"/>
+  <path class="arrow" d="M174 162 h12 l-6 9 z"/>
+
+  <!-- The one decision: classify by consequence (gate diamond) -->
+  <path class="glyph" d="M180 172 l84 26 l-84 26 l-84 -26 z"/>
+  <text class="mono" x="180" y="203" font-size="13" text-anchor="middle">Consequence?</text>
+  <text class="mono muted" x="264" y="181" font-size="13">low</text>
+  <line class="stroke-arrow" x1="264" y1="198" x2="276" y2="198"/>
+  <path class="arrow" d="M276 192 v12 l9 -6 z"/>
+  <rect class="panel" x="288" y="184" width="64" height="28" rx="6"/>
+  <text class="ink2" x="320" y="203" font-size="13" text-anchor="middle">Proceeds</text>
+  <text class="mono muted" x="190" y="240" font-size="13">high</text>
+  <line class="stroke-arrow" x1="180" y1="224" x2="180" y2="238"/>
+  <path class="arrow" d="M174 238 h12 l-6 9 z"/>
+
+  <!-- Designed checkpoint with a named reviewer (human role glyph) -->
+  <rect class="panel" x="60" y="250" width="240" height="58" rx="8"/>
+  <circle class="glyph" cx="80" cy="267" r="4"/>
+  <path class="glyph" d="M73 281 a7 6 0 0 1 14 0"/>
+  <text class="disp" x="98" y="274" font-size="14.5">Designed checkpoint</text>
+  <text class="ink2" x="98" y="295" font-size="13">Context to disagree</text>
+  <rect class="l4-bg" x="31.5" y="316" width="297" height="22" rx="5"/>
+  <text class="l4-tx" x="41.5" y="331" font-size="13.5">Layer 04 Runtime Controls &amp; Observability</text>
+  <line class="stroke-arrow" x1="180" y1="340" x2="180" y2="352"/>
+  <path class="arrow" d="M174 352 h12 l-6 9 z"/>
+
+  <!-- Evidence: the decision and the oversight signal (document with a check) -->
+  <rect class="panel" x="8" y="364" width="344" height="88" rx="10"/>
+  <path class="glyph" d="M20 376 h14 l6 6 v18 h-20 z"/>
+  <path class="glyph" d="M34 376 v6 h6"/>
+  <path class="glyph-check" d="M24 390 l3 3 l7 -8"/>
+  <text class="disp" x="50" y="386" font-size="14.5">Oversight evidence</text>
+  <text class="ink2" x="50" y="406" font-size="13">Approver and decision, logged</text>
+  <text class="ink2" x="50" y="424" font-size="13">Approval rate, time-to-decide and</text>
+  <text class="ink2" x="50" y="442" font-size="13">override rate, watched as a signal</text>
+
+  <text class="ink2" x="16" y="476" font-size="13.5">Oversight you do not measure is oversight</text>
+  <text class="ink2" x="16" y="494" font-size="13.5">you cannot claim.</text>
+</svg>

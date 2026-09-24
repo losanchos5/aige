@@ -28,10 +28,10 @@
   },
   "lanes": [
     { "id": "provider", "label": "Provider" },
-    { "id": "assess", "label": "Due-diligence gate" },
-    { "id": "rejected", "label": "Rejected", "variant": "exception" },
+    { "id": "assess", "label": "Deployer" },
     { "id": "l2", "label": "Layer 02 Inventory & Transparency" },
-    { "id": "l5", "label": "Layer 05 Assurance & Continuous Compliance" }
+    { "id": "l5", "label": "Layer 05 Assurance & Continuous Compliance" },
+    { "id": "rejected", "label": "Rejected", "variant": "exception" }
   ],
   "phases": [
     { "id": "submit", "label": "Submit", "fromCol": 0, "toCol": 0 },
@@ -43,17 +43,17 @@
     { "id": "pkg", "lane": "provider", "col": 0, "type": "external", "label": "Vendor package", "sublabel": "docs, model card, terms", "width": 172 },
     { "id": "checks", "lane": "assess", "col": 1, "type": "backend", "label": "Due-diligence checks", "sublabel": "docs, evals, contract", "width": 174 },
     { "id": "gate", "lane": "assess", "col": 2, "type": "security", "label": "Due-diligence gate", "sublabel": "approve / reject", "tag": "or conditions", "width": 170 },
-    { "id": "rejected", "lane": "rejected", "col": 2, "type": "backend", "label": "Rejected", "sublabel": "not deployed", "width": 150 },
-    { "id": "registry", "lane": "l2", "col": 3, "type": "database", "label": "Registry entry", "sublabel": "with conditions", "width": 158 },
-    { "id": "record", "lane": "l5", "col": 4, "type": "database", "label": "Evidence record", "sublabel": "assessment filed", "width": 160 }
+    { "id": "rejected", "lane": "rejected", "col": 4, "type": "backend", "label": "Rejected", "sublabel": "not deployed", "width": 150 },
+    { "id": "registry", "lane": "l2", "col": 2, "type": "database", "label": "Registry entry", "sublabel": "with conditions", "width": 158 },
+    { "id": "record", "lane": "l5", "col": 3, "type": "database", "label": "Evidence record", "sublabel": "assessment filed", "width": 160, "tag": "provider-attested flagged" }
   ],
   "edges": [
-    { "id": "pkg-checks", "from": "pkg", "to": "checks", "label": "submit", "variant": "default" },
-    { "id": "checks-gate", "from": "checks", "to": "gate", "label": "assess", "variant": "emphasis" },
-    { "id": "gate-registry", "from": "gate", "to": "registry", "label": "approve, conditions", "variant": "emphasis" },
+    { "id": "pkg-checks", "from": "pkg", "to": "checks", "label": "submit", "variant": "default", "fromSide": "bottom", "toSide": "top" },
+    { "id": "checks-gate", "from": "checks", "to": "gate", "label": "assess", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
     { "id": "gate-rejected", "from": "gate", "to": "rejected", "label": "reject", "variant": "security", "role": "error" },
+    { "id": "gate-registry", "from": "gate", "to": "registry", "variant": "emphasis", "fromSide": "bottom", "toSide": "top", "route": "drop" },
     { "id": "registry-record", "from": "registry", "to": "record", "label": "file assessment", "variant": "emphasis" },
-    { "id": "registry-checks", "from": "registry", "to": "checks", "label": "re-open on change", "variant": "dashed", "role": "branch" }
+    { "id": "registry-checks", "from": "registry", "to": "checks", "label": "re-open on change", "variant": "dashed", "role": "branch", "fromSide": "left", "toSide": "bottom" }
   ],
   "cards": [
     {

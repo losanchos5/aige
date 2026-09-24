@@ -48,8 +48,8 @@
       "label": "Policy card",
       "sublabel": "same rule as CI",
       "pos": [
-        440,
-        40
+        478,
+        30
       ],
       "size": [
         180,
@@ -132,8 +132,8 @@
       "label": "Assurance store",
       "sublabel": "decision events",
       "pos": [
-        364,
-        392
+        420,
+        480
       ],
       "size": [
         184,
@@ -142,12 +142,12 @@
     },
     {
       "id": "breaker",
-      "type": "external",
+      "type": "security",
       "label": "Circuit breaker",
       "sublabel": "on a defined breach",
       "pos": [
-        676,
-        392
+        714,
+        340
       ],
       "size": [
         184,
@@ -244,7 +244,7 @@
       "label": "event",
       "variant": "emphasis",
       "fromSide": "bottom",
-      "toSide": "top"
+      "toSide": "left"
     },
     {
       "id": "output-store",
@@ -253,7 +253,7 @@
       "label": "event",
       "variant": "emphasis",
       "fromSide": "bottom",
-      "toSide": "left"
+      "toSide": "right"
     },
     {
       "id": "output-breaker",
@@ -262,7 +262,11 @@
       "label": "breach",
       "variant": "dashed",
       "fromSide": "bottom",
-      "toSide": "top"
+      "toSide": "top",
+      "labelAt": [
+        842,
+        306
+      ]
     }
   ],
   "cards": [
