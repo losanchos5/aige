@@ -1,0 +1,451 @@
+/* toolkit.css: the shared styling of the /toolkit pages (ToolShell and the
+   forms the tools put in it). Tokens only (site/DESIGN.md), so light and dark
+   both follow; no hue outside the five layer pairs, no halo, no badge. Class
+   names are prefixed `tool-` to stay out of the way of the other stylesheets.
+   Every motion rule sits inside prefers-reduced-motion: no-preference. */
+
+.tool-page {
+  padding-block: var(--s-5) var(--s-8);
+}
+
+.tool-page > * + * {
+  margin-top: var(--s-6);
+}
+
+/* ---- The fixed notice and the no-JS note --------------------------------- */
+.tool-notice {
+  max-width: var(--prose);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--ink) 4%, var(--bg));
+  color: var(--ink);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.tool-notice strong {
+  font-weight: 600;
+}
+
+.tool-nojs,
+.tool-built {
+  max-width: var(--prose);
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+.tool-top > * + * {
+  margin-top: var(--s-3);
+}
+
+/* ---- Section heads inside a tool ------------------------------------------ */
+.tool-page h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  letter-spacing: var(--tracking-display);
+  color: var(--ink);
+}
+
+.tool-page h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  color: var(--ink);
+}
+
+.tool-intro {
+  max-width: var(--prose);
+  margin-top: var(--s-2);
+  color: var(--ink-2);
+}
+
+.tool-block {
+  margin-top: var(--s-7);
+}
+
+/* ---- Forms ---------------------------------------------------------------- */
+.tool-form {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.tool-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.tool-fieldset[data-invalid] {
+  border-color: var(--block);
+}
+
+.tool-legend {
+  /* Floated, so the legend sits inside the frame and wraps like a heading
+     instead of riding the top border (which breaks on two-line names). */
+  float: left;
+  width: 100%;
+  padding: 0;
+  margin: 0 0 var(--s-1);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: var(--fs-h3);
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.tool-legend + * {
+  clear: both;
+}
+
+.tool-hint {
+  margin: var(--s-1) 0 var(--s-3);
+  max-width: var(--prose);
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+.tool-error {
+  margin: 0 0 var(--s-3);
+  color: var(--block);
+  font-size: var(--fs-small);
+  font-weight: 600;
+}
+
+.tool-error[hidden] {
+  display: none;
+}
+
+.tool-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-1);
+  max-width: 36rem;
+}
+
+.tool-field label {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.tool-input,
+.tool-select {
+  min-height: 44px;
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--ink-2);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.tool-input,
+.tool-select {
+  width: 100%;
+  min-width: 0;
+}
+
+.tool-input[type='file'] {
+  padding: var(--s-2);
+}
+
+/* One radio per row: the whole row is the label, at least 44px tall. */
+.tool-options {
+  display: grid;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tool-option {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--s-3);
+  min-height: 44px;
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+}
+
+.tool-option input {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0.2rem 0 0;
+  accent-color: var(--opt-ink, var(--ink));
+}
+
+.tool-option label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--s-3);
+  cursor: pointer;
+  color: var(--ink);
+}
+
+/* The label covers the whole row, so the row is the click target. */
+.tool-option label::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.tool-option:has(input:checked) {
+  border-color: var(--opt-ink, var(--ink));
+  background: color-mix(in srgb, var(--opt-tint, var(--line)) 55%, var(--bg));
+}
+
+.tool-option:has(input:focus-visible) {
+  outline: 2px solid var(--l1-ink);
+  outline-offset: 2px;
+}
+
+.tool-option-level {
+  min-width: 10.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.tool-option-text {
+  flex: 1 1 16rem;
+}
+
+/* ---- Error summary --------------------------------------------------------- */
+.tool-errors {
+  max-width: var(--prose);
+  padding: var(--s-4) var(--s-5);
+  border: 2px solid var(--block);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+}
+
+.tool-errors h2 {
+  font-size: var(--fs-h3);
+}
+
+.tool-errors ul {
+  margin: var(--s-2) 0 0;
+  padding-left: var(--s-5);
+}
+
+.tool-errors a {
+  color: var(--block);
+  font-weight: 600;
+}
+
+/* ---- Buttons and actions --------------------------------------------------- */
+.tool-buttons,
+.tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3);
+  align-items: center;
+}
+
+.tool-actions .btn,
+.tool-buttons .btn {
+  font-size: var(--fs-small);
+  min-height: 44px;
+  padding-inline: var(--s-4);
+}
+
+.tool-status {
+  min-height: 1.5em;
+  margin-top: var(--s-2);
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+/* ---- Results --------------------------------------------------------------- */
+.tool-result {
+  padding: var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.tool-result[hidden] {
+  display: none;
+}
+
+.tool-result > * + * {
+  margin-top: var(--s-5);
+}
+
+.tool-result h2:focus {
+  outline: none;
+}
+
+.tool-result h2:focus-visible,
+.tool-errors:focus-visible {
+  outline: 2px solid var(--l1-ink);
+  outline-offset: 4px;
+}
+
+.tool-chart svg {
+  width: 100%;
+  height: auto;
+  max-width: 760px;
+}
+
+.tool-table-wrap {
+  overflow-x: auto;
+}
+
+.tool-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+}
+
+.tool-table caption {
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink);
+  padding-bottom: var(--s-2);
+}
+
+.tool-table th,
+.tool-table td {
+  padding: var(--s-2) var(--s-3);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.tool-table thead th {
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.tool-table .num {
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+/* Phones: each row becomes a small block (row header, then labelled cells),
+   so no column is pushed off screen. The cells carry their own data-label. */
+@media (max-width: 600px) {
+  .tool-result {
+    padding: var(--s-4);
+  }
+
+  .tool-fieldset {
+    padding: var(--s-4);
+  }
+
+  .tool-table caption {
+    display: block;
+  }
+
+  .tool-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .tool-table,
+  .tool-table tbody,
+  .tool-table tr,
+  .tool-table th,
+  .tool-table td {
+    display: block;
+  }
+
+  .tool-table tr {
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .tool-table th,
+  .tool-table td {
+    padding: var(--s-1) 0;
+    border-bottom: 0;
+  }
+
+  .tool-table td[data-label]::before {
+    content: attr(data-label) ': ';
+    font-family: var(--font-body);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+
+  .tool-table .num {
+    white-space: normal;
+  }
+}
+
+/* ---- Guide (the server-rendered teaching content) --------------------------- */
+.tool-guide {
+  max-width: var(--prose);
+}
+
+.tool-guide > * + * {
+  margin-top: var(--s-4);
+}
+
+.tool-guide > h2:not(:first-child) {
+  margin-top: var(--s-7);
+}
+
+.tool-guide > h3 {
+  margin-top: var(--s-5);
+}
+
+.tool-guide ul,
+.tool-guide ol {
+  padding-left: var(--s-5);
+}
+
+.tool-guide li + li {
+  margin-top: var(--s-1);
+}
+
+.tool-sources {
+  max-width: var(--prose);
+}
+
+.tool-sources .sources a {
+  overflow-wrap: anywhere;
+}
+
+/* ---- Print: the notice, the result and the guide; no chrome, no controls ---- */
+@media print {
+  .tool-nojs,
+  .tool-actions,
+  .tool-buttons,
+  .tool-status,
+  [data-print-hide] {
+    display: none !important;
+  }
+
+  .tool-page {
+    padding: 0;
+  }
+
+  .tool-result,
+  .tool-fieldset {
+    background: #fff !important;
+    border-color: #999 !important;
+  }
+
+  .tool-page,
+  .tool-page :is(p, li, td, th, h2, h3, legend, label, caption) {
+    color: #000 !important;
+  }
+
+  .tool-result,
+  .tool-chart,
+  .tool-table tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}

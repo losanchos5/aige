@@ -1,0 +1,248 @@
+---
+// /toolkit: the index of the browser tools, rendered from the registry in
+// src/data/toolkit.ts. Live tools are linked; planned ones are listed without a
+// link, so the link checker stays green while a tool is being built. The
+// conventions section states what every tool shares (ToolShell + lib.js).
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import { tools, toolNotice } from '../../data/toolkit';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { site } from '../../data/site';
+import '../../styles/resources.css';
+import '../../components/toolkit/toolkit.css';
+
+const crumbs = [{ label: 'Toolkit' }];
+const pageUrl = `${site.url}/toolkit`;
+const live = tools.filter((tool) => tool.status === 'live');
+
+const jsonLd = [
+  breadcrumbJsonLd(crumbs),
+  {
+    '@type': 'CollectionPage',
+    '@id': `${pageUrl}#page`,
+    name: 'Toolkit',
+    url: pageUrl,
+    inLanguage: 'en',
+    hasPart: live.map((tool) => ({
+      '@type': 'WebApplication',
+      '@id': `${site.url}${tool.href}#app`,
+      name: tool.title,
+      url: `${site.url}${tool.href}`,
+    })),
+  },
+];
+
+const sources = [
+  {
+    text: 'RFC 8259, The JavaScript Object Notation (JSON) Data Interchange Format (STD 90; JSON exchanged between systems outside a closed ecosystem MUST be UTF-8). IETF. 2017-12.',
+    url: 'https://www.rfc-editor.org/rfc/rfc8259',
+    verified: 'primary',
+  },
+  {
+    text: 'RFC 4180, Common Format and MIME Type for Comma-Separated Values (CSV) Files (Informational; CRLF records, fields with commas, double quotes or line breaks enclosed in double quotes, inner quotes doubled; registers text/csv). IETF. 2005-10.',
+    url: 'https://www.rfc-editor.org/rfc/rfc4180',
+    verified: 'primary',
+  },
+  {
+    text: 'RFC 5545, Internet Calendaring and Scheduling Core Object Specification (iCalendar) (Proposed Standard; CRLF content lines folded at 75 octets, TEXT escaping, PRODID and VERSION per calendar, UID and DTSTAMP per event, DATE values for all-day events). IETF. 2009-09.',
+    url: 'https://www.rfc-editor.org/rfc/rfc5545',
+    verified: 'primary',
+  },
+  {
+    text: 'RFC 3986, Uniform Resource Identifier (URI): Generic Syntax (STD 66), section 3.5: the fragment is separated from the rest of the URI before dereference and handled by the user agent alone. IETF. 2005-01.',
+    url: 'https://www.rfc-editor.org/rfc/rfc3986#section-3.5',
+    verified: 'primary',
+  },
+];
+---
+
+<Base
+  title="Toolkit"
+  description="Browser tools built from the AI governance Body of Knowledge: indicative self-checks that run in the page, keep your answers in the link and export open formats."
+  image="/og/default.png"
+  jsonLd={jsonLd}
+>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="Governance tools that run in your browser."
+    lede="Small, single-purpose tools built from the Body of Knowledge. Each one runs entirely in this page, keeps your answers in the link you copy and exports its result in an open format you can file, diff and re-import."
+  />
+
+  <div class="container tool-page" data-pagefind-body>
+    <p class="tool-notice"><strong>{toolNotice}</strong></p>
+
+    <section class="tool-block tk-registry" aria-labelledby="tk-tools">
+      <h2 id="tk-tools">The tools</h2>
+      <p class="tool-intro">
+        {live.length} {live.length === 1 ? 'tool is' : 'tools are'} live. Each one names the chapter
+        it is built from, what you enter and what you get back.
+      </p>
+      <ul class="tc-grid">
+        {
+          tools.map((tool) => {
+            const body = (
+              <Fragment>
+                <span class="tc-title">{tool.title}</span>
+                <span class="tc-summary">{tool.summary}</span>
+                <span class="tc-row">
+                  <span class="tc-key">For:</span> {tool.audience.join(', ')}.
+                </span>
+                <span class="tc-row">
+                  <span class="tc-key">You enter:</span> {tool.inputs.join('; ')}.
+                </span>
+                <span class="tc-row">
+                  <span class="tc-key">You get:</span>{' '}
+                  {tool.outputs.map((output, i) => (i === 0 ? output : output.charAt(0).toLowerCase() + output.slice(1))).join('; ')}.
+                </span>
+                <span class="tc-status">{tool.status === 'live' ? 'Open the tool' : 'Planned'}</span>
+              </Fragment>
+            );
+            return (
+              <li data-tool-card={tool.id} data-status={tool.status}>
+                {tool.status === 'live' ? (
+                  <a class="tc-card card-lum lift" href={tool.href}>
+                    {body}
+                  </a>
+                ) : (
+                  <div class="tc-card card-lum">{body}</div>
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
+    </section>
+
+    <section class="tool-block tool-guide" aria-labelledby="tk-how">
+      <h2 id="tk-how">How every tool works</h2>
+      <ul>
+        <li>
+          <strong>In the page, nowhere else.</strong> No account and no upload: the tools make no
+          network request with what you enter. Files you import are read by your browser.
+        </li>
+        <li>
+          <strong>State in the link.</strong> Your answers travel in the part of the address after
+          <code>#</code>, the fragment, which the browser handles itself and does not send when it
+          requests the page <a href="#src-4" class="cite">[4]</a>. Copy the link to share a result
+          or to come back to it.
+        </li>
+        <li>
+          <strong>Open formats.</strong> JSON <a href="#src-1" class="cite">[1]</a>, CSV
+          <a href="#src-2" class="cite">[2]</a>, iCalendar <a href="#src-3" class="cite">[3]</a>,
+          Markdown, SVG and PNG. A JSON export carries a <code>kind</code> and a
+          <code>version</code>, so the tool can read it back; on import it recomputes every
+          derived value rather than trusting the file.
+        </li>
+        <li>
+          <strong>Readable without JavaScript.</strong> Every tool renders its questions and its
+          guide on the server, so with scripts off the page still works as a worksheet. Forms use
+          labelled groups, errors are announced and focus moves to the result.
+        </li>
+        <li>
+          <strong>Indicative.</strong> A result is a reading for planning, not legal advice, not an
+          audit and not a conformity claim. No tool gives a single score, a badge or a
+          certificate.
+        </li>
+      </ul>
+
+      <h3 id="tk-build">Adding a tool</h3>
+      <p>
+        Each tool is one entry in the registry (<a
+          href={`${site.github}/blob/main/site/src/data/toolkit.ts`}>src/data/toolkit.ts</a
+        >), one page wrapped in the shared ToolShell component and one client module that imports
+        the shared helpers (<a href={`${site.github}/blob/main/site/public/toolkit/lib.js`}
+          >public/toolkit/lib.js</a
+        >): link state, safe storage, downloads, the clipboard and image export. No inline
+        scripts and no third-party code, so the site's content security policy holds unchanged.
+      </p>
+    </section>
+
+    <section class="tool-block tool-sources prose" aria-labelledby="tk-sources">
+      <h2 id="tk-sources">Sources</h2>
+      <ol class="sources">
+        {
+          sources.map((source, i) => (
+            <li id={`src-${i + 1}`}>
+              <span class="src-num">[{i + 1}]</span> {source.text}{' '}
+              <a href={source.url} rel="noopener">{source.url}</a>{' '}
+              <span class="verified">(verified: {source.verified})</span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .tc-grid {
+    list-style: none;
+    margin: var(--s-5) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+  }
+
+  .tc-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    height: 100%;
+    padding: var(--s-5);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  a.tc-card:hover {
+    border-color: var(--ink-2);
+  }
+
+  .tc-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .tc-summary {
+    margin-bottom: var(--s-1);
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  .tc-row {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .tc-key {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .tc-status {
+    margin-top: auto;
+    padding-top: var(--s-3);
+    font-weight: 600;
+    color: var(--l1-ink);
+  }
+
+  div.tc-card .tc-status {
+    color: var(--ink-2);
+  }
+
+  .cite {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    text-decoration: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    a.tc-card {
+      transition: border-color var(--dur) var(--ease);
+    }
+  }
+</style>

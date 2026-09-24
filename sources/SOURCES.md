@@ -1022,3 +1022,24 @@ A hand-built site page, not a chapter; its numbering is local to the page, as in
 |---|---|---|---|---|---|---|---|
 | 1 | MAJOR.MINOR.PATCH: increment MAJOR for incompatible changes, MINOR for backward-compatible additions, PATCH for backward-compatible fixes; the book follows it "in spirit" | Semantic Versioning 2.0.0 | semver.org (originally authored by Tom Preston-Werner) | undated | https://semver.org/spec/v2.0.0.html | primary | Versioning and DOI |
 | 2 | A Version DOI identifies one version of a record; a Concept DOI represents all of its versions | What is DOI versioning? | Zenodo | 2026-04-11 | https://support.zenodo.org/help/en-gb/1-upload-deposit/97-what-is-doi-versioning | primary | Versioning and DOI |
+### site/src/pages/toolkit/index.astro (/toolkit)
+
+Block b-toolkit-foundation, checked 2026-09-24. The `#` column matches the page's `[n]` markers; the
+shared helpers in `site/public/toolkit/lib.js` implement the same rules.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | JSON exchanged between systems outside a closed ecosystem MUST be encoded in UTF-8; STD 90 | RFC 8259, The JavaScript Object Notation (JSON) Data Interchange Format | IETF (RFC Editor) | 2017-12 | https://www.rfc-editor.org/rfc/rfc8259 | primary | Toolkit (open formats); lib.js downloadJson |
+| 2 | CSV records end in CRLF; fields with line breaks, double quotes or commas are enclosed in double quotes; an inner double quote is doubled; registers text/csv with an optional header parameter; Informational | RFC 4180, Common Format and MIME Type for Comma-Separated Values (CSV) Files | IETF (RFC Editor) | 2005-10 | https://www.rfc-editor.org/rfc/rfc4180 | primary | Toolkit (open formats); lib.js toCsv |
+| 3 | content lines end in CRLF and SHOULD NOT exceed 75 octets, folded with CRLF plus one space; TEXT escapes backslash, semicolon, comma and newline; PRODID and VERSION required once per calendar; VEVENT carries UID, DTSTAMP and DTSTART; a DATE DTSTART without DTEND lasts one day, and a DATE DTEND is exclusive | RFC 5545, Internet Calendaring and Scheduling Core Object Specification (iCalendar) | IETF (RFC Editor) | 2009-09 | https://www.rfc-editor.org/rfc/rfc5545 | primary | Toolkit (open formats); lib.js toIcs |
+| 4 | the fragment is separated from the rest of the URI before dereference and handled by the user agent alone; STD 66 | RFC 3986, Uniform Resource Identifier (URI): Generic Syntax, section 3.5 | IETF (RFC Editor) | 2005-01 | https://www.rfc-editor.org/rfc/rfc3986#section-3.5 | primary | Toolkit (state in the link) |
+
+### site/src/pages/toolkit/maturity-self-check.astro (/toolkit/maturity-self-check)
+
+Block b-toolkit-foundation, checked 2026-09-24. The tool renders chapter 07's own text and adds no
+external claim; the chapter's sources stay in its section above.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | the observable criteria by layer and level, the metrics per level, the self-assessment checklist and each level's typical failure, rendered verbatim | 07. Maturity model (five levels) | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/bok/maturity-model | primary | Maturity self-check (form, guide, exports) |
+| 2 | the pattern each next move links to | 05. Patterns | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/bok/patterns | primary | Maturity self-check (next move) |

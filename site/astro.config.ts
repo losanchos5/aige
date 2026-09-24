@@ -54,6 +54,20 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ['/resources/tools', ['src/pages/resources/tools.astro', 'src/data/stack.ts']],
   ['/role', ['src/pages/role.astro', 'src/data/role.ts', 'src/data/maturity.ts']],
   ['/stack', ['src/pages/stack.astro', 'src/data/stack.ts']],
+  // Block b-toolkit-foundation: the /toolkit index (registry) and its first tool,
+  // whose criteria come from maturity.ts and whose client code lives in public/toolkit.
+  ['/toolkit', ['src/pages/toolkit/index.astro', 'src/data/toolkit.ts']],
+  [
+    '/toolkit/maturity-self-check',
+    [
+      'src/pages/toolkit/maturity-self-check.astro',
+      'src/components/toolkit/ToolShell.astro',
+      'src/data/toolkit.ts',
+      'src/data/maturity.ts',
+      'public/toolkit/maturity-self-check.js',
+      'public/toolkit/lib.js',
+    ],
+  ],
   ['/thesis', ['../THESIS.md']],
   ['/es/thesis', ['../THESIS.es.md']],
   ...chaptersOrdered.map(

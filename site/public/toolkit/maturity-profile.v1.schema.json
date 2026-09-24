@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/toolkit/maturity-profile.v1.schema.json",
+  "title": "Maturity self-check profile",
+  "description": "A per-layer reading of the five-level maturity model (chapter 07 of the AI Governance Engineering Body of Knowledge), as exported by /toolkit/maturity-self-check. Only kind, version and layers[].layer/level are read back on import; the floor and the next move are recomputed. Indicative, not legal advice and not a conformity claim. CC BY 4.0.",
+  "type": "object",
+  "required": ["kind", "version", "layers"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "This schema's $id."
+    },
+    "kind": {
+      "const": "aige.maturity-profile",
+      "description": "Identifies the file as a maturity self-check profile."
+    },
+    "version": {
+      "const": 1,
+      "description": "Profile format version. A breaking change ships as version 2 at a new URL."
+    },
+    "label": {
+      "type": "string",
+      "maxLength": 80,
+      "description": "Optional name for the profile: a team, a platform or a quarter."
+    },
+    "assessedOn": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Date of the reading, YYYY-MM-DD."
+    },
+    "model": {
+      "type": "string",
+      "description": "URL of the maturity model the profile was read against."
+    },
+    "notice": {
+      "type": "string",
+      "description": "The toolkit's fixed notice, repeated in every export."
+    },
+    "layers": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "description": "One reading per stack layer, Layer 1 (Govern-as-Code) to Layer 5 (Assurance & Continuous Compliance).",
+      "items": {
+        "type": "object",
+        "required": ["layer", "level"],
+        "properties": {
+          "layer": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "description": "Layer number in build order."
+          },
+          "id": {
+            "type": "string",
+            "description": "Stable layer id (govern-as-code, inventory, evals, runtime, assurance)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Layer name as chapter 04 states it."
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 5,
+            "description": "Highest observable criterion met: 0 for none yet, 1 Documented to 5 Continuous."
+          },
+          "levelName": {
+            "type": ["string", "null"],
+            "description": "Name of the level, null for 0."
+          },
+          "criterion": {
+            "type": ["string", "null"],
+            "description": "The chapter 07 criterion met, verbatim; null for 0."
+          }
+        }
+      }
+    },
+    "floor": {
+      "type": "object",
+      "description": "Derived: the weakest layer's level and the layers at it. Recomputed on import.",
+      "properties": {
+        "level": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "levelName": { "type": ["string", "null"] },
+        "layers": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1, "maximum": 5 }
+        }
+      }
+    },
+    "nextMove": {
+      "type": ["object", "null"],
+      "description": "Derived: the next cell in the first weakest layer's row, with its pattern. Null when every layer is at Level 5. Recomputed on import.",
+      "properties": {
+        "layer": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "from": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "to": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "criterion": { "type": "string" },
+        "pattern": { "type": "string" }
+      }
+    },
+    "link": {
+      "type": "string",
+      "description": "Link that reproduces the profile; the answers travel in the URL fragment."
+    }
+  }
+}

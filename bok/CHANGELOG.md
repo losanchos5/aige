@@ -76,6 +76,20 @@ a completed, reviewed core (1.0).
   in the footer and on `/about`, newsletter sign-ups, search opening and citation copying carry
   declarative Umami event attributes; no new script, and the newsletter note now says the address
   goes straight to Buttondown.
+- **Toolkit** (`/toolkit`): a registry of browser tools built from the Body of Knowledge
+  (`site/src/data/toolkit.ts`), a shared `ToolShell` component with the fixed notice "Indicative,
+  not legal advice and not a conformity claim. Nothing you enter leaves your browser.", a no-JS
+  worksheet mode and print styles, and dependency-free client helpers (`site/public/toolkit/lib.js`:
+  state in the URL fragment, safe storage, JSON, CSV per RFC 4180, Markdown and iCalendar per RFC
+  5545 downloads, clipboard, SVG to PNG through a `data:` URL). No change to the content security
+  policy.
+- **Maturity self-check** (`/toolkit/maturity-self-check`): pick, per stack layer, the highest
+  observable criterion of chapter 07 met today; get the ragged per-layer profile drawn in SVG, the
+  floor and the single next move with its metrics, checklist questions and pattern link. Exports a
+  re-importable JSON profile (`/toolkit/maturity-profile.v1.schema.json`), a Markdown report and an
+  SVG or PNG image; saves profiles in the browser and compares two. `site/src/data/maturity.ts` gains
+  the chapter's criteria table, metrics per level, checklist and typical failures as data (additive;
+  no heading changed).
 
 ## [Unreleased] - 2026-09-20
 
