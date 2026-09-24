@@ -56,6 +56,30 @@ export const tools: readonly ToolEntry[] = [
     href: '/toolkit/maturity-self-check',
     chapter: { label: '07. Maturity model', href: '/bok/maturity-model' },
   },
+  // Block w2-tool-planner: the obligations and deadlines planner over the EU AI
+  // Act and GPAI rows of the obligation register.
+  {
+    id: 'obligations-planner',
+    title: 'Obligations and deadlines planner',
+    summary:
+      'Pick your roles in the EU AI Act value chain and what the system is: the register rows that bind you, with the artefact that evidences each, its layer, the date it applies and its status.',
+    audience: ['AI governance engineers', 'Compliance and legal leads', 'Product and platform owners'],
+    inputs: [
+      'Your roles: provider, deployer, importer, distributor, authorised representative, GPAI model provider (with or without systemic risk)',
+      'The system classes: Annex III, Annex I, Article 50',
+      'An optional reference date',
+    ],
+    outputs: [
+      'The obligations that bind you, with artefact, layer, date, status and patterns',
+      'Timeline of the dates, drawn',
+      'Checklist in Markdown',
+      'Open-data JSON and a CSV',
+      'Calendar file (.ics), one all-day event per date',
+    ],
+    status: 'live',
+    href: '/toolkit/obligations-planner',
+    chapter: { label: '08. Regulatory map', href: '/bok/regulatory-map' },
+  },
 ];
 
 /** The registry entry for `id`; throws at build time on an unknown id so a

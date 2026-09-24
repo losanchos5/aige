@@ -1,0 +1,665 @@
+---
+// /toolkit/obligations-planner: which EU AI Act and GPAI obligations bind a
+// reader, and from when. The reader ticks the roles it holds in the value chain,
+// the classes of the system and, optionally, a reference date; the client module
+// (public/toolkit/obligations-planner.js, with the pure logic in
+// obligations-planner-core.js) keeps the register rows that bind those answers,
+// reads each one's date and status on the reference date, draws the timeline and
+// exports a Markdown checklist, CSV, JSON and an .ics calendar. The rows come
+// from the obligation register (src/data/frameworks.ts, chapter 08); the role
+// mapping and the four duties the register does not hold as rows come from
+// src/data/obligations-planner.ts. Every row is rendered here as well, so the
+// page works as a worksheet without JavaScript.
+import ToolShell from '../../components/toolkit/ToolShell.astro';
+import { toolById, toolNotice } from '../../data/toolkit';
+import {
+  appliesStatusLabels,
+  systemClassLabels,
+  obligationPath,
+  type Obligation,
+  type SystemClass,
+} from '../../data/frameworks';
+import {
+  plannerRoles,
+  plannerClasses,
+  plannerDuties,
+  plannerRows,
+  rowTimeline,
+  outsideDuties,
+  BASELINE_CLASSES,
+  ROLE_CLASSES,
+  AI_ACT_CONSOLIDATED,
+} from '../../data/obligations-planner';
+import { layers } from '../../data/stack';
+import { patternPath } from '../../data/patterns';
+import { patternsFor, frameworkOf } from '../../lib/obligations';
+import { envelope, obligationRecord } from '../../lib/api';
+import { PLAN_SCHEMA_URL } from '../../lib/obligations-plan-schema';
+import { site } from '../../data/site';
+
+const tool = toolById('obligations-planner');
+const pageUrl = new URL(tool.href, site.url).href;
+const chapterHref = '/bok/regulatory-map#eu-ai-act-post-omnibus';
+const rolesHref = '/bok/eu-ai-act#the-eu-operator-roles';
+const timelineHref = '/bok/eu-ai-act#the-post-omnibus-timeline';
+const READING_AID =
+  'A reading aid, not legal advice. Mappings are illustrative, not a claim of conformity.';
+
+const rows = plannerRows();
+const outside = outsideDuties();
+const asOf = rows.map((row) => row.reviewed).sort().at(-1) ?? site.bokVersion;
+const roleLabel = new Map(plannerRoles.map((role) => [role.id, role.label]));
+
+// Labels the planner prints for a class it matched on. The two baseline classes
+// read as what they are for every system, not as a verdict on the reader's.
+const classLabels: Record<string, string> = {
+  ...systemClassLabels,
+  ...Object.fromEntries(plannerClasses.map((c) => [c.id, c.label])),
+  'all-ai-systems': 'Every AI system',
+  prohibited: 'Prohibited-practice screen (every AI system)',
+};
+
+// Short class names for the date qualifiers ("2028-08-02 (Annex I)").
+const shortClass = (c: SystemClass) =>
+  c === 'high-risk-annex-iii' ? 'Annex III' : c === 'high-risk-annex-i' ? 'Annex I' : systemClassLabels[c];
+
+/** A row's start dates, one per distinct date, qualified by class only when
+ *  the row starts on more than one date. */
+function startLabels(row: Obligation): { date: string; label: string }[] {
+  const timeline = rowTimeline(row);
+  const startsByDate = new Map<string, SystemClass[]>();
+  for (const c of timeline.classes) {
+    const date = timeline.starts[c];
+    if (date) startsByDate.set(date, [...(startsByDate.get(date) ?? []), c]);
+  }
+  return [...startsByDate.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, classes]) => ({
+      date,
+      label: startsByDate.size > 1 ? ` (${classes.map(shortClass).join(', ')})` : '',
+    }));
+}
+
+// The worksheet: every row the planner reads, with the dates per class.
+const worksheet = rows.map((row) => {
+  const timeline = rowTimeline(row);
+  const duty = plannerDuties[row.id];
+  const starts = startLabels(row).map(({ date, label }) => `${date}${label}`);
+  return {
+    row,
+    path: obligationPath(row),
+    roles: duty.roles.map((id) => roleLabel.get(id) ?? id),
+    notes: Object.entries(duty.notes ?? {}).map(([role, note]) => `${roleLabel.get(role as never)}: ${note}`),
+    classes: timeline.classes.map((c) => classLabels[c]),
+    starts,
+    later: timeline.steps.filter((step) => step.startFor.length === 0).map((step) => `${step.date}: ${step.note}`),
+  };
+});
+
+// Every date the register gives these rows, for the no-JS "key dates" list.
+const keyDates = new Map<string, Set<string>>();
+for (const row of rows) {
+  const timeline = rowTimeline(row);
+  for (const { date, label } of startLabels(row)) {
+    keyDates.set(date, (keyDates.get(date) ?? new Set()).add(`${row.clause} starts${label}`));
+  }
+  for (const step of timeline.steps) {
+    if (step.startFor.length) continue;
+    keyDates.set(step.date, (keyDates.get(step.date) ?? new Set()).add(`${row.clause}: ${step.note}`));
+  }
+}
+const keyDateList = [...keyDates.entries()]
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([date, items]) => ({ date, items: [...items] }));
+
+// The model the client reads from the JSON island: data only, no markup.
+const data = {
+  version: 1,
+  notice: toolNotice,
+  aid: READING_AID,
+  page: pageUrl,
+  chapter: new URL(chapterHref, site.url).href,
+  asOf,
+  license: site.license,
+  licenseUrl: site.licenseUrl,
+  envelope: {
+    ...envelope('obligations', 2, pageUrl, tool.href),
+    schemaVersion: 1,
+    schema: PLAN_SCHEMA_URL,
+  },
+  roles: plannerRoles.map(({ id, code, label }) => ({ id, code, label })),
+  classes: plannerClasses.map(({ id, code, label }) => ({ id, code, label })),
+  classLabels,
+  classShort: {
+    'high-risk-annex-iii': 'Annex III systems',
+    'high-risk-annex-i': 'Annex I systems',
+  },
+  layers: layers.map((layer) => layer.name),
+  baseline: BASELINE_CLASSES,
+  roleClasses: ROLE_CLASSES,
+  rows: rows.map((row: Obligation) => {
+    const timeline = rowTimeline(row);
+    const duty = plannerDuties[row.id];
+    return {
+      id: row.id,
+      title: row.obligation,
+      clause: row.clause,
+      framework: frameworkOf(row).short,
+      path: obligationPath(row),
+      url: new URL(obligationPath(row), site.url).href,
+      artefact: row.artefact,
+      layers: [...row.layerN],
+      dutyHolder: row.dutyHolder ?? null,
+      status: row.appliesStatus,
+      statusLabel: appliesStatusLabels[row.appliesStatus],
+      reviewed: row.reviewed,
+      roles: duty.roles,
+      notes: duty.notes ?? {},
+      classes: timeline.classes,
+      starts: timeline.starts,
+      steps: timeline.steps,
+      patterns: patternsFor(row).map((p) => ({ title: p.title, href: patternPath(p) })),
+      record: obligationRecord(row),
+    };
+  }),
+  outside,
+};
+
+const sources = [
+  {
+    text: 'Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 July 2026 as amended by Regulation (EU) 2026/1744 (Arts. 3(3) to 3(8) operator roles; 22 and 54 authorised representatives; 23 importers; 24 distributors; 25; 27(1); 49(1) to 49(3); 50; 55(1); 60(1); 113(b) and (c) application dates). Publications Office of the EU (EUR-Lex). 2026-07-27.',
+    url: AI_ACT_CONSOLIDATED,
+    verified: 'primary',
+  },
+  {
+    text: 'Regulation (EU) 2026/1744 (Digital Omnibus on AI), of 8 July 2026; OJ L, 2026/1744, 24.7.2026 (the high-risk dates of Art. 113(c): Annex III from 2 December 2027, Annex I from 2 August 2028). Publications Office of the EU (EUR-Lex). 2026-07-24.',
+    url: 'https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng',
+    verified: 'primary',
+  },
+  {
+    text: '08. Regulatory map: the EU AI Act and GPAI Code of Practice rows of the obligation register (ids, requirement, artefact, layers, duty holder, application date, status, later dates, system classes, patterns), the data this tool reads. AI Governance Engineering Body of Knowledge. 2026-09-24.',
+    url: `${site.url}${chapterHref}`,
+    verified: 'primary',
+  },
+  {
+    text: '18. The EU AI Act: "The EU operator roles", "Article 25: when someone else becomes the provider", "Fundamental rights impact assessment (Article 27)" and "The post-Omnibus timeline". AI Governance Engineering Body of Knowledge. 2026-09-24.',
+    url: `${site.url}${rolesHref}`,
+    verified: 'primary',
+  },
+  {
+    text: 'RFC 5545, Internet Calendaring and Scheduling Core Object Specification (iCalendar) (DATE values for all-day events, an exclusive DTEND, UID and DTSTAMP per event). IETF. 2009-09.',
+    url: 'https://www.rfc-editor.org/rfc/rfc5545',
+    verified: 'primary',
+  },
+  {
+    text: 'AIGP Body of Knowledge and Exam Blueprint, version 2.1, competency II.C (the main elements of AI-specific laws), including the performance indicator on requirements that differ by organisational context such as providers, deployers, importers and distributors; effective 2 February 2026; cited by competency code only; this site is not affiliated with or endorsed by IAPP. IAPP. 2025-09-09.',
+    url: 'https://prod.iapp.org/media/pdf/certification/AIGP_Cert_BOK_2025_FINAL_v2.1.0.pdf',
+    verified: 'primary',
+  },
+];
+---
+
+<ToolShell
+  tool={tool}
+  heading="Which AI Act duties bind you, and from when."
+  description="Pick your EU AI Act roles and system classes: the obligations that bind you, with artefact, layer, date and status, as a checklist, CSV, JSON and calendar."
+  lede="Tick the roles you hold in the value chain and what the system is. You get the rows of the obligation register that bind you: the artefact that evidences each, its stack layer, the date it applies and its status on the date you choose, with a timeline and files to plan from."
+  image={`/og/toolkit/${tool.id}.png`}
+  data={data}
+  needsJs="the filtered plan, the timeline and the exports"
+>
+  <form class="tool-form" id="opl-form" data-opl-form novalidate>
+    <div
+      class="tool-errors"
+      id="opl-errors"
+      data-opl-errors
+      tabindex="-1"
+      role="group"
+      aria-labelledby="opl-errors-title"
+      hidden
+    >
+      <h2 id="opl-errors-title">Check these answers first</h2>
+      <ul data-opl-errors-list></ul>
+    </div>
+
+    <p class="tool-intro">
+      One organisation often holds several roles for the same system, and roles name tasks, not
+      organisations: tick every role you hold for the system you are planning. v1 covers the EU AI
+      Act and the GPAI Code of Practice rows of the <a href="/obligations">obligation register</a>.
+    </p>
+
+    <fieldset class="tool-fieldset" id="opl-roles" aria-describedby="opl-roles-hint">
+      <legend class="tool-legend">Your roles in the value chain</legend>
+      <p class="tool-hint" id="opl-roles-hint">
+        As the Act defines them. Tick at least one.
+        <a href={rolesHref}>Chapter 18 sets the roles out</a>.
+      </p>
+      <p class="tool-error" id="opl-roles-error" hidden></p>
+      <ul class="tool-options">
+        {
+          plannerRoles.map((role) => (
+            <li class="tool-option">
+              <input type="checkbox" id={`opl-role-${role.code}`} name="role" value={role.id} />
+              <label for={`opl-role-${role.code}`}>
+                <span class="tool-option-level">{role.ref}</span>
+                <span class="tool-option-text">
+                  <strong>{role.label}.</strong> {role.hint}
+                </span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="opl-classes" aria-describedby="opl-classes-hint">
+      <legend class="tool-legend">What the system is</legend>
+      <p class="tool-hint" id="opl-classes-hint">
+        Tick every class that applies, or none. AI literacy (Art. 4) and the prohibited-practice
+        screen (Art. 5) reach every provider and deployer whatever you tick; the GPAI duties follow
+        from the GPAI roles above. The planner does not classify the system for you: see
+        <a href="/bok/eu-ai-act#the-risk-ladder">the risk ladder</a>.
+      </p>
+      <ul class="tool-options">
+        {
+          plannerClasses.map((c) => (
+            <li class="tool-option">
+              <input type="checkbox" id={`opl-class-${c.code}`} name="class" value={c.id} />
+              <label for={`opl-class-${c.code}`}>
+                <span class="tool-option-text">
+                  <strong>{c.label}.</strong> {c.hint}
+                </span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <div class="tool-field opl-date">
+      <label for="opl-date">Reference date (optional)</label>
+      <input
+        class="tool-input"
+        id="opl-date"
+        name="date"
+        type="date"
+        min="2024-08-01"
+        max="2035-12-31"
+        aria-describedby="opl-date-hint"
+      />
+      <p class="tool-hint" id="opl-date-hint">
+        The statuses are read on this date. Leave it empty for today; set it to plan a quarter
+        ahead or to see where a past date stood.
+      </p>
+      <p class="tool-error" id="opl-date-error" hidden></p>
+    </div>
+
+    <div class="tool-buttons" data-tool-js data-print-hide hidden>
+      <button type="submit" class="btn btn-primary">Show my obligations</button>
+      <button type="button" class="btn btn-secondary" data-opl-reset>Clear answers</button>
+    </div>
+  </form>
+
+  <section
+    class="tool-result tool-block"
+    id="opl-result"
+    data-opl-result
+    aria-labelledby="opl-result-title"
+    hidden
+  >
+    <h2 id="opl-result-title" tabindex="-1">Your obligations</h2>
+    <p class="tool-intro" data-opl-summary></p>
+    <p class="opl-aid">
+      <strong>{READING_AID}</strong> Register as of <time datetime={asOf}>{asOf}</time>; each row
+      links its own page and sources, and the <a href="#opl-sources">sources below</a> back the
+      role mapping. Dates from the <a href={timelineHref}>post-Omnibus timeline</a>.
+    </p>
+
+    <figure class="tool-chart" data-opl-chart>
+      <div data-opl-chart-svg></div>
+      <figcaption class="tool-hint">
+        One row per date in your plan, read left to right in time. A filled dot applies on the
+        reference date (<span data-opl-ref></span>, the dashed rule); a hollow dot applies later.
+        As of <time datetime={asOf}>{asOf}</time>; the table below holds the same dates.
+      </figcaption>
+    </figure>
+
+    <div class="tool-table-wrap" data-opl-dates-block>
+      <table class="tool-table">
+        <caption>Dates in your plan</caption>
+        <thead>
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">What happens</th>
+          </tr>
+        </thead>
+        <tbody data-opl-dates></tbody>
+      </table>
+    </div>
+
+    <div class="tool-table-wrap" data-opl-rows-block>
+      <table class="tool-table opl-table">
+        <caption>Obligations that bind you, in date order</caption>
+        <thead>
+          <tr>
+            <th scope="col">Obligation</th>
+            <th scope="col">Why it binds you</th>
+            <th scope="col">Artefact and layer</th>
+            <th scope="col">Applies from</th>
+            <th scope="col">Status on the reference date</th>
+            <th scope="col">Patterns</th>
+          </tr>
+        </thead>
+        <tbody data-opl-rows></tbody>
+      </table>
+    </div>
+
+    <div class="opl-outside" data-opl-outside hidden>
+      <h3>Duties outside the register</h3>
+      <p class="tool-hint">
+        Your role carries these duties too. The register does not hold them as rows yet, so they
+        have no id or layer; the dates are those of the same chapter of the Act.
+      </p>
+      <ul></ul>
+    </div>
+
+    <div class="tool-actions" data-print-hide>
+      <button type="button" class="btn btn-secondary" data-action="copy">Copy link</button>
+      <button type="button" class="btn btn-secondary" data-action="md">Download checklist (Markdown)</button>
+      <button type="button" class="btn btn-secondary" data-action="csv">Download CSV</button>
+      <button type="button" class="btn btn-secondary" data-action="json">Download JSON</button>
+      <button type="button" class="btn btn-secondary" data-action="ics">Download calendar (.ics)</button>
+      <button type="button" class="btn btn-secondary" data-action="print">Print</button>
+    </div>
+    <p class="tool-status" role="status" data-opl-status></p>
+  </section>
+
+  <Fragment slot="guide">
+    <h2 id="opl-how">How the planner reads the register</h2>
+    <p>
+      Each row of the <a href="/obligations">obligation register</a> names a clause, the artefact
+      that evidences it, the stack layer that artefact lives in, who it binds, the date it applies
+      and where it stands <a href="#src-3" class="cite">[3]</a>. The planner adds only the role
+      mapping and adds no date of its own.
+    </p>
+    <ul>
+      <li>
+        <strong>A row binds you</strong> when one of your roles is among its duty holders and the
+        system carries one of its classes. Every system carries the baseline classes (Arts. 4 and
+        5); a GPAI role carries the GPAI classes.
+      </li>
+      <li>
+        <strong>Its date is the one for your classes.</strong> The high-risk rows start on
+        2027-12-02 for Annex III systems and on 2028-08-02 for Annex I systems (<code
+          >Art. 113(c)</code
+        >) <a href="#src-1" class="cite">[1]</a><a href="#src-2" class="cite">[2]</a>; the planner
+        takes the earliest date among the classes you ticked and lists the later ones as steps.
+      </li>
+      <li>
+        <strong>Its status is read on your reference date</strong>, not copied: a row applies once
+        its date has passed, whatever status the register gave it on its review date.
+      </li>
+      <li>
+        <strong>Conditions stay visible.</strong> Where the Act narrows a duty to some holders of a
+        role (the FRIA, registration by public-authority deployers, Article 25), the row carries the
+        condition instead of dropping out <a href="#src-1" class="cite">[1]</a><a
+          href="#src-4"
+          class="cite">[4]</a
+        >.
+      </li>
+    </ul>
+
+    <h3 id="opl-roles-guide">The roles, and where their duties sit</h3>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>Operator roles in the EU AI Act</caption>
+        <thead>
+          <tr>
+            <th scope="col">Role</th>
+            <th scope="col">Who holds it</th>
+            <th scope="col">Rows it binds</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            plannerRoles.map((role) => {
+              const bound = rows.filter((row) => plannerDuties[row.id].roles.includes(role.id));
+              const out = outside.filter((duty) => duty.roles.includes(role.id));
+              return (
+                <tr>
+                  <th scope="row">
+                    {role.label} <span class="opl-id">{role.ref}</span>
+                  </th>
+                  <td data-label="Who holds it">{role.hint}</td>
+                  <td data-label="Rows it binds">
+                    {bound.map((row) => row.clause).join(', ') || 'None'}
+                    {out.length > 0 && ` (outside the register: ${out.map((d) => d.article).join(', ')})`}
+                  </td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="opl-register">Every row the planner reads</h2>
+    <p>
+      The worksheet for planning by hand: {rows.length} rows, in register order. Each links its own
+      page with the artefact, the layer, the patterns and the crosswalk.
+    </p>
+    <div class="tool-table-wrap">
+      <table class="tool-table opl-worksheet">
+        <caption>EU AI Act and GPAI Code of Practice rows, as of {asOf}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Obligation</th>
+            <th scope="col">Binds</th>
+            <th scope="col">System class</th>
+            <th scope="col">Applies from</th>
+            <th scope="col">Later dates</th>
+            <th scope="col">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            worksheet.map((entry) => (
+              <tr>
+                <th scope="row">
+                  <a href={entry.path}>{entry.row.obligation}</a>
+                  <span class="opl-id">{entry.row.id}</span>
+                </th>
+                <td data-label="Binds">
+                  {entry.roles.join(', ')}
+                  {entry.notes.map((note) => (
+                    <span class="opl-note">{note}</span>
+                  ))}
+                </td>
+                <td data-label="System class">{entry.classes.join(', ')}</td>
+                <td data-label="Applies from">
+                  {entry.starts.length ? entry.starts.map((start) => <span class="opl-when">{start}</span>) : 'No date'}
+                </td>
+                <td data-label="Later dates">{entry.later.join('; ') || 'None'}</td>
+                <td data-label="Status">{appliesStatusLabels[entry.row.appliesStatus]}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="opl-key-dates">Every date these rows carry</h3>
+    <ul>
+      {
+        keyDateList.map((entry) => (
+          <li>
+            <time datetime={entry.date}>{entry.date}</time>: {entry.items.join('; ')}
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 id="opl-outside-guide">Duties outside the register</h2>
+    <p>
+      The register maps the provider, deployer and GPAI duties. The importer, distributor and
+      authorised-representative duties are not rows yet, so the planner lists them from the Act
+      itself <a href="#src-1" class="cite">[1]</a>, with the dates of the chapter they sit in:
+      Chapter III, Section 3 for Arts. 22 to 24 and Chapter V for Art. 54 (<code
+        >Art. 113(b)</code
+      >, <code>(c)</code>).
+    </p>
+    <ul>
+      {
+        outside.map((duty) => (
+          <li>
+            <strong>
+              <a href={duty.url} rel="noopener">
+                {duty.article}
+              </a>{' '}
+              {duty.title}
+            </strong>{' '}
+            ({duty.roles.map((id) => roleLabel.get(id)).join(', ')}; from{' '}
+            {Object.entries(duty.starts)
+              .map(([c, date]) => (c === '*' ? date : `${date} for ${classLabels[c] ?? c}`))
+              .join(', ')}
+            ). {duty.duty} Record: {duty.artefact}.{duty.condition ? ` ${duty.condition}` : ''}
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 id="opl-by-hand">By hand, without JavaScript</h2>
+    <ol>
+      <li>Note the roles you hold and the classes the system carries.</li>
+      <li>
+        In the worksheet above, keep the rows whose "Binds" cell names one of your roles and whose
+        "System class" cell names one of your classes (Every AI system and the prohibited-practice
+        screen always count; GPAI classes count for GPAI roles).
+      </li>
+      <li>
+        For each row kept, take the date for your class; if it is on or before your reference date,
+        the row applies; otherwise it applies from that date.
+      </li>
+      <li>
+        Build the artefact the row's page names, in the layer it names, and file its output as an
+        evidence record against the row's id.
+      </li>
+    </ol>
+
+    <h2 id="opl-not">What this is not</h2>
+    <p>
+      The planner is a reading aid over the register, not legal advice and not a conformity
+      assessment. It does not classify a system, check an Annex III exception or read Member State
+      law; it trusts the roles and classes you tick. A later amendment, delegated act or guideline can
+      move a date or reshape a duty after the review date; each row's page says when it was last
+      checked. Mappings are illustrative, not a claim of conformity.
+    </p>
+    <p>
+      The same ground, the requirements that differ by organisational context (providers,
+      deployers, importers and distributors), is a performance indicator of competency II.C in the
+      AIGP Body of Knowledge v2.1 <a href="#src-6" class="cite">[6]</a>; this site is not affiliated
+      with or endorsed by IAPP. The calendar export follows RFC 5545 <a href="#src-5" class="cite"
+        >[5]</a
+      >.
+    </p>
+  </Fragment>
+
+  <ol class="sources" id="opl-sources" slot="sources">
+    {
+      sources.map((source, i) => (
+        <li id={`src-${i + 1}`}>
+          <span class="src-num">[{i + 1}]</span> {source.text}{' '}
+          <a href={source.url}>{source.url}</a>{' '}
+          <span class="verified">(verified: {source.verified})</span>
+        </li>
+      ))
+    }
+  </ol>
+</ToolShell>
+
+<style>
+  /* The result rows are built by the client script and the worksheet cells by
+     this page, so the opl- classes are global (the prefix keeps them local). */
+  .opl-aid {
+    max-width: var(--prose);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .opl-aid strong {
+    color: var(--ink);
+  }
+
+  :global(.opl-id) {
+    display: block;
+    margin-top: var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 400;
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+
+  :global(.opl-note),
+  :global(.opl-later),
+  :global(.opl-layers) {
+    display: block;
+    margin-top: var(--s-1);
+    color: var(--ink-2);
+  }
+
+  :global(.opl-when) {
+    display: block;
+    font-family: var(--font-mono);
+    white-space: nowrap;
+  }
+
+  :global(.opl-cell-list) {
+    margin: 0;
+    padding-left: var(--s-4);
+  }
+
+  :global(.opl-cell-list li + li) {
+    margin-top: var(--s-1);
+  }
+
+  :global([data-opl-status='applies']) {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .opl-outside > * + * {
+    margin-top: var(--s-2);
+  }
+
+  .opl-outside :global(ul) {
+    padding-left: var(--s-5);
+  }
+
+  .opl-outside :global(li + li) {
+    margin-top: var(--s-2);
+  }
+
+  .opl-date {
+    max-width: 22rem;
+  }
+
+  :global(.opl-table th[scope='row']),
+  :global(.opl-worksheet th[scope='row']) {
+    min-width: 11rem;
+    font-weight: 600;
+  }
+
+  @media (max-width: 600px) {
+    :global(.opl-table th[scope='row']),
+    :global(.opl-worksheet th[scope='row']) {
+      min-width: 0;
+    }
+  }
+
+  .cite {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    text-decoration: none;
+  }
+</style>
