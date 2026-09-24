@@ -178,6 +178,8 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       'src/data/obligations-planner.ts',
       'public/toolkit/obligations-planner.js',
       'public/toolkit/obligations-planner-core.js',
+    ],
+  ],
   // Block w2-tool-triage: the EU AI Act role and risk-class triage. Its question
   // graph (triage.ts) is built from chapter 18; the engine and the client module
   // live in public/toolkit.
@@ -219,6 +221,8 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       'public/toolkit/policy-card.js',
       'public/toolkit/policy-card-core.js',
       'public/toolkit/lib.js',
+    ],
+  ],
   // Block w2-builders-a: the three document builders of /toolkit, each dated by
   // its page, the builders' data and form engine, its client code and the
   // published schema its record validates against.
@@ -257,6 +261,8 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       'public/toolkit/schema-form.js',
       'public/toolkit/builders.js',
       'public/schemas/model-card.v1.json',
+    ],
+  ],
   // Block w2-builders-b: four toolkit tools that turn a questionnaire into a
   // document. Each page is dated by its template, its data, its client module,
   // the shared form plumbing and the chapter or registry it restates.

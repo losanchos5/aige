@@ -365,6 +365,8 @@ export const patterns: readonly PatternDef[] = [
       'DMCC Act 2024 s. 225',
       'ISO/IEC 42001 A.8.2, A.8.5',
       'NIST AI RMF (Measure 2.3, 2.5)',
+    ],
+  },
   // Block w2-patterns-b (v0.5.0): eight patterns on the deployment and use
   // side, in the catalogue order of their `order` frontmatter (18 to 25 when
   // appended after the 17 patterns above; renumber the files' `order` if another

@@ -308,6 +308,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'The build from intake to release as a chain of gates, each reading a structured record and each named with the pattern that implements it, ending in a technical file the pipeline compiles from those records. Find the first stage whose gate cannot refuse a missing record, and wire that one first. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'governing-development', at: 'lead' }],
+  },
   // Block w2-patterns-a (v0.5.0): the diagrams of the eight development-side
   // patterns, each opening its pattern page.
   {
@@ -373,6 +374,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'Each public claim becomes a register row bound to the eval run behind it; rules check scope and interval before publication, and each release revalidates or pulls the claim. Register a claim before it reaches the copy. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'patterns', pattern: 'claims-substantiation-gate', at: 'lead' }],
+  },
   // Block w2-patterns-b (v0.5.0): one diagram per deployment-side pattern, each
   // placed on its own pattern page.
   {

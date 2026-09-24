@@ -79,6 +79,7 @@ export const tools: readonly ToolEntry[] = [
     status: 'live',
     href: '/toolkit/obligations-planner',
     chapter: { label: '08. Regulatory map', href: '/bok/regulatory-map' },
+  },
   // Block w2-tool-triage: the EU AI Act role and risk-class triage, built from
   // chapter 18; question graph in src/data/triage.ts.
   {
@@ -106,6 +107,7 @@ export const tools: readonly ToolEntry[] = [
     status: 'live',
     href: '/toolkit/ai-act-triage',
     chapter: { label: '18. The EU AI Act in one pass', href: '/bok/eu-ai-act' },
+  },
   {
     id: 'policy-card',
     title: 'Policy Card builder',
@@ -125,6 +127,7 @@ export const tools: readonly ToolEntry[] = [
     status: 'live',
     href: '/toolkit/policy-card',
     chapter: { label: '05. Patterns: Policy Card', href: '/patterns/policy-card' },
+  },
   // Block w2-builders-a: three document builders whose records validate
   // against the published schemas (public/schemas); data in doc-builders.ts.
   {
@@ -195,6 +198,8 @@ export const tools: readonly ToolEntry[] = [
     chapter: {
       label: '14. Governing AI development',
       href: '/bok/governing-development#the-technical-file',
+  },
+  },
   // Block w2-builders-b: four tools that turn a questionnaire into a document.
   {
     id: 'vendor-due-diligence',
