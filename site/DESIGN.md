@@ -135,7 +135,8 @@ respect `prefers-reduced-motion`.
 **Perpetual motion:** three sanctioned infinite animations, all gated to
 `prefers-reduced-motion: no-preference`. The mesh drift (`mesh-drift-a` 34s / `mesh-drift-b` 42s,
 `alternate`) has no user control (it is decorative and behind content). The home hero's gradient
-field (`public/hero-field.js`, a WebGL shader painting `.hero-canvas`, ~30 fps) and its figures strip
+field (`public/hero-field.js`, a WebGL shader painting `.hero-canvas`, ~30 fps, a blob lap every
+~30–60 s so the drift reads within a few seconds) and its figures strip
 marquee (`facts-scroll`, 60s linear, transform-only) share one pause control (`.motion-toggle`,
 `aria-pressed`, WCAG 2.2.2) that stops them together. By Jordi's call (2026-09-24) it has no visible
 chrome: like the skip link it sits off screen until keyboard focus reaches it (Tab after the CTA);
