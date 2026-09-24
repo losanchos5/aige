@@ -10,7 +10,9 @@
  *
  * Self-contained: one <Section> on mesh composition `a`, the one its home
  * neighbours (the resources tint on `b`, the newsletter on `c`) do not use,
- * its own scoped styles, no script. Flat cards (no lift: they are not links).
+ * laid over a tint band so it stays still (only the role section's mesh
+ * drifts), its own scoped styles, no script. Flat cards (no lift: they are
+ * not links).
  */
 import Section from './Section.astro';
 import {
@@ -39,7 +41,7 @@ const art = (n: number) => (n === 1 ? 'Art.' : 'Arts.');
 ---
 
 <Section
-  tone="mesh"
+  tone="tint"
   mesh="a"
   meshK={0.3}
   id="what-applies-now"

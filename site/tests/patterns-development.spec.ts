@@ -84,7 +84,9 @@ test.describe('development-side patterns: data', () => {
       expect(sections.get('Problem')).toContain('**Failure mode.**');
       expect(sections.get('Solution')).toContain('```json');
       expect(sections.get('Solution')).toContain('(illustrative)');
-      expect(text).toContain('Mappings are illustrative, not a claim of conformity.');
+      // The Maps to paragraph is wrapped at 100 columns, so compare with the
+      // line breaks folded into spaces.
+      expect(text.replace(/\s+/g, ' ')).toContain('Mappings are illustrative, not a claim of conformity.');
       expect(text).not.toContain('—');
     });
   }

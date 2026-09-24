@@ -107,7 +107,9 @@ test.describe('what applies now: computation', () => {
     for (const row of now) expect(row.appliesFrom! <= today).toBe(true);
 
     const dates = nextDates(today, 3);
-    expect(dates.map((d) => d.date)).toEqual(['2026-12-02', '2027-12-02', '2028-08-02']);
+    // 2027-08-02 is the Art. 111(3) step of the GPAI rows (models placed before
+    // 2025-08-02 comply), a milestone of the register since v0.5.0.
+    expect(dates.map((d) => d.date)).toEqual(['2026-12-02', '2027-08-02', '2027-12-02']);
     for (const d of dates) {
       expect(d.items.length).toBeGreaterThan(0);
       for (const item of d.items) {
@@ -115,15 +117,17 @@ test.describe('what applies now: computation', () => {
         expect(item.rows.length).toBeGreaterThan(0);
       }
     }
+    const gpai = dates[1].items.flatMap((item) => item.rows.map((r) => r.id));
+    expect(gpai).toContain('AIGE-OBL-EUAIA-ART53');
     // Annex III switches on in one item that carries Arts. 9 and 26.
-    const annexIII = dates[1].items.flatMap((item) => item.rows.map((r) => r.id));
+    const annexIII = dates[2].items.flatMap((item) => item.rows.map((r) => r.id));
     expect(annexIII).toContain('AIGE-OBL-EUAIA-ART9');
     expect(annexIII).toContain('AIGE-OBL-EUAIA-ART26');
   });
 
   test('a date that has passed drops out', () => {
     const after = nextDates('2026-12-02', 3).map((d) => d.date);
-    expect(after[0]).toBe('2027-12-02');
+    expect(after[0]).toBe('2027-08-02');
     expect(after).not.toContain('2026-12-02');
   });
 

@@ -80,7 +80,12 @@ test.describe('toolkit data', () => {
       row.cells.forEach((cell, j) => {
         const raw = table[i][j];
         expect(cell.text, `layer ${row.layer} level ${cell.level}`).toBe(plain(raw));
-        const linked = /\(\/bok\/patterns#([^)]+)\)/.exec(raw)?.[1];
+        // The chapter links a pattern by its page (/patterns/<slug>) or, in
+        // older text, by its catalogue anchor (/bok/patterns#<id>).
+        const bySlug = /\(\/patterns\/([^)#]+)\)/.exec(raw)?.[1];
+        const linked = bySlug
+          ? patterns.find((pattern) => pattern.slug === bySlug)?.id
+          : /\(\/bok\/patterns#([^)]+)\)/.exec(raw)?.[1];
         if (cell.patternSource === 'chapter') expect(linked).toBe(cell.pattern);
         else expect(linked, `cell ${row.layer}.${cell.level} links a pattern`).toBeUndefined();
       });

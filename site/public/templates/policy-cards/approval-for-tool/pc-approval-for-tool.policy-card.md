@@ -33,7 +33,7 @@
 |---|---|---|
 | [AIGE-OBL-EUAIA-ART14](https://aigovernanceengineer.com/obligations/aige-obl-euaia-art14) | EU AI Act Art. 14 human oversight | Deferred |
 | [AIGE-OBL-OWASP-AGENTIC](https://aigovernanceengineer.com/obligations/aige-obl-owasp-agentic) | Top 10 for Agentic Applications 2026 | Voluntary |
-| [AIGE-OBL-CSA-AICM-AGENTIC](https://aigovernanceengineer.com/obligations/aige-obl-csa-aicm-agentic) | AICM Agentic Control Supplement (proposed agent controls) | Draft or proposed |
+| [AIGE-OBL-CSA-AICM-AGENTIC](https://aigovernanceengineer.com/obligations/aige-obl-csa-aicm-agentic) | AICM agent controls with the CSA Agentic Trust Framework and AARM specification | Voluntary |
 
 Mappings are illustrative, not a claim of conformity: a rule helps evidence an obligation, it
 does not discharge it.

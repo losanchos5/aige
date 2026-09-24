@@ -396,8 +396,10 @@ export const figures: readonly FigureDef[] = [
       'In rough order of force, weakest first, as of 2026-09-24. Principles and soft law (the OECD AI Principles, the UNESCO Recommendation, the G7 Hiroshima Code of Conduct and the EU High-Level Expert Group guidelines) set the target and the shared vocabulary. Standards and frameworks (the NIST AI RMF, the ISO/IEC 42001 family and the IEEE 7000 series) are voluntary; ISO/IEC 42001 is certifiable, evidences a management system and confers no AI Act presumption of conformity. The NIST AI RMF adapts the OECD lifecycle and dimensions. Harmonised standards, written by CEN-CENELEC JTC 21 on a Commission request, give a presumption of conformity under Article 40 only once their reference is cited in the Official Journal; the chapter found none cited. The Council of Europe Framework Convention (CETS No. 225) binds the Parties that ratify it and is not in force; the EU AI Act is binding law and recalls the HLEG principles in recital 27. The OECD definition of an AI system, the Convention\'s Article 2 and the AI Act\'s Article 3(1) use near-identical wording. The engineering rule: build each control once, tag it with every instrument it serves and generate each instrument\'s view from the tags.',
     placements: [{ chapter: 'principles-and-standards', section: 'A short lineage of AI soft law', at: 'head' }],
     pages: ['/resources/frameworks'],
-  },
     // Statuses (Convention not in force, no OJ citation): re-check with chapter 22.
+    asOf: '2026-09-24',
+    reviewBy: '2027-03-24',
+  },
   // Block w2-fig-posters (v0.5.0): the reference posters, generated at build
   // from frameworks.ts, roles.ts and deployment-options.ts by
   // scripts/lib/posters.mjs (A-series portrait, 1000 × 1414 units, ≤ 48 KB).

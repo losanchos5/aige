@@ -131,7 +131,9 @@ function renderFigureFigure(def: FigureDef): string {
       ? `<div class="figure-canvas figure-canvas--dual">${svg}${wide}</div>`
       : `<div class="figure-canvas">${svg}</div>`;
   // id="figure-<id>" is the deep link the figure's permalink page uses for
-  // "Where it appears"; the caption links that page (downloads, citation).
+  // "Where it appears"; the caption links that page (downloads, citation). A
+  // poster's link also carries figure-poster-link: it is the way to the full
+  // size, which figures-posters.spec checks.
   const permalinkText = poster
     ? 'Full-size poster, downloads and citation'
     : 'Permalink, downloads and citation';
@@ -141,7 +143,7 @@ function renderFigureFigure(def: FigureDef): string {
     `<figcaption class="figure-figcaption">` +
     `<span class="figure-fig-title">${escapeHtml(def.title)}</span>` +
     `<span class="figure-fig-desc">${escapeHtml(def.caption)}</span>` +
-    `<a class="figure-permalink" href="/figures/${def.id}">${permalinkText}</a>` +
+    `<a class="figure-permalink${poster ? ' figure-poster-link' : ''}" href="/figures/${def.id}">${permalinkText}</a>` +
     `</figcaption>` +
     `<details class="figure-alt">` +
     `<summary class="figure-alt-summary" data-pagefind-ignore>Text description</summary>` +
