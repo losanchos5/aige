@@ -60,12 +60,14 @@ export const stages: readonly { id: LifecycleStage; label: string; lede: string 
 /** Reading order of the schemas inside each stage (a record before the ones that cite it). */
 export const schemaOrder: readonly string[] = [
   'use-case-record',
+  'classification-decision-record',
   'ai-system-register-entry',
   'agent-register-entry',
   'impact-assessment',
   'vendor-due-diligence-response',
   'design-record',
   'dataset-card',
+  'model-card',
   'dataset-admission-record',
   'test-plan',
   'eval-result',

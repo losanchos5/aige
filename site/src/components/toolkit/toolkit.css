@@ -247,11 +247,13 @@
   align-items: center;
 }
 
-/* display: flex above outranks the UA [hidden] rule: keep the JS-only rows
-   (data-tool-js hidden, revealed by lib.js) out of a page without JavaScript. */
+/* display: flex above (and the display of any other tool block) outranks the UA
+   [hidden] rule: keep the JS-only rows and sections (data-tool-js hidden,
+   revealed by lib.js) out of a page without JavaScript. */
 .tool-buttons[hidden],
-.tool-actions[hidden] {
-  display: none;
+.tool-actions[hidden],
+[data-tool-js][hidden] {
+  display: none !important;
 }
 
 .tool-actions .btn,
