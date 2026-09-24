@@ -1,0 +1,972 @@
+---
+// /toolkit/policy-card: the Policy Card builder. The reader picks one rule from
+// the curated templates (src/data/policy-card.ts) or writes a custom one, sets
+// the card's owner, scope, review date and the obligation ids it answers
+// (src/data/frameworks.ts), and the client module (public/toolkit/policy-card.js,
+// with the generators in public/toolkit/policy-card-core.js) builds the Policy
+// Card as Markdown, YAML and JSON (valid against /schemas/policy-card.v1.json),
+// an OPA/Rego module with unit tests, a Cedar stub with tests, an example input
+// and the CI hook. The templates, the obligations and the guide are rendered
+// here too, so the page works as a worksheet without JavaScript.
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import ToolShell from '../../components/toolkit/ToolShell.astro';
+import { toolById, toolNotice } from '../../data/toolkit';
+import {
+  policyCardTemplates,
+  customOperators,
+  effectLabels,
+  enforcementLabels,
+  type PolicyEffect,
+  type EnforcementPoint,
+} from '../../data/policy-card';
+import { obligations, appliesStatusLabels } from '../../data/frameworks';
+import { patterns } from '../../data/patterns';
+import { site } from '../../data/site';
+
+const tool = toolById('policy-card');
+const schema = JSON.parse(
+  readFileSync(resolve(process.cwd(), 'public/schemas/policy-card.v1.json'), 'utf8'),
+);
+
+// Fail the build if a template names an obligation or a pattern that does not exist.
+const obligationById = new Map(obligations.map((row) => [row.id, row]));
+const patternBySlug = new Map(patterns.map((pattern) => [pattern.slug, pattern]));
+for (const template of policyCardTemplates) {
+  for (const id of template.obligations) {
+    if (!obligationById.has(id)) throw new Error(`policy-card: unknown obligation ${id} in ${template.id}`);
+  }
+  if (!patternBySlug.has(template.pattern)) {
+    throw new Error(`policy-card: unknown pattern ${template.pattern} in ${template.id}`);
+  }
+}
+
+// Obligations grouped as chapter 08 groups them, in register order.
+const groups: { label: string; rows: typeof obligations }[] = [];
+for (const row of obligations) {
+  const group = groups.find((entry) => entry.label === row.framework);
+  if (group) (group.rows as (typeof row)[]).push(row);
+  else groups.push({ label: row.framework, rows: [row] });
+}
+
+const statusOf = (id: string) => {
+  const row = obligationById.get(id);
+  return row ? appliesStatusLabels[row.appliesStatus] : '';
+};
+
+/** A template's statement with its default parameter values. */
+function withDefaults(text: string, params: readonly { key: string; default: string }[]): string {
+  return text.replace(/\{([a-z_]+)\}/g, (match, key: string) => {
+    const param = params.find((entry) => entry.key === key);
+    if (!param) return match;
+    if (key === 'operations' && !param.default) return 'every operation';
+    if (key === 'operator') {
+      return customOperators.find((op) => op.id === param.default)?.label ?? param.default;
+    }
+    return param.default;
+  });
+}
+
+const templates = policyCardTemplates.map((template) => ({
+  ...template,
+  statementText:
+    template.id === 'custom' ? template.statement : withDefaults(template.statement, template.params),
+  patternTitle: patternBySlug.get(template.pattern)?.title ?? template.pattern,
+}));
+const curated = templates.filter((template) => template.id !== 'custom');
+const effects = Object.keys(effectLabels) as PolicyEffect[];
+const points = Object.keys(enforcementLabels) as EnforcementPoint[];
+
+// Everything the client needs, as data (no markup): the JSON island.
+const data = {
+  version: 1,
+  notice: toolNotice,
+  page: new URL(tool.href, site.url).href,
+  templates: policyCardTemplates,
+  obligations: obligations.map((row) => ({
+    id: row.id,
+    obligation: row.obligation,
+    status: appliesStatusLabels[row.appliesStatus],
+  })),
+  patterns: Object.fromEntries(patterns.map((pattern) => [pattern.slug, pattern.title])),
+  schema,
+};
+
+const sources = [
+  {
+    text: 'Pattern: Policy Card. A governance rule written as a machine-readable card that the pipeline and the runtime both evaluate, leaving a verdict on every check. AI Governance Engineering Body of Knowledge, chapter 05. 2026-09-24.',
+    url: `${site.url}/patterns/policy-card`,
+    verified: 'primary',
+  },
+  {
+    text: 'Policy Cards: machine-readable, deployment-layer governance artefacts for AI agents, linked to enforcement and audit pipelines (arXiv 2510.24383). 2025-10.',
+    url: 'https://arxiv.org/abs/2510.24383',
+    verified: 'primary',
+  },
+  {
+    text: 'Policy card schema v1 (draft 2020-12) and the AI policy template (ai-policy.yaml, ai-policy.rego) the rule templates cite as their source clauses. AI Governance Engineer templates and schemas library. 2026-09-24.',
+    url: `${site.url}/resources/templates`,
+    verified: 'primary',
+  },
+  {
+    text: 'Obligation register: stable obligation ids (AIGE-OBL-<INSTRUMENT>-<CLAUSE>), one page per obligation. AI Governance Engineering Body of Knowledge, chapter 08. 2026-09-24.',
+    url: `${site.url}/obligations`,
+    verified: 'primary',
+  },
+  {
+    text: 'CLI reference (opa check and its --strict flag, opa test, opa eval with --fail-defined, "exits with non-zero exit code on defined/non-empty result and errors", and --format raw). Open Policy Agent. Accessed 2026-09-24.',
+    url: 'https://www.openpolicyagent.org/docs/cli',
+    verified: 'primary',
+  },
+  {
+    text: 'Policy Testing: opa test runs the rules prefixed with test_; the with keyword replaces input or data with mocks; a test that is undefined or not true fails. Open Policy Agent. Accessed 2026-09-24.',
+    url: 'https://www.openpolicyagent.org/docs/policy-testing',
+    verified: 'primary',
+  },
+  {
+    text: 'Upgrading to v1.0: the if keyword is required for rules with a body and contains for multi-value rules. Open Policy Agent. Accessed 2026-09-24.',
+    url: 'https://www.openpolicyagent.org/docs/v0-upgrade',
+    verified: 'primary',
+  },
+  {
+    text: 'REST API: POST /v1/data/{path} with {"input": ...} returns {"result": ...}. Open Policy Agent. Accessed 2026-09-24.',
+    url: 'https://www.openpolicyagent.org/docs/rest-api',
+    verified: 'primary',
+  },
+  {
+    text: 'Basic Cedar syntax: permit or forbid, when and unless clauses, annotations that "have no impact on policy evaluation", and the implicit deny. Cedar Policy Language Reference Guide. Accessed 2026-09-24.',
+    url: 'https://docs.cedarpolicy.com/policies/syntax-policy.html',
+    verified: 'primary',
+  },
+  {
+    text: 'Authorization: a forbid overrides any permit, and a policy whose evaluation returns an error is skipped and reported in the diagnostics. Cedar Policy Language Reference Guide. Accessed 2026-09-24.',
+    url: 'https://docs.cedarpolicy.com/auth/authorization.html',
+    verified: 'primary',
+  },
+  {
+    text: 'setup-opa: the GitHub Action that installs the OPA CLI (open-policy-agent/setup-opa@v2; release v2.4.0, 2026-04-21). Open Policy Agent. 2026-04-21.',
+    url: 'https://github.com/open-policy-agent/setup-opa',
+    verified: 'primary',
+  },
+  {
+    text: 'OPA v1.21.0, the release the committed Rego samples were checked with. Open Policy Agent. 2026-09-24.',
+    url: 'https://github.com/open-policy-agent/opa/releases/tag/v1.21.0',
+    verified: 'primary',
+  },
+  {
+    text: 'cedar-policy-cli v4.13.0, with the run-tests command, the release the committed Cedar samples were checked with. Cedar. 2026-09-15.',
+    url: 'https://github.com/cedar-policy/cedar/releases/tag/cedar-policy-cli-v4.13.0',
+    verified: 'primary',
+  },
+  {
+    text: 'actions/checkout releases: v7.0.1 is the latest (2026-07-20), the major the CI hook names. GitHub. 2026-07-20.',
+    url: 'https://github.com/actions/checkout/releases',
+    verified: 'primary',
+  },
+  {
+    text: 'actions/upload-artifact releases: v7.0.1 is the latest (2026-04-10), the major the CI hook names. GitHub. 2026-04-10.',
+    url: 'https://github.com/actions/upload-artifact/releases',
+    verified: 'primary',
+  },
+  {
+    text: 'AIGP Body of Knowledge and Exam Blueprint, version 2.1 (effective 2 February 2026): competencies I.C (policies and procedures across the AI life cycle) and IV.C (governing deployment and use). IAPP. 2025-09-09.',
+    url: 'https://prod.iapp.org/media/pdf/certification/AIGP_Cert_BOK_2025_FINAL_v2.1.0.pdf',
+    verified: 'primary',
+  },
+];
+const cite = (n: number) => `#src-${n}`;
+---
+
+<ToolShell
+  tool={tool}
+  heading="One rule, as code and as a card."
+  description="Build a Policy Card in your browser: the rule for people and machines, an OPA/Rego module with tests, a Cedar stub and the CI hook that runs it."
+  lede="Pick a governance rule from six templates, or write your own, then set its owner, scope, review date and the obligations it answers. You get the Policy Card in Markdown, YAML and JSON, an OPA/Rego module with unit tests, a Cedar stub and the CI hook. Illustrative: review before use."
+  image="/og/default.png"
+  data={data}
+  needsJs="the generated files and the downloads"
+>
+  <form class="tool-form" id="pc-form" data-pc-form novalidate>
+    <div
+      class="tool-errors"
+      id="pc-errors"
+      data-pc-errors
+      tabindex="-1"
+      role="group"
+      aria-labelledby="pc-errors-title"
+      hidden
+    >
+      <h2 id="pc-errors-title">Fix these first</h2>
+      <ul data-pc-errors-list></ul>
+    </div>
+
+    <p class="tool-intro">
+      One card holds one rule, so a rule change is one reviewable diff. The templates come from the
+      Policy Card pattern and the AI policy template; every value that ends up in code is checked
+      here, and nothing leaves this page.
+    </p>
+
+    <fieldset class="tool-fieldset" id="pc-rule" aria-describedby="pc-rule-hint">
+      <legend class="tool-legend">1. The rule</legend>
+      <p class="tool-hint" id="pc-rule-hint">
+        Six curated rules, or one condition of your own on one field of the input.
+      </p>
+      <ul class="tool-options">
+        {
+          templates.map((template, i) => (
+            <li class="tool-option">
+              <input
+                type="radio"
+                id={`pc-template-${template.id}`}
+                name="template"
+                value={template.id}
+                checked={i === 0}
+              />
+              <label for={`pc-template-${template.id}`}>
+                <span class="tool-option-level">{template.title}</span>
+                <span class="tool-option-text">{template.summary}</span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="pc-params" aria-describedby="pc-params-hint">
+      <legend class="tool-legend">2. Rule parameters</legend>
+      <p class="tool-hint" id="pc-params-hint" data-tool-nojs>
+        Each rule's parameters, with their defaults. With JavaScript on, only the chosen rule's are
+        shown.
+      </p>
+      {
+        templates.map((template) => (
+          <div class="pc-params" data-pc-params={template.id}>
+            <h3 class="pc-params-title">{template.title}</h3>
+            {template.params.map((param) => {
+              const id = `pc-${template.id}-${param.key}`;
+              if (param.kind === 'operator') {
+                return (
+                  <div class="tool-field">
+                    <label for={id}>{param.label}</label>
+                    <select
+                      class="tool-select"
+                      id={id}
+                      data-pc-param={param.key}
+                      aria-describedby={`${id}-hint`}
+                    >
+                      {customOperators.map((op) => (
+                        <option value={op.id} selected={op.id === param.default}>
+                          {op.label}
+                        </option>
+                      ))}
+                    </select>
+                    <p class="tool-hint" id={`${id}-hint`}>
+                      {param.hint}
+                    </p>
+                  </div>
+                );
+              }
+              return (
+                <div class="tool-field">
+                  <label for={id}>{param.label}</label>
+                  <input
+                    class="tool-input"
+                    id={id}
+                    type="text"
+                    inputmode={param.kind === 'int' || param.kind === 'decimal' ? 'decimal' : undefined}
+                    value={param.default}
+                    autocomplete="off"
+                    spellcheck="false"
+                    data-pc-param={param.key}
+                    aria-describedby={`${id}-hint`}
+                  />
+                  <p class="tool-hint" id={`${id}-hint`}>
+                    {param.hint}
+                  </p>
+                </div>
+              );
+            })}
+            {template.id === 'custom' && (
+              <div class="pc-custom">
+                <div class="tool-field">
+                  <label for="pc-statement">Rule statement</label>
+                  <textarea
+                    class="tool-input"
+                    id="pc-statement"
+                    rows="2"
+                    maxlength="300"
+                    aria-describedby="pc-statement-hint"
+                  >{template.statement}</textarea>
+                  <p class="tool-hint" id="pc-statement-hint">
+                    The rule in one sentence, as the card states it.
+                  </p>
+                </div>
+                <div class="tool-field">
+                  <label for="pc-failureMode">Failure mode it addresses</label>
+                  <textarea
+                    class="tool-input"
+                    id="pc-failureMode"
+                    rows="2"
+                    maxlength="300"
+                    aria-describedby="pc-failureMode-hint"
+                  >{template.failureMode}</textarea>
+                  <p class="tool-hint" id="pc-failureMode-hint">
+                    Start from a named failure mode or harm, not from a clause.
+                  </p>
+                </div>
+                <fieldset class="tool-fieldset pc-sub" id="pc-effect">
+                  <legend class="tool-legend">Effect when the condition holds</legend>
+                  <ul class="tool-options">
+                    {effects.map((effect) => (
+                      <li class="tool-option">
+                        <input
+                          type="radio"
+                          id={`pc-effect-${effect}`}
+                          name="effect"
+                          value={effect}
+                          checked={effect === template.effect}
+                        />
+                        <label for={`pc-effect-${effect}`}>
+                          <span class="tool-option-text">{effectLabels[effect]}</span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </fieldset>
+                <fieldset class="tool-fieldset pc-sub" id="pc-enforcement">
+                  <legend class="tool-legend">Enforced at</legend>
+                  <ul class="tool-options">
+                    {points.map((point) => (
+                      <li class="tool-option">
+                        <input
+                          type="checkbox"
+                          id={`pc-point-${point}`}
+                          name="enforcement"
+                          value={point}
+                          checked={template.enforcementPoints.includes(point)}
+                        />
+                        <label for={`pc-point-${point}`}>
+                          <span class="tool-option-text">{enforcementLabels[point]}</span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </fieldset>
+              </div>
+            )}
+          </div>
+        ))
+      }
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="pc-card" aria-describedby="pc-card-hint">
+      <legend class="tool-legend">3. The card</legend>
+      <p class="tool-hint" id="pc-card-hint">
+        Write roles, not personal names. The card id names the files and the Rego package.
+      </p>
+      <div class="pc-grid">
+        <div class="tool-field">
+          <label for="pc-cardId">Card id</label>
+          <input class="tool-input" id="pc-cardId" type="text" maxlength="60" autocomplete="off" spellcheck="false" value={curated[0].cardId} aria-describedby="pc-cardId-hint" />
+          <p class="tool-hint" id="pc-cardId-hint">Lower case, for example pc-eval-score-gate.</p>
+        </div>
+        <div class="tool-field">
+          <label for="pc-version">Version</label>
+          <input class="tool-input" id="pc-version" type="text" maxlength="32" autocomplete="off" spellcheck="false" value="1.0.0" aria-describedby="pc-version-hint" />
+          <p class="tool-hint" id="pc-version-hint">A rule change is a new version.</p>
+        </div>
+        <div class="tool-field">
+          <label for="pc-title">Title</label>
+          <input class="tool-input" id="pc-title" type="text" maxlength="120" autocomplete="off" value={curated[0].cardTitle} aria-describedby="pc-title-hint" />
+          <p class="tool-hint" id="pc-title-hint">What the card governs.</p>
+        </div>
+        <div class="tool-field">
+          <label for="pc-ruleId">Rule id</label>
+          <input class="tool-input" id="pc-ruleId" type="text" maxlength="80" autocomplete="off" spellcheck="false" value={curated[0].ruleId} aria-describedby="pc-ruleId-hint" />
+          <p class="tool-hint" id="pc-ruleId-hint">Versioned; every verdict carries it.</p>
+        </div>
+        <div class="tool-field">
+          <label for="pc-owner">Owner</label>
+          <input class="tool-input" id="pc-owner" type="text" maxlength="80" autocomplete="off" value="ai-governance-engineering" aria-describedby="pc-owner-hint" />
+          <p class="tool-hint" id="pc-owner-hint">The policy owner: a role or a team.</p>
+        </div>
+        <div class="tool-field">
+          <label for="pc-approver">Approving role (optional)</label>
+          <input class="tool-input" id="pc-approver" type="text" maxlength="80" autocomplete="off" value="ai-governance-committee" aria-describedby="pc-approver-hint" />
+          <p class="tool-hint" id="pc-approver-hint">The card shows the approval as pending until it is recorded.</p>
+        </div>
+        <div class="tool-field">
+          <label for="pc-appliesTo">Applies to</label>
+          <input class="tool-input" id="pc-appliesTo" type="text" maxlength="400" autocomplete="off" spellcheck="false" value={curated[0].appliesTo.join(', ')} aria-describedby="pc-appliesTo-hint" />
+          <p class="tool-hint" id="pc-appliesTo-hint">Registry ids or selectors, comma-separated (for example agent:*, tier:high).</p>
+        </div>
+        <div class="tool-field">
+          <label for="pc-sourcePolicy">Source policy clause (optional)</label>
+          <input class="tool-input" id="pc-sourcePolicy" type="text" maxlength="160" autocomplete="off" spellcheck="false" value={curated[0].sourcePolicy} aria-describedby="pc-sourcePolicy-hint" />
+          <p class="tool-hint" id="pc-sourcePolicy-hint">The clause of your AI policy the card implements.</p>
+        </div>
+        <div class="tool-field">
+          <label for="pc-effectiveFrom">Effective from</label>
+          <input class="tool-input" id="pc-effectiveFrom" type="date" value="2026-10-01" aria-describedby="pc-effectiveFrom-hint" />
+          <p class="tool-hint" id="pc-effectiveFrom-hint">The date this version applies from.</p>
+        </div>
+        <div class="tool-field">
+          <label for="pc-reviewBy">Review by</label>
+          <input class="tool-input" id="pc-reviewBy" type="date" value="2027-04-01" aria-describedby="pc-reviewBy-hint" />
+          <p class="tool-hint" id="pc-reviewBy-hint">Defaults to six months after the effective date.</p>
+        </div>
+      </div>
+      <div class="tool-field pc-wide">
+        <label for="pc-exceptions">Exceptions (optional)</label>
+        <textarea class="tool-input" id="pc-exceptions" rows="2" maxlength="400" aria-describedby="pc-exceptions-hint">Requested by the system owner, approved by the AI governance committee for at most 90 days, and recorded as a signed verdict override with an expiry.</textarea>
+        <p class="tool-hint" id="pc-exceptions-hint">How an exception is requested, approved and time-limited.</p>
+      </div>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="pc-obligations" aria-describedby="pc-obligations-hint">
+      <legend class="tool-legend">4. Obligations answered</legend>
+      <p class="tool-hint" id="pc-obligations-hint">
+        Stable ids from the <a href="/obligations">obligation register</a>; the rule's defaults are
+        ticked. A rule helps evidence an obligation; it does not discharge it.
+      </p>
+      <div class="pc-groups">
+        {
+          groups.map((group) => (
+            <details class="pc-group" data-pc-group>
+              <summary>
+                {group.label} <span class="pc-count" data-pc-count />
+              </summary>
+              <ul class="pc-checks">
+                {group.rows.map((row) => (
+                  <li>
+                    <input
+                      type="checkbox"
+                      id={`pc-ob-${row.id.toLowerCase()}`}
+                      name="obligation"
+                      value={row.id}
+                      checked={curated[0].obligations.includes(row.id)}
+                    />
+                    <label for={`pc-ob-${row.id.toLowerCase()}`}>
+                      <span class="pc-ob-id">{row.id}</span> {row.obligation}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ))
+        }
+      </div>
+      <div class="tool-field pc-wide">
+        <label for="pc-otherRefs">Other references (optional)</label>
+        <input class="tool-input" id="pc-otherRefs" type="text" maxlength="800" autocomplete="off" aria-describedby="pc-otherRefs-hint" />
+        <p class="tool-hint" id="pc-otherRefs-hint">
+          Internal clauses or controls the rule also answers, comma-separated (at most eight).
+        </p>
+      </div>
+    </fieldset>
+
+    <div class="tool-buttons" data-tool-js data-print-hide hidden>
+      <button type="submit" class="btn btn-primary">Build the card</button>
+      <button type="button" class="btn btn-secondary" data-pc-reset>Reset to the rule's defaults</button>
+    </div>
+  </form>
+
+  <section
+    class="tool-result tool-block"
+    id="pc-result"
+    data-pc-result
+    aria-labelledby="pc-result-title"
+    hidden
+  >
+    <h2 id="pc-result-title" tabindex="-1">Your Policy Card</h2>
+    <p class="tool-intro" data-pc-summary></p>
+    <p class="pc-valid" data-pc-valid></p>
+    <p class="pc-review"><strong>Illustrative, review before use.</strong> Test the modules against your own inputs before any of them gates a build or an action.</p>
+
+    <div class="tool-actions" data-print-hide>
+      <button type="button" class="btn btn-secondary" data-action="copy-link">Copy link</button>
+      <button type="button" class="btn btn-secondary" data-action="bundle">Download all (one Markdown file)</button>
+      <button type="button" class="btn btn-secondary" data-action="print">Print</button>
+    </div>
+    <p class="tool-status" role="status" data-pc-status></p>
+
+    <div class="pc-files" data-pc-files></div>
+  </section>
+
+  <Fragment slot="guide">
+    <h2 id="pc-what">What a Policy Card is</h2>
+    <p>
+      A <a href="/glossary/policy-card">Policy Card</a> writes one governance rule as a
+      machine-readable artefact that travels with the system it governs: its effect, the failure mode it addresses, where it is enforced, the
+      obligations it maps to and the engine module that implements it
+      <a href={cite(1)} class="cite">[1]</a><a href={cite(2)} class="cite">[2]</a>. The same card is
+      evaluated in the pipeline and, where the rule is a runtime constraint, at the point of action,
+      and every evaluation leaves a verdict: rule id, decision, input hash and timestamp
+      <a href={cite(1)} class="cite">[1]</a>. The machine version validates against the policy card
+      schema <a href={cite(3)} class="cite">[3]</a>; the obligation ids are the stable ids of the
+      register <a href={cite(4)} class="cite">[4]</a>.
+    </p>
+
+    <h2 id="pc-templates">The six rule templates</h2>
+    <p>
+      Each template states the rule with its default parameters, the effect, where it is enforced,
+      the failure mode it starts from, the obligations it helps evidence by default and the pattern
+      it builds. Without JavaScript, use this list and the fields above as a worksheet.
+    </p>
+    <div class="pc-guide-list">
+      {
+        curated.map((template) => (
+          <section class="pc-guide-item" aria-labelledby={`pc-g-${template.id}`}>
+            <h3 id={`pc-g-${template.id}`}>{template.title}</h3>
+            <p>{template.statementText}</p>
+            <dl class="pc-dl">
+              <dt>Effect</dt>
+              <dd>
+                <code>{template.effect}</code>
+              </dd>
+              <dt>Enforced at</dt>
+              <dd>{template.enforcementPoints.map((point) => <code>{point}</code>)}</dd>
+              <dt>Failure mode</dt>
+              <dd>{template.failureMode}</dd>
+              <dt>Obligations (default)</dt>
+              <dd>
+                <ul class="pc-inline">
+                  {template.obligations.map((id) => (
+                    <li>
+                      <a href={`/obligations/${id.toLowerCase()}`}>{id}</a>{' '}
+                      <span class="pc-muted">({statusOf(id)})</span>
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+              <dt>Builds</dt>
+              <dd>
+                <a href={`/patterns/${template.pattern}`}>{template.patternTitle}</a>
+              </dd>
+              <dt>Sample files</dt>
+              <dd>
+                <a href={`/templates/policy-cards/${template.id}/${template.cardId}.rego`}>Rego</a>,{' '}
+                <a href={`/templates/policy-cards/${template.id}/${template.cardId}_test.rego`}>
+                  Rego tests
+                </a>
+                , <a href={`/templates/policy-cards/${template.id}/${template.cardId}.cedar`}>Cedar</a>,{' '}
+                <a href={`/templates/policy-cards/${template.id}/${template.cardId}.policy-card.yaml`}>
+                  card (YAML)
+                </a>
+              </dd>
+            </dl>
+          </section>
+        ))
+      }
+    </div>
+    <p>
+      <strong>Write your own rule</strong> takes one condition on one field of the input (is
+      missing, equals, does not equal, is below, is above, is one of, is not one of), for one action,
+      with any of the four effects. Comparison operators never match a missing field; use "is
+      missing" to catch one.
+    </p>
+
+    <h2 id="pc-files">What you get</h2>
+    <ul>
+      <li>
+        <strong>The card, three ways.</strong> Markdown for the people who approve it; YAML and JSON
+        for machines, checked in this browser against <code>policy-card.v1.json</code>
+        <a href={cite(3)} class="cite">[3]</a>. The executable module is authoritative over the prose.
+      </li>
+      <li>
+        <strong>An OPA/Rego module.</strong> Rego v1 syntax, which OPA 1.x requires (<code>if</code>
+        on every rule with a body, <code>contains</code> for multi-value rules)
+        <a href={cite(7)} class="cite">[7]</a>, with the rule's parameters at the top, a
+        <code>decision</code>, a <code>blocks</code> rule the CI hook fails on and the
+        <code>verdict</code> the pattern asks for.
+      </li>
+      <li>
+        <strong>Its unit tests.</strong> <code>opa test</code> runs every rule prefixed with
+        <code>test_</code> and mocks the input with <code>with</code>; a test that is undefined or
+        not true fails <a href={cite(6)} class="cite">[6]</a>. The generated cases cover a compliant
+        input, each way the rule fails and an input the rule does not govern.
+      </li>
+      <li>
+        <strong>A Cedar stub and its tests.</strong> For teams that authorise with Cedar: a
+        <code>forbid</code> (or, for the allow effect, a <code>permit</code>) with the rule id in an
+        <code>@id</code> annotation, and cases for <code>cedar run-tests</code>
+        <a href={cite(9)} class="cite">[9]</a><a href={cite(13)} class="cite">[13]</a>.
+      </li>
+      <li>
+        <strong>An example input and the CI hook.</strong> A compliant input document, and a GitHub
+        Actions workflow that checks and tests the module, records the verdict as a build artefact
+        and fails the job on a deny <a href={cite(5)} class="cite">[5]</a><a href={cite(11)} class="cite">[11]</a><a href={cite(14)} class="cite">[14]</a><a href={cite(15)} class="cite">[15]</a>.
+      </li>
+    </ul>
+
+    <h2 id="pc-use">Use it in a repository</h2>
+    <ol>
+      <li>
+        Commit the card and the modules under <code>policies/</code>, next to the system they
+        govern, and review every change as a diff.
+      </li>
+      <li>
+        Run <code>opa check --strict</code> and <code>opa test</code> on the module and its tests
+        <a href={cite(5)} class="cite">[5]</a><a href={cite(6)} class="cite">[6]</a>, then add the
+        cases your own inputs need.
+      </li>
+      <li>
+        Write the step that builds the input (from the registry, the eval store or the change
+        itself) and wire the workflow: <code>opa eval --fail-defined</code> on the
+        <code>blocks</code> rule fails the job when the decision is deny
+        <a href={cite(5)} class="cite">[5]</a>.
+      </li>
+      <li>
+        For runtime rules, have the gateway or guardrail ask OPA for the verdict on every call, for
+        example with <code>POST /v1/data/aige/cards/&lt;package&gt;/verdict</code> and the request as
+        <code>input</code> <a href={cite(8)} class="cite">[8]</a>, and act on its decision.
+      </li>
+      <li>
+        Sign each verdict and write it to the evidence store, as the AI policy template's module
+        does <a href={cite(3)} class="cite">[3]</a>: the verdict left by every evaluation is the
+        evidence the pattern produces <a href={cite(1)} class="cite">[1]</a>.
+      </li>
+    </ol>
+
+    <h3 id="pc-engines">Rego and Cedar read the same rule differently</h3>
+    <p>
+      <a href="/glossary/opa-rego">OPA/Rego</a> computes any decision you name, so the module returns <code>deny</code>,
+      <code>require_approval</code> or <code>alert</code> as the card says.
+      <a href="/glossary/cedar">Cedar</a> returns permit or deny only: it denies by default, a matching <code>forbid</code> overrides every
+      <code>permit</code>, and annotations do not change evaluation
+      <a href={cite(9)} class="cite">[9]</a><a href={cite(10)} class="cite">[10]</a>. The stub
+      therefore carries an <code>@effect</code> annotation the caller reads to route a deny, and a
+      baseline <code>permit</code> so the card can be tested on its own; drop that baseline in a real
+      policy set. Cedar also skips a policy whose evaluation errors
+      <a href={cite(10)} class="cite">[10]</a>, so a wrongly typed request can slip past a
+      <code>forbid</code>: validate requests against a Cedar schema before you rely on it.
+    </p>
+
+    <h3 id="pc-samples">Samples, checked</h3>
+    <p>
+      The default card of every template is published under
+      <a href="/templates/policy-cards/README.md">/templates/policy-cards/</a>, generated by the same
+      code as this page. On 2026-09-24 every sample passed <code>opa check --strict</code> and
+      <code>opa test</code> with OPA 1.21.0, and <code>cedar run-tests</code> with
+      cedar-policy-cli 4.13.0 <a href={cite(12)} class="cite">[12]</a><a href={cite(13)} class="cite">[13]</a>. What you generate with other
+      values is not checked here: run the same commands before you use it.
+    </p>
+
+    <h2 id="pc-where">Where this sits</h2>
+    <p>
+      The builder is layer 1 of the stack, Govern-as-Code: it turns a policy clause into a control
+      that can fail a build or hold an action, which is what
+      <a href="/glossary/governance-as-code">governance-as-code</a> means and what the narrower
+      <a href="/glossary/policy-as-code">policy-as-code</a> does in CI/CD. In the IAPP's AIGP Body of Knowledge (version 2.1) it
+      supports competency I.C, creating and implementing policies across the AI life cycle, and IV.C,
+      applying those policies when an AI system is deployed and used
+      <a href={cite(16)} class="cite">[16]</a>. This site is not affiliated with or endorsed by IAPP.
+    </p>
+
+    <h2 id="pc-not">What this is not</h2>
+    <p>
+      The generated files are illustrative starting points, not finished controls: review them
+      before use. The obligation mappings are illustrative, not a claim of conformity, and a rule
+      that runs is evidence toward an obligation, not proof that it is met. Nothing you enter leaves
+      your browser: there is no upload and no account, and the state lives only in the link you copy.
+    </p>
+  </Fragment>
+
+  <ol class="sources" slot="sources">
+    {
+      sources.map((source, i) => (
+        <li id={`src-${i + 1}`}>
+          <span class="src-num">[{i + 1}]</span> {source.text} <a href={source.url}>{source.url}</a>{' '}
+          <span class="verified">(verified: {source.verified})</span>
+        </li>
+      ))
+    }
+  </ol>
+</ToolShell>
+
+<style>
+  .pc-params > * + * {
+    margin-top: var(--s-3);
+  }
+
+  .pc-params + .pc-params {
+    margin-top: var(--s-5);
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--line);
+  }
+
+  .pc-params-title {
+    font-size: 1.125rem;
+  }
+
+  /* With JavaScript only the chosen rule's group shows: no divider above it. */
+  form[data-pc-js] .pc-params + .pc-params {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .pc-custom > * + * {
+    margin-top: var(--s-3);
+  }
+
+  .pc-sub {
+    margin-top: var(--s-4);
+  }
+
+  .pc-grid {
+    display: grid;
+    gap: var(--s-2) var(--s-5);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  }
+
+  .pc-wide {
+    max-width: none;
+    margin-top: var(--s-3);
+  }
+
+  textarea.tool-input {
+    min-height: 4.5rem;
+    resize: vertical;
+    font: inherit;
+  }
+
+  .pc-groups {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .pc-group {
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+  }
+
+  .pc-group summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding: var(--s-2) var(--s-3);
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .pc-count {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+
+  .pc-checks {
+    display: grid;
+    gap: var(--s-1);
+    margin: 0;
+    padding: 0 var(--s-3) var(--s-3);
+    list-style: none;
+  }
+
+  .pc-checks li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-2);
+    align-items: start;
+    min-height: 32px;
+  }
+
+  .pc-checks input {
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0.2rem 0 0;
+  }
+
+  .pc-checks label {
+    cursor: pointer;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  .pc-ob-id,
+  .pc-guide-item code,
+  .pc-dl code {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .pc-ob-id {
+    color: var(--ink-2);
+  }
+
+  .pc-valid {
+    font-weight: 600;
+    color: var(--ok);
+  }
+
+  .pc-valid[data-invalid] {
+    color: var(--block);
+  }
+
+  .pc-review {
+    color: var(--ink);
+  }
+
+  .pc-files > * + * {
+    margin-top: var(--s-5);
+  }
+
+  .pc-files :global(.pc-file-group > * + *) {
+    margin-top: var(--s-3);
+  }
+
+  .pc-files :global(.pc-file) {
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+  }
+
+  .pc-files :global(.pc-file-head) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-2) var(--s-3);
+    padding: var(--s-2) var(--s-3);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .pc-files :global(.pc-file-name) {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .pc-files :global(.pc-file-label) {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .pc-files :global(.pc-file-path) {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+
+  .pc-files :global(.pc-file-actions) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+
+  .pc-files :global(.pc-file-actions .btn) {
+    min-height: 44px;
+    padding-inline: var(--s-3);
+    font-size: var(--fs-small);
+  }
+
+  .pc-files :global(.pc-code) {
+    max-height: 26rem;
+    margin: 0;
+    padding: var(--s-3);
+    overflow: auto;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--ink);
+    white-space: pre;
+    tab-size: 2;
+  }
+
+  .pc-files :global(.pc-code:focus-visible) {
+    outline: 2px solid var(--l1-ink);
+    outline-offset: -2px;
+  }
+
+  .pc-guide-list {
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .pc-guide-item {
+    padding: var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+
+  .pc-guide-item > * + * {
+    margin-top: var(--s-2);
+  }
+
+  .pc-guide-item h3 {
+    font-size: 1.125rem;
+  }
+
+  .pc-dl {
+    display: grid;
+    grid-template-columns: minmax(8rem, max-content) 1fr;
+    gap: var(--s-1) var(--s-4);
+    margin: 0;
+    font-size: var(--fs-small);
+  }
+
+  .pc-dl dt {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .pc-dl dd {
+    margin: 0;
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+
+  .pc-dl dd code + code {
+    margin-left: var(--s-2);
+  }
+
+  .pc-inline {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .pc-muted {
+    color: var(--ink-2);
+  }
+
+  /* Long paths and endpoints in the guide wrap instead of widening the page. */
+  code {
+    overflow-wrap: anywhere;
+  }
+
+  .cite {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    text-decoration: none;
+  }
+
+  @media (max-width: 600px) {
+    .pc-dl {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .pc-dl dd + dt {
+      margin-top: var(--s-2);
+    }
+  }
+
+  @media print {
+    /* With a result on the page, print the card and its files, not the form. */
+    :global(.tool-app:has([data-pc-result]:not([hidden]))) form {
+      display: none;
+    }
+
+    .pc-files :global(.pc-code) {
+      max-height: none;
+      overflow: visible;
+      white-space: pre-wrap;
+    }
+  }
+</style>
