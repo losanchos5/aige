@@ -113,6 +113,8 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       [
         `/patterns/${pattern.slug}`,
         ['src/pages/patterns/[id].astro', `../bok/patterns/${pattern.slug}.md`],
+      ] as [string, string[]],
+  ),
   // Block b-figures-system: the figures gallery and one permalink per figure,
   // each dated by its template, the figure manifest and the figure's own art.
   ['/figures', ['src/pages/figures/index.astro', 'src/data/figures.ts', 'src/data/diagrams.ts']],
