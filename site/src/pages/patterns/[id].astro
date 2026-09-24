@@ -1,0 +1,159 @@
+---
+// /patterns/<slug>: one page per pattern of the chapter 05 catalogue, rendered
+// from bok/patterns/<slug>.md with the chapter reading layout (Doc): breadcrumb,
+// chapter rail with chapter 05 active, on-this-page TOC, the pattern's archify
+// diagram (placed by data/diagrams.ts, see lib/rehype-diagrams.ts), glossary
+// hover cards, its own numbered sources, a cite block and a prev/next pager in
+// catalogue order. lib/pattern-pages.ts fails the build when a file, its
+// data/patterns.ts entry and its catalogue section disagree.
+import { render } from 'astro:content';
+import Doc from '../../layouts/Doc.astro';
+import PatternFoot from '../../components/PatternFoot.astro';
+import { layers } from '../../data/stack';
+import { site } from '../../data/site';
+import { patternCatalogueHref } from '../../data/patterns';
+import { loadPatternPages, type PatternPage } from '../../lib/pattern-pages';
+import { gitCreated, gitDate } from '../../lib/reading';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+
+export async function getStaticPaths() {
+  const pages = await loadPatternPages();
+  return pages.map((page, i) => ({
+    params: { id: page.def.slug },
+    props: {
+      page,
+      prev: i > 0 ? pages[i - 1].def : undefined,
+      next: i < pages.length - 1 ? pages[i + 1].def : undefined,
+    },
+  }));
+}
+
+interface Adjacent {
+  slug: string;
+  title: string;
+}
+
+interface Props {
+  page: PatternPage;
+  prev?: Adjacent;
+  next?: Adjacent;
+}
+
+const { page, prev, next } = Astro.props;
+const { entry, def } = page;
+const { Content, headings } = await render(entry);
+
+const title = `Pattern: ${def.title}`;
+const summary = entry.data.summary;
+const editPath = `bok/patterns/${def.slug}.md`;
+const updated = gitDate(`../${editPath}`);
+const published = gitCreated(`../${editPath}`);
+
+const layerOf = (n: number) => layers.find((layer) => layer.n === n);
+const pageLayers = [def.layer, ...(def.secondaryLayer ? [def.secondaryLayer] : [])]
+  .map(layerOf)
+  .filter((layer): layer is NonNullable<ReturnType<typeof layerOf>> => layer !== undefined);
+
+const crumbs = [{ label: 'Patterns', href: '/patterns' }, { label: def.title }];
+
+// The source URLs listed under "## Sources", for the article's `citation`.
+const citations = [...(entry.body ?? '').split(/^## Sources\s*$/m)[1]?.matchAll(/(https?:\/\/\S+) \(verified:/g) ?? []]
+  .map((match) => match[1]);
+
+const pageUrl = new URL(`/patterns/${def.slug}`, site.url).href;
+const bokUrl = new URL('/bok', site.url).href;
+const chapterUrl = new URL('/bok/patterns', site.url).href;
+const bookId = `${bokUrl}#book`;
+
+const jsonLd = [
+  {
+    '@type': 'Book',
+    '@id': bookId,
+    name: 'AI Governance Engineering: The Thesis and Body of Knowledge',
+    url: bokUrl,
+    version: site.bokVersion,
+    inLanguage: 'en',
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+  },
+  {
+    '@type': 'TechArticle',
+    '@id': `${pageUrl}#article`,
+    headline: title,
+    description: summary,
+    url: pageUrl,
+    inLanguage: 'en',
+    datePublished: published,
+    dateModified: updated,
+    image: new URL('/og/bok-patterns.png', site.url).href,
+    isPartOf: [{ '@id': bookId }, { '@id': `${chapterUrl}#article` }],
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    ...(citations.length > 0 ? { citation: citations } : {}),
+  },
+  ...authorNodes,
+];
+---
+
+<Doc
+  title={title}
+  summary={summary}
+  description={summary}
+  crumbs={crumbs}
+  headings={headings}
+  updated={updated}
+  activeSlug="patterns"
+  image="/og/bok-patterns.png"
+  jsonLd={jsonLd}
+  article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
+>
+  <p class="pp-meta" data-pagefind-ignore>
+    {
+      pageLayers.map((layer) => (
+        <a class="pp-layer" href={`/bok/the-stack#${layer.chapterAnchor}`} style={`--pp-l: var(${layer.colorVar}); --pp-ink: var(${layer.colorVar}-ink)`}>
+          Layer {String(layer.n).padStart(2, '0')} · {layer.name}
+        </a>
+      ))
+    }
+    <a class="pp-cat" href={patternCatalogueHref(def)}>In the chapter 05 catalogue</a>
+  </p>
+  <Content />
+  <PatternFoot title={def.title} slug={def.slug} editPath={editPath} prev={prev} next={next} />
+</Doc>
+
+<style>
+  /* The layer chip(s) and the way back to the catalogue, above the Summary. A
+     layer colour means that layer (audit SL-06): the chip takes its pair. */
+  .pp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-3);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.04em;
+  }
+
+  .pp-layer {
+    display: inline-block;
+    padding: 0.3em 0.6em;
+    border-radius: var(--r-sm);
+    background: var(--pp-l);
+    color: var(--pp-ink);
+    text-decoration: none;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  .pp-layer:hover {
+    text-decoration: underline;
+  }
+
+  .pp-cat {
+    color: var(--ink-2);
+  }
+</style>

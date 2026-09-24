@@ -1,12 +1,15 @@
 // /llms.txt: the plain-text index an LLM reads to find its way around the site,
 // in the llmstxt.org format: an H1, a `>` summary, a paragraph of provenance and
 // then one `##` section per group of `- [name](url): notes` links. Every title
-// and summary comes from data/chapters.ts or from the Markdown sources
-// themselves, so this file says exactly what the rendered pages say. The full
-// text of everything listed here is at /llms-full.txt.
+// and summary comes from data/chapters.ts, the pattern files' frontmatter or
+// the Markdown sources themselves, so this file says exactly what the rendered
+// pages say. The full text of every chapter, pattern and Thesis listed here is
+// at /llms-full.txt.
 import type { APIRoute } from 'astro';
 import { chaptersOrdered } from '../data/chapters';
+import { patternPath } from '../data/patterns';
 import { site } from '../data/site';
+import { loadPatternPages } from '../lib/pattern-pages';
 import {
   chapterPath,
   docLead,
@@ -18,10 +21,11 @@ import {
 } from '../lib/llms';
 import { readSource } from '../lib/md-parse';
 
-export const GET: APIRoute = (context) => {
+export const GET: APIRoute = async (context) => {
   const origin = originOf(context.site);
   const url = (path: string) => `${origin}${path}`;
 
+  const patternPages = await loadPatternPages();
   const thesisEn = docLead(readSource('THESIS.md'));
   const thesisEs = docLead(readSource('THESIS.es.md'));
 
@@ -39,6 +43,17 @@ export const GET: APIRoute = (context) => {
         linkLine(chapter.title, url(chapterPath(chapter)), chapter.summary),
       ),
     ),
+
+    section('Patterns', [
+      linkLine(
+        'Pattern catalogue',
+        url('/patterns'),
+        `The ${patternPages.length} patterns below, grouped by the five stack layers. Chapter 05 (${url('/bok/patterns')}) keeps the template and a summary of each.`,
+      ),
+      ...patternPages.map(({ entry, def }) =>
+        linkLine(`Pattern: ${def.title}`, url(patternPath(def)), entry.data.summary),
+      ),
+    ]),
 
     section('Thesis', [
       linkLine(thesisEn.title, url('/thesis'), thesisEn.summary),
@@ -66,6 +81,31 @@ export const GET: APIRoute = (context) => {
         'The same mapping as JSON, with the disclaimer, version and licence in the payload.',
       ),
       linkLine(
+        'Harms atlas',
+        url('/resources/harms'),
+        'The harms AI systems cause to individuals, groups, organisations, society and the environment: each with its failure mode, the control that catches it, the evidence it leaves and real incidents.',
+      ),
+      linkLine(
+        'Harms atlas (JSON)',
+        url('/resources/harms.json'),
+        'The same atlas as JSON.',
+      ),
+      linkLine(
+        'Cases',
+        url('/cases'),
+        'Publicly documented AI incidents written as engineering post-mortems: what happened, the failure mode, the control that would have caught it, the evidence it would have left and the obligations it touches.',
+      ),
+      linkLine(
+        'Templates and schemas',
+        url('/resources/templates'),
+        'JSON Schemas, filled examples and human templates for the records AI governance produces, each field tagged with the obligations it helps evidence. Illustrative, not a claim of conformity.',
+      ),
+      linkLine(
+        'AI contract and licence clauses',
+        url('/resources/contracts'),
+        'The clauses to check before you deploy a third-party AI system: what each governs, the red flag, a fallback position and the evidence to keep. An engineering checklist, not legal advice.',
+      ),
+      linkLine(
         'Discipline map',
         url('/map'),
         'The whole discipline on one page: every chapter, layer, pattern, workflow, obligation, maturity level and learning stage, as a mind map and as a linked list.',
@@ -91,7 +131,7 @@ export const GET: APIRoute = (context) => {
       linkLine(
         'Full text',
         url('/llms-full.txt'),
-        'Every chapter and the Thesis in full, as Markdown, in one file.',
+        'Every chapter, every pattern and the Thesis in full, as Markdown, in one file.',
       ),
     ]),
 

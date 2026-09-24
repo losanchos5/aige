@@ -3,8 +3,9 @@
 // llmstxt.org convention: an H1 with the site name, a `>` blockquote summary, a
 // short paragraph, then `##` sections of `- [name](url): notes` links.
 //
-// Everything is derived from data/site.ts and data/chapters.ts, so the two files
-// cannot drift from what the site renders.
+// Everything is derived from data/site.ts, data/chapters.ts, data/patterns.ts
+// and the Markdown sources, so the two files cannot drift from what the site
+// renders.
 
 import type { Chapter } from '../data/chapters';
 import { site } from '../data/site';
@@ -22,6 +23,9 @@ export function originOf(contextSite: URL | undefined): string {
 export function chapterPath(chapter: Chapter): string {
   return `/bok/${chapter.slug}`;
 }
+
+/** The chapter whose position the pattern pages follow in reading order. */
+export const PATTERNS_CHAPTER_ID = '05-patterns';
 
 /** One link line in the spec's format; the notes are optional. */
 export function linkLine(name: string, url: string, notes?: string): string {

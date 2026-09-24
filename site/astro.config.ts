@@ -12,6 +12,7 @@ import rehypeGlossary from './src/lib/rehype-glossary';
 import { chaptersOrdered } from './src/data/chapters';
 import { cases } from './src/data/cases';
 import { obligations, obligationPath } from './src/data/frameworks';
+import { patterns } from './src/data/patterns';
 import { gitDate } from './src/lib/reading';
 
 // Sitemap URL -> the source file(s) whose last commit dates the page: the page
@@ -70,6 +71,17 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         string,
         string[],
       ],
+  ),
+  // Block b-patterns-split: the pattern index and one page per pattern. The
+  // index is dated by its template, the pattern manifest and the pattern files;
+  // each pattern page by its own Markdown file and the template that renders it.
+  ['/patterns', ['src/pages/patterns/index.astro', 'src/data/patterns.ts', '../bok/patterns']],
+  ...patterns.map(
+    (pattern) =>
+      [
+        `/patterns/${pattern.slug}`,
+        ['src/pages/patterns/[id].astro', `../bok/patterns/${pattern.slug}.md`],
+      ] as [string, string[]],
   ),
 ]);
 

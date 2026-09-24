@@ -12,7 +12,8 @@
 // It also checks that every schema has a human template in public/templates
 // naming each top-level field, that the CSV templates are rectangular, that no
 // file in the library carries an em dash (house style), and that the
-// illustrative JSON shapes published in bok/05-patterns.md still validate
+// illustrative JSON shapes published in the pattern catalogue (chapter 05,
+// bok/05-patterns.md, and its pattern pages, bok/patterns/*.md) still validate
 // against the schemas that extend them (compatibility with the book).
 //
 //   node scripts/schemas-check.mjs          # from site/, as the build runs it
@@ -25,6 +26,9 @@ const SCHEMAS = join(SITE, 'public', 'schemas');
 const EXAMPLES = join(SCHEMAS, 'examples');
 const TEMPLATES = join(SITE, 'public', 'templates');
 const PATTERNS_MD = resolve(SITE, '..', 'bok', '05-patterns.md');
+// Since v0.5.0 each pattern's full text, including its illustrative JSON shape,
+// lives in its own page under bok/patterns/.
+const PATTERN_PAGES = resolve(SITE, '..', 'bok', 'patterns');
 
 const BASE_ID = 'https://aigovernanceengineer.com/schemas/';
 const PATTERN_BASE = 'https://aigovernanceengineer.com/bok/patterns#pattern-';
@@ -403,7 +407,15 @@ function main() {
   if (!existsSync(PATTERNS_MD)) {
     warnings.push(`${rel(PATTERNS_MD)} not found; skipped the chapter 05 compatibility check`);
   } else {
-    const chapter = readFileSync(PATTERNS_MD, 'utf8');
+    // The catalogue followed by every pattern page, in file-name order: each
+    // compatibility lead below appears once across them.
+    const pageFiles = existsSync(PATTERN_PAGES)
+      ? readdirSync(PATTERN_PAGES).filter((name) => name.endsWith('.md')).sort()
+      : [];
+    const chapter = [
+      readFileSync(PATTERNS_MD, 'utf8'),
+      ...pageFiles.map((name) => readFileSync(join(PATTERN_PAGES, name), 'utf8')),
+    ].join('\n');
     for (const [lead, stem, pointer] of compat) {
       const at = chapter.indexOf(lead);
       const block = at === -1 ? null : /```json\s*\n([\s\S]*?)```/.exec(chapter.slice(at, at + 1200));
@@ -422,7 +434,7 @@ function main() {
       const target = pointer ? resolveRef(entry.schema, pointer) : entry.schema;
       const out = [];
       validate(target, instance, '', entry.schema, out);
-      out.forEach((message) => fail(`bok/05-patterns.md ("${lead}") vs ${stem}`, message));
+      out.forEach((message) => fail(`chapter 05 patterns ("${lead}") vs ${stem}`, message));
       compatChecked++;
     }
   }
