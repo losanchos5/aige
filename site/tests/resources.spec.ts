@@ -136,6 +136,82 @@ test('crosswalk CSV and JSON export the data with the notice', async ({ page }) 
   expect(await json.text()).toContain(notice);
 });
 
+test('crosswalk exports use schema 2 and keep the v1 fields', async ({ page }) => {
+  const json = await (await page.request.get('/resources/crosswalk.json')).json();
+  expect(json.schemaVersion).toBe(2);
+  expect(json.topics).toHaveLength(topics.length);
+  expect(json.columns).toHaveLength(columns.length);
+  expect(json.frameworks.length).toBeGreaterThanOrEqual(columns.length);
+  const fields = [
+    'topic',
+    'framework',
+    'reference',
+    'label',
+    'title',
+    'strength',
+    'verified',
+    'note',
+    'url',
+    'obligation',
+    'chapter',
+    'clauseId',
+    'column',
+    'see',
+  ];
+  for (const field of fields) {
+    expect(json.references[0], field).toHaveProperty(field);
+  }
+
+  const csv = await (await page.request.get('/resources/crosswalk.csv')).text();
+  const header = csv.split('\r\n')[1];
+  // The nine v1 columns keep their order; v2 appends the machine ids.
+  expect(
+    header.startsWith(
+      'Topic,Framework,Reference,Title,Strength,Verified,Note,Source URL,Obligation,',
+    ),
+  ).toBe(true);
+  expect(header).toContain('Clause ID');
+});
+
+test('crosswalk column chooser: four default columns, more on demand, remembered', async ({
+  page,
+}) => {
+  await page.goto('/resources/crosswalk');
+  const visibleHeads = page.locator('th.cw-colh:visible');
+  const defaults = columns.filter((c) => c.defaultVisible).length;
+  await expect(visibleHeads).toHaveCount(defaults);
+
+  const chooser = page.locator('[data-cw-cols]');
+  await expect(chooser).toBeVisible();
+  await chooser.locator('summary').click();
+  await chooser.getByLabel('GDPR').check();
+  await expect(page.locator('th.cw-colh[data-cw-col="gdpr"]')).toBeVisible();
+  await expect(page.locator('td[data-cw-col="gdpr"]').first()).toBeVisible();
+
+  // Remembered in this browser (localStorage) across a reload.
+  await page.reload();
+  await expect(page.locator('th.cw-colh[data-cw-col="gdpr"]')).toBeVisible();
+
+  await page.locator('[data-cw-cols] summary').click();
+  await page.locator('[data-cw-cols-all]').click();
+  await expect(visibleHeads).toHaveCount(columns.length);
+  await page.locator('[data-cw-cols-reset]').click();
+  await expect(visibleHeads).toHaveCount(defaults);
+});
+
+test('crosswalk at 390 px: every column on, still no horizontal page scroll', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/resources/crosswalk');
+  await page.locator('[data-cw-cols] summary').click();
+  await page.locator('[data-cw-cols-all]').click();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
 test('every crosswalk "Obligation row →" link resolves on the frameworks page', async ({
   page,
 }) => {
@@ -164,6 +240,14 @@ test.describe('crosswalk without JavaScript', () => {
     expect(href).toMatch(/^#topic-/);
     await rowh.click();
     expect(new URL(page.url()).hash).toBe(href);
+  });
+
+  test('every column shows and the explorer says it needs JavaScript', async ({ page }) => {
+    await page.goto('/resources/crosswalk');
+    await expect(page.locator('th.cw-colh:visible')).toHaveCount(columns.length);
+    await expect(page.locator('[data-cw-cols]')).toBeHidden();
+    await expect(page.locator('[data-cwx-form]')).toBeHidden();
+    await expect(page.locator('#explore')).toContainText('The explorer needs JavaScript');
   });
 });
 
