@@ -877,7 +877,9 @@ const sources = [
     margin-top: var(--s-4);
   }
 
-  .tool-guide pre {
+  /* The guide lives in ToolShell's slot, so these rules key on elements this
+     page authors (scoped), not on ToolShell's .tool-guide wrapper. */
+  pre {
     overflow-x: auto;
     max-width: 100%;
     padding: var(--s-3);
@@ -886,6 +888,17 @@ const sources = [
     font-size: var(--fs-small);
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+  }
+
+  pre code {
+    white-space: inherit;
+    overflow-wrap: anywhere;
+  }
+
+  /* toolkit.css gives .tool-buttons display: flex, which beats the [hidden]
+     UA rule; without JavaScript the submit row must stay hidden. */
+  .tool-buttons[hidden] {
+    display: none;
   }
 
   .cite {
