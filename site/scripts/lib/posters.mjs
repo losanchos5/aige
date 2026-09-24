@@ -265,13 +265,12 @@ const LANE_PRECEDENCE = [
 ];
 
 /**
- * Dated steps chapter 18 states ("The post-Omnibus timeline") that no obligation
- * row carries. The two markers frame the axis; the GPAI step is an obligation.
+ * Dated markers chapter 18 states ("The post-Omnibus timeline") that no
+ * obligation row carries; they frame the axis. Every dated duty, including the
+ * Art. 111(3) step for GPAI models placed before 2025-08-02, comes from the
+ * register rows' appliesFrom and milestones.
  */
 const CH18_MARKERS = { actInForce: '2024-08-01', omnibusInForce: '2026-07-27' };
-const CH18_STEPS = [
-  { lane: 'gpai', date: '2027-08-02', note: 'GPAI models placed before 2025-08-02 must comply (Art. 111(3))' },
-];
 
 /** Build the lanes and their events from the frameworks.ts obligation rows. */
 export function timelineModel(obligations) {
@@ -304,8 +303,6 @@ export function timelineModel(obligations) {
       addEvent(target, m.date, row.id, 'step', m.note);
     }
   }
-  for (const step of CH18_STEPS) addEvent(step.lane, step.date, 'ch18', 'step', step.note);
-
   return LANE_ORDER.map((id) => {
     const lane = lanes.get(id);
     const events = [...lane.events.values()].sort((a, b) => a.date.localeCompare(b.date));
@@ -374,15 +371,15 @@ const TIMELINE = {
     },
     legacyArticles: 'Art. 111(2)',
     events: {
-      'prohibited:2025-02-02': 'Se aplican las prohibiciones originales',
-      'prohibited:2026-12-02': 'Nuevas prohibiciones: NCII y CSAM',
+      'prohibited:2025-02-02': 'Se aplican las prohibiciones',
+      'prohibited:2026-12-02': 'Nuevos vetos: NCII y CSAM',
       'literacy:2025-02-02': 'Se aplica el art. 4',
       'literacy:2026-07-27': 'Art. 4 reformulado; nuevo art. 4a',
       'gpai:2025-08-02': 'Obligaciones de los proveedores',
       'gpai:2026-08-02': 'La Comisión puede multar (art. 101)',
       'gpai:2027-08-02': 'Deben cumplir los modelos introducidos antes de 2025-08-02',
       'transparency:2026-08-02': 'Informar y marcar (art. 50)',
-      'transparency:2026-12-02': 'Fin del periodo de gracia del marcado para sistemas existentes',
+      'transparency:2026-12-02': 'Fin de la gracia del marcado para sistemas existentes',
       'annex-iii:2026-08-02': 'Pruebas en condiciones reales (art. 60)',
       'annex-iii:2027-12-02': 'Se aplican las obligaciones; aplazadas desde 2026-08-02',
       'annex-i:2028-08-02': 'Se aplican las obligaciones; aplazadas desde 2027-08-02',

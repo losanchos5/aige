@@ -8,14 +8,14 @@
   <line class="rule" x1="40" y1="196" x2="960" y2="196"/>
   <text class="mono" x="66.9" y="230" font-size="16">Act in force 2024-08-01</text>
   <text class="mono" x="339.6" y="230" font-size="16">Omnibus in force 2026-07-27</text>
-  <line class="rule" x1="128.5" y1="270" x2="128.5" y2="1226"/>
-  <line class="rule" x1="265.7" y1="270" x2="265.7" y2="1226"/>
-  <line class="rule" x1="403" y1="270" x2="403" y2="1226"/>
-  <line class="rule" x1="540.2" y1="270" x2="540.2" y2="1226"/>
-  <line class="rule" x1="677.9" y1="270" x2="677.9" y2="1226"/>
-  <line class="rule" x1="815.1" y1="270" x2="815.1" y2="1226"/>
-  <line class="axis" x1="70.9" y1="238" x2="70.9" y2="1226"/>
-  <line class="stroke-arrow" x1="343.6" y1="238" x2="343.6" y2="1226" stroke-dasharray="5 4"/>
+  <line class="rule" x1="128.5" y1="270" x2="128.5" y2="1248"/>
+  <line class="rule" x1="265.7" y1="270" x2="265.7" y2="1248"/>
+  <line class="rule" x1="403" y1="270" x2="403" y2="1248"/>
+  <line class="rule" x1="540.2" y1="270" x2="540.2" y2="1248"/>
+  <line class="rule" x1="677.9" y1="270" x2="677.9" y2="1248"/>
+  <line class="rule" x1="815.1" y1="270" x2="815.1" y2="1248"/>
+  <line class="axis" x1="70.9" y1="238" x2="70.9" y2="1248"/>
+  <line class="stroke-arrow" x1="343.6" y1="238" x2="343.6" y2="1248" stroke-dasharray="5 4"/>
   <rect class="dot-mask" x="64.2" y="244" width="48" height="22"/>
   <text class="mono muted" x="88.2" y="260" font-size="16" text-anchor="middle">2024</text>
   <rect class="dot-mask" x="173.1" y="244" width="48" height="22"/>
@@ -68,8 +68,8 @@
   <line class="rule" x1="40" y1="526" x2="960" y2="526"/>
   <rect class="dot-mask" x="36" y="532" width="303" height="26"/>
   <text class="disp" x="40" y="551" font-size="20">General-purpose AI models</text>
-  <rect class="dot-mask" x="838.8" y="534" width="125.2" height="24"/>
-  <text class="mono muted" x="960" y="551" font-size="16" text-anchor="end">Arts. 53, 55</text>
+  <rect class="dot-mask" x="819.6" y="534" width="144.4" height="24"/>
+  <text class="mono muted" x="960" y="551" font-size="16" text-anchor="end">Arts. 52 to 55</text>
   <line class="stroke-arrow" x1="48" y1="570" x2="208.6" y2="570" stroke-dasharray="4 5"/>
   <rect class="glyph-fill" x="208.6" y="567" width="743.4" height="6"/>
   <line class="rule" x1="208.6" y1="579" x2="208.6" y2="590"/>
@@ -113,49 +113,49 @@
   <line class="rule" x1="40" y1="818" x2="960" y2="818"/>
   <rect class="dot-mask" x="36" y="824" width="366.8" height="26"/>
   <text class="disp" x="40" y="843" font-size="20">High-risk through use (Annex III)</text>
-  <rect class="dot-mask" x="416.4" y="826" width="547.6" height="24"/>
-  <text class="mono muted" x="960" y="843" font-size="16" text-anchor="end">Arts. 6, 9 to 15, 17, 25 to 27, 43, 47, 49, 60, 71 to 73</text>
-  <line class="stroke-arrow" x1="48" y1="862" x2="529" y2="862" stroke-dasharray="4 5"/>
-  <rect class="glyph-fill" x="529" y="859" width="423" height="6"/>
-  <line class="rule" x1="345.8" y1="871" x2="345.8" y2="882"/>
-  <rect class="dot-mask" x="165" y="883" width="191.9" height="60"/>
-  <text class="mono" x="353.8" y="897" font-size="16" text-anchor="end">2026-08-02</text>
-  <text class="ink2" x="353.8" y="918" font-size="16" text-anchor="end">Real-world testing rules</text>
-  <text class="ink2" x="353.8" y="938" font-size="16" text-anchor="end">(Art. 60)</text>
-  <line class="rule" x1="529" y1="871" x2="529" y2="882"/>
-  <rect class="dot-mask" x="518" y="883" width="241.5" height="60"/>
-  <text class="mono" x="521" y="897" font-size="16">2027-12-02</text>
-  <text class="ink2" x="521" y="918" font-size="16">Annex III duties apply; deferred</text>
-  <text class="ink2" x="521" y="938" font-size="16">from 2026-08-02</text>
-  <circle class="dot-off" cx="345.8" cy="862" r="7"/>
-  <circle class="dot-on" cx="529" cy="862" r="8"/>
-  <line class="rule" x1="40" y1="954" x2="960" y2="954"/>
-  <rect class="dot-mask" x="36" y="960" width="405.2" height="26"/>
-  <text class="disp" x="40" y="979" font-size="20">High-risk through products (Annex I)</text>
-  <rect class="dot-mask" x="531.6" y="962" width="432.4" height="24"/>
-  <text class="mono muted" x="960" y="979" font-size="16" text-anchor="end">Arts. 6, 9 to 15, 17, 25, 26, 43, 47, 72, 73</text>
-  <line class="stroke-arrow" x1="48" y1="998" x2="620.7" y2="998" stroke-dasharray="4 5"/>
-  <rect class="glyph-fill" x="620.7" y="995" width="331.3" height="6"/>
-  <line class="rule" x1="620.7" y1="1007" x2="620.7" y2="1018"/>
-  <rect class="dot-mask" x="609.7" y="1019" width="231.3" height="60"/>
-  <text class="mono" x="612.7" y="1033" font-size="16">2028-08-02</text>
-  <text class="ink2" x="612.7" y="1054" font-size="16">Annex I duties apply; deferred</text>
-  <text class="ink2" x="612.7" y="1074" font-size="16">from 2027-08-02</text>
-  <circle class="dot-on" cx="620.7" cy="998" r="8"/>
-  <line class="rule" x1="40" y1="1090" x2="960" y2="1090"/>
-  <rect class="dot-mask" x="36" y="1096" width="516.6" height="26"/>
-  <text class="disp" x="40" y="1115" font-size="20">Legacy high-risk systems for public authorities</text>
-  <rect class="dot-mask" x="848.4" y="1098" width="115.6" height="24"/>
-  <text class="mono muted" x="960" y="1115" font-size="16" text-anchor="end">Art. 111(2)</text>
-  <line class="stroke-arrow" x1="48" y1="1134" x2="895.2" y2="1134" stroke-dasharray="4 5"/>
-  <rect class="glyph-fill" x="895.2" y="1131" width="56.8" height="6"/>
-  <line class="rule" x1="895.2" y1="1143" x2="895.2" y2="1154"/>
-  <rect class="dot-mask" x="721.2" y="1155" width="185" height="60"/>
-  <text class="mono" x="903.2" y="1169" font-size="16" text-anchor="end">2030-08-02</text>
-  <text class="ink2" x="903.2" y="1190" font-size="16" text-anchor="end">Systems already on the</text>
-  <text class="ink2" x="903.2" y="1210" font-size="16" text-anchor="end">market must comply</text>
-  <circle class="dot-on" cx="895.2" cy="1134" r="8"/>
-  <line class="rule" x1="40" y1="1226" x2="960" y2="1226"/>
+  <rect class="dot-mask" x="36" y="849" width="605.2" height="22"/>
+  <text class="mono muted" x="40" y="864" font-size="16">Arts. 6, 9 to 20, 22 to 27, 43, 47 to 49, 60, 71 to 73, 75, 86</text>
+  <line class="stroke-arrow" x1="48" y1="884" x2="529" y2="884" stroke-dasharray="4 5"/>
+  <rect class="glyph-fill" x="529" y="881" width="423" height="6"/>
+  <line class="rule" x1="345.8" y1="893" x2="345.8" y2="904"/>
+  <rect class="dot-mask" x="165" y="905" width="191.9" height="60"/>
+  <text class="mono" x="353.8" y="919" font-size="16" text-anchor="end">2026-08-02</text>
+  <text class="ink2" x="353.8" y="940" font-size="16" text-anchor="end">Real-world testing rules</text>
+  <text class="ink2" x="353.8" y="960" font-size="16" text-anchor="end">(Art. 60)</text>
+  <line class="rule" x1="529" y1="893" x2="529" y2="904"/>
+  <rect class="dot-mask" x="518" y="905" width="241.5" height="60"/>
+  <text class="mono" x="521" y="919" font-size="16">2027-12-02</text>
+  <text class="ink2" x="521" y="940" font-size="16">Annex III duties apply; deferred</text>
+  <text class="ink2" x="521" y="960" font-size="16">from 2026-08-02</text>
+  <circle class="dot-off" cx="345.8" cy="884" r="7"/>
+  <circle class="dot-on" cx="529" cy="884" r="8"/>
+  <line class="rule" x1="40" y1="976" x2="960" y2="976"/>
+  <rect class="dot-mask" x="36" y="982" width="405.2" height="26"/>
+  <text class="disp" x="40" y="1001" font-size="20">High-risk through products (Annex I)</text>
+  <rect class="dot-mask" x="474" y="984" width="490" height="24"/>
+  <text class="mono muted" x="960" y="1001" font-size="16" text-anchor="end">Arts. 6, 9 to 20, 22 to 26, 43, 47, 48, 72, 73, 75</text>
+  <line class="stroke-arrow" x1="48" y1="1020" x2="620.7" y2="1020" stroke-dasharray="4 5"/>
+  <rect class="glyph-fill" x="620.7" y="1017" width="331.3" height="6"/>
+  <line class="rule" x1="620.7" y1="1029" x2="620.7" y2="1040"/>
+  <rect class="dot-mask" x="609.7" y="1041" width="231.3" height="60"/>
+  <text class="mono" x="612.7" y="1055" font-size="16">2028-08-02</text>
+  <text class="ink2" x="612.7" y="1076" font-size="16">Annex I duties apply; deferred</text>
+  <text class="ink2" x="612.7" y="1096" font-size="16">from 2027-08-02</text>
+  <circle class="dot-on" cx="620.7" cy="1020" r="8"/>
+  <line class="rule" x1="40" y1="1112" x2="960" y2="1112"/>
+  <rect class="dot-mask" x="36" y="1118" width="516.6" height="26"/>
+  <text class="disp" x="40" y="1137" font-size="20">Legacy high-risk systems for public authorities</text>
+  <rect class="dot-mask" x="848.4" y="1120" width="115.6" height="24"/>
+  <text class="mono muted" x="960" y="1137" font-size="16" text-anchor="end">Art. 111(2)</text>
+  <line class="stroke-arrow" x1="48" y1="1156" x2="895.2" y2="1156" stroke-dasharray="4 5"/>
+  <rect class="glyph-fill" x="895.2" y="1153" width="56.8" height="6"/>
+  <line class="rule" x1="895.2" y1="1165" x2="895.2" y2="1176"/>
+  <rect class="dot-mask" x="721.2" y="1177" width="185" height="60"/>
+  <text class="mono" x="903.2" y="1191" font-size="16" text-anchor="end">2030-08-02</text>
+  <text class="ink2" x="903.2" y="1212" font-size="16" text-anchor="end">Systems already on the</text>
+  <text class="ink2" x="903.2" y="1232" font-size="16" text-anchor="end">market must comply</text>
+  <circle class="dot-on" cx="895.2" cy="1156" r="8"/>
+  <line class="rule" x1="40" y1="1248" x2="960" y2="1248"/>
   <circle class="dot-on" cx="50" cy="1287" r="8"/>
   <text class="ink2" x="70" y="1292" font-size="16">Duties apply</text>
   <circle class="dot-off" cx="203.04000000000002" cy="1287" r="7"/>

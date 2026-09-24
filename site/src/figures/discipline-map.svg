@@ -1,201 +1,217 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1248 2108" class="figc map-svg" role="group" aria-labelledby="fig-discipline-map-t fig-discipline-map-d">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1248 2160" class="figc map-svg" role="group" aria-labelledby="fig-discipline-map-t fig-discipline-map-d">
   <title id="fig-discipline-map-t">The map of the discipline</title>
   <desc id="fig-discipline-map-d">A two-sided mind map with a central AI Governance Engineer node and eight branches, each with its second-level topics as links.</desc>
 <g class="branch" data-branch="foundations">
 <g class="edges" aria-hidden="true">
-<path class="edge l1-st" fill="none" stroke-width="2.5" d="M 524 1054 C 506 1054, 506 462, 488 462"/>
-<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 462 C 300 462, 300 256, 282 256"/>
-<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 462 C 300 462, 300 292, 282 292"/>
-<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 462 C 300 462, 300 328, 282 328"/>
-<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 462 C 300 462, 300 532, 282 532"/>
+<path class="edge l1-st" fill="none" stroke-width="2.5" d="M 524 1080 C 506 1080, 506 248, 488 248"/>
+<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 248 C 300 248, 300 42, 282 42"/>
+<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 248 C 300 248, 300 78, 282 78"/>
+<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 248 C 300 248, 300 114, 282 114"/>
+<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 248 C 300 248, 300 318, 282 318"/>
 </g>
-<a href="/bok/definition"><rect class="l1-bg" x="318" y="448" width="170" height="28" rx="8"/><text class="l1-tx disp" x="329" y="467.1" font-size="15"><tspan x="329" dy="0">Foundations</tspan></text></a>
-<a href="/bok/definition#the-definition"><rect class="l1-bg" x="12" y="242" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="260.4" font-size="13"><tspan x="23" dy="0">The definition</tspan></text></a>
-<a href="/bok/definition#the-three-questions"><rect class="l1-bg" x="12" y="278" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="296.4" font-size="13"><tspan x="23" dy="0">The three questions</tspan></text></a>
-<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-bg" x="12" y="314" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="332.4" font-size="13"><tspan x="23" dy="0">The disambiguation cluster</tspan></text></a>
-<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="12" y="350" width="118.8" height="20" rx="6"/><text class="l1-tx" x="20" y="364.1" font-size="12"><tspan x="20" dy="0">AI safety research</tspan></text></a>
-<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="136.8" y="350" width="121.9" height="20" rx="6"/><text class="l1-tx" x="144.8" y="364.1" font-size="12"><tspan x="144.8" dy="0">MLOps / LLMOps</tspan></text></a>
-<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="12" y="382" width="252.5" height="20" rx="6"/><text class="l1-tx" x="20" y="396.1" font-size="12"><tspan x="20" dy="0">Model risk management (SR 11-7 style)</tspan></text></a>
-<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="12" y="414" width="140.3" height="20" rx="6"/><text class="l1-tx" x="20" y="428.1" font-size="12"><tspan x="20" dy="0">AI compliance / legal</tspan></text></a>
-<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="12" y="446" width="166.7" height="20" rx="6"/><text class="l1-tx" x="20" y="460.1" font-size="12"><tspan x="20" dy="0">Responsible AI / AI ethics</tspan></text></a>
-<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="12" y="478" width="111" height="20" rx="6"/><text class="l1-tx" x="20" y="492.1" font-size="12"><tspan x="20" dy="0">GRC engineering</tspan></text></a>
-<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="129" y="478" width="147.1" height="20" rx="6"/><text class="l1-tx" x="137" y="492.1" font-size="12"><tspan x="137" dy="0">AI security engineering</tspan></text></a>
-<a href="/bok/why-now#the-five-problems-with-the-evidence"><rect class="l1-bg" x="12" y="518" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="536.4" font-size="13"><tspan x="23" dy="0">The five problems, with the evidence</tspan></text></a>
-<a href="/bok/why-now#1-governance-written-for-systems-that-no-longer-exist"><rect class="l1-band" x="12" y="554" width="126.9" height="20" rx="6"/><text class="l1-tx" x="20" y="568.1" font-size="12"><tspan x="20" dy="0">Governance written</tspan></text></a>
-<a href="/bok/why-now#2-point-in-time-review-of-a-continuously-changing-thing"><rect class="l1-band" x="12" y="586" width="139" height="20" rx="6"/><text class="l1-tx" x="20" y="600.1" font-size="12"><tspan x="20" dy="0">Point-in-time review</tspan></text></a>
-<a href="/bok/why-now#3-governance-as-a-gate-at-the-end-not-a-property-of-the-build"><rect class="l1-band" x="12" y="618" width="138.1" height="20" rx="6"/><text class="l1-tx" x="20" y="632.1" font-size="12"><tspan x="20" dy="0">Governance as a gate</tspan></text></a>
-<a href="/bok/why-now#4-framework-theatre"><rect class="l1-band" x="156.1" y="618" width="124.5" height="20" rx="6"/><text class="l1-tx" x="164.1" y="632.1" font-size="12"><tspan x="164.1" dy="0">Framework theatre</tspan></text></a>
-<a href="/bok/why-now#5-no-runtime-data-path"><rect class="l1-band" x="12" y="650" width="133.5" height="20" rx="6"/><text class="l1-tx" x="20" y="664.1" font-size="12"><tspan x="20" dy="0">No runtime data path</tspan></text></a>
+<a href="/bok/definition"><rect class="l1-bg" x="318" y="234" width="170" height="28" rx="8"/><text class="l1-tx disp" x="329" y="253.1" font-size="15"><tspan x="329" dy="0">Foundations</tspan></text></a>
+<a href="/bok/definition#the-definition"><rect class="l1-bg" x="12" y="28" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="46.4" font-size="13"><tspan x="23" dy="0">The definition</tspan></text></a>
+<a href="/bok/definition#the-three-questions"><rect class="l1-bg" x="12" y="64" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="82.4" font-size="13"><tspan x="23" dy="0">The three questions</tspan></text></a>
+<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-bg" x="12" y="100" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="118.4" font-size="13"><tspan x="23" dy="0">The disambiguation cluster</tspan></text></a>
+<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="12" y="136" width="118.8" height="20" rx="6"/><text class="l1-tx" x="20" y="150.1" font-size="12"><tspan x="20" dy="0">AI safety research</tspan></text></a>
+<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="136.8" y="136" width="121.9" height="20" rx="6"/><text class="l1-tx" x="144.8" y="150.1" font-size="12"><tspan x="144.8" dy="0">MLOps / LLMOps</tspan></text></a>
+<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="12" y="168" width="252.5" height="20" rx="6"/><text class="l1-tx" x="20" y="182.1" font-size="12"><tspan x="20" dy="0">Model risk management (SR 11-7 style)</tspan></text></a>
+<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="12" y="200" width="140.3" height="20" rx="6"/><text class="l1-tx" x="20" y="214.1" font-size="12"><tspan x="20" dy="0">AI compliance / legal</tspan></text></a>
+<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="12" y="232" width="166.7" height="20" rx="6"/><text class="l1-tx" x="20" y="246.1" font-size="12"><tspan x="20" dy="0">Responsible AI / AI ethics</tspan></text></a>
+<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="12" y="264" width="111" height="20" rx="6"/><text class="l1-tx" x="20" y="278.1" font-size="12"><tspan x="20" dy="0">GRC engineering</tspan></text></a>
+<a href="/bok/definition#the-disambiguation-cluster"><rect class="l1-band" x="129" y="264" width="147.1" height="20" rx="6"/><text class="l1-tx" x="137" y="278.1" font-size="12"><tspan x="137" dy="0">AI security engineering</tspan></text></a>
+<a href="/bok/why-now#the-five-problems-with-the-evidence"><rect class="l1-bg" x="12" y="304" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="322.4" font-size="13"><tspan x="23" dy="0">The five problems, with the evidence</tspan></text></a>
+<a href="/bok/why-now#1-governance-written-for-systems-that-no-longer-exist"><rect class="l1-band" x="12" y="340" width="126.9" height="20" rx="6"/><text class="l1-tx" x="20" y="354.1" font-size="12"><tspan x="20" dy="0">Governance written</tspan></text></a>
+<a href="/bok/why-now#2-point-in-time-review-of-a-continuously-changing-thing"><rect class="l1-band" x="12" y="372" width="139" height="20" rx="6"/><text class="l1-tx" x="20" y="386.1" font-size="12"><tspan x="20" dy="0">Point-in-time review</tspan></text></a>
+<a href="/bok/why-now#3-governance-as-a-gate-at-the-end-not-a-property-of-the-build"><rect class="l1-band" x="12" y="404" width="138.1" height="20" rx="6"/><text class="l1-tx" x="20" y="418.1" font-size="12"><tspan x="20" dy="0">Governance as a gate</tspan></text></a>
+<a href="/bok/why-now#4-framework-theatre"><rect class="l1-band" x="156.1" y="404" width="124.5" height="20" rx="6"/><text class="l1-tx" x="164.1" y="418.1" font-size="12"><tspan x="164.1" dy="0">Framework theatre</tspan></text></a>
+<a href="/bok/why-now#5-no-runtime-data-path"><rect class="l1-band" x="12" y="436" width="133.5" height="20" rx="6"/><text class="l1-tx" x="20" y="450.1" font-size="12"><tspan x="20" dy="0">No runtime data path</tspan></text></a>
 </g>
 <g class="branch" data-branch="values">
 <g class="edges" aria-hidden="true">
-<path class="edge l2-st" fill="none" stroke-width="2.5" d="M 524 1054 C 506 1054, 506 750, 488 750"/>
-<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 318 750 C 300 750, 300 732, 282 732"/>
-<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 318 750 C 300 750, 300 768, 282 768"/>
+<path class="edge l2-st" fill="none" stroke-width="2.5" d="M 524 1080 C 506 1080, 506 536, 488 536"/>
+<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 318 536 C 300 536, 300 518, 282 518"/>
+<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 318 536 C 300 536, 300 554, 282 554"/>
 </g>
-<a href="/bok/values-and-principles"><rect class="l2-bg" x="318" y="736" width="170" height="28" rx="8"/><text class="l2-tx disp" x="329" y="755.1" font-size="15"><tspan x="329" dy="0">Values &amp; principles</tspan></text></a>
-<a href="/bok/values-and-principles#the-eight-values"><rect class="l2-bg" x="12" y="718" width="270" height="28" rx="8"/><text class="l2-tx" x="23" y="736.4" font-size="13"><tspan x="23" dy="0">The eight values</tspan></text><text class="l2-tx mono" x="276" y="732" font-size="11" text-anchor="end" aria-hidden="true">8</text></a>
-<a href="/bok/values-and-principles#the-six-principles"><rect class="l2-bg" x="12" y="754" width="270" height="28" rx="8"/><text class="l2-tx" x="23" y="772.4" font-size="13"><tspan x="23" dy="0">The six principles</tspan></text><text class="l2-tx mono" x="276" y="768" font-size="11" text-anchor="end" aria-hidden="true">6</text></a>
+<a href="/bok/values-and-principles"><rect class="l2-bg" x="318" y="522" width="170" height="28" rx="8"/><text class="l2-tx disp" x="329" y="541.1" font-size="15"><tspan x="329" dy="0">Values &amp; principles</tspan></text></a>
+<a href="/bok/values-and-principles#the-eight-values"><rect class="l2-bg" x="12" y="504" width="270" height="28" rx="8"/><text class="l2-tx" x="23" y="522.4" font-size="13"><tspan x="23" dy="0">The eight values</tspan></text><text class="l2-tx mono" x="276" y="518" font-size="11" text-anchor="end" aria-hidden="true">8</text></a>
+<a href="/bok/values-and-principles#the-six-principles"><rect class="l2-bg" x="12" y="540" width="270" height="28" rx="8"/><text class="l2-tx" x="23" y="558.4" font-size="13"><tspan x="23" dy="0">The six principles</tspan></text><text class="l2-tx mono" x="276" y="554" font-size="11" text-anchor="end" aria-hidden="true">6</text></a>
 </g>
 <g class="branch" data-branch="stack">
 <g class="edges" aria-hidden="true">
-<path class="edge l3-st" fill="none" stroke-width="2.5" d="M 524 1054 C 506 1054, 506 954, 488 954"/>
-<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 954 C 300 954, 300 832, 282 832"/>
-<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 318 954 C 300 954, 300 868, 282 868"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 318 954 C 300 954, 300 912, 282 912"/>
-<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 318 954 C 300 954, 300 964, 282 964"/>
-<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 318 954 C 300 954, 300 1016, 282 1016"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 318 954 C 300 954, 300 1068, 282 1068"/>
+<path class="edge l3-st" fill="none" stroke-width="2.5" d="M 524 1080 C 506 1080, 506 740, 488 740"/>
+<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 740 C 300 740, 300 618, 282 618"/>
+<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 318 740 C 300 740, 300 654, 282 654"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 318 740 C 300 740, 300 698, 282 698"/>
+<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 318 740 C 300 740, 300 750, 282 750"/>
+<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 318 740 C 300 740, 300 802, 282 802"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 318 740 C 300 740, 300 854, 282 854"/>
 </g>
-<a href="/bok/the-stack"><rect class="l3-bg" x="318" y="940" width="170" height="28" rx="8"/><text class="l3-tx disp" x="329" y="959.1" font-size="15"><tspan x="329" dy="0">The Stack</tspan></text></a>
-<a href="/bok/the-stack#layer-01-govern-as-code"><rect class="l1-bg" x="12" y="818" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="836.4" font-size="13"><tspan x="23" dy="0">Layer 01 Govern-as-Code</tspan></text></a>
-<a href="/bok/the-stack#layer-02-inventory--transparency"><rect class="l2-bg" x="12" y="854" width="270" height="28" rx="8"/><text class="l2-tx" x="23" y="872.4" font-size="13"><tspan x="23" dy="0">Layer 02 Inventory &amp; Transparency</tspan></text></a>
-<a href="/bok/the-stack#layer-03-evals--red-teaming-as-evidence"><rect class="l3-bg" x="12" y="890" width="270" height="44" rx="8"/><text class="l3-tx" x="23" y="908.9" font-size="13"><tspan x="23" dy="0">Layer 03 Evals &amp; Red Teaming as</tspan><tspan x="23" dy="15">Evidence</tspan></text></a>
-<a href="/bok/the-stack#layer-04-runtime-controls--observability"><rect class="l4-bg" x="12" y="942" width="270" height="44" rx="8"/><text class="l4-tx" x="23" y="960.9" font-size="13"><tspan x="23" dy="0">Layer 04 Runtime Controls &amp;</tspan><tspan x="23" dy="15">Observability</tspan></text></a>
-<a href="/bok/the-stack#layer-05-assurance--continuous-compliance"><rect class="l5-bg" x="12" y="994" width="270" height="44" rx="8"/><text class="l5-tx" x="23" y="1012.9" font-size="13"><tspan x="23" dy="0">Layer 05 Assurance &amp; Continuous</tspan><tspan x="23" dy="15">Compliance</tspan></text></a>
-<a href="/bok/the-stack#the-minimum-viable-stack-for-a-team-of-one"><rect class="l3-bg" x="12" y="1046" width="270" height="44" rx="8"/><text class="l3-tx" x="23" y="1064.9" font-size="13"><tspan x="23" dy="0">The minimum viable stack for a team of</tspan><tspan x="23" dy="15">one</tspan></text></a>
+<a href="/bok/the-stack"><rect class="l3-bg" x="318" y="726" width="170" height="28" rx="8"/><text class="l3-tx disp" x="329" y="745.1" font-size="15"><tspan x="329" dy="0">The Stack</tspan></text></a>
+<a href="/bok/the-stack#layer-01-govern-as-code"><rect class="l1-bg" x="12" y="604" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="622.4" font-size="13"><tspan x="23" dy="0">Layer 01 Govern-as-Code</tspan></text></a>
+<a href="/bok/the-stack#layer-02-inventory--transparency"><rect class="l2-bg" x="12" y="640" width="270" height="28" rx="8"/><text class="l2-tx" x="23" y="658.4" font-size="13"><tspan x="23" dy="0">Layer 02 Inventory &amp; Transparency</tspan></text></a>
+<a href="/bok/the-stack#layer-03-evals--red-teaming-as-evidence"><rect class="l3-bg" x="12" y="676" width="270" height="44" rx="8"/><text class="l3-tx" x="23" y="694.9" font-size="13"><tspan x="23" dy="0">Layer 03 Evals &amp; Red Teaming as</tspan><tspan x="23" dy="15">Evidence</tspan></text></a>
+<a href="/bok/the-stack#layer-04-runtime-controls--observability"><rect class="l4-bg" x="12" y="728" width="270" height="44" rx="8"/><text class="l4-tx" x="23" y="746.9" font-size="13"><tspan x="23" dy="0">Layer 04 Runtime Controls &amp;</tspan><tspan x="23" dy="15">Observability</tspan></text></a>
+<a href="/bok/the-stack#layer-05-assurance--continuous-compliance"><rect class="l5-bg" x="12" y="780" width="270" height="44" rx="8"/><text class="l5-tx" x="23" y="798.9" font-size="13"><tspan x="23" dy="0">Layer 05 Assurance &amp; Continuous</tspan><tspan x="23" dy="15">Compliance</tspan></text></a>
+<a href="/bok/the-stack#the-minimum-viable-stack-for-a-team-of-one"><rect class="l3-bg" x="12" y="832" width="270" height="44" rx="8"/><text class="l3-tx" x="23" y="850.9" font-size="13"><tspan x="23" dy="0">The minimum viable stack for a team of</tspan><tspan x="23" dy="15">one</tspan></text></a>
 </g>
 <g class="branch" data-branch="patterns">
 <g class="edges" aria-hidden="true">
-<path class="edge l4-st" fill="none" stroke-width="2.5" d="M 524 1054 C 506 1054, 506 1496, 488 1496"/>
-<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 1496 C 300 1496, 300 1140, 282 1140"/>
-<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 318 1496 C 300 1496, 300 1248, 282 1248"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 318 1496 C 300 1496, 300 1428, 282 1428"/>
-<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 318 1496 C 300 1496, 300 1552, 282 1552"/>
-<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 318 1496 C 300 1496, 300 1740, 282 1740"/>
+<path class="edge l4-st" fill="none" stroke-width="2.5" d="M 524 1080 C 506 1080, 506 1522, 488 1522"/>
+<path class="edge l1-st" fill="none" stroke-width="1.5" d="M 318 1522 C 300 1522, 300 926, 282 926"/>
+<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 318 1522 C 300 1522, 300 1098, 282 1098"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 318 1522 C 300 1522, 300 1406, 282 1406"/>
+<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 318 1522 C 300 1522, 300 1562, 282 1562"/>
+<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 318 1522 C 300 1522, 300 1942, 282 1942"/>
 </g>
-<a href="/bok/patterns"><rect class="l4-bg" x="318" y="1482" width="170" height="28" rx="8"/><text class="l4-tx disp" x="329" y="1501.1" font-size="15"><tspan x="329" dy="0">Patterns</tspan></text></a>
-<a href="/bok/patterns"><rect class="l1-bg" x="12" y="1126" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="1144.4" font-size="13"><tspan x="23" dy="0">Layer 01 Govern-as-Code</tspan></text><text class="l1-tx mono" x="276" y="1140" font-size="11" text-anchor="end" aria-hidden="true">3</text></a>
-<a href="/bok/patterns#pattern-policy-card"><rect class="l1-band" x="12" y="1162" width="82" height="20" rx="6"/><text class="l1-tx" x="20" y="1176.1" font-size="12"><tspan x="20" dy="0">Policy Card</tspan></text></a>
-<a href="/bok/patterns#pattern-fria-as-code"><rect class="l1-band" x="100" y="1162" width="101.7" height="20" rx="6"/><text class="l1-tx" x="108" y="1176.1" font-size="12"><tspan x="108" dy="0">FRIA-as-Code</tspan></text></a>
-<a href="/bok/patterns#pattern-framework-crosswalk"><rect class="l1-band" x="12" y="1194" width="147.3" height="20" rx="6"/><text class="l1-tx" x="20" y="1208.1" font-size="12"><tspan x="20" dy="0">Framework Crosswalk</tspan></text></a>
-<a href="/bok/patterns"><rect class="l2-bg" x="12" y="1234" width="270" height="28" rx="8"/><text class="l2-tx" x="23" y="1252.4" font-size="13"><tspan x="23" dy="0">Layer 02 Inventory &amp; Transparency</tspan></text><text class="l2-tx mono" x="276" y="1248" font-size="11" text-anchor="end" aria-hidden="true">5</text></a>
-<a href="/bok/patterns#pattern-agent-registry"><rect class="l2-band" x="12" y="1270" width="99.6" height="20" rx="6"/><text class="l2-tx" x="20" y="1284.1" font-size="12"><tspan x="20" dy="0">Agent Registry</tspan></text></a>
-<a href="/bok/patterns#pattern-aibom"><rect class="l2-band" x="117.6" y="1270" width="56.5" height="20" rx="6"/><text class="l2-tx" x="125.6" y="1284.1" font-size="12"><tspan x="125.6" dy="0">AIBOM</tspan></text></a>
-<a href="/bok/patterns#pattern-model-card-as-control-evidence"><rect class="l2-band" x="12" y="1302" width="198.7" height="20" rx="6"/><text class="l2-tx" x="20" y="1316.1" font-size="12"><tspan x="20" dy="0">Model Card as Control Evidence</tspan></text></a>
-<a href="/bok/patterns#pattern-shadow-ai-discovery"><rect class="l2-band" x="12" y="1334" width="143" height="20" rx="6"/><text class="l2-tx" x="20" y="1348.1" font-size="12"><tspan x="20" dy="0">Shadow-AI Discovery</tspan></text></a>
-<a href="/bok/patterns#pattern-vendor--model-due-diligence-gate"><rect class="l2-band" x="12" y="1366" width="220.9" height="20" rx="6"/><text class="l2-tx" x="20" y="1380.1" font-size="12"><tspan x="20" dy="0">Vendor / Model Due-Diligence Gate</tspan></text></a>
-<a href="/bok/patterns"><rect class="l3-bg" x="12" y="1406" width="270" height="44" rx="8"/><text class="l3-tx" x="23" y="1424.9" font-size="13"><tspan x="23" dy="0">Layer 03 Evals &amp; Red Teaming as</tspan><tspan x="23" dy="15">Evidence</tspan></text><text class="l3-tx mono" x="276" y="1420" font-size="11" text-anchor="end" aria-hidden="true">2</text></a>
-<a href="/bok/patterns#pattern-eval-gate-in-ci"><rect class="l3-band" x="12" y="1458" width="100.9" height="20" rx="6"/><text class="l3-tx" x="20" y="1472.1" font-size="12"><tspan x="20" dy="0">Eval Gate in CI</tspan></text></a>
-<a href="/bok/patterns#pattern-adversarial-red-team-suite"><rect class="l3-band" x="12" y="1490" width="179.9" height="20" rx="6"/><text class="l3-tx" x="20" y="1504.1" font-size="12"><tspan x="20" dy="0">Adversarial Red-Team Suite</tspan></text></a>
-<a href="/bok/patterns"><rect class="l4-bg" x="12" y="1530" width="270" height="44" rx="8"/><text class="l4-tx" x="23" y="1548.9" font-size="13"><tspan x="23" dy="0">Layer 04 Runtime Controls &amp;</tspan><tspan x="23" dy="15">Observability</tspan></text><text class="l4-tx mono" x="276" y="1544" font-size="11" text-anchor="end" aria-hidden="true">4</text></a>
-<a href="/bok/patterns#pattern-runtime-guardrail"><rect class="l4-band" x="12" y="1582" width="118.6" height="20" rx="6"/><text class="l4-tx" x="20" y="1596.1" font-size="12"><tspan x="20" dy="0">Runtime Guardrail</tspan></text></a>
-<a href="/bok/patterns#pattern-kill-switch--circuit-breaker"><rect class="l4-band" x="12" y="1614" width="178.2" height="20" rx="6"/><text class="l4-tx" x="20" y="1628.1" font-size="12"><tspan x="20" dy="0">Kill Switch / Circuit Breaker</tspan></text></a>
-<a href="/bok/patterns#pattern-agent-identity--scoped-credentials"><rect class="l4-band" x="12" y="1646" width="221.8" height="20" rx="6"/><text class="l4-tx" x="20" y="1660.1" font-size="12"><tspan x="20" dy="0">Agent Identity &amp; Scoped Credentials</tspan></text></a>
-<a href="/bok/patterns#pattern-human-in-the-loop-gate"><rect class="l4-band" x="12" y="1678" width="159" height="20" rx="6"/><text class="l4-tx" x="20" y="1692.1" font-size="12"><tspan x="20" dy="0">Human-in-the-loop Gate</tspan></text></a>
-<a href="/bok/patterns"><rect class="l5-bg" x="12" y="1718" width="270" height="44" rx="8"/><text class="l5-tx" x="23" y="1736.9" font-size="13"><tspan x="23" dy="0">Layer 05 Assurance &amp; Continuous</tspan><tspan x="23" dy="15">Compliance</tspan></text><text class="l5-tx mono" x="276" y="1732" font-size="11" text-anchor="end" aria-hidden="true">3</text></a>
-<a href="/bok/patterns#pattern-continuous-assurance-telemetry"><rect class="l5-band" x="12" y="1770" width="205.8" height="20" rx="6"/><text class="l5-tx" x="20" y="1784.1" font-size="12"><tspan x="20" dy="0">Continuous Assurance Telemetry</tspan></text></a>
-<a href="/bok/patterns#pattern-incident-pipeline"><rect class="l5-band" x="12" y="1802" width="112.5" height="20" rx="6"/><text class="l5-tx" x="20" y="1816.1" font-size="12"><tspan x="20" dy="0">Incident Pipeline</tspan></text></a>
-<a href="/bok/patterns#pattern-machine-readable-evidence-oscal"><rect class="l5-band" x="12" y="1834" width="241.9" height="20" rx="6"/><text class="l5-tx" x="20" y="1848.1" font-size="12"><tspan x="20" dy="0">Machine-Readable Evidence (OSCAL)</tspan></text></a>
+<a href="/bok/patterns"><rect class="l4-bg" x="318" y="1508" width="170" height="28" rx="8"/><text class="l4-tx disp" x="329" y="1527.1" font-size="15"><tspan x="329" dy="0">Patterns</tspan></text></a>
+<a href="/bok/patterns"><rect class="l1-bg" x="12" y="912" width="270" height="28" rx="8"/><text class="l1-tx" x="23" y="930.4" font-size="13"><tspan x="23" dy="0">Layer 01 Govern-as-Code</tspan></text><text class="l1-tx mono" x="276" y="926" font-size="11" text-anchor="end" aria-hidden="true">6</text></a>
+<a href="/bok/patterns#pattern-policy-card"><rect class="l1-band" x="12" y="948" width="82" height="20" rx="6"/><text class="l1-tx" x="20" y="962.1" font-size="12"><tspan x="20" dy="0">Policy Card</tspan></text></a>
+<a href="/bok/patterns#pattern-fria-as-code"><rect class="l1-band" x="100" y="948" width="101.7" height="20" rx="6"/><text class="l1-tx" x="108" y="962.1" font-size="12"><tspan x="108" dy="0">FRIA-as-Code</tspan></text></a>
+<a href="/bok/patterns#pattern-framework-crosswalk"><rect class="l1-band" x="12" y="980" width="147.3" height="20" rx="6"/><text class="l1-tx" x="20" y="994.1" font-size="12"><tspan x="20" dy="0">Framework Crosswalk</tspan></text></a>
+<a href="/bok/patterns#pattern-use-case-intake--risk-tiering"><rect class="l1-band" x="12" y="1012" width="198.2" height="20" rx="6"/><text class="l1-tx" x="20" y="1026.1" font-size="12"><tspan x="20" dy="0">Use-Case Intake &amp; Risk Tiering</tspan></text></a>
+<a href="/bok/patterns#pattern-ai-threat-model"><rect class="l1-band" x="12" y="1044" width="107.3" height="20" rx="6"/><text class="l1-tx" x="20" y="1058.1" font-size="12"><tspan x="20" dy="0">AI Threat Model</tspan></text></a>
+<a href="/bok/patterns#pattern-dataset-admission-gate"><rect class="l1-band" x="125.3" y="1044" width="153.9" height="20" rx="6"/><text class="l1-tx" x="133.3" y="1058.1" font-size="12"><tspan x="133.3" dy="0">Dataset Admission Gate</tspan></text></a>
+<a href="/bok/patterns"><rect class="l2-bg" x="12" y="1084" width="270" height="28" rx="8"/><text class="l2-tx" x="23" y="1102.4" font-size="13"><tspan x="23" dy="0">Layer 02 Inventory &amp; Transparency</tspan></text><text class="l2-tx mono" x="276" y="1098" font-size="11" text-anchor="end" aria-hidden="true">9</text></a>
+<a href="/bok/patterns#pattern-agent-registry"><rect class="l2-band" x="12" y="1120" width="99.6" height="20" rx="6"/><text class="l2-tx" x="20" y="1134.1" font-size="12"><tspan x="20" dy="0">Agent Registry</tspan></text></a>
+<a href="/bok/patterns#pattern-aibom"><rect class="l2-band" x="117.6" y="1120" width="56.5" height="20" rx="6"/><text class="l2-tx" x="125.6" y="1134.1" font-size="12"><tspan x="125.6" dy="0">AIBOM</tspan></text></a>
+<a href="/bok/patterns#pattern-model-card-as-control-evidence"><rect class="l2-band" x="12" y="1152" width="198.7" height="20" rx="6"/><text class="l2-tx" x="20" y="1166.1" font-size="12"><tspan x="20" dy="0">Model Card as Control Evidence</tspan></text></a>
+<a href="/bok/patterns#pattern-shadow-ai-discovery"><rect class="l2-band" x="12" y="1184" width="143" height="20" rx="6"/><text class="l2-tx" x="20" y="1198.1" font-size="12"><tspan x="20" dy="0">Shadow-AI Discovery</tspan></text></a>
+<a href="/bok/patterns#pattern-vendor--model-due-diligence-gate"><rect class="l2-band" x="12" y="1216" width="220.9" height="20" rx="6"/><text class="l2-tx" x="20" y="1230.1" font-size="12"><tspan x="20" dy="0">Vendor / Model Due-Diligence Gate</tspan></text></a>
+<a href="/bok/patterns#pattern-training-data-rights-ledger"><rect class="l2-band" x="12" y="1248" width="179.3" height="20" rx="6"/><text class="l2-tx" x="20" y="1262.1" font-size="12"><tspan x="20" dy="0">Training-Data Rights Ledger</tspan></text></a>
+<a href="/bok/patterns#pattern-model-artefact-integrity"><rect class="l2-band" x="12" y="1280" width="149.3" height="20" rx="6"/><text class="l2-tx" x="20" y="1294.1" font-size="12"><tspan x="20" dy="0">Model Artefact Integrity</tspan></text></a>
+<a href="/bok/patterns#pattern-rights-requests-against-models"><rect class="l2-band" x="12" y="1312" width="202.3" height="20" rx="6"/><text class="l2-tx" x="20" y="1326.1" font-size="12"><tspan x="20" dy="0">Rights Requests Against Models</tspan></text></a>
+<a href="/bok/patterns#pattern-downstream-use-register"><rect class="l2-band" x="12" y="1344" width="165.3" height="20" rx="6"/><text class="l2-tx" x="20" y="1358.1" font-size="12"><tspan x="20" dy="0">Downstream Use Register</tspan></text></a>
+<a href="/bok/patterns"><rect class="l3-bg" x="12" y="1384" width="270" height="44" rx="8"/><text class="l3-tx" x="23" y="1402.9" font-size="13"><tspan x="23" dy="0">Layer 03 Evals &amp; Red Teaming as</tspan><tspan x="23" dy="15">Evidence</tspan></text><text class="l3-tx mono" x="276" y="1398" font-size="11" text-anchor="end" aria-hidden="true">3</text></a>
+<a href="/bok/patterns#pattern-eval-gate-in-ci"><rect class="l3-band" x="12" y="1436" width="100.9" height="20" rx="6"/><text class="l3-tx" x="20" y="1450.1" font-size="12"><tspan x="20" dy="0">Eval Gate in CI</tspan></text></a>
+<a href="/bok/patterns#pattern-adversarial-red-team-suite"><rect class="l3-band" x="12" y="1468" width="179.9" height="20" rx="6"/><text class="l3-tx" x="20" y="1482.1" font-size="12"><tspan x="20" dy="0">Adversarial Red-Team Suite</tspan></text></a>
+<a href="/bok/patterns#pattern-fairness-eval-suite"><rect class="l3-band" x="12" y="1500" width="128.9" height="20" rx="6"/><text class="l3-tx" x="20" y="1514.1" font-size="12"><tspan x="20" dy="0">Fairness Eval Suite</tspan></text></a>
+<a href="/bok/patterns"><rect class="l4-bg" x="12" y="1540" width="270" height="44" rx="8"/><text class="l4-tx" x="23" y="1558.9" font-size="13"><tspan x="23" dy="0">Layer 04 Runtime Controls &amp;</tspan><tspan x="23" dy="15">Observability</tspan></text><text class="l4-tx mono" x="276" y="1554" font-size="11" text-anchor="end" aria-hidden="true">10</text></a>
+<a href="/bok/patterns#pattern-runtime-guardrail"><rect class="l4-band" x="12" y="1592" width="118.6" height="20" rx="6"/><text class="l4-tx" x="20" y="1606.1" font-size="12"><tspan x="20" dy="0">Runtime Guardrail</tspan></text></a>
+<a href="/bok/patterns#pattern-kill-switch--circuit-breaker"><rect class="l4-band" x="12" y="1624" width="178.2" height="20" rx="6"/><text class="l4-tx" x="20" y="1638.1" font-size="12"><tspan x="20" dy="0">Kill Switch / Circuit Breaker</tspan></text></a>
+<a href="/bok/patterns#pattern-agent-identity--scoped-credentials"><rect class="l4-band" x="12" y="1656" width="221.8" height="20" rx="6"/><text class="l4-tx" x="20" y="1670.1" font-size="12"><tspan x="20" dy="0">Agent Identity &amp; Scoped Credentials</tspan></text></a>
+<a href="/bok/patterns#pattern-human-in-the-loop-gate"><rect class="l4-band" x="12" y="1688" width="159" height="20" rx="6"/><text class="l4-tx" x="20" y="1702.1" font-size="12"><tspan x="20" dy="0">Human-in-the-loop Gate</tspan></text></a>
+<a href="/bok/patterns#pattern-explanation-artefact"><rect class="l4-band" x="12" y="1720" width="131.6" height="20" rx="6"/><text class="l4-tx" x="20" y="1734.1" font-size="12"><tspan x="20" dy="0">Explanation Artefact</tspan></text></a>
+<a href="/bok/patterns#pattern-decision-notice--contest-path"><rect class="l4-band" x="12" y="1752" width="195.1" height="20" rx="6"/><text class="l4-tx" x="20" y="1766.1" font-size="12"><tspan x="20" dy="0">Decision Notice &amp; Contest Path</tspan></text></a>
+<a href="/bok/patterns#pattern-sanctioned-ai-gateway"><rect class="l4-band" x="12" y="1784" width="150.1" height="20" rx="6"/><text class="l4-tx" x="20" y="1798.1" font-size="12"><tspan x="20" dy="0">Sanctioned AI Gateway</tspan></text></a>
+<a href="/bok/patterns#pattern-staged-rollout-with-rollback-criteria"><rect class="l4-band" x="12" y="1816" width="227.1" height="20" rx="6"/><text class="l4-tx" x="20" y="1830.1" font-size="12"><tspan x="20" dy="0">Staged Rollout with Rollback Criteria</tspan></text></a>
+<a href="/bok/patterns#pattern-drift--fairness-monitor"><rect class="l4-band" x="12" y="1848" width="152.8" height="20" rx="6"/><text class="l4-tx" x="20" y="1862.1" font-size="12"><tspan x="20" dy="0">Drift &amp; Fairness Monitor</tspan></text></a>
+<a href="/bok/patterns#pattern-deactivation-localisation--retirement-runbook"><rect class="l4-band" x="12" y="1880" width="131.5" height="20" rx="6"/><text class="l4-tx" x="20" y="1894.1" font-size="12"><tspan x="20" dy="0">Retirement Runbook</tspan></text></a>
+<a href="/bok/patterns"><rect class="l5-bg" x="12" y="1920" width="270" height="44" rx="8"/><text class="l5-tx" x="23" y="1938.9" font-size="13"><tspan x="23" dy="0">Layer 05 Assurance &amp; Continuous</tspan><tspan x="23" dy="15">Compliance</tspan></text><text class="l5-tx mono" x="276" y="1934" font-size="11" text-anchor="end" aria-hidden="true">5</text></a>
+<a href="/bok/patterns#pattern-continuous-assurance-telemetry"><rect class="l5-band" x="12" y="1972" width="205.8" height="20" rx="6"/><text class="l5-tx" x="20" y="1986.1" font-size="12"><tspan x="20" dy="0">Continuous Assurance Telemetry</tspan></text></a>
+<a href="/bok/patterns#pattern-incident-pipeline"><rect class="l5-band" x="12" y="2004" width="112.5" height="20" rx="6"/><text class="l5-tx" x="20" y="2018.1" font-size="12"><tspan x="20" dy="0">Incident Pipeline</tspan></text></a>
+<a href="/bok/patterns#pattern-machine-readable-evidence-oscal"><rect class="l5-band" x="12" y="2036" width="241.9" height="20" rx="6"/><text class="l5-tx" x="20" y="2050.1" font-size="12"><tspan x="20" dy="0">Machine-Readable Evidence (OSCAL)</tspan></text></a>
+<a href="/bok/patterns#pattern-claims-substantiation-gate"><rect class="l5-band" x="12" y="2068" width="172.3" height="20" rx="6"/><text class="l5-tx" x="20" y="2082.1" font-size="12"><tspan x="20" dy="0">Claims Substantiation Gate</tspan></text></a>
+<a href="/bok/patterns#pattern-disclosure--notification-pipeline"><rect class="l5-band" x="12" y="2100" width="209.4" height="20" rx="6"/><text class="l5-tx" x="20" y="2114.1" font-size="12"><tspan x="20" dy="0">Disclosure &amp; Notification Pipeline</tspan></text></a>
 </g>
 <g class="branch" data-branch="role">
 <g class="edges" aria-hidden="true">
-<path class="edge l3-st" fill="none" stroke-width="2.5" d="M 724 1054 C 742 1054, 742 238, 760 238"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 238 C 948 238, 948 42, 966 42"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 238 C 948 238, 948 78, 966 78"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 238 C 948 238, 948 114, 966 114"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 238 C 948 238, 948 150, 966 150"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 238 C 948 238, 948 186, 966 186"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 238 C 948 238, 948 222, 966 222"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 238 C 948 238, 948 258, 966 258"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 238 C 948 238, 948 294, 966 294"/>
-<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 238 C 948 238, 948 330, 966 330"/>
+<path class="edge l3-st" fill="none" stroke-width="2.5" d="M 724 1080 C 742 1080, 742 264, 760 264"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 264 C 948 264, 948 68, 966 68"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 264 C 948 264, 948 104, 966 104"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 264 C 948 264, 948 140, 966 140"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 264 C 948 264, 948 176, 966 176"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 264 C 948 264, 948 212, 966 212"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 264 C 948 264, 948 248, 966 248"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 264 C 948 264, 948 284, 966 284"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 264 C 948 264, 948 320, 966 320"/>
+<path class="edge l3-st" fill="none" stroke-width="1.5" d="M 930 264 C 948 264, 948 356, 966 356"/>
 </g>
-<a href="/bok/the-role"><rect class="l3-bg" x="760" y="224" width="170" height="28" rx="8"/><text class="l3-tx disp" x="771" y="243.1" font-size="15"><tspan x="771" dy="0">The Role</tspan></text></a>
-<a href="/bok/the-role#intake-and-classification"><rect class="l3-bg" x="966" y="28" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="46.4" font-size="13"><tspan x="977" dy="0">Intake and classification</tspan></text></a>
-<a href="/bok/the-role#inventory-and-registry"><rect class="l3-bg" x="966" y="64" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="82.4" font-size="13"><tspan x="977" dy="0">Inventory and registry</tspan></text></a>
-<a href="/bok/the-role#evals-and-red-teaming-as-evidence"><rect class="l3-bg" x="966" y="100" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="118.4" font-size="13"><tspan x="977" dy="0">Evals and red teaming as evidence</tspan></text></a>
-<a href="/bok/the-role#policy-as-code-and-gates"><rect class="l3-bg" x="966" y="136" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="154.4" font-size="13"><tspan x="977" dy="0">Policy-as-code and gates</tspan></text></a>
-<a href="/bok/the-role#runtime-monitoring-and-incidents"><rect class="l3-bg" x="966" y="172" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="190.4" font-size="13"><tspan x="977" dy="0">Runtime monitoring and incidents</tspan></text></a>
-<a href="/bok/the-role#assurance-and-audit-evidence"><rect class="l3-bg" x="966" y="208" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="226.4" font-size="13"><tspan x="977" dy="0">Assurance and audit evidence</tspan></text></a>
-<a href="/bok/the-role#regulatory-translation"><rect class="l3-bg" x="966" y="244" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="262.4" font-size="13"><tspan x="977" dy="0">Regulatory translation</tspan></text></a>
-<a href="/bok/the-role#the-career-ladder"><rect class="l3-bg" x="966" y="280" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="298.4" font-size="13"><tspan x="977" dy="0">The career ladder</tspan></text></a>
-<a href="/bok/the-role#three-ways-in"><rect class="l3-bg" x="966" y="316" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="334.4" font-size="13"><tspan x="977" dy="0">Three ways in</tspan></text></a>
-<a href="/bok/the-role#three-ways-in"><rect class="l3-band" x="966" y="352" width="141.9" height="20" rx="6"/><text class="l3-tx" x="974" y="366.1" font-size="12"><tspan x="974" dy="0">From Legal or privacy</tspan></text></a>
-<a href="/bok/the-role#three-ways-in"><rect class="l3-band" x="966" y="384" width="139.8" height="20" rx="6"/><text class="l3-tx" x="974" y="398.1" font-size="12"><tspan x="974" dy="0">From Security or GRC</tspan></text></a>
-<a href="/bok/the-role#three-ways-in"><rect class="l3-band" x="966" y="416" width="198.6" height="20" rx="6"/><text class="l3-tx" x="974" y="430.1" font-size="12"><tspan x="974" dy="0">From MLOps or ML engineering</tspan></text></a>
+<a href="/bok/the-role"><rect class="l3-bg" x="760" y="250" width="170" height="28" rx="8"/><text class="l3-tx disp" x="771" y="269.1" font-size="15"><tspan x="771" dy="0">The Role</tspan></text></a>
+<a href="/bok/the-role#intake-and-classification"><rect class="l3-bg" x="966" y="54" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="72.4" font-size="13"><tspan x="977" dy="0">Intake and classification</tspan></text></a>
+<a href="/bok/the-role#inventory-and-registry"><rect class="l3-bg" x="966" y="90" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="108.4" font-size="13"><tspan x="977" dy="0">Inventory and registry</tspan></text></a>
+<a href="/bok/the-role#evals-and-red-teaming-as-evidence"><rect class="l3-bg" x="966" y="126" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="144.4" font-size="13"><tspan x="977" dy="0">Evals and red teaming as evidence</tspan></text></a>
+<a href="/bok/the-role#policy-as-code-and-gates"><rect class="l3-bg" x="966" y="162" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="180.4" font-size="13"><tspan x="977" dy="0">Policy-as-code and gates</tspan></text></a>
+<a href="/bok/the-role#runtime-monitoring-and-incidents"><rect class="l3-bg" x="966" y="198" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="216.4" font-size="13"><tspan x="977" dy="0">Runtime monitoring and incidents</tspan></text></a>
+<a href="/bok/the-role#assurance-and-audit-evidence"><rect class="l3-bg" x="966" y="234" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="252.4" font-size="13"><tspan x="977" dy="0">Assurance and audit evidence</tspan></text></a>
+<a href="/bok/the-role#regulatory-translation"><rect class="l3-bg" x="966" y="270" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="288.4" font-size="13"><tspan x="977" dy="0">Regulatory translation</tspan></text></a>
+<a href="/bok/the-role#the-career-ladder"><rect class="l3-bg" x="966" y="306" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="324.4" font-size="13"><tspan x="977" dy="0">The career ladder</tspan></text></a>
+<a href="/bok/the-role#three-ways-in"><rect class="l3-bg" x="966" y="342" width="270" height="28" rx="8"/><text class="l3-tx" x="977" y="360.4" font-size="13"><tspan x="977" dy="0">Three ways in</tspan></text></a>
+<a href="/bok/the-role#three-ways-in"><rect class="l3-band" x="966" y="378" width="141.9" height="20" rx="6"/><text class="l3-tx" x="974" y="392.1" font-size="12"><tspan x="974" dy="0">From Legal or privacy</tspan></text></a>
+<a href="/bok/the-role#three-ways-in"><rect class="l3-band" x="966" y="410" width="139.8" height="20" rx="6"/><text class="l3-tx" x="974" y="424.1" font-size="12"><tspan x="974" dy="0">From Security or GRC</tspan></text></a>
+<a href="/bok/the-role#three-ways-in"><rect class="l3-band" x="966" y="442" width="198.6" height="20" rx="6"/><text class="l3-tx" x="974" y="456.1" font-size="12"><tspan x="974" dy="0">From MLOps or ML engineering</tspan></text></a>
 </g>
 <g class="branch" data-branch="obligations">
 <g class="edges" aria-hidden="true">
-<path class="edge l5-st" fill="none" stroke-width="2.5" d="M 724 1054 C 742 1054, 742 1056, 760 1056"/>
-<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 930 1056 C 948 1056, 948 498, 966 498"/>
-<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 930 1056 C 948 1056, 948 534, 966 534"/>
-<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 930 1056 C 948 1056, 948 1314, 966 1314"/>
-<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 930 1056 C 948 1056, 948 1614, 966 1614"/>
+<path class="edge l5-st" fill="none" stroke-width="2.5" d="M 724 1080 C 742 1080, 742 1082, 760 1082"/>
+<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 930 1082 C 948 1082, 948 524, 966 524"/>
+<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 930 1082 C 948 1082, 948 560, 966 560"/>
+<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 930 1082 C 948 1082, 948 1340, 966 1340"/>
+<path class="edge l5-st" fill="none" stroke-width="1.5" d="M 930 1082 C 948 1082, 948 1640, 966 1640"/>
 </g>
-<a href="/bok/regulatory-map"><rect class="l5-bg" x="760" y="1042" width="170" height="28" rx="8"/><text class="l5-tx disp" x="771" y="1061.1" font-size="15"><tspan x="771" dy="0">Obligations</tspan></text></a>
-<a href="/resources/crosswalk#topic-risk-management"><rect class="l5-bg" x="966" y="484" width="270" height="28" rx="8"/><text class="l5-tx" x="977" y="502.4" font-size="13"><tspan x="977" dy="0">Risk management</tspan></text></a>
-<a href="/resources/crosswalk"><rect class="l5-bg" x="966" y="520" width="270" height="28" rx="8"/><text class="l5-tx" x="977" y="538.4" font-size="13"><tspan x="977" dy="0">Topic crosswalk</tspan></text><text class="l5-tx mono" x="1230" y="534" font-size="11" text-anchor="end" aria-hidden="true">25</text></a>
-<a href="/resources/crosswalk#topic-risk-management"><rect class="l5-band" x="966" y="556" width="119.9" height="20" rx="6"/><text class="l5-tx" x="974" y="570.1" font-size="12"><tspan x="974" dy="0">Risk management</tspan></text></a>
-<a href="/resources/crosswalk#topic-governance-accountability"><rect class="l5-band" x="966" y="588" width="191.3" height="20" rx="6"/><text class="l5-tx" x="974" y="602.1" font-size="12"><tspan x="974" dy="0">Governance and accountability</tspan></text></a>
-<a href="/resources/crosswalk#topic-impact-assessment"><rect class="l5-band" x="966" y="620" width="129" height="20" rx="6"/><text class="l5-tx" x="974" y="634.1" font-size="12"><tspan x="974" dy="0">Impact assessment</tspan></text></a>
-<a href="/resources/crosswalk#topic-data-governance"><rect class="l5-band" x="1101" y="620" width="110.9" height="20" rx="6"/><text class="l5-tx" x="1109" y="634.1" font-size="12"><tspan x="1109" dy="0">Data governance</tspan></text></a>
-<a href="/resources/crosswalk#topic-documentation-transparency"><rect class="l5-band" x="966" y="652" width="202.6" height="20" rx="6"/><text class="l5-tx" x="974" y="666.1" font-size="12"><tspan x="974" dy="0">Documentation and transparency</tspan></text></a>
-<a href="/resources/crosswalk#topic-inventory-registration"><rect class="l5-band" x="966" y="684" width="160" height="20" rx="6"/><text class="l5-tx" x="974" y="698.1" font-size="12"><tspan x="974" dy="0">Inventory and registration</tspan></text></a>
-<a href="/resources/crosswalk#topic-logging-traceability"><rect class="l5-band" x="966" y="716" width="153.9" height="20" rx="6"/><text class="l5-tx" x="974" y="730.1" font-size="12"><tspan x="974" dy="0">Logging and traceability</tspan></text></a>
-<a href="/resources/crosswalk#topic-human-oversight"><rect class="l5-band" x="966" y="748" width="112.4" height="20" rx="6"/><text class="l5-tx" x="974" y="762.1" font-size="12"><tspan x="974" dy="0">Human oversight</tspan></text></a>
-<a href="/resources/crosswalk#topic-runtime-guardrails"><rect class="l5-band" x="1084.4" y="748" width="123.8" height="20" rx="6"/><text class="l5-tx" x="1092.4" y="762.1" font-size="12"><tspan x="1092.4" dy="0">Runtime guardrails</tspan></text></a>
-<a href="/resources/crosswalk#topic-robustness-security-evals"><rect class="l5-band" x="966" y="780" width="229.7" height="20" rx="6"/><text class="l5-tx" x="974" y="794.1" font-size="12"><tspan x="974" dy="0">Robustness, security and evaluations</tspan></text></a>
-<a href="/resources/crosswalk#topic-incident-monitoring"><rect class="l5-band" x="966" y="812" width="205.2" height="20" rx="6"/><text class="l5-tx" x="974" y="826.1" font-size="12"><tspan x="974" dy="0">Incident response and monitoring</tspan></text></a>
-<a href="/resources/crosswalk#topic-supply-chain"><rect class="l5-band" x="966" y="844" width="185" height="20" rx="6"/><text class="l5-tx" x="974" y="858.1" font-size="12"><tspan x="974" dy="0">Supply chain and third parties</tspan></text></a>
-<a href="/resources/crosswalk#topic-prohibited-practices"><rect class="l5-band" x="966" y="876" width="130" height="20" rx="6"/><text class="l5-tx" x="974" y="890.1" font-size="12"><tspan x="974" dy="0">Prohibited practices</tspan></text></a>
-<a href="/resources/crosswalk#topic-fairness-non-discrimination"><rect class="l5-band" x="966" y="908" width="203.4" height="20" rx="6"/><text class="l5-tx" x="974" y="922.1" font-size="12"><tspan x="974" dy="0">Fairness and non-discrimination</tspan></text></a>
-<a href="/resources/crosswalk#topic-privacy-data-protection"><rect class="l5-band" x="966" y="940" width="171" height="20" rx="6"/><text class="l5-tx" x="974" y="954.1" font-size="12"><tspan x="974" dy="0">Privacy and data protection</tspan></text></a>
-<a href="/resources/crosswalk#topic-explainability"><rect class="l5-band" x="966" y="972" width="231.6" height="20" rx="6"/><text class="l5-tx" x="974" y="986.1" font-size="12"><tspan x="974" dy="0">Explainability and right to explanation</tspan></text></a>
-<a href="/resources/crosswalk#topic-ai-literacy"><rect class="l5-band" x="966" y="1004" width="171.6" height="20" rx="6"/><text class="l5-tx" x="974" y="1018.1" font-size="12"><tspan x="974" dy="0">AI literacy and competence</tspan></text></a>
-<a href="/resources/crosswalk#topic-conformity-assessment"><rect class="l5-band" x="966" y="1036" width="247.1" height="20" rx="6"/><text class="l5-tx" x="974" y="1050.1" font-size="12"><tspan x="974" dy="0">Conformity assessment and certification</tspan></text></a>
-<a href="/resources/crosswalk#topic-gpai-foundation-models"><rect class="l5-band" x="966" y="1068" width="177.8" height="20" rx="6"/><text class="l5-tx" x="974" y="1082.1" font-size="12"><tspan x="974" dy="0">GPAI and foundation models</tspan></text></a>
-<a href="/resources/crosswalk#topic-ip-copyright"><rect class="l5-band" x="966" y="1100" width="108.1" height="20" rx="6"/><text class="l5-tx" x="974" y="1114.1" font-size="12"><tspan x="974" dy="0">IP and copyright</tspan></text></a>
-<a href="/resources/crosswalk#topic-agent-identity-autonomy"><rect class="l5-band" x="966" y="1132" width="178.5" height="20" rx="6"/><text class="l5-tx" x="974" y="1146.1" font-size="12"><tspan x="974" dy="0">Agent identity and autonomy</tspan></text></a>
-<a href="/resources/crosswalk#topic-content-provenance"><rect class="l5-band" x="966" y="1164" width="214.4" height="20" rx="6"/><text class="l5-tx" x="974" y="1178.1" font-size="12"><tspan x="974" dy="0">Content provenance and deepfakes</tspan></text></a>
-<a href="/resources/crosswalk#topic-sandboxes-real-world-testing"><rect class="l5-band" x="966" y="1196" width="209.8" height="20" rx="6"/><text class="l5-tx" x="974" y="1210.1" font-size="12"><tspan x="974" dy="0">Sandboxes and real-world testing</tspan></text></a>
-<a href="/resources/crosswalk#topic-environmental-impact"><rect class="l5-band" x="966" y="1228" width="142.1" height="20" rx="6"/><text class="l5-tx" x="974" y="1242.1" font-size="12"><tspan x="974" dy="0">Environmental impact</tspan></text></a>
-<a href="/resources/crosswalk#topic-deployment-change-decommissioning"><rect class="l5-band" x="966" y="1260" width="263" height="20" rx="6"/><text class="l5-tx" x="974" y="1274.1" font-size="12"><tspan x="974" dy="0">Deployment, change and decommissioning</tspan></text></a>
-<a href="/resources/frameworks#fw-heading"><rect class="l5-bg" x="966" y="1300" width="270" height="28" rx="8"/><text class="l5-tx" x="977" y="1318.4" font-size="13"><tspan x="977" dy="0">Frameworks</tspan></text><text class="l5-tx mono" x="1230" y="1314" font-size="11" text-anchor="end" aria-hidden="true">76</text></a>
-<a href="/bok/regulatory-map#eu-ai-act-post-omnibus"><rect class="l5-band" x="966" y="1336" width="160.4" height="20" rx="6"/><text class="l5-tx" x="974" y="1350.1" font-size="12"><tspan x="974" dy="0">EU AI Act, post-Omnibus</tspan></text></a>
-<a href="/bok/regulatory-map#gpai-code-of-practice"><rect class="l5-band" x="966" y="1368" width="142.2" height="20" rx="6"/><text class="l5-tx" x="974" y="1382.1" font-size="12"><tspan x="974" dy="0">GPAI Code of Practice</tspan></text></a>
-<a href="/bok/regulatory-map#data-protection-and-other-eu-law"><rect class="l5-band" x="966" y="1400" width="202.8" height="20" rx="6"/><text class="l5-tx" x="974" y="1414.1" font-size="12"><tspan x="974" dy="0">Data protection and other EU law</tspan></text></a>
-<a href="/bok/regulatory-map#isoiec-42001-42005-and-42006"><rect class="l5-band" x="966" y="1432" width="214.8" height="20" rx="6"/><text class="l5-tx" x="974" y="1446.1" font-size="12"><tspan x="974" dy="0">ISO/IEC 42001, 42005 and 42006</tspan></text></a>
-<a href="/bok/regulatory-map#nist-ai-rmf"><rect class="l5-band" x="966" y="1464" width="92.3" height="20" rx="6"/><text class="l5-tx" x="974" y="1478.1" font-size="12"><tspan x="974" dy="0">NIST AI RMF</tspan></text></a>
-<a href="/bok/regulatory-map#csa-aicm-and-star-for-ai"><rect class="l5-band" x="1064.3" y="1464" width="171.1" height="20" rx="6"/><text class="l5-tx" x="1072.3" y="1478.1" font-size="12"><tspan x="1072.3" dy="0">CSA AICM and STAR for AI</tspan></text></a>
-<a href="/bok/regulatory-map#owasp-genai-security-project"><rect class="l5-band" x="966" y="1496" width="193.4" height="20" rx="6"/><text class="l5-tx" x="974" y="1510.1" font-size="12"><tspan x="974" dy="0">OWASP GenAI Security Project</tspan></text></a>
-<a href="/bok/regulatory-map#us-federal-and-state-laws"><rect class="l5-band" x="966" y="1528" width="162.8" height="20" rx="6"/><text class="l5-tx" x="974" y="1542.1" font-size="12"><tspan x="974" dy="0">US federal and state laws</tspan></text></a>
-<a href="/bok/regulatory-map#other-jurisdictions"><rect class="l5-band" x="966" y="1560" width="120.1" height="20" rx="6"/><text class="l5-tx" x="974" y="1574.1" font-size="12"><tspan x="974" dy="0">Other jurisdictions</tspan></text></a>
-<a href="/resources/frameworks#ob-heading"><rect class="l5-bg" x="966" y="1600" width="270" height="28" rx="8"/><text class="l5-tx" x="977" y="1618.4" font-size="13"><tspan x="977" dy="0">Obligation → artefact → layer</tspan></text></a>
+<a href="/bok/regulatory-map"><rect class="l5-bg" x="760" y="1068" width="170" height="28" rx="8"/><text class="l5-tx disp" x="771" y="1087.1" font-size="15"><tspan x="771" dy="0">Obligations</tspan></text></a>
+<a href="/resources/crosswalk#topic-risk-management"><rect class="l5-bg" x="966" y="510" width="270" height="28" rx="8"/><text class="l5-tx" x="977" y="528.4" font-size="13"><tspan x="977" dy="0">Risk management</tspan></text></a>
+<a href="/resources/crosswalk"><rect class="l5-bg" x="966" y="546" width="270" height="28" rx="8"/><text class="l5-tx" x="977" y="564.4" font-size="13"><tspan x="977" dy="0">Topic crosswalk</tspan></text><text class="l5-tx mono" x="1230" y="560" font-size="11" text-anchor="end" aria-hidden="true">25</text></a>
+<a href="/resources/crosswalk#topic-risk-management"><rect class="l5-band" x="966" y="582" width="119.9" height="20" rx="6"/><text class="l5-tx" x="974" y="596.1" font-size="12"><tspan x="974" dy="0">Risk management</tspan></text></a>
+<a href="/resources/crosswalk#topic-governance-accountability"><rect class="l5-band" x="966" y="614" width="191.3" height="20" rx="6"/><text class="l5-tx" x="974" y="628.1" font-size="12"><tspan x="974" dy="0">Governance and accountability</tspan></text></a>
+<a href="/resources/crosswalk#topic-impact-assessment"><rect class="l5-band" x="966" y="646" width="129" height="20" rx="6"/><text class="l5-tx" x="974" y="660.1" font-size="12"><tspan x="974" dy="0">Impact assessment</tspan></text></a>
+<a href="/resources/crosswalk#topic-data-governance"><rect class="l5-band" x="1101" y="646" width="110.9" height="20" rx="6"/><text class="l5-tx" x="1109" y="660.1" font-size="12"><tspan x="1109" dy="0">Data governance</tspan></text></a>
+<a href="/resources/crosswalk#topic-documentation-transparency"><rect class="l5-band" x="966" y="678" width="202.6" height="20" rx="6"/><text class="l5-tx" x="974" y="692.1" font-size="12"><tspan x="974" dy="0">Documentation and transparency</tspan></text></a>
+<a href="/resources/crosswalk#topic-inventory-registration"><rect class="l5-band" x="966" y="710" width="160" height="20" rx="6"/><text class="l5-tx" x="974" y="724.1" font-size="12"><tspan x="974" dy="0">Inventory and registration</tspan></text></a>
+<a href="/resources/crosswalk#topic-logging-traceability"><rect class="l5-band" x="966" y="742" width="153.9" height="20" rx="6"/><text class="l5-tx" x="974" y="756.1" font-size="12"><tspan x="974" dy="0">Logging and traceability</tspan></text></a>
+<a href="/resources/crosswalk#topic-human-oversight"><rect class="l5-band" x="966" y="774" width="112.4" height="20" rx="6"/><text class="l5-tx" x="974" y="788.1" font-size="12"><tspan x="974" dy="0">Human oversight</tspan></text></a>
+<a href="/resources/crosswalk#topic-runtime-guardrails"><rect class="l5-band" x="1084.4" y="774" width="123.8" height="20" rx="6"/><text class="l5-tx" x="1092.4" y="788.1" font-size="12"><tspan x="1092.4" dy="0">Runtime guardrails</tspan></text></a>
+<a href="/resources/crosswalk#topic-robustness-security-evals"><rect class="l5-band" x="966" y="806" width="229.7" height="20" rx="6"/><text class="l5-tx" x="974" y="820.1" font-size="12"><tspan x="974" dy="0">Robustness, security and evaluations</tspan></text></a>
+<a href="/resources/crosswalk#topic-incident-monitoring"><rect class="l5-band" x="966" y="838" width="205.2" height="20" rx="6"/><text class="l5-tx" x="974" y="852.1" font-size="12"><tspan x="974" dy="0">Incident response and monitoring</tspan></text></a>
+<a href="/resources/crosswalk#topic-supply-chain"><rect class="l5-band" x="966" y="870" width="185" height="20" rx="6"/><text class="l5-tx" x="974" y="884.1" font-size="12"><tspan x="974" dy="0">Supply chain and third parties</tspan></text></a>
+<a href="/resources/crosswalk#topic-prohibited-practices"><rect class="l5-band" x="966" y="902" width="130" height="20" rx="6"/><text class="l5-tx" x="974" y="916.1" font-size="12"><tspan x="974" dy="0">Prohibited practices</tspan></text></a>
+<a href="/resources/crosswalk#topic-fairness-non-discrimination"><rect class="l5-band" x="966" y="934" width="203.4" height="20" rx="6"/><text class="l5-tx" x="974" y="948.1" font-size="12"><tspan x="974" dy="0">Fairness and non-discrimination</tspan></text></a>
+<a href="/resources/crosswalk#topic-privacy-data-protection"><rect class="l5-band" x="966" y="966" width="171" height="20" rx="6"/><text class="l5-tx" x="974" y="980.1" font-size="12"><tspan x="974" dy="0">Privacy and data protection</tspan></text></a>
+<a href="/resources/crosswalk#topic-explainability"><rect class="l5-band" x="966" y="998" width="231.6" height="20" rx="6"/><text class="l5-tx" x="974" y="1012.1" font-size="12"><tspan x="974" dy="0">Explainability and right to explanation</tspan></text></a>
+<a href="/resources/crosswalk#topic-ai-literacy"><rect class="l5-band" x="966" y="1030" width="171.6" height="20" rx="6"/><text class="l5-tx" x="974" y="1044.1" font-size="12"><tspan x="974" dy="0">AI literacy and competence</tspan></text></a>
+<a href="/resources/crosswalk#topic-conformity-assessment"><rect class="l5-band" x="966" y="1062" width="247.1" height="20" rx="6"/><text class="l5-tx" x="974" y="1076.1" font-size="12"><tspan x="974" dy="0">Conformity assessment and certification</tspan></text></a>
+<a href="/resources/crosswalk#topic-gpai-foundation-models"><rect class="l5-band" x="966" y="1094" width="177.8" height="20" rx="6"/><text class="l5-tx" x="974" y="1108.1" font-size="12"><tspan x="974" dy="0">GPAI and foundation models</tspan></text></a>
+<a href="/resources/crosswalk#topic-ip-copyright"><rect class="l5-band" x="966" y="1126" width="108.1" height="20" rx="6"/><text class="l5-tx" x="974" y="1140.1" font-size="12"><tspan x="974" dy="0">IP and copyright</tspan></text></a>
+<a href="/resources/crosswalk#topic-agent-identity-autonomy"><rect class="l5-band" x="966" y="1158" width="178.5" height="20" rx="6"/><text class="l5-tx" x="974" y="1172.1" font-size="12"><tspan x="974" dy="0">Agent identity and autonomy</tspan></text></a>
+<a href="/resources/crosswalk#topic-content-provenance"><rect class="l5-band" x="966" y="1190" width="214.4" height="20" rx="6"/><text class="l5-tx" x="974" y="1204.1" font-size="12"><tspan x="974" dy="0">Content provenance and deepfakes</tspan></text></a>
+<a href="/resources/crosswalk#topic-sandboxes-real-world-testing"><rect class="l5-band" x="966" y="1222" width="209.8" height="20" rx="6"/><text class="l5-tx" x="974" y="1236.1" font-size="12"><tspan x="974" dy="0">Sandboxes and real-world testing</tspan></text></a>
+<a href="/resources/crosswalk#topic-environmental-impact"><rect class="l5-band" x="966" y="1254" width="142.1" height="20" rx="6"/><text class="l5-tx" x="974" y="1268.1" font-size="12"><tspan x="974" dy="0">Environmental impact</tspan></text></a>
+<a href="/resources/crosswalk#topic-deployment-change-decommissioning"><rect class="l5-band" x="966" y="1286" width="263" height="20" rx="6"/><text class="l5-tx" x="974" y="1300.1" font-size="12"><tspan x="974" dy="0">Deployment, change and decommissioning</tspan></text></a>
+<a href="/resources/frameworks#fw-heading"><rect class="l5-bg" x="966" y="1326" width="270" height="28" rx="8"/><text class="l5-tx" x="977" y="1344.4" font-size="13"><tspan x="977" dy="0">Frameworks</tspan></text><text class="l5-tx mono" x="1230" y="1340" font-size="11" text-anchor="end" aria-hidden="true">76</text></a>
+<a href="/bok/regulatory-map#eu-ai-act-post-omnibus"><rect class="l5-band" x="966" y="1362" width="160.4" height="20" rx="6"/><text class="l5-tx" x="974" y="1376.1" font-size="12"><tspan x="974" dy="0">EU AI Act, post-Omnibus</tspan></text></a>
+<a href="/bok/regulatory-map#gpai-code-of-practice"><rect class="l5-band" x="966" y="1394" width="142.2" height="20" rx="6"/><text class="l5-tx" x="974" y="1408.1" font-size="12"><tspan x="974" dy="0">GPAI Code of Practice</tspan></text></a>
+<a href="/bok/regulatory-map#data-protection-and-other-eu-law"><rect class="l5-band" x="966" y="1426" width="202.8" height="20" rx="6"/><text class="l5-tx" x="974" y="1440.1" font-size="12"><tspan x="974" dy="0">Data protection and other EU law</tspan></text></a>
+<a href="/bok/regulatory-map#isoiec-42001-42005-and-42006"><rect class="l5-band" x="966" y="1458" width="214.8" height="20" rx="6"/><text class="l5-tx" x="974" y="1472.1" font-size="12"><tspan x="974" dy="0">ISO/IEC 42001, 42005 and 42006</tspan></text></a>
+<a href="/bok/regulatory-map#nist-ai-rmf"><rect class="l5-band" x="966" y="1490" width="92.3" height="20" rx="6"/><text class="l5-tx" x="974" y="1504.1" font-size="12"><tspan x="974" dy="0">NIST AI RMF</tspan></text></a>
+<a href="/bok/regulatory-map#csa-aicm-and-star-for-ai"><rect class="l5-band" x="1064.3" y="1490" width="171.1" height="20" rx="6"/><text class="l5-tx" x="1072.3" y="1504.1" font-size="12"><tspan x="1072.3" dy="0">CSA AICM and STAR for AI</tspan></text></a>
+<a href="/bok/regulatory-map#owasp-genai-security-project"><rect class="l5-band" x="966" y="1522" width="193.4" height="20" rx="6"/><text class="l5-tx" x="974" y="1536.1" font-size="12"><tspan x="974" dy="0">OWASP GenAI Security Project</tspan></text></a>
+<a href="/bok/regulatory-map#us-federal-and-state-laws"><rect class="l5-band" x="966" y="1554" width="162.8" height="20" rx="6"/><text class="l5-tx" x="974" y="1568.1" font-size="12"><tspan x="974" dy="0">US federal and state laws</tspan></text></a>
+<a href="/bok/regulatory-map#other-jurisdictions"><rect class="l5-band" x="966" y="1586" width="120.1" height="20" rx="6"/><text class="l5-tx" x="974" y="1600.1" font-size="12"><tspan x="974" dy="0">Other jurisdictions</tspan></text></a>
+<a href="/resources/frameworks#ob-heading"><rect class="l5-bg" x="966" y="1626" width="270" height="28" rx="8"/><text class="l5-tx" x="977" y="1644.4" font-size="13"><tspan x="977" dy="0">Obligation → artefact → layer</tspan></text></a>
 </g>
 <g class="branch" data-branch="maturity">
 <g class="edges" aria-hidden="true">
-<path class="edge l4-st" fill="none" stroke-width="2.5" d="M 724 1054 C 742 1054, 742 1786, 760 1786"/>
-<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1786 C 948 1786, 948 1678, 966 1678"/>
-<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1786 C 948 1786, 948 1714, 966 1714"/>
-<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1786 C 948 1786, 948 1750, 966 1750"/>
-<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1786 C 948 1786, 948 1786, 966 1786"/>
-<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1786 C 948 1786, 948 1822, 966 1822"/>
-<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1786 C 948 1786, 948 1858, 966 1858"/>
-<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1786 C 948 1786, 948 1894, 966 1894"/>
+<path class="edge l4-st" fill="none" stroke-width="2.5" d="M 724 1080 C 742 1080, 742 1812, 760 1812"/>
+<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1812 C 948 1812, 948 1704, 966 1704"/>
+<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1812 C 948 1812, 948 1740, 966 1740"/>
+<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1812 C 948 1812, 948 1776, 966 1776"/>
+<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1812 C 948 1812, 948 1812, 966 1812"/>
+<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1812 C 948 1812, 948 1848, 966 1848"/>
+<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1812 C 948 1812, 948 1884, 966 1884"/>
+<path class="edge l4-st" fill="none" stroke-width="1.5" d="M 930 1812 C 948 1812, 948 1920, 966 1920"/>
 </g>
-<a href="/bok/maturity-model"><rect class="l4-bg" x="760" y="1772" width="170" height="28" rx="8"/><text class="l4-tx disp" x="771" y="1791.1" font-size="15"><tspan x="771" dy="0">Maturity</tspan></text></a>
-<a href="/bok/maturity-model#the-five-levels"><rect class="l4-bg" x="966" y="1664" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1682.4" font-size="13"><tspan x="977" dy="0">1 Documented</tspan></text></a>
-<a href="/bok/maturity-model#the-five-levels"><rect class="l4-bg" x="966" y="1700" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1718.4" font-size="13"><tspan x="977" dy="0">2 Inventoried</tspan></text></a>
-<a href="/bok/maturity-model#the-five-levels"><rect class="l4-bg" x="966" y="1736" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1754.4" font-size="13"><tspan x="977" dy="0">3 Tested</tspan></text></a>
-<a href="/bok/maturity-model#the-five-levels"><rect class="l4-bg" x="966" y="1772" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1790.4" font-size="13"><tspan x="977" dy="0">4 Enforced</tspan></text></a>
-<a href="/bok/maturity-model#the-five-levels"><rect class="l4-bg" x="966" y="1808" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1826.4" font-size="13"><tspan x="977" dy="0">5 Continuous</tspan></text></a>
-<a href="/bok/maturity-model#self-assessment-checklist"><rect class="l4-bg" x="966" y="1844" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1862.4" font-size="13"><tspan x="977" dy="0">Self-assessment checklist</tspan></text></a>
-<a href="/bok/maturity-model#metrics-per-level"><rect class="l4-bg" x="966" y="1880" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1898.4" font-size="13"><tspan x="977" dy="0">Metrics per level</tspan></text></a>
+<a href="/bok/maturity-model"><rect class="l4-bg" x="760" y="1798" width="170" height="28" rx="8"/><text class="l4-tx disp" x="771" y="1817.1" font-size="15"><tspan x="771" dy="0">Maturity</tspan></text></a>
+<a href="/bok/maturity-model#the-five-levels"><rect class="l4-bg" x="966" y="1690" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1708.4" font-size="13"><tspan x="977" dy="0">1 Documented</tspan></text></a>
+<a href="/bok/maturity-model#the-five-levels"><rect class="l4-bg" x="966" y="1726" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1744.4" font-size="13"><tspan x="977" dy="0">2 Inventoried</tspan></text></a>
+<a href="/bok/maturity-model#the-five-levels"><rect class="l4-bg" x="966" y="1762" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1780.4" font-size="13"><tspan x="977" dy="0">3 Tested</tspan></text></a>
+<a href="/bok/maturity-model#the-five-levels"><rect class="l4-bg" x="966" y="1798" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1816.4" font-size="13"><tspan x="977" dy="0">4 Enforced</tspan></text></a>
+<a href="/bok/maturity-model#the-five-levels"><rect class="l4-bg" x="966" y="1834" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1852.4" font-size="13"><tspan x="977" dy="0">5 Continuous</tspan></text></a>
+<a href="/bok/maturity-model#self-assessment-checklist"><rect class="l4-bg" x="966" y="1870" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1888.4" font-size="13"><tspan x="977" dy="0">Self-assessment checklist</tspan></text></a>
+<a href="/bok/maturity-model#metrics-per-level"><rect class="l4-bg" x="966" y="1906" width="270" height="28" rx="8"/><text class="l4-tx" x="977" y="1924.4" font-size="13"><tspan x="977" dy="0">Metrics per level</tspan></text></a>
 </g>
 <g class="branch" data-branch="path">
 <g class="edges" aria-hidden="true">
-<path class="edge l2-st" fill="none" stroke-width="2.5" d="M 724 1054 C 742 1054, 742 2012, 760 2012"/>
-<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 930 2012 C 948 2012, 948 1958, 966 1958"/>
-<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 930 2012 C 948 2012, 948 1994, 966 1994"/>
-<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 930 2012 C 948 2012, 948 2030, 966 2030"/>
-<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 930 2012 C 948 2012, 948 2066, 966 2066"/>
+<path class="edge l2-st" fill="none" stroke-width="2.5" d="M 724 1080 C 742 1080, 742 2038, 760 2038"/>
+<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 930 2038 C 948 2038, 948 1984, 966 1984"/>
+<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 930 2038 C 948 2038, 948 2020, 966 2020"/>
+<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 930 2038 C 948 2038, 948 2056, 966 2056"/>
+<path class="edge l2-st" fill="none" stroke-width="1.5" d="M 930 2038 C 948 2038, 948 2092, 966 2092"/>
 </g>
-<a href="/path"><rect class="l2-bg" x="760" y="1998" width="170" height="28" rx="8"/><text class="l2-tx disp" x="771" y="2017.1" font-size="15"><tspan x="771" dy="0">Learning path</tspan></text></a>
-<a href="/path#stage-foundations"><rect class="l2-bg" x="966" y="1944" width="270" height="28" rx="8"/><text class="l2-tx" x="977" y="1962.4" font-size="13"><tspan x="977" dy="0">Foundations</tspan></text><text class="l2-tx mono" x="1230" y="1958" font-size="11" text-anchor="end" aria-hidden="true">10</text></a>
-<a href="/path#stage-see-and-rule"><rect class="l2-bg" x="966" y="1980" width="270" height="28" rx="8"/><text class="l2-tx" x="977" y="1998.4" font-size="13"><tspan x="977" dy="0">See it and rule it</tspan></text><text class="l2-tx mono" x="1230" y="1994" font-size="11" text-anchor="end" aria-hidden="true">9</text></a>
-<a href="/path#stage-test-and-contain"><rect class="l2-bg" x="966" y="2016" width="270" height="28" rx="8"/><text class="l2-tx" x="977" y="2034.4" font-size="13"><tspan x="977" dy="0">Test it and contain it</tspan></text><text class="l2-tx mono" x="1230" y="2030" font-size="11" text-anchor="end" aria-hidden="true">10</text></a>
-<a href="/path#stage-prove-and-specialise"><rect class="l2-bg" x="966" y="2052" width="270" height="28" rx="8"/><text class="l2-tx" x="977" y="2070.4" font-size="13"><tspan x="977" dy="0">Prove it and specialise</tspan></text><text class="l2-tx mono" x="1230" y="2066" font-size="11" text-anchor="end" aria-hidden="true">8</text></a>
+<a href="/path"><rect class="l2-bg" x="760" y="2024" width="170" height="28" rx="8"/><text class="l2-tx disp" x="771" y="2043.1" font-size="15"><tspan x="771" dy="0">Learning path</tspan></text></a>
+<a href="/path#stage-foundations"><rect class="l2-bg" x="966" y="1970" width="270" height="28" rx="8"/><text class="l2-tx" x="977" y="1988.4" font-size="13"><tspan x="977" dy="0">Foundations</tspan></text><text class="l2-tx mono" x="1230" y="1984" font-size="11" text-anchor="end" aria-hidden="true">10</text></a>
+<a href="/path#stage-see-and-rule"><rect class="l2-bg" x="966" y="2006" width="270" height="28" rx="8"/><text class="l2-tx" x="977" y="2024.4" font-size="13"><tspan x="977" dy="0">See it and rule it</tspan></text><text class="l2-tx mono" x="1230" y="2020" font-size="11" text-anchor="end" aria-hidden="true">9</text></a>
+<a href="/path#stage-test-and-contain"><rect class="l2-bg" x="966" y="2042" width="270" height="28" rx="8"/><text class="l2-tx" x="977" y="2060.4" font-size="13"><tspan x="977" dy="0">Test it and contain it</tspan></text><text class="l2-tx mono" x="1230" y="2056" font-size="11" text-anchor="end" aria-hidden="true">10</text></a>
+<a href="/path#stage-prove-and-specialise"><rect class="l2-bg" x="966" y="2078" width="270" height="28" rx="8"/><text class="l2-tx" x="977" y="2096.4" font-size="13"><tspan x="977" dy="0">Prove it and specialise</tspan></text><text class="l2-tx mono" x="1230" y="2092" font-size="11" text-anchor="end" aria-hidden="true">8</text></a>
 </g>
-<a href="/thesis"><rect class="panel" x="524" y="1026" width="200" height="56" rx="8"/><text class="disp" x="535" y="1049.3" font-size="20"><tspan x="535" dy="0">AI Governance</tspan><tspan x="535" dy="23">Engineer</tspan></text></a>
+<a href="/thesis"><rect class="panel" x="524" y="1052" width="200" height="56" rx="8"/><text class="disp" x="535" y="1075.3" font-size="20"><tspan x="535" dy="0">AI Governance</tspan><tspan x="535" dy="23">Engineer</tspan></text></a>
 </svg>
