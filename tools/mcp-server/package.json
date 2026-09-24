@@ -1,0 +1,33 @@
+{
+  "name": "@aige/mcp-server",
+  "version": "0.5.0",
+  "private": true,
+  "description": "Read-only remote MCP server over the AI Governance Engineer open data API (/api/v1).",
+  "license": "CC-BY-4.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc -p tsconfig.test.json --noEmit",
+    "pretest": "tsc -p tsconfig.test.json",
+    "test": "node --test --test-reporter=spec \".test-dist/test/**/*.test.js\"",
+    "fixtures": "node scripts/sync-fixtures.mjs",
+    "catalogue": "node --experimental-strip-types --no-warnings scripts/sync-catalogue.mjs"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.17",
+    "@modelcontextprotocol/server": "^2.1.0",
+    "github-slugger": "^2.0.0",
+    "hono": "^4.13.9",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "^2.1.0",
+    "@types/node": "^22.20.4",
+    "typescript": "~5.9.3"
+  }
+}

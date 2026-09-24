@@ -1,0 +1,11 @@
+node_modules
+dist
+.test-dist
+test
+scripts
+*.md
+!README.md
+Dockerfile
+compose.example.yaml
+.gitignore
+.dockerignore

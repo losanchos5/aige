@@ -1,0 +1,3406 @@
+# AI Governance Engineer
+
+> The Thesis and Body of Knowledge for AI governance engineering: turning governance obligations into policy-as-code, eval gates and machine-readable evidence.
+
+Body of Knowledge v0.4.0 by Jorge García Aibar, licensed CC BY 4.0. This file carries the complete text of the 24 Body of Knowledge chapters, in reading order, with the 17 pattern pages after chapter 05, and then the Thesis. The index is at https://aigovernanceengineer.com/llms.txt.
+
+---
+
+# 00. Preface
+
+Source: https://aigovernanceengineer.com/bok/preface
+
+> Why this book exists, who it is for, and how to use it.
+
+## Why this exists
+
+There is a manifesto for GRC engineering. There is a manifesto for agile software. There is a pattern
+catalogue for responsible AI and a twelve-factor guide for cloud applications. There is nothing that
+tells you how to *engineer* the governance of AI systems: how to turn an AI Act obligation or an ISO
+42001 control into policy-as-code, an eval gate, an agent registry and machine-readable evidence that
+an auditor can read. This book is the first attempt to write that down.
+
+It exists because the gap is now expensive. The thing being governed (models that retrain, prompts
+that change, agents that act on their own) moves faster than any document can follow. Governance
+written as PDFs and spreadsheets is stale before it is signed. The discipline that closes the gap is
+engineering, applied to governance. This book is its founding text and its working reference.
+
+## Who wrote it, and from what
+
+The Body of Knowledge was written by Jorge García Aibar, an AI Governance & Privacy Engineer,
+drawing on two and a half years designing and operating an AI governance framework inside a large
+telco, sitting between Legal, Security and Engineering, and covering the governance, security,
+compliance, business and model-performance dimensions of AI risk. The Thesis is the sole co-authored
+part of the project, written by Jorge García Aibar and Aurélie Pols, who works in Responsible AI,
+Privacy and Data Governance. Nothing in this book discloses any employer's internal detail; where
+practice is described it is generic ("in a large telco").
+
+It is built from three things. First, that operating experience: what actually held up when a model
+changed on a Friday and an agent gained a new tool over the weekend. Second, the **GRC Engineering**
+precedent: the community, manifesto and body of practice that, since about 2024, has turned
+governance, risk and compliance into a product built with code [1][2]. Third, the public
+record: the EU AI Act and its Digital Omnibus reform, ISO/IEC 42001, the NIST AI RMF, OWASP's GenAI
+and Agentic work, CSA, CSIRO's Responsible AI Pattern Catalogue, and the frontier labs' own safety
+frameworks. Every factual claim in the book carries a sourced, verified citation.
+
+## Who should read this
+
+- **AI governance leads** who want to stop shipping documents and start shipping controls.
+- **Security engineers and AI security engineers** extending their threat models to models and agents.
+- **Privacy engineers and DPOs** who want FRIA and DPIA to live as code, not as one-off PDFs.
+- **MLOps and platform engineers** who are being asked to make governance a property of the pipeline.
+- **Lawyers and compliance professionals who want to build**, to see the obligation turned into an
+  executable control and readable evidence, and to help specify it.
+
+You do not need to write production code to use this book, but you should be comfortable near a
+pipeline. The discipline is a capability anyone close to the build can develop.
+
+## What this is not
+
+This is not a compliance checklist, and it is not legal advice. It does not tell you whether your
+system is compliant; it tells you how to build the controls and the evidence that let someone qualified
+make that call. It is not an AI safety research agenda, an MLOps handbook, or a vendor buyer's guide;
+tools are named only as illustrative examples of a category, never as endorsements. And it is not
+finished. Version 0.4.0 is a public draft with deliberate gaps open to contributions.
+
+## How to cite
+
+> García Aibar, J. *AI Governance Engineering: The Body of Knowledge*, v0.4.0. 2026.
+> https://aigovernanceengineer.com/bok. Licensed CC BY 4.0.
+
+For the Thesis, cite both co-authors:
+
+> García Aibar, J., & Pols, A. *The AI Governance Engineering Thesis*, v0.4.0. 2026.
+> https://aigovernanceengineer.com/thesis. Licensed CC BY 4.0.
+
+Cite a specific chapter by its number and title (for example, "chapter 01, The definition"). The
+canonical home of the Thesis is https://aigovernanceengineer.com/thesis and of the Body of
+Knowledge https://aigovernanceengineer.com/bok. Each chapter carries its own numbered source list;
+the consolidated table lives in `sources/SOURCES.md`.
+
+## Versioning
+
+This is **v0.4.0**, a public draft. Versioning is semantic in spirit: patch releases fix facts
+and typos, minor releases add chapters or patterns, and a 1.0 will mark the point at which the core
+chapters (00–10) are complete and reviewed. Every change is recorded in `bok/CHANGELOG.md`. Because
+the regulatory and standards landscape moves (the Digital Omnibus reform, harmonised standards under
+JTC 21, the OWASP and CSA releases), chapters carry a "current as of" date and are expected to be
+revised.
+
+## How to contribute
+
+This book welcomes credited contributions. To contribute:
+
+1. Read `STYLEGUIDE.md` and follow the chapter or pattern template exactly.
+2. Source every factual claim. Use the `[n]` citation format, tag each source `primary`, `secondary`
+   or `reported`, and add the row to `sources/SOURCES.md` under your chapter's section.
+3. Open a pull request. To sign the Thesis, add your name to `bok/CONTRIBUTORS.md`.
+
+The rules exist so that many hands produce one coherent book. Everything else (the arguments, the
+patterns, the mappings) is open for you to improve.
+
+**Maps to:** this preface makes no normative claim; the standards it names are treated in full in
+chapters 04, 05 and 08.
+
+## Sources
+
+[1] GRC Engineering Manifesto. grcengineering. ~2024. https://grc.engineering/ (verified: primary)
+[2] "What is GRC Engineering" (Ayoub Fandi). GRC Engineer. 2025. https://grcengineer.com/what-is-grc-engineering/ (verified: primary)
+
+---
+
+# 01. The definition
+
+Source: https://aigovernanceengineer.com/bok/definition
+
+> AI governance engineering is the application of engineering practice (systems thinking, product
+> thinking and code) to the governance of AI systems; a capability, not a job title, measured by
+> realised risk reduction and audit-ready evidence.
+
+## The definition
+thinking and code) to the governance of AI systems.**
+
+## Three clarifiers
+"compliance." It runs from setting the rules (governance), through identifying and reducing what can
+
+## The disambiguation cluster
+The discipline is defined as much by what it is not as by what it is. Eight neighbours are routinely
+
+## The object of governance
+What, concretely, does this discipline govern? Five nested objects, each needing different controls:
+
+## The three questions
+At any moment, an AI governance engineering function must be able to answer three questions about
+
+## The limits of the eval gate
+This book leans hard on evals as controls, so it owes the reader the same "theatre" test it applies to
+> **In practice**
+> Inside a large telco, the difference between "governed" and "documented" came down to those three
+> questions. A model inventory maintained by hand answered question one on the day it was edited and
+> was wrong within a week. Wiring the registry to the deployment pipeline (so a new model or agent
+> registered itself, with an owner and a scope, at deploy time) was what made the three questions
+> answerable on any given Tuesday. The document became a query.
+
+## Sources
+[1] "What is GRC Engineering" (Ayoub Fandi). GRC Engineer. 2025. https://grcengineer.com/what-is-grc-engineering/ (verified: primary)
+---
+
+# 02. Why now
+
+Source: https://aigovernanceengineer.com/bok/why-now
+
+> AI governance engineering is forming now because the thing being governed changed shape, the market
+> began hiring for engineering skills before the profession named itself, and the law began asking for
+> engineered evidence, all between April 2025 and August 2026.
+
+## The five problems, with the evidence
+
+### 1. Governance written for systems that no longer exist
+Legacy governance describes an AI system as it was on the day it was reviewed, while models retrain,
+
+### 2. Point-in-time review of a continuously changing thing
+Annual assessments and committee sign-offs assume a system that holds still long enough to be judged.
+
+### 3. Governance as a gate at the end, not a property of the build
+Governance still tends to arrive after the model is trained, as a checkpoint to clear before launch,
+
+### 4. Framework theatre
+Mapping to NIST AI RMF or ISO/IEC 42001 becomes the end state instead of the starting point, and a
+
+### 5. No runtime data path
+The registry does not know what is running. One vendor's comparison of the AI governance platform
+
+## The evidence
+
+### The profession is understaffed, and it knows it
+The clearest signal that the work has outgrown its current form is that almost nobody thinks they have
+
+### The market is hiring for the engineering
+The labour market is already hiring for this shift, and it is doing so in the vocabulary of
+
+### Registry versus runtime
+The tooling market tells the same story from the supply side. Gartner published its first Magic
+
+### The standards gap
+The framework-theatre problem has a hard deadline attached to it. As of 2026-09-24, zero harmonised
+
+### The regulatory wave: the Omnibus and GPAI enforcement
+The law moved twice in the summer of 2026, in opposite directions, and both moves point at
+
+### The agent shift
+The last signal is the object of governance itself. Agents that browse, execute code, call APIs and
+
+## What changes when governance is engineered
+The five problems share one root: governance that describes rather than runs. Engineering the
+> **In practice**
+> Inside a large telco, the shift from "documented" to "engineered" was visible in a single quarter's
+> incident drill. The paper version answered "which agents can reach the payments API?" with a
+> spreadsheet that was a week stale and missing two services stood up since the last review. After the
+> registry was wired to the deploy pipeline and every agent was issued a scoped identity, the same
+> question was a query that returned owners, scopes and last-seen timestamps in seconds, and a
+> misbehaving agent could be revoked without breaking the others. The evidence for the drill was not
+> assembled afterwards; it was already in the assurance store.
+
+## Sources
+[1] AI Governance Profession Report 2025 (with Credo AI; 671 respondents; only 1.5% will not need more staff; 77% working on AI governance; 5% of the function in Security; still the current edition on 2026-09-24). IAPP. 2025-04-16. https://iapp.org/resources/article/ai-governance-profession-report/ (verified: primary)
+---
+
+# 03. Values and principles
+
+Source: https://aigovernanceengineer.com/bok/values-and-principles
+
+> The eight values and six principles of the Thesis, each expanded with what it means in practice
+> and the anti-pattern it rejects.
+
+## The eight values
+Each value is stated as an affirmation: what we build toward, which by naming it also names what we
+
+### 1. Governance is code, not a document
+A policy in a PDF is a statement of intent that a human must read, remember and apply. A policy as
+> **In practice** A data-residency rule written as `OPA/Rego` blocks any deployment that would route
+> inference outside the permitted region, in CI and at admission. The same rule, as a PDF, was
+> "communicated" quarterly and violated monthly.
+> **Anti-pattern** The "policy library" that is a folder of Word documents nobody can query, whose
+> enforcement is an email and whose compliance is self-attested.
+
+### 2. Evals fail builds; reviews only recommend
+A review produces a recommendation; someone may act on it, later, or not. An eval produces a verdict
+> **In practice** A red-team eval suite (Inspect, Garak) runs in CI; if injection resistance drops
+> below the agreed threshold, the pipeline fails and the release does not ship until it is fixed.
+> **Anti-pattern** A "model risk review board" that meets monthly, writes findings rated
+> low/medium/high, and has no mechanism to stop a launch already scheduled.
+
+### 3. Evidence comes from runtime, not from a point-in-time attestation
+An attestation says a control was in place when someone looked. Runtime evidence shows the control
+> **In practice** Guardrail decisions, eval results and policy verdicts stream into an assurance store
+> with timestamps; the control's status is a live query, not an annual sign-off.
+> **Anti-pattern** A SOC-style attestation binder assembled the week before an audit, describing
+> controls as they were imagined to be, not as production actually behaved.
+
+### 4. Every agent carries its own identity and scope
+An agent acting on a shared service account or a static key is ungovernable: you cannot attribute its
+> **In practice** Each agent is issued a distinct workload identity, registered with an owner and a
+> declared scope; a misbehaving agent is traced to its identity and its access revoked without
+> touching the others.
+> **Anti-pattern** A fleet of agents sharing one API key and one privileged service account, where an
+> incident means rotating one secret and breaking everything, and attribution is impossible.
+
+### 5. Evidence is machine-readable or it is not evidence
+Evidence a human must produce, format and file by hand does not scale and cannot be verified at speed.
+> **In practice** Control results are emitted as `OSCAL` component and assessment artefacts; an
+> auditor's question is answered by running a query against the evidence store.
+> **Anti-pattern** A shared drive of screenshots and exported spreadsheets, re-collected from scratch
+> for every audit, unverifiable and out of date the moment it is saved.
+
+### 6. Tooling must be inspectable and composable
+The point is not who built the tool or whether it is open source; it is whether you can see inside it.
+> **In practice** The eval harness, policy library and registry expose how a verdict is reached (the
+> rule, the input and the emitted evidence) and compose into the pipeline the team already runs,
+> whether the components are open-source or a platform with an open data path.
+> **Anti-pattern** A six-figure governance platform whose "compliance score" cannot be traced to a
+> single running control, and whose data path stops at the spreadsheet import.
+
+### 7. Success is measured in realised risk reduction, not framework coverage
+Mapping every control to NIST AI RMF and ISO 42001 proves you have read the frameworks; it does not
+> **In practice** Each control declares the failure mode it addresses and a metric for it (injection
+> success rate, time-to-detect, unauthorised tool-calls blocked); the control is judged by the metric
+> moving, not by the framework cell turning green.
+> **Anti-pattern** A 300-row traceability matrix mapping controls to five frameworks, presented as
+> maturity, with no measurement of whether any of the mapped controls actually reduces risk.
+
+### 8. Governance is owned with engineering, not enforced from outside
+Governance that sits apart and grants or denies passage is a bottleneck engineers route around.
+> **In practice** The eval gate and policy checks ship as part of the standard pipeline template;
+> engineers adopt them because the paved path is also the fastest path, and governance co-maintains
+> them.
+> **Anti-pattern** A governance team that reviews and sign-offs releases from the outside, measured by
+> how many it stops, while engineering builds a shadow process to avoid it.
+
+## The six principles
+
+### Build the control at the earliest point it can block
+Put every control where it can still stop the thing going wrong, and no later. The earliest place a
+> **In practice** A new agent cannot be deployed until it has registered an owner and a scope and
+> passed its eval gate; the pipeline enforces this at the earliest gate that can refuse it, not a
+> person at the end.
+> **Anti-pattern** A pre-launch "governance review" that happens after the system is built, changes
+> nothing about how it was built, and can only delay or wave through.
+
+### Give every control teeth
+A control must be able to change what happens next: block a merge, fail a deploy, revoke access.
+> **In practice** Capability and adversarial evals are versioned alongside the model; the deploy
+> depends on the eval job passing, its coverage is tracked as its own metric, and a runtime guardrail
+> carries the same threshold into production against the inputs no eval sampled.
+> **Anti-pattern** A one-off model evaluation run before launch, its results pasted into a slide,
+> never re-run when the model or its prompts change; or a gate whose threshold is quietly lowered
+> until the build goes green.
+
+### Register and bound every actor before it acts
+Nothing, human or non-human, gets to act until it has an owner, a declared scope and a way to be
+> **In practice** The agent registry is the gate: an agent with no owner, no scope or no kill switch
+> is denied a workload identity and cannot reach production.
+> **Anti-pattern** Agents spun up ad hoc on a shared key, discovered only after one of them takes an
+> action no one can explain or undo.
+
+### Instrument the build to produce its own proof
+Wire each control to emit its own record as it runs, so assurance falls out of the system instead of
+> **In practice** Every gate and guardrail writes a structured, signed record; the audit trail builds
+> itself, and the evidence store answers both the auditor and the on-call engineer.
+> **Anti-pattern** An evidence-collection sprint before each audit, re-creating after the fact a
+> record the systems never actually produced.
+
+### Start from a named failure mode or a named harm
+Design each control against a specific way the system fails or a specific harm it can do to a person,
+> **In practice** The agent's design starts from its OWASP Agentic threat model [4] and its FRIA; the
+> controls that ship are exactly the ones those two documents demanded, and they map back to them.
+> **Anti-pattern** A control catalogue assembled from a framework checklist, addressing risks the
+> system does not have while missing the injection path an attacker actually uses.
+
+### Make the governed path the easiest path
+Ship governance as tooling, templates and paved paths engineers adopt without asking permission (a
+> **In practice** An engineer scaffolds a new AI service from a template that already includes the
+> registry hook, the policy checks and the eval gate; compliance is the default, not a request.
+> **Anti-pattern** A governance intranet of forms and ticket queues, where doing the right thing takes
+> a week and a meeting, so teams quietly do the fast thing instead.
+
+## Sources
+[1] GRC Engineering Manifesto (values and principles precedent). grcengineering. ~2024. https://grc.engineering/ (verified: primary)
+---
+
+# 04. The stack (five layers)
+
+Source: https://aigovernanceengineer.com/bok/the-stack
+
+> The reference architecture of AI governance engineering: five layers that answer the three
+> questions, where evidence is produced at the bottom and proven at the top.
+
+## How to read the stack
+The stack is not an org chart and not a maturity ladder. It is a build order. Each layer produces an
+
+## Layer 01: Govern-as-Code
+it evaluated a specific change and returned a decision. The proof is a policy verdict tied to a commit,
+> **In practice** For `csa-01`, a customer-service assistant in a large telco, a data-residency rule
+> written as `OPA/Rego` ran at both CI and admission and blocked any deployment routing its inference
+> outside the permitted region. The value was not the rule but that the enforced version emitted a
+> verdict every engineer could see before merge.
+
+## Layer 02: Inventory & Transparency
+are live, in which version, owned by whom), and that each has the transparency documentation an
+> **In practice** Wiring the registry to the deployment pipeline (so `csa-01` registered itself, with
+> an owner and a scope, at deploy time) turned "documented" into "governed". Its registry entry became
+> a query answered from production, not from a slide.
+
+## Layer 03: Evals & Red Teaming as Evidence
+is the layer where the principle "give every control teeth" becomes concrete for evals: a benchmark
+> **In practice** A red-team eval suite combining Inspect and Garak ran in CI for `csa-01`; a release
+> that dropped its injection resistance below the agreed floor failed the pipeline until fixed. The
+> eval's output, not a reviewer's opinion, was the assurance evidence filed against the model version.
+
+## Layer 04: Runtime Controls & Observability
+observed. Policies and evals are point-in-time; agents act continuously, on inputs no one reviewed.
+> **In practice** `csa-01` was issued a distinct workload identity with an owner and a declared scope,
+> as was every other agent in the telco; when it misbehaved it was traced to its identity and revoked
+> without touching the others. The kill switch was tested on a schedule. An untested kill switch is a
+> claim, not a control.
+
+## Layer 05: Assurance & Continuous Compliance
+machine-readable and audit-ready. This is where evidence stops being a by-product and becomes the
+> **In practice** `csa-01`'s guardrail decisions, eval results and policy verdicts streamed into an
+> assurance store with timestamps, so a control's status was a live query, not an annual sign-off. When
+> an auditor asked what its data-residency control did in the second quarter, the answer was a filter
+> over emitted evidence, produced in minutes.
+
+## Data governance across the stack
+The five layers govern models and agents; they are only as sound as the data underneath them, and data
+
+## Designing human oversight (Article 14)
+Human oversight is a control to be engineered, not a reassurance to be asserted. EU AI Act Article 14
+
+## Third-party and procured AI
+Most organisations do not train the models they run. They buy SaaS with an embedded LLM, call an
+
+## The cost of the stack
+None of this is free, and a FinOps line is part of governing it honestly. The recurring costs are
+
+## The minimum viable stack for a team of one
+Most AI governance functions are small, and many are a single person: in the adjacent GRC discipline,
+
+## One system through the five layers
+`csa-01`, the customer-service assistant from the boxes above, is one system, not five. Below is the
+
+## Sources
+[1] "What is GRC Engineering" (Ayoub Fandi; "theatre with extra steps"). GRC Engineer. 2025. https://grcengineer.com/what-is-grc-engineering/ (verified: primary)
+---
+
+# 05. Patterns
+
+Source: https://aigovernanceengineer.com/bok/patterns
+
+> A catalogue of reusable AI governance engineering patterns, each named to a layer of the stack, in
+> the CSIRO Responsible AI Pattern Catalogue structure.
+
+## The pattern template
+Every pattern page uses the same fields, in this order, and ends with its own **Sources** list.
+
+## Pattern: Policy Card
+Express a governance rule as a machine-readable card that travels with the model or agent, instead of
+
+## Pattern: Eval Gate in CI
+Wire a versioned eval suite into CI so a model or agent must clear a documented threshold, traced to a
+
+## Pattern: Adversarial Red-Team Suite
+Keep a versioned adversarial suite, built from a threat taxonomy rather than intuition, and run it in
+
+## Pattern: Agent Registry
+Keep a runtime-aware inventory of every model, service and agent, each entry carrying an owner, a
+
+## Pattern: AIBOM
+Emit an AI bill of materials at build, in a standard format such as CycloneDX ML-BOM or the SPDX 3.0
+
+## Pattern: Model Card as Control Evidence
+Populate the model card and the data card from the pipeline (eval results, the datasets in the AIBOM,
+
+## Pattern: Continuous Assurance Telemetry
+Have every control write a timestamped, structured evidence record to one assurance store, on one
+
+## Pattern: Runtime Guardrail
+Screen inputs and outputs on the live request path with guardrails that enforce the same Policy Card
+
+## Pattern: Kill Switch / Circuit Breaker
+Bind each agent to its own identity and put a circuit breaker at the tool-call boundary that trips on
+
+## Pattern: Incident Pipeline
+Connect runtime detection to a triage workflow that classifies severity and, on a reportable event,
+
+## Pattern: FRIA-as-Code
+Template the fundamental-rights impact assessment as structured data, link each mitigation to the
+
+## Pattern: Framework Crosswalk
+Generate the mapping from controls to framework clauses from the controls themselves, and use it to
+
+## Pattern: Machine-Readable Evidence (OSCAL)
+Emit control results as OSCAL component-definition and assessment-results artefacts, building on the
+
+## Pattern: Agent Identity & Scoped Credentials
+Issue each agent a distinct workload identity with a declared scope, an owner and an expiry, recorded
+
+## Pattern: Human-in-the-loop Gate
+Classify an agent's actions by consequence and hold the high-consequence class behind a named human
+
+## Pattern: Shadow-AI Discovery
+Scan the places AI appears (identity providers, cloud accounts, network egress, code repositories,
+
+## Pattern: Vendor / Model Due-Diligence Gate
+Gate bought and API-only AI on a structured due-diligence assessment before it reaches production: the
+
+## Sources
+[1] Responsible AI Pattern Catalogue (template: summary, objectives, target users, impacted stakeholders, relevant principles, context, problem, solution, consequences; governance/process/product patterns). CSIRO. 2023–2024. https://research.csiro.au/ss/science/projects/responsible-ai-pattern-catalogue/ (verified: primary)
+---
+
+# Pattern: Policy Card
+
+Source: https://aigovernanceengineer.com/patterns/policy-card
+
+**Summary:** Express a governance rule as a machine-readable artefact that travels with the model or
+agent and is evaluated in the pipeline and at runtime, rather than as prose a human must apply. The
+Policy Card encodes permitted and prohibited actions, obligations and evidentiary requirements for one
+AI system, and links to the enforcement and audit pipelines that act on it [1].
+
+## Objectives
+Turn a policy from a statement of intent into an executing control, versioned and testable, so that a
+rule change is a reviewable diff and every evaluation leaves a verdict.
+
+## Target users
+AI governance engineer, platform team, policy owner.
+
+## Impacted stakeholders
+Model owners, deployers, auditors, regulators.
+
+## Relevant principles
+Build the control at the earliest point it can block; make the governed path the easiest path.
+
+## Context
+An organisation with more than a handful of AI systems and a governance function that cannot review
+every change by hand. Rules exist but live in documents no pipeline can read.
+
+## Problem
+Prose policy cannot be enforced automatically, drifts from the systems it governs, and leaves no
+evidence that it was applied. A rule that can only be remembered is violated the moment someone forgets.
+
+## Solution
+Write each rule as a Policy Card: a structured, machine-readable artefact (for example expressed for an
+`OPA/Rego` or `Cedar` engine, or as a Policy Cards document) that states allow/deny logic, the failure
+mode it addresses and the framework clauses it maps to. Store it with the system it governs. Evaluate
+it pre-merge, at deploy, and (where the rule is a runtime constraint) at the point of action. Emit a
+verdict (rule id, input hash, decision, timestamp) on every evaluation.
+
+Illustrative schema for the verdict:
+
+```json
+{
+  "rule_id": "residency.eu-only.v3",
+  "decision": "deny",
+  "input_hash": "sha256:9f2b…",
+  "timestamp": "2026-09-18T14:07:11Z"
+}
+```
+
+> **Example (illustrative)** A Policy Card for a customer-service agent declares that it may call the
+> refunds tool only up to a bounded amount and never outside business hours; the same card is evaluated
+> in CI against the agent's declared scope and at runtime by the tool-call guardrail.
+
+## Consequences
+Rules become enforceable and auditable, and the crosswalk generates itself. The cost is authoring and
+maintaining cards, and the discipline to keep the executable version authoritative over the prose.
+
+## Related patterns
+[Framework Crosswalk](/patterns/framework-crosswalk); [Eval Gate in CI](/patterns/eval-gate-in-ci);
+[Runtime Guardrail](/patterns/runtime-guardrail);
+[Machine-Readable Evidence (OSCAL)](/patterns/machine-readable-evidence-oscal);
+[Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials).
+
+**Maps to:** EU AI Act Art. 9 · ISO/IEC 42001 · NIST AI RMF (Govern) · CSA AICM · OWASP Agentic
+ASI02/ASI03 · Layer 01 Govern-as-Code.
+
+Threat IDs follow the OWASP Top 10 for Agentic Applications 2026 [2] and function labels
+the NIST AI RMF [3]. Mappings are illustrative, not a claim of conformity.
+
+## Sources
+
+[1] Policy Cards: machine-readable, deployment-layer governance artefacts for AI agents, linked to enforcement and audit pipelines (arXiv 2510.24383). 2025-10. https://arxiv.org/abs/2510.24383 (verified: primary)
+[2] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
+[3] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+
+---
+
+# Pattern: Eval Gate in CI
+
+Source: https://aigovernanceengineer.com/patterns/eval-gate-in-ci
+
+**Summary:** Wire an evaluation suite into the CI/CD pipeline so that a model or agent must pass a
+
+## Objectives
+Make "give every control teeth" concrete: give a testable property a consequence, so failure stops a
+
+## Target users
+AI governance engineer, ML engineer, platform team.
+
+## Impacted stakeholders
+Model owners, users exposed to the system, auditors.
+
+## Relevant principles
+Give every control teeth; build the control at the earliest point it can block.
+
+## Context
+A model or agent that changes (retrained, re-prompted, given a new tool) and a pipeline that already
+
+## Problem
+Evaluations run once before launch and pasted into a slide prove nothing after the next change. A review
+
+## Solution
+Version an eval suite alongside the model. Run at least one capability eval and one adversarial eval in
+> **Example (illustrative)** An internal coding agent must clear an injection-resistance floor and a
+> regression suite before deploy; a release that drops resistance below the floor fails the pipeline and
+> does not ship until fixed.
+
+## Consequences
+Regressions are caught before production and evidence accrues automatically. The trade-off is eval
+
+## Related patterns
+[Policy Card](/patterns/policy-card);
+
+## Sources
+[1] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
+---
+
+# Pattern: Adversarial Red-Team Suite
+
+Source: https://aigovernanceengineer.com/patterns/adversarial-red-team-suite
+
+**Summary:** Maintain a versioned adversarial test suite, built from a threat taxonomy and run in CI
+
+## Objectives
+Turn adversarial testing from a one-off exercise into a maintained, versioned control that discovers
+
+## Target users
+AI governance engineer, security engineer, ML engineer, red-team lead.
+
+## Impacted stakeholders
+Model owners, users exposed to the system, incident responders, auditors, regulators.
+
+## Relevant principles
+Start from a named failure mode or harm; give every control teeth.
+
+## Context
+A model or agent whose exposure grows as it gains tools, prompts and reach, in an organisation that
+
+## Problem
+A one-off red-team is out of date the moment the system changes, and its findings, a slide of
+
+## Solution
+Build the suite from a threat taxonomy rather than intuition: draw techniques from MITRE ATLAS's
+> **Example (illustrative)** A red-team suite for a customer-service assistant runs a versioned set of
+> prompt-injection and tool-abuse cases drawn from ATLAS and the OWASP agentic classes; a new
+> tool-exfiltration finding is triaged, fixed and added to the suite, so the next release must pass it.
+
+## Consequences
+Adversarial coverage grows over time instead of resetting each launch, and the triage record shows what
+
+## Related patterns
+[Eval Gate in CI](/patterns/eval-gate-in-ci); [Runtime Guardrail](/patterns/runtime-guardrail);
+
+## Sources
+[1] MITRE ATLAS: adversarial tactics and techniques knowledge base for AI systems (incl. agents). MITRE. 2026. https://atlas.mitre.org/ (verified: primary)
+---
+
+# Pattern: Agent Registry
+
+Source: https://aigovernanceengineer.com/patterns/agent-registry
+
+**Summary:** Maintain a runtime-aware inventory of every model, service and agent, each entry carrying
+
+## Objectives
+Answer "what AI is running, and what is it allowed to do?" from a live source, and make registration a
+
+## Target users
+AI governance engineer, platform team, security engineer.
+
+## Impacted stakeholders
+Model owners, deployers, auditors, incident responders.
+
+## Relevant principles
+Register and bound every actor before it acts; make the governed path the easiest path.
+
+## Context
+An organisation deploying models and agents across teams, where no single source knows what is live.
+
+## Problem
+A hand-maintained inventory is correct on the day it is edited and wrong within a week. Without owner,
+
+## Solution
+Make the registry an API the deploy pipeline writes to: a new model or agent registers itself at deploy
+> **Example (illustrative)** Each agent's registry entry expires after 90 days; an owner who does not
+> renew loses the agent's workload identity, so abandoned agents fall out of production automatically.
+
+## Consequences
+Attribution, scope enforcement and lifecycle control become possible, and every other layer gets an
+
+## Related patterns
+[Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials);
+
+## Sources
+[1] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
+---
+
+# Pattern: AIBOM
+
+Source: https://aigovernanceengineer.com/patterns/aibom
+
+**Summary:** Generate an AI bill of materials at build for each AI system, recording models, datasets,
+
+## Objectives
+Make the composition and provenance of an AI system machine-readable, so supply-chain risk and
+
+## Target users
+AI governance engineer, ML engineer, security engineer.
+
+## Impacted stakeholders
+Model owners, downstream deployers, auditors, procurement.
+
+## Relevant principles
+Instrument the build to produce its own proof; start from a named failure mode or harm.
+
+## Context
+AI systems assembled from foundation models, fine-tunes, third-party datasets and libraries, where the
+
+## Problem
+Without a bill of materials for models and data, an organisation cannot answer which model version, from
+
+## Solution
+Emit an AIBOM at build in a standard format, CycloneDX ML-BOM or the SPDX 3.0 AI profile, for example
+> **Example (illustrative)** A retrieval-augmented assistant's AIBOM lists the base model, the
+> embedding model, the corpus snapshot and their licences; when a corpus licence changes, the diff
+> surfaces in the next build's AIBOM.
+
+## Consequences
+Supply-chain and provenance questions become queries; transparency documents can be generated from the
+
+## Related patterns
+[Agent Registry](/patterns/agent-registry);
+
+## Sources
+[1] "Evolving AI Transparency: the AIBOM generator's new home at OWASP" (CycloneDX output). OWASP GenAI Security Project. 2025-12-18. https://genai.owasp.org/2025/12/18/evolving-ai-transparency-the-journey-of-the-aibom-generator-and-its-new-home-at-owasp/ (verified: primary)
+---
+
+# Pattern: Model Card as Control Evidence
+
+Source: https://aigovernanceengineer.com/patterns/model-card-as-control-evidence
+
+**Summary:** Treat the model card and data card not as launch documentation written once, but as
+
+## Objectives
+Convert transparency documentation from a static PDF into a versioned artefact that is both
+
+## Target users
+AI governance engineer, ML engineer, DPO.
+
+## Impacted stakeholders
+Model owners, users, auditors, data subjects.
+
+## Relevant principles
+Instrument the build to produce its own proof; make the governed path the easiest path.
+
+## Context
+A system subject to transparency obligations, where cards are traditionally written at launch and never
+
+## Problem
+A model card written once decays into fiction as the model, prompts and datasets change. A card that is
+
+## Solution
+Template the card and populate it from the pipeline: intended use, evaluation results (from the Eval
+> **Example (illustrative)** A classifier's card is rebuilt on every deploy, pulling its latest
+> fairness-eval scores and dataset provenance automatically, so the card an auditor reads is the card
+> production produced.
+
+## Consequences
+Transparency stays true and doubles as evidence. The cost is templating and pipeline wiring, and
+
+## Related patterns
+[AIBOM](/patterns/aibom); [Eval Gate in CI](/patterns/eval-gate-in-ci);
+
+## Sources
+[1] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+---
+
+# Pattern: Continuous Assurance Telemetry
+
+Source: https://aigovernanceengineer.com/patterns/continuous-assurance-telemetry
+
+**Summary:** Stream control decisions (policy verdicts, eval results, guardrail actions, identity
+
+## Objectives
+Replace periodic attestation with evidence emitted as the system runs, so "is the control working?" is
+
+## Target users
+AI governance engineer, SRE/platform team, auditor.
+
+## Impacted stakeholders
+Model owners, auditors, regulators, incident responders.
+
+## Relevant principles
+Instrument the build to produce its own proof; give every control teeth.
+
+## Context
+A stack whose lower layers already emit structured records, and an assurance function tired of
+
+## Problem
+An attestation says a control existed when someone looked; it says nothing about the weeks in between,
+
+## Solution
+Have each control write a timestamped, structured record to a common assurance store, on one schema.
+> **Example (illustrative)** A dashboard tile for the data-residency control is backed by a live query
+> over emitted guardrail decisions; if the control stops firing, the tile goes red within minutes, not
+> at the next audit.
+
+## Consequences
+The audit becomes a query and drift is visible in near real time. The cost is building the pipeline and
+
+## Related patterns
+[Machine-Readable Evidence (OSCAL)](/patterns/machine-readable-evidence-oscal);
+
+## Sources
+[1] TAIP: NIST TEVV outputs as reusable AI Assurance Objects; trustworthiness as a continuously generated signal (arXiv 2603.03340; submitted 15 Feb 2026). 2026-02. https://arxiv.org/abs/2603.03340 (verified: primary)
+---
+
+# Pattern: Runtime Guardrail
+
+Source: https://aigovernanceengineer.com/patterns/runtime-guardrail
+
+**Summary:** Place input and output guardrails on the model or agent's runtime path that enforce its
+
+## Objectives
+Enforce policy at the point of action, on inputs and outputs no eval anticipated, and make each
+
+## Target users
+AI governance engineer, ML engineer, security engineer, platform team.
+
+## Impacted stakeholders
+Users, model owners, affected persons, incident responders, auditors.
+
+## Relevant principles
+Give every control teeth; instrument the build to produce its own proof.
+
+## Context
+An agent or model in production, acting on live inputs, whose Policy Card and eval thresholds exist but
+
+## Problem
+Policies and evals are point-in-time; the system then meets prompt injection, unsafe outputs and tool
+
+## Solution
+Put a guardrail on both sides of the model/agent path. The input guardrail screens prompts and
+> **Example (illustrative)** A customer-service assistant's input guardrail blocks a prompt-injection
+> attempt and its output guardrail redacts an account number the model was about to return; both
+> decisions are emitted to the assurance store, and a burst of blocks trips the circuit breaker.
+
+## Consequences
+The tested control holds on live traffic and every enforcement leaves evidence; the guardrail is also
+
+## Related patterns
+[Policy Card](/patterns/policy-card);
+
+## Sources
+[1] Policy Cards: machine-readable, deployment-layer governance artefacts for AI agents, linked to enforcement and audit pipelines (arXiv 2510.24383). 2025-10. https://arxiv.org/abs/2510.24383 (verified: primary)
+---
+
+# Pattern: Kill Switch / Circuit Breaker
+
+Source: https://aigovernanceengineer.com/patterns/kill-switch-circuit-breaker
+
+**Summary:** Provide a tested mechanism to stop an agent or class of agents at the point of action,
+revoking access and halting tool calls, without breaking the rest of the fleet. Autonomy is granted
+only where it can be withdrawn.
+
+## Objectives
+Bound the blast radius of a misbehaving or compromised agent, and make "stop it" a control that has been
+exercised, not a claim.
+
+## Target users
+AI governance engineer, security engineer, SRE.
+
+## Impacted stakeholders
+Model owners, users, incident responders, affected third parties.
+
+## Relevant principles
+Register and bound every actor before it acts; start from a named failure mode or harm.
+
+## Context
+Agents that act autonomously (calling tools, moving data or money), where a single failure can cascade.
+Gartner expects that by 2029 more than half of successful attacks on AI agents will exploit
+access-control weaknesses and prompt injection [1].
+
+## Problem
+An agent that cannot be stopped precisely can only be stopped by breaking everything. A fleet on shared
+credentials means an incident forces a choice between leaving the agent running and rotating a secret
+that halts the whole fleet.
+
+## Solution
+Bind each agent to its own identity (see
+[Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials)) so access can be
+revoked per agent. Implement a circuit breaker at the tool-call boundary that trips on a defined signal: a
+threshold breach, an anomaly, a manual pull. Test the kill switch on a schedule; an untested kill switch
+is not a control.
+
+> **Example (illustrative)** A payments agent's circuit breaker trips automatically when its
+> unauthorised-tool-call rate crosses a threshold, revoking just that agent's scope while the rest of
+> the fleet keeps running; the pull is drilled monthly.
+
+## Consequences
+Incidents are contained to one agent and recovery is fast. The cost is per-agent identity plumbing and
+the engineering to make revocation instant and safe.
+
+## Related patterns
+[Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials);
+[Agent Registry](/patterns/agent-registry);
+[Human-in-the-loop Gate](/patterns/human-in-the-loop-gate);
+[Incident Pipeline](/patterns/incident-pipeline).
+
+**Maps to:** EU AI Act Art. 14, Art. 15 · ISO/IEC 42001 · NIST AI RMF (Manage) · CSA AICM · OWASP
+Agentic ASI02/ASI10 · Layer 04 Runtime Controls & Observability.
+
+Threat IDs follow the OWASP Top 10 for Agentic Applications 2026 [2] and function labels
+the NIST AI RMF [3]. Mappings are illustrative, not a claim of conformity.
+
+## Sources
+
+[1] "Gartner Forecasts the Market for Securing AI Will Reach Almost $5 Billion in 2027" (>50% of agent attacks exploit access-control and prompt injection by 2029). Gartner. 2026-08-26. https://www.gartner.com/en/newsroom/press-releases/2026-08-26-gartner-forecasts-the-market-for-securing-ai-will-reach-almost-5-billion-in-2027 (verified: primary)
+[2] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
+[3] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+
+---
+
+# Pattern: Incident Pipeline
+
+Source: https://aigovernanceengineer.com/patterns/incident-pipeline
+
+**Summary:** Build the plumbing to detect, triage and report serious AI incidents on the clock, with
+
+## Objectives
+Turn a runtime signal into a reported obligation within the legal window, and produce the incident
+
+## Target users
+AI governance engineer, security/incident responder, legal/compliance.
+
+## Impacted stakeholders
+Regulators, affected persons, deployers, model owners.
+
+## Relevant principles
+Instrument the build to produce its own proof; start from a named failure mode or harm.
+
+## Context
+A high-risk or GPAI system in production, subject to serious-incident reporting duties, where detection
+
+## Problem
+When an incident is detected, the clock starts. If detection, triage and reporting are disconnected
+
+## Solution
+Connect runtime detection (from observability and guardrails) to a triage workflow that classifies
+> **Example (illustrative)** A guardrail flags a data-exfiltration attempt via an agent tool; the
+> pipeline classifies it, opens an incident with the Art. 73 timer running, and pre-fills the report
+> from the trace and registry entry.
+
+## Consequences
+Reporting happens on time and the record is audit-ready. The cost is cross-functional integration and
+
+## Related patterns
+[Continuous Assurance Telemetry](/patterns/continuous-assurance-telemetry);
+
+## Sources
+[1] Regulation (EU) 2024/1689 (AI Act), Art. 72 (post-market monitoring) and Art. 73 (reporting of serious incidents). Publications Office of the EU (EUR-Lex). 2024-07-12. https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng (verified: primary)
+---
+
+# Pattern: FRIA-as-Code
+
+Source: https://aigovernanceengineer.com/patterns/fria-as-code
+
+**Summary:** Maintain the fundamental-rights impact assessment as a versioned, reviewable artefact
+
+## Objectives
+Keep the FRIA and its DPIA cross-reference live and linked to the controls they demand, so a change in
+
+## Target users
+AI governance engineer, DPO, legal/compliance.
+
+## Impacted stakeholders
+Data subjects, affected persons, deployers, regulators.
+
+## Relevant principles
+Start from a named failure mode or harm; instrument the build to produce its own proof.
+
+## Context
+A deployer of a high-risk AI system subject to the EU AI Act Art. 27 fundamental-rights impact
+
+## Problem
+A FRIA written once as a Word document describes rights impact at a single moment and is never revisited
+
+## Solution
+Template the FRIA as structured data covering intended use, affected groups, risks to rights, and the
+> **Example (illustrative)** A benefits-eligibility system's FRIA links each identified risk to
+> people's rights to a specific eval and guardrail; when the model is retrained, the FRIA flags which
+> mitigations need re-verification.
+
+## Consequences
+Rights assessment stays current and traceable to controls, and overlaps with the DPIA are not
+
+## Related patterns
+[Model Card as Control Evidence](/patterns/model-card-as-control-evidence);
+
+## Sources
+[1] Regulation (EU) 2024/1689 (AI Act), Art. 27 (fundamental-rights impact assessment for high-risk AI systems; DPIA cross-reference). Publications Office of the EU (EUR-Lex). 2024-07-12. https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng (verified: primary)
+---
+
+# Pattern: Framework Crosswalk
+
+Source: https://aigovernanceengineer.com/patterns/framework-crosswalk
+
+**Summary:** Maintain a mapping from each control to the framework clauses it serves, generated from
+
+## Objectives
+Let one control satisfy many frameworks and make coverage navigable, while refusing to mistake coverage
+
+## Target users
+AI governance engineer, compliance lead, auditor.
+
+## Impacted stakeholders
+Auditors, regulators, model owners.
+
+## Relevant principles
+Make the governed path the easiest path; instrument the build to produce its own proof.
+
+## Context
+An organisation answering to several overlapping frameworks (EU AI Act, ISO/IEC 42001, NIST AI RMF, CSA
+
+## Problem
+The crosswalk is where framework theatre begins. A green mapping matrix is mistaken for a working
+
+## Solution
+Generate the crosswalk from the controls, not beside them: each Policy Card and Eval Gate declares the
+> **Example (illustrative)** Clicking a green cell for "logging" opens the guardrail and the OSCAL
+> evidence it emitted this week; a cell with no evidence renders amber, not green.
+
+## Consequences
+Controls are reused across frameworks and gaps are visible, without inflating a matrix into false
+
+## Related patterns
+[Policy Card](/patterns/policy-card); [Runtime Guardrail](/patterns/runtime-guardrail);
+
+## Sources
+[1] AI Controls Matrix (AICM) v1.1 (247 control objectives across 18 domains). Cloud Security Alliance. 2026-06-22. https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1 (verified: primary)
+---
+
+# Pattern: Machine-Readable Evidence (OSCAL)
+
+Source: https://aigovernanceengineer.com/patterns/machine-readable-evidence-oscal
+
+**Summary:** Emit control evidence in a machine-readable, standard format so that the audit is a query
+
+## Objectives
+Make evidence queryable, diffable and aggregatable, and eliminate the screenshot as an evidence
+
+## Target users
+AI governance engineer, auditor, platform team.
+
+## Impacted stakeholders
+Auditors, regulators, model owners.
+
+## Relevant principles
+Instrument the build to produce its own proof; give every control teeth.
+
+## Context
+A stack whose controls already produce structured records, and an assurance function that must answer
+
+## Problem
+Evidence a human must format and file by hand does not scale, cannot be verified quickly, and is out of
+
+## Solution
+Emit control results as OSCAL component-definition and assessment-results artefacts. OSCAL's native
+> **Example (illustrative)** An eval gate writes an OSCAL assessment result on every run; the auditor's
+> request for "all robustness evidence in Q3" is a filter over the store, returned in minutes.
+
+## Consequences
+The audit becomes a query and evidence composes across tools and jurisdictions. The cost is adopting the
+
+## Related patterns
+[Continuous Assurance Telemetry](/patterns/continuous-assurance-telemetry);
+
+## Sources
+[1] "Making AI Compliance Evidence Machine-Readable" (OSCAL + 16 property extensions; three-layer policy/evidence/enforcement; "specify what to assure but provide no executable format for how") (arXiv 2604.13767). UC3M. 2026-04-15. https://arxiv.org/abs/2604.13767 (verified: primary)
+---
+
+# Pattern: Agent Identity & Scoped Credentials
+
+Source: https://aigovernanceengineer.com/patterns/agent-identity-scoped-credentials
+
+**Summary:** Give every agent its own identity, an owner, a bounded scope and an expiry, established
+
+## Objectives
+Make every non-human actor governable by construction: attributable, scopable, revocable, expiring.
+
+## Target users
+AI governance engineer, security engineer, IAM/platform team.
+
+## Impacted stakeholders
+Model owners, security operations, auditors, affected third parties.
+
+## Relevant principles
+Register and bound every actor before it acts; start from a named failure mode or harm.
+
+## Context
+Agents that act under delegated authority (calling APIs, tools and other agents), where the default is
+
+## Problem
+An agent on borrowed credentials cannot be attributed, contained or revoked. NIST's NCCoE frames the
+
+## Solution
+Issue each agent a distinct workload identity with a declared scope, an owner and an expiry, recorded in
+> **Example (illustrative)** A data-analysis agent authenticates with an issuer-bound credential and a
+> scope limited to read-only access to one dataset; its every action is logged under its own identity,
+> and its credential expires with its registry entry.
+
+## Consequences
+Attribution, containment and precise revocation become possible, and the kill switch has something to
+
+## Related patterns
+[Agent Registry](/patterns/agent-registry);
+
+## Sources
+[1] "Accelerating the Adoption of Software and AI Agent Identity and Authorization" (concept paper; "known, trusted, and properly governed"; non-repudiation, tamper-proof logging). NIST NCCoE. 2026-02-05. https://www.nccoe.nist.gov/news-insights/new-concept-paper-identity-and-authority-software-agents (verified: primary)
+---
+
+# Pattern: Human-in-the-loop Gate
+
+Source: https://aigovernanceengineer.com/patterns/human-in-the-loop-gate
+
+**Summary:** Require human approval at a defined, high-consequence decision point before an agent's
+
+## Objectives
+Insert meaningful human oversight where an action is irreversible or high-impact, and record the
+
+## Target users
+AI governance engineer, product owner, risk owner.
+
+## Impacted stakeholders
+Affected persons, users, model owners, regulators.
+
+## Relevant principles
+Start from a named failure mode or harm; register and bound every actor before it acts.
+
+## Context
+An agent whose actions include some that are irreversible or affect people's rights (a payment, a
+
+## Problem
+Full autonomy over a high-consequence action removes the human oversight the law and the risk both
+
+## Solution
+Classify actions by consequence. For the high-consequence class, gate the action behind a human
+> **Example (illustrative)** An agent can draft and queue refunds autonomously, but any refund above a
+> threshold is held for a named human approver, whose decision is logged against the transaction.
+
+## Consequences
+Oversight lands where it matters without throttling routine work, and the approval is auditable. The
+
+## Related patterns
+[Kill Switch / Circuit Breaker](/patterns/kill-switch-circuit-breaker);
+
+## Sources
+[1] Regulation (EU) 2024/1689 (AI Act), Art. 14 (human oversight of high-risk AI systems). Publications Office of the EU (EUR-Lex). 2024-07-12. https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng (verified: primary)
+---
+
+# Pattern: Shadow-AI Discovery
+
+Source: https://aigovernanceengineer.com/patterns/shadow-ai-discovery
+
+**Summary:** Continuously discover AI systems and agents that are running but not registered, and
+
+## Objectives
+Close the gap between the registry and production by finding unregistered models, agents and AI-enabled
+
+## Target users
+AI governance engineer, security engineer, platform team.
+
+## Impacted stakeholders
+Model owners, security operations, auditors.
+
+## Relevant principles
+Register and bound every actor before it acts; make the governed path the easiest path.
+
+## Context
+An organisation where teams adopt AI tools and spin up agents faster than any central inventory can
+
+## Problem
+A registry fed only by voluntary declaration is always behind. Unregistered agents, the shadow fleet,
+
+## Solution
+Run discovery against the environments where AI appears (identity providers, cloud accounts, network
+> **Example (illustrative)** A weekly discovery sweep finds an agent calling an external API from a
+> team's cloud account with no registry entry; it is auto-registered as unclaimed, its owner is
+> notified, and its scope is frozen until claimed.
+
+## Consequences
+The inventory converges on reality and the blind spot shrinks. The cost is discovery integration and the
+
+## Related patterns
+[Agent Registry](/patterns/agent-registry);
+
+## Sources
+[1] "Best AI Governance Platforms in 2026: 14 Enterprise Vendors Compared" (vendor-published comparison of the 13 Magic Quadrant vendors plus its own product; most of the category "manages the program … without any runtime data path"). Kosmoy. 2026-07-10. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
+---
+
+# Pattern: Vendor / Model Due-Diligence Gate
+
+Source: https://aigovernanceengineer.com/patterns/vendor-model-due-diligence-gate
+
+**Summary:** Gate the procurement or integration of a third-party AI system (SaaS with an embedded
+
+## Objectives
+Bring bought and API-only AI under the same registry and assurance discipline as systems you build, and
+
+## Target users
+AI governance engineer, procurement, security engineer, DPO.
+
+## Impacted stakeholders
+Deployers, model providers, data subjects, auditors, regulators.
+
+## Relevant principles
+Register and bound every actor before it acts; start from a named failure mode or harm.
+
+## Context
+An organisation that consumes far more AI than it trains: SaaS features with an embedded LLM, hosted
+
+## Problem
+The parts of the stack that assume you own the model degrade when you do not. You cannot red-team
+
+## Solution
+Make due diligence a gate a procured or integrated AI system must pass before it reaches production,
+> **Example (illustrative)** A team integrating an API-only foundation model cannot test its weights,
+> so the gate captures the provider's published evaluations, restricts the model to a scoped service
+> identity with no standing data access, adds a boundary eval on the team's own prompts, and files the
+> whole assessment as the system's registry entry, flagged "provider-attested" where the team relied
+> on the vendor's evidence rather than its own.
+
+## Consequences
+Procured AI is inventoried and bounded, and the reliance on provider-supplied evidence is explicit
+
+## Related patterns
+[Agent Registry](/patterns/agent-registry); [AIBOM](/patterns/aibom);
+
+## Sources
+[1] Responsible AI Pattern Catalogue (template: summary, objectives, target users, impacted stakeholders, relevant principles, context, problem, solution, consequences; governance/process/product patterns). CSIRO. 2023–2024. https://research.csiro.au/ss/science/projects/responsible-ai-pattern-catalogue/ (verified: primary)
+---
+
+# 06. The role
+
+Source: https://aigovernanceengineer.com/bok/the-role
+
+> The AI governance engineer as a concrete role: a capability first and a job title second, defined
+> by the workflows it owns and the evidence it produces, not by the certifications on its holder.
+
+## Capability first, title second
+The Thesis insists that AI governance engineering is a capability, not a job title (the same claim
+
+## What the role owns, by workflow
+The engineer owns workflows, not documents. Each workflow below is a running system with inputs,
+
+### Intake and classification
+Every AI system, model and agent enters through an intake that classifies it: by risk tier, by
+
+### Inventory and registry
+The engineer owns the inventory of models and the **agent registry**, the runtime-aware record of
+
+### Evals and red teaming as evidence
+The engineer builds and maintains the eval suites (capability, safety and adversarial) and wires
+
+### Policy-as-code and gates
+The engineer expresses governance rules as executable policy (`OPA/Rego`, Cedar, Policy Cards) that
+
+### Runtime monitoring and incidents
+The engineer instruments runtime: guardrail decisions, tool-call mediation, drift signals and agent
+
+### Assurance and audit evidence
+The engineer emits **audit-ready evidence** as a by-product of the build (`OSCAL` component and
+
+### Regulatory translation
+The engineer reads the obligation well enough to build the control that meets it: turning an AI Act
+
+## Skills, by workflow
+Skills are grouped by the workflow they serve, not by the certificate that teaches them. The table is
+
+## Analyst versus engineer
+The clearest way to define the role is against the analyst it grows from. The contrast below is
+
+## The career ladder
+The role has observable rungs, each defined by what the person can be trusted to own end to end, not
+
+## Three ways in
+Nobody starts as an AI governance engineer; everyone converts from an adjacent discipline, keeping its
+
+## The market
+The role is defined by the workflows above, not by the vacancies. But the market is forming and the
+> **Postings (footnote).** Individual postings mark the top of the range: a GRC engineering-manager
+> role at a frontier lab was advertised in 2026 at USD 405,000 [3]. But named vacancies are a lagging,
+> noisy signal, kept here as corroboration and out of the argument; this edition cites no job-board
+> listing whose URL expires or is reassigned once the vacancy closes. The role is the workflows, not
+> the requisition.
+
+## What employers get wrong in the job description
+Reading the postings against the workflows above, three mistakes recur.
+> **In practice**
+> In a large telco, the role arrived before the title. The first version of the work sat inside a
+> privacy team and looked like DPIAs and reviews. What turned it into AI governance engineering was
+> owning two workflows outright: wiring the model and agent registry to the deployment pipeline so it
+> was true on any Tuesday, and putting an eval gate in CI so a regression in injection resistance
+> failed the build. The job description caught up a year later. The capability was visible in the
+> systems long before it was visible on the org chart.
+
+## Sources
+[1] "How the AI Engineer role is unbundling in 2026" (names the AI Evaluation & Governance Engineer). AI Journal. 2026-08-26. https://aijourn.com/how-the-ai-engineer-role-is-unbundling-in-2026/ (verified: secondary)
+---
+
+# 07. Maturity model (five levels)
+
+Source: https://aigovernanceengineer.com/bok/maturity-model
+
+> A ladder from paper to production (Documented, Inventoried, Tested, Enforced, Continuous), where
+> each level is proven by what the running systems can show, not by what a document claims.
+
+## Why a maturity model, and how to read this one
+Maturity models fail when they measure paperwork. This one measures the systems. A level is not a
+
+## The five levels
+spreadsheet inventory, a risk register, a review that happens before launch. The rules are written and
+
+## Observable criteria, by layer and level
+Read each row as one layer maturing left to right. You are at a level only when every row has reached
+
+## Metrics per level
+Each level has metrics you can read off the systems. Track the trend, not the single number.
+
+## Self-assessment checklist
+Answer each with the system, not the intention. A "no" caps you at the level below.
+
+## How this relates to certification and other assessments
+This maturity model is not a certification and does not confer one. It relates to three external
+> **In practice**
+> A function in a large telco assessed itself honestly and landed at Level 2 for inventory but Level 1
+> for evals: the registry was live off the deploy pipeline, but evals were still run by hand before
+> launch and pasted into slides. The chain was only as strong as its weakest layer, so the function
+> was Level 1 overall. The smallest step was not a new framework mapping; it was versioning one eval
+> suite and storing its timestamped results, moving the eval layer to Level 3, before wiring it into
+> a gate. Evidence freshness fell from a quarter to a release cycle within two sprints.
+
+## Sources
+[1] "Best AI Governance Platforms in 2026: 14 Enterprise Vendors Compared" (vendor-published comparison of the 13 Magic Quadrant vendors plus its own product; most of the category "manages the program … without any runtime data path"). Kosmoy. 2026-07-10. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
+---
+
+# 08. Regulatory map (obligation → artefact → layer)
+
+Source: https://aigovernanceengineer.com/bok/regulatory-map
+
+> This chapter is the reverse index of every "Maps to" line in the book: for each obligation it names
+> the engineering artefact that satisfies or supports it and the stack layer the artefact lives in.
+
+## How to read this map
+Read each row as a sentence: *this obligation is answered by this artefact, which lives in this layer*.
+
+## EU AI Act, post-Omnibus
+For a teaching walk-through of the Act before this reverse index maps it (scope, the risk ladder,
+
+## GPAI Code of Practice
+The GPAI Code of Practice, published 10 July 2025, is the voluntary instrument providers use to
+
+## ISO/IEC 42001, 42005 and 42006
+ISO/IEC 42001:2023 is the AI management-system (AIMS) standard; its Annex A groups control objectives
+
+## NIST AI RMF
+The NIST AI Risk Management Framework 1.0 (January 2023; there is no 2.0) organises risk work into
+
+### Newer NIST AI work
+Beyond the RMF, three newer NIST efforts bear on the stack. Two are still in draft, and the copy says
+
+## CSA AICM and STAR for AI
+The Cloud Security Alliance's AI Controls Matrix (AICM) v1.1, published 22 June 2026, defines 247
+
+## OWASP GenAI Security Project
+OWASP's GenAI Security Project supplies the threat vocabulary the controls are built against, plus two
+
+## US federal and state laws
+The United States has no horizontal federal AI statute; the binding rules are state laws, and they
+
+### Frontier-developer laws
+Two US state laws bind only large frontier developers, not general deployers: a narrower scope than
+
+### Other state AI laws
+Two further state laws reach beyond frontier developers to ordinary developers and deployers. They
+
+## Other jurisdictions
+The map's spine is the EU AI Act, but a governance function working across borders answers to more
+
+### United Kingdom
+The UK has no horizontal AI act. It governs AI through existing sector regulators (the ICO, the FCA,
+
+### China
+China governs AI in two tiers, and this map keeps them apart. The binding tier is a set of
+
+## What is NOT harmonised yet
+The map has a hole, and it is important to state it plainly rather than paper over it.
+> **In practice (illustrative)**
+> A governance team maintained this map not as a slide but as a machine-readable crosswalk: a
+> versioned file linking each obligation ID to the artefact that produced its evidence and the layer
+> it lived in, emitted as `OSCAL` component definitions. When the Omnibus moved the high-risk dates,
+> the change was a diff to one field per affected row, and every "Maps to" line downstream re-resolved
+> from the same file. The audit question "show me what answers Article 15" became a query against the
+> crosswalk, not a hunt through a wiki.
+
+## Sources
+[1] "AI Omnibus enters into force" (Reg. (EU) 2026/1744, in force 2026-07-27; Annex III high-risk → 2 Dec 2027; Annex I → 2 Aug 2028; legacy public-authority → 2 Aug 2030). European Commission. 2026-07-27. https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force (verified: primary)
+---
+
+# 09. Glossary
+
+Source: https://aigovernanceengineer.com/bok/glossary
+
+> The canonical definitions for the book: every term defined once, alphabetically, and
+> cross-referenced to the chapter that treats it in full.
+
+## Commonly confused pairs
+Ten pairs are confused often enough in reviews to be worth fixing in a team's vocabulary. Each
+
+## A
+to a human reviewer. Its width is set by risk tier; the band size and the reviewers' override rate
+
+## B
+bias into three categories: systemic, statistical and computational, and human [41]. Bias can enter
+
+## C
+of the binding AI rules (algorithmic recommendation, deep synthesis, generative AI services and
+
+## D
+composition and known limitations) maintained as code alongside the system. Contrast with [Datasheet
+
+## E
+independence and organisational standing to force change. The term comes from US model-risk
+
+## F
+dangers [60]. For AI: undisclosed limitations or out-of-scope uses, which is why model cards and
+
+## G
+estimate about something that exists. Its distinctive risks include confabulation, information
+
+## H
+sources; NIST's generative AI profile calls it confabulation and lists it among the risks generative
+
+## I
+system bearing the name or trademark of a provider established outside the Union. It must verify the
+
+## J
+treats jailbreaking as a form of prompt injection [84]; it is tested with red-team suites in the
+
+## K
+appetite (unregistered AI found, open exceptions by age, override rates), as distinct from a key
+
+## L
+behind an API. Because calls pass through a gateway, runtime controls (tracing, filtering, stopping)
+
+## M
+from data rather than by following rules people wrote. ISO/IEC 22989 groups its approaches into
+
+## N
+blocked the exfiltration, the reviewer caught the invented dosage. Near-miss data is evidence; the
+
+## O
+rights, fairness and privacy; transparency and explainability; robustness, security and safety;
+
+## P
+the governed way the easiest way to ship, so engineers adopt governance without asking permission.
+
+## Q
+providers; distinct from an ISO/IEC 42001 AIMS, which certifies a management system but is not
+
+## R
+large frontier developers to publish a safety framework and disclose incidents; signed 19 December
+
+## S
+whose intended purpose is to prevent or mitigate risks to the health and safety of persons or
+
+## T
+mode, producing the same records a real incident would (record, clocks, draft reports, containment
+
+## U
+laws [120]. Deception is a material representation likely to mislead; unfairness is substantial,
+
+## V
+retrieval corpus and guardrails a deployed system uses, so what ran is known and any unpinned
+
+## W
+detector can later read to identify it as AI-generated. The AI Act asks providers of generative
+
+## Sources
+[1] Real Decreto 729/2023, de 22 de agosto, por el que se aprueba el Estatuto de la Agencia Española de Supervisión de Inteligencia Artificial (Royal Decree approving the AESIA statute; seat in A Coruña; BOE no. 210, 2 Sep 2023). Boletín Oficial del Estado. 2023-09-02. https://www.boe.es/eli/es/rd/2023/08/22/729 (verified: primary)
+---
+
+# 10. Reading list
+
+Source: https://aigovernanceengineer.com/bok/reading-list
+
+> The sources that formed the discipline, curated and annotated, each with a verified URL and a
+> one-line note on why it matters.
+
+## Foundational texts (the form and the method)
+  philosophical model for this book. `https://grc.engineering/` (verified: primary) (audience:
+
+## Regulation and standards
+  Omnibus (Regulation (EU) 2026/1744), consolidated on 27 July 2026; the primary obligation source for
+
+## International principles and frameworks
+  Principles as revised in 2024, and the source of the AI-system definition and lifecycle that the AI
+
+## EU guidance, codes and adjacent law
+  seven elements, the low autonomy bar and the excluded families of software. `https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application`
+
+## Government and regulator guidance beyond the EU
+  creates or worsens, with suggested actions keyed to AI RMF subcategories, usable as eval-suite
+
+## Frontier safety frameworks (the labs' own commitments)
+  thresholds and required safeguards; the page states version 3.4, effective 8 July 2026.
+
+## Papers (machine-readable evidence and agent governance)
+  argues frameworks specify *what* to assure but no executable *how*. `https://arxiv.org/html/2604.13767v1`
+
+## Canonical papers: documentation, audit and accountability
+  human-readable half of a dataset admission record. `https://arxiv.org/abs/1803.09010` (verified:
+
+## Canonical papers: measurement, fairness and evaluation
+  (Buolamwini and Gebru, 2018)**: the audit that made disaggregated, intersectional evaluation the
+
+## Reports (the market and the profession)
+  staffed; the profession's baseline census. `https://iapp.org/resources/article/ai-governance-profession-report/`
+
+## Incident and risk repositories (the empirical record)
+  near-harms; a reference corpus for threat modelling and post-market monitoring. `https://incidentdatabase.ai/`
+
+## Engineering and assurance practice
+  second lines and independent internal audit, which an AI governance programme has to map onto,
+
+## Tools (illustrative categories, not endorsements)
+  evals-as-evidence and eval gates. `https://github.com/UKGovernmentBEIS/inspect_ai` (verified:
+
+## Books
+  Press, 2023)**: the standard text on what fairness criteria can and cannot say; readable in full
+
+## Courses
+  to non-experts; one way to start the AI-literacy programme Article 4 asks for. `https://www.elementsofai.com/`
+
+## Communities and newsletters
+  the role definitions this book adapts. `https://grcengineer.com/` (verified: primary) (audience:
+
+## Sources
+The reading list is its own source set: each entry above carries its URL and a verification tag
+---
+
+# 11. AI, defined for governance
+
+Source: https://aigovernanceengineer.com/bok/ai-defined
+
+> What an AI system is for governance purposes: the definitions that set scope, the kinds of AI and
+> the traits that break classic governance, each turned into a registry field, a control and
+> evidence.
+
+## Why the definition is a control
+Two decisions sit at the front of every intake, and they are different decisions. The first is
+> **In practice (illustrative)**
+> In a large telco, the first intake pass asked teams to self-declare "AI or not". Self-declaration
+> produced both failure modes at once: a churn-propensity model registered as "analytics" and a
+> keyword-routing macro registered as "AI". Replacing the yes/no question with the element questions
+> below, each answered in the registry with a one-line reason, moved the decision from opinion to
+> record. Disagreements became diffs on the decision record, reviewed like any other change.
+
+## Four definitions, compared
+Four texts set scope for most organisations: the OECD definition, the EU AI Act definition with the
+
+### The OECD definition (2023 revision)
+Chapter 22 places [the OECD definition and lifecycle](/bok/principles-and-standards#the-oecd-ai-system-definition-and-lifecycle)
+
+### EU AI Act Article 3(1) and the Commission guidelines
+Chapter 18 sets [the legal definition of an AI system](/bok/eu-ai-act#what-counts-as-an-ai-system)
+
+### ISO/IEC 22989
+ISO/IEC 22989:2022 is the terminology standard the rest of the ISO/IEC AI family builds on [6]. Its
+
+### NIST AI 100-1
+The NIST AI Risk Management Framework (NIST AI 100-1, January 2023) "refers to an AI system as an
+
+### The definitions side by side
+Sources: [3][4][1][6][8].
+
+## From definition element to registry field
+Each element of the definition is a question the intake asks and a field the registry keeps. The
+> **Example (illustrative)**
+> The scoping fields of `csa-01`, the customer-service assistant used across this book, as its
+> registry entry records them. The definitional decision and the risk tier are separate records.
+
+## AI versus conventional software
+The line between AI and conventional software is the line between behaviour someone specified and
+> **Note**
+> A **model** is not a **system**, and neither is an **agent**. The AI Act defines the AI system
+> (Art. 3(1)) and, separately, the general-purpose AI model (Art. 3(63)) and the general-purpose AI
+> system built on one (Art. 3(66)) [4]. The registry keeps both levels and links them: one model can
+> sit inside many systems, and chapter 01's [five objects of
+> governance](/bok/definition#the-object-of-governance) each need their own entry.
+
+## Kinds of AI that change the governance problem
+Taxonomies of AI are plentiful. The test applied here is narrow: does knowing the kind change a
+
+### By capability and by functionality
+The capability ladder (narrow AI, artificial general intelligence, superintelligence) is the most
+
+### By learning paradigm
+The learning paradigm tells you where the behaviour came from, and so where its evidence must come
+
+### By technology family
+
+### Predictive versus generative
+A **predictive** (or discriminative) system outputs an estimate about something that exists: a
+
+### Foundation models and GPAI
+A **foundation model** is one "trained on broad data at scale" and "adaptable to a wide range of
+
+### LLMs and SLMs
+A **large language model (LLM)** is a foundation model for language, usually served from a data
+
+### Multimodal models
+A **multimodal** model takes or produces more than one modality (text, image, audio, video). Images
+
+### RAG systems
+retrievable ("non-parametric") store of documents, originally a dense vector index [24]. Its authors
+
+### Agentic systems
+An **agentic system** plans and acts: it calls tools, browses, executes code and moves data under
+
+### Why the type matters: the control set by kind
+Kinds combine. `csa-01` is generative, retrieval-augmented and agentic at once, so it carries all
+
+## Eight characteristics that break classic IT governance
+Classic IT governance (change management, SDLC gates, access control, the security management
+
+### Contrast pairs
+Four pairs are confused often enough in reviews to be worth fixing in the team's vocabulary.
+
+## Governing probabilistic outputs
+Conventional software returns an answer. Most AI returns an estimate or a sample, and someone has to
+
+### A score is not a decision
+A predictive model emits a score. A decision is a score, plus a threshold, plus an action taken when
+
+### Calibration before thresholds
+A threshold only means something if the score does. A **calibrated** model's 0.9 is right about nine
+
+### Certainty required by risk tier
+The certainty a decision needs depends on what being wrong costs, so the runtime rule is set by risk
+> **Example (illustrative)**
+> A threshold policy for a loan-triage model, written as a Policy Card rule. The numbers are
+> illustrative; the point is that each one has an owner and an effective date and is tested in the
+> gate.
+
+### Generative outputs and non-determinism
+Generative systems have no single score to threshold. The controls move to properties of the output:
+
+## Responsible-AI principle sets, engineered
+In this book, **principle** has a house meaning: one of the six rules of method in [chapter
+
+### Four principle sets in brief
+principles on 3 May 2024, the Recommendation sets five values-based principles: inclusive growth,
+
+### Where the sets agree
+The four sets disagree on emphasis and agree on substance. The table crosses the seven principles
+
+### From principle to artefact
+A principle is applied when it has been traced to a named harm, a control that bites, a metric that
+> **Example (illustrative)**
+> One principle traced end to end. OECD 1.3 asks that people adversely affected by a system can
+> challenge its output. Named harm: an applicant declined by `loan-triage-02` cannot find out why or
+> contest it. Control: every adverse decision carries logged reason codes and an appeal route to a
+> reviewer who can reverse it. Metric: appeal volume, reversal rate and time to resolution, per
+> month. Evidence: the appeal log, filed against the registry entry and the model version.
+> Obligation it supports: AI Act Art. 86 where it applies, GDPR Art. 22 safeguards where the
+> decision is solely automated.
+
+### Trade-offs are decisions, and decisions are records
+Principles collide. NIST names the usual collisions: interpretability against privacy, predictive
+> **In practice (illustrative)**
+> A governance team inherited a published "responsible AI charter" of six principles and no evidence
+> behind any of them. Rather than rewrite the charter, it added one column to the registry per
+> principle and asked, for each high-risk system, which artefact evidenced it. Four of six columns
+> were empty for most systems on day one. The empty cells became the backlog, and the charter became
+> auditable for the first time: a principle with no artefact was reported as a gap, not as a value.
+
+## What you can do this week
+1. Add the eight scoping fields from this chapter (`substrate`, `objective`, `intended_purpose`,
+
+## Sources
+[1] Commission Guidelines on the definition of an artificial intelligence system established by Regulation (EU) 2024/1689 (C(2025) 5053 final; first published 6 Feb 2025; not binding; seven elements of Art. 3(1); exclusions at paras 40–51; definition applicable since 2 Feb 2025). European Commission. 2025-07-29. https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application (verified: primary)
+---
+
+# 12. Running the AI governance program
+
+Source: https://aigovernanceengineer.com/bok/governance-program
+
+> An AI governance program is the organisation governed as a system: people hold the duties, a
+> committee decides what gates cannot, policies compile into gates, and the evidence reaches the board.
+
+## The organisation as an object of governance
+Chapter 01 names five objects of governance: models, systems, agents, data and the organisation. The
+
+## The stakeholder map
+Each stakeholder holds a duty, a decision right (or explicitly none) and an artefact that evidences
+
+## A lifecycle RACI
+The RACI says who does what at each lifecycle stage. **R** does the work, **A** answers for it (one
+
+## The committee decides, the gates enforce
+Committees have a bad reputation in this book, and chapter 04 earns it: a board that rates findings
+
+### What the committee is for
+Four kinds of decision. **Risk acceptance**: whether a residual risk above the product owner's
+
+### Charter and membership
+A one- or two-page charter sets purpose, decision rights, quorum, membership, cadence, escalation, how
+
+### Advisory or binding
+An advisory committee recommends and a named executive decides; a binding committee decides within its
+
+### Risk acceptance and exceptions
+Residual risk is accepted by someone with the authority to own it, for a bounded time. An acceptance
+
+### Escalation, triggers and cadence
+Most use cases never reach the committee; they pass intake, get a tier and go through the gates.
+> **In practice (illustrative)**
+> In a large telco, the committee's first meetings debated individual releases. Moving exceptions
+> into a register the gates read changed its job. Engineers filed requests as pull requests; the
+> committee decided within the service level; the gate enforced the expiry. Meetings shrank to
+> triggered use cases and the trend in open exceptions, and an auditor could list every release that
+> shipped under an exception with one query.
+
+## Enterprise risk, the three lines and internal audit
+
+### AI risk in the enterprise risk register
+AI risk belongs in the enterprise risk register under the same appetite, rating scale and reporting
+
+### The three lines, applied to AI
+The AI governance engineer usually sits in the second line, building tools the first line runs. The
+
+### What internal audit tests
+ISO/IEC 42001 asks for internal audits of the management system (clause 9.2) [2]. They should test the
+
+## AI literacy as code
+
+### What Article 4 asks after the Omnibus
+Article 4 of the EU AI Act has applied since 2 February 2025. As amended by Regulation (EU) 2026/1744,
+
+### Role-based curricula
+Formats follow the persona: scenario briefings for the board, labs for engineers, simulations for
+
+### Training records and attestation as an access condition
+A training record is evidence when it is structured, tied to a system and able to expire
+
+### Measuring and refreshing literacy
+Completion rates measure attendance. Better indicators are coverage by persona, time from joining (or
+
+## Governance culture
+Controls fail quietly when people route around them; culture is whether they do. Three levers are
+
+## A channel for raising concerns
+Pipelines catch what they were built to see. A data scientist who suspects a benchmark was gamed, an
+
+## KPIs and KRIs for leadership and the board
+Leadership needs a few indicators it can trust, computed from live systems rather than self-reported.
+
+## Management review and continual improvement
+A management system improves only if someone looks at the evidence on a schedule and changes
+
+## Strategy, value and whether to use AI at all
+Governance usually starts after someone has decided to build. It should start a step earlier. The
+
+## Standing up a program without engineering capacity
+Many organisations that need a program build no AI at all; they buy it. The engineering-first route of
+
+## Policies across the lifecycle
+
+### Policy, standard, procedure, code
+Policy documents fail by being too vague to enforce or too detailed to keep current. A four-level
+
+### What policy requires at each stage
+Each stage has a minimum requirement, a gate that enforces it and the evidence it leaves. Chapters 14
+
+### Policy as code: one source, two outputs
+The drift between a policy PDF and the check that enforces it is where auditors find their findings.
+
+## Updating the policies you already have
+Most organisations do not need a new policy for every AI concern. They need their privacy, security,
+
+## A data acquisition policy
+Most data-governance failures are decided at acquisition: a scrape nobody scoped, a broker's dataset
+
+## Third-party AI policy
+Most AI an organisation runs, it bought. Chapter 04 explains how the stack degrades for procured AI
+
+## Acceptable use of AI by staff
+The glossary defines shadow AI as AI running in production without registering. Staff use of
+> **Example (illustrative)**
+> A legal team starts using a public drafting assistant for contract summaries. Discovery flags the
+> traffic. Rather than block the domain, the program runs the tool through procurement intake, signs
+> an enterprise agreement with no training on customer data, routes it through the gateway under the
+> confidential-data rule, and adds a one-page module to the legal team's curriculum. Usage moves to
+> the sanctioned route within weeks, because it is now the easiest one.
+
+## What you can do this week
+1. **Write the committee charter on one page**, listing the four decision types the committee alone
+
+## Sources
+[1] EU AI Act Art. 17 (quality management system; Art. 17(1)(a) strategy for regulatory compliance; Art. 17(1)(m) accountability framework; Art. 17(2) proportionality). AI Act (Reg. (EU) 2024/1689), as amended. 2024. https://artificialintelligenceact.eu/article/17/ (verified: primary)
+---
+
+# 13. Where risk management sits
+
+Source: https://aigovernanceengineer.com/bok/risk-management
+
+> Risk management is the loop that tells every other control how hard to bite: identify, assess,
+> treat and monitor, run on the five layers and seven workflows, with the risk register as evidence.
+
+## What this chapter settles
+The book has leaned on risk without giving it a home. Chapter 03 says every control should
+
+## Risk, defined for engineers
+Two definitions anchor the chapter. The EU AI Act defines **risk** as "the combination of the
+
+## The loop: identify, assess, treat, monitor
+ISO 31000:2018 gives the generic process: communicate and consult; set scope, context and criteria;
+
+### The loop on the five layers
+The loop does not add a layer. It gives each existing layer a risk job, and each job leaves an
+
+### The loop in the seven workflows
+Each workflow of chapter 06 owns part of the loop; the system owner stays accountable for each risk
+
+## NIST AI RMF and ISO/IEC 23894 on the stack
+The NIST AI RMF 1.0 splits risk work into four functions, each broken into categories and
+
+### ISO 31000, ISO/IEC 23894 and ISO/IEC 42001
+Three ISO documents, three jobs. ISO 31000 is generic guidance for any risk [5]; ISO/IEC
+> **Note** A crosswalk is an index, not a control (see the
+> [Framework Crosswalk](/bok/patterns#pattern-framework-crosswalk) pattern). The row that counts is
+> the one whose artefact exists and emits evidence.
+
+## Identifying risk: sources, factors and stakeholders
+Identification is where risk work fails quietly: a register written in a workshop lists what the
+
+### Internal and external risk sources
+An **internal** source sits inside the organisation's control: data, design choices, people,
+
+### Contributing factors and the use-case risk profile
+A **contributing factor** does not create a risk on its own; it moves likelihood, severity or both.
+> **Example (illustrative)** HR proposes a CV-screening assistant. Its profile reads
+> `decision_impact: decides-about-person`, `exposure: public-applicants`, `autonomy: filters, a
+> recruiter sees only the shortlist`, `data_class: personal`. The tier rule places it in tier 3
+> before any meeting. The gate then asks for fairness and robustness evals, a DPIA link and a
+> signed acceptance for any residual risk above Low. Whether it is also a high-risk system under the
+> AI Act is a separate question for the Annex III route (chapter 08).
+
+### Stakeholder mapping
+Different actors see different risks. A developer releasing a pre-trained model can have a different
+
+## Assessing risk: the likelihood-by-severity matrix
+A risk matrix turns two judgements into a band that triggers a response. Its value is consistency,
+
+### Defined scales
+Without shared definitions, assessors can give opposite ratings to the same risk [19]. Anchor
+
+### The matrix and what each band triggers
+A band is useful only if it changes what the pipeline does. The policy later in this chapter
+
+### The catastrophic-severity override
+Multiplying likelihood by severity hides the tail. A grid can give a rare catastrophe the band of a
+
+### What a matrix cannot tell you
+Cox names four limits: poor resolution, rating errors, no basis for allocating resources, and
+
+## Risk appetite and tolerance, compiled into gates
+NIST does not prescribe a risk tolerance. It defines tolerance as the "readiness to bear the risk in
+
+### From statement to data
+> **Example (illustrative)** An appetite statement as a governing body might approve it: "We use AI
+> to make staff and customers faster. We accept moderate risk in internal tools and in decision
+> support where a person reviews each output, so that we learn quickly. We accept only low residual
+> risk in systems that decide about a person or act on their behalf. No agent moves money above a set
+> amount without a person's decision. We carry catastrophic risk only with the governing body's
+> explicit acceptance, for a fixed period. No risk is accepted indefinitely."
+Each sentence becomes a value in a versioned file that gates read. The file is the enforced version;
+
+### From data to a gate
+The gate runs at deploy (layer 01) over the registry entry (layer 02), the system's open risks
+
+## Treating risk: the mitigation hierarchy
+NIST lists the response options as mitigating, transferring, avoiding or accepting [1]; the
+> **In practice (illustrative)**
+> The first design of `csa-01`, the customer-service assistant of chapter 04, gave it a tool that
+> issued refunds. Intake rated the scenario "an injected instruction makes the agent refund the wrong
+> amount or account" at L4 and S3: High. The team walked the ladder. Eliminating refunds would remove
+> the use case. Substituting a read-only scope, with the agent drafting a refund that a person
+> issues, cut the path to the event. Engineered controls (an injection guardrail, an
+> injection-resistance eval gate, the approval step) cut likelihood further. The residual came out at
+> L2 and S3, Medium, accepted by the product owner for six months, void if the eval score fell below
+> its floor. The read-only refund scope in the chapter 04 registry entry is that decision, as data.
+
+## Inherent risk, residual risk and who accepts it
+remaining after risk treatment", in the ISO-derived definition NIST adopts [1]. The gap between
+
+### Who may accept
+Acceptance is a decision with a name on it. The Institute of Internal Auditors' Three Lines Model
+> **Anti-pattern** "Accepted" as a status with no name, no date and no expiry. The register fills with
+> risks nobody chose to carry, and the first incident reveals that the acceptance was a spreadsheet
+> default.
+
+## The risk register as an evidence record
+Chapter 08 names a "risk register as code" as the artefact behind `Art. 9` and ISO/IEC 23894; this
+
+### Register schema
+Three fields do what a spreadsheet cannot. `treatment.controls` resolves to artefacts that emit
+
+### Operating the register
+  it, forcing a re-rating before the next release.
+> **In practice (illustrative)**
+> A governance function moved its register from a spreadsheet into the repository that holds its
+> policies, one file per risk keyed to registry ids, and pointed the deploy gate at it. The first run
+> blocked two releases for the same reason: accepted risks with no named acceptor and no expiry.
+> Nobody had decided to carry them; the spreadsheet had. Within a quarter every open High risk had
+> either a signed, expiring acceptance or a control whose evidence the gate could read.
+
+## Proportionate governance: tailoring the loop
+The loop is the same everywhere; its intensity is not. The AI RMF sets the level of risk activity
+
+### The tailoring matrix
+Six factors set the intensity. For each, the matrix gives minimum controls, gates and review
+
+### Sector overlays
+NIST tells organisations to follow the risk criteria, tolerances and responses their sector already
+
+### The floor that does not tailor away
+Some controls are the same at every size, in every sector and at every maturity level:
+
+## Risk, maturity and incidents
+
+### Risk practice by maturity level
+Risk practice is not a sixth row in the maturity model; it is a lens on all five layers, and the
+
+### Incidents are realised risks
+An incident is a risk that materialised, or one nobody identified. If it matches a register entry,
+
+## What you can do this week
+1. **Publish the scales.** Write five-level likelihood and severity definitions for your context,
+
+## Sources
+[1] Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (§1.1 risk; §1.2.2 risk tolerance; §1.2.3 prioritisation, "cease in a safe manner", residual risk; Core tables 1 to 4; §6 profiles). NIST. 2023-01-26. https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf (verified: primary)
+---
+
+# 14. Governing AI development
+
+Source: https://aigovernanceengineer.com/bok/governing-development
+
+> AI development is governed when every decision in the build, from the use case to the release,
+> leaves a record that a gate reads, so the pipeline compiles the technical file instead of a team
+> writing it afterwards.
+
+## The build as a chain of gates
+Most governance failures in an AI system are decided before it serves its first request. The use
+
+## The use-case record
+The use-case record is the first artefact and the one most often missing. It is written at
+
+### Is AI the right tool?
+The first gate question is whether to build at all. Google's engineering guidance opens with the
+
+### Error appetite: false positives versus false negatives
+Every classifier trades one error for another, and the trade is a business and rights decision, not
+
+### Function creep
+A model built for one purpose drifts into others because its scores are available and cheap. The US
+> **Example (illustrative)** A use-case record stored on the registry entry of a credit-limit model.
+> Every later gate reads these fields rather than a slide.
+> **In practice (illustrative)**
+> A retention team in a large telco asked for a churn model and got, at intake, a one-page use-case
+> record to fill instead of a notebook. Writing the out-of-scope list surfaced that sales wanted the
+> same scores to set individual discount levels: a second purpose with its own fairness exposure. The
+> record split the request into two use cases, each with its own classification and error appetite,
+> and the discount case went back for an impact assessment before any training ran.
+
+## Design review
+The design review is the gate between an approved use case and spending compute. It reads the
+
+### Requirements with traceability
+Requirements come in three families. **Functional** requirements say what the system does.
+
+### Architecture and model-selection trade-offs
+Model choice is a governance decision because it fixes what can later be tested, explained and
+
+### Reasonably foreseeable misuse
+its intended purpose, but which may result from reasonably foreseeable human behaviour or interaction
+
+### Oversight and controls designed in
+The decision-authority field of the use-case record sets the oversight model. The EU's High-Level
+
+## Data for training and testing
+[Data governance across the stack](/bok/the-stack#data-governance-across-the-stack) sets the rule
+
+### The right to use the data
+Admission starts with rights, because a quality problem can be fixed and a rights problem often
+
+### Quality, quantity, representativeness and fitness for purpose
+For high-risk systems, Art. 10 turns data quality into law. Training, validation and testing sets
+
+### Owners, stewards and the admission gate
+The **data owner** is accountable for a dataset: its permitted uses, its risk acceptance and the
+
+### Provenance versus lineage
+The two words are used interchangeably and should not be. **Provenance** is where a dataset came
+
+### Synthetic data, augmentation and privacy-enhancing technologies
+Synthetic data inherits the properties of its generator: its biases, its gaps and, where the
+> **Example (illustrative)** A dataset admission record. The training job checks `admitted` and
+> `permitted_uses` against the use-case id before it reads a byte.
+
+## Testing and validation
+
+### A test plan before the first run
+The EU AI Act requires high-risk systems to be tested "throughout the development process, and, in
+
+### The test-type matrix
+ISO/IEC TR 29119-11 gives guidelines for testing AI-based systems [29], and the ISO/IEC 24029
+
+### Statistical validity of evals
+An eval gate is only as good as the statistics under its threshold, and most gates have none
+
+### Independent validation and model risk management
+Banking has run independent model validation for years, and AI governance engineering borrows its
+
+### Reproducibility and linked versioning
+A result nobody can reproduce is not evidence. The **training record** captures the code commit, the
+
+### What goes wrong in training and testing
+Every finding becomes an issue with an owner, a severity and a deadline. A finding that ships
+> **In practice (illustrative)**
+> An LLM summariser passed its release gate at 0.96 against a 0.95 floor, on 150 hand-picked cases.
+> A reviewer asked for the interval: at that sample size it ran from about 0.93 to 0.99, so the gate
+> could not tell a pass from a fail. The team moved to a frozen plan of 1,500 cases stratified by
+> document type and language, three repeated runs to capture sampling variance, and a judge from a
+> different model family calibrated against 200 human ratings. The gate became slower, and its
+> verdicts started to mean something.
+
+## Release readiness and conformity
+
+### The go/no-go gate
+Release is a governance milestone, not an engineering handover. The release gate reads the records
+
+### EU AI Act conformity, in order
+For high-risk systems the release gate carries a legal sequence. After the Digital Omnibus, the
+
+### Substantial modification
+A **substantial modification** is a change after placing on the market "which is not foreseen or
+
+## The technical file
+
+### Annex IV, element by element
+Art. 11 requires the technical documentation of a high-risk system to be drawn up before it is
+
+### Model cards, system cards and datasheets
+The documents overlap and answer different questions for different readers.
+
+### The GPAI provider side
+A provider of a general-purpose AI model has its own documentation set under Art. 53: technical
+
+### Open-weight release decisions
+Release is a gradient, not a switch. Solaiman describes six levels of access: fully closed, gradual
+
+### Record keeping
+For high-risk systems, the provider keeps the technical documentation, the quality management system
+
+### Public disclosures
+Different audiences are owed different disclosures, and each has something that must not be
+> **In practice (illustrative)**
+> A provider preparing an Annex III system for the 2 Dec 2027 date listed the 23 items of Annex IV in
+> a file, one row each, with the pipeline source and a named author. Most rows turned out to be
+> assembled from records the pipeline already emitted; the rest were rationale, residual-risk
+> judgements and signatures. The documentation job ran on every release candidate and failed twice
+> in its first month: once on a model card older than the model, once on a test report nobody had
+> signed. Both failures would have surfaced a year later, in front of a notified body.
+
+## Impact assessments compared
+A single system can trigger several impact assessments at once. They overlap on facts (who is
+
+### Dimensions that make impacts comparable
+Score each impact on the same axes whichever assessment it feeds: **severity** (how bad for the
+
+### Performing versus reviewing
+The performer owns the facts; the reviewer challenges them. A reviewer who did not write the
+
+### Re-assessment triggers
+Encode the triggers so that the registry, not a calendar reminder, reopens the assessment: a new or
+> **In practice (illustrative)**
+> The credit-limit model from the use-case example sat under four assessments at once: a DPIA (the
+> bank as controller), a FRIA (the bank as deployer of an Annex III 5(b) system), an impact assessment
+> run by the model team along ISO/IEC 42005 lines, and independent validation. The team kept one fact
+> base (affected groups, harms scored on the five dimensions, controls with their eval ids) and
+> rendered four views from it. When retraining added a new data source, the lineage change tripped
+> the trigger for all four in the same pipeline run, and the reviewers saw a diff instead of four new
+> documents.
+
+## What you can do this week
+1. Write the use-case record for the highest-risk system you have in development, including its
+
+## Sources
+[1] ISO/IEC 5338:2023, AI system life cycle processes. ISO/IEC. 2023. https://www.iso.org/standard/81118.html (verified: primary)
+---
+
+# 15. Governing deployment and use
+
+Source: https://aigovernanceengineer.com/bok/governing-deployment
+
+> Governing the run: how a deployer decides to use an AI system, chooses it, contracts for it, takes
+> it live, operates it and retires it, with every step leaving evidence that a control fired.
+
+## The deployment lifecycle at a glance
+
+## The deployment decision
+
+### Start from the use case, not the model
+The decision to deploy is a product decision with a governance record. Before any model is compared,
+
+### Set performance and explainability requirements first
+Requirements written after a vendor demonstration are fitted to the demonstration. Set them before
+
+### Check the data and the people
+will last, and a lawful basis for this purpose? Where the deployer controls the input data of a
+
+### The Deployment Decision Record
+Pull these answers into one artefact, the **Deployment Decision Record (DDR)**, committed next to the
+> **In practice (illustrative)**
+> For `csa-01`, the customer-service assistant in a large telco, the DDR's negative space listed
+> "complaints about staff". Months later a team proposed routing internal HR queries to the same
+> assistant. The intake form checked the proposal against the record, flagged it as a new use, and
+> sent it back through classification instead of a quiet configuration change. The record did not
+> stop the idea; it made the change of purpose visible and owned.
+
+## Choosing the model
+
+### Evaluate on your task, your data and your users
+A public benchmark answers "how good is this model at that benchmark?". The deployer's question is
+
+### What public benchmarks and leaderboards cannot tell you
+  grade-school maths problems matched to a popular benchmark, several model families lost up to 8% in
+
+### Count the whole cost, including energy
+The cost of a model is the licence or API fee plus inference compute, integration, evaluation and
+
+### Record the choice
+The **model selection record** lists the candidates, their selection-eval results, the cost and
+
+## Model types and deployment options
+The model type changes the failure modes. The hosting option changes who can see and stop what. The
+
+### Model type changes the control set
+The largest split is classic against generative. Classic models fail quietly, through calibration,
+
+### Where it runs
+
+### How it is adapted
+
+### The model-type by deployment-option matrix
+Read each cell as the one control the combination adds on top of its row and its column.
+
+## Build, buy or adapt
+
+### Three routes, three evidence burdens
+The less of the model you own, the more of your control budget moves from testing it to bounding it
+
+### When a deployer becomes a provider
+Article 25(1) makes a distributor, importer, deployer or other third party the provider of a
+
+### Open-weight licences
+Open weights are not one licence, and "open weight" is not "open source". Each family asks something
+
+### Owning the model: the upside and the burden
+Building or heavily adapting your own model buys control: over versions and retirement dates, over
+
+### Liability, insurance and risk transfer
+The new Product Liability Directive brings software, including AI systems, within the definition of
+
+## Vendor contracts and licence terms
+When you deploy a system you did not build, the contract is a control surface, and the place where
+> **Example (illustrative)**
+> A supplier's terms allowed 60 days' notice before retiring a model version. The deployer's
+> re-validation cycle (selection eval, red team, canary) took about 90 days. The gap was recorded as a
+> risk, negotiated to a 120-day deprecation window at renewal, and in the meantime covered by keeping
+> a second candidate model warm in the eval harness.
+
+## The go-live review
+
+### What the review reads
+The go-live review reads an evidence pack, not a slide deck: the DDR; the model selection record; eval
+
+### Three outcomes
+An approval with conditions is where governance most often turns into theatre, because conditions are
+
+### Recorded dissent
+Any member of the review can record dissent. The dissent is attached to the decision record, named,
+> **In practice (illustrative)**
+> The go-live review for `csa-01` approved it with two conditions: a groundedness floor on the refunds
+> topic, re-measured after four weeks of live traffic, and a Spanish-language red team before the
+> assistant served Spanish speakers. Both became flags. The security lead recorded dissent on the
+> tool scope for order lookups. The four-week check passed; the red team did not, so Spanish stayed
+> behind its flag until a fix shipped, and the dissent was closed with a narrowed scope.
+
+## Progressive delivery as a control
+Progressive delivery limits exposure while evidence accumulates. Each stage is a gate with a
+
+## Operating the system
+
+### Policies at go-live
+The system goes live with the policies that make its use governable. An **acceptable-use policy**
+
+### Inference-time data governance
+Live inputs are data processing, and a deployed system creates new data with every request: prompts,
+
+### Maintenance calendar and retraining governance
+The provider's instructions for use state the system's expected lifetime and the maintenance it needs,
+
+### Drift: what moves and how to see it
+Concept drift is an unforeseeable change in the distribution of the data a model sees over time, and
+
+### Fairness and quality in production
+A system that passed its fairness evals at go-live can drift into unfairness without any code change.
+
+### Who owns the signal
+The rule is the one from [chapter 06](/bok/the-role#runtime-monitoring-and-incidents): you own a
+
+### Monitoring third parties while you run
+A procured system keeps changing after the contract is signed. File every change and deprecation
+
+### When the provider fails: continuity
+Plan for the supplier failing in each of the ways it can: an outage, a rate limit at peak, a quality
+
+### Benefit realisation
+Track the objective in the DDR against what the system delivers, including its inference and
+
+### Energy footprint reporting
+Measure energy per request and in total, with the boundary stated: accelerators, host systems, idle
+
+### Records retention
+Retention is a control, so it is code: a schedule per record type, tamper-evident storage for logs, a
+
+## Periodic assurance
+
+### An audit programme, not an audit
+A single audit is a snapshot. An audit programme has a charter, a risk-based cadence tied to the risk
+
+### Red teaming on a schedule
+Schedule red teaming by risk tier, and aim it at the deployed configuration (prompts, tools, retrieval
+
+### Threat modelling the deployed system
+Decompose the data flows (user, application, retrieval, model, tools, downstream consumers), then
+
+## Secondary use and downstream harm
+Systems are used for more than they were approved for. The AI Act names the concept: **reasonably
+
+## External communications
+Every deployed system needs a plan for talking to people outside the organisation, written before it
+
+## Deactivation, degradation, localisation and retirement
+
+### A deactivation policy someone can execute
+A deactivation policy names its triggers, its decision authority, the record each decision leaves,
+
+### Graduated degradation
+Switching off is the last resort, not the only one. Build the intermediate modes in advance as
+
+### Localisation by jurisdiction
+Launch only where compliance has been shown, and keep the jurisdiction as a policy input rather than
+
+### Retirement and decommissioning
+Design retirement in from the start: the DDR already names the conditions under which the system is
+
+## One system from decision to retirement
+`csa-01`, the assistant that [chapter 04](/bok/the-stack#one-system-through-the-five-layers) follows
+
+## What you can do this week
+1. **Write the DDR for your riskiest live system**, retroactively if you must, including its negative
+
+## Sources
+[1] EU AI Act Art. 26 (deployer obligations: 26(1) use per the instructions; 26(2) oversight by competent persons with authority; 26(4) relevant and representative input data; 26(5) monitor, suspend and inform, serious incidents to the provider first; 26(6) logs kept at least six months; 26(7) inform workers; 26(8) public-authority registration; 26(9) DPIA; 26(11) inform affected persons). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26 (verified: primary)
+---
+
+# 16. Fairness and explainability for practitioners
+
+Source: https://aigovernanceengineer.com/bok/fairness-and-explainability
+
+> Fairness and explainability become controls only when they are measured, gated and filed as
+> evidence; this chapter maps each technique to its stack layer and its legal hook.
+
+## How to read this chapter
+Fairness and explainability are the two principles every responsible-AI framework names and the two
+
+## Where bias enters the lifecycle
+NIST SP 1270 sorts AI bias into three categories, **systemic**, **statistical** and **human**, and
+
+## Protected characteristics, proxies and the data you need to test
+employment law protects race, colour, religion, sex and national origin under Title VII [7]; EU
+
+## Disparate treatment and disparate impact
+Anti-discrimination law has two doctrines, and an AI system can breach either.
+
+### The four-fifths rule and the adverse-impact ratio
+The most widely used screening number comes from the US Uniform Guidelines on Employee Selection
+> **Example (illustrative)** A screening model advances 120 of 400 applicants from group A (a
+> selection rate of 30%) and 45 of 250 from group B (18%). The AIR for group B is 18 / 30 = 0.60,
+> well under 0.8. The eval records the rates, the counts, the ratio, a bootstrap confidence interval
+> for the ratio and the protected attribute's source, and the gate routes the release to review
+> rather than silently failing or passing it.
+
+## Group fairness metrics
+A **group fairness metric** compares a statistic of the model's behaviour across groups. The five
+
+### Individual and counterfactual fairness
+Group metrics can be satisfied while individuals are treated arbitrarily inside each group. Two
+
+## The impossibility results
+Two papers from 2016 and 2017 turned "which fairness metric?" from a technical question into a value
+> **Example (illustrative)** Two groups of 1,000 people. Group A has a base rate of 30% (300
+> positives), group B a base rate of 10% (100 positives). A classifier with the same true-positive
+> rate (0.8) and false-positive rate (0.1) in both groups satisfies equalised odds. In group A it
+> produces 240 true positives and 70 false positives (0.1 × 700), a precision of 240 / 310 = 0.77.
+> In group B it produces 80 true positives and 90 false positives (0.1 × 900), a precision of 80 /
+> 170 = 0.47. Equal error rates, unequal meaning of a positive decision: predictive parity fails,
+> and no threshold choice fixes both while the base rates differ.
+
+## Intersectional and subgroup testing
+Aggregate group metrics hide the people at the intersections. The Gender Shades audit of three
+
+## Choosing a fairness metric by use case
+The metric follows the harm, and the harm follows the use case. Fairlearn's user guide separates
+
+## Mitigation before, during and after training
+Once a disparity is found and judged unacceptable, the fixes fall into three families by where they
+
+## Monitoring fairness in production
+A fairness eval proves the model was acceptable on the evaluation data at build time. Production
+
+## Transparency, interpretability and explainability
+The three words are used interchangeably and should not be. NIST's framework draws the line in one
+
+## Interpretable by design or explained after the fact
+There are two routes to an explanation. An **inherently interpretable** model is one whose structure
+
+### When an interpretable model is required
+No statute in this chapter says "use a scorecard". Several say things that are hard to meet any
+
+## Explanation techniques
+Explanations vary along two axes: **scope** (a *global* explanation describes the model's overall
+
+### Feature attribution: SHAP, LIME and integrated gradients
+prediction, grounded in Shapley values from game theory, and unifies several earlier methods as
+
+### Surrogate models
+A **global surrogate** is an interpretable model (a tree, a rule list) trained to mimic the complex
+
+### Counterfactual explanations
+A **counterfactual explanation** states the smallest change to the input that would have changed the
+
+### Example-based explanations
+most influenced a prediction. They are intuitive for images and documents and for expert reviewers.
+
+### Explanations for LLMs and RAG systems
+Large language models add two complications. First, the model's own account of its reasoning is not
+
+## The legal hooks for explanations
+Explanation duties come from several regimes that differ in who owes what, to whom and when. The
+
+### Credit: adverse-action notices and reason codes
+US credit law is the oldest explanation regime and the most concrete. Regulation B requires the
+
+### Data protection: GDPR and the UK regime
+The GDPR's articles do not use the words "right to explanation"; Recital 71 mentions obtaining "an
+
+### The EU AI Act: Articles 13 and 86
+The AI Act adds one duty upstream and one downstream. Article 13 requires high-risk systems to be
+
+## Testing explanation quality
+An explanation is an output, so it gets evals like any other output. Doshi-Velez and Kim's taxonomy
+
+## Accessible explanations
+An explanation that the recipient cannot perceive or understand fails the "meaningful" test whatever
+
+## Explanation artefacts as evidence records
+An explanation delivered and not kept cannot be audited, reproduced or defended. The unit of
+> **Example (illustrative)** An explanation record for a declined device-financing application:
+>
+> ```json
+> { "decision_id": "dfc-2026-09-18-004211", "subject": "credit-dfc@2026-09-01",
+>   "outcome": "decline", "method": "treeshap", "method_version": "0.46",
+>   "baseline": "bg-sample.v12", "fidelity_check": "pass",
+>   "reason_codes": ["R07 debt-to-income", "R12 recent missed payments"],
+>   "counterfactual": { "feature": "monthly_debt", "change": "-180", "result": "approve" },
+>   "template": "adverse-action.en.v5", "audience": "applicant",
+>   "delivered": "2026-09-18T10:02:13Z", "channel": "email+letter",
+>   "contest_url_ref": "appeal-flow.v3" }
+> ```
+
+## Fairness and explainability in the stack
+Both disciplines produce evidence at every layer. The table is the checklist; each row names the
+
+### Gate conditions
+A gate condition is a sentence the pipeline can evaluate. Illustrative conditions, each tied to a
+> **In practice (illustrative)** A telco that sells handsets on instalment plans runs a credit check
+> at the point of sale, so every decline is a credit decision that owes the applicant its reasons.
+> The first version used a gradient-boosted model and generated reason codes from SHAP values at
+> request time. A reason-code consistency test found that for a slice of declines the top SHAP
+> feature was an engineered interaction no notice could describe. The team trained a monotone
+> scorecard as a baseline, found it within a small margin of the complex model on approval accuracy,
+> and shipped the scorecard. The fairness eval then gated each release on the approval-rate AIR by
+> age band with intervals, and every decline wrote an explanation record. The audit question "why
+> was this customer declined, and was anyone like them treated differently?" became two queries.
+
+## What you can do this week
+1. **Pick one decision system about people and write its fairness policy as data**: the protected
+
+## Sources
+[1] Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (transparency answers "what happened", explainability "how", interpretability "why"; MEASURE 2.9 and 2.11). NIST. 2023-01-26. https://doi.org/10.6028/NIST.AI.100-1 (verified: primary)
+---
+
+# 17. Incidents, issues and root causes
+
+Source: https://aigovernanceengineer.com/bok/incidents
+
+> AI incident management turns a runtime signal into an event that is classified, contained,
+> reported on every clock that applies and explained, with its cause fed back into the controls.
+
+## Incident, hazard, issue and serious incident
+Four words decide whether a clock starts, so define them before anything else.
+> **In practice (illustrative)**
+> In a large telco, the first useful change to the incident process was not a new tool but a new
+> field. Tickets had one "priority" value that engineering set for urgency and legal read as
+> reportability, and the two readings disagreed silently. Splitting it into `severity` (set by the
+> on-call engineer from a harm table) and one `reportable_<regime>` flag per applicable regime (set
+> by the privacy and legal owners, each with a timestamp and a rationale) made every decision
+> reviewable afterwards. The first review found tickets from the prior quarter that should have been
+> assessed for GDPR notification and never were.
+
+## A severity scale mapped to the clocks
+A severity scale is a policy, so write it as one. The scale below has four incident levels and one
+> **Example (illustrative)** A severity rule written as a [Policy Card](/bok/patterns#pattern-policy-card)
+> fires when an incident record has `harm.type` of `fundamental_rights` and `system.ai_act_class` of
+> `high_risk`: it sets `severity: SEV-2`, opens an `ai_act_art73` clock with a 15-day ceiling from
+> the `aware_at` timestamp, and pages the system owner and legal. The verdict itself is stored as
+> evidence, so a later reviewer can see which rule version classified the event.
+
+## The response lifecycle
+NIST's incident-response guidance changed shape in April 2025. SP 800-61 Revision 3 superseded the
+
+### Freeze before you fix
+The instinct after containment is to fix the thing. For a high-risk system the AI Act says wait:
+
+## Playbooks, RACI and drills
+A playbook is the response to one failure mode, written before it happens. Keep it short enough to
+> **In practice (illustrative)**
+> A quarterly tabletop in a large telco replayed an injection scenario against a customer-service
+> agent. The first run took 50 minutes to revoke the agent's egress scope, because the only person
+> who knew the revocation command was on leave. The fix was a one-line runbook entry and a second
+> named holder; the next run took four minutes. The drill record, with both timings, went into the
+> assurance store as evidence for the containment control.
+
+## AI-specific failure modes
+Most AI incidents are system incidents, not model incidents: the model behaved as models do, and the
+
+## Root-cause analysis
+Root-cause analysis (RCA) answers "why did this happen, and why did our controls not stop it?" The
+
+### Who takes part
+Run the review as a small **incident review board** with a standing core and invited specialists:
+
+### Techniques
+change. It is fast, but it follows one chain, while AI failures usually have several contributing
+
+### A cause taxonomy that points at controls
+A cause taxonomy is useful only if each class names the control that should have caught it. Code
+> **Example (illustrative)** A fault tree for "discriminatory refusals reached applicants" has three
+> AND-ed branches: the model's error rate rose for one age band (cause class: drift); the monitoring
+> compared only aggregate accuracy, not subgroup accuracy (testing gap); and reviewers approved 99% of
+> model recommendations in under ten seconds (oversight failure). Fixing any one branch would have
+> broken the chain. The board assigns three CAPA items, one per branch, and records all three cause
+> codes on the incident.
+
+## CAPA: from incident to risk register and eval suite
+this instance: patch, retrain, roll back, re-scope. The preventive action stops the class of failure
+
+## Deployer duties: inform the provider, suspend use
+Most organisations meet AI incidents as **deployers** of a system someone else built. For high-risk
+
+## The overlapping clocks
+One event can start several clocks. An indirect prompt injection that leaks customer data from a
+
+### Reading the table
+DORA's four-hour clock counts from *classification* as major, capped at 24 hours from awareness [19].
+
+### One record, many reports
+The engineering answer to overlapping clocks is not a better calendar. It is one incident record that
+> **In practice (illustrative)**
+> Replaying a realistic scenario on `csa-01`, the customer-service assistant from
+> [chapter 04](/bok/the-stack#one-system-through-the-five-layers): an order note carrying hidden
+> instructions made the assistant include another customer's delivery address in a reply. The
+> guardrail logged but did not block the output. Triage set SEV-2 (personal data disclosed to a third
+> party) and ran the regimes. GDPR `Art. 33`: notifiable, 72-hour clock from the DPO's awareness
+> decision. GDPR `Art. 34`: not high risk for the one affected customer on the facts, decision
+> recorded. NIS2: telecoms providers are in scope as digital infrastructure [13], but a single-record
+> disclosure was not significant, determination recorded. AI Act `Art. 73`: not a high-risk system,
+> so no clock; the incident still went to the model provider through its downstream reporting
+> channel. The GDPR notification left in 44 hours, generated from the same record the root-cause
+> review later used.
+
+## The incident record
+Design the record once, around what the most demanding recipients ask for, and every other report
+
+## Learning from public incident databases
+Your own incident history is small and biased toward what you already detect. Public repositories
+
+## What you can do this week
+1. **Write the severity scale as policy.** Five levels, a harm test per level, the regime triggers per
+
+## Sources
+[1] "Name it to tame it: defining AI incidents and hazards" (Luis Aranda and Karine Perset; summary of the OECD paper "Defining AI incidents and related terms", OECD Artificial Intelligence Papers, doi 10.1787/d1a8d965-en; AI incident and AI hazard definitions; graded terms serious AI incident, AI disaster, serious AI hazard). OECD.AI. 2024-05-17. https://oecd.ai/en/wonk/defining-ai-incidents-and-hazards (verified: primary)
+---
+
+# 18. The EU AI Act in one pass
+
+Source: https://aigovernanceengineer.com/bok/eu-ai-act
+
+> The EU AI Act, as amended by the Digital Omnibus, read end to end: what it covers, how it ranks
+> risk, who carries which duty, and the date each duty starts to apply.
+
+## How to read this chapter
+This chapter teaches the Act; [chapter 08](/bok/regulatory-map#eu-ai-act-post-omnibus) indexes it.
+
+## The Act and the Omnibus
+The AI Act is a product-safety regulation with fundamental-rights goals. It is directly applicable
+
+## Scope and reach
+
+### Who is in scope
+Article 2(1) reaches providers placing AI systems or GPAI models on the EU market, wherever they are
+
+### What counts as an AI system
+Article 3(1) defines an **AI system** as "a machine-based system that is designed to operate with
+
+### What the Act excludes
+The first six rows are in the original text [1]; the Section B row is as amended [2]. Union data
+
+## The risk ladder
+The Act sorts AI systems by intended purpose onto four rungs, and puts GPAI models on a separate
+
+### Prohibited practices (Article 5)
+Article 5 is a list of banned uses, not a risk assessment. If a practice is on the list, no
+> **In practice (illustrative)**
+> A team shipping an image-editing feature treated 2 Dec 2026 as a release gate, not a legal memo.
+> It added an adversarial suite of intimate-imagery and minor-safety prompts to the eval gate, set a
+> zero-tolerance threshold, and wired the output classifier's block decisions into the evidence store
+> under the obligation id `EU-AIA-5-1-ba`. The first run failed on edits that increased exposure in
+> existing photos. The fix shipped before the date, and the passing run, not a policy statement,
+> became the evidence that the safeguard was "reasonable and adequate".
+
+### High-risk through products (Annex I)
+A system is high-risk under `Art. 6(1)` when both conditions hold: it is a safety component of a
+
+### High-risk through use (Annex III)
+Under `Art. 6(2)`, Annex III lists eight areas. A system whose intended purpose falls in one of them
+
+### The Annex III filter and the profiling override
+Under `Art. 6(3)`, an Annex III system is not high-risk where it does not pose a significant risk of
+> **Example (illustrative)**
+> A classification decision record, filed in the registry and re-evaluated whenever the intended
+> purpose changes:
+>
+> ```json
+> { "system": "cv-screen-02", "annex_iii_point": "4(a)",
+>   "art_6_3_condition": "preparatory_task", "profiling": true,
+>   "result": "high-risk", "reason": "profiling override, Art. 6(3) third subparagraph",
+>   "reviewed_by": "ai-governance", "date": "2026-09-24" }
+> ```
+>
+> The explicit `profiling` flag is the point: the filter was claimed, and the override defeated it.
+
+### Transparency cases (Article 50)
+Article 50 is often called the "limited risk" rung. It applies to any AI system that fits one of its
+
+### Minimal risk
+Everything else is minimal risk. The Act asks nothing specific of it beyond AI literacy (`Art. 4`)
+
+## General-purpose AI models
+
+### Model, system and the indicative criterion
+A **GPAI model** is an AI model that "displays significant generality and is capable of competently
+
+### Duties of every GPAI provider
+The duties and their details are in the Act [1]; the chapter 08 rows for
+
+### Systemic risk: threshold, notification, designation
+A GPAI model has **systemic risk** if it has high-impact capabilities, or if the Commission designates
+
+### Duties for models with systemic risk
+On top of `Arts. 53` and `54`, the provider must evaluate the model with state-of-the-art protocols
+
+### Open-source carve-outs and their limits
+A model released under a free and open-source licence, with its weights, architecture and usage
+
+### When a fine-tuner becomes a GPAI provider
+A modifier becomes the provider of a new GPAI model only if the change is significant for generality,
+
+### The Code of Practice and enforcement
+The General-Purpose AI Code of Practice was published on 10 July 2025. Its Transparency and Copyright
+
+## High-risk requirements (Articles 8 to 15)
+Article 8 requires a high-risk system to meet Section 2 of Chapter III, taking into account its
+
+## Provider duties beyond the requirements
+
+### Article 16 and the quality management system (Article 17)
+Article 16 is the umbrella for the provider's duties: the requirements, name on the system, QMS,
+
+### Conformity assessment, declaration, marking and registration
+Annex III points 2 to 8 use internal control (Annex VI) with no notified body; biometrics (point 1)
+
+### Post-market monitoring and serious incidents (Articles 72 and 73)
+The provider runs a post-market monitoring system that actively collects and analyses performance
+
+## Who you are in the value chain
+
+### The EU operator roles
+The Act binds **operators** (`Art. 3(8)`): providers, product manufacturers, deployers, authorised
+
+### Article 25: when someone else becomes the provider
+A distributor, importer, deployer or other third party becomes the provider of a high-risk system,
+> **Example (illustrative)**
+> An HR team configures a general-purpose chat assistant, which it deploys under a vendor licence, to
+> rank job applicants. The configuration moves the intended purpose into Annex III, point 4(a), so
+> under `Art. 25(1)(c)` the organisation becomes the provider of a high-risk system: `Arts. 8` to `17`,
+> conformity assessment and registration are now its duties. Whether it starts with anything depends
+> on the contract. If the vendor did not exclude high-risk use, `Art. 25(2)` obliges it to hand over
+> documentation, known limitations and test access. If it did exclude it, the organisation builds the
+> evidence alone. The exclusion clause in the vendor terms sets the size of the evidence budget.
+
+### Roles name tasks, not organisations
+A role attaches to an activity on a specific system, not to a company. A bank is the provider of the
+
+### The same roles across regimes
+The words differ across laws; the tasks rarely do. The mapping column is this chapter's reading, not a
+
+## Deployer duties (Article 26)
+Article 26 is the deployer's list for high-risk systems. Broken into sub-duties, each has an artefact
+> **In practice (illustrative)**
+> In a large telco, the deployer duties stopped being a questionnaire once each became a registry
+> field with an owner. `oversight_roster` pointed at named people whose literacy training was current;
+> `log_retention_days` was checked against the six-month floor by a policy test; `worker_notice_ref`
+> linked to the consultation record before a workplace tool could be switched on. The audit question
+> "show me your Article 26 controls for this system" became one registry query per system.
+
+## Fundamental rights impact assessment (Article 27)
+required from deployers that are bodies governed by public law or private entities providing public
+
+## Explanation and notice to affected people
+output of an Annex III high-risk system (except point 2), which produces legal effects or similarly
+
+## AI literacy and bias-detection data
+support the development of AI literacy" of their staff and others operating or using AI systems on
+
+## Sandboxes and real-world testing
+sandbox operational by 2 Aug 2027, a date the Omnibus moved from 2 Aug 2026 [1][2]. The AI Office may
+
+## Governance and enforcement
+
+### Who supervises what
+Market surveillance follows the sector [1]: product authorities for Annex I, Section A systems
+
+### The AI Office's direct powers (Articles 75 and 75a to 75d)
+The Omnibus made the AI Office exclusively competent for two groups of AI systems [2]: systems built
+
+### Penalties
+The tiers are in `Arts. 99` and `101` [1], with the Omnibus additions in `Arts. 75c`, `99(4)(da)` and
+
+## The post-Omnibus timeline
+Other high-risk systems already on the market before the Chapter III date fall under the Act only if
+
+## What you can do this week
+1. **Add three fields to every registry entry:** `eu_roles` (a list, per system), `risk_rung` with
+
+## Sources
+[1] Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence (Artificial Intelligence Act), of 13 June 2024; OJ L, 2024/1689, 12.7.2024 (original text: Arts. 2, 3, 5 to 27, 43, 49 to 61, 64 to 75, 85 to 87, 99, 101, 111, 113; Annexes I, III, VIII). Publications Office of the EU (EUR-Lex). 2024-07-12. https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng (verified: primary)
+---
+
+# 19. Privacy and data protection law applied to AI
+
+Source: https://aigovernanceengineer.com/bok/privacy-and-ai
+
+> Data protection law already binds every AI system that touches personal data; this chapter turns
+> its duties for training, inference, rights and breaches into artefacts, stack layers and evidence.
+
+## How to read this chapter
+An AI system processes personal data at more moments than its owners usually list, and each moment
+
+## Principles applied to AI
+Article 5 GDPR sets the principles (lawfulness, fairness and transparency; purpose limitation; data
+
+### Lawful basis for training versus inference
+Article 6 offers six lawful bases and none ranks above another; the controller picks the one that
+> **Example (illustrative)**
+> A basis registry entry read by the `csa-01` training pipeline before a run:
+>
+> ```json
+> { "dataset": "support-transcripts-2025q4", "system": "csa-01", "stage": "fine-tuning",
+>   "basis": "Art. 6(1)(f)", "lia_ref": "lia-csa-01-v3", "purpose": "support-answer-quality",
+>   "special_category_scan": "pass", "retention": "P18M", "objection_opt_out": true }
+> ```
+
+### Legitimate interests and the three-step test
+Legitimate interests is the basis AI developers are most likely to rely on [4]. The EDPB set out how
+
+### The limits of consent
+Consent must be specific, informed and freely given; the controller must prove it; and people may
+
+### Transparency to the people in the data
+Articles 13 and 14 require notice, and Article 14 covers data not collected from the person, the
+
+### Purpose limitation and function creep
+Data may not be further processed in a way incompatible with its original purpose; Article 6(4) sets
+> **In practice (illustrative)**
+> An analytics team asked to fine-tune a churn model on the transcripts collected for `csa-01`. The
+> purpose check denied the job: the card said `support-answer-quality`, the requester said
+> `retention-marketing`, and no compatibility assessment existed. The request became an Article 6(4)
+> assessment that allowed only aggregated topic counts, and the denied run and the assessment were
+> both filed against the dataset's registry entry.
+
+## Minimisation, privacy by design and PETs
+Data must be adequate, relevant and limited to what the purpose needs, and Article 25 requires this
+
+### Anonymisation versus pseudonymisation
+The distinction decides whether the GDPR applies. **Pseudonymised** data cannot be attributed to a
+
+### Privacy-enhancing technologies and their honest limits
+Privacy-enhancing technologies (PETs) reduce what an attacker, vendor or insider can learn. None
+> **In practice (illustrative)**
+> A team swapped real records in `csa-01`'s regression suite for synthetic ones and assumed the problem
+> was solved. A membership-inference test added to the eval gate flagged rare records reproduced almost
+> verbatim. The generator was retrained with a privacy budget, the test stayed as a permanent gate, and
+> the synthetic set's card now carries the attack result as its evidence of fitness.
+
+## Controller duties across the AI supply chain
+
+### Controller, processor or joint controller
+A **controller** decides purposes and means; a **processor** acts on its behalf; parties deciding
+
+### AI vendor DPAs and no-training clauses
+Article 28 requires a contract under which the processor acts only on documented instructions,
+
+### The DPIA for AI systems
+A **DPIA** is required before processing likely to result in a high risk, particularly with new
+
+### Records of processing
+Article 30 requires a record of processing activities (ROPA): purposes, categories of data and
+
+### Transfers, remote inference and TIAs
+Chapter V GDPR requires a ground for every transfer to a third country: adequacy, appropriate
+> **In practice (illustrative)**
+> When `csa-01`'s vendor announced a model served from a US region, the change notice triggered the
+> due-diligence gate. It checked the vendor's Data Privacy Framework certification, stored the check in
+> the transfer register, and the residency policy then allowed the new endpoint for pseudonymised
+> support prompts only. Account notes stayed on the EU endpoint, and the policy verdicts in the traces
+> proved which data went where.
+
+## Automated decision-making
+
+### GDPR Article 22 after SCHUFA
+Article 22 gives people the right not to be subject to a decision based solely on automated
+> **Example (illustrative)**
+> A decision record for `credit-check-04`, a telco's handset-financing check, filed at runtime:
+>
+> ```json
+> { "decision_id": "cc4-2026-09-18-0192", "system": "credit-check-04@3.2",
+>   "solely_automated": true, "basis": "GDPR Art. 22(2)(a)", "outcome": "declined",
+>   "reason_codes": ["R07 payment arrears", "R12 short credit history"],
+>   "counterfactual": "approval likely after six months without arrears",
+>   "notice_sent": "2026-09-18T10:02:11Z", "contest_channel": "human-review-queue" }
+> ```
+
+### The regimes side by side
+Article 86 applies only where Union law does not already give the right [29], so the GDPR route
+
+## Data subject rights against trained models
+
+### Where a request has to reach
+Rights of access, rectification, erasure and objection [1] do not stop at the database. The deadline
+
+### Suppression, retraining and unlearning
+For data inside the weights there is a ladder, from fast and partial to slow and complete:
+
+### Recording how a request was honoured
+The evidence is a **fulfilment record** written by the workflow: every location, the action in each,
+> **Example (illustrative)**
+> An erasure request against `csa-01`, closed within the deadline:
+>
+> ```json
+> { "request_id": "dsr-2026-0412", "right": "erasure", "subject_key": "hash:7c1e…",
+>   "locations": { "crm": "deleted", "rag_index": "deleted", "fine_tune_set": "deleted",
+>                  "logs": "deleted", "weights": "output-suppression:rule-dsr-0412" },
+>   "retrain_scheduled": "csa-01@2026-10-15", "closed": "2026-09-30", "within_deadline": true }
+> ```
+
+## Does a model contain personal data?
+
+### The EDPB anonymity test
+If a model is personal data, rights, transfer and breach rules reach the weights. Authorities
+> **Example (illustrative)**
+> One line of an anonymity evidence pack, filed against a model version:
+>
+> ```json
+> { "suite_id": "privacy.membership-inference.v2", "model_version": "csa-01@2026-09-18",
+>   "attack_auc": 0.52, "threshold": 0.55, "canary_extraction": "0/500", "result": "pass" }
+> ```
+
+### When the model was trained unlawfully
+The opinion sets three scenarios [3]. If personal data stays in the model and **the same
+
+## Special categories, inferred data and biometrics
+Article 9(1) GDPR prohibits processing data revealing racial or ethnic origin, political opinions,
+
+### Inferred and proxy sensitive data
+AI creates sensitive data without collecting it: health inferred from purchases, religion from meal
+
+### Biometrics
+Biometric data results from technical processing of physical, physiological or behavioural traits
+
+### Consumer-health and neural data
+Washington's My Health My Data Act, in force for most entities since 31 Mar 2024, requires consent
+
+## AI-specific privacy breaches
+A **personal data breach** is a breach of security leading to the accidental or unlawful
+
+## The GDPR side of the Digital Omnibus
+Only one of the two Omnibus texts is law: the **Digital Omnibus on AI**, Regulation (EU) 2026/1744,
+
+## Beyond the EU: UK, US, Brazil and China
+
+### United Kingdom
+The Data (Use and Access) Act 2025, section 80, replaced UK GDPR Article 22 with Articles 22A to
+
+### United States
+There is no federal comprehensive privacy law. California's regulations on ADMT, risk assessments
+
+### Brazil and China
+Brazil's **LGPD** includes legitimate interests among its legal bases, sets stricter conditions for
+
+## Obligation to artefact map
+Layers: **1 Govern-as-Code · 2 Inventory & Transparency · 3 Evals & Red Teaming as Evidence · 4
+> **In practice (illustrative)**
+> A privacy engineering lead in a large telco rebuilt the `csa-01` DPIA so most of it was generated:
+> processing moments from the registry, bases from the basis registry, the transfer map from the routing
+> policy, memorisation risk from the latest privacy eval, the rights path from the request workflow. The
+> DPO still wrote and signed the risk judgement. When the vendor changed region, three fields changed
+> and the DPIA showed a diff instead of going stale in a shared drive.
+
+## What you can do this week
+1. **List the processing moments** of your highest-risk AI system and write the lawful basis and
+
+## Sources
+[1] Regulation (EU) 2016/679 (General Data Protection Regulation; Arts. 4(1), 4(4), 4(5), 4(12), 4(14), 5, 6, 6(4), 7, 9, 12(3), 13–17, 21, 22, 25, 26, 28, 30, 33–36, 44–46, 83(5), 99; Recital 26). Publications Office of the EU (EUR-Lex). 2016-04-27. https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng (verified: primary)
+---
+
+# 20. Other law that already applies to AI
+
+Source: https://aigovernanceengineer.com/bok/existing-law
+
+> Copyright, anti-discrimination, consumer-protection and product-liability law already bind AI
+> systems; this chapter maps each duty to its evidence artefact and stack layer.
+
+## How to read this chapter
+Each body of law asks one question of an AI system. The table names the artefact that answers it and
+
+## Intellectual property
+Intellectual property touches an AI system at four points: the works copied to train it, its
+
+### Copyright and training data
+Copying a work into a training corpus is, on its face, a reproduction. The legal question is whether
+
+### US training cases, dated
+Each ruling turned on its own record; none is a rule for every model.
+
+### Outputs: memorisation and ownership
+queries, and larger models are more exposed [24]. The controls sit in two layers: an eval that
+
+### Database rights and trade secrets
+re-utilisation of all or a substantial part of its contents, where the maker invested substantially
+
+### Patents and AI inventorship
+The DABUS applications, in which an AI system was named as sole inventor, failed everywhere they
+
+### Model licences and vendor indemnities
+use restrictions. The Llama 3.1 licence, for example, incorporates an acceptable use policy and
+
+### Artefacts that evidence IP compliance
+> **In practice (illustrative)**
+> A retrieval assistant for a publisher's sales team was built on a corpus assembled by three
+> different teams. The rights ledger was added after the fact: one row per source, with its
+> acquisition channel and licence. Two sources had no licence on record and one had been scraped
+> from a site whose `robots.txt` disallowed the crawler's user agent. The corpus build now fails
+> when a source lacks a ledger row, the crawler's allow/deny decisions are logged per URL, and the
+> two unlicensed sources were removed and the index rebuilt, with the rebuild recorded against the
+> same registry id.
+
+## Non-discrimination
+Anti-discrimination law does not ask whether a model is fair in the abstract. It asks whether a
+
+### Disparate treatment, disparate impact and proxies
+trait. *Disparate impact* is a neutral practice that falls harder on a protected group. Under Title
+
+### Employment
+vendors are not safely outside federal age-discrimination law: in *Mobley v. Workday* the court
+
+### Credit and lending
+specific reasons, or a notice of the right to receive them [50]. The CFPB's Circular 2022-03 states
+
+### Housing, insurance and public services
+Department of Justice, Meta agreed to drop its "Special Ad Audience" tool and build a system to
+
+### Fairness measures the law recognises
+The law picks no single fairness metric, but several of its tests are quantitative. Each maps to an
+> **In practice (illustrative)**
+> A recruitment team deployed a vendor ranking model in New York and two EU countries. The vendor's
+> bias audit was a year old and computed on another customer's data. The team re-ran the impact
+> ratios on its own applicant flow monthly, as a pipeline eval with a 0.8 floor that paged the
+> owner. In month three one intersectional category fell to 0.71; the cause was a new "years of
+> continuous experience" feature that penalised career gaps. The feature was removed, the search log
+> recorded the alternatives tested, and a refreshed audit summary was published before the next
+> round.
+
+## Consumer protection
+Consumer-protection law reaches AI through three doors, with no AI-specific statute: what you claim
+
+### Unfair and deceptive practices in the United States
+Section 5 of the FTC Act prohibits unfair or deceptive acts or practices. A practice is unfair only
+
+### The EU: UCPD, DSA and the AI Act
+The Unfair Commercial Practices Directive prohibits practices that are contrary to professional
+
+### The United Kingdom: DMCC Act
+Under the Digital Markets, Competition and Consumers Act 2024, the general prohibition of unfair
+
+### Claims substantiation and algorithmic disgorgement
+capability is a row: the claim, where it appears, the eval run that supports it, the data it was
+
+## Product liability
+Product liability asks whether a product was defective and whether the defect caused the harm. For
+
+### The EU Product Liability Directive
+The revised Product Liability Directive, (EU) 2024/2853, was adopted on 23 Oct 2024 and published on
+
+### United States tort theories
+US product liability recognises three kinds of defect: manufacturing defects in some units, design
+
+### The UK product liability review
+The Law Commission is reviewing the Consumer Protection Act 1987 regime, expressly including digital
+
+### Defect types mapped to AI failure modes
+Each legal category maps onto engineering failure modes and an artefact that shows whether they
+
+### Duty to warn after updates
+A model update is a new release. Under the EU regime the manufacturer answers for defects that
+
+### The defence file
+A defence file per product release holds:
+
+## Deepfakes and synthetic media
+Synthetic media sits across consumer protection, privacy and criminal law. Three regimes set the
+
+## One hiring model through five bodies of law
+A single system usually answers to several of these bodies of law at once, so its artefacts should
+> **Example (illustrative)**
+> An employer in New York and the EU deploys a vendor's model that ranks applicants for interviews.
+> One registry entry answers five legal questions.
+
+## What you can do this week
+1. **Add four fields to every dataset's data card**: source, acquisition channel, licence, and the
+
+## Sources
+[1] "FTC Announces Crackdown on Deceptive AI Claims and Schemes" (Operation AI Comply; "there is no AI exemption from the laws on the books"; DoNotPay "robot lawyer" proposed order). Federal Trade Commission. 2024-09-25. https://www.ftc.gov/news-events/news/press-releases/2024/09/ftc-announces-crackdown-deceptive-ai-claims-schemes (verified: primary)
+---
+
+# 21. AI-specific laws around the world
+
+Source: https://aigovernanceengineer.com/bok/ai-laws-worldwide
+
+> Outside the EU, AI-specific law ranges from Korea's horizontal Basic Act to US state statutes,
+> public-sector directives and voluntary frameworks; this chapter dates each regime and names the
+> artefact that evidences each duty.
+
+## How to read this chapter
+This chapter is a field guide to the AI-specific rules that sit beside the EU AI Act. It is written
+
+## The landscape at a glance
+
+## South Korea: the AI Basic Act
+South Korea has a horizontal AI statute in force that carries operator duties and fines. Its
+
+### Status and dates
+The Act was promulgated on 21 Jan 2025 and entered into force on 22 Jan 2026; the part of the
+
+### Scope and duty holders
+The Act reaches conduct abroad that affects the Korean market or Korean users (Article 4(1)), and
+
+### High-impact AI and how it is confirmed
+physical safety or fundamental rights, and that is used in one of the areas the Act lists (Article
+
+### Transparency: prior notice and labelling
+Article 31 carries three duties [1]:
+
+### Duties for high-impact AI
+An operator that provides high-impact AI must implement six measures (Article 34(1)) [1]: a risk
+
+### Safety duties for high-compute systems
+Article 32 applies to systems whose cumulative training compute exceeds a threshold set by decree
+
+### Domestic representative
+An operator with no address or business establishment in Korea must designate a **domestic
+
+### Enforcement and the grace period
+MSIT may demand documents and investigate, including on-site, when it finds or is told of a
+> **In practice (illustrative)**
+> A foreign provider of a hiring-assessment API crossed the 1-million-daily-user threshold through
+> Korean customers of its customers. The governance team did three things. It added a
+> `jurisdiction.kr` block to each system's registry entry holding the Article 2(4) area ("hiring"),
+> the self-review verdict and a link to the decree-shaped impact assessment. It extended the
+> evidence store's retention policy to five years for every artefact tagged `kr-art34`. And it gave
+> the domestic representative read access to a filtered evidence view, so the representative could
+> answer MSIT from current documents instead of emailing the product team. Nothing new was built in
+> the model; the work was in the registry, the retention policy and the access path.
+
+## United States: the federal layer
+The United States has no federal AI statute that binds private actors. The federal layer is a set of
+
+### Executive orders
+  Intelligence*, ordered a review of every action taken under the revoked EO 14110, so that those
+
+### OMB memoranda for federal agencies
+Public Trust*, rescinded and replaced M-24-10 [6]. It defines **high-impact AI** as AI whose output
+
+### America's AI Action Plan
+The plan, published in July 2025, has three pillars: accelerate innovation, build American AI
+
+### The federal push against state AI laws
+EO 14365 sets the machinery [10]. The Attorney General was to establish an **AI Litigation Task
+
+## United States: state laws that bind private organisations
+Chapter 08 maps the two frontier laws, Texas and Colorado at the level of the
+
+### Consequential decisions: one hiring tool, four regimes
+Colorado, the California ADMT rules, Illinois and New York City all reach automated hiring, but each
+> **Example (illustrative)**
+> A vendor's CV-ranking model is deployed by employers in Denver, Chicago, New York City and Seoul.
+> The [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci) runs an adverse-impact suite on every
+> release and blocks one that moves any group's selection-rate ratio below the configured floor.
+> The same results feed the NYC bias-audit auditor's data request, the Illinois discriminatory-effect
+> file and the Korean impact assessment's "indicators and method" section. The registry entry
+> carries four notice templates and one human-review queue; the adverse-outcome explanation is
+> generated from the model's top reason codes and logged with the decision, so Colorado's 30-day
+> clock is met by the same pipeline that answers a US credit adverse-action notice.
+
+### Provenance, training data and frontier developers
+California splits content transparency across two statutes: AB 2013 makes developers publish a
+
+### Chatbots and companions
+Utah, California and New York regulate the conversational interface itself, not the model behind it
+
+## Japan: the AI Promotion Act
+Japan's Act on the Promotion of Research, Development and Utilisation of AI-Related Technologies
+
+## China: what chapter 08 does not already cover
+Chapter 08 maps China's [binding and voluntary tiers](/bok/regulatory-map#china), from the
+
+## Brazil: PL 2338/2023 (bill)
+Brazil's AI bill, PL 2338/2023, was introduced in the Senate on 3 May 2023, approved by the Senate
+
+## Canada: after AIDA, the Directive on Automated Decision-Making
+The Artificial Intelligence and Data Act (AIDA), part of Bill C-27, died on the Order Paper when
+
+## India: governance guidelines, no AI act
+India has no AI-specific statute. MeitY published the **India AI Governance Guidelines** on
+
+## United Kingdom: principles, regulators and public-sector records
+The UK has no horizontal AI statute. Its approach, confirmed in the government's February 2024
+
+## Italy: Law 132/2025
+Italy has a national AI law of general scope that sits beside the EU AI Act. Law No. 132 of
+
+## Spain: AESIA, the sandbox and a bill
+Spain has an operational AI supervisor, a live sandbox and a national AI bill that is not law.
+
+## Singapore: model frameworks and AI Verify
+Singapore regulates AI through voluntary frameworks and a testing toolkit, maintained by IMDA and
+
+## Australia: existing law and voluntary guidance
+Australia has no AI act. The government's **National AI Plan**, published in December 2025, states
+
+## Comparing the regimes
+The comparison below uses the questions a governance function asks of any AI-specific law. It covers
+
+## Sector rules that already reach AI
+AI-specific law is only half the picture. Sector regimes written before, or beside, the AI laws
+
+### Incident clocks across regimes
+One AI incident can start several clocks at once. The [Incident Pipeline](/bok/patterns#pattern-incident-pipeline)
+> **In practice (illustrative)**
+> A payments company ran a fraud-scoring model inside a platform that was an ICT service under DORA,
+> an important entity under NIS2 and, through its point-of-sale devices, a CRA product. When a
+> prompt-injection path in its support agent exposed card data, the incident pipeline opened one
+> ticket and three regulator-facing reports from the same timeline, each with its own clock and
+> template. What made it work was not the model: it was a registry that already tagged the agent
+> with all three regimes, and an evidence store that let each report cite the same signed logs.
+
+## What you can do this week
+1. **Add a jurisdiction block to every registry entry.** List where each system is offered, and for
+
+## Sources
+[1] Basic Act on the Development of Artificial Intelligence and the Establishment of a Foundation for Trust (인공지능 발전과 신뢰 기반 조성 등에 관한 기본법; Act No. 20676, promulgated 2025-01-21, in force 2026-01-22; Art. 2 as amended 2026-01-20; Arts. 2(4) high-impact areas, 2(7) operators, 4 scope, 31 transparency, 32 safety, 33 confirmation, 34 high-impact duties, 35 impact assessment, 36 domestic representative, 40 fact-finding, 43 fines up to KRW 30M). Korean Law Information Center (MOLEG). 2026-01-22. https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=268543 (verified: primary)
+---
+
+# 22. Principles, soft law and standards
+
+Source: https://aigovernanceengineer.com/bok/principles-and-standards
+
+> Principles say what good looks like and standards say how to show it; this chapter maps each
+> instrument to the stack layer and the evidence record that answer it.
+
+## How to read this chapter
+Most of what shapes AI governance is not law. It is a lattice of principle sets, a treaty, voluntary
+
+## The instruments at a glance
+Sources for each row are in the section that treats it. The adherent and Member State counts come
+
+## A short lineage of AI soft law
+The instruments cite each other, and the order matters because definitions travel downstream. The EU
+
+## OECD AI Principles
+The OECD Recommendation on AI (legal instrument `OECD/LEGAL/0449`) was the first intergovernmental
+
+### The five principles and five recommendations
+The principles address AI actors; the recommendations address governments. Only the first five
+
+### The OECD AI system definition and lifecycle
+The 2023 definition reads: a machine-based system that, for explicit or implicit objectives, infers,
+
+### The Framework for the Classification of AI Systems
+The OECD classification framework evaluates an AI system from a policy perspective along five
+> **Example (illustrative)** A registry entry extended with the five dimensions. The fields are the
+> team's own choice; the grouping is the OECD's.
+>
+> ```yaml
+> id: credit-limit-assist
+> oecd_classification:
+>   people_and_planet: { affected: [applicants], rights_impact: high, opt_out: false }
+>   economic_context: { sector: consumer-credit, criticality: high, deployment: customer-facing }
+>   data_and_input: { provenance: [bureau-feed, application-form], personal_data: true }
+>   ai_model: { type: gradient-boosted-trees, adaptive_after_deployment: false }
+>   task_and_output: { task: recommendation, autonomy: human-reviewed, output: limit-band }
+> ```
+>
+> A policy in layer 01 reads `rights_impact: high` and requires a fairness eval gate; the eval gate
+> in layer 03 reads `personal_data: true` and adds a leakage suite. The classification stops being a
+> description and starts routing controls.
+
+### The OECD.AI observatory
+Three OECD.AI resources are worth wiring in. The **Catalogue of Tools & Metrics for Trustworthy AI**
+> **In practice (illustrative)**
+> A governance team in a large insurer added the five OECD dimensions to its registry schema as
+> required fields. The first reconciliation found several systems whose `task_and_output.autonomy`
+> said "human-reviewed" while runtime traces showed no reviewer action on most decisions. The field
+> did not create the gap; it made the gap queryable. The fix was an oversight checkpoint with logged
+> approvals, and the registry field became a claim the traces could falsify.
+
+## UNESCO Recommendation on the Ethics of AI
+UNESCO's 193 Member States adopted the Recommendation on the Ethics of Artificial Intelligence in
+
+## Council of Europe Framework Convention (CETS No. 225)
+The Framework Convention on Artificial Intelligence and Human Rights, Democracy and the Rule of Law
+
+### Scope and status
+Article 3 sets the scope. Parties must apply the Convention to lifecycle activities of AI systems
+
+### What the Convention asks for, and what it changes in the stack
+Chapter III sets principles that Parties implement: human dignity and individual autonomy;
+
+## G7 Hiroshima Process
+G7 leaders agreed two texts on 30 October 2023: the International Guiding Principles for
+
+## EU HLEG guidelines and ALTAI
+The Commission's independent High-Level Expert Group on AI presented its Ethics Guidelines for
+
+## NIST AI RMF 1.0 in depth
+The NIST AI Risk Management Framework 1.0 (NIST AI 100-1, 26 January 2023) describes itself as
+
+### Harm, risk and tolerance
+Part 1 frames risk as a function of the magnitude of harm and its likelihood, and groups potential
+
+### The seven trustworthy characteristics
+The RMF names seven characteristics of trustworthy AI and describes valid and reliable as the base
+
+### The Core: 19 categories
+The Core has four functions, 19 categories and, by our count of the published tables, 72
+
+### How a Playbook entry is structured
+The AI RMF Playbook is the companion that turns each subcategory into suggested practice. Every
+> **Example (illustrative)** One subcategory, turned into a gate and an evidence record.
+>
+> ```yaml
+> control: kill-switch-tested
+> nist_ai_rmf: [MANAGE 2.4]          # supersede, disengage or deactivate
+> playbook_question: "Who can deactivate the system, and how is that tested?"
+> check: last_kill_switch_test.passed == true and age_days <= 30
+> enforce: deploy-admission          # block release if stale
+> evidence: kill-switch-test-result  # filed against the registry id
+> ```
+>
+> The Playbook supplied the question; the pipeline supplies the answer on every release.
+
+### Profiles and the Generative AI Profile
+A profile applies the Core to a context. The RMF describes three kinds: **use-case profiles** for a
+
+### Adjacent NIST work
+Four further NIST publications bear directly on the stack. The newer drafts already indexed in
+
+### Revision status
+The RMF itself foresaw a formal review with community input no later than 2028, with versions
+
+## The ISO/IEC family
+ISO/IEC JTC 1/SC 42 publishes the international AI standards. They are referenced here by number and
+
+### Foundations and vocabulary
+ISO/IEC 22989 establishes terminology and concepts for AI and is written to be used by other
+
+### Risk, quality and data
+Two details matter for planning. ISO/IEC 25059 is marked "to be revised" on ISO's page as of
+
+### The management-system trio
+continually improving an AI management system [40]. **ISO/IEC 42005:2025** gives guidance for AI
+
+### Integrating with 27001, 27701 and 9001
+ISO designed management-system standards to share a structure so that an organisation can run one
+> **In practice (illustrative)**
+> A team that already held ISO/IEC 27001 added 42001 by extending, not duplicating. The risk
+> register gained an `ai` risk type and a link to the registry id; the internal audit programme
+> gained AI controls; the Statement of Applicability for 42001 was generated from the same control
+> metadata as the 27001 one. The certification audit found the evidence where the 27001 auditors had
+> always found it. The one new artefact was the impact assessment, built to 42005 and attached to
+> each high-risk registry entry.
+
+## Harmonised standards under the AI Act
+
+### How presumption of conformity works
+Article 40 of the AI Act presumes that high-risk systems (and general-purpose AI models) conform
+
+### The JTC 21 programme
+The work sits in the joint technical committee CEN-CENELEC JTC 21, organised in working groups on
+
+### What each deliverable changes in the stack
+The drafts are not public, so this is a reading of their published scopes, not of their clauses.
+
+### Building before the OJ citation
+The gap between a draft and a cited standard is where most teams will spend 2026 and 2027. Three
+> **In practice (illustrative)**
+> A provider of a high-risk recruitment tool built its risk file to the published scope of prEN
+> 18228 while the draft was at Enquiry: hazards, estimates, controls and monitoring per system, with
+> acceptability thresholds as code. When EN 18286 was published, the team compared its QMS process
+> list with the pipeline stages it already ran and found two gaps (supplier change notification and
+> a post-market review cadence). Both became pipeline stages with owners. The standards-watch file
+> recorded the date of each check, which is what an assessor asked to see.
+
+## IEEE 7000 series
+The IEEE 7000 series approaches ethics as systems-engineering process. None of these standards is
+
+## One control, many instruments
+The instruments overlap far more than their authors' different vocabularies suggest. The table
+
+## What you can do this week
+1. **Add the five OECD classification dimensions to your registry schema** as required fields, and
+
+## Sources
+[1] Council of Europe Framework Convention on Artificial Intelligence and Human Rights, Democracy and the Rule of Law (CETS No. 225), text (Art. 2 definition; Art. 3 scope and private-actor declaration; Arts. 7–13 principles; Arts. 14–15 remedies and safeguards; Art. 16 risk and impact management; Art. 30 entry into force). Council of Europe. 2024-09-05. https://rm.coe.int/1680afae3c (verified: primary)
+---
+
+# 23. Governing AI agents
+
+Source: https://aigovernanceengineer.com/bok/governing-agents
+
+> An AI agent is governed when every action traces back to a registered identity, a scope someone
+> approved, a checkpoint that fired where the stakes required one and a tested way to stop it.
+
+## What makes an agent a governance object
+An agent is an AI system that pursues a goal by choosing and taking actions: it plans, calls tools,
+
+### Autonomy is a design decision
+Autonomy is a setting the deployer chooses, not a property of the model. As Feng, McDonald and Zhang
+
+## The agent registry
+The [Agent Registry](/bok/patterns#pattern-agent-registry) pattern makes registration a precondition
+> **Example (illustrative)** A registry entry for a refunds agent, written by the deploy pipeline.
+> The versions block is what makes an incident replayable; the stop block is what makes the kill
+> switch more than a claim.
+> **In practice (illustrative)**
+> In a large telco, the first discovery sweep found more agents on developer laptops than in the
+> production registry: coding assistants with local MCP servers holding personal access tokens, some
+> with write access to shared repositories. The fix was not a ban. A paved path issued each
+> developer's agent a short-lived, repository-scoped credential from the production identity system,
+> and the sweep became a weekly reconciliation with an owner for every finding.
+
+## Identity and short-lived credentials
+
+### Channel authentication is not agent identity
+Chapters 04 and 05 draw the key line. **Channel authentication** secures one hop, such as a client
+
+### Short-lived, attested credentials
+SPIFFE defines "short lived cryptographic identity documents", called SVIDs, delivered through a
+
+### Delegation without impersonation
+When an agent acts for a user, two identities are in play, and the log must keep both. OAuth 2.0
+> **Example (illustrative)** The claims of a delegated access token. The user is the subject; the
+> refunds agent is the current actor; the orchestrator that delegated the task to it is nested
+> inside. The audience is one API and the scope one operation.
+
+### MCP authorization as of 2026-07-28
+The Model Context Protocol specification dated 2026-07-28 is the current version as of 2026-09-24.
+
+## Tool and MCP server permissions
+
+### The tool allow-list
+A tool is a capability, and the allow-list is where capabilities are granted. OWASP's advice under
+> **Example (illustrative)** The allow-list as a deny-by-default policy the tool gateway evaluates
+> on every call, reading the registry as data. The rate check is omitted for brevity.
+
+### Admitting an MCP server
+An MCP server is a supplier. OWASP separates two cases: a tool whose interface is manipulated at
+
+## Human checkpoints and approval design
+
+### Where to put a checkpoint
+The [Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate) pattern says to gate by
+
+### What a good approval looks like
+The AI Act describes the overseer the design must serve. For a high-risk system they must be able to
+> **Anti-pattern** A checkpoint that fires 200 times a day on a person with other work. It becomes a
+> rubber stamp within a week, and the approval log then launders the decisions it was meant to
+> examine.
+> **In practice (illustrative)**
+> A payments team found its reviewers approving almost every agent refund request within seconds.
+> Two changes fixed it: only irreversible, high-value refunds now reach a person, which cut the
+> volume by an order of magnitude, and the approval screen shows the raw tool call first, with the
+> agent's explanation below it. Overrides rose from almost none to a rate worth investigating, and
+> two of the first exposed a prompt-injection path through customer notes.
+
+## Runtime guardrails for tool calls
+A runtime guardrail for an agent sits at one point: between the decision to call a tool and the
+
+### Execution limits
+Budgets are the guardrail that catches what no rule anticipated. The 2026 OWASP LLM list names
+
+## Kill switch and per-agent circuit breakers
+Autonomy is granted only where it can be withdrawn. The NIST AI RMF asks for mechanisms to
+
+### Stopping across hops
+You cannot stop someone else's agent. A2A's cancel operation says so: "The server will attempt to
+> **In practice (illustrative)**
+> A kill-switch drill on a document-processing agent measured four seconds from the pull to the
+> breaker rejecting calls, which looked like a pass. The follow-up check found long-running tasks
+> still writing to storage twenty minutes later, on a refresh token issued before the pull. Agent
+> refresh tokens were removed, access tokens cut to five minutes, and the drill now asserts zero
+> writes after the pull, not only a fast breaker.
+
+## Memory and context governance
+Memory turns one bad input into a lasting one. The 2026 OWASP LLM list calls this **memory
+
+## Multi-agent systems and delegation chains
+The Agent2Agent protocol (A2A) is an open protocol for communication between agents, first developed
+
+### Accountability across hops
+Two standards efforts address the hard part, carrying identity and authorisation context through a
+
+## Prompts as configuration under change control
+An agent's behaviour is set by its model, its system prompt, its tool descriptions and its policy
+> **Example (illustrative)** A prompt manifest that the pipeline refuses to deploy unless the eval
+> run it names has passed.
+> **Anti-pattern** Editing the production system prompt in a vendor console to fix a complaint. The
+> behaviour changes, the registry and the traces still name the old version, and the next incident
+> replays a configuration that never ran.
+
+## Agent incidents and telemetry
+
+### An agent incident taxonomy
+The Partnership on AI defines the capability agents need most: "Real-time failure detection is the
+
+### Telemetry with the OpenTelemetry GenAI conventions
+The OpenTelemetry generative-AI semantic conventions now live in their own repository and are in
+
+## Threats mapped to controls
+The two OWASP lists divide the ground. The 2026 LLM list, published on 3 Aug 2026, says it "owns the
+
+## Frameworks written for agents
+Five bodies have published agent-specific guidance, and chapter 08 already sets three of them side
+
+## EU AI Act hooks for agents
+The AI Act does not define "agent". An agent is an AI system, classified by its intended purpose
+
+## What you can do this week
+1. **Find your agents.** Run a discovery sweep that includes coding agents and local MCP server
+
+## Sources
+[1] OWASP Top 10 for Agentic Applications 2026 (ASI01 Agent Goal Hijack; ASI02 Tool Misuse and Exploitation, per-tool least-privilege profiles, auto-approved ping tool used for DNS exfiltration; ASI03 Identity and Privilege Abuse; ASI04 Agentic Supply Chain Vulnerabilities; ASI05 Unexpected Code Execution (RCE); ASI06 Memory & Context Poisoning; ASI07 Insecure Inter-Agent Communication; ASI08 Cascading Failures; ASI09 Human-Agent Trust Exploitation; ASI10 Rogue Agents; "Least-Agency"). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
+---
+
+# The AI Governance Engineering Thesis
+
+Source: https://aigovernanceengineer.com/thesis
+
+## Fundamental problems with legacy AI governance
+and spreadsheet inventories that describe an AI system as it was on the day it was reviewed. But
+
+## Values
+Eight affirmations. Each states what we build toward and, by naming it, what we build away from. Not
+
+## Principles
+The values say what we prefer; these principles say what we commit to *do*. They are rules of action,
+
+## What AI governance engineers build
+Not decks. Working artefacts, versioned in a repository and running in production:
+
+## A discipline, distinct from its neighbours
+AI governance engineering is not AI safety research, MLOps, model risk management, AI compliance or
+
+## Authors
+https://www.linkedin.com/in/jorgara
+
+## Sign / get involved
+  https://aigovernanceengineer.com/bok
+
+## Licence
+This Thesis is licensed under **CC BY 4.0**. You may share and adapt it provided you give appropriate
+
+## Sources
+[1] GRC Engineering Manifesto. grcengineering. ~2024. https://grc.engineering/ (verified: primary)

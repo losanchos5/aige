@@ -1,0 +1,309 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/policy-card.v1.json",
+  "title": "Policy card",
+  "description": "A governance rule set as a machine-readable artefact that travels with the system it governs: each rule's effect, the failure mode it addresses, where it is enforced and the engine module that implements it. Every evaluation emits a verdict in the shape published in chapter 05 ($defs/verdict).",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 9",
+    "EU AI Act Art. 17",
+    "ISO/IEC 42001 5.2",
+    "ISO/IEC 42001 A.2",
+    "NIST AI RMF GOVERN 1.2",
+    "NIST AI RMF GOVERN 1.4"
+  ],
+  "x-layer": [
+    1
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-policy-card",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-framework-crosswalk"
+  ],
+  "x-lifecycle-stage": "organisation",
+  "type": "object",
+  "required": [
+    "card_id",
+    "version",
+    "title",
+    "owner",
+    "applies_to",
+    "rules",
+    "effective_from"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/policy-card.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "card_id": {
+      "type": "string",
+      "description": "Identifier of the card.",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "description": "Card version. A rule change is a new version and a reviewable diff.",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "description": "What the card governs.",
+      "minLength": 1
+    },
+    "owner": {
+      "type": "string",
+      "description": "Policy owner.",
+      "minLength": 1
+    },
+    "applies_to": {
+      "type": "array",
+      "description": "Registry ids or selectors the card applies to.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "source_policy": {
+      "type": "string",
+      "description": "Clause of the organisation's AI policy the card implements (for example \"ai-policy.yaml#rules/agents-bounded-spend\").",
+      "x-evidences": [
+        "ISO/IEC 42001 5.2"
+      ]
+    },
+    "rules": {
+      "type": "array",
+      "description": "The rules.",
+      "items": {
+        "type": "object",
+        "description": "One rule.",
+        "required": [
+          "rule_id",
+          "description",
+          "effect",
+          "failure_mode",
+          "enforcement_points"
+        ],
+        "properties": {
+          "rule_id": {
+            "type": "string",
+            "description": "Versioned rule id; verdicts carry it (for example \"refunds.per-order-cap.v4\").",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "The rule in one sentence.",
+            "minLength": 1
+          },
+          "effect": {
+            "type": "string",
+            "enum": [
+              "deny",
+              "allow",
+              "require_approval",
+              "alert"
+            ],
+            "description": "What happens when the condition holds."
+          },
+          "condition": {
+            "type": "string",
+            "description": "The condition in plain words; the engine module is authoritative."
+          },
+          "failure_mode": {
+            "type": "string",
+            "description": "The failure mode the rule addresses.",
+            "minLength": 1
+          },
+          "enforcement_points": {
+            "type": "array",
+            "description": "Where the rule is evaluated.",
+            "items": {
+              "type": "string",
+              "enum": [
+                "pre_merge",
+                "deploy",
+                "runtime",
+                "periodic"
+              ]
+            },
+            "minItems": 1
+          },
+          "implementation": {
+            "type": "object",
+            "description": "Where the executable rule lives.",
+            "required": [
+              "engine",
+              "module"
+            ],
+            "properties": {
+              "engine": {
+                "type": "string",
+                "enum": [
+                  "opa_rego",
+                  "cedar",
+                  "other"
+                ],
+                "description": "Policy engine."
+              },
+              "module": {
+                "type": "string",
+                "description": "Module or file.",
+                "minLength": 1
+              },
+              "entrypoint": {
+                "type": "string",
+                "description": "Rule or query evaluated."
+              }
+            },
+            "additionalProperties": false
+          },
+          "maps_to": {
+            "type": "array",
+            "description": "Obligations the rule helps evidence.",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "NIST AI RMF GOVERN 1.4"
+      ]
+    },
+    "exceptions": {
+      "type": "string",
+      "description": "How an exception is requested, approved and time-limited."
+    },
+    "effective_from": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the version applies from."
+    },
+    "review_by": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the card must be reviewed."
+    },
+    "approved": {
+      "type": "object",
+      "description": "Approval of this version.",
+      "required": [
+        "role",
+        "decision",
+        "timestamp"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "The approving role, not a personal name.",
+          "minLength": 1
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "approve",
+            "approve_with_conditions",
+            "reject",
+            "abstain"
+          ],
+          "description": "What this approver decided."
+        },
+        "conditions": {
+          "type": "string",
+          "description": "Conditions attached to the approval, if any."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the approver decided (RFC 3339)."
+        },
+        "signature": {
+          "type": "string",
+          "description": "Detached signature over the record, prefixed with the algorithm (for example \"ed25519:<base64>\"). Makes the record tamper-evident in the evidence store.",
+          "pattern": "^[a-z0-9-]+:.+$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sample_verdicts": {
+      "type": "array",
+      "description": "Example verdicts, in the shape every evaluation emits.",
+      "items": {
+        "$ref": "#/$defs/verdict"
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "verdict": {
+      "type": "object",
+      "description": "The verdict emitted on every evaluation of a rule, as published in chapter 05 (rule_id, decision, input_hash, timestamp).",
+      "x-evidences": [
+        "EU AI Act Art. 12",
+        "ISO/IEC 42001 A.6"
+      ],
+      "required": [
+        "rule_id",
+        "decision",
+        "input_hash",
+        "timestamp"
+      ],
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Rule evaluated."
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "allow",
+            "deny",
+            "require_approval",
+            "alert"
+          ],
+          "description": "Outcome."
+        },
+        "input_hash": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+:.+$",
+          "description": "Digest of the input evaluated, algorithm-prefixed."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When evaluated (RFC 3339)."
+        },
+        "subject": {
+          "type": "string",
+          "pattern": "^[^@\\s]+@[^@\\s]+$",
+          "description": "Governed system, as \"id@version\"."
+        },
+        "enforcement_point": {
+          "type": "string",
+          "enum": [
+            "pre_merge",
+            "deploy",
+            "runtime",
+            "periodic"
+          ],
+          "description": "Where it was evaluated."
+        },
+        "signature": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+:.+$",
+          "description": "Signature over the verdict."
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
