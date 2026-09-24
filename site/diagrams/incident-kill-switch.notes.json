@@ -1,8 +1,8 @@
 {
-  "signal": "A runtime signal — such as a guardrail flagging a data-exfiltration attempt or an agent's unauthorised-tool-call rate crossing a threshold — starts the flow.",
+  "signal": "A runtime signal, such as a guardrail flagging a data-exfiltration attempt or an agent's unauthorised-tool-call rate crossing a threshold, starts the flow.",
   "detect": "Runtime detection comes from observability and guardrails.",
-  "drill": "The kill switch is tested on a schedule — the pull is drilled monthly — because an untested kill switch is not a control.",
-  "breaker": "A circuit breaker at the tool-call boundary trips on a defined signal — a threshold breach, an anomaly, or a manual pull.",
+  "drill": "The kill switch is tested on a schedule (the pull is drilled monthly) because an untested kill switch is not a control.",
+  "breaker": "A circuit breaker at the tool-call boundary trips on a defined signal: a threshold breach, an anomaly, or a manual pull.",
   "revoke": "Tripping revokes just that agent's scope and halts its tool calls.",
   "fleet": "Containment stops one agent without breaking the rest of the fleet, which keeps running.",
   "triage": "Runtime detection is wired to a triage workflow that classifies severity.",

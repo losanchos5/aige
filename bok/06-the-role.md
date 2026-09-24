@@ -5,10 +5,10 @@
 
 ## Capability first, title second
 
-The Thesis insists that AI governance engineering is a capability, not a job title — the same claim
+The Thesis insists that AI governance engineering is a capability, not a job title (the same claim
 the parent discipline makes for GRC engineering, a capability anyone close to the build can develop
-[11]. This chapter makes it concrete without contradicting that: a capability still lives in someone's
-week — the tickets they own, the pipelines they maintain, the incidents they are paged for. So we
+[11]). This chapter makes it concrete without contradicting that: a capability still lives in someone's
+week: the tickets they own, the pipelines they maintain, the incidents they are paged for. So we
 describe the **AI governance engineer** as the person, on whatever org chart, who holds that capability
 and is accountable for the three questions in production: what AI is running, what it is allowed to do,
 and what evidence proves it.
@@ -17,7 +17,7 @@ The distinction matters because the title is still forming. The same work is adv
 Governance Engineer", "AI Risk Engineer", "AI Evaluation & Governance Engineer" [1], "Responsible AI
 Engineer" and, inside GRC teams building the AI-forward version of their function, "GRC Engineer" with
 an AI mandate [2]. A security engineer who writes the eval gate, a privacy engineer who turns a FRIA
-into code, an MLOps engineer who wires the registry to the deploy — each is doing AI governance
+into code, an MLOps engineer who wires the registry to the deploy: each is doing AI governance
 engineering under a different title. We define the role by what it owns, not by what HR called the
 requisition.
 
@@ -28,22 +28,22 @@ engineer reads the system directly and ships the control that changes what it do
 ## What the role owns, by workflow
 
 The engineer owns workflows, not documents. Each workflow below is a running system with inputs,
-artefacts and evidence — and each maps to one of the five layers of the stack (chapter 04). Grouping
+artefacts and evidence, and each maps to one of the five layers of the stack (chapter 04). Grouping
 responsibilities this way keeps the role honest: you own a workflow when you can be paged for it, not
 when your name is on a policy.
 
 ### Intake and classification
 
-Every AI system, model and agent enters through an intake that classifies it — by risk tier, by
+Every AI system, model and agent enters through an intake that classifies it: by risk tier, by
 regulatory exposure (EU AI Act high-risk, GPAI, out of scope), by data sensitivity and by autonomy.
 The engineer builds intake as a form-plus-code path, not a meeting: a request that scaffolds a
 registry entry, triggers the right impact assessment (FRIA, DPIA), and routes the system to the
-controls its class requires. Live postings name exactly this — one VP role is scoped to "AI intake,
+controls its class requires. Live postings name exactly this: one VP role is scoped to "AI intake,
 classification and approval aligned to NIST AI RMF" [3]. **Maps to** Inventory & Transparency.
 
 ### Inventory and registry
 
-The engineer owns the inventory of models and the **agent registry** — the runtime-aware record of
+The engineer owns the inventory of models and the **agent registry**, the runtime-aware record of
 every non-human actor, each with an owner, a declared scope, a status and a kill switch. The
 capability that distinguishes the engineer here is the runtime data path: the registry is fed by the
 deployment pipeline and by discovery against production, not typed into a spreadsheet. Registry work
@@ -52,7 +52,7 @@ governance [4]. **Maps to** Inventory & Transparency.
 
 ### Evals and red teaming as evidence
 
-The engineer builds and maintains the eval suites — capability, safety and adversarial — and wires
+The engineer builds and maintains the eval suites (capability, safety and adversarial) and wires
 them into an **eval gate** so a failing eval blocks the release. This is the workflow that most
 sharply separates the engineer from the analyst: the analyst reviews a model report; the engineer
 writes the test the model must pass and owns the harness that runs it (Inspect AI, promptfoo, Garak,
@@ -65,7 +65,7 @@ adversarial red-teaming [1]. **Maps to** Evals & Red Teaming as Evidence.
 The engineer expresses governance rules as executable policy (`OPA/Rego`, Cedar, Policy Cards) that
 evaluate in CI/CD and at admission, and maintains the gates that enforce them. A public GRC
 engineering-manager posting frames the mandate as "translate policies into policy-as-code" [5]. The
-engineer's output here is a merge that is blocked or allowed, with a logged reason — not a
+engineer's output here is a merge that is blocked or allowed, with a logged reason, not a
 recommendation in a review. **Maps to** Govern-as-Code.
 
 ### Runtime monitoring and incidents
@@ -79,8 +79,8 @@ Runtime Controls & Observability.
 
 ### Assurance and audit evidence
 
-The engineer emits **audit-ready evidence** as a by-product of the build — `OSCAL` component and
-assessment artefacts, signed logs, structured eval results — so the audit is a query, not a project.
+The engineer emits **audit-ready evidence** as a by-product of the build (`OSCAL` component and
+assessment artefacts, signed logs, structured eval results) so the audit is a query, not a project.
 This is **continuous assurance**: the control's status is a live signal, not a point-in-time
 attestation. **Maps to** Assurance & Continuous Compliance.
 
@@ -88,7 +88,7 @@ attestation. **Maps to** Assurance & Continuous Compliance.
 
 The engineer reads the obligation well enough to build the control that meets it: turning an AI Act
 article, an ISO/IEC 42001 control or a NIST AI RMF subcategory into a gate, a registry field or an
-evidence artefact — and back, so an auditor can trace the control to the obligation. This is
+evidence artefact, and back, so an auditor can trace the control to the obligation. This is
 translation, not legal advice; the engineer depends on Legal to confirm the obligation is read right.
 **Maps to** all five layers; it is the spine that chapter 08 indexes.
 
@@ -121,9 +121,9 @@ but does different work and is measured differently.
 
 | Dimension | AI governance analyst | AI governance engineer |
 |---|---|---|
-| **Evidence artefact** | A point-in-time artefact — an attestation, a questionnaire, an exported report — compiled for a review | A continuously emitted artefact — a query result, an eval run, a signed log — produced as the pipeline runs |
+| **Evidence artefact** | A point-in-time artefact (an attestation, a questionnaire, an exported report) compiled for a review | A continuously emitted artefact (a query result, an eval run, a signed log) produced as the pipeline runs |
 | **Primary source** | Works from the system's reported description: documentation, summaries and vendor answers | Works from the running system: the registry and production telemetry, the same signals the build emits |
-| **Toolset** | Spreadsheets, a GRC/AI-governance platform, ticketing | Python, `OPA/Rego`, Git, CI/CD, eval harnesses, `OSCAL` — plus the platform |
+| **Toolset** | Spreadsheets, a GRC/AI-governance platform, ticketing | Python, `OPA/Rego`, Git, CI/CD, eval harnesses, `OSCAL`, plus the platform |
 | **Cadence** | Periodic: quarterly reviews, annual assessments | Continuous: every commit, deploy and runtime call |
 | **Output** | A report, a mapping matrix, a risk rating | A merged-or-blocked build, a registered agent, a machine-readable evidence artefact |
 | **Success metric** | Audit passed, framework coverage complete | Control failures caught before the auditor arrives, and realised risk measurably reduced |
@@ -140,15 +140,15 @@ failure mode by title alone.
 ## The career ladder
 
 The role has observable rungs, each defined by what the person can be trusted to own end to end, not
-by years served — and verifiable by looking at the systems, not a self-assessment.
+by years served, and verifiable by looking at the systems, not a self-assessment.
 
 1. **Associate.** Runs existing controls: adds an eval to a suite, registers an agent correctly,
    produces evidence from a control someone else built.
-2. **AI governance engineer.** Builds a control end to end — one obligation into a gate, an eval suite
-   for a system class, wired into CI/CD — and owns at least one workflow for a product area.
+2. **AI governance engineer.** Builds a control end to end (one obligation into a gate, an eval suite
+   for a system class, wired into CI/CD) and owns at least one workflow for a product area.
 3. **Senior.** Owns a full workflow across the organisation and designs the paved path others adopt;
    the registry, eval gate or evidence pipeline they built is the standard template.
-4. **Staff / principal.** Owns the reference architecture — how the five layers fit together — and the
+4. **Staff / principal.** Owns the reference architecture (how the five layers fit together) and the
    cross-cutting decisions (identity model, evidence format, incident path).
 5. **Head of AI governance engineering.** Owns the function and its shared ownership with engineering,
    measured by realised risk reduction, not by controls stopped. A public engineering-manager posting
@@ -166,8 +166,8 @@ strength and adding what it lacks.
   assessment into a versioned, executable artefact (a FRIA-as-code template, a policy in `OPA/Rego`),
   and learn enough pipeline to see where the control fires. Start at policy-as-code and intake.
 - **From Security or GRC.** Your edge is the control mindset; your gap is the model layer. GRC
-  engineering already taught the parent moves — policy-as-code, continuous assurance, evidence as a
-  by-product [2]; add the AI-specific objects: evals as controls, agent identity and scope, and the
+  engineering already taught the parent moves: policy-as-code, continuous assurance, evidence as a
+  by-product [2]. Add the AI-specific objects: evals as controls, agent identity and scope, and the
   model and agent failure modes of the OWASP Agentic Top 10 [8]. Start at evals-as-evidence and the
   agent registry.
 - **From MLOps or ML engineering.** Your edge is the runtime data path everyone else lacks; your gap
@@ -176,12 +176,12 @@ strength and adding what it lacks.
 
 ## The market
 
-The role is defined by the workflows above, not by the vacancies — but the market is forming and the
+The role is defined by the workflows above, not by the vacancies. But the market is forming and the
 evidence is public, and it corroborates the shape of the work. Treat every figure as sourced; salary
 points are survey medians or posting ranges, not guarantees.
 
 **Survey bands.** The IAPP Salary & Jobs Report 2025-26 (1,600+ respondents, 60+ countries) puts
-technical AI-governance roles in the tech sector at a median of USD 221,000 — its highest band —
+technical AI-governance roles in the tech sector at a median of USD 221,000 (its highest band)
 against USD 151,800 for AI-governance work generally and USD 169,700 for combined privacy-and-AI-
 governance roles [9]. The premium is for the technical, build-the-control end of the discipline, which
 is exactly the role this chapter describes.
@@ -191,13 +191,13 @@ observability/monitoring in 41-42% of AI-governance listings, Python in 27-28%, 
 about 27%, foundation-model familiarity in 25.6% and cloud in 18.2%; median advertised pay was USD
 169,000 and median required experience five years [7]. And the demand signal is broad: LinkedIn's 2026
 Skills on the Rise lists governance and responsible-AI skills among its fastest-rising clusters,
-alongside the technical AI capabilities [10]. The load-bearing signal is the skills mix —
-observability, Python, the runtime data path — not the salary headline.
+alongside the technical AI capabilities [10]. The load-bearing signal is the skills mix
+(observability, Python, the runtime data path), not the salary headline.
 
-> **Postings (footnote).** Individual September 2026 postings corroborate the bands across seniorities
-> — an "AI Governance Engineer" at USD 175,000-260,000 [4], a governance VP at USD 120,000-202,500 [3],
+> **Postings (footnote).** Individual September 2026 postings corroborate the bands across seniorities:
+> an "AI Governance Engineer" at USD 175,000-260,000 [4], a governance VP at USD 120,000-202,500 [3],
 > another engineer role at USD 100,000-150,000 [6], and a GRC engineering-manager role at USD 405,000
-> [5] — but named vacancies are a lagging, noisy signal, kept here as corroboration and out of the
+> [5]. But named vacancies are a lagging, noisy signal, kept here as corroboration and out of the
 > argument. The role is the workflows, not the requisition.
 
 ## What employers get wrong in the job description
@@ -206,10 +206,10 @@ Reading the postings against the workflows above, three mistakes recur.
 
 - **Certifications as a proxy for capability.** Descriptions list AIGP, CIPP, CISSP and CISM as if a
   certificate produced a control. The Axial data shows certs appear in under 11% of postings each [7];
-  the load-bearing skills — eval harnesses, policy-as-code, the runtime data path — are the ones the
+  the load-bearing skills (eval harnesses, policy-as-code, the runtime data path) are the ones the
   JD under-specifies. Ask for the workflow, then the cert if it helps.
 - **Analyst work under an engineer title.** Many "AI Governance Engineer" postings describe intake,
-  mapping and reporting — analyst work — at engineer pay. The tell is the absence of any build: no
+  mapping and reporting (analyst work) at engineer pay. The tell is the absence of any build: no
   eval gate, no registry integration, no evidence pipeline.
 - **Everything, in one hire.** A single posting asks for policy-as-code, red teaming, identity,
   observability, incident response, regulatory translation and stakeholder management. That is a

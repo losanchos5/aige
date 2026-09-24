@@ -4,7 +4,7 @@
   "registry": "Layer 02 Inventory & Transparency: the agent registry, the runtime-aware inventory of every model, service and agent with an owner, a scope and a status, fed by the deploy pipeline.",
   "aibom": "Layer 02: the AIBOM, the bill of materials recording models, datasets, weights and their provenance, generated at build and stored with the registry entry.",
   "eval-gate": "Layer 03 Evals & Red Teaming as Evidence: the eval gate that runs the suites in CI and fails the build when a result drops below its agreed threshold.",
-  "eval-suites": "Layer 03: the versioned eval suites — capability, adversarial and safety-threshold — whose structured results are filed against the registry entry as evidence.",
+  "eval-suites": "Layer 03: the versioned eval suites (capability, adversarial and safety-threshold) whose structured results are filed against the registry entry as evidence.",
   "guardrails": "Layer 04 Runtime Controls & Observability: runtime guardrails that mediate tool calls and input/output, enforcing the scope the registry declares and streaming decisions and traces.",
   "identity": "Layer 04: each agent's own workload identity with a bounded scope and a tested kill switch that revokes access without breaking the fleet.",
   "evidence-store": "Layer 05 Assurance & Continuous Compliance: the assurance store that the lower layers write into and an auditor reads from, holding machine-readable OSCAL evidence so the audit is a query.",

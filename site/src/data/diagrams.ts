@@ -64,7 +64,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'workflow',
     title: 'Eval Gate in CI',
     caption:
-      'How a model or prompt change moves through an eval gate in CI — capability and adversarial evals against a versioned suite, a threshold that ships the release or blocks it and files the result against the registry — generated from the Body of Knowledge.',
+      'How a model or prompt change moves through an eval gate in CI: capability and adversarial evals against a versioned suite, a threshold that ships the release or blocks it and files the result against the registry. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Eval Gate in CI', at: 'head' },
     ],
@@ -74,7 +74,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'workflow',
     title: 'Incident Pipeline and Kill Switch',
     caption:
-      'The runtime incident pipeline and kill switch: a signal trips a circuit breaker that revokes one agent’s scope without breaking the fleet, while triage opens a reportable incident on the statutory clock — generated from the Body of Knowledge.',
+      'The runtime incident pipeline and kill switch: a signal trips a circuit breaker that revokes one agent’s scope without breaking the fleet, while triage opens a reportable incident on the statutory clock. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Incident Pipeline', at: 'head' },
     ],
@@ -84,7 +84,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'architecture',
     title: 'Agent Registry and Scoped Identity',
     caption:
-      'How the deploy pipeline registers each agent, issues it a scoped workload identity, and files signed evidence an auditor can attribute — with a policy gate that denies the unregistered — generated from the Body of Knowledge.',
+      'How the deploy pipeline registers each agent, issues it a scoped workload identity, and files signed evidence an auditor can attribute, with a policy gate that denies the unregistered. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Agent Registry', at: 'head' },
     ],
@@ -94,7 +94,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'sequence',
     title: 'How the AI governance engineer works',
     caption:
-      'The sequence an AI governance engineer runs across the workflows it owns, from intake and inventory through evals, gates and runtime to assurance evidence — generated from the Body of Knowledge.',
+      'The sequence an AI governance engineer runs across the workflows it owns, from intake and inventory through evals, gates and runtime to assurance evidence. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'the-role', at: 'lead' }],
   },
   {
@@ -102,7 +102,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'lifecycle',
     title: 'The five maturity levels',
     caption:
-      'The five maturity levels from Documented to Continuous, each proven by what the running systems show — with the trap that stalls the climb between them — generated from the Body of Knowledge.',
+      'The five maturity levels from Documented to Continuous, each proven by what the running systems show, with the trap that stalls the climb between them. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'maturity-model', at: 'lead' }],
   },
   {
@@ -110,7 +110,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'dataflow',
     title: 'From obligation to evidence',
     caption:
-      'How a regulatory obligation flows to the engineering artefact that satisfies or supports it and the stack layer that artefact lives in — the reverse index made visible — generated from the Body of Knowledge.',
+      'How a regulatory obligation flows to the engineering artefact that satisfies or supports it and the stack layer that artefact lives in: the reverse index made visible. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'regulatory-map', at: 'lead' }],
   },
   {
@@ -118,7 +118,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'architecture',
     title: 'Where AI governance engineering sits',
     caption:
-      'Where AI governance engineering sits among the adjacent roles — analyst, platform and assurance — turning governance intent into running controls and evidence — generated from the Body of Knowledge.',
+      'Where AI governance engineering sits among the adjacent roles (analyst, platform and assurance), turning governance intent into running controls and evidence. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'definition', at: 'lead' }],
   },
   {
@@ -126,7 +126,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'architecture',
     title: 'Reference toolchain by stack layer',
     caption:
-      'The reference toolchain mapped to the five stack layers, from policy engines and the agent registry up to guardrails, observability and the assurance store — generated from the Body of Knowledge.',
+      'The reference toolchain mapped to the five stack layers, from policy engines and the agent registry up to guardrails, observability and the assurance store. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'the-stack', section: 'The cost of the stack', at: 'foot' }],
   },
   {
@@ -134,7 +134,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'workflow',
     title: 'Policy Card',
     caption:
-      'A governance rule travels as a versioned policy card that a policy engine evaluates at one gate, recording an allow-or-deny verdict against every change. Start by writing one card for one obligation and wiring it to that gate — generated from the Body of Knowledge.',
+      'A governance rule travels as a versioned policy card that a policy engine evaluates at one gate, recording an allow-or-deny verdict against every change. Start by writing one card for one obligation and wiring it to that gate. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Policy Card', at: 'head' },
     ],
@@ -144,7 +144,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'dataflow',
     title: 'AIBOM at Build',
     caption:
-      'The build step emits an AI bill of materials that lands on the registry entry and feeds the vulnerability-matching and documentation consumers. If your build does not emit it, you cannot answer what is running — generated from the Body of Knowledge.',
+      'The build step emits an AI bill of materials that lands on the registry entry and feeds the vulnerability-matching and documentation consumers. If your build does not emit it, you cannot answer what is running. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'patterns', section: 'Pattern: AIBOM', at: 'head' }],
   },
   {
@@ -152,7 +152,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'workflow',
     title: 'Model Card as Evidence',
     caption:
-      'The model card is generated from real training and eval outputs, checked against a schema at one gate, and attached to the release as control evidence. A hand-written card is documentation; a generated, validated one is a control — generated from the Body of Knowledge.',
+      'The model card is generated from real training and eval outputs, checked against a schema at one gate, and attached to the release as control evidence. A hand-written card is documentation; a generated, validated one is a control. Generated from the Body of Knowledge.',
     placements: [
       {
         chapter: 'patterns',
@@ -166,7 +166,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'dataflow',
     title: 'Continuous Assurance Telemetry',
     caption:
-      'Runtime signals are checked against controls continuously, and every check writes an evidence record an auditor can read from the assurance store. Continuous means the evidence is produced by the data path, not a quarterly exercise — generated from the Body of Knowledge.',
+      'Runtime signals are checked against controls continuously, and every check writes an evidence record an auditor can read from the assurance store. Continuous means the evidence is produced by the data path, not a quarterly exercise. Generated from the Body of Knowledge.',
     placements: [
       {
         chapter: 'patterns',
@@ -180,7 +180,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'workflow',
     title: 'FRIA-as-Code',
     caption:
-      'The fundamental-rights impact assessment is captured as data at intake, assessed and mitigated, then approved at a human gate and stored machine-readable beside the DPIA. Run it before deploying a high-risk system and keep the record where the auditor looks — generated from the Body of Knowledge.',
+      'The fundamental-rights impact assessment is captured as data at intake, assessed and mitigated, then approved at a human gate and stored machine-readable beside the DPIA. Run it before deploying a high-risk system and keep the record where the auditor looks. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: FRIA-as-Code', at: 'head' },
     ],
@@ -190,7 +190,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'architecture',
     title: 'Framework Crosswalk',
     caption:
-      'One internal control set is the hub that external frameworks map onto, with evidence attached once to the hub and reused for all of them. The crosswalk is an index, not the end state — the hub is what you maintain — generated from the Body of Knowledge.',
+      'One internal control set is the hub that external frameworks map onto, with evidence attached once to the hub and reused for all of them. The crosswalk is an index, not the end state; the hub is what you maintain. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Framework Crosswalk', at: 'head' },
     ],
@@ -200,7 +200,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'dataflow',
     title: 'Machine-Readable Evidence',
     caption:
-      'Controls, assessments and evidence become OSCAL documents that a validator checks and assurance consumers read without anyone re-typing them. Choose the format your assessor can ingest and generate it from data you already hold — generated from the Body of Knowledge.',
+      'Controls, assessments and evidence become OSCAL documents that a validator checks and assurance consumers read without anyone re-typing them. Choose the format your assessor can ingest and generate it from data you already hold. Generated from the Body of Knowledge.',
     placements: [
       {
         chapter: 'patterns',
@@ -214,7 +214,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'workflow',
     title: 'Adversarial Red-Team Suite',
     caption:
-      'A versioned adversarial suite built from a threat taxonomy runs in CI or on a schedule, and every finding is fixed or accepted on the record and filed as evidence, with fixes feeding back into the suite. Treat red-team findings like test failures, with an owner and a deadline — generated from the Body of Knowledge.',
+      'A versioned adversarial suite built from a threat taxonomy runs in CI or on a schedule, and every finding is fixed or accepted on the record and filed as evidence, with fixes feeding back into the suite. Treat red-team findings like test failures, with an owner and a deadline. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Adversarial Red-Team Suite', at: 'head' },
     ],
@@ -224,7 +224,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'architecture',
     title: 'Runtime Guardrail',
     caption:
-      'Input and output guardrails on the model or agent path enforce the same policy card that CI evaluated and emit a decision event on every call to the assurance store and, on a breach, to the circuit breaker. A guardrail without events is a filter, not a control — generated from the Body of Knowledge.',
+      'Input and output guardrails on the model or agent path enforce the same policy card that CI evaluated and emit a decision event on every call to the assurance store and, on a breach, to the circuit breaker. A guardrail without events is a filter, not a control. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Runtime Guardrail', at: 'head' },
     ],
@@ -234,7 +234,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'architecture',
     title: 'Kill Switch and Circuit Breaker',
     caption:
-      'A breaker trips on a signal and revokes one agent’s scope while the rest of the fleet keeps running, and the trip itself becomes an incident record. Design the breaker per agent scope before you need it and test the trip in staging — generated from the Body of Knowledge.',
+      'A breaker trips on a signal and revokes one agent’s scope while the rest of the fleet keeps running, and the trip itself becomes an incident record. Design the breaker per agent scope before you need it and test the trip in staging. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Kill Switch / Circuit Breaker', at: 'head' },
     ],
@@ -244,7 +244,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'sequence',
     title: 'Agent Identity and Scoped Credentials',
     caption:
-      'An agent receives a short-lived, scoped credential from its registry entry at deploy time, and every downstream call is verified and attributed in the audit log. No registry entry, no credential, no access — generated from the Body of Knowledge.',
+      'An agent receives a short-lived, scoped credential from its registry entry at deploy time, and every downstream call is verified and attributed in the audit log. No registry entry, no credential, no access. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Agent Identity & Scoped Credentials', at: 'head' },
     ],
@@ -254,7 +254,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'sequence',
     title: 'Human-in-the-loop Gate',
     caption:
-      'For the actions the policy marks as needing a human, the agent pauses, a named reviewer decides within a time box, and the decision is logged as evidence. Define which actions need a human by policy, not by habit — generated from the Body of Knowledge.',
+      'For the actions the policy marks as needing a human, the agent pauses, a named reviewer decides within a time box, and the decision is logged as evidence. Define which actions need a human by policy, not by habit. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Human-in-the-loop Gate', at: 'head' },
     ],
@@ -264,7 +264,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'workflow',
     title: 'Shadow-AI Discovery',
     caption:
-      'Discovery scans the places AI hides, matches each finding against the registry, and turns unknowns into registry entries or blocks, leaving a discovery report. Run it before you claim your inventory is complete — generated from the Body of Knowledge.',
+      'Discovery scans the places AI hides, matches each finding against the registry, and turns unknowns into registry entries or blocks, leaving a discovery report. Run it before you claim your inventory is complete. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Shadow-AI Discovery', at: 'head' },
     ],
@@ -274,7 +274,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'workflow',
     title: 'Vendor and Model Due-Diligence Gate',
     caption:
-      'A procured model or tool enters the inventory only after a gate that checks its documentation, evals and contract terms, and the outcome is recorded with any conditions. The gate is where deployer duties start, so keep its checklist versioned — generated from the Body of Knowledge.',
+      'A procured model or tool enters the inventory only after a gate that checks its documentation, evals and contract terms, and the outcome is recorded with any conditions. The gate is where deployer duties start, so keep its checklist versioned. Generated from the Body of Knowledge.',
     placements: [
       { chapter: 'patterns', section: 'Pattern: Vendor / Model Due-Diligence Gate', at: 'head' },
     ],
@@ -284,7 +284,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'architecture',
     title: 'The five layers and their artefacts',
     caption:
-      'The five layers of the stack in their canonical order, each holding the artefacts it produces, with evidence flowing up into assurance. Read the chapter layer by layer, then build in the order it gives for a team of one — generated from the Body of Knowledge.',
+      'The five layers of the stack in their canonical order, each holding the artefacts it produces, with evidence flowing up into assurance. Read the chapter layer by layer, then build in the order it gives for a team of one. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'the-stack', at: 'lead' }],
   },
   {
@@ -292,7 +292,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'lifecycle',
     title: 'The regulatory window',
     caption:
-      'The obligations that are live now and the deferred deadlines that follow them, as the chapter states them as of 2026-09-19. Pick the next stage and map its obligations to artefacts in chapter 08 — generated from the Body of Knowledge.',
+      'The obligations that are live now and the deferred deadlines that follow them, as the chapter states them as of 2026-09-19. Pick the next stage and map its obligations to artefacts in chapter 08. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'why-now', at: 'lead' }],
   },
   // The two hero diagrams are placed by the home page (src/pages/index.astro),
@@ -301,14 +301,14 @@ export const diagrams: readonly DiagramDef[] = [
     id: 'hero-loop',
     type: 'dataflow',
     title: 'The evidence loop',
-    caption: 'The evidence loop on the home page — generated from the Body of Knowledge.',
+    caption: 'The evidence loop on the home page. Generated from the Body of Knowledge.',
     placements: [],
   },
   {
     id: 'hero-loop-tall',
     type: 'dataflow',
     title: 'The evidence loop (tall)',
-    caption: 'The evidence loop, stacked for narrow screens — generated from the Body of Knowledge.',
+    caption: 'The evidence loop, stacked for narrow screens. Generated from the Body of Knowledge.',
     placements: [],
   },
 ] as const;

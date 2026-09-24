@@ -81,6 +81,11 @@ function validate(type, jsonPath) {
   }
 }
 
+// Every em dash, and the spaces around it, becomes the site's ' · ' separator.
+function dedash(text) {
+  return text.replace(/\s*—\s*/g, ' · ');
+}
+
 // Isolate the single <svg>…</svg> block from the rendered viewer and rewrite it
 // for safe inline embedding: prefix every internal id (and every reference to
 // one) with "<id>-" so several diagrams can coexist on one page, drop the
@@ -232,7 +237,10 @@ async function main() {
       process.exit(1);
     }
 
-    const html = readFileSync(htmlTmp, 'utf8');
+    // The site publishes no em dash (the owner's rule, enforced by
+    // content-lint): archify's own viewer strings ("{label} — current
+    // chapter") take the site's " · " separator instead.
+    const html = dedash(readFileSync(htmlTmp, 'utf8'));
     let svg;
     try {
       svg = transformSvg(html, id);

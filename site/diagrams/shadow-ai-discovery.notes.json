@@ -8,5 +8,5 @@
   "triage": "Each unknown opens an entry with an owner to claim it, and the unclaimed are escalated.",
   "registered": "An unknown is auto-registered as an unclaimed entry until its owner claims it, and the result feeds the registry's drift check.",
   "blocked": "An unclaimed agent has its scope frozen until an owner claims it.",
-  "report": "The reconciliation produces a discovery report — the machine-readable evidence that the inventory was checked against reality."
+  "report": "The reconciliation produces a discovery report, the machine-readable evidence that the inventory was checked against reality."
 }

@@ -21,7 +21,7 @@ from layer 03 and a guardrail decision from layer 04 are not four disconnected r
 structured artefact with a timestamp and an owner, and layer 05 is where they are aggregated into
 audit-ready evidence. The test of the whole stack is the test from the Thesis: as Ayoub Fandi puts
 it, a green dashboard over a broken control is "theatre with extra steps" [1]. The stack is the
-plumbing that makes the dashboard mean something — every green cell traces to a running control and the
+plumbing that makes the dashboard mean something: every green cell traces to a running control and the
 evidence it emitted.
 
 The five layers, named exactly and in order, are: **01 Govern-as-Code · 02 Inventory & Transparency ·
@@ -29,24 +29,24 @@ The five layers, named exactly and in order, are: **01 Govern-as-Code · 02 Inve
 Compliance.** They map onto the three questions the discipline must answer at any moment. Layers 01 and
 02 answer *what AI is running* and *what it is allowed to do*. Layers 03 and 05 answer *what evidence
 proves it*. Layer 04 keeps all three answers true as the system changes underneath them. The threats
-the controls are built against — goal hijack, tool misuse, agent identity and privilege abuse, rogue
-agents — are catalogued in OWASP's Top 10 for Agentic Applications 2026 [2].
+the controls are built against (goal hijack, tool misuse, agent identity and privilege abuse, rogue
+agents) are catalogued in OWASP's Top 10 for Agentic Applications 2026 [2].
 
 Three of these layers are inherited, not invented. Govern-as-Code (01), machine-readable evidence
 (part of 02 and 05) and Assurance & Continuous Compliance (05) come almost unchanged from GRC
-engineering. Layers 03 and 04 — evals and red-teaming as controls, and agent identity and runtime
-control — are what AI forces the discipline to add, because a model whose behaviour must be tested and
+engineering. Layers 03 and 04 (evals and red-teaming as controls, and agent identity and runtime
+control) are what AI forces the discipline to add, because a model whose behaviour must be tested and
 an autonomous actor that acts under delegated authority have no analogue in classic GRC. The new work
 concentrates there; the rest is a specialisation of a method that already works.
 
 Every tool named below is an example of a category, not a recommendation. The categories are the
 substance; the brands are illustrative and interchangeable.
 
-## Layer 01 — Govern-as-Code
+## Layer 01: Govern-as-Code
 
 **What it proves.** That a governance rule exists as an executable artefact, not a paragraph, and that
 it evaluated a specific change and returned a decision. The proof is a policy verdict tied to a commit,
-a pull request or a deploy — machine-readable and reproducible.
+a pull request or a deploy, machine-readable and reproducible.
 
 **The artefacts.** An AI governance engineer ships policy-as-code: rules written in a policy language
 that a pipeline evaluates. Typical artefacts are a policy library under version control, a set of
@@ -57,16 +57,16 @@ gate", "an agent may not be granted a tool scope it did not declare". Each rule 
 human-readable statement of intent as its documentation, but the enforced version is the code.
 
 **Reference tools and standards (illustrative).** Policy engines express allow/deny logic. `OPA/Rego`
-is the general default for non-authorization policy — data residency, deploy gating, configuration
-constraints — while `Cedar` is narrower: an authorization language, strongest for "may this principal
+is the general default for non-authorization policy (data residency, deploy gating, configuration
+constraints), while `Cedar` is narrower: an authorization language, strongest for "may this principal
 take this action on this resource?" and a poor fit for policy that is not an access decision. Choose by
 the shape of the rule, not the brand. Beyond general-purpose engines, one proposed approach is Policy
 Cards: a research proposal for a machine-readable, deployment-layer artefact that encodes operational,
 regulatory and ethical constraints for an agent and links them to enforcement and audit pipelines [3];
-it is a single preprint, promising but not yet a standard, and the point it makes — that the rule
-should travel with the agent as data — stands whichever format wins. Crosswalks reference the
+it is a single preprint, promising but not yet a standard, and the point it makes, that the rule
+should travel with the agent as data, stands whichever format wins. Crosswalks reference the
 frameworks themselves: ISO/IEC 42001 (the AI management
-system), NIST AI RMF and its four functions — Govern, Map, Measure, Manage [4] — the EU AI Act, and the
+system), NIST AI RMF and its four functions (Govern, Map, Measure, Manage [4]), the EU AI Act, and the
 CSA AI Controls Matrix (AICM) v1.1, which offers 247 control objectives across 18 domains as a control
 vocabulary to map against [5]. Vendors are illustrative; the standards are not.
 
@@ -87,7 +87,7 @@ vocabulary to map against [5]. Vendors are illustrative; the standards are not.
 - The "policy library" that is a folder of Word documents nobody can query, enforced by email and
   self-attested in a spreadsheet.
 - The crosswalk maintained as a 300-row matrix in a separate tool, drifting from the policies it claims
-  to describe — coverage presented as control.
+  to describe: coverage presented as control.
 
 **Evidence to the next layer.** The policy verdict is the first evidence artefact. But a verdict is
 only meaningful against a known object: "deny deploy of model X" presumes the stack knows model X
@@ -101,16 +101,16 @@ exists, who owns it and what it is. That object is what layer 02 supplies.
 **Maps to:** EU AI Act Art. 9 (risk management) · ISO/IEC 42001 · NIST AI RMF (Govern) · CSA AICM ·
 OWASP Agentic ASI02/ASI03. Mappings are illustrative, not a claim of conformity.
 
-## Layer 02 — Inventory & Transparency
+## Layer 02: Inventory & Transparency
 
-**What it proves.** That the organisation knows what AI is running — which models, systems and agents
-are live, in which version, owned by whom — and that each has the transparency documentation an
+**What it proves.** That the organisation knows what AI is running (which models, systems and agents
+are live, in which version, owned by whom), and that each has the transparency documentation an
 obligation demands. The proof is a registry entry and its attached documents, ideally written by a
 deployment pipeline rather than typed by hand.
 
 **The artefacts.** The core artefact is the **agent registry**: the runtime-aware inventory of every
 model, service and agent, each with an owner, a scope and a status. Around it sit the transparency
-documents — model cards and data cards — and the **AIBOM**, the bill of materials for an AI system.
+documents (model cards and data cards) and the **AIBOM**, the bill of materials for an AI system.
 FRIA and DPIA references hang off the registry entry for systems that need them, so the inventory is
 also the index of which system has which impact assessment.
 
@@ -127,7 +127,7 @@ day it was edited.
 
 - Every model, system and agent in production has a registry entry with an owner, a version and a
   declared scope; an unregistered artefact cannot reach production.
-- The registry is fed by the deployment pipeline, not by manual entry — a new deploy registers itself.
+- The registry is fed by the deployment pipeline, not by manual entry; a new deploy registers itself.
 - Each high-risk system links to its model card, data card and, where required, its FRIA/DPIA.
 - An AIBOM is generated at build for each AI system and stored with the registry entry.
 - A discovery mechanism periodically reconciles the registry against what is actually running and flags
@@ -138,44 +138,44 @@ day it was edited.
 - The hand-maintained model inventory that answers "what is running?" correctly on the day it is edited
   and is wrong within a week.
 - Transparency documents written once at launch and never regenerated when the model, prompt or dataset
-  changes — a model card describing a model that no longer exists.
+  changes: a model card describing a model that no longer exists.
 
 **Evidence to the next layer.** The registry entry names the object under test. An eval in layer 03 is
 run *against a registered version* and its result is filed *against that entry*, so the question "was
-this model tested?" is answered by a join, not a search. The AIBOM tells the eval layer what to test —
+this model tested?" is answered by a join, not a search. The AIBOM tells the eval layer what to test:
 which model, which datasets, which provenance claims need adversarial probing.
 
-> **In practice** Wiring the registry to the deployment pipeline — so `csa-01` registered itself, with
-> an owner and a scope, at deploy time — turned "documented" into "governed". Its registry entry became
+> **In practice** Wiring the registry to the deployment pipeline (so `csa-01` registered itself, with
+> an owner and a scope, at deploy time) turned "documented" into "governed". Its registry entry became
 > a query answered from production, not from a slide.
 
 **Maps to:** EU AI Act Art. 11 (technical documentation), Art. 49/71 (registration and the EU
 database), Art. 50 (transparency) · ISO/IEC 42001 · NIST AI RMF (Map) · CSA AICM · OWASP Agentic
 ASI10.
 
-## Layer 03 — Evals & Red Teaming as Evidence
+## Layer 03: Evals & Red Teaming as Evidence
 
 **What it proves.** That the model or agent passed a defined test whose failure has consequences. This
 is the layer where the principle "give every control teeth" becomes concrete for evals: a benchmark
 that only informs a committee is not a control; an eval wired into an **eval gate** that can fail the
 build is.
-The proof is a structured eval result — pass or fail against a threshold, versioned alongside the model
+The proof is a structured eval result: pass or fail against a threshold, versioned alongside the model
 it tested.
 
 **The artefacts.** An engineer ships eval suites and the gate that runs them. Three families recur:
-capability and quality evals (does the system do its job — groundedness, regression against a golden
+capability and quality evals (does the system do its job: groundedness, regression against a golden
 set), adversarial and red-team evals (does it resist jailbreaks, prompt injection, tool misuse), and
 safety-threshold evals tied to a policy from layer 01 (a PII-leakage bound, an injection-resistance
 floor). The gate is a pipeline stage: if the eval drops below the agreed threshold, the pipeline fails
 and the release does not ship.
 
-**Reference tools and standards (illustrative).** Evaluation frameworks such as Inspect — maintained on
-behalf of the UK AI Security Institute [7] — promptfoo and DeepEval run capability and regression
+**Reference tools and standards (illustrative).** Evaluation frameworks such as Inspect (maintained on
+behalf of the UK AI Security Institute [7]), promptfoo and DeepEval run capability and regression
 suites; Garak, Mindgard and Giskard run adversarial and vulnerability probes; Ragas covers
 retrieval-augmented quality. Adversarial testing is not only good practice: the GPAI Code of Practice
 lists adversarial testing and red-teaming among the evaluation approaches expected of GPAI models with
 systemic risk, though the Code is voluntary and scoped to those models [8]. The eval result is the
-evidence artefact that layer 05 will aggregate — which is why it must be machine-readable, not a
+evidence artefact that layer 05 will aggregate, which is why it must be machine-readable, not a
 screenshot pasted into a slide.
 
 **Definition of done.**
@@ -183,7 +183,7 @@ screenshot pasted into a slide.
 - Each model or agent has an eval suite versioned in the same repository and updated when the system
   changes.
 - At least one adversarial eval and one capability eval run in CI, with a documented threshold.
-- A failing eval blocks the deploy — the gate has teeth, not just a report.
+- A failing eval blocks the deploy; the gate has teeth, not just a report.
 - Every eval run emits a structured result (suite id, model version, score, threshold, pass/fail,
   timestamp) filed against the registry entry.
 - Thresholds trace to a named failure mode or obligation, not to a round number chosen for comfort.
@@ -193,21 +193,21 @@ screenshot pasted into a slide.
 - The one-off pre-launch evaluation whose results are pasted into a slide and never re-run when the
   model or its prompts change.
 - The "risk review board" that rates findings low/medium/high monthly but has no mechanism to stop a
-  launch already scheduled — recommendation without consequence.
+  launch already scheduled: recommendation without consequence.
 
 **Evidence to the next layer.** An eval proves the system was safe *at test time*. The system then
 meets inputs no eval anticipated. Layer 04 carries the same thresholds into production as runtime
-guardrails, and the eval result becomes the baseline that runtime telemetry is compared against — a
+guardrails, and the eval result becomes the baseline that runtime telemetry is compared against. A
 drop in live injection-resistance against the tested baseline is a signal, not a surprise.
 
 > **In practice** A red-team eval suite combining Inspect and Garak ran in CI for `csa-01`; a release
 > that dropped its injection resistance below the agreed floor failed the pipeline until fixed. The
-> eval's output — not a reviewer's opinion — was the assurance evidence filed against the model version.
+> eval's output, not a reviewer's opinion, was the assurance evidence filed against the model version.
 
 **Maps to:** EU AI Act Art. 15 (accuracy, robustness, cybersecurity), Art. 55 (GPAI systemic-risk
 evaluation) · ISO/IEC 42001 · NIST AI RMF (Measure) · CSA AICM · OWASP Agentic ASI01/ASI02.
 
-## Layer 04 — Runtime Controls & Observability
+## Layer 04: Runtime Controls & Observability
 
 **What it proves.** That the controls hold while the system is acting, and that its behaviour is
 observed. Policies and evals are point-in-time; agents act continuously, on inputs no one reviewed.
@@ -217,7 +217,7 @@ scope, and that there is a tested way to stop it. The proof is a stream of runti
 **The artefacts.** Three groups. Guardrails: input/output filters, tool-call mediation, the enforcement
 point where a policy from layer 01 fires against a live request. Observability: tracing and monitoring
 that turn agent behaviour into a control signal. Agent runtime identity: every non-human actor with its
-own workload identity, a bounded scope, and a **kill switch** — a tested way to revoke access and stop
+own workload identity, a bounded scope, and a **kill switch**, a tested way to revoke access and stop
 an agent without breaking the fleet. Register and bound every actor before it acts: no agent acts
 before it has an identity, an owner and a scope.
 
@@ -226,19 +226,19 @@ Meta LlamaFirewall and Lakera enforce input/output and tool-call policy; observa
 Langfuse and Arize Phoenix build on OpenTelemetry to trace agent runs. Agent identity has two distinct
 questions the tools should not be allowed to blur. The first is **channel authentication**: how a
 client authenticates to a tool server on one hop. The Model Context Protocol specification of
-2026-07-28 tightened exactly this — deprecating Dynamic Client Registration in favour of Client ID
+2026-07-28 tightened exactly this: deprecating Dynamic Client Registration in favour of Client ID
 Metadata Documents and binding credentials to their issuer [9]. That hardens the MCP connection; it is
 not the identity model for the agent. The second is **agent workload identity**: a durable, attributable
 identity the agent carries across every hop, tool and protocol, under which its actions are logged and
-its access revoked. That is the job of a workload-identity system — SPIFFE/SPIRE, or first-class agent
-identities from enterprise providers (for example Microsoft Entra Agent ID, Okta Agent SSO) — not of
+its access revoked. That is the job of a workload-identity system, such as SPIFFE/SPIRE or first-class agent
+identities from enterprise providers (for example Microsoft Entra Agent ID, Okta Agent SSO), not of
 MCP, which secures one channel. Conflating the two leaves an agent well-authenticated on the MCP hop
 and still unattributable everywhere else. NIST's NCCoE set out the open questions in its February 2026
 concept
 paper on software and AI agent identity and authorization: how identification, authentication and
 authorization apply so each agent is "known, trusted, and properly governed", including non-repudiation
 and tamper-proof logging [10]. Gartner expects that by 2029 more than half of successful attacks on AI
-agents will exploit access-control weaknesses and prompt injection [11] — the failure modes this layer
+agents will exploit access-control weaknesses and prompt injection [11], the failure modes this layer
 exists to contain.
 
 **Definition of done.**
@@ -247,7 +247,7 @@ exists to contain.
   static key across functions.
 - A guardrail mediates tool calls and input/output for each agent, enforcing the scope declared in the
   registry.
-- A kill switch exists and has been tested — revoking one agent's access does not break the others.
+- A kill switch exists and has been tested: revoking one agent's access does not break the others.
 - Every agent run is traced, and traces carry the agent identity, the tools called and the policy
   verdicts that fired.
 - Runtime signals are compared against the eval baseline from layer 03, and a regression raises an
@@ -257,23 +257,23 @@ exists to contain.
 
 - A fleet of agents sharing one API key and one privileged service account: an incident means rotating
   one secret and breaking everything, and attribution is impossible.
-- Guardrails that log but never block — observability mistaken for control, so the system watches
+- Guardrails that log but never block: observability mistaken for control, so the system watches
   itself fail in high resolution.
 
 **Evidence to the next layer.** Every guardrail decision, trace and identity event is a timestamped,
 structured record. Layer 05 does not re-collect this evidence; it subscribes to it. Runtime is where
-continuous assurance gets its continuity — the difference between an attestation that a control existed
+continuous assurance gets its continuity: the difference between an attestation that a control existed
 and evidence that it fired, on a specific call, at a specific time.
 
 > **In practice** `csa-01` was issued a distinct workload identity with an owner and a declared scope,
 > as was every other agent in the telco; when it misbehaved it was traced to its identity and revoked
-> without touching the others. The kill switch was tested on a schedule — an untested kill switch is a
+> without touching the others. The kill switch was tested on a schedule. An untested kill switch is a
 > claim, not a control.
 
 **Maps to:** EU AI Act Art. 14 (human oversight), Art. 15 (robustness, cybersecurity), Art. 12
 (logging) · ISO/IEC 42001 · NIST AI RMF (Manage) · CSA AICM · OWASP Agentic ASI02/ASI03/ASI10.
 
-## Layer 05 — Assurance & Continuous Compliance
+## Layer 05: Assurance & Continuous Compliance
 
 **What it proves.** That the controls below are working, continuously, and that the proof is
 machine-readable and audit-ready. This is where evidence stops being a by-product and becomes the
@@ -287,7 +287,7 @@ substrate is NIST's native model: a control layer (`catalog`, `profile`), an imp
 (`component-definition`, `system-security-plan`) and an assessment layer (`assessment-plan`,
 `assessment-results`, `POA&M`), with traceability from an assessment result back to the control it
 tested [15]. That model is the part to build on; the AI-specific additions on top are still forming.
-One proposed approach — a single 2026 preprint, not a standard — extends OSCAL with sixteen property
+One proposed approach (a single 2026 preprint, not a standard) extends OSCAL with sixteen property
 extensions for lifecycle phase, enforcement semantics and risk traceability, in a three-layer
 compliance-as-code architecture that generates OSCAL assessment results automatically [13]. Treat it
 as an early answer to a real gap the authors name well: frameworks "such as the EU AI Act, ISO/IEC
@@ -312,8 +312,8 @@ does not by itself satisfy it, and confers no presumption of conformity under Ar
   sprint.
 - A serious-incident pipeline can detect, triage and report on the clock, with the Art. 73 timelines
   encoded, not remembered.
-- The assurance store measures realised risk reduction — the failure-mode rate, the time-to-detect,
-  the blast radius — not framework coverage.
+- The assurance store measures realised risk reduction (the failure-mode rate, the time-to-detect,
+  the blast radius), not framework coverage.
 
 **Anti-patterns.**
 
@@ -340,7 +340,7 @@ The five layers govern models and agents; they are only as sound as the data und
 governance is not one layer but a thread through all five. Training data, fine-tuning sets, retrieval
 corpora, prompts and outputs each carry a lawful basis, a provenance, a retention limit and a set of
 rights, and each is an object the stack must be able to name. In layer 02 this is the **data card** and
-the lineage record — where a dataset came from, what it may be used for, when it must be deleted —
+the lineage record (where a dataset came from, what it may be used for, when it must be deleted),
 attached to the registry entry beside the model card. In layer 01 it is retention-and-residency policy
 as code. In layer 03 it is data-quality and bias tests run against the set, not assumed of it. The EU
 AI Act treats this as a first-class duty: Article 10 requires representative, relevant and
@@ -355,8 +355,8 @@ makes every layer above it unprovable.
 ## Designing human oversight (Article 14)
 
 Human oversight is a control to be engineered, not a reassurance to be asserted. EU AI Act Article 14
-requires that high-risk systems be designed so a person can *effectively* oversee them — understand the
-output, decide against it, and stop the system — and the hard part is that undifferentiated oversight
+requires that high-risk systems be designed so a person can *effectively* oversee them (understand the
+output, decide against it, and stop the system), and the hard part is that undifferentiated oversight
 fails in both directions. Human review of every action destroys the value of automation; nominal
 oversight of a firehose of actions is a rubber stamp, and a rubber stamp is worse than none because it
 launders the decision. Two failure modes have to be designed against explicitly. **Automation bias**:
@@ -364,19 +364,19 @@ a reviewer who sees a confident machine output will tend to confirm it, so overs
 "approve/reject" on the model's proposal is oversight in name only. **Oversight that degrades**: a gate
 that a person can clear in two seconds under load will be cleared in two seconds, and its quality falls
 silently as volume rises. The engineering answer is to classify actions by consequence and place a
-designed checkpoint only where the stakes justify the latency — the
-[**Human-in-the-loop Gate**](/bok/patterns#pattern-human-in-the-loop-gate) pattern (chapter 05) — giving the reviewer enough context to disagree, logging the approver and the decision as
+designed checkpoint only where the stakes justify the latency (the
+[**Human-in-the-loop Gate**](/bok/patterns#pattern-human-in-the-loop-gate) pattern in chapter 05), giving the reviewer enough context to disagree, logging the approver and the decision as
 evidence, and monitoring the oversight itself (approval rate, time-to-decide, override rate) as a
 signal that can degrade. Oversight you do not measure is oversight you cannot claim.
 
 ## Third-party and procured AI
 
 Most organisations do not train the models they run. They buy SaaS with an embedded LLM, call an
-API-only foundation model, or inherit an agent inside a vendor's product — and for those, the parts of
+API-only foundation model, or inherit an agent inside a vendor's product; for those, the parts of
 the stack that assume you own the model degrade. You cannot red-team weights you cannot reach, and an
 **eval gate** (layer 03) can only test the vendor's system as a black box, at its boundary, not its
 internals. Runtime control (layer 04) narrows to what the integration exposes: the tool scopes you
-grant, the identity you issue the vendor's agent, the traffic you can observe — not the model's own
+grant, the identity you issue the vendor's agent, the traffic you can observe, not the model's own
 behaviour. The layers do not disappear, but layer 03 shrinks to boundary evals and reliance on the
 vendor's own evidence, and layer 04 shrinks to the perimeter you control. What grows to compensate is
 inventory and assurance: the vendor's system still needs a registry entry, an owner and a scope; its
@@ -405,15 +405,15 @@ the first budget round, which is its own governance failure.
 
 Most AI governance functions are small, and many are a single person: in the adjacent GRC discipline,
 roughly half of teams are four people or fewer and about one in six is a team of one [14]. A team of
-one cannot build all five layers at depth, but it can build the spine thinly, end to end — one vertical
+one cannot build all five layers at depth, but it can build the spine thinly, end to end: one vertical
 slice that touches every layer beats one layer built out and four left on paper. Start where the
 leverage is highest and the cost is lowest:
 
 - **Layer 02 first, minimally.** A registry that a deploy writes to, with an owner and a scope per
   entry. If you can answer "what is running and who owns it?" from a live source, you have more than
   most.
-- **One policy in layer 01 with teeth.** A single rule that matters — no deploy without a registered
-  owner, or a data-residency check — as code, in the pipeline, blocking on failure. One control that
+- **One policy in layer 01 with teeth.** A single rule that matters (no deploy without a registered
+  owner, or a data-residency check), as code, in the pipeline, blocking on failure. One control that
   bites beats a hundred that recommend.
 - **One eval gate in layer 03.** One adversarial eval against your highest-risk agent, wired so a
   regression fails the build. Reuse an open framework; do not write your own harness.
@@ -424,45 +424,45 @@ leverage is highest and the cost is lowest:
   screenshots.
 
 The order is deliberate: see it, rule it, test it, contain it, prove it. A thin vertical slice answers
-all three questions for one system today and widens as the team grows. The alternative — a thick layer
-01 of policies with no inventory beneath them — answers none of the three questions, and is exactly the
+all three questions for one system today and widens as the team grows. The alternative, a thick layer
+01 of policies with no inventory beneath them, answers none of the three questions, and is exactly the
 framework theatre the discipline exists to end.
 
 ## One system through the five layers
 
 `csa-01`, the customer-service assistant from the boxes above, is one system, not five. Below is the
-single artefact it produces at each layer — short excerpts of the schemas defined in chapter 05, each
+single artefact it produces at each layer: short excerpts of the schemas defined in chapter 05, each
 illustrative.
 
-**Layer 01 — Govern-as-Code** — a Policy Card verdict (illustrative):
+**Layer 01: Govern-as-Code.** A Policy Card verdict (illustrative):
 
 ```json
 { "rule_id": "residency.eu-only.v3", "decision": "deny",
   "input_hash": "sha256:9f2b…", "timestamp": "2026-09-18T14:07:11Z" }
 ```
 
-**Layer 02 — Inventory & Transparency** — its registry entry (illustrative):
+**Layer 02: Inventory & Transparency.** Its registry entry (illustrative):
 
 ```json
 { "id": "csa-01", "owner": "team-support-platform",
   "scope": ["refunds:read", "orders:read"], "expiry": "2026-12-17" }
 ```
 
-**Layer 03 — Evals & Red Teaming as Evidence** — an eval-gate result (illustrative):
+**Layer 03: Evals & Red Teaming as Evidence.** An eval-gate result (illustrative):
 
 ```json
 { "suite_id": "injection-resistance.v4", "model_version": "csa-01@2026-09-18",
   "score": 0.982, "threshold": 0.95, "result": "pass" }
 ```
 
-**Layer 04 — Runtime Controls & Observability** — a guardrail event (illustrative):
+**Layer 04: Runtime Controls & Observability.** A guardrail event (illustrative):
 
 ```json
 { "agent": "csa-01", "direction": "output", "rule_id": "output.pii.v2",
   "decision": "block", "timestamp": "2026-09-18T14:31:52Z" }
 ```
 
-**Layer 05 — Assurance & Continuous Compliance** — the evidence record it emits (illustrative):
+**Layer 05: Assurance & Continuous Compliance.** The evidence record it emits (illustrative):
 
 ```json
 { "control_id": "guardrail.output.pii.v2", "subject": "csa-01@2026-09-18",
@@ -480,7 +480,7 @@ The five excerpts are one data path from policy to proof, keyed on the same regi
 [4] AI Risk Management Framework (AI RMF 1.0). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
 [5] AI Controls Matrix (AICM) v1.1 (247 control objectives across 18 domains). Cloud Security Alliance. 2026-06-22. https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1 (verified: primary)
 [6] "Evolving AI Transparency: the AIBOM generator's new home at OWASP" (CycloneDX output). OWASP GenAI Security Project. 2025-12-18. https://genai.owasp.org/2025/12/18/evolving-ai-transparency-the-journey-of-the-aibom-generator-and-its-new-home-at-owasp/ (verified: primary)
-[7] Inspect — a framework for large language model evaluations (UK AI Security Institute). GitHub. 2026. https://github.com/UKGovernmentBEIS/inspect_ai (verified: primary)
+[7] Inspect: a framework for large language model evaluations (UK AI Security Institute). GitHub. 2026. https://github.com/UKGovernmentBEIS/inspect_ai (verified: primary)
 [8] GPAI Code of Practice, Safety & Security chapter (adversarial testing / red-teaming for systemic-risk models; voluntary; published 10 Jul 2025). European Commission. 2025-07-10. https://artificialintelligenceact.eu/code-of-practice-overview/ (verified: primary)
 [9] Model Context Protocol specification 2026-07-28 (DCR deprecated in favour of CIMD; issuer-bound credentials). MCP. 2026-07-28. https://blog.modelcontextprotocol.io/posts/2026-07-28/ (verified: primary)
 [10] "Accelerating the Adoption of Software and AI Agent Identity and Authorization" (concept paper; "known, trusted, and properly governed"). NIST NCCoE. 2026-02-05. https://www.nccoe.nist.gov/news-insights/new-concept-paper-identity-and-authority-software-agents (verified: primary)

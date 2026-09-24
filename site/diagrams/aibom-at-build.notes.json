@@ -1,9 +1,9 @@
 {
-  "model": "The foundation model and any fine-tunes that make up the system — the classic SBOM captures software dependencies but not models.",
+  "model": "The foundation model and any fine-tunes that make up the system; the classic SBOM captures software dependencies but not models.",
   "datasets": "The datasets, corpus snapshots and prompt templates the system is built on, with their licences and provenance.",
   "dependencies": "The third-party libraries and packages the system links, whose provenance supply-chain risk turns on.",
   "build": "The build pipeline, instrumented to produce its own proof: it captures the composition of the system as it is assembled.",
-  "aibom": "The AI bill of materials emitted at build in a standard format — labelled CycloneDX ML-BOM or the SPDX 3.0 AI profile — covering models, datasets, prompts, dependencies and their provenance and licences.",
+  "aibom": "The AI bill of materials emitted at build in a standard format (labelled CycloneDX ML-BOM or the SPDX 3.0 AI profile), covering models, datasets, prompts, dependencies and their provenance and licences.",
   "registry": "The registry entry the AIBOM is attached to; regenerating it on each build keeps it from drifting from the deployed system.",
   "vuln": "Vulnerability matching and supply-chain risk assessment, answered as a query over the AIBOM rather than reconstructed by hand.",
   "docs": "Regulator-facing transparency and GPAI documentation, generated from the AIBOM to answer which model, from which provenance, trained on which data, is inside the system."

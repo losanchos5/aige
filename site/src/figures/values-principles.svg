@@ -2,7 +2,7 @@
   <title id="fig-values-principles-t">Values and principles</title>
   <desc id="fig-values-principles-d">Two groups: the eight values as affirmations of which way to lean, and the six principles as commitments to act.</desc>
   <text class="mono muted" x="16" y="20" font-size="13.5">Eight values · six principles</text>
-  <text class="disp" x="16" y="54" font-size="15">Eight values — which way to lean</text>
+  <text class="disp" x="16" y="54" font-size="15">Eight values: which way to lean</text>
   <line class="rule" x1="16" y1="62" x2="344" y2="62"/>
   <text class="mono muted" x="16" y="83" font-size="13.5">01</text>
   <text x="44" y="83" font-size="14">Governance is code, not a document</text>
@@ -27,7 +27,7 @@
   <text class="mono muted" x="16" y="360" font-size="13.5">08</text>
   <text x="44" y="360" font-size="14">Governance is owned with engineering,</text>
   <text x="44" y="377" font-size="14">not enforced from outside</text>
-  <text class="disp" x="16" y="403" font-size="15">Six principles — what to do on Monday</text>
+  <text class="disp" x="16" y="403" font-size="15">Six principles: what to do on Monday</text>
   <line class="rule" x1="16" y1="411" x2="344" y2="411"/>
   <text class="mono muted" x="16" y="432" font-size="13.5">01</text>
   <text x="44" y="432" font-size="14">Build the control at the earliest point</text>

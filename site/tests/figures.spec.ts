@@ -47,7 +47,7 @@ test('every figure has an SVG on disk and its placement headings exist', () => {
   for (const figure of figures) {
     const svg = resolve(process.cwd(), 'src/figures', `${figure.id}.svg`);
     expect(existsSync(svg), `${figure.id}.svg exists`).toBe(true);
-    expect(figure.caption).toContain('— drawn from chapter');
+    expect(figure.caption).toContain('Drawn from chapter');
     expect(figure.alt.trim().length).toBeGreaterThan(0);
     expect(figure.description.trim().length).toBeGreaterThan(0);
 

@@ -68,7 +68,7 @@ test.describe('obligation export endpoints', () => {
     const text = await res.text();
     const firstLine = text.split(/\r?\n/)[0];
     expect(firstLine).toMatch(
-      /^Illustrative mapping from the AI Governance Engineer Body of Knowledge v[\d.]+ — not a claim of conformity$/,
+      /^Illustrative mapping from the AI Governance Engineer Body of Knowledge v[\d.]+ \(not a claim of conformity\)$/,
     );
     // A header row and at least one obligation row follow.
     const lines = text.split(/\r?\n/).filter(Boolean);

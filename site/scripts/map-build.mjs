@@ -518,7 +518,7 @@ export function renderPortrait(map, site) {
   const r = renderMap(map, 'portrait', { site });
   const title = 'The map of the discipline';
   const desc =
-    'A two-sided mind map: a central AI Governance Engineer node with eight branches — Foundations, Values and principles, The Stack, Patterns, The Role, Obligations, Maturity and the Learning path — each with its second-level topics.';
+    'A two-sided mind map: a central AI Governance Engineer node with eight branches (Foundations, Values and principles, The Stack, Patterns, The Role, Obligations, Maturity and the Learning path), each with its second-level topics.';
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${r.width} ${r.height}" role="img" aria-labelledby="map-t map-d">\n` +
     `<title id="map-t">${esc(title)}</title>\n` +

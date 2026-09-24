@@ -4,12 +4,12 @@
 
 <img width="1128" height="191" alt="cover-headline-1128x191" src="https://github.com/user-attachments/assets/52123838-69ef-4bc1-9814-39ac0354dd6a" />
 
-**AI governance engineering is the application of engineering practice — systems thinking, product
-thinking and code — to the governance of AI systems.**
+**AI governance engineering is the application of engineering practice (systems thinking, product
+thinking and code) to the governance of AI systems.**
 
 This repository is the founding text of that discipline: a short **Thesis** and a growing **body of
-knowledge**. It is written for practitioners who build governance for AI systems — policy-as-
-code, agent registries, eval gates, runtime guardrails, machine-readable evidence — and who measure
+knowledge**. It is written for practitioners who build governance for AI systems (policy-as-
+code, agent registries, eval gates, runtime guardrails, machine-readable evidence) and who measure
 their work by realised risk reduction and audit-ready evidence, not by framework coverage.
 
 It is **version 0.4.0**: the Thesis restated as affirmations over a peer-reviewed revision of the
@@ -17,16 +17,16 @@ first public draft, still deliberately incomplete and open to contributions. The
 website, datasets and project materials are authored by **Jorge García Aibar**. The Thesis is the sole
 exception: it is co-authored by **Jorge García Aibar and Aurélie Pols** and is open for signatures.
 
-**Home:** https://aigovernanceengineer.com — the Thesis at `/thesis`, Body of Knowledge at `/bok`.
+**Home:** https://aigovernanceengineer.com (the Thesis at `/thesis`, Body of Knowledge at `/bok`).
 Source repository: `github.com/losanchos5/aige`.
 
 ## Start here
 
-- **[THESIS.md](THESIS.md)** — the founding statement: definition, the five problems with legacy
-  AI governance, eight values, six principles, what AI governance engineers build.
-- **[bok/01-definition.md](bok/01-definition.md)** — what the discipline is, and the eight neighbours
+- **[THESIS.md](THESIS.md)**: the founding statement (definition, the five problems with legacy
+  AI governance, eight values, six principles, what AI governance engineers build).
+- **[bok/01-definition.md](bok/01-definition.md)**: what the discipline is, and the eight neighbours
   it is not.
-- **[OUTLINE.md](OUTLINE.md)** — the full table of contents (chapters 00–10) with a brief for each.
+- **[OUTLINE.md](OUTLINE.md)**: the full table of contents (chapters 00–10) with a brief for each.
 
 ## Structure
 
@@ -42,7 +42,7 @@ aige/
 │   ├── 02-why-now.md          The five problems with the evidence; market, regulatory and agent signals
 │   ├── 03-values-principles.md  The eight values and six principles, expanded
 │   ├── 04-the-stack.md        The five-layer reference architecture
-│   ├── 05-patterns.md         Pattern catalogue (CSIRO template) — 14 patterns
+│   ├── 05-patterns.md         Pattern catalogue (CSIRO template), 14 patterns
 │   ├── 06-the-role.md         The AI governance engineer, by workflow, skills and market
 │   ├── 07-maturity-model.md   Five levels from Documented to Continuous
 │   ├── 08-regulatory-map.md   Obligation → artefact → layer reverse index
@@ -63,11 +63,11 @@ welcome and credited.
 
 The artefacts an AI governance engineer ships map onto five layers, always named in this order:
 
-1. **Govern-as-Code** — policy-as-code, framework crosswalks, gates in CI/CD.
-2. **Inventory & Transparency** — agent registry, AIBOM, model and data cards, FRIA/DPIA.
-3. **Evals & Red Teaming as Evidence** — adversarial and capability evals wired into the pipeline.
-4. **Runtime Controls & Observability** — guardrails, agent identity, tracing, kill switches.
-5. **Assurance & Continuous Compliance** — machine-readable evidence (OSCAL), continuous assurance,
+1. **Govern-as-Code**: policy-as-code, framework crosswalks, gates in CI/CD.
+2. **Inventory & Transparency**: agent registry, AIBOM, model and data cards, FRIA/DPIA.
+3. **Evals & Red Teaming as Evidence**: adversarial and capability evals wired into the pipeline.
+4. **Runtime Controls & Observability**: guardrails, agent identity, tracing, kill switches.
+5. **Assurance & Continuous Compliance**: machine-readable evidence (OSCAL), continuous assurance,
    serious-incident reporting.
 
 ## Open datasets

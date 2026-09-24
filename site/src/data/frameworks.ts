@@ -114,7 +114,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'ISO/IEC',
     url: 'https://www.iso.org/standard/42006',
     summary:
-      'Requirements for bodies providing audit and certification of AI management systems (2025). It builds on ISO/IEC 17021-1 and sets the competence and consistency a certification body must meet to credibly certify an organisation to ISO/IEC 42001 — in short, who may credibly certify you to 42001.',
+      'Requirements for bodies providing audit and certification of AI management systems (2025). It builds on ISO/IEC 17021-1 and sets the competence and consistency a certification body must meet to credibly certify an organisation to ISO/IEC 42001: in short, who may credibly certify you to 42001.',
   },
   {
     id: 'iso-23894',
@@ -134,7 +134,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'NIST',
     url: 'https://www.nist.gov/itl/ai-risk-management-framework',
     summary:
-      'The AI Risk Management Framework 1.0 (January 2023; there is no 2.0). Voluntary and US-origin, it organises risk work into four functions — Govern, Map, Measure, Manage — that map cleanly onto the five-layer stack.',
+      'The AI Risk Management Framework 1.0 (January 2023; there is no 2.0). Voluntary and US-origin, it organises risk work into four functions (Govern, Map, Measure, Manage) that map cleanly onto the five-layer stack.',
   },
   {
     id: 'nist-ai-agent-standards',
@@ -154,7 +154,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'NIST',
     url: 'https://csrc.nist.gov/pubs/ir/8596/iprd',
     summary:
-      'A draft Cybersecurity Framework (CSF 2.0) profile for AI — the Cyber AI Profile — organised around Secure, Defend and Thwart. Initial public draft released 16 December 2025; still in draft.',
+      'A draft Cybersecurity Framework (CSF 2.0) profile for AI, the Cyber AI Profile, organised around Secure, Defend and Thwart. Initial public draft released 16 December 2025; still in draft.',
   },
   {
     id: 'nist-ai-800-1',
@@ -294,7 +294,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'IMDA / AI Verify Foundation',
     url: 'https://aiverifyfoundation.sg/wp-content/uploads/2024/05/Model-AI-Governance-Framework-for-Generative-AI-May-2024-1-1.pdf',
     summary:
-      "Singapore's voluntary Model AI Governance Framework for Generative AI (IMDA and the AI Verify Foundation, May 2024). It sets out governance dimensions — testing, transparency, incident reporting, security and content provenance — as guidance, not law.",
+      "Singapore's voluntary Model AI Governance Framework for Generative AI (IMDA and the AI Verify Foundation, May 2024). It sets out governance dimensions (testing, transparency, incident reporting, security and content provenance) as guidance, not law.",
   },
   {
     id: 'cn-algo-recommendation',
@@ -364,7 +364,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'ETSI',
     url: 'https://www.etsi.org/newsroom/press-releases/2627-etsi-releases-world-leading-standard-for-securing-ai/',
     summary:
-      'Securing Artificial Intelligence (SAI); Baseline Cyber Security Requirements for AI Models and Systems (V2.1.1, December 2025). A cross-border European standard setting 13 security principles across the five stages of the AI lifecycle — a cyber-security baseline, not an EU AI Act harmonised standard.',
+      'Securing Artificial Intelligence (SAI); Baseline Cyber Security Requirements for AI Models and Systems (V2.1.1, December 2025). A cross-border European standard setting 13 security principles across the five stages of the AI lifecycle: a cyber-security baseline, not an EU AI Act harmonised standard.',
   },
   {
     id: 'en-18286',
@@ -374,7 +374,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'CEN-CENELEC',
     url: 'https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/',
     summary:
-      'The Article 17 QMS standard, published July 2026 — the first JTC 21 AI Act standard to reach publication — but not yet cited in the Official Journal, so it carries no presumption of conformity.',
+      'The Article 17 QMS standard, published July 2026 (the first JTC 21 AI Act standard to reach publication) but not yet cited in the Official Journal, so it carries no presumption of conformity.',
   },
 ] as const;
 
@@ -718,7 +718,7 @@ export const obligations: readonly Obligation[] = [
   {
     framework: 'ISO/IEC 42006',
     obligation:
-      'ISO/IEC 42006:2025 — requirements for AIMS certification bodies',
+      'ISO/IEC 42006:2025 requirements for AIMS certification bodies',
     artefact:
       'Accredited certification scope; auditor-competence evidence; certificate register',
     layerN: [5],
@@ -726,7 +726,7 @@ export const obligations: readonly Obligation[] = [
   },
   {
     framework: 'ISO/IEC 23894',
-    obligation: 'ISO/IEC 23894:2023 — guidance on AI risk management',
+    obligation: 'ISO/IEC 23894:2023 guidance on AI risk management',
     artefact:
       'Risk register as code; AI risk taxonomy; linkage to EU AI Act Art. 9 and the NIST AI RMF',
     layerN: [1, 3],
@@ -791,7 +791,7 @@ export const obligations: readonly Obligation[] = [
   // CSA AICM and STAR for AI
   {
     framework: 'CSA AICM / STAR for AI',
-    obligation: 'AICM v1.1 — 247 control objectives across 18 domains',
+    obligation: 'AICM v1.1: 247 control objectives across 18 domains',
     artefact:
       'Control catalogue mapped to policy-as-code and evals; crosswalk to ISO 42001 / NIST AI RMF',
     layerN: [1, 3, 5],
@@ -799,7 +799,7 @@ export const obligations: readonly Obligation[] = [
   },
   {
     framework: 'CSA AICM / STAR for AI',
-    obligation: 'STAR for AI — assurance and certification programme',
+    obligation: 'STAR for AI assurance and certification programme',
     artefact:
       'Machine-readable evidence submission; continuous assurance telemetry',
     layerN: [5],
@@ -912,7 +912,7 @@ export const obligations: readonly Obligation[] = [
   {
     framework: 'Other jurisdictions',
     obligation:
-      'UK ADM safeguards — Data (Use and Access) Act 2025, UK GDPR Arts. 22A–22D (in force 2026-02-05)',
+      'UK ADM safeguards: Data (Use and Access) Act 2025, UK GDPR Arts. 22A–22D (in force 2026-02-05)',
     artefact:
       'ADM safeguards: meaningful-human-review path, contest and representation channel, decision notice',
     layerN: [4, 2],
@@ -974,7 +974,7 @@ export const obligations: readonly Obligation[] = [
   {
     framework: 'China',
     obligation:
-      'TC260 AI Safety Governance Framework 3.0 — operators\' guidelines §5.3 (voluntary; 2026-09-14)',
+      'TC260 AI Safety Governance Framework 3.0: operators\' guidelines §5.3 (voluntary; 2026-09-14)',
     artefact:
       'Risk register keyed to the framework\'s taxonomy; log-retention policy (six months) with audit; real-time risk monitoring; resilience assessment',
     layerN: [1, 4, 5],
@@ -983,7 +983,7 @@ export const obligations: readonly Obligation[] = [
   {
     framework: 'China',
     obligation:
-      'TC260 Framework 3.0 Appendix 2 — agentic AI risk management (voluntary; 2026-09-14)',
+      'TC260 Framework 3.0 Appendix 2: agentic AI risk management (voluntary; 2026-09-14)',
     artefact:
       'Agent registry with identity and scope; approval-log store; tool allow-list with integrity checks; runtime guardrails and kill switch; memory-scope policy; decommissioning runbook',
     layerN: [2, 3, 4, 5],

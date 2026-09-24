@@ -1,9 +1,9 @@
 {
   "obligation": "The EU AI Act's Article 9 risk-management duty is the obligation the loop exists to answer: a legal requirement stated in prose, not yet anything a running system can enforce.",
-  "policy": "Policy-as-code compiles that obligation into an executable rule — deny model.deploy unless eval.safety ≥ 0.95 — so the requirement becomes a gate the pipeline applies rather than a paragraph someone must remember.",
+  "policy": "Policy-as-code compiles that obligation into an executable rule (deny model.deploy unless eval.safety ≥ 0.95), so the requirement becomes a gate the pipeline applies rather than a paragraph someone must remember.",
   "inventory": "The inventory is the registry of what is actually running, here the support-bot agent owned by the platform team, so every control and every piece of evidence attaches to a named, owned system.",
   "eval": "The eval gate runs the safety evaluation and checks the result against the policy threshold; recording eval.safety 0.97 ≥ 0.95 turns a measurement into a pass/fail decision the build must respect.",
-  "runtime": "Runtime controls keep the governed behaviour true after deploy — guardrails on, tools scoped, traces intact — so the promise made at the gate holds while the agent is live, not only at release.",
+  "runtime": "Runtime controls keep the governed behaviour true after deploy (guardrails on, tools scoped, traces intact), so the promise made at the gate holds while the agent is live, not only at release.",
   "evidence": "The evidence store captures the signed attestation as a machine-readable record produced as a by-product of the build, so the proof that the controls fired exists before anyone asks for it.",
   "auditor": "For the auditor the whole loop collapses to a query against that evidence: assurance becomes something a regulator can read as data, not a screenshot reassembled after the fact."
 }

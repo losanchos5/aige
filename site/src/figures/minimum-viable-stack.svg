@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 480" class="figc" role="img" aria-labelledby="fig-mvs-t fig-mvs-d">
   <title id="fig-mvs-t">The minimum viable stack</title>
-  <desc id="fig-mvs-d">Five ordered steps — see it, rule it, test it, contain it, prove it — one per stack layer, chained top to bottom.</desc>
+  <desc id="fig-mvs-d">Five ordered steps (see it, rule it, test it, contain it, prove it), one per stack layer, chained top to bottom.</desc>
 
   <text class="mono muted" x="16" y="20" font-size="13.5">One vertical slice, every layer</text>
 

@@ -1,9 +1,9 @@
 {
-  "intake": "The fundamental-rights impact assessment starts as a structured intake questionnaire — data, not a Word document — covering intended use and context of deployment.",
+  "intake": "The fundamental-rights impact assessment starts as a structured intake questionnaire (data, not a Word document) covering intended use and context of deployment.",
   "dpia": "The GDPR Art. 35 data-protection impact assessment, cross-referenced so shared elements are written once and the two assessments do not drift apart.",
   "assessment": "A rights-risk assessment over the affected groups and the risks to their rights, re-opened when the system changes rather than described at a single moment.",
-  "mitigations": "For each identified risk, a mitigation linked to the control that implements it — a Policy Card, an Eval Gate or a runtime guardrail.",
+  "mitigations": "For each identified risk, a mitigation linked to the control that implements it: a Policy Card, an Eval Gate or a runtime guardrail.",
   "gate": "The single approval gate where a named reviewer signs off on the residual risk before a high-risk system is deployed under EU AI Act Art. 27.",
-  "reviewer": "The human reviewer — DPO, legal or compliance — accountable for the sign-off at the gate.",
+  "reviewer": "The human reviewer (DPO, legal or compliance) accountable for the sign-off at the gate.",
   "record": "The machine-readable FRIA record produced by the sign-off, versioned and stored with the registry entry where the auditor looks."
 }

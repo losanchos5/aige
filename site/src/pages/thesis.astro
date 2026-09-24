@@ -17,7 +17,7 @@ const { Content, headings, remarkPluginFrontmatter } = await render(entry);
 const title = (remarkPluginFrontmatter.title as string | undefined) ?? 'The AI Governance Engineering Thesis';
 const summary =
   (remarkPluginFrontmatter.summary as string | undefined) ??
-  'Governance as a system to be built, run and measured — not a document to be signed.';
+  'Governance as a system to be built, run and measured, not a document to be signed.';
 // The visible lede is one line; the search snippet has ~160 characters to spend,
 // so the meta description restates the same claims the opening paragraph makes
 // (executable policy, a control in the pipeline, evidence produced by the build).

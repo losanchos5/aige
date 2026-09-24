@@ -3,8 +3,8 @@
 > This chapter is the reverse index of every "Maps to" line in the book: for each obligation it names
 > the engineering artefact that satisfies or supports it and the stack layer the artefact lives in.
 
-Every other chapter maps *forward* — a capability, then the obligations it touches. This chapter maps
-*backward* — an obligation, then the artefact and the layer that answer it. The unit of the map is a
+Every other chapter maps *forward*: a capability, then the obligations it touches. This chapter maps
+*backward*: an obligation, then the artefact and the layer that answer it. The unit of the map is a
 row: an obligation, the engineering artefact that produces the evidence for it, and one of the five
 stack layers (chapter 04): **1 Govern-as-Code · 2 Inventory & Transparency · 3 Evals & Red Teaming as
 Evidence · 4 Runtime Controls & Observability · 5 Assurance & Continuous Compliance**. The map is a
@@ -38,21 +38,21 @@ Transparency (Article 50) went live on 2 August 2026 and was not moved [5]. Lega
 high-risk systems keep their original 2 August 2030 date [2].
 
 The **Duty holder** column names who the obligation binds, which is a different axis from who enforces
-it. The high-risk design-and-build duties — Articles 9 to 15 and 17 — fall on the **provider**;
+it. The high-risk design-and-build duties (Articles 9 to 15 and 17) fall on the **provider**;
 Articles 26 and 27 fall on the **deployer**; Articles 4, 5 and 50 bind **both**; and Articles 53 and
 55 bind the **GPAI provider**. Article 25 sits across the value chain: it sets the conditions under
 which a distributor, importer or deployer itself becomes a **provider** and inherits the provider
 duties. This matters for the engineer because the artefacts you can produce
 depend on which hat your organisation wears: a deployer cannot draw up the provider's technical
-documentation, but it must run the Article 26 monitoring and the Article 27 FRIA — and when the model
+documentation, but it must run the Article 26 monitoring and the Article 27 FRIA; and when the model
 is procured, most of the provider-side evidence becomes something you collect rather than produce (see
 the Vendor / Model Due-Diligence Gate in chapter 05).
 
 **Article 16** is the umbrella for the provider's high-risk duties. It adds no artefact of its own; it
-gathers the obligations the rows below break out article by article — the requirements of Articles 9
+gathers the obligations the rows below break out article by article: the requirements of Articles 9
 to 15 and 17, the conformity assessment (Article 43), the EU declaration of conformity (Article 47),
 registration (Articles 49 and 71), post-market monitoring (Article 72) and serious-incident reporting
-(Article 73) — so it reads here as a cross-reference, not a row [22].
+(Article 73). So it reads here as a cross-reference, not a row [22].
 
 | Article | Obligation | Engineering artefact | Layer | Duty holder | Applies (post-Omnibus) | Authority |
 |---|---|---|---|---|---|---|
@@ -115,7 +115,7 @@ conformity [9]. Signatory status is dynamic and counted per the Commission's off
 For serious-incident reporting specifically, the Commission published a reporting template on 4
 November 2025 for serious incidents involving GPAI models with systemic risk. It aligns to the
 Article 55 reporting duty and to Commitment 9 of the Code's Safety and Security chapter, and is the
-concrete artefact the incident pipeline emits — the same template named in the Article 55 row above
+concrete artefact the incident pipeline emits, the same template named in the Article 55 row above
 [26].
 
 ## ISO/IEC 42001, 42005 and 42006
@@ -170,7 +170,7 @@ four functions. It is voluntary and US-origin, and it maps cleanly onto the five
 
 Beyond the RMF, three newer NIST efforts bear on the stack. Two are still in draft, and the copy says
 so. The **AI Agent Standards Initiative**, launched by NIST's Center for AI Standards and Innovation
-(CAISI) on 17 February 2026, targets interoperable, secure standards for AI agents — identity,
+(CAISI) on 17 February 2026, targets interoperable, secure standards for AI agents: identity,
 authentication, authorisation and agent security [29]. The draft **IR 8596 Cyber AI Profile** (initial
 public draft, 16 December 2025) is a Cybersecurity Framework (CSF 2.0) profile for AI, organised around
 Secure, Defend and Thwart [30]. The draft **AI 800-1** (Managing Misuse Risk for Dual-Use Foundation
@@ -181,7 +181,7 @@ mitigating misuse risk across the AI lifecycle [31].
 |---|---|---|---|
 | AI Agent Standards Initiative (2026) | CAISI initiative on interoperable, secure AI agents: identity, authentication, agent security | Agent registry; non-human-identity controls; agent authentication and authorisation; adversarial agent evals | 3 · 4 |
 | IR 8596 Cyber AI Profile (draft) | CSF 2.0 profile for AI (Secure / Defend / Thwart) | AI-system security controls; runtime observability; threat detection mapped to CSF 2.0 | 3 · 4 |
-| AI 800-1 (draft) | Managing Misuse Risk for Dual-Use Foundation Models — voluntary guidance | Misuse red-team suite; capability and dangerous-capability evals; safety framework | 3 |
+| AI 800-1 (draft) | Managing Misuse Risk for Dual-Use Foundation Models (voluntary guidance) | Misuse red-team suite; capability and dangerous-capability evals; safety framework | 3 |
 
 ## CSA AICM and STAR for AI
 
@@ -204,7 +204,7 @@ controls for high-autonomy systems, meant to be proven through pilot audits rath
 ## OWASP GenAI Security Project
 
 OWASP's GenAI Security Project supplies the threat vocabulary the controls are built against, plus two
-formats — the Agent Control Standard and an AIBOM — that the stack consumes directly [16][17].
+formats (the Agent Control Standard and an AIBOM) that the stack consumes directly [16][17].
 
 | OWASP artefact | What it is | Engineering artefact | Layer |
 |---|---|---|---|
@@ -216,12 +216,12 @@ formats — the Agent Control Standard and an AIBOM — that the stack consumes 
 ## US federal and state laws
 
 The United States has no horizontal federal AI statute; the binding rules are state laws, and they
-differ in scope. Two bind only large frontier developers; two more — Texas and Colorado — reach
+differ in scope. Two bind only large frontier developers; two more, Texas and Colorado, reach
 ordinary developers and deployers.
 
 ### Frontier-developer laws
 
-Two US state laws bind only large frontier developers, not general deployers — a narrower scope than
+Two US state laws bind only large frontier developers, not general deployers: a narrower scope than
 the EU AI Act's risk-tiering. They ask frontier developers to publish safety frameworks and report
 critical incidents to the state [18][19].
 
@@ -247,25 +247,25 @@ so.
 
 | Jurisdiction / instrument | Status (as of 2026-09-19) | What it asks for | Engineering artefact | Layer |
 |---|---|---|---|---|
-| South Korea — AI Basic Act | In force 2026-01-22; a grace period runs through 2026 [34] | Baseline duties for AI operators, heightened duties for "high-impact" AI in sensitive sectors, and AI-content labelling | Risk register for high-impact AI; AI-use notification; AI-content labelling | 1 · 2 · 4 |
-| Singapore — IMDA Model AI Governance Framework for Generative AI | Voluntary; published May 2024 [39] | Governance dimensions incl. testing, transparency, incident reporting, security and content provenance | Eval suite; model cards; content provenance and watermarking | 2 · 3 · 4 |
+| South Korea: AI Basic Act | In force 2026-01-22; a grace period runs through 2026 [34] | Baseline duties for AI operators, heightened duties for "high-impact" AI in sensitive sectors, and AI-content labelling | Risk register for high-impact AI; AI-use notification; AI-content labelling | 1 · 2 · 4 |
+| Singapore: IMDA Model AI Governance Framework for Generative AI | Voluntary; published May 2024 [39] | Governance dimensions incl. testing, transparency, incident reporting, security and content provenance | Eval suite; model cards; content provenance and watermarking | 2 · 3 · 4 |
 | ETSI EN 304 223 (Securing AI) | Published (V2.1.1, Dec 2025) [40] | Baseline cyber-security requirements across the AI lifecycle (13 principles over five stages) | AI-system security controls across the lifecycle; supply-chain and AIBOM checks; runtime hardening | 4 |
 
 ### United Kingdom
 
 The UK has no horizontal AI act. It governs AI through existing sector regulators (the ICO, the FCA,
-the MHRA and others), coordinated centrally, plus the **AI Security Institute** — renamed from the AI
-Safety Institute in February 2025 — for frontier-model evaluation [38]. For automated decision-making,
+the MHRA and others), coordinated centrally, plus the **AI Security Institute** (renamed from the AI
+Safety Institute in February 2025) for frontier-model evaluation [38]. For automated decision-making,
 the Data (Use and Access) Act 2025 replaced UK GDPR Article 22 with new **Articles 22A–22D** (in force
 5 February 2026): a permission-plus-safeguards model for significant, solely automated decisions, with
-tighter conditions where special-category data is used. The safeguards — a meaningful-human-review
-path, a channel to make representations and to contest, and a decision notice — are the artefact the
+tighter conditions where special-category data is used. The safeguards (a meaningful-human-review
+path, a channel to make representations and to contest, and a decision notice) are the artefact the
 engineer builds [37].
 
 ### China
 
 China governs AI in two tiers, and this map keeps them apart. The binding tier is a set of
-departmental rules issued by the Cyberspace Administration of China (CAC) with co-issuers — on
+departmental rules issued by the Cyberspace Administration of China (CAC) with co-issuers, on
 algorithmic recommendation (2022), deep synthesis (2023), generative AI services (2023) and the
 labelling of AI-generated synthetic content (2025); several are territorial, and the Interim Measures
 for Generative AI Services apply only to services offered "to the public within the PRC" [43][44][45].
@@ -288,27 +288,27 @@ jurisdictions:
 
 | Jurisdiction / instrument | Status (as of 2026-09-20) | What it asks for | Engineering artefact | Layer |
 |---|---|---|---|---|
-| China — Provisions on the Administration of Algorithmic Recommendation in Internet Information Services (CAC, MIIT, MPS and SAMR Order No. 9) | Binding; in force 2022-03-01 [43] | Algorithm filing for services with public-opinion attributes or social-mobilisation capacity, security assessment, display of the filing number, and a user option to switch off personalised recommendation | Algorithm inventory with filing record and number; security-assessment evidence pack; opt-out control at runtime | 1 · 2 · 4 |
-| China — Provisions on the Administration of Deep Synthesis in Internet Information Services (CAC, MIIT and MPS Order No. 12) | Binding; in force 2023-01-10 [44] | Conspicuous labels where synthetic content could mislead the public and non-removable technical marks; training-data management; separate consent for face and voice editing; filing and security assessment for opinion-shaping functions | Content-provenance pipeline (visible label plus metadata mark); training-data governance record; consent gate; pre-release security assessment | 2 · 3 · 4 |
-| China — Interim Measures for the Administration of Generative AI Services (CAC and six other bodies, Order No. 15) | Binding; in force 2023-08-15; applies to services offered to the public within the PRC [45] | Lawful-source training data and foundation models; content labelling under the deep-synthesis rules; security assessment and algorithm filing for opinion-shaping services; stop, remove, retrain and report on illegal content | Data-lineage and licensing record; eval gate on generated content; incident pipeline with a retraining loop; filing record | 2 · 3 · 4 · 5 |
-| China — Measures for Labelling AI-Generated Synthetic Content, with mandatory standard GB 45438-2025 | Binding; in force 2025-09-01, the standard implemented the same day [46][47] | Explicit labels (text, audio or graphic) and implicit metadata labels carrying the provider's name or code and a content number; distribution platforms verify metadata and flag suspected AI content | Provenance and watermarking pipeline emitting the GB 45438 metadata fields; platform-side detection and flagging | 3 · 4 |
-| China — GB/T 45654-2025 Basic security requirements for generative AI services | Recommended (voluntary) national standard; implemented 2025-11-01 [48] | Training-corpus source and content screening, model-safety requirements and the evaluation methods that underpin the security assessment | Corpus-screening record; eval question banks; security-assessment report | 3 · 5 |
-| China — TC260 AI Safety Governance Framework 3.0 | Voluntary; published 2026-09-14, building on 1.0 (2024) and 2.0 (2025) [41][42] | A three-block risk taxonomy (inherent, application, secondary), technological and governance countermeasures and role-based guidelines; operators keep logs for at least six months and audit them, monitor risk in real time, keep a traceable chain of responsibility and assess resilience (§5.3) | Risk register keyed to the framework's taxonomy; log-retention policy (six months) with audit; real-time risk monitoring; resilience assessment | 1 · 4 · 5 |
-| China — TC260 Framework 3.0, Appendix 2 (agentic AI risk management) | Voluntary; published 2026-09-14 [42] | Unique identity and least-privilege permissions per agent by decision mode; human checkpoints with tamper-proof approval logs and deny-by-default; tool and skill verification; runtime guardrails (alert, restrict, intercept, suspend, terminate); memory isolation with no credentials in memory; mutual authentication; sandbox validation, red teaming and re-validation on major change; controlled decommissioning | Agent registry with identity and scope; approval-log store; tool allow-list with integrity checks; runtime guardrails and kill switch; memory-scope policy; decommissioning runbook | 2 · 3 · 4 · 5 |
+| China: Provisions on the Administration of Algorithmic Recommendation in Internet Information Services (CAC, MIIT, MPS and SAMR Order No. 9) | Binding; in force 2022-03-01 [43] | Algorithm filing for services with public-opinion attributes or social-mobilisation capacity, security assessment, display of the filing number, and a user option to switch off personalised recommendation | Algorithm inventory with filing record and number; security-assessment evidence pack; opt-out control at runtime | 1 · 2 · 4 |
+| China: Provisions on the Administration of Deep Synthesis in Internet Information Services (CAC, MIIT and MPS Order No. 12) | Binding; in force 2023-01-10 [44] | Conspicuous labels where synthetic content could mislead the public and non-removable technical marks; training-data management; separate consent for face and voice editing; filing and security assessment for opinion-shaping functions | Content-provenance pipeline (visible label plus metadata mark); training-data governance record; consent gate; pre-release security assessment | 2 · 3 · 4 |
+| China: Interim Measures for the Administration of Generative AI Services (CAC and six other bodies, Order No. 15) | Binding; in force 2023-08-15; applies to services offered to the public within the PRC [45] | Lawful-source training data and foundation models; content labelling under the deep-synthesis rules; security assessment and algorithm filing for opinion-shaping services; stop, remove, retrain and report on illegal content | Data-lineage and licensing record; eval gate on generated content; incident pipeline with a retraining loop; filing record | 2 · 3 · 4 · 5 |
+| China: Measures for Labelling AI-Generated Synthetic Content, with mandatory standard GB 45438-2025 | Binding; in force 2025-09-01, the standard implemented the same day [46][47] | Explicit labels (text, audio or graphic) and implicit metadata labels carrying the provider's name or code and a content number; distribution platforms verify metadata and flag suspected AI content | Provenance and watermarking pipeline emitting the GB 45438 metadata fields; platform-side detection and flagging | 3 · 4 |
+| China: GB/T 45654-2025 Basic security requirements for generative AI services | Recommended (voluntary) national standard; implemented 2025-11-01 [48] | Training-corpus source and content screening, model-safety requirements and the evaluation methods that underpin the security assessment | Corpus-screening record; eval question banks; security-assessment report | 3 · 5 |
+| China: TC260 AI Safety Governance Framework 3.0 | Voluntary; published 2026-09-14, building on 1.0 (2024) and 2.0 (2025) [41][42] | A three-block risk taxonomy (inherent, application, secondary), technological and governance countermeasures and role-based guidelines; operators keep logs for at least six months and audit them, monitor risk in real time, keep a traceable chain of responsibility and assess resilience (§5.3) | Risk register keyed to the framework's taxonomy; log-retention policy (six months) with audit; real-time risk monitoring; resilience assessment | 1 · 4 · 5 |
+| China: TC260 Framework 3.0, Appendix 2 (agentic AI risk management) | Voluntary; published 2026-09-14 [42] | Unique identity and least-privilege permissions per agent by decision mode; human checkpoints with tamper-proof approval logs and deny-by-default; tool and skill verification; runtime guardrails (alert, restrict, intercept, suspend, terminate); memory isolation with no credentials in memory; mutual authentication; sandbox validation, red teaming and re-validation on major change; controlled decommissioning | Agent registry with identity and scope; approval-log store; tool allow-list with integrity checks; runtime guardrails and kill switch; memory-scope policy; decommissioning runbook | 2 · 3 · 4 · 5 |
 
-Appendix 2's agent controls line up with the two agentic references this chapter already carries — the
+Appendix 2's agent controls line up with the two agentic references this chapter already carries, the
 OWASP Top 10 for Agentic Applications [16] and the NIST AI Agent Standards Initiative [29]:
 
 | Agent control | TC260 Framework 3.0, Appendix 2 [42] | OWASP Top 10 for Agentic Applications 2026 [16] | NIST AI Agent Standards Initiative [29] | Layer |
 |---|---|---|---|---|
 | Identity and least privilege | II.2: unique identity per agent, permissions by decision mode, credentials revoked at task end | ASI03 Identity & Privilege Abuse | Agent identity, authentication, authorisation | 2 · 4 |
-| Human checkpoints and approval logs | II.3: tiered controls, human control checkpoints, tamper-proof approval logs, deny by default | ASI09 Human-Agent Trust Exploitation; ASI01 Agent Goal Hijack | — | 4 · 5 |
+| Human checkpoints and approval logs | II.3: tiered controls, human control checkpoints, tamper-proof approval logs, deny by default | ASI09 Human-Agent Trust Exploitation; ASI01 Agent Goal Hijack | None | 4 · 5 |
 | Tools, skills and supply chain | II.4: tool verification, fair tool selection, anomaly detection, skill management | ASI02 Tool Misuse; ASI04 Agentic Supply Chain Vulnerabilities | Agent security | 2 · 4 |
-| Runtime guardrails and execution limits | II.5(1)(2)(5)(6): input control, guardrails, step/frequency/duration limits, sandbox isolation | ASI01 Agent Goal Hijack; ASI05 Unexpected Code Execution; ASI08 Cascading Failures; ASI10 Rogue Agents | — | 4 |
-| Memory | II.5(3): retention windows, isolation across users and tasks, no credentials in memory | ASI06 Memory & Context Poisoning | — | 3 · 4 |
+| Runtime guardrails and execution limits | II.5(1)(2)(5)(6): input control, guardrails, step/frequency/duration limits, sandbox isolation | ASI01 Agent Goal Hijack; ASI05 Unexpected Code Execution; ASI08 Cascading Failures; ASI10 Rogue Agents | None | 4 |
+| Memory | II.5(3): retention windows, isolation across users and tasks, no credentials in memory | ASI06 Memory & Context Poisoning | None | 3 · 4 |
 | Agent–model–tool communication | II.5(4): mutual authentication, integrity, replay resistance | ASI07 Insecure Inter-Agent Communication | Authentication | 4 |
 | Monitoring, audit, sandbox, red teaming, incident response | II.6: anomaly blocking, log management, security auditing, sandbox validation, red teaming, emergency plans, re-validation on major change | Cross-cutting | Adversarial agent evals | 3 · 5 |
-| Decommissioning | II.7: complete shutdown, data backup, environment cleanup | ASI10 Rogue Agents (residual agents) | — | 2 · 4 |
+| Decommissioning | II.7: complete shutdown, data backup, environment cleanup | ASI10 Rogue Agents (residual agents) | None | 2 · 4 |
 
 Mappings are illustrative, not a claim of conformity.
 
@@ -320,7 +320,7 @@ The map has a hole, and it is important to state it plainly rather than paper ov
   presumption of conformity is available to no one, because no harmonised standard has been OJ-cited
   [20].
 - **EN 18286 is published but not cited.** The Article 17 QMS standard EN 18286:2026 was published in
-  July 2026 — the first JTC 21 AI Act standard to reach publication — but it is not yet cited in the
+  July 2026 (the first JTC 21 AI Act standard to reach publication), but it is not yet cited in the
   Official Journal, so it carries no presumption of conformity [21]. The Article 9 (risk), Article 12
   (logging) and Article 15 (cybersecurity) standards were still at the Enquiry stage, targeting the end
   of 2026 [20].
@@ -330,8 +330,8 @@ The map has a hole, and it is important to state it plainly rather than paper ov
 - **The Code of Practice is voluntary.** Signing the GPAI Code is a way to demonstrate compliance with
   GPAI obligations; it is not a legal presumption of conformity [9].
 - **China's framework does not cross-reference the Western instruments.** The TC260 AI Safety
-  Governance Framework 3.0 cites no ISO/IEC 42001, ISO/IEC 23894, NIST AI RMF or EU AI Act — its
-  named reference points are the Global AI Governance Initiative and UN-centred channels — and it
+  Governance Framework 3.0 cites no ISO/IEC 42001, ISO/IEC 23894, NIST AI RMF or EU AI Act (its
+  named reference points are the Global AI Governance Initiative and UN-centred channels), and it
   does not name China's own binding rules either [42]. A crosswalk between the two stacks is
   something the engineer builds; neither side's documents supply it.
 
@@ -357,17 +357,17 @@ illustrative, not a claim of conformity.
 
 [1] "AI Omnibus enters into force" (Reg. (EU) 2026/1744, in force 2026-07-27; Annex III high-risk → 2 Dec 2027; Annex I → 2 Aug 2028; legacy public-authority → 2 Aug 2030). European Commission. 2026-07-27. https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force (verified: primary)
 [2] Consolidated changes after the Digital Omnibus (Art. 4a special-category data; Art. 5 NCII/CSAM from 2 Dec 2026; transitional dates). AI Act Explorer (Future of Life Institute). 2026. https://artificialintelligenceact.eu/ai-act-explorer/digital-omnibus/ (verified: secondary)
-[3] Commission enforcement powers over GPAI providers apply from 2 August 2026; obligations since 2 August 2025 (fines up to 3% of worldwide turnover or EUR 15M under Art. 101). European Commission — AI Act Service Desk. 2026-08-02. https://ai-act-service-desk.ec.europa.eu/en/ai-act/faq/commissions-enforcement-powers-related-ai-act-obligations-providers-most-advanced-models (verified: primary)
+[3] Commission enforcement powers over GPAI providers apply from 2 August 2026; obligations since 2 August 2025 (fines up to 3% of worldwide turnover or EUR 15M under Art. 101). European Commission, AI Act Service Desk. 2026-08-02. https://ai-act-service-desk.ec.europa.eu/en/ai-act/faq/commissions-enforcement-powers-related-ai-act-obligations-providers-most-advanced-models (verified: primary)
 [4] EU AI Act Art. 101 (Commission fines for GPAI providers) and Art. 99 (penalties by national authorities: 7% / 3% / 1% ceilings). AI Act (Reg. (EU) 2024/1689). 2024. https://artificialintelligenceact.eu/article/101/ (verified: primary)
 [5] "Safer and more transparent AI" (Art. 50 transparency live 2 Aug 2026; marking grace for existing generative systems to 2 Dec 2026). European Commission. 2026-08-02. https://commission.europa.eu/news-and-media/news/safer-and-more-transparent-ai-2026-08-02_en (verified: primary)
 [6] "AI literacy, the Digital Omnibus and Article 4 of the AI Act" (Art. 4 reworded to "support the development of" AI literacy; applies from 27 Jul 2026). Law & Technology. 2026. https://lawandtechnology.eu/en/ai-literacy-digital-omnibus-article-4-ai-act/ (verified: secondary)
 [7] EU AI Act Art. 27 (FRIA for deployers of Annex III high-risk; Art. 27(4) cross-reference to a GDPR Art. 35 DPIA). AI Act (Reg. (EU) 2024/1689). 2024. https://artificialintelligenceact.eu/article/27/ (verified: primary)
 [8] Arts. 75a–75d: AI Office investigation powers with periodic penalty payments up to 5% of average daily turnover per day for continuing breaches (Art. 75c(5)). AI Act Explorer (Future of Life Institute). 2026. https://artificialintelligenceact.eu/ai-act-explorer/digital-omnibus/ (verified: secondary)
 [9] GPAI Code of Practice (published 10 Jul 2025; voluntary; three chapters: Transparency, Copyright, Safety and Security). AI Act Explorer / European Commission. 2025-07-10. https://artificialintelligenceact.eu/introduction-to-code-of-practice/ (verified: primary)
-[10] GPAI Code of Practice — contents and signatories (Safety & Security applies to systemic-risk models; official signatory list). European Commission. 2026. https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai (verified: primary)
+[10] GPAI Code of Practice: contents and signatories (Safety & Security applies to systemic-risk models; official signatory list). European Commission. 2026. https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai (verified: primary)
 [11] "ISO/IEC 42001 and the AI Act: why certification is not yet a presumption of conformity" (ISO 42001 AIMS ≠ Art. 17 QMS). Law & Technology. 2026. https://lawandtechnology.eu/en/iso-iec-42001-and-the-ai-act-why-certification-is-not-yet-a-presumption-of-conformity/ (verified: secondary)
 [12] CSA research note on EU AI Act, prEN 18286 and ISO/IEC 42001 (scope difference; EN ISO/IEC 42001:2026 not a harmonised standard). Cloud Security Alliance. 2026-04-28. https://labs.cloudsecurityalliance.org/research/csa-research-note-eu-ai-act-pren-18286-iso-42001-20260428-cs/ (verified: secondary)
-[13] ISO/IEC 42005:2025 — AI system impact assessment (companion to Art. 27 and ISO 42001 Annex A.5). ISO/IEC. 2025-05. https://www.iso.org/standard/44545.html (verified: secondary)
+[13] ISO/IEC 42005:2025, AI system impact assessment (companion to Art. 27 and ISO 42001 Annex A.5). ISO/IEC. 2025-05. https://www.iso.org/standard/44545.html (verified: secondary)
 [14] AI Risk Management Framework 1.0 (functions: Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
 [15] AI Controls Matrix (AICM) v1.1 (247 control objectives, 18 domains) and STAR for AI. Cloud Security Alliance. 2026-06-22. https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1 (verified: primary)
 [16] Top 10 for Agentic Applications 2026 (ASI01 … ASI10). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
@@ -381,28 +381,28 @@ illustrative, not a claim of conformity.
 [24] NY State Senate Bill 2025-S6953B (RAISE Act; signed 19 Dec 2025 as Chapter 699; frontier model = trained with over 10^26 operations costing over USD 100M; safety protocols and 72-hour incident disclosure; Attorney General and Division of Homeland Security and Emergency Services). New York State Senate. 2025-12-19. https://www.nysenate.gov/legislation/bills/2025/S6953/amendment/B (verified: primary)
 [25] "New York Finalizes RAISE Act for Frontier AI Models; Law Takes Effect January 1, 2027" (chapter amendment introduced 6 Jan 2026, passed 11 Mar 2026, signed 27 Mar 2026; effective 1 Jan 2027; DFS oversight office). Wiley. 2026. https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027 (verified: secondary)
 [26] "AI Act: Commission publishes a reporting template for serious incidents involving general-purpose AI models with systemic risk" (template for serious-incident reporting under Art. 55; aligned to Commitment 9 of the GPAI Code). European Commission. 2025-11-04. https://digital-strategy.ec.europa.eu/en/library/ai-act-commission-publishes-reporting-template-serious-incidents-involving-general-purpose-ai (verified: primary)
-[27] ISO/IEC 42006:2025 — Requirements for bodies providing audit and certification of AI management systems (builds on ISO/IEC 17021-1; who may credibly certify to 42001). ISO/IEC. 2025. https://www.iso.org/standard/42006 (verified: secondary)
-[28] ISO/IEC 23894:2023 — Guidance on AI risk management (adapts ISO 31000 to AI). ISO/IEC. 2023-02. https://www.iso.org/standard/77304.html (verified: secondary)
+[27] ISO/IEC 42006:2025, Requirements for bodies providing audit and certification of AI management systems (builds on ISO/IEC 17021-1; who may credibly certify to 42001). ISO/IEC. 2025. https://www.iso.org/standard/42006 (verified: secondary)
+[28] ISO/IEC 23894:2023, Guidance on AI risk management (adapts ISO 31000 to AI). ISO/IEC. 2023-02. https://www.iso.org/standard/77304.html (verified: secondary)
 [29] "Announcing the AI Agent Standards Initiative for Interoperable and Secure Innovation" (CAISI initiative; agent identity, authentication and security). NIST. 2026-02-17. https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure (verified: primary)
-[30] NIST IR 8596 (initial public draft) — Cybersecurity Framework Profile for Artificial Intelligence (Cyber AI Profile); Secure / Defend / Thwart. NIST. 2025-12-16. https://csrc.nist.gov/pubs/ir/8596/iprd (verified: primary)
-[31] NIST AI 800-1 (second public draft) — Managing Misuse Risk for Dual-Use Foundation Models (voluntary; still in draft). NIST. 2025-01. https://www.nist.gov/news-events/news/2025/01/updated-guidelines-managing-misuse-risk-dual-use-foundation-models (verified: primary)
-[32] AICM Agentic Control Supplement — proposed agent-specific controls extending the AI Controls Matrix. Cloud Security Alliance. 2026. https://cloudsecurityalliance.org/blog/2026/04/29/securing-the-agentic-control-plane-key-progress-at-the-csai-foundation (verified: primary)
-[33] AICM Catastrophic Risk Annex — enhanced AICM controls for high-autonomy systems with catastrophic-risk potential. Cloud Security Alliance. 2026-08-05. https://cloudsecurityalliance.org/csai-foundation/catastrophic-risk-annex (verified: primary)
+[30] NIST IR 8596 (initial public draft): Cybersecurity Framework Profile for Artificial Intelligence (Cyber AI Profile); Secure / Defend / Thwart. NIST. 2025-12-16. https://csrc.nist.gov/pubs/ir/8596/iprd (verified: primary)
+[31] NIST AI 800-1 (second public draft): Managing Misuse Risk for Dual-Use Foundation Models (voluntary; still in draft). NIST. 2025-01. https://www.nist.gov/news-events/news/2025/01/updated-guidelines-managing-misuse-risk-dual-use-foundation-models (verified: primary)
+[32] AICM Agentic Control Supplement: proposed agent-specific controls extending the AI Controls Matrix. Cloud Security Alliance. 2026. https://cloudsecurityalliance.org/blog/2026/04/29/securing-the-agentic-control-plane-key-progress-at-the-csai-foundation (verified: primary)
+[33] AICM Catastrophic Risk Annex: enhanced AICM controls for high-autonomy systems with catastrophic-risk potential. Cloud Security Alliance. 2026-08-05. https://cloudsecurityalliance.org/csai-foundation/catastrophic-risk-annex (verified: primary)
 [34] South Korea AI Basic Act (Basic Act on the Development of AI and Establishment of Trust; in force 22 Jan 2026; high-impact AI duties). International Trade Administration (US). 2026. https://www.trade.gov/market-intelligence/south-korea-ai-basic-act (verified: secondary)
 [35] Texas Responsible Artificial Intelligence Governance Act (HB 149), enrolled text; effective 1 Jan 2026. Texas Legislature (89R). 2025. https://capitol.texas.gov/tlodocs/89R/billtext/pdf/HB00149F.pdf (verified: primary)
 [36] "Colorado AI law in flux: comprehensive replacement bill signed after federal court blocks predecessor's enforcement" (SB 24-205 delayed to 30 Jun 2026, then replaced by SB 26-189, effective 1 Jan 2027). McDermott Will & Emery. 2026. https://www.mcdermottlaw.com/insights/colorado-ai-law-in-flux-comprehensive-replacement-bill-signed-after-federal-court-blocks-predecessors-enforcement/ (verified: secondary)
 [37] Data (Use and Access) Act 2025, s. 80 (replaces UK GDPR Art. 22 with Arts. 22A–22D; in force 5 Feb 2026). legislation.gov.uk. 2025. https://www.legislation.gov.uk/ukpga/2025/18/section/80 (verified: primary)
-[38] "AI Security Institute" — written statement announcing the rename of the AI Safety Institute. UK Parliament. 2025-02-24. https://questions-statements.parliament.uk/written-statements/detail/2025-02-24/hlws454 (verified: primary)
+[38] "AI Security Institute" (written statement announcing the rename of the AI Safety Institute). UK Parliament. 2025-02-24. https://questions-statements.parliament.uk/written-statements/detail/2025-02-24/hlws454 (verified: primary)
 [39] Model AI Governance Framework for Generative AI (voluntary). IMDA / AI Verify Foundation. 2024-05. https://aiverifyfoundation.sg/wp-content/uploads/2024/05/Model-AI-Governance-Framework-for-Generative-AI-May-2024-1-1.pdf (verified: primary)
-[40] ETSI EN 304 223 — Securing Artificial Intelligence (SAI); Baseline Cyber Security Requirements for AI Models and Systems (V2.1.1, Dec 2025; 13 principles across five lifecycle stages). ETSI. 2025-12. https://www.etsi.org/newsroom/press-releases/2627-etsi-releases-world-leading-standard-for-securing-ai/ (verified: primary)
-[41] 《人工智能安全治理框架3.0》发布 — announcement of the AI Safety Governance Framework 3.0 (TC260 under CAC guidance; released 2026-09-14 at the 2026 National Cybersecurity Publicity Week). Cyberspace Administration of China. 2026-09-14. https://www.cac.gov.cn/2026-09/14/c_1791137092283345.htm (verified: primary)
+[40] ETSI EN 304 223: Securing Artificial Intelligence (SAI); Baseline Cyber Security Requirements for AI Models and Systems (V2.1.1, Dec 2025; 13 principles across five lifecycle stages). ETSI. 2025-12. https://www.etsi.org/newsroom/press-releases/2627-etsi-releases-world-leading-standard-for-securing-ai/ (verified: primary)
+[41] 《人工智能安全治理框架3.0》发布: announcement of the AI Safety Governance Framework 3.0 (TC260 under CAC guidance; released 2026-09-14 at the 2026 National Cybersecurity Publicity Week). Cyberspace Administration of China. 2026-09-14. https://www.cac.gov.cn/2026-09/14/c_1791137092283345.htm (verified: primary)
 [42] AI Safety Governance Framework 3.0 (人工智能安全治理框架3.0), bilingual PDF; English text printed pp. 49–130; §2.1.1(b) open-source models p. 55; §2.1.4(a) computing power p. 59; §5.3 operators' guidelines pp. 101–104; Appendix 2 agentic AI risk management pp. 113–126; no reference to ISO/IEC 42001, NIST AI RMF or the EU AI Act. TC260 / CAC. 2026-09-14. https://www.cac.gov.cn/rootimages/uploadimg/1791137114683961/1791137114683961.pdf (verified: primary)
 [43] Provisions on the Administration of Algorithmic Recommendation in Internet Information Services (互联网信息服务算法推荐管理规定; CAC, MIIT, MPS and SAMR Order No. 9; promulgated 2021-12-31; in force 2022-03-01; Art. 17 opt-out, Art. 24 algorithm filing, Art. 27 security assessment). Cyberspace Administration of China. 2022-01-04. https://www.cac.gov.cn/2022-01/04/c_1642894606364259.htm (verified: primary)
 [44] Provisions on the Administration of Deep Synthesis in Internet Information Services (互联网信息服务深度合成管理规定; CAC, MIIT and MPS Order No. 12; promulgated 2022-11-25; in force 2023-01-10; Arts. 14 training data and separate consent, 16–17 marks and labels, 19 filing, 15/20 security assessment). Cyberspace Administration of China. 2022-12-11. https://www.cac.gov.cn/2022-12/11/c_1672221949354811.htm (verified: primary)
 [45] Interim Measures for the Administration of Generative AI Services (生成式人工智能服务管理暂行办法; CAC and six other bodies, Order No. 15; published 2023-07-13; in force 2023-08-15; Art. 2 scope: services to the public within the PRC; Art. 7 lawful-source data; Art. 12 labelling; Art. 14 stop-remove-retrain-report; Art. 17 security assessment and filing). Cyberspace Administration of China. 2023-07-13. https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm (verified: primary)
 [46] Measures for Labelling AI-Generated Synthetic Content (人工智能生成合成内容标识办法; CAC, MIIT, MPS and NRTA; published 2025-03-14; in force 2025-09-01; explicit and implicit labels; platform verification duty). Cyberspace Administration of China. 2025-03-14. https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm (verified: primary)
-[47] GB 45438-2025 Cybersecurity technology — Labeling method for content generated by artificial intelligence (网络安全技术 人工智能生成合成内容标识方法; mandatory national standard; issued 2025-02-28; implemented 2025-09-01). SAMR / SAC (drafted by TC260). 2025-02-28. https://std.samr.gov.cn/gb/search/gbDetailed?id=301E0388CB75788DE06397BE0A0AE1B4 (verified: primary)
-[48] GB/T 45654-2025 Cybersecurity technology — Basic security requirements for generative artificial intelligence service (网络安全技术 生成式人工智能服务安全基本要求; recommended national standard; issued 2025-04-25; implemented 2025-11-01). SAMR / SAC (drafted by TC260). 2025-04-25. https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=F67D3F376E0A0A0FF5317FB36B32A30A (verified: primary)
+[47] GB 45438-2025 Cybersecurity technology: Labeling method for content generated by artificial intelligence (网络安全技术 人工智能生成合成内容标识方法; mandatory national standard; issued 2025-02-28; implemented 2025-09-01). SAMR / SAC (drafted by TC260). 2025-02-28. https://std.samr.gov.cn/gb/search/gbDetailed?id=301E0388CB75788DE06397BE0A0AE1B4 (verified: primary)
+[48] GB/T 45654-2025 Cybersecurity technology: Basic security requirements for generative artificial intelligence service (网络安全技术 生成式人工智能服务安全基本要求; recommended national standard; issued 2025-04-25; implemented 2025-11-01). SAMR / SAC (drafted by TC260). 2025-04-25. https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=F67D3F376E0A0A0FF5317FB36B32A30A (verified: primary)
 [49] Cybersecurity Law of the PRC as amended by the NPC Standing Committee decision of 2025-10-28 (in force 2026-01-01; new Article 20 on AI: state support for AI research, training-data and computing infrastructure, AI ethics norms, risk monitoring, assessment and safety supervision). Cyberspace Administration of China (consolidated text). 2025-12-29. https://www.cac.gov.cn/2025-12/29/c_1768735112911946.htm (verified: primary)
 [50] Interim Measures for the Administration of Anthropomorphic Interaction Services (人工智能拟人化互动服务管理暂行办法; CAC, NDRC, MIIT, MPS and SAMR; published 2026-04-10; in force 2026-07-15). Cyberspace Administration of China. 2026-04-10. https://www.cac.gov.cn/2026-04/10/c_1777558395078289.htm (verified: primary)
 [51] "China's TC260 released Version 3.0 of the AI Safety Governance Framework" (LinkedIn post; agents and physically interactive systems as the headline change). Barbara Li (Reed Smith). 2026-09. https://www.linkedin.com/posts/barbara-li-67532067_tc260-ai-governance-share-7505863215600308224-XIyo/ (verified: reported)

@@ -6,18 +6,18 @@
 
 There is a manifesto for GRC engineering. There is a manifesto for agile software. There is a pattern
 catalogue for responsible AI and a twelve-factor guide for cloud applications. There is nothing that
-tells you how to *engineer* the governance of AI systems — how to turn an AI Act obligation or an ISO
+tells you how to *engineer* the governance of AI systems: how to turn an AI Act obligation or an ISO
 42001 control into policy-as-code, an eval gate, an agent registry and machine-readable evidence that
 an auditor can read. This book is the first attempt to write that down.
 
-It exists because the gap is now expensive. The thing being governed — models that retrain, prompts
-that change, agents that act on their own — moves faster than any document can follow. Governance
+It exists because the gap is now expensive. The thing being governed (models that retrain, prompts
+that change, agents that act on their own) moves faster than any document can follow. Governance
 written as PDFs and spreadsheets is stale before it is signed. The discipline that closes the gap is
 engineering, applied to governance. This book is its founding text and its working reference.
 
 ## Who wrote it, and from what
 
-The Body of Knowledge was written by Jorge García Aibar, an AI Governance & Privacy Engineer —
+The Body of Knowledge was written by Jorge García Aibar, an AI Governance & Privacy Engineer,
 drawing on two and a half years designing and operating an AI governance framework inside a large
 telco, sitting between Legal, Security and Engineering, and covering the governance, security,
 compliance, business and model-performance dimensions of AI risk. The Thesis is the sole co-authored
@@ -27,7 +27,7 @@ practice is described it is generic ("in a large telco").
 
 It is built from three things. First, that operating experience: what actually held up when a model
 changed on a Friday and an agent gained a new tool over the weekend. Second, the **GRC Engineering**
-precedent — the community, manifesto and body of practice that, over roughly the last two years,
+precedent: the community, manifesto and body of practice that, over roughly the last two years,
 turned governance, risk and compliance into a product built with code [1][2]. Third, the public
 record: the EU AI Act and its Digital Omnibus reform, ISO/IEC 42001, the NIST AI RMF, OWASP's GenAI
 and Agentic work, CSA, CSIRO's Responsible AI Pattern Catalogue, and the frontier labs' own safety
@@ -39,7 +39,7 @@ frameworks. Every factual claim in the book carries a sourced, verified citation
 - **Security engineers and AI security engineers** extending their threat models to models and agents.
 - **Privacy engineers and DPOs** who want FRIA and DPIA to live as code, not as one-off PDFs.
 - **MLOps and platform engineers** who are being asked to make governance a property of the pipeline.
-- **Lawyers and compliance professionals who want to build** — to see the obligation turned into an
+- **Lawyers and compliance professionals who want to build**, to see the obligation turned into an
   executable control and readable evidence, and to help specify it.
 
 You do not need to write production code to use this book, but you should be comfortable near a
@@ -49,7 +49,7 @@ pipeline. The discipline is a capability anyone close to the build can develop.
 
 This is not a compliance checklist, and it is not legal advice. It does not tell you whether your
 system is compliant; it tells you how to build the controls and the evidence that let someone qualified
-make that call. It is not an AI safety research agenda, an MLOps handbook, or a vendor buyer's guide —
+make that call. It is not an AI safety research agenda, an MLOps handbook, or a vendor buyer's guide;
 tools are named only as illustrative examples of a category, never as endorsements. And it is not
 finished. Version 0.4.0 is a public draft with deliberate gaps open to contributions.
 
@@ -70,11 +70,11 @@ the consolidated table lives in `sources/SOURCES.md`.
 
 ## Versioning
 
-This is **v0.4.0** — a public draft. Versioning is semantic in spirit: patch releases fix facts
+This is **v0.4.0**, a public draft. Versioning is semantic in spirit: patch releases fix facts
 and typos, minor releases add chapters or patterns, and a 1.0 will mark the point at which the core
 chapters (00–10) are complete and reviewed. Every change is recorded in `bok/CHANGELOG.md`. Because
-the regulatory and standards landscape moves — the Digital Omnibus reform, harmonised standards under
-JTC 21, the OWASP and CSA releases — chapters carry a "current as of" date and are expected to be
+the regulatory and standards landscape moves (the Digital Omnibus reform, harmonised standards under
+JTC 21, the OWASP and CSA releases), chapters carry a "current as of" date and are expected to be
 revised.
 
 ## How to contribute
@@ -86,8 +86,8 @@ This book welcomes credited contributions. To contribute:
    or `reported`, and add the row to `sources/SOURCES.md` under your chapter's section.
 3. Open a pull request. To sign the Thesis, add your name to `bok/CONTRIBUTORS.md`.
 
-The rules exist so that many hands produce one coherent book. Everything else — the arguments, the
-patterns, the mappings — is open for you to improve.
+The rules exist so that many hands produce one coherent book. Everything else (the arguments, the
+patterns, the mappings) is open for you to improve.
 
 **Maps to:** this preface makes no normative claim; the standards it names are treated in full in
 chapters 04, 05 and 08.

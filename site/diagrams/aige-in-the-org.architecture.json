@@ -34,7 +34,7 @@
 
     { "id": "mlops", "type": "backend", "label": "MLOps / LLMOps", "sublabel": "builds, deploys, serves", "pos": [470, 150], "size": [190, 60] },
     { "id": "aige", "type": "backend", "label": "AI Governance Engineering", "sublabel": "governance as engineered systems", "pos": [470, 300], "size": [220, 90] },
-    { "id": "ai-security", "type": "security", "label": "AI security engineering", "sublabel": "the sibling — defends", "pos": [470, 470], "size": [190, 60] },
+    { "id": "ai-security", "type": "security", "label": "AI security engineering", "sublabel": "the sibling, defends", "pos": [470, 470], "size": [190, 60] },
 
     { "id": "ai-systems", "type": "cloud", "label": "AI systems & agents", "sublabel": "the object, in production", "pos": [800, 250], "size": [210, 72] },
     { "id": "mrm", "type": "external", "label": "Model risk management", "sublabel": "validates models (SR 11-7)", "pos": [800, 440], "size": [190, 60] },
@@ -62,7 +62,7 @@
   ],
   "cards": [
     { "dot": "cyan", "title": "The definition", "items": ["Engineering practice applied to the governance of AI systems", "A capability, not a job title", "Measured by realised risk reduction and audit-ready evidence"] },
-    { "dot": "violet", "title": "Distinct from its neighbours", "items": ["Governs what MLOps ships; gates the same pipeline", "Extends model risk management to runtime and agents", "Sibling of AI security engineering — often the same person"] },
+    { "dot": "violet", "title": "Distinct from its neighbours", "items": ["Governs what MLOps ships; gates the same pipeline", "Extends model risk management to runtime and agents", "Sibling of AI security engineering, often the same person"] },
     { "dot": "emerald", "title": "The object and the proof", "items": ["Models, systems, agents, data and the organisation", "Agents acting under delegated authority are the hardest object", "Evidence an auditor or regulator can query, not a screenshot"] }
   ]
 }

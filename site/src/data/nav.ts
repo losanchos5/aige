@@ -108,7 +108,7 @@ export const nav: NavGroup[] = [
       {
         label: 'Tools',
         href: '/resources/tools',
-        description: 'Reference tool categories per layer — examples, not endorsements.',
+        description: 'Reference tool categories per layer: examples, not endorsements.',
       },
       {
         label: 'Glossary',

@@ -45,12 +45,12 @@ const mistakes = employerMistakes.map((text) => {
 });
 const pad = (n: number) => String(n).padStart(2, '0');
 
-// A single reported-only sentence for the non-primary demand signal(s). Em
-// dashes separate the source so the source's own parentheses do not nest.
+// A single reported-only sentence for the non-primary demand signal(s). A
+// comma and "per" separate the source so its own parentheses do not nest.
 const reportedText = reportedStats
   .map((stat) => {
     const label = stat.label.replace(' (reported demand signal — not a stat tile)', '');
-    return `${label}, up ${stat.value} — ${stat.source}`;
+    return `${label}, up ${stat.value}, per ${stat.source}`;
   })
   .join('; ');
 ---
@@ -71,7 +71,7 @@ const reportedText = reportedStats
   <Section
     tone="plain"
     title="Seven workflows the role owns."
-    lede="The engineer owns workflows, not documents — each a running system with inputs, outputs and a stack layer it maps to."
+    lede="The engineer owns workflows, not documents: each a running system with inputs, outputs and a stack layer it maps to."
   >
     <WorkflowGrid workflows={workflows} hrefFor={roleHref} class="bento reveal-stagger" />
     <Diagram id="role-workflows" />
@@ -180,7 +180,7 @@ const reportedText = reportedStats
 
   <CtaBand
     title="Own the capability, not the title."
-    sub="The role in full — workflows, skills, the ladder and the market, against the thesis that frames it."
+    sub="The role in full: workflows, skills, the ladder and the market, against the thesis that frames it."
     primary={{ label: 'Read chapter 06 in full', href: '/bok/the-role' }}
     secondary={{ label: 'Read the Thesis', href: '/thesis' }}
   />

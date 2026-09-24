@@ -101,9 +101,9 @@ function buildValuesPrinciples(values, principles, fig) {
     }
   };
 
-  group('Eight values — which way to lean');
+  group('Eight values: which way to lean');
   rows(values);
-  group('Six principles — what to do on Monday');
+  group('Six principles: what to do on Monday');
   rows(principles);
 
   const H = y + 8;

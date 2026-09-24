@@ -10,7 +10,7 @@
         "id": "evidence-spine",
         "label": "The evidence spine",
         "focus": ["policy-engines", "registry", "eval-frameworks", "guardrails", "evidence-store", "assurance-suites"],
-        "note": "Policy, Inventory, Evals, Runtime, Assurance — each layer's artefact feeds the one above."
+        "note": "Policy, Inventory, Evals, Runtime, Assurance: each layer's artefact feeds the one above."
       },
       {
         "id": "minimum-viable-stack",
@@ -22,7 +22,7 @@
         "id": "what-ai-adds",
         "label": "What AI forces us to add",
         "focus": ["eval-frameworks", "adversarial-probes", "guardrails", "agent-identity"],
-        "note": "Layers 03-04 — evals as evidence and agent runtime control — have no analogue in classic GRC."
+        "note": "Layers 03-04 (evals as evidence and agent runtime control) have no analogue in classic GRC."
       }
     ]
   },
