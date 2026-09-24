@@ -1,0 +1,55 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/instructions-for-use.v1.json",
+  "document_id": "ifu-credit-afford-03-3.2.0",
+  "subject": "credit-afford-03@3.2.0",
+  "provider": {
+    "name": "Example Bank, retail credit models team",
+    "contact": "ai-governance@example.org"
+  },
+  "intended_purpose": "Affordability score for consumer loan applications up to 30k EUR in ES and PT, as decision support for a trained credit analyst who takes the decision.",
+  "performance": {
+    "accuracy": [
+      {
+        "metric": "AUC",
+        "value": "0.80",
+        "conditions": "held-out 2025 applications"
+      },
+      {
+        "metric": "approval-rate ratio across age bands",
+        "value": "0.86",
+        "conditions": "held-out 2025 applications"
+      }
+    ],
+    "robustness": "Scores are stable under plus or minus 5% noise on declared income; not tested on incomes above 250k EUR.",
+    "cybersecurity": "Batch scoring inside the origination network; no applicant-facing interface.",
+    "circumstances_affecting_performance": [
+      "self-employed applicants with under 12 months of history",
+      "sharp interest-rate changes"
+    ]
+  },
+  "known_risks": [
+    "indirect discrimination by age if used outside the validated range",
+    "over-reliance by analysts on the score"
+  ],
+  "explanation_capabilities": "Top five reason codes per score, from monotonic feature contributions.",
+  "performance_by_group": [
+    {
+      "group": "applicants over 75",
+      "note": "too few cases to establish performance; refer to manual assessment"
+    }
+  ],
+  "input_data_specifications": "Application fields as defined in the origination schema v12; must not receive health or nationality data.",
+  "training_data_information": "Applications 2019 to 2025 with 12-month outcomes; see dataset card loan-apps-2019-2025.",
+  "output_interpretation": "A score of 0 to 1000 with reason codes. It is an input to the analyst, never a decision; referral band 450 to 550.",
+  "predetermined_changes": [
+    "quarterly recalibration of the score-to-band mapping within declared metrics"
+  ],
+  "human_oversight_measures": "Every application is decided by an analyst, who sees the score, the reason codes and the data used, and can override with a logged reason.",
+  "resources_and_maintenance": {
+    "compute_and_hardware": "Standard batch compute, under 1 CPU-hour per day.",
+    "expected_lifetime": "Until 2029, subject to annual review.",
+    "maintenance": "Monthly monitoring report; retraining is a new release."
+  },
+  "logging": "Each score, its reason codes and any override are written to the application record and kept ten years.",
+  "issued": "2026-08-20"
+}

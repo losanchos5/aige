@@ -1,0 +1,68 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/risk-register-entry.v1.json",
+  "risk_id": "rk-0042",
+  "title": "Indirect age discrimination in affordability scores",
+  "description": "Income-volatility features correlate with age; if the model leans on them, older applicants are declined more often for reasons unrelated to affordability.",
+  "subjects": [
+    "credit-afford-03"
+  ],
+  "failure_mode": "indirect age discrimination",
+  "category": "fairness",
+  "source": "internal",
+  "affected_parties": [
+    "applicants over 60"
+  ],
+  "inherent": {
+    "likelihood": 3,
+    "severity": 4,
+    "score": 12,
+    "catastrophic_override": false
+  },
+  "treatment": {
+    "option": "mitigate",
+    "controls": [
+      {
+        "control_id": "fairness-age-bands.v2",
+        "type": "engineer",
+        "layer": 3,
+        "status": "verified"
+      },
+      {
+        "control_id": "hitl-routing.v1",
+        "type": "engineer",
+        "layer": 4,
+        "status": "verified"
+      },
+      {
+        "control_id": "pmm fairness ratio weekly",
+        "type": "monitor",
+        "layer": 5,
+        "status": "in_place"
+      }
+    ]
+  },
+  "residual": {
+    "likelihood": 2,
+    "severity": 3,
+    "score": 6
+  },
+  "acceptance": {
+    "authority": "head-of-retail-credit",
+    "accepted_at": "2026-08-20",
+    "expires": "2027-08-20",
+    "signature": "ed25519:Hk2pL9qR4sT7vW0xY3zA6bC8dE1fG5hJ"
+  },
+  "owner": "model-risk",
+  "review_cadence": "quarterly",
+  "next_review": "2026-11-20",
+  "links": {
+    "incidents": [],
+    "eval_results": [
+      "fairness-age-bands.v2"
+    ],
+    "impact_assessments": [
+      "fria-2026-004"
+    ]
+  },
+  "status": "accepted"
+}

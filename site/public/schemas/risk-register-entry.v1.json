@@ -1,0 +1,356 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/risk-register-entry.v1.json",
+  "title": "Risk register entry",
+  "description": "One risk in the AI risk register, as code: the failure mode, its inherent and residual scores, the treatment and the controls that realise it, who accepted what remains, and the links to the incidents and eval results that keep the scores honest.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 9",
+    "EU AI Act Art. 9(5)",
+    "ISO/IEC 42001 6.1",
+    "ISO/IEC 23894",
+    "NIST AI RMF MAP 5.1",
+    "NIST AI RMF MANAGE 1.2",
+    "NIST AI RMF MANAGE 1.3",
+    "NIST AI RMF MANAGE 1.4"
+  ],
+  "x-layer": [
+    1,
+    3
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-fria-as-code",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-continuous-assurance-telemetry"
+  ],
+  "x-lifecycle-stage": "operate",
+  "type": "object",
+  "required": [
+    "risk_id",
+    "title",
+    "subjects",
+    "failure_mode",
+    "category",
+    "inherent",
+    "treatment",
+    "residual",
+    "owner",
+    "status",
+    "next_review"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/risk-register-entry.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "risk_id": {
+      "type": "string",
+      "description": "Identifier of the risk (for example \"rk-0042\").",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "description": "Short name of the risk.",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "description": "The risk in a few sentences: cause, event, consequence."
+    },
+    "subjects": {
+      "type": "array",
+      "description": "Systems the risk applies to.",
+      "items": {
+        "type": "string",
+        "description": "One system as \"id@version\" or a bare registry id.",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "failure_mode": {
+      "type": "string",
+      "description": "The named failure mode or harm, as the eval suites and incidents refer to it.",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "safety",
+        "fundamental_rights",
+        "privacy",
+        "security",
+        "fairness",
+        "reliability",
+        "transparency",
+        "legal",
+        "third_party",
+        "environmental",
+        "other"
+      ],
+      "description": "Risk category."
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "internal",
+        "external",
+        "third_party",
+        "emerging"
+      ],
+      "description": "Where the risk originates."
+    },
+    "affected_parties": {
+      "type": "array",
+      "description": "Who bears the harm if it materialises.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 9(2)"
+      ]
+    },
+    "inherent": {
+      "type": "object",
+      "description": "Score before treatment.",
+      "required": [
+        "likelihood",
+        "severity",
+        "score"
+      ],
+      "properties": {
+        "likelihood": {
+          "type": "integer",
+          "description": "Likelihood before treatment, 1 (rare) to 5 (almost certain).",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "severity": {
+          "type": "integer",
+          "description": "Severity before treatment, 1 (negligible) to 5 (catastrophic).",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "score": {
+          "type": "integer",
+          "description": "Likelihood times severity.",
+          "minimum": 1,
+          "maximum": 25
+        },
+        "catastrophic_override": {
+          "type": "boolean",
+          "description": "Severity 5 is escalated regardless of likelihood."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "NIST AI RMF MAP 5.1"
+      ]
+    },
+    "treatment": {
+      "type": "object",
+      "description": "How the risk is treated.",
+      "required": [
+        "option"
+      ],
+      "properties": {
+        "option": {
+          "type": "string",
+          "enum": [
+            "avoid",
+            "mitigate",
+            "transfer",
+            "accept"
+          ],
+          "description": "Response option."
+        },
+        "controls": {
+          "type": "array",
+          "description": "Controls that realise the treatment.",
+          "items": {
+            "type": "object",
+            "description": "One control.",
+            "required": [
+              "control_id",
+              "type",
+              "status"
+            ],
+            "properties": {
+              "control_id": {
+                "type": "string",
+                "description": "Control id (policy card rule, eval suite, guardrail, procedure).",
+                "minLength": 1
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "eliminate",
+                  "substitute",
+                  "engineer",
+                  "administrative",
+                  "monitor"
+                ],
+                "description": "Place in the mitigation hierarchy."
+              },
+              "layer": {
+                "type": "integer",
+                "description": "Stack layer that produces its evidence.",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "planned",
+                  "in_place",
+                  "verified"
+                ],
+                "description": "Status."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "due": {
+          "type": "string",
+          "format": "date",
+          "description": "When planned controls must be in place."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "NIST AI RMF MANAGE 1.3",
+        "EU AI Act Art. 9(2)"
+      ]
+    },
+    "residual": {
+      "type": "object",
+      "description": "Score after treatment.",
+      "required": [
+        "likelihood",
+        "severity",
+        "score"
+      ],
+      "properties": {
+        "likelihood": {
+          "type": "integer",
+          "description": "Likelihood after treatment.",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "severity": {
+          "type": "integer",
+          "description": "Severity after treatment.",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "score": {
+          "type": "integer",
+          "description": "Likelihood times severity.",
+          "minimum": 1,
+          "maximum": 25
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 9(5)",
+        "NIST AI RMF MANAGE 1.4"
+      ]
+    },
+    "acceptance": {
+      "type": "object",
+      "description": "Who accepted the residual risk, and until when.",
+      "required": [
+        "authority",
+        "accepted_at"
+      ],
+      "properties": {
+        "authority": {
+          "type": "string",
+          "description": "Role with authority to accept this residual score.",
+          "minLength": 1
+        },
+        "accepted_at": {
+          "type": "string",
+          "format": "date",
+          "description": "When accepted."
+        },
+        "expires": {
+          "type": "string",
+          "format": "date",
+          "description": "When the acceptance lapses."
+        },
+        "signature": {
+          "type": "string",
+          "description": "Detached signature over the record, prefixed with the algorithm (for example \"ed25519:<base64>\"). Makes the record tamper-evident in the evidence store.",
+          "pattern": "^[a-z0-9-]+:.+$"
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 9(5)",
+        "NIST AI RMF MANAGE 1.4"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "description": "Risk owner.",
+      "minLength": 1
+    },
+    "review_cadence": {
+      "type": "string",
+      "description": "How often the entry is reviewed."
+    },
+    "next_review": {
+      "type": "string",
+      "format": "date",
+      "description": "Next review date."
+    },
+    "links": {
+      "type": "object",
+      "description": "Links that keep the scores tied to evidence.",
+      "properties": {
+        "incidents": {
+          "type": "array",
+          "description": "Incident record ids.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "eval_results": {
+          "type": "array",
+          "description": "Eval suite ids whose results inform the score.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "impact_assessments": {
+          "type": "array",
+          "description": "Impact assessment ids.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "treated",
+        "accepted",
+        "closed"
+      ],
+      "description": "Status."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

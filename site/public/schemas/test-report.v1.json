@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/test-report.v1.json",
+  "title": "Test report",
+  "description": "The dated, signed report of a test campaign: the eval results against the plan, deviations and waivers, and the conclusion the go/no-go reads.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Annex IV(2)(g)",
+    "EU AI Act Art. 9(8)",
+    "EU AI Act Art. 15",
+    "ISO/IEC 42001 A.6",
+    "NIST AI RMF MEASURE 2.3",
+    "NIST AI RMF MEASURE 2.13"
+  ],
+  "x-layer": [
+    3
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-eval-gate-in-ci",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-adversarial-red-team-suite"
+  ],
+  "x-lifecycle-stage": "test",
+  "type": "object",
+  "required": [
+    "report_id",
+    "test_plan",
+    "subject",
+    "results",
+    "conclusion",
+    "signed_off"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/test-report.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "report_id": {
+      "type": "string",
+      "description": "Identifier of the report.",
+      "minLength": 1
+    },
+    "test_plan": {
+      "type": "string",
+      "description": "Id of the test plan executed.",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "string",
+      "description": "The governed object as registry id and version, \"id@version\" (for example \"csa-01@2026-09-18\"). The key every record is filed against.",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "period": {
+      "type": "object",
+      "description": "When testing ran.",
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "date",
+          "description": "First day of testing."
+        },
+        "to": {
+          "type": "string",
+          "format": "date",
+          "description": "Last day of testing."
+        }
+      },
+      "additionalProperties": false
+    },
+    "environment": {
+      "type": "string",
+      "description": "Where it ran."
+    },
+    "results": {
+      "type": "array",
+      "description": "The eval results, one per planned suite.",
+      "items": {
+        "type": "object",
+        "description": "One eval result, in the eval-result shape.",
+        "required": [
+          "suite_id",
+          "model_version",
+          "score",
+          "threshold",
+          "result",
+          "timestamp"
+        ],
+        "properties": {
+          "suite_id": {
+            "type": "string",
+            "description": "Versioned id of the eval suite (for example \"injection-resistance.v4\").",
+            "minLength": 1,
+            "x-evidences": [
+              "EU AI Act Art. 15"
+            ]
+          },
+          "model_version": {
+            "type": "string",
+            "description": "The system or model tested, as \"id@version\" from the registry.",
+            "pattern": "^[^@\\s]+@[^@\\s]+$"
+          },
+          "score": {
+            "type": "number",
+            "description": "The measured score."
+          },
+          "threshold": {
+            "type": "number",
+            "description": "The threshold the score is compared with, traced to a failure mode or obligation.",
+            "x-evidences": [
+              "EU AI Act Art. 9(8)"
+            ]
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail"
+            ],
+            "description": "Pass or fail against the threshold. A fail blocks the pipeline."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the run finished (RFC 3339)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "EU AI Act Annex IV(2)(g)"
+      ]
+    },
+    "summary": {
+      "type": "object",
+      "description": "Counts.",
+      "required": [
+        "passed",
+        "failed",
+        "waived"
+      ],
+      "properties": {
+        "passed": {
+          "type": "integer",
+          "description": "Suites passed.",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "description": "Suites failed.",
+          "minimum": 0
+        },
+        "waived": {
+          "type": "integer",
+          "description": "Suites waived.",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "deviations": {
+      "type": "array",
+      "description": "Deviations from the plan and any waivers.",
+      "items": {
+        "type": "object",
+        "description": "One deviation.",
+        "required": [
+          "suite_id",
+          "description"
+        ],
+        "properties": {
+          "suite_id": {
+            "type": "string",
+            "description": "Suite affected.",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "What deviated from the plan.",
+            "minLength": 1
+          },
+          "waiver_approved_by": {
+            "type": "string",
+            "description": "Role that approved a waiver, if any.",
+            "minLength": 1
+          },
+          "waiver_expires": {
+            "type": "string",
+            "format": "date",
+            "description": "When the waiver lapses."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "open_issues": {
+      "type": "array",
+      "description": "Defects or risks still open.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "conclusion": {
+      "type": "string",
+      "enum": [
+        "meets_exit_criteria",
+        "meets_with_waivers",
+        "does_not_meet"
+      ],
+      "description": "Conclusion against the plan's exit criteria."
+    },
+    "signed_off": {
+      "type": "object",
+      "description": "Sign-off by the responsible role, dated and signed.",
+      "required": [
+        "role",
+        "decision",
+        "timestamp"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "The approving role, not a personal name.",
+          "minLength": 1
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "approve",
+            "approve_with_conditions",
+            "reject",
+            "abstain"
+          ],
+          "description": "What this approver decided."
+        },
+        "conditions": {
+          "type": "string",
+          "description": "Conditions attached to the approval, if any."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the approver decided (RFC 3339)."
+        },
+        "signature": {
+          "type": "string",
+          "description": "Detached signature over the record, prefixed with the algorithm (for example \"ed25519:<base64>\"). Makes the record tamper-evident in the evidence store.",
+          "pattern": "^[a-z0-9-]+:.+$"
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Annex IV(2)(g)"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Links to logs and artefacts.",
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "description": "Link."
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

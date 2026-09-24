@@ -1,0 +1,82 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/dataset-card.v1.json",
+  "dataset_id": "loan-apps-2019-2025",
+  "version": "2026-04-30",
+  "name": "Consumer loan applications with 12-month outcomes",
+  "owner": "retail-credit-data-owner",
+  "steward": "credit-data-engineering",
+  "description": "Historical applications with repayment outcomes, to train and test the affordability model.",
+  "composition": {
+    "record_count": 412000,
+    "unit": "one loan application with its 12-month repayment outcome",
+    "features": [
+      "declared income",
+      "account inflows",
+      "existing debt",
+      "loan amount",
+      "outcome"
+    ],
+    "time_range": "2019-01 to 2025-03"
+  },
+  "collection": {
+    "method": "Extracted from the origination and servicing systems.",
+    "sources": [
+      "origination-db",
+      "servicing-db"
+    ]
+  },
+  "provenance": {
+    "upstream": [
+      "https://data.example.org/catalogue/origination-db",
+      "https://data.example.org/catalogue/servicing-db"
+    ],
+    "lineage": "https://lineage.example.org/datasets/loan-apps-2019-2025/2026-04-30",
+    "aibom_ref": "credit-afford-03 AIBOM, component loan-apps-2019-2025"
+  },
+  "personal_data": true,
+  "lawful_basis": "legitimate_interests",
+  "special_category": {
+    "present": false
+  },
+  "licence": {
+    "name": "Internal data, owned by the organisation",
+    "allows_training": true
+  },
+  "representativeness": {
+    "populations": [
+      "applicants in ES and PT, ages 18 to 80"
+    ],
+    "known_gaps": [
+      "self-employed applicants with under 12 months of history",
+      "applicants over 75"
+    ]
+  },
+  "quality_checks": [
+    {
+      "check": "missing income under 1%",
+      "result": "pass",
+      "run_at": "2026-05-02T08:00:00Z"
+    },
+    {
+      "check": "label leakage scan",
+      "result": "pass",
+      "run_at": "2026-05-02T08:05:00Z"
+    }
+  ],
+  "intended_uses": [
+    "training and testing credit-afford-03"
+  ],
+  "prohibited_uses": [
+    "marketing",
+    "employee assessment"
+  ],
+  "splits": [
+    "train 2019-2023",
+    "validation 2024",
+    "test 2025"
+  ],
+  "retention": {
+    "until": "2031-04-30",
+    "rule": "Snapshot deleted five years after the last model trained on it is retired."
+  }
+}

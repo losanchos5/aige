@@ -1,0 +1,77 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/deployment-decision-record.v1.json",
+  "decision_id": "ddr-credit-afford-03-es-pt",
+  "subject": "credit-afford-03@3.2.0",
+  "provider": "team-retail-credit-models (internal)",
+  "deployment_context": {
+    "business_process": "Consumer loan origination, branch and online channels",
+    "users": [
+      "credit analysts"
+    ],
+    "affected_persons": [
+      "consumer loan applicants"
+    ],
+    "jurisdictions": [
+      "ES",
+      "PT"
+    ],
+    "period_and_frequency": "Continuous, about 1,500 applications a day"
+  },
+  "role_assessment": {
+    "becomes_provider": false,
+    "rationale": "The deploying unit uses the system as supplied by the internal provider team, unmodified."
+  },
+  "duties": {
+    "instructions_for_use": {
+      "document": "https://evidence.example.org/ifu/credit-afford-03/3.2.0",
+      "gaps": []
+    },
+    "oversight": {
+      "roles": [
+        "credit analysts",
+        "credit team leads"
+      ],
+      "training_records": [
+        "tr-2026-0311",
+        "tr-2026-0312"
+      ]
+    },
+    "input_data": "Inputs come only from the origination schema v12; a schema check rejects any other field.",
+    "monitoring": {
+      "plan": "Operations dashboard on the provider PMM metrics, reviewed weekly.",
+      "suspension_criteria": [
+        "fairness ratio below 0.80 for two weeks",
+        "provider notice of a serious incident"
+      ]
+    },
+    "log_retention_days": 3650,
+    "workers_informed": {
+      "required": false
+    },
+    "affected_persons_informed": {
+      "required": true,
+      "method": "Notice in the application journey and in the decision letter."
+    },
+    "fria": {
+      "required": true,
+      "assessment_id": "fria-2026-004"
+    },
+    "dpia": {
+      "required": true,
+      "assessment_id": "dpia-2026-011"
+    },
+    "eu_database_registration": {
+      "required": false
+    }
+  },
+  "performance_requirements": [
+    "approval-rate ratio across age bands at or above 0.80"
+  ],
+  "decision": "deploy_with_conditions",
+  "conditions": [
+    "canary on 10% of applications for four weeks"
+  ],
+  "decided_by": "head-of-retail-credit",
+  "decided_at": "2026-08-21",
+  "review_by": "2027-08-21"
+}

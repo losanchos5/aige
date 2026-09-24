@@ -1,0 +1,83 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/post-market-monitoring-plan.v1.json",
+  "plan_id": "pmm-credit-afford-03",
+  "subject": "credit-afford-03@3.2.0",
+  "scope": "All scores issued in ES and PT, including analyst overrides and applicant complaints.",
+  "data_sources": [
+    {
+      "source": "scoring telemetry",
+      "type": "telemetry",
+      "owner": "credit-data-engineering"
+    },
+    {
+      "source": "analyst overrides with reasons",
+      "type": "deployer_feedback",
+      "owner": "retail-credit-operations"
+    },
+    {
+      "source": "applicant complaints mentioning the decision",
+      "type": "user_complaint",
+      "owner": "customer-care"
+    },
+    {
+      "source": "monthly re-run of fairness-age-bands.v2 on live outcomes",
+      "type": "eval_rerun",
+      "owner": "model-validation"
+    }
+  ],
+  "metrics": [
+    {
+      "metric": "population stability index on inputs",
+      "threshold": "> 0.2",
+      "cadence": "weekly",
+      "failure_mode": "input drift",
+      "alert_route": "model-validation"
+    },
+    {
+      "metric": "approval-rate ratio across age bands",
+      "threshold": "< 0.80",
+      "cadence": "weekly for six weeks, then monthly",
+      "failure_mode": "indirect age discrimination",
+      "alert_route": "model-risk"
+    },
+    {
+      "metric": "analyst override rate",
+      "threshold": "> 15% or < 1%",
+      "cadence": "weekly",
+      "failure_mode": "over-reliance or loss of trust",
+      "alert_route": "retail-credit-operations"
+    }
+  ],
+  "drift_signals": [
+    "input PSI",
+    "score distribution shift",
+    "6-month default rate against forecast"
+  ],
+  "triggers": [
+    {
+      "condition": "fairness ratio below 0.80 for two consecutive weeks",
+      "action": "suspend",
+      "owner": "model-risk"
+    },
+    {
+      "condition": "PSI above 0.2",
+      "action": "investigate",
+      "owner": "model-validation"
+    },
+    {
+      "condition": "complaint alleging a discriminatory decision",
+      "action": "open_incident",
+      "owner": "ai-governance-lead"
+    }
+  ],
+  "feedback_channels": [
+    "analyst override form",
+    "customer complaints process",
+    "ai-governance@example.org"
+  ],
+  "incident_process": "https://docs.example.org/ai-incident-process",
+  "retraining_policy": "Annual, or on a trigger; a retrained model is a new version and passes test plan, test report and go/no-go again.",
+  "review_cadence": "Monthly monitoring report; quarterly review by the AI governance committee.",
+  "owner": "model-risk",
+  "effective_from": "2026-08-24"
+}

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/decommissioning-runbook.v1.json",
+  "runbook_id": "rb-retire-credit-afford-02",
+  "subject": "credit-afford-02@2.4.1",
+  "reason": "replaced",
+  "replaced_by": "credit-afford-03",
+  "decision_ref": "gng-credit-afford-03-3.2.0",
+  "dependencies": [
+    "loan origination system scoring call",
+    "monthly credit risk report"
+  ],
+  "notifications": [
+    {
+      "party": "users",
+      "method": "Release note to credit analysts",
+      "sent_at": "2026-09-14"
+    },
+    {
+      "party": "deployers",
+      "method": "Change notice to the PT branch network",
+      "sent_at": "2026-09-14"
+    }
+  ],
+  "steps": [
+    {
+      "step_id": "S1",
+      "action": "disable_traffic",
+      "detail": "Remove 2.4.1 from the scoring router after 03 reaches 100%.",
+      "owner": "credit-data-engineering",
+      "status": "done",
+      "completed_at": "2026-09-21T08:00:00Z",
+      "evidence": "https://evidence.example.org/changes/chg-4410"
+    },
+    {
+      "step_id": "S2",
+      "action": "revoke_credentials",
+      "detail": "Revoke the service account and database grants.",
+      "owner": "platform-identity",
+      "status": "done",
+      "completed_at": "2026-09-21T09:30:00Z"
+    },
+    {
+      "step_id": "S3",
+      "action": "retire_register_entry",
+      "detail": "Set lifecycle_stage to retired; keep the entry.",
+      "owner": "ai-governance-lead",
+      "status": "done",
+      "completed_at": "2026-09-21T10:00:00Z"
+    },
+    {
+      "step_id": "S4",
+      "action": "archive_evidence",
+      "detail": "Archive technical documentation, test reports and logs.",
+      "owner": "model-risk",
+      "status": "done",
+      "completed_at": "2026-09-22T12:00:00Z"
+    },
+    {
+      "step_id": "S5",
+      "action": "delete_model_artefacts",
+      "detail": "Delete weights from the serving registry; keep one sealed copy with the archive.",
+      "owner": "credit-data-engineering",
+      "status": "pending"
+    }
+  ],
+  "data_disposition": [
+    {
+      "dataset": "scoring logs 2023-2026",
+      "action": "retain",
+      "basis": "credit file retention and audit",
+      "until": "2036-09-21"
+    },
+    {
+      "dataset": "feature cache",
+      "action": "delete"
+    }
+  ],
+  "evidence_archive": {
+    "location": "https://archive.example.org/ai/credit-afford-02",
+    "retain_until": "2033-06-30"
+  },
+  "rollback_possible_until": "2026-10-21",
+  "status": "in_progress"
+}

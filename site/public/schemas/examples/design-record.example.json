@@ -1,0 +1,90 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/design-record.v1.json",
+  "record_id": "dr-credit-afford-03-3.2",
+  "subject": "credit-afford-03@3.2.0",
+  "use_case_record": "uc-2026-017",
+  "requirements": [
+    {
+      "id": "R1",
+      "statement": "The system shall never decline an application without analyst review.",
+      "source": "uc-2026-017 conditions",
+      "verified_by": "hitl-routing.v1"
+    },
+    {
+      "id": "R2",
+      "statement": "Approval-rate ratio between age bands shall stay at or above 0.8.",
+      "source": "risk rk-0042",
+      "verified_by": "fairness-age-bands.v2"
+    },
+    {
+      "id": "R3",
+      "statement": "Each score shall come with the top reason codes shown to the analyst.",
+      "source": "EU AI Act Art. 13(3)(b)(iv)",
+      "verified_by": "reason-codes.v1"
+    }
+  ],
+  "architecture_summary": "Batch-scored gradient-boosted model behind the loan origination system; scores and reason codes are written to the application record. Diagram: https://docs.example.org/credit-afford-03/architecture",
+  "model_selection": {
+    "candidates": [
+      "logistic regression scorecard",
+      "gradient-boosted trees",
+      "neural network"
+    ],
+    "selected": "gradient-boosted trees with monotonic constraints",
+    "tradeoffs": "Beats the scorecard on held-out data; monotonic constraints and reason codes keep it explainable; the neural network gave no gain worth the opacity."
+  },
+  "human_oversight_design": {
+    "mode": "human_in_the_loop",
+    "intervention_points": [
+      "analyst decides every application",
+      "analyst can override the score with a reason"
+    ],
+    "reviewer_context": "Score, top five reason codes, and the applicant data the score used.",
+    "override_logged": true
+  },
+  "controls_designed_in": [
+    "kill_switch",
+    "rollback",
+    "shadow_mode",
+    "human_approval",
+    "audit_logging"
+  ],
+  "logging_design": {
+    "events": [
+      "score issued",
+      "override",
+      "model version change"
+    ],
+    "retention_days": 3650
+  },
+  "metrics_and_thresholds": [
+    {
+      "metric": "AUC on held-out 2025 data",
+      "threshold": ">= 0.78",
+      "failure_mode": "unreliable affordability signal"
+    },
+    {
+      "metric": "approval-rate ratio, age bands",
+      "threshold": ">= 0.80",
+      "failure_mode": "indirect age discrimination"
+    }
+  ],
+  "known_limitations": [
+    "Not validated for self-employed applicants with under 12 months of history."
+  ],
+  "reviews": [
+    {
+      "role": "model-risk",
+      "decision": "approve",
+      "timestamp": "2026-06-20T10:00:00Z"
+    },
+    {
+      "role": "privacy-office",
+      "decision": "approve_with_conditions",
+      "conditions": "DPIA approved before training on 2025 data.",
+      "timestamp": "2026-06-21T15:30:00Z"
+    }
+  ],
+  "decision": "approved_with_conditions",
+  "decided_at": "2026-06-21"
+}

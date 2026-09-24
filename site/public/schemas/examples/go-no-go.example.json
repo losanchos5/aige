@@ -1,0 +1,74 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/go-no-go.v1.json",
+  "decision_id": "gng-credit-afford-03-3.2.0",
+  "subject": "credit-afford-03@3.2.0",
+  "change_type": "major_change",
+  "checklist": [
+    {
+      "item_id": "C1",
+      "question": "Do all blocking suites pass?",
+      "evidences": "EU AI Act Art. 15",
+      "evidence": "https://evidence.example.org/test-reports/tr-credit-afford-03-3.2.0",
+      "status": "met"
+    },
+    {
+      "item_id": "C2",
+      "question": "Is the FRIA approved and notified?",
+      "evidences": "EU AI Act Art. 27",
+      "evidence": "https://evidence.example.org/fria/fria-2026-004",
+      "status": "met"
+    },
+    {
+      "item_id": "C3",
+      "question": "Are the instructions for use updated for this version?",
+      "evidences": "EU AI Act Art. 13",
+      "evidence": "https://evidence.example.org/ifu/credit-afford-03/3.2.0",
+      "status": "met"
+    },
+    {
+      "item_id": "C4",
+      "question": "Is the post-market monitoring plan in place?",
+      "evidences": "EU AI Act Art. 72",
+      "evidence": "https://evidence.example.org/pmm/pmm-credit-afford-03",
+      "status": "met"
+    },
+    {
+      "item_id": "C5",
+      "question": "Is the internal-control conformity assessment recorded for this version?",
+      "evidences": "EU AI Act Art. 43",
+      "evidence": "https://evidence.example.org/conformity/credit-afford-03/3.2.0",
+      "status": "met"
+    }
+  ],
+  "reviewers": [
+    {
+      "role": "model-risk",
+      "decision": "approve",
+      "timestamp": "2026-08-20T10:00:00Z"
+    },
+    {
+      "role": "privacy-office",
+      "decision": "approve",
+      "timestamp": "2026-08-20T10:20:00Z"
+    },
+    {
+      "role": "head-of-retail-credit",
+      "decision": "approve_with_conditions",
+      "conditions": "Canary first, weekly fairness review for six weeks.",
+      "timestamp": "2026-08-20T11:00:00Z"
+    }
+  ],
+  "overrides": [],
+  "residual_risk_accepted": "Unvalidated segment (self-employed, under 12 months) routed to manual assessment; accepted by head-of-retail-credit.",
+  "decision": "go_with_conditions",
+  "conditions": [
+    "canary on 10% of applications for four weeks",
+    "weekly fairness review for six weeks"
+  ],
+  "rollout": {
+    "strategy": "canary",
+    "exposure_percent": 10,
+    "rollback_plan": "Switch the origination system back to 3.1.4; trigger on any blocking metric below threshold for two consecutive days."
+  },
+  "decided_at": "2026-08-20T11:05:00Z"
+}
