@@ -48,7 +48,10 @@ test.describe('sitemap', () => {
     // The sitemap library normalises the date to a W3C datetime, so only the
     // leading YYYY-MM-DD is asserted. It must be a real past date, never the
     // build date: a rebuild may not claim that every page changed today.
-    const today = new Date().toISOString().slice(0, 10);
+    // git dates a commit in the committer's time zone (%cs), so a commit made
+    // just after local midnight east of UTC is "tomorrow" in UTC: compare with
+    // the latest calendar date anywhere (UTC+14), not with the UTC date.
+    const today = new Date(Date.now() + 14 * 3600 * 1000).toISOString().slice(0, 10);
     for (const raw of lastmods) {
       const value = raw.replace(/<\/?lastmod>/g, '');
       expect(value).toMatch(/^\d{4}-\d{2}-\d{2}/);
