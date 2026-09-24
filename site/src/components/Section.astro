@@ -13,25 +13,10 @@
 interface Props {
   /** Background treatment. */
   tone?: 'plain' | 'tint' | 'dark' | 'mesh';
-  /**
-   * Ignored: the dot/grid texture is gone (SL-18).
-   * @deprecated se retira cuando index.astro deje de pasarlos.
-   */
-  texture?: 'none' | 'dots' | 'grid';
   /** id for in-page anchors. */
   id?: string;
   /** Extra class(es) on the <section>. */
   class?: string;
-  /**
-   * Ignored: sections carry no eyebrow (SL-04).
-   * @deprecated se retira cuando index.astro deje de pasarlos.
-   */
-  kicker?: string;
-  /**
-   * Ignored, like `kicker`.
-   * @deprecated se retira cuando index.astro deje de pasarlos.
-   */
-  kickerSwatch?: string;
   /** Section title (H2). */
   title?: string;
   /** Lede paragraph under the title. */
