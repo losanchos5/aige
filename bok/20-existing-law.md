@@ -20,7 +20,8 @@ engineer turns the interpretation into a control and a record, and depends on co
 reading (see [the disambiguation cluster](/bok/definition#the-disambiguation-cluster) and
 [regulatory translation](/bok/the-role#regulatory-translation)). Data-protection law has its own
 chapter ([19](/bok/privacy-and-ai)), the AI Act has chapter [18](/bok/eu-ai-act), and AI-specific
-statutes around the world are in chapter [21](/bok/ai-laws-worldwide). Every status in this chapter
+statutes around the world are in chapter [21](/bok/ai-laws-worldwide), with the
+[sector rules that already reach AI](/bok/ai-laws-worldwide#sector-rules-that-already-reach-ai). Every status in this chapter
 is stamped as of 2026-09-24; court cases and transposition deadlines move, so re-check before you
 rely on a row.
 
@@ -264,7 +265,7 @@ career gaps can carry the same information. Blindness also makes testing harder,
 measure a disparity across groups you have not recorded; to test, you must process the attribute.
 After the Digital Omnibus, the AI Act's new Article 4a gives providers of high-risk systems a basis
 to process special-category data for bias detection, with pseudonymisation and deletion once the
-bias is corrected [43]. Chapter [16](/bok/fairness-and-explainability) covers the metrics
+bias is corrected [43]. Chapter [16](/bok/fairness-and-explainability#group-fairness-metrics) covers the metrics
 themselves; this section covers what the law will read them against.
 
 ### Employment
@@ -300,7 +301,8 @@ that creditors using complex algorithms, including AI or machine learning, must 
 specific principal reasons; complexity is no excuse [51]. Where the decision rests on a consumer
 report, the FCRA adds its own adverse-action duties [52]. The engineering consequence is precise:
 the reasons in the notice must be the reasons the model used, so a reason code produced by an
-attribution method is tested for fidelity against each model version.
+attribution method is tested for fidelity against each model version (chapter 16 on
+[adverse-action notices](/bok/fairness-and-explainability#credit-adverse-action-notices-and-reason-codes)).
 
 **European Union.** The second Consumer Credit Directive (EU) 2023/2225 requires a creditworthiness
 assessment on relevant, accurate information, without special-category data or social networks as a
@@ -309,7 +311,7 @@ an explanation of the assessment and its logic, a chance to state their view, an
 18(8)). Member States had to adopt the rules by 20 Nov 2025 and apply them from 20 Nov 2026 [53]
 (verify national transposition and any change to the application date). Creditworthiness scoring is
 also high-risk under the AI Act (Annex III, point 5(b)), with fraud detection excluded [47]; the
-data-protection rules on automated decisions are in chapter [19](/bok/privacy-and-ai).
+data-protection rules on automated decisions are in chapter [19](/bok/privacy-and-ai#automated-decision-making).
 
 ### Housing, insurance and public services
 
@@ -351,7 +353,9 @@ eval and a record.
 | CCD2 Art. 18(8) | Explanation, human intervention and review [53] | Explanation artefact per model version | Review log with outcome and reviewer |
 
 The four-fifths rule is a rule of thumb for enforcement agencies, not a safe harbour [59]. Treat an
-impact ratio above 0.8 as a pass of one check, not as proof of lawfulness.
+impact ratio above 0.8 as a pass of one check, not as proof of lawfulness. Chapter 16 computes and
+reports it with counts and intervals
+([disparate impact and the four-fifths rule](/bok/fairness-and-explainability#the-four-fifths-rule-and-the-adverse-impact-ratio)).
 
 > **In practice (illustrative)**
 > A recruitment team deployed a vendor ranking model in New York and two EU countries. The vendor's
@@ -365,7 +369,9 @@ impact ratio above 0.8 as a pass of one check, not as proof of lawfulness.
 ## Consumer protection
 
 Consumer-protection law reaches AI through three doors, with no AI-specific statute: what you claim
-about the system, how its interface treats people, and what it does with their data.
+about the system, how its interface treats people, and what it does with their data. What a
+chatbot tells a customer binds the business that deployed it:
+[Moffatt v. Air Canada](/cases/moffatt-v-air-canada) is the case written up as a post-mortem.
 
 ### Unfair and deceptive practices in the United States
 
@@ -521,7 +527,7 @@ control [2]; US failure-to-warn theories reach the same point [75]. So warnings 
 versions: the model card and instructions for use regenerate on every release, release notes list
 known limitations and changed behaviour, and field monitoring feeds the [Incident
 Pipeline](/bok/patterns#pattern-incident-pipeline), so a new hazard produces a decision (patch,
-warn, withdraw) with an owner and a date (chapter [17](/bok/incidents)).
+warn, withdraw) with an owner and a date (chapter [17](/bok/incidents#the-response-lifecycle)).
 
 ### The defence file
 
@@ -579,8 +585,8 @@ share one registry id.
 
 | Body of law | The question for this system | Artefact, keyed to the registry id | Layer |
 |---|---|---|---|
-| AI Act (chapter [18](/bok/eu-ai-act)) | Annex III point 4 high-risk: are the deployer duties met, and has the provider supplied its evidence? [47] | Registry entry with role (deployer); provider's documentation collected at the due-diligence gate; human oversight design | 2 · 5 |
-| Data protection (chapter [19](/bok/privacy-and-ai)) | Is the processing lawful and are automated decisions safeguarded? | DPIA; candidate notice; review path | 1 · 5 |
+| AI Act (chapter [18](/bok/eu-ai-act#deployer-duties-article-26)) | Annex III point 4 high-risk: are the deployer duties met, and has the provider supplied its evidence? [47] | Registry entry with role (deployer); provider's documentation collected at the due-diligence gate; human oversight design | 2 · 5 |
+| Data protection (chapter [19](/bok/privacy-and-ai#automated-decision-making)) | Is the processing lawful and are automated decisions safeguarded? | DPIA; candidate notice; review path | 1 · 5 |
 | Non-discrimination | Is there adverse impact, is the practice justified, and were alternatives searched? [38] [45] [39] | Monthly impact-ratio eval; published audit summary; search log | 3 · 5 |
 | Consumer protection | Is the vendor's "bias-free" claim, repeated in our candidate materials, substantiated? [62] | Claims register row citing our own eval run, not the vendor's brochure | 3 · 5 |
 | Product liability | Is the directive the route for a rejected candidate? | Usually not: its damage heads (injury, property, data) do not include discrimination [2], so the exposure runs through equality law and contract | 5 |

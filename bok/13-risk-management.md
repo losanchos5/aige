@@ -74,7 +74,8 @@ monitoring data; and adopt targeted risk management measures [8]. The Digital Om
 provider; the deployer runs its own loop through `Art. 26` monitoring and, where it applies, the
 `Art. 27` FRIA (chapter 08). A legal reading of Article 9, written against the 2021 proposal, is a
 useful guide to what each step asks [11]. No harmonised standard for AI risk management is yet
-cited in the Official Journal [12].
+cited in the Official Journal [12]; the draft that would answer Article 9, prEN 18228, is tracked in
+[the JTC 21 programme](/bok/principles-and-standards#the-jtc-21-programme) (chapter 22).
 
 The four steps compress ISO's activities: **identify** covers scope, context, criteria and
 identification; **assess** covers analysis and evaluation; **monitor** covers review, recording and
@@ -126,7 +127,8 @@ The NIST AI RMF 1.0 splits risk work into four functions, each broken into categ
 subcategories. GOVERN applies across the whole process; MAP, MEASURE and MANAGE apply per system and
 per lifecycle stage [1]. Chapter 08 maps the functions to layers; the table below goes down to
 the 19 categories and the subcategories this chapter builds on (paraphrased; the ids are NIST's; the
-layer column is this book's illustrative reading).
+layer column is this book's illustrative reading). Chapter 22 walks
+[the 19 NIST AI RMF categories](/bok/principles-and-standards#the-core-19-categories) in full.
 
 | Category | Subcategories this chapter uses | Layer | Artefact |
 |---|---|---|---|
@@ -210,8 +212,8 @@ Two rows carry a legal note. The AI Act's **reasonably foreseeable misuse** is u
 intended purpose that "may result from reasonably foreseeable human behaviour or interaction with
 other systems, including other AI systems" [3]: misuse by users and by other agents is in scope,
 not an excuse. And NIST warns that third-party risk comes both from the component and from how it is
-used, and that developer and deployer metrics may not match [1].
-
+used, and that developer and deployer metrics may not match [1]. Chapter 14 turns foreseeable misuse
+into design inputs ([reasonably foreseeable misuse](/bok/governing-development#reasonably-foreseeable-misuse)).
 Catalogues find gaps; they are not a register. NIST AI 600-1 names 12 risks unique to or made worse
 by generative AI and suggests grouping them as technical or model, misuse by humans, and ecosystem
 or societal [14]. The OWASP Top 10 for Agentic Applications covers agent threats such as goal
@@ -304,8 +306,9 @@ your volumes.
 | S5 | Catastrophic | Death or serious harm to health; serious and irreversible disruption of critical infrastructure; serious harm to property or the environment; widespread infringement of fundamental rights |
 
 S4 and S5 together cover the four categories of a **serious incident** under the AI Act [3], so
-a risk rated there is a candidate reportable incident the day it materialises.
-
+a risk rated there is a candidate reportable incident the day it materialises. The
+[harms atlas](/resources/harms) gives a harm taxonomy by level, with real incident records, to
+calibrate the severity column against.
 ### The matrix and what each band triggers
 
 | Severity / likelihood | L1 Rare | L2 Unlikely | L3 Possible | L4 Likely | L5 Almost certain |
@@ -540,7 +543,7 @@ gives a common division of labour: the first line provides the product and manag
 second line provides expertise, support, monitoring and challenge on risk; internal audit provides
 independent assurance; the governing body sets direction [23]. The AI RMF adds that executive
 leadership takes responsibility for decisions about AI risk (GOVERN 2.3) [1].
-[Chapter 12](/bok/governance-program) covers committees and decision rights; the table below is the
+[Chapter 12](/bok/governance-program#risk-acceptance-and-exceptions) covers committees and decision rights; the table below is the
 part a gate can enforce.
 
 | Residual band | Accepts | Consulted (challenge) | Maximum period | Record |
@@ -567,8 +570,9 @@ section defines it. The register is the layer 05 evidence record of the whole lo
 file per risk, keyed to a registry id, every control reference resolving to an artefact that emits
 evidence, every change reviewed like code. It answers Article 9's "documented" and is where an
 auditor starts. Its closest standard shape is the plan of action and milestones (`POA&M`) in OSCAL's
-assessment layer [24], into which a register can export its open treatments.
-
+assessment layer [24], into which a register can export its open treatments. A JSON Schema for
+[a risk register entry](/resources/templates#schema-risk-register-entry), with a filled example, is on
+the templates page.
 ### Register schema
 
 ```yaml
@@ -728,7 +732,7 @@ The severity scale connects the two. Because S4 and S5 cover the AI Act's seriou
 risk id (deadlines in [chapter 08](/bok/regulatory-map#eu-ai-act-post-omnibus)). Article 9 closes the
 loop from the other side: risks emerging from post-market monitoring data are evaluated in the risk
 management system [8]. MANAGE 4.3 adds that incidents are communicated to relevant AI actors,
-including affected communities [1]. [Chapter 17](/bok/incidents) covers the incident lifecycle;
+including affected communities [1]. [Chapter 17](/bok/incidents#capa-from-incident-to-risk-register-and-eval-suite) covers the incident lifecycle;
 this chapter owns the link.
 
 Two measures show whether the link works. The **identification hit rate** is the share of incidents

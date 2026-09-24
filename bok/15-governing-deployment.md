@@ -6,7 +6,10 @@
 Most organisations deploy far more AI than they build. A provider's design duties are largely
 discharged when the system is placed on the market; a deployer's duties begin when the system is put
 to use, and they run for as long as it runs: use it as instructed, staff its oversight, monitor it,
-suspend it when it presents a risk, keep its logs and tell people it is there [1]. This chapter
+suspend it when it presents a risk, keep its logs and tell people it is there [1]. Chapter 18 lists
+the [Article 26 deployer duties](/bok/eu-ai-act#deployer-duties-article-26) one by one, and chapter
+17 covers the incident side of them
+([deployer duties: inform the provider, suspend use](/bok/incidents#deployer-duties-inform-the-provider-suspend-use)). This chapter
 follows one system from the decision to use it to the day it is switched off. At each step it names
 the decision, the artefact that records it, the stack layer that produces the evidence and the record
 that lands in the assurance store.
@@ -83,7 +86,7 @@ you look at candidates:
   decision based on the output of most Annex III systems has legal or similarly significant effects on a
   person, that person has a right to a clear and meaningful explanation from the deployer of the
   system's role in the decision [7]. Designing for that answer is cheaper than retrofitting it;
-  [chapter 16](/bok/fairness-and-explainability) covers the methods.
+  [chapter 16](/bok/fairness-and-explainability#explanation-techniques) covers the methods.
 
 ### Check the data and the people
 
@@ -103,8 +106,10 @@ allowed to stop it without first asking permission.
 
 Pull these answers into one artefact, the **Deployment Decision Record (DDR)**, committed next to the
 system's code and referenced from its registry entry (layer 02). Its floors become the thresholds of
-the eval gate (layer 03); its negative space becomes the scope the runtime watches (layer 04). An
-illustrative excerpt:
+the eval gate (layer 03); its negative space becomes the scope the runtime watches (layer 04). The
+templates page has a JSON Schema for
+[the deployment decision and the retirement runbook](/resources/templates#schema-deployment-decision-record).
+An illustrative excerpt:
 
 ```json
 { "ddr_id": "ddr-csa-01-v1", "system": "csa-01",
@@ -324,11 +329,13 @@ cyber, technology errors-and-omissions and liability policies for AI exclusions 
 before assuming cover. Where an insurer asks for evidence of controls, the underwriting questionnaire becomes one
 more consumer of the assurance store. And risk transferred is not risk reduced: the residual risk left
 after caps, exclusions and deductibles belongs in the risk register (see
-[chapter 13](/bok/risk-management)).
+[chapter 13](/bok/risk-management#inherent-risk-residual-risk-and-who-accepts-it)).
 
 ## Vendor contracts and licence terms
 
-When you deploy a system you did not build, the contract is a control surface. It decides whether you
+When you deploy a system you did not build, the contract is a control surface, and the place where
+the organisation's [third-party AI policy](/bok/governance-program#third-party-ai-policy) (chapter
+12) becomes enforceable. It decides whether you
 may test the system, whether you hear when it changes, where your data goes and how you leave. The AI
 Act requires a written agreement between the provider of a high-risk system and third parties that
 supply its components, tools and services, specifying the information, capabilities, technical access
@@ -389,7 +396,9 @@ with named owners; the rollout plan with its rollback criteria; the communicatio
 deactivation runbook. When the evidence is the provider's own (its instructions for use, which must
 state the system's capabilities, limitations, oversight measures and maintenance needs [18]), the
 review runs in **review mode**: it assesses the supplier's assessment and records, explicitly, what
-the deployer could not verify.
+the deployer could not verify. On the provider side, the same evidence came out of
+[release readiness and conformity](/bok/governing-development#release-readiness-and-conformity)
+(chapter 14).
 
 ### Three outcomes
 
@@ -465,11 +474,12 @@ retrieved passages, outputs, logs and feedback. Govern them as you govern traini
   storage-limitation ceiling of data protection law.
 - **Re-check the lawful basis** when the purpose changes; a new use of old logs is a new processing
   purpose.
-- **Map transfers** when inference, storage or support run in another jurisdiction.
+- **Map transfers** when inference, storage or support run in another jurisdiction; chapter 19
+  treats [remote inference as a transfer](/bok/privacy-and-ai#transfers-remote-inference-and-tias).
 - **Plan for data-subject requests** that reach prompts, logs, retrieval corpora and fine-tuned
   weights. Deleting a record from a corpus is a delete; removing its influence from tuned weights may
   mean retraining, so decide before you tune on personal data. Deployers of high-risk systems use the
-  provider's information to carry out their DPIA [1]; [chapter 19](/bok/privacy-and-ai) covers
+  provider's information to carry out their DPIA [1]; [chapter 19](/bok/privacy-and-ai#the-dpia-for-ai-systems) covers
   the privacy side in depth.
 
 ### Maintenance calendar and retraining governance
@@ -520,7 +530,7 @@ group, and, for generative systems, groundedness and refusal rates by topic and 
 requires a periodic bias audit (New York City's Local Law 144, for example, requires a bias audit
 within one year before an automated employment decision tool is used, and a public summary of its
 results [35]), the production telemetry is what makes the audit cheap.
-[Chapter 16](/bok/fairness-and-explainability) covers the metrics; the point here is that they run
+[Chapter 16](/bok/fairness-and-explainability#monitoring-fairness-in-production) covers the metrics; the point here is that they run
 continuously and feed the same threshold, issue and incident path as every other signal.
 
 ### Who owns the signal
@@ -679,7 +689,7 @@ asks that incidents and errors be communicated to relevant AI actors, including 
 A **holding statement** is prepared in skeleton before any incident: what happened, stated only as far
 as it is known; what has been done to contain it; what affected people should do; and when the next
 update will come. It never speculates about cause. The incident side of communication is developed in
-[chapter 17](/bok/incidents). At retirement, the same plan sends the sunset notices. And measure the
+[chapter 17](/bok/incidents#the-response-lifecycle). At retirement, the same plan sends the sunset notices. And measure the
 plan: whether notices reached the people they were for, and what the complaint volume did afterwards.
 
 ## Deactivation, degradation, localisation and retirement
@@ -723,7 +733,7 @@ a deployment accident: per-jurisdiction rule sets as code, regional instances wh
 requires them, and feature flags by region so one market can be switched off without touching the
 others. Obligations overlap in places (the AI Act's six-month log floor and the six-month operator
 log retention in China's voluntary TC260 framework [1][41]) and diverge in many others; see
-[chapter 21](/bok/ai-laws-worldwide) and the [regulatory map](/bok/regulatory-map).
+[chapter 21](/bok/ai-laws-worldwide#comparing-the-regimes) and the [regulatory map](/bok/regulatory-map).
 
 ### Retirement and decommissioning
 

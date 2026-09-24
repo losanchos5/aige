@@ -27,9 +27,9 @@ framework true on a Tuesday. That is the engineering job.
 
 This chapter is not a GRC programme manual and not legal advice. It is the operating model that gives
 the five layers of [the stack](/bok/the-stack) their owners. The risk loop is chapter 13 ([Where risk
-management sits](/bok/risk-management)); the controls at each build and run stage are chapters 14 and
-15 ([Governing AI development](/bok/governing-development), [Governing deployment and
-use](/bok/governing-deployment)).
+management sits](/bok/risk-management#the-loop-identify-assess-treat-monitor)); the controls at each build and run stage are chapters 14 and
+15 ([Governing AI development](/bok/governing-development#the-build-as-a-chain-of-gates), [Governing deployment and
+use](/bok/governing-deployment#the-deployment-lifecycle-at-a-glance)).
 
 ## The stakeholder map
 
@@ -408,7 +408,9 @@ query generates it; a hand-assembled pack drifts from the systems it describes.
 A management system improves only if someone looks at the evidence on a schedule and changes
 something. ISO/IEC 42001 asks for monitoring and measurement, internal audit and management review
 (clauses 9.1 to 9.3) and for continual improvement with corrective action (clauses 10.1 and 10.2); read
-the standard for the required inputs and outputs [2]. NIST asks for planned periodic review of the risk
+the standard for the required inputs and outputs [2]. One review can serve several management systems
+([integrating ISO/IEC 42001 with 27001, 27701 and 9001](/bok/principles-and-standards#integrating-with-27001-27701-and-9001),
+chapter 22). NIST asks for planned periodic review of the risk
 process, with roles and frequency defined (GOVERN 1.5) [3].
 
 Engineer the review to produce changes, not minutes. Inputs: the KPI/KRI pack, audit findings,
@@ -478,8 +480,10 @@ the sign-on catalogue (days 1 to 30); the AI flag in purchase requests, tiering 
 bought, modules for operators of the riskiest systems (days 31 to 60); the first KPI pack, the first
 management review and a decision on which control to automate first (days 61 to 90). The Commission's
 Q&A notes that Article 4 mandates no specific governance structure [10]; size the program to what the
-organisation runs and grow the code with the portfolio.
-
+organisation runs and grow the code with the portfolio. Chapter 13 sets how much of the risk loop each
+kind of organisation runs
+([proportionate governance](/bok/risk-management#proportionate-governance-tailoring-the-loop)), and
+the templates page has starter [committee, RACI and AI policy sections](/resources/templates#tpl-kit).
 ## Policies across the lifecycle
 
 ### Policy, standard, procedure, code
@@ -523,7 +527,7 @@ irreversible disruption of critical infrastructure, infringement of fundamental-
 serious harm to property or the environment [16]; most incidents a program must learn from sit below
 that line (a biased batch, a leaked prompt, a tool call outside scope). Route every severity through
 one pipeline and let only the top class start a statutory clock (chapter 17, [Incidents, issues and
-root causes](/bok/incidents)). High-risk deployers must also inform the provider and suspend use when
+root causes](/bok/incidents#a-severity-scale-mapped-to-the-clocks)). High-risk deployers must also inform the provider and suspend use when
 they have reason to consider the system presents a risk (`Art. 26(5)`) [6]. **Change** needs
 triggers, because a prompt edit or a new retrieval source can change behaviour as much as a new model.
 **Retire** needs a runbook: NIST asks for safe decommissioning "in a manner that does not increase

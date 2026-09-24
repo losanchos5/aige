@@ -140,6 +140,37 @@ a completed, reviewed core (1.0).
   workload-identity revocation, API-gateway circuit breakers) became named tools (Unleash, Envoy,
   Resilience4j); workload identity stays under Agent workload identity (SPIFFE/SPIRE). mcp-scan is
   listed under its current name, Snyk Agent Scan.
+- Chapters 11 to 22 are written in full, replacing the stubs, in three parts: foundations (11 AI
+  defined for governance; 12 running the AI governance program; 13 where risk management sits),
+  the lifecycle (14 governing development; 15 governing deployment and use; 16 fairness and
+  explainability; 17 incidents, issues and root causes) and law and standards (18 the EU AI Act in
+  one pass; 19 privacy and data protection; 20 other law that already applies to AI, covering
+  intellectual property, non-discrimination, consumer protection, product liability and deepfakes,
+  with a dated case table and a defect-to-evidence table; 21 AI-specific laws around the world; 22
+  principles, soft law and standards). Chapter 23 (governing AI agents) is still a stub.
+- Book integration pass (block b-bok-maintenance): chapters 11 to 22 are woven into the rest of the
+  book. `site/src/data/chapters.ts` carries a one-sentence summary and an "at a glance" block for
+  chapter 02 and each of chapters 11 to 22; chapters 01 to 04, 06 to 08 and 11 to 22 gain deep
+  links to the sections that develop each topic (route-level links between chapters 11 to 22 now
+  point at the relevant section, except whole-chapter orientation references), plus links to the
+  harms atlas, the cases and the templates page.
+- `bok/08-regulatory-map.md`: the Article 73 clock table now counts the 15-, 2- and 10-day outer
+  deadlines from awareness, with the immediate duty on a causal link, and names the deployer when
+  it cannot reach the provider (`Art. 26(5)`); `Art. 75(1a)` and the scope of `Arts. 75a` to
+  `75d` are stated precisely; the South Korea row cites the Act and Enforcement Decree on
+  law.go.kr (primary) and the MSIT guidance period; the China paragraph points to chapter 21 for
+  the anthropomorphic interaction measures; the US section points to chapter 21; "What is NOT
+  harmonised yet" gives the JTC 21 stages as of 2026-09-24; the NIST AI RMF section notes that
+  1.0 "is being revised"; a pointer to chapter 18 opens the EU section; Omnibus precisions for
+  `Art. 6` and `Art. 25` are added in prose. Sources `[57]` to `[63]` added; `[34]` now cites
+  law.go.kr. No H2 or H3 renamed and no obligation-table row changed.
+- SR 11-7 superseded: chapters 01 and 02 and `STYLEGUIDE.md` section 10 now say that SR 26-2
+  (Federal Reserve, OCC and FDIC, 17 Apr 2026) replaced SR 11-7 and leaves generative and agentic
+  AI models out of its scope (new sources, verified primary). `STYLEGUIDE.md` gains a
+  "Superseded references" rule (SR 26-2, ISO 31073:2022, ISO 9001:2026, ISO/IEC 27701:2025).
+- `sources/SOURCES.md`: sections for chapters 12, 13 and 15 to 22, and a new "Site data pages"
+  part for the harms atlas, the eleven cases and the templates page; rows added for the new
+  sources of chapters 01, 02 and 08.
 
 ## [Unreleased] - 2026-09-20
 

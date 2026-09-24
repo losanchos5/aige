@@ -23,7 +23,9 @@ strong as its weakest layer.
 spreadsheet inventory, a risk register, a review that happens before launch. The rules are written and
 someone is accountable, but nothing executes. Typical evidence: policy documents, a populated
 spreadsheet, meeting minutes. Typical failure that moves you back: the document was last edited a
-quarter ago and no longer matches production; the artefact is stale before it is signed.
+quarter ago and no longer matches production; the artefact is stale before it is signed. Chapter 13
+shows what the risk register looks like at each level
+([risk practice by maturity level](/bok/risk-management#risk-practice-by-maturity-level)).
 
 **Level 2: Inventoried.** There is a real inventory of models and an
 **[agent registry](/bok/patterns#pattern-agent-registry)**, and it is
@@ -109,7 +111,9 @@ Each level has metrics you can read off the systems. Track the trend, not the si
 
 The single most telling cross-level metric is evidence freshness. At Level 1 the freshest evidence is
 a quarter old; at Level 5 it is as old as the last pipeline run. If your evidence ages in months, you
-are not yet continuous, whatever the dashboard says.
+are not yet continuous, whatever the dashboard says. These are engineering metrics; the board-level
+set that reports them upward is in chapter 12
+([KPIs and KRIs for leadership and the board](/bok/governance-program#kpis-and-kris-for-leadership-and-the-board)).
 
 ## Self-assessment checklist
 
@@ -144,7 +148,9 @@ says little about whether an **eval gate** blocks a build or whether evidence is
 Level 4-5 properties. And it is not a harmonised standard: the certificate confers no presumption of
 conformity with the EU AI Act, because none is yet cited in the Official Journal [3]. Reaching Level 5
 supports a 42001 audit by producing evidence continuously; it does not replace the certificate, and the
-certificate does not prove you are past Level 2.
+certificate does not prove you are past Level 2. Whatever the scheme, run
+[an audit programme](/bok/governing-deployment#an-audit-programme-not-an-audit), not a single audit
+(chapter 15).
 
 **OWASP AI Maturity Assessment (AIMA).** OWASP's GenAI Security Project publishes an AI Maturity
 Assessment reported at v1.0 (Aug 2025) [4]. It is complementary: where AIMA scores the *breadth* of an

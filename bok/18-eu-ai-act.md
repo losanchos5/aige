@@ -33,7 +33,9 @@ Four ideas carry the whole text:
 The **Digital Omnibus on AI** is Regulation (EU) 2026/1744 of 8 July 2026. It was published in the
 Official Journal on 24 July 2026 and entered into force on the third day after publication, 27 July
 2026 [2]. It did not rewrite the Act. It moved the high-risk dates, added two prohibitions and made
-targeted changes that matter to an engineer:
+targeted changes that matter to an engineer (its GDPR counterpart is a separate proposal, covered in
+[the GDPR side of the Digital Omnibus](/bok/privacy-and-ai#the-gdpr-side-of-the-digital-omnibus),
+chapter 19):
 
 | Change | Where | What it means for the engineer |
 |---|---|---|
@@ -87,7 +89,7 @@ system" call with no reasoning attached is the first thing an authority will ask
 model** is a separate object with its own definition (`Art. 3(63)`), covered below; a model is not
 an AI system on its own and needs further components, such as a user interface, to become one
 (recital 97) [1]. What "AI" means
-technically, beyond the legal test, is the subject of [chapter 11](/bok/ai-defined).
+technically, beyond the legal test, is the subject of [chapter 11](/bok/ai-defined#four-definitions-compared).
 
 ### What the Act excludes
 
@@ -143,7 +145,8 @@ prohibited only where that output is its intended purpose, or where the output i
 foreseeable and reproducible outcome" and the system lacks "reasonable and adequate technical safety
 measures" to prevent it and correct observed misuse; use is prohibited only where the deployer uses
 it for that purpose [2]. The evidence that the safeguard holds is therefore part of the legal test.
-The Commission's guidelines on the original prohibitions are non-binding [4].
+The Commission's guidelines on the original prohibitions are non-binding [4]. The scraping ban in
+point `(e)` has a data protection precedent in [the Clearview AI case](/cases/clearview-ai).
 
 For most organisations `Art. 5` is two controls: a denylist of prohibited purposes evaluated at
 intake ([Policy Card](/bok/patterns#pattern-policy-card)), and for generative systems an output
@@ -193,7 +196,8 @@ is high-risk unless the `Art. 6(3)` filter takes it out [1]:
 | 8. Administration of justice and democratic processes | Assisting judicial authorities with facts and law (and ADR), influencing elections or voting behaviour |
 
 The Commission can add use cases to Annex III by delegated act (`Art. 7`) [1], so the intake
-classifier's Annex III table is data with a version, not a hard-coded list.
+classifier's Annex III table is data with a version, not a hard-coded list. What point 5 guards
+against is visible in [the Dutch childcare-benefits case](/cases/dutch-childcare-benefits).
 
 ### The Annex III filter and the profiling override
 
@@ -252,7 +256,9 @@ The information must reach people at the latest at first interaction or exposure
 date have until 2 Dec 2026 to mark outputs (`Art. 111(4)`) [2]. The final Code of Practice on
 Transparency of AI-generated Content (10 June 2026) has a provider section on marking and a deployer
 section on labelling, and the Commission and the AI Board confirmed it as an adequate voluntary tool;
-draft `Art. 50` guidelines were published on 8 May 2026 [9].
+draft `Art. 50` guidelines were published on 8 May 2026 [9]. Law outside the Act also reaches
+synthetic media: see [deepfakes and synthetic media](/bok/existing-law#deepfakes-and-synthetic-media)
+in chapter 20.
 
 ### Minimal risk
 
@@ -260,7 +266,7 @@ Everything else is minimal risk. The Act asks nothing specific of it beyond AI l
 and invites voluntary codes of conduct (`Art. 95`) [1]. "Minimal" is a legal category, not a risk
 verdict: data protection, consumer, product-liability and anti-discrimination law still apply (see
 [existing law](/bok/existing-law) and [privacy and AI](/bok/privacy-and-ai)), and your own
-[risk management](/bok/risk-management) may rate a minimal-risk system as high for your
+[risk management](/bok/risk-management#assessing-risk-the-likelihood-by-severity-matrix) may rate a minimal-risk system as high for your
 organisation.
 
 ## General-purpose AI models
@@ -286,6 +292,8 @@ ability to generate language (text or audio), text-to-image or text-to-video [7]
 
 The duties and their details are in the Act [1]; the chapter 08 rows for
 [`Art. 53` and `Art. 55`](/bok/regulatory-map#eu-ai-act-post-omnibus) carry the dates and the authority.
+The copyright law behind the `Art. 53(1)(c)` policy is in chapter 20
+([copyright policy and TDM opt-outs](/bok/existing-law#copyright-and-training-data)).
 
 ### Systemic risk: threshold, notification, designation
 
@@ -356,6 +364,8 @@ one table, with the artefact that evidences each:
 | `Art. 15` | Accuracy, robustness and cybersecurity across the lifecycle, including defences against poisoning, adversarial examples and confidentiality attacks | Eval gate; red-team suite; security controls | 3 · 4 |
 
 The requirements are in the Act [1]; the SME and SMC form in `Art. 11(1)` is an Omnibus addition [2].
+Chapter 14 builds [the technical file](/bok/governing-development#the-technical-file) from pipeline
+records.
 `Art. 14(5)` adds two-person verification before acting on a remote biometric identification, with
 exceptions in law enforcement, migration, border control and asylum [1]; see
 [designing human oversight](/bok/the-stack#designing-human-oversight-article-14) and the
@@ -380,7 +390,8 @@ partner or linked enterprises may meet certain elements in a simplified way (`Ar
 [2]. Read as an engineer, the QMS is the pipeline plus its records: versioned policies, change
 control and the gates that run on every release. The Article 17 standard is published but not cited
 in the Official Journal, and ISO/IEC 42001 is not the Article 17 QMS (see
-[chapter 08](/bok/regulatory-map#what-is-not-harmonised-yet)).
+[chapter 08](/bok/regulatory-map#what-is-not-harmonised-yet), and chapter 22 on
+[harmonised standards and the presumption of conformity](/bok/principles-and-standards#how-presumption-of-conformity-works)).
 
 ### Conformity assessment, declaration, marking and registration
 
@@ -411,7 +422,7 @@ or its reasonable likelihood, is established, and in any event on the `Art. 73` 
 from when the provider (or deployer) becomes aware of the incident: 15 days in general, two days for
 a widespread infringement or serious disruption of critical infrastructure, and 10 days after a death
 [1]. Chapter 08 holds the [reporting-clock table](/bok/regulatory-map#eu-ai-act-post-omnibus);
-chapter 17 treats [incidents](/bok/incidents) end to end. Providers of high-risk systems under the AI
+chapter 17 treats [incidents](/bok/incidents#the-overlapping-clocks) end to end. Providers of high-risk systems under the AI
 Office's direct competence report to the AI Office instead (`Art. 75(1a)`) [2].
 
 ## Who you are in the value chain
@@ -503,7 +514,7 @@ Colorado's law was signed on 14 May 2026 and its duties apply from 1 Jan 2027 [1
 requires a domestic representative for foreign operators above decree thresholds (`Arts. 4`, `36`)
 [12]. The ISO/IEC 22989 list and its clause (5.19) are marked for verification [13]. See
 [chapter 08](/bok/regulatory-map#us-federal-and-state-laws) and
-[AI laws worldwide](/bok/ai-laws-worldwide) for these regimes in context.
+[AI laws worldwide](/bok/ai-laws-worldwide#comparing-the-regimes) for these regimes in context.
 
 ## Deployer duties (Article 26)
 
@@ -526,7 +537,7 @@ Article 26 is the deployer's list for high-risk systems. Broken into sub-duties,
 
 Financial institutions meet the monitoring and log duties through their financial-services
 governance rules [1]. The deployer's view of procured systems is developed in
-[governing deployment](/bok/governing-deployment).
+[governing deployment](/bok/governing-deployment#operating-the-system).
 
 > **In practice (illustrative)**
 > In a large telco, the deployer duties stopped being a questionnaire once each became a registry
@@ -565,11 +576,13 @@ significant effects that the person considers adverse to their health, safety or
 may obtain "clear and meaningful explanations of the role of the AI system in the decision-making
 procedure and the main elements of the decision taken" [1]. The right yields to exceptions in Union or
 national law and applies only where Union law does not already provide it [1], which is why it has to
-be read with GDPR rights on automated decisions (see [privacy and AI](/bok/privacy-and-ai)).
+be read with GDPR rights on automated decisions (see [privacy and AI](/bok/privacy-and-ai#the-regimes-side-by-side)).
 
 The artefact is an **explanation record** per decision: system and model version, the inputs or
 reason codes behind the output, whether the output was determinative or advisory, and the human who
-decided; methods are in [fairness and explainability](/bok/fairness-and-explainability). On timing,
+decided; methods are in [fairness and explainability](/bok/fairness-and-explainability#explanation-artefacts-as-evidence-records),
+with what the [right to explanation (Art. 86)](/bok/fairness-and-explainability#the-eu-ai-act-articles-13-and-86)
+asks of the content. On timing,
 `Art. 86` sits in Chapter IX, which applies from 2 Aug 2026, but it has work to do only once Annex
 III systems are regulated from 2 Dec 2027. That is this chapter's reading; confirm it with counsel
 (verify).

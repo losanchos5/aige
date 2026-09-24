@@ -1,4 +1,4 @@
-// Typed manifest of the eleven Body of Knowledge chapters.
+// Typed manifest of the Body of Knowledge chapters (00 to 23).
 // `id` is the collection entry id Astro's glob loader produces from each
 // file name (github-slugger over the path segment, e.g. `00-preface.md`
 // -> `00-preface`). Titles are the file H1; summaries are the opening
@@ -29,8 +29,8 @@ export interface Chapter {
    * The stack layer (1–5) this chapter is about, when it is about exactly one.
    * Only then does the chapter header take that layer's colour; any other
    * chapter reads neutral, because a layer colour means that layer and nothing
-   * else (audit SL-06). None of the eleven chapters is about a single layer:
-   * The stack and Patterns span all five, so none sets it today.
+   * else (audit SL-06). No chapter sets it today:
+   * The stack and Patterns span all five, and the others cut across layers.
    */
   layer?: 1 | 2 | 3 | 4 | 5;
   /**
@@ -90,11 +90,11 @@ export const chapters: readonly Chapter[] = [
     title: '02. Why now',
     shortTitle: 'Why Now',
     summary:
-      'AI governance engineering is forming now: the thing being governed changed shape, the market renamed the role and the law began asking for engineered evidence.',
+      'AI governance engineering is forming now: the object changed shape, the market began hiring for engineering and the law began asking for engineered evidence.',
     glance: [
       'Five problems share one root: governance that describes instead of runs.',
       'The object changed shape: agents that browse, execute code and act under delegated authority are what legacy governance can least see.',
-      'The market renamed the role before the profession named itself, and the law began asking for engineered evidence.',
+      'The market is hiring for engineering skills before the profession has named itself, and the law now asks for engineered evidence on dated deadlines.',
       'Engineered governance turns the quarterly guess into a live query and the end-of-line gate into a control that fires where the system changes.',
     ],
   },
@@ -222,7 +222,13 @@ export const chapters: readonly Chapter[] = [
     title: '11. AI, defined for governance',
     shortTitle: 'AI Defined',
     summary:
-      'What an AI system is for governance purposes: the definitions that set scope, the kinds of AI and the traits that break classic governance.',
+      'What an AI system is for governance: the definitions that set scope, the kinds of AI and the traits that break classic governance, each tied to a control.',
+    glance: [
+      'Whether a system counts as AI is the first control: a recorded intake decision, kept apart from the risk tier, that decides what enters the registry.',
+      'The OECD, EU AI Act, ISO/IEC 22989 and NIST definitions converge on inference, outputs and autonomy, and each element becomes a registry field that drives a decision.',
+      'A kind of AI matters when it changes a control: predictive, generative, RAG, on-device and agentic systems each need a different control set.',
+      'A score is not a decision: thresholds are owned policy, calibrated and set by risk tier, and a published responsible-AI principle counts only when an artefact evidences it.',
+    ],
   },
   {
     id: '12-governance-program',
@@ -232,7 +238,13 @@ export const chapters: readonly Chapter[] = [
     title: '12. Running the AI governance program',
     shortTitle: 'Governance Program',
     summary:
-      'The organisation as an object of governance: roles, committee, policies across the lifecycle, literacy and reporting.',
+      'An AI governance program is the organisation governed as a system: people hold duties, a committee decides what gates cannot, and policies compile into gates.',
+    glance: [
+      'The committee decides what code cannot (residual risk, exceptions, value trade-offs), and gates enforce each decision on every change and leave the evidence.',
+      'Exceptions live in a register the gate reads, each with an approver and an expiry, so a lapsed exception fails the build again without anyone having to remember.',
+      'AI literacy is a role-based system: structured training records that expire, with attestation as the condition for access to AI tools and override consoles.',
+      'Each policy rule is written once as data and compiled into both the prose people read and the policy-engine check the pipeline runs.',
+    ],
   },
   {
     id: '13-risk-management',
@@ -242,7 +254,13 @@ export const chapters: readonly Chapter[] = [
     title: '13. Where risk management sits',
     shortTitle: 'Risk Management',
     summary:
-      'Risk management as an engineering loop: identify, assess, treat and monitor, projected on the five layers and seven workflows.',
+      'Risk management is the loop that tells every other control how hard to bite: identify, assess, treat, monitor, with the risk register as its evidence.',
+    glance: [
+      'Risk management is not a sixth layer: it is the identify, assess, treat and monitor loop that sets the gates, thresholds and approvals of every other layer.',
+      'Likelihood and severity sit on defined five-level scales, and any catastrophic (S5) scenario is Critical whatever its likelihood.',
+      'Risk appetite is compiled into tier tolerances and a deploy gate, and every residual risk needs a named, expiring acceptance.',
+      'The risk register is versioned data keyed to the registry, and its intensity is tailored by size, sector, maturity, products, objectives and tolerance.',
+    ],
   },
   {
     id: '14-governing-development',
@@ -252,7 +270,13 @@ export const chapters: readonly Chapter[] = [
     title: '14. Governing AI development',
     shortTitle: 'Development',
     summary:
-      'Governing the build: use case, design review, training and test data, testing and validation, release and the technical file.',
+      'Development is governed when every build decision, from use case to release, leaves a record a gate reads, so the pipeline compiles the technical file.',
+    glance: [
+      'Write the use-case record first: intended purpose, out-of-scope uses, decision authority and error appetite are registry fields every later gate reads.',
+      "A dataset reaches training only through an admission gate that records the right to use it, licence and opt-out checks, quality, provenance and an owner's signature.",
+      'Freeze the test plan before testing and report intervals: a 0.96 pass rate on 200 cases cannot be told apart from a 0.95 threshold.',
+      'Most of Annex IV can be generated from pipeline records; people still write the rationale, the residual-risk judgements and the signatures.',
+    ],
   },
   {
     id: '15-governing-deployment',
@@ -262,7 +286,13 @@ export const chapters: readonly Chapter[] = [
     title: '15. Governing deployment and use',
     shortTitle: 'Deployment',
     summary:
-      'Governing the run: choosing and deploying a system, contracts, go-live, operation, communication and retirement.',
+      'Governing the run: deciding to use an AI system, choosing, contracting, going live, operating and retiring it, each step leaving evidence a control fired.',
+    glance: [
+      'Every step from the decision to deploy to retirement leaves an artefact: a decision record, a task eval, a contract check, a rollback event, a retired registry entry.',
+      'Choose models on task-specific evals on your own data: public benchmarks and leaderboards build a shortlist, they do not make the decision.',
+      'A deployer becomes a provider by rebranding, substantially modifying or repurposing a high-risk system, and the contract decides what it may test and how it leaves.',
+      'Operate with pre-registered rollback criteria, owned drift and fairness signals, tested degraded modes and a retirement runbook.',
+    ],
   },
   {
     id: '16-fairness-explainability',
@@ -272,7 +302,13 @@ export const chapters: readonly Chapter[] = [
     title: '16. Fairness and explainability for practitioners',
     shortTitle: 'Fairness & XAI',
     summary:
-      'How to measure fairness and produce explanations as evidence, and which legal hooks each technique answers.',
+      'Fairness and explainability become controls only when measured, gated and filed as evidence; this chapter maps each technique to its stack layer and legal hook.',
+    glance: [
+      'Fairness metrics conflict (Kleinberg 2016, Chouldechova 2017), so the metric, threshold and minimum cell size are a governance decision recorded as policy before the eval runs.',
+      'The four-fifths rule and the adverse-impact ratio are a trigger for investigation, reported with counts and confidence intervals, not a pass mark.',
+      'An explanation is an output that needs evals: fidelity, stability, sanity, reason-code consistency and comprehension testing with the people who receive it.',
+      'One explanation record per decision, pinned to model version, method and baseline, serves Regulation B notices, GDPR Art. 15(1)(h) requests and AI Act Art. 86 requests.',
+    ],
   },
   {
     id: '17-incidents',
@@ -282,7 +318,13 @@ export const chapters: readonly Chapter[] = [
     title: '17. Incidents, issues and root causes',
     shortTitle: 'Incidents',
     summary:
-      'AI incidents from detection to root cause, with the reporting clocks that overlap across regimes.',
+      'AI incident management turns a runtime signal into a classified, contained, reported and explained event, with its cause fed back into the controls.',
+    glance: [
+      'Severity and reportability are separate decisions: one internal harm scale, plus a test per regime, each with an owner and a timestamp.',
+      'Contain first, then freeze the evidence before fixing: the AI Act bars altering a high-risk system in ways that affect the evaluation of causes before authorities are informed.',
+      "One event can start several clocks (AI Act, GPAI Code, GDPR, NIS2, DORA, CRA), so keep one incident record and generate each regime's report from it.",
+      'Every closed incident leaves a regression eval, a risk-register change and a verified CAPA, coded against a cause taxonomy that names the control that should have caught it.',
+    ],
   },
   {
     id: '18-eu-ai-act',
@@ -292,7 +334,13 @@ export const chapters: readonly Chapter[] = [
     title: '18. The EU AI Act in one pass',
     shortTitle: 'EU AI Act',
     summary:
-      'The EU AI Act explained end to end after the Digital Omnibus: scope, risk classes, roles, duties, enforcement.',
+      'The EU AI Act as amended by the Digital Omnibus, read end to end: scope, risk ladder, roles, duties and the date each duty applies.',
+    glance: [
+      'The Digital Omnibus (Regulation (EU) 2026/1744, in force 27 Jul 2026) moved Annex III high-risk duties to 2 Dec 2027 and Annex I duties to 2 Aug 2028.',
+      'Article 5 now lists ten prohibited practices; the two Omnibus bans on non-consensual intimate imagery and child sexual abuse material apply from 2 Dec 2026.',
+      'Roles name tasks, not organisations: one organisation can be provider and deployer at once, and Article 25 turns rebranding, substantial modification or a new high-risk purpose into provider duties.',
+      'Every duty maps to an artefact: a classification decision record for Article 6(3), registry fields for Article 26, FRIA-as-code for Article 27 and an explanation record for Article 86.',
+    ],
   },
   {
     id: '19-privacy-and-ai',
@@ -302,7 +350,13 @@ export const chapters: readonly Chapter[] = [
     title: '19. Privacy and data protection law applied to AI',
     shortTitle: 'Privacy & AI',
     summary:
-      'How data protection law binds AI training and inference, and the artefacts that evidence compliance.',
+      'Data protection law already binds every AI system that touches personal data; this chapter turns its duties into artefacts, stack layers and evidence.',
+    glance: [
+      'Each processing moment of an AI system (collection, training, retrieval, inference, logging, evaluation) needs its own purpose, lawful basis and retention, recorded in a basis registry the pipeline reads.',
+      'The EDPB treats a trained model as anonymous only when extraction and query-based disclosure of training data are insignificant, so privacy attacks belong in the eval gate as evidence.',
+      'Rights requests must reach corpus, snapshots, RAG index, logs and weights, answered by suppression, retraining or unlearning and proven by a fulfilment record.',
+      'The GDPR part of the Digital Omnibus is still a proposal as of 2026-09-24, so build the controls both versions want and keep breach clocks and thresholds configurable.',
+    ],
   },
   {
     id: '20-existing-law',
@@ -312,7 +366,13 @@ export const chapters: readonly Chapter[] = [
     title: '20. Other law that already applies to AI',
     shortTitle: 'Existing Law',
     summary:
-      'Intellectual property, non-discrimination, consumer protection and product liability applied to AI systems.',
+      'Copyright, anti-discrimination, consumer-protection and product-liability law already bind AI systems; each duty maps to an evidence artefact and a stack layer.',
+    glance: [
+      'There is no AI exemption: copyright, equality, consumer-protection and product-liability law already apply to AI systems and are enforced today.',
+      'Training-data rights depend on where copying happens: EU opt-outs must be machine-readable, US fair use turns on each record, and the UK has no commercial exception.',
+      'Anti-discrimination law reads fairness through tests such as the four-fifths rule, adverse-action reasons and objective justification, so evals must report in those terms.',
+      'The EU Product Liability Directive treats software as a product from 9 Dec 2026 and lets courts order disclosure, so every AI release needs a complete defence file.',
+    ],
   },
   {
     id: '21-ai-laws-worldwide',
@@ -322,7 +382,13 @@ export const chapters: readonly Chapter[] = [
     title: '21. AI-specific laws around the world',
     shortTitle: 'AI Laws Worldwide',
     summary:
-      'AI-specific laws and sector rules outside the EU, jurisdiction by jurisdiction, each dated and sourced.',
+      "AI-specific law outside the EU, from Korea's Basic Act to US state statutes and voluntary frameworks, dated and mapped to the artefacts that evidence it.",
+    glance: [
+      "South Korea's AI Basic Act has applied since 22 January 2026, with notice, labelling, high-impact and domestic-representative duties, while fines wait out a guidance period of at least one year.",
+      'The US has no federal AI statute for private actors: OMB memoranda bind agencies and their vendors, state laws bind everyone else, and the federal push to preempt those laws was unresolved on 24 September 2026.',
+      'Most regimes ask for the same artefacts (inventory, classification record, notice, label, risk assessment, incident report, retained evidence), so build them once and parameterise trigger, clock and recipient per jurisdiction.',
+      "Sector rules already reach AI: the Cyber Resilience Act's reporting duties began on 11 September 2026, and SR 26-2 replaced SR 11-7 as US bank model-risk guidance in April 2026.",
+    ],
   },
   {
     id: '22-principles-and-standards',
@@ -332,7 +398,13 @@ export const chapters: readonly Chapter[] = [
     title: '22. Principles, soft law and standards',
     shortTitle: 'Principles & Standards',
     summary:
-      'The principle sets, international instruments and standards that shape AI governance, and what each changes in the stack.',
+      'Principles say what good looks like and standards say how to show it; this chapter maps each instrument to the stack layer and evidence that answer it.',
+    glance: [
+      'A principle counts only once a control in the stack evidences it; standards support conformity, they do not confer it.',
+      'The OECD AI-system definition, lifecycle and five classification dimensions reappear in the AI Act and the Council of Europe Convention, so they make good registry fields.',
+      'NIST AI RMF category and subcategory ids and ISO/IEC clause ids work best as control metadata from which profiles and crosswalks are generated.',
+      'As of 2026-09-24 we found no AI Act harmonised standard cited in the Official Journal: EN 18286 is published and the other JTC 21 drafts are at or before Enquiry.',
+    ],
   },
   {
     id: '23-governing-agents',

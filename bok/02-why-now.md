@@ -33,7 +33,10 @@ that by 2029 more than half of successful attacks on AI agents will exploit acce
 and prompt injection [3]. Both are runtime failure modes (the system misbehaving between reviews),
 and a once-a-year assessment is structurally blind to them. This is not the same work as model risk
 management in the SR 11-7 tradition, which validates a model at points in time; the object here never
-stops moving.
+stops moving. The tradition's own US guidance agrees on the boundary: SR 26-2, which replaced SR 11-7
+on 17 Apr 2026, leaves generative and agentic AI models outside its scope [22][23]. Chapter 11 lists
+[the traits of AI that break classic IT governance](/bok/ai-defined#eight-characteristics-that-break-classic-it-governance),
+each paired with the control that answers it.
 
 ### 3. Governance as a gate at the end, not a property of the build
 
@@ -117,7 +120,7 @@ build the controls and the evidence yourself and be ready to defend them on thei
 ### The regulatory wave: the Omnibus and GPAI enforcement
 
 The law moved twice in the summer of 2026, in opposite directions, and both moves point at
-engineering. First, the Digital Omnibus, Regulation (EU) 2026/1744, entered into force on 27 July
+engineering. First, [the Digital Omnibus, Regulation (EU) 2026/1744](/bok/eu-ai-act#the-act-and-the-omnibus), entered into force on 27 July
 2026, six days before the 2 August high-risk deadline, and reset the clock: Annex III high-risk
 obligations moved from 2 August 2026 to 2 December 2027, and Annex I embedded high-risk from 2 August
 2027 to 2 August 2028 [14][19]. The extra time is real, but it is not relief from the engineering; it
@@ -139,7 +142,7 @@ systems intended for public authorities that were already on the market must com
 [Chapter 08](/bok/regulatory-map#eu-ai-act-post-omnibus) maps each date to the artefact that
 answers it.
 
-The same pull shows up outside the EU. California's SB 53, the Transparency in Frontier Artificial
+The same pull shows up outside the EU. [California's SB 53](/bok/ai-laws-worldwide#united-states-state-laws-that-bind-private-organisations), the Transparency in Frontier Artificial
 Intelligence Act, signed on 29 September 2025 and in force since 1 January 2026, binds large frontier
 developers (models trained with more than 10^26 operations; annual revenue above USD 500 million) to
 publish a frontier AI framework and to report critical safety incidents to the state's Office of
@@ -223,3 +226,5 @@ five-layer stack, all layers. Mappings are illustrative, not a claim of conformi
 [19] Regulation (EU) 2026/1744 (Digital Omnibus on AI), Art. 1: new Art. 5(1)(ba)–(bb) from 2 Dec 2026; new Art. 111(4) (Art. 50(2) marking for systems placed on the market before 2 Aug 2026, by 2 Dec 2026); Art. 111(2) (public-authority high-risk systems by 2 Aug 2030); Art. 113 (Annex III 2 Dec 2027; Annex I 2 Aug 2028). Publications Office of the EU (EUR-Lex). 2026-07-24. https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng (verified: primary)
 [20] "Accelerating the Adoption of Software and Artificial Intelligence Agent Identity and Authorization" (concept paper; agents "known, trusted, and properly governed"; tamper-proof logging and non-repudiation). NIST NCCoE. 2026-02-05. https://www.nccoe.nist.gov/news-insights/new-concept-paper-identity-and-authority-software-agents (verified: primary)
 [21] Top 10 for Agentic Applications 2026 (ASI01 Agent Goal Hijack, ASI02 Tool Misuse, ASI03 Agent Identity & Privilege Abuse, … ASI10 Rogue Agents). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
+[22] SR 26-2, Revised Guidance on Model Risk Management (Federal Reserve, OCC and FDIC; supersedes SR 11-7 of 2011-04-04 and SR 21-8). Board of Governors of the Federal Reserve System. 2026-04-17. https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm (verified: primary)
+[23] Revised Guidance on Model Risk Management, attachment to SR 26-2 (footnote 3: generative AI and agentic AI models "are not within the scope of this guidance"). Federal Reserve, OCC and FDIC. 2026-04-17. https://www.federalreserve.gov/supervisionreg/srletters/SR2602a1.pdf (verified: primary)

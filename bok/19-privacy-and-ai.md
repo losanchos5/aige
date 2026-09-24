@@ -37,7 +37,10 @@ third-party model.
 Data cards live in layer 02 ([Inventory &
 Transparency](/bok/the-stack#layer-02-inventory--transparency)); purpose, retention and residency
 rules in layer 01; privacy tests in layer 03; redaction, filters and routing in layer 04; and the
-records a regulator asks for in layer 05.
+records a regulator asks for in layer 05. Two neighbouring chapters carry the organisational side:
+chapter 12 on [updating the policies you already have](/bok/governance-program#updating-the-policies-you-already-have),
+and chapter 14 on [the right to use the data](/bok/governing-development#the-right-to-use-the-data)
+at the dataset admission gate.
 
 ## Principles applied to AI
 
@@ -51,7 +54,8 @@ where they bite does.
 Article 6 offers six lawful bases and none ranks above another; the controller picks the one that
 fits each processing activity [3]. The trap is to pick one basis for "the model". Training on
 transcripts, indexing account notes and answering a live customer are different activities, and each
-needs its own basis.
+needs its own basis. [The Garante's ChatGPT order](/cases/garante-chatgpt-order) shows what an
+unrecorded basis costs.
 
 | Stage | Bases that usually fit | Why the choice is hard |
 |---|---|---|
@@ -274,7 +278,9 @@ the authority first, which has up to eight weeks to respond [1]. The EDPB expect
 also decisions that one was not needed [3], so "no DPIA" is an artefact too. Deployers of high-risk
 systems use the provider's Article 13 information for their DPIA [14], and the Article 27 FRIA
 complements a DPIA rather than repeating it [15]; the
-[FRIA-as-Code](/bok/patterns#pattern-fria-as-code) pattern writes the shared fields once.
+[FRIA-as-Code](/bok/patterns#pattern-fria-as-code) pattern writes the shared fields once. The
+templates page has an [AI DPIA addendum](/resources/templates#schema-impact-assessment) in its
+impact-assessment schema.
 
 ### Records of processing
 
@@ -325,10 +331,13 @@ and 05. Mappings are illustrative, not a claim of conformity.
 Article 22 gives people the right not to be subject to a decision based solely on automated
 processing, including profiling, with legal or similarly significant effects. Such decisions are
 allowed only when necessary for a contract, authorised by law, or based on explicit consent, and
-then with at least the right to human intervention, to express a view and to contest [1].
+then with at least the right to human intervention, to express a view and to contest [1]. Chapter 16
+turns [automated decision-making under GDPR Art. 22](/bok/fairness-and-explainability#data-protection-gdpr-and-the-uk-regime)
+into explanation and contest records.
 
 Two judgments set the engineering task. In SCHUFA (C-634/21, 7 Dec 2023) the Court of Justice held
-that a credit score is itself an automated decision when lenders give it a determining role [21]. A
+that a credit score is itself an automated decision when lenders give it a determining role [21]
+(the credit-law side is in chapter 20, [credit and lending](/bok/existing-law#credit-and-lending)). A
 model that "only recommends" is inside Article 22 when humans downstream follow it as a rule, and
 the party producing the score is itself deciding. In Dun & Bradstreet Austria (C-203/22, 27 Feb
 2025) the Court held that meaningful information about the logic means describing the procedure and
@@ -368,7 +377,9 @@ Gate](/bok/patterns#pattern-human-in-the-loop-gate) pattern).
 | EU AI Act `Art. 86`, `Art. 26(11)` | Deployer decision on an Annex III high-risk output | Explanation of the system's role and main elements; informing people [29][14] | Explanation keyed to the decision record | 4 · 5 |
 
 Article 86 applies only where Union law does not already give the right [29], so the GDPR route
-usually does the work. It sits outside the Annex III requirements the Omnibus deferred to 2 Dec 2027
+usually does the work (chapter 18 reads
+[AI Act Article 86 and Article 4a](/bok/eu-ai-act#explanation-and-notice-to-affected-people) in
+context). It sits outside the Annex III requirements the Omnibus deferred to 2 Dec 2027
 [2], and whether it bites earlier is not settled as of 2026-09-24 (verify). The Digital Omnibus
 proposal would recast Article 22 as a permission list in which contractual necessity holds even if a
 human could decide [30]; it is not law (see below).
@@ -491,7 +502,9 @@ data for unique identification, health data and data on sex life or sexual orien
 Article 9(2) condition applies, such as explicit consent [1]. The AI Act's new Article 4a lets
 providers of high-risk systems process such data where strictly necessary for bias detection and
 correction, only if other data (including synthetic or anonymised data) would not do, with
-pseudonymisation, access controls, no onward transmission and deletion once the bias is corrected;
+pseudonymisation, access controls, no onward transmission and deletion once the bias is corrected
+(chapter 16 on
+[special-category data for bias detection (Art. 4a)](/bok/fairness-and-explainability#protected-characteristics-proxies-and-the-data-you-need-to-test));
 deployers and providers of other systems may do so exceptionally, and no duty to run bias work is
 created [2]. The old Article 10(5) basis was deleted [35].
 
@@ -569,7 +582,8 @@ trace of what left, the registry entry saying whose data the system holds, the e
 whether the weakness was known. For agents that read mail, browse and call tools, the AEPD's
 guidance on agentic AI of 18 Feb 2026 sets out the added threats and the measures controllers can
 take [49]. One incident can start several clocks: the GDPR's 72 hours runs beside the AI Act's
-Article 73 deadlines (chapter 08) and any sector regime. Give the [Incident
+Article 73 deadlines (chapter 08) and any sector regime; chapter 17 sets
+[GDPR breach notification next to the AI Act clocks](/bok/incidents#the-overlapping-clocks). Give the [Incident
 Pipeline](/bok/patterns#pattern-incident-pipeline) a personal-data-breach branch with its own timer
 from the awareness timestamp, and keep the Omnibus proposal's 96 hours and high-risk threshold as a
 parameter, not today's rule [30].
@@ -618,7 +632,9 @@ the [regulatory map](/bok/regulatory-map#united-kingdom).
 ### United States
 
 There is no federal comprehensive privacy law. California's regulations on ADMT, risk assessments
-and cybersecurity audits took effect on 1 Jan 2026 [24]. ADMT means technology that uses computation
+and cybersecurity audits took effect on 1 Jan 2026 [24]. Chapter 21 walks one hiring tool through
+[Colorado SB 26-189 and the CPPA ADMT rules](/bok/ai-laws-worldwide#consequential-decisions-one-hiring-tool-four-regimes)
+side by side. ADMT means technology that uses computation
 to replace or substantially replace human decision-making; a significant decision concerns lending,
 housing, education, employment or healthcare. Risk assessments are due before, among others, using
 ADMT for significant decisions, certain automated inferences, and training ADMT or

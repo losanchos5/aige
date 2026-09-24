@@ -55,7 +55,9 @@ scoping decision.
 
 ### The OECD definition (2023 revision)
 
-The OECD Council revised its definition on 8 Nov 2023, ahead of the wider five-year review of the AI
+Chapter 22 places [the OECD definition and lifecycle](/bok/principles-and-standards#the-oecd-ai-system-definition-and-lifecycle)
+in the wider OECD instruments. The OECD Council revised its definition on 8 Nov 2023, ahead of the
+wider five-year review of the AI
 Principles, partly to support alignment with definitions then being written in the EU, Japan and
 elsewhere [2][3]. It now reads: "An AI system is a machine-based system that, for explicit or
 implicit objectives, infers, from the input it receives, how to generate outputs such as
@@ -73,7 +75,8 @@ initial development, such as a speech recogniser adapting to one voice [3].
 
 ### EU AI Act Article 3(1) and the Commission guidelines
 
-Article 3(1) of the AI Act follows the OECD text closely: "'AI system' means a machine-based system
+Chapter 18 sets [the legal definition of an AI system](/bok/eu-ai-act#what-counts-as-an-ai-system)
+in the Act's scope. Article 3(1) of the AI Act follows the OECD text closely: "'AI system' means a machine-based system
 that is designed to operate with varying levels of autonomy and that may exhibit adaptiveness after
 deployment, and that, for explicit or implicit objectives, infers, from the input it receives, how
 to generate outputs such as predictions, content, recommendations, or decisions that can influence
@@ -257,7 +260,7 @@ Record the reasoning, because the next reviewer will draw the line again. Second
 people the right not to be subject to a decision "based solely on automated processing" with legal
 or similarly significant effects, whether or not any AI definition is met [11]. The definitional
 decision routes a system to the AI-specific controls; it does not exempt anything else (see [Privacy
-and AI](/bok/privacy-and-ai)).
+and AI](/bok/privacy-and-ai#principles-applied-to-ai)).
 
 > **Note**
 > A **model** is not a **system**, and neither is an **agent**. The AI Act defines the AI system
@@ -434,7 +437,7 @@ rights); illiteracy by literacy and by explanations written for their reader; on
 technical explanation methods and, above all, behavioural evidence. When you cannot read the
 mechanism, you test the behaviour, and the eval result becomes the evidence that stands in for
 inspection. Explanation techniques themselves are covered in [Fairness and
-explainability](/bok/fairness-and-explainability).
+explainability](/bok/fairness-and-explainability#explanation-techniques).
 
 **Dual use is a property of capability, not intent.** Researchers who inverted the objective of a
 drug-discovery toxicity model, rewarding toxicity instead of penalising it, report that it generated
@@ -556,7 +559,7 @@ section keeps the two apart. It calls the published ones **principle sets**, tre
 people's frameworks (in chapter 01's [disambiguation](/bok/definition#the-disambiguation-cluster),
 ethics sets the target; engineering hits it and proves it) and asks one question of each: which
 artefact evidences it, from which layer, under which house value and principle. The sets as
-frameworks are treated in full in [Principles and standards](/bok/principles-and-standards).
+frameworks are treated in full in [Principles and standards](/bok/principles-and-standards#the-instruments-at-a-glance).
 
 ### Four principle sets in brief
 

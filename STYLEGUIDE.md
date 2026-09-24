@@ -169,6 +169,11 @@ to so the catalogue and the stack (chapter 04) stay consistent.
   Congress).
 - Never invent a statistic, a date, a version or a quote. If you need one and cannot source it,
   restructure the sentence so it does not need one.
+- **Superseded references.** When an instrument is replaced, cite the current one and, where the old
+  name is a tradition readers know, say both. As of 2026-09-24: SR 11-7 was superseded by SR 26-2
+  (17 Apr 2026; chapters 01, 13, 21); ISO Guide 73:2009 is withdrawn in favour of ISO 31073:2022
+  (chapter 13); ISO 9001:2015 was replaced by ISO 9001:2026 and ISO/IEC 27701:2019 by the standalone
+  ISO/IEC 27701:2025 (chapter 22). Reuse those chapters' verified source rows.
 - Prefer the complement honestly stated: IAPP says "only 1.5% will not need more staff"; if you write
   "98.5%", show the derivation ("100 − 1.5%") so the reader sees it is arithmetic, not a survey line.
 
@@ -217,8 +222,9 @@ switch**, **FRIA** (Fundamental Rights Impact Assessment), **DPIA**, **model car
 The single most important editorial job of this book is to say what AI governance engineering is
 **not**. Whenever a chapter risks blurring into a neighbour, add a one-line contrast. The canonical
 neighbours (full treatment in chapter 01): AI safety research, MLOps/LLMOps, model risk management
-(SR 11-7 style), AI compliance/legal, Responsible AI / AI ethics, GRC engineering (the parent), AI
-security engineering (the sibling), and Visure's "AI governance for engineering" (governing AI used
+(the SR 11-7 tradition; in the US, SR 26-2 has replaced SR 11-7 since 17 Apr 2026), AI
+compliance/legal, Responsible AI / AI ethics, GRC engineering (the parent), AI security engineering
+(the sibling), and Visure's "AI governance for engineering" (governing AI used
 _inside_ engineering workflows, the opposite direction). Never let the reader confuse the discipline
 with any of these.
 
