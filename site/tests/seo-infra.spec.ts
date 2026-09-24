@@ -4,20 +4,37 @@
 // the files are read from dist, which is what the preview server serves.
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { obligations, obligationPath } from '../src/data/frameworks';
 
-// Several blocks add routes in parallel, so the check is not a fixed count but
-// "every URL carries a lastmod": a new page without a `lastmod` source in
-// astro.config.ts (SOURCE_BY_PATH, or REVIEWED_BY_PATH for the obligation
-// pages) still fails it. The floor catches a sitemap that lost whole sections:
-// the chapters, the Thesis pages, the hand-built pages and one page per
-// obligation.
-const MIN_INDEXABLE_ROUTES = 28 + obligations.length;
+// Every indexable route is every HTML page the build writes, less the ones the
+// sitemap filter in astro.config.ts leaves out (the OG cards, the diagram
+// viewers and the 404). Counted from dist rather than typed, so parallel
+// changes that add pages never fight over one number; a new page without a
+// `lastmod` source in SOURCE_BY_PATH still fails the lastmod count below.
+function htmlRoutes(dir: string, root = dir): string[] {
+  const out: string[] = [];
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) out.push(...htmlRoutes(full, root));
+    else if (name.endsWith('.html')) {
+      const route = full
+        .slice(root.length)
+        .replace(/\\/g, '/')
+        .replace(/\.html$/, '')
+        .replace(/\/index$/, '');
+      out.push(route === '' ? '/' : route);
+    }
+  }
+  return out;
+}
+const INDEXABLE_ROUTES = htmlRoutes('dist').filter(
+  (route) => !/^\/(og|diagrams)\//.test(route) && route !== '/404',
+).length;
 
 test.describe('sitemap', () => {
-  test('every URL carries a dated lastmod', async ({ request }) => {
+  test(`every one of the ${INDEXABLE_ROUTES} URLs carries a dated lastmod`, async ({ request }) => {
     const res = await request.get('/sitemap-0.xml');
     expect(res.status()).toBe(200);
     expect(res.headers()['content-type']).toContain('xml');
@@ -25,8 +42,8 @@ test.describe('sitemap', () => {
     const xml = await res.text();
     const locs = xml.match(/<loc>/g) ?? [];
     const lastmods = xml.match(/<lastmod>([^<]+)<\/lastmod>/g) ?? [];
-    expect(locs.length).toBeGreaterThanOrEqual(MIN_INDEXABLE_ROUTES);
-    expect(lastmods.length).toBe(locs.length);
+    expect(locs.length).toBe(INDEXABLE_ROUTES);
+    expect(lastmods.length).toBe(INDEXABLE_ROUTES);
 
     // The sitemap library normalises the date to a W3C datetime, so only the
     // leading YYYY-MM-DD is asserted. It must be a real past date, never the

@@ -1,9 +1,10 @@
 ---
 /**
  * Footer: a full site map built from data/nav.ts (brand + Read/Practice/
- * Reference/About columns, the eleven chapters, feeds & data, and the project
- * links) over a meta line. Identity values come from data/site.ts. The tinted
- * band, grid texture and display watermark are kept.
+ * Reference/About columns, feeds & data and the project links, then every
+ * chapter grouped by part in a full-width block) over a meta line. Identity
+ * values come from data/site.ts. The tinted band, grid texture and display
+ * watermark are kept.
  */
 import RegisterMark from './RegisterMark.astro';
 import { site } from '../data/site';
@@ -46,16 +47,6 @@ const about = byId('about');
           ))}
           <li><a href={bok.href}>{bok.label}</a></li>
         </ul>
-        <ol class="fchap" aria-label="Chapters">
-          {bok.items.map((item) => (
-            <li>
-              <a href={item.href}>
-                <span class="num" aria-hidden="true">{item.num}</span>
-                <span>{item.label}</span>
-              </a>
-            </li>
-          ))}
-        </ol>
       </div>
 
       <div class="col col-practice">
@@ -98,7 +89,18 @@ const about = byId('about');
         <ul aria-labelledby="fg-feeds">
           {feeds.map((item) => (
             <li>
-              <a href={item.href}>{item.label}</a>
+              <a
+                href={item.href}
+                {...(item.event
+                  ? {
+                      'data-umami-event': item.event,
+                      'data-umami-event-file': item.href,
+                      'data-umami-event-location': 'footer',
+                    }
+                  : {})}
+              >
+                {item.label}
+              </a>
             </li>
           ))}
         </ul>
@@ -118,6 +120,29 @@ const about = byId('about');
             </li>
           ))}
         </ul>
+      </div>
+
+      <div class="col col-chapters">
+        <p class="group-title" id="fg-chapters">{bok.label}, by part</p>
+        <div class="fparts">
+          {(bok.sections ?? []).map((section) => (
+            <div class="fpart">
+              <p class="fpart-title" id={`fg-part-${section.id}`}>
+                {section.label} <span class="fpart-range">{section.range}</span>
+              </p>
+              <ol class="fchap" aria-labelledby={`fg-part-${section.id}`}>
+                {section.items.map((item) => (
+                  <li>
+                    <a href={item.href}>
+                      <span class="num" aria-hidden="true">{item.num}</span>
+                      <span>{item.label}</span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))}
+        </div>
       </div>
     </nav>
 
@@ -160,19 +185,18 @@ const about = byId('about');
     container-type: inline-size;
   }
 
-  /* Phones: two tracks so the short link groups pair up; the brand and the
-     Read column (with its two-column chapter list) take the full row. The two
-     short groups (About, Project) stack beside the long Feeds list instead of
-     leaving Project alone on a last row. */
+  /* Phones: two tracks so the link groups pair up (the long Reference list
+     beside Feeds, the short About beside Project); the brand and the chapters
+     by part take full rows. */
   .sitemap {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
       'brand brand'
-      'read read'
-      'practice reference'
-      'about feeds'
-      'project feeds';
+      'read practice'
+      'reference feeds'
+      'about project'
+      'chapters chapters';
     gap: var(--s-6) var(--s-5);
   }
 
@@ -197,14 +221,16 @@ const about = byId('about');
   .col-project {
     grid-area: project;
   }
+  .col-chapters {
+    grid-area: chapters;
+  }
 
-  /* From 720px Read is one track among several, too narrow for two chapter
-     columns ("07 Maturity / Model"), so the chapters run in one column and the
-     tracks are sized so no label wraps: Read gets the widest flexible track and
-     the link groups never shrink below their longest link. */
+  /* From 720px the link groups flow into tracks that never shrink below their
+     longest link, beside the brand; the chapters by part always close the map
+     on a row of their own. */
   @media (min-width: 720px) {
     .sitemap {
-      grid-template-columns: 1.4fr 1.6fr repeat(2, minmax(max-content, 1fr));
+      grid-template-columns: 1.4fr repeat(3, minmax(max-content, 1fr));
       grid-template-areas: none;
       gap: var(--s-6);
     }
@@ -212,13 +238,17 @@ const about = byId('about');
     .sitemap > .col {
       grid-area: auto;
     }
+
+    .sitemap > .col-chapters {
+      grid-column: 1 / -1;
+    }
   }
 
-  /* Wide: one track per column (brand, Read, five link groups), so no group
+  /* Wide: one track per column (brand, Read and five link groups), so no group
      wraps alone onto a second row. */
   @media (min-width: 1100px) {
     .sitemap {
-      grid-template-columns: 1.4fr 1.6fr repeat(5, minmax(max-content, 1fr));
+      grid-template-columns: 1.4fr repeat(6, minmax(max-content, 1fr));
     }
   }
 
@@ -255,19 +285,53 @@ const about = byId('about');
     gap: var(--s-2);
   }
 
-  .fchap {
-    list-style: none;
-    margin: var(--s-3) 0 0;
-    padding: 0;
+  /* Chapters by part: the parts flow into two columns on phones and three
+     from 720px, never split across a column; from 1100px one part per track. */
+  .fparts {
     columns: 2;
     column-gap: var(--s-5);
   }
 
-  /* One chapter column once Read is a single track (see the sitemap grid). */
   @media (min-width: 720px) {
-    .fchap {
-      columns: 1;
+    .fparts {
+      columns: 3;
+      column-gap: var(--s-6);
     }
+  }
+
+  @media (min-width: 1100px) {
+    .fparts {
+      columns: auto;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: var(--s-6);
+    }
+  }
+
+  .fpart {
+    break-inside: avoid;
+    padding-bottom: var(--s-4);
+  }
+
+  /* Sentence-case mono caption naming each part's list; --ink over --ink-2
+     rows, never --muted on the tinted band. */
+  .fpart-title {
+    margin: 0 0 var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .fpart-range {
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+
+  .fchap {
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
   .fchap li {

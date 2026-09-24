@@ -3,9 +3,10 @@
  * Home: the discipline, defined. A full-viewport hero (the headline on a
  * moving gradient field, one CTA, a strip of figures), the definition with the
  * governance loop, the three questions, the five-layer stack, the eight values,
- * the role, a verdict beat, the Body of Knowledge, the resources and a closing
- * CTA. All copy and every figure come from the typed content modules; no
- * number appears here that a primary source does not carry.
+ * the role, a verdict beat, the Body of Knowledge by part, the resources, the
+ * newsletter and a closing CTA. All copy and every figure come from the typed
+ * content modules; no number appears here that a primary source does not carry,
+ * and every count is computed from the data.
  *
  * The body sections are built on <Section>, which supplies the tinted/mesh/dark
  * bands and the shared heads; no body section sits on the bare page ground
@@ -24,13 +25,15 @@ import GovernanceLoop from '../components/GovernanceLoop.astro';
 import VerdictTicker from '../components/VerdictTicker.astro';
 import DefinitionCards from '../components/DefinitionCards.astro';
 import ValuePair from '../components/ValuePair.astro';
-import ChapterGrid from '../components/ChapterGrid.astro';
+import BookParts from '../components/BookParts.astro';
 import ResourceTiles from '../components/ResourceTiles.astro';
+import NewsletterForm from '../components/NewsletterForm.astro';
 import { site } from '../data/site';
 import { WEBSITE_ID } from '../lib/jsonld';
 import { definition, values } from '../data/values';
 import { capabilityStatement, workflows, market } from '../data/role';
 import { chaptersOrdered } from '../data/chapters';
+import { bookParts, countWord } from '../data/parts';
 import { layers } from '../data/stack';
 import { frameworks } from '../data/frameworks';
 import { patterns } from '../data/patterns';
@@ -112,11 +115,40 @@ const heroFonts = [
   '/fonts/newsreader-latin-display-italic.woff2',
 ];
 
+// The chapters section: its title counts chapters and parts from the data, and
+// its lede names the three parts that carry the discipline from what an AI
+// system is to the law (their titles from chapterParts, never retyped here).
+const partTitle = (id: string) => bookParts.find((part) => part.id === id)?.title ?? id;
+const chaptersTitle = `${chaptersOrdered.length} chapters in ${countWord(bookParts.length)} parts, versioned and open.`;
+const chaptersLede = `The Body of Knowledge is at v${site.bokVersion} and published under ${site.license}. ${partTitle('foundations')}, ${partTitle('lifecycle')}, and ${partTitle('law')} carry the discipline from what an AI system is, through its life, to the law that binds it.`;
+
+// Eight tiles, two full rows of the four-column bento: the references a reader
+// reaches for first. The hub (/resources) lists every one.
 const resources = [
   {
     label: 'Frameworks',
     href: '/resources/frameworks',
     desc: 'The obligations (EU AI Act, ISO/IEC 42001, NIST AI RMF) mapped to the artefacts that satisfy them.',
+  },
+  {
+    label: 'Topic crosswalk',
+    href: '/resources/crosswalk',
+    desc: 'One governance topic per row, read across the instruments that bind it, down to the article or clause.',
+  },
+  {
+    label: 'The map',
+    href: '/map',
+    desc: 'The whole discipline on one canvas: chapters, layers, patterns and obligations as a navigable map.',
+  },
+  {
+    label: 'Templates & schemas',
+    href: '/resources/templates',
+    desc: 'JSON Schemas, filled examples and templates for governance records, tagged by obligation.',
+  },
+  {
+    label: 'Harms atlas',
+    href: '/resources/harms',
+    desc: 'AI harms by level, each with its failure mode, the control that catches it and real incidents.',
   },
   {
     label: 'Tools',
@@ -307,10 +339,12 @@ const resources = [
     tone="mesh"
     mesh="c"
     meshK={0.45}
-    title="Eleven chapters, versioned and open."
-    lede={`The Body of Knowledge is at v${site.bokVersion} and published under ${site.license}.`}
+    class="parts-sec"
+    title={chaptersTitle}
+    lede={chaptersLede}
   >
-    <ChapterGrid chapters={chaptersOrdered} class="reveal-stagger" />
+    <BookParts class="reveal-stagger" />
+    <p class="sec-link" slot="foot"><a href="/bok">Browse the chapters by part →</a></p>
   </Section>
 
   <Section
@@ -320,6 +354,23 @@ const resources = [
     title="Curated resources, cross-referenced, in the open."
   >
     <ResourceTiles tiles={resources} class="reveal-stagger" />
+    <p class="sec-link" slot="foot"><a href="/resources">All resources →</a></p>
+  </Section>
+
+  <Section
+    tone="mesh"
+    mesh="c"
+    meshK={0.35}
+    class="nl-sec"
+    title="Follow the changes."
+    lede="Every chapter shows the date it last changed, and every release is written up in the changelog. Get an email when a chapter changes, or follow the feed."
+  >
+    <NewsletterForm location="home" />
+    <p class="sec-link" slot="foot">
+      <a href="/rss.xml">RSS feed →</a>
+      <span class="sec-link-sep" aria-hidden="true">·</span>
+      <a href="/about/changelog">Changelog →</a>
+    </p>
   </Section>
 
   <CtaBand

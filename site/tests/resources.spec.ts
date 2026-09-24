@@ -4,22 +4,47 @@
 import { test, expect } from '@playwright/test';
 import { frameworks, obligations } from '../src/data/frameworks';
 import { topics, columns } from '../src/data/crosswalk';
+import { harms } from '../src/data/harms';
+import { cases } from '../src/data/cases';
+import { clauses } from '../src/data/contracts';
 
-test('hub renders six resource cards, each with a count', async ({ page }) => {
+// The hub's destinations, in order: every reference page the site publishes.
+const HUB = [
+  '/resources/frameworks',
+  '/resources/crosswalk',
+  '/resources/harms',
+  '/cases',
+  '/resources/contracts',
+  '/resources/templates',
+  '/resources/tools',
+  '/resources/reading-list',
+  '/resources/glossary',
+  '/map',
+];
+
+test('hub renders one resource card per reference, each with a count', async ({ page }) => {
   await page.goto('/resources');
   const cards = page.locator('[data-resource-card]');
-  await expect(cards).toHaveCount(6);
+  await expect(cards).toHaveCount(HUB.length);
+  for (let i = 0; i < HUB.length; i++) {
+    await expect(cards.nth(i)).toHaveAttribute('href', HUB[i]);
+  }
 
   const counts = page.locator('[data-resource-count]');
-  await expect(counts).toHaveCount(6);
-  for (let i = 0; i < 6; i++) {
+  await expect(counts).toHaveCount(HUB.length);
+  for (let i = 0; i < HUB.length; i++) {
     await expect(counts.nth(i)).not.toHaveText('');
   }
 
   // Counts are computed from the data, not hard-coded prose.
-  await expect(page.locator('body')).toContainText(
+  const body = page.locator('body');
+  await expect(body).toContainText(
     `${frameworks.length} frameworks · ${obligations.length} obligations`,
   );
+  await expect(body).toContainText(`${harms.length} harms`);
+  await expect(body).toContainText(`${cases.length} cases`);
+  await expect(body).toContainText(`${clauses.length} clauses`);
+  await expect(page.locator('.hero--page')).toContainText(`${HUB.length} references`);
 });
 
 test('crosswalk renders a row per topic and a column per framework family', async ({ page }) => {

@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import Doc from '../../layouts/Doc.astro';
 import AtAGlance from '../../components/AtAGlance.astro';
+import NewsletterForm from '../../components/NewsletterForm.astro';
 import { chaptersOrdered } from '../../data/chapters';
 import { site } from '../../data/site';
 import { gitCreated, gitDate } from '../../lib/reading';
@@ -138,4 +139,19 @@ const jsonLd = {
 >
   <AtAGlance items={chapter.glance} />
   <Content />
+  {/* After the sources: the sign-up, out of the search index and of snippets so
+      it never shows up as chapter text. Renders nothing without an endpoint. */}
+  <div class="chapter-newsletter" data-pagefind-ignore data-nosnippet>
+    <NewsletterForm location="chapter" />
+  </div>
 </Doc>
+
+<style>
+  /* A hairline and one --s-7 step set the sign-up apart from the sources list;
+     an empty wrapper (no endpoint configured) collapses to nothing. */
+  .chapter-newsletter:not(:empty) {
+    margin-top: var(--s-7);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+</style>

@@ -8,6 +8,12 @@ import { topics, columns } from '../../data/crosswalk';
 import { toolsByCategory } from '../../data/stack';
 import { getReadingList } from '../../lib/reading-list';
 import { getGlossary } from '../../lib/glossary';
+import { harms, levelOrder } from '../../data/harms';
+import { cases } from '../../data/cases';
+import { clauses, licenceTypes } from '../../data/contracts';
+import { kit } from '../../data/templates';
+import { getSchemas } from '../../lib/schemas-library';
+import { countWord } from '../../data/parts';
 import { WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
@@ -17,10 +23,14 @@ const toolCount = tools.reduce((n, group) => n + group.examples.length, 0);
 const reading = getReadingList();
 const readingCount = reading.reduce((n, group) => n + group.items.length, 0);
 const glossaryCount = getGlossary().length;
+const schemaCount = getSchemas().length;
 
-const cards = [
+// The hub's cards, in reading order: the mapping references first, then the
+// harms and the cases that test them, the contract and record templates, and
+// the tools, reading list, glossary and map. Every count is computed from the
+// data the page links to; the index labels are assigned below from the order.
+const entries = [
   {
-    index: '01',
     title: 'Frameworks',
     href: '/resources/frameworks',
     swatch: 'var(--l1)',
@@ -29,34 +39,6 @@ const cards = [
     count: `${frameworks.length} frameworks · ${obligations.length} obligations`,
   },
   {
-    index: '02',
-    title: 'Tools',
-    href: '/resources/tools',
-    swatch: 'var(--l4)',
-    description:
-      'Reference tool categories for each layer of the stack, with illustrative examples: the substance, not an endorsement of any brand.',
-    count: `${toolCount} tools · ${tools.length} categories`,
-  },
-  {
-    index: '03',
-    title: 'Reading list',
-    href: '/resources/reading-list',
-    swatch: 'var(--l5)',
-    description:
-      'The annotated bibliography that formed the discipline, grouped by theme, each source with a verified URL and a one-line note.',
-    count: `${readingCount} sources · ${reading.length} groups`,
-  },
-  {
-    index: '04',
-    title: 'Glossary',
-    href: '/resources/glossary',
-    swatch: 'var(--l3)',
-    description:
-      'Every term defined once, alphabetically, and cross-referenced to the chapter that treats it in full.',
-    count: `${glossaryCount} terms`,
-  },
-  {
-    index: '05',
     title: 'Crosswalk',
     href: '/resources/crosswalk',
     swatch: 'var(--l2)',
@@ -65,7 +47,62 @@ const cards = [
     count: `${topics.length} topics · ${columns.length} columns`,
   },
   {
-    index: '06',
+    title: 'Harms atlas',
+    href: '/resources/harms',
+    swatch: 'var(--l3)',
+    description:
+      'AI harms by level, each with its failure mode, the control and layer that catch it, the evidence it leaves and real incident records.',
+    count: `${harms.length} harms · ${levelOrder.length} levels`,
+  },
+  {
+    title: 'Cases',
+    href: '/cases',
+    swatch: 'var(--l4)',
+    description:
+      'Public AI incidents written as engineering post-mortems: what failed, which control would have caught it and what evidence it would have left.',
+    count: `${cases.length} cases`,
+  },
+  {
+    title: 'Contracts',
+    href: '/resources/contracts',
+    swatch: 'var(--l1)',
+    description:
+      'AI contract and licence clauses for buyers and deployers: the red flags, the fallback wording to ask for and the evidence to keep.',
+    count: `${clauses.length} clauses · ${licenceTypes.length} licence families`,
+  },
+  {
+    title: 'Templates & schemas',
+    href: '/resources/templates',
+    swatch: 'var(--l5)',
+    description:
+      'JSON Schemas, filled examples and human templates for the records AI governance produces, each field tagged with the obligations it helps evidence.',
+    count: `${schemaCount} schemas · ${kit.length} kit templates`,
+  },
+  {
+    title: 'Tools',
+    href: '/resources/tools',
+    swatch: 'var(--l4)',
+    description:
+      'Reference tool categories for each layer of the stack, with illustrative examples: the substance, not an endorsement of any brand.',
+    count: `${toolCount} tools · ${tools.length} categories`,
+  },
+  {
+    title: 'Reading list',
+    href: '/resources/reading-list',
+    swatch: 'var(--l5)',
+    description:
+      'The annotated bibliography that formed the discipline, grouped by theme, each source with a verified URL and a one-line note.',
+    count: `${readingCount} sources · ${reading.length} groups`,
+  },
+  {
+    title: 'Glossary',
+    href: '/resources/glossary',
+    swatch: 'var(--l3)',
+    description:
+      'Every term defined once, alphabetically, and cross-referenced to the chapter that treats it in full.',
+    count: `${glossaryCount} terms`,
+  },
+  {
     title: 'The map',
     href: '/map',
     swatch: 'var(--l1)',
@@ -75,7 +112,10 @@ const cards = [
   },
 ];
 
-// The landing is a collection of the six reference pages above; Seo.astro merges
+const cards = entries.map((entry, i) => ({ ...entry, index: String(i + 1).padStart(2, '0') }));
+const cardCount = countWord(cards.length);
+
+// The landing is a collection of the reference pages above; Seo.astro merges
 // this node into the page's single ld+json graph.
 const resourcesUrl = new URL('/resources', site.url).href;
 const jsonLd = {
@@ -96,14 +136,14 @@ const jsonLd = {
 
 <Marketing
   title="Resources"
-  description="Curated, sourced and versioned resources for AI governance engineering: frameworks, tools, a reading list, a glossary, a topic crosswalk and the discipline map, all from the Body of Knowledge."
+  description="Sourced, versioned references for AI governance engineering: frameworks, crosswalk, harms atlas, cases, contract clauses, templates, tools, glossary and the map."
   image="/og/resources.png"
   jsonLd={jsonLd}
 >
   <PageHero
     variant="res"
     title="Curated, sourced, versioned."
-    lede="Six references drawn straight from the Body of Knowledge: the frameworks the discipline maps against, the tool categories that fill each layer, the sources that formed it, the terms it uses, the crosswalk that maps each topic to every framework and the map that lays the whole discipline on one canvas."
+    lede={`${cardCount[0].toUpperCase()}${cardCount.slice(1)} references drawn straight from the Body of Knowledge: the frameworks the discipline maps against and the crosswalk that reads each topic across them, the harms atlas and the incident cases, contract clauses, templates and schemas for governance records, the tool categories that fill each layer, the sources that formed it, the terms it uses and the map that lays the whole discipline on one canvas.`}
   >
     <p slot="note">
       Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync
@@ -159,12 +199,25 @@ const jsonLd = {
   .rc-bento > :global(li:nth-child(6)) {
     --i: 5;
   }
+  .rc-bento > :global(li:nth-child(7)) {
+    --i: 6;
+  }
+  .rc-bento > :global(li:nth-child(8)) {
+    --i: 7;
+  }
+  .rc-bento > :global(li:nth-child(9)) {
+    --i: 8;
+  }
+  .rc-bento > :global(li:nth-child(10)) {
+    --i: 9;
+  }
 
   @media (min-width: 600px) {
-    /* Two columns: the first card and the last (the map) each span both (a full
-       row), so the four references between them tile a clean 2×2, no orphan. */
+    /* The first card (Frameworks) and the last (the map) each span two tracks.
+       With ten cards that tiles with no orphan: at two columns they take full
+       rows around four pairs; at four columns, 2 + 8 × 1 + 2 = three full rows. */
     .rc-bento > :global(li:first-child),
-    .rc-bento > :global(li:nth-child(6)) {
+    .rc-bento > :global(li:last-child) {
       grid-column: span 2;
     }
   }

@@ -54,6 +54,28 @@ a completed, reviewed core (1.0).
   the contract clauses; `/llms-full.txt` carries every pattern in full right after chapter 05.
 - The PDF build (`build/build_pdf.py`) prints every chapter file (00 to the last) and assembles
   chapter 05 with the full text of every pattern in place of the catalogue summaries.
+- **Navigation by part.** The Body of Knowledge menu, the mobile drawer, the footer site map and the
+  chapter rail now group the chapters by the five parts of the book (the discipline, reference,
+  foundations, the lifecycle, law and standards), each with its chapter range; counts come from the
+  chapter manifest (`site/src/data/parts.ts`). Reference gains Harms atlas, Cases, Contracts and
+  Templates & schemas; About gains Methodology.
+- **Home and index by part.** The home presents the five parts (title and counts computed, no more
+  "Eleven chapters"), its resource tiles add the topic crosswalk, the map, the templates and the
+  harms atlas, and a newsletter section sits before the closing band. The `/bok` index groups the
+  chapter cards by part, with a one-line introduction and a jump list; the three reading paths now
+  run through chapters 11 to 18.
+- **Resources hub.** `/resources` lists ten references, adding the harms atlas, cases, contract
+  clauses and the templates and schemas library, each with a count computed from its data.
+- **Methodology.** New `/about/methodology`: how sources are chosen and tagged, how "as of" dates
+  are kept, the review cadence, what the build checks, how corrections and contributions work, and
+  versioning with DOIs. `bok/CONTRIBUTORS.md` defines the author, reviewer and contributor roles and
+  how reviewers are credited.
+- **Issue forms.** Report an error on a page, propose an obligation row, propose a glossary term and
+  propose a case study join the existing forms.
+- **Newsletter and analytics.** The sign-up form also closes every chapter and the home. Downloads
+  in the footer and on `/about`, newsletter sign-ups, search opening and citation copying carry
+  declarative Umami event attributes; no new script, and the newsletter note now says the address
+  goes straight to Buttondown.
 
 ## [Unreleased] - 2026-09-20
 
