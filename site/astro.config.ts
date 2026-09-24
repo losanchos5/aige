@@ -26,6 +26,7 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ['/map', ['src/pages/map.astro', 'src/data/map.ts']],
   ['/path', ['src/pages/path.astro', 'src/data/path.ts']],
   ['/resources', ['src/pages/resources/index.astro']],
+  ['/resources/contracts', ['src/pages/resources/contracts.astro', 'src/data/contracts.ts']],
   ['/resources/crosswalk', ['src/pages/resources/crosswalk.astro', 'src/data/crosswalk.ts']],
   ['/resources/frameworks', ['src/pages/resources/frameworks.astro', 'src/data/frameworks.ts']],
   // The glossary and the reading list are parsed from their BoK chapters
