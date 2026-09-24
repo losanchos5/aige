@@ -73,7 +73,7 @@ export const GET: APIRoute = (context) => {
       linkLine(
         'Resources index',
         url('/resources'),
-        'Frameworks, tools, a reading list and a glossary, all extracted from the Body of Knowledge.',
+        'Frameworks, tools, a reading list, a glossary, the topic crosswalk and the discipline map, all extracted from the Body of Knowledge.',
       ),
     ]),
 
