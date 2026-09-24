@@ -7,7 +7,15 @@
 import { test, expect } from '@playwright/test';
 
 import { readSource, slugify, getHeadings } from '../src/lib/md-parse';
-import { layers, minimumViableStack, toolsByCategory } from '../src/data/stack';
+import {
+  layers,
+  minimumViableStack,
+  toolsByCategory,
+  toolCatalogue,
+  allTools,
+  toolAccessLabels,
+  TOOLS_LAST_CHECKED,
+} from '../src/data/stack';
 import { workflows, market } from '../src/data/role';
 import { levels } from '../src/data/maturity';
 import {
@@ -29,7 +37,7 @@ import {
 } from '../src/data/crosswalk';
 import { values } from '../src/data/values';
 import { getGlossary, termId } from '../src/lib/glossary';
-import { getReadingList } from '../src/lib/reading-list';
+import { getReadingList, AUDIENCES } from '../src/lib/reading-list';
 import { getChapterBySlug } from '../src/data/chapters';
 import {
   stages,
@@ -77,6 +85,96 @@ test('toolsByCategory flattens and deduplicates with layer references', () => {
   for (const group of flattened) {
     expect(group.examples.length).toBe(new Set(group.examples).size);
     expect(group.layers.length).toBeGreaterThan(0);
+  }
+});
+
+// ── The tool catalogue (src/data/stack.ts, v0.5.0) ───────────────────────
+test('every catalogued tool carries checked metadata', () => {
+  const access = new Set(Object.keys(toolAccessLabels));
+  const tools = allTools();
+  expect(tools.length).toBeGreaterThanOrEqual(80);
+  for (const { tool, category, layers: toolLayerList } of tools) {
+    const label = `${category.category} / ${tool.name}`;
+    expect(tool.url.startsWith('https://'), `${label} url`).toBe(true);
+    expect(tool.licence.trim().length, `${label} licence`).toBeGreaterThan(0);
+    expect(access.has(tool.access), `${label} access`).toBe(true);
+    expect(tool.lastChecked, `${label} lastChecked`).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(tool.lastChecked <= TOOLS_LAST_CHECKED, `${label} lastChecked`).toBe(true);
+    expect(toolLayerList.length, `${label} layers`).toBeGreaterThan(0);
+    for (const n of toolLayerList) expect([1, 2, 3, 4, 5]).toContain(n);
+    if (tool.oecd !== undefined) {
+      expect(tool.oecd.startsWith('https://oecd.ai/en/catalogue/tools/'), `${label} oecd`).toBe(
+        true,
+      );
+    }
+  }
+  // Category ids are unique (they are the page's #cat-<id> anchors), and no
+  // name repeats inside a category.
+  const ids = toolCatalogue.map((def) => def.id);
+  expect(new Set(ids).size).toBe(ids.length);
+  for (const def of toolCatalogue) {
+    const names = def.tools.map((tool) => tool.name);
+    expect(new Set(names).size, def.category).toBe(names.length);
+    expect(def.summary.trim().length, def.category).toBeGreaterThan(0);
+  }
+});
+
+test('the categories the v0.5.0 chapters cite are catalogued', () => {
+  const ids = new Set(toolCatalogue.map((def) => def.id));
+  for (const id of [
+    'data-validation',
+    'versioning',
+    'fairness',
+    'explainability',
+    'monitoring',
+    'progressive-delivery',
+    'signing',
+  ]) {
+    expect(ids.has(id), id).toBe(true);
+  }
+});
+
+test('every catalogue chapter link resolves to a chapter heading', () => {
+  for (const def of toolCatalogue) {
+    const match = /^\/bok\/([a-z0-9-]+)(?:#(.+))?$/.exec(def.chapter.href);
+    expect(match, `${def.category}: ${def.chapter.href}`).not.toBeNull();
+    const chapter = getChapterBySlug(match![1]);
+    expect(chapter, `${def.chapter.href} is a chapter`).toBeDefined();
+    if (match![2]) {
+      const slugs = headingSlugs(`bok/${chapter!.id}.md`);
+      expect(slugs.has(match![2]), `${def.chapter.href} anchor`).toBe(true);
+    }
+  }
+});
+
+test('the per-layer tool categories are derived from the catalogue', () => {
+  for (const layer of layers) {
+    const expected = toolCatalogue
+      .filter((def) => def.layers.includes(layer.n))
+      .map((def) => def.category);
+    expect(layer.toolCategories.map((tc) => tc.category)).toEqual(expected);
+  }
+});
+
+test('every tool the learning path links is in the catalogue', () => {
+  // A path resource titled "garak (LLM vulnerability scanner)" matches the
+  // catalogue's "Garak": every word of 3+ letters in the tool name appears in
+  // the resource title.
+  const names = allTools().map(({ tool }) => tool.name);
+  const words = (text: string) =>
+    text
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((word) => word.length >= 3 && word !== 'the');
+  const pathTools = nodes.flatMap((node) => node.resources).filter((r) => r.type === 'tool');
+  expect(pathTools.length).toBeGreaterThan(0);
+  for (const resource of pathTools) {
+    const title = words(resource.title);
+    const found = names.some((name) => {
+      const needed = words(name);
+      return needed.length > 0 && needed.every((word) => title.includes(word));
+    });
+    expect(found, `/path tool "${resource.title}" is catalogued`).toBe(true);
   }
 });
 
@@ -145,6 +243,54 @@ test('reading list has 3+ groups and every url is https', () => {
       expect(item.url).toBeDefined();
       expect(item.url?.startsWith('https://')).toBe(true);
     }
+  }
+});
+
+test('reading list: unique urls, audience and jurisdiction tags on every entry', () => {
+  const groups = getReadingList();
+  const items = groups.flatMap((group) => group.items);
+  expect(items.length).toBeGreaterThanOrEqual(150);
+
+  const urls = items.map((item) => item.url);
+  expect(new Set(urls).size, 'no url listed twice').toBe(urls.length);
+
+  const audiences = new Set<string>(AUDIENCES);
+  for (const item of items) {
+    expect(item.audience.length, `${item.title} audience`).toBeGreaterThan(0);
+    for (const audience of item.audience) expect(audiences.has(audience)).toBe(true);
+    expect(item.jurisdiction.length, `${item.title} jurisdiction`).toBeGreaterThan(0);
+    expect(item.note.includes('audience:'), `${item.title} note`).toBe(false);
+    expect(item.note.includes('jurisdiction:'), `${item.title} note`).toBe(false);
+  }
+});
+
+test('reading list keeps its v0.4 sections and carries the canonical papers', () => {
+  const groups = getReadingList();
+  const headings = groups.map((group) => group.group);
+  // Existing H2s are anchors: they must not be renamed.
+  for (const heading of [
+    'Foundational texts (the form and the method)',
+    'Regulation and standards',
+    "Frontier safety frameworks (the labs' own commitments)",
+    'Papers (machine-readable evidence and agent governance)',
+    'Reports (the market and the profession)',
+    'Incident and risk repositories (the empirical record)',
+    'Tools (illustrative categories, not endorsements)',
+    'Communities and newsletters',
+  ]) {
+    expect(headings, heading).toContain(heading);
+  }
+  for (const heading of ['Books', 'Courses']) expect(headings).toContain(heading);
+
+  const urls = new Set(groups.flatMap((group) => group.items.map((item) => item.url)));
+  for (const url of [
+    'https://arxiv.org/abs/1803.09010', // Datasheets for Datasets
+    'https://arxiv.org/abs/1810.03993', // Model Cards for Model Reporting
+    'https://arxiv.org/abs/2001.00973', // Raji et al. 2020, internal algorithmic auditing
+    'https://hai.stanford.edu/ai-index/2026-ai-index-report', // The AI Index
+    'https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026',
+  ]) {
+    expect(urls.has(url), url).toBe(true);
   }
 });
 
