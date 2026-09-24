@@ -7,29 +7,33 @@
 // Gates: performance >= 0.95, accessibility = 1, best-practices = 1, seo = 1.
 // Desktop preset, so the performance gate reflects the target reading context
 // rather than a throttled-mobile worst case.
+// PW_PORT, as in playwright.config.ts, lets a parallel worktree audit its own
+// preview server instead of whatever holds the default port 4321.
+const PORT = Number(process.env.PW_PORT) || 4321;
+
 module.exports = {
   ci: {
     collect: {
-      startServerCommand: 'npm run preview',
+      startServerCommand: `npm run preview -- --port ${PORT}`,
       startServerReadyPattern: 'localhost',
       startServerReadyTimeout: 60000,
       numberOfRuns: 1,
       url: [
-        'http://localhost:4321/',
-        'http://localhost:4321/thesis',
-        'http://localhost:4321/bok/the-stack',
-        'http://localhost:4321/role',
-        'http://localhost:4321/stack',
-        'http://localhost:4321/path',
-        'http://localhost:4321/map',
-        'http://localhost:4321/bok/glossary',
-        'http://localhost:4321/resources/crosswalk',
-        'http://localhost:4321/obligations',
-        'http://localhost:4321/patterns',
-        'http://localhost:4321/figures',
-        'http://localhost:4321/toolkit',
-        'http://localhost:4321/agents',
-      ],
+        '/',
+        '/thesis',
+        '/bok/the-stack',
+        '/role',
+        '/stack',
+        '/path',
+        '/map',
+        '/bok/glossary',
+        '/resources/crosswalk',
+        '/obligations',
+        '/patterns',
+        '/figures',
+        '/toolkit',
+        '/agents',
+      ].map((path) => `http://localhost:${PORT}${path}`),
       settings: {
         preset: 'desktop',
       },

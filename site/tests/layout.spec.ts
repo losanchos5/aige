@@ -41,6 +41,10 @@ const PHONE_PAGES = [
   '/glossary/serious-incident',
   '/toolkit',
   '/agents',
+  '/cases',
+  '/cases/clearview-ai',
+  '/resources/harms',
+  '/bok',
 ];
 
 async function measure(page: import('@playwright/test').Page) {
