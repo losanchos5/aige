@@ -57,6 +57,14 @@ const includedFwIds = new Set(
   obligations.map((o) => resolveFwId(o.framework, o.obligation)),
 );
 
+// frameworks.ts now carries the join explicitly (`frameworkId`, schema v2); the
+// oracle above and the explicit field must agree row by row.
+test('every obligation frameworkId agrees with the matrix join', () => {
+  for (const o of obligations) {
+    expect(o.frameworkId, o.id).toBe(resolveFwId(o.framework, o.obligation));
+  }
+});
+
 // Block V3: the obligation heat matrix (/resources/frameworks), StatTile
 // count-up and the MaturityLadder draw-on (/role). Acceptance assertions plus
 // the review screenshots written to tests/__screenshots__/V3/.

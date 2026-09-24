@@ -10,7 +10,14 @@ import { readSource, slugify, getHeadings } from '../src/lib/md-parse';
 import { layers, minimumViableStack, toolsByCategory } from '../src/data/stack';
 import { workflows, market } from '../src/data/role';
 import { levels } from '../src/data/maturity';
-import { frameworks, obligations, disclaimer } from '../src/data/frameworks';
+import {
+  frameworks,
+  obligations,
+  disclaimer,
+  retiredObligationIds,
+  OBLIGATION_ID_PATTERN,
+} from '../src/data/frameworks';
+import { patterns } from '../src/data/patterns';
 import {
   topics,
   columns,
@@ -471,5 +478,140 @@ test.describe('crosswalk data', () => {
     }
     // Never claim TC260 3.0 is a binding rule.
     expect(frameworkById('cn-tc260-framework')!.summary.includes('binding')).toBe(false);
+  });
+});
+
+// ── The obligation register (schema version 2, src/data/frameworks.ts) ─────
+test.describe('obligation register', () => {
+  const EU = 'eu-ai-act';
+  const isIsoDate = (value: string) =>
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
+  const today = new Date().toISOString().slice(0, 10);
+  const articlesOf = (clause: string) =>
+    [...clause.matchAll(/Art\.\s*(\d+[a-z]?)/g)].map((m) => m[1]);
+  /** Does an EU "Maps to" entry of a pattern name article `a`? */
+  const namesArticle = (entry: string, a: string) =>
+    entry.startsWith('EU AI Act') && new RegExp(`Art\\. ${a}(?![0-9a-z])`).test(entry);
+
+  test('ids are well formed, unique, never retired, and obligation texts are unique', () => {
+    const ids = obligations.map((o) => o.id);
+    for (const id of ids) expect(id, id).toMatch(OBLIGATION_ID_PATTERN);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const retired of retiredObligationIds) expect(ids.includes(retired), retired).toBe(false);
+    const texts = obligations.map((o) => o.obligation);
+    expect(new Set(texts).size).toBe(texts.length);
+  });
+
+  test('every row names a real instrument, a clause and a requirement', () => {
+    const frameworkIds = new Set(frameworks.map((f) => f.id));
+    for (const row of obligations) {
+      expect(frameworkIds.has(row.frameworkId), `${row.id} frameworkId`).toBe(true);
+      expect(row.clause.trim().length, `${row.id} clause`).toBeGreaterThan(0);
+      expect(row.requirement.trim().length, `${row.id} requirement`).toBeGreaterThan(0);
+    }
+  });
+
+  test('dates are real ISO dates; milestones follow appliesFrom in order; reviewed is past', () => {
+    for (const row of obligations) {
+      expect(isIsoDate(row.reviewed), `${row.id} reviewed`).toBe(true);
+      expect(row.reviewed <= today, `${row.id} reviewed`).toBe(true);
+      if (row.appliesFrom !== undefined) {
+        expect(isIsoDate(row.appliesFrom), `${row.id} appliesFrom`).toBe(true);
+      }
+      let previous = row.appliesFrom ?? '';
+      for (const step of row.milestones ?? []) {
+        expect(isIsoDate(step.date), `${row.id} milestone`).toBe(true);
+        expect(step.date > previous, `${row.id} milestone order`).toBe(true);
+        previous = step.date;
+      }
+    }
+  });
+
+  test('the status agrees with the dates on the review date', () => {
+    for (const row of obligations) {
+      const from = row.appliesFrom;
+      switch (row.appliesStatus) {
+        case 'in-force':
+        case 'grace':
+          expect(from !== undefined && from <= row.reviewed, `${row.id} ${row.appliesStatus}`).toBe(true);
+          break;
+        case 'applies-later':
+        case 'deferred':
+          expect(from !== undefined && from > row.reviewed, `${row.id} ${row.appliesStatus}`).toBe(true);
+          break;
+        default:
+          // voluntary / pending: a date is optional.
+          break;
+      }
+    }
+  });
+
+  test('duty holder, authority and system class stay on the EU AI Act rows', () => {
+    for (const row of obligations) {
+      if (row.frameworkId === EU) {
+        expect(row.dutyHolder, `${row.id} dutyHolder`).toBeTruthy();
+        expect(row.authority, `${row.id} authority`).toBeTruthy();
+        expect((row.systemClass ?? []).length, `${row.id} systemClass`).toBeGreaterThan(0);
+        expect(row.appliesFrom, `${row.id} appliesFrom`).toBeTruthy();
+      } else {
+        // ObligationTable's duty-holder filter reads dutyHolder as an EU AI Act field.
+        expect(row.dutyHolder, `${row.id} dutyHolder`).toBe(undefined);
+        expect(row.systemClass, `${row.id} systemClass`).toBe(undefined);
+      }
+    }
+  });
+
+  test('every EU AI Act date is one chapter 08 states', () => {
+    const chapter = readSource('bok/08-regulatory-map.md');
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ];
+    const stated = (iso: string) => {
+      const [y, m, d] = iso.split('-');
+      return chapter.includes(iso) || chapter.includes(`${Number(d)} ${months[Number(m) - 1]} ${y}`);
+    };
+    for (const row of obligations.filter((o) => o.frameworkId === EU)) {
+      for (const date of [row.appliesFrom!, ...(row.milestones ?? []).map((m) => m.date)]) {
+        expect(stated(date), `${row.id} ${date}`).toBe(true);
+      }
+    }
+  });
+
+  test('the high-risk rows carry the Annex I and public-authority dates', () => {
+    for (const row of obligations.filter((o) => o.frameworkId === EU)) {
+      const classes = row.systemClass ?? [];
+      const dates = (row.milestones ?? []).map((m) => m.date);
+      if (row.appliesStatus === 'deferred') expect(row.appliesFrom).toBe('2027-12-02');
+      // A deferred high-risk duty that reaches Annex I systems reaches them later.
+      if (row.appliesStatus === 'deferred' && classes.includes('high-risk-annex-i')) {
+        expect(dates.includes('2028-08-02'), `${row.id} Annex I`).toBe(true);
+        // Art. 6 is the classification rule, not a duty on a deployed system, so the
+        // Art. 111(2) public-authority deadline is not stamped on it.
+        if (row.id !== 'AIGE-OBL-EUAIA-ART6') {
+          expect(dates.includes('2030-08-02'), `${row.id} public authorities`).toBe(true);
+        }
+      }
+    }
+    const art4 = obligations.find((o) => o.id === 'AIGE-OBL-EUAIA-ART4')!;
+    expect(art4.appliesFrom).toBe('2025-02-02');
+    expect(art4.appliesStatus).toBe('in-force');
+  });
+
+  test('patterns exist; EU rows list exactly the patterns whose "Maps to" names the article', () => {
+    const patternIds = new Set(patterns.map((p) => p.id));
+    for (const row of obligations) {
+      for (const id of row.patterns ?? []) expect(patternIds.has(id), `${row.id} ${id}`).toBe(true);
+    }
+    for (const row of obligations.filter((o) => o.frameworkId === EU)) {
+      const articles = articlesOf(row.clause);
+      expect(articles.length, `${row.id} clause`).toBeGreaterThan(0);
+      const expected = patterns
+        .filter((p) => p.mapsTo.some((entry) => articles.some((a) => namesArticle(entry, a))))
+        .map((p) => p.id)
+        .sort();
+      expect([...(row.patterns ?? [])].sort(), row.id).toEqual(expected);
+    }
   });
 });

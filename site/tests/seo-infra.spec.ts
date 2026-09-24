@@ -6,14 +6,18 @@ import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { obligations, obligationPath } from '../src/data/frameworks';
 
-// Every indexable route: 11 chapters, the two Thesis pages and the 15 hand-built
-// pages. Bump this when a route is added, so a new page without a `lastmod`
-// source in astro.config.ts cannot slip in unnoticed.
-const INDEXABLE_ROUTES = 28;
+// Several blocks add routes in parallel, so the check is not a fixed count but
+// "every URL carries a lastmod": a new page without a `lastmod` source in
+// astro.config.ts (SOURCE_BY_PATH, or REVIEWED_BY_PATH for the obligation
+// pages) still fails it. The floor catches a sitemap that lost whole sections:
+// the chapters, the Thesis pages, the hand-built pages and one page per
+// obligation.
+const MIN_INDEXABLE_ROUTES = 28 + obligations.length;
 
 test.describe('sitemap', () => {
-  test(`every one of the ${INDEXABLE_ROUTES} URLs carries a dated lastmod`, async ({ request }) => {
+  test('every URL carries a dated lastmod', async ({ request }) => {
     const res = await request.get('/sitemap-0.xml');
     expect(res.status()).toBe(200);
     expect(res.headers()['content-type']).toContain('xml');
@@ -21,8 +25,8 @@ test.describe('sitemap', () => {
     const xml = await res.text();
     const locs = xml.match(/<loc>/g) ?? [];
     const lastmods = xml.match(/<lastmod>([^<]+)<\/lastmod>/g) ?? [];
-    expect(locs.length).toBe(INDEXABLE_ROUTES);
-    expect(lastmods.length).toBe(INDEXABLE_ROUTES);
+    expect(locs.length).toBeGreaterThanOrEqual(MIN_INDEXABLE_ROUTES);
+    expect(lastmods.length).toBe(locs.length);
 
     // The sitemap library normalises the date to a W3C datetime, so only the
     // leading YYYY-MM-DD is asserted. It must be a real past date, never the
@@ -52,6 +56,10 @@ test.describe('sitemap', () => {
       ['/bok/definition', '../bok/01-definition.md'],
     ] as const) {
       expect(lastmodFor(path), path).toBe(commitDate(file));
+    }
+    // An obligation page is dated by the review date of its register row, not by git.
+    for (const row of obligations) {
+      expect(lastmodFor(obligationPath(row)), row.id).toBe(row.reviewed);
     }
   });
 });
