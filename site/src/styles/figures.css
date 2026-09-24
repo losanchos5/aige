@@ -338,3 +338,15 @@
   background: var(--ink);
   color: var(--bg);
 }
+
+/* ------------------------------------------ status tiles (block w2-fig-concepts) -- */
+/* The jurisdiction tile map (src/figures/jurisdiction-tiles.svg) encodes how
+   binding a regime is. Status is not a stack layer, so it is an ink ramp, never
+   a hue (VISUAL-GUIDE §4.3), and the outline carries it too: solid ink for a
+   horizontal binding regime, a tint with a heavy stroke for a targeted one, a
+   hairline for voluntary guidance and a dashed line for a bill. */
+.figc .tile-h { fill: var(--ink); stroke: var(--ink); stroke-width: 1.5; }
+.figc .tile-h-tx { fill: var(--bg); }
+.figc .tile-t { fill: color-mix(in srgb, var(--ink) 22%, var(--bg)); stroke: var(--ink); stroke-width: 1.5; }
+.figc .tile-v { fill: var(--bg); stroke: var(--ink-2); stroke-width: 1; }
+.figc .tile-b { fill: var(--bg); stroke: var(--ink-2); stroke-width: 1.5; stroke-dasharray: 4 3; }

@@ -328,6 +328,119 @@ export const figures: readonly FigureDef[] = [
       "One event can start several clocks. First reports, counted from awareness unless noted, as of 2026-09-24: DORA Art. 19, within 4 hours of classification as major and no later than 24 hours from awareness; NIS2 Art. 23, an early warning within 24 hours and a notification within 72 hours; the Cyber Resilience Act Art. 14, an early warning within 24 hours and a notification within 72 hours; California SB 53, within 15 days of discovery, or within 24 hours on an imminent risk of death or serious physical injury; EU AI Act Art. 73, no later than 2 days (widespread infringement or critical infrastructure), 10 days (death) or 15 days (other); the GPAI Code of Practice under Art. 55, 2, 5, 10 or 15 days depending on the harm; GDPR Art. 33, where feasible within 72 hours; the New York RAISE Act, within 72 hours of a determination, effective 1 Jan 2027. Follow-up and final reports, the deployer's duty under Art. 26(5), GDPR Art. 34 and the voluntary OECD framework are in the table. The engineering answer is one incident record that holds the facts once, with a timer per regime, and a pipeline that alerts on the nearest deadline.",
     placements: [{ chapter: 'incidents', section: 'The overlapping clocks', at: 'head' }],
   },
+  // Block w2-fig-concepts (v0.5.0): concept figures for chapters 12, 13, 16,
+  // 21, 22 and 23, drawn only from what those chapters and their data modules
+  // (harms.ts, jurisdictions.ts) state.
+  {
+    id: 'agent-control-plane',
+    title: 'The agent control plane',
+    caption:
+      'One tool call through the agent control plane: a registry entry gates the credential, the gateway and the guardrail check the call, a checkpoint fires where the stakes demand it and a per-agent breaker can stop it, while every step leaves telemetry kept as evidence. Check that each agent in your registry has all of them and that its stop has been drilled. Illustrative, not a claim of conformity. Drawn from chapter 23.',
+    alt: 'One tool call through the agent control plane: registry, identity, gateway, guardrail, checkpoint and breaker, with telemetry kept as evidence.',
+    description:
+      'The control plane in the order a tool call meets it. The agent registry (Layer 02 Inventory & Transparency) holds every agent with an owner, a purpose, an autonomy level, its tools, pinned versions, stop handles and an expiry: no registry entry, no credential. The identity issuer (Layer 04 Runtime Controls & Observability) gives the agent a short-lived, attested workload credential, with delegation that names the agent, never impersonation of the user. The agent proposes a tool call. The tool gateway denies by default, with pinned tool definitions, scopes, rates and egress per tool, and admitted MCP servers only. The runtime guardrail checks every call before it runs (identity against a live registry entry, the allow-list and definition hash, parameters within policy, instruction provenance, the output and egress filter, execution budgets) and fails closed for pay, delete, send and execute, open with an alert only for reads. A human checkpoint approves where the stakes or irreversibility demand it, showing the raw call. The per-agent circuit breaker has six stop levels: pause a task, narrow the scope, trip the breaker, revoke the identity, stop a class and degrade; exhausted budgets trip it, and a tripped breaker makes the gateway reject every call from the agent. Past your boundary sit the tool, the MCP server or a remote agent: you cannot stop someone else\'s agent, only stop calling it and revoke what you issued to it. Every step leaves telemetry that carries identity, tool calls, verdicts and approvals, kept as evidence (Layer 05 Assurance & Continuous Compliance). Memory controls, delegation across hops and prompt change control complete the plane in chapter 23.',
+    placements: [{ chapter: 'governing-agents', at: 'lead' }],
+    pages: ['/agents'],
+  },
+  {
+    id: 'governance-operating-model',
+    title: 'The governance operating model',
+    caption:
+      'The board sets appetite, the committee decides what the gates cannot, the second line builds the gates the first line runs through, and the third line re-performs gate decisions from the same evidence the board reads as KPIs and KRIs. Name who holds each role for your AI systems, and check that internal audit stays independent of what it assures. Drawn from chapter 12.',
+    alt: 'Board, committee and the three lines around one set of gates, with the AI governance engineer in the second line and evidence flowing to audit and the board.',
+    description:
+      'The board, the governing body, sets AI risk appetite and the AI policy, and reads a few indicators computed from live systems rather than self-reported: KPIs that say whether the program is doing its job and KRIs that say whether risk is moving towards the edge of appetite. The AI governance committee decides what the gates cannot (risk acceptance, exceptions, value trade-offs and policy), and its exceptions reach the gates as data. The second line (risk, compliance, privacy, security and AI governance) sets method and policy, builds the paved path and challenges first-line ratings; the AI governance engineer usually sits here, building the gates, the registry and the evidence path the first line runs. The first line (product owners, engineering and operators) builds and runs systems inside the gates and owns their risks. The gates (Layer 01 Govern-as-Code) enforce, and the evidence they leave (registry entries, eval results, runtime logs and verdicts) lands in the evidence store (Layer 05 Assurance & Continuous Compliance). The third line, internal audit, gives independent assurance by testing the gates, not the documents about them: it re-performs policy decisions for a sample of releases from the stored inputs, hunts bypasses and checks exception hygiene. The model describes roles, not boxes on an org chart; the committee decides, the gates enforce.',
+    placements: [
+      {
+        chapter: 'governance-program',
+        section: 'Enterprise risk, the three lines and internal audit',
+        sub: 'The three lines, applied to AI',
+        at: 'head',
+      },
+    ],
+  },
+  {
+    id: 'harm-levels',
+    title: 'Harm at five levels',
+    caption:
+      'Where AI harm lands, from one person to the physical environment, with one example harm per level from the harms atlas and the control that catches it, coloured by its stack layer. Calibrate your severity scale against every level, not only against harm to one person. Drawn from chapter 13.',
+    alt: 'Five harm levels from one person to the environment, each with an example harm from the atlas and the control, by stack layer, that catches it.',
+    description:
+      'Five levels at which harm lands, with one example per level from the harms atlas. Individual: harm to one person, their rights, money, liberty, autonomy or body; for example discrimination in consequential decisions, caught by the Eval Gate in CI (Layer 03 Evals & Red Teaming as Evidence). Group: harm that falls on a group or community as such, not only on its members one by one; for example exclusion through under-representation in data, caught by Model Card as Control Evidence (Layer 02 Inventory & Transparency). Organisation: risk to the organisation that builds, buys or deploys the system; for example security compromise through prompt injection, caught by the Runtime Guardrail (Layer 04 Runtime Controls & Observability). Society: harm to shared systems such as information, elections, work, equality and essential services; for example job displacement and task transformation, caught by a workforce impact assessment (Layer 01 Govern-as-Code). Environment: harm to the physical environment from building and running AI systems; for example energy demand and emissions of training and inference, caught by energy and emissions telemetry (Layer 05 Assurance & Continuous Compliance). The harms atlas holds every harm with real incident records, the failure mode an engineer can test for, the control that catches it and the evidence that control leaves.',
+    placements: [
+      {
+        chapter: 'risk-management',
+        section: 'Assessing risk: the likelihood-by-severity matrix',
+        sub: 'Defined scales',
+        at: 'foot',
+      },
+    ],
+  },
+  {
+    id: 'explanation-techniques',
+    title: 'The explanation technique map',
+    caption:
+      'Explanation techniques on two axes, scope (global or local) and access (model-agnostic or model-specific), and the tests an explanation passes before its record is kept as evidence. Pick the quadrant your decision needs, then test the method for fidelity and stability before you rely on it. Drawn from chapter 16.',
+    alt: 'Explanation techniques on two axes, global or local and model-agnostic or model-specific, each tested before its explanation record is kept.',
+    description:
+      'Explanations vary along two axes: scope (a global explanation describes the model\'s overall behaviour; a local one explains a single output) and access (a model-agnostic method needs only inputs and outputs; a model-specific one uses the model\'s internals). Model-agnostic and global: global surrogate models, permutation feature importance and partial dependence. Model-agnostic and local: LIME, KernelSHAP, counterfactual explanations and nearest-example explanations. Model-specific and global: the coefficients of an interpretable model, tree structure and probing of internal representations. Model-specific and local: TreeSHAP, integrated gradients and other gradient attributions, and attention or circuit analysis (research). An explanation is an output, so it gets evals like any other output (Layer 03 Evals & Red Teaming as Evidence): fidelity, stability and sanity tests without people, and comprehension tests with them. The unit of evidence is the explanation record, one structured object per explained decision, written at decision time by the runtime (Layer 04 Runtime Controls & Observability) with the method, its version, the baseline and the reason codes pinned.',
+    placements: [{ chapter: 'fairness-and-explainability', section: 'Explanation techniques', at: 'head' }],
+  },
+  {
+    id: 'instrument-lineage',
+    title: 'How the instruments relate',
+    caption:
+      'AI governance instruments in rising order of force, from principles and soft law through voluntary and harmonised standards to the treaty and the law, with the links the chapter traces between them, as of 2026-09-24. Build each control once and tag it with every instrument it serves, because standards support and do not confer. Drawn from chapter 22.',
+    alt: 'AI governance instruments in rising order of force, from principles to binding law, with the definition, lifecycle and presumption links between them.',
+    description:
+      'In rough order of force, weakest first, as of 2026-09-24. Principles and soft law (the OECD AI Principles, the UNESCO Recommendation, the G7 Hiroshima Code of Conduct and the EU High-Level Expert Group guidelines) set the target and the shared vocabulary. Standards and frameworks (the NIST AI RMF, the ISO/IEC 42001 family and the IEEE 7000 series) are voluntary; ISO/IEC 42001 is certifiable, evidences a management system and confers no AI Act presumption of conformity. The NIST AI RMF adapts the OECD lifecycle and dimensions. Harmonised standards, written by CEN-CENELEC JTC 21 on a Commission request, give a presumption of conformity under Article 40 only once their reference is cited in the Official Journal; the chapter found none cited. The Council of Europe Framework Convention (CETS No. 225) binds the Parties that ratify it and is not in force; the EU AI Act is binding law and recalls the HLEG principles in recital 27. The OECD definition of an AI system, the Convention\'s Article 2 and the AI Act\'s Article 3(1) use near-identical wording. The engineering rule: build each control once, tag it with every instrument it serves and generate each instrument\'s view from the tags.',
+    placements: [{ chapter: 'principles-and-standards', section: 'A short lineage of AI soft law', at: 'head' }],
+    pages: ['/resources/frameworks'],
+    // Statuses (Convention not in force, no OJ citation): re-check with chapter 22.
+    asOf: '2026-09-24',
+    reviewBy: '2027-03-24',
+  },
+  {
+    id: 'jurisdiction-tiles',
+    title: 'AI laws by jurisdiction',
+    caption:
+      'Twenty jurisdictions as equal tiles in rough geographic order, shaded by how binding their AI-specific regime is, with the US states and New York City in an inset, as of 2026-09-24. Find each jurisdiction you operate in, then read its section for the trigger, the clock and the enforcer. Drawn from chapter 21.',
+    alt: 'Twenty jurisdictions as equal tiles in rough geographic layout, shaded by how binding their AI-specific regime is, as of 2026-09-24.',
+    description:
+      'Twenty jurisdictions, one equal tile each, in rough geographic order, as of 2026-09-24. Binding, horizontal (a statute in force that applies across sectors): the European Union, South Korea, Japan (a promotional act with no penalties) and Italy. Binding, targeted (rules limited to a use, a sector, a class of developer or the public sector): the United States federal agencies, Canada\'s directive, China\'s departmental rules and, in the United States inset, California, Colorado, Illinois, New York, Texas, Utah and New York City. Voluntary (frameworks and guidance with no penalty attached): the United Kingdom, India, Singapore and Australia. Bill (not law yet): Brazil and Spain\'s national AI bill. The status is a reading aid, not legal advice; the table lists each jurisdiction\'s main instrument and its key date.',
+    placements: [{ chapter: 'ai-laws-worldwide', section: 'The landscape at a glance', at: 'head' }],
+    kind: 'data-viz',
+    // Statuses move monthly: re-check against chapter 21 and jurisdictions.ts.
+    asOf: '2026-09-24',
+    reviewBy: '2026-12-24',
+    data: {
+      caption: 'AI-specific regime by jurisdiction, as of 2026-09-24',
+      columns: ['Jurisdiction', 'Tile', 'Status', 'Main instrument', 'Key date'],
+      rows: [
+        ['South Korea', 'KOR', 'Binding, horizontal', 'Basic Act on the Development of AI and the Establishment of a Foundation for Trust (Act No. 20676)', '2026-01-22'],
+        ['United States (federal)', 'USA', 'Binding, targeted', 'OMB Memorandum M-25-21 (federal agency use of AI)', '2025-04-03'],
+        ['Colorado', 'CO', 'Binding, targeted', 'SB 26-189, Automated Decision-Making Technology (replaces SB 24-205)', '2027-01-01'],
+        ['Texas', 'TX', 'Binding, targeted', 'Texas Responsible Artificial Intelligence Governance Act (HB 149)', '2026-01-01'],
+        ['California', 'CA', 'Binding, targeted', 'SB 53, Transparency in Frontier Artificial Intelligence Act', '2026-01-01'],
+        ['New York', 'NY', 'Binding, targeted', 'RAISE Act (S6953B, as amended)', '2027-01-01'],
+        ['Utah', 'UT', 'Binding, targeted', 'Artificial Intelligence Policy Act as amended by SB 226 and SB 332', '2025-05-07'],
+        ['Illinois', 'IL', 'Binding, targeted', 'HB 3773, Human Rights Act amendment on AI in employment', '2026-01-01'],
+        ['New York City', 'NYC', 'Binding, targeted', 'Local Law 144 of 2021, automated employment decision tools', '2023-07-05'],
+        ['Japan', 'JPN', 'Binding, horizontal', 'Act on the Promotion of Research, Development and Utilisation of AI-Related Technologies (Act No. 53 of 2025)', '2025-09-01'],
+        ['China', 'CHN', 'Binding, targeted', 'Interim Measures for the Administration of Anthropomorphic Interaction Services', '2026-07-15'],
+        ['Brazil', 'BRA', 'Bill', 'PL 2338/2023 (AI bill; passed the Senate, in the Chamber of Deputies)', '2024-12-10'],
+        ['Canada', 'CAN', 'Binding, targeted', 'Directive on Automated Decision-Making', '2025-06-24'],
+        ['India', 'IND', 'Voluntary', 'India AI Governance Guidelines', '2025-11-05'],
+        ['United Kingdom', 'GBR', 'Voluntary', 'A pro-innovation approach to AI regulation: government response', '2024-02-06'],
+        ['Italy', 'ITA', 'Binding, horizontal', 'Law No. 132 of 23 September 2025 on artificial intelligence', '2025-10-10'],
+        ['Spain', 'ESP', 'Bill', 'Draft bill for the good use and governance of AI (first reading 11 March 2025)', '2025-03-11'],
+        ['Singapore', 'SGP', 'Voluntary', 'Model AI Governance Framework for Agentic AI (v1.5)', '2026-05-20'],
+        ['Australia', 'AUS', 'Voluntary', 'National AI Plan', '2025-12'],
+        ['European Union', 'EU', 'Binding, horizontal', 'Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744', '2024-08-01'],
+      ],
+      source: 'Chapter 21 and site/src/data/jurisdictions.ts, as of 2026-09-24',
+    },
+  },
 ] as const;
 
 /** Look up a figure definition by id. */

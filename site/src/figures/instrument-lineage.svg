@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 508" class="figc" role="img" aria-labelledby="fig-instrument-lineage-t fig-instrument-lineage-d">
+  <title id="fig-instrument-lineage-t">How the instruments relate</title>
+  <desc id="fig-instrument-lineage-d">AI governance instruments in rising order of force, from principles to binding law, with the definition, lifecycle and presumption links between them.</desc>
+
+  <text class="mono muted" x="16" y="18" font-size="13.5">Top to bottom, in rising order of force</text>
+
+  <!-- Principles and soft law -->
+  <rect class="panel" x="8" y="28" width="344" height="68" rx="8"/>
+  <text class="disp" x="18" y="46" font-size="14.5">Principles and soft law</text>
+  <rect class="cell cell-empty" x="18" y="54" width="52" height="20" rx="5"/>
+  <text x="26" y="69" font-size="13">OECD</text>
+  <rect class="cell cell-empty" x="76" y="54" width="66" height="20" rx="5"/>
+  <text x="84" y="69" font-size="13">UNESCO</text>
+  <rect class="cell cell-empty" x="148" y="54" width="94" height="20" rx="5"/>
+  <text x="156" y="69" font-size="13">G7 Hiroshima</text>
+  <rect class="cell cell-empty" x="248" y="54" width="68" height="20" rx="5"/>
+  <text x="256" y="69" font-size="13">EU HLEG</text>
+  <text class="ink2" x="18" y="89" font-size="13">set the target and the shared vocabulary</text>
+
+  <!-- The OECD definition travels down (left rail); the lifecycle into NIST -->
+  <line class="stroke-arrow" x1="86" y1="96" x2="86" y2="110"/>
+  <path class="arrow" d="M80 110 h12 l-6 9 z"/>
+  <text class="mono muted" x="98" y="114" font-size="13">lifecycle</text>
+
+  <!-- International standards and frameworks -->
+  <rect class="panel" x="32" y="122" width="320" height="68" rx="8"/>
+  <text class="disp" x="42" y="140" font-size="14.5">Standards and frameworks</text>
+  <rect class="cell cell-empty" x="42" y="148" width="88" height="20" rx="5"/>
+  <text x="50" y="163" font-size="13">NIST AI RMF</text>
+  <rect class="cell cell-empty" x="136" y="148" width="100" height="20" rx="5"/>
+  <text x="144" y="163" font-size="13">ISO/IEC 42001</text>
+  <rect class="cell cell-empty" x="242" y="148" width="76" height="20" rx="5"/>
+  <text x="250" y="163" font-size="13">IEEE 7000</text>
+  <text class="ink2" x="42" y="183" font-size="13">voluntary; ISO/IEC 42001 is certifiable</text>
+
+  <!-- Harmonised standards -->
+  <rect class="panel" x="32" y="202" width="320" height="68" rx="8"/>
+  <text class="disp" x="42" y="220" font-size="14.5">Harmonised standards</text>
+  <rect class="cell cell-empty" x="42" y="228" width="150" height="20" rx="5"/>
+  <text x="50" y="243" font-size="13">CEN-CENELEC JTC 21</text>
+  <text class="ink2" x="42" y="263" font-size="13">presumption only once cited in the OJ</text>
+  <line class="stroke-arrow" x1="274" y1="270" x2="274" y2="284"/>
+  <path class="arrow" d="M268 284 h12 l-6 9 z"/>
+  <text class="mono muted" x="286" y="288" font-size="13">Art. 40</text>
+
+  <!-- Binding: the treaty and the law -->
+  <rect class="panel" x="32" y="296" width="154" height="76" rx="8"/>
+  <text class="disp" x="42" y="314" font-size="14.5">CoE Convention</text>
+  <text class="ink2" x="42" y="331" font-size="13">CETS No. 225</text>
+  <text class="ink2" x="42" y="347" font-size="13">binds its Parties</text>
+  <text class="ink2" x="42" y="363" font-size="13">not in force</text>
+  <rect class="panel" x="196" y="296" width="156" height="76" rx="8"/>
+  <text class="disp" x="206" y="314" font-size="14.5">EU AI Act</text>
+  <text class="ink2" x="206" y="331" font-size="13">binding law</text>
+  <text class="ink2" x="206" y="347" font-size="13">recalls the HLEG</text>
+  <text class="ink2" x="206" y="363" font-size="13">in recital 27</text>
+  <path class="stroke-arrow" d="M16 96 V386 H240 M109 386 V381 M240 386 V381"/>
+  <path class="arrow" d="M103 381 h12 l-6 -9 z"/>
+  <path class="arrow" d="M234 381 h12 l-6 -9 z"/>
+  <text class="mono muted" x="24" y="404" font-size="13">definition: near-identical wording</text>
+
+  <!-- Build each control once, tag it with every instrument -->
+  <line class="rule" x1="8" y1="416" x2="352" y2="416"/>
+  <rect class="panel" x="8" y="426" width="344" height="52" rx="10"/>
+  <path class="glyph" d="M20 438 h12 l5 5 v17 h-17 z"/>
+  <path class="glyph" d="M32 438 v5 h5"/>
+  <path class="glyph-check" d="M23 451 l3 3 l6 -7"/>
+  <text class="disp" x="48" y="446" font-size="14.5">One control, many instruments</text>
+  <text class="ink2" x="48" y="465" font-size="13">build it once, tag it with each instrument</text>
+
+  <text class="mono muted" x="16" y="498" font-size="13">As of 2026-09-24</text>
+</svg>

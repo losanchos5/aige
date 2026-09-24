@@ -27,6 +27,19 @@ a completed, reviewed core (1.0).
   the existing downloads; the Content-Security-Policy is unchanged.
 - The citation block now serves any page (`kind`: chapter, obligation, figure, dataset or page);
   chapters keep their existing reference and BibTeX.
+- Concept figures for the new chapters, each drawn only from what its chapter or data module
+  states, with a text description and a `/figures/<id>` permalink: the agent control plane
+  (chapter 23 and `/agents#control-plane`: registry, identity issuer, tool gateway, runtime
+  guardrail with its failure posture, human checkpoint, per-agent breaker with its six stop levels,
+  the boundary a kill switch cannot cross, telemetry kept as evidence), the governance operating
+  model (chapter 12: board, committee, the three lines and where the AI governance engineer sits),
+  harm at five levels (chapter 13, from the harms atlas), the explanation technique map (chapter
+  16), how the instruments relate (chapter 22 and `/resources/frameworks`, dated as of
+  2026-09-24) and AI laws by jurisdiction (chapter 21: a tile map from the jurisdictions dataset,
+  shaded by status, with its table, dated as of 2026-09-24).
+- Chapter 14 opens with an interactive diagram of the build as a chain of gates: intake, design
+  review, dataset admission, eval gate and release gate, each named with the pattern the chapter
+  ties to it, ending in the technical file the pipeline compiles.
 
 ### Changed
 - `/resources/obligations.json` and `/resources/obligations.csv` move to `schemaVersion` 2 at the

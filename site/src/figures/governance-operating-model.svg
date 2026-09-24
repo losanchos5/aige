@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 492" class="figc" role="img" aria-labelledby="fig-governance-operating-model-t fig-governance-operating-model-d">
+  <title id="fig-governance-operating-model-t">The governance operating model</title>
+  <desc id="fig-governance-operating-model-d">Board, committee and the three lines around one set of gates, with the AI governance engineer in the second line and evidence flowing to audit and the board.</desc>
+
+  <text class="mono muted" x="16" y="18" font-size="13.5">Roles, not boxes on an org chart</text>
+
+  <!-- Board: sets appetite, reads the indicators (person glyph) -->
+  <rect class="panel" x="8" y="28" width="324" height="44" rx="8"/>
+  <circle class="glyph" cx="26" cy="43" r="4"/>
+  <path class="glyph" d="M19 57 a7 6 0 0 1 14 0"/>
+  <text class="disp" x="44" y="46" font-size="14.5">Board</text>
+  <text class="ink2" x="44" y="63" font-size="13">sets appetite; reads KPIs and KRIs</text>
+  <line class="stroke-arrow" x1="179" y1="72" x2="179" y2="84"/>
+  <path class="arrow" d="M173 84 h12 l-6 9 z"/>
+  <text class="mono muted" x="190" y="88" font-size="13">appetite, policy</text>
+
+  <!-- Committee: decides what the gates cannot (person glyph) -->
+  <rect class="panel" x="8" y="96" width="324" height="44" rx="8"/>
+  <circle class="glyph" cx="26" cy="111" r="4"/>
+  <path class="glyph" d="M19 125 a7 6 0 0 1 14 0"/>
+  <text class="disp" x="44" y="114" font-size="14.5">AI governance committee</text>
+  <text class="ink2" x="44" y="131" font-size="13">decides what the gates cannot</text>
+
+  <!-- Spine: exceptions reach the gates as data -->
+  <line class="stroke-arrow" x1="179" y1="140" x2="179" y2="253"/>
+  <path class="arrow" d="M173 253 h12 l-6 9 z"/>
+  <text class="mono muted" x="190" y="156" font-size="13">exceptions as data</text>
+
+  <!-- Second line, where the AI governance engineer usually sits -->
+  <rect class="panel" x="8" y="164" width="166" height="76" rx="8"/>
+  <text class="disp" x="18" y="183" font-size="14.5">Second line</text>
+  <text class="ink2" x="18" y="200" font-size="13">sets method, policy</text>
+  <rect class="glyph" x="12" y="208" width="158" height="24" rx="12"/>
+  <text x="20" y="225" font-size="13">AI governance engineer</text>
+
+  <!-- First line -->
+  <rect class="panel" x="186" y="164" width="146" height="76" rx="8"/>
+  <text class="disp" x="196" y="183" font-size="14.5">First line</text>
+  <text class="ink2" x="196" y="200" font-size="13">builds and runs</text>
+  <text class="ink2" x="196" y="216" font-size="13">inside the gates</text>
+
+  <!-- Both lines meet the gates -->
+  <path class="stroke-arrow" d="M90 240 V284 H100"/>
+  <path class="arrow" d="M100 278 v12 l9 -6 z"/>
+  <text class="mono muted" x="18" y="262" font-size="13">builds</text>
+  <path class="stroke-arrow" d="M259 240 V284 H258"/>
+  <path class="arrow" d="M258 278 v12 l-9 -6 z"/>
+  <text class="mono muted" x="268" y="262" font-size="13">changes</text>
+
+  <!-- The gates enforce (the one gate glyph; Layer 01) -->
+  <path class="l1-band" d="M179 262 l70 22 l-70 22 l-70 -22 z"/>
+  <text class="mono" x="179" y="289" font-size="13" text-anchor="middle">Gates</text>
+  <line class="stroke-arrow" x1="179" y1="306" x2="179" y2="318"/>
+  <path class="arrow" d="M173 318 h12 l-6 9 z"/>
+
+  <!-- Third line reads the evidence; the evidence store (Layer 05) -->
+  <rect class="panel" x="8" y="330" width="120" height="72" rx="8"/>
+  <text class="disp" x="18" y="349" font-size="14.5">Third line</text>
+  <text class="ink2" x="18" y="366" font-size="13">internal audit</text>
+  <text class="ink2" x="18" y="382" font-size="13">re-performs</text>
+  <text class="ink2" x="18" y="396" font-size="13">gate decisions</text>
+  <line class="stroke-arrow" x1="128" y1="366" x2="139" y2="366"/>
+  <path class="arrow" d="M139 360 v12 l9 -6 z"/>
+
+  <rect class="l5-band" x="148" y="330" width="184" height="72" rx="10"/>
+  <ellipse class="glyph" cx="168" cy="344" rx="9" ry="3.2"/>
+  <path class="glyph" d="M159 344 v16 a9 3.2 0 0 0 18 0 v-16"/>
+  <text class="disp" x="186" y="351" font-size="14.5">Evidence store</text>
+  <text class="ink2" x="186" y="370" font-size="13">registry entries,</text>
+  <text class="ink2" x="186" y="386" font-size="13">eval results, logs</text>
+
+  <!-- Indicators computed from the evidence reach the board -->
+  <path class="stroke-arrow" d="M332 366 H346 V50 H341" stroke-dasharray="4 3"/>
+  <path class="arrow" d="M341 44 v12 l-9 -6 z"/>
+
+  <text class="ink2" x="16" y="428" font-size="13.5">The committee decides; the gates enforce.</text>
+
+  <!-- Legend: layers named exactly -->
+  <rect class="l1-band" x="16" y="444" width="12" height="12" rx="2"/>
+  <text x="36" y="455" font-size="13">Layer 01 Govern-as-Code</text>
+  <rect class="l5-band" x="16" y="462" width="12" height="12" rx="2"/>
+  <text x="36" y="473" font-size="13">Layer 05 Assurance &amp; Continuous Compliance</text>
+</svg>

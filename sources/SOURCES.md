@@ -2028,3 +2028,20 @@ Commission's AI Act Service Desk, and the Omnibus changes come from chapter 18's
 | 22 | OECD AI Principles 1.1 to 1.5 (the 2024 revision adds sustainability, safe decommissioning, and traceability and risk management under accountability) | Chapter 22 row [7] (OECD/LEGAL/0449) | OECD (via chapter 22) | 2024-05-03 | https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449 | primary | Crosswalk treaty and soft-law column |
 | 23 | G7 Hiroshima Code of Conduct, Actions 1 to 11 (e.g. 7 content authentication and provenance; 11 data input, personal data and IP) | Chapter 22 rows (Hiroshima Process International Code of Conduct for Advanced AI Systems) | European Commission (via chapter 22) | 2023-10-30 | https://digital-strategy.ec.europa.eu/en/library/hiroshima-process-international-code-conduct-advanced-ai-systems | primary | Crosswalk treaty and soft-law column |
 | 24 | JTC 21 stages as of 2026-09-24: EN 18286:2026 published (60.60); prEN 18228 and prEN 18229-1 at Enquiry (40.60); no JTC 21 deliverable cited in the OJ | Chapter 22 rows [52] and [54] | Genorma; CEN-CENELEC (via chapter 22) | 2026-09-24 | https://genorma.com/en/standards/pren-18228 | secondary | Crosswalk CEN-CENELEC column (prEN refs unverified) |
+
+## site/src/figures concept figures (block w2-fig-concepts, BoK v0.5.0)
+
+The six concept infographics and the chapter 14 lifecycle diagram add no new source: each draws only
+on its chapter (or the data module the chapter uses) and inherits that chapter's numbered sources.
+The table records which of them each figure relies on, so a reviewer can re-check a figure against
+the same rows. Source numbers are the chapter's own, as of 2026-09-24.
+
+| Figure | Drawn from | Chapter sources it relies on | Verified |
+|---|---|---|---|
+| `agent-control-plane` (`/figures/agent-control-plane`, `/agents#control-plane`) | ch. 23, runtime guardrails, kill switch and stop levels, stopping across hops, agent telemetry | [4] Agentic Trust Framework; [5] AI Act Art. 14(4)(e); [16] AARM; [17] Agent Control Standard (failure posture); [19] NIST AI RMF MANAGE 2.4; [20] A2A cancel | primary (as tagged in ch. 23) |
+| `governance-operating-model` | ch. 12, stakeholder map, the three lines applied to AI, internal audit, KPIs and KRIs | [1] AI Act Art. 17(1)(m); [2] ISO/IEC 42001 clauses 5.3, 9.2; [3] NIST AI RMF GOVERN 2.1; [4] IIA Three Lines Model | primary (as tagged in ch. 12) |
+| `harm-levels` | ch. 13, defined scales; `site/src/data/harms.ts` rows discriminatory-decisions, underrepresentation, prompt-injection, job-displacement, energy-emissions | harms.ts [1] MIT AI Risk Repository taxonomy and each row's own `sources` | primary (as tagged in harms.ts) |
+| `explanation-techniques` | ch. 16, explanation techniques, testing explanation quality, explanation artefacts | [29] NIST IR 8312; [32] SHAP; [33] LIME; [34] integrated gradients; [35] Fooling LIME and SHAP; [36] Sanity checks; [52] Doshi-Velez and Kim | primary (as tagged in ch. 16) |
+| `instrument-lineage` (`/resources/frameworks`) | ch. 22, how to read, instruments at a glance, lineage, ISO/IEC family, harmonised standards, one control many instruments | [1] CETS No. 225; [2] AI Act Art. 40; [5] Convention status; [7] OECD/LEGAL/0449; [9] NIST AI RMF; [14] AI Act recitals 12 and 27; [40] ISO/IEC 42001; [47] C(2025)3871; [53] JTC 21 tracker (secondary) | primary, [53] secondary (as tagged in ch. 22) |
+| `jurisdiction-tiles` | ch. 21, the landscape at a glance; `site/src/data/jurisdictions.ts` (status and first instrument per jurisdiction) | the landscape table's rows [1] to [54] and each instrument's `url` and `verified` tag in jurisdictions.ts | as tagged per instrument |
+| `build-chain-of-gates` (archify) | ch. 14, the build as a chain of gates and the sections each gate names | [1] ISO/IEC 5338; [2] ISO/IEC 42001 Annex A.6, A.7; [3] NIST AI RMF MAP 1.1, 1.5; [4] AI Act Art. 17 | primary (as tagged in ch. 14) |

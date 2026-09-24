@@ -15,6 +15,9 @@ import RegisterList from '../components/RegisterList.astro';
 import ResourceCard from '../components/ResourceCard.astro';
 import Callout from '../components/Callout.astro';
 import CtaBand from '../components/CtaBand.astro';
+import Figure from '../components/Figure.astro';
+import { getFigure } from '../data/figures';
+import controlPlaneSvg from '../figures/agent-control-plane.svg?raw';
 import { layers } from '../data/stack';
 import { slugify } from '../lib/md-parse';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
@@ -49,6 +52,9 @@ const properties = [
       'Steps happen with no person between them, so the design has to say where a person decides and how anyone stops it.',
   },
 ];
+
+// Block w2-fig-concepts: the control plane as one figure, above the list.
+const controlPlaneFigure = getFigure('agent-control-plane')!;
 
 const controlPlane = [
   {
@@ -352,6 +358,14 @@ const description =
     title="The agent control plane, component by component."
     lede="Ten components sit around every agent in production. Each one leaves evidence, and each links to its section in chapter 23."
   >
+    <Figure
+      id="agent-control-plane"
+      title={controlPlaneFigure.title}
+      caption={controlPlaneFigure.caption}
+      description={controlPlaneFigure.description}
+    >
+      <Fragment set:html={controlPlaneSvg} />
+    </Figure>
     <div class="well"><RegisterList items={controlPlane} /></div>
   </Section>
 
