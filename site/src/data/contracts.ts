@@ -22,7 +22,7 @@ export interface ContractReference {
 export const references = {
   'aia-25-4': {
     label: 'EU AI Act Art. 25(4)',
-    url: 'https://artificialintelligenceact.eu/article/25/',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_25',
   },
   'aia-26': {
     label: 'EU AI Act Art. 26',
@@ -30,7 +30,7 @@ export const references = {
   },
   'aia-13': {
     label: 'EU AI Act Art. 13',
-    url: 'https://artificialintelligenceact.eu/article/13/',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_13',
   },
   'iso-42001-a10': {
     label: 'ISO/IEC 42001 A.10',

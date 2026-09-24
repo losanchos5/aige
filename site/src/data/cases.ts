@@ -88,26 +88,27 @@ const src = {
     title: 'EU AI Act Art. 5',
     gloss:
       'prohibited AI practices; 5(1)(c) social scoring leading to unjustified or disproportionate detrimental treatment; 5(1)(e) facial recognition databases built by untargeted scraping',
-    publisher: 'AI Act (Reg. (EU) 2024/1689)',
-    date: '2024',
-    url: 'https://artificialintelligenceact.eu/article/5/',
+    publisher: 'Publications Office of the EU (EUR-Lex)',
+    date: '2026-07-27',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_5',
     verified: 'primary',
   },
   aiActArt113: {
     title: 'EU AI Act Art. 113',
-    gloss: 'entry into force and application; Chapters I and II apply from 2 Feb 2025',
-    publisher: 'AI Act (Reg. (EU) 2024/1689)',
-    date: '2024',
-    url: 'https://artificialintelligenceact.eu/article/113/',
+    gloss:
+      'entry into force and application; Chapters I and II apply from 2 Feb 2025, except the Art. 5 bans added by Reg. (EU) 2026/1744 (from 2 Dec 2026)',
+    publisher: 'Publications Office of the EU (EUR-Lex)',
+    date: '2026-07-27',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_113',
     verified: 'primary',
   },
   aiActAnnex3: {
     title: 'EU AI Act Annex III',
     gloss:
       'high-risk uses; point 3(b) evaluating learning outcomes, 4(a) recruitment and selection, 5(a) eligibility for essential public assistance benefits and services',
-    publisher: 'AI Act (Reg. (EU) 2024/1689)',
-    date: '2024',
-    url: 'https://artificialintelligenceact.eu/annex/3/',
+    publisher: 'Publications Office of the EU (EUR-Lex)',
+    date: '2026-07-27',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#anx_III',
     verified: 'primary',
   },
   omnibus: {
@@ -121,27 +122,27 @@ const src = {
   aiActArt10: {
     title: 'EU AI Act Art. 10',
     gloss: 'data and data governance; examination of training data for possible biases',
-    publisher: 'AI Act (Reg. (EU) 2024/1689)',
-    date: '2024',
-    url: 'https://artificialintelligenceact.eu/article/10/',
+    publisher: 'Publications Office of the EU (EUR-Lex)',
+    date: '2026-07-27',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_10',
     verified: 'primary',
   },
   aiActArt27: {
     title: 'EU AI Act Art. 27',
     gloss:
-      'FRIA for deployers of Annex III high-risk systems, including bodies governed by public law; Art. 27(4) cross-reference to a GDPR Art. 35 DPIA',
-    publisher: 'AI Act (Reg. (EU) 2024/1689)',
-    date: '2024',
-    url: 'https://artificialintelligenceact.eu/article/27/',
+      'FRIA before first use by deployers that are bodies governed by public law or private entities providing public services, and by deployers of Annex III point 5(b) and (c) systems; Art. 27(4) cross-reference to a GDPR Art. 35 DPIA',
+    publisher: 'Publications Office of the EU (EUR-Lex)',
+    date: '2026-07-27',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_27',
     verified: 'primary',
   },
   aiActArt50: {
     title: 'EU AI Act Art. 50',
     gloss:
       'transparency; systems that interact directly with natural persons must be designed so that those persons are informed they are interacting with an AI system',
-    publisher: 'AI Act (Reg. (EU) 2024/1689)',
-    date: '2024',
-    url: 'https://artificialintelligenceact.eu/article/50/',
+    publisher: 'Publications Office of the EU (EUR-Lex)',
+    date: '2026-07-27',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_50',
     verified: 'primary',
   },
   art50Date: {
@@ -156,9 +157,9 @@ const src = {
     title: 'EU AI Act Art. 53',
     gloss:
       'obligations for providers of general-purpose AI models, including a sufficiently detailed public summary of the content used for training',
-    publisher: 'AI Act (Reg. (EU) 2024/1689)',
-    date: '2024',
-    url: 'https://artificialintelligenceact.eu/article/53/',
+    publisher: 'Publications Office of the EU (EUR-Lex)',
+    date: '2026-07-27',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_53',
     verified: 'primary',
   },
   gpaiEnforcement: {
@@ -172,9 +173,9 @@ const src = {
   aiActArt86: {
     title: 'EU AI Act Art. 86',
     gloss: 'right to explanation of individual decision-making based on the output of a high-risk AI system',
-    publisher: 'AI Act (Reg. (EU) 2024/1689)',
-    date: '2024',
-    url: 'https://artificialintelligenceact.eu/article/86/',
+    publisher: 'Publications Office of the EU (EUR-Lex)',
+    date: '2026-07-27',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_86',
     verified: 'primary',
   },
   art4Literacy: {
