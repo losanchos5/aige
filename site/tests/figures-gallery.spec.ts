@@ -31,7 +31,12 @@ test('dated figures print "As of <date>" inside the art and keep a later reviewB
     if (figure.reviewBy) expect(figure.reviewBy > figure.asOf).toBe(true);
     const svg = readFileSync(resolve(process.cwd(), 'src/figures', `${figure.id}.svg`), 'utf8');
     const text = svg.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').toLowerCase();
-    expect(text, `${figure.id} prints its as-of date`).toContain(`as of ${figure.asOf}`);
+    // A Spanish figure (root lang="es", block w2-fig-posters) prints the stamp
+    // in Spanish: "A fecha de <date>".
+    const stamp = /^<svg\b[^>]*\slang="es"/.test(svg.trim())
+      ? `a fecha de ${figure.asOf}`
+      : `as of ${figure.asOf}`;
+    expect(text, `${figure.id} prints its as-of date`).toContain(stamp);
   }
 });
 
@@ -69,8 +74,9 @@ test('the standalone SVGs are self-contained, themed and attributed', () => {
     );
     const svg = readFileSync(resolve(EXPORTS, auto.file), 'utf8');
     expect(svg).toContain('role="img"');
-    expect(svg).toMatch(/<title id="[^"]+">/);
-    expect(svg).toMatch(/<desc id="[^"]+">/);
+    // A Spanish poster's export marks its English <title>/<desc> lang="en".
+    expect(svg).toMatch(/<title id="[^"]+"(?: lang="en")?>/);
+    expect(svg).toMatch(/<desc id="[^"]+"(?: lang="en")?>/);
     expect(svg).toContain('@media (prefers-color-scheme:dark)');
     expect(svg).toContain('@font-face');
     expect(svg).toContain(`aigovernanceengineer.com · CC BY 4.0 · v${site.bokVersion}`);
