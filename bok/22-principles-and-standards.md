@@ -350,11 +350,11 @@ for the others, with accountable and transparent spanning them all [9].
 |---|---|---|
 | Valid and reliable | Capability and regression evals against a golden set; drift monitoring | 3 · 4 |
 | Safe | Safety-threshold evals; tested kill switch; override path | 3 · 4 |
-| Secure and resilient | Adversarial red-team suite; threat model; runtime detection | 3 · 4 |
+| Secure and resilient | Adversarial red-team suite; [threat model](/patterns/ai-threat-model); runtime detection | 3 · 4 |
 | Accountable and transparent | Registry ownership; model card; evidence keyed to registry ids | 2 · 5 |
-| Explainable and interpretable | Explanation artefacts and reason codes, tested for fidelity ([chapter 16](/bok/fairness-and-explainability#testing-explanation-quality)) | 2 · 3 |
+| Explainable and interpretable | [Explanation artefacts](/patterns/explanation-artefact) and reason codes, tested for fidelity ([chapter 16](/bok/fairness-and-explainability#testing-explanation-quality)) | 2 · 3 |
 | Privacy-enhanced | Leakage and memorisation evals; DPIA linked to registry ([chapter 19](/bok/privacy-and-ai#does-a-model-contain-personal-data)) | 2 · 3 |
-| Fair with harmful bias managed | Fairness evals with thresholds traced to named harms | 3 |
+| Fair with harmful bias managed | [Fairness evals](/patterns/fairness-eval-suite) with thresholds traced to named harms | 3 |
 
 ### The Core: 19 categories
 

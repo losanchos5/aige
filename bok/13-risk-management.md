@@ -228,7 +228,7 @@ A **contributing factor** does not create a risk on its own; it moves likelihood
 NIST gives higher initial priority where training data is sensitive or personal or outputs affect
 people directly, and counts deployer customisation as a factor [1]. Article 9 asks providers to
 consider people under 18 and other vulnerable groups [8]. Capture factors as registry fields at
-intake and let a policy compute the tier.
+[intake](/patterns/use-case-intake-risk-tiering) and let a policy compute the tier.
 
 | Factor | Moves | Profile field |
 |---|---|---|

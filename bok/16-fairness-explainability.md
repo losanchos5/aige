@@ -599,7 +599,7 @@ testable criteria for the digital channel [54]. In practice:
 ## Explanation artefacts as evidence records
 
 An explanation delivered and not kept cannot be audited, reproduced or defended. The unit of
-evidence is the **explanation record**: one structured object per explained decision, written at
+evidence is the [**explanation record**](/patterns/explanation-artefact): one structured object per explained decision, written at
 decision time by the runtime (layer 04), keyed to the same registry id as every other artefact, and
 retained by the obligation it serves.
 
@@ -633,8 +633,8 @@ artefact, not the aspiration.
 |---|---|---|---|
 | **01 Govern-as-Code** | Fairness policy as data: protected attributes by jurisdiction, chosen metric and reason, thresholds, minimum cell size, approver | Explanation policy: required explanation types per use case, interpretable-by-default rule, reason-code limits | [Policy Card](/bok/patterns#pattern-policy-card) |
 | **02 Inventory & Transparency** | Data card with coverage per group and the Art. 4a basis; model card with disaggregated and intersectional metrics | Instructions for use and explanation-method card (method, baseline, fidelity, limits); AI-use notice | [Model Card as Control Evidence](/bok/patterns#pattern-model-card-as-control-evidence) |
-| **03 Evals & Red Teaming as Evidence** | Fairness eval suite: group metrics with intervals, intersectional slices, proxy scan, counterfactual flip test | Explanation eval suite: fidelity, stability, sanity, reason-code consistency, comprehension test | [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci) |
-| **04 Runtime Controls & Observability** | Rolling selection rates and AIR by group; override and appeal rates by group | Explanation record per decision; contest channel; RAG citation trace | [Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate) |
+| **03 Evals & Red Teaming as Evidence** | [Fairness eval suite](/patterns/fairness-eval-suite): group metrics with intervals, intersectional slices, proxy scan, counterfactual flip test | Explanation eval suite: fidelity, stability, sanity, reason-code consistency, comprehension test | [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci) |
+| **04 Runtime Controls & Observability** | Rolling selection rates and AIR by group; override and appeal rates by group | [Explanation record](/patterns/explanation-artefact) per decision; contest channel; RAG citation trace | [Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate) |
 | **05 Assurance & Continuous Compliance** | Fairness results and audit summaries as machine-readable evidence; LL144-style published summary | Explanation-request log with response times; periodic re-derivation checks | [Machine-Readable Evidence (OSCAL)](/bok/patterns#pattern-machine-readable-evidence-oscal) |
 
 Layer 03 is where both become controls, which is why the definition of done in [Layer

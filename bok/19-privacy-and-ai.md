@@ -40,7 +40,7 @@ rules in layer 01; privacy tests in layer 03; redaction, filters and routing in 
 records a regulator asks for in layer 05. Two neighbouring chapters carry the organisational side:
 chapter 12 on [updating the policies you already have](/bok/governance-program#updating-the-policies-you-already-have),
 and chapter 14 on [the right to use the data](/bok/governing-development#the-right-to-use-the-data)
-at the dataset admission gate.
+at the [dataset admission gate](/patterns/dataset-admission-gate).
 
 ## Principles applied to AI
 

@@ -578,7 +578,7 @@ procedure and the main elements of the decision taken" [1]. The right yields to 
 national law and applies only where Union law does not already provide it [1], which is why it has to
 be read with GDPR rights on automated decisions (see [privacy and AI](/bok/privacy-and-ai#the-regimes-side-by-side)).
 
-The artefact is an **explanation record** per decision: system and model version, the inputs or
+The artefact is an [**explanation record**](/patterns/explanation-artefact) per decision: system and model version, the inputs or
 reason codes behind the output, whether the output was determinative or advisory, and the human who
 decided; methods are in [fairness and explainability](/bok/fairness-and-explainability#explanation-artefacts-as-evidence-records),
 with what the [right to explanation (Art. 86)](/bok/fairness-and-explainability#the-eu-ai-act-articles-13-and-86)

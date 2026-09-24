@@ -13,7 +13,7 @@ frameworks side by side. None says in one place what makes an agent different to
 controls form one control plane, or where each control meets the law. This chapter does.
 
 One contrast first. **AI security engineering**, the sibling discipline, asks how an attacker can
-make an agent cause harm, and it owns the threat model. AI governance engineering asks a wider
+make an agent cause harm, and it owns the [threat model](/patterns/ai-threat-model). AI governance engineering asks a wider
 question: under whose authority did the agent act, within what bound, with what evidence, and who
 could have stopped it. The two share most controls. They differ on what counts as done: for security
 a blocked attack is done; for governance it is done when the block, the authority behind the action

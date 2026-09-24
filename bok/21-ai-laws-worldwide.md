@@ -357,7 +357,7 @@ evidence every one of them needs; the notices and review paths differ only in wo
 > release and blocks one that moves any group's selection-rate ratio below the configured floor.
 > The same results feed the NYC bias-audit auditor's data request, the Illinois discriminatory-effect
 > file and the Korean impact assessment's "indicators and method" section. The registry entry
-> carries four notice templates and one human-review queue; the adverse-outcome explanation is
+> carries four notice templates and one human-review queue; the [adverse-outcome explanation](/patterns/explanation-artefact) is
 > generated from the model's top reason codes and logged with the decision, so Colorado's 30-day
 > clock is met by the same pipeline that answers a US credit adverse-action notice.
 

@@ -34,7 +34,7 @@ Compliance**.
 
 | Body of law | The question it asks of an AI system | Primary evidence artefact | Layer |
 |---|---|---|---|
-| Intellectual property | Did we have the right to use each input, and does any output copy protected expression? | Training-data rights ledger; memorisation eval; output-filter log | 2 · 3 · 4 |
+| Intellectual property | Did we have the right to use each input, and does any output copy protected expression? | [Training-data rights ledger](/patterns/training-data-rights-ledger); memorisation eval; output-filter log | 2 · 3 · 4 |
 | Non-discrimination | Does the system put a protected group at a disadvantage it cannot justify? | Per-group impact eval; search log for less discriminatory alternatives; reason-code fidelity test | 3 · 5 |
 | Consumer protection | Is what we claim about the system, or do through its interface, misleading or unfair? | Claims register linked to eval runs; interface and disclosure review record | 1 · 3 · 5 |
 | Product liability | Was the system defective when it left our control, and did we warn about its limits? | FMEA; AIBOM with hashes; eval history; change log; instructions for use | 2 · 3 · 5 |
@@ -217,7 +217,7 @@ held when an output was produced.
 
 | Artefact | What it records | Layer | Pattern |
 |---|---|---|---|
-| Training-data rights ledger | Per dataset: source, acquisition channel, licence, TDM reservation check (result, method, date), place of copying | 2 | Training-Data Rights Ledger (proposed); [AIBOM](/bok/patterns#pattern-aibom) |
+| Training-data rights ledger | Per dataset: source, acquisition channel, licence, TDM reservation check (result, method, date), place of copying | 2 | [Training-Data Rights Ledger](/patterns/training-data-rights-ledger); [AIBOM](/bok/patterns#pattern-aibom) |
 | Crawler policy-as-code | Honouring `robots.txt` and other machine-readable reservations; no paywall circumvention; blocklist of infringing sites | 1 | [Policy Card](/bok/patterns#pattern-policy-card) |
 | Memorisation and regurgitation eval | Extraction probes and verbatim-overlap thresholds per model version | 3 | [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci) |
 | Output filter log | Blocked near-verbatim outputs; licence matches on generated code | 4 | [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) |
@@ -350,7 +350,7 @@ eval and a record.
 | NYC Local Law 144 | Impact ratios by sex, race and ethnicity, and intersectional categories, by an independent auditor [46] | The same calculation on historical or test data | Published audit summary with its date; candidate notice record |
 | EU indirect discrimination | Particular disadvantage; objective justification; appropriate and necessary means [39] | Group-disparity metrics plus a necessity analysis | Justification section in the [FRIA](/bok/patterns#pattern-fria-as-code) or DPIA |
 | Adverse action (ECOA, FCRA) | Specific principal reasons for the decision [50] [51] | Reason-code fidelity test against the model | Reason-code eval result and the notice template version |
-| CCD2 Art. 18(8) | Explanation, human intervention and review [53] | Explanation artefact per model version | Review log with outcome and reviewer |
+| CCD2 Art. 18(8) | Explanation, human intervention and review [53] | [Explanation artefact](/patterns/explanation-artefact) per model version | Review log with outcome and reviewer |
 
 The four-fifths rule is a rule of thumb for enforcement agencies, not a safe harbour [59]. Treat an
 impact ratio above 0.8 as a pass of one check, not as proof of lawfulness. Chapter 16 computes and
@@ -428,7 +428,7 @@ include fake consumer reviews and reviews that conceal an incentive (Sch. 20, pa
 
 | Practice (as of 2026-09-24) | United States | European Union | United Kingdom | Evidence artefact | Layer |
 |---|---|---|---|---|---|
-| Unsubstantiated accuracy or fairness claim | FTC Act s. 5; Workado order [62] | UCPD general clause [68] | DMCC s. 225 [73] | Claims register linked to eval runs | 3 · 5 |
+| Unsubstantiated accuracy or fairness claim | FTC Act s. 5; Workado order [62] | UCPD general clause [68] | DMCC s. 225 [73] | [Claims register](/patterns/claims-substantiation-gate) linked to eval runs | 3 · 5 |
 | AI-generated fake reviews | 16 CFR Part 465 [66] | UCPD Annex I, 23b–23c [69] | DMCC Sch. 20, para. 13 [73] | Policy blocking review generation; provenance log | 1 · 4 |
 | Undisclosed bot | Cal. BPC s. 17941 [67] | AI Act Art. 50(1) [72] | No bot-specific rule; s. 225 may apply [73] | Disclosure control and a test that it renders | 4 |
 | Manipulative interface or output | FTC Act s. 5 unfairness [60] | DSA Art. 25 [70]; AI Act Art. 5(1)(a)–(b) [71] | s. 225 [73] | Interface review; red-team eval for manipulation | 3 · 5 |
@@ -441,13 +441,13 @@ capability is a row: the claim, where it appears, the eval run that supports it,
 measured on, and the date. Workado failed on the last two columns: the measurement did not match the
 population the claim described [62]. A model release reruns the eval and re-validates every claim
 that cites it; a stale or failing claim is pulled from the copy. This is proposed here as a new
-pattern, the **Claims Substantiation Gate**: an [eval gate](/bok/patterns#pattern-eval-gate-in-ci)
+pattern, the [**Claims Substantiation Gate**](/patterns/claims-substantiation-gate): an [eval gate](/bok/patterns#pattern-eval-gate-in-ci)
 pointed at marketing copy.
 
 **Deletion-ready lineage.** An order to delete "models or algorithms developed in whole or in part
 using" some data [64] can only be complied with, and proven, if you know which models touched the
 data. That is an [AIBOM](/bok/patterns#pattern-aibom) with dataset lineage down to the version, plus
-the training-data rights ledger. Without it, the only safe response to a disgorgement order is to
+the [training-data rights ledger](/patterns/training-data-rights-ledger). Without it, the only safe response to a disgorgement order is to
 delete everything.
 
 ## Product liability
