@@ -1,0 +1,164 @@
+---
+/**
+ * BookParts: the Body of Knowledge as its five parts, for the home. Each part
+ * is a flat card (card-lum, no lift: the card is not a link, its chapters are)
+ * with the part title linking to that part on the /bok index, the chapter
+ * range, a one-sentence introduction and one link per chapter (number + short
+ * title). Everything comes from data/parts.ts, so a new chapter or part shows
+ * up here with no edit.
+ *
+ * Layout: one column on phones, two from 600px; from 960px a six-track grid
+ * puts The discipline (the longest part, its chapters in two columns) beside
+ * Reference, then the three newer parts side by side on the second row. Each
+ * <li> carries --i for a .reveal-stagger class passed in.
+ */
+import { bookParts, chapterNum } from '../data/parts';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<ol class:list={['parts', className]}>
+  {
+    bookParts.map((part, i) => (
+      <li class="part card-lum" data-part={part.id} data-testid="part-card" style={`--i:${i}`}>
+        <h3 class="part-title">
+          <a href={`/bok#part-${part.id}`}>{part.title}</a>
+        </h3>
+        <p class="part-range">Chapters {part.range}</p>
+        <p class="part-intro">{part.intro}</p>
+        <ol class="part-chapters" aria-label={`${part.title}: chapters`}>
+          {part.chapters.map((chapter) => (
+            <li>
+              <a href={`/bok/${chapter.slug}`} data-testid="chapter-link">
+                <span class="num" aria-hidden="true">
+                  {chapterNum(chapter.order)}
+                </span>
+                <span class="ch-title">{chapter.shortTitle}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .parts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
+  }
+
+  @media (min-width: 600px) {
+    .parts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .part[data-part='discipline'] {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .parts {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .part {
+      grid-column: span 2;
+    }
+
+    .part[data-part='discipline'] {
+      grid-column: span 4;
+    }
+  }
+
+  /* Surface from .card-lum (effects.css); this keeps the card's layout. */
+  .part {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    padding: var(--s-5);
+  }
+
+  .part-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .part-title a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .part-title a:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  /* --ink-2, never --muted: the cards sit on a mesh band. */
+  .part-range {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .part-intro {
+    margin: 0;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .part-chapters {
+    list-style: none;
+    margin: var(--s-2) 0 0;
+    padding: var(--s-3) 0 0;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 600px) {
+    .part[data-part='discipline'] .part-chapters {
+      columns: 2;
+      column-gap: var(--s-6);
+    }
+  }
+
+  .part-chapters li {
+    break-inside: avoid;
+  }
+
+  .part-chapters a {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-3);
+    padding: var(--s-1) 0;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .part-chapters a:hover .ch-title {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .num {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+</style>
