@@ -1,0 +1,31 @@
+---
+/**
+ * SourceList: a numbered source list in the house format (STYLEGUIDE.md §6),
+ * rendered as the same `ol.sources` the chapters get from rehype-citations, so
+ * prose.css styles it and `li:target` highlights the row a citation chip jumps
+ * to. Each row: [n] Title (gloss). Publisher. Date. URL (verified: tag).
+ */
+import { sourceText, type Source } from '../lib/sources';
+
+interface Props {
+  sources: readonly Source[];
+  /** Row ids are `<prefix>-<n>`, matching CitedText's links. */
+  prefix?: string;
+}
+
+const { sources, prefix = 'src' } = Astro.props;
+---
+
+<ol class="sources">
+  {
+    sources.map((source, i) => (
+      <li id={`${prefix}-${i + 1}`}>
+        <span class="src-num">[{i + 1}]</span> {sourceText(source)}{' '}
+        <a href={source.url} rel="noopener">
+          {source.url}
+        </a>{' '}
+        <span class="verified">(verified: {source.verified})</span>
+      </li>
+    ))
+  }
+</ol>

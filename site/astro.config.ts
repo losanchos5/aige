@@ -10,6 +10,7 @@ import rehypeTables from './src/lib/rehype-tables';
 import rehypeDiagrams from './src/lib/rehype-diagrams';
 import rehypeGlossary from './src/lib/rehype-glossary';
 import { chaptersOrdered } from './src/data/chapters';
+import { cases } from './src/data/cases';
 import { gitDate } from './src/lib/reading';
 
 // Sitemap URL -> the source file(s) whose last commit dates the page: the page
@@ -23,11 +24,13 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ['/about/changelog', ['src/pages/about/changelog.astro', '../bok/CHANGELOG.md']],
   ['/about/contributors', ['src/pages/about/contributors.astro', '../bok/CONTRIBUTORS.md']],
   ['/bok', ['src/pages/bok/index.astro', 'src/data/chapters.ts']],
+  ['/cases', ['src/pages/cases/index.astro', 'src/data/cases.ts']],
   ['/map', ['src/pages/map.astro', 'src/data/map.ts']],
   ['/path', ['src/pages/path.astro', 'src/data/path.ts']],
   ['/resources', ['src/pages/resources/index.astro']],
   ['/resources/crosswalk', ['src/pages/resources/crosswalk.astro', 'src/data/crosswalk.ts']],
   ['/resources/frameworks', ['src/pages/resources/frameworks.astro', 'src/data/frameworks.ts']],
+  ['/resources/harms', ['src/pages/resources/harms.astro', 'src/data/harms.ts', 'src/data/cases.ts']],
   // The glossary and the reading list are parsed from their BoK chapters
   // (src/lib/glossary.ts, src/lib/reading-list.ts).
   ['/resources/glossary', ['src/pages/resources/glossary.astro', '../bok/09-glossary.md']],
@@ -39,6 +42,14 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ['/es/thesis', ['../THESIS.es.md']],
   ...chaptersOrdered.map(
     (chapter) => [`/bok/${chapter.slug}`, [`../bok/${chapter.id}.md`]] as [string, string[]],
+  ),
+  // One page per incident case, all rendered from the same template and dataset.
+  ...cases.map(
+    (entry) =>
+      [`/cases/${entry.id}`, ['src/pages/cases/[id].astro', 'src/data/cases.ts']] as [
+        string,
+        string[],
+      ],
   ),
 ]);
 
