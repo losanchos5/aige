@@ -1043,3 +1043,17 @@ external claim; the chapter's sources stay in its section above.
 |---|---|---|---|---|---|---|---|
 | 1 | the observable criteria by layer and level, the metrics per level, the self-assessment checklist and each level's typical failure, rendered verbatim | 07. Maturity model (five levels) | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/bok/maturity-model | primary | Maturity self-check (form, guide, exports) |
 | 2 | the pattern each next move links to | 05. Patterns | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/bok/patterns | primary | Maturity self-check (next move) |
+## site/VISUAL-GUIDE.md and the /figures pages
+
+Rows [1]–[6] match the `### Sources` list at the foot of `site/VISUAL-GUIDE.md` (sections 5 and 6);
+rows [3] and [4] also back the "Reuse and credit" copy on every `/figures/<id>` page. Verified
+2026-09-24.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | The A series of trimmed paper sizes and its 1 : √2 ratio are defined by ISO 216 (cited by identifier and short title only; the ISO page returned HTTP 403) | ISO 216:2007, Writing paper and certain classes of printed matter: trimmed sizes, A and B series | ISO | 2007 | https://www.iso.org/standard/36631.html | reported | VISUAL-GUIDE §5 (posters) |
+| 2 | A4 210 × 297 mm, A3 297 × 420 mm, A2 420 × 594 mm, A1 594 × 841 mm, A0 841 × 1189 mm; halving a sheet keeps the √2 ratio | ISO 216 | Wikipedia | 2026-09-24 | https://en.wikipedia.org/wiki/ISO_216 | secondary | VISUAL-GUIDE §5 (posters) |
+| 3 | CC BY 4.0 lets anyone share and adapt, for any purpose including commercial use, if they give appropriate credit, provide a link to the licence and indicate if changes were made | Attribution 4.0 International (deed) | Creative Commons | 2026-09-24 | https://creativecommons.org/licenses/by/4.0/ | primary | VISUAL-GUIDE §5; /figures, /figures/<id> (reuse) |
+| 4 | Recommended attribution covers title, author, source and licence (TASL) | Recommended practices for attribution | Creative Commons | 2026-09-24 | https://wiki.creativecommons.org/wiki/Recommended_practices_for_attribution | primary | VISUAL-GUIDE §5; /figures/<id> (credit line) |
+| 5 | Moving content that starts automatically and lasts more than five seconds needs a mechanism to pause, stop or hide it | WCAG 2.2, success criterion 2.2.2 Pause, Stop, Hide | W3C | 2024-12-12 | https://www.w3.org/TR/WCAG22/ | primary | VISUAL-GUIDE §6 (motion) |
+| 6 | Pointer targets are at least 24 by 24 CSS pixels, with listed exceptions (level AA) | Understanding SC 2.5.8 Target Size (Minimum) | W3C | 2024-12-12 | https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html | primary | VISUAL-GUIDE §6 (input) |

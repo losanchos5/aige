@@ -13,6 +13,7 @@ import { chaptersOrdered } from './src/data/chapters';
 import { cases } from './src/data/cases';
 import { obligations, obligationPath } from './src/data/frameworks';
 import { patterns } from './src/data/patterns';
+import { figures } from './src/data/figures';
 import { gitDate } from './src/lib/reading';
 
 // Sitemap URL -> the source file(s) whose last commit dates the page: the page
@@ -98,6 +99,14 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       [
         `/patterns/${pattern.slug}`,
         ['src/pages/patterns/[id].astro', `../bok/patterns/${pattern.slug}.md`],
+  // Block b-figures-system: the figures gallery and one permalink per figure,
+  // each dated by its template, the figure manifest and the figure's own art.
+  ['/figures', ['src/pages/figures/index.astro', 'src/data/figures.ts', 'src/data/diagrams.ts']],
+  ...figures.map(
+    (figure) =>
+      [
+        `/figures/${figure.id}`,
+        ['src/pages/figures/[id].astro', 'src/data/figures.ts', `src/figures/${figure.id}.svg`],
       ] as [string, string[]],
   ),
 ]);

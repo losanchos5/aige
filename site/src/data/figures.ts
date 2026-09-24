@@ -21,8 +21,43 @@
 // it is exempt from the usual figure budget: see VISUAL-GUIDE.md §2.4.
 // reading-paths lives on the /bok index page (src/pages/bok/index.astro), not
 // here, because it has no chapter placement and is rendered as accessible HTML.
+//
+// Every entry is also citable and reusable: it gets a permalink page at
+// /figures/<id> and, at build, standalone SVG and PNG exports with an
+// attribution band under /downloads/figures/ (file names from figureExports).
+// Dated content carries `asOf` (printed inside the image) and `reviewBy`. New
+// figures are appended at the END of the array.
 
 import type { DiagramPlacement } from './diagrams';
+
+/** What kind of figure it is; sets its size budget (VISUAL-GUIDE.md §1.12, §5). */
+export type FigureKind = 'infographic' | 'data-viz' | 'poster';
+
+/** Size budget in KB of the inline SVG, per kind (enforced by figures-build.mjs). */
+export const figureBudgetKb: Readonly<Record<FigureKind, number>> = {
+  infographic: 12,
+  'data-viz': 12,
+  poster: 48,
+};
+
+/** Licence of every figure unless an entry says otherwise (matches site.ts). */
+export const DEFAULT_FIGURE_LICENSE = 'CC BY 4.0';
+
+/**
+ * The HTML table that stands in for a data-viz figure (VISUAL-GUIDE.md §4): the
+ * same numbers the chart draws, a caption and the source line. Rendered on the
+ * figure's permalink page; every value must already be in the chapter.
+ */
+export interface FigureTable {
+  /** Table caption: what the rows are. */
+  caption: string;
+  /** Column headers, left to right. */
+  columns: readonly string[];
+  /** One array of cell strings per row, in column order. */
+  rows: readonly (readonly string[])[];
+  /** Source line, e.g. "Chapter 17, sources [3] and [4]". */
+  source: string;
+}
 
 export interface FigureDef {
   /** Figure id: matches src/figures/<id>.svg. */
@@ -38,6 +73,24 @@ export interface FigureDef {
   description: string;
   /** Where in the BoK the figure is inserted (matched by heading text). */
   placements: readonly DiagramPlacement[];
+  /** Kind of figure (default 'infographic'); sets the size budget. */
+  kind?: FigureKind;
+  /** Site paths outside the chapters that show the figure (e.g. '/map'). */
+  pages?: readonly string[];
+  /**
+   * YYYY-MM-DD on which the dated content (deadlines, statuses, counts) was
+   * last checked against its chapter. Set it on every figure whose content can
+   * go stale: the SVG itself must then print "As of <asOf>" (the build fails
+   * otherwise), so a download never travels without its date.
+   */
+  asOf?: string;
+  /** YYYY-MM-DD by which a dated figure must be re-checked; the build warns
+   *  once it has passed. */
+  reviewBy?: string;
+  /** Licence label when it is not DEFAULT_FIGURE_LICENSE. */
+  license?: string;
+  /** Table fallback for a data-viz figure (required when kind is 'data-viz'). */
+  data?: FigureTable;
 }
 
 export const figures: readonly FigureDef[] = [
@@ -99,13 +152,16 @@ export const figures: readonly FigureDef[] = [
     id: 'art73-clock',
     title: 'The Article 73 clock',
     caption:
-      'The serious-incident reporting windows for high-risk systems, by incident class, and the pipeline that meets them. Your pipeline must classify the incident before it can report. Drawn from chapter 08.',
+      'The serious-incident reporting windows for high-risk systems, by incident class, and the pipeline that meets them. Your pipeline must classify the incident before it can report. Drawn from chapter 08, as of 2026-09-24.',
     alt: 'The Article 73 serious-incident reporting windows by incident class (2, 10 and no later than 15 days), with the incident pipeline that meets them.',
     description:
       'The serious-incident reporting windows for high-risk systems under Article 73, by incident class. A widespread infringement: 2 days. On the death of a person: 10 days. Otherwise: no later than 15 days. The engineering artefact that meets them is the incident detection and triage pipeline with reporting-clock automation and evidence capture, which must classify the incident before it can report.',
     placements: [
       { chapter: 'regulatory-map', section: 'EU AI Act, post-Omnibus', at: 'foot' },
     ],
+    // Statutory deadlines: dated, and re-checked with chapter 08's next date pass.
+    asOf: '2026-09-24',
+    reviewBy: '2027-03-24',
   },
   {
     id: 'pattern-map',
@@ -126,6 +182,8 @@ export const figures: readonly FigureDef[] = [
     description:
       'A two-sided mind map. The centre is the AI Governance Engineer. Four branches sit on the left: Foundations (the definition, the three questions, the disambiguation cluster, the five problems), Values and principles, The Stack (five layers and the minimum viable stack) and Patterns (the catalogue by layer); and four on the right: The Role (seven workflows, the career ladder, three ways in), Obligations (the topic crosswalk, the frameworks and the reverse index), Maturity (the five levels, metrics and the self-assessment) and the Learning path (four stages of nodes). Every node links to the page or on-page anchor that develops it; the list under the map is the same content as text.',
     placements: [],
+    kind: 'poster',
+    pages: ['/map'],
   },
 ] as const;
 
@@ -139,4 +197,57 @@ export function figuresForChapter(slug: string): FigureDef[] {
   return figures.filter((figure) =>
     figure.placements.some((placement) => placement.chapter === slug),
   );
+}
+
+/** The figure's kind, defaulting to 'infographic'. */
+export function figureKind(figure: FigureDef): FigureKind {
+  return figure.kind ?? 'infographic';
+}
+
+/** The figure's licence label, defaulting to DEFAULT_FIGURE_LICENSE. */
+export function figureLicense(figure: FigureDef): string {
+  return figure.license ?? DEFAULT_FIGURE_LICENSE;
+}
+
+/** Chapter slugs the figure is placed in, first placement first, no repeats. */
+export function figureChapters(figure: FigureDef): string[] {
+  return [...new Set(figure.placements.map((placement) => placement.chapter))];
+}
+
+/** One downloadable export of a figure (see scripts/figures-build.mjs). */
+export interface FigureExport {
+  /** 'svg' adapts to the viewer's colour scheme unless `theme` pins it. */
+  format: 'svg' | 'png';
+  /** 'auto' follows prefers-color-scheme (SVG only). */
+  theme: 'auto' | 'light' | 'dark';
+  /** Rendered pixel width (PNG only). */
+  width?: number;
+  /** File name under /downloads/figures/. */
+  file: string;
+}
+
+/** Directory (site path) that holds every figure export. */
+export const FIGURE_EXPORT_DIR = '/downloads/figures';
+
+/** Rendered PNG widths, in px. */
+export const FIGURE_PNG_WIDTHS: readonly number[] = [1600, 3200];
+
+/**
+ * Every export of one figure for one book version, in download order. The
+ * single source for file names: the exporter writes exactly these and the
+ * pages link exactly these. `<id>-v<version>[-<theme>][-<width>].<ext>`.
+ */
+export function figureExports(id: string, version: string): FigureExport[] {
+  const base = `${id}-v${version}`;
+  const out: FigureExport[] = [
+    { format: 'svg', theme: 'auto', file: `${base}.svg` },
+    { format: 'svg', theme: 'light', file: `${base}-light.svg` },
+    { format: 'svg', theme: 'dark', file: `${base}-dark.svg` },
+  ];
+  for (const theme of ['light', 'dark'] as const) {
+    for (const width of FIGURE_PNG_WIDTHS) {
+      out.push({ format: 'png', theme, width, file: `${base}-${theme}-${width}.png` });
+    }
+  }
+  return out;
 }
