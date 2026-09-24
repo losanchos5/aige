@@ -420,3 +420,17 @@ chapter and recorded once below._
 | 53 | 6.1 algorithmic impact assessment completed, approved and published on the Open Government Portal before production, updated on a schedule and when functionality or scope changes; 6.3.7 expert review; Appendix B impact levels defined by reversibility and duration | Directive on Automated Decision-Making | Treasury Board of Canada Secretariat | 2025-06-24 | https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=32592 | primary | Impact assessments compared; The technical file |
 | 54 | guidance for assessing impacts on individuals, groups and society throughout the life cycle, updated as needed; complements ISO/IEC 42001 and ISO/IEC 23894 | ISO/IEC 42005:2025, AI system impact assessment | ISO/IEC | 2025-05 | https://www.iso.org/standard/44545.html | primary | Impact assessments compared |
 | 55 | FRIA by deployers that are bodies governed by public law or private entities providing public services, and deployers of Annex III points 5(b) and (c), except point 2 systems; elements (a) to (f); results notified to the market surveillance authority; 27(4) relationship with the DPIA | EU AI Act Art. 27 | AI Act (Reg. (EU) 2024/1689) | 2024 | https://artificialintelligenceact.eu/article/27/ | primary | Impact assessments compared |
+
+## site/src/data/frameworks.ts (obligation register, v0.5.0)
+
+Rows re-checked for the schema-version-2 fields (`appliesFrom`, `milestones`, `systemClass`) of
+the obligation register; the register stays faithful to `bok/08-regulatory-map.md`, whose own
+sources carry the chapter's claims. Verified 2026-09-24.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | Chapters I and II apply from 2 Feb 2025 (`Art. 113(a)`); `Art. 4` (AI literacy) sits in Chapter I | EU AI Act Art. 113 | European Commission, AI Act Service Desk | 2024 | https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113 | primary | `AIGE-OBL-EUAIA-ART4` appliesFrom 2025-02-02 |
+| 2 | Registration covers the high-risk systems listed in Annex III, except point 2, by providers (49(1)) and public-authority deployers (49(3)); Annex I systems are not in scope | EU AI Act Art. 49 | European Commission, AI Act Service Desk | 2024 | https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-49 | primary | `AIGE-OBL-EUAIA-ART49-71` systemClass |
+| 3 | Providers and deployers of high-risk AI systems intended to be used by public authorities comply by 2 Aug 2030 (`Art. 111(2)`) | EU AI Act Art. 111 | European Commission, AI Act Service Desk | 2024 | https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-111 | primary | 2030-08-02 milestone on the high-risk rows |
+| 4 | Reg. (EU) 2026/1744 in force 2026-07-27; Annex III high-risk rules from 2 Dec 2027; Annex I from 2 Aug 2028 (reuses ch08 [1]) | "AI Omnibus enters into force" | European Commission | 2026-07-27 | https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force | primary | appliesFrom 2027-12-02; 2028-08-02 milestone |
+| 5 | `Art. 4a(1)` lets providers of high-risk systems process special-category data for bias detection; `Art. 4a(2)` extends it, under stricter conditions, to other AI systems and models and to deployers | Article 4a | AI Act Explorer (Future of Life Institute) | 2026 | https://artificialintelligenceact.eu/article/4a/ | secondary | `AIGE-OBL-EUAIA-ART4A` (handoff note on scope) |

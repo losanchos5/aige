@@ -4,6 +4,40 @@ All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledg
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
 
+## Unreleased (v0.5.0)
+
+### Added
+- Stable obligation ids and one page per obligation (`site/src/data/frameworks.ts`, `/obligations`,
+  `/obligations/<id>`): every row of the regulatory map carries an id of the form
+  `AIGE-OBL-<INSTRUMENT>-<CLAUSE>` (for example `AIGE-OBL-EUAIA-ART9`), assigned once and never
+  reused; a removed row's id stays reserved. Each page shows the clause, the duty holder, the
+  application date with its status and later dates, the artefact, the layers, the patterns, the
+  crosswalk siblings, the cases that cite the same EU AI Act article, the chapter 08 section it
+  comes from, its review date, its JSON and a citation block. The sitemap dates these pages by the
+  row's review date.
+- The rows now carry the dates chapter 08 states in prose but no row held: Annex I embedded
+  systems from 2028-08-02 and legacy high-risk systems intended for public authorities by
+  2030-08-02 (`Art. 111(2)`), as later milestones on the high-risk rows.
+- A static open-data API under `/api/v1/`: a catalogue (`index.json`), one file per dataset
+  (obligations, frameworks, crosswalk, glossary, patterns, maturity, path, chapters,
+  jurisdictions, harms, cases, contracts, roles), one file per obligation, an OpenAPI 3.1
+  description and a JSON Schema (draft 2020-12) per document, all with the same notice, licence
+  and DOI envelope; `/resources/data` documents the endpoints, the id rule, the versioning and
+  stability promise and how to cite. `_headers` opens CORS and sets a one-hour cache on the API and
+  the existing downloads; the Content-Security-Policy is unchanged.
+- The citation block now serves any page (`kind`: chapter, obligation, figure, dataset or page);
+  chapters keep their existing reference and BibTeX.
+
+### Changed
+- `/resources/obligations.json` and `/resources/obligations.csv` move to `schemaVersion` 2 at the
+  same URLs. `appliesFrom` is now an ISO date (or `null` for voluntary instruments without one) and
+  the former free text moved to `appliesNote`; each row gains `id`, `url`, `json`, `frameworkId`,
+  `clause`, `requirement`, `appliesStatus`, `milestones`, `systemClass`, `patterns`,
+  `crosswalkTopics`, `authority`, `scope` and `reviewed`. The CSV keeps its first seven columns in
+  place and appends the new ones.
+- The EU AI Act `Art. 4` row: applies since 2025-02-02 (Chapter I, `Art. 113(a)`), reworded by the
+  Digital Omnibus on 2026-07-27, in line with chapter 12.
+
 ## [Unreleased] - 2026-09-20
 
 Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the
