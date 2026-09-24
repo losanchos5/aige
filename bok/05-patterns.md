@@ -896,8 +896,8 @@ market "manages the program … without any runtime data path" [20].
 
 ### Problem
 A registry fed only by voluntary declaration is always behind. Unregistered agents, the shadow fleet,
-are exactly the layer a paper inventory cannot see, and roughly one in eight reported AI breaches now
-involves an autonomous agent [16] (reported).
+are exactly the layer a paper inventory cannot see, and a security vendor's 2026 survey reports that
+roughly one in eight AI breaches involved agentic systems [16].
 
 ### Solution
 Run discovery against the environments where AI appears (identity providers, cloud accounts, network
@@ -1008,7 +1008,7 @@ Scoped Credentials; Shadow-AI Discovery.
 [13] Regulation (EU) 2024/1689 (AI Act), Art. 27 (fundamental-rights impact assessment for high-risk AI systems; DPIA cross-reference). Publications Office of the EU (EUR-Lex). 2024-07-12. https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng (verified: primary)
 [14] "Evolving AI Transparency: the AIBOM generator's new home at OWASP" (CycloneDX output). OWASP GenAI Security Project. 2025-12-18. https://genai.owasp.org/2025/12/18/evolving-ai-transparency-the-journey-of-the-aibom-generator-and-its-new-home-at-owasp/ (verified: primary)
 [15] AI Controls Matrix (AICM) v1.1 (247 control objectives across 18 domains). Cloud Security Alliance. 2026-06-22. https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1 (verified: primary)
-[16] Threat Report 2026 (~1 in 8 reported AI breaches involve autonomous agents). HiddenLayer. 2026. https://www.hiddenlayer.com/report-and-guide/threatreport2026 (verified: reported)
+[16] 2026 AI Threat Landscape Report (vendor survey; key finding stated on the report page: one in eight breaches were agentic). HiddenLayer. 2026. https://www.hiddenlayer.com/report-and-guide/threatreport2026 (verified: primary)
 [17] "Gartner Forecasts the Market for Securing AI Will Reach Almost $5 Billion in 2027" (>50% of agent attacks exploit access-control and prompt injection by 2029). Gartner. 2026-08-26. https://www.gartner.com/en/newsroom/press-releases/2026-08-26-gartner-forecasts-the-market-for-securing-ai-will-reach-almost-5-billion-in-2027 (verified: primary)
 [18] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
 [19] Regulation (EU) 2024/1689 (AI Act), Art. 14 (human oversight of high-risk AI systems). Publications Office of the EU (EUR-Lex). 2024-07-12. https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng (verified: primary)
