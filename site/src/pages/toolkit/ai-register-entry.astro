@@ -143,7 +143,15 @@ const cite = (n: number) => `#src-${n}`;
         <button type="button" class="btn btn-secondary" data-action="print">Print</button>
       </div>
       <p class="tool-status" role="status" data-bld-result-status></p>
-      <div class="tool-table-wrap">
+      {/* One column per regime: wider than the well at every width, so the
+          wrapper is a named, focusable scroll region (axe
+          scrollable-region-focusable). */}
+      <div
+        class="tool-table-wrap"
+        tabindex="0"
+        role="region"
+        aria-label="Where this entry's fields go (scroll sideways)"
+      >
         <table class="tool-table bld-xwalk">
           <caption>Where this entry's fields go</caption>
           <thead>
@@ -337,7 +345,12 @@ const cite = (n: number) => `#src-${n}`;
         justification for the rows named in the last column.
       </li>
     </ul>
-    <div class="tool-table-wrap">
+    <div
+      class="tool-table-wrap"
+      tabindex="0"
+      role="region"
+      aria-label="Register field to regime field (scroll sideways)"
+    >
       <table class="tool-table bld-xwalk">
         <caption>Register field to regime field</caption>
         <thead>

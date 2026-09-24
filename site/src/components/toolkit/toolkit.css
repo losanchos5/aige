@@ -306,6 +306,18 @@
   overflow-x: auto;
 }
 
+/* A focusable scroll region (a table wider than the well) shows its focus. */
+.tool-table-wrap[tabindex]:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Long field paths in code (JSON pointers, CycloneDX paths) break anywhere
+   rather than push a column, and the page, sideways. */
+.tool-table code {
+  overflow-wrap: anywhere;
+}
+
 .tool-table {
   width: 100%;
   border-collapse: collapse;

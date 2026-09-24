@@ -358,15 +358,17 @@ const description =
     title="The agent control plane, component by component."
     lede="Ten components sit around every agent in production. Each one leaves evidence, and each links to its section in chapter 23."
   >
-    <Figure
-      id="agent-control-plane"
-      title={controlPlaneFigure.title}
-      caption={controlPlaneFigure.caption}
-      description={controlPlaneFigure.description}
-    >
-      <Fragment set:html={controlPlaneSvg} />
-    </Figure>
-    <div class="well"><RegisterList items={controlPlane} /></div>
+    <div class="ag-plane">
+      <Figure
+        id="agent-control-plane"
+        title={controlPlaneFigure.title}
+        caption={controlPlaneFigure.caption}
+        description={controlPlaneFigure.description}
+      >
+        <Fragment set:html={controlPlaneSvg} />
+      </Figure>
+      <div class="well"><RegisterList items={controlPlane} /></div>
+    </div>
     <p class="section-foot">
       <a class="chapter-link" href="/toolkit/agent-control-profile">
         Write down one agent’s control profile in the toolkit <span class="arrow" aria-hidden="true">→</span>
@@ -526,5 +528,24 @@ const description =
 
   .ag-callout {
     margin-top: var(--s-5);
+  }
+
+  /* The control plane: the portrait figure beside the ten components it draws
+     on wide screens (a tall figure alone on a 1168px row leaves two empty
+     gutters), stacked above them below 1024px. */
+  .ag-plane {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .ag-plane > :global(figure) {
+    margin: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .ag-plane {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
   }
 </style>
