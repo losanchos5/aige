@@ -1,0 +1,553 @@
+---
+// /toolkit/maturity-self-check: the first toolkit tool. The reader picks, for
+// each of the five stack layers, the highest observable criterion of chapter 07
+// that the running systems meet today; the client module
+// (public/toolkit/maturity-self-check.js) draws the ragged profile, names the
+// floor and the single next move, and handles the exports and comparisons. The
+// criteria, metrics and checklist are rendered here as well, so the page works
+// as a worksheet without JavaScript.
+import ToolShell from '../../components/toolkit/ToolShell.astro';
+import { toolById, toolNotice } from '../../data/toolkit';
+import {
+  levels,
+  layerCriteria,
+  stepMetrics,
+  levelChecklist,
+  levelFailures,
+  maturityAnchors,
+} from '../../data/maturity';
+import type { LevelNumber } from '../../data/maturity';
+import { layers } from '../../data/stack';
+import { patterns } from '../../data/patterns';
+import { site } from '../../data/site';
+
+const tool = toolById('maturity-self-check');
+const chapterHref = tool.chapter?.href ?? '/bok/maturity-model';
+const patternTitle = new Map(patterns.map((pattern) => [pattern.id, pattern.title]));
+const levelName = new Map(levels.map((level) => [level.n, level.name]));
+
+// One row per layer, joined with the stack's names; fail the build if a
+// criterion names a pattern the catalogue does not have.
+const rows = layerCriteria.map((row) => {
+  const layer = layers.find((entry) => entry.n === row.layer);
+  if (!layer) throw new Error(`maturity-self-check: no stack layer ${row.layer}`);
+  return {
+    n: layer.n,
+    id: layer.id,
+    name: layer.name,
+    proves: layer.proves,
+    cells: row.cells.map((cell) => {
+      const title = patternTitle.get(cell.pattern);
+      if (!title) throw new Error(`maturity-self-check: unknown pattern ${cell.pattern}`);
+      return { ...cell, patternTitle: title, levelName: levelName.get(cell.level) ?? '' };
+    }),
+  };
+});
+
+const steps = ([2, 3, 4, 5] as const).map((to) => ({
+  from: to - 1,
+  to,
+  fromName: levelName.get((to - 1) as LevelNumber) ?? '',
+  toName: levelName.get(to) ?? '',
+  metrics: stepMetrics[to],
+}));
+
+// Everything the client needs, as data (no markup): the JSON island.
+const data = {
+  version: 1,
+  notice: toolNotice,
+  page: new URL(tool.href, site.url).href,
+  chapter: new URL(chapterHref, site.url).href,
+  patternsBase: new URL('/bok/patterns', site.url).href,
+  license: site.license,
+  licenseUrl: site.licenseUrl,
+  levels: levels.map((level) => ({ n: level.n, name: level.name })),
+  layers: rows.map((row) => ({
+    n: row.n,
+    id: row.id,
+    name: row.name,
+    cells: row.cells.map((cell) => ({
+      level: cell.level,
+      text: cell.text,
+      pattern: cell.pattern,
+      patternTitle: cell.patternTitle,
+    })),
+  })),
+  metrics: stepMetrics,
+  checklist: levelChecklist,
+  failures: levelFailures,
+};
+
+const sources = [
+  {
+    text: '07. Maturity model (five levels): "Observable criteria, by layer and level", "Metrics per level", "Self-assessment checklist" and each level\'s typical failure, the text this tool renders. AI Governance Engineering Body of Knowledge. 2026-09-24.',
+    url: `${site.url}${chapterHref}`,
+    verified: 'primary',
+  },
+  {
+    text: '05. Patterns: the catalogue each next move links to, one pattern per step. AI Governance Engineering Body of Knowledge. 2026-09-24.',
+    url: `${site.url}/bok/patterns`,
+    verified: 'primary',
+  },
+];
+---
+
+<ToolShell
+  tool={tool}
+  heading="Maturity, read layer by layer."
+  description="Read your AI governance function against the five-level maturity model, layer by layer: the ragged profile, the floor it sets and the one move that raises it."
+  lede="For each of the five stack layers, pick the highest observable criterion your running systems meet today. You get the per-layer profile, not a single score: the floor it sets and the single next move, with the pattern that builds it."
+  image="/og/bok-maturity-model.png"
+  data={data}
+>
+  <form class="tool-form" id="msc-form" data-msc-form novalidate>
+    <div
+      class="tool-errors"
+      id="msc-errors"
+      data-msc-errors
+      tabindex="-1"
+      role="group"
+      aria-labelledby="msc-errors-title"
+      hidden
+    >
+      <h2 id="msc-errors-title">Answer every layer first</h2>
+      <ul data-msc-errors-list></ul>
+    </div>
+
+    <p class="tool-intro">
+      Answer with the system, not the intention: each statement should be something you could show
+      by querying the registry, running the gate or reading the evidence store. Each level assumes
+      the ones below it. If no statement is true of a layer yet, pick "None of these yet".
+    </p>
+
+    <div class="tool-field">
+      <label for="msc-label">Name this profile (optional)</label>
+      <input
+        class="tool-input"
+        id="msc-label"
+        name="label"
+        type="text"
+        maxlength="80"
+        autocomplete="off"
+        aria-describedby="msc-label-hint"
+      />
+      <p class="tool-hint" id="msc-label-hint">
+        A team, a platform or a quarter. It appears in the exports and in the link you copy.
+      </p>
+    </div>
+
+    {
+      rows.map((row) => (
+        <fieldset
+          class="tool-fieldset"
+          id={`msc-layer-${row.n}`}
+          data-msc-layer={row.n}
+          aria-describedby={`msc-layer-${row.n}-hint`}
+          style={`--opt-ink: var(--l${row.n}-ink); --opt-tint: var(--l${row.n})`}
+        >
+          <legend class="tool-legend">
+            Layer {row.n}: {row.name}
+          </legend>
+          <p class="tool-hint" id={`msc-layer-${row.n}-hint`}>
+            What this layer proves: {row.proves}
+          </p>
+          <p class="tool-error" id={`msc-layer-${row.n}-error`} hidden>
+            Choose one statement for {row.name}, or "None of these yet".
+          </p>
+          <ul class="tool-options">
+            <li class="tool-option">
+              <input type="radio" id={`msc-l${row.n}-0`} name={`layer-${row.n}`} value="0" />
+              <label for={`msc-l${row.n}-0`}>
+                <span class="tool-option-level">Level 0</span>
+                <span class="tool-option-text">None of these yet</span>
+              </label>
+            </li>
+            {row.cells.map((cell) => (
+              <li class="tool-option">
+                <input
+                  type="radio"
+                  id={`msc-l${row.n}-${cell.level}`}
+                  name={`layer-${row.n}`}
+                  value={String(cell.level)}
+                />
+                <label for={`msc-l${row.n}-${cell.level}`}>
+                  <span class="tool-option-level">
+                    Level {cell.level} {cell.levelName}
+                  </span>
+                  <span class="tool-option-text">{cell.text}</span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </fieldset>
+      ))
+    }
+
+    <div class="tool-buttons" data-tool-js data-print-hide hidden>
+      <button type="submit" class="btn btn-primary">Show my profile</button>
+      <button type="button" class="btn btn-secondary" data-msc-reset>Clear answers</button>
+    </div>
+  </form>
+
+  <section
+    class="tool-result tool-block"
+    id="msc-result"
+    data-msc-result
+    aria-labelledby="msc-result-title"
+    hidden
+  >
+    <h2 id="msc-result-title" tabindex="-1">Your profile</h2>
+    <p class="tool-intro" data-msc-summary></p>
+
+    <figure class="tool-chart" data-msc-chart>
+      <div data-msc-chart-svg></div>
+      <figcaption class="tool-hint">
+        One bar per layer, read left to right as in the chapter's table. The line joins the bar
+        ends: the ragged profile. The dashed rule marks the floor.
+      </figcaption>
+    </figure>
+
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>Profile, layer by layer</caption>
+        <thead>
+          <tr>
+            <th scope="col">Layer</th>
+            <th scope="col">Level</th>
+            <th scope="col">Highest criterion met</th>
+          </tr>
+        </thead>
+        <tbody data-msc-rows></tbody>
+      </table>
+    </div>
+
+    <div class="msc-floor">
+      <h3>Floor</h3>
+      <p data-msc-floor></p>
+      <p class="tool-hint">
+        The single overall level is the weakest layer. It is a floor for planning, not a verdict
+        on the whole function: the profile above shows where the leverage is.
+      </p>
+    </div>
+
+    <div class="msc-next">
+      <h3>Next move</h3>
+      <div data-msc-next></div>
+    </div>
+
+    <div class="tool-actions" data-print-hide>
+      <button type="button" class="btn btn-secondary" data-action="copy">Copy link</button>
+      <button type="button" class="btn btn-secondary" data-action="json">Download JSON</button>
+      <button type="button" class="btn btn-secondary" data-action="md">Download report (Markdown)</button>
+      <button type="button" class="btn btn-secondary" data-action="svg">Download image (SVG)</button>
+      <button type="button" class="btn btn-secondary" data-action="png">Download image (PNG)</button>
+      <button type="button" class="btn btn-secondary" data-action="save">Save in this browser</button>
+      <button type="button" class="btn btn-secondary" data-action="print">Print</button>
+    </div>
+    <p class="tool-status" role="status" data-msc-status></p>
+  </section>
+
+  <section
+    class="tool-block msc-compare"
+    id="msc-compare"
+    aria-labelledby="msc-compare-title"
+    data-tool-js
+    hidden
+  >
+    <h2 id="msc-compare-title">Compare two profiles</h2>
+    <p class="tool-intro">
+      Read two profiles side by side: before and after a quarter of work, or two teams. Profiles
+      you save stay in this browser; a JSON export can be imported from anywhere.
+    </p>
+
+    <div class="msc-controls" data-print-hide>
+      <h3>Saved in this browser</h3>
+      <p class="tool-hint" data-msc-saved-empty>
+        No saved profiles yet. Show your profile and choose "Save in this browser", or import a
+        JSON export.
+      </p>
+      <ul class="msc-saved" data-msc-saved></ul>
+
+      <div class="tool-field msc-import">
+        <label for="msc-import">Import a JSON profile</label>
+        <input
+          class="tool-input"
+          id="msc-import"
+          type="file"
+          accept=".json,application/json"
+          aria-describedby="msc-import-hint"
+          data-msc-import
+        />
+        <p class="tool-hint" id="msc-import-hint">
+          A file exported by this tool. It is read in this browser and added to the saved profiles.
+        </p>
+        <p class="tool-error" id="msc-import-error" data-msc-import-error hidden></p>
+      </div>
+
+      <fieldset class="tool-fieldset msc-pair" data-msc-pair>
+        <legend class="tool-legend">Choose two profiles</legend>
+        <div class="msc-pair-grid">
+          <div class="tool-field">
+            <label for="msc-before">Before</label>
+            <select class="tool-select" id="msc-before" data-msc-before></select>
+          </div>
+          <div class="tool-field">
+            <label for="msc-after">After</label>
+            <select class="tool-select" id="msc-after" data-msc-after></select>
+          </div>
+        </div>
+        <p class="tool-error" id="msc-pair-error" data-msc-pair-error hidden></p>
+        <div class="tool-buttons">
+          <button type="button" class="btn btn-primary" data-msc-compare>Compare</button>
+        </div>
+      </fieldset>
+      <p class="tool-status" role="status" data-msc-compare-status></p>
+    </div>
+
+    <section
+      class="tool-result msc-comparison"
+      data-msc-comparison
+      aria-labelledby="msc-comparison-title"
+      hidden
+    >
+      <h3 id="msc-comparison-title" tabindex="-1">Before and after</h3>
+      <figure class="tool-chart">
+        <div data-msc-cmp-chart></div>
+        <figcaption class="tool-hint">
+          Before is the dashed outline and line; after is the filled bar and solid line.
+        </figcaption>
+      </figure>
+      <div class="tool-table-wrap">
+        <table class="tool-table">
+          <caption>Change, layer by layer</caption>
+          <thead>
+            <tr>
+              <th scope="col">Layer</th>
+              <th scope="col" data-msc-cmp-before-head>Before</th>
+              <th scope="col" data-msc-cmp-after-head>After</th>
+              <th scope="col">Change</th>
+            </tr>
+          </thead>
+          <tbody data-msc-cmp-rows></tbody>
+        </table>
+      </div>
+      <p data-msc-cmp-floor></p>
+      <div class="tool-actions" data-print-hide>
+        <button type="button" class="btn btn-secondary" data-action="cmp-copy">
+          Copy comparison link
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="cmp-md">
+          Download comparison (Markdown)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="cmp-svg">
+          Download image (SVG)
+        </button>
+      </div>
+      <p class="tool-status" role="status" data-msc-cmp-status></p>
+    </section>
+  </section>
+
+  <Fragment slot="guide">
+    <h2 id="msc-how">How to read the result</h2>
+    <p>
+      The model measures the running systems, not the paperwork, and it is read layer by layer
+      <a href="#src-1" class="cite">[1]</a>. Almost no real function sits at one clean level
+      across all five layers; the usual picture is a ragged line, and that is the point of
+      reading it by layer.
+    </p>
+    <ul>
+      <li>
+        <strong>Profile.</strong> One reading per layer: the highest criterion in that layer's row
+        that the systems meet today. Report the profile, not just the floor: it shows where the
+        leverage is.
+      </li>
+      <li>
+        <strong>Floor.</strong> The overall level is the weakest layer, because a chain is as
+        strong as its weakest link. You are at a level only when every layer has reached it.
+      </li>
+      <li>
+        <strong>Next move.</strong> The next cell to the right in the weakest layer's row. The
+        smallest step to the next level is almost always to close the weakest layer, not to add a
+        control to the strongest one. When several layers share the floor, the tool takes the
+        first in build order (Layer 1 to Layer 5); the others still cap the floor until they move.
+      </li>
+    </ul>
+
+    <h3 id="msc-by-hand">By hand, without JavaScript</h3>
+    <ol>
+      <li>In each layer above, note the highest statement that is true today (Level 0 if none).</li>
+      <li>The lowest of the five numbers is your floor; the layers that hold it set it.</li>
+      <li>
+        Your next move is the statement one level up in the first of those layers. Its metrics
+        and checklist questions are listed below, and the pattern that builds it is in the
+        <a href="/bok/patterns">patterns catalogue</a>
+        <a href="#src-2" class="cite">[2]</a>.
+      </li>
+    </ol>
+
+    <h2 id="msc-metrics">Metrics for each step up</h2>
+    <p>
+      Each step has metrics you can read off the systems <a href="#src-1" class="cite">[1]</a>.
+      Track the trend, not the single number. The most telling one across levels is evidence
+      freshness: if your evidence ages in months, you are not yet continuous.
+    </p>
+    {
+      steps.map((step) => (
+        <div class="msc-step">
+          <h3 id={`msc-step-${step.to}`}>
+            Level {step.from} {step.fromName} to Level {step.to} {step.toName}
+          </h3>
+          <ul>
+            {step.metrics.map((metric) => (
+              <li>{metric}</li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+
+    <h2 id="msc-checklist">Checklist questions, by level</h2>
+    <p>
+      Answer each with the system, not the intention. A "no" caps you at the level below
+      <a href="#src-1" class="cite">[1]</a>. Each level also has a typical failure that moves a
+      function back down.
+    </p>
+    {
+      levels.map((level) => (
+        <div class="msc-step">
+          <h3 id={`msc-check-${level.n}`}>
+            Level {level.n} {level.name}
+          </h3>
+          <ul>
+            {levelChecklist[level.n].map((question) => (
+              <li>{question}</li>
+            ))}
+          </ul>
+          <p class="tool-hint">Typical failure: {levelFailures[level.n]}</p>
+        </div>
+      ))
+    }
+
+    <h2 id="msc-not">What this is not</h2>
+    <p>
+      This self-check is not a certification, does not confer one and is not an audit. It reads
+      the depth of the runtime data path; schemes such as ISO/IEC 42001 certification attest a
+      management system, which is a different claim. The chapter sets out how the two relate in
+      <a href={`${chapterHref}#${maturityAnchors.certification}`}
+        >How this relates to certification and other assessments</a
+      >. The pattern links are illustrative, not a claim of conformity.
+    </p>
+    <p>
+      The criteria are the chapter's own, in its
+      <a href={`${chapterHref}#${maturityAnchors.criteria}`}>observable criteria table</a>; the
+      tool adds no criterion of its own.
+    </p>
+  </Fragment>
+
+  <ol class="sources" slot="sources">
+    {
+      sources.map((source, i) => (
+        <li id={`src-${i + 1}`}>
+          <span class="src-num">[{i + 1}]</span> {source.text}{' '}
+          <a href={source.url}>{source.url}</a>{' '}
+          <span class="verified">(verified: {source.verified})</span>
+        </li>
+      ))
+    }
+  </ol>
+</ToolShell>
+
+<style>
+  .msc-floor > * + *,
+  .msc-next > * + *,
+  .msc-next :global([data-msc-next] > * + *) {
+    margin-top: var(--s-2);
+  }
+
+  .msc-next :global(ul) {
+    padding-left: var(--s-5);
+  }
+
+  .msc-next :global(li + li) {
+    margin-top: var(--s-1);
+  }
+
+  .msc-next :global(.msc-move) {
+    font-size: 1.0625rem;
+    color: var(--ink);
+  }
+
+  .msc-next :global(h4) {
+    margin-top: var(--s-4);
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .msc-controls > * + * {
+    margin-top: var(--s-4);
+  }
+
+  .msc-compare > * + * {
+    margin-top: var(--s-4);
+  }
+
+  .msc-saved {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .msc-saved :global(li) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-3);
+    padding: var(--s-2) var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+
+  .msc-saved :global(.msc-saved-name) {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .msc-saved :global(.msc-saved-meta) {
+    flex: 1 1 12rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .msc-saved :global(.btn) {
+    min-height: 44px;
+    padding-inline: var(--s-3);
+    font-size: var(--fs-small);
+  }
+
+  .msc-pair-grid {
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    margin-bottom: var(--s-4);
+  }
+
+  .msc-step h3 {
+    margin-bottom: var(--s-2);
+    font-size: 1.125rem;
+  }
+
+  .msc-step .tool-hint {
+    margin-top: var(--s-2);
+  }
+
+  .cite {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    text-decoration: none;
+  }
+</style>
