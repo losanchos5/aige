@@ -201,6 +201,66 @@ test('tools page renders at least fifteen tools', async ({ page }) => {
   expect(await page.locator('[data-tool]').count()).toBeGreaterThanOrEqual(15);
 });
 
+// v0.5.0 (block b-catalogues): the catalogue carries metadata and filters.
+test('tools page is titled "Tool categories" and links every tool out over https', async ({
+  page,
+}) => {
+  await page.goto('/resources/tools');
+  await expect(page).toHaveTitle(/^Tool categories · /);
+  const tools = page.locator('[data-tool]');
+  const count = await tools.count();
+  expect(count).toBeGreaterThanOrEqual(80);
+  for (let i = 0; i < count; i++) {
+    const href = await tools.nth(i).locator('a.tc-name').getAttribute('href');
+    expect(href?.startsWith('https://')).toBe(true);
+    await expect(tools.nth(i).locator('.tc-licence')).not.toHaveText('');
+  }
+  // The disclaimer stays.
+  await expect(page.locator('main')).toContainText('Examples, not endorsements');
+});
+
+test('tools filter narrows by layer and by licence, and counts', async ({ page }) => {
+  await page.goto('/resources/tools');
+  const controls = page.locator('.tc-controls');
+  await expect(controls).toBeVisible();
+  const status = page.locator('.tc-count');
+  await expect(status).toContainText('Showing all');
+
+  await page.locator('label[for="tc-layer-3"]').click();
+  await expect(status).toContainText('Showing');
+  const visible = page.locator('[data-tool]:not([hidden])');
+  const n = await visible.count();
+  expect(n).toBeGreaterThan(0);
+  for (let i = 0; i < n; i++) {
+    const layerList = (await visible.nth(i).getAttribute('data-layers')) ?? '';
+    expect(layerList.split(' ')).toContain('3');
+  }
+  await expect(page).toHaveURL(/[?&]layers=3/);
+
+  await page.locator('label[for="tc-layer-all"]').click();
+  await page.locator('label[for="tc-access-commercial"]').click();
+  const commercial = page.locator('[data-tool]:not([hidden])');
+  const c = await commercial.count();
+  expect(c).toBeGreaterThan(0);
+  for (let i = 0; i < c; i++) {
+    await expect(commercial.nth(i)).toHaveAttribute('data-access', 'commercial');
+  }
+  // A category with no visible tool is hidden with it.
+  await expect(page.locator('#cat-policy-engines')).toBeHidden();
+});
+
+test('tools filter state can be linked', async ({ page }) => {
+  await page.goto('/resources/tools?layers=4&access=open-source');
+  await expect(page.locator('#tc-layer-4')).toBeChecked();
+  await expect(page.locator('#tc-access-open-source')).toBeChecked();
+  const visible = page.locator('[data-tool]:not([hidden])');
+  const n = await visible.count();
+  expect(n).toBeGreaterThan(0);
+  for (let i = 0; i < n; i++) {
+    await expect(visible.nth(i)).toHaveAttribute('data-access', 'open-source');
+  }
+});
+
 test('reading list renders links, all https', async ({ page }) => {
   await page.goto('/resources/reading-list');
   const links = page.locator('a[data-reading-item]');
@@ -211,6 +271,47 @@ test('reading list renders links, all https', async ({ page }) => {
     expect(href).toBeTruthy();
     expect(href?.startsWith('https://')).toBe(true);
   }
+});
+
+test('reading list filters by audience and jurisdiction', async ({ page }) => {
+  await page.goto('/resources/reading-list');
+  const status = page.locator('.rl-status');
+  await expect(page.locator('.rl-controls')).toBeVisible();
+  await expect(status).toContainText('Showing all');
+
+  await page.locator('label[for="rl-jurisdiction-eu"]').click();
+  const visible = page.locator('.rd-item:not([hidden])');
+  const n = await visible.count();
+  expect(n).toBeGreaterThan(0);
+  for (let i = 0; i < n; i++) {
+    const keys = (await visible.nth(i).getAttribute('data-jurisdiction')) ?? '';
+    expect(keys.split(' ')).toContain('eu');
+  }
+
+  await page.locator('label[for="rl-audience-legal"]').click();
+  const both = page.locator('.rd-item:not([hidden])');
+  const m = await both.count();
+  expect(m).toBeGreaterThan(0);
+  expect(m).toBeLessThanOrEqual(n);
+  for (let i = 0; i < m; i++) {
+    const audience = (await both.nth(i).getAttribute('data-audience')) ?? '';
+    expect(audience.split(' ')).toContain('legal');
+  }
+});
+
+test('reading list points to the book chapter as its canonical text', async ({ page }) => {
+  await page.goto('/resources/reading-list');
+  await expect(page.locator('.lede a[href="/bok/reading-list"]')).toHaveCount(1);
+});
+
+// Enable once Base.astro forwards a `canonical` prop to Seo and the page
+// passes it (b-catalogues handoff): the chapter is the canonical text.
+test.fixme('reading list declares /bok/reading-list as rel=canonical', async ({ page }) => {
+  await page.goto('/resources/reading-list');
+  const canonicals = await page
+    .locator('link[rel="canonical"]')
+    .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('href')));
+  expect(canonicals).toEqual(['https://aigovernanceengineer.com/bok/reading-list']);
 });
 
 test('glossary renders terms and a working jump bar', async ({ page }) => {
