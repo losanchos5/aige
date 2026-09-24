@@ -1,0 +1,9 @@
+{
+  "card": "The system's intended uses and its negative space (prohibited uses, populations and contexts it was not validated for) as rules on a Policy Card.",
+  "system": "The producing system, whose outputs carry provenance: producer, version, intended use and a caveat.",
+  "register": "The downstream use register records each consumer against the registry entry, with its purpose, approval and the re-test that cleared it.",
+  "service": "A consuming system, granted a credential to the outputs only for its registered use.",
+  "partner": "An external partner that receives outputs under a contract linked to the register entry.",
+  "training": "A training pipeline that would reuse outputs as data, checked for feedback loops before it gets access.",
+  "monitor": "The off-purpose monitor classifies traffic and requests against the negative space and alerts on use outside it."
+}

@@ -36,11 +36,11 @@ which signal rolls it back without a meeting, and what record proves each of tho
 | Choose | Which model, hosted where, adapted how? | Model selection record | 3 · 2 | Task-eval results per candidate |
 | Contract | On what terms? | Contract and licence review | 1 · 5 | Clause checklist; AIBOM licence fields |
 | Go live | Approve, approve with conditions, or reject? | Go-live decision with dissent | 1 · 5 | Decision record; conditions as policy |
-| Roll out | How much exposure, and what rolls it back? | Rollout plan with rollback criteria | 4 | Stage-gate results; rollback events |
-| Operate | Is it still fit, fair and worth it? | Monitoring plan; maintenance calendar | 4 · 5 | Drift, fairness, cost and energy telemetry |
+| Roll out | How much exposure, and what rolls it back? | [Rollout plan with rollback criteria](/patterns/staged-rollout-rollback-criteria) | 4 | Stage-gate results; rollback events |
+| Operate | Is it still fit, fair and worth it? | [Monitoring plan](/patterns/drift-fairness-monitor); maintenance calendar | 4 · 5 | Drift, fairness, cost and energy telemetry |
 | Assure | Do the controls still work? | Audit, red-team and threat-model programme | 3 · 5 | Findings tracked to closure |
-| Communicate | Who must hear what, and when? | Communications plan and templates | 5 | Notices sent, with timestamps |
-| Retire | Degrade, localise or switch off? | Deactivation and retirement runbook | 4 · 2 | Decision record; final evidence snapshot |
+| Communicate | Who must hear what, and when? | [Communications plan and templates](/patterns/disclosure-notification-pipeline) | 5 | Notices sent, with timestamps |
+| Retire | Degrade, localise or switch off? | [Deactivation and retirement runbook](/patterns/deactivation-localisation-retirement-runbook) | 4 · 2 | Decision record; final evidence snapshot |
 
 ## The deployment decision
 
@@ -442,7 +442,7 @@ is defined as a partial, time-limited deployment of a change and its evaluation 
 | **Feature flags** | Runtime toggles per cohort, region or function, including operational kill switches [33] | Exposure is controllable without a deploy | Set per flag | Flag change log |
 | **Version pinning** | The registry pins model, prompt, corpus and guardrail versions | What ran is known | An unpinned change is detected | Registry diff |
 
-Rollback criteria must be **pre-registered**: written into the rollout plan before the stage starts,
+Rollback criteria must be **pre-registered**: written into the [rollout plan](/patterns/staged-rollout-rollback-criteria) before the stage starts,
 and evaluated by the pipeline, not by a meeting. A criterion invented after the metric moved is a
 negotiation, not a control. The same applies to changes you did not make: a new vendor model version
 is a release, and it goes through shadow and canary on your side against the pinned version before it
@@ -476,7 +476,7 @@ retrieved passages, outputs, logs and feedback. Govern them as you govern traini
   purpose.
 - **Map transfers** when inference, storage or support run in another jurisdiction; chapter 19
   treats [remote inference as a transfer](/bok/privacy-and-ai#transfers-remote-inference-and-tias).
-- **Plan for data-subject requests** that reach prompts, logs, retrieval corpora and fine-tuned
+- **Plan for [data-subject requests](/patterns/rights-requests-against-models)** that reach prompts, logs, retrieval corpora and fine-tuned
   weights. Deleting a record from a corpus is a delete; removing its influence from tuned weights may
   mean retraining, so decide before you tune on personal data. Deployers of high-risk systems use the
   provider's information to carry out their DPIA [1]; [chapter 19](/bok/privacy-and-ai#the-dpia-for-ai-systems) covers
@@ -519,7 +519,7 @@ production it helps to name what moved:
 
 Labels often arrive late, or never. For classic models, pair input-drift statistics with a delayed
 performance check when labels land; for generative systems, sample outputs for groundedness scoring
-and human review. Every drift signal needs a threshold, an owner and a defined consequence: an issue,
+and human review. Every [drift signal](/patterns/drift-fairness-monitor) needs a threshold, an owner and a defined consequence: an issue,
 a retrain, a degraded mode or an incident.
 
 ### Fairness and quality in production
@@ -658,7 +658,8 @@ and the system caused harm, then write down how. **Abuse cases**: misuse stories
 user stories, by people paid to think like the abuser. **Stakeholder impact mapping**: every group the
 outputs reach, including those who never touch the interface.
 
-Then give the answers a home, which this chapter calls a **downstream use register**: intended and
+Then give the answers a home, which this chapter calls a
+**[downstream use register](/patterns/downstream-use-register)**: intended and
 prohibited uses written as a [Policy Card](/bok/patterns#pattern-policy-card); every consumer of the
 outputs (systems, teams, partners) recorded against the registry entry; provenance and caveats
 stamped on outputs so a consumer knows what it is using; and a re-test whenever outputs are used in a
@@ -671,7 +672,8 @@ whether children or other vulnerable people will use the system, with age assura
 
 Every deployed system needs a plan for talking to people outside the organisation, written before it
 is needed. The plan names one owner and a single voice, an approval workflow, and a single source of
-truth: a transparency page and a plain-language system card generated from the registry, so what you
+truth: a transparency page and a plain-language system card
+[generated from the registry](/patterns/disclosure-notification-pipeline), so what you
 say publicly cannot drift from what is running. Templates are versioned like code. The NIST AI RMF
 asks that incidents and errors be communicated to relevant AI actors, including affected communities
 [30].
@@ -696,7 +698,7 @@ plan: whether notices reached the people they were for, and what the complaint v
 
 ### A deactivation policy someone can execute
 
-A deactivation policy names its triggers, its decision authority, the record each decision leaves,
+A [deactivation policy](/patterns/deactivation-localisation-retirement-runbook) names its triggers, its decision authority, the record each decision leaves,
 how evidence is preserved and the criteria for a safe restart. Triggers come in two kinds. Threshold
 triggers: a floor breached and not recovered within a set window, a fairness gap above its limit, an
 incident severity. Legal triggers: the deployer's own duty to suspend use when it has reason to
@@ -742,7 +744,8 @@ retired. Triggers include a benefit shortfall, a vendor deprecation, a replaceme
 The NIST AI RMF warns that irregular or indiscriminate termination can itself increase risk
 [29], so retirement is a runbook, not a deletion:
 
-1. **Dependency analysis.** Who consumes the outputs? The downstream use register answers it.
+1. **Dependency analysis.** Who consumes the outputs? The
+   [downstream use register](/patterns/downstream-use-register) answers it.
 2. **Fallback and transition.** Users move to the replacement or the manual process, with training.
 3. **Sunset notices.** Customers, partners and affected people hear before the date, not after.
 4. **Final evidence snapshot.** Cards, evals, decisions and logs are archived per the retention

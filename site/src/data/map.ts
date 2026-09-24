@@ -177,6 +177,12 @@ const PATTERN_SHORT: Record<string, string> = {
   'pattern-agent-identity--scoped-credentials': 'Agent Identity',
   'pattern-continuous-assurance-telemetry': 'Assurance Telemetry',
   'pattern-machine-readable-evidence-oscal': 'Machine-Readable Evidence',
+  // Block w2-patterns-b (v0.5.0): the deployment-side patterns.
+  'pattern-decision-notice--contest-path': 'Decision Notice',
+  'pattern-rights-requests-against-models': 'Rights Requests',
+  'pattern-staged-rollout-with-rollback-criteria': 'Staged Rollout',
+  'pattern-disclosure--notification-pipeline': 'Notification Pipeline',
+  'pattern-deactivation-localisation--retirement-runbook': 'Retirement Runbook',
 };
 
 // ----------------------------------------------------------- hand-written -- //

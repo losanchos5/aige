@@ -1,0 +1,9 @@
+{
+  "traffic": "Live inputs and outputs, sampled for input and embedding drift, usage drift against the negative space and, for generative systems, groundedness and refusals.",
+  "labels": "Outcome labels, which often arrive late; the label delay is stated and performance and calibration by group are checked when they land.",
+  "feedback": "Overrides, complaints and contests by group, which need no labels and are often the earliest fairness signal.",
+  "checks": "Each signal is compared with its threshold over a window; the monitoring plan that sets them is data, and a threshold change is a reviewed diff.",
+  "owner": "A breach pages the signal's owner, who opens an issue, schedules a retrain or switches a degraded mode.",
+  "incident": "A severe breach opens an incident through the incident pipeline or trips the circuit breaker.",
+  "records": "Every check writes an evidence record, pass or fail, so the absence of breaches is evidenced as well."
+}

@@ -339,6 +339,31 @@ a completed, reviewed core (1.0).
   gains an operate step (change and deprecation notices, detection of unannounced change,
   reassessment by trigger and tier, a tested fallback).
 
+### Added
+- Eight patterns on the deployment and use side (block w2-patterns-b), each with its own page under
+  `/patterns/<slug>`, an archify diagram placed on that page, a `## Pattern:` section in the chapter
+  05 catalogue and an entry in `site/src/data/patterns.ts`: **Decision Notice & Contest Path**
+  (GDPR `Art. 22`, UK `Arts. 22A–22D`, AI Act `Art. 26(11)` and `Art. 86`, Regulation B adverse
+  action), **Rights Requests Against Models**, **Sanctioned AI Gateway**, **Staged Rollout with
+  Rollback Criteria**, **Drift & Fairness Monitor**, **Downstream Use Register**, **Disclosure &
+  Notification Pipeline** and **Deactivation, Localisation & Retirement Runbook**. Each follows the
+  pattern template with a `### Forces` subsection under Problem, an illustrative JSON artefact and a
+  **Maps to** line with AI Act articles, ISO/IEC 42001 Annex A ids, NIST AI RMF subcategories and,
+  where relevant, OWASP ids. Three artefacts are instances of the published schemas and validate
+  against them: an evidence record (gateway decision event), a post-market monitoring plan (the
+  deployer's monitoring plan) and a decommissioning runbook (retirement record).
+- `sources/SOURCES.md`: a section for the eight pattern pages. The public AIGP Body of Knowledge
+  v2.1 is cited by competency code (IV.C), paraphrased, with a note that the site is not affiliated
+  with or endorsed by IAPP.
+
+### Changed
+- Chapters 11 to 19, 22 and 23 link the new pattern pages from the sentences that already describe
+  the practice (for example the downstream use register and the retirement runbook in chapter 15,
+  the contest path and the fulfilment record in chapter 19, the gateway in chapter 12); the prose
+  is unchanged.
+- The pattern map and the discipline map draw the new patterns (regenerated `pattern-map.svg` and
+  `discipline-map.svg`); `site/src/data/map.ts` gains shorts for the five longest new pattern names.
+
 ## [Unreleased] - 2026-09-20
 
 Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the

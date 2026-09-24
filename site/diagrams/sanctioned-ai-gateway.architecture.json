@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Sanctioned AI Gateway",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "one-route-in",
+        "label": "One route in",
+        "focus": ["staff", "gateway", "tools"],
+        "note": "Approved tools are reached through single sign-on and one gateway, which is built to be the fastest route."
+      },
+      {
+        "id": "policy-at-the-gateway",
+        "label": "Policy at the gateway",
+        "focus": ["card", "gateway", "store"],
+        "note": "The gateway applies the acceptable-use card by data class and writes a decision event per call."
+      },
+      {
+        "id": "discovery-closes-the-loop",
+        "label": "Discovery closes the loop",
+        "focus": ["bypass", "discovery", "card"],
+        "note": "Discovery finds use that goes around the gateway and turns it into an intake request."
+      }
+    ]
+  },
+  "components": [
+    { "id": "card", "type": "database", "label": "Acceptable-use card", "sublabel": "tool x data class", "pos": [262, 30], "size": [196, 64] },
+    { "id": "staff", "type": "external", "label": "Staff", "sublabel": "SSO, attested", "pos": [40, 200], "size": [150, 64] },
+    { "id": "gateway", "type": "security", "label": "AI gateway", "sublabel": "allow / redact / block", "pos": [262, 194], "size": [196, 76] },
+    { "id": "tools", "type": "external", "label": "Approved AI tools", "sublabel": "enterprise terms", "pos": [540, 200], "size": [178, 64] },
+    { "id": "store", "type": "database", "label": "Assurance store", "sublabel": "decision events", "pos": [540, 400], "size": [178, 64] },
+    { "id": "bypass", "type": "external", "label": "Unapproved tool", "sublabel": "the bypass", "pos": [40, 400], "size": [150, 64] },
+    { "id": "discovery", "type": "backend", "label": "Shadow-AI discovery", "sublabel": "identity, network", "pos": [262, 400], "size": [196, 64] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Layer 01 Govern-as-Code", "wraps": ["card"], "pad": 16 },
+    { "kind": "region", "label": "Layer 04 Runtime Controls & Observability", "wraps": ["gateway", "tools"], "pad": 22 },
+    { "kind": "region", "label": "Layer 02 and 05", "wraps": ["discovery", "store"], "pad": 16 }
+  ],
+  "connections": [
+    { "id": "staff-gateway", "from": "staff", "to": "gateway", "label": "sign in", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
+    { "id": "gateway-tools", "from": "gateway", "to": "tools", "label": "allow", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
+    { "id": "card-gateway", "from": "card", "to": "gateway", "label": "enforce", "variant": "default", "fromSide": "bottom", "toSide": "top", "labelAt": [400, 144] },
+    { "id": "gateway-store", "from": "gateway", "to": "store", "label": "event", "variant": "default", "fromSide": "bottom", "toSide": "left" },
+    { "id": "staff-bypass", "from": "staff", "to": "bypass", "label": "bypass", "variant": "dashed", "fromSide": "bottom", "toSide": "top", "labelAt": [150, 332] },
+    { "id": "discovery-bypass", "from": "discovery", "to": "bypass", "label": "finds", "variant": "security", "fromSide": "left", "toSide": "right" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "The governed path is the easy path",
+      "items": [
+        "Approved tools sit behind single sign-on and one gateway",
+        "Access depends on a current acceptable-use attestation",
+        "A block comes with a reason and a route to the right tool"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Policy as code at the gateway",
+      "items": [
+        "The acceptable-use card maps each tool to the data classes it may receive",
+        "The gateway allows, redacts or blocks per call",
+        "Every call writes a decision event, with a hash of the input rather than the input"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Discovery is the feedback loop",
+      "items": [
+        "Discovery reads identity, network and expense data for tools outside the gateway",
+        "Each find becomes an intake request before it becomes a sanction"
+      ]
+    }
+  ]
+}

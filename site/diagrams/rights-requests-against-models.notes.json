@@ -1,0 +1,11 @@
+{
+  "request": "A data-subject request for access, rectification, erasure or objection, matched on a pseudonymous subject key and due within one month, extendable by two.",
+  "map": "The data map, built from data cards, dataset admission records, the AIBOM and the registry, says which snapshots, indexes, logs and model versions hold the person's data.",
+  "router": "One ticket fans out to one handler per store, each with a response agreed in advance.",
+  "sources": "Source systems and training or fine-tuning snapshots: delete, and flag every model version trained on an affected snapshot.",
+  "rag": "Retrieval indexes, caches and prompt and output logs: delete or re-index at once, or pseudonymise logs within the retention rule.",
+  "evals": "Eval sets: replace the person's records with synthetic ones so regression tests keep working.",
+  "weights": "Where the model is not anonymous, an output filter built on general rules suppresses the person's data now; it is tested like any control.",
+  "retrain": "Retraining without the data on a schedule closes the gap; unlearning is accepted only as a claim that passes a membership-inference test.",
+  "record": "The fulfilment record lists every location, the action taken, the model versions affected and the date the remaining gap closes."
+}

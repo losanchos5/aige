@@ -530,7 +530,7 @@ one pipeline and let only the top class start a statutory clock (chapter 17, [In
 root causes](/bok/incidents#a-severity-scale-mapped-to-the-clocks)). High-risk deployers must also inform the provider and suspend use when
 they have reason to consider the system presents a risk (`Art. 26(5)`) [6]. **Change** needs
 triggers, because a prompt edit or a new retrieval source can change behaviour as much as a new model.
-**Retire** needs a runbook: NIST asks for safe decommissioning "in a manner that does not increase
+**Retire** needs a [runbook](/patterns/deactivation-localisation-retirement-runbook): NIST asks for safe decommissioning "in a manner that does not increase
 risks" (GOVERN 1.7) [3], which means revoking every identity and credential, marking the registry
 entry retired, archiving the evidence for its retention period and applying retention rules to
 training and derived data.
@@ -604,7 +604,7 @@ data governance and intellectual-property policies to see AI. A gap assessment f
 
 | Policy | Typical AI gaps | Typical additions | Evidence |
 |---|---|---|---|
-| Privacy | Lawful basis for training versus inference; purpose limitation on reuse; what models memorise; notices; rights over models and outputs; retention of training and derived data | Dataset purpose tags; DPIA triggers for AI; procedure for rights requests against models | DPIA; data card; rights-request log |
+| Privacy | Lawful basis for training versus inference; purpose limitation on reuse; what models memorise; notices; rights over models and outputs; retention of training and derived data | Dataset purpose tags; DPIA triggers for AI; procedure for [rights requests against models](/patterns/rights-requests-against-models) | DPIA; data card; rights-request log |
 | Security | Prompt injection, poisoning, model extraction and supply-chain threats missing from the risk assessment and playbooks; no trusted model sources | AI threats in the ISMS risk assessment; AI incident playbooks; model and dataset allowlist | Threat model; red-team results; allowlist |
 | Data governance | Lineage without provenance; scraped, brokered and synthetic data unlabelled; no retention by layer | Acquisition policy (below); provenance fields; retention for raw data, features, labels and weights | Data card; lineage graph |
 | Intellectual property | Training rights and text-and-data-mining opt-outs; use of outputs; trade secrets in prompts; open-weight licences; vendor indemnities | Rights review per dataset; output-use rules; prompt rules by data class; model licence review | [Rights ledger](/patterns/training-data-rights-ledger); licence records |
@@ -720,7 +720,7 @@ proportionate consequences.
 | Special-category or regulated data | Not allowed | Only with a DPIA-backed use case | Allowed within scope |
 | Secrets, credentials, restricted code | Not allowed | Not allowed | Per security standard |
 
-Enforce with the gateway, not the handbook: approved tools behind single sign-on and a gateway that
+Enforce with the [gateway](/patterns/sanctioned-ai-gateway), not the handbook: approved tools behind single sign-on and a gateway that
 applies data-class rules and logs use; access conditional on a current AUP attestation (the literacy
 gate above); discovery of unapproved tools through identity, network and expense data (the
 [Shadow-AI Discovery](/bok/patterns#pattern-shadow-ai-discovery) pattern). When discovery finds an

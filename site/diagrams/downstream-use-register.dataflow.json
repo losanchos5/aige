@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Downstream Use Register",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [980, 540],
+    "views": [
+      {
+        "id": "uses-as-rules",
+        "label": "Uses as rules",
+        "focus": ["card", "system", "register"],
+        "note": "Intended and prohibited uses are a Policy Card, and outputs leave the producing system stamped with provenance."
+      },
+      {
+        "id": "consumers-registered",
+        "label": "Consumers registered",
+        "focus": ["register", "service", "partner", "training"],
+        "note": "Every consumer is registered with its use and the re-test that cleared it, and only a registered consumer gets a credential."
+      },
+      {
+        "id": "off-purpose-signal",
+        "label": "Off-purpose as a signal",
+        "focus": ["service", "training", "monitor"],
+        "note": "Use outside the intended purpose and outputs returning as training data raise alerts."
+      }
+    ]
+  },
+  "stages": [
+    { "label": "Producer" },
+    { "label": "Register and grant" },
+    { "label": "Consumers" },
+    { "label": "Signals" }
+  ],
+  "nodes": [
+    { "id": "card", "type": "database", "label": "Use Policy Card", "sublabel": "intended, prohibited", "tag": "Layer 01", "stage": 0, "row": 0, "width": 150, "height": 64 },
+    { "id": "system", "type": "backend", "label": "Producing system", "sublabel": "stamped outputs", "tag": "Layer 02", "stage": 0, "row": 2, "width": 150, "height": 64 },
+    { "id": "register", "type": "database", "label": "Use register", "sublabel": "consumer, use, test", "tag": "Layer 02", "stage": 1, "row": 1, "width": 150, "height": 64 },
+    { "id": "service", "type": "backend", "label": "Consuming system", "sublabel": "registered use", "stage": 2, "row": 0, "width": 144, "height": 64 },
+    { "id": "partner", "type": "external", "label": "Partner", "sublabel": "under contract", "stage": 2, "row": 1, "width": 144, "height": 64 },
+    { "id": "training", "type": "backend", "label": "Training pipeline", "sublabel": "loop check", "stage": 2, "row": 2, "width": 144, "height": 64 },
+    { "id": "monitor", "type": "security", "label": "Off-purpose monitor", "sublabel": "vs negative space", "tag": "Layer 04", "stage": 3, "row": 1, "width": 160, "height": 64 }
+  ],
+  "flows": [
+    { "id": "card-register", "from": "card", "to": "register", "label": "rules", "variant": "default" },
+    { "id": "system-register", "from": "system", "to": "register", "label": "outputs", "variant": "emphasis" },
+    { "id": "register-service", "from": "register", "to": "service", "label": "access", "variant": "emphasis" },
+    { "id": "register-partner", "from": "register", "to": "partner", "label": "grant", "variant": "default", "labelDy": 12 },
+    { "id": "register-training", "from": "register", "to": "training", "label": "check", "variant": "dashed" },
+    { "id": "service-monitor", "from": "service", "to": "monitor", "label": "usage", "variant": "default" },
+    { "id": "training-monitor", "from": "training", "to": "monitor", "label": "reuse", "variant": "security" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Decide secondary use",
+      "items": [
+        "Intended and prohibited uses are rules on a Policy Card",
+        "A premortem and abuse cases feed the prohibited list before go-live",
+        "A new use is a new approval with its own re-test"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Know every consumer",
+      "items": [
+        "Systems, teams, partners and training pipelines are registered against the producer",
+        "Only a registered consumer gets a credential to the outputs",
+        "Outputs carry producer, version, intended use and a caveat"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Watch and fan out",
+      "items": [
+        "Off-purpose use and outputs returning as training data raise alerts",
+        "A change, incident or retirement notifies every registered consumer"
+      ]
+    }
+  ]
+}

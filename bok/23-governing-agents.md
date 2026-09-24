@@ -398,7 +398,7 @@ an anomaly, an upstream notice (the model vendor reports an incident) or a legal
 A stop that has not been drilled is a claim. Drill it on a schedule, measure time to stop, and check
 that the stop held: no tool calls after the breaker tripped, no credentials issued after revocation.
 Chapter 17 makes the same point for [rogue behaviour](/bok/incidents#ai-specific-failure-modes):
-revoke, then verify that the revocation took effect. Decommissioning is the planned version: TC260
+revoke, then verify that the revocation took effect. [Decommissioning](/patterns/deactivation-localisation-retirement-runbook) is the planned version: TC260
 lists complete shutdown, data backup and environment cleanup [6]; add deleting memory under its
 retention rule and removing the agent from other agents' delegation lists.
 

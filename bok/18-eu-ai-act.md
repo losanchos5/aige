@@ -532,7 +532,7 @@ Article 26 is the deployer's list for high-risk systems. Broken into sub-duties,
 | Public bodies: register the use; never use unregistered systems | `26(8)` | Registry synced with the EU database id | 2 |
 | Feed the provider's `Art. 13` information into the DPIA | `26(9)` | DPIA cross-referencing the instructions | 1 · 2 |
 | Post-remote biometric identification: authorisation, logging, reports | `26(10)` | Authorisation record; per-use log | 5 |
-| Tell people subject to Annex III decisions | `26(11)` | Decision notice at the point of decision | 2 · 4 |
+| Tell people subject to Annex III decisions | `26(11)` | [Decision notice](/patterns/decision-notice-contest-path) at the point of decision | 2 · 4 |
 | Cooperate with authorities | `26(12)` | Evidence export on request | 5 |
 
 Financial institutions meet the monitoring and log duties through their financial-services

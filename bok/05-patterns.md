@@ -283,6 +283,83 @@ reruns the cited evals and flags any claim the new version no longer supports.
 
 Layer 05 Assurance & Continuous Compliance / Layer 03 Evals & Red Teaming as Evidence ·
 [Read the Claims Substantiation Gate pattern](/patterns/claims-substantiation-gate)
+## Pattern: Decision Notice & Contest Path
+
+When an AI system makes or shapes a decision about a person, send a notice generated from the
+decision record that gives the principal reasons and says how to contest, and route each contest to
+a reviewer with the authority and the information to change the outcome. The notice, the contest and
+the review outcome are records, so the right to contest is evidenced decision by decision.
+
+Layer 04 Runtime Controls & Observability / Layer 05 Assurance & Continuous Compliance ·
+[Read the Decision Notice & Contest Path pattern](/patterns/decision-notice-contest-path)
+
+## Pattern: Rights Requests Against Models
+
+Route each data-subject request to every place the person's data sits in an AI system, from source
+systems and retrieval indexes to logs, eval sets and, where the model is not anonymous, the weights.
+Each location has a pre-agreed response, from deletion to scheduled retraining, and the request closes
+with a fulfilment record that dates the remaining gap.
+
+Layer 02 Inventory & Transparency / Layer 05 Assurance & Continuous Compliance ·
+[Read the Rights Requests Against Models pattern](/patterns/rights-requests-against-models)
+
+## Pattern: Sanctioned AI Gateway
+
+Put approved AI tools and model APIs behind single sign-on and one gateway that applies the
+acceptable-use policy as code: data-class rules, redaction or blocking, a decision event per call and
+access conditional on a current attestation. The sanctioned path is built to be the easiest one, and
+discovery finds what goes around it.
+
+Layer 04 Runtime Controls & Observability / Layer 02 Inventory & Transparency ·
+[Read the Sanctioned AI Gateway pattern](/patterns/sanctioned-ai-gateway)
+
+## Pattern: Staged Rollout with Rollback Criteria
+
+Take every model, prompt, corpus or vendor-version change to production through shadow, pilot and
+canary stages, with rollback criteria registered before each stage starts and evaluated by the
+pipeline. Versions are pinned in the registry and the path back is tested before anyone depends on it.
+
+Layer 04 Runtime Controls & Observability ·
+[Read the Staged Rollout with Rollback Criteria pattern](/patterns/staged-rollout-rollback-criteria)
+
+## Pattern: Drift & Fairness Monitor
+
+Watch a deployed system for input, label, concept, pipeline, vendor-model and usage drift, and for
+quality and fairness by group. Every signal has a threshold, an owner and a pre-agreed consequence,
+from an issue to a tripped breaker, and every check writes an evidence record.
+
+Layer 04 Runtime Controls & Observability / Layer 05 Assurance & Continuous Compliance ·
+[Read the Drift & Fairness Monitor pattern](/patterns/drift-fairness-monitor)
+
+## Pattern: Downstream Use Register
+
+Write a system's intended and prohibited uses as a Policy Card, register every consumer of its outputs
+against its registry entry with the re-test that cleared that use, and stamp provenance and caveats on
+the outputs. Secondary use becomes a decision instead of a discovery, and a change or retirement can
+reach everyone it affects.
+
+Layer 02 Inventory & Transparency / Layer 01 Govern-as-Code ·
+[Read the Downstream Use Register pattern](/patterns/downstream-use-register)
+
+## Pattern: Disclosure & Notification Pipeline
+
+Generate disclosures (AI-interaction notices, labels, the transparency page and system card, notices
+to workers and affected people) and triggered notifications (to providers, authorities, customers and
+the public) from the registry and versioned templates, each on its clock. Every notice sent is
+recorded with its audience, template version and timestamp.
+
+Layer 05 Assurance & Continuous Compliance / Layer 02 Inventory & Transparency ·
+[Read the Disclosure & Notification Pipeline pattern](/patterns/disclosure-notification-pipeline)
+
+## Pattern: Deactivation, Localisation & Retirement Runbook
+
+Keep a drilled runbook per system for degrading it, switching it off by jurisdiction and retiring it:
+named threshold and legal triggers, a decision owner, evidence frozen first, graduated modes short of
+shutdown, regional switches and retirement steps that end in a retired registry entry and no running
+copy.
+
+Layer 04 Runtime Controls & Observability / Layer 02 Inventory & Transparency ·
+[Read the Deactivation, Localisation & Retirement Runbook pattern](/patterns/deactivation-localisation-retirement-runbook)
 
 ## Sources
 

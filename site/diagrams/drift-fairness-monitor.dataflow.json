@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Drift & Fairness Monitor",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [980, 540],
+    "views": [
+      {
+        "id": "signals-in",
+        "label": "Signals in",
+        "focus": ["traffic", "labels", "feedback", "checks"],
+        "note": "Live traffic, late labels and human feedback by group feed checks against thresholds."
+      },
+      {
+        "id": "breach-has-a-consequence",
+        "label": "A breach has a consequence",
+        "focus": ["checks", "owner", "incident"],
+        "note": "Every signal has an owner who can be paged and a pre-agreed action, up to an incident or a tripped breaker."
+      },
+      {
+        "id": "every-check-recorded",
+        "label": "Every check recorded",
+        "focus": ["checks", "records"],
+        "note": "Each check writes an evidence record, pass or fail, so the absence of breaches is evidenced too."
+      }
+    ]
+  },
+  "stages": [
+    { "label": "Production signals" },
+    { "label": "Checks vs thresholds" },
+    { "label": "Consequence" },
+    { "label": "Evidence" }
+  ],
+  "nodes": [
+    { "id": "traffic", "type": "external", "label": "Live traffic", "sublabel": "inputs, outputs", "tag": "Layer 04", "stage": 0, "row": 0, "width": 152, "height": 64 },
+    { "id": "labels", "type": "external", "label": "Outcome labels", "sublabel": "arrive late", "tag": "Layer 04", "stage": 0, "row": 1, "width": 152, "height": 64 },
+    { "id": "feedback", "type": "external", "label": "Overrides, contests", "sublabel": "by group", "tag": "Layer 04", "stage": 0, "row": 2, "width": 152, "height": 64 },
+    { "id": "checks", "type": "backend", "label": "Drift and fairness", "sublabel": "threshold per signal", "tag": "Layer 04", "stage": 1, "row": 1, "width": 164, "height": 64 },
+    { "id": "owner", "type": "backend", "label": "Owner paged", "sublabel": "issue, retrain, mode", "stage": 2, "row": 0, "width": 160, "height": 64 },
+    { "id": "incident", "type": "security", "label": "Incident, breaker", "sublabel": "severe breach", "stage": 2, "row": 2, "width": 160, "height": 64 },
+    { "id": "records", "type": "database", "label": "Evidence records", "sublabel": "pass or fail", "tag": "Layer 05", "stage": 3, "row": 1, "width": 156, "height": 64 }
+  ],
+  "flows": [
+    { "id": "traffic-checks", "from": "traffic", "to": "checks", "label": "sample", "variant": "default", "route": "top-channel" },
+    { "id": "labels-checks", "from": "labels", "to": "checks", "label": "join", "variant": "default", "route": "straight" },
+    { "id": "feedback-checks", "from": "feedback", "to": "checks", "label": "rates", "variant": "default", "route": "bottom-channel" },
+    { "id": "checks-owner", "from": "checks", "to": "owner", "label": "breach", "variant": "default" },
+    { "id": "checks-incident", "from": "checks", "to": "incident", "label": "severe", "variant": "dashed" },
+    { "id": "checks-records", "from": "checks", "to": "records", "label": "every check", "variant": "emphasis" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Name what can move",
+      "items": [
+        "Data, label, concept, pipeline, vendor-model and usage drift",
+        "Quality and fairness by group, with and without labels",
+        "Groundedness and refusals by topic and language for generative systems"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Threshold, owner, consequence",
+      "items": [
+        "Every signal has a threshold, a window and an owner who can be paged",
+        "A breach opens an issue, schedules a retrain or switches a degraded mode",
+        "A severe breach opens an incident or trips the breaker"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Evidence, not a chart",
+      "items": [
+        "Each check writes an evidence record, pass or fail",
+        "The monitoring plan is data, and a threshold change is a reviewed diff"
+      ]
+    }
+  ]
+}
