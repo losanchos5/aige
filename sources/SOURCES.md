@@ -2134,3 +2134,19 @@ atlas.mitre.org renders in JavaScript and its deep links answer 404 to a non-bro
 | 12 | Inspect Evals task names (agentdojo, agent_threat_bench, strong_reject, cyberseceval_2, simpleqa, make_me_pay, agentic_misalignment) | Inspect Evals | UK AI Security Institute and contributors (GitHub) | 2026 | https://github.com/UKGovernmentBEIS/inspect_evals | primary | Eval column |
 | 13 | promptfoo red-team plugin ids (e.g. indirect-prompt-injection, prompt-extraction, rag-poisoning, agentic:memory-poisoning, mcp, reasoning-dos) | promptfoo red-team plugins | promptfoo | 2026 | https://www.promptfoo.dev/docs/red-team/plugins/ | primary | Eval column |
 | 14 | garak probe modules (promptinject, latentinjection, sysprompt_extraction, leakreplay, packagehallucination, web_injection, agent_breaker, fileformats, propile, divergence, dan, tap), release v0.17.0 of 9 Sep 2026 | garak | NVIDIA (GitHub) | 2026-09-09 | https://github.com/NVIDIA/garak | primary | Eval column |
+## site/src/figures concept figures (block w2-fig-concepts, BoK v0.5.0)
+
+The six concept infographics and the chapter 14 lifecycle diagram add no new source: each draws only
+on its chapter (or the data module the chapter uses) and inherits that chapter's numbered sources.
+The table records which of them each figure relies on, so a reviewer can re-check a figure against
+the same rows. Source numbers are the chapter's own, as of 2026-09-24.
+
+| Figure | Drawn from | Chapter sources it relies on | Verified |
+|---|---|---|---|
+| `agent-control-plane` (`/figures/agent-control-plane`, `/agents#control-plane`) | ch. 23, runtime guardrails, kill switch and stop levels, stopping across hops, agent telemetry | [4] Agentic Trust Framework; [5] AI Act Art. 14(4)(e); [16] AARM; [17] Agent Control Standard (failure posture); [19] NIST AI RMF MANAGE 2.4; [20] A2A cancel | primary (as tagged in ch. 23) |
+| `governance-operating-model` | ch. 12, stakeholder map, the three lines applied to AI, internal audit, KPIs and KRIs | [1] AI Act Art. 17(1)(m); [2] ISO/IEC 42001 clauses 5.3, 9.2; [3] NIST AI RMF GOVERN 2.1; [4] IIA Three Lines Model | primary (as tagged in ch. 12) |
+| `harm-levels` | ch. 13, defined scales; `site/src/data/harms.ts` rows discriminatory-decisions, underrepresentation, prompt-injection, job-displacement, energy-emissions | harms.ts [1] MIT AI Risk Repository taxonomy and each row's own `sources` | primary (as tagged in harms.ts) |
+| `explanation-techniques` | ch. 16, explanation techniques, testing explanation quality, explanation artefacts | [29] NIST IR 8312; [32] SHAP; [33] LIME; [34] integrated gradients; [35] Fooling LIME and SHAP; [36] Sanity checks; [52] Doshi-Velez and Kim | primary (as tagged in ch. 16) |
+| `instrument-lineage` (`/resources/frameworks`) | ch. 22, how to read, instruments at a glance, lineage, ISO/IEC family, harmonised standards, one control many instruments | [1] CETS No. 225; [2] AI Act Art. 40; [5] Convention status; [7] OECD/LEGAL/0449; [9] NIST AI RMF; [14] AI Act recitals 12 and 27; [40] ISO/IEC 42001; [47] C(2025)3871; [53] JTC 21 tracker (secondary) | primary, [53] secondary (as tagged in ch. 22) |
+| `jurisdiction-tiles` | ch. 21, the landscape at a glance; `site/src/data/jurisdictions.ts` (status and first instrument per jurisdiction) | the landscape table's rows [1] to [54] and each instrument's `url` and `verified` tag in jurisdictions.ts | as tagged per instrument |
+| `build-chain-of-gates` (archify) | ch. 14, the build as a chain of gates and the sections each gate names | [1] ISO/IEC 5338; [2] ISO/IEC 42001 Annex A.6, A.7; [3] NIST AI RMF MAP 1.1, 1.5; [4] AI Act Art. 17 | primary (as tagged in ch. 14) |

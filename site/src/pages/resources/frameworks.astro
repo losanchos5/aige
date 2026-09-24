@@ -6,12 +6,17 @@ import FrameworkTable from '../../components/FrameworkTable.astro';
 import ObligationMatrix from '../../components/ObligationMatrix.astro';
 import ObligationTable from '../../components/ObligationTable.astro';
 import Diagram from '../../components/Diagram.astro';
+import Figure from '../../components/Figure.astro';
+import { getFigure } from '../../data/figures';
+import lineageSvg from '../../figures/instrument-lineage.svg?raw';
 import { frameworks, obligations, disclaimer } from '../../data/frameworks';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Frameworks' }];
+// Block w2-fig-concepts: how the instruments relate, above the table.
+const lineage = getFigure('instrument-lineage')!;
 ---
 
 <Base
@@ -42,6 +47,14 @@ const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Frameworks
         <p>{frameworks.length} instruments: laws, standards, codes and control sets. External links
         open the canonical source.</p>
       </div>
+      <Figure
+        id="instrument-lineage"
+        title={lineage.title}
+        caption={lineage.caption}
+        description={lineage.description}
+      >
+        <Fragment set:html={lineageSvg} />
+      </Figure>
       <FrameworkTable frameworks={frameworks} />
     </section>
 

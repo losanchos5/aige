@@ -299,6 +299,16 @@ export const diagrams: readonly DiagramDef[] = [
       'The obligations that are live now and the dates the Omnibus sets for what follows (new bans and marking, the deferred high-risk deadlines, legacy public-authority systems), as the chapter states them as of 2026-09-24. Pick the next stage and map its obligations to artefacts in chapter 08. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'why-now', at: 'lead' }],
   },
+  // Block w2-fig-concepts (v0.5.0): the build lifecycle as a chain of gates,
+  // each gate naming the pattern chapter 14 ties to it; opens chapter 14.
+  {
+    id: 'build-chain-of-gates',
+    type: 'lifecycle',
+    title: 'The build as a chain of gates',
+    caption:
+      'The build from intake to release as a chain of gates, each reading a structured record and each named with the pattern that implements it, ending in a technical file the pipeline compiles from those records. Find the first stage whose gate cannot refuse a missing record, and wire that one first. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'governing-development', at: 'lead' }],
+  },
 ] as const;
 
 /** Look up a diagram definition by id. */

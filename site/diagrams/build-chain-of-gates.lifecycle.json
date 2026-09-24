@@ -1,0 +1,189 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "The build as a chain of gates",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      900,
+      660
+    ],
+    "views": [
+      {
+        "id": "the-chain",
+        "label": "The chain",
+        "focus": [
+          "use-case",
+          "design",
+          "data",
+          "testing",
+          "release"
+        ],
+        "note": "Every stage ends in a gate, every gate reads a structured record, and every record lands in the evidence store keyed to the registry id."
+      },
+      {
+        "id": "what-blocks",
+        "label": "What blocks",
+        "focus": [
+          "testing",
+          "blocked",
+          "release"
+        ],
+        "note": "Tests are held to thresholds fixed before they ran, and the release gate refuses to open while a record is missing or stale."
+      },
+      {
+        "id": "the-file-compiles",
+        "label": "The file compiles itself",
+        "focus": [
+          "release",
+          "technical-file"
+        ],
+        "note": "A documentation job assembles the technical file on every release candidate and emits it as machine-readable evidence."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Build stages, each closed by a gate"
+    },
+    {
+      "id": "terminal",
+      "label": "What the gates leave"
+    }
+  ],
+  "states": [
+    {
+      "id": "use-case",
+      "type": "start",
+      "label": "Intake gate",
+      "sublabel": "Agent Registry",
+      "lane": "main",
+      "col": 0,
+      "step": "01",
+      "tag": "use-case record",
+      "width": 124
+    },
+    {
+      "id": "design",
+      "type": "active",
+      "label": "Design review",
+      "sublabel": "Human-in-the-loop Gate",
+      "lane": "main",
+      "col": 1,
+      "step": "02",
+      "tag": "design record",
+      "width": 140
+    },
+    {
+      "id": "data",
+      "type": "active",
+      "label": "Dataset admission",
+      "sublabel": "AIBOM",
+      "lane": "main",
+      "col": 2,
+      "step": "03",
+      "tag": "admission record",
+      "width": 140
+    },
+    {
+      "id": "testing",
+      "type": "decision",
+      "label": "Eval gate",
+      "sublabel": "Eval Gate in CI",
+      "lane": "main",
+      "col": 3,
+      "step": "04",
+      "tag": "test report",
+      "width": 140
+    },
+    {
+      "id": "release",
+      "type": "decision",
+      "label": "Release gate",
+      "sublabel": "Model Card as Control Evidence",
+      "lane": "main",
+      "col": 4,
+      "step": "05",
+      "tag": "go/no-go record",
+      "width": 140
+    },
+    {
+      "id": "blocked",
+      "type": "failure",
+      "label": "Blocked",
+      "sublabel": "record missing or failing",
+      "lane": "terminal",
+      "col": 1,
+      "width": 140
+    },
+    {
+      "id": "technical-file",
+      "type": "success",
+      "label": "Technical file",
+      "sublabel": "Machine-Readable Evidence",
+      "lane": "terminal",
+      "col": 2,
+      "step": "06",
+      "tag": "documentation build",
+      "width": 140
+    }
+  ],
+  "transitions": [
+    {
+      "id": "testing-blocked",
+      "from": "testing",
+      "to": "blocked",
+      "label": "below threshold",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [
+        556,
+        214
+      ]
+    },
+    {
+      "id": "release-file",
+      "from": "release",
+      "to": "technical-file",
+      "label": "compiles",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [
+        710,
+        214
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Every stage ends in a gate",
+      "items": [
+        "Use case, design, data, testing and release each close with a gate that reads a structured record",
+        "Every record lands in the evidence store, keyed to the registry id",
+        "Not MLOps and not model validation: the governance record both produce, made machine-readable and given the power to block"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "The pattern behind each gate",
+      "items": [
+        "Intake: the use-case record lives on the Agent Registry entry; design: the Human-in-the-loop Gate",
+        "Data: licences go into the AIBOM; testing: every suite sits behind the Eval Gate in CI",
+        "Release: cards regenerated as in Model Card as Control Evidence; technical file: Machine-Readable Evidence (OSCAL)"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "First step",
+      "items": [
+        "Write the use-case record at intake, as fields on the registry entry",
+        "Make one gate refuse to open while its record is missing or stale"
+      ]
+    }
+  ]
+}

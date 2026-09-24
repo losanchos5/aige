@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 456" class="figc" role="img" aria-labelledby="fig-jurisdiction-tiles-t fig-jurisdiction-tiles-d">
+  <title id="fig-jurisdiction-tiles-t">AI laws by jurisdiction</title>
+  <desc id="fig-jurisdiction-tiles-d">Twenty jurisdictions as equal tiles in rough geographic layout, shaded by how binding their AI-specific regime is, as of 2026-09-24.</desc>
+
+  <text class="mono muted" x="16" y="20" font-size="13.5">One tile per jurisdiction, by status</text>
+
+  <!-- The world: countries (ISO 3166-1 alpha-3) and the EU, in rough geographic order -->
+  <rect class="tile-t" x="8" y="34" width="44" height="40" rx="5"/>
+  <text class="mono" x="30" y="59" font-size="13" text-anchor="middle">CAN</text>
+  <rect class="tile-v" x="108" y="34" width="44" height="40" rx="5"/>
+  <text class="mono" x="130" y="59" font-size="13" text-anchor="middle">GBR</text>
+  <rect class="tile-h" x="158" y="34" width="44" height="40" rx="5"/>
+  <text class="mono tile-h-tx" x="180" y="59" font-size="13" text-anchor="middle">EU</text>
+  <rect class="tile-t" x="8" y="80" width="44" height="40" rx="5"/>
+  <text class="mono" x="30" y="105" font-size="13" text-anchor="middle">USA</text>
+  <rect class="tile-b" x="108" y="80" width="44" height="40" rx="5"/>
+  <text class="mono" x="130" y="105" font-size="13" text-anchor="middle">ESP</text>
+  <rect class="tile-h" x="158" y="80" width="44" height="40" rx="5"/>
+  <text class="mono tile-h-tx" x="180" y="105" font-size="13" text-anchor="middle">ITA</text>
+  <rect class="tile-t" x="208" y="80" width="44" height="40" rx="5"/>
+  <text class="mono" x="230" y="105" font-size="13" text-anchor="middle">CHN</text>
+  <rect class="tile-h" x="258" y="80" width="44" height="40" rx="5"/>
+  <text class="mono tile-h-tx" x="280" y="105" font-size="13" text-anchor="middle">KOR</text>
+  <rect class="tile-h" x="308" y="80" width="44" height="40" rx="5"/>
+  <text class="mono tile-h-tx" x="330" y="105" font-size="13" text-anchor="middle">JPN</text>
+  <rect class="tile-b" x="58" y="126" width="44" height="40" rx="5"/>
+  <text class="mono" x="80" y="151" font-size="13" text-anchor="middle">BRA</text>
+  <rect class="tile-v" x="208" y="126" width="44" height="40" rx="5"/>
+  <text class="mono" x="230" y="151" font-size="13" text-anchor="middle">IND</text>
+  <rect class="tile-v" x="258" y="126" width="44" height="40" rx="5"/>
+  <text class="mono" x="280" y="151" font-size="13" text-anchor="middle">SGP</text>
+  <rect class="tile-v" x="308" y="172" width="44" height="40" rx="5"/>
+  <text class="mono" x="330" y="197" font-size="13" text-anchor="middle">AUS</text>
+
+  <!-- United States: the federal layer is the USA tile; states and one city below -->
+  <path class="stroke-arrow" d="M30 120 V228" stroke-dasharray="3 3"/>
+  <rect x="2" y="228" width="356" height="128" rx="10" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3"/>
+  <text class="mono" x="16" y="248" font-size="13">United States: states and a city</text>
+  <rect class="tile-t" x="8" y="258" width="44" height="40" rx="5"/>
+  <text class="mono" x="30" y="283" font-size="13" text-anchor="middle">CA</text>
+  <rect class="tile-t" x="58" y="258" width="44" height="40" rx="5"/>
+  <text class="mono" x="80" y="283" font-size="13" text-anchor="middle">UT</text>
+  <rect class="tile-t" x="108" y="258" width="44" height="40" rx="5"/>
+  <text class="mono" x="130" y="283" font-size="13" text-anchor="middle">CO</text>
+  <rect class="tile-t" x="208" y="258" width="44" height="40" rx="5"/>
+  <text class="mono" x="230" y="283" font-size="13" text-anchor="middle">IL</text>
+  <rect class="tile-t" x="258" y="258" width="44" height="40" rx="5"/>
+  <text class="mono" x="280" y="283" font-size="13" text-anchor="middle">NY</text>
+  <rect class="tile-t" x="308" y="258" width="44" height="40" rx="5"/>
+  <text class="mono" x="330" y="283" font-size="13" text-anchor="middle">NYC</text>
+  <rect class="tile-t" x="108" y="304" width="44" height="40" rx="5"/>
+  <text class="mono" x="130" y="329" font-size="13" text-anchor="middle">TX</text>
+
+  <!-- Legend: status as an ink ramp and an outline style -->
+  <rect class="tile-h" x="16" y="378" width="22" height="18" rx="3"/>
+  <text x="46" y="392" font-size="13">Binding, horizontal</text>
+  <rect class="tile-t" x="184" y="378" width="22" height="18" rx="3"/>
+  <text x="214" y="392" font-size="13">Binding, targeted</text>
+  <rect class="tile-v" x="16" y="404" width="22" height="18" rx="3"/>
+  <text x="46" y="418" font-size="13">Voluntary</text>
+  <rect class="tile-b" x="184" y="404" width="22" height="18" rx="3"/>
+  <text x="214" y="418" font-size="13">Bill</text>
+
+  <text class="mono muted" x="16" y="446" font-size="13">Source: chapter 21 · As of 2026-09-24</text>
+</svg>
