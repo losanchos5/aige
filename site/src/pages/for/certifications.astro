@@ -1,0 +1,439 @@
+---
+/**
+ * /for/certifications: a neutral overview of the personal certifications that
+ * bear on AI governance work (AIGP, ISO/IEC 42001 Lead Implementer and Lead
+ * Auditor, ISACA AAISM and AAIA): who owns each scheme, what the owner says it
+ * assesses, and how this body of knowledge relates to each. Only facts read on
+ * the scheme owners' own pages, the standards bodies and EUR-Lex on 2026-09-24,
+ * each with a numbered source. No ranking, no recommendation, no study
+ * material. It follows chapter 06's critique of certifications as a proxy for
+ * capability and chapter 07's account of what an organisation's ISO/IEC 42001
+ * certificate proves.
+ */
+import Doc from '../../layouts/Doc.astro';
+import SourceList from '../../components/SourceList.astro';
+import { aigpBok, aigpDomains, aigpIndicators, rangeText } from '../../data/aigp';
+import { gitDate } from '../../lib/reading';
+import type { Source } from '../../lib/sources';
+import '../../styles/resources.css';
+import '../../styles/aigp.css';
+
+const CHECKED = '2026-09-24';
+
+// Numbered sources in the house format; [n] in the text links #src-n.
+const sources: Source[] = [
+  {
+    title: 'AIGP Body of Knowledge and Exam Blueprint, version 2.1',
+    gloss:
+      'Certified AI Governance Professional; four domains with minimum and maximum exam questions; competencies and performance indicators; questions mostly at the remember/understand and apply/analyse levels of Bloom\'s taxonomy; the EU AI Act and the South Korean AI Basic Law named as examples; approved 9 Sep 2025, effective 2 Feb 2026, supersedes 2.0.1',
+    publisher: 'IAPP',
+    date: aigpBok.effective,
+    url: aigpBok.url,
+    verified: 'primary',
+  },
+  {
+    title: 'IAPP candidate handbook: procedures and policies, version 5.3.2',
+    gloss:
+      'CIPP/E, CIPP/US, CIPM and CIPT accredited by ANAB under ISO/IEC 17024:2012, AIGP, CDPO, CIPP/A and CIPP/C not; multiple-choice questions with one or more correct answers, some on a scenario; core exams scored from 100 to 500 with 300 to pass; about 10% to 15% of exam content changed each year, body-of-knowledge changes announced at least 90 days ahead; IAPP membership or a maintenance fee required for a certification in good standing; effective 1 Jun 2026',
+    publisher: 'IAPP',
+    date: '2026-06-01',
+    url: 'https://iapp.org/certify/candidate-handbook/',
+    verified: 'primary',
+  },
+  {
+    title: 'Certification',
+    gloss:
+      'ISO does not perform certification or issue certificates; certification is performed by external certification bodies; accreditation is not compulsory',
+    publisher: 'ISO',
+    date: CHECKED,
+    url: 'https://www.iso.org/certification.html',
+    verified: 'primary',
+  },
+  {
+    title: 'ISO/IEC 17024:2026, Conformity assessment: general requirements for bodies operating certification of persons',
+    gloss: 'edition 3, published 2026-03, replacing ISO/IEC 17024:2012',
+    publisher: 'ISO/IEC',
+    date: '2026-03',
+    url: 'https://www.iso.org/standard/17024',
+    verified: 'primary',
+  },
+  {
+    title: 'ISO/IEC 42006:2025, Requirements for AIMS audit and certification bodies',
+    gloss: 'builds on ISO/IEC 17021-1',
+    publisher: 'ISO/IEC',
+    date: '2025-07',
+    url: 'https://www.iso.org/standard/44546.html',
+    verified: 'primary',
+  },
+  {
+    title: 'ISO/IEC 42001:2023, AI management systems',
+    gloss:
+      'requirements for establishing, implementing, maintaining and continually improving an AIMS',
+    publisher: 'ISO/IEC',
+    date: '2023-12',
+    url: 'https://www.iso.org/standard/81230.html',
+    verified: 'primary',
+  },
+  {
+    title: 'ISO/IEC 42001 Lead Implementer',
+    gloss:
+      'a training course on planning, implementing, managing, monitoring, maintaining and continually improving an AIMS based on ISO/IEC 42001, then an exam, then an application for the "PECB Certified ISO/IEC 42001 Lead Implementer" credential; cited as one example of a scheme, not an endorsement',
+    publisher: 'PECB',
+    date: CHECKED,
+    url: 'https://pecb.com/en/education-and-certification-for-individuals/iso-iec-42001/iso-iec-42001-lead-implementer',
+    verified: 'primary',
+  },
+  {
+    title: 'ISO/IEC 42001 Lead Auditor',
+    gloss:
+      'training course, then an exam, then an application for the "PECB Certified ISO/IEC 42001 Lead Auditor" credential, described as expertise in auditing organisations against ISO/IEC 42001; cited as one example of a scheme, not an endorsement',
+    publisher: 'PECB',
+    date: CHECKED,
+    url: 'https://pecb.com/en/education-and-certification-for-individuals/iso-iec-42001/iso-iec-42001-lead-auditor',
+    verified: 'primary',
+  },
+  {
+    title: 'ISACA Advanced in AI Security Management (AAISM)',
+    gloss:
+      'candidates must hold an active CISM or CISSP; three practice areas: AI governance and program management, AI risk management, AI technologies and controls; computer-based exam at a test centre or remotely proctored',
+    publisher: 'ISACA',
+    date: CHECKED,
+    url: 'https://www.isaca.org/credentialing/aaism',
+    verified: 'primary',
+  },
+  {
+    title: 'Advanced in AI Audit (AAIA)',
+    gloss:
+      'candidates must hold an active CISA or a qualified designation from a published list (including CIA and several national CPA credentials); three domains: AI governance and risk, AI operations, AI auditing tools and techniques',
+    publisher: 'ISACA',
+    date: CHECKED,
+    url: 'https://www.isaca.org/credentialing/aaia',
+    verified: 'primary',
+  },
+  {
+    title: 'Regulation (EU) 2024/1689 (Artificial Intelligence Act), Art. 4, consolidated text as amended by Regulation (EU) 2026/1744',
+    gloss:
+      'providers and deployers take measures to support the AI literacy of their staff and others acting on their behalf; the obligation does not require any specific level of AI literacy of any individual',
+    publisher: 'Publications Office of the EU (EUR-Lex)',
+    date: '2026-07-27',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_4',
+    verified: 'primary',
+  },
+  {
+    title: 'AI Literacy: Questions & Answers',
+    gloss:
+      'no specific or "sufficient" level mandated; no certificate needed; an internal record of trainings will do',
+    publisher: 'European Commission',
+    date: '2026-07-27',
+    url: 'https://digital-strategy.ec.europa.eu/en/faqs/ai-literacy-questions-answers',
+    verified: 'primary',
+  },
+];
+
+const cite = (n: number) => `#src-${n}`;
+
+const headings = [
+  { depth: 2, slug: 'how-to-read-this-page', text: 'How to read this page' },
+  { depth: 2, slug: 'two-kinds-of-certificate', text: 'Two kinds of certificate' },
+  { depth: 2, slug: 'at-a-glance', text: 'At a glance' },
+  { depth: 2, slug: 'aigp', text: 'AIGP (IAPP)' },
+  {
+    depth: 2,
+    slug: 'isoiec-42001-lead-implementer-and-lead-auditor',
+    text: 'ISO/IEC 42001 Lead Implementer and Lead Auditor',
+  },
+  { depth: 2, slug: 'aaism', text: 'AAISM (ISACA)' },
+  { depth: 2, slug: 'aaia', text: 'AAIA (ISACA)' },
+  {
+    depth: 2,
+    slug: 'what-a-certificate-shows',
+    text: 'What a certificate shows, and what it does not',
+  },
+  { depth: 2, slug: 'sources', text: 'Sources' },
+];
+
+const indicatorCount = aigpIndicators().length;
+const competencyCount = aigpDomains.reduce((n, d) => n + d.competencies.length, 0);
+
+const title = 'Certifications, neutrally';
+const summary =
+  'Who owns each AI governance certification, what the owner says it assesses, and how this open body of knowledge relates to it: facts checked on 24 Sep 2026, no ranking.';
+const description =
+  'A neutral overview of AIGP, ISO/IEC 42001 Lead Implementer and Lead Auditor, ISACA AAISM and AAIA, and how this open body of knowledge relates to each.';
+const updated = gitDate('src/pages/for/certifications.astro');
+---
+
+<Doc
+  title={title}
+  summary={summary}
+  description={description}
+  crumbs={[{ label: 'Resources', href: '/resources' }, { label: 'Certifications' }]}
+  headings={headings}
+  updated={updated}
+  sidebar={false}
+  image="/og/resources.png"
+>
+  <h2 id="how-to-read-this-page">How to read this page</h2>
+  <p>
+    Five personal certifications bear on AI governance work. This page says who owns each scheme,
+    what the owner says it assesses, and how this body of knowledge relates to it. Every fact comes
+    from the scheme owner's own material, a standards body or EUR-Lex, read on 24 Sep 2026, and
+    carries a numbered source. The page does not rank the schemes, recommend one, or offer study
+    material. Schemes change (the AIGP blueprint, for one, is reviewed every year<sup
+      ><a class="cite" href={cite(1)}>1</a></sup
+    >), so check the owner's page before you rely on a detail.
+  </p>
+  <p>
+    <strong
+      >AIGP is a registered trademark of the IAPP. AAISM and AAIA are trademarks of ISACA. This site
+      is not affiliated with or endorsed by the IAPP, ISACA, ISO, IEC or any certification body named
+      here.</strong
+    >
+  </p>
+
+  <h2 id="two-kinds-of-certificate">Two kinds of certificate</h2>
+  <p>
+    A <strong>certificate of a person</strong> says that someone passed an assessment set by a
+    scheme owner. A <strong>certificate of a management system</strong> says that a certification
+    body audited an organisation's AI management system (AIMS) against ISO/IEC 42001<sup
+      ><a class="cite" href={cite(6)}>6</a></sup
+    >. The two are easy to confuse, because some personal schemes carry the standard's name.
+  </p>
+  <p>
+    ISO does not perform certification or issue certificates; external certification bodies
+    do<sup><a class="cite" href={cite(3)}>3</a></sup>. Bodies that certify persons can work to ISO/IEC
+    17024, whose 2026 edition replaced the 2012 one<sup><a class="cite" href={cite(4)}>4</a></sup>;
+    bodies that audit and certify an AIMS against ISO/IEC 42001 work to ISO/IEC 42006:2025, which
+    builds on ISO/IEC 17021-1<sup><a class="cite" href={cite(5)}>5</a></sup>. What an organisation's
+    42001 certificate proves, and what it does not, is set out in <a
+      href="/bok/maturity-model#how-this-relates-to-certification-and-other-assessments"
+      >chapter 07</a
+    >: it evidences a management system and confers no presumption of conformity with the EU AI
+    Act.
+  </p>
+
+  <h2 id="at-a-glance">At a glance</h2>
+  <div class="res-tablewrap">
+    <table class="res-table ag-cert-table">
+      <caption class="visually-hidden">
+        Five personal certifications: owner, what the owner says each assesses, and the closest part
+        of this body of knowledge
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Scheme</th>
+          <th scope="col">Owner</th>
+          <th scope="col">What the owner says it assesses</th>
+          <th scope="col">Closest part of this body of knowledge</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-label="Scheme"><a href="#aigp">AIGP</a></td>
+          <td data-label="Owner">IAPP</td>
+          <td data-label="Assesses">
+            Knowledge across four domains: foundations of AI governance; laws, standards and
+            frameworks; governing development; governing deployment and use<sup
+              ><a class="cite" href={cite(1)}>1</a></sup
+            >
+          </td>
+          <td data-label="Closest part">
+            All four parts; indicator by indicator in the <a href="/for/aigp">AIGP coverage map</a>
+          </td>
+        </tr>
+        <tr>
+          <td data-label="Scheme">
+            <a href="#isoiec-42001-lead-implementer-and-lead-auditor"
+              >ISO/IEC 42001 Lead Implementer</a
+            >
+          </td>
+          <td data-label="Owner">The issuing body (for example, PECB)</td>
+          <td data-label="Assesses">
+            Planning, implementing and improving an AIMS based on ISO/IEC 42001, after a course and
+            an exam<sup
+              ><a class="cite" href={cite(7)}>7</a></sup
+            >
+          </td>
+          <td data-label="Closest part">
+            <a href="/bok/governance-program">Chapter 12</a> and the management-system trio in <a
+              href="/bok/principles-and-standards#the-management-system-trio">chapter 22</a
+            >
+          </td>
+        </tr>
+        <tr>
+          <td data-label="Scheme">
+            <a href="#isoiec-42001-lead-implementer-and-lead-auditor">ISO/IEC 42001 Lead Auditor</a
+            >
+          </td>
+          <td data-label="Owner">The issuing body (for example, PECB)</td>
+          <td data-label="Assesses">
+            Auditing organisations against ISO/IEC 42001, after a course and an exam<sup
+              ><a class="cite" href={cite(8)}>8</a></sup
+            >
+          </td>
+          <td data-label="Closest part">
+            <a href="/bok/governance-program#what-internal-audit-tests">What internal audit tests</a
+            > and <a href="/bok/governing-deployment#an-audit-programme-not-an-audit"
+              >an audit programme</a
+            >
+          </td>
+        </tr>
+        <tr>
+          <td data-label="Scheme"><a href="#aaism">AAISM</a></td>
+          <td data-label="Owner">ISACA</td>
+          <td data-label="Assesses">
+            AI security management: governance and program management, risk management, and AI
+            technologies and controls<sup><a class="cite" href={cite(9)}>9</a></sup>
+          </td>
+          <td data-label="Closest part">
+            Layers 03 and 04 of <a href="/bok/the-stack">the stack</a> and <a
+              href="/bok/governing-agents">governing agents</a
+            >
+          </td>
+        </tr>
+        <tr>
+          <td data-label="Scheme"><a href="#aaia">AAIA</a></td>
+          <td data-label="Owner">ISACA</td>
+          <td data-label="Assesses">
+            AI audit: governance and risk, AI operations, and auditing tools and techniques<sup
+              ><a class="cite" href={cite(10)}>10</a></sup
+            >
+          </td>
+          <td data-label="Closest part">
+            Layer 05 of <a href="/bok/the-stack">the stack</a> and <a href="/bok/incidents"
+              >incidents</a
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Mappings are illustrative, not a claim of conformity or of equivalence: reading a chapter does
+    not earn a credential, and a credential does not cover the chapter.
+  </p>
+
+  <h2 id="aigp">AIGP (IAPP)</h2>
+  <p>
+    The IAPP's Certified AI Governance Professional is examined against the AIGP Body of Knowledge
+    and Exam Blueprint. Version {aigpBok.version} was approved on 9 Sep 2025, took effect on 2 Feb
+    2026 and replaced version {aigpBok.supersedes}. It has four domains, each with a minimum and
+    maximum number of exam questions ({
+      aigpDomains.map((d) => `Domain ${d.code}, ${rangeText(d.questions)}`).join('; ')
+    }), and {competencyCount} competencies; by our count it lists {indicatorCount} performance
+    indicators. It says its questions mostly sit at the remember and understand, and apply and
+    analyse, levels of Bloom's taxonomy, and names the EU AI Act and the South Korean AI Basic Law
+    among the AI laws it covers<sup><a class="cite" href={cite(1)}>1</a></sup>.
+  </p>
+  <p>
+    The IAPP's candidate handbook says its exams are multiple choice, with one or more correct
+    answers and some questions set on a scenario; that its core exams are scored from 100 to 500,
+    with 300 to pass; that about 10% to 15% of exam content changes each year, with changes to a
+    body of knowledge announced at least 90 days ahead; and that a certification is in good standing only
+    with IAPP membership or a maintenance fee. It lists CIPP/E, CIPP/US, CIPM and CIPT as accredited
+    by ANAB under ISO/IEC 17024:2012, and says AIGP is not accredited by ANAB<sup
+      ><a class="cite" href={cite(2)}>2</a></sup
+    >.
+  </p>
+  <p>
+    <strong>How this body of knowledge relates.</strong> The two overlap heavily in topic and differ
+    in purpose. The blueprint states what is examined; this book is built around what a governance
+    function runs and the evidence it leaves, so its chapters end in artefacts: a registry entry, a
+    gate, a template, a record. The <a href="/for/aigp">AIGP coverage map</a> lays the blueprint's
+    indicators over the chapters, one by one, and says where the book is only partly there. It is
+    a coverage map of an open body of knowledge, not exam preparation.
+  </p>
+
+  <h2 id="isoiec-42001-lead-implementer-and-lead-auditor">
+    ISO/IEC 42001 Lead Implementer and Lead Auditor
+  </h2>
+  <p>
+    These titles name personal certificates, not the certification of an organisation. Because ISO
+    issues no certificates<sup><a class="cite" href={cite(3)}>3</a></sup>, each scheme belongs to
+    the body that runs it, with its own course, exam and conditions. One example: PECB offers an
+    ISO/IEC 42001 Lead Implementer credential and an ISO/IEC 42001 Lead Auditor credential, each
+    after a training course and an exam, and describes the second as expertise in auditing
+    organisations against ISO/IEC 42001<sup><a class="cite" href={cite(7)}>7</a></sup><sup
+      ><a class="cite" href={cite(8)}>8</a></sup
+    >. It is cited as an example of the category, not an endorsement. Two credentials with the same
+    title can differ, so compare the scheme documents, not the name.
+  </p>
+  <p>
+    <strong>How this body of knowledge relates.</strong> The standard itself is covered in <a
+      href="/bok/principles-and-standards#the-management-system-trio">chapter 22</a
+    > (with 42005 and 42006) and <a href="/bok/regulatory-map#isoiec-42001-42005-and-42006"
+      >chapter 08</a
+    >; the organisation that runs an AIMS, from the committee to management review, in <a
+      href="/bok/governance-program">chapter 12</a
+    >; and what a 42001 audit can and cannot see, in <a
+      href="/bok/maturity-model#how-this-relates-to-certification-and-other-assessments"
+      >chapter 07</a
+    >. For the auditor's side, read <a href="/bok/governance-program#what-internal-audit-tests"
+      >what internal audit tests</a
+    > and <a href="/bok/governing-deployment#an-audit-programme-not-an-audit"
+      >an audit programme, not an audit</a
+    >; the <a href="/patterns/machine-readable-evidence-oscal">Machine-Readable Evidence (OSCAL)</a>
+    pattern is how the evidence reaches an auditor as data.
+  </p>
+
+  <h2 id="aaism">AAISM (ISACA)</h2>
+  <p>
+    ISACA's Advanced in AI Security Management is open to candidates who hold an active CISM or
+    CISSP. ISACA lists three practice areas: AI governance and program management, AI risk
+    management, and AI technologies and controls. The exam is computer-based, at a test centre or
+    remotely proctored<sup><a class="cite" href={cite(9)}>9</a></sup>.
+  </p>
+  <p>
+    <strong>How this body of knowledge relates.</strong> AI security engineering is this
+    discipline's sibling, not the discipline itself (see <a
+      href="/bok/definition#the-disambiguation-cluster">the disambiguation cluster</a
+    >). The overlap sits in Layers 03 and 04 of <a href="/bok/the-stack">the stack</a>, in <a
+      href="/bok/governing-agents">governing agents</a
+    > (identity, tool permissions, runtime guardrails, the kill switch) and in patterns such as the <a
+      href="/patterns/adversarial-red-team-suite">Adversarial Red-Team Suite</a
+    > and the <a href="/patterns/runtime-guardrail">Runtime Guardrail</a>.
+  </p>
+
+  <h2 id="aaia">AAIA (ISACA)</h2>
+  <p>
+    ISACA's Advanced in AI Audit is open to candidates who hold an active CISA or a qualified
+    designation from a published list, which includes CIA and several national CPA credentials.
+    ISACA lists three domains: AI governance and risk, AI operations, and AI auditing tools and
+    techniques<sup><a class="cite" href={cite(10)}>10</a></sup>.
+  </p>
+  <p>
+    <strong>How this body of knowledge relates.</strong> An auditor reads what Layer 05 of <a
+      href="/bok/the-stack">the stack</a
+    > produces: <a href="/patterns/continuous-assurance-telemetry">continuous assurance telemetry</a
+    >, <a href="/patterns/machine-readable-evidence-oscal">machine-readable evidence</a> and the
+    records in <a href="/resources/templates">the templates and schemas</a>. <a
+      href="/bok/governance-program#the-three-lines-applied-to-ai">The three lines applied to AI</a
+    > places internal audit in the programme, and <a
+      href="/bok/incidents#capa-from-incident-to-risk-register-and-eval-suite">CAPA</a
+    > shows how a failure becomes a corrective and preventive action, a regression eval and a risk
+    register change.
+  </p>
+
+  <h2 id="what-a-certificate-shows">What a certificate shows, and what it does not</h2>
+  <p>
+    A personal certificate shows that its holder passed an assessment of knowledge at a point in
+    time, against a blueprint the owner revises. It does not show that an eval gate blocks a build,
+    that the registry is true on any Tuesday, or that evidence is machine-readable. That is the
+    argument of <a href="/bok/the-role#what-employers-get-wrong-in-the-job-description"
+      >chapter 06</a
+    >: descriptions list certifications as if a certificate produced a control. Ask for the
+    workflow first, then the certificate if it helps.
+  </p>
+  <p>
+    No certificate is a legal requirement for AI literacy under the EU AI Act. Article 4 asks
+    providers and deployers to take measures to support the AI literacy of their staff and others
+    acting on their behalf, without requiring any specific level for any individual<sup
+      ><a class="cite" href={cite(11)}>11</a></sup
+    >, and the Commission's questions and answers say no certificate is needed and an internal
+    record of trainings will do<sup><a class="cite" href={cite(12)}>12</a></sup>. How to run that
+    record as code is in <a href="/bok/governance-program#ai-literacy-as-code">chapter 12</a>.
+  </p>
+
+  <h2 id="sources">Sources</h2>
+  <SourceList sources={sources} />
+</Doc>

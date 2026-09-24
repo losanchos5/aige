@@ -1,0 +1,435 @@
+---
+/**
+ * /for/aigp: the AIGP coverage map. It lays the public AIGP Body of Knowledge
+ * and Exam Blueprint v2.1 (IAPP) over this site: for each of the 58
+ * performance indicators, the section that teaches it, the artefact it leads to
+ * and whether it is taught or partly taught (src/data/aigp.ts). A heatmap
+ * generated at build (src/lib/aigp-heatmap.ts) shows the whole map at once; a
+ * study path per domain lets a reader tick sections off, with the ticks kept in
+ * this browser only (public/for/aigp.js, through public/toolkit/lib.js).
+ *
+ * Every link is resolved at build by src/lib/aigp-coverage.ts, which throws on
+ * a heading, term, pattern, template or route that does not exist. There is no
+ * overall score on purpose. The page is a coverage map of an open body of
+ * knowledge, not exam preparation, and carries the trademark notice.
+ */
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import Figure from '../../components/Figure.astro';
+import SourceList from '../../components/SourceList.astro';
+import { site } from '../../data/site';
+import { chaptersOrdered } from '../../data/chapters';
+import { countWord } from '../../data/parts';
+import { toolNotice } from '../../data/toolkit';
+import {
+  aigpBok,
+  aigpAsOf,
+  aigpDomains,
+  aigpNotice,
+  indicatorAnchor,
+  rangeText,
+  statusCriterion,
+  statusLabel,
+  studyPath,
+} from '../../data/aigp';
+import { resolvedAigpMap, resolveAigpLink } from '../../lib/aigp-coverage';
+import { aigpHeatmapSvg } from '../../lib/aigp-heatmap';
+import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
+import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import type { Source } from '../../lib/sources';
+import '../../styles/resources.css';
+import '../../styles/aigp.css';
+
+// Throws, and so fails the build, if any mapped link does not resolve.
+const domains = resolvedAigpMap();
+
+/** The chapters a domain names by number ('03'), failing the build on a typo. */
+const chapterLinks = (numbers: readonly string[]) =>
+  numbers.map((nn) => {
+    const chapter = chaptersOrdered.find((c) => c.id.startsWith(`${nn}-`));
+    if (!chapter) throw new Error(`aigp.ts: no chapter ${nn}`);
+    return chapter;
+  });
+
+// House style for dates in prose: `2 Aug 2026` (STYLEGUIDE.md §2).
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const dateText = (iso: string) => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} ${MONTHS[m - 1]} ${y}`;
+};
+
+const indicatorCount = domains.reduce(
+  (sum, domain) => sum + domain.competencies.reduce((n, c) => n + c.indicators.length, 0),
+  0,
+);
+const competencyCount = domains.reduce((sum, domain) => sum + domain.competencies.length, 0);
+const domainMin = domains.reduce((sum, domain) => sum + domain.questions.min, 0);
+const domainMax = domains.reduce((sum, domain) => sum + domain.questions.max, 0);
+
+// Heatmap: drawn from the same data, at build.
+const heatmapTitle = 'AIGP coverage heatmap';
+const heatmapAlt = `Heatmap of the ${indicatorCount} AIGP performance indicators in ${competencyCount} competencies, each cell marked taught or partly taught on this site.`;
+const heatmap = aigpHeatmapSvg(aigpDomains, {
+  id: 'aigp-coverage',
+  title: heatmapTitle,
+  alt: heatmapAlt,
+  asOf: aigpAsOf,
+  bokVersion: aigpBok.version,
+  bokEffective: aigpBok.effective,
+});
+const heatmapCaption =
+  'One bar per competency, as wide as the midpoint of its exam question range, split into one cell per indicator: filled where this site teaches the indicator, dashed where it is only partly taught. Start from a dashed cell if you want to know where this body of knowledge is thin. Drawn from the coverage map on this page.';
+const heatmapDescription = [
+  `Each bar is as wide as the midpoint of its competency's question range; for example, 4–6 questions gives a bar 5 questions wide ((4 + 6) / 2).`,
+  ...domains.map((domain) => {
+    const parts = domain.competencies.map((competency) => {
+      const partly = competency.indicators.filter((i) => i.status === 'partly-taught');
+      const count = competency.indicators.length;
+      const statusText = partly.length
+        ? `${partly.map((i) => i.id).join(' and ')} partly taught, the rest taught`
+        : 'each taught';
+      return `${competency.code}, ${rangeText(competency.questions)} questions: ${countWord(count)} indicators, ${statusText}`;
+    });
+    return `Domain ${domain.code}, ${domain.title} (${rangeText(domain.questions)} questions): ${parts.join('; ')}.`;
+  }),
+].join(' ');
+
+// Study paths: the first link of each indicator, per domain, repeats merged.
+const paths = aigpDomains.map((domain) => ({
+  code: domain.code,
+  title: domain.title,
+  steps: studyPath(domain).map((step) => ({ ...step, link: resolveAigpLink(step.href) })),
+}));
+
+const sources: Source[] = [
+  {
+    title: 'AIGP Body of Knowledge and Exam Blueprint, version 2.1',
+    gloss:
+      'four domains and 13 competencies with the minimum and maximum number of exam questions for each, and the performance indicators under each competency; approved 9 Sep 2025, effective 2 Feb 2026, supersedes 2.0.1; reviewed every year, with changes announced at least 90 days ahead',
+    publisher: 'IAPP',
+    date: aigpBok.effective,
+    url: aigpBok.url,
+    verified: 'primary',
+  },
+];
+
+const description =
+  'Where an open body of knowledge teaches each of the 58 performance indicators of the public AIGP blueprint v2.1, with a heatmap and a study path per domain.';
+const crumbs: Crumb[] = [
+  { label: 'Resources', href: '/resources' },
+  { label: 'Certifications', href: '/for/certifications' },
+  { label: 'AIGP coverage map' },
+];
+const pageUrl = new URL('/for/aigp', site.url).href;
+const jsonLd = [
+  breadcrumbJsonLd(crumbs),
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    name: 'AIGP coverage map',
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    creator: [...authorRefs],
+    license: site.licenseUrl,
+    dateModified: aigpAsOf,
+    about: {
+      '@type': 'CreativeWork',
+      name: `${aigpBok.name}, version ${aigpBok.version}`,
+      url: aigpBok.url,
+      publisher: { '@type': 'Organization', name: aigpBok.owner },
+    },
+  },
+];
+---
+
+<Base title="AIGP coverage map" description={description} image="/og/path.png" jsonLd={jsonLd}>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="The AIGP blueprint, laid over an open body of knowledge."
+    lede={`Where this site teaches each of the ${indicatorCount} performance indicators of the public AIGP Body of Knowledge v${aigpBok.version}: the section to read first, the artefact it leads to, and whether the indicator is taught or partly taught.`}
+  />
+
+  <div class="container res-page ag-page" data-pagefind-body>
+    <div class="res-section">
+      <Callout kind="note" title="A coverage map, not exam preparation">
+        <p><strong>{aigpNotice}</strong></p>
+        <p>
+          The indicator wording on this page is our own paraphrase; read the blueprint itself for
+          the wording that is examined. Holding any certificate is not the same as running the
+          controls: see <a href="/for/certifications">certifications, neutrally</a>.
+        </p>
+      </Callout>
+    </div>
+
+    <nav class="res-section ag-toc" aria-label="On this page">
+      <p class="ag-toc-title">On this page</p>
+      <ol>
+        <li><a href="#how-to-read">How to read the map</a></li>
+        <li><a href="#heatmap">The heatmap</a></li>
+        <li><a href="#study-paths">Study paths, one per domain</a></li>
+        {
+          domains.map((domain) => (
+            <li>
+              <a href={`#domain-${domain.code.toLowerCase()}`}>
+                Domain {domain.code}: {domain.title}
+              </a>
+            </li>
+          ))
+        }
+        <li><a href="#what-this-map-is-not">What this map is not</a></li>
+        <li><a href="#sources">Sources</a></li>
+      </ol>
+    </nav>
+
+    <section class="res-section" aria-labelledby="how-to-read">
+      <div class="res-section-head">
+        <h2 id="how-to-read">How to read the map</h2>
+      </div>
+      <div class="prose ag-prose">
+        <p>
+          The IAPP publishes the AIGP Body of Knowledge and Exam Blueprint as a public PDF. Version
+          {aigpBok.version} took effect on {dateText(aigpBok.effective)} and replaced version
+          {aigpBok.supersedes}. It sets out {countWord(domains.length)} domains and {competencyCount}
+          competencies, gives each a minimum and maximum number of exam questions, and lists the
+          performance indicators under each competency<sup><a class="cite" href="#src-1">1</a></sup>.
+          The four domain ranges add up to {domainMin} to {domainMax} questions ({
+            domains.map((d) => d.questions.min).join(' + ')
+          } and {domains.map((d) => d.questions.max).join(' + ')}).
+        </p>
+        <p>
+          Each indicator here has a positional id: <code>II.C.5</code> is the fifth indicator of
+          competency II.C, in the blueprint's order. For each one the map gives the section to
+          study first, then the artefact that section leads to (a pattern, a template, a tool, a
+          glossary term or a reference page), and a status on the house criterion:
+        </p>
+        <dl class="ag-criteria">
+          <dt><span class="ag-status ag-status--taught">{statusLabel.taught}</span></dt>
+          <dd>{statusCriterion.taught}</dd>
+          <dt>
+            <span class="ag-status ag-status--partly-taught">{statusLabel['partly-taught']}</span>
+          </dt>
+          <dd>{statusCriterion['partly-taught']}</dd>
+        </dl>
+        <p>
+          There is no overall score, on purpose. Coverage of a blueprint says where to read; it
+          does not say whether anyone can run the controls, which is the argument of <a
+            href="/bok/the-role#what-employers-get-wrong-in-the-job-description"
+            >chapter 06</a
+          > about certifications as a proxy for capability. The map was checked against the site
+          and the blueprint on {dateText(aigpAsOf)}; the blueprint is reviewed every year, so read
+          it as of that date.
+        </p>
+      </div>
+    </section>
+
+    <section class="res-section" aria-labelledby="heatmap">
+      <div class="res-section-head">
+        <h2 id="heatmap">The heatmap</h2>
+        <p>
+          The whole map at a glance, generated from the same data as the tables below. The tables
+          are its text form: every cell of the heatmap is one row there.
+        </p>
+      </div>
+      <Figure
+        title={heatmapTitle}
+        caption={heatmapCaption}
+        description={heatmapDescription}
+        id="aigp-coverage"
+        class="ag-figure"
+      >
+        <Fragment set:html={heatmap} />
+      </Figure>
+    </section>
+
+    <section class="res-section" aria-labelledby="study-paths" data-ag-study>
+      <div class="res-section-head">
+        <h2 id="study-paths">Study paths, one per domain</h2>
+        <p>
+          Each path is the first section of every indicator in the domain, in the blueprint's
+          order, with a section that serves two indicators listed once. Read a section, then open
+          the artefact its row links to below.
+        </p>
+      </div>
+      <p class="ag-notice"><strong>{toolNotice}</strong></p>
+      <p class="ag-note" data-tool-nojs>
+        Without JavaScript each path is a plain reading list. With it, you can tick sections off;
+        the ticks are kept in this browser only, and nothing is sent anywhere.
+      </p>
+      <p class="ag-note" data-tool-js hidden>
+        Tick a section when you have read it. Your ticks are kept in this browser's storage only;
+        nothing is sent anywhere, and clearing your browser data removes them.
+      </p>
+      <p class="ag-note ag-warn" data-ag-nostore hidden>
+        This browser is not keeping storage for this page (a private window, or blocked site data),
+        so your ticks will not survive a reload.
+      </p>
+      <p class="visually-hidden" role="status" aria-live="polite" data-ag-status></p>
+
+      <div class="ag-paths">
+        {
+          paths.map((path) => (
+            <section class="ag-path" aria-labelledby={`path-${path.code}`} data-ag-domain={path.code}>
+              <h3 id={`path-${path.code}`}>
+                Domain {path.code}: {path.title}
+              </h3>
+              <p class="ag-progress" data-tool-js hidden>
+                <span data-ag-progress-text>
+                  0 of {path.steps.length} sections read
+                </span>
+                <progress data-ag-progress max={path.steps.length} value="0" aria-hidden="true" />
+              </p>
+              <ol class="ag-steps">
+                {path.steps.map((step, i) => {
+                  const inputId = `ag-${path.code}-${i + 1}`;
+                  return (
+                    <li class="ag-step" data-ag-step={step.href}>
+                      <span class="ag-check" data-tool-js hidden>
+                        <input
+                          type="checkbox"
+                          id={inputId}
+                          value={step.href}
+                          data-ag-check
+                          aria-describedby={`${inputId}-link`}
+                        />
+                        <label for={inputId} class="visually-hidden">
+                          Mark as read
+                        </label>
+                      </span>
+                      <span class="ag-step-body">
+                        <a href={step.href} id={`${inputId}-link`}>
+                          {step.link.label}
+                        </a>
+                        <span class="ag-serves">
+                          For {step.indicators.map((id, j) => (<>{j > 0 && ', '}<a href={`#${indicatorAnchor(id)}`}>{id}</a></>))}
+                        </span>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
+          ))
+        }
+      </div>
+      <p data-tool-js hidden>
+        <button type="button" class="btn ag-reset" data-ag-reset>Clear my ticks</button>
+      </p>
+    </section>
+
+    {
+      domains.map((domain) => (
+        <section
+          class="res-section ag-domain"
+          aria-labelledby={`domain-${domain.code.toLowerCase()}`}
+        >
+          <div class="res-section-head">
+            <h2 id={`domain-${domain.code.toLowerCase()}`}>
+              Domain {domain.code}: {domain.title}
+            </h2>
+            <p class="prose ag-prose ag-domain-lede">
+              {rangeText(domain.questions)} exam questions in the blueprint<sup><a class="cite" href="#src-1" aria-label="Source 1">1</a></sup>. Mostly taught in chapters {chapterLinks(domain.chapters).map((chapter, i) => (<>{i > 0 && ', '}<a href={`/bok/${chapter.slug}`} title={chapter.title}>{chapter.id.slice(0, 2)}</a></>))}.
+            </p>
+          </div>
+          {domain.competencies.map((competency) => (
+            <div class="ag-competency">
+              <h3 id={`competency-${competency.code.toLowerCase().replace('.', '-')}`}>
+                <span class="ag-code">{competency.code}</span> {competency.title}
+                <span class="ag-range">{rangeText(competency.questions)} questions</span>
+              </h3>
+              <div class="res-tablewrap">
+                <table class="res-table ag-table">
+                  <caption class="visually-hidden">
+                    Indicators of competency {competency.code}, where this site teaches each one,
+                    and its status
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">Indicator</th>
+                      <th scope="col">Where this site teaches it</th>
+                      <th scope="col">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {competency.indicators.map((indicator) => (
+                      <tr id={indicatorAnchor(indicator.id)}>
+                        <td class="ag-ind" data-label="Indicator">
+                          <span class="ag-id">{indicator.id}</span>
+                          <span class="ag-para">{indicator.paraphrase}</span>
+                        </td>
+                        <td class="ag-links" data-label="Taught in">
+                          <ul>
+                            {indicator.links.map((link, i) => (
+                              <li class:list={['ag-link', `ag-link--${link.kind}`]}>
+                                {i === 0 && <span class="ag-first">Study first: </span>}
+                                <a href={link.href}>{link.label}</a>
+                              </li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td class="ag-st" data-label="Status">
+                          <span class:list={['ag-status', `ag-status--${indicator.status}`]}>
+                            {statusLabel[indicator.status]}
+                          </span>
+                          {indicator.note && <p class="ag-gap">{indicator.note}</p>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
+        </section>
+      ))
+    }
+
+    <section class="res-section" aria-labelledby="what-this-map-is-not">
+      <div class="res-section-head">
+        <h2 id="what-this-map-is-not">What this map is not</h2>
+      </div>
+      <div class="prose ag-prose">
+        <ul>
+          <li>
+            <strong>Not exam preparation.</strong> It does not reproduce, predict or rehearse exam
+            questions, and it does not say what the exam weighs within a competency. The blueprint
+            is the only statement of what is examined.
+          </li>
+          <li>
+            <strong>Not affiliated.</strong> AIGP is a registered trademark of the IAPP. This site
+            is not affiliated with or endorsed by the IAPP, and the IAPP has not reviewed this map.
+          </li>
+          <li>
+            <strong>Not a claim of competence.</strong> A reader who has read every section has read
+            every section. The body of knowledge measures work by the evidence a control leaves
+            behind, and so does <a href="/toolkit/maturity-self-check">the maturity self-check</a>.
+          </li>
+          <li>
+            <strong>Not legal advice.</strong> The map points at chapters that cite the law; it
+            does not tell anyone which obligations apply to them. Mappings are illustrative, not a
+            claim of conformity.
+          </li>
+        </ul>
+        <p>
+          Found a wrong anchor, a better section or an indicator we mark taught that you think is
+          not? <a href="/about/methodology#corrections-and-contributions">Corrections are welcome</a>.
+        </p>
+      </div>
+    </section>
+
+    <section class="res-section" aria-labelledby="sources">
+      <div class="res-section-head">
+        <h2 id="sources">Sources</h2>
+      </div>
+      <div class="prose ag-prose">
+        <SourceList sources={sources} />
+      </div>
+    </section>
+  </div>
+
+  <script is:inline type="module" src="/for/aigp.js"></script>
+</Base>
