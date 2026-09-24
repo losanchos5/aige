@@ -46,6 +46,23 @@ import { cases, casesForHarm } from '../data/cases';
 import { clauses, licenceTypes, references as contractReferences } from '../data/contracts';
 import { regimes, roles, rolesChapterPath } from '../data/roles';
 import { layers } from '../data/stack';
+// Block w2-threats (v0.5.0): the threat bridge dataset.
+import {
+  threats,
+  taxonomies as threatTaxonomies,
+  threatSources,
+  threatAnchor,
+  relatedOf as threatRelatedOf,
+  sourcesOf as threatSourcesOf,
+  iso42001Controls,
+  aicmDomains,
+  ssdfTasks,
+  cosaisUseCases,
+  atlasMitigationNames,
+  THREATS_AS_OF,
+} from '../data/threats';
+import { getPatternBySlug, patternPath } from '../data/patterns';
+import { obligationById } from '../data/frameworks';
 import { getGlossary, termId } from './glossary';
 import { sourceText } from './sources';
 import { obligationApiPath } from './obligations';
@@ -980,6 +997,121 @@ export const datasets: readonly Dataset[] = [
           verify: s.bool('True while a detail is still marked "(verify)" in the chapter.'),
         }),
         'The roles.',
+      ),
+    },
+  },
+  // Block w2-threats (v0.5.0): the threat bridge. One record per external
+  // threat id (OWASP LLM 2026, OWASP Agentic 2026, MITRE ATLAS, NIST AI 100-2),
+  // with the patterns that control it, example evals, the obligations its
+  // evidence helps satisfy and the control-framework ids beside it.
+  {
+    name: 'threats',
+    title: 'Threat bridge',
+    description:
+      'External AI threat ids (OWASP LLM 2026, OWASP Agentic 2026, MITRE ATLAS, NIST AI 100-2) mapped to the controlling patterns, example evals, obligation ids, ISO/IEC 42001 Annex A, CSA AICM domains, NIST SP 800-218A tasks and COSAiS use cases.',
+    schemaVersion: 1,
+    page: '/resources/threats',
+    build: () => ({
+      asOf: THREATS_AS_OF,
+      taxonomies: threatTaxonomies.map((t) => ({
+        id: t.id,
+        name: t.name,
+        short: t.short,
+        version: t.version,
+        issuer: t.issuer,
+        url: t.url,
+        scope: t.scope,
+      })),
+      threats: threats.map((row) => ({
+        id: row.id,
+        taxonomy: row.taxonomy,
+        externalId: row.externalId,
+        name: row.name,
+        formerly: row.formerly ?? null,
+        url: row.url,
+        page: abs(`/resources/threats#${threatAnchor(row)}`),
+        summary: row.summary,
+        control: row.control,
+        patterns: row.patterns.map((slug) => {
+          const p = getPatternBySlug(slug);
+          return { slug, title: p?.title ?? slug, url: abs(p ? patternPath(p) : '/patterns') };
+        }),
+        evals: row.evals.map((e) => ({ tool: e.tool, check: e.check, note: e.note })),
+        obligations: row.obligations.map((id) => {
+          const o = obligationById(id);
+          return { id, name: o?.obligation ?? id, url: abs(`/obligations/${id.toLowerCase()}`) };
+        }),
+        iso42001: row.iso42001.map((id) => ({ id, title: iso42001Controls[id] ?? id })),
+        aicmDomains: row.aicm.map((id) => ({ id, title: aicmDomains[id] })),
+        ssdfTasks: row.ssdf.map((id) => ({ id, title: ssdfTasks[id] ?? id })),
+        cosaisUseCases: row.cosais.map((id) => ({ id, title: cosaisUseCases[id] })),
+        atlasMitigations: row.atlasMitigations.map((id) => ({ id, name: atlasMitigationNames[id] ?? id })),
+        related: threatRelatedOf(row).map((r) => r.id),
+        layers: [...row.layers],
+        sources: threatSourcesOf(row).map((n) => {
+          const src = threatSources[n - 1];
+          return { title: src.title, url: src.url, verified: src.verified };
+        }),
+      })),
+    }),
+    properties: {
+      asOf: s.date('Date the catalogue versions and eval names were checked.'),
+      taxonomies: s.arr(
+        s.obj({
+          id: s.enumOf(['owasp-llm', 'owasp-asi', 'mitre-atlas', 'nist-aml'], 'Catalogue id.'),
+          name: s.str('Catalogue name.'),
+          short: s.str('Short label.'),
+          version: s.str('Version the rows are pinned to.'),
+          issuer: s.str('Issuing body.'),
+          url: s.uri('Catalogue home.'),
+          scope: s.str('What the catalogue covers.'),
+        }),
+        'The external threat catalogues.',
+      ),
+      threats: s.arr(
+        s.obj({
+          id: s.str('Stable row id (lower case).'),
+          taxonomy: s.enumOf(['owasp-llm', 'owasp-asi', 'mitre-atlas', 'nist-aml'], 'Catalogue id.'),
+          externalId: s.str('The id as the catalogue prints it.'),
+          name: s.str("The catalogue's name for the threat."),
+          formerly: s.strOrNull('Id in the previous edition (OWASP LLM rows).'),
+          url: s.uri('Public page or canonical source of the id.'),
+          page: s.uri('Card on the threat bridge page.'),
+          summary: s.str('What the threat is, in our words.'),
+          control: s.str('The control that stops it.'),
+          patterns: s.arr(
+            s.obj({ slug: s.str('Pattern slug.'), title: s.str('Pattern title.'), url: s.uri('Pattern page.') }),
+            'Patterns that implement the control.',
+          ),
+          evals: s.arr(
+            s.obj({
+              tool: s.enumOf(['Inspect', 'promptfoo', 'garak', 'custom'], 'Harness, or custom when none ships a named check.'),
+              check: s.str('Named check (task, plugin or probe).'),
+              note: s.str('What it does.'),
+            }),
+            'Example evals.',
+          ),
+          obligations: s.arr(
+            s.obj({ id: s.str('Obligation id.'), name: s.str('Obligation.'), url: s.uri('Obligation page.') }),
+            'Obligations the evidence helps satisfy.',
+          ),
+          iso42001: s.arr(s.obj({ id: s.str('Annex A id.'), title: s.str('Short title.') }), 'ISO/IEC 42001 Annex A controls.'),
+          aicmDomains: s.arr(s.obj({ id: s.str('Domain id.'), title: s.str('Domain title.') }), 'CSA AICM v1.1 domains.'),
+          ssdfTasks: s.arr(s.obj({ id: s.str('Task id.'), title: s.str('What it asks.') }), 'NIST SP 800-218A tasks.'),
+          cosaisUseCases: s.arr(s.obj({ id: s.str('Use case id.'), title: s.str('Label.') }), 'NIST COSAiS proposed use cases.'),
+          atlasMitigations: s.arr(s.obj({ id: s.str('ATLAS mitigation id.'), name: s.str('Name.') }), 'ATLAS mitigations (ATLAS rows).'),
+          related: s.arr(s.str('Row id.'), 'Rows in other catalogues that describe the same threat.'),
+          layers: layerList,
+          sources: s.arr(
+            s.obj({
+              title: s.str('Source title.'),
+              url: s.uri('Source URL.'),
+              verified: s.enumOf(['primary', 'secondary', 'reported'], 'Verification tag.'),
+            }),
+            'Sources the row rests on.',
+          ),
+        }),
+        'The rows.',
       ),
     },
   },

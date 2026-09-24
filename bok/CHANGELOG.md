@@ -263,6 +263,31 @@ a completed, reviewed core (1.0).
   entries of chapters 11 and 15 (gdpr-info.eu) move from `secondary` to the official text. Source
   numbering is unchanged; the matching rows of `sources/SOURCES.md` are updated in place.
 
+### Added
+- The threat bridge (`/resources/threats`, `site/src/data/threats.ts`): 51 threats keyed by the ids
+  their catalogues give them (the ten `LLM01:2026` to `LLM10:2026` entries of the OWASP Top 10 for
+  LLM Applications 2026 with their 2025 ids, `ASI01` to `ASI10` of the OWASP Top 10 for Agentic
+  Applications 2026, 18 MITRE ATLAS techniques from data release v2026.09 with the mitigations ATLAS
+  links to them, and 13 `NISTAML` attack classes of NIST AI 100-2 E2025). Each row names the
+  patterns that control the threat, an example eval (an Inspect task, a promptfoo plugin, a garak
+  probe, or a test to write where none ships one), the obligation ids its evidence helps satisfy,
+  and ISO/IEC 42001 Annex A ids, CSA AICM v1.1 domains, NIST SP 800-218A tasks and NIST COSAiS use
+  cases. Catalogue and layer filters work without JavaScript; the build fails on any broken
+  reference. Published as `/api/v1/threats.json` (with its schema) and `/resources/threats.csv`.
+  Illustrative, not a claim of conformity; versions checked on 2026-09-24.
+
+### Changed
+- Four patterns reach the deployer and operate side (no heading, slug or anchor renamed):
+  [Incident Pipeline](/patterns/incident-pipeline) gains issue versus incident, a severity scale
+  mapped to the `Art. 73` classes, the incident record schema, RCA and CAPA, blameless review,
+  tabletop drills and the `Art. 26(5)` deployer duties; [FRIA-as-Code](/patterns/fria-as-code) is
+  generalised as Impact-Assessment-as-Code (ISO/IEC 42005 AIIA, DPIA and FRIA as views of one fact
+  base, with re-assessment triggers as code) at the same address; the
+  [Adversarial Red-Team Suite](/patterns/adversarial-red-team-suite) gains the step from threat
+  model to test plan; the [Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate)
+  gains an operate step (change and deprecation notices, detection of unannounced change,
+  reassessment by trigger and tier, a tested fallback).
+
 ## [Unreleased] - 2026-09-20
 
 Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the

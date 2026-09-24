@@ -1,0 +1,335 @@
+/* threats.css: the threat bridge (/resources/threats). The filter chips reuse
+   .ob-filter / .ob-chip / .ob-radio and the layer ticks reuse .ticks / .tk
+   from resources.css. Layer colours stay reserved for the five stack layers;
+   catalogue and harness tags are neutral. */
+
+/* ---- The four steps ------------------------------------------------------ */
+.tb-steps {
+  display: grid;
+  gap: var(--s-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: var(--wide, 72rem);
+}
+
+.tb-steps li {
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.tb-step-k {
+  display: block;
+  margin-bottom: var(--s-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* ---- Filters and jump links ---------------------------------------------- */
+.tb-count {
+  font-family: var(--font-mono);
+  font-weight: 400;
+}
+
+.tb-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-4);
+  margin: 0 0 var(--s-5);
+  padding: var(--s-3) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-small);
+}
+
+.tb-jump a {
+  color: var(--ink-2);
+}
+
+/* Catalogue filter: hide the other groups. */
+.tb-index:has(#tb-t-owasp-llm:checked) .tb-group:not([data-tax='owasp-llm']),
+.tb-index:has(#tb-t-owasp-asi:checked) .tb-group:not([data-tax='owasp-asi']),
+.tb-index:has(#tb-t-mitre-atlas:checked) .tb-group:not([data-tax='mitre-atlas']),
+.tb-index:has(#tb-t-nist-aml:checked) .tb-group:not([data-tax='nist-aml']) {
+  display: none;
+}
+
+/* Layer filter: hide rows outside the layer, and groups left with none. */
+.tb-index:has(#tb-l-1:checked) .tb-row:not(.has-l1),
+.tb-index:has(#tb-l-1:checked) .tb-group:not(:has(.has-l1)),
+.tb-index:has(#tb-l-2:checked) .tb-row:not(.has-l2),
+.tb-index:has(#tb-l-2:checked) .tb-group:not(:has(.has-l2)),
+.tb-index:has(#tb-l-3:checked) .tb-row:not(.has-l3),
+.tb-index:has(#tb-l-3:checked) .tb-group:not(:has(.has-l3)),
+.tb-index:has(#tb-l-4:checked) .tb-row:not(.has-l4),
+.tb-index:has(#tb-l-4:checked) .tb-group:not(:has(.has-l4)),
+.tb-index:has(#tb-l-5:checked) .tb-row:not(.has-l5),
+.tb-index:has(#tb-l-5:checked) .tb-group:not(:has(.has-l5)) {
+  display: none;
+}
+
+/* Empty state: the page renders a note only for a catalogue-and-layer pair
+   with no row (#tb-empty-<catalogue>-<layer>, or -all- for every catalogue);
+   the rule for that pair shows it. Rules for pairs that have rows match
+   nothing. */
+.tb-empty {
+  display: none;
+  margin: 0 0 var(--s-5);
+  padding: var(--s-3) var(--s-4);
+  border: 1px dashed var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+.tb-index:has(#tb-t-all:checked):has(#tb-l-1:checked) #tb-empty-all-1,
+.tb-index:has(#tb-t-all:checked):has(#tb-l-2:checked) #tb-empty-all-2,
+.tb-index:has(#tb-t-all:checked):has(#tb-l-3:checked) #tb-empty-all-3,
+.tb-index:has(#tb-t-all:checked):has(#tb-l-4:checked) #tb-empty-all-4,
+.tb-index:has(#tb-t-all:checked):has(#tb-l-5:checked) #tb-empty-all-5,
+.tb-index:has(#tb-t-owasp-llm:checked):has(#tb-l-1:checked) #tb-empty-owasp-llm-1,
+.tb-index:has(#tb-t-owasp-llm:checked):has(#tb-l-2:checked) #tb-empty-owasp-llm-2,
+.tb-index:has(#tb-t-owasp-llm:checked):has(#tb-l-3:checked) #tb-empty-owasp-llm-3,
+.tb-index:has(#tb-t-owasp-llm:checked):has(#tb-l-4:checked) #tb-empty-owasp-llm-4,
+.tb-index:has(#tb-t-owasp-llm:checked):has(#tb-l-5:checked) #tb-empty-owasp-llm-5,
+.tb-index:has(#tb-t-owasp-asi:checked):has(#tb-l-1:checked) #tb-empty-owasp-asi-1,
+.tb-index:has(#tb-t-owasp-asi:checked):has(#tb-l-2:checked) #tb-empty-owasp-asi-2,
+.tb-index:has(#tb-t-owasp-asi:checked):has(#tb-l-3:checked) #tb-empty-owasp-asi-3,
+.tb-index:has(#tb-t-owasp-asi:checked):has(#tb-l-4:checked) #tb-empty-owasp-asi-4,
+.tb-index:has(#tb-t-owasp-asi:checked):has(#tb-l-5:checked) #tb-empty-owasp-asi-5,
+.tb-index:has(#tb-t-mitre-atlas:checked):has(#tb-l-1:checked) #tb-empty-mitre-atlas-1,
+.tb-index:has(#tb-t-mitre-atlas:checked):has(#tb-l-2:checked) #tb-empty-mitre-atlas-2,
+.tb-index:has(#tb-t-mitre-atlas:checked):has(#tb-l-3:checked) #tb-empty-mitre-atlas-3,
+.tb-index:has(#tb-t-mitre-atlas:checked):has(#tb-l-4:checked) #tb-empty-mitre-atlas-4,
+.tb-index:has(#tb-t-mitre-atlas:checked):has(#tb-l-5:checked) #tb-empty-mitre-atlas-5,
+.tb-index:has(#tb-t-nist-aml:checked):has(#tb-l-1:checked) #tb-empty-nist-aml-1,
+.tb-index:has(#tb-t-nist-aml:checked):has(#tb-l-2:checked) #tb-empty-nist-aml-2,
+.tb-index:has(#tb-t-nist-aml:checked):has(#tb-l-3:checked) #tb-empty-nist-aml-3,
+.tb-index:has(#tb-t-nist-aml:checked):has(#tb-l-4:checked) #tb-empty-nist-aml-4,
+.tb-index:has(#tb-t-nist-aml:checked):has(#tb-l-5:checked) #tb-empty-nist-aml-5 {
+  display: block;
+}
+
+/* ---- Catalogue groups ---------------------------------------------------- */
+.tb-group {
+  margin-top: var(--s-6);
+  scroll-margin-top: var(--anchor-offset);
+}
+
+.tb-group-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-2);
+  padding-bottom: var(--s-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.tb-group-head h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  color: var(--ink);
+}
+
+.tb-group-count {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+}
+
+.tb-group-note {
+  margin: var(--s-3) 0 0;
+  max-width: 70ch;
+  color: var(--ink-2);
+}
+
+/* ---- Row cards ----------------------------------------------------------- */
+.tb-rows {
+  list-style: none;
+  margin: var(--s-4) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
+}
+
+.tb-card {
+  height: 100%;
+  padding: var(--s-4) var(--s-5) var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  scroll-margin-top: var(--anchor-offset);
+}
+
+.tb-card:target {
+  border-color: var(--ink-2);
+  background: color-mix(in srgb, var(--l3) 25%, var(--bg));
+}
+
+.tb-card h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  line-height: 1.25;
+  letter-spacing: var(--tracking-display);
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.tb-xid {
+  display: inline-block;
+  margin-right: var(--s-1);
+  font-family: var(--font-mono);
+  font-size: 0.72em;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+  vertical-align: 0.12em;
+}
+
+.tb-meta {
+  margin: var(--s-2) 0 0;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.tb-summary {
+  margin: var(--s-3) 0 0;
+  color: var(--ink);
+  line-height: 1.55;
+}
+
+/* Fact list: a label column and a value column from 560px up, stacked below. */
+.tb-facts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s-1) var(--s-4);
+  margin: var(--s-4) 0 0;
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-small);
+}
+
+@media (min-width: 560px) {
+  .tb-facts {
+    grid-template-columns: minmax(7.5rem, max-content) 1fr;
+  }
+}
+
+.tb-facts dt {
+  padding-top: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.tb-facts dd {
+  margin: 0;
+  padding-top: var(--s-1);
+  color: var(--ink);
+  line-height: 1.5;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 560px) {
+  .tb-facts dd {
+    padding-top: var(--s-2);
+  }
+}
+
+.tb-facts dd > p {
+  margin: 0;
+}
+
+.tb-facts ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tb-facts li + li {
+  margin-top: var(--s-1);
+}
+
+.tb-facts dd > p + .tb-links {
+  margin-top: var(--s-2);
+}
+
+.tb-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-3);
+}
+
+.tb-facts .tb-links li + li {
+  margin-top: 0;
+}
+
+.tb-facts code {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+/* Harness tag: neutral, like .type-tag, so no colour carries meaning. */
+.tb-tool {
+  display: inline-block;
+  padding: 0.15em 0.5em;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--tint-bg);
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.tb-tool--custom {
+  background: transparent;
+  border-style: dashed;
+}
+
+/* ---- Secondary ids, folded -------------------------------------------------- */
+.tb-more {
+  margin-top: var(--s-3);
+  border-top: 1px solid var(--line);
+  padding-top: var(--s-2);
+}
+
+.tb-more > summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+  padding: var(--s-1) 0;
+}
+
+.tb-more > summary:hover {
+  color: var(--ink);
+}
+
+.tb-more .tb-facts {
+  border-top: 0;
+  margin-top: var(--s-1);
+  padding-top: 0;
+}
+
+.tb-sources-wrap {
+  max-width: var(--prose);
+}
