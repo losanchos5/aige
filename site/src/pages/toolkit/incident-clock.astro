@@ -1,0 +1,538 @@
+---
+// /toolkit/incident-clock: from the awareness time, the reader's roles, the
+// system tier and the incident facts, the incident class of chapter 17's scale
+// and one clock per regime of the chapter's table, as calendar dates, with
+// .ics reminders and an incident-record.v1 skeleton. The client module is
+// public/toolkit/incident-clock.js; the chapter's clock table, severity scale
+// and the by-hand method are rendered here, so the page works as a worksheet
+// without JavaScript. The tool never asserts more than the chapter.
+import ToolShell from '../../components/toolkit/ToolShell.astro';
+import ToolTerms from '../../components/toolkit/ToolTerms.astro';
+import ToolSourceList from '../../components/toolkit/ToolSourceList.astro';
+import type { ToolSource } from '../../components/toolkit/ToolSourceList.astro';
+import { toolById, toolNotice } from '../../data/toolkit';
+import {
+  incidentClockData,
+  incidentChapter,
+  incidentAnchors as A,
+  incidentFacts,
+  incidentDeterminations,
+  incidentRoles,
+  incidentConditions,
+  systemTiers,
+  severityScale,
+  regimes,
+  regimesNotComputed,
+  clockCaveat,
+  incidentClockAsOf,
+} from '../../data/tool-incident-clock';
+import { site } from '../../data/site';
+import { chapterAnchorTitles } from '../../lib/tool-anchors';
+import '../../components/toolkit/tool-docs.css';
+
+const tool = toolById('incident-clock');
+// Fails the build if a chapter-17 heading the tool links to is renamed.
+chapterAnchorTitles('bok/17-incidents.md', A);
+const data = incidentClockData(site.url, toolNotice, site.license);
+const ch = (anchor: string) => `${incidentChapter}#${anchor}`;
+const sevName = new Map(severityScale.map((level) => [level.id, `${level.id} ${level.name}`]));
+
+const relations = [
+  ['other', 'Not established yet'],
+  ['direct_cause', 'Direct cause'],
+  ['contributing_factor', 'Contributing factor'],
+  ['failure_to_act', 'Failure to act'],
+  ['overreliance_or_intentional_misuse', 'Over-reliance or intentional misuse'],
+  ['human_error', 'Human error'],
+  ['failure_to_comply_with_legal_frameworks', 'Failure to comply with legal frameworks'],
+] as const;
+
+const sources: ToolSource[] = [
+  {
+    text: '17. Incidents, issues and root causes: "The overlapping clocks" (table as of 2026-09-24), "A severity scale mapped to the clocks", "Deployer duties: inform the provider, suspend use" and "Reading the table", the text this tool computes from. AI Governance Engineering Body of Knowledge. 2026-09-24.',
+    url: `${site.url}${incidentChapter}`,
+    verified: 'primary',
+  },
+  {
+    text: 'Regulation (EU) 2024/1689 (AI Act), consolidated text as amended by Reg. (EU) 2026/1744: Art. 3(49) serious incident, Art. 3(61) widespread infringement, Art. 26(5) deployer duties, Art. 55(1)(c) GPAI serious incidents, Art. 73 reporting of serious incidents (2, 10 and 15 days), Art. 75(1a). Publications Office of the EU (EUR-Lex); Art. 26(5), 55(1)(c) and 73(2) to (4) read on the Commission\'s AI Act Service Desk on 2026-09-24. 2026-07-27.',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_73',
+    verified: 'primary',
+  },
+  {
+    text: 'General-Purpose AI Code of Practice, Safety and Security chapter, Commitment 9 serious incident reporting (timelines of 2, 5, 10 and 15 days; intermediate reports at least every four weeks; final report within 60 days of resolution). European Commission. 2025-07-10.',
+    url: 'https://ec.europa.eu/newsroom/dae/redirection/document/118119',
+    verified: 'primary',
+  },
+  {
+    text: 'Regulation (EU) 2016/679 (GDPR): Art. 33 notification of a personal data breach to the supervisory authority (72 hours where feasible; processor to controller) and Art. 34 communication to the data subject (high risk). Publications Office of the EU (EUR-Lex). 2016-04-27.',
+    url: 'https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng',
+    verified: 'primary',
+  },
+  {
+    text: 'Directive (EU) 2022/2555 (NIS2): Art. 23 reporting obligations (early warning within 24 hours; notification within 72 hours; final report within one month); Art. 4 sector-specific Union acts. Publications Office of the EU (EUR-Lex). 2022-12-14.',
+    url: 'https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng',
+    verified: 'primary',
+  },
+  {
+    text: 'Regulation (EU) 2022/2554 (DORA): Art. 19 reporting of major ICT-related incidents. Publications Office of the EU (EUR-Lex). 2022-12-14.',
+    url: 'https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng',
+    verified: 'primary',
+  },
+  {
+    text: 'Commission Delegated Regulation (EU) 2025/301, RTS on the content and time limits for major ICT-related incident reports under DORA (initial notification within 4 hours of classification and 24 hours of awareness; intermediate within 72 hours; final within one month). Publications Office of the EU (EUR-Lex). 2024-10-23.',
+    url: 'https://eur-lex.europa.eu/eli/reg_del/2025/301/oj/eng',
+    verified: 'primary',
+  },
+  {
+    text: 'Regulation (EU) 2026/1744 (Digital Omnibus on AI), amending Reg. (EU) 2024/1689; in force 27 Jul 2026; Annex III high-risk obligations from 2 Dec 2027. Publications Office of the EU (EUR-Lex). 2026-07-24.',
+    url: 'https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng',
+    verified: 'primary',
+  },
+  {
+    text: 'RFC 5545, Internet Calendaring and Scheduling Core Object Specification (iCalendar) (the reminders file: all-day events with UID and DTSTAMP). IETF. 2009-09.',
+    url: 'https://www.rfc-editor.org/rfc/rfc5545',
+    verified: 'primary',
+  },
+];
+---
+
+<ToolShell
+  tool={tool}
+  heading="Which clocks run, and when they stop."
+  description="Enter the awareness time, your role, the system tier and the facts: the incident class, who reports to whom and each deadline as a date, per chapter 17."
+  lede="One AI incident can start several reporting clocks at once. Enter when you became aware, the roles you hold, the tier of the system and what happened: the tool classifies the event on chapter 17's scale and lays out each clock as a calendar date, with reminders and a record skeleton."
+  image="/og/bok-incidents.png"
+  data={data}
+>
+  <div class="tk-verify" id="ic-verify" role="note">
+    <p>
+      <strong>Verify with counsel or the authority before you rely on any date here.</strong>
+      {clockCaveat}
+    </p>
+    <p>
+      The clocks are the ones chapter 17 states, as of {incidentClockAsOf}; the tool asserts
+      nothing the chapter does not. It does not compute {regimesNotComputed.join(', ')}.
+    </p>
+  </div>
+
+  <form class="tool-form" id="ic-form" data-ic-form novalidate>
+    <div
+      class="tool-errors"
+      id="ic-errors"
+      data-ic-errors
+      tabindex="-1"
+      role="group"
+      aria-labelledby="ic-errors-title"
+      hidden
+    >
+      <h2 id="ic-errors-title">Check these first</h2>
+      <ul></ul>
+    </div>
+
+    <fieldset class="tool-fieldset" id="ic-time" aria-describedby="ic-time-hint">
+      <legend class="tool-legend">When</legend>
+      <p class="tool-hint" id="ic-time-hint">
+        Times are read in this browser's time zone and shown with it; exports carry UTC as well.
+        The clocks count from awareness, except where a regime counts from a later decision.
+      </p>
+      <div class="tk-fields">
+        <div class="tool-field" id="ic-at-field" data-field data-describes="ic-at" data-hint-id="ic-at-hint">
+          <label for="ic-at">Became aware (required)</label>
+          <div class="tk-inline">
+            <input class="tool-input" id="ic-at" name="at" type="datetime-local" required aria-describedby="ic-at-hint" />
+            <button type="button" class="btn btn-secondary" data-ic-now data-tool-js hidden>Now</button>
+          </div>
+          <p class="tool-hint" id="ic-at-hint">
+            When a person responsible decided this is, or may be, a reportable event.
+          </p>
+          <p class="tool-error" id="ic-at-error" hidden></p>
+        </div>
+        <div class="tool-field" id="ic-cl-field" data-field data-describes="ic-cl" data-hint-id="ic-cl-hint">
+          <label for="ic-cl">Causal link established (optional)</label>
+          <input class="tool-input" id="ic-cl" name="cl" type="datetime-local" aria-describedby="ic-cl-hint" />
+          <p class="tool-hint" id="ic-cl-hint">
+            EU AI Act Art. 73 asks for the report immediately once a causal link, or its reasonable
+            likelihood, is established.
+          </p>
+          <p class="tool-error" id="ic-cl-error" hidden></p>
+        </div>
+        <div class="tool-field" id="ic-ct-field" data-field data-describes="ic-ct" data-hint-id="ic-ct-hint">
+          <label for="ic-ct">Classified as major under DORA (optional)</label>
+          <input class="tool-input" id="ic-ct" name="ct" type="datetime-local" aria-describedby="ic-ct-hint" />
+          <p class="tool-hint" id="ic-ct-hint">DORA counts four hours from classification, capped at 24 hours from awareness.</p>
+          <p class="tool-error" id="ic-ct-error" hidden></p>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="ic-roles" data-field data-hint-id="ic-roles-hint" aria-describedby="ic-roles-hint">
+      <legend class="tool-legend">Your roles for this event</legend>
+      <p class="tool-hint" id="ic-roles-hint">Tick every role you hold. One organisation often holds several.</p>
+      <p class="tool-error" id="ic-roles-error" hidden></p>
+      <ul class="tool-options">
+        {
+          incidentRoles.map((role) => (
+            <li class="tool-option">
+              <input type="checkbox" id={`ic-r-${role.id}`} name="r" value={role.id} />
+              <label for={`ic-r-${role.id}`}>
+                <span class="tool-option-text">{role.label}</span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="ic-tier" data-field data-hint-id="ic-tier-hint" aria-describedby="ic-tier-hint">
+      <legend class="tool-legend">The AI system's tier under the EU AI Act</legend>
+      <p class="tool-hint" id="ic-tier-hint">From the registry entry. If it is not classified, say so: the tool plans against the high-risk clocks until it is.</p>
+      <p class="tool-error" id="ic-tier-error" hidden></p>
+      <ul class="tool-options">
+        {
+          systemTiers.map((tier) => (
+            <li class="tool-option">
+              <input type="radio" id={`ic-t-${tier.id}`} name="t" value={tier.id} />
+              <label for={`ic-t-${tier.id}`}>
+                <span class="tool-option-text">{tier.label}</span>
+                {tier.appliesFrom && (
+                  <span class="tool-option-level">regime applies from {tier.appliesFrom}</span>
+                )}
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="tk-group-label">If any of these is true</p>
+      <ul class="tool-options">
+        {
+          incidentConditions.map((condition) => (
+            <li class="tool-option">
+              <input type="checkbox" id={`ic-c-${condition.id}`} name="c" value={condition.id} />
+              <label for={`ic-c-${condition.id}`}>
+                <span class="tool-option-text">{condition.label}</span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="ic-facts" data-field data-hint-id="ic-facts-hint" aria-describedby="ic-facts-hint">
+      <legend class="tool-legend">What happened</legend>
+      <p class="tool-hint" id="ic-facts-hint">
+        Tick every reading that is plausible on what you know now. Classify up: the most severe
+        reading sets the level, and you downgrade with evidence.
+      </p>
+      <p class="tool-error" id="ic-facts-error" hidden></p>
+      <ul class="tool-options">
+        {
+          incidentFacts.map((fact) => (
+            <li class="tool-option">
+              <input type="checkbox" id={`ic-f-${fact.id}`} name="f" value={fact.id} />
+              <label for={`ic-f-${fact.id}`}>
+                <span class="tool-option-level">{sevName.get(fact.severity)}</span>
+                <span class="tool-option-text">{fact.label}</span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="tk-group-label">Decisions already taken</p>
+      <ul class="tool-options">
+        {
+          incidentDeterminations.map((det) => (
+            <li class="tool-option">
+              <input type="checkbox" id={`ic-d-${det.id}`} name="d" value={det.id} />
+              <label for={`ic-d-${det.id}`}>
+                <span class="tool-option-text">{det.label}</span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="ic-record" data-ic-record aria-describedby="ic-record-hint">
+      <legend class="tool-legend">For the record skeleton (optional)</legend>
+      <p class="tool-hint" id="ic-record-hint">
+        Only needed for the JSON incident record, which must name the system, the organisation and
+        at least one evidence link to validate against incident-record.v1.
+      </p>
+      <div class="tk-fields">
+        <div class="tool-field" id="ic-rsy-field" data-field data-describes="ic-rsy">
+          <label for="ic-rsy">AI system (registry id)</label>
+          <input class="tool-input" id="ic-rsy" name="rsy" type="text" maxlength="80" autocomplete="off" />
+          <p class="tool-error" id="ic-rsy-error" hidden></p>
+        </div>
+        <div class="tool-field">
+          <label for="ic-rsv">Version</label>
+          <input class="tool-input" id="ic-rsv" name="rsv" type="text" maxlength="40" autocomplete="off" />
+        </div>
+        <div class="tool-field" id="ic-ror-field" data-field data-describes="ic-ror">
+          <label for="ic-ror">Organisation</label>
+          <input class="tool-input" id="ic-ror" name="ror" type="text" maxlength="120" autocomplete="organization" />
+          <p class="tool-error" id="ic-ror-error" hidden></p>
+        </div>
+        <div class="tool-field">
+          <label for="ic-rid">Record id</label>
+          <input class="tool-input" id="ic-rid" name="rid" type="text" maxlength="80" autocomplete="off" />
+        </div>
+        <div class="tool-field">
+          <label for="ic-row">Owner</label>
+          <input class="tool-input" id="ic-row" name="row" type="text" maxlength="120" autocomplete="off" />
+        </div>
+        <div class="tool-field">
+          <label for="ic-rco">Countries (comma-separated)</label>
+          <input class="tool-input" id="ic-rco" name="rco" type="text" maxlength="200" autocomplete="off" />
+        </div>
+        <div class="tool-field">
+          <label for="ic-rre">The AI system's part in it</label>
+          <select class="tool-select" id="ic-rre" name="rre">
+            {relations.map(([value, label]) => <option value={value}>{label}</option>)}
+          </select>
+        </div>
+      </div>
+      <div class="tool-field" id="ic-rti-field">
+        <label for="ic-rti">Title</label>
+        <input class="tool-input" id="ic-rti" name="rti" type="text" maxlength="160" autocomplete="off" />
+      </div>
+      <div class="tool-field" id="ic-rev-field" data-field data-describes="ic-rev" data-hint-id="ic-rev-hint">
+        <label for="ic-rev">Evidence links (comma-separated URLs)</label>
+        <input class="tool-input" id="ic-rev" name="rev" type="text" maxlength="1000" autocomplete="off" aria-describedby="ic-rev-hint" />
+        <p class="tool-hint" id="ic-rev-hint">Trace, ticket or log links. They stay in this page and in the file you download.</p>
+        <p class="tool-error" id="ic-rev-error" hidden></p>
+      </div>
+      <div class="tool-field">
+        <label for="ic-rds">What happened, in two or three sentences</label>
+        <textarea class="tool-input" id="ic-rds" name="rds" maxlength="2000"></textarea>
+      </div>
+    </fieldset>
+
+    <div class="tool-buttons" data-tool-js data-print-hide hidden>
+      <button type="submit" class="btn btn-primary">Show the clocks</button>
+      <button type="button" class="btn btn-secondary" data-ic-reset>Clear</button>
+    </div>
+  </form>
+
+  <section class="tool-result tool-block" id="ic-result" data-ic-result aria-labelledby="ic-result-title" hidden>
+    <h2 id="ic-result-title" tabindex="-1">Class and clocks</h2>
+    <div class="tk-summary" data-ic-class></div>
+    <p class="tool-hint" data-ic-aware></p>
+
+    <div class="tk-verify">
+      <p><strong>Verify with counsel or the authority.</strong> These are the chapter's outer limits, not legal advice.</p>
+    </div>
+
+    <p data-ic-none hidden>No clock runs on these inputs. Record why, per regime, below.</p>
+    <div class="tool-table-wrap" data-ic-table>
+      <table class="tool-table">
+        <caption>Clocks that run or need a decision, nearest first</caption>
+        <thead>
+          <tr>
+            <th scope="col">Regime</th>
+            <th scope="col">Status</th>
+            <th scope="col">Report</th>
+            <th scope="col">Due</th>
+            <th scope="col">Basis</th>
+            <th scope="col">To whom</th>
+          </tr>
+        </thead>
+        <tbody data-ic-rows></tbody>
+      </table>
+    </div>
+
+    <h3>Who reports, and why</h3>
+    <ul class="tk-list" data-ic-notes></ul>
+
+    <h3>Not applicable or not triggered</h3>
+    <p class="tool-hint">
+      A "not applicable" decision is evidence too: write it down with its rationale and owner.
+    </p>
+    <ul class="tk-list" data-ic-closed></ul>
+
+    <div class="tool-actions" data-print-hide>
+      <button type="button" class="btn btn-secondary" data-action="ics">Download reminders (.ics)</button>
+      <button type="button" class="btn btn-secondary" data-action="json">Download record skeleton (JSON)</button>
+      <button type="button" class="btn btn-secondary" data-action="md">Download summary (Markdown)</button>
+      <button type="button" class="btn btn-secondary" data-action="copy">Copy link</button>
+      <button type="button" class="btn btn-secondary" data-action="print">Print</button>
+    </div>
+    <p class="tool-status" role="status" data-ic-status></p>
+  </section>
+
+  <div class="tool-field tk-import tool-block" data-tool-js data-print-hide hidden>
+    <label for="ic-import">Reopen a record skeleton made by this tool</label>
+    <input class="tool-input" id="ic-import" type="file" accept=".json,application/json" data-ic-import aria-describedby="ic-import-hint" />
+    <p class="tool-hint" id="ic-import-hint">Read in this browser only; the inputs are restored and the clocks recomputed.</p>
+    <p class="tool-error" data-ic-import-error hidden></p>
+  </div>
+
+  <Fragment slot="guide">
+    <h2 id="ic-how">How the tool reads chapter 17</h2>
+    <p>
+      Two decisions, kept apart <a href="#src-1" class="cite">[1]</a>. <strong>Severity</strong> is a
+      judgement about harm on the internal scale; <strong>reportability</strong> is a separate test,
+      run once per regime against that regime's trigger. A moderate incident can still be
+      notifiable, and a severe one can fall outside every regime's scope. The tool sets severity
+      from the most severe reading you tick and runs each regime's test on your roles, the tier and
+      the decisions you have taken.
+    </p>
+
+    <h3 id="ic-scale">The severity scale</h3>
+    <p>The chapter's scale is illustrative; what matters is that each level names a harm test.</p>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>Severity, as <a href={ch(A.severity)}>chapter 17</a> states it</caption>
+        <thead>
+          <tr>
+            <th scope="col">Level</th>
+            <th scope="col">Harm test</th>
+            <th scope="col">Default response</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            severityScale.map((level) => (
+              <tr>
+                <th scope="row">{level.id} {level.name}</th>
+                <td data-label="Harm test">{level.harmTest}</td>
+                <td data-label="Default response">{level.response}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="ic-table">The clocks the tool computes</h3>
+    <p>
+      As of {incidentClockAsOf}, from the chapter's <a href={ch(A.clocks)}>overlapping clocks</a>
+      table <a href="#src-1" class="cite">[1]</a>, with the instruments behind each row
+      <a href="#src-2" class="cite">[2]</a><a href="#src-3" class="cite">[3]</a><a href="#src-4" class="cite">[4]</a><a href="#src-5" class="cite">[5]</a><a href="#src-6" class="cite">[6]</a><a href="#src-7" class="cite">[7]</a>.
+    </p>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>Regime, trigger, first report, follow-up and recipient</caption>
+        <thead>
+          <tr>
+            <th scope="col">Regime</th>
+            <th scope="col">Who reports</th>
+            <th scope="col">Trigger</th>
+            <th scope="col">First report</th>
+            <th scope="col">Follow-up and final</th>
+            <th scope="col">To whom</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            regimes.map((regime) => (
+              <tr>
+                <th scope="row">
+                  {regime.label} <a href={`#src-${regime.source}`} class="cite">[{regime.source}]</a>
+                </th>
+                <td data-label="Who reports">{regime.who}</td>
+                <td data-label="Trigger">{regime.trigger}</td>
+                <td data-label="First report">{regime.first}</td>
+                <td data-label="Follow-up and final">{regime.followUp}</td>
+                <td data-label="To whom">{regime.to}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="ic-reading">What the dates mean</h3>
+    <ul>
+      <li>
+        <strong>The triggers are not the same event.</strong> GDPR, NIS2 and Art. 73 count from
+        awareness; DORA's four hours count from classification as major, capped at 24 hours from
+        awareness; Art. 73 also asks for the report immediately once a causal link, or its
+        reasonable likelihood, is established. The chapter's advice is a timestamp per trigger, not
+        one "opened at" (<a href={ch(A.reading)}>reading the table</a>).
+      </li>
+      <li>
+        <strong>Some regimes defer to others.</strong> NIS2 steps aside where a sector-specific
+        Union act imposes at least equivalent notification, which is how DORA displaces NIS2 for
+        financial entities; for Annex III systems whose providers are under equivalent Union
+        reporting obligations, and AI in medical devices, Art. 73 reporting is limited to
+        fundamental-rights infringements. Which regimes count as equivalent is a legal call.
+      </li>
+      <li>
+        <strong>The high-risk regime is not in application yet.</strong> After the Digital
+        Omnibus, Art. 73 and the deployer duties apply to Annex III systems from 2 Dec 2027 and to
+        Annex I systems from 2 Aug 2028 <a href="#src-8" class="cite">[8]</a>; the GPAI duties of
+        Art. 55 already apply. For an earlier awareness date the tool marks those clocks "not yet in
+        application" and still shows the dates, for planning and drills.
+      </li>
+      <li>
+        <strong>"Immediately" and "without undue delay" have no number.</strong> The tool dates
+        them to the awareness time. Follow-up dates assume the previous report went on its last
+        permitted day; filing earlier moves them earlier.
+      </li>
+      <li>
+        <strong>Periods are simple sums.</strong> Hours and 24-hour days are added to the
+        awareness time, and a month is the same day and time a calendar month later. No rule on
+        counting periods, weekends or public holidays is applied: that reading is for counsel or
+        the authority.
+      </li>
+    </ul>
+
+    <h3 id="ic-by-hand">By hand, without JavaScript</h3>
+    <ol>
+      <li>Write down the awareness time, and the classification and causal-link times if any.</li>
+      <li>Find the most severe harm test above that the facts plausibly meet: that is the severity.</li>
+      <li>
+        For each row of the clock table, check who reports against your roles and the trigger
+        against the facts. Where both hold, add the row's hours or days to the awareness time.
+      </li>
+      <li>
+        Record each "not applicable" with its rationale and owner, in one incident record from
+        which every report is rendered (<a href={ch(A.oneRecord)}>one record, many reports</a>;
+        the <a href={ch(A.record)}>incident record fields</a>).
+      </li>
+    </ol>
+
+    <h3 id="ic-exports">What you can take away</h3>
+    <ul>
+      <li>
+        <strong>Reminders (.ics).</strong> One all-day event per dated step, on its local date, with
+        the exact time in the title <a href="#src-9" class="cite">[9]</a>.
+      </li>
+      <li>
+        <strong>Record skeleton (JSON).</strong> A record that validates against the
+        <a href="/resources/templates#schema-incident-record">incident-record.v1</a> schema, with one
+        reporting obligation per regime, its rationale and deadline; the tool's inputs travel in
+        <code>extensions</code> so the file can be reopened here.
+      </li>
+      <li><strong>Summary (Markdown)</strong> and the link, which carries the inputs after the #.</li>
+    </ul>
+
+    <h2 id="ic-not">What this is not</h2>
+    <p>
+      Not legal advice, not a reportability decision and not a conformity claim. The chapter also
+      lists {regimesNotComputed.join('; ')}; read them in its <a href={ch(A.clocks)}>table</a>. For
+      the response itself (contain, freeze before you fix, root cause), read the
+      <a href={ch(A.lifecycle)}>response lifecycle</a> and
+      <a href={ch(A.deployer)}>deployer duties</a>, and the
+      <a href="/patterns/incident-pipeline">Incident Pipeline</a> pattern that wires detection to
+      the report.
+    </p>
+
+    <ToolTerms
+      id="ic-terms"
+      terms={[
+        'Serious incident',
+        'AI incident',
+        'AI hazard',
+        'Near miss',
+        'Issue (versus incident)',
+        'Reporting clock',
+        'Personal data breach',
+        'Major ICT-related incident (DORA)',
+      ]}
+    />
+  </Fragment>
+
+  <ToolSourceList slot="sources" sources={sources} />
+</ToolShell>

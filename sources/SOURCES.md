@@ -2586,3 +2586,60 @@ opened: ISO/IEC 42005 clause ids come from the INCITS/AI crosswalk against the D
 | 11 | Clause ids and headings of ISO/IEC DIS 42005 (5.1 to 5.12, 6.2 to 6.8.3) as listed against the NIST AI RMF; ids of the draft, verify against the published standard | Crosswalk ISO/IEC 42005 to NIST AI RMF 1.0 | INCITS/AI, on the NIST Trustworthy and Responsible AI Resource Center | 2025-08-14 | https://airc.nist.gov/documents/2/ai-2025-00108_ISO_IEC_42005_to_NIST_AI_RMF_Crosswalk.pdf | secondary | Impact assessment (AIIA clause list, verify) |
 | 12 | MAP 1.1, MAP 3, MEASURE 2.1, 2.5, 2.9, 2.11 and 2.12 | Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Model card checklist |
 | 13 | Model cards as short documents reporting intended use, evaluation across groups and limits | Model Cards for Model Reporting (Mitchell et al.; arXiv 1810.03993) | arXiv | 2018-10-05 | https://arxiv.org/abs/1810.03993 | primary | Model card guide |
+## site/src/pages/toolkit (block w2-builders-b: document-building tools)
+
+Block w2-builders-b, checked 2026-09-24. Four tools on the toolkit contract. Each restates its
+chapter and adds no external claim beyond the rows below; the `#` column matches each page's `[n]`
+markers. The chapters' own sources stay in their sections above. Mappings are illustrative, not a
+claim of conformity; the outputs are indicative, not legal advice.
+
+### site/src/pages/toolkit/vendor-due-diligence.astro (/toolkit/vendor-due-diligence)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | gate procured and API-only AI on a structured assessment; record what can and cannot be verified; re-open on renewal or material change | Vendor / Model Due-Diligence Gate (pattern) | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/patterns/vendor-model-due-diligence-gate | primary | Vendor DD (request, tiering) |
+| 2 | build, buy or adapt; vendor contracts and licence terms; monitoring third parties while you run | 15. Governing deployment | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/bok/governing-deployment#vendor-contracts-and-licence-terms | primary | Vendor DD (guide, questions) |
+| 3 | contract clause checklist (red flag, fallback, evidence) and open-weight licence families | Contracts and licences | AI Governance Engineer | 2026-09-24 | https://aigovernanceengineer.com/resources/contracts | primary | Vendor DD (clause checklist) |
+| 4 | crosswalk topics and the CSA AICM control ids each topic maps to | Topic crosswalk v2 | AI Governance Engineer | 2026-09-24 | https://aigovernanceengineer.com/resources/crosswalk | primary | Vendor DD (cross-references) |
+| 5 | CSA AICM control ids and short titles, cited only as the crosswalk carries them | AI Controls Matrix (AICM) v1.1 | Cloud Security Alliance | 2026-06-22 | https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1 | secondary | Vendor DD (cross-references) |
+| 6 | the response record shape (supplier answers, buyer assessment, reassessment date) | Vendor due-diligence response, JSON Schema v1 | AI Governance Engineer templates and schemas library | 2026-09-24 | https://aigovernanceengineer.com/schemas/vendor-due-diligence-response.v1.json | primary | Vendor DD (JSON export) |
+
+### site/src/pages/toolkit/incident-clock.astro (/toolkit/incident-clock)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | the clock table, severity scale, deployer duties and reading notes the tool computes from, as of 2026-09-24 | 17. Incidents, issues and root causes | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/bok/incidents | primary | Incident clock (all clocks) |
+| 2 | Art. 3(49) serious incident; Art. 3(61) widespread infringement; Art. 26(5); Art. 55(1)(c); Art. 73 (2, 10 and 15 days); Art. 75(1a) | Reg. (EU) 2024/1689 (AI Act), consolidated text as amended by Reg. (EU) 2026/1744 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_73 | primary | Incident clock (AI Act clocks) |
+| 3 | Commitment 9: 2, 5, 10 and 15 days; intermediate reports at least every four weeks; final report within 60 days of resolution | General-Purpose AI Code of Practice, Safety and Security chapter | European Commission | 2025-07-10 | https://ec.europa.eu/newsroom/dae/redirection/document/118119 | primary | Incident clock (GPAI clock) |
+| 4 | Art. 33 (72 hours where feasible; processor to controller) and Art. 34 (high risk, data subjects) | Reg. (EU) 2016/679 (GDPR) | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary | Incident clock (GDPR clocks) |
+| 5 | Art. 23: early warning 24 hours, notification 72 hours, final report one month; Art. 4 sector-specific acts | Directive (EU) 2022/2555 (NIS2) | Publications Office of the EU (EUR-Lex) | 2022-12-14 | https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng | primary | Incident clock (NIS2 clock) |
+| 6 | Art. 19 reporting of major ICT-related incidents | Reg. (EU) 2022/2554 (DORA) | Publications Office of the EU (EUR-Lex) | 2022-12-14 | https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng | primary | Incident clock (DORA clock) |
+| 7 | initial notification within 4 hours of classification and 24 hours of awareness; intermediate within 72 hours; final within one month | Commission Delegated Reg. (EU) 2025/301 (RTS under DORA) | Publications Office of the EU (EUR-Lex) | 2024-10-23 | https://eur-lex.europa.eu/eli/reg_del/2025/301/oj/eng | primary | Incident clock (DORA clock) |
+| 8 | in force 27 Jul 2026; Annex III high-risk obligations from 2 Dec 2027; Annex I from 2 Aug 2028 | Reg. (EU) 2026/1744 (Digital Omnibus on AI) | Publications Office of the EU (EUR-Lex) | 2026-07-24 | https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng | primary | Incident clock (tier dates) |
+| 9 | all-day events with UID and DTSTAMP for the reminders file | RFC 5545, iCalendar | IETF (RFC Editor) | 2009-09 | https://www.rfc-editor.org/rfc/rfc5545 | primary | Incident clock (.ics export) |
+
+### site/src/pages/toolkit/agent-control-profile.astro (/toolkit/agent-control-profile)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | minimum controls per autonomy level; registry; identity; tool and MCP permissions; checkpoints; guardrails; kill switch; memory; delegation; agent incident taxonomy; AI Act hooks | 23. Governing AI agents | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/bok/governing-agents | primary | Agent control profile (controls, gaps) |
+| 2 | the pattern behind each control | Patterns | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/patterns | primary | Agent control profile (pattern links) |
+| 3 | five autonomy levels by user role: operator, collaborator, consultant, approver, observer | "Levels of Autonomy for AI Agents" (Feng, McDonald, Zhang), arXiv 2506.12469 | arXiv | 2025-06-14 | https://arxiv.org/abs/2506.12469 | primary | Agent control profile (autonomy levels) |
+| 4 | ASI01 to ASI10; least agency | OWASP Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Agent control profile (threat ids) |
+| 5 | protected-resource metadata; resource parameter; audience validation; no token passthrough; issuer validation; step-up scopes | Model Context Protocol specification 2026-07-28, Authorization | Model Context Protocol | 2026-07-28 | https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization | primary | Agent control profile (MCP controls) |
+| 6 | Art. 12 record-keeping; Art. 14(3)-(4) human oversight; Art. 26(2) and (6); Art. 50(1) | Reg. (EU) 2024/1689 (AI Act), consolidated text | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_14 | primary | Agent control profile (AI Act hooks) |
+| 7 | the register entry shape (identity, owner, scope, expiry, tools, autonomy level, oversight, spend limit, kill switch) | Agent register entry, JSON Schema v1 | AI Governance Engineer templates and schemas library | 2026-09-24 | https://aigovernanceengineer.com/schemas/agent-register-entry.v1.json | primary | Agent control profile (JSON export) |
+
+### site/src/pages/toolkit/fairness-metric-chooser.astro (/toolkit/fairness-metric-chooser)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | choosing a fairness metric by use case; group metrics; impossibility results; subgroup testing; where bias enters; protected characteristics and proxies | 16. Fairness and explainability for practitioners | AI Governance Engineering Body of Knowledge | 2026-09-24 | https://aigovernanceengineer.com/bok/fairness-and-explainability | primary | Fairness chooser (tree, results) |
+| 2 | allocation, quality-of-service and stereotyping harms; disparity as ratios or differences | Fairlearn user guide, "Fairness in machine learning" | Fairlearn project | 2026 | https://fairlearn.org/main/user_guide/fairness_in_machine_learning.html | primary | Fairness chooser (harm types) |
+| 3 | equalised odds and equal opportunity | "Equality of Opportunity in Supervised Learning" (Hardt, Price, Srebro), arXiv 1610.02413 | arXiv | 2016-10-07 | https://arxiv.org/abs/1610.02413 | primary | Fairness chooser (error-rate metrics) |
+| 4 | predictive parity and equal error rates cannot both hold when prevalence differs | "Fair prediction with disparate impact" (Chouldechova), arXiv 1703.00056 | arXiv | 2017-02-28 | https://arxiv.org/abs/1703.00056 | primary | Fairness chooser (impossibility warning) |
+| 5 | calibration within groups and balance for both classes cannot hold together except in constrained cases | "Inherent Trade-Offs in the Fair Determination of Risk Scores" (Kleinberg, Mullainathan, Raghavan), arXiv 1609.05807 | arXiv | 2016-09-19 | https://arxiv.org/abs/1609.05807 | primary | Fairness chooser (impossibility warning) |
+| 6 | adverse impact and the four-fifths rule with its significance and small-numbers caveats | 29 CFR 1607.4(D), Uniform Guidelines on Employee Selection Procedures | eCFR | 2026-09-01 | https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1607/section-1607.4 | primary | Fairness chooser (US employment note) |
+| 7 | independent bias audit within the past year; impact ratios by sex, race/ethnicity and intersectional categories; published summary | Automated Employment Decision Tools FAQ (Local Law 144 of 2021) | NYC Department of Consumer and Worker Protection | 2023-06-29 | https://www.nyc.gov/assets/dca/downloads/pdf/about/DCWP-AEDT-FAQ.pdf | primary | Fairness chooser (NYC note) |
+| 8 | disparate impact burden of proof; no adjusted scores or different cut-offs by protected class | 42 U.S.C. 2000e-2(k) and (l) | Legal Information Institute, Cornell Law School | 2026 | https://www.law.cornell.edu/uscode/text/42/2000e-2 | secondary | Fairness chooser (US employment note) |
+| 9 | Art. 4a special categories for bias detection; Art. 10(2)(f)-(g); Annex III points 4, 5(a), 5(b) | Reg. (EU) 2024/1689 (AI Act), consolidated text as amended by Reg. (EU) 2026/1744 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_10 | primary | Fairness chooser (EU note) |
