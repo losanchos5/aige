@@ -1,0 +1,392 @@
+---
+// /toolkit/impact-assessment: write a FRIA (EU AI Act Art. 27), an AI system
+// impact assessment (ISO/IEC 42005) or an AI addendum to a DPIA (GDPR Art. 35)
+// as one record that validates against impact-assessment.v1.json. Each risk is
+// linked to the measures that address it and each measure to the pattern and
+// controls that implement it; re-open triggers keep the record alive. Exports
+// JSON, YAML and Markdown. The form is built by the client from the specs in
+// src/data/doc-builders.ts; the elements, clause lists and triggers render
+// here, so the page is a worksheet without JavaScript.
+import ToolShell from '../../components/toolkit/ToolShell.astro';
+import { toolById, toolNotice } from '../../data/toolkit';
+import {
+  iaTypes,
+  iaSections,
+  art27Elements,
+  dpiaElements,
+  iso42005Clauses,
+  iso42005Process,
+  reopenTriggers,
+  patternOptions,
+  impactSources,
+  buildersAsOf,
+} from '../../data/doc-builders';
+import { patterns } from '../../data/patterns';
+import { loadPublicSchema } from '../../lib/doc-builders-schemas';
+import { site } from '../../data/site';
+import '../../components/toolkit/builders.css';
+
+const tool = toolById('impact-assessment');
+const schema = loadPublicSchema('impact-assessment.v1.json');
+
+const data = {
+  version: 1,
+  notice: toolNotice,
+  page: new URL(tool.href, site.url).href,
+  asOf: buildersAsOf,
+  schema,
+  types: iaTypes,
+  sections: iaSections,
+  art27Elements,
+  dpiaElements,
+  iso42005Clauses,
+  reopenTriggers,
+  patternTitles: Object.fromEntries(patternOptions.map(([url, title]) => [url, title])),
+};
+
+const cite = (n: number) => `#src-${n}`;
+const typeLabel = new Map(iaTypes.map((t) => [t.id as string, t.label]));
+---
+
+<ToolShell
+  tool={tool}
+  heading="Impact assessments that stay linked to their controls."
+  description="Write a FRIA, an ISO/IEC 42005 AI impact assessment or an AI DPIA addendum as one record: each risk linked to its measure and pattern, with re-open triggers and exports."
+  lede="Pick the instrument, fill the elements it asks for, then the risks and the measures that address them. Every measure names the pattern and the controls that implement it, and the triggers that reopen the assessment are part of the record. Export JSON, YAML or Markdown."
+  data={data}
+  needsJs="the form, the checks, the risk-to-measure matrix and the exports"
+>
+  <div class="bld-app" data-bld="impact">
+    <fieldset class="tool-fieldset bld-kind" data-tool-js hidden>
+      <legend class="tool-legend">Which assessment?</legend>
+      <ul class="tool-options">
+        {
+          iaTypes.map((t, i) => (
+            <li class="tool-option">
+              <input
+                type="radio"
+                id={`ia-type-${t.id}`}
+                name="ia-type"
+                value={t.id}
+                checked={i === 0}
+                data-ia-type
+              />
+              <label for={`ia-type-${t.id}`}>
+                <span class="tool-option-level">{t.basis}</span>
+                <span class="tool-option-text">
+                  <strong>{t.label}.</strong> {t.lede}
+                </span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <div
+      class="tool-errors"
+      id="ia-errors"
+      data-bld-errors
+      tabindex="-1"
+      role="group"
+      aria-labelledby="ia-errors-title"
+      hidden
+    >
+      <h2 id="ia-errors-title">Fix these fields</h2>
+      <ul></ul>
+    </div>
+
+    <form class="tool-form" id="ia-form" data-bld-form-el novalidate data-tool-js hidden>
+      <div class="bld-form" data-bld-form></div>
+      <div class="tool-buttons" data-print-hide>
+        <button type="submit" class="btn btn-primary">Check the record</button>
+        <button type="button" class="btn btn-secondary" data-action="clear">Clear the form</button>
+      </div>
+      <p class="tool-status" role="status" data-bld-status></p>
+    </form>
+
+    <section
+      class="tool-result tool-block"
+      id="ia-result"
+      data-bld-result
+      aria-labelledby="ia-result-title"
+      data-tool-js
+      hidden
+    >
+      <h2 id="ia-result-title" tabindex="-1">Your assessment</h2>
+      <p class="bld-validity" data-bld-validity></p>
+
+      <div class="tool-table-wrap">
+        <table class="tool-table">
+          <caption data-ia-elements-caption>Elements of the instrument</caption>
+          <thead>
+            <tr>
+              <th scope="col">Element</th>
+              <th scope="col">What it asks for</th>
+              <th scope="col">In the record</th>
+            </tr>
+          </thead>
+          <tbody data-ia-elements></tbody>
+        </table>
+      </div>
+
+      <div class="tool-table-wrap">
+        <table class="tool-table">
+          <caption>Risks and the measures that address them</caption>
+          <thead>
+            <tr>
+              <th scope="col">Risk</th>
+              <th scope="col">Right or interest</th>
+              <th scope="col">Score</th>
+              <th scope="col">Measures, with their pattern</th>
+            </tr>
+          </thead>
+          <tbody data-ia-matrix></tbody>
+        </table>
+      </div>
+      <ul class="bld-warn" data-ia-warnings hidden></ul>
+
+      <div>
+        <h3>Re-open triggers</h3>
+        <ul data-ia-triggers></ul>
+      </div>
+
+      <div class="tool-actions" data-print-hide>
+        <button type="button" class="btn btn-secondary" data-action="json">Download JSON</button>
+        <button type="button" class="btn btn-secondary" data-action="yaml">Download YAML</button>
+        <button type="button" class="btn btn-secondary" data-action="md">
+          Download report (Markdown)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="print">Print</button>
+      </div>
+      <p class="tool-status" role="status" data-bld-result-status></p>
+
+      <div class="tool-field bld-import" data-print-hide>
+        <label for="ia-import">Open a saved assessment (JSON)</label>
+        <input
+          class="tool-input"
+          id="ia-import"
+          type="file"
+          accept=".json,application/json"
+          aria-describedby="ia-import-hint"
+          data-bld-import
+        />
+        <p class="tool-hint" id="ia-import-hint">
+          A record exported here, or any record of the impact-assessment schema. Read in this
+          browser; it replaces the form.
+        </p>
+        <p class="tool-error" id="ia-import-error" data-bld-import-error hidden></p>
+      </div>
+    </section>
+  </div>
+
+  <Fragment slot="guide">
+    <h2 id="ia-how">How to use it</h2>
+    <ol>
+      <li>
+        Choose the instrument. The three share one record (the <a
+          href="/schemas/impact-assessment.v1.json"><code>impact-assessment</code> schema</a
+        >): identification, risks, measures, outcome, approvals and triggers are common; the
+        elements differ.
+      </li>
+      <li>
+        Fill the elements. Then list the specific risks, each with an id, and the measures. Tick
+        the risks each measure addresses and pick the pattern that implements it.
+      </li>
+      <li>
+        Choose "Check the record": problems are listed at the top, each linked to its field. The
+        result shows which elements are filled and which risks still have no measure.
+      </li>
+      <li>
+        Export JSON or YAML to keep the record in the repository next to the system, where a change
+        to the system shows up as a change to the assessment; export Markdown for readers.
+      </li>
+    </ol>
+    <p>
+      Your draft stays in this browser (local storage), not in the link, because an assessment
+      holds internal detail. The instrument you picked is kept in the link.
+    </p>
+
+    <h3 id="ia-by-hand">By hand, without JavaScript</h3>
+    <p>
+      Use the <a href="/templates/impact-assessment.md">impact assessment template</a>, which names
+      every field of the record, with the element lists below.
+    </p>
+
+    <h2 id="ia-fria">FRIA: the Art. 27(1) elements</h2>
+    <p>
+      A deployer that must run a FRIA does so before first use and updates it when an element
+      changes (<code>Art. 27(2)</code>), then notifies the market surveillance authority of the
+      results (<code>Art. 27(3)</code>) <a href={cite(1)} class="cite">[1]</a>. Since the Digital
+      Omnibus it may cross-reference or include the relevant DPIA sections, and the duty applies
+      with the Annex III regime from 2 Dec 2027 <a href={cite(2)} class="cite">[2]</a>.
+    </p>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>Art. 27(1), point by point</caption>
+        <thead>
+          <tr>
+            <th scope="col">Point</th>
+            <th scope="col">What the assessment consists of</th>
+            <th scope="col">Record field</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            art27Elements.map((e) => (
+              <tr>
+                <th scope="row" class="num">
+                  {e.point}
+                </th>
+                <td data-label="What it asks for">{e.text}</td>
+                <td data-label="Record field">
+                  {e.paths.map((p, i) => (
+                    <Fragment>
+                      {i > 0 ? ', ' : ''}
+                      <code>{p}</code>
+                    </Fragment>
+                  ))}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="ia-aiia">AIIA: the ISO/IEC 42005 elements</h2>
+    <p>
+      ISO/IEC 42005:2025 gives guidance for assessing an AI system's impacts on individuals, groups
+      and society <a href={cite(4)} class="cite">[4]</a>. The builder keys each documented element
+      by its clause id, with the ids and headings the INCITS/AI crosswalk lists against the draft
+      (DIS) <a href={cite(5)} class="cite">[5]</a>: verify them against the published text. The
+      impacts themselves (6.8) go in the risks and the measures.
+    </p>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>Clause 6: what the assessment documents</caption>
+        <thead>
+          <tr>
+            <th scope="col">Clause</th>
+            <th scope="col">Heading</th>
+            <th scope="col">What to write</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            iso42005Clauses.map((c) => (
+              <tr>
+                <th scope="row" class="num">
+                  {c.clause}
+                </th>
+                <td data-label="Heading">{c.heading}</td>
+                <td data-label="What to write">{c.hint}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>Clause 5: the process, and where the record carries it</caption>
+        <thead>
+          <tr>
+            <th scope="col">Clause</th>
+            <th scope="col">Heading</th>
+            <th scope="col">In the record</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            iso42005Process.map((c) => (
+              <tr>
+                <th scope="row" class="num">
+                  {c.clause}
+                </th>
+                <td data-label="Heading">{c.heading}</td>
+                <td data-label="In the record">{c.where}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="ia-dpia">DPIA addendum: Art. 35(7) and the AI-specific fields</h2>
+    <p>
+      A DPIA contains at least the four points of <code>Art. 35(7)</code>, is carried out with the
+      advice of the data protection officer (<code>Art. 35(2)</code>) and is reviewed at least when
+      the risk of the processing changes (<code>Art. 35(11)</code>); a high residual risk means
+      prior consultation of the authority (<code>Art. 36</code>) <a href={cite(3)} class="cite"
+        >[3]</a
+      >. The addendum adds what a generic template lacks for AI: training versus operational data,
+      solely automated decisions, inferences about people and memorisation
+      <a href={cite(7)} class="cite">[7]</a>.
+    </p>
+    <ul>
+      {
+        dpiaElements.map((e) => (
+          <li>
+            <strong>{e.point}</strong> {e.text}: <code>{e.paths.join(', ')}</code>
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 id="ia-link">Every risk linked to a measure, every measure to a pattern</h2>
+    <p>
+      A risk without a measure is an open finding; a measure without a risk is a control nobody can
+      justify. The builder gives each risk an id (R1, R2 ...), lets each measure tick the risks it
+      addresses, and names the <a href="/patterns">pattern</a> that implements it and the controls
+      or obligation ids it evidences. The result lists any risk still without a measure. The
+      patterns you can pick:
+    </p>
+    <ul>
+      {
+        patterns.map((pattern) => (
+          <li>
+            <a href={`/patterns/${pattern.slug}`}>{pattern.title}</a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 id="ia-triggers">Re-open triggers</h2>
+    <p>
+      An assessment is only as current as the last change it saw. The record lists what reopens
+      it <a href={cite(6)} class="cite">[6]</a>; the <a href="/patterns/fria-as-code"
+        >FRIA-as-Code</a
+      > pattern wires those triggers to the pipeline <a href={cite(8)} class="cite">[8]</a>. The
+      preset triggers, with the instruments they apply to:
+    </p>
+    <ul>
+      {
+        reopenTriggers.map((t) => (
+          <li>
+            {t.text} ({t.for.map((id) => typeLabel.get(id)?.replace(/ \(.*\)$/, '') ?? id).join(', ')})
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 id="ia-not">What this is not</h2>
+    <p>
+      It does not decide whether a FRIA, a DPIA or an AIIA is required for your system, and it
+      does not replace the authority's template for the <code>Art. 27(3)</code> notification. It
+      checks the shape of the record, not the quality of the assessment. The element lists are as
+      of {buildersAsOf}. Illustrative, not a claim of conformity.
+    </p>
+  </Fragment>
+
+  <ol class="sources" slot="sources">
+    {
+      impactSources.map((source, i) => (
+        <li id={`src-${i + 1}`}>
+          <span class="src-num">[{i + 1}]</span> {source.text} <a href={source.url}>{source.url}</a>{' '}
+          <span class="verified">(verified: {source.verified})</span>
+        </li>
+      ))
+    }
+  </ol>
+</ToolShell>

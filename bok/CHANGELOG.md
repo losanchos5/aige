@@ -83,6 +83,30 @@ a completed, reviewed core (1.0).
   assesses, and how this body of knowledge relates to each, from the owners' own pages, ISO and
   EUR-Lex (checked 2026-09-24), in line with chapter 06 on certifications as a proxy for
   capability.
+- **AI register entry builder** (`/toolkit/ai-register-entry`): build AI system and agent register
+  entries that validate against the published schemas, keep a register in the browser, import and
+  export it in bulk as JSON or CSV (RFC 4180, round trip without loss), download a Markdown public
+  summary without the internal fields, and read a field crosswalk (UK ATRS template v4.0, Canada
+  AIA questionnaire, EU database Annex VIII Sections A to C after the Digital Omnibus, model card,
+  ISO/IEC 42001 SoA columns marked "verify"): field names only, so one source record feeds each
+  regime.
+- **Impact assessment builder** (`/toolkit/impact-assessment`): one record for a FRIA (the six
+  elements of `Art. 27(1)`), an AI system impact assessment (elements by ISO/IEC 42005 clause id,
+  ids from the DIS, marked "verify") or an AI addendum to a DPIA (`Art. 35(7)` plus the AI-specific
+  fields); every risk has an id and every measure names the risks it addresses, the pattern that
+  implements it and its controls; a risk-to-measure matrix flags loose ends; re-open triggers are
+  part of the record; JSON, YAML and Markdown exports.
+- **Model card builder** (`/toolkit/model-card`) and a new schema `model-card.v1.json` (with its
+  example and human template): an obligation coverage checklist (`Art. 11` with Annex IV and
+  `Art. 13(3)` for high-risk systems, `Art. 53(1)` for GPAI models, ISO/IEC 42001 Annex A, NIST AI
+  RMF MAP and MEASURE), each item linked to its obligation page; exports to a Hugging Face style
+  card (YAML front matter and the Hub template's headings) and a CycloneDX 1.7 ML-BOM that
+  validates against the official schema.
+- The register entry and impact assessment schemas gain optional fields only (`public_record`;
+  `iso42005_sections`, `risks[].id`, `mitigations[].pattern`, `mitigations[].controls`): every v1
+  record written before still validates. Shared client modules `site/public/toolkit/builders.js`
+  (the schema subset validator, YAML and CSV) and `schema-form.js` (accessible forms from field
+  specs); no new dependency and no change to the content security policy.
 
 ### Changed
 - Chapter 08 and the register: the CSA row that named an "Agentic Control Supplement" now names what

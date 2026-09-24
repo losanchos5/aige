@@ -156,6 +156,38 @@
       },
       "additionalProperties": false
     },
+    "iso42005_sections": {
+      "type": "array",
+      "description": "aiia: the documented elements of the assessment, keyed by ISO/IEC 42005 clause id (for example \"6.3.4\" for intended use). Clause ids as listed in the INCITS/AI crosswalk to the NIST AI RMF; the risks and mitigations below carry the impacts and the measures.",
+      "items": {
+        "type": "object",
+        "description": "One documented element.",
+        "required": [
+          "clause",
+          "text"
+        ],
+        "properties": {
+          "clause": {
+            "type": "string",
+            "pattern": "^[0-9]+(\\.[0-9]+)*$",
+            "description": "Clause id, for example \"6.3.4\"."
+          },
+          "heading": {
+            "type": "string",
+            "description": "The clause's heading."
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What the assessment records under it."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "ISO/IEC 42005"
+      ]
+    },
     "risks": {
       "type": "array",
       "description": "Specific risks of harm to the people and groups affected.",
@@ -169,6 +201,11 @@
           "severity"
         ],
         "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Short id of the risk inside this assessment (for example \"R1\"), so each mitigation can name the risks it addresses."
+          },
           "right_or_interest": {
             "type": "string",
             "description": "The right, freedom or interest at stake (for example \"non-discrimination\", \"privacy\").",
@@ -235,7 +272,20 @@
           },
           "addresses": {
             "type": "array",
-            "description": "Rights or risks it addresses.",
+            "description": "Ids of the risks it addresses (for example \"R1\"); older records may name the rights instead.",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "pattern": {
+            "type": "string",
+            "format": "uri",
+            "description": "The pattern that implements the measure: a page under https://aigovernanceengineer.com/patterns/."
+          },
+          "controls": {
+            "type": "array",
+            "description": "Controls or obligations the measure implements, by id (for example \"ISO/IEC 42001 A.5\" or \"AIGE-OBL-EUAIA-ART27\").",
             "items": {
               "type": "string",
               "minLength": 1

@@ -195,6 +195,38 @@ When the entry was first written. Format: date and time, RFC 3339 (`2026-09-24T1
 
 Answer:
 
+### `public_record`
+
+Optional. What a public register or transparency record asks for that the internal entry does not:
+the responsible organisation, a contact, a plain-language description and the registration details.
+One source record then feeds a UK ATRS record, a Canada AIA, an EU database registration (Annex VIII)
+and a model or system card; the field crosswalk and a builder are at
+https://aigovernanceengineer.com/toolkit/ai-register-entry. Evidences: `EU AI Act Art. 49` ·
+`EU AI Act Art. 71` · `EU AI Act Annex VIII`.
+
+- `organisation`: Organisation responsible for the system (the provider or the deployer), as a
+  public record names it.
+- `address`: The organisation's address and other contact details, where a register asks for them.
+- `contact_email`: Contact address of the team or organisation responsible: a role mailbox, not a
+  person. Format: email.
+- `website_url`: Public page with more information about the system. Format: URL.
+- `one_sentence_description`: The system in one plain-language sentence (at most 300 characters).
+- `description`: Plain-language overview for the public: what the system is and why it is used.
+- `data_and_logic`: Basic, concise description of the information the system uses (data, inputs)
+  and of its operating logic. Evidences: `EU AI Act Annex VIII`.
+- `trade_name`: Trade name and any additional unambiguous reference that identifies and traces the
+  system.
+- `market_status`: Status of the system on the market or in service. One of: `not_yet_placed`,
+  `on_the_market`, `in_service`, `withdrawn`, `recalled`. Evidences: `EU AI Act Annex VIII`.
+- `region`: Primary region or area whose public the system affects.
+- `authorised_representative`: Name and contact details of the authorised representative, where one
+  is required.
+- `certificate`: Type, number and expiry date of any notified-body certificate, with the notified
+  body's name or number.
+- `declaration_of_conformity`: Link to the EU declaration of conformity, where one exists. Format:
+  URL.
+- `instructions_for_use`: Link to the electronic instructions for use. Format: URL.
+
 ### `extensions`
 
 Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the

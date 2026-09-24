@@ -1,0 +1,115 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/model-card.v1.json",
+  "name": "Consumer loan affordability model",
+  "version": "3.2.0",
+  "registry_id": "credit-afford-03",
+  "developer": "Example Retail Bank, retail credit models team",
+  "contact": "credit-models@bank.example.org",
+  "summary": "Scores the affordability of consumer loan applications for a credit analyst.",
+  "description": "A gradient-boosted tree model that estimates the probability that an applicant repays a consumer loan of up to 30k EUR within its first 12 months, with reason codes. The analyst decides every application.",
+  "license": "other",
+  "languages": [
+    "es",
+    "pt"
+  ],
+  "model_type": "gradient-boosted trees",
+  "task": "binary classification",
+  "architecture_family": "tree ensemble",
+  "architecture": "gradient-boosted decision trees, 400 trees, depth 6",
+  "learning_approach": "supervised",
+  "library": "lightgbm",
+  "tags": [
+    "credit",
+    "affordability",
+    "tabular"
+  ],
+  "repository": "https://git.example.org/credit/affordability",
+  "intended_uses": [
+    "Support the credit analyst's affordability decision on consumer loan applications up to 30k EUR in Spain and Portugal"
+  ],
+  "users": [
+    "credit analysts",
+    "credit risk validation"
+  ],
+  "out_of_scope_uses": [
+    "Fully automated approval or decline without an analyst",
+    "Mortgages, business loans or applications above 30k EUR",
+    "Fraud detection"
+  ],
+  "datasets": [
+    {
+      "name": "loan-apps-2019-2025",
+      "role": "training",
+      "url": "https://evidence.example.org/dataset-cards/loan-apps-2019-2025",
+      "description": "412,000 applications with 12-month outcomes, 2019-01 to 2025-03; self-employed applicants under-represented."
+    },
+    {
+      "name": "loan-apps-holdout-2025",
+      "role": "testing",
+      "description": "Out-of-time holdout, 2025-04 to 2025-12."
+    }
+  ],
+  "training_data": "Historical applications from the origination and servicing systems, admitted by dataset admission record dar-2026-031.",
+  "preprocessing": "Income and debt features winsorised at the 1st and 99th percentiles; age not used as a feature.",
+  "training_procedure": "Five-fold cross-validation for hyper-parameters, then a single fit on the full training window.",
+  "inputs": [
+    "application record (JSON, 42 fields)"
+  ],
+  "outputs": [
+    "affordability score 0 to 1 with up to four reason codes"
+  ],
+  "evaluation_data": "Out-of-time holdout with the same product mix as production; age bands and employment types sliced.",
+  "metrics": [
+    {
+      "type": "AUC",
+      "value": "0.81",
+      "lower_bound": "0.80",
+      "upper_bound": "0.82",
+      "dataset": "loan-apps-holdout-2025"
+    },
+    {
+      "type": "approval-rate ratio",
+      "value": "0.86",
+      "slice": "applicants over 60 vs 30 to 45",
+      "dataset": "loan-apps-holdout-2025"
+    }
+  ],
+  "metrics_rationale": "AUC tracks ranking quality for the analyst's queue; the approval-rate ratio is held at 0.80 or above by the fairness eval gate.",
+  "fairness_assessments": [
+    {
+      "group_at_risk": "applicants over 60",
+      "benefits": "Faster decisions on complete applications.",
+      "harms": "Age-correlated features could lower scores.",
+      "mitigation": "Fairness eval gate on age bands; weekly monitoring in the post-market plan."
+    }
+  ],
+  "limitations": [
+    "Less accurate for self-employed applicants with under 24 months of history"
+  ],
+  "ethical_considerations": [
+    {
+      "name": "An applicant cannot understand or contest a decline influenced by the score",
+      "mitigation": "Reason codes in the decline letter and a human review on request."
+    }
+  ],
+  "human_oversight": "The analyst sees the score, the reason codes and the data, and decides; overrides are logged and sampled monthly.",
+  "explainability": "Up to four reason codes per score, from SHAP values mapped to plain-language reasons.",
+  "output_interpretation": "A score below 0.35 flags an affordability concern for the analyst to check; it is not a decision.",
+  "predetermined_changes": "Quarterly retraining on a rolling window within the tested feature set and thresholds.",
+  "compute_and_lifetime": "CPU inference, under 50 ms per score; reviewed at least yearly and retired by 2028-12-31 at the latest.",
+  "logging": "Each score is logged with its inputs hash, model version and reason codes to the decision log, retained six years.",
+  "cybersecurity": "Model artefact signed in the registry; inputs schema-validated; evasion tests on income features in the test report.",
+  "applicability": {
+    "high_risk": true,
+    "gpai": false
+  },
+  "links": {
+    "instructions_for_use": "https://evidence.example.org/ifu/credit-afford-03-3.2.0",
+    "risk_management": "https://evidence.example.org/risk-register/credit-afford-03",
+    "impact_assessment": "https://evidence.example.org/fria/fria-2026-004",
+    "post_market_monitoring": "https://evidence.example.org/pmm/credit-afford-03",
+    "aibom": "https://evidence.example.org/aibom/credit-afford-03/3.2.0.cdx.json"
+  },
+  "change_log": "3.2.0: added the self-employed slice to the test plan; retrained on data to 2025-03.",
+  "last_updated": "2026-09-15"
+}

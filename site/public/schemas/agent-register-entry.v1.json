@@ -401,6 +401,93 @@
       "format": "date-time",
       "description": "When the entry was first written."
     },
+    "public_record": {
+      "type": "object",
+      "description": "Optional. What a public register or transparency record asks for that the internal entry does not: the responsible organisation, a contact, a plain-language description and the registration details. One source record then feeds a UK ATRS record, a Canada AIA, an EU database registration (Annex VIII) and a model or system card; the field crosswalk is on /toolkit/ai-register-entry.",
+      "properties": {
+        "organisation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Organisation responsible for the system (the provider or the deployer), as a public record names it."
+        },
+        "address": {
+          "type": "string",
+          "description": "The organisation's address and other contact details, where a register asks for them."
+        },
+        "contact_email": {
+          "type": "string",
+          "format": "email",
+          "description": "Contact address of the team or organisation responsible: a role mailbox, not a person."
+        },
+        "website_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Public page with more information about the system."
+        },
+        "one_sentence_description": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "The system in one plain-language sentence."
+        },
+        "description": {
+          "type": "string",
+          "description": "Plain-language overview for the public: what the system is and why it is used."
+        },
+        "data_and_logic": {
+          "type": "string",
+          "description": "Basic, concise description of the information the system uses (data, inputs) and of its operating logic.",
+          "x-evidences": [
+            "EU AI Act Annex VIII"
+          ]
+        },
+        "trade_name": {
+          "type": "string",
+          "description": "Trade name and any additional unambiguous reference that identifies and traces the system."
+        },
+        "market_status": {
+          "type": "string",
+          "enum": [
+            "not_yet_placed",
+            "on_the_market",
+            "in_service",
+            "withdrawn",
+            "recalled"
+          ],
+          "description": "Status of the system on the market or in service.",
+          "x-evidences": [
+            "EU AI Act Annex VIII"
+          ]
+        },
+        "region": {
+          "type": "string",
+          "description": "Primary region or area whose public the system affects."
+        },
+        "authorised_representative": {
+          "type": "string",
+          "description": "Name and contact details of the authorised representative, where one is required."
+        },
+        "certificate": {
+          "type": "string",
+          "description": "Type, number and expiry date of any notified-body certificate, with the notified body's name or number."
+        },
+        "declaration_of_conformity": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to the EU declaration of conformity, where one exists."
+        },
+        "instructions_for_use": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to the electronic instructions for use."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 49",
+        "EU AI Act Art. 71",
+        "EU AI Act Annex VIII"
+      ]
+    },
     "extensions": {
       "type": "object",
       "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
