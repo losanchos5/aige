@@ -1,0 +1,9 @@
+{
+  "card": "The acceptable-use card, a Policy Card that maps each approved tool to the data classes and use cases it may receive, with the contract terms it was approved on.",
+  "staff": "Staff reach AI tools through single sign-on; the gateway role is granted only while a current acceptable-use attestation and its training record exist.",
+  "gateway": "The AI gateway classifies each request by data class and allows, redacts or blocks it per the card, with a reason and a route to the right tool.",
+  "tools": "Approved AI tools and model APIs on enterprise terms, such as no training on customer inputs.",
+  "store": "The assurance store receives a signed decision event per call: decision, data class, tool, redactions and a hash of the input, not the input.",
+  "bypass": "An unapproved public tool used from a personal account or device, outside the gateway.",
+  "discovery": "Shadow-AI discovery reads identity, network and expense data for tools outside the gateway and turns each find into an intake request."
+}

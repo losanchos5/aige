@@ -299,6 +299,74 @@ export const diagrams: readonly DiagramDef[] = [
       'The obligations that are live now and the deferred deadlines that follow them, as the chapter states them as of 2026-09-24. Pick the next stage and map its obligations to artefacts in chapter 08. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'why-now', at: 'lead' }],
   },
+  // Block w2-patterns-b (v0.5.0): one diagram per deployment-side pattern, each
+  // placed on its own pattern page.
+  {
+    id: 'decision-notice-contest-path',
+    type: 'sequence',
+    title: 'Decision Notice and Contest Path',
+    caption:
+      'The decision is recorded with its reason codes, the notice is generated from that record, and a contest reaches a reviewer who can change the outcome and logs it. Tie every notice to a decision record before you write the template. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'decision-notice-contest-path', at: 'lead' }],
+  },
+  {
+    id: 'rights-requests-against-models',
+    type: 'workflow',
+    title: 'Rights Requests Against Models',
+    caption:
+      'One request is located through a data map, fanned out to a handler per store, answered in the weights by suppression now and retraining later, and closed with a fulfilment record. Build the data map before the first request arrives. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'rights-requests-against-models', at: 'lead' }],
+  },
+  {
+    id: 'sanctioned-ai-gateway',
+    type: 'architecture',
+    title: 'Sanctioned AI Gateway',
+    caption:
+      'Staff reach approved AI tools through one gateway that applies the acceptable-use card by data class and emits a decision event per call, while discovery finds the tools used around it. Make the gateway the fastest route. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'sanctioned-ai-gateway', at: 'lead' }],
+  },
+  {
+    id: 'staged-rollout-rollback-criteria',
+    type: 'lifecycle',
+    title: 'Staged Rollout with Rollback Criteria',
+    caption:
+      'A change moves from a registered plan through shadow, pilot and canary to general availability, and a tripped criterion rolls it back to the pinned baseline. Register the criteria before the stage starts. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'staged-rollout-rollback-criteria', at: 'lead' }],
+  },
+  {
+    id: 'drift-fairness-monitor',
+    type: 'dataflow',
+    title: 'Drift and Fairness Monitor',
+    caption:
+      'Live traffic, late labels and feedback by group are checked against thresholds; a breach pages an owner or opens an incident, and every check writes an evidence record. Give every signal an owner before you give it a chart. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'drift-fairness-monitor', at: 'lead' }],
+  },
+  {
+    id: 'downstream-use-register',
+    type: 'dataflow',
+    title: 'Downstream Use Register',
+    caption:
+      'Intended and prohibited uses as a Policy Card, a register that grants each consumer access for its approved use, and a monitor for use outside it. Register consumers before they get the outputs. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'downstream-use-register', at: 'lead' }],
+  },
+  {
+    id: 'disclosure-notification-pipeline',
+    type: 'workflow',
+    title: 'Disclosure and Notification Pipeline',
+    caption:
+      'Registry facts and triggers feed a duty matrix, notices are drafted from versioned templates and approved by one owner, and every disclosure and notice sent is recorded. Generate the transparency page from the registry, not by hand. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'disclosure-notification-pipeline', at: 'lead' }],
+  },
+  {
+    id: 'deactivation-localisation-retirement-runbook',
+    type: 'workflow',
+    title: 'Deactivation, Localisation and Retirement Runbook',
+    caption:
+      'A threshold or legal trigger goes to a named owner, evidence is frozen first, then a degraded mode, a regional switch or the full stop, and retirement ends in a recorded runbook. Drill the switches before a trigger fires. Generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', pattern: 'deactivation-localisation-retirement-runbook', at: 'lead' },
+    ],
+  },
 ] as const;
 
 /** Look up a diagram definition by id. */

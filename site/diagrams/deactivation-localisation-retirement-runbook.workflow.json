@@ -1,0 +1,93 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Deactivation, Localisation & Retirement Runbook",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "trigger-and-authority",
+        "label": "Trigger, then authority",
+        "focus": ["threshold", "legal", "decide"],
+        "note": "Threshold and legal triggers go to a named decision owner with a time limit."
+      },
+      {
+        "id": "preserve-then-act",
+        "label": "Preserve, then act",
+        "focus": ["preserve", "degrade", "localise", "off"],
+        "note": "Evidence is frozen first; then a graduated mode, a regional switch or the full stop with a fallback."
+      },
+      {
+        "id": "retire-cleanly",
+        "label": "Retire cleanly",
+        "focus": ["off", "retire", "record"],
+        "note": "Retirement revokes identities, archives evidence, retires the registry entry and confirms no copy runs."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "triggers", "label": "Triggers" },
+    { "id": "decide", "label": "Decision owner" },
+    { "id": "act", "label": "Layer 04 Runtime Controls & Observability" },
+    { "id": "retire", "label": "Layer 02 Inventory & Transparency" },
+    { "id": "evidence", "label": "Evidence" }
+  ],
+  "phases": [
+    { "id": "trigger", "label": "Trigger + decide", "fromCol": 0, "toCol": 1 },
+    { "id": "act", "label": "Preserve + act", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "retire", "label": "Retire + record", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["legal", "decide", "preserve", "off", "retire", "record"],
+  "nodes": [
+    { "id": "threshold", "lane": "triggers", "col": 0, "type": "external", "label": "Threshold trigger", "sublabel": "floor breached", "yOffset": -44, "width": 160 },
+    { "id": "legal", "lane": "triggers", "col": 0, "type": "external", "label": "Legal trigger", "sublabel": "suspend, recall", "yOffset": 44, "width": 160 },
+    { "id": "decide", "lane": "decide", "col": 1, "type": "security", "label": "Named authority", "sublabel": "decides, in time", "width": 158 },
+    { "id": "preserve", "lane": "act", "col": 2, "type": "database", "label": "Preserve evidence", "sublabel": "freeze logs, hold", "width": 162 },
+    { "id": "degrade", "lane": "act", "col": 3, "type": "backend", "label": "Degraded mode", "sublabel": "advice-only, scoped", "yOffset": -88, "width": 162 },
+    { "id": "localise", "lane": "act", "col": 3, "type": "backend", "label": "Regional switch", "sublabel": "one market off", "width": 162 },
+    { "id": "off", "lane": "act", "col": 3, "type": "security", "label": "Off + fallback", "sublabel": "manual process", "yOffset": 88, "width": 162 },
+    { "id": "retire", "lane": "retire", "col": 4, "type": "backend", "label": "Retirement steps", "sublabel": "revoke, archive", "width": 160 },
+    { "id": "record", "lane": "evidence", "col": 5, "type": "database", "label": "Runbook record", "sublabel": "each step, signed", "width": 160 }
+  ],
+  "edges": [
+    { "id": "threshold-decide", "from": "threshold", "to": "decide", "label": "breach", "role": "branch" },
+    { "id": "legal-decide", "from": "legal", "to": "decide", "label": "duty", "variant": "emphasis" },
+    { "id": "decide-preserve", "from": "decide", "to": "preserve", "label": "first", "variant": "emphasis" },
+    { "id": "preserve-degrade", "from": "preserve", "to": "degrade", "role": "branch" },
+    { "id": "preserve-localise", "from": "preserve", "to": "localise", "role": "branch" },
+    { "id": "preserve-off", "from": "preserve", "to": "off", "variant": "security" },
+    { "id": "off-retire", "from": "off", "to": "retire", "label": "retire", "variant": "emphasis" },
+    { "id": "retire-record", "from": "retire", "to": "record", "label": "evidence", "variant": "emphasis" },
+    { "id": "degrade-record", "from": "degrade", "to": "record", "variant": "dashed", "role": "branch" },
+    { "id": "localise-record", "from": "localise", "to": "record", "variant": "dashed", "role": "branch" }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Triggers with an owner",
+      "items": [
+        "Threshold triggers come from the drift and fairness monitor",
+        "Legal triggers: suspend and inform, corrective action, an authority's measure, a new prohibition",
+        "Each trigger names the role that decides and the time allowed"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Short of switching off",
+      "items": [
+        "Evidence is frozen before anything stops",
+        "Advice-only, raised thresholds, grounded-only, scoped off, back to pilot",
+        "Regional flags switch one market off without touching the others"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Retire, do not delete",
+      "items": [
+        "Dependencies, fallback, sunset notices, archive or dispose",
+        "Identities revoked, registry entry retired, discovery confirms no copy runs"
+      ]
+    }
+  ]
+}

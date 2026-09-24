@@ -1,0 +1,10 @@
+{
+  "registered": "The rollout plan, with metrics, thresholds, windows and group breakdowns for each stage, is committed and signed before the first stage starts.",
+  "shadow": "The candidate sees live inputs and its outputs are logged, not used; disagreement with the baseline is measured and the switch back is exercised.",
+  "pilot": "A small group of trained users works with the candidate, proving that oversight works; override and complaint rates are the criteria.",
+  "canary": "A share of production traffic goes to the candidate and is compared with a control group per metric and per group.",
+  "ga": "General availability; the rollback criteria stay live as monitors, and a live breach can still roll the release back.",
+  "hold": "The stage verdict is hold when the evidence is not yet sufficient, for example when a group is too small to measure.",
+  "rollback": "A feature flag or blue-green switch returns traffic to the pinned baseline version without a deploy.",
+  "restored": "The baseline serves again, and the stage verdict and rollback event are written to the assurance store."
+}

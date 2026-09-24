@@ -1,0 +1,7 @@
+{
+  "system": "The deployed system that scores or decides about a person, and writes one decision record per decision at runtime.",
+  "record": "The decision record: system and model version, inputs by reference, outcome, reason codes, legal basis, and later the notice and contest fields.",
+  "notice": "The notice service renders the notice from a versioned template per regime and language and writes the template version and send time back.",
+  "person": "The affected person, who receives the reasons and the way to contest, and may make representations.",
+  "reviewer": "A reviewer who did not take the original decision, with the authority and the information to change the outcome."
+}
