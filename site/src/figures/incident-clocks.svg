@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 504" class="figc" role="img" aria-labelledby="fig-incident-clocks-t fig-incident-clocks-d">
+  <title id="fig-incident-clocks-t">The overlapping incident clocks</title>
+  <desc id="fig-incident-clocks-d">First-report deadlines of eight regimes on one axis from awareness, from DORA at 4 hours after classification to the AI Act and SB 53 at 15 days, all held in one incident record.</desc>
+
+  <text class="mono muted" x="16" y="20" font-size="13.5">From awareness; not to scale</text>
+
+  <!-- Time axis (ordinal); each lane repeats the ticks -->
+  <text class="mono" x="24" y="46" font-size="13" text-anchor="middle">0</text>
+  <text class="mono" x="64" y="46" font-size="13" text-anchor="middle">4h</text>
+  <text class="mono" x="104" y="46" font-size="13" text-anchor="middle">24h</text>
+  <text class="mono" x="144" y="46" font-size="13" text-anchor="middle">2d</text>
+  <text class="mono" x="184" y="46" font-size="13" text-anchor="middle">72h</text>
+  <text class="mono" x="224" y="46" font-size="13" text-anchor="middle">5d</text>
+  <text class="mono" x="264" y="46" font-size="13" text-anchor="middle">10d</text>
+  <text class="mono" x="304" y="46" font-size="13" text-anchor="middle">15d</text>
+
+  <!-- One lane per regime: the first-report deadlines -->
+  <text x="24" y="76" font-size="13">DORA Art. 19 (4h after classification)</text>
+  <path class="rule" d="M24 82 v12 M64 82 v12 M104 82 v12 M144 82 v12 M184 82 v12 M224 82 v12 M264 82 v12 M304 82 v12"/>
+  <line class="axis" x1="24" y1="88" x2="104" y2="88"/>
+  <circle class="glyph-fill" cx="64" cy="88" r="4.5"/>
+  <circle class="glyph-fill" cx="104" cy="88" r="4.5"/>
+  <text x="24" y="114" font-size="13">NIS2 Art. 23</text>
+  <path class="rule" d="M24 120 v12 M64 120 v12 M104 120 v12 M144 120 v12 M184 120 v12 M224 120 v12 M264 120 v12 M304 120 v12"/>
+  <line class="axis" x1="24" y1="126" x2="184" y2="126"/>
+  <circle class="glyph-fill" cx="104" cy="126" r="4.5"/>
+  <circle class="glyph-fill" cx="184" cy="126" r="4.5"/>
+  <text x="24" y="152" font-size="13">Cyber Resilience Act Art. 14</text>
+  <path class="rule" d="M24 158 v12 M64 158 v12 M104 158 v12 M144 158 v12 M184 158 v12 M224 158 v12 M264 158 v12 M304 158 v12"/>
+  <line class="axis" x1="24" y1="164" x2="184" y2="164"/>
+  <circle class="glyph-fill" cx="104" cy="164" r="4.5"/>
+  <circle class="glyph-fill" cx="184" cy="164" r="4.5"/>
+  <text x="24" y="190" font-size="13">California SB 53</text>
+  <path class="rule" d="M24 196 v12 M64 196 v12 M104 196 v12 M144 196 v12 M184 196 v12 M224 196 v12 M264 196 v12 M304 196 v12"/>
+  <line class="axis" x1="24" y1="202" x2="304" y2="202"/>
+  <circle class="glyph-fill" cx="104" cy="202" r="4.5"/>
+  <circle class="glyph-fill" cx="304" cy="202" r="4.5"/>
+  <text x="24" y="228" font-size="13">EU AI Act Art. 73</text>
+  <path class="rule" d="M24 234 v12 M64 234 v12 M104 234 v12 M144 234 v12 M184 234 v12 M224 234 v12 M264 234 v12 M304 234 v12"/>
+  <line class="axis" x1="24" y1="240" x2="304" y2="240"/>
+  <circle class="glyph-fill" cx="144" cy="240" r="4.5"/>
+  <circle class="glyph-fill" cx="264" cy="240" r="4.5"/>
+  <circle class="glyph-fill" cx="304" cy="240" r="4.5"/>
+  <text x="24" y="266" font-size="13">GPAI Code (Art. 55)</text>
+  <path class="rule" d="M24 272 v12 M64 272 v12 M104 272 v12 M144 272 v12 M184 272 v12 M224 272 v12 M264 272 v12 M304 272 v12"/>
+  <line class="axis" x1="24" y1="278" x2="304" y2="278"/>
+  <circle class="glyph-fill" cx="144" cy="278" r="4.5"/>
+  <circle class="glyph-fill" cx="224" cy="278" r="4.5"/>
+  <circle class="glyph-fill" cx="264" cy="278" r="4.5"/>
+  <circle class="glyph-fill" cx="304" cy="278" r="4.5"/>
+  <text x="24" y="304" font-size="13">GDPR Art. 33</text>
+  <path class="rule" d="M24 310 v12 M64 310 v12 M104 310 v12 M144 310 v12 M184 310 v12 M224 310 v12 M264 310 v12 M304 310 v12"/>
+  <line class="axis" x1="24" y1="316" x2="184" y2="316"/>
+  <circle class="glyph-fill" cx="184" cy="316" r="4.5"/>
+  <text x="24" y="342" font-size="13">New York RAISE Act (from 1 Jan 2027)</text>
+  <path class="rule" d="M24 348 v12 M64 348 v12 M104 348 v12 M144 348 v12 M184 348 v12 M224 348 v12 M264 348 v12 M304 348 v12"/>
+  <line class="axis" x1="24" y1="354" x2="184" y2="354"/>
+  <circle class="glyph-fill" cx="184" cy="354" r="4.5"/>
+
+  <!-- The triggers differ -->
+  <text class="ink2" x="16" y="390" font-size="13">Clocks run from awareness, except DORA's 4h</text>
+  <text class="ink2" x="16" y="408" font-size="13">(from classification), RAISE (from a</text>
+  <text class="ink2" x="16" y="426" font-size="13">determination) and SB 53 (from discovery).</text>
+
+  <!-- Evidence: one incident record (document with a check) -->
+  <rect class="panel" x="8" y="440" width="344" height="56" rx="10"/>
+  <path class="glyph" d="M20 452 h12 l5 5 v17 h-17 z"/>
+  <path class="glyph" d="M32 452 v5 h5"/>
+  <path class="glyph-check" d="M23 465 l3 3 l6 -7"/>
+  <text class="disp" x="48" y="462" font-size="14.5">One incident record</text>
+  <text class="ink2" x="48" y="482" font-size="13">A timer per regime; alert on the nearest</text>
+</svg>

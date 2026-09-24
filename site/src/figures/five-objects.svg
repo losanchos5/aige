@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 448" class="figc" role="img" aria-labelledby="fig-five-objects-t fig-five-objects-d">
+  <title id="fig-five-objects-t">The five objects of governance</title>
+  <desc id="fig-five-objects-d">Five nested objects: models inside systems inside agents, with data beside them, all inside the organisation, each with the controls that govern it.</desc>
+
+  <text class="mono muted" x="16" y="20" font-size="13.5">Five nested objects, one discipline</text>
+
+  <!-- The organisation: the outermost object (human role glyph) -->
+  <rect class="panel" x="8" y="32" width="344" height="380" rx="10"/>
+  <circle class="glyph" cx="26" cy="47" r="4"/>
+  <path class="glyph" d="M19 61 a7 6 0 0 1 14 0"/>
+  <text class="disp" x="42" y="58" font-size="15">The organisation</text>
+  <text class="ink2" x="20" y="80" font-size="13.5">Operating model · RACI · incident pipeline</text>
+
+  <!-- Agents: systems that act (agent hexagon) -->
+  <rect class="panel" x="20" y="92" width="320" height="236" rx="8"/>
+  <path class="glyph" d="M29 112 l4.5 -7.8 h9 l4.5 7.8 l-4.5 7.8 h-9 z"/>
+  <text class="disp" x="54" y="117" font-size="15">Agents</text>
+  <text class="ink2" x="328" y="117" font-size="13" text-anchor="end">Hardest and newest</text>
+  <text class="ink2" x="32" y="140" font-size="13.5">Identity · bounded scope · tool mediation</text>
+  <text class="ink2" x="32" y="158" font-size="13.5">Runtime guardrails · kill switches</text>
+
+  <!-- Systems: the application around the model -->
+  <rect class="panel" x="32" y="172" width="296" height="144" rx="8"/>
+  <text class="disp" x="46" y="196" font-size="15">Systems</text>
+  <text class="ink2" x="46" y="218" font-size="13">Prompts, retrieval, tools, orchestration</text>
+  <text class="ink2" x="46" y="236" font-size="13">Most risk is here, not in the raw model</text>
+
+  <!-- Models: the trained artefacts (model hexagon) -->
+  <rect class="panel" x="44" y="250" width="272" height="54" rx="8"/>
+  <path class="glyph" d="M53 268 l4.5 -7.8 h9 l4.5 7.8 l-4.5 7.8 h-9 z"/>
+  <text class="disp" x="78" y="273" font-size="15">Models</text>
+  <text class="ink2" x="58" y="294" font-size="13">Model cards · evals · AIBOM</text>
+
+  <!-- Data: training data, corpora, prompts and outputs (store glyph) -->
+  <rect class="panel" x="20" y="340" width="320" height="60" rx="8"/>
+  <ellipse class="glyph" cx="38" cy="354" rx="9" ry="3.2"/>
+  <path class="glyph" d="M29 354 v14 a9 3.2 0 0 0 18 0 v-14"/>
+  <text class="disp" x="56" y="364" font-size="15">Data</text>
+  <text class="ink2" x="328" y="364" font-size="13" text-anchor="end">Training data to outputs</text>
+  <text class="ink2" x="32" y="390" font-size="13.5">Data cards · DPIAs · lineage</text>
+
+  <text class="ink2" x="16" y="436" font-size="13.5">Govern one and you leave the others open.</text>
+</svg>
