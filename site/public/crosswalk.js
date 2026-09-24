@@ -194,4 +194,107 @@
 
   // On load we deliberately do NOT open the drawer from location.hash: a
   // #topic-<id> link should land on the section natively (matching no-JS).
+
+  // Column chooser (crosswalk v2). The optional columns ship hidden by CSS
+  // (.cw-col-opt); here each column's header and cells take .is-on or .is-off
+  // from the chooser, and the choice is remembered in this browser only
+  // (localStorage, every access guarded: private windows and blocked storage
+  // fall back to the default columns).
+  var chooser = document.querySelector('[data-cw-cols]');
+  if (grid && chooser) {
+    var STORE = 'aige.crosswalk.columns.v2';
+    var picks = chooser.querySelectorAll('input[data-cw-colpick]');
+    var countEl = chooser.querySelector('[data-cw-cols-count]');
+
+    var readStore = function () {
+      try {
+        var raw = window.localStorage.getItem(STORE);
+        var list = raw ? JSON.parse(raw) : null;
+        return Array.isArray(list) ? list : null;
+      } catch (e) {
+        return null;
+      }
+    };
+    var writeStore = function (list) {
+      try {
+        window.localStorage.setItem(STORE, JSON.stringify(list));
+      } catch (e) {
+        /* storage blocked: the choice lasts for this page view only */
+      }
+    };
+
+    var applyColumns = function (list) {
+      var on = {};
+      for (var i = 0; i < list.length; i++) on[list[i]] = true;
+      var cells = grid.querySelectorAll('[data-cw-col]');
+      for (var c = 0; c < cells.length; c++) {
+        // Cell links carry data-cw-col too (for the drawer); only th/td toggle.
+        var tag = cells[c].tagName;
+        if (tag !== 'TH' && tag !== 'TD') continue;
+        var shown = !!on[cells[c].getAttribute('data-cw-col')];
+        cells[c].classList.toggle('is-on', shown);
+        cells[c].classList.toggle('is-off', !shown);
+      }
+      var n = 0;
+      for (var p = 0; p < picks.length; p++) {
+        picks[p].checked = !!on[picks[p].value];
+        if (picks[p].checked) n++;
+      }
+      if (countEl) countEl.textContent = n + ' of ' + picks.length;
+    };
+
+    var chosen = function () {
+      var list = [];
+      for (var i = 0; i < picks.length; i++) if (picks[i].checked) list.push(picks[i].value);
+      return list;
+    };
+    var defaults = function () {
+      var list = [];
+      for (var i = 0; i < picks.length; i++) {
+        if (picks[i].getAttribute('data-default') === 'true') list.push(picks[i].value);
+      }
+      return list;
+    };
+
+    var known = {};
+    for (var k = 0; k < picks.length; k++) known[picks[k].value] = true;
+    var stored = readStore();
+    var initial = stored
+      ? stored.filter(function (id) {
+          return known[id];
+        })
+      : [];
+    applyColumns(initial.length ? initial : defaults());
+    chooser.hidden = false;
+
+    chooser.addEventListener('change', function (e) {
+      var t = e.target;
+      if (!t || !t.hasAttribute || !t.hasAttribute('data-cw-colpick')) return;
+      var list = chosen();
+      // Keep at least one column: unticking the last one is undone.
+      if (!list.length) {
+        t.checked = true;
+        list = chosen();
+      }
+      applyColumns(list);
+      writeStore(list);
+    });
+    var allBtn = chooser.querySelector('[data-cw-cols-all]');
+    if (allBtn) {
+      allBtn.addEventListener('click', function () {
+        var list = [];
+        for (var i = 0; i < picks.length; i++) list.push(picks[i].value);
+        applyColumns(list);
+        writeStore(list);
+      });
+    }
+    var resetBtn = chooser.querySelector('[data-cw-cols-reset]');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        var list = defaults();
+        applyColumns(list);
+        writeStore(list);
+      });
+    }
+  }
 })();

@@ -32,6 +32,12 @@ import {
   refs,
   chipLabel,
   chipPrefix,
+  cnChipPrefix,
+  clauseId,
+  columnOf,
+  crosswalkInstruments,
+  crosswalkAsOf,
+  crosswalkSchemaVersion,
   topicMatrix,
   frameworkById,
 } from '../src/data/crosswalk';
@@ -506,45 +512,79 @@ test.describe('path data', () => {
 // ── The topic crosswalk data (src/data/crosswalk.ts) ───────────────────────
 test.describe('crosswalk data', () => {
   const cnIds = columns.find((column) => column.id === 'cn')!.frameworks;
+  const knownFrameworkIds = new Set([
+    ...frameworks.map((framework) => framework.id),
+    ...crosswalkInstruments.map((framework) => framework.id),
+  ]);
 
-  test('refs reference known topics; topic ids are unique; 40+ refs', () => {
+  // The v0.4 topic ids are anchors (#topic-<id>) used by the map, the path and
+  // published links: v2 may add topics but never rename or drop these.
+  const V04_TOPIC_IDS = [
+    'risk-management',
+    'governance-accountability',
+    'impact-assessment',
+    'data-governance',
+    'documentation-transparency',
+    'inventory-registration',
+    'logging-traceability',
+    'human-oversight',
+    'runtime-guardrails',
+    'robustness-security-evals',
+    'incident-monitoring',
+    'supply-chain',
+  ];
+
+  test('refs reference known topics; topic ids are unique; v0.4 topic ids are kept', () => {
     const topicIds = topics.map((topic) => topic.id);
     expect(new Set(topicIds).size).toBe(topicIds.length);
+    expect(topicIds.slice(0, V04_TOPIC_IDS.length)).toEqual(V04_TOPIC_IDS);
+    expect(topics.length).toBeGreaterThanOrEqual(25);
     const topicIdSet = new Set(topicIds);
     for (const ref of refs) {
       expect(topicIdSet.has(ref.topic), ref.topic).toBe(true);
     }
-    expect(refs.length).toBeGreaterThan(40);
+    expect(refs.length).toBeGreaterThan(400);
   });
 
-  test('every ref.framework is a known framework or a cn column id', () => {
-    const frameworkIds = new Set(frameworks.map((framework) => framework.id));
-    const allowed = new Set([...frameworkIds, ...cnIds]);
+  test('every ref.framework exists in frameworks.ts or the crosswalk instruments', () => {
     for (const ref of refs) {
-      expect(allowed.has(ref.framework), ref.framework).toBe(true);
+      expect(knownFrameworkIds.has(ref.framework), ref.framework).toBe(true);
+      expect(frameworkById(ref.framework), ref.framework).toBeTruthy();
     }
     // The China block lands all cn-* ids together: if one is in frameworks.ts,
     // they all must be.
+    const frameworkIds = new Set(frameworks.map((framework) => framework.id));
     const present = cnIds.filter((id) => frameworkIds.has(id));
     if (present.length > 0) {
       expect(present.length).toBe(cnIds.length);
     }
+    // frameworks.ts wins over a crosswalk instrument with the same id.
+    for (const framework of frameworks) {
+      expect(frameworkById(framework.id)).toBe(framework);
+    }
   });
 
-  // Active now that frameworks.ts carries the cn-* ids the China block added.
-  test(
-    'every ref.framework exists in frameworks.ts (cn-* entries land with the China block)',
-    () => {
-      const frameworkIds = new Set(frameworks.map((framework) => framework.id));
-      for (const ref of refs) {
-        expect(frameworkIds.has(ref.framework), ref.framework).toBe(true);
-      }
-    },
-  );
+  test('columns: v0.4 ids kept as the default view; every framework in exactly one column', () => {
+    const ids = columns.map((column) => column.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(columns.filter((column) => column.defaultVisible).map((column) => column.id)).toEqual([
+      'eu',
+      'iso',
+      'nist',
+      'cn',
+    ]);
+    const all = columns.flatMap((column) => column.frameworks);
+    expect(new Set(all).size).toBe(all.length);
+    for (const column of columns) {
+      expect(['law', 'codes', 'standards']).toContain(column.group);
+      for (const id of column.frameworks) expect(columnOf(id)?.id).toBe(column.id);
+    }
+    for (const instrument of crosswalkInstruments) {
+      expect(columnOf(instrument.id), instrument.id).toBeTruthy();
+    }
+  });
 
-  test('columns are eu/iso/nist/cn; each is referenced; topics span 2+ columns', () => {
-    expect(columns.map((column) => column.id)).toEqual(['eu', 'iso', 'nist', 'cn']);
-
+  test('each column framework is referenced; topics span 2+ columns with a core ref', () => {
     const referenced = new Set(refs.map((ref) => ref.framework));
     for (const column of columns) {
       for (const frameworkId of column.frameworks) {
@@ -565,6 +605,15 @@ test.describe('crosswalk data', () => {
     }
   });
 
+  test('no clause is listed twice under the same topic', () => {
+    const seen = new Set<string>();
+    for (const ref of refs) {
+      const key = `${ref.topic}|${ref.framework}|${ref.ref}`;
+      expect(seen.has(key), key).toBe(false);
+      seen.add(key);
+    }
+  });
+
   test('every obligation join exists verbatim in the obligation matrix', () => {
     const obligationTexts = new Set(obligations.map((o) => o.obligation));
     for (const ref of refs) {
@@ -574,8 +623,10 @@ test.describe('crosswalk data', () => {
     }
   });
 
-  test('urls are https; unverified refs carry a note; chips prefix only cn refs', () => {
-    const cnIdSet = new Set(cnIds);
+  test('urls are https; unverified refs carry a note; chips prefix multi-instrument columns only', () => {
+    const multi = new Set(
+      columns.filter((column) => column.frameworks.length > 1).flatMap((c) => c.frameworks),
+    );
     for (const ref of refs) {
       if (ref.url !== undefined) {
         expect(ref.url.startsWith('https://'), ref.url).toBe(true);
@@ -586,27 +637,68 @@ test.describe('crosswalk data', () => {
         );
       }
       const label = chipLabel(ref);
-      if (cnIdSet.has(ref.framework)) {
-        expect(label, `${ref.framework} ${ref.ref}`).not.toBe(ref.ref);
-        expect(label.endsWith(ref.ref)).toBe(true);
-      } else {
-        expect(label).toBe(ref.ref);
-      }
+      expect(label.endsWith(ref.ref), `${ref.framework} ${ref.ref}`).toBe(true);
+      if (!multi.has(ref.framework)) expect(label).toBe(ref.ref);
+      // The China chips always name their instrument.
+      if (cnIds.includes(ref.framework)) expect(label).not.toBe(ref.ref);
     }
-    // chipPrefix holds exactly the cn column ids.
-    expect(new Set(Object.keys(chipPrefix))).toEqual(cnIdSet);
+    // chipPrefix covers exactly the multi-instrument columns; the cn block
+    // keeps its own record of the six China ids.
+    expect(new Set(Object.keys(chipPrefix))).toEqual(multi);
+    expect(new Set(Object.keys(cnChipPrefix))).toEqual(new Set(cnIds));
   });
 
-  test('topicMatrix is 12 rows x 4 columns with cells sorted core-first', () => {
+  test('EU AI Act links point at the consolidated EUR-Lex text', () => {
+    for (const ref of refs) {
+      if (ref.framework !== 'eu-ai-act' || ref.url === undefined) continue;
+      expect(ref.url, `${ref.ref}`).toMatch(
+        /^https:\/\/eur-lex\.europa\.eu\/eli\/reg\/2024\/1689\/2026-07-27\/eng#(art|anx)_/,
+      );
+    }
+  });
+
+  test('clause ids are OSCAL tokens, unique within their framework', () => {
+    const token = /^(\p{L}|_)(\p{L}|\p{N}|[.\-_])*$/u;
+    const byClause = new Map<string, string>();
+    for (const ref of refs) {
+      const id = clauseId(ref);
+      expect(token.test(id), `${ref.framework} ${ref.ref} -> ${id}`).toBe(true);
+      const key = `${ref.framework}|${id}`;
+      const prior = byClause.get(key);
+      if (prior !== undefined) expect(prior, key).toBe(ref.ref);
+      byClause.set(key, ref.ref);
+    }
+    // CSA AICM ids follow CSA's own OSCAL catalog.
+    expect(clauseId({ framework: 'csa-aicm', ref: 'A&A-02' })).toBe('A_A-02');
+    expect(clauseId({ framework: 'iso-42001', ref: '6.1.2' })).toBe('_6.1.2');
+    expect(clauseId({ framework: 'eu-ai-act', ref: 'Art. 10(2)(f)–(g)' })).toBe('art-10-2-f-g');
+  });
+
+  test('every Body-of-Knowledge link (see, read) resolves to a chapter heading', () => {
+    const hrefs = [
+      ...refs.flatMap((ref) => (ref.see ? [ref.see] : [])),
+      ...topics.flatMap((topic) => (topic.read ?? []).map((r) => r.href)),
+    ];
+    expect(hrefs.length).toBeGreaterThan(10);
+    for (const href of hrefs) {
+      const [target, frag] = href.split('#');
+      expect(target.startsWith('/bok/'), href).toBe(true);
+      const chapter = getChapterBySlug(target.slice('/bok/'.length));
+      expect(chapter, href).toBeTruthy();
+      if (frag) expect(headingSlugs(`bok/${chapter!.id}.md`).has(frag), href).toBe(true);
+    }
+  });
+
+  test('topicMatrix is topics x columns with cells sorted core-first', () => {
     const matrix = topicMatrix();
-    expect(matrix.rows).toHaveLength(12);
-    expect(matrix.columns).toHaveLength(4);
+    expect(matrix.rows).toHaveLength(topics.length);
+    expect(matrix.columns).toHaveLength(columns.length);
     for (const column of matrix.columns) {
-      // Every column framework resolves, via the cn fallback where needed.
+      // Every column framework resolves (frameworks.ts or crosswalk instruments).
       expect(column.fws.length, column.id).toBe(column.frameworks.length);
     }
     for (const row of matrix.rows) {
-      expect(row.cells, row.topic.id).toHaveLength(4);
+      expect(row.cells, row.topic.id).toHaveLength(columns.length);
       for (const cell of row.cells) {
         const ranks = cell.map((ref) => (ref.strength === 'core' ? 0 : 1));
         const sorted = [...ranks].sort((a, b) => a - b);
@@ -615,15 +707,19 @@ test.describe('crosswalk data', () => {
     }
   });
 
-  test('frameworkById resolves cn stub ids even before frameworks.ts has them', () => {
+  test('frameworkById resolves the cn ids; TC260 3.0 is never called binding', () => {
     for (const id of cnIds) {
       const framework = frameworkById(id);
       expect(framework, id).toBeTruthy();
       expect(framework!.id).toBe(id);
       expect(framework!.name.trim().length, id).toBeGreaterThan(0);
     }
-    // Never claim TC260 3.0 is a binding rule.
     expect(frameworkById('cn-tc260-framework')!.summary.includes('binding')).toBe(false);
+  });
+
+  test('schema version and verification date are published with the data', () => {
+    expect(crosswalkSchemaVersion).toBe(2);
+    expect(crosswalkAsOf).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });
 
