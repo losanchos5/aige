@@ -58,8 +58,9 @@ const jsonLd = {
 
 // The three questions that define the discipline. Stated verbatim in
 // role.capabilityStatement and as the stack layers' `question` fields; the
-// bodies paraphrase the corresponding stack layers (inventory, govern-as-code,
-// evals/assurance).
+// bodies paraphrase the layers that answer each one, the single model of
+// chapters 01 and 04 and the three-questions figure: 02 answers the first,
+// 01 and 04 the second, 03 and 05 the third. The swatch is the lead layer.
 const questions = [
   {
     index: '01',
@@ -70,7 +71,7 @@ const questions = [
   {
     index: '02',
     title: 'What is it allowed to do?',
-    body: 'Governance rules expressed as executable policy that evaluates in CI/CD and at runtime, so a bad release is blocked at the earliest point it can be, not discouraged in a review.',
+    body: "Governance rules written as executable policy and enforced at runtime, under each agent's own identity and scope, so a bad release or an out-of-scope call is blocked at the earliest point it can be, not discouraged in a review.",
     swatch: 'var(--l1)',
   },
   {
