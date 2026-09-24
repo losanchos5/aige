@@ -4,6 +4,32 @@ All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledg
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
 
+## Unreleased (v0.5.0)
+
+### Added
+- `site/src/data/stack.ts`, `/resources/tools` (block b-catalogues): the tool catalogue is now one typed
+  registry. Every tool carries a checked URL, its licence (SPDX identifier where one exists), an
+  access model (open source, open standard, source-available, commercial, free service), its layers,
+  `lastChecked` 2026-09-24 and, for 22 tools, its OECD.AI Catalogue of Tools & Metrics entry. Seven
+  categories the new chapters cite (data validation and quality; data and experiment versioning;
+  fairness toolkits; explainability libraries; ML and LLM monitoring and drift; progressive delivery
+  and feature flags; model signing and artefact scanning), two policy-as-code categories that cover
+  the learning-path tools (Conftest, OPA Gatekeeper, Kyverno, the Rego Playground) and a curated
+  indexes group: 96 tools in 31 categories. The page is titled "Tool categories" and filters by
+  layer and licence (`public/catalogue-filter.js`, CSP-safe, progressive enhancement). The
+  per-layer categories on `/stack` and `/map` are derived from the same registry.
+- `bok/10-reading-list.md`, `/resources/reading-list` (block b-catalogues): 98 new entries (books,
+  courses, canonical papers, regulator guidance and every reading-list entry the chapter handoffs
+  proposed, without duplicates), for 162 in 16 themes. Every entry carries audience and jurisdiction
+  tags; the resources view filters on both. The eight existing section headings are unchanged.
+  `sources/SOURCES.md` gains rows 62-159 for chapter 10 and a short tool-catalogue section.
+
+### Changed
+- Kill switch / circuit breaker: the three generic examples (feature-flag kill switches,
+  workload-identity revocation, API-gateway circuit breakers) became named tools (Unleash, Envoy,
+  Resilience4j); workload identity stays under Agent workload identity (SPIFFE/SPIRE). mcp-scan is
+  listed under its current name, Snyk Agent Scan.
+
 ## [Unreleased] - 2026-09-20
 
 Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the
