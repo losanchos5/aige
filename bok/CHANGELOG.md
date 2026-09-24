@@ -107,6 +107,19 @@ a completed, reviewed core (1.0).
   record written before still validates. Shared client modules `site/public/toolkit/builders.js`
   (the schema subset validator, YAML and CSV) and `schema-form.js` (accessible forms from field
   specs); no new dependency and no change to the content security policy.
+- Audience hubs (`/for`, `site/src/data/audiences.ts`): one route through the site for each of six
+  audiences (engineers, CISOs and risk leads, legal counsel and DPOs, executives and boards, the
+  public sector, SMEs and start-ups). Each hub names who it is for, answers the three questions
+  that audience brings with numbered sources and a link to the section of the Body of Knowledge
+  that answers it in full, walks chapters, patterns, tools, templates, datasets, figures and cases
+  in reading order, lists "start this week" actions and the obligations that matter most, with
+  status and dates read from the register. The build fails on a broken anchor, an unknown pattern,
+  figure, case, path node or obligation, or an uncited source; a toolkit tool appears on a route
+  only once the toolkit lists it as live. Illustrative, not a claim of conformity.
+- A "What applies now" band on the home page: the EU AI Act articles that already apply and the
+  next three dates with what each one switches on, computed from the obligation register at build
+  time and linked to each `/obligations/<id>`, so a date drops out on the first build after it
+  passes.
 
 ### Changed
 - Chapter 08 and the register: the CSA row that named an "Agentic Control Supplement" now names what

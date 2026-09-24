@@ -1,0 +1,193 @@
+---
+// /for: the index of the audience hubs. One card per hub of
+// src/data/audiences.ts, plus the hubs another block owns (/for/aigp,
+// /for/certifications) once their page exists in this folder, so the index
+// never links a route the build does not have. Then the questions each
+// audience brings, side by side, and the ways in that do not start from a
+// role. No script.
+import Marketing from '../../layouts/Marketing.astro';
+import PageHero from '../../components/PageHero.astro';
+import Section from '../../components/Section.astro';
+import ResourceCard from '../../components/ResourceCard.astro';
+import RegisterList from '../../components/RegisterList.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { audiences, audiencePath } from '../../data/audiences';
+import { hubCount, liveSiblingHubs, validateAudiences } from '../../lib/audiences';
+import { chaptersOrdered } from '../../data/chapters';
+import { bookParts, countWord } from '../../data/parts';
+import { tools } from '../../data/toolkit';
+import { obligations } from '../../data/frameworks';
+import { site } from '../../data/site';
+import { WEBSITE_ID } from '../../lib/jsonld';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import '../../styles/pages.css';
+import '../../styles/resources.css';
+
+validateAudiences();
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const siblings = liveSiblingHubs();
+
+const cards = [
+  ...audiences.map((a) => ({
+    title: a.navLabel,
+    href: audiencePath(a),
+    description: a.summary,
+    count: hubCount(a),
+  })),
+  ...siblings.map((hub) => ({
+    title: hub.label,
+    href: `/for/${hub.slug}`,
+    description: hub.summary,
+    count: 'Route',
+  })),
+];
+
+const liveTools = tools.filter((tool) => tool.status === 'live').length;
+const elsewhere = [
+  {
+    title: 'The learning path',
+    description: 'Four stages from foundations to proof, with three ways in by background.',
+    href: '/path',
+  },
+  {
+    title: 'The Body of Knowledge',
+    description: `${chaptersOrdered.length} chapters in ${countWord(bookParts.length)} parts, from the definition to the law.`,
+    href: '/bok',
+  },
+  {
+    title: 'The obligation register',
+    description: `${obligations.length} obligations, each with a stable id, its date, its status and its artefact.`,
+    href: '/obligations',
+  },
+  {
+    title: 'The toolkit',
+    description: `${liveTools === 1 ? 'A browser tool that produces' : `${liveTools} browser tools that produce`} documents; nothing you enter leaves the browser.`,
+    href: '/toolkit',
+  },
+  {
+    title: 'Governing AI agents',
+    description: 'The agent control plane, its patterns and the threats it holds against.',
+    href: '/agents',
+  },
+  {
+    title: 'What applies now',
+    description: 'The next three EU AI Act dates and what each switches on, read from the register.',
+    href: '/#what-applies-now',
+  },
+];
+
+const metaTitle = 'AI governance by audience: where to start';
+const description =
+  'Six routes through the site, one per audience: engineers, CISOs and risk, legal and DPOs, executives and boards, the public sector, and SMEs.';
+const crumbs = [{ label: 'For you' }];
+const pageUrl = new URL('/for', site.url).href;
+const jsonLd = [
+  {
+    '@type': 'CollectionPage',
+    '@id': `${pageUrl}#webpage`,
+    name: metaTitle,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    hasPart: audiences.map((a) => ({
+      '@type': 'WebPage',
+      name: a.metaTitle,
+      url: new URL(audiencePath(a), site.url).href,
+    })),
+  },
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Marketing title={metaTitle} description={description} image="/og/default.png" jsonLd={jsonLd}>
+  <PageHero
+    variant="page"
+    title="Start from the work you do."
+    lede="Six routes through the site, one per audience. Each names the questions that audience brings, walks the chapters, patterns, tools, templates, datasets and figures in the order it needs them, and lists the obligations that matter most to it."
+  />
+
+  <Section tone="plain" rule id="routes" title="Pick your route.">
+    <ul class="rc-grid for-grid" data-pagefind-body>
+      {
+        cards.map((card, i) => (
+          <ResourceCard
+            title={card.title}
+            href={card.href}
+            description={card.description}
+            count={card.count}
+            index={pad(i + 1)}
+          />
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section
+    tone="tint"
+    id="questions"
+    title="The questions each audience brings."
+    lede="Three per route, answered in brief on each hub and in full in the Body of Knowledge."
+  >
+    <div class="res-tablewrap">
+      <table class="res-table for-table">
+        <caption class="visually-hidden">The three questions each audience brings, by route</caption>
+        <thead>
+          <tr>
+            <th scope="col">Route</th>
+            <th scope="col">Questions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            audiences.map((a) => (
+              <tr>
+                <td class="c-name" data-label="Route">
+                  <a href={`${audiencePath(a)}#questions`}>{a.navLabel}</a>
+                </td>
+                <td class="c-summary" data-label="Questions">
+                  <ul class="for-qs">
+                    {a.questions.map((q) => (
+                      <li>{q.question}</li>
+                    ))}
+                  </ul>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </Section>
+
+  <Section tone="plain" id="elsewhere" title="Not sure which one?">
+    <div class="well"><RegisterList items={elsewhere} /></div>
+  </Section>
+
+  <CtaBand
+    title="Or start with the argument."
+    sub="The Thesis sets out why governance has to run in the system, not sit beside it."
+    primary={{ label: 'Read the Thesis', href: '/thesis' }}
+    secondary={{ label: 'Open the Body of Knowledge', href: '/bok' }}
+  />
+</Marketing>
+
+<style>
+  .for-grid {
+    margin: 0;
+  }
+
+  .for-table a {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .for-qs {
+    margin: 0;
+    padding-left: 1.1em;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+</style>

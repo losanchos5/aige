@@ -301,6 +301,29 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       '../bok/16-fairness-explainability.md',
     ],
   ],
+  // Block w2-hubs (audience hubs): the /for index and one hub per audience, all
+  // rendered from src/data/audiences.ts through the resolver in
+  // src/lib/audiences.ts. A hub also shows each obligation's status and date
+  // from the register, so frameworks.ts dates it too. The slugs are listed here
+  // so the block needs no import; tests/audiences.spec.ts checks that every hub
+  // of audiences.ts is listed.
+  [
+    '/for',
+    ['src/pages/for/index.astro', 'src/data/audiences.ts', 'src/lib/audiences.ts'],
+  ],
+  ...['engineers', 'ciso-risk', 'legal-dpo', 'executives-board', 'public-sector', 'smes'].map(
+    (slug) =>
+      [
+        `/for/${slug}`,
+        [
+          'src/pages/for/[slug].astro',
+          'src/components/AudienceHub.astro',
+          'src/data/audiences.ts',
+          'src/lib/audiences.ts',
+          'src/data/frameworks.ts',
+        ],
+      ] as [string, string[]],
+  ),
 ]);
 
 // Pages dated by their content rather than by git: each /obligations/<id> page

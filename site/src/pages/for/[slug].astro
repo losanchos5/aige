@@ -1,0 +1,22 @@
+---
+// /for/<slug>: one audience hub per entry of src/data/audiences.ts (engineers,
+// CISOs and risk leads, legal counsel and DPOs, executives and boards, the
+// public sector, SMEs and start-ups), all rendered by AudienceHub. Static
+// siblings in this folder (another block's /for/aigp and /for/certifications)
+// take precedence over this dynamic route, and getStaticPaths names only the
+// audiences, so the two never collide.
+import AudienceHub from '../../components/AudienceHub.astro';
+import { audiences, type Audience } from '../../data/audiences';
+
+export function getStaticPaths() {
+  return audiences.map((audience) => ({ params: { slug: audience.slug }, props: { audience } }));
+}
+
+interface Props {
+  audience: Audience;
+}
+
+const { audience } = Astro.props;
+---
+
+<AudienceHub audience={audience} />
