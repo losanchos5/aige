@@ -88,6 +88,15 @@ textarea.tool-input {
   display: none;
 }
 
+/* JS-only controls ship with `hidden` and lib.js unhides them on mount; the
+   flex display of .tool-buttons and .tool-actions would otherwise beat the
+   [hidden] UA rule and show dead buttons without JavaScript. */
+[data-tool-js][hidden],
+.tool-buttons[hidden],
+.tool-actions[hidden] {
+  display: none;
+}
+
 .tk-row legend {
   padding: 0 var(--s-1);
   font-weight: 600;
