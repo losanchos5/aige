@@ -126,7 +126,13 @@ function init(app, model) {
                           {},
                           m.measure,
                           m.pattern ? ' (' : '',
-                          m.pattern ? h('a', { href: m.pattern, text: patternTitles[m.pattern] ?? 'pattern' }) : '',
+                          // Only a known pattern page becomes a link: an imported record may
+                          // carry any string here, and it must never become a clickable URL.
+                          m.pattern
+                            ? Object.prototype.hasOwnProperty.call(patternTitles, m.pattern)
+                              ? h('a', { href: m.pattern, text: patternTitles[m.pattern] })
+                              : m.pattern
+                            : '',
                           m.pattern ? ')' : '',
                         ),
                       ),
