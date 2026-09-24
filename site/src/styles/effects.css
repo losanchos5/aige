@@ -8,15 +8,51 @@
 /* ---------------------------------------------------------------- Backgrounds */
 
 /* Gradient mesh: five soft radial glows split across two pseudo-elements that
-   drift slowly. Absolute, contained and inert; the host clips the overflow. */
+   drift slowly. Absolute, contained and inert; the host clips the overflow.
+   Each glow's colour and centre is a custom property, so a section can pick a
+   composition: the default (a) is the role section's, which drifts; b mirrors
+   it and c turns it around, and both stay still, as does any mesh laid over a
+   tint band (one drifting mesh per screen is enough, and a still one is a
+   single paint). --mesh-k scales the strength per section (Section's meshK). */
 .bg-mesh {
+  --m1: var(--glow-1);
+  --m1-at: 15% 20%;
+  --m2: var(--glow-3);
+  --m2-at: 82% 15%;
+  --m3: var(--glow-5);
+  --m3-at: 58% 88%;
+  --m4: var(--glow-4);
+  --m4-at: 86% 68%;
+  --m5: var(--glow-2);
+  --m5-at: 22% 82%;
   position: absolute;
   inset: 0;
   z-index: 0;
   overflow: hidden;
   contain: strict;
-  opacity: var(--mesh-alpha);
+  opacity: calc(var(--mesh-alpha) * var(--mesh-k, 1));
   pointer-events: none;
+}
+
+.bg-mesh--b {
+  --m1-at: 84% 22%;
+  --m2-at: 16% 14%;
+  --m3-at: 40% 90%;
+  --m4-at: 12% 66%;
+  --m5-at: 80% 84%;
+}
+
+.bg-mesh--c {
+  --m1: var(--glow-4);
+  --m1-at: 78% 82%;
+  --m2: var(--glow-2);
+  --m2-at: 20% 16%;
+  --m3: var(--glow-1);
+  --m3-at: 46% 10%;
+  --m4: var(--glow-3);
+  --m4-at: 12% 74%;
+  --m5: var(--glow-5);
+  --m5-at: 88% 30%;
 }
 
 .bg-mesh::before,
@@ -29,22 +65,29 @@
 
 .bg-mesh::before {
   background-image:
-    radial-gradient(40% 50% at 15% 20%, var(--glow-1), transparent 70%),
-    radial-gradient(45% 55% at 82% 15%, var(--glow-3), transparent 70%),
-    radial-gradient(52% 52% at 58% 88%, var(--glow-5), transparent 72%);
+    radial-gradient(40% 50% at var(--m1-at), var(--m1), transparent 70%),
+    radial-gradient(45% 55% at var(--m2-at), var(--m2), transparent 70%),
+    radial-gradient(52% 52% at var(--m3-at), var(--m3), transparent 72%);
 }
 
 .bg-mesh::after {
   background-image:
-    radial-gradient(42% 46% at 86% 68%, var(--glow-4), transparent 70%),
-    radial-gradient(46% 50% at 22% 82%, var(--glow-2), transparent 72%);
+    radial-gradient(42% 46% at var(--m4-at), var(--m4), transparent 70%),
+    radial-gradient(46% 50% at var(--m5-at), var(--m5), transparent 72%);
+}
+
+/* A section's mesh fades out over its top and bottom tenth, so two mesh
+   sections in a row (or a mesh next to the page ground) meet without a seam. */
+.sec > .bg-mesh {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .bg-mesh::before {
+  .bg-mesh:not(.bg-mesh--b, .bg-mesh--c, .sec--tint > *)::before {
     animation: mesh-drift-a 34s ease-in-out infinite alternate;
   }
-  .bg-mesh::after {
+  .bg-mesh:not(.bg-mesh--b, .bg-mesh--c, .sec--tint > *)::after {
     animation: mesh-drift-b 42s ease-in-out infinite alternate;
   }
 
@@ -352,12 +395,12 @@
 /* --muted drops below AA over the gradient mesh too (12px mono labels on the
    glows: kicker, breadcrumb, .meta, hero notes), as it does on .sec--tint.
    Re-scope it to --ink-2 on every mesh-backed surface: mesh sections, the page
-   heroes, the home hero's gradient field and the loop figure's panel. --ink-2
-   follows the theme, so one rule serves light and dark. Leaves the mesh itself
-   untouched. */
+   heroes and the home hero's gradient field (a tint band with a mesh is
+   covered by .sec--tint, and the loop figure's panel re-scopes its own).
+   --ink-2 follows the theme, so one rule serves light and dark. Leaves the
+   mesh itself untouched. */
 .sec--mesh,
 .hero--page,
-.hero--field,
-.hero-panel {
+.hero--field {
   --muted: var(--ink-2);
 }

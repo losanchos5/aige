@@ -8,9 +8,10 @@
  * number appears here that a primary source does not carry.
  *
  * The body sections are built on <Section>, which supplies the tinted/mesh/dark
- * bands and the shared heads. The hero keeps its own scoped layout (the field,
- * the centred headline and the figures strip) and the loop section its figure
- * and panel — see the <style>.
+ * bands and the shared heads; no body section sits on the bare page ground
+ * (each mesh takes its own composition and strength, so neighbours differ).
+ * The hero keeps its own scoped layout (the field, the centred headline and the
+ * figures strip; see the <style>) and the loop is <GovernanceLoop>.
  */
 import Marketing from '../layouts/Marketing.astro';
 import Section from '../components/Section.astro';
@@ -19,7 +20,7 @@ import StatTile from '../components/StatTile.astro';
 import VerdictStamp from '../components/VerdictStamp.astro';
 import CtaBand from '../components/CtaBand.astro';
 import StackDiagram from '../components/StackDiagram.astro';
-import Diagram from '../components/Diagram.astro';
+import GovernanceLoop from '../components/GovernanceLoop.astro';
 import VerdictTicker from '../components/VerdictTicker.astro';
 import DefinitionCards from '../components/DefinitionCards.astro';
 import ValuePair from '../components/ValuePair.astro';
@@ -187,35 +188,26 @@ const resources = [
     <script is:inline defer src="/hero-field.js"></script>
   </section>
 
-  <Section tone="plain" class="loop-sec">
-    <div class="loop-grid">
-      <div class="sec-head loop-head">
-        <h2 class="sec-title display">The discipline, defined.</h2>
-        <p class="sec-lede lede">{definition}</p>
-      </div>
-
-      <figure
-        class="hero-art"
-        data-hero-loop
-        data-hero-sequence="obligation,policy,inventory,eval,runtime,evidence,auditor"
-      >
-        <div class="hero-panel card-lum">
-          <div class="hero-art-wide"><Diagram id="hero-loop" bare /></div>
-          <div class="hero-art-tall"><Diagram id="hero-loop-tall" bare /></div>
-        </div>
-        <figcaption class="hero-caption">
-          Seven steps, from obligation to auditor.
-          <a href="/bok/the-stack#how-to-read-the-stack">Read how the governance loop works</a>
-        </figcaption>
-      </figure>
-    </div>
+  <Section
+    tone="mesh"
+    mesh="b"
+    meshK={0.5}
+    class="loop-sec"
+    title="The discipline, defined."
+    lede={definition}
+  >
+    <GovernanceLoop>
+      Seven steps, from obligation to auditor.
+      <a href="/bok/the-stack#how-to-read-the-stack">Read how the governance loop works</a>
+    </GovernanceLoop>
     <p class="sec-link" slot="foot"><a href="/bok">Open the Body of Knowledge →</a></p>
-    <script is:inline defer src="/hero.js"></script>
     <script is:inline defer src="/countup.js"></script>
   </Section>
 
   <Section
-    tone="plain"
+    tone="mesh"
+    mesh="c"
+    meshK={0.5}
     title="Three questions define the discipline."
     lede="Legacy AI governance leaves them unanswered because nothing is connected to production. The engineer answers all three from the running system."
   >
@@ -224,6 +216,8 @@ const resources = [
 
   <Section
     tone="tint"
+    mesh="a"
+    meshK={0.35}
     headSize="xl"
     title="A build order, from policy to proof."
     lede="The stack is five layers that answer the three questions. Evidence is produced at the bottom and flows up; three layers are established engineering practice, two are new to AI."
@@ -241,7 +235,12 @@ const resources = [
   </Section>
   <script is:inline defer src="/story.js"></script>
 
-  <Section tone="plain" title="Eight values, each a commitment made on purpose.">
+  <Section
+    tone="mesh"
+    mesh="b"
+    meshK={0.45}
+    title="Eight values, each a commitment made on purpose."
+  >
     <div class="bento reveal-stagger">
       {
         values.map((value) => (
@@ -258,6 +257,7 @@ const resources = [
 
   <Section
     tone="mesh"
+    meshK={0.6}
     class="role-sec"
     title="The role is a capability first, a job title second."
   >
@@ -303,14 +303,21 @@ const resources = [
   </Section>
 
   <Section
-    tone="plain"
+    tone="mesh"
+    mesh="c"
+    meshK={0.45}
     title="Eleven chapters, versioned and open."
     lede={`The Body of Knowledge is at v${site.bokVersion} and published under ${site.license}.`}
   >
     <ChapterGrid chapters={chaptersOrdered} class="reveal-stagger" />
   </Section>
 
-  <Section tone="tint" title="Curated resources, cross-referenced, in the open.">
+  <Section
+    tone="tint"
+    mesh="b"
+    meshK={0.35}
+    title="Curated resources, cross-referenced, in the open."
+  >
     <ResourceTiles tiles={resources} class="reveal-stagger" />
   </Section>
 
@@ -586,120 +593,6 @@ const resources = [
     }
   }
 
-  /* The loop section — the definition beside the archify "governance loop",
-     an editorial figure wrapped in a luminous panel and captioned with a link
-     to the chapter that explains it. One diagram renders per breakpoint (the
-     other is display:none so the observer/hover never touch it): portrait
-     below 720px, landscape above. One column until 1280, then the head 5/12
-     and the figure 7/12 on the site grid. */
-  .loop-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--s-6);
-    align-items: start;
-  }
-
-  .loop-head {
-    margin-bottom: 0;
-  }
-
-  /* The figure never grows past the diagram's natural size (1 user unit =
-     1px): --art-w is the cropped viewBox width of the visible variant, plus the
-     panel's padding and 1px border on each side. */
-  .hero-art {
-    --art-w: 390px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-4);
-    width: 100%;
-    max-width: calc(var(--art-w) + 2 * var(--s-3) + 2px);
-    margin: 0;
-  }
-
-  /* The luminous panel wraps both diagram variants. Its gradient border ring is
-     kept always-on here (card-lum shows it on hover only), with a deep shadow
-     and no coloured halo. No overflow:hidden — the hover note overlays the
-     foot. */
-  .hero-panel {
-    padding: var(--s-3);
-    box-shadow: var(--shadow-3);
-  }
-
-  .hero-panel::before {
-    opacity: 1;
-  }
-
-  /* Crop the empty margin archify leaves around the lanes (the viewBox runs
-     74 units past them at the foot, 46 above them and 35 to the right on the
-     landscape variant). The SVG is drawn wider than its box and pulled up and
-     left by the cropped amounts (percent margins resolve against the box
-     width), and .diagram-canvas clips the rest. The wrapper's aspect ratio is
-     the cropped box, so the inline SVG still never shifts layout (CLS).
-       landscape: viewBox 864 x 508 -> x 15..830, y 45..435 (815 x 390)
-       portrait:  viewBox 436 x 612 -> x 15..405, y 45..539 (390 x 494) */
-  .hero-art-wide {
-    display: none;
-    aspect-ratio: 815 / 390;
-  }
-
-  .hero-art-wide :global(svg) {
-    width: calc(864 / 815 * 100%);
-    max-width: none;
-    margin: calc(-45 / 815 * 100%) 0 calc(-73 / 815 * 100%) calc(-15 / 815 * 100%);
-  }
-
-  .hero-art-tall {
-    display: block;
-    aspect-ratio: 390 / 494;
-  }
-
-  .hero-art-tall :global(svg) {
-    width: calc(436 / 390 * 100%);
-    max-width: none;
-    margin: calc(-45 / 390 * 100%) 0 calc(-73 / 390 * 100%) calc(-15 / 390 * 100%);
-  }
-
-  /* The figure's caption: plain small text in --ink-2, and a link to the
-     chapter that documents the loop (the global link colour and focus ring).
-     A wrapping flex row: sentence and link share a line wherever both fit
-     (834 and up); on phones the link drops whole onto its own line. */
-  .hero-caption {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 0.3em;
-    margin: 0;
-    font-size: var(--fs-small);
-    color: var(--ink-2);
-    text-wrap: pretty;
-  }
-
-  /* From 720 the landscape variant fits at a legible scale (labels >= 12px). */
-  @media (min-width: 720px) {
-    .loop-grid {
-      gap: var(--s-7);
-    }
-
-    .hero-art {
-      --art-w: 815px;
-    }
-
-    .hero-art-tall {
-      display: none;
-    }
-
-    .hero-art-wide {
-      display: block;
-    }
-  }
-
-  /* Wide desktop: two columns on the site grid, head 5/12 and figure 7/12,
-     the page's two-column gap between them. */
-  @media (min-width: 1280px) {
-    .loop-grid {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    }
-  }
-
   /* The two in-section captions ("Build order", "Seven workflows"): plain mono
      at the small size, sentence case, no dot. --ink-2 holds AA on the tint and
      over the role section's mesh. */
@@ -725,12 +618,6 @@ const resources = [
   }
 
   /* Values live in the bento grid (effects.css); the reveal cascades by index. */
-
-  /* Role — a mesh band. The mesh reads at 60% of the section default so the
-     pullquote leads (the mesh div belongs to Section, so target it globally). */
-  :global(.role-sec > .bg-mesh) {
-    opacity: calc(var(--mesh-alpha) * 0.6);
-  }
 
   /* The capability statement, set as a display-weight quote on the content
      edge. No side stripe: the type carries the emphasis. */

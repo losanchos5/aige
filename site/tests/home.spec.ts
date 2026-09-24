@@ -12,43 +12,34 @@ test.describe('home page', () => {
     ).toHaveAttribute('href', '/bok');
   });
 
-  test('the loop section, under the hero, embeds both governance-loop diagrams', async ({
-    page,
-  }) => {
+  test('the loop section, under the hero, holds the governance loop', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('.hero--field + .loop-sec')).toHaveCount(1);
-    await expect(page.locator('.hero--field figure.diagram')).toHaveCount(0);
-    await expect(page.locator('.loop-sec figure.diagram[data-diagram="hero-loop"]')).toHaveCount(1);
-    await expect(
-      page.locator('.loop-sec figure.diagram[data-diagram="hero-loop-tall"]'),
-    ).toHaveCount(1);
+    await expect(page.locator('.hero--field [data-loop]')).toHaveCount(0);
+    await expect(page.locator('.loop-sec figure[data-loop] .loop-step')).toHaveCount(7);
+    // The archify figure it replaced is gone.
+    await expect(page.locator('.loop-sec figure.diagram')).toHaveCount(0);
     await expect(page.locator('.loop-sec .sec-lede')).toContainText(
       'AI governance engineering is the application of engineering practice',
     );
   });
 
-  test('at desktop the wide loop shows and the tall one is hidden', async ({ page }) => {
+  test('at desktop the loop draws its canvas; at phone width it is a list', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
-    await expect(page.locator('.hero-art-wide figure[data-diagram="hero-loop"]')).toBeVisible();
-    await expect(page.locator('.hero-art-tall figure[data-diagram="hero-loop-tall"]')).toBeHidden();
-  });
-
-  test('at phone width the tall loop shows and the wide one is hidden', async ({ page }) => {
+    await expect(page.locator('.loop-sec .loop-wires')).toBeVisible();
+    await expect(page.locator('.loop-sec .loop-pills')).toBeVisible();
     await page.setViewportSize({ width: 390, height: 900 });
-    await page.goto('/');
-    await expect(page.locator('.hero-art-tall figure[data-diagram="hero-loop-tall"]')).toBeVisible();
-    await expect(page.locator('.hero-art-wide figure[data-diagram="hero-loop"]')).toBeHidden();
+    await expect(page.locator('.loop-sec .loop-wires')).toBeHidden();
+    await expect(page.locator('.loop-sec .loop-pills')).toBeHidden();
+    await expect(page.locator('.loop-sec .loop-return')).toBeVisible();
   });
 
-  test('the hero figure carries no simulated run telemetry', async ({ page }) => {
+  test('the loop figure carries no simulated run telemetry', async ({ page }) => {
     await page.goto('/');
-    // No run bar, no PASS stamp, no attestation number around the diagram.
-    await expect(page.locator('.loop-sec .hero-panel-bar')).toHaveCount(0);
+    // No run bar, no PASS stamp, no attestation number around the figure.
     await expect(page.locator('.loop-sec .stamp')).toHaveCount(0);
-    await expect(page.locator('.hero-caption')).not.toContainText(/#\d|run|attestation/i);
-    // The nodes' example run values (sublabels) are not drawn in the hero.
-    await expect(page.locator('.hero-art-wide text[data-detail="context"]').first()).toBeHidden();
+    await expect(page.locator('.loop-sec figcaption')).not.toContainText(/#\d|run|attestation/i);
   });
 
   test('the hero figure links to the chapter that explains the loop', async ({ page }) => {

@@ -295,22 +295,6 @@ export const diagrams: readonly DiagramDef[] = [
       'The obligations that are live now and the deferred deadlines that follow them, as the chapter states them as of 2026-09-19. Pick the next stage and map its obligations to artefacts in chapter 08. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'why-now', at: 'lead' }],
   },
-  // The two hero diagrams are placed by the home page (src/pages/index.astro),
-  // not by a chapter; they are listed here so the manifest is the full inventory.
-  {
-    id: 'hero-loop',
-    type: 'dataflow',
-    title: 'The evidence loop',
-    caption: 'The evidence loop on the home page. Generated from the Body of Knowledge.',
-    placements: [],
-  },
-  {
-    id: 'hero-loop-tall',
-    type: 'dataflow',
-    title: 'The evidence loop (tall)',
-    caption: 'The evidence loop, stacked for narrow screens. Generated from the Body of Knowledge.',
-    placements: [],
-  },
 ] as const;
 
 /** Look up a diagram definition by id. */
