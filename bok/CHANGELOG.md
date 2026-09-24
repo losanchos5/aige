@@ -199,6 +199,16 @@ a completed, reviewed core (1.0).
 - `site/src/pages/agents.astro`: the **/agents** hub, a practitioner landing for agent governance
   with the control plane, the six agent patterns, the ten agentic threats with their controls, the
   chapter 08 cross-references and the runtime tool categories.
+- `tools/reg-monitor/`, `.github/workflows/reg-monitor.yml`: a **regulatory change monitor**. A
+  daily GitHub Actions job (06:17 UTC) reads 34 official pages the site already cites (EUR-Lex and
+  the Digital Omnibus, the AI Act Service Desk, the Commission's AI Act pages, CEN-CENELEC JTC 21,
+  NIST, OWASP GenAI, law.go.kr, the California, New York, Colorado and Texas legislatures, the
+  EDPB, ICO and CNIL, the IAPP AIGP page and the International AI Safety Report), reduces each to
+  stable text, compares a SHA-256 with the previous run and, on a change, opens or comments on an
+  issue labelled `regulatory-change` with a diff excerpt and the files that cite the URL. It never
+  edits or publishes the site; its state lives on the orphan branch `reg-monitor-state`, not on
+  `main`, because every push to `main` deploys. Manual runs default to a dry run. Unit tests run
+  with `node --test`; `tools/reg-monitor/README.md` explains operation and how to add a source.
 
 ## [Unreleased] - 2026-09-20
 

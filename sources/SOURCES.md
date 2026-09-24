@@ -1158,6 +1158,11 @@ external claim; the chapter's sources stay in its section above.
 
 Rows [1]–[6] match the `### Sources` list at the foot of `site/VISUAL-GUIDE.md` (sections 5 and 6);
 rows [3] and [4] also back the "Reuse and credit" copy on every `/figures/<id>` page. Verified
+## tools/reg-monitor/README.md
+
+Regulatory change monitor (block b-reg-monitor, v0.5.0). The pages the monitor watches are listed in
+`tools/reg-monitor/sources.json`; each is already cited, with its own row, under the chapter that
+uses it. The rows below support the README's claims about GitHub's own behaviour. Verified
 2026-09-24.
 
 | # | Claim | Source | Publisher | Date | URL | Verified | Used in |
@@ -1985,3 +1990,7 @@ numbered source list.
 | 27 | AI Agent Standards Initiative launched 17 Feb 2026 by CAISI with three pillars; RFI on AI agent security; agent identity and authorisation concept paper | Announcing the AI Agent Standards Initiative | NIST | 2026-02-17 | https://www.nist.gov/news-events/news/2026/02/announcing-ai-agent-standards-initiative-interoperable-and-secure | primary | Frameworks written for agents |
 | 28 | CSA agentic control plane programme names the Agentic Trust Framework and AARM | Securing the Agentic Control Plane | Cloud Security Alliance | 2026-04-29 | https://cloudsecurityalliance.org/blog/2026/04/29/securing-the-agentic-control-plane-key-progress-at-the-csai-foundation | primary | Frameworks written for agents |
 | 29 | Model AI Governance Framework for Agentic AI launched on 22 Jan 2026 | Singapore Launches New Model AI Governance Framework for Agentic AI | IMDA | 2026-01-22 | https://www.imda.gov.sg/resources/press-releases-factsheets-and-speeches/press-releases/2026/new-model-ai-governance-framework-for-agentic-ai | primary | Frameworks written for agents |
+| 1 | Scheduled workflows run only on the default branch; the schedule event can be delayed at high load, including the start of every hour; in a public repository scheduled workflows are disabled when no repository activity has occurred in 60 days; notifications go to the user who last modified the cron syntax | Events that trigger workflows (`schedule`) | GitHub Docs | 2026 | https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows | primary | Monitor README (how it runs; known limits) |
+| 2 | Events triggered by the repository's `GITHUB_TOKEN` do not create a new workflow run, except `workflow_dispatch` and `repository_dispatch` | Triggering a workflow | GitHub Docs | 2026 | https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow | primary | Monitor README (state branch deploys nothing) |
+| 3 | GitHub Actions usage is free for self-hosted runners and for public repositories that use standard GitHub-hosted runners | GitHub Actions billing | GitHub Docs | 2026 | https://docs.github.com/en/billing/concepts/product-billing/github-actions | primary | Monitor README (cost) |
+| 4 | The REST API treats every pull request as an issue, identifiable by the `pull_request` key; `per_page` maximum 100 | REST API endpoints for issues | GitHub Docs | 2026 | https://docs.github.com/en/rest/issues/issues | primary | Monitor README (security); `lib/github.mjs` |
