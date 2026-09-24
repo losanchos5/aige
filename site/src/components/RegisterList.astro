@@ -1,7 +1,8 @@
 ---
 /**
  * RegisterList — the "register" motif as a list. Each row carries a mono index,
- * a title, an optional description and a layer-colour tick. Rows are separated
+ * a title, an optional description and, when the item names a swatch, a
+ * layer-colour tick (rows with no layer meaning draw none). Rows are separated
  * by 1px rules; on hover the row's swatch tint fills the left index cell.
  * Used for nav-like lists, layer lists and principle lists.
  */
@@ -9,7 +10,7 @@ export interface RegisterItem {
   title: string;
   description?: string;
   href?: string;
-  /** Layer colour for the tick + hover tint, e.g. `var(--l1)`. */
+  /** Layer colour for the tick + hover tint, e.g. `var(--l1)`. No swatch, no tick. */
   swatch?: string;
   /** Mono index label; auto-numbered from 01 when omitted. */
   index?: string;
@@ -40,7 +41,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
               <span class="title">{item.title}</span>
               {item.description && <span class="desc">{item.description}</span>}
             </span>
-            <span class="tick" aria-hidden="true"></span>
+            {item.swatch && <span class="tick" aria-hidden="true"></span>}
           </Inner>
         </li>
       );

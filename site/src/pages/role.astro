@@ -63,8 +63,6 @@ const reportedText = reportedStats
 >
   <PageHero
     variant="page"
-    kicker="The role"
-    swatch="var(--l3)"
     related={{ label: 'Chapter 06 · Body of Knowledge', href: '/bok/the-role' }}
     title="What an AI Governance Engineer does."
     lede={capabilityStatement}
@@ -72,9 +70,6 @@ const reportedText = reportedStats
 
   <Section
     tone="plain"
-    texture="dots"
-    kicker="The workflows"
-    kickerSwatch="var(--l2)"
     title="Seven workflows the role owns."
     lede="The engineer owns workflows, not documents — each a running system with inputs, outputs and a stack layer it maps to."
   >
@@ -82,7 +77,7 @@ const reportedText = reportedStats
     <Diagram id="role-workflows" />
   </Section>
 
-  <Section tone="plain" rule kicker="The skills" kickerSwatch="var(--l3)" title="Core and supporting skills, by workflow.">
+  <Section tone="plain" rule title="Core and supporting skills, by workflow.">
     <SkillsTable skills={skills} />
     <p class="section-foot">
       <a class="chapter-link" href={roleHref('skills-by-workflow')}>
@@ -93,8 +88,6 @@ const reportedText = reportedStats
 
   <Section
     tone="plain"
-    kicker="Analyst versus engineer"
-    kickerSwatch="var(--l1)"
     title="One line separates the two."
     lede={analystDistinction}
   >
@@ -106,7 +99,7 @@ const reportedText = reportedStats
     </p>
   </Section>
 
-  <Section tone="plain" rule kicker="Three ways in" kickerSwatch="var(--l5)" title="Convert from an adjacent discipline.">
+  <Section tone="plain" rule title="Convert from an adjacent discipline.">
     <ul class="ways reveal-stagger">
       {
         waysIn.map((way, i) => (
@@ -125,7 +118,7 @@ const reportedText = reportedStats
     </p>
   </Section>
 
-  <Section tone="plain" kicker="What employers get wrong" kickerSwatch="var(--l3)" title="Three tells in the job description.">
+  <Section tone="plain" title="Three tells an employer has the role wrong.">
     <ol class="mistakes">
       {
         mistakes.map((m, i) => (
@@ -149,7 +142,7 @@ const reportedText = reportedStats
     </p>
   </Section>
 
-  <Section tone="tint" kicker="The market" kickerSwatch="var(--l4)" title="What the primary sources report.">
+  <Section tone="tint" title="The market, as the primary sources report it.">
     <div class="stats">
       {
         primaryStats.map((stat) => (
@@ -169,9 +162,7 @@ const reportedText = reportedStats
   <Section
     tone="dark"
     rule
-    kicker="The maturity ladder"
-    kickerSwatch="var(--l5)"
-    title="From paper to production, in five levels."
+    title="Maturity, from paper to production, in five levels."
     lede="Each level is assessed across all five stack layers; the overall level is the weakest layer."
   >
     <MaturityLadder levels={levels} />

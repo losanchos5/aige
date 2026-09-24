@@ -233,9 +233,10 @@ const relatedLinks = (ids: readonly string[]) =>
     background: color-mix(in srgb, var(--ink) 12%, transparent);
   }
 
+  /* Matches the optional node's own border (PathNode): a dashed --ink-2. */
   .lg-opt {
     border-style: dashed;
-    border-color: var(--line);
+    border-color: var(--ink-2);
   }
 
   .path-reset {
@@ -279,13 +280,14 @@ const relatedLinks = (ids: readonly string[]) =>
   }
 
   /* Only meaningful where the connectors draw (>=840px), so hidden below it. */
+  /* A sentence, so sentence case (audit SL-05); it keeps the mono face. */
   .path-edges-hint {
     display: none;
     margin: 0;
     color: var(--muted);
     font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
+    letter-spacing: normal;
+    text-transform: none;
   }
 
   @media (min-width: 840px) {
@@ -363,13 +365,13 @@ const relatedLinks = (ids: readonly string[]) =>
     font-size: var(--fs-h2);
   }
 
+  /* A 35–40 character phrase: body face in sentence case, not mono capitals
+     (audit SL-05). */
   .stage-tagline {
     margin: var(--s-2) 0 0;
     color: var(--ink-2);
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
   }
 
   .stage-summary {

@@ -78,7 +78,7 @@ function buildValuesPrinciples(values, principles, fig) {
   const W = 360;
   const parts = [];
   let y = 20;
-  parts.push(`  <text class="mono muted" x="16" y="${y}" font-size="13.5">EIGHT VALUES · SIX PRINCIPLES</text>`);
+  parts.push(`  <text class="mono muted" x="16" y="${y}" font-size="13.5">Eight values · six principles</text>`);
   y += 20;
 
   const group = (label) => {
@@ -123,8 +123,8 @@ function buildMaturityGrid(layers, levels, fig) {
   const OVERALL = 2; // the weakest layer's level (Evals, Level 2)
 
   const parts = [];
-  parts.push(`  <text class="mono muted" x="16" y="18" font-size="13.5">YOUR LEVEL IS THE WEAKEST LAYER</text>`);
-  parts.push(`  <text class="mono muted" x="16" y="36" font-size="13">ILLUSTRATIVE FILL</text>`);
+  parts.push(`  <text class="mono muted" x="16" y="18" font-size="13.5">Your level is the weakest layer</text>`);
+  parts.push(`  <text class="mono muted" x="16" y="36" font-size="13">Illustrative fill</text>`);
 
   const colX = (c) => 52 + (c - 1) * 54; // cell left for level c (1..5)
   const CW = 46;
@@ -138,7 +138,7 @@ function buildMaturityGrid(layers, levels, fig) {
   for (let c = 1; c <= 5; c += 1) {
     parts.push(`  <text class="mono muted" x="${colX(c) + CW / 2}" y="58" font-size="13.5" text-anchor="middle">${c}</text>`);
   }
-  parts.push(`  <text class="mono" x="${colX(OVERALL) + CW / 2}" y="268" font-size="13" text-anchor="middle">overall</text>`);
+  parts.push(`  <text class="mono" x="${colX(OVERALL) + CW / 2}" y="268" font-size="13" text-anchor="middle">Overall</text>`);
 
   // Grid cells, row per layer in canonical order.
   for (let r = 1; r <= 5; r += 1) {
@@ -185,7 +185,7 @@ function buildMaturityGrid(layers, levels, fig) {
 function buildPatternMap(patterns, layers, fig) {
   const W = 360;
   const parts = [];
-  parts.push(`  <text class="mono muted" x="16" y="20" font-size="13.5">THE PATTERN CATALOGUE, BY LAYER</text>`);
+  parts.push(`  <text class="mono muted" x="16" y="20" font-size="13.5">The pattern catalogue, by layer</text>`);
 
   const FS = 13.5;
   const CHIP_H = 24;

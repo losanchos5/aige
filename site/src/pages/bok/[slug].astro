@@ -49,15 +49,17 @@ const summary = (remarkPluginFrontmatter.summary as string | undefined) ?? chapt
 const editPath = `bok/${chapter.id}.md`;
 const updated = gitDate(`../${editPath}`);
 const published = gitCreated(`../${editPath}`);
-const kicker = `Body of Knowledge · Chapter ${String(chapter.order).padStart(2, '0')}`;
 // The chapter's own Open Graph card, built by src/pages/og/[...slug].png.ts.
 const ogPath = `/og/bok-${chapter.slug}.png`;
 
-// Visible breadcrumb: Body of Knowledge › NN · Title. The BreadcrumbList JSON-LD
-// is already carried in this page's @graph below, so the crumb suppresses its own.
+// Visible breadcrumb: Body of Knowledge › NN · Short title. The full title
+// already opens with "NN.", so the crumb uses the short navigation label to
+// avoid repeating the number and to stay on one line on a phone. The
+// BreadcrumbList JSON-LD is already carried in this page's @graph below, so the
+// crumb suppresses its own.
 const crumbs = [
   { label: 'Body of Knowledge', href: '/bok' },
-  { label: `${String(chapter.order).padStart(2, '0')} · ${title}` },
+  { label: `${String(chapter.order).padStart(2, '0')} · ${chapter.shortTitle}` },
 ];
 
 // JSON-LD @graph for the chapter. Absolute URLs are built on the site's canonical
@@ -120,7 +122,6 @@ const jsonLd = {
   title={title}
   summary={summary}
   description={chapter.summary}
-  kicker={kicker}
   crumbs={crumbs}
   crumbsJsonLd={false}
   headings={headings}

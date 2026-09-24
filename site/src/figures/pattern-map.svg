@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 684" class="figc" role="group" aria-labelledby="fig-pattern-map-t fig-pattern-map-d">
   <title id="fig-pattern-map-t">The pattern map</title>
   <desc id="fig-pattern-map-d">Five bands, one per stack layer in canonical order, each holding the patterns whose home layer it is, as links.</desc>
-  <text class="mono muted" x="16" y="20" font-size="13.5">THE PATTERN CATALOGUE, BY LAYER</text>
+  <text class="mono muted" x="16" y="20" font-size="13.5">The pattern catalogue, by layer</text>
   <rect class="l1-band" x="8" y="30" width="344" height="26" rx="6" stroke-width="1"/>
   <text class="l1-tx disp" x="16" y="48" font-size="13.5">Layer 01 Govern-as-Code</text>
   <a href="#pattern-policy-card">

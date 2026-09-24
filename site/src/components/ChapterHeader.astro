@@ -1,14 +1,13 @@
 ---
-// ChapterHeader: the register that opens every Doc page — a kicker split into a
-// section name and a mono chip, the H1 (the page's only H1, since remark-lead
-// strips the Markdown one), a summary lede and a meta line. Everything sits in a
-// full-bleed tinted band (.ch-band) whose layer is passed by Doc.astro from
-// chapter.order % 5 (thesis / meta pages pass none → a neutral band).
+// ChapterHeader: the register that opens every Doc page — the H1 (the page's
+// only H1, since remark-lead strips the Markdown one), a summary lede and a meta
+// line. No eyebrow above the H1 (audit SL-04): a chapter's book and number are
+// already in the breadcrumb above the header. Everything sits in a full-bleed
+// band (.ch-band), neutral unless Doc.astro passes the layer of a chapter that is
+// about one stack layer (chapters.ts `layer`).
 import { site } from '../data/site';
-import RegisterMark from './RegisterMark.astro';
 
 interface Props {
-  kicker?: string;
   title: string;
   summary?: string;
   updated?: string;
@@ -20,7 +19,7 @@ interface Props {
   lang?: string;
 }
 
-const { kicker, title, summary, updated, words, minutes, layer, lang = 'en' } = Astro.props;
+const { title, summary, updated, words, minutes, layer, lang = 'en' } = Astro.props;
 
 // The meta line is the only copy this component writes itself, so it is the only
 // thing that has to follow the page language (/es/thesis). Anything not listed
@@ -30,18 +29,6 @@ const LABELS: Record<string, { updated: string; read: string; words: string; loc
   es: { updated: 'Actualizado', read: 'min de lectura', words: 'palabras', locale: 'es-ES' },
 };
 const labels = LABELS[lang] ?? LABELS.en;
-
-// Split the kicker on the middot: the leading part names the section, any
-// trailing part becomes a mono chip. Meta pages ("About") have only one part
-// and get no chip. The chip is a <span>, never a heading.
-const kickerParts = kicker
-  ? kicker
-      .split('·')
-      .map((part) => part.trim())
-      .filter(Boolean)
-  : [];
-const kickerBook = kickerParts[0];
-const kickerNum = kickerParts.length > 1 ? kickerParts.slice(1).join(' · ') : undefined;
 
 // One meta line, joined into list items: version/date, reading estimate, licence.
 // The date bit carries the machine-readable value so it renders inside a <time>
@@ -64,15 +51,6 @@ if (updated) metaBits.push({ text: site.license });
 
 <header class="chapter-header">
   <div class="ch-band" data-layer={layer}>
-    {
-      kickerBook && (
-        <div class="ch-kicker">
-          <RegisterMark size="sm" class="ch-kicker-mark" label={site.name} />
-          <span class="ch-kicker-book">{kickerBook}</span>
-          {kickerNum && <span class="ch-kicker-num">{kickerNum}</span>}
-        </div>
-      )
-    }
     <h1 data-pagefind-meta="title">{title}</h1>
     {summary && <p class="lede">{summary}</p>}
     {
@@ -103,15 +81,14 @@ if (updated) metaBits.push({ text: site.license });
     margin-bottom: var(--s-6);
   }
 
-  /* Tinted register band. Layer tint + a soft radial glow and 14px dots live in
-     two inert pseudo-elements behind the text (negative z-index inside an
-     isolated stacking context). Neutral by default; the data-layer rules below
-     swap in the layer's tint, glow and chip colours. */
+  /* Register band. A soft radial glow lives in an inert pseudo-element behind
+     the text (negative z-index inside an isolated stacking context). Neutral by
+     default; the data-layer rules below swap in the layer's tint and glow, and
+     only a chapter about one stack layer gets one (SL-06). No dot texture
+     (SL-18). */
   .ch-band {
     --ch-tint: color-mix(in srgb, var(--ink) 4%, var(--bg));
     --ch-glow: transparent;
-    --ch-chip-bg: color-mix(in srgb, var(--ink) 8%, var(--bg));
-    --ch-chip-ink: var(--ink-2);
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -128,11 +105,14 @@ if (updated) metaBits.push({ text: site.license });
     }
   }
 
-  /* Break out to the reading well, exactly like .prose > .glance / .diagram: the
-     prose stays at 72ch but .doc-main is a container, so the band widens to the
-     whole well. Off a container the cq units resolve to the column and nothing
-     moves — and the band never exceeds .doc-main, so no page-level scroll. */
-  :global(.prose) > .chapter-header .ch-band {
+  /* In a chapter, break out to the reading well, exactly like .prose > .glance /
+     .diagram: the prose stays at 72ch but .doc-main is a container, so the band
+     widens to the whole well and lines up with the crumbs and the At a glance
+     box. Off a container the cq units resolve to the column and nothing moves —
+     and the band never exceeds .doc-main, so no page-level scroll. The Thesis
+     and the meta pages have no crumbs or glance box: there the band keeps the
+     prose column, so the header, the lede and the text share one left edge. */
+  :global([data-mode='chapter'] .prose) > .chapter-header .ch-band {
     width: 100cqw;
     margin-inline: calc(50% - 50cqw);
   }
@@ -140,32 +120,22 @@ if (updated) metaBits.push({ text: site.license });
   .ch-band[data-layer='l1'] {
     --ch-tint: color-mix(in srgb, var(--l1) 22%, var(--bg));
     --ch-glow: var(--glow-1);
-    --ch-chip-bg: color-mix(in srgb, var(--l1) 55%, var(--bg));
-    --ch-chip-ink: var(--l1-ink);
   }
   .ch-band[data-layer='l2'] {
     --ch-tint: color-mix(in srgb, var(--l2) 22%, var(--bg));
     --ch-glow: var(--glow-2);
-    --ch-chip-bg: color-mix(in srgb, var(--l2) 55%, var(--bg));
-    --ch-chip-ink: var(--l2-ink);
   }
   .ch-band[data-layer='l3'] {
     --ch-tint: color-mix(in srgb, var(--l3) 22%, var(--bg));
     --ch-glow: var(--glow-3);
-    --ch-chip-bg: color-mix(in srgb, var(--l3) 55%, var(--bg));
-    --ch-chip-ink: var(--l3-ink);
   }
   .ch-band[data-layer='l4'] {
     --ch-tint: color-mix(in srgb, var(--l4) 22%, var(--bg));
     --ch-glow: var(--glow-4);
-    --ch-chip-bg: color-mix(in srgb, var(--l4) 55%, var(--bg));
-    --ch-chip-ink: var(--l4-ink);
   }
   .ch-band[data-layer='l5'] {
     --ch-tint: color-mix(in srgb, var(--l5) 22%, var(--bg));
     --ch-glow: var(--glow-5);
-    --ch-chip-bg: color-mix(in srgb, var(--l5) 55%, var(--bg));
-    --ch-chip-ink: var(--l5-ink);
   }
 
   /* Radial glow, anchored top-right. */
@@ -176,52 +146,6 @@ if (updated) metaBits.push({ text: site.license });
     z-index: -1;
     background: radial-gradient(70% 90% at 88% 12%, var(--ch-glow), transparent 72%);
     pointer-events: none;
-  }
-
-  /* 14px dot texture, fading away from the glow so it never overpowers the copy.
-     Dimmer in dark via --texture-alpha. */
-  .ch-band::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background-image: radial-gradient(var(--tex-line) 1px, transparent 1px);
-    background-size: 14px 14px;
-    opacity: var(--texture-alpha);
-    pointer-events: none;
-    -webkit-mask-image: radial-gradient(120% 100% at 90% 0%, #000 25%, transparent 75%);
-    mask-image: radial-gradient(120% 100% at 90% 0%, #000 25%, transparent 75%);
-  }
-
-  .ch-kicker {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--s-3);
-    margin-bottom: var(--s-4);
-  }
-
-  .ch-kicker-mark {
-    flex: none;
-  }
-
-  .ch-kicker-book {
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--ink-2);
-  }
-
-  .ch-kicker-num {
-    padding: var(--s-1) var(--s-2);
-    border-radius: var(--r-sm);
-    background: var(--ch-chip-bg);
-    color: var(--ch-chip-ink);
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: 0.04em;
-    line-height: 1;
   }
 
   .chapter-header h1 {
@@ -235,7 +159,7 @@ if (updated) metaBits.push({ text: site.license });
   .lede {
     margin-top: var(--s-4);
     max-width: 60ch;
-    font-size: 1.25rem;
+    font-size: var(--fs-h3);
     line-height: 1.5;
     color: var(--ink-2);
   }

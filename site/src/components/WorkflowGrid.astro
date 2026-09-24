@@ -3,7 +3,9 @@
  * WorkflowGrid — the seven workflows the role owns, as register cards. Each
  * card carries a mono index, the workflow name, the stack layer it maps to (a
  * colour tick, or "all layers" for regulatory translation), a summary, and a
- * back-link to the workflow's heading in chapter 06.
+ * back-link to the workflow's heading in chapter 06. The card itself is not a
+ * link, so it takes the flat .card-lum surface with no hover lift (the lift is
+ * for cards that are links, audit SL-13).
  */
 import type { Workflow } from '../data/role';
 
@@ -25,7 +27,7 @@ const isBento = (className ?? '').split(/\s+/).includes('bento');
   {
     workflows.map((wf, i) => (
       <li
-        class:list={['workflow-item card-lum lift', { 'bento-2x': isBento && wf.layerN === 'all' }]}
+        class:list={['workflow-item card-lum', { 'bento-2x': isBento && wf.layerN === 'all' }]}
         style={`--i:${i};${wf.layerN === 'all' ? '' : ` --c: var(--l${wf.layerN});`}`}
       >
         <div class="head">

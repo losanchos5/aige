@@ -8,7 +8,6 @@
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/pages.css';
 import PageHero from '../components/PageHero.astro';
-import Kicker from '../components/Kicker.astro';
 import Section from '../components/Section.astro';
 import RegisterList from '../components/RegisterList.astro';
 import StackLayerPanel from '../components/StackLayerPanel.astro';
@@ -23,24 +22,22 @@ import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 const tools = toolsByCategory();
 const stackHref = (anchor: string) => `/bok/the-stack#${anchor}`;
 
+// Reading notes, not layers: no swatch, so RegisterList draws no layer tick.
 const howToRead = [
   {
     title: 'A build order, not an org chart',
     description:
       'Each layer produces an artefact the layer above consumes: Policy → Inventory → Evals → Runtime → Assurance.',
-    swatch: 'var(--l1)',
   },
   {
     title: 'Evidence flows up',
     description:
       'A policy verdict, a registry entry, an eval result and a guardrail decision are structured artefacts that layer 05 aggregates into audit-ready evidence.',
-    swatch: 'var(--l5)',
   },
   {
     title: 'It answers the three questions',
     description:
       'What AI is running, what it is allowed to do, and what evidence proves it — kept true as the system changes underneath.',
-    swatch: 'var(--l3)',
   },
 ];
 
@@ -59,18 +56,16 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
 >
   <PageHero
     variant="page"
-    kicker="The stack"
-    swatch="var(--l3)"
     related={{ label: 'Chapter 04 · Body of Knowledge', href: '/bok/the-stack' }}
     title="Five layers. One evidence chain."
     lede="The reference architecture of AI governance engineering: five layers that turn governance from a stack of parallel documents into one system with a data path from policy to proof."
   />
 
-  <Section tone="plain" rule kicker="Layer flow" kickerSwatch="var(--l5)" title="Follow one artefact from policy to proof.">
+  <Section tone="plain" rule title="Follow one artefact from policy to proof.">
     <div class="reveal"><StackFlow /></div>
   </Section>
 
-  <Section tone="plain" kicker="How to read it" kickerSwatch="var(--l1)" title="A build order, from policy to proof.">
+  <Section tone="plain" title="A build order, from policy to proof.">
     <div class="well reveal"><RegisterList items={howToRead} /></div>
     <p class="section-foot">
       <a class="chapter-link" href={stackHref('how-to-read-the-stack')}>
@@ -83,7 +78,6 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     <div class="story" data-story>
       <div class="story-pin">
         <div class="sec-head">
-          <Kicker swatch="var(--l2)">The five layers</Kicker>
           <h2 class="sec-title display">Policy, inventory, evals, runtime, assurance.</h2>
         </div>
         <div class="story-mark" data-story-mark>
@@ -102,13 +96,13 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     </div>
   </Section>
 
-  <Section tone="dark" rule kicker="Established and new" kickerSwatch="var(--l4)" title="Three layers established, two the AI forces.">
+  <Section tone="dark" rule title="Three layers established, two the AI forces.">
     <div class="split">
       <ol class="barmark" aria-hidden="true">
         {
           layers.map((layer) => (
             <li class:list={['bar-row', layer.inherited ? 'is-inherited' : 'is-new']}>
-              <span class="bar" style={`background: var(${layer.colorVar})`} />
+              <span class="bar" style={`background: var(${layer.colorVar}-ink)`} />
               <span class="bar-n">{String(layer.n).padStart(2, '0')}</span>
               <span class="bar-name">{layer.name}</span>
               <span class="bar-tag">{layer.inherited ? 'Established' : 'New'}</span>
@@ -138,7 +132,7 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     </div>
   </Section>
 
-  <Section tone="plain" kicker="Minimum viable stack" kickerSwatch="var(--l5)" title="The spine, thinly, for a team of one.">
+  <Section tone="plain" title="The minimum viable stack, for a team of one.">
     <p class="lede well">{minimumViableStack.intro}</p>
     <div class="well mvs reveal"><RegisterList items={mvsItems} /></div>
     <p class="section-foot">
@@ -148,7 +142,7 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     </p>
   </Section>
 
-  <Section tone="plain" texture="grid" rule kicker="The tools" kickerSwatch="var(--l1)" title="Categories are the substance; brands are illustrative.">
+  <Section tone="plain" rule title="Tool categories are the substance; brands are illustrative.">
     <Callout kind="note" title="Illustrative, not an endorsement">
       <p>
         Every tool named is an example of a category, not a recommendation. The
@@ -176,7 +170,10 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
 </Marketing>
 
 <style>
-  /* Inherited/new split: the five-bar register mark beside two short notes. */
+  /* Inherited/new split: the five-bar register mark beside two short notes.
+     The band is always dark (.sec--dark re-scopes the dark token set), where
+     the pastel --lN fills sink into the slate, so each bar paints its layer ink
+     (the bright pastel of the dark set). */
   .split {
     display: grid;
     gap: var(--s-6);
@@ -197,7 +194,7 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     grid-template-columns: 64px auto 1fr auto;
     align-items: center;
     gap: var(--s-3);
-    padding: var(--s-2) var(--s-3);
+    padding: var(--s-3) var(--s-4);
     border: 1px solid var(--line);
     border-radius: var(--r-sm);
   }

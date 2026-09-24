@@ -48,6 +48,82 @@ test('crosswalk cell opens the drawer on Enter and closes on Escape', async ({ p
   await expect(cell).toBeFocused();
 });
 
+test('crosswalk drawer: page behind is inert while open, scrim closes, focus returns', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/resources/crosswalk');
+  const cell = page.locator('.cw-cell').first();
+  await cell.click();
+
+  const drawer = page.locator('#cw-drawer');
+  await expect(drawer).toBeVisible();
+
+  // One close for both drawers: a "×" button named "Close", focused on open.
+  const close = drawer.getByRole('button', { name: 'Close', exact: true });
+  await expect(close).toBeFocused();
+  await expect(close).toHaveText('×');
+
+  // Header, footer and the grid behind are inert; the drawer and scrim are not.
+  const inert = await page.evaluate(() => {
+    const isInert = (sel: string) => !!document.querySelector(sel)?.closest('[inert]');
+    return {
+      header: isInert('header.site-header'),
+      footer: isInert('.site-footer'),
+      grid: isInert('[data-cw-grid]'),
+      drawer: isInert('#cw-drawer'),
+      scrim: isInert('.cw-scrim'),
+    };
+  });
+  expect(inert).toEqual({ header: true, footer: true, grid: true, drawer: false, scrim: false });
+
+  // A click on the scrim (left of the panel) closes it and lifts inert.
+  await page.locator('.cw-scrim').click({ position: { x: 200, y: 450 } });
+  await expect(drawer).toBeHidden();
+  await expect(page.locator('[inert]')).toHaveCount(0);
+  await expect(cell).toBeFocused();
+});
+
+test('crosswalk key, layer codes and scroll region are visible and named', async ({ page }) => {
+  await page.goto('/resources/crosswalk');
+  // CRW-1: the chip outlines are spelled out above the grid.
+  const key = page.getByRole('list', { name: 'Chip key' });
+  await expect(key).toBeVisible();
+  await expect(key).toContainText('maps to');
+  await expect(key).toContainText('related');
+
+  // CRW-3: the sideways scroller is a named, focusable region.
+  const region = page.getByRole('region', { name: /Topic by framework crosswalk/ });
+  await expect(region).toHaveAttribute('tabindex', '0');
+
+  // CRW-2: every layer tick in "By topic" prints its code next to the colour.
+  const firstTicks = page.locator('.cw-topic .ticks').first();
+  const label = (await firstTicks.getAttribute('aria-label')) as string;
+  const codes = label.replace(/^Layers /, '').split(', ').map((n) => `L${n}`);
+  await expect(firstTicks.locator('.tk-key')).toHaveText(codes);
+});
+
+// SL-06: a layer colour means a stack layer, so the framework-type tags and the
+// crosswalk chips are one neutral chip whatever the type.
+test('framework type tags and crosswalk chips are neutral, one colour for every type', async ({ page }) => {
+  const paints = (sel: string) =>
+    page.evaluate((s) => {
+      const out = new Set<string>();
+      for (const el of document.querySelectorAll(s)) {
+        const cs = getComputedStyle(el);
+        out.add(`${cs.backgroundColor}|${cs.color}`);
+      }
+      return [...out];
+    }, sel);
+
+  await page.goto('/resources/frameworks');
+  expect(await page.locator('.type-tag[data-type]').count()).toBeGreaterThan(1);
+  expect(await paints('.type-tag[data-type]')).toHaveLength(1);
+
+  await page.goto('/resources/crosswalk');
+  expect(await paints('.cw-chip[data-type]:not(.is-related)')).toHaveLength(1);
+});
+
 test('crosswalk CSV and JSON export the data with the notice', async ({ page }) => {
   const notice = 'not a claim of conformity';
 
@@ -95,6 +171,29 @@ test('frameworks page renders the frameworks and the obligation index', async ({
   await page.goto('/resources/frameworks');
   expect(await page.locator('[data-framework-row]').count()).toBeGreaterThanOrEqual(14);
   expect(await page.locator('[data-obligation-row]').count()).toBeGreaterThanOrEqual(40);
+});
+
+test('obligation layers print their codes, and matrix heads are not dimmed', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/resources/frameworks');
+  // CRW-2: the LAYERS column shows "L1"… beside each colour tick.
+  const ticks = page.locator('[data-obligation-row] .ticks').first();
+  const label = (await ticks.getAttribute('aria-label')) as string;
+  const codes = label.replace(/^Layers /, '').split(', ').map((n) => `L${n}`);
+  await expect(ticks.locator('.tk-key')).toHaveText(codes);
+
+  // FRW-1: the layer names on the heat-matrix heads are >= 12px and opaque.
+  const name = page.locator('.mx-colh-name').first();
+  await expect(name).toHaveCSS('opacity', '1');
+  const size = await name.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+  expect(size).toBeGreaterThanOrEqual(12);
+});
+
+test('hub resource list has no bullets or indent', async ({ page }) => {
+  await page.goto('/resources');
+  const list = page.locator('ul.rc-bento');
+  await expect(list).toHaveCSS('list-style-type', 'none');
+  await expect(list).toHaveCSS('padding-left', '0px');
 });
 
 test('tools page renders at least fifteen tools', async ({ page }) => {

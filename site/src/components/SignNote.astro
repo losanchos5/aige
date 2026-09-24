@@ -28,8 +28,10 @@ const { signUrl, issueUrl, class: className } = Astro.props;
     padding: var(--s-3) var(--s-4);
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
-    background: color-mix(in srgb, var(--l5) 40%, var(--bg));
-    font-size: 0.9375rem;
+    /* Neutral tint, not a layer colour (audit SL-06); body size, on the token
+       scale (the note is set apart by its box, not by a smaller size). */
+    background: var(--tint-bg);
+    font-size: var(--fs-body);
   }
 
   .sign-note p {
@@ -39,6 +41,12 @@ const { signUrl, issueUrl, class: className } = Astro.props;
   .sign-note a {
     color: var(--ink);
     font-weight: 600;
+  }
+
+  /* The file path is one long token: let it break rather than push the page
+     sideways when text is enlarged on a phone (WCAG 1.4.4). */
+  .sign-note code {
+    overflow-wrap: anywhere;
   }
 
   .sign-note a:focus-visible {

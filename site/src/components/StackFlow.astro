@@ -238,7 +238,7 @@ const axisBottom = cy(1) - 12;
     <div class="flow-panels">
       {layers.map((layer) => (
         <div class="flow-panel" data-panel={layer.n} hidden={layer.n !== 1}>
-          <p class="fp-eyebrow">
+          <p class="fp-title">
             <span class="fp-sq" aria-hidden="true" style={`background: var(${layer.colorVar})`}></span>
             Layer {pad(layer.n)} · {layer.name}
           </p>
@@ -380,10 +380,19 @@ const axisBottom = cy(1) - 12;
     text-transform: uppercase;
   }
 
-  /* Active state (JS only): dim the rest, light the active layer's flows. The
-     lane labels stay at full --ink-2 strength so every lane stays named. */
-  .flow.flow-js.has-active [data-band]:not(.is-active):not(.nband) {
+  /* Active state (JS only): recede the rest, light the active layer's flows.
+     Only the band geometry recedes (opacity on the rect, never on its text):
+     an inactive name drops to --ink-2 at a lighter weight, while the active
+     band keeps --ink, weight 600 and the 2px ink outline. The index keeps its
+     layer ink, which reads stronger still over the paler rect. The lane labels
+     stay at full --ink-2 strength so every lane stays named. */
+  .flow.flow-js.has-active .band:not(.is-active) .band-rect {
     opacity: 0.4;
+  }
+
+  .flow.flow-js.has-active .band:not(.is-active) .band-name {
+    fill: var(--ink-2);
+    font-weight: 500;
   }
 
   .flow.flow-js.has-active .flow-path {
@@ -401,12 +410,14 @@ const axisBottom = cy(1) - 12;
   }
 
   @media (prefers-reduced-motion: no-preference) {
-    .band,
+    .band-rect,
+    .band-name,
     .flow-path,
     .flow-label,
     .nband {
       transition:
         opacity var(--dur) var(--ease),
+        fill var(--dur) var(--ease),
         stroke var(--dur) var(--ease),
         stroke-width var(--dur) var(--ease);
     }
@@ -525,16 +536,17 @@ const axisBottom = cy(1) - 12;
     display: none;
   }
 
-  .fp-eyebrow {
+  /* The panel's title line: its layer square, number and name. Mono in
+     sentence case (the name runs to ~45 characters, audit SL-05), at --ink-2
+     because it heads the panel rather than labelling it. */
+  .fp-title {
     display: flex;
     align-items: center;
     gap: var(--s-2);
     margin: 0;
     font-family: var(--font-mono);
     font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--muted);
+    color: var(--ink-2);
   }
 
   .fp-sq {

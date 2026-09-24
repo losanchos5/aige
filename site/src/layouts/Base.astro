@@ -27,6 +27,10 @@ interface Props {
   article?: { publishedTime?: string; modifiedTime?: string; author?: string };
   /** Emit `<meta name="robots" content="noindex">`; see Seo. */
   noindex?: boolean;
+  /** Float the header, transparent, over a full-viewport hero (the home). */
+  overlayHeader?: boolean;
+  /** Extra /fonts/*.woff2 files this page preloads (the home hero's serif). */
+  preloadFonts?: string[];
 }
 
 const {
@@ -40,6 +44,8 @@ const {
   titleSuffix,
   article,
   noindex,
+  overlayHeader = false,
+  preloadFonts = [],
 } = Astro.props;
 
 // Cloudflare Web Analytics: only injected when a token is provided at build time
@@ -99,11 +105,16 @@ const umamiSrc = 'https://admin.stocktcg.net/script.js';
     />
     <link
       rel="preload"
-      href="/fonts/bricolage-grotesque-latin-standard-normal.woff2"
+      href="/fonts/bricolage-grotesque-latin-wght-normal.woff2"
       as="font"
       type="font/woff2"
       crossorigin
     />
+    {
+      preloadFonts.map((href) => (
+        <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />
+      ))
+    }
 
     <!-- Apply persisted theme before paint; exposes window.__setTheme. -->
     <script is:inline src="/theme.js"></script>
@@ -128,7 +139,7 @@ const umamiSrc = 'https://admin.stocktcg.net/script.js';
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
-    <Header />
+    <Header overlay={overlayHeader} />
 
     <main id="main">
       <slot />

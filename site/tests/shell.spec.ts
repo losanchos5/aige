@@ -44,6 +44,46 @@ test.describe('desktop grouped nav', () => {
     await expect(page.locator('#nav-menu-reference')).toBeVisible();
   });
 
+  // TC-07: hover-intent opens the panel ~80ms after the pointer enters; the
+  // click that follows is the same gesture and must not toggle the panel shut,
+  // however long the pointer lingered first. Once the pointer has left the
+  // group, a click toggles as usual.
+  test('a click after hover-intent keeps the panel open until the pointer leaves', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const trigger = page.locator('header.site-header').getByRole('button', { name: 'Practice' });
+    const menu = page.locator('#nav-menu-practice');
+    const box = await trigger.boundingBox();
+    expect(box).not.toBeNull();
+    const over = { x: box!.x + box!.width / 2, y: box!.y + box!.height / 2 };
+    // Top-left corner of the page: outside every nav group and its panel.
+    const away = { x: 4, y: 4 };
+
+    for (const delay of [150, 600]) {
+      await page.mouse.move(away.x, away.y);
+      await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+      await page.mouse.move(over.x, over.y);
+      await page.waitForTimeout(delay);
+      await page.mouse.click(over.x, over.y);
+      await expect(trigger, `a click ${delay}ms after the hover`).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      );
+      await expect(menu).toBeVisible();
+    }
+
+    // Out of the group and straight back, before the 200ms close fires: the
+    // panel stays open, but it is no longer the hover's, so the click closes it.
+    await page.mouse.move(away.x, away.y);
+    await page.mouse.move(over.x, over.y);
+    await page.waitForTimeout(300);
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await page.mouse.click(over.x, over.y);
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(menu).toBeHidden();
+  });
+
   test('Escape closes the panel and returns focus to the trigger', async ({ page }) => {
     await page.goto('/');
     const trigger = page.locator('header.site-header').getByRole('button', { name: 'Practice' });
@@ -122,11 +162,34 @@ test('theme toggle flips data-theme and back', async ({ page }) => {
   expect(second).not.toBe(first);
 });
 
+// TC-16: one fixed name; the state lives in aria-pressed alone.
+test('theme toggle keeps one name and reports its state via aria-pressed', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/');
+  const toggle = page.locator('header.site-header [data-theme-toggle]');
+  await expect(toggle).toHaveAttribute('aria-label', 'Dark theme');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-label', 'Dark theme');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+});
+
 test('404 renders the BLOCK verdict', async ({ page }) => {
   const res = await page.goto('/does-not-exist');
   expect(res?.status()).toBe(404);
   await expect(page.getByText('BLOCK', { exact: false })).toBeVisible();
   await expect(page.getByText('Route not registered.')).toBeVisible();
+});
+
+// 404-1: one primary way out; search is the quiet fallback.
+test('404 offers one primary CTA and a search fallback', async ({ page }) => {
+  await page.goto('/does-not-exist');
+  const cta = page.locator('.nf-cta');
+  await expect(cta.locator('.btn')).toHaveCount(1);
+  await expect(cta.getByRole('link', { name: 'Back to home' })).toBeVisible();
+  await cta.getByRole('button', { name: 'Search the site' }).click();
+  await expect(page.locator('#search-dialog')).toBeVisible();
 });
 
 test.describe('mobile drawer', () => {

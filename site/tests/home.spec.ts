@@ -1,21 +1,30 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('home page', () => {
-  test('hero shows the headline and both CTAs', async ({ page }) => {
+  test('hero shows the headline and its CTA; the loop section links the BoK', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('h1')).toHaveText('Governance you can run, not just read.');
     await expect(
       page.getByRole('link', { name: 'Read the Thesis', exact: true }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: 'Open the Body of Knowledge', exact: true }),
-    ).toBeVisible();
+      page.locator('.loop-sec').getByRole('link', { name: 'Open the Body of Knowledge →' }),
+    ).toHaveAttribute('href', '/bok');
   });
 
-  test('the hero embeds both governance-loop diagrams', async ({ page }) => {
+  test('the loop section, under the hero, embeds both governance-loop diagrams', async ({
+    page,
+  }) => {
     await page.goto('/');
-    await expect(page.locator('.hero figure.diagram[data-diagram="hero-loop"]')).toHaveCount(1);
-    await expect(page.locator('.hero figure.diagram[data-diagram="hero-loop-tall"]')).toHaveCount(1);
+    await expect(page.locator('.hero--field + .loop-sec')).toHaveCount(1);
+    await expect(page.locator('.hero--field figure.diagram')).toHaveCount(0);
+    await expect(page.locator('.loop-sec figure.diagram[data-diagram="hero-loop"]')).toHaveCount(1);
+    await expect(
+      page.locator('.loop-sec figure.diagram[data-diagram="hero-loop-tall"]'),
+    ).toHaveCount(1);
+    await expect(page.locator('.loop-sec .sec-lede')).toContainText(
+      'AI governance engineering is the application of engineering practice',
+    );
   });
 
   test('at desktop the wide loop shows and the tall one is hidden', async ({ page }) => {
@@ -35,8 +44,8 @@ test.describe('home page', () => {
   test('the hero figure carries no simulated run telemetry', async ({ page }) => {
     await page.goto('/');
     // No run bar, no PASS stamp, no attestation number around the diagram.
-    await expect(page.locator('.hero .hero-panel-bar')).toHaveCount(0);
-    await expect(page.locator('.hero .stamp')).toHaveCount(0);
+    await expect(page.locator('.loop-sec .hero-panel-bar')).toHaveCount(0);
+    await expect(page.locator('.loop-sec .stamp')).toHaveCount(0);
     await expect(page.locator('.hero-caption')).not.toContainText(/#\d|run|attestation/i);
     // The nodes' example run values (sublabels) are not drawn in the hero.
     await expect(page.locator('.hero-art-wide text[data-detail="context"]').first()).toBeHidden();
@@ -45,7 +54,7 @@ test.describe('home page', () => {
   test('the hero figure links to the chapter that explains the loop', async ({ page }) => {
     await page.goto('/');
     const link = page
-      .locator('.hero figcaption')
+      .locator('.loop-sec figcaption')
       .getByRole('link', { name: 'Read how the governance loop works', exact: true });
     await expect(link).toBeVisible();
     await expect(link).toHaveAttribute('href', '/bok/the-stack#how-to-read-the-stack');

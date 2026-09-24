@@ -27,12 +27,63 @@
   text-wrap: pretty;
 }
 
-/* Horizontal scroll container; the first column stays put (sticky). */
+/* Chip key (CRW-1): the outline treatments spelled out above the grid, on
+   neutral sample chips so the key does not read as a framework type. */
+.cw-key {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-5);
+  margin: 0 0 var(--s-4);
+  padding: 0;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.cw-key > li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+/* A narrow-screen cue that the grid scrolls sideways (as .map-hint on /map).
+   A mixed-case sentence, so no label tracking. */
+.cw-hint {
+  display: none;
+  margin: 0 0 var(--s-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .cw-hint {
+    display: block;
+  }
+}
+
+/* Horizontal scroll container; the first column stays put (sticky). It is a
+   named, focusable region (keyboard scrolling). The scroll cue (CRW-3) is
+   pure background, no motion: a soft ink shade pinned to the right edge
+   (attachment: scroll) while more columns lie beyond, and a --bg cover that
+   travels with the content (attachment: local) and slides over the shade at
+   the far end, so the shade shows only while there is more to scroll. */
 .cw-scroll {
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  background: var(--bg);
+  background:
+    linear-gradient(to left, var(--bg) 50%, transparent) right center / var(--s-6) 100%
+      no-repeat local,
+    linear-gradient(to left, color-mix(in srgb, var(--ink) 16%, transparent), transparent)
+      right center / var(--s-4) 100% no-repeat scroll,
+    var(--bg);
+}
+
+.cw-scroll:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
 }
 
 .cw-grid {
@@ -142,33 +193,27 @@
 }
 
 /* ---- Chips ---------------------------------------------------------------- */
-/* Coloured by the framework's type with the .type-tag key in resources.css
-   (law → L1 · code → L2 · controls → L3 · standard → L4 · framework → L5): the
-   layer's --lN fill under its --lN-ink text, border-less (a transparent border
-   keeps every chip the same size). Related refs lose the fill and take a dashed
-   border in the chip's ink; unverified refs carry a dotted underline and a
-   visible "?" (never dimmed — opacity would drop contrast below AA). */
+/* One neutral chip for every framework type: a --tint-bg fill, a 1px --line
+   hairline and --ink-2 text (≥ 4.5:1 in light and dark). The layer colours are
+   kept for the layer ticks and codes (audit SL-06): the chip label and the
+   column head name the framework, so its type is not coded in colour. Related
+   refs lose the fill and take a dashed border in the chip's ink; unverified
+   refs carry a dotted underline and a visible "?" (never dimmed — opacity
+   would drop contrast below AA). */
 .cw-chip {
   display: inline-flex;
   align-items: center;
   padding: 0.15em 0.5em;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
-  background: color-mix(in srgb, var(--ink) 5%, var(--bg));
-  color: var(--ink);
+  background: var(--tint-bg);
+  color: var(--ink-2);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   letter-spacing: 0.02em;
   line-height: 1.3;
   white-space: nowrap;
 }
-
-.cw-chip[data-type] { border-color: transparent; }
-.cw-chip[data-type='law'] { background: var(--l1); color: var(--l1-ink); }
-.cw-chip[data-type='code'] { background: var(--l2); color: var(--l2-ink); }
-.cw-chip[data-type='controls'] { background: var(--l3); color: var(--l3-ink); }
-.cw-chip[data-type='standard'] { background: var(--l4); color: var(--l4-ink); }
-.cw-chip[data-type='framework'] { background: var(--l5); color: var(--l5-ink); }
 
 /* Related: dashed outline in the chip's own ink, no fill. */
 .cw-chip.is-related {
@@ -322,6 +367,7 @@
   gap: var(--s-2) var(--s-3);
 }
 
+/* Title without a rule under it, as in PathDrawer (GLB-1). */
 .cwd-title {
   grid-column: 1;
   margin: 0;
@@ -330,23 +376,25 @@
   font-size: var(--fs-h2);
   line-height: 1.1;
   letter-spacing: var(--tracking-display);
-  border-bottom: 3px solid var(--line);
-  padding-bottom: var(--s-2);
 }
 
+/* The one drawer close: a square "×" with aria-label="Close" at the head's top
+   right. Kept identical to .pd-close in PathDrawer.astro (GLB-1). */
 .cwd-close {
   grid-column: 2;
+  grid-row: 1;
   align-self: start;
-  min-height: 40px;
-  padding: 0 var(--s-3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
   background: transparent;
   color: var(--ink);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 1.5rem;
+  line-height: 1;
   cursor: pointer;
 }
 

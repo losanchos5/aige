@@ -1,9 +1,10 @@
 // page-hero.spec.ts: the shared full-bleed PageHero and the Breadcrumb trail.
-// (a) the hero's inert background layers (mesh + dot texture) reach both viewport
-// edges with no page-level horizontal scroll; (b) breadcrumbs render the right
-// trail, mark the current page and emit exactly one BreadcrumbList JSON-LD where
-// the page owns it; (c) the landings' related-chapter link, and that /path no
-// longer attributes itself to chapter 06.
+// (a) the hero's inert mesh reaches both viewport edges with no page-level
+// horizontal scroll, and no hero or section carries an eyebrow/kicker or a
+// dot/grid texture any more (audit SL-04, SL-18); (b) breadcrumbs render the
+// right trail, mark the current page and emit exactly one BreadcrumbList JSON-LD
+// where the page owns it; (c) the landings' related-chapter link, and that /path
+// no longer attributes itself to chapter 06.
 import { test, expect } from '@playwright/test';
 
 /** Geometry of a hero background layer plus the document's scroll/client width. */
@@ -34,26 +35,53 @@ test('resources sub-page hero mesh spans the viewport at 1440x900', async ({ pag
   expect(m!.scrollW).toBe(m!.clientWidth);
 });
 
-test('glossary hero keeps the dot texture full-bleed and has no mesh', async ({ page }) => {
+test('glossary hero has neither a mesh nor a texture layer', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/resources/glossary');
   await expect(page.locator('.hero .bg-mesh')).toHaveCount(0);
-  const t = await layer(page, '.hero .hero-tex');
-  expect(t).not.toBeNull();
-  expect(t!.left).toBe(0);
-  expect(t!.width).toBe(t!.clientWidth);
-  expect(t!.scrollW).toBe(t!.clientWidth);
+  await expect(page.locator('.hero .hero-tex, .hero .bg-dots, .hero .bg-grid')).toHaveCount(0);
+  const m = await layer(page, '.hero');
+  expect(m).not.toBeNull();
+  expect(m!.scrollW).toBe(m!.clientWidth);
 });
 
-test('landing hero texture spans the viewport on /role', async ({ page }) => {
+test('landing hero mesh spans the viewport on /role', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/role');
-  const t = await layer(page, '.hero .hero-tex');
-  expect(t).not.toBeNull();
-  expect(t!.left).toBe(0);
-  expect(t!.width).toBe(t!.clientWidth);
-  expect(t!.scrollW).toBe(t!.clientWidth);
+  const m = await layer(page, '.hero .bg-mesh');
+  expect(m).not.toBeNull();
+  expect(m!.left).toBe(0);
+  expect(m!.width).toBe(m!.clientWidth);
+  expect(m!.scrollW).toBe(m!.clientWidth);
 });
+
+// SL-04 / SL-18: no eyebrow above any title and no dot/grid texture behind the
+// content on the interior pages (the home keeps its own hero, and the footer's
+// grid is a separate, kept decision).
+const INTERIOR = [
+  '/role',
+  '/stack',
+  '/path',
+  '/map',
+  '/resources',
+  '/resources/frameworks',
+  '/resources/crosswalk',
+  '/bok',
+  '/bok/the-stack',
+  '/thesis',
+  '/es/thesis',
+  '/about',
+  '/about/changelog',
+  '/404',
+];
+
+for (const path of INTERIOR) {
+  test(`${path} has no eyebrow and no dot/grid texture`, async ({ page }) => {
+    await page.goto(path);
+    await expect(page.locator('main .kicker, main .ch-kicker, main .eyebrow')).toHaveCount(0);
+    await expect(page.locator('main .bg-dots, main .bg-grid, main .hero-tex')).toHaveCount(0);
+  });
+}
 
 // ---- (b) breadcrumbs -------------------------------------------------------
 

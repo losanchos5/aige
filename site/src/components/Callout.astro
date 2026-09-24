@@ -1,7 +1,8 @@
 ---
 /**
- * Callout — an editorial aside with a 3px ink bar on the left and a matte tint
- * keyed to its kind. No rounded pill, no shadow.
+ * Callout — an editorial aside: a 1px --line frame with the label inside and a
+ * matte tint keyed to its kind. No side rail (the tint and the label already
+ * tell the kinds apart), no rounded pill.
  *   practice -> L2, example -> L1, anti -> L3, note -> neutral surface.
  */
 interface Props {
@@ -28,10 +29,8 @@ const tags: Record<Props['kind'], string> = {
 <style>
   .callout {
     --tint: var(--surface);
-    --rail: var(--ink);
     border: 1px solid var(--line);
-    border-left: 3px solid var(--rail);
-    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    border-radius: var(--r-sm);
     background: var(--tint);
     box-shadow: var(--shadow-1);
     padding: var(--s-4) var(--s-5);

@@ -56,6 +56,14 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
 </div>
 
 <style>
+  /* A flex item of Doc's footer row: without min-width: 0 it grows to the
+     BibTeX block's unwrapped width once the disclosure opens, and the whole
+     page scrolls sideways on a phone. */
+  .cite-wrap {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   .cite-box {
     font-size: 0.9375rem;
   }
@@ -92,9 +100,11 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
     background: var(--surface);
   }
 
+  /* The DOI and page URLs have no break points of their own. */
   .cite-apa {
     color: var(--ink-2);
     line-height: 1.5;
+    overflow-wrap: anywhere;
   }
 
   .cite-label {
@@ -108,6 +118,7 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
   }
 
   .cite-bibtex {
+    max-width: 100%;
     margin: var(--s-2) 0 0;
     padding: var(--s-3);
     border: 1px solid var(--line);

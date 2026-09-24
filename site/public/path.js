@@ -1,10 +1,10 @@
 /* Learning-path behaviour, loaded from a same-origin file so the CSP
    script-src 'self' holds. Tracks per-node progress in localStorage, drives the
    stage/overall meters, opens a focus-trapped modal drawer per node (Esc/scrim
-   close, focus restored), and precomputes the cross-stage prerequisite edges
-   >=840px — kept hidden and revealed only for the node under the pointer/focus
-   or open in the drawer. No-JS falls back to the native <details> bodies and
-   the CSS spine. */
+   close, the page behind inert while open, focus restored), and precomputes
+   the cross-stage prerequisite edges >=840px — kept hidden and revealed only
+   for the node under the pointer/focus or open in the drawer. No-JS falls back
+   to the native <details> bodies and the CSS spine. */
 (function () {
   'use strict';
 
@@ -118,6 +118,11 @@
     });
   }
   function onKeydown(e) {
+    // A <dialog> over the drawer (the search) owns the keyboard: no trap, and
+    // its Esc closes only it. Its own Esc handler may already have closed it by
+    // the time the key bubbles here, so a key from inside a dialog counts too.
+    var t = e.target;
+    if (document.querySelector('dialog[open]') || (t && t.closest && t.closest('dialog'))) return;
     if (e.key === 'Escape') {
       closeDrawer();
       return;
@@ -136,6 +141,10 @@
       first.focus();
     }
   }
+  // The page behind the open drawer goes inert (TC-15), through the helper
+  // shared with the other drawers (public/inert.js, loaded first): header,
+  // footer and the rest of <main>, never the scrim or a <dialog>.
+  var setBackgroundInert = window.aigeInert ? window.aigeInert(drawer, scrim) : function () {};
   // Open motion. With the bundled runtime (window.aigeMotion, from
   // src/scripts/motion-ui.ts) aigeMotion.openPanel() springs the panel in from
   // its off-canvas position, then the body's blocks follow with a short
@@ -203,12 +212,21 @@
     drawer.hidden = false;
     if (scrim) scrim.hidden = false;
     document.body.classList.add('path-lock');
+    setBackgroundInert(true);
     var opener = li.querySelector('[data-node-open]');
     if (opener) opener.setAttribute('aria-expanded', 'true');
-    showDrawer();
+    // Esc and the focus trap are wired before the entrance runs, and a failed
+    // entrance falls back to the CSS slide: the inert page behind is never left
+    // without a way out. (Focus still moves after it: focusing first would
+    // flush styles and let the CSS transition fight the spring.)
+    document.addEventListener('keydown', onKeydown);
+    try {
+      showDrawer();
+    } catch (err) {
+      drawer.classList.add('is-open');
+    }
     var closeBtn = drawer.querySelector('[data-path-close]');
     if (closeBtn) closeBtn.focus();
-    document.addEventListener('keydown', onKeydown);
     refreshEdges();
   }
 
@@ -224,6 +242,8 @@
       var opener = li && li.querySelector('[data-node-open]');
       if (opener) opener.setAttribute('aria-expanded', 'false');
     }
+    // Lift inert before handing focus back: an inert trigger cannot take it.
+    setBackgroundInert(false);
     if (lastFocused && lastFocused.focus) lastFocused.focus();
     lastFocused = null;
     currentId = null;

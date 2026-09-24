@@ -45,6 +45,10 @@ block).
 | `--tint-bg` | `color-mix(in srgb, var(--l1) 18%, var(--bg))` | `color-mix(in srgb, var(--l1-ink) 10%, var(--bg))` |
 | `--band-bg` ⁴ | `#15171c` | `#0b0d10` |
 | `--tex-line` ² | `color-mix(in srgb, var(--ink) 9%, transparent)` | `color-mix(in srgb, var(--ink) 8%, transparent)` |
+| `--hero-ink` ⁵ | `var(--l1-ink)` | `var(--ink)` |
+| `--field-1` ⁵ | `#1F3A63` | `#1F3A63` |
+| `--field-2` ⁵ | `#8FAEE0` | `#2D4F86` |
+| `--field-3` ⁵ | `#F1C99A` | `#6B4E2E` |
 
 ¹ The glows colour the `.bg-mesh` radial blooms (and ChapterHeader's corner glow). They are never a
 `box-shadow` halo: no button, card or panel carries a coloured glow.
@@ -53,6 +57,9 @@ block).
 `--shadow-2` is the hover elevation of link cards only.
 ⁴ The `.sec--dark` ground. On the home, the verdict beat swaps it for the dark `--l1` tone in the
 dark theme (the near-black `#0b0d10` all but vanishes on the `#121417` page).
+⁵ The home hero's moving gradient field (`public/hero-field.js` and its static CSS fallback on
+`.hero-field`): three blob tones on the page ground, and the headline's own ink over them. Read
+only by `pages/index.astro`.
 
 The five `--l1..--l5` pairs are the only accent hues on the site. They map to the five layers of the
 governance stack (see the home page and `/stack`) and are reused everywhere a figure or an accent
@@ -60,21 +67,26 @@ needs a color — never introduce a sixth hue.
 
 ## Typography
 
-Three self-hosted, self-fontsourced variable families, loaded in `site/src/styles/fonts.css` via
-`@font-face` from `/fonts/*.woff2` (copied from `@fontsource-variable/*`, latin subset,
-`font-display: swap`; Instrument Sans and JetBrains Mono carry the weight axis only):
+Four self-hosted, self-fontsourced families, loaded in `site/src/styles/fonts.css` via `@font-face`
+from `/fonts/*.woff2` (latin subset, `font-display: swap`):
 
-- **Bricolage Grotesque Variable** (`--font-display`) — display type: hero, H1/H2/H3. The one
-  family with all its axes: `wght` 200–800, `wdth` 75–100 (declared as `font-stretch: 75% 100%`,
-  so `font-stretch` drives it) and `opsz` 12–96, from the `latin-standard` file (131 KB, preloaded
-  in `Base.astro` and `public/_headers`). `fonts.css` pins `font-variation-settings: 'opsz' 14` on
-  `:root`, the text master every heading has always drawn; only `.display-xl` releases the pin.
+- **Bricolage Grotesque Variable** (`--font-display`) — display type: H1/H2/H3 everywhere except the
+  home hero headline. Weight axis only (`wght` 200–800), copied from `@fontsource-variable/*` as the
+  `latin-wght-normal` file (preloaded in `Base.astro` and `public/_headers`); no `wdth`/`opsz` axes
+  and no `font-variation-settings` pin — every heading draws the plain weight master.
 - **Instrument Sans Variable** (`--font-body`, weight 400–700) — body copy, paragraphs, UI labels.
 - **JetBrains Mono Variable** (`--font-mono`, weight 100–800) — code, data, short identifiers and
   small in-section captions (sentence case, e.g. "Build order"). Uppercase + `--tracking-label` only
   for short identifiers (PASS / BLOCK, a value's "established" / "new" tag). No eyebrow labels.
   Table headers and any label longer than a short identifier are sentence case; `.meta` is the
   only remaining uppercase run (dropping it too is the owner's call).
+- **Newsreader Display** (`--font-serif`) — the home hero headline only (`.hero-title` in
+  `pages/index.astro`), nowhere else. Two static cuts (roman + italic), each instanced at its
+  display optical size (opsz 72, wght 400) from `@fontsource-variable/newsreader`'s opsz files with
+  fontTools (`fonttools varLib.instancer … opsz=72 wght=400 --flavor woff2`, ~22 KB each, against
+  132/147 KB for the source variable files) — no axes to set at runtime, so `font-variation-settings:
+  normal`. Preloaded only on `/` via `Base.astro`'s `preloadFonts` prop and a `/`-scoped block in
+  `public/_headers` (every other route stays untouched).
 
 Fluid type scale (all `clamp()` values from `tokens.css`):
 
@@ -91,15 +103,11 @@ Fluid type scale (all `clamp()` values from `tokens.css`):
 Display lettering defaults: `--tracking-display: -0.02em`, `--tracking-label: 0.1em`,
 `--leading-display: 1.05`.
 
-**`.display-xl`** — the display voice at hero scale, a modifier on `.display` used by the home hero
-H1 only (scoped in `site/src/pages/index.astro`, so no other page changes). Tall, narrow and light:
-`font-size: var(--fs-display-xl)`, with `--fs-display-xl: clamp(4rem, 3.6rem + 3.7vw, 7rem)` set on
-`.hero-grid` (69 px at 320, 72 at 390, 105 at 1280, 111 at 1440, 112 cap); `font-weight: 350`;
-`font-stretch: 80%`; `font-optical-sizing: auto` with `font-variation-settings: normal`, so the
-optical size follows the font size up to the display master (96); `line-height: 0.98`;
-`letter-spacing: -0.01em` (a condensed cut needs far less negative tracking than the 700 weight);
-`text-wrap: balance`. The hero H1 caps its measure at `4.2em`, so it breaks as the same three
-phrases at every width ("Governance / you can run, / not just read.").
+**`.hero-title`** — the home hero headline's own scoped style (`site/src/pages/index.astro`, not a
+shared primitive: no other page uses `--font-serif`). `font-size: min(clamp(3rem, 1rem + 4.6vw,
+6.5rem), 15vw)` (the `15vw` cap keeps 200% zoomed text inside a 390px viewport, WCAG 1.4.4/1.4.10);
+`font-weight: 400`; `line-height: 1.02`; `letter-spacing: -0.015em`; colour `--hero-ink`. Two
+`.hero-line` blocks ("Governance you can *run*," / "not just read."), each `text-wrap: balance`.
 
 ## Spacing & radius
 
@@ -124,9 +132,19 @@ range by `var(--i, 0) * 6%`). The keyframes (`reveal-in`) animate **`transform: 
 only as a progressive-enhancement fallback for browsers without scroll-timelines, and both paths
 respect `prefers-reduced-motion`.
 
-**Perpetual motion:** the mesh drift (`mesh-drift-a` 34s / `mesh-drift-b` 42s, `alternate`, only under
-`no-preference`) is the one sanctioned infinite animation. Everything else runs once: the hero loop
-walks one pulse and rests, the verdict ticker is a static list, count-ups play once.
+**Perpetual motion:** three sanctioned infinite animations, all gated to
+`prefers-reduced-motion: no-preference`. The mesh drift (`mesh-drift-a` 34s / `mesh-drift-b` 42s,
+`alternate`) has no user control (it is decorative and behind content). The home hero's gradient
+field (`public/hero-field.js`, a WebGL shader painting `.hero-canvas`, ~30 fps) and its figures strip
+marquee (`facts-scroll`, 60s linear, transform-only) share one pause control (`.motion-toggle`,
+`aria-pressed`, WCAG 2.2.2) that stops them together. By Jordi's call (2026-09-24) it has no visible
+chrome: like the skip link it sits off screen until keyboard focus reaches it (Tab after the CTA);
+a click or tap on the strip pauses and resumes both (touch and mouse users), and hovering the strip
+pauses it. Under forced colours the canvas is skipped and the CSS fallback shows. Under reduced motion the field renders one
+still frame and the strip is a static wrapping list, from first paint. Everything else runs once: the
+loop section's figure (`.hero-art` under `.loop-sec`) now starts its one pulse when it scrolls into
+view (`IntersectionObserver` in `public/hero.js`) rather than on load, the verdict ticker is a static
+list, count-ups play once.
 
 ## Primitives
 
@@ -171,6 +189,22 @@ walks one pulse and rests, the verdict ticker is a static list, count-ups play o
   `--band-text-2`).
 - **Section rule** (`site/src/layouts/Marketing.astro`) — a plain 1px `--line` top border between
   adjacent `<section>` siblings inside `.marketing`. No number, no notch.
+- **`.hero--field`** (scoped in `site/src/pages/index.astro`, home only) — the full-viewport
+  (`min-height: 100svh`) hero: a `.hero-field` layer holding `.hero-canvas` (the WebGL gradient
+  field, `public/hero-field.js`, with a static CSS radial-gradient fallback painted from the same
+  `--field-1..3` tokens for no-JS/no-WebGL and first paint), the centred `.hero-title` + CTA
+  (`.hero-center`), and the `.hero-facts` strip. `--muted` is re-scoped to `--ink-2` on it in
+  `effects.css`, same as `.sec--mesh`/`.hero--page`.
+- **`.hero-facts`** (`pages/index.astro`) — the strip of figures under the headline: label | value
+  pairs computed from the content modules (stack layers, workflows, chapters, values, frameworks,
+  patterns, BoK version, license), doubled into an `aria-hidden`+`inert` copy for the seamless
+  marquee, with the keyboard-only `.motion-toggle` pause control (see Motion tokens). Reduced motion or no JS
+  keeps it a static, centred, wrapping list.
+- **Header overlay mode** (`Header.astro` prop `overlay`, threaded from `Base.astro`/`Marketing.astro`
+  `overlayHeader`, home only) — `data-overlay` makes the bar `position: fixed`, fully transparent (no
+  ground, blur, hairline or shadow, `--muted` re-scoped to `--ink-2`) until `.is-scrolled` (`ui.js`,
+  >8px), when it falls back to the normal frosted/solid bar. The shader keeps the header's `--ink-2`
+  text ≥ 5:1 wherever it floats over the field.
 
 ## Hard constraints
 
@@ -181,7 +215,7 @@ walks one pulse and rests, the verdict ticker is a static list, count-ups play o
 2. **Never dim text with `opacity`.** Secondary text uses the `--muted` or `--ink-2` color tokens,
    never a reduced-opacity `--ink`.
 3. **`--muted` fails AA on tinted/dark bands.** It is re-scoped to `var(--ink-2)` inside
-   `.sec--tint` and over the mesh (`.sec--mesh`, `.hero--page`, `.hero--loop`, `.hero-panel`), and
+   `.sec--tint` and over the mesh (`.sec--mesh`, `.hero--page`, `.hero--field`, `.hero-panel`), and
    the full dark token set (including `--muted`) is re-scoped inside `.sec--dark`, all in
    `effects.css`. Any new tinted or dark surface must go through `<Section tone="tint">` /
    `<Section tone="dark">` rather than hand-rolling a background color. CtaBand is the one
@@ -199,7 +233,9 @@ walks one pulse and rests, the verdict ticker is a static list, count-ups play o
    coloured glow) on buttons, cards or panels; the gradient fills carry the weight.
 8. **No eyebrows, no section numbers.** No kicker or eyebrow label above a heading, no running
    section counter, no chip or badge. Leading-zero numbers are reserved for content sequences the
-   reader uses (layers, chapters, values).
+   reader uses (layers, chapters, values). Documented exception: the home hero's `.hero-facts` strip
+   (`.fact` plates) — it is not a badge on a heading but a self-contained register of figures with
+   its own label|value structure, matched by the accompanying `.motion-toggle` control.
 
 ## Quality gates
 
@@ -218,8 +254,12 @@ detect dist` (anti-pattern count must not rise versus the recorded baseline; no 
 - Do keep all scroll-reveal and hover motion inside `--dur`/`--ease` and transform-only for anything
   above the fold.
 - Don't introduce purple, blue-violet or saturated marketing gradients — the only gradients are the
-  mesh's radial glows, `--grad-border` and `--grad-cta`, all derived from the layer/ink tokens.
-- Don't add a new font family; the site has exactly three (display, body, mono).
+  mesh's radial glows, `--grad-border`, `--grad-cta` and the home hero's gradient field, all derived
+  from the layer/ink or `--field-*` tokens (the field is the one sanctioned exception to "no
+  saturated gradient", scoped to `.hero--field` on the home).
+- Don't add a new font family; the site has exactly four (display, body, mono, serif), and the
+  serif (`--font-serif`, Newsreader Display) is limited to the home hero headline — never use it
+  elsewhere.
 - Don't nest `.card-lum` inside another `.card-lum`, or stack more than one `.bg-mesh` in a section.
 - Don't put a dot or grid texture behind content, and don't give a non-link card a hover lift.
 - Don't add inline `<script>` tags or inline event handlers; the CSP forbids them.
