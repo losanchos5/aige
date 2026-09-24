@@ -44,8 +44,9 @@ política de roles de autoría y revisión.
 - **Newsletter**: el formulario existente también en la portada y al final de cada capítulo.
 - **Eventos de Umami**: atributos `data-umami-event` (sin scripts nuevos) en descargas del footer y
   del PDF, envío de la newsletter, apertura de la búsqueda y botones de citar/copiar.
-- **Tests**: `nav.spec`, `home.spec`, `loop.spec`, `resources.spec`, `seo-infra.spec` y
-  `shell.spec` alineados con lo anterior; conteos derivados de los datos o del `dist`.
+- **Tests**: `nav.spec`, `home.spec`, `loop.spec`, `resources.spec` y `seo-infra.spec`
+  alineados con lo anterior y un `shell-parts.spec` nuevo; conteos derivados de los datos o del
+  `dist`.
 - Fuera de alcance (van al handoff): enlaces a rutas que otros bloques crean en paralelo
   (`/obligations`, `/patterns`, `/figures`, `/toolkit`, `/glossary/<term>`, `/agents`, `/api/v1`,
   `/resources/data`), atributos de Umami en páginas de otros bloques y en `Doc.astro`, y la
@@ -75,5 +76,5 @@ política de roles de autoría y revisión.
 - Registros compartidos: `site/astro.config.ts` (`SOURCE_BY_PATH`), `sources/SOURCES.md`,
   `bok/CHANGELOG.md`.
 - Repositorio: `bok/CONTRIBUTORS.md`, `.github/ISSUE_TEMPLATE/*.yml`.
-- Tests: `site/tests/{nav,home,loop,resources,seo-infra,shell}.spec.ts`.
+- Tests: `site/tests/{nav,home,loop,resources,seo-infra,shell-parts}.spec.ts`.
 - Sin dependencias nuevas ni scripts nuevos en el cliente; la CSP no cambia.

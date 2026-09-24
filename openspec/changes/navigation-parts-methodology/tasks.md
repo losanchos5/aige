@@ -40,7 +40,7 @@ no se tocan; lo que falte fuera del bloque va al handoff.
 ## 6. Registros, tests y entrega
 
 - [x] 6.1 Añadir entradas a `sources/SOURCES.md` y `bok/CHANGELOG.md` (Unreleased (v0.5.0)).
-- [x] 6.2 Actualizar `nav.spec`, `home.spec`, `loop.spec`, `resources.spec`, `seo-infra.spec` y `shell.spec`.
+- [x] 6.2 Actualizar `nav.spec`, `home.spec`, `loop.spec`, `resources.spec` y `seo-infra.spec`, y crear `shell-parts.spec`.
 - [x] 6.3 Ejecutar `bash D:/Documents/aige-wt/build.sh` hasta que salga con código 0.
 - [x] 6.4 Ejecutar `openspec validate navigation-parts-methodology --strict` hasta que pase.
 - [x] 6.5 Escribir `D:/Documents/aige-wt/handoffs/b-nav-shell.json`.
