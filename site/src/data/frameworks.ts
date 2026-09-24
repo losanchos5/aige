@@ -234,7 +234,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'State of California',
     url: 'https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB53',
     summary:
-      'A frontier-AI transparency law in force 1 January 2026, binding large frontier developers (models above ~10^26 FLOP; developer revenue over USD 500M) to publish a frontier AI framework and report critical safety incidents to the state's Office of Emergency Services within 15 days.',
+      'A frontier-AI transparency law in force 1 January 2026, binding large frontier developers (models above ~10^26 FLOP; developer revenue over USD 500M) to publish a frontier AI framework and report critical safety incidents to the California Office of Emergency Services within 15 days.',
   },
   {
     id: 'ny-raise-act',
