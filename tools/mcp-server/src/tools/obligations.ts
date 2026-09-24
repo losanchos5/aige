@@ -33,6 +33,7 @@ const obligationSummary = z.object({
   artefact: z.string().describe('The engineering artefact that evidences the obligation.'),
   layers: z.array(z.number().int()),
   dutyHolder: z.string().nullable(),
+  scope: z.string().nullable().describe('Who the row binds, for laws outside the EU AI Act.'),
   appliesFrom: z.string().nullable().describe('First application date (ISO), null when voluntary or undated.'),
   appliesStatus: z.string(),
   appliesNote: z.string().nullable(),
@@ -57,6 +58,7 @@ function summary(row: Obligation): z.infer<typeof obligationSummary> {
     artefact: row.artefact,
     layers: row.layers,
     dutyHolder: row.dutyHolder,
+    scope: row.scope,
     appliesFrom: row.appliesFrom,
     appliesStatus: row.appliesStatus,
     appliesNote: row.appliesNote,
@@ -75,7 +77,7 @@ function summary(row: Obligation): z.infer<typeof obligationSummary> {
 
 function oneLine(row: Obligation): string {
   const when = row.appliesFrom ? `${row.appliesStatus} from ${row.appliesFrom}` : row.appliesStatus;
-  const who = row.dutyHolder ? `; ${row.dutyHolder}` : '';
+  const who = row.dutyHolder ? `; ${row.dutyHolder}` : row.scope ? `; ${row.scope}` : '';
   return `- ${row.id}: ${row.obligation} (${when}${who})\n  Artefact: ${row.artefact}\n  ${row.url}`;
 }
 
@@ -95,7 +97,7 @@ export const registerObligations: Register = (server, deps) => {
     {
       title: 'List obligations',
       description:
-        'Filter the obligation register (obligation → artefact → stack layer, with stable ids such as AIGE-OBL-EUAIA-ART9). All filters are optional and combine with AND. framework: an id, short name or name ("eu-ai-act", "EU AI Act", "ISO 42001", "nist"); role: a duty holder such as "provider", "deployer" or "GPAI provider" (matched in the dutyHolder field; rows with no duty holder, such as voluntary standards, drop out); systemClass: an EU AI Act class (all-ai-systems, prohibited, high-risk-annex-iii, high-risk-annex-i, transparency-art50, gpai, gpai-systemic); appliesBefore: an ISO date, keeping rows whose first application date (appliesFrom) is on or before it (later milestones are listed with each row); status: in-force, applies-later, deferred, grace, voluntary or pending; layer: a stack layer 1-5.',
+        'Filter the obligation register (obligation → artefact → stack layer, with stable ids such as AIGE-OBL-EUAIA-ART9). All filters are optional and combine with AND. framework: an id, short name or name ("eu-ai-act", "EU AI Act", "ISO 42001", "nist"); role: a duty holder such as "provider", "deployer", "developer" or "GPAI provider" (matched in the duty holder, or in the scope of laws that name who they bind; rows with neither, such as voluntary standards, drop out); systemClass: an EU AI Act class (all-ai-systems, prohibited, high-risk-annex-iii, high-risk-annex-i, transparency-art50, gpai, gpai-systemic); appliesBefore: an ISO date, keeping rows whose first application date (appliesFrom) is on or before it (later milestones are listed with each row); status: in-force, applies-later, deferred, grace, voluntary or pending; layer: a stack layer 1-5.',
       inputSchema: z.object({
         framework: z.string().max(120).optional().describe('Framework id or name.'),
         role: z.string().max(80).optional().describe('Duty holder, e.g. "provider", "deployer".'),
@@ -141,8 +143,11 @@ export const registerObligations: Register = (server, deps) => {
           rows = rows.filter((row) => frameworkIds.includes(row.frameworkId));
         }
         if (role) {
+          // EU rows name the duty holder; other laws name who they bind in `scope`.
           const wanted = normalise(role);
-          rows = rows.filter((row) => row.dutyHolder !== null && ` ${normalise(row.dutyHolder)} `.includes(` ${wanted}`));
+          rows = rows.filter((row) =>
+            [row.dutyHolder, row.scope].some((field) => field !== null && ` ${normalise(field)} `.includes(` ${wanted}`)),
+          );
         }
         if (systemClass) {
           const classes = [...new Set(doc.obligations.flatMap((row) => row.systemClass))];
@@ -203,7 +208,6 @@ export const registerObligations: Register = (server, deps) => {
         id: z.string().min(3).max(200).describe('Obligation id or URL.'),
       }),
       outputSchema: obligationSummary.extend({
-        scope: z.string().nullable(),
         authority: z.string().nullable(),
         chapter: z.string().describe('Chapter 08 section the row comes from.'),
         crosswalkTopics: z.array(z.string()),
@@ -277,7 +281,6 @@ export const registerObligations: Register = (server, deps) => {
           .join('\n');
         return ok(text, {
           ...out,
-          scope: row.scope,
           authority: row.authority,
           chapter: row.chapter,
           crosswalkTopics: row.crosswalkTopics,

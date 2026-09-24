@@ -153,8 +153,12 @@ export async function startApp(fixtures: FixtureServer, options: AppOptions = {}
   };
 }
 
-export async function connect(url: string): Promise<Client> {
-  const client = new Client({ name: 'aige-mcp-tests', version: '1.0.0' });
+/** An MCP client over Streamable HTTP; `era` picks 2025-era initialisation or the 2026-07-28 revision. */
+export async function connect(url: string, era: 'legacy' | 'modern' = 'legacy'): Promise<Client> {
+  const client = new Client(
+    { name: 'aige-mcp-tests', version: '1.0.0' },
+    era === 'modern' ? { versionNegotiation: { mode: { pin: '2026-07-28' } } } : {},
+  );
   await client.connect(new StreamableHTTPClientTransport(new URL(`${url}/mcp`)));
   return client;
 }

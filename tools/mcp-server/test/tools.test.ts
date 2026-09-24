@@ -146,6 +146,12 @@ describe('get_obligations', () => {
     assert.ok(data.obligations.some((o: Structured) => o.id === 'AIGE-OBL-EUAIA-ART26'));
   });
 
+  it('matches the role in the scope of laws outside the EU AI Act', async () => {
+    const { data } = await call('get_obligations', { framework: 'Colorado', role: 'deployer' });
+    assert.ok(data.total >= 1);
+    assert.ok(data.obligations.every((o: Structured) => o.frameworkId === 'co-ai-act' && /deployers/i.test(o.scope)));
+  });
+
   it('keeps only rows that apply by a date', async () => {
     const { data } = await call('get_obligations', { framework: 'eu-ai-act', appliesBefore: '2025-12-31', limit: 100 });
     const ids = data.obligations.map((o: Structured) => o.id);
