@@ -237,6 +237,22 @@ a completed, reviewed core (1.0).
   reference, `clauseId`, `column`, `frameworkShort` and `see`; the CSV keeps its nine columns in
   order and appends topic, framework, column and clause ids and the BoK section.
 
+### Changed
+- Source integrity sweep over chapters 11 to 23 (block w2-source-sweep): the 64 source entries that
+  cited the Future of Life Institute's AI Act Explorer for EU legal text, 57 of them tagged
+  `primary`, now cite EUR-Lex: the consolidated text of Regulation (EU) 2024/1689 of 2026-07-27 with
+  the article or annex anchor (`#art_<n>`, `#anx_<n>`), or the Official Journal text with the
+  recital anchor (`#rct_<n>`) for recitals, which the consolidated text does not reproduce. Each
+  gloss was checked against the provision as amended by the Digital Omnibus; chapter 14's Art. 72
+  entry now gives the amended wording (Commission guidance with a template by 2 Sep 2027).
+- Chapter 14's source on monetisation and the open-source exemption cites the Commission's GPAI
+  guidelines (C(2025) 7719 final, paras 82 to 84) instead of a third-party overview.
+- Unofficial reproductions of legal texts no longer stand in for the official text: seven US Code
+  and CFR entries in chapter 20 were tagged `primary` on the Legal Information Institute and now
+  cite GovInfo (United States Code, 2024 edition) or the eCFR; two in chapter 16 and the GDPR
+  entries of chapters 11 and 15 (gdpr-info.eu) move from `secondary` to the official text. Source
+  numbering is unchanged; the matching rows of `sources/SOURCES.md` are updated in place.
+
 ## [Unreleased] - 2026-09-20
 
 Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the
