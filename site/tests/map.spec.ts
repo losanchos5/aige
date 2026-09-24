@@ -172,7 +172,7 @@ test('every href resolves to a real anchor, id or known route', () => {
   }
 });
 
-// --- 4. Framework families partition the 31 frameworks -----------------------
+// --- 4. Framework families partition every framework -------------------------
 test('FRAMEWORK_FAMILIES cover every framework id exactly once', () => {
   const famIds = FRAMEWORK_FAMILIES.flatMap((f) => f.ids);
   expect(new Set(famIds).size, 'no id in two families').toBe(famIds.length);

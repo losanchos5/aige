@@ -9,8 +9,9 @@
  * (public/matrix.js wires the filtering, staggered reveal and status line).
  *
  * A framework here is finer than the ObligationTable's group: the compound
- * groups (CSA, OWASP, US laws) fan out to their catalogue frameworks, so the
- * grid reads as a proper index. The join back to the table rows is by obligation
+ * groups (CSA, OWASP, US laws, other jurisdictions) fan out to their catalogue
+ * frameworks through each row's `frameworkId`, so the grid reads as a proper
+ * index. The join back to the table rows is by obligation
  * text, carried in a JSON payload matrix.js reads: the table markup is left
  * untouched (it already carries the obligation text and its layer classes).
  */
@@ -27,54 +28,12 @@ const layers: StackLayer[] = [1, 2, 3, 4, 5];
 const layerNames = ['Govern', 'Inventory', 'Evals', 'Runtime', 'Assurance'];
 const pad = (n: number) => String(n).padStart(2, '0');
 
-// Resolve an obligation to a single catalogue framework id. The obligations data
-// keys rows by a group name (a legacy alias, e.g. "EU AI Act" or "US state AI
-// laws"), never by the framework id, and several groups fan out to more than one
-// catalogue framework, so this join is still needed. Plain groups map straight
-// through; compound groups split on a marker in the obligation text.
+// Resolve an obligation to its catalogue framework id. Schema version 2 of the
+// register carries the join explicitly (`frameworkId`), so the grid no longer
+// guesses it from the group name and the obligation text: a row added under any
+// heading lands on its own instrument's row.
 function resolveFwId(o: Obligation): string {
-  const f = o.framework;
-  const t = o.obligation;
-  if (f === 'EU AI Act') return 'eu-ai-act';
-  if (f === 'GPAI Code of Practice') return 'gpai-code-of-practice';
-  if (f === 'ISO/IEC 42001') return 'iso-42001';
-  if (f === 'ISO/IEC 42006') return 'iso-42006';
-  if (f === 'ISO/IEC 23894') return 'iso-23894';
-  if (f === 'NIST AI RMF') return 'nist-ai-rmf';
-  if (f === 'NIST (agent, cyber and misuse work)') {
-    if (/agent standards/i.test(t)) return 'nist-ai-agent-standards';
-    if (/8596/.test(t)) return 'nist-ir-8596';
-    return 'nist-ai-800-1';
-  }
-  if (f === 'CSA AICM / STAR for AI')
-    return /star/i.test(t) ? 'csa-star-for-ai' : 'csa-aicm';
-  if (f === 'OWASP GenAI Security Project') {
-    if (/agentic/i.test(t)) return 'owasp-agentic-top-10';
-    if (/llm/i.test(t)) return 'owasp-llm-top-10';
-    if (/acs|agent control/i.test(t)) return 'owasp-acs';
-    if (/aibom/i.test(t)) return 'owasp-aibom';
-    return 'owasp-llm-top-10';
-  }
-  if (f === 'US frontier-developer laws')
-    return /raise/i.test(t) ? 'ny-raise-act' : 'ca-sb-53';
-  if (f === 'US state AI laws')
-    return /texas|traiga/i.test(t) ? 'tx-traiga' : 'co-ai-act';
-  if (f === 'China') {
-    if (/algorithmic recommendation/i.test(t)) return 'cn-algo-recommendation';
-    if (/deep synthesis/i.test(t)) return 'cn-deep-synthesis';
-    if (/45654/.test(t)) return 'cn-gbt-45654';
-    if (/generative ai services/i.test(t)) return 'cn-genai-measures';
-    if (/45438|labelling/i.test(t)) return 'cn-content-labelling';
-    if (/tc260|framework 3\.0/i.test(t)) return 'cn-tc260-framework';
-    return 'cn-tc260-framework';
-  }
-  if (f === 'Other jurisdictions') {
-    if (/korea/i.test(t)) return 'kr-ai-basic-act';
-    if (/singapore|imda/i.test(t)) return 'sg-genai-framework';
-    if (/etsi|304 223/i.test(t)) return 'etsi-en-304-223';
-    return 'uk-duaa';
-  }
-  return f;
+  return o.frameworkId;
 }
 
 // Row grouping + order, derived from the framework's issuer (a real field on the
@@ -138,8 +97,8 @@ for (const o of obligations) {
 }
 
 // Inclusion rule (unchanged): a framework gets a row iff at least one obligation
-// resolves to it. Frameworks that carry no obligation row (currently ISO/IEC
-// 42005 and EN 18286) are omitted: the grid has no empty-row or "n/a"
+// resolves to it. Frameworks that carry no obligation row (currently the UK
+// ATRS) are omitted: the grid has no empty-row or "n/a"
 // affordance, so this is deliberate, not an oversight. Rows come straight from
 // frameworks.ts (single source of truth): name and short label from the data,
 // band from the issuer, ordered by band then by declaration order within a band.
