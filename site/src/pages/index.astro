@@ -35,8 +35,9 @@ import { frameworks } from '../data/frameworks';
 import { patterns } from '../data/patterns';
 
 // The home title already names the site, so Seo appends no ` · {site.name}`
-// suffix (titleSuffix={false} on <Marketing> below).
-const seoTitle = 'AI Governance Engineer — the discipline, defined';
+// suffix (titleSuffix={false} on <Marketing> below); it uses the same ` · `
+// separator as every other page title, not a dash.
+const seoTitle = 'AI Governance Engineer · The discipline, defined';
 const seoDesc =
   'AI governance engineering turns governance into policy-as-code, eval gates and machine-readable evidence you can run, not just read.';
 

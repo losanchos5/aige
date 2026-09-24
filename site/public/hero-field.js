@@ -39,12 +39,12 @@
   var header = document.querySelector('.site-header');
   if (!field || !canvas || !title) return;
 
-  var FPS_MS = 1000 / 30; // frame budget: the field moves slowly.
-  // Field seconds per real second: the blobs' paths take roughly 30-60 s a
-  // lap and the edges keep morphing, so the motion reads within a few
-  // seconds, as on the reference (at 1x a lap took 100-200 s and the field
-  // looked still).
-  var SPEED = 3.5;
+  var FPS_MS = 1000 / 60; // every display frame: the field is small and lively.
+  // Field seconds per real second: the blobs' paths take roughly 15-30 s a
+  // lap and the edges keep morphing, so the field reads as alive at a glance
+  // (at 1x a lap took 100-200 s and the field looked still; 3.5x was still
+  // too calm for Jordi).
+  var SPEED = 7;
   var SCALE = 0.5; // canvas px per CSS px, before the width cap below.
   var MAX_W = 720; // widest canvas drawn, in canvas px.
   var TARGET_TITLE = 4.6; // contrast kept under the headline (AA is 3 for large text).
@@ -150,18 +150,18 @@
     '  vec2 p = px / u_s;',
     '  vec2 k = u_css / u_s;', // fractions of the hero -> p space
     '  float t = u_t;',
-    '  p += 0.06 * vec2(',
-    '    sin(p.y * 2.6 + t * 0.11) + 0.5 * sin(p.y * 4.3 - t * 0.07),',
-    '    cos(p.x * 2.2 - t * 0.09) + 0.5 * cos(p.x * 3.9 + t * 0.05));',
+    '  p += 0.08 * vec2(',
+    '    sin(p.y * 2.6 + t * 0.16) + 0.5 * sin(p.y * 4.3 - t * 0.11),',
+    '    cos(p.x * 2.2 - t * 0.13) + 0.5 * cos(p.x * 3.9 + t * 0.08));',
     // Peach low on the left, a broad blue over the right half and the navy
     // inside the blue, high on the right: navy -> blue -> ground stays a
     // chromatic run (navy straight onto the cream would turn grey).
     '  vec2 c3 = k * vec2(0.10 + 0.10 * sin(t * 0.041), 0.72 + 0.12 * sin(t * 0.033 + 2.1));',
     '  vec2 c2 = k * vec2(0.80 + 0.09 * sin(t * 0.047 + 1.7), 0.58 + 0.15 * cos(t * 0.039));',
     '  vec2 c1 = k * vec2(0.80 + 0.13 * sin(t * 0.029 + 0.6), 0.30 + 0.15 * cos(t * 0.037 + 0.4));',
-    '  float r1 = 0.30 + 0.03 * sin(t * 0.061);',
-    '  float r2 = 0.56 + 0.04 * cos(t * 0.053);',
-    '  float r3 = 0.52 + 0.04 * sin(t * 0.045 + 1.0);',
+    '  float r1 = 0.30 + 0.05 * sin(t * 0.061);',
+    '  float r2 = 0.56 + 0.06 * cos(t * 0.053);',
+    '  float r3 = 0.52 + 0.06 * sin(t * 0.045 + 1.0);',
     // The navy thins out as it nears the headline (an elliptical hollow
     // around it) and the top edge, so the dark mass hugs the text instead of
     // running under it; the clamp below is then a safety net, not a plate.
