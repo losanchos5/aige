@@ -116,12 +116,24 @@ function renderFigureFigure(def: FigureDef): string {
   const svgPath = resolve(FIGURES_DIR, `${def.id}.svg`);
   if (!existsSync(svgPath)) return '';
   const svg = readFileSync(svgPath, 'utf8').trim();
+  // A poster (kind 'poster') keeps a legible width: it fills the well and, on a
+  // narrow screen, scrolls sideways inside a focusable, labelled region (see
+  // figures.css), with a link to its permalink for the full size and downloads.
+  const poster = def.kind === 'poster';
+  const canvas = poster
+    ? `<div class="figure-canvas figure-canvas--poster" tabindex="0" role="region" ` +
+      `aria-label="${escapeHtml(def.title).replace(/"/g, '&quot;')}: poster, scroll sideways on a narrow screen">${svg}</div>`
+    : `<div class="figure-canvas">${svg}</div>`;
+  const posterLink = poster
+    ? `<a class="figure-poster-link" href="/figures/${def.id}">Full-size poster, downloads and citation</a>`
+    : '';
   return (
-    `<figure class="figure figure--infographic" data-figure="${def.id}">` +
-    `<div class="figure-canvas">${svg}</div>` +
+    `<figure class="figure figure--infographic${poster ? ' figure--poster' : ''}" data-figure="${def.id}">` +
+    canvas +
     `<figcaption class="figure-figcaption">` +
     `<span class="figure-fig-title">${escapeHtml(def.title)}</span>` +
     `<span class="figure-fig-desc">${escapeHtml(def.caption)}</span>` +
+    posterLink +
     `</figcaption>` +
     `<details class="figure-alt">` +
     `<summary class="figure-alt-summary" data-pagefind-ignore>Text description</summary>` +

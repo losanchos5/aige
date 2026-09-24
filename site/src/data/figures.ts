@@ -328,6 +328,216 @@ export const figures: readonly FigureDef[] = [
       "One event can start several clocks. First reports, counted from awareness unless noted, as of 2026-09-24: DORA Art. 19, within 4 hours of classification as major and no later than 24 hours from awareness; NIS2 Art. 23, an early warning within 24 hours and a notification within 72 hours; the Cyber Resilience Act Art. 14, an early warning within 24 hours and a notification within 72 hours; California SB 53, within 15 days of discovery, or within 24 hours on an imminent risk of death or serious physical injury; EU AI Act Art. 73, no later than 2 days (widespread infringement or critical infrastructure), 10 days (death) or 15 days (other); the GPAI Code of Practice under Art. 55, 2, 5, 10 or 15 days depending on the harm; GDPR Art. 33, where feasible within 72 hours; the New York RAISE Act, within 72 hours of a determination, effective 1 Jan 2027. Follow-up and final reports, the deployer's duty under Art. 26(5), GDPR Art. 34 and the voluntary OECD framework are in the table. The engineering answer is one incident record that holds the facts once, with a timer per regime, and a pipeline that alerts on the nearest deadline.",
     placements: [{ chapter: 'incidents', section: 'The overlapping clocks', at: 'head' }],
   },
+  // Block w2-fig-posters (v0.5.0): the reference posters, generated at build
+  // from frameworks.ts, roles.ts and deployment-options.ts by
+  // scripts/lib/posters.mjs (A-series portrait, 1000 × 1414 units, ≤ 48 KB).
+  // The Spanish editions (ids ending in -es) carry lang="es" in their art and
+  // are listed on /figures only, never placed in the English chapters.
+  {
+    id: 'eu-ai-act-timeline',
+    title: 'EU AI Act timeline, post-Omnibus',
+    caption:
+      'When each family of EU AI Act obligations applies, from the entry into force in 2024 to the legacy public-authority deadline in 2030, one lane per family, as of 2026-09-24. Find the lanes your systems sit in and plan the evidence for the next date on each. Drawn from chapters 18 and 08.',
+    alt: 'Seven lanes of EU AI Act obligation families on one time axis, 2024 to 2030, with the Omnibus in force from 2026-07-27 and the deferred high-risk dates.',
+    description:
+      'Seven lanes on one time axis, as of 2026-09-24. The Act entered into force on 2024-08-01 and the Digital Omnibus (Regulation (EU) 2026/1744) on 2026-07-27. Prohibited practices (Art. 5): the original prohibitions from 2025-02-02, and new bans on AI-generated non-consensual intimate imagery (NCII) and child sexual abuse material (CSAM) from 2026-12-02. AI literacy and bias-detection data (Arts. 4 and 4a): AI literacy from 2025-02-02; Art. 4 reworded and the new Art. 4a from 2026-07-27. General-purpose AI models (Arts. 53 and 55): obligations from 2025-08-02, Commission enforcement powers from 2026-08-02, and models placed before 2025-08-02 must comply by 2027-08-02. Transparency for certain AI systems (Art. 50): from 2026-08-02, with the marking grace for existing systems ending on 2026-12-02. High-risk through use (Annex III): the rules for testing in real-world conditions (Art. 60) from 2026-08-02, and the Annex III duties from 2027-12-02, deferred by the Omnibus from 2026-08-02. High-risk through products (Annex I): from 2028-08-02, deferred from 2027-08-02. Legacy high-risk systems intended for use by public authorities must comply by 2030-08-02 (Art. 111(2)). A filled dot marks the date a family starts to apply and a ring another dated step. Chapter 18 also lists Commission, notified-body and Annex X dates that the poster does not draw.',
+    placements: [
+      { chapter: 'eu-ai-act', section: 'The post-Omnibus timeline', at: 'head' },
+      { chapter: 'regulatory-map', section: 'EU AI Act, post-Omnibus', at: 'head' },
+    ],
+    kind: 'poster',
+    asOf: '2026-09-24',
+    reviewBy: '2027-03-24',
+    data: {
+      caption: 'EU AI Act dates by obligation family, post-Omnibus, as of 2026-09-24',
+      columns: ['Date', 'Obligation family', 'What applies', 'Articles'],
+      rows: [
+        ['2024-08-01', 'The Act', 'The Act enters into force', 'Art. 113'],
+        ['2025-02-02', 'Prohibited practices', 'Original prohibitions apply', 'Art. 5'],
+        ['2025-02-02', 'AI literacy and bias-detection data', 'AI literacy applies', 'Art. 4'],
+        ['2025-08-02', 'General-purpose AI models', 'GPAI provider obligations apply', 'Arts. 53, 55'],
+        ['2026-07-27', 'The Act', 'The Digital Omnibus enters into force', 'Regulation (EU) 2026/1744'],
+        ['2026-07-27', 'AI literacy and bias-detection data', 'Art. 4 reworded; new Art. 4a', 'Arts. 4, 4a'],
+        ['2026-08-02', 'General-purpose AI models', 'Commission enforcement powers apply', 'Arts. 53, 55'],
+        ['2026-08-02', 'Transparency for certain AI systems', 'Disclosure and marking apply', 'Art. 50'],
+        ['2026-08-02', 'High-risk through use (Annex III)', 'Rules for testing in real-world conditions', 'Art. 60'],
+        ['2026-12-02', 'Prohibited practices', 'New bans on NCII and CSAM', 'Art. 5'],
+        ['2026-12-02', 'Transparency for certain AI systems', 'Marking grace ends for existing systems', 'Art. 50'],
+        ['2027-08-02', 'General-purpose AI models', 'Models placed before 2025-08-02 must comply', 'Art. 111(3)'],
+        [
+          '2027-12-02',
+          'High-risk through use (Annex III)',
+          'Annex III duties apply; deferred from 2026-08-02',
+          'Arts. 6, 9 to 15, 17, 25 to 27, 43, 47, 49, 71 to 73',
+        ],
+        [
+          '2028-08-02',
+          'High-risk through products (Annex I)',
+          'Annex I duties apply; deferred from 2027-08-02',
+          'Arts. 6, 9 to 15, 17, 25, 26, 43, 47, 72, 73',
+        ],
+        [
+          '2030-08-02',
+          'Legacy high-risk systems for public authorities',
+          'Systems already on the market must comply',
+          'Art. 111(2)',
+        ],
+      ],
+      source:
+        'Chapter 18, The post-Omnibus timeline, sources [1] and [2]; chapter 08, EU AI Act, post-Omnibus (the obligation rows of src/data/frameworks.ts)',
+    },
+  },
+  {
+    id: 'eu-ai-act-operator-roles',
+    title: 'EU AI Act operator roles',
+    caption:
+      'The questions that tell which EU AI Act operator roles an organisation holds for one system, each role with its core duties and the evidence it produces, and the Article 25 loop that turns a distributor, importer or deployer into the provider. Record the roles per system in the registry and ask the questions again whenever an Article 25 trigger fires. Drawn from chapter 18.',
+    alt: 'Seven questions down a spine, each leading to an EU AI Act operator role with its duties and evidence, an Article 25 loop to provider and a registry entry.',
+    description:
+      'Ask every question for one system: roles name tasks, not organisations, so one organisation can hold several. Provider (Art. 3(3)): develops an AI system, or has it developed, and places it on the market or into service under its own name; Arts. 8 to 17, 43 to 49, 72 and 73, and 50(1) and 50(2); produces technical documentation, QMS records, eval results and the declaration. GPAI provider (Art. 53): places a general-purpose AI model on the market; Arts. 53 to 55; produces model documentation, the training summary and the copyright policy. Product manufacturer (Art. 25(3)): places a high-risk AI safety component on the market with its Annex I, Section A product under its own name, and carries the provider duties of Art. 16. Importer (Art. 3(6)): established in the EU, places on the market a system bearing the name of a provider established outside it; Art. 23; keeps an import verification record. Distributor (Art. 3(7)): makes a system available on the EU market without being its provider or importer; Art. 24; keeps a distribution check record. Authorised representative (Art. 3(5)): established in the EU under a written mandate from a provider outside it; Arts. 22 and 54; keeps the mandate and document copies. Deployer (Art. 3(4)): uses a system under its own authority, other than for a purely personal, non-professional activity; Arts. 26, 27, 50(3), 50(4) and 86; keeps use logs, the oversight roster, the FRIA and notices. The Article 25 loop: a distributor, importer, deployer or other third party becomes the provider of a high-risk system, with all Art. 16 duties, when it puts its name or trademark on a high-risk system already on the market, makes a substantial modification to a high-risk system that stays high-risk, or changes the intended purpose of a system, including a general-purpose AI system, so that it becomes high-risk. The initial provider must cooperate (Art. 25(2)), and a written agreement fixes the information and access (Art. 25(4)). The answers end in a registry entry that records the roles per system as a list, such as ["provider", "deployer"]. If no role applies, the organisation is not an operator for that system; an affected person holds protections, not duties (Art. 2(1)(g)). A reading aid, not legal advice; illustrative, not a claim of conformity.',
+    placements: [{ chapter: 'eu-ai-act', section: 'Who you are in the value chain', at: 'head' }],
+    kind: 'poster',
+    asOf: '2026-09-24',
+    reviewBy: '2027-03-24',
+  },
+  {
+    id: 'eu-ai-act-risk-ladder',
+    title: 'EU AI Act risk ladder',
+    caption:
+      'The four rungs the EU AI Act puts AI systems on by intended purpose, with the two high-risk routes and the Article 6(3) filter, the separate track for GPAI models, and side notes on what Korea, Texas, California and Colorado do instead, as of 2026-09-24. Place each system on every rung it meets, then read off its duties and dates. Drawn from chapters 18 and 21.',
+    alt: 'Four EU AI Act rungs (prohibited, high-risk via Annex I or III with the Art. 6(3) filter, transparency, minimal), a GPAI track and notes on other regimes.',
+    description:
+      'The EU AI Act sorts AI systems by intended purpose onto four rungs and puts GPAI models on a separate track; one system can sit on two rungs at once, as an Annex III chatbot carries the high-risk duties and the Art. 50 disclosure. Prohibited (Art. 5), from 2025-02-02 with new points from 2026-12-02: the practice is on the Art. 5 list, now ten points, and may not be placed on the market, put into service or used. High-risk (Arts. 6 to 49): requirements of Arts. 8 to 15, provider and deployer duties and conformity assessment. It is reached through products (Art. 6(1)), from 2028-08-02, where a safety component of an Annex I product, or the product itself, needs a third-party conformity assessment, a notion the Omnibus narrowed; or through use (Art. 6(2)), from 2027-12-02, where the intended purpose falls in one of the eight Annex III areas. The Art. 6(3) filter takes an Annex III system out when it poses no significant risk of harm and performs a narrow procedural task, improves a completed human activity, detects patterns without replacing human review, or performs a preparatory task; the provider documents the assessment and registers it (Arts. 6(4) and 49(2)). An Annex III system that profiles natural persons is always high-risk. Transparency (Art. 50), from 2026-08-02: a system that interacts with people, generates synthetic content, recognises emotions, categorises biometrically or produces deep fakes must disclose, mark or label, whatever else it is. Minimal (Arts. 4 and 95), from 2025-02-02 with Art. 4 reworded on 2026-07-27: everything else, with no specific duties beyond AI literacy and voluntary codes; a legal category, not a risk verdict. The GPAI track (Arts. 51 to 56), from 2025-08-02 with Commission enforcement from 2026-08-02: model generality, and systemic risk by capability, compute or designation, carry model-level duties; a system built on the model is an AI system (Art. 3(66)) and sits on the ladder. Side notes from chapter 21, not equivalents: Texas TRAIGA (HB 149), in force 2026-01-01, has intent-based prohibitions (behaviour manipulation, government social scoring, unlawful discrimination, certain sexual content); the Korea AI Basic Act defines high-impact AI as a listed Art. 2(4) area, such as hiring and loan screening, that may significantly affect, or pose a risk to, life, physical safety or fundamental rights, which the operator reviews in advance and MSIT may confirm (Art. 33); Colorado SB 26-189, from 2027-01-01, a transparency note, has deployers of automated decision-making technology (ADMT) in consequential decisions give notice of its use and a plain-language explanation within 30 days of an adverse outcome; California SB 53, in force 2026-01-01, covers frontier developers of models trained above 10^26 operations and large frontier developers above USD 500M revenue. A reading aid, not legal advice; illustrative, not a claim of conformity.',
+    placements: [{ chapter: 'eu-ai-act', section: 'The risk ladder', at: 'head' }],
+    kind: 'poster',
+    asOf: '2026-09-24',
+    reviewBy: '2027-03-24',
+  },
+  {
+    id: 'deployment-option-matrix',
+    title: 'Model type by deployment option',
+    caption:
+      'The one control each combination of model type and deployment option adds on top of its row and its column, from classic predictive to open-weight models and from cloud hosting to an agentic wrapper. Find your combination and check that its control is in place before the go-live review. Drawn from chapter 15.',
+    alt: 'A grid of five model types across and six deployment options down, each cell naming the one control that combination adds on top of its row and column.',
+    description:
+      'Illustrative, not a claim of conformity: the controls a real deployment needs follow from its risk tier, its obligations and its failure modes. Five model types run across (classic predictive; generative, language; generative, multimodal; proprietary API; open-weight) and six options run down in two groups: where it runs (cloud, on-premise, edge) and how it is adapted (fine-tune, RAG, agentic wrapper). Each cell is the one control the combination adds on top of its row and its column: for example, a classic predictive model behind an agentic wrapper needs a human gate on adverse outcomes, because a score now triggers an action; a generative language model with RAG needs a groundedness eval, corpus permissions and poisoning checks; an open-weight model fine-tuned in house needs a compute log against the GPAI one-third criterion. Chapter 15 prints the same matrix with model types as rows; hybrid hosting, prompting only and distillation have their own rows in its tables but no cell here. The full grid is in the data table.',
+    placements: [
+      {
+        chapter: 'governing-deployment',
+        section: 'Model types and deployment options',
+        sub: 'The model-type by deployment-option matrix',
+        at: 'head',
+      },
+    ],
+    kind: 'poster',
+    asOf: '2026-09-24',
+    reviewBy: '2027-03-24',
+    data: {
+      caption: 'The control each combination adds on top of its row and its column (illustrative)',
+      columns: [
+        'Deployment option',
+        'Classic predictive',
+        'Generative, language',
+        'Generative, multimodal',
+        'Proprietary (API)',
+        'Open-weight',
+      ],
+      rows: [
+        [
+          'Cloud',
+          'Residency check on features; input drift monitor',
+          'No-training and retention terms; output guardrail',
+          'Provenance marks on output; biometric-use block',
+          'Pin the version; boundary evals on every change',
+          'Licence gate; hash-verified weights on rented compute',
+        ],
+        [
+          'On-premise',
+          'Own the retraining pipeline and its approval',
+          'Own guardrails, patching and energy metering',
+          'Own content signing; media retention rules',
+          'Vendor appliance: attest version and update path',
+          'You own patching: AIBOM, file scans, red team',
+        ],
+        [
+          'Edge',
+          'Signed model; field-version telemetry; remote rollback',
+          'Small model; offline guardrails; signed updates',
+          'Camera and microphone notices; on-device minimisation',
+          'Vendor SDK: licence limits; offline revocation',
+          'Weights are extractable: licence terms and threat model',
+        ],
+        [
+          'Fine-tune',
+          'Retrain is a release: re-run per-group floors',
+          'Full red team; safety-erosion eval',
+          'Likeness and consent checks on tuning media',
+          'Vendor tuning service: data terms; your own re-eval',
+          'Compute log against the GPAI one-third criterion',
+        ],
+        [
+          'RAG',
+          'Not typical; govern feature-store lineage instead',
+          'Groundedness eval; corpus permissions; poisoning checks',
+          'Cross-modal injection tests on retrieved media',
+          'Your corpus, their model: retention and no-training terms',
+          'Every layer of evidence is yours to produce',
+        ],
+        [
+          'Agentic wrapper',
+          'Score triggers an action: human gate on adverse outcomes',
+          'Agent identity, tool mediation, kill switch',
+          'Screen and voice actions behind a human gate',
+          'Grant scoped tools; the vendor agent gets its own identity',
+          'Own guardrails end to end; no vendor safety layer',
+        ],
+      ],
+      source:
+        'Chapter 15, The model-type by deployment-option matrix (src/data/deployment-options.ts)',
+    },
+  },
+  {
+    id: 'eu-ai-act-timeline-es',
+    title: 'EU AI Act timeline, in Spanish',
+    caption:
+      'The Spanish edition of the EU AI Act timeline poster: the same seven lanes and dates, as of 2026-09-24, with its text in Spanish and the official Spanish terms of the Act. Share it with Spanish-speaking teams; the English poster sits in chapters 18 and 08. Drawn from chapters 18 and 08.',
+    alt: 'Spanish edition: seven lanes of EU AI Act obligation families on one time axis, 2024 to 2030, with the Omnibus in force from 2026-07-27.',
+    description:
+      'The Spanish-language edition of the EU AI Act timeline, post-Omnibus poster, titled "Cuándo se aplica cada obligación". It draws the same seven lanes and dates as the English poster, whose permalink carries the data table, as of 2026-09-24: Prácticas de IA prohibidas (prohibited practices), Alfabetización en materia de IA y datos para detectar sesgos (AI literacy and bias-detection data), Modelos de IA de uso general (general-purpose AI models), Transparencia de determinados sistemas de IA (transparency), Alto riesgo por su uso, anexo III (high-risk through use), Alto riesgo por producto, anexo I (high-risk through products) and Alto riesgo ya en el mercado, autoridades públicas (legacy high-risk systems for public authorities). The terms follow the Spanish text of Regulation (EU) 2024/1689; the stamp reads "A fecha de 2026-09-24". A reading aid, not legal advice.',
+    placements: [],
+    kind: 'poster',
+    pages: ['/figures'],
+    asOf: '2026-09-24',
+    reviewBy: '2027-03-24',
+  },
+  {
+    id: 'eu-ai-act-operator-roles-es',
+    title: 'EU AI Act roles, in Spanish',
+    caption:
+      'The Spanish edition of the EU AI Act operator roles poster: the same questions, roles, duties, evidence and Article 25 loop, with its text in Spanish and the official Spanish role names of the Act. Share it with Spanish-speaking teams; the English poster sits in chapter 18. Drawn from chapter 18.',
+    alt: 'Spanish edition: seven questions leading to EU AI Act operator roles, from proveedor to responsable del despliegue, with the Article 25 loop and a registry.',
+    description:
+      'The Spanish-language edition of the EU AI Act operator roles poster, titled "¿Qué rol tiene en este sistema?". It asks the same seven questions as the English poster and names the roles with the terms of the Spanish text of Regulation (EU) 2024/1689: proveedor (provider), proveedor de modelos de uso general (GPAI provider), fabricante del producto (product manufacturer), importador (importer), distribuidor (distributor), representante autorizado (authorised representative) and responsable del despliegue (deployer). Each role carries its duties and the evidence it produces; the Article 25 loop and its three triggers, the registry entry per system and the note on the affected person are as in the English poster. The stamp reads "A fecha de 2026-09-24". A reading aid, not legal advice; illustrative, not a claim of conformity.',
+    placements: [],
+    kind: 'poster',
+    pages: ['/figures'],
+    asOf: '2026-09-24',
+    reviewBy: '2027-03-24',
+  },
+  {
+    id: 'eu-ai-act-risk-ladder-es',
+    title: 'EU AI Act ladder, in Spanish',
+    caption:
+      'The Spanish edition of the EU AI Act risk ladder poster: the same rungs, high-risk routes, Article 6(3) filter, GPAI track and side notes, as of 2026-09-24, with its text in Spanish. Share it with Spanish-speaking teams; the English poster sits in chapter 18. Drawn from chapters 18 and 21.',
+    alt: 'Spanish edition: the four EU AI Act rungs with the Art. 6(3) filter, the track for general-purpose AI models and notes on other regimes.',
+    description:
+      'The Spanish-language edition of the EU AI Act risk ladder poster, titled "¿En qué peldaño está el sistema?". It draws the same four rungs as the English poster, Prohibido (prohibited), Alto riesgo (high-risk, por producto and por su uso, with the Art. 6(3) filter and the profiling override), Transparencia (transparency) and Mínimo (minimal), the separate track for modelos de uso general (GPAI models), and the same side notes on Texas, Korea, Colorado and California from chapter 21, with the dates of chapter 08. The terms follow the Spanish text of Regulation (EU) 2024/1689, such as ultrasuplantación for deep fake. The stamp reads "A fecha de 2026-09-24". A reading aid, not legal advice; illustrative, not a claim of conformity.',
+    placements: [],
+    kind: 'poster',
+    pages: ['/figures'],
+    asOf: '2026-09-24',
+    reviewBy: '2027-03-24',
+  },
 ] as const;
 
 /** Look up a figure definition by id. */

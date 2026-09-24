@@ -45,6 +45,30 @@
   margin-inline: auto;
 }
 
+/* A poster (kind 'poster', 1000 units wide) placed in a chapter keeps a legible
+   width instead of the 560px cap: it fills the well and, below 760px, scrolls
+   sideways inside a focusable region (WCAG scrollable-region), so its 16-unit
+   text never renders under 12px. Its permalink gives the full size. */
+.figure--poster .figure-canvas.figure-canvas--poster {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.figure--poster .figure-canvas.figure-canvas--poster > svg {
+  max-width: 1000px;
+  min-width: 760px;
+}
+
+.figure-canvas--poster:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.figure-poster-link {
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
 .figure-figcaption {
   display: flex;
   flex-direction: column;
@@ -210,6 +234,15 @@
 .figc .chip-bg { rx: 5; }
 .figc .cell { stroke: var(--line); stroke-width: 1; }
 .figc .cell-empty { fill: color-mix(in srgb, var(--ink) 4%, var(--bg)); }
+
+/* Poster marks (scripts/lib/posters.mjs): a timeline dot drawn over an ink bar
+   (dot-on, haloed in the ground colour) or as a ring (dot-off), a ground-colour
+   mask behind a glyph or label that sits on a line, and inverse text on an ink
+   band. All from the tokens, so both themes and the exports follow. */
+.figc .dot-on { fill: var(--ink); stroke: var(--bg); stroke-width: 3; }
+.figc .dot-off { fill: var(--bg); stroke: var(--ink); stroke-width: 2.5; }
+.figc .dot-mask { fill: var(--bg); }
+.figc .inv-tx { fill: var(--bg); }
 
 /* Links inside a figure SVG (pattern-map): the label is the visible text, the
    whole <a> is the target. Keep the ink colour; underline on hover/focus. */
