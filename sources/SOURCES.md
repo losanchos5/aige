@@ -2028,3 +2028,116 @@ Commission's AI Act Service Desk, and the Omnibus changes come from chapter 18's
 | 22 | OECD AI Principles 1.1 to 1.5 (the 2024 revision adds sustainability, safe decommissioning, and traceability and risk management under accountability) | Chapter 22 row [7] (OECD/LEGAL/0449) | OECD (via chapter 22) | 2024-05-03 | https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449 | primary | Crosswalk treaty and soft-law column |
 | 23 | G7 Hiroshima Code of Conduct, Actions 1 to 11 (e.g. 7 content authentication and provenance; 11 data input, personal data and IP) | Chapter 22 rows (Hiroshima Process International Code of Conduct for Advanced AI Systems) | European Commission (via chapter 22) | 2023-10-30 | https://digital-strategy.ec.europa.eu/en/library/hiroshima-process-international-code-conduct-advanced-ai-systems | primary | Crosswalk treaty and soft-law column |
 | 24 | JTC 21 stages as of 2026-09-24: EN 18286:2026 published (60.60); prEN 18228 and prEN 18229-1 at Enquiry (40.60); no JTC 21 deliverable cited in the OJ | Chapter 22 rows [52] and [54] | Genorma; CEN-CENELEC (via chapter 22) | 2026-09-24 | https://genorma.com/en/standards/pren-18228 | secondary | Crosswalk CEN-CENELEC column (prEN refs unverified) |
+
+## bok/patterns: deployment-side patterns (v0.5.0, block w2-patterns-b)
+
+Eight pattern pages on the deployment and use side, `bok/patterns/<slug>.md` (`/patterns/<slug>`),
+each with its own `## Sources` numbered from `[1]`, and their catalogue sections in chapter 05, which
+cite nothing. Rows opened on 2026-09-24: the Microsoft Work Trend Index page, the NIST AI RMF 1.0 PDF
+(subcategory statements), Regulation B through a reproduction of 12 CFR 1002.9 that matches the eCFR
+row of chapter 16, the AI Act articles quoted through the Commission's AI Act Service Desk (EUR-Lex
+refused automated access on 2026-09-24; the EUR-Lex rows are carried from chapter 18), the ISO/IEC
+42001 Annex A control titles (A.8.2 to A.10.4) on a secondary listing, the OWASP LLM05:2025 page
+(superseded by the 2026 list carried from the crosswalk row) and the public AIGP Body of Knowledge
+v2.1 PDF (cited by competency code and paraphrased; this site is not affiliated with or endorsed by
+IAPP). Every other row reuses a row verified for chapters 15, 16, 18, 19 or 21, or for the crosswalk,
+and carries its tag. Mappings are illustrative, not a claim of conformity.
+
+#### bok/patterns/decision-notice-contest-path.md (Decision Notice & Contest Path)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | GDPR Art. 22 solely automated decisions: narrow bases; human intervention, point of view, contest; Arts. 13(2)(f), 14(2)(g), 15(1)(h) meaningful information about the logic | Regulation (EU) 2016/679 | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary | Context |
+| 2 | A credit score is an automated individual decision where lenders give it a determining role | Press release No 186/23, Case C-634/21 SCHUFA Holding (Scoring) | Court of Justice of the EU | 2023-12-07 | https://curia.europa.eu/jcms/upload/docs/application/pdf/2023-12/cp230186en.pdf | primary | Context |
+| 3 | UK GDPR Arts. 22A–22D, in force 5 Feb 2026: information, representations, human intervention, contest | Data (Use and Access) Act 2025, s. 80 | legislation.gov.uk | 2025 | https://www.legislation.gov.uk/ukpga/2025/18/section/80 | primary | Context |
+| 4 | AI Act Art. 26(11) informing persons subject to Annex III decisions; Art. 86(1) and (3) right to explanation, subsidiary to other Union law | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Context |
+| 5 | Annex III high-risk requirements apply from 2 Dec 2027 | Regulation (EU) 2026/1744 (Digital Omnibus on AI) | Publications Office of the EU (EUR-Lex) | 2026-07-24 | https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng | primary | Context |
+| 6 | Regulation B: action taken notified within 30 days of a completed application; specific principal reasons | 12 CFR 1002.9 | eCFR | 2026-09-01 | https://www.ecfr.gov/current/title-12/chapter-X/part-1002/section-1002.9 | primary | Context; Forces |
+| 7 | A complex algorithm does not excuse vague adverse-action reasons | Consumer Financial Protection Circular 2022-03 | Consumer Financial Protection Bureau | 2022-05-26 | https://www.consumerfinance.gov/compliance/circulars/circular-2022-03-adverse-action-notification-requirements-in-connection-with-credit-decisions-based-on-complex-algorithms/ | primary | Context |
+| 8 | Colorado, from 1 Jan 2027: notice of use, 30-day plain-language explanation of an adverse outcome, human review | SB26-189, Automated Decision-Making Technology | Colorado General Assembly | 2026-05-14 | https://leg.colorado.gov/bills/sb26-189 | primary | Context |
+| 9 | Explanation of the procedure and principles actually applied; trade secrets balanced by the authority or court | Press release No 22/25, Case C-203/22 Dun & Bradstreet Austria | Court of Justice of the EU | 2025-02-27 | https://curia.europa.eu/site/upload/docs/application/pdf/2025-02/cp250022en.pdf | primary | Forces |
+| 10 | ISO/IEC 42001 Annex A ids: A.8.2 system documentation and information for users; A.9.2 processes for responsible use of AI systems | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
+| 11 | NIST AI RMF subcategories MAP 3.5, MEASURE 3.3, MANAGE 4.1 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Maps to note |
+
+#### bok/patterns/rights-requests-against-models.md (Rights Requests Against Models)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | GDPR rights of access, rectification, erasure and objection (Arts. 15, 16, 17, 21); one month, extendable by two (Art. 12(3)) | Regulation (EU) 2016/679 | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary | Context |
+| 2 | Anonymity of AI models assessed case by case, with evidence (paras 49–58) | EDPB Opinion 28/2024 on AI models | European Data Protection Board | 2024-12-17 | https://www.edpb.europa.eu/system/files/2024-12/edpb_opinion_202428_ai-models_en.pdf | primary | Context |
+| 3 | Identification in training sets; retraining; output filters on general rules where retraining is disproportionate | "Ensuring and facilitating the exercise of data subjects' rights" | CNIL | 2026-01-05 | https://www.cnil.fr/en/respect-and-facilitate-exercise-data-subjects-rights | primary | Context |
+| 4 | Storing an LLM is not processing; rights attach to inputs and outputs | Discussion Paper: Large Language Models and Personal Data | Hamburg Commissioner for Data Protection and Freedom of Information | 2024-07-15 | https://datenschutz-hamburg.de/fileadmin/user_upload/HmbBfDI/Datenschutz/Informationen/240715_Discussion_Paper_Hamburg_DPA_KI_Models.pdf | primary | Context |
+| 5 | AI Act Art. 26(6): deployer logs kept at least six months unless other law provides otherwise | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Forces |
+| 6 | SISA sharded training for exact unlearning | Bourtoule et al., "Machine Unlearning" (arXiv 1912.03817) | arXiv | 2019-12-09 | https://arxiv.org/abs/1912.03817 | primary | Solution |
+| 7 | Membership inference as a test of removal | Shokri et al., "Membership Inference Attacks against Machine Learning Models" (arXiv 1610.05820) | arXiv | 2016-10-18 | https://arxiv.org/abs/1610.05820 | primary | Solution |
+| 8 | OWASP Top 10 for LLM Applications 2026 (LLM02 Sensitive Information Disclosure) | OWASP GenAI LLM Top 10 2026 | OWASP GenAI Security Project | 2026-08-03 | https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ | primary | Maps to note |
+| 9 | ISO/IEC 42001 Annex A id A.7 data for AI systems | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
+| 10 | NIST AI RMF subcategories GOVERN 1.1, MEASURE 2.10 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Maps to note |
+
+#### bok/patterns/sanctioned-ai-gateway.md (Sanctioned AI Gateway)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | 2024 survey of 31,000 people in 31 countries: 78% of AI users bring their own AI tools to work | "AI at Work Is Here. Now Comes the Hard Part" (2024 Work Trend Index) | Microsoft and LinkedIn | 2024-05-08 | https://www.microsoft.com/en-us/worklab/work-trend-index/ai-at-work-is-here-now-comes-the-hard-part | primary | Context |
+| 2 | Art. 4 as replaced: providers and deployers take measures to support AI literacy | Regulation (EU) 2026/1744 (Digital Omnibus on AI) | Publications Office of the EU (EUR-Lex) | 2026-07-24 | https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng | primary | Context |
+| 3 | LLM02 Sensitive Information Disclosure; ids used in the Maps to line | OWASP GenAI LLM Top 10 2026 | OWASP GenAI Security Project | 2026-08-03 | https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ | primary | Context; Maps to note |
+| 4 | GDPR Art. 5(1)(c) data minimisation | Regulation (EU) 2016/679 | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary | Forces |
+| 5 | ISO/IEC 42001 Annex A ids: A.2 policies related to AI; A.9.2 processes for responsible use; A.10.3 suppliers | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
+| 6 | NIST AI RMF subcategories GOVERN 2.2, GOVERN 6.1, MANAGE 3.1 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Maps to note |
+
+#### bok/patterns/staged-rollout-rollback-criteria.md (Staged Rollout with Rollback Criteria)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | Canarying: a partial and time-limited deployment of a change and its evaluation | The Site Reliability Workbook, ch. 16 "Canarying Releases" | Google (O'Reilly) | 2018 | https://sre.google/workbook/canarying-releases/ | primary | Context |
+| 2 | Blue-green: two production environments, switch back on failure | "BlueGreenDeployment" | Martin Fowler | 2010-03-01 | https://martinfowler.com/bliki/BlueGreenDeployment.html | primary | Context |
+| 3 | Operational toggles switch exposure without a deploy | "Feature Toggles (aka Feature Flags)" | Pete Hodgson, martinfowler.com | 2017-10-09 | https://martinfowler.com/articles/feature-toggles.html | primary | Context |
+| 4 | AI Act Art. 26(5) monitor, suspend and inform; Art. 60 testing in real-world conditions | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Context |
+| 5 | NIST AI RMF subcategories MANAGE 1.1, MEASURE 2.3, MANAGE 2.4 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Context; Maps to note |
+| 6 | ISO/IEC 42001 Annex A ids: A.6.2.5 AI system deployment; A.6.2.6 operation and monitoring | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
+
+#### bok/patterns/drift-fairness-monitor.md (Drift & Fairness Monitor)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | Concept drift work divides into detection, understanding and adaptation | "Learning under Concept Drift: A Review" (arXiv 2004.05785) | Lu et al. | 2018 | https://arxiv.org/abs/2004.05785 | primary | Context |
+| 2 | AI Act Art. 15(4) feedback loops; Art. 26(5) deployer monitoring; Art. 72 post-market monitoring | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Context |
+| 3 | New Art. 4a on special categories of personal data for bias detection and correction | Regulation (EU) 2026/1744 (Digital Omnibus on AI) | Publications Office of the EU (EUR-Lex) | 2026-07-24 | https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng | primary | Context |
+| 4 | NYC Local Law 144: bias audit within one year before use | Automated Employment Decision Tools | NYC Department of Consumer and Worker Protection | 2023 | https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page | primary | Context |
+| 5 | NIST AI RMF subcategories MEASURE 2.4, MEASURE 2.11, MEASURE 3.1, MANAGE 4.1 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Context; Maps to note |
+| 6 | ISO/IEC 42001 Annex A ids: A.5.4 impact on individuals or groups; A.6.2.6 operation and monitoring | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
+
+#### bok/patterns/downstream-use-register.md (Downstream Use Register)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | AI Act Art. 3(13) reasonably foreseeable misuse; Art. 9(2)(b); Art. 25(1)(c) changed intended purpose; Art. 50(2) machine-readable marking | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Context |
+| 2 | LLM10 Improper Output Handling (outputs passed downstream without validation) | OWASP GenAI LLM Top 10 2026 | OWASP GenAI Security Project | 2026-08-03 | https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ | primary | Context; Maps to note |
+| 3 | ASI08 Cascading Failures | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Context; Maps to note |
+| 4 | Competency IV.C lists forecasting and reducing risks of secondary or unintended uses and downstream harms (paraphrased; not affiliated with or endorsed by IAPP) | AIGP Body of Knowledge and Exam Blueprint, version 2.1 | IAPP | 2025-09-09 | https://prod.iapp.org/media/pdf/certification/AIGP_Cert_BOK_2025_FINAL_v2.1.0.pdf | primary | Context |
+| 5 | ISO/IEC 42001 Annex A ids: A.8.2, A.9.4 intended use, A.10.4 customers | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
+| 6 | NIST AI RMF subcategories MAP 1.1, MAP 3.3, MANAGE 1.4 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Maps to note |
+
+#### bok/patterns/disclosure-notification-pipeline.md (Disclosure & Notification Pipeline)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | AI Act Art. 50(1)–(5) transparency; Art. 26(5), (7), (11) deployer information duties | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Context |
+| 2 | Art. 50 applies from 2 Aug 2026; generative systems already on the market mark outputs from 2 Dec 2026 (Art. 111(4)) | Regulation (EU) 2026/1744 (Digital Omnibus on AI) | Publications Office of the EU (EUR-Lex) | 2026-07-24 | https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng | primary | Context |
+| 3 | GDPR Art. 33 notification within 72 hours where feasible; Art. 34 communication to the data subject | Regulation (EU) 2016/679 | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary | Context |
+| 4 | Korea AI Basic Act Art. 31: prior notice, output labelling, realistic synthetic content; in force 2026-01-22 | Basic Act on the Development of AI and the Establishment of a Foundation for Trust (Act No. 20676) | Korean Law Information Center (MOLEG) | 2026-01-22 | https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=268543 | primary | Context |
+| 5 | California AI Transparency Act (SB 942 as amended by AB 853), operative 2 Aug 2026: latent and optional manifest disclosures | AB-853 | California Legislative Information | 2025-10-13 | https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260AB853 | primary | Context |
+| 6 | Utah: disclosure when a consumer clearly asks | S.B. 226, Artificial Intelligence Consumer Protection Amendments | Utah State Legislature | 2025 | https://le.utah.gov/Session/2025/bills/enrolled/SB0226.pdf | primary | Context |
+| 7 | Competency IV.C lists establishing external communication plans (paraphrased; not affiliated with or endorsed by IAPP) | AIGP Body of Knowledge and Exam Blueprint, version 2.1 | IAPP | 2025-09-09 | https://prod.iapp.org/media/pdf/certification/AIGP_Cert_BOK_2025_FINAL_v2.1.0.pdf | primary | Context |
+| 8 | ISO/IEC 42001 Annex A ids: A.8.2, A.8.3 external reporting, A.8.4 communication of incidents, A.8.5 information for interested parties | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
+| 9 | NIST AI RMF subcategories GOVERN 4.2, GOVERN 5.1, MANAGE 4.3 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Maps to note |
+
+#### bok/patterns/deactivation-localisation-retirement-runbook.md (Deactivation, Localisation & Retirement Runbook)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | AI Act Art. 5; Art. 18(1) documentation ten years; Art. 20 corrective actions; Art. 26(5) suspend and inform; Art. 26(6) logs at least six months; Art. 79 systems presenting a risk | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Context |
+| 2 | NIST AI RMF GOVERN 1.7 decommissioning safely; MANAGE 2.4 supersede, disengage or deactivate; MANAGE 4.1 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Context; Maps to note |
+| 3 | Competency IV.C lists a policy and controls to deactivate or localise an AI system (paraphrased; not affiliated with or endorsed by IAPP) | AIGP Body of Knowledge and Exam Blueprint, version 2.1 | IAPP | 2025-09-09 | https://prod.iapp.org/media/pdf/certification/AIGP_Cert_BOK_2025_FINAL_v2.1.0.pdf | primary | Context |
+| 4 | ASI10 Rogue Agents | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
+| 5 | ISO/IEC 42001 Annex A ids: A.6.2.5, A.6.2.6 | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
