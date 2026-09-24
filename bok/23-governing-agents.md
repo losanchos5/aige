@@ -75,7 +75,8 @@ control sets are this book's reading, not the authors'.
 
 Record the level as a registry field (chapter 11 gives
 [an illustrative autonomy scale](/bok/ai-defined#from-definition-element-to-registry-field) for it)
-and treat raising it as a change that needs the same review as a new deployment. A promotion is a decision with evidence behind it, not a flag someone flipped.
+and treat raising it as a change that needs the same review as a new deployment. A promotion is a
+decision with evidence behind it, not a flag someone flipped.
 
 ## The agent registry
 
