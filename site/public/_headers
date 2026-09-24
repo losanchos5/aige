@@ -29,3 +29,10 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
   X-Robots-Tag: noindex
   Cache-Control: public, max-age=3600
+/schemas/*
+  Content-Type: application/schema+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/schemas/examples/*
+  ! Content-Type
+  Content-Type: application/json; charset=utf-8

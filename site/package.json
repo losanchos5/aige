@@ -13,7 +13,7 @@
     "diagrams:build": "node scripts/diagrams-build.mjs",
     "figures:build": "node scripts/figures-build.mjs",
     "prebuild": "node scripts/diagrams-build.mjs && node scripts/figures-build.mjs",
-    "build": "astro check && astro build && npm run lint:content && npm run check:links",
+    "build": "astro check && astro build && npm run lint:content && npm run check:links && node scripts/schemas-check.mjs",
     "postbuild": "pagefind --site dist",
     "lint:content": "node scripts/content-lint.mjs",
     "check:links": "node scripts/check-links.mjs",

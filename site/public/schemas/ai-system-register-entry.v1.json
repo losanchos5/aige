@@ -1,0 +1,337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/ai-system-register-entry.v1.json",
+  "title": "AI system register entry",
+  "description": "One entry in the inventory of AI systems and models: who owns it, what it may do, how it is classified and where its evidence lives. The deploy pipeline writes the core fields; intake adds the classification. Extends the registry entry shape in chapter 05 (id, version, owner, scope, expiry).",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 49",
+    "EU AI Act Art. 71",
+    "EU AI Act Art. 6",
+    "EU AI Act Art. 26",
+    "ISO/IEC 42001 A.4",
+    "ISO/IEC 42001 A.6",
+    "NIST AI RMF GOVERN 1.6"
+  ],
+  "x-layer": [
+    2
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-registry",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-shadow-ai-discovery"
+  ],
+  "x-lifecycle-stage": "intake",
+  "x-recommended": [
+    "name",
+    "purpose",
+    "role",
+    "risk_classification",
+    "lifecycle_stage",
+    "human_oversight"
+  ],
+  "type": "object",
+  "required": [
+    "id",
+    "version",
+    "owner",
+    "scope",
+    "expiry"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/ai-system-register-entry.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "id": {
+      "type": "string",
+      "description": "Stable registry identifier, lower case (for example \"credit-afford-03\"). Never reused after retirement.",
+      "minLength": 1,
+      "x-evidences": [
+        "NIST AI RMF GOVERN 1.6"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "description": "Version of the deployed artefact this entry describes (a date, a semantic version or a build id).",
+      "minLength": 1
+    },
+    "owner": {
+      "type": "string",
+      "description": "Accountable owning team or role. An entry without an owner is denied production access.",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "array",
+      "description": "Declared scope: the permissions, data domains or decisions the system is allowed to touch. Anything outside it is out of policy.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "ISO/IEC 42001 A.6"
+      ]
+    },
+    "expiry": {
+      "type": "string",
+      "format": "date",
+      "description": "Date after which the entry must be renewed or the system is deactivated. Forces a periodic review.",
+      "x-evidences": [
+        "NIST AI RMF GOVERN 1.6"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name."
+    },
+    "purpose": {
+      "type": "string",
+      "description": "Intended purpose in one or two sentences, as the use-case record states it.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)",
+        "NIST AI RMF MAP 1.1"
+      ]
+    },
+    "system_type": {
+      "type": "string",
+      "enum": [
+        "ml_model",
+        "llm_application",
+        "agent",
+        "gpai_model",
+        "rules_plus_ml",
+        "other"
+      ],
+      "description": "What kind of AI artefact this is."
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "provider",
+        "deployer",
+        "provider_and_deployer",
+        "importer",
+        "distributor"
+      ],
+      "description": "The organisation's role for this system under the EU AI Act. Recheck it whenever the system is modified or rebranded.",
+      "x-evidences": [
+        "EU AI Act Art. 25"
+      ]
+    },
+    "risk_classification": {
+      "type": "object",
+      "description": "Regulatory and internal classification, with the record that justifies it.",
+      "required": [
+        "eu_ai_act_category",
+        "internal_tier"
+      ],
+      "properties": {
+        "eu_ai_act_category": {
+          "type": "string",
+          "enum": [
+            "not_assessed",
+            "out_of_scope",
+            "minimal",
+            "transparency",
+            "high_risk_annex_i",
+            "high_risk_annex_iii",
+            "gpai",
+            "gpai_systemic_risk",
+            "prohibited"
+          ],
+          "description": "Classification under the EU AI Act, from the classification decision record.",
+          "x-evidences": [
+            "EU AI Act Art. 6"
+          ]
+        },
+        "annex_iii_point": {
+          "type": "string",
+          "description": "For Annex III systems, the point and letter relied on (for example \"5(b)\")."
+        },
+        "internal_tier": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "description": "The organisation's own risk tier, which drives the controls required."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Why this classification, in one paragraph."
+        },
+        "classification_record": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to the signed classification decision."
+        },
+        "decided_at": {
+          "type": "string",
+          "format": "date",
+          "description": "When the classification was decided."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 6"
+      ]
+    },
+    "lifecycle_stage": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "in_development",
+        "in_validation",
+        "in_production",
+        "suspended",
+        "retired"
+      ],
+      "description": "Where the system is in its lifecycle.",
+      "x-evidences": [
+        "ISO/IEC 42001 A.6"
+      ]
+    },
+    "use_case_record": {
+      "type": "string",
+      "description": "Id of the use-case record that admitted the system at intake."
+    },
+    "components": {
+      "type": "array",
+      "description": "Models, datasets, tools and services the system is built from. Mirrors the AIBOM.",
+      "items": {
+        "type": "object",
+        "description": "One component.",
+        "required": [
+          "type",
+          "ref"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "model",
+              "dataset",
+              "tool",
+              "service",
+              "library"
+            ],
+            "description": "Kind of component."
+          },
+          "ref": {
+            "type": "string",
+            "description": "Identifier of the component (registry id, dataset id or package name).",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "description": "Component version."
+          },
+          "supplier": {
+            "type": "string",
+            "description": "Supplier, if third party."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "EU AI Act Art. 11",
+        "ISO/IEC 42001 A.4"
+      ]
+    },
+    "aibom": {
+      "type": "string",
+      "format": "uri",
+      "description": "Link to the AIBOM (for example a CycloneDX ML-BOM).",
+      "x-evidences": [
+        "EU AI Act Art. 11"
+      ]
+    },
+    "jurisdictions": {
+      "type": "array",
+      "description": "Countries or regions where the system is used (ISO 3166 codes where possible).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "personal_data": {
+      "type": "boolean",
+      "description": "Whether the system processes personal data. True routes it to the DPIA screen."
+    },
+    "affected_persons": {
+      "type": "array",
+      "description": "Categories of people affected by the outputs (for example \"loan applicants\").",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "NIST AI RMF MAP 1.1"
+      ]
+    },
+    "human_oversight": {
+      "type": "string",
+      "enum": [
+        "human_in_the_loop",
+        "human_on_the_loop",
+        "human_in_command",
+        "none"
+      ],
+      "description": "Oversight mode designed into the system.",
+      "x-evidences": [
+        "EU AI Act Art. 14"
+      ]
+    },
+    "eu_database_registration": {
+      "type": "object",
+      "description": "Registration in the EU database for high-risk systems.",
+      "required": [
+        "required"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "description": "Whether registration in the EU database applies."
+        },
+        "registration_id": {
+          "type": "string",
+          "description": "Identifier returned by the EU database, once registered."
+        },
+        "registered_at": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of registration."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 49",
+        "EU AI Act Art. 71"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "description": "Links to the records that evidence this entry: model card, impact assessments, eval results, go/no-go.",
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "description": "Link to one evidence item."
+      },
+      "x-evidences": [
+        "ISO/IEC 42001 A.6"
+      ]
+    },
+    "last_reviewed": {
+      "type": "string",
+      "format": "date",
+      "description": "When the entry was last reviewed by its owner."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

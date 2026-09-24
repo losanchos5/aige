@@ -1,0 +1,65 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/test-report.v1.json",
+  "report_id": "tr-credit-afford-03-3.2.0",
+  "test_plan": "tp-credit-afford-03-3.2",
+  "subject": "credit-afford-03@3.2.0",
+  "period": {
+    "from": "2026-07-06",
+    "to": "2026-08-14"
+  },
+  "environment": "CI and shadow in production",
+  "results": [
+    {
+      "suite_id": "auc-holdout-2025.v1",
+      "model_version": "credit-afford-03@3.2.0",
+      "score": 0.803,
+      "threshold": 0.78,
+      "result": "pass",
+      "timestamp": "2026-07-06T11:02:00Z"
+    },
+    {
+      "suite_id": "fairness-age-bands.v2",
+      "model_version": "credit-afford-03@3.2.0",
+      "score": 0.86,
+      "threshold": 0.8,
+      "result": "pass",
+      "timestamp": "2026-07-06T11:09:00Z"
+    },
+    {
+      "suite_id": "reason-codes.v1",
+      "model_version": "credit-afford-03@3.2.0",
+      "score": 1,
+      "threshold": 1,
+      "result": "pass",
+      "timestamp": "2026-07-06T11:12:00Z"
+    },
+    {
+      "suite_id": "hitl-routing.v1",
+      "model_version": "credit-afford-03@3.2.0",
+      "score": 0,
+      "threshold": 0,
+      "result": "pass",
+      "timestamp": "2026-08-14T17:00:00Z"
+    }
+  ],
+  "summary": {
+    "passed": 4,
+    "failed": 0,
+    "waived": 0
+  },
+  "deviations": [],
+  "open_issues": [
+    "Performance for self-employed applicants under 12 months of history not established; documented as a limitation."
+  ],
+  "conclusion": "meets_exit_criteria",
+  "signed_off": {
+    "role": "model-validation-lead",
+    "decision": "approve",
+    "timestamp": "2026-08-17T09:30:00Z",
+    "signature": "ed25519:Zt4mK8pQ1sV6wX9yA2bD5eG7hJ0kL3nR"
+  },
+  "evidence": [
+    "https://ci.example.org/runs/81002",
+    "https://evidence.example.org/shadow/credit-afford-03/2026-08"
+  ]
+}

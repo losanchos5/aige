@@ -1,0 +1,75 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/test-plan.v1.json",
+  "plan_id": "tp-credit-afford-03-3.2",
+  "subject": "credit-afford-03@3.2.0",
+  "design_record": "dr-credit-afford-03-3.2",
+  "scope": "Offline validation on 2025 data and four weeks in shadow mode. Adversarial testing limited to input manipulation, since the model is not exposed to applicants.",
+  "categories": [
+    "performance",
+    "fairness",
+    "robustness",
+    "explainability",
+    "human_oversight",
+    "regression"
+  ],
+  "suites": [
+    {
+      "suite_id": "auc-holdout-2025.v1",
+      "category": "performance",
+      "metric": "AUC",
+      "threshold": ">= 0.78",
+      "direction": "higher_is_better",
+      "failure_mode": "unreliable affordability signal",
+      "dataset": "loan-apps-2019-2025@2026-04-30",
+      "blocking": true
+    },
+    {
+      "suite_id": "fairness-age-bands.v2",
+      "category": "fairness",
+      "metric": "approval-rate ratio across age bands",
+      "threshold": ">= 0.80",
+      "direction": "higher_is_better",
+      "failure_mode": "indirect age discrimination",
+      "requirement": "R2",
+      "blocking": true
+    },
+    {
+      "suite_id": "reason-codes.v1",
+      "category": "explainability",
+      "metric": "share of scores with five reason codes",
+      "threshold": "= 1.0",
+      "direction": "higher_is_better",
+      "failure_mode": "analyst cannot contest the score",
+      "requirement": "R3",
+      "blocking": true
+    },
+    {
+      "suite_id": "hitl-routing.v1",
+      "category": "human_oversight",
+      "metric": "declines issued without analyst review",
+      "threshold": "= 0",
+      "direction": "lower_is_better",
+      "failure_mode": "automated decline",
+      "requirement": "R1",
+      "blocking": true
+    }
+  ],
+  "environments": [
+    "CI",
+    "shadow in production"
+  ],
+  "entry_criteria": [
+    "dataset admission record for the training snapshot is \"admit\"",
+    "design record approved"
+  ],
+  "exit_criteria": [
+    "all blocking suites pass",
+    "no open severity-high defect"
+  ],
+  "real_world_testing": {
+    "planned": false
+  },
+  "owner": "model-validation",
+  "approved_by": "model-risk",
+  "approved_at": "2026-07-01"
+}

@@ -1,0 +1,837 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/incident-record.v1.json",
+  "title": "AI incident record",
+  "description": "One AI incident or hazard, from detection to closure. Field names follow the Commission reporting template for serious incidents involving general-purpose AI models with systemic risk and the OECD common reporting framework for AI incidents (see x-aligns-with on each field), so a report can be generated from the record rather than retyped. Adds the internal fields the pipeline needs: reporting clocks, containment, root cause and links.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 73",
+    "EU AI Act Art. 55(1)(c)",
+    "EU AI Act Art. 26(5)",
+    "EU AI Act Art. 72",
+    "GPAI Code of Practice, Safety and Security, Commitment 9",
+    "ISO/IEC 42001 10.2",
+    "NIST AI RMF MANAGE 4.3",
+    "NIST AI RMF MANAGE 2.3"
+  ],
+  "x-layer": [
+    5,
+    4
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-incident-pipeline",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-kill-switch--circuit-breaker"
+  ],
+  "x-lifecycle-stage": "operate",
+  "type": "object",
+  "required": [
+    "record_id",
+    "title",
+    "description",
+    "ai_systems",
+    "ai_system_relation",
+    "submitter",
+    "supporting_materials",
+    "severity",
+    "harm_types",
+    "reporting",
+    "status"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/incident-record.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "record_id": {
+      "type": "string",
+      "description": "Internal identifier of the incident.",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "description": "Short title of the incident.",
+      "minLength": 1,
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 1"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "description": "What happened, in a paragraph.",
+      "minLength": 1,
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 2"
+      ]
+    },
+    "ai_systems": {
+      "type": "array",
+      "description": "The AI systems or models involved, with versions.",
+      "items": {
+        "type": "string",
+        "description": "One system or model as \"id@version\".",
+        "pattern": "^[^@\\s]+@[^@\\s]+$"
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "EU AI Act Art. 73"
+      ],
+      "x-aligns-with": [
+        "Commission GPAI serious-incident template, item 4",
+        "OECD common reporting framework, criterion 8"
+      ]
+    },
+    "organisations": {
+      "type": "array",
+      "description": "Organisations that developed or deployed the systems involved.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 9"
+      ]
+    },
+    "ai_system_relation": {
+      "type": "array",
+      "description": "How the AI system relates to the incident.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "direct_cause",
+          "contributing_factor",
+          "failure_to_act",
+          "overreliance_or_intentional_misuse",
+          "human_error",
+          "failure_to_comply_with_legal_frameworks",
+          "other"
+        ]
+      },
+      "minItems": 1,
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 3"
+      ]
+    },
+    "submitter": {
+      "type": "object",
+      "description": "Who submits the record or report.",
+      "required": [
+        "submitter_type",
+        "organisation"
+      ],
+      "properties": {
+        "submitter_type": {
+          "type": "string",
+          "enum": [
+            "provider",
+            "authorised_representative",
+            "deployer",
+            "user",
+            "affected_person",
+            "authority",
+            "other"
+          ],
+          "description": "Who is reporting."
+        },
+        "organisation": {
+          "type": "string",
+          "description": "Organisation name.",
+          "minLength": 1
+        },
+        "contact_role": {
+          "type": "string",
+          "description": "Contact role (not a personal name in shared records).",
+          "minLength": 1
+        },
+        "contact_email": {
+          "type": "string",
+          "description": "Contact mailbox, preferably a team address.",
+          "format": "email"
+        }
+      },
+      "additionalProperties": false,
+      "x-aligns-with": [
+        "Commission GPAI serious-incident template, item 10",
+        "OECD common reporting framework, criterion 4"
+      ]
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When the incident started, or the best approximation.",
+      "x-aligns-with": [
+        "Commission GPAI serious-incident template, item 1",
+        "OECD common reporting framework, criterion 5"
+      ]
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "When it ended, or the best approximation; omit while ongoing.",
+      "x-aligns-with": [
+        "Commission GPAI serious-incident template, item 1"
+      ]
+    },
+    "detected_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the organisation detected it."
+    },
+    "countries": {
+      "type": "array",
+      "description": "Countries where it occurred (ISO 3166 codes).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 6"
+      ]
+    },
+    "supporting_materials": {
+      "type": "array",
+      "description": "Evidence about the incident: logs, traces, screenshots, reports.",
+      "items": {
+        "type": "string",
+        "format": "uri",
+        "description": "Link to one supporting material."
+      },
+      "minItems": 1,
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 7"
+      ]
+    },
+    "evidence_available": {
+      "type": "string",
+      "description": "Description of the evidence available setting out the AI system's involvement.",
+      "x-aligns-with": [
+        "Commission GPAI serious-incident template, item 5"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "hazard",
+        "serious_hazard",
+        "incident",
+        "serious_incident",
+        "disaster",
+        "other"
+      ],
+      "description": "Severity class. A hazard is an event that could have led to harm; an incident is one that did.",
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 10"
+      ]
+    },
+    "harm_types": {
+      "type": "array",
+      "description": "Types of harm caused or threatened.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "physical",
+          "psychological",
+          "reputational",
+          "economic_property",
+          "environmental",
+          "public_interest_critical_infrastructure",
+          "human_or_fundamental_rights",
+          "other"
+        ]
+      },
+      "minItems": 1,
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 11"
+      ]
+    },
+    "resulting_harm": {
+      "type": "string",
+      "description": "The resulting harm and the victim or affected group.",
+      "x-aligns-with": [
+        "Commission GPAI serious-incident template, item 2"
+      ]
+    },
+    "harm_quantification": {
+      "type": "object",
+      "description": "Quantification of harm, where applicable.",
+      "properties": {
+        "economic_loss": {
+          "type": "number",
+          "description": "Economic loss, in `currency`.",
+          "minimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "description": "ISO 4217 code.",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "deaths": {
+          "type": "integer",
+          "description": "Deaths.",
+          "minimum": 0
+        },
+        "injuries": {
+          "type": "integer",
+          "description": "Injuries.",
+          "minimum": 0
+        },
+        "affected_count": {
+          "type": "integer",
+          "description": "Number of people affected.",
+          "minimum": 0
+        },
+        "other": {
+          "type": "string",
+          "description": "Other quantification."
+        }
+      },
+      "additionalProperties": false,
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 12"
+      ]
+    },
+    "unintended_use": {
+      "type": "object",
+      "description": "Whether the incident is linked to use in an unintended or wrongful way.",
+      "required": [
+        "linked"
+      ],
+      "properties": {
+        "linked": {
+          "type": "boolean",
+          "description": "Whether the incident is linked to this factor."
+        },
+        "how": {
+          "type": "string",
+          "description": "How, in a sentence."
+        }
+      },
+      "additionalProperties": false,
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 13"
+      ]
+    },
+    "affected_stakeholders": {
+      "type": "array",
+      "description": "Stakeholder groups affected.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "consumers",
+          "children",
+          "workers",
+          "trade_unions",
+          "business",
+          "government",
+          "civil_society",
+          "general_public",
+          "other"
+        ]
+      },
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 14"
+      ]
+    },
+    "rights_impacts": {
+      "type": "string",
+      "description": "Adverse impacts on human rights or fundamental rights, if any.",
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 15"
+      ]
+    },
+    "associated_ai_principles": {
+      "type": "array",
+      "description": "AI principles the incident relates to (for example accountability, fairness, privacy, robustness, safety, transparency).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 16"
+      ]
+    },
+    "industries": {
+      "type": "array",
+      "description": "Industries (ISIC classification where possible).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 17"
+      ]
+    },
+    "business_functions": {
+      "type": "array",
+      "description": "Business functions where it occurred (for example citizen or customer service).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 18"
+      ]
+    },
+    "critical_infrastructure": {
+      "type": "object",
+      "description": "Link to critical functions or infrastructure.",
+      "required": [
+        "affected"
+      ],
+      "properties": {
+        "affected": {
+          "type": "boolean",
+          "description": "Whether critical functions or infrastructure were affected."
+        },
+        "sectors": {
+          "type": "array",
+          "description": "Sectors.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false,
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 19"
+      ]
+    },
+    "deployment_breadth": {
+      "type": "string",
+      "enum": [
+        "pilot",
+        "narrow",
+        "broad",
+        "widespread",
+        "other"
+      ],
+      "description": "How widely the system was deployed.",
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 20"
+      ]
+    },
+    "training_data_link": {
+      "type": "object",
+      "description": "Whether the training data is implicated.",
+      "required": [
+        "linked"
+      ],
+      "properties": {
+        "linked": {
+          "type": "boolean",
+          "description": "Whether the incident is linked to this factor."
+        },
+        "how": {
+          "type": "string",
+          "description": "How, in a sentence."
+        }
+      },
+      "additionalProperties": false,
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 21"
+      ]
+    },
+    "model_link": {
+      "type": "object",
+      "description": "Whether the model itself is implicated.",
+      "required": [
+        "linked"
+      ],
+      "properties": {
+        "linked": {
+          "type": "boolean",
+          "description": "Whether the incident is linked to this factor."
+        },
+        "how": {
+          "type": "string",
+          "description": "How, in a sentence."
+        }
+      },
+      "additionalProperties": false,
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 22"
+      ]
+    },
+    "usage_rights": {
+      "type": "string",
+      "description": "Usage rights of the system or model (for example proprietary licence, open weights).",
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 23"
+      ]
+    },
+    "multiple_systems_interaction": {
+      "type": "object",
+      "description": "Whether the interaction of several AI systems is implicated.",
+      "required": [
+        "linked"
+      ],
+      "properties": {
+        "linked": {
+          "type": "boolean",
+          "description": "Whether the incident is linked to this factor."
+        },
+        "how": {
+          "type": "string",
+          "description": "How, in a sentence."
+        }
+      },
+      "additionalProperties": false,
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 24"
+      ]
+    },
+    "tasks": {
+      "type": "array",
+      "description": "Tasks of the AI system (for example interaction support, recognition, forecasting, content generation, goal-driven organisation).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 25"
+      ]
+    },
+    "max_autonomy_level": {
+      "type": "string",
+      "enum": [
+        "no_action",
+        "low_action",
+        "medium_action",
+        "high_action",
+        "other"
+      ],
+      "description": "Highest autonomy of the system: no-action (human support), low-action (human-in-the-loop), medium-action (human-on-the-loop), high-action (human-out-of-the-loop).",
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 26"
+      ]
+    },
+    "chain_of_events": {
+      "type": "string",
+      "description": "The chain of events that led, directly or indirectly, to the incident.",
+      "x-aligns-with": [
+        "Commission GPAI serious-incident template, item 3"
+      ]
+    },
+    "containment": {
+      "type": "object",
+      "description": "Containment.",
+      "required": [
+        "kill_switch_used"
+      ],
+      "properties": {
+        "kill_switch_used": {
+          "type": "boolean",
+          "description": "Whether the kill switch or circuit breaker was used."
+        },
+        "contained_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the harm stopped growing."
+        },
+        "actions": {
+          "type": "string",
+          "description": "What was done to contain it."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "NIST AI RMF MANAGE 2.4"
+      ]
+    },
+    "response": {
+      "type": "string",
+      "description": "What the organisation intends to do or has done in response.",
+      "x-aligns-with": [
+        "Commission GPAI serious-incident template, item 6"
+      ]
+    },
+    "actions_taken": {
+      "type": "array",
+      "description": "Actions taken, by kind.",
+      "items": {
+        "type": "object",
+        "description": "One action.",
+        "required": [
+          "type",
+          "description"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "prevention",
+              "mitigation",
+              "ceasing",
+              "remediation",
+              "other"
+            ],
+            "description": "Kind of action."
+          },
+          "description": {
+            "type": "string",
+            "description": "The action.",
+            "minLength": 1
+          },
+          "taken_at": {
+            "type": "string",
+            "format": "date",
+            "description": "When."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 27"
+      ]
+    },
+    "recommendation": {
+      "type": "string",
+      "description": "What the organisation recommends authorities or other parties do, if anything.",
+      "x-aligns-with": [
+        "Commission GPAI serious-incident template, item 7"
+      ]
+    },
+    "root_cause_analysis": {
+      "type": "object",
+      "description": "Root cause analysis.",
+      "required": [
+        "method",
+        "cause_category"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "five_whys",
+            "fault_tree",
+            "fishbone",
+            "timeline_review",
+            "other"
+          ],
+          "description": "Method used."
+        },
+        "outputs_involved": {
+          "type": "string",
+          "description": "The outputs that led to the incident and what contributed to their generation, including inputs."
+        },
+        "cause_category": {
+          "type": "string",
+          "enum": [
+            "brittleness",
+            "robustness",
+            "data_quality",
+            "insufficient_testing",
+            "drift",
+            "misaligned_objective",
+            "oversight_failure",
+            "security_attack",
+            "misuse",
+            "other"
+          ],
+          "description": "Primary cause category."
+        },
+        "contributing_factors": {
+          "type": "array",
+          "description": "Contributing factors.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "mitigations_failed_or_circumvented": {
+          "type": "array",
+          "description": "Controls that failed or were circumvented.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "control_that_would_have_caught_it": {
+          "type": "string",
+          "description": "The control or pattern that would have caught it earlier."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 73(6)"
+      ],
+      "x-aligns-with": [
+        "Commission GPAI serious-incident template, item 8"
+      ]
+    },
+    "post_market_monitoring_patterns": {
+      "type": "string",
+      "description": "Patterns seen in post-market monitoring that are plausibly connected, such as near misses.",
+      "x-aligns-with": [
+        "Commission GPAI serious-incident template, item 9"
+      ]
+    },
+    "steps_to_reproduce": {
+      "type": "string",
+      "description": "Steps to reproduce, where applicable and safe to share.",
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 28"
+      ]
+    },
+    "additional_information": {
+      "type": "string",
+      "description": "Anything else relevant.",
+      "x-aligns-with": [
+        "OECD common reporting framework, criterion 29"
+      ]
+    },
+    "reporting": {
+      "type": "object",
+      "description": "Reporting assessment and clocks.",
+      "required": [
+        "became_aware_at",
+        "obligations"
+      ],
+      "properties": {
+        "became_aware_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the organisation became aware of the incident. Reporting clocks start here."
+        },
+        "causal_link_established_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When a causal link, or its reasonable likelihood, was established."
+        },
+        "obligations": {
+          "type": "array",
+          "description": "Each regime assessed, with its clock and submission.",
+          "items": {
+            "type": "object",
+            "description": "One reporting regime.",
+            "required": [
+              "regime",
+              "required"
+            ],
+            "properties": {
+              "regime": {
+                "type": "string",
+                "enum": [
+                  "eu_ai_act_art_73",
+                  "eu_ai_act_art_55",
+                  "gdpr_personal_data_breach",
+                  "sector_regulator",
+                  "contractual",
+                  "internal_only",
+                  "other"
+                ],
+                "description": "Reporting regime assessed."
+              },
+              "required": {
+                "type": "boolean",
+                "description": "Whether a report is required under this regime."
+              },
+              "rationale": {
+                "type": "string",
+                "description": "Why it is or is not required."
+              },
+              "deadline_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Deadline computed by the reporting clock."
+              },
+              "report_type": {
+                "type": "string",
+                "enum": [
+                  "initial",
+                  "intermediate",
+                  "final",
+                  "complete"
+                ],
+                "description": "Kind of report submitted."
+              },
+              "submitted_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "When submitted."
+              },
+              "authority": {
+                "type": "string",
+                "description": "Recipient authority."
+              },
+              "reference": {
+                "type": "string",
+                "description": "Reference returned by the recipient."
+              }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "x-evidences": [
+            "EU AI Act Art. 73",
+            "EU AI Act Art. 55(1)(c)"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 73"
+      ]
+    },
+    "links": {
+      "type": "object",
+      "description": "Links to the records the incident changed.",
+      "properties": {
+        "risk_register_entries": {
+          "type": "array",
+          "description": "Risk ids re-scored because of this incident.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "eval_suites_added": {
+          "type": "array",
+          "description": "Eval suites or cases added so it cannot recur silently.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "policy_cards_changed": {
+          "type": "array",
+          "description": "Policy cards changed.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "NIST AI RMF MANAGE 4.3"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "description": "Incident owner.",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "contained",
+        "resolved",
+        "closed"
+      ],
+      "description": "Status."
+    },
+    "closed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When closed after the post-incident review."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

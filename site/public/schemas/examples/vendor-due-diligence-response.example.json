@@ -1,0 +1,83 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/vendor-due-diligence-response.v1.json",
+  "response_id": "vdd-2026-022",
+  "questionnaire_version": "aige-vdd-1",
+  "vendor": {
+    "name": "Example Model Vendor",
+    "contact": "trust@vendor.example.com"
+  },
+  "product": {
+    "name": "Hosted LLM API",
+    "version": "2026-07",
+    "model_ids": [
+      "vendor-llm-large-2026-07"
+    ]
+  },
+  "requested_by": "team-support-platform",
+  "received_at": "2026-06-02",
+  "answers": {
+    "provider_role": "gpai_provider",
+    "eu_ai_act_category": "gpai",
+    "documentation": {
+      "model_card": "https://vendor.example.com/docs/model-card-large-2026-07",
+      "downstream_information": "https://vendor.example.com/docs/downstream-info"
+    },
+    "training_on_customer_data": {
+      "used": false,
+      "opt_out": true,
+      "contract_clause": "DPA section 4.2"
+    },
+    "data_processing": {
+      "locations": [
+        "EU"
+      ],
+      "retention": "Prompts and outputs kept 30 days for abuse monitoring, then deleted.",
+      "subprocessors": [
+        "cloud hosting provider (EU region)"
+      ]
+    },
+    "security": {
+      "certifications": [
+        "ISO/IEC 27001"
+      ],
+      "last_penetration_test": "2026-03-15"
+    },
+    "evaluations": [
+      {
+        "suite": "prompt-injection red team",
+        "summary": "Vendor reports reduced but non-zero success of indirect injection.",
+        "report": "https://vendor.example.com/docs/system-card"
+      }
+    ],
+    "incident_notification": {
+      "window_hours": 72,
+      "channel": "trust portal and email"
+    },
+    "change_notification": {
+      "notice_days": 30,
+      "covers_model_updates": true
+    },
+    "audit_rights": false,
+    "logging_support": "Request logs exportable for 30 days.",
+    "copyright_policy": "https://vendor.example.com/legal/copyright-policy",
+    "training_content_summary": "https://vendor.example.com/legal/training-content-summary",
+    "exit": {
+      "data_return_days": 30,
+      "deletion_certificate": true
+    }
+  },
+  "open_questions": [
+    "No right to audit; only third-party reports on request."
+  ],
+  "assessment": {
+    "risk_tier": "medium",
+    "decision": "approve_with_conditions",
+    "conditions": [
+      "boundary evals on every vendor model update before csa-01 switches version",
+      "contract clause fixing the 72-hour incident notice"
+    ],
+    "reviewer": "third-party-risk",
+    "reviewed_at": "2026-06-10",
+    "reassess_by": "2027-06-10"
+  }
+}

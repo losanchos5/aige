@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/training-record.v1.json",
+  "title": "Training record",
+  "description": "Proof that one person completed one AI literacy or role-based module, with the assessment result and the access it unlocks. Pseudonymous by design: the record carries a person reference, not a name.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 4",
+    "EU AI Act Art. 26(2)",
+    "EU AI Act Art. 14",
+    "ISO/IEC 42001 7.2",
+    "ISO/IEC 42001 7.3",
+    "NIST AI RMF GOVERN 2.2",
+    "NIST AI RMF MAP 3.4"
+  ],
+  "x-layer": [
+    1
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-human-in-the-loop-gate",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-identity--scoped-credentials"
+  ],
+  "x-lifecycle-stage": "organisation",
+  "type": "object",
+  "required": [
+    "record_id",
+    "person_ref",
+    "role",
+    "module_id",
+    "curriculum_version",
+    "completed_at",
+    "valid_until"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/training-record.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "record_id": {
+      "type": "string",
+      "description": "Identifier of the record.",
+      "minLength": 1
+    },
+    "person_ref": {
+      "type": "string",
+      "description": "Pseudonymous reference to the person in the HR or identity system. Never a name in shared evidence.",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string",
+      "description": "Role the training is for (for example \"credit analyst, oversight\").",
+      "minLength": 1
+    },
+    "module_id": {
+      "type": "string",
+      "description": "Module completed, as listed in the literacy curriculum.",
+      "minLength": 1
+    },
+    "curriculum_version": {
+      "type": "string",
+      "description": "Version of the curriculum the module belongs to.",
+      "minLength": 1
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Completion date."
+    },
+    "assessment": {
+      "type": "object",
+      "description": "Assessment result, if the module is assessed.",
+      "required": [
+        "passed"
+      ],
+      "properties": {
+        "score": {
+          "type": "number",
+          "description": "Score obtained.",
+          "minimum": 0
+        },
+        "pass_mark": {
+          "type": "number",
+          "description": "Pass mark.",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "boolean",
+          "description": "Whether the person passed."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "ISO/IEC 42001 7.2"
+      ]
+    },
+    "attestation": {
+      "type": "object",
+      "description": "Policy acknowledgement collected with the training.",
+      "required": [
+        "policy",
+        "policy_version"
+      ],
+      "properties": {
+        "policy": {
+          "type": "string",
+          "description": "Policy acknowledged (for example the acceptable-use policy).",
+          "minLength": 1
+        },
+        "policy_version": {
+          "type": "string",
+          "description": "Version acknowledged.",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "ISO/IEC 42001 7.3"
+      ]
+    },
+    "grants": {
+      "type": "array",
+      "description": "Access or duties the record unlocks (for example \"override in credit-afford-03\"). Access checks read this field.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 26(2)"
+      ]
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date",
+      "description": "Expiry; refresher due before this date."
+    },
+    "delivered_by": {
+      "type": "string",
+      "description": "Who delivered it (internal team or provider)."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,343 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/design-record.v1.json",
+  "title": "Design record",
+  "description": "The design review of one AI system version: requirements traced to their source, the model-selection trade-off, the oversight and logging designed in, and the metrics and thresholds the release will be judged on.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 9",
+    "EU AI Act Art. 11",
+    "EU AI Act Annex IV",
+    "EU AI Act Art. 12",
+    "EU AI Act Art. 14",
+    "EU AI Act Art. 15",
+    "ISO/IEC 42001 A.6",
+    "NIST AI RMF MAP 1.6",
+    "NIST AI RMF MAP 3.5"
+  ],
+  "x-layer": [
+    1,
+    3
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-human-in-the-loop-gate",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-kill-switch--circuit-breaker",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-eval-gate-in-ci"
+  ],
+  "x-lifecycle-stage": "build",
+  "type": "object",
+  "required": [
+    "record_id",
+    "subject",
+    "requirements",
+    "human_oversight_design",
+    "metrics_and_thresholds",
+    "reviews",
+    "decision"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/design-record.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "record_id": {
+      "type": "string",
+      "description": "Identifier of this design record.",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "string",
+      "description": "The governed object as registry id and version, \"id@version\" (for example \"csa-01@2026-09-18\"). The key every record is filed against.",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "use_case_record": {
+      "type": "string",
+      "description": "Id of the use-case record it implements."
+    },
+    "requirements": {
+      "type": "array",
+      "description": "Requirements, each traced to its source and to the test that verifies it.",
+      "items": {
+        "type": "object",
+        "description": "One requirement with its trace.",
+        "required": [
+          "id",
+          "statement",
+          "source"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Requirement id.",
+            "minLength": 1
+          },
+          "statement": {
+            "type": "string",
+            "description": "The requirement, testable (\"the system shall ...\").",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "description": "Where it comes from: an obligation, the use-case record or a risk.",
+            "minLength": 1
+          },
+          "verified_by": {
+            "type": "string",
+            "description": "Test suite or check that verifies it."
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "NIST AI RMF MAP 1.6",
+        "EU AI Act Annex IV"
+      ]
+    },
+    "architecture_summary": {
+      "type": "string",
+      "description": "The architecture in a paragraph, with a link to the diagram.",
+      "x-evidences": [
+        "EU AI Act Annex IV"
+      ]
+    },
+    "model_selection": {
+      "type": "object",
+      "description": "The model-selection trade-off.",
+      "required": [
+        "selected",
+        "tradeoffs"
+      ],
+      "properties": {
+        "candidates": {
+          "type": "array",
+          "description": "Options considered, including simpler or interpretable ones.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "selected": {
+          "type": "string",
+          "description": "The option chosen.",
+          "minLength": 1
+        },
+        "tradeoffs": {
+          "type": "string",
+          "description": "Why: accuracy, interpretability, cost, latency, data needs.",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Annex IV"
+      ]
+    },
+    "human_oversight_design": {
+      "type": "object",
+      "description": "Oversight designed in, not asserted.",
+      "required": [
+        "mode",
+        "intervention_points"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "human_in_the_loop",
+            "human_on_the_loop",
+            "human_in_command",
+            "none"
+          ],
+          "description": "Oversight mode."
+        },
+        "intervention_points": {
+          "type": "array",
+          "description": "Where a person can intervene, override or stop.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "reviewer_context": {
+          "type": "string",
+          "description": "What the reviewer sees to be able to disagree (guards against automation bias)."
+        },
+        "override_logged": {
+          "type": "boolean",
+          "description": "Whether every override is logged as evidence."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 14",
+        "NIST AI RMF MAP 3.5"
+      ]
+    },
+    "controls_designed_in": {
+      "type": "array",
+      "description": "Controls built into the design.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "kill_switch",
+          "rollback",
+          "shadow_mode",
+          "canary",
+          "rate_limit",
+          "input_guardrail",
+          "output_guardrail",
+          "human_approval",
+          "audit_logging"
+        ]
+      },
+      "x-evidences": [
+        "EU AI Act Art. 15",
+        "NIST AI RMF MANAGE 2.4"
+      ]
+    },
+    "logging_design": {
+      "type": "object",
+      "description": "Automatic event logging over the system's lifetime.",
+      "required": [
+        "events",
+        "retention_days"
+      ],
+      "properties": {
+        "events": {
+          "type": "array",
+          "description": "Events logged automatically.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "retention_days": {
+          "type": "integer",
+          "description": "Retention of the logs, in days.",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 12"
+      ]
+    },
+    "metrics_and_thresholds": {
+      "type": "array",
+      "description": "Metrics and thresholds, set before testing, each traced to a failure mode.",
+      "items": {
+        "type": "object",
+        "description": "One metric and its threshold.",
+        "required": [
+          "metric",
+          "threshold",
+          "failure_mode"
+        ],
+        "properties": {
+          "metric": {
+            "type": "string",
+            "description": "Metric.",
+            "minLength": 1
+          },
+          "threshold": {
+            "type": "string",
+            "description": "Threshold the release must meet.",
+            "minLength": 1
+          },
+          "failure_mode": {
+            "type": "string",
+            "description": "The failure mode or harm the threshold guards against.",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "EU AI Act Art. 9(8)",
+        "EU AI Act Art. 15"
+      ]
+    },
+    "known_limitations": {
+      "type": "array",
+      "description": "Known limitations, carried into the instructions for use.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "reviews": {
+      "type": "array",
+      "description": "Design review sign-offs by role (for example security, privacy, governance).",
+      "items": {
+        "type": "object",
+        "description": "One design review sign-off.",
+        "required": [
+          "role",
+          "decision",
+          "timestamp"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "The approving role, not a personal name.",
+            "minLength": 1
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "approve_with_conditions",
+              "reject",
+              "abstain"
+            ],
+            "description": "What this approver decided."
+          },
+          "conditions": {
+            "type": "string",
+            "description": "Conditions attached to the approval, if any."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the approver decided (RFC 3339)."
+          },
+          "signature": {
+            "type": "string",
+            "description": "Detached signature over the record, prefixed with the algorithm (for example \"ed25519:<base64>\"). Makes the record tamper-evident in the evidence store.",
+            "pattern": "^[a-z0-9-]+:.+$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "ISO/IEC 42001 A.6"
+      ]
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "approved",
+        "approved_with_conditions",
+        "rework"
+      ],
+      "description": "Outcome of the design review."
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the decision."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

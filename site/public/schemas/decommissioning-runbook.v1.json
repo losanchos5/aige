@@ -1,0 +1,310 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/decommissioning-runbook.v1.json",
+  "title": "Decommissioning runbook",
+  "description": "The executed plan for retiring one AI system or agent: why, who is told, each step with its owner and evidence (identity revoked, traffic stopped, register entry retired, evidence archived, data disposed of), and the sign-off.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "NIST AI RMF GOVERN 1.7",
+    "NIST AI RMF MANAGE 2.4",
+    "EU AI Act Art. 18",
+    "EU AI Act Art. 26(6)",
+    "ISO/IEC 42001 A.6",
+    "GDPR Art. 5(1)(e)"
+  ],
+  "x-layer": [
+    2,
+    4
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-kill-switch--circuit-breaker",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-registry"
+  ],
+  "x-lifecycle-stage": "retire",
+  "type": "object",
+  "required": [
+    "runbook_id",
+    "subject",
+    "reason",
+    "steps",
+    "evidence_archive",
+    "status"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/decommissioning-runbook.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "runbook_id": {
+      "type": "string",
+      "description": "Identifier of the runbook.",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "string",
+      "description": "The governed object as registry id and version, \"id@version\" (for example \"csa-01@2026-09-18\"). The key every record is filed against.",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "end_of_life",
+        "replaced",
+        "risk_unacceptable",
+        "regulatory",
+        "vendor_exit",
+        "incident"
+      ],
+      "description": "Why it is retired."
+    },
+    "replaced_by": {
+      "type": "string",
+      "description": "Registry id of the successor, if any."
+    },
+    "decision_ref": {
+      "type": "string",
+      "description": "Record of the retirement decision."
+    },
+    "dependencies": {
+      "type": "array",
+      "description": "Downstream systems, agents or processes that rely on it.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "notifications": {
+      "type": "array",
+      "description": "Who is told, and when.",
+      "items": {
+        "type": "object",
+        "description": "One notification.",
+        "required": [
+          "party"
+        ],
+        "properties": {
+          "party": {
+            "type": "string",
+            "enum": [
+              "deployers",
+              "users",
+              "affected_persons",
+              "workers",
+              "authority",
+              "vendor",
+              "other"
+            ],
+            "description": "Who is told."
+          },
+          "method": {
+            "type": "string",
+            "description": "How."
+          },
+          "sent_at": {
+            "type": "string",
+            "format": "date",
+            "description": "When."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "steps": {
+      "type": "array",
+      "description": "Ordered steps. The runbook is complete when every step is done or skipped with a reason.",
+      "items": {
+        "type": "object",
+        "description": "One step.",
+        "required": [
+          "step_id",
+          "action",
+          "owner",
+          "status"
+        ],
+        "properties": {
+          "step_id": {
+            "type": "string",
+            "description": "Step id.",
+            "minLength": 1
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "disable_traffic",
+              "revoke_identity",
+              "revoke_credentials",
+              "retire_register_entry",
+              "archive_evidence",
+              "delete_data",
+              "delete_model_artefacts",
+              "update_documentation",
+              "notify",
+              "other"
+            ],
+            "description": "Action."
+          },
+          "detail": {
+            "type": "string",
+            "description": "What exactly is done."
+          },
+          "owner": {
+            "type": "string",
+            "description": "Who does it.",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "done",
+              "skipped"
+            ],
+            "description": "Status."
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When done."
+          },
+          "evidence": {
+            "type": "string",
+            "format": "uri",
+            "description": "Record that proves it."
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "NIST AI RMF GOVERN 1.7"
+      ]
+    },
+    "data_disposition": {
+      "type": "array",
+      "description": "What happens to each dataset, log and prompt store.",
+      "items": {
+        "type": "object",
+        "description": "One dataset.",
+        "required": [
+          "dataset",
+          "action"
+        ],
+        "properties": {
+          "dataset": {
+            "type": "string",
+            "description": "Dataset or store.",
+            "minLength": 1
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "delete",
+              "retain",
+              "anonymise"
+            ],
+            "description": "Action."
+          },
+          "basis": {
+            "type": "string",
+            "description": "Why retained, if retained."
+          },
+          "until": {
+            "type": "string",
+            "format": "date",
+            "description": "Until when."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "GDPR Art. 5(1)(e)",
+        "EU AI Act Art. 26(6)"
+      ]
+    },
+    "evidence_archive": {
+      "type": "object",
+      "description": "Where the record of the system's life is kept.",
+      "required": [
+        "location",
+        "retain_until"
+      ],
+      "properties": {
+        "location": {
+          "type": "string",
+          "format": "uri",
+          "description": "Where the evidence is archived."
+        },
+        "retain_until": {
+          "type": "string",
+          "format": "date",
+          "description": "Retention end (for a high-risk system, documentation is kept for ten years after placing on the market or putting into service)."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 18"
+      ]
+    },
+    "rollback_possible_until": {
+      "type": "string",
+      "format": "date",
+      "description": "Last date the system could be restored, if any."
+    },
+    "sign_off": {
+      "type": "object",
+      "description": "Final sign-off.",
+      "required": [
+        "role",
+        "decision",
+        "timestamp"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "The approving role, not a personal name.",
+          "minLength": 1
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "approve",
+            "approve_with_conditions",
+            "reject",
+            "abstain"
+          ],
+          "description": "What this approver decided."
+        },
+        "conditions": {
+          "type": "string",
+          "description": "Conditions attached to the approval, if any."
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the approver decided (RFC 3339)."
+        },
+        "signature": {
+          "type": "string",
+          "description": "Detached signature over the record, prefixed with the algorithm (for example \"ed25519:<base64>\"). Makes the record tamper-evident in the evidence store.",
+          "pattern": "^[a-z0-9-]+:.+$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "in_progress",
+        "completed"
+      ],
+      "description": "Status."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

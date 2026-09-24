@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/go-no-go.v1.json",
+  "title": "Go/no-go decision",
+  "description": "The release gate for one system version: a checklist whose items name the obligation they evidence and the record that proves them, the reviewers' decisions by role, any overrides, and the rollout and rollback plan.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 9",
+    "EU AI Act Art. 17",
+    "EU AI Act Art. 43",
+    "ISO/IEC 42001 A.6",
+    "NIST AI RMF MANAGE 1.1",
+    "NIST AI RMF MANAGE 1.4"
+  ],
+  "x-layer": [
+    3,
+    5
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-eval-gate-in-ci",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-human-in-the-loop-gate"
+  ],
+  "x-lifecycle-stage": "release",
+  "type": "object",
+  "required": [
+    "decision_id",
+    "subject",
+    "checklist",
+    "reviewers",
+    "decision",
+    "decided_at"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/go-no-go.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "decision_id": {
+      "type": "string",
+      "description": "Identifier of the decision.",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "string",
+      "description": "The governed object as registry id and version, \"id@version\" (for example \"csa-01@2026-09-18\"). The key every record is filed against.",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "change_type": {
+      "type": "string",
+      "enum": [
+        "new_system",
+        "major_change",
+        "minor_change",
+        "retrain",
+        "rollback"
+      ],
+      "description": "What kind of release this is. A retrained model is a new release."
+    },
+    "checklist": {
+      "type": "array",
+      "description": "Readiness checklist. Every item links the record that answers it.",
+      "items": {
+        "type": "object",
+        "description": "One checklist item.",
+        "required": [
+          "item_id",
+          "question",
+          "status"
+        ],
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "description": "Checklist item id.",
+            "minLength": 1
+          },
+          "question": {
+            "type": "string",
+            "description": "The question the item answers (for example \"Do all blocking suites pass?\").",
+            "minLength": 1
+          },
+          "evidences": {
+            "type": "string",
+            "description": "The obligation the item evidences."
+          },
+          "evidence": {
+            "type": "string",
+            "format": "uri",
+            "description": "Link to the record that answers it."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "met",
+              "not_met",
+              "not_applicable",
+              "waived"
+            ],
+            "description": "Status."
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "EU AI Act Art. 17"
+      ]
+    },
+    "reviewers": {
+      "type": "array",
+      "description": "Named reviewer roles and their decisions (for example legal, security, privacy, business, governance).",
+      "items": {
+        "type": "object",
+        "description": "One reviewer decision.",
+        "required": [
+          "role",
+          "decision",
+          "timestamp"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "The approving role, not a personal name.",
+            "minLength": 1
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "approve_with_conditions",
+              "reject",
+              "abstain"
+            ],
+            "description": "What this approver decided."
+          },
+          "conditions": {
+            "type": "string",
+            "description": "Conditions attached to the approval, if any."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the approver decided (RFC 3339)."
+          },
+          "signature": {
+            "type": "string",
+            "description": "Detached signature over the record, prefixed with the algorithm (for example \"ed25519:<base64>\"). Makes the record tamper-evident in the evidence store.",
+            "pattern": "^[a-z0-9-]+:.+$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "NIST AI RMF MANAGE 1.1"
+      ]
+    },
+    "overrides": {
+      "type": "array",
+      "description": "Management overrides, recorded rather than hidden.",
+      "items": {
+        "type": "object",
+        "description": "One override.",
+        "required": [
+          "item_id",
+          "by_role",
+          "rationale"
+        ],
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "description": "Item overridden.",
+            "minLength": 1
+          },
+          "by_role": {
+            "type": "string",
+            "description": "Role that overrode it.",
+            "minLength": 1
+          },
+          "rationale": {
+            "type": "string",
+            "description": "Why.",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "residual_risk_accepted": {
+      "type": "string",
+      "description": "Residual risk accepted with this release, with the accepting role.",
+      "x-evidences": [
+        "NIST AI RMF MANAGE 1.4",
+        "EU AI Act Art. 9(5)"
+      ]
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "go",
+        "go_with_conditions",
+        "no_go"
+      ],
+      "description": "The decision."
+    },
+    "conditions": {
+      "type": "array",
+      "description": "Conditions on a conditional go.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "rollout": {
+      "type": "object",
+      "description": "Rollout and rollback.",
+      "required": [
+        "strategy",
+        "rollback_plan"
+      ],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "shadow",
+            "pilot",
+            "canary",
+            "full"
+          ],
+          "description": "Rollout strategy."
+        },
+        "exposure_percent": {
+          "type": "number",
+          "description": "Share of traffic or cases exposed at first.",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "rollback_plan": {
+          "type": "string",
+          "description": "How to roll back, and the trigger.",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "NIST AI RMF MANAGE 2.4"
+      ]
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the decision was taken."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

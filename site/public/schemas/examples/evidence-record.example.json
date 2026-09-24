@@ -1,0 +1,15 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/evidence-record.v1.json",
+  "control_id": "guardrail.output.pii.v2",
+  "subject": "csa-01@2026-09-18",
+  "decision": "alert",
+  "metric": "pii_leak_rate",
+  "value": 0.004,
+  "threshold": 0,
+  "obligation": "EU AI Act Art. 15",
+  "failure_mode": "personal data disclosed in an answer",
+  "input_hash": "sha256:1c7d4e9a2b5f8c1d4e7a0b3c6d9e2f5a8b1c4d7e0f3a6b9c2d5e8f1a4b7c0d3e",
+  "actor": "csa-01",
+  "timestamp": "2026-09-18T14:31:52Z",
+  "signature": "ed25519:5aR8tY1uI4oP7aS0dF3gH6jK9lZ2xC5v"
+}

@@ -1,0 +1,394 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/deployment-decision-record.v1.json",
+  "title": "Deployment decision record",
+  "description": "The deployer's decision to put one AI system into use in one context, with the deployer duties checked one by one: use per the instructions, assigned and trained oversight, input data, monitoring, log retention, worker and affected-person information, impact assessments and registration.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 26",
+    "EU AI Act Art. 27",
+    "EU AI Act Art. 25",
+    "EU AI Act Art. 50",
+    "GDPR Art. 35",
+    "ISO/IEC 42001 A.9",
+    "NIST AI RMF MANAGE 1.1"
+  ],
+  "x-layer": [
+    2,
+    4
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-vendor--model-due-diligence-gate",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-human-in-the-loop-gate"
+  ],
+  "x-lifecycle-stage": "release",
+  "type": "object",
+  "required": [
+    "decision_id",
+    "subject",
+    "deployment_context",
+    "duties",
+    "decision",
+    "decided_by",
+    "decided_at"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/deployment-decision-record.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "decision_id": {
+      "type": "string",
+      "description": "Identifier of the decision.",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "string",
+      "description": "The governed object as registry id and version, \"id@version\" (for example \"csa-01@2026-09-18\"). The key every record is filed against.",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "provider": {
+      "type": "string",
+      "description": "Provider of the system (internal team or supplier)."
+    },
+    "deployment_context": {
+      "type": "object",
+      "description": "Where, by whom and on whom it is used.",
+      "required": [
+        "business_process",
+        "affected_persons"
+      ],
+      "properties": {
+        "business_process": {
+          "type": "string",
+          "description": "Process the system is used in.",
+          "minLength": 1
+        },
+        "users": {
+          "type": "array",
+          "description": "Who operates it.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "affected_persons": {
+          "type": "array",
+          "description": "Who is affected.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "jurisdictions": {
+          "type": "array",
+          "description": "Where.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "period_and_frequency": {
+          "type": "string",
+          "description": "How long and how often it will be used."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 27(1)(a)"
+      ]
+    },
+    "role_assessment": {
+      "type": "object",
+      "description": "Whether deployer duties or provider duties apply.",
+      "required": [
+        "becomes_provider",
+        "rationale"
+      ],
+      "properties": {
+        "becomes_provider": {
+          "type": "boolean",
+          "description": "Whether this deployment makes the organisation a provider (for example by substantial modification or rebranding)."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Why.",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 25"
+      ]
+    },
+    "duties": {
+      "type": "object",
+      "description": "The deployer duties, checked one by one.",
+      "required": [
+        "instructions_for_use",
+        "oversight",
+        "monitoring",
+        "log_retention_days",
+        "fria",
+        "dpia"
+      ],
+      "properties": {
+        "instructions_for_use": {
+          "type": "object",
+          "description": "Use in line with the instructions.",
+          "required": [
+            "document"
+          ],
+          "properties": {
+            "document": {
+              "type": "string",
+              "format": "uri",
+              "description": "Instructions for use relied on."
+            },
+            "gaps": {
+              "type": "array",
+              "description": "Gaps found in them.",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": false,
+          "x-evidences": [
+            "EU AI Act Art. 26(1)"
+          ]
+        },
+        "oversight": {
+          "type": "object",
+          "description": "Oversight assigned to competent, trained people.",
+          "required": [
+            "roles"
+          ],
+          "properties": {
+            "roles": {
+              "type": "array",
+              "description": "Roles assigned to oversee.",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "training_records": {
+              "type": "array",
+              "description": "Ids of their training records.",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": false,
+          "x-evidences": [
+            "EU AI Act Art. 26(2)",
+            "EU AI Act Art. 4"
+          ]
+        },
+        "input_data": {
+          "type": "string",
+          "description": "How input data is kept relevant and representative, where the deployer controls it.",
+          "x-evidences": [
+            "EU AI Act Art. 26(4)"
+          ]
+        },
+        "monitoring": {
+          "type": "object",
+          "description": "Monitoring and suspension.",
+          "required": [
+            "plan"
+          ],
+          "properties": {
+            "plan": {
+              "type": "string",
+              "description": "How operation is monitored."
+            },
+            "suspension_criteria": {
+              "type": "array",
+              "description": "When use is suspended and the provider informed.",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": false,
+          "x-evidences": [
+            "EU AI Act Art. 26(5)"
+          ]
+        },
+        "log_retention_days": {
+          "type": "integer",
+          "description": "How long automatically generated logs are kept, in days (at least six months unless other law says otherwise).",
+          "minimum": 1,
+          "x-evidences": [
+            "EU AI Act Art. 26(6)"
+          ]
+        },
+        "workers_informed": {
+          "type": "object",
+          "description": "Information to workers before workplace use.",
+          "required": [
+            "required"
+          ],
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "description": "Whether workers and their representatives must be informed."
+            },
+            "informed_at": {
+              "type": "string",
+              "format": "date",
+              "description": "When."
+            }
+          },
+          "additionalProperties": false,
+          "x-evidences": [
+            "EU AI Act Art. 26(7)"
+          ]
+        },
+        "affected_persons_informed": {
+          "type": "object",
+          "description": "Information to people subject to decisions or interacting with the system.",
+          "required": [
+            "required"
+          ],
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "description": "Whether affected persons must be told the system is used."
+            },
+            "method": {
+              "type": "string",
+              "description": "How."
+            }
+          },
+          "additionalProperties": false,
+          "x-evidences": [
+            "EU AI Act Art. 26(11)",
+            "EU AI Act Art. 50"
+          ]
+        },
+        "fria": {
+          "type": "object",
+          "description": "Fundamental rights impact assessment.",
+          "required": [
+            "required"
+          ],
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "description": "Whether a FRIA is required."
+            },
+            "assessment_id": {
+              "type": "string",
+              "description": "Id of the impact assessment."
+            }
+          },
+          "additionalProperties": false,
+          "x-evidences": [
+            "EU AI Act Art. 27"
+          ]
+        },
+        "dpia": {
+          "type": "object",
+          "description": "Data protection impact assessment.",
+          "required": [
+            "required"
+          ],
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "description": "Whether a DPIA is required."
+            },
+            "assessment_id": {
+              "type": "string",
+              "description": "Id of the impact assessment."
+            }
+          },
+          "additionalProperties": false,
+          "x-evidences": [
+            "GDPR Art. 35",
+            "EU AI Act Art. 26(9)"
+          ]
+        },
+        "eu_database_registration": {
+          "type": "object",
+          "description": "Registration by public-authority deployers.",
+          "required": [
+            "required"
+          ],
+          "properties": {
+            "required": {
+              "type": "boolean",
+              "description": "Whether the deployer must register (public authorities)."
+            },
+            "registration_id": {
+              "type": "string",
+              "description": "Registration id."
+            }
+          },
+          "additionalProperties": false,
+          "x-evidences": [
+            "EU AI Act Art. 26(8)",
+            "EU AI Act Art. 49"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 26"
+      ]
+    },
+    "performance_requirements": {
+      "type": "array",
+      "description": "Performance floors the deployment must hold, including per group.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "deploy",
+        "deploy_with_conditions",
+        "do_not_deploy"
+      ],
+      "description": "The decision."
+    },
+    "conditions": {
+      "type": "array",
+      "description": "Conditions attached.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "decided_by": {
+      "type": "string",
+      "description": "Deciding role.",
+      "minLength": 1
+    },
+    "decided_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Decision date."
+    },
+    "review_by": {
+      "type": "string",
+      "format": "date",
+      "description": "When the decision must be reviewed."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}
