@@ -247,6 +247,13 @@
   align-items: center;
 }
 
+/* display: flex above outranks the UA [hidden] rule: keep the JS-only rows
+   (data-tool-js hidden, revealed by lib.js) out of a page without JavaScript. */
+.tool-buttons[hidden],
+.tool-actions[hidden] {
+  display: none;
+}
+
 .tool-actions .btn,
 .tool-buttons .btn {
   font-size: var(--fs-small);

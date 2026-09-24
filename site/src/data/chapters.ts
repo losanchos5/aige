@@ -414,7 +414,13 @@ export const chapters: readonly Chapter[] = [
     title: '23. Governing AI agents',
     shortTitle: 'AI Agents',
     summary:
-      'Governing autonomous agents: registry, identity, tool permissions, human checkpoints, kill switches and prompt change control.',
+      'Governing AI agents: registry, identity and short-lived credentials, tool permissions, human checkpoints, guardrails, kill switches, memory and delegation.',
+    glance: [
+      'Autonomy is a design decision, not a model property: record the level in the registry and give each level a minimum control set, as Art. 14(3) asks for oversight commensurate with autonomy.',
+      'Channel authentication is not agent identity: MCP authorization (spec 2026-07-28) secures one hop, while a short-lived workload identity with delegation, never impersonation, makes the agent attributable across all of them.',
+      'Every tool call passes a deny-by-default gateway with pinned tool definitions, budgets and checkpoints that show the raw call, and every stop level is drilled and verified to hold.',
+      'Memory, prompts and delegation chains are governed like configuration: writes carry provenance, prompts sit behind an eval gate, and scope only narrows from hop to hop.',
+    ],
   },
 ];
 

@@ -3,6 +3,8 @@
 // same corpus in full.
 import { test, expect } from '@playwright/test';
 import { chaptersOrdered } from '../src/data/chapters';
+import { obligations, obligationPath } from '../src/data/frameworks';
+import { getGlossary } from '../src/lib/glossary';
 
 test.describe('the site publishes an llms.txt index', () => {
   test('/llms.txt is plain text and links every chapter', async ({ request }) => {
@@ -24,6 +26,34 @@ test.describe('the site publishes an llms.txt index', () => {
     // The sections the index promises.
     for (const heading of ['## Body of Knowledge', '## Thesis', '## Resources']) {
       expect(text).toContain(heading);
+    }
+  });
+
+  test('/llms.txt lists the v0.5.0 destinations and every detail page', async ({ request }) => {
+    const text = await (await request.get('/llms.txt')).text();
+    const origin = 'https://aigovernanceengineer.com';
+    for (const path of [
+      '/obligations',
+      '/resources/data',
+      '/api/v1/index.json',
+      '/figures',
+      '/toolkit',
+      '/agents',
+      '/patterns',
+      '/about/methodology',
+      '/bok/glossary',
+      '/glossary.json',
+    ]) {
+      expect(text, path).toContain(`](${origin}${path})`);
+    }
+    // The detail pages sit in the llmstxt.org "Optional" section, last.
+    expect(text).toContain('## Optional');
+    const optional = text.slice(text.indexOf('## Optional'));
+    for (const row of obligations) {
+      expect(optional, row.id).toContain(`(${origin}${obligationPath(row)})`);
+    }
+    for (const entry of getGlossary()) {
+      expect(optional, entry.term).toContain(`(${origin}${entry.url})`);
     }
   });
 

@@ -9,6 +9,11 @@ import type { APIRoute } from 'astro';
 import { chaptersOrdered } from '../data/chapters';
 import { patternPath } from '../data/patterns';
 import { site } from '../data/site';
+import { obligations, obligationPath } from '../data/frameworks';
+import { figures } from '../data/figures';
+import { tools as toolkitTools, toolNotice } from '../data/toolkit';
+import { getGlossary } from '../lib/glossary';
+import { hasFigureArt } from '../lib/figure-reuse';
 import { loadPatternPages } from '../lib/pattern-pages';
 import {
   chapterPath,
@@ -55,6 +60,22 @@ export const GET: APIRoute = async (context) => {
       ),
     ]),
 
+    section('Practice', [
+      linkLine(
+        'Toolkit',
+        url('/toolkit'),
+        `Browser tools built from the book that produce documents you keep. ${toolNotice}`,
+      ),
+      ...toolkitTools
+        .filter((tool) => tool.status === 'live')
+        .map((tool) => linkLine(`Toolkit: ${tool.title}`, url(tool.href), tool.summary)),
+      linkLine(
+        'Governing AI agents',
+        url('/agents'),
+        'The agent control plane in one place: registry, identity and short-lived credentials, tool permissions, human checkpoints, guardrails, kill switches, the patterns and the threats they answer, routed into chapter 23.',
+      ),
+    ]),
+
     section('Thesis', [
       linkLine(thesisEn.title, url('/thesis'), thesisEn.summary),
       linkLine(
@@ -65,6 +86,26 @@ export const GET: APIRoute = async (context) => {
     ]),
 
     section('Resources', [
+      linkLine(
+        'Frameworks',
+        url('/resources/frameworks'),
+        'The laws, standards, codes and control sets the Body of Knowledge maps against, with the obligation, artefact and stack-layer matrix. Illustrative, not a claim of conformity.',
+      ),
+      linkLine(
+        'Obligation register',
+        url('/obligations'),
+        `The ${obligations.length} obligations the book maps, one page each, with a stable id (AIGE-OBL-<instrument>-<clause>), the duty holder, the date it applies from, its status, the artefact that evidences it and its stack layer. Illustrative, not a claim of conformity.`,
+      ),
+      linkLine(
+        'Open data and API',
+        url('/resources/data'),
+        'How to reuse the registers behind the site: static JSON under /api/v1 with a JSON Schema per dataset, an OpenAPI description, stable ids, the versioning promise and the CC BY 4.0 licence.',
+      ),
+      linkLine(
+        'API catalogue (JSON)',
+        url('/api/v1/index.json'),
+        'The machine-readable list of every /api/v1 dataset with its schema and page.',
+      ),
       linkLine(
         'Topic × framework crosswalk',
         url('/resources/crosswalk'),
@@ -106,6 +147,31 @@ export const GET: APIRoute = async (context) => {
         'The clauses to check before you deploy a third-party AI system: what each governs, the red flag, a fallback position and the evidence to keep. An engineering checklist, not legal advice.',
       ),
       linkLine(
+        'Figures',
+        url('/figures'),
+        `The ${figures.length} infographics and the interactive diagrams of the Body of Knowledge, each infographic with its own page, a text alternative, SVG and PNG downloads and a citation.`,
+      ),
+      linkLine(
+        'Glossary',
+        url('/bok/glossary'),
+        `Chapter 09: ${getGlossary().length} terms, each defined once with its source, and each with its own page under /glossary/ (listed below under Optional).`,
+      ),
+      linkLine(
+        'Glossary (JSON)',
+        url('/glossary.json'),
+        'Every term with its definition, chapter references and page URL, as JSON.',
+      ),
+      linkLine(
+        'Tool categories',
+        url('/resources/tools'),
+        'Tool categories for each stack layer, every tool with its licence and access model: examples, not endorsements.',
+      ),
+      linkLine(
+        'Reading list',
+        url('/bok/reading-list'),
+        `Chapter 10, the canonical annotated bibliography; ${url('/resources/reading-list')} is the same list with audience and jurisdiction filters.`,
+      ),
+      linkLine(
         'Discipline map',
         url('/map'),
         'The whole discipline on one page: every chapter, layer, pattern, workflow, obligation, maturity level and learning stage, as a mind map and as a linked list.',
@@ -113,7 +179,7 @@ export const GET: APIRoute = async (context) => {
       linkLine(
         'Resources index',
         url('/resources'),
-        'Frameworks, tools, a reading list, a glossary, the topic crosswalk and the discipline map, all extracted from the Body of Knowledge.',
+        'Frameworks, the obligation register, the crosswalk, harms, cases, contracts, templates, figures, tools, the toolkit, the reading list, the glossary, the open data and the discipline map, all extracted from the Body of Knowledge.',
       ),
     ]),
 
@@ -141,6 +207,23 @@ export const GET: APIRoute = async (context) => {
         url('/about'),
         `Who writes this, how to contribute and how to get in touch. Licensed ${site.license}.`,
       ),
+      linkLine(
+        'Methodology',
+        url('/about/methodology'),
+        'How sources are chosen and tagged, how dated claims are re-verified, how corrections and reviews work, and how releases are versioned with DOIs.',
+      ),
+    ]),
+
+    // llmstxt.org: the "Optional" section holds the URLs a reader with a short
+    // context can skip. Here: one page per obligation, per figure and per term.
+    section('Optional', [
+      ...obligations.map((row) =>
+        linkLine(`Obligation ${row.id}: ${row.obligation}`, url(obligationPath(row))),
+      ),
+      ...figures.filter((figure) => hasFigureArt(figure.id)).map((figure) =>
+        linkLine(`Figure: ${figure.title}`, url(`/figures/${figure.id}`), figure.alt),
+      ),
+      ...getGlossary().map((entry) => linkLine(`Term: ${entry.term}`, url(entry.url))),
     ]),
   ];
 

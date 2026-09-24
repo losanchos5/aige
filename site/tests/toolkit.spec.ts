@@ -277,7 +277,8 @@ test.describe('maturity self-check without JavaScript', () => {
     await expect(page.locator('#tool-notice')).toHaveText(NOTICE);
     await expect(page.locator('[data-tool-nojs]')).toBeVisible();
     await expect(page.locator('input[type="radio"]')).toHaveCount(30);
-    await expect(page.locator('fieldset legend')).toHaveCount(5);
+    // The five layer fieldsets; the compare section's pair picker stays hidden.
+    await expect(page.locator('fieldset legend:visible')).toHaveCount(5);
     await expect(page.getByText('Registry reconciled against production')).toBeVisible();
     await expect(page.locator('#msc-metrics')).toBeVisible();
     await expect(page.locator('#msc-checklist')).toBeVisible();

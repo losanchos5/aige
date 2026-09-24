@@ -16,6 +16,10 @@ const ROUTES: Record<string, string> = {
   resources: 'Resources & reading list',
   map: 'The map of the discipline',
   about: 'About this site',
+  toolkit: 'Toolkit: governance tools in your browser',
+  obligations: 'The obligation register',
+  figures: 'Figures of the Body of Knowledge',
+  data: 'Open data and API',
 };
 
 export const getStaticPaths: GetStaticPaths = () => {

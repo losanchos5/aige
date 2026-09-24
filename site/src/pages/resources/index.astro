@@ -5,7 +5,7 @@ import ResourceCard from '../../components/ResourceCard.astro';
 import { site } from '../../data/site';
 import { frameworks, obligations } from '../../data/frameworks';
 import { topics, columns } from '../../data/crosswalk';
-import { toolsByCategory } from '../../data/stack';
+import { allTools, toolCatalogue } from '../../data/stack';
 import { getReadingList } from '../../lib/reading-list';
 import { getGlossary } from '../../lib/glossary';
 import { harms, levelOrder } from '../../data/harms';
@@ -13,22 +13,31 @@ import { cases } from '../../data/cases';
 import { clauses, licenceTypes } from '../../data/contracts';
 import { kit } from '../../data/templates';
 import { getSchemas } from '../../lib/schemas-library';
+import { datasets } from '../../lib/api';
+import { figures } from '../../data/figures';
+import { diagrams } from '../../data/diagrams';
+import { tools as toolkitTools } from '../../data/toolkit';
 import { countWord } from '../../data/parts';
 import { WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
-const tools = toolsByCategory();
-const toolCount = tools.reduce((n, group) => n + group.examples.length, 0);
+// The catalogue counts every tool once, the curated indexes included, so the
+// card matches the lede of /resources/tools.
+const toolCount = allTools().length;
+const liveToolkit = toolkitTools.filter((tool) => tool.status === 'live').length;
+const instrumentCount = new Set(obligations.map((row) => row.frameworkId)).size;
 const reading = getReadingList();
 const readingCount = reading.reduce((n, group) => n + group.items.length, 0);
 const glossaryCount = getGlossary().length;
 const schemaCount = getSchemas().length;
 
-// The hub's cards, in reading order: the mapping references first, then the
-// harms and the cases that test them, the contract and record templates, and
-// the tools, reading list, glossary and map. Every count is computed from the
-// data the page links to; the index labels are assigned below from the order.
+// The hub's cards, in reading order: the mapping references first (frameworks,
+// the obligation register, the crosswalk), then the harms and the cases that
+// test them, the contract and record templates, the figures, the tools and the
+// toolkit, the reading list and glossary, the open data behind all of it and
+// the map. Every count is computed from the data the page links to; the index
+// labels are assigned below from the order.
 const entries = [
   {
     title: 'Frameworks',
@@ -39,9 +48,17 @@ const entries = [
     count: `${frameworks.length} frameworks · ${obligations.length} obligations`,
   },
   {
+    title: 'Obligation register',
+    href: '/obligations',
+    swatch: 'var(--l2)',
+    description:
+      'Every obligation the book maps, one page each: a stable id, the duty holder, the date it applies from, its status, the artefact that evidences it and its stack layer.',
+    count: `${obligations.length} obligation pages · ${instrumentCount} instruments`,
+  },
+  {
     title: 'Crosswalk',
     href: '/resources/crosswalk',
-    swatch: 'var(--l2)',
+    swatch: 'var(--l3)',
     description:
       'One governance topic per row, read across to the EU, ISO, NIST and Chinese instruments that bind it, down to the article, clause or control.',
     count: `${topics.length} topics · ${columns.length} columns`,
@@ -49,7 +66,7 @@ const entries = [
   {
     title: 'Harms atlas',
     href: '/resources/harms',
-    swatch: 'var(--l3)',
+    swatch: 'var(--l4)',
     description:
       'AI harms by level, each with its failure mode, the control and layer that catch it, the evidence it leaves and real incident records.',
     count: `${harms.length} harms · ${levelOrder.length} levels`,
@@ -57,7 +74,7 @@ const entries = [
   {
     title: 'Cases',
     href: '/cases',
-    swatch: 'var(--l4)',
+    swatch: 'var(--l5)',
     description:
       'Public AI incidents written as engineering post-mortems: what failed, which control would have caught it and what evidence it would have left.',
     count: `${cases.length} cases`,
@@ -79,12 +96,28 @@ const entries = [
     count: `${schemaCount} schemas · ${kit.length} kit templates`,
   },
   {
+    title: 'Figures',
+    href: '/figures',
+    swatch: 'var(--l2)',
+    description:
+      'Every infographic and diagram in the book, each with a text alternative, SVG and PNG downloads, an embed snippet and a citation.',
+    count: `${figures.length} infographics · ${diagrams.length} diagrams`,
+  },
+  {
     title: 'Tools',
     href: '/resources/tools',
+    swatch: 'var(--l3)',
+    description:
+      'Tool categories for each layer of the stack, every tool with its licence and access model: examples of the substance, not endorsements of any brand.',
+    count: `${toolCount} tools · ${toolCatalogue.length} categories`,
+  },
+  {
+    title: 'Toolkit',
+    href: '/toolkit',
     swatch: 'var(--l4)',
     description:
-      'Reference tool categories for each layer of the stack, with illustrative examples: the substance, not an endorsement of any brand.',
-    count: `${toolCount} tools · ${tools.length} categories`,
+      'Browser tools built from the book that produce documents you keep; nothing you enter leaves your browser. Indicative, not legal advice and not a conformity claim.',
+    count: `${liveToolkit} live ${liveToolkit === 1 ? 'tool' : 'tools'} · ${toolkitTools.length} in the registry`,
   },
   {
     title: 'Reading list',
@@ -96,16 +129,24 @@ const entries = [
   },
   {
     title: 'Glossary',
-    href: '/resources/glossary',
-    swatch: 'var(--l3)',
+    href: '/bok/glossary',
+    swatch: 'var(--l1)',
     description:
-      'Every term defined once, alphabetically, and cross-referenced to the chapter that treats it in full.',
+      'Every term defined once, each with its own page, and cross-referenced to the chapter that treats it in full.',
     count: `${glossaryCount} terms`,
+  },
+  {
+    title: 'Open data & API',
+    href: '/resources/data',
+    swatch: 'var(--l2)',
+    description:
+      'The registers behind these pages as static JSON under /api/v1, each with a JSON Schema, an OpenAPI description and stable ids, free to reuse under CC BY 4.0.',
+    count: `${datasets.length} datasets · JSON Schema`,
   },
   {
     title: 'The map',
     href: '/map',
-    swatch: 'var(--l1)',
+    swatch: 'var(--l3)',
     description:
       'The whole discipline on one canvas: every chapter, layer, pattern, obligation and learning stage as a navigable mind map, with the same map as a linked index.',
     count: '8 branches · one page',
@@ -136,14 +177,14 @@ const jsonLd = {
 
 <Marketing
   title="Resources"
-  description="Sourced, versioned references for AI governance engineering: frameworks, crosswalk, harms atlas, cases, contract clauses, templates, tools, glossary and the map."
+  description="Sourced, versioned references for AI governance engineering: frameworks, obligations, crosswalk, harms, cases, templates, figures, tools, open data and the map."
   image="/og/resources.png"
   jsonLd={jsonLd}
 >
   <PageHero
     variant="res"
     title="Curated, sourced, versioned."
-    lede={`${cardCount[0].toUpperCase()}${cardCount.slice(1)} references drawn straight from the Body of Knowledge: the frameworks the discipline maps against and the crosswalk that reads each topic across them, the harms atlas and the incident cases, contract clauses, templates and schemas for governance records, the tool categories that fill each layer, the sources that formed it, the terms it uses and the map that lays the whole discipline on one canvas.`}
+    lede={`${cardCount[0].toUpperCase()}${cardCount.slice(1)} references drawn straight from the Body of Knowledge: the frameworks the discipline maps against, the obligation register and the crosswalk that reads each topic across them, the harms atlas and the incident cases, contract clauses, templates and schemas for governance records, the figures, the tool categories that fill each layer and the browser toolkit, the sources that formed it, the terms it uses, the open data behind every page and the map that lays the whole discipline on one canvas.`}
   >
     <p slot="note">
       Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync
@@ -211,11 +252,24 @@ const jsonLd = {
   .rc-bento > :global(li:nth-child(10)) {
     --i: 9;
   }
+  .rc-bento > :global(li:nth-child(11)) {
+    --i: 10;
+  }
+  .rc-bento > :global(li:nth-child(12)) {
+    --i: 11;
+  }
+  .rc-bento > :global(li:nth-child(13)) {
+    --i: 12;
+  }
+  .rc-bento > :global(li:nth-child(14)) {
+    --i: 13;
+  }
 
   @media (min-width: 600px) {
     /* The first card (Frameworks) and the last (the map) each span two tracks.
-       With ten cards that tiles with no orphan: at two columns they take full
-       rows around four pairs; at four columns, 2 + 8 × 1 + 2 = three full rows. */
+       With fourteen cards that tiles with no orphan: at two columns they take
+       full rows around six pairs; at four columns, 2 + 12 × 1 + 2 = four full
+       rows. Keep the card count even when adding one. */
     .rc-bento > :global(li:first-child),
     .rc-bento > :global(li:last-child) {
       grid-column: span 2;
