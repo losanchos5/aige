@@ -2,37 +2,54 @@
 /**
  * NewsletterForm: a plain, backend-free sign-up that posts straight to the
  * newsletter provider named in data/site.ts. The browser does the POST; there
- * is no script and no tracking here. It renders nothing while
- * `site.newsletter.action` is empty, so the feature stays dark until a real
- * endpoint is configured.
+ * is no script here, and the address never reaches this site. It renders
+ * nothing while `site.newsletter.action` is empty, so the feature stays dark
+ * until a real endpoint is configured.
+ *
+ * `location` names where the form sits (home, chapter, about): it becomes the
+ * field id suffix, so two forms never share an id, and the Umami event's
+ * `location` property on the submit button (a declarative data attribute; it
+ * does nothing unless Base.astro loads Umami, and it never sends the address).
  */
 import { site } from '../data/site';
 
+interface Props {
+  location?: string;
+}
+
+const { location = 'about' } = Astro.props;
 const { action } = site.newsletter;
+const fieldId = `nl-email-${location}`;
 ---
 
 {
   action && (
     <form class="newsletter" method="post" action={action}>
-      <label class="nl-label" for="nl-email">
+      <label class="nl-label" for={fieldId}>
         Get an email when a chapter changes
       </label>
       <div class="nl-row">
         <input
           class="nl-input"
-          id="nl-email"
+          id={fieldId}
           type="email"
           name="email"
           autocomplete="email"
           placeholder="you@example.com"
           required
         />
-        <button class="btn btn-primary nl-submit" type="submit">
+        <button
+          class="btn btn-primary nl-submit"
+          type="submit"
+          data-umami-event="newsletter-subscribe"
+          data-umami-event-location={location}
+        >
           Subscribe
         </button>
       </div>
       <p class="nl-note">
-        Occasional updates when a chapter changes. No tracking; the form posts to Buttondown.
+        Occasional updates when a chapter changes. The form posts straight to Buttondown; this
+        site never receives your address.
       </p>
     </form>
   )
