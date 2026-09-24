@@ -56,6 +56,95 @@ export const tools: readonly ToolEntry[] = [
     href: '/toolkit/maturity-self-check',
     chapter: { label: '07. Maturity model', href: '/bok/maturity-model' },
   },
+  // Block w2-builders-b: four tools that turn a questionnaire into a document.
+  {
+    id: 'vendor-due-diligence',
+    title: 'Vendor due-diligence request',
+    summary:
+      'Build a tiered, evidence-first due-diligence request for an AI vendor or model: the artefacts to ask for, cross-referenced to crosswalk topics and CSA AICM controls, and the contract clauses to check.',
+    audience: ['AI governance engineers', 'Procurement and vendor risk', 'Security and privacy leads'],
+    inputs: [
+      'Supply type, use tier, data sensitivity, autonomy and tool access',
+      'Jurisdictions and sector',
+      'Optionally, the answers received',
+    ],
+    outputs: [
+      'Risk tier with its reasons',
+      '20 to 38 artefact requests',
+      'Contract-clause checklist',
+      'Markdown request and CSV',
+      'Response record (JSON, vendor-due-diligence-response.v1)',
+    ],
+    status: 'live',
+    href: '/toolkit/vendor-due-diligence',
+    chapter: { label: '15. Governing deployment', href: '/bok/governing-deployment' },
+  },
+  {
+    id: 'incident-clock',
+    title: 'Incident clock',
+    summary:
+      'From the awareness time, your role, the system tier and the facts: the incident class, who reports to whom and every deadline as a calendar date, as chapter 17 states the clocks.',
+    audience: ['Incident commanders', 'AI governance engineers', 'DPOs and legal'],
+    inputs: [
+      'Awareness time, and classification or causal-link times if known',
+      'Your roles and the system tier',
+      'What happened, read as severely as the evidence allows',
+    ],
+    outputs: [
+      'Incident class and severity',
+      'Clocks per regime with calendar dates',
+      'Calendar reminders (.ics)',
+      'Incident record skeleton (JSON, incident-record.v1)',
+      'Markdown summary',
+    ],
+    status: 'live',
+    href: '/toolkit/incident-clock',
+    chapter: { label: '17. Incidents, issues and root causes', href: '/bok/incidents' },
+  },
+  {
+    id: 'agent-control-profile',
+    title: 'Agent control profile',
+    summary:
+      'Describe one agent and get the minimum control set chapter 23 asks for at its autonomy level, the controls its tools, memory and identity add, an agent register entry and a checklist.',
+    audience: ['AI governance engineers', 'Platform and security engineers', 'Agent owners'],
+    inputs: [
+      'Autonomy level and approval points',
+      'Tools and MCP servers with operation class and scope',
+      'Data classes, memory, external actions and identity model',
+    ],
+    outputs: [
+      'Minimum control set with patterns',
+      'Gaps to close',
+      'Agent register entry (JSON, agent-register-entry.v1)',
+      'Checklist (Markdown and CSV)',
+    ],
+    status: 'live',
+    href: '/toolkit/agent-control-profile',
+    chapter: { label: '23. Governing AI agents', href: '/bok/governing-agents' },
+  },
+  {
+    id: 'fairness-metric-chooser',
+    title: 'Fairness metric chooser',
+    summary:
+      'Walk the questions chapter 16 says decide the fairness metric (ground truth, costlier error, allocation or quality of service, legal frame) and get the metric families to use, with their caveats.',
+    audience: ['Data scientists and ML engineers', 'AI governance engineers', 'Legal and compliance'],
+    inputs: [
+      'Harm type and ground truth',
+      'Costlier error',
+      'Legal frame and access to the protected attribute',
+    ],
+    outputs: [
+      'Primary metric families and secondary checks',
+      'Warnings and legal notes, linked to the chapter',
+      'Markdown and JSON record of the choice',
+    ],
+    status: 'live',
+    href: '/toolkit/fairness-metric-chooser',
+    chapter: {
+      label: '16. Fairness and explainability',
+      href: '/bok/fairness-and-explainability',
+    },
+  },
 ];
 
 /** The registry entry for `id`; throws at build time on an unknown id so a

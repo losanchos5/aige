@@ -1,0 +1,315 @@
+---
+// /toolkit/fairness-metric-chooser: the questions chapter 16 says decide the
+// fairness metric (harm type, ground truth, costlier error, legal frame, access
+// to the protected attribute), answered once, turned into the metric families
+// to use, the secondary checks and the chapter's warnings, each linked to its
+// section. The client module is public/toolkit/fairness-metric-chooser.js; the
+// tree, the metric families and the use-case table are rendered here, so the
+// page works as a worksheet without JavaScript.
+import ToolShell from '../../components/toolkit/ToolShell.astro';
+import ToolTerms from '../../components/toolkit/ToolTerms.astro';
+import ToolSourceList from '../../components/toolkit/ToolSourceList.astro';
+import type { ToolSource } from '../../components/toolkit/ToolSourceList.astro';
+import { toolById, toolNotice } from '../../data/toolkit';
+import {
+  fairnessChooserData,
+  fairnessChapter,
+  fairnessAnchors,
+  treeQuestions,
+  metricFamilies,
+  useCaseRows,
+  type FairnessAnchor,
+} from '../../data/tool-fairness-chooser';
+import { chapterAnchorTitles } from '../../lib/tool-anchors';
+import { site } from '../../data/site';
+import '../../components/toolkit/tool-docs.css';
+
+const tool = toolById('fairness-metric-chooser');
+const anchorTitles = chapterAnchorTitles<FairnessAnchor>(
+  'bok/16-fairness-explainability.md',
+  fairnessAnchors,
+);
+const data = fairnessChooserData(site.url, toolNotice, site.license, anchorTitles);
+const ch = (key: FairnessAnchor) => `${fairnessChapter}#${fairnessAnchors[key]}`;
+
+const sources: ToolSource[] = [
+  {
+    text: '16. Fairness and explainability for practitioners: "Choosing a fairness metric by use case", "Group fairness metrics", "The impossibility results", "Intersectional and subgroup testing", "Where bias enters the lifecycle" and "Protected characteristics, proxies and the data you need to test", the text this tool restates. AI Governance Engineering Body of Knowledge. 2026-09-24.',
+    url: `${site.url}${fairnessChapter}`,
+    verified: 'primary',
+  },
+  {
+    text: 'Fairlearn user guide, "Fairness in machine learning" (allocation, quality-of-service and stereotyping harms; disparity metrics as ratios or differences). Fairlearn project. 2026.',
+    url: 'https://fairlearn.org/main/user_guide/fairness_in_machine_learning.html',
+    verified: 'primary',
+  },
+  {
+    text: '"Equality of Opportunity in Supervised Learning" (M. Hardt, E. Price, N. Srebro; equalised odds and equal opportunity). arXiv 1610.02413. 2016-10-07.',
+    url: 'https://arxiv.org/abs/1610.02413',
+    verified: 'primary',
+  },
+  {
+    text: '"Fair prediction with disparate impact: A study of bias in recidivism prediction instruments" (A. Chouldechova; predictive parity and equal error rates cannot both hold when prevalence differs). arXiv 1703.00056. 2017-02-28.',
+    url: 'https://arxiv.org/abs/1703.00056',
+    verified: 'primary',
+  },
+  {
+    text: '"Inherent Trade-Offs in the Fair Determination of Risk Scores" (J. Kleinberg, S. Mullainathan, M. Raghavan; calibration within groups and balance for the positive and negative class cannot hold together except in highly constrained special cases). arXiv 1609.05807. 2016-09-19.',
+    url: 'https://arxiv.org/abs/1609.05807',
+    verified: 'primary',
+  },
+  {
+    text: '29 CFR 1607.4(D), Uniform Guidelines on Employee Selection Procedures (1978): adverse impact and the "four-fifths rule", with the statistical and practical significance and small-numbers caveats. eCFR (text as of 2026-09-01). 2026-09-01.',
+    url: 'https://www.ecfr.gov/current/title-29/subtitle-B/chapter-XIV/part-1607/section-1607.4',
+    verified: 'primary',
+  },
+  {
+    text: 'Automated Employment Decision Tools: Frequently Asked Questions (Local Law 144 of 2021: independent bias audit within the past year; impact ratios across sex, race/ethnicity and intersectional categories; published summary; no specific action required). NYC Department of Consumer and Worker Protection. 2023-06-29.',
+    url: 'https://www.nyc.gov/assets/dca/downloads/pdf/about/DCWP-AEDT-FAQ.pdf',
+    verified: 'primary',
+  },
+  {
+    text: '42 U.S.C. § 2000e-2(k) and (l) (disparate impact burden of proof; no adjusted scores or different cut-off scores by race, colour, religion, sex or national origin). Legal Information Institute, Cornell Law School. 2026.',
+    url: 'https://www.law.cornell.edu/uscode/text/42/2000e-2',
+    verified: 'secondary',
+  },
+  {
+    text: 'Regulation (EU) 2024/1689 (AI Act), consolidated text as amended by Reg. (EU) 2026/1744: Art. 4a (special categories of personal data for bias detection and correction), Art. 10(2)(f)-(g) (examination for and mitigation of biases), Annex III points 4, 5(a) and 5(b). Publications Office of the EU (EUR-Lex). 2026-07-27.',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_10',
+    verified: 'primary',
+  },
+];
+---
+
+<ToolShell
+  tool={tool}
+  heading="Pick the fairness metric before the results."
+  description="Answer the questions chapter 16 says decide the fairness metric and get the metric families to use, the secondary checks and the caveats, linked to the chapter."
+  lede="Which fairness metric fits depends on the harm, on whether a trustworthy label exists, on which error costs more and on the legal frame. Answer those once, before the eval runs, and get the metric families to use, the checks beside them and the chapter's warnings."
+  image="/og/bok-fairness-and-explainability.png"
+  data={data}
+>
+  <form class="tool-form" id="fmc-form" data-fmc-form novalidate>
+    <div class="tool-errors" id="fmc-errors" data-fmc-errors tabindex="-1" role="group" aria-labelledby="fmc-errors-title" hidden>
+      <h2 id="fmc-errors-title">Answer these first</h2>
+      <ul></ul>
+    </div>
+
+    <div class="tool-field">
+      <label for="fmc-uc">Use case (optional)</label>
+      <input class="tool-input" id="fmc-uc" name="uc" type="text" maxlength="120" autocomplete="off" aria-describedby="fmc-uc-hint" />
+      <p class="tool-hint" id="fmc-uc-hint">It names the exports and the link.</p>
+    </div>
+
+    {
+      treeQuestions.map((question) => (
+        <fieldset
+          class="tool-fieldset"
+          id={`fmc-${question.id}`}
+          data-field
+          data-hint-id={`fmc-${question.id}-hint`}
+          aria-describedby={`fmc-${question.id}-hint`}
+        >
+          <legend class="tool-legend">{question.legend}</legend>
+          <p class="tool-hint" id={`fmc-${question.id}-hint`}>
+            {question.hint}
+            {question.allocationOnly && ' Only for allocation harms.'}{' '}
+            <a href={ch(question.anchor)}>Chapter 16: {anchorTitles[question.anchor]}</a>.
+          </p>
+          <p class="tool-error" id={`fmc-${question.id}-error`} hidden />
+          <ul class="tool-options">
+            {question.options.map((option) => (
+              <li class="tool-option">
+                <input type="radio" id={`fmc-${question.id}-${option.id}`} name={question.id} value={option.id} />
+                <label for={`fmc-${question.id}-${option.id}`}>
+                  <span class="tool-option-text">
+                    {option.label}
+                    {option.hint && <span class="fmc-option-hint"> {option.hint}</span>}
+                  </span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </fieldset>
+      ))
+    }
+
+    <div class="tool-buttons" data-tool-js data-print-hide hidden>
+      <button type="submit" class="btn btn-primary">Choose the metrics</button>
+      <button type="button" class="btn btn-secondary" data-fmc-reset>Clear</button>
+    </div>
+  </form>
+
+  <section class="tool-result tool-block" id="fmc-result" data-fmc-result aria-labelledby="fmc-result-title" hidden>
+    <h2 id="fmc-result-title" tabindex="-1">Metrics to use</h2>
+    <div class="tk-summary" data-fmc-summary></div>
+
+    <h3>Primary metric families</h3>
+    <ul class="tk-cards" data-fmc-primary></ul>
+
+    <h3>Secondary checks</h3>
+    <ul class="tk-list" data-fmc-secondary></ul>
+
+    <h3>What the chapter says to watch</h3>
+    <ul class="tk-cards" data-fmc-notes></ul>
+
+    <div class="tool-actions" data-print-hide>
+      <button type="button" class="btn btn-secondary" data-action="md">Download choice (Markdown)</button>
+      <button type="button" class="btn btn-secondary" data-action="json">Download choice (JSON)</button>
+      <button type="button" class="btn btn-secondary" data-action="copy">Copy link</button>
+      <button type="button" class="btn btn-secondary" data-action="print">Print</button>
+    </div>
+    <p class="tool-status" role="status" data-fmc-status></p>
+  </section>
+
+  <div class="tool-field tk-import tool-block" data-tool-js data-print-hide hidden>
+    <label for="fmc-import">Reopen a choice made by this tool</label>
+    <input class="tool-input" id="fmc-import" type="file" accept=".json,application/json" data-fmc-import aria-describedby="fmc-import-hint" />
+    <p class="tool-hint" id="fmc-import-hint">Read in this browser only; the answers are restored and the choice recomputed.</p>
+    <p class="tool-error" data-fmc-import-error hidden></p>
+  </div>
+
+  <Fragment slot="guide">
+    <h2 id="fmc-how">How the tree reads chapter 16</h2>
+    <p>
+      The metric follows the harm, and the harm follows the use case
+      <a href="#src-1" class="cite">[1]</a>. Allocation harms (a system extends or withholds an
+      opportunity, a resource or information) and quality-of-service harms (it works less well for
+      some people) need different metrics, and stereotyping is a third kind
+      <a href="#src-2" class="cite">[2]</a>. Add the cost of each error type and the legal frame,
+      and the choice narrows. Because the metrics conflict when base rates differ
+      <a href="#src-4" class="cite">[4]</a><a href="#src-5" class="cite">[5]</a>, the choice is a
+      governance decision with an owner, taken before the results are seen.
+    </p>
+
+    <h3 id="fmc-tree">The tree, by hand</h3>
+    <ol>
+      <li>
+        <strong>Allocation, with a trustworthy label.</strong> Take the metric of the costliest
+        error: missing a qualified person, equal opportunity; a wrongful cut or flag,
+        false-positive-rate parity; both, equalised odds <a href="#src-3" class="cite">[3]</a>; a
+        positive decision whose value depends on being right, predictive parity; a score read as a
+        probability, calibration within groups.
+      </li>
+      <li>
+        <strong>Allocation, with a label that may be a proxy.</strong> Review the label first
+        (<a href={ch('sources')}>where bias enters the lifecycle</a>); meanwhile measure selection
+        rates, which need no label.
+      </li>
+      <li>
+        <strong>Allocation, with no label yet.</strong> Selection rates and the adverse-impact ratio,
+        the counterfactual flip test, and the error-based metric once outcomes arrive.
+      </li>
+      <li><strong>Quality of service.</strong> The worst-group error rate, with intersectional error.</li>
+      <li>
+        <strong>Generative output.</strong> The counterfactual flip rate and a per-group quality
+        floor, with stereotype probes and refusal-rate gaps.
+      </li>
+      <li>
+        <strong>Then the legal frame.</strong> US employment adds the selection-rate AIR and the
+        four-fifths screen <a href="#src-6" class="cite">[6]</a><a href="#src-7" class="cite">[7]</a>
+        and rules out group-specific cut-offs <a href="#src-8" class="cite">[8]</a>; credit pairs
+        calibration with the approval-rate AIR; benefits put wrongful cuts first; in the EU,
+        high-risk systems examine data for biases and may use special-category data only under
+        Art. 4a's conditions <a href="#src-9" class="cite">[9]</a>.
+      </li>
+    </ol>
+
+    <h3 id="fmc-families">The metric families</h3>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>What each family equalises, when it fits and what to watch</caption>
+        <thead>
+          <tr>
+            <th scope="col">Metric</th>
+            <th scope="col">Holds when</th>
+            <th scope="col">Fits when</th>
+            <th scope="col">Watch for</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            metricFamilies.map((family) => (
+              <tr>
+                <th scope="row">
+                  <a href={ch(family.anchor)}>{family.name}</a>
+                </th>
+                <td data-label="Holds when">{family.holds}</td>
+                <td data-label="Fits when">{family.fits}</td>
+                <td data-label="Watch for">{family.watch}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="fmc-use-cases">The chapter's use-case table</h3>
+    <p>
+      From <a href={ch('choosing')}>choosing a fairness metric by use case</a>: a starting point,
+      not a rule. What makes a choice defensible is that it is written down with its reasons before
+      the eval runs and reviewed by someone who represents the affected people.
+    </p>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>Use case, costliest error and metrics</caption>
+        <thead>
+          <tr>
+            <th scope="col">Use case</th>
+            <th scope="col">Harm type</th>
+            <th scope="col">Costliest error</th>
+            <th scope="col">Primary metric</th>
+            <th scope="col">Secondary checks</th>
+            <th scope="col">Legal frame</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            useCaseRows.map((row) => (
+              <tr>
+                <th scope="row">{row.useCase}</th>
+                <td data-label="Harm type">{row.harm}</td>
+                <td data-label="Costliest error">{row.costliest}</td>
+                <td data-label="Primary metric">{row.primary}</td>
+                <td data-label="Secondary checks">{row.secondary}</td>
+                <td data-label="Legal frame">{row.legal}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="fmc-not">What this is not</h2>
+    <p>
+      Not legal advice and not a conformity claim. The law decides which disparity is unlawful and
+      which fix is allowed; the tree only restates chapter 16, which names the toolkits that compute
+      these metrics as examples of a category, not endorsements. Record the choice, the threshold
+      and the approver in a <a href="/patterns/policy-card">Policy Card</a>, and let the
+      <a href="/patterns/eval-gate-in-ci">eval gate</a> read it.
+    </p>
+
+    <ToolTerms
+      id="fmc-terms"
+      terms={[
+        'Adverse-impact ratio (AIR)',
+        'Four-fifths rule',
+        'Demographic parity',
+        'Equalised odds',
+        'Calibration within groups',
+        'Counterfactual fairness',
+        'Proxy label',
+        'Proxy variable',
+      ]}
+    />
+  </Fragment>
+
+  <ToolSourceList slot="sources" sources={sources} />
+</ToolShell>
+
+<style>
+  .fmc-option-hint {
+    color: var(--ink-2);
+    font-size: var(--fs-small);
+  }
+</style>

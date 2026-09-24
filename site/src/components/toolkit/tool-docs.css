@@ -1,0 +1,169 @@
+/* tool-docs.css: the extra styling of the four document-building tools
+   (vendor due diligence, incident clock, agent control profile, fairness metric
+   chooser), on top of toolkit.css. Tokens only (site/DESIGN.md): light and
+   dark both follow; no hue outside the five layer pairs, no halo, no badge. */
+
+/* The "verify" callout: a thick rule and bold text, not a colour. */
+.tk-verify {
+  max-width: var(--prose);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--ink-2);
+  border-left-width: 6px;
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.tk-verify strong {
+  font-weight: 700;
+}
+
+.tk-verify > * + * {
+  margin-top: var(--s-2);
+}
+
+/* Two or three fields side by side on wide screens, stacked on phones. */
+.tk-fields {
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+}
+
+.tk-fields .tool-field {
+  max-width: none;
+}
+
+.tk-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  align-items: stretch;
+}
+
+.tk-inline .tool-input {
+  flex: 1 1 14rem;
+  width: auto;
+}
+
+.tk-inline .btn {
+  min-height: 44px;
+  font-size: var(--fs-small);
+}
+
+textarea.tool-input {
+  min-height: 6rem;
+  resize: vertical;
+  font: inherit;
+}
+
+/* Checkbox options reuse the radio rows of toolkit.css. */
+.tool-option input[type='checkbox'] {
+  accent-color: var(--ink);
+}
+
+/* A group heading inside a long option list. */
+.tk-group-label {
+  margin: var(--s-3) 0 var(--s-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+/* Repeated rows (tools of an agent). */
+.tk-rows {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.tk-row {
+  min-width: 0;
+  margin: 0;
+  padding: var(--s-4);
+  border: 1px dashed var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+}
+
+.tk-row[hidden] {
+  display: none;
+}
+
+.tk-row legend {
+  padding: 0 var(--s-1);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Result blocks. */
+.tk-summary > * + * {
+  margin-top: var(--s-2);
+}
+
+.tk-lede {
+  font-size: 1.0625rem;
+  color: var(--ink);
+}
+
+.tk-list {
+  padding-left: var(--s-5);
+}
+
+.tk-list li + li {
+  margin-top: var(--s-2);
+}
+
+.tk-refs {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.tk-cards {
+  display: grid;
+  gap: var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tk-card {
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+}
+
+.tk-card > * + * {
+  margin-top: var(--s-1);
+}
+
+.tk-card h4 {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.tk-card .tool-hint {
+  margin: 0;
+}
+
+.tool-guide .tool-table-wrap {
+  max-width: none;
+}
+
+.cite {
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  text-decoration: none;
+}
+
+.tk-import {
+  max-width: 36rem;
+}
+
+@media print {
+  .tk-verify {
+    border-color: #000 !important;
+  }
+}

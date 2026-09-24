@@ -1,0 +1,48 @@
+---
+/**
+ * ToolTerms: "Terms used here", a short list of links to the glossary pages
+ * of the terms a tool relies on. Terms the glossary does not carry are left
+ * out, so a renamed or removed entry never produces a broken link.
+ */
+import { getGlossary } from '../../lib/glossary';
+
+interface Props {
+  /** Glossary terms, exactly as bok/09-glossary.md names them. */
+  terms: readonly string[];
+  /** Heading id, unique on the page. */
+  id: string;
+}
+
+const { terms, id } = Astro.props;
+const byTerm = new Map(getGlossary().map((entry) => [entry.term, entry]));
+const found = terms.map((term) => byTerm.get(term)).filter((entry) => entry !== undefined);
+---
+
+{
+  found.length > 0 && (
+    <>
+      <h3 id={id}>Terms used here</h3>
+      <ul class="tool-terms">
+        {found.map((entry) => (
+          <li>
+            <a href={entry.url}>{entry.term}</a>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
+<style>
+  .tool-terms {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+    padding-left: 0 !important;
+    list-style: none;
+  }
+
+  .tool-terms li + li {
+    margin-top: 0 !important;
+  }
+</style>

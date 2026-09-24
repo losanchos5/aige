@@ -1,0 +1,555 @@
+---
+// /toolkit/agent-control-profile: describe one agent (autonomy, tools and MCP
+// servers with permissions, data classes, memory, external actions, identity
+// model, approval points) and get the minimum control set of chapter 23 and
+// the agent patterns, the gaps, an agent-register-entry.v1 entry and a
+// checklist. The client module is public/toolkit/agent-control-profile.js; the
+// autonomy table, the conditional controls and the by-hand method are rendered
+// here, so the page works as a worksheet without JavaScript.
+import ToolShell from '../../components/toolkit/ToolShell.astro';
+import ToolTerms from '../../components/toolkit/ToolTerms.astro';
+import ToolSourceList from '../../components/toolkit/ToolSourceList.astro';
+import type { ToolSource } from '../../components/toolkit/ToolSourceList.astro';
+import { toolById, toolNotice } from '../../data/toolkit';
+import {
+  agentControlsData,
+  agentChapter,
+  agentAnchors,
+  autonomyLevels,
+  agentControls,
+  operationClasses,
+  serverKinds,
+  dataClassOptions,
+  identityModels,
+  memoryOptions,
+  externalActions,
+  checkpointClasses,
+  type AnchorKey,
+} from '../../data/tool-agent-controls';
+import { chapterAnchorTitles } from '../../lib/tool-anchors';
+import { site } from '../../data/site';
+import '../../components/toolkit/tool-docs.css';
+
+const tool = toolById('agent-control-profile');
+
+// Heading text of every chapter-23 section the tool links to; a renamed
+// heading fails the build here rather than leaving a dead anchor.
+const anchorTitles = chapterAnchorTitles<AnchorKey>('bok/23-governing-agents.md', agentAnchors);
+
+const data = agentControlsData(site.url, toolNotice, site.license, anchorTitles);
+const controlTitle = new Map(agentControls.map((control) => [control.id, control.title]));
+const ch = (key: AnchorKey) => `${agentChapter}#${agentAnchors[key]}`;
+const toolRows = Array.from({ length: 6 }, (_, i) => i + 1);
+
+/** When the tool adds a control beyond the autonomy table. */
+const triggers: { control: string; when: string }[] = [
+  { control: 'checkpoint-irreversible', when: 'A tool of the pay, delete, send or execute class, or an external action; always at the Approver and Observer levels' },
+  { control: 'sandbox', when: 'A tool of the execute class, or generated code the agent runs' },
+  { control: 'egress-filter', when: 'A send-class tool, messages or publication, or a tool touching confidential or restricted data' },
+  { control: 'mcp-admission', when: 'Any tool served by an MCP server' },
+  { control: 'mcp-local', when: 'A local MCP server' },
+  { control: 'mcp-authorization', when: 'A remote MCP server over HTTP' },
+  { control: 'short-lived-credentials', when: 'A static API key or a long-lived secret' },
+  { control: 'delegated-token', when: "The agent acts for users, or holds the user's own token" },
+  { control: 'memory-governance', when: 'Long-term or shared memory, or a retrieval corpus' },
+  { control: 'memory-personal-data', when: 'Long-term or shared memory that may hold personal data' },
+  { control: 'data-classes', when: 'Personal data, or confidential or restricted data in a tool' },
+  { control: 'hop-accountability', when: 'The agent calls or delegates to other agents, or shares memory with them' },
+  { control: 'remote-agents', when: "It calls another organisation's agents" },
+  { control: 'prompt-change-control', when: 'Every agent' },
+  { control: 'otel-telemetry', when: 'Every agent' },
+  { control: 'ai-act-high-risk', when: 'Its purpose is, or may be, an Annex III use case' },
+  { control: 'ai-disclosure', when: 'It sends messages, emails or calls to people' },
+];
+
+const sources: ToolSource[] = [
+  {
+    text: '23. Governing AI agents: "Autonomy is a design decision" (the minimum controls per level), "The agent registry", "Identity and short-lived credentials", "Tool and MCP server permissions", "Human checkpoints and approval design", "Runtime guardrails for tool calls", "Kill switch and per-agent circuit breakers", "Memory and context governance", "Multi-agent systems and delegation chains", "An agent incident taxonomy" and "EU AI Act hooks for agents", the text this tool derives its controls from. AI Governance Engineering Body of Knowledge. 2026-09-24.',
+    url: `${site.url}${agentChapter}`,
+    verified: 'primary',
+  },
+  {
+    text: 'Patterns: Agent Registry, Agent Identity & Scoped Credentials, Runtime Guardrail, Human-in-the-loop Gate, Kill Switch / Circuit Breaker, AIBOM, Shadow-AI Discovery and Eval Gate in CI. AI Governance Engineering Body of Knowledge. 2026-09-24.',
+    url: `${site.url}/patterns`,
+    verified: 'primary',
+  },
+  {
+    text: '"Levels of Autonomy for AI Agents" (K. J. Kevin Feng, David W. McDonald, Amy X. Zhang; five levels by user role: operator, collaborator, consultant, approver, observer). arXiv 2506.12469. 2025-06-14.',
+    url: 'https://arxiv.org/abs/2506.12469',
+    verified: 'primary',
+  },
+  {
+    text: 'OWASP Top 10 for Agentic Applications 2026 (ASI01 to ASI10; least agency). OWASP GenAI Security Project. 2025-12-09.',
+    url: 'https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/',
+    verified: 'primary',
+  },
+  {
+    text: 'Model Context Protocol specification, version 2026-07-28, Authorization (RFC 9728 protected-resource metadata; RFC 8707 resource parameter; audience validation; no token passthrough; RFC 9207 issuer validation; step-up scopes). Model Context Protocol. 2026-07-28.',
+    url: 'https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization',
+    verified: 'primary',
+  },
+  {
+    text: 'Regulation (EU) 2024/1689 (AI Act), consolidated text: Art. 12 record-keeping; Art. 14(3)-(4) human oversight; Art. 26(2) and (6) deployer obligations; Art. 50(1) transparency for systems interacting with natural persons. Publications Office of the EU (EUR-Lex). 2026-07-27.',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_14',
+    verified: 'primary',
+  },
+  {
+    text: 'Agent register entry, JSON Schema v1 (identity, owner, scope, expiry, tools, data access, delegation, autonomy level, human oversight, spend limit, kill switch). AI Governance Engineer templates and schemas library. 2026-09-24.',
+    url: `${site.url}/schemas/agent-register-entry.v1.json`,
+    verified: 'primary',
+  },
+];
+---
+
+<ToolShell
+  tool={tool}
+  heading="The controls one agent needs."
+  description="Describe an AI agent and get the minimum control set of chapter 23 for its autonomy level and tools, an agent register entry and a checklist."
+  lede="Describe one agent: how much it decides on its own, which tools and MCP servers it calls with what permissions, what data and memory it touches, and how it proves who it is. You get the minimum control set chapter 23 asks for, the gaps to close, an agent register entry and a checklist."
+  image="/og/bok-governing-agents.png"
+  data={data}
+>
+  <form class="tool-form" id="acp-form" data-acp-form novalidate>
+    <div class="tool-errors" id="acp-errors" data-acp-errors tabindex="-1" role="group" aria-labelledby="acp-errors-title" hidden>
+      <h2 id="acp-errors-title">Check these first</h2>
+      <ul></ul>
+    </div>
+
+    <fieldset class="tool-fieldset" id="acp-agent" aria-describedby="acp-agent-hint">
+      <legend class="tool-legend">The agent</legend>
+      <p class="tool-hint" id="acp-agent-hint">The register entry's required fields are the id, the owner and the expiry.</p>
+      <div class="tk-fields">
+        <div class="tool-field" id="acp-aid-field" data-field data-describes="acp-aid">
+          <label for="acp-aid">Agent id (required)</label>
+          <input class="tool-input" id="acp-aid" name="aid" type="text" maxlength="60" autocomplete="off" />
+          <p class="tool-error" id="acp-aid-error" hidden></p>
+        </div>
+        <div class="tool-field">
+          <label for="acp-nm">Name</label>
+          <input class="tool-input" id="acp-nm" name="nm" type="text" maxlength="120" autocomplete="off" />
+        </div>
+        <div class="tool-field" id="acp-own-field" data-field data-describes="acp-own">
+          <label for="acp-own">Owner, team or accountable person (required)</label>
+          <input class="tool-input" id="acp-own" name="own" type="text" maxlength="120" autocomplete="off" />
+          <p class="tool-error" id="acp-own-error" hidden></p>
+        </div>
+        <div class="tool-field" id="acp-exp-field" data-field data-describes="acp-exp" data-hint-id="acp-exp-hint">
+          <label for="acp-exp">Expiry (required)</label>
+          <input class="tool-input" id="acp-exp" name="exp" type="date" aria-describedby="acp-exp-hint" />
+          <p class="tool-hint" id="acp-exp-hint">No agent outlives its review: the entry deactivates on this date.</p>
+          <p class="tool-error" id="acp-exp-error" hidden></p>
+        </div>
+        <div class="tool-field">
+          <label for="acp-ver">Entry version</label>
+          <input class="tool-input" id="acp-ver" name="ver" type="text" maxlength="40" autocomplete="off" />
+        </div>
+        <div class="tool-field">
+          <label for="acp-bm">Base models (comma-separated)</label>
+          <input class="tool-input" id="acp-bm" name="bm" type="text" maxlength="200" autocomplete="off" />
+        </div>
+      </div>
+      <div class="tool-field">
+        <label for="acp-pur">Purpose</label>
+        <input class="tool-input" id="acp-pur" name="pur" type="text" maxlength="400" autocomplete="off" />
+      </div>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="acp-autonomy" data-field data-hint-id="acp-autonomy-hint" aria-describedby="acp-autonomy-hint">
+      <legend class="tool-legend">Autonomy: what the person does</legend>
+      <p class="tool-hint" id="acp-autonomy-hint">
+        Autonomy is a design decision, set by the role the person plays, not a property of the
+        model. Least agency first: the cheapest agent control is the autonomy you did not grant.
+      </p>
+      <p class="tool-error" id="acp-autonomy-error" hidden></p>
+      <ul class="tool-options">
+        {
+          autonomyLevels.map((level) => (
+            <li class="tool-option">
+              <input type="radio" id={`acp-al-${level.id}`} name="al" value={level.id} />
+              <label for={`acp-al-${level.id}`}>
+                <span class="tool-option-level">{level.name}</span>
+                <span class="tool-option-text">
+                  {level.person}. Nearest IMDA level: {level.imda}; ATF tier: {level.atf}.
+                </span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="acp-tools" data-field data-hint-id="acp-tools-hint" aria-describedby="acp-tools-hint">
+      <legend class="tool-legend">Tools and MCP servers</legend>
+      <p class="tool-hint" id="acp-tools-hint">
+        One row per tool. The operation class drives the checkpoints; scopes become the register
+        entry's scope. A tool is a capability: no tool is harmless by name.
+      </p>
+      <p class="tool-error" id="acp-tools-error" hidden></p>
+      <div class="tk-rows">
+        {
+          toolRows.map((n) => (
+            <fieldset class="tk-row" data-acp-tool={n}>
+              <legend>Tool {n}</legend>
+              <div class="tk-fields">
+                <div class="tool-field">
+                  <label for={`acp-t${n}`}>Tool name</label>
+                  <input class="tool-input" id={`acp-t${n}`} name={`t${n}`} type="text" maxlength="80" autocomplete="off" />
+                </div>
+                <div class="tool-field">
+                  <label for={`acp-s${n}`}>Served by</label>
+                  <select class="tool-select" id={`acp-s${n}`} name={`s${n}`}>
+                    {serverKinds.map((kind) => <option value={kind.id}>{kind.label}</option>)}
+                  </select>
+                </div>
+                <div class="tool-field">
+                  <label for={`acp-o${n}`}>Operation class</label>
+                  <select class="tool-select" id={`acp-o${n}`} name={`o${n}`}>
+                    <option value="">Choose</option>
+                    {operationClasses.map((op) => <option value={op.id}>{op.label}</option>)}
+                  </select>
+                </div>
+                <div class="tool-field">
+                  <label for={`acp-c${n}`}>Scopes (comma-separated)</label>
+                  <input class="tool-input" id={`acp-c${n}`} name={`c${n}`} type="text" maxlength="200" autocomplete="off" />
+                </div>
+                <div class="tool-field">
+                  <label for={`acp-d${n}`}>Most sensitive data it touches</label>
+                  <select class="tool-select" id={`acp-d${n}`} name={`d${n}`}>
+                    <option value="">Not stated</option>
+                    {dataClassOptions.map((dc) => <option value={dc.id}>{dc.label}</option>)}
+                  </select>
+                </div>
+                <div class="tool-field">
+                  <label for={`acp-k${n}`}>Checkpoint rule, if any</label>
+                  <input class="tool-input" id={`acp-k${n}`} name={`k${n}`} type="text" maxlength="160" autocomplete="off" />
+                </div>
+              </div>
+            </fieldset>
+          ))
+        }
+      </div>
+      <div class="tool-buttons" data-tool-js hidden>
+        <button type="button" class="btn btn-secondary" data-acp-add>Add a tool</button>
+      </div>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="acp-data">
+      <legend class="tool-legend">Data, memory and actions</legend>
+      <p class="tk-group-label">Data</p>
+      <ul class="tool-options">
+        <li class="tool-option">
+          <input type="checkbox" id="acp-pd" name="pd" value="yes" />
+          <label for="acp-pd"><span class="tool-option-text">It handles personal data</span></label>
+        </li>
+        <li class="tool-option">
+          <input type="checkbox" id="acp-sp" name="sp" value="yes" />
+          <label for="acp-sp"><span class="tool-option-text">It handles special-category personal data</span></label>
+        </li>
+      </ul>
+      <p class="tk-group-label">Memory</p>
+      <ul class="tool-options">
+        {
+          memoryOptions.map((option) => (
+            <li class="tool-option">
+              <input type="checkbox" id={`acp-mem-${option.id}`} name="mem" value={option.id} />
+              <label for={`acp-mem-${option.id}`}><span class="tool-option-text">{option.label}</span></label>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="tk-group-label">External actions</p>
+      <ul class="tool-options">
+        {
+          externalActions.map((option) => (
+            <li class="tool-option">
+              <input type="checkbox" id={`acp-ext-${option.id}`} name="ext" value={option.id} />
+              <label for={`acp-ext-${option.id}`}><span class="tool-option-text">{option.label}</span></label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="acp-identity" data-field data-hint-id="acp-identity-hint" aria-describedby="acp-identity-hint">
+      <legend class="tool-legend">Identity: how it proves who it is</legend>
+      <p class="tool-hint" id="acp-identity-hint">Channel authentication secures one hop; the agent's own identity is what its actions are logged and revoked under.</p>
+      <p class="tool-error" id="acp-identity-error" hidden></p>
+      <ul class="tool-options">
+        {
+          identityModels.map((model) => (
+            <li class="tool-option">
+              <input type="radio" id={`acp-idm-${model.id}`} name="idm" value={model.id} />
+              <label for={`acp-idm-${model.id}`}><span class="tool-option-text">{model.label}</span></label>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="tk-fields">
+        <div class="tool-field">
+          <label for="acp-wid">Identifier (for example spiffe://…)</label>
+          <input class="tool-input" id="acp-wid" name="wid" type="text" maxlength="200" autocomplete="off" />
+        </div>
+        <div class="tool-field">
+          <label for="acp-ttl">Credential lifetime (seconds)</label>
+          <input class="tool-input" id="acp-ttl" name="ttl" type="number" min="1" step="1" inputmode="numeric" />
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="acp-oversight">
+      <legend class="tool-legend">Approval points and other agents</legend>
+      <p class="tk-group-label">Where a person approves</p>
+      <ul class="tool-options">
+        {
+          checkpointClasses.map((option) => (
+            <li class="tool-option">
+              <input type="checkbox" id={`acp-cp-${option.id}`} name="cp" value={option.id} />
+              <label for={`acp-cp-${option.id}`}><span class="tool-option-text">{option.label}</span></label>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="tool-field">
+        <label for="acp-ovr">Approving role</label>
+        <input class="tool-input" id="acp-ovr" name="ovr" type="text" maxlength="120" autocomplete="off" />
+      </div>
+      <p class="tk-group-label">Other agents</p>
+      <ul class="tool-options">
+        <li class="tool-option">
+          <input type="radio" id="acp-ma-none" name="ma" value="none" />
+          <label for="acp-ma-none"><span class="tool-option-text">It works alone</span></label>
+        </li>
+        <li class="tool-option">
+          <input type="radio" id="acp-ma-internal" name="ma" value="internal" />
+          <label for="acp-ma-internal"><span class="tool-option-text">It calls or delegates to our own agents</span></label>
+        </li>
+        <li class="tool-option">
+          <input type="radio" id="acp-ma-external" name="ma" value="external" />
+          <label for="acp-ma-external"><span class="tool-option-text">It calls agents of another organisation (for example over A2A)</span></label>
+        </li>
+      </ul>
+      <div class="tool-field">
+        <label for="acp-dl">Agents it may delegate to (comma-separated ids)</label>
+        <input class="tool-input" id="acp-dl" name="dl" type="text" maxlength="300" autocomplete="off" />
+      </div>
+    </fieldset>
+
+    <fieldset class="tool-fieldset" id="acp-law">
+      <legend class="tool-legend">Purpose, budgets and the stop</legend>
+      <p class="tk-group-label">Is its intended purpose an EU AI Act Annex III use case?</p>
+      <ul class="tool-options">
+        <li class="tool-option">
+          <input type="radio" id="acp-hr-no" name="hr" value="no" />
+          <label for="acp-hr-no"><span class="tool-option-text">No</span></label>
+        </li>
+        <li class="tool-option">
+          <input type="radio" id="acp-hr-yes" name="hr" value="yes" />
+          <label for="acp-hr-yes"><span class="tool-option-text">Yes, for example screening job applicants</span></label>
+        </li>
+        <li class="tool-option">
+          <input type="radio" id="acp-hr-unsure" name="hr" value="unsure" />
+          <label for="acp-hr-unsure"><span class="tool-option-text">Not classified yet</span></label>
+        </li>
+      </ul>
+      <div class="tk-fields">
+        <div class="tool-field">
+          <label for="acp-sa">Spend limit (amount)</label>
+          <input class="tool-input" id="acp-sa" name="sa" type="number" min="0" step="any" inputmode="decimal" />
+        </div>
+        <div class="tool-field">
+          <label for="acp-scur">Currency (ISO code, for example EUR)</label>
+          <input class="tool-input" id="acp-scur" name="scur" type="text" maxlength="3" autocomplete="off" pattern="[A-Z]{3}" />
+        </div>
+        <div class="tool-field">
+          <label for="acp-sper">Per</label>
+          <select class="tool-select" id="acp-sper" name="sper">
+            <option value="">Choose</option>
+            <option value="per_action">Action</option>
+            <option value="per_hour">Hour</option>
+            <option value="per_day">Day</option>
+            <option value="per_month">Month</option>
+          </select>
+        </div>
+        <div class="tool-field">
+          <label for="acp-kso">Who pulls the kill switch</label>
+          <input class="tool-input" id="acp-kso" name="kso" type="text" maxlength="120" autocomplete="off" />
+        </div>
+        <div class="tool-field">
+          <label for="acp-ksd">Last stop drill</label>
+          <input class="tool-input" id="acp-ksd" name="ksd" type="date" />
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="tool-buttons" data-tool-js data-print-hide hidden>
+      <button type="submit" class="btn btn-primary">Build the profile</button>
+      <button type="button" class="btn btn-secondary" data-acp-reset>Clear</button>
+    </div>
+  </form>
+
+  <section class="tool-result tool-block" id="acp-result" data-acp-result aria-labelledby="acp-result-title" hidden>
+    <h2 id="acp-result-title" tabindex="-1">Control profile</h2>
+    <div class="tk-summary" data-acp-summary></div>
+
+    <div data-acp-gaps-block hidden>
+      <h3>Gaps to close</h3>
+      <ul class="tk-list" data-acp-gaps></ul>
+    </div>
+
+    <h3>Minimum control set</h3>
+    <ul class="tk-cards" data-acp-controls></ul>
+
+    <h3>Incidents worth drilling</h3>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>From chapter 23's agent incident taxonomy</caption>
+        <thead>
+          <tr>
+            <th scope="col">Class</th>
+            <th scope="col">Detection signal</th>
+            <th scope="col">First containment</th>
+            <th scope="col">Threat</th>
+          </tr>
+        </thead>
+        <tbody data-acp-drills></tbody>
+      </table>
+    </div>
+
+    <div class="tool-actions" data-print-hide>
+      <button type="button" class="btn btn-secondary" data-action="json">Download register entry (JSON)</button>
+      <button type="button" class="btn btn-secondary" data-action="md">Download checklist (Markdown)</button>
+      <button type="button" class="btn btn-secondary" data-action="csv">Download checklist (CSV)</button>
+      <button type="button" class="btn btn-secondary" data-action="copy">Copy link</button>
+      <button type="button" class="btn btn-secondary" data-action="print">Print</button>
+    </div>
+    <p class="tool-status" role="status" data-acp-status></p>
+  </section>
+
+  <div class="tool-field tk-import tool-block" data-tool-js data-print-hide hidden>
+    <label for="acp-import">Reopen a register entry made by this tool</label>
+    <input class="tool-input" id="acp-import" type="file" accept=".json,application/json" data-acp-import aria-describedby="acp-import-hint" />
+    <p class="tool-hint" id="acp-import-hint">Read in this browser only; the description is restored and the profile recomputed.</p>
+    <p class="tool-error" data-acp-import-error hidden></p>
+  </div>
+
+  <Fragment slot="guide">
+    <h2 id="acp-how">How the profile is built</h2>
+    <p>
+      An agent is governed when every action traces back to a registered identity, a scope someone
+      approved, a checkpoint that fired where the stakes required one and a tested way to stop it
+      <a href="#src-1" class="cite">[1]</a>. The tool starts from the minimum set of the autonomy
+      level, adds the controls the agent's tools, memory, identity and delegation call for, and
+      flags where the description breaks one of the chapter's rules.
+    </p>
+
+    <h3 id="acp-levels">Minimum controls by autonomy level</h3>
+    <p>
+      The levels follow the user's role as Feng, McDonald and Zhang define it
+      <a href="#src-3" class="cite">[3]</a>; the alignment with the IMDA levels and ATF tiers and
+      the control sets are chapter 23's reading (<a href={ch('autonomy')}>autonomy is a design
+      decision</a>). Each level adds to the one above. The tool carries every control up, except
+      the Operator's read-only tools and the Collaborator's checkpoint before every write, which
+      the Approver row narrows to critical or irreversible steps.
+    </p>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>What each level adds</caption>
+        <thead>
+          <tr>
+            <th scope="col">Level</th>
+            <th scope="col">What the person does</th>
+            <th scope="col">Adds</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            autonomyLevels.map((level) => (
+              <tr>
+                <th scope="row">{level.name}</th>
+                <td data-label="What the person does">{level.person}</td>
+                <td data-label="Adds">{level.adds.map((id) => controlTitle.get(id)).join('; ')}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="acp-triggers">Controls the agent's design adds</h3>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>Control, when the tool adds it, and where the chapter sets it out</caption>
+        <thead>
+          <tr>
+            <th scope="col">Control</th>
+            <th scope="col">Added when</th>
+            <th scope="col">Chapter 23 and pattern</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            triggers.map((row) => {
+              const control = agentControls.find((c) => c.id === row.control)!;
+              return (
+                <tr>
+                  <th scope="row">{control.title}</th>
+                  <td data-label="Added when">{row.when}</td>
+                  <td data-label="Chapter 23 and pattern">
+                    <a href={ch(control.anchor)}>{anchorTitles[control.anchor]}</a>
+                    {control.pattern && (
+                      <>
+                        {' · '}
+                        <a href={`/patterns/${control.pattern}`}>{data.patternTitles[control.pattern]}</a>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              );
+            })
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="acp-entry">The register entry</h3>
+    <p>
+      The JSON download validates against the
+      <a href="/resources/templates#schema-agent-register-entry">agent-register-entry.v1</a> schema
+      <a href="#src-7" class="cite">[7]</a>. Its <code>autonomy_level</code> and
+      <code>human_oversight.mode</code> values are the tool's nearest reading of the five levels
+      (Operator: suggest only; Collaborator and Approver: act with approval; Consultant: act and
+      report; Observer: act autonomously); the chapter's level travels in <code>extensions</code>
+      with the control list and the gaps. Record the level as a registry field and treat raising it
+      as a change that needs the same review as a new deployment.
+    </p>
+
+    <h3 id="acp-by-hand">By hand, without JavaScript</h3>
+    <ol>
+      <li>Pick the level from what the person does, and take its row and every row above it.</li>
+      <li>For each tool, note its operation class; pay, delete, send and execute need a checkpoint that fails closed.</li>
+      <li>Walk the second table: add each control whose condition your agent meets.</li>
+      <li>
+        Fill the register fields of <a href={ch('registry')}>the agent registry</a> and drill the
+        incident classes of the <a href={ch('incidents')}>agent incident taxonomy</a> that its
+        tools make possible.
+      </li>
+    </ol>
+
+    <h2 id="acp-not">What this is not</h2>
+    <p>
+      Not legal advice and not a conformity claim. The controls restate chapter 23 and add none of
+      their own; the threat ids come from the OWASP agentic list <a href="#src-4" class="cite">[4]</a>
+      and the MCP rules from the 2026-07-28 specification <a href="#src-5" class="cite">[5]</a>, as
+      the chapter reads them. The EU AI Act hooks <a href="#src-6" class="cite">[6]</a> apply by
+      intended purpose, not by architecture: an agent is classified like any other AI system.
+      Mappings are illustrative, not a claim of conformity.
+    </p>
+
+    <ToolTerms
+      id="acp-terms"
+      terms={['Agent (agentic AI)', 'Agent registry', 'Autonomy', 'Guardian agent', 'Guardrail', 'Kill switch', 'Human-in-the-loop (HITL)', 'MCP', 'AIBOM']}
+    />
+  </Fragment>
+
+  <ToolSourceList slot="sources" sources={sources} />
+</ToolShell>
