@@ -26,16 +26,19 @@ evidence it emitted.
 
 The five layers, named exactly and in order, are: **01 Govern-as-Code · 02 Inventory & Transparency ·
 03 Evals & Red Teaming as Evidence · 04 Runtime Controls & Observability · 05 Assurance & Continuous
-Compliance.** They map onto the three questions the discipline must answer at any moment. Layers 01 and
-02 answer *what AI is running* and *what it is allowed to do*. Layers 03 and 05 answer *what evidence
-proves it*. Layer 04 keeps all three answers true as the system changes underneath them. The threats
+Compliance.** They map onto the three questions the discipline must answer at any moment. Layer 02
+answers *what AI is running*. Layers 01 and 04 answer *what it is allowed to do*: layer 01 writes the
+bound as code and layer 04 enforces it on the live call, under the agent's own identity and scope.
+Layers 03 and 05 answer *what evidence proves it*. The threats
 the controls are built against (goal hijack, tool misuse, agent identity and privilege abuse, rogue
 agents) are catalogued in OWASP's Top 10 for Agentic Applications 2026 [2].
 
-Three of these layers are inherited, not invented. Govern-as-Code (01), machine-readable evidence
-(part of 02 and 05) and Assurance & Continuous Compliance (05) come almost unchanged from GRC
-engineering. Layers 03 and 04 (evals and red-teaming as controls, and agent identity and runtime
-control) are what AI forces the discipline to add, because a model whose behaviour must be tested and
+Three of these layers are inherited, not invented. Govern-as-Code (01), Inventory & Transparency (02)
+and Assurance & Continuous Compliance (05) come almost unchanged from GRC engineering: policy as code,
+the asset inventory and machine-readable evidence are its established practice, and the AI-specific
+records (the agent registry, the AIBOM) extend them rather than replace them. Layers 03 and 04 (evals
+and red-teaming as controls, and agent identity and runtime control) are what AI forces the discipline
+to add, because a model whose behaviour must be tested and
 an autonomous actor that acts under delegated authority have no analogue in classic GRC. The new work
 concentrates there; the rest is a specialisation of a method that already works.
 
@@ -219,7 +222,10 @@ point where a policy from layer 01 fires against a live request. Observability: 
 that turn agent behaviour into a control signal. Agent runtime identity: every non-human actor with its
 own workload identity, a bounded scope, and a **kill switch**, a tested way to revoke access and stop
 an agent without breaking the fleet. Register and bound every actor before it acts: no agent acts
-before it has an identity, an owner and a scope.
+before it has an identity, an owner and a scope. A **guardian agent**, an agent whose job is to
+review, constrain or stop other agents at runtime, is one way to build the mediation point; it is
+itself an agent, so it needs its own identity, scope and kill switch, and its decisions are evidence
+like any other guardrail's [16].
 
 **Reference tools and standards (illustrative).** Guardrail frameworks such as NVIDIA NeMo Guardrails,
 Meta LlamaFirewall and Lakera enforce input/output and tool-call policy; observability tools such as
@@ -289,7 +295,7 @@ substrate is NIST's native model: a control layer (`catalog`, `profile`), an imp
 tested [15]. That model is the part to build on; the AI-specific additions on top are still forming.
 One proposed approach (a single 2026 preprint, not a standard) extends OSCAL with sixteen property
 extensions for lifecycle phase, enforcement semantics and risk traceability, in a three-layer
-compliance-as-code architecture that generates OSCAL assessment results automatically [13]. Treat it
+compliance-as-code architecture that generates OSCAL assessment results automatically [12]. Treat it
 as an early answer to a real gap the authors name well: frameworks "such as the EU AI Act, ISO/IEC
 42001, and NIST AI RMF specify what to assure but provide no executable format for how" [12]. The gap
 is what layer 05 closes; the native OSCAL assessment models close most of it today, with or without
@@ -298,9 +304,9 @@ the extensions.
 **Reference tools and standards (illustrative).** Evidence is emitted as OSCAL component and assessment
 artefacts; GRC and AI-governance suites (for example Vanta, Drata, OneTrust; watsonx.governance,
 Holistic AI, Saidot) aggregate and present it. Incident reporting maps to EU AI Act Art. 73 (serious
-incidents) and Art. 72 (post-market monitoring). No harmonised standard is yet cited in the EU's
-Official Journal, so an ISO/IEC 42001 certificate supports the Art. 17 quality management system but
-does not by itself satisfy it, and confers no presumption of conformity under Art. 40 [13].
+incidents) and Art. 72 (post-market monitoring). As of 2026-09-24 no harmonised standard is cited in
+the EU's Official Journal [13], so an ISO/IEC 42001 certificate supports the Art. 17 quality management
+system but does not by itself satisfy it, and confers no presumption of conformity under Art. 40 [17].
 
 **Definition of done.**
 
@@ -481,11 +487,13 @@ The five excerpts are one data path from policy to proof, keyed on the same regi
 [5] AI Controls Matrix (AICM) v1.1 (247 control objectives across 18 domains). Cloud Security Alliance. 2026-06-22. https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1 (verified: primary)
 [6] "Evolving AI Transparency: the AIBOM generator's new home at OWASP" (CycloneDX output). OWASP GenAI Security Project. 2025-12-18. https://genai.owasp.org/2025/12/18/evolving-ai-transparency-the-journey-of-the-aibom-generator-and-its-new-home-at-owasp/ (verified: primary)
 [7] Inspect: a framework for large language model evaluations (UK AI Security Institute). GitHub. 2026. https://github.com/UKGovernmentBEIS/inspect_ai (verified: primary)
-[8] GPAI Code of Practice, Safety & Security chapter (adversarial testing / red-teaming for systemic-risk models; voluntary; published 10 Jul 2025). European Commission. 2025-07-10. https://artificialintelligenceact.eu/code-of-practice-overview/ (verified: primary)
+[8] General-Purpose AI Code of Practice, Safety and Security chapter (examples of model evaluation methods include "red-teaming and other methods of adversarial testing"; systemic-risk models only; voluntary; published 10 Jul 2025). European Commission. 2025-07-10. https://ec.europa.eu/newsroom/dae/redirection/document/118119 (verified: primary)
 [9] Model Context Protocol specification 2026-07-28 (DCR deprecated in favour of CIMD; issuer-bound credentials). MCP. 2026-07-28. https://blog.modelcontextprotocol.io/posts/2026-07-28/ (verified: primary)
 [10] "Accelerating the Adoption of Software and AI Agent Identity and Authorization" (concept paper; "known, trusted, and properly governed"). NIST NCCoE. 2026-02-05. https://www.nccoe.nist.gov/news-insights/new-concept-paper-identity-and-authority-software-agents (verified: primary)
 [11] "Gartner Forecasts the Market for Securing AI Will Reach Almost $5 Billion in 2027" (>50% of agent attacks exploit access-control and prompt injection by 2029). Gartner. 2026-08-26. https://www.gartner.com/en/newsroom/press-releases/2026-08-26-gartner-forecasts-the-market-for-securing-ai-will-reach-almost-5-billion-in-2027 (verified: primary)
 [12] "Making AI Compliance Evidence Machine-Readable" (OSCAL + 16 property extensions; three-layer compliance-as-code) (arXiv 2604.13767). UC3M. 2026-04-15. https://arxiv.org/abs/2604.13767 (verified: primary)
-[13] JTC 21 standards tracker / CSA research note (no harmonised standard cited in the OJ; ISO/IEC 42001 not a harmonised standard, supports but does not satisfy Art. 17). CEN-CENELEC JTC 21 (via kla.digital) / CSA. 2026. https://kla.digital/blog/jtc-21-standards-tracker (verified: secondary)
+[13] Standardisation of the AI Act (no harmonised standard yet referenced in the Official Journal; page last updated 2026-08-03; no Commission implementing decision citing one found in the Publications Office index on 2026-09-24). European Commission. 2026-08-03. https://digital-strategy.ec.europa.eu/en/policies/ai-act-standardisation (verified: primary)
 [14] State of GRC 2026 (≈51% of GRC teams ≤4 people; ≈18.5% solo). GRC Engineer. 2026. https://grcengineer.com/report/ (verified: primary)
 [15] OSCAL native model (control layer: catalog, profile; implementation: component-definition, system-security-plan; assessment: assessment-plan, assessment-results, POA&M). NIST. 2026. https://pages.nist.gov/OSCAL/learn/concepts/layer/ (verified: primary)
+[16] "Gartner Predicts that Guardian Agents will Capture 10-15% of the Agentic AI Market by 2030" (guardian agents: AI-based technologies that review, monitor and redirect or block agent actions). Gartner. 2025-06-11. https://www.gartner.com/en/newsroom/press-releases/2025-06-11-gartner-predicts-that-guardian-agents-will-capture-10-15-percent-of-the-agentic-ai-market-by-2030 (verified: primary)
+[17] CSA research note on the EU AI Act, prEN 18286 and ISO/IEC 42001 (ISO/IEC 42001 alone does not satisfy the AI Act and is not a harmonised standard; EN 18286 targets the Art. 17 QMS). Cloud Security Alliance. 2026-04-28. https://labs.cloudsecurityalliance.org/research/csa-research-note-eu-ai-act-pren-18286-iso-42001-20260428-cs/ (verified: secondary)
