@@ -56,7 +56,6 @@ const jsonLd = [
   title={title}
   summary={summary}
   description={metaDescription}
-  kicker="La Tesis"
   headings={headings}
   editPath="THESIS.es.md"
   updated={updated}
@@ -93,7 +92,7 @@ const jsonLd = [
   .lang-switch {
     margin-bottom: var(--s-4);
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--fs-label);
   }
 
   .lang-switch a {
@@ -110,8 +109,9 @@ const jsonLd = [
     padding: var(--s-3) var(--s-4);
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
-    background: color-mix(in srgb, var(--l5) 40%, var(--bg));
-    font-size: 0.9375rem;
+    /* Same as SignNote: a neutral tint and the body size. */
+    background: var(--tint-bg);
+    font-size: var(--fs-body);
   }
 
   .sign-note p {

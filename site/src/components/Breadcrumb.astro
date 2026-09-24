@@ -1,6 +1,6 @@
 ---
 /**
- * Breadcrumb — a mono, uppercase trail styled after Kicker: an optional layer
+ * Breadcrumb — a mono, uppercase trail of short labels: an optional layer
  * square, then an ordered list of crumbs separated by aria-hidden chevrons. The
  * last crumb is the current page (`aria-current="page"`, no link).
  *
@@ -14,9 +14,10 @@ import type { Crumb } from '../lib/breadcrumbs';
 
 interface Props {
   items: Crumb[];
-  /** CSS colour for the 4px square. Pass a layer var, e.g. `var(--l1)`. */
+  /** CSS colour for the 4px square: --ink by default, a layer var (e.g.
+      `var(--l1)`) only when the page is about that layer. */
   swatch?: string;
-  /** Draw a trailing 1px rule after the trail, like Kicker's `rule`. */
+  /** Draw a trailing 1px rule after the trail. */
   rule?: boolean;
   class?: string;
 }
@@ -97,9 +98,11 @@ const { items, swatch = 'var(--ink)', rule = false, class: className } = Astro.p
     color: var(--ink);
   }
 
-  /* The current page's crumb: a touch stronger than the muted links. */
+  /* The current page's crumb: a touch stronger than the muted links. It is the
+     one crumb long enough to wrap on a phone, so it gets a real line-height. */
   .crumbs [aria-current='page'] {
     color: var(--ink-2);
+    line-height: 1.3;
   }
 
   .sep {

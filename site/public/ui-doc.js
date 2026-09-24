@@ -8,6 +8,10 @@
   var scrim = document.querySelector('.doc-scrim');
   var openBtn = document.querySelector('[data-drawer-open]');
   var lastFocused = null;
+  // The page behind the open drawer goes inert (TC-15), through the helper
+  // shared with the other drawers (public/inert.js, loaded first): header,
+  // footer and the rest of <main>, never the scrim or a <dialog>.
+  var setBackgroundInert = window.aigeInert ? window.aigeInert(sidebar, scrim) : function () {};
 
   // Visible, tabbable elements inside the open drawer, for the focus trap.
   function focusables() {
@@ -22,6 +26,12 @@
 
   // Esc closes; Tab / Shift+Tab wrap so focus stays within the drawer.
   function onKeydown(e) {
+    // A <dialog> over the drawer (the search, opened from the rail's own button
+    // or Ctrl+K) owns the keyboard: no trap, and its Esc closes only it. Its own
+    // Esc handler may already have closed it by the time the key bubbles here,
+    // so a key from inside a dialog counts too.
+    var t = e.target;
+    if (document.querySelector('dialog[open]') || (t && t.closest && t.closest('dialog'))) return;
     if (e.key === 'Escape') {
       closeDrawer();
       return;
@@ -43,12 +53,21 @@
     }
   }
 
+  // Open, the drawer is a named modal dialog with the page behind it inert;
+  // closed (and on the desktop rail) it is a plain <div> whose inner
+  // <nav aria-label="Chapters"> is the landmark (an <aside> may not take
+  // role="dialog"). The CSS hides the closed drawer with visibility, which
+  // also takes its links out of the tab order.
   function openDrawer() {
     if (!sidebar) return;
     lastFocused = document.activeElement;
+    sidebar.setAttribute('role', 'dialog');
+    sidebar.setAttribute('aria-modal', 'true');
+    sidebar.setAttribute('aria-label', 'Chapters');
     sidebar.classList.add('is-open');
     if (scrim) scrim.hidden = false;
     if (openBtn) openBtn.setAttribute('aria-expanded', 'true');
+    setBackgroundInert(true);
     var first = sidebar.querySelector('a, button');
     if (first) first.focus();
     document.addEventListener('keydown', onKeydown);
@@ -57,9 +76,14 @@
   function closeDrawer() {
     if (!sidebar || !sidebar.classList.contains('is-open')) return;
     sidebar.classList.remove('is-open');
+    sidebar.removeAttribute('role');
+    sidebar.removeAttribute('aria-modal');
+    sidebar.removeAttribute('aria-label');
     if (scrim) scrim.hidden = true;
     if (openBtn) openBtn.setAttribute('aria-expanded', 'false');
     document.removeEventListener('keydown', onKeydown);
+    // Lift inert before handing focus back: an inert trigger cannot take it.
+    setBackgroundInert(false);
     // Restore focus to whatever opened the drawer (normally the toggle button).
     var restore = lastFocused && lastFocused.focus ? lastFocused : openBtn;
     if (restore) restore.focus();
@@ -75,6 +99,16 @@
     Array.prototype.forEach.call(sidebar.querySelectorAll('a'), function (a) {
       a.addEventListener('click', closeDrawer);
     });
+    // Widening past the drawer breakpoint turns the drawer back into the
+    // static rail: drop the dialog state and the focus trap with it.
+    if (window.matchMedia) {
+      var wide = window.matchMedia('(min-width: 840px)');
+      var onWide = function (e) {
+        if (e.matches) closeDrawer();
+      };
+      if (wide.addEventListener) wide.addEventListener('change', onWide);
+      else if (wide.addListener) wide.addListener(onWide);
+    }
   }
 
   /* ---- TOC scroll-spy ---- */
@@ -87,6 +121,7 @@
   );
   var tocMarker = document.querySelector('[data-toc-marker]');
   var tocList = document.querySelector('.toc-list');
+  var tocBox = document.querySelector('.doc-toc');
 
   // Index of a heading id within the document-order headings list (-1 if none).
   function headingIndex(id) {
@@ -99,15 +134,30 @@
   if (links.size && headings.length && 'IntersectionObserver' in window) {
     var visible = new Set();
 
-    // Slide the 2px marker to the active entry and size it to that entry.
+    // Slide the 2px marker to the active entry and size it to that entry, with
+    // transform only: scaleY stretches the marker's CSS height to the entry's.
     function moveMarker(activeId) {
       if (!tocMarker || !tocList || !activeId) return;
       var link = links.get(activeId);
       if (!link) return;
       var lr = link.getBoundingClientRect();
       var cr = tocList.getBoundingClientRect();
-      tocMarker.style.height = lr.height + 'px';
-      tocMarker.style.transform = 'translateY(' + (lr.top - cr.top) + 'px)';
+      var base = tocMarker.offsetHeight || 1;
+      tocMarker.style.transform =
+        'translateY(' + (lr.top - cr.top) + 'px) scaleY(' + (lr.height / base).toFixed(4) + ')';
+    }
+
+    // A TOC taller than the viewport scrolls inside its sticky column: keep the
+    // current entry in view there. Only the column scrolls, never the page.
+    function revealActive(activeId) {
+      if (!tocBox || !activeId || tocBox.scrollHeight <= tocBox.clientHeight) return;
+      var link = links.get(activeId);
+      if (!link) return;
+      var br = tocBox.getBoundingClientRect();
+      var lr = link.getBoundingClientRect();
+      var margin = 48;
+      if (lr.top < br.top + margin) tocBox.scrollTop -= br.top + margin - lr.top;
+      else if (lr.bottom > br.bottom - margin) tocBox.scrollTop += lr.bottom - (br.bottom - margin);
     }
 
     function setActive() {
@@ -132,6 +182,7 @@
         else a.classList.remove('is-past');
       });
       moveMarker(activeId);
+      revealActive(activeId);
     }
 
     window.addEventListener('resize', setActive, { passive: true });
@@ -182,8 +233,9 @@
     function placeRail() {
       var nr = nav.getBoundingClientRect();
       var cr = currentRow.getBoundingClientRect();
-      rail.style.height = cr.height + 'px';
-      rail.style.transform = 'translateY(' + (cr.top - nr.top) + 'px)';
+      var base = rail.offsetHeight || 1;
+      rail.style.transform =
+        'translateY(' + (cr.top - nr.top) + 'px) scaleY(' + (cr.height / base).toFixed(4) + ')';
       var ink = getComputedStyle(currentRow).getPropertyValue('--layer-ink').trim();
       if (ink) rail.style.background = ink;
     }

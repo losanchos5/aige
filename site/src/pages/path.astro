@@ -12,7 +12,6 @@ import Marketing from '../layouts/Marketing.astro';
 import '../styles/pages.css';
 import PageHero from '../components/PageHero.astro';
 import Section from '../components/Section.astro';
-import RegisterList from '../components/RegisterList.astro';
 import PathMap from '../components/PathMap.astro';
 import PathDrawer from '../components/PathDrawer.astro';
 import CtaBand from '../components/CtaBand.astro';
@@ -21,36 +20,39 @@ import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 
 const edges = crossStageEdges();
 
+// The key: each kind and state with a small sample drawn in its real node
+// treatment (see PathNode.astro): solid ink, plain line + kind pill, dashed
+// --ink-2; then filled, dashed over a tint, and struck through.
 const legend = [
   {
     title: 'Core',
     description: 'The spine of the path. Work these in order.',
-    swatch: 'var(--ink)',
+    sample: 'core',
   },
   {
     title: 'Alternative',
     description: 'A swap-in for the core node beside it — pick the one that fits your stack.',
-    swatch: 'var(--l1)',
+    sample: 'alternative',
   },
   {
     title: 'Optional',
     description: 'Deepens a stage; safe to skip on a first pass.',
-    swatch: 'var(--muted)',
+    sample: 'optional',
   },
   {
     title: 'Done',
     description: 'You have worked through it; it counts toward your progress.',
-    swatch: 'var(--l5)',
+    sample: 'done',
   },
   {
     title: 'Learning',
     description: 'In progress — you have started but not finished.',
-    swatch: 'var(--l4)',
+    sample: 'learning',
   },
   {
     title: 'Skipped',
     description: 'Not on your route; it drops out of the progress denominator.',
-    swatch: 'var(--muted)',
+    sample: 'skipped',
   },
 ];
 ---
@@ -63,23 +65,35 @@ const legend = [
 >
   <PageHero
     variant="page"
-    kicker="The learning path"
-    swatch="var(--l2)"
     title="Learn the role, one stage at a time."
     lede="A build order for the AI Governance Engineer: four stages from foundations to proof, each a grid of nodes that map back to the Body of Knowledge and out to the tools and reading behind them. Mark what you have done; the path remembers."
   />
 
   <Section
     tone="tint"
-    kicker="How to read it"
-    kickerSwatch="var(--l3)"
     title="Three kinds of node, three states."
     lede="Each stage builds on the one above it. Nodes are marked as core, alternative or optional; you mark your own as done, learning or skipped."
   >
-    <div class="well reveal"><RegisterList items={legend} /></div>
+    <div class="reveal">
+      <ul class="path-key">
+        {
+          legend.map((item) => (
+            <li class="key-item">
+              <span class="key-sample" data-sample={item.sample} aria-hidden="true">
+                {item.sample === 'alternative' ? <span class="key-pill">Node</span> : 'Node'}
+              </span>
+              <span class="key-body">
+                <span class="key-title">{item.title}</span>
+                <span class="key-desc">{item.description}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </Section>
 
-  <Section tone="plain" texture="grid" kicker="The path" kickerSwatch="var(--l1)" title="Four stages, from foundations to proof.">
+  <Section tone="plain" title="Four stages, from foundations to proof.">
     <PathMap stages={stages} nodes={nodes} edges={edges} entries={entries} />
   </Section>
 
@@ -92,5 +106,114 @@ const legend = [
 
   <PathDrawer />
 
+  <script is:inline defer src="/inert.js"></script>
   <script is:inline defer src="/path.js"></script>
 </Marketing>
+
+<style>
+  /* The key in one row on wide screens (three kinds, then three states), two
+     rows of three on tablets, a list on phones. Each sample repeats its node
+     treatment from PathNode.astro, so the legend distinguishes by form. */
+  .path-key {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
+  }
+
+  .key-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--s-4);
+  }
+
+  @media (min-width: 640px) {
+    .path-key {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--s-6) var(--s-5);
+    }
+
+    .key-item {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--s-3);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .path-key {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+
+  .key-sample {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: start;
+    width: 5.5rem;
+    height: 2.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-small);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .key-sample[data-sample='core'] {
+    border-color: var(--ink);
+  }
+
+  .key-pill {
+    padding: 1px var(--s-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+
+  .key-sample[data-sample='optional'] {
+    border: 1px dashed var(--ink-2);
+  }
+
+  /* Done and Learning are states, not layers (SL-06): the samples take the
+     neutral treatment a transversal node gets in PathNode.astro — filled ink,
+     and a dashed ink border over a 35% ink tint. */
+  .key-sample[data-sample='done'] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .key-sample[data-sample='learning'] {
+    border: 1px dashed var(--ink);
+    background: color-mix(in srgb, var(--ink) 35%, var(--bg));
+  }
+
+  .key-sample[data-sample='skipped'] {
+    color: var(--muted);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+
+  .key-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    min-width: 0;
+  }
+
+  .key-title {
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .key-desc {
+    font-size: var(--fs-small);
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+</style>

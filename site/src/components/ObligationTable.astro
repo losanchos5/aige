@@ -2,7 +2,8 @@
 /**
  * ObligationTable — the obligation → artefact → layer rows, grouped by the
  * framework they belong to. Each group has a sticky header; each row shows the
- * obligation, the engineering artefact, the stack layer(s) as colour ticks and
+ * obligation, the engineering artefact, the stack layer(s) as colour ticks, each
+ * with its visible layer code ("L2", so colour is never the only key), and
  * a link back to the row's anchor in chapter 08. A pure-CSS radio filter (no JS)
  * narrows the list to a single layer, and a second one to a single EU AI Act
  * duty holder. Below 720px rows become stacked cards.
@@ -177,9 +178,15 @@ const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}
                     )}
                   </td>
                   <td class="c-layers" data-label="Layers">
-                    <span class="ticks" role="img" aria-label={`Layers ${row.layerN.join(', ')}`}>
+                    <span
+                      class="ticks ticks--coded"
+                      role="img"
+                      aria-label={`Layers ${row.layerN.join(', ')}`}
+                    >
                       {row.layerN.map((n) => (
-                        <span class="tk" data-l={n} aria-hidden="true" />
+                        <span class="tk-key">
+                          <span class="tk" data-l={n} aria-hidden="true" />L{n}
+                        </span>
                       ))}
                     </span>
                   </td>

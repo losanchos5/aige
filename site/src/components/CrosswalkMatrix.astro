@@ -8,9 +8,12 @@
  * Unlike ObligationMatrix it carries no JSON payload — the drawer clones the
  * server-rendered topic section — and no opacity stagger. Mirrors the
  * sticky-first-column horizontal scroll of ObligationMatrix. Pagefind indexes
- * the topic sections, not this grid. Column type tags and clause chips share
- * one category → layer colour key (.type-tag in resources.css, .cw-chip in
- * crosswalk.css).
+ * the topic sections, not this grid. Column type tags and clause chips are
+ * neutral (.type-tag in resources.css, .cw-chip in crosswalk.css): layer
+ * colours are reserved for the stack layers. A visible key above the grid
+ * spells out the chip outlines (solid = maps to, dashed = related, "?" = not
+ * yet verified), and the scroll region is focusable and named, with a sideways
+ * cue on narrow screens.
  */
 import { topicMatrix, chipLabel, frameworkById } from '../data/crosswalk';
 
@@ -31,7 +34,29 @@ const { columns, rows } = matrix;
     >
   </figcaption>
 
-  <div class="cw-scroll" role="group" aria-label="Topic by framework crosswalk">
+  <ul class="cw-key" aria-label="Chip key">
+    <li>
+      <span class="cw-chip" aria-hidden="true">clause</span>
+      <span>Solid: maps to</span>
+    </li>
+    <li>
+      <span class="cw-chip is-related" aria-hidden="true">clause</span>
+      <span>Dashed: related</span>
+    </li>
+    <li>
+      <span class="cw-chip is-unverified" aria-hidden="true">clause ?</span>
+      <span>“?”: not yet verified</span>
+    </li>
+  </ul>
+
+  <p class="cw-hint">Scroll the grid sideways, or read each topic below.</p>
+
+  <div
+    class="cw-scroll"
+    role="region"
+    aria-label="Topic by framework crosswalk (scrolls sideways on small screens)"
+    tabindex="0"
+  >
     <table class="cw-grid" data-cw-grid>
       <thead>
         <tr>

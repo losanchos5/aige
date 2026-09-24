@@ -51,6 +51,8 @@
   --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
   --font-body: 'Instrument Sans Variable', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  /* The home hero's headline only (see fonts.css). */
+  --font-serif: 'Newsreader Display', Georgia, 'Times New Roman', serif;
 
   /* Type scale (fluid). Ranges match the design brief in px. */
   --fs-display: clamp(3.25rem, 2.72rem + 2.25vw, 4.75rem); /* 52 -> 76 */
@@ -83,6 +85,16 @@
   --tint-bg: color-mix(in srgb, var(--l1) 18%, var(--bg));
   --band-bg: #15171c;
   --tex-line: color-mix(in srgb, var(--ink) 9%, transparent);
+
+  /* Home hero field: the moving gradient behind the headline (public/
+     hero-field.js, and the static CSS fallback under it). Three tones on the
+     page ground: the L1 ink (navy), the L1 blue pushed to a mid tone and the
+     L4 peach. The headline sets in --hero-ink: the L1 ink (navy) in light,
+     the plain --ink in dark (the pale L1 ink read too blue on the field). */
+  --hero-ink: var(--l1-ink);
+  --field-1: #1F3A63;
+  --field-2: #8FAEE0;
+  --field-3: #F1C99A;
 }
 
 /* Dark, explicit toggle */
@@ -127,6 +139,12 @@
   --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
   --band-bg: #0b0d10;
   --tex-line: color-mix(in srgb, var(--ink) 8%, transparent);
+
+  /* Home hero field (dark): deep tones that keep the light inks >= AA. */
+  --hero-ink: var(--ink);
+  --field-1: #1F3A63;
+  --field-2: #2D4F86;
+  --field-3: #6B4E2E;
 }
 
 /* Dark, system preference (unless explicitly forced light) */
@@ -171,5 +189,10 @@
     --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
     --band-bg: #0b0d10;
     --tex-line: color-mix(in srgb, var(--ink) 8%, transparent);
+
+    --hero-ink: var(--ink);
+    --field-1: #1F3A63;
+    --field-2: #2D4F86;
+    --field-3: #6B4E2E;
   }
 }

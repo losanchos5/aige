@@ -1,9 +1,9 @@
 ---
 /**
  * Marketing — wraps Base for editorial/landing pages. Direct <section> children
- * span full width (each holds its own .container), and a thin, mono-numbered
- * "register rule" is drawn automatically between adjacent sections. Use the
- * `.full-bleed` utility on a section for a tinted, edge-to-edge band.
+ * span full width (each holds its own .container), and a 1px hairline is drawn
+ * automatically between adjacent sections. Use the `.full-bleed` utility on a
+ * section for a tinted, edge-to-edge band.
  */
 import Base from './Base.astro';
 import type { JsonLdInput } from '../lib/jsonld';
@@ -16,9 +16,14 @@ interface Props {
   jsonLd?: JsonLdInput;
   /** Append ` · {site.name}` to the document title (default true); see Seo. */
   titleSuffix?: boolean;
+  /** Passed to Base: the header floats over a full-viewport hero. */
+  overlayHeader?: boolean;
+  /** Passed to Base: extra fonts to preload. */
+  preloadFonts?: string[];
 }
 
-const { title, description, image, jsonLd, titleSuffix } = Astro.props;
+const { title, description, image, jsonLd, titleSuffix, overlayHeader, preloadFonts } =
+  Astro.props;
 ---
 
 <Base
@@ -27,6 +32,8 @@ const { title, description, image, jsonLd, titleSuffix } = Astro.props;
   image={image}
   jsonLd={jsonLd}
   titleSuffix={titleSuffix}
+  overlayHeader={overlayHeader}
+  preloadFonts={preloadFonts}
 >
   <div class="marketing">
     <slot />
@@ -34,33 +41,12 @@ const { title, description, image, jsonLd, titleSuffix } = Astro.props;
 </Base>
 
 <style>
-  .marketing {
-    counter-reset: rule;
-  }
-
-  /* The register rule: a 1px line between sections with a running mono number
-     aligned to the container's left edge. Sections own their own padding
-     (use the .section utility or a component's built-in rhythm). */
+  /* The rule: a 1px line between sections. Sections own their own padding
+     (use the .section utility or a component's built-in rhythm). position:
+     relative keeps every section a containing block for its positioned
+     descendants, including plain <section>s that do not carry .sec. */
   .marketing > :global(section + section) {
-    counter-increment: rule;
     position: relative;
     border-top: 1px solid var(--line);
-  }
-
-  .marketing > :global(section + section)::before {
-    content: counter(rule, decimal-leading-zero);
-    position: absolute;
-    top: 0;
-    left: max(var(--s-4), calc(50% - var(--container) / 2 + var(--s-4)));
-    transform: translateY(-50%);
-    padding-right: var(--s-3);
-    z-index: 2;
-    background: var(--sec-bg, var(--bg));
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    /* --ink-2, not --muted: the number sits on the section's own colour
-       (--sec-bg), and --muted drops below AA on tinted bands. */
-    color: var(--ink-2);
   }
 </style>

@@ -58,7 +58,7 @@ const about = byId('about');
         </ol>
       </div>
 
-      <div class="col">
+      <div class="col col-practice">
         <p class="group-title" id="fg-practice">Practice</p>
         <ul aria-labelledby="fg-practice">
           {practice.items.map((item) => (
@@ -69,7 +69,7 @@ const about = byId('about');
         </ul>
       </div>
 
-      <div class="col">
+      <div class="col col-reference">
         <p class="group-title" id="fg-reference">Reference</p>
         <ul aria-labelledby="fg-reference">
           <li><a href={reference.href}>All resources</a></li>
@@ -81,7 +81,7 @@ const about = byId('about');
         </ul>
       </div>
 
-      <div class="col">
+      <div class="col col-about">
         <p class="group-title" id="fg-about">About</p>
         <ul aria-labelledby="fg-about">
           <li><a href={about.href}>About</a></li>
@@ -93,7 +93,7 @@ const about = byId('about');
         </ul>
       </div>
 
-      <div class="col">
+      <div class="col col-feeds">
         <p class="group-title" id="fg-feeds">Feeds &amp; data</p>
         <ul aria-labelledby="fg-feeds">
           {feeds.map((item) => (
@@ -104,7 +104,7 @@ const about = byId('about');
         </ul>
       </div>
 
-      <div class="col">
+      <div class="col col-project">
         <p class="group-title" id="fg-project">Project</p>
         <ul aria-labelledby="fg-project">
           {project.map((item) => (
@@ -161,27 +161,56 @@ const about = byId('about');
   }
 
   /* Phones: two tracks so the short link groups pair up; the brand and the
-     Read column (with its two-column chapter list) take the full row. */
+     Read column (with its two-column chapter list) take the full row. The two
+     short groups (About, Project) stack beside the long Feeds list instead of
+     leaving Project alone on a last row. */
   .sitemap {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      'brand brand'
+      'read read'
+      'practice reference'
+      'about feeds'
+      'project feeds';
     gap: var(--s-6) var(--s-5);
   }
 
-  .col-brand,
+  .col-brand {
+    grid-area: brand;
+  }
   .col-read {
-    grid-column: 1 / -1;
+    grid-area: read;
+  }
+  .col-practice {
+    grid-area: practice;
+  }
+  .col-reference {
+    grid-area: reference;
+  }
+  .col-about {
+    grid-area: about;
+  }
+  .col-feeds {
+    grid-area: feeds;
+  }
+  .col-project {
+    grid-area: project;
   }
 
+  /* From 720px Read is one track among several, too narrow for two chapter
+     columns ("07 Maturity / Model"), so the chapters run in one column and the
+     tracks are sized so no label wraps: Read gets the widest flexible track and
+     the link groups never shrink below their longest link. */
   @media (min-width: 720px) {
     .sitemap {
-      grid-template-columns: 2fr repeat(3, 1fr);
+      grid-template-columns: 1.4fr 1.6fr repeat(2, minmax(max-content, 1fr));
+      grid-template-areas: none;
       gap: var(--s-6);
     }
 
-    .col-brand,
-    .col-read {
-      grid-column: auto;
+    .sitemap > .col {
+      grid-area: auto;
     }
   }
 
@@ -189,7 +218,7 @@ const about = byId('about');
      wraps alone onto a second row. */
   @media (min-width: 1100px) {
     .sitemap {
-      grid-template-columns: 1.4fr 1.6fr repeat(5, 1fr);
+      grid-template-columns: 1.4fr 1.6fr repeat(5, minmax(max-content, 1fr));
     }
   }
 
@@ -234,6 +263,13 @@ const about = byId('about');
     column-gap: var(--s-5);
   }
 
+  /* One chapter column once Read is a single track (see the sitemap grid). */
+  @media (min-width: 720px) {
+    .fchap {
+      columns: 1;
+    }
+  }
+
   .fchap li {
     break-inside: avoid;
   }
@@ -244,9 +280,11 @@ const about = byId('about');
     padding: 2px 0;
   }
 
+  /* --ink-2, not --muted: --muted fell to ~3.8:1 on the tinted band where it
+     crosses the grid lines (audit SL-17); --ink-2 clears 4.5:1 in both themes. */
   .num {
     font-family: var(--font-mono);
-    color: var(--muted);
+    color: var(--ink-2);
   }
 
   .col a,
@@ -272,6 +310,9 @@ const about = byId('about');
     font-family: var(--font-mono);
     font-size: var(--fs-label);
     letter-spacing: 0.04em;
+    /* The colophon runs to ~45 characters (licence, version, domain), so it
+       drops the global .meta capitals (audit SL-05). */
+    text-transform: none;
     /* --ink-2, not --muted: the footer is a tinted band. */
     color: var(--ink-2);
   }

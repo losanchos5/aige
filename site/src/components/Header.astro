@@ -1,16 +1,27 @@
 ---
 /**
- * Header — sticky, ground colour, 1px bottom line (no blur). Left: RegisterMark
- * + wordmark. Right: the grouped desktop nav (WAI-ARIA disclosure navigation),
- * a search button, the theme toggle and a burger. At >=840px the group bar
- * shows inline; below that it collapses into a modal <dialog> drawer (a sibling
- * of the header, so the header still holds exactly one search button and one
- * theme toggle). All behaviour is in /nav.js (CSP script-src 'self').
+ * Header — sticky, near-solid ground (frosted only on desktop), 1px bottom line.
+ * Left: RegisterMark + wordmark (the wordmark drops below 360px; the link keeps
+ * its name via aria-label). Right: the grouped desktop nav (WAI-ARIA disclosure
+ * navigation), a search button, the theme toggle and a burger. At >=840px the
+ * group bar shows inline; below that it collapses into a modal <dialog> drawer
+ * (a sibling of the header, so the header still holds exactly one search button
+ * and one theme toggle). All behaviour is in /nav.js (CSP script-src 'self').
+ * `overlay` (the home) floats the bar over the full-viewport hero: fixed and
+ * fully transparent at the top of the page, it takes the same ground, hairline
+ * and elevation as everywhere else once the page scrolls (.is-scrolled, ui.js).
  */
 import RegisterMark from './RegisterMark.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { site } from '../data/site';
 import { nav, resolveCurrent, type NavGroup, type NavItem } from '../data/nav';
+
+interface Props {
+  /** Float the bar, transparent until scrolled, over a full-viewport hero. */
+  overlay?: boolean;
+}
+
+const { overlay = false } = Astro.props;
 
 const current = resolveCurrent(Astro.url.pathname);
 const currentHref = current.href;
@@ -31,9 +42,9 @@ const chapterOf = (group: NavGroup) => panelItems(group).filter((i) => i.num);
 const isDirect = (group: NavGroup) => panelItems(group).length === 0;
 ---
 
-<header class="site-header">
+<header class="site-header" data-overlay={overlay ? '' : undefined}>
   <div class="container bar">
-    <a class="brand" href="/">
+    <a class="brand" href="/" aria-label={`${site.name}, home`}>
       <RegisterMark size="sm" label={site.name} />
       <span class="wordmark">{site.name}</span>
     </a>
@@ -299,6 +310,19 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     border-bottom: 1px solid transparent;
   }
 
+  /* The blur is re-rendered on every scrolled frame, which low-end phones pay
+     for; below the desktop breakpoint, and whenever the user asks for less
+     transparency, the bar is a near-solid ground with no backdrop-filter.
+     Written as an override so browsers without prefers-reduced-transparency
+     keep the frosted desktop bar. */
+  @media (max-width: 839px), (prefers-reduced-transparency: reduce) {
+    .site-header {
+      background: color-mix(in srgb, var(--bg) 94%, transparent);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     .site-header {
       transition:
@@ -312,11 +336,45 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     box-shadow: var(--shadow-1);
   }
 
+  /* Overlay (the home): the bar floats over the hero's gradient field, so the
+     hero starts at the top of the viewport and the brand sits on the field.
+     Unscrolled it has no ground, blur, hairline or elevation (the field keeps
+     the links >= 4.5:1 under the bar, see hero-field.js); once scrolled it
+     falls back to the rules above, frosted on desktop and near-solid below
+     840px or under prefers-reduced-transparency. Fixed, not sticky, so it takes
+     no room in the flow; its height is unchanged. The selector outranks the
+     narrow/reduced-transparency override. */
+  .site-header[data-overlay] {
+    position: fixed;
+    inset: 0 0 auto;
+  }
+
+  .site-header[data-overlay]:not(.is-scrolled) {
+    background: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* On the bare field the chevrons (--muted) step up to --ink-2, as muted
+     text does over the mesh; the menus keep their own ground and colours. */
+  .site-header[data-overlay]:not(.is-scrolled) .chev {
+    color: var(--ink-2);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .site-header[data-overlay] {
+      transition:
+        background-color var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease);
+    }
+  }
+
   .bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--s-4);
+    gap: var(--s-2) var(--s-4);
     padding-block: var(--s-3);
   }
 
@@ -328,18 +386,61 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     text-decoration: none;
   }
 
+  /* break-word, not anywhere: it leaves the min-content width at the longest
+     word, which is what tells the phone bar below to wrap. */
   .wordmark {
     font-family: var(--font-display);
     font-weight: 600;
     font-size: 1.125rem;
     letter-spacing: -0.01em;
     line-height: 1;
+    overflow-wrap: break-word;
   }
 
   .right {
     display: flex;
     align-items: center;
     gap: var(--s-3);
+  }
+
+  /* Phones (the drawer layout). Text enlarged to 200% (WCAG 1.4.4) made the
+     wordmark alone wider than the bar: the page scrolled sideways to ~435px at
+     390 and the menu button left the viewport. Here the bar may wrap. The
+     brand's flex basis is 0, so the row only breaks when the wordmark's longest
+     word cannot sit beside the buttons (enlarged text); at normal sizes it stays
+     one row and the brand grows up to its own width, the wordmark wrapping
+     between words as before. On a second row the buttons stay pinned right.
+     The desktop bar (>=840px) keeps its single-row flex. */
+  @media (max-width: 839px) {
+    .bar {
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      flex: 1 1 0;
+      max-width: max-content;
+    }
+
+    .right {
+      margin-left: auto;
+    }
+  }
+
+  /* 320px reflow (WCAG 1.4.10): the wordmark plus three 44px buttons overflow
+     below 360px, so the bar tightens its gaps and keeps only the mark; the
+     brand link is still named by its aria-label. */
+  @media (max-width: 359px) {
+    .bar {
+      gap: var(--s-3);
+    }
+
+    .right {
+      gap: var(--s-2);
+    }
+
+    .wordmark {
+      display: none;
+    }
   }
 
   /* ---------- Desktop group bar (>=840px) ---------- */
@@ -703,6 +804,13 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     border: 1px solid var(--line);
     border-radius: var(--r-sm);
     padding: 2px 6px;
+  }
+
+  /* The shortcut hint means nothing without a keyboard: hide it on touch. */
+  @media (hover: none) {
+    .nav-drawer-search kbd {
+      display: none;
+    }
   }
 
   .nav-panel {

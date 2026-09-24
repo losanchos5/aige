@@ -1,19 +1,20 @@
-/* hero.js — drive the homepage "governance loop". Loaded same-origin so the CSP
-   script-src 'self' holds (no inline JS). Progressive enhancement: the diagram
-   is fully legible without this file, and the verdict stamp is server-rendered.
+/* hero.js — demonstrate the homepage "governance loop" once, when its figure
+   (in the loop section under the home hero) first scrolls into view. Loaded same-origin
+   so the CSP script-src 'self' holds (no inline JS). Progressive enhancement: the
+   diagram is fully legible without this file.
 
    When motion is allowed a small "packet" (an ink dot with a soft halo, appended
-   into the visible SVG) travels each edge of the loop in turn with rAF, easing
-   in and out (~700ms per edge). As it reaches a node that node lights up; a short
-   trail of two lit steps (node + the edge just travelled) follows the packet, and
-   nothing else is dimmed. When the packet reaches the auditor the PASS stamp pops,
-   then after ~1.2s the loop restarts — it never stops while the tab is visible.
-   The dashed "closes the loop" edge keeps a slow marching idle (CSS) so the figure
-   is never fully static. The dot drives whichever of the two diagrams (wide/tall)
-   is visible at the current breakpoint, re-picks on resize, and pauses (dot hidden,
-   rAF cancelled) while the tab is hidden or while the user is hovering/focusing a
-   node (diagram.js adds `has-active`), resuming from a clean state afterwards. It
-   never adds `is-dim` or `has-active` itself — those belong to the hover
+   into the visible SVG) travels each edge of the sequence in turn with rAF,
+   easing in and out (~700ms per edge). As it reaches a node that node lights up;
+   a short trail of two lit steps (node + the edge just travelled) follows the
+   packet, and nothing else is dimmed. One pass, obligation to auditor: after a
+   short hold on the auditor the packet and the trail clear and the figure rests
+   as the static diagram — it is a demonstration, not a live feed. The dot drives
+   whichever of the two diagrams (wide/tall) is visible at the current
+   breakpoint, re-picks on resize, and pauses (dot hidden, rAF cancelled) while
+   the tab is hidden or while the user is hovering/focusing a node (diagram.js
+   adds `has-active`); an interrupted pass replays from a clean state afterwards.
+   It never adds `is-dim` or `has-active` itself — those belong to the hover
    interaction — and under reduced motion it does nothing at all. */
 (function () {
   'use strict';
@@ -35,16 +36,9 @@
     .filter(Boolean);
   if (sequence.length < 2) return;
 
-  var stamp = host.querySelector('.hero-stamp');
-  if (stamp) {
-    stamp.addEventListener('animationend', function () {
-      stamp.classList.remove('is-pop');
-    });
-  }
-
   var START_DELAY = 1400; // let diagram.js's draw-on finish first.
   var EDGE_MS = 700; // one edge traversal.
-  var HOLD_MS = 1200; // pause on the closed loop before restarting.
+  var HOLD_MS = 1200; // rest on the auditor before the trail clears.
   var TRAIL = 2; // lit steps kept behind the packet.
   var RESIZE_DEBOUNCE = 200;
   var SVG_NS = 'http://www.w3.org/2000/svg';
@@ -55,9 +49,10 @@
   var packet = null; // the travelling dot, moved between the wide/tall svgs.
 
   var raf = null; // the pending animation frame.
-  var holdTimer = null; // the pending restart timer at the closed loop.
+  var holdTimer = null; // the pending clear at the end of the pass.
   var trail = []; // recent lit steps, each an array of elements.
   var started = false; // the initial start delay has elapsed.
+  var done = false; // the one pass has run to the end.
   var ei = 0; // index of the edge currently being travelled.
   var edgeLen = 0; // cached length of that edge.
   var t0 = 0; // timestamp the current edge started (0 = not yet).
@@ -155,13 +150,6 @@
     }
   }
 
-  function popStamp() {
-    if (!stamp) return;
-    stamp.classList.remove('is-pop');
-    void stamp.offsetWidth; // restart the animation cleanly.
-    stamp.classList.add('is-pop');
-  }
-
   function clearAll(fig) {
     trail = [];
     if (!fig) return;
@@ -219,30 +207,32 @@
   }
 
   // The packet reached the end of edge `ei`: light the destination node (folding
-  // in the edge just travelled), pop the stamp at the auditor, then advance.
+  // in the edge just travelled), then advance.
   function arrive() {
     var e = edges[ei];
     var els = edgeElsById(figure, e.id);
     var node = nodeEl(figure, e.to);
     if (node) els = [node].concat(els);
     litStep(els);
-    if (e.to === 'auditor') popStamp();
 
     ei += 1;
     if (ei < edges.length) {
       beginEdge();
     } else {
-      // Loop closed on the auditor: rest briefly (the dashed edge keeps marching),
-      // then restart from a clean state — never stopping while the tab is visible.
+      // The pass ended on the auditor: rest briefly, then clear the trail and
+      // leave the static diagram for good. (A pause during the hold cancels this
+      // timer, and the pass replays when it resumes.)
       hidePacket();
       holdTimer = setTimeout(function () {
         holdTimer = null;
-        if (!shouldPause()) startLoop();
+        done = true;
+        observer.disconnect();
+        clearAll(figure);
       }, HOLD_MS);
     }
   }
 
-  // Start (or restart) the loop from a clean state, packet at the first node.
+  // Start (or replay) the pass from a clean state, packet at the first node.
   function startLoop() {
     cancelAll();
     clearAll(figure);
@@ -260,9 +250,10 @@
   }
 
   // Single reconcile point: cancel when we should pause, (re)start when we may
-  // run and nothing is pending. Called from every state-change event.
+  // run and nothing is pending. Called from every state-change event; a no-op
+  // once the pass has finished.
   function reconcile() {
-    if (!started || !figure) return;
+    if (!started || done || !figure) return;
     if (shouldPause()) {
       cancelAll();
       hidePacket();
@@ -293,7 +284,7 @@
     if (resizeTimer) clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
       var next = visibleFigure();
-      if (next === figure) return;
+      if (done || next === figure) return;
       cancelAll();
       clearAll(figure);
       observer.disconnect();
@@ -303,13 +294,32 @@
       attachPacket(svg); // move the packet into the newly visible SVG.
       hidePacket();
       watch(figure);
-      reconcile(); // start the loop on the newly visible figure.
+      reconcile(); // replay the pass on the newly visible figure.
     }, RESIZE_DEBOUNCE);
   });
 
-  // Kick off after the draw-on has had time to play.
-  setTimeout(function () {
-    started = true;
-    reconcile();
-  }, START_DELAY);
+  // The figure sits below the fold (the home's loop section, under the hero),
+  // so the pass starts once most of it is on screen, after diagram.js's
+  // draw-on (which fires on the same entry) has had time to play. Without
+  // IntersectionObserver it starts after the delay, as it used to on load.
+  function kickOff() {
+    setTimeout(function () {
+      started = true;
+      reconcile();
+    }, START_DELAY);
+  }
+
+  if ('IntersectionObserver' in window) {
+    var inView = new IntersectionObserver(
+      function (entries) {
+        if (!entries.some(function (e) { return e.isIntersecting; })) return;
+        inView.disconnect();
+        kickOff();
+      },
+      { threshold: 0.4 }
+    );
+    inView.observe(host);
+  } else {
+    kickOff();
+  }
 })();

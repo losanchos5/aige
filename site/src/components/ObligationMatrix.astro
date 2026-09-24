@@ -345,10 +345,14 @@ const rowsWithFlags = rows.map((r) => {
     line-height: 1;
   }
 
+  /* The layer name under the index: --fs-label and --ink-2, never a reduced
+     opacity (hard constraint #2, FRW-1). --ink-2 clears AA on every --lN fill
+     in both themes. */
   .mx-colh-name {
-    font-size: 0.625rem;
+    font-size: var(--fs-label);
     letter-spacing: 0.02em;
-    opacity: 0.85;
+    line-height: 1.2;
+    color: var(--ink-2);
   }
 
   /* Row headers: mono-adjacent name, understated. */

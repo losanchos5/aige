@@ -3,9 +3,9 @@
    is a link to that topic's section (#topic-<id>); with JS off they jump there
    natively. Here we intercept the click, clone the section into a modal drawer,
    highlight the references that belong to the framework column the reader came
-   from, trap focus (Esc/scrim/Close close it) and restore focus on close. No
-   opacity animation; the panel slides on transform only. Ported from
-   public/path.js. */
+   from, trap focus (Esc/scrim/Close close it), make the page behind inert while
+   it is open and restore focus on close. No opacity animation; the panel
+   slides on transform only. Ported from public/path.js. */
 (function () {
   'use strict';
 
@@ -37,6 +37,11 @@
   }
 
   function onKeydown(e) {
+    // A <dialog> over the drawer (the search) owns the keyboard: no trap, and
+    // its Esc closes only it. Its own Esc handler may already have closed it by
+    // the time the key bubbles here, so a key from inside a dialog counts too.
+    var t = e.target;
+    if (document.querySelector('dialog[open]') || (t && t.closest && t.closest('dialog'))) return;
     if (e.key === 'Escape') {
       closeDrawer();
       return;
@@ -57,6 +62,11 @@
       first.focus();
     }
   }
+
+  // The page behind the open drawer goes inert (TC-15), through the helper
+  // shared with the other drawers (public/inert.js, loaded first): header,
+  // footer and the rest of <main>, never the scrim or a <dialog>.
+  var setBackgroundInert = window.aigeInert ? window.aigeInert(drawer, scrim) : function () {};
 
   // Open motion, as in public/path.js. With the bundled runtime
   // (window.aigeMotion, from src/scripts/motion-ui.ts) aigeMotion.openPanel()
@@ -131,10 +141,19 @@
     drawer.hidden = false;
     if (scrim) scrim.hidden = false;
     document.body.classList.add('cw-lock');
-    showDrawer();
+    setBackgroundInert(true);
+    // Esc and the focus trap are wired before the entrance runs, and a failed
+    // entrance falls back to the CSS slide: the inert page behind is never left
+    // without a way out. (Focus still moves after it: focusing first would
+    // flush styles and let the CSS transition fight the spring.)
+    document.addEventListener('keydown', onKeydown);
+    try {
+      showDrawer();
+    } catch (err) {
+      drawer.classList.add('is-open');
+    }
     var closeBtn = drawer.querySelector('[data-cw-close]');
     if (closeBtn) closeBtn.focus();
-    document.addEventListener('keydown', onKeydown);
   }
 
   function closeDrawer() {
@@ -144,6 +163,8 @@
     if (scrim) scrim.hidden = true;
     document.body.classList.remove('cw-lock');
     document.removeEventListener('keydown', onKeydown);
+    // Lift inert before handing focus back: an inert trigger cannot take it.
+    setBackgroundInert(false);
     if (lastFocused && lastFocused.focus) lastFocused.focus();
     lastFocused = null;
   }

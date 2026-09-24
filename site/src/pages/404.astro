@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import Section from '../components/Section.astro';
-import Kicker from '../components/Kicker.astro';
 import VerdictStamp from '../components/VerdictStamp.astro';
 ---
 
@@ -10,16 +9,19 @@ import VerdictStamp from '../components/VerdictStamp.astro';
       slotted here with the shared .sec-head classes instead of the title prop. */}
   <Section tone="mesh" class="notfound">
     <div class="sec-head sec-head--xl nf-head">
-      <Kicker swatch="var(--l3)">Error 404</Kicker>
       <h1 class="sec-title display nf-title">
         Verdict: <VerdictStamp verdict="block" />
       </h1>
-      <p class="sec-lede lede nf-lede">Route not registered.</p>
+      <p class="sec-lede lede nf-lede">Error 404. Route not registered.</p>
     </div>
+    {/* One primary way out; search is the fallback, set as a quiet text
+        control. It opens the global search dialog (/search.js binds every
+        [data-search-open]); the header and footer already carry the site map. */}
     <div class="nf-cta">
       <a class="btn btn-primary btn-glow" href="/">Back to home</a>
-      <a class="btn btn-secondary" href="/bok">Body of Knowledge</a>
-      <a class="btn btn-secondary" href="/resources">Resources</a>
+      <button type="button" class="nf-search" data-search-open aria-haspopup="dialog">
+        Search the site
+      </button>
     </div>
   </Section>
 
@@ -33,9 +35,16 @@ import VerdictStamp from '../components/VerdictStamp.astro';
       min-height: 60vh;
     }
 
+    /* The section's own bottom padding already closes the verdict; the
+       footer's top margin on top of it left an empty plain band between the
+       mesh and the footer, so it goes on this page only. */
+    :global(body:has(.sec.notfound) .site-footer) {
+      margin-top: 0;
+    }
+
     /* Over the mesh every text run is --ink: the glows are pastel in light and
        ink-tinted in dark, so the dimmer tokens are not guaranteed 4.5:1 across
-       the whole gradient. Re-scoping --muted carries that to the Kicker label. */
+       the whole gradient. Re-scoping --muted carries that to any muted run. */
     .nf-head {
       --muted: var(--ink);
       color: var(--ink);
@@ -55,7 +64,29 @@ import VerdictStamp from '../components/VerdictStamp.astro';
     .nf-cta {
       display: flex;
       flex-wrap: wrap;
-      gap: var(--s-3);
+      align-items: center;
+      gap: var(--s-3) var(--s-5);
+    }
+
+    /* Text-link weight next to the primary button; 44px tall for touch. */
+    .nf-search {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--ink);
+      font: inherit;
+      font-weight: 600;
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 0.2em;
+      cursor: pointer;
+    }
+
+    .nf-search:hover {
+      text-decoration-thickness: 2px;
     }
   </style>
 </Base>

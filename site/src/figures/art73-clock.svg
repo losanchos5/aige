@@ -2,7 +2,7 @@
   <title id="fig-art73-t">The Article 73 clock</title>
   <desc id="fig-art73-d">The Article 73 serious-incident reporting windows by incident class — 2, 10 and no later than 15 days — with the incident pipeline that meets them.</desc>
 
-  <text class="mono muted" x="16" y="20" font-size="13.5">ARTICLE 73 · SERIOUS-INCIDENT REPORTING</text>
+  <text class="mono muted" x="16" y="20" font-size="13.5">Article 73 · serious-incident reporting</text>
 
   <!-- Trigger -->
   <rect class="panel" x="108" y="30" width="144" height="30" rx="6"/>

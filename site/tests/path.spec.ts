@@ -59,6 +59,39 @@ test('keyboard: Enter opens the drawer, traps focus, Escape closes and restores'
   await expect(firstBtn).toBeFocused();
 });
 
+test('drawer: page behind is inert while open, scrim closes, focus returns', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const opener = page.locator('.pn-btn').first();
+  await opener.click();
+
+  const drawer = page.locator('#path-drawer[role="dialog"]');
+  await expect(drawer).toBeVisible();
+
+  // Same close as the crosswalk drawer: a "×" button named "Close", focused.
+  const close = drawer.getByRole('button', { name: 'Close', exact: true });
+  await expect(close).toBeFocused();
+  await expect(close).toHaveText('×');
+
+  // Header, footer and the map behind are inert; the drawer and scrim are not.
+  const inert = await page.evaluate(() => {
+    const isInert = (sel: string) => !!document.querySelector(sel)?.closest('[inert]');
+    return {
+      header: isInert('header.site-header'),
+      footer: isInert('.site-footer'),
+      map: isInert('[data-path]'),
+      drawer: isInert('#path-drawer'),
+      scrim: isInert('.path-scrim'),
+    };
+  });
+  expect(inert).toEqual({ header: true, footer: true, map: true, drawer: false, scrim: false });
+
+  // A click on the scrim (left of the panel) closes it and lifts inert.
+  await page.locator('.path-scrim').click({ position: { x: 200, y: 450 } });
+  await expect(drawer).toBeHidden();
+  await expect(page.locator('[inert]')).toHaveCount(0);
+  await expect(opener).toBeFocused();
+});
+
 test('marking a node done persists to localStorage and survives reload', async ({ page }) => {
   const firstNode = page.locator('li.path-node').first();
   const nodeId = await firstNode.getAttribute('data-node');

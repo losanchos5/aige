@@ -29,7 +29,15 @@
     if (!target || target.tagName !== 'DETAILS') return;
     target.open = true;
     var summary = target.querySelector('summary');
-    if (summary) summary.focus();
+    if (!summary) return;
+    summary.focus();
+    // Chromium's own fragment navigation then clears focus (the <details>
+    // target is not focusable), which can land after this runs. Focus again on
+    // the next frame unless the reader has already moved focus elsewhere.
+    requestAnimationFrame(function () {
+      var active = document.activeElement;
+      if (!active || active === document.body) summary.focus();
+    });
   }
 
   window.addEventListener('hashchange', openFromHash);
