@@ -1,8 +1,10 @@
 ---
 /**
- * CtaBand — a full-width ink block with ground-coloured text, a headline and up
- * to two buttons. Primary = ground fill on ink with the .btn-glow halo;
- * secondary = a quiet outline (softened ground border) at the same height.
+ * CtaBand — a full-width closing band with a headline and up to two buttons.
+ * Light theme: an ink block with ground-coloured text. Dark theme: the L1
+ * layer's deep tone with the page's own ink (inverting there would make it a
+ * cream slab, the brightest thing on the page). Primary = a solid fill in the
+ * band's text colour, no halo; secondary = a quiet outline at the same height.
  * Place as a direct child of <main> (outside .container) so it spans full width.
  */
 interface Cta {
@@ -36,23 +38,38 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
 </section>
 
 <style>
-  /* The band's ::before belongs to the Marketing register rule (the numbered
-     notch between sections), so it gets the section contract: --sec-bg notches
-     the number on the ink ground, and --ink-2 (the number's colour) is
-     re-scoped to the softened ground so it reads on ink in both themes. No
-     overflow clip: the notch straddles the top edge like every other section
-     (the mesh clips itself). */
+  /* The band's colours live in three locals so the dark theme can swap them in
+     one place: --band-fill (ground), --band-text (title, labels, borders) and
+     --band-text-2 (the sub line). The Marketing rule draws the 1px hairline on
+     top like on every other section; the mesh clips itself. */
   .band {
+    --band-fill: var(--ink);
+    --band-text: var(--bg);
+    --band-text-2: color-mix(in srgb, var(--bg) 82%, var(--ink));
     position: relative;
     isolation: isolate;
-    background: var(--ink);
-    color: var(--bg);
+    background: var(--band-fill);
+    color: var(--band-text);
     padding-block: clamp(48px, 7vw, 96px);
-    --sec-bg: var(--ink);
-    --ink-2: color-mix(in srgb, var(--bg) 82%, var(--ink));
   }
 
-  /* 2px gradient hairline along the top edge, under the register notch. */
+  /* Dark theme: the deep L1 tone (dark --l1) instead of the inverted ink, with
+     the page's --ink / --ink-2 on it. Same two selectors as tokens.css. */
+  :global(:root[data-theme='dark']) .band {
+    --band-fill: var(--l1);
+    --band-text: var(--ink);
+    --band-text-2: var(--ink-2);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .band {
+      --band-fill: var(--l1);
+      --band-text: var(--ink);
+      --band-text-2: var(--ink-2);
+    }
+  }
+
+  /* 2px gradient hairline along the top edge. */
   .band::after {
     content: '';
     position: absolute;
@@ -86,7 +103,7 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
 
   .title {
     margin: 0;
-    color: var(--bg);
+    color: var(--band-text);
     font-family: var(--font-display);
     font-weight: 700;
     font-size: var(--fs-h2);
@@ -96,7 +113,7 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
 
   .sub {
     margin: var(--s-3) 0 0;
-    color: color-mix(in srgb, var(--bg) 82%, var(--ink));
+    color: var(--band-text-2);
   }
 
   .actions {
@@ -110,30 +127,29 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
     align-items: center;
     min-height: 44px;
     padding: 0 var(--s-5);
-    border: 1px solid var(--bg);
+    border: 1px solid var(--band-text);
     border-radius: var(--r-sm);
     font-weight: 600;
     text-decoration: none;
   }
 
-  /* Primary: the ground fill carries the same soft --glow-1 halo as .btn-glow
-     (the gradient itself would vanish on the ink ground). */
+  /* Primary: a solid fill in the band's text colour with the band's ground
+     for the label. No coloured halo: the fill carries the weight. */
   .cta-primary {
-    background: var(--bg);
-    color: var(--ink);
-    box-shadow: 0 2px 12px var(--glow-1);
+    background: var(--band-text);
+    color: var(--band-fill);
   }
 
-  /* Secondary: an outline one weight down — the border is the ground at 45%,
-     so the label (full ground colour) keeps its contrast. */
+  /* Secondary: an outline one weight down — the border is the text colour at
+     45%, so the label (full text colour) keeps its contrast. */
   .cta-secondary {
     background: transparent;
-    color: var(--bg);
-    border-color: color-mix(in srgb, var(--bg) 45%, transparent);
+    color: var(--band-text);
+    border-color: color-mix(in srgb, var(--band-text) 45%, transparent);
   }
 
   .cta:focus-visible {
-    outline: 2px solid var(--bg);
+    outline: 2px solid var(--band-text);
     outline-offset: 2px;
   }
 
@@ -143,18 +159,16 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
         background-color var(--dur) var(--ease),
         border-color var(--dur) var(--ease),
         color var(--dur) var(--ease),
-        box-shadow var(--dur) var(--ease),
         transform var(--dur) var(--ease);
     }
 
     .cta-primary:hover {
-      box-shadow: 0 8px 24px var(--glow-1);
       transform: translateY(-1px);
     }
   }
 
   .cta-secondary:hover {
-    background: color-mix(in srgb, var(--bg) 14%, transparent);
-    border-color: var(--bg);
+    background: color-mix(in srgb, var(--band-text) 14%, transparent);
+    border-color: var(--band-text);
   }
 </style>

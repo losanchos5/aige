@@ -10,7 +10,7 @@ import type { Value } from '../data/values';
 interface Props {
   value: Value;
   /** `row` (default) keeps the original ruled-row rendering; `bento` renders a
-   *  luminous card with a large decorative index for the values bento grid. */
+   *  flat card with a large muted index for the values bento grid. */
   variant?: 'row' | 'bento';
   class?: string;
 }
@@ -22,13 +22,10 @@ const tag = value.note
     ? 'established'
     : 'new'
   : undefined;
-// Cycle the five layer pastels so each card's big index carries a tint.
-const tint = `var(--l${((value.n - 1) % 5) + 1})`;
 ---
 
 <div
-  class:list={['pair', variant === 'bento' && 'pair-bento card-lum lift', className]}
-  style={`--tint:${tint}`}
+  class:list={['pair', variant === 'bento' && 'pair-bento card-lum', className]}
   data-testid="value-pair"
 >
   <span class="index" aria-hidden="true">{index}</span>
@@ -82,9 +79,9 @@ const tint = `var(--l${((value.n - 1) % 5) + 1})`;
     color: var(--muted);
   }
 
-  /* Bento variant: a luminous card (surface + shadow come from .card-lum) with a
-     large tinted index, a display-font title and an --ink-2 summary. Overrides
-     the row layout defined above. */
+  /* Bento variant: a flat card (hairline + surface come from .card-lum; no
+     lift, it is not a link) with a large index, a display-font title and an
+     --ink-2 summary. Overrides the row layout defined above. */
   .pair-bento {
     flex-direction: column;
     align-items: stretch;
@@ -99,7 +96,10 @@ const tint = `var(--l${((value.n - 1) % 5) + 1})`;
     font-size: clamp(2.5rem, 1.9rem + 3vw, 4rem);
     line-height: 1;
     letter-spacing: var(--tracking-display);
-    color: color-mix(in srgb, var(--tint) 70%, var(--bg));
+    /* Decorative large text (>= 40px, bold): --muted eased 20% toward the
+       ground stays >= 3:1 on the card fill in both themes (3.5:1 light,
+       3.8:1 dark). A neutral, not a layer tint: the pastels fell to ~1.2:1. */
+    color: color-mix(in srgb, var(--muted) 80%, var(--bg));
   }
 
   .pair-bento .title {

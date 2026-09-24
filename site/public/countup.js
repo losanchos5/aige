@@ -109,10 +109,15 @@
             );
           });
         },
-        { rootMargin: '0px 0px -10% 0px', threshold: 0.2 }
+        { rootMargin: '0px 0px 64px 0px', threshold: 0 }
       );
+      // A tile already on screen (or scrolled past) has been painted with its
+      // final figure: keep it, no full-to-zero jump. A tile below the fold
+      // starts 64px before it scrolls in, so its zero is painted before the
+      // figure is ever seen.
       tiles.forEach(function (el) {
-        io.observe(el);
+        if (el.getBoundingClientRect().top < window.innerHeight) setFinal(el);
+        else io.observe(el);
       });
     });
   }
