@@ -685,6 +685,12 @@ const cite = (n: number) => `#src-${n}`;
 </ToolShell>
 
 <style>
+  /* The shared .tool-buttons display: flex would beat the [hidden] UA rule, so
+     the JavaScript-only buttons would show without JavaScript; guard it. */
+  .tool-buttons[hidden] {
+    display: none;
+  }
+
   .pc-params > * + * {
     margin-top: var(--s-3);
   }
