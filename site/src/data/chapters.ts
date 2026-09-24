@@ -33,12 +33,29 @@ export interface Chapter {
    * The stack and Patterns span all five — so none sets it today.
    */
   layer?: 1 | 2 | 3 | 4 | 5;
+  /**
+   * The part of the book the chapter belongs to. It groups the index and the
+   * navigation; the reading order stays the numeric `order`.
+   */
+  part: ChapterPart;
 }
+
+/** The five parts of the Body of Knowledge, in reading order. */
+export const chapterParts = [
+  { id: 'discipline', title: 'The discipline' },
+  { id: 'reference', title: 'Reference' },
+  { id: 'foundations', title: 'Foundations' },
+  { id: 'lifecycle', title: 'The lifecycle' },
+  { id: 'law', title: 'Law and standards' },
+] as const;
+
+export type ChapterPart = (typeof chapterParts)[number]['id'];
 
 export const chapters: readonly Chapter[] = [
   {
     id: '00-preface',
     order: 0,
+    part: 'discipline',
     slug: 'preface',
     title: '00. Preface',
     shortTitle: 'Preface',
@@ -52,6 +69,7 @@ export const chapters: readonly Chapter[] = [
   {
     id: '01-definition',
     order: 1,
+    part: 'discipline',
     slug: 'definition',
     title: '01. The definition',
     shortTitle: 'Definition',
@@ -67,6 +85,7 @@ export const chapters: readonly Chapter[] = [
   {
     id: '02-why-now',
     order: 2,
+    part: 'discipline',
     slug: 'why-now',
     title: '02. Why now',
     shortTitle: 'Why Now',
@@ -82,6 +101,7 @@ export const chapters: readonly Chapter[] = [
   {
     id: '03-values-principles',
     order: 3,
+    part: 'discipline',
     slug: 'values-and-principles',
     title: '03. Values and principles',
     shortTitle: 'Values & Principles',
@@ -97,6 +117,7 @@ export const chapters: readonly Chapter[] = [
   {
     id: '04-the-stack',
     order: 4,
+    part: 'discipline',
     slug: 'the-stack',
     title: '04. The stack (five layers)',
     shortTitle: 'The Stack',
@@ -112,6 +133,7 @@ export const chapters: readonly Chapter[] = [
   {
     id: '05-patterns',
     order: 5,
+    part: 'discipline',
     slug: 'patterns',
     title: '05. Patterns',
     shortTitle: 'Patterns',
@@ -127,6 +149,7 @@ export const chapters: readonly Chapter[] = [
   {
     id: '06-the-role',
     order: 6,
+    part: 'discipline',
     slug: 'the-role',
     title: '06. The role',
     shortTitle: 'The Role',
@@ -142,6 +165,7 @@ export const chapters: readonly Chapter[] = [
   {
     id: '07-maturity-model',
     order: 7,
+    part: 'discipline',
     slug: 'maturity-model',
     title: '07. Maturity model (five levels)',
     shortTitle: 'Maturity Model',
@@ -157,6 +181,7 @@ export const chapters: readonly Chapter[] = [
   {
     id: '08-regulatory-map',
     order: 8,
+    part: 'reference',
     slug: 'regulatory-map',
     title: '08. Regulatory map (obligation → artefact → layer)',
     shortTitle: 'Regulatory Map',
@@ -172,6 +197,7 @@ export const chapters: readonly Chapter[] = [
   {
     id: '09-glossary',
     order: 9,
+    part: 'reference',
     slug: 'glossary',
     title: '09. Glossary',
     shortTitle: 'Glossary',
@@ -181,11 +207,142 @@ export const chapters: readonly Chapter[] = [
   {
     id: '10-reading-list',
     order: 10,
+    part: 'reference',
     slug: 'reading-list',
     title: '10. Reading list',
     shortTitle: 'Reading List',
     summary:
       'The sources that formed the discipline, curated and annotated, each with a verified URL and a one-line note on why it matters.',
+  },
+  {
+    id: '11-ai-defined',
+    order: 11,
+    part: 'foundations',
+    slug: 'ai-defined',
+    title: '11. AI, defined for governance',
+    shortTitle: 'AI Defined',
+    summary:
+      'What an AI system is for governance purposes: the definitions that set scope, the kinds of AI and the traits that break classic governance.',
+  },
+  {
+    id: '12-governance-program',
+    order: 12,
+    part: 'foundations',
+    slug: 'governance-program',
+    title: '12. Running the AI governance program',
+    shortTitle: 'Governance Program',
+    summary:
+      'The organisation as an object of governance: roles, committee, policies across the lifecycle, literacy and reporting.',
+  },
+  {
+    id: '13-risk-management',
+    order: 13,
+    part: 'foundations',
+    slug: 'risk-management',
+    title: '13. Where risk management sits',
+    shortTitle: 'Risk Management',
+    summary:
+      'Risk management as an engineering loop: identify, assess, treat and monitor, projected on the five layers and seven workflows.',
+  },
+  {
+    id: '14-governing-development',
+    order: 14,
+    part: 'lifecycle',
+    slug: 'governing-development',
+    title: '14. Governing AI development',
+    shortTitle: 'Development',
+    summary:
+      'Governing the build: use case, design review, training and test data, testing and validation, release and the technical file.',
+  },
+  {
+    id: '15-governing-deployment',
+    order: 15,
+    part: 'lifecycle',
+    slug: 'governing-deployment',
+    title: '15. Governing deployment and use',
+    shortTitle: 'Deployment',
+    summary:
+      'Governing the run: choosing and deploying a system, contracts, go-live, operation, communication and retirement.',
+  },
+  {
+    id: '16-fairness-explainability',
+    order: 16,
+    part: 'lifecycle',
+    slug: 'fairness-and-explainability',
+    title: '16. Fairness and explainability for practitioners',
+    shortTitle: 'Fairness & XAI',
+    summary:
+      'How to measure fairness and produce explanations as evidence, and which legal hooks each technique answers.',
+  },
+  {
+    id: '17-incidents',
+    order: 17,
+    part: 'lifecycle',
+    slug: 'incidents',
+    title: '17. Incidents, issues and root causes',
+    shortTitle: 'Incidents',
+    summary:
+      'AI incidents from detection to root cause, with the reporting clocks that overlap across regimes.',
+  },
+  {
+    id: '18-eu-ai-act',
+    order: 18,
+    part: 'law',
+    slug: 'eu-ai-act',
+    title: '18. The EU AI Act in one pass',
+    shortTitle: 'EU AI Act',
+    summary:
+      'The EU AI Act explained end to end after the Digital Omnibus: scope, risk classes, roles, duties, enforcement.',
+  },
+  {
+    id: '19-privacy-and-ai',
+    order: 19,
+    part: 'law',
+    slug: 'privacy-and-ai',
+    title: '19. Privacy and data protection law applied to AI',
+    shortTitle: 'Privacy & AI',
+    summary:
+      'How data protection law binds AI training and inference, and the artefacts that evidence compliance.',
+  },
+  {
+    id: '20-existing-law',
+    order: 20,
+    part: 'law',
+    slug: 'existing-law',
+    title: '20. Other law that already applies to AI',
+    shortTitle: 'Existing Law',
+    summary:
+      'Intellectual property, non-discrimination, consumer protection and product liability applied to AI systems.',
+  },
+  {
+    id: '21-ai-laws-worldwide',
+    order: 21,
+    part: 'law',
+    slug: 'ai-laws-worldwide',
+    title: '21. AI-specific laws around the world',
+    shortTitle: 'AI Laws Worldwide',
+    summary:
+      'AI-specific laws and sector rules outside the EU, jurisdiction by jurisdiction, each dated and sourced.',
+  },
+  {
+    id: '22-principles-and-standards',
+    order: 22,
+    part: 'law',
+    slug: 'principles-and-standards',
+    title: '22. Principles, soft law and standards',
+    shortTitle: 'Principles & Standards',
+    summary:
+      'The principle sets, international instruments and standards that shape AI governance, and what each changes in the stack.',
+  },
+  {
+    id: '23-governing-agents',
+    order: 23,
+    part: 'lifecycle',
+    slug: 'governing-agents',
+    title: '23. Governing AI agents',
+    shortTitle: 'AI Agents',
+    summary:
+      'Governing autonomous agents: registry, identity, tool permissions, human checkpoints, kill switches and prompt change control.',
   },
 ];
 
