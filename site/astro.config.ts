@@ -125,6 +125,9 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         ['src/pages/figures/[id].astro', 'src/data/figures.ts', `src/figures/${figure.id}.svg`],
       ] as [string, string[]],
   ),
+  // Block w2-threats (v0.5.0): the threat bridge, dated by its template and the
+  // dataset it renders.
+  ['/resources/threats', ['src/pages/resources/threats.astro', 'src/data/threats.ts']],
 ]);
 
 // Pages dated by their content rather than by git: each /obligations/<id> page

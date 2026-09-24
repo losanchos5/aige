@@ -2028,3 +2028,82 @@ Commission's AI Act Service Desk, and the Omnibus changes come from chapter 18's
 | 22 | OECD AI Principles 1.1 to 1.5 (the 2024 revision adds sustainability, safe decommissioning, and traceability and risk management under accountability) | Chapter 22 row [7] (OECD/LEGAL/0449) | OECD (via chapter 22) | 2024-05-03 | https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449 | primary | Crosswalk treaty and soft-law column |
 | 23 | G7 Hiroshima Code of Conduct, Actions 1 to 11 (e.g. 7 content authentication and provenance; 11 data input, personal data and IP) | Chapter 22 rows (Hiroshima Process International Code of Conduct for Advanced AI Systems) | European Commission (via chapter 22) | 2023-10-30 | https://digital-strategy.ec.europa.eu/en/library/hiroshima-process-international-code-conduct-advanced-ai-systems | primary | Crosswalk treaty and soft-law column |
 | 24 | JTC 21 stages as of 2026-09-24: EN 18286:2026 published (60.60); prEN 18228 and prEN 18229-1 at Enquiry (40.60); no JTC 21 deliverable cited in the OJ | Chapter 22 rows [52] and [54] | Genorma; CEN-CENELEC (via chapter 22) | 2026-09-24 | https://genorma.com/en/standards/pren-18228 | secondary | Crosswalk CEN-CENELEC column (prEN refs unverified) |
+
+## Block w2-threats (v0.5.0): pattern extensions and the threat bridge
+
+Block w2-threats. Sources opened on 2026-09-24. The four tables for pattern pages below supersede,
+for these four files only, the tables of the same name in the section "bok/05-patterns.md
+(catalogue, v0.5.0) and bok/patterns/*.md (pattern pages)" above, because the extensions renumber
+their citations by order of appearance. EUR-Lex refused automated access on 2026-09-24 (a WAF
+challenge), so every EU AI Act and GDPR row here reuses a row already verified as primary in
+chapters 14, 17, 18 or 23 and carries its tag; ISO/IEC standards are cited by id and short title
+only, from secondary listings, as the rest of the book does.
+
+#### bok/patterns/incident-pipeline.md (Incident Pipeline)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | GPAI Code of Practice, Safety and Security chapter, Commitment 9 (serious incident reporting for GPAI models with systemic risk) | General-Purpose AI Code of Practice | European Commission | 2025-07-10 | https://ec.europa.eu/newsroom/dae/redirection/document/118119 | primary (chapter 17 row [5]) | Summary |
+| 2 | AI Act Art. 3(49) serious incident; Art. 26(5)–(6) deployer monitoring, suspension, serious-incident information, log retention; Art. 72; Art. 73(2) 15 days, 73(3) 2 days, 73(4) 10 days | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary (chapter 17 row [3]) | Solution; severity table; deployer side |
+| 3 | ISO/IEC 42001 clause 10.2 nonconformity and corrective action (issues as nonconformities) | ISO/IEC 42001:2023 | ISO/IEC | 2023 | https://www.iso.org/standard/81230.html | secondary (chapter 17 row [4]) | Issue or incident |
+| 4 | OECD AI incident and AI hazard; severity values hazard, serious hazard, incident, serious incident, disaster | Towards a common reporting framework for AI incidents (OECD AI Papers No. 34) | OECD | 2025-02 | https://www.oecd.org/content/dam/oecd/en/publications/reports/2025/02/towards-a-common-reporting-framework-for-ai-incidents_8c488fdb/f326d4ac-en.pdf | primary (chapter 17 row [2]) | Issue or incident; the record |
+| 5 | GDPR Art. 33 personal data breach notification within 72 hours where feasible | Regulation (EU) 2016/679 | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary (chapter 17 row [17]) | Severity section |
+| 6 | Blameless postmortems; postmortem triggers set in advance | Postmortem Culture: Learning from Failure (SRE book, ch. 15) | Google | 2016 | https://sre.google/sre-book/postmortem-culture/ | primary (chapter 17 row [11]) | Root cause, CAPA and blameless review |
+| 7 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/fria-as-code.md (FRIA-as-Code, generalised as Impact-Assessment-as-Code)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | AI Act Art. 27 FRIA: who performs it, before first use, update on change, results notified, 27(4) relationship with the DPIA | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary (chapter 05 row [1]; content of chapter 14 row [55]) | Solution; views table; triggers |
+| 2 | ISO/IEC 42005:2025 AI system impact assessment across the life cycle, updated as needed | ISO/IEC 42005:2025 | ISO/IEC | 2025-05 | https://www.iso.org/standard/44545.html | primary (chapter 14 row [54]) | Views table |
+| 3 | ISO/IEC 42001 Annex A.5 (A.5.2 process, A.5.3 documentation, A.5.4 individuals or groups, A.5.5 societal impacts) | ISO/IEC 42001:2023 | ISO/IEC | 2023 | https://www.iso.org/standard/81230.html | secondary | Views table |
+| 4 | GDPR Art. 35 DPIA (35(2), 35(3), 35(7), 35(11)) and Art. 36 prior consultation | Regulation (EU) 2016/679 | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary (chapter 14 row [16]) | Views table; triggers |
+| 5 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/adversarial-red-team-suite.md (Adversarial Red-Team Suite)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | MITRE ATLAS: adversarial tactics and techniques knowledge base for AI systems (incl. agents) | MITRE ATLAS | MITRE | 2026 | https://atlas.mitre.org/ | primary | Solution; threat-model step |
+| 2 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Solution; threat-model step; Maps to note |
+| 3 | OWASP LLM Top 10 2026, LLM01 to LLM10, published 3 Aug 2026 | OWASP GenAI LLM Top 10 2026 | OWASP GenAI Security Project | 2026-08-03 | https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ | primary | Threat-model step |
+| 4 | NIST adversarial machine learning taxonomy, predictive and generative attack classes with NISTAML ids | NIST AI 100-2 E2025 | NIST | 2025-03-24 | https://csrc.nist.gov/pubs/ai/100/2/e2025/final | primary | Threat-model step |
+| 5 | SP 800-218A task PW.1.1: risk modelling that includes AI model-specific vulnerability and threat types | NIST SP 800-218A | NIST | 2024-07 | https://csrc.nist.gov/pubs/sp/800/218/a/final | primary | Threat-model step |
+| 6 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/vendor-model-due-diligence-gate.md (Vendor / Model Due-Diligence Gate)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | CSIRO Responsible AI Pattern Catalogue (supplier-assessment fields) | Responsible AI Pattern Catalogue | CSIRO | 2023–2024 | https://research.csiro.au/ss/science/projects/responsible-ai-pattern-catalogue/ | primary | Solution |
+| 2 | ISO/IEC 42001:2023 Annex A.10 third-party and customer relationships | ISO/IEC 42001:2023 | ISO/IEC | 2023 | https://www.iso.org/standard/81230.html | secondary | Solution |
+| 3 | AI Act Arts. 25, 26 (incl. 26(5) monitoring on the basis of the instructions for use, informing the provider, suspending use), 27 | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary (chapter 17 row [3] for Art. 26(5)) | Solution; operate step |
+| 4 | GPAI Code of Practice (Transparency chapter, Model Documentation Form) | The General-Purpose AI Code of Practice | European Commission | 2025-07-10 | https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai | primary | Solution |
+| 5 | ATLAS AML.T0109 AI Supply Chain Rug Pull; AML.T0010 AI Supply Chain Compromise | MITRE ATLAS data, release v2026.09 | MITRE | 2026-09-15 | https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.09 | primary | Operate step |
+| 6 | NIST AI RMF Playbook MANAGE 3.1, 3.2, 2.4 | NIST AI RMF Playbook, MANAGE | NIST | 2023 | https://airc.nist.gov/airmf-resources/playbook/manage/ | primary (chapter 15 row [30]) | Operate step |
+| 7 | NIST AI RMF Playbook GOVERN 6.1, 6.2 (contingency for failures in high-risk third-party systems) | NIST AI RMF Playbook, GOVERN | NIST | 2023 | https://airc.nist.gov/airmf-resources/playbook/govern/ | primary (chapter 15 row [29]) | Operate step |
+| 8 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### site/src/data/threats.ts and /resources/threats (threat bridge)
+
+The `#` column matches `threatSources` in `site/src/data/threats.ts` (cited as `ts-<n>` on the
+page). ATLAS ids, names and technique-to-mitigation links were read from the release data, because
+atlas.mitre.org renders in JavaScript and its deep links answer 404 to a non-browser client.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | OWASP LLM Top 10 2026: LLM01:2026 Prompt Injection to LLM10:2026 Improper Output Handling; resource page dated 3 Aug 2026 | OWASP GenAI LLM Top 10 2026 | OWASP GenAI Security Project | 2026-08-03 | https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ | primary | OWASP LLM rows |
+| 2 | Canonical Markdown of the 2026 entries; Appendix A maps each entry to ASI ids and to CSA AICM v1.1 domains; the README gives the release date as 4 Aug 2026 | OWASP Top 10 for LLM Applications 2026, 2026/final | OWASP GenAI Security Project (GitHub) | 2026-08 | https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/blob/main/2026/final/Appendix_A_Related_Framework_Mappings.md | primary | LLM row URLs; related LLM-ASI links; AICM domains |
+| 3 | OWASP LLM Top 10 2025 ids (LLM01:2025 to LLM10:2025), used for `formerly` | OWASP Top 10 for LLM Applications 2025 | OWASP GenAI Security Project | 2025 | https://genai.owasp.org/llm-top-10/ | primary | `formerly` column |
+| 4 | ASI01 Agent Goal Hijack to ASI10 Rogue Agents (names as the PDF's table of contents prints them) | OWASP Top 10 for Agentic Applications for 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | OWASP Agentic rows |
+| 5 | ATLAS release v2026.09: 16 tactics, 120 techniques, 88 sub-techniques, 40 mitigations; technique names and mitigation links | MITRE ATLAS data, release v2026.09 (dist/v6/ATLAS-2026.09.yaml) | MITRE | 2026-09-15 | https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.09 | primary | ATLAS rows |
+| 6 | NISTAML ids and names (e.g. NISTAML.015 Indirect Prompt Injection, NISTAML.018 Prompt Injection, NISTAML.022 Evasion, NISTAML.051 Model Poisoning) | NIST AI 100-2 E2025 | NIST | 2025-03-24 | https://csrc.nist.gov/pubs/ai/100/2/e2025/final | primary | NIST rows |
+| 7 | SP 800-218A tasks PO.5.3, PS.1.3, PS.3.2, PW.1.1, PW.3.1, PW.3.2, PW.3.3, RV.1.1 | NIST SP 800-218A | NIST | 2024-07 | https://csrc.nist.gov/pubs/sp/800/218/a/final | primary | SP 800-218A column |
+| 8 | COSAiS: five proposed use cases; concept paper 14 Aug 2025; annotated outline for predictive AI 8 Jan 2026; no final overlay listed as of 2026-09-24 | SP 800-53 Control Overlays for Securing AI Systems | NIST | 2026-01-08 | https://csrc.nist.gov/projects/cosais | primary | COSAiS column; control-frameworks section |
+| 9 | AI Act Art. 15(5): data poisoning, model poisoning, adversarial examples or model evasion, confidentiality attacks, model flaws | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary (chapter 23 row [5]; chapter 18 row [1]) | Page callout |
+| 10 | ISO/IEC 42001 Annex A control ids and short titles (A.5.2 to A.10.3 as used) | ISO/IEC 42001:2023 | ISO/IEC | 2023 | https://www.iso.org/standard/81230.html | secondary | ISO column |
+| 11 | CSA AICM v1.1: 247 control objectives across 18 security domains, released 22 Jun 2026 | AI Controls Matrix v1.1 | Cloud Security Alliance | 2026-06-22 | https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1 | primary | AICM column |
+| 12 | Inspect Evals task names (agentdojo, agent_threat_bench, strong_reject, cyberseceval_2, simpleqa, make_me_pay, agentic_misalignment) | Inspect Evals | UK AI Security Institute and contributors (GitHub) | 2026 | https://github.com/UKGovernmentBEIS/inspect_evals | primary | Eval column |
+| 13 | promptfoo red-team plugin ids (e.g. indirect-prompt-injection, prompt-extraction, rag-poisoning, agentic:memory-poisoning, mcp, reasoning-dos) | promptfoo red-team plugins | promptfoo | 2026 | https://www.promptfoo.dev/docs/red-team/plugins/ | primary | Eval column |
+| 14 | garak probe modules (promptinject, latentinjection, sysprompt_extraction, leakreplay, packagehallucination, web_injection, agent_breaker, fileformats, propile, divergence, dan, tap), release v0.17.0 of 9 Sep 2026 | garak | NVIDIA (GitHub) | 2026-09-09 | https://github.com/NVIDIA/garak | primary | Eval column |

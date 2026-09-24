@@ -1,0 +1,432 @@
+---
+// /resources/threats: the threat bridge. Every row of src/data/threats.ts takes
+// one externally identified threat (OWASP LLM 2026, OWASP Agentic 2026, MITRE
+// ATLAS, NIST AI 100-2) to the patterns that control it, an example eval that
+// tests the control and the obligations that evidence helps satisfy. Two pure
+// CSS radio filters (catalogue and layer; native inputs, no JavaScript, so the
+// CSP holds) narrow the list; without :has() support every row stays visible.
+// The build fails if any row names a pattern, obligation, control id or related
+// row that does not exist (threatProblems()).
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import CitedText from '../../components/CitedText.astro';
+import SourceList from '../../components/SourceList.astro';
+import { site } from '../../data/site';
+import { obligationById, obligationPath } from '../../data/frameworks';
+import { getPatternBySlug, patternPath } from '../../data/patterns';
+import {
+  threats,
+  taxonomies,
+  threatSources,
+  threatsIn,
+  threatAnchor,
+  threatProblems,
+  obligationLabel,
+  relatedOf,
+  sourcesOf,
+  iso42001Controls,
+  aicmDomains,
+  ssdfTasks,
+  cosaisUseCases,
+  atlasMitigationNames,
+  THREATS_AS_OF,
+  SRC,
+  type Threat,
+  type ThreatTaxonomyId,
+} from '../../data/threats';
+import { layerName } from '../../lib/api';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/threats.css';
+
+const problems = threatProblems();
+if (problems.length > 0) {
+  throw new Error(`threats.ts has broken references:\n  - ${problems.join('\n  - ')}`);
+}
+
+const description =
+  'OWASP LLM and Agentic 2026, MITRE ATLAS and NIST AI 100-2 threat ids mapped to the pattern that controls each, an example eval and the obligations it evidences.';
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Threat bridge' }];
+const pageUrl = new URL('/resources/threats', site.url).href;
+const apiUrl = new URL('/api/v1/threats.json', site.url).href;
+const csvUrl = new URL('/resources/threats.csv', site.url).href;
+
+const jsonLd = [
+  {
+    '@type': 'Dataset',
+    '@id': `${pageUrl}#dataset`,
+    name: `AI threat bridge · ${site.name}`,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    version: site.bokVersion,
+    dateModified: THREATS_AS_OF,
+    keywords: [
+      'AI threat model',
+      'OWASP Top 10 for LLM Applications 2026',
+      'OWASP Top 10 for Agentic Applications',
+      'MITRE ATLAS',
+      'NIST AI 100-2',
+      'AI red teaming',
+      'AI governance',
+    ],
+    creator: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    isBasedOn: taxonomies.map((t) => t.url),
+    distribution: [
+      { '@type': 'DataDownload', name: 'Threat bridge (JSON API)', encodingFormat: 'application/json', contentUrl: apiUrl },
+      { '@type': 'DataDownload', name: 'Threat bridge (CSV)', encodingFormat: 'text/csv', contentUrl: csvUrl },
+    ],
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+
+// Filters: catalogue (groups) and stack layer (rows). Both are radio groups;
+// styles/threats.css hides what the checked pair excludes.
+const taxonomyFilters = [
+  { id: 'tb-t-all', label: 'All catalogues', count: threats.length },
+  ...taxonomies.map((t) => ({ id: `tb-t-${t.id}`, label: t.short, count: threatsIn(t.id).length })),
+];
+const LAYERS = [1, 2, 3, 4, 5] as const;
+const layerFilters = [
+  { id: 'tb-l-all', label: 'All layers', l: undefined as string | undefined },
+  ...LAYERS.map((n) => ({ id: `tb-l-${n}`, label: `L${n}`, l: String(n) })),
+];
+
+// A filter pair with no row gets a visible note instead of a blank list: the
+// note is rendered only for empty pairs, and styles/threats.css holds one rule
+// per possible pair, so the stylesheet never has to know the data.
+const inLayer = (rows: readonly Threat[], n: number) => rows.filter((r) => r.layers.includes(n as Threat['layers'][number]));
+const emptyPairs: { t: ThreatTaxonomyId | 'all'; l: number }[] = [];
+for (const n of LAYERS) {
+  if (inLayer(threats, n).length === 0) emptyPairs.push({ t: 'all', l: n });
+  for (const t of taxonomies) if (inLayer(threatsIn(t.id), n).length === 0) emptyPairs.push({ t: t.id, l: n });
+}
+const shortOf = (t: ThreatTaxonomyId | 'all') => (t === 'all' ? 'any catalogue' : taxonomies.find((x) => x.id === t)!.short);
+
+const toolClass = (tool: string) => `tb-tool tb-tool--${tool.toLowerCase()}`;
+const ticksLabel = (layers: readonly number[]) =>
+  `Layers: ${layers.map((n) => `${n} ${layerName(n)}`).join(', ')}`;
+---
+
+<Base title="AI threat bridge" description={description} image="/og/resources.png" jsonLd={jsonLd}>
+  <PageHero variant="res" crumbs={crumbs} title="From a threat id to the test that proves the control.">
+    <p class="lede" slot="lede">
+      A threat model is only useful when each threat ends in a control that runs and a test that
+      would fail if the control did not. Each row here starts from an id an external catalogue gives
+      a threat, names the <a href="/patterns">patterns</a> that control it, an example eval that tests
+      the control, and the <a href="/obligations">obligations</a> that eval's evidence helps satisfy.
+    </p>
+  </PageHero>
+
+  <div class="container res-page" data-pagefind-body>
+    <div class="res-section">
+      <Callout kind="note" title="Illustrative, not a claim of conformity">
+        <p>
+          The mapping from each threat to a pattern, an eval and an obligation is our engineering
+          judgement. Passing a named check does not make a system secure or compliant, and the eval
+          names are examples of a category, not recommendations. Catalogue versions and eval names
+          were checked on {THREATS_AS_OF}.
+        </p>
+        <p class="prose">
+          <CitedText
+            text={`The EU AI Act asks high-risk systems to resist attempts to alter their use, outputs or performance, and names the AI-specific attacks: data poisoning, model poisoning, adversarial examples or model evasion, confidentiality attacks and model flaws (Art. 15(5)) [${SRC.aiAct}]. The rows below are one way to turn that sentence into tests.`}
+            prefix="ts"
+          />
+        </p>
+      </Callout>
+    </div>
+
+    <section class="res-section" aria-labelledby="tb-how-heading">
+      <div class="res-section-head">
+        <h2 id="tb-how-heading">How to read a row</h2>
+        <p>
+          Read each card as one sentence: this threat is stopped by this control, built with these
+          patterns; this check fails if the control does not work; and the result is evidence for
+          these obligations. The step that produces the rows for your own system, from data-flow
+          diagram to test plan, is in the <a
+          href="/patterns/adversarial-red-team-suite#from-threat-model-to-test-plan">Adversarial
+          Red-Team Suite</a> pattern; chapter 15 applies it to <a
+          href="/bok/governing-deployment#threat-modelling-the-deployed-system">the deployed
+          system</a> and chapter 23 to <a href="/bok/governing-agents#threats-mapped-to-controls">agents</a>.
+        </p>
+      </div>
+      <ol class="tb-steps">
+        <li><span class="tb-step-k">Threat</span> An id from OWASP, MITRE ATLAS or NIST, and what it means in our words.</li>
+        <li><span class="tb-step-k">Control</span> What stops it, and the patterns that build that control.</li>
+        <li><span class="tb-step-k">Test</span> A named check in Inspect, promptfoo or garak, or a test you write where none of them ships one.</li>
+        <li><span class="tb-step-k">Obligation</span> The register rows the passing result helps evidence, with ISO/IEC 42001, CSA AICM, NIST SP 800-218A and COSAiS ids beside them.</li>
+      </ol>
+    </section>
+
+    <section class="res-section" aria-labelledby="tb-heading">
+      <div class="res-section-head">
+        <h2 id="tb-heading">{threats.length} threats from four catalogues</h2>
+        <p>
+          The same threat often has an id in more than one catalogue: prompt injection is
+          <code>LLM01:2026</code>, <code>AML.T0051</code> and <code>NISTAML.018</code>. Each card links
+          its equivalents under "Same threat elsewhere", so a test tagged with one id can be traced
+          to the others.
+        </p>
+        <p class="ob-export">
+          <a class="ob-dl" href="/api/v1/threats.json">JSON (API)</a>
+          <a class="ob-dl" href="/resources/threats.csv" download>Download CSV</a>
+        </p>
+      </div>
+
+      <div class="tb-index">
+        <fieldset class="ob-filter">
+          <legend>Filter by catalogue</legend>
+          <div class="ob-chips">
+            {
+              taxonomyFilters.map((f, i) => (
+                <span>
+                  <input class="ob-radio" type="radio" name="tb-taxonomy" id={f.id} checked={i === 0} />
+                  <label class="ob-chip" for={f.id}>
+                    {f.label} <span class="tb-count">({f.count})</span>
+                  </label>
+                </span>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <fieldset class="ob-filter">
+          <legend>Filter by stack layer</legend>
+          <div class="ob-chips">
+            {
+              layerFilters.map((f, i) => (
+                <span>
+                  <input class="ob-radio" type="radio" name="tb-layer" id={f.id} checked={i === 0} />
+                  <label class="ob-chip" for={f.id} data-l={f.l}>
+                    {f.label}
+                  </label>
+                </span>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <nav class="tb-jump" aria-label="Catalogues on this page">
+          {taxonomies.map((t) => <a href={`#tb-${t.id}`}>{t.short}</a>)}
+        </nav>
+
+        {
+          emptyPairs.map(({ t, l }) => (
+            <p class="tb-empty" id={`tb-empty-${t}-${l}`}>
+              No row from {shortOf(t)} sits in layer {l}, {layerName(l)}. Choose another layer.
+            </p>
+          ))
+        }
+
+        {
+          taxonomies.map((taxonomy) => {
+            const rows = threatsIn(taxonomy.id);
+            return (
+              <section class="tb-group" data-tax={taxonomy.id} id={`tb-${taxonomy.id}`} aria-labelledby={`tb-${taxonomy.id}-h`}>
+                <div class="tb-group-head">
+                  <h3 id={`tb-${taxonomy.id}-h`}>{taxonomy.name}</h3>
+                  <span class="tb-group-count">{rows.length} rows</span>
+                </div>
+                <p class="tb-group-note prose">
+                  <CitedText text={`${taxonomy.scope} Version: ${taxonomy.version}; ${taxonomy.issuer} [${taxonomy.source}].`} prefix="ts" />
+                </p>
+                <ul class="tb-rows">
+                  {rows.map((row) => {
+                    const anchor = threatAnchor(row);
+                    const related = relatedOf(row);
+                    return (
+                      <li class:list={['tb-row', ...row.layers.map((n) => `has-l${n}`)]}>
+                        <article class="tb-card" id={anchor} aria-labelledby={`${anchor}-t`}>
+                          <header class="tb-card-head">
+                            <h4 id={`${anchor}-t`}>
+                              <code class="tb-xid">{row.externalId}</code> {row.name}
+                            </h4>
+                            <p class="tb-meta">
+                              {row.formerly && <span>Formerly <code>{row.formerly}</code> · </span>}
+                              <a href={row.url} rel="noopener">
+                                {taxonomy.short} entry<span class="visually-hidden"> for {row.externalId}</span>
+                              </a>
+                            </p>
+                          </header>
+                          <p class="tb-summary">{row.summary}</p>
+                          <dl class="tb-facts">
+                            <dt>Control</dt>
+                            <dd>
+                              <p>{row.control}</p>
+                              <ul class="tb-links" aria-label="Patterns">
+                                {row.patterns.map((slug) => {
+                                  const p = getPatternBySlug(slug)!;
+                                  return (
+                                    <li>
+                                      <a href={patternPath(p)}>{p.title}</a>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </dd>
+                            <dt>Test</dt>
+                            <dd>
+                              <ul class="tb-evals">
+                                {row.evals.map((e) => (
+                                  <li>
+                                    <span class={toolClass(e.tool)}>{e.tool === 'custom' ? 'Write your own' : e.tool}</span>{' '}
+                                    <code>{e.check}</code>: {e.note}
+                                  </li>
+                                ))}
+                              </ul>
+                            </dd>
+                            <dt>Evidence for</dt>
+                            <dd>
+                              <ul class="tb-links">
+                                {row.obligations.map((id) => {
+                                  const o = obligationById(id)!;
+                                  return (
+                                    <li>
+                                      <a href={obligationPath(o)}>{obligationLabel(id)}</a>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </dd>
+                            {related.length > 0 && (
+                              <>
+                                <dt>Same threat elsewhere</dt>
+                                <dd>
+                                  <ul class="tb-links">
+                                    {related.map((r) => (
+                                      <li>
+                                        <a href={`#${threatAnchor(r)}`}>
+                                          <code>{r.externalId}</code> {r.name}
+                                        </a>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </dd>
+                              </>
+                            )}
+                            <dt>Layer</dt>
+                            <dd>
+                              <span class="ticks ticks--coded" role="img" aria-label={ticksLabel(row.layers)}>
+                                {row.layers.map((n) => (
+                                  <span class="tk-key">
+                                    <span class="tk" data-l={n} aria-hidden="true" />L{n}
+                                  </span>
+                                ))}
+                              </span>
+                            </dd>
+                          </dl>
+                          <details class="tb-more">
+                            <summary>Control-framework ids</summary>
+                            <dl class="tb-facts">
+                              <dt>ISO/IEC 42001 Annex A</dt>
+                              <dd>
+                                <ul class="tb-ids">
+                                  {row.iso42001.map((id) => (
+                                    <li>
+                                      <code>{id}</code> {iso42001Controls[id]}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </dd>
+                              <dt>CSA AICM v1.1 domain</dt>
+                              <dd>
+                                <ul class="tb-ids">
+                                  {row.aicm.map((id) => (
+                                    <li>
+                                      <code>{id}</code> {aicmDomains[id]}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </dd>
+                              {row.ssdf.length > 0 && (
+                                <>
+                                  <dt>NIST SP 800-218A task</dt>
+                                  <dd>
+                                    <ul class="tb-ids">
+                                      {row.ssdf.map((id) => (
+                                        <li>
+                                          <code>{id}</code> {ssdfTasks[id]}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </dd>
+                                </>
+                              )}
+                              <dt>NIST COSAiS use case</dt>
+                              <dd>
+                                <ul class="tb-ids">
+                                  {row.cosais.map((id) => (
+                                    <li>{cosaisUseCases[id]}</li>
+                                  ))}
+                                </ul>
+                              </dd>
+                              {row.atlasMitigations.length > 0 && (
+                                <>
+                                  <dt>ATLAS mitigations</dt>
+                                  <dd>
+                                    <ul class="tb-ids">
+                                      {row.atlasMitigations.map((id) => (
+                                        <li>
+                                          <code>{id}</code> {atlasMitigationNames[id]}
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </dd>
+                                </>
+                              )}
+                              <dt>Sources</dt>
+                              <dd class="prose">
+                                <CitedText text={sourcesOf(row).map((n) => `[${n}]`).join(' ')} prefix="ts" />
+                              </dd>
+                            </dl>
+                          </details>
+                        </article>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            );
+          })
+        }
+      </div>
+    </section>
+
+    <section class="res-section" aria-labelledby="tb-fw-heading">
+      <div class="res-section-head">
+        <h2 id="tb-fw-heading">The control frameworks beside each row</h2>
+        <p class="prose">
+          <CitedText
+            text={`ISO/IEC 42001 controls are cited by their Annex A id and short title only [${SRC.iso42001}]; the register rows they belong to are linked under "Evidence for". CSA AICM v1.1 holds 247 control objectives in 18 domains [${SRC.aicm}]; rows name the domain, following the domain mapping OWASP publishes for the 2026 LLM list [${SRC.llm2026Repo}], not individual control ids. NIST SP 800-218A adds AI-specific tasks to the Secure Software Development Framework, and a row names one only where the threat enters during development [${SRC.ssdf}].`}
+            prefix="ts"
+          />
+        </p>
+        <p class="prose">
+          <CitedText
+            text={`NIST's Control Overlays for Securing AI Systems (COSAiS) will tailor SP 800-53 controls to five use cases. As of ${THREATS_AS_OF} the project page lists a concept paper (14 Aug 2025) and an annotated outline for predictive AI (8 Jan 2026) and no overlay in final form, so rows name the use case a threat belongs to, not overlay controls [${SRC.cosais}].`}
+            prefix="ts"
+          />
+        </p>
+      </div>
+    </section>
+
+    <section class="res-section" aria-labelledby="tb-src-heading">
+      <div class="res-section-head">
+        <h2 id="tb-src-heading">Sources</h2>
+        <p>
+          Each catalogue is pinned to the version named above. ATLAS names and mitigation links were
+          read from the release data, because the ATLAS website renders in JavaScript.
+        </p>
+      </div>
+      <div class="prose tb-sources-wrap">
+        <SourceList sources={threatSources} prefix="ts" />
+      </div>
+    </section>
+  </div>
+</Base>
