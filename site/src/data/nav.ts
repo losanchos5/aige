@@ -1,8 +1,9 @@
 // Single source of truth for site navigation: the desktop group bar, the mobile
-// drawer and the footer sitemap all build from `nav`, `feeds` and `project`.
-// Only `import type`-free runtime imports allowed here are the already-verified
-// data modules `chapters` and `site`.
+// drawer, the footer sitemap and the chapter rail all build from `nav`, `feeds`
+// and `project`. The only runtime imports allowed here are the already-verified
+// data modules `chapters`, `parts` and `site`.
 import { chaptersOrdered } from './chapters';
+import { bookParts, chapterNum, countWord } from './parts';
 import { site } from './site';
 
 export interface NavItem {
@@ -16,6 +17,22 @@ export interface NavItem {
   external?: boolean;
   /** `footer` items appear only in the footer sitemap, not the header/drawer. */
   placement?: 'all' | 'footer';
+  /**
+   * Umami click event (data-umami-event) for items that are file downloads or
+   * machine-readable data; the renderers add `data-umami-event-file` = href.
+   */
+  event?: string;
+}
+
+/** A named sub-list of a group's items: one part of the Body of Knowledge. */
+export interface NavSection {
+  id: string;
+  /** Part title. */
+  label: string;
+  /** Chapter-number range of the part, e.g. `14–17, 23`. */
+  range: string;
+  /** The part's chapters; every one of them is also in the group's `items`. */
+  items: NavItem[];
 }
 
 export interface NavGroup {
@@ -26,13 +43,28 @@ export interface NavGroup {
    *  about) set this; Practice has no lead link. */
   href?: string;
   items: NavItem[];
+  /**
+   * Optional grouping of `items` into named sub-lists (the parts of the Body of
+   * Knowledge). `items` stays the flat list every consumer can iterate; the
+   * renderers draw the sections when a group has them.
+   */
+  sections?: NavSection[];
 }
 
-// The eleven chapters, as compact panel/footer rows (number + short title).
-const chapterItems: NavItem[] = chaptersOrdered.map((chapter) => ({
+// Every chapter, as a compact panel/footer row (number + short title).
+const chapterItem = (chapter: (typeof chaptersOrdered)[number]): NavItem => ({
   label: chapter.shortTitle,
   href: `/bok/${chapter.slug}`,
-  num: String(chapter.order).padStart(2, '0'),
+  num: chapterNum(chapter.order),
+});
+const chapterItems: NavItem[] = chaptersOrdered.map(chapterItem);
+
+// The same chapters grouped by part, in the parts' reading order.
+const chapterSections: NavSection[] = bookParts.map((part) => ({
+  id: part.id,
+  label: part.title,
+  range: part.range,
+  items: part.chapters.map(chapterItem),
 }));
 
 export const nav: NavGroup[] = [
@@ -53,9 +85,10 @@ export const nav: NavGroup[] = [
   {
     id: 'bok',
     label: 'Body of Knowledge',
-    description: 'Eleven chapters, from the definition to the reading list.',
+    description: `${chaptersOrdered.length} chapters in ${countWord(bookParts.length)} parts, from the definition to the law.`,
     href: '/bok',
     items: chapterItems,
+    sections: chapterSections,
   },
   {
     id: 'practice',
@@ -75,7 +108,7 @@ export const nav: NavGroup[] = [
       {
         label: 'Patterns',
         href: '/bok/patterns',
-        description: 'Seventeen reusable patterns, each named to a layer.',
+        description: 'Reusable patterns, each named to the stack layer it serves.',
       },
       {
         label: 'Learning path',
@@ -92,7 +125,7 @@ export const nav: NavGroup[] = [
   {
     id: 'reference',
     label: 'Reference',
-    description: 'Frameworks, crosswalk, tools, glossary and the reading list.',
+    description: 'Frameworks, crosswalk, harms atlas, cases, contracts, templates, tools and glossary.',
     href: '/resources',
     items: [
       {
@@ -104,6 +137,26 @@ export const nav: NavGroup[] = [
         label: 'Crosswalk',
         href: '/resources/crosswalk',
         description: 'One governance topic per row, across the instruments that bind it.',
+      },
+      {
+        label: 'Harms atlas',
+        href: '/resources/harms',
+        description: 'AI harms by level, each with its failure mode, control, evidence and incidents.',
+      },
+      {
+        label: 'Cases',
+        href: '/cases',
+        description: 'Public AI incidents as post-mortems: which control would have caught them.',
+      },
+      {
+        label: 'Contracts',
+        href: '/resources/contracts',
+        description: 'AI contract and licence clauses: red flags, fallbacks and the evidence to keep.',
+      },
+      {
+        label: 'Templates & schemas',
+        href: '/resources/templates',
+        description: 'Schemas, examples and templates for governance records, tagged by obligation.',
       },
       {
         label: 'Tools',
@@ -145,18 +198,25 @@ export const nav: NavGroup[] = [
         href: '/about/contributors',
         description: 'The people who wrote, reviewed and corrected the text.',
       },
+      {
+        label: 'Methodology',
+        href: '/about/methodology',
+        description: 'How sources are chosen and tagged, dates kept current and errors corrected.',
+      },
     ],
   },
 ];
 
-// Downloadable feeds and machine-readable data.
+// Downloadable feeds and machine-readable data. The datasets carry the Umami
+// `download` event; the RSS feed is a subscription, not a download.
 export const feeds: NavItem[] = [
   { label: 'RSS (changelog)', href: '/rss.xml' },
-  { label: 'Glossary JSON', href: '/glossary.json' },
-  { label: 'Crosswalk CSV', href: '/resources/crosswalk.csv' },
-  { label: 'Crosswalk JSON', href: '/resources/crosswalk.json' },
-  { label: 'Obligations CSV', href: '/resources/obligations.csv' },
-  { label: 'Obligations JSON', href: '/resources/obligations.json' },
+  { label: 'Glossary JSON', href: '/glossary.json', event: 'download' },
+  { label: 'Crosswalk CSV', href: '/resources/crosswalk.csv', event: 'download' },
+  { label: 'Crosswalk JSON', href: '/resources/crosswalk.json', event: 'download' },
+  { label: 'Obligations CSV', href: '/resources/obligations.csv', event: 'download' },
+  { label: 'Obligations JSON', href: '/resources/obligations.json', event: 'download' },
+  { label: 'Harms JSON', href: '/resources/harms.json', event: 'download' },
 ];
 
 // Off-site project links.
