@@ -1035,6 +1035,11 @@ export const obligations: readonly Obligation[] = [
     appliesStatus: 'in-force',
     appliesNote: '2025-02-02 (Chapter I)',
     systemClass: ['all-ai-systems'],
+    patterns: [
+      'pattern-use-case-intake--risk-tiering',
+      'pattern-claims-substantiation-gate',
+      'pattern-downstream-use-register',
+    ],
     reviewed: REVIEWED_V050,
   },
   {
@@ -1061,6 +1066,7 @@ export const obligations: readonly Obligation[] = [
       },
     ],
     systemClass: ['all-ai-systems'],
+    patterns: ['pattern-sanctioned-ai-gateway'],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -1082,6 +1088,11 @@ export const obligations: readonly Obligation[] = [
     appliesStatus: 'in-force',
     appliesNote: '2026-07-27 (new, in force)',
     systemClass: HIGH_RISK,
+    patterns: [
+      'pattern-dataset-admission-gate',
+      'pattern-fairness-eval-suite',
+      'pattern-drift--fairness-monitor',
+    ],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -1109,6 +1120,10 @@ export const obligations: readonly Obligation[] = [
       },
     ],
     systemClass: ['prohibited'],
+    patterns: [
+      'pattern-use-case-intake--risk-tiering',
+      'pattern-deactivation-localisation--retirement-runbook',
+    ],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -1137,6 +1152,7 @@ export const obligations: readonly Obligation[] = [
       },
     ],
     systemClass: HIGH_RISK,
+    patterns: ['pattern-use-case-intake--risk-tiering'],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -1157,6 +1173,7 @@ export const obligations: readonly Obligation[] = [
     appliesStatus: 'deferred',
     appliesNote: ANNEX_III_NOTE,
     systemClass: ANNEX_III,
+    patterns: ['pattern-use-case-intake--risk-tiering'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -1181,6 +1198,7 @@ export const obligations: readonly Obligation[] = [
       'pattern-policy-card',
       'pattern-adversarial-red-team-suite',
       'pattern-fria-as-code',
+      'pattern-downstream-use-register',
     ],
     reviewed: REVIEWED_DEBT_PASS,
   },
@@ -1202,6 +1220,11 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: HIGH_RISK_STEPS,
     systemClass: HIGH_RISK,
+    patterns: [
+      'pattern-training-data-rights-ledger',
+      'pattern-dataset-admission-gate',
+      'pattern-fairness-eval-suite',
+    ],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -1272,7 +1295,12 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: HIGH_RISK_STEPS,
     systemClass: HIGH_RISK,
-    patterns: ['pattern-model-card-as-control-evidence'],
+    patterns: [
+      'pattern-model-card-as-control-evidence',
+      'pattern-fairness-eval-suite',
+      'pattern-explanation-artefact',
+      'pattern-claims-substantiation-gate',
+    ],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -1325,6 +1353,11 @@ export const obligations: readonly Obligation[] = [
       'pattern-runtime-guardrail',
       'pattern-kill-switch--circuit-breaker',
       'pattern-agent-identity--scoped-credentials',
+      'pattern-ai-threat-model',
+      'pattern-fairness-eval-suite',
+      'pattern-model-artefact-integrity',
+      'pattern-claims-substantiation-gate',
+      'pattern-drift--fairness-monitor',
     ],
     reviewed: REVIEWED_DEBT_PASS,
   },
@@ -1353,6 +1386,11 @@ export const obligations: readonly Obligation[] = [
       'pattern-runtime-guardrail',
       'pattern-kill-switch--circuit-breaker',
       'pattern-agent-identity--scoped-credentials',
+      'pattern-ai-threat-model',
+      'pattern-fairness-eval-suite',
+      'pattern-model-artefact-integrity',
+      'pattern-claims-substantiation-gate',
+      'pattern-drift--fairness-monitor',
     ],
     reviewed: REVIEWED_V050,
   },
@@ -1440,6 +1478,7 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: HIGH_RISK_STEPS,
     systemClass: HIGH_RISK,
+    patterns: ['pattern-deactivation-localisation--retirement-runbook'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -1482,6 +1521,7 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: HIGH_RISK_STEPS,
     systemClass: HIGH_RISK,
+    patterns: ['pattern-deactivation-localisation--retirement-runbook'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -1566,7 +1606,7 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: HIGH_RISK_STEPS,
     systemClass: HIGH_RISK,
-    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    patterns: ['pattern-vendor--model-due-diligence-gate', 'pattern-downstream-use-register'],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -1588,7 +1628,16 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: HIGH_RISK_STEPS,
     systemClass: HIGH_RISK,
-    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    patterns: [
+      'pattern-vendor--model-due-diligence-gate',
+      'pattern-explanation-artefact',
+      'pattern-decision-notice--contest-path',
+      'pattern-rights-requests-against-models',
+      'pattern-staged-rollout-with-rollback-criteria',
+      'pattern-drift--fairness-monitor',
+      'pattern-disclosure--notification-pipeline',
+      'pattern-deactivation-localisation--retirement-runbook',
+    ],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -1611,7 +1660,16 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: HIGH_RISK_STEPS,
     systemClass: HIGH_RISK,
-    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    patterns: [
+      'pattern-vendor--model-due-diligence-gate',
+      'pattern-explanation-artefact',
+      'pattern-decision-notice--contest-path',
+      'pattern-rights-requests-against-models',
+      'pattern-staged-rollout-with-rollback-criteria',
+      'pattern-drift--fairness-monitor',
+      'pattern-disclosure--notification-pipeline',
+      'pattern-deactivation-localisation--retirement-runbook',
+    ],
     reviewed: REVIEWED_V050,
   },
   {
@@ -1633,7 +1691,16 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: HIGH_RISK_STEPS,
     systemClass: HIGH_RISK,
-    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    patterns: [
+      'pattern-vendor--model-due-diligence-gate',
+      'pattern-explanation-artefact',
+      'pattern-decision-notice--contest-path',
+      'pattern-rights-requests-against-models',
+      'pattern-staged-rollout-with-rollback-criteria',
+      'pattern-drift--fairness-monitor',
+      'pattern-disclosure--notification-pipeline',
+      'pattern-deactivation-localisation--retirement-runbook',
+    ],
     reviewed: REVIEWED_V050,
   },
   {
@@ -1655,7 +1722,16 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: HIGH_RISK_STEPS,
     systemClass: HIGH_RISK,
-    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    patterns: [
+      'pattern-vendor--model-due-diligence-gate',
+      'pattern-explanation-artefact',
+      'pattern-decision-notice--contest-path',
+      'pattern-rights-requests-against-models',
+      'pattern-staged-rollout-with-rollback-criteria',
+      'pattern-drift--fairness-monitor',
+      'pattern-disclosure--notification-pipeline',
+      'pattern-deactivation-localisation--retirement-runbook',
+    ],
     reviewed: REVIEWED_V050,
   },
   {
@@ -1677,7 +1753,16 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: HIGH_RISK_STEPS,
     systemClass: HIGH_RISK,
-    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    patterns: [
+      'pattern-vendor--model-due-diligence-gate',
+      'pattern-explanation-artefact',
+      'pattern-decision-notice--contest-path',
+      'pattern-rights-requests-against-models',
+      'pattern-staged-rollout-with-rollback-criteria',
+      'pattern-drift--fairness-monitor',
+      'pattern-disclosure--notification-pipeline',
+      'pattern-deactivation-localisation--retirement-runbook',
+    ],
     reviewed: REVIEWED_V050,
   },
   {
@@ -1699,7 +1784,16 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: HIGH_RISK_STEPS,
     systemClass: HIGH_RISK,
-    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    patterns: [
+      'pattern-vendor--model-due-diligence-gate',
+      'pattern-explanation-artefact',
+      'pattern-decision-notice--contest-path',
+      'pattern-rights-requests-against-models',
+      'pattern-staged-rollout-with-rollback-criteria',
+      'pattern-drift--fairness-monitor',
+      'pattern-disclosure--notification-pipeline',
+      'pattern-deactivation-localisation--retirement-runbook',
+    ],
     reviewed: REVIEWED_V050,
   },
   {
@@ -1721,7 +1815,16 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: ANNEX_III_STEPS,
     systemClass: ANNEX_III,
-    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    patterns: [
+      'pattern-vendor--model-due-diligence-gate',
+      'pattern-explanation-artefact',
+      'pattern-decision-notice--contest-path',
+      'pattern-rights-requests-against-models',
+      'pattern-staged-rollout-with-rollback-criteria',
+      'pattern-drift--fairness-monitor',
+      'pattern-disclosure--notification-pipeline',
+      'pattern-deactivation-localisation--retirement-runbook',
+    ],
     reviewed: REVIEWED_V050,
   },
   {
@@ -1849,7 +1952,11 @@ export const obligations: readonly Obligation[] = [
     appliesNote: ANNEX_III_NOTE,
     milestones: ANNEX_III_STEPS,
     systemClass: ANNEX_III,
-    patterns: ['pattern-agent-registry', 'pattern-shadow-ai-discovery'],
+    patterns: [
+      'pattern-agent-registry',
+      'pattern-shadow-ai-discovery',
+      'pattern-use-case-intake--risk-tiering',
+    ],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -1873,6 +1980,7 @@ export const obligations: readonly Obligation[] = [
       { date: '2026-12-02', note: 'Marking grace for existing systems ends' },
     ],
     systemClass: ['transparency-art50'],
+    patterns: ['pattern-downstream-use-register', 'pattern-disclosure--notification-pipeline'],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -1916,7 +2024,11 @@ export const obligations: readonly Obligation[] = [
     appliesNote: 'Obligations from 2025-08-02; enforcement from 2026-08-02',
     milestones: GPAI_STEPS,
     systemClass: ['gpai'],
-    patterns: ['pattern-aibom', 'pattern-vendor--model-due-diligence-gate'],
+    patterns: [
+      'pattern-aibom',
+      'pattern-vendor--model-due-diligence-gate',
+      'pattern-training-data-rights-ledger',
+    ],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -1939,7 +2051,11 @@ export const obligations: readonly Obligation[] = [
     appliesNote: 'Obligations from 2025-08-02; enforcement from 2026-08-02',
     milestones: GPAI_STEPS,
     systemClass: ['gpai'],
-    patterns: ['pattern-aibom', 'pattern-vendor--model-due-diligence-gate'],
+    patterns: [
+      'pattern-aibom',
+      'pattern-vendor--model-due-diligence-gate',
+      'pattern-training-data-rights-ledger',
+    ],
     reviewed: REVIEWED_V050,
   },
   {
@@ -1986,6 +2102,8 @@ export const obligations: readonly Obligation[] = [
       'pattern-eval-gate-in-ci',
       'pattern-adversarial-red-team-suite',
       'pattern-incident-pipeline',
+      'pattern-ai-threat-model',
+      'pattern-model-artefact-integrity',
     ],
     reviewed: REVIEWED_DEBT_PASS,
   },
@@ -2008,6 +2126,7 @@ export const obligations: readonly Obligation[] = [
     appliesStatus: 'in-force',
     appliesNote: '2026-08-02',
     systemClass: ANNEX_III,
+    patterns: ['pattern-staged-rollout-with-rollback-criteria'],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -2032,6 +2151,7 @@ export const obligations: readonly Obligation[] = [
       'pattern-continuous-assurance-telemetry',
       'pattern-incident-pipeline',
       'pattern-machine-readable-evidence-oscal',
+      'pattern-drift--fairness-monitor',
     ],
     reviewed: REVIEWED_DEBT_PASS,
   },
@@ -2119,6 +2239,7 @@ export const obligations: readonly Obligation[] = [
     appliesNote: '2027-12-02 (Annex III); Chapter IX applies from 2026-08-02, but the right needs a classified Annex III system (reading, verify)',
     milestones: ANNEX_III_STEPS,
     systemClass: ANNEX_III,
+    patterns: ['pattern-explanation-artefact', 'pattern-decision-notice--contest-path'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -2244,6 +2365,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2018-05-25',
     appliesStatus: 'in-force',
     appliesNote: 'In force; applies from 2018-05-25',
+    patterns: ['pattern-training-data-rights-ledger', 'pattern-dataset-admission-gate'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -2320,6 +2442,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2018-05-25',
     appliesStatus: 'in-force',
     appliesNote: 'In force; applies from 2018-05-25',
+    patterns: ['pattern-decision-notice--contest-path'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -2339,6 +2462,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2018-05-25',
     appliesStatus: 'in-force',
     appliesNote: 'In force; applies from 2018-05-25',
+    patterns: ['pattern-explanation-artefact', 'pattern-decision-notice--contest-path'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -2358,6 +2482,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2018-05-25',
     appliesStatus: 'in-force',
     appliesNote: 'In force; applies from 2018-05-25',
+    patterns: ['pattern-rights-requests-against-models'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -2377,6 +2502,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2018-05-25',
     appliesStatus: 'in-force',
     appliesNote: 'In force; applies from 2018-05-25',
+    patterns: ['pattern-explanation-artefact', 'pattern-decision-notice--contest-path'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -2397,6 +2523,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2018-05-25',
     appliesStatus: 'in-force',
     appliesNote: 'In force; applies from 2018-05-25',
+    patterns: ['pattern-sanctioned-ai-gateway'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -2473,6 +2600,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2018-05-25',
     appliesStatus: 'in-force',
     appliesNote: 'In force; applies from 2018-05-25',
+    patterns: ['pattern-disclosure--notification-pipeline'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -2695,6 +2823,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2021-06-07',
     appliesStatus: 'in-force',
     appliesNote: 'Transposition deadline 2021-06-07',
+    patterns: ['pattern-training-data-rights-ledger'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -2752,6 +2881,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2007-12-12',
     appliesStatus: 'in-force',
     appliesNote: 'Applies from 2007-12-12; review points added by Directive (EU) 2019/2161',
+    patterns: ['pattern-claims-substantiation-gate'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -2808,6 +2938,7 @@ export const obligations: readonly Obligation[] = [
     anchor: ISO_ANCHOR,
     appliesStatus: 'voluntary',
     appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    patterns: ['pattern-sanctioned-ai-gateway'],
     reviewed: REVIEWED_V040,
   },
   {
@@ -2850,6 +2981,11 @@ export const obligations: readonly Obligation[] = [
     anchor: ISO_ANCHOR,
     appliesStatus: 'voluntary',
     appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    patterns: [
+      'pattern-use-case-intake--risk-tiering',
+      'pattern-fairness-eval-suite',
+      'pattern-drift--fairness-monitor',
+    ],
     reviewed: REVIEWED_V040,
   },
   {
@@ -2864,6 +3000,14 @@ export const obligations: readonly Obligation[] = [
     anchor: ISO_ANCHOR,
     appliesStatus: 'voluntary',
     appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    patterns: [
+      'pattern-ai-threat-model',
+      'pattern-fairness-eval-suite',
+      'pattern-model-artefact-integrity',
+      'pattern-staged-rollout-with-rollback-criteria',
+      'pattern-drift--fairness-monitor',
+      'pattern-deactivation-localisation--retirement-runbook',
+    ],
     reviewed: REVIEWED_V040,
   },
   {
@@ -2878,6 +3022,11 @@ export const obligations: readonly Obligation[] = [
     anchor: ISO_ANCHOR,
     appliesStatus: 'voluntary',
     appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    patterns: [
+      'pattern-training-data-rights-ledger',
+      'pattern-dataset-admission-gate',
+      'pattern-rights-requests-against-models',
+    ],
     reviewed: REVIEWED_V040,
   },
   {
@@ -2892,6 +3041,13 @@ export const obligations: readonly Obligation[] = [
     anchor: ISO_ANCHOR,
     appliesStatus: 'voluntary',
     appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    patterns: [
+      'pattern-explanation-artefact',
+      'pattern-claims-substantiation-gate',
+      'pattern-decision-notice--contest-path',
+      'pattern-downstream-use-register',
+      'pattern-disclosure--notification-pipeline',
+    ],
     reviewed: REVIEWED_V040,
   },
   {
@@ -2906,6 +3062,12 @@ export const obligations: readonly Obligation[] = [
     anchor: ISO_ANCHOR,
     appliesStatus: 'voluntary',
     appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
+    patterns: [
+      'pattern-use-case-intake--risk-tiering',
+      'pattern-decision-notice--contest-path',
+      'pattern-sanctioned-ai-gateway',
+      'pattern-downstream-use-register',
+    ],
     reviewed: REVIEWED_V040,
   },
   {
@@ -2920,7 +3082,12 @@ export const obligations: readonly Obligation[] = [
     anchor: ISO_ANCHOR,
     appliesStatus: 'voluntary',
     appliesNote: 'Voluntary management-system standard (2023); no presumption of conformity',
-    patterns: ['pattern-vendor--model-due-diligence-gate'],
+    patterns: [
+      'pattern-vendor--model-due-diligence-gate',
+      'pattern-model-artefact-integrity',
+      'pattern-sanctioned-ai-gateway',
+      'pattern-downstream-use-register',
+    ],
     reviewed: REVIEWED_V040,
   },
   {
@@ -3008,6 +3175,13 @@ export const obligations: readonly Obligation[] = [
       'pattern-framework-crosswalk',
       'pattern-machine-readable-evidence-oscal',
       'pattern-vendor--model-due-diligence-gate',
+      'pattern-use-case-intake--risk-tiering',
+      'pattern-training-data-rights-ledger',
+      'pattern-model-artefact-integrity',
+      'pattern-rights-requests-against-models',
+      'pattern-sanctioned-ai-gateway',
+      'pattern-disclosure--notification-pipeline',
+      'pattern-deactivation-localisation--retirement-runbook',
     ],
     reviewed: REVIEWED_V040,
   },
@@ -3030,6 +3204,12 @@ export const obligations: readonly Obligation[] = [
       'pattern-fria-as-code',
       'pattern-shadow-ai-discovery',
       'pattern-vendor--model-due-diligence-gate',
+      'pattern-use-case-intake--risk-tiering',
+      'pattern-ai-threat-model',
+      'pattern-training-data-rights-ledger',
+      'pattern-dataset-admission-gate',
+      'pattern-decision-notice--contest-path',
+      'pattern-downstream-use-register',
     ],
     reviewed: REVIEWED_V040,
   },
@@ -3049,6 +3229,15 @@ export const obligations: readonly Obligation[] = [
       'pattern-eval-gate-in-ci',
       'pattern-adversarial-red-team-suite',
       'pattern-model-card-as-control-evidence',
+      'pattern-ai-threat-model',
+      'pattern-fairness-eval-suite',
+      'pattern-explanation-artefact',
+      'pattern-model-artefact-integrity',
+      'pattern-claims-substantiation-gate',
+      'pattern-decision-notice--contest-path',
+      'pattern-rights-requests-against-models',
+      'pattern-staged-rollout-with-rollback-criteria',
+      'pattern-drift--fairness-monitor',
     ],
     reviewed: REVIEWED_V040,
   },
@@ -3072,6 +3261,14 @@ export const obligations: readonly Obligation[] = [
       'pattern-machine-readable-evidence-oscal',
       'pattern-agent-identity--scoped-credentials',
       'pattern-human-in-the-loop-gate',
+      'pattern-model-artefact-integrity',
+      'pattern-decision-notice--contest-path',
+      'pattern-sanctioned-ai-gateway',
+      'pattern-staged-rollout-with-rollback-criteria',
+      'pattern-drift--fairness-monitor',
+      'pattern-downstream-use-register',
+      'pattern-disclosure--notification-pipeline',
+      'pattern-deactivation-localisation--retirement-runbook',
     ],
     reviewed: REVIEWED_V040,
   },
@@ -3246,6 +3443,10 @@ export const obligations: readonly Obligation[] = [
       'pattern-agent-identity--scoped-credentials',
       'pattern-human-in-the-loop-gate',
       'pattern-shadow-ai-discovery',
+      'pattern-ai-threat-model',
+      'pattern-model-artefact-integrity',
+      'pattern-downstream-use-register',
+      'pattern-deactivation-localisation--retirement-runbook',
     ],
     reviewed: REVIEWED_V040,
   },
@@ -3261,6 +3462,14 @@ export const obligations: readonly Obligation[] = [
     anchor: OWASP_ANCHOR,
     appliesStatus: 'voluntary',
     appliesNote: 'Voluntary (2026 edition)',
+    patterns: [
+      'pattern-ai-threat-model',
+      'pattern-dataset-admission-gate',
+      'pattern-model-artefact-integrity',
+      'pattern-rights-requests-against-models',
+      'pattern-sanctioned-ai-gateway',
+      'pattern-downstream-use-register',
+    ],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -3510,6 +3719,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2023-07-05',
     appliesStatus: 'in-force',
     appliesNote: 'Enforced since 2023-07-05',
+    patterns: ['pattern-fairness-eval-suite', 'pattern-drift--fairness-monitor'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -3754,6 +3964,7 @@ export const obligations: readonly Obligation[] = [
     appliesStatus: 'in-force',
     appliesNote:
       "Long-standing duty; the CFPB's Regulation B text dates from 2011-12-21 (76 FR 79445)",
+    patterns: ['pattern-explanation-artefact', 'pattern-decision-notice--contest-path'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -3792,6 +4003,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '1978-08-25',
     appliesStatus: 'in-force',
     appliesNote: 'UGESP adopted 1978-08-25 (43 FR 38295); s. 703(k) since 1991-11-21',
+    patterns: ['pattern-fairness-eval-suite'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -3812,6 +4024,7 @@ export const obligations: readonly Obligation[] = [
     appliesStatus: 'in-force',
     appliesNote:
       'Deception prong since the Wheeler-Lea Act of 1938-03-21; applied to AI accuracy claims in 2025',
+    patterns: ['pattern-claims-substantiation-gate'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -3886,6 +4099,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2026-02-05',
     appliesStatus: 'in-force',
     appliesNote: 'In force 2026-02-05',
+    patterns: ['pattern-decision-notice--contest-path'],
     reviewed: REVIEWED_DEBT_PASS,
   },
   {
@@ -4007,6 +4221,7 @@ export const obligations: readonly Obligation[] = [
     appliesStatus: 'grace',
     appliesNote:
       'In force 2026-01-22; MSIT holds back fact-finding and fines for a guidance period of at least one year, while the duty applies',
+    patterns: ['pattern-disclosure--notification-pipeline'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -4028,6 +4243,7 @@ export const obligations: readonly Obligation[] = [
     appliesStatus: 'grace',
     appliesNote:
       'In force 2026-01-22; MSIT holds back fact-finding and fines for a guidance period of at least one year, while the duty applies',
+    patterns: ['pattern-disclosure--notification-pipeline'],
     reviewed: REVIEWED_V050,
   },
   {
@@ -4149,6 +4365,7 @@ export const obligations: readonly Obligation[] = [
     appliesFrom: '2025-04-06',
     appliesStatus: 'in-force',
     appliesNote: 'In force 2025-04-06',
+    patterns: ['pattern-claims-substantiation-gate'],
     reviewed: REVIEWED_V050,
   },
 

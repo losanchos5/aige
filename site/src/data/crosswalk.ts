@@ -15,8 +15,8 @@
 // (/obligations/<id>) and a reworded row never breaks the join. Mappings are
 // illustrative, not a claim of conformity.
 //
-// Version 2 (BoK v0.5.0) widens the grid to 25 topics and 14 columns, adds the
-// instruments the crosswalk needs before frameworks.ts carries them
+// Version 2 (BoK v0.5.0) widens the grid to 25 topics and 14 columns, keeps a
+// fallback list for instruments the register does not carry yet
 // (`crosswalkInstruments`, looked up after frameworks.ts), and gives every
 // reference a `clauseId` token that the explorer and the OSCAL export reuse.
 // `verified` stays honest: true only where the clause was checked against the
@@ -150,93 +150,14 @@ const PREN18228_URL = 'https://genorma.com/en/standards/pren-18228';
 const JTC21_URL = 'https://jtc21.eu/working-groups/';
 
 /**
- * Instruments the crosswalk maps before frameworks.ts carries them (the
- * orchestrator may promote them there; frameworkById looks in frameworks.ts
- * first, so a promoted entry wins and these become fallbacks). Same shape as
- * frameworks.ts; summaries stay factual and dated where status can change.
+ * Instruments the crosswalk maps before frameworks.ts carries them. Empty since
+ * the v0.5.0 register promoted all eight it held (gdpr, uk-atrs,
+ * sg-agentic-framework, coe-cets-225, oecd-ai-principles, g7-hiroshima-coc,
+ * pren-18228, pren-18229-1). A new instrument the crosswalk needs before the
+ * register carries it goes here, same shape as frameworks.ts; frameworkById
+ * looks in frameworks.ts first, so a promoted entry wins.
  */
-export const crosswalkInstruments: readonly Framework[] = [
-  {
-    id: 'gdpr',
-    name: 'General Data Protection Regulation (EU) 2016/679',
-    short: 'GDPR',
-    type: 'law',
-    issuer: 'European Union',
-    url: 'https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng',
-    summary:
-      'The EU data-protection regulation. It applies alongside the AI Act whenever an AI system processes personal data: lawful basis, minimisation, DPIA, automated decisions and breach notification.',
-  },
-  {
-    id: 'uk-atrs',
-    name: 'UK Algorithmic Transparency Recording Standard (ATRS) v4.0',
-    short: 'UK ATRS',
-    type: 'standard',
-    issuer: 'UK Government Digital Service',
-    url: 'https://www.gov.uk/government/collections/algorithmic-transparency-recording-standard-hub',
-    summary:
-      'A two-tier record template for public-sector algorithmic tools, mandatory for government departments and for arm\'s-length bodies that deliver public or frontline services under the December 2024 scope policy, and recommended across the wider public sector (as of 2026-09-24).',
-  },
-  {
-    id: 'sg-agentic-framework',
-    name: 'Singapore Model AI Governance Framework for Agentic AI',
-    short: 'Singapore Agentic',
-    type: 'framework',
-    issuer: 'IMDA',
-    url: SG_AGENTIC_URL,
-    summary:
-      'Voluntary guidance launched on 22 Jan 2026; version 1.5 (20 May 2026, updated 5 Jun 2026) has four dimensions: assess and bound the risks upfront, make humans meaningfully accountable, implement technical controls and processes, enable end-user responsibility.',
-  },
-  {
-    id: 'coe-cets-225',
-    name: 'Council of Europe Framework Convention on AI (CETS No. 225)',
-    short: 'CoE Convention',
-    type: 'law',
-    issuer: 'Council of Europe',
-    url: COE_URL,
-    summary:
-      'A treaty on AI and human rights, democracy and the rule of law, binding on Parties once in force; not in force as of 2026-09-24. The EU implements it through the AI Act.',
-  },
-  {
-    id: 'oecd-ai-principles',
-    name: 'OECD AI Principles (Recommendation on AI, OECD/LEGAL/0449)',
-    short: 'OECD AI Principles',
-    type: 'framework',
-    issuer: 'OECD',
-    url: OECD_URL,
-    summary:
-      'Five values-based principles for AI actors and five recommendations to governments, revised on 3 May 2024; a non-binding intergovernmental standard.',
-  },
-  {
-    id: 'g7-hiroshima-coc',
-    name: 'G7 Hiroshima Process International Code of Conduct for Advanced AI Systems',
-    short: 'G7 Code',
-    type: 'code',
-    issuer: 'G7',
-    url: G7_URL,
-    summary:
-      'Eleven voluntary actions for organisations developing advanced AI systems, from lifecycle risk management to content provenance and data protection.',
-  },
-  {
-    id: 'pren-18228',
-    name: 'prEN 18228 AI risk management (draft)',
-    short: 'prEN 18228',
-    type: 'standard',
-    issuer: 'CEN-CENELEC JTC 21',
-    url: PREN18228_URL,
-    summary:
-      'Draft harmonised standard supporting AI Act Art. 9; its Enquiry vote closed on 30 Jul 2026, as reported by Genorma on 2026-09-24.',
-  },
-  {
-    id: 'pren-18229-1',
-    name: 'prEN 18229-1 AI trustworthiness framework, Part 1: logging (draft)',
-    short: 'prEN 18229-1',
-    type: 'standard',
-    issuer: 'CEN-CENELEC JTC 21',
-    url: JTC21_URL,
-    summary:
-      'Draft harmonised standard supporting AI Act Art. 12; its Enquiry vote closed on 20 Aug 2026, as reported by Genorma on 2026-09-24.',
-  },
-];
+export const crosswalkInstruments: readonly Framework[] = [];
 
 /**
  * Chip prefix for the frameworks that share a column: the single place the
