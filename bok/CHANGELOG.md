@@ -41,7 +41,7 @@ a completed, reviewed core (1.0).
   Implementer and Lead Auditor schemes, ISACA AAISM and AAIA, what each owner says the scheme
   assesses, and how this body of knowledge relates to each, from the owners' own pages, ISO and
   EUR-Lex (checked 2026-09-24), in line with chapter 06 on certifications as a proxy for
-  capability. `/for` redirects to it.
+  capability.
 
 ### Changed
 - `/resources/obligations.json` and `/resources/obligations.csv` move to `schemaVersion` 2 at the

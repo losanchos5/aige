@@ -44,8 +44,8 @@ confunda una certificación personal con la certificación ISO/IEC 42001 de una 
   certificado 42001 de una organización.
 - **Estilos** `site/src/styles/aigp.css` (prefijo `ag-`, solo tokens).
 - **Registros compartidos**: un bloque en `SOURCE_BY_PATH` de `site/astro.config.ts`, una sección
-  en `sources/SOURCES.md`, viñetas en `bok/CHANGELOG.md` bajo "Unreleased (v0.5.0)" y una
-  redirección `/for` en `public/_redirects`.
+  en `sources/SOURCES.md` y viñetas en `bok/CHANGELOG.md` bajo "Unreleased (v0.5.0)". Sin
+  redirección de `/for`: la ruta queda para el índice de los hubs de audiencia de otro bloque.
 - **Pruebas** `site/tests/aigp.spec.ts` (sin navegador): estructura contra el blueprint, ids
   posicionales, límite de 12 palabras, regla de estado, que cada ancla mapeada existe, rutas de
   estudio y contrato del heatmap. Se ejecutan de forma central.
@@ -60,8 +60,7 @@ confunda una certificación personal con la certificación ISO/IEC 42001 de una 
   `site/src/lib/aigp-heatmap.ts`, `site/src/pages/for/aigp.astro`,
   `site/src/pages/for/certifications.astro`, `site/src/styles/aigp.css`, `site/public/for/aigp.js`,
   `site/tests/aigp.spec.ts`.
-- Registros compartidos: `site/astro.config.ts`, `sources/SOURCES.md`, `bok/CHANGELOG.md`,
-  `site/public/_redirects`.
+- Registros compartidos: `site/astro.config.ts`, `sources/SOURCES.md`, `bok/CHANGELOG.md`.
 - Ninguna ruta existente cambia. La CSP no cambia: el script es un módulo externo del mismo origen.
 - Riesgo: si un capítulo renombra un encabezado enlazado, la build falla en `/for/aigp` con el
   enlace y el motivo; es intencionado.

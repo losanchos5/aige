@@ -20,7 +20,7 @@ Worktree `D:/Documents/aige-wt/w2-tool-aigp`, rama `wt/w2-tool-aigp`. La build s
 
 ## 3. Registros, pruebas y build
 
-- [x] 3.1 Añadir el bloque de rutas a `SOURCE_BY_PATH`, la sección de `sources/SOURCES.md`, las viñetas de `bok/CHANGELOG.md` y la redirección `/for` en `public/_redirects`.
+- [x] 3.1 Añadir el bloque de rutas a `SOURCE_BY_PATH`, la sección de `sources/SOURCES.md`, las viñetas de `bok/CHANGELOG.md` (sin redirección de `/for`, que queda para los hubs de audiencia).
 - [x] 3.2 Escribir `site/tests/aigp.spec.ts` (estructura del blueprint, ids, paráfrasis, regla de estado, anclas mapeadas, rutas de estudio, contrato del heatmap).
 - [x] 3.3 Ejecutar `bash D:/Documents/aige-wt/build.sh` con salida 0 y `openspec validate aigp-coverage-map --strict`.
 - [x] 3.4 Escribir el handoff `D:/Documents/aige-wt/handoffs/w2-tool-aigp.json` (navegación, pista en `/path`, enlaces desde los capítulos 06 y 07, heatmap en `/figures`, conjunto de datos en `/api/v1`, `llms.txt`).
