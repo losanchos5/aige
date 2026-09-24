@@ -33,9 +33,9 @@ Continuous Compliance**.
 
 | Stage | Governance question | Record | Gate | Layer |
 |---|---|---|---|---|
-| Use case | Is this the right problem, and is AI the right tool? | Use-case record | Intake approval | 1 · 2 |
+| Use case | Is this the right problem, and is AI the right tool? | Use-case record | [Intake approval](/patterns/use-case-intake-risk-tiering) | 1 · 2 |
 | Design review | Do the requirements, architecture and misuse analysis hold up? | Design record and decision log | Design review sign-off | 1 · 2 |
-| Data | May we use this data, and is it fit for the purpose? | Dataset admission record, datasheet, lineage | Dataset admission gate | 1 · 2 · 3 |
+| Data | May we use this data, and is it fit for the purpose? | Dataset admission record, datasheet, lineage | [Dataset admission gate](/patterns/dataset-admission-gate) | 1 · 2 · 3 |
 | Testing | Does the system meet thresholds fixed before the tests ran? | Test plan, eval results, test report | Eval gate | 3 |
 | Release | Is it ready, and is the conformity route complete? | Go/no-go record, declaration, registration | Release gate | 1 · 5 |
 | Technical file | Can an authority reconstruct all of the above? | Annex IV file, cards, AIBOM | Documentation build | 2 · 5 |
@@ -210,7 +210,7 @@ can speak for them. Its output is a signed design record with open conditions, n
 
 [Data governance across the stack](/bok/the-stack#data-governance-across-the-stack) sets the rule
 that every dataset carries a lawful basis, a provenance, a retention limit and a set of rights. This
-section is the development-time procedure that enforces it: a **dataset admission gate**. A training
+section is the development-time procedure that enforces it: a [**dataset admission gate**](/patterns/dataset-admission-gate). A training
 job may read only datasets whose admission record is complete and signed by the data owner, and the
 check is policy-as-code in the pipeline, not a reminder in a wiki.
 
@@ -434,7 +434,7 @@ environment (container digest, library versions, hardware), the compute used, la
 (inter-annotator agreement) and the owner. The record links in both directions: model version to
 training record to eval results to release tag to the risk approvals that let it ship.
 
-The model artefact itself needs integrity. Sign it: the OpenSSF model-signing tooling signs a
+The [model artefact itself needs integrity](/patterns/model-artefact-integrity). Sign it: the OpenSSF model-signing tooling signs a
 statement listing each model file and its digest, through Sigstore or conventional keys, and
 verification recomputes the hashes [35]. Refuse to load serialised formats that execute code
 from untrusted sources; the Python documentation is blunt that "The pickle module is not secure"
@@ -575,7 +575,7 @@ supply. The table splits it.
 | 2(e) | Assessment of the human-oversight measures | Oversight design; human-in-the-loop test results | The assessment |
 | 2(f) | Pre-determined changes and how compliance is kept | Envelope-as-code | The justification of the envelope |
 | 2(g) | Validation and testing: data, metrics, discriminatory impacts, dated and signed test reports | Test plan; eval results; test reports | Signatures of the responsible persons |
-| 2(h) | Cybersecurity measures | Security test results; threat model; signing records | Residual security risk |
+| 2(h) | Cybersecurity measures | Security test results; [threat model](/patterns/ai-threat-model); [signing records](/patterns/model-artefact-integrity) | Residual security risk |
 | 3 | Capabilities, limitations, accuracy for specific groups, foreseeable unintended outcomes | Model card; subgroup evals; misuse register | Interpretation of the limits |
 | 4 | Why the performance metrics are appropriate | Test plan | The argument |
 | 5 | The risk management system | Risk register | Residual-risk judgement |

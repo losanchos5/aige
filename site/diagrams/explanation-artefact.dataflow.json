@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Explanation Artefact",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1076,
+      540
+    ],
+    "views": [
+      {
+        "id": "write-at-decision",
+        "label": "Written at decision time",
+        "focus": [
+          "decision",
+          "method",
+          "record"
+        ],
+        "note": "The runtime writes one record per explained decision, with model, method and baseline pinned."
+      },
+      {
+        "id": "tested",
+        "label": "Tested for fidelity",
+        "focus": [
+          "record",
+          "fidelity",
+          "store"
+        ],
+        "note": "A fidelity suite recomputes a sample of records against the pinned model before they count as evidence."
+      },
+      {
+        "id": "reused",
+        "label": "One record, every duty",
+        "focus": [
+          "store",
+          "notice",
+          "access",
+          "appeal"
+        ],
+        "note": "The same record renders the notice, answers access and Art. 86 requests, and supports an appeal."
+      }
+    ]
+  },
+  "stages": [
+    {
+      "label": "Decision (Layer 04)"
+    },
+    {
+      "label": "Record"
+    },
+    {
+      "label": "Checks (Layer 03)"
+    },
+    {
+      "label": "Evidence (Layer 05)"
+    },
+    {
+      "label": "Duties"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "decision",
+      "type": "backend",
+      "label": "Decision",
+      "sublabel": "model version pinned",
+      "stage": 0,
+      "row": 0,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "method",
+      "type": "backend",
+      "label": "Explanation method",
+      "sublabel": "method and baseline",
+      "stage": 0,
+      "row": 2,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "record",
+      "type": "database",
+      "label": "Explanation record",
+      "sublabel": "reason codes",
+      "stage": 1,
+      "row": 1,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "fidelity",
+      "type": "security",
+      "label": "Fidelity suite",
+      "sublabel": "recompute a sample",
+      "stage": 2,
+      "row": 1,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "Evidence store",
+      "sublabel": "retained per duty",
+      "stage": 3,
+      "row": 1,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "notice",
+      "type": "external",
+      "label": "Adverse notice",
+      "sublabel": "plain language",
+      "stage": 4,
+      "row": 0,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "access",
+      "type": "external",
+      "label": "Access requests",
+      "sublabel": "GDPR and Art. 86",
+      "stage": 4,
+      "row": 1,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "appeal",
+      "type": "external",
+      "label": "Appeal",
+      "sublabel": "human review",
+      "stage": 4,
+      "row": 2,
+      "width": 150,
+      "height": 64
+    }
+  ],
+  "flows": [
+    {
+      "id": "decision-record",
+      "from": "decision",
+      "to": "record",
+      "label": "write",
+      "variant": "emphasis",
+      "route": "top-channel"
+    },
+    {
+      "id": "method-record",
+      "from": "method",
+      "to": "record",
+      "label": "pin",
+      "variant": "default",
+      "route": "bottom-channel"
+    },
+    {
+      "id": "record-fidelity",
+      "from": "record",
+      "to": "fidelity",
+      "label": "test",
+      "variant": "emphasis"
+    },
+    {
+      "id": "fidelity-store",
+      "from": "fidelity",
+      "to": "store",
+      "label": "file",
+      "variant": "emphasis"
+    },
+    {
+      "id": "store-notice",
+      "from": "store",
+      "to": "notice",
+      "label": "render",
+      "variant": "default",
+      "route": "top-channel"
+    },
+    {
+      "id": "store-access",
+      "from": "store",
+      "to": "access",
+      "label": "answer",
+      "variant": "default",
+      "route": "straight"
+    },
+    {
+      "id": "store-appeal",
+      "from": "store",
+      "to": "appeal",
+      "label": "review",
+      "variant": "default",
+      "route": "bottom-channel"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Reproducible",
+      "items": [
+        "Model version, method, method version and baseline are pinned in the record",
+        "Reason codes come only from the factors the model scored",
+        "A counterfactual changes mutable features only"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Checked, not assumed",
+      "items": [
+        "Fidelity, stability, sanity and reason-code consistency run in CI",
+        "A sample of stored records is recomputed against the pinned model",
+        "Post-hoc methods can diverge from the model, so the test is the control"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Reused for every duty",
+      "items": [
+        "One record answers a notice, an access request, an Art. 86 request and an appeal",
+        "Appeal outcomes are counted by group and feed fairness monitoring"
+      ]
+    }
+  ]
+}

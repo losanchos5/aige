@@ -234,7 +234,7 @@ Read each cell as the one control the combination adds on top of its row and its
 | **Generative, language** | No-training and retention terms; output guardrail | Own guardrails, patching and energy metering | Small model; offline guardrails; signed updates | Full red team; safety-erosion eval | Groundedness eval; corpus permissions; poisoning checks | Agent identity, tool mediation, kill switch |
 | **Generative, multimodal** | Provenance marks on output; biometric-use block | Own content signing; media retention rules | Camera and microphone notices; on-device minimisation | Likeness and consent checks on tuning media | Cross-modal injection tests on retrieved media | Screen and voice actions behind a human gate |
 | **Proprietary (API)** | Pin the version; boundary evals on every change | Vendor appliance: attest version and update path | Vendor SDK: licence limits; offline revocation | Vendor tuning service: data terms; your own re-eval | Your corpus, their model: retention and no-training terms | Grant scoped tools; the vendor agent gets its own identity |
-| **Open-weight** | Licence gate; hash-verified weights on rented compute | You own patching: AIBOM, file scans, red team | Weights are extractable: licence terms and threat model | Compute log against the GPAI one-third criterion | Every layer of evidence is yours to produce | Own guardrails end to end; no vendor safety layer |
+| **Open-weight** | Licence gate; hash-verified weights on rented compute | You own patching: AIBOM, file scans, red team | Weights are extractable: licence terms and [threat model](/patterns/ai-threat-model) | Compute log against the GPAI one-third criterion | Every layer of evidence is yours to produce | Own guardrails end to end; no vendor safety layer |
 
 ## Build, buy or adapt
 
@@ -302,7 +302,7 @@ their name, and requires licensees whose products had more than 700 million mont
 date to request a separate licence [22]. The controls follow: a licence
 check as a policy gate (layer 01), licence, acceptable-use version and file hash in the
 [AIBOM](/bok/patterns#pattern-aibom) (layer 02), hash verification of every weight file before
-load, and a scan of serialised model files before they reach a runtime. The full clause and licence
+load, and a [scan of serialised model files](/patterns/model-artefact-integrity) before they reach a runtime. The full clause and licence
 checklist is on the [contracts page](/resources/contracts).
 
 ### Owning the model: the upside and the burden
@@ -524,7 +524,7 @@ a retrain, a degraded mode or an incident.
 
 ### Fairness and quality in production
 
-A system that passed its fairness evals at go-live can drift into unfairness without any code change.
+A system that passed its [fairness evals](/patterns/fairness-eval-suite) at go-live can drift into unfairness without any code change.
 Monitor error rates per group against the per-group floors in the DDR, complaint and appeal rates by
 group, and, for generative systems, groundedness and refusal rates by topic and language. Where law
 requires a periodic bias audit (New York City's Local Law 144, for example, requires a bias audit
@@ -639,7 +639,7 @@ matters is the mapping from threat to mitigation to the test that proves the mit
 | Retrieval poisoning | Corpus ingestion | Source allow-list; provenance in the AIBOM | Canary documents that must never be retrieved |
 | Model extraction | Inference API | Rate limits; query-pattern detection | Extraction probe against the limits |
 | Membership inference, inversion | A model tuned on personal data | Minimise personal data in tuning; output filtering | Privacy attack suite on the tuned model |
-| Tampered weights | Supply chain | Hash and signature verification | The pipeline fails on a hash mismatch |
+| Tampered weights | Supply chain | [Hash and signature verification](/patterns/model-artefact-integrity) | The pipeline fails on a hash mismatch |
 | Tool misuse | Agent actions | Scoped credentials; human gate on high-consequence actions | Scope and [kill-switch](/bok/patterns#pattern-kill-switch--circuit-breaker) tests |
 
 ## Secondary use and downstream harm

@@ -320,7 +320,7 @@ every confirmed cause against one or more of these classes:
 | **Adversarial** | Prompt injection, jailbreak, supply-chain compromise | Red team; input and output guardrails; AIBOM | 03 · 04 | [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) |
 | **Oversight failure** | Automation bias; a reviewer without context, time or authority; no checkpoint | Designed oversight with measured override rates | 04 | [Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate) |
 | **Change management** | Unreviewed model, prompt or config change; silent vendor update | Registry versioning; change gate; vendor notice terms | 01 · 02 | [Vendor / Model Due-Diligence Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate) |
-| **Use outside intended purpose** | Deployment beyond the use the system was assessed for | Intake and classification; instructions for use | 01 · 02 | [Agent Registry](/bok/patterns#pattern-agent-registry) |
+| **Use outside intended purpose** | Deployment beyond the use the system was assessed for | [Intake and classification](/patterns/use-case-intake-risk-tiering); instructions for use | 01 · 02 | [Agent Registry](/bok/patterns#pattern-agent-registry) |
 | **Organisational** | No owner, unclear decision rights, alert fatigue, untrained staff | Operating model, RACI, drills | 05 | [Incident Pipeline](/bok/patterns#pattern-incident-pipeline) |
 
 The taxonomy is not only a learning device; regulators ask for it. The Commission's reporting

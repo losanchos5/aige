@@ -16,8 +16,9 @@ stack stay consistent, and realises one or more of the six principles
 every control teeth · register and bound every actor before it acts · instrument the build to produce
 its own proof · start from a named failure mode or harm · make the governed path the easiest path*.
 Each **Maps to** line draws its threat IDs from the OWASP Top 10 for Agentic Applications 2026 [2] and
-its function labels from the NIST AI RMF [3]. Each pattern carries a short example labelled
-`(illustrative)`: a plausible, de-identified sketch, not a claim about any named system. Mappings to
+its function labels from the NIST AI RMF [3]; the development-side patterns also name OWASP Top 10
+for LLM Applications 2026 and MITRE ATLAS ids, each sourced on its own page. Each pattern carries a
+short example labelled `(illustrative)`: a plausible, de-identified sketch, not a claim about any named system. Mappings to
 the EU AI Act are illustrative, not a claim of conformity, and as of 2026-09-24 no harmonised standard
 under the Act is referenced in the Official Journal [4].
 
@@ -206,6 +207,82 @@ integration is bounded instead.
 
 Layer 02 Inventory & Transparency / Layer 05 Assurance & Continuous Compliance ·
 [Read the Vendor / Model Due-Diligence Gate pattern](/patterns/vendor-model-due-diligence-gate)
+
+## Pattern: Use-Case Intake & Risk Tiering
+
+Route every proposed AI use case, built or bought, through one intake that writes a structured
+use-case record, screens it against prohibited practices and the EU AI Act risk ladder, and computes
+an internal tier from declared profile fields. The tier switches on the assessments, evals and
+approvals the system must clear, and the record becomes its registry entry.
+
+Layer 01 Govern-as-Code / Layer 02 Inventory & Transparency ·
+[Read the Use-Case Intake & Risk Tiering pattern](/patterns/use-case-intake-risk-tiering)
+
+## Pattern: AI Threat Model
+
+Threat-model each AI system at design review as a versioned data file: STRIDE per data-flow element,
+extended with the AI-specific attacks that MITRE ATLAS, NIST AI 100-2 and the OWASP lists catalogue.
+Every threat above tolerance resolves to a mitigation and to the test that proves it, and the design
+review fails while one does not.
+
+Layer 01 Govern-as-Code / Layer 03 Evals & Red Teaming as Evidence ·
+[Read the AI Threat Model pattern](/patterns/ai-threat-model)
+
+## Pattern: Training-Data Rights Ledger
+
+Keep one ledger row per training source: acquisition channel, licence or legal basis, the
+rights-reservation check with its method and date, and the permitted uses. Joined to lineage, the
+ledger names the models each source trained, so a withdrawal, an erasure request or an order reaches
+only the affected models.
+
+Layer 02 Inventory & Transparency ·
+[Read the Training-Data Rights Ledger pattern](/patterns/training-data-rights-ledger)
+
+## Pattern: Dataset Admission Gate
+
+Let a training, evaluation or retrieval job read a dataset version only if a signed admission record
+permits that use, after rights, quality, representativeness, bias and integrity checks. The check is
+policy-as-code at read time, so a missing field fails the run rather than a review.
+
+Layer 01 Govern-as-Code / Layer 02 Inventory & Transparency ·
+[Read the Dataset Admission Gate pattern](/patterns/dataset-admission-gate)
+
+## Pattern: Fairness Eval Suite
+
+Version a fairness suite with the model: group and intersectional metrics with confidence intervals,
+an "insufficient data" outcome for small cells, a proxy scan and a counterfactual flip test, judged
+against a policy fixed before the run. It fails the build when the policy is not met and runs again
+on live decisions.
+
+Layer 03 Evals & Red Teaming as Evidence ·
+[Read the Fairness Eval Suite pattern](/patterns/fairness-eval-suite)
+
+## Pattern: Explanation Artefact
+
+Write one explanation record per consequential decision at decision time, with the model version,
+the method and baseline, reason codes drawn from scored factors and the contest route pinned. Test
+the explanations for fidelity and answer every explanation duty from the same record.
+
+Layer 04 Runtime Controls & Observability / Layer 05 Assurance & Continuous Compliance ·
+[Read the Explanation Artefact pattern](/patterns/explanation-artefact)
+
+## Pattern: Model Artefact Integrity
+
+Sign a manifest of every model file at build, attach build provenance, prefer serialisation formats
+that cannot execute code and scan the rest, and make every runtime verify signature, digests and
+provenance against the registry entry before it loads the weights.
+
+Layer 02 Inventory & Transparency / Layer 04 Runtime Controls & Observability ·
+[Read the Model Artefact Integrity pattern](/patterns/model-artefact-integrity)
+
+## Pattern: Claims Substantiation Gate
+
+Register every public claim about an AI system's accuracy, fairness or capability with the eval run,
+population and date that support it. Publication is blocked without live evidence, and each release
+reruns the cited evals and flags any claim the new version no longer supports.
+
+Layer 05 Assurance & Continuous Compliance / Layer 03 Evals & Red Teaming as Evidence ·
+[Read the Claims Substantiation Gate pattern](/patterns/claims-substantiation-gate)
 
 ## Sources
 

@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Model Artefact Integrity",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "sign-and-prove",
+        "label": "Sign and prove",
+        "focus": ["build", "sign", "provenance"],
+        "note": "The build signs a manifest of every model file and attaches provenance of how it was built."
+      },
+      {
+        "id": "register",
+        "label": "Register the artefact",
+        "focus": ["provenance", "registry", "thirdparty"],
+        "note": "Own and third-party models enter the registry by digest, signer and provenance, after a format scan."
+      },
+      {
+        "id": "verify-before-load",
+        "label": "Verify before load",
+        "focus": ["registry", "verify", "serve", "refused"],
+        "note": "Serving refuses a model whose signature, digests or provenance do not match its registry entry."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "build", "label": "Build pipeline" },
+    { "id": "l2", "label": "Layer 02 Inventory & Transparency" },
+    { "id": "l4", "label": "Layer 04 Runtime Controls & Observability" },
+    { "id": "refused", "label": "Load refused", "variant": "exception" }
+  ],
+  "phases": [
+    { "id": "produce", "label": "Build + sign", "fromCol": 0, "toCol": 2, "variant": "emphasis" },
+    { "id": "record", "label": "Register", "fromCol": 3, "toCol": 3 },
+    { "id": "load", "label": "Verify + load", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["build", "sign", "provenance", "registry", "verify", "serve"],
+  "nodes": [
+    { "id": "build", "lane": "build", "col": 0, "type": "backend", "label": "Training build", "sublabel": "safetensors out", "width": 150 },
+    { "id": "sign", "lane": "build", "col": 1, "type": "security", "label": "Sign manifest", "sublabel": "every file digest", "width": 150 },
+    { "id": "provenance", "lane": "build", "col": 2, "type": "backend", "label": "Build provenance", "sublabel": "how and from what", "width": 152 },
+    { "id": "thirdparty", "lane": "l2", "col": 2, "type": "external", "label": "Third-party model", "sublabel": "pinned by digest", "tag": "scanned", "width": 152 },
+    { "id": "registry", "lane": "l2", "col": 3, "type": "database", "label": "Registry entry", "sublabel": "digest, signer, AIBOM", "width": 156 },
+    { "id": "verify", "lane": "l4", "col": 4, "type": "security", "label": "Verify before load", "sublabel": "signature and digests", "width": 156 },
+    { "id": "serve", "lane": "l4", "col": 5, "type": "backend", "label": "Model serves", "sublabel": "evidence record", "width": 150 },
+    { "id": "refused", "lane": "refused", "col": 5, "type": "backend", "label": "Load refused", "sublabel": "mismatch recorded", "width": 150 }
+  ],
+  "edges": [
+    { "id": "build-sign", "from": "build", "to": "sign", "label": "manifest", "variant": "emphasis" },
+    { "id": "sign-provenance", "from": "sign", "to": "provenance", "label": "attest", "variant": "emphasis" },
+    { "id": "provenance-registry", "from": "provenance", "to": "registry", "label": "register", "variant": "emphasis" },
+    { "id": "thirdparty-registry", "from": "thirdparty", "to": "registry", "label": "re-host", "variant": "default", "role": "branch" },
+    { "id": "registry-verify", "from": "registry", "to": "verify", "label": "deploy", "variant": "emphasis" },
+    { "id": "verify-serve", "from": "verify", "to": "serve", "label": "match", "variant": "emphasis" },
+    { "id": "verify-refused", "from": "verify", "to": "refused", "label": "mismatch", "variant": "security", "role": "error" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Signed at build",
+      "items": [
+        "A manifest lists every model file and its digest, and the manifest is signed",
+        "Provenance records what built the artefact, by what process, from which inputs",
+        "Safe tensor formats by default; code-executing formats are scanned or refused"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Registered by digest",
+      "items": [
+        "Third-party models are pulled by digest, scanned and re-hosted",
+        "The registry entry holds digest, signer, provenance and the AIBOM link"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Verified before load",
+      "items": [
+        "Serving refuses a signature, digest or provenance mismatch",
+        "Every load, allowed or refused, writes an evidence record",
+        "What runs is provably what was built and evaluated"
+      ]
+    }
+  ]
+}

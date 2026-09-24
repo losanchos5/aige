@@ -186,7 +186,7 @@ a board indicator.
 
 ### Escalation, triggers and cadence
 
-Most use cases never reach the committee; they pass intake, get a tier and go through the gates.
+Most use cases never reach the committee; they pass [intake, get a tier](/patterns/use-case-intake-risk-tiering) and go through the gates.
 Review triggers route the rest:
 
 - a decision with legal or similarly significant effect on a person (credit, employment, insurance,
@@ -512,8 +512,8 @@ and 15 treat the build and run stages in depth.
 | Stage | Policy requires | Gate that enforces it | Evidence | Layer |
 |---|---|---|---|---|
 | Intake | Justification memo; risk tier; prohibited-use screen; review triggers | Intake writes a registry stub; no stub, no deploy | Registry entry; tier record | 1 · 2 |
-| Design | Threat model; oversight design; impact assessment when triggered | Design review as a required check | Threat model; FRIA/DPIA reference | 1 · 3 |
-| Data | Acquisition record; lawful basis; licence; quality and bias checks | Pipeline refuses a dataset without a valid data card | Data card; lineage | 2 · 3 |
+| Design | [Threat model](/patterns/ai-threat-model); oversight design; impact assessment when triggered | Design review as a required check | Threat model; FRIA/DPIA reference | 1 · 3 |
+| Data | Acquisition record; lawful basis; licence; quality and bias checks | [Pipeline refuses a dataset without a valid data card](/patterns/dataset-admission-gate) | Data card; lineage | 2 · 3 |
 | Build | Approved models and platforms; versioned prompts, retrieval and tools; AIBOM | CI policy checks; model allowlist | AIBOM; policy verdicts | 1 · 2 |
 | Test | Required eval categories and thresholds by tier; red teaming for higher tiers | Eval gate | Eval results | 3 |
 | Release | Complete deployment package; approvals; transparency notices | Admission control reads the registry | Release record; model card | 1 · 2 · 5 |
@@ -607,7 +607,7 @@ data governance and intellectual-property policies to see AI. A gap assessment f
 | Privacy | Lawful basis for training versus inference; purpose limitation on reuse; what models memorise; notices; rights over models and outputs; retention of training and derived data | Dataset purpose tags; DPIA triggers for AI; procedure for rights requests against models | DPIA; data card; rights-request log |
 | Security | Prompt injection, poisoning, model extraction and supply-chain threats missing from the risk assessment and playbooks; no trusted model sources | AI threats in the ISMS risk assessment; AI incident playbooks; model and dataset allowlist | Threat model; red-team results; allowlist |
 | Data governance | Lineage without provenance; scraped, brokered and synthetic data unlabelled; no retention by layer | Acquisition policy (below); provenance fields; retention for raw data, features, labels and weights | Data card; lineage graph |
-| Intellectual property | Training rights and text-and-data-mining opt-outs; use of outputs; trade secrets in prompts; open-weight licences; vendor indemnities | Rights review per dataset; output-use rules; prompt rules by data class; model licence review | Rights ledger; licence records |
+| Intellectual property | Training rights and text-and-data-mining opt-outs; use of outputs; trade secrets in prompts; open-weight licences; vendor indemnities | Rights review per dataset; output-use rules; prompt rules by data class; model licence review | [Rights ledger](/patterns/training-data-rights-ledger); licence records |
 
 Three notes. For **security**, the agentic threat catalogue (goal hijack, tool misuse, identity and
 privilege abuse, rogue agents) is the checklist to add to the existing threat model [17]. For **data

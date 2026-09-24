@@ -1,0 +1,10 @@
+{
+  "decision": "A consequential decision made or supported by the system, with the model version pinned.",
+  "method": "The explanation method, its version and its baseline, fixed by the explanation policy for this use case.",
+  "record": "The explanation record: reason codes from scored factors, a counterfactual where helpful, the notice template and the contest route.",
+  "fidelity": "A fidelity suite checks fidelity, stability, sanity and reason-code consistency, and recomputes a sample of stored records.",
+  "store": "Records are retained in the evidence store for as long as the longest obligation they serve.",
+  "notice": "The adverse-action or decision notice, rendered in plain language from the record.",
+  "access": "Data-subject access requests and AI Act Art. 86 explanation requests are answered from the same record.",
+  "appeal": "An appeal gives the human reviewer the record as context; outcomes are logged and counted by group."
+}

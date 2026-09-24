@@ -53,6 +53,21 @@ a completed, reviewed core (1.0).
   "Data protection and other EU law", and new subsections for US state privacy and sector law, US
   federal law, Korea and treaty and soft law; its new sources, numbered 63 to 116, were verified
   on 2026-09-24.
+- Eight development-side patterns, catalogue order 18 to 25, each with its own page, archify
+  diagram, illustrative artefact and numbered sources: **Use-Case Intake & Risk Tiering**
+  (`/patterns/use-case-intake-risk-tiering`), **AI Threat Model** (`/patterns/ai-threat-model`:
+  STRIDE extended with MITRE ATLAS, NIST AI 100-2 and the OWASP LLM and Agentic ids),
+  **Training-Data Rights Ledger** (`/patterns/training-data-rights-ledger`), **Dataset Admission
+  Gate** (`/patterns/dataset-admission-gate`), **Fairness Eval Suite**
+  (`/patterns/fairness-eval-suite`), **Explanation Artefact** (`/patterns/explanation-artefact`),
+  **Model Artefact Integrity** (`/patterns/model-artefact-integrity`: model signing, build
+  provenance, serialisation scanning, verification before load) and **Claims Substantiation Gate**
+  (`/patterns/claims-substantiation-gate`). Four of the artefacts reuse the published schemas
+  (`use-case-record.v1`, `dataset-admission-record.v1`, `eval-result.v1`, `evidence-record.v1`) and
+  validate against them. Chapter 05 gains a catalogue section per pattern with the usual anchor, and
+  chapters 11 to 23 now link the specific sentences that described these practices to the new pages
+  (the chapter 20 table no longer marks the rights ledger as proposed). Mappings are illustrative,
+  not a claim of conformity.
 
 ### Changed
 - Chapter 08 and the register: the CSA row that named an "Agentic Control Supplement" now names what

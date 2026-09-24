@@ -1,0 +1,86 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Claims Substantiation Gate",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "register-the-claim",
+        "label": "Register the claim",
+        "focus": ["copy", "row", "evidence"],
+        "note": "Each public claim becomes a register row that cites the eval run, population and date behind it."
+      },
+      {
+        "id": "gate-publication",
+        "label": "Gate publication",
+        "focus": ["row", "rules", "publish"],
+        "note": "Substantiation rules check scope and interval before the claim can be published."
+      },
+      {
+        "id": "gate-the-release",
+        "label": "Gate the release",
+        "focus": ["release", "rules", "withdrawn"],
+        "note": "Each model release reruns the cited evals; a claim the new version no longer supports is pulled."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "copy", "label": "Marketing, sales and documentation" },
+    { "id": "l5", "label": "Layer 05 Assurance & Continuous Compliance" },
+    { "id": "l3", "label": "Layer 03 Evals & Red Teaming as Evidence" },
+    { "id": "withdrawn", "label": "Claim withdrawn", "variant": "exception" }
+  ],
+  "phases": [
+    { "id": "draft", "label": "Draft", "fromCol": 0, "toCol": 0 },
+    { "id": "bind", "label": "Register + bind", "fromCol": 1, "toCol": 3, "variant": "emphasis" },
+    { "id": "publish", "label": "Publish + revalidate", "fromCol": 4, "toCol": 4, "variant": "dashed" }
+  ],
+  "mainPath": ["copy", "row", "evidence", "rules", "publish"],
+  "nodes": [
+    { "id": "copy", "lane": "copy", "col": 0, "type": "external", "label": "Draft claim", "sublabel": "site, deck, IFU", "width": 150 },
+    { "id": "row", "lane": "l5", "col": 1, "type": "database", "label": "Claims register", "sublabel": "claim, scope, owner", "width": 156 },
+    { "id": "evidence", "lane": "l3", "col": 2, "type": "backend", "label": "Cited eval run", "sublabel": "value with interval", "width": 156 },
+    { "id": "rules", "lane": "l5", "col": 3, "type": "security", "label": "Substantiation rules", "sublabel": "scope and lower bound", "width": 168 },
+    { "id": "publish", "lane": "copy", "col": 4, "type": "backend", "label": "Published claim", "sublabel": "with live evidence", "width": 156 },
+    { "id": "release", "lane": "l3", "col": 4, "type": "backend", "label": "Model release", "sublabel": "reruns cited suites", "width": 156 },
+    { "id": "withdrawn", "lane": "withdrawn", "col": 4, "type": "backend", "label": "Claim pulled", "sublabel": "history kept", "width": 150 }
+  ],
+  "edges": [
+    { "id": "copy-row", "from": "copy", "to": "row", "label": "register", "variant": "default" },
+    { "id": "row-evidence", "from": "row", "to": "evidence", "label": "cite", "variant": "emphasis" },
+    { "id": "evidence-rules", "from": "evidence", "to": "rules", "label": "check", "variant": "emphasis" },
+    { "id": "rules-publish", "from": "rules", "to": "publish", "label": "substantiated", "variant": "emphasis" },
+    { "id": "release-rules", "from": "release", "to": "rules", "label": "revalidate", "variant": "dashed", "role": "branch" },
+    { "id": "rules-withdrawn", "from": "rules", "to": "withdrawn", "label": "unsupported", "variant": "security", "role": "error" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Every claim is a row",
+      "items": [
+        "Accuracy, fairness, safety, autonomy and AI-powered claims are registered",
+        "Each row lists every place the claim appears",
+        "The row cites the eval run, the population measured and the date"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Rules as code",
+      "items": [
+        "The measured population must match the scope of the claim",
+        "A figure is claimed only if the lower interval bound supports it",
+        "Vendor figures are provider-attested until re-measured"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "True while it stays true",
+      "items": [
+        "Every release reruns the cited suites",
+        "A claim the new version does not support is pulled, with its history kept"
+      ]
+    }
+  ]
+}

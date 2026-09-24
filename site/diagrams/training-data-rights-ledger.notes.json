@@ -1,0 +1,10 @@
+{
+  "licensed": "Licensed corpora: the ledger row records the licensor, the licence reference and its terms for training, commercial use and derived models.",
+  "crawl": "Crawled content: the row records the crawler, the window and the rights-reservation check with its method, result and date.",
+  "internal": "Internal and user data: the row records the legal basis and the purpose-compatibility assessment for personal data.",
+  "ledger": "The rights ledger keeps one row per training source, with its acquisition channel and permitted uses.",
+  "gate": "The corpus build and the dataset admission gate refuse a source without a ledger row that permits the declared use.",
+  "models": "Each model version records the ledger rows it was trained on, so lineage runs in both directions.",
+  "summary": "Training-content summaries and training-data documentation are generated as queries over the ledger.",
+  "change": "A licence withdrawal, an erasure request or an order marks the affected rows, and forward lineage names only the models that read them."
+}

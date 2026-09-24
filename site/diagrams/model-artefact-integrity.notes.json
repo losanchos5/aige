@@ -1,0 +1,10 @@
+{
+  "build": "The training build writes the model in a safe tensor format.",
+  "sign": "A manifest listing every model file and its digest is signed, for example with the OpenSSF Model Signing specification.",
+  "provenance": "Build provenance records what built the artefact, by what process and from which inputs, including the base model digest and dataset admissions.",
+  "thirdparty": "A third-party model is pulled by digest, its publisher signature verified where offered, scanned for code-executing formats and re-hosted.",
+  "registry": "The registry entry holds the digest, the signer identity, the provenance and the AIBOM link for each version.",
+  "verify": "Serving admission control verifies signature, digests and provenance against the registry entry before any load.",
+  "serve": "A verified model serves, and the verification writes an evidence record.",
+  "refused": "A mismatch refuses the load and records which check failed."
+}

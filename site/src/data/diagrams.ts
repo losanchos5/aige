@@ -308,6 +308,71 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'The build from intake to release as a chain of gates, each reading a structured record and each named with the pattern that implements it, ending in a technical file the pipeline compiles from those records. Find the first stage whose gate cannot refuse a missing record, and wire that one first. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'governing-development', at: 'lead' }],
+  // Block w2-patterns-a (v0.5.0): the diagrams of the eight development-side
+  // patterns, each opening its pattern page.
+  {
+    id: 'use-case-intake-tiering',
+    type: 'workflow',
+    title: 'Use-Case Intake and Risk Tiering',
+    caption:
+      'A use-case request becomes a structured record, passes the prohibited-use screen, gets a computed tier and switches on the gates that tier requires before the registry entry exists. Put every new AI request through this one path. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'use-case-intake-risk-tiering', at: 'lead' }],
+  },
+  {
+    id: 'ai-threat-model',
+    type: 'workflow',
+    title: 'AI Threat Model',
+    caption:
+      'Threats are enumerated per data-flow element with STRIDE, extended with AI-specific attack classes, and each one is mitigated with a named test or accepted by a named owner. Fail the design review on any threat without a test. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'ai-threat-model', at: 'lead' }],
+  },
+  {
+    id: 'training-data-rights-ledger',
+    type: 'dataflow',
+    title: 'Training-Data Rights Ledger',
+    caption:
+      'Every training source enters a ledger row with its acquisition channel, licence or legal basis and reservation check, and lineage joins the rows to the models they trained. Query it when rights change, instead of retraining everything. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'training-data-rights-ledger', at: 'lead' }],
+  },
+  {
+    id: 'dataset-admission-gate',
+    type: 'workflow',
+    title: 'Dataset Admission Gate',
+    caption:
+      'A dataset version is checked and signed into an admission record, and a read-time policy lets a job read it only for an admitted use, logging each read in lineage. Make every training job present its use case before it reads. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'dataset-admission-gate', at: 'lead' }],
+  },
+  {
+    id: 'fairness-eval-suite',
+    type: 'workflow',
+    title: 'Fairness Eval Suite',
+    caption:
+      'A fairness policy fixed before the run drives group and intersectional metrics, a proxy scan and a counterfactual flip test, gated on intervals and repeated on live decisions. Write the policy first, then let the suite fail the build. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'fairness-eval-suite', at: 'lead' }],
+  },
+  {
+    id: 'explanation-artefact',
+    type: 'dataflow',
+    title: 'Explanation Artefact',
+    caption:
+      'Each consequential decision writes an explanation record with model, method and reason codes pinned, which is tested for fidelity and reused for notices, access requests and appeals. Answer every explanation duty from the same record. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'explanation-artefact', at: 'lead' }],
+  },
+  {
+    id: 'model-artefact-integrity',
+    type: 'workflow',
+    title: 'Model Artefact Integrity',
+    caption:
+      'The build signs a manifest of every model file and attaches provenance, the registry holds digest and signer, and serving verifies both before it loads a model. Refuse any load that does not match its registry entry. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'model-artefact-integrity', at: 'lead' }],
+  },
+  {
+    id: 'claims-substantiation-gate',
+    type: 'workflow',
+    title: 'Claims Substantiation Gate',
+    caption:
+      'Each public claim becomes a register row bound to the eval run behind it; rules check scope and interval before publication, and each release revalidates or pulls the claim. Register a claim before it reaches the copy. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'claims-substantiation-gate', at: 'lead' }],
   },
 ] as const;
 
