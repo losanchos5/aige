@@ -82,9 +82,11 @@ export function effectiveClasses(model, roles, classes) {
 
 /**
  * The rows that bind the answers: a row binds when one of its roles is picked
- * and one of its classes is carried. Its start is the earliest start among the
- * matched classes; its later dates are the milestones that concern a matched
- * class, minus the milestone that is itself the start.
+ * and one of its classes is carried, or when a picked role is one the row binds
+ * whatever the classes (`anyClass`: an authorised representative's mandate says
+ * what the model is). Its start is the earliest start among the matched
+ * classes; its later dates are the milestones that concern a matched class,
+ * minus the milestone that is itself the start.
  */
 export function planFor(model, { roles, classes, ref }) {
   const picked = new Set(roles);
@@ -92,7 +94,8 @@ export function planFor(model, { roles, classes, ref }) {
   const items = [];
   model.rows.forEach((row, order) => {
     const byRoles = row.roles.filter((r) => picked.has(r));
-    const matched = row.classes.filter((c) => carried.has(c));
+    const anyClass = (row.anyClass ?? []).some((r) => picked.has(r));
+    const matched = anyClass ? [...row.classes] : row.classes.filter((c) => carried.has(c));
     if (!byRoles.length || !matched.length) return;
     const start = matched.map((c) => row.starts[c]).filter(Boolean).sort()[0] ?? null;
     /** @type {{ date: string, kind: 'start' | 'step', note: string }[]} */

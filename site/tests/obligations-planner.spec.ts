@@ -2,8 +2,9 @@
 // (/toolkit/obligations-planner) and the obligation-to-evidence chain on the
 // /obligations/<id> pages. Three layers of checks:
 // 1. data (pure Node): every EU AI Act and GPAI row is mapped to roles; the
-//    per-class dates come from the register; the outside duties borrow the
-//    register's dates; the registry entry, budgets and house style hold;
+//    per-class dates come from the register; the importer, distributor and
+//    authorised-representative duties are register rows, so none sits outside
+//    it; the registry entry, budgets and house style hold;
 // 2. the pure core (public/toolkit/obligations-planner-core.js) run in Node on
 //    the model the built page ships in its JSON island: matching, dates,
 //    statuses, link codec and every export (Markdown, CSV, JSON against its
@@ -107,17 +108,19 @@ test.describe('planner data', () => {
     expect(art5.steps.map((s) => [s.date, s.startFor])).toEqual([['2026-12-02', []]]);
   });
 
-  test('the duties outside the register borrow the register dates', () => {
+  test('the importer, distributor and representative duties are register rows', () => {
+    // Arts. 22, 23, 24 and 54 were duties outside the register until v0.5.0.
+    expect(outsideDuties()).toEqual([]);
+    expect(plannerDuties['AIGE-OBL-EUAIA-ART22'].roles).toEqual(['provider', 'authorised-representative']);
+    expect(plannerDuties['AIGE-OBL-EUAIA-ART23'].roles).toEqual(['importer']);
+    expect(plannerDuties['AIGE-OBL-EUAIA-ART24'].roles).toEqual(['distributor']);
+    const art54 = plannerDuties['AIGE-OBL-EUAIA-ART54'];
+    expect(art54.roles).toEqual(['gpai-provider', 'gpai-systemic', 'authorised-representative']);
+    // The mandate, not a ticked class, says the model is a GPAI model.
+    expect(art54.anyClass).toEqual(['authorised-representative']);
     const art9 = rowTimeline(obligations.find((o) => o.id === 'AIGE-OBL-EUAIA-ART9')!);
-    const art53 = obligations.find((o) => o.id === 'AIGE-OBL-EUAIA-ART53')!;
-    const outside = outsideDuties();
-    expect(outside.map((d) => d.article)).toEqual(['Art. 22', 'Art. 23', 'Art. 24', 'Art. 54']);
-    for (const duty of outside.filter((d) => d.article !== 'Art. 54')) {
-      expect(duty.starts).toEqual(art9.starts);
-    }
-    expect(outside.find((d) => d.article === 'Art. 54')!.starts).toEqual({ '*': art53.appliesFrom });
-    for (const duty of outside) {
-      expect(duty.url).toMatch(/^https:\/\/eur-lex\.europa\.eu\/eli\/reg\/2024\/1689\/2026-07-27\/eng#art_\d+$/);
+    for (const id of ['AIGE-OBL-EUAIA-ART22', 'AIGE-OBL-EUAIA-ART23', 'AIGE-OBL-EUAIA-ART24']) {
+      expect(rowTimeline(obligations.find((o) => o.id === id)!).starts, id).toEqual(art9.starts);
     }
   });
 
@@ -238,34 +241,51 @@ test.describe('planner core', () => {
   test('GPAI roles carry the GPAI rows, the systemic ones only for systemic risk', async ({ request }) => {
     const model = await shippedModel(request);
     const plain = ids(planFor(model, { roles: ['gpai-provider'], classes: [], ref: '2026-09-24' }));
-    expect(plain).toEqual(['AIGE-OBL-EUAIA-ART53', 'AIGE-OBL-GPAICOP-TRANSPARENCY', 'AIGE-OBL-GPAICOP-COPYRIGHT']);
+    expect(plain).toEqual([
+      'AIGE-OBL-EUAIA-ART53',
+      'AIGE-OBL-EUAIA-ART53-1C',
+      'AIGE-OBL-EUAIA-ART54',
+      'AIGE-OBL-EUAIA-ART87',
+      'AIGE-OBL-GPAICOP-TRANSPARENCY',
+      'AIGE-OBL-GPAICOP-COPYRIGHT',
+    ]);
     const systemic = ids(planFor(model, { roles: ['gpai-systemic'], classes: [], ref: '2026-09-24' }));
     expect(systemic).toEqual([
+      'AIGE-OBL-EUAIA-ART52',
       'AIGE-OBL-EUAIA-ART53',
+      'AIGE-OBL-EUAIA-ART53-1C',
+      'AIGE-OBL-EUAIA-ART54',
       'AIGE-OBL-EUAIA-ART55',
+      'AIGE-OBL-EUAIA-ART87',
       'AIGE-OBL-GPAICOP-SAFETY',
       'AIGE-OBL-GPAICOP-TRANSPARENCY',
       'AIGE-OBL-GPAICOP-COPYRIGHT',
+      'AIGE-OBL-GPAICOP-SAFETY-C9',
+      'AIGE-OBL-GPAICOP-SAFETY-APP1',
     ]);
     const plan = planFor(model, { roles: ['gpai-systemic'], classes: [], ref: '2026-09-24' });
     expect(plan.items.find((i) => i.row.id === 'AIGE-OBL-GPAICOP-SAFETY')!.status.key).toBe('voluntary');
   });
 
-  test('importers, distributors and representatives get Art. 25 and the outside duties', async ({ request }) => {
+  test('importers, distributors and representatives get their own rows and Art. 25', async ({ request }) => {
     const model = await shippedModel(request);
     const importer = planFor(model, { roles: ['importer'], classes: ['high-risk-annex-iii'], ref: '2026-09-24' });
-    expect(ids(importer)).toEqual(['AIGE-OBL-EUAIA-ART25']);
-    expect(importer.items[0].notes[0]).toContain('Art. 25(1)');
-    expect(importer.outside.map((o) => [o.duty.article, o.start])).toEqual([['Art. 23', '2027-12-02']]);
+    expect(ids(importer)).toEqual(['AIGE-OBL-EUAIA-ART87', 'AIGE-OBL-EUAIA-ART23', 'AIGE-OBL-EUAIA-ART25']);
+    expect(importer.items.find((i) => i.row.id === 'AIGE-OBL-EUAIA-ART23')!.start).toBe('2027-12-02');
+    expect(importer.items.find((i) => i.row.id === 'AIGE-OBL-EUAIA-ART25')!.notes[0]).toContain('Art. 25(1)');
+    expect(importer.outside).toEqual([]);
+    // With no class ticked, a distributor keeps only the duty every legal entity has.
     const none = planFor(model, { roles: ['distributor'], classes: [], ref: '2026-09-24' });
-    expect(none.items).toEqual([]);
+    expect(ids(none)).toEqual(['AIGE-OBL-EUAIA-ART87']);
     expect(none.outside).toEqual([]);
     const rep = planFor(model, { roles: ['authorised-representative'], classes: ['high-risk-annex-i'], ref: '2026-09-24' });
-    expect(rep.outside.map((o) => [o.duty.article, o.start])).toEqual([
-      ['Art. 22', '2028-08-02'],
-      ['Art. 54', '2025-08-02'],
+    expect(rep.items.map((i) => [i.row.id, i.start])).toEqual([
+      ['AIGE-OBL-EUAIA-ART54', '2025-08-02'],
+      ['AIGE-OBL-EUAIA-ART87', '2026-08-02'],
+      ['AIGE-OBL-EUAIA-ART22', '2028-08-02'],
     ]);
-    expect(rep.outside[1].status.key).toBe('applies');
+    expect(rep.items[0].status.key).toBe('applies');
+    expect(rep.items[0].notes[0]).toContain('Art. 54(6)');
   });
 
   test('statuses are read on the reference date, not copied', async ({ request }) => {
@@ -303,7 +323,8 @@ test.describe('planner core', () => {
     expect(md).toContain(`> ${NOTICE}`);
     expect(md).toContain(`> ${AID}`);
     expect(md).toContain('- [ ] **EU AI Act Art. 9 risk management system** (`AIGE-OBL-EUAIA-ART9`)');
-    expect(md).toContain('## Duties outside the register');
+    expect(md).toContain('(`AIGE-OBL-EUAIA-ART23`)');
+    expect(md).not.toContain('## Duties outside the register');
     expect(md).toContain(`Plan link: ${link}`);
     expect(md).not.toContain('—');
 
@@ -376,7 +397,8 @@ test.describe('planner without JavaScript', () => {
     await expect(page.locator('input[name="class"]')).toHaveCount(plannerClasses.length);
     await expect(page.locator('.opl-worksheet tbody tr')).toHaveCount(plannerRows().length);
     await expect(page.locator('#opl-by-hand')).toBeVisible();
-    await expect(page.locator('#opl-outside-guide')).toBeVisible();
+    // No duty sits outside the register, so the guide to them is not drawn.
+    await expect(page.locator('#opl-outside-guide')).toHaveCount(0);
     await expect(page.locator('[data-opl-result]')).toBeHidden();
     await expect(page.getByRole('button', { name: 'Show my obligations', exact: true })).toBeHidden();
   });
@@ -420,14 +442,14 @@ test.describe('planner', () => {
     expect(page.url()).toContain('c=h3.tr');
   });
 
-  test('restores a plan from the link, including the outside duties', async ({ page }) => {
+  test('restores a plan from the link, including the importer rows', async ({ page }) => {
     await page.goto(`${TOOL}#v=1&r=im&c=h3&d=2026-09-24`);
     const result = page.locator('[data-opl-result]');
     await expect(result).toBeVisible();
     await expect(page.locator('#opl-role-im')).toBeChecked();
-    await expect(result.locator('[data-opl-rows] tr')).toHaveCount(1);
-    await expect(result.locator('[data-opl-outside-duty="art23"]')).toContainText('Obligations of importers');
-    await expect(result.locator('[data-opl-outside-duty="art23"] a')).toHaveAttribute('href', /#art_23$/);
+    await expect(result.locator('[data-opl-rows] tr')).toHaveCount(3);
+    await expect(result.locator('[data-opl-row="AIGE-OBL-EUAIA-ART23"]')).toContainText('importers');
+    await expect(result.locator('[data-opl-outside]')).toBeHidden();
 
     await page.goto(`${TOOL}#v=1&r=gs`);
     await expect(result.locator('[data-opl-row="AIGE-OBL-EUAIA-ART55"]')).toBeVisible();

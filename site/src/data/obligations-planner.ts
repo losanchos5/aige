@@ -2,16 +2,16 @@
 // planner reads the EU AI Act and GPAI Code of Practice rows of the obligation
 // register (src/data/frameworks.ts) and adds only what a row cannot say by
 // itself: which of the seven EU operator roles a row binds (its `dutyHolder`
-// is free text), the role-specific condition where the Act narrows a duty to
-// some holders of a role, and the four role duties the register does not hold
-// as rows yet (Arts. 22, 23, 24 and 54). Every addition cites the consolidated
-// text of Regulation (EU) 2024/1689 (EUR-Lex, 2026-07-27), read on 2026-09-24,
-// or chapter 18, which cites the same text.
+// is free text) and the role-specific condition where the Act narrows a duty
+// to some holders of a role. Every addition cites the consolidated text of
+// Regulation (EU) 2024/1689 (EUR-Lex, 2026-07-27), read on 2026-09-24, or
+// chapter 18, which cites the same text. The importer, distributor and
+// authorised-representative duties (Arts. 22, 23, 24 and 54) sat outside the
+// register until the v0.5.0 register gave them rows; `outsideDuties()` stays
+// for any role duty the register does not hold yet.
 //
 // Dates are never restated here: a row's dates are its own `appliesFrom` and
-// `milestones`, and the four outside duties borrow them from the register rows
-// of the same chapter of the Act (Art. 113(b) and (c)), so a date that moves in
-// frameworks.ts moves in the planner.
+// `milestones`, so a date that moves in frameworks.ts moves in the planner.
 //
 // `plannerRows()` throws at build time when an EU AI Act or GPAI row has no
 // entry in `plannerDuties`, or an entry names a row that does not exist, so a
@@ -155,11 +155,31 @@ export interface RowDuty {
   classes?: readonly SystemClass[];
   /** A role-specific condition, where the Act narrows the duty for that role. */
   notes?: Readonly<Partial<Record<PlannerRoleId, string>>>;
+  /** Roles the row binds whatever class the reader ticks: the role itself
+   *  says what the model is (an authorised representative's mandate from a
+   *  general-purpose AI model provider, Art. 54). */
+  anyClass?: readonly PlannerRoleId[];
 }
 
 const P: readonly PlannerRoleId[] = ['provider'];
 const PD: readonly PlannerRoleId[] = ['provider', 'deployer'];
+const D: readonly PlannerRoleId[] = ['deployer'];
 const GPAI: readonly PlannerRoleId[] = ['gpai-provider', 'gpai-systemic'];
+const ALL_ROLES: readonly PlannerRoleId[] = [
+  'provider',
+  'deployer',
+  'importer',
+  'distributor',
+  'authorised-representative',
+  'gpai-provider',
+  'gpai-systemic',
+];
+
+const APPOINT_NOTE = (article: string, what: string) =>
+  `Only if you are established outside the Union: before ${what}, appoint by written mandate an authorised representative established in the Union (${article}).`;
+
+const ART87_NOTE =
+  'Through Directive (EU) 2019/1937 (Art. 87): if you are a legal entity with 50 or more workers, your internal reporting channel also takes reports of AI Act infringements, and the people who report them are protected.';
 
 const ART25_NOTE =
   'Only if you put your name or trademark on a high-risk system already on the market, make a substantial modification that keeps it high-risk, or change its intended purpose so it becomes high-risk: you then become its provider, with the Art. 16 duties (Art. 25(1)).';
@@ -170,10 +190,12 @@ const ART25_NOTE =
  * condition from the Act is in `notes` (chapter 18 and the consolidated text).
  */
 export const plannerDuties: Readonly<Record<string, RowDuty>> = {
+  'AIGE-OBL-EUAIA-ART3-1': { roles: PD },
   'AIGE-OBL-EUAIA-ART4': { roles: PD },
   'AIGE-OBL-EUAIA-ART4A': { roles: P },
   'AIGE-OBL-EUAIA-ART5': { roles: PD },
   'AIGE-OBL-EUAIA-ART6': { roles: P },
+  'AIGE-OBL-EUAIA-ART6-3': { roles: P },
   'AIGE-OBL-EUAIA-ART9': { roles: P },
   'AIGE-OBL-EUAIA-ART10': { roles: P },
   'AIGE-OBL-EUAIA-ART11': { roles: P },
@@ -181,7 +203,23 @@ export const plannerDuties: Readonly<Record<string, RowDuty>> = {
   'AIGE-OBL-EUAIA-ART13': { roles: P },
   'AIGE-OBL-EUAIA-ART14': { roles: P },
   'AIGE-OBL-EUAIA-ART15': { roles: P },
+  'AIGE-OBL-EUAIA-ART15-4': { roles: P },
+  'AIGE-OBL-EUAIA-ART16-L': { roles: P },
   'AIGE-OBL-EUAIA-ART17': { roles: P },
+  'AIGE-OBL-EUAIA-ART17-1M': { roles: P },
+  'AIGE-OBL-EUAIA-ART18': { roles: P },
+  'AIGE-OBL-EUAIA-ART19': { roles: P },
+  'AIGE-OBL-EUAIA-ART20': { roles: P },
+  'AIGE-OBL-EUAIA-ART22': {
+    roles: ['provider', 'authorised-representative'],
+    notes: {
+      provider: APPOINT_NOTE('Art. 22(1)', 'making the system available'),
+      'authorised-representative':
+        'Perform the mandate: verify the declaration of conformity, the technical documentation and the conformity assessment, keep them for 10 years, cooperate with the authorities, and end the mandate if the provider acts contrary to its obligations (Art. 22(3)).',
+    },
+  },
+  'AIGE-OBL-EUAIA-ART23': { roles: ['importer'] },
+  'AIGE-OBL-EUAIA-ART24': { roles: ['distributor'] },
   'AIGE-OBL-EUAIA-ART25': {
     roles: ['provider', 'deployer', 'importer', 'distributor'],
     notes: {
@@ -192,7 +230,25 @@ export const plannerDuties: Readonly<Record<string, RowDuty>> = {
       distributor: ART25_NOTE,
     },
   },
-  'AIGE-OBL-EUAIA-ART26': { roles: ['deployer'] },
+  'AIGE-OBL-EUAIA-ART26': { roles: D },
+  'AIGE-OBL-EUAIA-ART26-2': { roles: D },
+  'AIGE-OBL-EUAIA-ART26-4': { roles: D },
+  'AIGE-OBL-EUAIA-ART26-5': { roles: D },
+  'AIGE-OBL-EUAIA-ART26-6': { roles: D },
+  'AIGE-OBL-EUAIA-ART26-7': {
+    roles: D,
+    notes: {
+      deployer:
+        'Only deployers who are employers, before putting the system into service or using it at the workplace: inform the workers’ representatives and the affected workers (Art. 26(7)).',
+    },
+  },
+  'AIGE-OBL-EUAIA-ART26-11': {
+    roles: D,
+    notes: {
+      deployer:
+        'Only where the system makes, or assists in making, decisions about natural persons: inform them that they are subject to its use (Art. 26(11)).',
+    },
+  },
   'AIGE-OBL-EUAIA-ART27': {
     roles: ['deployer'],
     notes: {
@@ -201,7 +257,9 @@ export const plannerDuties: Readonly<Record<string, RowDuty>> = {
     },
   },
   'AIGE-OBL-EUAIA-ART43': { roles: P },
+  'AIGE-OBL-EUAIA-ART43-4': { roles: P },
   'AIGE-OBL-EUAIA-ART47': { roles: P },
+  'AIGE-OBL-EUAIA-ART48': { roles: P },
   'AIGE-OBL-EUAIA-ART49-71': {
     roles: ['provider', 'deployer', 'authorised-representative'],
     notes: {
@@ -220,7 +278,19 @@ export const plannerDuties: Readonly<Record<string, RowDuty>> = {
         'Art. 50(3) and 50(4): inform people exposed to emotion recognition or biometric categorisation, and disclose deep fakes and AI text published to inform the public.',
     },
   },
+  'AIGE-OBL-EUAIA-ART52': { roles: GPAI },
   'AIGE-OBL-EUAIA-ART53': { roles: GPAI },
+  'AIGE-OBL-EUAIA-ART53-1C': { roles: GPAI },
+  'AIGE-OBL-EUAIA-ART54': {
+    roles: [...GPAI, 'authorised-representative'],
+    anyClass: ['authorised-representative'],
+    notes: {
+      'gpai-provider': APPOINT_NOTE('Art. 54(1)', 'placing the model on the market'),
+      'gpai-systemic': APPOINT_NOTE('Art. 54(1)', 'placing the model on the market'),
+      'authorised-representative':
+        'Only when the mandate comes from a provider of a general-purpose AI model established outside the Union: verify the Annex XI documentation and the Art. 53 (and, where applicable, Art. 55) duties, keep the documentation for 10 years and cooperate with the AI Office. Free and open-source models that publish their parameters are exempt unless they present systemic risks (Art. 54(6)).',
+    },
+  },
   'AIGE-OBL-EUAIA-ART55': { roles: ['gpai-systemic'] },
   'AIGE-OBL-EUAIA-ART60': {
     roles: P,
@@ -231,7 +301,22 @@ export const plannerDuties: Readonly<Record<string, RowDuty>> = {
   },
   'AIGE-OBL-EUAIA-ART72': { roles: P },
   'AIGE-OBL-EUAIA-ART73': { roles: P },
+  'AIGE-OBL-EUAIA-ART73-6': { roles: P },
+  'AIGE-OBL-EUAIA-ART75-1A': {
+    roles: P,
+    notes: {
+      provider:
+        'Only for systems under the AI Office’s exclusive competence: systems based on a general-purpose AI model from the same provider or undertaking (with the exceptions of Art. 75(1)(a)), and systems that are or sit in a very large online platform or search engine (Art. 75(1)).',
+    },
+  },
+  'AIGE-OBL-EUAIA-ART86': { roles: D },
+  'AIGE-OBL-EUAIA-ART87': {
+    roles: ALL_ROLES,
+    notes: Object.fromEntries(ALL_ROLES.map((role) => [role, ART87_NOTE])),
+  },
   'AIGE-OBL-GPAICOP-SAFETY': { roles: ['gpai-systemic'], classes: ['gpai-systemic'] },
+  'AIGE-OBL-GPAICOP-SAFETY-C9': { roles: ['gpai-systemic'], classes: ['gpai-systemic'] },
+  'AIGE-OBL-GPAICOP-SAFETY-APP1': { roles: ['gpai-systemic'], classes: ['gpai-systemic'] },
   'AIGE-OBL-GPAICOP-TRANSPARENCY': { roles: GPAI, classes: ['gpai'] },
   'AIGE-OBL-GPAICOP-COPYRIGHT': { roles: GPAI, classes: ['gpai'] },
 };
@@ -298,15 +383,6 @@ export function rowTimeline(row: Obligation): RowTimeline {
   return { classes, starts, steps };
 }
 
-/** The start date a class carries in a register row (throws if absent), so
- *  the outside duties borrow their dates from the register. */
-function startOf(id: string, systemClass: SystemClass): string {
-  const row = obligations.find((o) => o.id === id);
-  const date = row ? rowTimeline(row).starts[systemClass] : undefined;
-  if (!date) throw new Error(`obligations-planner: ${id} has no start date for ${systemClass}`);
-  return date;
-}
-
 /** A role duty the register does not hold as a row yet. */
 export interface OutsideDuty {
   id: string;
@@ -331,60 +407,12 @@ export interface OutsideDuty {
 export const AI_ACT_CONSOLIDATED = 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng';
 
 /**
- * Arts. 22, 23 and 24 sit in Chapter III, Section 3, which applies from
- * 2 Dec 2027 for Annex III systems and 2 Aug 2028 for Annex I systems
- * (Art. 113(c)); Art. 54 sits in Chapter V, which applies from 2 Aug 2025
- * (Art. 113(b)). The dates are read from the Art. 9 and Art. 53 rows, which
- * sit in the same chapters.
+ * Role duties the register does not hold as rows. Empty since v0.5.0: the
+ * register carries Arts. 22, 23, 24 and 54 as rows (AIGE-OBL-EUAIA-ART22, -ART23,
+ * -ART24 and -ART54), mapped in `plannerDuties` above. A duty added here takes
+ * its dates from the register row of the same chapter of the Act (Art. 113),
+ * never a typed date.
  */
 export function outsideDuties(): OutsideDuty[] {
-  const highRisk = {
-    'high-risk-annex-iii': startOf('AIGE-OBL-EUAIA-ART9', 'high-risk-annex-iii'),
-    'high-risk-annex-i': startOf('AIGE-OBL-EUAIA-ART9', 'high-risk-annex-i'),
-  };
-  return [
-    {
-      id: 'art22',
-      roles: ['authorised-representative'],
-      article: 'Art. 22',
-      title: 'Authorised representative of a high-risk system provider',
-      duty: 'Perform the mandate: verify that the EU declaration of conformity and the technical documentation exist and that the conformity assessment was carried out; keep them and the provider contact details for 10 years; cooperate with the authorities; end the mandate if the provider acts contrary to its obligations.',
-      artefact: 'Mandate; document copies',
-      starts: highRisk,
-      url: `${AI_ACT_CONSOLIDATED}#art_22`,
-    },
-    {
-      id: 'art23',
-      roles: ['importer'],
-      article: 'Art. 23',
-      title: 'Obligations of importers',
-      duty: 'Before placing a high-risk system on the market, verify the conformity assessment, the technical documentation, the CE marking, the declaration and instructions, and the appointed authorised representative; hold back a system you consider non-conforming; keep copies for 10 years.',
-      artefact: 'Import verification record',
-      starts: highRisk,
-      url: `${AI_ACT_CONSOLIDATED}#art_23`,
-    },
-    {
-      id: 'art24',
-      roles: ['distributor'],
-      article: 'Art. 24',
-      title: 'Obligations of distributors',
-      duty: 'Before making a high-risk system available, verify the CE marking, the declaration of conformity and the instructions for use, and that the provider and importer met their marking duties; hold back a system you consider non-conforming.',
-      artefact: 'Distribution check record',
-      starts: highRisk,
-      url: `${AI_ACT_CONSOLIDATED}#art_24`,
-    },
-    {
-      id: 'art54',
-      roles: ['authorised-representative'],
-      article: 'Art. 54',
-      title: 'Authorised representative of a GPAI model provider',
-      duty: 'Perform the mandate: verify the Annex XI technical documentation and the Art. 53 (and, where applicable, Art. 55) duties; keep the documentation for 10 years at the disposal of the AI Office; cooperate with it; end the mandate if the provider acts contrary to its obligations.',
-      artefact: 'Mandate; document copies',
-      // The mandate, not a ticked class, says the model is a GPAI model.
-      starts: { '*': startOf('AIGE-OBL-EUAIA-ART53', 'gpai') },
-      condition:
-        'When the mandate comes from a provider of a general-purpose AI model established outside the Union; free and open-source models that publish their parameters are exempt unless they present systemic risks (Art. 54(6)).',
-      url: `${AI_ACT_CONSOLIDATED}#art_54`,
-    },
-  ];
+  return [];
 }

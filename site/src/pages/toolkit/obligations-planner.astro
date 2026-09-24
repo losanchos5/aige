@@ -154,6 +154,7 @@ const data = {
       statusLabel: appliesStatusLabels[row.appliesStatus],
       reviewed: row.reviewed,
       roles: duty.roles,
+      anyClass: duty.anyClass ?? [],
       notes: duty.notes ?? {},
       classes: timeline.classes,
       starts: timeline.starts,
@@ -275,6 +276,10 @@ const sources = [
         }
       </ul>
     </fieldset>
+    <p class="tool-hint opl-triage">
+      Not sure of your roles and classes? <a href="/toolkit/ai-act-triage">Run the triage</a>: it
+      asks chapter 18's questions and hands its answer to this planner.
+    </p>
 
     <div class="tool-field opl-date">
       <label for="opl-date">Reference date (optional)</label>
@@ -500,34 +505,40 @@ const sources = [
       }
     </ul>
 
-    <h2 id="opl-outside-guide">Duties outside the register</h2>
-    <p>
-      The register maps the provider, deployer and GPAI duties. The importer, distributor and
-      authorised-representative duties are not rows yet, so the planner lists them from the Act
-      itself <a href="#src-1" class="cite">[1]</a>, with the dates of the chapter they sit in:
-      Chapter III, Section 3 for Arts. 22 to 24 and Chapter V for Art. 54 (<code
-        >Art. 113(b)</code
-      >, <code>(c)</code>).
-    </p>
-    <ul>
-      {
-        outside.map((duty) => (
-          <li>
-            <strong>
-              <a href={duty.url} rel="noopener">
-                {duty.article}
-              </a>{' '}
-              {duty.title}
-            </strong>{' '}
-            ({duty.roles.map((id) => roleLabel.get(id)).join(', ')}; from{' '}
-            {Object.entries(duty.starts)
-              .map(([c, date]) => (c === '*' ? date : `${date} for ${classLabels[c] ?? c}`))
-              .join(', ')}
-            ). {duty.duty} Record: {duty.artefact}.{duty.condition ? ` ${duty.condition}` : ''}
-          </li>
-        ))
-      }
-    </ul>
+    {
+      /* Role duties the register does not hold as rows. None since v0.5.0: the
+         register carries the importer, distributor and authorised-representative
+         duties (Arts. 22, 23, 24 and 54) as rows, so the guide renders only when
+         a duty sits outside it again. */
+      outside.length > 0 && (
+        <Fragment>
+          <h2 id="opl-outside-guide">Duties outside the register</h2>
+          <p>
+            The register does not hold these role duties as rows yet, so the planner lists them
+            from the Act itself <a href="#src-1" class="cite">[1]</a>, with the dates of the
+            chapter they sit in (<code>Art. 113</code>).
+          </p>
+          <ul>
+            {outside.map((duty) => (
+              <li>
+                <strong>
+                  <a href={duty.url} rel="noopener">
+                    {duty.article}
+                  </a>{' '}
+                  {duty.title}
+                </strong>{' '}
+                ({duty.roles.map((id) => roleLabel.get(id)).join(', ')}; from{' '}
+                {Object.entries(duty.starts)
+                  .map(([c, date]) => (c === '*' ? date : `${date} for ${classLabels[c] ?? c}`))
+                  .join(', ')}
+                ). {duty.duty} Record: {duty.artefact}.
+                {duty.condition ? ` ${duty.condition}` : ''}
+              </li>
+            ))}
+          </ul>
+        </Fragment>
+      )
+    }
 
     <h2 id="opl-by-hand">By hand, without JavaScript</h2>
     <ol>

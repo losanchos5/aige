@@ -29,7 +29,7 @@ import {
   type SystemClass,
   obligationPath,
 } from '../data/frameworks';
-import { patterns, patternPath } from '../data/patterns';
+import { patterns, patternPath, getPatternBySlug } from '../data/patterns';
 import { topics, columns, refs, chipLabel, refObligation } from '../data/crosswalk';
 import { levels } from '../data/maturity';
 import { stages, nodes, entries } from '../data/path';
@@ -61,7 +61,6 @@ import {
   atlasMitigationNames,
   THREATS_AS_OF,
 } from '../data/threats';
-import { getPatternBySlug, patternPath } from '../data/patterns';
 import { obligationById } from '../data/frameworks';
 import { getGlossary, termId } from './glossary';
 import { sourceText } from './sources';
