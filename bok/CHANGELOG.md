@@ -4,6 +4,37 @@ All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledg
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
 
+## Unreleased (v0.5.0)
+
+### Added
+- Crosswalk v2 (`site/src/data/crosswalk.ts`, `/resources/crosswalk`): 25 topics (the twelve v0.4
+  topics keep their ids and `#topic-<id>` anchors; new: prohibited practices, fairness and
+  non-discrimination, privacy and data protection, explainability and right to explanation, AI
+  literacy and competence, conformity assessment and certification, GPAI and foundation models, IP
+  and copyright, agent identity and autonomy, content provenance and deepfakes, sandboxes and
+  real-world testing, environmental impact, deployment, change and decommissioning) and 14 columns
+  (new: GPAI Code of Practice, GDPR, ISO/IEC 42005 · 23894 · 42006, CSA AICM by control id, OWASP LLM
+  2026 and Agentic 2026 ids, Korea AI Basic Act, United Kingdom (UK GDPR Arts. 22A to 22D and ATRS
+  v4.0), Singapore (generative and agentic frameworks), treaty and soft law (CoE CETS No. 225, OECD,
+  G7 Code), CEN-CENELEC). 493 references, every `crosswalk` entry of the chapter 11 to 22 and
+  harms-atlas handoffs included; each keeps `strength`, an honest `verified` flag (28 stay unverified
+  with a note: ISO/IEC clauses whose text could not be opened, the prEN drafts and two GDPR articles
+  read only secondarily) and a URL; references checked as of 2026-09-24.
+- Column chooser on the crosswalk grid: the four v0.4 columns show by default, any other column on
+  demand, remembered per browser; every column shows without JavaScript.
+- Clause-to-clause explorer (`/resources/crosswalk#explore`, `public/crosswalk-explorer.js`): source
+  frameworks and a target side by side per topic, a gap view (target clauses no chosen source
+  reaches), topic and verified-only filters, a shareable URL fragment, and downloads of the selection
+  as CSV, JSON and an OSCAL 1.2.3 mapping collection (NIST Control Mapping model; relationship
+  `intersects-with`, gap summaries). Every export says "illustrative, not a claim of conformity"
+  inside the file.
+
+### Changed
+- `/resources/crosswalk.json` and `/resources/crosswalk.csv` move to schema version 2 at the same
+  URLs: the JSON adds `schemaVersion`, `asOf`, `columns`, `frameworks`, topic `read` links and, per
+  reference, `clauseId`, `column`, `frameworkShort` and `see`; the CSV keeps its nine columns in
+  order and appends topic, framework, column and clause ids and the BoK section.
+
 ## [Unreleased] - 2026-09-20
 
 Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the
