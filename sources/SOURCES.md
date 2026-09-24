@@ -2028,3 +2028,58 @@ Commission's AI Act Service Desk, and the Omnibus changes come from chapter 18's
 | 22 | OECD AI Principles 1.1 to 1.5 (the 2024 revision adds sustainability, safe decommissioning, and traceability and risk management under accountability) | Chapter 22 row [7] (OECD/LEGAL/0449) | OECD (via chapter 22) | 2024-05-03 | https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449 | primary | Crosswalk treaty and soft-law column |
 | 23 | G7 Hiroshima Code of Conduct, Actions 1 to 11 (e.g. 7 content authentication and provenance; 11 data input, personal data and IP) | Chapter 22 rows (Hiroshima Process International Code of Conduct for Advanced AI Systems) | European Commission (via chapter 22) | 2023-10-30 | https://digital-strategy.ec.europa.eu/en/library/hiroshima-process-international-code-conduct-advanced-ai-systems | primary | Crosswalk treaty and soft-law column |
 | 24 | JTC 21 stages as of 2026-09-24: EN 18286:2026 published (60.60); prEN 18228 and prEN 18229-1 at Enquiry (40.60); no JTC 21 deliverable cited in the OJ | Chapter 22 rows [52] and [54] | Genorma; CEN-CENELEC (via chapter 22) | 2026-09-24 | https://genorma.com/en/standards/pren-18228 | secondary | Crosswalk CEN-CENELEC column (prEN refs unverified) |
+
+## site/src/data/audiences.ts (audience hubs, BoK v0.5.0)
+
+Block w2-hubs. Each hub under `/for/<slug>` answers three questions in brief and numbers its own
+sources; the table below lists them per hub, in the hub's order. The EU AI Act is cited to the
+consolidated EUR-Lex text of 27 July 2026, the Omnibus to its Official Journal ELI; article wording
+checked on 2026-09-24 against EUR-Lex, the Commission's AI Act Service Desk and chapter 18's rows.
+Application dates are never typed in a hub: they render from the obligation register
+(`site/src/data/frameworks.ts`), and so does the home page's "What applies now" band
+(`site/src/lib/applies-now.ts`), which cites no source of its own. Obligation lists are
+illustrative, not a claim of conformity.
+
+### site/src/data/audiences.ts: /for/engineers
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | high-risk testing against prior defined metrics and probabilistic thresholds (Art. 9(8)); automatic recording of events over the lifetime (Art. 12(1)); deployer keeps the logs it controls for at least six months (Art. 26(6)) | Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 July 2026 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | Engineers hub, questions 2 and 3 |
+
+### site/src/data/audiences.ts: /for/ciso-risk
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | ten agentic threats, ASI01 to ASI10 | OWASP Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | CISO and risk hub, question 2 |
+| 2 | reporting of serious incidents (Art. 73) | Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 July 2026 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | CISO and risk hub, question 3 |
+| 3 | notification of a personal data breach (Art. 33) | Regulation (EU) 2016/679 (General Data Protection Regulation) | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary | CISO and risk hub, question 3 |
+| 4 | reporting obligations for significant incidents (Art. 23) | Directive (EU) 2022/2555 (NIS2) | Publications Office of the EU (EUR-Lex) | 2022-12-14 | https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng | primary | CISO and risk hub, question 3 |
+| 5 | reporting of major ICT-related incidents (Art. 19) | Regulation (EU) 2022/2554 (DORA) | Publications Office of the EU (EUR-Lex) | 2022-12-14 | https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng | primary | CISO and risk hub, question 3 |
+
+### site/src/data/audiences.ts: /for/legal-dpo
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | a deployer becomes provider on name or trademark, substantial modification or a change of intended purpose (Art. 25(1)); the FRIA complements a DPIA that already meets part of Art. 27 (Art. 27(4)); interaction notice and marking (Art. 50); notice to people subject to Annex III decisions (Art. 26(11)); right to an explanation (Art. 86) | Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 July 2026 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | Legal and DPO hub, questions 1 to 3 |
+| 2 | information and access rights, and automated individual decisions (Arts. 13 to 15 and 22) | Regulation (EU) 2016/679 (General Data Protection Regulation) | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary | Legal and DPO hub, question 3 |
+
+### site/src/data/audiences.ts: /for/executives-board
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | AI literacy (Art. 4) and prohibited practices (Art. 5) already apply; application dates (Art. 113) | Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 July 2026 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | Executives and boards hub, question 3 |
+| 2 | two new prohibitions, Art. 5(1)(ba) and (bb), from 2 December 2026; Annex III high-risk obligations from 2 December 2027 (dates rendered from the register) | Regulation (EU) 2026/1744 (Digital Omnibus on AI) | Publications Office of the EU (EUR-Lex) | 2026-07-24 | https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng | primary | Executives and boards hub, question 3 |
+
+### site/src/data/audiences.ts: /for/public-sector
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | FRIA before first use for bodies governed by public law and private entities providing public services, Annex III point 2 excepted (Art. 27(1)), complementing the DPIA (Art. 27(4)); registration by public-authority deployers (Arts. 26(8), 49); notice (Art. 26(11)) and explanation (Art. 86); legacy systems intended for public authorities comply by 2 August 2030 (Art. 111(2), date rendered from the register) | Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 July 2026 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | Public sector hub, questions 1 to 3 |
+| 2 | mandatory for government departments and for arm's-length bodies that deliver public or frontline services or deal directly with the public | Algorithmic Transparency Recording Standard hub | Government Digital Service (GOV.UK) | 2025-05-08 | https://www.gov.uk/government/collections/algorithmic-transparency-recording-standard-hub | primary | Public sector hub, question 2 |
+
+### site/src/data/audiences.ts: /for/smes
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | priority access to sandboxes for SMEs and start-ups (Art. 62(1)(a)); fines at the lower of the amount and the percentage (Art. 99(6)); deployers disclose deep fakes (Art. 50(4)) and assign oversight to people with the competence, training and authority (Art. 26(2)) | Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 July 2026 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | SMEs and start-ups hub, questions 2 and 3 |
+| 2 | simplified technical documentation for SMEs and SMCs (amended Art. 11(1)); QMS proportionate to the size of the provider, in particular an SME or SMC (amended Art. 17(2)) | Regulation (EU) 2026/1744 (Digital Omnibus on AI) | Publications Office of the EU (EUR-Lex) | 2026-07-24 | https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng | primary | SMEs and start-ups hub, question 2 |
