@@ -420,3 +420,17 @@ chapter and recorded once below._
 | 53 | 6.1 algorithmic impact assessment completed, approved and published on the Open Government Portal before production, updated on a schedule and when functionality or scope changes; 6.3.7 expert review; Appendix B impact levels defined by reversibility and duration | Directive on Automated Decision-Making | Treasury Board of Canada Secretariat | 2025-06-24 | https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=32592 | primary | Impact assessments compared; The technical file |
 | 54 | guidance for assessing impacts on individuals, groups and society throughout the life cycle, updated as needed; complements ISO/IEC 42001 and ISO/IEC 23894 | ISO/IEC 42005:2025, AI system impact assessment | ISO/IEC | 2025-05 | https://www.iso.org/standard/44545.html | primary | Impact assessments compared |
 | 55 | FRIA by deployers that are bodies governed by public law or private entities providing public services, and deployers of Annex III points 5(b) and (c), except point 2 systems; elements (a) to (f); results notified to the market surveillance authority; 27(4) relationship with the DPIA | EU AI Act Art. 27 | AI Act (Reg. (EU) 2024/1689) | 2024 | https://artificialintelligenceact.eu/article/27/ | primary | Impact assessments compared |
+
+## tools/reg-monitor/README.md
+
+Regulatory change monitor (block b-reg-monitor, v0.5.0). The pages the monitor watches are listed in
+`tools/reg-monitor/sources.json`; each is already cited, with its own row, under the chapter that
+uses it. The rows below support the README's claims about GitHub's own behaviour. Verified
+2026-09-24.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | Scheduled workflows run only on the default branch; the schedule event can be delayed at high load, including the start of every hour; in a public repository scheduled workflows are disabled when no repository activity has occurred in 60 days; notifications go to the user who last modified the cron syntax | Events that trigger workflows (`schedule`) | GitHub Docs | 2026 | https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows | primary | Monitor README (how it runs; known limits) |
+| 2 | Events triggered by the repository's `GITHUB_TOKEN` do not create a new workflow run, except `workflow_dispatch` and `repository_dispatch` | Triggering a workflow | GitHub Docs | 2026 | https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow | primary | Monitor README (state branch deploys nothing) |
+| 3 | GitHub Actions usage is free for self-hosted runners and for public repositories that use standard GitHub-hosted runners | GitHub Actions billing | GitHub Docs | 2026 | https://docs.github.com/en/billing/concepts/product-billing/github-actions | primary | Monitor README (cost) |
+| 4 | The REST API treats every pull request as an issue, identifiable by the `pull_request` key; `per_page` maximum 100 | REST API endpoints for issues | GitHub Docs | 2026 | https://docs.github.com/en/rest/issues/issues | primary | Monitor README (security); `lib/github.mjs` |
