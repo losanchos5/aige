@@ -120,6 +120,17 @@ a completed, reviewed core (1.0).
   next three dates with what each one switches on, computed from the obligation register at build
   time and linked to each `/obligations/<id>`, so a date drops out on the first build after it
   passes.
+- A read-only remote MCP server over the open data (`tools/mcp-server/`, to be deployed at
+  `https://mcp.aigovernanceengineer.com/mcp`): ten tools (`search_glossary`, `get_term`,
+  `get_obligations`, `get_obligation`, `map_clause`, `list_patterns`, `get_pattern`,
+  `list_templates`, `get_template`, `search_bok`) and the `/api/v1` datasets as resources, over
+  Streamable HTTP with the official TypeScript SDK v2 (protocol revision 2026-07-28, with a
+  stateless fallback for 2025-era clients). Every answer carries its source URL, the CC BY 4.0
+  licence and the notice "Illustrative, not legal advice and not a claim of conformity". It reads
+  the public API through a one-hour in-memory cache with conditional revalidation, keeps no data
+  about callers (no IPs, user agents or tool arguments in its logs; the rate limiter holds only
+  keyed hashes until each window closes) and ships a Dockerfile, a compose service, a Caddy site
+  block and connection instructions for Claude and other MCP clients.
 
 ### Changed
 - Chapter 08 and the register: the CSA row that named an "Agentic Control Supplement" now names what

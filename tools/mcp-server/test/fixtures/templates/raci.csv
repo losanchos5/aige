@@ -1,0 +1,24 @@
+activity,lifecycle_stage,record,board,ai_governance_committee,system_owner,ai_governance_engineer,engineering_team,data_owner,privacy_office,security,model_risk,legal,procurement,internal_audit,evidences
+Approve and review the AI policy,organisation,ai-policy.yaml,A,R,I,C,I,I,C,C,C,C,I,I,ISO/IEC 42001 5.2; NIST AI RMF GOVERN 1.2
+Record and classify a new use case,intake,use-case-record,,C,A,R,C,C,C,C,C,C,,,EU AI Act Art. 6; NIST AI RMF MAP 1.1
+Approve a high or critical tier use case,intake,use-case-record,I,A,R,C,,,C,C,C,C,,,ISO/IEC 42001 A.5
+Create and renew the register entry,intake,ai-system-register-entry,,,A,R,C,,,,,,,I,EU AI Act Art. 49; NIST AI RMF GOVERN 1.6
+Register an agent and issue its identity,intake,agent-register-entry,,,A,C,R,,,R,,,,,EU AI Act Art. 14; ISO/IEC 42001 A.9
+Run the impact assessment (AIIA or FRIA),intake,impact-assessment,,I,A,R,C,C,C,C,C,C,,,EU AI Act Art. 27; ISO/IEC 42005
+Run the DPIA addendum,intake,impact-assessment,,I,C,C,C,C,A,C,,C,,,GDPR Art. 35
+Assess a third-party AI product,intake,vendor-due-diligence-response,,I,C,C,C,,C,C,C,C,A,,EU AI Act Art. 25; ISO/IEC 42001 A.10
+Review the design,build,design-record,,,A,C,R,,C,C,C,,,,EU AI Act Art. 14; NIST AI RMF MAP 1.6
+Document and admit a dataset,build,dataset-card; dataset-admission-record,,,C,C,R,A,C,,,,,,EU AI Act Art. 10; ISO/IEC 42001 A.7
+Plan and run tests,test,test-plan; eval-result,,,A,C,R,,,C,C,,,,EU AI Act Art. 15; NIST AI RMF MEASURE 2.3
+Sign the test report (high and critical tiers),test,test-report,,,I,C,C,,,,A,,,,EU AI Act Annex IV(2)(g)
+Decide go or no-go,release,go-no-go,,C,A,R,C,,C,C,C,C,,I,NIST AI RMF MANAGE 1.1
+Write the instructions for use,release,instructions-for-use,,,A,C,R,,,,C,C,,,EU AI Act Art. 13
+Decide to deploy in a context,release,deployment-decision-record,,C,A,R,C,,C,C,,C,,,EU AI Act Art. 26
+Run post-market monitoring,operate,post-market-monitoring-plan,,I,A,R,R,,,,C,,,,EU AI Act Art. 72; NIST AI RMF MANAGE 4.1
+Maintain the risk register,operate,risk-register-entry,,C,A,R,C,,C,C,C,,,I,EU AI Act Art. 9; ISO/IEC 23894
+Handle an AI incident,operate,incident-record,I,C,A,R,R,,C,R,C,C,,I,EU AI Act Art. 73; NIST AI RMF MANAGE 4.3
+Accept residual risk above owner authority,operate,risk-register-entry,I,A,R,C,,,,,C,C,,,EU AI Act Art. 9(5); NIST AI RMF MANAGE 1.4
+Retire a system,retire,decommissioning-runbook,,I,A,R,R,C,C,R,,,,I,NIST AI RMF GOVERN 1.7
+Deliver AI literacy and role training,organisation,training-record,,A,C,R,,,C,C,,,,,EU AI Act Art. 4; ISO/IEC 42001 7.2
+Maintain policy cards and the policy engine,organisation,policy-card,,C,C,A,R,,,C,,,,I,ISO/IEC 42001 A.2; NIST AI RMF GOVERN 1.4
+Audit AI controls from the evidence store,organisation,evidence-record,I,I,C,C,,,,,,,,A,ISO/IEC 42001 9.2; ISO/IEC 42001 9.1
