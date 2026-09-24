@@ -44,8 +44,8 @@ escritor). La build solo se lanza con `bash D:/Documents/aige-wt/build.sh`. Hand
 
 - [x] 6.1 Reponer los lados descartados de `resources.spec.ts` (b-catalogues y b-data-crosswalk) y activar el test de canonical.
 - [x] 6.2 Alinear `nav.spec` (colecciones de detalle y redirecciones), `block-c`, `shell`, `seo-infra`, `data`, `llms`, `map-page`, `layout` y `lighthouserc`.
-- [ ] 6.3 Suite `default` completa en verde (puerto 4410).
-- [ ] 6.4 Suite `a11y` completa en verde.
-- [ ] 6.5 Suite `visual` ejecutada y capturas de las páginas nuevas revisadas a 390 y 1440.
-- [ ] 6.6 `lhci autorun` al final.
-- [ ] 6.7 `openspec validate integration-wave1 --strict` en verde.
+- [x] 6.3 Suite `default` completa en verde (puerto 4410).
+- [x] 6.4 Suite `a11y` completa en verde.
+- [x] 6.5 Suite `visual` ejecutada y capturas de las páginas nuevas revisadas a 390 y 1440.
+- [x] 6.6 `lhci autorun` al final.
+- [x] 6.7 `openspec validate integration-wave1 --strict` en verde.
