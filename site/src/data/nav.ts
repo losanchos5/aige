@@ -213,6 +213,11 @@ export const nav: NavGroup[] = [
         description: 'AI harms by level, each with its failure mode, control, evidence and incidents.',
       },
       {
+        label: 'Threat bridge',
+        href: '/resources/threats',
+        description: 'OWASP, MITRE ATLAS and NIST threat ids mapped to the pattern and test that answer each.',
+      },
+      {
         label: 'Cases',
         href: '/cases',
         description: 'Public AI incidents as post-mortems: which control would have caught them.',

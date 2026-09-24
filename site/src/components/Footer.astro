@@ -261,19 +261,33 @@ const about = byId('about');
     }
   }
 
-  /* Wide: one track per column (brand, Read and six link groups), so no group
-     wraps alone onto a second row. */
-  @media (min-width: 1100px) {
-    .sitemap {
-      grid-template-columns: 1.4fr repeat(7, minmax(max-content, 1fr));
-    }
-  }
-
   .col-brand {
     display: flex;
     flex-direction: column;
     gap: var(--s-3);
     max-width: 40ch;
+  }
+
+  /* Wide: the brand takes a row of its own (mark, blurb and its two links side
+     by side), then one track per link group (Read and six more), so no group
+     wraps alone onto a second row and the brand is never squeezed to a sliver
+     beside seven lists. */
+  @media (min-width: 1100px) {
+    .sitemap {
+      grid-template-columns: repeat(7, minmax(max-content, 1fr));
+    }
+
+    .sitemap > .col-brand {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: var(--s-6);
+      max-width: none;
+    }
+
+    .col-brand .blurb {
+      max-width: 60ch;
+    }
   }
 
   .blurb {
