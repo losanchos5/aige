@@ -72,7 +72,7 @@ que estar bien antes.
   crosswalk incluyen China y TC260; la cabecera de `patterns.ts` dice 17 patrones.
 - **Rayas.** Se eliminan las 586 líneas con U+2014 de los ficheros versionados (salvo `LICENSE` y
   `site/package-lock.json`, que no contienen ninguna); en código, las comparaciones y expresiones
-  regulares que necesitan el carácter usan el escape `—`.
+  regulares que necesitan el carácter usan el escape `\u2014`.
 - Fuera de alcance: los capítulos 11 a 23, el catálogo de herramientas (su fecha de revisión sigue en
   2026-09-19), las filas de China del capítulo 08 (sellos del 2026-09-20, no reverificadas una a una)
   y los ficheros compartidos (`chapters.ts`, `nav.ts`, `astro.config.ts`), cuyos cambios van en el
