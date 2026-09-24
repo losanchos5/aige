@@ -41,7 +41,7 @@
 }
 
 /* Framed like a card-lum for in-prose chapter/thesis figures. Scoped to .prose
-   so the hero loop (.hero--loop) and the enlarge dialog (appended to <body>)
+   so the hero loop (.loop-sec) and the enlarge dialog (appended to <body>)
    keep their own chrome. */
 .prose .diagram:not(.diagram--bare) .diagram-canvas {
   box-shadow: var(--shadow-1);
@@ -563,11 +563,11 @@
   }
 }
 
-/* ------------------------------------------ homepage hero loop (scoped) --- */
-/* The hero "governance loop" (public/hero.js) drives a travelling packet and a
+/* ------------------------------------------ homepage loop figure (scoped) --- */
+/* The home "governance loop" (public/hero.js) drives a travelling packet and a
    walking lit trail, so it needs a lit state that reads at a glance — heavier
    than the subtle in-prose highlight above. Everything here is scoped to
-   .hero--loop, so chapter/page diagrams keep the default look unchanged. */
+   .loop-sec, so chapter/page diagrams keep the default look unchanged. */
 
 /* Hover/focus note: taken out of flow and overlaid on the foot of the diagram,
    so opening it never changes the figure's height or the canvas position — the
@@ -576,7 +576,7 @@
    scrolls inside its cap rather than growing the figure. Lives here rather than
    in the page's scoped <style> because the note is injected via set:html and so
    carries no data-astro-cid for a scoped selector to match. */
-.hero--loop .diagram-note {
+.loop-sec .diagram-note {
   position: absolute;
   left: 0;
   bottom: 0;
@@ -604,37 +604,37 @@
    in ink lead; lane heads 500 in --muted; tags and edge labels regular.
    archify's kind sigils and graph-paper grid carry no meaning here and are
    dropped. */
-.hero--loop .diagram text[data-node-label] {
+.loop-sec .diagram text[data-node-label] {
   font-size: 16px;
   transform: translateY(10px);
 }
 
-.hero--loop .diagram text[data-detail='fine'] {
+.loop-sec .diagram text[data-detail='fine'] {
   font-size: 16px;
   transform: translateY(-10px);
 }
 
-.hero--loop .diagram [data-composition-frame-kind='stage'] + text {
+.loop-sec .diagram [data-composition-frame-kind='stage'] + text {
   font-size: 16px;
   font-weight: 500;
   fill: var(--muted);
 }
 
-.hero--loop .diagram g[data-edge-id] {
+.loop-sec .diagram g[data-edge-id] {
   transform-box: fill-box;
   transform-origin: center;
   transform: scale(2);
 }
 
-.hero--loop .diagram g[data-edge-id] > rect.c-mask {
+.loop-sec .diagram g[data-edge-id] > rect.c-mask {
   transform-box: fill-box;
   transform-origin: center;
   transform: scaleX(0.75);
 }
 
-.hero--loop .diagram text[data-detail='context'],
-.hero--loop .diagram .semantic-sigil,
-.hero--loop .diagram .c-grid {
+.loop-sec .diagram text[data-detail='context'],
+.loop-sec .diagram .semantic-sigil,
+.loop-sec .diagram .c-grid {
   display: none;
 }
 
@@ -642,21 +642,21 @@
    scale, so the text runs larger in user units. Its two lanes are the two
    columns of the loop: the law and the proof it gets back (left), the
    controls that turn one into the other (right). */
-.hero--loop svg[data-diagram='hero-loop-tall'] text[data-node-label] {
+.loop-sec svg[data-diagram='hero-loop-tall'] text[data-node-label] {
   font-size: 16.5px;
   transform: translateY(6.5px);
 }
 
-.hero--loop svg[data-diagram='hero-loop-tall'] text[data-detail='fine'] {
+.loop-sec svg[data-diagram='hero-loop-tall'] text[data-detail='fine'] {
   font-size: 16.5px;
   transform: translateY(-6.5px);
 }
 
-.hero--loop svg[data-diagram='hero-loop-tall'] [data-composition-frame-kind='stage'] + text {
+.loop-sec svg[data-diagram='hero-loop-tall'] [data-composition-frame-kind='stage'] + text {
   font-size: 16.5px;
 }
 
-.hero--loop svg[data-diagram='hero-loop-tall'] g[data-edge-id] {
+.loop-sec svg[data-diagram='hero-loop-tall'] g[data-edge-id] {
   transform: scale(2.1);
 }
 
@@ -667,42 +667,42 @@
    layer-ink rule and a layer-ink tag. The two nodes outside the stack (the
    law and the auditor, kind "external") keep the neutral ground-and-muted
    style. The lit state below still wins with its ink outline. */
-.hero--loop .diagram [data-node-tag='Layer 01'] {
+.loop-sec .diagram [data-node-tag='Layer 01'] {
   --layer: var(--l1);
   --layer-ink: var(--l1-ink);
 }
 
-.hero--loop .diagram [data-node-tag='Layer 02'] {
+.loop-sec .diagram [data-node-tag='Layer 02'] {
   --layer: var(--l2);
   --layer-ink: var(--l2-ink);
 }
 
-.hero--loop .diagram [data-node-tag='Layer 03'] {
+.loop-sec .diagram [data-node-tag='Layer 03'] {
   --layer: var(--l3);
   --layer-ink: var(--l3-ink);
 }
 
-.hero--loop .diagram [data-node-tag='Layer 04'] {
+.loop-sec .diagram [data-node-tag='Layer 04'] {
   --layer: var(--l4);
   --layer-ink: var(--l4-ink);
 }
 
-.hero--loop .diagram [data-node-tag='Layer 05'] {
+.loop-sec .diagram [data-node-tag='Layer 05'] {
   --layer: var(--l5);
   --layer-ink: var(--l5-ink);
 }
 
-.hero--loop .diagram [data-node-tag^='Layer '] rect:not(.c-mask) {
+.loop-sec .diagram [data-node-tag^='Layer '] rect:not(.c-mask) {
   fill: color-mix(in srgb, var(--layer) 72%, var(--bg));
   stroke: var(--layer-ink);
 }
 
-.hero--loop .diagram [data-node-tag^='Layer '] text[data-detail='fine'] {
+.loop-sec .diagram [data-node-tag^='Layer '] text[data-detail='fine'] {
   fill: var(--layer-ink);
 }
 
 /* Lit node: a heavier ink outline with a soft ink glow. */
-.hero--loop .diagram [data-node-id].is-lit rect:not(.c-mask) {
+.loop-sec .diagram [data-node-id].is-lit rect:not(.c-mask) {
   stroke: var(--ink);
   stroke-width: 2.5;
   filter: drop-shadow(0 0 6px color-mix(in srgb, var(--ink) 35%, transparent));
@@ -710,19 +710,19 @@
 
 /* Lit edge: the route <path> itself carries data-edge-id (no wrapping group),
    so stroke it directly — the shared `.is-lit text` rule lights the label. */
-.hero--loop .diagram path[data-edge-id].is-lit {
+.loop-sec .diagram path[data-edge-id].is-lit {
   stroke: var(--ink);
   stroke-width: 2.5;
 }
 
 /* The travelling packet, appended into the visible SVG by hero.js and moved
    along each edge with requestAnimationFrame. A small ink dot with a soft halo. */
-.hero--loop .diagram .hero-packet {
+.loop-sec .diagram .hero-packet {
   fill: var(--ink);
   filter: drop-shadow(0 0 5px color-mix(in srgb, var(--ink) 45%, transparent));
   pointer-events: none;
 }
 
-.hero--loop .diagram .hero-packet.is-hidden {
+.loop-sec .diagram .hero-packet.is-hidden {
   display: none;
 }

@@ -146,7 +146,7 @@ for (const path of REFLOW_PAGES) {
 // which every rem-sized token follows) the header's wordmark alone was wider
 // than the bar, so the page scrolled sideways to ~435px at 390 and the menu
 // button left the viewport. The bar now wraps; nothing in it may overflow.
-const TEXT200_PAGES = ['/thesis', '/bok/the-stack', '/role', '/resources/glossary', '/404'];
+const TEXT200_PAGES = ['/', '/thesis', '/bok/the-stack', '/role', '/resources/glossary', '/404'];
 
 for (const path of TEXT200_PAGES) {
   test(`header holds with text at 200% on ${path} at 390px`, async ({ page }) => {

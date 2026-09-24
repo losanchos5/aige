@@ -352,11 +352,12 @@
 /* --muted drops below AA over the gradient mesh too (12px mono labels on the
    glows: kicker, breadcrumb, .meta, hero notes), as it does on .sec--tint.
    Re-scope it to --ink-2 on every mesh-backed surface: mesh sections, the page
-   heroes and the home hero with its panel. --ink-2 follows the theme, so one
-   rule serves light and dark. Leaves the mesh itself untouched. */
+   heroes, the home hero's gradient field and the loop figure's panel. --ink-2
+   follows the theme, so one rule serves light and dark. Leaves the mesh itself
+   untouched. */
 .sec--mesh,
 .hero--page,
-.hero--loop,
+.hero--field,
 .hero-panel {
   --muted: var(--ink-2);
 }

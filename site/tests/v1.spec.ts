@@ -67,6 +67,11 @@ test.describe('hero loop', () => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
     const lit = page.locator('.hero-art-wide [data-node-id].is-lit');
+    // The figure sits in the loop section under the full-viewport hero, and
+    // the pass waits until it is on screen.
+    await page.waitForTimeout(1600);
+    await expect(lit).toHaveCount(0);
+    await page.locator('.hero-art').scrollIntoViewIfNeeded();
     // The pass starts after the draw-on settles (~1.4s) then lights a node
     // every ~0.7s; at least one node is lit well inside the window.
     await expect.poll(async () => lit.count(), { timeout: 6000 }).toBeGreaterThanOrEqual(1);
