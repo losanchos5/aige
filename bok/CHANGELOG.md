@@ -90,6 +90,23 @@ a completed, reviewed core (1.0).
   SVG or PNG image; saves profiles in the browser and compares two. `site/src/data/maturity.ts` gains
   the chapter's criteria table, metrics per level, checklist and typical failures as data (additive;
   no heading changed).
+- **Obligations and deadlines planner** (`/toolkit/obligations-planner`): tick your roles in the
+  EU AI Act value chain (provider, deployer, importer, distributor, authorised representative, GPAI
+  model provider, with or without systemic risk), the system classes (Annex III, Annex I, Article
+  50) and an optional reference date; get the rows of the obligation register that bind you, each
+  with its artefact, layer, patterns, the date it applies for your classes and its status read on
+  your date, plus a timeline and, apart, the importer, distributor and authorised-representative
+  duties the register does not hold as rows (Arts. 22, 23, 24 and 54, from the consolidated text).
+  Exports a Markdown checklist, a CSV, a JSON in the open-data envelope
+  (`/toolkit/obligations-plan.v1.schema.json`) and an `.ics` calendar with one all-day event per
+  date. The role mapping lives in `site/src/data/obligations-planner.ts`; no register date is
+  restated.
+- Every `/obligations/<id>` page opens with the obligation-to-evidence chain, generated from its
+  row: clause, duty holder, date, artefact, layer and the record schema its evidence is filed as,
+  with the crosswalk siblings and "As of" in the image; and carries its own Open Graph card
+  (`/og/obligations/<id>.png`). Each live tool gets one too (`/og/toolkit/<id>.png`).
+- A test fails when a register row still says "applies later" or "deferred" after its date has
+  passed (`site/tests/obligation-status-dates.spec.ts`).
 - Figures are citable and reusable: a `/figures` gallery grouped by part and chapter (the
   infographics and the interactive diagrams) and a `/figures/<id>` permalink per infographic with
   its text alternative, where it appears, downloads, HTML and Markdown embed snippets with the

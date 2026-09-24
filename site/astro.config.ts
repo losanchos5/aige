@@ -125,6 +125,21 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         ['src/pages/figures/[id].astro', 'src/data/figures.ts', `src/figures/${figure.id}.svg`],
       ] as [string, string[]],
   ),
+  // Block w2-tool-planner: the obligations and deadlines planner, dated by its
+  // template, its data (the register and the role mapping) and its client code.
+  [
+    '/toolkit/obligations-planner',
+    [
+      'src/pages/toolkit/obligations-planner.astro',
+      'src/components/toolkit/ToolShell.astro',
+      'src/data/toolkit.ts',
+      'src/data/frameworks.ts',
+      'src/data/obligations-planner.ts',
+      'public/toolkit/obligations-planner.js',
+      'public/toolkit/obligations-planner-core.js',
+      'public/toolkit/lib.js',
+    ],
+  ],
 ]);
 
 // Pages dated by their content rather than by git: each /obligations/<id> page
