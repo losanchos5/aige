@@ -202,7 +202,7 @@ export const figures: readonly FigureDef[] = [
     title: 'The profession in numbers',
     caption:
       'The demand for AI governance and the skills employers ask for, using only the figures chapter 02 cites: the IAPP 2025 report and an analysis of 1,997 US postings updated in August 2026. Read the skills as the brief for a hiring or learning plan: build-and-run skills, not review skills. Drawn from chapter 02.',
-    alt: 'Demand for AI governance is near-universal (77% of organisations, roughly nine in ten of those using AI, and only 1.5% expecting no new staff), and the postings ask for observability, Python and NIST frameworks.',
+    alt: 'AI governance demand in numbers: 77% of organisations work on it, only 1.5% expect no new staff, and postings ask for observability, Python and NIST skills.',
     description:
       "Demand, from IAPP's 2025 report: some 77% of organisations report working on AI governance, rising to roughly nine in ten among those already using AI, and of 671 respondents only 10 (1.5%) said they will not need additional AI governance staff in the next 12 months. Skills, from an analysis of 1,997 United States AI-governance postings updated in August 2026: observability platforms in 41% of postings, Python in 28% and NIST frameworks in 27%. These are build-and-run skills, not review skills.",
     placements: [{ chapter: 'why-now', section: 'The evidence', at: 'head' }],
@@ -212,7 +212,7 @@ export const figures: readonly FigureDef[] = [
     title: 'Human oversight, designed',
     caption:
       'Human oversight as an engineered control: classify each action by consequence, put a designed checkpoint only where the stakes justify the latency, and keep the decision and the oversight metrics as evidence. Decide which actions need a person by consequence, then watch approval rate, time-to-decide and override rate. Drawn from chapter 04.',
-    alt: 'Between reviewing every action and rubber-stamping all of them, actions are classified by consequence, a designed checkpoint with context sits only where the stakes justify it, and the oversight leaves evidence that is itself monitored.',
+    alt: 'Actions classified by consequence, a designed checkpoint only where the stakes justify it, and oversight that leaves evidence which is itself monitored.',
     description:
       'Article 14 requires that a person can effectively oversee a high-risk system: understand the output, decide against it and stop the system. Undifferentiated oversight fails both ways: human review of every action destroys the value of automation, and nominal oversight of a firehose of actions is a rubber stamp. The engineered answer classifies each proposed action by consequence and places a designed checkpoint only where the stakes justify the latency, in Layer 04 Runtime Controls & Observability (the Human-in-the-loop Gate pattern); other actions proceed without one. The reviewer gets enough context to disagree, which designs against automation bias. The approver and the decision are logged as evidence, and the oversight itself (approval rate, time-to-decide, override rate) is monitored as a signal that can degrade. Oversight you do not measure is oversight you cannot claim.',
     placements: [
@@ -234,7 +234,7 @@ export const figures: readonly FigureDef[] = [
     title: 'Who enforces, and the ceilings',
     caption:
       "Who enforces each regime and how high its penalties can go: the AI Office for GPAI providers, national market-surveillance authorities for high-risk systems and the state Attorney General under California's SB 53, as of 2026-09-24. Record for each system which authority asks, so its evidence is ready for that authority. Drawn from chapter 08.",
-    alt: 'Three enforcement tracks: GPAI providers and the AI Office, high-risk systems and national market-surveillance authorities, and US frontier developers under SB 53 and the state Attorney General, each with its penalty ceiling.',
+    alt: 'Three enforcement tracks (AI Office for GPAI, national authorities for high-risk AI, the California Attorney General under SB 53) and their penalty ceilings.',
     description:
       "Three enforcement tracks, as of 2026-09-24. GPAI providers answer to the AI Office: Commission enforcement powers have been live since 2 August 2026; under Art. 101 the Commission may fine GPAI providers up to 3% of worldwide annual turnover or EUR 15 million, whichever is higher; and the Omnibus's new Art. 75a to 75d give the AI Office investigation powers backed by periodic penalty payments of up to 5% of average daily turnover per day for a continuing breach, in force since 27 July 2026. High-risk systems answer to national market-surveillance authorities, which each Member State chooses (Spain, for example, set up AESIA); their administrative fines run under Art. 99, with ceilings of 7%, 3% and 1% of turnover depending on the breach. Large frontier developers under California's SB 53 answer to the Attorney General, with penalties of up to USD 1 million per violation.",
     placements: [{ chapter: 'regulatory-map', section: 'EU AI Act, post-Omnibus', at: 'foot' }],
@@ -244,7 +244,7 @@ export const figures: readonly FigureDef[] = [
     title: 'The committee decides, the gates enforce',
     caption:
       'How the decisions that cannot be automated reach the committee and come back as data: triggers route a use case to the committee, its exceptions go into a register the policy gate reads, and the verdict shows the release passed under an exception until it expires. File exceptions as data with an expiry, not as minutes. Drawn from chapter 12.',
-    alt: 'Most use cases pass intake and go straight to the gates; review triggers route the rest to the committee, which records exceptions as data in a register that the policy gate reads, so the verdict shows a release passed under an exception and the build fails again once it expires.',
+    alt: 'Most use cases go straight to the gates; triggers route the rest to the committee, whose exceptions become data the policy gate reads until they expire.',
     description:
       'Most use cases never reach the committee: they pass intake, get a tier and go through the gates. Review triggers, with the escalation for each hop written in the charter, route the rest: for example a decision with legal or similarly significant effect on a person, special-category data, or an agent with write access to money, customer records or production infrastructure. The AI governance committee takes four kinds of decision (risk acceptance, exceptions, value trade-offs and policy) and records each exception as data in the policy repository, not in minutes: the rule, the system, the compensating controls, the residual risk, the decision record and an expiry. The policy gate reads the register. While the exception is live, the rule returns allow with the exception id in its verdict, so the evidence shows the release passed under an exception; when it expires, the same rule fails the build again without anyone having to remember.',
     placements: [
@@ -260,7 +260,7 @@ export const figures: readonly FigureDef[] = [
     title: 'The risk loop on the stack',
     caption:
       'The four steps of the risk loop with the NIST AI RMF functions each covers and the stack layers that do its work, all under GOVERN and all writing to one risk register. Find the step your function skips, then build the layer that does its work. Drawn from chapter 13.',
-    alt: 'The four steps of the risk loop, each with its NIST AI RMF functions and the stack layers that do the work, inside GOVERN, looping back from monitor to identify and writing to one risk register.',
+    alt: 'The four-step risk loop inside GOVERN, each step with its NIST AI RMF function and stack layers, all writing to one risk register.',
     description:
       'Identify (MAP 1 to 5, GOVERN 5): Layer 02 Inventory & Transparency gives every risk an object, with a registry id, owner, tier and affected stakeholders. Assess (MAP 5.1, MEASURE 1 to 2): Layer 03 Evals & Red Teaming as Evidence measures likelihood and finds risks nobody listed. Treat (MANAGE 1 to 3): Layer 01 Govern-as-Code holds appetite, tolerance, scales and tier rules as data and blocks what exceeds them, and Layer 04 Runtime Controls & Observability treats at runtime. Monitor (MEASURE 3 to 4, MANAGE 4): Layer 04 detects a risk becoming real, and Layer 05 Assurance & Continuous Compliance records, re-rates and reports. GOVERN applies across the whole process. The loop returns from monitor to identify, and every step writes to the risk register, whose history, signed acceptances and review log are the evidence.',
     placements: [
@@ -277,7 +277,7 @@ export const figures: readonly FigureDef[] = [
     title: 'The matrix and the S5 override',
     caption:
       'The illustrative five-by-five likelihood-by-severity matrix, with catastrophic severity on its own track as Critical at any likelihood, and the gate and acceptor each band triggers. Rate each risk on the defined scales, then wire each band to its gate. Drawn from chapter 13.',
-    alt: 'A five-by-five likelihood-by-severity matrix with Low, Medium, High and Critical bands, the catastrophic severity row on its own track as Critical at any likelihood, and the gate and acceptor for each band.',
+    alt: 'A five-by-five likelihood by severity matrix in four bands, with catastrophic severity Critical at any likelihood and a gate and acceptor per band.',
     description:
       'Likelihood: L1 Rare, L2 Unlikely, L3 Possible, L4 Likely, L5 Almost certain. Severity: S1 Negligible, S2 Minor, S3 Moderate, S4 Major, S5 Catastrophic. S5 runs on its own track: any S5 scenario is Critical whatever its likelihood. From L1 to L5, S4 is Medium, High, High, Critical, Critical; S3 is Low, Medium, High, High, Critical; S2 is Low, Low, Medium, Medium, High; S1 is Low, Low, Low, Medium, Medium. Low: a registry entry and owner, accepted by the system owner. Medium: an eval gate on the linked risk, accepted by the product owner. High: an eval gate and runtime guardrail, deploy denied without a current acceptance, accepted by the risk committee with the second line consulted. Critical: deploy denied, accepted by the governing body, or no one. The thresholds are illustrative; calibrate them to your volumes.',
     placements: [
@@ -294,7 +294,7 @@ export const figures: readonly FigureDef[] = [
     title: 'The mitigation ladder',
     caption:
       'The five rungs of the mitigation hierarchy, worked top down, each with the stack control that implements it and the evidence it leaves; transfer sits beside the ladder, not on it. Start at the top and record why each higher rung was infeasible before you settle on a lower one. Drawn from chapter 13.',
-    alt: 'Five rungs worked top down (eliminate, substitute, engineer, administrative, accept and monitor), each with its stack control and its evidence; transfer sits beside the ladder, and the ladder ends in acceptance.',
+    alt: 'Five mitigation rungs worked top down, from eliminate to accept and monitor, each with its stack control and evidence; transfer sits beside the ladder.',
     description:
       "1 Eliminate: do not build it, remove the capability or refuse the use, with a policy deny, a prohibited-use blocklist or a tool never granted; evidence: the deny verdict. Elimination has a legal floor: practices the AI Act prohibits are eliminated, never treated or accepted. 2 Substitute: the same goal at lower risk, with a design record and a narrower registry scope; evidence: the design decision linked to the risk id. 3 Engineer: controls that act without relying on anyone remembering (eval gate, runtime guardrail, approval gate, kill switch); evidence: eval results, guardrail events and approval logs. 4 Administrative: rules for people, such as instructions for use and training; evidence: training attestations and versioned instructions. 5 Accept and monitor: carry what is left, knowingly, with a signed acceptance, telemetry and a review date; evidence: the acceptance record and a monitoring signal. Transfer (insurance, contractual indemnities) sits beside the ladder: it moves the financial consequence, not the harm to the person on the other end of the decision. Every rung leaves a residual; the ladder ends in acceptance, never in 'resolved'.",
     placements: [
@@ -306,7 +306,7 @@ export const figures: readonly FigureDef[] = [
     title: 'Provenance and lineage',
     caption:
       'Provenance says where a dataset came from and on what terms; lineage traces how it moved through pipeline jobs and runs, backward from a model and forward from a dataset. Record lineage forward as well as back, because an erasure request or a licence withdrawal asks which models used the data. Drawn from chapter 14.',
-    alt: 'Provenance records where a dataset came from and on what terms; lineage traces it through pipeline jobs and runs, backward from a model to its sources and forward from a dataset to every model that used it.',
+    alt: 'Provenance records where a dataset came from and on what terms; lineage traces it backward from a model to its sources and forward to every model using it.',
     description:
       'Provenance is where a dataset came from and on what terms. Lineage is how the data moved and changed through pipelines, recorded as lineage events about datasets, jobs and runs. Lineage runs both ways: backward lineage answers "what fed this model?", forward lineage answers "which models used this dataset?", and the second question is the one an erasure request or a licence withdrawal asks. Granularity follows where rights attach: dataset-level provenance is the default, record-level provenance is needed where rights attach to records (personal data, per-source licences, opt-outs), and feature-level lineage is needed for sensitive derived features that can act as proxies. The human-readable companion is a datasheet.',
     placements: [
