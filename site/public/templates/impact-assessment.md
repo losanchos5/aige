@@ -121,6 +121,18 @@ dpia_addendum and aiia: questions a classic DPIA template does not ask.
 - `memorisation_and_extraction`: Risk that personal data is memorised by the model and extracted
   from it.
 
+### `iso42005_sections`
+
+aiia: the documented elements of the assessment, keyed by ISO/IEC 42005 clause id (for example
+"6.3.4" for intended use). Clause ids as listed in the INCITS/AI crosswalk to the NIST AI RMF; the
+risks and mitigations below carry the impacts and the measures. Evidences: `ISO/IEC 42005`.
+
+Add one entry per item. Each entry has:
+
+- `clause` (required): Clause id, for example "6.3.4".
+- `heading`: The clause's heading.
+- `text` (required): What the assessment records under it.
+
 ### `risks` (required)
 
 Specific risks of harm to the people and groups affected. Evidences: `EU AI Act Art. 27(1)(d)` ·
@@ -128,6 +140,8 @@ Specific risks of harm to the people and groups affected. Evidences: `EU AI Act 
 
 Add one entry per item. Each entry has:
 
+- `id`: Short id of the risk inside this assessment (for example "R1"), so each mitigation can
+  name the risks it addresses.
 - `right_or_interest` (required): The right, freedom or interest at stake (for example
   "non-discrimination", "privacy").
 - `description` (required): How harm could occur.
@@ -151,7 +165,12 @@ Measures to take if the risks materialise, and measures to prevent them. Evidenc
 Add one entry per item. Each entry has:
 
 - `measure` (required): The measure.
-- `addresses`: Rights or risks it addresses. A list.
+- `addresses`: Ids of the risks it addresses (for example "R1"); older records may name the rights
+  instead. A list.
+- `pattern`: The pattern that implements the measure: a page under
+  https://aigovernanceengineer.com/patterns/. Format: URL.
+- `controls`: Controls or obligations the measure implements, by id (for example
+  "ISO/IEC 42001 A.5" or "AIGE-OBL-EUAIA-ART27"). A list.
 - `owner`: Owner.
 - `status` (required): Status. One of: `planned`, `in_place`, `verified`.
 - `evidence`: Record that proves it runs. Format: URL.
