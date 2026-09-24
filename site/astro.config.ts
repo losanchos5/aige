@@ -66,8 +66,14 @@ function pathnameOf(url: string): string {
 }
 
 // https://astro.build/config
+// Parallel builds from several git worktrees can share one node_modules
+// (a junction); ASTRO_CACHE_DIR gives each its own content-layer data store and
+// Vite cache so they never overwrite each other. Unset, Astro's defaults apply.
+const cacheDir = process.env.ASTRO_CACHE_DIR;
+
 export default defineConfig({
   site: 'https://aigovernanceengineer.com',
+  ...(cacheDir ? { cacheDir } : {}),
   trailingSlash: 'never',
   build: { format: 'file' },
   integrations: [
@@ -89,6 +95,7 @@ export default defineConfig({
     }),
   ],
   vite: {
+    ...(cacheDir ? { cacheDir: `${cacheDir}/vite` } : {}),
     build: {
       rollupOptions: {
         output: {
