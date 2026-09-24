@@ -70,7 +70,7 @@ export const problems: readonly Problem[] = [
     n: 5,
     title: 'No runtime data path',
     summary:
-      'The registry does not know what is running; most of the AI governance platform category manages the program without any runtime data path. So the three questions that define the discipline go unanswered, because nothing is connected to production.',
+      'The registry does not know what is running. Analysts ask governance platforms for policy enforcement at runtime, yet one vendor comparison finds most of the category manages the program without any runtime data path. So the three questions that define the discipline go unanswered, because nothing is connected to production.',
   },
 ] as const;
 

@@ -891,8 +891,8 @@ Register and bound every actor before it acts; make the governed path the easies
 
 ### Context
 An organisation where teams adopt AI tools and spin up agents faster than any central inventory can
-track, and where much of the AI-governance platform category "manages the program … without any runtime
-data path" [20].
+track, and where, by one vendor's comparison of the category, much of the AI-governance platform
+market "manages the program … without any runtime data path" [20].
 
 ### Problem
 A registry fed only by voluntary declaration is always behind. Unregistered agents, the shadow fleet,
@@ -1012,7 +1012,7 @@ Scoped Credentials; Shadow-AI Discovery.
 [17] "Gartner Forecasts the Market for Securing AI Will Reach Almost $5 Billion in 2027" (>50% of agent attacks exploit access-control and prompt injection by 2029). Gartner. 2026-08-26. https://www.gartner.com/en/newsroom/press-releases/2026-08-26-gartner-forecasts-the-market-for-securing-ai-will-reach-almost-5-billion-in-2027 (verified: primary)
 [18] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
 [19] EU AI Act Art. 14 (human oversight of high-risk AI systems). artificialintelligenceact.eu. Reg. (EU) 2024/1689. https://artificialintelligenceact.eu/article/14/ (verified: primary)
-[20] "Best AI Governance Platforms 2026" (most of the category "manages the program … without any runtime data path"). Kosmoy. 2026. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
+[20] "Best AI Governance Platforms in 2026: 14 Enterprise Vendors Compared" (vendor-published comparison of the 13 Magic Quadrant vendors plus its own product; most of the category "manages the program … without any runtime data path"). Kosmoy. 2026-07-10. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
 [21] OSCAL native model (control layer: catalog, profile; implementation: component-definition, system-security-plan; assessment: assessment-plan, assessment-results, POA&M). NIST. 2026. https://pages.nist.gov/OSCAL/learn/concepts/layer/ (verified: primary)
 [22] ISO/IEC 42001:2023 Annex A.10 (third-party and customer relationships; supplier controls). ISO/IEC. 2023. https://www.iso.org/standard/81230.html (verified: secondary)
 [23] EU AI Act Arts. 25 (value-chain responsibilities), 26 (deployer obligations), 27 (FRIA): allocation of duties between provider and deployer. AI Act (Reg. (EU) 2024/1689). 2024. https://artificialintelligenceact.eu/article/25/ (verified: primary)
