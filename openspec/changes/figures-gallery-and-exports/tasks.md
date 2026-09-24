@@ -12,13 +12,13 @@ lanza con `bash D:/Documents/aige-wt/build.sh`.
 
 - [x] 2.1 Decodificar WOFF/WOFF2 a TTF sin dependencias (`site/scripts/lib/woff.mjs`) y comprobar que resvg dibuja el texto con las fuentes del sitio.
 - [x] 2.2 Resolver los tokens de `tokens.css` y las reglas `.figc` de `figures.css` a hex claro y oscuro y construir el SVG autónomo (banda de atribución, enlaces absolutos, fuentes declaradas, metadatos CC).
-- [x] 2.3 Renderizar PNG claro y oscuro a 1600 y 3200 px con `tEXt` de licencia, con caché por hash, desde `figures-build.mjs`.
+- [x] 2.3 Renderizar PNG claro y oscuro a 1600 y 3200 px con fragmentos `iTXt` de licencia, con caché por hash, desde `figures-build.mjs`.
 - [x] 2.4 Validar en la build presupuestos por tipo, formato de fechas, "as of" dentro de la imagen y aviso de `reviewBy` vencido.
 - [x] 2.5 Ignorar `site/public/downloads/figures/` y la caché en `.gitignore`.
 
 ## 3. Galería y permalinks
 
-- [x] 3.1 Crear `site/src/lib/figure-downloads.ts` (descargas existentes, tamaños y dimensiones) y `site/src/components/FigureCite.astro`.
+- [x] 3.1 Crear `site/src/lib/figure-reuse.ts` (descargas existentes, tamaños, dimensiones, lugares y créditos) y `site/src/components/FigureCite.astro`.
 - [x] 3.2 Crear `/figures` agrupada por parte y capítulo, con infografías y diagramas archify.
 - [x] 3.3 Crear `/figures/<id>` con figura, leyenda, alternativa textual, dónde aparece, descargas, fragmentos de incrustación, cita y JSON-LD `ImageObject`.
 - [x] 3.4 Añadir `site/public/figure-cite.js` para copiar al portapapeles sin JS en línea.

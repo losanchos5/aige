@@ -24,7 +24,7 @@ sin el capítulo que la fecha.
   absolutos, metadatos CC en RDF), un SVG claro y uno oscuro fijos, y PNG claro y oscuro a 1600 y
   3200 px renderizados con `@resvg/resvg-js` (ya instalado) sobre las fuentes del propio sitio,
   decodificadas de WOFF/WOFF2 a TTF en memoria. Todas llevan la banda "aigovernanceengineer.com ·
-  CC BY 4.0 · v<bokVersion>" y los PNG llevan metadatos `tEXt`. Salida en
+  CC BY 4.0 · v<bokVersion>" y los PNG llevan metadatos `iTXt`. Salida en
   `site/public/downloads/figures/<id>-v<version>[-tema][-ancho].<ext>`, ignorada por git; una caché
   por hash evita re-renderizar lo que no ha cambiado. La build valida presupuestos, fechas y el
   "as of" dentro de la imagen, y avisa cuando una figura pasa su `reviewBy`.
@@ -61,9 +61,10 @@ sin el capítulo que la fecha.
 ## Impact
 
 - **Nuevos**: `site/scripts/lib/woff.mjs`, `site/scripts/lib/figure-export.mjs`,
-  `site/src/lib/figure-downloads.ts`, `site/src/components/FigureCite.astro`,
+  `site/src/lib/figure-reuse.ts`, `site/src/components/FigureCite.astro`,
   `site/src/pages/figures/index.astro`, `site/src/pages/figures/[id].astro`,
-  `site/public/figure-cite.js`, `site/tests/figures-gallery.spec.ts`.
+  `site/src/styles/figures-gallery.css`, `site/public/figure-cite.js`,
+  `site/tests/figures-gallery.spec.ts`.
 - **Modificados**: `site/src/data/figures.ts`, `site/src/figures/art73-clock.svg` (línea "As of"),
   `site/scripts/figures-build.mjs`, `site/scripts/content-lint.mjs`, `site/VISUAL-GUIDE.md`,
   `site/astro.config.ts` (un bloque en `SOURCE_BY_PATH`), `.gitignore`, `bok/CHANGELOG.md`,
