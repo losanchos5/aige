@@ -1,0 +1,331 @@
+/* builders.css: the parts the /toolkit document builders add to toolkit.css
+   (register entry, impact assessment, model card): generated form sections,
+   repeatable groups, checkbox lists, the crosswalk and checklist tables and the
+   register table. Tokens only (site/DESIGN.md), so light and dark both follow;
+   state is carried by words, never by colour alone. Classes are prefixed
+   `bld-`. No motion. */
+
+/* The grid and flex displays below would beat the [hidden] UA rule (the form
+   and its buttons stay hidden until the script mounts), so guard it once. */
+.bld-app [hidden] {
+  display: none !important;
+}
+
+/* ---- Form sections ---------------------------------------------------------- */
+.bld-form {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.bld-fields {
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  align-items: start;
+}
+
+/* Long answers, groups and checkbox lists take the full row. */
+.bld-fields > :is(.bld-group, .bld-refs, .bld-clauses),
+.bld-fields > .bld-field:has(textarea) {
+  grid-column: 1 / -1;
+}
+
+.bld-field {
+  max-width: none;
+}
+
+.bld-req {
+  font-weight: 400;
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+.bld-area {
+  min-height: 5.5rem;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.bld-sublegend {
+  padding: 0;
+  margin-bottom: var(--s-2);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ---- Repeatable groups -------------------------------------------------------- */
+.bld-group,
+.bld-refs,
+.bld-clauses {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.bld-group[data-invalid] .bld-items,
+.bld-refs[data-invalid] {
+  outline: 2px solid var(--block);
+  outline-offset: 4px;
+}
+
+.bld-items {
+  display: grid;
+  gap: var(--s-3);
+  margin: 0 0 var(--s-3);
+  padding: 0;
+  list-style: none;
+}
+
+.bld-item-set {
+  min-width: 0;
+  margin: 0;
+  padding: var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  display: grid;
+  gap: var(--s-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.bld-item-set > legend {
+  float: left;
+  width: 100%;
+  margin: 0;
+}
+
+.bld-item-set > legend + * {
+  clear: both;
+}
+
+.bld-item-set > :is(.bld-refs, .bld-remove),
+.bld-item-set > .bld-field:has(textarea) {
+  grid-column: 1 / -1;
+}
+
+.bld-remove,
+.bld-add {
+  justify-self: start;
+  min-height: 44px;
+  font-size: var(--fs-small);
+}
+
+/* ---- Checkbox lists -------------------------------------------------------------- */
+.bld-checks {
+  display: grid;
+  gap: var(--s-2);
+}
+
+.bld-check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--s-3);
+  min-height: 44px;
+  padding: var(--s-2) var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+}
+
+.bld-check input {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0.2rem 0 0;
+  accent-color: var(--ink);
+}
+
+.bld-check label {
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.bld-check:has(input:focus-visible) {
+  outline: 2px solid var(--l1-ink);
+  outline-offset: 2px;
+}
+
+.bld-clauses {
+  display: grid;
+  gap: var(--s-4);
+}
+
+.bld-clause-id,
+.bld-path {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.bld-path {
+  display: block;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+/* ---- Results ------------------------------------------------------------------------ */
+.bld-validity {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.bld-xwalk th[scope='row'] {
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 10rem;
+}
+
+.bld-xwalk td {
+  min-width: 9rem;
+}
+
+.bld-empty {
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.bld-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+
+.bld-row-actions .btn {
+  min-height: 44px;
+  padding-inline: var(--s-3);
+  font-size: var(--fs-small);
+}
+
+.bld-register > * + *,
+.bld-report > * + * {
+  margin-top: var(--s-4);
+}
+
+.bld-report ul {
+  padding-left: var(--s-5);
+}
+
+.bld-report li + li {
+  margin-top: var(--s-1);
+}
+
+.bld-import {
+  max-width: 36rem;
+}
+
+/* Coverage and checklist tables: the status is a word in its own column. */
+.bld-state {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bld-state[data-state='covered'],
+.bld-state[data-state='linked'] {
+  color: var(--ok);
+}
+
+.bld-state[data-state='missing'],
+.bld-state[data-state='not-linked'] {
+  color: var(--block);
+}
+
+.bld-state[data-state='partial'],
+.bld-state[data-state='not-applicable'] {
+  color: var(--ink-2);
+}
+
+.bld-summary {
+  display: grid;
+  gap: var(--s-2);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bld-summary li {
+  padding: var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+}
+
+.bld-summary strong {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  color: var(--ink);
+}
+
+.bld-warn {
+  padding: var(--s-3) var(--s-4);
+  border-left: 3px solid var(--block);
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* ---- Guide ---------------------------------------------------------------------------- */
+.bld-worksheet {
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+}
+
+.bld-worksheet summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.bld-worksheet h4 {
+  margin-top: var(--s-4);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.bld-worksheet ul {
+  padding-left: var(--s-5);
+}
+
+.bld-worksheet code {
+  overflow-wrap: anywhere;
+}
+
+.tool-guide .cite {
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  text-decoration: none;
+}
+
+@media print {
+  .bld-app [data-print-hide],
+  .bld-add,
+  .bld-remove {
+    display: none !important;
+  }
+
+  .bld-item-set,
+  .bld-check {
+    background: #fff !important;
+  }
+}
+
+.bld-group-row th {
+  padding-top: var(--s-4);
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--ink);
+  text-align: left;
+}
+
+.bld-measures {
+  margin: 0;
+  padding-left: var(--s-4);
+}
