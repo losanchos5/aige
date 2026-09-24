@@ -143,21 +143,33 @@ chrome: like the skip link it sits off screen until keyboard focus reaches it (T
 a click or tap on the strip pauses and resumes both (touch and mouse users), and hovering the strip
 pauses it. Under forced colours the canvas is skipped and the CSS fallback shows. Under reduced motion the field renders one
 still frame and the strip is a static wrapping list, from first paint. Everything else runs once: the
-loop section's figure (`.hero-art` under `.loop-sec`) now starts its one pulse when it scrolls into
-view (`IntersectionObserver` in `public/hero.js`) rather than on load, the verdict ticker is a static
-list, count-ups play once.
+verdict ticker is a static
+list, count-ups play once. The home governance loop (`GovernanceLoop.astro`) also runs once each
+time it comes into view (`data-play`, set by `public/loop.js`): a short beam walks its edges in loop
+order and the step it reaches rings once, `stroke-dashoffset` on the wires and `opacity` on a
+decorative ring, never on text. One lap is 4.8s (eight 0.6s beats), inside WCAG 2.2.2's 5s, so it
+needs no pause control; it also pauses while a step is active, and is absent under reduced motion.
 
 ## Primitives
 
 - **`<Section tone="plain|tint|dark|mesh">`** (`site/src/components/Section.astro`) — the shared
   section shell: `<section class="section sec sec--{tone}">`, an inert `.bg-mesh` when
-  `tone="mesh"`, an optional head (H2 or H1-scale title + lede, no kicker) and slotted content over
-  `.sec-inner` (`z-index: 1`).
+  `tone="mesh"` (or when a `tone="tint"` band passes `mesh`), an optional head (H2 or H1-scale
+  title + lede, no kicker) and slotted content over `.sec-inner` (`z-index: 1`). `mesh="a|b|c"`
+  picks the composition and `meshK` its strength.
 - **`.bg-mesh`** (`effects.css`) — the identity element: five soft radial glows (`--glow-1..5`)
   split across two pseudo-elements that overhang the host by 20% and drift slowly (see Motion).
   Absolute, `contain: strict`, `aria-hidden`, `pointer-events: none`; the host clips it. Strength is
-  `--mesh-alpha`: `1` light / `0.55` dark by default, `0.7` in PageHero, `0.6 ×` in the home role
-  section, `0.25` inside CtaBand. One mesh per section; never under a table or a node grid.
+  `--mesh-alpha × --mesh-k`: `--mesh-alpha` is `1` light / `0.55` dark by default, `0.7` in
+  PageHero, `0.25` inside CtaBand; `--mesh-k` (Section's `meshK`) is `1` by default. Compositions
+  are custom properties (`--m1..5` colour, `--m1..5-at` centre): `a` (default) is the home role
+  section's and drifts; `.bg-mesh--b` mirrors it and `.bg-mesh--c` turns it around, both still, as is
+  any mesh a `tone="tint"` band carries (Section's `mesh` on a tint band). A
+  section's mesh fades over its top and bottom tenth (`mask-image`), so neighbouring meshes meet
+  without a seam. On the home page no body section sits on the bare ground (Jordi, 2026-09-24):
+  loop `b` 0.5, questions `c` 0.5, stack tint + `a` 0.35, values `b` 0.45, role `a` 0.6, chapters
+  `c` 0.45, resources tint + `b` 0.35; neighbours never share a composition. One mesh per section, several per
+  page; never directly under a table or a node grid (the loop sits on its own opaque panel).
 - **`.card-lum`** (`effects.css`) — a flat card: 1px `--line` hairline, `--surface` fill, no
   shadow. A masked `--grad-border` ring fades in around its edge on hover/focus-within (`opacity`,
   not layout).
@@ -216,7 +228,7 @@ list, count-ups play once.
 2. **Never dim text with `opacity`.** Secondary text uses the `--muted` or `--ink-2` color tokens,
    never a reduced-opacity `--ink`.
 3. **`--muted` fails AA on tinted/dark bands.** It is re-scoped to `var(--ink-2)` inside
-   `.sec--tint` and over the mesh (`.sec--mesh`, `.hero--page`, `.hero--field`, `.hero-panel`), and
+   `.sec--tint` and over the mesh (`.sec--mesh`, `.hero--page`, `.hero--field`, the loop's panel), and
    the full dark token set (including `--muted`) is re-scoped inside `.sec--dark`, all in
    `effects.css`. Any new tinted or dark surface must go through `<Section tone="tint">` /
    `<Section tone="dark">` rather than hand-rolling a background color. CtaBand is the one
@@ -261,7 +273,8 @@ detect dist` (anti-pattern count must not rise versus the recorded baseline; no 
 - Don't add a new font family; the site has exactly four (display, body, mono, serif), and the
   serif (`--font-serif`, Newsreader Display) is limited to the home hero headline — never use it
   elsewhere.
-- Don't nest `.card-lum` inside another `.card-lum`, or stack more than one `.bg-mesh` in a section.
+- Don't nest `.card-lum` inside another `.card-lum`, or stack more than one `.bg-mesh` in a section
+  (one per section is fine, on as many sections as the page needs).
 - Don't put a dot or grid texture behind content, and don't give a non-link card a hover lift.
 - Don't add inline `<script>` tags or inline event handlers; the CSP forbids them.
 - Don't dim, gray-out or opacity-fade text for a "disabled" or "secondary" look — use `--muted` /

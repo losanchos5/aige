@@ -3,7 +3,9 @@
  * Section — the editorial section shell shared across the landing pages. It
  * renders `<section class="section sec sec--{tone}">` with an inert gradient
  * mesh when `tone="mesh"` (aria-hidden, pointer-events:none via effects.css),
- * an optional head (title + lede) and the page content. `tone="dark"`
+ * an optional head (title + lede) and the page content. `mesh` picks the
+ * mesh's composition (a, the default, drifts on a mesh band; b and c are
+ * still) and also lays a still mesh over a `tone="tint"` band; `meshK` scales its strength. `tone="dark"`
  * re-scopes the dark token set in effects.css so children render with audited
  * dark contrast. No eyebrow above the title and no dot/grid texture: the audit
  * (SL-04, SL-18) retired both.
@@ -27,6 +29,10 @@ interface Props {
   rule?: boolean;
   /** Widen the inner container past the default max. */
   wide?: boolean;
+  /** Mesh composition; on a tint band it also adds the mesh. */
+  mesh?: 'a' | 'b' | 'c';
+  /** Mesh strength, a factor on --mesh-alpha (default 1). */
+  meshK?: number;
 }
 
 const {
@@ -38,13 +44,24 @@ const {
   headSize = 'md',
   rule = false,
   wide = false,
+  mesh,
+  meshK,
 } = Astro.props;
 
 const hasHead = Boolean(title || lede);
+const hasMesh = tone === 'mesh' || (tone === 'tint' && mesh !== undefined);
 ---
 
 <section id={id} class:list={['section', 'sec', `sec--${tone}`, className]}>
-  {tone === 'mesh' && <div class="bg-mesh" aria-hidden="true"></div>}
+  {
+    hasMesh && (
+      <div
+        class:list={['bg-mesh', mesh && mesh !== 'a' && `bg-mesh--${mesh}`]}
+        style={meshK === undefined ? undefined : `--mesh-k:${meshK}`}
+        aria-hidden="true"
+      />
+    )
+  }
 
   <div class:list={['container', 'sec-inner', wide && 'sec-inner--wide']}>
     {
