@@ -3,7 +3,7 @@ id: sanctioned-ai-gateway
 title: Sanctioned AI Gateway
 layer: 4
 secondaryLayer: 2
-order: 20
+order: 28
 summary: "Approved AI tools behind single sign-on and one gateway that applies data-class rules, logs use and checks a current acceptable-use attestation."
 ---
 

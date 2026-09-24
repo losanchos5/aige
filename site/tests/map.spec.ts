@@ -244,12 +244,12 @@ test('the portrait variant is a standalone light-theme SVG with matching meta', 
   expect(meta.counts.branches).toBe(8);
   expect((svg.match(/<text/g) ?? []).length).toBe(meta.counts.texts);
 
-  // Patterns branch shows the 17 pattern names (or their shorts), not the layer
+  // Patterns branch shows every pattern name (or its short), not the layer
   // headers, which The Stack branch already carries exactly once.
   const patternNodes = map.branches
     .find((b) => b.id === 'patterns')!
     .leaves.flatMap((leaf) => leaf.children ?? []);
-  expect(patternNodes).toHaveLength(patterns.length); // all 17
+  expect(patternNodes).toHaveLength(patterns.length); // every pattern in patterns.ts
   // The generator XML-escapes labels (scripts/lib/svg-text.mjs esc), so compare escaped text.
   const escXml = (s: string) =>
     s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');

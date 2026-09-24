@@ -3,7 +3,7 @@ id: decision-notice-contest-path
 title: "Decision Notice & Contest Path"
 layer: 4
 secondaryLayer: 5
-order: 18
+order: 26
 summary: "A notice at the point of an automated decision, keyed to its decision record, and a contest path to a reviewer with the power to change the outcome."
 ---
 

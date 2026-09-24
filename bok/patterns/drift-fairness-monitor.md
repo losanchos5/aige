@@ -3,7 +3,7 @@ id: drift-fairness-monitor
 title: "Drift & Fairness Monitor"
 layer: 4
 secondaryLayer: 5
-order: 22
+order: 30
 summary: "Production signals for drift, quality and fairness by group, each with a threshold, an owner and a pre-agreed consequence, written as evidence."
 ---
 

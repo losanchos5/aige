@@ -3,7 +3,7 @@ id: deactivation-localisation-retirement-runbook
 title: "Deactivation, Localisation & Retirement Runbook"
 layer: 4
 secondaryLayer: 2
-order: 25
+order: 33
 summary: "A drilled runbook to degrade, switch off by jurisdiction or retire an AI system, with named triggers, a decision authority and evidence at each step."
 ---
 

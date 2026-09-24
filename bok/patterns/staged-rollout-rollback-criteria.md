@@ -2,7 +2,7 @@
 id: staged-rollout-rollback-criteria
 title: Staged Rollout with Rollback Criteria
 layer: 4
-order: 21
+order: 29
 summary: "Release every model, prompt or vendor-version change through shadow, pilot and canary stages whose rollback criteria are registered before each stage starts."
 ---
 

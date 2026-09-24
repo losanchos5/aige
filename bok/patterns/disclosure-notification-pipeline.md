@@ -3,7 +3,7 @@ id: disclosure-notification-pipeline
 title: "Disclosure & Notification Pipeline"
 layer: 5
 secondaryLayer: 2
-order: 24
+order: 32
 summary: "Disclosures and notices generated from the registry, from versioned templates per audience and clock, with every notice sent recorded as evidence."
 ---
 

@@ -3,7 +3,7 @@ id: downstream-use-register
 title: Downstream Use Register
 layer: 2
 secondaryLayer: 1
-order: 23
+order: 31
 summary: "Intended and prohibited uses as a Policy Card, every consumer of a system's outputs recorded against its registry entry, and provenance stamped on outputs."
 ---
 

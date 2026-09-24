@@ -17,7 +17,7 @@
 // order is the catalogue order (the files' `order` frontmatter). No pattern,
 // framework or layer appears here that the pattern files do not state.
 //
-// KEEP IN SYNC: 17 patterns. When a pattern is added, add its file under
+// KEEP IN SYNC: 33 patterns. When a pattern is added, add its file under
 // bok/patterns/, its "## Pattern:" section to chapter 05 and its entry here:
 // src/lib/pattern-pages.ts fails the build when the three disagree, and
 // tests/figures.spec.ts fails when the count of "## Pattern:" headings in
@@ -368,9 +368,8 @@ export const patterns: readonly PatternDef[] = [
     ],
   },
   // Block w2-patterns-b (v0.5.0): eight patterns on the deployment and use
-  // side, in the catalogue order of their `order` frontmatter (18 to 25 when
-  // appended after the 17 patterns above; renumber the files' `order` if another
-  // block's patterns land before these).
+  // side, catalogue order 26 to 33 (their files' `order` frontmatter), after
+  // the development-side patterns of w2-patterns-a.
   {
     id: 'pattern-decision-notice--contest-path',
     slug: 'decision-notice-contest-path',

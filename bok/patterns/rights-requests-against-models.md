@@ -3,7 +3,7 @@ id: rights-requests-against-models
 title: Rights Requests Against Models
 layer: 2
 secondaryLayer: 5
-order: 19
+order: 27
 summary: "Route each data-subject request to every place the person's data sits, from source systems to model weights, and close it with a fulfilment record."
 ---
 
