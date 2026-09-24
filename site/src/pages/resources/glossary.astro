@@ -1,8 +1,14 @@
 ---
+// /resources/glossary: the interactive A-Z index of the glossary. Since v0.5.0
+// every term has its own canonical page (/glossary/<slug>) and the book index is
+// /bok/glossary; public/_redirects sends this path to /bok/glossary with a 301
+// on the host, and the page is still built so the local preview, the content
+// lint and the tests keep an A-Z index with the same `t-…` anchors.
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import GlossaryIndex from '../../components/GlossaryIndex.astro';
-import { getGlossary, getGlossaryLetters, termId } from '../../lib/glossary';
+import ContrastCards from '../../components/ContrastCards.astro';
+import { getGlossary, getGlossaryLetters, getContrastPairs } from '../../lib/glossary';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { site } from '../../data/site';
 import { WEBSITE_ID } from '../../lib/jsonld';
@@ -11,12 +17,13 @@ import '../../styles/pages.css';
 
 const entries = getGlossary();
 const letters = getGlossaryLetters();
+const pairs = getContrastPairs();
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Glossary' }];
 
-// The glossary is genuinely structured (term, definition and an on-page anchor
-// per entry; GlossaryIndex renders each <dt id={termId(term)}>), so it is stated
-// as a DefinedTermSet whose terms @id the anchors a reader can actually follow.
-const glossaryUrl = new URL('/resources/glossary', site.url).href;
+// The glossary is genuinely structured, so it is stated as a DefinedTermSet.
+// The set's identity is the book index (/bok/glossary#glossary) and each term's
+// is its own page (/glossary/<slug>#term), the same @ids the term pages carry.
+const glossaryUrl = new URL('/bok/glossary', site.url).href;
 const termSetId = `${glossaryUrl}#glossary`;
 const jsonLd = [
   {
@@ -26,13 +33,17 @@ const jsonLd = [
     url: glossaryUrl,
     inLanguage: 'en',
     isPartOf: { '@id': WEBSITE_ID },
-    hasDefinedTerm: entries.map((entry) => ({
-      '@type': 'DefinedTerm',
-      '@id': `${glossaryUrl}#${termId(entry.term)}`,
-      name: entry.term,
-      description: entry.definition,
-      inDefinedTermSet: { '@id': termSetId },
-    })),
+    hasDefinedTerm: entries.map((entry) => {
+      const termUrl = new URL(entry.url, site.url).href;
+      return {
+        '@type': 'DefinedTerm',
+        '@id': `${termUrl}#term`,
+        name: entry.term,
+        description: entry.definition,
+        url: termUrl,
+        inDefinedTermSet: { '@id': termSetId },
+      };
+    }),
   },
   breadcrumbJsonLd(crumbs),
 ];
@@ -40,7 +51,7 @@ const jsonLd = [
 
 <Base
   title="Glossary"
-  description="The canonical glossary for AI governance engineering: every term defined once, alphabetically, and cross-referenced to the chapter that treats it in full."
+  description="The canonical glossary for AI governance engineering: every term defined once, alphabetically, with its own page, its source and the chapter that treats it in full."
   image="/og/resources.png"
   jsonLd={jsonLd}
 >
@@ -49,14 +60,28 @@ const jsonLd = [
   <PageHero
     variant="res"
     mesh={false}
-    crumbs={[{ label: 'Resources', href: '/resources' }, { label: 'Glossary' }]}
+    crumbs={crumbs}
     title="Every term, defined once."
-    lede={`${entries.length} terms, alphabetical, each one to three sentences and cross-referenced to the chapter that develops it. Where a term has a canonical spelling in the style guide, that spelling is used here and everywhere in the book.`}
+    lede={`${entries.length} terms, alphabetical, each at most 60 words, sourced and cross-referenced to the chapter that develops it. Every term has its own page with its sources, the chapters that use it and a citation.`}
   />
 
   <div class="container res-page">
+    <div class="res-section">
+      <h2 class="gl-pairs-head">Commonly confused pairs</h2>
+      <ContrastCards pairs={pairs} level={3} />
+    </div>
     <div class="res-section">
       <GlossaryIndex entries={entries} letters={letters} />
     </div>
   </div>
 </Base>
+
+<style>
+  .gl-pairs-head {
+    margin: 0 0 var(--s-4);
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    letter-spacing: var(--tracking-display);
+    color: var(--ink);
+  }
+</style>

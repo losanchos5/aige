@@ -14,6 +14,7 @@ import { cases } from './src/data/cases';
 import { obligations, obligationPath } from './src/data/frameworks';
 import { patterns } from './src/data/patterns';
 import { figures } from './src/data/figures';
+import { getGlossary } from './src/lib/glossary';
 import { gitDate } from './src/lib/reading';
 
 // Sitemap URL -> the source file(s) whose last commit dates the page: the page
@@ -82,6 +83,16 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
     ['src/pages/obligations/index.astro', 'src/data/frameworks.ts', 'src/lib/obligations.ts'],
   ],
   ['/resources/data', ['src/pages/resources/data.astro', 'src/lib/api.ts']],
+  // Block b-glossary (v0.5.0): one canonical page per glossary term, all rendered
+  // from the same template and the glossary chapter (src/lib/glossary.ts).
+  ...getGlossary().map(
+    (entry) =>
+      [entry.url, ['src/pages/glossary/[slug].astro', '../bok/09-glossary.md']] as [
+        string,
+        string[],
+      ],
+  ),
+
   // One page per incident case, all rendered from the same template and dataset.
   ...cases.map(
     (entry) =>

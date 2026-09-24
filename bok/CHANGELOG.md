@@ -171,6 +171,20 @@ a completed, reviewed core (1.0).
 - `sources/SOURCES.md`: sections for chapters 12, 13 and 15 to 22, and a new "Site data pages"
   part for the harms atlas, the eleven cases and the templates page; rows added for the new
   sources of chapters 01, 02 and 08.
+- `bok/09-glossary.md`: the glossary grows from 63 to 279 terms, covering every term the new
+  chapters 11 to 22 define plus the core vocabulary of the EU AI Act, risk, privacy, fairness,
+  incidents and generative AI. Every entry is at most 60 words, cites its source when it comes from
+  a law, a standard or a paper, names the terms it is most often confused with ("Contrast with")
+  and links the exact section that develops it ("See"). Letter headings and a "Commonly confused
+  pairs" table (ten pairs, from transparency versus explainability to provider versus deployer) are
+  new. "Serious incident" now carries the four limbs of AI Act `Art. 3(49)` and points to chapter
+  17; "Model risk management" records that SR 26-2 superseded SR 11-7 on 17 Apr 2026. Sources grow
+  from 19 to 120; `sources/SOURCES.md` carries the rows.
+- Site: every term has its own canonical page at `/glossary/<term>` with its definition and
+  numbered sources, the sections that develop it, the chapters that use it, contrast cards,
+  related terms and a "Cite this term" block. `/bok/glossary` stays the book index (each term is
+  anchored and links to its page); `/resources/glossary` and `/glossary` redirect to it. Hover
+  cards and `/glossary.json` now point at the term pages.
 
 ## [Unreleased] - 2026-09-20
 

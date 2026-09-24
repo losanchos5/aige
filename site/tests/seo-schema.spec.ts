@@ -183,11 +183,12 @@ test.describe('page-specific nodes', () => {
     }
   });
 
-  test('the glossary is a DefinedTermSet of anchored terms', async ({ page }) => {
+  test('the glossary is a DefinedTermSet of terms with their own pages', async ({ page }) => {
     const graph = await graphOf(page, '/resources/glossary');
     const set = graph.find((node) => node['@type'] === 'DefinedTermSet');
 
-    const setId = `${SITE_ORIGIN}/resources/glossary#glossary`;
+    // The set is the book index; each term is identified by its own page.
+    const setId = `${SITE_ORIGIN}/bok/glossary#glossary`;
     expect(set?.['@id']).toBe(setId);
 
     const terms = (set?.hasDefinedTerm ?? []) as JsonLdNode[];
@@ -197,20 +198,34 @@ test.describe('page-specific nodes', () => {
       expect(term.name).toBeTruthy();
       expect(term.description).toBeTruthy();
       expect(term.inDefinedTermSet?.['@id']).toBe(setId);
-      expect(String(term['@id'])).toMatch(
-        new RegExp(`^${SITE_ORIGIN}/resources/glossary#t-[a-z0-9-]+$`),
-      );
+      expect(String(term['@id'])).toMatch(new RegExp(`^${SITE_ORIGIN}/glossary/[a-z0-9-]+#term$`));
+      expect(String(term.url)).toBe(String(term['@id']).replace(/#term$/, ''));
     }
 
-    // Every term @id points at an anchor the page actually renders.
-    const anchors = await page.locator('.gl-dl dt[id]').evaluateAll((nodes) =>
-      nodes.map((node) => node.id),
-    );
-    const anchored = new Set(anchors);
+    // Every term's page is linked from the index entry the page renders.
+    const hrefs = await page
+      .locator('.gl-dl dt a')
+      .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('href') ?? ''));
+    const linked = new Set(hrefs);
     for (const term of terms) {
-      const hash = String(term['@id']).split('#')[1];
-      expect(anchored.has(hash), `no <dt id="${hash}"> for "${term.name}"`).toBe(true);
+      const path = new URL(String(term.url)).pathname;
+      expect(linked.has(path), `no index link to ${path} for "${term.name}"`).toBe(true);
     }
+  });
+
+  test('a glossary term page is a DefinedTerm in the book glossary set', async ({ page }) => {
+    const graph = await graphOf(page, '/glossary/serious-incident');
+    const term = graph.find((node) => node['@type'] === 'DefinedTerm');
+    const set = graph.find((node) => node['@type'] === 'DefinedTermSet');
+    const setId = `${SITE_ORIGIN}/bok/glossary#glossary`;
+
+    expect(term?.['@id']).toBe(`${SITE_ORIGIN}/glossary/serious-incident#term`);
+    expect(term?.name).toBe('Serious incident');
+    expect(term?.description).toBeTruthy();
+    expect(term?.inDefinedTermSet?.['@id']).toBe(setId);
+    expect(set?.['@id']).toBe(setId);
+    expect(set?.url).toBe(`${SITE_ORIGIN}/bok/glossary`);
+    expect(typesOf(graph)).toContain('BreadcrumbList');
   });
 
   test('the crosswalk Dataset distributes the CSV and the JSON it links', async ({ page }) => {

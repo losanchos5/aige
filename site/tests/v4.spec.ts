@@ -4,24 +4,27 @@ import { test, expect, type Page } from '@playwright/test';
 // `default` project; the screenshots below are review shots into V4/.
 
 test.describe('glossary term links', () => {
-  test('the-stack links >= 5 terms that resolve to glossary ids', async ({ page }) => {
+  test('the-stack links >= 5 terms to their pages and book-index anchors', async ({ page }) => {
     await page.goto('/bok/the-stack');
 
-    const hrefs = await page
-      .locator('a.term')
-      .evaluateAll((els) => els.map((el) => el.getAttribute('href') ?? ''));
-    expect(hrefs.length).toBeGreaterThanOrEqual(5);
+    const links = await page.locator('a.term').evaluateAll((els) =>
+      els.map((el) => ({
+        href: el.getAttribute('href') ?? '',
+        term: el.getAttribute('data-term') ?? '',
+      })),
+    );
+    expect(links.length).toBeGreaterThanOrEqual(5);
 
-    for (const href of hrefs) {
-      expect(href.startsWith('/resources/glossary#')).toBe(true);
+    // Each term links to its own page (/glossary/<slug>); data-term is its t- id.
+    for (const link of links) {
+      expect(link.href).toBe(`/glossary/${link.term.replace(/^t-/, '')}`);
     }
 
-    const fragments = [...new Set(hrefs.map((h) => h.split('#')[1]).filter(Boolean))];
-
-    await page.goto('/resources/glossary');
+    // The t- ids are anchors in the book index, /bok/glossary.
+    await page.goto('/bok/glossary');
     const ids = await page.locator('[id]').evaluateAll((els) => els.map((el) => el.id));
-    for (const fragment of fragments) {
-      expect(ids).toContain(fragment);
+    for (const link of links) {
+      expect(ids).toContain(link.term);
     }
   });
 
@@ -34,7 +37,7 @@ test.describe('glossary term links', () => {
     const tip = page.locator('#term-card[role="tooltip"]');
     await expect(tip).toBeVisible();
     await expect(tip.locator('.tc-term')).not.toBeEmpty();
-    await expect(tip.locator('.tc-link')).toHaveAttribute('href', /\/resources\/glossary#/);
+    await expect(tip.locator('.tc-link')).toHaveAttribute('href', /^\/glossary\/[a-z0-9-]+$/);
   });
 });
 
@@ -74,7 +77,8 @@ test('glossary.json is valid with >= 50 entries', async ({ page }) => {
     expect(typeof entry.slug).toBe('string');
     expect(typeof entry.definition).toBe('string');
     expect(entry.definition.length).toBeLessThanOrEqual(241);
-    expect(entry.url).toBe(`/resources/glossary#${entry.slug}`);
+    expect(entry.url).toBe(`/glossary/${entry.slug.replace(/^t-/, '')}`);
+    expect(entry.anchor).toBe(`/bok/glossary#${entry.slug}`);
   }
 });
 
