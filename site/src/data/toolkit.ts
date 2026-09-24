@@ -56,6 +56,34 @@ export const tools: readonly ToolEntry[] = [
     href: '/toolkit/maturity-self-check',
     chapter: { label: '07. Maturity model', href: '/bok/maturity-model' },
   },
+  // Block w2-tool-triage: the EU AI Act role and risk-class triage, built from
+  // chapter 18; question graph in src/data/triage.ts.
+  {
+    id: 'ai-act-triage',
+    title: 'EU AI Act role and risk-class triage',
+    summary:
+      'Walk an AI system or model through the EU AI Act as amended by the Digital Omnibus: indicative roles and risk classes with the reason behind each answer, and a classification decision record to file.',
+    audience: [
+      'AI governance engineers',
+      'Product and platform owners at intake',
+      'Privacy and legal partners reviewing a classification',
+    ],
+    inputs: [
+      'The system or model and its intended purpose',
+      'Up to 20 questions on definition, reach, role, prohibited practices, high-risk, transparency and GPAI',
+      'Reviewer, date, legal-review state and re-review triggers',
+    ],
+    outputs: [
+      'Indicative scope, EU roles and risk classes, each with its reason and article',
+      'The reason behind every answer',
+      'Classification decision record in JSON and YAML, with its JSON Schema',
+      'Markdown report',
+      'A link that opens the obligations planner with these roles and classes',
+    ],
+    status: 'live',
+    href: '/toolkit/ai-act-triage',
+    chapter: { label: '18. The EU AI Act in one pass', href: '/bok/eu-ai-act' },
+  },
 ];
 
 /** The registry entry for `id`; throws at build time on an unknown id so a
