@@ -6,18 +6,33 @@ import CrosswalkMatrix from '../../components/CrosswalkMatrix.astro';
 import CrosswalkDrawer from '../../components/CrosswalkDrawer.astro';
 import { site } from '../../data/site';
 import { disclaimer } from '../../data/frameworks';
-import { topics, columns, refs, topicMatrix, chipLabel, frameworkById } from '../../data/crosswalk';
+import {
+  topics,
+  columns,
+  refs,
+  topicMatrix,
+  chipLabel,
+  frameworkById,
+  crosswalkAsOf,
+} from '../../data/crosswalk';
 import { slugify } from '../../lib/md-parse';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 import '../../styles/crosswalk.css';
+import '../../styles/crosswalk-explorer.css';
 
 const matrix = topicMatrix();
+const frameworkCount = matrix.columns.reduce((n, c) => n + c.fws.length, 0);
+const unverifiedCount = refs.filter((r) => r.verified === false).length;
 const description =
-  'A crosswalk from each Body-of-Knowledge topic to the EU AI Act, ISO, NIST and Chinese instruments that govern it, clause by clause.';
+  'A crosswalk from 25 AI governance topics to the laws, codes, standards and controls that govern them, clause by clause, with a gap explorer and OSCAL export.';
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Crosswalk' }];
+
+// The explorer's defaults, mirrored in public/crosswalk-explorer.js.
+const DEFAULT_SOURCE = 'eu-ai-act';
+const DEFAULT_TARGET = 'iso-42001';
 
 // The crosswalk is a dataset, not just a page: the two download endpoints next to
 // it (crosswalk.csv.ts / crosswalk.json.ts) are its distributions.
@@ -31,7 +46,25 @@ const jsonLd = [
     url: crosswalkUrl,
     inLanguage: 'en',
     version: site.bokVersion,
-    keywords: ['AI governance', 'EU AI Act', 'ISO/IEC 42001', 'NIST AI RMF', 'China', 'TC260', 'crosswalk'],
+    dateModified: crosswalkAsOf,
+    keywords: [
+      'AI governance',
+      'EU AI Act',
+      'GPAI Code of Practice',
+      'GDPR',
+      'ISO/IEC 42001',
+      'ISO/IEC 42005',
+      'ISO/IEC 23894',
+      'NIST AI RMF',
+      'CSA AICM',
+      'OWASP',
+      'Korea AI Basic Act',
+      'Singapore',
+      'China',
+      'TC260',
+      'OSCAL',
+      'crosswalk',
+    ],
     creator: [...authorRefs],
     publisher: { '@id': ORG_ID },
     isPartOf: { '@id': WEBSITE_ID },
@@ -62,7 +95,7 @@ const jsonLd = [
     variant="res"
     crumbs={crumbs}
     title="One topic, every framework."
-    lede="Start from a governance topic, read across to the instrument that governs it, and land on the exact article, clause or control, each with a link back to the obligation it evidences."
+    lede="Start from a governance topic, read across to the instrument that governs it, and land on the exact article, clause or control. Or start from one framework and see where another covers it, and where it does not."
   />
 
   <div class="container res-page">
@@ -71,19 +104,23 @@ const jsonLd = [
         <p>{disclaimer}</p>
         <p>A mapping cell is not evidence; see the <a href="/bok/patterns#pattern-framework-crosswalk"
         >Framework Crosswalk pattern</a> for what turns a crosswalk into an auditable control.</p>
-        <p>The Chinese references were checked against the CAC texts on 2026-09-20; any chip marked
-        “?” is not yet verified against its source.</p>
+        <p>The Chinese references were checked against the CAC texts on 2026-09-20 and the
+        references added in v0.5.0 on {crosswalkAsOf}. Any chip marked “?” is not yet verified
+        against its source ({unverifiedCount} of {refs.length}), mostly ISO/IEC clauses whose text
+        could not be opened and draft European standards.</p>
       </Callout>
     </div>
 
     <section class="res-section" aria-labelledby="cw-heading">
       <div class="res-section-head">
         <h2 id="cw-heading">Topic × framework</h2>
-        <p>{topics.length} topics · {columns.length} columns · {refs.length} references. Read each row
-        across: this topic is governed here, and there, down to the clause.</p>
+        <p>{topics.length} topics · {columns.length} columns ({frameworkCount} instruments) ·
+        {refs.length} references. Read each row across: this topic is governed here, and there,
+        down to the clause. Four columns show at first; add the others with the column chooser.</p>
         <p class="ob-xref">
           Cross-reference: <a href="/resources/frameworks">the obligation index</a> ·
-          <a href="/bok/patterns#pattern-framework-crosswalk">the Framework Crosswalk pattern</a>.
+          <a href="/bok/patterns#pattern-framework-crosswalk">the Framework Crosswalk pattern</a> ·
+          <a href="#explore">the clause-to-clause explorer</a>.
         </p>
         <p class="ob-export">
           <a class="ob-dl" href="/resources/crosswalk.csv" download>Download CSV</a>
@@ -91,6 +128,116 @@ const jsonLd = [
         </p>
       </div>
       <CrosswalkMatrix matrix={matrix} />
+    </section>
+
+    <section
+      id="explore"
+      class="res-section cwx"
+      aria-labelledby="cwx-heading"
+      data-cwx-src="/resources/crosswalk.json"
+      data-cwx-nojs
+    >
+      <div class="res-section-head">
+        <h2 id="cwx-heading">Clause-to-clause explorer</h2>
+        <p>Pick one or more source frameworks and a target. Two clauses are paired when the
+        crosswalk files them under the same topic, so a pair says "these deal with the same thing"
+        (OSCAL <code>intersects-with</code>), never "meeting one meets the other". The gap view
+        lists the target clauses in this crosswalk that no chosen source reaches; it is not a list
+        of every clause the target contains.</p>
+      </div>
+
+      <noscript>
+        <p class="cwx-nojs">The explorer needs JavaScript. The matrix above and the topic sections
+        below carry the same references, and the CSV and JSON downloads carry all of them.</p>
+      </noscript>
+
+      <form class="cwx-form" data-cwx-form data-cwx-js hidden>
+        <details class="cwx-src" open>
+          <summary class="cwx-src-sum">
+            Source frameworks <span class="mono cwx-src-count" data-cwx-src-count>1 selected</span>
+          </summary>
+          <div class="cwx-src-grid">
+            {
+              matrix.columns.map((col) => (
+                <fieldset class="cwx-src-group">
+                  <legend>{col.label}</legend>
+                  {col.fws.map((f) => (
+                    <label class="cwx-check">
+                      <input
+                        type="checkbox"
+                        name="cwx-src"
+                        value={f.id}
+                        checked={f.id === DEFAULT_SOURCE}
+                        disabled={f.id === DEFAULT_TARGET}
+                      />
+                      <span>{f.short}</span>
+                    </label>
+                  ))}
+                </fieldset>
+              ))
+            }
+          </div>
+        </details>
+
+        <div class="cwx-fields">
+          <label class="cwx-field">
+            <span class="cwx-field-label">Target framework</span>
+            <select name="cwx-tgt">
+              {
+                matrix.columns.map((col) => (
+                  <optgroup label={col.label}>
+                    {col.fws.map((f) => (
+                      <option value={f.id} selected={f.id === DEFAULT_TARGET}>
+                        {f.short}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))
+              }
+            </select>
+          </label>
+          <label class="cwx-field">
+            <span class="cwx-field-label">Topic</span>
+            <select name="cwx-topic">
+              <option value="all" selected>All topics</option>
+              {topics.map((t) => <option value={t.id}>{t.name}</option>)}
+            </select>
+          </label>
+          <label class="cwx-toggle">
+            <input type="checkbox" name="cwx-verified" />
+            <span>Verified references only</span>
+          </label>
+          <fieldset class="cwx-view">
+            <legend class="cwx-field-label">View</legend>
+            <label class="cwx-seg">
+              <input type="radio" name="cwx-view" value="pairs" checked />
+              <span>Side by side</span>
+            </label>
+            <label class="cwx-seg">
+              <input type="radio" name="cwx-view" value="gaps" />
+              <span>Gaps</span>
+            </label>
+          </fieldset>
+        </div>
+      </form>
+
+      <div class="cwx-actions" data-cwx-js hidden>
+        <button type="button" class="cwx-btn" data-cwx-action="link" disabled>Copy link</button>
+        <button type="button" class="cwx-btn" data-cwx-action="csv" disabled>Download CSV</button>
+        <button type="button" class="cwx-btn" data-cwx-action="json" disabled>Download JSON</button>
+        <button type="button" class="cwx-btn" data-cwx-action="oscal" disabled>Download OSCAL</button>
+      </div>
+
+      <p class="cwx-status" role="status" data-cwx-status data-cwx-js hidden></p>
+      <div class="cwx-out" data-cwx-out data-cwx-js hidden></div>
+
+      <p class="cwx-fine">
+        Every export says “illustrative, not a claim of conformity” inside the file. The OSCAL
+        export is a mapping collection in the NIST OSCAL 1.2.3 Control Mapping model: one mapping
+        per source framework, relationship <code>intersects-with</code>, with gap summaries. Its
+        id-refs are the crosswalk clause ids (CSA’s own control ids for the AICM), because most of
+        these instruments publish no OSCAL catalog to resolve against.
+      </p>
     </section>
 
     <section class="res-section" aria-labelledby="cw-topics-heading">
@@ -116,6 +263,17 @@ const jsonLd = [
                 ))}
               </span>
             )}
+            {topic.read && topic.read.length > 0 && (
+              <p class="cw-read">
+                In the Body of Knowledge:{' '}
+                {topic.read.map((r, i) => (
+                  <>
+                    {i > 0 && ' · '}
+                    <a href={r.href}>{r.label}</a>
+                  </>
+                ))}
+              </p>
+            )}
             <ul class="cw-refs">
               {cells.flat().map((r) => (
                 <li data-fw={r.framework}>
@@ -136,6 +294,7 @@ const jsonLd = [
                   {r.verified === false && (
                     <span class="visually-hidden"> not yet verified against the source</span>
                   )}
+                  <span class="cw-ref-fw">{frameworkById(r.framework)?.short ?? r.framework}</span>
                   <span class="cw-ref-title">{r.title}</span>
                   {r.note && <span class="cw-ref-note">{r.note}</span>}
                   {r.url && (
@@ -151,6 +310,11 @@ const jsonLd = [
                       Obligation row →
                     </a>
                   )}
+                  {r.see && (
+                    <a class="cw-ref-see" href={r.see}>
+                      In the BoK →
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -164,4 +328,5 @@ const jsonLd = [
 
   <script is:inline defer src="/inert.js"></script>
   <script is:inline defer src="/crosswalk.js"></script>
+  <script is:inline defer src="/crosswalk-explorer.js"></script>
 </Base>

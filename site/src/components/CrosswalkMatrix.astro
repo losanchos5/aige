@@ -1,21 +1,27 @@
 ---
 /**
  * CrosswalkMatrix, the topic × framework grid: one row per Body-of-Knowledge
- * topic, one column per framework family (EU, ISO, NIST and the China group),
- * each cell a stack of clause chips. Every trigger is a link, not a button: with
- * JS off the row header and each cell jump natively to the topic's <article>
- * further down the page; public/crosswalk.js upgrades them to open the drawer.
- * Unlike ObligationMatrix it carries no JSON payload: the drawer clones the
- * server-rendered topic section, and no opacity stagger. Mirrors the
- * sticky-first-column horizontal scroll of ObligationMatrix. Pagefind indexes
- * the topic sections, not this grid. Column type tags and clause chips are
- * neutral (.type-tag in resources.css, .cw-chip in crosswalk.css): layer
- * colours are reserved for the stack layers. A visible key above the grid
- * spells out the chip outlines (solid = maps to, dashed = related, "?" = not
- * yet verified), and the scroll region is focusable and named, with a sideways
- * cue on narrow screens.
+ * topic, one column per framework family, each cell a stack of clause chips.
+ * Every trigger is a link, not a button: with JS off the row header and each
+ * cell jump natively to the topic's <article> further down the page;
+ * public/crosswalk.js upgrades them to open the drawer. Unlike ObligationMatrix
+ * it carries no JSON payload: the drawer clones the server-rendered topic
+ * section, and no opacity stagger. Mirrors the sticky-first-column horizontal
+ * scroll of ObligationMatrix. Pagefind indexes the topic sections, not this
+ * grid. Column type tags and clause chips are neutral (.type-tag in
+ * resources.css, .cw-chip in crosswalk.css): layer colours are reserved for the
+ * stack layers. A visible key above the grid spells out the chip outlines
+ * (solid = maps to, dashed = related, "?" = not yet verified), and the scroll
+ * region is focusable and named, with a sideways cue on narrow screens.
+ *
+ * Version 2 has fourteen columns. The four v0.4 columns show by default and
+ * the others carry .cw-col-opt, hidden by crosswalk-explorer.css from the first
+ * paint; the column chooser (revealed and driven by public/crosswalk.js, choice
+ * remembered per browser) shows or hides any column, so the grid stays usable
+ * at 390 px. Without JavaScript the <noscript> rule shows every column.
  */
 import { topicMatrix, chipLabel, frameworkById } from '../data/crosswalk';
+import type { ColumnGroup } from '../data/crosswalk';
 
 interface Props {
   matrix?: ReturnType<typeof topicMatrix>;
@@ -23,6 +29,13 @@ interface Props {
 
 const { matrix = topicMatrix() } = Astro.props;
 const { columns, rows } = matrix;
+
+const groups: { id: ColumnGroup; label: string }[] = [
+  { id: 'law', label: 'Law' },
+  { id: 'codes', label: 'Codes and frameworks' },
+  { id: 'standards', label: 'Standards and controls' },
+];
+const defaultCount = columns.filter((c) => c.defaultVisible).length;
 ---
 
 <figure class="cw" aria-labelledby="cw-cap">
@@ -49,6 +62,43 @@ const { columns, rows } = matrix;
     </li>
   </ul>
 
+  <div class="cw-cols" data-cw-cols hidden>
+    <details class="cw-cols-d">
+      <summary class="cw-cols-sum">
+        Columns <span class="mono cw-cols-count" data-cw-cols-count
+          >{defaultCount} of {columns.length}</span
+        >
+      </summary>
+      <div class="cw-cols-body">
+        {
+          groups.map((group) => (
+            <fieldset class="cw-cols-group">
+              <legend>{group.label}</legend>
+              {columns
+                .filter((col) => col.group === group.id)
+                .map((col) => (
+                  <label class="cw-cols-opt">
+                    <input
+                      type="checkbox"
+                      value={col.id}
+                      data-cw-colpick
+                      data-default={col.defaultVisible ? 'true' : 'false'}
+                      checked={col.defaultVisible === true}
+                    />
+                    <span>{col.label}</span>
+                  </label>
+                ))}
+            </fieldset>
+          ))
+        }
+        <p class="cw-cols-actions">
+          <button type="button" class="cw-cols-btn" data-cw-cols-all>Show all</button>
+          <button type="button" class="cw-cols-btn" data-cw-cols-reset>Default columns</button>
+        </p>
+      </div>
+    </details>
+  </div>
+
   <p class="cw-hint">Scroll the grid sideways, or read each topic below.</p>
 
   <div
@@ -65,7 +115,7 @@ const { columns, rows } = matrix;
             columns.map((col) => (
               <th
                 scope="col"
-                class="cw-colh"
+                class:list={['cw-colh', !col.defaultVisible && 'cw-col-opt']}
                 data-cw-col={col.id}
                 data-fws={col.frameworks.join(' ')}
               >
@@ -90,7 +140,10 @@ const { columns, rows } = matrix;
                 </a>
               </th>
               {cells.map((refs, i) => (
-                <td class="cw-td">
+                <td
+                  class:list={['cw-td', !columns[i].defaultVisible && 'cw-col-opt']}
+                  data-cw-col={columns[i].id}
+                >
                   {refs.length > 0 ? (
                     <a
                       class="cw-cell"
@@ -128,7 +181,10 @@ const { columns, rows } = matrix;
                       ))}
                     </a>
                   ) : (
-                    <span class="cw-empty" aria-hidden="true">–</span><span class="visually-hidden">no mapping</span>
+                    <>
+                      <span class="cw-empty" aria-hidden="true">–</span>
+                      <span class="visually-hidden">no mapping</span>
+                    </>
                   )}
                 </td>
               ))}
@@ -139,3 +195,11 @@ const { columns, rows } = matrix;
     </table>
   </div>
 </figure>
+
+<noscript>
+  <style is:inline>
+    .cw-grid .cw-col-opt {
+      display: table-cell !important;
+    }
+  </style>
+</noscript>
