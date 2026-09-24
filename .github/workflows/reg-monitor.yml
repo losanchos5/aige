@@ -1,0 +1,98 @@
+name: Regulatory monitor
+
+# Daily check of the official pages the site cites (tools/reg-monitor/sources.json).
+# It never publishes anything: on a change it opens, or comments on, an issue
+# labelled "regulatory-change", and a person decides what to edit.
+#
+# State (hashes and the last normalised text of each page) lives on the orphan
+# branch "reg-monitor-state", never on main: every push to main deploys the site
+# (deploy.yml), and a daily state commit there would redeploy it every day.
+# Pushes made with the GITHUB_TOKEN do not start other workflow runs, and no
+# workflow listens to that branch. See tools/reg-monitor/README.md.
+
+on:
+  schedule:
+    - cron: '17 6 * * *' # daily, 06:17 UTC (off the top of the hour)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run: print what would happen; write no state and open no issue'
+        type: boolean
+        default: true
+      only:
+        description: 'Comma-separated source ids to check (empty checks all)'
+        type: string
+        default: ''
+
+permissions: {}
+
+concurrency:
+  group: reg-monitor
+  cancel-in-progress: false
+
+jobs:
+  monitor:
+    # Forks get the file but not the job: only the canonical repository runs it.
+    if: github.repository == 'losanchos5/aige'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write # push the reg-monitor-state branch
+      issues: write # open or comment on "regulatory-change" issues
+    env:
+      STATE_BRANCH: reg-monitor-state
+      # Scheduled runs have no inputs: they are never dry runs.
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '' }}
+      ONLY: ${{ inputs.only }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+      # No dependencies to install: the monitor is plain Node 22.
+      - name: Unit tests and source list check
+        run: |
+          node --test 'tools/reg-monitor/test/*.test.mjs'
+          node tools/reg-monitor/monitor.mjs --check
+      - name: Check out the state branch
+        run: |
+          set -euo pipefail
+          dir="$RUNNER_TEMP/reg-state"
+          if git ls-remote --exit-code --heads origin "$STATE_BRANCH" >/dev/null; then
+            git fetch --no-tags --depth=1 origin "$STATE_BRANCH"
+            git worktree add --quiet --detach "$dir" FETCH_HEAD
+          else
+            # First run: an empty orphan branch, sharing no history with main.
+            git worktree add --quiet --detach "$dir"
+            git -C "$dir" checkout --quiet --orphan "$STATE_BRANCH"
+            git -C "$dir" rm -r -q --cached --ignore-unmatch .
+            git -C "$dir" clean -f -d -x -q
+          fi
+          echo "STATE_DIR=$dir" >> "$GITHUB_ENV"
+      - name: Run the monitor
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          args=(--state-dir "$STATE_DIR")
+          if [ -n "$DRY_RUN" ]; then args+=(--dry-run); fi
+          if [ -n "$ONLY" ]; then args+=(--only "$ONLY"); fi
+          node tools/reg-monitor/monitor.mjs "${args[@]}"
+      # Runs even when the monitor step failed, so the sources already handled
+      # (and their issues) are recorded and not reported twice.
+      - name: Save the state
+        if: ${{ always() && env.DRY_RUN == '' && env.STATE_DIR != '' }}
+        run: |
+          set -euo pipefail
+          cd "$STATE_DIR"
+          [ -f state.json ] || { echo "No state written; nothing to save."; exit 0; }
+          git add -- README.md state.json
+          if [ -d text ]; then git add -- text; fi
+          if git diff --cached --quiet; then
+            echo "State unchanged."
+            exit 0
+          fi
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit --quiet -m "chore(reg-monitor): estado de la ejecución $GITHUB_RUN_ID"
+          git push --quiet origin "HEAD:refs/heads/$STATE_BRANCH"
