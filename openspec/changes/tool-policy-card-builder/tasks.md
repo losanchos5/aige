@@ -28,5 +28,5 @@ se lanza con `bash D:/Documents/aige-wt/build.sh`.
 
 ## 5. Notas de verificación
 
-- Las nueve pruebas de generadores de `policy-card.spec.ts` se ejecutaron en Node con un arnés local y pasan; las de navegador no se ejecutan en este bloque (se lanzan de forma central).
-- OPA no estaba instalado: se usaron los binarios oficiales descargados en el directorio temporal, comprobados con su sha256.
+- `policy-card.spec.ts` se ejecutó con Playwright solo sobre este fichero (`PW_PORT=4391`, dos workers): 16 de 17 pasaron; la prueba sin JavaScript encontró visible el botón «Build the card» porque `display: flex` de `.tool-buttons` (toolkit.css compartido) gana a `[hidden]`. Se corrigió en la página con una regla acotada y se repitió la ejecución tras la build.
+- OPA no estaba instalado: se usaron los binarios oficiales descargados en el directorio temporal, comprobados con su sha256. Tras el último cambio del generador se repitieron las muestras (idénticas byte a byte) y las 114 variantes: todas pasan `opa check --strict`, `opa test` y `cedar run-tests`.
