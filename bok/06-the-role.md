@@ -49,6 +49,8 @@ purpose and decision authority (chapter 14); which risk tier the
 it (chapter 13); and where it sits on [the AI Act risk ladder](/bok/eu-ai-act#the-risk-ladder)
 (chapter 18). A system that is bought rather than built enters with a
 [Deployment Decision Record](/bok/governing-deployment#the-deployment-decision-record) (chapter 15).
+The [Use-Case Intake & Risk Tiering](/patterns/use-case-intake-risk-tiering) pattern builds the
+intake, and the [AI Act triage](/toolkit/ai-act-triage) drafts the classification decision record.
 **Maps to** Inventory & Transparency.
 
 ### Inventory and registry
@@ -221,7 +223,9 @@ Reading the postings against the workflows above, three mistakes recur.
 - **Certifications as a proxy for capability.** Descriptions list AIGP, CIPP, CISSP and CISM as if a
   certificate produced a control. The Axial data shows certs appear in under 11% of postings each [4];
   the load-bearing skills (eval harnesses, policy-as-code, the runtime data path) are the ones the
-  JD under-specifies. Ask for the workflow, then the cert if it helps.
+  JD under-specifies. Ask for the workflow, then the cert if it helps. What each scheme assesses,
+  and how this book relates to it, is set out neutrally on the
+  [certifications page](/for/certifications).
 - **Analyst work under an engineer title.** In our reading of the postings, "AI Governance
   Engineer" titles often describe intake, mapping and reporting (analyst work) at engineer pay. The tell is the absence of any build: no
   eval gate, no registry integration, no evidence pipeline.

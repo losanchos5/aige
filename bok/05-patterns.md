@@ -361,6 +361,19 @@ copy.
 Layer 04 Runtime Controls & Observability / Layer 02 Inventory & Transparency ·
 [Read the Deactivation, Localisation & Retirement Runbook pattern](/patterns/deactivation-localisation-retirement-runbook)
 
+## What you can do this week
+
+1. **Find your emptiest layer.** List the controls you run by layer and pick the pattern that fills
+   the layer with the fewest.
+2. **Adopt one pattern whole.** Build one pattern's Solution as written, including the record it
+   emits, before you adapt it: a pattern without its artefact is a slide.
+3. **Start from a failure you have seen.** For your highest-risk system, pick the pattern whose
+   Problem names a failure you have already had, not the one that is easiest to build.
+4. **Trace one Maps to line.** Take one pattern you run and check that each article, clause and
+   threat id in its Maps to line points to an artefact you can show today.
+5. **Write down the pattern you are missing.** If you run a control that no pattern describes,
+   draft it in the template and propose it: the catalogue is open to contributions.
+
 ## Sources
 
 [1] Responsible AI Pattern Catalogue (template: summary, objectives, target users, impacted stakeholders, relevant principles, context, problem, solution, consequences; governance/process/product patterns). CSIRO. 2023–2024. https://research.csiro.au/ss/science/projects/responsible-ai-pattern-catalogue/ (verified: primary)

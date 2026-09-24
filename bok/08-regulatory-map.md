@@ -755,6 +755,19 @@ and 22989, NIST AI RMF and the newer NIST AI work, CSA AICM, OWASP GenAI/Agentic
 instruments named above map onto the five-layer stack (chapter 04) and the pattern catalogue (chapter
 05). Mappings are illustrative, not a claim of conformity.
 
+## What you can do this week
+
+1. **Find your rows.** For one system, list the rows of this map that apply to it, by role and risk
+   class, with the date from which each applies.
+2. **Name one artefact per row.** Next to each row, write the artefact that evidences it today, or
+   mark the gap.
+3. **Put the dates in the pipeline.** Store each applicable date as data that your policy checks
+   read, so an obligation that starts to apply shows up as a failing check, not a surprise.
+4. **Evidence one obligation on its merits.** For the obligation you most expected a harmonised
+   standard to cover, write down how you evidence it today without a presumption of conformity.
+5. **Re-read on change.** When a date or a row in this map changes, re-run the first step for your
+   systems and record the difference.
+
 ## Sources
 
 [1] "AI Omnibus enters into force" (Reg. (EU) 2026/1744, in force 2026-07-27; Annex III high-risk → 2 Dec 2027; Annex I → 2 Aug 2028; legacy public-authority → 2 Aug 2030). European Commission. 2026-07-27. https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force (verified: primary)

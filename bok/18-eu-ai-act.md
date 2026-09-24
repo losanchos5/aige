@@ -714,6 +714,8 @@ legacy system is modified.
    entry.
 2. **Write the classification decision record** for every Annex III candidate, with the `Art. 6(3)`
    condition relied on and the profiling flag stated explicitly, and store it next to the system.
+   The [AI Act triage](/toolkit/ai-act-triage) drafts one against the
+   [schema](/schemas/classification-decision-record.v1.json).
 3. **Gate the 2 Dec 2026 prohibitions.** Put `Art. 5(1)(ba)` and `(bb)` in the intake denylist and add
    an adversarial suite for any image, video or voice generator to the eval gate before that date.
 4. **Read your vendor terms for `Art. 25`.** Find the clause that excludes high-risk use and the

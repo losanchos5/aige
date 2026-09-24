@@ -760,8 +760,9 @@ Encode the triggers so that the registry, not a calendar reminder, reopens the a
 widened intended purpose; retraining on a new data source; a new affected population, language or
 jurisdiction; a threshold change; an incident or near miss ([chapter 17](/bok/incidents#capa-from-incident-to-risk-register-and-eval-suite)); a
 monitoring signal outside its band; new law or guidance; and a scheduled review date. The
-[**FRIA-as-Code**](/patterns/fria-as-code) pattern already does this for the FRIA and
-its DPIA cross-reference; the same structure generalises to every assessment in the table.
+[**FRIA-as-Code**](/patterns/fria-as-code#re-assessment-triggers-as-code) pattern already does this
+for the FRIA and its DPIA cross-reference; the same structure generalises, as Impact-Assessment-as-Code,
+to every assessment in the table.
 
 > **In practice (illustrative)**
 > The credit-limit model from the use-case example sat under four assessments at once: a DPIA (the

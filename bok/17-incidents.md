@@ -320,9 +320,9 @@ every confirmed cause against one or more of these classes:
 | **Integration and tooling** | Excessive tool scope, missing mediation, shared credentials | Scoped identity; tool-call mediation | 04 | [Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials) |
 | **Adversarial** | Prompt injection, jailbreak, supply-chain compromise | Red team; input and output guardrails; AIBOM | 03 · 04 | [Runtime Guardrail](/patterns/runtime-guardrail) |
 | **Oversight failure** | Automation bias; a reviewer without context, time or authority; no checkpoint | Designed oversight with measured override rates | 04 | [Human-in-the-loop Gate](/patterns/human-in-the-loop-gate) |
-| **Change management** | Unreviewed model, prompt or config change; silent vendor update | Registry versioning; change gate; vendor notice terms | 01 · 02 | [Vendor / Model Due-Diligence Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate) |
-| **Use outside intended purpose** | Deployment beyond the use the system was assessed for | [Intake and classification](/patterns/use-case-intake-risk-tiering); instructions for use | 01 · 02 | [Agent Registry](/bok/patterns#pattern-agent-registry) |
-| **Organisational** | No owner, unclear decision rights, alert fatigue, untrained staff | Operating model, RACI, drills | 05 | [Incident Pipeline](/bok/patterns#pattern-incident-pipeline) |
+| **Change management** | Unreviewed model, prompt or config change; silent vendor update | Registry versioning; change gate; vendor notice terms | 01 · 02 | [Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate) |
+| **Use outside intended purpose** | Deployment beyond the use the system was assessed for | [Intake and classification](/patterns/use-case-intake-risk-tiering); instructions for use | 01 · 02 | [Agent Registry](/patterns/agent-registry) |
+| **Organisational** | No owner, unclear decision rights, alert fatigue, untrained staff | Operating model, RACI, drills | 05 | [Incident Pipeline](/patterns/incident-pipeline) |
 
 The taxonomy is not only a learning device; regulators ask for it. The Commission's reporting
 template for GPAI serious incidents has a root-cause field that asks for the model outputs that led
@@ -427,6 +427,8 @@ Each duty needs an engineered artefact, and none of them exists by default:
 
 Suspension is a kill switch for a system you do not own. You cannot revoke a vendor's weights, but you
 can stop sending it traffic; test that you can, and how long it takes, before you need it. The
+[Incident Pipeline](/patterns/incident-pipeline#the-deployer-side-inform-the-provider-suspend-use)
+builds the deployer side. The
 [Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate) is where
 the two-way notification terms belong: the provider tells you about incidents and corrective actions
 that affect your deployment, and you have a named channel to tell the provider. The same logic runs

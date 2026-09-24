@@ -218,8 +218,8 @@ held when an output was produced.
 
 | Artefact | What it records | Layer | Pattern |
 |---|---|---|---|
-| Training-data rights ledger | Per dataset: source, acquisition channel, licence, TDM reservation check (result, method, date), place of copying | 2 | [Training-Data Rights Ledger](/patterns/training-data-rights-ledger); [AIBOM](/bok/patterns#pattern-aibom) |
-| Crawler policy-as-code | Honouring `robots.txt` and other machine-readable reservations; no paywall circumvention; blocklist of infringing sites | 1 | [Policy Card](/bok/patterns#pattern-policy-card) |
+| Training-data rights ledger | Per dataset: source, acquisition channel, licence, TDM reservation check (result, method, date), place of copying | 2 | [Training-Data Rights Ledger](/patterns/training-data-rights-ledger); [AIBOM](/patterns/aibom) |
+| Crawler policy-as-code | Honouring `robots.txt` and other machine-readable reservations; no paywall circumvention; blocklist of infringing sites | 1 | [Policy Card](/patterns/policy-card) |
 | Memorisation and regurgitation eval | Extraction probes and verbatim-overlap thresholds per model version | 3 | [Eval Gate in CI](/patterns/eval-gate-in-ci) |
 | Output filter log | Blocked near-verbatim outputs; licence matches on generated code | 4 | [Runtime Guardrail](/patterns/runtime-guardrail) |
 | Copyright policy and training summary | Versioned Art. 53(1)(c) policy and Art. 53(1)(d) summary for GPAI providers | 5 | [Machine-Readable Evidence (OSCAL)](/patterns/machine-readable-evidence-oscal) |
@@ -442,12 +442,12 @@ capability is a row: the claim, where it appears, the eval run that supports it,
 measured on, and the date. Workado failed on the last two columns: the measurement did not match the
 population the claim described [62]. A model release reruns the eval and re-validates every claim
 that cites it; a stale or failing claim is pulled from the copy. This is proposed here as a new
-pattern, the [**Claims Substantiation Gate**](/patterns/claims-substantiation-gate): an [eval gate](/bok/patterns#pattern-eval-gate-in-ci)
+pattern, the [**Claims Substantiation Gate**](/patterns/claims-substantiation-gate): an [eval gate](/patterns/eval-gate-in-ci)
 pointed at marketing copy.
 
 **Deletion-ready lineage.** An order to delete "models or algorithms developed in whole or in part
 using" some data [64] can only be complied with, and proven, if you know which models touched the
-data. That is an [AIBOM](/bok/patterns#pattern-aibom) with dataset lineage down to the version, plus
+data. That is an [AIBOM](/patterns/aibom) with dataset lineage down to the version, plus
 the [training-data rights ledger](/patterns/training-data-rights-ledger). Without it, the only safe response to a disgorgement order is to
 delete everything.
 

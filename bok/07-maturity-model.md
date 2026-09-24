@@ -165,7 +165,8 @@ coverage; use this ladder to find whether the covered controls actually fire.
 third-party ISO/IEC 42001 certification with the validated assessment [1][5]. Its Level 2 aligns with
 the *Enforced* end of this ladder, but, like 42001, it attests a programme rather than measuring the
 freshness of runtime evidence, the property continuous assurance (Level 5) makes cheap to produce and
-hard to fake.
+hard to fake. Certificates of persons (AIGP, ISO/IEC 42001 Lead Implementer and Lead Auditor, AAISM,
+AAIA) are a different thing again: see the [certifications page](/for/certifications).
 
 > **In practice**
 > A function in a large telco assessed itself honestly and landed at Level 2 for inventory but Level 1

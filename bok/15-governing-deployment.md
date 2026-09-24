@@ -301,7 +301,7 @@ Llama" attribution, asks that derived models distributed to others carry "Llama"
 their name, and requires licensees whose products had more than 700 million monthly active users on the release
 date to request a separate licence [22]. The controls follow: a licence
 check as a policy gate (layer 01), licence, acceptable-use version and file hash in the
-[AIBOM](/bok/patterns#pattern-aibom) (layer 02), hash verification of every weight file before
+[AIBOM](/patterns/aibom) (layer 02), hash verification of every weight file before
 load, and a [scan of serialised model files](/patterns/model-artefact-integrity) before they reach a runtime. The full clause and licence
 checklist is on the [contracts page](/resources/contracts).
 
@@ -558,7 +558,9 @@ notice against the registry entry, read the SLA reports, snapshot the sub-proces
 the due-diligence gate on renewal. Keep an alternative model warm in the eval harness so a forced
 migration starts from evidence, not from a standing start. The NIST AI RMF asks for exactly this:
 third-party risks and benefits monitored regularly, and pre-trained models monitored as part of the
-system's own maintenance [30].
+system's own maintenance [30]. The
+[operate step of the due-diligence gate](/patterns/vendor-model-due-diligence-gate#operate-change-notices-reassessment-and-fallback)
+turns this into a runbook.
 
 ### When the provider fails: continuity
 
@@ -644,7 +646,10 @@ matters is the mapping from threat to mitigation to the test that proves the mit
 | Model extraction | Inference API | Rate limits; query-pattern detection | Extraction probe against the limits |
 | Membership inference, inversion | A model tuned on personal data | Minimise personal data in tuning; output filtering | Privacy attack suite on the tuned model |
 | Tampered weights | Supply chain | [Hash and signature verification](/patterns/model-artefact-integrity) | The pipeline fails on a hash mismatch |
-| Tool misuse | Agent actions | Scoped credentials; human gate on high-consequence actions | Scope and [kill-switch](/bok/patterns#pattern-kill-switch--circuit-breaker) tests |
+| Tool misuse | Agent actions | Scoped credentials; human gate on high-consequence actions | Scope and [kill-switch](/patterns/kill-switch-circuit-breaker) tests |
+
+The site's [threat bridge](/resources/threats) lines up these threats with the patterns that control
+them.
 
 ## Secondary use and downstream harm
 
@@ -664,7 +669,7 @@ outputs reach, including those who never touch the interface.
 
 Then give the answers a home, which this chapter calls a
 **[downstream use register](/patterns/downstream-use-register)**: intended and
-prohibited uses written as a [Policy Card](/bok/patterns#pattern-policy-card); every consumer of the
+prohibited uses written as a [Policy Card](/patterns/policy-card); every consumer of the
 outputs (systems, teams, partners) recorded against the registry entry; provenance and caveats
 stamped on outputs so a consumer knows what it is using; and a re-test whenever outputs are used in a
 new context. At runtime, off-purpose use is a signal like any other: classify traffic against the

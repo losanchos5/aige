@@ -69,9 +69,11 @@ You do not need to write production code to use this book, but you should be com
 pipeline. The discipline is a capability anyone close to the build can develop, whatever the title:
 an AI governance engineer is defined by the workflows they own, not by the name of the role.
 
-The website adds one landing page per audience (engineers, CISOs and risk leads, legal counsel and
-DPOs, executives and boards, the public sector, and SMEs) that puts the chapters, patterns, templates
-and tools in the order that job needs them.
+The website adds [one landing page per audience](/for) ([engineers](/for/engineers),
+[CISOs and risk leads](/for/ciso-risk), [legal counsel and DPOs](/for/legal-dpo),
+[executives and boards](/for/executives-board), [the public sector](/for/public-sector) and
+[SMEs](/for/smes)) that puts the chapters, patterns, templates and tools in the order that job
+needs them.
 
 ## How to use this book
 

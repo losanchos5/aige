@@ -619,8 +619,9 @@ techniques from the 2026-09 data release [10], a control and the pattern that im
 `LLM02:2026` Sensitive Information Disclosure lands in the egress filter and `LLM08:2026` Hidden
 Context Exposure in the treatment of prompts. Use the ATLAS IDs to tag test cases in the
 [Adversarial Red-Team Suite](/patterns/adversarial-red-team-suite), so a finding traces
-from technique to control to the eval that now guards it. Mappings are illustrative, not a claim of
-conformity.
+from technique to control to the eval that now guards it. The site's
+[threat bridge](/resources/threats) carries the same rows as data. Mappings are illustrative, not a
+claim of conformity.
 
 ## Frameworks written for agents
 

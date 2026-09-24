@@ -60,6 +60,8 @@ not a claim of conformity.
 | Singapore | Model AI Governance Frameworks (incl. agentic), AI Verify | Voluntary [50][51][53] | Voluntary | IMDA (guidance) |
 | Australia | National AI Plan; Guidance for AI Adoption | Existing law applies; no AI act [54] | Voluntary | Existing regulators; AI Safety Institute advises |
 
+The same regimes are drawn as [a tile map by jurisdiction](/figures/jurisdiction-tiles).
+
 ## South Korea: the AI Basic Act
 
 South Korea has a horizontal AI statute in force that carries operator duties and fines. Its
