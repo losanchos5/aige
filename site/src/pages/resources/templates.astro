@@ -1,0 +1,465 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import { stages, kit, schemaOrder } from '../../data/templates';
+import { patterns } from '../../data/patterns';
+import { getSchemas } from '../../lib/schemas-library';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { site } from '../../data/site';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+
+// Unlisted schemas sort last, so a new file still shows up before its order is set.
+const rank = (name: string) => {
+  const i = schemaOrder.indexOf(name);
+  return i === -1 ? schemaOrder.length : i;
+};
+const schemas = [...getSchemas()].sort((a, b) => rank(a.name) - rank(b.name));
+const byStage = stages
+  .map((stage) => ({ ...stage, rows: schemas.filter((s) => s.stage === stage.id) }))
+  .filter((stage) => stage.rows.length > 0);
+
+const patternTitle = new Map(patterns.map((p) => [p.id, p.title]));
+const patternHref = (id: string) => `/bok/patterns#${id}`;
+const layerLabel = (layers: readonly number[]) => `Layer${layers.length > 1 ? 's' : ''} ${layers.join(', ')}`;
+
+// Sources for the claims this page makes. Obligation identifiers inside the
+// files are references, not quotations; ISO/IEC material is cited by identifier.
+const sources = [
+  {
+    text: 'Regulation (EU) 2024/1689 (Artificial Intelligence Act), Arts. 9, 13, 18, 26, 27, 53, 72 and 73 and Annex IV, consulted article by article (Art. 13(3) lists the content of instructions for use; Annex IV(2)(g) asks for test reports dated and signed by the responsible persons). Future of Life Institute, AI Act Explorer. 2026.',
+    url: 'https://artificialintelligenceact.eu/ai-act-explorer/',
+    verified: 'primary',
+  },
+  {
+    text: 'Regulation (EU) 2026/1744 (Digital Omnibus on AI): Art. 4 reworded so providers and deployers take measures to support AI literacy; the implementing act on a post-market monitoring template replaced by Commission guidance, including a voluntary template, due by 2 Sep 2027. Publications Office of the EU (EUR-Lex). 2026-07-24.',
+    url: 'https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng',
+    verified: 'primary',
+  },
+  {
+    text: '"Report for Serious Incidents under the AI Act (General-Purpose AI Models with Systemic Risk)": reporting template with ten items (start and end dates; resulting harm; chain of events; model involved; evidence available; serious incident response; recommendation; root cause analysis; patterns in post-market monitoring; submitter information), for Art. 55(1)(c) and Commitment 9 of the Safety and Security chapter of the GPAI Code of Practice. European Commission. 2025-11-04.',
+    url: 'https://digital-strategy.ec.europa.eu/en/library/ai-act-commission-publishes-reporting-template-serious-incidents-involving-general-purpose-ai',
+    verified: 'primary',
+  },
+  {
+    text: 'Towards a common reporting framework for AI incidents (OECD Artificial Intelligence Papers No. 34; 29 criteria in eight dimensions, seven of them mandatory). OECD. 2025-02.',
+    url: 'https://www.oecd.org/content/dam/oecd/en/publications/reports/2025/02/towards-a-common-reporting-framework-for-ai-incidents_8c488fdb/f326d4ac-en.pdf',
+    verified: 'primary',
+  },
+  {
+    text: 'NIST AI 100-1, Artificial Intelligence Risk Management Framework (AI RMF 1.0); subcategories cited by identifier (for example GOVERN 1.6 inventory, GOVERN 1.7 decommissioning, MANAGE 1.1 whether development or deployment should proceed, MANAGE 4.1 post-deployment monitoring plans, MANAGE 4.3 incident communication). NIST. 2023-01-26.',
+    url: 'https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf',
+    verified: 'primary',
+  },
+  {
+    text: 'ISO/IEC 42001:2023, Artificial intelligence: Management system (clauses and Annex A controls referenced by identifier only). ISO/IEC. 2023.',
+    url: 'https://www.iso.org/standard/81230.html',
+    verified: 'secondary',
+  },
+  {
+    text: 'ISO/IEC 42005:2025, AI system impact assessment (referenced by identifier only). ISO/IEC. 2025-05.',
+    url: 'https://www.iso.org/standard/44545.html',
+    verified: 'secondary',
+  },
+  {
+    text: 'ISO/IEC 23894:2023, Guidance on AI risk management (referenced by identifier only). ISO/IEC. 2023-02.',
+    url: 'https://www.iso.org/standard/77304.html',
+    verified: 'secondary',
+  },
+  {
+    text: 'Regulation (EU) 2016/679 (GDPR): Arts. 5(1)(e), 6, 9, 22, 28, 35 and 36 referenced by identifier; the text of Art. 28 (processor terms) and Art. 35(7) (minimum content of a data protection impact assessment) checked on a consolidated reproduction. Publications Office of the EU (EUR-Lex). 2016-04-27.',
+    url: 'https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng',
+    verified: 'secondary',
+  },
+  {
+    text: 'JSON Schema Draft 2020-12 (meta-schema https://json-schema.org/draft/2020-12/schema). JSON Schema. 2022-06-16.',
+    url: 'https://json-schema.org/draft/2020-12',
+    verified: 'primary',
+  },
+  {
+    text: 'Policy Language (Rego, the policy language of Open Policy Agent). Open Policy Agent. 2026.',
+    url: 'https://www.openpolicyagent.org/docs/policy-language',
+    verified: 'primary',
+  },
+  {
+    text: 'Datasheets for Datasets (arXiv 1803.09010, v8). Gebru et al. 2018-03-23, revised 2021-12-01.',
+    url: 'https://arxiv.org/abs/1803.09010',
+    verified: 'primary',
+  },
+];
+
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Templates' }];
+const checkScript = `${site.github}/blob/main/site/scripts/schemas-check.mjs`;
+---
+
+<Base
+  title="Templates and schemas"
+  description="JSON Schemas, filled examples and human templates for the records AI governance produces, from the use-case record to the incident record, each field tagged with the obligations it helps evidence."
+  image="/og/resources.png"
+  jsonLd={breadcrumbJsonLd(crumbs)}
+>
+  <PageHero variant="res" crumbs={crumbs} title="Templates and schemas, as code.">
+    <p class="lede" slot="lede">
+      {schemas.length} JSON Schemas for the records AI governance produces, each with a filled
+      example that validates and a human template with the same fields, plus a policy kit of
+      {kit.length} organisation-level templates. Every field that helps evidence an obligation says
+      which one, so a record drops into the evidence store and the audit becomes a query.
+    </p>
+  </PageHero>
+
+  <div class="container res-page">
+    <div class="res-section">
+      <Callout kind="note" title="Illustrative, not a claim of conformity">
+        <p>The obligation tags (<code>x-evidences</code>) are an illustrative mapping. A filled
+        template supports and evidences an obligation; it does not make a system compliant, and
+        nothing here is legal advice. Adapt the fields to your context and your law.</p>
+        <p>Licensed CC BY 4.0. Version 1 of every schema lives at a fixed URL; a breaking change
+        ships as version 2 at a new URL, so records that cite <code>v1</code> keep validating.
+        Obligation references checked as of 2026-09-24.</p>
+      </Callout>
+    </div>
+
+    <section class="res-section" aria-labelledby="tpl-how">
+      <div class="res-section-head">
+        <h2 id="tpl-how">How the library fits together</h2>
+        <p>One record per lifecycle step, all filed against the same key: the registry id and
+        version of the system (<code>id@version</code>). The shapes published in the patterns
+        chapter (registry entry, verdict, eval result, evidence record) validate against these
+        schemas, and the site build checks that on every release.</p>
+      </div>
+      <ol class="tpl-stages">
+        {
+          byStage.map((stage) => (
+            <li>
+              <a href={`#stage-${stage.id}`}>{stage.label}</a>
+              <span class="tpl-stage-names">
+                {stage.rows.map((row) => (
+                  <code>{row.name}</code>
+                ))}
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="res-section" aria-labelledby="tpl-schemas">
+      <div class="res-section-head">
+        <h2 id="tpl-schemas">Schemas, by lifecycle stage</h2>
+        <p>Each row gives the schema (JSON Schema draft 2020-12<sup><a class="cite" href="#src-10">10</a></sup>),
+        a filled example that validates against it, and a Markdown template with the same fields
+        and short guidance. The examples follow two de-identified systems: a customer-service agent
+        and an in-house credit affordability model.</p>
+      </div>
+
+      {
+        byStage.map((stage) => (
+          <div class="tpl-stage">
+            <h3 id={`stage-${stage.id}`}>{stage.label}</h3>
+            <p class="tpl-stage-lede">{stage.lede}</p>
+            <div class="res-tablewrap">
+              <table class="res-table tpl-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Record</th>
+                    <th scope="col">Purpose</th>
+                    <th scope="col">Evidences</th>
+                    <th scope="col">Patterns</th>
+                    <th scope="col">Layer</th>
+                    <th scope="col">Files</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stage.rows.map((row) => (
+                    <tr id={`schema-${row.name}`}>
+                      <td class="c-name" data-label="Record">
+                        {row.title}
+                        <span class="tpl-file">{row.name}.v1.json</span>
+                        <span class="tpl-count">{row.fieldCount} fields, {row.requiredCount} required</span>
+                      </td>
+                      <td class="c-summary" data-label="Purpose">{row.purpose}</td>
+                      <td class="tpl-ev" data-label="Evidences">
+                        <ul>
+                          {row.evidences.map((ref) => (
+                            <li><code>{ref}</code></li>
+                          ))}
+                        </ul>
+                      </td>
+                      <td class="tpl-pat" data-label="Patterns">
+                        <ul>
+                          {row.patterns.map((id) => (
+                            <li><a href={patternHref(id)}>{patternTitle.get(id) ?? id}</a></li>
+                          ))}
+                        </ul>
+                      </td>
+                      <td class="c-layers" data-label="Layer">
+                        <span class="ticks" role="img" aria-label={layerLabel(row.layers)}>
+                          {row.layers.map((n) => (
+                            <span class="tk" data-l={n} aria-hidden="true" />
+                          ))}
+                        </span>
+                        <span class="tpl-layers">{row.layers.map((n) => `L${n}`).join(' · ')}</span>
+                      </td>
+                      <td class="tpl-files" data-label="Files">
+                        <a href={row.schemaHref}>Schema</a>
+                        <a href={row.exampleHref}>Example</a>
+                        <a href={row.templateHref} download>Template</a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="res-section" aria-labelledby="tpl-kit">
+      <div class="res-section-head">
+        <h2 id="tpl-kit">Policy kit</h2>
+        <p>The organisation-level documents the records hang from. The AI policy is written once,
+        as YAML, and read two ways: as prose people approve and as a Rego<sup><a class="cite" href="#src-11">11</a></sup>
+        skeleton a policy engine evaluates, both keyed to the same rule ids so a verdict traces
+        back to the clause that produced it.</p>
+      </div>
+      <div class="res-tablewrap">
+        <table class="res-table tpl-table">
+          <thead>
+            <tr>
+              <th scope="col">Template</th>
+              <th scope="col">Purpose</th>
+              <th scope="col">Evidences</th>
+              <th scope="col">Patterns</th>
+              <th scope="col">Layer</th>
+              <th scope="col">Files</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              kit.map((item) => (
+                <tr id={`kit-${item.id}`}>
+                  <td class="c-name" data-label="Template">{item.title}</td>
+                  <td class="c-summary" data-label="Purpose">{item.purpose}</td>
+                  <td class="tpl-ev" data-label="Evidences">
+                    <ul>
+                      {item.evidences.map((ref) => (
+                        <li><code>{ref}</code></li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td class="tpl-pat" data-label="Patterns">
+                    <ul>
+                      {item.patterns.map((id) => (
+                        <li><a href={patternHref(id)}>{patternTitle.get(id) ?? id}</a></li>
+                      ))}
+                    </ul>
+                  </td>
+                  <td class="c-layers" data-label="Layer">
+                    <span class="ticks" role="img" aria-label={layerLabel(item.layers)}>
+                      {item.layers.map((n) => (
+                        <span class="tk" data-l={n} aria-hidden="true" />
+                      ))}
+                    </span>
+                    <span class="tpl-layers">{item.layers.map((n) => `L${n}`).join(' · ')}</span>
+                  </td>
+                  <td class="tpl-files" data-label="Files">
+                    {item.files.map((file) => (
+                      <a href={file.href} download>{file.label}</a>
+                    ))}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="res-section prose tpl-prose" aria-labelledby="tpl-use">
+      <h2 id="tpl-use">Using the schemas</h2>
+      <ul>
+        <li><strong>Validate</strong> a record with any draft 2020-12 validator. Each record names
+        its schema in <code>$schema</code>; organisation-specific fields go in
+        <code>extensions</code>, because every other unknown field is rejected so a typo cannot
+        pass as evidence.</li>
+        <li><strong>Obligation tags.</strong> <code>x-evidences</code> names the obligations a
+        record or a field helps evidence: EU AI Act articles<sup><a class="cite" href="#src-1">1</a></sup><sup><a class="cite" href="#src-2">2</a></sup>,
+        GDPR articles<sup><a class="cite" href="#src-9">9</a></sup>, NIST AI RMF subcategories<sup><a class="cite" href="#src-5">5</a></sup>
+        and ISO/IEC 42001, 42005 and 23894 clauses or controls<sup><a class="cite" href="#src-6">6</a></sup><sup><a class="cite" href="#src-7">7</a></sup><sup><a class="cite" href="#src-8">8</a></sup>,
+        by identifier only. <code>x-layer</code>, <code>x-pattern</code> and
+        <code>x-lifecycle-stage</code> place the record in the stack, the pattern catalogue and
+        the lifecycle.</li>
+        <li><strong>Incident record.</strong> Its field names follow the Commission's ten-item
+        template for serious incidents involving general-purpose AI models with systemic
+        risk<sup><a class="cite" href="#src-3">3</a></sup> and the OECD common reporting framework
+        (29 criteria, seven mandatory)<sup><a class="cite" href="#src-4">4</a></sup>; each field
+        says which item or criterion it matches in <code>x-aligns-with</code>, and the seven
+        mandatory criteria are required. Generate a report from the record rather than retyping
+        it.</li>
+        <li><strong>Instructions for use</strong> carry one field per element the EU AI Act lists
+        for them<sup><a class="cite" href="#src-1">1</a></sup>. <strong>Post-market monitoring
+        plan</strong>: since the Digital Omnibus, the Act asks the Commission for guidance,
+        including a voluntary template, by 2 Sep 2027<sup><a class="cite" href="#src-2">2</a></sup>;
+        align this schema with it once published.</li>
+        <li><strong>Dataset card</strong> follows the datasheet idea<sup><a class="cite" href="#src-12">12</a></sup>
+        and adds the fields an admission gate checks: lawful basis, licence, provenance and
+        retention.</li>
+        <li><strong>Checked on every build.</strong> The site's
+        <a href={checkScript}>schemas-check script</a> parses every schema and example, checks each
+        <code>$id</code> against its file name, validates each example with a dependency-free
+        validator for the keyword subset the library uses, and fails the build on drift.</li>
+      </ul>
+    </section>
+
+    <section class="res-section prose tpl-prose" aria-labelledby="tpl-sources">
+      <h2 id="tpl-sources">Sources</h2>
+      <ol class="sources">
+        {
+          sources.map((source, i) => (
+            <li id={`src-${i + 1}`}>
+              <span class="src-num">[{i + 1}]</span> {source.text}{' '}
+              <a href={source.url} rel="noopener">{source.url}</a>{' '}
+              <span class="verified">(verified: {source.verified})</span>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .tpl-stages {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .tpl-stages li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-1) var(--s-3);
+    padding: var(--s-2) 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .tpl-stages a {
+    min-width: 12rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .tpl-stage-names {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-2);
+  }
+
+  .tpl-stage-names code,
+  .tpl-ev code {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+
+  .tpl-stage + .tpl-stage {
+    margin-top: var(--s-6);
+  }
+
+  .tpl-stage h3 {
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    color: var(--ink);
+    scroll-margin-top: var(--anchor-offset);
+  }
+
+  .tpl-stage-lede {
+    margin: var(--s-1) 0 var(--s-4);
+    max-width: var(--prose);
+    color: var(--ink-2);
+  }
+
+  .tpl-table tbody tr {
+    scroll-margin-top: var(--anchor-offset);
+  }
+
+  .tpl-file,
+  .tpl-count {
+    display: block;
+    margin-top: var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 400;
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+
+  .tpl-ev ul,
+  .tpl-pat ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2px;
+  }
+
+  .tpl-ev {
+    min-width: 12rem;
+  }
+
+  .tpl-layers {
+    display: block;
+    margin-top: var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .tpl-files {
+    white-space: nowrap;
+  }
+
+  .tpl-files a {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .tpl-files a:hover {
+    color: var(--ink);
+  }
+
+  .tpl-prose {
+    max-width: var(--prose);
+    margin-inline: 0;
+  }
+
+  .tpl-prose .sources a {
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 720px) {
+    .tpl-ev ul,
+    .tpl-pat ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-1) var(--s-3);
+    }
+
+    .tpl-files {
+      white-space: normal;
+    }
+
+    .tpl-files a {
+      display: inline-block;
+      margin-right: var(--s-3);
+    }
+  }
+</style>

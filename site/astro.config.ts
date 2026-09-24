@@ -32,6 +32,16 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   // (src/lib/glossary.ts, src/lib/reading-list.ts).
   ['/resources/glossary', ['src/pages/resources/glossary.astro', '../bok/09-glossary.md']],
   ['/resources/reading-list', ['src/pages/resources/reading-list.astro', '../bok/10-reading-list.md']],
+  // The templates page reads the schema files themselves (src/lib/schemas-library.ts).
+  [
+    '/resources/templates',
+    [
+      'src/pages/resources/templates.astro',
+      'src/data/templates.ts',
+      'public/schemas',
+      'public/templates',
+    ],
+  ],
   ['/resources/tools', ['src/pages/resources/tools.astro', 'src/data/stack.ts']],
   ['/role', ['src/pages/role.astro', 'src/data/role.ts', 'src/data/maturity.ts']],
   ['/stack', ['src/pages/stack.astro', 'src/data/stack.ts']],
