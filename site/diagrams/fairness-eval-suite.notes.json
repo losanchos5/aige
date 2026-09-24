@@ -1,0 +1,10 @@
+{
+  "policy": "The fairness policy, fixed before the run: protected attributes, the chosen metric and why, the threshold, the minimum cell size and the approver.",
+  "groups": "Group and intersectional metrics, each with a confidence interval, plus a search for the worst slice.",
+  "proxy": "A proxy scan: a model trained to predict the protected attribute from the features flags proxies to justify or remove.",
+  "flip": "A counterfactual flip test that changes only the protected attribute, or swaps identity terms in prompts, and measures how often the outcome changes.",
+  "gate": "The gate judges the confidence interval, not the point, and lists cells below the minimum as insufficient data.",
+  "results": "One structured result per metric and slice, filed against the registry entry and fed into the model card.",
+  "live": "The same metrics run on live decisions on a rolling window, so drift raises an alert.",
+  "blocked": "A release that fails the fairness policy does not ship unless a signed justification is attached."
+}

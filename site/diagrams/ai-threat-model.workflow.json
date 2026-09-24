@@ -1,0 +1,248 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "AI Threat Model",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "enumerate",
+        "label": "Enumerate the threats",
+        "focus": [
+          "design",
+          "stride",
+          "aiclasses"
+        ],
+        "note": "Walk each data-flow element with STRIDE, then add the AI-specific attack classes."
+      },
+      {
+        "id": "decide",
+        "label": "Decide per threat",
+        "focus": [
+          "aiclasses",
+          "decide",
+          "register",
+          "tests"
+        ],
+        "note": "Each threat is mitigated with a named test, or accepted by a named owner in the risk register."
+      },
+      {
+        "id": "gate",
+        "label": "Gate the design",
+        "focus": [
+          "tests",
+          "gate",
+          "blocked"
+        ],
+        "note": "The design review fails while any threat above tolerance has no mitigation or no test."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "l1",
+      "label": "Layer 01 Govern-as-Code"
+    },
+    {
+      "id": "l3",
+      "label": "Layer 03 Evals & Red Teaming as Evidence"
+    },
+    {
+      "id": "risk",
+      "label": "Risk register"
+    },
+    {
+      "id": "blocked",
+      "label": "Design review fails",
+      "variant": "exception"
+    }
+  ],
+  "phases": [
+    {
+      "id": "scope",
+      "label": "Scope",
+      "fromCol": 0,
+      "toCol": 0
+    },
+    {
+      "id": "model",
+      "label": "Enumerate + decide",
+      "fromCol": 1,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "prove",
+      "label": "Test + gate",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "dashed"
+    }
+  ],
+  "mainPath": [
+    "design",
+    "stride",
+    "aiclasses",
+    "decide",
+    "tests",
+    "gate"
+  ],
+  "nodes": [
+    {
+      "id": "design",
+      "lane": "l1",
+      "col": 0,
+      "type": "external",
+      "label": "Design record",
+      "sublabel": "data-flow diagram",
+      "width": 150
+    },
+    {
+      "id": "stride",
+      "lane": "l1",
+      "col": 1,
+      "type": "backend",
+      "label": "STRIDE per element",
+      "sublabel": "trust boundaries",
+      "width": 152
+    },
+    {
+      "id": "aiclasses",
+      "lane": "l1",
+      "col": 2,
+      "type": "backend",
+      "label": "AI-specific classes",
+      "sublabel": "ATLAS, NIST, OWASP",
+      "width": 156
+    },
+    {
+      "id": "decide",
+      "lane": "l1",
+      "col": 3,
+      "type": "security",
+      "label": "Rate and decide",
+      "sublabel": "mitigate or accept",
+      "width": 150
+    },
+    {
+      "id": "tests",
+      "lane": "l3",
+      "col": 4,
+      "type": "backend",
+      "label": "Test per mitigation",
+      "sublabel": "red-team case, eval",
+      "width": 156
+    },
+    {
+      "id": "gate",
+      "lane": "l3",
+      "col": 5,
+      "type": "security",
+      "label": "Design review gate",
+      "sublabel": "every threat tested",
+      "tag": "pass / fail",
+      "width": 156
+    },
+    {
+      "id": "register",
+      "lane": "risk",
+      "col": 4,
+      "type": "database",
+      "label": "Accepted threats",
+      "sublabel": "named acceptor",
+      "width": 150
+    },
+    {
+      "id": "blocked",
+      "lane": "blocked",
+      "col": 5,
+      "type": "backend",
+      "label": "Review fails",
+      "sublabel": "threat without a test",
+      "width": 152
+    }
+  ],
+  "edges": [
+    {
+      "id": "design-stride",
+      "from": "design",
+      "to": "stride",
+      "label": "decompose",
+      "variant": "default"
+    },
+    {
+      "id": "stride-aiclasses",
+      "from": "stride",
+      "to": "aiclasses",
+      "label": "extend",
+      "variant": "emphasis"
+    },
+    {
+      "id": "aiclasses-decide",
+      "from": "aiclasses",
+      "to": "decide",
+      "label": "rate",
+      "variant": "emphasis"
+    },
+    {
+      "id": "decide-tests",
+      "from": "decide",
+      "to": "tests",
+      "label": "mitigate",
+      "variant": "emphasis"
+    },
+    {
+      "id": "decide-register",
+      "from": "decide",
+      "to": "register",
+      "label": "accept",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "id": "tests-gate",
+      "from": "tests",
+      "to": "gate",
+      "label": "test ids",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gate-blocked",
+      "from": "gate",
+      "to": "blocked",
+      "label": "untested threat",
+      "variant": "security",
+      "role": "error"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Scope the AI surface",
+      "items": [
+        "Decompose data sources, training, model artefact, corpus, prompts, tools and the inference API",
+        "Training data stores and the model registry are in scope",
+        "Keep the model as a versioned data file next to the design record"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "STRIDE, extended",
+      "items": [
+        "Walk each element with the six STRIDE categories",
+        "Add poisoning, evasion, extraction, prompt injection and unsafe model files",
+        "Name catalogue ids from MITRE ATLAS and the OWASP lists"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Every threat resolves",
+      "items": [
+        "Mitigated threats carry the id of the test that proves the control",
+        "Accepted threats go to the risk register with a named acceptor",
+        "A new tool, data source, model or technique reopens the model"
+      ]
+    }
+  ]
+}

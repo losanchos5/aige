@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Training-Data Rights Ledger",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1076,
+      540
+    ],
+    "views": [
+      {
+        "id": "one-row-per-source",
+        "label": "One row per source",
+        "focus": [
+          "licensed",
+          "crawl",
+          "internal",
+          "ledger"
+        ],
+        "note": "Each source enters the ledger with its acquisition channel, licence or legal basis, and reservation check."
+      },
+      {
+        "id": "no-row-no-read",
+        "label": "No row, no read",
+        "focus": [
+          "ledger",
+          "gate",
+          "models"
+        ],
+        "note": "The corpus build and the admission gate refuse a source without a row that permits the use."
+      },
+      {
+        "id": "lineage-answers",
+        "label": "Lineage answers",
+        "focus": [
+          "models",
+          "summary",
+          "change"
+        ],
+        "note": "Disclosures are generated from the ledger, and forward lineage names the models a change affects."
+      }
+    ]
+  },
+  "stages": [
+    {
+      "label": "Sources"
+    },
+    {
+      "label": "Ledger (Layer 02)"
+    },
+    {
+      "label": "Admission"
+    },
+    {
+      "label": "Models"
+    },
+    {
+      "label": "Answers"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "licensed",
+      "type": "external",
+      "label": "Licensed corpus",
+      "sublabel": "licence terms",
+      "stage": 0,
+      "row": 0,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "crawl",
+      "type": "external",
+      "label": "Crawled content",
+      "sublabel": "reservation check",
+      "stage": 0,
+      "row": 1,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "internal",
+      "type": "external",
+      "label": "Internal and user data",
+      "sublabel": "legal basis",
+      "stage": 0,
+      "row": 2,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "ledger",
+      "type": "database",
+      "label": "Rights ledger",
+      "sublabel": "one row per source",
+      "stage": 1,
+      "row": 1,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Corpus build gate",
+      "sublabel": "no row, no read",
+      "stage": 2,
+      "row": 1,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "models",
+      "type": "database",
+      "label": "Model versions",
+      "sublabel": "lineage to rows",
+      "stage": 3,
+      "row": 1,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "summary",
+      "type": "external",
+      "label": "Training summary",
+      "sublabel": "generated, not drafted",
+      "stage": 4,
+      "row": 0,
+      "width": 150,
+      "height": 64
+    },
+    {
+      "id": "change",
+      "type": "external",
+      "label": "Withdrawal or order",
+      "sublabel": "affected models only",
+      "stage": 4,
+      "row": 2,
+      "width": 150,
+      "height": 64
+    }
+  ],
+  "flows": [
+    {
+      "id": "licensed-ledger",
+      "from": "licensed",
+      "to": "ledger",
+      "label": "record",
+      "variant": "default",
+      "route": "top-channel"
+    },
+    {
+      "id": "crawl-ledger",
+      "from": "crawl",
+      "to": "ledger",
+      "label": "record",
+      "variant": "default",
+      "route": "straight"
+    },
+    {
+      "id": "internal-ledger",
+      "from": "internal",
+      "to": "ledger",
+      "label": "record",
+      "variant": "default",
+      "route": "bottom-channel"
+    },
+    {
+      "id": "ledger-gate",
+      "from": "ledger",
+      "to": "gate",
+      "label": "admit",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gate-models",
+      "from": "gate",
+      "to": "models",
+      "label": "train",
+      "variant": "emphasis"
+    },
+    {
+      "id": "models-summary",
+      "from": "models",
+      "to": "summary",
+      "label": "disclose",
+      "variant": "default"
+    },
+    {
+      "id": "models-change",
+      "from": "models",
+      "to": "change",
+      "label": "forward lineage",
+      "variant": "default"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "The right to train, per source",
+      "items": [
+        "Acquisition channel, licence or legal basis, and the permitted uses",
+        "For crawled content, the reservation check with its method and date",
+        "Rows are written by the pipelines that acquire the data"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Joined to lineage",
+      "items": [
+        "Every training run records the ledger rows it read",
+        "Backward lineage says what trained a model; forward lineage says which models used a source",
+        "Training-content summaries are queries over the ledger"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "When rights change",
+      "items": [
+        "A withdrawal, an erasure request or an order marks the affected rows",
+        "Only the models that read those rows are retrained or retired"
+      ]
+    }
+  ]
+}
