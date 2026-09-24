@@ -1,0 +1,126 @@
+---
+/**
+ * EvidenceChain: the header figure of an /obligations/<id> page. The chain
+ * clause -> duty holder -> date -> artefact -> layer -> evidence record, with
+ * the crosswalk siblings under it, generated at build time from the register
+ * row (src/lib/evidence-chain.ts). Two inline SVGs of the same chain: left to
+ * right from 960px up, top to bottom below it (VISUAL-GUIDE §1.3 and §1.11);
+ * CSS shows one. The text alternative repeats every node in the row's words,
+ * with links to the record schemas.
+ */
+import type { Obligation } from '../../data/frameworks';
+import { chainFor, chainSvg } from '../../lib/evidence-chain';
+
+interface Props {
+  row: Obligation;
+}
+
+const { row } = Astro.props;
+const chain = chainFor(row);
+const base = `chain-${row.id.toLowerCase()}`;
+const title = 'From clause to evidence';
+const desc = chain.nodes.map((node) => node.full).join(' ');
+const wide = chainSvg(chain, { layout: 'row', idPrefix: `${base}-row`, title, desc });
+const narrow = chainSvg(chain, { layout: 'column', idPrefix: `${base}-col`, title, desc });
+---
+
+<figure class="figure--infographic ob-chain" aria-labelledby={`${base}-caption`}>
+  <div class="figure-canvas">
+    <Fragment set:html={wide} />
+    <Fragment set:html={narrow} />
+  </div>
+  <figcaption class="figure-figcaption" id={`${base}-caption`}>
+    <span class="figure-fig-title">{title}</span>
+    <span class="figure-fig-desc">
+      The obligation as a chain: the clause, who it binds, from when, the artefact that evidences
+      it, the stack layer that holds the artefact and the record its evidence is filed as, with the
+      same topic in other frameworks. Build the artefact, then file every output it produces as a
+      record that names <code>{row.id}</code>; illustrative, not a claim of conformity. Drawn from
+      chapter 08.
+    </span>
+  </figcaption>
+  <details class="figure-alt">
+    <summary class="figure-alt-summary">Text alternative</summary>
+    <ul class="ob-chain-alt">
+      {chain.nodes.map((node) => <li>{node.full}</li>)}
+      {
+        chain.records.length > 0 && (
+          <li>
+            Record schemas:{' '}
+            {chain.records.map((record, i) => (
+              <>
+                {i > 0 && ', '}
+                <a href={record.schemaHref}>{record.title}</a>
+              </>
+            ))}
+            .
+          </li>
+        )
+      }
+      {
+        chain.records.length === 0 && (
+          <li>
+            Record schema: <a href="/schemas/evidence-record.v1.json">Evidence record</a>.
+          </li>
+        )
+      }
+      <li>
+        {
+          chain.siblingFrameworks.length > 0
+            ? `Same topic in other frameworks: ${chain.siblingFrameworks
+                .map((f) => `${f.name} (${f.clauses.join(', ')})`)
+                .join('; ')}. The crosswalk section below links each clause.`
+            : 'No crosswalk topic files this clause yet.'
+        }
+      </li>
+      <li>As of {chain.asOf}, the row's review date.</li>
+    </ul>
+  </details>
+</figure>
+
+<style>
+  .ob-chain {
+    max-width: 940px;
+    margin: 0 0 var(--s-6);
+  }
+
+  .ob-chain :global(svg.ob-chain-row),
+  .ob-chain :global(svg.ob-chain-column) {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-inline: auto;
+  }
+
+  .ob-chain :global(svg.ob-chain-row) {
+    display: none;
+    max-width: 900px;
+  }
+
+  .ob-chain :global(svg.ob-chain-column) {
+    max-width: 440px;
+  }
+
+  @media (min-width: 960px) {
+    .ob-chain :global(svg.ob-chain-row) {
+      display: block;
+    }
+
+    .ob-chain :global(svg.ob-chain-column) {
+      display: none;
+    }
+  }
+
+  .ob-chain-alt {
+    margin: var(--s-3) 0 0;
+    padding-left: var(--s-5);
+    max-width: 72ch;
+    font-size: var(--fs-small);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .ob-chain-alt li + li {
+    margin-top: var(--s-1);
+  }
+</style>
