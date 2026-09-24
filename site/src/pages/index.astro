@@ -28,6 +28,7 @@ import ValuePair from '../components/ValuePair.astro';
 import BookParts from '../components/BookParts.astro';
 import ResourceTiles from '../components/ResourceTiles.astro';
 import NewsletterForm from '../components/NewsletterForm.astro';
+import WhatAppliesNow from '../components/WhatAppliesNow.astro';
 import { site } from '../data/site';
 import { WEBSITE_ID } from '../lib/jsonld';
 import { definition, values } from '../data/values';
@@ -356,6 +357,8 @@ const resources = [
     <ResourceTiles tiles={resources} class="reveal-stagger" />
     <p class="sec-link" slot="foot"><a href="/resources">All resources →</a></p>
   </Section>
+
+  <WhatAppliesNow />
 
   <Section
     tone="mesh"

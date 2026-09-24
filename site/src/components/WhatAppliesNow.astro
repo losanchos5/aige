@@ -1,0 +1,186 @@
+---
+/**
+ * WhatAppliesNow: the home page's compact "What applies now" band. It reads
+ * the EU AI Act rows of the obligation register (src/data/frameworks.ts)
+ * through src/lib/applies-now.ts: one line of what already applies, then the
+ * next three dates on which something switches on, each with the register's
+ * own note and the clauses it concerns, every clause linked to its
+ * /obligations/<id> page. Nothing here is typed by hand, so the band cannot
+ * drift from the register; a date that has passed drops out on the next build.
+ *
+ * Self-contained: one <Section> on mesh composition `a`, the one its home
+ * neighbours (the resources tint on `b`, the newsletter on `c`) do not use,
+ * its own scoped styles, no script. Flat cards (no lift: they are not links).
+ */
+import Section from './Section.astro';
+import {
+  inForce,
+  nextDates,
+  formatDate,
+  clauseLinks,
+  euReviewed,
+  isoToday,
+} from '../lib/applies-now';
+
+interface Props {
+  /** Reference date (YYYY-MM-DD); defaults to the build date. */
+  today?: string;
+}
+
+const { today = isoToday() } = Astro.props;
+const now = clauseLinks(inForce(today));
+const dates = nextDates(today, 3).map((d) => ({
+  ...d,
+  label: formatDate(d.date),
+  items: d.items.map((item) => ({ note: item.note, links: clauseLinks(item.rows) })),
+}));
+const reviewed = formatDate(euReviewed());
+const art = (n: number) => (n === 1 ? 'Art.' : 'Arts.');
+---
+
+<Section
+  tone="mesh"
+  mesh="a"
+  meshK={0.3}
+  id="what-applies-now"
+  class="wan-sec"
+  title="What applies now."
+  lede="The EU AI Act, read from the obligation register: what already applies, and the next three dates with what each one switches on."
+>
+  <p class="wan-now">
+    <span class="wan-cap">Applies today</span>
+    <span class="wan-refs">
+      {/* One line: a line break between a link and its comma renders as a space. */}
+      {art(now.length)}{' '}{now.map((link, i) => (<>{i > 0 ? ', ' : ''}<a href={link.href} aria-label={`${link.label}: ${link.name}`}>{link.label}</a></>))}
+    </span>
+  </p>
+
+  <ol class="wan-dates">
+    {
+      dates.map((d) => (
+        <li class="wan-date card-lum">
+          <p class="wan-when">
+            <time datetime={d.date}>{d.label}</time>
+          </p>
+          <ul class="wan-items">
+            {d.items.map((item) => (
+              <li>
+                <span class="wan-note">{item.note}</span>
+                <span class="wan-refs">
+                  {art(item.links.length)}{' '}{item.links.map((link, i) => (<>{i > 0 ? ', ' : ''}<a href={link.href} aria-label={`${link.label}: ${link.name}`}>{link.label}</a></>))}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))
+    }
+  </ol>
+
+  <p class="wan-foot">
+    Dates as the register states them, last reviewed {reviewed}. Indicative, not legal advice and
+    not a claim of conformity.
+  </p>
+
+  <p class="sec-link" slot="foot">
+    <a href="/obligations">The obligation register →</a>
+    <span class="sec-link-sep" aria-hidden="true">·</span>
+    <a href="/bok/eu-ai-act#the-post-omnibus-timeline">The post-Omnibus timeline →</a>
+    <span class="sec-link-sep" aria-hidden="true">·</span>
+    <a href="/for">Routes by audience →</a>
+  </p>
+</Section>
+
+<style>
+  .wan-now {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-4);
+    margin: 0 0 var(--s-5);
+  }
+
+  .wan-cap {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .wan-refs {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  /* Inline links in a run of text: underlined, so they read as links without
+     relying on colour (WCAG 1.4.1). */
+  .wan-refs a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+    text-decoration-thickness: 1px;
+  }
+
+  .wan-refs a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .wan-dates {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 960px) {
+    .wan-dates {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .wan-date {
+    padding: var(--s-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .wan-when {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+
+  .wan-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+
+  .wan-items > li {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+
+  .wan-note {
+    color: var(--ink);
+    line-height: 1.4;
+    text-wrap: pretty;
+  }
+
+  .wan-foot {
+    max-width: 72ch;
+    margin: var(--s-5) 0 0;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+</style>
