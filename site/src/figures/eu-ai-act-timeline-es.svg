@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1414" class="figc" lang="es" role="img" aria-labelledby="fig-eu-ai-act-timeline-es-t fig-eu-ai-act-timeline-es-d">
+  <title id="fig-eu-ai-act-timeline-es-t" lang="en">EU AI Act timeline, in Spanish</title>
+  <desc id="fig-eu-ai-act-timeline-es-d" lang="en">Spanish edition: seven lanes of EU AI Act obligation families on one time axis, 2024 to 2030, with the Omnibus in force from 2026-07-27.</desc>
+  <text class="mono muted" x="40" y="56" font-size="17">Reglamento (UE) 2024/1689, modificado por el Reglamento (UE) 2026/1744</text>
+  <text class="disp" x="40" y="108" font-size="40">Cuándo se aplica cada obligación</text>
+  <text class="ink2" x="40" y="146" font-size="19">Un carril por familia de obligaciones sobre un mismo eje temporal, con los cambios del Ómnibus</text>
+  <text class="ink2" x="40" y="172" font-size="19">digital en vigor desde 2026-07-27.</text>
+  <line class="rule" x1="40" y1="196" x2="960" y2="196"/>
+  <text class="mono" x="66.9" y="230" font-size="16">En vigor 2024-08-01</text>
+  <text class="mono" x="339.6" y="230" font-size="16">Ómnibus en vigor 2026-07-27</text>
+  <line class="rule" x1="128.5" y1="270" x2="128.5" y2="1266"/>
+  <line class="rule" x1="265.7" y1="270" x2="265.7" y2="1266"/>
+  <line class="rule" x1="403" y1="270" x2="403" y2="1266"/>
+  <line class="rule" x1="540.2" y1="270" x2="540.2" y2="1266"/>
+  <line class="rule" x1="677.9" y1="270" x2="677.9" y2="1266"/>
+  <line class="rule" x1="815.1" y1="270" x2="815.1" y2="1266"/>
+  <line class="axis" x1="70.9" y1="238" x2="70.9" y2="1266"/>
+  <line class="stroke-arrow" x1="343.6" y1="238" x2="343.6" y2="1266" stroke-dasharray="5 4"/>
+  <rect class="dot-mask" x="64.2" y="244" width="48" height="22"/>
+  <text class="mono muted" x="88.2" y="260" font-size="16" text-anchor="middle">2024</text>
+  <rect class="dot-mask" x="173.1" y="244" width="48" height="22"/>
+  <text class="mono muted" x="197.1" y="260" font-size="16" text-anchor="middle">2025</text>
+  <rect class="dot-mask" x="310.4" y="244" width="48" height="22"/>
+  <text class="mono muted" x="334.4" y="260" font-size="16" text-anchor="middle">2026</text>
+  <rect class="dot-mask" x="447.6" y="244" width="48" height="22"/>
+  <text class="mono muted" x="471.6" y="260" font-size="16" text-anchor="middle">2027</text>
+  <rect class="dot-mask" x="585.1" y="244" width="48" height="22"/>
+  <text class="mono muted" x="609.1" y="260" font-size="16" text-anchor="middle">2028</text>
+  <rect class="dot-mask" x="722.5" y="244" width="48" height="22"/>
+  <text class="mono muted" x="746.5" y="260" font-size="16" text-anchor="middle">2029</text>
+  <rect class="dot-mask" x="859.6" y="244" width="48" height="22"/>
+  <text class="mono muted" x="883.6" y="260" font-size="16" text-anchor="middle">2030</text>
+  <line class="rule" x1="40" y1="274" x2="960" y2="274"/>
+  <rect class="dot-mask" x="36" y="280" width="289.4" height="26"/>
+  <text class="disp" x="40" y="299" font-size="20">Prácticas de IA prohibidas</text>
+  <rect class="dot-mask" x="896.4" y="282" width="67.6" height="24"/>
+  <text class="mono muted" x="960" y="299" font-size="16" text-anchor="end">Art. 5</text>
+  <line class="stroke-arrow" x1="48" y1="318" x2="140.5" y2="318" stroke-dasharray="4 5"/>
+  <rect class="glyph-fill" x="140.5" y="315" width="811.5" height="6"/>
+  <line class="rule" x1="140.5" y1="327" x2="140.5" y2="338"/>
+  <rect class="dot-mask" x="129.5" y="339" width="221.8" height="60"/>
+  <text class="mono" x="132.5" y="353" font-size="16">2025-02-02</text>
+  <text class="ink2" x="132.5" y="374" font-size="16">Se aplican las prohibiciones</text>
+  <text class="ink2" x="132.5" y="394" font-size="16">originales</text>
+  <line class="rule" x1="391.7" y1="327" x2="391.7" y2="338"/>
+  <rect class="dot-mask" x="380.7" y="339" width="226" height="60"/>
+  <text class="mono" x="383.7" y="353" font-size="16">2026-12-02</text>
+  <text class="ink2" x="383.7" y="374" font-size="16">Nuevas prohibiciones: NCII y</text>
+  <text class="ink2" x="383.7" y="394" font-size="16">CSAM</text>
+  <circle class="dot-on" cx="140.5" cy="318" r="8"/>
+  <circle class="dot-off" cx="391.7" cy="318" r="7"/>
+  <line class="rule" x1="40" y1="410" x2="960" y2="410"/>
+  <rect class="dot-mask" x="36" y="416" width="653.8" height="26"/>
+  <text class="disp" x="40" y="435" font-size="20">Alfabetización en materia de IA y datos para detectar sesgos</text>
+  <rect class="dot-mask" x="848.4" y="418" width="115.6" height="24"/>
+  <text class="mono muted" x="960" y="435" font-size="16" text-anchor="end">Arts. 4, 4a</text>
+  <line class="stroke-arrow" x1="48" y1="454" x2="140.5" y2="454" stroke-dasharray="4 5"/>
+  <rect class="glyph-fill" x="140.5" y="451" width="811.5" height="6"/>
+  <line class="rule" x1="140.5" y1="463" x2="140.5" y2="474"/>
+  <rect class="dot-mask" x="129.5" y="475" width="139.6" height="40"/>
+  <text class="mono" x="132.5" y="489" font-size="16">2025-02-02</text>
+  <text class="ink2" x="132.5" y="510" font-size="16">Se aplica el art. 4</text>
+  <line class="rule" x1="343.6" y1="463" x2="343.6" y2="474"/>
+  <rect class="dot-mask" x="332.6" y="475" width="197.1" height="60"/>
+  <text class="mono" x="335.6" y="489" font-size="16">2026-07-27</text>
+  <text class="ink2" x="335.6" y="510" font-size="16">Art. 4 reformulado; nuevo</text>
+  <text class="ink2" x="335.6" y="530" font-size="16">art. 4a</text>
+  <circle class="dot-on" cx="140.5" cy="454" r="8"/>
+  <circle class="dot-off" cx="343.6" cy="454" r="7"/>
+  <line class="rule" x1="40" y1="546" x2="960" y2="546"/>
+  <rect class="dot-mask" x="36" y="552" width="324.2" height="26"/>
+  <text class="disp" x="40" y="571" font-size="20">Modelos de IA de uso general</text>
+  <rect class="dot-mask" x="838.8" y="554" width="125.2" height="24"/>
+  <text class="mono muted" x="960" y="571" font-size="16" text-anchor="end">Arts. 53, 55</text>
+  <line class="stroke-arrow" x1="48" y1="590" x2="208.6" y2="590" stroke-dasharray="4 5"/>
+  <rect class="glyph-fill" x="208.6" y="587" width="743.4" height="6"/>
+  <line class="rule" x1="208.6" y1="599" x2="208.6" y2="610"/>
+  <rect class="dot-mask" x="63.3" y="611" width="156.3" height="60"/>
+  <text class="mono" x="216.6" y="625" font-size="16" text-anchor="end">2025-08-02</text>
+  <text class="ink2" x="216.6" y="646" font-size="16" text-anchor="end">Obligaciones de los</text>
+  <text class="ink2" x="216.6" y="666" font-size="16" text-anchor="end">proveedores</text>
+  <line class="rule" x1="345.8" y1="599" x2="345.8" y2="610"/>
+  <rect class="dot-mask" x="334.8" y="611" width="104.9" height="80"/>
+  <text class="mono" x="337.8" y="625" font-size="16">2026-08-02</text>
+  <text class="ink2" x="337.8" y="646" font-size="16">La Comisión</text>
+  <text class="ink2" x="337.8" y="666" font-size="16">puede multar</text>
+  <text class="ink2" x="337.8" y="686" font-size="16">(art. 101)</text>
+  <line class="rule" x1="483.1" y1="599" x2="483.1" y2="610"/>
+  <rect class="dot-mask" x="472.1" y="611" width="214.4" height="80"/>
+  <text class="mono" x="475.1" y="625" font-size="16">2027-08-02</text>
+  <text class="ink2" x="475.1" y="646" font-size="16">Deben cumplir los modelos</text>
+  <text class="ink2" x="475.1" y="666" font-size="16">introducidos antes de</text>
+  <text class="ink2" x="475.1" y="686" font-size="16">2025-08-02</text>
+  <circle class="dot-on" cx="208.6" cy="590" r="8"/>
+  <circle class="dot-off" cx="345.8" cy="590" r="7"/>
+  <circle class="dot-off" cx="483.1" cy="590" r="7"/>
+  <line class="rule" x1="40" y1="702" x2="960" y2="702"/>
+  <rect class="dot-mask" x="36" y="708" width="512.2" height="26"/>
+  <text class="disp" x="40" y="727" font-size="20">Transparencia de determinados sistemas de IA</text>
+  <rect class="dot-mask" x="886.8" y="710" width="77.2" height="24"/>
+  <text class="mono muted" x="960" y="727" font-size="16" text-anchor="end">Art. 50</text>
+  <line class="stroke-arrow" x1="48" y1="746" x2="345.8" y2="746" stroke-dasharray="4 5"/>
+  <rect class="glyph-fill" x="345.8" y="743" width="606.2" height="6"/>
+  <line class="rule" x1="345.8" y1="755" x2="345.8" y2="766"/>
+  <rect class="dot-mask" x="145.4" y="767" width="211.4" height="40"/>
+  <text class="mono" x="353.8" y="781" font-size="16" text-anchor="end">2026-08-02</text>
+  <text class="ink2" x="353.8" y="802" font-size="16" text-anchor="end">Informar y marcar (art. 50)</text>
+  <line class="rule" x1="391.7" y1="755" x2="391.7" y2="766"/>
+  <rect class="dot-mask" x="380.7" y="767" width="221.4" height="80"/>
+  <text class="mono" x="383.7" y="781" font-size="16">2026-12-02</text>
+  <text class="ink2" x="383.7" y="802" font-size="16">Fin del periodo de gracia del</text>
+  <text class="ink2" x="383.7" y="822" font-size="16">marcado para sistemas</text>
+  <text class="ink2" x="383.7" y="842" font-size="16">existentes</text>
+  <circle class="dot-on" cx="345.8" cy="746" r="8"/>
+  <circle class="dot-off" cx="391.7" cy="746" r="7"/>
+  <line class="rule" x1="40" y1="858" x2="960" y2="858"/>
+  <rect class="dot-mask" x="36" y="864" width="363.3" height="26"/>
+  <text class="disp" x="40" y="883" font-size="20">Alto riesgo por su uso (anexo III)</text>
+  <rect class="dot-mask" x="445.2" y="866" width="518.8" height="24"/>
+  <text class="mono muted" x="960" y="883" font-size="16" text-anchor="end">Arts. 6, 9 a 15, 17, 25 a 27, 43, 47, 49, 60, 71 a 73</text>
+  <line class="stroke-arrow" x1="48" y1="902" x2="529" y2="902" stroke-dasharray="4 5"/>
+  <rect class="glyph-fill" x="529" y="899" width="423" height="6"/>
+  <line class="rule" x1="345.8" y1="911" x2="345.8" y2="922"/>
+  <rect class="dot-mask" x="117.8" y="923" width="239" height="60"/>
+  <text class="mono" x="353.8" y="937" font-size="16" text-anchor="end">2026-08-02</text>
+  <text class="ink2" x="353.8" y="958" font-size="16" text-anchor="end">Pruebas en condiciones reales</text>
+  <text class="ink2" x="353.8" y="978" font-size="16" text-anchor="end">(art. 60)</text>
+  <line class="rule" x1="529" y1="911" x2="529" y2="922"/>
+  <rect class="dot-mask" x="518" y="923" width="237.4" height="60"/>
+  <text class="mono" x="521" y="937" font-size="16">2027-12-02</text>
+  <text class="ink2" x="521" y="958" font-size="16">Se aplican las obligaciones;</text>
+  <text class="ink2" x="521" y="978" font-size="16">aplazadas desde 2026-08-02</text>
+  <circle class="dot-off" cx="345.8" cy="902" r="7"/>
+  <circle class="dot-on" cx="529" cy="902" r="8"/>
+  <line class="rule" x1="40" y1="994" x2="960" y2="994"/>
+  <rect class="dot-mask" x="36" y="1000" width="370" height="26"/>
+  <text class="disp" x="40" y="1019" font-size="20">Alto riesgo por producto (anexo I)</text>
+  <rect class="dot-mask" x="541.2" y="1002" width="422.8" height="24"/>
+  <text class="mono muted" x="960" y="1019" font-size="16" text-anchor="end">Arts. 6, 9 a 15, 17, 25, 26, 43, 47, 72, 73</text>
+  <line class="stroke-arrow" x1="48" y1="1038" x2="620.7" y2="1038" stroke-dasharray="4 5"/>
+  <rect class="glyph-fill" x="620.7" y="1035" width="331.3" height="6"/>
+  <line class="rule" x1="620.7" y1="1047" x2="620.7" y2="1058"/>
+  <rect class="dot-mask" x="609.7" y="1059" width="237.4" height="60"/>
+  <text class="mono" x="612.7" y="1073" font-size="16">2028-08-02</text>
+  <text class="ink2" x="612.7" y="1094" font-size="16">Se aplican las obligaciones;</text>
+  <text class="ink2" x="612.7" y="1114" font-size="16">aplazadas desde 2027-08-02</text>
+  <circle class="dot-on" cx="620.7" cy="1038" r="8"/>
+  <line class="rule" x1="40" y1="1130" x2="960" y2="1130"/>
+  <rect class="dot-mask" x="36" y="1136" width="547.4" height="26"/>
+  <text class="disp" x="40" y="1155" font-size="20">Alto riesgo ya en el mercado, autoridades públicas</text>
+  <rect class="dot-mask" x="848.4" y="1138" width="115.6" height="24"/>
+  <text class="mono muted" x="960" y="1155" font-size="16" text-anchor="end">Art. 111(2)</text>
+  <line class="stroke-arrow" x1="48" y1="1174" x2="895.2" y2="1174" stroke-dasharray="4 5"/>
+  <rect class="glyph-fill" x="895.2" y="1171" width="56.8" height="6"/>
+  <line class="rule" x1="895.2" y1="1183" x2="895.2" y2="1194"/>
+  <rect class="dot-mask" x="686.7" y="1195" width="219.5" height="60"/>
+  <text class="mono" x="903.2" y="1209" font-size="16" text-anchor="end">2030-08-02</text>
+  <text class="ink2" x="903.2" y="1230" font-size="16" text-anchor="end">Deben cumplir los sistemas</text>
+  <text class="ink2" x="903.2" y="1250" font-size="16" text-anchor="end">ya en el mercado</text>
+  <circle class="dot-on" cx="895.2" cy="1174" r="8"/>
+  <line class="rule" x1="40" y1="1266" x2="960" y2="1266"/>
+  <circle class="dot-on" cx="50" cy="1287" r="8"/>
+  <text class="ink2" x="70" y="1292" font-size="16">Se aplican las obligaciones</text>
+  <circle class="dot-off" cx="318.6719999999999" cy="1287" r="7"/>
+  <text class="ink2" x="338.7" y="1292" font-size="16">Otro hito con fecha</text>
+  <rect class="glyph-fill" x="508.2" y="1284" width="22" height="6"/>
+  <text class="ink2" x="538.2" y="1292" font-size="16">En aplicación</text>
+  <line class="stroke-arrow" x1="680.4" y1="1276" x2="680.4" y2="1298" stroke-dasharray="5 4"/>
+  <text class="ink2" x="700.4" y="1292" font-size="16">Ómnibus en vigor</text>
+  <line class="rule" x1="40" y1="1309" x2="960" y2="1309"/>
+  <text class="mono muted" x="40" y="1334" font-size="16">Fuente: capítulo 18 (The post-Omnibus timeline) y capítulo 08 (EU AI Act, post-Omnibus). Las</text>
+  <text class="mono muted" x="40" y="1357" font-size="16">fechas de la Comisión, de organismos notificados y del anexo X: tabla del capítulo 18.</text>
+  <text class="mono muted" x="40" y="1384" font-size="16">A fecha de 2026-09-24 · una ayuda de lectura, no asesoramiento jurídico</text>
+</svg>

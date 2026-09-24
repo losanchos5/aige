@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1414" class="figc" role="img" aria-labelledby="fig-deployment-option-matrix-t fig-deployment-option-matrix-d">
+  <title id="fig-deployment-option-matrix-t">Model type by deployment option</title>
+  <desc id="fig-deployment-option-matrix-d">A grid of five model types across and six deployment options down, each cell naming the one control that combination adds on top of its row and column.</desc>
+  <text class="mono muted" x="40" y="56" font-size="17">Chapter 15 · Governing deployment and use</text>
+  <text class="disp" x="40" y="108" font-size="40">What each combination adds</text>
+  <text class="ink2" x="40" y="146" font-size="19">Read each cell as the one control the combination adds on top of its row and its column. Illustrative,</text>
+  <text class="ink2" x="40" y="172" font-size="19">not a claim of conformity: the controls a real deployment needs follow from its risk tier, its obligations</text>
+  <text class="ink2" x="40" y="198" font-size="19">and its failure modes.</text>
+  <line class="rule" x1="40" y1="222" x2="960" y2="222"/>
+  <text class="mono muted" x="40" y="258" font-size="16">Model type</text>
+  <text class="disp" x="174" y="258" font-size="18">Classic</text>
+  <text class="disp" x="174" y="280" font-size="18">predictive</text>
+  <text class="disp" x="332.8" y="258" font-size="18">Generative,</text>
+  <text class="disp" x="332.8" y="280" font-size="18">language</text>
+  <text class="disp" x="491.6" y="258" font-size="18">Generative,</text>
+  <text class="disp" x="491.6" y="280" font-size="18">multimodal</text>
+  <text class="disp" x="650.4" y="258" font-size="18">Proprietary</text>
+  <text class="disp" x="650.4" y="280" font-size="18">(API)</text>
+  <text class="disp" x="809.2" y="258" font-size="18">Open-weight</text>
+  <text class="mono muted" x="40" y="326" font-size="16">Where it runs</text>
+  <line class="axis" x1="40" y1="335" x2="960" y2="335"/>
+  <text class="disp" x="40" y="372" font-size="18">Cloud</text>
+  <rect class="panel" x="174" y="346" width="150.8" height="129" rx="5"/>
+  <text x="184" y="371" font-size="17">Residency</text>
+  <text x="184" y="392" font-size="17">check on</text>
+  <text x="184" y="413" font-size="17">features; input</text>
+  <text x="184" y="434" font-size="17">drift monitor</text>
+  <rect class="panel" x="332.8" y="346" width="150.8" height="129" rx="5"/>
+  <text x="342.8" y="371" font-size="17">No-training and</text>
+  <text x="342.8" y="392" font-size="17">retention terms;</text>
+  <text x="342.8" y="413" font-size="17">output guardrail</text>
+  <rect class="panel" x="491.6" y="346" width="150.8" height="129" rx="5"/>
+  <text x="501.6" y="371" font-size="17">Provenance</text>
+  <text x="501.6" y="392" font-size="17">marks on</text>
+  <text x="501.6" y="413" font-size="17">output;</text>
+  <text x="501.6" y="434" font-size="17">biometric-use</text>
+  <text x="501.6" y="455" font-size="17">block</text>
+  <rect class="panel" x="650.4" y="346" width="150.8" height="129" rx="5"/>
+  <text x="660.4" y="371" font-size="17">Pin the version;</text>
+  <text x="660.4" y="392" font-size="17">boundary evals</text>
+  <text x="660.4" y="413" font-size="17">on every</text>
+  <text x="660.4" y="434" font-size="17">change</text>
+  <rect class="panel" x="809.2" y="346" width="150.8" height="129" rx="5"/>
+  <text x="819.2" y="371" font-size="17">Licence gate;</text>
+  <text x="819.2" y="392" font-size="17">hash-verified</text>
+  <text x="819.2" y="413" font-size="17">weights on</text>
+  <text x="819.2" y="434" font-size="17">rented compute</text>
+  <text class="disp" x="40" y="509" font-size="18">On-premise</text>
+  <rect class="panel" x="174" y="483" width="150.8" height="108" rx="5"/>
+  <text x="184" y="508" font-size="17">Own the</text>
+  <text x="184" y="529" font-size="17">retraining</text>
+  <text x="184" y="550" font-size="17">pipeline and its</text>
+  <text x="184" y="571" font-size="17">approval</text>
+  <rect class="panel" x="332.8" y="483" width="150.8" height="108" rx="5"/>
+  <text x="342.8" y="508" font-size="17">Own guardrails,</text>
+  <text x="342.8" y="529" font-size="17">patching and</text>
+  <text x="342.8" y="550" font-size="17">energy metering</text>
+  <rect class="panel" x="491.6" y="483" width="150.8" height="108" rx="5"/>
+  <text x="501.6" y="508" font-size="17">Own content</text>
+  <text x="501.6" y="529" font-size="17">signing; media</text>
+  <text x="501.6" y="550" font-size="17">retention rules</text>
+  <rect class="panel" x="650.4" y="483" width="150.8" height="108" rx="5"/>
+  <text x="660.4" y="508" font-size="17">Vendor</text>
+  <text x="660.4" y="529" font-size="17">appliance:</text>
+  <text x="660.4" y="550" font-size="17">attest version</text>
+  <text x="660.4" y="571" font-size="17">and update path</text>
+  <rect class="panel" x="809.2" y="483" width="150.8" height="108" rx="5"/>
+  <text x="819.2" y="508" font-size="17">You own</text>
+  <text x="819.2" y="529" font-size="17">patching:</text>
+  <text x="819.2" y="550" font-size="17">AIBOM, file</text>
+  <text x="819.2" y="571" font-size="17">scans, red team</text>
+  <text class="disp" x="40" y="625" font-size="18">Edge</text>
+  <rect class="panel" x="174" y="599" width="150.8" height="129" rx="5"/>
+  <text x="184" y="624" font-size="17">Signed model;</text>
+  <text x="184" y="645" font-size="17">field-version</text>
+  <text x="184" y="666" font-size="17">telemetry;</text>
+  <text x="184" y="687" font-size="17">remote rollback</text>
+  <rect class="panel" x="332.8" y="599" width="150.8" height="129" rx="5"/>
+  <text x="342.8" y="624" font-size="17">Small model;</text>
+  <text x="342.8" y="645" font-size="17">offline</text>
+  <text x="342.8" y="666" font-size="17">guardrails;</text>
+  <text x="342.8" y="687" font-size="17">signed updates</text>
+  <rect class="panel" x="491.6" y="599" width="150.8" height="129" rx="5"/>
+  <text x="501.6" y="624" font-size="17">Camera and</text>
+  <text x="501.6" y="645" font-size="17">microphone</text>
+  <text x="501.6" y="666" font-size="17">notices;</text>
+  <text x="501.6" y="687" font-size="17">on-device</text>
+  <text x="501.6" y="708" font-size="17">minimisation</text>
+  <rect class="panel" x="650.4" y="599" width="150.8" height="129" rx="5"/>
+  <text x="660.4" y="624" font-size="17">Vendor SDK:</text>
+  <text x="660.4" y="645" font-size="17">licence limits;</text>
+  <text x="660.4" y="666" font-size="17">offline</text>
+  <text x="660.4" y="687" font-size="17">revocation</text>
+  <rect class="panel" x="809.2" y="599" width="150.8" height="129" rx="5"/>
+  <text x="819.2" y="624" font-size="17">Weights are</text>
+  <text x="819.2" y="645" font-size="17">extractable:</text>
+  <text x="819.2" y="666" font-size="17">licence terms</text>
+  <text x="819.2" y="687" font-size="17">and threat</text>
+  <text x="819.2" y="708" font-size="17">model</text>
+  <text class="mono muted" x="40" y="758" font-size="16">How it is adapted</text>
+  <line class="axis" x1="40" y1="767" x2="960" y2="767"/>
+  <text class="disp" x="40" y="804" font-size="18">Fine-tune</text>
+  <rect class="panel" x="174" y="778" width="150.8" height="108" rx="5"/>
+  <text x="184" y="803" font-size="17">Retrain is a</text>
+  <text x="184" y="824" font-size="17">release: re-run</text>
+  <text x="184" y="845" font-size="17">per-group floors</text>
+  <rect class="panel" x="332.8" y="778" width="150.8" height="108" rx="5"/>
+  <text x="342.8" y="803" font-size="17">Full red team;</text>
+  <text x="342.8" y="824" font-size="17">safety-erosion</text>
+  <text x="342.8" y="845" font-size="17">eval</text>
+  <rect class="panel" x="491.6" y="778" width="150.8" height="108" rx="5"/>
+  <text x="501.6" y="803" font-size="17">Likeness and</text>
+  <text x="501.6" y="824" font-size="17">consent checks</text>
+  <text x="501.6" y="845" font-size="17">on tuning media</text>
+  <rect class="panel" x="650.4" y="778" width="150.8" height="108" rx="5"/>
+  <text x="660.4" y="803" font-size="17">Vendor tuning</text>
+  <text x="660.4" y="824" font-size="17">service: data</text>
+  <text x="660.4" y="845" font-size="17">terms; your</text>
+  <text x="660.4" y="866" font-size="17">own re-eval</text>
+  <rect class="panel" x="809.2" y="778" width="150.8" height="108" rx="5"/>
+  <text x="819.2" y="803" font-size="17">Compute log</text>
+  <text x="819.2" y="824" font-size="17">against the</text>
+  <text x="819.2" y="845" font-size="17">GPAI one-third</text>
+  <text x="819.2" y="866" font-size="17">criterion</text>
+  <text class="disp" x="40" y="920" font-size="18">RAG</text>
+  <rect class="panel" x="174" y="894" width="150.8" height="129" rx="5"/>
+  <text x="184" y="919" font-size="17">Not typical;</text>
+  <text x="184" y="940" font-size="17">govern</text>
+  <text x="184" y="961" font-size="17">feature-store</text>
+  <text x="184" y="982" font-size="17">lineage instead</text>
+  <rect class="panel" x="332.8" y="894" width="150.8" height="129" rx="5"/>
+  <text x="342.8" y="919" font-size="17">Groundedness</text>
+  <text x="342.8" y="940" font-size="17">eval; corpus</text>
+  <text x="342.8" y="961" font-size="17">permissions;</text>
+  <text x="342.8" y="982" font-size="17">poisoning</text>
+  <text x="342.8" y="1003" font-size="17">checks</text>
+  <rect class="panel" x="491.6" y="894" width="150.8" height="129" rx="5"/>
+  <text x="501.6" y="919" font-size="17">Cross-modal</text>
+  <text x="501.6" y="940" font-size="17">injection tests</text>
+  <text x="501.6" y="961" font-size="17">on retrieved</text>
+  <text x="501.6" y="982" font-size="17">media</text>
+  <rect class="panel" x="650.4" y="894" width="150.8" height="129" rx="5"/>
+  <text x="660.4" y="919" font-size="17">Your corpus,</text>
+  <text x="660.4" y="940" font-size="17">their model:</text>
+  <text x="660.4" y="961" font-size="17">retention and</text>
+  <text x="660.4" y="982" font-size="17">no-training</text>
+  <text x="660.4" y="1003" font-size="17">terms</text>
+  <rect class="panel" x="809.2" y="894" width="150.8" height="129" rx="5"/>
+  <text x="819.2" y="919" font-size="17">Every layer of</text>
+  <text x="819.2" y="940" font-size="17">evidence is</text>
+  <text x="819.2" y="961" font-size="17">yours to</text>
+  <text x="819.2" y="982" font-size="17">produce</text>
+  <text class="disp" x="40" y="1057" font-size="18">Agentic</text>
+  <text class="disp" x="40" y="1079" font-size="18">wrapper</text>
+  <rect class="panel" x="174" y="1031" width="150.8" height="129" rx="5"/>
+  <text x="184" y="1056" font-size="17">Score triggers</text>
+  <text x="184" y="1077" font-size="17">an action:</text>
+  <text x="184" y="1098" font-size="17">human gate on</text>
+  <text x="184" y="1119" font-size="17">adverse</text>
+  <text x="184" y="1140" font-size="17">outcomes</text>
+  <rect class="panel" x="332.8" y="1031" width="150.8" height="129" rx="5"/>
+  <text x="342.8" y="1056" font-size="17">Agent identity,</text>
+  <text x="342.8" y="1077" font-size="17">tool mediation,</text>
+  <text x="342.8" y="1098" font-size="17">kill switch</text>
+  <rect class="panel" x="491.6" y="1031" width="150.8" height="129" rx="5"/>
+  <text x="501.6" y="1056" font-size="17">Screen and</text>
+  <text x="501.6" y="1077" font-size="17">voice actions</text>
+  <text x="501.6" y="1098" font-size="17">behind a human</text>
+  <text x="501.6" y="1119" font-size="17">gate</text>
+  <rect class="panel" x="650.4" y="1031" width="150.8" height="129" rx="5"/>
+  <text x="660.4" y="1056" font-size="17">Grant scoped</text>
+  <text x="660.4" y="1077" font-size="17">tools; the</text>
+  <text x="660.4" y="1098" font-size="17">vendor agent</text>
+  <text x="660.4" y="1119" font-size="17">gets its own</text>
+  <text x="660.4" y="1140" font-size="17">identity</text>
+  <rect class="panel" x="809.2" y="1031" width="150.8" height="129" rx="5"/>
+  <text x="819.2" y="1056" font-size="17">Own guardrails</text>
+  <text x="819.2" y="1077" font-size="17">end to end; no</text>
+  <text x="819.2" y="1098" font-size="17">vendor safety</text>
+  <text x="819.2" y="1119" font-size="17">layer</text>
+  <line class="rule" x1="40" y1="1168" x2="960" y2="1168"/>
+  <text class="ink2" x="40" y="1194" font-size="16">Model types run across and deployment options down: the chapter prints the same matrix turned a quarter. Hybrid</text>
+  <text class="ink2" x="40" y="1215" font-size="16">hosting, prompting only and distillation have their own rows in the chapter tables, not a cell here.</text>
+  <line class="rule" x1="40" y1="1332" x2="960" y2="1332"/>
+  <text class="mono muted" x="40" y="1357" font-size="16">Source: chapter 15, Governing deployment and use: The model-type by deployment-option matrix.</text>
+  <text class="mono muted" x="40" y="1384" font-size="16">As of 2026-09-24 · illustrative, not a claim of conformity</text>
+</svg>

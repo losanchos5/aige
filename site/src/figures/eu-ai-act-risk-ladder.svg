@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1414" class="figc" role="img" aria-labelledby="fig-eu-ai-act-risk-ladder-t fig-eu-ai-act-risk-ladder-d">
+  <title id="fig-eu-ai-act-risk-ladder-t">EU AI Act risk ladder</title>
+  <desc id="fig-eu-ai-act-risk-ladder-d">Four EU AI Act rungs (prohibited, high-risk via Annex I or III with the Art. 6(3) filter, transparency, minimal), a GPAI track and notes on other regimes.</desc>
+  <line class="axis" x1="42" y1="182" x2="42" y2="1115"/>
+  <line class="axis" x1="56" y1="182" x2="56" y2="1115"/>
+  <line class="axis" x1="42" y1="201" x2="56" y2="201"/>
+  <line class="axis" x1="42" y1="334" x2="56" y2="334"/>
+  <line class="axis" x1="42" y1="818" x2="56" y2="818"/>
+  <line class="axis" x1="42" y1="991" x2="56" y2="991"/>
+  <line class="axis" x1="42" y1="1115" x2="56" y2="1115"/>
+  <text class="mono muted" x="40" y="56" font-size="17">EU AI Act · four rungs for AI systems by intended purpose; GPAI models on a separate track</text>
+  <text class="disp" x="40" y="108" font-size="40">Which rung is the system on?</text>
+  <line class="rule" x1="40" y1="136" x2="960" y2="136"/>
+  <text class="mono muted" x="68" y="166" font-size="16">The ladder (chapter 18)</text>
+  <text class="mono muted" x="648" y="166" font-size="16">Other regimes, not equivalents</text>
+  <rect class="panel" x="68" y="182" width="560" height="123" rx="8"/>
+  <rect class="glyph-fill" x="68" y="182" width="560" height="38" rx="6"/>
+  <text class="disp inv-tx" x="80" y="209" font-size="22">Prohibited</text>
+  <text class="mono inv-tx" x="616" y="208" font-size="16" text-anchor="end">Art. 5</text>
+  <text class="mono" x="80" y="244" font-size="16">From 2025-02-02; new points 2026-12-02</text>
+  <text x="80" y="267" font-size="16">The practice is on the Art. 5 list, now ten points.</text>
+  <text class="ink2" x="80" y="289" font-size="16">It may not be placed on the market, put into service or used.</text>
+  <rect class="panel" x="648" y="182" width="312" height="141" rx="6"/>
+  <text class="disp" x="660" y="206" font-size="17">Texas TRAIGA (HB 149)</text>
+  <text class="ink2" x="660" y="229" font-size="16">Intent-based prohibitions: behaviour</text>
+  <text class="ink2" x="660" y="249" font-size="16">manipulation, government social</text>
+  <text class="ink2" x="660" y="269" font-size="16">scoring, unlawful discrimination,</text>
+  <text class="ink2" x="660" y="289" font-size="16">certain sexual content. In force</text>
+  <text class="ink2" x="660" y="309" font-size="16">2026-01-01.</text>
+  <rect class="panel" x="68" y="315" width="560" height="474" rx="8"/>
+  <text class="disp" x="80" y="342" font-size="22">High-risk</text>
+  <text class="mono muted" x="616" y="341" font-size="16" text-anchor="end">Arts. 6 to 49</text>
+  <text class="ink2" x="80" y="375" font-size="16">Requirements of Arts. 8 to 15, provider and deployer duties,</text>
+  <text class="ink2" x="80" y="395" font-size="16">conformity assessment.</text>
+  <rect class="cell-empty cell" x="80" y="411" width="536" height="100" rx="6"/>
+  <text class="disp" x="92" y="435" font-size="17">Through products, Art. 6(1)</text>
+  <text class="mono" x="604" y="435" font-size="16" text-anchor="end">From 2028-08-02</text>
+  <text x="92" y="457" font-size="16">A safety component of an Annex I product, or the product itself, that</text>
+  <text x="92" y="477" font-size="16">needs a third-party conformity assessment.</text>
+  <text class="ink2" x="92" y="497" font-size="16">The Omnibus narrowed &quot;safety component&quot;.</text>
+  <rect class="cell-empty cell" x="80" y="521" width="536" height="256" rx="6"/>
+  <text class="disp" x="92" y="545" font-size="17">Through use, Art. 6(2)</text>
+  <text class="mono" x="604" y="545" font-size="16" text-anchor="end">From 2027-12-02</text>
+  <text x="92" y="567" font-size="16">The intended purpose falls in one of the eight Annex III areas.</text>
+  <path class="glyph" d="M102 580 L113 591 L102 602 L91 591 Z"/>
+  <line class="stroke-arrow" x1="102" y1="602" x2="102" y2="721"/>
+  <text class="mono" x="122" y="596" font-size="16">Filter, Art. 6(3)</text>
+  <text class="ink2" x="122" y="617" font-size="16">No significant risk of harm, and one of four conditions: a narrow</text>
+  <text class="ink2" x="122" y="637" font-size="16">procedural task; it improves a completed human activity; it</text>
+  <text class="ink2" x="122" y="657" font-size="16">detects patterns without replacing human review; a preparatory</text>
+  <text class="ink2" x="122" y="677" font-size="16">task.</text>
+  <text x="122" y="699" font-size="16">Filtered out: document the assessment, register it (Arts. 6(4),</text>
+  <text x="122" y="719" font-size="16">49(2)).</text>
+  <text class="disp" x="92" y="743" font-size="16">Override: an Annex III system that profiles natural persons</text>
+  <text class="disp" x="92" y="763" font-size="16">is always high-risk.</text>
+  <rect class="glyph" x="68" y="315" width="560" height="474" rx="8"/>
+  <rect class="panel" x="648" y="335" width="312" height="181" rx="6"/>
+  <text class="disp" x="660" y="359" font-size="17">Korea AI Basic Act</text>
+  <text class="ink2" x="660" y="382" font-size="16">High-impact AI: a listed Art. 2(4)</text>
+  <text class="ink2" x="660" y="402" font-size="16">area, such as hiring and loan</text>
+  <text class="ink2" x="660" y="422" font-size="16">screening, that may significantly</text>
+  <text class="ink2" x="660" y="442" font-size="16">affect, or pose a risk to, life, physical</text>
+  <text class="ink2" x="660" y="462" font-size="16">safety or fundamental rights. The</text>
+  <text class="ink2" x="660" y="482" font-size="16">operator reviews it in advance; MSIT</text>
+  <text class="ink2" x="660" y="502" font-size="16">may confirm (Art. 33).</text>
+  <rect class="panel" x="68" y="799" width="560" height="163" rx="8"/>
+  <text class="disp" x="80" y="826" font-size="22">Transparency</text>
+  <text class="mono muted" x="616" y="825" font-size="16" text-anchor="end">Art. 50</text>
+  <text class="mono" x="80" y="861" font-size="16">From 2026-08-02</text>
+  <text x="80" y="884" font-size="16">It interacts with people, generates synthetic content, recognises</text>
+  <text x="80" y="904" font-size="16">emotions, categorises biometrically or produces deep fakes.</text>
+  <text class="ink2" x="80" y="926" font-size="16">Disclose, mark, label, whatever else the system is: an Annex III</text>
+  <text class="ink2" x="80" y="946" font-size="16">chatbot sits on two rungs.</text>
+  <rect class="panel" x="648" y="799" width="312" height="161" rx="6"/>
+  <text class="disp" x="660" y="823" font-size="17">Colorado SB 26-189</text>
+  <text class="ink2" x="660" y="846" font-size="16">A transparency note: deployers of</text>
+  <text class="ink2" x="660" y="866" font-size="16">ADMT in consequential decisions</text>
+  <text class="ink2" x="660" y="886" font-size="16">give notice of its use and a</text>
+  <text class="ink2" x="660" y="906" font-size="16">plain-language explanation within 30</text>
+  <text class="ink2" x="660" y="926" font-size="16">days of an adverse outcome. From</text>
+  <text class="ink2" x="660" y="946" font-size="16">2027-01-01.</text>
+  <rect class="panel" x="68" y="972" width="560" height="143" rx="8"/>
+  <text class="disp" x="80" y="999" font-size="22">Minimal</text>
+  <text class="mono muted" x="616" y="998" font-size="16" text-anchor="end">Arts. 4, 95</text>
+  <text class="mono" x="80" y="1034" font-size="16">From 2025-02-02; Art. 4 reworded 2026-07-27</text>
+  <text x="80" y="1057" font-size="16">Everything else.</text>
+  <text class="ink2" x="80" y="1079" font-size="16">No specific duties beyond AI literacy (Art. 4); voluntary codes</text>
+  <text class="ink2" x="80" y="1099" font-size="16">(Art. 95). A legal category, not a risk verdict.</text>
+  <rect class="panel" x="68" y="1131" width="560" height="143" rx="8" stroke-dasharray="6 4"/>
+  <text class="disp" x="80" y="1158" font-size="22">Separate track: GPAI models</text>
+  <text class="mono muted" x="616" y="1157" font-size="16" text-anchor="end">Arts. 51 to 56</text>
+  <text class="mono" x="80" y="1193" font-size="16">From 2025-08-02; Commission enforcement 2026-08-02</text>
+  <text x="80" y="1216" font-size="16">Model generality; systemic risk by capability, compute or designation.</text>
+  <text class="ink2" x="80" y="1238" font-size="16">Model-level duties. A system built on the model is an AI system</text>
+  <text class="ink2" x="80" y="1258" font-size="16">(Art. 3(66)) and sits on the ladder.</text>
+  <rect class="panel" x="648" y="1131" width="312" height="121" rx="6"/>
+  <text class="disp" x="660" y="1155" font-size="17">California SB 53</text>
+  <text class="ink2" x="660" y="1178" font-size="16">Frontier developers: models trained</text>
+  <text class="ink2" x="660" y="1198" font-size="16">above 10^26 operations; large frontier</text>
+  <text class="ink2" x="660" y="1218" font-size="16">developers above USD 500M</text>
+  <text class="ink2" x="660" y="1238" font-size="16">revenue. In force 2026-01-01.</text>
+  <line class="rule" x1="40" y1="1332" x2="960" y2="1332"/>
+  <text class="mono muted" x="40" y="1357" font-size="16">Source: chapter 18, The risk ladder; chapter 21 (other regimes); dates from chapter 08.</text>
+  <text class="mono muted" x="40" y="1384" font-size="16">As of 2026-09-24 · a reading aid, not legal advice; illustrative, not a claim of conformity</text>
+</svg>

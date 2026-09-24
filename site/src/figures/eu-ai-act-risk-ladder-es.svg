@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1414" class="figc" lang="es" role="img" aria-labelledby="fig-eu-ai-act-risk-ladder-es-t fig-eu-ai-act-risk-ladder-es-d">
+  <title id="fig-eu-ai-act-risk-ladder-es-t" lang="en">EU AI Act ladder, in Spanish</title>
+  <desc id="fig-eu-ai-act-risk-ladder-es-d" lang="en">Spanish edition: the four EU AI Act rungs with the Art. 6(3) filter, the track for general-purpose AI models and notes on other regimes.</desc>
+  <line class="axis" x1="42" y1="182" x2="42" y2="1135"/>
+  <line class="axis" x1="56" y1="182" x2="56" y2="1135"/>
+  <line class="axis" x1="42" y1="201" x2="56" y2="201"/>
+  <line class="axis" x1="42" y1="334" x2="56" y2="334"/>
+  <line class="axis" x1="42" y1="798" x2="56" y2="798"/>
+  <line class="axis" x1="42" y1="991" x2="56" y2="991"/>
+  <line class="axis" x1="42" y1="1135" x2="56" y2="1135"/>
+  <text class="mono muted" x="40" y="56" font-size="17">Reglamento de IA · cuatro peldaños por finalidad prevista; modelos de uso general aparte</text>
+  <text class="disp" x="40" y="108" font-size="40">¿En qué peldaño está el sistema?</text>
+  <line class="rule" x1="40" y1="136" x2="960" y2="136"/>
+  <text class="mono muted" x="68" y="166" font-size="16">La escalera (capítulo 18)</text>
+  <text class="mono muted" x="648" y="166" font-size="16">Otros regímenes, no equivalentes</text>
+  <rect class="panel" x="68" y="182" width="560" height="123" rx="8"/>
+  <rect class="glyph-fill" x="68" y="182" width="560" height="38" rx="6"/>
+  <text class="disp inv-tx" x="80" y="209" font-size="22">Prohibido</text>
+  <text class="mono inv-tx" x="616" y="208" font-size="16" text-anchor="end">Art. 5</text>
+  <text class="mono" x="80" y="244" font-size="16">Desde 2025-02-02; nuevos puntos 2026-12-02</text>
+  <text x="80" y="267" font-size="16">La práctica está en la lista del art. 5, que ahora tiene diez puntos.</text>
+  <text class="ink2" x="80" y="289" font-size="16">No puede introducirse en el mercado, ponerse en servicio ni usarse.</text>
+  <rect class="panel" x="648" y="182" width="312" height="161" rx="6"/>
+  <text class="disp" x="660" y="206" font-size="17">Texas, TRAIGA (HB 149)</text>
+  <text class="ink2" x="660" y="229" font-size="16">Prohibiciones según la intención:</text>
+  <text class="ink2" x="660" y="249" font-size="16">manipulación de la conducta,</text>
+  <text class="ink2" x="660" y="269" font-size="16">puntuación social por el gobierno,</text>
+  <text class="ink2" x="660" y="289" font-size="16">discriminación ilícita, cierto</text>
+  <text class="ink2" x="660" y="309" font-size="16">contenido sexual. En vigor desde</text>
+  <text class="ink2" x="660" y="329" font-size="16">2026-01-01.</text>
+  <rect class="panel" x="68" y="315" width="560" height="454" rx="8"/>
+  <text class="disp" x="80" y="342" font-size="22">Alto riesgo</text>
+  <text class="mono muted" x="616" y="341" font-size="16" text-anchor="end">Arts. 6 a 49</text>
+  <text class="ink2" x="80" y="375" font-size="16">Requisitos de los arts. 8 a 15, obligaciones de proveedores y</text>
+  <text class="ink2" x="80" y="395" font-size="16">responsables del despliegue, evaluación de la conformidad.</text>
+  <rect class="cell-empty cell" x="80" y="411" width="536" height="100" rx="6"/>
+  <text class="disp" x="92" y="435" font-size="17">Por producto, art. 6(1)</text>
+  <text class="mono" x="604" y="435" font-size="16" text-anchor="end">Desde 2028-08-02</text>
+  <text x="92" y="457" font-size="16">Componente de seguridad de un producto del anexo I, o el propio</text>
+  <text x="92" y="477" font-size="16">producto, con evaluación de la conformidad por terceros.</text>
+  <text class="ink2" x="92" y="497" font-size="16">El Ómnibus acotó el «componente de seguridad».</text>
+  <rect class="cell-empty cell" x="80" y="521" width="536" height="236" rx="6"/>
+  <text class="disp" x="92" y="545" font-size="17">Por su uso, art. 6(2)</text>
+  <text class="mono" x="604" y="545" font-size="16" text-anchor="end">Desde 2027-12-02</text>
+  <text x="92" y="567" font-size="16">La finalidad prevista está en uno de los ocho ámbitos del anexo III.</text>
+  <path class="glyph" d="M102 580 L113 591 L102 602 L91 591 Z"/>
+  <line class="stroke-arrow" x1="102" y1="602" x2="102" y2="701"/>
+  <text class="mono" x="122" y="596" font-size="16">Filtro, art. 6(3)</text>
+  <text class="ink2" x="122" y="617" font-size="16">Sin riesgo importante y con una de cuatro condiciones: tarea de</text>
+  <text class="ink2" x="122" y="637" font-size="16">procedimiento limitada; mejora una actividad humana previa;</text>
+  <text class="ink2" x="122" y="657" font-size="16">detecta patrones sin sustituir la revisión humana; tarea</text>
+  <text class="ink2" x="122" y="677" font-size="16">preparatoria.</text>
+  <text x="122" y="699" font-size="16">Si se filtra: se documenta y se registra (arts. 6(4), 49(2)).</text>
+  <text class="disp" x="92" y="723" font-size="16">Excepción: un sistema del anexo III que elabora perfiles de</text>
+  <text class="disp" x="92" y="743" font-size="16">personas físicas siempre es de alto riesgo.</text>
+  <rect class="glyph" x="68" y="315" width="560" height="454" rx="8"/>
+  <rect class="panel" x="648" y="355" width="312" height="221" rx="6"/>
+  <text class="disp" x="660" y="379" font-size="17">Corea, Ley Básica de IA</text>
+  <text class="ink2" x="660" y="402" font-size="16">IA de alto impacto: un ámbito de la</text>
+  <text class="ink2" x="660" y="422" font-size="16">lista del art. 2(4), como la</text>
+  <text class="ink2" x="660" y="442" font-size="16">contratación o la concesión de</text>
+  <text class="ink2" x="660" y="462" font-size="16">préstamos, que puede afectar de</text>
+  <text class="ink2" x="660" y="482" font-size="16">forma significativa a la vida, la</text>
+  <text class="ink2" x="660" y="502" font-size="16">seguridad física o los derechos</text>
+  <text class="ink2" x="660" y="522" font-size="16">fundamentales, o ponerlos en riesgo.</text>
+  <text class="ink2" x="660" y="542" font-size="16">El operador lo revisa antes; el MSIT</text>
+  <text class="ink2" x="660" y="562" font-size="16">puede confirmarlo (art. 33).</text>
+  <rect class="panel" x="68" y="779" width="560" height="183" rx="8"/>
+  <text class="disp" x="80" y="806" font-size="22">Transparencia</text>
+  <text class="mono muted" x="616" y="805" font-size="16" text-anchor="end">Art. 50</text>
+  <text class="mono" x="80" y="841" font-size="16">Desde 2026-08-02</text>
+  <text x="80" y="864" font-size="16">Interactúa con personas, genera contenido sintético, reconoce</text>
+  <text x="80" y="884" font-size="16">emociones, categoriza biométricamente o produce</text>
+  <text x="80" y="904" font-size="16">ultrasuplantaciones.</text>
+  <text class="ink2" x="80" y="926" font-size="16">Informar, marcar y etiquetar, sea cual sea el resto: un chatbot del</text>
+  <text class="ink2" x="80" y="946" font-size="16">anexo III está en dos peldaños.</text>
+  <rect class="panel" x="648" y="779" width="312" height="161" rx="6"/>
+  <text class="disp" x="660" y="803" font-size="17">Colorado SB 26-189</text>
+  <text class="ink2" x="660" y="826" font-size="16">Nota de transparencia: quien</text>
+  <text class="ink2" x="660" y="846" font-size="16">despliega ADMT en decisiones</text>
+  <text class="ink2" x="660" y="866" font-size="16">trascendentes avisa de su uso y</text>
+  <text class="ink2" x="660" y="886" font-size="16">explica con claridad, en 30 días, un</text>
+  <text class="ink2" x="660" y="906" font-size="16">resultado adverso. Desde</text>
+  <text class="ink2" x="660" y="926" font-size="16">2027-01-01.</text>
+  <rect class="panel" x="68" y="972" width="560" height="163" rx="8"/>
+  <text class="disp" x="80" y="999" font-size="22">Mínimo</text>
+  <text class="mono muted" x="616" y="998" font-size="16" text-anchor="end">Arts. 4, 95</text>
+  <text class="mono" x="80" y="1034" font-size="16">Desde 2025-02-02; art. 4 reformulado 2026-07-27</text>
+  <text x="80" y="1057" font-size="16">Todo lo demás.</text>
+  <text class="ink2" x="80" y="1079" font-size="16">Sin obligaciones específicas salvo la alfabetización en IA (art. 4);</text>
+  <text class="ink2" x="80" y="1099" font-size="16">códigos voluntarios (art. 95). Categoría jurídica, no veredicto de</text>
+  <text class="ink2" x="80" y="1119" font-size="16">riesgo.</text>
+  <rect class="panel" x="68" y="1151" width="560" height="163" rx="8" stroke-dasharray="6 4"/>
+  <text class="disp" x="80" y="1178" font-size="22">Vía aparte: modelos de uso general</text>
+  <text class="mono muted" x="616" y="1177" font-size="16" text-anchor="end">Arts. 51 a 56</text>
+  <text class="mono" x="80" y="1213" font-size="16">Desde 2025-08-02; ejecución por la Comisión 2026-08-02</text>
+  <text x="80" y="1236" font-size="16">Generalidad del modelo; riesgo sistémico por capacidad, cómputo o</text>
+  <text x="80" y="1256" font-size="16">designación.</text>
+  <text class="ink2" x="80" y="1278" font-size="16">Obligaciones del modelo. Un sistema basado en el modelo es un</text>
+  <text class="ink2" x="80" y="1298" font-size="16">sistema de IA (art. 3(66)) y va en la escalera.</text>
+  <rect class="panel" x="648" y="1151" width="312" height="161" rx="6"/>
+  <text class="disp" x="660" y="1175" font-size="17">California SB 53</text>
+  <text class="ink2" x="660" y="1198" font-size="16">Desarrolladores de frontera: modelos</text>
+  <text class="ink2" x="660" y="1218" font-size="16">entrenados con más de 10^26</text>
+  <text class="ink2" x="660" y="1238" font-size="16">operaciones; grandes desarrolladores</text>
+  <text class="ink2" x="660" y="1258" font-size="16">de frontera con ingresos de más de</text>
+  <text class="ink2" x="660" y="1278" font-size="16">500 M USD. En vigor desde</text>
+  <text class="ink2" x="660" y="1298" font-size="16">2026-01-01.</text>
+  <line class="rule" x1="40" y1="1332" x2="960" y2="1332"/>
+  <text class="mono muted" x="40" y="1357" font-size="16">Fuente: capítulo 18 (The risk ladder), capítulo 21 (otros regímenes), fechas del 08.</text>
+  <text class="mono muted" x="40" y="1384" font-size="16">A fecha de 2026-09-24 · orientativo: no es asesoramiento jurídico ni declaración de conformidad</text>
+</svg>

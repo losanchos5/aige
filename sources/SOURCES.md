@@ -2643,3 +2643,14 @@ claim of conformity; the outputs are indicative, not legal advice.
 | 7 | independent bias audit within the past year; impact ratios by sex, race/ethnicity and intersectional categories; published summary | Automated Employment Decision Tools FAQ (Local Law 144 of 2021) | NYC Department of Consumer and Worker Protection | 2023-06-29 | https://www.nyc.gov/assets/dca/downloads/pdf/about/DCWP-AEDT-FAQ.pdf | primary | Fairness chooser (NYC note) |
 | 8 | disparate impact burden of proof; no adjusted scores or different cut-offs by protected class | 42 U.S.C. 2000e-2(k) and (l) | Legal Information Institute, Cornell Law School | 2026 | https://www.law.cornell.edu/uscode/text/42/2000e-2 | secondary | Fairness chooser (US employment note) |
 | 9 | Art. 4a special categories for bias detection; Art. 10(2)(f)-(g); Annex III points 4, 5(a), 5(b) | Reg. (EU) 2024/1689 (AI Act), consolidated text as amended by Reg. (EU) 2026/1744 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_10 | primary | Fairness chooser (EU note) |
+## site/scripts/lib/posters.mjs (reference posters, BoK v0.5.0)
+
+Block w2-fig-posters. The four posters restate chapters 08, 15, 18 and 21 and the data modules
+`frameworks.ts`, `roles.ts` and `deployment-options.ts`; their dates and claims carry the sources of
+those chapters and rows. The one source opened for this block is the Spanish text of the Act, read on
+2026-09-24 for the terms of the three Spanish editions. It is the text as adopted: the Omnibus wording
+of Art. 4 was not checked in Spanish, so the posters say only that Art. 4 was reworded.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | Spanish terms of the Act: proveedor (Art. 3(3)), responsable del despliegue (3(4)), representante autorizado (3(5)), importador (3(6)), distribuidor (3(7)), operador and fabricante del producto (3(8)), modificación sustancial (3(23)), alfabetización en materia de IA (3(56) and Art. 4), ultrasuplantación (3(60)), modelo de IA de uso general (3(63)), sistema de IA de uso general (3(66)), proveedor posterior (3(68)); Art. 5 "Prácticas de IA prohibidas"; Art. 6(3) "tarea de procedimiento limitada" and "tarea preparatoria"; "Oficina de IA"; "riesgo sistémico" | Regulation (EU) 2024/1689 (Reglamento de Inteligencia Artificial), Spanish-language Official Journal text | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/legal-content/ES/TXT/HTML/?uri=OJ:L_202401689 | primary | Spanish editions of the timeline, roles and ladder posters |

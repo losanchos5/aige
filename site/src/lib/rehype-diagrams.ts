@@ -118,21 +118,30 @@ function renderFigureFigure(def: FigureDef): string {
   const svg = readFileSync(svgPath, 'utf8').trim();
   // Optional wide variant (src/figures/<id>-wide.svg, e.g. values-principles in
   // two columns): both SVGs are inlined and figures.css shows exactly one, so
-  // the hidden one never reaches the accessibility tree.
+  // the hidden one never reaches the accessibility tree. A poster (kind
+  // 'poster') keeps a legible width: it fills the well and, on a narrow screen,
+  // scrolls sideways inside a focusable, labelled region (see figures.css).
+  const poster = def.kind === 'poster';
   const widePath = resolve(FIGURES_DIR, `${def.id}-wide.svg`);
-  const wide = existsSync(widePath) ? readFileSync(widePath, 'utf8').trim() : '';
-  const canvas = wide
-    ? `<div class="figure-canvas figure-canvas--dual">${svg}${wide}</div>`
-    : `<div class="figure-canvas">${svg}</div>`;
+  const wide = !poster && existsSync(widePath) ? readFileSync(widePath, 'utf8').trim() : '';
+  const canvas = poster
+    ? `<div class="figure-canvas figure-canvas--poster" tabindex="0" role="region" ` +
+      `aria-label="${escapeHtml(def.title).replace(/"/g, '&quot;')}: poster, scroll sideways on a narrow screen">${svg}</div>`
+    : wide
+      ? `<div class="figure-canvas figure-canvas--dual">${svg}${wide}</div>`
+      : `<div class="figure-canvas">${svg}</div>`;
   // id="figure-<id>" is the deep link the figure's permalink page uses for
   // "Where it appears"; the caption links that page (downloads, citation).
+  const permalinkText = poster
+    ? 'Full-size poster, downloads and citation'
+    : 'Permalink, downloads and citation';
   return (
-    `<figure class="figure figure--infographic" id="figure-${def.id}" data-figure="${def.id}">` +
+    `<figure class="figure figure--infographic${poster ? ' figure--poster' : ''}" id="figure-${def.id}" data-figure="${def.id}">` +
     canvas +
     `<figcaption class="figure-figcaption">` +
     `<span class="figure-fig-title">${escapeHtml(def.title)}</span>` +
     `<span class="figure-fig-desc">${escapeHtml(def.caption)}</span>` +
-    `<a class="figure-permalink" href="/figures/${def.id}">Permalink, downloads and citation</a>` +
+    `<a class="figure-permalink" href="/figures/${def.id}">${permalinkText}</a>` +
     `</figcaption>` +
     `<details class="figure-alt">` +
     `<summary class="figure-alt-summary" data-pagefind-ignore>Text description</summary>` +

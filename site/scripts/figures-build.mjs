@@ -6,6 +6,10 @@
 //   - src/figures/maturity-grid.svg      (from src/data/maturity.ts + stack.ts)
 //   - src/figures/pattern-map.svg        (from src/data/patterns.ts + stack.ts)
 //   - src/figures/discipline-map.svg     (the whole discipline map; see map-build.mjs)
+//   - the reference posters (scripts/lib/posters.mjs): eu-ai-act-timeline
+//     (frameworks.ts), eu-ai-act-operator-roles (roles.ts), eu-ai-act-risk-ladder
+//     (frameworks.ts dates), deployment-option-matrix (deployment-options.ts)
+//     and the Spanish editions of the first three (ids ending in -es)
 // The other figures under src/figures are hand-authored. All figures are inlined
 // into the chapters by src/lib/rehype-diagrams.ts and declared in
 // src/data/figures.ts.
@@ -42,6 +46,7 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadTs } from './lib/load-ts.mjs';
 import { loadMap, renderMap } from './map-build.mjs';
+import { POSTERS } from './lib/posters.mjs';
 import { woffToSfnt } from './lib/woff.mjs';
 import {
   FALLBACK_FONT_CANDIDATES,
@@ -349,6 +354,32 @@ const svgText = (svg) =>
     .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ');
 
+/** Language of a figure SVG: its root lang attribute, English by default. */
+const svgLang = (svg) => /^<svg\b[^>]*\slang="([a-z-]+)"/.exec(svg.trim())?.[1] ?? 'en';
+
+/**
+ * The dated stamp inside a figure: "As of <date>", or in a Spanish figure
+ * (root lang="es") its translation "A fecha de <date>".
+ */
+function hasStamp(svg, asOf) {
+  const text = svgText(svg).toLowerCase();
+  if (text.includes(`as of ${asOf}`)) return true;
+  return svgLang(svg) === 'es' && text.includes(`a fecha de ${asOf}`);
+}
+
+/**
+ * A standalone export of a non-English figure keeps its language: the root
+ * says lang="<lang>", while the <title> and <desc> it takes from figures.ts
+ * stay marked as English, the language of the site that describes it.
+ */
+function localiseExport(out, lang) {
+  if (lang === 'en') return out;
+  return out
+    .replace(/(<svg\b[^>]*?)\slang="en"/, `$1 lang="${lang}"`)
+    .replace(/<title id="([^"]+)">/, '<title id="$1" lang="en">')
+    .replace(/<desc id="([^"]+)">/, '<desc id="$1" lang="en">');
+}
+
 /**
  * Check every figure entry against the rules the exports and pages rely on.
  * Returns the list of problems (the build fails on any) and prints warnings.
@@ -410,7 +441,7 @@ function validateFigures(figuresMod) {
         `${where}: ${figure.id}.svg is ${kb.toFixed(1)} KB, over the ${budget} KB ${kind} budget`,
       );
     }
-    if (figure.asOf && !svgText(svg).toLowerCase().includes(`as of ${figure.asOf}`)) {
+    if (figure.asOf && !hasStamp(svg, figure.asOf)) {
       problems.push(`${where}: dated figure must print "As of ${figure.asOf}" inside ${figure.id}.svg`);
     }
   }
@@ -543,7 +574,10 @@ async function exportFigures(figuresMod, site) {
       expected.add(entry.file);
       const dest = join(EXPORT_DIR, entry.file);
       if (entry.format === 'svg') {
-        const out = standaloneSvg({ ...common, theme: entry.theme, css: cssFor(entry.theme, true) });
+        const out = localiseExport(
+          standaloneSvg({ ...common, theme: entry.theme, css: cssFor(entry.theme, true) }),
+          svgLang(sourceSvg),
+        );
         if (writeIfChanged(dest, out)) written += 1;
         continue;
       }
@@ -616,16 +650,29 @@ function purgeAstroCacheIfFiguresChanged(changedGenerated) {
 async function main() {
   if (!CHECK) mkdirSync(OUT, { recursive: true });
 
-  const [{ values, principles }, { layers }, { levels }, { patterns }, figuresMod, { map }, { site }] =
-    await Promise.all([
-      loadTs('src/data/values.ts', SITE),
-      loadTs('src/data/stack.ts', SITE),
-      loadTs('src/data/maturity.ts', SITE),
-      loadTs('src/data/patterns.ts', SITE),
-      loadTs('src/data/figures.ts', SITE),
-      loadMap(SITE),
-      loadTs('src/data/site.ts', SITE),
-    ]);
+  const [
+    { values, principles },
+    { layers },
+    { levels },
+    { patterns },
+    figuresMod,
+    { map },
+    { site },
+    { obligations },
+    { roles },
+    deployment,
+  ] = await Promise.all([
+    loadTs('src/data/values.ts', SITE),
+    loadTs('src/data/stack.ts', SITE),
+    loadTs('src/data/maturity.ts', SITE),
+    loadTs('src/data/patterns.ts', SITE),
+    loadTs('src/data/figures.ts', SITE),
+    loadMap(SITE),
+    loadTs('src/data/site.ts', SITE),
+    loadTs('src/data/frameworks.ts', SITE),
+    loadTs('src/data/roles.ts', SITE),
+    loadTs('src/data/deployment-options.ts', SITE),
+  ]);
   const { figures, figureBudgetKb, figureKind } = figuresMod;
   const fig = (id) => figures.find((f) => f.id === id);
   const budget = (id) => figureBudgetKb[figureKind(fig(id))];
@@ -640,6 +687,11 @@ async function main() {
     ['pattern-map.svg', buildPatternMap(patterns, layers, fig('pattern-map'))],
     ['discipline-map.svg', buildDisciplineMap(map, fig('discipline-map'))],
   ];
+  // Reference posters: generated only for the ids declared in figures.ts.
+  const posterData = { obligations, roles, deployment };
+  for (const [id, build] of POSTERS) {
+    if (fig(id)) outputs.push([`${id}.svg`, build(posterData, fig(id))]);
+  }
 
   let problems = 0;
   let changed = 0;
