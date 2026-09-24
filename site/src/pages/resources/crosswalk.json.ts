@@ -9,7 +9,7 @@ import { site } from '../../data/site';
 import { slugify } from '../../lib/md-parse';
 
 export const GET: APIRoute = () => {
-  const notice = `Illustrative mapping from the AI Governance Engineer Body of Knowledge v${site.bokVersion} — not a claim of conformity`;
+  const notice = `Illustrative mapping from the AI Governance Engineer Body of Knowledge v${site.bokVersion} (not a claim of conformity)`;
 
   // `reference` is the clause id within its framework; `label` is the display chip.
   const payload = {

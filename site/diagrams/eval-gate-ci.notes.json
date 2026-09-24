@@ -1,12 +1,12 @@
 {
-  "change": "A model or agent that changes — retrained, re-prompted, or given a new tool — is what triggers the gate.",
+  "change": "A model or agent that changes (retrained, re-prompted, or given a new tool) is what triggers the gate.",
   "pipeline": "The change enters a CI/CD pipeline that already runs tests for functional correctness.",
   "suite": "An eval suite is versioned alongside the model so the same tests travel with each change.",
   "capability": "The pipeline runs at least one capability eval in CI (illustratively with tools such as Inspect or promptfoo).",
   "adversarial": "It also runs at least one adversarial eval, for example an injection-resistance floor (illustratively with Garak or Giskard).",
   "threshold": "A threshold that traces to a named failure mode or obligation decides pass or fail.",
   "ship": "Above the documented threshold the release passes the gate and ships.",
-  "evidence": "The eval run emits a structured result — suite id, model version, score, threshold, pass/fail, timestamp.",
+  "evidence": "The eval run emits a structured result: suite id, model version, score, threshold, pass/fail, timestamp.",
   "registry": "The structured result is filed against the registry entry, so evidence accrues automatically.",
   "blocked": "Below the threshold the eval fails the pipeline and the release does not ship until fixed."
 }

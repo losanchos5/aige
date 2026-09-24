@@ -56,9 +56,9 @@ export const chapters: readonly Chapter[] = [
     title: '01. The definition',
     shortTitle: 'Definition',
     summary:
-      'AI governance engineering is the application of engineering practice — systems thinking, product thinking and code — to the governance of AI systems.',
+      'AI governance engineering is the application of engineering practice (systems thinking, product thinking and code) to the governance of AI systems.',
     glance: [
-      'Engineering practice — systems thinking, product thinking and code — applied to the governance of AI systems, agents included.',
+      'Engineering practice (systems thinking, product thinking and code) applied to the governance of AI systems, agents included.',
       'A capability, not a job title: measured by realised risk reduction and audit-ready evidence.',
       'Three questions any function must answer from live systems: what AI is running, what it is allowed to do, what evidence proves it.',
       'The eval gate is necessary but not sufficient: it is point-in-time and sampling-bound.',
@@ -119,7 +119,7 @@ export const chapters: readonly Chapter[] = [
       'A catalogue of reusable AI governance engineering patterns, each named to a layer of the stack, in the CSIRO Responsible AI Pattern Catalogue structure.',
     glance: [
       'Seventeen reusable patterns, each named to one of the five stack layers.',
-      'The CSIRO Responsible AI Pattern Catalogue structure — context, problem, solution, consequences — plus a Maps to line naming standards and articles.',
+      'The CSIRO Responsible AI Pattern Catalogue structure (context, problem, solution, consequences) plus a Maps to line naming standards and articles.',
       'Every pattern realises one or more of the six principles and cites the OWASP agentic threats and NIST AI RMF functions it serves.',
       'Examples are illustrative sketches; EU AI Act mappings are not claims of conformity.',
     ],
@@ -134,7 +134,7 @@ export const chapters: readonly Chapter[] = [
       'The AI governance engineer as a concrete role, defined by the workflows it owns and the evidence it produces, not by the certifications on its holder.',
     glance: [
       'The person, on whatever org chart, accountable for the three questions in production.',
-      'Defined by the workflows it owns — intake, registry, evals, gates, runtime, assurance, regulatory translation — and the evidence each produces.',
+      'Defined by the workflows it owns (intake, registry, evals, gates, runtime, assurance, regulatory translation) and the evidence each produces.',
       'Analyst and engineer are both needed; the engineer does different work and is measured differently.',
       'A career ladder, three ways in, and what employers get wrong in the job description.',
     ],
@@ -146,7 +146,7 @@ export const chapters: readonly Chapter[] = [
     title: '07. Maturity model (five levels)',
     shortTitle: 'Maturity Model',
     summary:
-      'A ladder from paper to production — Documented, Inventoried, Tested, Enforced, Continuous — where each level is proven by what the running systems show.',
+      'A ladder from paper to production (Documented, Inventoried, Tested, Enforced, Continuous), where each level is proven by what the running systems show.',
     glance: [
       'Five levels: Documented, Inventoried, Tested, Enforced, Continuous.',
       'A level is a state you demonstrate by querying the registry, running the gate and reading the evidence store, not a score you award yourself.',
@@ -185,7 +185,7 @@ export const chapters: readonly Chapter[] = [
     title: '10. Reading list',
     shortTitle: 'Reading List',
     summary:
-      'The sources that formed the discipline, curated and annotated — each with a verified URL and a one-line note on why it matters.',
+      'The sources that formed the discipline, curated and annotated, each with a verified URL and a one-line note on why it matters.',
   },
 ];
 

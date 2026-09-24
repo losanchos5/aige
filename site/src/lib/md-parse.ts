@@ -181,7 +181,7 @@ export function parseAnnotatedList(body: string): AnnotatedItem[] {
         .replace(/`https?:\/\/[^`]+`/g, '')
         .replace(/\(verified:[^)]*\)/g, ''),
     )
-      .replace(/^[—–-]\s*/, '')
+      .replace(/^[:—–-]\s*/, '')
       .replace(/\s*[.;]\s*$/, '')
       .trim();
     items.push({

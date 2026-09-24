@@ -28,7 +28,7 @@ export const levels: readonly MaturityLevel[] = [
     n: 1,
     name: 'Documented',
     summary:
-      'Governance exists as artefacts a human maintains — a policy PDF, a spreadsheet inventory, a risk register, a review before launch. The rules are written and someone is accountable, but nothing executes.',
+      'Governance exists as artefacts a human maintains: a policy PDF, a spreadsheet inventory, a risk register, a review before launch. The rules are written and someone is accountable, but nothing executes.',
     signals: [
       'Policy documents',
       'A populated spreadsheet inventory',
@@ -51,7 +51,7 @@ export const levels: readonly MaturityLevel[] = [
     n: 3,
     name: 'Tested',
     summary:
-      'Systems are evaluated against defined tests — capability, safety and adversarial evals — and the results are recorded as evidence. Failures are visible, but a failing eval does not yet stop anything.',
+      'Systems are evaluated against defined tests (capability, safety and adversarial evals) and the results are recorded as evidence. Failures are visible, but a failing eval does not yet stop anything.',
     signals: [
       'Versioned eval suites',
       'Stored, timestamped eval results',

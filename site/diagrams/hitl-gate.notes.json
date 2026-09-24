@@ -2,6 +2,6 @@
   "agent": "The agent proposes an action; some of its actions are routine and some are irreversible or affect people's rights.",
   "policy": "The policy check classifies the action by consequence and, for the high-consequence class, requires a human before it takes effect.",
   "reviewer": "A single named human reviewer with enough context to decide, who approves or rejects the action within a time box.",
-  "target": "The action target — a payment, a denial, a publication — which executes only after approval, while routine actions proceed under guardrails.",
+  "target": "The action target (a payment, a denial, a publication), which executes only after approval, while routine actions proceed under guardrails.",
   "log": "The approver, the context and the decision are recorded as evidence, making the oversight auditable under EU AI Act Art. 14."
 }

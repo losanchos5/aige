@@ -38,7 +38,7 @@ const NEW = 'New: what AI forces us to add.';
 
 /** The Thesis's one-sentence definition of the discipline. */
 export const definition =
-  'AI governance engineering is the application of engineering practice — systems thinking, product thinking and code — to the governance of AI systems.';
+  'AI governance engineering is the application of engineering practice (systems thinking, product thinking and code) to the governance of AI systems.';
 
 /** The five fundamental problems with legacy AI governance. */
 export const problems: readonly Problem[] = [
@@ -46,13 +46,13 @@ export const problems: readonly Problem[] = [
     n: 1,
     title: 'Governance written for systems that no longer exist',
     summary:
-      'Legacy AI governance runs on PDF policies and spreadsheet inventories that describe an AI system as it was on the day it was reviewed, while models are retrained, prompts rewritten and agents given new tools by the day. The artefact is stale before it is signed — and the function still sits mostly with privacy, legal and IT, only 5% with security.',
+      'Legacy AI governance runs on PDF policies and spreadsheet inventories that describe an AI system as it was on the day it was reviewed, while models are retrained, prompts rewritten and agents given new tools by the day. The artefact is stale before it is signed, and the function still sits mostly with privacy, legal and IT, only 5% with security.',
   },
   {
     n: 2,
     title: 'Point-in-time review of a continuously changing thing',
     summary:
-      'Annual assessments and committee sign-offs assume a system that holds still long enough to be judged; frontier models and autonomous agents do not. Gartner expects more than 40% of agentic AI projects to be cancelled by the end of 2027, citing inadequate risk controls — a runtime failure mode a once-a-year review is structurally blind to.',
+      'Annual assessments and committee sign-offs assume a system that holds still long enough to be judged; frontier models and autonomous agents do not. Gartner expects more than 40% of agentic AI projects to be cancelled by the end of 2027, citing inadequate risk controls, a runtime failure mode a once-a-year review is structurally blind to.',
   },
   {
     n: 3,
@@ -137,19 +137,19 @@ export const principles: readonly Principle[] = [
     n: 1,
     title: 'Build the control at the earliest point it can block',
     summary:
-      'Put every control where it can still stop the thing going wrong, and no later — in the repository, the build and the runtime, not in a review after the fact. The earliest enforceable point is the cheapest and the strongest.',
+      'Put every control where it can still stop the thing going wrong, and no later: in the repository, the build and the runtime, not in a review after the fact. The earliest enforceable point is the cheapest and the strongest.',
   },
   {
     n: 2,
     title: 'Give every control teeth, or call it a signal',
     summary:
-      'A control has to be able to change what happens next — block a merge, fail a deploy, revoke access. Anything that can only inform a committee is a signal, and we label it honestly as one rather than dress it up as a control.',
+      'A control has to be able to change what happens next: block a merge, fail a deploy, revoke access. Anything that can only inform a committee is a signal, and we label it honestly as one rather than dress it up as a control.',
   },
   {
     n: 3,
     title: 'Register and bound every actor before it acts',
     summary:
-      'Nothing — human or non-human — gets to act until it has an owner, a declared scope and a way to be stopped. Autonomy is granted only where it can be attributed, contained and withdrawn, never by default.',
+      'Nothing, human or non-human, gets to act until it has an owner, a declared scope and a way to be stopped. Autonomy is granted only where it can be attributed, contained and withdrawn, never by default.',
   },
   {
     n: 4,
@@ -161,7 +161,7 @@ export const principles: readonly Principle[] = [
     n: 5,
     title: 'Start from a named failure mode or a named harm',
     summary:
-      "Design each control against a specific way the system fails — prompt injection, tool misuse, agent identity abuse, data exfiltration — or a specific harm to a person's rights. If we cannot name the risk it answers, we do not build it.",
+      "Design each control against a specific way the system fails (prompt injection, tool misuse, agent identity abuse, data exfiltration) or a specific harm to a person's rights. If we cannot name the risk it answers, we do not build it.",
   },
   {
     n: 6,
@@ -173,13 +173,13 @@ export const principles: readonly Principle[] = [
 
 /** What AI governance engineers build — working artefacts, not decks. */
 export const builds: readonly string[] = [
-  'Policy-as-code — governance rules as executable policy (OPA/Rego, Cedar, Policy Cards) that evaluate in CI/CD and at runtime.',
-  'An agent registry — the runtime-aware inventory of every model, service and agent, each with an owner, a scope and a status.',
-  'AIBOM and model/data cards — the bill of materials for an AI system (CycloneDX ML-BOM, SPDX 3.0 AI profile) and structured transparency documentation.',
-  'Eval gates in CI — adversarial and capability evals (Inspect, promptfoo, Garak, Giskard) wired into the pipeline so a failing eval blocks the release.',
-  'Runtime guardrails and kill switches — input/output controls, tool-call mediation and a tested way to stop an agent, at the point of action.',
-  'Continuous assurance telemetry — tracing and monitoring (OpenTelemetry, agent observability) that turns production behaviour into a live control signal.',
-  'Machine-readable evidence — OSCAL and signed, structured artefacts that make the audit a query instead of a scramble.',
-  "Incident pipelines — the plumbing to detect, triage and report serious incidents on the clock, including the EU AI Act's Article 73 reporting for high-risk systems.",
-  'FRIA and DPIA templates as code — fundamental-rights and data-protection impact assessments maintained as versioned, reviewable artefacts, not one-off documents.',
+  'Policy-as-code: governance rules as executable policy (OPA/Rego, Cedar, Policy Cards) that evaluate in CI/CD and at runtime.',
+  'An agent registry: the runtime-aware inventory of every model, service and agent, each with an owner, a scope and a status.',
+  'AIBOM and model/data cards: the bill of materials for an AI system (CycloneDX ML-BOM, SPDX 3.0 AI profile) and structured transparency documentation.',
+  'Eval gates in CI: adversarial and capability evals (Inspect, promptfoo, Garak, Giskard) wired into the pipeline so a failing eval blocks the release.',
+  'Runtime guardrails and kill switches: input/output controls, tool-call mediation and a tested way to stop an agent, at the point of action.',
+  'Continuous assurance telemetry: tracing and monitoring (OpenTelemetry, agent observability) that turns production behaviour into a live control signal.',
+  'Machine-readable evidence: OSCAL and signed, structured artefacts that make the audit a query instead of a scramble.',
+  "Incident pipelines: the plumbing to detect, triage and report serious incidents on the clock, including the EU AI Act's Article 73 reporting for high-risk systems.",
+  'FRIA and DPIA templates as code: fundamental-rights and data-protection impact assessments maintained as versioned, reviewable artefacts, not one-off documents.',
 ] as const;

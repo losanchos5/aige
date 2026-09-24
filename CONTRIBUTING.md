@@ -20,7 +20,7 @@ the Thesis is co-authored by Jorge García Aibar and Aurélie Pols.
 
 - **Cite every factual claim.** Each factual statement carries a `[n]` marker with a matching row in
   `sources/SOURCES.md`, tagged `primary`, `secondary` or `reported`. No row, no claim.
-- **Keep the voice.** Practitioner-direct, per `STYLEGUIDE.md` — its templates and section shapes are
+- **Keep the voice.** Practitioner-direct, per `STYLEGUIDE.md`. Its templates and section shapes are
   the house style. Read it before writing.
 - **Do not rename the discipline.** The canonical term is **"AI governance engineering"**. Do not
   coin synonyms or retitle it.
@@ -40,7 +40,7 @@ index. `npm test` runs the Playwright default project. Green locally means green
 ## First pull request
 
 If this is your first PR from a fork, a maintainer has to approve the workflow run before CI starts,
-so the checks will show **"action required"** until someone clicks approve. That is expected — it is
+so the checks will show **"action required"** until someone clicks approve. That is expected; it is
 not a failure on your side. After the first approval, later pushes run automatically.
 
 ## Licence

@@ -11,7 +11,7 @@ import { site } from '../../data/site';
 import { csvRow } from '../../lib/csv';
 
 export const GET: APIRoute = () => {
-  const notice = `Illustrative mapping from the AI Governance Engineer Body of Knowledge v${site.bokVersion} — not a claim of conformity`;
+  const notice = `Illustrative mapping from the AI Governance Engineer Body of Knowledge v${site.bokVersion} (not a claim of conformity)`;
 
   const header = [
     'Framework',

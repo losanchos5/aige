@@ -6,8 +6,8 @@
 This chapter is the catalogue. Each pattern is a reusable solution to a problem that recurs when you
 engineer the governance of AI systems. The structure follows the CSIRO Responsible AI Pattern
 Catalogue, which applies software-engineering design patterns to responsible AI across governance,
-process and product levels [1]. We keep its fields — summary, objectives, target users, impacted
-stakeholders, relevant principles, context, problem, solution, consequences, related patterns — and add
+process and product levels [1]. We keep its fields (summary, objectives, target users, impacted
+stakeholders, relevant principles, context, problem, solution, consequences, related patterns) and add
 a **Maps to** line naming the standards, articles and stack layer (1–5) each pattern serves.
 
 Every pattern names one of the five layers (chapter 04) so the catalogue and the stack stay consistent,
@@ -24,7 +24,7 @@ not a claim of conformity, and no harmonised standard is yet cited in the Offici
 
 ## Pattern: Policy Card
 
-**Summary** — Express a governance rule as a machine-readable artefact that travels with the model or
+**Summary:** Express a governance rule as a machine-readable artefact that travels with the model or
 agent and is evaluated in the pipeline and at runtime, rather than as prose a human must apply. The
 Policy Card encodes permitted and prohibited actions, obligations and evidentiary requirements for one
 AI system, and links to the enforcement and audit pipelines that act on it [2].
@@ -54,7 +54,7 @@ evidence that it was applied. A rule that can only be remembered is violated the
 Write each rule as a Policy Card: a structured, machine-readable artefact (for example expressed for an
 `OPA/Rego` or `Cedar` engine, or as a Policy Cards document) that states allow/deny logic, the failure
 mode it addresses and the framework clauses it maps to. Store it with the system it governs. Evaluate
-it pre-merge, at deploy, and — where the rule is a runtime constraint — at the point of action. Emit a
+it pre-merge, at deploy, and (where the rule is a runtime constraint) at the point of action. Emit a
 verdict (rule id, input hash, decision, timestamp) on every evaluation.
 
 Illustrative schema for the verdict:
@@ -87,7 +87,7 @@ ASI02/ASI03 · Layer 01 Govern-as-Code.
 
 ## Pattern: Eval Gate in CI
 
-**Summary** — Wire an evaluation suite into the CI/CD pipeline so that a model or agent must pass a
+**Summary:** Wire an evaluation suite into the CI/CD pipeline so that a model or agent must pass a
 defined test, above a documented threshold, before it can ship. The eval run is the control and its
 result is the evidence; a failing eval blocks the build.
 
@@ -105,7 +105,7 @@ Model owners, users exposed to the system, auditors.
 Give every control teeth; build the control at the earliest point it can block.
 
 ### Context
-A model or agent that changes — retrained, re-prompted, given a new tool — and a pipeline that already
+A model or agent that changes (retrained, re-prompted, given a new tool) and a pipeline that already
 runs tests for functional correctness.
 
 ### Problem
@@ -115,7 +115,7 @@ research, not control.
 
 ### Solution
 Version an eval suite alongside the model. Run at least one capability eval and one adversarial eval in
-CI (for example with Inspect, promptfoo, Garak or Giskard — illustrative). Set a threshold that traces
+CI (for example with Inspect, promptfoo, Garak or Giskard; illustrative). Set a threshold that traces
 to a named failure mode or obligation. Fail the pipeline below the threshold. Emit a structured result
 (suite id, model version, score, threshold, pass/fail, timestamp) filed against the registry entry.
 
@@ -151,7 +151,7 @@ ASI01/ASI02 · Layer 03 Evals & Red Teaming as Evidence.
 
 ## Pattern: Adversarial Red-Team Suite
 
-**Summary** — Maintain a versioned adversarial test suite, built from a threat taxonomy and run in CI
+**Summary:** Maintain a versioned adversarial test suite, built from a threat taxonomy and run in CI
 or on a schedule, whose findings are triaged into fixes or accepted risks, recorded as evidence, and
 fed back into the suite. Where an Eval Gate proves a threshold still holds, the red-team suite is the
 standing adversary that keeps finding the inputs the threshold never anticipated.
@@ -175,8 +175,8 @@ already runs an Eval Gate for regression and wants a standing adversary rather t
 pre-launch penetration test.
 
 ### Problem
-A one-off red-team is out of date the moment the system changes, and its findings — a slide of
-jailbreaks — leave no trace that they were fixed or accepted. Without a versioned suite and a triage
+A one-off red-team is out of date the moment the system changes, and its findings, a slide of
+jailbreaks, leave no trace that they were fixed or accepted. Without a versioned suite and a triage
 record, the same attack is rediscovered every quarter and no one can prove which findings were closed.
 
 ### Solution
@@ -184,7 +184,7 @@ Build the suite from a threat taxonomy rather than intuition: draw techniques fr
 adversarial tactics and techniques for AI systems [25] and the agentic attack classes in the OWASP Top
 10 for Agentic Applications [3], so each test traces to a named technique. Version the suite alongside
 the model and run it in CI or on a schedule against the registered version. Route each finding through
-triage — fix, or accept with a recorded rationale and owner — and file the outcome as a structured
+triage (fix, or accept with a recorded rationale and owner) and file the outcome as a structured
 evidence record against the registry entry. Feed every confirmed finding back into the suite as a
 regression test, so a closed attack stays closed. The suite complements the Eval Gate: the gate
 enforces a threshold on each release, the suite is the adversary that generates the next one.
@@ -209,7 +209,7 @@ Agentic ASI01/ASI02 · Layer 03 Evals & Red Teaming as Evidence.
 
 ## Pattern: Agent Registry
 
-**Summary** — Maintain a runtime-aware inventory of every model, service and agent, each entry carrying
+**Summary:** Maintain a runtime-aware inventory of every model, service and agent, each entry carrying
 an owner, a scope and an expiry, fed by the deployment pipeline rather than typed by hand. The registry
 is the object that policies evaluate and runtime controls attach to.
 
@@ -269,7 +269,7 @@ Agentic ASI10 · Layer 02 Inventory & Transparency.
 
 ## Pattern: AIBOM
 
-**Summary** — Generate an AI bill of materials at build for each AI system, recording models, datasets,
+**Summary:** Generate an AI bill of materials at build for each AI system, recording models, datasets,
 weights and their provenance in a standard format, and store it with the registry entry. The AIBOM is
 what the transparency and eval layers read to know what to document and what to test.
 
@@ -292,12 +292,12 @@ classic SBOM captures software dependencies but not models or data.
 
 ### Problem
 Without a bill of materials for models and data, an organisation cannot answer which model version, from
-which provenance, trained on which data, is inside a given system — so it cannot assess supply-chain
+which provenance, trained on which data, is inside a given system, so it cannot assess supply-chain
 risk or produce transparency documentation on demand.
 
 ### Solution
-Emit an AIBOM at build in a standard format — CycloneDX ML-BOM or the SPDX 3.0 AI profile, for example
-with the OWASP AIBOM generator [14] (illustrative) — covering models, datasets, weights, and their
+Emit an AIBOM at build in a standard format, CycloneDX ML-BOM or the SPDX 3.0 AI profile, for example
+with the OWASP AIBOM generator [14] (illustrative), covering models, datasets, weights, and their
 provenance and licences. Attach it to the registry entry and regenerate it on each build so it never
 drifts from the deployed system.
 
@@ -319,7 +319,7 @@ AICM · Layer 02 Inventory & Transparency.
 
 ## Pattern: Model Card as Control Evidence
 
-**Summary** — Treat the model card and data card not as launch documentation written once, but as
+**Summary:** Treat the model card and data card not as launch documentation written once, but as
 structured evidence regenerated from the pipeline, so that transparency documents describe the system as
 it is now and feed the assurance layer.
 
@@ -368,8 +368,8 @@ AIBOM; Eval Gate in CI; Machine-Readable Evidence (OSCAL); FRIA-as-Code.
 
 ## Pattern: Continuous Assurance Telemetry
 
-**Summary** — Stream control decisions — policy verdicts, eval results, guardrail actions, identity
-events — into an assurance store as they happen, so the status of a control is a live query rather than
+**Summary:** Stream control decisions (policy verdicts, eval results, guardrail actions, identity
+events) into an assurance store as they happen, so the status of a control is a live query rather than
 a point-in-time attestation. Trustworthiness becomes a continuously generated signal, not a static
 certificate [5].
 
@@ -443,7 +443,7 @@ Assurance & Continuous Compliance.
 
 ## Pattern: Runtime Guardrail
 
-**Summary** — Place input and output guardrails on the model or agent's runtime path that enforce its
+**Summary:** Place input and output guardrails on the model or agent's runtime path that enforce its
 Policy Card on every live request and emit a decision to telemetry and to the circuit breaker. The
 guardrail is where a policy written in layer 01 and a threshold tested in layer 03 become an action
 taken on a real call, not a claim about one.
@@ -463,12 +463,12 @@ Give every control teeth; instrument the build to produce its own proof.
 
 ### Context
 An agent or model in production, acting on live inputs, whose Policy Card and eval thresholds exist but
-have no runtime enforcement point — so a rule proven in CI is unguarded the moment the system meets an
+have no runtime enforcement point, so a rule proven in CI is unguarded the moment the system meets an
 input no test covered.
 
 ### Problem
 Policies and evals are point-in-time; the system then meets prompt injection, unsafe outputs and tool
-calls no one reviewed. A guardrail that only logs is observability mistaken for control — the system
+calls no one reviewed. A guardrail that only logs is observability mistaken for control: the system
 watches itself fail in high resolution. Without an enforcement point that can block and emit, the
 runtime is the gap between a tested control and an uncontrolled action.
 
@@ -477,8 +477,8 @@ Put a guardrail on both sides of the model/agent path. The input guardrail scree
 retrieved context for injection and policy-violating requests before they reach the model; the output
 guardrail screens generations and tool calls for unsafe content, data leakage and out-of-scope actions
 before they take effect. Enforce the same Policy Card evaluated in CI [2], so the runtime decision and
-the pipeline decision share one rule. On every call emit a structured event — `{agent, direction
-(input/output), rule_id, decision (allow/block/redact), timestamp}` — to the assurance store
+the pipeline decision share one rule. On every call emit a structured event, `{agent, direction
+(input/output), rule_id, decision (allow/block/redact), timestamp}`, to the assurance store
 (Continuous Assurance Telemetry) and, on a defined breach, signal the circuit breaker (Kill Switch /
 Circuit Breaker). Guardrail frameworks realise this as a category; the OWASP Agent Control Standard
 names the runtime-control surface [11]. This is distinct from the kill switch: the guardrail decides one
@@ -505,8 +505,8 @@ ASI02/ASI03 · Layer 04 Runtime Controls & Observability.
 
 ## Pattern: Kill Switch / Circuit Breaker
 
-**Summary** — Provide a tested mechanism to stop an agent or class of agents at the point of action —
-revoking access and halting tool calls — without breaking the rest of the fleet. Autonomy is granted
+**Summary:** Provide a tested mechanism to stop an agent or class of agents at the point of action,
+revoking access and halting tool calls, without breaking the rest of the fleet. Autonomy is granted
 only where it can be withdrawn.
 
 ### Objectives
@@ -523,7 +523,7 @@ Model owners, users, incident responders, affected third parties.
 Register and bound every actor before it acts; start from a named failure mode or harm.
 
 ### Context
-Agents that act autonomously — calling tools, moving data or money — where a single failure can cascade.
+Agents that act autonomously (calling tools, moving data or money), where a single failure can cascade.
 Gartner expects that by 2029 more than half of successful attacks on AI agents will exploit
 access-control weaknesses and prompt injection [17].
 
@@ -534,7 +534,7 @@ that halts the whole fleet.
 
 ### Solution
 Bind each agent to its own identity (see Agent Identity & Scoped Credentials) so access can be revoked
-per agent. Implement a circuit breaker at the tool-call boundary that trips on a defined signal — a
+per agent. Implement a circuit breaker at the tool-call boundary that trips on a defined signal: a
 threshold breach, an anomaly, a manual pull. Test the kill switch on a schedule; an untested kill switch
 is not a control.
 
@@ -556,7 +556,7 @@ Agentic ASI02/ASI10 · Layer 04 Runtime Controls & Observability.
 
 ## Pattern: Incident Pipeline
 
-**Summary** — Build the plumbing to detect, triage and report serious AI incidents on the clock, with
+**Summary:** Build the plumbing to detect, triage and report serious AI incidents on the clock, with
 reporting timelines and templates encoded rather than remembered. For high-risk systems this includes EU
 AI Act Article 73 serious-incident reporting; for GPAI models it includes the systemic-incident
 reporting the Code of Practice expects.
@@ -607,7 +607,7 @@ Evidence (OSCAL).
 
 ## Pattern: FRIA-as-Code
 
-**Summary** — Maintain the fundamental-rights impact assessment as a versioned, reviewable artefact
+**Summary:** Maintain the fundamental-rights impact assessment as a versioned, reviewable artefact
 cross-referenced to the data-protection impact assessment, so that a rights assessment is an input to
 design that updates with the system, not a document produced once and filed.
 
@@ -635,7 +635,7 @@ sync.
 
 ### Solution
 Template the FRIA as structured data covering intended use, affected groups, risks to rights, and the
-mitigating controls — each mitigation linked to the control that implements it (a Policy Card, an Eval
+mitigating controls, with each mitigation linked to the control that implements it (a Policy Card, an Eval
 Gate, a guardrail). Cross-reference the DPIA so shared elements are written once. Store it with the
 registry entry and re-open it on significant change. The EU AI Act Art. 27 FRIA and its DPIA
 cross-reference define the scope [13].
@@ -659,8 +659,8 @@ Human-in-the-loop Gate.
 
 ## Pattern: Framework Crosswalk
 
-**Summary** — Maintain a mapping from each control to the framework clauses it serves, generated from
-the controls themselves, as an index for navigation and reuse — never as the end state. A crosswalk
+**Summary:** Maintain a mapping from each control to the framework clauses it serves, generated from
+the controls themselves, as an index for navigation and reuse, never as the end state. A crosswalk
 proves you have read the framework; it does not prove the control fires.
 
 ### Objectives
@@ -677,8 +677,8 @@ Auditors, regulators, model owners.
 Make the governed path the easiest path; instrument the build to produce its own proof.
 
 ### Context
-An organisation answering to several overlapping frameworks — EU AI Act, ISO/IEC 42001, NIST AI RMF, CSA
-AICM — that would otherwise implement the same control several times.
+An organisation answering to several overlapping frameworks (EU AI Act, ISO/IEC 42001, NIST AI RMF, CSA
+AICM) that would otherwise implement the same control several times.
 
 ### Problem
 The crosswalk is where framework theatre begins. A green mapping matrix is mistaken for a working
@@ -711,7 +711,7 @@ Control Standard · Layer 01 Govern-as-Code / Layer 05 Assurance & Continuous Co
 
 ## Pattern: Machine-Readable Evidence (OSCAL)
 
-**Summary** — Emit control evidence in a machine-readable, standard format so that the audit is a query
+**Summary:** Emit control evidence in a machine-readable, standard format so that the audit is a query
 and the same evidence feeds continuous assurance. OSCAL, extended with properties for AI, is the
 organising format: frameworks specify what to assure but provide no executable format for how, and this
 pattern supplies it [4].
@@ -739,10 +739,10 @@ date the moment it is saved. Every audit re-collects it from scratch.
 
 ### Solution
 Emit control results as OSCAL component-definition and assessment-results artefacts. OSCAL's native
-model — a control layer (`catalog`, `profile`), an implementation layer (`component-definition`,
-`system-security-plan`) and an assessment layer (`assessment-plan`, `assessment-results`, `POA&M`),
-with traceability from a result back to the control it tested [21] — is the stable substrate; build on
-it first. AI-specific extensions are still forming: one proposed approach, a single 2026 preprint,
+model is the stable substrate: a control layer (`catalog`, `profile`), an implementation layer
+(`component-definition`, `system-security-plan`) and an assessment layer (`assessment-plan`,
+`assessment-results`, `POA&M`), with traceability from a result back to the control it tested [21].
+Build on it first. AI-specific extensions are still forming: one proposed approach, a single 2026 preprint,
 adds sixteen property extensions for lifecycle phase, enforcement semantics and risk traceability in a
 three-layer policy/evidence/enforcement architecture that generates OSCAL assessment results
 automatically and validates them against the NIST JSON schema [4]. Adopt the extensions if they fit,
@@ -766,7 +766,7 @@ Continuous Assurance Telemetry; Framework Crosswalk; Eval Gate in CI; Incident P
 
 ## Pattern: Agent Identity & Scoped Credentials
 
-**Summary** — Give every agent its own identity, an owner, a bounded scope and an expiry, established
+**Summary:** Give every agent its own identity, an owner, a bounded scope and an expiry, established
 before it acts, so that its actions can be attributed, its access revoked precisely and its scope
 contained. Identity is the precondition of accountability; scope is the precondition of containment.
 
@@ -783,7 +783,7 @@ Model owners, security operations, auditors, affected third parties.
 Register and bound every actor before it acts; start from a named failure mode or harm.
 
 ### Context
-Agents that act under delegated authority — calling APIs, tools and other agents — where the default is
+Agents that act under delegated authority (calling APIs, tools and other agents), where the default is
 a shared service account or a static key.
 
 ### Problem
@@ -793,14 +793,14 @@ open question directly: how do identification, authentication and authorization 
 
 ### Solution
 Issue each agent a distinct workload identity with a declared scope, an owner and an expiry, recorded in
-the Agent Registry. Keep two questions separate. **Channel authentication** secures one hop — how a
+the Agent Registry. Keep two questions separate. **Channel authentication** secures one hop: how a
 client authenticates to a tool server; the MCP specification of 2026-07-28 tightened exactly this,
 deprecating Dynamic Client Registration in favour of Client ID Metadata Documents and binding
 credentials to their issuer [7]. That hardens the MCP connection but is not the agent's identity.
 **Agent workload identity** is the durable, attributable identity the agent carries across every hop
-and protocol, under which its actions are logged and its access revoked — the job of a
+and protocol, under which its actions are logged and its access revoked: the job of a
 workload-identity system (SPIFFE/SPIRE) or a first-class agent identity from an enterprise provider
-(for example Microsoft Entra Agent ID [8] or Okta Agent SSO [9] — illustrative), recorded in the
+(for example Microsoft Entra Agent ID [8] or Okta Agent SSO [9]; illustrative), recorded in the
 registry, not of the transport protocol. Secure the channel *and* issue the workload identity; scope
 its credentials to the least privilege the agent's declared function needs.
 
@@ -822,7 +822,7 @@ OWASP Agentic ASI03 · Layer 04 Runtime Controls & Observability.
 
 ## Pattern: Human-in-the-loop Gate
 
-**Summary** — Require human approval at a defined, high-consequence decision point before an agent's
+**Summary:** Require human approval at a defined, high-consequence decision point before an agent's
 action takes effect, so that autonomy is bounded by a person exactly where the stakes justify the
 latency. Oversight is a designed checkpoint, not an afterthought.
 
@@ -840,8 +840,8 @@ Affected persons, users, model owners, regulators.
 Start from a named failure mode or harm; register and bound every actor before it acts.
 
 ### Context
-An agent whose actions include some that are irreversible or affect people's rights — a payment, a
-denial, a publication — alongside many that are routine.
+An agent whose actions include some that are irreversible or affect people's rights (a payment, a
+denial, a publication) alongside many that are routine.
 
 ### Problem
 Full autonomy over a high-consequence action removes the human oversight the law and the risk both
@@ -872,7 +872,7 @@ Runtime Controls & Observability.
 
 ## Pattern: Shadow-AI Discovery
 
-**Summary** — Continuously discover AI systems and agents that are running but not registered, and
+**Summary:** Continuously discover AI systems and agents that are running but not registered, and
 reconcile them against the registry, so the inventory reflects reality rather than only what teams
 remembered to declare. You cannot govern what you cannot see.
 
@@ -895,13 +895,13 @@ track, and where much of the AI-governance platform category "manages the progra
 data path" [20].
 
 ### Problem
-A registry fed only by voluntary declaration is always behind. Unregistered agents — the shadow fleet —
+A registry fed only by voluntary declaration is always behind. Unregistered agents, the shadow fleet,
 are exactly the layer a paper inventory cannot see, and roughly one in eight reported AI breaches now
 involves an autonomous agent [16] (reported).
 
 ### Solution
-Run discovery against the environments where AI appears — identity providers, cloud accounts, network
-egress, code repositories, SaaS integrations — using discovery tooling (illustrative) to find models and
+Run discovery against the environments where AI appears (identity providers, cloud accounts, network
+egress, code repositories, SaaS integrations) using discovery tooling (illustrative) to find models and
 agents. Reconcile findings against the registry, open an entry for each unknown with an owner to claim
 it, and escalate the unclaimed. Feed the result back into the Agent Registry's drift check.
 
@@ -923,8 +923,8 @@ Agent Registry; Agent Identity & Scoped Credentials; Continuous Assurance Teleme
 
 ## Pattern: Vendor / Model Due-Diligence Gate
 
-**Summary** — Gate the procurement or integration of a third-party AI system — SaaS with an embedded
-LLM, an API-only foundation model, a vendor's agent — on a structured due-diligence assessment, so a
+**Summary:** Gate the procurement or integration of a third-party AI system (SaaS with an embedded
+LLM, an API-only foundation model, a vendor's agent) on a structured due-diligence assessment, so a
 model you do not own still enters through a control that records what you can and cannot verify about
 it. When you do not own the model, this gate is what replaces the red-team you cannot run.
 
@@ -951,11 +951,11 @@ The parts of the stack that assume you own the model degrade when you do not. Yo
 weights you cannot reach, so an eval gate (layer 03) can only test the vendor's system as a black box
 at its boundary; runtime control (layer 04) narrows to the tool scopes, identity and traffic the
 integration exposes, not the model's own behaviour. Left ungoverned, procured AI becomes the shadow
-fleet with a contract — in production, unassessed, and outside the registry.
+fleet with a contract: in production, unassessed, and outside the registry.
 
 ### Solution
 Make due diligence a gate a procured or integrated AI system must pass before it reaches production,
-and structure the assessment on a template rather than an ad-hoc questionnaire — the CSIRO Responsible
+and structure the assessment on a template rather than an ad-hoc questionnaire; the CSIRO Responsible
 AI Pattern Catalogue's supplier-assessment fields are a usable starting point [1]. Assess, at minimum:
 the provider's own evaluations and red-team evidence (what they will share, and its independence); the
 model card, supplier documentation and any AIBOM you can obtain; the lawful basis and data flows,
@@ -964,7 +964,7 @@ vendor's agent; the provider's incident-reporting commitments; and the contractu
 to be notified of material change. Record the result as a registry entry with an owner and a scope,
 and re-open the gate on renewal or on a material model change. Anchor the assessment in ISO/IEC 42001
 Annex A.10 (third-party and customer relationships) [22], the EU AI Act's allocation of duties along
-the value chain — provider obligations versus deployer obligations under Articles 25, 26 and 27 [23] —
+the value chain (provider obligations versus deployer obligations under Articles 25, 26 and 27 [23])
 and, for general-purpose models, the transparency and documentation the GPAI Code of Practice expects
 providers to supply [24]. Where you cannot verify a control, record that you cannot, and compensate by
 bounding the integration: least-privilege scopes, boundary evals, and tighter runtime observation of
@@ -973,7 +973,7 @@ the traffic you do control.
 > **Example (illustrative)** A team integrating an API-only foundation model cannot test its weights,
 > so the gate captures the provider's published evaluations, restricts the model to a scoped service
 > identity with no standing data access, adds a boundary eval on the team's own prompts, and files the
-> whole assessment as the system's registry entry — flagged "provider-attested" where the team relied
+> whole assessment as the system's registry entry, flagged "provider-attested" where the team relied
 > on the vendor's evidence rather than its own.
 
 ### Consequences
@@ -1015,6 +1015,6 @@ Scoped Credentials; Shadow-AI Discovery.
 [20] "Best AI Governance Platforms 2026" (most of the category "manages the program … without any runtime data path"). Kosmoy. 2026. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
 [21] OSCAL native model (control layer: catalog, profile; implementation: component-definition, system-security-plan; assessment: assessment-plan, assessment-results, POA&M). NIST. 2026. https://pages.nist.gov/OSCAL/learn/concepts/layer/ (verified: primary)
 [22] ISO/IEC 42001:2023 Annex A.10 (third-party and customer relationships; supplier controls). ISO/IEC. 2023. https://www.iso.org/standard/81230.html (verified: secondary)
-[23] EU AI Act Arts. 25 (value-chain responsibilities), 26 (deployer obligations), 27 (FRIA) — allocation of duties between provider and deployer. AI Act (Reg. (EU) 2024/1689). 2024. https://artificialintelligenceact.eu/article/25/ (verified: primary)
+[23] EU AI Act Arts. 25 (value-chain responsibilities), 26 (deployer obligations), 27 (FRIA): allocation of duties between provider and deployer. AI Act (Reg. (EU) 2024/1689). 2024. https://artificialintelligenceact.eu/article/25/ (verified: primary)
 [24] GPAI Code of Practice (published 10 Jul 2025; voluntary; transparency documentation providers supply to downstream deployers). European Commission / AI Act Explorer. 2025-07-10. https://artificialintelligenceact.eu/introduction-to-code-of-practice/ (verified: primary)
 [25] MITRE ATLAS: adversarial tactics and techniques knowledge base for AI systems (incl. agents). MITRE. 2026. https://atlas.mitre.org/ (verified: primary)

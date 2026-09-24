@@ -5,6 +5,6 @@
   "agent": "The model or agent acting on the call; the guardrails sit on both sides of it in the request path.",
   "output": "The output guardrail screens generations and tool calls for unsafe content, data leakage and out-of-scope actions before they take effect, allowing, blocking or redacting.",
   "response": "The response or tool call that leaves the system only after the output guardrail has allowed it.",
-  "store": "The assurance store that receives a structured event on every call — agent, direction, rule id, decision, timestamp — so each enforcement leaves evidence.",
+  "store": "The assurance store that receives a structured event on every call (agent, direction, rule id, decision, timestamp), so each enforcement leaves evidence.",
   "breaker": "The circuit breaker signalled on a defined breach; the guardrail decides one call at a time, the breaker withdraws the agent's autonomy wholesale."
 }

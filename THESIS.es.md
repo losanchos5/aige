@@ -6,8 +6,8 @@ _Traducción al español de `THESIS.md` (2026-09-20). En caso de discrepancia, p
 
 ---
 
-**La ingeniería de gobernanza de IA es la aplicación de la práctica de la ingeniería —pensamiento
-sistémico, pensamiento de producto y código— a la gobernanza de los sistemas de IA.** Trata la
+**La ingeniería de gobernanza de IA es la aplicación de la práctica de la ingeniería (pensamiento
+sistémico, pensamiento de producto y código) a la gobernanza de los sistemas de IA.** Trata la
 gobernanza no como un documento que se firma, sino como un sistema que se construye, se ejecuta y se
 mide, con el mismo rigor que los ingenieros ya aplican a los modelos y agentes que gobierna.
 
@@ -21,12 +21,12 @@ construcción puede desarrollarla. Se mide por la reducción real del riesgo y p
 auditoría, nunca por cuántos marcos aparecen en una diapositiva.
 
 La idea no surge de la nada. Hereda de una línea de movimientos de ingeniería que convirtieron el
-proceso en sistemas en ejecución —la ingeniería de fiabilidad de sitios (SRE), DevSecOps, la política
-como código (policy-as-code) y la seguridad de la cadena de suministro de software— y, de forma más
-directa, de la ingeniería GRC (gobernanza, riesgo y cumplimiento), que en los últimos dos años convirtió
+proceso en sistemas en ejecución: la ingeniería de fiabilidad de sitios (SRE), DevSecOps, la política
+como código (policy-as-code) y la seguridad de la cadena de suministro de software. De forma más
+directa, hereda de la ingeniería GRC (gobernanza, riesgo y cumplimiento), que en los últimos dos años convirtió
 la gobernanza, el riesgo y el cumplimiento en un producto construido con código, probado en CI/CD y que
 entrega evidencia a través de APIs [1]. La gobernanza de IA necesita ahora el mismo salto, porque lo que
-se gobierna —modelos que se reentrenan, prompts que cambian, agentes que actúan por su cuenta— se mueve
+se gobierna (modelos que se reentrenan, prompts que cambian, agentes que actúan por su cuenta) se mueve
 más rápido de lo que cualquier documento puede seguir.
 
 ## Problemas fundamentales de la gobernanza de IA heredada
@@ -62,23 +62,23 @@ no que el control al que apunta se dispare de verdad; una matriz en verde sobre 
 «teatro con pasos de más» [2].
 
 **5. Sin vía de datos en tiempo de ejecución.** El registro no sabe qué está en ejecución. La mayor
-parte de la categoría de plataformas de gobernanza de IA «gestiona el programa —inventarios,
-evaluaciones, mapeos de marcos, flujos de trabajo de evidencia— sin ninguna vía de datos en tiempo de
+parte de la categoría de plataformas de gobernanza de IA «gestiona el programa (inventarios,
+evaluaciones, mapeos de marcos, flujos de trabajo de evidencia) sin ninguna vía de datos en tiempo de
 ejecución» [7]. Una lectura independiente del propio líder de la categoría apunta en la misma dirección:
 el relato de IBM sobre encabezar el primer Cuadrante Mágico de Gartner para Plataformas de Gobernanza de
 IA (2026) describe visibilidad sobre los casos de uso de IA, un inventario centralizado de activos de IA
-y su trazabilidad, y la incorporación de casos de uso —la capa de programa—, no la aplicación de
-controles en tiempo de ejecución [10]. Así, las tres preguntas que definen la disciplina —qué IA está en
-ejecución, qué se le permite hacer, qué evidencia lo demuestra— quedan sin responder, porque nada está
+y su trazabilidad, y la incorporación de casos de uso (la capa de programa), no la aplicación de
+controles en tiempo de ejecución [10]. Así, las tres preguntas que definen la disciplina (qué IA está en
+ejecución, qué se le permite hacer, qué evidencia lo demuestra) quedan sin responder, porque nada está
 conectado a producción. Mientras tanto, aproximadamente una de cada ocho brechas de IA notificadas
 implica ya a un agente autónomo [8]: justo la capa que el registro en papel no puede ver.
 
 ## Valores
 
 Ocho afirmaciones. Cada una declara aquello hacia lo que construimos y, al nombrarlo, aquello de lo que
-nos alejamos. No todas son nuevas: los valores 1, 5 y 7 —la gobernanza como código, la evidencia legible
-por máquina y la reducción medida del riesgo— se heredan de la ingeniería GRC; los valores 2 y 4 —las
-evals que hacen fallar la construcción, y la identidad y el alcance de los agentes— son lo que la IA nos
+nos alejamos. No todas son nuevas: los valores 1, 5 y 7 (la gobernanza como código, la evidencia legible
+por máquina y la reducción medida del riesgo) se heredan de la ingeniería GRC; los valores 2 y 4 (las
+evals que hacen fallar la construcción, y la identidad y el alcance de los agentes) son lo que la IA nos
 obliga a añadir. El capítulo 03 amplía cada uno con un ejemplo práctico y el antipatrón que rechaza.
 
 **1. La gobernanza es código, no un documento.** Una política en un PDF es una declaración de
@@ -103,13 +103,13 @@ condición previa de la contención, y ambos se establecen antes de que se permi
 
 **5. La evidencia es legible por máquina o no es evidencia.** La evidencia que una persona tiene que
 producir, formatear y archivar a mano no se puede consultar, comparar ni verificar con rapidez. Los
-artefactos legibles por máquina —OSCAL, resultados estructurados de evals, registros firmados—
+artefactos legibles por máquina (OSCAL, resultados estructurados de evals, registros firmados)
 convierten la auditoría en una consulta y alimentan el aseguramiento continuo en lugar de una carpeta
 puntual.
 
 **6. Las herramientas deben ser inspeccionables y componibles.** No puedes confiar en un veredicto que no
-puedes rastrear. Unas herramientas cuyo razonamiento y vía de datos puedes abrir —compradas o
-construidas— te permiten seguir una decisión hasta la regla que la produjo y la evidencia que emitió, e
+puedes rastrear. Unas herramientas cuyo razonamiento y vía de datos puedes abrir, compradas o
+construidas, te permiten seguir una decisión hasta la regla que la produjo y la evidencia que emitió, e
 integrarlas en el pipeline que ya ejecutas en lugar de exportarla al de otra persona.
 
 **7. El éxito se mide en reducción real del riesgo, no en cobertura de marcos.** Mapear cada control a un
@@ -119,8 +119,8 @@ cobertura es una entrada; la reducción real del riesgo es el resultado.
 
 **8. La gobernanza se posee junto con ingeniería, no se impone desde fuera.** Una gobernanza que se
 sitúa aparte y concede o deniega el paso es un cuello de botella que los ingenieros esquivan. Poseída de
-forma conjunta con ingeniería —integrada en el camino pavimentado, adoptada porque es la forma más fácil
-de entregar— pasa a formar parte de cómo se hacen las cosas, no de una reunión que un bando teme.
+forma conjunta con ingeniería, integrada en el camino pavimentado, adoptada porque es la forma más fácil
+de entregar, pasa a formar parte de cómo se hacen las cosas, no de una reunión que un bando teme.
 
 ## Principios
 
@@ -137,7 +137,7 @@ continuación: bloquear un merge, hacer fallar un despliegue, revocar un acceso.
 pueda informar a un comité es una señal, y la etiquetamos honestamente como tal en lugar de disfrazarla
 de control.
 
-**Registra y acota cada actor antes de que actúe.** Nada —humano o no humano— llega a actuar hasta que
+**Registra y acota cada actor antes de que actúe.** Nada, humano o no humano, llega a actuar hasta que
 tiene un responsable, un alcance declarado y una forma de ser detenido. La autonomía se concede solo allí
 donde puede atribuirse, contenerse y retirarse, nunca por defecto.
 
@@ -147,8 +147,8 @@ de montarse a mano. Si demostrar un control necesita una captura de pantalla, no
 construirlo.
 
 **Parte de un modo de fallo con nombre o de un daño con nombre.** Diseña cada control frente a una forma
-específica en que el sistema falla —inyección de prompts, uso indebido de herramientas, abuso de la
-identidad de un agente, exfiltración de datos— o frente a un daño específico a los derechos de una
+específica en que el sistema falla (inyección de prompts, uso indebido de herramientas, abuso de la
+identidad de un agente, exfiltración de datos) o frente a un daño específico a los derechos de una
 persona. Si no podemos nombrar el riesgo al que responde, no lo construimos.
 
 **Haz que el camino gobernado sea el camino más fácil.** Entrega la gobernanza como herramientas,
@@ -159,25 +159,25 @@ esquivar la gobernanza es más fácil que usarla, arreglamos el producto, no a l
 
 No presentaciones. Artefactos que funcionan, versionados en un repositorio y en ejecución en producción:
 
-- **Policy-as-code** (política como código) — reglas de gobernanza como política ejecutable (`OPA/Rego`,
+- **Policy-as-code** (política como código): reglas de gobernanza como política ejecutable (`OPA/Rego`,
   Cedar, Policy Cards) que se evalúan en CI/CD y en tiempo de ejecución.
-- **Un registro de agentes** (agent registry) — el inventario, consciente del tiempo de ejecución, de
+- **Un registro de agentes** (agent registry): el inventario, consciente del tiempo de ejecución, de
   cada modelo, servicio y agente, cada uno con un responsable, un alcance y un estado.
-- **AIBOM y model/data cards** (fichas de modelo y de datos) — la lista de materiales de un sistema de IA
+- **AIBOM y model/data cards** (fichas de modelo y de datos): la lista de materiales de un sistema de IA
   (`CycloneDX ML-BOM`, perfil `SPDX 3.0 AI`) y documentación de transparencia estructurada.
-- **Eval gates en CI** (puertas de evaluación) — evals adversariales y de capacidad (Inspect, promptfoo,
+- **Eval gates en CI** (puertas de evaluación): evals adversariales y de capacidad (Inspect, promptfoo,
   Garak, Giskard) integradas en el pipeline para que una eval fallida bloquee la publicación.
-- **Guardrails de ejecución y kill switches** (barreras de protección e interruptores de parada) —
+- **Guardrails de ejecución y kill switches** (barreras de protección e interruptores de parada):
   controles de entrada/salida, mediación de llamadas a herramientas y una forma probada de detener a un
   agente, en el punto de acción.
-- **Telemetría de aseguramiento continuo** — trazas y monitorización (`OpenTelemetry`, observabilidad de
+- **Telemetría de aseguramiento continuo**: trazas y monitorización (`OpenTelemetry`, observabilidad de
   agentes) que convierte el comportamiento en producción en una señal de control en vivo.
-- **Evidencia legible por máquina** — `OSCAL` y artefactos estructurados y firmados que hacen de la
+- **Evidencia legible por máquina**: `OSCAL` y artefactos estructurados y firmados que hacen de la
   auditoría una consulta en lugar de una carrera a contrarreloj.
-- **Pipelines de incidentes** — la fontanería para detectar, triar y notificar incidentes graves dentro
+- **Pipelines de incidentes**: la fontanería para detectar, triar y notificar incidentes graves dentro
   de plazo, incluida la notificación del artículo 73 del Reglamento de IA de la UE para los sistemas de
   alto riesgo.
-- **Plantillas de FRIA y DPIA como código** — evaluaciones de impacto en los derechos fundamentales
+- **Plantillas de FRIA y DPIA como código**: evaluaciones de impacto en los derechos fundamentales
   (FRIA) y en la protección de datos (DPIA) mantenidas como artefactos versionados y revisables, no como
   documentos puntuales.
 
@@ -188,8 +188,8 @@ transparencia; Evals y red teaming como evidencia; Controles y observabilidad en
 Aseguramiento y cumplimiento continuo).
 
 Reconocemos la herencia con claridad, porque es la defensa honesta frente a «esto no es más que GRC con
-palabras de IA». Tres de las cinco capas —Govern-as-Code, la evidencia legible por máquina y Assurance &
-Continuous Compliance— se heredan de la ingeniería GRC y se trasladan casi sin cambios. Dos son lo que la
+palabras de IA». Tres de las cinco capas (Govern-as-Code, la evidencia legible por máquina y Assurance &
+Continuous Compliance) se heredan de la ingeniería GRC y se trasladan casi sin cambios. Dos son lo que la
 IA nos obliga a añadir: las evals y el red teaming *como controles* (capa 03), porque lo que se gobierna
 es un modelo cuyo comportamiento solo puede establecerse probándolo; y la identidad de los agentes y el
 control en tiempo de ejecución (capa 04), porque un actor autónomo no tiene análogo en el GRC clásico. El
@@ -209,15 +209,15 @@ detalle.
 
 ## Autores
 
-**Jorge García Aibar (v0.1–v0.4.0)** — AI Governance & Privacy Engineer. LinkedIn:
+**Jorge García Aibar (v0.1–v0.4.0)**, AI Governance & Privacy Engineer. LinkedIn:
 https://www.linkedin.com/in/jorgara
 
-**Aurélie Pols (v0.1–v0.4.0)** — Responsible AI (EU/Global), Privacy & Data Governance. LinkedIn:
+**Aurélie Pols (v0.1–v0.4.0)**, Responsible AI (EU/Global), Privacy & Data Governance. LinkedIn:
 https://www.linkedin.com/in/aureliepols
 
 **Se buscan coautores.** Esta es la versión 0.4.0: un borrador público, deliberadamente incompleto. Lo
-empezó un solo profesional y necesita a muchos. Si construyes gobernanza para sistemas de IA —policy-as-
-code, registros de agentes, eval gates, guardrails de ejecución, aseguramiento continuo— y puedes aportar
+empezó un solo profesional y necesita a muchos. Si construyes gobernanza para sistemas de IA (policy-as-
+code, registros de agentes, eval gates, guardrails de ejecución, aseguramiento continuo) y puedes aportar
 un hecho verificado, un patrón que funcionó o un argumento más afilado, se te invita a coescribir. La
 disciplina es una capacidad que cualquiera puede desarrollar, y este texto pertenece a todos los que
 hacen el trabajo.
@@ -250,4 +250,4 @@ García Aibar y Aurélie Pols.
 [7] "Best AI Governance Platforms 2026" (runtime data path critique). Kosmoy. 2026. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
 [8] Threat Report 2026 (~1 in 8 reported AI breaches involve autonomous agents). HiddenLayer. 2026. https://www.hiddenlayer.com/report-and-guide/threatreport2026 (verified: reported)
 [9] "AI Governance Engineering" (governing AI used inside engineering workflows). Visure Solutions. 2026. https://visuresolutions.com/ai-engineering/ai-governance-engineering/ (verified: primary)
-[10] "IBM recognized as a Leader in the Gartner Magic Quadrant for AI Governance Platforms" (first-ever MQ; visibility into AI use cases, AI asset inventory and lineage, use-case onboarding — the program layer). IBM. 2026. https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms (verified: primary)
+[10] "IBM recognized as a Leader in the Gartner Magic Quadrant for AI Governance Platforms" (first-ever MQ; the program layer: visibility into AI use cases, AI asset inventory and lineage, use-case onboarding). IBM. 2026. https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms (verified: primary)

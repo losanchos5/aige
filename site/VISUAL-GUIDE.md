@@ -11,7 +11,8 @@ content; a figure never adds facts, numbers, dates or vendors that the chapter d
    Write that message as a sentence first; if you cannot, the figure is not needed.
 2. **Caption formula.** Title ≤ 6 words. Caption = two sentences: *what it shows* and *what the
    reader does with it* (a decision, a first step, a check). Archify captions end with
-   "— generated from the Body of Knowledge"; infographic captions end with "— drawn from chapter NN".
+   "… Generated from the Body of Knowledge."; infographic captions end with
+   "… Drawn from chapter NN."
 3. **Reading order is explicit.** Left→right or top→bottom, never both. Workflows with more than
    five steps flow top→bottom so they stay legible at 390 px. The gate or decision is the only
    diamond/hexagon in the figure; everything else is a box, store or actor.

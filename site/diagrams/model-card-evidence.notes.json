@@ -1,5 +1,5 @@
 {
-  "outputs": "The pipeline's own training and evaluation outputs — eval scores, dataset provenance, known limitations and the owner — that the card is populated from.",
+  "outputs": "The pipeline's own training and evaluation outputs (eval scores, dataset provenance, known limitations and the owner) that the card is populated from.",
   "card": "The model card, generated from those outputs and stored as structured data, so it is both read by a person and consumed by the assurance layer.",
   "gate": "The single gate: a schema check that decides whether the card is valid; an invalid card fails rather than being trusted as evidence.",
   "release": "A valid card is attached to the release and versioned with the model, so transparency describes the system as it is now.",

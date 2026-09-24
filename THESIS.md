@@ -4,8 +4,8 @@ Version 0.4.0 · 2026-09-19 · Jorge García Aibar and Aurélie Pols
 
 ---
 
-**AI governance engineering is the application of engineering practice — systems thinking, product
-thinking and code — to the governance of AI systems.** It treats governance not as a document to be
+**AI governance engineering is the application of engineering practice (systems thinking, product
+thinking and code) to the governance of AI systems.** It treats governance not as a document to be
 signed but as a system to be built, run and measured, with the same rigour engineers already apply to
 the models and agents it governs.
 
@@ -15,14 +15,14 @@ means the policy is executable, the control runs in the pipeline, the evidence i
 by-product of the build, and the whole thing is judged by one test: did realised risk actually fall,
 and can a regulator or auditor read the proof? It is a capability, not a job title. Anyone close
 enough to the build can develop it. It is measured by realised risk reduction and by audit-ready
-evidence — never by how many frameworks appear on a slide.
+evidence, never by how many frameworks appear on a slide.
 
 The idea does not appear from nowhere. It inherits from a line of engineering movements that turned
-process into running systems — site reliability engineering, DevSecOps, policy-as-code and software
-supply-chain security — and, most directly, from GRC engineering, which over the last two years turned
+process into running systems: site reliability engineering, DevSecOps, policy-as-code and software
+supply-chain security. Most directly, it inherits from GRC engineering, which over the last two years turned
 governance, risk and compliance into a product built with code, tested in CI/CD and shipping evidence
-through APIs [1]. AI governance now needs the same step-change, because the thing being governed —
-models that retrain, prompts that change, agents that act on their own — moves faster than any document
+through APIs [1]. AI governance now needs the same step-change, because the thing being governed
+(models that retrain, prompts that change, agents that act on their own) moves faster than any document
 can follow.
 
 ## Fundamental problems with legacy AI governance
@@ -31,13 +31,13 @@ can follow.
 and spreadsheet inventories that describe an AI system as it was on the day it was reviewed. But
 models are retrained, prompts are rewritten and agents acquire new tools by the day. The artefact is
 stale before it is signed. It is no accident that the function still sits mostly with privacy, legal
-and IT and only 5% with security [3] — far from the pipeline where the system actually changes.
+and IT and only 5% with security [3]: far from the pipeline where the system actually changes.
 
 **2. Point-in-time review of a continuously changing thing.** Annual assessments and committee
 sign-offs assume a system that holds still long enough to be judged. Frontier models and autonomous
 agents do not. Gartner expects more than 40% of agentic AI projects to be cancelled by the end of
 2027, citing inadequate risk controls among the causes [4], and predicts that by 2029 more than half
-of successful attacks on AI agents will exploit access-control weaknesses and prompt injection [5] —
+of successful attacks on AI agents will exploit access-control weaknesses and prompt injection [5]:
 runtime failure modes that a once-a-year review is structurally blind to.
 
 **3. Governance as a gate at the end, not a property of the build.** Governance arrives after the
@@ -54,22 +54,21 @@ have read the framework, not that the control it points to actually fires; a gre
 broken control is "theatre with extra steps" [2].
 
 **5. No runtime data path.** The registry does not know what is running. Most of the AI governance
-platform category "manages the program — inventories, assessments, framework mappings, evidence
-workflows — without any runtime data path" [7]. An independent read of the category's own leader points
+platform category "manages the program (inventories, assessments, framework mappings, evidence
+workflows) without any runtime data path" [7]. An independent read of the category's own leader points
 the same way: IBM's account of topping Gartner's first Magic Quadrant for AI Governance Platforms
 (2026) describes visibility into AI use cases, centralised AI asset inventory and lineage, and use-case
-onboarding — the program layer — not runtime enforcement [10]. So the three questions that define the
-discipline —
-what AI is running, what is it allowed to do, what evidence proves it — go unanswered, because nothing
-is connected to production. Meanwhile roughly one in eight reported AI breaches now involves an
+onboarding (the program layer), not runtime enforcement [10]. So the three questions that define the
+discipline (what AI is running, what is it allowed to do, what evidence proves it) go unanswered,
+because nothing is connected to production. Meanwhile roughly one in eight reported AI breaches now involves an
 autonomous agent [8]: exactly the layer the paper registry cannot see.
 
 ## Values
 
 Eight affirmations. Each states what we build toward and, by naming it, what we build away from. Not
-all are new: values 1, 5 and 7 — governance as code, machine-readable evidence and measured risk
-reduction — are inherited from GRC engineering; values 2 and 4 — evals that fail the build, and agent
-identity and scope — are what AI forces us to add. Chapter 03 expands each with an in-practice example
+all are new: values 1, 5 and 7 (governance as code, machine-readable evidence and measured risk
+reduction) are inherited from GRC engineering; values 2 and 4 (evals that fail the build, and agent
+identity and scope) are what AI forces us to add. Chapter 03 expands each with an in-practice example
 and the anti-pattern it rejects.
 
 **1. Governance is code, not a document.** A policy in a PDF is a statement of intent a human must
@@ -83,7 +82,7 @@ defined test, and a failure blocks the release. We prefer controls that bite.
 
 **3. Evidence comes from runtime, not from a point-in-time attestation.** An attestation says a control
 was in place when someone looked. Runtime evidence shows it working continuously, emitted by the system
-as it runs — because an AI system changes between reviews, and evidence gathered once decays
+as it runs, because an AI system changes between reviews, and evidence gathered once decays
 immediately.
 
 **4. Every agent carries its own identity and scope.** An actor on shared credentials is ungovernable:
@@ -92,12 +91,12 @@ precondition of accountability; scope is the precondition of containment, and bo
 before the actor is allowed to act.
 
 **5. Evidence is machine-readable or it is not evidence.** Evidence a human must produce, format and
-file by hand cannot be queried, diffed or verified at speed. Machine-readable artefacts — OSCAL,
-structured eval results, signed logs — turn the audit into a query and feed continuous assurance
+file by hand cannot be queried, diffed or verified at speed. Machine-readable artefacts (OSCAL,
+structured eval results, signed logs) turn the audit into a query and feed continuous assurance
 instead of a one-off binder.
 
 **6. Tooling must be inspectable and composable.** You cannot trust a verdict you cannot trace.
-Tooling whose reasoning and data path you can open — bought or built — lets you follow a decision to
+Tooling whose reasoning and data path you can open, bought or built, lets you follow a decision to
 the rule that produced it and the evidence it emitted, and wire it into the pipeline you already run
 rather than export into someone else's.
 
@@ -107,8 +106,8 @@ rate of the failure mode drop, did the blast radius shrink, did the incident get
 Coverage is an input; realised risk reduction is the outcome.
 
 **8. Governance is owned with engineering, not enforced from outside.** Governance that sits apart and
-grants or denies passage is a bottleneck engineers route around. Owned jointly with engineering —
-built into the paved path, adopted because it is the easiest way to ship — it becomes part of how
+grants or denies passage is a bottleneck engineers route around. Owned jointly with engineering,
+built into the paved path, adopted because it is the easiest way to ship, it becomes part of how
 things are made, not a meeting one side dreads.
 
 ## Principles
@@ -117,15 +116,15 @@ The values say what we prefer; these principles say what we commit to *do*. They
 not restatements of the preferences above.
 
 **Build the control at the earliest point it can block.** Put every control where it can still stop
-the thing going wrong, and no later — in the repository, the build and the runtime, not in a review
+the thing going wrong, and no later: in the repository, the build and the runtime, not in a review
 after the fact. The earliest enforceable point is the cheapest and the strongest, so that is where we
 put it.
 
 **Give every control teeth, or call it a signal.** A control has to be able to change what happens
-next — block a merge, fail a deploy, revoke access. Anything that can only inform a committee is a
+next: block a merge, fail a deploy, revoke access. Anything that can only inform a committee is a
 signal, and we label it honestly as one rather than dress it up as a control.
 
-**Register and bound every actor before it acts.** Nothing — human or non-human — gets to act until it
+**Register and bound every actor before it acts.** Nothing, human or non-human, gets to act until it
 has an owner, a declared scope and a way to be stopped. Autonomy is granted only where it can be
 attributed, contained and withdrawn, never by default.
 
@@ -134,7 +133,7 @@ runs, so assurance falls out of the system instead of being assembled by hand. I
 control needs a screenshot, we have not finished building it.
 
 **Start from a named failure mode or a named harm.** Design each control against a specific way the
-system fails — prompt injection, tool misuse, agent identity abuse, data exfiltration — or a specific
+system fails (prompt injection, tool misuse, agent identity abuse, data exfiltration) or a specific
 harm to a person's rights. If we cannot name the risk it answers, we do not build it.
 
 **Make the governed path the easiest path.** Ship governance as tooling, templates and paved paths
@@ -145,23 +144,23 @@ easier than using it, we fix the product, not the people.
 
 Not decks. Working artefacts, versioned in a repository and running in production:
 
-- **Policy-as-code** — governance rules as executable policy (`OPA/Rego`, Cedar, Policy Cards) that
+- **Policy-as-code**: governance rules as executable policy (`OPA/Rego`, Cedar, Policy Cards) that
   evaluate in CI/CD and at runtime.
-- **An agent registry** — the runtime-aware inventory of every model, service and agent, each with an
+- **An agent registry**: the runtime-aware inventory of every model, service and agent, each with an
   owner, a scope and a status.
-- **AIBOM and model/data cards** — the bill of materials for an AI system (`CycloneDX ML-BOM`, `SPDX
+- **AIBOM and model/data cards**: the bill of materials for an AI system (`CycloneDX ML-BOM`, `SPDX
   3.0 AI` profile) and structured transparency documentation.
-- **Eval gates in CI** — adversarial and capability evals (Inspect, promptfoo, Garak, Giskard) wired
+- **Eval gates in CI**: adversarial and capability evals (Inspect, promptfoo, Garak, Giskard) wired
   into the pipeline so a failing eval blocks the release.
-- **Runtime guardrails and kill switches** — input/output controls, tool-call mediation and a tested
+- **Runtime guardrails and kill switches**: input/output controls, tool-call mediation and a tested
   way to stop an agent, at the point of action.
-- **Continuous assurance telemetry** — tracing and monitoring (`OpenTelemetry`, agent observability)
+- **Continuous assurance telemetry**: tracing and monitoring (`OpenTelemetry`, agent observability)
   that turns production behaviour into a live control signal.
-- **Machine-readable evidence** — `OSCAL` and signed, structured artefacts that make the audit a
+- **Machine-readable evidence**: `OSCAL` and signed, structured artefacts that make the audit a
   query instead of a scramble.
-- **Incident pipelines** — the plumbing to detect, triage and report serious incidents on the clock,
+- **Incident pipelines**: the plumbing to detect, triage and report serious incidents on the clock,
   including the EU AI Act's Article 73 reporting for high-risk systems.
-- **FRIA and DPIA templates as code** — fundamental-rights and data-protection impact assessments
+- **FRIA and DPIA templates as code**: fundamental-rights and data-protection impact assessments
   maintained as versioned, reviewable artefacts, not one-off documents.
 
 These artefacts map, layer by layer, onto the five-layer AI governance engineering stack: Govern-as-
@@ -169,8 +168,8 @@ Code, Inventory & Transparency, Evals & Red Teaming as Evidence, Runtime Control
 and Assurance & Continuous Compliance.
 
 We concede the inheritance plainly, because it is the honest defence against "this is just GRC with AI
-words." Three of the five layers — Govern-as-Code, machine-readable evidence, and Assurance &
-Continuous Compliance — are inherited from GRC engineering and carried across almost unchanged. Two
+words." Three of the five layers (Govern-as-Code, machine-readable evidence, and Assurance &
+Continuous Compliance) are inherited from GRC engineering and carried across almost unchanged. Two
 are what AI forces us to add: evals and red-teaming *as controls* (layer 03), because the thing being
 governed is a model whose behaviour can only be established by testing it; and agent identity and
 runtime control (layer 04), because an autonomous actor has no analogue in classic GRC. The new work
@@ -182,21 +181,21 @@ AI governance engineering is not AI safety research, MLOps, model risk managemen
 legal work, or Responsible AI ethics; it is the engineering that turns all of those into running
 controls and readable evidence. It is the AI-era sibling of AI security engineering, the direct
 descendant of GRC engineering. One name clash is worth flagging: some vendors use the same words,
-"AI governance engineering", for the reverse problem — governing the AI tools that engineers use
+"AI governance engineering", for the reverse problem, governing the AI tools that engineers use
 inside their own workflows [9]. That is governed AI engineering, not the discipline described here.
 Chapter 01 draws every one of these lines in full.
 
 ## Authors
 
-**Jorge García Aibar (v0.1–v0.4.0)** — AI Governance & Privacy Engineer. LinkedIn:
+**Jorge García Aibar (v0.1–v0.4.0)**, AI Governance & Privacy Engineer. LinkedIn:
 https://www.linkedin.com/in/jorgara
 
-**Aurélie Pols (v0.1–v0.4.0)** — Responsible AI (EU/Global), Privacy & Data Governance. LinkedIn:
+**Aurélie Pols (v0.1–v0.4.0)**, Responsible AI (EU/Global), Privacy & Data Governance. LinkedIn:
 https://www.linkedin.com/in/aureliepols
 
 **Co-authors wanted.** This is version 0.4.0: a public draft, deliberately incomplete. It was
-started by one practitioner and it needs many. If you build governance for AI systems — policy-as-
-code, agent registries, eval gates, runtime guardrails, continuous assurance — and you can bring a
+started by one practitioner and it needs many. If you build governance for AI systems (policy-as-
+code, agent registries, eval gates, runtime guardrails, continuous assurance) and you can bring a
 verified fact, a pattern that worked, or a sharper argument, you are invited to co-author. The
 discipline is a capability anyone can develop, and this text belongs to everyone who does the work.
 
@@ -227,4 +226,4 @@ credit, link to the licence and indicate changes. Attribution: Jorge García Aib
 [7] "Best AI Governance Platforms 2026" (runtime data path critique). Kosmoy. 2026. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
 [8] Threat Report 2026 (~1 in 8 reported AI breaches involve autonomous agents). HiddenLayer. 2026. https://www.hiddenlayer.com/report-and-guide/threatreport2026 (verified: reported)
 [9] "AI Governance Engineering" (governing AI used inside engineering workflows). Visure Solutions. 2026. https://visuresolutions.com/ai-engineering/ai-governance-engineering/ (verified: primary)
-[10] "IBM recognized as a Leader in the Gartner Magic Quadrant for AI Governance Platforms" (first-ever MQ; visibility into AI use cases, AI asset inventory and lineage, use-case onboarding — the program layer). IBM. 2026. https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms (verified: primary)
+[10] "IBM recognized as a Leader in the Gartner Magic Quadrant for AI Governance Platforms" (first-ever MQ; the program layer: visibility into AI use cases, AI asset inventory and lineage, use-case onboarding). IBM. 2026. https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms (verified: primary)

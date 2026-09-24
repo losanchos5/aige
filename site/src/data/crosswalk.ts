@@ -204,8 +204,8 @@ const OBL_CN_DEEPSYN = 'Provisions on Deep Synthesis (in force 2023-01-10)';
 const OBL_CN_GENAI = 'Interim Measures for Generative AI Services (in force 2023-08-15)';
 const OBL_CN_LABEL = 'Measures for Labelling AI-Generated Synthetic Content with GB 45438-2025 (in force 2025-09-01)';
 const OBL_CN_GBT = 'GB/T 45654-2025 Basic security requirements for generative AI services (voluntary; implemented 2025-11-01)';
-const OBL_CN_TC260 = 'TC260 AI Safety Governance Framework 3.0 — operators\' guidelines §5.3 (voluntary; 2026-09-14)';
-const OBL_CN_TC260_APP2 = 'TC260 Framework 3.0 Appendix 2 — agentic AI risk management (voluntary; 2026-09-14)';
+const OBL_CN_TC260 = 'TC260 AI Safety Governance Framework 3.0: operators\' guidelines §5.3 (voluntary; 2026-09-14)';
+const OBL_CN_TC260_APP2 = 'TC260 Framework 3.0 Appendix 2: agentic AI risk management (voluntary; 2026-09-14)';
 
 /** The topic → framework clause refs, grouped by topic in display order. */
 export const refs: readonly CrosswalkRef[] = [

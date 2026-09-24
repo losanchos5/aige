@@ -134,7 +134,7 @@ export const stages: readonly PathStage[] = [
     title: 'Prove it and specialise',
     tagline: 'Prove it with evidence, then specialise',
     summary:
-      'Layer 05 and beyond. Close the loop with machine-readable evidence and continuous assurance, then specialise — systemic-risk models, vendor due diligence — and pressure-test the whole stack.',
+      'Layer 05 and beyond. Close the loop with machine-readable evidence and continuous assurance, then specialise (systemic-risk models, vendor due diligence) and pressure-test the whole stack.',
   },
 ] as const;
 
@@ -152,7 +152,7 @@ export const nodes: readonly PathNode[] = [
     stage: 'foundations',
     kind: 'core',
     summary:
-      'AI governance engineering applies engineering practice — systems thinking, product thinking and code — to the governance of AI. Start here, and learn what separates it from AI safety, MLOps and compliance.',
+      'AI governance engineering applies engineering practice (systems thinking, product thinking and code) to the governance of AI. Start here, and learn what separates it from AI safety, MLOps and compliance.',
     links: [
       { label: 'The definition', href: '/bok/definition#the-definition' },
       { label: 'The Thesis', href: '/thesis' },
@@ -204,7 +204,7 @@ export const nodes: readonly PathNode[] = [
     stage: 'foundations',
     kind: 'optional',
     summary:
-      'The thing being governed changed shape — from models you call to agents that act — and the market named the role before the profession named itself. Read why the discipline is forming now.',
+      'The thing being governed changed shape, from models you call to agents that act, and the market named the role before the profession named itself. Read why the discipline is forming now.',
     links: [
       {
         label: 'The five problems with the evidence',
@@ -323,7 +323,7 @@ export const nodes: readonly PathNode[] = [
     stage: 'foundations',
     kind: 'core',
     summary:
-      'Python is the cross-cutting skill under every workflow — enough to glue systems together, script an intake, or run an eval harness. You do not need to be a software engineer, but you do need to read and write it.',
+      'Python is the cross-cutting skill under every workflow: enough to glue systems together, script an intake, or run an eval harness. You do not need to be a software engineer, but you do need to read and write it.',
     links: [
       { label: 'Skills by workflow', href: '/bok/the-role#skills-by-workflow' },
     ],
@@ -377,7 +377,7 @@ export const nodes: readonly PathNode[] = [
     stage: 'foundations',
     kind: 'core',
     summary:
-      'Reading regulation and standards well enough to build the control that meets them — parsing an AI Act article or an ISO/IEC 42001 control without mistaking it for legal advice. This is translation, not law.',
+      'Reading regulation and standards well enough to build the control that meets them, parsing an AI Act article or an ISO/IEC 42001 control without mistaking it for legal advice. This is translation, not law.',
     links: [
       { label: 'Skills by workflow', href: '/bok/the-role#skills-by-workflow' },
       { label: 'Frameworks', href: '/resources/frameworks' },
@@ -409,7 +409,7 @@ export const nodes: readonly PathNode[] = [
     stage: 'foundations',
     kind: 'optional',
     summary:
-      'Enough of how models and agents work — context, tools, autonomy — to see where a control has to fire. The agent shift is what makes runtime identity and scope non-optional.',
+      'Enough of how models and agents work (context, tools, autonomy) to see where a control has to fire. The agent shift is what makes runtime identity and scope non-optional.',
     links: [
       { label: 'The agent shift', href: '/bok/why-now#the-agent-shift' },
       {
@@ -481,7 +481,7 @@ export const nodes: readonly PathNode[] = [
     kind: 'core',
     layerN: 2,
     summary:
-      'The runtime-aware inventory of every model, service and agent — each with an owner, a declared scope, a status and a kill switch — fed by the deployment pipeline, not typed into a spreadsheet.',
+      'The runtime-aware inventory of every model, service and agent (each with an owner, a declared scope, a status and a kill switch), fed by the deployment pipeline, not typed into a spreadsheet.',
     links: [
       {
         label: 'Inventory and registry',
@@ -521,8 +521,8 @@ export const nodes: readonly PathNode[] = [
         href: '/bok/patterns#pattern-model-card-as-control-evidence',
       },
       {
-        label: 'Layer 02 — Inventory & Transparency',
-        href: '/bok/the-stack#layer-02--inventory--transparency',
+        label: 'Layer 02 · Inventory & Transparency',
+        href: '/bok/the-stack#layer-02-inventory--transparency',
       },
     ],
     resources: [
@@ -590,8 +590,8 @@ export const nodes: readonly PathNode[] = [
         href: '/bok/the-role#policy-as-code-and-gates',
       },
       {
-        label: 'Layer 01 — Govern-as-Code',
-        href: '/bok/the-stack#layer-01--govern-as-code',
+        label: 'Layer 01 · Govern-as-Code',
+        href: '/bok/the-stack#layer-01-govern-as-code',
       },
       { label: 'Policy-as-code', href: '/resources/glossary#t-policy-as-code' },
     ],
@@ -624,15 +624,15 @@ export const nodes: readonly PathNode[] = [
     kind: 'alternative',
     layerN: 1,
     summary:
-      'Cedar is an alternative policy language for the same job — authored rules, evaluated against structured input, with a machine-readable verdict. Choose it where its authorization model fits better than Rego.',
+      'Cedar is an alternative policy language for the same job: authored rules, evaluated against structured input, with a machine-readable verdict. Choose it where its authorization model fits better than Rego.',
     links: [
       {
         label: 'Policy-as-code and gates',
         href: '/bok/the-role#policy-as-code-and-gates',
       },
       {
-        label: 'Layer 01 — Govern-as-Code',
-        href: '/bok/the-stack#layer-01--govern-as-code',
+        label: 'Layer 01 · Govern-as-Code',
+        href: '/bok/the-stack#layer-01-govern-as-code',
       },
       { label: 'Policy-as-code', href: '/resources/glossary#t-policy-as-code' },
     ],
@@ -692,8 +692,8 @@ export const nodes: readonly PathNode[] = [
         href: '/bok/values-and-principles#give-every-control-teeth',
       },
       {
-        label: 'Layer 01 — Govern-as-Code',
-        href: '/bok/the-stack#layer-01--govern-as-code',
+        label: 'Layer 01 · Govern-as-Code',
+        href: '/bok/the-stack#layer-01-govern-as-code',
       },
     ],
     resources: [
@@ -725,7 +725,7 @@ export const nodes: readonly PathNode[] = [
     kind: 'alternative',
     layerN: 1,
     summary:
-      'Turn a fundamental-rights or data-protection impact assessment into a versioned, executable artefact generated from a template — cross-referenced to the registry entry, not filed as a one-off document.',
+      'Turn a fundamental-rights or data-protection impact assessment into a versioned, executable artefact generated from a template, cross-referenced to the registry entry, not filed as a one-off document.',
     links: [
       { label: 'Pattern: FRIA as code', href: '/bok/patterns#pattern-fria-as-code' },
       { label: 'FRIA', href: '/resources/glossary#t-fria' },
@@ -761,15 +761,15 @@ export const nodes: readonly PathNode[] = [
     kind: 'core',
     layerN: 3,
     summary:
-      'Build and maintain the eval suites — capability, safety and adversarial — and the harness that runs them. This is the workflow that most sharply separates the engineer from the analyst.',
+      'Build and maintain the eval suites (capability, safety and adversarial) and the harness that runs them. This is the workflow that most sharply separates the engineer from the analyst.',
     links: [
       {
         label: 'Evals and red teaming as evidence',
         href: '/bok/the-role#evals-and-red-teaming-as-evidence',
       },
       {
-        label: 'Layer 03 — Evals & Red Teaming as Evidence',
-        href: '/bok/the-stack#layer-03--evals--red-teaming-as-evidence',
+        label: 'Layer 03 · Evals & Red Teaming as Evidence',
+        href: '/bok/the-stack#layer-03-evals--red-teaming-as-evidence',
       },
     ],
     resources: [
@@ -922,15 +922,15 @@ export const nodes: readonly PathNode[] = [
     kind: 'core',
     layerN: 4,
     summary:
-      'Input and output filters and tool-call mediation at the enforcement point — the runtime line that holds when an eval or a policy is not enough. Configure them against the failure modes red teaming found.',
+      'Input and output filters and tool-call mediation at the enforcement point: the runtime line that holds when an eval or a policy is not enough. Configure them against the failure modes red teaming found.',
     links: [
       {
         label: 'Runtime monitoring and incidents',
         href: '/bok/the-role#runtime-monitoring-and-incidents',
       },
       {
-        label: 'Layer 04 — Runtime Controls & Observability',
-        href: '/bok/the-stack#layer-04--runtime-controls--observability',
+        label: 'Layer 04 · Runtime Controls & Observability',
+        href: '/bok/the-stack#layer-04-runtime-controls--observability',
       },
     ],
     resources: [
@@ -995,7 +995,7 @@ export const nodes: readonly PathNode[] = [
     kind: 'core',
     layerN: 4,
     summary:
-      'Every agent under its own workload identity with a bounded scope, not a shared human credential. Paired with a tested kill switch, this is among the cheapest controls with the largest blast-radius reduction — non-human identity is the precondition of agent governance.',
+      'Every agent under its own workload identity with a bounded scope, not a shared human credential. Paired with a tested kill switch, this is among the cheapest controls with the largest blast-radius reduction; non-human identity is the precondition of agent governance.',
     links: [
       {
         label: 'Pattern: agent identity & scoped credentials',
@@ -1132,7 +1132,7 @@ export const nodes: readonly PathNode[] = [
     kind: 'core',
     layerN: 5,
     summary:
-      'Emit audit-ready evidence as a by-product of the build — machine-readable OSCAL component and assessment artefacts — so the audit is a query, not a project.',
+      'Emit audit-ready evidence as a by-product of the build (machine-readable OSCAL component and assessment artefacts), so the audit is a query, not a project.',
     links: [
       {
         label: 'Pattern: machine-readable evidence (OSCAL)',
@@ -1176,8 +1176,8 @@ export const nodes: readonly PathNode[] = [
       'Structured, signed and tamper-evident logs are what make evidence hold up later. Signing and attestation turn a log line into something an auditor can trust.',
     links: [
       {
-        label: 'Layer 05 — Assurance & Continuous Compliance',
-        href: '/bok/the-stack#layer-05--assurance--continuous-compliance',
+        label: 'Layer 05 · Assurance & Continuous Compliance',
+        href: '/bok/the-stack#layer-05-assurance--continuous-compliance',
       },
       {
         label: 'EU AI Act (post-Omnibus)',
@@ -1206,7 +1206,7 @@ export const nodes: readonly PathNode[] = [
     stage: 'prove-and-specialise',
     kind: 'core',
     summary:
-      'Map one control to the many obligations it serves — an AI Act article, an ISO/IEC 42001 control, a NIST AI RMF subcategory — so an auditor can trace the control back to the obligation. Generate the crosswalk from the evidence, do not maintain it beside it.',
+      'Map one control to the many obligations it serves (an AI Act article, an ISO/IEC 42001 control, a NIST AI RMF subcategory), so an auditor can trace the control back to the obligation. Generate the crosswalk from the evidence, do not maintain it beside it.',
     links: [
       {
         label: 'Regulatory translation',
@@ -1317,7 +1317,7 @@ export const nodes: readonly PathNode[] = [
     kind: 'optional',
     layerN: 2,
     summary:
-      'Most AI is procured, not built. A due-diligence gate asks a supplier for the same evidence you would produce yourself — an AIBOM, evals, a control mapping — before the system enters.',
+      'Most AI is procured, not built. A due-diligence gate asks a supplier for the same evidence you would produce yourself (an AIBOM, evals, a control mapping) before the system enters.',
     links: [
       {
         label: 'Pattern: vendor & model due-diligence gate',

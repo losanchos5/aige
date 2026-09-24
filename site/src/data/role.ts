@@ -85,7 +85,7 @@ export const workflows: readonly Workflow[] = [
     name: 'Inventory and registry',
     layerN: 2,
     summary:
-      'The engineer owns the inventory of models and the agent registry — every non-human actor with an owner, a declared scope, a status and a kill switch. What distinguishes the engineer is the runtime data path: the registry is fed by the deployment pipeline and by discovery against production, not typed into a spreadsheet.',
+      'The engineer owns the inventory of models and the agent registry: every non-human actor with an owner, a declared scope, a status and a kill switch. What distinguishes the engineer is the runtime data path: the registry is fed by the deployment pipeline and by discovery against production, not typed into a spreadsheet.',
     anchor: 'inventory-and-registry',
   },
   {
@@ -93,7 +93,7 @@ export const workflows: readonly Workflow[] = [
     name: 'Evals and red teaming as evidence',
     layerN: 3,
     summary:
-      'The engineer builds and maintains the eval suites — capability, safety and adversarial — and wires them into an eval gate so a failing eval blocks the release. This is the workflow that most sharply separates the engineer from the analyst: the engineer writes the test the model must pass and owns the harness that runs it.',
+      'The engineer builds and maintains the eval suites (capability, safety and adversarial) and wires them into an eval gate so a failing eval blocks the release. This is the workflow that most sharply separates the engineer from the analyst: the engineer writes the test the model must pass and owns the harness that runs it.',
     anchor: 'evals-and-red-teaming-as-evidence',
   },
   {
@@ -101,7 +101,7 @@ export const workflows: readonly Workflow[] = [
     name: 'Policy-as-code and gates',
     layerN: 1,
     summary:
-      'The engineer expresses governance rules as executable policy that evaluates in CI/CD and at admission, and maintains the gates that enforce them. The output is a merge that is blocked or allowed, with a logged reason — not a recommendation in a review.',
+      'The engineer expresses governance rules as executable policy that evaluates in CI/CD and at admission, and maintains the gates that enforce them. The output is a merge that is blocked or allowed, with a logged reason, not a recommendation in a review.',
     anchor: 'policy-as-code-and-gates',
   },
   {
@@ -117,7 +117,7 @@ export const workflows: readonly Workflow[] = [
     name: 'Assurance and audit evidence',
     layerN: 5,
     summary:
-      'The engineer emits audit-ready evidence as a by-product of the build — OSCAL component and assessment artefacts, signed logs, structured eval results — so the audit is a query, not a project. This is continuous assurance: the control status is a live signal, not a point-in-time attestation.',
+      'The engineer emits audit-ready evidence as a by-product of the build (OSCAL component and assessment artefacts, signed logs, structured eval results), so the audit is a query, not a project. This is continuous assurance: the control status is a live signal, not a point-in-time attestation.',
     anchor: 'assurance-and-audit-evidence',
   },
   {
@@ -125,7 +125,7 @@ export const workflows: readonly Workflow[] = [
     name: 'Regulatory translation',
     layerN: 'all',
     summary:
-      'The engineer reads the obligation well enough to build the control that meets it — turning an AI Act article, an ISO/IEC 42001 control or a NIST AI RMF subcategory into a gate, a registry field or an evidence artefact, and back, so an auditor can trace the control to the obligation. This is translation, not legal advice.',
+      'The engineer reads the obligation well enough to build the control that meets it, turning an AI Act article, an ISO/IEC 42001 control or a NIST AI RMF subcategory into a gate, a registry field or an evidence artefact, and back, so an auditor can trace the control to the obligation. This is translation, not legal advice.',
     anchor: 'regulatory-translation',
   },
 ] as const;
@@ -198,8 +198,8 @@ export const skills: readonly SkillArea[] = [
   {
     area: 'Cross-cutting (under all seven workflows)',
     core: [
-      'Python — enough to glue systems together',
-      'Law-reading — enough to parse an article without mistaking it for advice',
+      'Python: enough to glue systems together',
+      'Law-reading: enough to parse an article without mistaking it for advice',
     ],
     supporting: [],
   },
@@ -210,9 +210,9 @@ export const analystVsEngineer: readonly AnalystEngineerRow[] = [
   {
     dimension: 'Evidence artefact',
     analyst:
-      'A point-in-time artefact — an attestation, a questionnaire, an exported report — compiled for a review',
+      'A point-in-time artefact (an attestation, a questionnaire, an exported report) compiled for a review',
     engineer:
-      'A continuously emitted artefact — a query result, an eval run, a signed log — produced as the pipeline runs',
+      'A continuously emitted artefact (a query result, an eval run, a signed log) produced as the pipeline runs',
   },
   {
     dimension: 'Primary source',
@@ -225,7 +225,7 @@ export const analystVsEngineer: readonly AnalystEngineerRow[] = [
     dimension: 'Toolset',
     analyst: 'Spreadsheets, a GRC/AI-governance platform, ticketing',
     engineer:
-      'Python, OPA/Rego, Git, CI/CD, eval harnesses, OSCAL — plus the platform',
+      'Python, OPA/Rego, Git, CI/CD, eval harnesses, OSCAL, plus the platform',
   },
   {
     dimension: 'Cadence',
@@ -251,24 +251,24 @@ export const waysIn: readonly WayIn[] = [
   {
     title: 'From Legal or privacy',
     summary:
-      'Your edge is regulatory translation; your gap is the build. Turn one assessment into a versioned, executable artefact and learn enough pipeline to see where the control fires — start at policy-as-code and intake.',
+      'Your edge is regulatory translation; your gap is the build. Turn one assessment into a versioned, executable artefact and learn enough pipeline to see where the control fires. Start at policy-as-code and intake.',
   },
   {
     title: 'From Security or GRC',
     summary:
-      'Your edge is the control mindset; your gap is the model layer. Add the AI-specific objects — evals as controls, agent identity and scope, and the model and agent failure modes of the OWASP Agentic Top 10 — starting at evals-as-evidence and the agent registry.',
+      'Your edge is the control mindset; your gap is the model layer. Add the AI-specific objects (evals as controls, agent identity and scope, and the model and agent failure modes of the OWASP Agentic Top 10), starting at evals-as-evidence and the agent registry.',
   },
   {
     title: 'From MLOps or ML engineering',
     summary:
-      'Your edge is the runtime data path everyone else lacks; your gap is the obligation. Add the eval gate rather than the eval report, the registry field for owner and scope, and the evidence artefact the audit needs — start at eval gates in CI and runtime monitoring.',
+      'Your edge is the runtime data path everyone else lacks; your gap is the obligation. Add the eval gate rather than the eval report, the registry field for owner and scope, and the evidence artefact the audit needs. Start at eval gates in CI and runtime monitoring.',
   },
 ] as const;
 
 /** What employers get wrong in the job description, read against the workflows. */
 export const employerMistakes: readonly string[] = [
-  'Certifications as a proxy for capability: descriptions list AIGP, CIPP, CISSP and CISM as if a certificate produced a control, while under-specifying the load-bearing skills — eval harnesses, policy-as-code, the runtime data path.',
-  'Analyst work under an engineer title: many "AI Governance Engineer" postings describe intake, mapping and reporting at engineer pay; the tell is the absence of any build — no eval gate, no registry integration, no evidence pipeline.',
+  'Certifications as a proxy for capability: descriptions list AIGP, CIPP, CISSP and CISM as if a certificate produced a control, while under-specifying the load-bearing skills: eval harnesses, policy-as-code, the runtime data path.',
+  'Analyst work under an engineer title: many "AI Governance Engineer" postings describe intake, mapping and reporting at engineer pay; the tell is the absence of any build: no eval gate, no registry integration, no evidence pipeline.',
   'Everything, in one hire: a single posting asks for policy-as-code, red teaming, identity, observability, incident response, regulatory translation and stakeholder management. That is a function, not a person; a first hire owns two or three workflows and builds the paved path for the rest.',
 ] as const;
 

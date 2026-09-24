@@ -99,6 +99,27 @@ function toText(html) {
     .trim();
 }
 
+// House style: the site publishes no em dash (U+2014) at all, since the owner
+// reads it as a tell of machine-written prose. Checks everything a reader or a
+// search engine sees: visible text, attributes (alt, title, aria-label, meta
+// content) and the JSON-LD graph. HTML comments, inline CSS and inline JS are
+// skipped, because they are not published text.
+function emDashes(file, raw) {
+  const published = raw
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script(?![^>]*application\/ld\+json)[\s\S]*?<\/script>/gi, ' ');
+  const out = [];
+  const re = /—|&mdash;|&#8212;|&#x2014;/gi;
+  let m;
+  while ((m = re.exec(published)) !== null) {
+    const start = Math.max(0, m.index - 50);
+    const snippet = published.slice(start, m.index + 50).replace(/\s+/g, ' ').trim();
+    out.push({ file, label: 'em dash', snippet });
+  }
+  return out;
+}
+
 function countMatches(raw, regex) {
   const matches = raw.match(regex);
   return matches ? matches.length : 0;
@@ -214,6 +235,9 @@ function main() {
     // Structural: every citation link `href="#src-N"` must resolve to an
     // `id="src-N"` in the same document, or the footnote jump is dead.
     structural.push(...danglingSrcAnchors(file, raw));
+
+    // House style: no em dash anywhere in the published page.
+    structural.push(...emDashes(file, raw));
 
     // Structural: the two resource landing pages must ship their full content.
     const rel = file.replace(/\\/g, '/');

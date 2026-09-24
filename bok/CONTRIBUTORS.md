@@ -2,11 +2,11 @@
 
 ## Authorship
 
-**Jorge García Aibar** — AI Governance & Privacy Engineer. Sole author of the Body of Knowledge,
+**Jorge García Aibar**, AI Governance & Privacy Engineer. Sole author of the Body of Knowledge,
 website, datasets and project materials.
 LinkedIn: https://www.linkedin.com/in/jorgara
 
-**The Thesis is the sole exception.** It is co-authored by Jorge García Aibar and **Aurélie Pols** —
+**The Thesis is the sole exception.** It is co-authored by Jorge García Aibar and **Aurélie Pols**,
 Responsible AI (EU/Global), Privacy & Data Governance (v0.1–v0.4.0).
 LinkedIn: https://www.linkedin.com/in/aureliepols
 
@@ -27,7 +27,7 @@ contribute:
 4. Keep the voice practitioner-direct, name categories rather than vendors, and never invent a figure.
    Respect the BRIEF blocklist recorded in `STYLEGUIDE.md` §7.
 
-Substantive fixes — a corrected fact, a sharper argument, a better source — are also credited, in the
+Substantive fixes (a corrected fact, a sharper argument, a better source) are also credited, in the
 **Contributors** list.
 
 ## Contributors
@@ -36,14 +36,14 @@ _None yet. This section lists people who have made substantive corrections or ad
 
 ## Signatories
 
-Signing the Thesis means you endorse *The AI Governance Engineering Thesis* — its definition,
+Signing the Thesis means you endorse *The AI Governance Engineering Thesis*: its definition,
 values and principles. Signatories are practitioners and organisations who support the discipline;
 signing does not require writing a chapter.
 
 **To sign:** open a pull request that adds a line to the list below, in the form:
 
 ```
-- Name — role / organisation (optional) — LinkedIn or GitHub link (optional)
+- Name, role / organisation (optional), LinkedIn or GitHub link (optional)
 ```
 
 Add yourself at the end of the list. Keep it to one line. By signing you confirm you are adding your
@@ -51,7 +51,7 @@ own name and that the entry contains nothing confidential.
 
 ### Signatories
 
-- Jorge García Aibar — AI Governance & Privacy Engineer — https://www.linkedin.com/in/jorgara
+- Jorge García Aibar, AI Governance & Privacy Engineer, https://www.linkedin.com/in/jorgara
 
 ## Licence
 

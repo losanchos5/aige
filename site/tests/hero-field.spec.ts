@@ -409,7 +409,10 @@ for (const scheme of ['light', 'dark'] as const) {
       viewport: { width: 1440, height: 900 },
     });
     const page = await ctx.newPage();
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'networkidle' });
+    // The pills' boxes are measured before the capture: let the web fonts
+    // settle first, or a late swap moves the strip under the sample.
+    await page.evaluate(() => document.fonts.ready);
     expectAA(await worstContrast(page), 'on the fallback');
     await ctx.close();
   });

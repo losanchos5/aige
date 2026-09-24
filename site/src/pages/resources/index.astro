@@ -34,7 +34,7 @@ const cards = [
     href: '/resources/tools',
     swatch: 'var(--l4)',
     description:
-      'Reference tool categories for each layer of the stack, with illustrative examples — the substance, not an endorsement of any brand.',
+      'Reference tool categories for each layer of the stack, with illustrative examples: the substance, not an endorsement of any brand.',
     count: `${toolCount} tools · ${tools.length} categories`,
   },
   {
@@ -43,7 +43,7 @@ const cards = [
     href: '/resources/reading-list',
     swatch: 'var(--l5)',
     description:
-      'The annotated bibliography that formed the discipline — grouped by theme, each source with a verified URL and a one-line note.',
+      'The annotated bibliography that formed the discipline, grouped by theme, each source with a verified URL and a one-line note.',
     count: `${readingCount} sources · ${reading.length} groups`,
   },
   {
@@ -61,7 +61,7 @@ const cards = [
     href: '/resources/crosswalk',
     swatch: 'var(--l2)',
     description:
-      'One governance topic per row, read across to the EU, ISO, NIST and Chinese instruments that bind it — down to the article, clause or control.',
+      'One governance topic per row, read across to the EU, ISO, NIST and Chinese instruments that bind it, down to the article, clause or control.',
     count: `${topics.length} topics · ${columns.length} columns`,
   },
   {
@@ -70,7 +70,7 @@ const cards = [
     href: '/map',
     swatch: 'var(--l1)',
     description:
-      'The whole discipline on one canvas — every chapter, layer, pattern, obligation and learning stage as a navigable mind map, with the same map as a linked index.',
+      'The whole discipline on one canvas: every chapter, layer, pattern, obligation and learning stage as a navigable mind map, with the same map as a linked index.',
     count: '8 branches · one page',
   },
 ];
@@ -81,7 +81,7 @@ const resourcesUrl = new URL('/resources', site.url).href;
 const jsonLd = {
   '@type': 'CollectionPage',
   '@id': `${resourcesUrl}#page`,
-  name: `Resources — ${site.name}`,
+  name: `Resources · ${site.name}`,
   url: resourcesUrl,
   inLanguage: 'en',
   isPartOf: { '@id': WEBSITE_ID },

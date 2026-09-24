@@ -1,5 +1,5 @@
 {
-  "taxonomy": "The threat taxonomy the suite is built from — adversarial tactics and techniques for AI systems and the agentic attack classes — so each test traces to a named technique rather than to intuition.",
+  "taxonomy": "The threat taxonomy the suite is built from (adversarial tactics and techniques for AI systems and the agentic attack classes), so each test traces to a named technique rather than to intuition.",
   "suite": "The versioned adversarial suite, kept alongside the model and run against the registered version, so coverage grows over time instead of resetting at each launch.",
   "run": "The suite runs in CI or on a schedule against the registered version, and each finding names the technique that produced it, so the same attack is not rediscovered every quarter.",
   "triage": "Every finding is routed through triage: fixed, or accepted with a recorded rationale and an owner; nothing is left as a slide of jailbreaks.",

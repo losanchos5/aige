@@ -1,20 +1,20 @@
 # 01. The definition
 
-> AI governance engineering is the application of engineering practice — systems thinking, product
-> thinking and code — to the governance of AI systems; a capability, not a job title, measured by
+> AI governance engineering is the application of engineering practice (systems thinking, product
+> thinking and code) to the governance of AI systems; a capability, not a job title, measured by
 > realised risk reduction and audit-ready evidence.
 
 ## The definition
 
-**AI governance engineering is the application of engineering practice — systems thinking, product
-thinking and code — to the governance of AI systems.**
+**AI governance engineering is the application of engineering practice (systems thinking, product
+thinking and code) to the governance of AI systems.**
 
 Read the sentence in three parts. *Engineering practice* means we build, run and measure governance
 the way engineers build, run and measure anything else: as versioned systems with tests, telemetry
 and owners, not as documents. *Systems thinking and product thinking* mean we treat governance as a
 whole that spans data, model, pipeline, runtime and organisation, delivered as a product to the
 engineers who are its users. *The governance of AI systems* is the subject: the whole span of
-governance, risk and assurance for AI — including autonomous agents — not one narrow slice of it.
+governance, risk and assurance for AI, including autonomous agents, not one narrow slice of it.
 
 The framing is borrowed, deliberately. GRC engineering defines itself as "the application of software
 engineering practice, systems thinking and product thinking to governance, risk and compliance" [1].
@@ -23,7 +23,7 @@ discipline pointed at a faster, stranger target.
 
 ## Three clarifiers
 
-**It covers governance, risk and assurance of AI systems — including agents.** The scope is not
+**It covers governance, risk and assurance of AI systems, including agents.** The scope is not
 "compliance." It runs from setting the rules (governance), through identifying and reducing what can
 go wrong (risk), to producing the evidence that the controls work (assurance). It explicitly includes
 autonomous and agentic AI, because that is where the hardest governance problems now live: an agent
@@ -31,17 +31,17 @@ that browses, executes code, calls APIs and acts under delegated authority is th
 governance can least see.
 
 **It is a capability, not a job title.** You do not need "AI governance engineer" on your business
-card to do this work, and having the title does not mean you are doing it. It is a set of practices —
-policy-as-code, eval gates, agent registries, continuous assurance — that a security engineer, a
+card to do this work, and having the title does not mean you are doing it. It is a set of practices
+(policy-as-code, eval gates, agent registries, continuous assurance) that a security engineer, a
 privacy engineer, an MLOps engineer or a governance lead can each develop. The market is forming the
 role (technical AI-governance roles in the tech sector report a median near USD 221,000, the highest
 band in IAPP's survey [2], and the AI governance platform market is forecast to grow from tens of
-millions of dollars to well over a billion by 2030 [3]) — but the discipline is defined by the
+millions of dollars to well over a billion by 2030 [3]), but the discipline is defined by the
 capability, not by the vacancy.
 
 **It is measured by realised risk reduction and audit-ready evidence.** There are exactly two tests.
-Did the risk actually fall — measurably, in production, not on a maturity slide? And can a regulator
-or auditor read the proof — as machine-readable evidence, not a reassembled screenshot? A control that
+Did the risk actually fall, measurably, in production, not on a maturity slide? And can a regulator
+or auditor read the proof as machine-readable evidence, not a reassembled screenshot? A control that
 passes neither test is theatre. Framework coverage, number of policies written and committees held are
 inputs at best; they are never the measure.
 
@@ -58,31 +58,31 @@ confused with it. Each shares a border; none is the same thing.
 | **AI compliance / legal** | Interprets obligations (EU AI Act, GDPR) and advises on them. | Turns the obligation into an executable control and readable evidence; needs legal, does not replace it. |
 | **Responsible AI / AI ethics** | Sets the values and principles (fairness, transparency, accountability). | Implements those values as running controls; ethics sets the target, engineering hits it and proves it. |
 | **GRC engineering** (the parent) | Applies engineering practice to governance, risk and compliance generally. | Same method, specialised to AI: models, agents, evals, AIBOM, runtime AI controls. |
-| **AI security engineering** (the sibling) | Secures AI systems against attack (prompt injection, model theft, agent abuse); its deliverable is a defended system. | Overlaps heavily — often the same person — but its deliverable is a *governed and evidenced* system: the rights-and-obligations record and continuous assurance, not only defence. |
+| **AI security engineering** (the sibling) | Secures AI systems against attack (prompt injection, model theft, agent abuse); its deliverable is a defended system. | Overlaps heavily (often the same person), but its deliverable is a *governed and evidenced* system: the rights-and-obligations record and continuous assurance, not only defence. |
 | **Visure's "AI governance engineering"** | Governs the AI that engineers *use inside* engineering workflows (requirements, MBSE). | The opposite direction: our subject is governing AI *systems*, not governing AI-assisted engineering [4]. |
 
 In prose: the frontier lies where a discipline stops. **AI safety research** asks whether a model is
 safe; we ask whether the deployed system is governed, and prove it. **MLOps** answers "is the model
-serving?"; we answer "is it allowed to serve, and what evidence says so?" — governing the very
+serving?"; we answer "is it allowed to serve, and what evidence says so?" We govern the very
 pipeline MLOps runs. **Model risk management** in the SR 11-7 tradition validates a model at points in
 time; we govern the system continuously, including agents that have no analogue in a credit model.
 **AI compliance and legal** tell you what the law requires; we build the control that meets it and the
 evidence that shows it, and we depend on lawyers to tell us we got the obligation right. **Responsible
 AI and AI ethics** set the values; without engineering, those values stay on a poster. **GRC
 engineering** is the parent method, and we are its AI specialisation. We inherit three of the five
-stack layers almost unchanged — govern-as-code, machine-readable evidence and continuous assurance —
+stack layers almost unchanged (govern-as-code, machine-readable evidence and continuous assurance)
 along with the "green dashboard over a broken control is theatre" test; what AI forces us to add is
 the other two, evals and red-teaming as controls and agent identity and runtime control, because a
 model whose behaviour must be tested and an autonomous actor that acts under delegated authority have
 no analogue in classic GRC. **AI security engineering** is the sibling we overlap with most, and the
 overlap is a feature, not a boundary dispute: the same person often wears both hats. The line is not
-"framing versus fences" but *deliverable*. Security engineering's deliverable is a defended system —
+"framing versus fences" but *deliverable*. Security engineering's deliverable is a defended system:
 it stops the attack. AI governance engineering's deliverable is a *governed and evidenced* system: the
 rights-and-obligations record (which control answers which article, with the proof attached) and
 continuous assurance as a product an auditor or regulator can query. A red-team eval is security work
 and governance work at once; it becomes governance when its result is filed as evidence against an
-obligation. Security asks "is it safe from attack?"; we ask "is it governed, and can we prove it?" —
-and we usually need the security answer as an input to ours. And **Visure's** use of the
+obligation. Security asks "is it safe from attack?"; we ask "is it governed, and can we prove it?"
+We usually need the security answer as an input to ours. And **Visure's** use of the
 identical phrase points the other way entirely: governing the AI that assists engineering work, not
 engineering the governance of AI. We claim the second meaning and disambiguate the first on sight.
 
@@ -90,15 +90,15 @@ engineering the governance of AI. We claim the second meaning and disambiguate t
 
 What, concretely, does this discipline govern? Five nested objects, each needing different controls:
 
-- **Models.** The trained artefacts — foundation models, fine-tunes, classifiers — with their
+- **Models.** The trained artefacts (foundation models, fine-tunes, classifiers), with their
   provenance, capabilities, evaluations and known failure modes. Governed with model cards, evals and
   AIBOM.
 - **Systems.** The application around the model: prompts, retrieval, tools, orchestration, the human
   and machine users. Most risk is here, not in the raw model.
-- **Agents.** Systems that act — browse, execute code, call APIs, move money, delegate to other
+- **Agents.** Systems that act: browse, execute code, call APIs, move money, delegate to other
   agents. Governed with identity, bounded scope, tool mediation, runtime guardrails and kill switches.
   This is the hardest and newest object, and the one legacy governance cannot see.
-- **Data.** Training data, retrieval corpora, prompts and outputs — with their lawful basis, rights,
+- **Data.** Training data, retrieval corpora, prompts and outputs, with their lawful basis, rights,
   provenance and retention. Governed with data cards, DPIAs and lineage.
 - **The organisation.** The roles, decision rights, escalation paths and accountability that surround
   all of the above. Governed with an operating model, RACI and an incident pipeline. A control with no
@@ -110,24 +110,24 @@ agent registry with no runtime data path, governs one object and leaves the othe
 ## The three questions
 
 At any moment, an AI governance engineering function must be able to answer three questions about
-production — instantly, from live systems, not from a document last updated a quarter ago:
+production, instantly, from live systems, not from a document last updated a quarter ago:
 
 1. **What AI is running?** Which models, systems and agents are live, in which version, owned by whom.
-   This is the job of the inventory and the agent registry — and it must be fed by a runtime data
+   This is the job of the inventory and the agent registry, and it must be fed by a runtime data
    path, not typed into a spreadsheet.
 2. **What is it allowed to do?** The scope, permissions, guardrails and policy that bound each system
-   and agent. This is the job of governance-as-code and runtime controls — identity before autonomy,
+   and agent. This is the job of governance-as-code and runtime controls: identity before autonomy,
    scope before action.
 3. **What evidence proves it?** The machine-readable, audit-ready record that the controls fired and
-   the risk fell. This is the job of evals-as-evidence and continuous assurance — evidence as a
+   the risk fell. This is the job of evals-as-evidence and continuous assurance: evidence as a
    by-product of the build.
 
 These three questions are the spine of the whole Body of Knowledge. The five-layer stack (chapter 04)
 is built to answer them: Govern-as-Code and Inventory & Transparency answer *what is running* and
 *what it may do*; Evals & Red Teaming and Assurance & Continuous Compliance answer *what evidence
 proves it*; Runtime Controls & Observability keeps all three answers true as the system changes. The
-threats those controls are built against — prompt injection, tool misuse, agent identity and privilege
-abuse, rogue agents — are catalogued in OWASP's Top 10 for Agentic Applications [5], and the patterns
+threats those controls are built against (prompt injection, tool misuse, agent identity and privilege
+abuse, rogue agents) are catalogued in OWASP's Top 10 for Agentic Applications [5], and the patterns
 that answer them are in chapter 05.
 
 ## The limits of the eval gate
@@ -147,15 +147,15 @@ follow directly:
 None of this argues against the gate; it argues for how the gate must be run. The eval suite is itself
 an artefact to be governed: its coverage measured, its cases maintained adversarially, its thresholds
 traced to named failure modes rather than round numbers. And a passing gate *obliges* runtime
-monitoring — layer 04 — rather than replacing it. An eval is the control at build time; the guardrail
+monitoring (layer 04) rather than replacing it. An eval is the control at build time; the guardrail
 and the trace are the control at run time, against the inputs no eval anticipated. A discipline that
 treats a green gate as proof of safety has rebuilt framework theatre with a faster pipeline.
 
 > **In practice**
 > Inside a large telco, the difference between "governed" and "documented" came down to those three
 > questions. A model inventory maintained by hand answered question one on the day it was edited and
-> was wrong within a week. Wiring the registry to the deployment pipeline — so a new model or agent
-> registered itself, with an owner and a scope, at deploy time — was what made the three questions
+> was wrong within a week. Wiring the registry to the deployment pipeline (so a new model or agent
+> registered itself, with an owner and a scope, at deploy time) was what made the three questions
 > answerable on any given Tuesday. The document became a query.
 
 **Maps to:** EU AI Act Art. 9 (risk management), Art. 11/49/71 (documentation and registration),

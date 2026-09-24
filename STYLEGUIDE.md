@@ -1,8 +1,8 @@
-# Style guide — AI Governance Engineering: The Thesis & Body of Knowledge
+# Style guide (AI Governance Engineering: The Thesis & Body of Knowledge)
 
 This guide governs every file in this repository. It exists so that chapters written by different
 people, at different times, read as one book. Read it before you write. If a rule here conflicts with
-your instinct, follow the rule or open a pull request to change the rule — do not quietly diverge.
+your instinct, follow the rule or open a pull request to change the rule. Do not quietly diverge.
 
 Version 0.4.0 · 2026-09-19. Maintainer: Jorge García Aibar.
 
@@ -46,6 +46,9 @@ We write as practitioners, for practitioners. The reader is building something o
   date for v0.4.0 is 2026-09-19.
 - **Numbers.** Spell out one to nine in prose unless paired with a unit or a percentage; use figures
   for 10 and above and for all money, versions and article numbers.
+- **Dashes.** No em dashes (—). Use a comma pair, a colon, a semicolon, a full stop or parentheses
+  instead. En dashes (–) stay for ranges (2024–2026, v0.1–v0.3). The site build fails on any em dash
+  (`site/scripts/content-lint.mjs`).
 
 ## 3. Chapter template
 
@@ -61,11 +64,11 @@ Prose. ### subsections as needed.
 
 > **In practice**
 > A concrete, grounded example of the idea applied inside a real governance function
-> (generic — "in a large telco", never a named employer). What was built, what evidence
+> (generic: "in a large telco", never a named employer). What was built, what evidence
 > it produced, what failed. 3–8 lines.
 
-**Maps to:** the standards, frameworks and legal articles this chapter touches, as a single line —
-e.g. `EU AI Act Art. 9, 15 · ISO/IEC 42001 · NIST AI RMF (Measure) · OWASP Agentic ASI03`.
+**Maps to:** the standards, frameworks and legal articles this chapter touches, as a single line
+(e.g. `EU AI Act Art. 9, 15 · ISO/IEC 42001 · NIST AI RMF (Measure) · OWASP Agentic ASI03`).
 Mappings are illustrative, not a claim of conformity.
 
 ## Sources
@@ -90,7 +93,7 @@ Pattern Catalogue structure [see 04 sources]. Use these headings, in this order:
 ```
 # Pattern: <name>
 
-**Summary** — one paragraph: what the pattern is and when it applies.
+**Summary:** one paragraph (what the pattern is and when it applies).
 
 ## Objectives
 What governance outcome the pattern achieves.
@@ -144,10 +147,10 @@ to so the catalogue and the stack (chapter 04) stay consistent.
   `[n] Title. Publisher. Date (YYYY-MM-DD or month/year). URL (verified: <tag>)`
 
 - The **verification tag** is one of:
-  - `primary` — you (or a cited sibling `sources.md`) opened the official primary source: the
+  - `primary`: you (or a cited sibling `sources.md`) opened the official primary source: the
     regulation text, the standards body, the vendor's own release, the report itself.
-  - `secondary` — a reputable outlet reporting a primary fact you could not open directly.
-  - `reported` — a claim carried only by secondary sources, or a figure the primary does not state
+  - `secondary`: a reputable outlet reporting a primary fact you could not open directly.
+  - `reported`: a claim carried only by secondary sources, or a figure the primary does not state
     verbatim. Copy that uses a `reported` fact must say "reported" in the sentence.
 - Every `[n]` in a chapter must also exist as a row in `sources/SOURCES.md`, under that chapter's
   section, so the consolidated table stays complete. Add the row when you add the citation.
@@ -169,7 +172,7 @@ to so the catalogue and the stack (chapter 04) stay consistent.
 - Prefer the complement honestly stated: IAPP says "only 1.5% will not need more staff"; if you write
   "98.5%", show the derivation ("100 − 1.5%") so the reader sees it is arithmetic, not a survey line.
 
-## 8. Terminology — canonical terms
+## 8. Terminology: canonical terms
 
 Use these spellings and capitalisations exactly. Define each once in the glossary (chapter 09).
 
@@ -201,13 +204,13 @@ switch**, **FRIA** (Fundamental Rights Impact Assessment), **DPIA**, **model car
 
 - Hype: revolutionary, game-changer, cutting-edge, next-generation, world-class, seamless, robustly,
   leverage (as a verb), unlock, supercharge, empower, holistic (unless quoting).
-- Vague authority: "studies show", "experts agree", "it is well known" — cite instead.
+- Vague authority: "studies show", "experts agree", "it is well known". Cite instead.
 - False certainty: "guarantees compliance", "makes you compliant", "ensures the model is safe". No
   artefact guarantees compliance; standards support, they do not confer. Say "supports", "evidences",
   "reduces the risk that".
-- "Trustworthy AI" / "responsible AI" as our own banner — we cite them as other people's frameworks,
+- "Trustworthy AI" / "responsible AI" as our own banner: we cite them as other people's frameworks,
   we do not adopt them as the name of what we do (that is chapter 01's disambiguation job).
-- "Just", "simply", "obviously" — they hide the hard part.
+- "Just", "simply", "obviously": they hide the hard part.
 
 ## 10. Disambiguation discipline
 
@@ -216,7 +219,7 @@ The single most important editorial job of this book is to say what AI governanc
 neighbours (full treatment in chapter 01): AI safety research, MLOps/LLMOps, model risk management
 (SR 11-7 style), AI compliance/legal, Responsible AI / AI ethics, GRC engineering (the parent), AI
 security engineering (the sibling), and Visure's "AI governance for engineering" (governing AI used
-_inside_ engineering workflows — the opposite direction). Never let the reader confuse the discipline
+_inside_ engineering workflows, the opposite direction). Never let the reader confuse the discipline
 with any of these.
 
 ## 11. Licence and copy notice (put at the foot of every standalone document)

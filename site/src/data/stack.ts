@@ -60,7 +60,7 @@ export const layers: readonly Layer[] = [
     tagline: 'Write the rule as code',
     question: 'What is it allowed to do?',
     proves:
-      'A policy verdict tied to a commit, a pull request or a deploy — machine-readable and reproducible.',
+      'A policy verdict tied to a commit, a pull request or a deploy, machine-readable and reproducible.',
     artefacts: [
       'Policy-as-code library under version control',
       'Crosswalks that map each policy to the frameworks it serves',
@@ -82,7 +82,7 @@ export const layers: readonly Layer[] = [
       'OWASP Agentic ASI02/ASI03',
     ],
     inherited: true,
-    chapterAnchor: 'layer-01--govern-as-code',
+    chapterAnchor: 'layer-01-govern-as-code',
     colorVar: '--l1',
   },
   {
@@ -95,7 +95,7 @@ export const layers: readonly Layer[] = [
       'A registry entry and its attached documents, ideally written by a deployment pipeline rather than typed by hand.',
     artefacts: [
       'Agent registry: the runtime-aware inventory of every model, service and agent, each with an owner, a scope and a status',
-      'Transparency documents — model cards and data cards',
+      'Transparency documents: model cards and data cards',
       'AIBOM, the bill of materials for an AI system',
       'FRIA and DPIA references linked to the registry entry',
     ],
@@ -137,7 +137,7 @@ export const layers: readonly Layer[] = [
       'OWASP Agentic ASI10',
     ],
     inherited: true,
-    chapterAnchor: 'layer-02--inventory--transparency',
+    chapterAnchor: 'layer-02-inventory--transparency',
     colorVar: '--l2',
   },
   {
@@ -147,7 +147,7 @@ export const layers: readonly Layer[] = [
     tagline: 'Run evals as evidence',
     question: 'What evidence proves it?',
     proves:
-      'A structured eval result — pass or fail against a threshold, versioned alongside the model it tested.',
+      'A structured eval result: pass or fail against a threshold, versioned alongside the model it tested.',
     artefacts: [
       'Eval suites and the eval gate that runs them',
       'Capability and quality evals (groundedness, regression against a golden set)',
@@ -178,7 +178,7 @@ export const layers: readonly Layer[] = [
       'OWASP Agentic ASI01/ASI02',
     ],
     inherited: false,
-    chapterAnchor: 'layer-03--evals--red-teaming-as-evidence',
+    chapterAnchor: 'layer-03-evals--red-teaming-as-evidence',
     colorVar: '--l3',
   },
   {
@@ -238,7 +238,7 @@ export const layers: readonly Layer[] = [
       'OWASP Agentic ASI02/ASI03/ASI10',
     ],
     inherited: false,
-    chapterAnchor: 'layer-04--runtime-controls--observability',
+    chapterAnchor: 'layer-04-runtime-controls--observability',
     colorVar: '--l4',
   },
   {
@@ -284,7 +284,7 @@ export const layers: readonly Layer[] = [
       'CSA AICM',
     ],
     inherited: true,
-    chapterAnchor: 'layer-05--assurance--continuous-compliance',
+    chapterAnchor: 'layer-05-assurance--continuous-compliance',
     colorVar: '--l5',
   },
 ] as const;
@@ -313,7 +313,7 @@ export interface MinimumViableStack {
 export const minimumViableStack: MinimumViableStack = {
   anchor: 'the-minimum-viable-stack-for-a-team-of-one',
   intro:
-    'A team of one cannot build all five layers at depth, but it can build the spine thinly, end to end — one vertical slice that touches every layer beats one layer built out and four left on paper.',
+    'A team of one cannot build all five layers at depth, but it can build the spine thinly, end to end: one vertical slice that touches every layer beats one layer built out and four left on paper.',
   steps: [
     {
       layerN: 2,
@@ -325,7 +325,7 @@ export const minimumViableStack: MinimumViableStack = {
       layerN: 1,
       title: 'One policy in layer 01 with teeth',
       summary:
-        'A single rule that matters — no deploy without a registered owner, or a data-residency check — as code, in the pipeline, blocking on failure.',
+        'A single rule that matters (no deploy without a registered owner, or a data-residency check) as code, in the pipeline, blocking on failure.',
     },
     {
       layerN: 3,
@@ -337,7 +337,7 @@ export const minimumViableStack: MinimumViableStack = {
       layerN: 4,
       title: 'Identity and a kill switch in layer 04',
       summary:
-        'Every agent under its own identity with a scope, and a tested way to stop it — the cheapest control with the largest blast-radius reduction.',
+        'Every agent under its own identity with a scope, and a tested way to stop it: the cheapest control with the largest blast-radius reduction.',
     },
     {
       layerN: 5,
