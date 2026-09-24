@@ -76,7 +76,8 @@ controls; chapter 13 sets out where
 [model risk management meets AI risk management](/bok/risk-management#what-this-chapter-settles).
 **AI compliance and legal** tell you what the law requires; we build the control that meets it and the
 evidence that shows it, and we depend on lawyers to tell us we got the obligation right. **Responsible
-AI and AI ethics** set the values; without engineering, those values stay on a poster. **GRC
+AI and AI ethics** set the values; without engineering, those values stay on a poster (chapter 16
+turns one of them, [fairness, into metrics and eval gates](/bok/fairness-and-explainability#group-fairness-metrics)). **GRC
 engineering** is the parent method, and we are its AI specialisation. We inherit three of the five
 stack layers almost unchanged (Govern-as-Code, Inventory & Transparency, and Assurance & Continuous
 Compliance, which carry policy as code, the asset inventory and machine-readable evidence) along
@@ -106,9 +107,11 @@ What, concretely, does this discipline govern? Five nested objects, each needing
   and machine users. Most risk is here, not in the raw model.
 - **Agents.** Systems that act: browse, execute code, call APIs, move money, delegate to other
   agents. Governed with identity, bounded scope, tool mediation, runtime guardrails and kill switches.
-  This is the hardest and newest object, and the one legacy governance cannot see.
+  This is the hardest and newest object, and the one legacy governance cannot see; chapter 23 covers
+  [governing agents](/bok/governing-agents#what-makes-an-agent-a-governance-object) end to end.
 - **Data.** Training data, retrieval corpora, prompts and outputs, with their lawful basis, rights,
-  provenance and retention. Governed with data cards, DPIAs and lineage.
+  provenance and retention. Governed with data cards, DPIAs and lineage; chapter 19 applies
+  [data protection law to AI](/bok/privacy-and-ai#principles-applied-to-ai).
 - **The organisation.** The roles, decision rights, escalation paths and accountability that surround
   all of the above. Governed with an operating model, RACI and an incident pipeline (chapter 12 maps
   [the stakeholders and their duties](/bok/governance-program#the-stakeholder-map)). A control with no

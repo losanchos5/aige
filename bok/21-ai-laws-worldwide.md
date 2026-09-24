@@ -8,11 +8,12 @@
 
 This chapter is a field guide to the AI-specific rules that sit beside the EU AI Act. It is written
 for the engineer who has to make one set of controls answer several regimes at once, not for the
-lawyer who has to opine on any one of them. Chapter 18 treats the [EU AI Act](/bok/eu-ai-act) in
-depth; chapter 19 covers [privacy and data protection](/bok/privacy-and-ai); chapter 20 covers the
-[other law that already applies to AI](/bok/existing-law); chapter 22 covers
-[principles, soft law and standards](/bok/principles-and-standards), including the international
-treaties. Chapter 08 remains the [reverse index](/bok/regulatory-map#other-jurisdictions) that
+lawyer who has to opine on any one of them. Chapter 18 treats the
+[EU AI Act](/bok/eu-ai-act#how-to-read-this-chapter) in depth; chapter 19 covers privacy and data
+protection, including [the regimes beyond the EU](/bok/privacy-and-ai#beyond-the-eu-uk-us-brazil-and-china);
+chapter 20 covers the [other law that already applies to AI](/bok/existing-law#how-to-read-this-chapter);
+chapter 22 covers [principles, soft law and standards](/bok/principles-and-standards#the-instruments-at-a-glance),
+including the international treaties. Chapter 08 remains the [reverse index](/bok/regulatory-map#other-jurisdictions) that
 turns each obligation into an artefact and a layer.
 
 Every entry below follows the same template: **status**, **dates**, **scope**, **key duties**,
@@ -37,7 +38,7 @@ The engineering reading is the one chapter 06 calls
 decision, a notice, a label, a risk assessment, an incident report, a record kept for a fixed
 period). What differs is the trigger, the wording of the notice, the clock on the report, the
 recipient and the enforcer. Build the control once in the stack and parameterise it per
-jurisdiction; the [Framework Crosswalk](/bok/patterns#pattern-framework-crosswalk) pattern is the
+jurisdiction; the [Framework Crosswalk](/patterns/framework-crosswalk) pattern is the
 place where those parameters live. None of this is legal advice, and the mappings are illustrative,
 not a claim of conformity.
 
@@ -353,7 +354,7 @@ evidence every one of them needs; the notices and review paths differ only in wo
 
 > **Example (illustrative)**
 > A vendor's CV-ranking model is deployed by employers in Denver, Chicago, New York City and Seoul.
-> The [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci) runs an adverse-impact suite on every
+> The [Eval Gate in CI](/patterns/eval-gate-in-ci) runs an adverse-impact suite on every
 > release and blocks one that moves any group's selection-rate ratio below the configured floor.
 > The same results feed the NYC bias-audit auditor's data request, the Illinois discriminatory-effect
 > file and the Korean impact assessment's "indicators and method" section. The registry entry
@@ -379,7 +380,7 @@ Utah, California and New York regulate the conversational interface itself, not 
 high-risk interactions [28]; California and New York add periodic reminders and a crisis-referral
 protocol for companion products, with California's reminders tied to known minors [24][27]. China's
 anthropomorphic interaction measures, below, cover the same ground with a two-hour reminder [35].
-These are [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) problems: a session timer, a
+These are [Runtime Guardrail](/patterns/runtime-guardrail) problems: a session timer, a
 classifier that detects self-harm signals and routes to a referral, and a log that proves both fired.
 
 ## Japan: the AI Promotion Act
@@ -465,7 +466,7 @@ date until 24 Jun 2026 to meet the new requirements, and the directive is review
   [39].
 
 The AIA is the most mature public example of an impact assessment that is also a published,
-versioned artefact; it is a direct model for [FRIA-as-Code](/bok/patterns#pattern-fria-as-code).
+versioned artefact; it is a direct model for [FRIA-as-Code](/patterns/fria-as-code).
 
 ## India: governance guidelines, no AI act
 
@@ -571,10 +572,10 @@ the AI Verify Foundation.
   recognised governance principles, with a generative-AI extension and technical testing tools [53].
 
 The agentic framework's first two dimensions are what this book calls the
-[Agent Registry](/bok/patterns#pattern-agent-registry) and
-[Agent Identity & Scoped Credentials](/bok/patterns#pattern-agent-identity--scoped-credentials);
-its third is the [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci) plus runtime monitoring.
-Chapter 23 on [governing agents](/bok/governing-agents) goes further.
+[Agent Registry](/patterns/agent-registry) and
+[Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials);
+its third is the [Eval Gate in CI](/patterns/eval-gate-in-ci) plus runtime monitoring.
+Chapter 23 on [governing agents](/bok/governing-agents#frameworks-written-for-agents) goes further.
 
 ## Australia: existing law and voluntary guidance
 
@@ -634,7 +635,7 @@ the revised guidance. And the Cyber Resilience Act's reporting duties started on
 
 ### Incident clocks across regimes
 
-One AI incident can start several clocks at once. The [Incident Pipeline](/bok/patterns#pattern-incident-pipeline)
+One AI incident can start several clocks at once. The [Incident Pipeline](/patterns/incident-pipeline)
 pattern should hold each clock as data, keyed to the regime and the trigger, so that one triage
 decision fans out to every report that is due. Chapter 17 treats [incident response](/bok/incidents#the-overlapping-clocks)
 in full.

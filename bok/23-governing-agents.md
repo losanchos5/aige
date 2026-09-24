@@ -3,10 +3,10 @@
 > An AI agent is governed when every action traces back to a registered identity, a scope someone
 > approved, a checkpoint that fired where the stakes required one and a tested way to stop it.
 
-Chapter 05 carries four agent patterns: the [Agent Registry](/bok/patterns#pattern-agent-registry),
-[Agent Identity & Scoped Credentials](/bok/patterns#pattern-agent-identity--scoped-credentials), the
-[Kill Switch / Circuit Breaker](/bok/patterns#pattern-kill-switch--circuit-breaker) and the
-[Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate). [Layer 04 of the
+Chapter 05 carries four agent patterns: the [Agent Registry](/patterns/agent-registry),
+[Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials), the
+[Kill Switch / Circuit Breaker](/patterns/kill-switch-circuit-breaker) and the
+[Human-in-the-loop Gate](/patterns/human-in-the-loop-gate). [Layer 04 of the
 stack](/bok/the-stack#layer-04-runtime-controls--observability) says what runtime control must
 prove, and the [regulatory map](/bok/regulatory-map#china) lines up the agent controls of three
 frameworks side by side. None says in one place what makes an agent different to govern, how the
@@ -23,6 +23,9 @@ The OWASP agentic list states the first principle, **least agency**: its advice 
 unnecessary autonomy", because agentic behaviour deployed where it is not needed "expands the attack
 surface without adding value" [1]. The cheapest agent control is the agent you did not build: a
 fixed workflow with one model call is easier to govern than a planner that picks its own tools.
+Chapter 15 treats
+[the agentic wrapper as a deployment option](/bok/governing-deployment#how-it-is-adapted), with the
+controls it adds on top of the model it wraps.
 
 ## What makes an agent a governance object
 
@@ -48,7 +51,9 @@ the right result through a tool it should never have held.
 Autonomy is a setting the deployer chooses, not a property of the model. As Feng, McDonald and Zhang
 put it, "An agent's level of autonomy can be treated as a deliberate design decision, separate from
 its capability and operational environment" [2]. They define five levels by the role the user plays:
-operator, collaborator, consultant, approver and observer. Singapore's agentic framework describes
+operator, collaborator, consultant, approver and observer.
+[Singapore's Model AI Governance Framework for Agentic AI](/bok/ai-laws-worldwide#singapore-model-frameworks-and-ai-verify)
+describes
 four levels of human involvement, from "agent proposes, human operates" to "agent operates, human
 observes", and cites the same work [3]. The Cloud Security Alliance's Agentic Trust Framework names
 four tiers, from Intern (read-only) to Principal (autonomous within bounds), and makes promotion
@@ -68,12 +73,13 @@ control sets are this book's reading, not the authors'.
 | **Approver** | Agent operates, human approves | Senior | Approves critical or irreversible steps | The above, plus an approval log, a per-agent circuit breaker and a drilled kill switch |
 | **Observer** | Agent operates, human observes | Principal | Audits after the fact | The above, plus trajectory anomaly detection and independent trajectory evals; reversible, bounded actions only |
 
-Record the level as a registry field and treat raising it as a change that needs the same review as
-a new deployment. A promotion is a decision with evidence behind it, not a flag someone flipped.
+Record the level as a registry field (chapter 11 gives
+[an illustrative autonomy scale](/bok/ai-defined#from-definition-element-to-registry-field) for it)
+and treat raising it as a change that needs the same review as a new deployment. A promotion is a decision with evidence behind it, not a flag someone flipped.
 
 ## The agent registry
 
-The [Agent Registry](/bok/patterns#pattern-agent-registry) pattern makes registration a precondition
+The [Agent Registry](/patterns/agent-registry) pattern makes registration a precondition
 of production: owner, scope and expiry, written by the pipeline. An agent's entry has to carry more.
 Singapore's framework asks that agent identities be "catalogued and centrally managed", issued from
 and tracked by a central system "to prevent agent sprawl" [3]; TC260's agentic appendix asks for a
@@ -118,7 +124,7 @@ expiry: 2026-12-17
 ```
 
 A registry is only as good as what it misses. The [Shadow-AI
-Discovery](/bok/patterns#pattern-shadow-ai-discovery) pattern reconciles it against what runs: SaaS
+Discovery](/patterns/shadow-ai-discovery) pattern reconciles it against what runs: SaaS
 connectors, coding agents on laptops and local MCP servers, which run with the same privileges as
 the client that launched them [7]. An agent found by discovery is either registered within a
 deadline or switched off.
@@ -262,7 +268,7 @@ description is an instruction the model reads, so a changed description is a cha
 Admit a server through a gate:
 
 1. **Provenance.** Publisher, source repository and a signed release, recorded in the
-   [AIBOM](/bok/patterns#pattern-aibom) of every agent that uses it.
+   [AIBOM](/patterns/aibom) of every agent that uses it.
 2. **Definition pinning.** Hash tool names, descriptions and schemas at admission; alert on change.
 3. **Authorisation conformance.** MCP version, protected-resource metadata, audience validation, no
    token passthrough.
@@ -272,7 +278,7 @@ Admit a server through a gate:
 5. **Testing.** Poisoned descriptors and injected tool outputs, before any allow-list.
 6. **An owner and a review date**, like any other supplier.
 
-The [Vendor / Model Due-Diligence Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate)
+The [Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate)
 covers the commercial side: who answers when the server misbehaves, and what notice you get before
 it changes.
 
@@ -280,7 +286,7 @@ it changes.
 
 ### Where to put a checkpoint
 
-The [Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate) pattern says to gate by
+The [Human-in-the-loop Gate](/patterns/human-in-the-loop-gate) pattern says to gate by
 consequence. Two sources make "consequence" concrete. The Partnership on AI grades agent risk on
 three factors: **stakes** (the severity of potential consequences), **reversibility** (whether a
 failure can be undone) and **affordances** (unconstrained tool selection and persistent memory
@@ -346,7 +352,7 @@ action before it happens, over an authenticated channel, with an audit trail" [1
 The reference guardian in the ACS repository starts with a failure posture of "proceed", overridable
 to deny [17]. That default is a governance decision disguised as a setting: when the guardian is
 down, fail-open lets every call through unchecked and fail-closed stops the business. Decide per
-operation class and record it in the agent's [Policy Card](/bok/patterns#pattern-policy-card): fail
+operation class and record it in the agent's [Policy Card](/patterns/policy-card): fail
 closed for pay, delete, send and execute; fail open, with an alert, only for reads.
 
 | Check | Runs | On failure |
@@ -368,7 +374,7 @@ agent-level circuit breakers, and continuous cost-attribution monitoring" (`LLM0
 added "Agentic Resource Consumption" (`AML.T0034.002`) for attackers who coerce an agent into
 expensive tool calls [10], and TC260 asks for step, frequency and duration limits [6]. Put the
 budgets in the registry entry, enforce them at the gateway and make exhaustion trip the breaker
-rather than raise a ticket. The [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) pattern
+rather than raise a ticket. The [Runtime Guardrail](/patterns/runtime-guardrail) pattern
 covers the mechanics; a **guardian agent**, as chapter 04 notes, is one way to build the enforcement
 point and needs its own identity, scope and kill switch.
 
@@ -378,7 +384,7 @@ Autonomy is granted only where it can be withdrawn. The NIST AI RMF asks for mec
 "supersede, disengage, or deactivate" systems whose outcomes are inconsistent with intended use
 (MANAGE 2.4) [19]; the AI Act asks for a stop procedure (`Art. 14(4)(e)`) [5]; the CSA's framework
 puts the goal plainly: "You can stop one agent without stopping the business" [4]. The [Kill Switch
-/ Circuit Breaker](/bok/patterns#pattern-kill-switch--circuit-breaker) pattern gives the mechanism.
+/ Circuit Breaker](/patterns/kill-switch-circuit-breaker) pattern gives the mechanism.
 In operation, a stop has levels:
 
 | Stop level | Mechanism | Blast radius | Target time (illustrative) | Evidence |
@@ -505,7 +511,7 @@ configuration under change control, like infrastructure code:
 2. **Hash it everywhere.** The registry records the hash, and so does every trace: the OpenTelemetry
    conventions carry `gen_ai.agent.version` for exactly this [26].
 3. **Gate it.** Every change runs the regression suite (task success, injection resistance,
-   trajectory checks) in the [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci); a failure
+   trajectory checks) in the [Eval Gate in CI](/patterns/eval-gate-in-ci); a failure
    blocks the change.
 4. **Roll it out and back.** Canary the change, as in [progressive
    delivery](/bok/governing-deployment#progressive-delivery-as-a-control), and keep the previous
@@ -598,20 +604,20 @@ techniques from the 2026-09 data release [10], a control and the pattern that im
 
 | Agentic threat [1] | Related LLM 2026 [18] | Example ATLAS techniques | Control | Pattern | Layer |
 |---|---|---|---|---|---|
-| `ASI01` Agent Goal Hijack | `LLM01` Prompt Injection | `AML.T0051` LLM Prompt Injection | Instruction provenance; checkpoints before writes; trajectory evals | [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) | 03 · 04 |
-| `ASI02` Tool Misuse and Exploitation | `LLM03` Excessive Agency; `LLM06` Unbounded Consumption | `AML.T0053` AI Agent Tool Invocation; `AML.T0086` | Tool allow-list; per-tool rate, egress and budgets | [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) | 04 |
-| `ASI03` Identity and Privilege Abuse | `LLM03` Excessive Agency | `AML.T0083`; `AML.T0098` AI Agent Tool Credential Harvesting | Workload identity; short-lived delegated tokens; audience checks | [Agent Identity & Scoped Credentials](/bok/patterns#pattern-agent-identity--scoped-credentials) | 04 |
-| `ASI04` Agentic Supply Chain Vulnerabilities | `LLM04` Supply Chain | `AML.T0110` AI Agent Tool Poisoning | Server admission; definition pinning | [AIBOM](/bok/patterns#pattern-aibom) | 02 |
-| `ASI05` Unexpected Code Execution (RCE) | `LLM10` Improper Output Handling | `AML.T0112.000` Local AI Agent | Sandboxed execution; deny by default | [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) | 04 |
-| `ASI06` Memory & Context Poisoning | `LLM05` Data and Model Poisoning; `LLM09` Vector and Embedding Weaknesses | `AML.T0080` AI Agent Context Poisoning | Memory write gate; namespaces; rollback | [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) | 03 · 04 |
-| `ASI07` Insecure Inter-Agent Communication | None | `AML.T0118` Autonomous AI Agent Communication | Mutual authentication; signed Agent Cards; peer allow-list | [Agent Identity & Scoped Credentials](/bok/patterns#pattern-agent-identity--scoped-credentials) | 04 |
-| `ASI08` Cascading Failures | `LLM06` Unbounded Consumption | `AML.T0034.002` Agentic Resource Consumption | Depth and fan-out limits; per-agent breakers | [Kill Switch / Circuit Breaker](/bok/patterns#pattern-kill-switch--circuit-breaker) | 04 |
-| `ASI09` Human-Agent Trust Exploitation | `LLM07` Misinformation | `AML.T0067` LLM Trusted Output Components Manipulation | Raw-call approvals; oversight metrics | [Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate) | 04 · 05 |
-| `ASI10` Rogue Agents | `LLM03` Excessive Agency | `AML.T0103` Deploy AI Agent | Registry with expiry; discovery; drilled kill switch | [Agent Registry](/bok/patterns#pattern-agent-registry); [Shadow-AI Discovery](/bok/patterns#pattern-shadow-ai-discovery) | 02 · 04 |
+| `ASI01` Agent Goal Hijack | `LLM01` Prompt Injection | `AML.T0051` LLM Prompt Injection | Instruction provenance; checkpoints before writes; trajectory evals | [Runtime Guardrail](/patterns/runtime-guardrail) | 03 · 04 |
+| `ASI02` Tool Misuse and Exploitation | `LLM03` Excessive Agency; `LLM06` Unbounded Consumption | `AML.T0053` AI Agent Tool Invocation; `AML.T0086` | Tool allow-list; per-tool rate, egress and budgets | [Runtime Guardrail](/patterns/runtime-guardrail) | 04 |
+| `ASI03` Identity and Privilege Abuse | `LLM03` Excessive Agency | `AML.T0083`; `AML.T0098` AI Agent Tool Credential Harvesting | Workload identity; short-lived delegated tokens; audience checks | [Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials) | 04 |
+| `ASI04` Agentic Supply Chain Vulnerabilities | `LLM04` Supply Chain | `AML.T0110` AI Agent Tool Poisoning | Server admission; definition pinning | [AIBOM](/patterns/aibom) | 02 |
+| `ASI05` Unexpected Code Execution (RCE) | `LLM10` Improper Output Handling | `AML.T0112.000` Local AI Agent | Sandboxed execution; deny by default | [Runtime Guardrail](/patterns/runtime-guardrail) | 04 |
+| `ASI06` Memory & Context Poisoning | `LLM05` Data and Model Poisoning; `LLM09` Vector and Embedding Weaknesses | `AML.T0080` AI Agent Context Poisoning | Memory write gate; namespaces; rollback | [Runtime Guardrail](/patterns/runtime-guardrail) | 03 · 04 |
+| `ASI07` Insecure Inter-Agent Communication | None | `AML.T0118` Autonomous AI Agent Communication | Mutual authentication; signed Agent Cards; peer allow-list | [Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials) | 04 |
+| `ASI08` Cascading Failures | `LLM06` Unbounded Consumption | `AML.T0034.002` Agentic Resource Consumption | Depth and fan-out limits; per-agent breakers | [Kill Switch / Circuit Breaker](/patterns/kill-switch-circuit-breaker) | 04 |
+| `ASI09` Human-Agent Trust Exploitation | `LLM07` Misinformation | `AML.T0067` LLM Trusted Output Components Manipulation | Raw-call approvals; oversight metrics | [Human-in-the-loop Gate](/patterns/human-in-the-loop-gate) | 04 · 05 |
+| `ASI10` Rogue Agents | `LLM03` Excessive Agency | `AML.T0103` Deploy AI Agent | Registry with expiry; discovery; drilled kill switch | [Agent Registry](/patterns/agent-registry); [Shadow-AI Discovery](/patterns/shadow-ai-discovery) | 02 · 04 |
 
 `LLM02:2026` Sensitive Information Disclosure lands in the egress filter and `LLM08:2026` Hidden
 Context Exposure in the treatment of prompts. Use the ATLAS IDs to tag test cases in the
-[Adversarial Red-Team Suite](/bok/patterns#pattern-adversarial-red-team-suite), so a finding traces
+[Adversarial Red-Team Suite](/patterns/adversarial-red-team-suite), so a finding traces
 from technique to control to the eval that now guards it. Mappings are illustrative, not a claim of
 conformity.
 
@@ -644,7 +650,11 @@ like any other: an agent that screens job applicants is high-risk through Annex 
 architecture, and a scheduling assistant is not. Chapter 18 has the [high-risk
 requirements](/bok/eu-ai-act#high-risk-requirements-articles-8-to-15) and the [deployer
 duties](/bok/eu-ai-act#deployer-duties-article-26) in full. The provisions below are where agent
-controls produce the evidence.
+controls produce the evidence; the obligation register gives each its own page, with its dates,
+evidence and crosswalk: [Art. 12](/obligations/aige-obl-euaia-art12),
+[Art. 14](/obligations/aige-obl-euaia-art14), [Art. 15](/obligations/aige-obl-euaia-art15),
+[Art. 25](/obligations/aige-obl-euaia-art25), [Art. 26](/obligations/aige-obl-euaia-art26) and
+[Art. 50](/obligations/aige-obl-euaia-art50).
 
 | Provision | What it asks | Agent artefact | Duty holder |
 |---|---|---|---|
@@ -664,7 +674,7 @@ AI models/systems)" and the "level of human oversight (e.g. degree of model auto
 specified systemic risks include **loss of control**, defined as "Risks from humans losing the
 ability to reliably direct, modify, or shut down a model" [23]. A deployer should ask how the
 provider evaluated autonomy and tool use at the [due-diligence
-gate](/bok/patterns#pattern-vendor--model-due-diligence-gate); chapter 18 covers [the GPAI
+gate](/patterns/vendor-model-due-diligence-gate); chapter 18 covers [the GPAI
 duties](/bok/eu-ai-act#general-purpose-ai-models). The Code is a voluntary tool. Mappings are
 illustrative, not a claim of conformity.
 

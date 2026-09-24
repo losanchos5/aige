@@ -149,9 +149,9 @@ The Commission's guidelines on the original prohibitions are non-binding [4]. Th
 point `(e)` has a data protection precedent in [the Clearview AI case](/cases/clearview-ai).
 
 For most organisations `Art. 5` is two controls: a denylist of prohibited purposes evaluated at
-intake ([Policy Card](/bok/patterns#pattern-policy-card)), and for generative systems an output
-[Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) tested by an
-[Adversarial Red-Team Suite](/bok/patterns#pattern-adversarial-red-team-suite). Both leave records a
+intake ([Policy Card](/patterns/policy-card)), and for generative systems an output
+[Runtime Guardrail](/patterns/runtime-guardrail) tested by an
+[Adversarial Red-Team Suite](/patterns/adversarial-red-team-suite). Both leave records a
 regulator can read. Breaches sit in the highest fine tier (see "Penalties").
 
 > **In practice (illustrative)**
@@ -265,7 +265,8 @@ in chapter 20.
 Everything else is minimal risk. The Act asks nothing specific of it beyond AI literacy (`Art. 4`)
 and invites voluntary codes of conduct (`Art. 95`) [1]. "Minimal" is a legal category, not a risk
 verdict: data protection, consumer, product-liability and anti-discrimination law still apply (see
-[existing law](/bok/existing-law) and [privacy and AI](/bok/privacy-and-ai)), and your own
+[existing law](/bok/existing-law#how-to-read-this-chapter) and
+[privacy and AI](/bok/privacy-and-ai#principles-applied-to-ai)), and your own
 [risk management](/bok/risk-management#assessing-risk-the-likelihood-by-severity-matrix) may rate a minimal-risk system as high for your
 organisation.
 
@@ -313,8 +314,8 @@ On top of `Arts. 53` and `54`, the provider must evaluate the model with state-o
 including adversarial testing; assess and mitigate systemic risks at Union level; track, document and
 report serious incidents to the AI Office without undue delay; and ensure adequate cybersecurity for
 the model and its physical infrastructure (`Art. 55(1)`) [1]. The artefacts are the
-[eval gate](/bok/patterns#pattern-eval-gate-in-ci) and red-team suite, a systemic-risk register, the
-[incident pipeline](/bok/patterns#pattern-incident-pipeline) on the Commission's reporting template
+[eval gate](/patterns/eval-gate-in-ci) and red-team suite, a systemic-risk register, the
+[incident pipeline](/patterns/incident-pipeline) on the Commission's reporting template
 (see [chapter 08](/bok/regulatory-map#gpai-code-of-practice)) and weight-security controls.
 
 ### Open-source carve-outs and their limits
@@ -369,7 +370,7 @@ records.
 `Art. 14(5)` adds two-person verification before acting on a remote biometric identification, with
 exceptions in law enforcement, migration, border control and asylum [1]; see
 [designing human oversight](/bok/the-stack#designing-human-oversight-article-14) and the
-[Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate). A high-risk system within the
+[Human-in-the-loop Gate](/patterns/human-in-the-loop-gate). A high-risk system within the
 Cyber Resilience Act that fulfils the conditions of its Article 12(1) is deemed to meet the `Art. 15`
 cybersecurity requirement (`Art. 42(3)`) [2], so one security evidence pack can serve both regimes.
 
@@ -414,7 +415,7 @@ The provider runs a post-market monitoring system that actively collects and ana
 data, including from deployers, to evaluate continuous compliance (`Art. 72(1)`, `72(2)`) [1]. Its
 plan is part of the Annex IV documentation, and the Omnibus replaced the overdue implementing act with
 Commission guidance and a template due by 2 Sep 2027 (`Art. 72(3)`) [2].
-[Continuous Assurance Telemetry](/bok/patterns#pattern-continuous-assurance-telemetry) is the
+[Continuous Assurance Telemetry](/patterns/continuous-assurance-telemetry) is the
 monitoring system; the plan is its versioned configuration.
 
 Serious incidents are reported to the market surveillance authority immediately after a causal link,
@@ -472,7 +473,7 @@ breaches of both paragraphs are now fined in the middle tier (`Art. 99(4)(da)`) 
 In the pipeline the three triggers are detectable events: a white-label or brand change, a retrain
 that touches conformity, and a configuration change that moves `intended_purpose` into an Annex III
 value. Each should fire a role re-assessment and a
-[Vendor / Model Due-Diligence Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate) ticket
+[Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate) ticket
 (see [third-party and procured AI](/bok/the-stack#third-party-and-procured-ai)).
 
 > **Example (illustrative)**
@@ -565,7 +566,7 @@ governance and complaint mechanisms (`Art. 27(1)(a)` to `(f)`) [1].
 template (`Art. 27(3)`) [1]. After the Omnibus, it may cross-reference or include the relevant DPIA
 sections, and the template must allow for that (`Art. 27(4)`, `27(5)`) [2]. The duty applies from 2
 Dec 2027 with the Annex III regime [2]. Build it as
-[FRIA-as-Code](/bok/patterns#pattern-fria-as-code): a versioned record generated from the registry,
+[FRIA-as-Code](/patterns/fria-as-code): a versioned record generated from the registry,
 the instructions for use and the DPIA, so an update is a diff, not a rewrite.
 
 ## Explanation and notice to affected people
@@ -709,7 +710,7 @@ legacy system is modified.
 
 1. **Add three fields to every registry entry:** `eu_roles` (a list, per system), `risk_rung` with
    the article that put it there, and `output_used_in_eu`. Run
-   [Shadow-AI Discovery](/bok/patterns#pattern-shadow-ai-discovery) to find the systems that have no
+   [Shadow-AI Discovery](/patterns/shadow-ai-discovery) to find the systems that have no
    entry.
 2. **Write the classification decision record** for every Annex III candidate, with the `Art. 6(3)`
    condition relied on and the profiling flag stated explicitly, and store it next to the system.

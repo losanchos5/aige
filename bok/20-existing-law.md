@@ -19,8 +19,9 @@ It is not legal advice. **AI compliance and legal** functions interpret these ob
 engineer turns the interpretation into a control and a record, and depends on counsel to confirm the
 reading (see [the disambiguation cluster](/bok/definition#the-disambiguation-cluster) and
 [regulatory translation](/bok/the-role#regulatory-translation)). Data-protection law has its own
-chapter ([19](/bok/privacy-and-ai)), the AI Act has chapter [18](/bok/eu-ai-act), and AI-specific
-statutes around the world are in chapter [21](/bok/ai-laws-worldwide), with the
+chapter ([19](/bok/privacy-and-ai#how-to-read-this-chapter)), the AI Act has chapter
+[18](/bok/eu-ai-act#how-to-read-this-chapter), and AI-specific statutes around the world are in
+chapter [21](/bok/ai-laws-worldwide#the-landscape-at-a-glance), with the
 [sector rules that already reach AI](/bok/ai-laws-worldwide#sector-rules-that-already-reach-ai). Every status in this chapter
 is stamped as of 2026-09-24; court cases and transposition deadlines move, so re-check before you
 rely on a row.
@@ -28,7 +29,7 @@ rely on a row.
 ## How to read this chapter
 
 Each body of law asks one question of an AI system. The table names the artefact that answers it and
-its layer in [the stack](/bok/the-stack): **1 Govern-as-Code · 2 Inventory & Transparency · 3 Evals
+its layer in [the stack](/bok/the-stack#how-to-read-the-stack): **1 Govern-as-Code · 2 Inventory & Transparency · 3 Evals
 & Red Teaming as Evidence · 4 Runtime Controls & Observability · 5 Assurance & Continuous
 Compliance**.
 
@@ -175,9 +176,9 @@ paths put that condition at risk: staff pasting code, prices or customer data in
 model whose terms allow retention or training, and fine-tuning on confidential material that
 extraction attacks can later recover [24]. A record showing no control at all is a poor start in
 either case. The artefacts are ordinary and cheap: a data-loss-prevention rule in front of every
-external model endpoint (layer 04, [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail)); a
+external model endpoint (layer 04, [Runtime Guardrail](/patterns/runtime-guardrail)); a
 vendor record of retention and no-training terms, checked at the [Vendor / Model Due-Diligence
-Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate); and a data-classification tag on
+Gate](/patterns/vendor-model-due-diligence-gate); and a data-classification tag on
 every fine-tuning set, so a secret never enters a training pipeline without a decision on record.
 
 ### Patents and AI inventorship
@@ -202,7 +203,7 @@ requires the preferred form for modification: data information, code and paramet
 Act's open-source relief is narrower still and never covers the copyright duties [4].
 
 The control is a licence field on every model and dataset in the
-[AIBOM](/bok/patterns#pattern-aibom), plus a policy that blocks a deployment whose use case breaches
+[AIBOM](/patterns/aibom), plus a policy that blocks a deployment whose use case breaches
 the licence's use policy or commercial threshold (layer 01). A licence read once at procurement and
 never again is not a control.
 
@@ -219,11 +220,11 @@ held when an output was produced.
 |---|---|---|---|
 | Training-data rights ledger | Per dataset: source, acquisition channel, licence, TDM reservation check (result, method, date), place of copying | 2 | Training-Data Rights Ledger (proposed); [AIBOM](/bok/patterns#pattern-aibom) |
 | Crawler policy-as-code | Honouring `robots.txt` and other machine-readable reservations; no paywall circumvention; blocklist of infringing sites | 1 | [Policy Card](/bok/patterns#pattern-policy-card) |
-| Memorisation and regurgitation eval | Extraction probes and verbatim-overlap thresholds per model version | 3 | [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci) |
-| Output filter log | Blocked near-verbatim outputs; licence matches on generated code | 4 | [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) |
-| Copyright policy and training summary | Versioned Art. 53(1)(c) policy and Art. 53(1)(d) summary for GPAI providers | 5 | [Machine-Readable Evidence (OSCAL)](/bok/patterns#pattern-machine-readable-evidence-oscal) |
-| Licence and indemnity register | Model and dataset licences, use policies, indemnity scope and conditions | 2 · 5 | [Vendor / Model Due-Diligence Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate) |
-| Prompt DLP rule | Secrets and source code blocked or redacted before external calls | 4 | [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail) |
+| Memorisation and regurgitation eval | Extraction probes and verbatim-overlap thresholds per model version | 3 | [Eval Gate in CI](/patterns/eval-gate-in-ci) |
+| Output filter log | Blocked near-verbatim outputs; licence matches on generated code | 4 | [Runtime Guardrail](/patterns/runtime-guardrail) |
+| Copyright policy and training summary | Versioned Art. 53(1)(c) policy and Art. 53(1)(d) summary for GPAI providers | 5 | [Machine-Readable Evidence (OSCAL)](/patterns/machine-readable-evidence-oscal) |
+| Licence and indemnity register | Model and dataset licences, use policies, indemnity scope and conditions | 2 · 5 | [Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate) |
+| Prompt DLP rule | Secrets and source code blocked or redacted before external calls | 4 | [Runtime Guardrail](/patterns/runtime-guardrail) |
 
 > **In practice (illustrative)**
 > A retrieval assistant for a publisher's sales team was built on a corpus assembled by three
@@ -348,7 +349,7 @@ eval and a record.
 | Four-fifths rule (US selection procedures) | A selection rate below 80% of the highest group's is generally evidence of adverse impact; smaller gaps can still count [59] | Adverse-impact ratio per group, with sample sizes and a significance test | Signed eval result per model version, in the model card |
 | Title VII disparate impact | Impact caused by a practice; business necessity; less discriminatory alternative [38] | Impact metrics; job-relatedness validation; search across candidate models | Log of alternatives considered and why each was rejected |
 | NYC Local Law 144 | Impact ratios by sex, race and ethnicity, and intersectional categories, by an independent auditor [46] | The same calculation on historical or test data | Published audit summary with its date; candidate notice record |
-| EU indirect discrimination | Particular disadvantage; objective justification; appropriate and necessary means [39] | Group-disparity metrics plus a necessity analysis | Justification section in the [FRIA](/bok/patterns#pattern-fria-as-code) or DPIA |
+| EU indirect discrimination | Particular disadvantage; objective justification; appropriate and necessary means [39] | Group-disparity metrics plus a necessity analysis | Justification section in the [FRIA](/patterns/fria-as-code) or DPIA |
 | Adverse action (ECOA, FCRA) | Specific principal reasons for the decision [50] [51] | Reason-code fidelity test against the model | Reason-code eval result and the notice template version |
 | CCD2 Art. 18(8) | Explanation, human intervention and review [53] | Explanation artefact per model version | Review log with outcome and reviewer |
 
@@ -516,7 +517,7 @@ happened.
 |---|---|---|---|
 | Manufacturing | The deployed system departs from its own design: wrong model version, corrupted weights, misconfigured guardrail, broken data pipeline | AIBOM with hashes; signed deployment record; configuration drift alerts | 2 · 4 · 5 |
 | Design | The design itself is unsafe for a foreseeable use, and a safer alternative was reasonably available: untested operating conditions, no guardrail, no human oversight where needed | FMEA; eval coverage matrix; red-team results; design review with alternatives considered | 1 · 3 |
-| Warning (marketing) | Known limits and out-of-scope uses were not disclosed | [Model card](/bok/patterns#pattern-model-card-as-control-evidence); instructions for use; in-product notices, all versioned | 2 · 5 |
+| Warning (marketing) | Known limits and out-of-scope uses were not disclosed | [Model card](/patterns/model-card-as-control-evidence); instructions for use; in-product notices, all versioned | 2 · 5 |
 | Update (EU Art. 11(2)) | An update introduced the defect, or a safety update that was needed was not shipped | Change log; regression evals per release; patch decision records | 3 · 4 · 5 |
 
 ### Duty to warn after updates
@@ -526,7 +527,7 @@ updates cause, or that a missing safety update leaves in place, while the system
 control [2]; US failure-to-warn theories reach the same point [75]. So warnings travel with
 versions: the model card and instructions for use regenerate on every release, release notes list
 known limitations and changed behaviour, and field monitoring feeds the [Incident
-Pipeline](/bok/patterns#pattern-incident-pipeline), so a new hazard produces a decision (patch,
+Pipeline](/patterns/incident-pipeline), so a new hazard produces a decision (patch,
 warn, withdraw) with an owner and a date (chapter [17](/bok/incidents#the-response-lifecycle)).
 
 ### The defence file
@@ -545,7 +546,7 @@ A defence file per product release holds:
 
 The file cuts both ways: a claimant can obtain disclosure, and a gap can itself raise a presumption
 of defect [2]. Keep it complete and retrievable for at least the 10-year expiry period [2]; as
-[machine-readable evidence](/bok/patterns#pattern-machine-readable-evidence-oscal), disclosure
+[machine-readable evidence](/patterns/machine-readable-evidence-oscal), disclosure
 becomes a query rather than a project.
 
 ## Deepfakes and synthetic media
@@ -572,7 +573,7 @@ floor.
 The artefacts are provenance marking at the point of generation (for example content credentials or
 watermarks, layer 04), a detection eval for the marking's survival through common transformations
 (layer 03), and a takedown path with a 48-hour clock, an owner and a log (layer 05, built on the
-[Incident Pipeline](/bok/patterns#pattern-incident-pipeline)).
+[Incident Pipeline](/patterns/incident-pipeline)).
 
 ## One hiring model through five bodies of law
 

@@ -27,7 +27,7 @@ that a decision was unfair to them, and attribution methods are one way a team f
 made a model unfair. Both also trade against privacy: you cannot measure a disparity across a group
 you may not observe, or explain a decision without disclosing something about its data. The first
 half covers fairness, the second explainability, and the last section places both in the five layers
-of [the stack](/bok/the-stack).
+of [the stack](/bok/the-stack#how-to-read-the-stack).
 
 ## Where bias enters the lifecycle
 
@@ -196,7 +196,8 @@ decision or prediction, `Y` the true outcome and `A` the group.
 
 Two practical rules follow. Report differences *and* ratios, because a small absolute gap at a low
 base rate can be a large ratio and the reverse [20]. And report the metric with its denominator: a
-rate on 30 people is an anecdote, and the eval should say so.
+rate on 30 people is an anecdote, and the eval should say so. The tools catalogue lists
+[fairness toolkits](/resources/tools#cat-fairness) as illustrative examples, not endorsements.
 
 ### Individual and counterfactual fairness
 
@@ -236,7 +237,7 @@ The engineering consequence is procedural. Because the metrics conflict, the cho
 a governance decision with an owner, taken *before* the results are seen and recorded as policy. A
 team that picks the metric after looking at which one its model passes is metric shopping, and the
 record should make that impossible: the chosen metric, the reason, the threshold and the approver
-live in a versioned [Policy Card](/bok/patterns#pattern-policy-card) that the eval reads.
+live in a versioned [Policy Card](/patterns/policy-card) that the eval reads.
 
 ## Intersectional and subgroup testing
 
@@ -282,7 +283,7 @@ assistance benefits (point 5(a)) and creditworthiness and credit scoring (point 
 expressly excludes systems used to detect financial fraud [25]. The table is a starting point, not a
 rule. What makes the choice defensible is that it is written down with its reasons before the eval
 runs, reviewed by someone who represents the affected people (the
-[FRIA-as-Code](/bok/patterns#pattern-fria-as-code) pattern is where that review lives), and
+[FRIA-as-Code](/patterns/fria-as-code) pattern is where that review lives), and
 revisited when the use case changes.
 
 ## Mitigation before, during and after training
@@ -314,7 +315,7 @@ that do not need ground truth immediately:
   eval baseline. These need no outcome label.
 - **Calibration and error rates by group** once outcomes arrive, with the label delay stated.
 - **Human-oversight signals by group**: override rates, time-to-decide and reversal rates at the
-  [Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate). A reviewer who overrides
+  [Human-in-the-loop Gate](/patterns/human-in-the-loop-gate). A reviewer who overrides
   one group more often is a fairness signal about the model or about the reviewer.
 - **Complaints, appeals and explanation requests by group**, including their outcomes. The contest
   channel is a sensor.
@@ -326,7 +327,7 @@ which the attribute is known, periodic audits under the Article 4a conditions (d
 high-risk systems fall under Article 4a(2) [11]), or monitoring only the outcome-free rates with the
 attribute joined in a secured environment. Whichever is chosen, the monitor is a layer 04 signal
 streamed into layer 05 through [Continuous Assurance
-Telemetry](/bok/patterns#pattern-continuous-assurance-telemetry), and a breach opens a ticket with
+Telemetry](/patterns/continuous-assurance-telemetry), and a breach opens a ticket with
 an owner, not a chart nobody reads. A disparity that caused harm is an incident and follows chapter
 17, [Incidents](/bok/incidents#incident-hazard-issue-and-serious-incident).
 
@@ -387,7 +388,9 @@ explanation-accuracy tests, reason-code stability tests and a signed justificati
 
 Explanations vary along two axes: **scope** (a *global* explanation describes the model's overall
 behaviour; a *local* one explains a single output) and **access** (a *model-agnostic* method needs
-only inputs and outputs; a *model-specific* one uses the model's internals).
+only inputs and outputs; a *model-specific* one uses the model's internals). The tools catalogue lists
+[explainability libraries](/resources/tools#cat-explainability) as illustrative examples, not
+endorsements.
 
 | | Global | Local |
 |---|---|---|
@@ -631,7 +634,7 @@ artefact, not the aspiration.
 
 | Layer | Fairness artefact | Explainability artefact | Pattern |
 |---|---|---|---|
-| **01 Govern-as-Code** | Fairness policy as data: protected attributes by jurisdiction, chosen metric and reason, thresholds, minimum cell size, approver | Explanation policy: required explanation types per use case, interpretable-by-default rule, reason-code limits | [Policy Card](/bok/patterns#pattern-policy-card) |
+| **01 Govern-as-Code** | Fairness policy as data: protected attributes by jurisdiction, chosen metric and reason, thresholds, minimum cell size, approver | Explanation policy: required explanation types per use case, interpretable-by-default rule, reason-code limits | [Policy Card](/patterns/policy-card) |
 | **02 Inventory & Transparency** | Data card with coverage per group and the Art. 4a basis; model card with disaggregated and intersectional metrics | Instructions for use and explanation-method card (method, baseline, fidelity, limits); AI-use notice | [Model Card as Control Evidence](/bok/patterns#pattern-model-card-as-control-evidence) |
 | **03 Evals & Red Teaming as Evidence** | Fairness eval suite: group metrics with intervals, intersectional slices, proxy scan, counterfactual flip test | Explanation eval suite: fidelity, stability, sanity, reason-code consistency, comprehension test | [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci) |
 | **04 Runtime Controls & Observability** | Rolling selection rates and AIR by group; override and appeal rates by group | Explanation record per decision; contest channel; RAG citation trace | [Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate) |
@@ -642,7 +645,7 @@ Layer 03 is where both become controls, which is why the definition of done in [
 versioned with the model, run in CI, emit structured results filed against the registry entry, and
 fail the build when they fail. For procured models the same logic holds at the boundary: you can
 still compute group metrics on a vendor system's outputs and test the explanations it returns, and
-the [Vendor / Model Due-Diligence Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate) is
+the [Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate) is
 where you ask for the provider's own disaggregated results and explanation-method documentation (see
 [Third-party and procured AI](/bok/the-stack#third-party-and-procured-ai)).
 
@@ -705,7 +708,7 @@ Arts. 22A–22D · ECOA / Regulation B, FCRA · US Uniform Guidelines (29 CFR 16
    from them and record the result in the data card, with the Art. 4a basis if you used
    special-category data.
 3. **Add one intersectional fairness eval to CI** with confidence intervals and an "insufficient
-   data" outcome, wired to the [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci) so that it
+   data" outcome, wired to the [Eval Gate in CI](/patterns/eval-gate-in-ci) so that it
    can fail the build.
 4. **Emit an explanation record for every adverse decision** the system makes, with the model
    version, method, baseline and reason codes pinned, and test 10 of them for reason-code

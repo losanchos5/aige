@@ -85,6 +85,8 @@ An agent acting on a shared service account or a static key is ungovernable: you
 actions, revoke its access precisely, or bound what it may do. We prefer every non-human actor to have
 its own identity, an owner, and a scope of permitted actions, established *before* it is allowed to
 act. Identity is the precondition of accountability; scope is the precondition of containment.
+Chapter 23 builds both for agents, starting from
+[identity and short-lived credentials](/bok/governing-agents#identity-and-short-lived-credentials).
 
 > **In practice** Each agent is issued a distinct workload identity, registered with an owner and a
 > declared scope; a misbehaving agent is traced to its identity and its access revoked without
@@ -218,7 +220,8 @@ Wire each control to emit its own record as it runs, so assurance falls out of t
 being assembled by hand before an audit. If demonstrating a control needs a screenshot, we have not
 finished building it. The commitment is to instrumentation: every gate, guardrail and check writes a
 structured, signed record as it fires, so the audit is a query and the same records drive continuous
-assurance and incident response.
+assurance and incident response (chapter 17 specifies
+[the incident record](/bok/incidents#the-incident-record)).
 
 > **In practice** Every gate and guardrail writes a structured, signed record; the audit trail builds
 > itself, and the evidence store answers both the auditor and the on-call engineer.
@@ -229,7 +232,9 @@ assurance and incident response.
 
 Design each control against a specific way the system fails or a specific harm it can do to a person,
 and start there, not from a framework checklist. Threat models (prompt injection, tool misuse, agent
-identity abuse, data exfiltration) and fundamental-rights impact assessments are the inputs to design,
+identity abuse, data exfiltration) and
+[fundamental-rights impact assessments](/bok/eu-ai-act#fundamental-rights-impact-assessment-article-27)
+are the inputs to design,
 not paperwork produced afterward. If we cannot name the risk a control answers, we do not build it.
 Chapter 13 shows how to go about
 [identifying risk sources, factors and stakeholders](/bok/risk-management#identifying-risk-sources-factors-and-stakeholders),

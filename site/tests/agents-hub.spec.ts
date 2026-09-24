@@ -57,8 +57,10 @@ test.describe('chapter 23: Governing AI agents', () => {
     for (let n = 1; n <= 10; n++) {
       await expect(table).toContainText(`ASI${String(n).padStart(2, '0')}`);
     }
+    // Chapter prose links a pattern's own page (/patterns/<slug>); the catalogue
+    // anchors (/bok/patterns#pattern-…) stay valid, so either form counts.
     const hrefs = await table
-      .locator('a[href^="/bok/patterns#pattern-"]')
+      .locator('a[href^="/patterns/"], a[href^="/bok/patterns#pattern-"]')
       .evaluateAll((links) => links.map((a) => a.getAttribute('href')));
     expect(hrefs.length).toBeGreaterThanOrEqual(10);
   });

@@ -236,7 +236,7 @@ answers requests; a processor assists and notifies breaches to the controller wi
 
 Article 28 requires a contract under which the processor acts only on documented instructions,
 including on transfers [1]. For AI vendors the [Vendor / Model Due-Diligence
-Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate) should check clauses a generic
+Gate](/patterns/vendor-model-due-diligence-gate) should check clauses a generic
 agreement misses:
 
 - **No training on customer data** (prompts, outputs, files, embeddings, feedback), any opt-in explicit.
@@ -278,7 +278,7 @@ the authority first, which has up to eight weeks to respond [1]. The EDPB expect
 also decisions that one was not needed [3], so "no DPIA" is an artefact too. Deployers of high-risk
 systems use the provider's Article 13 information for their DPIA [14], and the Article 27 FRIA
 complements a DPIA rather than repeating it [15]; the
-[FRIA-as-Code](/bok/patterns#pattern-fria-as-code) pattern writes the shared fields once. The
+[FRIA-as-Code](/patterns/fria-as-code) pattern writes the shared fields once. The
 templates page has an [AI DPIA addendum](/resources/templates#schema-impact-assessment) in its
 impact-assessment schema.
 
@@ -351,7 +351,7 @@ codes, counterfactual); a **notice** that a solely automated decision was taken 
 it; a **contest path** to a reviewer with authority and information to change the outcome, with a
 record of what they did; and a monitor of the oversight itself, because a reviewer who confirms
 almost every output in seconds is not meaningful involvement (the [Human-in-the-loop
-Gate](/bok/patterns#pattern-human-in-the-loop-gate) pattern).
+Gate](/patterns/human-in-the-loop-gate) pattern).
 
 > **Example (illustrative)**
 > A decision record for `credit-check-04`, a telco's handset-financing check, filed at runtime:
@@ -486,12 +486,12 @@ processes no personal data, the GDPR does not apply to that operation; new perso
 in deployment is assessed on its own.
 
 The second scenario reaches most organisations, because most deploy models they did not train. In
-the [Vendor / Model Due-Diligence Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate) it
+the [Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate) it
 becomes stored answers: the provider's training-data summary, its stated basis, any public
 enforcement finding, its anonymity claim and evidence, and the date checked.
 
 **Maps to:** GDPR `Art. 4(1)`, `Art. 5(2)`, `Art. 24`, `Art. 25` · EU AI Act `Art. 53` · NIST AI RMF
-(Measure) · [Adversarial Red-Team Suite](/bok/patterns#pattern-adversarial-red-team-suite) · layers
+(Measure) · [Adversarial Red-Team Suite](/patterns/adversarial-red-team-suite) · layers
 02, 03 and 05. Mappings are illustrative, not a claim of conformity.
 
 ## Special categories, inferred data and biometrics
@@ -584,7 +584,7 @@ guidance on agentic AI of 18 Feb 2026 sets out the added threats and the measure
 take [49]. One incident can start several clocks: the GDPR's 72 hours runs beside the AI Act's
 Article 73 deadlines (chapter 08) and any sector regime; chapter 17 sets
 [GDPR breach notification next to the AI Act clocks](/bok/incidents#the-overlapping-clocks). Give the [Incident
-Pipeline](/bok/patterns#pattern-incident-pipeline) a personal-data-breach branch with its own timer
+Pipeline](/patterns/incident-pipeline) a personal-data-breach branch with its own timer
 from the awareness timestamp, and keep the Omnibus proposal's 96 hours and high-risk threshold as a
 parameter, not today's rule [30].
 

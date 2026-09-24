@@ -139,7 +139,7 @@ want, stratified by the groups and edge cases the DDR names, and scored on the m
 harm. Make it large enough to show the per-group difference you care about. Run every candidate
 through the same harness with the same prompts, retrieval and guardrails, and keep the results: the
 selection eval becomes the first version of the regression suite behind the
-[eval gate](/bok/patterns#pattern-eval-gate-in-ci).
+[eval gate](/patterns/eval-gate-in-ci).
 
 ### What public benchmarks and leaderboards cannot tell you
 
@@ -373,7 +373,7 @@ The clauses that matter most for governance, with the red flag to look for and t
 Two rules turn the table into governance. First, a clause that matters at runtime must become a
 check: the no-training setting read back from the account, the residency commitment enforced on the
 inference path, the version pin held in the registry. A clause nothing checks is a hope. Second, the
-review is one step of the [Vendor / Model Due-Diligence Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate),
+review is one step of the [Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate),
 so it re-opens on renewal and on every material change notice. The dataset behind this table, with the
 risk each clause addresses, a fallback position and the instruments it maps to, is an engineering
 checklist, not legal advice.
@@ -391,7 +391,7 @@ checklist, not legal advice.
 The go-live review reads an evidence pack, not a slide deck: the DDR; the model selection record; eval
 gate results against the floors; the red-team summary; the impact assessments (a FRIA where Article 27
 applies, a DPIA where data protection law requires one, both maintained as in the
-[FRIA-as-Code](/bok/patterns#pattern-fria-as-code) pattern); the contract review; the monitoring plan
+[FRIA-as-Code](/patterns/fria-as-code) pattern); the contract review; the monitoring plan
 with named owners; the rollout plan with its rollback criteria; the communications plan; and the
 deactivation runbook. When the evidence is the provider's own (its instructions for use, which must
 state the system's capabilities, limitations, oversight measures and maintenance needs [18]), the
@@ -446,7 +446,9 @@ Rollback criteria must be **pre-registered**: written into the rollout plan befo
 and evaluated by the pipeline, not by a meeting. A criterion invented after the metric moved is a
 negotiation, not a control. The same applies to changes you did not make: a new vendor model version
 is a release, and it goes through shadow and canary on your side against the pinned version before it
-takes traffic.
+takes traffic. The tools catalogue lists
+[progressive-delivery tools](/resources/tools#cat-progressive-delivery) as illustrative examples, not
+endorsements.
 
 ## Operating the system
 
@@ -469,7 +471,7 @@ retrieved passages, outputs, logs and feedback. Govern them as you govern traini
 [data governance across the stack](/bok/the-stack#data-governance-across-the-stack)):
 
 - **Minimise** what reaches the model, with PII filtering and data-loss prevention in the input
-  [guardrail](/bok/patterns#pattern-runtime-guardrail).
+  [guardrail](/patterns/runtime-guardrail).
 - **Set retention per data type** as code, reconciling the log-retention floor below with the
   storage-limitation ceiling of data protection law.
 - **Re-check the lawful basis** when the purpose changes; a new use of old logs is a new processing
@@ -501,6 +503,8 @@ and a vendor model update are all releases. Each goes through the eval gate and 
 delivery stages, and each bumps the version in the registry. A threshold change is a change to a
 control, so it is a reviewed diff with an approver, not an edit on a dashboard. Retraining is
 triggered by a drift or floor breach, by the calendar, or by a change in the world the DDR describes.
+The tools catalogue lists [monitoring tools](/resources/tools#cat-monitoring) as illustrative
+examples, not endorsements.
 
 ### Drift: what moves and how to see it
 
@@ -539,7 +543,7 @@ continuously and feed the same threshold, issue and incident path as every other
 |---|---|---|---|---|---|
 | Performance and drift | ML platform on-call | System owner | AI governance engineer | Risk | Go-live panel if a floor is breached |
 | Fairness | AI governance engineer | System owner | Legal; representatives of affected groups | DPO | Risk committee |
-| Security and abuse | Security operations | Security lead | AI governance engineer | System owner | [Incident pipeline](/bok/patterns#pattern-incident-pipeline) |
+| Security and abuse | Security operations | Security lead | AI governance engineer | System owner | [Incident pipeline](/patterns/incident-pipeline) |
 | Compliance obligations | AI governance engineer | Compliance lead | Legal | Regulator liaison | Incident pipeline; communications owner |
 | Cost, energy and benefit | FinOps | Business owner | Sustainability lead | Finance | Benefit review |
 
@@ -622,7 +626,7 @@ a closure test, and the open findings are a live query, not a spreadsheet.
 
 Schedule red teaming by risk tier, and aim it at the deployed configuration (prompts, tools, retrieval
 corpus, guardrails), not only at the model. For a procured system, test at the boundary within the
-windows the contract allows. The [Adversarial Red-Team Suite](/bok/patterns#pattern-adversarial-red-team-suite)
+windows the contract allows. The [Adversarial Red-Team Suite](/patterns/adversarial-red-team-suite)
 pattern turns each finding into a regression test, so the next scheduled run proves the fix held.
 
 ### Threat modelling the deployed system
@@ -709,8 +713,8 @@ performance or outcomes are inconsistent with intended use [30].
 Evidence preservation comes first: freeze the logs, apply a legal hold, snapshot the versions. Then
 stop. Deactivation applies to every kind of system, not only agents: a classifier embedded in a
 vendor product needs a switch too, whether a feature flag or a fallback path. For agents, the
-[Kill Switch / Circuit Breaker](/bok/patterns#pattern-kill-switch--circuit-breaker) pattern applies,
-and [chapter 23](/bok/governing-agents) develops it.
+[Kill Switch / Circuit Breaker](/patterns/kill-switch-circuit-breaker) pattern applies,
+and [chapter 23](/bok/governing-agents#kill-switch-and-per-agent-circuit-breakers) develops it.
 
 ### Graduated degradation
 
@@ -733,7 +737,7 @@ a deployment accident: per-jurisdiction rule sets as code, regional instances wh
 requires them, and feature flags by region so one market can be switched off without touching the
 others. Obligations overlap in places (the AI Act's six-month log floor and the six-month operator
 log retention in China's voluntary TC260 framework [1][41]) and diverge in many others; see
-[chapter 21](/bok/ai-laws-worldwide#comparing-the-regimes) and the [regulatory map](/bok/regulatory-map).
+[chapter 21](/bok/ai-laws-worldwide#comparing-the-regimes) and the [regulatory map](/bok/regulatory-map#other-jurisdictions).
 
 ### Retirement and decommissioning
 
@@ -752,7 +756,7 @@ The NIST AI RMF warns that irregular or indiscriminate termination can itself in
 6. **Revoke identities and credentials.** Every non-human identity the system held is revoked.
 7. **Retire, do not delete, the registry entry.** Its status reads `retired`, with the date and the
    decision record.
-8. **Confirm it is gone.** [Shadow-AI Discovery](/bok/patterns#pattern-shadow-ai-discovery) checks
+8. **Confirm it is gone.** [Shadow-AI Discovery](/patterns/shadow-ai-discovery) checks
    that no copy still runs.
 
 ## One system from decision to retirement

@@ -43,7 +43,8 @@ each paired with the control that answers it.
 Governance still tends to arrive after the model is trained, as a checkpoint to clear before launch,
 and nothing it produces is wired back into how the system is built. A policy that can only recommend
 cannot stop a bad release; an eval wired into an `eval gate` that can fail the build can: the
-difference between a control that describes risk and one that prevents it.
+difference between a control that describes risk and one that prevents it. Chapter 14 rebuilds
+[the build as a chain of gates](/bok/governing-development#the-build-as-a-chain-of-gates).
 
 ### 4. Framework theatre
 
@@ -149,7 +150,8 @@ publish a frontier AI framework and to report critical safety incidents to the s
 Emergency Services within 15 days, with civil penalties of up to USD 1 million per violation recovered
 by the Attorney General [17][18]. Its scope is narrow (chapter 08 sets it beside the other
 [US state laws](/bok/regulatory-map#us-federal-and-state-laws)), but what it asks for, a published
-framework and an incident pipeline that runs on a clock, is again an engineering deliverable.
+framework and [an incident pipeline that runs on a clock](/bok/incidents#the-overlapping-clocks), is again an
+engineering deliverable.
 
 ### The agent shift
 
@@ -166,7 +168,8 @@ test by construction: its actions cannot be traced or revoked precisely. OWASP's
 Applications 2026 catalogues the failure modes that follow, from agent goal hijack (ASI01) through tool
 misuse (ASI02) and agent identity and privilege abuse (ASI03) to rogue agents (ASI10) [21]. And the
 2026 vendor survey cited above reports roughly one in eight AI breaches involving agentic systems [7].
-The threat model has moved to the layer the paper registry cannot reach.
+The threat model has moved to the layer the paper registry cannot reach. Chapter 23 maps
+[those threats to controls](/bok/governing-agents#threats-mapped-to-controls).
 
 ## What changes when governance is engineered
 

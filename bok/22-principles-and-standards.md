@@ -12,8 +12,9 @@ it carries, and which artefact in the stack would evidence that the ask is met. 
 counts once it is a control; a standard only helps once its clauses are wired to a gate, a registry
 field or an evidence record.
 
-In rough order of force: binding law (the AI Act, in [chapter 08](/bok/regulatory-map) and [chapter
-18](/bok/eu-ai-act)); a binding treaty, the Council of Europe Framework Convention, which binds the
+In rough order of force: binding law (the AI Act, in
+[chapter 08](/bok/regulatory-map#eu-ai-act-post-omnibus) and
+[chapter 18](/bok/eu-ai-act#the-act-and-the-omnibus)); a binding treaty, the Council of Europe Framework Convention, which binds the
 Parties that ratify it and leaves each to choose how to reach private actors [1]; **harmonised
 standards**, European standards written on a Commission request that give a presumption of
 conformity once their reference is published in the Official Journal [2]; international standards
@@ -22,8 +23,9 @@ law (OECD, UNESCO, G7, the EU High-Level Expert Group), which set the target and
 vocabulary.
 
 Two cautions run through the chapter. Standards support, they do not confer: no certificate and no
-coverage figure makes a system compliant, and the test from [chapter 01](/bok/definition) still
-applies. And this chapter explains the instruments while [chapter 08](/bok/regulatory-map) stays the
+coverage figure makes a system compliant, and the test from
+[chapter 01](/bok/definition#three-clarifiers) still applies. And this chapter explains the
+instruments while [chapter 08](/bok/regulatory-map#how-to-read-this-map) stays the
 obligations index; where an instrument already has rows there, this chapter links to them. Principle
 sets are the home ground of Responsible AI and AI ethics ([chapter
 01](/bok/definition#the-disambiguation-cluster)): they set the values. The tables of artefacts and
@@ -102,10 +104,10 @@ work later in this chapter [7].
 Principle 1.4(b) is the most directly operational sentence in the instrument: mechanisms should let
 AI systems that risk undue harm be "overridden, repaired, and/or decommissioned safely" [7]. In
 stack terms that is the [**Kill Switch / Circuit
-Breaker**](/bok/patterns#pattern-kill-switch--circuit-breaker) pattern with a tested revocation
+Breaker**](/patterns/kill-switch-circuit-breaker) pattern with a tested revocation
 path, and a decommissioning record in the registry. Principle 1.5(b)'s traceability "in relation to
 datasets, processes and decisions" is what [**Continuous Assurance
-Telemetry**](/bok/patterns#pattern-continuous-assurance-telemetry) produces when every evidence
+Telemetry**](/patterns/continuous-assurance-telemetry) produces when every evidence
 record carries the registry id of the system it describes.
 
 ### The OECD AI system definition and lifecycle
@@ -195,9 +197,9 @@ individual AI system before and during use, and is designed for governments proc
 AI, companies developing it and researchers assessing it [17].
 
 In the stack an EIA is one more impact assessment: attached to the registry entry, versioned and
-re-run on change, following [**FRIA-as-Code**](/bok/patterns#pattern-fria-as-code). A public buyer
+re-run on change, following [**FRIA-as-Code**](/patterns/fria-as-code). A public buyer
 that requires one from suppliers makes it a procurement artefact for the [**Vendor / Model
-Due-Diligence Gate**](/bok/patterns#pattern-vendor--model-due-diligence-gate). "Proportionality and
+Due-Diligence Gate**](/patterns/vendor-model-due-diligence-gate). "Proportionality and
 do no harm" restates the house principle [start from a named failure mode or a named
 harm](/bok/values-and-principles#start-from-a-named-failure-mode-or-a-named-harm) [4].
 
@@ -252,7 +254,7 @@ environments (Articles 7–13) [1]. Chapters IV and V are where the engineering 
 Article 16(2)(g) deserves the emphasis. "When they are significantly modified" is a trigger, not a
 date, and a trigger is something a pipeline can evaluate: a registry diff that changes the model,
 the training data or the intended purpose re-runs the gate. That is the [**Eval Gate in
-CI**](/bok/patterns#pattern-eval-gate-in-ci) pattern with the material-change rule written down, and
+CI**](/patterns/eval-gate-in-ci) pattern with the material-change rule written down, and
 it answers the same question the AI Act asks about substantial modification (see [chapter
 18](/bok/eu-ai-act#article-25-when-someone-else-becomes-the-provider)).
 
@@ -307,7 +309,7 @@ safety; privacy and data governance; transparency; diversity, non-discrimination
 societal and environmental well-being; accountability [6]. The Guidelines name three oversight
 approaches (human-in-the-loop, human-on-the-loop and human-in-command), which is still the most
 compact vocabulary for oversight design [6]; the [**Human-in-the-loop
-Gate**](/bok/patterns#pattern-human-in-the-loop-gate) pattern chooses among them by consequence.
+Gate**](/patterns/human-in-the-loop-gate) pattern chooses among them by consequence.
 
 The **Assessment List for Trustworthy AI** (ALTAI) followed on 17 July 2020, revised after a pilot
 with over 350 stakeholders and published both as a document and as a web-based self-assessment tool
@@ -386,7 +388,7 @@ paraphrases each category in one line and names the artefact that evidences it.
 
 The identifiers are the useful part. A control that carries `nist_ai_rmf: [MEASURE 2.7, MANAGE 2.4]`
 in its metadata can be counted, crosswalked and queried; a control described in prose cannot. The
-[**Framework Crosswalk**](/bok/patterns#pattern-framework-crosswalk) pattern generates the RMF view
+[**Framework Crosswalk**](/patterns/framework-crosswalk) pattern generates the RMF view
 from that metadata instead of maintaining it beside the code.
 
 ### How a Playbook entry is structured
@@ -443,7 +445,7 @@ Cyber AI Profile and the draft AI 800-1) are not repeated here.
 - **NIST AI 100-2 E2025** (March 2025) is a taxonomy and terminology of adversarial machine
   learning: ML methods, lifecycle stages of attack, attacker goals, objectives, capabilities and
   knowledge, and mitigations [25]. Use its terms to name the cases in the [**Adversarial Red-Team
-  Suite**](/bok/patterns#pattern-adversarial-red-team-suite), so a finding reads the same in the
+  Suite**](/patterns/adversarial-red-team-suite), so a finding reads the same in the
   eval report and in the threat model.
 - **NIST SP 800-218A** (July 2024) is a Secure Software Development Framework community profile for
   generative AI and dual-use foundation models. It adds AI-specific practices and tasks to SSDF 1.1
@@ -534,7 +536,7 @@ as applicable should point at the running control and the evidence stream that i
 exclusion should carry its justification and an owner.
 
 What a 42001 certificate proves, and what it does not, is set out in [chapter
-07](/bok/maturity-model) and [chapter 08](/bok/regulatory-map#what-is-not-harmonised-yet): it
+07](/bok/maturity-model#how-this-relates-to-certification-and-other-assessments) and [chapter 08](/bok/regulatory-map#what-is-not-harmonised-yet): it
 evidences a management system; it confers no AI Act presumption of conformity.
 
 ### Integrating with 27001, 27701 and 9001
@@ -639,13 +641,13 @@ thresholds a gate can evaluate, and monitoring that closes the loop in layer 05.
 **Logging, oversight and transparency become specifiable.** The prEN 18229 series splits Articles
 12–15 into separate parts [52]. Once final, the logging part is a schema to validate event logs
 against in CI, the oversight part a design reference for the [**Human-in-the-loop
-Gate**](/bok/patterns#pattern-human-in-the-loop-gate), and the transparency part a field list for
+Gate**](/patterns/human-in-the-loop-gate), and the transparency part a field list for
 the model card and instructions for use.
 
 **The QMS becomes auditable as a pipeline.** EN 18286 supports the Article 17 quality management
 system [54]. A QMS whose design control, change management and post-market monitoring run as
 pipeline stages emits its own evidence; one that lives in procedures does not. The
-[**Machine-Readable Evidence (OSCAL)**](/bok/patterns#pattern-machine-readable-evidence-oscal)
+[**Machine-Readable Evidence (OSCAL)**](/patterns/machine-readable-evidence-oscal)
 pattern is how that evidence reaches an assessor.
 
 ### Building before the OJ citation
@@ -707,7 +709,9 @@ starting point for a crosswalk file, not a claim that the rows are equivalent.
 
 Sources: [7][1][10][9][40][52]; the ISO/IEC 42001 clause and Annex A ids follow [chapter
 08](/bok/regulatory-map#isoiec-42001-42005-and-42006) and the site's
-[crosswalk](/resources/crosswalk). Mappings are illustrative, not a claim of conformity.
+[crosswalk](/resources/crosswalk), whose [explorer](/resources/crosswalk#explore) derives these pairs
+for any two instruments and exports them as an OSCAL mapping collection. Mappings are illustrative,
+not a claim of conformity.
 
 The engineering rule is the one from the [regulatory
 translation](/bok/the-role#regulatory-translation) workflow: build each control once, tag it with

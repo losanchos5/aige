@@ -26,7 +26,7 @@ documented roles and lines of communication for AI risk (GOVERN 2.1) [3]. None s
 framework true on a Tuesday. That is the engineering job.
 
 This chapter is not a GRC programme manual and not legal advice. It is the operating model that gives
-the five layers of [the stack](/bok/the-stack) their owners. The risk loop is chapter 13 ([Where risk
+the five layers of [the stack](/bok/the-stack#how-to-read-the-stack) their owners. The risk loop is chapter 13 ([Where risk
 management sits](/bok/risk-management#the-loop-identify-assess-treat-monitor)); the controls at each build and run stage are chapters 14 and
 15 ([Governing AI development](/bok/governing-development#the-build-as-a-chain-of-gates), [Governing deployment and
 use](/bok/governing-deployment#the-deployment-lifecycle-at-a-glance)).
@@ -368,7 +368,7 @@ resulting from a catastrophic risk" or violate the Act [14][15].
 
 Build the channel like any governed system. Intake accepts anonymous and named reports by more than one
 route. Each report becomes a case record with the statutory clocks encoded as timers, not reminders.
-Triage routes a possible incident to the [Incident Pipeline](/bok/patterns#pattern-incident-pipeline),
+Triage routes a possible incident to the [Incident Pipeline](/patterns/incident-pipeline),
 a possible infringement to legal, a policy gap to the committee. The reporter's identity is sealed from
 the people named, and HR watches for retaliation signals (sudden performance actions, access changes)
 around protected reporters. Volumes, clock compliance and outcomes go upward without identities. This
@@ -382,7 +382,7 @@ edge of appetite.
 
 | Indicator | Type | Definition | Produced by |
 |---|---|---|---|
-| Registry coverage | KPI | Share of discovered AI systems and agents with a registry entry and an owner | Layer 02; [Shadow-AI Discovery](/bok/patterns#pattern-shadow-ai-discovery) |
+| Registry coverage | KPI | Share of discovered AI systems and agents with a registry entry and an owner | Layer 02; [Shadow-AI Discovery](/patterns/shadow-ai-discovery) |
 | Unregistered AI found | KRI | Count of running AI with no entry, by tier | Layer 02 discovery |
 | Gate coverage | KPI | Share of production releases that passed through an eval gate | Layer 03 |
 | Open exceptions by age | KRI | Live exceptions, oldest first; expired ones flagged | Exception register (layer 01) |
@@ -582,8 +582,8 @@ exception_active(sys, rule) if {
 ```
 
 Both outputs come from one commit, so the published policy and the enforced rule cannot disagree. The
-same source feeds the [Framework Crosswalk](/bok/patterns#pattern-framework-crosswalk) and, for agents,
-a [Policy Card](/bok/patterns#pattern-policy-card). Tests prove the rule fires on a violating input
+same source feeds the [Framework Crosswalk](/patterns/framework-crosswalk) and, for agents,
+a [Policy Card](/patterns/policy-card). Tests prove the rule fires on a violating input
 and passes a clean one, as layer 01 requires.
 
 ## Updating the policies you already have
@@ -617,8 +617,8 @@ ungoverned. For **intellectual property**, EU law lets rightholders reserve work
 mining "in an appropriate manner, such as machine-readable means in the case of content made publicly
 available online" (Directive (EU) 2019/790, Art. 4(3)) [18], and general-purpose model providers must
 have a policy to identify and comply with those reservations (`Art. 53(1)(c)`) [19]. Chapters 19 and
-20 ([Privacy and data protection law applied to AI](/bok/privacy-and-ai), [Other law that already
-applies to AI](/bok/existing-law)) cover the law; the policy's job is to make each rule checkable.
+20 ([Privacy and data protection law applied to AI](/bok/privacy-and-ai#principles-applied-to-ai), [Other
+law that already applies to AI](/bok/existing-law#how-to-read-this-chapter)) cover the law; the policy's job is to make each rule checkable.
 
 ## A data acquisition policy
 
@@ -646,14 +646,14 @@ in a rush under unclear instructions become the noise and bias the eval suite la
 
 Enforce at the pipeline boundary: no dataset enters a training, fine-tuning or retrieval pipeline
 without an acquisition record that passes schema validation, and the record flows into the data card
-and the [AIBOM](/bok/patterns#pattern-aibom) (see [data governance across the
+and the [AIBOM](/patterns/aibom) (see [data governance across the
 stack](/bok/the-stack#data-governance-across-the-stack)).
 
 ## Third-party AI policy
 
 Most AI an organisation runs, it bought. Chapter 04 explains how the stack degrades for procured AI
 ([third-party and procured AI](/bok/the-stack#third-party-and-procured-ai)), and chapter 05 gives the
-[Vendor / Model Due-Diligence Gate](/bok/patterns#pattern-vendor--model-due-diligence-gate). ISO/IEC
+[Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate). ISO/IEC
 42001 covers third-party and customer relationships in Annex A.10 [2]; NIST asks for policies on
 third-party AI risk, including infringement of third-party intellectual property, and for contingency
 processes for failures in high-risk third-party data or systems (GOVERN 6.1, 6.2) [3].
@@ -723,7 +723,7 @@ proportionate consequences.
 Enforce with the gateway, not the handbook: approved tools behind single sign-on and a gateway that
 applies data-class rules and logs use; access conditional on a current AUP attestation (the literacy
 gate above); discovery of unapproved tools through identity, network and expense data (the
-[Shadow-AI Discovery](/bok/patterns#pattern-shadow-ai-discovery) pattern). When discovery finds an
+[Shadow-AI Discovery](/patterns/shadow-ai-discovery) pattern). When discovery finds an
 unapproved tool, offer a way in (register, tier, approve or replace) before a sanction. People use
 unapproved tools because the approved path is slower; the fix is usually a better path.
 

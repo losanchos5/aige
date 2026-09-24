@@ -176,7 +176,7 @@ NIST's crosswalk was a January 2023 draft for comment, mapped against the final 
 (verify).
 
 > **Note** A crosswalk is an index, not a control (see the
-> [Framework Crosswalk](/bok/patterns#pattern-framework-crosswalk) pattern). The row that counts is
+> [Framework Crosswalk](/patterns/framework-crosswalk) pattern). The row that counts is
 > the one whose artefact exists and emits evidence.
 
 ## Identifying risk: sources, factors and stakeholders
@@ -486,11 +486,11 @@ mitigation and control measures, then information and, where appropriate, traini
 
 | Rung | What it means for AI | Stack control | Pattern | Evidence |
 |---|---|---|---|---|
-| **1 Eliminate** | Do not build it; remove the capability; refuse the use | Policy deny; prohibited-use blocklist; tool never granted | [Policy Card](/bok/patterns#pattern-policy-card) | Deny verdict; absent scope in the registry |
-| **2 Substitute** | Same goal, lower risk: a non-AI method, a simpler or interpretable model, retrieval over free generation, read-only instead of write | Design record; narrower registry scope | [Agent Identity & Scoped Credentials](/bok/patterns#pattern-agent-identity--scoped-credentials) | Design decision linked to the risk id |
-| **3 Engineer** | Controls that act without relying on anyone remembering | Eval gate; runtime guardrail; approval gate; kill switch | [Eval Gate in CI](/bok/patterns#pattern-eval-gate-in-ci), [Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail), [Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate), [Kill Switch](/bok/patterns#pattern-kill-switch--circuit-breaker) | Eval results; guardrail events; approval logs |
-| **4 Administrative** | Rules for people: instructions for use, training, procedures, warnings | Instructions for use; literacy and training records | [Model Card as Control Evidence](/bok/patterns#pattern-model-card-as-control-evidence) | Training attestations; versioned instructions |
-| **5 Accept and monitor** | Carry what is left, knowingly, and watch it | Signed acceptance; telemetry; review date | [Continuous Assurance Telemetry](/bok/patterns#pattern-continuous-assurance-telemetry) | Acceptance record; monitoring signal |
+| **1 Eliminate** | Do not build it; remove the capability; refuse the use | Policy deny; prohibited-use blocklist; tool never granted | [Policy Card](/patterns/policy-card) | Deny verdict; absent scope in the registry |
+| **2 Substitute** | Same goal, lower risk: a non-AI method, a simpler or interpretable model, retrieval over free generation, read-only instead of write | Design record; narrower registry scope | [Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials) | Design decision linked to the risk id |
+| **3 Engineer** | Controls that act without relying on anyone remembering | Eval gate; runtime guardrail; approval gate; kill switch | [Eval Gate in CI](/patterns/eval-gate-in-ci), [Runtime Guardrail](/patterns/runtime-guardrail), [Human-in-the-loop Gate](/patterns/human-in-the-loop-gate), [Kill Switch](/patterns/kill-switch-circuit-breaker) | Eval results; guardrail events; approval logs |
+| **4 Administrative** | Rules for people: instructions for use, training, procedures, warnings | Instructions for use; literacy and training records | [Model Card as Control Evidence](/patterns/model-card-as-control-evidence) | Training attestations; versioned instructions |
+| **5 Accept and monitor** | Carry what is left, knowingly, and watch it | Signed acceptance; telemetry; review date | [Continuous Assurance Telemetry](/patterns/continuous-assurance-telemetry) | Acceptance record; monitoring signal |
 
 Elimination has a legal floor: practices the AI Act prohibits are eliminated, never treated or
 accepted [22]. **Transfer** (insurance, contractual indemnities) sits beside the ladder, not on
@@ -728,7 +728,7 @@ previously unknown risk (MANAGE 2.3) [1], and asks identification why intake mis
 
 The severity scale connects the two. Because S4 and S5 cover the AI Act's serious-incident categories
 [3], an entry rated there already names the reporting path, and the
-[Incident Pipeline](/bok/patterns#pattern-incident-pipeline) can start the `Art. 73` clock from the
+[Incident Pipeline](/patterns/incident-pipeline) can start the `Art. 73` clock from the
 risk id (deadlines in [chapter 08](/bok/regulatory-map#eu-ai-act-post-omnibus)). Article 9 closes the
 loop from the other side: risks emerging from post-market monitoring data are evaluated in the risk
 management system [8]. MANAGE 4.3 adds that incidents are communicated to relevant AI actors,
