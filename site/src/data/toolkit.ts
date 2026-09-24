@@ -106,6 +106,25 @@ export const tools: readonly ToolEntry[] = [
     status: 'live',
     href: '/toolkit/ai-act-triage',
     chapter: { label: '18. The EU AI Act in one pass', href: '/bok/eu-ai-act' },
+  {
+    id: 'policy-card',
+    title: 'Policy Card builder',
+    summary:
+      'Turn one governance rule into a Policy Card for people and machines, an OPA/Rego module with unit tests, a Cedar stub and the CI hook that runs it.',
+    audience: ['AI governance engineers', 'Platform and security leads', 'Policy owners'],
+    inputs: [
+      'A rule from six templates, or your own condition on one input field',
+      'Owner, scope, review date and the obligation ids the rule answers',
+    ],
+    outputs: [
+      'Policy Card in Markdown, YAML and JSON, valid against the policy-card schema',
+      'OPA/Rego module with a verdict rule and unit tests',
+      'Cedar stub with tests',
+      'Example input and a GitHub Actions CI hook',
+    ],
+    status: 'live',
+    href: '/toolkit/policy-card',
+    chapter: { label: '05. Patterns: Policy Card', href: '/patterns/policy-card' },
   },
 ];
 

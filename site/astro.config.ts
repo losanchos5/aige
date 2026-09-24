@@ -207,6 +207,20 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
     ],
   ],
   ['/for/certifications', ['src/pages/for/certifications.astro', 'src/data/aigp.ts']],
+  // Block w2-tool-policy-card: the Policy Card builder, dated by its page, its
+  // rule templates, the toolkit registry and its client modules.
+  [
+    '/toolkit/policy-card',
+    [
+      'src/pages/toolkit/policy-card.astro',
+      'src/components/toolkit/ToolShell.astro',
+      'src/data/toolkit.ts',
+      'src/data/policy-card.ts',
+      'public/toolkit/policy-card.js',
+      'public/toolkit/policy-card-core.js',
+      'public/toolkit/lib.js',
+    ],
+  ],
 ]);
 
 // Pages dated by their content rather than by git: each /obligations/<id> page

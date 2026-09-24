@@ -1,0 +1,132 @@
+[
+  {
+    "name": "exception in date is allowed",
+    "request": {
+      "principal": "Pipeline::\"ci\"",
+      "action": "Action::\"build\"",
+      "resource": "Exception::\"EXC-0042\"",
+      "context": {
+        "now": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-10-02"
+          }
+        },
+        "granted": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-10-01"
+          }
+        },
+        "expires": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-12-30"
+          }
+        }
+      }
+    },
+    "entities": [],
+    "decision": "allow",
+    "reason": [
+      "pc-expired-exception-blocks-build.baseline"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "expired exception is denied",
+    "request": {
+      "principal": "Pipeline::\"ci\"",
+      "action": "Action::\"build\"",
+      "resource": "Exception::\"EXC-0042\"",
+      "context": {
+        "now": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-10-02"
+          }
+        },
+        "granted": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-09-01"
+          }
+        },
+        "expires": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-09-30"
+          }
+        }
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "exceptions.no-expired.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "exception without expiry is denied",
+    "request": {
+      "principal": "Pipeline::\"ci\"",
+      "action": "Action::\"build\"",
+      "resource": "Exception::\"EXC-0042\"",
+      "context": {
+        "now": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-10-02"
+          }
+        },
+        "granted": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-10-01"
+          }
+        }
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "exceptions.no-expired.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "exception too long is denied",
+    "request": {
+      "principal": "Pipeline::\"ci\"",
+      "action": "Action::\"build\"",
+      "resource": "Exception::\"EXC-0042\"",
+      "context": {
+        "now": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-10-02"
+          }
+        },
+        "granted": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-10-01"
+          }
+        },
+        "expires": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-12-31"
+          }
+        }
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "exceptions.no-expired.v1"
+    ],
+    "num_errors": 0
+  }
+]

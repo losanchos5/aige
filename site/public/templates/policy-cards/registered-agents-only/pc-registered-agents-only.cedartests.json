@@ -1,0 +1,110 @@
+[
+  {
+    "name": "registered active agent is allowed",
+    "request": {
+      "principal": "Agent::\"csa-01\"",
+      "action": "Action::\"deploy\"",
+      "resource": "Environment::\"production\"",
+      "context": {
+        "now": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-10-02"
+          }
+        },
+        "registry_entry": {
+          "status": "active",
+          "owner": "customer-service",
+          "expiry": {
+            "__extn": {
+              "fn": "datetime",
+              "arg": "2027-03-31"
+            }
+          }
+        }
+      }
+    },
+    "entities": [],
+    "decision": "allow",
+    "reason": [
+      "pc-registered-agents-only.baseline"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "unregistered agent is denied",
+    "request": {
+      "principal": "Agent::\"csa-01\"",
+      "action": "Action::\"deploy\"",
+      "resource": "Environment::\"production\"",
+      "context": {
+        "now": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-10-02"
+          }
+        }
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "agents.registered-only.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "expired entry is denied",
+    "request": {
+      "principal": "Agent::\"csa-01\"",
+      "action": "Action::\"deploy\"",
+      "resource": "Environment::\"production\"",
+      "context": {
+        "now": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-10-02"
+          }
+        },
+        "registry_entry": {
+          "status": "active",
+          "owner": "customer-service",
+          "expiry": {
+            "__extn": {
+              "fn": "datetime",
+              "arg": "2026-09-30"
+            }
+          }
+        }
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "agents.registered-only.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "other environment is out of scope",
+    "request": {
+      "principal": "Agent::\"csa-01\"",
+      "action": "Action::\"deploy\"",
+      "resource": "Environment::\"staging\"",
+      "context": {
+        "now": {
+          "__extn": {
+            "fn": "datetime",
+            "arg": "2026-10-02"
+          }
+        }
+      }
+    },
+    "entities": [],
+    "decision": "allow",
+    "reason": [
+      "pc-registered-agents-only.baseline"
+    ],
+    "num_errors": 0
+  }
+]

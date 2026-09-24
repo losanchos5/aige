@@ -1,0 +1,21 @@
+{
+  "action": "deploy",
+  "environment": "production",
+  "now": "2026-10-02",
+  "agent": {
+    "id": "csa-01",
+    "version": "2026-09-22"
+  },
+  "registry": [
+    {
+      "id": "csa-01",
+      "version": "2026-09-22",
+      "owner": "customer-service",
+      "scope": [
+        "refunds"
+      ],
+      "expiry": "2027-03-31",
+      "status": "active"
+    }
+  ]
+}

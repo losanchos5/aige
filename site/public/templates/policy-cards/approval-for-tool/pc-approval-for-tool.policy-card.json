@@ -1,0 +1,44 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/policy-card.v1.json",
+  "card_id": "pc-approval-for-tool",
+  "version": "1.0.0",
+  "title": "Human approval for a named tool",
+  "owner": "ai-governance-engineering",
+  "applies_to": [
+    "agent:*"
+  ],
+  "source_policy": "ai-policy.yaml#rules/agents-bounded-spend",
+  "rules": [
+    {
+      "rule_id": "tools.approval-required.v1",
+      "description": "An agent calls refunds-api (create_refund) only with a recorded approval by a person other than the agent.",
+      "effect": "require_approval",
+      "condition": "an agent calls refunds-api (create_refund) and the request carries no approval, or the approval was not given or was given by the agent itself",
+      "failure_mode": "An agent takes a consequential action through a tool with no human in the loop.",
+      "enforcement_points": [
+        "runtime"
+      ],
+      "implementation": {
+        "engine": "opa_rego",
+        "module": "policies/pc-approval-for-tool.rego",
+        "entrypoint": "data.aige.cards.pc_approval_for_tool.verdict"
+      },
+      "maps_to": [
+        "AIGE-OBL-EUAIA-ART14",
+        "AIGE-OBL-OWASP-AGENTIC",
+        "AIGE-OBL-CSA-AICM-AGENTIC"
+      ]
+    }
+  ],
+  "exceptions": "Requested by the system owner, approved by the AI governance committee for at most 90 days, and recorded as a signed verdict override with an expiry.",
+  "effective_from": "2026-10-01",
+  "review_by": "2027-04-01",
+  "extensions": {
+    "generated_by": "https://aigovernanceengineer.com/toolkit/policy-card",
+    "template": "approval-for-tool",
+    "notice": "Illustrative, review before use. Indicative, not legal advice and not a conformity claim.",
+    "cedar_module": "policies/pc-approval-for-tool.cedar",
+    "ci_hook": ".github/workflows/policy-card-pc-approval-for-tool.yml",
+    "approval_pending_from": "ai-governance-committee"
+  }
+}

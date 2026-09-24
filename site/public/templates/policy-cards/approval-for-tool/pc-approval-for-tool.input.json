@@ -1,0 +1,15 @@
+{
+  "action": "tool_call",
+  "agent": {
+    "id": "csa-01"
+  },
+  "call": {
+    "tool": "refunds-api",
+    "operation": "create_refund"
+  },
+  "approval": {
+    "status": "approved",
+    "approved_by": "team-lead-07",
+    "ticket": "APR-1042"
+  }
+}
