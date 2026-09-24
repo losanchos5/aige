@@ -1,0 +1,6 @@
+{
+  "action": "deploy",
+  "system": {
+    "risk_tier": "prohibited-other"
+  }
+}

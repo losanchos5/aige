@@ -1,0 +1,13 @@
+{
+  "action": "build",
+  "now": "2026-10-02",
+  "exceptions": [
+    {
+      "id": "EXC-0042",
+      "rule_id": "evals.min-score.v1",
+      "granted": "2026-10-01",
+      "expires": "2026-12-30",
+      "approved_by_role": "ai-governance-committee"
+    }
+  ]
+}

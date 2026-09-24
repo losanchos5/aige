@@ -1,0 +1,82 @@
+[
+  {
+    "name": "approved call is allowed",
+    "request": {
+      "principal": "Agent::\"csa-01\"",
+      "action": "Action::\"tool_call\"",
+      "resource": "Tool::\"refunds-api\"",
+      "context": {
+        "agent_id": "csa-01",
+        "operation": "create_refund",
+        "approval": {
+          "status": "approved",
+          "approved_by": "team-lead-07"
+        }
+      }
+    },
+    "entities": [],
+    "decision": "allow",
+    "reason": [
+      "pc-approval-for-tool.baseline"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "call without approval is held",
+    "request": {
+      "principal": "Agent::\"csa-01\"",
+      "action": "Action::\"tool_call\"",
+      "resource": "Tool::\"refunds-api\"",
+      "context": {
+        "agent_id": "csa-01",
+        "operation": "create_refund"
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "tools.approval-required.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "self-approved call is held",
+    "request": {
+      "principal": "Agent::\"csa-01\"",
+      "action": "Action::\"tool_call\"",
+      "resource": "Tool::\"refunds-api\"",
+      "context": {
+        "agent_id": "csa-01",
+        "operation": "create_refund",
+        "approval": {
+          "status": "approved",
+          "approved_by": "csa-01"
+        }
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "tools.approval-required.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "other tool is out of scope",
+    "request": {
+      "principal": "Agent::\"csa-01\"",
+      "action": "Action::\"tool_call\"",
+      "resource": "Tool::\"refunds-api-other\"",
+      "context": {
+        "agent_id": "csa-01",
+        "operation": "create_refund"
+      }
+    },
+    "entities": [],
+    "decision": "allow",
+    "reason": [
+      "pc-approval-for-tool.baseline"
+    ],
+    "num_errors": 0
+  }
+]
