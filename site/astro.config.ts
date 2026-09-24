@@ -16,6 +16,7 @@ import { patterns } from './src/data/patterns';
 import { figures } from './src/data/figures';
 import { getGlossary } from './src/lib/glossary';
 import { gitDate } from './src/lib/reading';
+import { inSitemap } from './src/lib/sitemap-policy';
 
 // Sitemap URL -> the source file(s) whose last commit dates the page: the page
 // itself plus, for a data-driven page, the module or Markdown it renders. The
@@ -125,6 +126,43 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         ['src/pages/figures/[id].astro', 'src/data/figures.ts', `src/figures/${figure.id}.svg`],
       ] as [string, string[]],
   ),
+  // Block w2-integrator (integration of wave 1): these entries replace earlier
+  // ones for the same path (a Map keeps the last value). The crosswalk page
+  // also ships its explorer client; the Resources hub and the home count the
+  // registers they link to, so their data modules date them too.
+  [
+    '/resources/crosswalk',
+    ['src/pages/resources/crosswalk.astro', 'src/data/crosswalk.ts', 'public/crosswalk-explorer.js'],
+  ],
+  [
+    '/resources',
+    [
+      'src/pages/resources/index.astro',
+      'src/data/frameworks.ts',
+      'src/data/crosswalk.ts',
+      'src/data/harms.ts',
+      'src/data/cases.ts',
+      'src/data/contracts.ts',
+      'src/data/templates.ts',
+      'src/data/figures.ts',
+      'src/data/stack.ts',
+      'src/data/toolkit.ts',
+      'src/lib/api.ts',
+      'public/schemas',
+    ],
+  ],
+  [
+    '/',
+    [
+      'src/pages/index.astro',
+      'src/data/values.ts',
+      'src/data/role.ts',
+      'src/data/chapters.ts',
+      'src/data/parts.ts',
+      'src/data/stack.ts',
+    ],
+  ],
+  ['/bok', ['src/pages/bok/index.astro', 'src/data/chapters.ts', 'src/data/parts.ts']],
 ]);
 
 // Pages dated by their content rather than by git: each /obligations/<id> page
@@ -172,11 +210,9 @@ export default defineConfig({
   integrations: [
     sitemap({
       // /og/* are the generated Open Graph cards, /diagrams/* the static SVG
-      // assets and /404 the error page: none of them is a destination.
-      filter: (page) => {
-        const pathname = pathnameOf(page);
-        return !/^\/(og|diagrams)\//.test(pathname) && pathname !== '/404';
-      },
+      // assets and /404 the error page: none of them is a destination. Nor are
+      // the pages whose canonical URL is another page (src/lib/sitemap-policy.ts).
+      filter: (page) => inSitemap(pathnameOf(page)),
       // Every indexable route is dated by the last commit that touched what it
       // is built from (lib/reading.ts gitDate), so an edit moves the page's
       // lastmod without a manual step. A path missing from the map gets no

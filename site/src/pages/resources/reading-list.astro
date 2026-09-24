@@ -9,16 +9,15 @@ import {
   readingJurisdictions,
 } from '../../lib/reading-list';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { site } from '../../data/site';
 import '../../styles/pages.css';
 import '../../styles/resources.css';
 
 // Canonical: the book chapter (/bok/reading-list) is the canonical text; this
 // page renders the same items from the same Markdown, plus a filter. A 301 was
 // ruled out: it would drop the filter, and content-lint requires this page to
-// be built with its links. The page should declare a canonical link to
-// https://aigovernanceengineer.com + CANONICAL_PATH; Base.astro does not yet
-// forward a `canonical` prop to Seo (owned by another block, see the
-// b-catalogues handoff), so until it does the page keeps its self-canonical.
+// be built with its links. The page declares the chapter as rel=canonical
+// through Base's `canonical` prop, and the sitemap leaves this URL out.
 const CANONICAL_PATH = '/bok/reading-list';
 
 const groups = getReadingList();
@@ -38,6 +37,7 @@ const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Reading li
   description="The annotated bibliography of AI governance engineering: books, courses, papers, law and guidance, each with a verified URL, filterable by audience and jurisdiction."
   image="/og/resources.png"
   jsonLd={breadcrumbJsonLd(crumbs)}
+  canonical={`${site.url}${CANONICAL_PATH}`}
 >
   <PageHero
     variant="res"

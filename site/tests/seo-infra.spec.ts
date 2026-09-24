@@ -7,12 +7,14 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { obligations, obligationPath } from '../src/data/frameworks';
+import { NOT_IN_SITEMAP, inSitemap } from '../src/lib/sitemap-policy';
 
 // Every indexable route is every HTML page the build writes, less the ones the
 // sitemap filter in astro.config.ts leaves out (the OG cards, the diagram
-// viewers and the 404). Counted from dist rather than typed, so parallel
-// changes that add pages never fight over one number; a new page without a
-// `lastmod` source in SOURCE_BY_PATH still fails the lastmod count below.
+// viewers, the 404 and the non-canonical pages of src/lib/sitemap-policy.ts,
+// through the same `inSitemap`). Counted from dist rather than typed, so
+// parallel changes that add pages never fight over one number; a new page
+// without a `lastmod` source in SOURCE_BY_PATH still fails the lastmod count below.
 function htmlRoutes(dir: string, root = dir): string[] {
   const out: string[] = [];
   for (const name of readdirSync(dir)) {
@@ -29,9 +31,7 @@ function htmlRoutes(dir: string, root = dir): string[] {
   }
   return out;
 }
-const INDEXABLE_ROUTES = htmlRoutes('dist').filter(
-  (route) => !/^\/(og|diagrams)\//.test(route) && route !== '/404',
-).length;
+const INDEXABLE_ROUTES = htmlRoutes('dist').filter(inSitemap).length;
 
 test.describe('sitemap', () => {
   test(`every one of the ${INDEXABLE_ROUTES} URLs carries a dated lastmod`, async ({ request }) => {
@@ -79,6 +79,22 @@ test.describe('sitemap', () => {
       expect(lastmodFor(obligationPath(row)), row.id).toBe(row.reviewed);
     }
   });
+});
+
+test('every page left out of the sitemap is built and says why', () => {
+  const built = new Set(htmlRoutes('dist'));
+  const redirects = readFileSync(join('dist', '_redirects'), 'utf8').replace(/\r/g, '');
+  for (const { path, reason } of NOT_IN_SITEMAP) {
+    expect(built.has(path), `${path} is built`).toBe(true);
+    // Either the host redirects it, or the page names another canonical URL.
+    const html = readFileSync(join('dist', `${path}.html`), 'utf8');
+    const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1] ?? '';
+    const redirected = new RegExp(`^${path}\\s+\\S+\\s+301$`, 'm').test(redirects);
+    expect(
+      redirected || new URL(canonical).pathname !== path,
+      `${path} (${reason}) must redirect or declare another canonical`,
+    ).toBe(true);
+  }
 });
 
 test('in-content diagram links are extensionless (no 308 on the host)', () => {

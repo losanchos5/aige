@@ -1,6 +1,6 @@
 // Lighthouse CI config. Serves the built site with `astro preview` (which knows
-// this project's `format: 'file'` routing over ./dist) and audits the nine key
-// pages. Run with `npm run lhci`. The `url` list below is also read by
+// this project's `format: 'file'` routing over ./dist) and audits the key pages,
+// one of each kind of v0.5.0 destination included. Run with `npm run lhci`. The `url` list below is also read by
 // tests/seo-basics.spec.ts, which asserts the SEO category's checks in a
 // blocking Playwright suite (the CI lhci step is continue-on-error).
 //
@@ -22,8 +22,13 @@ module.exports = {
         'http://localhost:4321/stack',
         'http://localhost:4321/path',
         'http://localhost:4321/map',
-        'http://localhost:4321/resources/glossary',
+        'http://localhost:4321/bok/glossary',
         'http://localhost:4321/resources/crosswalk',
+        'http://localhost:4321/obligations',
+        'http://localhost:4321/patterns',
+        'http://localhost:4321/figures',
+        'http://localhost:4321/toolkit',
+        'http://localhost:4321/agents',
       ],
       settings: {
         preset: 'desktop',

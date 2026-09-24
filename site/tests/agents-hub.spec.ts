@@ -74,7 +74,9 @@ test.describe('/agents hub', () => {
     expect(description?.length ?? 0).toBeGreaterThanOrEqual(50);
     expect(description?.length ?? 0).toBeLessThanOrEqual(160);
 
-    await expect(page.locator(`a[href="${CHAPTER}"]`).first()).toBeVisible();
+    // In the page itself: the header's Body of Knowledge panel also lists the
+    // chapter, hidden until the panel opens.
+    await expect(page.locator(`main a[href="${CHAPTER}"]`).first()).toBeVisible();
   });
 
   test('lists the ten control-plane components, each linked to its chapter section', async ({

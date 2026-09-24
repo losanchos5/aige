@@ -83,17 +83,47 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
         Engineering: The Thesis &amp; Body of Knowledge</em> (v{site.bokVersion}).{' '}
         <a href={`https://doi.org/${site.doi}`}>https://doi.org/{site.doi}</a>. {url}. {site.license}
       </p>
-      <button type="button" class="cite-copy" data-copy-cite={reference} data-umami-event="cite-copy" data-umami-event-kind={`${kind}-reference`}>Copy</button>
+      <button
+        type="button"
+        class="cite-copy"
+        data-copy-cite={reference}
+        data-umami-event="cite-copy"
+        data-umami-event-kind="reference"
+        data-umami-event-type={kind}
+        data-umami-event-chapter={slug}
+      >
+        Copy
+      </button>
 
       <p class="cite-label">BibTeX</p>
       <pre class="cite-bibtex"><code>{bibtex}</code></pre>
-      <button type="button" class="cite-copy bibtex-copy" data-copy-cite={bibtex} data-umami-event="cite-copy" data-umami-event-kind={`${kind}-bibtex`}>Copy BibTeX</button>
+      <button
+        type="button"
+        class="cite-copy bibtex-copy"
+        data-copy-cite={bibtex}
+        data-umami-event="cite-copy"
+        data-umami-event-kind="bibtex"
+        data-umami-event-type={kind}
+        data-umami-event-chapter={slug}
+      >
+        Copy BibTeX
+      </button>
     </div>
   </details>
 
   <div class="share-row">
     <a class="share-link" href={linkedInUrl} target="_blank" rel="noopener">Share on LinkedIn</a>
-    <button type="button" class="share-copy" data-copy-cite={url} data-umami-event="cite-copy" data-umami-event-kind={`${kind}-link`}>Copy link</button>
+    <button
+      type="button"
+      class="share-copy"
+      data-copy-cite={url}
+      data-umami-event="cite-copy"
+      data-umami-event-kind="link"
+      data-umami-event-type={kind}
+      data-umami-event-chapter={slug}
+    >
+      Copy link
+    </button>
   </div>
 </div>
 

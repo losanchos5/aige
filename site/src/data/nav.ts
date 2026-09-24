@@ -22,6 +22,12 @@ export interface NavItem {
    * machine-readable data; the renderers add `data-umami-event-file` = href.
    */
   event?: string;
+  /**
+   * Other route prefixes this item owns for the current-group highlight, when
+   * its pages live outside `href` (the per-term /glossary/<slug> pages belong
+   * to the Glossary item, whose href is the glossary chapter).
+   */
+  owns?: string[];
 }
 
 /** A named sub-list of a group's items: one part of the Body of Knowledge. */
@@ -93,7 +99,7 @@ export const nav: NavGroup[] = [
   {
     id: 'practice',
     label: 'Practice',
-    description: 'How the discipline is done: the role, stack, patterns and path.',
+    description: 'How the discipline is done: the role, stack, patterns, tools, path and agents.',
     items: [
       {
         label: 'The Role',
@@ -107,7 +113,7 @@ export const nav: NavGroup[] = [
       },
       {
         label: 'Patterns',
-        href: '/bok/patterns',
+        href: '/patterns',
         description: 'Reusable patterns, each named to the stack layer it serves.',
       },
       {
@@ -116,22 +122,37 @@ export const nav: NavGroup[] = [
         description: 'Four stages from foundations to proof; mark your own progress.',
       },
       {
+        label: 'Toolkit',
+        href: '/toolkit',
+        description: 'Browser tools built from the book, starting with the maturity self-check.',
+      },
+      {
         label: 'Maturity model',
         href: '/bok/maturity-model',
         description: 'Where a governance function stands, and what the next level demands.',
+      },
+      {
+        label: 'Agents',
+        href: '/agents',
+        description: 'Governing AI agents: registry, identity, permissions and kill switches.',
       },
     ],
   },
   {
     id: 'reference',
     label: 'Reference',
-    description: 'Frameworks, crosswalk, harms atlas, cases, contracts, templates, tools and glossary.',
+    description: 'Frameworks, obligations, crosswalk, harms, cases, templates, figures, data, glossary.',
     href: '/resources',
     items: [
       {
         label: 'Frameworks',
         href: '/resources/frameworks',
         description: 'The laws, standards, codes and control sets the book maps against.',
+      },
+      {
+        label: 'Obligations',
+        href: '/obligations',
+        description: 'Every obligation with a stable id, its date, status, artefact and layer.',
       },
       {
         label: 'Crosswalk',
@@ -159,14 +180,25 @@ export const nav: NavGroup[] = [
         description: 'Schemas, examples and templates for governance records, tagged by obligation.',
       },
       {
+        label: 'Figures',
+        href: '/figures',
+        description: 'Every diagram and infographic in the book, citable and downloadable.',
+      },
+      {
+        label: 'Open data & API',
+        href: '/resources/data',
+        description: 'The registers as static JSON with schemas, an OpenAPI file and stable ids.',
+      },
+      {
         label: 'Tools',
         href: '/resources/tools',
         description: 'Reference tool categories per layer: examples, not endorsements.',
       },
       {
         label: 'Glossary',
-        href: '/resources/glossary',
-        description: 'Every term defined once, alphabetically, linked to its chapter.',
+        href: '/bok/glossary',
+        description: 'Every term defined once, each with its own page, linked to its chapter.',
+        owns: ['/glossary'],
       },
       {
         label: 'Reading list',
@@ -217,6 +249,7 @@ export const feeds: NavItem[] = [
   { label: 'Obligations CSV', href: '/resources/obligations.csv', event: 'download' },
   { label: 'Obligations JSON', href: '/resources/obligations.json', event: 'download' },
   { label: 'Harms JSON', href: '/resources/harms.json', event: 'download' },
+  { label: 'Open data API', href: '/api/v1/index.json', event: 'download' },
 ];
 
 // Off-site project links.
@@ -256,14 +289,18 @@ export function resolveCurrent(pathname: string): { href?: string; groupId?: str
 
   let best: { href?: string; groupId?: string; len: number } = { len: -1 };
   for (const group of groups) {
-    const candidates: string[] = [];
-    if (group.href) candidates.push(group.href);
+    // Each candidate is a route prefix and the href it resolves to: an item's
+    // own href, plus any prefix it `owns` (resolving to the item's href).
+    const candidates: { prefix: string; href: string }[] = [];
+    if (group.href) candidates.push({ prefix: group.href, href: group.href });
     for (const item of group.items) {
-      if (!item.external && item.href.startsWith('/')) candidates.push(item.href);
+      if (item.external || !item.href.startsWith('/')) continue;
+      candidates.push({ prefix: item.href, href: item.href });
+      for (const prefix of item.owns ?? []) candidates.push({ prefix, href: item.href });
     }
-    for (const href of candidates) {
-      if (isPrefixOf(href, path) && href.length > best.len) {
-        best = { href, groupId: group.id, len: href.length };
+    for (const { prefix, href } of candidates) {
+      if (isPrefixOf(prefix, path) && prefix.length > best.len) {
+        best = { href, groupId: group.id, len: prefix.length };
       }
     }
   }

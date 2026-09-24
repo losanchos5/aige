@@ -31,6 +31,10 @@ interface Props {
   overlayHeader?: boolean;
   /** Extra /fonts/*.woff2 files this page preloads (the home hero's serif). */
   preloadFonts?: string[];
+  /** Absolute canonical URL when another page holds the canonical text (for
+   *  example /resources/reading-list, a filtered view of /bok/reading-list).
+   *  Omitted: Seo derives the canonical from the page's own clean URL. */
+  canonical?: string;
 }
 
 const {
@@ -46,6 +50,7 @@ const {
   noindex,
   overlayHeader = false,
   preloadFonts = [],
+  canonical,
 } = Astro.props;
 
 // Cloudflare Web Analytics: only injected when a token is provided at build time
@@ -53,7 +58,11 @@ const {
 const cfBeaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
 
 // Umami (self-hosted, cookieless): only injected when a website id is provided
-// at build time via PUBLIC_UMAMI_WEBSITE_ID. No id → no script.
+// at build time via PUBLIC_UMAMI_WEBSITE_ID. No id → no script. The tracker
+// runs with data-exclude-hash and data-exclude-search: the /toolkit tools keep
+// a reader's answers in the URL fragment, and the notice on every tool promises
+// that nothing entered leaves the browser, so neither the fragment nor the
+// query string is ever sent.
 const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
 const umamiSrc = 'https://admin.stocktcg.net/script.js';
 ---
@@ -74,6 +83,7 @@ const umamiSrc = 'https://admin.stocktcg.net/script.js';
       titleSuffix={titleSuffix}
       article={article}
       noindex={noindex}
+      canonical={canonical}
     />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -132,7 +142,14 @@ const umamiSrc = 'https://admin.stocktcg.net/script.js';
 
     {
       umamiWebsiteId && (
-        <script is:inline defer src={umamiSrc} data-website-id={umamiWebsiteId} />
+        <script
+          is:inline
+          defer
+          src={umamiSrc}
+          data-website-id={umamiWebsiteId}
+          data-exclude-hash="true"
+          data-exclude-search="true"
+        />
       )
     }
   </head>

@@ -6,7 +6,7 @@
 // in light and dark.
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { nav, feeds, allHrefs } from '../src/data/nav';
 import { chapterParts, chaptersOrdered } from '../src/data/chapters';
@@ -19,7 +19,26 @@ const DIST = 'dist';
 // collection of generated detail pages lands.
 const DETAIL_COLLECTIONS: { prefix: string; index: string }[] = [
   { prefix: '/cases/', index: '/cases' },
+  { prefix: '/obligations/', index: '/obligations' },
+  { prefix: '/patterns/', index: '/patterns' },
+  { prefix: '/figures/', index: '/figures' },
+  // One page per glossary term; the glossary chapter links every one of them.
+  { prefix: '/glossary/', index: '/bok/glossary' },
+  { prefix: '/toolkit/', index: '/toolkit' },
 ];
+
+// Built pages the host answers with a redirect (public/_redirects, copied to
+// dist): not destinations, so the footer must not link them. Today that is
+// /resources/glossary, kept built for local previews and 301'd to /bok/glossary.
+function redirectedRoutes(): Set<string> {
+  const text = readFileSync(join(DIST, '_redirects'), 'utf8');
+  const out = new Set<string>();
+  for (const line of text.split(/\r?\n/)) {
+    const [from, , status] = line.trim().split(/\s+/);
+    if (from?.startsWith('/') && /^30[178]$/.test(status ?? '')) out.add(from);
+  }
+  return out;
+}
 
 function htmlFiles(dir: string): string[] {
   const out: string[] = [];
@@ -82,14 +101,22 @@ test('the footer sitemap links every model href and every public route', async (
     ).toHaveCount(1);
   }
 
+  const redirected = redirectedRoutes();
   const routes = htmlFiles(DIST)
     .map(toRoute)
     .filter(
       (route) =>
         !route.startsWith('/og/') &&
         !route.startsWith('/diagrams/') &&
-        route !== '/404',
+        route !== '/404' &&
+        !redirected.has(route),
     );
+  for (const route of redirected) {
+    await expect(
+      sitemap.locator(`a[href="${route}"]`),
+      `footer must not link the redirected route ${route}`,
+    ).toHaveCount(0);
+  }
 
   const detailOf = (route: string) =>
     DETAIL_COLLECTIONS.find((c) => route.startsWith(c.prefix) && route !== c.index);
@@ -137,16 +164,25 @@ test('the Body of Knowledge group lists every chapter once, grouped by part in o
   }
 });
 
-test('Reference and About carry the new destinations', () => {
+test('Practice, Reference and About carry the new destinations', () => {
   const hrefsOf = (id: string) => nav.find((g) => g.id === id)!.items.map((i) => i.href);
+  expect(hrefsOf('practice')).toEqual(
+    expect.arrayContaining(['/patterns', '/toolkit', '/agents']),
+  );
   expect(hrefsOf('reference')).toEqual(
     expect.arrayContaining([
+      '/obligations',
       '/resources/harms',
       '/cases',
       '/resources/contracts',
       '/resources/templates',
+      '/figures',
+      '/resources/data',
+      '/bok/glossary',
     ]),
   );
+  // The chapter is the glossary's home; the old A-Z page only redirects to it.
+  expect(hrefsOf('reference')).not.toContain('/resources/glossary');
   expect(hrefsOf('about')).toEqual(
     expect.arrayContaining(['/about/changelog', '/about/contributors', '/about/methodology']),
   );

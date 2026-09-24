@@ -19,7 +19,14 @@ import VerdictStamp from '../components/VerdictStamp.astro';
         [data-search-open]); the header and footer already carry the site map. */}
     <div class="nf-cta">
       <a class="btn btn-primary btn-glow" href="/">Back to home</a>
-      <button type="button" class="nf-search" data-search-open aria-haspopup="dialog">
+      <button
+        type="button"
+        class="nf-search"
+        data-search-open
+        aria-haspopup="dialog"
+        data-umami-event="search-open"
+        data-umami-event-location="404"
+      >
         Search the site
       </button>
     </div>
