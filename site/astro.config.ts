@@ -11,6 +11,7 @@ import rehypeDiagrams from './src/lib/rehype-diagrams';
 import rehypeGlossary from './src/lib/rehype-glossary';
 import { chaptersOrdered } from './src/data/chapters';
 import { cases } from './src/data/cases';
+import { figures } from './src/data/figures';
 import { gitDate } from './src/lib/reading';
 
 // Sitemap URL -> the source file(s) whose last commit dates the page: the page
@@ -61,6 +62,16 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         string,
         string[],
       ],
+  ),
+  // Block b-figures-system: the figures gallery and one permalink per figure,
+  // each dated by its template, the figure manifest and the figure's own art.
+  ['/figures', ['src/pages/figures/index.astro', 'src/data/figures.ts', 'src/data/diagrams.ts']],
+  ...figures.map(
+    (figure) =>
+      [
+        `/figures/${figure.id}`,
+        ['src/pages/figures/[id].astro', 'src/data/figures.ts', `src/figures/${figure.id}.svg`],
+      ] as [string, string[]],
   ),
 ]);
 

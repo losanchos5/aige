@@ -1,0 +1,142 @@
+---
+/**
+ * FigureCite: "Cite this figure" for a /figures/<id> permalink. A reference in
+ * the house style (the same shape as a chapter's Citation, with the figure as
+ * the cited part and its permalink as the locator) and a BibTeX entry, each
+ * with a copy button. The buttons are wired by /figure-cite.js (CSP-safe, no
+ * inline JS); without it the text stays selectable in the open block.
+ */
+import { site } from '../data/site';
+import { figureLicense, type FigureDef } from '../data/figures';
+import { figureUrl } from '../lib/figure-reuse';
+
+interface Props {
+  figure: FigureDef;
+  /** YYYY-MM-DD of the last change to the figure (its art or its entry). */
+  dateModified: string;
+}
+
+const { figure, dateModified } = Astro.props;
+const url = figureUrl(figure.id);
+const year = dateModified.slice(0, 4);
+const license = figureLicense(figure);
+const dated = figure.asOf ? ` As of ${figure.asOf}.` : '';
+const book = 'AI Governance Engineering: The Thesis & Body of Knowledge';
+const reference =
+  `García Aibar, J. (${year}). ${figure.title} [Figure]. In ${book} (v${site.bokVersion}). ` +
+  `https://doi.org/${site.doi}. ${url}. ${license}.${dated}`;
+
+// The literal backslash escapes the ampersand for BibTeX; the double braces
+// keep the title's capitals.
+const bibtex = `@misc{aige-figure-${figure.id},
+  author       = {${site.authors.join(' and ')}},
+  title        = {{${figure.title}}},
+  howpublished = {Figure in AI Governance Engineering: The Thesis \\& Body of Knowledge},
+  year         = {${year}},
+  version      = {${site.bokVersion}},
+  doi          = {${site.doi}},
+  url          = {${url}},
+  note         = {${license}${figure.asOf ? `; as of ${figure.asOf}` : ''}}
+}`;
+---
+
+<details class="fc-box" open>
+  <summary>Cite this figure</summary>
+  <div class="fc-body">
+    <p class="fc-ref">
+      García Aibar, J. ({year}). <em>{figure.title}</em> [Figure]. In <em>{book}</em>
+      (v{site.bokVersion}). <a href={`https://doi.org/${site.doi}`}>https://doi.org/{site.doi}</a>.
+      {' '}{url}. {license}.{dated}
+    </p>
+    <button type="button" class="fc-copy" data-figure-copy={reference}>Copy reference</button>
+
+    <p class="fc-label">BibTeX</p>
+    <pre class="fc-code"><code>{bibtex}</code></pre>
+    <button type="button" class="fc-copy" data-figure-copy={bibtex}>Copy BibTeX</button>
+  </div>
+</details>
+
+<style>
+  .fc-box {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .fc-box > summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
+
+  .fc-box > summary:hover {
+    color: var(--ink);
+  }
+
+  .fc-box > summary:focus-visible,
+  .fc-copy:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .fc-body {
+    margin-top: var(--s-3);
+    padding: var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+  }
+
+  /* The DOI and the permalink have no break points of their own. */
+  .fc-ref {
+    margin: 0;
+    color: var(--ink-2);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .fc-label {
+    margin: var(--s-4) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .fc-code {
+    max-width: 100%;
+    margin: var(--s-2) 0 0;
+    padding: var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .fc-code code {
+    font-family: inherit;
+  }
+
+  .fc-copy {
+    margin-top: var(--s-3);
+    min-height: 36px;
+    padding: var(--s-1) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: border-color var(--dur) var(--ease);
+  }
+
+  .fc-copy:hover {
+    border-color: var(--ink-2);
+  }
+</style>

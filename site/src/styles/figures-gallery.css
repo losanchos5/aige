@@ -1,0 +1,315 @@
+/* figures-gallery.css: the /figures gallery and the /figures/<id> permalink
+   pages. Tokens only, so light and dark follow the theme; classes are prefixed
+   fg-. The figure frame itself (.figure--infographic) comes from figures.css,
+   loaded on every page through diagrams.css. */
+
+/* ---- Gallery ------------------------------------------------------------- */
+.fg-chapter + .fg-chapter {
+  margin-top: var(--s-6);
+}
+
+.fg-chapter-title {
+  margin: 0 0 var(--s-4);
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-display);
+}
+
+.fg-chapter-title a,
+.fg-card-title a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.fg-chapter-title a:hover,
+.fg-card-title a:hover {
+  text-decoration: underline;
+}
+
+.fg-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+}
+
+.fg-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  height: 100%;
+  padding: var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+
+.fg-card--diagram {
+  background: var(--tint-bg);
+}
+
+/* Decorative preview: the chapter's own SVG, letterboxed in a fixed-height
+   frame on the figure ground (--bg), so both themes match the chapters. */
+.fg-thumb {
+  display: block;
+  padding: var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+}
+
+.fg-thumb > svg {
+  display: block;
+  width: 100%;
+  height: 200px;
+}
+
+.fg-card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  line-height: 1.25;
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+
+.fg-card p {
+  margin: 0;
+  font-size: var(--fs-small);
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.fg-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fg-card .fg-card-foot {
+  margin-top: auto;
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--line);
+}
+
+.fg-page a:not(.fg-thumb):focus-visible,
+.fg-thumb:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ---- Permalink ----------------------------------------------------------- */
+.fg-view .figure--infographic {
+  margin: 0;
+}
+
+/* The poster keeps its legible width and scrolls sideways on a phone, like
+   /map; the region is focusable (WCAG scrollable-region). */
+/* Specific enough to beat figures.css (overflow: hidden, the 560px cap). */
+.figure--infographic .figure-canvas.fg-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.figure--infographic .figure-canvas.fg-scroll > svg {
+  display: block;
+  width: 100%;
+  min-width: 980px;
+  max-width: none;
+  height: auto;
+  margin: 0;
+}
+
+.fg-scroll:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.fg-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 var(--s-7);
+}
+
+@media (min-width: 960px) {
+  .fg-cols {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  }
+}
+
+.fg-main,
+.fg-side {
+  min-width: 0;
+}
+
+.fg-h2 {
+  margin: 0 0 var(--s-3);
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-display);
+  color: var(--ink);
+}
+
+.fg-h3 {
+  margin: var(--s-5) 0 var(--s-2);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.fg-prose {
+  max-width: var(--prose);
+  margin: 0;
+  color: var(--ink-2);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.fg-prose + .fg-prose {
+  margin-top: var(--s-3);
+}
+
+.fg-note {
+  margin: var(--s-2) 0 0;
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
+.fg-table-caption {
+  padding: var(--s-3);
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.fg-downloads,
+.fg-places {
+  margin: var(--s-4) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.fg-downloads li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-1) var(--s-3);
+  padding-bottom: var(--s-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.fg-meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--muted);
+}
+
+.fg-page .fg-main a,
+.fg-page .fg-side a,
+.fg-card a,
+.fg-pager a {
+  color: var(--ink);
+  text-decoration-color: var(--line);
+  text-underline-offset: 0.18em;
+}
+
+.fg-page .fg-main a:hover,
+.fg-page .fg-side a:hover,
+.fg-card a:hover,
+.fg-pager a:hover {
+  text-decoration-color: currentColor;
+}
+
+.fg-credit {
+  max-width: var(--prose);
+  margin: var(--s-3) 0 0;
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.fg-code {
+  max-width: 100%;
+  margin: 0;
+  padding: var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.fg-code code {
+  font-family: inherit;
+}
+
+.fg-copy {
+  margin-top: var(--s-2);
+  min-height: 36px;
+  padding: var(--s-1) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease);
+}
+
+.fg-copy:hover {
+  border-color: var(--ink-2);
+}
+
+.fg-copy:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.fg-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--s-2) var(--s-4);
+  margin: 0;
+}
+
+.fg-facts dt {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 0.15em;
+}
+
+.fg-facts dd {
+  margin: 0;
+  color: var(--ink);
+}
+
+.fg-pager {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s-3);
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-small);
+}

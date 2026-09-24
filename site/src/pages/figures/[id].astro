@@ -1,0 +1,292 @@
+---
+// /figures/<id>: the permalink of one Body of Knowledge figure, so it can be
+// cited and reused on its own. The figure (the same SVG the chapter inlines),
+// its caption and text alternative, where it appears, the downloads written by
+// scripts/figures-build.mjs, ready-to-paste embed snippets with the full CC BY
+// credit, a FigureCite block and an ImageObject in the JSON-LD graph.
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Figure from '../../components/Figure.astro';
+import Callout from '../../components/Callout.astro';
+import FigureCite from '../../components/FigureCite.astro';
+import { site } from '../../data/site';
+import { figures, figureKind, figureLicense, type FigureDef } from '../../data/figures';
+import {
+  FIGURE_AUTHOR,
+  figureCredit,
+  figureDownloads,
+  figureMetaDescription,
+  figurePlaces,
+  figureUrl,
+  hasFigureArt,
+  permalinkSvg,
+  pngDownload,
+} from '../../lib/figure-reuse';
+import { gitDate, gitCreated } from '../../lib/reading';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/figures-gallery.css';
+
+export function getStaticPaths() {
+  const built = figures.filter((figure) => hasFigureArt(figure.id));
+  return built.map((figure, i) => ({
+    params: { id: figure.id },
+    props: { figure, prev: built[i - 1], next: built[i + 1] },
+  }));
+}
+
+interface Props {
+  figure: FigureDef;
+  prev?: FigureDef;
+  next?: FigureDef;
+}
+
+const { figure, prev, next } = Astro.props as Props;
+const kind = figureKind(figure);
+const license = figureLicense(figure);
+const svg = permalinkSvg(figure);
+const downloads = figureDownloads(figure);
+const places = figurePlaces(figure);
+const credit = figureCredit(figure, downloads);
+const pageUrl = figureUrl(figure.id);
+const description = figureMetaDescription(figure);
+
+// The figure changes when its art or its entry changes; the newest date wins.
+const artPath = `src/figures/${figure.id}.svg`;
+const updated = [gitDate(artPath), gitDate('src/data/figures.ts')].reduce((a, b) => (b > a ? b : a));
+const published = gitCreated(artPath);
+
+const kindLabel: Record<typeof kind, string> = {
+  infographic: 'Infographic',
+  'data-viz': 'Data visualisation',
+  poster: 'Poster',
+};
+const primary = pngDownload(downloads, 'light', 1600);
+const vector = downloads.find((d) => d.format === 'svg' && d.theme === 'auto');
+const crumbs = [{ label: 'Figures', href: '/figures' }, { label: figure.title }];
+
+const jsonLd = [
+  {
+    '@type': 'ImageObject',
+    '@id': `${pageUrl}#figure`,
+    name: figure.title,
+    caption: figure.caption,
+    description: figure.description,
+    url: pageUrl,
+    inLanguage: 'en',
+    ...(primary
+      ? {
+          contentUrl: primary.url,
+          encodingFormat: 'image/png',
+          width: primary.pixelWidth,
+          height: primary.pixelHeight,
+        }
+      : {}),
+    ...(vector ? { associatedMedia: { '@type': 'MediaObject', contentUrl: vector.url, encodingFormat: 'image/svg+xml' } } : {}),
+    license: site.licenseUrl,
+    acquireLicensePage: `${pageUrl}#reuse`,
+    creditText: `${FIGURE_AUTHOR}, aigovernanceengineer.com`,
+    copyrightNotice: `${FIGURE_AUTHOR}. ${license}.`,
+    creator: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    datePublished: published,
+    dateModified: updated,
+    version: site.bokVersion,
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+
+const facts: [string, string][] = [
+  ['Kind', kindLabel[kind]],
+  ['Licence', license],
+  ['Book version', `v${site.bokVersion}`],
+  ...(figure.asOf ? ([['Content as of', figure.asOf]] as [string, string][]) : []),
+  ...(figure.reviewBy ? ([['Review by', figure.reviewBy]] as [string, string][]) : []),
+  ['Last changed', updated],
+];
+---
+
+<Base
+  title={`Figure: ${figure.title}`}
+  description={description}
+  image="/og/resources.png"
+  jsonLd={jsonLd}
+  article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
+>
+  <PageHero variant="res" crumbs={crumbs} title={figure.title} lede={figure.alt} />
+
+  <div class="container res-page fg-page" data-pagefind-body>
+    <section class="res-section fg-view" aria-label="The figure">
+      {
+        kind === 'poster' ? (
+          <figure class="figure figure--infographic fg-poster" data-figure={figure.id}>
+            <div
+              class="figure-canvas fg-scroll"
+              tabindex="0"
+              role="region"
+              aria-label={`${figure.title}: scroll sideways on a narrow screen`}
+              set:html={svg}
+            />
+            <figcaption class="figure-figcaption">
+              <span class="figure-fig-title">{figure.title}</span>
+              <span class="figure-fig-desc">{figure.caption}</span>
+            </figcaption>
+          </figure>
+        ) : (
+          <Figure title={figure.title} caption={figure.caption} id={figure.id}>
+            <Fragment set:html={svg} />
+          </Figure>
+        )
+      }
+    </section>
+
+    {
+      figure.asOf && (
+        <div class="res-section">
+          <Callout kind="note" title={`Dated content, as of ${figure.asOf}`}>
+            <p>
+              This figure states rules or deadlines as they stood on {figure.asOf}; the date is
+              printed inside every download too. The chapter it is drawn from carries the sources
+              and the current reading. It is a reading aid, not legal advice.
+            </p>
+          </Callout>
+        </div>
+      )
+    }
+
+    <div class="fg-cols">
+      <div class="fg-main">
+        <section class="res-section" aria-labelledby="text-alternative">
+          <h2 id="text-alternative" class="fg-h2">Text alternative</h2>
+          <p class="fg-prose">{figure.description}</p>
+        </section>
+
+        {
+          figure.data && (
+            <section class="res-section" aria-labelledby="data">
+              <h2 id="data" class="fg-h2">Data</h2>
+              <div class="res-tablewrap">
+                <table class="res-table">
+                  <caption class="fg-table-caption">{figure.data.caption}</caption>
+                  <thead>
+                    <tr>
+                      {figure.data.columns.map((column) => (
+                        <th scope="col">{column}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {figure.data.rows.map((row) => (
+                      <tr>
+                        {row.map((cell) => (
+                          <td>{cell}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p class="fg-note">Source: {figure.data.source}</p>
+            </section>
+          )
+        }
+
+        <section class="res-section" aria-labelledby="downloads">
+          <h2 id="downloads" class="fg-h2">Download</h2>
+          {
+            downloads.length ? (
+              <>
+                <p class="fg-prose">
+                  Every file carries the attribution band "aigovernanceengineer.com · {license} ·
+                  v{site.bokVersion}" inside the image, and the version is in the file name, so a
+                  copy always says where it came from and which edition it shows. The SVGs keep the
+                  text live: the first follows the viewer's light or dark setting, the other two fix
+                  one theme for slides and print. The PNGs are drawn with the site's own typefaces.
+                </p>
+                <ul class="fg-downloads">
+                  {downloads.map((d) => (
+                    <li>
+                      <a href={d.href} download>
+                        {d.label}
+                      </a>
+                      <span class="fg-meta">
+                        {`${d.pixelWidth} × ${d.pixelHeight}${d.format === 'svg' ? ', scalable' : ' px'} · ${d.size}`}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <p class="fg-prose">The downloads are generated at build and are not in this build.</p>
+            )
+          }
+        </section>
+
+        <section class="res-section" aria-labelledby="reuse">
+          <h2 id="reuse" class="fg-h2">Reuse and credit</h2>
+          <p class="fg-prose">
+            The figure is published under <a href={site.licenseUrl} rel="noopener">{license}</a>:
+            you may copy, share and adapt it, commercially too, provided you give appropriate
+            credit, link to the licence and say if you changed it. Keep the attribution band in
+            the image. A credit line that covers title, author, source and licence:
+          </p>
+          <p class="fg-credit">{credit.text}</p>
+          <button type="button" class="fg-copy" data-figure-copy={credit.text}>Copy credit line</button>
+
+          <h3 class="fg-h3">Embed with HTML</h3>
+          <pre class="fg-code"><code>{credit.html}</code></pre>
+          <button type="button" class="fg-copy" data-figure-copy={credit.html}>Copy HTML</button>
+
+          <h3 class="fg-h3">Embed with Markdown</h3>
+          <pre class="fg-code"><code>{credit.markdown}</code></pre>
+          <button type="button" class="fg-copy" data-figure-copy={credit.markdown}>Copy Markdown</button>
+        </section>
+      </div>
+
+      <aside class="fg-side" aria-label="About this figure">
+        <section class="res-section" aria-labelledby="facts">
+          <h2 id="facts" class="fg-h2">About this figure</h2>
+          <dl class="fg-facts">
+            {
+              facts.map(([term, value]) => (
+                <>
+                  <dt>{term}</dt>
+                  <dd>{value}</dd>
+                </>
+              ))
+            }
+          </dl>
+        </section>
+
+        <section class="res-section" aria-labelledby="appears">
+          <h2 id="appears" class="fg-h2">Where it appears</h2>
+          <ul class="fg-places">
+            {
+              places.map((place) => (
+                <li>
+                  <a href={place.href}>{place.label}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <section class="res-section" aria-labelledby="cite">
+          <h2 id="cite" class="fg-h2">Cite</h2>
+          <FigureCite figure={figure} dateModified={updated} />
+        </section>
+      </aside>
+    </div>
+
+    <nav class="res-section fg-pager" aria-label="More figures">
+      {prev ? <a href={`/figures/${prev.id}`}>Previous: {prev.title}</a> : <span />}
+      <a href="/figures">All figures</a>
+      {next ? <a href={`/figures/${next.id}`}>Next: {next.title}</a> : <span />}
+    </nav>
+  </div>
+
+  <script is:inline defer src="/figure-cite.js"></script>
+</Base>
