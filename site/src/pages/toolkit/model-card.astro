@@ -1,0 +1,322 @@
+---
+// /toolkit/model-card: write a model or system card once, as a record of
+// model-card.v1.json, and export it as a Hugging Face style card (YAML front
+// matter with the Hub's metadata keys, then the Hub template's headings) and
+// as a CycloneDX 1.7 ML-BOM component, with a coverage checklist against EU AI
+// Act Art. 11 and Annex IV, Art. 13(3), Art. 53(1), ISO/IEC 42001 Annex A and
+// the NIST AI RMF. The form is built by the client from the specs in
+// src/data/doc-builders.ts; the checklist and the field mappings render here,
+// so the page is a worksheet without JavaScript.
+import ToolShell from '../../components/toolkit/ToolShell.astro';
+import { toolById, toolNotice } from '../../data/toolkit';
+import {
+  modelCardSections,
+  modelCardChecklist,
+  checklistGroups,
+  modelCardSources,
+  buildersAsOf,
+} from '../../data/doc-builders';
+import { obligationById } from '../../data/frameworks';
+import { loadPublicSchema } from '../../lib/doc-builders-schemas';
+import { site } from '../../data/site';
+import '../../components/toolkit/builders.css';
+
+const tool = toolById('model-card');
+const schema = loadPublicSchema('model-card.v1.json');
+
+// Fail the build if the checklist names an obligation the register lacks.
+for (const item of modelCardChecklist) {
+  if (!obligationById(item.obligation)) {
+    throw new Error(`model-card: unknown obligation ${item.obligation} in checklist item ${item.id}`);
+  }
+}
+
+const data = {
+  version: 1,
+  notice: toolNotice,
+  page: new URL(tool.href, site.url).href,
+  site: site.url,
+  asOf: buildersAsOf,
+  schema,
+  sections: modelCardSections,
+  checklist: modelCardChecklist,
+  groups: checklistGroups,
+};
+
+const appliesLabel: Record<string, string> = {
+  always: 'Always read',
+  high_risk: 'Read when the model is part of a high-risk system',
+  gpai: 'Read when the model is a general-purpose AI model',
+};
+
+const cdxMap: [string, string][] = [
+  ['name, version, description', 'components[0].name, .version, .description'],
+  ['developer', 'components[0].supplier.name'],
+  ['license', 'components[0].licenses[0].license.name'],
+  ['tags', 'components[0].tags'],
+  ['learning_approach, task', 'modelCard.modelParameters.approach.type, .task'],
+  ['architecture_family, architecture', 'modelCard.modelParameters.architectureFamily, .modelArchitecture'],
+  ['datasets', 'modelCard.modelParameters.datasets[] (type "dataset", name, contents.url; role and description as contents.properties)'],
+  ['inputs, outputs', 'modelCard.modelParameters.inputs[].format, .outputs[].format'],
+  ['metrics', 'modelCard.quantitativeAnalysis.performanceMetrics[] (type, value, slice, confidenceInterval)'],
+  ['users, intended_uses', 'modelCard.considerations.users, .useCases'],
+  ['limitations, out_of_scope_uses', 'modelCard.considerations.technicalLimitations'],
+  ['tradeoffs', 'modelCard.considerations.performanceTradeoffs'],
+  ['ethical_considerations', 'modelCard.considerations.ethicalConsiderations[] (name, mitigationStrategy)'],
+  ['fairness_assessments', 'modelCard.considerations.fairnessAssessments[] (groupAtRisk, benefits, harms, mitigationStrategy)'],
+  ['environmental', 'modelCard.considerations.environmentalConsiderations.properties[]'],
+  ['repository, links, gpai', 'components[0].externalReferences[] (vcs, documentation, risk-assessment, attestation, bom)'],
+];
+
+const cite = (n: number) => `#src-${n}`;
+---
+
+<ToolShell
+  tool={tool}
+  heading="One model card, three readers."
+  description="Write a model card once: export Hugging Face style Markdown and a CycloneDX 1.7 ML-BOM, and see what it covers of Annex IV, Art. 13, Art. 53, ISO/IEC 42001 and NIST."
+  lede="Fill the card once. It is checked against the published schema, read against the documentation duties it can evidence, and exported as a Hugging Face style card, a CycloneDX 1.7 ML-BOM component and the record itself."
+  data={data}
+  needsJs="the form, the checklist and the exports"
+>
+  <div class="bld-app" data-bld="model-card">
+    <div
+      class="tool-errors"
+      id="mc-errors"
+      data-bld-errors
+      tabindex="-1"
+      role="group"
+      aria-labelledby="mc-errors-title"
+      hidden
+    >
+      <h2 id="mc-errors-title">Fix these fields</h2>
+      <ul></ul>
+    </div>
+
+    <form class="tool-form" id="mc-form" data-bld-form-el novalidate data-tool-js hidden>
+      <div class="bld-form" data-bld-form></div>
+      <div class="tool-buttons" data-print-hide>
+        <button type="submit" class="btn btn-primary">Check the card</button>
+        <button type="button" class="btn btn-secondary" data-action="clear">Clear the form</button>
+      </div>
+      <p class="tool-status" role="status" data-bld-status></p>
+    </form>
+
+    <section
+      class="tool-result tool-block"
+      id="mc-result"
+      data-bld-result
+      aria-labelledby="mc-result-title"
+      data-tool-js
+      hidden
+    >
+      <h2 id="mc-result-title" tabindex="-1">Your card</h2>
+      <p class="bld-validity" data-bld-validity></p>
+      <ul class="bld-summary" data-mc-summary></ul>
+      <div class="tool-table-wrap">
+        <table class="tool-table">
+          <caption>Coverage checklist</caption>
+          <thead>
+            <tr>
+              <th scope="col">Reference</th>
+              <th scope="col">Requirement</th>
+              <th scope="col">State</th>
+              <th scope="col">Card fields</th>
+            </tr>
+          </thead>
+          <tbody data-mc-checklist></tbody>
+        </table>
+      </div>
+      <div class="tool-actions" data-print-hide>
+        <button type="button" class="btn btn-secondary" data-action="json">
+          Download record (JSON)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="hf">
+          Download card (Hugging Face Markdown)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="cdx">
+          Download ML-BOM (CycloneDX JSON)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="csv">
+          Download checklist (CSV)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="print">Print</button>
+      </div>
+      <p class="tool-status" role="status" data-bld-result-status></p>
+
+      <div class="tool-field bld-import" data-print-hide>
+        <label for="mc-import">Open a saved card (JSON)</label>
+        <input
+          class="tool-input"
+          id="mc-import"
+          type="file"
+          accept=".json,application/json"
+          aria-describedby="mc-import-hint"
+          data-bld-import
+        />
+        <p class="tool-hint" id="mc-import-hint">
+          A record exported here, or any record of the model-card schema. Read in this browser; it
+          replaces the form.
+        </p>
+        <p class="tool-error" id="mc-import-error" data-bld-import-error hidden></p>
+      </div>
+    </section>
+  </div>
+
+  <Fragment slot="guide">
+    <h2 id="mc-how">How to use it</h2>
+    <ol>
+      <li>
+        Say what the card is read against: part of a high-risk system, a general-purpose AI model,
+        both or neither. That switches the EU AI Act parts of the checklist on or off.
+      </li>
+      <li>
+        Fill what you know. Leave the rest empty: the Hugging Face card marks it "[More Information
+        Needed]", as the Hub template does, and the checklist shows the gap.
+      </li>
+      <li>
+        Choose "Check the card" to validate the record against the <a
+          href="/schemas/model-card.v1.json"><code>model-card</code> schema</a
+        >, then download the formats you need. Keep the JSON record next to the model: the other
+        two are generated from it.
+      </li>
+    </ol>
+    <p>
+      A model card describes one trained model; most risk sits in the system around it, so for a
+      system with tools or retrieval, fill the oversight and operation fields as a system card
+      <a href={cite(7)} class="cite">[7]</a>. The draft stays in this browser (local storage), not in
+      the link.
+    </p>
+
+    <h3 id="mc-by-hand">By hand, without JavaScript</h3>
+    <p>
+      Use the <a href="/templates/model-card.md">model card template</a>, which names every field of
+      the record, and read it against the checklist below.
+    </p>
+
+    <h2 id="mc-checklist">What the checklist reads</h2>
+    <p>
+      Each requirement lists the card fields that evidence it. Covered means every field is
+      filled; partly covered, some. Some requirements live in another artefact the card can only
+      link, such as the risk management system or the declaration of conformity: those read
+      Linked or Not linked. The EU AI Act references are to Art. 11(1) with Annex IV, Art. 13(3)
+      and Art. 53(1) <a href={cite(1)} class="cite">[1]</a>; ISO/IEC 42001 by Annex A control area
+      <a href={cite(5)} class="cite">[5]</a>; the NIST AI RMF by subcategory
+      <a href={cite(6)} class="cite">[6]</a>. A filled field is evidence that the card says
+      something, not that what it says is adequate. Illustrative, not a claim of conformity.
+    </p>
+    {
+      checklistGroups.map((group) => (
+        <div class="tool-table-wrap">
+          <table class="tool-table">
+            <caption>
+              {group.label} ({appliesLabel[group.applies]})
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Reference</th>
+                <th scope="col">Requirement</th>
+                <th scope="col">Card fields</th>
+              </tr>
+            </thead>
+            <tbody>
+              {modelCardChecklist
+                .filter((item) => item.group === group.id)
+                .map((item) => (
+                  <tr>
+                    <th scope="row" class="num">
+                      <a href={`/obligations/${item.obligation.toLowerCase()}`}>{item.ref}</a>
+                    </th>
+                    <td data-label="Requirement">
+                      {item.text}
+                      {item.elsewhere && (
+                        <Fragment>
+                          {' '}
+                          (lives in another artefact: <a href={item.elsewhere.href}>{item.elsewhere.label}</a>)
+                        </Fragment>
+                      )}
+                    </td>
+                    <td data-label="Card fields">
+                      {item.fields.map((field, i) => (
+                        <Fragment>
+                          {i > 0 ? (item.any ? ' or ' : ', ') : ''}
+                          <code>{field}</code>
+                        </Fragment>
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      ))
+    }
+
+    <h2 id="mc-hf">The Hugging Face style card</h2>
+    <p>
+      A Markdown file with YAML front matter, ready to be a model repository's
+      <code>README.md</code>. The front matter uses the Hub's metadata keys
+      (<code>license</code>, <code>language</code>, <code>library_name</code>, <code>tags</code>,
+      <code>datasets</code>, <code>metrics</code>, <code>base_model</code>)
+      <a href={cite(3)} class="cite">[3]</a>; the body follows the Hub template's headings, from
+      Model Details to Model Card Contact, and adds two sections the template lacks: oversight and
+      operation, and the coverage checklist. The Hub validates a licence against its own list of
+      identifiers, so use one of those (or <code>other</code>). The model card idea itself comes
+      from Mitchell et al. <a href={cite(4)} class="cite">[4]</a>.
+    </p>
+
+    <h2 id="mc-cdx">The CycloneDX ML-BOM</h2>
+    <p>
+      A CycloneDX 1.7 document (the current version as of {buildersAsOf}, released 21 Oct 2025)
+      holding one component of type <code>machine-learning-model</code> with its
+      <code>modelCard</code> <a href={cite(2)} class="cite">[2]</a>. It validates against the official
+      <code>bom-1.7.schema.json</code>, and merges into a larger AIBOM as one component (the
+      <a href="/patterns/aibom">AIBOM</a> pattern) <a href={cite(8)} class="cite">[8]</a>. Every
+      export gets a fresh random serial number and a timestamp. The fields map as follows:
+    </p>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>Card field to CycloneDX 1.7</caption>
+        <thead>
+          <tr>
+            <th scope="col">Card field</th>
+            <th scope="col">CycloneDX path</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            cdxMap.map(([from, to]) => (
+              <tr>
+                <th scope="row">
+                  <code>{from}</code>
+                </th>
+                <td data-label="CycloneDX path">
+                  <code>{to}</code>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="mc-not">What this is not</h2>
+    <p>
+      A card is one part of the technical file, not the file: it does not replace the risk
+      management record, the instructions for use, the declaration of conformity or the monitoring
+      plan, which it links. It does not decide whether the model is high-risk or a GPAI model. The
+      checklist reads the shape of the card, not the quality of its content.
+    </p>
+  </Fragment>
+
+  <ol class="sources" slot="sources">
+    {
+      modelCardSources.map((source, i) => (
+        <li id={`src-${i + 1}`}>
+          <span class="src-num">[{i + 1}]</span> {source.text} <a href={source.url}>{source.url}</a>{' '}
+          <span class="verified">(verified: {source.verified})</span>
+        </li>
+      ))
+    }
+  </ol>
+</ToolShell>

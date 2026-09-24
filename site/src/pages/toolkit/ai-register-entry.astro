@@ -1,0 +1,414 @@
+---
+// /toolkit/ai-register-entry: build AI system and agent register entries that
+// validate against the published schemas (ai-system-register-entry.v1 and
+// agent-register-entry.v1), keep a register of them in this browser, import
+// and export it as JSON or CSV, write a Markdown public summary and show, for
+// one entry, where each field goes in the UK ATRS, a Canada AIA, the EU
+// database (Annex VIII), a model or system card and an ISO/IEC 42001 SoA.
+// The form is built by the client (public/toolkit/schema-form.js) from the
+// specs in src/data/doc-builders.ts; the crosswalk, the CSV format and the
+// field lists render here, so the page is a worksheet without JavaScript.
+import ToolShell from '../../components/toolkit/ToolShell.astro';
+import { toolById, toolNotice } from '../../data/toolkit';
+import {
+  aiSystemSections,
+  agentSections,
+  registerCrosswalk,
+  crosswalkColumns,
+  registerSources,
+  buildersAsOf,
+} from '../../data/doc-builders';
+import { loadPublicSchema } from '../../lib/doc-builders-schemas';
+import { site } from '../../data/site';
+import '../../components/toolkit/builders.css';
+
+const tool = toolById('ai-register-entry');
+const schemas = {
+  system: loadPublicSchema('ai-system-register-entry.v1.json'),
+  agent: loadPublicSchema('agent-register-entry.v1.json'),
+};
+
+const data = {
+  version: 1,
+  notice: toolNotice,
+  page: new URL(tool.href, site.url).href,
+  asOf: buildersAsOf,
+  schemas,
+  sections: { system: aiSystemSections, agent: agentSections },
+  crosswalk: registerCrosswalk,
+  columns: crosswalkColumns,
+};
+
+const kinds = [
+  {
+    id: 'system',
+    label: 'AI system',
+    text: 'A model, an LLM application or a system built on them.',
+    schema: '/schemas/ai-system-register-entry.v1.json',
+    template: '/templates/ai-system-register-entry.md',
+    sections: aiSystemSections,
+  },
+  {
+    id: 'agent',
+    label: 'Agent',
+    text: 'A non-human actor with a workload identity, bounded tools and a kill switch.',
+    schema: '/schemas/agent-register-entry.v1.json',
+    template: '/templates/agent-register-entry.md',
+    sections: agentSections,
+  },
+];
+
+const cite = (n: number) => `#src-${n}`;
+---
+
+<ToolShell
+  tool={tool}
+  heading="One register entry, every register."
+  description="Build AI system and agent register entries that validate against open schemas, import and export a register as CSV or JSON, and map each field to ATRS, AIA and the EU database."
+  lede="Fill one entry for an AI system or an agent. It is checked against the published schema, kept in a register in this browser, exported as JSON, CSV or a Markdown public summary, and mapped field by field to the UK ATRS, a Canada AIA, the EU database, a model card and an ISO/IEC 42001 SoA."
+  data={data}
+  needsJs="the form, the checks, the register and the exports"
+>
+  <div class="bld-app" data-bld="register">
+    <fieldset class="tool-fieldset bld-kind" data-tool-js hidden>
+      <legend class="tool-legend">What are you registering?</legend>
+      <ul class="tool-options">
+        {
+          kinds.map((kind, i) => (
+            <li class="tool-option">
+              <input
+                type="radio"
+                id={`reg-kind-${kind.id}`}
+                name="reg-kind"
+                value={kind.id}
+                checked={i === 0}
+                data-reg-kind
+              />
+              <label for={`reg-kind-${kind.id}`}>
+                <span class="tool-option-level">{kind.label}</span>
+                <span class="tool-option-text">{kind.text}</span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <div
+      class="tool-errors"
+      id="reg-errors"
+      data-bld-errors
+      tabindex="-1"
+      role="group"
+      aria-labelledby="reg-errors-title"
+      hidden
+    >
+      <h2 id="reg-errors-title">Fix these fields</h2>
+      <ul></ul>
+    </div>
+
+    <form class="tool-form" id="reg-form" data-bld-form-el novalidate data-tool-js hidden>
+      <div class="bld-form" data-bld-form></div>
+      <div class="tool-buttons" data-print-hide>
+        <button type="submit" class="btn btn-primary">Check the entry</button>
+        <button type="button" class="btn btn-secondary" data-action="add">Add to the register</button>
+        <button type="button" class="btn btn-secondary" data-action="new">Start a new entry</button>
+      </div>
+      <p class="tool-status" role="status" data-bld-status></p>
+    </form>
+
+    <section
+      class="tool-result tool-block"
+      id="reg-result"
+      data-bld-result
+      aria-labelledby="reg-result-title"
+      data-tool-js
+      hidden
+    >
+      <h2 id="reg-result-title" tabindex="-1">This entry</h2>
+      <p class="bld-validity" data-bld-validity></p>
+      <div class="tool-actions" data-print-hide>
+        <button type="button" class="btn btn-secondary" data-action="entry-json">
+          Download entry (JSON)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="entry-md">
+          Download public summary (Markdown)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="xwalk-csv">
+          Download crosswalk (CSV)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="xwalk-md">
+          Download crosswalk (Markdown)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="print">Print</button>
+      </div>
+      <p class="tool-status" role="status" data-bld-result-status></p>
+      <div class="tool-table-wrap">
+        <table class="tool-table bld-xwalk">
+          <caption>Where this entry's fields go</caption>
+          <thead>
+            <tr>
+              <th scope="col">Field</th>
+              <th scope="col">This entry</th>
+              {crosswalkColumns.map((column) => <th scope="col">{column.label}</th>)}
+            </tr>
+          </thead>
+          <tbody data-bld-xwalk-rows></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section
+      class="tool-block bld-register"
+      id="reg-register"
+      aria-labelledby="reg-register-title"
+      data-tool-js
+      hidden
+    >
+      <h2 id="reg-register-title">The register</h2>
+      <p class="tool-intro">
+        Entries you add stay in this browser (local storage) until you clear them; nothing is sent
+        anywhere. Import a register exported earlier, or a CSV from a spreadsheet, to add entries in
+        bulk; each one is checked against its schema.
+      </p>
+      <div class="tool-table-wrap">
+        <table class="tool-table">
+          <caption>Entries in this browser</caption>
+          <thead>
+            <tr>
+              <th scope="col">Id</th>
+              <th scope="col">Name</th>
+              <th scope="col">Kind</th>
+              <th scope="col">Checks</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody data-bld-register-rows></tbody>
+        </table>
+      </div>
+      <p class="tool-hint" data-bld-register-empty>
+        No entries yet. Fill the form and choose "Add to the register", or import a file.
+      </p>
+
+      <div class="tool-field bld-import" data-print-hide>
+        <label for="reg-import">Import a register (JSON or CSV)</label>
+        <input
+          class="tool-input"
+          id="reg-import"
+          type="file"
+          accept=".json,.csv,application/json,text/csv"
+          aria-describedby="reg-import-hint"
+          data-bld-import
+        />
+        <p class="tool-hint" id="reg-import-hint">
+          A JSON record, a list of records or a register exported here; or a CSV with one entry per
+          row. Read in this browser and added to the register.
+        </p>
+        <p class="tool-error" id="reg-import-error" data-bld-import-error hidden></p>
+      </div>
+      <div class="bld-report" data-bld-import-report hidden>
+        <h3 id="reg-report-title">Import report</h3>
+        <ul data-bld-import-list></ul>
+      </div>
+
+      <div class="tool-actions" data-print-hide>
+        <button type="button" class="btn btn-secondary" data-action="reg-json">
+          Download register (JSON)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="reg-csv">
+          Download register (CSV)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="reg-md">
+          Download public summary of the register (Markdown)
+        </button>
+        <button type="button" class="btn btn-secondary" data-action="reg-clear">
+          Clear the register
+        </button>
+      </div>
+      <p class="tool-status" role="status" data-bld-register-status></p>
+    </section>
+  </div>
+
+  <Fragment slot="guide">
+    <h2 id="reg-how">How to use it</h2>
+    <ol>
+      <li>
+        Choose what you are registering: an AI system or an agent. Each kind has its own published
+        schema, and the entry is checked against it. The entry is the anchor every other record of
+        the system is filed against, the inventory of Layer 02 <a href={cite(9)} class="cite"
+          >[9]</a
+        >.
+      </li>
+      <li>
+        Fill the core first: id, version, owner, scope and expiry are required. The deploy pipeline
+        is the natural writer of those fields; intake adds the classification.
+      </li>
+      <li>
+        Fill the <strong>public record</strong> once if the system appears in any public register:
+        the crosswalk below shows where each of its fields goes.
+      </li>
+      <li>
+        Choose "Check the entry". Problems are listed at the top, each linked to its field. Then
+        add the entry to the register, download it, or start the next one.
+      </li>
+    </ol>
+
+    <h3 id="reg-by-hand">By hand, without JavaScript</h3>
+    <p>
+      Use the human templates, which name every field with its description:
+      {
+        kinds.map((kind, i) => (
+          <Fragment>
+            {i > 0 ? ' and ' : ''}
+            <a href={kind.template}>{kind.label.toLowerCase()} entry template</a> (schema:{' '}
+            <a href={kind.schema}>
+              <code>{kind.schema.replace('/schemas/', '')}</code>
+            </a>
+            )
+          </Fragment>
+        ))
+      }. The field lists below follow the form's sections.
+    </p>
+    {
+      kinds.map((kind) => (
+        <details class="bld-worksheet">
+          <summary>
+            {kind.label} entry: {kind.sections.reduce((n, s) => n + s.fields.length, 0)} fields in{' '}
+            {kind.sections.length} sections
+          </summary>
+          {kind.sections.map((section) => (
+            <Fragment>
+              <h4>{section.legend}</h4>
+              <ul>
+                {section.fields.map((field) => (
+                  <li>
+                    {field.label}
+                    {field.required ? ' (required)' : ''}: <code>{field.path}</code>
+                  </li>
+                ))}
+              </ul>
+            </Fragment>
+          ))}
+        </details>
+      ))
+    }
+
+    <h2 id="reg-crosswalk">One record, five regimes</h2>
+    <p>
+      Each regime asks for much the same facts under its own names. Write them once in the
+      register, then copy them across with this crosswalk. Field names are copied from each
+      source as of {buildersAsOf}; an empty cell means the regime has no field for it. The mapping
+      is illustrative, not a claim of conformity.
+    </p>
+    <ul>
+      <li>
+        <strong>UK ATRS</strong>, template v4.0 <a href={cite(3)} class="cite">[3]</a>: Tier 1
+        (Section 1, Summary information, for the general public) has four fields, 1.1 Name, 1.2
+        Description, 1.3 Website URL and 1.4 Contact email; Section 0 holds the record's metadata
+        (0.1 Title to 0.5 One sentence description); Tier 2 (sections 2.1 to 2.5) is for
+        specialist readers.
+      </li>
+      <li>
+        <strong>Canada AIA</strong> <a href={cite(4)} class="cite">[4]</a>: the Project Details
+        questions and the section names of the questionnaire. Its answers produce an impact level
+        (I to IV) under the Directive on Automated Decision-Making
+        <a href={cite(5)} class="cite">[5]</a>, which is the regime's own classification.
+      </li>
+      <li>
+        <strong>EU database</strong>, Annex VIII of the EU AI Act
+        <a href={cite(1)} class="cite">[1]</a>: Section A for providers of high-risk systems
+        (<code>Art. 49(1)</code>), Section B for providers relying on the <code>Art. 6(3)</code>
+        filter (<code>Art. 49(2)</code>) and Section C for deployers that register under
+        <code>Art. 49(3)</code>. The Digital Omnibus deleted Section B points 7 (summary of
+        grounds) and 9 (Member States) <a href={cite(2)} class="cite">[2]</a>.
+      </li>
+      <li>
+        <strong>Model or system card</strong>: the Hugging Face model card template headings
+        <a href={cite(6)} class="cite">[6]</a> and the CycloneDX 1.7 model card fields
+        <a href={cite(7)} class="cite">[7]</a>; the <a href="/toolkit/model-card"
+          >model card builder</a
+        > writes both.
+      </li>
+      <li>
+        <strong>ISO/IEC 42001 Statement of Applicability</strong>
+        <a href={cite(8)} class="cite">[8]</a>: the SoA lists the Annex A controls with the
+        justification for including or excluding each and whether it is implemented (verify the
+        clause wording). A register entry does not make an SoA; it supplies the evidence and the
+        justification for the rows named in the last column.
+      </li>
+    </ul>
+    <div class="tool-table-wrap">
+      <table class="tool-table bld-xwalk">
+        <caption>Register field to regime field</caption>
+        <thead>
+          <tr>
+            <th scope="col">Register field</th>
+            {crosswalkColumns.map((column) => <th scope="col">{column.label}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            registerCrosswalk.map((row) => (
+              <tr>
+                <th scope="row">
+                  {row.label}
+                  <span class="bld-path">{row.paths.join(' + ')}</span>
+                </th>
+                {crosswalkColumns.map((column) => (
+                  <td data-label={column.label}>{row[column.key] || 'No direct field'}</td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="reg-bulk">Bulk import and export</h2>
+    <ul>
+      <li>
+        <strong>JSON.</strong> One record, a list of records, or an object with an
+        <code>entries</code> list. A record's <code>$schema</code> says which kind it is; without
+        one, agent-only fields (workload identity, tools, kill switch) mark an agent.
+      </li>
+      <li>
+        <strong>CSV</strong> (RFC 4180). The header row holds the field names, nested ones with dots
+        (<code>risk_classification.internal_tier</code>, <code>public_record.contact_email</code>);
+        an optional <code>kind</code> column says <code>system</code> or <code>agent</code>. A list
+        of text goes in one cell, separated by <code>; </code>; a list of records (components,
+        tools, data access) goes in one cell as JSON. Booleans read <code>true</code>/<code
+          >false</code
+        > or <code>yes</code>/<code>no</code>.
+      </li>
+      <li>
+        The register CSV export uses the same shape, so an export imports back unchanged. Exported
+        text that a spreadsheet would run as a formula gets a leading apostrophe, which the import
+        removes.
+      </li>
+      <li>
+        Every imported entry is checked: the import report lists each entry that does not validate,
+        with its first problems, and the register table shows the count for every entry.
+      </li>
+    </ul>
+
+    <h2 id="reg-not">What this is not</h2>
+    <p>
+      It is not a registration in the EU database, an ATRS submission or a completed AIA: each
+      regime's own form and process decide. The crosswalk says where a field goes; it does not say
+      that a regime applies to your system. Drafts stay in this browser and are not in the link
+      you copy, because an entry can hold internal detail. The mappings are illustrative, not a
+      claim of conformity.
+    </p>
+  </Fragment>
+
+  <ol class="sources" slot="sources">
+    {
+      registerSources.map((source, i) => (
+        <li id={`src-${i + 1}`}>
+          <span class="src-num">[{i + 1}]</span> {source.text} <a href={source.url}>{source.url}</a>{' '}
+          <span class="verified">(verified: {source.verified})</span>
+        </li>
+      ))
+    }
+  </ol>
+</ToolShell>

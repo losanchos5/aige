@@ -125,6 +125,46 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         ['src/pages/figures/[id].astro', 'src/data/figures.ts', `src/figures/${figure.id}.svg`],
       ] as [string, string[]],
   ),
+  // Block w2-builders-a: the three document builders of /toolkit, each dated by
+  // its page, the builders' data and form engine, its client code and the
+  // published schema its record validates against.
+  [
+    '/toolkit/ai-register-entry',
+    [
+      'src/pages/toolkit/ai-register-entry.astro',
+      'src/data/doc-builders.ts',
+      'public/toolkit/ai-register-entry.js',
+      'public/toolkit/ai-register-entry-core.js',
+      'public/toolkit/schema-form.js',
+      'public/toolkit/builders.js',
+      'public/schemas/ai-system-register-entry.v1.json',
+      'public/schemas/agent-register-entry.v1.json',
+    ],
+  ],
+  [
+    '/toolkit/impact-assessment',
+    [
+      'src/pages/toolkit/impact-assessment.astro',
+      'src/data/doc-builders.ts',
+      'public/toolkit/impact-assessment.js',
+      'public/toolkit/impact-assessment-core.js',
+      'public/toolkit/schema-form.js',
+      'public/toolkit/builders.js',
+      'public/schemas/impact-assessment.v1.json',
+    ],
+  ],
+  [
+    '/toolkit/model-card',
+    [
+      'src/pages/toolkit/model-card.astro',
+      'src/data/doc-builders.ts',
+      'public/toolkit/model-card.js',
+      'public/toolkit/model-card-core.js',
+      'public/toolkit/schema-form.js',
+      'public/toolkit/builders.js',
+      'public/schemas/model-card.v1.json',
+    ],
+  ],
 ]);
 
 // Pages dated by their content rather than by git: each /obligations/<id> page

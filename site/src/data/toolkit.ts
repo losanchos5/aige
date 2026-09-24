@@ -56,6 +56,78 @@ export const tools: readonly ToolEntry[] = [
     href: '/toolkit/maturity-self-check',
     chapter: { label: '07. Maturity model', href: '/bok/maturity-model' },
   },
+  // Block w2-builders-a: three document builders whose records validate
+  // against the published schemas (public/schemas); data in doc-builders.ts.
+  {
+    id: 'ai-register-entry',
+    title: 'AI register entry builder',
+    summary:
+      'Build AI system and agent register entries that validate against the published schemas, keep a register in the browser and map each field to the UK ATRS, a Canada AIA, the EU database, a model card and an ISO/IEC 42001 SoA.',
+    audience: ['AI governance engineers', 'System and agent owners', 'Privacy and transparency leads'],
+    inputs: [
+      'One AI system or agent: identity, owner, scope, expiry, classification',
+      'Optionally, the public-record fields',
+      'Or a register file (JSON or CSV)',
+    ],
+    outputs: [
+      'Entry checked against its schema, problems linked to the fields',
+      'Register in JSON and CSV (re-importable)',
+      'Markdown public summary',
+      'Field crosswalk in CSV and Markdown',
+    ],
+    status: 'live',
+    href: '/toolkit/ai-register-entry',
+    chapter: {
+      label: '04. The stack (five layers)',
+      href: '/bok/the-stack#layer-02-inventory--transparency',
+    },
+  },
+  {
+    id: 'impact-assessment',
+    title: 'Impact assessment builder',
+    summary:
+      'Write a FRIA, an AI system impact assessment or an AI addendum to a DPIA as one record: the elements each instrument asks for, every risk linked to the measure and pattern that mitigate it, and the triggers that reopen it.',
+    audience: ['Deployers of high-risk systems', 'AI governance engineers', 'Privacy offices and DPOs'],
+    inputs: [
+      'The assessment type (FRIA, AIIA or DPIA addendum)',
+      'The elements of that instrument',
+      'Risks, measures, outcome, approvals and re-open triggers',
+    ],
+    outputs: [
+      'Record checked against the impact-assessment schema',
+      'Element coverage and a risk-to-measure matrix',
+      'JSON, YAML and Markdown exports',
+    ],
+    status: 'live',
+    href: '/toolkit/impact-assessment',
+    chapter: {
+      label: '14. Governing AI development',
+      href: '/bok/governing-development#impact-assessments-compared',
+    },
+  },
+  {
+    id: 'model-card',
+    title: 'Model card builder',
+    summary:
+      'Write a model or system card once and export it as a Hugging Face style card and a CycloneDX 1.7 ML-BOM component, with a checklist of what it covers under Annex IV, Art. 13, Art. 53, ISO/IEC 42001 and the NIST AI RMF.',
+    audience: ['Model owners and ML engineers', 'Model validation', 'AI governance engineers'],
+    inputs: [
+      'Model details, uses, data, evaluation, limits and oversight',
+      'Whether it is part of a high-risk system or a GPAI model',
+    ],
+    outputs: [
+      'Record checked against the model-card schema',
+      'Obligation coverage checklist',
+      'Hugging Face style Markdown with YAML front matter',
+      'CycloneDX 1.7 ML-BOM JSON',
+    ],
+    status: 'live',
+    href: '/toolkit/model-card',
+    chapter: {
+      label: '14. Governing AI development',
+      href: '/bok/governing-development#the-technical-file',
+    },
+  },
 ];
 
 /** The registry entry for `id`; throws at build time on an unknown id so a
