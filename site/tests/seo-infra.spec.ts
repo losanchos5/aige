@@ -3,6 +3,7 @@
 // 404 noindex header and the legacy favicon. Request-only, like infra.spec.ts;
 // the files are read from dist, which is what the preview server serves.
 import { test, expect } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -32,9 +33,26 @@ test.describe('sitemap', () => {
       expect(value).toMatch(/^\d{4}-\d{2}-\d{2}/);
       expect(value.slice(0, 10) <= today).toBe(true);
     }
-    // Not all pages share one date — that would mean a build-time stamp.
-    const dates = new Set(lastmods.map((raw) => raw.slice(9, 19)));
-    expect(dates.size).toBeGreaterThan(1);
+    // The dates come from git, not the build clock: a page with a single
+    // source carries exactly that file's last commit date. (One date across
+    // every page is fine after a site-wide commit, so the check is per page,
+    // not "the dates must differ".)
+    const byPath = new Map(
+      [...xml.matchAll(/<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/g)].map((m) => [
+        new URL(m[1]).pathname,
+        m[2].slice(0, 10),
+      ]),
+    );
+    const lastmodFor = (path: string) => byPath.get(path);
+    const commitDate = (file: string) =>
+      execFileSync('git', ['log', '-1', '--format=%cs', '--', file], { encoding: 'utf8' }).trim();
+    for (const [path, file] of [
+      ['/thesis', '../THESIS.md'],
+      ['/es/thesis', '../THESIS.es.md'],
+      ['/bok/definition', '../bok/01-definition.md'],
+    ] as const) {
+      expect(lastmodFor(path), path).toBe(commitDate(file));
+    }
   });
 });
 
