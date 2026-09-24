@@ -4,6 +4,26 @@ All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledg
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
 
+## Unreleased (v0.5.0)
+
+- Patterns get their own pages. Each of the 17 patterns of chapter 05 moved to
+  `bok/patterns/<slug>.md` (prose unchanged; sections one heading level up, citations renumbered
+  per page) and renders at `/patterns/<slug>` with the chapter layout: breadcrumb,
+  its archify diagram (moved from the chapter), glossary hover cards, its own numbered sources, a
+  "Cite this pattern" block and a pager in catalogue order. Each page adds one line under its
+  **Maps to** line naming the OWASP Agentic and NIST AI RMF sources and the "illustrative, not a
+  claim of conformity" notice; the "Related patterns" names now link to the pages.
+- `/patterns`: a new index of the catalogue grouped by the five stack layers.
+- Chapter 05 is now the catalogue: introduction, the pattern template, the pattern map and, under
+  each unchanged `## Pattern: <name>` heading, a short summary linking to the page, so every
+  published `/bok/patterns#pattern-*` link still lands on its pattern. Its sources are renumbered
+  (1-5) and a new one dates the harmonised-standards remark (none referenced in the Official
+  Journal as of 2026-09-24). The page no longer inlines 17 diagrams.
+- `/llms.txt` lists `/patterns`, every pattern page, the harms atlas, the cases, the templates and
+  the contract clauses; `/llms-full.txt` carries every pattern in full right after chapter 05.
+- The PDF build (`build/build_pdf.py`) prints every chapter file (00 to the last) and assembles
+  chapter 05 with the full text of every pattern in place of the catalogue summaries.
+
 ## [Unreleased] - 2026-09-20
 
 Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the

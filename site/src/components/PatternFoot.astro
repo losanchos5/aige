@@ -1,0 +1,323 @@
+---
+// PatternFoot: the foot of a pattern page (/patterns/<slug>): the "Edit this
+// page" link, a "Cite this pattern" disclosure with the same APA-ish reference,
+// BibTeX and share row a chapter carries, and a prev/next pager that walks the
+// catalogue order. It mirrors Doc's chapter footer, Citation and PrevNext, which
+// all build `/bok/<slug>` URLs; a pattern lives at /patterns/<slug>, so this
+// component builds its own. The copy buttons use the `data-copy-cite` hook that
+// /ui-doc.js already wires on every Doc page (CSP-safe, no inline JS).
+//
+// It renders inside the Doc slot (in article.prose), so it is kept out of the
+// search index and its scoped classes override the .prose element styles.
+import EditOnGitHub from './EditOnGitHub.astro';
+import { site } from '../data/site';
+
+interface Adjacent {
+  slug: string;
+  title: string;
+}
+
+interface Props {
+  /** Pattern name without the "Pattern: " prefix. */
+  title: string;
+  slug: string;
+  /** Repo-relative source file, e.g. "bok/patterns/policy-card.md". */
+  editPath: string;
+  prev?: Adjacent;
+  next?: Adjacent;
+}
+
+const { title, slug, editPath, prev, next } = Astro.props;
+const url = `${site.url}/patterns/${slug}`;
+const work = 'AI Governance Engineering: The Thesis & Body of Knowledge';
+const reference = `García Aibar, J. (2026). Pattern: ${title}. In ${work} (v${site.bokVersion}), chapter 05, Patterns. https://doi.org/${site.doi}. ${url}. ${site.license}`;
+
+// BibTeX for the whole work; the chapter and the pattern's canonical URL
+// identify the page being cited. The literal backslash escapes the ampersand.
+const bibtex = `@misc{aige2026bok,
+  author  = {${site.authors.join(' and ')}},
+  title   = {{AI Governance Engineering: The Thesis \\& Body of Knowledge}},
+  chapter = {05. Patterns: ${title.replace(/&/g, '\\&')}},
+  year    = {2026},
+  version = {${site.bokVersion}},
+  doi     = {${site.doi}},
+  url     = {${url}},
+  note    = {Version ${site.bokVersion}}
+}`;
+
+const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+---
+
+<div class="pf" data-pagefind-ignore>
+  <footer class="pf-foot">
+    <EditOnGitHub path={editPath} />
+    <div class="pf-cite">
+      <details class="pf-cite-box">
+        <summary>Cite this pattern</summary>
+        <div class="pf-cite-body">
+          <p class="pf-cite-apa">
+            García Aibar, J. (2026). <em>Pattern: {title}</em>. In <em>{work}</em>
+            (v{site.bokVersion}), chapter 05, Patterns.{' '}
+            <a href={`https://doi.org/${site.doi}`}>https://doi.org/{site.doi}</a>. {url}. {site.license}
+          </p>
+          <button type="button" class="pf-copy" data-copy-cite={reference}>Copy</button>
+
+          <p class="pf-cite-label">BibTeX</p>
+          <pre class="pf-bibtex"><code>{bibtex}</code></pre>
+          <button type="button" class="pf-copy" data-copy-cite={bibtex}>Copy BibTeX</button>
+        </div>
+      </details>
+
+      <div class="pf-share">
+        <a class="pf-share-link" href={linkedInUrl} target="_blank" rel="noopener">Share on LinkedIn</a>
+        <button type="button" class="pf-share-link" data-copy-cite={url}>Copy link</button>
+      </div>
+    </div>
+  </footer>
+
+  {
+    (prev || next) && (
+      <nav class="pager pf-pager" aria-label="Pattern navigation">
+        {prev ? (
+          <a class="pf-link prev card-lum lift" href={`/patterns/${prev.slug}`} rel="prev">
+            <span class="pf-dir">
+              <span class="pf-arrow" aria-hidden="true">←</span>
+              <span>Previous pattern</span>
+            </span>
+            <span class="pf-name">{prev.title}</span>
+          </a>
+        ) : (
+          <span />
+        )}
+        {next ? (
+          <a class="pf-link next card-lum lift" href={`/patterns/${next.slug}`} rel="next">
+            <span class="pf-dir">
+              <span>Next pattern</span>
+              <span class="pf-arrow" aria-hidden="true">→</span>
+            </span>
+            <span class="pf-name">{next.title}</span>
+          </a>
+        ) : (
+          <span />
+        )}
+      </nav>
+    )
+  }
+</div>
+
+<style>
+  /* The block sits inside article.prose: every rule below is class-scoped, so
+     it outranks the .prose element rules (p, a, pre) it would otherwise take. */
+  .pf {
+    margin-top: var(--s-7);
+  }
+
+  .pf-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--s-4);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  /* A flex item of the footer row: min-width 0 keeps the BibTeX block from
+     widening the page on a phone once the disclosure opens. */
+  .pf-cite {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .pf-cite-box {
+    font-size: 0.9375rem;
+  }
+
+  .pf-cite-box > summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--muted);
+    list-style: none;
+  }
+
+  .pf-cite-box > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .pf-cite-box > summary::before {
+    content: '+ ';
+  }
+
+  .pf-cite-box[open] > summary::before {
+    content: '– ';
+  }
+
+  .pf-cite-box > summary:hover {
+    color: var(--ink);
+  }
+
+  .pf-cite-body {
+    margin-top: var(--s-3);
+    padding: var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+  }
+
+  .pf-cite-apa {
+    margin: 0;
+    color: var(--ink-2);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .pf-cite-apa a {
+    color: inherit;
+  }
+
+  .pf-cite-label {
+    margin: var(--s-4) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .pf-bibtex {
+    max-width: 100%;
+    margin: var(--s-2) 0 0;
+    padding: var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .pf-bibtex code {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  .pf-copy {
+    margin-top: var(--s-3);
+    padding: var(--s-1) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: border-color var(--dur) var(--ease);
+  }
+
+  .pf-share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+  }
+
+  .pf-share-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: var(--s-1) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color var(--dur) var(--ease);
+  }
+
+  .pf-copy:hover,
+  .pf-share-link:hover {
+    border-color: var(--ink-2);
+  }
+
+  .pf-copy:focus-visible,
+  .pf-share-link:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  /* Pager: two equal tracks, prev left and next right, like the chapter pager. */
+  .pf-pager {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-4);
+    margin-top: var(--s-7);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .pf-link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    padding: var(--s-4);
+    text-decoration: none;
+    color: var(--ink);
+  }
+
+  @media (min-width: 600px) {
+    .pf-link {
+      padding-inline: var(--s-5);
+    }
+  }
+
+  .pf-link.next {
+    grid-column: 2;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .pf-dir {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .pf-arrow {
+    display: inline-block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pf-arrow {
+      transition: transform var(--dur) var(--ease);
+    }
+    .pf-link.prev:hover .pf-arrow {
+      transform: translateX(-4px);
+    }
+    .pf-link.next:hover .pf-arrow {
+      transform: translateX(4px);
+    }
+  }
+
+  .pf-name {
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    line-height: 1.25;
+  }
+</style>

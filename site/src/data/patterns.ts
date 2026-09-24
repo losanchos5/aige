@@ -1,21 +1,27 @@
-// patterns.ts: the typed index of the reusable patterns catalogued in
-// bok/05-patterns.md, used to draw the pattern-map infographic (five stack
-// layers, each holding the patterns that live in it: see
-// scripts/figures-build.mjs and src/data/figures.ts).
+// patterns.ts: the typed index of the reusable patterns catalogued in chapter 05.
+// Each pattern's full text lives in its own file, bok/patterns/<slug>.md (the
+// `patterns` content collection, rendered at /patterns/<slug>); chapter 05
+// (bok/05-patterns.md) is the catalogue that keeps one "## Pattern: <title>"
+// section per pattern, with a summary and a link, so every published
+// /bok/patterns#pattern-* anchor still resolves. This index draws the
+// pattern-map infographic (five stack layers, each holding the patterns that
+// live in it: see scripts/figures-build.mjs and src/data/figures.ts), the map
+// branch, the /patterns index and the prev/next order of the pattern pages.
 //
-// Each entry is faithful to the chapter: `id` is the anchor rehype-slug emits
-// for the pattern's H2 ("## Pattern: <title>" -> "pattern-<slug>"); `layer` is
-// the FIRST layer named on the pattern's "Maps to:" line, and `secondaryLayer`
-// the second one for the three dual-layer patterns; `mapsTo` lists the
-// frameworks named on that line, verbatim, with the trailing "Layer NN …" token
-// dropped. No pattern, framework or layer appears here that chapter 05 does not
-// state.
+// Each entry is faithful to the pattern file: `id` is the anchor rehype-slug
+// emits for the pattern's H2 in the catalogue ("## Pattern: <title>" ->
+// "pattern-<slug>"); `slug` is the page id and file name; `layer` is the FIRST
+// layer named on the pattern's "Maps to:" line, and `secondaryLayer` the second
+// one for the three dual-layer patterns; `mapsTo` lists the frameworks named on
+// that line, verbatim, with the trailing "Layer NN …" token dropped. The array
+// order is the catalogue order (the files' `order` frontmatter). No pattern,
+// framework or layer appears here that the pattern files do not state.
 //
-// KEEP IN SYNC: bok/05-patterns.md defines 17 patterns (the Adversarial
-// Red-Team Suite in Layer 03 and the Runtime Guardrail in Layer 04, once
-// planned, are now in the catalogue). When a "## Pattern:" heading is added to
-// the chapter, add its entry here too: tests/figures.spec.ts fails when the count of "## Pattern:"
-// headings in chapter 05 differs from the number of entries below.
+// KEEP IN SYNC: 17 patterns. When a pattern is added, add its file under
+// bok/patterns/, its "## Pattern:" section to chapter 05 and its entry here:
+// src/lib/pattern-pages.ts fails the build when the three disagree, and
+// tests/figures.spec.ts fails when the count of "## Pattern:" headings in
+// chapter 05 differs from the number of entries below.
 
 export type PatternLayer = 1 | 2 | 3 | 4 | 5;
 
@@ -23,6 +29,8 @@ export interface PatternDef {
   /** Anchor id of the pattern's H2, as rehype-slug (github-slugger) emits it
    *  from "Pattern: <title>", e.g. 'pattern-eval-gate-in-ci'. */
   id: string;
+  /** Page id and file name: /patterns/<slug>, bok/patterns/<slug>.md. */
+  slug: string;
   /** Pattern name, exactly as the H2 states it (without the "Pattern: " prefix). */
   title: string;
   /** The pattern's home layer: the first "Layer NN" on its "Maps to:" line. */
@@ -36,6 +44,7 @@ export interface PatternDef {
 export const patterns: readonly PatternDef[] = [
   {
     id: 'pattern-policy-card',
+    slug: 'policy-card',
     title: 'Policy Card',
     layer: 1,
     mapsTo: [
@@ -48,6 +57,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-eval-gate-in-ci',
+    slug: 'eval-gate-in-ci',
     title: 'Eval Gate in CI',
     layer: 3,
     mapsTo: [
@@ -59,6 +69,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-adversarial-red-team-suite',
+    slug: 'adversarial-red-team-suite',
     title: 'Adversarial Red-Team Suite',
     layer: 3,
     mapsTo: [
@@ -70,6 +81,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-agent-registry',
+    slug: 'agent-registry',
     title: 'Agent Registry',
     layer: 2,
     mapsTo: [
@@ -82,6 +94,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-aibom',
+    slug: 'aibom',
     title: 'AIBOM',
     layer: 2,
     mapsTo: [
@@ -93,6 +106,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-model-card-as-control-evidence',
+    slug: 'model-card-as-control-evidence',
     title: 'Model Card as Control Evidence',
     layer: 2,
     mapsTo: [
@@ -103,6 +117,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-continuous-assurance-telemetry',
+    slug: 'continuous-assurance-telemetry',
     title: 'Continuous Assurance Telemetry',
     layer: 5,
     mapsTo: [
@@ -114,6 +129,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-runtime-guardrail',
+    slug: 'runtime-guardrail',
     title: 'Runtime Guardrail',
     layer: 4,
     mapsTo: [
@@ -125,6 +141,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-kill-switch--circuit-breaker',
+    slug: 'kill-switch-circuit-breaker',
     title: 'Kill Switch / Circuit Breaker',
     layer: 4,
     mapsTo: [
@@ -137,6 +154,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-incident-pipeline',
+    slug: 'incident-pipeline',
     title: 'Incident Pipeline',
     layer: 5,
     mapsTo: [
@@ -147,6 +165,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-fria-as-code',
+    slug: 'fria-as-code',
     title: 'FRIA-as-Code',
     layer: 1,
     secondaryLayer: 2,
@@ -159,6 +178,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-framework-crosswalk',
+    slug: 'framework-crosswalk',
     title: 'Framework Crosswalk',
     layer: 1,
     secondaryLayer: 5,
@@ -172,6 +192,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-machine-readable-evidence-oscal',
+    slug: 'machine-readable-evidence-oscal',
     title: 'Machine-Readable Evidence (OSCAL)',
     layer: 5,
     mapsTo: [
@@ -182,6 +203,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-agent-identity--scoped-credentials',
+    slug: 'agent-identity-scoped-credentials',
     title: 'Agent Identity & Scoped Credentials',
     layer: 4,
     mapsTo: [
@@ -194,6 +216,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-human-in-the-loop-gate',
+    slug: 'human-in-the-loop-gate',
     title: 'Human-in-the-loop Gate',
     layer: 4,
     mapsTo: [
@@ -205,6 +228,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-shadow-ai-discovery',
+    slug: 'shadow-ai-discovery',
     title: 'Shadow-AI Discovery',
     layer: 2,
     mapsTo: [
@@ -217,6 +241,7 @@ export const patterns: readonly PatternDef[] = [
   },
   {
     id: 'pattern-vendor--model-due-diligence-gate',
+    slug: 'vendor-model-due-diligence-gate',
     title: 'Vendor / Model Due-Diligence Gate',
     layer: 2,
     secondaryLayer: 5,
@@ -232,4 +257,19 @@ export const patterns: readonly PatternDef[] = [
 /** Patterns whose home layer is `n`, in catalogue order. */
 export function patternsForLayer(n: PatternLayer): PatternDef[] {
   return patterns.filter((pattern) => pattern.layer === n);
+}
+
+/** Look up a pattern by its page slug (/patterns/<slug>). */
+export function getPatternBySlug(slug: string): PatternDef | undefined {
+  return patterns.find((pattern) => pattern.slug === slug);
+}
+
+/** The pattern's own page. */
+export function patternPath(pattern: Pick<PatternDef, 'slug'>): string {
+  return `/patterns/${pattern.slug}`;
+}
+
+/** The pattern's section in the chapter 05 catalogue (the published anchor). */
+export function patternCatalogueHref(pattern: Pick<PatternDef, 'id'>): string {
+  return `/bok/patterns#${pattern.id}`;
 }

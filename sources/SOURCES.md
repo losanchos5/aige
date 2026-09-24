@@ -112,6 +112,10 @@ _IAPP is the **2025** Profession Report. Respect the BRIEF blocklist._
 
 ### bok/05-patterns.md
 
+v0.4.0 numbering, when chapter 05 carried every pattern in full. The rows stay verified; from
+v0.5.0 the catalogue and the pattern pages number their own lists (see the section
+`bok/05-patterns.md (catalogue, v0.5.0) and bok/patterns/*.md` at the end of this file).
+
 | # | Claim | Source | Publisher | Date | URL | Verified | Used in |
 |---|---|---|---|---|---|---|---|
 | 1 | CSIRO Responsible AI Pattern Catalogue (template: summary, objectives, target users, impacted stakeholders, relevant principles, context, problem, solution, consequences; governance/process/product) | Responsible AI Pattern Catalogue | CSIRO | 2023–2024 | https://research.csiro.au/ss/science/projects/responsible-ai-pattern-catalogue/ | primary | Pattern template |
@@ -420,3 +424,157 @@ chapter and recorded once below._
 | 53 | 6.1 algorithmic impact assessment completed, approved and published on the Open Government Portal before production, updated on a schedule and when functionality or scope changes; 6.3.7 expert review; Appendix B impact levels defined by reversibility and duration | Directive on Automated Decision-Making | Treasury Board of Canada Secretariat | 2025-06-24 | https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=32592 | primary | Impact assessments compared; The technical file |
 | 54 | guidance for assessing impacts on individuals, groups and society throughout the life cycle, updated as needed; complements ISO/IEC 42001 and ISO/IEC 23894 | ISO/IEC 42005:2025, AI system impact assessment | ISO/IEC | 2025-05 | https://www.iso.org/standard/44545.html | primary | Impact assessments compared |
 | 55 | FRIA by deployers that are bodies governed by public law or private entities providing public services, and deployers of Annex III points 5(b) and (c), except point 2 systems; elements (a) to (f); results notified to the market surveillance authority; 27(4) relationship with the DPIA | EU AI Act Art. 27 | AI Act (Reg. (EU) 2024/1689) | 2024 | https://artificialintelligenceact.eu/article/27/ | primary | Impact assessments compared |
+
+### bok/05-patterns.md (catalogue, v0.5.0) and bok/patterns/*.md (pattern pages)
+
+From v0.5.0 each pattern has its own page, `bok/patterns/<slug>.md` (`/patterns/<slug>`), with its
+own `## Sources` numbered from `[1]`; chapter 05 keeps the catalogue with its own short list. Every
+row below reuses a row verified for the v0.4.0 chapter (section `bok/05-patterns.md` above, whose
+numbering this section supersedes) except catalogue row 4, verified 2026-09-24. On the pattern
+pages the OWASP Agentic and NIST AI RMF rows back the note under each **Maps to** line.
+
+#### bok/05-patterns.md (catalogue)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | CSIRO Responsible AI Pattern Catalogue (template: summary, objectives, target users, impacted stakeholders, relevant principles, context, problem, solution, consequences; governance/process/product) | Responsible AI Pattern Catalogue | CSIRO | 2023–2024 | https://research.csiro.au/ss/science/projects/responsible-ai-pattern-catalogue/ | primary | Introduction |
+| 2 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Introduction (Maps to IDs) |
+| 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Introduction (Maps to functions) |
+| 4 | No harmonised standard under the AI Act referenced in the Official Journal as of 2026-09-24; prEN 18286 entered public enquiry on 30 Oct 2025 | Standardisation of the AI Act | European Commission | 2026-08-03 | https://digital-strategy.ec.europa.eu/en/policies/ai-act-standardisation | primary | Introduction |
+| 5 | EU AI Act Art. 72 (post-market monitoring), Art. 73 (reporting of serious incidents) | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Pattern: Incident Pipeline (summary) |
+
+#### bok/patterns/adversarial-red-team-suite.md (Adversarial Red-Team Suite)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | MITRE ATLAS: adversarial tactics & techniques knowledge base for AI systems (incl. agents) | MITRE ATLAS | MITRE | 2026 | https://atlas.mitre.org/ | primary | Solution |
+| 2 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Solution; Maps to note |
+| 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/agent-identity-scoped-credentials.md (Agent Identity & Scoped Credentials)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | NCCoE: agents to be "known, trusted, and properly governed"; non-repudiation and tamper-proof logging | Software and AI Agent Identity and Authorization (concept paper) | NIST NCCoE | 2026-02-05 | https://www.nccoe.nist.gov/news-insights/new-concept-paper-identity-and-authority-software-agents | primary | Problem |
+| 2 | MCP spec 2026-07-28: DCR deprecated in favour of Client ID Metadata Documents; issuer-bound credentials | Model Context Protocol specification 2026-07-28 | MCP | 2026-07-28 | https://blog.modelcontextprotocol.io/posts/2026-07-28/ | primary | Solution |
+| 3 | Microsoft Entra Agent ID: first-class agent identity; OAuth 2.0, MCP, A2A | Microsoft Entra Agent ID | Microsoft Learn | 2026-04 | https://learn.microsoft.com/en-us/entra/agent-id/what-is-microsoft-entra-agent-id | primary | Solution |
+| 4 | Okta Agent SSO GA 24 Aug 2026; Cross App Access as the official MCP Enterprise-Managed Authorization extension | Okta brings first-class identity to AI agents with Agent SSO | Okta | 2026-08-24 | https://www.okta.com/newsroom/press-releases/okta-brings-first-class-identity-to-ai-agents-with-agent-sso/ | primary | Solution |
+| 5 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
+| 6 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/agent-registry.md (Agent Registry)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
+| 2 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/aibom.md (AIBOM)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | OWASP AIBOM generator; CycloneDX output | Evolving AI Transparency: AIBOM generator's new home at OWASP | OWASP GenAI Security Project | 2025-12-18 | https://genai.owasp.org/2025/12/18/evolving-ai-transparency-the-journey-of-the-aibom-generator-and-its-new-home-at-owasp/ | primary | Solution |
+| 2 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/continuous-assurance-telemetry.md (Continuous Assurance Telemetry)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | TAIP: NIST TEVV outputs as reusable AI Assurance Objects; trustworthiness as a continuously generated signal | TAIP (arXiv 2603.03340; submitted 15 Feb 2026) | n/a | 2026-02 | https://arxiv.org/abs/2603.03340 | primary | Summary; Solution |
+| 2 | AAGATE: NIST AI RMF-aligned, Kubernetes-native governance control plane for agentic AI in production | AAGATE (arXiv 2510.25863) | n/a | 2025-10 | https://arxiv.org/abs/2510.25863 | primary | Solution |
+| 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/eval-gate-in-ci.md (Eval Gate in CI)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
+| 2 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/framework-crosswalk.md (Framework Crosswalk)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | CSA AI Controls Matrix (AICM) v1.1: 247 control objectives across 18 domains | AI Controls Matrix v1.1 | Cloud Security Alliance | 2026-06-22 | https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1 | primary | Solution |
+| 2 | OWASP Agent Control Standard (ACS) unveiled Sept 2026 | OWASP GenAI release wave | OWASP GenAI Security Project | 2026-09-01 | https://genai.owasp.org/2026/09/01/owasp-genai-security-project-unveils-2026-top-10-for-llm-applications-new-agent-control-standard-and-sponsors-as-community-tops-30000-members/ | primary | Solution |
+| 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/fria-as-code.md (FRIA-as-Code)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | EU AI Act Art. 27 FRIA for deployers of Annex III high-risk; Art. 27(4) DPIA (GDPR Art. 35) cross-reference | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Solution |
+| 2 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/human-in-the-loop-gate.md (Human-in-the-loop Gate)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | EU AI Act Art. 14 (human oversight of high-risk AI systems) | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Solution |
+| 2 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
+| 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/incident-pipeline.md (Incident Pipeline)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | EU AI Act Art. 72 (post-market monitoring), Art. 73 (reporting of serious incidents) | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Solution |
+| 2 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/kill-switch-circuit-breaker.md (Kill Switch / Circuit Breaker)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | By 2029, >50% of successful attacks on AI agents will exploit access-control weaknesses and prompt injection | Press release (securing AI market) | Gartner | 2026-08-26 | https://www.gartner.com/en/newsroom/press-releases/2026-08-26-gartner-forecasts-the-market-for-securing-ai-will-reach-almost-5-billion-in-2027 | primary | Context |
+| 2 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
+| 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/machine-readable-evidence-oscal.md (Machine-Readable Evidence (OSCAL))
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | Making AI compliance evidence machine-readable via OSCAL + 16 property extensions; three-layer policy/evidence/enforcement architecture | Making AI Compliance Evidence Machine-Readable (arXiv 2604.13767) | UC3M | 2026-04-15 | https://arxiv.org/abs/2604.13767 | primary | Summary; Solution |
+| 2 | OSCAL native model (control / implementation / assessment layers; catalog, profile, component-definition, SSP, assessment-plan, assessment-results, POA&M) | OSCAL Layers and Models | NIST | 2026 | https://pages.nist.gov/OSCAL/learn/concepts/layer/ | primary | Solution |
+| 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/model-card-as-control-evidence.md (Model Card as Control Evidence)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/policy-card.md (Policy Card)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | Policy Cards: machine-readable, deployment-layer governance artefacts for AI agents linked to enforcement/audit pipelines | Policy Cards (arXiv 2510.24383) | Wong et al. | 2025-10 | https://arxiv.org/abs/2510.24383 | primary | Summary |
+| 2 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
+| 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/runtime-guardrail.md (Runtime Guardrail)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | Policy Cards: machine-readable, deployment-layer governance artefacts for AI agents linked to enforcement/audit pipelines | Policy Cards (arXiv 2510.24383) | Wong et al. | 2025-10 | https://arxiv.org/abs/2510.24383 | primary | Solution |
+| 2 | OWASP Agent Control Standard (ACS) unveiled Sept 2026 | OWASP GenAI release wave | OWASP GenAI Security Project | 2026-09-01 | https://genai.owasp.org/2026/09/01/owasp-genai-security-project-unveils-2026-top-10-for-llm-applications-new-agent-control-standard-and-sponsors-as-community-tops-30000-members/ | primary | Solution |
+| 3 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
+| 4 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/shadow-ai-discovery.md (Shadow-AI Discovery)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | One vendor's comparison finds much of the platform category "manages the program … without any runtime data path" | "Best AI Governance Platforms in 2026: 14 Enterprise Vendors Compared" (vendor-published; Kosmoy sells a competing product) | Kosmoy | 2026-07-10 | https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ | secondary | Context |
+| 2 | A security vendor's 2026 survey: one in eight AI breaches involved agentic systems | 2026 AI Threat Landscape Report (vendor survey) | HiddenLayer | 2026 | https://www.hiddenlayer.com/report-and-guide/threatreport2026 | primary | Problem |
+| 3 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
+| 4 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+
+#### bok/patterns/vendor-model-due-diligence-gate.md (Vendor / Model Due-Diligence Gate)
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | CSIRO Responsible AI Pattern Catalogue (template: summary, objectives, target users, impacted stakeholders, relevant principles, context, problem, solution, consequences; governance/process/product) | Responsible AI Pattern Catalogue | CSIRO | 2023–2024 | https://research.csiro.au/ss/science/projects/responsible-ai-pattern-catalogue/ | primary | Solution |
+| 2 | ISO/IEC 42001:2023 Annex A.10: third-party and customer relationships (supplier controls) | ISO/IEC 42001:2023 | ISO/IEC | 2023 | https://www.iso.org/standard/81230.html | secondary | Solution |
+| 3 | EU AI Act Arts. 25 (value-chain responsibilities), 26 (deployer obligations), 27 (FRIA): provider vs deployer duties | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Solution |
+| 4 | GPAI Code of Practice (published 10 Jul 2025; a voluntary tool; Transparency chapter Model Documentation Form for downstream providers) | The General-Purpose AI Code of Practice | European Commission | 2025-07-10 | https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai | primary | Solution |
+| 5 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |

@@ -1,0 +1,136 @@
+---
+// /patterns: the pattern catalogue as an index, grouped by the stack layer each
+// pattern lives in (its home layer; a pattern that straddles two is listed once
+// and marked with its second, as on the pattern map). Every card links to the
+// pattern's own page (/patterns/<slug>); chapter 05 (/bok/patterns) stays the
+// catalogue with the template and the map. No script: the layer jump list is
+// plain anchors, so the page is CSP-safe as it stands.
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import { site } from '../../data/site';
+import { layers } from '../../data/stack';
+import { loadPatternPages } from '../../lib/pattern-pages';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/patterns.css';
+
+const pages = await loadPatternPages();
+const pad = (n: number) => String(n).padStart(2, '0');
+const layerName = (n: number) => layers.find((layer) => layer.n === n)?.name ?? `Layer ${n}`;
+const groups = layers.map((layer) => ({
+  layer,
+  anchor: `layer-${pad(layer.n)}`,
+  pages: pages.filter((page) => page.def.layer === layer.n),
+}));
+
+const description =
+  'Reusable AI governance engineering patterns, one page each, grouped by the five stack layers: the artefact, where it runs and the evidence it leaves.';
+const crumbs = [{ label: 'Patterns' }];
+const pageUrl = new URL('/patterns', site.url).href;
+
+const jsonLd = [
+  {
+    '@type': 'CollectionPage',
+    '@id': `${pageUrl}#page`,
+    name: `Patterns · ${site.name}`,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+    hasPart: pages.map((page) => ({
+      '@id': `${new URL(`/patterns/${page.def.slug}`, site.url).href}#article`,
+    })),
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Base title="Patterns" description={description} image="/og/bok-patterns.png" jsonLd={jsonLd}>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="Patterns"
+    lede={`${pages.length} reusable patterns for engineering the governance of AI systems. Each names the artefact you ship, where it sits in the pipeline, what runs when and the evidence it leaves, and each lives in one of the five layers of the stack.`}
+  />
+
+  <div class="container res-page" data-pagefind-body>
+    <section class="res-section" aria-labelledby="pt-how">
+      <div class="res-section-head">
+        <h2 id="pt-how">How to read the catalogue</h2>
+        <p>
+          Every pattern follows the same fields (summary, objectives, context, problem, solution,
+          consequences, related patterns) and ends with a <strong>Maps to</strong> line and its own
+          numbered sources. The template, the pattern map and a short summary of each pattern are in
+          <a href="/bok/patterns">chapter 05</a>; the layers themselves are in
+          <a href="/bok/the-stack">chapter 04</a>. Mappings are illustrative, not a claim of
+          conformity.
+        </p>
+      </div>
+
+      <nav class="pt-jump" aria-label="Patterns by layer" data-pagefind-ignore>
+        <ul>
+          {
+            groups.map((group) => (
+              <li>
+                <a
+                  class="pt-jump-link"
+                  href={`#${group.anchor}`}
+                  style={`--pt-l: var(${group.layer.colorVar}); --pt-ink: var(${group.layer.colorVar}-ink)`}
+                >
+                  <span class="pt-jump-n">{pad(group.layer.n)}</span> {group.layer.name}
+                  <span class="pt-jump-count">({group.pages.length})</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </section>
+
+    {
+      groups.map((group) => (
+        <section
+          class="res-section pt-layer"
+          id={group.anchor}
+          aria-labelledby={`${group.anchor}-h`}
+          style={`--pt-l: var(${group.layer.colorVar}); --pt-ink: var(${group.layer.colorVar}-ink)`}
+        >
+          <div class="res-section-head">
+            <h2 id={`${group.anchor}-h`}>
+              <span class="pt-layer-n">Layer {pad(group.layer.n)}</span> {group.layer.name}
+            </h2>
+            <p>
+              {group.layer.tagline.replace(/\.$/, '')}.{' '}
+              <a href={`/bok/the-stack#${group.layer.chapterAnchor}`}>Read Layer {pad(group.layer.n)} in chapter 04</a>.
+            </p>
+          </div>
+
+          <ul class="pt-cards">
+            {group.pages.map(({ entry, def }) => (
+              <li>
+                <article class="pt-card" aria-labelledby={`pt-${def.slug}`}>
+                  <h3 id={`pt-${def.slug}`}>
+                    <a href={`/patterns/${def.slug}`}>{def.title}</a>
+                  </h3>
+                  <p>{entry.data.summary}</p>
+                  {def.secondaryLayer && (
+                    <p class="pt-also">
+                      Also Layer {pad(def.secondaryLayer)} {layerName(def.secondaryLayer)}
+                    </p>
+                  )}
+                  <p class="pt-maps">
+                    <span class="pt-maps-label">Maps to</span> {def.mapsTo.join(' · ')}
+                  </p>
+                </article>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</Base>
