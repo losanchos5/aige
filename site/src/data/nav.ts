@@ -42,11 +42,11 @@ export interface NavSection {
 }
 
 export interface NavGroup {
-  id: 'thesis' | 'bok' | 'practice' | 'reference' | 'map' | 'about';
+  id: 'thesis' | 'bok' | 'practice' | 'for-you' | 'reference' | 'map' | 'about';
   label: string;
   description: string;
-  /** Direct-link groups (thesis, map) and lead-link groups (bok, reference,
-   *  about) set this; Practice has no lead link. */
+  /** Direct-link groups (thesis, map) and lead-link groups (bok, for-you,
+   *  reference, about) set this; Practice has no lead link. */
   href?: string;
   items: NavItem[];
   /**
@@ -135,6 +135,54 @@ export const nav: NavGroup[] = [
         label: 'Agents',
         href: '/agents',
         description: 'Governing AI agents: registry, identity, permissions and kill switches.',
+      },
+    ],
+  },
+  {
+    id: 'for-you',
+    label: 'For you',
+    description: 'Six routes through the site, one per audience, with what to do this week.',
+    href: '/for',
+    items: [
+      {
+        label: 'Engineers',
+        href: '/for/engineers',
+        description: 'Build the controls that leave the evidence: pipeline, evals, runtime, records.',
+      },
+      {
+        label: 'CISOs and risk leads',
+        href: '/for/ciso-risk',
+        description: 'AI risk in the register you run: agentic threats, incident clocks, assurance.',
+      },
+      {
+        label: 'Legal counsel and DPOs',
+        href: '/for/legal-dpo',
+        description: 'The AI Act, data protection and existing law as obligations with artefacts.',
+      },
+      {
+        label: 'Executives and boards',
+        href: '/for/executives-board',
+        description: 'The decisions that are yours, the indicators to ask for, the dates ahead.',
+      },
+      {
+        label: 'Public sector',
+        href: '/for/public-sector',
+        description: 'FRIA before first use, registration, notice to citizens and procurement.',
+      },
+      {
+        label: 'SMEs and start-ups',
+        href: '/for/smes',
+        description: 'Proportionate governance: the floor, what the law eases, a first week.',
+      },
+      {
+        label: 'AIGP coverage map',
+        href: '/for/aigp',
+        description: 'Where the book teaches each AIGP BoK v2.1 indicator, with study paths.',
+      },
+      {
+        label: 'Certifications',
+        href: '/for/certifications',
+        description: 'AIGP, ISO/IEC 42001 schemes, AAISM and AAIA, neutrally, and how the book relates.',
       },
     ],
   },
@@ -279,12 +327,13 @@ function isPrefixOf(href: string, path: string): boolean {
 /**
  * Resolve the current route to the longest-prefix internal href and the group
  * that owns it. On a tie (e.g. `/bok/patterns` sits in both Body of Knowledge
- * and Practice) the Practice/Reference/Map/About/Thesis groups win over Body of
- * Knowledge, so a chapter surfaced by a Practice item lights Practice.
+ * and Practice) the Practice, For you, Reference, Map, About and Thesis groups
+ * win over Body of Knowledge, so a chapter surfaced by a Practice item lights
+ * Practice.
  */
 export function resolveCurrent(pathname: string): { href?: string; groupId?: string } {
   const path = normalise(pathname);
-  const priority: NavGroup['id'][] = ['thesis', 'practice', 'reference', 'map', 'about', 'bok'];
+  const priority: NavGroup['id'][] = ['thesis', 'practice', 'for-you', 'reference', 'map', 'about', 'bok'];
   const groups = [...nav].sort((a, b) => priority.indexOf(a.id) - priority.indexOf(b.id));
 
   let best: { href?: string; groupId?: string; len: number } = { len: -1 };

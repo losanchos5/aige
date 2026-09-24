@@ -123,6 +123,7 @@ export interface Audience {
  * they ship; the hub shows each only once toolkit.ts lists it as live.
  */
 export const PARALLEL_TOOL_IDS: readonly string[] = [
+  'policy-card',
   'ai-act-triage',
   'obligations-planner',
   'ai-register-entry',
@@ -325,9 +326,19 @@ export const audiences: readonly Audience[] = [
             why: 'Policy as data the pipeline reads, not a document it ignores.',
           },
           {
+            kind: 'tool',
+            id: 'policy-card',
+            why: 'Turn one rule into a Policy Card, a Rego module with tests and the CI hook.',
+          },
+          {
             kind: 'pattern',
             slug: 'eval-gate-in-ci',
             why: 'The pipeline stage that fails the build when an eval fails.',
+          },
+          {
+            kind: 'tool',
+            id: 'fairness-metric-chooser',
+            why: 'Choose the fairness metric before the eval suite runs, with its caveats.',
           },
           {
             kind: 'template',

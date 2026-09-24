@@ -12,6 +12,8 @@ import { site } from '../data/site';
 import { obligations, obligationPath } from '../data/frameworks';
 import { figures } from '../data/figures';
 import { tools as toolkitTools, toolNotice } from '../data/toolkit';
+import { audiences, audiencePath } from '../data/audiences';
+import { liveSiblingHubs } from '../lib/audiences';
 import { getGlossary } from '../lib/glossary';
 import { hasFigureArt } from '../lib/figure-reuse';
 import { loadPatternPages } from '../lib/pattern-pages';
@@ -25,6 +27,9 @@ import {
   textResponse,
 } from '../lib/llms';
 import { readSource } from '../lib/md-parse';
+
+/** The planned public endpoint of tools/mcp-server (README, "Connect"). */
+const MCP_ENDPOINT = 'https://mcp.aigovernanceengineer.com/mcp';
 
 export const GET: APIRoute = async (context) => {
   const origin = originOf(context.site);
@@ -76,6 +81,18 @@ export const GET: APIRoute = async (context) => {
       ),
     ]),
 
+    section('Routes by audience', [
+      linkLine(
+        'Routes by audience',
+        url('/for'),
+        'Six routes through the site, one per audience, each with what to do this week, the obligations that bind that audience and the questions it asks.',
+      ),
+      ...audiences.map((audience) =>
+        linkLine(audience.navLabel, url(audiencePath(audience)), audience.summary),
+      ),
+      ...liveSiblingHubs().map((hub) => linkLine(hub.label, url(`/for/${hub.slug}`), hub.summary)),
+    ]),
+
     section('Thesis', [
       linkLine(thesisEn.title, url('/thesis'), thesisEn.summary),
       linkLine(
@@ -105,6 +122,11 @@ export const GET: APIRoute = async (context) => {
         'API catalogue (JSON)',
         url('/api/v1/index.json'),
         'The machine-readable list of every /api/v1 dataset with its schema and page.',
+      ),
+      linkLine(
+        'Remote MCP server (read-only)',
+        MCP_ENDPOINT,
+        'A Model Context Protocol server (Streamable HTTP, no authentication) over the same /api/v1 data: the obligation register, the crosswalk, the glossary, the patterns, the templates and schemas, and the chapters; every answer names its source page. As of 2026-09-24 it is not deployed yet; its code and self-hosting guide are in tools/mcp-server of the repository.',
       ),
       linkLine(
         'Topic × framework crosswalk',

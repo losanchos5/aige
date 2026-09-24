@@ -1,7 +1,7 @@
 ---
 /**
- * Footer: a full site map built from data/nav.ts (brand + Read/Practice/
- * Reference/About columns, feeds & data and the project links, then every
+ * Footer: a full site map built from data/nav.ts (brand + Read/Practice/For
+ * you/Reference/About columns, feeds & data and the project links, then every
  * chapter grouped by part in a full-width block) over a meta line. Identity
  * values come from data/site.ts. The tinted band, grid texture and display
  * watermark are kept.
@@ -15,6 +15,7 @@ const byId = (id: NavGroup['id']) => nav.find((g) => g.id === id)!;
 const thesis = byId('thesis');
 const bok = byId('bok');
 const practice = byId('practice');
+const forYou = byId('for-you');
 const reference = byId('reference');
 const map = byId('map');
 const about = byId('about');
@@ -53,6 +54,18 @@ const about = byId('about');
         <p class="group-title" id="fg-practice">Practice</p>
         <ul aria-labelledby="fg-practice">
           {practice.items.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="col col-for-you">
+        <p class="group-title" id="fg-for-you">{forYou.label}</p>
+        <ul aria-labelledby="fg-for-you">
+          <li><a href={forYou.href}>All routes</a></li>
+          {forYou.items.map((item) => (
             <li>
               <a href={item.href}>{item.label}</a>
             </li>
@@ -186,16 +199,17 @@ const about = byId('about');
   }
 
   /* Phones: two tracks so the link groups pair up (the long Reference list
-     beside Feeds, the short About beside Project); the brand and the chapters
-     by part take full rows. */
+     beside Feeds, For you beside About, Project on its own); the brand and the
+     chapters by part take full rows. */
   .sitemap {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
       'brand brand'
       'read practice'
+      'for-you about'
       'reference feeds'
-      'about project'
+      'project project'
       'chapters chapters';
     gap: var(--s-6) var(--s-5);
   }
@@ -208,6 +222,9 @@ const about = byId('about');
   }
   .col-practice {
     grid-area: practice;
+  }
+  .col-for-you {
+    grid-area: for-you;
   }
   .col-reference {
     grid-area: reference;
@@ -244,11 +261,11 @@ const about = byId('about');
     }
   }
 
-  /* Wide: one track per column (brand, Read and five link groups), so no group
+  /* Wide: one track per column (brand, Read and six link groups), so no group
      wraps alone onto a second row. */
   @media (min-width: 1100px) {
     .sitemap {
-      grid-template-columns: 1.4fr repeat(6, minmax(max-content, 1fr));
+      grid-template-columns: 1.4fr repeat(7, minmax(max-content, 1fr));
     }
   }
 

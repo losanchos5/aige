@@ -20,6 +20,7 @@ const ROUTES: Record<string, string> = {
   obligations: 'The obligation register',
   figures: 'Figures of the Body of Knowledge',
   data: 'Open data and API',
+  for: 'Routes by audience',
 };
 
 export const getStaticPaths: GetStaticPaths = () => {

@@ -24,7 +24,22 @@ import { inSitemap } from './src/lib/sitemap-policy';
 // moves the page's `lastmod`. Never the build date: a rebuild must not claim
 // every page changed. Paths are relative to `site/` (the build cwd).
 const SOURCE_BY_PATH = new Map<string, readonly string[]>([
-  ['/', ['src/pages/index.astro', 'src/data/values.ts', 'src/data/role.ts', 'src/data/chapters.ts']],
+  // The home counts the registers it links to and shows the "What applies now"
+  // band (WhatAppliesNow.astro, lib/applies-now.ts), which reads the register.
+  [
+    '/',
+    [
+      'src/pages/index.astro',
+      'src/data/values.ts',
+      'src/data/role.ts',
+      'src/data/chapters.ts',
+      'src/data/parts.ts',
+      'src/data/stack.ts',
+      'src/components/WhatAppliesNow.astro',
+      'src/lib/applies-now.ts',
+      'src/data/frameworks.ts',
+    ],
+  ],
   ['/about', ['src/pages/about/index.astro', 'src/data/site.ts']],
   ['/about/changelog', ['src/pages/about/changelog.astro', '../bok/CHANGELOG.md']],
   ['/about/contributors', ['src/pages/about/contributors.astro', '../bok/CONTRIBUTORS.md']],
@@ -33,15 +48,51 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ['/about/methodology', ['src/pages/about/methodology.astro', 'src/data/site.ts']],
   // Block b-c23-agents: the /agents hub routes into chapter 23 and reads the
   // runtime tool categories from the stack data.
-  ['/agents', ['src/pages/agents.astro', '../bok/23-governing-agents.md', 'src/data/stack.ts']],
-  ['/bok', ['src/pages/bok/index.astro', 'src/data/chapters.ts']],
+  [
+    '/agents',
+    [
+      'src/pages/agents.astro',
+      '../bok/23-governing-agents.md',
+      'src/data/stack.ts',
+      'src/figures/agent-control-plane.svg',
+    ],
+  ],
+  ['/bok', ['src/pages/bok/index.astro', 'src/data/chapters.ts', 'src/data/parts.ts']],
   ['/cases', ['src/pages/cases/index.astro', 'src/data/cases.ts']],
   ['/map', ['src/pages/map.astro', 'src/data/map.ts']],
-  ['/path', ['src/pages/path.astro', 'src/data/path.ts']],
-  ['/resources', ['src/pages/resources/index.astro']],
+  ['/path', ['src/pages/path.astro', 'src/data/path.ts', 'src/data/audiences.ts']],
+  // The Resources hub counts the registers it links to, so their data modules
+  // date it too.
+  [
+    '/resources',
+    [
+      'src/pages/resources/index.astro',
+      'src/data/frameworks.ts',
+      'src/data/crosswalk.ts',
+      'src/data/harms.ts',
+      'src/data/cases.ts',
+      'src/data/contracts.ts',
+      'src/data/templates.ts',
+      'src/data/figures.ts',
+      'src/data/stack.ts',
+      'src/data/toolkit.ts',
+      'src/lib/api.ts',
+      'public/schemas',
+    ],
+  ],
   ['/resources/contracts', ['src/pages/resources/contracts.astro', 'src/data/contracts.ts']],
-  ['/resources/crosswalk', ['src/pages/resources/crosswalk.astro', 'src/data/crosswalk.ts']],
-  ['/resources/frameworks', ['src/pages/resources/frameworks.astro', 'src/data/frameworks.ts']],
+  [
+    '/resources/crosswalk',
+    ['src/pages/resources/crosswalk.astro', 'src/data/crosswalk.ts', 'public/crosswalk-explorer.js'],
+  ],
+  [
+    '/resources/frameworks',
+    [
+      'src/pages/resources/frameworks.astro',
+      'src/data/frameworks.ts',
+      'src/figures/instrument-lineage.svg',
+    ],
+  ],
   ['/resources/harms', ['src/pages/resources/harms.astro', 'src/data/harms.ts', 'src/data/cases.ts']],
   // The glossary and the reading list are parsed from their BoK chapters
   // (src/lib/glossary.ts, src/lib/reading-list.ts).
@@ -126,43 +177,6 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         ['src/pages/figures/[id].astro', 'src/data/figures.ts', `src/figures/${figure.id}.svg`],
       ] as [string, string[]],
   ),
-  // Block w2-integrator (integration of wave 1): these entries replace earlier
-  // ones for the same path (a Map keeps the last value). The crosswalk page
-  // also ships its explorer client; the Resources hub and the home count the
-  // registers they link to, so their data modules date them too.
-  [
-    '/resources/crosswalk',
-    ['src/pages/resources/crosswalk.astro', 'src/data/crosswalk.ts', 'public/crosswalk-explorer.js'],
-  ],
-  [
-    '/resources',
-    [
-      'src/pages/resources/index.astro',
-      'src/data/frameworks.ts',
-      'src/data/crosswalk.ts',
-      'src/data/harms.ts',
-      'src/data/cases.ts',
-      'src/data/contracts.ts',
-      'src/data/templates.ts',
-      'src/data/figures.ts',
-      'src/data/stack.ts',
-      'src/data/toolkit.ts',
-      'src/lib/api.ts',
-      'public/schemas',
-    ],
-  ],
-  [
-    '/',
-    [
-      'src/pages/index.astro',
-      'src/data/values.ts',
-      'src/data/role.ts',
-      'src/data/chapters.ts',
-      'src/data/parts.ts',
-      'src/data/stack.ts',
-    ],
-  ],
-  ['/bok', ['src/pages/bok/index.astro', 'src/data/chapters.ts', 'src/data/parts.ts']],
   // Block w2-threats (v0.5.0): the threat bridge, dated by its template and the
   // dataset it renders.
   ['/resources/threats', ['src/pages/resources/threats.astro', 'src/data/threats.ts']],

@@ -33,6 +33,8 @@ module.exports = {
         '/figures',
         '/toolkit',
         '/agents',
+        '/for',
+        '/for/engineers',
       ].map((path) => `http://localhost:${PORT}${path}`),
       settings: {
         preset: 'desktop',
