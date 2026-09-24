@@ -32,6 +32,13 @@ term's page carries the same comparison.
 
 ## A
 
+**A2A (Agent2Agent protocol).** An open protocol for agents to hand tasks to one another, at version
+1.0 since March 2026 [129] and a Growth Stage project of the Linux Foundation-directed Agentic AI
+Foundation since August 2026 [130]. Servers must authenticate every request, but authorisation, and
+the scope and revocation of authority granted mid-task, are left to the implementer [129]. Contrast
+with [MCP](/glossary/mcp). See [ch. 23, Multi-agent systems and delegation
+chains](/bok/governing-agents#multi-agent-systems-and-delegation-chains). (ch. 23)
+
 **Abstention band.** A range of scores in which a system does not act on its own but routes the case
 to a human reviewer. Its width is set by risk tier; the band size and the reviewers' override rate
 are monitored as signals. Conformal prediction gives one way to size it [20]. See [ch. 11, Certainty
@@ -41,7 +48,8 @@ required by risk tier](/bok/ai-defined#certainty-required-by-risk-tier). (ch. 11
 approved, which data classes may go where, duties to review and disclose outputs, logging,
 attestation before access and consequences. It is enforced through a sanctioned gateway and
 discovery, not the handbook alone. See [ch. 12, Acceptable use of AI by
-staff](/bok/governance-program#acceptable-use-of-ai-by-staff). (ch. 12)
+staff](/bok/governance-program#acceptable-use-of-ai-by-staff); [ch. 05, Pattern: Sanctioned AI
+Gateway](/patterns/sanctioned-ai-gateway). (ch. 05, 12)
 
 **Adaptiveness.** The ability of an AI system to change its behaviour while in use, through learning
 after deployment; optional under the EU AI Act definition [21]. For governance it is one change
@@ -58,7 +66,8 @@ States](/bok/privacy-and-ai#united-states). (ch. 19)
 
 **Adverse action notice.** The notice a US creditor must give when it denies or worsens credit,
 stating the specific principal reasons [23]. The reasons must be accurate even when the decision
-comes from a complex model, so reason codes need a fidelity test. See [ch. 20, Credit and
+comes from a complex model, so reason codes need a fidelity test. Contrast with [Decision
+notice](/glossary/decision-notice). See [ch. 20, Credit and
 lending](/bok/existing-law#credit-and-lending). (ch. 16, 20)
 
 **Adverse-impact ratio (AIR).** The selection rate of a group divided by the selection rate of the
@@ -76,12 +85,22 @@ bill](/bok/ai-laws-worldwide#spain-aesia-the-sandbox-and-a-bill). (ch. 08, 21)
 **Agent (agentic AI).** An AI system that acts (browses, executes code, calls APIs, moves data or
 delegates to other agents) under delegated authority, rather than only producing text. Agents are
 the hardest object to govern because their behaviour is emergent and their actions have external
-effects. See [ch. 11, Agentic systems](/bok/ai-defined#agentic-systems). (ch. 01, 11)
+effects. See [ch. 23, What makes an agent a governance
+object](/bok/governing-agents#what-makes-an-agent-a-governance-object); [ch. 11, Agentic
+systems](/bok/ai-defined#agentic-systems). (ch. 01, 11, 23)
+
+**Agent Card.** The JSON document an A2A agent publishes, usually at `/.well-known/agent-card.json`,
+describing its identity, skills, service endpoint and the authentication schemes it accepts. It can
+be signed with JWS over a canonicalised form, so a client can check that the card is untampered and
+comes from the claimed provider [129]. A peer allow-list admits only registered agents with verified
+cards. See [ch. 23, Multi-agent systems and delegation
+chains](/bok/governing-agents#multi-agent-systems-and-delegation-chains). (ch. 23)
 
 **Agent registry.** The runtime-aware inventory of every non-human actor (model, service and agent),
 each with an owner, a declared scope, a status and a kill switch, fed by a runtime data path rather
-than typed by hand. It is the artefact that answers "what AI is running?". See [ch. 05, Pattern:
-Agent Registry](/bok/patterns#pattern-agent-registry). (ch. 04, 05, 06)
+than typed by hand. It is the artefact that answers "what AI is running?". See [ch. 23, The agent
+registry](/bok/governing-agents#the-agent-registry); [ch. 05, Pattern: Agent
+Registry](/bok/patterns#pattern-agent-registry). (ch. 04, 05, 06, 23)
 
 **AI Act (EU).** Regulation (EU) 2024/1689, the EU's horizontal, risk-tiered law for AI, amended by
 the Digital Omnibus [2]. It classifies systems by risk (prohibited, high-risk, limited, minimal) and
@@ -181,7 +200,8 @@ lifecycle](/bok/principles-and-standards#the-oecd-ai-system-definition-and-lifec
 **AI washing.** Overstating or inventing the use or capability of AI in marketing or investor
 communications. US regulators treat it as deception; the SEC settled charges against two investment
 advisers over such claims in March 2024 [32]. See [ch. 20, Unfair and deceptive practices in the
-United States](/bok/existing-law#unfair-and-deceptive-practices-in-the-united-states). (ch. 20)
+United States](/bok/existing-law#unfair-and-deceptive-practices-in-the-united-states); [ch. 05,
+Pattern: Claims Substantiation Gate](/patterns/claims-substantiation-gate). (ch. 05, 20)
 
 **AIBOM.** AI bill of materials: the machine-readable inventory of an AI system's components
 (models, datasets, dependencies) in formats such as CycloneDX ML-BOM or the SPDX 3.0 AI profile. See
@@ -204,7 +224,8 @@ management-system trio](/bok/principles-and-standards#the-management-system-trio
 **Algorithmic disgorgement.** A remedy that orders deletion of models or algorithms developed with
 unlawfully obtained data, not only the data itself [33]. Complying, and proving it, requires lineage
 from each dataset to every model trained on it. See [ch. 20, Claims substantiation and algorithmic
-disgorgement](/bok/existing-law#claims-substantiation-and-algorithmic-disgorgement). (ch. 20)
+disgorgement](/bok/existing-law#claims-substantiation-and-algorithmic-disgorgement); [ch. 05,
+Pattern: Training-Data Rights Ledger](/patterns/training-data-rights-ledger). (ch. 05, 20)
 
 **Algorithmic Impact Assessment (AIA).** The assessment Canada's Directive on Automated
 Decision-Making requires before a federal automated decision system goes into production. It sets an
@@ -254,19 +275,24 @@ versus pseudonymisation](/bok/privacy-and-ai#anonymisation-versus-pseudonymisati
 **Article 6(3) filter.** The derogation under which an Annex III system is not high-risk when it
 poses no significant risk of harm and meets one of four conditions (narrow procedural task,
 improving completed human work, detecting patterns, preparatory task). Profiling of natural persons
-always defeats it; the provider documents and registers the assessment [2]. See [ch. 18, The Annex
-III filter and the profiling
-override](/bok/eu-ai-act#the-annex-iii-filter-and-the-profiling-override). (ch. 18)
+always defeats it; the provider documents and registers the assessment [2]. Contrast with [Profiling
+override](/glossary/profiling-override). See [ch. 18, The Annex III filter and the profiling
+override](/bok/eu-ai-act#the-annex-iii-filter-and-the-profiling-override); [Toolkit: EU AI Act role
+and risk-class triage](/toolkit/ai-act-triage). (ch. 18)
 
-**ASI01–ASI10.** The ten risks of the OWASP Top 10 for Agentic Applications 2026 (from ASI01 Agent
-Goal Hijack and ASI02 Tool Misuse through ASI03 Agent Identity & Privilege Abuse to ASI10 Rogue
-Agents), the canonical threat list for agents [6]. See [ch. 08, OWASP GenAI Security
-Project](/bok/regulatory-map#owasp-genai-security-project). (ch. 05, 08)
+**ASI01–ASI10.** The ten risks of the OWASP Top 10 for Agentic Applications 2026 [6]: ASI01 Agent
+Goal Hijack, ASI02 Tool Misuse and Exploitation, ASI03 Identity and Privilege Abuse, ASI04 Agentic
+Supply Chain Vulnerabilities, ASI05 Unexpected Code Execution (RCE), ASI06 Memory & Context
+Poisoning, ASI07 Insecure Inter-Agent Communication, ASI08 Cascading Failures, ASI09 Human-Agent
+Trust Exploitation and ASI10 Rogue Agents. See [ch. 23, Threats mapped to
+controls](/bok/governing-agents#threats-mapped-to-controls); [ch. 08, OWASP GenAI Security
+Project](/bok/regulatory-map#owasp-genai-security-project). (ch. 05, 08, 23)
 
 **ATLAS.** MITRE's Adversarial Threat Landscape for Artificial-Intelligence Systems, a knowledge
 base of adversary tactics and techniques against AI, including agent-specific techniques [7]. See
 [ch. 15, Threat modelling the deployed
-system](/bok/governing-deployment#threat-modelling-the-deployed-system). (ch. 05, 10, 15)
+system](/bok/governing-deployment#threat-modelling-the-deployed-system); [ch. 23, Threats mapped to
+controls](/bok/governing-agents#threats-mapped-to-controls). (ch. 05, 10, 15, 23)
 
 **Audit-ready evidence.** Evidence emitted as a by-product of the build in a form an auditor can
 read directly (machine-readable, signed, timestamped), so the audit is a query, not a collection
@@ -287,13 +313,22 @@ SCHUFA](/bok/privacy-and-ai#gdpr-article-22-after-schufa). (ch. 16, 19)
 Act Article 14 asks that people overseeing high-risk systems stay aware of it [2]; the human gate
 logs approver, time to decide and override rate so that degrading oversight is visible. See [ch. 11,
 Certainty required by risk tier](/bok/ai-defined#certainty-required-by-risk-tier); [ch. 04,
-Designing human oversight (Article 14)](/bok/the-stack#designing-human-oversight-article-14). (ch.
-04, 11)
+Designing human oversight (Article 14)](/bok/the-stack#designing-human-oversight-article-14); [ch.
+23, What a good approval looks like](/bok/governing-agents#what-a-good-approval-looks-like). (ch.
+04, 11, 23)
 
 **Autonomy.** In the EU AI Act and OECD texts, some degree of independence of action from human
 involvement, which almost every AI system has. ISO/IEC 22989 uses the word for a much stronger
 property, a system that can change its own goal or domain of use, and calls the ordinary case
-automation [40]. See [ch. 11, ISO/IEC 22989](/bok/ai-defined#isoiec-22989). (ch. 11)
+automation [40]. Contrast with [Autonomy level](/glossary/autonomy-level). See [ch. 11, ISO/IEC
+22989](/bok/ai-defined#isoiec-22989). (ch. 11, 23)
+
+**Autonomy level.** How far an agent acts without a person between its steps, set by the deployer as
+a design decision rather than taken as a property of the model; one research scale names five levels
+by the user's role, from operator to observer [122]. It is a registry field tied to a minimum
+control set, and raising it is a reviewed change. Contrast with [Autonomy](/glossary/autonomy). See
+[ch. 23, Autonomy is a design decision](/bok/governing-agents#autonomy-is-a-design-decision). (ch.
+15, 17, 23)
 
 ## B
 
@@ -322,8 +357,16 @@ Techniques](/bok/incidents#techniques). (ch. 17)
 **Blue-green deployment.** Two identical production environments with traffic switched between them,
 so a release can be rolled back by switching back [44]. It gives an AI system a tested, instant path
 to the previous version. Contrast with [Canary release](/glossary/canary-release). See [ch. 15,
-Progressive delivery as a control](/bok/governing-deployment#progressive-delivery-as-a-control).
-(ch. 15)
+Progressive delivery as a control](/bok/governing-deployment#progressive-delivery-as-a-control);
+[ch. 05, Pattern: Staged Rollout with Rollback
+Criteria](/patterns/staged-rollout-rollback-criteria). (ch. 05, 15)
+
+**Build provenance (SLSA).** A verifiable record, in the SLSA format, of what built an artefact, by
+what process and from which top-level inputs. Its build levels run from L1, provenance exists,
+through L2, signed by a hosted build platform, to L3, hardened builds whose provenance is very hard
+to forge [136]. For a model, inputs include the base model's digest and dataset admission records.
+Contrast with [Model signing](/glossary/model-signing). See [ch. 05, Pattern: Model Artefact
+Integrity](/patterns/model-artefact-integrity). (ch. 05)
 
 ## C
 
@@ -350,7 +393,8 @@ traffic, evaluated against a control group before the rollout continues [47]. Fo
 evaluation compares live quality, safety and fairness metrics with pre-registered rollback criteria.
 Contrast with [Shadow deployment](/glossary/shadow-deployment) and [Blue-green
 deployment](/glossary/blue-green-deployment). See [ch. 15, Progressive delivery as a
-control](/bok/governing-deployment#progressive-delivery-as-a-control). (ch. 15)
+control](/bok/governing-deployment#progressive-delivery-as-a-control); [ch. 05, Pattern: Staged
+Rollout with Rollback Criteria](/patterns/staged-rollout-rollback-criteria). (ch. 05, 14, 15, 23)
 
 **CAPA.** Corrective and preventive action, the output of an incident review. The corrective action
 fixes this instance; the preventive action stops the class of failure recurring across the fleet,
@@ -387,16 +431,29 @@ CEN and CENELEC that drafts the AI Act harmonised standards, including EN 18286 
 management and the drafts on risk management, trustworthiness and cybersecurity [50]. See [ch. 22,
 The JTC 21 programme](/bok/principles-and-standards#the-jtc-21-programme). (ch. 22)
 
-**CIMD.** Client ID Metadata Document: the MCP mechanism (2026 spec) by which a client identifies
-itself via a URL-addressable metadata document, replacing deprecated Dynamic Client Registration
-[8]. See [ch. 04, Layer 04: Runtime Controls &
-Observability](/bok/the-stack#layer-04-runtime-controls--observability). (ch. 04, 05)
+**CIMD.** Client ID Metadata Document: the mechanism by which an OAuth client identifies itself with
+a URL, used as its client ID, that points to its metadata document. The MCP specification of
+2026-07-28 has clients and authorisation servers support it and deprecates Dynamic Client
+Registration [8]; the IETF specification is still an Internet-Draft (revision 02, 6 Jul 2026) as of
+2026-09-24 [132]. See [ch. 23, MCP authorization as of
+2026-07-28](/bok/governing-agents#mcp-authorization-as-of-2026-07-28); [ch. 04, Layer 04: Runtime
+Controls & Observability](/bok/the-stack#layer-04-runtime-controls--observability). (ch. 04, 05, 23)
+
+**Claims register.** The record of every public statement about an AI system's accuracy, fairness,
+safety or capability: the exact wording, where it appears, and the eval run, measured value,
+interval and population behind it. Copy carrying a claim whose evidence is missing, stale or failing
+is not published; the FTC requires competent and reliable evidence for such claims when they are
+made [139]. See [ch. 20, Claims substantiation and algorithmic
+disgorgement](/bok/existing-law#claims-substantiation-and-algorithmic-disgorgement); [ch. 05,
+Pattern: Claims Substantiation Gate](/patterns/claims-substantiation-gate). (ch. 05, 20)
 
 **Classification decision record.** A versioned registry record of why a system sits on a given rung
 of the AI Act risk ladder: the Annex III point, any Article 6(3) condition relied on, an explicit
 profiling flag, the reviewer and the date [2]. It is re-evaluated whenever the intended purpose
-changes. See [ch. 18, The Annex III filter and the profiling
-override](/bok/eu-ai-act#the-annex-iii-filter-and-the-profiling-override). (ch. 18)
+changes. Contrast with [Profiling override](/glossary/profiling-override). See [ch. 18, The Annex
+III filter and the profiling
+override](/bok/eu-ai-act#the-annex-iii-filter-and-the-profiling-override); [Toolkit: EU AI Act role
+and risk-class triage](/toolkit/ai-act-triage). (ch. 18)
 
 **Common specifications.** Technical specifications the Commission may adopt by implementing act
 under AI Act Article 41 when a standardisation request is not accepted, the standards are late or
@@ -432,11 +489,21 @@ approach to synthetic-content transparency [53]. Contrast with
 [Watermarking](/glossary/watermarking) and [Data provenance](/glossary/data-provenance). See [ch.
 20, Deepfakes and synthetic media](/bok/existing-law#deepfakes-and-synthetic-media). (ch. 18, 20)
 
+**Contest path.** The route by which a person affected by an automated decision reaches a reviewer
+who did not take the original decision, sees the inputs, the reasons and the person's
+representations, and can change the outcome, with the result written back to the decision record. It
+is how the right to contest in GDPR Article 22(3) is honoured in practice [38]. Contrast with
+[Contestability](/glossary/contestability). See [ch. 19, GDPR Article 22 after
+SCHUFA](/bok/privacy-and-ai#gdpr-article-22-after-schufa); [ch. 05, Pattern: Decision Notice &
+Contest Path](/patterns/decision-notice-contest-path). (ch. 05, 19, 22)
+
 **Contestability.** The ability of a person affected by an AI-supported decision to challenge it and
 obtain a response that can change it. GDPR Article 22(3) gives a right to contest solely automated
 decisions [38], and the OECD principles ask that people adversely affected can challenge an output
-[31]. Contrast with [Recourse](/glossary/recourse). See [ch. 16, The legal hooks for
-explanations](/bok/fairness-and-explainability#the-legal-hooks-for-explanations). (ch. 12, 16)
+[31]. Contrast with [Recourse](/glossary/recourse) and [Contest path](/glossary/contest-path). See
+[ch. 16, The legal hooks for
+explanations](/bok/fairness-and-explainability#the-legal-hooks-for-explanations); [ch. 05, Pattern:
+Decision Notice & Contest Path](/patterns/decision-notice-contest-path). (ch. 05, 12, 16)
 
 **Continuous assurance.** Assurance produced continuously from telemetry rather than at a point in
 time; the control's status is a live query, not an annual sign-off. It is Level 5 of the maturity
@@ -453,7 +520,8 @@ use-case risk profile](/bok/risk-management#contributing-factors-and-the-use-cas
 **Controller and processor.** Under the GDPR the controller decides the purposes and means of
 processing and carries most duties; the processor acts on its documented instructions [38]. An AI
 vendor serving your inference is usually a processor, but becomes a controller for any use of your
-data it decides on, such as training. See [ch. 19, Controller, processor or joint
+data it decides on, such as training. Contrast with [Sub-processor](/glossary/sub-processor). See
+[ch. 19, Controller, processor or joint
 controller](/bok/privacy-and-ai#controller-processor-or-joint-controller). (ch. 19)
 
 **Counterfactual explanation.** An explanation that states the smallest change to the input that
@@ -465,8 +533,17 @@ explanations](/bok/fairness-and-explainability#counterfactual-explanations). (ch
 **Counterfactual fairness.** The requirement that a decision about an individual be the same in a
 counterfactual world where the individual belonged to a different group, defined through a causal
 model [55]; approximated in practice by counterfactual flip tests. Contrast with [Counterfactual
-explanation](/glossary/counterfactual-explanation). See [ch. 16, Individual and counterfactual
+explanation](/glossary/counterfactual-explanation) and [Counterfactual flip
+test](/glossary/counterfactual-flip-test). See [ch. 16, Individual and counterfactual
 fairness](/bok/fairness-and-explainability#individual-and-counterfactual-fairness). (ch. 16)
+
+**Counterfactual flip test.** A test that changes only a protected attribute in an input, or swaps
+identity terms in otherwise identical prompts, and measures how often the outcome or the answer
+quality changes. It is the practical approximation of counterfactual fairness [55] and runs in the
+fairness eval suite. Contrast with [Counterfactual fairness](/glossary/counterfactual-fairness). See
+[ch. 16, Individual and counterfactual
+fairness](/bok/fairness-and-explainability#individual-and-counterfactual-fairness); [ch. 05,
+Pattern: Fairness Eval Suite](/patterns/fairness-eval-suite). (ch. 05, 16)
 
 ## D
 
@@ -504,13 +581,22 @@ policies you already have](/bok/governance-program#updating-the-policies-you-alr
 admission record is complete and signed by the data owner: lawful basis or licence, reservation
 checks, quality results, provenance, permitted uses and retention. It evidences the data-governance
 practices of AI Act Article 10 [2]. See [ch. 14, Owners, stewards and the admission
-gate](/bok/governing-development#owners-stewards-and-the-admission-gate). (ch. 14)
+gate](/bok/governing-development#owners-stewards-and-the-admission-gate); [ch. 05, Pattern: Dataset
+Admission Gate](/patterns/dataset-admission-gate). (ch. 05, 14)
 
 **Datasheet for datasets.** Documentation that accompanies a dataset with its motivation,
 composition, collection process, preprocessing, uses, distribution and maintenance, as proposed by
 Gebru and colleagues [58]; the human-readable companion to the dataset admission record and the data
 card. Contrast with [Data card](/glossary/data-card). See [ch. 14, Model cards, system cards and
 datasheets](/bok/governing-development#model-cards-system-cards-and-datasheets). (ch. 14)
+
+**Decision notice.** The notice a person receives at the point of an automated or AI-assisted
+decision, rendered from a versioned template and the decision record: that a system was used, the
+principal reasons and what the person can do by when. Content follows each regime, such as notice of
+use under AI Act Article 26(11) or reasons under US Regulation B [2][23]. Contrast with [Adverse
+action notice](/glossary/adverse-action-notice). See [ch. 18, Deployer duties (Article
+26)](/bok/eu-ai-act#deployer-duties-article-26); [ch. 05, Pattern: Decision Notice & Contest
+Path](/patterns/decision-notice-contest-path). (ch. 05, 08, 18)
 
 **Decision threshold.** The score above or below which an AI output triggers an action. It is where
 risk appetite becomes behaviour, so it is governed as a policy with an owner, version and effective
@@ -522,7 +608,9 @@ metrics [2]. See [ch. 11, A score is not a decision](/bok/ai-defined#a-score-is-
 transition, sunset notices, a final evidence snapshot, archive or disposal of weights and data,
 revocation of every identity, and a registry entry marked retired rather than deleted. NIST asks
 that systems be phased out safely [29]. See [ch. 15, Retirement and
-decommissioning](/bok/governing-deployment#retirement-and-decommissioning). (ch. 15)
+decommissioning](/bok/governing-deployment#retirement-and-decommissioning); [ch. 05, Pattern:
+Deactivation, Localisation & Retirement
+Runbook](/patterns/deactivation-localisation-retirement-runbook). (ch. 05, 15)
 
 **Deepfake.** Under the EU AI Act, a deep fake is AI-generated or manipulated image, audio or video
 content that resembles existing persons, objects, places, entities or events and would falsely
@@ -530,6 +618,21 @@ appear to a person to be authentic; deployers must disclose it, with lighter dut
 or satire [2]. Contrast with [Content provenance (C2PA)](/glossary/content-provenance-c2pa). See
 [ch. 20, Deepfakes and synthetic media](/bok/existing-law#deepfakes-and-synthetic-media); [ch. 18,
 Transparency cases (Article 50)](/bok/eu-ai-act#transparency-cases-article-50). (ch. 18, 20)
+
+**Delegation (OAuth token exchange).** In RFC 8693, the mode in which one party acts for another
+while both stay identifiable: the token names the subject and, in its act claim, the current actor,
+with nested act claims for earlier actors [123]. Under impersonation the actor becomes
+indistinguishable from the subject. An agent should hold a delegated, narrower token, never the
+user's own. Contrast with [Delegation chain](/glossary/delegation-chain) and [Token
+passthrough](/glossary/token-passthrough). See [ch. 23, Delegation without
+impersonation](/bok/governing-agents#delegation-without-impersonation). (ch. 23)
+
+**Delegation chain.** The sequence of agents a task passes through from the person or system that
+started it. It is governed so that each hop authenticates as itself, scope narrows or stays equal
+but never widens, the purpose travels with the task, depth and fan-out are bounded, and one trace
+spans every hop. Contrast with [Delegation (OAuth token
+exchange)](/glossary/delegation-oauth-token-exchange). See [ch. 23, Accountability across
+hops](/bok/governing-agents#accountability-across-hops). (ch. 23)
 
 **Demographic parity.** A group fairness criterion that holds when the rate of positive decisions is
 equal across groups; the adverse-impact ratio is its ratio form. It ignores differences in base
@@ -608,6 +711,13 @@ general-purpose AI model providers must hand downstream [2]. Contrast with [Down
 (GPAI)](/glossary/downstream-modifier-gpai). See [ch. 18, The EU operator
 roles](/bok/eu-ai-act#the-eu-operator-roles). (ch. 18)
 
+**Downstream use register.** The record of every consumer of an AI system's outputs (a system, team,
+partner or training pipeline), each with its approved use, the re-test that cleared the outputs for
+that context and any contract, held against the producing system's registry entry. Access is granted
+per registered consumer, and a model change or retirement is notified to all of them. See [ch. 15,
+Secondary use and downstream harm](/bok/governing-deployment#secondary-use-and-downstream-harm);
+[ch. 05, Pattern: Downstream Use Register](/patterns/downstream-use-register). (ch. 05, 15)
+
 **DPIA.** Data Protection Impact Assessment: the GDPR Article 35 assessment of processing likely to
 result in high risk to individuals [38], maintained in this discipline as a versioned artefact, not
 a one-off document. Contrast with [FRIA](/glossary/fria). See [ch. 19, The DPIA for AI
@@ -617,8 +727,9 @@ systems](/bok/privacy-and-ai#the-dpia-for-ai-systems). (ch. 04, 05, 19)
 baseline over time; a runtime signal that a control or eval must catch. The two kinds to tell apart
 are data drift, in the inputs, and concept drift, in the input-to-answer relationship. Contrast with
 [Data drift](/glossary/data-drift) and [Concept drift](/glossary/concept-drift). See [ch. 15, Drift:
-what moves and how to see it](/bok/governing-deployment#drift-what-moves-and-how-to-see-it). (ch.
-04, 15)
+what moves and how to see it](/bok/governing-deployment#drift-what-moves-and-how-to-see-it); [ch.
+05, Pattern: Drift & Fairness Monitor](/patterns/drift-fairness-monitor); [ch. 17, AI-specific
+failure modes](/bok/incidents#ai-specific-failure-modes). (ch. 04, 05, 11, 15, 16, 17)
 
 **Dual use.** The capacity of the same AI capability to serve harmful ends as well as legitimate
 ones, for example a toxicity model inverted to propose toxic molecules [66]. It is answered with
@@ -692,9 +803,16 @@ explainability](/bok/fairness-and-explainability#transparency-interpretability-a
 method and version, baseline, reason codes, counterfactual, template, audience and delivery, written
 at decision time so the explanation can be reproduced when a person invokes a right to explanation
 [2]. See [ch. 16, Explanation artefacts as evidence
-records](/bok/fairness-and-explainability#explanation-artefacts-as-evidence-records). (ch. 16)
+records](/bok/fairness-and-explainability#explanation-artefacts-as-evidence-records); [ch. 05,
+Pattern: Explanation Artefact](/patterns/explanation-artefact). (ch. 05, 16)
 
 ## F
+
+**Failure posture.** What a guardrail, guardian agent or tool gateway does when it cannot reach a
+decision: fail open lets the call through, fail closed blocks it. The reference guardian of the
+OWASP Agent Control Standard starts at proceed unless set to deny [127]. The posture is a governance
+decision, set per operation class and recorded in the agent's Policy Card. See [ch. 23, Runtime
+guardrails for tool calls](/bok/governing-agents#runtime-guardrails-for-tool-calls). (ch. 23)
 
 **Failure to warn.** In product liability, a defect in instructions or warnings about non-obvious
 dangers [60]. For AI: undisclosed limitations or out-of-scope uses, which is why model cards and
@@ -718,6 +836,14 @@ case](/bok/fairness-and-explainability#choosing-a-fairness-metric-by-use-case). 
 predefined group but violates it on subgroups defined by combinations of attributes [71]; the reason
 intersectional testing is needed. See [ch. 16, Intersectional and subgroup
 testing](/bok/fairness-and-explainability#intersectional-and-subgroup-testing). (ch. 16)
+
+**Fairness policy.** The per-system record, fixed before results are seen, of what fairness means
+for that system: the protected attributes in each jurisdiction and where their values come from, the
+chosen metric and why, the threshold, the minimum cell size, the multiple-comparison correction and
+the approver. The fairness eval suite is judged against it. Contrast with
+[Fairness](/glossary/fairness). See [ch. 16, Fairness and explainability in the
+stack](/bok/fairness-and-explainability#fairness-and-explainability-in-the-stack); [ch. 05, Pattern:
+Fairness Eval Suite](/patterns/fairness-eval-suite). (ch. 05, 16)
 
 **Federated learning.** Training a model across devices or sites where the data lives, sharing model
 updates instead of raw records [72]. It limits data movement but does not by itself hide personal
@@ -770,12 +896,20 @@ training data and frontier
 developers](/bok/ai-laws-worldwide#provenance-training-data-and-frontier-developers); [ch. 08,
 Frontier-developer laws](/bok/regulatory-map#frontier-developer-laws). (ch. 08, 21)
 
+**Fulfilment record.** The per-request record of how a data-subject request was honoured wherever
+the person's data sits, from source systems, snapshots, retrieval indexes, logs and eval sets to
+model weights: the action in each, the model versions affected, any scheduled retrain and whether
+the GDPR deadline of one month, extendable by two, was met [38]. See [ch. 19, Recording how a
+request was honoured](/bok/privacy-and-ai#recording-how-a-request-was-honoured); [ch. 05, Pattern:
+Rights Requests Against Models](/patterns/rights-requests-against-models). (ch. 05, 08, 19)
+
 **Function creep.** The gradual reuse of personal data or an AI system for purposes nobody approved,
 usually by configuration rather than a new release. For personal data it breaches purpose limitation
 unless a compatibility assessment or new basis covers the new use [38]; negative space in the
 deployment record makes it detectable. See [ch. 19, Purpose limitation and function
 creep](/bok/privacy-and-ai#purpose-limitation-and-function-creep); [ch. 15, Secondary use and
-downstream harm](/bok/governing-deployment#secondary-use-and-downstream-harm). (ch. 14, 15, 19)
+downstream harm](/bok/governing-deployment#secondary-use-and-downstream-harm); [ch. 05, Pattern:
+Downstream Use Register](/patterns/downstream-use-register). (ch. 05, 14, 15, 19)
 
 ## G
 
@@ -815,18 +949,24 @@ models) [16]. See [ch. 08, GPAI Code of Practice](/bok/regulatory-map#gpai-code-
 advice-only, raised confidence thresholds, grounded-only answers, disabling for one group, language
 or region, and a return to the pilot cohort. Each is an operational toggle with a named trigger
 [77]. Contrast with [Kill switch](/glossary/kill-switch). See [ch. 15, Graduated
-degradation](/bok/governing-deployment#graduated-degradation). (ch. 15)
+degradation](/bok/governing-deployment#graduated-degradation); [ch. 05, Pattern: Deactivation,
+Localisation & Retirement Runbook](/patterns/deactivation-localisation-retirement-runbook). (ch. 05,
+15, 23)
 
 **Guardian agent.** An AI agent whose job is to supervise, check or constrain other agents at
 runtime; Gartner predicts guardian-agent technologies will account for at least 10 to 15% of agentic
 AI markets by 2030 [9]. Contrast with [Guardrail](/glossary/guardrail). See [ch. 04, Layer 04:
-Runtime Controls & Observability](/bok/the-stack#layer-04-runtime-controls--observability). (ch. 04)
+Runtime Controls & Observability](/bok/the-stack#layer-04-runtime-controls--observability); [ch. 23,
+Runtime guardrails for tool calls](/bok/governing-agents#runtime-guardrails-for-tool-calls). (ch.
+04, 23)
 
 **Guardrail.** A runtime control that inspects or mediates a model's or agent's inputs, outputs or
 tool calls and blocks, rewrites or escalates what breaks a policy, logging each decision as
 evidence. Guardrails are deterministic code or classifiers in the call path, unlike a guardian
 agent, which is itself an AI system. Contrast with [Guardian agent](/glossary/guardian-agent). See
-[ch. 05, Pattern: Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail). (ch. 04, 05)
+[ch. 05, Pattern: Runtime Guardrail](/bok/patterns#pattern-runtime-guardrail); [ch. 23, Runtime
+guardrails for tool calls](/bok/governing-agents#runtime-guardrails-for-tool-calls). (ch. 04,
+05, 23)
 
 ## H
 
@@ -852,6 +992,14 @@ standard. Contrast with [Harmonised standard](/glossary/harmonised-standard). Se
 Integrating with 27001, 27701 and
 9001](/bok/principles-and-standards#integrating-with-27001-27701-and-9001). (ch. 22)
 
+**Hidden Context Exposure.** LLM08:2026 in the OWASP LLM Top 10, which replaced System Prompt
+Leakage: extracting, inferring or reconstructing the hidden context a model sees, such as system
+prompts, developer instructions, retrieved policy text and tool schemas [128]. The advice is to
+assume hidden context is discoverable, keep credentials out of it and never rely on it as a security
+boundary. Contrast with [Prompt injection](/glossary/prompt-injection). See [ch. 23, Prompts as
+configuration under change
+control](/bok/governing-agents#prompts-as-configuration-under-change-control). (ch. 23)
+
 **High-impact AI (Korea).** Under Korea's AI Basic Act, an AI system that may significantly affect
 life, physical safety or fundamental rights and is used in a listed area such as health care, hiring
 and loan screening, biometric analysis, transport or public-service decisions. It triggers
@@ -863,9 +1011,9 @@ confirmed](/bok/ai-laws-worldwide#high-impact-ai-and-how-it-is-confirmed). (ch. 
 a product under Annex I legislation needing third-party conformity assessment, or that is used in an
 Annex III area, unless the Article 6(3) filter applies. It carries the Articles 8 to 15 requirements
 and provider and deployer duties [2]. Contrast with [Prohibited
-practice](/glossary/prohibited-practice) and [High-impact AI
-(Korea)](/glossary/high-impact-ai-korea). See [ch. 18, The risk
-ladder](/bok/eu-ai-act#the-risk-ladder). (ch. 18)
+practice](/glossary/prohibited-practice), [High-impact AI (Korea)](/glossary/high-impact-ai-korea)
+and [Risk tier](/glossary/risk-tier). See [ch. 18, The risk ladder](/bok/eu-ai-act#the-risk-ladder).
+(ch. 18)
 
 **Hiroshima Code of Conduct.** The G7's voluntary International Code of Conduct for Organizations
 Developing Advanced AI Systems (October 2023): 11 actions covering lifecycle risk evaluation,
@@ -876,7 +1024,8 @@ Process](/bok/principles-and-standards#g7-hiroshima-process). (ch. 22)
 **Holding statement.** A short public statement prepared in skeleton before any incident: what
 happened as far as it is known, what has been done to contain it, what affected people should do,
 and when the next update will come. It never speculates about cause. See [ch. 15, External
-communications](/bok/governing-deployment#external-communications). (ch. 15)
+communications](/bok/governing-deployment#external-communications); [ch. 05, Pattern: Disclosure &
+Notification Pipeline](/patterns/disclosure-notification-pipeline). (ch. 05, 15)
 
 **HUDERIA.** The Council of Europe's non-binding methodology for assessing the risks and impacts of
 AI systems on human rights, democracy and the rule of law [80]. Parties to the Framework Convention
@@ -887,8 +1036,9 @@ stack](/bok/principles-and-standards#what-the-convention-asks-for-and-what-it-ch
 **Human oversight.** The measures that let natural persons understand, monitor and, when needed,
 override or stop a high-risk AI system, required by AI Act Article 14, including awareness of
 automation bias and a way to halt the system safely [2]. Engineered as gates, review tooling and
-override drills that leave records. See [ch. 04, Designing human oversight (Article 14)](/bok/the-stack#designing-human-oversight-article-14).
-(ch. 04, 11)
+override drills that leave records. See [ch. 04, Designing human oversight (Article
+14)](/bok/the-stack#designing-human-oversight-article-14); [ch. 23, What a good approval looks
+like](/bok/governing-agents#what-a-good-approval-looks-like). (ch. 04, 11, 23)
 
 **Human-in-command (HIC).** The oversight mode, named by the EU High-Level Expert Group, in which
 people oversee the overall activity of an AI system and decide when and whether to use it in a given
@@ -901,7 +1051,9 @@ cycle of an AI system [81]; in engineering terms, a gate that holds each consequ
 a named approver decides, logging approver, time to decide and override. Contrast with
 [Human-on-the-loop (HOTL)](/glossary/human-on-the-loop-hotl). See [ch. 05, Pattern:
 Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate); [ch. 11, From definition
-element to registry field](/bok/ai-defined#from-definition-element-to-registry-field). (ch. 05, 11)
+element to registry field](/bok/ai-defined#from-definition-element-to-registry-field); [ch. 23,
+Human checkpoints and approval design](/bok/governing-agents#human-checkpoints-and-approval-design).
+(ch. 05, 11, 23)
 
 **Human-on-the-loop (HOTL).** The oversight mode in which a person can intervene in the design cycle
 and monitors the system's operation, rather than approving each decision [81]. The system acts;
@@ -911,6 +1063,12 @@ Contrast with [Human-in-the-loop (HITL)](/glossary/human-in-the-loop-hitl) and [
 field](/bok/ai-defined#from-definition-element-to-registry-field). (ch. 11)
 
 ## I
+
+**Implicit deny.** The authorisation rule that a request no policy explicitly permits is refused.
+Cedar denies by default and lets any matching forbid override every permit [141]; an agent's tool
+allow-list works the same way, so an unlisted tool is blocked without a rule of its own. See [ch.
+23, The tool allow-list](/bok/governing-agents#the-tool-allow-list); [Toolkit: Policy Card
+builder](/toolkit/policy-card#pc-engines). (ch. 08, 23)
 
 **Importer.** Under the EU AI Act, a person established in the Union who places on the market an AI
 system bearing the name or trademark of a provider established outside the Union. It must verify the
@@ -1026,7 +1184,9 @@ board](/bok/governance-program#kpis-and-kris-for-leadership-and-the-board). (ch.
 **Kill switch.** A tested mechanism to stop an agent or system from acting; a precondition of
 granting autonomy, registered against the agent's identity. Contrast with [Graduated
 degradation](/glossary/graduated-degradation). See [ch. 05, Pattern: Kill Switch / Circuit
-Breaker](/bok/patterns#pattern-kill-switch--circuit-breaker). (ch. 03, 05)
+Breaker](/bok/patterns#pattern-kill-switch--circuit-breaker); [ch. 23, Kill switch and per-agent
+circuit breakers](/bok/governing-agents#kill-switch-and-per-agent-circuit-breakers). (ch. 03,
+05, 23)
 
 ## L
 
@@ -1048,6 +1208,12 @@ lawful: consent, contract, legal obligation, vital interests, public task and le
 recorded per dataset and stage. See [ch. 19, Lawful basis for training versus
 inference](/bok/privacy-and-ai#lawful-basis-for-training-versus-inference). (ch. 19)
 
+**Least agency.** The principle, in the OWASP agentic list, of giving an agent no more autonomy than
+its task needs: agentic behaviour deployed where it is not needed widens the attack surface without
+adding value [6]. The cheapest agent control is the agent not built, such as a fixed workflow with
+one model call in place of a planner. Contrast with [Autonomy level](/glossary/autonomy-level). See
+[ch. 23, Governing AI agents](/bok/governing-agents). (ch. 23)
+
 **Legitimate-interest assessment (LIA).** The documented three-step test for relying on legitimate
 interests: a lawful, precise and present interest; processing necessary for it; and a balance not
 overridden by people's rights and reasonable expectations [88]. Kept as a versioned artefact that
@@ -1061,6 +1227,22 @@ attribution: SHAP, LIME and integrated
 gradients](/bok/fairness-and-explainability#feature-attribution-shap-lime-and-integrated-gradients).
 (ch. 16)
 
+**Localisation (by jurisdiction).** Controlling where an AI system runs and which features it offers
+in each jurisdiction, with per-jurisdiction rule sets as code, regional instances where residency
+requires them and feature flags by region, so one market can be switched off without touching the
+others. A system launches in a jurisdiction only once its duties there are shown to be met. See [ch.
+15, Localisation by jurisdiction](/bok/governing-deployment#localisation-by-jurisdiction); [ch. 05,
+Pattern: Deactivation, Localisation & Retirement
+Runbook](/patterns/deactivation-localisation-retirement-runbook). (ch. 05, 12, 15)
+
+**Loss of control.** One of the systemic risks the GPAI Code of Practice specifies: risks from
+humans losing the ability to reliably direct, modify or shut down a model, which may emerge from
+misalignment, self-replication, deception, resistance to goal modification or power-seeking [95].
+Signatories assess it for models with systemic risk; a deployer of agents asks how autonomy and tool
+use were evaluated. See [ch. 23, EU AI Act hooks for
+agents](/bok/governing-agents#eu-ai-act-hooks-for-agents); [ch. 08, GPAI Code of
+Practice](/bok/regulatory-map#gpai-code-of-practice). (ch. 08, 23)
+
 ## M
 
 **Machine learning.** The branch of AI in which a system improves at a task by learning patterns
@@ -1071,8 +1253,9 @@ paradigm](/bok/ai-defined#by-learning-paradigm). (ch. 11)
 **Machine unlearning.** Techniques that remove a training record's influence from a model without
 full retraining. Exact methods retrain an affected shard [90]; approximate methods adjust weights
 and are hard to verify, so an unlearning claim is tested with membership-inference or extraction
-evals. See [ch. 19, Suppression, retraining and
-unlearning](/bok/privacy-and-ai#suppression-retraining-and-unlearning). (ch. 19)
+evals. Contrast with [Output suppression](/glossary/output-suppression). See [ch. 19, Suppression,
+retraining and unlearning](/bok/privacy-and-ai#suppression-retraining-and-unlearning); [ch. 05,
+Pattern: Rights Requests Against Models](/patterns/rights-requests-against-models). (ch. 05, 19)
 
 **Machine-readable evidence.** Evidence a machine can query, diff and aggregate (`OSCAL` artefacts,
 structured eval results, signed logs), as opposed to screenshots and exported spreadsheets. See [ch.
@@ -1094,16 +1277,33 @@ types mapped to AI failure modes](/bok/existing-law#defect-types-mapped-to-ai-fa
 products placed on its market, with powers to investigate, demand documentation and require
 corrective action. See [ch. 18, Who supervises what](/bok/eu-ai-act#who-supervises-what). (ch. 08, 18)
 
+**Maturity floor.** The single overall maturity level of an AI governance function: the level of its
+weakest stack layer. It is a floor for planning, not a verdict on the whole function. The per-layer
+profile shows where the leverage is, and the next move is the next criterion in the weakest layer.
+See [ch. 07, Observable criteria by layer and
+level](/bok/maturity-model#observable-criteria-by-layer-and-level); [Toolkit: Maturity
+self-check](/toolkit/maturity-self-check). (ch. 07)
+
 **MCP.** Model Context Protocol: an open protocol for connecting AI applications to tools and data
 sources; its 2026 specification adds OAuth 2.1 resource-server patterns and issuer-bound credentials
-for agent authorisation [8]. See [ch. 04, Layer 04: Runtime Controls &
-Observability](/bok/the-stack#layer-04-runtime-controls--observability). (ch. 04, 05)
+for agent authorisation [8]. It secures the hop between one client and one server; which agent sits
+behind the client is for a workload identity to say. Contrast with [A2A (Agent2Agent
+protocol)](/glossary/a2a-agent2agent-protocol). See [ch. 23, MCP authorization as of
+2026-07-28](/bok/governing-agents#mcp-authorization-as-of-2026-07-28); [ch. 04, Layer 04: Runtime
+Controls & Observability](/bok/the-stack#layer-04-runtime-controls--observability). (ch. 04, 05, 23)
 
 **Membership inference.** An attack that determines whether a specific person's record was in a
 model's training set from the model's behaviour [92]. The EDPB counts resistance to it among the
 evidence for claiming a model is anonymous. Contrast with [Model
 inversion](/glossary/model-inversion). See [ch. 19, AI-specific privacy
 breaches](/bok/privacy-and-ai#ai-specific-privacy-breaches). (ch. 19)
+
+**Memory poisoning.** An injection that writes to an agent's long-term memory, a retrieval corpus, a
+vector store or a hosted memory service, and so taints every later session that reads from that
+store [128]. OWASP's agentic list has it as ASI06 Memory & Context Poisoning [6] and MITRE ATLAS as
+AI Agent Context Poisoning (AML.T0080) [126]. Contrast with [Prompt
+injection](/glossary/prompt-injection). See [ch. 23, Memory and context
+governance](/bok/governing-agents#memory-and-context-governance). (ch. 23)
 
 **Mitigation hierarchy.** The order in which risk treatments are tried: eliminate, substitute,
 engineer, administrative, then accept and monitor. Borrowed from the occupational-safety hierarchy
@@ -1130,11 +1330,23 @@ disclosing personal data. Contrast with [Membership inference](/glossary/members
 
 **Model risk management.** The banking-supervision practice of validating models for conceptual
 soundness, monitoring and outcomes analysis under effective challenge. SR 11-7 set the US tradition
-until SR 26-2 superseded it on 17 Apr 2026 [67]. A neighbour of this discipline, extended here to
-runtime behaviour and agents. Contrast with [Risk management](/glossary/risk-management). See [ch.
-14, Independent validation and model risk
-management](/bok/governing-development#independent-validation-and-model-risk-management); [ch. 01,
-The disambiguation cluster](/bok/definition#the-disambiguation-cluster). (ch. 01, 14)
+until SR 26-2 superseded it on 17 Apr 2026 [67], and SR 26-2 leaves generative and agentic AI models
+out of its scope [121]. A neighbour of this discipline, extended here to runtime behaviour and
+agents. Contrast with [Risk management](/glossary/risk-management). See [ch. 14, Independent
+validation and model risk
+management](/bok/governing-development#independent-validation-and-model-risk-management); [ch. 21,
+Sector rules that already reach AI](/bok/ai-laws-worldwide#sector-rules-that-already-reach-ai); [ch.
+01, The disambiguation cluster](/bok/definition#the-disambiguation-cluster). (ch. 01, 02, 13,
+14, 21)
+
+**Model signing.** Signing a model's files at build: a manifest lists every file with its
+cryptographic digest and a detached signature covers the manifest, so any changed file fails
+verification. The OpenSSF Model Signing specification uses the Sigstore bundle format and supports
+keyless signing, private PKI, self-signed certificates or bare keys [135]. Serving verifies the
+signature before it loads a model. Contrast with [Build provenance
+(SLSA)](/glossary/build-provenance-slsa). See [ch. 14, Reproducibility and linked
+versioning](/bok/governing-development#reproducibility-and-linked-versioning); [ch. 05, Pattern:
+Model Artefact Integrity](/patterns/model-artefact-integrity). (ch. 05, 14, 15)
 
 **Multimodal model.** A model that takes or produces more than one modality (text, image, audio,
 video). Each modality is a new channel for personal data, injected instructions and synthetic
@@ -1160,8 +1372,11 @@ consent and assessment duties for AI systems that read wearables or brain-comput
 [ch. 19, Consumer-health and neural data](/bok/privacy-and-ai#consumer-health-and-neural-data). (ch. 19)
 
 **NHI.** Non-human identity: the identity of an agent, service account or machine actor. Every NHI
-gets a registry entry, an owner and a scope before it is allowed to act. See [ch. 05, Pattern: Agent
-Identity & Scoped Credentials](/bok/patterns#pattern-agent-identity--scoped-credentials). (ch. 04, 05)
+gets a registry entry, an owner and a scope before it is allowed to act. Contrast with [Workload
+identity](/glossary/workload-identity). See [ch. 05, Pattern: Agent Identity & Scoped
+Credentials](/bok/patterns#pattern-agent-identity--scoped-credentials); [ch. 23, Identity and
+short-lived credentials](/bok/governing-agents#identity-and-short-lived-credentials). (ch. 04,
+05, 23)
 
 **NIST AI RMF.** The NIST Artificial Intelligence Risk Management Framework 1.0 (NIST AI 100-1,
 January 2023): voluntary guidance organised as a Core of four functions (Govern, Map, Measure,
@@ -1221,6 +1436,14 @@ controls, assessments and evidence, used here as the format for audit-ready evid
 05, Pattern: Machine-Readable Evidence
 (OSCAL)](/bok/patterns#pattern-machine-readable-evidence-oscal). (ch. 04, 05, 10)
 
+**Output suppression.** A filter around a model that stops it producing a person's data: the fast
+first answer to an erasure or objection request when the data sits in the weights and retraining is
+disproportionate. The CNIL accepts filters shown to be effective and robust and prefers general
+rules to a list of names [140]. The data stays in the model. Contrast with [Machine
+unlearning](/glossary/machine-unlearning). See [ch. 19, Suppression, retraining and
+unlearning](/bok/privacy-and-ai#suppression-retraining-and-unlearning); [ch. 05, Pattern: Rights
+Requests Against Models](/patterns/rights-requests-against-models). (ch. 05, 19)
+
 ## P
 
 **Paved path.** A supported, low-friction default route (a template, library or pipeline) that makes
@@ -1239,9 +1462,24 @@ required in advance for sensitive data, automated decision-making, entrusted pro
 cross-border provision, with the report kept for at least three years [100]. Contrast with
 [DPIA](/glossary/dpia). See [ch. 19, Brazil and China](/bok/privacy-and-ai#brazil-and-china). (ch. 19)
 
+**Placing on the market.** Under the EU AI Act, the first making available of an AI system or
+general-purpose AI model on the Union market; later supplies in the course of a commercial activity
+are making available [2]. For a high-risk system, the conformity assessment and the technical
+documentation come before it, or before putting into service. Contrast with [Putting into
+service](/glossary/putting-into-service). See [ch. 18, The EU operator
+roles](/bok/eu-ai-act#the-eu-operator-roles); [Toolkit: EU AI Act role and risk-class
+triage](/toolkit/ai-act-triage). (ch. 08, 14, 15, 18, 20)
+
 **Policy Card.** A JSON-schema, machine-readable governance artefact that declares an agent's
 allowed and forbidden behaviours for runtime enforcement [11]. See [ch. 05, Pattern: Policy
-Card](/bok/patterns#pattern-policy-card). (ch. 04, 05, 10)
+Card](/bok/patterns#pattern-policy-card). (ch. 04, 05, 10, 23)
+
+**Policy verdict.** The structured record a policy engine emits each time it evaluates a rule: allow
+or deny, the versioned rule id, a hash of the input and a timestamp, signed and written to the
+evidence store. A release or tool call without a verdict is an audit finding, and one that passed
+under an exception names it in its verdict. See [ch. 04, Layer 01:
+Govern-as-Code](/bok/the-stack#layer-01-govern-as-code); [Toolkit: Policy Card
+builder](/toolkit/policy-card). (ch. 04, 05, 12, 23)
 
 **Policy-as-code.** Governance policy expressed in an executable policy language (`OPA/Rego`, Cedar)
 that evaluates in CI/CD and at admission; the narrower, pipeline subset of governance-as-code.
@@ -1288,6 +1526,22 @@ AI, as a product; judges defect with learning and updates in view; lets courts o
 presume defect; and applies to products placed on the market after 9 Dec 2026 [101]. See [ch. 20,
 The EU Product Liability Directive](/bok/existing-law#the-eu-product-liability-directive). (ch. 20)
 
+**Profiling override.** The rule in the third subparagraph of AI Act Article 6(3) that an Annex III
+system which performs profiling of natural persons is always high-risk, whichever filter condition
+it meets [2]. A classification decision record therefore carries an explicit profiling flag, so a
+filter claim the override defeats is visible. Contrast with [Article 6(3)
+filter](/glossary/article-6-3-filter). See [ch. 18, The Annex III filter and the profiling
+override](/bok/eu-ai-act#the-annex-iii-filter-and-the-profiling-override); [Toolkit: EU AI Act role
+and risk-class triage](/toolkit/ai-act-triage). (ch. 08, 18)
+
+**Progressive delivery.** Releasing a change to a small, growing share of real traffic in stages
+(shadow, pilot, canary, general availability), each with rollback criteria registered before it
+starts and a tested path back to the previous version, so evidence about live behaviour arrives
+before full exposure. For AI systems it covers model, prompt, corpus and vendor-version changes
+alike. See [ch. 15, Progressive delivery as a
+control](/bok/governing-deployment#progressive-delivery-as-a-control); [ch. 05, Pattern: Staged
+Rollout with Rollback Criteria](/patterns/staged-rollout-rollback-criteria). (ch. 05, 14, 15, 23)
+
 **Prohibited practice.** An AI practice banned outright by AI Act Article 5, such as manipulative
 techniques that cause significant harm, social scoring, untargeted scraping of facial images,
 emotion recognition at work or school, and most real-time remote biometric identification in public
@@ -1298,9 +1552,9 @@ system](/glossary/high-risk-ai-system). See [ch. 18, Prohibited practices (Artic
 **Prompt injection.** An input that alters a model's behaviour or output in ways its designers did
 not intend. It is direct when the user supplies it and indirect when it arrives inside content the
 model processes, such as a web page, file or tool result [84]. Contained by guardrails,
-least-privilege tools and evals. Contrast with [Jailbreak](/glossary/jailbreak). See [ch. 04, Layer
-04: Runtime Controls & Observability](/bok/the-stack#layer-04-runtime-controls--observability). (ch.
-01, 04, 17)
+least-privilege tools and evals. Contrast with [Jailbreak](/glossary/jailbreak) and [Hidden Context
+Exposure](/glossary/hidden-context-exposure). See [ch. 04, Layer 04: Runtime Controls &
+Observability](/bok/the-stack#layer-04-runtime-controls--observability). (ch. 01, 04, 17, 23)
 
 **Proportionate governance.** Running the same risk loop at an intensity set by organisation size,
 sector, maturity and risk tolerance, above a floor of controls that never tailors away. The AI Act
@@ -1319,6 +1573,13 @@ such as health-care cost standing in for health need [102]. When the proxy is sh
 treatment, a model can be accurate on the proxy and biased on the construct. Contrast with [Proxy
 variable](/glossary/proxy-variable). See [Case: a health risk score with a proxy
 label](/cases/health-risk-score-proxy). (ch. 16)
+
+**Proxy scan.** A test that trains a model to predict a protected attribute from a system's
+features; features that predict it strongly are flagged as proxies to justify or remove, and the
+result is recorded in the data card. It finds proxy variables before an outcome metric shows their
+effect. See [ch. 16, Fairness and explainability in the
+stack](/bok/fairness-and-explainability#fairness-and-explainability-in-the-stack); [ch. 05, Pattern:
+Fairness Eval Suite](/patterns/fairness-eval-suite). (ch. 05, 16)
 
 **Proxy variable.** A feature that carries the information of a protected characteristic, such as
 postcode for ethnicity, so that a model can discriminate without using the attribute itself. Proxy
@@ -1339,6 +1600,13 @@ not be further processed in an incompatible way; Article 6(4) sets the compatibi
 Enforced in AI pipelines by purpose tags on datasets and a policy that denies runs whose declared
 purpose does not match. See [ch. 19, Purpose limitation and function
 creep](/bok/privacy-and-ai#purpose-limitation-and-function-creep). (ch. 19)
+
+**Putting into service.** Under the EU AI Act, the supply of an AI system for first use directly to
+the deployer, or for the provider's own use, in the Union for its intended purpose [2]. Own use
+counts: an organisation that builds a system and runs it itself is its provider and its deployer,
+with no sale involved. Contrast with [Placing on the market](/glossary/placing-on-the-market). See
+[ch. 18, Roles name tasks, not organisations](/bok/eu-ai-act#roles-name-tasks-not-organisations);
+[Toolkit: EU AI Act role and risk-class triage](/toolkit/ai-act-triage). (ch. 15, 18)
 
 ## Q
 
@@ -1365,7 +1633,9 @@ coverage](/bok/values-and-principles#7-success-is-measured-in-realised-risk-redu
 **Reason code.** A stable, human-readable statement of a principal factor behind an adverse
 decision, mapped from the factors the model actually scored and versioned with the model; required
 in substance by US adverse-action rules [23]. See [ch. 16, Credit: adverse-action notices and reason
-codes](/bok/fairness-and-explainability#credit-adverse-action-notices-and-reason-codes). (ch. 16)
+codes](/bok/fairness-and-explainability#credit-adverse-action-notices-and-reason-codes); [ch. 05,
+Pattern: Decision Notice & Contest Path](/patterns/decision-notice-contest-path); [ch. 05, Pattern:
+Explanation Artefact](/patterns/explanation-artefact). (ch. 05, 16, 20)
 
 **Reasonably foreseeable misuse.** Use of an AI system not in accordance with its intended purpose
 that may result from reasonably foreseeable human behaviour or interaction with other systems,
@@ -1452,6 +1722,15 @@ decision, where Union law does not already provide it [2]. Contrast with
 [Explainability](/glossary/explainability). See [ch. 18, Explanation and notice to affected
 people](/bok/eu-ai-act#explanation-and-notice-to-affected-people). (ch. 16, 18, 19)
 
+**Rights reservation (TDM opt-out).** A rightholder's express reservation of text and data mining
+under Article 4(3) of the DSM Directive, which takes the content out of the general mining
+exception; for content made publicly available online it must be made in an appropriate manner, such
+as machine-readable means [115]. General-purpose AI model providers must identify and comply with
+such reservations [2]. Contrast with [TDM exception](/glossary/tdm-exception). See [ch. 20,
+Artefacts that evidence IP compliance](/bok/existing-law#artefacts-that-evidence-ip-compliance);
+[ch. 05, Pattern: Training-Data Rights Ledger](/patterns/training-data-rights-ledger). (ch. 05, 08,
+12, 20)
+
 **Risk acceptance.** A named, signed and expiring decision by someone with the authority a residual
 band requires, that a risk may remain for a bounded period under named compensating controls and a
 monitoring signal that voids it [30]. Authority rises with the rating; a prohibited use cannot be
@@ -1490,6 +1769,15 @@ control; external ones arise outside it and are mostly engineered against and mo
 with [Contributing factor](/glossary/contributing-factor). See [ch. 13, Internal and external risk
 sources](/bok/risk-management#internal-and-external-risk-sources). (ch. 13)
 
+**Risk tier.** An organisation's own rating of an AI use case, computed at intake by a versioned
+policy from declared profile fields such as autonomy, decision impact, exposure, reversibility,
+vulnerable groups, data class and third parties. The tier selects the assessments, evals,
+thresholds, approvers and review cadence a system must pass; it sits beside the legal
+classification, not in place of it. Contrast with [High-risk AI
+system](/glossary/high-risk-ai-system). See [ch. 13, Contributing factors and the use-case risk
+profile](/bok/risk-management#contributing-factors-and-the-use-case-risk-profile); [ch. 05, Pattern:
+Use-Case Intake & Risk Tiering](/patterns/use-case-intake-risk-tiering). (ch. 05, 06, 12, 13)
+
 **Risk tolerance.** The readiness to bear a given risk in order to achieve objectives [30].
 Engineered as the highest residual band a system tier may carry before a deploy gate requires a
 signed acceptance. Contrast with [Risk appetite](/glossary/risk-appetite). See [ch. 13, Risk
@@ -1501,7 +1789,8 @@ under which the pipeline returns to the previous version automatically: a floor 
 control group, a disagreement or override rate above a threshold, a severity-1 event. A criterion
 set after the metric moved is a negotiation, not a control. Contrast with [Kill
 switch](/glossary/kill-switch). See [ch. 15, Progressive delivery as a
-control](/bok/governing-deployment#progressive-delivery-as-a-control). (ch. 15)
+control](/bok/governing-deployment#progressive-delivery-as-a-control); [ch. 05, Pattern: Staged
+Rollout with Rollback Criteria](/patterns/staged-rollout-rollback-criteria). (ch. 05, 15)
 
 **Root-cause analysis (RCA).** The review that answers why an incident happened and why the controls
 did not stop it, using techniques such as five whys, fault tree analysis [112] and blameless
@@ -1515,11 +1804,27 @@ path](/bok/why-now#5-no-runtime-data-path). (ch. 02, 04, 07)
 
 ## S
 
+**Safetensors.** A file format for storing a model's tensors safely, as opposed to Python pickle
+[137], whose loading can run arbitrary code and which the Python documentation calls not secure
+[138]. Storing weights as safetensors, and scanning any remaining pickle files for code-executing
+imports before they reach a registry, closes a common supply-chain route into serving. See [ch. 14,
+Reproducibility and linked
+versioning](/bok/governing-development#reproducibility-and-linked-versioning); [ch. 05, Pattern:
+Model Artefact Integrity](/patterns/model-artefact-integrity). (ch. 05, 14)
+
 **Safety component.** Under the AI Act as amended in 2026, a component of a product or AI system
 whose intended purpose is to prevent or mitigate risks to the health and safety of persons or
 property, or whose failure endangers them. AI used solely for convenience, efficiency or quality
 control is excluded unless its failure would endanger safety [2]. See [ch. 18, High-risk through
 products (Annex I)](/bok/eu-ai-act#high-risk-through-products-annex-i). (ch. 18)
+
+**Sanctioned AI gateway.** The single approved route by which staff reach AI tools and model APIs:
+approved tools behind single sign-on and a gateway that classifies each request by data class,
+allows, redacts or blocks it under the acceptable-use policy, checks for a current attestation and
+logs a decision per call. It works by being the easiest route. Contrast with [Shadow
+AI](/glossary/shadow-ai). See [ch. 12, Acceptable use of AI by
+staff](/bok/governance-program#acceptable-use-of-ai-by-staff); [ch. 05, Pattern: Sanctioned AI
+Gateway](/patterns/sanctioned-ai-gateway). (ch. 05, 12)
 
 **SB 53.** California's frontier-AI transparency law (TFAIA), in force 1 Jan 2026, covering large
 frontier developers training models above 10^26 FLOP, with transparency and safety-framework
@@ -1543,7 +1848,8 @@ Post-market monitoring and serious incidents (Articles 72 and 73)](/bok/eu-ai-ac
 
 **Shadow AI.** An AI system, model or agent running without registration, including staff use of
 unapproved AI tools; the failure mode that makes an inventory complete only for the honest. It is
-found by discovery and answered with a sanctioned route, not a ban. See [ch. 05, Pattern: Shadow-AI
+found by discovery and answered with a sanctioned route, not a ban. Contrast with [Sanctioned AI
+gateway](/glossary/sanctioned-ai-gateway). See [ch. 05, Pattern: Shadow-AI
 Discovery](/bok/patterns#pattern-shadow-ai-discovery); [ch. 12, Acceptable use of AI by
 staff](/bok/governance-program#acceptable-use-of-ai-by-staff). (ch. 05, 07, 12)
 
@@ -1551,7 +1857,8 @@ staff](/bok/governance-program#acceptable-use-of-ai-by-staff). (ch. 05, 07, 12)
 outputs are not used, so its behaviour on real traffic can be compared with the incumbent or with
 human decisions before any exposure. The disagreement log is its evidence. Contrast with [Canary
 release](/glossary/canary-release). See [ch. 15, Progressive delivery as a
-control](/bok/governing-deployment#progressive-delivery-as-a-control). (ch. 15)
+control](/bok/governing-deployment#progressive-delivery-as-a-control); [ch. 05, Pattern: Staged
+Rollout with Rollback Criteria](/patterns/staged-rollout-rollback-criteria). (ch. 05, 14, 15)
 
 **SHAP.** SHapley Additive exPlanations: a feature-attribution method that assigns each input
 feature a share of a particular prediction, based on Shapley values [113]; its explanations depend
@@ -1588,6 +1895,23 @@ with a self-assessment tier, an automated "Valid-AI-ted" tier and a Level 2 comb
 with the validated assessment [4]. See [ch. 08, CSA AICM and STAR for
 AI](/bok/regulatory-map#csa-aicm-and-star-for-ai). (ch. 07, 08)
 
+**STRIDE.** A threat-classification checklist from Microsoft's Security Development Lifecycle:
+spoofing, tampering, repudiation, information disclosure, denial of service and elevation of
+privilege [133]. For an AI system it is walked per element of the data-flow diagram and then
+extended with AI-specific catalogues such as MITRE ATLAS and the OWASP lists. Contrast with
+[ATLAS](/glossary/atlas). See [ch. 15, Threat modelling the deployed
+system](/bok/governing-deployment#threat-modelling-the-deployed-system); [ch. 05, Pattern: AI Threat
+Model](/patterns/ai-threat-model). (ch. 05, 06, 15)
+
+**Sub-processor.** A processor that another processor engages to carry out processing for a
+controller, such as the model host behind an AI vendor. Under GDPR Article 28 it needs the
+controller's prior written authorisation, specific or general with notice of changes and a chance to
+object, and the same data protection obligations flow down to it by contract [38]. Contrast with
+[Controller and processor](/glossary/controller-and-processor). See [ch. 19, AI vendor DPAs and
+no-training clauses](/bok/privacy-and-ai#ai-vendor-dpas-and-no-training-clauses); [ch. 15, Vendor
+contracts and licence terms](/bok/governing-deployment#vendor-contracts-and-licence-terms). (ch. 08,
+12, 15, 19)
+
 **Substantial modification.** Under the EU AI Act, a change after placing on the market that the
 initial conformity assessment did not foresee and that affects compliance or changes the intended
 purpose [2]. It triggers a new conformity assessment and can turn a deployer or distributor into the
@@ -1601,6 +1925,13 @@ a provider](/bok/governing-deployment#when-a-deployer-becomes-a-provider). (ch. 
 with their errors and bias, so the data card records label provenance and the eval gate tests error
 rates by subgroup. Contrast with [Unsupervised learning](/glossary/unsupervised-learning). See [ch.
 11, By learning paradigm](/bok/ai-defined#by-learning-paradigm). (ch. 11)
+
+**SVID.** SPIFFE Verifiable Identity Document: a short-lived cryptographic identity document, either
+an X.509 certificate or a JWT, that proves a workload's SPIFFE ID and is issued and rotated through
+the SPIFFE Workload API, which SPIRE implements [124]. A credential that expires in minutes need not
+be hunted down after an incident, only not reissued. Contrast with [Workload
+identity](/glossary/workload-identity). See [ch. 23, Short-lived, attested
+credentials](/bok/governing-agents#short-lived-attested-credentials). (ch. 23)
 
 **Synthetic data.** Data generated by a model or simulation rather than collected from people or
 events, used to augment training sets, test edge cases or reduce exposure of personal data. It
@@ -1634,10 +1965,12 @@ standards (GB and GB/T) and publishes the voluntary AI Safety Governance Framewo
 in 2025, 3.0 on 14 September 2026) [19]. See [ch. 21, China: what chapter 08 does not already
 cover](/bok/ai-laws-worldwide#china-what-chapter-08-does-not-already-cover). (ch. 08, 21)
 
-**TDM exception.** The EU copyright exception for text and data mining (DSM Directive Articles 3 and 4)
-that lets anyone copy lawfully accessible works for mining, including AI training, unless the
-rightholder has reserved that use; for content online the reservation must be machine-readable
-[115]. Contrast with [Fair use](/glossary/fair-use). See [ch. 20, Copyright and training
+**TDM exception.** The EU copyright exception for text and data mining (DSM Directive Articles 3
+and 4) that lets anyone copy lawfully accessible works for mining, including AI training, unless the
+rightholder has reserved that use; for content made publicly available online the reservation must
+be made in an appropriate manner, such as machine-readable means [115]. Contrast with [Fair
+use](/glossary/fair-use) and [Rights reservation (TDM
+opt-out)](/glossary/rights-reservation-tdm-opt-out). See [ch. 20, Copyright and training
 data](/bok/existing-law#copyright-and-training-data). (ch. 20)
 
 **Technical documentation (Annex IV).** The provider's technical file for a high-risk AI system,
@@ -1657,11 +1990,39 @@ with registration, informed consent of subjects, effective oversight and reversi
 limited period [2]. Contrast with [AI regulatory sandbox](/glossary/ai-regulatory-sandbox). See [ch.
 18, Sandboxes and real-world testing](/bok/eu-ai-act#sandboxes-and-real-world-testing). (ch. 18)
 
+**Threat model (AI).** A versioned record of what can go wrong with an AI system and what is done
+about it: data flows and trust boundaries, threats per element from STRIDE and AI-specific
+catalogues, a decision on each, and the test that proves each mitigation. It answers the four
+threat-modelling questions, ending with whether the job was done well enough [134]. Contrast with
+[Red teaming](/glossary/red-teaming). See [ch. 15, Threat modelling the deployed
+system](/bok/governing-deployment#threat-modelling-the-deployed-system); [ch. 05, Pattern: AI Threat
+Model](/patterns/ai-threat-model). (ch. 05, 14, 15, 23)
+
 **Three Lines Model.** The Institute of Internal Auditors' 2020 update of the "three lines of
 defense": the governing body oversees; management holds first-line roles (delivering products and
 services) and second-line roles (risk expertise, support and challenge); internal audit gives
 independent third-line assurance [117]. See [ch. 12, The three lines, applied to
 AI](/bok/governance-program#the-three-lines-applied-to-ai). (ch. 12)
+
+**Token passthrough.** The anti-pattern in which a server accepts a token that was not issued to it
+and forwards it, unmodified, to a downstream API, which may then trust it as if the server had
+validated it. The MCP specification forbids it: a server must not accept any token not explicitly
+issued for it, and so checks each token's audience [125]. Contrast with [Delegation (OAuth token
+exchange)](/glossary/delegation-oauth-token-exchange). See [ch. 23, MCP authorization as of
+2026-07-28](/bok/governing-agents#mcp-authorization-as-of-2026-07-28). (ch. 23)
+
+**Tool allow-list.** The deny-by-default list of tools an agent may call, each entry pinned by a
+hash of the tool's definition and bounded by resource scope, operation class, rate, egress
+destinations, data classes and a checkpoint rule, evaluated by the tool gateway on every call. OWASP
+asks for such per-tool least-privilege profiles [6]. See [ch. 23, The tool
+allow-list](/bok/governing-agents#the-tool-allow-list). (ch. 23)
+
+**Tool poisoning.** Tampering with a tool an agent uses, through its model-visible definition
+(description, schema, metadata) or its behaviour, so the agent acts on false premises. OWASP files
+manipulation of a legitimate tool's interface under ASI02 and a tool compromised at the source under
+ASI04 [6]; MITRE ATLAS lists AI Agent Tool Poisoning (AML.T0110) [126]. Contrast with [Prompt
+injection](/glossary/prompt-injection). See [ch. 23, Admitting an MCP
+server](/bok/governing-agents#admitting-an-mcp-server). (ch. 23)
 
 **Training-content summary.** The public summary of the content used to train a general-purpose AI
 model, required by AI Act Article 53(1)(d) on a mandatory Commission template covering data sources,
@@ -1674,6 +2035,19 @@ testing data gives an independent check before release [2]. Keeping them separat
 is what stops test-set contamination. Contrast with [Test-set
 contamination](/glossary/test-set-contamination). See [ch. 14, Data for training and
 testing](/bok/governing-development#data-for-training-and-testing). (ch. 14)
+
+**Trajectory (agent).** The sequence of plans, tool calls and memory operations that led an agent to
+an effect. Agents are evaluated on their trajectories as well as their final outputs, because a
+right result reached through a tool the agent should never have held is still a failure. See [ch.
+23, What makes an agent a governance
+object](/bok/governing-agents#what-makes-an-agent-a-governance-object). (ch. 14, 23)
+
+**Transaction token (Txn-Token).** A short-lived, signed token, specified in an IETF OAuth working
+group draft, that carries user identity, workload identity and authorisation context through a call
+chain within one trusted domain, so downstream services can decide on protected context [131]. Still
+a draft (revision 11, 30 Jul 2026) as of 2026-09-24. Contrast with [Delegation (OAuth token
+exchange)](/glossary/delegation-oauth-token-exchange). See [ch. 23, Accountability across
+hops](/bok/governing-agents#accountability-across-hops). (ch. 23)
 
 **Transfer impact assessment (TIA).** The data exporter's assessment of whether the law of a third
 country lets the importer honour the transfer tool, such as standard contractual clauses, and which
@@ -1720,15 +2094,17 @@ paradigm](/bok/ai-defined#by-learning-paradigm). (ch. 11)
 the uses ruled out, affected persons, decision authority, success metrics and error appetite, stored
 as fields on the registry entry so classification, thresholds, tests and impact assessments read the
 same facts [30]. See [ch. 14, The use-case record](/bok/governing-development#the-use-case-record);
-[ch. 06, Intake and classification](/bok/the-role#intake-and-classification). (ch. 06, 14)
+[ch. 06, Intake and classification](/bok/the-role#intake-and-classification); [ch. 05, Pattern:
+Use-Case Intake & Risk Tiering](/patterns/use-case-intake-risk-tiering). (ch. 05, 06, 14)
 
 ## V
 
 **Version pinning.** Fixing, in the registry entry, the exact versions of the model, prompts,
 retrieval corpus and guardrails a deployed system uses, so what ran is known and any unpinned
 change, including a vendor's model update, is detected and treated as a release. See [ch. 15,
-Progressive delivery as a control](/bok/governing-deployment#progressive-delivery-as-a-control).
-(ch. 15)
+Progressive delivery as a control](/bok/governing-deployment#progressive-delivery-as-a-control);
+[ch. 05, Pattern: Staged Rollout with Rollback
+Criteria](/patterns/staged-rollout-rollback-criteria). (ch. 05, 15)
 
 ## W
 
@@ -1746,14 +2122,23 @@ individuals across several Member States. It shortens the Article 73 serious-inc
 two days [2]. Contrast with [Serious incident](/glossary/serious-incident). See [ch. 17, Incident,
 hazard, issue and serious incident](/bok/incidents#incident-hazard-issue-and-serious-incident). (ch. 17)
 
+**Workload identity.** The attributable identity a workload such as an agent carries across every
+hop, under which its actions are logged and its access is revoked, typically a short-lived, attested
+credential such as an SVID [124]. It differs from channel authentication, which secures a single
+hop, such as a client talking to an MCP server. Contrast with [NHI](/glossary/nhi) and
+[SVID](/glossary/svid). See [ch. 23, Channel authentication is not agent
+identity](/bok/governing-agents#channel-authentication-is-not-agent-identity); [ch. 04, Layer 04:
+Runtime Controls & Observability](/bok/the-stack#layer-04-runtime-controls--observability). (ch. 03,
+04, 05, 23)
+
 ## Sources
 
 [1] Real Decreto 729/2023, de 22 de agosto, por el que se aprueba el Estatuto de la Agencia Española de Supervisión de Inteligencia Artificial (Royal Decree approving the AESIA statute; seat in A Coruña; BOE no. 210, 2 Sep 2023). Boletín Oficial del Estado. 2023-09-02. https://www.boe.es/eli/es/rd/2023/08/22/729 (verified: primary)
-[2] Regulation (EU) 2024/1689 (AI Act), consolidated text as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI, in force 27 Jul 2026; definitions in Art. 3, incl. 3(1), 3(3) to 3(8), 3(12), 3(13), 3(14), 3(14b), 3(20), 3(22), 3(23), 3(29) to 3(32), 3(49), 3(55) to 3(57), 3(60), 3(61), 3(63), 3(68); Arts. 4, 5, 6, 9, 10, 11, 13, 14, 15, 17, 22 to 27, 40, 41, 43, 47, 48, 50, 53, 55, 57, 60, 72, 73, 86; Annexes I, III, IV). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng (verified: primary)
+[2] Regulation (EU) 2024/1689 (AI Act), consolidated text as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI, in force 27 Jul 2026; definitions in Art. 3, incl. 3(1), 3(3) to 3(14), 3(14b), 3(20), 3(22), 3(23), 3(29) to 3(32), 3(49), 3(55) to 3(57), 3(60), 3(61), 3(63), 3(68); Arts. 4, 5, 6 (incl. 6(3) third subparagraph, profiling), 9, 10, 11, 13, 14, 15, 17, 22 to 27 (incl. 26(11)), 40, 41, 43, 47, 48, 50, 53 (incl. 53(1)(c)), 55, 57, 60, 72, 73, 86; Annexes I, III, IV). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng (verified: primary)
 [3] NIST AI Risk Management Framework 1.0 (Govern, Map, Measure, Manage); OSCAL. NIST. 2023. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
 [4] AI Controls Matrix v1.1 (247 control objectives, 18 domains) and STAR for AI. Cloud Security Alliance. 2026-06-22. https://cloudsecurityalliance.org/star/ai (verified: primary)
 [5] OWASP AI Maturity Assessment (AIMA), reported at v1.0 (Aug 2025). OWASP GenAI Security Project. 2025. https://genai.owasp.org/initiatives/ (verified: reported)
-[6] Top 10 for Agentic Applications 2026 (ASI01–ASI10). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
+[6] Top 10 for Agentic Applications 2026 (ASI01 Agent Goal Hijack; ASI02 Tool Misuse and Exploitation; ASI03 Identity and Privilege Abuse; ASI04 Agentic Supply Chain Vulnerabilities; ASI05 Unexpected Code Execution (RCE); ASI06 Memory & Context Poisoning; ASI07 Insecure Inter-Agent Communication; ASI08 Cascading Failures; ASI09 Human-Agent Trust Exploitation; ASI10 Rogue Agents; Least-Agency; per-tool least-privilege profiles; tool poisoning of a legitimate tool's interface under ASI02, a tool compromised at the source under ASI04). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [7] MITRE ATLAS (adversarial threat knowledge base for AI). MITRE. 2026. https://atlas.mitre.org/ (verified: primary)
 [8] Model Context Protocol specification 2026-07-28 (OAuth 2.1 resource servers; Client ID Metadata Documents; issuer-bound credentials). Anthropic / MCP. 2026-07-28. https://blog.modelcontextprotocol.io/posts/2026-07-28/ (verified: primary)
 [9] "Gartner Predicts that Guardian Agents will Capture 10-15% of the Agentic AI Market by 2030" (at least 10 to 15% of agentic AI markets by 2030). Gartner. 2025-06-11. https://www.gartner.com/en/newsroom/press-releases/2025-06-11-gartner-predicts-that-guardian-agents-will-capture-10-15-percent-of-the-agentic-ai-market-by-2030 (verified: primary)
@@ -1785,7 +2170,7 @@ hazard, issue and serious incident](/bok/incidents#incident-hazard-issue-and-ser
 [35] Directive (EU) 2024/2831 on improving working conditions in platform work (Arts. 7 limits on processing, 9 transparency, 10 human oversight, 11 human review; transposition by 2 Dec 2026). Official Journal of the EU (EUR-Lex). 2024-10-23. https://eur-lex.europa.eu/eli/dir/2024/2831/oj (verified: primary)
 [36] Algorithmic Transparency Recording Standard Hub (mandatory for government departments and for arm's-length bodies delivering public or frontline services). Government Digital Service. 2025-05-08. https://www.gov.uk/government/collections/algorithmic-transparency-recording-standard-hub (verified: primary)
 [37] Assessment List for Trustworthy Artificial Intelligence (ALTAI) for self-assessment (final list presented 17 Jul 2020 after a pilot; document and web tool). High-Level Expert Group on AI / European Commission. 2020-07-17. https://digital-strategy.ec.europa.eu/en/library/assessment-list-trustworthy-artificial-intelligence-altai-self-assessment (verified: primary)
-[38] Regulation (EU) 2016/679 (General Data Protection Regulation) (Arts. 4(1), 4(5), 4(7), 4(8), 4(12), 4(14), 5, 6, 9, 22, 25, 30, 33, 35; Recital 26). Publications Office of the EU (EUR-Lex). 2016-04-27. https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng (verified: primary)
+[38] Regulation (EU) 2016/679 (General Data Protection Regulation) (Arts. 4(1), 4(5), 4(7), 4(8), 4(12), 4(14), 5, 6, 9, 12(3), 22, 25, 28(2) and 28(4), 30, 33, 35; Recital 26). Publications Office of the EU (EUR-Lex). 2016-04-27. https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng (verified: primary)
 [39] Press release No 186/23: judgment in Case C-634/21, SCHUFA Holding (Scoring) (a credit score is an automated individual decision where lenders give it a determining role). Court of Justice of the EU. 2023-12-07. https://curia.europa.eu/jcms/upload/docs/application/pdf/2023-12/cp230186en.pdf (verified: primary)
 [40] ISO/IEC 22989:2022, Artificial intelligence concepts and terminology (referenced by identifier only; autonomy and heteronomy; clause 5.11 machine learning approaches: supervised, unsupervised, semi-supervised, reinforcement). ISO/IEC. 2022-07. https://www.iso.org/standard/74296.html (verified: secondary)
 [41] NIST SP 1270, Towards a Standard for Identifying and Managing Bias in Artificial Intelligence (three categories of AI bias: systemic, statistical and computational, and human). NIST. 2022-03-15. https://doi.org/10.6028/NIST.SP.1270 (verified: primary)
@@ -1842,7 +2227,7 @@ hazard, issue and serious incident](/bok/incidents#incident-hazard-issue-and-ser
 [92] "Membership Inference Attacks against Machine Learning Models" (Shokri et al.; arXiv 1610.05820). arXiv. 2016-10-18. https://arxiv.org/abs/1610.05820 (verified: primary)
 [93] Hierarchy of Controls (elimination, substitution, engineering controls, administrative controls, PPE). CDC / NIOSH. 2024-04-10. https://www.cdc.gov/niosh/hierarchy-of-controls/about/index.html (verified: primary)
 [94] "Model Inversion Attacks that Exploit Confidence Information and Basic Countermeasures" (Fredrikson, Jha and Ristenpart; CCS 2015). ACM. 2015-10-12. https://doi.org/10.1145/2810103.2813677 (verified: primary)
-[95] General-Purpose AI Code of Practice, Safety and Security chapter (Commitment 9, serious incident reporting, Measure 9.2). European Commission. 2025-07-10. https://ec.europa.eu/newsroom/dae/redirection/document/118119 (verified: primary)
+[95] General-Purpose AI Code of Practice, Safety and Security chapter (Commitment 9, serious incident reporting, Measure 9.2; Appendix 1.4 specified systemic risks, incl. loss of control). European Commission. 2025-07-10. https://ec.europa.eu/newsroom/dae/redirection/document/118119 (verified: primary)
 [96] SB 1223, Consumer privacy: sensitive personal information: neural data (neural data added to sensitive personal information under the CCPA; Chapter 887, Statutes of 2024). California Legislature. 2024-09-28. https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202320240SB1223 (verified: primary)
 [97] OECD Framework for the Classification of AI Systems (OECD Digital Economy Papers No. 323; People & Planet, Economic Context, Data & Input, AI Model, Task & Output). OECD. 2022-02-22. https://doi.org/10.1787/cb6d9eca-en (verified: primary)
 [98] "How the machine thinks: Understanding opacity in machine learning algorithms" (three forms of opacity; Big Data & Society 3(1)). SAGE (Jenna Burrell). 2016-01-06. https://doi.org/10.1177/2053951715622512 (verified: primary)
@@ -1868,3 +2253,24 @@ hazard, issue and serious incident](/bok/incidents#incident-hazard-issue-and-ser
 [118] Template for general-purpose AI model providers to summarise their training content (mandatory under Art. 53(1)(d); applicable from 2 Aug 2025, legacy models by 2 Aug 2027). European Commission. 2025-07-24. https://digital-strategy.ec.europa.eu/en/faqs/template-general-purpose-ai-model-providers-summarise-their-training-content (verified: primary)
 [119] Recommendations 01/2020 on measures that supplement transfer tools to ensure compliance with the EU level of protection of personal data (version 2.0). European Data Protection Board. 2021-06-18. https://www.edpb.europa.eu/our-work-tools/our-documents/recommendations/recommendations-012020-measures-supplement-transfer_en (verified: primary)
 [120] 15 U.S.C. § 45 (FTC Act section 5) (unfair or deceptive acts or practices; 45(n) standard for unfairness). Legal Information Institute, Cornell Law School. 2026. https://www.law.cornell.edu/uscode/text/15/45 (verified: secondary)
+[121] Revised Guidance on Model Risk Management, attachment to SR 26-2 (footnote 3: generative AI and agentic AI models "are not within the scope of this guidance"; the principles apply to traditional statistical and quantitative models and non-generative, non-agentic AI models). Federal Reserve, OCC and FDIC. 2026-04-17. https://www.federalreserve.gov/supervisionreg/srletters/SR2602a1.pdf (verified: primary)
+[122] "Levels of Autonomy for AI Agents" (K. J. Kevin Feng, David W. McDonald, Amy X. Zhang; arXiv 2506.12469; autonomy as a deliberate design decision separate from capability and operational environment; five levels by user role: operator, collaborator, consultant, approver, observer). arXiv. 2025-06-14 (v2 2025-07-28). https://arxiv.org/abs/2506.12469 (verified: primary)
+[123] RFC 8693, OAuth 2.0 Token Exchange (impersonation versus delegation semantics; the act (actor) claim; nested act claims record prior actors). IETF. 2020-01. https://www.rfc-editor.org/rfc/rfc8693.html (verified: primary)
+[124] SPIFFE overview (short-lived cryptographic identity documents called SVIDs, as X.509 certificates or JWTs; the Workload API issues and rotates them; SPIRE implementation). SPIFFE project. 2026. https://spiffe.io/docs/latest/spiffe-about/overview/ (verified: primary)
+[125] Model Context Protocol, Security Best Practices, version 2026-07-28 (token passthrough defined and explicitly forbidden; servers MUST NOT accept any tokens not explicitly issued for them; audience validation). Model Context Protocol. 2026-07-28. https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices (verified: primary)
+[126] MITRE ATLAS data, release v2026.09 (AML.T0080 AI Agent Context Poisoning, .000 Memory; AML.T0110 AI Agent Tool Poisoning). MITRE. 2026-09-15. https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.09 (verified: primary)
+[127] Agent Control Standard (ACS) repository (a wire specification that lets a separate guardian agent permit, deny or modify an agent's action before it happens; the reference guardian's failure posture defaults to proceed, overridable to deny; donated to the OWASP GenAI Security Project, announced 1 Sep 2026). OWASP GenAI Security Project (GitHub). 2026-09-01. https://github.com/GenAI-Security-Project/agent-control-standard (verified: primary)
+[128] OWASP GenAI LLM Top 10 2026 (published 3 Aug 2026; LLM01:2026 Prompt Injection, incl. memory persistence; LLM08:2026 Hidden Context Exposure, which replaced System Prompt Leakage: assume hidden context is discoverable, no credentials in it, not a security boundary; final text in github.com/GenAI-Security-Project/GenAI-LLM-Top10, 2026/final). OWASP GenAI Security Project. 2026-08-03. https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ (verified: primary)
+[129] Agent2Agent (A2A) Protocol Specification, v1.0 (v1.0.0 released 2026-03-12 and v1.0.1 on 2026-05-28 in github.com/a2aproject/A2A; Agent Card at /.well-known/agent-card.json, signed with JWS over JCS-canonicalised JSON; servers authenticate every request; authorisation implementation-specific; scope and revocation of in-task authorisation not defined). A2A Project (Linux Foundation). 2026-05-28. https://a2a-protocol.org/latest/specification/ (verified: primary)
+[130] "A New Chapter for A2A: Joining the Agentic AI Foundation" (A2A accepted as a Growth Stage project of the Linux Foundation-directed Agentic AI Foundation, alongside MCP). A2A Project. 2026-08-27. https://a2a-protocol.org/latest/blog/2026/08/27/a-new-chapter-for-a2a-joining-the-agentic-ai-foundation/ (verified: primary)
+[131] draft-ietf-oauth-transaction-tokens-11, Transaction Tokens (Internet-Draft, OAuth working group, revision 11 of 30 Jul 2026, WG state "Waiting for Write-Up"; short-lived signed tokens that propagate user identity, workload identity and authorisation context through a call chain within a trusted domain). IETF. 2026-07-30. https://datatracker.ietf.org/doc/draft-ietf-oauth-transaction-tokens/ (verified: primary)
+[132] draft-ietf-oauth-client-id-metadata-document-02, OAuth Client ID Metadata Document (Internet-Draft, OAuth working group, revision 02 of 6 Jul 2026; a URL used as client_id that refers to the client's metadata document). IETF. 2026-07-06. https://datatracker.ietf.org/doc/draft-ietf-oauth-client-id-metadata-document/ (verified: primary)
+[133] Threats: Microsoft Threat Modeling Tool (the STRIDE model: spoofing, tampering, repudiation, information disclosure, denial of service, elevation of privilege; the tool is a core element of the Security Development Lifecycle). Microsoft Learn. 2017-08-17. https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-threats (verified: primary)
+[134] Threat Modeling Manifesto (threat modelling as analysing representations of a system to highlight concerns about security and privacy characteristics; four key questions). Threat Modeling Manifesto working group. n.d. (accessed 2026-09-25). https://www.threatmodelingmanifesto.org/ (verified: primary)
+[135] "An Introduction to the OpenSSF Model Signing (OMS) Specification" (detached signature over a manifest of file hashes; Sigstore bundle format; PKI-agnostic: private PKI, self-signed certificates, bare keys, keyless Sigstore). OpenSSF. 2025-06-25. https://openssf.org/blog/2025/06/25/an-introduction-to-the-openssf-model-signing-oms-specification/ (verified: primary)
+[136] SLSA specification v1.2, Build track basics (provenance: what built the artefact, by what process and from which top-level inputs; Build L1 provenance exists, L2 hosted build platform, L3 hardened builds). OpenSSF SLSA project. n.d. (accessed 2026-09-25). https://slsa.dev/spec/v1.2/build-track-basics (verified: primary)
+[137] Safetensors ("a new simple format for storing tensors safely (as opposed to pickle)"). Hugging Face documentation. n.d. (accessed 2026-09-25). https://huggingface.co/docs/safetensors/index (verified: primary)
+[138] pickle: Python object serialization ("The pickle module is not secure. Only unpickle data you trust."). Python Software Foundation. 2026. https://docs.python.org/3/library/pickle.html (verified: primary)
+[139] "FTC Order Requires Workado to Back Up Artificial Intelligence Detection Claims" (claimed 98% accuracy, 53% on general-purpose content; competent and reliable evidence required at the time a claim is made). Federal Trade Commission. 2025-04-28. https://www.ftc.gov/news-events/news/press-releases/2025/04/ftc-order-requires-workado-back-artificial-intelligence-detection-claims (verified: primary)
+[140] "Ensuring and facilitating the exercise of data subjects' rights" (AI how-to sheet; retraining; output filters accepted if shown sufficiently effective and robust, based on general rules rather than lists of people). CNIL. 2026-01-05. https://www.cnil.fr/en/respect-and-facilitate-exercise-data-subjects-rights (verified: primary)
+[141] Authorization (Cedar Policy Language Reference Guide) (no request is allowed unless a permit policy grants it, so the default decision is Deny; any satisfied forbid overrides every permit). Cedar. n.d. (accessed 2026-09-25). https://docs.cedarpolicy.com/auth/authorization.html (verified: primary)
