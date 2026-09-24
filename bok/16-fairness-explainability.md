@@ -316,15 +316,15 @@ that do not need ground truth immediately:
 - **Human-oversight signals by group**: override rates, time-to-decide and reversal rates at the
   [Human-in-the-loop Gate](/bok/patterns#pattern-human-in-the-loop-gate). A reviewer who overrides
   one group more often is a fairness signal about the model or about the reviewer.
-- **Complaints, appeals and explanation requests by group**, including their outcomes. The contest
-  channel is a sensor.
+- **Complaints, appeals and explanation requests by group**, including their outcomes. The [contest
+  channel](/patterns/decision-notice-contest-path) is a sensor.
 - **Feedback-loop checks** for systems whose outputs shape future training data, which Article 15(4)
   requires high-risk systems that keep learning to address [6].
 
 The group attribute is usually absent at runtime. The options are a consented sample or panel on
 which the attribute is known, periodic audits under the Article 4a conditions (deployers of
 high-risk systems fall under Article 4a(2) [11]), or monitoring only the outcome-free rates with the
-attribute joined in a secured environment. Whichever is chosen, the monitor is a layer 04 signal
+attribute joined in a secured environment. Whichever is chosen, the [monitor](/patterns/drift-fairness-monitor) is a layer 04 signal
 streamed into layer 05 through [Continuous Assurance
 Telemetry](/bok/patterns#pattern-continuous-assurance-telemetry), and a breach opens a ticket with
 an owner, not a chart nobody reads. A disparity that caused harm is an incident and follows chapter

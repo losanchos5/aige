@@ -483,7 +483,7 @@ named in advance: product owner, engineering, the AI governance engineer, securi
 the high tiers, legal and the independent validator. The output is a signed go/no-go record with its
 conditions, filed against the registry entry. The deployer runs its own
 [go-live review](/bok/governing-deployment#the-go-live-review) on top of it (chapter 15).
-Release in stages, each with exit criteria from the test plan: **shadow** (the system runs on live
+[Release in stages](/patterns/staged-rollout-rollback-criteria), each with exit criteria from the test plan: **shadow** (the system runs on live
 inputs and its outputs are logged, not used), **canary** (a small share of traffic), a **limited
 pilot**, then general availability. In the EU, research, testing and development before placing on
 the market sit outside the AI Act, except testing in real-world conditions [37]; that testing is

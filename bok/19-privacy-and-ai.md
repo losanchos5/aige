@@ -348,7 +348,7 @@ balance [22].
 
 The artefacts follow: a **decision record** per decision (model version, inputs, outcome, reason
 codes, counterfactual); a **notice** that a solely automated decision was taken and how to contest
-it; a **contest path** to a reviewer with authority and information to change the outcome, with a
+it; a **[contest path](/patterns/decision-notice-contest-path)** to a reviewer with authority and information to change the outcome, with a
 record of what they did; and a monitor of the oversight itself, because a reviewer who confirms
 almost every output in seconds is not meaningful involvement (the [Human-in-the-loop
 Gate](/bok/patterns#pattern-human-in-the-loop-gate) pattern).
@@ -426,7 +426,7 @@ retraining, and when the next retrain closes the gap.
 
 ### Recording how a request was honoured
 
-The evidence is a **fulfilment record** written by the workflow: every location, the action in each,
+The evidence is a **[fulfilment record](/patterns/rights-requests-against-models)** written by the workflow: every location, the action in each,
 the model versions affected and when the gap closes.
 
 > **Example (illustrative)**

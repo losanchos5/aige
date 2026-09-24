@@ -179,7 +179,7 @@ no decision reads is a field no one will maintain.
 | Outputs | Prediction, content, recommendation or decision? | `output_types` | Content: marking and disclosure analysis (Art. 50); decision: explanation and human-review duties (Art. 86, GDPR Art. 22) |
 | Effect | Does it change a physical or virtual environment, and through what? | `effect_surface` (`display`, `tools`, `actuator`) | Tools: agent registry, scoped credentials; actuator: stop in a safe state |
 | Autonomy | What happens between output and effect without a person? | `autonomy_level` (0–4, below) | Human-oversight design, gate placement, kill switch |
-| Adaptiveness | Can behaviour change in use without a release? | `adapts_in_use`, `change_triggers` | Re-evaluation triggers; drift monitoring; feedback-loop controls (Art. 15(4)) |
+| Adaptiveness | Can behaviour change in use without a release? | `adapts_in_use`, `change_triggers` | Re-evaluation triggers; [drift monitoring](/patterns/drift-fairness-monitor); feedback-loop controls (Art. 15(4)) |
 
 Sources for the legal hooks: [9][10][11][12].
 

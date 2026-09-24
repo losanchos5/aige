@@ -668,7 +668,7 @@ intensity. Read each row as a floor; where two rows apply, the stricter wins.
 | | Level 4 to 5 | Bands compiled into gates; telemetry re-rates | Deny on unaccepted residual; acceptances void themselves | Event-driven plus calendar |
 | **Products and services** | Tier 1: internal tool | Registry entry, owner, acceptable-use rules | Registry gate | Yearly |
 | | Tier 2: decision support, a person reviews each output | Plus capability and misuse evals; oversight metrics | Eval gate | Every six months |
-| | Tier 3: automated decision about a person | Plus fairness and robustness evals; FRIA or DPIA where required; a contest channel | Eval gate; no deploy without acceptance at High | Quarterly |
+| | Tier 3: automated decision about a person | Plus fairness and robustness evals; FRIA or DPIA where required; a [contest channel](/patterns/decision-notice-contest-path) | Eval gate; no deploy without acceptance at High | Quarterly |
 | | Tier 4: agentic with write access, or real-time high stakes | Plus approval gates; scoped identity; tested kill switch; runtime guardrails | Plus runtime enforcement | Monthly and event-driven |
 | **Objectives** | Innovation-led | Sandboxed tiers 1 and 2 with wider tolerance; floor unchanged | Sandbox gates apart from production | Frequent, light |
 | | Risk-averse | Lower tolerances; acceptance one level higher | Higher eval floors | Heavier, less frequent |

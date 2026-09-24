@@ -242,7 +242,7 @@ environments (Articles 7–13) [1]. Chapters IV and V are where the engineering 
 
 | Article | Duty on Parties (paraphrased) | Engineering artefact | Layer |
 |---|---|---|---|
-| `Art. 14(2)(a)–(b)` | Document relevant information about systems that can significantly affect human rights, sufficient for affected people to contest decisions | Decision record per consequential output; contest path with the record attached | 2 · 5 |
+| `Art. 14(2)(a)–(b)` | Document relevant information about systems that can significantly affect human rights, sufficient for affected people to contest decisions | Decision record per consequential output; [contest path](/patterns/decision-notice-contest-path) with the record attached | 2 · 5 |
 | `Art. 14(2)(c)` | An effective possibility to complain to competent authorities | Complaint intake linked to the registry id | 5 |
 | `Art. 15(2)` | Notify people that they are interacting with an AI system, as appropriate | Interaction disclosure enforced at runtime | 4 |
 | `Art. 16(1)–(2)(a)–(f)` | Iterative, graduated risk and impact management: context, severity and probability, stakeholder views, monitoring, documentation | Risk register as code; impact assessment linked to registry; monitoring against baseline | 1 · 2 · 4 |

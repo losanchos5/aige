@@ -433,7 +433,7 @@ further up the chain for GPAI: the Code of Practice asks model providers to tell
 providers, modifiers and users how to report serious incidents, directly or to the AI Office [5].
 Deployment governance as a whole is chapter 15, [governing deployment](/bok/governing-deployment#the-deployment-lifecycle-at-a-glance),
 whose [external communications plan](/bok/governing-deployment#external-communications) carries the
-notices to users, affected people and authorities.
+[notices](/patterns/disclosure-notification-pipeline) to users, affected people and authorities.
 
 ## The overlapping clocks
 
