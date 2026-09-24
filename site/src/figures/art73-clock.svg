@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 316" class="figc" role="img" aria-labelledby="fig-art73-t fig-art73-d">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 334" class="figc" role="img" aria-labelledby="fig-art73-t fig-art73-d">
   <title id="fig-art73-t">The Article 73 clock</title>
   <desc id="fig-art73-d">The Article 73 serious-incident reporting windows by incident class (2, 10 and no later than 15 days), with the incident pipeline that meets them.</desc>
 
@@ -34,4 +34,7 @@
   <rect class="l5-bg" x="8" y="274" width="152" height="26" rx="6"/>
   <text class="l5-tx" x="18" y="291" font-size="13.5">Incident pipeline</text>
   <text class="ink2" x="170" y="291" font-size="13">Classify before you report.</text>
+
+  <!-- Dated content: the stamp travels with every copy (figures.ts asOf) -->
+  <text class="mono muted" x="16" y="322" font-size="13">As of 2026-09-24</text>
 </svg>
