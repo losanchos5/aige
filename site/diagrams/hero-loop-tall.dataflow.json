@@ -3,31 +3,32 @@
   "diagram_type": "dataflow",
   "meta": {
     "title": "The evidence loop",
+    "subtitle": "The governance loop: seven steps from obligation to auditor, each producing evidence.",
     "locale": "en",
     "quality_profile": "showcase",
     "legend": { "mode": "hidden" },
     "viewBox": [436, 612]
   },
   "stages": [
-    { "label": "Rules as code" },
-    { "label": "Proof" }
+    { "label": "Law and proof" },
+    { "label": "Controls" }
   ],
   "nodes": [
     { "id": "obligation", "type": "external", "label": "EU AI Act Art. 9", "sublabel": "risk management obligation", "tag": "law", "stage": 0, "row": 0, "width": 150, "height": 66 },
     { "id": "auditor", "type": "external", "label": "Auditor", "sublabel": "audit = a query", "tag": "assurance", "stage": 0, "row": 2, "width": 150, "height": 66 },
-    { "id": "evidence", "type": "security", "label": "Evidence store", "sublabel": "attestation #4821 · signed", "tag": "Layer 05", "stage": 0, "row": 3, "width": 152, "height": 66 },
+    { "id": "evidence", "type": "security", "label": "Evidence store", "sublabel": "attestation issued · signed", "tag": "Layer 05", "stage": 0, "row": 3, "width": 152, "height": 66 },
     { "id": "policy", "type": "security", "label": "Policy-as-code", "sublabel": "deny model.deploy unless eval.safety ≥ 0.95", "tag": "Layer 01", "stage": 1, "row": 0, "width": 176, "height": 66 },
     { "id": "inventory", "type": "database", "label": "Inventory", "sublabel": "agent: support-bot · owner: platform", "tag": "Layer 02", "stage": 1, "row": 1, "width": 150, "height": 66 },
     { "id": "eval", "type": "backend", "label": "Eval gate", "sublabel": "eval.safety 0.97 ≥ 0.95", "tag": "Layer 03", "stage": 1, "row": 2, "width": 150, "height": 66 },
     { "id": "runtime", "type": "backend", "label": "Runtime controls", "sublabel": "guardrails on · tools scoped · trace ok", "tag": "Layer 04", "stage": 1, "row": 3, "width": 152, "height": 66 }
   ],
   "flows": [
-    { "id": "obligation-policy", "from": "obligation", "to": "policy", "label": "compiles to", "variant": "emphasis", "route": "straight", "labelAt": [201, 116] },
-    { "id": "policy-inventory", "from": "policy", "to": "inventory", "label": "scopes", "variant": "default", "route": "straight", "labelAt": [315, 208] },
-    { "id": "inventory-eval", "from": "inventory", "to": "eval", "label": "checks", "variant": "default", "route": "straight", "labelAt": [315, 322] },
-    { "id": "eval-runtime", "from": "eval", "to": "runtime", "label": "gates", "variant": "default", "route": "straight", "labelAt": [315, 436] },
-    { "id": "runtime-evidence", "from": "runtime", "to": "evidence", "label": "emits", "variant": "default", "route": "straight", "labelAt": [207, 446] },
-    { "id": "evidence-auditor", "from": "evidence", "to": "auditor", "label": "attests", "variant": "default", "route": "straight" },
+    { "id": "obligation-policy", "from": "obligation", "to": "policy", "label": "compiles to", "variant": "emphasis", "route": "straight", "labelAt": [201, 112] },
+    { "id": "policy-inventory", "from": "policy", "to": "inventory", "label": "scopes", "variant": "default", "route": "straight", "labelAt": [315, 221] },
+    { "id": "inventory-eval", "from": "inventory", "to": "eval", "label": "checks", "variant": "default", "route": "straight", "labelAt": [315, 335] },
+    { "id": "eval-runtime", "from": "eval", "to": "runtime", "label": "gates", "variant": "default", "route": "straight", "labelAt": [315, 449] },
+    { "id": "runtime-evidence", "from": "runtime", "to": "evidence", "label": "emits", "variant": "default", "route": "straight", "labelAt": [207, 506] },
+    { "id": "evidence-auditor", "from": "evidence", "to": "auditor", "label": "attests", "variant": "default", "route": "straight", "labelAt": [100, 449] },
     { "id": "closes-loop", "from": "auditor", "to": "obligation", "label": "closes the loop", "variant": "dashed", "route": "straight", "labelAt": [100, 275] }
   ]
 }

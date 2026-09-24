@@ -1,19 +1,22 @@
 ---
 /**
- * VerdictTicker — a thin, 1px-ruled strip of mono verdicts that translates
- * slowly under the verdict-beat sentence, like a compliance ticker. The content
- * is duplicated so the translateX loop wraps seamlessly; it pauses on hover and
- * holds still under reduced motion. Generic, illustrative items only — no vendor
- * names. Decorative, so the whole strip is aria-hidden.
+ * VerdictTicker — a 1px-ruled row of mono verdict log lines under the
+ * verdict-beat sentence: the verdict word in its semantic ink (PASS in the L5
+ * ink, BLOCK in the L3 ink), then the stage that ran it and the check. No run
+ * numbers: the lines are illustrative, not telemetry. A static list that
+ * wraps to the width it has; it never loops or scrolls. The items rise once on
+ * reveal through the shared .reveal-stagger utility (resting state for no-JS
+ * and reduced motion). Generic, illustrative items only — no vendor names.
+ * Decorative, so the whole strip is aria-hidden.
  */
 interface Props {
-  /** `lg` enlarges the chips and speeds the loop to 30s (used on the home
-   *  verdict beat); `md` (default) keeps the thin strip. */
+  /** `lg` enlarges the verdicts and labels (used on the home verdict beat);
+   *  `md` (default) keeps the thin strip. */
   size?: 'md' | 'lg';
 }
 
 interface Item {
-  id: string;
+  stage: string;
   verdict: 'pass' | 'block';
   detail: string;
 }
@@ -21,94 +24,79 @@ interface Item {
 const { size = 'md' } = Astro.props;
 
 const items: readonly Item[] = [
-  { id: '#4821', verdict: 'pass', detail: 'eval.safety 0.97' },
-  { id: '#4822', verdict: 'block', detail: 'pii.leak detected' },
-  { id: '#4823', verdict: 'pass', detail: 'aibom.signed' },
-  { id: '#4824', verdict: 'pass', detail: 'scope.bound · trace ok' },
-  { id: '#4825', verdict: 'block', detail: 'eval.jailbreak 0.71' },
-  { id: '#4826', verdict: 'pass', detail: 'policy.allow deploy' },
-  { id: '#4827', verdict: 'pass', detail: 'oscal.evidence written' },
-  { id: '#4828', verdict: 'block', detail: 'owner missing' },
-  { id: '#4829', verdict: 'pass', detail: 'kill-switch armed' },
-  { id: '#4830', verdict: 'pass', detail: 'eval.groundedness 0.96' },
+  { stage: 'pre-merge', verdict: 'pass', detail: 'eval.safety 0.97' },
+  { stage: 'release gate', verdict: 'block', detail: 'pii.leak detected' },
+  { stage: 'build', verdict: 'pass', detail: 'aibom.signed' },
+  { stage: 'runtime', verdict: 'pass', detail: 'scope.bound · trace ok' },
+  { stage: 'release gate', verdict: 'block', detail: 'eval.jailbreak 0.71' },
+  { stage: 'admission', verdict: 'pass', detail: 'policy.allow deploy' },
+  { stage: 'post-deploy', verdict: 'pass', detail: 'oscal.evidence written' },
+  { stage: 'registry', verdict: 'block', detail: 'owner missing' },
+  { stage: 'runtime', verdict: 'pass', detail: 'kill-switch armed' },
+  { stage: 'nightly', verdict: 'pass', detail: 'eval.groundedness 0.96' },
 ];
 ---
 
 <div class:list={['vt', size === 'lg' && 'vt-lg']} aria-hidden="true">
-  <div class="vt-track">
+  <ul class="vt-list container reveal-stagger">
     {
-      [0, 1].map((copy) => (
-        <ul class="vt-list" data-copy={copy} aria-hidden={copy === 1 ? 'true' : undefined}>
-          {items.map((item) => (
-            <li class="vt-item">
-              <span class:list={['vt-chip', `vt-${item.verdict}`]}>{item.verdict === 'pass' ? 'PASS' : 'BLOCK'}</span>
-              <span class="vt-id">{item.id}</span>
-              <span class="vt-detail">{item.detail}</span>
-            </li>
-          ))}
-        </ul>
+      items.map((item, i) => (
+        <li class="vt-item" style={`--i:${i}`}>
+          <span class:list={['vt-verdict', `vt-${item.verdict}`]}>
+            {item.verdict === 'pass' ? 'PASS' : 'BLOCK'}
+          </span>
+          <span class="vt-stage">{item.stage}</span>
+          <span class="vt-detail">{item.detail}</span>
+        </li>
       ))
     }
-  </div>
+  </ul>
 </div>
 
 <style>
   .vt {
     border-top: 1px solid var(--line);
-    overflow: hidden;
-    /* fade the two edges so items enter and leave cleanly */
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    padding-top: var(--s-4);
   }
 
-  .vt-track {
-    display: flex;
-    width: max-content;
-    padding-block: var(--s-3);
-  }
-
+  /* .container supplies the centred well and its side inset; the row wraps
+     onto as many lines as the width needs. */
   .vt-list {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--s-5);
-    margin: 0;
-    padding: 0 calc(var(--s-5) / 2);
+    gap: var(--s-3) var(--s-5);
+    margin-block: 0;
     list-style: none;
-    flex: none;
   }
 
+  /* An item stays on one line unless it alone is wider than the row (narrow
+     phones), where its detail drops under the verdict instead of overflowing. */
   .vt-item {
     display: inline-flex;
-    align-items: center;
-    gap: var(--s-2);
-    white-space: nowrap;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--s-2);
   }
 
-  .vt-chip {
-    padding: 0.12em 0.45em;
-    border: 1px solid;
-    border-radius: var(--r-sm);
+  /* The verdict word: plain mono text in its semantic ink, no fill or frame. */
+  .vt-verdict {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     font-weight: 600;
     letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    line-height: 1;
   }
 
   .vt-pass {
     color: var(--l5-ink);
-    border-color: var(--l5-ink);
-    background: color-mix(in srgb, var(--l5) 55%, var(--bg));
   }
 
   .vt-block {
     color: var(--l3-ink);
-    border-color: var(--l3-ink);
-    background: color-mix(in srgb, var(--l3) 55%, var(--bg));
   }
 
-  .vt-id {
+  .vt-stage {
     font-family: var(--font-mono);
     font-size: var(--fs-small);
     color: var(--muted);
@@ -120,43 +108,19 @@ const items: readonly Item[] = [
     color: var(--ink-2);
   }
 
-  /* Large size: bigger chips and labels, used on the home verdict beat. Every
-     colour token here is re-scoped by .sec--dark, so it reads correctly on the
-     dark band too. */
+  /* Large size: bigger verdicts and labels, used on the home verdict beat.
+     Every colour token here is re-scoped by .sec--dark, so it reads correctly
+     on the dark band too. */
   .vt-lg .vt-list {
-    gap: var(--s-6);
+    gap: var(--s-3) var(--s-6);
   }
 
-  .vt-lg .vt-chip {
-    padding: 0.2em 0.6em;
+  .vt-lg .vt-verdict {
     font-size: var(--fs-small);
   }
 
-  .vt-lg .vt-id,
+  .vt-lg .vt-stage,
   .vt-lg .vt-detail {
     font-size: var(--fs-body);
-  }
-
-  /* Motion only: translate one full copy's width and loop; hovering the strip
-     pauses it. Under reduced motion the strip holds still and stays legible. */
-  @media (prefers-reduced-motion: no-preference) {
-    .vt-track {
-      animation: vt-scroll 42s linear infinite;
-    }
-
-    /* lg runs the loop faster (30s) so the larger chips keep pace. */
-    .vt-lg .vt-track {
-      animation-duration: 30s;
-    }
-
-    .vt:hover .vt-track {
-      animation-play-state: paused;
-    }
-  }
-
-  @keyframes vt-scroll {
-    to {
-      transform: translateX(-50%);
-    }
   }
 </style>

@@ -6,8 +6,8 @@
  * content modules; no number appears here that a primary source does not carry.
  *
  * The body sections are built on <Section>, which supplies the tinted/mesh/dark
- * bands, the textures and the shared heads. The hero keeps its own scoped layout
- * (the governance-loop art and the panel) — see the <style>.
+ * bands and the shared heads. The hero keeps its own scoped layout (the
+ * governance-loop art and the panel) — see the <style>.
  */
 import Marketing from '../layouts/Marketing.astro';
 import Section from '../components/Section.astro';
@@ -116,11 +116,10 @@ const resources = [
 >
   <section class="hero section hero--loop">
     <div class="bg-mesh hero-mesh" aria-hidden="true"></div>
-    <div class="hero-tex bg-grid bg-fade" aria-hidden="true"></div>
 
     <div class="container hero-grid">
       <div class="hero-copy hero-in">
-        <h1 class="display hero-h1" style="--i:0">Governance you can run, not just read.</h1>
+        <h1 class="display display-xl hero-h1" style="--i:0">Governance you can run, not just read.</h1>
         <p class="lede" style="--i:1">{definition}</p>
         <div class="hero-cta" style="--i:2">
           <a class="btn btn-primary btn-glow" href="/thesis">Read the Thesis</a>
@@ -128,24 +127,20 @@ const resources = [
         </div>
       </div>
 
-      <div
+      <figure
         class="hero-art"
         data-hero-loop
         data-hero-sequence="obligation,policy,inventory,eval,runtime,evidence,auditor"
       >
         <div class="hero-panel card-lum">
-          <div class="hero-panel-bar">
-            <span class="meta"><span class="meta-dot" aria-hidden="true"></span>governance-loop · run #4821</span>
-            <span class="meta hero-live"><span class="meta-dot" aria-hidden="true"></span>live</span>
-          </div>
           <div class="hero-art-wide"><Diagram id="hero-loop" bare /></div>
           <div class="hero-art-tall"><Diagram id="hero-loop-tall" bare /></div>
         </div>
-        <div class="hero-stamp">
-          <VerdictStamp verdict="pass" class="hero-stamp-badge" />
-          <span class="hero-attn mono">attestation #4821</span>
-        </div>
-      </div>
+        <figcaption class="hero-caption">
+          Seven steps, from obligation to auditor.
+          <a href="/bok/the-stack#how-to-read-the-stack">Read how the governance loop works</a>
+        </figcaption>
+      </figure>
     </div>
 
     <script is:inline defer src="/hero.js"></script>
@@ -154,10 +149,6 @@ const resources = [
 
   <Section
     tone="plain"
-    texture="dots"
-    rule
-    kicker="The three questions"
-    kickerSwatch="var(--l2)"
     title="Three questions define the discipline."
     lede="Legacy AI governance leaves them unanswered because nothing is connected to production. The engineer answers all three from the running system."
   >
@@ -167,14 +158,12 @@ const resources = [
   <Section
     tone="tint"
     headSize="xl"
-    kicker="The stack · five layers"
-    kickerSwatch="var(--l3)"
     title="A build order, from policy to proof."
-    lede="Five layers that answer the three questions. Evidence is produced at the bottom and flows up; three layers are established engineering practice, two are new to AI."
+    lede="The stack is five layers that answer the three questions. Evidence is produced at the bottom and flows up; three layers are established engineering practice, two are new to AI."
   >
     <div class="story" data-story>
       <div class="story-pin stack-pin">
-        <p class="meta"><span class="meta-dot" aria-hidden="true"></span>Build order</p>
+        <p class="mono-label">Build order</p>
         <StackDiagram mode="static" data-story-mark class="stack-mark" />
       </div>
       <div class="stack-rows reveal-stagger">
@@ -185,12 +174,7 @@ const resources = [
   </Section>
   <script is:inline defer src="/story.js"></script>
 
-  <Section
-    tone="plain"
-    kicker="Values"
-    kickerSwatch="var(--l4)"
-    title="Eight values, each a commitment made on purpose."
-  >
+  <Section tone="plain" title="Eight values, each a commitment made on purpose.">
     <div class="bento reveal-stagger">
       {
         values.map((value) => (
@@ -208,13 +192,11 @@ const resources = [
   <Section
     tone="mesh"
     class="role-sec"
-    kicker="The role"
-    kickerSwatch="var(--l5)"
-    title="A capability first, a job title second."
+    title="The role is a capability first, a job title second."
   >
     <blockquote class="pullquote display">{capabilityStatement}</blockquote>
     <div class="role-flows">
-      <p class="role-eyebrow meta"><span class="meta-dot" aria-hidden="true"></span>Seven workflows</p>
+      <p class="mono-label flows-label">Seven workflows</p>
       <RegisterList items={workflowItems} />
     </div>
     <div class="stats-row">
@@ -225,7 +207,6 @@ const resources = [
             label={stat.label}
             source={stat.source}
             href={stat.sourceUrl}
-            class="card-lum lift"
           />
         ))
       }
@@ -241,7 +222,9 @@ const resources = [
 
   <Section tone="dark" class="verdict-beat">
     <div class="vb-inner">
-      <p class="vb-line display">A policy is not a control. An eval that can fail the build is.</p>
+      <p class="vb-line display">
+        Every control on this site can fail a build, block a release, or sign an attestation.
+      </p>
       <div class="vb-stamps">
         <VerdictStamp verdict="block" />
         <VerdictStamp verdict="pass" />
@@ -254,20 +237,13 @@ const resources = [
 
   <Section
     tone="plain"
-    texture="grid"
-    kicker={`Body of Knowledge · v${site.bokVersion} · ${site.license}`}
-    kickerSwatch="var(--l1)"
     title="Eleven chapters, versioned and open."
+    lede={`The Body of Knowledge is at v${site.bokVersion} and published under ${site.license}.`}
   >
     <ChapterGrid chapters={chaptersOrdered} class="reveal-stagger" />
   </Section>
 
-  <Section
-    tone="tint"
-    kicker="Resources"
-    kickerSwatch="var(--l4)"
-    title="Curated, cross-referenced, in the open."
-  >
+  <Section tone="tint" title="Curated resources, cross-referenced, in the open.">
     <ResourceTiles tiles={resources} class="reveal-stagger" />
   </Section>
 
@@ -281,42 +257,44 @@ const resources = [
 
 <style>
   /* Hero — the archify "governance loop". The copy sits left; the diagram is
-     the art, wrapped in a luminous panel. One diagram renders per breakpoint
-     (the other is display:none so the observer/hover never touch it): portrait
-     on phones, landscape above. */
+     an editorial figure, wrapped in a luminous panel and captioned with a link
+     to the chapter that explains it. One diagram renders per breakpoint (the
+     other is display:none so the observer/hover never touch it): portrait
+     below 720px, landscape above. The hero sits on the site grid (the default
+     --container). Below 1280 its height follows its content; from 1280 it
+     claims most of the first viewport (see the two-column block). Block
+     padding comes from the spacing scale. */
   .hero--loop {
     position: relative;
     isolation: isolate;
     overflow: hidden;
     contain: paint;
+    padding-block: var(--s-7);
   }
 
-  /* Soft gradient mesh + a faint grid, faded toward the panel, replace the old
-     dot backdrop. Both are inert decorative layers behind the content. */
+  /* Soft gradient mesh on the page ground: an inert decorative layer behind
+     the content (no grid or dot texture). */
   .hero-mesh {
     z-index: 0;
   }
 
-  .hero-tex {
-    z-index: 0;
-    -webkit-mask-image: radial-gradient(62% 62% at 72% 45%, #000 40%, transparent 82%);
-    mask-image: radial-gradient(62% 62% at 72% 45%, #000 40%, transparent 82%);
-  }
-
-  /* The hero runs on a wider well than the body sections so the diagram sits
-     next to the copy instead of bleeding to the viewport edge. Its container
-     sits above the backdrop. */
+  /* The container sits above the backdrop. */
   .hero--loop > .container {
     position: relative;
     z-index: 1;
-    max-width: min(1440px, 100%);
   }
 
+  /* One column until 1280: the copy, then the figure under it at a width
+     where its labels stay legible. --fs-display-xl, the hero's display size
+     (69px at 320, 72 at 390, 89 at 834, 105 at 1280, 111 at 1440, 112 cap), is
+     shared by the headline and the figure's cap-line offset in the two-column
+     layout. */
   .hero-grid {
+    --fs-display-xl: clamp(4rem, 3.6rem + 3.7vw, 7rem);
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--s-6);
-    align-items: center;
+    align-items: start;
   }
 
   .hero-copy {
@@ -326,107 +304,161 @@ const resources = [
     gap: var(--s-5);
   }
 
+  /* .display-xl, a modifier on .display: the display voice at hero scale.
+     Tall, narrow and light: Bricolage's condensed width (wdth 80) at weight
+     350, with the display optical size (auto: opsz follows the font size, so
+     it reaches the 96 master here) in place of the text master the rest of the
+     site pins in fonts.css. A tight leading, and near-neutral tracking: the
+     condensed cut needs far less than the old 700 weight did. */
+  .display-xl {
+    font-size: var(--fs-display-xl);
+    font-weight: 350;
+    font-stretch: 80%;
+    font-optical-sizing: auto;
+    font-variation-settings: normal;
+    line-height: 0.98;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  /* The headline breaks the same way at every width, one phrase per line
+     ("Governance / you can run, / not just read."): its longest line is about
+     3.6em, and a 4.2em measure is too short for any line to take the next
+     word. */
   .hero-h1 {
-    font-size: var(--fs-display);
-    max-width: 16ch;
+    max-width: 4.2em;
     margin: 0;
   }
 
+  /* The lede keeps the body leading it inherits; the measure is capped and
+     its lines are balanced (no one-word last line, no line opening on a
+     dash). */
   .hero-copy .lede {
-    max-width: 54ch;
+    max-width: 52ch;
     margin: 0;
+    text-wrap: balance;
   }
 
+  /* Both CTAs on one baseline; they stack full-width on narrow phones. */
   .hero-cta {
     display: flex;
     flex-wrap: wrap;
+    align-items: baseline;
     gap: var(--s-3);
     margin-top: var(--s-2);
   }
 
-  /* Weight contrast: the primary is the glowing fill (.btn-glow); the
-     secondary steps down to a quiet outline — hairline --line border on a
-     transparent ground, --ink-2 on hover — at the same .btn height. */
+  /* A --s-4 side padding (the .btn default is --s-5) keeps the pair on one
+     line in the 5/12 copy column at 1280+ and from 480 up. */
+  .hero-cta .btn {
+    padding-inline: var(--s-4);
+  }
+
+  /* Weight contrast: the primary is the gradient fill (.btn-glow); the
+     secondary steps down to an outline at the same .btn height. Over the mesh
+     it needs a visible edge: an ink-derived border (>= 3:1 against the ground
+     and the layer tones in both themes) on a translucent --bg plate that keeps
+     the mesh from running through the label. --ink-2 border and a solid
+     plate on hover. */
   .hero-cta .btn-secondary {
-    border-color: var(--line);
-    background: transparent;
+    border-color: color-mix(in srgb, var(--ink) 60%, var(--bg));
+    background: color-mix(in srgb, var(--bg) 72%, transparent);
   }
 
   .hero-cta .btn-secondary:hover {
     border-color: var(--ink-2);
+    background: var(--bg);
   }
 
-  /* position: relative makes .hero-art the containing block for the diagram's
-     hover note (rule in diagrams.css under .hero--loop). */
+  /* The figure never grows past the diagram's natural size (1 user unit =
+     1px): --art-w is the cropped viewBox width of the visible variant, plus the
+     panel's padding and 1px border on each side. */
   .hero-art {
-    position: relative;
+    --art-w: 390px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
     width: 100%;
+    max-width: calc(var(--art-w) + 2 * var(--s-3) + 2px);
+    margin: 0;
   }
 
   /* The luminous panel wraps both diagram variants. Its gradient border ring is
      kept always-on here (card-lum shows it on hover only), with a deep shadow
-     and a soft glow. No overflow:hidden — the hover note overlays the foot. */
+     and no coloured halo. No overflow:hidden — the hover note overlays the
+     foot. */
   .hero-panel {
     padding: var(--s-3);
-    box-shadow: var(--shadow-3), 0 0 40px var(--glow-1);
+    box-shadow: var(--shadow-3);
   }
 
   .hero-panel::before {
     opacity: 1;
   }
 
-  .hero-panel-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--s-3);
-    padding: 0 var(--s-1) var(--s-3);
-    margin-bottom: var(--s-1);
-    border-bottom: 1px solid var(--line);
-  }
-
-  /* The "live" pip reads green from the L5 ink. */
-  .hero-live .meta-dot {
-    background: var(--l5-ink);
-  }
-
-  /* Reserve the diagram's box so the inline SVG never shifts layout (CLS). */
+  /* Crop the empty margin archify leaves around the lanes (the viewBox runs
+     74 units past them at the foot, 46 above them and 35 to the right on the
+     landscape variant). The SVG is drawn wider than its box and pulled up and
+     left by the cropped amounts (percent margins resolve against the box
+     width), and .diagram-canvas clips the rest. The wrapper's aspect ratio is
+     the cropped box, so the inline SVG still never shifts layout (CLS).
+       landscape: viewBox 864 x 508 -> x 15..830, y 45..435 (815 x 390)
+       portrait:  viewBox 436 x 612 -> x 15..405, y 45..539 (390 x 494) */
   .hero-art-wide {
     display: none;
-    aspect-ratio: 864 / 508;
+    aspect-ratio: 815 / 390;
+  }
+
+  .hero-art-wide :global(svg) {
+    width: calc(864 / 815 * 100%);
+    max-width: none;
+    margin: calc(-45 / 815 * 100%) 0 calc(-73 / 815 * 100%) calc(-15 / 815 * 100%);
   }
 
   .hero-art-tall {
     display: block;
-    aspect-ratio: 436 / 612;
-    max-width: 420px;
-    margin-inline: auto;
+    aspect-ratio: 390 / 494;
   }
 
-  /* The verdict flourish, pinned to the art's lower-right and cocked slightly.
-     Server-rendered, so no-JS and reduced-motion users see it at rest. */
-  .hero-stamp {
-    position: absolute;
-    right: var(--s-3);
-    bottom: var(--s-3);
-    z-index: 2;
+  .hero-art-tall :global(svg) {
+    width: calc(436 / 390 * 100%);
+    max-width: none;
+    margin: calc(-45 / 390 * 100%) 0 calc(-73 / 390 * 100%) calc(-15 / 390 * 100%);
+  }
+
+  /* The figure's caption: plain small text in --ink-2, and a link to the
+     chapter that documents the loop (the global link colour and focus ring).
+     A wrapping flex row: sentence and link share a line wherever both fit
+     (834 and up); on phones the link drops whole onto its own line. */
+  .hero-caption {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: var(--s-1);
-    transform: rotate(-6deg);
-    transform-origin: bottom right;
-    pointer-events: none;
+    flex-wrap: wrap;
+    column-gap: 0.3em;
+    margin: 0;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+    text-wrap: pretty;
   }
 
-  .hero-attn {
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    color: var(--muted);
+  /* Narrow phones: the CTAs stack full-width. */
+  @media (max-width: 479px) {
+    .hero-cta {
+      flex-direction: column;
+      align-items: stretch;
+      align-self: stretch;
+    }
   }
 
-  /* Tablet: single column, the landscape variant full width. */
-  @media (min-width: 640px) {
+  /* From 720 the landscape variant fits at a legible scale (labels >= 12px). */
+  @media (min-width: 720px) {
+    .hero-grid {
+      gap: var(--s-7);
+    }
+
+    .hero-art {
+      --art-w: 815px;
+    }
+
     .hero-art-tall {
       display: none;
     }
@@ -436,26 +468,32 @@ const resources = [
     }
   }
 
-  /* Desktop: two columns, copy left, art right, both inside the wider hero
-     well. The art fills its grid track (no viewport bleed). */
-  @media (min-width: 1024px) {
-    .hero-grid {
-      grid-template-columns: minmax(0, 4.5fr) minmax(0, 7.5fr);
-      gap: var(--s-8);
-      align-items: center;
-      min-height: min(72vh, 680px);
+  /* Wide desktop: two columns on the site grid, copy 5/12 and figure 7/12, the
+     page's two-column gap between them. The hero claims most of the first
+     viewport: a min(75vh, 720px) floor and --s-8 block padding, so the
+     headline starts one --s-8 under the header. Top-aligned, not centred: the
+     copy column is the taller one, and the figure panel starts on the
+     headline's cap line (0.16em below the line box at a 0.98 leading, from
+     Bricolage's metrics: ascent 0.93, descent 0.27, cap height 0.66). */
+  @media (min-width: 1280px) {
+    .hero--loop {
+      min-height: min(75vh, 720px);
+      padding-block: var(--s-8) var(--s-7);
     }
 
-    /* Scale the headline down so its longest line fits the copy column. */
-    .hero-h1 {
-      font-size: calc(var(--fs-display) * 0.76);
-      max-width: 15ch;
-      text-wrap: balance;
+    .hero-grid {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    }
+
+    .hero-art {
+      margin-top: calc(var(--fs-display-xl) * 0.16);
     }
   }
 
-  /* Hero entrance: a short, staggered rise on load (not scroll-driven), motion
-     only. Reduced-motion users get the resting state. */
+  /* Hero entrance: a short, staggered rise on load (not scroll-driven). A lift
+     only, transform and no opacity: the copy sits in the first viewport, where
+     axe and Lighthouse blend a fractional opacity into the contrast ratio.
+     Reduced-motion users get the resting state. */
   @media (prefers-reduced-motion: no-preference) {
     .hero-in > * {
       animation: hero-up 0.6s var(--ease) both;
@@ -464,28 +502,23 @@ const resources = [
 
     @keyframes hero-up {
       from {
-        opacity: 0;
         transform: translateY(12px);
       }
       to {
-        opacity: 1;
         transform: none;
       }
     }
+  }
 
-    /* The pop when the loop closes on the auditor. */
-    .hero-stamp.is-pop {
-      animation: hero-stamp-pop 260ms var(--ease);
-    }
-
-    @keyframes hero-stamp-pop {
-      from {
-        transform: rotate(-6deg) scale(1.18);
-      }
-      to {
-        transform: rotate(-6deg) scale(1);
-      }
-    }
+  /* The two in-section captions ("Build order", "Seven workflows"): plain mono
+     at the small size, sentence case, no dot. --ink-2 holds AA on the tint and
+     over the role section's mesh. */
+  .mono-label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    line-height: 1.4;
+    color: var(--ink-2);
   }
 
   /* Stack story: the static mark and its caption pin on the left; the
@@ -509,10 +542,10 @@ const resources = [
     opacity: calc(var(--mesh-alpha) * 0.6);
   }
 
+  /* The capability statement, set as a display-weight quote on the content
+     edge. No side stripe: the type carries the emphasis. */
   .pullquote {
-    position: relative;
     margin: 0 0 var(--s-6);
-    padding-left: var(--s-5);
     font-weight: 600;
     font-size: var(--fs-h3);
     line-height: 1.3;
@@ -521,20 +554,8 @@ const resources = [
     text-wrap: pretty;
   }
 
-  /* Gradient rule down the quote, from the L5 ink to the L5 pastel. */
-  .pullquote::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    border-radius: 2px;
-    background: linear-gradient(180deg, var(--l5-ink), var(--l5));
-  }
-
-  .role-eyebrow {
-    margin: 0 0 var(--s-3);
+  .flows-label {
+    margin-bottom: var(--s-3);
   }
 
   .role-flows {
@@ -555,7 +576,20 @@ const resources = [
   }
 
   /* Verdict beat — a dark band (tone="dark" re-scopes the dark tokens). The
-     sentence and stamps sit in the container; the ticker breaks full-bleed. */
+     sentence and stamps sit in the container; the ticker breaks full-bleed.
+     In the dark theme the default --band-bg (#0b0d10) all but vanishes on the
+     #121417 page, so the band takes the L1 layer's deep tone instead (the same
+     ground as the dark CtaBand); every text token on it stays >= 4.5:1. The
+     class sits on Section's root, hence :global. */
+  :global(:root[data-theme='dark'] .verdict-beat) {
+    background: var(--l1);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light']) .verdict-beat) {
+      background: var(--l1);
+    }
+  }
   .vb-inner {
     display: flex;
     flex-wrap: wrap;

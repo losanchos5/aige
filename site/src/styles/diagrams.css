@@ -572,8 +572,7 @@
 /* Hover/focus note: taken out of flow and overlaid on the foot of the diagram,
    so opening it never changes the figure's height or the canvas position — the
    centred art would otherwise jump up. Anchored bottom-left as an opaque panel
-   (the .hero-art ancestor in index.astro is the positioned containing block);
-   the lower-right corner is left free for the verdict stamp, and a tall note
+   (.hero-panel, a positioned .card-lum, is the containing block); a tall note
    scrolls inside its cap rather than growing the figure. Lives here rather than
    in the page's scoped <style> because the note is injected via set:html and so
    carries no data-astro-cid for a scoped selector to match. */
@@ -582,11 +581,124 @@
   left: 0;
   bottom: 0;
   z-index: 3;
-  max-width: min(32rem, calc(100% - 8.5rem));
+  max-width: min(32rem, 100%);
   max-height: 66%;
   overflow-y: auto;
   background: var(--bg);
   box-shadow: 0 10px 30px -14px rgb(0 0 0 / 0.35);
+}
+
+/* Legible at hero scale. archify writes fixed user-unit sizes (node label 10,
+   lane head 9, edge label 8, tag 7), which rendered at 6-9 px in the hero. A
+   CSS font-size beats the SVG presentation attribute, so the hero sets its own
+   sizes in user units, sized for the smallest scale each variant is shown at
+   (the page crops the viewBox to the lanes; see index.astro):
+     landscape, 815 units: 618 px in the 7/12 column at >= 1280 (0.76) ->
+       16 units = 12.1 px; 0.81-1.0 from 720 to 1279 -> 13-16 px.
+     portrait, 390 units: 332 px at 390 (0.85) and 262 px at 320 (0.67) ->
+       16.5 units = 14 px and 11.1 px.
+   Edge labels scale with their backing mask; the mask is narrowed so the chip
+   hugs its (now larger) text. The sublabels (example run values too long for
+   a node at a legible size) stay in the node's accessible name and hover note;
+   the label and tag close up to fill the space. Weight order: node labels 600
+   in ink lead; lane heads 500 in --muted; tags and edge labels regular.
+   archify's kind sigils and graph-paper grid carry no meaning here and are
+   dropped. */
+.hero--loop .diagram text[data-node-label] {
+  font-size: 16px;
+  transform: translateY(10px);
+}
+
+.hero--loop .diagram text[data-detail='fine'] {
+  font-size: 16px;
+  transform: translateY(-10px);
+}
+
+.hero--loop .diagram [data-composition-frame-kind='stage'] + text {
+  font-size: 16px;
+  font-weight: 500;
+  fill: var(--muted);
+}
+
+.hero--loop .diagram g[data-edge-id] {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(2);
+}
+
+.hero--loop .diagram g[data-edge-id] > rect.c-mask {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scaleX(0.75);
+}
+
+.hero--loop .diagram text[data-detail='context'],
+.hero--loop .diagram .semantic-sigil,
+.hero--loop .diagram .c-grid {
+  display: none;
+}
+
+/* Portrait variant: fewer, shorter lines per node and a smaller rendered
+   scale, so the text runs larger in user units. Its two lanes are the two
+   columns of the loop: the law and the proof it gets back (left), the
+   controls that turn one into the other (right). */
+.hero--loop svg[data-diagram='hero-loop-tall'] text[data-node-label] {
+  font-size: 16.5px;
+  transform: translateY(6.5px);
+}
+
+.hero--loop svg[data-diagram='hero-loop-tall'] text[data-detail='fine'] {
+  font-size: 16.5px;
+  transform: translateY(-6.5px);
+}
+
+.hero--loop svg[data-diagram='hero-loop-tall'] [data-composition-frame-kind='stage'] + text {
+  font-size: 16.5px;
+}
+
+.hero--loop svg[data-diagram='hero-loop-tall'] g[data-edge-id] {
+  transform: scale(2.1);
+}
+
+/* Layer colour. The five controls in the loop carry their stack layer as the
+   node tag (data-node-tag "Layer 01".."Layer 05", both variants), so the hero
+   colours them by layer, with the same tints and inks as the stack further
+   down the page, instead of by archify kind: a tint of the layer fill, a
+   layer-ink rule and a layer-ink tag. The two nodes outside the stack (the
+   law and the auditor, kind "external") keep the neutral ground-and-muted
+   style. The lit state below still wins with its ink outline. */
+.hero--loop .diagram [data-node-tag='Layer 01'] {
+  --layer: var(--l1);
+  --layer-ink: var(--l1-ink);
+}
+
+.hero--loop .diagram [data-node-tag='Layer 02'] {
+  --layer: var(--l2);
+  --layer-ink: var(--l2-ink);
+}
+
+.hero--loop .diagram [data-node-tag='Layer 03'] {
+  --layer: var(--l3);
+  --layer-ink: var(--l3-ink);
+}
+
+.hero--loop .diagram [data-node-tag='Layer 04'] {
+  --layer: var(--l4);
+  --layer-ink: var(--l4-ink);
+}
+
+.hero--loop .diagram [data-node-tag='Layer 05'] {
+  --layer: var(--l5);
+  --layer-ink: var(--l5-ink);
+}
+
+.hero--loop .diagram [data-node-tag^='Layer '] rect:not(.c-mask) {
+  fill: color-mix(in srgb, var(--layer) 72%, var(--bg));
+  stroke: var(--layer-ink);
+}
+
+.hero--loop .diagram [data-node-tag^='Layer '] text[data-detail='fine'] {
+  fill: var(--layer-ink);
 }
 
 /* Lit node: a heavier ink outline with a soft ink glow. */
@@ -613,22 +725,4 @@
 
 .hero--loop .diagram .hero-packet.is-hidden {
   display: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  /* Idle "marching ants" on the dashed closing edge, so the loop is never fully
-     static between packet runs. The delay lets diagram.js's one-time draw-on
-     (a stroke-dashoffset transition set inline) run and clear its inline dash
-     styles first; starting the animation immediately would mask that transition,
-     its transitionend cleanup would never fire, and the leftover inline
-     stroke-dasharray (the full path length) would render the edge solid. */
-  .hero--loop .diagram path[data-edge-id='closes-loop'] {
-    animation: hero-closes-march 1.5s linear 1.3s infinite;
-  }
-
-  @keyframes hero-closes-march {
-    to {
-      stroke-dashoffset: -16;
-    }
-  }
 }

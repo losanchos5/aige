@@ -5,7 +5,7 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Link: </fonts/instrument-sans-latin-wght-normal.woff2>; rel=preload; as=font; type=font/woff2; crossorigin
-  Link: </fonts/bricolage-grotesque-latin-wght-normal.woff2>; rel=preload; as=font; type=font/woff2; crossorigin
+  Link: </fonts/bricolage-grotesque-latin-standard-normal.woff2>; rel=preload; as=font; type=font/woff2; crossorigin
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 /fonts/*

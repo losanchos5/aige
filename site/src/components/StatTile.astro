@@ -1,7 +1,8 @@
 ---
 /**
  * StatTile — a bordered figure card: a large value, a label, and a required
- * source line rendered small underneath. Flat, 1px border, no shadow.
+ * source line rendered small underneath. Flat, 1px border, no shadow; it lifts
+ * on hover only when it is a link (href set).
  */
 interface Props {
   value: string;
@@ -29,7 +30,7 @@ const countup = match
 ---
 
 <Tag
-  class:list={['tile', 'card-lum', 'lift', className]}
+  class:list={['tile', 'card-lum', href && 'lift', className]}
   {...(href ? { href, target: '_blank', rel: 'noopener noreferrer' } : {})}
 >
   <span
@@ -47,7 +48,7 @@ const countup = match
 </Tag>
 
 <style>
-  /* Surface (border, radius, background, shadow) comes from .card-lum in
+  /* Surface (hairline, radius, background) comes from .card-lum in
      effects.css; this rule keeps only the tile's layout and ink colour. */
   .tile {
     display: flex;
