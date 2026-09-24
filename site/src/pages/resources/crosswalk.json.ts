@@ -23,7 +23,9 @@ import {
   frameworkById,
   crosswalkAsOf,
   crosswalkSchemaVersion,
+  refObligation,
 } from '../../data/crosswalk';
+import { obligationPath } from '../../data/frameworks';
 import { site } from '../../data/site';
 import { slugify } from '../../lib/md-parse';
 
@@ -70,7 +72,9 @@ export const GET: APIRoute = () => {
       layers: t.layerN ?? null,
       read: (t.read ?? []).map((r) => ({ label: r.label, url: abs(r.href) })),
     })),
-    references: refs.map((r) => ({
+    references: refs.map((r) => {
+      const row = refObligation(r);
+      return {
       topic: r.topic,
       framework: r.framework,
       frameworkShort: frameworkById(r.framework)?.short ?? r.framework,
@@ -83,12 +87,16 @@ export const GET: APIRoute = () => {
       verified: r.verified !== false,
       note: r.note ?? null,
       url: r.url ?? null,
-      obligation: r.obligation ?? null,
-      chapter: r.obligation
-        ? `${site.url}/resources/frameworks#ob-${slugify(r.obligation)}`
-        : null,
+      // `obligation` and `chapter` keep their v2 meaning (the row text and its
+      // row on the frameworks page); `obligationId` and `obligationUrl` add the
+      // register row's stable id and page.
+      obligation: row?.obligation ?? null,
+      chapter: row ? `${site.url}/resources/frameworks#ob-${slugify(row.obligation)}` : null,
+      obligationId: row?.id ?? null,
+      obligationUrl: row ? `${site.url}${obligationPath(row)}` : null,
       see: r.see ? abs(r.see) : null,
-    })),
+      };
+    }),
   };
 
   return new Response(`${JSON.stringify(payload, null, 2)}\n`, {

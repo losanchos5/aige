@@ -97,7 +97,7 @@ const jsonLd = [
 ];
 ---
 
-<Base title="Obligation register" description={description} image="/og/resources.png" jsonLd={jsonLd}>
+<Base title="Obligation register" description={description} image="/og/obligations.png" jsonLd={jsonLd}>
   <PageHero
     variant="res"
     crumbs={crumbs}
@@ -125,8 +125,24 @@ const jsonLd = [
         </p>
         <p class="ob-export">
           <a class="ob-dl" href="/api/v1/obligations.json">JSON (API)</a>
-          <a class="ob-dl" href="/resources/obligations.csv" download>Download CSV</a>
-          <a class="ob-dl" href="/resources/obligations.json" download>Download JSON</a>
+          <a
+            class="ob-dl"
+            href="/resources/obligations.csv"
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file="/resources/obligations.csv"
+            data-umami-event-location="obligations">Download CSV</a>
+          <a
+            class="ob-dl"
+            href="/resources/obligations.json"
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file="/resources/obligations.json"
+            data-umami-event-location="obligations">Download JSON</a>
         </p>
       </div>
 

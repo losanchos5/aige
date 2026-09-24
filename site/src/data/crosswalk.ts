@@ -9,10 +9,11 @@
 // clause ids (6.1.2, A.5, …) come from the ISO Online Browsing Platform table of
 // contents and NIST subcategory ids (MAP 1, MANAGE 2.4, GOVERN 1.6, …) from NIST
 // AI RMF 1.0 Appendix A / the Playbook. Fidelity to chapter 08 is kept through
-// the optional `obligation` join: where a clause has an obligations[] row in
-// frameworks.ts, `obligation` carries that row's exact text so the UI can link
-// the crosswalk cell to the obligation matrix. Mappings are illustrative, not a
-// claim of conformity.
+// the optional `obligationId` join: where a clause has an obligations[] row in
+// frameworks.ts, `obligationId` carries that row's stable id (AIGE-OBL-...), so
+// the UI links the crosswalk cell to the row's page in the obligation register
+// (/obligations/<id>) and a reworded row never breaks the join. Mappings are
+// illustrative, not a claim of conformity.
 //
 // Version 2 (BoK v0.5.0) widens the grid to 25 topics and 14 columns, adds the
 // instruments the crosswalk needs before frameworks.ts carries them
@@ -23,8 +24,8 @@
 // ISO/IEC clauses that could not be opened, and the prEN drafts, stay false
 // with a note saying why.
 
-import type { Framework, StackLayer } from './frameworks';
-import { frameworks } from './frameworks';
+import type { Framework, Obligation, StackLayer } from './frameworks';
+import { frameworks, obligations } from './frameworks';
 
 export { disclaimer } from './frameworks';
 
@@ -82,8 +83,13 @@ export interface CrosswalkRef {
   note?: string;
   /** 'core' = the clause is primarily about the topic; 'related' = it touches it. */
   strength: RefStrength;
-  /** Exact text of an obligations[].obligation row in frameworks.ts, to link the
-   *  obligation-matrix row. Unset where no row exists (ISO clauses). */
+  /** Stable id of the obligations[] row in frameworks.ts the clause joins
+   *  (AIGE-OBL-...), linking the row's register page. Unset where no row exists
+   *  (most ISO clauses). */
+  obligationId?: string;
+  /** Legacy (v0.4) join by the row's exact obligation text. Still resolved by
+   *  `refObligation`, so refs written against the text keep working, but new
+   *  refs use `obligationId`. */
   obligation?: string;
   /** false = could not be checked against the source; then `note` is required. */
   verified?: boolean;
@@ -600,21 +606,20 @@ export const columns: readonly CrosswalkColumn[] = [
   },
 ];
 
-// Exact obligation-row texts reused across topics, verbatim from frameworks.ts.
-const OBL_EU_9 = 'EU AI Act Art. 9 risk management system';
-const OBL_EU_26 = 'EU AI Act Art. 26 deployer obligations for high-risk systems';
-const OBL_EU_55 = 'EU AI Act Art. 55 GPAI models with systemic risk';
-const OBL_EU_4971 =
-  'EU AI Act Art. 49/71 registration of high-risk systems in the EU database';
-const OBL_A6 = 'A.6 AI system life cycle';
-// China obligation-row texts, verbatim from frameworks.ts (em-dash U+2014, section sign U+00A7).
-const OBL_CN_ALGOREC = 'Provisions on Algorithmic Recommendation (in force 2022-03-01)';
-const OBL_CN_DEEPSYN = 'Provisions on Deep Synthesis (in force 2023-01-10)';
-const OBL_CN_GENAI = 'Interim Measures for Generative AI Services (in force 2023-08-15)';
-const OBL_CN_LABEL = 'Measures for Labelling AI-Generated Synthetic Content with GB 45438-2025 (in force 2025-09-01)';
-const OBL_CN_GBT = 'GB/T 45654-2025 Basic security requirements for generative AI services (voluntary; implemented 2025-11-01)';
-const OBL_CN_TC260 = 'TC260 AI Safety Governance Framework 3.0: operators\' guidelines §5.3 (voluntary; 2026-09-14)';
-const OBL_CN_TC260_APP2 = 'TC260 Framework 3.0 Appendix 2: agentic AI risk management (voluntary; 2026-09-14)';
+// Obligation-row ids (frameworks.ts) reused across topics.
+const OBL_EU_9 = 'AIGE-OBL-EUAIA-ART9';
+const OBL_EU_26 = 'AIGE-OBL-EUAIA-ART26';
+const OBL_EU_55 = 'AIGE-OBL-EUAIA-ART55';
+const OBL_EU_4971 = 'AIGE-OBL-EUAIA-ART49-71';
+const OBL_A6 = 'AIGE-OBL-ISO42001-A6';
+// China obligation-row ids (frameworks.ts).
+const OBL_CN_ALGOREC = 'AIGE-OBL-CN-ALGOREC';
+const OBL_CN_DEEPSYN = 'AIGE-OBL-CN-DEEPSYN';
+const OBL_CN_GENAI = 'AIGE-OBL-CN-GENAI';
+const OBL_CN_LABEL = 'AIGE-OBL-CN-LABEL';
+const OBL_CN_GBT = 'AIGE-OBL-CN-GBT45654';
+const OBL_CN_TC260 = 'AIGE-OBL-CN-TC260-OPS';
+const OBL_CN_TC260_APP2 = 'AIGE-OBL-CN-TC260-AGENTS';
 
 /** The v0.4 topic → framework clause refs, grouped by topic in display order. */
 const refsV04: readonly CrosswalkRef[] = [
@@ -627,7 +632,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('9'),
     note: 'Iterative, lifecycle risk management; the backbone of the risk register.',
     strength: 'core',
-    obligation: OBL_EU_9,
+    obligationId: OBL_EU_9,
     verified: true,
   },
   {
@@ -675,7 +680,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ISO_URL,
     note: 'Lifecycle controls operationalise the risk treatment.',
     strength: 'related',
-    obligation: OBL_A6,
+    obligationId: OBL_A6,
     verified: true,
   },
   {
@@ -685,7 +690,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'MAP 1: Context is established and understood',
     url: NIST_URL,
     strength: 'core',
-    obligation: 'MAP',
+    obligationId: 'AIGE-OBL-NISTRMF-MAP',
     verified: true,
   },
   {
@@ -696,7 +701,7 @@ const refsV04: readonly CrosswalkRef[] = [
       'MAP 5: Impacts to individuals, groups, communities, organizations, and society are characterized',
     url: NIST_URL,
     strength: 'core',
-    obligation: 'MAP',
+    obligationId: 'AIGE-OBL-NISTRMF-MAP',
     verified: true,
   },
   {
@@ -707,7 +712,7 @@ const refsV04: readonly CrosswalkRef[] = [
       'MANAGE 1: AI risks based on assessments and other analytical output are prioritized, responded to, and managed',
     url: NIST_URL,
     strength: 'core',
-    obligation: 'MANAGE',
+    obligationId: 'AIGE-OBL-NISTRMF-MANAGE',
     verified: true,
   },
   {
@@ -718,7 +723,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: NIST_URL,
     note: 'Measurement feeds the risk picture.',
     strength: 'related',
-    obligation: 'MEASURE',
+    obligationId: 'AIGE-OBL-NISTRMF-MEASURE',
     verified: true,
   },
   {
@@ -729,7 +734,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Three-way taxonomy: inherent / application / secondary (derivative) safety risks; printed p. 54.',
     strength: 'core',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -740,7 +745,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Maps each risk class to its countermeasures; printed pp. 107-108.',
     strength: 'core',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -751,7 +756,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Re-run the risk assessment when the system materially changes; printed p. 104.',
     strength: 'related',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -762,7 +767,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Security assessment for services with public-opinion attributes; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -773,7 +778,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Security assessment for recommendation services with public-opinion or social-mobilization capacity; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_ALGOREC,
+    obligationId: OBL_CN_ALGOREC,
     verified: true,
   },
 
@@ -786,7 +791,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('17'),
     note: 'The QMS that assigns and documents responsibilities.',
     strength: 'core',
-    obligation: 'EU AI Act Art. 17 quality management system',
+    obligationId: 'AIGE-OBL-EUAIA-ART17',
     verified: true,
   },
   {
@@ -797,7 +802,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('4'),
     note: 'Staff competence underpins accountable operation.',
     strength: 'related',
-    obligation: 'EU AI Act Art. 4 AI literacy',
+    obligationId: 'AIGE-OBL-EUAIA-ART4',
     verified: true,
   },
   {
@@ -834,7 +839,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'Policies related to AI',
     url: ISO_URL,
     strength: 'core',
-    obligation: 'A.2 Policies related to AI',
+    obligationId: 'AIGE-OBL-ISO42001-A2',
     verified: true,
   },
   {
@@ -844,7 +849,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'Internal organization',
     url: ISO_URL,
     strength: 'core',
-    obligation: 'A.3 Internal organization',
+    obligationId: 'AIGE-OBL-ISO42001-A3',
     verified: true,
   },
   {
@@ -855,7 +860,7 @@ const refsV04: readonly CrosswalkRef[] = [
       'GOVERN 1: Policies, processes, procedures, and practices across the organization related to the mapping, measuring, and managing of AI risks are in place, transparent, and implemented effectively',
     url: NIST_URL,
     strength: 'core',
-    obligation: 'GOVERN',
+    obligationId: 'AIGE-OBL-NISTRMF-GOVERN',
     verified: true,
   },
   {
@@ -866,7 +871,7 @@ const refsV04: readonly CrosswalkRef[] = [
       'GOVERN 2: Accountability structures are in place so that the appropriate teams and individuals are empowered, responsible, and trained',
     url: NIST_URL,
     strength: 'core',
-    obligation: 'GOVERN',
+    obligationId: 'AIGE-OBL-NISTRMF-GOVERN',
     verified: true,
   },
   {
@@ -877,7 +882,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Organisational and institutional governance measures; printed p. 85.',
     strength: 'core',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -888,7 +893,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'A traceable responsibility chain across the lifecycle; printed p. 103.',
     strength: 'core',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -899,7 +904,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Providers bear network-information content-producer responsibility; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -910,7 +915,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Providers establish algorithm-security management systems; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_ALGOREC,
+    obligationId: OBL_CN_ALGOREC,
     verified: true,
   },
   {
@@ -921,7 +926,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Providers establish management systems (registration, review, ethics, data and personal-information protection); CAC text.',
     strength: 'core',
-    obligation: OBL_CN_DEEPSYN,
+    obligationId: OBL_CN_DEEPSYN,
     verified: true,
   },
 
@@ -934,7 +939,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('27'),
     note: 'See pattern: /bok/patterns#pattern-fria-as-code',
     strength: 'core',
-    obligation: 'EU AI Act Art. 27 Fundamental Rights Impact Assessment (FRIA)',
+    obligationId: 'AIGE-OBL-EUAIA-ART27',
     verified: true,
   },
   {
@@ -945,7 +950,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('9'),
     note: 'Risk management and the FRIA cross-reference each other.',
     strength: 'related',
-    obligation: OBL_EU_9,
+    obligationId: OBL_EU_9,
     verified: true,
   },
   {
@@ -974,7 +979,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ISO_URL,
     note: 'See pattern: /bok/patterns#pattern-fria-as-code',
     strength: 'core',
-    obligation: 'A.5 Assessing impacts of AI systems',
+    obligationId: 'AIGE-OBL-ISO42001-A5',
     verified: true,
   },
   {
@@ -985,7 +990,7 @@ const refsV04: readonly CrosswalkRef[] = [
       'MAP 3: AI capabilities, targeted usage, goals, and expected benefits and costs are understood',
     url: NIST_URL,
     strength: 'core',
-    obligation: 'MAP',
+    obligationId: 'AIGE-OBL-NISTRMF-MAP',
     verified: true,
   },
   {
@@ -996,7 +1001,7 @@ const refsV04: readonly CrosswalkRef[] = [
       'MAP 5: Impacts to individuals, groups, communities, organizations, and society are characterized',
     url: NIST_URL,
     strength: 'core',
-    obligation: 'MAP',
+    obligationId: 'AIGE-OBL-NISTRMF-MAP',
     verified: true,
   },
   {
@@ -1007,7 +1012,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Grading principles for classifying risk; printed pp. 109-112.',
     strength: 'core',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1018,7 +1023,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Application-layer risks to assess (agentic, embodied, cybersecurity, content, personal information, real-world); printed p. 60.',
     strength: 'related',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1029,7 +1034,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Pre-deployment security assessment for public-opinion services; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
 
@@ -1042,7 +1047,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('10'),
     note: 'Training, validation and test data quality and governance.',
     strength: 'core',
-    obligation: 'EU AI Act Art. 10 data and data governance',
+    obligationId: 'AIGE-OBL-EUAIA-ART10',
     verified: true,
   },
   {
@@ -1052,8 +1057,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'Special-category data for bias detection',
     note: 'Post-Omnibus new article: a lawful basis to process special-category data to detect and correct bias.',
     strength: 'related',
-    obligation:
-      'EU AI Act Art. 4a lawful basis for special-category data in bias detection',
+    obligationId: 'AIGE-OBL-EUAIA-ART4A',
     verified: true,
   },
   {
@@ -1063,7 +1067,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'Data for AI systems',
     url: ISO_URL,
     strength: 'core',
-    obligation: 'A.7 Data for AI systems',
+    obligationId: 'AIGE-OBL-ISO42001-A7',
     verified: true,
   },
   {
@@ -1074,7 +1078,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ISO_URL,
     note: 'Data as a governed resource.',
     strength: 'related',
-    obligation: 'A.4 Resources for AI systems',
+    obligationId: 'AIGE-OBL-ISO42001-A4',
     verified: true,
   },
   {
@@ -1085,7 +1089,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: NIST_URL,
     note: 'Data categorisation and provenance.',
     strength: 'related',
-    obligation: 'MAP',
+    obligationId: 'AIGE-OBL-NISTRMF-MAP',
     verified: true,
   },
   {
@@ -1095,7 +1099,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'MEASURE 2.10: Privacy risk of the AI system is examined and documented',
     url: NIST_URL,
     strength: 'related',
-    obligation: 'MEASURE',
+    obligationId: 'AIGE-OBL-NISTRMF-MEASURE',
     verified: true,
   },
   {
@@ -1105,7 +1109,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'MEASURE 2.11: Fairness and bias are evaluated and results are documented',
     url: NIST_URL,
     strength: 'related',
-    obligation: 'MEASURE',
+    obligationId: 'AIGE-OBL-NISTRMF-MEASURE',
     verified: true,
   },
   {
@@ -1116,7 +1120,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Inherent data risks (quality, poisoning, leakage); printed p. 57.',
     strength: 'core',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1127,7 +1131,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Training-data governance during model R&D; printed p. 95.',
     strength: 'related',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1138,7 +1142,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Lawful sources, IP and personal-information compliance for training data; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1149,7 +1153,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Clear, specific annotation rules and quality checks; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1160,7 +1164,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'No unlawful retention of user input and usage records; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1171,7 +1175,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Providers and technical supporters secure training data and personal information; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_DEEPSYN,
+    obligationId: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -1182,7 +1186,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GBT_URL,
     note: 'GB/T 45654-2025 corpus-security requirements (TC260-003 predecessor §5). The official listing shows the standard as current (issued 2025-04-25, implemented 2025-11-01; checked 2026-09-24), but the full text is only offered there as an image preview, so the clause id is not verified against it.',
     strength: 'core',
-    obligation: OBL_CN_GBT,
+    obligationId: OBL_CN_GBT,
     verified: false,
   },
 
@@ -1195,7 +1199,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('11'),
     note: 'Annex IV technical documentation.',
     strength: 'core',
-    obligation: 'EU AI Act Art. 11 technical documentation (Annex IV)',
+    obligationId: 'AIGE-OBL-EUAIA-ART11',
     verified: true,
   },
   {
@@ -1205,7 +1209,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'Transparency and provision of information to deployers',
     url: aia('13'),
     strength: 'core',
-    obligation: 'EU AI Act Art. 13 transparency and information to deployers',
+    obligationId: 'AIGE-OBL-EUAIA-ART13',
     verified: true,
   },
   {
@@ -1216,7 +1220,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('53'),
     note: 'Model documentation and training-content summary for GPAI providers.',
     strength: 'core',
-    obligation: 'EU AI Act Art. 53 GPAI provider obligations',
+    obligationId: 'AIGE-OBL-EUAIA-ART53',
     verified: true,
   },
   {
@@ -1228,7 +1232,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('50'),
     note: 'User-facing disclosure and machine-readable content marking.',
     strength: 'related',
-    obligation: 'EU AI Act Art. 50 transparency for certain AI systems',
+    obligationId: 'AIGE-OBL-EUAIA-ART50',
     verified: true,
   },
   {
@@ -1248,7 +1252,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ISO_URL,
     note: 'Lifecycle documentation.',
     strength: 'core',
-    obligation: OBL_A6,
+    obligationId: OBL_A6,
     verified: true,
   },
   {
@@ -1258,7 +1262,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'Information for interested parties',
     url: ISO_URL,
     strength: 'core',
-    obligation: 'A.8 Information for interested parties',
+    obligationId: 'AIGE-OBL-ISO42001-A8',
     verified: true,
   },
   {
@@ -1269,7 +1273,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: NIST_URL,
     note: 'Documenting context and intended use.',
     strength: 'related',
-    obligation: 'MAP',
+    obligationId: 'AIGE-OBL-NISTRMF-MAP',
     verified: true,
   },
   {
@@ -1280,7 +1284,7 @@ const refsV04: readonly CrosswalkRef[] = [
       'MEASURE 2.8: Risks associated with transparency and accountability are examined and documented',
     url: NIST_URL,
     strength: 'related',
-    obligation: 'MEASURE',
+    obligationId: 'AIGE-OBL-NISTRMF-MEASURE',
     verified: true,
   },
   {
@@ -1291,7 +1295,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: LABEL_URL,
     note: 'Visible labels on AI-generated and synthetic content; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_LABEL,
+    obligationId: OBL_CN_LABEL,
     verified: true,
   },
   {
@@ -1302,7 +1306,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: LABEL_URL,
     note: 'Implicit labels embedded in file metadata; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_LABEL,
+    obligationId: OBL_CN_LABEL,
     verified: true,
   },
   {
@@ -1313,7 +1317,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Label generated images and video per the Deep Synthesis rules; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1324,7 +1328,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Disclose training-data sources, scale and labelling mechanisms on request; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1335,7 +1339,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Non-disruptive technical marks on synthetic content; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_DEEPSYN,
+    obligationId: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -1346,7 +1350,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Prominent labels where synthetic media could mislead; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_DEEPSYN,
+    obligationId: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -1357,7 +1361,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Conspicuously inform users that algorithmic recommendation is in use; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_ALGOREC,
+    obligationId: OBL_CN_ALGOREC,
     verified: true,
   },
   {
@@ -1368,7 +1372,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GBT_URL,
     note: 'GB/T 45654-2025 content-labelling requirements (aligned with the 2025 Labelling Measures). The official listing shows the standard as current (issued 2025-04-25, implemented 2025-11-01; checked 2026-09-24), but the full text is only offered there as an image preview, so the clause id is not verified against it.',
     strength: 'related',
-    obligation: OBL_CN_GBT,
+    obligationId: OBL_CN_GBT,
     verified: false,
   },
 
@@ -1381,7 +1385,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('49'),
     note: 'Registration of high-risk systems in the EU database.',
     strength: 'core',
-    obligation: OBL_EU_4971,
+    obligationId: OBL_EU_4971,
     verified: true,
   },
   {
@@ -1392,7 +1396,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('71'),
     note: 'The EU database that registration feeds.',
     strength: 'core',
-    obligation: OBL_EU_4971,
+    obligationId: OBL_EU_4971,
     verified: true,
   },
   {
@@ -1403,8 +1407,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('6'),
     note: 'Classification decides what must be registered.',
     strength: 'related',
-    obligation:
-      'EU AI Act Art. 6 classification of high-risk AI systems (incl. the Annex III route)',
+    obligationId: 'AIGE-OBL-EUAIA-ART6',
     verified: true,
   },
   {
@@ -1415,7 +1418,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ISO_URL,
     note: 'Resource and asset inventory of AI systems.',
     strength: 'core',
-    obligation: 'A.4 Resources for AI systems',
+    obligationId: 'AIGE-OBL-ISO42001-A4',
     verified: true,
   },
   {
@@ -1427,7 +1430,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: NIST_URL,
     note: 'See pattern: /bok/patterns#pattern-agent-registry',
     strength: 'core',
-    obligation: 'GOVERN',
+    obligationId: 'AIGE-OBL-NISTRMF-GOVERN',
     verified: true,
   },
   {
@@ -1438,7 +1441,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'File within ten working days via the algorithm-filing system (public-opinion services); CAC text.',
     strength: 'core',
-    obligation: OBL_CN_ALGOREC,
+    obligationId: OBL_CN_ALGOREC,
     verified: true,
   },
   {
@@ -1449,7 +1452,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Filing per the Algorithm Recommendation rules; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_DEEPSYN,
+    obligationId: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -1460,7 +1463,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Algorithm filing alongside the security assessment; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1471,7 +1474,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Identity and permissions per agent; printed pp. 120-121.',
     strength: 'related',
-    obligation: OBL_CN_TC260_APP2,
+    obligationId: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1482,7 +1485,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Registration/filing for critical information infrastructure; printed p. 91.',
     strength: 'related',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
 
@@ -1495,7 +1498,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('12'),
     note: 'Automatic logging over the system lifetime.',
     strength: 'core',
-    obligation: 'EU AI Act Art. 12 record-keeping and logging',
+    obligationId: 'AIGE-OBL-EUAIA-ART12',
     verified: true,
   },
   {
@@ -1506,7 +1509,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('26'),
     note: 'Deployers keep the logs the system generates.',
     strength: 'related',
-    obligation: OBL_EU_26,
+    obligationId: OBL_EU_26,
     verified: true,
   },
   {
@@ -1517,7 +1520,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ISO_URL,
     note: 'Lifecycle event logs.',
     strength: 'core',
-    obligation: OBL_A6,
+    obligationId: OBL_A6,
     verified: true,
   },
   {
@@ -1528,7 +1531,7 @@ const refsV04: readonly CrosswalkRef[] = [
       'MANAGE 4: Risk treatments, including response and recovery, and communication plans for the identified and measured AI risks are documented and monitored',
     url: NIST_URL,
     strength: 'related',
-    obligation: 'MANAGE',
+    obligationId: 'AIGE-OBL-NISTRMF-MANAGE',
     verified: true,
   },
   {
@@ -1538,7 +1541,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'MEASURE 3: Mechanisms for tracking identified AI risks over time are in place',
     url: NIST_URL,
     strength: 'related',
-    obligation: 'MEASURE',
+    obligationId: 'AIGE-OBL-NISTRMF-MEASURE',
     verified: true,
   },
   {
@@ -1549,7 +1552,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Log management and auditing for agents; printed pp. 124-125.',
     strength: 'core',
-    obligation: OBL_CN_TC260_APP2,
+    obligationId: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1560,7 +1563,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Keep logs at least six months and audit them; printed p. 102.',
     strength: 'core',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1571,7 +1574,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: LABEL_URL,
     note: 'Metadata labels support content traceability; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_LABEL,
+    obligationId: OBL_CN_LABEL,
     verified: true,
   },
 
@@ -1584,7 +1587,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('14'),
     note: 'See pattern: /bok/patterns#pattern-human-in-the-loop-gate',
     strength: 'core',
-    obligation: 'EU AI Act Art. 14 human oversight',
+    obligationId: 'AIGE-OBL-EUAIA-ART14',
     verified: true,
   },
   {
@@ -1595,7 +1598,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('26'),
     note: 'Deployers assign the humans who oversee the system.',
     strength: 'related',
-    obligation: OBL_EU_26,
+    obligationId: OBL_EU_26,
     verified: true,
   },
   {
@@ -1606,7 +1609,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ISO_URL,
     note: 'Oversight of AI systems in use.',
     strength: 'core',
-    obligation: 'A.9 Use of AI systems',
+    obligationId: 'AIGE-OBL-ISO42001-A9',
     verified: true,
   },
   {
@@ -1618,7 +1621,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: NIST_URL,
     note: 'See pattern: /bok/patterns#pattern-human-in-the-loop-gate',
     strength: 'core',
-    obligation: 'MANAGE',
+    obligationId: 'AIGE-OBL-NISTRMF-MANAGE',
     verified: true,
   },
   {
@@ -1629,7 +1632,7 @@ const refsV04: readonly CrosswalkRef[] = [
       'GOVERN 3.2: Policies and procedures are in place to define and differentiate roles and responsibilities for human-AI configurations and oversight of AI systems',
     url: NIST_URL,
     strength: 'related',
-    obligation: 'GOVERN',
+    obligationId: 'AIGE-OBL-NISTRMF-GOVERN',
     verified: true,
   },
   {
@@ -1640,7 +1643,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Human approval checkpoints, tamper-proof approval logs, deny-by-default; printed pp. 121-122.',
     strength: 'core',
-    obligation: OBL_CN_TC260_APP2,
+    obligationId: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1651,7 +1654,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Users can opt out of algorithmic recommendation; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_ALGOREC,
+    obligationId: OBL_CN_ALGOREC,
     verified: true,
   },
   {
@@ -1662,7 +1665,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Disclose scope of use and protect minors from over-reliance; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
 
@@ -1675,7 +1678,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('5'),
     note: 'Prohibitions enforced as input/output guardrails.',
     strength: 'related',
-    obligation: 'EU AI Act Art. 5 prohibited practices (incl. new NCII and CSAM bans)',
+    obligationId: 'AIGE-OBL-EUAIA-ART5',
     verified: true,
   },
   {
@@ -1686,7 +1689,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('15'),
     note: 'Robustness and security controls that also act at runtime.',
     strength: 'related',
-    obligation: 'EU AI Act Art. 15 accuracy, robustness and cybersecurity',
+    obligationId: 'AIGE-OBL-EUAIA-ART15',
     verified: true,
   },
   {
@@ -1697,7 +1700,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ISO_URL,
     note: 'See pattern: /bok/patterns#pattern-runtime-guardrail',
     strength: 'core',
-    obligation: 'A.9 Use of AI systems',
+    obligationId: 'AIGE-OBL-ISO42001-A9',
     verified: true,
   },
   {
@@ -1708,7 +1711,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ISO_URL,
     note: 'Operational controls in the run phase.',
     strength: 'related',
-    obligation: OBL_A6,
+    obligationId: OBL_A6,
     verified: true,
   },
   {
@@ -1720,7 +1723,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: NIST_URL,
     note: 'See pattern: /bok/patterns#pattern-runtime-guardrail',
     strength: 'core',
-    obligation: 'MANAGE',
+    obligationId: 'AIGE-OBL-NISTRMF-MANAGE',
     verified: true,
   },
   {
@@ -1731,7 +1734,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Runtime guardrails, memory isolation and sandbox isolation for agents; printed pp. 123-124.',
     strength: 'core',
-    obligation: OBL_CN_TC260_APP2,
+    obligationId: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1742,7 +1745,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Agentic-AI technical countermeasures; printed p. 77.',
     strength: 'core',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1753,7 +1756,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Bound the service scope and guide reasonable use; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1764,7 +1767,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Stop generation and transmission of unlawful content; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1775,7 +1778,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Technical or manual review of user inputs and synthetic outputs; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_DEEPSYN,
+    obligationId: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -1786,7 +1789,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Regularly review the algorithm mechanisms, models and data; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_ALGOREC,
+    obligationId: OBL_CN_ALGOREC,
     verified: true,
   },
   {
@@ -1797,7 +1800,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Maintain a feature library to identify unlawful and harmful information; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_ALGOREC,
+    obligationId: OBL_CN_ALGOREC,
     verified: true,
   },
 
@@ -1810,7 +1813,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('15'),
     note: 'See pattern: /bok/patterns#pattern-adversarial-red-team-suite',
     strength: 'core',
-    obligation: 'EU AI Act Art. 15 accuracy, robustness and cybersecurity',
+    obligationId: 'AIGE-OBL-EUAIA-ART15',
     verified: true,
   },
   {
@@ -1821,7 +1824,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('55'),
     note: 'Model evaluations and adversarial testing for systemic-risk GPAI.',
     strength: 'core',
-    obligation: OBL_EU_55,
+    obligationId: OBL_EU_55,
     verified: true,
   },
   {
@@ -1833,7 +1836,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('60'),
     note: 'Real-world testing plan and controls.',
     strength: 'related',
-    obligation: 'EU AI Act Art. 60 testing in real-world conditions outside sandboxes',
+    obligationId: 'AIGE-OBL-EUAIA-ART60',
     verified: true,
   },
   {
@@ -1844,7 +1847,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ISO_URL,
     note: 'Verification and validation in the lifecycle; see pattern: /bok/patterns#pattern-eval-gate-in-ci',
     strength: 'core',
-    obligation: OBL_A6,
+    obligationId: OBL_A6,
     verified: true,
   },
   {
@@ -1864,7 +1867,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: NIST_URL,
     note: 'See pattern: /bok/patterns#pattern-eval-gate-in-ci',
     strength: 'core',
-    obligation: 'MEASURE',
+    obligationId: 'AIGE-OBL-NISTRMF-MEASURE',
     verified: true,
   },
   {
@@ -1875,7 +1878,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Technical measures across model, algorithm and data; printed p. 73.',
     strength: 'core',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1886,7 +1889,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Sandbox validation, red teaming and auditing for agents; printed pp. 124-125.',
     strength: 'core',
-    obligation: OBL_CN_TC260_APP2,
+    obligationId: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -1897,7 +1900,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'System resilience requirement; printed p. 103.',
     strength: 'related',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -1908,7 +1911,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Regular audit, assessment and verification of the synthesis-algorithm mechanisms; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_DEEPSYN,
+    obligationId: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -1919,7 +1922,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Security assessment before launching public-opinion products; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_DEEPSYN,
+    obligationId: OBL_CN_DEEPSYN,
     verified: true,
   },
   {
@@ -1930,7 +1933,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Pre-deployment security assessment; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -1941,7 +1944,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GBT_URL,
     note: 'GB/T 45654-2025 security-assessment requirements (TC260-003 predecessor §8 and Annex A risk list). The official listing shows the standard as current (issued 2025-04-25, implemented 2025-11-01; checked 2026-09-24), but the full text is only offered there as an image preview, so the clause id is not verified against it.',
     strength: 'core',
-    obligation: OBL_CN_GBT,
+    obligationId: OBL_CN_GBT,
     verified: false,
   },
 
@@ -1954,7 +1957,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('72'),
     note: 'Continuous post-market monitoring.',
     strength: 'core',
-    obligation: 'EU AI Act Art. 72 post-market monitoring',
+    obligationId: 'AIGE-OBL-EUAIA-ART72',
     verified: true,
   },
   {
@@ -1965,7 +1968,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('73'),
     note: 'See pattern: /bok/patterns#pattern-incident-pipeline',
     strength: 'core',
-    obligation: 'EU AI Act Art. 73 serious-incident reporting',
+    obligationId: 'AIGE-OBL-EUAIA-ART73',
     verified: true,
   },
   {
@@ -1976,7 +1979,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('55'),
     note: 'Systemic-risk incident tracking and reporting.',
     strength: 'related',
-    obligation: OBL_EU_55,
+    obligationId: OBL_EU_55,
     verified: true,
   },
   {
@@ -1987,7 +1990,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ISO_URL,
     note: 'Incident communication to interested parties.',
     strength: 'core',
-    obligation: 'A.8 Information for interested parties',
+    obligationId: 'AIGE-OBL-ISO42001-A8',
     verified: true,
   },
   {
@@ -2008,7 +2011,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: NIST_URL,
     note: 'See pattern: /bok/patterns#pattern-continuous-assurance-telemetry',
     strength: 'core',
-    obligation: 'MANAGE',
+    obligationId: 'AIGE-OBL-NISTRMF-MANAGE',
     verified: true,
   },
   {
@@ -2019,7 +2022,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Real-time monitoring of AI risks in operation; printed p. 102.',
     strength: 'core',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -2030,7 +2033,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Report safety incidents; printed p. 104.',
     strength: 'core',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -2041,7 +2044,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Emergency plans within continuous monitoring for agents; printed pp. 124-125.',
     strength: 'related',
-    obligation: OBL_CN_TC260_APP2,
+    obligationId: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -2052,7 +2055,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Stop, rectify and report unlawful content and optimise the model; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -2063,7 +2066,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Accessible complaint and report channels with published timelines; CAC text.',
     strength: 'core',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -2074,7 +2077,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: ALGOREC_URL,
     note: 'Management systems include emergency response; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_ALGOREC,
+    obligationId: OBL_CN_ALGOREC,
     verified: true,
   },
 
@@ -2087,7 +2090,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('25'),
     note: 'See pattern: /bok/patterns#pattern-vendor--model-due-diligence-gate',
     strength: 'core',
-    obligation: 'EU AI Act Art. 25 responsibilities along the AI value chain',
+    obligationId: 'AIGE-OBL-EUAIA-ART25',
     verified: true,
   },
   {
@@ -2098,7 +2101,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: aia('26'),
     note: 'Deployer duties toward upstream providers.',
     strength: 'related',
-    obligation: OBL_EU_26,
+    obligationId: OBL_EU_26,
     verified: true,
   },
   {
@@ -2108,7 +2111,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'Third-party and customer relationships',
     url: ISO_URL,
     strength: 'core',
-    obligation: 'A.10 Third-party and customer relationships',
+    obligationId: 'AIGE-OBL-ISO42001-A10',
     verified: true,
   },
   {
@@ -2119,7 +2122,7 @@ const refsV04: readonly CrosswalkRef[] = [
       'GOVERN 6: Policies and procedures are in place to address AI risks and benefits arising from third-party software and data and other supply chain issues',
     url: NIST_URL,
     strength: 'core',
-    obligation: 'GOVERN',
+    obligationId: 'AIGE-OBL-NISTRMF-GOVERN',
     verified: true,
   },
   {
@@ -2130,7 +2133,7 @@ const refsV04: readonly CrosswalkRef[] = [
       'MAP 4: Risks and benefits are mapped for all AI system components including third-party software and data',
     url: NIST_URL,
     strength: 'core',
-    obligation: 'MAP',
+    obligationId: 'AIGE-OBL-NISTRMF-MAP',
     verified: true,
   },
   {
@@ -2140,7 +2143,7 @@ const refsV04: readonly CrosswalkRef[] = [
     title: 'MANAGE 3: AI risks and benefits from third-party entities are managed',
     url: NIST_URL,
     strength: 'core',
-    obligation: 'MANAGE',
+    obligationId: 'AIGE-OBL-NISTRMF-MANAGE',
     verified: true,
   },
   {
@@ -2151,7 +2154,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Supply-chain and tool-invocation management for agents; printed pp. 122-123.',
     strength: 'core',
-    obligation: OBL_CN_TC260_APP2,
+    obligationId: OBL_CN_TC260_APP2,
     verified: true,
   },
   {
@@ -2162,7 +2165,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: TC260_URL,
     note: 'Governance of the open-source AI ecosystem; printed p. 92.',
     strength: 'related',
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     verified: true,
   },
   {
@@ -2173,7 +2176,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: GENAI_URL,
     note: 'Upstream training-data (and model) sourcing must be lawful; CAC text.',
     strength: 'related',
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     verified: true,
   },
   {
@@ -2184,7 +2187,7 @@ const refsV04: readonly CrosswalkRef[] = [
     url: DEEPSYN_URL,
     note: 'Providers and their technical supporters share training-data duties (a value-chain relationship); CAC text. Draft mapped this to Art. 7, but Art. 14 is the article that names technical supporters.',
     strength: 'related',
-    obligation: OBL_CN_DEEPSYN,
+    obligationId: OBL_CN_DEEPSYN,
     verified: true,
   },
 ];
@@ -2201,7 +2204,7 @@ const refsV04: readonly CrosswalkRef[] = [
 // check of chapters 19, 21 and 22 (same day). ISO/IEC clause ids that are new
 // here could not be opened and stay unverified.
 
-type RefExtra = Partial<Pick<CrosswalkRef, 'note' | 'obligation' | 'verified' | 'see'>>;
+type RefExtra = Partial<Pick<CrosswalkRef, 'note' | 'obligationId' | 'verified' | 'see'>>;
 
 /** One v0.5.0 reference; verified unless `extra` says otherwise. */
 function mk(
@@ -2228,32 +2231,31 @@ const GDPR_SECONDARY =
 const PREN_UNVERIFIED =
   'Draft European standard; stage as reported by Genorma on 2026-09-24 (secondary); the draft text is not public.';
 
-// Obligation-row texts, verbatim from frameworks.ts.
-const OBL_EU_4 = 'EU AI Act Art. 4 AI literacy';
-const OBL_EU_4A = 'EU AI Act Art. 4a lawful basis for special-category data in bias detection';
-const OBL_EU_5 = 'EU AI Act Art. 5 prohibited practices (incl. new NCII and CSAM bans)';
-const OBL_EU_10 = 'EU AI Act Art. 10 data and data governance';
-const OBL_EU_13 = 'EU AI Act Art. 13 transparency and information to deployers';
-const OBL_EU_14 = 'EU AI Act Art. 14 human oversight';
-const OBL_EU_15 = 'EU AI Act Art. 15 accuracy, robustness and cybersecurity';
-const OBL_EU_25 = 'EU AI Act Art. 25 responsibilities along the AI value chain';
-const OBL_EU_43 = 'EU AI Act Art. 43 conformity assessment';
-const OBL_EU_47 = 'EU AI Act Art. 47 EU declaration of conformity';
-const OBL_EU_50 = 'EU AI Act Art. 50 transparency for certain AI systems';
-const OBL_EU_53 = 'EU AI Act Art. 53 GPAI provider obligations';
-const OBL_EU_60 = 'EU AI Act Art. 60 testing in real-world conditions outside sandboxes';
-const OBL_GPAI_T = 'Transparency';
-const OBL_GPAI_C = 'Copyright';
-const OBL_GPAI_S = 'Safety and Security (systemic-risk models only)';
-const OBL_ISO42006 = 'ISO/IEC 42006:2025 requirements for AIMS certification bodies';
-const OBL_ISO23894 = 'ISO/IEC 23894:2023 guidance on AI risk management';
-const OBL_CSA = 'AICM v1.1: 247 control objectives across 18 domains';
-const OBL_LLM = 'Top 10 for LLM Applications 2026';
-const OBL_ASI = 'Top 10 for Agentic Applications 2026';
-const OBL_KR = 'South Korea AI Basic Act (in force 2026-01-22)';
-const OBL_SG = 'Singapore IMDA Model AI Governance Framework for Generative AI (voluntary)';
-const OBL_UK =
-  'UK ADM safeguards: Data (Use and Access) Act 2025, UK GDPR Arts. 22A–22D (in force 2026-02-05)';
+// Obligation-row ids (frameworks.ts).
+const OBL_EU_4 = 'AIGE-OBL-EUAIA-ART4';
+const OBL_EU_4A = 'AIGE-OBL-EUAIA-ART4A';
+const OBL_EU_5 = 'AIGE-OBL-EUAIA-ART5';
+const OBL_EU_10 = 'AIGE-OBL-EUAIA-ART10';
+const OBL_EU_13 = 'AIGE-OBL-EUAIA-ART13';
+const OBL_EU_14 = 'AIGE-OBL-EUAIA-ART14';
+const OBL_EU_15 = 'AIGE-OBL-EUAIA-ART15';
+const OBL_EU_25 = 'AIGE-OBL-EUAIA-ART25';
+const OBL_EU_43 = 'AIGE-OBL-EUAIA-ART43';
+const OBL_EU_47 = 'AIGE-OBL-EUAIA-ART47';
+const OBL_EU_50 = 'AIGE-OBL-EUAIA-ART50';
+const OBL_EU_53 = 'AIGE-OBL-EUAIA-ART53';
+const OBL_EU_60 = 'AIGE-OBL-EUAIA-ART60';
+const OBL_GPAI_T = 'AIGE-OBL-GPAICOP-TRANSPARENCY';
+const OBL_GPAI_C = 'AIGE-OBL-GPAICOP-COPYRIGHT';
+const OBL_GPAI_S = 'AIGE-OBL-GPAICOP-SAFETY';
+const OBL_ISO42006 = 'AIGE-OBL-ISO42006-CB';
+const OBL_ISO23894 = 'AIGE-OBL-ISO23894-RISK';
+const OBL_CSA = 'AIGE-OBL-CSA-AICM';
+const OBL_LLM = 'AIGE-OBL-OWASP-LLM';
+const OBL_ASI = 'AIGE-OBL-OWASP-AGENTIC';
+const OBL_KR = 'AIGE-OBL-KR-AIBASIC';
+const OBL_SG = 'AIGE-OBL-SG-GENAI';
+const OBL_UK = 'AIGE-OBL-UK-ADM';
 
 // Per-instrument shorthands. Each fills the framework id, the canonical URL
 // and, where one exists, the obligation-row join.
@@ -2262,11 +2264,11 @@ const eu = (t: string, ref: string, title: string, s: RefStrength, art: string, 
 const gd = (t: string, ref: string, title: string, s: RefStrength, art: string, x: RefExtra = {}) =>
   mk(t, 'gdpr', ref, title, s, gdpr(art), x);
 const gpT = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
-  mk(t, 'gpai-code-of-practice', ref, title, s, GPAI_T_URL, { obligation: OBL_GPAI_T, ...x });
+  mk(t, 'gpai-code-of-practice', ref, title, s, GPAI_T_URL, { obligationId: OBL_GPAI_T, ...x });
 const gpC = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
-  mk(t, 'gpai-code-of-practice', ref, title, s, GPAI_C_URL, { obligation: OBL_GPAI_C, ...x });
+  mk(t, 'gpai-code-of-practice', ref, title, s, GPAI_C_URL, { obligationId: OBL_GPAI_C, ...x });
 const gpS = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
-  mk(t, 'gpai-code-of-practice', ref, title, s, GPAI_S_URL, { obligation: OBL_GPAI_S, ...x });
+  mk(t, 'gpai-code-of-practice', ref, title, s, GPAI_S_URL, { obligationId: OBL_GPAI_S, ...x });
 /** ISO/IEC 42001 clause already checked in v0.4 (same id, same title). */
 const iso = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
   mk(t, 'iso-42001', ref, title, s, ISO_URL, x);
@@ -2277,30 +2279,31 @@ const i23894 = (t: string, ref: string, title: string, s: RefStrength) =>
   mk(t, 'iso-23894', ref, title, s, ISO23894_URL, {
     verified: false,
     note: ISO23894_UNVERIFIED,
-    obligation: OBL_ISO23894,
+    obligationId: OBL_ISO23894,
   });
 const i42005 = (t: string, ref: string, title: string, s: RefStrength) =>
   mk(t, 'iso-42005', ref, title, s, ISO42005_URL, { verified: false, note: ISO42005_UNVERIFIED });
 /** NIST AI RMF subcategory or category, titled with NIST's own statement. */
 const nist = (t: string, id: string, statement: string, s: RefStrength, x: RefExtra = {}) =>
   mk(t, 'nist-ai-rmf', id, `${id}: ${statement}`, s, NIST_URL, {
-    obligation: id.split(' ')[0],
+    // 'MAP 1.1' joins the NIST AI RMF MAP row, and so on for each function.
+    obligationId: `AIGE-OBL-NISTRMF-${id.split(' ')[0]}`,
     ...x,
   });
 const csa = (t: string, id: string, title: string, s: RefStrength, x: RefExtra = {}) =>
-  mk(t, 'csa-aicm', id, title, s, CSA_URL, { obligation: OBL_CSA, ...x });
+  mk(t, 'csa-aicm', id, title, s, CSA_URL, { obligationId: OBL_CSA, ...x });
 const llm = (t: string, id: string, title: string, s: RefStrength, x: RefExtra = {}) =>
-  mk(t, 'owasp-llm-top-10', id, title, s, LLM_URL, { obligation: OBL_LLM, ...x });
+  mk(t, 'owasp-llm-top-10', id, title, s, LLM_URL, { obligationId: OBL_LLM, ...x });
 const asi = (t: string, id: string, title: string, s: RefStrength, x: RefExtra = {}) =>
-  mk(t, 'owasp-agentic-top-10', id, title, s, ASI_URL, { obligation: OBL_ASI, ...x });
+  mk(t, 'owasp-agentic-top-10', id, title, s, ASI_URL, { obligationId: OBL_ASI, ...x });
 const kr = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
-  mk(t, 'kr-ai-basic-act', ref, title, s, KR_URL, { obligation: OBL_KR, ...x });
+  mk(t, 'kr-ai-basic-act', ref, title, s, KR_URL, { obligationId: OBL_KR, ...x });
 const ukd = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
-  mk(t, 'uk-duaa', ref, title, s, DUAA_URL, { obligation: OBL_UK, ...x });
+  mk(t, 'uk-duaa', ref, title, s, DUAA_URL, { obligationId: OBL_UK, ...x });
 const atrs = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
   mk(t, 'uk-atrs', ref, title, s, ATRS_URL, x);
 const sgG = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
-  mk(t, 'sg-genai-framework', ref, title, s, SG_GENAI_URL, { obligation: OBL_SG, ...x });
+  mk(t, 'sg-genai-framework', ref, title, s, SG_GENAI_URL, { obligationId: OBL_SG, ...x });
 const sgA = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
   mk(t, 'sg-agentic-framework', ref, title, s, SG_AGENTIC_URL, x);
 const coe = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
@@ -2434,7 +2437,7 @@ const refsV05: readonly CrosswalkRef[] = [
 
   // ── Data governance ──────────────────────────────────────────────────────
   eu('data-governance', 'Art. 10(2)(f)–(g)', 'Examination for possible biases; measures to detect, prevent and mitigate them', 'core', '10', {
-    obligation: OBL_EU_10,
+    obligationId: OBL_EU_10,
   }),
   eu('data-governance', 'Art. 53', T_ART_53, 'related', '53', {
     note: 'Art. 53(1)(d): public summary of the content used for training, on the AI Office template.',
@@ -2452,7 +2455,7 @@ const refsV05: readonly CrosswalkRef[] = [
     note: 'Sits beside AI Act Art. 4a on bias-detection processing; inferred sensitive data counts.',
   }),
   isoU('data-governance', 'A.7.3', 'Acquisition of data', 'core', {
-    obligation: 'A.7 Data for AI systems',
+    obligationId: 'AIGE-OBL-ISO42001-A7',
   }),
   csa('data-governance', 'DSP-20', 'Data Provenance and Transparency', 'core'),
   csa('data-governance', 'DSP-21', 'Data Poisoning Prevention & Detection', 'related'),
@@ -2468,7 +2471,7 @@ const refsV05: readonly CrosswalkRef[] = [
   eu('documentation-transparency', 'Art. 43', 'Conformity assessment', 'related', '43'),
   eu('documentation-transparency', 'Art. 53(1)(d)', 'Public summary of the content used for training', 'related', '53'),
   eu('documentation-transparency', 'Art. 50(2), 50(4)', 'Machine-readable marking of synthetic content; disclosure of deep fakes', 'related', '50', {
-    obligation: OBL_EU_50,
+    obligationId: OBL_EU_50,
   }),
   gpT('documentation-transparency', 'Transparency 1.1', 'Drawing up and keeping up-to-date model documentation', 'core'),
   gpT('documentation-transparency', 'Transparency 1.2', 'Providing relevant information', 'related'),
@@ -2510,11 +2513,11 @@ const refsV05: readonly CrosswalkRef[] = [
 
   // ── Logging and traceability ─────────────────────────────────────────────
   eu('logging-traceability', 'Art. 26(6)', 'Deployers keep the automatically generated logs', 'core', '26', {
-    obligation: OBL_EU_26,
+    obligationId: OBL_EU_26,
   }),
   eu('logging-traceability', 'Art. 19', 'Automatically generated logs', 'related', '19'),
   isoU('logging-traceability', 'A.6.2.8', 'AI system recording of event logs', 'core', {
-    obligation: OBL_A6,
+    obligationId: OBL_A6,
   }),
   csa('logging-traceability', 'LOG-09', 'Log Records', 'core'),
   csa('logging-traceability', 'LOG-12', 'Transaction/Activity Logging', 'related'),
@@ -2530,7 +2533,7 @@ const refsV05: readonly CrosswalkRef[] = [
 
   // ── Human oversight ──────────────────────────────────────────────────────
   eu('human-oversight', 'Art. 14(4)(b)', 'Awareness of automation bias', 'related', '14', {
-    obligation: OBL_EU_14,
+    obligationId: OBL_EU_14,
     note: 'Gate logs approver, time to decide and override rate so degrading oversight is visible.',
   }),
   gd('human-oversight', 'Art. 22', 'Automated individual decision-making, including profiling', 'core', '22', {
@@ -2550,7 +2553,7 @@ const refsV05: readonly CrosswalkRef[] = [
 
   // ── Runtime guardrails ───────────────────────────────────────────────────
   eu('runtime-guardrails', 'Art. 5(1)(a)–(b)', 'Manipulative techniques; exploitation of vulnerabilities', 'related', '5', {
-    obligation: OBL_EU_5,
+    obligationId: OBL_EU_5,
   }),
   gpS('runtime-guardrails', 'Safety C5', 'Commitment 5: Safety mitigations', 'related'),
   csa('runtime-guardrails', 'TVM-13', 'Guardrails', 'core'),
@@ -2563,11 +2566,11 @@ const refsV05: readonly CrosswalkRef[] = [
 
   // ── Robustness, security and evaluations ─────────────────────────────────
   eu('robustness-security-evals', 'Art. 15(3)', 'Declared accuracy levels and metrics', 'related', '15', {
-    obligation: OBL_EU_15,
+    obligationId: OBL_EU_15,
     note: 'Declared metrics become the eval baseline; calibration is measured in the gate.',
   }),
   eu('robustness-security-evals', 'Art. 9', 'Risk management system', 'related', '9', {
-    obligation: OBL_EU_9,
+    obligationId: OBL_EU_9,
     note: 'Art. 9(8): testing against prior defined metrics and probabilistic thresholds, before placing on the market.',
   }),
   eu('robustness-security-evals', 'Art. 42(3)', 'Presumption of conformity for cybersecurity (Cyber Resilience Act)', 'related', '42', {
@@ -2596,7 +2599,7 @@ const refsV05: readonly CrosswalkRef[] = [
 
   // ── Incident response and monitoring ─────────────────────────────────────
   eu('incident-monitoring', 'Art. 26(5)', 'Deployer monitoring, informing the provider and suspending use', 'core', '26', {
-    obligation: OBL_EU_26,
+    obligationId: OBL_EU_26,
     see: '/bok/incidents#deployer-duties-inform-the-provider-suspend-use',
   }),
   eu('incident-monitoring', 'Art. 3(49)', 'Definition of serious incident', 'related', '3', {
@@ -2629,7 +2632,7 @@ const refsV05: readonly CrosswalkRef[] = [
 
   // ── Supply chain and third parties ───────────────────────────────────────
   eu('supply-chain', 'Art. 25(4)', 'Written agreement with third-party suppliers', 'core', '25', {
-    obligation: OBL_EU_25,
+    obligationId: OBL_EU_25,
   }),
   eu('supply-chain', 'Art. 22', 'Authorised representatives of providers of high-risk AI systems', 'related', '22'),
   eu('supply-chain', 'Art. 23', 'Obligations of importers', 'related', '23'),
@@ -2655,11 +2658,11 @@ const refsV05: readonly CrosswalkRef[] = [
 
   // ── Prohibited practices ─────────────────────────────────────────────────
   eu('prohibited-practices', 'Art. 5', 'Prohibited AI practices', 'core', '5', {
-    obligation: OBL_EU_5,
+    obligationId: OBL_EU_5,
     note: 'The Digital Omnibus adds new prohibitions that apply from 2026-12-02.',
   }),
   isoU('prohibited-practices', 'A.9.4', 'Intended use of the AI system', 'related', {
-    obligation: 'A.9 Use of AI systems',
+    obligationId: 'AIGE-OBL-ISO42001-A9',
   }),
   nist('prohibited-practices', 'GOVERN 1.1', 'Legal and regulatory requirements involving AI are understood, managed, and documented', 'related'),
   csa('prohibited-practices', 'GRC-09', 'Acceptable Use of the AI Service', 'related'),
@@ -2667,22 +2670,22 @@ const refsV05: readonly CrosswalkRef[] = [
   sgA('prohibited-practices', '2.1.1', 'Determine suitable use cases for agent deployment', 'related'),
   coe('prohibited-practices', 'Art. 16(4)', 'Assess the need for a moratorium, ban or other measures for incompatible uses', 'core'),
   mk('prohibited-practices', 'cn-genai-measures', 'Art. 4', 'Prohibited content and baseline duties', 'related', GENAI_URL, {
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     note: 'Point (1) lists content that must not be generated; points (2) to (5) set non-discrimination, IP, rights and transparency duties; CAC text.',
   }),
 
   // ── Fairness and non-discrimination ──────────────────────────────────────
   eu('fairness-non-discrimination', 'Art. 10(2)(f)–(g)', 'Examination for possible biases; measures to detect, prevent and mitigate them', 'core', '10', {
-    obligation: OBL_EU_10,
+    obligationId: OBL_EU_10,
   }),
   eu('fairness-non-discrimination', 'Art. 4a', 'Special-category data for bias detection', 'core', '4a', {
-    obligation: OBL_EU_4A,
+    obligationId: OBL_EU_4A,
     note: 'Added by the Digital Omnibus; strictly necessary, pseudonymised, access-controlled and deleted after correction.',
   }),
   gd('fairness-non-discrimination', 'Art. 5(1)(a)', 'Lawfulness, fairness and transparency', 'core', '5'),
   gd('fairness-non-discrimination', 'Art. 9', 'Processing of special categories of personal data', 'related', '9'),
   isoU('fairness-non-discrimination', 'A.5.4', 'Assessing AI system impact on individuals or groups of individuals', 'related', {
-    obligation: 'A.5 Assessing impacts of AI systems',
+    obligationId: 'AIGE-OBL-ISO42001-A5',
   }),
   nist('fairness-non-discrimination', 'MEASURE 2.11', N_MEASURE_211, 'core', {
     see: '/bok/fairness-and-explainability',
@@ -2700,25 +2703,25 @@ const refsV05: readonly CrosswalkRef[] = [
   coe('fairness-non-discrimination', 'Art. 10', 'Equality and non-discrimination', 'core'),
   oecd('fairness-non-discrimination', '1.2', 'Rule of law, human rights and democratic values, including fairness and privacy', 'related'),
   mk('fairness-non-discrimination', 'cn-genai-measures', 'Art. 4(2)', 'Prevent discrimination in design, data, training and service', 'core', GENAI_URL, {
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     note: 'Ethnicity, belief, country, region, sex, age, occupation and health; CAC text.',
   }),
   mk('fairness-non-discrimination', 'cn-algo-recommendation', 'Art. 21', 'No unreasonable differential treatment in trading conditions', 'related', ALGOREC_URL, {
-    obligation: OBL_CN_ALGOREC,
+    obligationId: OBL_CN_ALGOREC,
     note: 'Bars algorithmic price discrimination based on consumer preferences and habits; CAC text.',
   }),
 
   // ── Privacy and data protection ──────────────────────────────────────────
   eu('privacy-data-protection', 'Art. 59', 'Further processing of personal data in the AI regulatory sandbox', 'related', '59'),
   eu('privacy-data-protection', 'Art. 4a', 'Special-category data for bias detection', 'related', '4a', {
-    obligation: OBL_EU_4A,
+    obligationId: OBL_EU_4A,
   }),
   gd('privacy-data-protection', 'Art. 5', 'Principles relating to processing of personal data', 'core', '5'),
   gd('privacy-data-protection', 'Art. 6', 'Lawfulness of processing', 'core', '6'),
   gd('privacy-data-protection', 'Art. 25', 'Data protection by design and by default', 'core', '25'),
   gd('privacy-data-protection', 'Art. 35', 'Data protection impact assessment', 'related', '35'),
   iso('privacy-data-protection', 'A.7', 'Data for AI systems', 'related', {
-    obligation: 'A.7 Data for AI systems',
+    obligationId: 'AIGE-OBL-ISO42001-A7',
   }),
   nist('privacy-data-protection', 'MEASURE 2.10', 'Privacy risk of the AI system as identified in the MAP function is examined and documented', 'core'),
   csa('privacy-data-protection', 'DSP-08', 'Data Privacy by Design and Default', 'core'),
@@ -2734,24 +2737,24 @@ const refsV05: readonly CrosswalkRef[] = [
   oecd('privacy-data-protection', '1.2', 'Rule of law, human rights and democratic values, including fairness and privacy', 'related'),
   g7('privacy-data-protection', 'Action 11', G_ACTION_11, 'related'),
   mk('privacy-data-protection', 'cn-genai-measures', 'Art. 7(3)', 'Consent or another lawful basis for personal information in training data', 'core', GENAI_URL, {
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     note: 'CAC text.',
   }),
   mk('privacy-data-protection', 'cn-genai-measures', 'Art. 11', 'Protection of user input and records', 'core', GENAI_URL, {
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     note: 'No unnecessary collection; access, correction and deletion requests handled; CAC text.',
   }),
 
   // ── Explainability and right to explanation ──────────────────────────────
   eu('explainability', 'Art. 86', T_ART_86, 'core', '86'),
   eu('explainability', 'Art. 13(3)(b)(iv)–(v)', 'Information relevant to explain output; performance for specific persons or groups', 'core', '13', {
-    obligation: OBL_EU_13,
+    obligationId: OBL_EU_13,
   }),
   gd('explainability', 'Art. 15(1)(h)', 'Meaningful information about the logic involved', 'core', '15'),
   gd('explainability', 'Art. 13(2)(f)', 'Existence of automated decision-making', 'related', '13'),
   gd('explainability', 'Art. 22(3)', 'Right to obtain human intervention and to contest the decision', 'related', '22'),
   isoU('explainability', 'A.8.2', 'System documentation and information for users', 'related', {
-    obligation: 'A.8 Information for interested parties',
+    obligationId: 'AIGE-OBL-ISO42001-A8',
   }),
   nist('explainability', 'MEASURE 2.9', N_MEASURE_29, 'core'),
   nist('explainability', 'MEASURE 2.8', 'Risks associated with transparency and accountability as identified in the MAP function are examined and documented', 'related'),
@@ -2766,18 +2769,18 @@ const refsV05: readonly CrosswalkRef[] = [
   coe('explainability', 'Art. 14(2)', 'Documentation sufficient to contest decisions; complaint to authorities', 'related'),
   oecd('explainability', '1.3', 'Transparency and explainability', 'core'),
   mk('explainability', 'cn-algo-recommendation', 'Art. 17', 'Explain where an algorithm significantly affects user rights', 'related', ALGOREC_URL, {
-    obligation: OBL_CN_ALGOREC,
+    obligationId: OBL_CN_ALGOREC,
     note: 'Third paragraph; the first two give an opt-out and control over user tags; CAC text.',
   }),
 
   // ── AI literacy and competence ───────────────────────────────────────────
   eu('ai-literacy', 'Art. 4', 'AI literacy', 'core', '4', {
-    obligation: OBL_EU_4,
+    obligationId: OBL_EU_4,
     note: 'Reworded by the Digital Omnibus: providers and deployers take measures to support AI literacy, without a guaranteed level.',
     see: '/bok/eu-ai-act#ai-literacy-and-bias-detection-data',
   }),
   eu('ai-literacy', 'Art. 26(2)', 'Oversight by people with the competence, training and authority it needs', 'related', '26', {
-    obligation: OBL_EU_26,
+    obligationId: OBL_EU_26,
   }),
   eu('ai-literacy', 'Art. 95(2)(c)', 'Codes of conduct: promoting AI literacy', 'related', '95'),
   gd('ai-literacy', 'Art. 39(1)(b)', 'DPO tasks: awareness-raising and training of staff', 'related', '39', {
@@ -2806,16 +2809,16 @@ const refsV05: readonly CrosswalkRef[] = [
     note: 'Includes upskilling workers.',
   }),
   mk('ai-literacy', 'cn-genai-measures', 'Art. 10', 'Guide users to understand and use generative AI rationally', 'related', GENAI_URL, {
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     note: 'Also protects minors from over-reliance; CAC text.',
   }),
 
   // ── Conformity assessment and certification ──────────────────────────────
   eu('conformity-assessment', 'Art. 43', 'Conformity assessment', 'core', '43', {
-    obligation: OBL_EU_43,
+    obligationId: OBL_EU_43,
   }),
   eu('conformity-assessment', 'Art. 47', 'EU declaration of conformity', 'related', '47', {
-    obligation: OBL_EU_47,
+    obligationId: OBL_EU_47,
   }),
   eu('conformity-assessment', 'Art. 48', 'CE marking', 'related', '48'),
   eu('conformity-assessment', 'Art. 40', 'Harmonised standards and standardisation deliverables', 'related', '40', {
@@ -2827,7 +2830,7 @@ const refsV05: readonly CrosswalkRef[] = [
   }),
   isoU('conformity-assessment', '9.2', 'Internal audit', 'related'),
   mk('conformity-assessment', 'iso-42006', 'ISO/IEC 42006', 'Requirements for bodies providing audit and certification of AI management systems', 'core', ISO42006_URL, {
-    obligation: OBL_ISO42006,
+    obligationId: OBL_ISO42006,
     note: 'The whole standard: who may credibly certify an organisation to ISO/IEC 42001.',
   }),
   nist(
@@ -2846,13 +2849,13 @@ const refsV05: readonly CrosswalkRef[] = [
     note: 'A harmonised-standard candidate for Art. 17; not cited in the Official Journal as of 2026-09-24.',
   }),
   mk('conformity-assessment', 'cn-genai-measures', 'Art. 17', 'Security assessment and algorithm filing', 'related', GENAI_URL, {
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     note: 'Services with public-opinion attributes or social-mobilisation capacity; CAC text.',
   }),
 
   // ── GPAI and foundation models ───────────────────────────────────────────
-  eu('gpai-foundation-models', 'Art. 53', T_ART_53, 'core', '53', { obligation: OBL_EU_53 }),
-  eu('gpai-foundation-models', 'Art. 55', T_ART_55, 'core', '55', { obligation: OBL_EU_55 }),
+  eu('gpai-foundation-models', 'Art. 53', T_ART_53, 'core', '53', { obligationId: OBL_EU_53 }),
+  eu('gpai-foundation-models', 'Art. 55', T_ART_55, 'core', '55', { obligationId: OBL_EU_55 }),
   eu('gpai-foundation-models', 'Art. 51', 'Classification of general-purpose AI models as general-purpose AI models with systemic risk', 'related', '51'),
   eu('gpai-foundation-models', 'Art. 56', 'Codes of practice', 'related', '56'),
   gpT('gpai-foundation-models', 'Transparency 1.1', 'Drawing up and keeping up-to-date model documentation', 'core'),
@@ -2869,13 +2872,13 @@ const refsV05: readonly CrosswalkRef[] = [
     note: 'The whole code addresses organisations developing advanced AI systems.',
   }),
   mk('gpai-foundation-models', 'cn-genai-measures', 'Art. 7', 'Lawful data and foundation-model sources', 'related', GENAI_URL, {
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     note: 'Point (1): use data and foundation models with lawful sources; CAC text.',
   }),
 
   // ── IP and copyright ─────────────────────────────────────────────────────
   eu('ip-copyright', 'Art. 53(1)(c)', 'Copyright policy, including rights reservations', 'core', '53', {
-    obligation: OBL_EU_53,
+    obligationId: OBL_EU_53,
     note: 'Identify and honour reservations of rights under Art. 4(3) of Directive (EU) 2019/790.',
   }),
   eu('ip-copyright', 'Art. 53(1)(d)', 'Public summary of the content used for training', 'related', '53'),
@@ -2897,17 +2900,17 @@ const refsV05: readonly CrosswalkRef[] = [
   }),
   g7('ip-copyright', 'Action 11', G_ACTION_11, 'core'),
   mk('ip-copyright', 'cn-genai-measures', 'Art. 7(2)', 'No infringement of IP rights in training data', 'core', GENAI_URL, {
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     note: 'CAC text.',
   }),
   mk('ip-copyright', 'cn-genai-measures', 'Art. 4(3)', 'Respect IP rights and business ethics', 'related', GENAI_URL, {
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
     note: 'CAC text.',
   }),
 
   // ── Agent identity and autonomy ──────────────────────────────────────────
   eu('agent-identity-autonomy', 'Art. 14', 'Human oversight', 'related', '14', {
-    obligation: OBL_EU_14,
+    obligationId: OBL_EU_14,
     note: 'No agent-specific article; oversight and the Art. 14(4)(e) stop duty apply to agentic high-risk systems.',
   }),
   nist(
@@ -2929,19 +2932,19 @@ const refsV05: readonly CrosswalkRef[] = [
   }),
   sgA('agent-identity-autonomy', '2.2.2', 'Design for meaningful human oversight', 'related'),
   mk('agent-identity-autonomy', 'cn-tc260-framework', 'App. 2 II.2', 'Identity and access management', 'core', TC260_URL, {
-    obligation: OBL_CN_TC260_APP2,
+    obligationId: OBL_CN_TC260_APP2,
     note: 'Identity and permissions per agent; printed pp. 120-121.',
   }),
   mk('agent-identity-autonomy', 'cn-tc260-framework', 'App. 2 II.3', 'Strengthen human approval', 'related', TC260_URL, {
-    obligation: OBL_CN_TC260_APP2,
+    obligationId: OBL_CN_TC260_APP2,
   }),
 
   // ── Content provenance and deepfakes ─────────────────────────────────────
   eu('content-provenance', 'Art. 50(2)', 'Machine-readable marking of synthetic content', 'core', '50', {
-    obligation: OBL_EU_50,
+    obligationId: OBL_EU_50,
   }),
   eu('content-provenance', 'Art. 50(4)', 'Disclosure of deep fakes', 'core', '50', {
-    obligation: OBL_EU_50,
+    obligationId: OBL_EU_50,
   }),
   eu('content-provenance', 'Art. 3(60)', 'Definition of deep fake', 'related', '3'),
   csa('content-provenance', 'MDS-09', 'Model Signing/Ownership Verification', 'related', {
@@ -2954,16 +2957,16 @@ const refsV05: readonly CrosswalkRef[] = [
   sgG('content-provenance', '7', 'Content Provenance', 'core'),
   g7('content-provenance', 'Action 7', 'Deploy content authentication and provenance mechanisms where feasible', 'core'),
   mk('content-provenance', 'cn-content-labelling', 'Art. 4', 'Explicit labels for generated content', 'core', LABEL_URL, {
-    obligation: OBL_CN_LABEL,
+    obligationId: OBL_CN_LABEL,
   }),
   mk('content-provenance', 'cn-content-labelling', 'Art. 5', 'Implicit (metadata) labels', 'core', LABEL_URL, {
-    obligation: OBL_CN_LABEL,
+    obligationId: OBL_CN_LABEL,
   }),
   mk('content-provenance', 'cn-deep-synthesis', 'Art. 17', 'Conspicuous labels for confusable content', 'core', DEEPSYN_URL, {
-    obligation: OBL_CN_DEEPSYN,
+    obligationId: OBL_CN_DEEPSYN,
   }),
   mk('content-provenance', 'cn-genai-measures', 'Art. 12', 'Labelling of generated content', 'related', GENAI_URL, {
-    obligation: OBL_CN_GENAI,
+    obligationId: OBL_CN_GENAI,
   }),
 
   // ── Sandboxes and real-world testing ─────────────────────────────────────
@@ -2974,11 +2977,11 @@ const refsV05: readonly CrosswalkRef[] = [
   eu('sandboxes-real-world-testing', 'Art. 58', 'Detailed arrangements for, and functioning of, AI regulatory sandboxes', 'related', '58'),
   eu('sandboxes-real-world-testing', 'Art. 59', 'Further processing of personal data in the AI regulatory sandbox', 'related', '59'),
   eu('sandboxes-real-world-testing', 'Art. 60', 'Testing of high-risk AI systems in real world conditions outside AI regulatory sandboxes', 'core', '60', {
-    obligation: OBL_EU_60,
+    obligationId: OBL_EU_60,
   }),
   eu('sandboxes-real-world-testing', 'Art. 61', 'Informed consent to participate in testing in real world conditions', 'related', '61'),
   isoU('sandboxes-real-world-testing', 'A.6.2.4', 'AI system verification and validation', 'related', {
-    obligation: OBL_A6,
+    obligationId: OBL_A6,
   }),
   nist(
     'sandboxes-real-world-testing',
@@ -2992,13 +2995,13 @@ const refsV05: readonly CrosswalkRef[] = [
   sgA('sandboxes-real-world-testing', '2.3.2', 'Before deploying, test agents', 'related'),
   coe('sandboxes-real-world-testing', 'Art. 13', 'Safe innovation (controlled testing environments)', 'core'),
   mk('sandboxes-real-world-testing', 'cn-tc260-framework', 'App. 2 II.6', 'Sandbox validation and red teaming', 'related', TC260_URL, {
-    obligation: OBL_CN_TC260_APP2,
+    obligationId: OBL_CN_TC260_APP2,
     note: 'Technical sandbox validation for agents, not a regulatory sandbox; printed pp. 124-125.',
   }),
 
   // ── Environmental impact ─────────────────────────────────────────────────
   mk('environmental-impact', 'eu-ai-act', 'Annex XI 1(2)(e)', 'Known or estimated energy consumption of the GPAI model', 'core', aiaAnx('XI'), {
-    obligation: OBL_EU_53,
+    obligationId: OBL_EU_53,
     note: 'Part of the technical documentation GPAI providers keep under Art. 53(1)(a); may be estimated from compute where unknown.',
   }),
   eu('environmental-impact', 'Art. 40(2)', 'Standardisation deliverables on energy and resource performance', 'related', '40'),
@@ -3018,13 +3021,13 @@ const refsV05: readonly CrosswalkRef[] = [
   oecd('environmental-impact', '1.1', 'Inclusive growth, sustainable development and well-being', 'core'),
 
   // ── Deployment, change and decommissioning ───────────────────────────────
-  eu('deployment-change-decommissioning', 'Art. 26', T_ART_26, 'core', '26', { obligation: OBL_EU_26 }),
+  eu('deployment-change-decommissioning', 'Art. 26', T_ART_26, 'core', '26', { obligationId: OBL_EU_26 }),
   eu('deployment-change-decommissioning', 'Art. 25', 'Responsibilities along the AI value chain', 'related', '25', {
-    obligation: OBL_EU_25,
+    obligationId: OBL_EU_25,
     note: 'A substantial modification or a changed intended purpose makes the deployer a provider.',
   }),
   eu('deployment-change-decommissioning', 'Art. 43(4)', 'New conformity assessment on substantial modification', 'related', '43', {
-    obligation: OBL_EU_43,
+    obligationId: OBL_EU_43,
   }),
   eu('deployment-change-decommissioning', 'Art. 20', 'Corrective actions and duty of information', 'related', '20', {
     note: 'Bring into conformity, withdraw, disable or recall.',
@@ -3032,11 +3035,11 @@ const refsV05: readonly CrosswalkRef[] = [
   eu('deployment-change-decommissioning', 'Art. 79', 'Procedure at national level for dealing with AI systems presenting a risk', 'related', '79'),
   eu('deployment-change-decommissioning', 'Art. 86', T_ART_86, 'related', '86'),
   iso('deployment-change-decommissioning', 'A.9', 'Use of AI systems', 'related', {
-    obligation: 'A.9 Use of AI systems',
+    obligationId: 'AIGE-OBL-ISO42001-A9',
   }),
-  isoU('deployment-change-decommissioning', 'A.6.2.5', 'AI system deployment', 'core', { obligation: OBL_A6 }),
+  isoU('deployment-change-decommissioning', 'A.6.2.5', 'AI system deployment', 'core', { obligationId: OBL_A6 }),
   isoU('deployment-change-decommissioning', 'A.6.2.6', 'AI system operation and monitoring', 'core', {
-    obligation: OBL_A6,
+    obligationId: OBL_A6,
   }),
   nist('deployment-change-decommissioning', 'MANAGE 2.4', N_MANAGE_24, 'core'),
   nist(
@@ -3055,11 +3058,11 @@ const refsV05: readonly CrosswalkRef[] = [
     note: 'The 2024 revision asks for mechanisms to override, repair or decommission safely.',
   }),
   mk('deployment-change-decommissioning', 'cn-tc260-framework', '5.3', "Operators' safety guidelines", 'related', TC260_URL, {
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
     note: 'Logs kept at least six months and audited; voluntary.',
   }),
   mk('deployment-change-decommissioning', 'cn-tc260-framework', '5.3.19', 'Re-assessment on material change', 'related', TC260_URL, {
-    obligation: OBL_CN_TC260,
+    obligationId: OBL_CN_TC260,
   }),
 ];
 
@@ -3073,6 +3076,16 @@ const byId = new Map<string, Framework>([
 ]);
 
 /** Look up a framework by id (frameworks.ts first, then crosswalkInstruments). */
+/** The obligation-register row a ref joins, by id (or, for a legacy ref, by
+ *  the row's exact text); undefined where the clause has no row. */
+export function refObligation(
+  r: Pick<CrosswalkRef, 'obligationId' | 'obligation'>,
+): Obligation | undefined {
+  if (r.obligationId) return obligations.find((row) => row.id === r.obligationId);
+  if (r.obligation) return obligations.find((row) => row.obligation === r.obligation);
+  return undefined;
+}
+
 export function frameworkById(id: string): Framework | undefined {
   return byId.get(id);
 }

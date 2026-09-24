@@ -54,7 +54,10 @@ test.describe('pattern files', () => {
         expect(h2, `${pattern.slug} has "## ${field}"`).toContain(field);
       }
       expect(body).toContain('**Maps to:**');
-      expect(body).toContain('Mappings are illustrative, not a claim of conformity.');
+      // The sentence may wrap across source lines; compare with whitespace collapsed.
+      expect(body.replace(/\s+/g, ' ')).toContain(
+        'Mappings are illustrative, not a claim of conformity.',
+      );
     });
   }
 

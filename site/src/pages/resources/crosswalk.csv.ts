@@ -18,6 +18,7 @@ import {
   frameworkById,
   crosswalkAsOf,
   crosswalkSchemaVersion,
+  refObligation,
 } from '../../data/crosswalk';
 import { site } from '../../data/site';
 import { csvRow } from '../../lib/csv';
@@ -42,6 +43,7 @@ export const GET: APIRoute = () => {
     'Column',
     'Clause ID',
     'BoK section',
+    'Obligation ID',
   ];
 
   const lines = [
@@ -57,12 +59,13 @@ export const GET: APIRoute = () => {
         r.verified === false ? 'no' : 'yes',
         r.note ?? '',
         r.url ?? '',
-        r.obligation ?? '',
+        refObligation(r)?.obligation ?? '',
         r.topic,
         r.framework,
         columnOf(r.framework)?.id ?? '',
         clauseId(r),
         r.see ? new URL(r.see, site.url).href : '',
+        refObligation(r)?.id ?? '',
       ]),
     ),
   ];

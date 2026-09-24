@@ -375,7 +375,6 @@ test.describe('path data', () => {
     '/resources/frameworks',
     '/resources/tools',
     '/resources/reading-list',
-    '/resources/glossary',
   ]);
 
   const nodeIds = new Set(nodes.map((node) => node.id));
@@ -383,6 +382,7 @@ test.describe('path data', () => {
     nodes.map((node) => [node.id, stages.find((s) => s.id === node.stage)!.n]),
   );
   const glossaryIds = new Set(getGlossary().map((entry) => termId(entry.term)));
+  const glossarySlugs = new Set(getGlossary().map((entry) => entry.slug));
 
   test('has four stages, 1..4, whose ids partition every node', () => {
     expect(stages).toHaveLength(4);
@@ -460,6 +460,11 @@ test.describe('path data', () => {
           expect(slugsForChapter(slugName).has(frag), `${link.href} should resolve`).toBe(
             true,
           );
+        } else if (target.startsWith('/glossary/')) {
+          // A term's own page (v0.5.0); the slug must be a glossary term.
+          expect(frag, `${link.href} should carry no fragment`).toBeFalsy();
+          expect(target, link.href).toMatch(/^\/glossary\/[a-z0-9-]+$/);
+          expect(glossarySlugs.has(target.slice('/glossary/'.length)), `${link.href} should resolve`).toBe(true);
         } else if (target === '/resources/glossary') {
           expect(frag, `${link.href} needs a term`).toBeTruthy();
           expect(glossaryIds.has(frag), `${link.href} should resolve`).toBe(true);
@@ -614,13 +619,20 @@ test.describe('crosswalk data', () => {
     }
   });
 
-  test('every obligation join exists verbatim in the obligation matrix', () => {
+  test('every obligation join names a register row by its stable id', () => {
+    const ids = new Set(obligations.map((o) => o.id));
     const obligationTexts = new Set(obligations.map((o) => o.obligation));
     for (const ref of refs) {
+      if (ref.obligationId !== undefined) {
+        expect(ids.has(ref.obligationId), `${ref.topic} ${ref.ref}: ${ref.obligationId}`).toBe(true);
+      }
+      // A legacy text join (v0.4) must still resolve to a row.
       if (ref.obligation !== undefined) {
         expect(obligationTexts.has(ref.obligation), ref.obligation).toBe(true);
       }
     }
+    // The v0.5.0 crosswalk joins by id only.
+    expect(refs.filter((ref) => ref.obligation !== undefined)).toEqual([]);
   });
 
   test('urls are https; unverified refs carry a note; chips prefix multi-instrument columns only', () => {

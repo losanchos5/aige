@@ -29,8 +29,8 @@ import {
   type SystemClass,
   obligationPath,
 } from '../data/frameworks';
-import { patterns } from '../data/patterns';
-import { topics, columns, refs, chipLabel } from '../data/crosswalk';
+import { patterns, patternPath } from '../data/patterns';
+import { topics, columns, refs, chipLabel, refObligation } from '../data/crosswalk';
 import { levels } from '../data/maturity';
 import { stages, nodes, entries } from '../data/path';
 import { chapters, chapterParts, chaptersOrdered } from '../data/chapters';
@@ -48,7 +48,7 @@ import { regimes, roles, rolesChapterPath } from '../data/roles';
 import { layers } from '../data/stack';
 import { getGlossary, termId } from './glossary';
 import { sourceText } from './sources';
-import { obligationByText, obligationApiPath } from './obligations';
+import { obligationApiPath } from './obligations';
 
 // ---------------------------------------------------------------------------
 // URLs
@@ -191,10 +191,10 @@ export function obligationRecord(row: Obligation) {
     patterns: patternRefs.map((p) => ({
       id: p.id,
       title: p.title,
-      url: abs(`/bok/patterns#${p.id}`),
+      url: abs(patternPath(p)),
     })),
     crosswalkTopics: [
-      ...new Set(refs.filter((r) => r.obligation === row.obligation).map((r) => r.topic)),
+      ...new Set(refs.filter((r) => refObligation(r)?.id === row.id).map((r) => r.topic)),
     ],
     reviewed: row.reviewed,
     chapter: abs(`/bok/regulatory-map#${row.anchor}`),
@@ -348,7 +348,7 @@ export const datasets: readonly Dataset[] = [
         verified: r.verified !== false,
         note: r.note ?? null,
         url: r.url ?? null,
-        obligationId: r.obligation ? (obligationByText(r.obligation)?.id ?? null) : null,
+        obligationId: refObligation(r)?.id ?? null,
       })),
     }),
     properties: {
@@ -391,25 +391,27 @@ export const datasets: readonly Dataset[] = [
     title: 'Glossary',
     description: 'The canonical terms of the discipline, parsed from chapter 09, with their chapter references.',
     schemaVersion: 1,
-    page: '/resources/glossary',
+    page: '/bok/glossary',
     build: () => ({
       terms: getGlossary().map((entry) => ({
         id: termId(entry.term),
         term: entry.term,
         definition: entry.definition,
         letter: entry.letter,
-        url: abs(`/resources/glossary#${termId(entry.term)}`),
+        url: abs(entry.url),
+        anchor: abs(`/bok/glossary#${termId(entry.term)}`),
         chapters: entry.chapterRefs.map(chapterRef),
       })),
     }),
     properties: {
       terms: s.arr(
         s.obj({
-          id: s.str('Term id (the anchor on the glossary page).'),
+          id: s.str('Term id (the anchor on the glossary chapter).'),
           term: s.str('The term.'),
           definition: s.str('Definition, faithful to chapter 09.'),
           letter: s.str('A–Z group.'),
-          url: s.uri('The term on the glossary page.'),
+          url: s.uri('The term\'s own page (/glossary/<slug>).'),
+          anchor: s.uri('The term in the glossary chapter (/bok/glossary#<id>).'),
           chapters: s.arr(
             s.obj({
               number: s.str('Zero-padded chapter number.'),
@@ -428,15 +430,17 @@ export const datasets: readonly Dataset[] = [
     description:
       'The reusable patterns of chapter 05, with their home layer, the frameworks their "Maps to" line names and the obligation rows that list them.',
     schemaVersion: 1,
-    page: '/bok/patterns',
+    page: '/patterns',
     build: () => ({
       patterns: patterns.map((p) => ({
         id: p.id,
+        slug: p.slug,
         title: p.title,
         layer: p.layer,
         secondaryLayer: p.secondaryLayer ?? null,
         mapsTo: [...p.mapsTo],
-        url: abs(`/bok/patterns#${p.id}`),
+        url: abs(patternPath(p)),
+        section: abs(`/bok/patterns#${p.id}`),
         obligations: obligations.filter((o) => (o.patterns ?? []).includes(p.id)).map((o) => o.id),
       })),
     }),
@@ -444,11 +448,13 @@ export const datasets: readonly Dataset[] = [
       patterns: s.arr(
         s.obj({
           id: s.str('Pattern id (the anchor on /bok/patterns).'),
+          slug: s.str('Page slug: the pattern lives at /patterns/<slug>.'),
           title: s.str('Pattern name.'),
           layer: layer,
           secondaryLayer: s.intOrNull('Second layer for dual-layer patterns.', 1, 5),
           mapsTo: s.arr(s.str('Framework reference.'), 'What the "Maps to" line names.'),
-          url: s.uri('Pattern section.'),
+          url: s.uri('The pattern\'s own page.'),
+          section: s.uri('The pattern\'s summary in the chapter 05 catalogue.'),
           obligations: s.arr(s.str('Obligation id.'), 'Register rows that list the pattern.'),
         }),
         'The patterns, in catalogue order.',

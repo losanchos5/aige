@@ -18,7 +18,15 @@ import {
   type Obligation,
 } from '../data/frameworks';
 import { patterns, type PatternDef } from '../data/patterns';
-import { topics, refs, chipLabel, frameworkById, type CrosswalkRef, type Topic } from '../data/crosswalk';
+import {
+  topics,
+  refs,
+  chipLabel,
+  frameworkById,
+  refObligation,
+  type CrosswalkRef,
+  type Topic,
+} from '../data/crosswalk';
 import { cases, type IncidentCase } from '../data/cases';
 import { slugify } from './md-parse';
 
@@ -89,16 +97,16 @@ export interface CrosswalkTopic {
 
 /** The crosswalk topics a row is filed under, with its siblings in each. */
 export function crosswalkFor(row: Obligation): CrosswalkTopic[] {
-  const own = refs.filter((ref) => ref.obligation === row.obligation);
+  const own = refs.filter((ref) => refObligation(ref)?.id === row.id);
   const topicIds = [...new Set(own.map((ref) => ref.topic))];
   return topicIds.flatMap((topicId) => {
     const topic = topics.find((t) => t.id === topicId);
     if (!topic) return [];
     const siblings = refs
-      .filter((ref) => ref.topic === topicId && ref.obligation !== row.obligation)
+      .filter((ref) => ref.topic === topicId && refObligation(ref)?.id !== row.id)
       .sort((a, b) => (a.strength === b.strength ? 0 : a.strength === 'core' ? -1 : 1))
       .map((ref) => {
-        const target = ref.obligation ? obligationByText(ref.obligation) : undefined;
+        const target = refObligation(ref);
         return {
           ref,
           label: chipLabel(ref),

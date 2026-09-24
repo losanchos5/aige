@@ -14,8 +14,9 @@ import {
   chipLabel,
   frameworkById,
   crosswalkAsOf,
+  refObligation,
 } from '../../data/crosswalk';
-import { slugify } from '../../lib/md-parse';
+import { obligationPath } from '../../data/frameworks';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
@@ -123,8 +124,24 @@ const jsonLd = [
           <a href="#explore">the clause-to-clause explorer</a>.
         </p>
         <p class="ob-export">
-          <a class="ob-dl" href="/resources/crosswalk.csv" download>Download CSV</a>
-          <a class="ob-dl" href="/resources/crosswalk.json" download>Download JSON</a>
+          <a
+            class="ob-dl"
+            href="/resources/crosswalk.csv"
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file="/resources/crosswalk.csv"
+            data-umami-event-location="crosswalk">Download CSV</a>
+          <a
+            class="ob-dl"
+            href="/resources/crosswalk.json"
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file="/resources/crosswalk.json"
+            data-umami-event-location="crosswalk">Download JSON</a>
         </p>
       </div>
       <CrosswalkMatrix matrix={matrix} />
@@ -302,12 +319,9 @@ const jsonLd = [
                       Source ↗
                     </a>
                   )}
-                  {r.obligation && (
-                    <a
-                      class="cw-ref-oblig"
-                      href={`/resources/frameworks#ob-${slugify(r.obligation)}`}
-                    >
-                      Obligation row →
+                  {refObligation(r) && (
+                    <a class="cw-ref-oblig" href={obligationPath(refObligation(r)!)}>
+                      Obligation page →
                     </a>
                   )}
                   {r.see && (

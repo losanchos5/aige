@@ -204,7 +204,14 @@ const checkScript = `${site.github}/blob/main/site/scripts/schemas-check.mjs`;
                       <td class="tpl-files" data-label="Files">
                         <a href={row.schemaHref}>Schema</a>
                         <a href={row.exampleHref}>Example</a>
-                        <a href={row.templateHref} download>Template</a>
+                        <a
+                          href={row.templateHref}
+                          download
+                          target="_blank"
+                          rel="noopener"
+                          data-umami-event="download"
+                          data-umami-event-file={row.templateHref}
+                          data-umami-event-location="templates">Template</a>
                       </td>
                     </tr>
                   ))}
@@ -266,7 +273,14 @@ const checkScript = `${site.github}/blob/main/site/scripts/schemas-check.mjs`;
                   </td>
                   <td class="tpl-files" data-label="Files">
                     {item.files.map((file) => (
-                      <a href={file.href} download>{file.label}</a>
+                      <a
+                        href={file.href}
+                        download
+                        target="_blank"
+                        rel="noopener"
+                        data-umami-event="download"
+                        data-umami-event-file={file.href}
+                        data-umami-event-location="templates">{file.label}</a>
                     ))}
                   </td>
                 </tr>

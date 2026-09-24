@@ -26,6 +26,9 @@ export interface CaseObligation {
   instrument: string;
   /** The article, annex point or section, as a label. */
   ref: string;
+  /** Stable id of the obligation-register row the ref names (AIGE-OBL-...),
+   *  where the register has one; the case page links /obligations/<id>. */
+  obligationId?: string;
   /** How the case touches it; carries `[n]` markers. */
   why: string;
 }
@@ -284,11 +287,13 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'EU AI Act',
         ref: 'Art. 27',
+        obligationId: 'AIGE-OBL-EUAIA-ART27',
         why: 'A public body deploying such a system carries out a fundamental-rights impact assessment before first use [7].',
       },
       {
         instrument: 'EU AI Act',
         ref: 'Art. 5(1)(c)',
+        obligationId: 'AIGE-OBL-EUAIA-ART5',
         why: 'Social scoring that leads to unjustified or disproportionate detrimental treatment is prohibited [8]. Whether a given risk model meets those conditions is a legal judgement, not an engineering one.',
       },
     ],
@@ -391,6 +396,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'EU AI Act',
         ref: 'Annex III, point 5(a); Art. 27',
+        obligationId: 'AIGE-OBL-EUAIA-ART27',
         why: 'Fraud-risk scoring of benefit recipients by public authorities falls in the benefits use case [4]; Annex III obligations apply from 2 Dec 2027 (as of 2026-09-24) [5], and public deployers carry out a FRIA before first use [6].',
       },
       {
@@ -481,6 +487,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'UK data protection',
         ref: 'Data (Use and Access) Act 2025, s. 80',
+        obligationId: 'AIGE-OBL-UK-ADM',
         why: 'Replaces UK GDPR Art. 22 on automated decision-making with Arts. 22A-22D, in force since 5 Feb 2026 (as of 2026-09-24) [6].',
       },
     ],
@@ -564,6 +571,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'EU AI Act',
         ref: 'Art. 10',
+        obligationId: 'AIGE-OBL-EUAIA-ART10',
         why: 'For high-risk systems, training data must be examined for possible biases likely to affect health and safety or fundamental rights [3].',
       },
       {
@@ -639,6 +647,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'EU AI Act',
         ref: 'Art. 50(1)',
+        obligationId: 'AIGE-OBL-EUAIA-ART50',
         why: 'In the EU, systems that interact directly with people must be designed so that people know they are dealing with an AI system [4]; Art. 50 applies from 2 Aug 2026 (as of 2026-09-24) [5]. Disclosure does not shift liability for what the system says.',
       },
     ],
@@ -723,6 +732,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'EU AI Act',
         ref: 'Art. 10',
+        obligationId: 'AIGE-OBL-EUAIA-ART10',
         why: 'Training data for high-risk systems must be examined for possible biases [5].',
       },
       {
@@ -886,6 +896,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'EU AI Act',
         ref: 'Art. 5(1)(e)',
+        obligationId: 'AIGE-OBL-EUAIA-ART5',
         why: 'Placing on the market, putting into service or using AI systems that create or expand facial recognition databases through untargeted scraping of facial images from the internet or CCTV footage is prohibited [6]; the prohibitions apply from 2 Feb 2025 [7].',
       },
     ],
@@ -977,6 +988,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'EU AI Act',
         ref: 'Art. 53(1)(d)',
+        obligationId: 'AIGE-OBL-EUAIA-ART53',
         why: 'Providers of general-purpose AI models publish a sufficiently detailed summary of the content used for training [6]; these obligations apply since 2 Aug 2025, with Commission enforcement powers from 2 Aug 2026 (as of 2026-09-24) [7].',
       },
     ],
@@ -1072,6 +1084,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'EU AI Act',
         ref: 'Art. 50(1)',
+        obligationId: 'AIGE-OBL-EUAIA-ART50',
         why: 'For an EU deployment, people must be told they are dealing with an AI system [5]. The duty is about disclosure, not accuracy, which is why the eval gate matters more than the banner.',
       },
     ],
@@ -1146,6 +1159,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'EU AI Act',
         ref: 'Art. 4',
+        obligationId: 'AIGE-OBL-EUAIA-ART4',
         why: 'AI literacy: after the Digital Omnibus the article was reworded to support the development of AI literacy, applying from 27 Jul 2026 (as of 2026-09-24), as reported [3].',
       },
       {

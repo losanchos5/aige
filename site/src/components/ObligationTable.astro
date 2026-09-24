@@ -2,18 +2,20 @@
 /**
  * ObligationTable: the obligation → artefact → layer rows, grouped by the
  * framework they belong to. Each group has a sticky header; each row shows the
- * obligation, the engineering artefact, the stack layer(s) as colour ticks, each
- * with its visible layer code ("L2", so colour is never the only key), and
- * a link back to the row's anchor in chapter 08. A pure-CSS radio filter (no JS)
+ * obligation (linked to its page in the obligation register, /obligations/<id>,
+ * with its stable id under it), the engineering artefact, the stack layer(s) as
+ * colour ticks, each with its visible layer code ("L2", so colour is never the
+ * only key), and a link back to the row's anchor in chapter 08. A pure-CSS radio filter (no JS)
  * narrows the list to a single layer, and a second one to a single EU AI Act
  * duty holder. Below 720px rows become stacked cards.
  *
  * The EU AI Act group alone carries a duty holder and an applies-from date (the
  * voluntary frameworks bind no one), so those two columns and the duty-holder
  * filter render for that group only. Where an obligation maps one-to-one onto a
- * pattern from chapter 05, its artefact cell links to that pattern's anchor.
+ * pattern from chapter 05, its artefact cell links to that pattern's page.
  */
-import type { Obligation, StackLayer } from '../data/frameworks';
+import { obligationPath, type Obligation, type StackLayer } from '../data/frameworks';
+import { patterns, patternPath } from '../data/patterns';
 import { slugify } from '../lib/md-parse';
 
 interface Props {
@@ -73,8 +75,8 @@ const dutyClass = (dutyHolder?: string): string => {
 };
 
 // Obligations that map one-to-one onto a chapter-05 pattern. The value is the
-// pattern's H2 name; the anchor is computed with the same slugger rehype-slug
-// uses, so it always matches the built page (verified by check-links).
+// pattern's title in data/patterns.ts; the link is that pattern's own page
+// (/patterns/<slug>), and an unknown title fails the build.
 const artefactPattern: Record<string, string> = {
   'EU AI Act Art. 11 technical documentation (Annex IV)': 'AIBOM',
   'EU AI Act Art. 13 transparency and information to deployers':
@@ -88,7 +90,11 @@ const artefactPattern: Record<string, string> = {
   'EU AI Act Art. 73 serious-incident reporting': 'Incident Pipeline',
 };
 
-const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}`)}`;
+const patternHref = (name: string) => {
+  const pattern = patterns.find((p) => p.title === name);
+  if (!pattern) throw new Error(`ObligationTable: no pattern titled "${name}" in data/patterns.ts`);
+  return patternPath(pattern);
+};
 ---
 
 <div class="ob-list">
@@ -166,7 +172,10 @@ const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}
                   id={`ob-${slugify(row.obligation)}`}
                   class:list={[layerClass(row.layerN), dutyClass(row.dutyHolder)]}
                 >
-                  <td class="c-oblig" data-label="Obligation">{row.obligation}</td>
+                  <td class="c-oblig" data-label="Obligation">
+                    <a class="ob-name" href={obligationPath(row)}>{row.obligation}</a>
+                    <span class="ob-id">{row.id}</span>
+                  </td>
                   {hasDutyColumns(group.framework) && (
                     <td class="c-duty" data-label="Duty holder">{row.dutyHolder}</td>
                   )}
@@ -226,6 +235,19 @@ const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}
 
   .ob-filter-duty {
     margin-top: calc(-1 * var(--s-3));
+  }
+
+  /* The obligation links to its register page; its stable id sits under it in
+     mono, in --ink-2 (not --muted) for the same zebra-row contrast reason as
+     .c-applies below. */
+  .res-table .c-oblig .ob-id {
+    display: block;
+    margin-top: 0.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
   }
 
   .res-table .c-duty {

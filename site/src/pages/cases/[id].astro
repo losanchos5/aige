@@ -5,6 +5,7 @@ import Callout from '../../components/Callout.astro';
 import CitedText from '../../components/CitedText.astro';
 import SourceList from '../../components/SourceList.astro';
 import { site } from '../../data/site';
+import { obligationPath } from '../../data/frameworks';
 import { layers } from '../../data/stack';
 import { harms, incidentDbLabel } from '../../data/harms';
 import {
@@ -214,7 +215,11 @@ const jsonLd = [
             <li>
               <span class="cs-oblig-ref">
                 <span>{o.instrument}</span>
-                {o.ref}
+                {o.obligationId ? (
+                  <a href={obligationPath({ id: o.obligationId })}>{o.ref}</a>
+                ) : (
+                  o.ref
+                )}
               </span>
               <CitedText text={o.why} />
             </li>

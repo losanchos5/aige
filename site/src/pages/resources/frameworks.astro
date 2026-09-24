@@ -52,13 +52,32 @@ const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Frameworks
         is answered by this artefact, which lives in this layer. Filter by the layer you are
         building, or by EU AI Act duty holder.</p>
         <p class="ob-xref">
-          Cross-reference: <a href="/resources/tools">tools by layer</a> ·
-          <a href="/bok/patterns">the pattern catalogue</a> ·
+          Cross-reference: <a href="/obligations">the obligation register</a> (one page per row,
+          with a stable id) · <a href="/resources/tools">tools by layer</a> ·
+          <a href="/patterns">the patterns</a> ·
           <a href="/resources/crosswalk">topic crosswalk</a>.
         </p>
         <p class="ob-export">
-          <a class="ob-dl" href="/resources/obligations.csv" download>Download CSV</a>
-          <a class="ob-dl" href="/resources/obligations.json" download>Download JSON</a>
+          <a
+            class="ob-dl"
+            href="/resources/obligations.csv"
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file="/resources/obligations.csv"
+            data-umami-event-location="frameworks">Download CSV</a>
+          <a
+            class="ob-dl"
+            href="/resources/obligations.json"
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file="/resources/obligations.json"
+            data-umami-event-location="frameworks">Download JSON</a>
+          <a class="ob-dl" href="/api/v1/obligations.json">API</a>
+          <a class="ob-dl" href="/resources/data">About the data</a>
         </p>
       </div>
       <Diagram id="obligation-to-evidence" />
