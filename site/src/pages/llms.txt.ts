@@ -1,4 +1,4 @@
-// /llms.txt — the plain-text index an LLM reads to find its way around the site,
+// /llms.txt: the plain-text index an LLM reads to find its way around the site,
 // in the llmstxt.org format: an H1, a `>` summary, a paragraph of provenance and
 // then one `##` section per group of `- [name](url): notes` links. Every title
 // and summary comes from data/chapters.ts or from the Markdown sources
@@ -73,7 +73,7 @@ export const GET: APIRoute = (context) => {
       linkLine(
         'Resources index',
         url('/resources'),
-        'Frameworks, tools, a reading list and a glossary, all extracted from the Body of Knowledge.',
+        'Frameworks, tools, a reading list, a glossary, the topic crosswalk and the discipline map, all extracted from the Body of Knowledge.',
       ),
     ]),
 

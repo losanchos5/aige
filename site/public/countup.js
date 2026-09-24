@@ -14,8 +14,8 @@
   /* Count-up. The tween comes from the shared motion runtime
      (window.aigeMotion, bundled by Base.astro). Its `animate` is the WAAPI
      build (motion/mini), which only animates element styles, so the number is
-     tweened as a registered <number> custom property on the figure itself —
-     motion owns the duration and the --ease curve — and each frame copies the
+     tweened as a registered <number> custom property on the figure itself:
+     motion owns the duration and the --ease curve, and each frame copies the
      live value into the text. The server HTML already carries the final
      figure: reduced motion, no IntersectionObserver, no @property or a motion
      module that never loads all keep (or restore) that exact text. */

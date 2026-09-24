@@ -1,4 +1,4 @@
-# Distill (de-slop) worklist — feat/ui-refinement
+# Distill (de-slop) worklist: feat/ui-refinement
 
 Análisis de solo lectura (2026-09-23) sobre el worktree `D:\Documents\aige\.claude\worktrees\ui\site`,
 a partir de `npx impeccable detect dist --json` (119 hallazgos en el sitio, excluido `dist/diagrams/`),
@@ -12,7 +12,7 @@ como hairline plano sin contador.
 | Regla | Nº | Ficheros principales | Ejemplo | Arreglo según impeccable |
 |---|---|---|---|---|
 | cramped-padding | 73 | resources/tools (20), stack (17), index (15), path (10), role (8) | hijos de `<section>` pegados al border-top, sin inset | ≥ 8 px (ideal 12–16) de padding dentro de contenedores con borde o color |
-| side-tab | 21 | changelog/path CSS, bok/definition, bok/glossary, bok/maturity-model, bok/patterns | `.glance:after` — franja absoluta de 3 px (left: 0) | quitar el borde de acento o tratamiento más sutil |
+| side-tab | 21 | changelog/path CSS, bok/definition, bok/glossary, bok/maturity-model, bok/patterns | `.glance:after`, franja absoluta de 3 px (left: 0) | quitar el borde de acento o tratamiento más sutil |
 | em-dash-overuse (aviso) | 6 | changelog (75), bok/definition (48), reading-list (64), the-stack, glossary, thesis | "N em-dashes in body text" | comas, dos puntos, puntos |
 | layout-transition | 5 | pagefind-ui.css, chunks CSS de changelog/index/stack | `transition: width/height` | animar transform/opacity |
 | all-caps-body | 4 | bok/maturity-model, bok/regulatory-map, bok/the-stack, index | `text-transform: uppercase` en 30–55 caracteres de cuerpo | mayúsculas solo en etiquetas cortas |
@@ -51,7 +51,7 @@ como hairline plano sin contador.
 
 ## C. Lista de trabajo priorizada (home primero)
 
-1. **~~Quitar malla + rejilla del hero~~ — DECISIÓN DE JORDI (2026-09-23 18:50): la malla/gradiente
+1. **~~Quitar malla + rejilla del hero~~, DECISIÓN DE JORDI (2026-09-23 18:50): la malla/gradiente
    se CONSERVA, es identidad del sitio, no slop.** No tocar `.bg-mesh` ni los gradientes de
    `.card-lum` / `.btn-glow`. Sobre la rejilla (`.bg-grid` / `.bg-dots`) Jordi aún no ha decidido:
    preguntar antes de quitarla.

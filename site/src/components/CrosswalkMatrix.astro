@@ -1,12 +1,12 @@
 ---
 /**
- * CrosswalkMatrix — the topic × framework grid: one row per Body-of-Knowledge
+ * CrosswalkMatrix, the topic × framework grid: one row per Body-of-Knowledge
  * topic, one column per framework family (EU, ISO, NIST and the China group),
  * each cell a stack of clause chips. Every trigger is a link, not a button: with
  * JS off the row header and each cell jump natively to the topic's <article>
  * further down the page; public/crosswalk.js upgrades them to open the drawer.
- * Unlike ObligationMatrix it carries no JSON payload — the drawer clones the
- * server-rendered topic section — and no opacity stagger. Mirrors the
+ * Unlike ObligationMatrix it carries no JSON payload: the drawer clones the
+ * server-rendered topic section, and no opacity stagger. Mirrors the
  * sticky-first-column horizontal scroll of ObligationMatrix. Pagefind indexes
  * the topic sections, not this grid. Column type tags and clause chips are
  * neutral (.type-tag in resources.css, .cw-chip in crosswalk.css): layer

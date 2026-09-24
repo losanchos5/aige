@@ -57,7 +57,7 @@ const includedFwIds = new Set(
   obligations.map((o) => resolveFwId(o.framework, o.obligation)),
 );
 
-// Block V3 — the obligation heat matrix (/resources/frameworks), StatTile
+// Block V3: the obligation heat matrix (/resources/frameworks), StatTile
 // count-up and the MaturityLadder draw-on (/role). Acceptance assertions plus
 // the review screenshots written to tests/__screenshots__/V3/.
 const DIR = join('tests', '__screenshots__', 'V3');
@@ -75,7 +75,7 @@ test.describe('obligation matrix', () => {
   });
 
   // The rows are derived from frameworks.ts, so every framework the inclusion
-  // rule selects gets a row — including the ones the old hard-coded id map dropped
+  // rule selects gets a row, including the ones the old hard-coded id map dropped
   // (ISO/IEC 42006, ISO/IEC 23894, the newer NIST work, US state laws, and the
   // other-jurisdiction instruments).
   test('derives one row per framework with obligations, incl. new frameworks', async ({ page }) => {
@@ -85,7 +85,7 @@ test.describe('obligation matrix', () => {
     await expect(page.locator('.mx-rowh[data-mx-fw="iso-42006"]')).toHaveCount(1);
     await expect(page.locator('.mx-rowh[data-mx-fw="tx-traiga"]')).toHaveCount(1);
 
-    // One row per framework the inclusion rule selects — no more, no fewer.
+    // One row per framework the inclusion rule selects, no more, no fewer.
     const rowHeads = page.locator('[data-mx-grid] tbody tr.mx-row .mx-rowh');
     expect(await rowHeads.count()).toBe(includedFwIds.size);
 

@@ -1,4 +1,4 @@
-// reading.ts: build-time helpers for the Body of Knowledge — word counts,
+// reading.ts: build-time helpers for the Body of Knowledge, word counts,
 // reading-time estimates, and the last-updated date from git history.
 
 import { execFileSync } from 'node:child_process';
@@ -31,15 +31,15 @@ let changelogDateCache: string | undefined;
 
 /**
  * The date (YYYY-MM-DD) of the latest entry in bok/CHANGELOG.md, whose headings
- * read `## [0.2] — 2026-09-10`. Read once and memoised. Returns undefined only
+ * read `## [0.2] - 2026-09-10`. Read once and memoised. Returns undefined only
  * if the file is missing or has no dated entry.
  */
 function changelogDate(): string | undefined {
   if (changelogDateCache !== undefined) return changelogDateCache || undefined;
   try {
     const text = readFileSync(CHANGELOG, 'utf8');
-    // First `## [version] — YYYY-MM-DD` heading (em/en dash or hyphen).
-    const match = text.match(/^##\s*\[[^\]]+\]\s*[—–-]\s*(\d{4}-\d{2}-\d{2})/m);
+    // First `## [version] - YYYY-MM-DD` heading (em/en dash or hyphen).
+    const match = text.match(/^##\s*\[[^\]]+\]\s*[\u2014–-]\s*(\d{4}-\d{2}-\d{2})/m);
     changelogDateCache = match ? match[1] : '';
   } catch {
     changelogDateCache = '';
@@ -49,8 +49,8 @@ function changelogDate(): string | undefined {
 
 /**
  * Last commit date (YYYY-MM-DD) that touched `file`, read from git at build.
- * When git returns nothing — a shallow clone with no history for the file, or
- * git being unavailable — falls back to the date of the latest CHANGELOG entry
+ * When git returns nothing (a shallow clone with no history for the file, or
+ * git being unavailable), falls back to the date of the latest CHANGELOG entry
  * rather than the build date, so pages stay stable across environments. Never
  * throws.
  */
@@ -70,7 +70,7 @@ export function gitDate(file: string): string {
 
 /**
  * Date (YYYY-MM-DD) of the commit that first added `file`, read from git at
- * build — the `datePublished` of the pages built from it. Falls back to
+ * build: the `datePublished` of the pages built from it. Falls back to
  * `gitDate(file)` when git has no add commit for the path (a shallow clone, a
  * rename, or git being unavailable). Never throws.
  */

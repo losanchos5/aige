@@ -4,8 +4,8 @@
 //
 // Numbers policy: `market` carries only figures the chapter attributes to a
 // primary source (the IAPP Salary & Jobs Report medians), each `primary: true`.
-// LinkedIn's "Skills on the Rise" demand signal is qualitative — no per-skill
-// percentage is stated in a primary source — so it lives in the chapter prose,
+// LinkedIn's "Skills on the Rise" demand signal is qualitative (no per-skill
+// percentage is stated in a primary source), so it lives in the chapter prose,
 // not as a figure here. Employer names from the postings footnote, and every
 // forbidden claim, are deliberately omitted.
 
@@ -268,7 +268,7 @@ export const waysIn: readonly WayIn[] = [
 /** What employers get wrong in the job description, read against the workflows. */
 export const employerMistakes: readonly string[] = [
   'Certifications as a proxy for capability: descriptions list AIGP, CIPP, CISSP and CISM as if a certificate produced a control, while under-specifying the load-bearing skills: eval harnesses, policy-as-code, the runtime data path.',
-  'Analyst work under an engineer title: many "AI Governance Engineer" postings describe intake, mapping and reporting at engineer pay; the tell is the absence of any build: no eval gate, no registry integration, no evidence pipeline.',
+  'Analyst work under an engineer title: in our reading of the postings, "AI Governance Engineer" titles often describe intake, mapping and reporting at engineer pay; the tell is the absence of any build: no eval gate, no registry integration, no evidence pipeline.',
   'Everything, in one hire: a single posting asks for policy-as-code, red teaming, identity, observability, incident response, regulatory translation and stakeholder management. That is a function, not a person; a first hire owns two or three workflows and builds the paved path for the rest.',
 ] as const;
 

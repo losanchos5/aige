@@ -1,4 +1,4 @@
-// block-f-es.spec.ts: acceptance checks for Block F4 — the Spanish translation of
+// block-f-es.spec.ts: acceptance checks for Block F4, the Spanish translation of
 // the Thesis at /es/thesis. The page responds, declares Spanish for the body,
 // shows a Spanish heading and links back to the English original.
 //

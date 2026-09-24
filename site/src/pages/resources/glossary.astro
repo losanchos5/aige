@@ -13,8 +13,8 @@ const entries = getGlossary();
 const letters = getGlossaryLetters();
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Glossary' }];
 
-// The glossary is genuinely structured — term, definition and an on-page anchor
-// per entry (GlossaryIndex renders each <dt id={termId(term)}>) — so it is stated
+// The glossary is genuinely structured (term, definition and an on-page anchor
+// per entry; GlossaryIndex renders each <dt id={termId(term)}>), so it is stated
 // as a DefinedTermSet whose terms @id the anchors a reader can actually follow.
 const glossaryUrl = new URL('/resources/glossary', site.url).href;
 const termSetId = `${glossaryUrl}#glossary`;
@@ -44,7 +44,7 @@ const jsonLd = [
   image="/og/resources.png"
   jsonLd={jsonLd}
 >
-  {/* Glossary is a Lighthouse route: keep it light — the dot texture only, no
+  {/* Glossary is a Lighthouse route: keep it light, the dot texture only, no
       animated gradient mesh (mesh={false}). */}
   <PageHero
     variant="res"

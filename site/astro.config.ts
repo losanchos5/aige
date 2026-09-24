@@ -15,7 +15,7 @@ import { gitDate } from './src/lib/reading';
 // Sitemap URL -> the source file(s) whose last commit dates the page: the page
 // itself plus, for a data-driven page, the module or Markdown it renders. The
 // newest of those commit dates wins, so editing either the template or its data
-// moves the page's `lastmod`. Never the build date — a rebuild must not claim
+// moves the page's `lastmod`. Never the build date: a rebuild must not claim
 // every page changed. Paths are relative to `site/` (the build cwd).
 const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ['/', ['src/pages/index.astro', 'src/data/values.ts', 'src/data/role.ts', 'src/data/chapters.ts']],

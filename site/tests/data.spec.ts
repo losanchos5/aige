@@ -1,5 +1,5 @@
 // data.spec.ts: verifies the typed data layer against the source Markdown.
-// Runs in the Playwright test runner but uses no browser — pure Node reads and
+// Runs in the Playwright test runner but uses no browser: pure Node reads and
 // assertions. It checks structure (layer/level counts, unique colours), that
 // every `anchor` resolves to a real heading in its chapter (slugified exactly
 // as rehype-slug would), and that no forbidden claim leaks into any module.

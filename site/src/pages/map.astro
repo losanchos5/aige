@@ -1,10 +1,10 @@
 ---
 /**
- * /map — the discipline of the AI Governance Engineer as one navigable mind map
+ * /map: the discipline of the AI Governance Engineer as one navigable mind map
  * plus a per-cluster index. The SVG is generated from the same data modules as
  * the rest of the site (scripts/map-build.mjs writes src/figures/discipline-map.svg)
  * and imported here raw; the index under it (buildClusterIndex) is the textual,
- * JavaScript-free alternative — eight <details>, one per branch, each with the
+ * JavaScript-free alternative: eight <details>, one per branch, each with the
  * map tree, the chapter sections and the diagrams/nodes/resources that reach the
  * branch. Every node in both halves is a link. The scroll region carries the
  * wide canvas sideways on a phone; public/map.js only adds expand/collapse-all
@@ -92,7 +92,7 @@ function chapterNote(branchChapters: readonly string[]): string {
 
 // The published-PNG download, only when both the export manifest and the file it
 // names exist (the LinkedIn kit writes them). Guarded so a checkout without them
-// still builds — the precedent is the About-page PDF link.
+// still builds: the precedent is the About-page PDF link.
 interface MapDownload {
   href: string;
   size: string;

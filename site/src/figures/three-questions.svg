@@ -4,7 +4,7 @@
 
   <text class="mono muted" x="16" y="20" font-size="13.5">The spine of the Body of Knowledge</text>
 
-  <!-- Panel 1: What AI is running? — registry cylinder — Layer 02 -->
+  <!-- Panel 1: What AI is running? (registry cylinder) Layer 02 -->
   <rect class="panel" x="8" y="34" width="344" height="76" rx="10"/>
   <g>
     <ellipse class="glyph" cx="32" cy="50" rx="13" ry="4.5"/>
@@ -16,7 +16,7 @@
     <text class="l2-tx" x="30" y="95" font-size="13.5">Layer 02 Inventory &amp; Transparency</text>
   </g>
 
-  <!-- Panel 2: What is it allowed to do? — policy card + gate — Layers 01, 04 -->
+  <!-- Panel 2: What is it allowed to do? (policy card + gate) Layers 01, 04 -->
   <rect class="panel" x="8" y="118" width="344" height="102" rx="10"/>
   <g>
     <rect class="glyph" x="19" y="130" width="20" height="26" rx="3"/>
@@ -35,7 +35,7 @@
     <text class="l4-tx" x="30" y="205" font-size="13.5">Layer 04 Runtime Controls &amp; Observability</text>
   </g>
 
-  <!-- Panel 3: What evidence proves it? — evidence document — Layers 03, 05 -->
+  <!-- Panel 3: What evidence proves it? (evidence document) Layers 03, 05 -->
   <rect class="panel" x="8" y="228" width="344" height="102" rx="10"/>
   <g>
     <path class="glyph" d="M22 240 h18 l8 8 v26 h-26 z"/>

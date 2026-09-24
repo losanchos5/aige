@@ -1,5 +1,5 @@
 // seo-infra.spec.ts: the SEO gates that live in build output rather than in a
-// page's markup — sitemap freshness dates, the redirect-free diagram links, the
+// page's markup: sitemap freshness dates, the redirect-free diagram links, the
 // 404 noindex header and the legacy favicon. Request-only, like infra.spec.ts;
 // the files are read from dist, which is what the preview server serves.
 import { test, expect } from '@playwright/test';

@@ -27,8 +27,8 @@ practice is described it is generic ("in a large telco").
 
 It is built from three things. First, that operating experience: what actually held up when a model
 changed on a Friday and an agent gained a new tool over the weekend. Second, the **GRC Engineering**
-precedent: the community, manifesto and body of practice that, over roughly the last two years,
-turned governance, risk and compliance into a product built with code [1][2]. Third, the public
+precedent: the community, manifesto and body of practice that, since about 2024, has turned
+governance, risk and compliance into a product built with code [1][2]. Third, the public
 record: the EU AI Act and its Digital Omnibus reform, ISO/IEC 42001, the NIST AI RMF, OWASP's GenAI
 and Agentic work, CSA, CSIRO's Responsible AI Pattern Catalogue, and the frontier labs' own safety
 frameworks. Every factual claim in the book carries a sourced, verified citation.

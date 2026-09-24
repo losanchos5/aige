@@ -1,4 +1,4 @@
-/* map.css: the /map page — the discipline mind map (a wide SVG in a sideways
+/* map.css: the /map page, the discipline mind map (a wide SVG in a sideways
    scroll region), its legend, and the per-cluster index of <details>. Loaded
    only by src/pages/map.astro. The focus ring on a pill lives in figures.css
    (.map-svg a:focus-visible > rect); the branch-dimming :has() rules and the

@@ -2,7 +2,7 @@
    script-src 'self' holds. Tracks per-node progress in localStorage, drives the
    stage/overall meters, opens a focus-trapped modal drawer per node (Esc/scrim
    close, the page behind inert while open, focus restored), and precomputes
-   the cross-stage prerequisite edges >=840px — kept hidden and revealed only
+   the cross-stage prerequisite edges >=840px, kept hidden and revealed only
    for the node under the pointer/focus or open in the drawer. No-JS falls back
    to the native <details> bodies and the CSS spine. */
 (function () {

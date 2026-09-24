@@ -105,9 +105,10 @@ You cannot trust a verdict you cannot trace. Inspectable tooling lets you follow
 rule that produced it, the input it saw and the evidence it emitted; composable tooling lets you wire
 that decision into your own pipeline rather than export into someone else's. We prefer tooling whose
 reasoning and data path we can open, bought or built, because governance you cannot see inside is a
-control you cannot trust. Much of the AI-governance platform category stops at the program layer,
-"managing inventories, assessments and framework mappings without any runtime data path" [3]; the
-objection is not that it is commercial but that its verdict cannot be audited.
+control you cannot trust. One vendor's comparison of the AI-governance platform category, published
+by a competitor in it, finds that most of the category "manages the program (inventories, assessments,
+framework mappings, evidence workflows) without any runtime data path" [3]; where that holds, the
+objection is not that the tooling is commercial but that its verdict cannot be audited.
 
 This is a lean, not an absolute. Closed and commercial tools have a place, including capable
 platforms. But the default is tooling the team can inspect and compose, over a black box the team must
@@ -251,5 +252,5 @@ Applications; the assurance they demand maps to ISO/IEC 42001, NIST AI RMF and E
 
 [1] GRC Engineering Manifesto (values and principles precedent). grcengineering. ~2024. https://grc.engineering/ (verified: primary)
 [2] "What is GRC Engineering" (Ayoub Fandi; "theatre with extra steps"). GRC Engineer. 2025. https://grcengineer.com/what-is-grc-engineering/ (verified: primary)
-[3] "Best AI Governance Platforms 2026" (runtime data path critique). Kosmoy. 2026. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
+[3] "Best AI Governance Platforms in 2026: 14 Enterprise Vendors Compared" (vendor-published comparison of the 13 Magic Quadrant vendors plus its own product; most of the category "manages the program … without any runtime data path"). Kosmoy. 2026-07-10. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
 [4] Top 10 for Agentic Applications 2026. OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)

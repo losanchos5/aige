@@ -6,7 +6,7 @@
 // Each placement's `at` picks where the figure lands: 'lead' opens the chapter
 // (before its first H2, after the intro), 'head' sits immediately under the
 // anchor heading, and 'foot' (the default) goes at the END of the named
-// (sub)section — just before the next heading of depth ≤ the anchor (see
+// (sub)section: just before the next heading of depth ≤ the anchor (see
 // src/lib/rehype-diagrams.ts). Chapter slugs match src/data/chapters.ts; the
 // `section`/`sub` strings must match the chapter's real H2/H3 heading text,
 // because rehype-diagrams matches them by normalised heading text.
@@ -26,11 +26,11 @@ export interface DiagramPlacement {
   chapter: string;
   /**
    * Where the figure is inserted relative to its anchor (default `'foot'`):
-   * - `'lead'` — before the chapter's first H2, as an opening figure after the
+   * - `'lead'`: before the chapter's first H2, as an opening figure after the
    *   intro. `section`/`sub` are ignored.
-   * - `'head'` — immediately after the anchor heading (`section`, plus `sub`
+   * - `'head'`: immediately after the anchor heading (`section`, plus `sub`
    *   when the anchor is an H3 inside that section).
-   * - `'foot'` — at the foot of the anchor (sub)section, i.e. just before the
+   * - `'foot'`: at the foot of the anchor (sub)section, i.e. just before the
    *   next heading of depth ≤ the anchor.
    */
   at?: 'lead' | 'head' | 'foot';
@@ -43,7 +43,7 @@ export interface DiagramPlacement {
 }
 
 export interface DiagramDef {
-  /** Diagram id — matches site/diagrams/<id>.<type>.json and the generated
+  /** Diagram id: matches site/diagrams/<id>.<type>.json and the generated
    *  src/generated/diagrams/<id>.svg. */
   id: string;
   /** Archify diagram type (the penultimate dotted segment of the IR file). */
@@ -292,7 +292,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'lifecycle',
     title: 'The regulatory window',
     caption:
-      'The obligations that are live now and the deferred deadlines that follow them, as the chapter states them as of 2026-09-19. Pick the next stage and map its obligations to artefacts in chapter 08. Generated from the Body of Knowledge.',
+      'The obligations that are live now and the deferred deadlines that follow them, as the chapter states them as of 2026-09-24. Pick the next stage and map its obligations to artefacts in chapter 08. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'why-now', at: 'lead' }],
   },
 ] as const;

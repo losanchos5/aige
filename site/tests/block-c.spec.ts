@@ -1,4 +1,4 @@
-// block-c.spec.ts: acceptance checks for Block C — surfacing the duty holders in
+// block-c.spec.ts: acceptance checks for Block C, surfacing the duty holders in
 // the obligation table, the Patterns nav item, the build-time obligation export
 // endpoints, and the collapsible on-this-page TOC on narrow viewports.
 import { test, expect } from '@playwright/test';
@@ -7,7 +7,7 @@ test.describe('duty holders in the obligation table', () => {
   test('the duty columns and filter render only in the EU AI Act group', async ({ page }) => {
     await page.goto('/resources/frameworks');
 
-    // The two extra columns exist exactly once — in the EU AI Act group.
+    // The two extra columns exist exactly once: in the EU AI Act group.
     await expect(page.locator('thead th', { hasText: 'Duty holder' })).toHaveCount(1);
     await expect(page.locator('thead th', { hasText: 'Applies from' })).toHaveCount(1);
 

@@ -15,7 +15,7 @@ Reglas de trabajo: Fable planifica, revisa figuras y verifica; subagentes `imple
 - [x] Zenodo conectado al repo (2026-09-20). Falta: crear la release `v0.4.0` en GitHub, recoger
       el DOI y ponerlo en `CITATION.cff`, `Citation.astro` (BibTeX) y /about.
 
-## 2. Bloque F — Crecimiento y rigor (hecho 2026-09-20, commits d8f642a..dde6bbc)
+## 2. Bloque F: Crecimiento y rigor (hecho 2026-09-20, commits d8f642a..dde6bbc)
 - [x] JSON-LD acotado: `Book` + `TechArticle` en `/bok/[slug]` (pasar `jsonLd` por `Doc.astro`),
       `Person` mínimo con `authors` de `site.ts` (sin jobTitle/worksFor), `BreadcrumbList` desde
       `chapters.ts`; `og:locale` en `Seo.astro`; `site.webmanifest`.
@@ -48,7 +48,7 @@ Reglas de trabajo: Fable planifica, revisa figuras y verifica; subagentes `imple
       «Updated» de ChapterHeader ya se traduce (2026-09-23): `lang` llega hasta ChapterHeader y la
       línea de meta usa «Actualizado».
 - [x] Feed RSS: título del feed y del `<link rel="alternate">` de Base.astro cambiados a
-      «AI Governance Engineer — chapters and releases» (2026-09-23); ya no dice «Changelog».
+      «AI Governance Engineer: chapters and releases» (2026-09-23); ya no dice «Changelog».
 - [x] `ObligationMatrix.astro` derivado de `frameworks.ts` (23 filas; ISO 42005 y EN 18286 quedan
       fuera porque ninguna obligación las referencia).
 - [ ] Dogfooding (D8, sin hacer): publicar el AIBOM del sitio (CycloneDX en build),
@@ -77,7 +77,7 @@ Reglas de trabajo: Fable planifica, revisa figuras y verifica; subagentes `imple
       FPF, Stanford HAI) y oportunidades de enlace/colaboración.
 - [ ] Auditoría de contenido de `/path` y de la home (nunca se revisaron como páginas).
 - [ ] Ámbito regulatorio: GDPR Art. 22 con FRIA/DPIA, sectoriales (DORA, FDA).
-- [x] China: cap. 08 (subsección + tabla + cruce agéntico TC260 3.0), catálogo del sitio, lecturas y glosario — 2026-09-20
+- [x] China: cap. 08 (subsección + tabla + cruce agéntico TC260 3.0), catálogo del sitio, lecturas y glosario, 2026-09-20
 - [ ] Propuestas para las otras audiencias del prefacio (security, privacy/DPO, MLOps, juristas).
 - [ ] Cadencia de LinkedIn y motor de contenido corto («Field notes»). (OG/infografía para LinkedIn:
       resuelto vía la infografía vertical del mapa `/map`, kit `aige-media/linkedin`, 2026-09-21.)

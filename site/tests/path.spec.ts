@@ -1,4 +1,4 @@
-// path.spec.ts: Block C — the /path learning-path page. Structural counts
+// path.spec.ts: Block C, the /path learning-path page. Structural counts
 // (four stages, one node <li> per data node), chapter back-link resolution,
 // the keyboard-driven drawer (open on Enter, focus trapped inside, Escape
 // closes and restores focus), per-node progress persisted to
@@ -167,7 +167,7 @@ test('axe: no serious or critical violations with the drawer open', async ({ pag
     (v) => v.impact === 'serious' || v.impact === 'critical',
   );
   const detail = serious
-    .map((v) => `${v.id} [${v.impact}] ${v.help} — ${v.nodes.length} node(s)`)
+    .map((v) => `${v.id} [${v.impact}] ${v.help}: ${v.nodes.length} node(s)`)
     .join('\n');
   expect(serious, `serious/critical a11y violations with drawer open:\n${detail}`).toEqual([]);
 });

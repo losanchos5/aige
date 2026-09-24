@@ -306,7 +306,7 @@
 }
 
 /* Oversized decorative opening quote in the layer pastel (ornamental, not the
-   quote's text — that stays --ink below). */
+   quote's text: that stays --ink below). */
 .prose blockquote::before {
   content: '\201C';
   position: absolute;
@@ -372,7 +372,7 @@
   background: none;
   /* Inherit Shiki's own foreground (set inline on the dark `astro-code` pre).
      Overriding it with a theme ink turns plaintext blocks dark-on-dark in light
-     mode — unreadable, and a serious contrast failure. */
+     mode: unreadable, and a serious contrast failure. */
   color: inherit;
 }
 
@@ -559,7 +559,7 @@
     grid-template-columns: none !important;
   }
 
-  /* Reveal external link targets — there is no hover or click on paper. */
+  /* Reveal external link targets: there is no hover or click on paper. */
   .prose a[href^="http"]::after {
     content: ' (' attr(href) ')';
     font-size: 0.85em;

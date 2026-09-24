@@ -1,9 +1,9 @@
 ---
 /**
- * ObligationMatrix — a heat grid above the ObligationTable: framework rows
+ * ObligationMatrix, a heat grid above the ObligationTable: framework rows
  * (grouped by family) against the five stack layers as columns. Each cell shows
- * how many obligations of that framework map to that layer as a filled square —
- * the layer pastel at an opacity scaled by count, with an ink number — and is a
+ * how many obligations of that framework map to that layer as a filled square:
+ * the layer pastel at an opacity scaled by count, with an ink number, and is a
  * button that filters the table below. Column headers filter by layer only, row
  * headers by framework only. No-JS: the grid is static and the table unfiltered
  * (public/matrix.js wires the filtering, staggered reveal and status line).
@@ -11,7 +11,7 @@
  * A framework here is finer than the ObligationTable's group: the compound
  * groups (CSA, OWASP, US laws) fan out to their catalogue frameworks, so the
  * grid reads as a proper index. The join back to the table rows is by obligation
- * text, carried in a JSON payload matrix.js reads — the table markup is left
+ * text, carried in a JSON payload matrix.js reads: the table markup is left
  * untouched (it already carries the obligation text and its layer classes).
  */
 import type { Framework, Obligation, StackLayer } from '../data/frameworks';
@@ -30,7 +30,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 // Resolve an obligation to a single catalogue framework id. The obligations data
 // keys rows by a group name (a legacy alias, e.g. "EU AI Act" or "US state AI
 // laws"), never by the framework id, and several groups fan out to more than one
-// catalogue framework — so this join is still needed. Plain groups map straight
+// catalogue framework, so this join is still needed. Plain groups map straight
 // through; compound groups split on a marker in the obligation text.
 function resolveFwId(o: Obligation): string {
   const f = o.framework;
@@ -80,7 +80,7 @@ function resolveFwId(o: Obligation): string {
 // Row grouping + order, derived from the framework's issuer (a real field on the
 // data), not a per-id table: frameworks from the same body/jurisdiction share a
 // band, so any framework added to frameworks.ts joins its band automatically. The
-// band string is never rendered — it only sets the row order and where the family
+// band string is never rendered: it only sets the row order and where the family
 // separator rule falls. Old frameworks keep the exact grouping and order they had
 // (EU AI Act · GPAI · ISO · NIST · CSA · OWASP · US frontier laws); the newer ones
 // slot in behind their family and, for the trailing jurisdictions, in the order
@@ -139,7 +139,7 @@ for (const o of obligations) {
 
 // Inclusion rule (unchanged): a framework gets a row iff at least one obligation
 // resolves to it. Frameworks that carry no obligation row (currently ISO/IEC
-// 42005 and EN 18286) are omitted — the grid has no empty-row or "n/a"
+// 42005 and EN 18286) are omitted: the grid has no empty-row or "n/a"
 // affordance, so this is deliberate, not an oversight. Rows come straight from
 // frameworks.ts (single source of truth): name and short label from the data,
 // band from the issuer, ordered by band then by declaration order within a band.

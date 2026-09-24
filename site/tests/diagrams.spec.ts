@@ -287,7 +287,7 @@ test.describe('accessibility', () => {
         (v) => v.impact === 'serious' || v.impact === 'critical',
       );
       const detail = serious
-        .map((v) => `${v.id} [${v.impact}] ${v.help} — ${v.nodes.length} node(s)`)
+        .map((v) => `${v.id} [${v.impact}] ${v.help}: ${v.nodes.length} node(s)`)
         .join('\n');
       expect(serious, `serious/critical a11y violations on ${route}:\n${detail}`).toEqual([]);
     });
@@ -327,7 +327,7 @@ test.describe('enlarge', () => {
       (v) => v.impact === 'serious' || v.impact === 'critical',
     );
     const detail = serious
-      .map((v) => `${v.id} [${v.impact}] ${v.help} — ${v.nodes.length} node(s)`)
+      .map((v) => `${v.id} [${v.impact}] ${v.help}: ${v.nodes.length} node(s)`)
       .join('\n');
     expect(serious, `serious/critical a11y violations with dialog open:\n${detail}`).toEqual([]);
   });

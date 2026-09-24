@@ -42,7 +42,7 @@ body:
     attributes:
       label: Primary or secondary source
       options:
-        - Primary — the official text, standard, report, or the vendor's own release
-        - Secondary — a reputable outlet reporting a primary fact
+        - Primary: the official text, standard, report, or the vendor's own release
+        - Secondary: a reputable outlet reporting a primary fact
     validations:
       required: true

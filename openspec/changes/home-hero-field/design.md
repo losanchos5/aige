@@ -44,12 +44,12 @@ Ver `proposal.md` (Why). Estado que condiciona el enfoque:
    `prefers-reduced-motion` requiere JS igual que el shader. El shader (`public/hero-field.js`, sin
    dependencias, ~6 KB sin gzip) lee los tokens de tema en cada cambio (`MutationObserver` sobre
    `data-theme`) y se dibuja a una fracción del tamaño CSS (`SCALE = 0.5`, tope `MAX_W = 720`px) a
-   ~30 fps (`FPS_MS`), reescalado por CSS — el campo no tiene bordes que perder al hacerlo. Riesgo
+   ~30 fps (`FPS_MS`), reescalado por CSS: el campo no tiene bordes que perder al hacerlo. Riesgo
    conocido: WebGL puede no estar disponible o perder el contexto; `initGL()` devuelve `false` y
    `webglcontextlost` degrada al fallback CSS estático (mismos tokens `--field-1..3`), sin dejar el
    hero sin fondo.
 2. **Paleta de tres tonos, no la mesh de cinco capas.** `--field-1` (navy, ink de L1), `--field-2`
-   (azul, un tono medio entre L1 y el fondo) y `--field-3` (melocotón, cerca de L4) — tres blobs con
+   (azul, un tono medio entre L1 y el fondo) y `--field-3` (melocotón, cerca de L4): tres blobs con
    trayectorias Lissajous lentas y un domain warp ligero, en vez de las cinco glows de `.bg-mesh` (el
    hero necesita una sola forma legible detrás del titular, no un fondo decorativo uniforme).
    `--hero-ink` es un cuarto token: la tinta del titular (L1-ink en claro, donde el campo es más
@@ -59,16 +59,16 @@ Ver `proposal.md` (Why). Estado que condiciona el enfoque:
    (`u_box`, en px CSS) y la altura de la cabecera (`u_bar`) como uniforms recalculados en cada
    resize/cambio de fuente, y aclara u oscurece (`clear()`, búsqueda binaria de 8 pasos hacia
    `u_ground`) cada píxel dentro de esas zonas hasta el contraste objetivo (4.6:1 titular, 5:1
-   cabecera — por encima del mínimo AA de 3:1/4.5:1, con margen) contra la tinta que se dibuja ahí.
+   cabecera: por encima del mínimo AA de 3:1/4.5:1, con margen) contra la tinta que se dibuja ahí.
    El blob navy además se ahueca cerca del titular y se atenúa cerca del borde superior
    (`hollow`/`top` en el shader), así la corrección es una red de seguridad y no un rectángulo
-   translúcido permanente. Alternativa descartada: un velo `linear-gradient` fijo bajo el titular —
+   translúcido permanente. Alternativa descartada: un velo `linear-gradient` fijo bajo el titular:
    se ve a simple vista como una placa y no se adapta si el titular cambia de tamaño (zoom, idioma).
 4. **Newsreader como cortes estáticos, no variable.** Solo se necesita un tamaño óptico (72) y un
    peso (400) para una única línea de texto; instanciar con fontTools
    (`fonttools varLib.instancer … opsz=72 wght=400 --flavor woff2`) dos cortes (roman + italic) de
    ~22 KB cada uno evita cargar los ficheros variables completos (132/147 KB) por una sola línea.
-   Alternativa descartada: mantener `.display-xl` (Bricolage a peso 350) — Jordi pidió explícitamente
+   Alternativa descartada: mantener `.display-xl` (Bricolage a peso 350). Jordi pidió explícitamente
    un serif editorial, y mantener el peso variable de Bricolage solo para el hero habría dejado dos
    mecanismos de "hero type" en el sistema.
 5. **Cabecera fija y transparente solo en la portada.** `Header.astro` gana el prop `overlay`

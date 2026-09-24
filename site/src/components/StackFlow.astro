@@ -1,6 +1,6 @@
 ---
 /**
- * StackFlow — the five-layer stack as an interactive layer-flow diagram.
+ * StackFlow: the five-layer stack as an interactive layer-flow diagram.
  *
  * On wide screens, an SVG shows the five layers as horizontal bands (05 at the
  * top, 01 at the foot, so evidence flows up) on the left, and a clean flow lane
@@ -26,7 +26,7 @@ const BAND_W = 520;
 const BAND_H = 58;
 const TOP = 29;
 const PITCH = 76;
-const RIGHT = BAND_X + BAND_W; // 576 — bands' right edge, where every flow starts/ends.
+const RIGHT = BAND_X + BAND_W; // 576: bands' right edge, where every flow starts/ends.
 
 /** Vertical centre of a layer's band. 05 is at the top, 01 at the foot. */
 const cy = (n: number) => TOP + (5 - n) * PITCH + BAND_H / 2;

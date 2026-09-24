@@ -8,11 +8,11 @@ Several precise terms are used in the Body of Knowledge chapters but never defin
 (`bok/09-glossary.md`). `STYLEGUIDE.md` §1 asks that each precise term be defined once, in the
 glossary, and §8 lists the canonical spellings. These terms are used in chapters 04–08 with no entry:
 
-- **Attestation** — used in three chapters (04–08); named in `STYLEGUIDE.md` §1 as an example of a
+- **Attestation**: used in three chapters (04–08); named in `STYLEGUIDE.md` §1 as an example of a
   precise term to define once, but it has no glossary entry.
-- **Prompt injection** — used across chapters; the glossary defines `jailbreak` and `red teaming`
+- **Prompt injection**: used across chapters; the glossary defines `jailbreak` and `red teaming`
   but not prompt injection, which is a distinct failure class (and an OWASP LLM Top 10 category).
-- **Human-in-the-loop** — used in three chapters as a control, with no definition.
+- **Human-in-the-loop**: used in three chapters as a control, with no definition.
 
 ## What to add
 

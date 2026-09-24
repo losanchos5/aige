@@ -1,5 +1,5 @@
 // nav.spec.ts: the navigation data model (data/nav.ts) and its rendered surfaces
-// — every internal href resolves, descriptions stay short, the footer sitemap
+//: every internal href resolves, descriptions stay short, the footer sitemap
 // covers every public route, and axe finds nothing serious/critical with a
 // desktop panel open (1440) or the drawer open (390), in light and dark.
 import { test, expect } from '@playwright/test';
@@ -103,7 +103,7 @@ for (const scheme of schemes) {
       (v) => v.impact === 'serious' || v.impact === 'critical',
     );
     const detail = serious
-      .map((v) => `${v.id} [${v.impact}] ${v.help} — ${v.nodes.length} node(s)`)
+      .map((v) => `${v.id} [${v.impact}] ${v.help}: ${v.nodes.length} node(s)`)
       .join('\n');
     expect(serious, `panel open ${scheme}:\n${detail}`).toEqual([]);
   });
@@ -120,7 +120,7 @@ for (const scheme of schemes) {
       (v) => v.impact === 'serious' || v.impact === 'critical',
     );
     const detail = serious
-      .map((v) => `${v.id} [${v.impact}] ${v.help} — ${v.nodes.length} node(s)`)
+      .map((v) => `${v.id} [${v.impact}] ${v.help}: ${v.nodes.length} node(s)`)
       .join('\n');
     expect(serious, `drawer open ${scheme}:\n${detail}`).toEqual([]);
   });

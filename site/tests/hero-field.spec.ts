@@ -1,4 +1,4 @@
-// hero-field.spec.ts: the home hero — a full-viewport gradient field
+// hero-field.spec.ts: the home hero, a full-viewport gradient field
 // (public/hero-field.js) under a floating, transparent header, the serif
 // headline centred on it, one CTA and a strip of figures. Covers the layout,
 // the header's overlay mode, the motion rules (reduced motion, pause control,

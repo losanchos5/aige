@@ -7,7 +7,7 @@
 
 The Thesis insists that AI governance engineering is a capability, not a job title (the same claim
 the parent discipline makes for GRC engineering, a capability anyone close to the build can develop
-[11]). This chapter makes it concrete without contradicting that: a capability still lives in someone's
+[8]). This chapter makes it concrete without contradicting that: a capability still lives in someone's
 week: the tickets they own, the pipelines they maintain, the incidents they are paged for. So we
 describe the **AI governance engineer** as the person, on whatever org chart, who holds that capability
 and is accountable for the three questions in production: what AI is running, what it is allowed to do,
@@ -38,17 +38,16 @@ Every AI system, model and agent enters through an intake that classifies it: by
 regulatory exposure (EU AI Act high-risk, GPAI, out of scope), by data sensitivity and by autonomy.
 The engineer builds intake as a form-plus-code path, not a meeting: a request that scaffolds a
 registry entry, triggers the right impact assessment (FRIA, DPIA), and routes the system to the
-controls its class requires. Live postings name exactly this: one VP role is scoped to "AI intake,
-classification and approval aligned to NIST AI RMF" [3]. **Maps to** Inventory & Transparency.
+controls its class requires. The NIST AI RMF's Map function is the natural vocabulary for the
+classification step. **Maps to** Inventory & Transparency.
 
 ### Inventory and registry
 
 The engineer owns the inventory of models and the **agent registry**, the runtime-aware record of
 every non-human actor, each with an owner, a declared scope, a status and a kill switch. The
 capability that distinguishes the engineer here is the runtime data path: the registry is fed by the
-deployment pipeline and by discovery against production, not typed into a spreadsheet. Registry work
-appears verbatim in senior postings that ask for an "enterprise agent registry" and non-human identity
-governance [4]. **Maps to** Inventory & Transparency.
+deployment pipeline and by discovery against production, not typed into a spreadsheet, and every
+non-human actor in it carries its own identity. **Maps to** Inventory & Transparency.
 
 ### Evals and red teaming as evidence
 
@@ -64,7 +63,7 @@ adversarial red-teaming [1]. **Maps to** Evals & Red Teaming as Evidence.
 
 The engineer expresses governance rules as executable policy (`OPA/Rego`, Cedar, Policy Cards) that
 evaluate in CI/CD and at admission, and maintains the gates that enforce them. A public GRC
-engineering-manager posting frames the mandate as "translate policies into policy-as-code" [5]. The
+engineering-manager posting frames the mandate as "translate policies into policy-as-code" [3]. The
 engineer's output here is a merge that is blocked or allowed, with a logged reason, not a
 recommendation in a review. **Maps to** Govern-as-Code.
 
@@ -73,9 +72,9 @@ recommendation in a review. **Maps to** Govern-as-Code.
 The engineer instruments runtime: guardrail decisions, tool-call mediation, drift signals and agent
 behaviour stream into observability (Langfuse, Arize Phoenix over OpenTelemetry as examples). They own
 the detection-to-report path for serious incidents, including the EU AI Act's Article 73 clock for
-high-risk systems, and they own the tested **kill switch** for agents. Postings scope this as "threat
-modelling, red teams, MCP security" and "incident response for LLM systems" [4][6]. **Maps to**
-Runtime Controls & Observability.
+high-risk systems, and they own the tested **kill switch** for agents, with the threat model that
+says which runtime failures the controls are built against [5]. **Maps to** Runtime Controls &
+Observability.
 
 ### Assurance and audit evidence
 
@@ -109,7 +108,7 @@ each workflow. It is illustrative, not a checklist to pass.
 | Regulatory translation | Reading regulation and standards (AI Act, ISO/IEC 42001, NIST AI RMF); mapping | Legal English; DPIA/FRIA methodology |
 
 Two cross-cutting skills sit under all seven: enough **Python** to glue systems together (postings put
-Python in roughly one in four AI-governance listings [7]), and enough **law-reading** to parse an
+Python in roughly one in four AI-governance listings [4]), and enough **law-reading** to parse an
 article without mistaking it for advice. Neither is optional; neither is the whole job.
 
 ## Analyst versus engineer
@@ -152,7 +151,7 @@ by years served, and verifiable by looking at the systems, not a self-assessment
    cross-cutting decisions (identity model, evidence format, incident path).
 5. **Head of AI governance engineering.** Owns the function and its shared ownership with engineering,
    measured by realised risk reduction, not by controls stopped. A public engineering-manager posting
-   scoped to "build an AI-forward GRC engineering function" sits at this rung [5].
+   scoped to "build an AI-forward GRC engineering function" sits at this rung [3].
 
 A person can hold the capability at rung two while the title lags at "analyst", or hold the title
 without the capability. The ladder describes the work, and the work is visible in the systems.
@@ -168,7 +167,7 @@ strength and adding what it lacks.
 - **From Security or GRC.** Your edge is the control mindset; your gap is the model layer. GRC
   engineering already taught the parent moves: policy-as-code, continuous assurance, evidence as a
   by-product [2]. Add the AI-specific objects: evals as controls, agent identity and scope, and the
-  model and agent failure modes of the OWASP Agentic Top 10 [8]. Start at evals-as-evidence and the
+  model and agent failure modes of the OWASP Agentic Top 10 [5]. Start at evals-as-evidence and the
   agent registry.
 - **From MLOps or ML engineering.** Your edge is the runtime data path everyone else lacks; your gap
   is the obligation. Add the eval *gate* rather than the eval report, the registry field for owner and
@@ -183,33 +182,33 @@ points are survey medians or posting ranges, not guarantees.
 **Survey bands.** The IAPP Salary & Jobs Report 2025-26 (1,600+ respondents, 60+ countries) puts
 technical AI-governance roles in the tech sector at a median of USD 221,000 (its highest band)
 against USD 151,800 for AI-governance work generally and USD 169,700 for combined privacy-and-AI-
-governance roles [9]. The premium is for the technical, build-the-control end of the discipline, which
+governance roles [6]. The premium is for the technical, build-the-control end of the discipline, which
 is exactly the role this chapter describes.
 
 **Skills in demand.** Analysis of US postings since January 2026 (Axial Search) reports
 observability/monitoring in 41-42% of AI-governance listings, Python in 27-28%, NIST frameworks in
 about 27%, foundation-model familiarity in 25.6% and cloud in 18.2%; median advertised pay was USD
-169,000 and median required experience five years [7]. And the demand signal is broad: LinkedIn's 2026
+169,000 and median required experience five years [4]. And the demand signal is broad: LinkedIn's 2026
 Skills on the Rise lists governance and responsible-AI skills among its fastest-rising clusters,
-alongside the technical AI capabilities [10]. The load-bearing signal is the skills mix
+alongside the technical AI capabilities [7]. The load-bearing signal is the skills mix
 (observability, Python, the runtime data path), not the salary headline.
 
-> **Postings (footnote).** Individual September 2026 postings corroborate the bands across seniorities:
-> an "AI Governance Engineer" at USD 175,000-260,000 [4], a governance VP at USD 120,000-202,500 [3],
-> another engineer role at USD 100,000-150,000 [6], and a GRC engineering-manager role at USD 405,000
-> [5]. But named vacancies are a lagging, noisy signal, kept here as corroboration and out of the
-> argument. The role is the workflows, not the requisition.
+> **Postings (footnote).** Individual postings mark the top of the range: a GRC engineering-manager
+> role at a frontier lab was advertised in 2026 at USD 405,000 [3]. But named vacancies are a lagging,
+> noisy signal, kept here as corroboration and out of the argument; this edition cites no job-board
+> listing whose URL expires or is reassigned once the vacancy closes. The role is the workflows, not
+> the requisition.
 
 ## What employers get wrong in the job description
 
 Reading the postings against the workflows above, three mistakes recur.
 
 - **Certifications as a proxy for capability.** Descriptions list AIGP, CIPP, CISSP and CISM as if a
-  certificate produced a control. The Axial data shows certs appear in under 11% of postings each [7];
+  certificate produced a control. The Axial data shows certs appear in under 11% of postings each [4];
   the load-bearing skills (eval harnesses, policy-as-code, the runtime data path) are the ones the
   JD under-specifies. Ask for the workflow, then the cert if it helps.
-- **Analyst work under an engineer title.** Many "AI Governance Engineer" postings describe intake,
-  mapping and reporting (analyst work) at engineer pay. The tell is the absence of any build: no
+- **Analyst work under an engineer title.** In our reading of the postings, "AI Governance
+  Engineer" titles often describe intake, mapping and reporting (analyst work) at engineer pay. The tell is the absence of any build: no
   eval gate, no registry integration, no evidence pipeline.
 - **Everything, in one hire.** A single posting asks for policy-as-code, red teaming, identity,
   observability, incident response, regulatory translation and stakeholder management. That is a
@@ -233,12 +232,9 @@ Mappings are illustrative, not a claim of conformity.
 
 [1] "How the AI Engineer role is unbundling in 2026" (names the AI Evaluation & Governance Engineer). AI Journal. 2026-08-26. https://aijourn.com/how-the-ai-engineer-role-is-unbundling-in-2026/ (verified: secondary)
 [2] "The GRC Engineer role" (analyst-vs-engineer table; career paths). GRC Engineer. 2025. https://grcengineer.com/grc-engineer/ (verified: primary)
-[3] "AI Governance VP" posting (intake, classification, approval aligned to NIST AI RMF), USD 120,000-202,500. State Street (via SimplyHired). 2026-09. https://www.simplyhired.com/job/iy04VeXdd9DR3vffvKZvupPCsoZtHi405zOLc_RMSJXOSRJVqLbhmw (verified: secondary)
-[4] "AI Governance Engineer" posting (agent registry, threat modelling, red teams, MCP security), USD 175,000-260,000. Dalio Family Office (via SimplyHired). 2026-09. https://www.simplyhired.com/job/vKibNHPKReLf8h5PgcPxYjWZOx1ctDsml8sjzydKbSpd6ZoNoNvP-Q (verified: secondary)
-[5] "Engineering Manager, GRC" posting (AI-forward GRC engineering function; policies into policy-as-code), USD 405,000. Anthropic (via General Catalyst jobs). 2026. https://jobs.generalcatalyst.com/companies/anthropic/jobs/78167778-engineering-manager-grc (verified: secondary)
-[6] "AI Governance Engineer" posting (security controls, threat models, incident response for LLM systems), USD 100,000-150,000. Bright Vision (via SimplyHired). 2026-09. https://www.simplyhired.com/job/s2v6mqCI9KO8Xldf5enD0Z46iDqIBLdwS0jqZlgtO8YhD-DU_4XDog (verified: secondary)
-[7] AI governance jobs analysis (US postings since Jan 2026: observability 41-42%, Python 27-28%, NIST ~27%, foundation models 25.6%, cloud 18.2%; median pay USD 169,000; median 5 yrs). Axial Search. 2026-08-04. https://axialsearch.com/insights/ai-governance-jobs (verified: secondary)
-[8] Top 10 for Agentic Applications 2026. OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
-[9] Salary & Jobs Report 2025-26 (technical AI-gov in tech median USD 221,000; AI governance only 151,800; privacy + AI governance 169,700). IAPP. 2025-08-03. https://iapp.org/resources/article/salary-survey-summary/ (verified: primary)
-[10] LinkedIn 2026 Skills on the Rise (governance and responsible-AI skills among the fastest-rising clusters; no per-skill percentage published). LinkedIn, via EdTech Innovation Hub. 2026. https://www.edtechinnovationhub.com/news/linkedins-2026-skills-on-the-rise-shows-global-ai-driving-hiring-shifts (verified: secondary)
-[11] "What is GRC Engineering" (capability, not a job title). GRC Engineer. 2025. https://grcengineer.com/what-is-grc-engineering/ (verified: primary)
+[3] "Engineering Manager, GRC" posting (AI-forward GRC engineering function; policies into policy-as-code), USD 405,000. Anthropic (via General Catalyst jobs). 2026. https://jobs.generalcatalyst.com/companies/anthropic/jobs/78167778-engineering-manager-grc (verified: secondary)
+[4] AI governance jobs analysis (US postings since Jan 2026: observability 41-42%, Python 27-28%, NIST ~27%, foundation models 25.6%, cloud 18.2%; median pay USD 169,000; median 5 yrs). Axial Search. 2026-08-04. https://axialsearch.com/insights/ai-governance-jobs (verified: secondary)
+[5] Top 10 for Agentic Applications 2026. OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
+[6] Salary & Jobs Report 2025-26 (technical AI-gov in tech median USD 221,000; AI governance only 151,800; privacy + AI governance 169,700). IAPP. 2025-08-03. https://iapp.org/resources/article/salary-survey-summary/ (verified: primary)
+[7] LinkedIn 2026 Skills on the Rise (governance and responsible-AI skills among the fastest-rising clusters; no per-skill percentage published). LinkedIn, via EdTech Innovation Hub. 2026. https://www.edtechinnovationhub.com/news/linkedins-2026-skills-on-the-rise-shows-global-ai-driving-hiring-shifts (verified: secondary)
+[8] "What is GRC Engineering" (capability, not a job title). GRC Engineer. 2025. https://grcengineer.com/what-is-grc-engineering/ (verified: primary)

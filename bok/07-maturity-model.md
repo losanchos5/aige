@@ -63,8 +63,8 @@ decisions, tool-call mediation, drift and agent behaviour stream into observabil
 behaviour into a live control signal; evidence is emitted as
 [machine-readable artefacts](/bok/patterns#pattern-machine-readable-evidence-oscal) (`OSCAL`, signed
 logs) as the pipeline and runtime operate. The audit is a
-query. This is the end state most of the AI-governance platform category does not reach, because it
-"manages the program … without any runtime data path" [1]. Typical evidence: a live assurance store;
+query. On one vendor's comparison of the AI-governance platform category, most of it does not reach
+this end state, because it "manages the program … without any runtime data path" [1]. Typical evidence: a live assurance store;
 streaming eval and guardrail telemetry; an audit answered by running a query. Typical failure:
 telemetry that is collected but never wired to a decision; observability without enforcement decays
 back to Level 3 dressed up as Level 5.
@@ -173,7 +173,7 @@ Mappings are illustrative, not a claim of conformity.
 
 ## Sources
 
-[1] "Best AI Governance Platforms 2026" (most of the category "manages the program … without any runtime data path"). Kosmoy. 2026. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
+[1] "Best AI Governance Platforms in 2026: 14 Enterprise Vendors Compared" (vendor-published comparison of the 13 Magic Quadrant vendors plus its own product; most of the category "manages the program … without any runtime data path"). Kosmoy. 2026-07-10. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
 [2] Top 10 for Agentic Applications 2026 (ASI03 Agent Identity & Privilege Abuse; ASI10 Rogue Agents). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [3] ISO/IEC 42001 certification is not yet a presumption of conformity with the EU AI Act (no harmonised standard cited in the OJ). Law & Technology. 2026. https://lawandtechnology.eu/en/iso-iec-42001-and-the-ai-act-why-certification-is-not-yet-a-presumption-of-conformity/ (verified: secondary)
 [4] OWASP AI Maturity Assessment (AIMA), reported at v1.0 (Aug 2025); Secure Governance initiative. OWASP GenAI Security Project. 2025. https://genai.owasp.org/initiatives/ (verified: reported)

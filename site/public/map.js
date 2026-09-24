@@ -1,5 +1,5 @@
 /* map.js: progressive enhancement for /map, loaded from a same-origin file
-   (CSP script-src 'self'). The page works with no JS — every <details> opens
+   (CSP script-src 'self'). The page works with no JS: every <details> opens
    with its native control and every node is a link. This only reveals the
    expand/collapse-all toolbar, opens the branch named in the URL hash and
    focuses it, and opens every cluster before printing so the whole index prints. */

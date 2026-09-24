@@ -58,47 +58,47 @@ Each brief: *Message* (the sentence the reader takes away) · *Elements* (in rea
 
 ### 2.1 Pattern diagrams (archify, `at: 'head'` of the pattern's section in chapter 05)
 
-**policy-card** (workflow, Layer 01) — Message: a policy is a versioned card that a policy
+**policy-card** (workflow, Layer 01). Message: a policy is a versioned card that a policy
 engine evaluates at the gate, and its verdict is recorded against the change. Elements: policy
 card (in repo) → policy engine → gate (diamond: allow / deny) → change proceeds or is blocked →
 verdict record (evidence). Owner glyph on the card. So what: start by writing one card for one
 obligation and wiring it to one gate. Avoid: naming an engine brand; more than one gate.
 
-**aibom-at-build** (dataflow, Layer 02) — Message: the build step emits the AI bill of materials,
+**aibom-at-build** (dataflow, Layer 02). Message: the build step emits the AI bill of materials,
 which feeds the registry and the vulnerability and documentation consumers. Elements: sources
 (model, datasets, prompts, dependencies) → build → AIBOM artefact → registry entry (store) →
 consumers: vulnerability matching, regulator-facing documentation. So what: if your build does not
 emit it, you cannot answer "what is running". Avoid: format names as the hero (CycloneDX/SPDX are
 labels on the artefact at most); vendors.
 
-**model-card-evidence** (workflow, Layer 02) — Message: the model card is generated from real
+**model-card-evidence** (workflow, Layer 02). Message: the model card is generated from real
 training and eval outputs, validated against a schema, and attached to the release as evidence.
 Elements: training/eval outputs → card generator → schema check (gate) → card attached to release →
 cited by the evidence record. So what: a card that is written by hand is documentation; one that is
 generated and validated is a control. Avoid: hand-written card as a node; any lab or vendor name.
 
-**continuous-assurance-telemetry** (dataflow, Layer 05) — Message: runtime signals are checked
+**continuous-assurance-telemetry** (dataflow, Layer 05). Message: runtime signals are checked
 against controls continuously and every check leaves an evidence record an auditor can read.
 Elements: runtime signals (traces, guardrail events, registry state) → control checks → evidence
 records (store) → dashboards / auditor. Layer 04 group on the left (signals), Layer 05 group on the
 right (checks and store). So what: continuous means the evidence is produced by the data path, not
 by a quarterly exercise. Avoid: more than three signal sources; monitoring-tool names.
 
-**fria-as-code** (workflow, Layers 01/02) — Message: the fundamental-rights impact assessment is
+**fria-as-code** (workflow, Layers 01/02). Message: the fundamental-rights impact assessment is
 data captured at intake, assessed, mitigated, approved at a gate and stored machine-readable next to
 the DPIA. Elements: intake questionnaire (data) → risk assessment → mitigations → approval gate
 (diamond, human reviewer glyph) → FRIA record (evidence) linked to DPIA. So what: run it before
 deployment of a high-risk system, and keep the record where the auditor looks. Avoid: legal prose
 in labels; "form" as a node (it is data).
 
-**framework-crosswalk** (architecture, Layers 01/05) — Message: one internal control set is the
+**framework-crosswalk** (architecture, Layers 01/05). Message: one internal control set is the
 hub; external frameworks map to it, and evidence is attached once and reused for all of them.
 Elements: internal control set (centre) with spokes to EU AI Act, ISO/IEC 42001, NIST AI RMF, CSA
 AICM, OWASP (labels only); evidence store attached to the hub, not to the spokes. So what: the
 crosswalk is an index, not the end state; the hub is what you maintain. Avoid: a matrix look;
 more than six spokes; implying conformity.
 
-**machine-readable-evidence** (dataflow, Layer 05) — Message: controls, assessments and evidence
+**machine-readable-evidence** (dataflow, Layer 05). Message: controls, assessments and evidence
 become OSCAL documents that validators check and assurance consumers read without a human
 re-typing anything. Elements: control catalogue, assessment results, evidence records → OSCAL
 documents (component/assessment) → validator (gate) → consumers: auditor, continuous-compliance
@@ -106,42 +106,42 @@ tooling category, regulator submission. So what: choose the format your assessor
 generate it from the same data you already hold. Avoid: OSCAL schema names beyond two; product
 names.
 
-**kill-switch-circuit-breaker** (architecture, Layer 04; batch 2) — Message: a breaker revokes one
+**kill-switch-circuit-breaker** (architecture, Layer 04; batch 2). Message: a breaker revokes one
 agent's scope on a signal without stopping the fleet, and the trip is itself an evidence event.
 Elements: signal sources (guardrail, telemetry) → breaker → per-agent scope revoked (one hexagon
 greyed) while other agents continue → incident record. So what: design the breaker per agent
 scope before you need it; test the trip in staging. Avoid: duplicating the incident pipeline
 figure (that one exists); more than three agents.
 
-**agent-identity-scoped-credentials** (sequence, Layer 04; batch 2) — Message: an agent gets a
+**agent-identity-scoped-credentials** (sequence, Layer 04; batch 2). Message: an agent gets a
 short-lived, scoped credential from its registry entry at deploy time, and every call is
 attributable. Elements (lanes): deploy pipeline · registry · identity issuer · agent · downstream
 tool/API · audit log. Sequence: register → issue scoped credential → call with credential →
 verify scope → log attribution. So what: no registry entry, no credential, no access. Avoid:
 protocol acronyms beyond one (e.g. one "token exchange" label); vendor identity products.
 
-**hitl-gate** (sequence, Layer 04; batch 2) — Message: for the actions the policy marks as
+**hitl-gate** (sequence, Layer 04; batch 2). Message: for the actions the policy marks as
 needing a human, the agent pauses, a named reviewer decides within a time box, and the decision
 is recorded. Elements (lanes): agent · policy check · reviewer (person glyph) · action target ·
 evidence log. Sequence: propose action → policy says "human required" → reviewer approves or
 rejects (or times out) → action executes or is dropped → decision logged. So what: define which
 actions need a human by policy, not by habit. Avoid: chat-UI framing; more than one reviewer.
 
-**shadow-ai-discovery** (workflow, Layer 02; batch 2) — Message: discovery scans the places AI
+**shadow-ai-discovery** (workflow, Layer 02; batch 2). Message: discovery scans the places AI
 hides (keys, traffic, repos, spend), matches findings against the registry, and turns unknowns
 into registry entries or blocks. Elements: sources (API keys, network traffic, repos, invoices) →
 discovery scan → match against registry (gate: known / unknown) → unknown → triage → registered
 or blocked; evidence: discovery report. So what: run it before you claim your inventory is
 complete. Avoid: security-tool brands; more than four sources.
 
-**vendor-due-diligence-gate** (workflow, Layers 02/05; batch 2) — Message: a procured model or
+**vendor-due-diligence-gate** (workflow, Layers 02/05; batch 2). Message: a procured model or
 tool enters the inventory only after a due-diligence gate that checks documentation, evals and
 contract terms, and the outcome is recorded. Elements: vendor package (docs, model card, terms) →
 checks (documentation present, evals run, contract clauses) → gate (approve / reject / conditions)
 → registry entry with conditions → evidence record. So what: the gate is where deployer duties
 start; keep the checklist versioned. Avoid: naming any vendor; legal clause text.
 
-**adversarial-red-team-suite** (workflow, Layer 03; batch 2, after the pattern is written) —
+**adversarial-red-team-suite** (workflow, Layer 03; batch 2, after the pattern is written):
 Message: a versioned adversarial suite runs on every relevant change and its findings are
 evidence, triaged into fixes or accepted risk. Elements: threat taxonomy (categories, not
 frameworks' names beyond one) → suite (versioned) → run in CI / scheduled → findings → triage
@@ -149,7 +149,7 @@ frameworks' names beyond one) → suite (versioned) → run in CI / scheduled �
 red-team findings like test failures with an owner and a deadline. Avoid: jailbreak jargon;
 tool names.
 
-**runtime-guardrail** (architecture, Layer 04; batch 2, after the pattern is written) —
+**runtime-guardrail** (architecture, Layer 04; batch 2, after the pattern is written):
 Message: guardrails sit on the input and output paths of the model or agent, enforce the policy
 at runtime, and emit events that feed telemetry and the breaker. Elements: request → input
 guardrail → model/agent (hexagon) → output guardrail → response; both guardrails read the policy
@@ -158,14 +158,14 @@ events is a filter, not a control. Avoid: listing guardrail products; more than 
 
 ### 2.2 Chapter openers (archify; batch 2)
 
-**the-stack-layers** (architecture, `at: 'lead'` in `the-stack`) — Message: five layers, in this
+**the-stack-layers** (architecture, `at: 'lead'` in `the-stack`). Message: five layers, in this
 order, each holding named artefacts, with evidence flowing up to assurance. Elements: five
 horizontal bands bottom→top or left→right in canonical order, two or three artefacts per band
 taken from the chapter's layer sections, one arrow "evidence" up into Layer 05. So what: read the
 chapter layer by layer; build in the order chapter 04 gives for a team of one. Avoid: repeating the
 `/stack` page's StackDiagram verbatim (this one is about artefacts, that one about flow); tools.
 
-**regulatory-wave** (lifecycle, `at: 'lead'` in `why-now`) — Message: obligations arrive in
+**regulatory-wave** (lifecycle, `at: 'lead'` in `why-now`). Message: obligations arrive in
 stages over a short window, so the stack has to exist before the dates. Elements: stages in the
 order the chapter states them, each labelled with the obligation family and its date exactly as
 chapter 02 or 08 gives it (nothing else); a marker "you are here" is NOT included (it would date
@@ -174,27 +174,27 @@ Caption carries "as of <the chapter's currency date>". Avoid: any date not in th
 
 ### 2.3 Infographics (hand-made SVG, `figures.ts`)
 
-**three-questions** (`definition`, head of "The three questions") — Message: everything in the
+**three-questions** (`definition`, head of "The three questions"). Message: everything in the
 book serves three questions. Elements: three equal panels, each with the exact question from the
 chapter, a glyph (registry cylinder / policy card + gate / evidence document) and the layers that
 answer it as small layer chips using the chapter's own attribution. So what: if you cannot answer
 one of the three for a system today, that is your first task. Avoid: paraphrasing the questions.
 
-**values-principles** (`values-principles`, head of "The eight values") — Message: eight values
+**values-principles** (`values-principles`, head of "The eight values"). Message: eight values
 are trade-offs, six principles are commitments. Elements: two columns; left "Values" with the
 eight affirmations verbatim from `values.ts`, right "Principles" with the six; a one-line header
 per column stating trade-off vs commitment in the chapter's words. So what: quote them, do not
 reword them, when you write your own policy. Avoid: icons per value (noise); shortening the
 affirmations.
 
-**minimum-viable-stack** (`the-stack`, head of "The minimum viable stack for a team of one") —
+**minimum-viable-stack** (`the-stack`, head of "The minimum viable stack for a team of one"):
 Message: one person can stand up the stack in five ordered steps. Elements: numbered steps
 exactly as the section lists them, each with its layer chip (colour token) and the artefact it
 yields; a thin arrow chaining them. So what: do step one this week. Avoid: adding steps or
 effort estimates the chapter does not state.
 
 **maturity-grid** (`maturity-model`, head of the section that states the weakest-layer rule,
-likely "The five levels" or "Observable criteria, by layer and level": read to choose) — Message:
+likely "The five levels" or "Observable criteria, by layer and level": read to choose). Message:
 your level is the weakest layer's level. Elements: 5×5 grid, layers as rows in canonical order,
 levels Documented → Inventoried → Tested → Enforced → Continuous as columns; one illustrative
 fill showing a system at mixed levels with the resulting level called out; a legend. Illustrative
@@ -202,19 +202,19 @@ fill must be labelled "illustrative". So what: assess each layer separately, the
 Avoid: scores or percentages.
 
 **art73-clock** (`regulatory-map`, at the closest heading holding Art. 73, probably inside "EU AI
-Act, post-Omnibus") — Message: the reporting window depends on the incident class, and the clock
+Act, post-Omnibus"). Message: the reporting window depends on the incident class, and the clock
 starts at awareness. Elements: horizontal clock/timeline from "aware" with the windows exactly as
 the chapter states them (class → deadline), the artefact that must exist to hit them (incident
 pipeline) as a chip. So what: your pipeline must classify before it can report. Avoid: any
 deadline not in the chapter; legal citations beyond "Art. 73".
 
-**reading-paths** (`/bok` index, below the chapter grid) — Message: three readers, three routes
+**reading-paths** (`/bok` index, below the chapter grid). Message: three readers, three routes
 through the book. Elements: three columns with persona heading in the preface's words, ordered
 chapter nodes as real links (titles from `chapters.ts`), the newcomer route ending in the learning
 path link. So what: pick your column and start at its first node. Avoid: a fourth persona; job
 framing.
 
-**pattern-map** (`patterns`, `at: 'lead'`, generated from `patterns.ts`) — Message: the catalogue
+**pattern-map** (`patterns`, `at: 'lead'`, generated from `patterns.ts`). Message: the catalogue
 covers all five layers and this is where each pattern lives. Elements: five bands in canonical
 order, coloured by layer token, each holding its patterns as linked chips; dual-layer patterns
 appear once, in their first layer, with a small secondary-layer mark. So what: start from the
@@ -224,7 +224,7 @@ is chapter 08's job); more than one line of text per chip.
 ### 2.4 The discipline map (generated SVG, `map.ts` + `map-build.mjs`)
 
 **discipline-map** (`/map`, no chapter placement, generated from `src/data/map.ts` by
-`scripts/map-build.mjs`) — the one figure that is an *index of the whole book*, not a diagram of a
+`scripts/map-build.mjs`): the one figure that is an *index of the whole book*, not a diagram of a
 single mechanism, so it is exempt from the two limits in §1: it carries far more than nine nodes,
 and its own budget is **≤ 48 KB** (`emit(name, svg, 48)` in `figures-build.mjs`) rather than 12 KB.
 Everything else in §1 still holds: colour comes only from the layer tokens (no hex in the web
