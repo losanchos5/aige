@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 504" class="figc" role="img" aria-labelledby="fig-incident-clocks-t fig-incident-clocks-d">
   <title id="fig-incident-clocks-t">The overlapping incident clocks</title>
-  <desc id="fig-incident-clocks-d">First-report deadlines of eight regimes on one axis from awareness, from DORA at 4 hours after classification to the AI Act and SB 53 at 15 days, all held in one incident record.</desc>
+  <desc id="fig-incident-clocks-d">First-report deadlines of eight regimes, timed from awareness: DORA at 4 hours after classification to the AI Act and SB 53 at 15 days, in one incident record.</desc>
 
   <text class="mono muted" x="16" y="20" font-size="13.5">From awareness; not to scale</text>
 
