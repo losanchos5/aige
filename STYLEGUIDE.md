@@ -87,8 +87,26 @@ Mappings are illustrative, not a claim of conformity.
 
 ## 4. Pattern template (CSIRO style)
 
-Patterns live in the single catalogue file `bok/05-patterns.md` (one `##` section per pattern) and follow the CSIRO Responsible AI
-Pattern Catalogue structure [see 04 sources]. Use these headings, in this order:
+Since v0.5.0 each pattern is one file, `bok/patterns/<slug>.md`, rendered at `/patterns/<slug>`;
+the chapter 05 catalogue (`bok/05-patterns.md`) keeps one `## Pattern: <name>` section per pattern
+with its summary and a link to the page, so every `#pattern-*` anchor stays valid. Patterns follow
+the CSIRO Responsible AI Pattern Catalogue structure [see 04 sources].
+
+A pattern file opens with this frontmatter, and nothing else (the content schema is strict, so any
+other field fails the build):
+
+```yaml
+---
+id: <slug>              # the file name: lower case, digits and hyphens
+title: <Name>           # no "Pattern: " prefix; quoted if it contains : / & ( )
+layer: <1-5>            # home layer: the first "Layer NN" of its Maps to line
+secondaryLayer: <1-5>   # optional, only when the Maps to line names a second layer
+order: <n>              # position in the catalogue, 1..N with no gaps, its index in patterns.ts
+summary: "<one sentence of 50 to 160 characters: the lede and the meta description>"
+---
+```
+
+Then use these headings, in this order:
 
 ```
 # Pattern: <name>
@@ -123,9 +141,18 @@ Benefits and trade-offs (cost, latency, false positives, maintenance).
 Links to other patterns in the catalogue.
 
 **Maps to:** standards / articles / layer (1–5) this pattern serves.
+
+## Sources
+Numbered from [1] with no gaps; every source cited at least once.
 ```
 
-Target 12–15 patterns. Each pattern names the **layer** (1 Govern-as-Code … 5 Assurance) it belongs
+A new pattern also needs, in the same change: an entry in `site/src/data/patterns.ts` (`id` =
+`pattern-<github-slugger slug of the title>`, `slug`, `layer`, `mapsTo`), a `## Pattern: <name>`
+section in `bok/05-patterns.md` with its summary and a link to `/patterns/<slug>`, rows in
+`sources/SOURCES.md` and, if it has a diagram, a placement `{ chapter: 'patterns', pattern: '<slug>' }`
+in `site/src/data/diagrams.ts`. The build fails when any of these disagree.
+
+Target 12–20 patterns. Each pattern names the **layer** (1 Govern-as-Code … 5 Assurance) it belongs
 to so the catalogue and the stack (chapter 04) stay consistent.
 
 ## 5. The "In practice" box and the "Maps to" line

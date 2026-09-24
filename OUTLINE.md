@@ -59,8 +59,9 @@ Agent Registry · AIBOM at Build · Model/Data Card as Code · Eval Gate in CI �
 Suite · Runtime Guardrail · Agent Kill Switch · Non-Human Identity & Scoped Access · Continuous
 Assurance Telemetry · Machine-Readable Evidence (OSCAL) · Serious-Incident Pipeline (Art. 73) · FRIA/
 DPIA as Code · Human-in-the-Loop Checkpoint · Framework Crosswalk (as index, not end state) · Vendor /
-Model Due-Diligence Gate. The catalogue is a single file, `bok/05-patterns.md`, with one `##` section
-per pattern. Cite CSIRO as the template source.
+Model Due-Diligence Gate. Since v0.5.0 each pattern is one file, `bok/patterns/<slug>.md`, published
+at `/patterns/<slug>`; `bok/05-patterns.md` is the catalogue, with one `## Pattern:` section per pattern
+holding its summary and a link to its page. Cite CSIRO as the template source.
 
 ### 06. The role **[drafted]**
 The capability made concrete as a role (without ever implying a job search). What an AI governance

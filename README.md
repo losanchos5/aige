@@ -26,7 +26,7 @@ Source repository: `github.com/losanchos5/aige`.
   AI governance, eight values, six principles, what AI governance engineers build).
 - **[bok/01-definition.md](bok/01-definition.md)**: what the discipline is, and the eight neighbours
   it is not.
-- **[OUTLINE.md](OUTLINE.md)**: the full table of contents (chapters 00–10) with a brief for each.
+- **[OUTLINE.md](OUTLINE.md)**: the full table of contents with a brief for each chapter.
 
 ## Structure
 
@@ -42,12 +42,14 @@ aige/
 │   ├── 02-why-now.md          The five problems with the evidence; market, regulatory and agent signals
 │   ├── 03-values-principles.md  The eight values and six principles, expanded
 │   ├── 04-the-stack.md        The five-layer reference architecture
-│   ├── 05-patterns.md         Pattern catalogue (CSIRO template), 14 patterns
+│   ├── 05-patterns.md         Pattern catalogue (CSIRO template): one summary per pattern
+│   ├── patterns/              One file per pattern (bok/patterns/<slug>.md, /patterns/<slug>)
 │   ├── 06-the-role.md         The AI governance engineer, by workflow, skills and market
 │   ├── 07-maturity-model.md   Five levels from Documented to Continuous
 │   ├── 08-regulatory-map.md   Obligation → artefact → layer reverse index
 │   ├── 09-glossary.md         Canonical definitions, alphabetical
 │   ├── 10-reading-list.md     Annotated bibliography
+│   ├── 11-…23-*.md            AI defined, the programme, the lifecycle, the law, governing agents
 │   ├── CONTRIBUTORS.md        Authorship, contributors, SIGNATORIES
 │   └── CHANGELOG.md           Version history
 ├── sources/
@@ -56,7 +58,7 @@ aige/
     └── build_pdf.py       Assembles the Markdown into dist/site-preview.html (PDF export optional)
 ```
 
-Chapters 00–10 are drafted; contributions that extend the catalogue, mappings and arguments are
+Chapters 00–23 are drafted; contributions that extend the catalogue, mappings and arguments are
 welcome and credited.
 
 ## The five-layer stack

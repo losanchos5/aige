@@ -19,8 +19,9 @@ Home: https://aigovernanceengineer.com · source repository `github.com/losancho
 Contributors may correct or substantially revise a chapter or pattern and are credited by name. To
 contribute:
 
-1. Read `STYLEGUIDE.md`. Chapters 00–10 are drafted; contributors extend and sharpen them, add
-   patterns to `bok/05-patterns.md`, or propose new chapters from `OUTLINE.md`.
+1. Read `STYLEGUIDE.md`. Every chapter, 00 to 23, is drafted; contributors extend and sharpen them,
+   add patterns as files under `bok/patterns/` (STYLEGUIDE §4), or propose new chapters from
+   `OUTLINE.md`.
 2. Write it to the template. Every factual claim needs a `[n]` citation tagged `primary`, `secondary`
    or `reported`, with a matching row in `sources/SOURCES.md` under that chapter's section.
 3. Open a pull request. Add yourself to the **Contributors** list below in the same PR.
