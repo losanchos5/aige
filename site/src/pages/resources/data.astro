@@ -17,6 +17,8 @@ import '../../styles/pages.css';
 import '../../styles/obligations.css';
 
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Open data' }];
+/** The planned public endpoint of tools/mcp-server (its README, "Connect"). */
+const MCP_ENDPOINT = 'https://mcp.aigovernanceengineer.com/mcp';
 const pageUrl = new URL('/resources/data', site.url).href;
 const description =
   'The open data behind the site as static JSON: obligations with stable ids, frameworks, crosswalk, glossary, patterns and more, with schemas and an OpenAPI file.';
@@ -267,6 +269,22 @@ curl -s ${site.url}${API_PATH}/obligations.json \\
         <li><a href="/glossary.json"><code>/glossary.json</code></a> (short definitions for hover cards)</li>
         <li>The governance templates and their JSON Schemas on the <a href="/resources/templates">templates page</a></li>
       </ul>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="dt-mcp">
+      <h2 id="dt-mcp">Remote MCP server (read-only)</h2>
+      <p>
+        The same data is served to AI assistants by a read-only Model Context Protocol server:
+        it answers questions about the obligation register, the crosswalk, the glossary, the
+        patterns, the templates and schemas and the chapters, and every answer names the page it
+        was read from. It holds no data of its own, needs no account and stores nothing about the
+        people who call it. Its endpoint is <code>{MCP_ENDPOINT}</code> (Streamable HTTP, no
+        authentication). As of 2026-09-24 the endpoint is not deployed yet; the server's code, its
+        tools and a guide to run it yourself are in
+        <a href={`${site.github}/tree/main/tools/mcp-server`}><code>tools/mcp-server</code></a>
+        of the repository.
+      </p>
+      <pre tabindex="0" role="region" aria-label="Adding the MCP server to Claude Code"><code>{`claude mcp add --transport http aige ${MCP_ENDPOINT}`}</code></pre>
     </section>
 
     <section class="res-section prose" aria-labelledby="dt-cite">
