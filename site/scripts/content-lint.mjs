@@ -3,6 +3,11 @@
 // "looking for work"-style phrasing, leaks into the rendered site. Scans the
 // built HTML (dist/**/*.html by default) because that is the one place that
 // catches both the hand-written Astro pages and the Markdown chapters at once.
+// The em-dash rule and the forbidden phrases also run over every other text
+// file the site publishes (dist/**/*.svg, .json, .csv, .txt, .xml, .md: the
+// data exports, the feeds, llms.txt, the schemas and templates, the figure
+// downloads) and over the text chunks of the PNG figure downloads, because a
+// reader or a crawler reads those too.
 //
 //   npm run lint:content            # scan ./dist
 //   node scripts/content-lint.mjs <dir>
@@ -11,7 +16,7 @@
 // scripts/content-lint.allow (one per line); any match whose surrounding text
 // contains an allowed substring is ignored.
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
-import { join, dirname, resolve, relative } from 'node:path';
+import { join, dirname, resolve, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -77,6 +82,74 @@ function htmlFiles(dir, root = dir) {
       if (relative(root, full) === 'diagrams') continue; // top-level dist/diagrams
       out.push(...htmlFiles(full, root));
     } else if (name.endsWith('.html')) out.push(full);
+  }
+  return out;
+}
+
+// Every other published text file: data exports, feeds, llms.txt, schemas,
+// templates and the figure downloads. The archify viewers (dist/diagrams) are
+// third-party, and the search index (dist/pagefind) is generated from the HTML
+// already scanned, so both are skipped.
+const TEXT_EXT = /\.(svg|json|csv|txt|xml|md)$/i;
+function publishedFiles(dir, root = dir) {
+  const text = [];
+  const png = [];
+  for (const name of readdirSync(dir)) {
+    const full = join(dir, name);
+    const st = statSync(full);
+    if (st.isDirectory()) {
+      const rel = relative(root, full);
+      if (rel === 'diagrams' || rel === 'pagefind') continue;
+      const inner = publishedFiles(full, root);
+      text.push(...inner.text);
+      png.push(...inner.png);
+    } else if (TEXT_EXT.test(name)) text.push(full);
+    else if (name.endsWith('.png') && relative(root, full).split(sep).join('/').startsWith('downloads/')) {
+      png.push(full);
+    }
+  }
+  return { text, png };
+}
+
+// The tEXt/iTXt chunks of a PNG (the figure downloads carry title, author,
+// description and licence there), joined as plain text.
+function pngText(buf) {
+  const out = [];
+  let at = 8;
+  while (at + 8 <= buf.length) {
+    const length = buf.readUInt32BE(at);
+    const type = buf.toString('latin1', at + 4, at + 8);
+    const data = buf.subarray(at + 8, at + 8 + length);
+    if (type === 'tEXt') out.push(data.toString('latin1').split(String.fromCharCode(0)).join(': '));
+    if (type === 'iTXt') {
+      const key = data.subarray(0, data.indexOf(0)).toString('latin1');
+      // keyword NUL, compression flag, method, language NUL, translated NUL, text
+      let i = data.indexOf(0) + 3;
+      i = data.indexOf(0, i) + 1;
+      i = data.indexOf(0, i) + 1;
+      if (data[data.indexOf(0) + 1] === 0) out.push(`${key}: ${data.subarray(i).toString('utf8')}`);
+    }
+    if (type === 'IEND') break;
+    at += 12 + length;
+  }
+  return out.join(' ');
+}
+
+// Visible text of a non-HTML file for the phrase rules (an SVG's tags go).
+function fileText(file, raw) {
+  const body = file.toLowerCase().endsWith('.svg') ? raw.replace(/<[^>]+>/g, ' ') : raw;
+  return body.replace(/\s+/g, ' ');
+}
+
+// Any em dash in a published non-HTML file, literal or as a JSON/CSS escape.
+function emDashesIn(file, raw) {
+  const out = [];
+  const re = /\u2014|\\u2014|&mdash;|&#8212;|&#x2014;/gi;
+  let m;
+  while ((m = re.exec(raw)) !== null) {
+    const start = Math.max(0, m.index - 50);
+    const snippet = raw.slice(start, m.index + 50).replace(/\s+/g, ' ').trim();
+    out.push({ file, label: 'em dash', snippet });
   }
   return out;
 }
@@ -257,6 +330,28 @@ function main() {
     }
   }
 
+  // Every other published text file, and the PNG downloads' text chunks.
+  const published = publishedFiles(targetDir);
+  const others = [
+    ...published.text.map((file) => [file, readFileSync(file, 'utf8')]),
+    ...published.png.map((file) => [file, pngText(readFileSync(file))]),
+  ];
+  for (const [file, raw] of others) {
+    structural.push(...emDashesIn(file, raw));
+    const text = fileText(file, raw);
+    for (const { label, regex } of PATTERNS) {
+      regex.lastIndex = 0;
+      let match;
+      while ((match = regex.exec(text)) !== null) {
+        const start = Math.max(0, match.index - 40);
+        const context = text.slice(start, match.index + match[0].length + 40);
+        if (allow.some((needle) => context.toLowerCase().includes(needle))) continue;
+        violations.push({ file, label, snippet: context.trim() });
+        if (match[0].length === 0) regex.lastIndex++;
+      }
+    }
+  }
+
   if (!glossarySeen) {
     structural.push({ file: join(targetDir, 'resources', 'glossary.html'), label: 'missing page', snippet: '/resources/glossary was not built' });
   }
@@ -289,7 +384,10 @@ function main() {
     process.exit(1);
   }
 
-  console.log(`content-lint: clean (${files.length} HTML file(s) scanned in ${targetDir}).`);
+  console.log(
+    `content-lint: clean (${files.length} HTML file(s), ${published.text.length} other text file(s) and ` +
+      `${published.png.length} PNG download(s) scanned in ${targetDir}).`,
+  );
 }
 
 main();
