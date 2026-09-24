@@ -57,7 +57,9 @@ illness, the model was accurate on its target and biased on the thing that matte
 disparity would have raised the share of Black patients flagged for extra help from 17.7% to 46.5%
 [4]. No fairness metric computed against the cost label would have caught it. What catches it is a
 review of whether the label measures the construct the decision is about, recorded before training.
-
+The [health-risk score case](/cases/health-risk-score-proxy) reads it as a post-mortem, and the
+[recruiting-model case (reported)](/cases/recruiting-model-reported) does the same for historical
+bias in hiring data.
 The EU AI Act writes this view into law for high-risk systems. Article 10(2)(f) and (g) require data
 to be examined for biases likely to affect health and safety, harm fundamental rights or lead to
 prohibited discrimination, and require measures to detect, prevent and mitigate them; Article 10(3)
@@ -108,10 +110,11 @@ how to build them:
 | (f) Records of processing state why the processing was strictly necessary | Record-of-processing entry generated from the memo | Record-of-processing version |
 
 The article sits on top of the GDPR, not instead of it, so the lawful basis and the DPIA still apply
-(see chapter 19, [Privacy and AI](/bok/privacy-and-ai)). Where special-category data cannot be used
+(see chapter 19, [Privacy and AI](/bok/privacy-and-ai#special-categories-inferred-data-and-biometrics)). Where special-category data cannot be used
 at all, the fallbacks are voluntary self-identification with a clear purpose statement, testing on
 consented panels, and inferred attributes; the last carry their own error and legal risk and need
-the same review as any other use of the data.
+the same review as any other use of the data (chapter 19 on
+[inferred and proxy sensitive data](/bok/privacy-and-ai#inferred-and-proxy-sensitive-data)).
 
 ## Disparate treatment and disparate impact
 
@@ -175,7 +178,7 @@ tests [7], so a post-processing fix that sets group-specific thresholds can itse
 that setting. And any mitigation that uses the protected attribute at decision time risks becoming
 direct discrimination under EU law. Mitigation choices go to Legal with the eval evidence attached
 (see [mitigation](#mitigation-before-during-and-after-training) below). The wider US and EU picture
-is in chapter 20, [Existing law and AI](/bok/existing-law).
+is in chapter 20, [Existing law and AI](/bok/existing-law#fairness-measures-the-law-recognises).
 
 ## Group fairness metrics
 
@@ -261,7 +264,9 @@ The metric follows the harm, and the harm follows the use case. Fairlearn's user
 **allocation harms** (a system extends or withholds opportunities, resources or information) from
 **quality-of-service harms** (a system works less well for some people even when nothing is
 withheld) and **stereotyping harms** [20]. Add the cost of each error type and the legal frame, and
-the choice narrows.
+the choice narrows. The cost of each error type is the use-case record's
+[error appetite](/bok/governing-development#error-appetite-false-positives-versus-false-negatives)
+(chapter 14).
 
 | Use case | Harm type | Costliest error | Primary metric | Secondary checks | Legal frame |
 |---|---|---|---|---|---|
@@ -323,14 +328,15 @@ attribute joined in a secured environment. Whichever is chosen, the monitor is a
 streamed into layer 05 through [Continuous Assurance
 Telemetry](/bok/patterns#pattern-continuous-assurance-telemetry), and a breach opens a ticket with
 an owner, not a chart nobody reads. A disparity that caused harm is an incident and follows chapter
-17, [Incidents](/bok/incidents).
+17, [Incidents](/bok/incidents#incident-hazard-issue-and-serious-incident).
 
 ## Transparency, interpretability and explainability
 
 The three words are used interchangeably and should not be. NIST's framework draws the line in one
 sentence each: transparency answers "what happened" in the system, explainability answers "how" a
 decision was made, and interpretability answers "why" it was made and what it means to the user in
-context [1].
+context [1]. Chapter 11 names the three sources of opacity among
+[the traits of AI that break classic IT governance](/bok/ai-defined#eight-characteristics-that-break-classic-it-governance).
 
 | Term | Question it answers | Typical artefact | Primary audience | Layer |
 |---|---|---|---|---|
@@ -358,7 +364,7 @@ post-hoc explanation is a model of the model, and can be wrong about it [30]. Th
 that argument is a design rule. Train an interpretable baseline first. If the complex model does not
 beat it by a margin that matters for the decision, ship the interpretable one; if it does, record
 the margin, the reason the gain justifies the explanation risk, and the post-hoc method that will be
-used, in the design decision log (chapter 14, [Governing development](/bok/governing-development)).
+used, in the design decision log (chapter 14, [Governing development](/bok/governing-development#architecture-and-model-selection-trade-offs)).
 
 ### When an interpretable model is required
 
@@ -468,8 +474,8 @@ re-checked later.
 
 Explanation duties come from several regimes that differ in who owes what, to whom and when. The
 table routes the work; the subsections add what matters for the build. Chapters 18 to 20 ([The EU AI
-Act](/bok/eu-ai-act), [Privacy and AI](/bok/privacy-and-ai), [Existing law and
-AI](/bok/existing-law)) give the full legal picture.
+Act](/bok/eu-ai-act#explanation-and-notice-to-affected-people), [Privacy and AI](/bok/privacy-and-ai#gdpr-article-22-after-schufa), [Existing law and
+AI](/bok/existing-law#credit-and-lending)) give the full legal picture.
 
 | Instrument | Who owes it | Trigger | What must be given | Artefact |
 |---|---|---|---|---|

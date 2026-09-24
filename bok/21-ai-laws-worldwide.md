@@ -591,7 +591,10 @@ programme, not a compliance duty.
 
 The comparison below uses the questions a governance function asks of any AI-specific law. It covers
 regimes whose text this edition verified; the EU AI Act is the reference point and lives in
-chapter 18.
+chapter 18, which also maps [the same roles across regimes](/bok/eu-ai-act#the-same-roles-across-regimes)
+that the Roles column compresses. One international treaty sits beside these regimes: the
+[Council of Europe Framework Convention](/bok/principles-and-standards#council-of-europe-framework-convention-cets-no-225)
+is treated in chapter 22, with its ratification status.
 
 | Regime | Classification trigger | Core duties | Notice and human oversight | Frontier or general-purpose models | Enforcement | Roles |
 |---|---|---|---|---|---|---|
@@ -633,7 +636,7 @@ the revised guidance. And the Cyber Resilience Act's reporting duties started on
 
 One AI incident can start several clocks at once. The [Incident Pipeline](/bok/patterns#pattern-incident-pipeline)
 pattern should hold each clock as data, keyed to the regime and the trigger, so that one triage
-decision fans out to every report that is due. Chapter 17 treats [incident response](/bok/incidents)
+decision fans out to every report that is due. Chapter 17 treats [incident response](/bok/incidents#the-overlapping-clocks)
 in full.
 
 | Regime | Trigger | Clock | Recipient |

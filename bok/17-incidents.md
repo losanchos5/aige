@@ -137,6 +137,11 @@ Detection needs more channels than the runtime signals from
 expects providers to review police and media reports, social media, research papers and incident
 databases, and to give downstream providers, modifiers and users a direct channel to report [5]. A
 deployer that only watches its own dashboards will learn about some incidents from a journalist.
+Staff are a channel too: [a channel for raising concerns](/bok/governance-program#a-channel-for-raising-concerns)
+(chapter 12) routes their reports into the same pipeline, and for a high-risk provider the
+post-market monitoring plan is a standing source
+([post-market monitoring and serious incidents under the AI Act](/bok/eu-ai-act#post-market-monitoring-and-serious-incidents-articles-72-and-73),
+chapter 18).
 
 Containment is where the runtime patterns earn their keep. A
 [kill switch](/bok/patterns#pattern-kill-switch--circuit-breaker) that revokes one agent's scope
@@ -168,6 +173,8 @@ Engineering reads that as a preservation step between contain and eradicate:
 
 Retention outlives the incident. The Code of Practice commits GPAI signatories to keep incident
 documentation for at least five years from the documentation or the incident, whichever is later [5].
+The frozen evidence also feeds the [defence file](/bok/existing-law#the-defence-file) that product
+liability law now lets a court order disclosed (chapter 20).
 
 ## Playbooks, RACI and drills
 
@@ -356,7 +363,7 @@ Every closed incident should leave five artefacts behind:
 2. **A risk register change.** Either a new risk or a re-scored existing one, with the incident id
    attached. The link runs both ways: the incident record lists the risks it realised, and the risk
    entry lists the incidents that realised it. The risk method itself is chapter 13,
-   [risk management](/bok/risk-management).
+   [risk management](/bok/risk-management#incidents-are-realised-risks).
 3. **A control change** where the fault tree found one: a tightened guardrail, a narrower scope, a new
    oversight checkpoint.
 4. **A playbook update**, if the response itself was slow or unclear.
@@ -424,7 +431,9 @@ the two-way notification terms belong: the provider tells you about incidents an
 that affect your deployment, and you have a named channel to tell the provider. The same logic runs
 further up the chain for GPAI: the Code of Practice asks model providers to tell downstream
 providers, modifiers and users how to report serious incidents, directly or to the AI Office [5].
-Deployment governance as a whole is chapter 15, [governing deployment](/bok/governing-deployment).
+Deployment governance as a whole is chapter 15, [governing deployment](/bok/governing-deployment#the-deployment-lifecycle-at-a-glance),
+whose [external communications plan](/bok/governing-deployment#external-communications) carries the
+notices to users, affected people and authorities.
 
 ## The overlapping clocks
 
@@ -483,7 +492,9 @@ per system in the registry, not per incident under pressure.
   a single entry point for incident reports. It is tabled, not adopted: as of the Parliament's 1 Aug
   2026 update, amendments were under discussion and the Council's mandate had stalled [27].
   Commentators report a longer GDPR deadline limited to high-risk breaches (verify). The 72-hour rule
-  stands.
+  stands; chapter 19 covers [AI-specific privacy breaches and the 72-hour clock](/bok/privacy-and-ai#ai-specific-privacy-breaches).
+- Outside the EU the clocks differ again: chapter 21 lays out the
+  [incident clocks across regimes](/bok/ai-laws-worldwide#incident-clocks-across-regimes).
 
 ### One record, many reports
 
@@ -527,7 +538,9 @@ be a record, not a memory.
 ## The incident record
 
 Design the record once, around what the most demanding recipients ask for, and every other report
-becomes a projection of it. Two public schemas set the bar. The Commission's template for GPAI
+becomes a projection of it. The templates page has the
+[incident record fields](/resources/templates#schema-incident-record) as a JSON Schema with a filled
+example. Two public schemas set the bar. The Commission's template for GPAI
 serious incidents asks for ten items: start and end dates, the resulting harm and the victims or
 affected group, the chain of events, the model involved, the evidence available, the provider's
 response, its recommendation to the authorities, a root-cause analysis, patterns from post-market
@@ -557,7 +570,9 @@ for a spreadsheet.
 ## Learning from public incident databases
 
 Your own incident history is small and biased toward what you already detect. Public repositories
-widen it, as long as you know what they are.
+widen it, as long as you know what they are. This site keeps two curated starting points: the
+[incident cases written as post-mortems](/cases) and the [harms atlas](/resources/harms), which
+maps harms by level to the control that catches each.
 
 - **AI Incident Database (AIID).** Run by the Responsible AI Collaborative, it indexes harms and near
   harms from deployed AI, in the manner of aviation and computer-security incident databases. It

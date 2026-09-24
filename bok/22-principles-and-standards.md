@@ -66,7 +66,8 @@ The practical consequence is convergence on one definition. The OECD definition 
 Convention's Article 2 and the AI Act's Article 3(1) use near-identical wording, and the AI Act's
 recital 12 says the notion should be closely aligned with the work of international organisations
 [7][1][14]. A registry that classifies systems against that wording once can answer all three
-instruments; [chapter 11](/bok/ai-defined) treats the definition itself.
+instruments; [chapter 11](/bok/ai-defined#four-definitions-compared) treats the definition itself,
+and tabulates [where the principle sets agree](/bok/ai-defined#where-the-sets-agree).
 
 ## OECD AI Principles
 
@@ -165,7 +166,7 @@ fields that makes a system comparable with others and tells the rest of the stac
 Three OECD.AI resources are worth wiring in. The **Catalogue of Tools & Metrics for Trustworthy AI**
 is a place to find eval methods and metrics, not an endorsement list [15]. The **AI Incidents and
 Hazards Monitor** [3] is an input to layer 03: a reported failure in a comparable system is a
-candidate eval case (see [chapter 17](/bok/incidents)). The **Hiroshima AI Reporting Framework** is
+candidate eval case (see [chapter 17](/bok/incidents#learning-from-public-incident-databases)). The **Hiroshima AI Reporting Framework** is
 where developers of advanced AI systems file risk-management reports [3] (see the G7 section).
 
 > **In practice (illustrative)**
@@ -230,7 +231,7 @@ EUR-Lex).
 
 Inside the EU, then, the treaty is implemented through the AI Act rather than through a separate set
 of private-sector duties. Outside it, once the Convention is in force, each Party's implementing
-measures are what bind; track them per jurisdiction in [chapter 21](/bok/ai-laws-worldwide).
+measures are what bind; track them per jurisdiction in [chapter 21](/bok/ai-laws-worldwide#comparing-the-regimes).
 
 ### What the Convention asks for, and what it changes in the stack
 
@@ -253,7 +254,7 @@ date, and a trigger is something a pipeline can evaluate: a registry diff that c
 the training data or the intended purpose re-runs the gate. That is the [**Eval Gate in
 CI**](/bok/patterns#pattern-eval-gate-in-ci) pattern with the material-change rule written down, and
 it answers the same question the AI Act asks about substantial modification (see [chapter
-18](/bok/eu-ai-act)).
+18](/bok/eu-ai-act#article-25-when-someone-else-becomes-the-provider)).
 
 The Council of Europe also published **HUDERIA**, a non-binding methodology for risk and impact
 assessment of AI systems from the point of view of human rights, democracy and the rule of law. It
@@ -351,8 +352,8 @@ for the others, with accountable and transparent spanning them all [9].
 | Safe | Safety-threshold evals; tested kill switch; override path | 3 · 4 |
 | Secure and resilient | Adversarial red-team suite; threat model; runtime detection | 3 · 4 |
 | Accountable and transparent | Registry ownership; model card; evidence keyed to registry ids | 2 · 5 |
-| Explainable and interpretable | Explanation artefacts and reason codes, tested for fidelity ([chapter 16](/bok/fairness-and-explainability)) | 2 · 3 |
-| Privacy-enhanced | Leakage and memorisation evals; DPIA linked to registry ([chapter 19](/bok/privacy-and-ai)) | 2 · 3 |
+| Explainable and interpretable | Explanation artefacts and reason codes, tested for fidelity ([chapter 16](/bok/fairness-and-explainability#testing-explanation-quality)) | 2 · 3 |
+| Privacy-enhanced | Leakage and memorisation evals; DPIA linked to registry ([chapter 19](/bok/privacy-and-ai#does-a-model-contain-personal-data)) | 2 · 3 |
 | Fair with harmful bias managed | Fairness evals with thresholds traced to named harms | 3 |
 
 ### The Core: 19 categories

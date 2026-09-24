@@ -12,7 +12,7 @@ under terms nobody checked. The test set leaked into training. The release went 
 was fixed. Each of these is a development decision, and each leaves behind either a record or a gap.
 
 This chapter covers the provider side of the lifecycle: the organisation that designs, trains, tests
-and releases an AI system or model. [Chapter 15](/bok/governing-deployment) covers deployment and
+and releases an AI system or model. [Chapter 15](/bok/governing-deployment#the-deployment-lifecycle-at-a-glance) covers deployment and
 use. The split follows the EU AI Act's duty holders (see the
 [regulatory map](/bok/regulatory-map#eu-ai-act-post-omnibus)): most of what follows binds the
 provider, and a deployer that builds on a procured model inherits a thinner version of it through the
@@ -44,7 +44,10 @@ This is not MLOps, which moves the model through the same stages, and it is not 
 the banking sense, which challenges the model at points in time (the
 [disambiguation cluster](/bok/definition#the-disambiguation-cluster) draws both lines). It is the
 governance record those two activities produce, made machine-readable and given the power to block.
-
+The organisation-level rules each gate enforces are set out in chapter 12
+([what policy requires at each stage](/bok/governance-program#what-policy-requires-at-each-stage)),
+and the templates page has schemas and filled examples for the
+[use-case record, design review, dataset admission, test plan and report, and release gate](/resources/templates#stage-build).
 ## The use-case record
 
 The use-case record is the first artefact and the one most often missing. It is written at
@@ -87,7 +90,7 @@ missed case costs, what a false alarm costs, and which error, for which group, i
 of cost. Threshold selection then becomes arithmetic against stated costs, and moving the threshold
 becomes a change to the record with an approver, not a tuning decision inside a notebook. Per-group
 error rates and the fairness trade-offs they force are treated in
-[chapter 16](/bok/fairness-and-explainability).
+[chapter 16](/bok/fairness-and-explainability#the-impossibility-results).
 
 ### Function creep
 
@@ -185,7 +188,7 @@ such misuse, that may lead to risks to health, safety or fundamental rights (Art
 harm, and the response. Each entry must land in at least one of three places: a test in the eval
 suite, a runtime policy that blocks or flags it, or a warning in the instructions for use. An entry
 that lands nowhere is an accepted risk and needs a named acceptor
-([chapter 13](/bok/risk-management) covers who may accept).
+([chapter 13](/bok/risk-management#who-may-accept) covers who may accept).
 
 ### Oversight and controls designed in
 
@@ -227,7 +230,7 @@ cannot. Per dataset, the record answers five questions.
   on personal data is anonymous only if it is very unlikely both to identify the people whose data
   trained it and to let anyone extract that data through queries; it sets a three-step test for
   legitimate interest and warns that unlawful processing in development can affect the lawfulness of
-  deployment [18]. [Chapter 19](/bok/privacy-and-ai) takes this further.
+  deployment [18]. [Chapter 19](/bok/privacy-and-ai#lawful-basis-for-training-versus-inference) takes this further.
 - **Scraped and third-party content.** The EU's commercial text-and-data-mining exception applies
   only where rightholders have not reserved their rights "in an appropriate manner, such as
   machine-readable means" for content made publicly available online (DSM Directive Art. 4(3))
@@ -371,7 +374,9 @@ requests that users and timeouts actually meet.
 
 Each row is a suite behind the [**Eval Gate in CI**](/bok/patterns#pattern-eval-gate-in-ci); the
 security row is the [**Adversarial Red-Team Suite**](/bok/patterns#pattern-adversarial-red-team-suite).
-Fairness and explainability metrics are defined in [chapter 16](/bok/fairness-and-explainability).
+Fairness metrics are defined in [chapter 16](/bok/fairness-and-explainability#group-fairness-metrics),
+which also covers [bias and interpretability testing](/bok/fairness-and-explainability#testing-explanation-quality)
+of the explanations themselves.
 
 ### Statistical validity of evals
 
@@ -453,7 +458,7 @@ from untrusted sources; the Python documentation is blunt that "The pickle modul
 
 Every finding becomes an issue with an owner, a severity and a deadline. A finding that ships
 unfixed is an accepted risk with a named acceptor, recorded in the risk register that
-[chapter 13](/bok/risk-management) describes, and becomes a regression test so it cannot return
+[chapter 13](/bok/risk-management#the-risk-register-as-an-evidence-record) describes, and becomes a regression test so it cannot return
 silently.
 
 > **In practice (illustrative)**
@@ -473,11 +478,11 @@ the earlier gates produced and refuses to open while any is missing or stale: a 
 record; a signed design record; admitted datasets; a test report against the frozen plan; open
 issues below the agreed severity or accepted by a named acceptor; completed impact assessments;
 regenerated cards and instructions for use; monitoring configured (see
-[chapter 15](/bok/governing-deployment)); a tested rollback; trained operators. The reviewers are
+[chapter 15](/bok/governing-deployment#operating-the-system)); a tested rollback; trained operators. The reviewers are
 named in advance: product owner, engineering, the AI governance engineer, security, privacy and, for
 the high tiers, legal and the independent validator. The output is a signed go/no-go record with its
-conditions, filed against the registry entry.
-
+conditions, filed against the registry entry. The deployer runs its own
+[go-live review](/bok/governing-deployment#the-go-live-review) on top of it (chapter 15).
 Release in stages, each with exit criteria from the test plan: **shadow** (the system runs on live
 inputs and its outputs are logged, not used), **canary** (a small share of traffic), a **limited
 pilot**, then general availability. In the EU, research, testing and development before placing on
@@ -669,7 +674,7 @@ conformity at the disposal of national authorities for 10 years after placing on
 18), and keeps the logs the system generates automatically, where they are under its control, for a
 period appropriate to the intended purpose of at least six months, unless other law provides
 otherwise; financial institutions keep them within their financial-services documentation (Art. 19)
-[51]. Deployers carry a parallel log duty, covered in [chapter 15](/bok/governing-deployment).
+[51]. Deployers carry a parallel log duty, covered in [chapter 15](/bok/governing-deployment#records-retention).
 
 Treat retention as code: each evidence class carries a retention rule keyed to its obligation, signed
 records go to write-once storage, a legal hold overrides deletion, and the six-month log floor is a
@@ -685,7 +690,7 @@ published.
 |---|---|---|---|
 | Authority or notified body | The full technical file, test logs, access to datasets under Annex VII | On request; conformity assessment | Nothing the law requires; mark trade secrets as confidential |
 | Deployer | Instructions for use (Art. 13); model and system cards; Annex XII information for GPAI | Contract; documentation portal | Exploitable security detail; weights |
-| Affected persons | That AI is used, and how to contest or seek explanation (see [chapter 15](/bok/governing-deployment)) | Product interface; notices | Nothing about their own case that a right entitles them to |
+| Affected persons | That AI is used, and how to contest or seek explanation (see [chapter 15](/bok/governing-deployment#external-communications)) | Product interface; notices | Nothing about their own case that a right entitles them to |
 | The public | EU database entry; GPAI training-content summary; AB 2013 documentation; bias-audit summaries; published impact assessments | Website; public registers | Red-team exploit detail; personal data; security configuration |
 
 Two non-EU disclosures show the pattern. New York City's Local Law 144 requires employers using an
@@ -746,7 +751,7 @@ written it is.
 
 Encode the triggers so that the registry, not a calendar reminder, reopens the assessment: a new or
 widened intended purpose; retraining on a new data source; a new affected population, language or
-jurisdiction; a threshold change; an incident or near miss ([chapter 17](/bok/incidents)); a
+jurisdiction; a threshold change; an incident or near miss ([chapter 17](/bok/incidents#capa-from-incident-to-risk-register-and-eval-suite)); a
 monitoring signal outside its band; new law or guidance; and a scheduled review date. The
 [**FRIA-as-Code**](/bok/patterns#pattern-fria-as-code) pattern already does this for the FRIA and
 its DPIA cross-reference; the same structure generalises to every assessment in the table.
