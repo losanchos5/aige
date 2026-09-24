@@ -185,6 +185,20 @@ a completed, reviewed core (1.0).
   related terms and a "Cite this term" block. `/bok/glossary` stays the book index (each term is
   anchored and links to its page); `/resources/glossary` and `/glossary` redirect to it. Hover
   cards and `/glossary.json` now point at the term pages.
+- `bok/23-governing-agents.md`: chapter 23, **Governing AI agents**, replaces the stub. It covers
+  what makes an agent a governance object and autonomy as a design decision (Knight Institute,
+  IMDA and CSA scales aligned to `Art. 14(3)`), the agent registry, workload identity and
+  short-lived credentials (SPIFFE/SPIRE, RFC 8693 delegation, the MCP authorization specification
+  of 2026-07-28), tool allow-lists and MCP server admission, human checkpoints, runtime guardrails
+  for tool calls with an explicit failure posture, kill-switch stop levels, memory and context
+  governance, A2A v1.0 delegation chains and accountability across hops, prompts as configuration
+  under change control, an agent incident taxonomy with OpenTelemetry GenAI telemetry, a
+  threat-to-control table (OWASP Agentic 2026, OWASP GenAI LLM Top 10 2026, MITRE ATLAS v2026.09),
+  the frameworks written for agents and the EU AI Act hooks. Sources `[1]`–`[29]`, all `primary`,
+  as of 2026-09-24; one item marked "(verify)".
+- `site/src/pages/agents.astro`: the **/agents** hub, a practitioner landing for agent governance
+  with the control plane, the six agent patterns, the ten agentic threats with their controls, the
+  chapter 08 cross-references and the runtime tool categories.
 
 ## [Unreleased] - 2026-09-20
 
