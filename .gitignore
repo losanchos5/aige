@@ -43,3 +43,6 @@ site/.impeccable
 # Source material dropped in the repo root is never published
 /*.pdf
 /*.epub
+
+# Local build log written by the parallel-worktree build gate
+.build.log
