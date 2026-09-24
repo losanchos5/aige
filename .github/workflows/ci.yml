@@ -24,6 +24,12 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: site/package-lock.json
+      # The regulatory monitor's unit tests (tools/reg-monitor, no network, no
+      # dependencies): run from the repo root, before the site install. Node 22
+      # takes a quoted glob, not a directory.
+      - name: Regulatory monitor tests
+        working-directory: .
+        run: node --test 'tools/reg-monitor/test/*.test.mjs'
       - run: npm ci
       # Cache the pinned archify CLI so `npm run build` (prebuild → diagrams-build)
       # does not re-download the tarball on every run. `path` is repo-root relative.

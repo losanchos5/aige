@@ -15,6 +15,7 @@ import { gitDate } from '../../lib/reading';
 
 const repo = site.github;
 const blob = (path: string) => `${repo}/blob/main/${path}`;
+const tree = (path: string) => `${repo}/tree/main/${path}`;
 const form = (file: string) => `${repo}/issues/new?template=${file}`;
 
 // The issue forms in .github/ISSUE_TEMPLATE, one per kind of contribution.
@@ -162,8 +163,13 @@ const partsWord = countWord(bookParts.length);
     Every citation also has a row in the consolidated table,
     <a href={blob('sources/SOURCES.md')}>sources/SOURCES.md</a>, under its chapter's section and
     with the same number, so one file lists every source the book relies on. An already verified
-    row is reused rather than re-verified. A crosswalk reference that could not be checked against
-    its source stays marked unverified, with a note saying why.
+    row is reused rather than re-verified. A <a href="/resources/crosswalk">crosswalk</a> reference
+    that could not be checked against its source stays marked unverified, with a note saying why.
+  </p>
+  <p>
+    The registers the pages render (the obligations, the crosswalk, the glossary, the patterns and
+    the rest) are also published as <a href="/resources/data">open data</a>, one JSON file per
+    dataset with its schema, so a reader can check a mapping against the same rows the page shows.
   </p>
 
   <h2 id="how-dates-are-kept-current">How dates are kept current</h2>
@@ -192,6 +198,12 @@ const partsWord = countWord(bookParts.length);
       <strong>Weekly link check.</strong> Every Monday a scheduled workflow checks the external
       links in the Thesis, the chapters, the sources table and the site's data files, and keeps
       the results in a single open "Link rot report" issue.
+    </li>
+    <li>
+      <strong>Daily regulatory watch.</strong> A daily
+      <a href={tree('tools/reg-monitor')} target="_blank" rel="noopener noreferrer">regulatory change monitor</a>
+      watches the official pages the site cites and opens an issue for a person to review when one
+      changes; nothing is published automatically.
     </li>
     <li>
       <strong>On every change.</strong> Each pull request and each push to the main branch runs the
