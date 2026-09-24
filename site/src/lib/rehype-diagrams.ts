@@ -116,12 +116,23 @@ function renderFigureFigure(def: FigureDef): string {
   const svgPath = resolve(FIGURES_DIR, `${def.id}.svg`);
   if (!existsSync(svgPath)) return '';
   const svg = readFileSync(svgPath, 'utf8').trim();
+  // Optional wide variant (src/figures/<id>-wide.svg, e.g. values-principles in
+  // two columns): both SVGs are inlined and figures.css shows exactly one, so
+  // the hidden one never reaches the accessibility tree.
+  const widePath = resolve(FIGURES_DIR, `${def.id}-wide.svg`);
+  const wide = existsSync(widePath) ? readFileSync(widePath, 'utf8').trim() : '';
+  const canvas = wide
+    ? `<div class="figure-canvas figure-canvas--dual">${svg}${wide}</div>`
+    : `<div class="figure-canvas">${svg}</div>`;
+  // id="figure-<id>" is the deep link the figure's permalink page uses for
+  // "Where it appears"; the caption links that page (downloads, citation).
   return (
-    `<figure class="figure figure--infographic" data-figure="${def.id}">` +
-    `<div class="figure-canvas">${svg}</div>` +
+    `<figure class="figure figure--infographic" id="figure-${def.id}" data-figure="${def.id}">` +
+    canvas +
     `<figcaption class="figure-figcaption">` +
     `<span class="figure-fig-title">${escapeHtml(def.title)}</span>` +
     `<span class="figure-fig-desc">${escapeHtml(def.caption)}</span>` +
+    `<a class="figure-permalink" href="/figures/${def.id}">Permalink, downloads and citation</a>` +
     `</figcaption>` +
     `<details class="figure-alt">` +
     `<summary class="figure-alt-summary" data-pagefind-ignore>Text description</summary>` +

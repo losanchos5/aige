@@ -45,6 +45,25 @@
   margin-inline: auto;
 }
 
+/* Dual canvas: a stacked SVG and its wide variant (<id>-wide.svg). Exactly one
+   is displayed, so the hidden one leaves the accessibility tree; the wide one
+   takes over from 834 px and may grow a little past the 560-px cap, since its
+   viewBox is twice as wide (text stays at or above 1:1 in the reading well). */
+.figure--infographic .figure-canvas--dual > svg + svg {
+  display: none;
+}
+
+@media (min-width: 834px) {
+  .figure--infographic .figure-canvas--dual > svg:first-child {
+    display: none;
+  }
+
+  .figure--infographic .figure-canvas--dual > svg + svg {
+    display: block;
+    max-width: 760px;
+  }
+}
+
 .figure-figcaption {
   display: flex;
   flex-direction: column;
@@ -61,6 +80,30 @@
   font-size: var(--fs-small);
   color: var(--muted);
   text-wrap: pretty;
+}
+
+/* The caption's link to the figure's permalink page (downloads, embed snippets
+   and citation). --ink-2 keeps AA on every figure frame in both themes. */
+.figure-permalink {
+  align-self: flex-start;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.figure-permalink:hover {
+  color: var(--ink);
+}
+
+.figure-permalink:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* A deep link to the figure (/bok/<chapter>#figure-<id>) clears the header. */
+.figure--infographic[id] {
+  scroll-margin-top: var(--anchor-offset, 96px);
 }
 
 /* Text alternative: a plain, collapsible full description in the chapter's
@@ -210,6 +253,9 @@
 .figc .chip-bg { rx: 5; }
 .figc .cell { stroke: var(--line); stroke-width: 1; }
 .figc .cell-empty { fill: color-mix(in srgb, var(--ink) 4%, var(--bg)); }
+/* Text on a solid-ink fill (a .glyph-fill shape): the ground colour, so the
+   exporter resolves it per theme instead of an inline var() it cannot read. */
+.figc .on-ink { fill: var(--bg); }
 
 /* Links inside a figure SVG (pattern-map): the label is the visible text, the
    whole <a> is the target. Keep the ink colour; underline on hover/focus. */

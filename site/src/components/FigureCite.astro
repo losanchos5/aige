@@ -111,7 +111,9 @@ const bibtex = `@misc{aige-figure-${figure.id},
     border: 1px solid var(--line);
     border-radius: var(--r-sm);
     background: var(--bg);
-    overflow-x: auto;
+    /* Wrap instead of scrolling (see .fg-code in figures-gallery.css). */
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
     font-family: var(--font-mono);
     font-size: 0.75rem;
     line-height: 1.5;

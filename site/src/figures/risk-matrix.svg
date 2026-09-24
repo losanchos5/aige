@@ -14,7 +14,7 @@
   <!-- S5 runs on its own track: Critical whatever the likelihood -->
   <text class="mono" x="16" y="78" font-size="13">S5</text>
   <rect class="glyph-fill" x="48" y="58" width="296" height="30" rx="4"/>
-  <text x="196" y="78" font-size="13.5" text-anchor="middle" style="fill: var(--bg)">Critical at any likelihood</text>
+  <text x="196" y="78" font-size="13.5" text-anchor="middle" class="on-ink">Critical at any likelihood</text>
 
   <!-- S4 to S1: the matrix bands -->
   <text class="mono" x="16" y="120" font-size="13">S4</text>
@@ -25,9 +25,9 @@
   <rect fill="currentColor" fill-opacity="0.32" x="168" y="100" width="56" height="30" rx="3"/>
   <text x="196" y="120" font-size="13" text-anchor="middle">High</text>
   <rect class="glyph-fill" x="228" y="100" width="56" height="30" rx="3"/>
-  <text x="256" y="120" font-size="13" text-anchor="middle" style="fill: var(--bg)">Critical</text>
+  <text x="256" y="120" font-size="13" text-anchor="middle" class="on-ink">Critical</text>
   <rect class="glyph-fill" x="288" y="100" width="56" height="30" rx="3"/>
-  <text x="316" y="120" font-size="13" text-anchor="middle" style="fill: var(--bg)">Critical</text>
+  <text x="316" y="120" font-size="13" text-anchor="middle" class="on-ink">Critical</text>
   <text class="mono" x="16" y="154" font-size="13">S3</text>
   <rect class="cell-empty cell" x="48" y="134" width="56" height="30" rx="3"/>
   <text x="76" y="154" font-size="13" text-anchor="middle">Low</text>
@@ -38,7 +38,7 @@
   <rect fill="currentColor" fill-opacity="0.32" x="228" y="134" width="56" height="30" rx="3"/>
   <text x="256" y="154" font-size="13" text-anchor="middle">High</text>
   <rect class="glyph-fill" x="288" y="134" width="56" height="30" rx="3"/>
-  <text x="316" y="154" font-size="13" text-anchor="middle" style="fill: var(--bg)">Critical</text>
+  <text x="316" y="154" font-size="13" text-anchor="middle" class="on-ink">Critical</text>
   <text class="mono" x="16" y="188" font-size="13">S2</text>
   <rect class="cell-empty cell" x="48" y="168" width="56" height="30" rx="3"/>
   <text x="76" y="188" font-size="13" text-anchor="middle">Low</text>

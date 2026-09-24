@@ -2,6 +2,7 @@
 // figures-build: generate the data-driven conceptual infographics from the typed
 // data modules, so they stay in sync with the Body of Knowledge:
 //   - src/figures/values-principles.svg  (from src/data/values.ts)
+//   - src/figures/values-principles-wide.svg (the same, two columns, from 834 px)
 //   - src/figures/maturity-grid.svg      (from src/data/maturity.ts + stack.ts)
 //   - src/figures/pattern-map.svg        (from src/data/patterns.ts + stack.ts)
 //   - src/figures/discipline-map.svg     (the whole discipline map; see map-build.mjs)
@@ -146,6 +147,45 @@ function buildValuesPrinciples(values, principles, fig) {
   const H = y + 8;
   return (
     open(W, H, 'img', 'values-principles', fig.title, fig.alt) + parts.join('\n') + `\n</svg>\n`
+  );
+}
+
+// The same figure as two columns (values left, principles right) for wide wells.
+// rehype-diagrams inlines it next to the stacked SVG when src/figures/<id>-wide.svg
+// exists, and figures.css shows exactly one of the two: the stacked figure below
+// 834 px, the two-column one from 834 px (VISUAL-GUIDE.md §2.3). It is not a
+// figure of its own: no figures.ts entry, no permalink and no exports.
+function buildValuesPrinciplesWide(values, principles, fig) {
+  const W = 720;
+  const COL = 360; // x of the second column; each keeps the stacked figure's 328-px text width
+  const parts = [];
+  parts.push(`  <text class="mono muted" x="16" y="20" font-size="13.5">Eight values · six principles</text>`);
+
+  const column = (x0, label, items) => {
+    let y = 54;
+    parts.push(`  <text class="disp" x="${x0 + 16}" y="${y}" font-size="15">${esc(label)}</text>`);
+    y += 8;
+    parts.push(`  <line class="rule" x1="${x0 + 16}" y1="${y}" x2="${x0 + 344}" y2="${y}"/>`);
+    y += 8;
+    for (const item of items) {
+      const lines = wrap(item.title, 40);
+      const top = y + 13;
+      parts.push(`  <text class="mono muted" x="${x0 + 16}" y="${top}" font-size="13.5">${pad2(item.n)}</text>`);
+      lines.forEach((ln, i) => {
+        parts.push(`  <text x="${x0 + 44}" y="${top + i * 17}" font-size="14">${esc(ln)}</text>`);
+      });
+      y = top + (lines.length - 1) * 17 + 12;
+    }
+    return y;
+  };
+
+  const yValues = column(0, 'Eight values: which way to lean', values);
+  const yPrinciples = column(COL, 'Six principles: what to do on Monday', principles);
+  const H = Math.max(yValues, yPrinciples) + 8;
+  return (
+    open(W, H, 'img', 'values-principles-wide', fig.title, fig.alt, 'figc--wide') +
+    parts.join('\n') +
+    `\n</svg>\n`
   );
 }
 
@@ -592,6 +632,10 @@ async function main() {
 
   const outputs = [
     ['values-principles.svg', buildValuesPrinciples(values, principles, fig('values-principles'))],
+    [
+      'values-principles-wide.svg',
+      buildValuesPrinciplesWide(values, principles, fig('values-principles')),
+    ],
     ['maturity-grid.svg', buildMaturityGrid(layers, levels, fig('maturity-grid'))],
     ['pattern-map.svg', buildPatternMap(patterns, layers, fig('pattern-map'))],
     ['discipline-map.svg', buildDisciplineMap(map, fig('discipline-map'))],
@@ -600,7 +644,8 @@ async function main() {
   let problems = 0;
   let changed = 0;
   for (const [name, svg] of outputs) {
-    const r = emit(name, svg, budget(name.replace(/\.svg$/, '')));
+    // A wide variant (<id>-wide.svg) shares its figure's budget.
+    const r = emit(name, svg, budget(name.replace(/(-wide)?\.svg$/, '')));
     if (CHECK) problems += r;
     else changed += r;
   }

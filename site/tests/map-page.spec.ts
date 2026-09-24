@@ -3,8 +3,6 @@
 // project against the preview server (baseURL from config). The pure-data and
 // generated-SVG checks live in tests/map.spec.ts.
 import { test, expect } from '@playwright/test';
-import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/map');
@@ -153,19 +151,20 @@ test('a #cluster hash opens that cluster and focuses its summary', async ({ page
   expect(focused).toBe(true);
 });
 
-// --- 9. Download block: present with 200 image/png only when published -------
-test('the download block matches the published export', async ({ page }) => {
-  const exportPath = resolve(process.cwd(), 'src/data/map-export.json');
-  const link = page.locator('.map-download a[download]');
-  if (existsSync(exportPath)) {
-    await expect(link).toHaveCount(1);
-    const href = await link.getAttribute('href');
-    const response = await page.request.get(href!);
-    expect(response.ok(), `${href} should serve 200`).toBeTruthy();
-    expect(response.headers()['content-type']).toContain('image/png');
-  } else {
-    await expect(link).toHaveCount(0);
-  }
+// --- 9. Download block: the figure permalink carries the exports ------------
+test('the download block points to the figure permalink and its PNG exports', async ({ page }) => {
+  const link = page.locator('.map-download a');
+  await expect(link).toHaveCount(1);
+  await expect(link).toHaveAttribute('href', '/figures/discipline-map#downloads');
+
+  await page.goto('/figures/discipline-map');
+  await expect(page.locator('#downloads')).toHaveCount(1);
+  const pngs = page.locator('.fg-downloads a[href$=".png"]');
+  expect(await pngs.count()).toBeGreaterThanOrEqual(2);
+  const href = await pngs.first().getAttribute('href');
+  const response = await page.request.get(href!);
+  expect(response.ok(), `${href} should serve 200`).toBeTruthy();
+  expect(response.headers()['content-type']).toContain('image/png');
 });
 
 // --- 10. Target size (WCAG 2.5.8) at a phone width ---------------------------

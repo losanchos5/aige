@@ -249,7 +249,11 @@
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
   background: var(--bg);
-  overflow-x: auto;
+  /* Wrap instead of scrolling: a scrolling <pre> is a region a keyboard user
+     cannot reach (axe scrollable-region-focusable), and the copy button copies
+     the exact text either way. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   line-height: 1.5;

@@ -296,7 +296,7 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'lifecycle',
     title: 'The regulatory window',
     caption:
-      'The obligations that are live now and the deferred deadlines that follow them, as the chapter states them as of 2026-09-24. Pick the next stage and map its obligations to artefacts in chapter 08. Generated from the Body of Knowledge.',
+      'The obligations that are live now and the dates the Omnibus sets for what follows (new bans and marking, the deferred high-risk deadlines, legacy public-authority systems), as the chapter states them as of 2026-09-24. Pick the next stage and map its obligations to artefacts in chapter 08. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'why-now', at: 'lead' }],
   },
 ] as const;

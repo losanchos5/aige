@@ -176,22 +176,28 @@ function chapterAnchors(chapter: Chapter): Map<string, string> {
 }
 
 /** Link and label for one chapter placement (figure or archify diagram). */
-export function placementPlace(placement: DiagramPlacement): FigurePlace | undefined {
+export function placementPlace(
+  placement: DiagramPlacement,
+  figureId?: string,
+): FigurePlace | undefined {
   const chapter = getChapterBySlug(placement.chapter);
   if (!chapter) return undefined;
   const heading = placement.at === 'lead' ? undefined : (placement.sub ?? placement.section);
   const anchor = heading ? chapterAnchors(chapter).get(heading) : undefined;
+  // An infographic carries id="figure-<id>" in the chapter (rehype-diagrams), so
+  // its places deep-link the figure itself; a diagram links its section.
+  const target = figureId ? `figure-${figureId}` : anchor;
   return {
     chapter,
     label: heading ? `${chapter.title}, “${heading}”` : `${chapter.title}, opening`,
-    href: anchor ? `/bok/${chapter.slug}#${anchor}` : `/bok/${chapter.slug}`,
+    href: target ? `/bok/${chapter.slug}#${target}` : `/bok/${chapter.slug}`,
   };
 }
 
 /** Every place the figure appears: chapter placements, then site pages. */
 export function figurePlaces(figure: FigureDef): FigurePlace[] {
   const places = figure.placements
-    .map(placementPlace)
+    .map((placement) => placementPlace(placement, figure.id))
     .filter((place): place is FigurePlace => Boolean(place));
   for (const page of figure.pages ?? []) places.push({ label: `The page ${page}`, href: page });
   return places;

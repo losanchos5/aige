@@ -229,6 +229,96 @@ appear once, in their first layer, with a small secondary-layer mark. So what: s
 layer you are weakest in (chapter 07) and open its patterns. Avoid: obligations on this map (that
 is chapter 08's job); more than one line of text per chip.
 
+Batch v0.5.0 (existing chapters): eleven infographics for the sections that carried no figure,
+drawn from the chapters as they stand and declared at the end of `figures.ts`. Every dated one
+prints its "As of" date inside the image as well as in its caption (section 4).
+
+**five-objects** (`definition`, head of "The object of governance"). Message: the discipline
+governs five nested objects, each with its own controls; governing one leaves the others open.
+Elements: organisation (person glyph) around agents (hexagon) around systems around models
+(hexagon); data (store glyph) beside them inside the organisation; each with the controls chapter
+01 names. So what: check that every object in your estate has its control. Avoid: nesting data
+inside models; adding controls for systems (the chapter names none).
+
+**profession-in-numbers** (`why-now`, head of "The evidence"). Message: demand for AI governance
+is near-universal and the skills asked for are build-and-run skills. Elements: demand panel (IAPP
+2025: 77%, roughly 9 in 10, 1.5% = 10 of 671); skills panel (1,997 US postings, Aug 2026:
+observability 41%, Python 28%, NIST frameworks 27%) as zero-based bars. Dated: "As of 2026-09-24"
+in the art and the caption. So what: read the skills as the brief for a hiring or learning plan.
+Avoid: any number the chapter does not state; the blocklisted certificate-holder or open-role
+counts.
+
+**human-oversight** (`the-stack`, head of "Designing human oversight (Article 14)"). Message:
+oversight works only where it is designed: classify by consequence, put a checkpoint where the
+stakes justify it, and measure the oversight itself. Elements: two failure modes (review every
+action, nominal review); proposed action (hexagon) to the consequence gate (the one diamond); low:
+proceeds; high: designed checkpoint (person glyph, Layer 04 chip); oversight evidence (document
+with check) as the terminal node. So what: decide which actions need a person by consequence, then
+watch approval rate, time-to-decide and override rate. Avoid: chat-UI framing; more than one
+reviewer.
+
+**procured-ai-control** (`the-stack`, head of "Third-party and procured AI"). Message: the less of
+the model you own, the more of the control budget moves from testing it to bounding it and
+evidencing the supplier. Elements: the vendor's system to the due-diligence gate (diamond), then
+four layer bands in canonical order: 02 grows, 03 shrinks, 04 shrinks, 05 grows (evidence glyph).
+So what: budget controls for bounding and evidencing, not only for testing. Avoid: layer 01 (the
+section does not discuss it); vendor names.
+
+**enforcement-map** (`regulatory-map`, foot of "EU AI Act, post-Omnibus", after art73-clock).
+Message: who enforces, and how high the ceiling, depends on the regime. Elements: three tracks
+with the regulator glyph (building): GPAI providers and the AI Office (Art. 101: 3% or EUR 15M;
+Art. 75a–75d: up to 5% of average daily turnover per day); high-risk systems and national
+market-surveillance authorities (for example AESIA; Art. 99 ceilings 7%, 3%, 1%); US frontier
+developers under SB 53 and the Attorney General (USD 1M per violation). Dated: "As of 2026-09-24"
+in the art and the caption. So what: record for each system which authority asks. Avoid: EUR
+amounts for Art. 99 (chapter 08 states only the percentages); an application date for Art. 99.
+
+**committee-gates** (`governance-program`, head of "The committee decides, the gates enforce").
+Message: the committee decides only what the triggers route to it, and its exceptions come back as
+data the gate enforces until they expire. Elements: use case, review triggers (no trigger:
+straight to the gate), committee (person glyph), exception register (store), policy gate (the one
+diamond), verdict record (evidence, terminal: live allow with the exception id; expired fails the
+build). So what: file exceptions as data with an expiry, not as minutes. Avoid: showing the
+committee reviewing every release.
+
+**risk-loop-stack** (`risk-management`, head of "The loop on the five layers"). Message: each step
+of the risk loop runs on a stack layer and a NIST AI RMF function, and every step writes to one
+risk register. Elements: GOVERN frame; identify (MAP 1–5, GOVERN 5; L02), assess (MAP 5.1, MEASURE
+1–2; L03), treat (MANAGE 1–3; L01, L04), monitor (MEASURE 3–4, MANAGE 4; L04, L05); loop rail back
+to identify; risk register (store) as the terminal node. So what: find the step your function
+skips, then build the layer that does its work. Avoid: ISO/IEC 23894 clause numbers (chapter 13
+marks them verify).
+
+**risk-matrix** (`risk-management`, foot of "The matrix and what each band triggers"). Message:
+likelihood by severity gives the band that decides the gate, but S5 is Critical at any likelihood.
+Elements: S5 as one override bar; S4 to S1 by L1 to L5 cells named by band on a neutral ink ramp
+(fill-opacity on currentColor; Critical in solid ink with --bg text); the scales; band to gate and
+acceptor. So what: rate on the defined scales, then wire each band to its gate. Avoid: scores or
+products of likelihood and severity; layer colours for bands.
+
+**mitigation-ladder** (`risk-management`, head of "Treating risk: the mitigation hierarchy").
+Message: work the ladder top down; transfer sits beside it, and every rung leaves a residual.
+Elements: five rungs (eliminate, substitute, engineer, administrative, accept and monitor), each
+with its stack control and evidence (document with check); legal-floor note on rung 1; transfer in
+a dashed box beside the ladder. So what: record why each higher rung was infeasible before
+settling lower. Avoid: putting transfer on the ladder.
+
+**provenance-lineage** (`governing-development`, head of "Provenance versus lineage"). Message:
+provenance says where data came from and on what terms; lineage runs backward from a model and
+forward from a dataset. Elements: source, dataset (store glyph), pipeline, two models (hexagons);
+backward rail (what fed this model?) and forward rail (which models used this dataset?);
+granularity list; lineage events (evidence) as the terminal node. So what: record lineage forward
+as well as back. Avoid: standard or product names in the art (PROV and OpenLineage stay in the
+chapter text).
+
+**incident-clocks** (`incidents`, head of "The overlapping clocks"). Message: one event can start
+several reporting clocks at once, and the nearest deadline bites first. Elements: ordinal axis
+from awareness (4h to 15d, not to scale); eight lanes (DORA, NIS2, CRA, SB 53, AI Act Art. 73,
+GPAI Code, GDPR Art. 33, RAISE) with their first-report marks; trigger footnote; one incident
+record (evidence) as the terminal node. Dated: "As of 2026-09-24" in the art and the caption. So
+what: hold every clock in one incident record and alert on the nearest deadline. Avoid: follow-up
+and final reports (the table has them); regimes without a numeric clock.
+
 ### 2.4 The discipline map (generated SVG, `map.ts` + `map-build.mjs`)
 
 **discipline-map** (`/map`, no chapter placement, generated from `src/data/map.ts` by

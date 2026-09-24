@@ -136,7 +136,7 @@ const facts: [string, string][] = [
             </figcaption>
           </figure>
         ) : (
-          <Figure title={figure.title} caption={figure.caption} id={figure.id}>
+          <Figure title={figure.title} caption={figure.caption} id={figure.id} permalink={false}>
             <Fragment set:html={svg} />
           </Figure>
         )
@@ -209,7 +209,15 @@ const facts: [string, string][] = [
                 <ul class="fg-downloads">
                   {downloads.map((d) => (
                     <li>
-                      <a href={d.href} download>
+                      <a
+                        href={d.href}
+                        download
+                        target="_blank"
+                        rel="noopener"
+                        data-umami-event="download"
+                        data-umami-event-file={d.href}
+                        data-umami-event-location="figure"
+                      >
                         {d.label}
                       </a>
                       <span class="fg-meta">
