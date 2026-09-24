@@ -4,11 +4,15 @@
 // (src/data/frameworks.ts, faithful to chapter 08), the patterns it lists, the
 // crosswalk topics that join it, the cases that cite the same EU AI Act article
 // and the section of chapter 08 it comes from. The sitemap dates the page by the
-// row's `reviewed` field (astro.config.ts), not by git.
+// row's `reviewed` field (astro.config.ts), not by git. The header figure is the
+// obligation-to-evidence chain (components/obligations/EvidenceChain.astro), and
+// the page's Open Graph card is its own (/og/obligations/<id>.png).
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import Citation from '../../components/Citation.astro';
+import EvidenceChain from '../../components/obligations/EvidenceChain.astro';
+import { obligationShortTitle, obligationOgPath } from '../../lib/obligation-title';
 import { site } from '../../data/site';
 import {
   obligations,
@@ -67,10 +71,9 @@ const pagePath = obligationPath(row);
 const pageUrl = new URL(pagePath, site.url).href;
 const apiPath = obligationApiPath(row);
 
-// <title> budget: the suffix " · AI Governance Engineer" takes 25 of ~70
-// characters, so a long obligation name falls back to "<instrument> <clause>".
-const shortTitle =
-  row.obligation.length <= 45 ? row.obligation : `${fw.short} ${row.clause}`.slice(0, 45);
+// <title> budget: a long obligation name falls back to "<instrument> <clause>"
+// (lib/obligation-title.ts, shared with the Open Graph card).
+const shortTitle = obligationShortTitle(row);
 // Meta description: the requirement, cut on a word boundary to fit 160 chars.
 function clip(text: string, max = 158): string {
   if (text.length <= max) return text;
@@ -109,10 +112,11 @@ const jsonLd = [
 ];
 ---
 
-<Base title={shortTitle} description={description} image="/og/resources.png" jsonLd={jsonLd}>
+<Base title={shortTitle} description={description} image={obligationOgPath(row)} jsonLd={jsonLd}>
   <PageHero variant="res" crumbs={crumbs} title={row.obligation} lede={row.requirement} />
 
   <div class="container res-page">
+    <EvidenceChain row={row} />
     <div class="cs-body" data-pagefind-body>
       <dl class="cs-facts">
         <dt>Id</dt>
