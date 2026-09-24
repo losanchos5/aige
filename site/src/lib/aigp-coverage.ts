@@ -161,7 +161,7 @@ export function resolveAigpLink(href: string): ResolvedLink {
 }
 
 const WORD_LIMIT = 12;
-const EM_DASH = '—';
+const EM_DASH = String.fromCharCode(0x2014);
 
 /**
  * Every problem with the map, as readable lines: structure (4 domains, 13

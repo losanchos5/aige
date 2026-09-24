@@ -23,6 +23,9 @@ import {
 import { aigpMapProblems, resolveAigpLink, resolvedAigpMap } from '../src/lib/aigp-coverage';
 import { aigpHeatmapSvg } from '../src/lib/aigp-heatmap';
 
+// The em dash, built from its code point so this file never contains one.
+const EM_DASH = String.fromCharCode(0x2014);
+
 // The blueprint's question ranges (AIGP BoK v2.1, pages 4 to 9), hard-coded on
 // purpose: a test that read the same module it checks would pass on any drift.
 const DOMAIN_RANGES: Record<string, [number, number]> = {
@@ -93,7 +96,7 @@ test.describe('AIGP coverage map', () => {
     for (const { indicator } of aigpIndicators()) {
       const words = indicator.paraphrase.trim().split(/\s+/);
       expect(words.length, `${indicator.id}: ${indicator.paraphrase}`).toBeLessThanOrEqual(12);
-      expect(indicator.paraphrase.includes('—'), indicator.id).toBe(false);
+      expect(indicator.paraphrase.includes(EM_DASH), indicator.id).toBe(false);
       expect(['taught', 'partly-taught']).toContain(indicator.status);
       if (indicator.status === 'partly-taught') {
         expect(indicator.note?.trim().length ?? 0, indicator.id).toBeGreaterThan(20);
@@ -166,7 +169,7 @@ test.describe('AIGP coverage map', () => {
     const partly = aigpIndicators().filter(({ indicator }) => indicator.status === 'partly-taught');
     expect(cells('ag-hm-taught') + cells('ag-hm-partly')).toBe(58);
     expect(cells('ag-hm-partly')).toBe(partly.length);
-    expect(svg.includes('—')).toBe(false);
+    expect(svg.includes(EM_DASH)).toBe(false);
     expect(Buffer.byteLength(svg, 'utf8')).toBeLessThanOrEqual(12 * 1024);
     // Bar widths follow the range midpoint: IV.C (9-11) is 10 wide, II.D (3-5) is 4.
     expect(rangeMidpoint({ min: 9, max: 11 })).toBe(10);
