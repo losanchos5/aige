@@ -13,7 +13,10 @@
 // endorsements. A URL drawn from bok/10-reading-list.md is trusted as verified;
 // every other external URL was checked by hand on 2026-09-15, and the Block E
 // additions and replacements were verified on 2026-09-19 (status, redirects,
-// relevance). No tool is named that the Body of Knowledge does not treat.
+// relevance). On 2026-09-24 the EU AI Act links were re-pointed from a
+// third-party explorer to the EUR-Lex consolidated text (Reg. (EU) 2024/1689 as
+// amended by Reg. (EU) 2026/1744), anchored per article (#art_<n>) or annex
+// (#anx_<n>). No tool is named that the Body of Knowledge does not treat.
 
 import type { LayerNumber } from './stack';
 
@@ -220,7 +223,7 @@ export const nodes: readonly PathNode[] = [
         cost: 'free',
       },
       {
-        title: 'HiddenLayer Threat Report',
+        title: 'HiddenLayer 2026 AI Threat Landscape Report (vendor survey)',
         url: 'https://www.hiddenlayer.com/report-and-guide/threatreport2026',
         type: 'article',
         cost: 'free',
@@ -384,8 +387,8 @@ export const nodes: readonly PathNode[] = [
     ],
     resources: [
       {
-        title: 'EU AI Act + Digital Omnibus explorer',
-        url: 'https://artificialintelligenceact.eu/ai-act-explorer/digital-omnibus/',
+        title: 'EU AI Act, consolidated text after the Digital Omnibus (EUR-Lex)',
+        url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng',
         type: 'official',
         cost: 'free',
       },
@@ -461,7 +464,7 @@ export const nodes: readonly PathNode[] = [
     resources: [
       {
         title: 'EU AI Act Annex III (high-risk use cases)',
-        url: 'https://artificialintelligenceact.eu/annex/3/',
+        url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#anx_III',
         type: 'official',
         cost: 'free',
       },
@@ -733,7 +736,7 @@ export const nodes: readonly PathNode[] = [
     resources: [
       {
         title: 'EU AI Act Article 27 (FRIA)',
-        url: 'https://artificialintelligenceact.eu/article/27/',
+        url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_27',
         type: 'official',
         cost: 'free',
       },
@@ -1048,7 +1051,7 @@ export const nodes: readonly PathNode[] = [
     resources: [
       {
         title: 'EU AI Act Article 14 (human oversight)',
-        url: 'https://artificialintelligenceact.eu/article/14/',
+        url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_14',
         type: 'official',
         cost: 'free',
       },
@@ -1110,7 +1113,7 @@ export const nodes: readonly PathNode[] = [
     resources: [
       {
         title: 'EU AI Act Article 73 (serious-incident reporting)',
-        url: 'https://artificialintelligenceact.eu/article/73/',
+        url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_73',
         type: 'official',
         cost: 'free',
       },
@@ -1298,7 +1301,7 @@ export const nodes: readonly PathNode[] = [
       },
       {
         title: 'EU AI Act Article 55 (GPAI systemic risk)',
-        url: 'https://artificialintelligenceact.eu/article/55/',
+        url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_55',
         type: 'official',
         cost: 'free',
       },
