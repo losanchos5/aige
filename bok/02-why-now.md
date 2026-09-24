@@ -88,9 +88,8 @@ substance of AI governance engineering; they have not yet agreed on its name.
 
 ### Registry versus runtime
 
-The tooling market tells the same story from the supply side, with one caveat worth stating first.
-Gartner published its first Magic Quadrant for AI Governance Platforms in June 2026, as the vendors
-named in it reported [10]. Gartner's own framing of the category asks for more than a register: its
+The tooling market tells the same story from the supply side. Gartner published its first Magic
+Quadrant for AI Governance Platforms in June 2026, as one of the vendors named in it reported [10]. Gartner's own framing of the category asks for more than a register: its
 February 2026 analysis says these platforms should enable "automated policy enforcement at runtime" and
 continuous monitoring, and it expects AI governance spending to reach USD 492 million in 2026 and pass
 USD 1 billion by 2030 [11]. What the category is asked to do and what it ships are different questions.
