@@ -1,0 +1,271 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/classification-decision-record.v1.json",
+  "kind": "aige.classification-decision-record",
+  "version": 1,
+  "record_id": "cdr-2026-09-24-cv-screen-02",
+  "system": {
+    "name": "CV screening assistant",
+    "registry_id": "cv-screen-02",
+    "intended_purpose": "Rank incoming job applications against the published role profile so that recruiters in the EU review the strongest candidates first; recruiters take every hiring decision."
+  },
+  "question_set": {
+    "id": "aige.eu-ai-act-triage",
+    "version": "1.0.0",
+    "as_of": "2026-09-24",
+    "basis": "Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI)",
+    "url": "https://aigovernanceengineer.com/toolkit/ai-act-triage"
+  },
+  "answers": [
+    {
+      "question": "object",
+      "article": "Art. 3(1), Art. 3(63)",
+      "values": [
+        "system"
+      ],
+      "labels": [
+        "An AI system: software with an intended purpose that people or other systems use"
+      ],
+      "means": [
+        "The system track: the definition screen, then the risk ladder by intended purpose."
+      ]
+    },
+    {
+      "question": "inference",
+      "article": "Art. 3(1)",
+      "values": [
+        "yes"
+      ],
+      "labels": [
+        "Yes: its outputs are inferred, for example by a trained model"
+      ],
+      "means": [
+        "It meets the decisive element of the Art. 3(1) definition: an AI system."
+      ]
+    },
+    {
+      "question": "reach",
+      "article": "Art. 2(1)",
+      "values": [
+        "eu-market",
+        "eu-established"
+      ],
+      "labels": [
+        "It is placed on the EU market or put into service in the EU, by us or by its provider",
+        "We are established or located in the EU and use it"
+      ],
+      "means": [
+        "Art. 2(1) reaches providers placing AI systems or GPAI models on the EU market, wherever they are established.",
+        "Art. 2(1) reaches deployers in the Union."
+      ]
+    },
+    {
+      "question": "exclusions",
+      "article": "Art. 2(3) to 2(12)",
+      "values": [
+        "none"
+      ],
+      "labels": [
+        "None of these"
+      ],
+      "means": [
+        "No exclusion claimed."
+      ]
+    },
+    {
+      "question": "activity",
+      "article": "Art. 3(3) to 3(8), Art. 3(68)",
+      "values": [
+        "develop",
+        "use"
+      ],
+      "labels": [
+        "We develop it, or have it developed, and place it on the market or put it into service under our own name (own use counts)",
+        "We use it under our authority, in a professional activity"
+      ],
+      "means": [
+        "Provider (Art. 3(3)): develops an AI system or GPAI model, or has one developed, and places it on the market or into service under its own name. Putting into service includes own use.",
+        "Deployer (Art. 3(4)): uses an AI system under its authority, other than for personal, non-professional use."
+      ]
+    },
+    {
+      "question": "art25",
+      "article": "Art. 25(1)",
+      "values": [
+        "none"
+      ],
+      "labels": [
+        "None of these"
+      ],
+      "means": [
+        "No Art. 25(1) trigger."
+      ]
+    },
+    {
+      "question": "art5",
+      "article": "Art. 5(1)",
+      "values": [
+        "none"
+      ],
+      "labels": [
+        "None of these"
+      ],
+      "means": [
+        "No practice on the original Art. 5 list."
+      ]
+    },
+    {
+      "question": "generation",
+      "article": "Art. 5(1)(ba), (bb), Art. 5(1a)",
+      "values": [
+        "no"
+      ],
+      "labels": [
+        "No"
+      ],
+      "means": [
+        "Points (ba) and (bb) do not arise."
+      ]
+    },
+    {
+      "question": "annex1",
+      "article": "Art. 6(1), Annex I",
+      "values": [
+        "no"
+      ],
+      "labels": [
+        "No"
+      ],
+      "means": [
+        "The Annex I route does not arise."
+      ]
+    },
+    {
+      "question": "annex3",
+      "article": "Art. 6(2), Annex III",
+      "values": [
+        "employment"
+      ],
+      "labels": [
+        "4. Employment and workers’ management: recruitment and selection, decisions on terms, promotion or termination, task allocation, monitoring and evaluating performance"
+      ],
+      "means": [
+        "Annex III, point 4: high-risk unless the Art. 6(3) filter takes it out."
+      ]
+    },
+    {
+      "question": "art6-3",
+      "article": "Art. 6(3)",
+      "values": [
+        "preparatory-task"
+      ],
+      "labels": [
+        "It performs a preparatory task to an assessment relevant to an Annex III use case"
+      ],
+      "means": [
+        "Fourth Art. 6(3) condition claimed."
+      ]
+    },
+    {
+      "question": "profiling",
+      "article": "Art. 6(3), third subparagraph",
+      "values": [
+        "yes"
+      ],
+      "labels": [
+        "Yes"
+      ],
+      "means": [
+        "Always high-risk, whatever condition is claimed: the override beats all four."
+      ]
+    },
+    {
+      "question": "art50",
+      "article": "Art. 50",
+      "values": [
+        "interacts"
+      ],
+      "labels": [
+        "It interacts directly with people"
+      ],
+      "means": [
+        "Art. 50(1), a provider duty: people must know it is AI, unless obvious."
+      ]
+    }
+  ],
+  "outcome": {
+    "scope": "in-scope",
+    "scope_reasons": [],
+    "roles": [
+      {
+        "role": "eu-provider",
+        "label": "Provider",
+        "article": "Art. 3(3)",
+        "reasons": [
+          "You develop the system, or have it developed, and place it on the market or put it into service under your own name. Putting into service includes own use. (Art. 3(3))"
+        ]
+      },
+      {
+        "role": "eu-deployer",
+        "label": "Deployer",
+        "article": "Art. 3(4)",
+        "reasons": [
+          "You use the AI system under your authority, other than for personal, non-professional use. (Art. 3(4))"
+        ]
+      }
+    ],
+    "classes": [
+      {
+        "class": "high-risk-annex-iii",
+        "label": "High-risk (Annex III)",
+        "article": "Art. 6(2)",
+        "applies_from": "2027-12-02",
+        "reasons": [
+          "An Annex III system that profiles natural persons is always high-risk: the override beats all four Art. 6(3) conditions. (Art. 6(2), Art. 6(3), third subparagraph)"
+        ]
+      },
+      {
+        "class": "transparency-art50",
+        "label": "Transparency (Art. 50)",
+        "article": "Art. 50",
+        "applies_from": "2026-08-02",
+        "reasons": [
+          "Fits an Article 50 case, whatever else the system is. The information must reach people at the latest at first interaction or exposure; the article has applied since 2026-08-02. (Art. 50)"
+        ]
+      }
+    ],
+    "high_risk_screen": {
+      "annex_i": "no",
+      "annex_iii_areas": [
+        "employment"
+      ],
+      "art_6_3_conditions": [
+        "preparatory-task"
+      ],
+      "profiling": true,
+      "high_risk": true
+    },
+    "open_points": [],
+    "notes": [
+      "Before deploying an Annex III system (except point 2, critical infrastructure), a FRIA is required from deployers that are bodies governed by public law or private entities providing public services, and from deployers of credit scoring (point 5(b)) and life and health insurance pricing (point 5(c)). The duty applies from 2027-12-02.",
+      "One system on two rungs: the high-risk duties and the Art. 50 disclosure duty both apply.",
+      "A high-risk system already on the market before its Chapter III date falls under the Act only if its design changes significantly after that date; those intended for use by public authorities must comply by 2030-08-02. Log every significant change in design, with the reasoning."
+    ]
+  },
+  "rationale": "In scope (indicative). Roles: Provider (Art. 3(3)) and Deployer (Art. 3(4)). Classes: High-risk (Annex III), from 2027-12-02 and Transparency (Art. 50), from 2026-08-02.\n\nReviewer note: The preparatory-task condition was claimed; the ranking profiles applicants, so the override applies. Counsel review booked.",
+  "reviewer": "ai-governance",
+  "decided_at": "2026-09-24",
+  "legal_review": "pending",
+  "re_review": {
+    "triggers": [
+      "intended-purpose-change",
+      "brand-change",
+      "substantial-modification",
+      "annex-iii-amended",
+      "classification-guidelines-final",
+      "significant-design-change"
+    ],
+    "review_by": "2027-03-24"
+  },
+  "notice": "Indicative, not legal advice and not a conformity claim. Nothing you enter leaves your browser.",
+  "link": "https://aigovernanceengineer.com/toolkit/ai-act-triage#v=1&qs=1.0.0&object=system&inference=yes&reach=eu-market%2Ceu-established&exclusions=none&activity=develop%2Cuse&art25=none&art5=none&generation=no&annex1=no&annex3=employment&art6-3=preparatory-task&profiling=yes&art50=interacts&n=CV+screening+assistant&rid=cv-screen-02&p=Rank+incoming+job+applications+against+the+published+role+profile+so+that+recruiters+in+the+EU+review+the+strongest+candidates+first%3B+recruiters+take+every+hiring+decision.&r=ai-governance&d=2026-09-24&t=intended-purpose-change%2Cbrand-change%2Csubstantial-modification%2Cannex-iii-amended%2Cclassification-guidelines-final%2Csignificant-design-change&rb=2027-03-24&note=The+preparatory-task+condition+was+claimed%3B+the+ranking+profiles+applicants%2C+so+the+override+applies.+Counsel+review+booked."
+}
