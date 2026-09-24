@@ -31,5 +31,5 @@ Worktree `D:/Documents/aige-wt/w2-tool-triage`, rama `wt/w2-tool-triage`. La bui
 
 ## 6. Notas de verificación
 
-- EUR-Lex rechazó el acceso automatizado el 2026-09-24 (respuesta 202 vacía); los textos se leyeron en `publications.europa.eu/resource/celex/` (mismo documento, mismas anclas `art_N` y `anx_N`).
+- EUR-Lex rechazó al principio el acceso automatizado el 2026-09-24 (respuesta 202 vacía); los textos se leyeron en `publications.europa.eu/resource/celex/` (mismo documento, mismas anclas `art_N` y `anx_N`). Más tarde, el mismo día, se volvieron a contrastar en las páginas ELI de EUR-Lex: `Art. 5(1)(ba)`, `5(1a)`, el párrafo de elaboración de perfiles del `Art. 6(3)`, `Art. 25(1)`, `Art. 51(2)` y las fechas del `Art. 113` modificado coinciden.
 - El formato del fragmento del planificador se tomó de su worktree (`w2-tool-planner`, en curso); una prueba compara los códigos cuando ambos bloques estén en la misma rama.

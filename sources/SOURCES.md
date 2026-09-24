@@ -2034,10 +2034,13 @@ Commission's AI Act Service Desk, and the Omnibus changes come from chapter 18's
 Block w2-tool-triage, checked 2026-09-24. The `#` column matches the page's `[n]` markers. The tool
 adds no claim of its own: every question, option, rule, reason and date in `site/src/data/triage.ts`
 carries verbatim fragments of chapter 18, and the build fails if one is no longer in the chapter.
-EUR-Lex's HTML front end refused automated access on 2026-09-24, so rows [2] to [4] were read on the
-Publications Office's own copies of the same documents (`publications.europa.eu/resource/celex/`
-32024R1689, 32026R1744 and 02024R1689-20260727), which carry the same `art_N` and `anx_N` anchors the
-page links on EUR-Lex. Rows [5] to [7] reuse chapter 18's verified rows [3], [7] and [5].
+Rows [2] to [4] were first read on the Publications Office's own copies of the same documents
+(`publications.europa.eu/resource/celex/` 32024R1689, 32026R1744 and 02024R1689-20260727), when
+EUR-Lex's HTML front end refused automated access, and then re-checked on the EUR-Lex ELI pages
+themselves later on 2026-09-24: Art. 5(1)(ba) and 5(1a), Art. 6(3) profiling subparagraph, Art. 25(1),
+Art. 51(2) and the Art. 113 dates as amended (2026-12-02, 2027-12-02, 2028-08-02) match. The pages
+carry the `art_N` and `anx_N` anchors the tool links. Rows [5] to [7] reuse chapter 18's verified
+rows [3], [7] and [5].
 
 | # | Claim | Source | Publisher | Date | URL | Verified | Used in |
 |---|---|---|---|---|---|---|---|
