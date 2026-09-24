@@ -853,6 +853,47 @@ test.describe('obligation register', () => {
     expect(art4.appliesStatus).toBe('in-force');
   });
 
+  // v0.5.0 (block w2-data-obligations): the rows the new chapters proposed live in
+  // chapter 08's own tables, so the register keeps mirroring the chapter.
+  test('every register row has its requirement and artefact in chapter 08', () => {
+    const norm = (text: string) => text.toLowerCase().replace(/`/g, '').replace(/\s+/g, ' ');
+    const chapter = norm(readSource('bok/08-regulatory-map.md'));
+    // Art. 73's chapter cell points at "the reporting-clock table below"; the
+    // register names the table explicitly. Every other row is mirrored verbatim.
+    const contextual = new Set(['AIGE-OBL-EUAIA-ART73']);
+    for (const row of obligations) {
+      if (!contextual.has(row.id)) {
+        expect(chapter.includes(norm(row.requirement)), `${row.id} requirement`).toBe(true);
+      }
+      expect(chapter.includes(norm(row.artefact)), `${row.id} artefact`).toBe(true);
+    }
+  });
+
+  test('the v0.5.0 rows sit in the chapter-08 sections that carry them', () => {
+    const anchorOf = (id: string) => obligations.find((o) => o.id === id)?.anchor;
+    expect(anchorOf('AIGE-OBL-EUAIA-ART86')).toBe('eu-ai-act-post-omnibus');
+    expect(anchorOf('AIGE-OBL-EUAIA-ART26-11')).toBe('eu-ai-act-post-omnibus');
+    for (const row of obligations.filter((o) => o.frameworkId === 'gdpr')) {
+      expect(row.anchor, row.id).toBe('the-gdpr');
+      expect(row.appliesFrom, row.id).toBe('2018-05-25');
+    }
+    const gdprArticles = obligations
+      .filter((o) => o.frameworkId === 'gdpr')
+      .flatMap((o) => [...o.clause.matchAll(/(\d+)/g)].map((m) => m[1]));
+    for (const article of ['5', '6', '9', '13', '15', '17', '21', '22', '25', '28', '30', '33', '35', '44']) {
+      expect(gdprArticles.includes(article), `GDPR Art. ${article}`).toBe(true);
+    }
+    // Korea's duties apply; only fact-finding and fines are held back.
+    for (const row of obligations.filter((o) => o.frameworkId === 'kr-ai-basic-act')) {
+      expect(row.appliesStatus, row.id).toBe('grace');
+    }
+    // Every instrument carries at least one row, except the UK ATRS, which the
+    // crosswalk cites clause by clause but chapter 08 does not map.
+    const withRows = new Set(obligations.map((o) => o.frameworkId));
+    const withoutRows = frameworks.filter((f) => !withRows.has(f.id)).map((f) => f.id);
+    expect(withoutRows).toEqual(['uk-atrs']);
+  });
+
   test('patterns exist; EU rows list exactly the patterns whose "Maps to" names the article', () => {
     const patternIds = new Set(patterns.map((p) => p.id));
     for (const row of obligations) {

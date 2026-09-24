@@ -212,6 +212,7 @@ export const HAND_WRITTEN: readonly HandWritten[] = [
   // chapter 08: regulatory map (framework families, verbatim H2s)
   { label: 'EU AI Act, post-Omnibus', file: 'bok/08-regulatory-map.md' },
   { label: 'GPAI Code of Practice', file: 'bok/08-regulatory-map.md' },
+  { label: 'Data protection and other EU law', file: 'bok/08-regulatory-map.md' },
   { label: 'ISO/IEC 42001, 42005 and 42006', file: 'bok/08-regulatory-map.md' },
   { label: 'NIST AI RMF', file: 'bok/08-regulatory-map.md' },
   { label: 'CSA AICM and STAR for AI', file: 'bok/08-regulatory-map.md' },
@@ -221,9 +222,10 @@ export const HAND_WRITTEN: readonly HandWritten[] = [
 ];
 
 /**
- * The eight chapter-08 H2 families, each `anchor` a real heading slug and each
- * `ids` a subset of frameworks.ts ids. Together the families partition all 31
- * framework ids (checked in tests/map.spec.ts).
+ * The nine chapter-08 H2 families, each `anchor` a real heading slug and each
+ * `ids` a subset of frameworks.ts ids. Together the families partition every
+ * framework id (checked in tests/map.spec.ts): an instrument added to
+ * frameworks.ts joins the family whose chapter-08 section carries its rows.
  */
 export const FRAMEWORK_FAMILIES: readonly FrameworkFamily[] = [
   {
@@ -239,16 +241,33 @@ export const FRAMEWORK_FAMILIES: readonly FrameworkFamily[] = [
     ids: ['gpai-code-of-practice'],
   },
   {
+    anchor: 'data-protection-and-other-eu-law',
+    label: 'Data protection and other EU law',
+    short: 'EU law',
+    ids: [
+      'gdpr',
+      'eu-nis2',
+      'eu-dora',
+      'eu-cra',
+      'eu-pld',
+      'eu-dsm',
+      'eu-dsa',
+      'eu-ucpd',
+      'eu-platform-work',
+      'eu-ccd2',
+    ],
+  },
+  {
     anchor: 'isoiec-42001-42005-and-42006',
     label: 'ISO/IEC 42001, 42005 and 42006',
     short: 'ISO/IEC 42001',
-    ids: ['iso-42001', 'iso-42005', 'iso-42006', 'iso-23894'],
+    ids: ['iso-42001', 'iso-42005', 'iso-42006', 'iso-23894', 'iso-22989'],
   },
   {
     anchor: 'nist-ai-rmf',
     label: 'NIST AI RMF',
     short: 'NIST AI RMF',
-    ids: ['nist-ai-rmf', 'nist-ai-agent-standards', 'nist-ir-8596', 'nist-ai-800-1'],
+    ids: ['nist-ai-rmf', 'nist-ai-agent-standards', 'nist-ir-8596', 'nist-ai-800-1', 'nist-ai-600-1'],
   },
   {
     anchor: 'csa-aicm-and-star-for-ai',
@@ -266,7 +285,33 @@ export const FRAMEWORK_FAMILIES: readonly FrameworkFamily[] = [
     anchor: 'us-federal-and-state-laws',
     label: 'US federal and state laws',
     short: 'US federal',
-    ids: ['ca-sb-53', 'ny-raise-act', 'tx-traiga', 'co-ai-act'],
+    ids: [
+      'ca-sb-53',
+      'ny-raise-act',
+      'tx-traiga',
+      'co-ai-act',
+      'ca-ab-2013',
+      'ca-sb-942',
+      'ca-sb-243',
+      'ca-cppa-regs',
+      'ny-gbl-47',
+      'il-hb-3773',
+      'nyc-ll-144',
+      'ut-ai-disclosure',
+      'co-sb21-169',
+      'va-cdpa',
+      'co-privacy-act',
+      'mn-cdpa',
+      'il-bipa',
+      'wa-mhmda',
+      'us-omb-m-25-21',
+      'us-omb-m-26-04',
+      'us-ecoa-reg-b',
+      'us-fcra',
+      'us-title-vii-ugesp',
+      'us-ftc-act',
+      'us-take-it-down',
+    ],
   },
   {
     anchor: 'other-jurisdictions',
@@ -275,7 +320,17 @@ export const FRAMEWORK_FAMILIES: readonly FrameworkFamily[] = [
     ids: [
       'kr-ai-basic-act',
       'uk-duaa',
+      'uk-dmcc',
+      'uk-atrs',
       'sg-genai-framework',
+      'sg-agentic-framework',
+      'canada-dadm',
+      'br-lgpd',
+      'cn-pipl',
+      'cn-anthropomorphic',
+      'coe-cets-225',
+      'oecd-ai-principles',
+      'g7-hiroshima-coc',
       'cn-algo-recommendation',
       'cn-deep-synthesis',
       'cn-genai-measures',
@@ -284,6 +339,8 @@ export const FRAMEWORK_FAMILIES: readonly FrameworkFamily[] = [
       'cn-tc260-framework',
       'etsi-en-304-223',
       'en-18286',
+      'pren-18228',
+      'pren-18229-1',
     ],
   },
 ];

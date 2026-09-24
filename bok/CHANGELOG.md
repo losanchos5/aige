@@ -40,8 +40,31 @@ a completed, reviewed core (1.0).
 - Chapter 14 opens with an interactive diagram of the build as a chain of gates: intake, design
   review, dataset admission, eval gate and release gate, each named with the pattern the chapter
   ties to it, ending in the technical file the pipeline compiles.
+- The obligation register grows from 68 to 178 rows and from 31 to 76 instruments, so every
+  obligation the v0.5.0 chapters teach has an id and a page: GDPR articles, NIS2, DORA, the Cyber
+  Resilience Act, the Product Liability Directive, the DSM Directive, the DSA, the UCPD, the
+  Platform Work and Consumer Credit Directives, Korea's AI Basic Act article by article, US state and
+  federal law that reaches AI (California, New York, Illinois, New York City, Utah, Colorado,
+  Virginia, Minnesota, Washington, OMB, Regulation B, the FCRA, Title VII, the FTC Act, the TAKE IT
+  DOWN Act), Canada, Brazil, China's PIPL and anthropomorphic-interaction measures, the Council of
+  Europe Convention, the OECD AI Principles, the G7 Hiroshima Code, ISO/IEC 42005 and 22989, NIST AI
+  600-1, the JTC 21 deliverables and 26 more EU AI Act articles and paragraphs (among them
+  `Art. 86` and `Art. 26(11)`). Chapter 08 carries every row in its own tables, with a new section,
+  "Data protection and other EU law", and new subsections for US state privacy and sector law, US
+  federal law, Korea and treaty and soft law; its new sources, numbered 63 to 116, were verified
+  on 2026-09-24.
 
 ### Changed
+- Chapter 08 and the register: the CSA row that named an "Agentic Control Supplement" now names what
+  the CSA has published (the AICM agent controls, the Agentic Trust Framework and AARM), because the
+  supplement could not be matched to a primary document; STAR for AI lists its three levels; the
+  agent-control table uses OWASP's official ASI names; the Korea row cites the Act on law.go.kr and
+  the guidance-period wording; the Colorado row describes SB 26-189; the EU AI Act lead states the
+  amended `Art. 113(c)` and how the map dates the high-risk duties that sit outside Chapter III.
+- The GPAI rows of the register (`Art. 52` to `Art. 55`) gain the 2 August 2027 milestone of
+  `Art. 111(3)` for models placed on the market before 2 August 2025, and chapter 08 states it.
+- The obligation heat matrix on `/resources/frameworks` joins each row to its instrument by the
+  register's `frameworkId`, so rows under the new chapter-08 sections land on their own instrument.
 - `/resources/obligations.json` and `/resources/obligations.csv` move to `schemaVersion` 2 at the
   same URLs. `appliesFrom` is now an ISO date (or `null` for voluntary instruments without one) and
   the former free text moved to `appliesNote`; each row gains `id`, `url`, `json`, `frameworkId`,
