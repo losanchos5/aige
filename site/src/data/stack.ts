@@ -21,7 +21,7 @@ export type ColorVar = '--l1' | '--l2' | '--l3' | '--l4' | '--l5';
 export interface ToolCategory {
   /** Category of tool (the substance; brands are illustrative). */
   category: string;
-  /** Example tools named in ch.04 or SOURCES.md — illustrative, not endorsed. */
+  /** Example tools named in ch.04 or SOURCES.md: illustrative, not endorsed. */
   examples: readonly string[];
 }
 
@@ -34,7 +34,11 @@ export interface Layer {
   name: string;
   /** ≤8-word tagline drawn from the chapter's one-line spine. */
   tagline: string;
-  /** The core question this layer answers, where the chapter states one. */
+  /** The question this layer answers, as chapter 04 states it: 02 answers
+   *  "What AI is running?", 01 and 04 "What is it allowed to do?" (01 writes
+   *  the bound, 04 enforces it on the live call), 03 and 05 "What evidence
+   *  proves it?". The same model drives the three-questions figure and the
+   *  home cards. */
   question?: string;
   /** What evidence the layer produces (the chapter's "The proof is …"). */
   proves: string;
@@ -44,7 +48,8 @@ export interface Layer {
   toolCategories: readonly ToolCategory[];
   /** Frameworks and articles the chapter maps this layer to. */
   mapsTo: readonly string[];
-  /** True for the three layers inherited from GRC engineering (01, 02, 05). */
+  /** True for the three layers inherited from GRC engineering (01, 02, 05),
+   *  as the Thesis and chapter 04 state them. */
   inherited: boolean;
   /** The `#slug` of the layer's H2 heading, as rehype-slug produces it. */
   chapterAnchor: string;
@@ -186,6 +191,7 @@ export const layers: readonly Layer[] = [
     id: 'runtime',
     name: 'Runtime Controls & Observability',
     tagline: 'Hold the line at runtime',
+    question: 'What is it allowed to do?',
     proves: 'A stream of runtime decisions and traces.',
     artefacts: [
       'Guardrails: input/output filters and tool-call mediation at the enforcement point',
@@ -307,7 +313,7 @@ export interface MinimumViableStack {
   steps: readonly MinimumStackStep[];
 }
 
-/** The chapter's "minimum viable stack for a team of one" — a thin vertical
+/** The chapter's "minimum viable stack for a team of one": a thin vertical
  * slice that touches every layer, in the order: see it, rule it, test it,
  * contain it, prove it. */
 export const minimumViableStack: MinimumViableStack = {

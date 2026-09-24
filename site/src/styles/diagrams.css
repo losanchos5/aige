@@ -1,4 +1,4 @@
-/* diagrams.css — style the generated archify SVGs and the figure that wraps
+/* diagrams.css: style the generated archify SVGs and the figure that wraps
    them. The inline SVGs ship semantic class names but NO styles of their own
    (the build strips the renderer's stylesheet), so every fill/stroke/colour
    below maps an archify class to a site token. Dark mode falls out of the
@@ -25,7 +25,7 @@
    so the figure widens to the whole well with the classic centred-breakout
    formula in cq units. When the well equals the prose column (mobile/tablet, or
    any page whose .doc-main is not widened) 100cqw == the column, 50cqw == 50%,
-   and the negative margins resolve to 0 — so nothing moves. */
+   and the negative margins resolve to 0, so nothing moves. */
 .prose > .diagram {
   width: 100cqw;
   margin-inline: calc(50% - 50cqw);
@@ -457,7 +457,7 @@
 }
 
 /* Inside the dialog the canvas already fills the screen, so the overlaid button
-   (moved in with the canvas) is redundant — and would sit over the SVG. */
+   (moved in with the canvas) is redundant, and would sit over the SVG. */
 .diagram-dialog .diagram-enlarge {
   display: none;
 }

@@ -40,7 +40,7 @@ reorganización descrita; el resto de landings y capítulos no se tocan.
 ## Capabilities
 
 ### New Capabilities
-- `home-hero`: el hero de portada a pantalla completa — el campo de gradiente y su movimiento, el
+- `home-hero`: el hero de portada a pantalla completa, el campo de gradiente y su movimiento, el
   titular y su tipografía, la franja de cifras, y la sección de la definición/bucle que sigue debajo.
 
 ### Modified Capabilities

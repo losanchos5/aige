@@ -27,17 +27,27 @@ edition. Tools are named as category examples, illustrative and not endorsements
 
 ## Regulation and standards
 
-- **EU AI Act + Digital Omnibus explorer**: the consolidated, navigable text of the Act as amended;
-  the primary obligation source for chapter 08. `https://artificialintelligenceact.eu/ai-act-explorer/digital-omnibus/`
+- **EU AI Act, consolidated text (EUR-Lex)**: Regulation (EU) 2024/1689 as amended by the Digital
+  Omnibus (Regulation (EU) 2026/1744), consolidated on 27 July 2026; the primary obligation source for
+  chapter 08. `https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng` (verified: primary)
+- **Digital Omnibus on AI, Regulation (EU) 2026/1744 (EUR-Lex)**: the amending act as published in
+  the Official Journal on 24 July 2026, with the new dates and the new Articles 4a and 75a-75d.
+  `https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng` (verified: primary)
+- **AI Act Explorer (Future of Life Institute)**: a navigable, article-by-article reading of the Act
+  and the Omnibus changes; commentary and navigation, not the legal text. `https://artificialintelligenceact.eu/ai-act-explorer/digital-omnibus/`
+  (verified: secondary)
+- **GPAI Code of Practice**: the Commission's voluntary code for general-purpose AI, including the
+  safety and security chapter whose signatories commit to model evaluations. `https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai`
   (verified: primary)
-- **GPAI Code of Practice**: the Commission's code for general-purpose AI, including the safety and
-  security chapter that requires model evaluations. `https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai`
-  (verified: primary)
+- **Standardisation of the AI Act (European Commission)**: the Commission's own status page for the
+  harmonised standards that would grant a presumption of conformity; as of 2026-09-24, none is
+  OJ-cited. `https://digital-strategy.ec.europa.eu/en/policies/ai-act-standardisation` (verified:
+  primary)
 - **"ISO/IEC 42001 and the AI Act: why certification is not yet a presumption of conformity"**: the
   key relationship between the AIMS standard (and 42005/42006) and the Act. `https://lawandtechnology.eu/en/iso-iec-42001-and-the-ai-act-why-certification-is-not-yet-a-presumption-of-conformity/`
   (verified: secondary)
-- **JTC 21 harmonised-standards tracker**: the live status of the European standards that would grant
-  a presumption of conformity; as of the book's date, none is OJ-cited. `https://kla.digital/blog/jtc-21-standards-tracker`
+- **JTC 21 harmonised-standards tracker**: a vendor-maintained tracker of the stage each JTC 21
+  deliverable has reached; useful for dates, read against the Commission's page above. `https://kla.digital/blog/jtc-21-standards-tracker`
   (verified: secondary)
 - **NIST AI Risk Management Framework 1.0**: the Govern/Map/Measure/Manage functions used as a
   mapping target throughout. `https://www.nist.gov/itl/ai-risk-management-framework` (verified: primary)
@@ -145,12 +155,21 @@ edition. Tools are named as category examples, illustrative and not endorsements
   (verified: primary)
 - **State of GRC 2026**: the practitioner survey behind the "spreadsheet is still the #1 GRC tool"
   reality the discipline reacts against. `https://grcengineer.com/report/` (verified: primary)
-- **Gartner Magic Quadrant for AI Governance Platforms 2026 (via IBM)**: the first MQ for the
-  category and its inclusion criteria (discovery, registry, policy, evidence). `https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms`
+- **"Global AI Regulations Fuel Billion-Dollar Market for AI Governance Platforms" (Gartner)**: the
+  analyst's own framing of the platform category, including runtime policy enforcement, and its spend
+  forecast. `https://www.gartner.com/en/newsroom/press-releases/2026-02-17-gartner-global-ai-regulations-fuel-billion-dollar-market-for-ai-governance-platforms`
+  (verified: primary)
+- **Gartner Magic Quadrant for AI Governance Platforms, June 2026 (via IBM)**: one named vendor's
+  account of the first MQ for the category; the report itself is licensed, so read this as a
+  vendor's summary. `https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms`
   (verified: secondary)
-- **HiddenLayer Threat Report 2026**: the source of the reported "~1 in 8 AI breaches involve
-  autonomous agents" figure; read as reported. `https://www.hiddenlayer.com/report-and-guide/threatreport2026`
-  (verified: reported)
+- **HiddenLayer 2026 AI Threat Landscape Report**: a security vendor's survey and the source of the
+  "one in eight breaches were agentic" finding; read it as a vendor survey. `https://www.hiddenlayer.com/report-and-guide/threatreport2026`
+  (verified: primary)
+- **International AI Safety Report 2026**: the second edition (3 February 2026) of the scientific
+  assessment of general-purpose AI capabilities, risks and risk management, chaired by Yoshua Bengio
+  and backed by more than 30 countries and international organisations. `https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026`
+  (verified: primary)
 
 ## Incident and risk repositories (the empirical record)
 
@@ -203,6 +222,4 @@ conformity.
 
 The reading list is its own source set: each entry above carries its URL and a verification tag
 inline, and every URL is recorded as a row in this chapter's section of `sources/SOURCES.md`. Items
-whose URL could not be drawn from the research digest or verified for this edition were left out, most
-notably the International AI Safety Report 2026, cited elsewhere in the digest but without a URL that
-resolved at the time of writing.
+whose URL could not be drawn from the research digest or verified for this edition were left out.

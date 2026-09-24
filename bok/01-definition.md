@@ -35,9 +35,9 @@ card to do this work, and having the title does not mean you are doing it. It is
 (policy-as-code, eval gates, agent registries, continuous assurance) that a security engineer, a
 privacy engineer, an MLOps engineer or a governance lead can each develop. The market is forming the
 role (technical AI-governance roles in the tech sector report a median near USD 221,000, the highest
-band in IAPP's survey [2], and the AI governance platform market is forecast to grow from tens of
-millions of dollars to well over a billion by 2030 [3]), but the discipline is defined by the
-capability, not by the vacancy.
+band in IAPP's survey [2], and Gartner forecasts AI governance spending of USD 492 million in 2026,
+passing USD 1 billion by 2030 [3]), but the discipline is defined by the capability, not by the
+vacancy.
 
 **It is measured by realised risk reduction and audit-ready evidence.** There are exactly two tests.
 Did the risk actually fall, measurably, in production, not on a maturity slide? And can a regulator
@@ -70,9 +70,10 @@ time; we govern the system continuously, including agents that have no analogue 
 evidence that shows it, and we depend on lawyers to tell us we got the obligation right. **Responsible
 AI and AI ethics** set the values; without engineering, those values stay on a poster. **GRC
 engineering** is the parent method, and we are its AI specialisation. We inherit three of the five
-stack layers almost unchanged (govern-as-code, machine-readable evidence and continuous assurance)
-along with the "green dashboard over a broken control is theatre" test; what AI forces us to add is
-the other two, evals and red-teaming as controls and agent identity and runtime control, because a
+stack layers almost unchanged (Govern-as-Code, Inventory & Transparency, and Assurance & Continuous
+Compliance, which carry policy as code, the asset inventory and machine-readable evidence) along
+with the "green dashboard over a broken control is theatre" test; what AI forces us to add is the
+other two, evals and red-teaming as controls and agent identity and runtime control, because a
 model whose behaviour must be tested and an autonomous actor that acts under delegated authority have
 no analogue in classic GRC. **AI security engineering** is the sibling we overlap with most, and the
 overlap is a feature, not a boundary dispute: the same person often wears both hats. The line is not
@@ -123,12 +124,12 @@ production, instantly, from live systems, not from a document last updated a qua
    by-product of the build.
 
 These three questions are the spine of the whole Body of Knowledge. The five-layer stack (chapter 04)
-is built to answer them: Govern-as-Code and Inventory & Transparency answer *what is running* and
-*what it may do*; Evals & Red Teaming and Assurance & Continuous Compliance answer *what evidence
-proves it*; Runtime Controls & Observability keeps all three answers true as the system changes. The
-threats those controls are built against (prompt injection, tool misuse, agent identity and privilege
-abuse, rogue agents) are catalogued in OWASP's Top 10 for Agentic Applications [5], and the patterns
-that answer them are in chapter 05.
+is built to answer them: Inventory & Transparency answers *what is running*; Govern-as-Code and
+Runtime Controls & Observability answer *what it may do*, the first writing the bound as code and the
+second enforcing it on the live call; Evals & Red Teaming and Assurance & Continuous Compliance answer
+*what evidence proves it*. The threats those controls are built against (prompt injection, tool
+misuse, agent identity and privilege abuse, rogue agents) are catalogued in OWASP's Top 10 for Agentic
+Applications [5], and the patterns that answer them are in chapter 05.
 
 ## The limits of the eval gate
 
@@ -167,6 +168,6 @@ claim of conformity.
 
 [1] "What is GRC Engineering" (Ayoub Fandi). GRC Engineer. 2025. https://grcengineer.com/what-is-grc-engineering/ (verified: primary)
 [2] Salary & Jobs Report 2025-26. IAPP. 2025-08-03. https://iapp.org/resources/article/salary-survey-summary/ (verified: primary)
-[3] "Global AI Regulations Fuel Billion-Dollar Market for AI Governance Platforms". Gartner. 2026-02-17. https://www.gartner.com/en/newsroom/press-releases/2026-02-17-gartner-global-ai-regulations-fuel-billion-dollar-market-for-ai-governance-platforms (verified: primary)
+[3] "Global AI Regulations Fuel Billion-Dollar Market for AI Governance Platforms" (AI governance spending USD 492M in 2026, over USD 1B by 2030). Gartner. 2026-02-17. https://www.gartner.com/en/newsroom/press-releases/2026-02-17-gartner-global-ai-regulations-fuel-billion-dollar-market-for-ai-governance-platforms (verified: primary)
 [4] "AI Governance Engineering". Visure Solutions. 2026. https://visuresolutions.com/ai-engineering/ai-governance-engineering/ (verified: primary)
 [5] Top 10 for Agentic Applications 2026. OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)

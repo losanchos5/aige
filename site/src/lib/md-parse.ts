@@ -148,7 +148,7 @@ export interface AnnotatedItem {
 }
 
 /**
- * Parse a bullet list whose items read `- **Title** — note. \`url\` (verified: tag)`.
+ * Parse a bullet list whose items read `- **Title**, note. \`url\` (verified: tag)`.
  * Continuation lines (indented wraps) are folded into their bullet; a blank
  * line ends the list so trailing prose (e.g. a `**Maps to:**` line) is ignored.
  */
@@ -181,7 +181,7 @@ export function parseAnnotatedList(body: string): AnnotatedItem[] {
         .replace(/`https?:\/\/[^`]+`/g, '')
         .replace(/\(verified:[^)]*\)/g, ''),
     )
-      .replace(/^[:—–-]\s*/, '')
+      .replace(/^[:\u2014–-]\s*/, '')
       .replace(/\s*[.;]\s*$/, '')
       .trim();
     items.push({

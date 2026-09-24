@@ -1,5 +1,5 @@
 // rss.xml: the site feed. It carries two kinds of items, newest first:
-//   - one per released version in bok/CHANGELOG.md (`## [x.y] — date` headings),
+//   - one per released version in bok/CHANGELOG.md (`## [x.y] - date` headings),
 //     each linking to its anchor on the /about/changelog page;
 //   - one per Body of Knowledge chapter (data/chapters.ts), linking to the
 //     chapter page, dated by the last git commit that touched the chapter source
@@ -48,7 +48,7 @@ function parseChangelog(markdown: string): ChangelogItem[] {
   };
 
   for (const line of lines) {
-    const match = /^##\s+(\[([^\]]+)\]\s*[—–-]\s*(.+?))\s*$/.exec(line);
+    const match = /^##\s+(\[([^\]]+)\]\s*[\u2014–-]\s*(.+?))\s*$/.exec(line);
     if (match) {
       flush();
       const [, heading, version, rawDate] = match;
@@ -121,7 +121,7 @@ export const GET: APIRoute = (context) => {
         description: lead || chapter.summary,
         // Stable guid per chapter + date: a new git date (an edit) surfaces the
         // chapter as a new item; an unchanged chapter keeps its guid across
-        // builds. isPermaLink="false" — this is an identity, not a fetchable URL.
+        // builds. isPermaLink="false": this is an identity, not a fetchable URL.
         customData: `<guid isPermaLink="false">${origin}${link}#${iso}</guid>`,
       },
     };

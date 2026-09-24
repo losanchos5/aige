@@ -1,4 +1,4 @@
-// frameworks.ts: the regulatory map, faithful to bok/08-regulatory-map.md —
+// frameworks.ts: the regulatory map, faithful to bok/08-regulatory-map.md:
 // the reverse index that names, for each obligation, the engineering artefact
 // that evidences it and the stack layer the artefact lives in.
 //
@@ -73,7 +73,7 @@ export const frameworks: readonly Framework[] = [
     short: 'EU AI Act',
     type: 'law',
     issuer: 'European Union',
-    url: 'https://artificialintelligenceact.eu/ai-act-explorer/digital-omnibus/',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng',
     summary:
       "The EU's horizontal, risk-tiered law for AI (Regulation (EU) 2024/1689), amended by the Digital Omnibus (Regulation (EU) 2026/1744). High-risk Annex III obligations apply from 2 December 2027; Annex I embedded systems from 2 August 2028.",
   },
@@ -154,7 +154,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'NIST',
     url: 'https://csrc.nist.gov/pubs/ir/8596/iprd',
     summary:
-      'A draft Cybersecurity Framework (CSF 2.0) profile for AI, the Cyber AI Profile, organised around Secure, Defend and Thwart. Initial public draft released 16 December 2025; still in draft.',
+      'A draft Cybersecurity Framework (CSF 2.0) profile for AI, the Cyber AI Profile, organised around Secure, Defend and Thwart. Initial preliminary draft released 16 December 2025 (comments closed 30 January 2026); still in draft as of 2026-09-24.',
   },
   {
     id: 'nist-ai-800-1',
@@ -164,7 +164,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'NIST',
     url: 'https://www.nist.gov/news-events/news/2025/01/updated-guidelines-managing-misuse-risk-dual-use-foundation-models',
     summary:
-      'Draft voluntary guidance (Managing Misuse Risk for Dual-Use Foundation Models) for identifying, measuring and mitigating the misuse risk of dual-use foundation models across the AI lifecycle. Second public draft January 2025; still in draft.',
+      'Draft voluntary guidance (Managing Misuse Risk for Dual-Use Foundation Models) for identifying, measuring and mitigating the misuse risk of dual-use foundation models across the AI lifecycle. Second public draft January 2025; still in draft as of 2026-09-24.',
   },
   {
     id: 'csa-aicm',
@@ -202,7 +202,7 @@ export const frameworks: readonly Framework[] = [
     short: 'OWASP LLM',
     type: 'framework',
     issuer: 'OWASP GenAI Security Project',
-    url: 'https://genai.owasp.org/',
+    url: 'https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/',
     summary:
       'The LLM threat catalogue, including Excessive Agency at #3, answered by prompt-injection and output-handling controls and an eval gate.',
   },
@@ -212,7 +212,7 @@ export const frameworks: readonly Framework[] = [
     short: 'OWASP ACS',
     type: 'standard',
     issuer: 'OWASP GenAI Security Project',
-    url: 'https://genai.owasp.org/',
+    url: 'https://genai.owasp.org/resource/agent-control-standard-acs/',
     summary:
       'A standard for expressing agent controls as machine-readable control definitions the stack consumes directly.',
   },
@@ -222,7 +222,7 @@ export const frameworks: readonly Framework[] = [
     short: 'OWASP AIBOM',
     type: 'standard',
     issuer: 'OWASP GenAI Security Project',
-    url: 'https://genai.owasp.org/',
+    url: 'https://genai.owasp.org/initiatives/ai-sbom-initiative/',
     summary:
       'The AI bill-of-materials format and generator, producing CycloneDX ML-BOM and SPDX 3.0 AI output at build.',
   },
@@ -232,9 +232,9 @@ export const frameworks: readonly Framework[] = [
     short: 'California SB 53',
     type: 'law',
     issuer: 'State of California',
-    url: 'https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/',
+    url: 'https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB53',
     summary:
-      'A frontier-AI transparency law in force 1 January 2026, binding large frontier developers (models above ~10^26 FLOP; developer revenue over USD 500M) to publish a safety framework and report critical incidents to the state.',
+      'A frontier-AI transparency law in force 1 January 2026, binding large frontier developers (models above ~10^26 FLOP; developer revenue over USD 500M) to publish a frontier AI framework and report critical safety incidents to the California Office of Emergency Services within 15 days.',
   },
   {
     id: 'ny-raise-act',
@@ -274,7 +274,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'Republic of Korea',
     url: 'https://www.trade.gov/market-intelligence/south-korea-ai-basic-act',
     summary:
-      "South Korea's framework Act on AI (Basic Act on the Development of AI and Establishment of Trust), in force 22 January 2026. It sets baseline duties for AI operators and heightened obligations for \"high-impact\" AI in sensitive sectors; the ministry is running a grace period through 2026.",
+      "South Korea's framework Act on AI (Basic Act on the Development of AI and Establishment of Trust), in force 22 January 2026. It sets baseline duties for AI operators and heightened obligations for \"high-impact\" AI in sensitive sectors; the ministry (MSIT) is running a grace period of at least one year in 2026, deferring fact-finding investigations and fines except in serious cases.",
   },
   {
     id: 'uk-duaa',

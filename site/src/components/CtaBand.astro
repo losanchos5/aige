@@ -1,6 +1,6 @@
 ---
 /**
- * CtaBand — a full-width closing band with a headline and up to two buttons.
+ * CtaBand: a full-width closing band with a headline and up to two buttons.
  * Light theme: an ink block with ground-coloured text. Dark theme: the L1
  * layer's deep tone with the page's own ink (inverting there would make it a
  * cream slab, the brightest thing on the page). Primary = a solid fill in the
@@ -140,7 +140,7 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
     color: var(--band-fill);
   }
 
-  /* Secondary: an outline one weight down — the border is the text colour at
+  /* Secondary: an outline one weight down, the border is the text colour at
      45%, so the label (full text colour) keeps its contrast. */
   .cta-secondary {
     background: transparent;

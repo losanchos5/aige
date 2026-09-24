@@ -1,9 +1,9 @@
 ---
 /**
- * PathNode — one node of the learning path, as a register card in a stage grid.
+ * PathNode: one node of the learning path, as a register card in a stage grid.
  *
  * The card is a button (opens the side drawer when path.js is present) plus a
- * native <details> that carries the full body — summary, "In the Body of
+ * native <details> that carries the full body: summary, "In the Body of
  * Knowledge" links and curated "Resources" with type/cost badges. With no JS
  * the <details> is the whole interaction; with JS the details are hidden and
  * path.js shows a clone of the .pn-body inside the drawer. Every href is in the
@@ -28,9 +28,9 @@ interface Props {
   node: PathNode;
   /** Position within its stage, for the mono index. */
   index: number;
-  /** The node's prerequisites, resolved to {id,title} — the "Builds on" list. */
+  /** The node's prerequisites, resolved to {id,title}: the "Builds on" list. */
   builtOn?: readonly RelatedLink[];
-  /** Nodes that list this one as a prerequisite — the "Leads to" list. */
+  /** Nodes that list this one as a prerequisite: the "Leads to" list. */
   leadsTo?: readonly RelatedLink[];
 }
 

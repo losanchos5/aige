@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 
-// V4 — glossary hover cards + reading progress register. Assertions run in the
+// V4: glossary hover cards + reading progress register. Assertions run in the
 // `default` project; the screenshots below are review shots into V4/.
 
 test.describe('glossary term links', () => {

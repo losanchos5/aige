@@ -1,6 +1,6 @@
 ---
 /**
- * Home — the discipline, defined. A full-viewport hero (the headline on a
+ * Home: the discipline, defined. A full-viewport hero (the headline on a
  * moving gradient field, one CTA, a strip of figures), the definition with the
  * governance loop, the three questions, the five-layer stack, the eight values,
  * the role, a verdict beat, the Body of Knowledge, the resources and a closing
@@ -58,8 +58,9 @@ const jsonLd = {
 
 // The three questions that define the discipline. Stated verbatim in
 // role.capabilityStatement and as the stack layers' `question` fields; the
-// bodies paraphrase the corresponding stack layers (inventory, govern-as-code,
-// evals/assurance).
+// bodies paraphrase the layers that answer each one, the single model of
+// chapters 01 and 04 and the three-questions figure: 02 answers the first,
+// 01 and 04 the second, 03 and 05 the third. The swatch is the lead layer.
 const questions = [
   {
     index: '01',
@@ -70,7 +71,7 @@ const questions = [
   {
     index: '02',
     title: 'What is it allowed to do?',
-    body: 'Governance rules expressed as executable policy that evaluates in CI/CD and at runtime, so a bad release is blocked at the earliest point it can be, not discouraged in a review.',
+    body: "Governance rules written as executable policy and enforced at runtime, under each agent's own identity and scope, so a bad release or an out-of-scope call is blocked at the earliest point it can be, not discouraged in a review.",
     swatch: 'var(--l1)',
   },
   {
@@ -330,7 +331,7 @@ const resources = [
 </Marketing>
 
 <style>
-  /* Hero — the whole first viewport. A moving gradient field (hero-field.js
+  /* Hero: the whole first viewport. A moving gradient field (hero-field.js
      paints it on the canvas; the div's own background is the static fallback
      for no JS, no WebGL and the first paint), the headline centred on it in
      the serif display cut, one CTA, and a strip of figures along the foot.
@@ -652,7 +653,7 @@ const resources = [
     }
   }
 
-  /* Verdict beat — a dark band (tone="dark" re-scopes the dark tokens). The
+  /* Verdict beat: a dark band (tone="dark" re-scopes the dark tokens). The
      sentence and stamps sit in the container; the ticker breaks full-bleed.
      In the dark theme the default --band-bg (#0b0d10) all but vanishes on the
      #121417 page, so the band takes the L1 layer's deep tone instead (the same

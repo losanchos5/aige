@@ -1,7 +1,7 @@
 // crosswalk.ts: the topic-centred index built on frameworks.ts. Where
 // frameworks.ts answers "for this obligation, what artefact evidences it and on
 // which layer does it live?", this module answers the reader's other question:
-// "which article or clause of each framework deals with topic X?" — e.g. AI risk
+// "which article or clause of each framework deals with topic X?", e.g. AI risk
 // management is EU AI Act Art. 9, ISO/IEC 42001 6.1.2/6.1.3/8.2/8.3, NIST AI RMF
 // MAP/MANAGE and China's TC260 3.0 risk taxonomy.
 //
@@ -65,9 +65,11 @@ export interface CrosswalkRef {
   verified?: boolean;
 }
 
-/** EU AI Act article page on artificialintelligenceact.eu. */
+/** EU AI Act article in the EUR-Lex consolidated text (Reg. (EU) 2024/1689 as
+ *  amended by the Digital Omnibus, Reg. (EU) 2026/1744; consolidation of
+ *  2026-07-27). EUR-Lex anchors each article as #art_<n>. */
 const aia = (n: string): string =>
-  `https://artificialintelligenceact.eu/article/${n}/`;
+  `https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_${n}`;
 
 // One canonical URL per instrument keeps the refs terse and easy to re-point.
 const ISO_URL = 'https://www.iso.org/standard/42001';
@@ -78,6 +80,9 @@ const ALGOREC_URL = 'https://www.cac.gov.cn/2022-01/04/c_1642894606364259.htm';
 const DEEPSYN_URL = 'https://www.cac.gov.cn/2022-12/11/c_1672221949354811.htm';
 const GENAI_URL = 'https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm';
 const LABEL_URL = 'https://www.cac.gov.cn/2025-03/14/c_1743654684782215.htm';
+/** Official listing of GB/T 45654-2025 on the national standards platform. */
+const GBT_URL =
+  'https://openstd.samr.gov.cn/bzgk/std/newGbInfo?hcno=F67D3F376E0A0A0FF5317FB36B32A30A';
 
 /**
  * Chip prefix for the frameworks that share the China column, and the single
@@ -770,7 +775,8 @@ export const refs: readonly CrosswalkRef[] = [
     framework: 'cn-gbt-45654',
     ref: 'Corpus security',
     title: 'Training-corpus (data) security requirements',
-    note: 'GB/T 45654-2025 corpus-security requirements (TC260-003 predecessor §5); section id not verified against the published standard.',
+    url: GBT_URL,
+    note: 'GB/T 45654-2025 corpus-security requirements (TC260-003 predecessor §5). The official listing shows the standard as current (issued 2025-04-25, implemented 2025-11-01; checked 2026-09-24), but the full text is only offered there as an image preview, so the clause id is not verified against it.',
     strength: 'core',
     obligation: OBL_CN_GBT,
     verified: false,
@@ -955,7 +961,8 @@ export const refs: readonly CrosswalkRef[] = [
     framework: 'cn-gbt-45654',
     ref: 'Content labelling',
     title: 'Generated-content labelling requirements',
-    note: 'GB/T 45654-2025 content-labelling requirements (aligned with the 2025 Labelling Measures); section id not verified against the published standard.',
+    url: GBT_URL,
+    note: 'GB/T 45654-2025 content-labelling requirements (aligned with the 2025 Labelling Measures). The official listing shows the standard as current (issued 2025-04-25, implemented 2025-11-01; checked 2026-09-24), but the full text is only offered there as an image preview, so the clause id is not verified against it.',
     strength: 'related',
     obligation: OBL_CN_GBT,
     verified: false,
@@ -1527,7 +1534,8 @@ export const refs: readonly CrosswalkRef[] = [
     framework: 'cn-gbt-45654',
     ref: 'Security assessment',
     title: 'Security-assessment requirements for generative AI services',
-    note: 'GB/T 45654-2025 security-assessment requirements (TC260-003 predecessor §8 and Annex A risk list); section id not verified against the published standard.',
+    url: GBT_URL,
+    note: 'GB/T 45654-2025 security-assessment requirements (TC260-003 predecessor §8 and Annex A risk list). The official listing shows the standard as current (issued 2025-04-25, implemented 2025-11-01; checked 2026-09-24), but the full text is only offered there as an image preview, so the clause id is not verified against it.',
     strength: 'core',
     obligation: OBL_CN_GBT,
     verified: false,

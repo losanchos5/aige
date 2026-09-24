@@ -17,8 +17,9 @@ hardest object to govern because their behaviour is emergent and their actions h
 each with an owner, a declared scope, a status and a kill switch, fed by a runtime data path rather
 than typed by hand. It is the artefact that answers "what AI is running?". (ch. 04, 06)
 
-**AESIA.** Spain's Agencia Española de Supervisión de la Inteligencia Artificial, based in A Coruña;
-the first operational national AI supervisor in the EU, with sanctioning powers since 2025 [1]. (ch. 08)
+**AESIA.** Spain's Agencia Española de Supervisión de Inteligencia Artificial, a state agency based in
+A Coruña whose statute was approved by Royal Decree 729/2023, created to act as Spain's national
+supervisory authority for the AI Act [1]. (ch. 08)
 
 **AI Act (EU).** Regulation (EU) 2024/1689, the EU's horizontal, risk-tiered law for AI, amended by the
 Digital Omnibus [2]. It classifies systems by risk (prohibited, high-risk, limited, minimal) and
@@ -137,10 +138,11 @@ three chapters: Transparency, Copyright, and Safety and Security (the last for s
 [16]. (ch. 08)
 
 **Guardian agent.** An AI agent whose job is to supervise, check or constrain other agents at runtime;
-Gartner is reported to project guardian agents as a material share of the agentic market by 2030 [9]. (ch. 04, 05)
+Gartner predicts guardian-agent technologies will account for at least 10 to 15% of agentic AI markets
+by 2030 [9]. (ch. 04)
 
 **Harmonised standard.** A European standard cited in the Official Journal that, once cited, grants a
-presumption of conformity with a specific AI Act requirement. As of the book's date, none is yet cited
+presumption of conformity with a specific AI Act requirement. As of 2026-09-24, none is yet cited
 [10]. (ch. 08)
 
 **ISO/IEC 42005.** ISO/IEC 42005:2025, the AI system impact-assessment standard (a companion to the AI
@@ -242,22 +244,22 @@ national standards (GB and GB/T) and publishes the voluntary AI Safety Governanc
 
 ## Sources
 
-[1] AESIA (first operational national AI supervisor; sanctioning powers 2025). Research digest / AESIA. 2026. https://www.aesia.gob.es/ (verified: secondary)
-[2] EU AI Act + Digital Omnibus (Regulation (EU) 2026/1744, in force 27 Jul 2026; Arts. 17, 27, 50, 55, 72, 73; Annex III). AI Act Explorer. 2026. https://artificialintelligenceact.eu/ai-act-explorer/digital-omnibus/ (verified: primary)
+[1] Real Decreto 729/2023, de 22 de agosto, por el que se aprueba el Estatuto de la Agencia Española de Supervisión de Inteligencia Artificial (Royal Decree approving the AESIA statute; seat in A Coruña; BOE no. 210, 2 Sep 2023). Boletín Oficial del Estado. 2023-09-02. https://www.boe.es/eli/es/rd/2023/08/22/729 (verified: primary)
+[2] Regulation (EU) 2024/1689 (AI Act), consolidated text as amended by Regulation (EU) 2026/1744 (Digital Omnibus on AI, in force 27 Jul 2026; Arts. 17, 27, 50, 55, 72, 73; Annex III). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng (verified: primary)
 [3] NIST AI Risk Management Framework 1.0 (Govern, Map, Measure, Manage); OSCAL. NIST. 2023. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
 [4] AI Controls Matrix v1.1 (247 control objectives, 18 domains) and STAR for AI. Cloud Security Alliance. 2026-06-22. https://cloudsecurityalliance.org/star/ai (verified: primary)
 [5] OWASP AI Maturity Assessment (AIMA), reported at v1.0 (Aug 2025). OWASP GenAI Security Project. 2025. https://genai.owasp.org/initiatives/ (verified: reported)
 [6] Top 10 for Agentic Applications 2026 (ASI01–ASI10). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [7] MITRE ATLAS (adversarial threat knowledge base for AI). MITRE. 2026. https://atlas.mitre.org/ (verified: primary)
 [8] Model Context Protocol specification 2026-07-28 (OAuth 2.1 resource servers; Client ID Metadata Documents; issuer-bound credentials). Anthropic / MCP. 2026-07-28. https://blog.modelcontextprotocol.io/posts/2026-07-28/ (verified: primary)
-[9] Guardian agents reported as a material share (reported figure: 10-15%) of the agentic AI market by 2030: a separate Gartner guardian-agent prediction; the figure is not stated in the June 2025 project-cancellation release. Gartner (reported). 2025. https://www.gartner.com/en/newsroom (verified: reported)
-[10] No harmonised standard cited in the OJ → no presumption of conformity; ISO/IEC 42001 not harmonised. JTC 21 standards tracker. 2026. https://kla.digital/blog/jtc-21-standards-tracker (verified: secondary)
+[9] "Gartner Predicts that Guardian Agents will Capture 10-15% of the Agentic AI Market by 2030" (at least 10 to 15% of agentic AI markets by 2030). Gartner. 2025-06-11. https://www.gartner.com/en/newsroom/press-releases/2025-06-11-gartner-predicts-that-guardian-agents-will-capture-10-15-percent-of-the-agentic-ai-market-by-2030 (verified: primary)
+[10] Standardisation of the AI Act (no harmonised standard yet referenced in the Official Journal, so no presumption of conformity from any standard, ISO/IEC 42001 included; page last updated 2026-08-03; none found in the Publications Office index on 2026-09-24). European Commission. 2026-08-03. https://digital-strategy.ec.europa.eu/en/policies/ai-act-standardisation (verified: primary)
 [11] Policy Cards: machine-readable runtime governance artefacts for agents. arXiv 2510.24383. 2025-10. https://arxiv.org/abs/2510.24383 (verified: primary)
 [12] "Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models" (RAISE Act, S6953B/A6453B, signed 19 Dec 2025; oversight office within the Department of Financial Services). Governor Kathy Hochul (New York State). 2025-12-19. https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models (verified: primary)
-[13] Runtime data path critique of the AI-governance platform category. Kosmoy. 2026. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
+[13] "Best AI Governance Platforms in 2026: 14 Enterprise Vendors Compared" (vendor-published comparison of the 13 Magic Quadrant vendors plus its own product; most of the category "manages the program … without any runtime data path"). Kosmoy. 2026-07-10. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
 [14] California SB 53 / TFAIA (in force 1 Jan 2026; models above 10^26 FLOP; large frontier developers). Future of Privacy Forum. 2026. https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ (verified: secondary)
 [15] "New York Finalizes RAISE Act for Frontier AI Models; Law Takes Effect January 1, 2027" (chapter amendment signed 27 Mar 2026; effective 1 Jan 2027; DFS oversight office). Wiley. 2026. https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027 (verified: secondary)
-[16] GPAI Code of Practice (published 10 Jul 2025; voluntary; three chapters: Transparency, Copyright, Safety and Security). AI Act Explorer / European Commission. 2025-07-10. https://artificialintelligenceact.eu/introduction-to-code-of-practice/ (verified: primary)
+[16] The General-Purpose AI Code of Practice (published 10 Jul 2025; a voluntary tool; three chapters: Transparency, Copyright, Safety and Security). European Commission. 2025-07-10. https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai (verified: primary)
 [17] ISO/IEC 42005:2025, AI system impact assessment (companion to Art. 27 and ISO 42001 Annex A.5). ISO/IEC. 2025-05. https://www.iso.org/standard/44545.html (verified: secondary)
 [18] 《人工智能安全治理框架3.0》发布: announcement of the AI Safety Governance Framework 3.0 (TC260 under CAC guidance). Cyberspace Administration of China. 2026-09-14. https://www.cac.gov.cn/2026-09/14/c_1791137092283345.htm (verified: primary)
 [19] AI Safety Governance Framework 3.0 (人工智能安全治理框架3.0), bilingual PDF. TC260 / CAC. 2026-09-14. https://www.cac.gov.cn/rootimages/uploadimg/1791137114683961/1791137114683961.pdf (verified: primary)

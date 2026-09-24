@@ -14,7 +14,7 @@
 //
 // The data modules are TypeScript; they carry no runtime imports (only type-only
 // imports, which erase), so scripts/lib/load-ts.mjs transpiles each with the
-// installed `typescript` and imports it from a data: URL — no extra tooling.
+// installed `typescript` and imports it from a data: URL, no extra tooling.
 import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync, rmSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -115,7 +115,7 @@ function buildValuesPrinciples(values, principles, fig) {
 // -------------------------------------------------------------- maturity -- //
 function buildMaturityGrid(layers, levels, fig) {
   const W = 360;
-  // Illustrative profile — anchored to chapter 07's own example: inventory at
+  // Illustrative profile, anchored to chapter 07's own example: inventory at
   // Level 4, evals at Level 2, assurance at Level 3, identity/runtime at Level 4;
   // Govern-as-Code shown at Level 4 to dramatise that a strong layer does not
   // lift the floor. Labelled "illustrative"; the weakest layer sets the level.

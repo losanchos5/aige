@@ -234,7 +234,7 @@ def html_doc(body: str, extra_css: str = "") -> str:
     return (
         "<!doctype html>\n<html lang=\"en\"><head>\n<meta charset=\"utf-8\">\n"
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        f"<title>{TITLE} — The Thesis &amp; Body of Knowledge</title>\n"
+        f"<title>{TITLE} · The Thesis &amp; Body of Knowledge</title>\n"
         f"<style>{CSS}\n{extra_css}</style>\n</head>\n<body>\n{body}\n</body></html>\n"
     )
 

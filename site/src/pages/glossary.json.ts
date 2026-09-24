@@ -1,4 +1,4 @@
-// /glossary.json — a static endpoint the in-chapter hover cards fetch once to
+// /glossary.json: a static endpoint the in-chapter hover cards fetch once to
 // look up a term's definition and its glossary link. Shape:
 //   [{ term, slug, definition, url: '/resources/glossary#<slug>' }]
 // `slug` matches GlossaryIndex's `termId`, so `url` resolves to the term's <dt>.

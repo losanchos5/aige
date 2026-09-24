@@ -1,6 +1,6 @@
 // figures.ts: the typed manifest of the hand-made conceptual infographics under
 // src/figures/<id>.svg. Each entry names a figure, its two-sentence caption and
-// its text alternative, and where in the Body of Knowledge it is placed —
+// its text alternative, and where in the Body of Knowledge it is placed:
 // reusing the placement type and text-matching rules of the interactive archify
 // diagrams (src/data/diagrams.ts). The figures are inlined into the chapters at
 // Markdown-compile time by src/lib/rehype-diagrams.ts, wrapped in
@@ -18,14 +18,14 @@
 // from data by scripts/figures-build.mjs; the rest are hand-authored.
 // discipline-map is the whole "map of the discipline" (scripts/map-build.mjs):
 // it carries no chapter placement (placements: []) because it lives on /map, and
-// it is exempt from the usual figure budget — see VISUAL-GUIDE.md §2.4.
+// it is exempt from the usual figure budget: see VISUAL-GUIDE.md §2.4.
 // reading-paths lives on the /bok index page (src/pages/bok/index.astro), not
 // here, because it has no chapter placement and is rendered as accessible HTML.
 
 import type { DiagramPlacement } from './diagrams';
 
 export interface FigureDef {
-  /** Figure id — matches src/figures/<id>.svg. */
+  /** Figure id: matches src/figures/<id>.svg. */
   id: string;
   /** Short title (≤ 6 words) shown in the figcaption. */
   title: string;

@@ -110,7 +110,7 @@ function emDashes(file, raw) {
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
     .replace(/<script(?![^>]*application\/ld\+json)[\s\S]*?<\/script>/gi, ' ');
   const out = [];
-  const re = /—|&mdash;|&#8212;|&#x2014;/gi;
+  const re = /\u2014|&mdash;|&#8212;|&#x2014;/gi;
   let m;
   while ((m = re.exec(published)) !== null) {
     const start = Math.max(0, m.index - 50);
@@ -151,7 +151,7 @@ function danglingSrcAnchors(file, raw) {
 // The canonical book version lives in site/src/data/site.ts (`bokVersion`).
 // Any explicit "current version" statement in the front-matter files below must
 // agree with it. bok/CHANGELOG.md is excluded on purpose (it records historical
-// versions), and version *ranges* like `v0.1–v0.3` are not matched — only the
+// versions), and version *ranges* like `v0.1–v0.3` are not matched, only the
 // lead-ins below, which mark a statement of the current version.
 const REPO_ROOT = resolve(HERE, '..', '..');
 const SITE_TS = resolve(HERE, '..', 'src', 'data', 'site.ts');

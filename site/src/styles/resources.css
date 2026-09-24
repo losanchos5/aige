@@ -1,5 +1,5 @@
 /* resources.css: the shared editorial styling for the Resources section
-   (/resources and its four sub-pages). Flat and matte — tokens only, so light
+   (/resources and its four sub-pages). Flat and matte: tokens only, so light
    and dark both follow. Class names are prefixed (res-, rc-, ft-, ob-, tk-,
    tl-, rd-, gl-) to stay out of the way of the prose and component styles. */
 
@@ -223,7 +223,7 @@
 }
 
 /* Zebra striping aids row tracking on the dense obligation tables. Wide screens
-   only — below 720px rows are stacked cards and carry their own surface. */
+   only: below 720px rows are stacked cards and carry their own surface. */
 @media (min-width: 721px) {
   .res-table tbody tr:nth-child(even) {
     background: color-mix(in srgb, var(--ink) 3%, transparent);

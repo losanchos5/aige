@@ -1,4 +1,4 @@
-// /resources/obligations.json — a static endpoint that exports the obligation
+// /resources/obligations.json: a static endpoint that exports the obligation
 // index (the same `obligations` array the frameworks page renders) as JSON. The
 // disclaimer travels in a top-level `notice` field, alongside the BoK version,
 // licence and source URL, so it cannot be stripped in transit. Pagefind indexes

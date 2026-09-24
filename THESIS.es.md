@@ -23,8 +23,8 @@ auditoría, nunca por cuántos marcos aparecen en una diapositiva.
 La idea no surge de la nada. Hereda de una línea de movimientos de ingeniería que convirtieron el
 proceso en sistemas en ejecución: la ingeniería de fiabilidad de sitios (SRE), DevSecOps, la política
 como código (policy-as-code) y la seguridad de la cadena de suministro de software. De forma más
-directa, hereda de la ingeniería GRC (gobernanza, riesgo y cumplimiento), que en los últimos dos años convirtió
-la gobernanza, el riesgo y el cumplimiento en un producto construido con código, probado en CI/CD y que
+directa, hereda de la ingeniería GRC (gobernanza, riesgo y cumplimiento), que desde aproximadamente 2024
+ha convertido la gobernanza, el riesgo y el cumplimiento en un producto construido con código, probado en CI/CD y que
 entrega evidencia a través de APIs [1]. La gobernanza de IA necesita ahora el mismo salto, porque lo que
 se gobierna (modelos que se reentrenan, prompts que cambian, agentes que actúan por su cuenta) se mueve
 más rápido de lo que cualquier documento puede seguir.
@@ -55,23 +55,25 @@ puede describir el riesgo; la gobernanza integrada en el pipeline puede prevenir
 
 **4. Teatro de marcos.** Mapear a NIST AI RMF o a ISO/IEC 42001 se convierte en el estado final en lugar
 de en el punto de partida. Se confunde una matriz de mapeo en verde con un control que funciona. Y, sin
-embargo, a día de hoy no hay ninguna norma armonizada citada en el Diario Oficial de la UE, de modo que
+embargo, a 2026-09-24 no hay ninguna norma armonizada citada en el Diario Oficial de la UE, de modo que
 ni siquiera un certificado ISO 42001 confiere presunción de conformidad con el Reglamento de IA [6]. La
 cobertura no es aseguramiento. Un crosswalk (tabla de correspondencias) demuestra que has leído el marco,
 no que el control al que apunta se dispare de verdad; una matriz en verde sobre un control roto es
 «teatro con pasos de más» [2].
 
-**5. Sin vía de datos en tiempo de ejecución.** El registro no sabe qué está en ejecución. La mayor
-parte de la categoría de plataformas de gobernanza de IA «gestiona el programa (inventarios,
-evaluaciones, mapeos de marcos, flujos de trabajo de evidencia) sin ninguna vía de datos en tiempo de
-ejecución» [7]. Una lectura independiente del propio líder de la categoría apunta en la misma dirección:
-el relato de IBM sobre encabezar el primer Cuadrante Mágico de Gartner para Plataformas de Gobernanza de
-IA (2026) describe visibilidad sobre los casos de uso de IA, un inventario centralizado de activos de IA
-y su trazabilidad, y la incorporación de casos de uso (la capa de programa), no la aplicación de
-controles en tiempo de ejecución [10]. Así, las tres preguntas que definen la disciplina (qué IA está en
+**5. Sin vía de datos en tiempo de ejecución.** El registro no sabe qué está en ejecución. Gartner
+pide a las plataformas de gobernanza de IA «la aplicación automatizada de políticas en tiempo de
+ejecución» [11]; sin embargo, la comparativa de un proveedor, publicada por un competidor de la propia
+categoría, concluye que la mayor parte de ella «gestiona el programa (inventarios, evaluaciones, mapeos
+de marcos, flujos de trabajo de evidencia) sin ninguna vía de datos en tiempo de ejecución» [7]. El
+propio relato de IBM sobre su reconocimiento como Líder en el primer Cuadrante Mágico de Gartner para
+Plataformas de Gobernanza de IA (junio de 2026) apunta en la misma dirección: describe visibilidad sobre
+los casos de uso de IA y una hoja de ruta de inventario centralizado de activos de IA, trazabilidad e
+incorporación de casos de uso (la capa de programa), y no menciona la aplicación de controles en tiempo
+de ejecución [10]. Así, las tres preguntas que definen la disciplina (qué IA está en
 ejecución, qué se le permite hacer, qué evidencia lo demuestra) quedan sin responder, porque nada está
-conectado a producción. Mientras tanto, aproximadamente una de cada ocho brechas de IA notificadas
-implica ya a un agente autónomo [8]: justo la capa que el registro en papel no puede ver.
+conectado a producción. Mientras tanto, la encuesta de 2026 de un proveedor de seguridad señala que
+aproximadamente una de cada ocho brechas de IA afectó a sistemas agénticos [8]: justo la capa que el registro en papel no puede ver.
 
 ## Valores
 
@@ -188,8 +190,9 @@ transparencia; Evals y red teaming como evidencia; Controles y observabilidad en
 Aseguramiento y cumplimiento continuo).
 
 Reconocemos la herencia con claridad, porque es la defensa honesta frente a «esto no es más que GRC con
-palabras de IA». Tres de las cinco capas (Govern-as-Code, la evidencia legible por máquina y Assurance &
-Continuous Compliance) se heredan de la ingeniería GRC y se trasladan casi sin cambios. Dos son lo que la
+palabras de IA». Tres de las cinco capas (Govern-as-Code, Inventory & Transparency y Assurance &
+Continuous Compliance, que aportan la política como código, el inventario de activos y la evidencia
+legible por máquina) se heredan de la ingeniería GRC y se trasladan casi sin cambios. Dos son lo que la
 IA nos obliga a añadir: las evals y el red teaming *como controles* (capa 03), porque lo que se gobierna
 es un modelo cuyo comportamiento solo puede establecerse probándolo; y la identidad de los agentes y el
 control en tiempo de ejecución (capa 04), porque un actor autónomo no tiene análogo en el GRC clásico. El
@@ -246,8 +249,9 @@ García Aibar y Aurélie Pols.
 [3] AI Governance Profession Report 2025. IAPP (with Credo AI). 2025-04-16. https://iapp.org/resources/article/ai-governance-profession-report/ (verified: primary)
 [4] "Gartner Predicts Over 40% of Agentic AI Projects Will Be Canceled by End of 2027". Gartner. 2025-06-25. https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027 (verified: primary)
 [5] "Gartner Forecasts the Market for Securing AI Will Reach Almost $5 Billion in 2027". Gartner. 2026-08-26. https://www.gartner.com/en/newsroom/press-releases/2026-08-26-gartner-forecasts-the-market-for-securing-ai-will-reach-almost-5-billion-in-2027 (verified: primary)
-[6] CEN-CENELEC JTC 21 standards tracker / CSA research note (no harmonised standard cited in the OJ; ISO/IEC 42001 not a harmonised standard). 2026. https://kla.digital/blog/jtc-21-standards-tracker (verified: secondary)
-[7] "Best AI Governance Platforms 2026" (runtime data path critique). Kosmoy. 2026. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
-[8] Threat Report 2026 (~1 in 8 reported AI breaches involve autonomous agents). HiddenLayer. 2026. https://www.hiddenlayer.com/report-and-guide/threatreport2026 (verified: reported)
+[6] Standardisation of the AI Act (no harmonised standard yet referenced in the Official Journal, so no Art. 40 presumption of conformity from any standard, ISO/IEC 42001 included; page last updated 2026-08-03; no Commission implementing decision citing one found in the Publications Office index on 2026-09-24). European Commission. 2026-08-03. https://digital-strategy.ec.europa.eu/en/policies/ai-act-standardisation (verified: primary)
+[7] "Best AI Governance Platforms in 2026: 14 Enterprise Vendors Compared" (vendor-published comparison of the 13 Magic Quadrant vendors plus its own product; runtime data path critique). Kosmoy. 2026-07-10. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
+[8] 2026 AI Threat Landscape Report (vendor survey; key finding stated on the report page: one in eight breaches were agentic). HiddenLayer. 2026. https://www.hiddenlayer.com/report-and-guide/threatreport2026 (verified: primary)
 [9] "AI Governance Engineering" (governing AI used inside engineering workflows). Visure Solutions. 2026. https://visuresolutions.com/ai-engineering/ai-governance-engineering/ (verified: primary)
-[10] "IBM recognized as a Leader in the Gartner Magic Quadrant for AI Governance Platforms" (first-ever MQ; the program layer: visibility into AI use cases, AI asset inventory and lineage, use-case onboarding). IBM. 2026. https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms (verified: primary)
+[10] "IBM recognized as a Leader in the Gartner Magic Quadrant for AI Governance Platforms" (vendor announcement citing Gartner, Magic Quadrant for AI Governance Platforms, L. Kornutick et al., 17 June 2026, the first MQ for the category; visibility into AI use cases; roadmap: AI asset inventory and lineage, use-case onboarding). IBM. 2026-06-17. https://www.ibm.com/new/announcements/ibm-recognized-as-a-leader-in-gartner-magic-quadrant-for-ai-governance-platforms (verified: secondary)
+[11] "Global AI Regulations Fuel Billion-Dollar Market for AI Governance Platforms" (platforms should enable "automated policy enforcement at runtime"; AI governance spending USD 492M in 2026, over USD 1B by 2030). Gartner. 2026-02-17. https://www.gartner.com/en/newsroom/press-releases/2026-02-17-gartner-global-ai-regulations-fuel-billion-dollar-market-for-ai-governance-platforms (verified: primary)

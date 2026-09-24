@@ -1,4 +1,4 @@
-// /resources/crosswalk.json — a static endpoint that exports the topic ×
+// /resources/crosswalk.json: a static endpoint that exports the topic ×
 // framework crosswalk as JSON. The disclaimer travels in a top-level `notice`
 // field, alongside the BoK version, licence and source URL, so it cannot be
 // stripped in transit. Pagefind indexes HTML only, so this endpoint is not

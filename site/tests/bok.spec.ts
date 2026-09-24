@@ -200,7 +200,7 @@ test('search opens with Ctrl+K and returns results for "policy"', async ({ page 
 });
 
 // TC-05: the result rows are built at runtime, so the dialog's styles must
-// reach them — display-font titles, no underline, and a token-tinted <mark>
+// reach them: display-font titles, no underline, and a token-tinted <mark>
 // instead of the browser's yellow. TC-17: one Esc closes, even with text typed.
 test('search results are styled and a single Escape closes the dialog', async ({ page }) => {
   await page.goto('/bok/the-stack');

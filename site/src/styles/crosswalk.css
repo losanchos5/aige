@@ -1,5 +1,5 @@
 /* crosswalk.css: the topic × framework crosswalk grid, the per-topic reference
-   lists and the reference drawer (/resources/crosswalk). Flat and matte — tokens
+   lists and the reference drawer (/resources/crosswalk). Flat and matte: tokens
    only, so light and dark both follow. Class names are prefixed (cw-, cwd-) to
    stay out of the way of the shared resources styles. Text keeps ink/ink-2 (not
    --muted) so it clears 4.5:1 on the pale chip fills in both themes. */
@@ -198,7 +198,7 @@
    kept for the layer ticks and codes (audit SL-06): the chip label and the
    column head name the framework, so its type is not coded in colour. Related
    refs lose the fill and take a dashed border in the chip's ink; unverified
-   refs carry a dotted underline and a visible "?" (never dimmed — opacity
+   refs carry a dotted underline and a visible "?" (never dimmed: opacity
    would drop contrast below AA). */
 .cw-chip {
   display: inline-flex;
@@ -307,7 +307,7 @@
 }
 
 /* The references that belong to the column the reader came from, highlighted in
-   the drawer's clone. ink-2 sits on a pale tint here — clears AA in both themes. */
+   the drawer's clone. ink-2 sits on a pale tint here: clears AA in both themes. */
 .cwd-body .cw-refs > li[data-active] {
   padding-left: var(--s-3);
   border-left: 3px solid var(--l1-ink);

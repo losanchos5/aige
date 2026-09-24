@@ -63,7 +63,7 @@ for (const route of routes) {
         }
 
         const detail = serious
-          .map((v) => `${v.id} [${v.impact}] ${v.help} — ${v.nodes.length} node(s)`)
+          .map((v) => `${v.id} [${v.impact}] ${v.help}: ${v.nodes.length} node(s)`)
           .join('\n');
         expect(serious, `serious/critical a11y violations on ${route} ${scheme} ${width}:\n${detail}`).toEqual(
           [],

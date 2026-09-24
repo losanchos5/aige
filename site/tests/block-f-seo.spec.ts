@@ -1,4 +1,4 @@
-// block-f-seo.spec.ts: acceptance checks for Block F1 — the JSON-LD @graph on a
+// block-f-seo.spec.ts: acceptance checks for Block F1, the JSON-LD @graph on a
 // Body of Knowledge chapter, the Open Graph locale, and the web manifest.
 //
 // The chapter's own nodes now share one @graph with the site-wide Organization

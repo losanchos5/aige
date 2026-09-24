@@ -6,7 +6,7 @@
 // SVG in a canvas, an empty aria-live note panel that public/diagram.js fills,
 // a caption with the title/caption and a link to the full interactive viewer,
 // and a JSON payload of per-node { label, sublabel?, note? } the script reads.
-// The SVG carries no styles of its own — src/styles/diagrams.css maps the
+// The SVG carries no styles of its own: src/styles/diagrams.css maps the
 // archify semantic classes to the site tokens.
 
 import { existsSync, readFileSync } from 'node:fs';
@@ -102,7 +102,7 @@ function loadNotes(id: string, type: string): Record<string, string> {
  * error when the generated SVG is missing (regenerate with the build script).
  *
  * With `opts.bare`, the figure gets the extra `diagram--bare` class and emits
- * only the canvas, the note panel and the notes payload — no figcaption and no
+ * only the canvas, the note panel and the notes payload, no figcaption and no
  * enlarge dialog. It is the frame-only variant used where the surrounding page
  * supplies its own chrome (e.g. the homepage hero). public/diagram.js still
  * wires the hover/note highlight and the draw-on; it already guards the missing
@@ -161,7 +161,7 @@ export function renderDiagramFigure(id: string, opts?: { bare?: boolean }): stri
   // Enlarge is a no-op without JS (a bare button with no target), so it ships
   // hidden; public/diagram.js reveals it and moves the canvas (button and all)
   // into the dialog, where diagrams.css hides the button again. It overlays the
-  // canvas top-right, so it lives inside .diagram-canvas — the frame-only `bare`
+  // canvas top-right, so it lives inside .diagram-canvas: the frame-only `bare`
   // variant leaves it out and lets the host page own the enlarge chrome.
   // data-pagefind-ignore keeps the UI label ("⤢ Enlarge") out of search excerpts.
   const enlargeBtn =
@@ -170,7 +170,7 @@ export function renderDiagramFigure(id: string, opts?: { bare?: boolean }): stri
     `</button>`;
   const canvasWithEnlarge = `<div class="diagram-canvas">${svg}${enlargeBtn}</div>`;
 
-  // Bare: frame only — canvas, note panel and the notes payload, no figcaption
+  // Bare: frame only, canvas, note panel and the notes payload, no figcaption
   // and no enlarge dialog. The host page owns the caption/enlarge chrome.
   if (bare) {
     return openTag + canvas + notePanel + notesScript + `</figure>`;

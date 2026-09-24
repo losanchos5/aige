@@ -63,7 +63,7 @@ Decisión de Jordi del 2026-09-23, tomada tras ver el bloque 1 de distill:
 ### 3.2 Veredictos
 
 - **Especificidad de diseño: falla parcialmente.**
-  - **Pasa en la capa de referencia:** tesis, capítulos del BoK, glosario, crosswalk, tablas de `/role`, índice de obligaciones, `/map` y la 404 («Verdict: BLOCK — Route not registered.»).
+  - **Pasa en la capa de referencia:** tesis, capítulos del BoK, glosario, crosswalk, tablas de `/role`, índice de obligaciones, `/map` y la 404 («Verdict: BLOCK. Route not registered.»).
   - **Falla en landing y chrome** (`/`, `/role`, `/stack`, `/path`, hero de `/map`, `/resources`, `/404`). Si en el hero se cambia el titular, lo que queda sirve a cualquier startup de compliance: telemetría simulada, franja de cifras con count-up, bento con tesela vacía, ticker, banda CTA oscura y secciones 01–07 con eyebrow + H2 + lede.
   - Por la restricción de §2, la parte de la falla que viene de la malla no se corrige. El resto sí.
 - **Integridad de implementación: PASS con reservas** (C 3/4; B coincide con 3/4). El sistema es propio y coherente, pero:
@@ -83,7 +83,7 @@ Tras desduplicar (un hecho visto por varios cuenta una vez):
 |---|---|
 | Hallazgos únicos | **98**: 22 patrones de slop (SL), 39 de página (§5), 27 técnicos (TC), 9 de malla (MS, §8) y 1 del detector (DET) |
 | Por impacto | P0 0 · P1 10 · P2 39 · P3 49 |
-| Por eje | P1 contraste/jerarquía 46 · P2 ritmo/espaciado 28 · P3 movimiento 8 · — funcional/copy/código 16 |
+| Por eje | P1 contraste/jerarquía 46 · P2 ritmo/espaciado 28 · P3 movimiento 8 · n/a funcional/copy/código 16 |
 | Por bloque primario | D1 11 · D4 18 · D2 27 · D3 15 · D5 13 · D6 4 · sin bloque 10 |
 | ¿Amplía el alcance? | no 60 · sí 17 · pendiente de Jordi 11 · sin bloque 10 |
 | Fuera del cambio actual (sí + sin bloque) | 27 |
@@ -129,7 +129,7 @@ Tras desduplicar (un hecho visto por varios cuenta una vez):
 ## 4. Patrones de slop por componente
 
 **Leyenda:**
-- **Eje:** P1 contraste/jerarquía (lo que se lee y cuánto destaca: contraste, peso, color, tipografía), P2 ritmo/espaciado (layout, alineación, responsive, microtipografía), P3 movimiento. «—» marca lo funcional, de copy o de código.
+- **Eje:** P1 contraste/jerarquía (lo que se lee y cuánto destaca: contraste, peso, color, tipografía), P2 ritmo/espaciado (layout, alineación, responsive, microtipografía), P3 movimiento. «sin bloque» marca lo funcional, de copy o de código.
 - **Imp.:** severidad de impacto de P0 a P3.
 - **Visto por:** A = diseño, B = detector, C = técnica.
 - **Tokens:** todas las sustituciones usan solo tokens de DESIGN.md.
@@ -138,27 +138,27 @@ Tras desduplicar (un hecho visto por varios cuenta una vez):
 | ID | Patrón | Ficheros + selectores | Rutas | Anchos/temas | Visto por | Eje · imp. | Quitar / conservar / sustituir | Estado |
 |---|---|---|---|---|---|---|---|---|
 | SL-01 | **Telemetría simulada en el hero.** Pip «● LIVE», «run #4821», «attestation #4821», sello PASS girado y ticker de logs inventados («eval.safety 0.97», «pii.leak detected»). Contradice «Sourced / No hype» de PRODUCT.md. El ticker solo se pausa con hover y con `reduce` queda truncado a ~1/5. | `index.astro` `.hero-panel-bar .meta`, `.hero-live`, `.hero-stamp` (`rotate(-6deg)`), `.hero-attn`; `VerdictTicker.astro` `.vt-track` (`vt-scroll` 42/30 s infinito) | / | todos | A S11 · B marquee, dark-glow · C P1-5, P2-5 | P1 · imp. P1 | Quitar pip, números de run/attestation, rotación y ticker. Conservar `VerdictStamp` sin girar y el diagrama del bucle como figura estática con leyenda. Si el ticker se queda: pausa por foco/botón y `flex-wrap` con `reduce`. | en curso (chip live, bucle del ticker) · amplía |
-| SL-02 | **Movimiento perpetuo en la home.** Paquete rAF de `hero.js` que no para, `hero-closes-march`, `bar-flash` ×5 y `pulse-up`, que anima `top` (relayout en cada frame). Son 6 tipos (C) y ~9 instancias (A). Compite con el titular y no tiene pausa por teclado. | `public/hero.js`; `index.astro` `hero-closes-march`; `StackDiagram.astro` `.d-pulse` (`pulse-up`), `.d-bar::after` (`bar-flash`) | /, /stack | todos · solo `no-preference` | A (movimiento) · C P2-6 | P3 · imp. P2 | Mínimo: `pulse-up` con `transform: translateY` y pausa fuera del viewport. Recomendado: quitar los bucles y dejar `flow-draw`, reveals y drawers. `mesh-drift` va en MS-04. | — |
+| SL-02 | **Movimiento perpetuo en la home.** Paquete rAF de `hero.js` que no para, `hero-closes-march`, `bar-flash` ×5 y `pulse-up`, que anima `top` (relayout en cada frame). Son 6 tipos (C) y ~9 instancias (A). Compite con el titular y no tiene pausa por teclado. | `public/hero.js`; `index.astro` `hero-closes-march`; `StackDiagram.astro` `.d-pulse` (`pulse-up`), `.d-bar::after` (`bar-flash`) | /, /stack | todos · solo `no-preference` | A (movimiento) · C P2-6 | P3 · imp. P2 | Mínimo: `pulse-up` con `transform: translateY` y pausa fuera del viewport. Recomendado: quitar los bucles y dejar `flow-draw`, reveals y drawers. `mesh-drift` va en MS-04. | n/a |
 | SL-03 | **Register rule numerado 01–07.** Contador 01–07 que nadie referencia. Compite con cinco numeraciones de contenido (preguntas 01–03, capas 01–05, capítulos 00–10, valores 01–08, workflows 01–07) y deja tres niveles de etiqueta por sección. | `Marketing.astro` `.marketing > section + section::before { content: counter(rule, decimal-leading-zero) }` | /, /role, /stack, /path, /map, /resources | todos | A S3 · worklist B | P1 · imp. P2 | Quitar el contador y conservar `border-top: 1px solid var(--line)`. Reservar los ceros a la izquierda para capas y capítulos. Actualizar DESIGN.md («Register-rule dividers»). Revierte la tarea 6.2. | en curso (home) · amplía |
 | SL-04 | **Fórmula eyebrow + H2 + lede y chips de kicker.** Eyebrow + H2 + lede en 6–8 secciones por página. PageHero apila dos eyebrows. Hay chips «Chapter 04» y «FIGURE», y un swatch de color de kicker que no significa nada. | `Kicker.astro` `.kicker .label`/`.square`; `PageHero.astro` `.hero--landing .hero-eyebrow :global(.kicker .square)` + `.hero-eyebrow > .meta`; `ChapterHeader.astro` `.ch-kicker-num`; `figures.css` `.figure-fig-chip`; `index.astro` `kickerSwatch` | /, /role, /stack, /path, /map, /bok, /bok/*, /thesis | todos | A S4 · worklist B, C.2 | P1 · imp. P2 | Kicker solo si aporta un dato que no dice el H2 (p. ej. «Body of Knowledge · v0.4.0 · CC BY 4.0»). Un solo eyebrow en PageHero: el enlace al capítulo como línea `--fs-small` bajo el lede. Fuera el chip FIGURE (el `<figcaption>` basta). Swatch `--ink` o ninguno. | en curso (kickers-chip de la home) · amplía |
-| SL-05 | **Mono mayúsculas omnipresente.** Mono en mayúsculas en botones, enlaces, etiquetas de 31–55 caracteres y cabeceras de 11 px. Todo «susurra en voz alta» y la jerarquía se aplana. | `Kicker`; `.meta` (`effects.css`); `.sec-link a`; `.chapter-link` (`pages.css`); botones DOWNLOAD CSV/JSON, EXPAND ALL, RESET PROGRESS, CLOSE; `.res-table thead th`, `.mx-rowh` (11 px); etiquetas de `StackLayerPanel` (6 por tarjeta); colofón `p.meta` de `Footer.astro`; `StackFlow` `.fp-eyebrow`; `PathMap` `.stage-tagline`, `.path-edges-hint`; `ObligationTable` `legend`; miga actual de `Breadcrumb`; `prose.css` `thead th` | todas (/resources/frameworks 150, /path 103, /stack 75, /map 62, /role 59, / 52) | todos; más denso a 390 | A S14 · B all-caps-body 58 (D) · C (lo da por prescrito) | P1 · imp. P2 | Mono mayúsculas solo para identificadores (`Art. 9`, versiones, fechas, «ch. 08») y cabeceras de tabla a `--fs-label`. Botones y enlaces en `--font-body` `--fs-small` con capitalización de frase. Etiquetas de 40 caracteres o más, en capitalización de frase. | — · amplía |
-| SL-06 | **Colores de capa sin significado estable.** Los cinco `--lN` rotan con `% 5` en numerales, cabecera y chips de capítulo, y en swatches. También se reutilizan para el tipo de marco: el azul significa «law» y «Layer 01» en la misma pantalla del crosswalk, y la cabecera del capítulo 04 sale verde. | `ValuePair.astro` `tint = var(--l${((n-1)%5)+1})`; `Doc.astro` `headerLayers[order % 5]`; chips de número de `/bok` y `ChapterGrid`; `kickerSwatch`; swatches de `ResourceCard`; `crosswalk.css` `.cw-chip[data-type]`; `resources.css` `.type-tag[data-type]` | /, /bok, /bok/*, /resources, /resources/crosswalk, /resources/frameworks | todos | A S6 · C lo cita como positivo · DESIGN.md l.164 lo permite | P1 · imp. P1 | Regla: `--lN` solo si el elemento pertenece a la capa N. Chips de tipo en neutro (`--surface` + 1 px `--line` + `--ink`, distinguidos por contorno o etiqueta). Cabecera y chips de capítulo con `--ink-2` sobre `--tint-bg`. Numerales en `--muted`. Revierte la tarea 8.2 y toca el requisito de color de capítulo de `reading-experience`. | — · amplía |
-| SL-07 | **Figuras archify coloreadas por kind, no por capa.** El color de los nodos depende del tipo técnico: «Layer 01» sale ámbar en el hero; la figura del capítulo 04 pinta las cinco capas en rosa y ámbar, con la leyenda «Database / Security»; y el diagrama «obligation → evidence» va justo encima del heat index, que sí colorea bien. Incumple VISUAL-GUIDE §1.6. | `diagrams.css` `.diagram svg .c-frontend→--l1`, `.c-backend→--l2`, `.c-database→--l3`, `.c-security→--l4`, `.c-cloud→--l5`; IR en `site/diagrams/*.json` | /, /bok/the-stack, /resources/frameworks | todos | A S7 | P1 · imp. P1 | Colorear por grupo o zona de capa (la IR ya nombra «Layer 0N»). Nodos sin capa en `c-external` (`--bg` + `--muted`). Leyenda por capa. Queda fuera de alcance: es Non-Goal de design.md y está en PENDIENTE.md. | — |
-| SL-08 | **Raíl lateral en callouts.** Barra de 3 px en «NOTE» e «IN PRACTICE». Es neutra y no codifica nada: el tipo ya se distingue por el tinte y la etiqueta. | `Callout.astro` `.callout { border-left: 3px solid var(--rail) }`; `prose.css` `.prose .callout` | /bok/* (patterns ×17, the-stack, values-and-principles, regulatory-map), /stack, /resources/crosswalk | todos | A S5 · B side-tab 18 R · C advisory | P1 · imp. P2 | Borde completo de 1 px `--line` con la etiqueta dentro, o `--tint-bg` sin raíl. | — |
-| SL-09 | **Raíl degradado en AtAGlance.** Degradado de capas l1→l5 de 3 px sobre una lista que no es de capas: decoración. | `AtAGlance.astro` `.glance::after` | /bok/* | todos | A S5 · worklist C.5 · B FP | P1 · imp. P3 | Quitarlo. Caja plana `--surface` + 1 px `--line`. | — |
-| SL-10 | **Raíl degradado en el pullquote.** Degradado `--l5-ink`→`--l5` en el pullquote de «The role». | `index.astro` `.pullquote::before` | / | todos | A S5 · B FP (convención de cita) | P1 · imp. P3 | Conservar un raíl de cita plano (`--line` o `--ink-2`, 2–3 px), sin degradado ni color de capa. | — |
-| SL-11 | **Banda de 8 px en StackLayerPanel.** Es la tercera codificación de la capa (ya están el número, el nombre y las barras fijas). | `StackLayerPanel.astro` `.layer-panel .band` | /stack | todos; en oscuro casi desaparece | A S5 | P1 · imp. P2 | Sustituirla por un cuadrado de capa `--lN` junto al número. | — |
-| SL-12 | **Raíl de capa en nodos core.** Borde de tinta grueso + raíl de 3 px: se lee como una tarjeta «admonition». Como la franja codifica la capa, no es slop puro. | `PathNode.astro` `.path-node { border-left: 3px solid var(--c) }` | /path | 1440 | A S5 · B FP (codifica la capa) | P1 · imp. P3 | Opcional: cuadrado de capa junto a «CORE» y borde uniforme. | — |
+| SL-05 | **Mono mayúsculas omnipresente.** Mono en mayúsculas en botones, enlaces, etiquetas de 31–55 caracteres y cabeceras de 11 px. Todo «susurra en voz alta» y la jerarquía se aplana. | `Kicker`; `.meta` (`effects.css`); `.sec-link a`; `.chapter-link` (`pages.css`); botones DOWNLOAD CSV/JSON, EXPAND ALL, RESET PROGRESS, CLOSE; `.res-table thead th`, `.mx-rowh` (11 px); etiquetas de `StackLayerPanel` (6 por tarjeta); colofón `p.meta` de `Footer.astro`; `StackFlow` `.fp-eyebrow`; `PathMap` `.stage-tagline`, `.path-edges-hint`; `ObligationTable` `legend`; miga actual de `Breadcrumb`; `prose.css` `thead th` | todas (/resources/frameworks 150, /path 103, /stack 75, /map 62, /role 59, / 52) | todos; más denso a 390 | A S14 · B all-caps-body 58 (D) · C (lo da por prescrito) | P1 · imp. P2 | Mono mayúsculas solo para identificadores (`Art. 9`, versiones, fechas, «ch. 08») y cabeceras de tabla a `--fs-label`. Botones y enlaces en `--font-body` `--fs-small` con capitalización de frase. Etiquetas de 40 caracteres o más, en capitalización de frase. | n/a · amplía |
+| SL-06 | **Colores de capa sin significado estable.** Los cinco `--lN` rotan con `% 5` en numerales, cabecera y chips de capítulo, y en swatches. También se reutilizan para el tipo de marco: el azul significa «law» y «Layer 01» en la misma pantalla del crosswalk, y la cabecera del capítulo 04 sale verde. | `ValuePair.astro` `tint = var(--l${((n-1)%5)+1})`; `Doc.astro` `headerLayers[order % 5]`; chips de número de `/bok` y `ChapterGrid`; `kickerSwatch`; swatches de `ResourceCard`; `crosswalk.css` `.cw-chip[data-type]`; `resources.css` `.type-tag[data-type]` | /, /bok, /bok/*, /resources, /resources/crosswalk, /resources/frameworks | todos | A S6 · C lo cita como positivo · DESIGN.md l.164 lo permite | P1 · imp. P1 | Regla: `--lN` solo si el elemento pertenece a la capa N. Chips de tipo en neutro (`--surface` + 1 px `--line` + `--ink`, distinguidos por contorno o etiqueta). Cabecera y chips de capítulo con `--ink-2` sobre `--tint-bg`. Numerales en `--muted`. Revierte la tarea 8.2 y toca el requisito de color de capítulo de `reading-experience`. | n/a · amplía |
+| SL-07 | **Figuras archify coloreadas por kind, no por capa.** El color de los nodos depende del tipo técnico: «Layer 01» sale ámbar en el hero; la figura del capítulo 04 pinta las cinco capas en rosa y ámbar, con la leyenda «Database / Security»; y el diagrama «obligation → evidence» va justo encima del heat index, que sí colorea bien. Incumple VISUAL-GUIDE §1.6. | `diagrams.css` `.diagram svg .c-frontend→--l1`, `.c-backend→--l2`, `.c-database→--l3`, `.c-security→--l4`, `.c-cloud→--l5`; IR en `site/diagrams/*.json` | /, /bok/the-stack, /resources/frameworks | todos | A S7 | P1 · imp. P1 | Colorear por grupo o zona de capa (la IR ya nombra «Layer 0N»). Nodos sin capa en `c-external` (`--bg` + `--muted`). Leyenda por capa. Queda fuera de alcance: es Non-Goal de design.md y está en PENDIENTE.md. | n/a |
+| SL-08 | **Raíl lateral en callouts.** Barra de 3 px en «NOTE» e «IN PRACTICE». Es neutra y no codifica nada: el tipo ya se distingue por el tinte y la etiqueta. | `Callout.astro` `.callout { border-left: 3px solid var(--rail) }`; `prose.css` `.prose .callout` | /bok/* (patterns ×17, the-stack, values-and-principles, regulatory-map), /stack, /resources/crosswalk | todos | A S5 · B side-tab 18 R · C advisory | P1 · imp. P2 | Borde completo de 1 px `--line` con la etiqueta dentro, o `--tint-bg` sin raíl. | n/a |
+| SL-09 | **Raíl degradado en AtAGlance.** Degradado de capas l1→l5 de 3 px sobre una lista que no es de capas: decoración. | `AtAGlance.astro` `.glance::after` | /bok/* | todos | A S5 · worklist C.5 · B FP | P1 · imp. P3 | Quitarlo. Caja plana `--surface` + 1 px `--line`. | n/a |
+| SL-10 | **Raíl degradado en el pullquote.** Degradado `--l5-ink`→`--l5` en el pullquote de «The role». | `index.astro` `.pullquote::before` | / | todos | A S5 · B FP (convención de cita) | P1 · imp. P3 | Conservar un raíl de cita plano (`--line` o `--ink-2`, 2–3 px), sin degradado ni color de capa. | n/a |
+| SL-11 | **Banda de 8 px en StackLayerPanel.** Es la tercera codificación de la capa (ya están el número, el nombre y las barras fijas). | `StackLayerPanel.astro` `.layer-panel .band` | /stack | todos; en oscuro casi desaparece | A S5 | P1 · imp. P2 | Sustituirla por un cuadrado de capa `--lN` junto al número. | n/a |
+| SL-12 | **Raíl de capa en nodos core.** Borde de tinta grueso + raíl de 3 px: se lee como una tarjeta «admonition». Como la franja codifica la capa, no es slop puro. | `PathNode.astro` `.path-node { border-left: 3px solid var(--c) }` | /path | 1440 | A S5 · B FP (codifica la capa) | P1 · imp. P3 | Opcional: cuadrado de capa junto a «CORE» y borde uniforme. | n/a |
 | SL-13 | **Elevación uniforme (sombra + lift en todas las tarjetas).** Preguntas, valores, capítulos, recursos, estadísticas y PrevNext tienen el mismo peso elevado. Si todo flota, nada destaca. | `effects.css` `.card-lum` (`--shadow-1`), `.lift:hover { translateY(-3px) }`; `PrevNext.astro` | / (30 card-lum / 29 lift), /role (13/10), /stack (5), /resources (6/6), /bok/* (3/2) | todos; `lift` solo con `no-preference` | A S8 · B gpt-thin-border (D) · worklist C.7 | P1 · imp. P2 | Tarjetas planas: 1 px `--line` y fondo `--bg`/`--surface`, sin sombra. `lift` solo en tarjetas que son enlace. `--shadow-1` para drawers, menú y diálogo. **Conservar el anillo `--grad-border`** (MS-05). Revierte 5.3 y 6.4. | en curso (sombra de `.card-lum`) · amplía |
 | SL-14 | **Halos de color en CTA y hero-panel.** Halo sin desplazamiento: `.hero-panel` (`0 0 40px var(--glow-1)`), `.btn-glow` y `.cta-primary` de CtaBand. | `index.astro` `.hero-panel`; `effects.css` `.btn-glow`; `CtaBand.astro` `.cta-primary` | /, /role, /stack, /path | todos | A S8 · B dark-glow R (hero-panel), D (`.btn-glow`, CtaBand) | P1 · imp. P3 | Quitar el halo `--glow-1` y **conservar siempre el relleno `--grad-cta`**. `.btn-glow` es una primitiva de identidad: confirmar con Jordi. | en curso (halo del hero-panel) |
-| SL-15 | **Bento con teselas medio vacías.** La tesela 01 de valores mide ~400 px de alto con dos líneas. Frameworks y The map ocupan 2 columnas en el hub. Preface ocupa 2 columnas con una línea. El tamaño no refleja la importancia. | `effects.css` `.bento-2x/-2y`; `index.astro` values (`n===1` → 2×2, `n===6` → 2×); `pages/resources/index.astro` `ul.bento.rc-bento`; `ChapterGrid` | /, /resources | 1440 y 834 (a 390 es una columna) | A S9 | P2 · imp. P2 | Rejilla uniforme sin spans (valores 2×4, hub 3×2) o lista numerada, como en `/thesis`. | — · amplía |
-| SL-16 | **Numerales fantasma.** Tipografía usada como textura: numerales de valores de 2,5–4 rem y «01/02/03» decorativos. | `ValuePair.astro` `.pair-bento .index` (`color-mix(var(--tint) 70%, var(--bg))`); `DefinitionCards`; hub de recursos | /, /resources | todos; en oscuro casi invisibles | A S10 | P1 · imp. P3 | Numerales al tamaño del texto, en mono `--fs-label` `--muted`, o fuera. | — |
+| SL-15 | **Bento con teselas medio vacías.** La tesela 01 de valores mide ~400 px de alto con dos líneas. Frameworks y The map ocupan 2 columnas en el hub. Preface ocupa 2 columnas con una línea. El tamaño no refleja la importancia. | `effects.css` `.bento-2x/-2y`; `index.astro` values (`n===1` → 2×2, `n===6` → 2×); `pages/resources/index.astro` `ul.bento.rc-bento`; `ChapterGrid` | /, /resources | 1440 y 834 (a 390 es una columna) | A S9 | P2 · imp. P2 | Rejilla uniforme sin spans (valores 2×4, hub 3×2) o lista numerada, como en `/thesis`. | n/a · amplía |
+| SL-16 | **Numerales fantasma.** Tipografía usada como textura: numerales de valores de 2,5–4 rem y «01/02/03» decorativos. | `ValuePair.astro` `.pair-bento .index` (`color-mix(var(--tint) 70%, var(--bg))`); `DefinitionCards`; hub de recursos | /, /resources | todos; en oscuro casi invisibles | A S10 | P1 · imp. P3 | Numerales al tamaño del texto, en mono `--fs-label` `--muted`, o fuera. | n/a |
 | SL-17 | **Footer: rejilla y marca de agua.** Rejilla de 48 px y marca de agua gigante al 10 % (repite el logotipo ~1.000 px más abajo). Los números `.num` (`--muted`) bajan a p10 3,83:1 sobre las líneas de la rejilla. | `Footer.astro` `.site-footer::before`, `.foot-wordmark`, `ol.fchap .num` | todas | todos | A S2, S10 · B codex-grid (D), low-contrast del wordmark (FP) · C P3-10 · worklist C.10 | P1 · imp. P3 | Rejilla y marca de agua pendientes de Jordi (decisión documentada). Con independencia de eso, `.num` → `--ink-2`. Si se quita la rejilla, `--tint-bg` plano. | Jordi |
 | SL-18 | **Rejilla y puntos detrás del contenido.** Papel cuadriculado o de puntos detrás de tablas y de la rejilla de nodos, justo donde hay que leer. Junto con la malla forma el cliché «malla + rejilla». | `index.astro` `.hero-tex.bg-grid.bg-fade`; `PageHero.astro` `.hero-tex.bg-dots(.bg-fade)`; `Section.astro` `texture="dots\|grid"` (home: three questions y chapters; `/path` The path; `/stack` The tools); `ChapterHeader.astro` (puntos de 14 px) | /, /path, /stack, /map, /resources*, /thesis, /bok/*, /about | todos | A S2 · B codex-grid (D) | P1 · imp. P2 | Pendiente de Jordi. Propuesta mínima si se conserva: nunca detrás de tablas ni de la rejilla de nodos (`/path`, tools de `/stack`). | Jordi · en curso (rejilla del hero de la home) |
-| SL-19 | **CtaBand de cierre en cada landing.** «Open, versioned, contributable» + dos botones: el cierre de cualquier SaaS. En oscuro, `--ink` = `#ECEAE3` la convierte en una losa crema, lo más brillante de la página. En `/role` y `/stack` va pegada a otra banda oscura. | `CtaBand.astro` `.band { background: var(--ink); color: var(--bg) }` | /, /role, /stack, /path | todos; crítico en oscuro | A S13 | P1 · imp. P2 | Sustituirla por una línea `.sec-link` («Read chapter 04 in full →») o por `tone="tint"` (`--tint-bg`), que respeta el tema. `/map` y `/bok` no tienen CtaBand y no les falta. La malla y la línea degradada de la banda van en MS-07. | — · amplía |
-| SL-20 | **Franja de salarios en la home, duplicada en /role.** Las únicas cifras de la home son salarios (IAPP, con fuente): desplazan el registro de referencia hacia marketing de carrera. El mismo bloque se repite en «The market» de `/role`. | `StatTile.astro`; `index.astro` `.stats-row`; `role.astro` «The market» | /, /role | todos | A S12 | P1 · imp. P2 | Quitarla de la home. En `/role`, tabla o frase con cita. Si la tesela se queda: `--ink` sobre `--bg`, sin `card-lum lift`. El texto degradado va en MS-06. | — · amplía |
-| SL-21 | **Tarjetas 3-up idénticas.** Tres tarjetas iguales con número, título y cuerpo: tres preguntas, «Three ways in» (duplicada en `/role` y `/path`) y 7 workflows con el mismo enlace. | `DefinitionCards.astro`; «Three ways in»; `WorkflowGrid` | /, /role, /path | 1440 | A S16 | P1 · imp. P3 | Tres preguntas como lista de 3 filas, cada una con la capa que la responde. Workflows como lista con un solo enlace al pie. | — · amplía |
-| SL-22 | **Ritmo monótono entre secciones y apretado dentro.** Todas las secciones miden 128/128 a 1440 y el footer suma 128 más. Dentro de los componentes: chips con huecos de 4 px, pilas de etiquetas a `--s-2`, `.hero-panel` a `--s-3` y cabeceras de 11 px. | `utilities.css` `.section { padding-block: clamp(64px,10vw,128px) }`; `.cw-chip { padding: .15em .5em }`; `StackLayerPanel`; `.hero-panel` | todas las landings; lo micro en /stack, /resources/crosswalk, /resources/frameworks, / | macro 1440; micro sobre todo a 390 | A S15 · B cramped-padding 97 FP, monotonous-spacing 29 FP · worklist C.4 | P2 · imp. P2 | `--s-7` entre secciones relacionadas y `--s-8` solo antes de un cambio de tema. Chips con hueco `--s-2` y grupos separados por `--s-5`. No perseguir el `cramped-padding` del detector. | — |
+| SL-19 | **CtaBand de cierre en cada landing.** «Open, versioned, contributable» + dos botones: el cierre de cualquier SaaS. En oscuro, `--ink` = `#ECEAE3` la convierte en una losa crema, lo más brillante de la página. En `/role` y `/stack` va pegada a otra banda oscura. | `CtaBand.astro` `.band { background: var(--ink); color: var(--bg) }` | /, /role, /stack, /path | todos; crítico en oscuro | A S13 | P1 · imp. P2 | Sustituirla por una línea `.sec-link` («Read chapter 04 in full →») o por `tone="tint"` (`--tint-bg`), que respeta el tema. `/map` y `/bok` no tienen CtaBand y no les falta. La malla y la línea degradada de la banda van en MS-07. | n/a · amplía |
+| SL-20 | **Franja de salarios en la home, duplicada en /role.** Las únicas cifras de la home son salarios (IAPP, con fuente): desplazan el registro de referencia hacia marketing de carrera. El mismo bloque se repite en «The market» de `/role`. | `StatTile.astro`; `index.astro` `.stats-row`; `role.astro` «The market» | /, /role | todos | A S12 | P1 · imp. P2 | Quitarla de la home. En `/role`, tabla o frase con cita. Si la tesela se queda: `--ink` sobre `--bg`, sin `card-lum lift`. El texto degradado va en MS-06. | n/a · amplía |
+| SL-21 | **Tarjetas 3-up idénticas.** Tres tarjetas iguales con número, título y cuerpo: tres preguntas, «Three ways in» (duplicada en `/role` y `/path`) y 7 workflows con el mismo enlace. | `DefinitionCards.astro`; «Three ways in»; `WorkflowGrid` | /, /role, /path | 1440 | A S16 | P1 · imp. P3 | Tres preguntas como lista de 3 filas, cada una con la capa que la responde. Workflows como lista con un solo enlace al pie. | n/a · amplía |
+| SL-22 | **Ritmo monótono entre secciones y apretado dentro.** Todas las secciones miden 128/128 a 1440 y el footer suma 128 más. Dentro de los componentes: chips con huecos de 4 px, pilas de etiquetas a `--s-2`, `.hero-panel` a `--s-3` y cabeceras de 11 px. | `utilities.css` `.section { padding-block: clamp(64px,10vw,128px) }`; `.cw-chip { padding: .15em .5em }`; `StackLayerPanel`; `.hero-panel` | todas las landings; lo micro en /stack, /resources/crosswalk, /resources/frameworks, / | macro 1440; micro sobre todo a 390 | A S15 · B cramped-padding 97 FP, monotonous-spacing 29 FP · worklist C.4 | P2 · imp. P2 | `--s-7` entre secciones relacionadas y `--s-8` solo antes de un cambio de tema. Chips con hueco `--s-2` y grupos separados por `--s-5`. No perseguir el `cramped-padding` del detector. | n/a |
 
 ### 4.1 Refutado o descartado (no perseguir)
 
@@ -190,7 +190,7 @@ Cada hallazgo vive en un solo sitio. Aquí van los propios de cada ruta; los tra
 | HOM-4 | P2 | P3 | **Entrada del hero con opacity.** A 120 ms: h1 0,56, lede 0,18 y CTA 0 (a 390: 0,73 / 0,47 / 0,06). Incumple la hard constraint #1 y retrasa el LCP ~0,6–0,8 s (inferido). | `index.astro` `.hero-in > *` + `@keyframes hero-up` | todos · `no-preference` | Solo `translateY(12px) → none`, como en `PageHero`. Conservar el stagger `--i * 70ms`. |
 | HOM-5 | P2 | P1 | **Verdict beat indistinguible en oscuro.** `--band-bg` `#0b0d10` sobre `--bg` `#121417` apenas se distingue: la banda pierde su función. | `index.astro` verdict beat (`Section tone="dark"`) | oscuro | Separar con `border-block: 1px solid var(--line)` en oscuro o ampliar la diferencia de `--band-bg`. La frase la está quitando distill y A pide conservarla: decide Jordi. |
 | HOM-6 | P3 | P3 | **Salto del count-up.** La cifra se ve completa (USD 221k), cae a 88k y vuelve a subir. | `StatTile.astro` `[data-countup]` + `public/countup.js` (tarea 6.3) | `no-preference` | Pintar el valor inicial antes del primer frame, o no animar. Deja de aplicar si se hace SL-20. |
-| HOM-7 | P3 | — | **Titulares y bloques duplicados entre páginas.** El H2 «A build order, from policy to proof.» está en `/` y en `/stack`. Las estadísticas, en `/` y `/role`. «Three ways in», en `/role` y `/path`. Rutas: /, /stack, /role, /path. | `index.astro`; «How to read it» de `stack.astro`; `role.astro`; `path.astro` | todos | Un titular propio por página y un solo sitio para cada bloque. |
+| HOM-7 | P3 | n/a | **Titulares y bloques duplicados entre páginas.** El H2 «A build order, from policy to proof.» está en `/` y en `/stack`. Las estadísticas, en `/` y `/role`. «Three ways in», en `/role` y `/path`. Rutas: /, /stack, /role, /path. | `index.astro`; «How to read it» de `stack.astro`; `role.astro`; `path.astro` | todos | Un titular propio por página y un solo sitio para cada bloque. |
 
 ### `/thesis`
 
@@ -199,7 +199,7 @@ Cada hallazgo vive en un solo sitio. Aquí van los propios de cada ruta; los tra
 | ID | Sev. | Eje | Qué | Dónde | Anchos/temas | Sugerencia |
 |---|---|---|---|---|---|---|
 | THS-1 | P3 | P2 | **Dos bordes izquierdos en el primer viewport.** La tarjeta de cabecera y la figura empiezan en x≈170 (contenedor); «Leer en español», el callout, el byline y la prosa, en x≈313. Rutas: /thesis, /about. | `ChapterHeader.astro` y la cabecera de `/about` frente a la columna `.prose` de `Doc.astro` | 1440 | Alinear la cabecera con la columna de prosa, o la prosa con el contenedor. |
-| THS-2 | P2 | — | **Fechas incoherentes.** El meta dice «Updated 2026-09-22» y el byline «Version 0.4.0 · 2026-09-19»: resta en un sitio que presume de trazabilidad. | Meta del Doc y byline de la tesis (frontmatter) | todos | Una sola fuente de fecha. Si difieren a propósito, rotular «Version date» y «Last edit». |
+| THS-2 | P2 | n/a | **Fechas incoherentes.** El meta dice «Updated 2026-09-22» y el byline «Version 0.4.0 · 2026-09-19»: resta en un sitio que presume de trazabilidad. | Meta del Doc y byline de la tesis (frontmatter) | todos | Una sola fuente de fecha. Si difieren a propósito, rotular «Version date» y «Last edit». |
 
 ### `/role`
 
@@ -254,14 +254,14 @@ Cada hallazgo vive en un solo sitio. Aquí van los propios de cada ruta; los tra
 
 | ID | Sev. | Eje | Qué | Dónde | Anchos/temas | Sugerencia |
 |---|---|---|---|---|---|---|
-| BST-1 | P3 | — | **Miga con el número de capítulo duplicado.** La miga dice «04 · 04. THE STACK (FIVE LAYERS)» porque el título ya empieza por «NN.». Rutas: /bok/* (11 capítulos). | `pages/bok/[slug].astro` l.58-60, ``crumbs[1].label = `${NN} · ${title}` `` | todos | Usar el título sin anteponer `NN`, o quitar el prefijo del título. |
+| BST-1 | P3 | n/a | **Miga con el número de capítulo duplicado.** La miga dice «04 · 04. THE STACK (FIVE LAYERS)» porque el título ya empieza por «NN.». Rutas: /bok/* (11 capítulos). | `pages/bok/[slug].astro` l.58-60, ``crumbs[1].label = `${NN} · ${title}` `` | todos | Usar el título sin anteponer `NN`, o quitar el prefijo del título. |
 | BST-2 | P3 | P2 | **Interlínea 1 en la miga.** La miga actual, en mono de 12 px con `line-height: 1`, ocupa 2 líneas pegadas a 390. Rutas: /bok/*. | `Breadcrumb.astro` `.crumbs [aria-current='page']` | 390 | `line-height` de al menos 1,3 y etiqueta corta (junto con BST-1). |
 | BST-3 | P2 | P1 | **La máscara del sidebar atenúa el último capítulo.** Con la máscara, «10 Reading List» parece texto atenuado. Rutas: /bok/*. | `Doc.astro` l.460-464 (`mask-image`) | ≥840 | `padding-bottom` en lugar de máscara, o una máscara que termine después del último ítem. |
 | BST-4 | P3 | P2 | **Punto huérfano en AtAGlance.** Cuatro puntos en una rejilla de 3 columnas dejan el 4.º solo. Rutas: /bok/*. | `AtAGlance.astro` | 1440 | Rejilla 2×2, o número de columnas según el número de ítems. |
 
 ### `/resources`
 
-**Hereda:** SL-03 («01» colgando bajo el hero), SL-06 (swatches), SL-13, SL-15, SL-18; MS-02. **Conservar:** —
+**Hereda:** SL-03 («01» colgando bajo el hero), SL-06 (swatches), SL-13, SL-15, SL-18; MS-02. **Conservar:**:
 
 | ID | Sev. | Eje | Qué | Dónde | Anchos/temas | Sugerencia |
 |---|---|---|---|---|---|---|
@@ -302,7 +302,7 @@ Cada hallazgo vive en un solo sitio. Aquí van los propios de cada ruta; los tra
 
 ### `/404`
 
-**Hereda:** MS-01, MS-09 (malla más saturada); TC-27. **Conservar:** El concepto «Verdict: BLOCK — Route not registered.».
+**Hereda:** MS-01, MS-09 (malla más saturada); TC-27. **Conservar:** El concepto «Verdict: BLOCK. Route not registered.».
 
 | ID | Sev. | Eje | Qué | Dónde | Anchos/temas | Sugerencia |
 |---|---|---|---|---|---|---|
@@ -317,7 +317,7 @@ Cada hallazgo vive en un solo sitio. Aquí van los propios de cada ruta; los tra
 |---|---|---|---|---|---|---|
 | GLB-1 | P3 | P2 | **Drawers con cierres distintos.** «×» en `/path` y «CLOSE» en mono en el crosswalk, más una barra gruesa bajo el título. Rutas: /path, /resources/crosswalk. | `PathDrawer.astro`; `CrosswalkDrawer.astro` (`.cwd-title` `border-bottom: 3px`) | 1440 y 390 | Un solo cierre «×» con `aria-label` y título sin barra. |
 | GLB-2 | P3 | P2 | **Footer largo y nombres partidos.** 7 columnas y ~45 enlaces, ~1.000 px a 390. A 1440 los nombres de capítulo se parten («07 Maturity / Model»). Rutas: todas. | `Footer.astro` | 1440 y 390 | Agrupar los capítulos en una lista de 2 columnas, o usar nombres cortos. |
-| GLB-3 | P3 | — | **Pista «Ctrl K» en táctil.** La pista de teclado se muestra en dispositivos sin teclado. Rutas: todas (menú móvil). | Menú móvil de `Header.astro` | 390 táctil | Ocultarla con `@media (hover: none)`. |
+| GLB-3 | P3 | n/a | **Pista «Ctrl K» en táctil.** La pista de teclado se muestra en dispositivos sin teclado. Rutas: todas (menú móvil). | Menú móvil de `Header.astro` | 390 táctil | Ocultarla con `@media (hover: none)`. |
 
 ## 6. Hallazgos técnicos no visuales
 
@@ -327,13 +327,13 @@ La severidad sigue a `audit.md`: P0 bloquea, P1 incumple WCAG AA, P2 tiene alter
 
 | ID | Sev. | Eje | Qué y medida | Dónde | Rutas · anchos | Recomendación | Visto por |
 |---|---|---|---|---|---|---|---|
-| TC-01 | P1 | — | **Drawer de capítulos cerrado pero enfocable.** 13 paradas de tabulación invisibles (`button.sidebar-search` en x=−288 y 12 `a.nav-item` en x≈−296) antes del contenido. WCAG 2.4.7, 2.4.3 y 2.4.11. | `Doc.astro` l.397-413 `.doc-sidebar` (`position: fixed; transform: translateX(-100%)`, sin `visibility`/`inert`); `public/ui-doc.js` | /bok/* (<840 px) · <840 | Estado cerrado con `visibility: hidden` y transición de `visibility` diferida en `--dur`, o `inert`. Al abrir, `role="dialog" aria-modal="true" aria-label="Chapters"`. | C P1-3 |
+| TC-01 | P1 | n/a | **Drawer de capítulos cerrado pero enfocable.** 13 paradas de tabulación invisibles (`button.sidebar-search` en x=−288 y 12 `a.nav-item` en x≈−296) antes del contenido. WCAG 2.4.7, 2.4.3 y 2.4.11. | `Doc.astro` l.397-413 `.doc-sidebar` (`position: fixed; transform: translateX(-100%)`, sin `visibility`/`inert`); `public/ui-doc.js` | /bok/* (<840 px) · <840 | Estado cerrado con `visibility: hidden` y transición de `visibility` diferida en `--dur`, o `inert`. Al abrir, `role="dialog" aria-modal="true" aria-label="Chapters"`. | C P1-3 |
 | TC-02 | P1 | P2 | **Reflow a 320: la cabecera desborda.** Desborde de 13 px y el botón de menú recortado (borde derecho en x=333). WCAG 1.4.10. A 390 no desborda. | `Header.astro` l.315-343 `.bar { gap: var(--s-4) }`, `.right { gap: var(--s-3) }`, `.wordmark` | todas (320 px) · 320 | `@media (max-width: 359px)`: gaps `--s-2`/`--s-3` y wordmark oculto, con `aria-label` en `.brand`. Añadir 320 a `layout.spec`. | C P1-4 |
 | TC-03 | P1 | P2 | **Desborde horizontal en /resources/frameworks a 390.** `scrollWidth` 408 frente a 390: las `th` «Applies from» y «Chapter» se escapan y la página se bambolea 18 px. Rompe la garantía de «no horizontal scroll» de `PageHero`. | `resources.css` `.res-table thead th { position: sticky }` dentro del `thead` oculto por `@media (max-width:720px)` | /resources/frameworks (390) · 390 | `position: static` en `thead th` por debajo de 720 px. En el test de overflow, medir con `documentElement.clientWidth` o sin `isMobile`. | A (C lo confirma: `W: 408` en `responsive.json`) |
 | TC-04 | P2 | P2 | **«Cite this chapter» desborda a 390.** Al abrir la cita, el documento pasa de 390 a 616 px (226 px de scroll horizontal): el hijo flex crece hasta el min-content de `pre.cite-bibtex`. | `Citation.astro` `.cite-wrap`, `.cite-apa`, `pre.cite-bibtex`; `Doc.astro` `footer.doc-foot` (flex) | /bok/* (390) · 390 | `min-width: 0` en el hijo flex, `pre { overflow-x: auto; max-width: 100% }` y `overflow-wrap: anywhere` en `.cite-apa`. | B |
 | TC-05 | P2 | P1 | **Resultados de búsqueda sin estilo.** Enlaces subrayados en `--l1-ink`, `<mark>` amarillo del navegador (rgb 255,255,0: el único color saturado fuera de tokens), título en la fuente de cuerpo y extractos con cadenas de UI («⤢ Enlarge»). | `SearchDialog.astro`: las reglas con ámbito `.search-result a`, `.search-result-title` y `.search-result-excerpt mark` no alcanzan a los nodos que crea `public/search.js` | todas (búsqueda) · todos | `:global()` u hoja global. `mark` con `--tint-bg` + `--ink` (no un color de capa). Sacar el texto de UI del índice con `data-pagefind-ignore`. | A M-2 |
-| TC-06 | P2 | — | **Sidebar y TOC del Doc no son sticky.** Con `scrollY` 5000 quedan en top −4899. El scroll-spy y el progreso (`is-past`, `aria-current`) se calculan fuera de pantalla. Los estados de la spec `reading-experience` no los ve nadie. | `Doc.astro` l.427-430 (`inset: auto` después de `top`), l.301 `.doc-layout { align-items: start }`; `Toc.astro` l.38 | /bok/* (≥840 sidebar, ≥1100 TOC) · ≥840 / ≥1100 | Quitar `inset: auto` o ponerlo antes de `top`. Hacer sticky `.doc-toc` con `align-self: start`. Ningún `transform` en los ancestros. | C P2-2 |
-| TC-07 | P2 | — | **El clic tras el hover cierra el mega-menú.** El hover pone `aria-expanded=true` y el clic inmediato lo pasa a `false`: el usuario cierra lo que acababa de abrir. | `Header.astro` + `public/nav.js` | todas (1440) · 1440 (ratón) | Ignorar el clic si el panel se abrió por hover hace menos de ~300 ms, o abrir solo con clic. | A |
+| TC-06 | P2 | n/a | **Sidebar y TOC del Doc no son sticky.** Con `scrollY` 5000 quedan en top −4899. El scroll-spy y el progreso (`is-past`, `aria-current`) se calculan fuera de pantalla. Los estados de la spec `reading-experience` no los ve nadie. | `Doc.astro` l.427-430 (`inset: auto` después de `top`), l.301 `.doc-layout { align-items: start }`; `Toc.astro` l.38 | /bok/* (≥840 sidebar, ≥1100 TOC) · ≥840 / ≥1100 | Quitar `inset: auto` o ponerlo antes de `top`. Hacer sticky `.doc-toc` con `align-self: start`. Ningún `transform` en los ancestros. | C P2-2 |
+| TC-07 | P2 | n/a | **El clic tras el hover cierra el mega-menú.** El hover pone `aria-expanded=true` y el clic inmediato lo pasa a `false`: el usuario cierra lo que acababa de abrir. | `Header.astro` + `public/nav.js` | todas (1440) · 1440 (ratón) | Ignorar el clic si el panel se abrió por hover hace menos de ~300 ms, o abrir solo con clic. | A |
 
 Hay otros bugs, visuales o de datos, en §5: RES-1 (viñetas en el hub) y BST-1 (miga duplicada).
 
@@ -347,20 +347,20 @@ Hay otros bugs, visuales o de datos, en §5: RES-1 (viñetas en el hub) y BST-1 
 | TC-11 | P2 | P2 | **Texto al 200 % recortado a 390.** Desborde de 45–139 px; palabras cortadas («Governa\|nce»). WCAG 1.4.4. | `index.astro` l.264-268 `.hero--loop { overflow: hidden; contain: paint }`; `PageHero.astro` l.110-113 `.hero--page { overflow: hidden }` | /, /resources/*, /bok/* · 390 con texto al 200 % | `overflow-wrap: anywhere; hyphens: auto` en `.hero-h1`/`.page-title`. Dejar el recorte solo en `.bg-mesh`. | C P2-7 |
 | TC-12 | P2 | P2 | **Objetivos táctiles de menos de 24 px.** 10 ramas del mapa de 15,7 px de alto, con círculos de 24 px que se solapan; el nodo auditor mide 38,4×19. WCAG 2.5.8. | `scripts/map-build.mjs` → `src/figures/discipline-map.svg` `g.branch > a`; `#role-workflows-node-auditor` | /map (390), /role (nodo auditor) · 390 | `rect` transparente de al menos 24 px por rama, o `--s-2` extra entre ramas. El nodo de `/role` es archify: fuera de alcance. | C P2-8 |
 | TC-13 | P3 | P1 | **`.nav-num` bajo AA en hover.** 4,01:1 mientras dura el hover. | `SidebarNav.astro` `.nav-item:hover .nav-num` | /bok/* · claro (en oscuro, 4,71: pasa) | `color: var(--ink-2)` en hover. | C P3-1 |
-| TC-14 | P3 | — | **`landmark-unique`: dos `<aside>` sin nombre.** Es la única violación de axe (moderate). | `Doc.astro` l.144 `#doc-sidebar`, l.206 `.doc-toc` | /bok/* (≥1100) · ≥1100 · ambos temas | `aria-label="Chapters"` y `aria-label="On this page"`. | C P3-2 |
-| TC-15 | P3 | — | **Drawers con fondo no inerte.** Son `<aside role="dialog">`: el foco queda atrapado, pero el cursor virtual del lector puede salir del diálogo. | `PathDrawer.astro` l.12-17, `CrosswalkDrawer.astro` l.12-17 | /path, /resources/crosswalk · todos | `<dialog>` + `showModal()`, o `inert` en `main`. | C P3-3 |
-| TC-16 | P3 | — | **El toggle de tema anuncia un estado doble.** Se anuncia «Switch to light theme, pressed». | `public/ui.js` l.20 | todas · todos | Etiqueta fija + `aria-pressed`, o etiqueta dinámica sin `aria-pressed`. | C P3-4 |
-| TC-17 | P3 | — | **La búsqueda necesita dos Esc.** El primer Esc vacía el campo y el segundo cierra. | `SearchDialog.astro` / `public/search.js` | todas · todos | Que Esc cierre siempre y el campo se vacíe con el botón de limpiar. | A |
+| TC-14 | P3 | n/a | **`landmark-unique`: dos `<aside>` sin nombre.** Es la única violación de axe (moderate). | `Doc.astro` l.144 `#doc-sidebar`, l.206 `.doc-toc` | /bok/* (≥1100) · ≥1100 · ambos temas | `aria-label="Chapters"` y `aria-label="On this page"`. | C P3-2 |
+| TC-15 | P3 | n/a | **Drawers con fondo no inerte.** Son `<aside role="dialog">`: el foco queda atrapado, pero el cursor virtual del lector puede salir del diálogo. | `PathDrawer.astro` l.12-17, `CrosswalkDrawer.astro` l.12-17 | /path, /resources/crosswalk · todos | `<dialog>` + `showModal()`, o `inert` en `main`. | C P3-3 |
+| TC-16 | P3 | n/a | **El toggle de tema anuncia un estado doble.** Se anuncia «Switch to light theme, pressed». | `public/ui.js` l.20 | todas · todos | Etiqueta fija + `aria-pressed`, o etiqueta dinámica sin `aria-pressed`. | C P3-4 |
+| TC-17 | P3 | n/a | **La búsqueda necesita dos Esc.** El primer Esc vacía el campo y el segundo cierra. | `SearchDialog.astro` / `public/search.js` | todas · todos | Que Esc cierre siempre y el campo se vacíe con el botón de limpiar. | A |
 | TC-18 | P3 | P1 | **Shiki con la paleta github-dark.** Azules fuera de los 5 acentos (`#79b8ff`, `#9ecbff`) y bloque oscuro también en tema claro. El contraste es correcto (7,06–11,5:1). | `astro.config.ts` (sin `shikiConfig`); `prose.css` l.350 | /bok/the-stack, /bok/patterns, /about/contributors · claro y oscuro | Tema `css-variables` mapeado a `--ink`, `--ink-2`, `--lN-ink` y `--surface`. | C P3-6 |
-| TC-19 | P3 | — | **Scrims y color de OG hard-coded.** `rgba(0,0,0,.4)` repetido; `og.ts` usa `#6B7079`, que no es `--muted` (`#676C75`). | `Header.astro` l.634, `SearchDialog.astro` l.54, `Doc.astro` l.419, `diagrams.css` l.484, `src/lib/og.ts` l.46 | todas · todos | Un token `--scrim` en `tokens.css` y los valores de OG desde una fuente común. | C P3-7 |
+| TC-19 | P3 | n/a | **Scrims y color de OG hard-coded.** `rgba(0,0,0,.4)` repetido; `og.ts` usa `#6B7079`, que no es `--muted` (`#676C75`). | `Header.astro` l.634, `SearchDialog.astro` l.54, `Doc.astro` l.419, `diagrams.css` l.484, `src/lib/og.ts` l.46 | todas · todos | Un token `--scrim` en `tokens.css` y los valores de OG desde una fuente común. | C P3-7 |
 | TC-20 | P3 | P3 | **`backdrop-filter` en la cabecera sticky.** `blur(10px)` se recalcula en cada frame de scroll. | `Header.astro` l.297-298 | todas · todos (coste en gama baja) | Por debajo de 840 px y con `prefers-reduced-transparency`: fondo sólido `color-mix(in srgb, var(--bg) 94%, transparent)`. | C P3-8 |
 | TC-21 | P3 | P3 | **Transiciones de height fuera de tokens.** `height 200ms` en los marcadores y `transform 160ms linear`, frente a `--dur` (180 ms) y `--ease`. | `SidebarNav.astro` l.89 `.nav-rail`; `Toc.astro` l.74 `.toc-marker` | /bok/*, /thesis, /about/changelog · `no-preference` | `transform: scaleY()` con `--dur`/`--ease`. | B #11 · C P3-9 |
-| TC-22 | P3 | P3 | **`motion-ui` cargado en todas las rutas.** 6,4 KB gz en las 14 rutas; solo lo usan los drawers y el icono del tema. | `Base.astro` → `motion-ui.*.js` | todas · — | `import()` bajo demanda en los consumidores. Contradice la decisión 1 de design.md (tarea 3.2). | C P3-9 |
-| TC-23 | P3 | — | **Set oscuro triplicado.** ~30 valores copiados en `.sec--dark`: es la tercera copia, tras `[data-theme=dark]` y la media query. | `effects.css` l.348-395 | todas · oscuro | Una sola definición (`:root[data-theme='dark'], .sec--dark { … }` + media query). | C P3-5 |
+| TC-22 | P3 | P3 | **`motion-ui` cargado en todas las rutas.** 6,4 KB gz en las 14 rutas; solo lo usan los drawers y el icono del tema. | `Base.astro` → `motion-ui.*.js` | todas · n/a | `import()` bajo demanda en los consumidores. Contradice la decisión 1 de design.md (tarea 3.2). | C P3-9 |
+| TC-23 | P3 | n/a | **Set oscuro triplicado.** ~30 valores copiados en `.sec--dark`: es la tercera copia, tras `[data-theme=dark]` y la media query. | `effects.css` l.348-395 | todas · oscuro | Una sola definición (`:root[data-theme='dark'], .sec--dark { … }` + media query). | C P3-5 |
 | TC-24 | P3 | P3 | **«Kill» global de reduced-motion.** `.01ms !important` universal. Hoy es inocuo, pero aplana cualquier feedback futuro. | `base.css` l.116-129 | todas · `reduce` | Mantenerlo como red de seguridad documentada, o sustituirlo por gates por componente + un test de 0 animaciones con `reduce`. | C P3-11 |
 | TC-25 | P2 | P2 | **Líneas de prosa demasiado largas.** `--prose: 72ch` da ~96–107 caracteres por línea (`.prose > p` de 815 px). | `tokens.css` `--prose` (usado en `pages.css`, `utilities.css`, `resources.css`, `crosswalk.css`) | toda la BoK, /thesis, /es/thesis, /resources/glossary, /about/changelog; ledes de /stack, /role, /path · 1440 | ~60–66ch con Instrument Sans a 17 px, o `max-width` en `em`. Es un cambio de token: fuera del cambio actual. | B #3 (overlay `line-length`, 643/tema) |
-| TC-26 | P2 | — | **Gates de CI ciegos al contraste.** axe deja 8.130 nodos de `color-contrast` como «incomplete» (pseudo-elementos, degradados, SVG) y Lighthouse hereda esa ceguera. Ahí están los fallos. | `tests/a11y.spec.ts` | CI · — | Test de contraste por píxeles (`scratchpad/audit/contrast-lib.cjs`) o de pares de tokens para `.t-muted`, `.t-dim` y `.band`. | C (patrón 3) |
-| TC-27 | P3 | — | **Estado HTTP de /404 en producción.** El preview sirve `/404` con HTTP 200, lo normal en `astro preview`. | Producción (Cloudflare) | /404 · — | Confirmar con `curl -I` que una ruta inexistente devuelve 404. | A M-13 |
+| TC-26 | P2 | n/a | **Gates de CI ciegos al contraste.** axe deja 8.130 nodos de `color-contrast` como «incomplete» (pseudo-elementos, degradados, SVG) y Lighthouse hereda esa ceguera. Ahí están los fallos. | `tests/a11y.spec.ts` | CI · n/a | Test de contraste por píxeles (`scratchpad/audit/contrast-lib.cjs`) o de pares de tokens para `.t-muted`, `.t-dim` y `.band`. | C (patrón 3) |
+| TC-27 | P3 | n/a | **Estado HTTP de /404 en producción.** El preview sirve `/404` con HTTP 200, lo normal en `astro preview`. | Producción (Cloudflare) | /404 · n/a | Confirmar con `curl -I` que una ruta inexistente devuelve 404. | A M-13 |
 
 ### 6.3 Patrones sistémicos (C)
 
@@ -388,7 +388,7 @@ Con `--no-design-system` salen los mismos 5851 hallazgos: DESIGN.md no cambia ni
 | Veredicto | Nº | Reglas → ID de este informe |
 |---|---:|---|
 | **R** real | 30 | `side-tab` 18 (callouts) → SL-08 · `gradient-text` 6 → MS-06 · `dark-glow` 2 (hero-panel) → SL-14 · `tight-leading` 1 (miga) → BST-2 · `wide-tracking` 1 (`.map-hint`) → MAP-2 · `layout-transition` 1 (`height`) → TC-21 · `marquee` 1 → SL-01 |
-| **R, solo en navegador** | — | `line-length` (643/tema, una causa) → TC-25 · `tiny-text` SVG (80/tema) → TC-09 · `undersized-ui-text` `.mx-colh-name` → FRW-1 · `text-overflow` cita a 390 → TC-04 |
+| **R, solo en navegador** | n/a | `line-length` (643/tema, una causa) → TC-25 · `tiny-text` SVG (80/tema) → TC-09 · `undersized-ui-text` `.mx-colh-name` → FRW-1 · `text-overflow` cita a 390 → TC-04 |
 | **D** decisión documentada | 90 | `all-caps-body` 58 → SL-05 · `codex-grid-background` 30 → SL-17/SL-18 · `gpt-thin-border-wide-shadow` 1 (hero-panel) → SL-13 · `overused-font` 1 (Instrument Sans, marca) · `cream-palette` 13 en navegador (`--bg` `#F6F4EE`) |
 | **n/a** copy | 6 | `em-dash-overuse`: changelog 75, the-stack 92, reading-list 64, thesis 57, definition 48, glossary 40 |
 | **FP** | 2061 | §7.3 |
@@ -407,7 +407,7 @@ Con `--no-design-system` salen los mismos 5851 hallazgos: DESIGN.md no cambia ni
 | `wide-tracking` | 18 | `span.cluster-meta` («L2»): el tracking no afecta a dos caracteres. |
 | `layout-transition` | 4 | `stroke-width` de SVG leído como `width` (3) y `pagefind-ui.css` de terceros (1). |
 | `border-accent-on-rounded` | 3 | Títulos de drawer sin radio y un triángulo CSS de 0×0. |
-| Navegador: `heading-rhythm` 8, `text-occlusion` 15/16, `dark-glow` en `body`, `text-overflow` a 1440 | — | Clúster plegado; etiquetas del propio overlay (los textos «PASS» y «attestation» se leen en la captura); color `#ffba00` del overlay; `scrollWidth = clientWidth`. |
+| Navegador: `heading-rhythm` 8, `text-occlusion` 15/16, `dark-glow` en `body`, `text-overflow` a 1440 | n/a | Clúster plegado; etiquetas del propio overlay (los textos «PASS» y «attestation» se leen en la captura); color `#ffba00` del overlay; `scrollWidth = clientWidth`. |
 
 ### 7.4 Comparabilidad con el baseline
 
@@ -473,7 +473,7 @@ La única excepción práctica es **MS-03**. Re-escopar `--muted` sobre la malla
 | Rendimiento | 12,3–21,7 KB gz de JS por ruta; 0 scripts inline (CSP respetada); 3 woff2 (2 precargadas); 0 `<img>`; `.bg-mesh` con `contain: strict` y sin `blur()`; 137–176 KB gz por ruta | (C) |
 | Disciplina de tokens | 3 familias exactas; sin morados; ~9 literales de color fuera de tokens de 75 | (A, C) |
 | Reveals | Solo transform, rango `entry 5%–35%` | Cumplen la hard constraint #1 (A) |
-| Concepto de la 404 | «Verdict: BLOCK — Route not registered.» | (A) |
+| Concepto de la 404 | «Verdict: BLOCK. Route not registered.» | (A) |
 
 ## 10. Asignación provisional a bloques D1–D6 (insumo de la tarea 2.2)
 
@@ -483,109 +483,109 @@ La única excepción práctica es **MS-03**. Re-escopar `--muted` sobre la malla
   - «sí»: quita o reestructura un componente o primitiva, cambia contenido o semántica, o revierte una tarea ya hecha;
   - «no»: corrección dentro del objetivo del bloque (contraste, tokens, espaciado, bug o conformidad con las specs `ui-motion` / `reading-experience`);
   - «Jordi»: decisión pendiente (malla, rejilla, footer);
-  - «—»: no encaja en ningún bloque.
+  - «sin bloque»: no encaja en ningún bloque.
 - **La pasada distill ya es una ampliación de la propuesta,** que excluye el rediseño (design.md, Non-Goals). Los «sí» marcan lo que requiere que Jordi amplíe `proposal.md` / `tasks.md` o abra un cambio nuevo.
 
 | ID | Hallazgo | Eje · imp. | Bloque | ¿Amplía? | Nota |
 |---|---|---|---|---|---|
 | SL-01 | Telemetría simulada en el hero | P1 · imp. P1 | D2 | sí | en curso (chip live, bucle del ticker) |
-| SL-02 | Movimiento perpetuo en la home | P3 · imp. P2 | D2 (+D3) | no | — |
+| SL-02 | Movimiento perpetuo en la home | P3 · imp. P2 | D2 (+D3) | no | n/a |
 | SL-03 | Register rule numerado 01–07 | P1 · imp. P2 | D2 | sí | en curso (home) |
 | SL-04 | Fórmula eyebrow + H2 + lede y chips de kicker | P1 · imp. P2 | D2 (+D3, D4) | sí | en curso (kickers-chip de la home) |
-| SL-05 | Mono mayúsculas omnipresente | P1 · imp. P2 | D1 (+D2, D3, D4, D5) | sí | — |
-| SL-06 | Colores de capa sin significado estable | P1 · imp. P1 | D5 (+D2, D4) | sí | — |
-| SL-07 | Figuras archify coloreadas por kind, no por capa | P1 · imp. P1 | — | — | — |
-| SL-08 | Raíl lateral en callouts | P1 · imp. P2 | D4 | no | — |
-| SL-09 | Raíl degradado en AtAGlance | P1 · imp. P3 | D4 | no | — |
-| SL-10 | Raíl degradado en el pullquote | P1 · imp. P3 | D2 | no | — |
-| SL-11 | Banda de 8 px en StackLayerPanel | P1 · imp. P2 | D3 | no | — |
-| SL-12 | Raíl de capa en nodos core | P1 · imp. P3 | D3 | no | — |
+| SL-05 | Mono mayúsculas omnipresente | P1 · imp. P2 | D1 (+D2, D3, D4, D5) | sí | n/a |
+| SL-06 | Colores de capa sin significado estable | P1 · imp. P1 | D5 (+D2, D4) | sí | n/a |
+| SL-07 | Figuras archify coloreadas por kind, no por capa | P1 · imp. P1 | n/a | n/a | n/a |
+| SL-08 | Raíl lateral en callouts | P1 · imp. P2 | D4 | no | n/a |
+| SL-09 | Raíl degradado en AtAGlance | P1 · imp. P3 | D4 | no | n/a |
+| SL-10 | Raíl degradado en el pullquote | P1 · imp. P3 | D2 | no | n/a |
+| SL-11 | Banda de 8 px en StackLayerPanel | P1 · imp. P2 | D3 | no | n/a |
+| SL-12 | Raíl de capa en nodos core | P1 · imp. P3 | D3 | no | n/a |
 | SL-13 | Elevación uniforme (sombra + lift en todas las tarjetas) | P1 · imp. P2 | D2 (+D4) | sí | en curso (sombra de `.card-lum`) |
 | SL-14 | Halos de color en CTA y hero-panel | P1 · imp. P3 | D2 | Jordi | en curso (halo del hero-panel) |
-| SL-15 | Bento con teselas medio vacías | P2 · imp. P2 | D2 (+D5) | sí | — |
-| SL-16 | Numerales fantasma | P1 · imp. P3 | D2 | no | — |
-| SL-17 | Footer: rejilla y marca de agua | P1 · imp. P3 | D1 | Jordi | — |
+| SL-15 | Bento con teselas medio vacías | P2 · imp. P2 | D2 (+D5) | sí | n/a |
+| SL-16 | Numerales fantasma | P1 · imp. P3 | D2 | no | n/a |
+| SL-17 | Footer: rejilla y marca de agua | P1 · imp. P3 | D1 | Jordi | n/a |
 | SL-18 | Rejilla y puntos detrás del contenido | P1 · imp. P2 | D2 (+D3, D4) | Jordi | Jordi · en curso (rejilla del hero de la home) |
-| SL-19 | CtaBand de cierre en cada landing | P1 · imp. P2 | D2 | sí | — |
-| SL-20 | Franja de salarios en la home, duplicada en /role | P1 · imp. P2 | D2 | sí | — |
-| SL-21 | Tarjetas 3-up idénticas | P1 · imp. P3 | D2 (+D3) | sí | — |
-| SL-22 | Ritmo monótono entre secciones y apretado dentro | P2 · imp. P2 | D3 (+D2) | no | — |
-| HOM-1 | Hero fuera de la retícula | P2 · imp. P2 | D2 | no | — |
-| HOM-2 | Hueco sobre el titular | P2 · imp. P3 | D2 | no | — |
-| HOM-3 | CTA secundario casi invisible | P1 · imp. P2 | D2 | no | — |
-| HOM-4 | Entrada del hero con opacity | P3 · imp. P2 | D2 | no | — |
-| HOM-5 | Verdict beat indistinguible en oscuro | P1 · imp. P2 | D2 | no | — |
-| HOM-6 | Salto del count-up | P3 · imp. P3 | D2 | no | — |
-| HOM-7 | Titulares y bloques duplicados entre páginas | — · imp. P3 | D2 (+D3) | sí | — |
-| THS-1 | Dos bordes izquierdos en el primer viewport | P2 · imp. P3 | D4 (+D6) | no | — |
-| THS-2 | Fechas incoherentes | — · imp. P2 | D4 | sí | — |
-| ROL-1 | H1 de 4 líneas a 390 | P2 · imp. P2 | D3 | no | — |
-| ROL-2 | Workflows: enlace repetido ×7 y span vacío | P1 · imp. P3 | D3 | sí | — |
-| STK-1 | Bandas inactivas del diagrama con opacity sobre el texto | P1 · imp. P1 | D3 | no | — |
-| STK-2 | Barras de capa invisibles en la banda oscura | P1 · imp. P2 | D3 | no | — |
-| STK-3 | Cuadrados decorativos en «How to read it» | P1 · imp. P3 | D3 | no | — |
-| STK-4 | Tabla de herramientas a una por fila | P2 · imp. P2 | D3 | sí | — |
-| PTH-1 | La leyenda no distingue los estados | P1 · imp. P2 | D3 | no | — |
-| PTH-2 | Nodos opcionales casi invisibles | P1 · imp. P2 | D3 | no | — |
-| MAP-1 | Chips que repiten el nombre de la fila | P1 · imp. P3 | D3 | no | — |
-| MAP-2 | Tracking de etiqueta en texto de caja mixta | P2 · imp. P3 | D3 | no | — |
-| BOK-1 | Resúmenes cortados a mitad de frase | P2 · imp. P3 | D4 (+D2) | no | — |
-| BOK-2 | Hueco antes del footer | P2 · imp. P3 | D4 | no | — |
-| BST-1 | Miga con el número de capítulo duplicado | — · imp. P3 | D4 | no | — |
-| BST-2 | Interlínea 1 en la miga | P2 · imp. P3 | D4 | no | — |
-| BST-3 | La máscara del sidebar atenúa el último capítulo | P1 · imp. P2 | D4 | no | — |
-| BST-4 | Punto huérfano en AtAGlance | P2 · imp. P3 | D4 | no | — |
+| SL-19 | CtaBand de cierre en cada landing | P1 · imp. P2 | D2 | sí | n/a |
+| SL-20 | Franja de salarios en la home, duplicada en /role | P1 · imp. P2 | D2 | sí | n/a |
+| SL-21 | Tarjetas 3-up idénticas | P1 · imp. P3 | D2 (+D3) | sí | n/a |
+| SL-22 | Ritmo monótono entre secciones y apretado dentro | P2 · imp. P2 | D3 (+D2) | no | n/a |
+| HOM-1 | Hero fuera de la retícula | P2 · imp. P2 | D2 | no | n/a |
+| HOM-2 | Hueco sobre el titular | P2 · imp. P3 | D2 | no | n/a |
+| HOM-3 | CTA secundario casi invisible | P1 · imp. P2 | D2 | no | n/a |
+| HOM-4 | Entrada del hero con opacity | P3 · imp. P2 | D2 | no | n/a |
+| HOM-5 | Verdict beat indistinguible en oscuro | P1 · imp. P2 | D2 | no | n/a |
+| HOM-6 | Salto del count-up | P3 · imp. P3 | D2 | no | n/a |
+| HOM-7 | Titulares y bloques duplicados entre páginas | n/a · imp. P3 | D2 (+D3) | sí | n/a |
+| THS-1 | Dos bordes izquierdos en el primer viewport | P2 · imp. P3 | D4 (+D6) | no | n/a |
+| THS-2 | Fechas incoherentes | n/a · imp. P2 | D4 | sí | n/a |
+| ROL-1 | H1 de 4 líneas a 390 | P2 · imp. P2 | D3 | no | n/a |
+| ROL-2 | Workflows: enlace repetido ×7 y span vacío | P1 · imp. P3 | D3 | sí | n/a |
+| STK-1 | Bandas inactivas del diagrama con opacity sobre el texto | P1 · imp. P1 | D3 | no | n/a |
+| STK-2 | Barras de capa invisibles en la banda oscura | P1 · imp. P2 | D3 | no | n/a |
+| STK-3 | Cuadrados decorativos en «How to read it» | P1 · imp. P3 | D3 | no | n/a |
+| STK-4 | Tabla de herramientas a una por fila | P2 · imp. P2 | D3 | sí | n/a |
+| PTH-1 | La leyenda no distingue los estados | P1 · imp. P2 | D3 | no | n/a |
+| PTH-2 | Nodos opcionales casi invisibles | P1 · imp. P2 | D3 | no | n/a |
+| MAP-1 | Chips que repiten el nombre de la fila | P1 · imp. P3 | D3 | no | n/a |
+| MAP-2 | Tracking de etiqueta en texto de caja mixta | P2 · imp. P3 | D3 | no | n/a |
+| BOK-1 | Resúmenes cortados a mitad de frase | P2 · imp. P3 | D4 (+D2) | no | n/a |
+| BOK-2 | Hueco antes del footer | P2 · imp. P3 | D4 | no | n/a |
+| BST-1 | Miga con el número de capítulo duplicado | n/a · imp. P3 | D4 | no | n/a |
+| BST-2 | Interlínea 1 en la miga | P2 · imp. P3 | D4 | no | n/a |
+| BST-3 | La máscara del sidebar atenúa el último capítulo | P1 · imp. P2 | D4 | no | n/a |
+| BST-4 | Punto huérfano en AtAGlance | P2 · imp. P3 | D4 | no | n/a |
 | RES-1 | Viñetas visibles en el hub | P2 · imp. P2 | D5 | no | bug |
-| GLO-1 | Hueco entre el hero y la barra A–Z | P2 · imp. P3 | D5 | no | — |
-| GLO-2 | Anchos desiguales entre entradas y barra A–Z | P2 · imp. P3 | D5 | no | — |
-| CRW-1 | Chip «related» sin leyenda visible | P1 · imp. P2 | D5 | no | — |
-| CRW-2 | Claves de capa solo por color | P1 · imp. P2 | D5 (+D3) | no | — |
-| CRW-3 | Matriz cortada a 390 sin pista de scroll | P2 · imp. P2 | D5 | no | — |
-| FRW-1 | Cabeceras de la matriz a 10 px con opacity | P1 · imp. P2 | D5 | no | — |
-| FRW-2 | Páginas interminables a 390 | P2 · imp. P2 | D5 | sí | — |
-| FRW-3 | Columna de etiquetas ancha en filas-tarjeta | P2 · imp. P3 | D5 | no | — |
-| 404-1 | Tres CTAs | P2 · imp. P3 | D6 | no | — |
-| 404-2 | Banda vacía antes del footer | P2 · imp. P3 | D6 | no | — |
-| GLB-1 | Drawers con cierres distintos | P2 · imp. P3 | D5 | no | — |
-| GLB-2 | Footer largo y nombres partidos | P2 · imp. P3 | D1 | no | — |
-| GLB-3 | Pista «Ctrl K» en táctil | — · imp. P3 | D1 | no | — |
-| TC-01 | Drawer de capítulos cerrado pero enfocable | — · imp. P1 | D4 | no | bug |
+| GLO-1 | Hueco entre el hero y la barra A–Z | P2 · imp. P3 | D5 | no | n/a |
+| GLO-2 | Anchos desiguales entre entradas y barra A–Z | P2 · imp. P3 | D5 | no | n/a |
+| CRW-1 | Chip «related» sin leyenda visible | P1 · imp. P2 | D5 | no | n/a |
+| CRW-2 | Claves de capa solo por color | P1 · imp. P2 | D5 (+D3) | no | n/a |
+| CRW-3 | Matriz cortada a 390 sin pista de scroll | P2 · imp. P2 | D5 | no | n/a |
+| FRW-1 | Cabeceras de la matriz a 10 px con opacity | P1 · imp. P2 | D5 | no | n/a |
+| FRW-2 | Páginas interminables a 390 | P2 · imp. P2 | D5 | sí | n/a |
+| FRW-3 | Columna de etiquetas ancha en filas-tarjeta | P2 · imp. P3 | D5 | no | n/a |
+| 404-1 | Tres CTAs | P2 · imp. P3 | D6 | no | n/a |
+| 404-2 | Banda vacía antes del footer | P2 · imp. P3 | D6 | no | n/a |
+| GLB-1 | Drawers con cierres distintos | P2 · imp. P3 | D5 | no | n/a |
+| GLB-2 | Footer largo y nombres partidos | P2 · imp. P3 | D1 | no | n/a |
+| GLB-3 | Pista «Ctrl K» en táctil | n/a · imp. P3 | D1 | no | n/a |
+| TC-01 | Drawer de capítulos cerrado pero enfocable | n/a · imp. P1 | D4 | no | bug |
 | TC-02 | Reflow a 320: la cabecera desborda | P2 · imp. P1 | D1 | no | bug |
 | TC-03 | Desborde horizontal en /resources/frameworks a 390 | P2 · imp. P1 | D5 | no | bug |
 | TC-04 | «Cite this chapter» desborda a 390 | P2 · imp. P2 | D4 | no | bug |
 | TC-05 | Resultados de búsqueda sin estilo | P1 · imp. P2 | D1 | no | bug |
-| TC-06 | Sidebar y TOC del Doc no son sticky | — · imp. P2 | D4 | no | bug |
-| TC-07 | El clic tras el hover cierra el mega-menú | — · imp. P2 | D1 | no | bug |
-| TC-08 | Etiquetas SVG de diagramas bajo AA | P1 · imp. P1 | — | — | — |
-| TC-09 | Texto de diagramas a 2–7 px | P1 · imp. P1 | — | — | — |
-| TC-10 | «Dim the rest» atenúa texto con opacity | P1 · imp. P2 | — | — | — |
-| TC-11 | Texto al 200 % recortado a 390 | P2 · imp. P2 | D3 (+D2) | no | — |
-| TC-12 | Objetivos táctiles de menos de 24 px | P2 · imp. P2 | D3 | no | — |
-| TC-13 | `.nav-num` bajo AA en hover | P1 · imp. P3 | D4 | no | — |
-| TC-14 | `landmark-unique`: dos `<aside>` sin nombre | — · imp. P3 | D4 | no | — |
-| TC-15 | Drawers con fondo no inerte | — · imp. P3 | D5 | no | — |
-| TC-16 | El toggle de tema anuncia un estado doble | — · imp. P3 | D1 | no | — |
-| TC-17 | La búsqueda necesita dos Esc | — · imp. P3 | D1 | no | — |
-| TC-18 | Shiki con la paleta github-dark | P1 · imp. P3 | D4 | sí | — |
-| TC-19 | Scrims y color de OG hard-coded | — · imp. P3 | D1 | sí | — |
-| TC-20 | `backdrop-filter` en la cabecera sticky | P3 · imp. P3 | D1 | no | — |
-| TC-21 | Transiciones de height fuera de tokens | P3 · imp. P3 | D4 | no | — |
-| TC-22 | `motion-ui` cargado en todas las rutas | P3 · imp. P3 | — | — | — |
-| TC-23 | Set oscuro triplicado | — · imp. P3 | — | — | — |
-| TC-24 | «Kill» global de reduced-motion | P3 · imp. P3 | — | — | — |
-| TC-25 | Líneas de prosa demasiado largas | P2 · imp. P2 | — | — | — |
-| TC-26 | Gates de CI ciegos al contraste | — · imp. P2 | — | — | — |
-| TC-27 | Estado HTTP de /404 en producción | — · imp. P3 | D6 | no | — |
-| DET-01 | Detector no comparable con el baseline | — · imp. P2 | — | — | — |
-| MS-01 | Turbidez de la malla en oscuro | P1 · imp. P3 | D2 (+D6) | Jordi | — |
-| MS-02 | Repetición de la malla | P1 · imp. P3 | D2 (+D3) | Jordi | — |
-| MS-03 | `--muted` sin re-scope sobre la malla (AA) | P1 · imp. P1 | D2 (+D3) | no | — |
-| MS-04 | Deriva de la malla | P3 · imp. P3 | D2 | Jordi | — |
-| MS-05 | Anillo `--grad-border` en hover | P1 · imp. P3 | D2 | Jordi | — |
-| MS-06 | Texto degradado en las cifras | P1 · imp. P3 | D2 | Jordi | — |
-| MS-07 | Malla y línea degradada dentro de la CtaBand | P1 · imp. P3 | D2 | Jordi | — |
-| MS-08 | Glow radial de ChapterHeader | P1 · imp. P3 | D4 | Jordi | — |
-| MS-09 | Malla más saturada en /404 | P1 · imp. P3 | D6 | Jordi | — |
+| TC-06 | Sidebar y TOC del Doc no son sticky | n/a · imp. P2 | D4 | no | bug |
+| TC-07 | El clic tras el hover cierra el mega-menú | n/a · imp. P2 | D1 | no | bug |
+| TC-08 | Etiquetas SVG de diagramas bajo AA | P1 · imp. P1 | n/a | n/a | n/a |
+| TC-09 | Texto de diagramas a 2–7 px | P1 · imp. P1 | n/a | n/a | n/a |
+| TC-10 | «Dim the rest» atenúa texto con opacity | P1 · imp. P2 | n/a | n/a | n/a |
+| TC-11 | Texto al 200 % recortado a 390 | P2 · imp. P2 | D3 (+D2) | no | n/a |
+| TC-12 | Objetivos táctiles de menos de 24 px | P2 · imp. P2 | D3 | no | n/a |
+| TC-13 | `.nav-num` bajo AA en hover | P1 · imp. P3 | D4 | no | n/a |
+| TC-14 | `landmark-unique`: dos `<aside>` sin nombre | n/a · imp. P3 | D4 | no | n/a |
+| TC-15 | Drawers con fondo no inerte | n/a · imp. P3 | D5 | no | n/a |
+| TC-16 | El toggle de tema anuncia un estado doble | n/a · imp. P3 | D1 | no | n/a |
+| TC-17 | La búsqueda necesita dos Esc | n/a · imp. P3 | D1 | no | n/a |
+| TC-18 | Shiki con la paleta github-dark | P1 · imp. P3 | D4 | sí | n/a |
+| TC-19 | Scrims y color de OG hard-coded | n/a · imp. P3 | D1 | sí | n/a |
+| TC-20 | `backdrop-filter` en la cabecera sticky | P3 · imp. P3 | D1 | no | n/a |
+| TC-21 | Transiciones de height fuera de tokens | P3 · imp. P3 | D4 | no | n/a |
+| TC-22 | `motion-ui` cargado en todas las rutas | P3 · imp. P3 | n/a | n/a | n/a |
+| TC-23 | Set oscuro triplicado | n/a · imp. P3 | n/a | n/a | n/a |
+| TC-24 | «Kill» global de reduced-motion | P3 · imp. P3 | n/a | n/a | n/a |
+| TC-25 | Líneas de prosa demasiado largas | P2 · imp. P2 | n/a | n/a | n/a |
+| TC-26 | Gates de CI ciegos al contraste | n/a · imp. P2 | n/a | n/a | n/a |
+| TC-27 | Estado HTTP de /404 en producción | n/a · imp. P3 | D6 | no | n/a |
+| DET-01 | Detector no comparable con el baseline | n/a · imp. P2 | n/a | n/a | n/a |
+| MS-01 | Turbidez de la malla en oscuro | P1 · imp. P3 | D2 (+D6) | Jordi | n/a |
+| MS-02 | Repetición de la malla | P1 · imp. P3 | D2 (+D3) | Jordi | n/a |
+| MS-03 | `--muted` sin re-scope sobre la malla (AA) | P1 · imp. P1 | D2 (+D3) | no | n/a |
+| MS-04 | Deriva de la malla | P3 · imp. P3 | D2 | Jordi | n/a |
+| MS-05 | Anillo `--grad-border` en hover | P1 · imp. P3 | D2 | Jordi | n/a |
+| MS-06 | Texto degradado en las cifras | P1 · imp. P3 | D2 | Jordi | n/a |
+| MS-07 | Malla y línea degradada dentro de la CtaBand | P1 · imp. P3 | D2 | Jordi | n/a |
+| MS-08 | Glow radial de ChapterHeader | P1 · imp. P3 | D4 | Jordi | n/a |
+| MS-09 | Malla más saturada en /404 | P1 · imp. P3 | D6 | Jordi | n/a |
 
 ### 10.1 Recuento por bloque
 
@@ -610,11 +610,11 @@ Hace falta que Jordi amplíe `proposal.md` / `tasks.md` o abra un cambio nuevo.
 - **TC-09** Texto de diagramas a 2–7 px (P1 · imp. P1). Diagramas archify: Non-Goal de design.md.
 - **TC-10** «Dim the rest» atenúa texto con opacity (P1 · imp. P2). Diagramas archify: Non-Goal de design.md.
 - **TC-22** `motion-ui` cargado en todas las rutas (P3 · imp. P3). Fase 3 (base de motion).
-- **TC-23** Set oscuro triplicado (— · imp. P3). Refactor de tokens/base.
+- **TC-23** Set oscuro triplicado (sin bloque · imp. P3). Refactor de tokens/base.
 - **TC-24** «Kill» global de reduced-motion (P3 · imp. P3). Refactor de tokens/base.
 - **TC-25** Líneas de prosa demasiado largas (P2 · imp. P2). Token `--prose`.
-- **TC-26** Gates de CI ciegos al contraste (— · imp. P2). Gates de CI.
-- **DET-01** Detector no comparable con el baseline (— · imp. P2). Gate del detector (§7.5).
+- **TC-26** Gates de CI ciegos al contraste (sin bloque · imp. P2). Gates de CI.
+- **DET-01** Detector no comparable con el baseline (sin bloque · imp. P2). Gate del detector (§7.5).
 
 **Con bloque, pero amplían su alcance:**
 
@@ -625,7 +625,7 @@ Hace falta que Jordi amplíe `proposal.md` / `tasks.md` o abra un cambio nuevo.
 | 6 · D2 home + marketing | SL-01 Telemetría simulada en el hero (en curso); SL-03 Register rule numerado 01–07 (en curso); SL-04 Fórmula eyebrow + H2 + lede y chips de kicker (en curso); SL-13 Elevación uniforme (sombra + lift en todas las tarjetas) (en curso); SL-15 Bento con teselas medio vacías; SL-19 CtaBand de cierre en cada landing; SL-20 Franja de salarios en la home, duplicada en /role; SL-21 Tarjetas 3-up idénticas; HOM-7 Titulares y bloques duplicados entre páginas |
 | 7 · D3 landings | ROL-2 Workflows: enlace repetido ×7 y span vacío; STK-4 Tabla de herramientas a una por fila |
 | 8 · D5 resources | SL-06 Colores de capa sin significado estable; FRW-2 Páginas interminables a 390 |
-| 9 · D6 about/404/newsletter | — |
+| 9 · D6 about/404/newsletter | n/a |
 
 ### 10.3 Pendientes de decisión de Jordi
 

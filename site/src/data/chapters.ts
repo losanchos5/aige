@@ -29,8 +29,8 @@ export interface Chapter {
    * The stack layer (1–5) this chapter is about, when it is about exactly one.
    * Only then does the chapter header take that layer's colour; any other
    * chapter reads neutral, because a layer colour means that layer and nothing
-   * else (audit SL-06). None of the eleven chapters is about a single layer —
-   * The stack and Patterns span all five — so none sets it today.
+   * else (audit SL-06). None of the eleven chapters is about a single layer:
+   * The stack and Patterns span all five, so none sets it today.
    */
   layer?: 1 | 2 | 3 | 4 | 5;
 }

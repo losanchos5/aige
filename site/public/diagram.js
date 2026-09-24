@@ -244,7 +244,7 @@
 
       // Any close path (Close button, the dialog's native Escape, or a backdrop
       // click) restores the moved nodes and focus, then empties the dialog. The
-      // document-level Escape handler still clears the pinned selection — it does
+      // document-level Escape handler still clears the pinned selection: it does
       // not preventDefault, so the dialog closes normally.
       dialog.addEventListener('close', function () {
         if (canvasHome && canvasHome.parentNode) {

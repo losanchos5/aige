@@ -1,4 +1,4 @@
-/* figures.css — the conceptual infographics (src/figures/*.svg) and the figure
+/* figures.css: the conceptual infographics (src/figures/*.svg) and the figure
    that wraps them, plus the reading-paths map on the /bok index. Imported once
    from diagrams.css (which Base.astro loads on every page), so both the chapter
    pipeline (rehype-diagrams) and <Figure> get these styles.

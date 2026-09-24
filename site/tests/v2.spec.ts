@@ -1,4 +1,4 @@
-// v2.spec.ts: Block V2 — the /stack interactive layer-flow diagram and the
+// v2.spec.ts: Block V2, the /stack interactive layer-flow diagram and the
 // home "The stack" evidence pulse. Structural/interaction assertions run in the
 // default project; the review screenshots (motion on for the pulse, both colour
 // schemes) are written to tests/__screenshots__/V2b/.

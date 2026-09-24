@@ -96,14 +96,14 @@ const jsonLd = {
 
 <Marketing
   title="Resources"
-  description="Curated, sourced and versioned resources for AI governance engineering: frameworks, tools, a reading list and a glossary, all from the Body of Knowledge."
+  description="Curated, sourced and versioned resources for AI governance engineering: frameworks, tools, a reading list, a glossary, a topic crosswalk and the discipline map, all from the Body of Knowledge."
   image="/og/resources.png"
   jsonLd={jsonLd}
 >
   <PageHero
     variant="res"
     title="Curated, sourced, versioned."
-    lede="Five references drawn straight from the Body of Knowledge: the frameworks the discipline maps against, the tool categories that fill each layer, the sources that formed it, the terms it uses and the crosswalk that maps each topic to every framework."
+    lede="Six references drawn straight from the Body of Knowledge: the frameworks the discipline maps against, the tool categories that fill each layer, the sources that formed it, the terms it uses, the crosswalk that maps each topic to every framework and the map that lays the whole discipline on one canvas."
   >
     <p slot="note">
       Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync
@@ -162,7 +162,7 @@ const jsonLd = {
 
   @media (min-width: 600px) {
     /* Two columns: the first card and the last (the map) each span both (a full
-       row), so the four references between them tile a clean 2×2 — no orphan. */
+       row), so the four references between them tile a clean 2×2, no orphan. */
     .rc-bento > :global(li:first-child),
     .rc-bento > :global(li:nth-child(6)) {
       grid-column: span 2;

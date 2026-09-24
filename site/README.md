@@ -2,10 +2,10 @@
 
 The Astro 5 static site for AI Governance Engineering, deployed to Cloudflare Pages.
 
-- `npm run dev` — local dev server (runs `predev` → the diagram build first).
-- `npm run build` — `astro check` + build, content-lint, link check, then Pagefind
+- `npm run dev`: local dev server (runs `predev` → the diagram build first).
+- `npm run build`: `astro check` + build, content-lint, link check, then Pagefind
   (runs `prebuild` → the diagram build first).
-- `npm test` — Playwright default project.
+- `npm test`: Playwright default project.
 
 ## Analytics
 
@@ -14,7 +14,7 @@ Cloudflare Web Analytics is off by default and needs no code change to turn on.
 `PUBLIC_CF_BEACON_TOKEN` is non-empty; otherwise nothing is emitted. The deploy
 workflow passes it from a repository secret named **`CF_BEACON_TOKEN`**, so the
 owner activates analytics by adding that secret (its value is the Cloudflare Web
-Analytics site token) — no redeploy of the code is required beyond the next push.
+Analytics site token), no redeploy of the code is required beyond the next push.
 The beacon loads from `static.cloudflareinsights.com`, already allow-listed in
 `public/_headers`, so the strict CSP keeps working.
 
@@ -32,10 +32,10 @@ Architecture, workflow, sequence, dataflow and lifecycle diagrams are authored a
 [archify](https://github.com/tt-a1i/archify) JSON IR and compiled at build time into
 two artifacts each:
 
-- `public/diagrams/<id>.html` — the full standalone archify viewer, served at
+- `public/diagrams/<id>.html`: the full standalone archify viewer, served at
   `/diagrams/<id>.html` (its own relaxed CSP lives in `public/_headers`, and it is
   excluded from the Pagefind index).
-- `src/generated/diagrams/<id>.svg` — a cleaned, id-namespaced SVG for inlining in
+- `src/generated/diagrams/<id>.svg`: a cleaned, id-namespaced SVG for inlining in
   Astro pages, alongside `src/generated/diagrams/manifest.json`.
 
 ### Flow
@@ -70,7 +70,7 @@ All three output locations (`site/.archify`, `site/public/diagrams`,
    `architecture`, `workflow`, `sequence`, `dataflow`, `lifecycle` (the penultimate
    dotted segment of the filename). Start from the archify `examples/` if needed.
 2. Run `npm run diagrams:build`. A validation failure prints the failing checks and
-   exits non-zero — fix the IR until `--quality showcase` passes.
+   exits non-zero: fix the IR until `--quality showcase` passes.
 3. Inline the SVG (or link `/diagrams/<id>.html`) in a page; `manifest.json`
    exposes `{ id, type, title, nodes, viewBox }` for build-time use.
 
@@ -89,14 +89,14 @@ data modules (not hand-edited) by `scripts/figures-build.mjs`, which runs in
 **The discipline map** (`/map`) is the largest figure, built by
 `scripts/map-build.mjs` from `src/data/map.ts` (pure: only `import type`, loaded via
 `scripts/lib/load-ts.mjs`). Its layout engine measures text with
-`scripts/lib/svg-text.mjs` and throws if a label does not fit its column — fix the
+`scripts/lib/svg-text.mjs` and throws if a label does not fit its column: fix the
 offending node with a `short` (a verbatim substring), never a smaller font. It emits
 two variants:
 
-- **web** — inlined on `/map` and re-emitted as `src/figures/discipline-map.svg`
+- **web**: inlined on `/map` and re-emitted as `src/figures/discipline-map.svg`
   (class-based colour, ≤ 48 KB budget). Debug it with
   `node scripts/map-build.mjs --web --out test-results/map-web.svg`.
-- **portrait** — a standalone, light-theme-hex SVG for the LinkedIn infographic
+- **portrait**: a standalone, light-theme-hex SVG for the LinkedIn infographic
   kit (not versioned in the repo):
   `node scripts/map-build.mjs --portrait --out <path.svg> --meta <path.json>`.
   The `--meta` JSON carries the BoK version, `viewBox` and node/leaf/text counts

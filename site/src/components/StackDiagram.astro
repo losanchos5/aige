@@ -1,14 +1,14 @@
 ---
 /**
- * StackDiagram — the five-layer stack, in two modes.
+ * StackDiagram: the five-layer stack, in two modes.
  *
- * `static`  — a large, RegisterMark-style graphic: five inline-SVG bars, each
+ * `static`, a large, RegisterMark-style graphic: five inline-SVG bars, each
  *   filled with its layer pastel and hairline-outlined, labelled with the mono
  *   index and layer name. A subtle, staggered draw-in plays on load (CSS only,
  *   reduced-motion safe). On /stack, public/stack.js swaps that draw-in for a
  *   scroll-triggered stagger (see `[data-layer-bars]` below).
  *
- * `interactive` — five register rows (index, name, tagline, artefact chips).
+ * `interactive`: five register rows (index, name, tagline, artefact chips).
  *   Hovering or focusing a row tints its index cell with the layer pastel and,
  *   via `:has()`, highlights the matching bar in a small side mark. A thin
  *   vertical rule with an arrowhead reads "Evidence flows up". Pure CSS.
@@ -29,9 +29,9 @@ const pad = (n: number) => String(n).padStart(2, '0');
 // Trim a full artefact sentence down to a short, chip-sized head phrase. This is
 // a mechanical cut at the first natural break (comma, colon, dash, parenthesis,
 // or a relative/prepositional joint) with a word-boundary length cap and a
-// trailing stop-word strip — no new wording is introduced.
+// trailing stop-word strip, no new wording is introduced.
 function chip(text: string): string {
-  const seps = [',', ':', ';', '(', '—', ' that ', ' under ', ' tied ', ' linked '];
+  const seps = [',', ':', ';', '(', '\u2014', ' that ', ' under ', ' tied ', ' linked '];
   let cut = -1;
   for (const sep of seps) {
     const i = text.indexOf(sep);
