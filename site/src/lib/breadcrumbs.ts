@@ -12,7 +12,7 @@ export interface Crumb {
 
 /**
  * Build a schema.org BreadcrumbList for `items`, with Home in position 1 and
- * absolute item URLs (a crumb without an href — the current page — omits `item`).
+ * absolute item URLs (a crumb without an href (the current page) omits `item`).
  */
 export function breadcrumbJsonLd(items: Crumb[]): Record<string, unknown> {
   const all: Crumb[] = [{ label: 'Home', href: '/' }, ...items];

@@ -1,5 +1,5 @@
 // maturity.ts: the five-level maturity model, faithful to
-// bok/07-maturity-model.md — a ladder from paper to production that measures
+// bok/07-maturity-model.md: a ladder from paper to production that measures
 // the running systems, not the paperwork. The levels are bold sub-headings
 // inside the "The five levels" section rather than their own headings, so every
 // level's `anchor` points at that section.

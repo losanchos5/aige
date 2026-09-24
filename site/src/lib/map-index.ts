@@ -1,5 +1,5 @@
 // map-index.ts: build the per-branch "content by cluster" index that sits under
-// the map on /map — the textual, JavaScript-free alternative to the SVG. For
+// the map on /map: the textual, JavaScript-free alternative to the SVG. For
 // each of the eight branches it groups everything the site says about that
 // branch: the map's own tree as links, the chapter's H2 sections, the diagrams
 // and figures placed in those chapters, the learning-path nodes that reach into

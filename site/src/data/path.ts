@@ -1,4 +1,4 @@
-// path.ts: the AIGE learning path — a roadmap.sh-style itinerary for the AI
+// path.ts: the AIGE learning path, a roadmap.sh-style itinerary for the AI
 // governance engineer. Stages follow the spine of chapter 04 ("see it, rule
 // it, test it, contain it, prove it"); nodes are grounded in bok/*.md and the
 // /role and /stack pages, and never introduce a claim the chapters do not make.

@@ -27,7 +27,7 @@ for (const scheme of schemes) {
   }
 }
 
-// Block N: grouped-navigation review shots — the Body of Knowledge disclosure
+// Block N: grouped-navigation review shots, the Body of Knowledge disclosure
 // panel open at 1440 and the mobile drawer open at 390, both colour schemes,
 // written to tests/__screenshots__/N/. Viewport (not full-page) shots so the
 // panel/drawer are the subject.

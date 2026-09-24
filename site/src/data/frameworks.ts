@@ -1,4 +1,4 @@
-// frameworks.ts: the regulatory map, faithful to bok/08-regulatory-map.md —
+// frameworks.ts: the regulatory map, faithful to bok/08-regulatory-map.md:
 // the reverse index that names, for each obligation, the engineering artefact
 // that evidences it and the stack layer the artefact lives in.
 //

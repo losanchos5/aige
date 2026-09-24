@@ -1,4 +1,4 @@
-// map.ts: the data model of "the map of the discipline" — a two-sided mind map
+// map.ts: the data model of "the map of the discipline", a two-sided mind map
 // with a central node (AI Governance Engineer) and eight branches, each with its
 // second-level leaves and, where the design calls for it, third-level chips.
 //
@@ -62,8 +62,8 @@ export interface MapNode {
   inlineChildren?: boolean;
   /**
    * Portrait-only rendering mode (the web variant ignores it):
-   * - 'pill' (default) — draw the node's own pill, no chips.
-   * - 'chips-only' — draw only the node's inline children as chips (no pill,
+   * - 'pill' (default): draw the node's own pill, no chips.
+   * - 'chips-only': draw only the node's inline children as chips (no pill,
    *   no badge), so the portrait shows the members rather than the group header.
    */
   portrait?: 'pill' | 'chips-only';
@@ -188,7 +188,7 @@ const PATTERN_SHORT: Record<string, string> = {
  * chapters it names.
  */
 export const HAND_WRITTEN: readonly HandWritten[] = [
-  // chapter 01 — foundations
+  // chapter 01: foundations
   { label: 'The definition', file: 'bok/01-definition.md' },
   { label: 'The three questions', file: 'bok/01-definition.md' },
   { label: 'The disambiguation cluster', file: 'bok/01-definition.md' },
@@ -199,17 +199,17 @@ export const HAND_WRITTEN: readonly HandWritten[] = [
   { label: 'Responsible AI / AI ethics', file: 'bok/01-definition.md' },
   { label: 'GRC engineering', file: 'bok/01-definition.md' },
   { label: 'AI security engineering', file: 'bok/01-definition.md' },
-  // chapter 02 — why now
+  // chapter 02: why now
   { label: 'The five problems, with the evidence', file: 'bok/02-why-now.md' },
-  // chapter 04 — the stack
+  // chapter 04: the stack
   { label: 'The minimum viable stack for a team of one', file: 'bok/04-the-stack.md' },
-  // chapter 06 — the role
+  // chapter 06: the role
   { label: 'The career ladder', file: 'bok/06-the-role.md' },
   { label: 'Three ways in', file: 'bok/06-the-role.md' },
-  // chapter 07 — maturity
+  // chapter 07: maturity
   { label: 'Self-assessment checklist', file: 'bok/07-maturity-model.md' },
   { label: 'Metrics per level', file: 'bok/07-maturity-model.md' },
-  // chapter 08 — regulatory map (framework families, verbatim H2s)
+  // chapter 08: regulatory map (framework families, verbatim H2s)
   { label: 'EU AI Act, post-Omnibus', file: 'bok/08-regulatory-map.md' },
   { label: 'GPAI Code of Practice', file: 'bok/08-regulatory-map.md' },
   { label: 'ISO/IEC 42001, 42005 and 42006', file: 'bok/08-regulatory-map.md' },

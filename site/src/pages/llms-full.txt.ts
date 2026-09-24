@@ -1,11 +1,11 @@
-// /llms-full.txt — the whole corpus in one plain-text file, as llmstxt.org
+// /llms-full.txt: the whole corpus in one plain-text file, as llmstxt.org
 // suggests alongside the /llms.txt index: the same header, then every Body of
 // Knowledge chapter in reading order and the Thesis, each opened by its title
 // and canonical URL and followed by its Markdown source verbatim.
 //
-// The sources are plain Markdown — the callouts are labelled blockquotes and the
+// The sources are plain Markdown: the callouts are labelled blockquotes and the
 // diagrams are injected at build time from data/diagrams.ts, not from any custom
-// syntax in the files — so nothing has to be stripped beyond each document's own
+// syntax in the files, so nothing has to be stripped beyond each document's own
 // H1, which this file re-emits with the URL attached.
 import { getCollection, getEntry } from 'astro:content';
 import type { APIRoute } from 'astro';

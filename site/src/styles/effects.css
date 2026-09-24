@@ -1,7 +1,7 @@
 /* effects.css: the Editorial+ depth layer. Every value comes from a token in
    tokens.css so light and dark both follow, and every decorative surface is
    inert (aria-hidden in markup, pointer-events:none here). No `filter: blur()`
-   anywhere — the mesh reads soft because its gradient stops are soft, and it
+   anywhere: the mesh reads soft because its gradient stops are soft, and it
    only drifts via translate/scale under prefers-reduced-motion: no-preference.
    Imported after utilities.css so it can layer on the flat base. */
 

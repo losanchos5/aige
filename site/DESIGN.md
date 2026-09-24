@@ -1,11 +1,11 @@
-# Design system — aigovernanceengineer.com
+# Design system: aigovernanceengineer.com
 
 ## Purpose
 
 This site is the home of AI Governance Engineering: the Thesis, the Body of Knowledge, the Role,
 Stack, Path and Map, and a Resources section (frameworks, crosswalk, glossary, tools, reading list).
 This file is the source of truth for any design tool or agent auditing or modifying the visual
-system — it lists every token, primitive and constraint that actually exists in the codebase; do not
+system: it lists every token, primitive and constraint that actually exists in the codebase; do not
 invent colors, fonts or components beyond what is documented here.
 
 ## Color tokens
@@ -63,28 +63,28 @@ only by `pages/index.astro`.
 
 The five `--l1..--l5` pairs are the only accent hues on the site. They map to the five layers of the
 governance stack (see the home page and `/stack`) and are reused everywhere a figure or an accent
-needs a color — never introduce a sixth hue.
+needs a color, never introduce a sixth hue.
 
 ## Typography
 
 Four self-hosted, self-fontsourced families, loaded in `site/src/styles/fonts.css` via `@font-face`
 from `/fonts/*.woff2` (latin subset, `font-display: swap`):
 
-- **Bricolage Grotesque Variable** (`--font-display`) — display type: H1/H2/H3 everywhere except the
+- **Bricolage Grotesque Variable** (`--font-display`), display type: H1/H2/H3 everywhere except the
   home hero headline. Weight axis only (`wght` 200–800), copied from `@fontsource-variable/*` as the
   `latin-wght-normal` file (preloaded in `Base.astro` and `public/_headers`); no `wdth`/`opsz` axes
-  and no `font-variation-settings` pin — every heading draws the plain weight master.
-- **Instrument Sans Variable** (`--font-body`, weight 400–700) — body copy, paragraphs, UI labels.
-- **JetBrains Mono Variable** (`--font-mono`, weight 100–800) — code, data, short identifiers and
+  and no `font-variation-settings` pin: every heading draws the plain weight master.
+- **Instrument Sans Variable** (`--font-body`, weight 400–700): body copy, paragraphs, UI labels.
+- **JetBrains Mono Variable** (`--font-mono`, weight 100–800): code, data, short identifiers and
   small in-section captions (sentence case, e.g. "Build order"). Uppercase + `--tracking-label` only
   for short identifiers (PASS / BLOCK, a value's "established" / "new" tag). No eyebrow labels.
   Table headers and any label longer than a short identifier are sentence case; `.meta` is the
   only remaining uppercase run (dropping it too is the owner's call).
-- **Newsreader Display** (`--font-serif`) — the home hero headline only (`.hero-title` in
+- **Newsreader Display** (`--font-serif`): the home hero headline only (`.hero-title` in
   `pages/index.astro`), nowhere else. Two static cuts (roman + italic), each instanced at its
   display optical size (opsz 72, wght 400) from `@fontsource-variable/newsreader`'s opsz files with
   fontTools (`fonttools varLib.instancer … opsz=72 wght=400 --flavor woff2`, ~22 KB each, against
-  132/147 KB for the source variable files) — no axes to set at runtime, so `font-variation-settings:
+  132/147 KB for the source variable files), no axes to set at runtime, so `font-variation-settings:
   normal`. Preloaded only on `/` via `Base.astro`'s `preloadFonts` prop and a `/`-scoped block in
   `public/_headers` (every other route stays untouched).
 
@@ -103,7 +103,7 @@ Fluid type scale (all `clamp()` values from `tokens.css`):
 Display lettering defaults: `--tracking-display: -0.02em`, `--tracking-label: 0.1em`,
 `--leading-display: 1.05`.
 
-**`.hero-title`** — the home hero headline's own scoped style (`site/src/pages/index.astro`, not a
+**`.hero-title`**: the home hero headline's own scoped style (`site/src/pages/index.astro`, not a
 shared primitive: no other page uses `--font-serif`). `font-size: min(clamp(3rem, 1rem + 4.6vw,
 6.5rem), 15vw)` (the `15vw` cap keeps 200% zoomed text inside a 390px viewport, WCAG 1.4.4/1.4.10);
 `font-weight: 400`; `line-height: 1.02`; `letter-spacing: -0.015em`; colour `--hero-ink`. Two
@@ -121,13 +121,13 @@ Layout: `--container: 1200px` (default max width), `--prose: 72ch` (long-form te
 
 ## Motion tokens
 
-`--dur: 180ms`, `--ease: cubic-bezier(0.2, 0.7, 0.2, 1)` — the only duration/easing pair on the
+`--dur: 180ms`, `--ease: cubic-bezier(0.2, 0.7, 0.2, 1)`, the only duration/easing pair on the
 site; every transition and hover/lift animation composes from these two tokens.
 
 **Scroll reveal rule:** `.reveal` / `.reveal-stagger > *` (in `utilities.css`) drive off
 `animation-timeline: view()` with `animation-range: entry 5% entry 35%` (staggered items shift the
 range by `var(--i, 0) * 6%`). The keyframes (`reveal-in`) animate **`transform: translateY(16px)` →
-`none` only** — never `opacity`. The `@supports not (animation-timeline: view())` fallback
+`none` only**, never `opacity`. The `@supports not (animation-timeline: view())` fallback
 (`ui.js`-driven, class `js-reveal`/`is-visible`) does use `opacity` in addition to `transform`, but
 only as a progressive-enhancement fallback for browsers without scroll-timelines, and both paths
 respect `prefers-reduced-motion`.
@@ -152,12 +152,12 @@ needs no pause control; it also pauses while a step is active, and is absent und
 
 ## Primitives
 
-- **`<Section tone="plain|tint|dark|mesh">`** (`site/src/components/Section.astro`) — the shared
+- **`<Section tone="plain|tint|dark|mesh">`** (`site/src/components/Section.astro`): the shared
   section shell: `<section class="section sec sec--{tone}">`, an inert `.bg-mesh` when
   `tone="mesh"` (or when a `tone="tint"` band passes `mesh`), an optional head (H2 or H1-scale
   title + lede, no kicker) and slotted content over `.sec-inner` (`z-index: 1`). `mesh="a|b|c"`
   picks the composition and `meshK` its strength.
-- **`.bg-mesh`** (`effects.css`) — the identity element: five soft radial glows (`--glow-1..5`)
+- **`.bg-mesh`** (`effects.css`), the identity element: five soft radial glows (`--glow-1..5`)
   split across two pseudo-elements that overhang the host by 20% and drift slowly (see Motion).
   Absolute, `contain: strict`, `aria-hidden`, `pointer-events: none`; the host clips it. Strength is
   `--mesh-alpha × --mesh-k`: `--mesh-alpha` is `1` light / `0.55` dark by default, `0.7` in
@@ -170,51 +170,51 @@ needs no pause control; it also pauses while a step is active, and is absent und
   loop `b` 0.5, questions `c` 0.5, stack tint + `a` 0.35, values `b` 0.45, role `a` 0.6, chapters
   `c` 0.45, resources tint + `b` 0.35; neighbours never share a composition. One mesh per section, several per
   page; never directly under a table or a node grid (the loop sits on its own opaque panel).
-- **`.card-lum`** (`effects.css`) — a flat card: 1px `--line` hairline, `--surface` fill, no
+- **`.card-lum`** (`effects.css`), a flat card: 1px `--line` hairline, `--surface` fill, no
   shadow. A masked `--grad-border` ring fades in around its edge on hover/focus-within (`opacity`,
   not layout).
-- **`.lift`** (`effects.css`) — hover elevation for cards that are links only: it acts on
+- **`.lift`** (`effects.css`), hover elevation for cards that are links only: it acts on
   `a.lift` or on `.lift.card-link` (the caller opts in), a `translateY(-3px)` plus `--shadow-2` on
   `.card-lum`, gated behind `prefers-reduced-motion: no-preference`. A non-link card stays flat.
-- **`.bento`** (`effects.css`) — a responsive editorial grid: 1 column on phones, 2 from 600px, 4
+- **`.bento`** (`effects.css`), a responsive editorial grid: 1 column on phones, 2 from 600px, 4
   from 960px, with `.bento-2x`/`.bento-2y` span modifiers for feature tiles.
-- **`.btn-glow`** (`effects.css`) — the primary CTA: the `--grad-cta` fill with the `--bg` label,
+- **`.btn-glow`** (`effects.css`), the primary CTA: the `--grad-cta` fill with the `--bg` label,
   no halo; hover is a 1px `translateY` lift.
-- **`.reveal` / `.reveal-stagger > *` with `--i`** (`utilities.css`) — scroll-linked entrance
+- **`.reveal` / `.reveal-stagger > *` with `--i`** (`utilities.css`): scroll-linked entrance
   animation (see Motion tokens); `--i` (an integer custom property per item) offsets each staggered
   child's animation range.
-- **`.story` / `.story-pin`** (`effects.css`) — a two-column sticky-scroll layout from 1024px: the
+- **`.story` / `.story-pin`** (`effects.css`), a two-column sticky-scroll layout from 1024px: the
   left column (`.story-pin`) sticks under the header while the right column's rows scroll past it;
   driven by `story.js` toggling `[data-active]`.
-- **`.meta`** (`effects.css`) — a small inline mono status line with a 6px `--l5-ink` dot, used by
+- **`.meta`** (`effects.css`): a small inline mono status line with a 6px `--l5-ink` dot, used by
   the Footer and PageHero's related-chapter link.
-- **ChapterHeader number** (`site/src/components/ChapterHeader.astro`) — the chapter number is plain
+- **ChapterHeader number** (`site/src/components/ChapterHeader.astro`): the chapter number is plain
   mono text beside the title: no chip, no fill.
-- **Type chips** (`.type-tag` in `resources.css`, `.cw-chip` in `crosswalk.css`) — neutral:
+- **Type chips** (`.type-tag` in `resources.css`, `.cw-chip` in `crosswalk.css`): neutral:
   `--tint-bg` fill, `--ink-2` text, hairline border. The five layer colours are reserved for layer
   squares and for elements that genuinely belong to one layer; the chapter header and
   `--chapter-ink` use `--ink`, because no chapter is about a single layer. The FIGURE chip on
   figures is gone for the same reason.
-- **`CtaBand`** (`site/src/components/CtaBand.astro`) — the closing band. Light theme: an `--ink`
+- **`CtaBand`** (`site/src/components/CtaBand.astro`), the closing band. Light theme: an `--ink`
   block with `--bg` text. Dark theme: the dark `--l1` tone with `--ink` / `--ink-2` text (inverting
   there would make a cream slab). Primary button = a solid fill in the band's text colour, no halo;
   secondary = a 45% outline. Its colours live in three locals (`--band-fill`, `--band-text`,
   `--band-text-2`).
-- **Section rule** (`site/src/layouts/Marketing.astro`) — a plain 1px `--line` top border between
+- **Section rule** (`site/src/layouts/Marketing.astro`): a plain 1px `--line` top border between
   adjacent `<section>` siblings inside `.marketing`. No number, no notch.
-- **`.hero--field`** (scoped in `site/src/pages/index.astro`, home only) — the full-viewport
+- **`.hero--field`** (scoped in `site/src/pages/index.astro`, home only): the full-viewport
   (`min-height: 100svh`) hero: a `.hero-field` layer holding `.hero-canvas` (the WebGL gradient
   field, `public/hero-field.js`, with a static CSS radial-gradient fallback painted from the same
   `--field-1..3` tokens for no-JS/no-WebGL and first paint), the centred `.hero-title` + CTA
   (`.hero-center`), and the `.hero-facts` strip. `--muted` is re-scoped to `--ink-2` on it in
   `effects.css`, same as `.sec--mesh`/`.hero--page`.
-- **`.hero-facts`** (`pages/index.astro`) — the strip of figures under the headline: label | value
+- **`.hero-facts`** (`pages/index.astro`), the strip of figures under the headline: label | value
   pairs computed from the content modules (stack layers, workflows, chapters, values, frameworks,
   patterns, BoK version, license), doubled into an `aria-hidden`+`inert` copy for the seamless
   marquee, with the keyboard-only `.motion-toggle` pause control (see Motion tokens). Reduced motion or no JS
   keeps it a static, centred, wrapping list.
 - **Header overlay mode** (`Header.astro` prop `overlay`, threaded from `Base.astro`/`Marketing.astro`
-  `overlayHeader`, home only) — `data-overlay` makes the bar `position: fixed`, fully transparent (no
+  `overlayHeader`, home only), `data-overlay` makes the bar `position: fixed`, fully transparent (no
   ground, blur, hairline or shadow, `--muted` re-scoped to `--ink-2`) until `.is-scrolled` (`ui.js`,
   >8px), when it falls back to the normal frosted/solid bar. The shader keeps the header's `--ink-2`
   text ≥ 5:1 wherever it floats over the field.
@@ -222,7 +222,7 @@ needs no pause control; it also pauses while a step is active, and is absent und
 ## Hard constraints
 
 1. Any animation of an element that may sit in the initial viewport is **transform-only, never
-   opacity** — axe/Lighthouse blend fractional opacity into the contrast calculation, and Lighthouse
+   opacity**: axe/Lighthouse blend fractional opacity into the contrast calculation, and Lighthouse
    does not emulate `prefers-reduced-motion`, so an opacity ramp reads as a permanent contrast
    failure.
 2. **Never dim text with `opacity`.** Secondary text uses the `--muted` or `--ink-2` color tokens,
@@ -247,7 +247,7 @@ needs no pause control; it also pauses while a step is active, and is absent und
 8. **No eyebrows, no section numbers.** No kicker or eyebrow label above a heading, no running
    section counter, no chip or badge. Leading-zero numbers are reserved for content sequences the
    reader uses (layers, chapters, values). Documented exception: the home hero's `.hero-facts` strip
-   (`.fact` plates) — it is not a badge on a heading but a self-contained register of figures with
+   (`.fact` plates): it is not a badge on a heading but a self-contained register of figures with
    its own label|value structure, matched by the accompanying `.motion-toggle` control.
 
 ## Quality gates
@@ -266,16 +266,16 @@ detect dist` (anti-pattern count must not rise versus the recorded baseline; no 
   stays AA-compliant.
 - Do keep all scroll-reveal and hover motion inside `--dur`/`--ease` and transform-only for anything
   above the fold.
-- Don't introduce purple, blue-violet or saturated marketing gradients — the only gradients are the
+- Don't introduce purple, blue-violet or saturated marketing gradients: the only gradients are the
   mesh's radial glows, `--grad-border`, `--grad-cta` and the home hero's gradient field, all derived
   from the layer/ink or `--field-*` tokens (the field is the one sanctioned exception to "no
   saturated gradient", scoped to `.hero--field` on the home).
 - Don't add a new font family; the site has exactly four (display, body, mono, serif), and the
-  serif (`--font-serif`, Newsreader Display) is limited to the home hero headline — never use it
+  serif (`--font-serif`, Newsreader Display) is limited to the home hero headline, never use it
   elsewhere.
 - Don't nest `.card-lum` inside another `.card-lum`, or stack more than one `.bg-mesh` in a section
   (one per section is fine, on as many sections as the page needs).
 - Don't put a dot or grid texture behind content, and don't give a non-link card a hover lift.
 - Don't add inline `<script>` tags or inline event handlers; the CSP forbids them.
-- Don't dim, gray-out or opacity-fade text for a "disabled" or "secondary" look — use `--muted` /
+- Don't dim, gray-out or opacity-fade text for a "disabled" or "secondary" look: use `--muted` /
   `--ink-2` or a `--line`-bordered treatment instead.

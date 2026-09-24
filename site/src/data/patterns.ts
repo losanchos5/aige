@@ -1,6 +1,6 @@
 // patterns.ts: the typed index of the reusable patterns catalogued in
 // bok/05-patterns.md, used to draw the pattern-map infographic (five stack
-// layers, each holding the patterns that live in it — see
+// layers, each holding the patterns that live in it: see
 // scripts/figures-build.mjs and src/data/figures.ts).
 //
 // Each entry is faithful to the chapter: `id` is the anchor rehype-slug emits
@@ -14,7 +14,7 @@
 // KEEP IN SYNC: bok/05-patterns.md defines 17 patterns (the Adversarial
 // Red-Team Suite in Layer 03 and the Runtime Guardrail in Layer 04, once
 // planned, are now in the catalogue). When a "## Pattern:" heading is added to
-// the chapter, add its entry here too — tests/figures.spec.ts fails when the count of "## Pattern:"
+// the chapter, add its entry here too: tests/figures.spec.ts fails when the count of "## Pattern:"
 // headings in chapter 05 differs from the number of entries below.
 
 export type PatternLayer = 1 | 2 | 3 | 4 | 5;

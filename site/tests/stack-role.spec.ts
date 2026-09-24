@@ -1,4 +1,4 @@
-// stack-role.spec.ts: Block D — the /stack and /role landing pages.
+// stack-role.spec.ts: Block D, the /stack and /role landing pages.
 // Structural assertions (panel/row/workflow/step counts, sourced stat tiles),
 // a check that every chapter back-link resolves to a real #id in its target
 // /bok page, and reading-comfort screenshots into tests/__screenshots__/D/.

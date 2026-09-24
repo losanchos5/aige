@@ -1,4 +1,4 @@
-// /llms.txt — the plain-text index an LLM reads to find its way around the site,
+// /llms.txt: the plain-text index an LLM reads to find its way around the site,
 // in the llmstxt.org format: an H1, a `>` summary, a paragraph of provenance and
 // then one `##` section per group of `- [name](url): notes` links. Every title
 // and summary comes from data/chapters.ts or from the Markdown sources

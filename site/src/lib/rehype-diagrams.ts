@@ -5,10 +5,10 @@
 // chapters.ts id -> slug); for each placement the plugin resolves the anchor by
 // matching heading TEXT (normalised) and inserts the figure hast at the point
 // named by `at`:
-//   - 'lead' — before the chapter's first H2 (an opening figure after the intro);
-//   - 'head' — immediately after the anchor heading (the H2 `section`, or the H3
+//   - 'lead': before the chapter's first H2 (an opening figure after the intro);
+//   - 'head': immediately after the anchor heading (the H2 `section`, or the H3
 //     `sub` inside it when given);
-//   - 'foot' (default) — before the next heading of depth ≤ the anchor, i.e. at
+//   - 'foot' (default): before the next heading of depth ≤ the anchor, i.e. at
 //     the foot of that (sub)section.
 // Matching on text (not the slug id) avoids github-slugger's `-1`/`-2` dedup
 // suffixes; rehype-autolink-headings wraps heading text in an <a>, so nodeText
@@ -188,8 +188,8 @@ function insertFragment(
     return;
   }
 
-  // 'foot': before the next heading of depth ≤ the target — i.e. the foot of the
-  // (sub)section — or at the end of the document when there is none.
+  // 'foot': before the next heading of depth ≤ the target, i.e. the foot of the
+  // (sub)section, or at the end of the document when there is none.
   let insertAt = children.length;
   for (let i = targetIndex + 1; i < children.length; i += 1) {
     const depth = headingDepth(children[i]);

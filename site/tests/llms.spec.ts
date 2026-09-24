@@ -1,4 +1,4 @@
-// llms.spec.ts: acceptance checks for the two plain-text endpoints — /llms.txt,
+// llms.spec.ts: acceptance checks for the two plain-text endpoints, /llms.txt,
 // the llmstxt.org index of every document on the site, and /llms-full.txt, the
 // same corpus in full.
 import { test, expect } from '@playwright/test';

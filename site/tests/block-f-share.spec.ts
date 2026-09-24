@@ -1,4 +1,4 @@
-// block-f-share.spec.ts: acceptance checks for Block F2 — the frictionless
+// block-f-share.spec.ts: acceptance checks for Block F2, the frictionless
 // signature (a one-click edit link to CONTRIBUTORS.md and the SignNote on the
 // Body of Knowledge index) and the share/cite row on a chapter page (a LinkedIn
 // share link carrying the encoded page URL, and a copyable BibTeX entry).

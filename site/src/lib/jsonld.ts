@@ -1,11 +1,11 @@
 // jsonld.ts: the site-wide structured-data graph. Every page emits exactly one
 // <script type="application/ld+json"> (Seo.astro renders it in the head); this
-// module builds the two nodes that hold on every page — the Organization behind
-// the site and the WebSite itself — and merges whatever a page contributes into
+// module builds the two nodes that hold on every page (the Organization behind
+// the site and the WebSite itself) and merges whatever a page contributes into
 // that same @graph, so no component ever emits a second block.
 //
 // Person nodes are minimal: name plus any known url / sameAs. Never jobTitle or
-// worksFor — nothing is claimed that data/site.ts does not state.
+// worksFor, nothing is claimed that data/site.ts does not state.
 import { site } from '../data/site';
 
 /** Page-level JSON-LD as a page may pass it: one node, a list, or a @graph. */
@@ -48,7 +48,7 @@ export const authorRefs: readonly { '@id': string }[] = authorNodes.map((person)
 }));
 
 // The site's own presences: the project repository plus the profile links the
-// site already states for its authors. Nothing invented — every URL comes from
+// site already states for its authors. Nothing invented: every URL comes from
 // data/site.ts.
 const orgSameAs = [
   site.github,
@@ -93,7 +93,7 @@ function stripContext(node: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(Object.entries(node).filter(([key]) => key !== '@context'));
 }
 
-/** Flatten page JSON-LD — a node, a list or a nested @graph — into bare nodes. */
+/** Flatten page JSON-LD (a node, a list or a nested @graph) into bare nodes. */
 function nodesOf(input?: JsonLdInput): Record<string, unknown>[] {
   if (!input) return [];
   if (Array.isArray(input)) return input.flatMap((node) => nodesOf(node as JsonLdInput));

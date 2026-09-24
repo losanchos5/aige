@@ -171,7 +171,7 @@ export const principles: readonly Principle[] = [
   },
 ] as const;
 
-/** What AI governance engineers build — working artefacts, not decks. */
+/** What AI governance engineers build: working artefacts, not decks. */
 export const builds: readonly string[] = [
   'Policy-as-code: governance rules as executable policy (OPA/Rego, Cedar, Policy Cards) that evaluate in CI/CD and at runtime.',
   'An agent registry: the runtime-aware inventory of every model, service and agent, each with an owner, a scope and a status.',

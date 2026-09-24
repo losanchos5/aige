@@ -27,7 +27,7 @@ function charFactor(ch) {
   if (ch >= '0' && ch <= '9') return 0.57;
   if (ch === ' ') return 0.25;
   if (ch === '&') return 0.7;
-  if (ch === '—') return 0.8; // em dash
+  if (ch === '\u2014') return 0.8; // em dash (U+2014)
   return 0.52;
 }
 

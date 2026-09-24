@@ -1,7 +1,7 @@
 // crosswalk.ts: the topic-centred index built on frameworks.ts. Where
 // frameworks.ts answers "for this obligation, what artefact evidences it and on
 // which layer does it live?", this module answers the reader's other question:
-// "which article or clause of each framework deals with topic X?" — e.g. AI risk
+// "which article or clause of each framework deals with topic X?", e.g. AI risk
 // management is EU AI Act Art. 9, ISO/IEC 42001 6.1.2/6.1.3/8.2/8.3, NIST AI RMF
 // MAP/MANAGE and China's TC260 3.0 risk taxonomy.
 //

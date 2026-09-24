@@ -1,4 +1,4 @@
-// block-f-feed.spec.ts: acceptance checks for Block F3 — the RSS feed now carries
+// block-f-feed.spec.ts: acceptance checks for Block F3, the RSS feed now carries
 // one item per Body of Knowledge chapter alongside the released versions, each
 // dated and linking to its chapter page.
 import { test, expect } from '@playwright/test';

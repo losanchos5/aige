@@ -1,4 +1,4 @@
-// /resources/crosswalk.csv — a static endpoint that exports the topic ×
+// /resources/crosswalk.csv: a static endpoint that exports the topic ×
 // framework crosswalk as CSV. The first row carries the disclaimer (with the BoK
 // version from site.ts) as a single field, so it cannot be stripped in transit;
 // a header row and one row per reference follow. Fields are RFC 4180-escaped

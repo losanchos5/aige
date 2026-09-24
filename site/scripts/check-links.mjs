@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // check-links: fail the build if any internal link is dead. Parses every built
 // HTML file (dist/**/*.html by default), resolves every internal `href`/`src`
-// — including `#anchors`, which must match an id/name in the target document —
+//, including `#anchors`, which must match an id/name in the target document,
 // and reports each unresolved target. External links (http(s):, mailto:, tel:,
 // data:, protocol-relative //) are left alone.
 //

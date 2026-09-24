@@ -83,7 +83,7 @@ function validate(type, jsonPath) {
 
 // Every em dash, and the spaces around it, becomes the site's ' · ' separator.
 function dedash(text) {
-  return text.replace(/\s*—\s*/g, ' · ');
+  return text.replace(/\s*\u2014\s*/g, ' · ');
 }
 
 // Isolate the single <svg>…</svg> block from the rendered viewer and rewrite it
@@ -238,8 +238,8 @@ async function main() {
     }
 
     // The site publishes no em dash (the owner's rule, enforced by
-    // content-lint): archify's own viewer strings ("{label} — current
-    // chapter") take the site's " · " separator instead.
+    // content-lint): archify's own viewer strings (the label, an em dash and
+    // "current chapter") take the site's " · " separator instead.
     const html = dedash(readFileSync(htmlTmp, 'utf8'));
     let svg;
     try {

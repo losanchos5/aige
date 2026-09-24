@@ -1,4 +1,4 @@
-// llms.ts: the pieces the two plain-text endpoints share — /llms.txt (the index)
+// llms.ts: the pieces the two plain-text endpoints share, /llms.txt (the index)
 // and /llms-full.txt (every chapter and the Thesis in full). Both follow the
 // llmstxt.org convention: an H1 with the site name, a `>` blockquote summary, a
 // short paragraph, then `##` sections of `- [name](url): notes` links.
@@ -40,7 +40,7 @@ export interface DocLead {
 const CALLOUT_RE = /^\*\*(?:In practice|Example|Anti-pattern|Postings|Note|Warning)/i;
 
 /**
- * The title and abstract of a Markdown source — the same two pieces remark-lead
+ * The title and abstract of a Markdown source: the same two pieces remark-lead
  * hands the Doc layout. The abstract is the opening blockquote (every chapter
  * has one); the Thesis opens with a bold lead sentence instead, so that is the
  * fallback.

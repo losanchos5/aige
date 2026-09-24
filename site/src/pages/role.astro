@@ -1,6 +1,6 @@
 ---
 /**
- * /role — the AI governance engineer as a concrete role: the seven workflows it
+ * /role, the AI governance engineer as a concrete role: the seven workflows it
  * owns, the skills behind them, the analyst/engineer contrast, three ways in,
  * what employers get wrong, the market (primary medians only), and the maturity
  * ladder. Content comes from src/data/role.ts and src/data/maturity.ts; every
@@ -49,7 +49,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 // comma and "per" separate the source so its own parentheses do not nest.
 const reportedText = reportedStats
   .map((stat) => {
-    const label = stat.label.replace(' (reported demand signal — not a stat tile)', '');
+    const label = stat.label.replace(' (reported demand signal, not a stat tile)', '');
     return `${label}, up ${stat.value}, per ${stat.source}`;
   })
   .join('; ');

@@ -46,7 +46,7 @@ We write as practitioners, for practitioners. The reader is building something o
   date for v0.4.0 is 2026-09-19.
 - **Numbers.** Spell out one to nine in prose unless paired with a unit or a percentage; use figures
   for 10 and above and for all money, versions and article numbers.
-- **Dashes.** No em dashes (—). Use a comma pair, a colon, a semicolon, a full stop or parentheses
+- **Dashes.** No em dashes (U+2014). Use a comma pair, a colon, a semicolon, a full stop or parentheses
   instead. En dashes (–) stay for ranges (2024–2026, v0.1–v0.3). The site build fails on any em dash
   (`site/scripts/content-lint.mjs`).
 

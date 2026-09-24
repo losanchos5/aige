@@ -103,7 +103,7 @@
   margin-top: var(--s-6);
 }
 
-/* A mono, bordered tag — used for resource type/cost labels on the path page. */
+/* A mono, bordered tag: used for resource type/cost labels on the path page. */
 .badge {
   display: inline-block;
   padding: 1px var(--s-2);

@@ -20,40 +20,40 @@
 - [x] 3.3 Añadir a `site/tests/infra.spec.ts` el assert "ningún `<script>` sin `src`" sobre `dist/index.html` y `dist/bok/the-stack.html`, y que la CSP de `dist/_headers` no ha cambiado; verificar que el test pasa (si falla por inlining, fijar `vite.build.assetsInlineLimit: 0` en `astro.config.ts`)
 - [x] 3.4 Medir `dist/_astro/motion-ui.*.js` gzip ≤ 8 KB y documentar la medida en el resumen del bloque
 
-## 4. Bloque D1 — Chrome global
+## 4. Bloque D1: Chrome global
 
 - [x] 4.1 `ThemeToggle.astro` + `public/ui.js`: emitir `CustomEvent('theme:changed')` al pulsar; en `motion-ui.ts` spring rotate/scale del icono entrante (estado final síncrono bajo reduced-motion); verificar con `shell.spec.ts` y comprobación manual en claro/oscuro
 - [x] 4.2 `SearchDialog.astro`: entrada con `@starting-style` + `transition-behavior: allow-discrete` (transform + scrim, sin opacidad en texto); verificar que abre/cierra con teclado y `shell.spec.ts` pasa
 - [x] 4.3 `Header.astro` + `public/nav.js`: chevron de grupo rota con `aria-expanded`; `.is-scrolled` aplica `--shadow-1`; verificar con `nav.spec.ts`
 - [x] 4.4 `Footer.astro`: revisar jerarquía y espaciado con tokens (sin cambios de estructura); verificar que `test:a11y` pasa en `/` y `/bok`
 
-## 5. Bloque D4 — Lectura (BoK)
+## 5. Bloque D4: Lectura (BoK)
 
 - [x] 5.1 `Doc.astro` fija `--chapter-ink` desde `headerLayer`; `prose.css` usa `var(--chapter-ink)` en `.prose h2::before`; verificar en un capítulo de capa ≠ 1 en claro y oscuro
 - [x] 5.2 `Toc.astro` + `public/ui-doc.js`: estados actual / leída / pendiente por color (nunca opacity), AA ≥ 4,5:1; verificar con `bok.spec.ts` y `test:a11y`
 - [x] 5.3 `PrevNext.astro`: tarjetas con `card-lum lift`, nombre accesible = nombre del capítulo; verificar con `bok.spec.ts` incluido el último capítulo
 - [x] 5.4 `SidebarNav.astro` + `ChapterHeader.astro`: ritmo tipográfico y espaciado con tokens; verificar screenshots regenerados y `test:a11y`
 
-## 6. Bloque D2 — Home + Marketing
+## 6. Bloque D2: Home + Marketing
 
 - [x] 6.1 `pages/index.astro` + `CtaBand.astro`: fila de CTAs del hero con contraste de peso (primario `btn-glow`, secundario outline); verificar `home.spec.ts`
 - [x] 6.2 `layouts/Marketing.astro`: números de register-rule con `--ink-2` o `--muted` re-escopado sobre tint; verificar AA con `test:a11y`
 - [x] 6.3 `StatTile.astro` + `public/countup.js`: count-up con `animate()` de motion, trigger IntersectionObserver conservado, `.source` en `--ink-2`; verificar que el valor final es exacto y `v1-v4.spec.ts` pasa
 - [x] 6.4 `ResourceTiles.astro`, `DefinitionCards.astro`, `ChapterGrid.astro`: `.bento` + `card-lum lift` consistentes con `--i` en `.reveal-stagger`; verificar screenshots regenerados
 
-## 7. Bloque D3 — Landing pages
+## 7. Bloque D3: Landing pages
 
 - [x] 7.1 `PageHero.astro`: diferenciar las variantes landing/referencia (kicker, medida del título, textura) sin tocar los requisitos de `page-hero`; verificar `stack-role.spec.ts` y `path.spec.ts`
 - [x] 7.2 `StackLayerPanel.astro` + `StackDiagram.astro` + `public/stack.js`: `inView` + `stagger` translateY en las 5 capas, bajo el fold, sin transform en ancestros de `.story-pin`; verificar sticky en `/stack` a 1440 y `stack-role.spec.ts`
 - [x] 7.3 `PathMap.astro`, `MaturityLadder.astro`, `styles/pages.css`, `styles/map.css`: ritmo y espaciado con tokens; verificar `map*.spec.ts` y `path.spec.ts`
 
-## 8. Bloque D5 — Resources
+## 8. Bloque D5: Resources
 
 - [x] 8.1 `PathDrawer.astro` + `CrosswalkDrawer.astro`: spring translateX del panel y `stagger` sobre `[data-drawer-body] > *`, estado final síncrono bajo reduced-motion; verificar `resources.spec.ts` y `path.spec.ts`
 - [x] 8.2 `FrameworkTable.astro`, `ObligationTable.astro`, `CrosswalkMatrix.astro`: chips `.type-tag` coloreados por capa con inks de `tokens.css`; verificar AA con `test:a11y`
 - [x] 8.3 `GlossaryIndex.astro`: barra de salto con `aria-current`; verificar `resources.spec.ts`
 
-## 9. Bloque D6 — About, 404, Newsletter
+## 9. Bloque D6: About, 404, Newsletter
 
 - [x] 9.1 `pages/404.astro`: `<Section tone="mesh">` con CTA de vuelta; verificar `test:a11y` en `/404`
 - [x] 9.2 `NewsletterForm.astro`: `.nl-note` en `--ink-2`, anillo de foco con `--l1-ink`; verificar AA y que el `action` de Buttondown no cambia

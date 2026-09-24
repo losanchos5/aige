@@ -3,7 +3,7 @@
 // two-sided tree, in two variants from one layout:
 //   - web:      colour by site tokens (classes only, no hex); inlined into /map
 //               and re-emitted by figures-build.mjs as src/figures/discipline-map.svg.
-//   - portrait: a standalone SVG for the LinkedIn infographic — role="img",
+//   - portrait: a standalone SVG for the LinkedIn infographic, role="img",
 //               light-theme hex inline, viewBox 1200 wide, no <style> except the
 //               three font families, no background rect, no title/footer, links
 //               absolute against site.url. Written where the CLI says.

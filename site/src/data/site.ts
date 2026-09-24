@@ -3,7 +3,7 @@
 /**
  * A named author, with optional links used for structured data (JSON-LD
  * Person nodes). `url` is a homepage; `sameAs` lists canonical profile URLs
- * (LinkedIn, ORCID…). Both are omitted when unknown — we do not invent them.
+ * (LinkedIn, ORCID…). Both are omitted when unknown: we do not invent them.
  */
 export interface Author {
   name: string;

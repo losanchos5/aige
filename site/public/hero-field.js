@@ -1,4 +1,4 @@
-/* hero-field.js — the home hero's moving gradient field, and the motion of
+/* hero-field.js: the home hero's moving gradient field, and the motion of
    its figures strip. Loaded same-origin so the CSP script-src 'self' holds (no
    inline JS). Progressive enhancement: without this file the hero shows the
    static CSS fallback painted on .hero-field and a static, wrapping strip.
@@ -12,8 +12,8 @@
    Legibility is structural, not a matter of luck: inside the headline's box
    and under the floating header the shader lifts (light theme) or sinks (dark
    theme) each pixel towards the ground just enough to hold a contrast target
-   against the ink drawn there — the headline's --hero-ink and the header's
-   --ink-2, the weakest ink in the bar — and feathers the correction out
+   against the ink drawn there: the headline's --hero-ink and the header's
+   --ink-2, the weakest ink in the bar, and feathers the correction out
    around both zones. So the text keeps AA wherever the blobs wander.
 
    Motion rules (WCAG 2.2.2, SL-02): the field and the strip move only under

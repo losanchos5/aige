@@ -49,7 +49,7 @@ function decodeEntities(str) {
 }
 
 /** Build an excerpt safely: split Pagefind's markup on <mark>/</mark> and emit
-    text nodes and <mark> elements via textContent — never innerHTML. */
+    text nodes and <mark> elements via textContent, never innerHTML. */
 function buildExcerpt(target, excerpt) {
   target.replaceChildren();
   const parts = String(excerpt || '').split(/<\/?mark>/);

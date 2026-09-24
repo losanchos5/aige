@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 // Doc reading-layout regression guard. The owner reported the reading well
 // spilling under the "On this page" TOC (and the chapter rail growing a
 // horizontal scrollbar) at ~1517px. These assertions hold the well inside its
-// column and forbid any horizontal scroll — page-wide or in the rail — across
+// column and forbid any horizontal scroll (page-wide or in the rail) across
 // the band from 1517px down to 900px, on both a wide-content chapter
 // (/bok/why-now, which carries a bare URL) and a narrower one (/bok/the-stack).
 

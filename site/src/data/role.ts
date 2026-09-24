@@ -4,8 +4,8 @@
 //
 // Numbers policy: `market` carries only figures the chapter attributes to a
 // primary source (the IAPP Salary & Jobs Report medians), each `primary: true`.
-// LinkedIn's "Skills on the Rise" demand signal is qualitative — no per-skill
-// percentage is stated in a primary source — so it lives in the chapter prose,
+// LinkedIn's "Skills on the Rise" demand signal is qualitative (no per-skill
+// percentage is stated in a primary source), so it lives in the chapter prose,
 // not as a figure here. Employer names from the postings footnote, and every
 // forbidden claim, are deliberately omitted.
 

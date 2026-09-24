@@ -37,8 +37,8 @@ function typesOf(graph: JsonLdNode[]): string[] {
   return graph.flatMap((node) => (Array.isArray(node['@type']) ? node['@type'] : [node['@type']]));
 }
 
-// One page per shape the site builds: the home page — which the WebSite node
-// itself describes — a Body of Knowledge chapter, the two Thesis translations,
+// One page per shape the site builds: the home page (which the WebSite node
+// itself describes), a Body of Knowledge chapter, the two Thesis translations,
 // the crosswalk dataset and the map.
 const PAGES: { path: string; type: string }[] = [
   { path: '/', type: 'Organization' },

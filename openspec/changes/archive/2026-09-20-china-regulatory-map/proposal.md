@@ -37,7 +37,7 @@ capas 2–5 de la tesis; es el momento de cerrar el hueco con fuentes oficiales 
 ## Capabilities
 
 ### New Capabilities
-- `regulatory-map-china`: China en el mapa regulatorio — filas vinculantes y voluntarias con estado
+- `regulatory-map-china`: China en el mapa regulatorio, filas vinculantes y voluntarias con estado
   fechado y cita verificada, catálogo del sitio con grupo China resuelto en la matriz de obligaciones,
   cruce del Apéndice 2 con las fuentes agénticas existentes, lecturas y glosario.
 

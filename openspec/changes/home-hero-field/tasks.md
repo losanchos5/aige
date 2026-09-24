@@ -80,6 +80,6 @@
   0,6 s, CLS 0; detector mismo recuento por regla que ddc2fbd salvo +1 `cramped-padding` en la
   Section nueva, el falso positivo conocido del CSS enlazado en Windows; ninguna regla nueva)
 - [x] 7.3 Revisión con `code-reviewer` (Opus 5.5) del diff completo (2026-09-24: sin CRITICAL; 3 HIGH
-  —forced colors, hueco del marquee en pantallas anchas, pausa táctil— y 5 MEDIUM corregidos, con
+  (forced colors, hueco del marquee en pantallas anchas, pausa táctil) y 5 MEDIUM corregidos, con
   tests nuevos; cadena repetida en verde: 570 default, 116 a11y, 28 visual, lhci 1,00 ×4)
 - [x] 7.4 PR apilada sobre #19 (#20, commit 828abde, 2026-09-24)

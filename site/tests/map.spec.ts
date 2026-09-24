@@ -1,4 +1,4 @@
-// map.spec.ts: acceptance checks for the discipline map — the pure data model
+// map.spec.ts: acceptance checks for the discipline map, the pure data model
 // (src/data/map.ts) and the generated SVGs (scripts/map-build.mjs +
 // figures-build.mjs). All pure-Node assertions (no browser); runs in the
 // `default` project. The page-side checks (getBBox fit, cluster index, keyboard)

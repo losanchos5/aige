@@ -21,7 +21,7 @@ export type ColorVar = '--l1' | '--l2' | '--l3' | '--l4' | '--l5';
 export interface ToolCategory {
   /** Category of tool (the substance; brands are illustrative). */
   category: string;
-  /** Example tools named in ch.04 or SOURCES.md — illustrative, not endorsed. */
+  /** Example tools named in ch.04 or SOURCES.md: illustrative, not endorsed. */
   examples: readonly string[];
 }
 
@@ -313,7 +313,7 @@ export interface MinimumViableStack {
   steps: readonly MinimumStackStep[];
 }
 
-/** The chapter's "minimum viable stack for a team of one" — a thin vertical
+/** The chapter's "minimum viable stack for a team of one": a thin vertical
  * slice that touches every layer, in the order: see it, rule it, test it,
  * contain it, prove it. */
 export const minimumViableStack: MinimumViableStack = {

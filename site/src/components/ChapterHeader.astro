@@ -1,5 +1,5 @@
 ---
-// ChapterHeader: the register that opens every Doc page — the H1 (the page's
+// ChapterHeader: the register that opens every Doc page, the H1 (the page's
 // only H1, since remark-lead strips the Markdown one), a summary lede and a meta
 // line. No eyebrow above the H1 (audit SL-04): a chapter's book and number are
 // already in the breadcrumb above the header. Everything sits in a full-bleed
@@ -108,7 +108,7 @@ if (updated) metaBits.push({ text: site.license });
   /* In a chapter, break out to the reading well, exactly like .prose > .glance /
      .diagram: the prose stays at 72ch but .doc-main is a container, so the band
      widens to the whole well and lines up with the crumbs and the At a glance
-     box. Off a container the cq units resolve to the column and nothing moves —
+     box. Off a container the cq units resolve to the column and nothing moves,
      and the band never exceeds .doc-main, so no page-level scroll. The Thesis
      and the meta pages have no crumbs or glance box: there the band keeps the
      prose column, so the header, the lede and the text share one left edge. */

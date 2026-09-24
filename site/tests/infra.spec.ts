@@ -1,4 +1,4 @@
-// infra.spec.ts: Block F1 infrastructure — OG images, the RSS changelog feed,
+// infra.spec.ts: Block F1 infrastructure. OG images, the RSS changelog feed,
 // site-wide search, and the content linter. Uses the preview server (dist) from
 // playwright.config; no browser is needed for the request-only checks.
 import { test, expect } from '@playwright/test';
