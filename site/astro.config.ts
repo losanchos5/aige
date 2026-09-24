@@ -194,6 +194,19 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       'public/toolkit/lib.js',
     ],
   ],
+  // Block w2-tool-aigp: the AIGP coverage map (dated by its template, the map
+  // data and the resolver and heatmap it renders through) and the neutral
+  // certifications overview.
+  [
+    '/for/aigp',
+    [
+      'src/pages/for/aigp.astro',
+      'src/data/aigp.ts',
+      'src/lib/aigp-coverage.ts',
+      'src/lib/aigp-heatmap.ts',
+    ],
+  ],
+  ['/for/certifications', ['src/pages/for/certifications.astro', 'src/data/aigp.ts']],
 ]);
 
 // Pages dated by their content rather than by git: each /obligations/<id> page

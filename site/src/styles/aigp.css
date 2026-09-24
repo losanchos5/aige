@@ -1,0 +1,329 @@
+/* aigp.css: the AIGP coverage map (/for/aigp) and the certifications overview
+   (/for/certifications). Tokens only, so light and dark both follow; class
+   names are prefixed `ag-`. Status is carried by the word and the mark (a
+   filled chip or a dashed outline), never by colour alone, and the layer
+   colours stay reserved for the five stack layers. Nothing animates. */
+
+.ag-prose {
+  margin-inline: 0;
+}
+
+/* ---- On this page ---------------------------------------------------------- */
+.ag-toc {
+  max-width: var(--prose);
+  padding: var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+}
+
+.ag-toc-title {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ag-toc ol {
+  margin: var(--s-2) 0 0;
+  padding-left: 1.4em;
+  columns: 2 16rem;
+  column-gap: var(--s-6);
+}
+
+.ag-toc li {
+  break-inside: avoid;
+  padding-block: 2px;
+}
+
+.ag-toc a {
+  color: var(--ink);
+}
+
+/* ---- Status marks ---------------------------------------------------------- */
+.ag-status {
+  display: inline-block;
+  padding: 0.25em 0.6em;
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.3;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.ag-status--taught {
+  border: 1px solid var(--ink-2);
+  background: color-mix(in srgb, var(--ink) 16%, var(--bg));
+}
+
+.ag-status--partly-taught {
+  border: 1px dashed var(--ink);
+  background: var(--bg);
+}
+
+.ag-criteria {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--s-2) var(--s-4);
+  align-items: baseline;
+}
+
+.ag-criteria dd {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+/* ---- Heatmap --------------------------------------------------------------- */
+/* The cells are grouped by status; fill and stroke inherit into the rects. */
+.figc .ag-hm-taught {
+  fill: color-mix(in srgb, var(--ink) 16%, var(--bg));
+  stroke: var(--ink-2);
+  stroke-width: 1;
+}
+
+.figc .ag-hm-partly {
+  fill: var(--bg);
+  stroke: var(--ink);
+  stroke-width: 1.25;
+  stroke-dasharray: 3 2;
+}
+
+/* The figure sits in the page flow, not a chapter's breakout well. */
+.ag-figure {
+  margin: 0;
+  max-width: 760px;
+}
+
+/* ---- Study paths ------------------------------------------------------------ */
+.ag-notice {
+  max-width: var(--prose);
+  padding: var(--s-3) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--ink) 4%, var(--bg));
+  font-size: var(--fs-small);
+  line-height: 1.5;
+}
+
+.ag-note {
+  max-width: var(--prose);
+  margin-top: var(--s-3);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.ag-warn {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.ag-paths {
+  display: grid;
+  gap: var(--s-5);
+  margin-top: var(--s-5);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
+}
+
+.ag-path {
+  padding: var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+
+.ag-path h3 {
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  color: var(--ink);
+}
+
+.ag-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  margin-top: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.ag-progress progress {
+  width: 10rem;
+  height: 0.5rem;
+  accent-color: var(--ink);
+}
+
+.ag-steps {
+  margin: var(--s-3) 0 0;
+  padding-left: 1.6em;
+}
+
+.ag-step {
+  padding-block: var(--s-2);
+  border-top: 1px solid var(--line);
+}
+
+.ag-step:first-child {
+  border-top: 0;
+}
+
+.ag-step:has(.ag-check:not([hidden])) {
+  list-style: none;
+  margin-left: -1.6em;
+  display: flex;
+  gap: var(--s-3);
+  align-items: flex-start;
+}
+
+.ag-check input {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  accent-color: var(--ink);
+  cursor: pointer;
+}
+
+.ag-step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ag-step-body > a {
+  color: var(--ink);
+}
+
+.ag-step.is-done .ag-step-body > a {
+  color: var(--ink-2);
+}
+
+.ag-serves {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+.ag-serves a {
+  color: var(--ink-2);
+}
+
+.ag-reset {
+  margin-top: var(--s-4);
+}
+
+/* ---- Domain tables ---------------------------------------------------------- */
+.ag-domain-lede {
+  margin-top: var(--s-2);
+  color: var(--ink-2);
+}
+
+.ag-competency + .ag-competency {
+  margin-top: var(--s-6);
+}
+
+.ag-competency h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-1) var(--s-3);
+  margin-bottom: var(--s-3);
+  font-family: var(--font-display);
+  font-size: var(--fs-h3);
+  color: var(--ink);
+  scroll-margin-top: var(--anchor-offset);
+}
+
+.ag-code,
+.ag-id {
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.ag-range {
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.ag-table tr {
+  scroll-margin-top: var(--anchor-offset);
+}
+
+.ag-table tr:target {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
+
+.ag-ind {
+  min-width: 14rem;
+  max-width: 34ch;
+}
+
+.ag-ind .ag-id {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--ink);
+}
+
+.ag-para {
+  color: var(--ink);
+}
+
+.ag-links ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ag-links li + li {
+  margin-top: 4px;
+}
+
+.ag-first {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.ag-st {
+  min-width: 9rem;
+}
+
+.ag-gap {
+  margin: var(--s-2) 0 0;
+  max-width: 34ch;
+  font-size: var(--fs-small);
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+@media (max-width: 720px) {
+  .ag-ind,
+  .ag-gap {
+    max-width: none;
+  }
+
+  .ag-links ul {
+    flex-basis: 100%;
+  }
+}
+
+/* ---- Certifications overview ------------------------------------------------ */
+.ag-cert-table td,
+.ag-cert-table th {
+  min-width: 9rem;
+}
+
+@media print {
+  .ag-paths [data-tool-js],
+  .ag-reset {
+    display: none !important;
+  }
+}

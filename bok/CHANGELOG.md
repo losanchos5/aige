@@ -68,6 +68,21 @@ a completed, reviewed core (1.0).
   chapters 11 to 23 now link the specific sentences that described these practices to the new pages
   (the chapter 20 table no longer marks the rights ledger as proposed). Mappings are illustrative,
   not a claim of conformity.
+- **AIGP coverage map** (`/for/aigp`, `site/src/data/aigp.ts`): the four domains, 13 competencies
+  and 58 performance indicators of the public AIGP Body of Knowledge v2.1 (effective 2026-02-02),
+  each indicator under a positional id with this site's own paraphrase of at most 12 words, the
+  sections, patterns, glossary terms, templates and tools that teach it, and a status on the house
+  criterion (taught, or partly taught with what is missing). A heatmap generated at build shows
+  the whole map; a study path per domain keeps its ticks in the browser only. Every mapped link is
+  resolved at build and the build fails on one that does not exist. No overall score. It carries
+  the notice that AIGP is a registered trademark of the IAPP, that this site is not affiliated with
+  or endorsed by the IAPP, and that the map covers an open body of knowledge and is not exam
+  preparation.
+- **Certifications, neutrally** (`/for/certifications`): who owns AIGP, the ISO/IEC 42001 Lead
+  Implementer and Lead Auditor schemes, ISACA AAISM and AAIA, what each owner says the scheme
+  assesses, and how this body of knowledge relates to each, from the owners' own pages, ISO and
+  EUR-Lex (checked 2026-09-24), in line with chapter 06 on certifications as a proxy for
+  capability.
 
 ### Changed
 - Chapter 08 and the register: the CSA row that named an "Agentic Control Supplement" now names what
