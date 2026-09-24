@@ -90,6 +90,21 @@ a completed, reviewed core (1.0).
   SVG or PNG image; saves profiles in the browser and compares two. `site/src/data/maturity.ts` gains
   the chapter's criteria table, metrics per level, checklist and typical failures as data (additive;
   no heading changed).
+- **EU AI Act role and risk-class triage** (`/toolkit/ai-act-triage`): a versioned question graph
+  (`site/src/data/triage.ts`, question set 1.0.0 as of 2026-09-24, 20 questions in seven steps) that
+  walks an AI system or model through chapter 18: reach (`Art. 2(1)`), the `Art. 3(1)` definition,
+  the `Art. 2` exclusions, the `Art. 25(1)` triggers, the `Art. 5` screen with the Omnibus points
+  `(ba)` and `(bb)` from 2026-12-02, `Art. 6(1)` with the narrowed safety component, the eight
+  Annex III areas, the `Art. 6(3)` filter and the profiling override, the `Art. 50` cases and the
+  GPAI track with the 10^25 FLOP presumption. It returns indicative scope, EU roles and risk
+  classes with the reason and article behind each, the date each class applies from, open points
+  and the meaning of every answer; never a conformity verdict. Every question and rule cites
+  verbatim fragments of chapter 18 and the build fails if one leaves the chapter. Exports a
+  classification decision record in JSON and YAML (new schema
+  `/schemas/classification-decision-record.v1.json`, with a filled example and a human template),
+  a Markdown report and a link that opens the obligations planner with the roles and classes;
+  records re-open with the outcome recomputed. The pure engine
+  (`site/public/toolkit/ai-act-triage-engine.js`) holds no legal logic of its own.
 - Figures are citable and reusable: a `/figures` gallery grouped by part and chapter (the
   infographics and the interactive diagrams) and a `/figures/<id>` permalink per infographic with
   its text alternative, where it appears, downloads, HTML and Markdown embed snippets with the

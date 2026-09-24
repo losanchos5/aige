@@ -125,6 +125,22 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         ['src/pages/figures/[id].astro', 'src/data/figures.ts', `src/figures/${figure.id}.svg`],
       ] as [string, string[]],
   ),
+  // Block w2-tool-triage: the EU AI Act role and risk-class triage. Its question
+  // graph (triage.ts) is built from chapter 18; the engine and the client module
+  // live in public/toolkit.
+  [
+    '/toolkit/ai-act-triage',
+    [
+      'src/pages/toolkit/ai-act-triage.astro',
+      'src/components/toolkit/ToolShell.astro',
+      'src/data/toolkit.ts',
+      'src/data/triage.ts',
+      '../bok/18-eu-ai-act.md',
+      'public/toolkit/ai-act-triage.js',
+      'public/toolkit/ai-act-triage-engine.js',
+      'public/toolkit/lib.js',
+    ],
+  ],
 ]);
 
 // Pages dated by their content rather than by git: each /obligations/<id> page
