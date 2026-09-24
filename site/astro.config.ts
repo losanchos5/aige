@@ -125,6 +125,50 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         ['src/pages/figures/[id].astro', 'src/data/figures.ts', `src/figures/${figure.id}.svg`],
       ] as [string, string[]],
   ),
+  // Block w2-builders-b: four toolkit tools that turn a questionnaire into a
+  // document. Each page is dated by its template, its data, its client module,
+  // the shared form plumbing and the chapter or registry it restates.
+  [
+    '/toolkit/vendor-due-diligence',
+    [
+      'src/pages/toolkit/vendor-due-diligence.astro',
+      'src/data/tool-vendor-dd.ts',
+      'src/data/crosswalk.ts',
+      'src/data/contracts.ts',
+      'public/toolkit/vendor-due-diligence.js',
+      'public/toolkit/form-kit.js',
+    ],
+  ],
+  [
+    '/toolkit/incident-clock',
+    [
+      'src/pages/toolkit/incident-clock.astro',
+      'src/data/tool-incident-clock.ts',
+      'public/toolkit/incident-clock.js',
+      'public/toolkit/form-kit.js',
+      '../bok/17-incidents.md',
+    ],
+  ],
+  [
+    '/toolkit/agent-control-profile',
+    [
+      'src/pages/toolkit/agent-control-profile.astro',
+      'src/data/tool-agent-controls.ts',
+      'public/toolkit/agent-control-profile.js',
+      'public/toolkit/form-kit.js',
+      '../bok/23-governing-agents.md',
+    ],
+  ],
+  [
+    '/toolkit/fairness-metric-chooser',
+    [
+      'src/pages/toolkit/fairness-metric-chooser.astro',
+      'src/data/tool-fairness-chooser.ts',
+      'public/toolkit/fairness-metric-chooser.js',
+      'public/toolkit/form-kit.js',
+      '../bok/16-fairness-explainability.md',
+    ],
+  ],
 ]);
 
 // Pages dated by their content rather than by git: each /obligations/<id> page

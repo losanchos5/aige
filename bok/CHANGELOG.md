@@ -90,6 +90,35 @@ a completed, reviewed core (1.0).
   SVG or PNG image; saves profiles in the browser and compares two. `site/src/data/maturity.ts` gains
   the chapter's criteria table, metrics per level, checklist and typical failures as data (additive;
   no heading changed).
+- **Vendor due-diligence request** (`/toolkit/vendor-due-diligence`): supply type, use tier, data
+  sensitivity, autonomy and tool access, jurisdictions and sector give a risk tier with its reasons
+  and a tiered, evidence-first request of 20 to 40 questions in the site's own wording (model or
+  system card, AIBOM, evaluation and red-team reports, incident-notice SLA, training-content
+  summary, copyright policy, sub-processors and more), each cross-referenced to crosswalk topics and
+  to CSA AICM control ids the crosswalk already carries, plus the contract-clause checklist from the
+  contracts page. Exports Markdown, CSV and a response record (JSON,
+  `vendor-due-diligence-response.v1`).
+- **Incident clock** (`/toolkit/incident-clock`): from the awareness time, roles, system tier and
+  facts, the incident class on chapter 17's severity scale and every clock the chapter states (EU AI
+  Act Art. 73, Art. 26(5) and Art. 55(1)(c) with the GPAI Code of Practice, GDPR Arts. 33 and 34,
+  NIS2 Art. 23, DORA Art. 19 with RTS 2025/301) as calendar dates, with who reports to whom, a
+  prominent "verify with counsel or the authority" notice, `.ics` reminders, a Markdown summary and
+  an incident record skeleton (JSON, `incident-record.v1`). The tool never asserts more than the
+  chapter: it applies no period-counting rules and does not decide reportability.
+- **Agent control profile** (`/toolkit/agent-control-profile`): describe one agent (autonomy, tools
+  and MCP servers with operation class and scope, data classes, memory, external actions, identity
+  model, approval points) and get the minimum control set of chapter 23 with the pattern behind each
+  control, the gaps to close, an agent register entry (JSON, `agent-register-entry.v1`) and a
+  checklist (Markdown and CSV).
+- **Fairness metric chooser** (`/toolkit/fairness-metric-chooser`): the questions chapter 16 says
+  decide the metric (harm type, ground truth, costlier error, legal frame, access to the protected
+  attribute) give the primary metric families, secondary checks, warnings and legal notes, each
+  linked to its chapter 16 section; metrics that depend on an unreliable label are deferred, not
+  dropped. Exports Markdown and JSON.
+- Shared plumbing for these four tools: `site/public/toolkit/form-kit.js` (form to fragment and
+  back, accessible error summary, UTC date arithmetic), `ToolTerms` (glossary links),
+  `ToolSourceList` (numbered sources in the house format) and `site/src/lib/tool-anchors.ts`, which
+  fails the build when a chapter heading a tool links to is renamed.
 - Figures are citable and reusable: a `/figures` gallery grouped by part and chapter (the
   infographics and the interactive diagrams) and a `/figures/<id>` permalink per infographic with
   its text alternative, where it appears, downloads, HTML and Markdown embed snippets with the
