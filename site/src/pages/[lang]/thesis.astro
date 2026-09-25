@@ -1,0 +1,88 @@
+---
+// /<lang>/thesis: the machine-translated Thesis (I18N_DIR/<lang>/THESIS.md) for
+// French, German and Portuguese. Spanish is never generated here: /es/thesis is
+// the hand translation (pages/es/thesis.astro, THESIS.es.md), a static route
+// that wins over this one, and the translation collection only reads fr, de
+// and pt. Rendered like /thesis, with the English page's heading ids and the
+// translation notice.
+import { getEntry, render } from 'astro:content';
+import Doc from '../../layouts/Doc.astro';
+import Diagram from '../../components/Diagram.astro';
+import TranslationNotice from '../../components/TranslationNotice.astro';
+import { site } from '../../data/site';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { alternatesFor, translationFilePath } from '../../lib/i18n-content';
+import { allTranslations, assertSameAnchors, type TranslatedThesis } from '../../lib/i18n-pages';
+import { gitCreated, gitDate } from '../../lib/reading';
+import { translator } from '../../i18n/ui';
+
+export async function getStaticPaths() {
+  const { theses } = await allTranslations();
+  return theses.map((item) => ({ params: { lang: item.lang }, props: { item } }));
+}
+
+interface Props {
+  item: TranslatedThesis;
+}
+
+const { item } = Astro.props;
+const { entry, lang } = item;
+const t = translator(lang);
+const { Content, headings, remarkPluginFrontmatter } = await render(entry);
+
+const english = await getEntry('thesis', 'thesis');
+if (!english) throw new Error('thesis collection entry not found');
+assertSameAnchors((await render(english)).headings, headings, item.filePath);
+
+const title = (remarkPluginFrontmatter.title as string | undefined) ?? t('nav.thesis');
+const path = `/${lang}/thesis`;
+const file = translationFilePath(item.file);
+const updated = gitDate(file);
+const published = gitCreated(file);
+const pageUrl = new URL(path, site.url).href;
+const jsonLd = [
+  {
+    '@type': 'TechArticle',
+    '@id': `${pageUrl}#article`,
+    headline: title,
+    url: pageUrl,
+    inLanguage: lang,
+    datePublished: published,
+    dateModified: updated,
+    image: new URL('/og/thesis.png', site.url).href,
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    translationOfWork: { '@id': `${new URL('/thesis', site.url).href}#article` },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+  },
+  ...authorNodes,
+  breadcrumbJsonLd([{ label: title }]),
+];
+---
+
+<Doc
+  title={title}
+  headings={headings}
+  updated={updated}
+  sidebar={false}
+  wide={true}
+  activeThesis={true}
+  image="/og/thesis.png"
+  jsonLd={jsonLd}
+  article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
+  lang={lang}
+  alternates={alternatesFor(path)}
+>
+  <TranslationNotice
+    lang={lang}
+    model={item.model}
+    englishHref="/thesis"
+    path={path}
+    file={item.filePath}
+    stale={item.stale}
+  />
+  <Diagram id="aige-in-the-org" />
+  <Content />
+</Doc>

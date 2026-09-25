@@ -1,0 +1,202 @@
+---
+// /<lang>/patterns/<slug>: a machine-translated pattern page
+// (I18N_DIR/<lang>/patterns/<slug>.md), rendered like /patterns/<slug>: the
+// chapter rail, the TOC, the pattern's diagram (placed by position, see
+// lib/rehype-diagrams.ts), the English page's heading ids, the translation
+// notice and a pager over the patterns translated into the same language.
+// Only the patterns that have a translation get a route.
+import { getEntry, render } from 'astro:content';
+import Doc from '../../../layouts/Doc.astro';
+import PatternFoot from '../../../components/PatternFoot.astro';
+import TranslationNotice from '../../../components/TranslationNotice.astro';
+import { layers } from '../../../data/stack';
+import { site } from '../../../data/site';
+import { patternCatalogueHref } from '../../../data/patterns';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../../lib/jsonld';
+import {
+  alternatesFor,
+  pathIn,
+  translationFilePath,
+  translationIndex,
+} from '../../../lib/i18n-content';
+import {
+  allTranslations,
+  assertSameAnchors,
+  chapterLinks,
+  type TranslatedPattern,
+} from '../../../lib/i18n-pages';
+import { gitCreated, gitDate } from '../../../lib/reading';
+import { translator } from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const { patterns } = await allTranslations();
+  return patterns.map((item) => {
+    const siblings = patterns.filter((other) => other.lang === item.lang);
+    const i = siblings.indexOf(item);
+    return {
+      params: { lang: item.lang, id: item.def.slug },
+      props: { item, prev: siblings[i - 1], next: siblings[i + 1] },
+    };
+  });
+}
+
+interface Props {
+  item: TranslatedPattern;
+  prev?: TranslatedPattern;
+  next?: TranslatedPattern;
+}
+
+const { item, prev, next } = Astro.props;
+const { entry, def, lang } = item;
+const t = translator(lang);
+const { Content, headings, remarkPluginFrontmatter } = await render(entry);
+
+const english = await getEntry('patterns', def.slug);
+if (!english) throw new Error(`i18n: no English pattern "${def.slug}"`);
+assertSameAnchors((await render(english)).headings, headings, item.filePath);
+
+const title =
+  (remarkPluginFrontmatter.title as string | undefined) ?? `${t('pattern.prefix')}: ${entry.data.title}`;
+const summary = entry.data.summary;
+const path = `/${lang}/patterns/${def.slug}`;
+const englishPath = `/patterns/${def.slug}`;
+const file = translationFilePath(item.file);
+const updated = gitDate(file);
+const published = gitCreated(file);
+const ogImage = `/og/patterns/${def.slug}.png`;
+
+const layerOf = (n: number) => layers.find((layer) => layer.n === n);
+const pageLayers = [def.layer, ...(def.secondaryLayer ? [def.secondaryLayer] : [])]
+  .map(layerOf)
+  .filter((layer): layer is NonNullable<ReturnType<typeof layerOf>> => layer !== undefined);
+
+// The catalogue chapter (05) in this language when it is translated.
+const index = translationIndex();
+const catalogueHref = patternCatalogueHref(def);
+const localCatalogue = pathIn('/bok/patterns', lang, index);
+const catalogue = localCatalogue ? catalogueHref.replace(/^\/bok\/patterns/, localCatalogue) : catalogueHref;
+const crumbs = [
+  { label: t('breadcrumb.patterns'), href: '/patterns' },
+  { label: entry.data.title },
+];
+const adjacent = (other?: TranslatedPattern) =>
+  other ? { slug: other.def.slug, title: other.entry.data.title } : undefined;
+
+const pageUrl = new URL(path, site.url).href;
+const englishUrl = new URL(englishPath, site.url).href;
+const bokUrl = new URL('/bok', site.url).href;
+const bookId = `${bokUrl}#book`;
+const jsonLd = [
+  {
+    '@type': 'Book',
+    '@id': bookId,
+    name: 'AI Governance Engineering: The Thesis and Body of Knowledge',
+    url: bokUrl,
+    version: site.bokVersion,
+    inLanguage: 'en',
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+  },
+  {
+    '@type': 'TechArticle',
+    '@id': `${pageUrl}#article`,
+    headline: title,
+    description: summary,
+    url: pageUrl,
+    inLanguage: lang,
+    datePublished: published,
+    dateModified: updated,
+    image: new URL(ogImage, site.url).href,
+    isPartOf: { '@id': bookId },
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    translationOfWork: { '@id': `${englishUrl}#article` },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+  },
+  ...authorNodes,
+];
+---
+
+<Doc
+  title={title}
+  summary={summary}
+  description={summary}
+  crumbs={crumbs}
+  headings={headings}
+  updated={updated}
+  activeSlug="patterns"
+  image={ogImage}
+  jsonLd={jsonLd}
+  article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
+  lang={lang}
+  alternates={alternatesFor(path)}
+  thesisHref={pathIn('/thesis', lang) ?? '/thesis'}
+  sidebarLinks={await chapterLinks(lang)}
+>
+  <TranslationNotice
+    lang={lang}
+    model={item.model}
+    englishHref={englishPath}
+    path={path}
+    file={item.filePath}
+    stale={item.stale}
+  />
+  <p class="pp-meta" data-pagefind-ignore>
+    {
+      pageLayers.map((layer) => (
+        <a
+          class="pp-layer"
+          href={`/bok/the-stack#${layer.chapterAnchor}`}
+          style={`--pp-l: var(${layer.colorVar}); --pp-ink: var(${layer.colorVar}-ink)`}
+        >
+          {t('pattern.layer')} {String(layer.n).padStart(2, '0')} · <span lang="en">{layer.name}</span>
+        </a>
+      ))
+    }
+    <a class="pp-cat" href={catalogue}>{t('pattern.catalogue')}</a>
+  </p>
+  <Content />
+  <PatternFoot
+    title={entry.data.title}
+    slug={def.slug}
+    prev={adjacent(prev)}
+    next={adjacent(next)}
+    lang={lang}
+    base={`/${lang}/patterns`}
+  />
+</Doc>
+
+<style>
+  /* The same chips as /patterns/<slug> (pages/patterns/[id].astro). */
+  .pp-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-3);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.04em;
+  }
+
+  .pp-layer {
+    display: inline-block;
+    padding: 0.3em 0.6em;
+    border-radius: var(--r-sm);
+    background: var(--pp-l);
+    color: var(--pp-ink);
+    text-decoration: none;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+  .pp-layer:hover {
+    text-decoration: underline;
+  }
+
+  .pp-cat {
+    color: var(--ink-2);
+  }
+</style>

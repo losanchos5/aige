@@ -6,6 +6,7 @@
 // band (.ch-band), neutral unless Doc.astro passes the layer of a chapter that is
 // about one stack layer (chapters.ts `layer`).
 import { site } from '../data/site';
+import { intlLocale, translator } from '../i18n/ui';
 
 interface Props {
   title: string;
@@ -22,13 +23,16 @@ interface Props {
 const { title, summary, updated, words, minutes, layer, lang = 'en' } = Astro.props;
 
 // The meta line is the only copy this component writes itself, so it is the only
-// thing that has to follow the page language (/es/thesis). Anything not listed
-// here falls back to English.
-const LABELS: Record<string, { updated: string; read: string; words: string; locale: string }> = {
-  en: { updated: 'Updated', read: 'min read', words: 'words', locale: 'en-US' },
-  es: { updated: 'Actualizado', read: 'min de lectura', words: 'palabras', locale: 'es-ES' },
+// thing that has to follow the page language: its labels come from the UI
+// strings (src/i18n/ui.ts, where the hand-written Spanish of /es/thesis lives),
+// its number format from the language.
+const t = translator(lang);
+const labels = {
+  updated: t('chapter.updated'),
+  read: t('chapter.minRead'),
+  words: t('chapter.words'),
+  locale: intlLocale(lang),
 };
-const labels = LABELS[lang] ?? LABELS.en;
 
 // One meta line, joined into list items: version/date, reading estimate, licence.
 // The date bit carries the machine-readable value so it renders inside a <time>

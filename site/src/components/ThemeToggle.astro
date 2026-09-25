@@ -7,7 +7,15 @@
  * so the state is announced once ("Dark theme, pressed"). The swap itself is
  * pure CSS (works without JS); on a flip ui.js dispatches `theme:changed` and
  * src/scripts/motion-ui.ts springs the incoming icon in (transform only).
+ * `lang` translates the name.
  */
+import { t } from '../i18n/ui';
+
+interface Props {
+  lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
 ---
 
 <button
@@ -15,7 +23,7 @@
   class="theme-toggle"
   data-theme-toggle
   aria-pressed="false"
-  aria-label="Dark theme"
+  aria-label={t('theme.toggle', lang)}
 >
   <svg class="i i-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
     <path

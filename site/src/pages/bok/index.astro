@@ -8,6 +8,7 @@ import { chaptersOrdered, getChapter } from '../../data/chapters';
 import { bookParts, chapterNum, countWord } from '../../data/parts';
 import { readingTime } from '../../lib/reading';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { alternatesFor } from '../../lib/i18n-content';
 
 const entries = await getCollection('bok');
 const minutes = new Map(entries.map((entry) => [entry.id, readingTime(entry.body ?? '')]));
@@ -88,6 +89,7 @@ const readingPaths = [
   description={description}
   image="/og/bok.png"
   jsonLd={breadcrumbJsonLd([{ label: 'Body of Knowledge' }])}
+  alternates={alternatesFor('/bok')}
 >
   <div class="container bok-index">
     <header class="bok-head">

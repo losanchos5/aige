@@ -23,6 +23,7 @@ import { visitParents, SKIP } from 'unist-util-visit-parents';
 import { toString } from 'hast-util-to-string';
 import { termId, termSlug, termMatchers } from './glossary';
 import { hasClass } from './hast-utils';
+import { classifyFile } from './i18n-content';
 
 const MAX_PER_PAGE = 25;
 
@@ -87,6 +88,10 @@ function anchorGlossaryTerms(tree: Root): void {
 
 export default function rehypeGlossary() {
   return (tree: Root, file: VFileLike): void => {
+    // A translated glossary chapter gets its term anchors from rehype-i18n (by
+    // position against the English terms); its bold names are not English.
+    const translation = classifyFile(file?.path);
+    if (translation?.kind === 'chapter' && translation.id === '09-glossary') return;
     if (isGlossaryFile(file)) {
       anchorGlossaryTerms(tree);
       return;

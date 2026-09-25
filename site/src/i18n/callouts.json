@@ -1,0 +1,62 @@
+{
+  "In practice": {
+    "es": "En la práctica",
+    "fr": "En pratique",
+    "de": "In der Praxis",
+    "pt": "Na prática"
+  },
+  "In practice (illustrative)": {
+    "es": "En la práctica (ilustrativo)",
+    "fr": "En pratique (illustratif)",
+    "de": "In der Praxis (illustrativ)",
+    "pt": "Na prática (ilustrativo)"
+  },
+  "Example": {
+    "es": "Ejemplo",
+    "fr": "Exemple",
+    "de": "Beispiel",
+    "pt": "Exemplo"
+  },
+  "Example (illustrative)": {
+    "es": "Ejemplo (ilustrativo)",
+    "fr": "Exemple (illustratif)",
+    "de": "Beispiel (illustrativ)",
+    "pt": "Exemplo (ilustrativo)"
+  },
+  "Anti-pattern": {
+    "es": "Antipatrón",
+    "fr": "Anti-patron",
+    "de": "Anti-Pattern",
+    "pt": "Antipadrão"
+  },
+  "Note": {
+    "es": "Nota",
+    "fr": "Remarque",
+    "de": "Hinweis",
+    "pt": "Nota"
+  },
+  "Warning": {
+    "es": "Advertencia",
+    "fr": "Avertissement",
+    "de": "Warnung",
+    "pt": "Aviso"
+  },
+  "Postings (footnote).": {
+    "es": "Ofertas de empleo (nota).",
+    "fr": "Offres d'emploi (note).",
+    "de": "Stellenanzeigen (Anmerkung).",
+    "pt": "Ofertas de emprego (nota)."
+  },
+  "Maps to:": {
+    "es": "Correspondencias:",
+    "fr": "Correspondances :",
+    "de": "Zuordnung:",
+    "pt": "Correspondências:"
+  },
+  "Maps to": {
+    "es": "Correspondencias",
+    "fr": "Correspondances",
+    "de": "Zuordnung",
+    "pt": "Correspondências"
+  }
+}

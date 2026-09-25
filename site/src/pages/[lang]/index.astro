@@ -1,0 +1,111 @@
+---
+// /<lang>: a short landing page for a language that has at least one machine
+// translation. It points to what exists in that language (the Body of
+// Knowledge index, the Thesis, the translated patterns) and to the English
+// site, which stays the reference and holds everything else. It is not a
+// translation of the home page, so it declares no hreflang alternates.
+import Doc from '../../layouts/Doc.astro';
+import { site } from '../../data/site';
+import { chaptersOrdered } from '../../data/chapters';
+import { pathIn } from '../../lib/i18n-content';
+import { allTranslations, translatedLangs } from '../../lib/i18n-pages';
+import { LOCALE_INFO, type TranslatedLocale } from '../../i18n/locales';
+import { translator } from '../../i18n/ui';
+
+export async function getStaticPaths() {
+  return (await translatedLangs()).map((lang) => ({ params: { lang } }));
+}
+
+const { lang } = Astro.params as { lang: TranslatedLocale };
+const t = translator(lang);
+const { chapters, patterns } = await allTranslations();
+const ownChapters = chapters.filter((item) => item.lang === lang);
+const ownPatterns = patterns.filter((item) => item.lang === lang);
+const thesisHref = pathIn('/thesis', lang);
+
+const language = LOCALE_INFO[lang].autonym;
+const title = t('landing.title');
+const summary = t('landing.lede', { language });
+const pageUrl = new URL(`/${lang}`, site.url).href;
+const jsonLd = {
+  '@type': 'WebPage',
+  '@id': `${pageUrl}#page`,
+  name: title,
+  url: pageUrl,
+  inLanguage: lang,
+};
+---
+
+<Doc title={title} summary={summary} sidebar={false} lang={lang} jsonLd={jsonLd}>
+  <ul class="i18n-routes">
+    {
+      ownChapters.length > 0 && (
+        <li>
+          <a href={`/${lang}/bok`}>{t('landing.bok')}</a>
+          <span class="i18n-note">
+            {t('bokIndex.translated', { count: ownChapters.length, total: chaptersOrdered.length })}
+          </span>
+        </li>
+      )
+    }
+    {
+      thesisHref && (
+        <li>
+          <a href={thesisHref}>{t('landing.thesis')}</a>
+        </li>
+      )
+    }
+  </ul>
+
+  {
+    ownPatterns.length > 0 && (
+      <section aria-labelledby="i18n-patterns">
+        <h2 id="i18n-patterns">{t('landing.patterns')}</h2>
+        <ul class="i18n-routes">
+          {ownPatterns.map((item) => (
+            <li>
+              <a href={`/${lang}/patterns/${item.def.slug}`}>{item.entry.data.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section aria-labelledby="i18n-reference">
+    <h2 id="i18n-reference">{t('landing.reference')}</h2>
+    <p>{t('landing.referenceLede')}</p>
+    <p>
+      <a href="/" hreflang="en">{t('landing.referenceLink')}</a>
+    </p>
+  </section>
+</Doc>
+
+<style>
+  .i18n-routes {
+    list-style: none;
+    padding: 0;
+  }
+
+  .i18n-routes li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-3);
+    margin: 0;
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .i18n-routes a {
+    font-weight: 600;
+  }
+
+  .i18n-note {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+</style>

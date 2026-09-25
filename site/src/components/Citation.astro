@@ -11,6 +11,7 @@
 // it defaults to `chapter` when a slug is given and `page` otherwise. `label`
 // overrides the summary text.
 import { site } from '../data/site';
+import { translator } from '../i18n/ui';
 
 type CitationKind = 'chapter' | 'obligation' | 'figure' | 'dataset' | 'page';
 
@@ -20,10 +21,16 @@ interface Props {
   url?: string;
   kind?: CitationKind;
   label?: string;
+  /** Page language: translates the box's labels (the reference stays as cited). */
+  lang?: string;
 }
 
-const { title, slug, url: urlProp, kind: kindProp, label: labelProp } = Astro.props;
+const { title, slug, url: urlProp, kind: kindProp, label: labelProp, lang = 'en' } = Astro.props;
 const kind: CitationKind = kindProp ?? (slug ? 'chapter' : 'page');
+const t = translator(lang);
+// The copy buttons say "Copied" in the page language (ui-doc.js, cite.js); an
+// English page keeps the scripts' default and no extra attribute.
+const copied = lang === 'en' ? {} : { 'data-copied': t('cite.copied') };
 
 const defaultLabels: Record<CitationKind, string> = {
   chapter: 'Cite this chapter',
@@ -32,7 +39,9 @@ const defaultLabels: Record<CitationKind, string> = {
   dataset: 'Cite this dataset',
   page: 'Cite this page',
 };
-const label = labelProp ?? defaultLabels[kind];
+const label =
+  labelProp ??
+  (lang === 'en' ? defaultLabels[kind] : kind === 'chapter' ? t('cite.chapter') : t('cite.page'));
 
 const resolved = urlProp ?? (slug ? `/bok/${slug}` : undefined);
 if (!resolved) throw new Error(`Citation "${title}": pass a slug or a url`);
@@ -91,8 +100,9 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
         data-umami-event-kind="reference"
         data-umami-event-type={kind}
         data-umami-event-chapter={slug}
+        {...copied}
       >
-        Copy
+        {t('cite.copy')}
       </button>
 
       <p class="cite-label">BibTeX</p>
@@ -105,14 +115,15 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
         data-umami-event-kind="bibtex"
         data-umami-event-type={kind}
         data-umami-event-chapter={slug}
+        {...copied}
       >
-        Copy BibTeX
+        {t('cite.copyBibtex')}
       </button>
     </div>
   </details>
 
   <div class="share-row">
-    <a class="share-link" href={linkedInUrl} target="_blank" rel="noopener">Share on LinkedIn</a>
+    <a class="share-link" href={linkedInUrl} target="_blank" rel="noopener">{t('cite.shareLinkedIn')}</a>
     <button
       type="button"
       class="share-copy"
@@ -121,8 +132,9 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
       data-umami-event-kind="link"
       data-umami-event-type={kind}
       data-umami-event-chapter={slug}
+      {...copied}
     >
-      Copy link
+      {t('cite.copyLink')}
     </button>
   </div>
 </div>

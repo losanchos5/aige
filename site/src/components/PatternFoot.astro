@@ -11,6 +11,7 @@
 // search index and its scoped classes override the .prose element styles.
 import EditOnGitHub from './EditOnGitHub.astro';
 import { site } from '../data/site';
+import { translator } from '../i18n/ui';
 
 interface Adjacent {
   slug: string;
@@ -21,14 +22,21 @@ interface Props {
   /** Pattern name without the "Pattern: " prefix. */
   title: string;
   slug: string;
-  /** Repo-relative source file, e.g. "bok/patterns/policy-card.md". */
-  editPath: string;
+  /** Repo-relative source file, e.g. "bok/patterns/policy-card.md"; omitted
+      on a translation, whose errors are reported from its notice instead. */
+  editPath?: string;
   prev?: Adjacent;
   next?: Adjacent;
+  /** Page language: translates the labels (the reference stays as cited). */
+  lang?: string;
+  /** Where the pattern pages of the pager live (`/patterns`, or `/de/patterns`). */
+  base?: string;
 }
 
-const { title, slug, editPath, prev, next } = Astro.props;
-const url = `${site.url}/patterns/${slug}`;
+const { title, slug, editPath, prev, next, lang = 'en', base = '/patterns' } = Astro.props;
+const t = translator(lang);
+const copied = lang === 'en' ? {} : { 'data-copied': t('cite.copied') };
+const url = `${site.url}${base}/${slug}`;
 const work = 'AI Governance Engineering: The Thesis & Body of Knowledge';
 const reference = `García Aibar, J. (2026). Pattern: ${title}. In ${work} (v${site.bokVersion}), chapter 05, Patterns. https://doi.org/${site.doi}. ${url}. ${site.license}`;
 
@@ -50,39 +58,39 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
 
 <div class="pf" data-pagefind-ignore>
   <footer class="pf-foot">
-    <EditOnGitHub path={editPath} />
+    {editPath ? <EditOnGitHub path={editPath} lang={lang} /> : <span />}
     <div class="pf-cite">
       <details class="pf-cite-box">
-        <summary>Cite this pattern</summary>
+        <summary>{t('cite.pattern')}</summary>
         <div class="pf-cite-body">
           <p class="pf-cite-apa">
             García Aibar, J. (2026). <em>Pattern: {title}</em>. In <em>{work}</em>
             (v{site.bokVersion}), chapter 05, Patterns.{' '}
             <a href={`https://doi.org/${site.doi}`}>https://doi.org/{site.doi}</a>. {url}. {site.license}
           </p>
-          <button type="button" class="pf-copy" data-copy-cite={reference}>Copy</button>
+          <button type="button" class="pf-copy" data-copy-cite={reference} {...copied}>{t('cite.copy')}</button>
 
           <p class="pf-cite-label">BibTeX</p>
           <pre class="pf-bibtex"><code>{bibtex}</code></pre>
-          <button type="button" class="pf-copy" data-copy-cite={bibtex}>Copy BibTeX</button>
+          <button type="button" class="pf-copy" data-copy-cite={bibtex} {...copied}>{t('cite.copyBibtex')}</button>
         </div>
       </details>
 
       <div class="pf-share">
-        <a class="pf-share-link" href={linkedInUrl} target="_blank" rel="noopener">Share on LinkedIn</a>
-        <button type="button" class="pf-share-link" data-copy-cite={url}>Copy link</button>
+        <a class="pf-share-link" href={linkedInUrl} target="_blank" rel="noopener">{t('cite.shareLinkedIn')}</a>
+        <button type="button" class="pf-share-link" data-copy-cite={url} {...copied}>{t('cite.copyLink')}</button>
       </div>
     </div>
   </footer>
 
   {
     (prev || next) && (
-      <nav class="pager pf-pager" aria-label="Pattern navigation">
+      <nav class="pager pf-pager" aria-label={t('pager.patterns')}>
         {prev ? (
-          <a class="pf-link prev card-lum lift" href={`/patterns/${prev.slug}`} rel="prev">
+          <a class="pf-link prev card-lum lift" href={`${base}/${prev.slug}`} rel="prev">
             <span class="pf-dir">
               <span class="pf-arrow" aria-hidden="true">←</span>
-              <span>Previous pattern</span>
+              <span>{t('pager.previousPattern')}</span>
             </span>
             <span class="pf-name">{prev.title}</span>
           </a>
@@ -90,9 +98,9 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
           <span />
         )}
         {next ? (
-          <a class="pf-link next card-lum lift" href={`/patterns/${next.slug}`} rel="next">
+          <a class="pf-link next card-lum lift" href={`${base}/${next.slug}`} rel="next">
             <span class="pf-dir">
-              <span>Next pattern</span>
+              <span>{t('pager.nextPattern')}</span>
               <span class="pf-arrow" aria-hidden="true">→</span>
             </span>
             <span class="pf-name">{next.title}</span>

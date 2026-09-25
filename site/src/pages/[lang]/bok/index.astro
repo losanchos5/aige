@@ -1,0 +1,158 @@
+---
+// /<lang>/bok: the Body of Knowledge's table of contents in a language that has
+// at least one translated chapter. Every chapter is listed by part, in reading
+// order: a translated chapter links to its page in this language, one not
+// translated yet links to the English original, marked as English. No route
+// is emitted for a language without translated chapters.
+import Doc from '../../../layouts/Doc.astro';
+import { site } from '../../../data/site';
+import { chaptersOrdered } from '../../../data/chapters';
+import { bookParts, chapterNum } from '../../../data/parts';
+import { alternatesFor } from '../../../lib/i18n-content';
+import { allTranslations, translatedShortTitle } from '../../../lib/i18n-pages';
+import { LOCALE_INFO, type TranslatedLocale } from '../../../i18n/locales';
+import { translator, type UiKey } from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const { chapters } = await allTranslations();
+  const langs = [...new Set(chapters.map((item) => item.lang))];
+  return langs.map((lang) => ({
+    params: { lang },
+    props: { translated: chapters.filter((item) => item.lang === lang) },
+  }));
+}
+
+const { lang } = Astro.params as { lang: TranslatedLocale };
+const { translated } = Astro.props as {
+  translated: Awaited<ReturnType<typeof allTranslations>>['chapters'];
+};
+const t = translator(lang);
+const byId = new Map(translated.map((item) => [item.chapter.id, item]));
+const path = `/${lang}/bok`;
+const title = t('bokIndex.title');
+const summary = t('bokIndex.lede', { language: LOCALE_INFO[lang].autonym });
+const count = t('bokIndex.translated', { count: translated.length, total: chaptersOrdered.length });
+
+const parts = bookParts.map((part) => ({
+  id: part.id,
+  title: t(`part.${part.id}` as UiKey),
+  range: part.range,
+  chapters: part.chapters.map((chapter) => {
+    const item = byId.get(chapter.id);
+    return item
+      ? {
+          num: chapterNum(chapter.order),
+          href: `/${lang}/bok/${chapter.slug}`,
+          label: translatedShortTitle(item),
+          english: false,
+        }
+      : {
+          num: chapterNum(chapter.order),
+          href: `/bok/${chapter.slug}`,
+          label: chapter.shortTitle,
+          english: true,
+        };
+  }),
+}));
+
+const pageUrl = new URL(path, site.url).href;
+const jsonLd = {
+  '@type': 'CollectionPage',
+  '@id': `${pageUrl}#page`,
+  name: title,
+  url: pageUrl,
+  inLanguage: lang,
+  isPartOf: { '@id': `${new URL('/bok', site.url).href}#book` },
+};
+---
+
+<Doc
+  title={title}
+  summary={summary}
+  crumbs={[{ label: title }]}
+  sidebar={false}
+  lang={lang}
+  alternates={alternatesFor(path)}
+  jsonLd={jsonLd}
+  image="/og/bok.png"
+>
+  <p class="i18n-count" data-i18n-count>{count}</p>
+  {
+    parts.map((part) => (
+      <section class="i18n-part" aria-labelledby={`part-${part.id}`}>
+        <h2 id={`part-${part.id}`}>
+          {part.title} <span class="i18n-range">{part.range}</span>
+        </h2>
+        <ol class="i18n-chapters">
+          {part.chapters.map((chapter) => (
+            <li>
+              <a href={chapter.href} hreflang={chapter.english ? 'en' : undefined}>
+                <span class="i18n-num" aria-hidden="true">
+                  {chapter.num}
+                </span>
+                <span lang={chapter.english ? 'en' : undefined}>{chapter.label}</span>
+              </a>
+              {chapter.english && <span class="i18n-tag">{t('bokIndex.inEnglish')}</span>}
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))
+  }
+</Doc>
+
+<style>
+  .i18n-count {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .i18n-range {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .i18n-chapters {
+    margin-top: var(--s-3);
+    list-style: none;
+    padding: 0;
+  }
+
+  .i18n-chapters li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-3);
+    margin: 0;
+    padding: var(--s-2) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .i18n-chapters a {
+    display: inline-flex;
+    gap: var(--s-3);
+    text-decoration: none;
+  }
+
+  .i18n-chapters a:hover span:last-child {
+    text-decoration: underline;
+  }
+
+  .i18n-num {
+    font-family: var(--font-mono);
+    color: var(--muted);
+  }
+
+  .i18n-tag {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+</style>
