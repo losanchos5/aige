@@ -11,6 +11,7 @@
 
 import { chaptersOrdered, type Chapter } from '../data/chapters';
 import { cases, type IncidentCase } from '../data/cases';
+import { comparisons, comparisonPath } from '../data/comparisons';
 import { patterns, patternPath } from '../data/patterns';
 import { site } from '../data/site';
 import { getGlossary } from './glossary';
@@ -121,7 +122,8 @@ export function approxTokens(text: string): string {
 //
 // Every English content page with a Markdown source (the pillar page
 // /ai-governance, the chapters, the pattern pages, the glossary terms, the
-// incident cases and the Thesis) is also served as clean Markdown at its URL
+// incident cases, the framework comparisons under /resources/crosswalk and the
+// Thesis) is also served as clean Markdown at its URL
 // plus `.md` (/bok/definition.md), for agents and assistants that read Markdown
 // better than HTML. Seo.astro advertises it with
 // <link rel="alternate" type="text/markdown">; /llms.txt lists it.
@@ -191,6 +193,7 @@ export function markdownAlternateFor(pathname: string): string | null {
     ...patterns.map((pattern) => patternPath(pattern)),
     ...getGlossary().map((entry) => entry.url),
     ...cases.map((entry) => casePath(entry)),
+    ...comparisons.map((c) => comparisonPath(c)),
     '/thesis',
   ]);
   const clean = pathname.replace(/\.html$/, '').replace(/\/index$/, '').replace(/\/+$/, '');

@@ -109,7 +109,7 @@ test.describe('_headers: Cloudflare limits', () => {
 test.describe('_headers: Markdown twins', () => {
   test('the twins cover every section that serves one', () => {
     expect(TWINS.length).toBeGreaterThanOrEqual(300);
-    for (const prefix of ['/bok/', '/patterns/', '/cases/', '/glossary/']) {
+    for (const prefix of ['/bok/', '/patterns/', '/cases/', '/glossary/', '/resources/crosswalk/']) {
       expect(TWINS.some((p) => p.startsWith(prefix)), prefix).toBe(true);
     }
     expect(TWINS).toContain('/thesis.md');
@@ -153,6 +153,9 @@ test.describe('_headers: Markdown twins', () => {
     '/patterns/x.html',
     '/cases/zillow-offers',
     '/glossary/fria',
+    '/resources/crosswalk',
+    '/resources/crosswalk/iso-42001-vs-eu-ai-act',
+    '/resources/crosswalk/iso-42001-vs-eu-ai-act.html',
     '/thesis',
     '/es/thesis',
   ]) {
@@ -209,5 +212,16 @@ test.describe('IndexNow', () => {
     expect(step).toContain('.slice(0, 10000)');
     expect(step).toContain('continue-on-error: true');
     expect(step).toContain("if: github.event_name == 'push' && github.ref == 'refs/heads/main'");
+  });
+});
+
+test.describe('_headers: the analytics origin in the CSP', () => {
+  test('admin.stocktcg.net is explained as the self-hosted Umami instance', () => {
+    const lines = HEADERS_TEXT.replace(/\r/g, '').split('\n');
+    const csp = lines.findIndex((line) => /^\s*Content-Security-Policy:.*admin\.stocktcg\.net/.test(line));
+    expect(csp).toBeGreaterThan(-1);
+    const comment = lines.slice(0, csp).filter((line) => line.startsWith('#')).join(' ');
+    expect(comment).toContain('admin.stocktcg.net');
+    expect(comment).toMatch(/self-hosted Umami/);
   });
 });
