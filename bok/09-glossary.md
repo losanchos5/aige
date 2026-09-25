@@ -1619,9 +1619,10 @@ management system (Article 17)](/bok/eu-ai-act#article-16-and-the-quality-manage
 ## R
 
 **RAISE Act.** New York's Responsible AI Safety and Education Act, a frontier-AI safety law binding
-large frontier developers to publish a safety framework and disclose incidents; signed 19 December
-2025 and taking effect 1 January 2027 after a March 2026 chapter amendment that placed oversight in
-an office within the Department of Financial Services (DFS) [12][15]. See [ch. 08,
+large frontier developers to publish a safety framework and every frontier developer to report
+critical safety incidents; signed 19 December 2025 and taking effect 1 January 2027 after a March
+2026 chapter amendment that placed oversight in an office within the Department of Financial
+Services (DFS) [12][15]. See [ch. 08,
 Frontier-developer laws](/bok/regulatory-map#frontier-developer-laws). (ch. 08, 21)
 
 **Realised risk reduction.** The measured drop in a named failure mode's rate or blast radius in
@@ -2147,7 +2148,7 @@ Runtime Controls & Observability](/bok/the-stack#layer-04-runtime-controls--obse
 [12] "Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models" (RAISE Act, S6953B/A6453B, signed 19 Dec 2025; oversight office within the Department of Financial Services). Governor Kathy Hochul (New York State). 2025-12-19. https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models (verified: primary)
 [13] "Best AI Governance Platforms in 2026: 14 Enterprise Vendors Compared" (vendor-published comparison of the 13 Magic Quadrant vendors plus its own product; most of the category "manages the program … without any runtime data path"). Kosmoy. 2026-07-10. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
 [14] California SB 53 / TFAIA (in force 1 Jan 2026; models above 10^26 FLOP; large frontier developers). Future of Privacy Forum. 2026. https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ (verified: secondary)
-[15] "New York Finalizes RAISE Act for Frontier AI Models; Law Takes Effect January 1, 2027" (chapter amendment signed 27 Mar 2026; effective 1 Jan 2027; DFS oversight office). Wiley. 2026. https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027 (verified: secondary)
+[15] "New York Finalizes RAISE Act for Frontier AI Models; Law Takes Effect January 1, 2027" (chapter amendment signed 27 Mar 2026; effective 1 Jan 2027; framework for large frontier developers, incident reports for every frontier developer; DFS oversight office). Wiley. 2026. https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027 (verified: secondary)
 [16] The General-Purpose AI Code of Practice (published 10 Jul 2025; a voluntary tool; three chapters: Transparency, Copyright, Safety and Security). European Commission. 2025-07-10. https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai (verified: primary)
 [17] ISO/IEC 42005:2025, AI system impact assessment (companion to Art. 27 and ISO 42001 Annex A.5). ISO/IEC. 2025-05. https://www.iso.org/standard/44545.html (verified: secondary)
 [18] 《人工智能安全治理框架3.0》发布: announcement of the AI Safety Governance Framework 3.0 (TC260 under CAC guidance). Cyberspace Administration of China. 2026-09-14. https://www.cac.gov.cn/2026-09/14/c_1791137092283345.htm (verified: primary)

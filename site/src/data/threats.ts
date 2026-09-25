@@ -187,7 +187,8 @@ export const threatSources: readonly Source[] = [
   {
     title:
       'NIST SP 800-218A, Secure Software Development Practices for Generative AI and Dual-Use Foundation Models: An SSDF Community Profile',
-    gloss: 'AI-specific practices and tasks added to SSDF 1.1, e.g. PS.1.3, PW.1.1, PW.3.1 to PW.3.3',
+    gloss:
+      'AI-specific tasks added to SSDF 1.1 (e.g. PO.5.3, PS.1.3, PW.3.1 to PW.3.3) and AI-specific recommendations on existing tasks (e.g. PW.1.1, RV.1.1)',
     publisher: 'NIST',
     date: '2024-07',
     url: 'https://csrc.nist.gov/pubs/sp/800/218/a/final',
@@ -365,7 +366,7 @@ export const ssdfTasks: Readonly<Record<string, string>> = {
   'PO.5.3': 'Monitor development environments continuously for suspicious activity',
   'PS.1.3': 'Protect model weights and configuration parameters from unauthorised access and change',
   'PS.3.2': 'Keep provenance data for every component of a release',
-  'PW.1.1': 'Risk modelling that includes AI-specific threat types',
+  'PW.1.1': 'Risk modelling (an SSDF 1.1 task; 800-218A recommends including AI-specific threat types)',
   'PW.3.1': 'Analyse training and test data for poisoning, bias and tampering before use',
   'PW.3.2': 'Track the provenance of training, testing, fine-tuning and aligning data',
   'PW.3.3': 'Include adversarial samples in training and testing data',
