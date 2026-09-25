@@ -2289,7 +2289,9 @@ illustrative, not a claim of conformity.
 
 Read-only MCP server over the open data (block w2-mcp-server, v0.5.0). The rows below support the
 README's claims about the protocol, the SDK, the clients and the reverse proxy; the data the server
-returns keeps the sources of the chapters and datasets it comes from. Verified 2026-09-24.
+returns keeps the sources of the chapters and datasets it comes from. Verified 2026-09-24; rows 9 to
+14 (batch refusal, IPv6 rate-limit key, pinned base image, proxy-only network, log rotation) added
+and verified 2026-09-25.
 
 | # | Claim | Source | Publisher | Date | URL | Verified | Used in |
 |---|---|---|---|---|---|---|---|
@@ -2301,3 +2303,9 @@ returns keeps the sources of the chapters and datasets it comes from. Verified 2
 | 6 | Caddy sets or augments `X-Forwarded-For` and ignores incoming `X-Forwarded-*` values unless from trusted proxies; `text/event-stream` responses are flushed immediately | reverse_proxy directive | Caddy | 2026 | https://caddyserver.com/docs/caddyfile/directives/reverse_proxy | primary | MCP server README (Caddy block) |
 | 7 | The `filter` log format deletes fields such as `request>remote_ip` and `request>client_ip`; the `fields` block is optional | log directive | Caddy | 2026 | https://caddyserver.com/docs/caddyfile/directives/log | primary | MCP server README (Caddy block) |
 | 8 | The official node images ship a `node` user with uid 1000; run with `NODE_ENV=production`; `--init` handles PID 1 | Docker and Node.js best practices | Node.js docker-node | 2026 | https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md | primary | MCP server README (Dockerfile, compose) |
+| 9 | Revision 2025-06-18 removed support for JSON-RPC batching (first major change listed) | Key changes, revision 2025-06-18 | Model Context Protocol | 2025-06-18 | https://modelcontextprotocol.io/specification/2025-06-18/changelog | primary | MCP server README (batch arrays refused) |
+| 10 | End sites should get "at least one /64, and in most cases significantly more" | RFC 6177, IPv6 Address Assignment to End Sites | IETF | 2011-03 | https://www.rfc-editor.org/rfc/rfc6177 | primary | MCP server README (rate limit keyed by IPv6 /64) |
+| 11 | Image tags are mutable; pinning to a digest guarantees the same image; Dependabot with `package-ecosystem: "docker"` raises pull requests that update tags and digests | Building best practices, "Pin base image versions" | Docker Docs | 2026 | https://docs.docker.com/build/building/best-practices/#pin-base-image-versions | primary | MCP server README and Dockerfile (pinned base image) |
+| 12 | `docker network connect --ip` assigns a static address; create the network with an `--ip-range` and pick static addresses outside it | docker network connect | Docker Docs | 2026 | https://docs.docker.com/reference/cli/docker/network/connect/ | primary | MCP server README (proxy-only network) |
+| 13 | `ipv4_address` gives a service container a static address on a network whose subnet covers it | Compose file reference, services, `networks` | Docker Docs | 2026 | https://docs.docker.com/reference/compose-file/services/ | primary | MCP server README (Caddy's fixed address) |
+| 14 | The `json-file` driver's `max-size` defaults to -1 (unlimited) and logs are not rotated unless it is set; `max-file` works only with `max-size` | JSON File logging driver | Docker Docs | 2026 | https://docs.docker.com/engine/logging/drivers/json-file/ | primary | MCP server README (compose `logging` block) |

@@ -2,8 +2,13 @@
 # Build from this directory:  docker build -t aige-mcp:0.5.0 .
 # Run:  docker run --init --rm -p 127.0.0.1:8787:8787 aige-mcp:0.5.0
 # See README.md for the compose service and the Caddy site block.
+#
+# The base is pinned by digest (node:22-alpine resolved to Node.js 22.23.3 on
+# Alpine 3.24 as of 2026-09-24), so a rebuild or a retagged image cannot change
+# it silently; Dependabot (package-ecosystem docker, /tools/mcp-server) proposes
+# the next digest as a pull request. Keep both FROM lines on the same digest.
 
-FROM node:22-alpine AS build
+FROM node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
@@ -11,7 +16,7 @@ COPY tsconfig.json ./
 COPY src ./src
 RUN npm run build && npm prune --omit=dev
 
-FROM node:22-alpine
+FROM node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402
 ENV NODE_ENV=production \
     PORT=8787 \
     HOST=0.0.0.0
