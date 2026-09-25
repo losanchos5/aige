@@ -11,8 +11,10 @@
 // sentences at the end; what is left is the source's own opening, cut only at
 // a sentence end, a clause end ("; ", ": ") or before a clause that only adds
 // ("which", "such as", "for example", "including" ...), never before a
-// qualifier ("unless", "only", "where", "if", "and" ...). Or nothing is left:
-// the description is the template alone ("<term>: definition with ...").
+// qualifier ("unless", "only", "where", "if", "and" ...), nor when the dropped
+// rest of the sentence holds one (round 3, /glossary/tdm-exception). A glossary
+// term with no such opening has a hand-written summary instead
+// (data/glossary-descriptions.ts); since round 3 none is the stock template.
 // Pure reads of src data and dist.
 import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
@@ -21,6 +23,7 @@ import { obligations, obligationSlug, type Obligation } from '../src/data/framew
 import { getGlossary } from '../src/lib/glossary';
 import { instrumentClause, obligationHeading } from '../src/lib/obligation-title';
 import { leadDescription, shortenSentence } from '../src/lib/lead-sentence';
+import { glossaryDescriptions } from '../src/data/glossary-descriptions';
 
 // Hardcoded on purpose, not imported from lib/lead-sentence.ts: a test that
 // imported the rule it checks would pass however the rule drifted.
@@ -133,6 +136,33 @@ test.describe('lead-sentence cuts (lib/lead-sentence.ts)', () => {
     ).toBeUndefined();
   });
 
+  test('a qualifier anywhere in the dropped rest refuses the cut (/glossary/tdm-exception)', () => {
+    // Round 3 (CONTENT N-R3-1): cut at ", including", the snippet said anyone
+    // may copy works for mining, without "unless the rightholder has reserved
+    // that use" two clauses later.
+    const text =
+      'The EU copyright exception for text and data mining (DSM Directive Articles 3 and 4) that lets anyone copy lawfully accessible works for mining, including AI training, unless the rightholder has reserved that use; for content made publicly available online the reservation must be made in an appropriate manner, such as machine-readable means.';
+    expect(shortenSentence(text, 143)).toBeUndefined();
+    expect(
+      shortenSentence(
+        'A register of every model in production, such as vendor models and fine-tunes, which applies only where the model makes decisions.',
+        60,
+        20,
+      ),
+    ).toBeUndefined();
+    // The same sentence with no qualifier in its rest is cut, so the refusals
+    // below come from the qualifier, not from the budget.
+    expect(
+      shortenSentence('A duty to keep logs for six months, such as access logs and decision logs, for every system.', 60, 20),
+    ).toBe('A duty to keep logs for six months.');
+    for (const word of ['except', 'provided', 'where', 'if', 'when', 'subject to', 'to the extent', 'other than', 'but not']) {
+      expect(
+        shortenSentence(`A duty to keep logs for six months, such as access logs and decision logs, ${word} the system is high-risk.`, 60, 20),
+        word,
+      ).toBeUndefined();
+    }
+  });
+
   test('a clause that only adds is still a clean cut', () => {
     expect(
       shortenSentence(
@@ -161,8 +191,9 @@ test.describe('lead-sentence cuts (lib/lead-sentence.ts)', () => {
 /** The glossary page's own sentences after the lead (src/pages/glossary/[slug].astro). */
 const GLOSSARY_TAIL = /\s*(?:Definition with [^.]*\.|From the AI Governance Body of Knowledge glossary\.)$/i;
 
-test.describe('every glossary description is the definition\'s own opening, or the template', () => {
+test.describe('every glossary description is the definition\'s own opening, or its hand-written summary', () => {
   const entries = getGlossary().filter((entry) => existsSync(join('dist', 'glossary', `${entry.slug}.html`)));
+  const pageOf = (slug: string): string => join('dist', 'glossary', `${slug}.html`);
 
   test('the build wrote the glossary pages', () => {
     expect(entries.length).toBeGreaterThan(300);
@@ -171,7 +202,14 @@ test.describe('every glossary description is the definition\'s own opening, or t
   test('no description cuts the definition where it changes its meaning', () => {
     const bad: string[] = [];
     for (const entry of entries) {
-      const description = descriptionOf(join('dist', 'glossary', `${entry.slug}.html`));
+      const description = descriptionOf(pageOf(entry.slug));
+      // A hand-written summary (data/glossary-descriptions.ts) is not an
+      // opening of the definition; it is read against it by hand instead.
+      const authored = glossaryDescriptions[entry.slug];
+      if (authored !== undefined) {
+        if (description !== authored) bad.push(`${entry.slug}: not its hand-written description: ${description}`);
+        continue;
+      }
       const prefix = `${entry.term}: `;
       const labelled = description.startsWith(prefix);
       let lead = labelled ? description.slice(prefix.length) : description;
@@ -180,11 +218,61 @@ test.describe('every glossary description is the definition\'s own opening, or t
         lead = lead.replace(GLOSSARY_TAIL, '');
       }
       if (lead === '') {
-        if (!labelled) bad.push(`${entry.slug}: template without the term: ${description}`);
+        bad.push(`${entry.slug}: the stock template, no definition: ${description}`);
         continue;
       }
       const why = unfaithful(lead, entry.definition);
       if (why) bad.push(`${entry.slug}: ${why}: ${description}`);
+    }
+    expect(bad, bad.join('\n')).toEqual([]);
+  });
+
+  // Round 3 (ONPAGE N3-2, CONTENT N-R3-2): 82 terms fell back to "<term>:
+  // definition with sources, the chapters that use it ... From the AI
+  // Governance Body of Knowledge glossary.", a snippet that says nothing of
+  // what the term means.
+  test('every description is 110-158 characters, unique, whole and never the stock template', () => {
+    const bad: string[] = [];
+    const seen = new Map<string, string>();
+    for (const entry of entries) {
+      const description = descriptionOf(pageOf(entry.slug));
+      if (description.length < 110 || description.length > 158) {
+        bad.push(`${entry.slug}: ${description.length} characters: ${description}`);
+      }
+      if (description.includes('…') || description.includes('...')) bad.push(`${entry.slug}: ellipsis: ${description}`);
+      if (/(?:^|:\s)definition with\b/i.test(description) || description.includes('Body of Knowledge glossary.')) {
+        bad.push(`${entry.slug}: stock template: ${description}`);
+      }
+      const other = seen.get(description);
+      if (other) bad.push(`${entry.slug}: same description as ${other}`);
+      seen.set(description, entry.slug);
+    }
+    expect(bad, bad.join('\n')).toEqual([]);
+  });
+
+  test('every hand-written description names a glossary term and fits the snippet', () => {
+    const terms = new Map(getGlossary().map((entry) => [entry.slug, entry.term]));
+    const bad: string[] = [];
+    for (const [slug, description] of Object.entries(glossaryDescriptions)) {
+      const term = terms.get(slug);
+      if (term === undefined) bad.push(`${slug}: not a glossary term`);
+      else if (!description.startsWith(`${term}: `)) bad.push(`${slug}: does not open with "${term}: "`);
+      if (description.length < 110 || description.length > 158) bad.push(`${slug}: ${description.length} characters`);
+      if (!/[a-z0-9)]\.$/i.test(description)) bad.push(`${slug}: does not end a sentence`);
+    }
+    expect(bad, bad.join('\n')).toEqual([]);
+  });
+
+  // Round 3 (ONPAGE N9): three "<term>: definition" titles ran to 61-63
+  // characters; a long term now stands alone.
+  test('every glossary title is at most 60 characters before the site name', () => {
+    const bad: string[] = [];
+    for (const entry of entries) {
+      const html = readFileSync(pageOf(entry.slug), 'utf8');
+      const head = html.slice(0, html.indexOf('</head>'));
+      const title = decode(/<title>([^<]*)<\/title>/.exec(head)?.[1] ?? '').replace(/ · AI Governance Engineer$/, '');
+      if (title.length > 60) bad.push(`${entry.slug}: ${title.length}: ${title}`);
+      if (!title.startsWith(entry.term)) bad.push(`${entry.slug}: does not name the term: ${title}`);
     }
     expect(bad, bad.join('\n')).toEqual([]);
   });

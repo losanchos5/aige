@@ -31,6 +31,7 @@ import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import { gitDate } from '../../lib/reading';
 import { leadDescription, listSentences } from '../../lib/lead-sentence';
 import { patternsUsingTerm } from '../../lib/cross-links';
+import { glossaryDescriptions } from '../../data/glossary-descriptions';
 import { patternPath } from '../../data/patterns';
 import { comparisonsForTerm, termFrameworks } from '../../lib/compare-links';
 import '../../styles/resources.css';
@@ -75,6 +76,10 @@ const contrast = entry.contrast.map((slug) => {
 for (const slug of Object.keys(termFrameworks)) {
   if (!bySlug.has(slug)) throw new Error(`compare-links: "${slug}" is not a glossary term`);
 }
+// A hand-written description for a renamed or removed term fails the build too.
+for (const slug of Object.keys(glossaryDescriptions)) {
+  if (!bySlug.has(slug)) throw new Error(`glossary-descriptions: "${slug}" is not a glossary term`);
+}
 const compared = comparisonsForTerm(entry.slug);
 
 const pairs = contrastPairsFor(entry.slug);
@@ -103,15 +108,22 @@ const carries = [
   patternUses.length > 0 ? 'the patterns that use it' : '',
   related.length > 0 || contrast.length > 0 || pairs.length > 0 ? 'related terms' : '',
 ].filter(Boolean);
-const description = leadDescription(entry.definition, {
-  label: entry.term,
-  lowerFirst: true,
-  loose: true,
-  extras: [listSentences('Definition with', carries), 'From the AI Governance Body of Knowledge glossary.'],
-});
+// A term whose definition has no such opening has a hand-written one-sentence
+// summary instead (data/glossary-descriptions.ts, audit 2026-09-25 round 3
+// N3-2), so no page falls back to the "<term>: definition with ..." template.
+const description =
+  glossaryDescriptions[entry.slug] ??
+  leadDescription(entry.definition, {
+    label: entry.term,
+    lowerFirst: true,
+    loose: true,
+    extras: [listSentences('Definition with', carries), 'From the AI Governance Body of Knowledge glossary.'],
+  });
 
-// Title: "<term>: definition", with the site name when it still fits 70 chars.
-const title = `${entry.term}: definition`;
+// Title: "<term>: definition", with the site name when it still fits 70 chars;
+// the term alone when "<term>: definition" would pass 60 (ONPAGE N9).
+const TITLE_MAX = 60;
+const title = `${entry.term}: definition`.length <= TITLE_MAX ? `${entry.term}: definition` : entry.term;
 const titleSuffix = `${title} · ${site.name}`.length <= 70;
 
 const pageUrl = new URL(entry.url, site.url).href;
