@@ -1,0 +1,642 @@
+---
+/**
+ * HeroStrip: the strip along the foot of the home hero, under a hairline rule.
+ * Set as text, never as plates over the painting: a mono label in small caps
+ * and a Newsreader value on one baseline, items parted by thin rules. Three
+ * variants:
+ *
+ * - `ledger`: the figures as a still colophon. One justified row on wide
+ *   screens, a four- or two-column ledger on tablets, one column on phones.
+ * - `marquee`: the same figures running as a slow, edge-faded marquee that
+ *   passes behind a fixed kicker ("The discipline in figures").
+ * - `frameworks`: flagship framework names as italic wordmarks in the marquee,
+ *   behind a kicker that counts every framework mapped and links to the
+ *   catalogue; the figures move to a thinner still line under it.
+ *
+ * `caption` adds the museum label that credits the painting.
+ *
+ * Motion is CSS only (a transform marquee on .facts-track over a duplicated,
+ * aria-hidden and inert .facts-copy) and runs only under
+ * prefers-reduced-motion: no-preference; reduced motion hides the copy and
+ * lets the list wrap in place. Hover or focus inside the window pauses it, and
+ * so does .hero-facts[data-paused], which public/hero-strip.js sets from the
+ * "Pause motion" toggle (off screen until keyboard focus, like the skip link)
+ * and from a click or tap on the strip (WCAG 2.2.2). The class names keep the
+ * contract of the earlier strip (tests/hero-field.spec.ts).
+ */
+import { frameworks } from '../data/frameworks';
+
+interface Fact {
+  label: string;
+  value: string;
+}
+
+interface Props {
+  variant?: 'ledger' | 'marquee' | 'frameworks';
+  /** The figures, label | value pairs read off the content modules. */
+  facts: readonly Fact[];
+  /** Credit the painting behind the hero with a museum-style label. */
+  caption?: boolean;
+}
+
+const { variant = 'ledger', facts, caption = false } = Astro.props;
+
+// The frameworks marquee: flagship instruments by their `short` label, in this
+// order. A label that goes missing from the data fails the build instead of
+// silently dropping a wordmark.
+const FLAGSHIPS = [
+  'EU AI Act',
+  'NIST AI RMF',
+  'ISO 42001',
+  'ISO 23894',
+  'OECD AI Principles',
+  'GDPR',
+  'CoE Convention',
+  'TC260 Framework 3.0',
+  'Colorado ADMT',
+  'NYC LL 144',
+  'Singapore GenAI',
+  'Korea AI Act',
+];
+const marks = FLAGSHIPS.map((short) => {
+  const found = frameworks.find((framework) => framework.short === short);
+  if (!found) throw new Error(`HeroStrip: no framework with short name "${short}"`);
+  return found.short;
+});
+
+const moving = variant !== 'ledger';
+const LIST_LABEL = 'The discipline in figures';
+const NGA_URL = 'https://www.nga.gov/collection/art-object-page.46655.html';
+---
+
+<div class:list={['hero-facts', `hero-facts--${variant}`]} data-hero-strip={moving ? '' : undefined}>
+  {
+    moving && (
+      <button type="button" class="motion-toggle" data-motion-toggle aria-pressed="false" hidden>
+        Pause motion
+      </button>
+    )
+  }
+
+  <div class="strip-in">
+    {
+      variant === 'marquee' && (
+        <p class="strip-kicker" aria-hidden="true">
+          {LIST_LABEL}
+        </p>
+      )
+    }
+    {
+      variant === 'frameworks' && (
+        <a class="strip-kicker strip-kicker--link" href="/resources/frameworks">
+          <span class="kicker-count">{frameworks.length}</span> <span class="kicker-text">frameworks mapped</span>
+          <span class="kicker-arrow" aria-hidden="true">→</span>
+        </a>
+      )
+    }
+
+    {
+      variant === 'ledger' && (
+        <ul class="facts" aria-label={LIST_LABEL}>
+          {facts.map((fact) => (
+            <li class="fact">
+              <span class="fact-label">{fact.label}</span>
+              <span class="fact-value">{fact.value}</span>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    {
+      variant === 'marquee' && (
+        <div class="facts-window">
+          <div class="facts-track">
+            <ul class="facts" aria-label={LIST_LABEL}>
+              {facts.map((fact) => (
+                <li class="fact">
+                  <span class="fact-label">{fact.label}</span>
+                  <span class="fact-value">{fact.value}</span>
+                </li>
+              ))}
+            </ul>
+            <ul class="facts facts-copy" aria-hidden="true" inert>
+              {facts.map((fact) => (
+                <li class="fact">
+                  <span class="fact-label">{fact.label}</span>
+                  <span class="fact-value">{fact.value}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
+    }
+
+    {
+      variant === 'frameworks' && (
+        <div class="facts-window">
+          <div class="facts-track">
+            <ul class="marks" aria-label="Flagship frameworks on the map">
+              {marks.map((mark) => (
+                <li class="mark">{mark}</li>
+              ))}
+            </ul>
+            <ul class="marks facts-copy" aria-hidden="true" inert>
+              {marks.map((mark) => (
+                <li class="mark">{mark}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
+    }
+
+    {
+      caption && (
+        <p class="strip-caption">
+          <a href={NGA_URL} rel="noopener">
+            <span class="cap-work">Claude Monet, The Seine at Giverny, 1897</span><span class="cap-sep"> · </span><span class="cap-where">National Gallery of Art</span>
+          </a>
+        </p>
+      )
+    }
+  </div>
+
+  {
+    variant === 'frameworks' && (
+      <ul class="facts facts--line" aria-label={LIST_LABEL}>
+        {facts.map((fact) => (
+          <li class="fact">
+            <span class="fact-label">{fact.label}</span>
+            <span class="fact-value">{fact.value}</span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  {moving && <script is:inline defer src="/hero-strip.js"></script>}
+</div>
+
+<style>
+  /* The strip spans the hero's width under a hairline, with the page gutter
+     at its sides. Its inks: values in the headline's ink, labels and the
+     caption in --ink-2 pulled most of the way toward it. The rules are drawn
+     in the same ink at low strength: the --line token vanishes over the veil
+     below (it sits within a few steps of --bg by design). */
+  .hero-facts {
+    --strip-ink: var(--hero-ink);
+    --strip-ink-2: color-mix(in srgb, var(--ink-2) 35%, var(--hero-ink));
+    --strip-rule: color-mix(in srgb, var(--hero-ink) 28%, transparent);
+    --strip-gutter: var(--s-4);
+    /* The veil (see ::before): how far above the rule it starts, and how much
+       of the page ground it lays down at the rule and at the hero's foot. */
+    --strip-fade-lead: 8rem;
+    --strip-fade-top: 38%;
+    --strip-fade-foot: 68%;
+    position: relative;
+    z-index: 1;
+    padding: var(--s-4) var(--strip-gutter) var(--s-5);
+    border-top: 1px solid color-mix(in srgb, var(--hero-ink) 20%, transparent);
+  }
+
+  /* Dark: the painting's pale water sits under light ink, so the veil goes
+     deeper to hold the same contrast. */
+  :global(:root[data-theme='dark']) .hero-facts {
+    --strip-fade-top: 54%;
+    --strip-fade-foot: 80%;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .hero-facts {
+      --strip-fade-top: 54%;
+      --strip-fade-foot: 80%;
+    }
+  }
+
+  @media (min-width: 720px) {
+    .hero-facts {
+      --strip-gutter: var(--s-6);
+    }
+  }
+
+  /* The painting shows through the hero almost at full strength, and small
+     text over its darker strokes (light theme) or its pale water (dark theme)
+     would fall under 4.5:1. A veil of the page ground eases in from above the
+     rule to the hero's foot (a bottom fade, not a plate), so every pixel
+     under the labels, values and caption clears AA in both themes. */
+  .hero-facts::before {
+    content: '';
+    position: absolute;
+    inset: calc(-1 * var(--strip-fade-lead)) 0 0;
+    z-index: -1;
+    pointer-events: none;
+    /* An ease-in ramp (no visible top edge), then a gentle rise to the foot. */
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in srgb, var(--bg) calc(var(--strip-fade-top) * 0.06), transparent)
+        calc(var(--strip-fade-lead) * 0.3),
+      color-mix(in srgb, var(--bg) calc(var(--strip-fade-top) * 0.22), transparent)
+        calc(var(--strip-fade-lead) * 0.55),
+      color-mix(in srgb, var(--bg) calc(var(--strip-fade-top) * 0.55), transparent)
+        calc(var(--strip-fade-lead) * 0.8),
+      color-mix(in srgb, var(--bg) var(--strip-fade-top), transparent) var(--strip-fade-lead),
+      color-mix(in srgb, var(--bg) var(--strip-fade-foot), transparent)
+    );
+  }
+
+  .strip-in {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-5);
+  }
+
+  /* ------------------------------------------------------------ the items */
+
+  .facts,
+  .marks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .fact {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--s-2);
+  }
+
+  .fact-label {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: var(--tracking-label);
+    line-height: 1.3;
+    text-transform: uppercase;
+    color: var(--strip-ink-2);
+  }
+
+  .fact-value {
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    line-height: 1.25;
+    color: var(--strip-ink);
+  }
+
+  .mark {
+    display: inline-flex;
+    align-items: baseline;
+    font-family: var(--font-serif);
+    font-size: 1.3rem;
+    font-style: italic;
+    line-height: 1.25;
+    white-space: nowrap;
+    color: var(--strip-ink);
+  }
+
+  /* The fixed kicker: a mono label parted from the moving window by a rule;
+     the window's edge fade makes the items slip behind it. */
+  .strip-kicker {
+    flex: none;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: var(--tracking-label);
+    line-height: 1.3;
+    text-transform: uppercase;
+    color: var(--strip-ink-2);
+  }
+
+  /* The frameworks kicker is a link: the arrow marks it (as on the site's
+     section links) and the words underline on hover. */
+  .strip-kicker--link {
+    text-decoration: none;
+  }
+
+  .strip-kicker--link:hover .kicker-text {
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.3em;
+  }
+
+  .kicker-arrow {
+    margin-left: var(--s-1);
+    letter-spacing: normal;
+  }
+
+  .kicker-count {
+    margin-right: var(--s-1);
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    letter-spacing: normal;
+    color: var(--strip-ink);
+  }
+
+  .facts-window {
+    flex: 1 1 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .facts-copy {
+    display: none;
+  }
+
+  /* The museum label for the painting: mono at the small end, the link
+     underlined faintly so it reads as a link without shouting. */
+  .strip-caption {
+    flex: 1 1 100%;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+    color: var(--strip-ink-2);
+  }
+
+  .strip-caption a {
+    color: inherit;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+    text-underline-offset: 0.25em;
+  }
+
+  .strip-caption a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  /* From the tablet up the kicker sits left of the window, parted from it by
+     a rule; the caption keeps a line of its own under them. */
+  @media (min-width: 720px) {
+    .hero-facts--marquee .strip-kicker,
+    .hero-facts--frameworks .strip-kicker {
+      padding-right: var(--s-5);
+      border-right: 1px solid var(--strip-rule);
+    }
+
+    .hero-facts--marquee .facts-window,
+    .hero-facts--frameworks .facts-window {
+      flex: 1 1 0;
+    }
+  }
+
+  /* Wide: the caption joins the line at the right end, behind its own rule,
+     set as a two-line label (work, then collection); the separator stays in
+     the text for readers. */
+  @media (min-width: 1200px) {
+    .hero-facts--marquee .strip-in,
+    .hero-facts--frameworks .strip-in {
+      flex-wrap: nowrap;
+    }
+
+    .hero-facts--marquee .strip-caption,
+    .hero-facts--frameworks .strip-caption {
+      flex: none;
+      padding-left: var(--s-5);
+      border-left: 1px solid var(--strip-rule);
+    }
+
+    .hero-facts--marquee .cap-work,
+    .hero-facts--marquee .cap-where,
+    .hero-facts--frameworks .cap-work,
+    .hero-facts--frameworks .cap-where {
+      display: block;
+    }
+
+    .hero-facts--marquee .cap-sep,
+    .hero-facts--frameworks .cap-sep {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+  }
+
+  /* ------------------------------------------------------------- ledger */
+
+  /* Phone: one column, label left and value right, rows parted by rules. */
+  .hero-facts--ledger .facts {
+    display: grid;
+    flex: 1 1 100%;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0 var(--s-6);
+  }
+
+  .hero-facts--ledger .fact {
+    justify-content: space-between;
+    padding-block: var(--s-1);
+    border-bottom: 1px solid var(--strip-rule);
+  }
+
+  @media (min-width: 600px) {
+    .hero-facts--ledger .facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-facts--ledger .facts {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  /* Wide: one justified row. Every item takes an equal share of the spare
+     room and centres in it (the two ends take half a share and sit flush),
+     so the rules between them fall midway between the words. */
+  @media (min-width: 1280px) {
+    .hero-facts--ledger .facts {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 0;
+    }
+
+    .hero-facts--ledger .fact {
+      position: relative;
+      flex: 1 1 auto;
+      flex-wrap: nowrap;
+      justify-content: center;
+      padding-block: 0;
+      border-bottom: 0;
+      white-space: nowrap;
+    }
+
+    .hero-facts--ledger .fact:first-child {
+      flex-grow: 0.5;
+      justify-content: flex-start;
+    }
+
+    .hero-facts--ledger .fact:last-child {
+      flex-grow: 0.5;
+      justify-content: flex-end;
+    }
+
+    .hero-facts--ledger .fact + .fact::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 1px;
+      height: 0.9em;
+      translate: 0 -50%;
+      background: var(--strip-rule);
+    }
+
+    .hero-facts--ledger .strip-caption {
+      text-align: right;
+    }
+  }
+
+  /* --------------------------------------------------- frameworks: facts */
+
+  /* The figures under the wordmarks: one thinner mono line, still. */
+  .facts--line {
+    gap: var(--s-1) var(--s-5);
+    margin-top: var(--s-3);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--strip-rule);
+  }
+
+  .facts--line .fact-label {
+    font-size: 0.68rem;
+  }
+
+  .facts--line .fact-value {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+  }
+
+  @media (min-width: 1280px) {
+    .facts--line {
+      justify-content: space-between;
+    }
+  }
+
+  /* ------------------------------------------------------ pause control */
+
+  /* No visible chrome in the strip: like the skip link it waits below the
+     hero (clipped) until keyboard focus reaches it, then shows as a small
+     plate at the strip's right end. */
+  .motion-toggle {
+    position: absolute;
+    right: var(--strip-gutter);
+    bottom: var(--s-4);
+    z-index: 2;
+    padding: var(--s-2) var(--s-3);
+    border: 1px solid color-mix(in srgb, var(--ink) 60%, var(--bg));
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    cursor: pointer;
+    transform: translateY(calc(100% + var(--s-6)));
+  }
+
+  .motion-toggle:focus-visible {
+    transform: none;
+  }
+
+  .motion-toggle[aria-pressed='true'] {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .motion-toggle[hidden] {
+    display: none;
+  }
+
+  /* -------------------------------------------------------------- motion */
+
+  /* Motion on: the list runs twice in one track (the copy is aria-hidden and
+     inert) that slides left by half its width and loops seamlessly, about
+     80 s a lap. Each list is at least as wide as the window, so the loop
+     never shows an empty tail; the window's ends fade out. Hover, focus
+     inside, the toggle and a tap (data-paused) hold it. Transform only. */
+  @media (prefers-reduced-motion: no-preference) {
+    .facts-window {
+      container-type: inline-size;
+      cursor: pointer;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 10% 90%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 10% 90%, transparent);
+    }
+
+    .facts-track {
+      display: flex;
+      width: max-content;
+      animation: facts-scroll 80s linear infinite;
+      will-change: transform;
+    }
+
+    .facts-window .facts,
+    .facts-window .marks {
+      flex-wrap: nowrap;
+      justify-content: space-around;
+      min-width: 100cqi;
+    }
+
+    .facts-window .fact {
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    /* A thin rule after each item parts it from the next, and the last item
+       from the first of the copy, so the seam matches. */
+    .facts-window .fact::after,
+    .facts-window .mark::after {
+      content: '';
+      align-self: center;
+      width: 1px;
+      height: 0.9em;
+      margin-inline: var(--s-5);
+      background: var(--strip-rule);
+    }
+
+    .facts-window .facts-copy {
+      display: flex;
+    }
+
+    .facts-window:hover .facts-track,
+    .facts-window:focus-within .facts-track,
+    .hero-facts[data-paused] .facts-track {
+      animation-play-state: paused;
+    }
+
+    @keyframes facts-scroll {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(-50%);
+      }
+    }
+  }
+
+  /* Still (reduced motion): the list wraps in place, the items parted by
+     space alone (a rule would dangle at each line end); on a phone the
+     wordmarks step down a size so the wrapped list stays short. */
+  @media (prefers-reduced-motion: reduce) {
+    .facts-window .facts,
+    .facts-window .marks {
+      column-gap: var(--s-5);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) and (max-width: 719px) {
+    .mark {
+      font-size: 1.05rem;
+    }
+  }
+</style>

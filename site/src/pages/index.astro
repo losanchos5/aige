@@ -29,6 +29,7 @@ import BookParts from '../components/BookParts.astro';
 import ResourceTiles from '../components/ResourceTiles.astro';
 import NewsletterForm from '../components/NewsletterForm.astro';
 import WhatAppliesNow from '../components/WhatAppliesNow.astro';
+import HeroStrip from '../components/HeroStrip.astro';
 import { site } from '../data/site';
 import { WEBSITE_ID } from '../lib/jsonld';
 import { definition, values } from '../data/values';
@@ -233,35 +234,7 @@ const resources = [
       <a class="btn btn-primary btn-glow" style="--i:1" href="/thesis">Read the Thesis</a>
     </div>
 
-    <div class="hero-facts">
-      <div class="facts-window">
-        <div class="facts-track">
-          <ul class="facts" aria-label="The discipline in figures">
-            {
-              facts.map((fact) => (
-                <li class="fact">
-                  <span class="fact-label">{fact.label}</span>
-                  <span class="fact-value">{fact.value}</span>
-                </li>
-              ))
-            }
-          </ul>
-          <ul class="facts facts-copy" aria-hidden="true" inert>
-            {
-              facts.map((fact) => (
-                <li class="fact">
-                  <span class="fact-label">{fact.label}</span>
-                  <span class="fact-value">{fact.value}</span>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-      </div>
-      <button type="button" class="motion-toggle" data-motion-toggle aria-pressed="false" hidden>
-        Pause motion
-      </button>
-    </div>
+    <HeroStrip variant="frameworks" facts={facts} caption={HERO_ART} />
 
     {!HERO_ART && <script is:inline defer src="/hero-field.js"></script>}
     {HERO_ART && <script is:inline async src="/hero-art.js"></script>}
@@ -743,154 +716,6 @@ const resources = [
 
   .hero-title em {
     font-style: italic;
-  }
-
-  /* The figures strip: label | value pairs on translucent plates, in a row
-     that scrolls sideways while motion is on (hero-field.js adds .is-live;
-     reduced motion and no JS keep it a static, centred, wrapping list), and
-     the keyboard pause control that stops both the strip and the field (WCAG
-     2.2.2). */
-  .hero-facts {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    gap: var(--s-3);
-    padding: 0 var(--s-4) var(--s-5);
-  }
-
-  .facts-window {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-  }
-
-  .facts {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--s-3);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .facts-copy {
-    display: none;
-  }
-
-  /* Static, a pill may wrap inside the strip (text zoomed to 200% on a phone
-     makes "Body of Knowledge v0.5.0" wider than the window); live, each stays
-     on one line in the moving row. */
-  .fact {
-    display: inline-flex;
-    flex-wrap: wrap;
-    max-width: 100%;
-    border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
-    border-radius: var(--r-sm);
-    background: color-mix(in srgb, var(--bg) 80%, transparent);
-    font-size: var(--fs-small);
-    line-height: 1.3;
-  }
-
-  .fact-label,
-  .fact-value {
-    padding: var(--s-2) var(--s-3);
-  }
-
-  .fact-label {
-    color: var(--ink-2);
-  }
-
-  .fact-value {
-    border-left: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
-    font-family: var(--font-mono);
-    font-weight: 500;
-    color: var(--ink);
-  }
-
-  /* The pause control has no visible chrome in the strip: like the skip
-     link it stays off screen until keyboard focus reaches it, then shows as a
-     small plate at the strip's right end. Mouse users pause the strip by
-     hovering it; reduced motion keeps everything still from the first frame. */
-  .motion-toggle {
-    position: absolute;
-    right: var(--s-4);
-    bottom: var(--s-5);
-    z-index: 2;
-    padding: var(--s-2) var(--s-3);
-    border: 1px solid color-mix(in srgb, var(--ink) 60%, var(--bg));
-    border-radius: var(--r-sm);
-    background: var(--bg);
-    color: var(--ink);
-    font: inherit;
-    font-size: var(--fs-small);
-    cursor: pointer;
-    transform: translateY(calc(100% + var(--s-6)));
-  }
-
-  .motion-toggle:focus-visible {
-    transform: none;
-  }
-
-  .motion-toggle[aria-pressed='true'] {
-    background: var(--ink);
-    color: var(--bg);
-  }
-
-  .motion-toggle[hidden] {
-    display: none;
-  }
-
-  /* Motion on: the list runs twice in one track (the copy is aria-hidden and
-     inert) that slides left by half its width and loops seamlessly, each list
-     carrying a trailing gap. Hover pauses it; a click or tap on the strip, or
-     the keyboard toggle, pauses it and the field. Transform only. */
-  @media (prefers-reduced-motion: no-preference) {
-    .hero--field.is-live .facts-track {
-      display: flex;
-      width: max-content;
-      animation: facts-scroll 60s linear infinite;
-    }
-
-    /* Each list is at least as wide as the strip, so the half-width slide
-       never shows an empty tail on wide screens; the spare room spreads
-       evenly between the plates (padding-right stands in for the gap between
-       the two lists). */
-    .hero--field.is-live .facts {
-      flex-wrap: nowrap;
-      justify-content: space-around;
-      min-width: calc(100vw - 2 * var(--s-4));
-      padding-right: var(--s-3);
-    }
-
-    .hero--field.is-live .fact {
-      flex-wrap: nowrap;
-      max-width: none;
-      white-space: nowrap;
-    }
-
-    .hero--field.is-live .facts-window {
-      cursor: pointer;
-    }
-
-    .hero--field.is-live .facts-copy {
-      display: flex;
-    }
-
-    .hero--field[data-paused] .facts-track,
-    .facts-window:hover .facts-track {
-      animation-play-state: paused;
-    }
-
-    @keyframes facts-scroll {
-      from {
-        transform: translateX(0);
-      }
-      to {
-        transform: translateX(-50%);
-      }
-    }
   }
 
   /* Hero entrance: a short, staggered rise on load (not scroll-driven). A lift
