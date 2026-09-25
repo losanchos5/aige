@@ -276,12 +276,22 @@ const partsWord = countWord(bookParts.length);
     <a href="/about/changelog">changelog</a>. This is v{site.bokVersion}.
   </p>
   <p>
-    Releases are archived on Zenodo. v{site.bokVersion} has the DOI{' '}
-    <a href={`https://doi.org/${site.doi}`}>{site.doi}</a>; the concept DOI{' '}
-    <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a> represents every
-    version<sup><a class="cite" href="#src-2">2</a></sup>. Citation metadata lives in
-    <a href={blob('CITATION.cff')}>CITATION.cff</a>, and every chapter offers a ready-made
-    citation and BibTeX entry.
+    {site.doi !== site.conceptDoi ? (
+      <>
+        Releases are archived on Zenodo. v{site.bokVersion} has the DOI{' '}
+        <a href={`https://doi.org/${site.doi}`}>{site.doi}</a>; the concept DOI{' '}
+        <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a> represents every
+        version<sup><a class="cite" href="#src-2">2</a></sup>.
+      </>
+    ) : (
+      <>
+        Releases are archived on Zenodo. Until v{site.bokVersion} has its own version DOI, citations
+        use the concept DOI <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a>,
+        which represents every version<sup><a class="cite" href="#src-2">2</a></sup>.
+      </>
+    )}{' '}
+    Citation metadata lives in <a href={blob('CITATION.cff')}>CITATION.cff</a>, and every chapter
+    offers a ready-made citation and BibTeX entry.
   </p>
 
   <h2 id="what-this-is-not">What this is not</h2>

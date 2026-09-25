@@ -214,7 +214,9 @@ export const GET: APIRoute = async (context) => {
       linkLine(
         'Zenodo record',
         `https://doi.org/${site.conceptDoi}`,
-        `Archived releases of the Thesis and Body of Knowledge; this concept DOI always resolves to the latest. Current release: https://doi.org/${site.doi}.`,
+        site.doi !== site.conceptDoi
+          ? `Archived releases of the Thesis and Body of Knowledge; this concept DOI always resolves to the latest. Current release: https://doi.org/${site.doi}.`
+          : 'Archived releases of the Thesis and Body of Knowledge; this concept DOI always resolves to the latest.',
       ),
       linkLine(
         'Full text',

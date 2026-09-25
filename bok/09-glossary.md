@@ -697,12 +697,11 @@ business operator above thresholds set by decree must designate in writing. It s
 results, files high-impact confirmation requests and supports the high-impact measures [25][64]. See
 [ch. 21, Domestic representative](/bok/ai-laws-worldwide#domestic-representative). (ch. 21)
 
-**Downstream modifier (GPAI).** An actor that fine-tunes or otherwise modifies a general-purpose AI
-model that someone else placed on the market. The Commission treats it as the provider of the
-modified model only when the modification uses more than one third of the original training compute,
-and limits its documentation, copyright-policy and training-summary duties to the modification; if
-the original model has systemic risk, the modified model is presumed to have it too, with the
-systemic-risk duties [65][76]. Contrast with [Downstream
+**Downstream modifier (GPAI).** An actor that fine-tunes or modifies another provider's
+general-purpose AI model. The Commission's guidelines make it the modified model's provider only when
+the modification uses over a third of the original training compute; its `Art. 53(1)` duties then
+cover the modification, but a modified systemic-risk model is presumed to keep that risk and its
+duties [65][76]. Contrast with [Downstream
 provider](/glossary/downstream-provider). See [ch. 15, When a deployer becomes a
 provider](/bok/governing-deployment#when-a-deployer-becomes-a-provider); [ch. 18, When a fine-tuner
 becomes a GPAI provider](/bok/eu-ai-act#when-a-fine-tuner-becomes-a-gpai-provider). (ch. 15, 18)

@@ -290,9 +290,20 @@ curl -s ${site.url}${API_PATH}/obligations.json \\
     <section class="res-section prose" aria-labelledby="dt-cite">
       <h2 id="dt-cite">How to cite</h2>
       <p>
-        The data is part of the archived Body of Knowledge, not a separate deposit. Cite the release
-        DOI <a href={`https://doi.org/${site.doi}`}>{site.doi}</a> (this version) or the concept DOI
-        <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a> (always the latest), and
+        The data is part of the archived Body of Knowledge, not a separate deposit.{' '}
+        {site.doi !== site.conceptDoi ? (
+          <>
+            Cite the release DOI <a href={`https://doi.org/${site.doi}`}>{site.doi}</a> (this
+            version) or the concept DOI{' '}
+            <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a> (always the latest),
+            and
+          </>
+        ) : (
+          <>
+            Cite the concept DOI <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a>
+            {' '}(always the latest; this version's own DOI follows its Zenodo release), and
+          </>
+        )}{' '}
         name the file and the date you fetched it. For a single obligation, cite its id and its page:
         every obligation page carries its own citation block. Attribution under {site.license}:
         {site.authors.join(', ')}.

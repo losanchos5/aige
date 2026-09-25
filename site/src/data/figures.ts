@@ -489,7 +489,7 @@ export const figures: readonly FigureDef[] = [
       caption: 'AI-specific regime by jurisdiction, as of 2026-09-24',
       columns: ['Jurisdiction', 'Tile', 'Status', 'Main instrument', 'Key date'],
       rows: [
-        ['South Korea', 'KOR', 'Binding, horizontal', 'Basic Act on the Development of AI and the Establishment of a Foundation for Trust (Act No. 20676)', '2026-01-22'],
+        ['South Korea', 'KOR', 'Binding, horizontal', 'Basic Act on the Development of AI and the Establishment of a Foundation for Trust (Act No. 20676, as amended by Act No. 21311)', '2026-01-22'],
         ['United States (federal)', 'USA', 'Binding, targeted', 'OMB Memorandum M-25-21 (federal agency use of AI)', '2025-04-03'],
         ['Colorado', 'CO', 'Binding, targeted', 'SB 26-189, Automated Decision-Making Technology (replaces SB 24-205)', '2027-01-01'],
         ['Texas', 'TX', 'Binding, targeted', 'Texas Responsible Artificial Intelligence Governance Act (HB 149)', '2026-01-01'],
