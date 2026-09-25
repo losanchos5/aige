@@ -11,6 +11,7 @@
 import { render } from 'astro:content';
 import Doc from '../../layouts/Doc.astro';
 import PatternFoot from '../../components/PatternFoot.astro';
+import PillarLink from '../../components/PillarLink.astro';
 import { layers } from '../../data/stack';
 import { site } from '../../data/site';
 import { patternCatalogueHref } from '../../data/patterns';
@@ -154,6 +155,8 @@ const jsonLd = [
       ))
     }
   </p>
+  {/* Hub and spoke (SXO-N2): each pattern points at the /ai-governance pillar. */}
+  <PillarLink lead="One working control on the engineering side of" anchor="AI governance" />
   <Content />
   {
     evidenced.length > 0 && (

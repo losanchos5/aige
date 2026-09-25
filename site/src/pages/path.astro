@@ -20,6 +20,10 @@ import CtaBand from '../components/CtaBand.astro';
 import { stages, nodes, entries, crossStageEdges } from '../data/path';
 import { audiences, audiencePath } from '../data/audiences';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
+import { fitsSiteSuffix } from '../lib/seo-title';
+
+// Search title (SXO-N3, 2026-09-25 audit): the query first; the H1 stays.
+const seoTitle = 'AI governance learning path: four stages';
 
 const edges = crossStageEdges();
 
@@ -61,8 +65,9 @@ const legend = [
 ---
 
 <Marketing
-  title="The learning path"
-  description="A staged learning path for the AI Governance Engineer: four stages from foundations to proof, each a grid of nodes linking into the book and its resources."
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description="AI governance learning path in four stages, from foundations to proof: each stage a grid of nodes linking into the Body of Knowledge, its tools and its reading."
   image="/og/path.png"
   jsonLd={breadcrumbJsonLd([{ label: 'The learning path' }])}
 >
@@ -70,7 +75,12 @@ const legend = [
     variant="page"
     title="Learn the role, one stage at a time."
     lede="A build order for the AI Governance Engineer: four stages from foundations to proof, each a grid of nodes that map back to the Body of Knowledge and out to the tools and reading behind them. Mark what you have done; the path remembers."
-  />
+  >
+    <p slot="note">
+      Before stage one, read <a href="/ai-governance">an overview of AI governance</a>: what it
+      is and the frameworks it answers to.
+    </p>
+  </PageHero>
 
   <Section
     tone="tint"
