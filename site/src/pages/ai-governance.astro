@@ -12,7 +12,9 @@
  * search title than its question-form H1, and no " · AI Governance Engineer"
  * suffix (the title would pass 70 characters). The stack-layers diagram is
  * placed at the foot of the "framework includes" section, the same placement
- * rule rehype-diagrams applies to chapters.
+ * rule rehype-diagrams applies to chapters. The page has its own Open Graph card
+ * (/og/ai-governance.png, lib/og-cards.ts) and a Markdown alternate
+ * (/ai-governance.md, pages/ai-governance.md.ts), which Seo.astro advertises.
  */
 import Base from '../layouts/Base.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
@@ -30,6 +32,7 @@ import { getGlossaryEntry } from '../lib/glossary';
 const SOURCE = 'guides/ai-governance.md';
 const FIGURE_ID = 'the-stack-layers';
 const FIGURE_SECTION = 'what-does-an-ai-governance-framework-include';
+const OG_IMAGE = '/og/ai-governance.png';
 
 // remark-lead lifts the Markdown H1 and its answer-box blockquote into the
 // frontmatter, like a chapter's title and abstract.
@@ -130,7 +133,7 @@ const jsonLd = [
     datePublished: published,
     dateModified: updated,
     wordCount: words,
-    image: new URL('/og/default.png', site.url).href,
+    image: new URL(OG_IMAGE, site.url).href,
     author: [...authorRefs],
     publisher: { '@id': ORG_ID },
     isPartOf: { '@id': WEBSITE_ID },
@@ -169,6 +172,7 @@ if (emitDiagramScript) Astro.locals.diagramScript = true;
   title={title}
   titleSuffix={false}
   description={description}
+  image={OG_IMAGE}
   jsonLd={jsonLd}
   article={{
     publishedTime: `${published}T00:00:00Z`,
