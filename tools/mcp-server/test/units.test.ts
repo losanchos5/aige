@@ -148,10 +148,15 @@ describe('corpus', () => {
     assert.equal(plainHeading('The `x` **bold** [link](/a) <em>y</em>'), 'The x bold link y');
   });
 
-  it('parses the published file: 24 chapters, 17 patterns, the Thesis', () => {
+  it('parses the published file: 24 chapters, one page per pattern of the index, the Thesis', () => {
     const docs = parseCorpus(readFixture('llms-full.txt'));
+    const index = JSON.parse(readFixture('api/v1/patterns.json')) as { patterns: { slug: string }[] };
     assert.equal(docs.filter((d) => d.kind === 'chapter').length, 24);
-    assert.equal(docs.filter((d) => d.kind === 'pattern').length, 17);
+    assert.deepEqual(
+      docs.filter((d) => d.kind === 'pattern').map((d) => d.slug).sort(),
+      index.patterns.map((p) => p.slug).sort(),
+      'every pattern of patterns.json has its page, under its published slug',
+    );
     assert.equal(docs.filter((d) => d.kind === 'thesis').length, 1);
     for (const d of docs) assert.ok(d.headings.length > 0, `${d.url} has headings`);
   });

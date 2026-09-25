@@ -8,7 +8,7 @@ import type { Client } from '@modelcontextprotocol/client';
 
 import { CANONICAL_API } from '../src/data.js';
 import { TOOL_NAMES } from '../src/tools/index.js';
-import { connect, startApp, startFixtureServer, textOf, type FixtureServer, type RunningApp } from './helpers.js';
+import { connect, readFixture, startApp, startFixtureServer, textOf, type FixtureServer, type RunningApp } from './helpers.js';
 
 let fixtures: FixtureServer;
 let running: RunningApp;
@@ -40,7 +40,8 @@ describe('2026-07-28 clients', () => {
   it('read a resource', async () => {
     const result = await client.readResource({ uri: `${CANONICAL_API}/patterns.json` });
     const content = result.contents[0] as { text?: string };
-    assert.equal((JSON.parse(content.text ?? '{}') as { patterns: unknown[] }).patterns.length, 17);
+    const published = (JSON.parse(readFixture('api/v1/patterns.json')) as { patterns: unknown[] }).patterns.length;
+    assert.equal((JSON.parse(content.text ?? '{}') as { patterns: unknown[] }).patterns.length, published);
   });
 
   it('are logged by MCP method and tool name, from the mirrored headers', () => {

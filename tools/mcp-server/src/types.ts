@@ -44,7 +44,10 @@ export interface GlossaryTerm {
   term: string;
   definition: string;
   letter: string;
+  /** From v0.5.0 the term's own page; up to v0.4.0 its anchor in the glossary. */
   url: string;
+  /** The term in the glossary chapter, /bok/glossary#<id> (v0.5.0 and later). */
+  anchor?: string;
   chapters: { number: string; url: string | null }[];
 }
 
@@ -143,11 +146,16 @@ export interface CrosswalkDoc extends Envelope {
 
 export interface PatternRow {
   id: string;
+  /** Page slug (/patterns/<slug>); published from v0.5.0, not always derivable from the id. */
+  slug?: string;
   title: string;
   layer: number;
   secondaryLayer: number | null;
   mapsTo: string[];
+  /** From v0.5.0 the pattern's own page; up to v0.4.0 its chapter 05 anchor. */
   url: string;
+  /** The pattern's summary in the chapter 05 catalogue (v0.5.0 and later). */
+  section?: string;
   obligations: string[];
 }
 

@@ -106,7 +106,7 @@ export const registerBok: Register = (server, deps) => {
     {
       title: 'Search the Body of Knowledge',
       description:
-        'Search the 24 chapters of the AI Governance Engineer Body of Knowledge and its 17 pattern pages: chapter titles, summaries and key points, section headings and section text. Every query word must match. Returns chapters, sections (with the URL of the heading anchor) and patterns, best first, each with a snippet. Use it to find where the book treats a subject ("human oversight", "post-market monitoring", "agent identity", "conformity assessment").',
+        'Search the 24 chapters of the AI Governance Engineer Body of Knowledge and its pattern pages: chapter titles, summaries and key points, section headings and section text. Every query word must match. Returns chapters, sections (with the URL of the heading anchor) and patterns, best first, each with a snippet. Use it to find where the book treats a subject ("human oversight", "post-market monitoring", "agent identity", "conformity assessment").',
       inputSchema: z.object({
         query: z.string().min(2).max(200).describe('Words to look for.'),
         kind: z.enum(['any', 'chapter', 'section', 'pattern']).default('any').describe('Restrict the result type.'),

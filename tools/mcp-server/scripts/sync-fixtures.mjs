@@ -32,6 +32,8 @@ const KEEP_WHOLE = new Set([
   'https://aigovernanceengineer.com/bok/preface',
   'https://aigovernanceengineer.com/patterns/policy-card',
   'https://aigovernanceengineer.com/patterns/kill-switch-circuit-breaker',
+  // Its page slug is not derived from its id (pattern-staged-rollout-with-rollback-criteria).
+  'https://aigovernanceengineer.com/patterns/staged-rollout-rollback-criteria',
 ]);
 
 function write(path, text) {

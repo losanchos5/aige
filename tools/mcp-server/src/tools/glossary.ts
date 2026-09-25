@@ -34,7 +34,7 @@ function termOut(term: GlossaryTerm) {
     term: term.term,
     definition: term.definition,
     url: termPage(term),
-    glossaryUrl: term.url,
+    glossaryUrl: term.anchor ?? term.url,
     chapters: term.chapters.map((c) => ({ number: c.number, url: c.url })),
   };
 }
@@ -65,7 +65,7 @@ export const registerGlossary: Register = (server, deps) => {
     {
       title: 'Search the glossary',
       description:
-        'Search the ~280 canonical terms of AI governance engineering (definitions from the Body of Knowledge glossary, chapter 09). Matches term names, acronyms and definition text; every query word must match. Returns term slugs for get_term, definitions, the canonical page URL of each term and the chapters that use it.',
+        'Search the canonical terms of AI governance engineering (definitions from the Body of Knowledge glossary, chapter 09). Matches term names, acronyms and definition text; every query word must match. Returns term slugs for get_term, definitions, the canonical page URL of each term and the chapters that use it.',
       inputSchema: z.object({
         query: z.string().min(2).max(200).describe('Words to look for, e.g. "abstention band", "FRIA", "model card".'),
         limit: z.number().int().min(1).max(50).default(10).describe('Maximum number of terms to return.'),

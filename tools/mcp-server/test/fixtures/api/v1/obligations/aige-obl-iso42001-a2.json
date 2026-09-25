@@ -36,7 +36,13 @@
     "appliesNote": "Voluntary management-system standard (2023); no presumption of conformity",
     "milestones": [],
     "systemClass": [],
-    "patterns": [],
+    "patterns": [
+      {
+        "id": "pattern-sanctioned-ai-gateway",
+        "title": "Sanctioned AI Gateway",
+        "url": "https://aigovernanceengineer.com/patterns/sanctioned-ai-gateway"
+      }
+    ],
     "crosswalkTopics": [
       "governance-accountability"
     ],

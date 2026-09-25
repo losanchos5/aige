@@ -8,7 +8,7 @@ import type { Client } from '@modelcontextprotocol/client';
 
 import { NOTICE } from '../src/tools/common.js';
 import { TOOL_NAMES } from '../src/tools/index.js';
-import { connect, startApp, startFixtureServer, textOf, type FixtureServer, type RunningApp } from './helpers.js';
+import { connect, readFixture, startApp, startFixtureServer, textOf, type FixtureServer, type RunningApp } from './helpers.js';
 
 let fixtures: FixtureServer;
 let running: RunningApp;
@@ -108,7 +108,7 @@ describe('get_term', () => {
   it('carries the chapters, the page and the provenance', async () => {
     const { text, data } = await call('get_term', { slug: 'abstention-band' });
     assert.ok(data.chapters.length >= 1);
-    assert.equal(data.glossaryUrl, 'https://aigovernanceengineer.com/resources/glossary#t-abstention-band');
+    assert.equal(data.glossaryUrl, 'https://aigovernanceengineer.com/bok/glossary#t-abstention-band');
     assert.equal(data.source, 'https://aigovernanceengineer.com/glossary/abstention-band');
     assertProvenance(data, text);
   });
@@ -264,7 +264,9 @@ describe('map_clause', () => {
 describe('list_patterns', () => {
   it('lists all patterns with summaries and page URLs', async () => {
     const { text, data } = await call('list_patterns', {});
-    assert.equal(data.total, 17);
+    const published = (JSON.parse(readFixture('api/v1/patterns.json')) as { patterns: unknown[] }).patterns.length;
+    assert.equal(data.total, published);
+    assert.ok(data.patterns.every((p: Structured) => p.summary !== ''), 'every pattern is matched to its page');
     const card = data.patterns.find((p: Structured) => p.slug === 'policy-card');
     assert.equal(card.url, 'https://aigovernanceengineer.com/patterns/policy-card');
     assert.match(card.summary, /machine-readable artefact/);
@@ -300,6 +302,20 @@ describe('get_pattern', () => {
       const { data, isError } = await call('get_pattern', { slug: wanted });
       assert.equal(isError, false, wanted);
       assert.equal(data.slug, 'kill-switch-circuit-breaker', wanted);
+    }
+  });
+
+  it('uses the published slug when it is not derived from the id', async () => {
+    const page = 'https://aigovernanceengineer.com/patterns/staged-rollout-rollback-criteria';
+    for (const wanted of ['staged-rollout-rollback-criteria', 'pattern-staged-rollout-with-rollback-criteria', page]) {
+      const { data, isError } = await call('get_pattern', { slug: wanted });
+      assert.equal(isError, false, wanted);
+      assert.equal(data.slug, 'staged-rollout-rollback-criteria', wanted);
+      assert.equal(data.url, page, wanted);
+      assert.equal(data.source, page, wanted);
+      assert.equal(data.catalogueUrl, 'https://aigovernanceengineer.com/bok/patterns#pattern-staged-rollout-with-rollback-criteria');
+      assert.notEqual(data.summary, '', 'the page text is found');
+      assert.ok(data.sections.length > 0, 'the page sections are found');
     }
   });
 
