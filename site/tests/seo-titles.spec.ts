@@ -83,7 +83,7 @@ test.describe('chapter search titles', () => {
       expect(seoTitle, `bok/${chapter.id}.md has no seoTitle`).toBeTruthy();
       expect(seoTitle!.length).toBeLessThanOrEqual(55);
       expect(seoTitle).not.toMatch(/^\d/);
-      expect(seoTitle).not.toContain('—');
+      expect(seoTitle).not.toContain(String.fromCharCode(0x2014));
 
       const page = html(`/bok/${chapter.slug}`);
       const title = documentTitle(page);
