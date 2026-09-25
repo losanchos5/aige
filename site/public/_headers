@@ -2,6 +2,7 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-PO+5o+D4prt423FBYfiwuOrU1X1t8joAyzeNXUyzKxs=' 'wasm-unsafe-eval' https://static.cloudflareinsights.com https://admin.stocktcg.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com https://admin.stocktcg.net; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action https://buttondown.com
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
   Link: </fonts/instrument-sans-latin-wght-normal.woff2>; rel=preload; as=font; type=font/woff2; crossorigin
@@ -15,8 +16,10 @@
   Cache-Control: public, max-age=31536000, immutable
   Access-Control-Allow-Origin: *
 /pagefind/*
+  ! Link
   Cache-Control: public, max-age=3600
 /og/*
+  ! Link
   Cache-Control: public, max-age=86400
 /site.webmanifest
   Content-Type: application/manifest+json
@@ -31,6 +34,8 @@
   X-Robots-Tag: noindex
   Cache-Control: public, max-age=3600
 /schemas/*
+  ! Link
+  X-Robots-Tag: noindex
   Content-Type: application/schema+json; charset=utf-8
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=3600
@@ -38,27 +43,53 @@
   ! Content-Type
   Content-Type: application/json; charset=utf-8
 /api/v1/*
+  ! Link
+  X-Robots-Tag: noindex
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=3600
 /api/v1/schemas/*
   Content-Type: application/schema+json; charset=utf-8
 /resources/obligations.json
+  ! Link
+  X-Robots-Tag: noindex
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=3600
 /resources/obligations.csv
+  ! Link
+  X-Robots-Tag: noindex
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=3600
 /resources/crosswalk.json
+  ! Link
+  X-Robots-Tag: noindex
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=3600
 /resources/crosswalk.csv
+  ! Link
+  X-Robots-Tag: noindex
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=3600
 /resources/harms.json
+  ! Link
+  X-Robots-Tag: noindex
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=3600
 /glossary.json
+  ! Link
+  X-Robots-Tag: noindex
   Access-Control-Allow-Origin: *
   Cache-Control: public, max-age=3600
 /downloads/figures/*
+  ! Link
   Cache-Control: public, max-age=86400
+/resources/threats.csv
+  ! Link
+  X-Robots-Tag: noindex
+/llms*
+  ! Link
+/robots.txt
+  ! Link
+/rss.xml
+  ! Link
+/sitemap*
+  ! Link

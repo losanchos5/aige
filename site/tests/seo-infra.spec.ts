@@ -108,6 +108,87 @@ test('in-content diagram links are extensionless (no 308 on the host)', () => {
   expect(html).not.toMatch(/href="\/diagrams\/[^"]+\.html"/);
 });
 
+// The headers Cloudflare Pages would send for a path: every rule whose pattern
+// matches (a `*` matches any run of characters) adds its headers, and a
+// `! Name` line in a matching rule drops that header coming from the others.
+function headersFor(path: string): string[] {
+  const blocks = readFileSync(join('dist', '_headers'), 'utf8')
+    .replace(/\r/g, '')
+    .split(/^(?=\/)/m)
+    .map((b) => b.split('\n').filter((line) => line.trim() !== ''))
+    .filter((lines) => lines.length > 0);
+  const matching = blocks.filter(([pattern]) => {
+    const re = new RegExp(`^${pattern.trim().split('*').map((s) => s.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*')}$`);
+    return re.test(path);
+  });
+  const own = matching.map(([, ...lines]) => lines.map((line) => line.trim()));
+  const detached = own.map(
+    (lines) => new Set(lines.filter((l) => l.startsWith('!')).map((l) => l.slice(1).trim().toLowerCase())),
+  );
+  const out: string[] = [];
+  own.forEach((lines, i) => {
+    for (const line of lines) {
+      if (line.startsWith('!')) continue;
+      const name = line.slice(0, line.indexOf(':')).trim().toLowerCase();
+      if (detached.some((set, j) => j !== i && set.has(name))) continue;
+      out.push(line);
+    }
+  });
+  return out;
+}
+
+test.describe('_headers: machine files, font preloads, framing', () => {
+  // Data endpoints stay crawlable (linked, CORS-open) but out of the index.
+  const machine = [
+    '/api/v1/obligations.json',
+    '/api/v1/schemas/cases.json',
+    '/schemas/ai-system-register-entry.v1.json',
+    '/resources/obligations.json',
+    '/resources/obligations.csv',
+    '/resources/crosswalk.json',
+    '/resources/crosswalk.csv',
+    '/resources/harms.json',
+    '/resources/threats.csv',
+    '/glossary.json',
+  ];
+  // Text for machines that must stay indexable (or are sitemaps and feeds).
+  const indexableText = ['/llms.txt', '/llms-full.txt', '/rss.xml', '/sitemap-index.xml', '/robots.txt'];
+  const PRELOAD = /^Link: <\/fonts\//;
+
+  for (const path of machine) {
+    test(`${path} is noindex and carries no font preload`, () => {
+      const h = headersFor(path);
+      expect(h).toContain('X-Robots-Tag: noindex');
+      expect(h.filter((line) => PRELOAD.test(line))).toEqual([]);
+    });
+  }
+
+  for (const path of indexableText) {
+    test(`${path} stays indexable and carries no font preload`, () => {
+      const h = headersFor(path);
+      expect(h.filter((line) => line.startsWith('X-Robots-Tag'))).toEqual([]);
+      expect(h.filter((line) => PRELOAD.test(line))).toEqual([]);
+    });
+  }
+
+  test('HTML pages keep the font preloads, the CSP and X-Frame-Options', () => {
+    for (const path of ['/', '/bok/eu-ai-act', '/resources/crosswalk']) {
+      const h = headersFor(path);
+      expect(h.filter((line) => PRELOAD.test(line)).length, path).toBeGreaterThanOrEqual(2);
+      expect(h.filter((line) => line.startsWith('X-Robots-Tag')), path).toEqual([]);
+      expect(h, path).toContain('X-Frame-Options: DENY');
+      expect(h.some((line) => line.startsWith('Content-Security-Policy:')), path).toBe(true);
+    }
+    // The home also preloads the hero serif.
+    expect(headersFor('/').filter((line) => PRELOAD.test(line)).length).toBe(4);
+  });
+
+  test('figure downloads stay indexable for image search', () => {
+    const h = headersFor('/downloads/figures/art73-clock-v0.5.0-light-1600.png');
+    expect(h.filter((line) => line.startsWith('X-Robots-Tag'))).toEqual([]);
+  });
+});
+
 test('_headers keeps the 404 page out of the index', () => {
   const headers = readFileSync(join('dist', '_headers'), 'utf8').replace(/\r/g, '');
   for (const path of ['/404', '/404.html']) {
