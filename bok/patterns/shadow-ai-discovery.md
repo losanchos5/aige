@@ -12,6 +12,19 @@ summary: "Continuous discovery of AI systems and agents running without a regist
 reconcile them against the registry, so the inventory reflects reality rather than only what teams
 remembered to declare. You cannot govern what you cannot see.
 
+> **In short**
+> Shadow-AI Discovery is an inventory control that continuously finds AI systems and agents that are
+> running but not registered, and reconciles them against the registry, so the inventory reflects
+> production rather than only what teams remembered to declare. It solves the lag of a registry fed
+> only by voluntary declaration: unregistered agents, the shadow fleet, are exactly the layer a
+> paper inventory cannot see. Use it in an organisation where teams adopt AI tools and start agents
+> faster than any central inventory can track. Discovery runs against the environments where AI
+> appears: identity providers, cloud accounts, network egress, code repositories and SaaS
+> integrations. Each finding is reconciled against the Agent Registry; an unknown system gets an
+> entry and an owner is asked to claim it, and unclaimed ones are escalated. The result feeds the
+> registry's drift check. Its illustrative mappings are EU AI Act Art. 49/71, ISO/IEC 42001, the
+> NIST AI RMF Map function, CSA AICM and OWASP Agentic ASI10.
+
 ## Objectives
 Close the gap between the registry and production by finding unregistered models, agents and AI-enabled
 tools, and bringing them under governance.

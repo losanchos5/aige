@@ -16,6 +16,19 @@ that can, and make every runtime verify the signature, the digests and the prove
 registry entry before it loads a model. The verification writes an evidence record, so "which bytes
 ran, and who produced them?" has an answer.
 
+> **In short**
+> Model Artefact Integrity is a supply-chain control that treats model weights and their companion
+> files as signed, verifiable artefacts, so the model a service loads is the model the pipeline
+> built, evaluated and registered. It solves the gap where the pipeline evaluates one model and
+> production loads another: tags can be moved, files copied by hand, and code-executing formats such
+> as pickle can run an attacker's code on load. Use it wherever models move from training jobs to
+> registries to serving clusters, or are fine-tuned from bases pulled from public hubs. The build
+> signs a manifest of every file and its digest and attaches SLSA build provenance; weights are
+> stored as safetensors, other formats are scanned, and third-party models are pinned by digest. The
+> runtime verifies signature, digests and provenance against the registry entry before load and
+> writes an evidence record. Its illustrative mappings include EU AI Act Art. 15(5) and 55(1)(d),
+> ISO/IEC 42001 A.10.3, NIST AI RMF Manage 3.2 and OWASP LLM04:2026.
+
 ## Objectives
 Guarantee that the model a service loads is the model the pipeline built, evaluated and registered,
 from a known producer, and that loading it cannot run an attacker's code.

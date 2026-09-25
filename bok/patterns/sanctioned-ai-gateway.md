@@ -15,6 +15,19 @@ redaction or blocking where the class requires it, a decision event per call, an
 on a current acceptable-use attestation. The gateway is the sanctioned path, and it is built to be
 the easiest one; discovery finds what goes around it.
 
+> **In short**
+> The Sanctioned AI Gateway is a runtime control that puts an organisation's approved AI tools and
+> model APIs behind single sign-on and one gateway, which applies the acceptable-use policy as code.
+> It solves the handbook policy with no teeth, never evaluated at the moment someone pastes a
+> customer file into a public tool, while blocking every public tool pushes use onto personal
+> devices. Use it when staff adopt AI tools faster than procurement can approve them. A Policy Card
+> catalogue names each approved tool, its contract terms and the data classes it allows. A content
+> classifier tags each request by data class, and the gateway allows it, redacts it or blocks it
+> with a route to the right tool. Access depends on a current acceptable-use attestation, and each
+> call writes a signed evidence record with a hash of the input rather than the input. Its
+> illustrative mappings include EU AI Act Art. 4, GDPR Art. 5(1)(c), ISO/IEC 42001 A.9.2, NIST AI
+> RMF GOVERN 2.2 and OWASP LLM02:2026.
+
 ## Objectives
 Let staff use AI tools productively while keeping regulated, confidential and secret data out of
 tools that are not approved for it, and turn the acceptable-use policy from a handbook page into a

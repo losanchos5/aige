@@ -13,6 +13,19 @@ and the same evidence feeds continuous assurance. OSCAL, extended with propertie
 organising format: frameworks specify what to assure but provide no executable format for how, and this
 pattern supplies it [1].
 
+> **In short**
+> Machine-Readable Evidence (OSCAL) is an assurance control that emits control evidence in a
+> machine-readable, standard format, so the audit becomes a query and the same evidence feeds
+> continuous assurance. It solves evidence that a human must format and file by hand, which does not
+> scale, cannot be verified quickly, is out of date the moment it is saved and is collected again
+> for every audit. Use it when the controls of an AI stack already produce structured records and
+> the assurance function must answer auditors repeatedly and at speed. Control results are emitted
+> as OSCAL component-definition and assessment-results artefacts, building on OSCAL's native
+> control, implementation and assessment layers, which trace each result back to the control it
+> tested. AI-specific property extensions are still forming and are adopted only where they fit. The
+> screenshot stops being an evidence artefact. Its illustrative mappings are EU AI Act Art. 12, 17
+> and 72, ISO/IEC 42001 and the NIST AI RMF Manage and Govern functions.
+
 ## Objectives
 Make evidence queryable, diffable and aggregatable, and eliminate the screenshot as an evidence
 artefact.

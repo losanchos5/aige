@@ -13,6 +13,19 @@ summary: "A map from each control to the framework clauses it serves, generated 
 the controls themselves, as an index for navigation and reuse, never as the end state. A crosswalk
 proves you have read the framework; it does not prove the control fires.
 
+> **In short**
+> The Framework Crosswalk is a governance-as-code control that maps each control to the framework
+> clauses it serves, generated from the controls themselves and used as an index for navigation and
+> reuse, never as the end state. It solves framework theatre: a green mapping matrix is mistaken for
+> a working control, and a large spreadsheet is presented as maturity while nothing measures whether
+> any mapped control reduces risk. Use it when an organisation answers to several overlapping
+> frameworks, such as the EU AI Act, ISO/IEC 42001, the NIST AI RMF and CSA AICM, and would
+> otherwise build the same control several times. Each Policy Card and Eval Gate declares the
+> clauses it maps to, and the crosswalk is their aggregation. Every mapping cell must resolve to a
+> running control and its emitted evidence; a cell with no evidence is flagged, not counted. Its
+> illustrative mappings are the EU AI Act as a whole, ISO/IEC 42001, the NIST AI RMF Govern
+> function, CSA AICM and the OWASP Agent Control Standard.
+
 ## Objectives
 Let one control satisfy many frameworks and make coverage navigable, while refusing to mistake coverage
 for assurance.

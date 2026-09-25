@@ -16,6 +16,19 @@ its approval and the re-test that cleared it; outputs carry provenance and cavea
 what it is using; and off-purpose use is monitored at runtime. Secondary use, function creep and
 downstream harm become visible, and a change or retirement can reach everyone it affects.
 
+> **In short**
+> The Downstream Use Register is an inventory control that records, against each AI system's
+> registry entry, what its outputs may and may not be used for and who actually consumes them: other
+> systems, teams, partners and models trained on them. It solves function creep that an inventory of
+> systems cannot see, such as a risk score approved to prioritise manual review that later becomes
+> an automatic decline in another team's pipeline. Use it for any system whose outputs can be reused
+> beyond the purpose they were approved for. Intended and prohibited uses are written as a Policy
+> Card, each consumer is registered with its purpose, approval and re-test, and access to the
+> outputs is granted per registered consumer. Outputs carry provenance and caveats, off-purpose use
+> is monitored at runtime, and a model change or retirement notifies every consumer on the register.
+> Its illustrative mappings include EU AI Act Art. 3(13), 9(2)(b), 25(1)(c) and 50(2), ISO/IEC 42001
+> A.8.2, NIST AI RMF MAP 1.1 and OWASP Agentic ASI08.
+
 ## Objectives
 Forecast and bound the uses a system was not approved for, make every downstream consumer of its
 outputs known and accountable, and give change, incident and retirement processes a list of whom to

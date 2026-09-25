@@ -15,6 +15,19 @@ minimum cell size, approver) written down before the run. The suite emits one st
 metric and slice, fails the build when the policy is not met, and runs again on live decisions so a
 system that was fair at release cannot drift out of it unseen.
 
+> **In short**
+> The Fairness Eval Suite is an evaluation control that versions a fairness test suite with the
+> model and runs it behind the eval gate, so a release that treats a group worse than the fairness
+> policy allows does not ship. It solves fairness measured once, on the aggregate, with a metric
+> picked after seeing the results, which hides the worst-served intersections. Use it for a system
+> that allocates credit, jobs, housing, benefits or prices, or serves people with a quality that can
+> differ by group. A policy written before the run fixes the metric, threshold, minimum cell size
+> and approver. The suite computes group and intersectional metrics with confidence intervals,
+> reports small cells as insufficient data, runs a proxy scan and a counterfactual flip test, and
+> emits one result per metric and slice. The same metrics then run on live decisions. Its
+> illustrative mappings include EU AI Act Art. 10(2)(f)–(g), 13(3)(b)(v) and 15(4), NYC Local Law
+> 144, ISO/IEC TR 24027 and NIST AI RMF Measure 2.11.
+
 ## Objectives
 Turn "is it fair?" into a small set of chosen, testable properties with consequences, so a release
 that treats a group worse than the policy allows does not ship, and the evidence shows which metric

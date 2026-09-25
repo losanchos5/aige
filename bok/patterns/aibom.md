@@ -12,6 +12,19 @@ summary: "An AI bill of materials emitted at build, recording models, datasets, 
 weights and their provenance in a standard format, and store it with the registry entry. The AIBOM is
 what the transparency and eval layers read to know what to document and what to test.
 
+> **In short**
+> AIBOM is an inventory control that generates an AI bill of materials at build for each AI system,
+> recording its models, datasets, weights and their provenance and licences in a standard format. It
+> solves a supply-chain blind spot: the classic SBOM captures software dependencies but not models
+> or data, so without an AIBOM an organisation cannot say which model version, from which
+> provenance, trained on which data, sits inside a given system. Use it when AI systems are
+> assembled from foundation models, fine-tunes, third-party datasets and libraries. The AIBOM is
+> emitted in CycloneDX ML-BOM or the SPDX 3.0 AI profile, attached to the system's registry entry
+> and regenerated on each build, so it never drifts from the deployed system. The transparency and
+> eval layers read it to know what to document and what to test. Its illustrative mappings are EU AI
+> Act Art. 11 and Art. 53 for GPAI documentation, ISO/IEC 42001, the NIST AI RMF Map function and
+> CSA AICM.
+
 ## Objectives
 Make the composition and provenance of an AI system machine-readable, so supply-chain risk and
 transparency obligations can be answered from an artefact, not reconstructed.

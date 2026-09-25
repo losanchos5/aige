@@ -13,6 +13,18 @@ or on a schedule, whose findings are triaged into fixes or accepted risks, recor
 fed back into the suite. Where an Eval Gate proves a threshold still holds, the red-team suite is the
 standing adversary that keeps finding the inputs the threshold never anticipated.
 
+> **In short**
+> The Adversarial Red-Team Suite is an evaluation control that keeps a versioned set of adversarial
+> tests, built from a threat taxonomy and run in CI or on a schedule, as a standing adversary for a
+> model or agent. It solves the weakness of a one-off red-team exercise, which is out of date as
+> soon as the system changes and leaves no trace of which findings were fixed or accepted. Use it
+> when a system's exposure grows with its tools, prompts and reach, and an Eval Gate already covers
+> regression. Each test traces to a named technique from MITRE ATLAS or the OWASP Top 10 for Agentic
+> Applications. Every finding is triaged into a fix or an accepted risk with an owner, filed as an
+> evidence record against the registry entry and fed back as a regression test. Its illustrative
+> mappings are EU AI Act Art. 9, 15 and 55, ISO/IEC 42001, the NIST AI RMF Measure function and
+> OWASP Agentic ASI01 and ASI02.
+
 ## Objectives
 Turn adversarial testing from a one-off exercise into a maintained, versioned control that discovers
 failure modes before an attacker does and leaves a triaged, auditable record of every finding.

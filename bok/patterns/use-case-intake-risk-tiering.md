@@ -15,6 +15,19 @@ and computes an internal risk tier from declared profile fields. The tier, not a
 which assessments, evals and approvals the system must clear before it ships, and the record becomes
 the registry entry every later gate reads.
 
+> **In short**
+> Use-Case Intake & Risk Tiering is a governance-as-code control that routes every proposed AI use
+> case, built or bought, through one intake that writes a structured use-case record and computes an
+> internal risk tier. It solves governance that starts too late and scales badly: requests arrive by
+> email, in slide decks and in procurement tickets, a high-risk use slips through as a pilot, and
+> nobody can show which facts a classification rested on. Use it where many teams propose AI
+> features and most buy or call models rather than train them. The intake screens each use case
+> against EU AI Act Art. 5 prohibited practices before scoring it, places it on the Act's risk
+> ladder, and lets a versioned policy compute the tier from declared profile fields. The tier
+> selects the required assessments, evals, approvers and review cadence, and deployment refuses any
+> system without an intake record. Its illustrative mappings include EU AI Act Art. 3(12), 6(3)–(4)
+> and 49(2), ISO/IEC 42001 A.5.2 and NIST AI RMF Map 1.1.
+
 ## Objectives
 Make the first decision about an AI system a recorded, reproducible one: what it is for, what it must
 not be used for, how risky it is and, from that, how much governance it gets. Spend review effort
