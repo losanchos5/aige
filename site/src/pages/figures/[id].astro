@@ -112,7 +112,7 @@ const facts: [string, string][] = [
 <Base
   title={`Figure: ${figure.title}`}
   description={description}
-  image="/og/resources.png"
+  image={primary ? primary.href : '/og/resources.png'}
   jsonLd={jsonLd}
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
 >
@@ -206,6 +206,21 @@ const facts: [string, string][] = [
                   text live: the first follows the viewer's light or dark setting, the other two fix
                   one theme for slides and print. The PNGs are drawn with the site's own typefaces.
                 </p>
+                {primary && (
+                  <figure class="fg-png">
+                    <img
+                      src={primary.href}
+                      width={primary.pixelWidth}
+                      height={primary.pixelHeight}
+                      alt={figure.alt}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <figcaption class="fg-meta">
+                      The PNG, light, {primary.pixelWidth} px wide, as it downloads.
+                    </figcaption>
+                  </figure>
+                )}
                 <ul class="fg-downloads">
                   {downloads.map((d) => (
                     <li>
@@ -298,3 +313,25 @@ const facts: [string, string][] = [
 
   <script is:inline defer src="/figure-cite.js"></script>
 </Base>
+
+<style>
+  /* The PNG as an <img>, so image search indexes the licensable file the
+     ImageObject names (the inline SVG above stays the reading view). Small,
+     lazy and below the fold: it costs nothing until the reader gets here. */
+  .fg-png {
+    margin: var(--s-4) 0 0;
+    max-width: 24rem;
+  }
+
+  .fg-png img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+  }
+
+  .fg-png figcaption {
+    margin-top: var(--s-2);
+  }
+</style>
