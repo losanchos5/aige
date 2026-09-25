@@ -13,6 +13,7 @@
 //    browser, no network use with what the reader enters, and reflow at 390px.
 import { test, expect } from '@playwright/test';
 import type { Download, Page } from '@playwright/test';
+import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -185,6 +186,17 @@ test.describe('doc builders: data', () => {
     const codes = validate(S.ia, broken).map((e: { code: string }) => e.code);
     expect(codes).toContain('enum');
     expect(codes).toContain('additional');
+  });
+
+  test('schemas-check runs every chapter 05 compatibility check; none is skipped', () => {
+    // A missing lead or a broken block used to be a warning, so the gate could
+    // switch itself off; now it fails the script, and all five shapes are checked.
+    const out = execFileSync(process.execPath, ['scripts/schemas-check.mjs'], {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
+    expect(out).toMatch(/ 5 chapter 05 shape\(s\) compatible\./);
   });
 
   test('the crosswalk points at real register fields and carries no em dash', () => {

@@ -420,15 +420,20 @@ function main() {
       const at = chapter.indexOf(lead);
       const block = at === -1 ? null : /```json\s*\n([\s\S]*?)```/.exec(chapter.slice(at, at + 1200));
       const entry = schemas.get(stem);
+      // A reworded lead, a lost block or a renamed schema would switch the
+      // check off without anyone noticing: each is a failure, not a warning.
       if (!block || !entry) {
-        warnings.push(`chapter 05 block "${lead}" or schema ${stem} not found; compatibility not checked`);
+        fail(
+          'chapter 05 compatibility',
+          `${!entry ? `schema ${stem} not found` : `no JSON block after "${lead}" in bok/05-patterns.md or bok/patterns/*.md`}; compatibility not checked`,
+        );
         continue;
       }
       let instance;
       try {
         instance = JSON.parse(block[1]);
       } catch (error) {
-        warnings.push(`chapter 05 block "${lead}" is not valid JSON (${error.message})`);
+        fail('chapter 05 compatibility', `the block after "${lead}" is not valid JSON (${error.message})`);
         continue;
       }
       const target = pointer ? resolveRef(entry.schema, pointer) : entry.schema;
