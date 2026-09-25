@@ -133,6 +133,7 @@ const HUBS: { route: string; keyword: RegExp }[] = [
   { route: '/bok', keyword: /^AI Governance Body of Knowledge\b/i },
   { route: '/role', keyword: /^AI governance engineer\b/i },
   { route: '/resources/crosswalk', keyword: /^AI governance crosswalk: EU AI Act, ISO 42001, NIST AI RMF/ },
+  { route: '/resources/frameworks', keyword: /^AI governance frameworks: \d+ laws, standards and codes$/ },
   { route: '/for/aigp', keyword: /^Free AIGP study map\b/ },
   { route: '/for/certifications', keyword: /^AI governance certifications compared\b/ },
   { route: '/resources/harms', keyword: /^AI harms taxonomy\b/ },
@@ -154,6 +155,13 @@ test.describe('hub titles name their query', () => {
       expect(description.endsWith('…'), description).toBe(false);
     });
   }
+
+  test('/resources/frameworks has a 110 to 158 character description (audit ONPAGE N3-1)', () => {
+    const description = meta(html('/resources/frameworks'), 'name', 'description') ?? '';
+    expect(description.length, description).toBeGreaterThanOrEqual(110);
+    expect(description.length, description).toBeLessThanOrEqual(158);
+    expect(description).toContain('EU AI Act');
+  });
 
   test('/for/aigp stays a map, never a guide', () => {
     const page = html('/for/aigp');
