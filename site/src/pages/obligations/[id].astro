@@ -6,13 +6,23 @@
 // and the section of chapter 08 it comes from. The sitemap dates the page by the
 // row's `reviewed` field (astro.config.ts), not by git. The header figure is the
 // obligation-to-evidence chain (components/obligations/EvidenceChain.astro), and
-// the page's Open Graph card is its own (/og/obligations/<id>.png).
+// the page's Open Graph card is its own (/og/obligations/<id>.png). Each fact is
+// rendered once (audit C10): the facts list, the artefact with its layers, and a
+// byline that carries the review date.
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import Citation from '../../components/Citation.astro';
 import EvidenceChain from '../../components/obligations/EvidenceChain.astro';
-import { obligationShortTitle, obligationOgPath } from '../../lib/obligation-title';
+import Byline from '../../components/Byline.astro';
+import {
+  obligationShortTitle,
+  obligationOgPath,
+  obligationHeading,
+  instrumentClause,
+} from '../../lib/obligation-title';
+import { leadSentence } from '../../lib/lead-sentence';
+import { patternPath } from '../../data/patterns';
 import { site } from '../../data/site';
 import {
   obligations,
@@ -71,23 +81,51 @@ const pagePath = obligationPath(row);
 const pageUrl = new URL(pagePath, site.url).href;
 const apiPath = obligationApiPath(row);
 
-// <title> budget: a long obligation name falls back to "<instrument> <clause>"
-// (lib/obligation-title.ts, shared with the Open Graph card).
+// <title>: the heading fitted to the title budget (lib/obligation-title.ts,
+// shared with the Open Graph card). The H1 is the heading in full: the register's
+// name, qualified with its instrument where the name alone would not say it.
 const shortTitle = obligationShortTitle(row);
-// Meta description: the requirement, cut on a word boundary to fit 160 chars.
-function clip(text: string, max = 158): string {
-  if (text.length <= max) return text;
-  const cut = text.slice(0, max);
-  return `${cut.slice(0, cut.lastIndexOf(' ')).replace(/[\s,;:]+$/, '')}…`;
+const heading = obligationHeading(row);
+// Meta description: "<instrument> <clause>: " and the requirement's opening
+// sentence, within 155 characters; the requirement alone when that is too long,
+// and the evidence artefact added when a one-line requirement leaves it thin.
+const requirementLead = leadSentence(row.requirement);
+const labelled = `${instrumentClause(row)}: ${requirementLead}`;
+const description =
+  labelled.length > 155
+    ? requirementLead
+    : labelled.length >= 50
+      ? labelled
+      : leadSentence(`${labelled.replace(/\.?$/, '.')} Evidence: ${row.artefact}.`);
+
+// "Applies from" note, printed once: without the status and date the line
+// already shows, and with the chapter's "(verify)" working marker rendered as
+// plain words. The register data keeps the marker (it mirrors chapter 08).
+function appliesNoteText(): string {
+  let note = (row.appliesNote ?? '').replace(/\bverify\)/g, 'to be confirmed)');
+  // A leading status the tag already shows ("In force; ...", "In force 2020-...").
+  const status = appliesStatusLabels[row.appliesStatus].toLowerCase();
+  if (note.toLowerCase().startsWith(status)) {
+    const rest = note.slice(status.length);
+    if (/^[;,]\s*/.test(rest)) note = rest.replace(/^[;,]\s*/, '');
+    else if (/^\s+\d/.test(rest)) note = rest.trimStart();
+  }
+  // A leading date the line already shows ("2027-12-02 (Annex III)").
+  if (row.appliesFrom) {
+    const lead = /^(?:applies from |in force |effective |from )?(\d{4}-\d{2}-\d{2})(?:[;,]\s*|\s+|$)/i.exec(note);
+    if (lead && lead[1] === row.appliesFrom) note = note.slice(lead[0].length);
+  }
+  // A bracketed aside left at the head reads as a plain clause: "(Annex III)".
+  return note.replace(/^\(([^()]*)\)(?=;|$)/, '$1').trim();
 }
-const description = clip(`${fw.short} ${row.clause}: ${row.requirement}. Evidence: ${row.artefact}.`);
+const appliesNote = appliesNoteText();
 const crumbs = [{ label: 'Obligations', href: '/obligations' }, { label: row.id }];
 
 const jsonLd = [
   {
     '@type': 'WebPage',
     '@id': `${pageUrl}#page`,
-    name: row.obligation,
+    name: heading,
     description,
     url: pageUrl,
     inLanguage: 'en',
@@ -113,7 +151,9 @@ const jsonLd = [
 ---
 
 <Base title={shortTitle} description={description} image={obligationOgPath(row)} jsonLd={jsonLd}>
-  <PageHero variant="res" crumbs={crumbs} title={row.obligation} lede={row.requirement} />
+  <PageHero variant="res" crumbs={crumbs} title={heading} lede={row.requirement}>
+    <Byline slot="lede" date={row.reviewed} dateLabel="Reviewed" />
+  </PageHero>
 
   <div class="container res-page">
     <EvidenceChain row={row} />
@@ -156,7 +196,7 @@ const jsonLd = [
         <dd>
           {row.appliesFrom ? <time datetime={row.appliesFrom}>{row.appliesFrom}</time> : 'No date'}{' '}
           <span class="type-tag">{appliesStatusLabels[row.appliesStatus]}</span>
-          {row.appliesNote && <span> · {row.appliesNote}</span>}
+          {appliesNote && <span> · {appliesNote}</span>}
         </dd>
         {
           row.milestones && row.milestones.length > 0 && (
@@ -183,24 +223,6 @@ const jsonLd = [
             </>
           )
         }
-        <dt>Layers</dt>
-        <dd>
-          <span
-            class="ticks ticks--coded"
-            role="img"
-            aria-label={`Layers: ${row.layerN.map((n) => `${n} ${layerOf(n)?.name ?? ''}`).join(', ')}`}
-          >
-            {
-              row.layerN.map((n) => (
-                <span class="tk-key">
-                  <span class="tk" data-l={n} aria-hidden="true" />L{n}
-                </span>
-              ))
-            }
-          </span>
-        </dd>
-        <dt>Reviewed</dt>
-        <dd><time datetime={row.reviewed}>{row.reviewed}</time></dd>
       </dl>
 
       <div class="prose">
@@ -238,7 +260,7 @@ const jsonLd = [
             <ul>
               {rowPatterns.map((p) => (
                 <li>
-                  <a href={`/bok/patterns#${p.id}`}>{p.title}</a>
+                  <a href={patternPath(p)}>{p.title}</a>
                   {` (layer ${p.layer}${p.secondaryLayer ? ` and ${p.secondaryLayer}` : ''})`}
                 </li>
               ))}
@@ -308,10 +330,8 @@ const jsonLd = [
 
         <h2 id="source">Source</h2>
         <p>
-          Chapter 08, section <a href={`/bok/regulatory-map#${row.anchor}`}>{section.text}</a>.
-          The row was last checked against its sources on <time datetime={row.reviewed}
-            >{row.reviewed}</time
-          >.
+          Chapter 08, section <a href={`/bok/regulatory-map#${row.anchor}`}>{section.text}</a>,
+          checked against its sources on the review date above.
         </p>
 
         <h2 id="data">Machine-readable</h2>
@@ -330,7 +350,7 @@ const jsonLd = [
       </div>
 
       <div class="obx-cite">
-        <Citation title={`${row.obligation} (${row.id})`} url={pagePath} kind="obligation" />
+        <Citation title={`${heading} (${row.id})`} url={pagePath} kind="obligation" />
       </div>
 
       <nav class="cs-nav" aria-label="More obligations">
