@@ -22,6 +22,11 @@
 // scripts/lib/figure-export.mjs and VISUAL-GUIDE.md §5). File names come from
 // figureExports() in figures.ts, which the /figures pages link. PNGs are cached
 // by content hash in .figures-cache/ so an unchanged figure is not re-rendered.
+// Next to each light 1600 px PNG it writes lighter previews of it, AVIF and
+// WebP at 800 and 1600 px (<png name minus -1600.png>-<width>.<avif|webp>),
+// encoded with the sharp that Astro installs; the /figures/<id> page shows them
+// in a <picture> with the PNG as the fallback. They are cached the same way,
+// and skipped with a warning when sharp cannot be loaded.
 // It also validates every entry: size budget by kind, asOf/reviewBy dates, the
 // "As of <date>" stamp inside a dated figure, and the data-viz table fallback.
 //
@@ -69,6 +74,15 @@ const CHECK = ARGS.includes('--check');
 const NO_EXPORT = ARGS.includes('--no-export');
 // Bump when the export layout changes, so every cached PNG is re-rendered.
 const EXPORT_REV = '1';
+// The previews of the light 1600 px PNG (see the header); bump PREVIEW_REV when
+// their widths or encoder settings change. AVIF at effort 2 costs about 1.5x
+// the WebP encode and saves about a quarter of its bytes.
+const PREVIEW_WIDTHS = [800, 1600];
+const PREVIEW_FORMATS = [
+  { ext: 'avif', options: { quality: 55, effort: 2 } },
+  { ext: 'webp', options: { quality: 82 } },
+];
+const PREVIEW_REV = '1';
 
 const esc = (s) =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -544,6 +558,7 @@ async function exportFigures(figuresMod, site) {
   const nextCache = {};
   const expected = new Set();
   const jobs = [];
+  const previews = [];
   const author = site.authors[0];
   const started = Date.now();
   let written = 0;
@@ -590,6 +605,7 @@ async function exportFigures(figuresMod, site) {
       });
       const key = sha(EXPORT_REV, fonts.hash, String(entry.width), renderSvg);
       nextCache[entry.file] = key;
+      if (entry.theme === 'light' && entry.width === 1600) previews.push({ file: entry.file, key });
       if (cache[entry.file] === key && existsSync(dest)) continue;
       jobs.push(
         renderPng(renderSvg, entry.width, fonts.files).then((png) => {
@@ -607,6 +623,7 @@ async function exportFigures(figuresMod, site) {
     }
   }
   await Promise.all(jobs);
+  const encoded = await writePreviews(previews, { cache, nextCache, expected });
 
   // Drop exports no figure produces any more (an old version, a removed id).
   for (const name of readdirSync(EXPORT_DIR)) {
@@ -616,8 +633,51 @@ async function exportFigures(figuresMod, site) {
   const secs = ((Date.now() - started) / 1000).toFixed(1);
   console.log(
     `figures-build: ${expected.size} export(s) for v${site.bokVersion} in public/downloads/figures ` +
-      `(${written} written, ${jobs.length} PNG rendered, ${secs}s)`,
+      `(${written} written, ${jobs.length} PNG rendered, ${encoded} preview(s) encoded, ${secs}s)`,
   );
+}
+
+/**
+ * Encode the AVIF and WebP previews of each light 1600 px PNG (see the header).
+ * A preview is re-encoded only when its PNG changed (the PNG's render key is in
+ * the preview's cache key) or the file is missing. Four PNGs at a time, so the
+ * decoded posters (up to 1600 x 5000 px) do not all sit in memory at once.
+ * Returns the number of files encoded.
+ */
+async function writePreviews(sources, { cache, nextCache, expected }) {
+  let sharp;
+  try {
+    sharp = (await import('sharp')).default;
+  } catch {
+    console.warn('figures-build: warning: sharp is not installed; no AVIF/WebP figure previews.');
+    return 0;
+  }
+  let encoded = 0;
+  const queue = [...sources];
+  const worker = async () => {
+    for (let src = queue.shift(); src; src = queue.shift()) {
+      let png = null;
+      for (const width of PREVIEW_WIDTHS) {
+        for (const { ext, options } of PREVIEW_FORMATS) {
+          const file = src.file.replace(/-1600\.png$/, `-${width}.${ext}`);
+          const dest = join(EXPORT_DIR, file);
+          const key = sha(PREVIEW_REV, src.key, String(width), ext, JSON.stringify(options));
+          expected.add(file);
+          nextCache[file] = key;
+          if (cache[file] === key && existsSync(dest)) continue;
+          png ??= readFileSync(join(EXPORT_DIR, src.file));
+          const out = await sharp(png)
+            .resize({ width, withoutEnlargement: true })
+            .toFormat(ext, options)
+            .toBuffer();
+          writeIfChanged(dest, out);
+          encoded += 1;
+        }
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: 4 }, worker));
+  return encoded;
 }
 
 /**
