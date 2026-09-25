@@ -140,6 +140,9 @@ jobs:
           if [ -z "$base" ]; then
             gh pr comment "$branch" --body-file "$body"
           else
+            # Needs "Allow GitHub Actions to create and approve pull requests" in the repo
+            # settings; without it the branch is still pushed and a maintainer opens the PR.
             gh pr create --base "$base" --head "$branch" \
-              --title "i18n: traducción automática ($RUN_ID)" --body-file "$body"
+              --title "i18n: traducción automática ($RUN_ID)" --body-file "$body" \
+              || echo "::notice::Could not open the pull request; branch $branch is pushed, open it by hand."
           fi
