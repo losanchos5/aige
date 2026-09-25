@@ -3,6 +3,18 @@
 > Risk management is the loop that tells every other control how hard to bite: identify, assess,
 > treat and monitor, run on the five layers and seven workflows, with the risk register as evidence.
 
+> **In short**
+> AI risk management is the loop that tells every other control how hard to bite: identify, assess,
+> treat and monitor, run on the five layers and seven workflows, with the risk register as evidence.
+> It sets the parameters of every other control: which systems get which gates, how high an eval
+> threshold sits, when a person must approve an action, and who may sign for the risk that is left.
+> The EU AI Act defines risk as "the combination of the probability of an occurrence of harm and the
+> severity of that harm" [3], and the NIST AI RMF uses the same shape [1]. Ratings come from a
+> likelihood-by-severity matrix with defined scales, risk appetite and tolerance are compiled into
+> gates, and an acceptance of residual risk is a named, signed and expiring decision. The register
+> is kept as versioned data rather than as a spreadsheet, and every rating is recomputed from
+> evidence, not re-argued in a meeting.
+
 ## What this chapter settles
 
 The book has leaned on risk without giving it a home. Chapter 03 says every control should

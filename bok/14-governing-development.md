@@ -4,6 +4,18 @@
 > leaves a record that a gate reads, so the pipeline compiles the technical file instead of a team
 > writing it afterwards.
 
+> **In short**
+> AI development is governed when every decision in the build, from the use case to the release,
+> leaves a record that a gate reads, so the pipeline compiles the technical file instead of a team
+> writing it afterwards. This is the provider side of the lifecycle: the organisation that designs,
+> trains, tests and releases an AI system or model. The build runs as a chain of gates: a use-case
+> record read at intake approval, a design record at design review, a dataset admission record at
+> the dataset admission gate, a test plan and eval results at the eval gate, a go/no-go record at
+> the release gate, and an Annex IV technical file with cards and an AIBOM. The reference texts
+> agree on the stages: ISO/IEC 5338:2023 defines AI system life cycle processes, ISO/IEC 42001
+> groups the controls under Annex A.6 and A.7, and the NIST AI RMF puts context in Map and testing
+> in Measure [1][2][3].
+
 ## The build as a chain of gates
 
 Most governance failures in an AI system are decided before it serves its first request. The use

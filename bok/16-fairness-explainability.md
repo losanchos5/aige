@@ -3,6 +3,19 @@
 > Fairness and explainability become controls only when they are measured, gated and filed as
 > evidence; this chapter maps each technique to its stack layer and its legal hook.
 
+> **In short**
+> Fairness and explainability become controls only when they are measured, gated and filed as
+> evidence. The NIST AI RMF gives each a measurement subcategory: `MEASURE 2.11` for fairness and
+> bias and `MEASURE 2.9` for explanation [1]. NIST SP 1270 states that "it is not possible to
+> achieve zero risk of bias in an AI system" [2], so fairness is managed like any other residual
+> risk: named, measured, bounded and monitored, never declared solved. Choosing a fairness metric is
+> a value choice, because the impossibility results of Kleinberg, Mullainathan and Raghavan and of
+> Chouldechova show that common fairness conditions cannot all hold at once when base rates differ
+> [18][19]. The most widely used screening number is the four-fifths rule of the 1978 US Uniform
+> Guidelines [12]. On the explanation side, the legal hooks run through credit adverse-action
+> notices, the GDPR and EU AI Act Articles 13 and 86, and each explanation is kept as an evidence
+> record.
+
 ## How to read this chapter
 
 Fairness and explainability are the two principles every responsible-AI framework names and the two

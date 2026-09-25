@@ -2,6 +2,18 @@
 
 > Why this book exists, who it is for, and how to use it.
 
+> **In short**
+> The Body of Knowledge is the founding text and working reference of AI governance engineering: it
+> tells you how to turn an AI Act obligation or an ISO 42001 control into policy-as-code, an eval
+> gate, an agent registry and machine-readable evidence that an auditor can read. It was written by
+> Jorge García Aibar, drawing on two and a half years designing and operating an AI governance
+> framework inside a large telco; the Thesis, the sole co-authored part of the project, is by Jorge
+> García Aibar and Aurélie Pols. It is built from that operating experience, the GRC Engineering
+> precedent and the public record: the EU AI Act and its Digital Omnibus reform, ISO/IEC 42001, the
+> NIST AI RMF, OWASP, CSA, CSIRO's Responsible AI Pattern Catalogue and the frontier labs' safety
+> frameworks. The book has 24 chapters in five parts: the discipline, reference, foundations, the
+> lifecycle, and law and standards. Version 0.5.0 is a public draft, licensed CC BY 4.0.
+
 ## Why this exists
 
 There is a manifesto for GRC engineering. There is a manifesto for agile software. There is a pattern

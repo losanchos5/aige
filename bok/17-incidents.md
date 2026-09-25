@@ -3,6 +3,18 @@
 > AI incident management turns a runtime signal into an event that is classified, contained,
 > reported on every clock that applies and explained, with its cause fed back into the controls.
 
+> **In short**
+> AI incident management turns a runtime signal into an event that is classified, contained,
+> reported on every clock that applies and explained, with its cause fed back into the controls. In
+> the OECD's definition, an AI incident is an event where the development, use or malfunction of an
+> AI system directly or indirectly leads to harm; an AI hazard is one that could plausibly lead to
+> such an incident [1]. The EU AI Act defines only the top of that ladder: a serious incident under
+> `Art. 3(49)` leads to death or serious harm to health, serious and irreversible disruption of
+> critical infrastructure, infringement of fundamental-rights obligations, or serious harm to
+> property or the environment [3]. One event can start several clocks at once: `Art. 73` of the AI
+> Act (no later than 2, 10 or 15 days), GDPR `Art. 33` (within 72 hours where feasible), NIS2 and
+> DORA [3][13][17][18]. Corrective actions feed the risk register and the eval suite.
+
 This chapter extends two things the book already has. The
 [**Incident Pipeline**](/patterns/incident-pipeline) pattern (chapter 05) wires detection
 to a report with the statutory timer running; the Article 73 clock table in the
