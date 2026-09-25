@@ -1,7 +1,7 @@
 ---
 /**
- * Home: the discipline, defined. A full-viewport hero (the headline on a
- * moving gradient field, one CTA, a strip of figures), the definition with the
+ * Home: the discipline, defined. A full-viewport hero (the headline over a
+ * painting, one CTA, a strip of frameworks and figures), the definition with the
  * governance loop, the three questions, the five-layer stack, the eight values,
  * the role, a verdict beat, the Body of Knowledge by part, the resources, the
  * newsletter and a closing CTA. All copy and every figure come from the typed
@@ -11,8 +11,8 @@
  * The body sections are built on <Section>, which supplies the tinted/mesh/dark
  * bands and the shared heads; no body section sits on the bare page ground
  * (each mesh takes its own composition and strength, so neighbours differ).
- * The hero keeps its own scoped layout (the field, the centred headline and the
- * figures strip; see the <style>) and the loop is <GovernanceLoop>.
+ * The hero keeps its own scoped layout (the painting or the field, the centred
+ * headline and the strip; see the <style>) and the loop is <GovernanceLoop>.
  */
 import Marketing from '../layouts/Marketing.astro';
 import Section from '../components/Section.astro';
@@ -117,7 +117,8 @@ const heroFonts = [
   '/fonts/newsreader-latin-display-italic.woff2',
 ];
 
-// Local test of a painting background instead of the gradient field.
+// The hero's ground: the painting (true) or the WebGL gradient field of
+// public/hero-field.js (false).
 const HERO_ART = true;
 
 // The painting at three widths (a 1440px viewport at DPR 1 takes the 1600),
@@ -238,8 +239,6 @@ const resources = [
 
     {!HERO_ART && <script is:inline defer src="/hero-field.js"></script>}
     {HERO_ART && <script is:inline async src="/hero-art.js"></script>}
-    {/* DEV ONLY: remove before shipping. URL params drive the painting's layers. */}
-    {HERO_ART && <script is:inline defer src="/hero-art-dev.js"></script>}
   </section>
 
   <Section
@@ -460,11 +459,10 @@ const resources = [
     }
   }
 
-  /* Painting test (HERO_ART): the painting fills the hero under four veils of
-     the page ground (--bg, so each turns dark in the dark theme): a uniform
-     wash, a vertical fade, a halo behind the headline and a band under the
-     floating header. The custom properties let the variants be switched at
-     runtime (public/hero-art-dev.js reads them from the URL). */
+  /* The painting (HERO_ART) fills the hero under four veils of the page
+     ground (--bg, so each turns dark in the dark theme): a uniform wash, a
+     vertical fade, a halo behind the headline and a band under the floating
+     header. The custom properties hold the design's settings. */
   .hero--art {
     --hero-art-x: 68%; /* horizontal focal point: >50% shows more of the right side of the painting */
     --hero-art-y: 30%; /* keeps the sky above the trees on wide windows */
@@ -479,7 +477,13 @@ const resources = [
     --hero-halo-h: 40%;
     --hero-halo-y: 45%; /* the headline's centre at 1440x900 (402px of 900) */
     --hero-band: 0; /* veil under the floating header (0..1); 0.45 in the dark theme */
-    --hero-halo-blur: 0px; /* blurred halo, on only with data-halo-blur (dev: ?blur=14) */
+  }
+
+  /* 2:1 and wider (1920x900): lower the frame, or the tree tops sit under the header. */
+  @media (min-aspect-ratio: 2/1) {
+    .hero--art {
+      --hero-art-y: 22%;
+    }
   }
 
   /* Phones: the headline wraps to three lines, fills the width and sits
@@ -582,21 +586,6 @@ const resources = [
     );
   }
 
-  /* The blurred halo, mikeoss.com's technique behind its headline: the
-     painting behind the headline is blurred, not tinted (a light tint may
-     stay), inside a radial mask on the halo's ellipse. Only with
-     data-halo-blur, so backdrop-filter costs nothing while it is off. */
-  .hero--art[data-halo-blur] .hero-art-halo {
-    -webkit-backdrop-filter: blur(var(--hero-halo-blur)) saturate(0.9);
-    backdrop-filter: blur(var(--hero-halo-blur)) saturate(0.9);
-    mask-image: radial-gradient(
-      ellipse var(--hero-halo-w, 62%) var(--hero-halo-h, 40%) at var(--hero-halo-x, 50%) var(--hero-halo-y, 45%),
-      #000 22%,
-      #000000ad 52%,
-      #0000 80%
-    );
-  }
-
   .hero-art-band {
     background: linear-gradient(
       to bottom,
@@ -615,32 +604,19 @@ const resources = [
   /* Text over the painting. The headline keeps its navy in the light theme
      and turns pure white in the dark one; the floating header (only while it
      floats over this hero, unscrolled) sets its links in full --ink (light)
-     or white (dark) instead of the muted --ink-2. --hero-text-shadow (0..1,
-     default 0) scales an optional shadow: a cream glow in light, a soft dark
-     shadow in dark. --hero-nav-weight sets the links' weight over the hero.
-     These live on <body> because the header sits outside the hero. */
+     or white (dark) instead of the muted --ink-2. The nav ink lives on
+     <body> because the header sits outside the hero. */
   :global(body:has(.hero--art)) {
-    --hero-text-shadow: 0;
-    --hero-nav-weight: 400;
     --hero-nav-ink: var(--ink);
-    --hero-shadow:
-      0 0 2px color-mix(in srgb, var(--bg) calc(var(--hero-text-shadow) * 100%), transparent),
-      0 0 18px color-mix(in srgb, var(--bg) calc(var(--hero-text-shadow) * 100%), transparent);
   }
 
   :global(:root[data-theme='dark'] body:has(.hero--art)) {
     --hero-nav-ink: #ffffff;
-    --hero-shadow:
-      0 1px 2px rgb(0 0 0 / calc(0.35 * var(--hero-text-shadow))),
-      0 0 24px rgb(0 0 0 / calc(0.25 * var(--hero-text-shadow)));
   }
 
   @media (prefers-color-scheme: dark) {
     :global(:root:not([data-theme='light']) body:has(.hero--art)) {
       --hero-nav-ink: #ffffff;
-      --hero-shadow:
-        0 1px 2px rgb(0 0 0 / calc(0.35 * var(--hero-text-shadow))),
-        0 0 24px rgb(0 0 0 / calc(0.25 * var(--hero-text-shadow)));
     }
   }
 
@@ -659,23 +635,8 @@ const resources = [
     }
   }
 
-  /* Dev variant (?ink=dark in hero-art-dev.js): the headline in the near-black
-     --ink instead of the navy. Light theme only: the dark rules above outrank it. */
-  .hero--art[data-ink='dark'] {
-    --hero-ink: var(--ink);
-  }
-
-  .hero--art .hero-title {
-    text-shadow: var(--hero-shadow);
-  }
-
   :global(body:has(.hero--art) .site-header[data-overlay]:not(.is-scrolled) :is(.wordmark, .nav-link, .nav-trigger, .chev, .icon-btn)) {
     color: var(--hero-nav-ink);
-    text-shadow: var(--hero-shadow);
-  }
-
-  :global(body:has(.hero--art) .site-header[data-overlay]:not(.is-scrolled) :is(.nav-link, .nav-trigger)) {
-    font-weight: var(--hero-nav-weight);
   }
 
   /* Headline and CTA, centred in the space above the strip. The top padding
