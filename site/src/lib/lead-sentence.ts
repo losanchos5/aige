@@ -46,6 +46,17 @@ const CLAUSE_END =
 const QUALIFIER =
   /^(?:unless|except|excluding|only|provided|providing|where|wherever|when|whenever|if|save|subject to|other than|as long as|so long as|insofar|to the extent|but|and|or|nor)\b/i;
 
+/**
+ * Words that restrict the rule wherever they sit in the rest of the sentence,
+ * not only right after the clause end: "lets anyone copy lawfully accessible
+ * works for mining, including AI training, unless the rightholder has reserved
+ * that use" cut at ", including" states an unconditional right (CONTENT
+ * N-R3-1). A cut whose dropped remainder holds one of them, opening a phrase
+ * (a word follows, so not "which data may go where, ..."), is refused.
+ */
+const RESTRICTING =
+  /\b(?:unless|except|excluding|only|provided|providing|where|wherever|when|whenever|if|subject to|to the extent|insofar|as long as|so long as|other than|but not|save (?:where|when|for|that|as))\s+[\w("“]/i;
+
 /** A list enumerator at the start of an item: "(a) ", "(ii) ", "b) ", "2. ". */
 const ENUMERATOR = /^\(?(?:[a-z]|[ivx]+|\d+)[).]\s/i;
 
@@ -140,8 +151,9 @@ function openColonList(head: string): boolean {
  * The longest head of `sentence` before a CLAUSE_END that fits `max` once
  * closed and keeps at least `floor` characters. A head is refused when it ends
  * on a word that wants what follows, when the clause after it opens with a
- * qualifier or an enumerator, at a "; " when the semicolons separate list
- * items (semicolonList), and at a comma inside the list a colon opens
+ * qualifier or an enumerator, when the rest of the sentence holds a
+ * restricting word anywhere (RESTRICTING), at a "; " when the semicolons
+ * separate list items (semicolonList), and at a comma inside the list a colon opens
  * (openColonList: "rules: which tools are approved, which data ...") or when
  * the sentence goes on with ", and" or ", or" (the clause sits inside a list
  * whose next item would be lost). Undefined when no head qualifies.
@@ -158,7 +170,7 @@ function cutAtClauseEnd(sentence: string, max: number, floor: number): string | 
     if (match.groups?.aside !== undefined && (openColonList(head) || /,\s(?:and|or)\s/.test(rest))) continue;
     if (head.length < floor || !balanced(head)) continue;
     if ((match.groups?.end?.startsWith(':') ? OPEN_END : LOOSE_END).test(head)) continue;
-    if (QUALIFIER.test(rest) || ENUMERATOR.test(rest)) continue;
+    if (QUALIFIER.test(rest) || ENUMERATOR.test(rest) || RESTRICTING.test(rest)) continue;
     best = closeSentence(head);
   }
   return best;
