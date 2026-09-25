@@ -11,19 +11,39 @@ import { getFigure } from '../../data/figures';
 import lineageSvg from '../../figures/instrument-lineage.svg?raw';
 import { frameworks, obligations, disclaimer } from '../../data/frameworks';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { collectionPage, lastModified } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Frameworks' }];
 // Block w2-fig-concepts: how the instruments relate, above the table.
 const lineage = getFigure('instrument-lineage')!;
+const description =
+  'The laws, standards, codes and control sets AI governance engineering maps against, with the obligation → artefact → stack-layer index from chapter 08.';
+
+// The page as a CollectionPage of the frameworks in its table, each at its row
+// anchor, dated like the sitemap's lastmod.
+const jsonLd = [
+  collectionPage({
+    path: '/resources/frameworks',
+    name: 'Frameworks',
+    description,
+    dateModified: lastModified(
+      'src/pages/resources/frameworks.astro',
+      'src/data/frameworks.ts',
+      'src/figures/instrument-lineage.svg',
+    ),
+    items: frameworks.map((fw) => ({ name: fw.name, url: `/resources/frameworks#fw-${fw.id}` })),
+  }),
+  breadcrumbJsonLd(crumbs),
+];
 ---
 
 <Base
   title="Frameworks"
-  description="The laws, standards, codes and control sets AI governance engineering maps against, with the obligation → artefact → stack-layer index from chapter 08."
+  description={description}
   image="/og/resources.png"
-  jsonLd={breadcrumbJsonLd(crumbs)}
+  jsonLd={jsonLd}
 >
   <PageHero
     variant="res"

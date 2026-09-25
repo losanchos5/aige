@@ -6,6 +6,8 @@
  */
 import { site } from '../data/site';
 import { siteGraph, type JsonLdInput } from '../lib/jsonld';
+import { linkBreadcrumbs } from '../lib/breadcrumbs';
+import { documentTitle, metaDescription, ogImageAlt } from '../lib/meta';
 
 interface Props {
   title: string;
@@ -18,8 +20,9 @@ interface Props {
   jsonLd?: JsonLdInput;
   /** hreflang alternates, e.g. Spanish translations of the page. */
   alternates?: { hreflang: string; href: string }[];
-  /** Append ` · {site.name}` to the document title (default true). The home
-      page and any page whose title already names the site pass false. */
+  /** Append ` · {site.name}` to the document title (default true), when the
+      result stays within 60 characters (lib/meta.ts). The home page and any
+      page whose title already names the site pass false. */
   titleSuffix?: boolean;
   /** Article metadata. Present on the dated, authored long reads (the Thesis
       translations and the Body of Knowledge chapters): it switches `og:type` to
@@ -35,12 +38,17 @@ interface Props {
   noindex?: boolean;
 }
 
+// build.format is 'file', so Astro.url.pathname carries a `.html` suffix; the
+// page's own URL mirrors the clean URLs used by the nav, sitemap and JSON-LD.
+const selfUrl = new URL(
+  Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '/'),
+  site.url,
+).href;
+
 const {
   title,
   description = site.description,
-  // build.format is 'file', so Astro.url.pathname carries a `.html` suffix;
-  // the canonical mirrors the clean URLs used by the nav, sitemap and JSON-LD.
-  canonical = new URL(Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '/'), site.url).href,
+  canonical = selfUrl,
   image = '/og/default.png',
   locale = 'en_US',
   jsonLd,
@@ -51,50 +59,50 @@ const {
 } = Astro.props;
 
 // A search snippet is capped at ~160 characters. Most descriptions are written
-// to that budget already; a chapter's lede is written for reading, so it is
-// trimmed here on a word boundary with the same `…` the chapter manifest uses
-// (see data/chapters.ts, "summaries … trimmed to <=160 chars").
-const MAX_DESCRIPTION = 160;
-function snippet(text: string): string {
-  const clean = text.replace(/\s+/g, ' ').trim();
-  if (clean.length <= MAX_DESCRIPTION) return clean;
-  const cut = clean.slice(0, MAX_DESCRIPTION - 1);
-  const lastSpace = cut.lastIndexOf(' ');
-  return `${(lastSpace > 0 ? cut.slice(0, lastSpace) : cut).replace(/[\s,;:.]+$/, '')}…`;
-}
-
-const metaDescription = snippet(description);
+// to that budget already; a chapter's lede or a glossary definition is written
+// for reading, so lib/meta.ts cuts it at a sentence end, or else on a word
+// boundary with a `…`, never mid-word.
+const metaDescriptionText = metaDescription(description);
 const ogImage = new URL(image, site.url).href;
 // The one place the site name is appended: layouts and pages pass the bare page
-// title, so no title can carry the suffix twice.
-const pageTitle = titleSuffix ? `${title} · ${site.name}` : title;
+// title, so no title can carry the suffix twice, and the suffix is dropped when
+// it would push the title past 60 characters.
+const pageTitle = documentTitle(title, site.name, titleSuffix);
 // Every OG card this site ships is a 1200x630 PNG (src/pages/og/[...slug].png.ts),
 // so the dimensions and type are stated for the scrapers that pre-allocate the
 // card before fetching the bytes.
 const OG_IMAGE_WIDTH = '1200';
 const OG_IMAGE_HEIGHT = '630';
 const OG_IMAGE_TYPE = 'image/png';
-// The card renders the page title, so the title is also its alternative text.
-const ogImageAlt = pageTitle;
+// A card rendered for this page shows its title, so the title is its alternative
+// text; a shared section card is described by what it shows (lib/meta.ts).
+const ogAlt = ogImageAlt({ image, title, documentTitle: pageTitle, siteName: site.name });
 const articleAuthor = article?.author ?? site.author;
-// Exactly one ld+json block per page: Organization + WebSite + the page's nodes.
-const graph = siteGraph(jsonLd);
+// Exactly one ld+json block per page: Organization + WebSite + the page's nodes,
+// with the BreadcrumbList @id'd `<page url>#breadcrumb` and linked from the
+// page's WebPage node.
+const siteNodes = siteGraph(jsonLd);
+const graph = {
+  ...siteNodes,
+  '@graph': linkBreadcrumbs(siteNodes['@graph'] as Record<string, unknown>[], selfUrl),
+};
 ---
 
 <title>{pageTitle}</title>
-<meta name="description" content={metaDescription} />
+<meta name="description" content={metaDescriptionText} />
 {noindex && <meta name="robots" content="noindex" />}
 <link rel="canonical" href={canonical} />
+<link rel="license" href={site.licenseUrl} />
 
 {alternates?.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
 
 <meta property="og:type" content={article ? 'article' : 'website'} />
 <meta property="og:site_name" content={site.name} />
 <meta property="og:title" content={pageTitle} />
-<meta property="og:description" content={metaDescription} />
+<meta property="og:description" content={metaDescriptionText} />
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
-<meta property="og:image:alt" content={ogImageAlt} />
+<meta property="og:image:alt" content={ogAlt} />
 <meta property="og:image:width" content={OG_IMAGE_WIDTH} />
 <meta property="og:image:height" content={OG_IMAGE_HEIGHT} />
 <meta property="og:image:type" content={OG_IMAGE_TYPE} />
@@ -116,9 +124,9 @@ const graph = siteGraph(jsonLd);
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={pageTitle} />
-<meta name="twitter:description" content={metaDescription} />
+<meta name="twitter:description" content={metaDescriptionText} />
 <meta name="twitter:image" content={ogImage} />
-<meta name="twitter:image:alt" content={ogImageAlt} />
+<meta name="twitter:image:alt" content={ogAlt} />
 
 {
   /* JSON-LD is a data block, not executable script, so CSP script-src does

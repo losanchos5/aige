@@ -4,6 +4,13 @@ import { resolve } from 'node:path';
 import Doc from '../../layouts/Doc.astro';
 import NewsletterForm from '../../components/NewsletterForm.astro';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import {
+  authorRefs,
+  lastModified,
+  ORG_ID,
+  PROFILE_PAGE_ID,
+  WEBSITE_ID,
+} from '../../lib/jsonld';
 import { site } from '../../data/site';
 
 // Link the built Body-of-Knowledge PDF only when it exists at build time, so a
@@ -23,16 +30,45 @@ try {
 } catch {
   // No PDF in this environment; the download link is omitted below.
 }
+
+const description =
+  'What this site is, who maintains it and how to contribute: the founding text and working reference for engineering the governance of AI systems.';
+
+// The author as the preface states him (bok/00-preface.md, "Who wrote it, and
+// from what"): the role from data/site.ts and the experience sentence, nothing
+// beyond it.
+const author = site.authorDetails[0];
+const experience =
+  'Two and a half years designing and operating an AI governance framework inside a large telco, sitting between Legal, Security and Engineering, and covering the governance, security, compliance, business and model-performance dimensions of AI risk.';
+const githubProfile = author.sameAs?.find((url) => url.startsWith('https://github.com/'));
+
+// /about is the author's profile page: its main entity is the Person node
+// (lib/jsonld.ts), which Seo.astro adds to the graph because it is referenced.
+const jsonLd = [
+  {
+    '@type': 'ProfilePage',
+    '@id': PROFILE_PAGE_ID,
+    name: 'About this site',
+    description,
+    url: new URL('/about', site.url).href,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    mainEntity: authorRefs[0],
+    dateModified: lastModified('src/pages/about/index.astro', 'src/data/site.ts'),
+  },
+  breadcrumbJsonLd([{ label: 'About' }]),
+];
 ---
 
 <Doc
   title="About this site"
   summary="What this is, who maintains it, and how to contribute."
-  description="What this site is, who maintains it and how to contribute: the founding text and working reference for engineering the governance of AI systems."
+  description={description}
   sidebar={false}
   wide={true}
   image="/og/about.png"
-  jsonLd={breadcrumbJsonLd([{ label: 'About' }])}
+  jsonLd={jsonLd}
 >
   <p>
     <strong>{site.name}</strong> is the home of <em>AI Governance Engineering: The Thesis &amp; Body
@@ -43,11 +79,33 @@ try {
 
   <h2>Who maintains it</h2>
   <p>
-    Written and maintained by {site.author}, AI Governance Engineer. Jorge García Aibar is the sole
-    author of the Body of Knowledge, website, datasets and project materials. The Thesis is the sole
-    exception and is co-authored by Jorge García Aibar and Aurélie Pols. This is a public draft and
-    invites practitioners who build governance for AI systems to propose improvements.
+    Written and maintained by {site.author}, {author.jobTitle}, sole author of the Body of
+    Knowledge, website, datasets and project materials. The Thesis is the sole exception and is
+    co-authored by Jorge García Aibar and Aurélie Pols. This is a public draft and invites
+    practitioners who build governance for AI systems to propose improvements.
   </p>
+
+  <h2 id="author">About the author</h2>
+  <dl class="about-facts">
+    <dt>Name</dt>
+    <dd>{author.name}</dd>
+    <dt>Role</dt>
+    <dd>{author.jobTitle}</dd>
+    <dt>Experience</dt>
+    <dd>{experience}</dd>
+    <dt>Profiles</dt>
+    <dd>
+      <a href={site.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+      {
+        githubProfile && (
+          <Fragment>
+            {' · '}
+            <a href={githubProfile} target="_blank" rel="noopener noreferrer">GitHub</a>
+          </Fragment>
+        )
+      }
+    </dd>
+  </dl>
 
   <h2 id="work-together">Let’s work together</h2>
   <p>
@@ -165,5 +223,29 @@ try {
   :global(.prose) > p,
   :global(.prose) > ul {
     color: var(--ink-2);
+  }
+
+  /* The author facts: label and value on one row where there is room. */
+  .about-facts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-2) var(--s-5);
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  .about-facts dt {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .about-facts dd {
+    margin: 0;
+  }
+
+  @media (min-width: 560px) {
+    .about-facts {
+      grid-template-columns: max-content minmax(0, 1fr);
+    }
   }
 </style>

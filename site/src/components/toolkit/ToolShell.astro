@@ -21,7 +21,7 @@ import Base from '../../layouts/Base.astro';
 import PageHero from '../PageHero.astro';
 import { toolNotice, type ToolEntry } from '../../data/toolkit';
 import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
-import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import { site } from '../../data/site';
 import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/resources.css';
@@ -63,6 +63,14 @@ const {
 
 const crumbs: Crumb[] = [{ label: 'Toolkit', href: '/toolkit' }, { label: tool.title }];
 const pageUrl = new URL(tool.href, site.url).href;
+// Dated by the last commit to the tool page, this shell or the tool registry;
+// a tool's own data module is not known here, so the sitemap's lastmod (which
+// lists it) can be newer.
+const updated = lastModified(
+  `src/pages/toolkit/${tool.id}.astro`,
+  'src/components/toolkit/ToolShell.astro',
+  'src/data/toolkit.ts',
+);
 
 const jsonLd = [
   breadcrumbJsonLd(crumbs),
@@ -78,7 +86,9 @@ const jsonLd = [
     isAccessibleForFree: true,
     inLanguage: 'en',
     creator: [...authorRefs],
+    author: [...authorRefs],
     publisher: { '@id': ORG_ID },
+    dateModified: updated,
     isPartOf: { '@id': WEBSITE_ID },
     license: site.licenseUrl,
     ...(tool.chapter ? { isBasedOn: new URL(tool.chapter.href, site.url).href } : {}),

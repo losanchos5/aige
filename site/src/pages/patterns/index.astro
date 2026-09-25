@@ -12,7 +12,7 @@ import { layers } from '../../data/stack';
 import { loadPatternPages } from '../../lib/pattern-pages';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { fitsSiteSuffix } from '../../lib/seo-title';
-import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { authorNodes, authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/patterns.css';
 
@@ -43,6 +43,11 @@ const jsonLd = [
     isPartOf: { '@id': WEBSITE_ID },
     publisher: { '@id': ORG_ID },
     author: [...authorRefs],
+    dateModified: lastModified(
+      'src/pages/patterns/index.astro',
+      'src/data/patterns.ts',
+      '../bok/patterns',
+    ),
     hasPart: pages.map((page) => ({
       '@id': `${new URL(`/patterns/${page.def.slug}`, site.url).href}#article`,
     })),

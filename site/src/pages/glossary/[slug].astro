@@ -23,7 +23,7 @@ import {
   type GlossaryEntry,
 } from '../../lib/glossary';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
-import { WEBSITE_ID } from '../../lib/jsonld';
+import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
@@ -84,7 +84,25 @@ const crumbs = [
   { label: entry.term },
 ];
 
+// The term page itself: authored and dated like the rest of the book. A
+// DefinedTerm takes neither `author` nor `dateModified`, so they sit on the
+// WebPage whose main entity the term is, dated from the same sources as the
+// sitemap's lastmod (the template and the glossary chapter).
+const glossaryUpdated = lastModified('src/pages/glossary/[slug].astro', '../bok/09-glossary.md');
+
 const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#webpage`,
+    name: title,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    mainEntity: { '@id': `${pageUrl}#term` },
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    dateModified: glossaryUpdated,
+  },
   {
     '@type': 'DefinedTerm',
     '@id': `${pageUrl}#term`,

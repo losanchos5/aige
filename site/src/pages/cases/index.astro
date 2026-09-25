@@ -5,7 +5,7 @@ import Callout from '../../components/Callout.astro';
 import { site } from '../../data/site';
 import { cases, caseEvidenceLabel, casesDisclaimer } from '../../data/cases';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
-import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { authorNodes, authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 import '../../styles/harms.css';
@@ -26,6 +26,7 @@ const jsonLd = [
     isPartOf: { '@id': WEBSITE_ID },
     publisher: { '@id': ORG_ID },
     author: [...authorRefs],
+    dateModified: lastModified('src/pages/cases/index.astro', 'src/data/cases.ts'),
     hasPart: cases.map((c) => ({ '@id': `${new URL(`/cases/${c.id}`, site.url).href}#article` })),
   },
   ...authorNodes,

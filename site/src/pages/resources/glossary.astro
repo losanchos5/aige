@@ -11,7 +11,7 @@ import ContrastCards from '../../components/ContrastCards.astro';
 import { getGlossary, getGlossaryLetters, getContrastPairs } from '../../lib/glossary';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { site } from '../../data/site';
-import { WEBSITE_ID } from '../../lib/jsonld';
+import { glossaryTermSet, lastModified } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
@@ -20,31 +20,14 @@ const letters = getGlossaryLetters();
 const pairs = getContrastPairs();
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Glossary' }];
 
-// The glossary is genuinely structured, so it is stated as a DefinedTermSet.
-// The set's identity is the book index (/bok/glossary#glossary) and each term's
-// is its own page (/glossary/<slug>#term), the same @ids the term pages carry.
+// The glossary is genuinely structured, so it is stated as a DefinedTermSet,
+// the same node /bok/glossary carries (lib/jsonld.ts glossaryTermSet).
 const glossaryUrl = new URL('/bok/glossary', site.url).href;
-const termSetId = `${glossaryUrl}#glossary`;
 const jsonLd = [
-  {
-    '@type': 'DefinedTermSet',
-    '@id': termSetId,
-    name: `Glossary · ${site.name}`,
-    url: glossaryUrl,
-    inLanguage: 'en',
-    isPartOf: { '@id': WEBSITE_ID },
-    hasDefinedTerm: entries.map((entry) => {
-      const termUrl = new URL(entry.url, site.url).href;
-      return {
-        '@type': 'DefinedTerm',
-        '@id': `${termUrl}#term`,
-        name: entry.term,
-        description: entry.definition,
-        url: termUrl,
-        inDefinedTermSet: { '@id': termSetId },
-      };
-    }),
-  },
+  glossaryTermSet(
+    entries,
+    lastModified('src/pages/resources/glossary.astro', '../bok/09-glossary.md'),
+  ),
   breadcrumbJsonLd(crumbs),
 ];
 ---

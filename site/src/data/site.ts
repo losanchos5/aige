@@ -9,6 +9,12 @@ export interface Author {
   name: string;
   url?: string;
   sameAs?: readonly string[];
+  /** The role the site states for the author (bok/00-preface.md). */
+  jobTitle?: string;
+  /** One or two sentences, restating only what the preface and /about say. */
+  description?: string;
+  /** Subjects the author's stated work covers (schema.org `knowsAbout`). */
+  knowsAbout?: readonly string[];
 }
 
 export interface SiteConfig {
@@ -18,6 +24,7 @@ export interface SiteConfig {
   linkedin: string;
   email: string;
   github: string;
+  /** The author's full name, as the JSON-LD Person and every byline state it. */
   author: string;
   authors: readonly string[];
   /** Per-author metadata for structured data; keyed by the names in `authors`. */
@@ -51,10 +58,31 @@ export const site: SiteConfig = {
   linkedin: 'https://www.linkedin.com/in/jorgara',
   email: 'jorgegarciaaibar@gmail.com',
   github: 'https://github.com/losanchos5/aige',
-  author: 'Jorge García',
+  author: 'Jorge García Aibar',
   authors: ['Jorge García Aibar'],
   authorDetails: [
-    { name: 'Jorge García Aibar', sameAs: ['https://www.linkedin.com/in/jorgara'] },
+    {
+      name: 'Jorge García Aibar',
+      url: 'https://aigovernanceengineer.com/about',
+      // Role, experience and subjects as bok/00-preface.md ("Who wrote it, and
+      // from what") states them; nothing beyond that.
+      jobTitle: 'AI Governance & Privacy Engineer',
+      description:
+        'AI Governance & Privacy Engineer. Two and a half years designing and operating an AI governance framework inside a large telco, between Legal, Security and Engineering. Author of the AI Governance Engineering Body of Knowledge and co-author of its Thesis.',
+      knowsAbout: [
+        'AI governance',
+        'AI governance engineering',
+        'GRC engineering',
+        'AI risk management',
+        'Privacy engineering',
+        'EU AI Act',
+        'ISO/IEC 42001',
+        'NIST AI Risk Management Framework',
+      ],
+      // LinkedIn and the GitHub account that owns the project repository. TODO:
+      // add the ORCID iD here once one exists (none has been registered yet).
+      sameAs: ['https://www.linkedin.com/in/jorgara', 'https://github.com/losanchos5'],
+    },
   ],
   license: 'CC BY 4.0',
   licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
