@@ -6,7 +6,7 @@ import { describe, it } from 'node:test';
 
 import { loadConfig, siteBaseOf } from '../src/config.js';
 import { parseCorpus, plainHeading } from '../src/corpus.js';
-import { RateLimiter } from '../src/ratelimit.js';
+import { RateLimiter, clientBucket } from '../src/ratelimit.js';
 import { LAYERS, patternSlug } from '../src/tools/common.js';
 import { refKey } from '../src/tools/crosswalk.js';
 import { normalise, score, snippet, suggest, tokens } from '../src/text.js';
@@ -22,6 +22,8 @@ describe('config', () => {
     assert.deepEqual(c.allowedOrigins, ['*']);
     assert.deepEqual(c.allowedHosts, ['localhost', '127.0.0.1', '[::1]']);
     assert.equal(c.trustProxy, false);
+    assert.deepEqual(c.trustedProxies, []);
+    assert.equal(c.maxConcurrentRequests, 16);
   });
 
   it('derives the site base and the host allowlist', () => {
@@ -41,6 +43,13 @@ describe('config', () => {
     assert.throws(() => loadConfig({ API_BASE: 'https://user:pw@x/api/v1' }), /API_BASE/);
     assert.throws(() => loadConfig({ LOG_LEVEL: 'loud' }), /LOG_LEVEL/);
     assert.throws(() => loadConfig({ RATE_LIMIT_MAX: '0' }), /RATE_LIMIT_MAX/);
+    assert.throws(() => loadConfig({ TRUSTED_PROXIES: 'caddy' }), /TRUSTED_PROXIES/);
+    assert.throws(() => loadConfig({ MAX_CONCURRENT_REQUESTS: '0' }), /MAX_CONCURRENT_REQUESTS/);
+  });
+
+  it('reads the trusted proxy addresses', () => {
+    const c = loadConfig({ TRUST_PROXY: 'true', TRUSTED_PROXIES: '172.30.87.2, ::ffff:10.0.0.1, FD00::2' });
+    assert.deepEqual(c.trustedProxies, ['172.30.87.2', '10.0.0.1', 'fd00::2']);
   });
 });
 
@@ -186,6 +195,29 @@ describe('rate limiter', () => {
     now = 1500;
     assert.equal(limiter.hit('a').allowed, true, 'a new window');
     assert.equal(limiter.size, 1, 'the expired entry of b was swept');
+  });
+
+  it('flags only the first refusal of a window', () => {
+    const limiter = new RateLimiter({ max: 1, windowMs: 1000, now: () => 0 });
+    assert.equal(limiter.hit('a').firstRefusal, false);
+    assert.equal(limiter.hit('a').firstRefusal, true);
+    assert.equal(limiter.hit('a').firstRefusal, false);
+  });
+
+  it('counts an IPv6 client by its /64 and an IPv4-mapped address as IPv4', () => {
+    assert.equal(clientBucket('2001:db8:1:2:a:b:c:d'), '2001:0db8:0001:0002::/64');
+    assert.equal(clientBucket('2001:DB8:1:2::99'), '2001:0db8:0001:0002::/64');
+    assert.equal(clientBucket('2001:db8::1'), '2001:0db8:0000:0000::/64');
+    assert.equal(clientBucket('::1'), '0000:0000:0000:0000::/64');
+    assert.equal(clientBucket('fe80::1%eth0'), 'fe80:0000:0000:0000::/64');
+    assert.equal(clientBucket('64:ff9b::192.0.2.33'), '0064:ff9b:0000:0000::/64');
+    assert.equal(clientBucket('::ffff:198.51.100.7'), '198.51.100.7');
+    assert.equal(clientBucket('198.51.100.7'), '198.51.100.7');
+    assert.equal(clientBucket('unknown'), 'unknown');
+    const limiter = new RateLimiter({ max: 1, windowMs: 1000, now: () => 0 });
+    assert.equal(limiter.hit('2001:db8:1:2::1').allowed, true);
+    assert.equal(limiter.hit('2001:db8:1:2::2').allowed, false, 'another address in the same /64 shares the window');
+    assert.equal(limiter.hit('2001:db8:1:3::1').allowed, true, 'another /64 has its own window');
   });
 
   it('bounds the table', () => {
