@@ -174,6 +174,7 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
     ['src/pages/obligations/index.astro', 'src/data/frameworks.ts', 'src/lib/obligations.ts'],
   ],
   ['/resources/data', ['src/pages/resources/data.astro', 'src/lib/api.ts']],
+  ['/mcp', ['src/pages/mcp.astro']],
   // Block b-glossary (v0.5.0): one canonical page per glossary term, all rendered
   // from the same template and the glossary chapter (src/lib/glossary.ts).
   ...getGlossary().map(

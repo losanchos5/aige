@@ -20,6 +20,7 @@ const ROUTES: Record<string, string> = {
   obligations: 'The obligation register',
   figures: 'Figures of the Body of Knowledge',
   data: 'Open data and API',
+  mcp: 'The Body of Knowledge in your AI assistant',
   for: 'Routes by audience',
 };
 
