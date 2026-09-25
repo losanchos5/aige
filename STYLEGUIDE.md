@@ -4,7 +4,7 @@ This guide governs every file in this repository. It exists so that chapters wri
 people, at different times, read as one book. Read it before you write. If a rule here conflicts with
 your instinct, follow the rule or open a pull request to change the rule. Do not quietly diverge.
 
-Version 0.4.0 · 2026-09-19. Maintainer: Jorge García Aibar.
+Version 0.5.0 · 2026-09-25. Maintainer: Jorge García Aibar.
 
 ---
 
@@ -43,7 +43,7 @@ We write as practitioners, for practitioners. The reader is building something o
   cells short; put prose in the paragraphs around the table, not inside it.
 - **Callout boxes** are plain blockquotes with a bold label (see §4 and §5).
 - **Dates.** Write `2 Aug 2026` in prose, `2026-08-02` in tables and front matter. Today's reference
-  date for v0.4.0 is 2026-09-19.
+  date for v0.5.0 is 2026-09-24.
 - **Numbers.** Spell out one to nine in prose unless paired with a unit or a percentage; use figures
   for 10 and above and for all money, versions and article numbers.
 - **Dashes.** No em dashes (U+2014). Use a comma pair, a colon, a semicolon, a full stop or parentheses

@@ -1,6 +1,6 @@
 # La Tesis de la Ingeniería de Gobernanza de IA
 
-Versión 0.4.0 · 2026-09-19 · Jorge García Aibar y Aurélie Pols
+Versión 0.5.0 · 2026-09-25 · Jorge García Aibar y Aurélie Pols
 
 _Traducción al español de `THESIS.md` (2026-09-20). En caso de discrepancia, prevalece el texto original en inglés._
 
@@ -212,13 +212,13 @@ detalle.
 
 ## Autores
 
-**Jorge García Aibar (v0.1–v0.4.0)**, AI Governance & Privacy Engineer. LinkedIn:
+**Jorge García Aibar (v0.1–v0.5.0)**, AI Governance & Privacy Engineer. LinkedIn:
 https://www.linkedin.com/in/jorgara
 
-**Aurélie Pols (v0.1–v0.4.0)**, Responsible AI (EU/Global), Privacy & Data Governance. LinkedIn:
+**Aurélie Pols (v0.1–v0.5.0)**, Responsible AI (EU/Global), Privacy & Data Governance. LinkedIn:
 https://www.linkedin.com/in/aureliepols
 
-**Se buscan coautores.** Esta es la versión 0.4.0: un borrador público, deliberadamente incompleto. Lo
+**Se buscan coautores.** Esta es la versión 0.5.0: un borrador público, deliberadamente incompleto. Lo
 empezó un solo profesional y necesita a muchos. Si construyes gobernanza para sistemas de IA (policy-as-
 code, registros de agentes, eval gates, guardrails de ejecución, aseguramiento continuo) y puedes aportar
 un hecho verificado, un patrón que funcionó o un argumento más afilado, se te invita a coescribir. La

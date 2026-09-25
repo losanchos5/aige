@@ -105,16 +105,16 @@ This is not a compliance checklist, and it is not legal advice. It does not tell
 system is compliant; it tells you how to build the controls and the evidence that let someone qualified
 make that call. It is not an AI safety research agenda, an MLOps handbook, or a vendor buyer's guide;
 tools are named only as illustrative examples of a category, never as endorsements. And it is not
-finished. Version 0.4.0 is a public draft with deliberate gaps open to contributions.
+finished. Version 0.5.0 is a public draft with deliberate gaps open to contributions.
 
 ## How to cite
 
-> García Aibar, J. *AI Governance Engineering: The Body of Knowledge*, v0.4.0. 2026.
+> García Aibar, J. *AI Governance Engineering: The Body of Knowledge*, v0.5.0. 2026.
 > https://aigovernanceengineer.com/bok. Licensed CC BY 4.0.
 
 For the Thesis, cite both co-authors:
 
-> García Aibar, J., & Pols, A. *The AI Governance Engineering Thesis*, v0.4.0. 2026.
+> García Aibar, J., & Pols, A. *The AI Governance Engineering Thesis*, v0.5.0. 2026.
 > https://aigovernanceengineer.com/thesis. Licensed CC BY 4.0.
 
 Cite a specific chapter by its number and title (for example, "chapter 01, The definition"). The
@@ -124,7 +124,7 @@ the consolidated table lives in `sources/SOURCES.md`.
 
 ## Versioning
 
-This is **v0.4.0**, a public draft. Versioning is semantic in spirit: patch releases fix facts
+This is **v0.5.0**, a public draft. Versioning is semantic in spirit: patch releases fix facts
 and typos, minor releases add chapters or patterns, and a 1.0 will mark the point at which the core
 chapters (00–10) are complete and reviewed. Every change is recorded in `bok/CHANGELOG.md`. Because
 the regulatory and standards landscape moves (the Digital Omnibus reform, harmonised standards under

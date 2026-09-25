@@ -1,6 +1,6 @@
 # Outline (AI Governance Engineering: The Thesis & Body of Knowledge)
 
-Version 0.4.0 · 2026-09-19. This is the full table of contents. Each chapter has a short brief so that
+Version 0.5.0 · 2026-09-25. This is the full table of contents. Each chapter has a short brief so that
 parallel writers stay consistent. Follow `STYLEGUIDE.md` for voice, templates and citations. All
 chapters are marked **[drafted]**; contributors may propose extensions, corrections and new ones.
 

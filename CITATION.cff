@@ -10,12 +10,12 @@ abstract: >-
 authors:
   - family-names: "García Aibar"
     given-names: "Jorge"
-version: "0.4.0"
-date-released: "2026-09-20"
+version: "0.5.0"
+date-released: "2026-09-25"
 url: "https://aigovernanceengineer.com"
 repository-code: "https://github.com/losanchos5/aige"
 license: CC-BY-4.0
-doi: 10.5281/zenodo.22857086  # this version (v0.4.0)
+doi: 10.5281/zenodo.22857084  # concept DOI until Zenodo mints the v0.5.0 version DOI
 identifiers:
   - type: doi
     value: 10.5281/zenodo.22857084
@@ -33,6 +33,6 @@ preferred-citation:
     - family-names: "García Aibar"
       given-names: "Jorge"
   year: 2026
-  version: "0.4.0"
+  version: "0.5.0"
   url: "https://aigovernanceengineer.com"
   license: CC-BY-4.0

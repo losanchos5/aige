@@ -7,7 +7,7 @@ website, datasets and project materials.
 LinkedIn: https://www.linkedin.com/in/jorgara
 
 **The Thesis is the sole exception.** It is co-authored by Jorge García Aibar and **Aurélie Pols**,
-Responsible AI (EU/Global), Privacy & Data Governance (v0.1–v0.4.0).
+Responsible AI (EU/Global), Privacy & Data Governance (v0.1–v0.5.0).
 LinkedIn: https://www.linkedin.com/in/aureliepols
 
 Accepted substantive contributions are credited below but do not change the authorship of the Body

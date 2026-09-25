@@ -9,7 +9,7 @@ reporting a primary fact; **reported** = carried only by secondary sources or no
 the primary (copy must say "reported").
 
 Verification date: v0.1 baseline 2026-09-10; v0.3.1 and v0.4.0 passes 2026-09-19; debt and date pass
-2026-09-24.
+2026-09-24; v0.5.0 fact-check pass 2026-09-24 and 2026-09-25.
 
 Columns: `# | Claim | Source | Publisher | Date | URL | Verified | Used in`
 
