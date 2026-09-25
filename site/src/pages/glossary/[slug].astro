@@ -3,14 +3,17 @@
  * /glossary/<slug>: the canonical page of one glossary term, generated from
  * bok/09-glossary.md (lib/glossary.ts). It carries the definition with its own
  * numbered sources, the sections that develop the term, the chapters that use
- * it, contrast cards for commonly confused pairs, related terms and a
- * ready-made citation. /bok/glossary stays the book's A-Z index.
+ * it, contrast cards for commonly confused pairs, the pattern pages that use
+ * it (lib/cross-links.ts), related terms and a ready-made citation. A byline
+ * under the H1 dates the page by the glossary chapter's last commit.
+ * /bok/glossary stays the book's A-Z index.
  */
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import CitedText from '../../components/CitedText.astro';
 import ContrastCards from '../../components/ContrastCards.astro';
 import TermCitation from '../../components/TermCitation.astro';
+import Byline from '../../components/Byline.astro';
 import { site } from '../../data/site';
 import { chaptersOrdered } from '../../data/chapters';
 import {
@@ -24,6 +27,10 @@ import {
 } from '../../lib/glossary';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { gitDate } from '../../lib/reading';
+import { leadSentence } from '../../lib/lead-sentence';
+import { patternsUsingTerm } from '../../lib/cross-links';
+import { patternPath } from '../../data/patterns';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
@@ -70,6 +77,14 @@ const chapterLinks = entry.chapterRefs
     label: `ch. ${String(c.order).padStart(2, '0')}, ${c.shortTitle}`,
     href: `/bok/${c.slug}`,
   }));
+
+// Pattern pages that use the term, most mentions first; the ten that use it most.
+const PATTERN_LIMIT = 10;
+const patternUses = patternsUsingTerm(entry.slug);
+// The page is generated from the glossary chapter: its last commit dates it.
+const updated = gitDate('../bok/09-glossary.md');
+// Meta description: the definition's opening sentence, not the whole paragraph.
+const description = leadSentence(entry.definition);
 
 // Title: "<term>: definition", with the site name when it still fits 70 chars.
 const title = `${entry.term}: definition`;
@@ -129,11 +144,13 @@ const jsonLd = [
 <Base
   title={title}
   titleSuffix={titleSuffix}
-  description={entry.definition}
+  description={description}
   image="/og/resources.png"
   jsonLd={jsonLd}
 >
-  <PageHero variant="res" mesh={false} crumbs={crumbs} title={entry.term} />
+  <PageHero variant="res" mesh={false} crumbs={crumbs} title={entry.term}>
+    <Byline slot="lede" date={updated} />
+  </PageHero>
 
   <div class="container res-page">
     <article class="gt-body" data-pagefind-body>
@@ -241,6 +258,33 @@ const jsonLd = [
       </section>
 
       {
+        patternUses.length > 0 && (
+          <section class="gt-section" aria-labelledby="in-patterns">
+            <div class="prose">
+              <h2 id="in-patterns">Patterns that use this term</h2>
+              <p>
+                {patternUses.length === 1
+                  ? 'One pattern page uses the term.'
+                  : patternUses.length > PATTERN_LIMIT
+                    ? `${patternUses.length} pattern pages use the term; the ${PATTERN_LIMIT} that use it most:`
+                    : `${patternUses.length} pattern pages use the term, most mentions first.`}
+              </p>
+              <ul class="gt-usage">
+                {patternUses.slice(0, PATTERN_LIMIT).map((use) => (
+                  <li>
+                    <a href={patternPath(use.pattern)}>{use.pattern.title}</a>
+                    <span class="gt-count">
+                      {use.count} {use.count === 1 ? 'mention' : 'mentions'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )
+      }
+
+      {
         related.length > 0 && (
           <section class="gt-section" aria-labelledby="related-terms">
             <div class="prose">
@@ -284,7 +328,7 @@ const jsonLd = [
         }
         <p class="gt-note">
           Definitions of legal terms paraphrase the cited text, which governs. Dated statements
-          are as of 2026-09-24.
+          are as of <time datetime="2026-09-24">2026-09-24</time>.
         </p>
       </section>
 

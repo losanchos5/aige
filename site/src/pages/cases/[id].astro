@@ -4,6 +4,7 @@ import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import CitedText from '../../components/CitedText.astro';
 import SourceList from '../../components/SourceList.astro';
+import Byline from '../../components/Byline.astro';
 import { site } from '../../data/site';
 import { obligationPath } from '../../data/frameworks';
 import { layers } from '../../data/stack';
@@ -17,6 +18,8 @@ import {
 import { citedNumbers } from '../../lib/sources';
 import { gitDate, gitCreated } from '../../lib/reading';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { patternById } from '../../lib/cross-links';
+import { patternPath } from '../../data/patterns';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
@@ -71,6 +74,16 @@ const pageUrl = new URL(`/cases/${entry.id}`, site.url).href;
 const updated = gitDate('src/data/cases.ts');
 const published = gitCreated('src/data/cases.ts');
 const crumbs = [{ label: 'Cases', href: '/cases' }, { label: entry.short }];
+// <title>: the case's short name and what the page is (audit F5): the full
+// headline stays the H1. A "(reported)" tag stays on the page, not in the title.
+const pageTitle = `${entry.short.replace(/\s*\([^)]*\)$/, '')}: AI incident case study`;
+// Each named control that is a catalogued pattern links its own page.
+const controls = entry.control.controls.map((ctl) => {
+  if (!ctl.patternId) return { name: ctl.name };
+  const pattern = patternById(ctl.patternId);
+  if (!pattern) throw new Error(`cases.ts: "${entry.id}" names unknown pattern "${ctl.patternId}"`);
+  return { name: ctl.name, href: patternPath(pattern) };
+});
 
 const jsonLd = [
   {
@@ -94,13 +107,15 @@ const jsonLd = [
 ---
 
 <Base
-  title={entry.title}
+  title={pageTitle}
   description={entry.summary}
   image="/og/resources.png"
   jsonLd={jsonLd}
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
 >
-  <PageHero variant="res" crumbs={crumbs} title={entry.title} lede={entry.summary} />
+  <PageHero variant="res" crumbs={crumbs} title={entry.title} lede={entry.summary}>
+    <Byline slot="lede" date={updated} />
+  </PageHero>
 
   <div class="container res-page">
     <div class="cs-body" data-pagefind-body>
@@ -173,10 +188,10 @@ const jsonLd = [
         <p>
           Patterns:{' '}
           {
-            entry.control.controls.map((ctl, i) => (
+            controls.map((ctl, i) => (
               <>
                 {i > 0 && ' · '}
-                {ctl.patternId ? <a href={`/bok/patterns#${ctl.patternId}`}>{ctl.name}</a> : ctl.name}
+                {ctl.href ? <a href={ctl.href}>{ctl.name}</a> : ctl.name}
               </>
             ))
           }

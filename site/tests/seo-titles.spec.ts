@@ -12,7 +12,7 @@ import { topics } from '../src/data/crosswalk';
 import { readSource } from '../src/lib/md-parse';
 import { inSitemap } from '../src/lib/sitemap-policy';
 
-const MAX_DOCUMENT_TITLE = 70;
+const MAX_DOCUMENT_TITLE = 60;
 
 /** The built HTML of a clean route (`/bok` → dist/bok.html or dist/bok/index.html). */
 function html(route: string): string {
@@ -107,9 +107,7 @@ test.describe('chapter search titles', () => {
 
 // Duplicates another block owns and fixes (seo-integral task 9 rewrites the
 // obligation title builder); drop an entry once its pages have their own titles.
-const KNOWN_DUPLICATES = new Set([
-  '/obligations/aige-obl-sg-agentic-checkpoints, /obligations/aige-obl-sg-agentic-identity',
-]);
+const KNOWN_DUPLICATES = new Set<string>([]);
 
 test('no two indexable pages share a <title>', () => {
   // English routes only: the machine translations are being taken off the site

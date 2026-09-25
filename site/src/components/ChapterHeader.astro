@@ -4,7 +4,9 @@
 // line. No eyebrow above the H1 (audit SL-04): a chapter's book and number are
 // already in the breadcrumb above the header. Everything sits in a full-bleed
 // band (.ch-band), neutral unless Doc.astro passes the layer of a chapter that is
-// about one stack layer (chapters.ts `layer`).
+// about one stack layer (chapters.ts `layer`). The meta line opens with the
+// author byline (audit C4/V2): the name the JSON-LD Person node carries, linked
+// to /about with rel="author".
 import { site } from '../data/site';
 import { intlLocale, translator } from '../i18n/ui';
 
@@ -18,9 +20,15 @@ interface Props {
   layer?: string;
   /** Page language, passed down by Doc; drives the meta line's labels. */
   lang?: string;
+  /** Show the author in the meta line. Default: on every dated page except the
+      Thesis (/thesis and its translations), which is co-authored and states
+      its own authorship. */
+  byline?: boolean;
 }
 
 const { title, summary, updated, words, minutes, layer, lang = 'en' } = Astro.props;
+const isThesis = /(^|\/)thesis(\.html)?\/?$/.test(Astro.url.pathname);
+const byline = (Astro.props.byline ?? !isThesis) && Boolean(updated);
 
 // The meta line is the only copy this component writes itself, so it is the only
 // thing that has to follow the page language: its labels come from the UI
@@ -41,8 +49,13 @@ interface MetaBit {
   text: string;
   /** YYYY-MM-DD for the <time datetime> attribute; omitted on plain bits. */
   datetime?: string;
+  /** Render the bit as the author byline: `text` is the "By" label. */
+  author?: boolean;
 }
 const metaBits: MetaBit[] = [];
+// "By" is written here only in English: the UI strings carry no label for it, so
+// a translated page shows the linked name alone.
+if (byline) metaBits.push({ text: lang === 'en' ? 'By' : '', author: true });
 if (updated)
   metaBits.push({ text: `v${site.bokVersion}` }, { text: labels.updated, datetime: updated });
 if (minutes && words)
@@ -65,7 +78,12 @@ if (updated) metaBits.push({ text: site.license });
               {/* The <li> is a flex container, so the label and the <time> are
                   kept in one inline wrapper: as two bare flex items the space
                   between them would be dropped. */}
-              {bit.datetime ? (
+              {bit.author ? (
+                <span class="ch-byline">
+                  {bit.text && `${bit.text} `}
+                  <a rel="author" href="/about">{site.authors[0]}</a>
+                </span>
+              ) : bit.datetime ? (
                 <span>
                   {bit.text} <time datetime={bit.datetime}>{bit.datetime}</time>
                 </span>
@@ -185,6 +203,18 @@ if (updated) metaBits.push({ text: site.license });
     display: flex;
     align-items: center;
     margin: 0;
+  }
+
+  /* The author link: --ink on the band, underlined, never dimmed. */
+  .ch-byline a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 0.18em;
+  }
+
+  .ch-byline a:hover {
+    text-decoration-color: currentColor;
   }
 
   /* Middot separators between the meta bits (kept at --ink-2 so the tinted band
