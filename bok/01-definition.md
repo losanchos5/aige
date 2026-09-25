@@ -16,7 +16,9 @@ whole that spans data, model, pipeline, runtime and organisation, delivered as a
 engineers who are its users. *The governance of AI systems* is the subject: the whole span of
 governance, risk and assurance for AI, including autonomous agents, not one narrow slice of it.
 Chapter 11 settles [what counts as an AI system](/bok/ai-defined#four-definitions-compared) for
-governance purposes, and why that decision is itself the first control.
+governance purposes, and why that decision is itself the first control. The general term, AI
+governance, with its definitions in the primary sources and its frameworks compared, has its own
+page: [What is AI governance?](/ai-governance).
 
 The framing is borrowed, deliberately. GRC engineering defines itself as "the application of software
 engineering practice, systems thinking and product thinking to governance, risk and compliance" [1].

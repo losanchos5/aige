@@ -102,6 +102,11 @@ export const nav: NavGroup[] = [
     description: 'How the discipline is done: the role, stack, patterns, tools, path and agents.',
     items: [
       {
+        label: 'What is AI governance?',
+        href: '/ai-governance',
+        description: 'The field defined from the sources: frameworks compared, roles, maturity, how to start.',
+      },
+      {
         label: 'The Role',
         href: '/role',
         description: 'What an AI Governance Engineer does: seven workflows, skills, market.',
