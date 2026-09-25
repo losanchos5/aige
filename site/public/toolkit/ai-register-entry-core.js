@@ -16,6 +16,7 @@ import {
   unflattenRow,
   parseCsv,
   getPath,
+  isUnsafePath,
 } from './builders.js';
 import { mdCell } from './lib.js';
 
@@ -93,6 +94,14 @@ export function entriesFromCsv(text, schemas) {
   const problems = error ? [error] : [];
   if (rows.length < 2) return { entries: [], problems: [...problems, 'The CSV needs a header row and at least one entry.'] };
   const header = rows[0].map((cell) => cell.trim());
+  // A column such as "__proto__.x" names no field and would reach
+  // Object.prototype: unflattenRow skips it, and the reader is told.
+  const unsafe = header.filter((name) => name && isUnsafePath(name));
+  if (unsafe.length) {
+    problems.push(
+      `Ignored ${unsafe.length === 1 ? 'a column' : `${unsafe.length} columns`} that no register field can have: ${unsafe.map((name) => `"${name}"`).join(', ')}.`,
+    );
+  }
   const kindAt = header.indexOf('kind');
   const entries = rows.slice(1).map((cells) => {
     const declared = kindAt >= 0 ? String(cells[kindAt] ?? '').trim().toLowerCase() : '';

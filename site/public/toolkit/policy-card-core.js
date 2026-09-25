@@ -45,6 +45,10 @@ const RESERVED = new Set([
   'forbid', 'when', 'unless', 'principal', 'action', 'resource', 'context', '__cedar',
 ]);
 
+// Segments that would reach Object.prototype when the sample inputs of the
+// generated tests are built (CWE-1321): never a field name.
+const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
 const OPERATORS = {
   missing: 'is missing',
   equals: 'equals',
@@ -188,7 +192,7 @@ function parseParam(param, raw, errors, field) {
       return { text: decimalText(text), value: n };
     }
     case 'path':
-      if (!PATH_RE.test(text) || text.split('.').some((seg) => RESERVED.has(seg))) {
+      if (!PATH_RE.test(text) || text.split('.').some((seg) => RESERVED.has(seg) || UNSAFE_KEYS.has(seg))) {
         return fail('use a dot path of snake_case names, for example system.risk_tier.');
       }
       return text;
@@ -1043,13 +1047,16 @@ when {
 
 const ABSENT = Symbol('absent');
 
+/** Set `value` at a dot path, walking own properties only; a path with an
+ *  unsafe segment is refused (checkValues already rejects it). */
 function setPath(target, path, value) {
   const keys = path.split('.');
+  if (keys.some((key) => UNSAFE_KEYS.has(key))) throw new Error(`Unsupported field path: ${path}`);
   let node = target;
-  keys.slice(0, -1).forEach((key) => {
-    node[key] = node[key] ?? {};
+  for (const key of keys.slice(0, -1)) {
+    if (!Object.hasOwn(node, key) || node[key] === null || typeof node[key] !== 'object') node[key] = {};
     node = node[key];
-  });
+  }
   node[keys[keys.length - 1]] = value;
 }
 

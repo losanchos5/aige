@@ -4,6 +4,9 @@
 // function here in Node.
 //
 // - Paths: `a.b.0.c` addresses a value inside a document; get, set and delete.
+//   They only walk the document's own properties, and a path with a
+//   `__proto__`, `constructor` or `prototype` segment is refused (CWE-1321):
+//   an imported CSV header must not reach Object.prototype.
 // - prune: drop empty strings, empty arrays and empty objects before export,
 //   so an unanswered optional field is absent rather than blank.
 // - validate: the draft 2020-12 subset the site's schemas use (the same subset
@@ -19,6 +22,9 @@
 
 // ---- Paths --------------------------------------------------------------------
 
+// Segments that lead to a prototype instead of a field of the document.
+const UNSAFE_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
 /** 'a.b.0' -> ['a', 'b', 0]. Numeric segments become array indices.
  *  @param {string | ReadonlyArray<string | number>} path
  *  @returns {Array<string | number>} */
@@ -30,21 +36,34 @@ export function splitPath(path) {
     .map((part) => (/^\d+$/.test(part) ? Number(part) : part));
 }
 
-/** @param {unknown} doc @param {string | ReadonlyArray<string | number>} path */
+/** True when a path has a `__proto__`, `constructor` or `prototype` segment,
+ *  which no field of a record can have.
+ *  @param {string | ReadonlyArray<string | number>} path */
+export function isUnsafePath(path) {
+  return splitPath(path).some((key) => UNSAFE_KEYS.has(String(key)));
+}
+
+/** The value at `path`, read through own properties only.
+ *  @param {unknown} doc @param {string | ReadonlyArray<string | number>} path */
 export function getPath(doc, path) {
   let node = doc;
   for (const key of splitPath(path)) {
     if (node === null || typeof node !== 'object') return undefined;
+    if (UNSAFE_KEYS.has(String(key)) || !Object.hasOwn(node, key)) return undefined;
     node = /** @type {Record<string, unknown>} */ (node)[/** @type {string} */ (key)];
   }
   return node;
 }
 
 /** Set a value, creating objects (or arrays, for numeric keys) on the way.
+ *  Only own properties are walked; an unsafe path throws.
  *  Returns the document. @param {Record<string, unknown>} doc */
 export function setPath(doc, path, value) {
   const keys = splitPath(path);
   if (!keys.length) return doc;
+  if (keys.some((key) => UNSAFE_KEYS.has(String(key)))) {
+    throw new Error(`Unsupported field name: ${keys.join('.')}`);
+  }
   /** @type {any} */
   let node = doc;
   keys.forEach((key, i) => {
@@ -52,7 +71,7 @@ export function setPath(doc, path, value) {
       node[key] = value;
       return;
     }
-    if (node[key] === null || typeof node[key] !== 'object') {
+    if (!Object.hasOwn(node, key) || node[key] === null || typeof node[key] !== 'object') {
       node[key] = typeof keys[i + 1] === 'number' ? [] : {};
     }
     node = node[key];
@@ -62,6 +81,7 @@ export function setPath(doc, path, value) {
 
 /** Remove a value (an array element is spliced out). Returns the document. */
 export function deletePath(doc, path) {
+  if (isUnsafePath(path)) return doc;
   const keys = splitPath(path);
   const last = keys.pop();
   const parent = keys.length ? getPath(doc, keys) : doc;
@@ -96,6 +116,9 @@ export function prune(value) {
   if (isPlainObject(value)) {
     const out = {};
     for (const [key, child] of Object.entries(value)) {
+      // An own "__proto__" key (JSON.parse makes one) would set the copy's
+      // prototype instead of a field.
+      if (key === '__proto__') continue;
       const kept = prune(child);
       if (kept !== undefined) out[key] = kept;
     }
@@ -460,7 +483,9 @@ export function flattenRecord(record, prefix = '', out = {}) {
 
 /** One CSV row -> a nested record, typed by `schema`: numbers, booleans,
  *  "; "-separated lists and JSON cells are parsed back. Unknown columns are
- *  kept as text so validation can name them. */
+ *  kept as text so validation can name them; a column whose name has a
+ *  `__proto__`, `constructor` or `prototype` segment is skipped (see
+ *  isUnsafePath; the importer reports it). */
 /** @param {string[]} header @param {string[]} cells @param {any} schema @returns {Record<string, any>} */
 export function unflattenRow(header, cells, schema) {
   /** @type {Record<string, any>} */
@@ -468,7 +493,7 @@ export function unflattenRow(header, cells, schema) {
   header.forEach((rawName, i) => {
     const name = String(rawName).trim();
     const raw = unguard(String(cells[i] ?? '')).trim();
-    if (!name || raw === '' || name === 'kind') return;
+    if (!name || raw === '' || name === 'kind' || isUnsafePath(name)) return;
     const node = schema ? schemaAt(schema, name) : undefined;
     const type = node ? (Array.isArray(node.type) ? node.type[0] : node.type) : 'string';
     let value = raw;

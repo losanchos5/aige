@@ -213,6 +213,9 @@ test.describe('policy card generators', () => {
       ['expired-exception-blocks-build', 'param-max_days', { max_days: '0' }],
       ['custom', 'param-field', { action: 'deploy', field: 'system.in', operator: 'equals', value: 'x' }],
       ['custom', 'param-value', { action: 'deploy', field: 'system.tier', operator: 'lt', value: 'high' }],
+      ['custom', 'param-field', { action: 'deploy', field: '__proto__.polluted', operator: 'equals', value: 'x' }],
+      ['custom', 'param-field', { action: 'deploy', field: 'constructor.prototype.polluted', operator: 'equals', value: 'x' }],
+      ['custom', 'param-field', { action: 'deploy', field: 'system.prototype', operator: 'equals', value: 'x' }],
     ];
     for (const [id, field, values] of params) {
       const { checked } = buildDefault(id, { params: values });
@@ -239,6 +242,17 @@ test.describe('policy card generators', () => {
       expect(b.values, template.id).toEqual(a.values);
     }
     expect(stateToValues(decodeFragment('#main'), policyCardTemplates, { today: SAMPLE_DATE })).toBeNull();
+  });
+
+  test('a link cannot write to Object.prototype through the custom field (CWE-1321)', () => {
+    const link = '#v=1&t=custom&p.field=__proto__.polluted&p.value=injected&ob=AIGE-OBL-EUAIA-ART5&en=deploy';
+    const values = stateToValues(decodeFragment(link), policyCardTemplates, { today: SAMPLE_DATE });
+    const template = policyCardTemplates.find((entry) => entry.id === 'custom');
+    if (!template || !values) throw new Error('custom template or link state missing');
+    const checked = checkValues(template, values, { obligationIds: ids });
+    expect(checked.ok).toBe(false);
+    expect(checked.errors.map((e: { field: string }) => e.field)).toContain('param-field');
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
   });
 
   test('YAML output quotes what a YAML reader could misread', () => {

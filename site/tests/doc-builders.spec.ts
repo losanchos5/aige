@@ -47,6 +47,9 @@ import {
   prune,
   uuidV4,
   orderBySchema,
+  isUnsafePath,
+  setPath,
+  getPath,
 } from '../public/toolkit/builders.js';
 import { toCsv } from '../public/toolkit/lib.js';
 import {
@@ -299,6 +302,31 @@ test.describe('doc builders: pure modules', () => {
     expect(back.problems).toEqual([]);
     expect(back.entries.map((e: { doc: unknown }) => e.doc)).toEqual(entries.map((e: { doc: unknown }) => e.doc));
     expect(detectKind({ workload_identity: {} })).toBe('agent');
+  });
+
+  test('a CSV header or a path cannot reach Object.prototype (CWE-1321)', () => {
+    const polluted = () => ({}) as Record<string, unknown>;
+    const record = unflattenRow(
+      ['id', '__proto__.polluted', 'constructor.prototype.polluted', 'owner.name'],
+      ['x', 'yes', 'yes', 'Ana'],
+      undefined,
+    );
+    expect(record).toEqual({ id: 'x', owner: { name: 'Ana' } });
+    expect(polluted().polluted).toBeUndefined();
+    expect(isUnsafePath('a.__proto__.b')).toBe(true);
+    expect(isUnsafePath('owner.name')).toBe(false);
+    expect(() => setPath({}, '__proto__.polluted', 'yes')).toThrow(/Unsupported field name/);
+    expect(getPath({}, 'constructor')).toBeUndefined();
+    expect(getPath({ a: [1, 2] }, 'a.1')).toBe(2);
+    // An own "__proto__" key from JSON.parse does not become the copy's prototype.
+    const pruned = prune(JSON.parse('{"__proto__": {"evil": true}, "a": "b"}'));
+    expect(pruned).toEqual({ a: 'b' });
+    expect(Object.getPrototypeOf(pruned)).toBe(Object.prototype);
+    // The importer names the column it ignored.
+    const schemas = { system: S.system, agent: S.agent };
+    const back = entriesFromCsv('kind,id,__proto__.polluted\r\nsystem,x,yes\r\n', schemas);
+    expect(back.problems.join(' ')).toContain('"__proto__.polluted"');
+    expect(polluted().polluted).toBeUndefined();
   });
 
   test('the public summary leaves internal fields out; the crosswalk carries the values', () => {
