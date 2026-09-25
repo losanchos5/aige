@@ -23,6 +23,7 @@ import {
 } from '../../lib/figure-reuse';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { authorNodes, authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/resources.css';
 import '../../styles/figures-gallery.css';
 
@@ -63,8 +64,11 @@ const diagramCount = parts.reduce(
 );
 const kindLabel = { infographic: 'Infographic', 'data-viz': 'Data visualisation', poster: 'Poster' };
 
+// Search title and description (SXO-R2-07, 2026-09-25 round 2): the query
+// first; the H1 stays.
+const seoTitle = 'AI governance diagrams: free figures to cite and reuse';
 const description =
-  'Every figure in the AI governance Body of Knowledge, with a permalink, text alternative, SVG and PNG downloads and a ready-made CC BY credit.';
+  'Free AI governance infographics to cite and reuse, each with a permalink, text alternative, SVG and PNG downloads and a CC BY credit line.';
 const crumbs = [{ label: 'Figures' }];
 const pageUrl = new URL('/figures', site.url).href;
 
@@ -92,7 +96,13 @@ const jsonLd = [
 ];
 ---
 
-<Base title="Figures" description={description} image="/og/figures.png" jsonLd={jsonLd}>
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/figures.png"
+  jsonLd={jsonLd}
+>
   <PageHero
     variant="res"
     crumbs={crumbs}

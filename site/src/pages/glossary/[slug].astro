@@ -32,6 +32,7 @@ import { gitDate } from '../../lib/reading';
 import { leadDescription, listSentences } from '../../lib/lead-sentence';
 import { patternsUsingTerm } from '../../lib/cross-links';
 import { patternPath } from '../../data/patterns';
+import { comparisonsForTerm, termFrameworks } from '../../lib/compare-links';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
@@ -67,6 +68,14 @@ const contrast = entry.contrast.map((slug) => {
   if (!other) throw new Error(`glossary: "${entry.term}" contrasts with unknown term "${slug}"`);
   return other;
 });
+
+// The comparison pages for the terms that name a compared instrument (ONPAGE
+// R2, 2026-09-25 round 2); a renamed term fails the build rather than
+// silently losing its line.
+for (const slug of Object.keys(termFrameworks)) {
+  if (!bySlug.has(slug)) throw new Error(`compare-links: "${slug}" is not a glossary term`);
+}
+const compared = comparisonsForTerm(entry.slug);
 
 const pairs = contrastPairsFor(entry.slug);
 const usage = termUsage(entry.slug);
@@ -209,6 +218,21 @@ const jsonLd = [
                   <>
                     {i > 0 && ' · '}
                     <a href={other.url}>{other.term}</a>
+                  </>
+                ))}
+              </dd>
+            </>
+          )
+        }
+        {
+          compared.length > 0 && (
+            <>
+              <dt>Compared side by side</dt>
+              <dd>
+                {compared.map((link, i) => (
+                  <>
+                    {i > 0 && ' · '}
+                    <a href={link.href}>{link.label}</a>
                   </>
                 ))}
               </dd>

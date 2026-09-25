@@ -6,9 +6,10 @@
 // uses (src/lib/sitemap-policy.ts), so the index and the sitemap agree.
 //
 // A page that llms.txt.ts does not describe by hand still gets listed, with
-// the title and description read from its source (the `title="..."` and
-// `description="..."` literals most pages pass to Base, or a
-// `const description = '...'`), so a new page is never left out.
+// the title and description read from its source (the `title` and
+// `description` props it passes to its layout, Base, Doc or Marketing, as a
+// literal or as a string constant, or a `const description = '...'`), so a new
+// page is never left out.
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -58,23 +59,40 @@ export function hasStaticRoute(path: string): boolean {
   return staticRoutes().some((route) => route.path === path);
 }
 
-const TITLE_RES = [
-  /<Base\b[^>]*?\btitle="([^"]+)"/s,
-  /\bconst title\s*=\s*(['"`])([^'"`$]+)\1/,
-  /^title:\s*["']?(.+?)["']?\s*$/m,
-];
-const DESCRIPTION_RES = [
-  /<Base\b[^>]*?\bdescription="([^"]+)"/s,
-  /\bconst description\s*=\s*(['"`])([^'"`$]+)\1/,
-  /^description:\s*["']?(.+?)["']?\s*$/m,
-];
+// The layouts an indexable page renders through; each takes `title` and
+// `description` props.
+const LAYOUT = '(?:Base|Doc|Marketing)';
 
-function firstMatch(source: string, patterns: readonly RegExp[]): string {
-  for (const re of patterns) {
-    const match = re.exec(source);
-    if (match) return (match[2] ?? match[1]).replace(/\s+/g, ' ').trim();
+/** `<Layout ... name="literal">` or `<Layout ... name={identifier}>`. */
+const layoutProp = (name: string): RegExp =>
+  new RegExp(String.raw`<${LAYOUT}\b[^>]*?\b${name}=(?:"([^"]+)"|\{\s*([A-Za-z_]\w*)\s*\})`, 's');
+
+/** `const <name> = '...'` (a single string literal, no interpolation). */
+const constLiteral = (name: string): RegExp =>
+  new RegExp(String.raw`\bconst ${name}\s*(?::\s*string\s*)?=\s*(['"\x60])([^'"\x60$]+)\1`);
+
+/** `<name>: ...` in a Markdown page's frontmatter. */
+const frontmatter = (name: string): RegExp => new RegExp(String.raw`^${name}:\s*["']?(.+?)["']?\s*$`, 'm');
+
+const clean = (text: string): string => text.replace(/\s+/g, ' ').trim();
+
+/**
+ * One prop of the page's layout: the literal it passes, or the string constant
+ * it passes by name (`title={seoTitle}` with `const seoTitle = '...'`); then a
+ * `const <name> = '...'`; then a Markdown page's frontmatter. '' when the page
+ * computes it.
+ */
+function propOf(source: string, name: string): string {
+  const prop = layoutProp(name).exec(source);
+  if (prop?.[1]) return clean(prop[1]);
+  if (prop?.[2]) {
+    const value = constLiteral(prop[2]).exec(source);
+    if (value) return clean(value[2]);
   }
-  return '';
+  const own = constLiteral(name).exec(source);
+  if (own) return clean(own[2]);
+  const front = frontmatter(name).exec(source);
+  return front ? clean(front[1]) : '';
 }
 
 /**
@@ -83,5 +101,5 @@ function firstMatch(source: string, patterns: readonly RegExp[]): string {
  */
 export function pageMeta(route: StaticRoute): { title: string; description: string } {
   const source = readFileSync(route.file, 'utf8');
-  return { title: firstMatch(source, TITLE_RES), description: firstMatch(source, DESCRIPTION_RES) };
+  return { title: propOf(source, 'title'), description: propOf(source, 'description') };
 }

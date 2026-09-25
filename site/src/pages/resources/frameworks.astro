@@ -13,6 +13,7 @@ import lineageSvg from '../../figures/instrument-lineage.svg?raw';
 import { frameworks, obligations, disclaimer } from '../../data/frameworks';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { collectionPage, lastModified } from '../../lib/jsonld';
+import { compareLinks } from '../../lib/compare-links';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
@@ -67,6 +68,12 @@ const jsonLd = [
         <h2 id="fw-heading">Frameworks</h2>
         <p>{frameworks.length} instruments: laws, standards, codes and control sets. External links
         open the canonical source.</p>
+        <p class="ob-xref">
+          Compared side by side, clause by clause:
+          {compareLinks.map((link, i) => (
+            <>{i > 0 && ' · '}<a href={link.href}>{link.label}</a></>
+          ))}.
+        </p>
       </div>
       <Figure
         id="instrument-lineage"

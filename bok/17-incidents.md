@@ -268,7 +268,7 @@ move.
 | **Lack of robustness** | Adversarial or noisy inputs degrade accuracy or safety | Red-team finding reproduced in production; guardrail hit-rate change | Tighten input filters; rate-limit the pattern |
 | **Poor or unrepresentative data** | Error rates differ by subgroup; retrieval returns stale or wrong documents | Subgroup metrics in monitoring; grounding failures | Suspend the affected decision class; pin the last good corpus |
 | **Drift** | The input distribution (data drift) or the input-outcome relationship (concept drift) moves after deployment | Distribution tests against the eval baseline; outcome metrics | Raise the human-review share; roll back or retrain |
-| **Prompt injection** | Instructions hidden in user input or in retrieved content redirect the system; OWASP lists it first (`LLM01:2025`), direct and indirect [8] | Guardrail events; tool calls outside the task; unusual egress | Revoke the tool scope the injection used; quarantine the source document |
+| **Prompt injection** | Instructions hidden in user input or in retrieved content redirect the system; OWASP lists it first (`LLM01:2026`), direct and indirect [8] | Guardrail events; tool calls outside the task; unusual egress | Revoke the tool scope the injection used; quarantine the source document |
 | **Tool misuse** | An agent uses a permitted tool in an unintended or harmful way (`ASI02`) [9] | Tool-call volume or parameter anomalies against the registry scope | Kill switch on the agent; narrow the scope |
 | **Hallucination with harm** | Invented facts, citations, policies or dosages that a person acts on | Complaints; downstream corrections; groundedness checks | Disable the answer class; require grounding or a citation |
 | **Cascading failures** | One agent's error propagates through others (`ASI08`) [9] | Correlated failures across agents sharing a tool or memory | Break the chain at the shared component |
@@ -644,7 +644,7 @@ keeps the current links under
 **Maps to:** EU AI Act Art. 3(49), 20, 26(5)–(6), 55(1)(c), 72, 73, 75(1a) · GPAI Code of Practice,
 Safety and Security Commitment 9 · GDPR Arts. 33–34 · NIS2 Art. 23 · DORA Art. 19 · Cyber Resilience
 Act Art. 14 · ISO/IEC 42001 (clause 10.2, Annex A.8) · NIST AI RMF (Manage 2.4, 4.1, 4.3) · NIST SP
-800-61r3 · OWASP LLM01:2025, Agentic ASI02/ASI08/ASI10 · Layer 04 Runtime Controls & Observability ·
+800-61r3 · OWASP LLM01:2026, Agentic ASI02/ASI08/ASI10 · Layer 04 Runtime Controls & Observability ·
 Layer 05 Assurance & Continuous Compliance. Mappings are illustrative, not a claim of conformity.
 
 ## Sources
@@ -656,8 +656,8 @@ Layer 05 Assurance & Continuous Compliance. Mappings are illustrative, not a cla
 [5] General-Purpose AI Code of Practice, Safety and Security chapter, Commitment 9 serious incident reporting (Measure 9.1 identification sources and informing third parties of direct reporting channels, if available; 9.2 information incl. near misses; 9.3 timelines of 2, 5, 10 and 15 days, intermediate reports at least every four weeks, final report within 60 days of resolution; 9.4 retention of at least five years). European Commission. 2025-07-10. https://ec.europa.eu/newsroom/dae/redirection/document/118119 (verified: primary)
 [6] NIST SP 800-61r3, Incident Response Recommendations and Considerations for Cybersecurity Risk Management: A CSF 2.0 Community Profile (supersedes SP 800-61r2; previous life-cycle phases mapped to CSF 2.0 functions). NIST. 2025-04. https://csrc.nist.gov/pubs/sp/800/61/r3/final (verified: primary)
 [7] AI Risk Management Framework 1.0, NIST AI 100-1 (MANAGE 2.4 supersede, disengage or deactivate; MANAGE 4.1 post-deployment monitoring incl. incident response; MANAGE 4.3 incidents and errors communicated, processes followed and documented). NIST. 2023-01-26. https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf (verified: primary)
-[8] LLM01:2025 Prompt Injection (direct and indirect prompt injection). OWASP GenAI Security Project. 2025. https://genai.owasp.org/llmrisk/llm01-prompt-injection/ (verified: primary)
-[9] Top 10 for Agentic Applications 2026 (ASI02 Tool Misuse; ASI08 Cascading Failures; ASI10 Rogue Agents). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
+[8] LLM01:2026 Prompt Injection (OWASP Top 10 for LLM Applications 2026; direct and indirect prompt injection; entry text in github.com/GenAI-Security-Project/GenAI-LLM-Top10, 2026/final). OWASP GenAI Security Project. 2026-08-03. https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ (verified: primary)
+[9] Top 10 for Agentic Applications 2026 (ASI02 Tool Misuse and Exploitation; ASI08 Cascading Failures; ASI10 Rogue Agents). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [10] IEC 61025:2006, Fault tree analysis (FTA), edition 2.0 (IEC TC 56 Dependability). IEC. 2006-12-13. https://webstore.iec.ch/en/publication/4311 (verified: primary)
 [11] "Postmortem Culture: Learning from Failure" (Site Reliability Engineering, ch. 15; blameless postmortems; postmortem triggers set in advance). Google. 2016. https://sre.google/sre-book/postmortem-culture/ (verified: primary)
 [12] "AI Act: Commission publishes a reporting template for serious incidents involving general-purpose AI models with systemic risk" (template under Art. 55(1)(c) and Commitment 9; ten fields from start and end dates to root-cause analysis, near-miss patterns and submitter). European Commission. 2025-11-04. https://digital-strategy.ec.europa.eu/en/library/ai-act-commission-publishes-reporting-template-serious-incidents-involving-general-purpose-ai (verified: primary)

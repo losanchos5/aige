@@ -6,12 +6,16 @@ import { site } from '../../data/site';
 import { cases, caseEvidenceLabel, casesDisclaimer } from '../../data/cases';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { authorNodes, authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 import '../../styles/harms.css';
 
+// Search title and description (SXO-R2-07, 2026-09-25 round 2): the query
+// first; the H1 stays.
+const seoTitle = 'AI incident case studies: what failed, which control';
 const description =
-  'Publicly documented AI incidents written as engineering post-mortems: what happened, the failure mode, the control that would have caught it, the evidence it would have left and the obligations it touches today.';
+  'Public AI incidents as engineering post-mortems: what happened, the failure mode, the control that would have caught it and the evidence it would have left.';
 const crumbs = [{ label: 'Cases' }];
 const pageUrl = new URL('/cases', site.url).href;
 
@@ -34,7 +38,13 @@ const jsonLd = [
 ];
 ---
 
-<Base title="Cases" description={description} image="/og/resources.png" jsonLd={jsonLd}>
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/resources.png"
+  jsonLd={jsonLd}
+>
   <PageHero
     variant="res"
     crumbs={crumbs}

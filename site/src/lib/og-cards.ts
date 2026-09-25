@@ -3,6 +3,7 @@
 // Seo.astro reads the same map, so a page that borrows a section card states
 // in og:image:alt what the card shows rather than the page's own title.
 import { chaptersOrdered } from '../data/chapters';
+import { comparisons, type ComparisonDef } from '../data/comparisons';
 
 /** Top-level cards: /og/<slug>.png -> the title printed on the card. */
 export const OG_ROUTE_TITLES: Readonly<Record<string, string>> = {
@@ -25,14 +26,27 @@ export const OG_ROUTE_TITLES: Readonly<Record<string, string>> = {
   for: 'Routes by audience',
 };
 
+/** Card slug of a framework comparison page (/resources/crosswalk/<slug>). */
+const comparisonCardSlug = (c: Pick<ComparisonDef, 'slug'>) => `crosswalk-${c.slug}`;
+
 /**
- * Every card of /og/<slug>.png with its title: the top-level cards plus one per
- * Body of Knowledge chapter (`bok-<slug>`, titled with the chapter title).
+ * The card of a framework comparison page: like the pillar's, it names the
+ * query the page answers ("ISO 42001 vs EU AI Act").
+ */
+export function comparisonOgImage(c: Pick<ComparisonDef, 'slug'>): string {
+  return `/og/${comparisonCardSlug(c)}.png`;
+}
+
+/**
+ * Every card of /og/<slug>.png with its title: the top-level cards, one per
+ * Body of Knowledge chapter (`bok-<slug>`, titled with the chapter title) and
+ * one per framework comparison (`crosswalk-<slug>`, titled "<A> vs <B>").
  */
 export function ogCards(): { slug: string; title: string }[] {
   return [
     ...Object.entries(OG_ROUTE_TITLES).map(([slug, title]) => ({ slug, title })),
     ...chaptersOrdered.map((chapter) => ({ slug: `bok-${chapter.slug}`, title: chapter.title })),
+    ...comparisons.map((c) => ({ slug: comparisonCardSlug(c), title: `${c.aName} vs ${c.bName}` })),
   ];
 }
 

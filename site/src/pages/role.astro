@@ -31,9 +31,11 @@ import {
   market,
 } from '../data/role';
 import { levels } from '../data/maturity';
-import { breadcrumbJsonLd } from '../lib/breadcrumbs';
+import { breadcrumbId, breadcrumbJsonLd } from '../lib/breadcrumbs';
 import { fitsSiteSuffix } from '../lib/seo-title';
-import { lastModified } from '../lib/jsonld';
+import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
+import { getGlossaryEntry } from '../lib/glossary';
+import { site } from '../data/site';
 
 const roleHref = (anchor: string) => `/bok/the-role#${anchor}`;
 // The visible author and date under the H1 (SXO-06): dated from the page
@@ -79,14 +81,42 @@ const answers = {
   salary:
     'The IAPP Salary & Jobs Report 2025-26 puts the median technical AI-governance salary at USD 221k in the tech sector, its highest band. The median across AI-governance work generally is USD 151.8k, and USD 169.7k for combined privacy-and-AI-governance roles. These are primary medians; other demand signals are reported below, not as headline figures.',
 };
+
+const description =
+  'What an AI governance engineer does: the seven workflows the role owns, the skills behind them, IAPP salary medians and three ways into the role.';
+
+// The page itself in the graph (SCHEMA R1, SXO-R2-05 of the 2026-09-25 round-2
+// audit): a WebPage, authored and dated like the byline, about the glossary's
+// "AI governance engineer" DefinedTerm. No Occupation or EstimatedSalary: the
+// salary figures stay page content.
+const pageUrl = new URL('/role', site.url).href;
+const crumbs = [{ label: 'The role' }];
+const roleTerm = getGlossaryEntry('ai-governance-engineer');
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    name: seoTitle,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+    dateModified: updated,
+    breadcrumb: { '@id': breadcrumbId(pageUrl) },
+    ...(roleTerm ? { about: { '@id': `${new URL(roleTerm.url, site.url).href}#term` } } : {}),
+  },
+  breadcrumbJsonLd(crumbs, pageUrl),
+];
 ---
 
 <Marketing
   title={seoTitle}
   titleSuffix={fitsSiteSuffix(seoTitle)}
-  description="What an AI governance engineer does: the seven workflows the role owns, the skills behind them, IAPP salary medians and three ways into the role."
+  description={description}
   image="/og/role.png"
-  jsonLd={breadcrumbJsonLd([{ label: 'The role' }])}
+  jsonLd={jsonLd}
 >
   <PageHero
     variant="page"

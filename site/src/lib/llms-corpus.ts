@@ -1,16 +1,17 @@
 // llms-corpus.ts: the documents behind /llms-full.txt, its slices
 // (/llms-full-<slice>.txt) and the Markdown alternates of the content pages
 // (/ai-governance.md, /bok/<slug>.md, /patterns/<slug>.md, /glossary/<slug>.md,
-// /cases/<id>.md, /thesis.md). One builder per kind of page, so the three
-// surfaces serialise a page the same way:
+// /cases/<id>.md, /resources/crosswalk/<pair>.md, /thesis.md). One builder per
+// kind of page, so the three surfaces serialise a page the same way:
 //
 //   - the pillar page, chapters, pattern pages and the Thesis are their
 //     Markdown sources, H1
 //     dropped (the caller re-emits it) and a chapter's "At a glance" points
 //     placed after its abstract, as the page shows them;
 //   - glossary terms, incident cases, the obligation register, the crosswalk,
-//     the frameworks and the harms atlas are written out from their datasets,
-//     with the same headings, fields and numbered sources as their pages.
+//     the framework comparisons, the frameworks and the harms atlas are
+//     written out from their datasets, with the same headings, fields and
+//     sources as their pages.
 //
 // Links in the generated documents are absolute, so a document still resolves
 // once it is copied out of the file it came in.
@@ -28,6 +29,15 @@ import {
   type Obligation,
 } from '../data/frameworks';
 import { chipLabel, crosswalkAsOf, frameworkById, refs, topics } from '../data/crosswalk';
+import {
+  comparisons,
+  comparisonPath,
+  comparisonSourceFiles,
+  glance,
+  glanceRows,
+  type ComparisonDef,
+  type SourceRef,
+} from '../data/comparisons';
 import {
   harmSources,
   harms,
@@ -58,6 +68,18 @@ import {
   header,
   withoutTitle,
 } from './llms';
+import {
+  buildComparison,
+  canUseQuestion,
+  comparisonSources,
+  gapQuestion,
+  inShortText,
+  levelLabel as overlapLevelLabel,
+  overlapSummary,
+  type SideRef,
+} from './comparisons';
+import { lastModified } from './jsonld';
+import { pageMeta, staticRoutes } from './llms-routes';
 import { readSource } from './md-parse';
 import { loadPatternPages } from './pattern-pages';
 import { gitDate } from './reading';
@@ -168,7 +190,8 @@ const PILLAR_SOURCE = 'guides/ai-governance.md';
  * box as the abstract. The figure the page inserts is not part of the source.
  */
 export function pillarDoc(): CorpusDoc {
-  const source = readSource(PILLAR_SOURCE);
+  // The source is stored with CRLF line ends; the twin is served with LF.
+  const source = readSource(PILLAR_SOURCE).replace(/\r\n/g, '\n');
   const lead = docLead(source);
   return {
     title: lead.title,
@@ -254,6 +277,8 @@ export function caseDoc(entry: IncidentCase): CorpusDoc {
     return `- ${o.instrument} ${ref}: ${o.why}`;
   });
 
+  // The "In short" passage is the first section, as on the page (GEO R1): it
+  // is the passage written for answer engines to quote whole.
   const body = [
     `> ${entry.summary}`,
     [
@@ -264,6 +289,8 @@ export function caseDoc(entry: IncidentCase): CorpusDoc {
       ...(incidentsLine ? [`- Incident record: ${incidentsLine}`] : []),
       ...(harmLinks ? [`- Harm: ${harmLinks}`] : []),
     ].join('\n'),
+    '## In short',
+    entry.inShort,
     '## What happened',
     ...entry.happened,
     '## Failure mode',
@@ -387,6 +414,121 @@ export function crosswalkDoc(): CorpusDoc {
       ...sections,
     ].join('\n\n'),
   };
+}
+
+/** A Markdown table cell: pipes escaped, one line. */
+const mdCell = (text: string) => text.replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
+
+/** "Source: [label](url)" (or "Sources: ...") for a cell or an answer. */
+function sourcesLine(list: readonly SourceRef[]): string {
+  const links = list.map((s) => `[${s.label}](${s.url})`).join(', ');
+  return `${list.length > 1 ? 'Sources' : 'Source'}: ${links}`;
+}
+
+/** One side of an overlap row: every clause, register-linked where it has a row. */
+function clauseCell(list: SideRef[]): string {
+  if (list.length === 0) return 'Not mapped';
+  return list
+    .map((s) => {
+      const id = s.obligation ? `[${s.label}](${abs(obligationPath(s.obligation))})` : s.label;
+      const flag = s.ref.verified === false ? ' (not yet verified against the source)' : '';
+      return `${id} ${s.title}${flag}`;
+    })
+    .join('; ');
+}
+
+/**
+ * One framework comparison ("ISO 42001 vs EU AI Act"), as its
+ * /resources/crosswalk/<slug> page states it: the answer, the In short passage,
+ * the "At a glance" table with a source per cell, the per-topic overlap table
+ * (every clause, where the page shows three and links the rest), the two
+ * questions, the FAQ with its sources, the caveat and the sources. Title and
+ * description are the page file's own literals.
+ */
+export function comparisonDoc(def: ComparisonDef): CorpusDoc {
+  const c = buildComparison(def);
+  const path = comparisonPath(def);
+  const route = staticRoutes().find((r) => r.path === path);
+  const meta = route ? pageMeta(route) : { title: '', description: '' };
+  const ga = glance[c.fa.id];
+  const gb = glance[c.fb.id];
+  if (!ga || !gb) throw new Error(`comparisonDoc: no glance facts for ${def.slug}`);
+
+  const glanceTable = [
+    `| Attribute | ${c.fa.name} | ${c.fb.name} |`,
+    '|---|---|---|',
+    ...glanceRows.map(
+      ({ label, key }) =>
+        `| ${label} | ${[ga, gb].map((g) => mdCell(`${g[key]} (${sourcesLine(g.sources[key])})`)).join(' | ')} |`,
+    ),
+    `| In the Body of Knowledge | ${[ga, gb]
+      .map((g) => g.read.map((r) => `[${r.label}](${abs(r.href)})`).join(' · '))
+      .join(' | ')} |`,
+  ].join('\n');
+
+  const overlapTable = [
+    `| Topic | What ${def.aName} asks for | What ${def.bName} asks for | Overlap | Patterns for both |`,
+    '|---|---|---|---|---|',
+    ...c.rows.map((row) => {
+      const cells = [
+        `[${row.topic.name}](${abs(`/resources/crosswalk#topic-${row.topic.id}`)})`,
+        clauseCell(row.a),
+        clauseCell(row.b),
+        overlapLevelLabel(row.level, c, row.passing),
+        row.shared.map((p) => `[${p.title}](${abs(patternPath(p))})`).join('; '),
+      ];
+      return `| ${cells.map(mdCell).join(' | ')} |`;
+    }),
+  ].join('\n');
+
+  const faq = [...def.faq, gapQuestion(c)].flatMap((item) => [
+    `### ${item.q}`,
+    item.a,
+    ...(item.sources ? [sourcesLine(item.sources)] : []),
+  ]);
+  const others = comparisons
+    .filter((other) => other.slug !== def.slug)
+    .map((other) => `[${other.aName} vs ${other.bName}](${abs(comparisonPath(other))})`)
+    .join(' · ');
+
+  const body = [
+    `> ${def.answer}`,
+    '**In short**',
+    inShortText(c),
+    '## At a glance',
+    'The two instruments side by side, as the Body of Knowledge states them, each cell with the primary source it rests on.',
+    glanceTable,
+    '## Where they overlap, topic by topic',
+    overlapSummary(c),
+    'Strong: both file a core clause. Partial: both file a clause, at least one only in passing. Only, in passing: one side files a related clause and the other none. The last column names a pattern only where it serves a core clause on both sides: the register entry of that clause lists it and the pattern\'s own "Maps to" line names the clause.',
+    overlapTable,
+    `## ${canUseQuestion(c)}`,
+    def.canUse,
+    '## Which should you start with?',
+    def.startWith,
+    '## Frequently asked questions',
+    ...faq,
+    '## Illustrative mapping, not a conformity assessment',
+    `${disclaimer} A mapping cell is not evidence; see the [Framework Crosswalk pattern](${abs('/patterns/framework-crosswalk')}) for what turns a crosswalk into an auditable control.`,
+    '## Sources',
+    comparisonSources(c)
+      .map((s) => `- ${s.label}: ${s.url}`)
+      .join('\n'),
+    `Every clause on this page, with its note and verification status, is in the [topic × framework crosswalk](${abs('/resources/crosswalk')}) and its [JSON download](${abs('/resources/crosswalk.json')}). Other comparisons: ${others}. The wider field: [AI governance, explained](${abs(PILLAR_PATH)}).`,
+  ].join('\n\n');
+
+  return {
+    title: meta.title || `${def.aName} vs ${def.bName}`,
+    path,
+    description: meta.description || def.answer,
+    updated: lastModified(...comparisonSourceFiles(def.slug)),
+    body,
+  };
+}
+
+/** Every framework comparison, in the order of the crosswalk hub. */
+export function comparisonDocs(): CorpusDoc[] {
+  return comparisons.map(comparisonDoc);
 }
 
 /** The harms atlas, grouped by level, with its numbered sources. */
@@ -519,12 +661,13 @@ export const llmsSlices: readonly LlmsSlice[] = [
     path: '/llms-full-regulatory.txt',
     title: 'Full text: regulatory map, obligations and crosswalk',
     summary:
-      'Chapter 08, the regulatory map, then the obligation register row by row, the frameworks and the topic × framework crosswalk.',
+      'Chapter 08, the regulatory map, then the obligation register row by row, the frameworks, the topic × framework crosswalk and the framework comparisons (ISO 42001, NIST AI RMF and the EU AI Act, pair by pair).',
     docs: async () => [
       ...(await chaptersWhere((c) => c.slug === 'regulatory-map')),
       obligationsDoc(),
       frameworksDoc(),
       crosswalkDoc(),
+      ...comparisonDocs(),
     ],
   },
   {
@@ -567,6 +710,7 @@ async function fullDocs(): Promise<CorpusDoc[]> {
     obligationsDoc(),
     frameworksDoc(),
     crosswalkDoc(),
+    ...comparisonDocs(),
     ...caseDocs(),
     harmsDoc(),
   ];
@@ -586,7 +730,7 @@ export async function llmsFullText(id: SliceId | 'full'): Promise<string> {
     const patterns = (await patternDocs()).length;
     text = document([
       header(
-        `This file opens with the pillar page, What is AI governance?, then carries the complete text of the ${chapters} Body of Knowledge chapters, in reading order, with the ${patterns} pattern pages after chapter 05, then the Thesis, the obligation register, the frameworks, the crosswalk, the ${cases.length} incident cases and the harms atlas. It is large; the same corpus is split into smaller files listed in ${index}.`,
+        `This file opens with the pillar page, What is AI governance?, then carries the complete text of the ${chapters} Body of Knowledge chapters, in reading order, with the ${patterns} pattern pages after chapter 05, then the Thesis, the obligation register, the frameworks, the crosswalk, the ${comparisons.length} framework comparisons, the ${cases.length} incident cases and the harms atlas. It is large; the same corpus is split into smaller files listed in ${index}.`,
       ),
       ...docs.map(fullTextBlock),
     ]);

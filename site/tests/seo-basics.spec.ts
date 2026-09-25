@@ -10,6 +10,7 @@
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import lighthouserc from '../lighthouserc.cjs';
+import { ogCardTitle } from '../src/lib/og-cards';
 
 // Mirrors src/data/site.ts. Hardcoded on purpose: a test that imported the same
 // constant it asserts on would pass however the value drifted.
@@ -188,6 +189,12 @@ for (const path of paths) {
         expect(ogAlt[0]).toBe(`Tarjeta de «The Thesis», en inglés · ${SITE_NAME}`);
       } else if (shared && ogAlt[0] !== titles[0].trim()) {
         expect(ogAlt[0]).toBe(`${shared} · ${SITE_NAME}`);
+      } else if (ogAlt[0] !== titles[0].trim()) {
+        // A page whose search title (seoTitle) differs from its own card's title:
+        // the alt describes the card (lib/meta.ts ogImageAlt).
+        const card = ogCardTitle(image);
+        expect(card, `no card title for ${image}`).toBeDefined();
+        expect(ogAlt[0]).toBe(`${card} · ${SITE_NAME}`);
       } else {
         expect(ogAlt[0]).toBe(titles[0].trim());
       }

@@ -4,17 +4,25 @@
  * (SXO-04 of the 2026-09-25 audit). Each page file passes its slug and its own
  * <title> and meta description (literals there, so llms.txt can read them); the
  * rest comes from src/data/comparisons.ts (the answer box, the two questions,
- * the FAQ, the "At a glance" facts) and src/lib/comparisons.ts (the per-topic
- * overlap table, its counts, the obligation and pattern links and the sources,
- * all derived from the crosswalk and the obligation register).
+ * the "In short" passage, the FAQ, the "At a glance" facts and their sources)
+ * and src/lib/comparisons.ts (the per-topic overlap table, its counts, the
+ * obligation and pattern links, the question wording and the sources, all
+ * derived from the crosswalk and the obligation register). The Markdown twin
+ * (/resources/crosswalk/<slug>.md, lib/llms-corpus.ts comparisonDoc) prints the
+ * same pieces.
  *
  * Structured data: a TechArticle and the BreadcrumbList. No FAQPage markup:
  * the questions are ordinary headings.
  */
 import Base from '../layouts/Base.astro';
+// The "In short" callout is the chapters' summary callout (prose.css), which
+// lives in the reading stylesheet; imported right after the layout, as
+// reading.css asks.
+import '../styles/reading.css';
 import PageHero from './PageHero.astro';
 import Byline from './Byline.astro';
 import Callout from './Callout.astro';
+import PillarLink from './PillarLink.astro';
 import { site } from '../data/site';
 import { disclaimer, obligationPath } from '../data/frameworks';
 import { patternPath } from '../data/patterns';
@@ -24,16 +32,20 @@ import {
   comparisonPath,
   comparisonSourceFiles,
   glance,
+  glanceRows,
   type GlanceFacts,
 } from '../data/comparisons';
 import {
   buildComparison,
+  canUseQuestion,
   comparisonSources,
   gapQuestion,
-  inSentence,
+  inShortText,
   levelLabel,
+  overlapSummary,
   type SideRef,
 } from '../lib/comparisons';
+import { comparisonOgImage } from '../lib/og-cards';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 import { authorNodes, authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
 import { gitCreated } from '../lib/reading';
@@ -66,21 +78,13 @@ const published = gitCreated(sourceFiles[0]);
 
 const faq = [...def.faq, gapQuestion(cmp)];
 const sources = comparisonSources(cmp);
+const inShort = inShortText(cmp);
+const ogImage = comparisonOgImage(def);
 const others = comparisons.filter((c) => c.slug !== slug);
 const crumbs = [
   { label: 'Resources', href: '/resources' },
   { label: 'Crosswalk', href: '/resources/crosswalk' },
   { label: h1 },
-];
-
-const glanceRows: { label: string; key: keyof Omit<GlanceFacts, 'read'> }[] = [
-  { label: 'Type', key: 'type' },
-  { label: 'Issuer', key: 'issuer' },
-  { label: 'Legal force', key: 'legalForce' },
-  { label: 'Scope and reach', key: 'scope' },
-  { label: 'Certifiable', key: 'certifiable' },
-  { label: 'Key artefacts', key: 'artefacts' },
-  { label: 'Dates', key: 'dates' },
 ];
 
 // How many clauses a cell shows before it points to the full crosswalk row.
@@ -105,7 +109,7 @@ const jsonLd = [
     inLanguage: 'en',
     datePublished: published,
     dateModified: updated,
-    image: new URL('/og/resources.png', site.url).href,
+    image: new URL(ogImage, site.url).href,
     author: [...authorRefs],
     publisher: { '@id': ORG_ID },
     isPartOf: { '@id': WEBSITE_ID },
@@ -124,7 +128,7 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
   title={title}
   titleSuffix={fitsSiteSuffix(title)}
   description={description}
-  image="/og/resources.png"
+  image={ogImage}
   jsonLd={jsonLd}
   article={{
     publishedTime: `${published}T00:00:00Z`,
@@ -139,14 +143,22 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
   <div class="container res-page cmp" data-pagefind-body>
     <section class="res-section" aria-label="Short answer">
       <p class="cmp-answer" data-cmp-answer>{def.answer}</p>
+      {/* "In short": the self-contained passage (130 to 170 words), in the
+          chapters' summary callout (prose.css data-kind="summary"). */}
+      <div class="prose cmp-in-short">
+        <aside class="callout" data-kind="summary" data-cmp-in-short>
+          <p class="callout-title">In short</p>
+          <p>{inShort}</p>
+        </aside>
+      </div>
     </section>
 
     <section class="res-section" aria-labelledby="cmp-glance">
       <div class="res-section-head">
         <h2 id="cmp-glance">At a glance</h2>
         <p>
-          The two instruments side by side, as the Body of Knowledge states them; the last row links
-          the chapter sections each line comes from.
+          The two instruments side by side, as the Body of Knowledge states them. Each cell names the
+          primary source it rests on; the last row links the chapter sections each line comes from.
         </p>
       </div>
       <div class="res-tablewrap">
@@ -164,8 +176,17 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
               glanceRows.map((row) => (
                 <tr>
                   <th scope="row" class="c-name">{row.label}</th>
-                  <td data-label={def.aName}>{ga[row.key]}</td>
-                  <td data-label={def.bName}>{gb[row.key]}</td>
+                  {[ga, gb].map((g, i) => (
+                    <td data-label={i === 0 ? def.aName : def.bName}>
+                      <span class="cmp-cell">{g[row.key]}</span>
+                      <span class="cmp-src">
+                        {g.sources[row.key].length > 1 ? 'Sources' : 'Source'}:{' '}
+                        {g.sources[row.key].map((src, j) => (
+                          <>{j > 0 && ', '}<a href={src.url} rel="noopener">{src.label}</a></>
+                        ))}
+                      </span>
+                    </td>
+                  ))}
                 </tr>
               ))
             }
@@ -193,19 +214,15 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
     <section class="res-section" aria-labelledby="cmp-overlap">
       <div class="res-section-head">
         <h2 id="cmp-overlap">Where they overlap, topic by topic</h2>
-        <p>
-          The <a href="/resources/crosswalk">crosswalk</a> maps {counts.topics} AI governance topics.
-          Both instruments file clauses under {counts.both} of them, {counts.strong} strongly (a core
-          clause on each side); {counts.aOnly} {counts.aOnly === 1 ? 'topic is' : 'topics are'} covered
-          only by {inSentence(def.aName)}, {counts.bOnly} only by {inSentence(def.bName)}, and
-          {counts.neither} by neither. A
-          shared topic means the two deal with the same thing, not that meeting one meets the other.
-        </p>
+        <p data-cmp-overlap-summary>{overlapSummary(cmp)}</p>
         <p>
           <strong>Strong</strong>: both file a core clause. <strong>Partial</strong>: both file a
-          clause, at least one only in passing. Clause ids link to their page in the
-          <a href="/obligations">obligation register</a> where one exists; the last column names the
-          patterns whose evidence serves a register row on both sides.
+          clause, at least one only in passing. <strong>Only, in passing</strong>: one side files a
+          related clause and the other none. Clause ids link to their page in the
+          <a href="/obligations">obligation register</a> where one exists. The last column names a
+          pattern only where it serves a core clause on both sides: the
+          <a href="/resources/crosswalk">crosswalk</a> row's register entry lists it and the pattern's
+          own "Maps to" line names that clause. Otherwise the cell is empty.
         </p>
       </div>
       <div class="res-tablewrap">
@@ -262,12 +279,12 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
                     </td>
                   ))}
                   <td data-label="Overlap">
-                    <span class="type-tag cmp-level">{levelLabel(row.level, cmp)}</span>
+                    <span class="type-tag cmp-level">{levelLabel(row.level, cmp, row.passing)}</span>
                   </td>
-                  <td data-label="Patterns for both">
-                    {row.shared.length === 0 ? (
-                      <span class="cmp-none">None shared</span>
-                    ) : (
+                  {row.shared.length === 0 ? (
+                    <td class="cmp-empty" />
+                  ) : (
+                    <td data-label="Patterns for both">
                       <ul class="cmp-list">
                         {row.shared.slice(0, SHOWN).map((p) => (
                           <li>
@@ -275,8 +292,8 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
                           </li>
                         ))}
                       </ul>
-                    )}
-                  </td>
+                    </td>
+                  )}
                 </tr>
               ))
             }
@@ -286,7 +303,7 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
     </section>
 
     <section class="res-section cmp-qa" aria-labelledby="cmp-can-use">
-      <h2 id="cmp-can-use">Can you use {def.aName} to comply with {def.bName}?</h2>
+      <h2 id="cmp-can-use">{canUseQuestion(cmp)}</h2>
       <p data-cmp-qa>{def.canUse}</p>
     </section>
 
@@ -302,6 +319,14 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
           <div class="cmp-faq-item" data-cmp-faq>
             <h3>{item.q}</h3>
             <p>{item.a}</p>
+            {item.sources && (
+              <p class="cmp-src">
+                {item.sources.length > 1 ? 'Sources' : 'Source'}:{' '}
+                {item.sources.map((src, j) => (
+                  <>{j > 0 && ', '}<a href={src.url} rel="noopener">{src.label}</a></>
+                ))}
+              </p>
+            )}
           </div>
         ))
       }
@@ -313,6 +338,14 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
         <a href="/patterns/framework-crosswalk">Framework Crosswalk pattern</a> for what turns a
         crosswalk into an auditable control.</p>
       </Callout>
+    </div>
+
+    <div class="res-section">
+      <PillarLink
+        lead="Both instruments sit inside a wider field:"
+        anchor="AI governance, explained"
+        tail=", from the laws and standards to the engineering practice."
+      />
     </div>
 
     <section class="res-section" aria-labelledby="cmp-sources">
@@ -349,6 +382,30 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
 </Base>
 
 <style>
+  /* CLS (performance NEW-1 of the 2026-09-25 audit, 0.19 on phones): the
+     current-page crumb ("ISO 42001 vs EU AI Act") fit the breadcrumb line in
+     the fallback monospace and wrapped to a second line once JetBrains Mono
+     loaded, pushing the page down 20px. Here the crumb takes the rest of the
+     first line and truncates instead of wrapping, so the hero is as tall with
+     either font. Global because PageHero renders the breadcrumb; this style
+     ships only with this component, so only the comparison pages get it. */
+  :global(.hero--res .crumbs ol) {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  :global(.hero--res .crumbs li:last-child) {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  :global(.hero--res .crumbs li:last-child [aria-current='page']) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   /* The answer box: the neutral Callout frame (1px --line, --surface), set at
      the lede size so it reads as the page's first answer. */
   .cmp-answer {
@@ -414,6 +471,29 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
     color: var(--ink-2);
   }
 
+  /* The In short callout sits under the answer box, one rhythm step down,
+     left-aligned with it (.prose centres its column by default). */
+  .cmp-in-short {
+    max-width: var(--prose);
+    margin-inline: 0;
+  }
+
+  .cmp-in-short .callout {
+    margin-top: var(--s-4);
+  }
+
+  /* The source line of a cell or an answer: small, on its own line. */
+  .cmp-src {
+    display: block;
+    margin-top: var(--s-1);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .cmp-src a {
+    color: var(--ink-2);
+  }
+
   .cmp-table th[scope='row'] {
     text-align: left;
     vertical-align: top;
@@ -439,6 +519,11 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
   /* Below 720px the shared table styles stack each row as a card of labelled
      cells; the row header joins the card as its title. */
   @media (max-width: 720px) {
+    /* A row with no pattern for both leaves no empty labelled line in its card. */
+    .cmp-table td.cmp-empty {
+      display: none;
+    }
+
     .cmp-table th[scope='row'] {
       display: block;
       width: 100%;
