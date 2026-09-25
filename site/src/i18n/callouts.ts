@@ -24,9 +24,18 @@ export function calloutMap(): CalloutMap {
   return cache;
 }
 
-/** Lower-cased, without a trailing colon or full stop, for prefix matching. */
+/**
+ * Straight quotes for curly ones. Smartypants has already curled the text of a
+ * rendered label ("Offres d’emploi (note).") while callouts.json keeps the
+ * straight apostrophe the pipeline writes, so both sides are compared straight.
+ */
+function straightQuotes(text: string): string {
+  return text.replace(/[\u2018\u2019\u201B\u2032]/g, "'").replace(/[\u201C\u201D\u201E\u2033]/g, '"');
+}
+
+/** Lower-cased, straight-quoted, without a trailing colon or full stop, for prefix matching. */
 function key(label: string): string {
-  return label
+  return straightQuotes(label)
     .trim()
     .replace(/[\s:.]+$/, '')
     .toLowerCase();
@@ -38,7 +47,7 @@ function key(label: string): string {
  * "Beispiel"). Undefined when nothing matches.
  */
 export function englishLabelFor(label: string, lang: TranslatedLocale): string | undefined {
-  const text = label.trim().toLowerCase();
+  const text = straightQuotes(label).trim().toLowerCase();
   const candidates = Object.entries(calloutMap())
     .map(([english, langs]) => [english, langs[lang]] as const)
     .filter((pair): pair is readonly [string, string] => typeof pair[1] === 'string')

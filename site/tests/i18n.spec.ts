@@ -10,9 +10,14 @@
 //     pattern in es and de, the Thesis in de):
 //
 //       node tests/fixtures/i18n/generate.mjs <tmp>
-//       I18N_DIR=<tmp> I18N_UI_DIR=<tmp>/ui npm run build
-//       I18N_DIR=<tmp> I18N_UI_DIR=<tmp>/ui npx playwright test tests/i18n.spec.ts
+//       I18N_DIR=<tmp> npm run build
+//       I18N_DIR=<tmp> npx playwright test tests/i18n.spec.ts
 //
+//     or a full mock run of the pipeline (every chapter, pattern and Thesis):
+//       I18N_DIR=<tmp> node ../tools/i18n/translate.mjs --mock
+//
+// The UI strings are read from <I18N_DIR>/ui when I18N_DIR is set (or from
+// I18N_UI_DIR when that is set), the same folder the pipeline writes to.
 // The test process must see the same I18N_DIR (and I18N_UI_DIR) as the build:
 // the expected routes come from src/lib/i18n-content.ts, which scans it.
 import { test, expect, type Page } from '@playwright/test';
@@ -105,6 +110,9 @@ test.describe('i18n helpers', () => {
         // "Maps to" and "Maps to:" share one translation; compare without the colon.
         const bare = (text: string | undefined) => text?.replace(/:$/, '');
         expect(bare(englishLabelFor(translated!, lang)), `${lang} "${translated}"`).toBe(bare(label));
+        // As rendered: smartypants curls the apostrophe of "Offres d'emploi (note)."
+        const curled = translated!.replace(/'/g, '\u2019');
+        expect(bare(englishLabelFor(curled, lang)), `${lang} "${curled}"`).toBe(bare(label));
       }
     }
   });
@@ -345,6 +353,13 @@ async function placements(page: Page) {
   );
 }
 
+/** The article's callouts by kind and its "Maps to" lines, in document order. */
+async function callouts(page: Page) {
+  return page.$$eval('article.prose aside.callout, article.prose p.maps-to', (els) =>
+    els.map((el) => (el.matches('p.maps-to') ? 'maps-to' : el.getAttribute('data-kind'))),
+  );
+}
+
 test.describe('each translated page', () => {
   test.skip(!hasTranslations, 'no translations in I18N_DIR');
 
@@ -353,6 +368,7 @@ test.describe('each translated page', () => {
       await page.goto(file.englishPath);
       const englishIds = await headingIds(page);
       const englishPlacements = await placements(page);
+      const englishCallouts = await callouts(page);
 
       const res = await page.goto(file.path);
       expect(res?.status()).toBe(200);
@@ -384,6 +400,9 @@ test.describe('each translated page', () => {
       // The English page's anchors, and its figures in the same sections.
       expect(await headingIds(page)).toEqual(englishIds);
       expect(await placements(page)).toEqual(englishPlacements);
+      // Every callout keeps its kind and every "Maps to" line its style, whatever
+      // the localized label (callouts.json) became once rendered.
+      expect(await callouts(page)).toEqual(englishCallouts);
 
       // No link in the text leaves the language when the target exists in it.
       const links = await page.$$eval('article.prose a[href^="/"]:not([data-i18n-notice] a)', (as) =>

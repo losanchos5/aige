@@ -15,6 +15,7 @@ import { patternCatalogueHref } from '../../../data/patterns';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../../lib/jsonld';
 import {
   alternatesFor,
+  localizeHref,
   pathIn,
   translationFilePath,
   translationIndex,
@@ -65,13 +66,15 @@ const updated = gitDate(file);
 const published = gitCreated(file);
 const ogImage = `/og/patterns/${def.slug}.png`;
 
+// The layer chips point at the stack chapter in this language when it is
+// translated (its heading ids are the English ones, so the anchor holds).
+const index = translationIndex();
 const layerOf = (n: number) => layers.find((layer) => layer.n === n);
 const pageLayers = [def.layer, ...(def.secondaryLayer ? [def.secondaryLayer] : [])]
   .map(layerOf)
   .filter((layer): layer is NonNullable<ReturnType<typeof layerOf>> => layer !== undefined);
 
 // The catalogue chapter (05) in this language when it is translated.
-const index = translationIndex();
 const catalogueHref = patternCatalogueHref(def);
 const localCatalogue = pathIn('/bok/patterns', lang, index);
 const catalogue = localCatalogue ? catalogueHref.replace(/^\/bok\/patterns/, localCatalogue) : catalogueHref;
@@ -148,7 +151,7 @@ const jsonLd = [
       pageLayers.map((layer) => (
         <a
           class="pp-layer"
-          href={`/bok/the-stack#${layer.chapterAnchor}`}
+          href={localizeHref(`/bok/the-stack#${layer.chapterAnchor}`, lang, index)}
           style={`--pp-l: var(${layer.colorVar}); --pp-ink: var(${layer.colorVar}-ink)`}
         >
           {t('pattern.layer')} {String(layer.n).padStart(2, '0')} · <span lang="en">{layer.name}</span>

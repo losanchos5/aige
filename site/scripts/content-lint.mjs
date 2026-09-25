@@ -13,8 +13,9 @@
 //   node scripts/content-lint.mjs <dir>
 //
 // Translations (openspec/changes/i18n-site-rendering): the translated Markdown
-// in I18N_DIR (default <repo>/i18n) and the UI strings (site/src/i18n/ui.*.json,
-// or I18N_UI_DIR) get the same em-dash and phrase rules, and every translated
+// in I18N_DIR (default <repo>/i18n) and the UI strings (ui.*.json in I18N_UI_DIR,
+// else <I18N_DIR>/ui, else site/src/i18n: the rule of src/i18n/ui.ts and of the
+// pipeline) get the same em-dash and phrase rules, and every translated
 // page in dist (/es|fr|de|pt/..., except the hand-translated /es/thesis) must
 // carry its language, the machine-translation notice, a self canonical and
 // hreflang alternates naming itself, English and x-default.
@@ -287,7 +288,13 @@ const SITE_URL = 'https://aigovernanceengineer.com';
 const I18N_DIR = process.env.I18N_DIR
   ? resolve(process.cwd(), process.env.I18N_DIR)
   : resolve(REPO_ROOT, 'i18n');
-const UI_DIR = resolve(process.cwd(), process.env.I18N_UI_DIR ?? 'src/i18n');
+// Where ui.<lang>.json lives: the same rule as src/i18n/ui.ts uiDir() and the
+// pipeline (tools/i18n/lib/config.mjs).
+const UI_DIR = process.env.I18N_UI_DIR
+  ? resolve(process.cwd(), process.env.I18N_UI_DIR)
+  : process.env.I18N_DIR
+    ? resolve(process.cwd(), process.env.I18N_DIR, 'ui')
+    : resolve(process.cwd(), 'src/i18n');
 
 /** The translation sources: <lang>/**.md under I18N_DIR and ui.*.json. */
 function translationSources() {

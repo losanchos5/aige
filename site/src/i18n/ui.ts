@@ -13,10 +13,12 @@
 // Spanish meta line of /es/thesis). They sit in HAND below and win over the
 // machine file, the same way the hand-translated Thesis wins over a machine one.
 //
-// The translated files are read from disk at build time, from I18N_UI_DIR when
-// it is set (the tests point it at pseudo-localised fixtures) and from
-// site/src/i18n otherwise. Paths resolve from the build cwd (site/), like the
-// diagram assets, because this module also runs bundled into dist chunks.
+// The translated files are read from disk at build time, from the one folder the
+// translation pipeline writes them to (uiDir below): I18N_UI_DIR when it is set,
+// else <I18N_DIR>/ui when I18N_DIR is set (a scratch or fixture run keeps its UI
+// strings beside its Markdown), else site/src/i18n, where the workflow commits
+// them. Paths resolve from the build cwd (site/), like the diagram assets,
+// because this module also runs bundled into dist chunks.
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { DEFAULT_LOCALE, LOCALE_INFO, isLocale, type Locale } from './locales';
@@ -71,8 +73,16 @@ export function uiProblems(strings: unknown, source: UiStrings = EN): string[] {
   return problems;
 }
 
-function uiDir(): string {
-  return resolve(process.cwd(), process.env.I18N_UI_DIR ?? 'src/i18n');
+/**
+ * The folder holding ui.<lang>.json. The same rule as the translation pipeline
+ * (tools/i18n/lib/config.mjs, resolveDirs) and scripts/content-lint.mjs, so a
+ * build finds the strings wherever a run with the same variables wrote them.
+ */
+export function uiDir(): string {
+  const { I18N_UI_DIR: ui, I18N_DIR: dir } = process.env;
+  if (ui) return resolve(process.cwd(), ui);
+  if (dir) return resolve(process.cwd(), dir, 'ui');
+  return resolve(process.cwd(), 'src/i18n');
 }
 
 const cache = new Map<Locale, UiStrings>();

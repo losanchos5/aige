@@ -8,7 +8,7 @@
 //   <outDir>/<lang>/bok/<chapter-id>.md     two chapters, es and de
 //   <outDir>/<lang>/patterns/<slug>.md      one pattern, es and de
 //   <outDir>/de/THESIS.md                   the Thesis, de only (fr/de/pt get one)
-//   <outDir>/ui/ui.<lang>.json              the UI strings, for I18N_UI_DIR
+//   <outDir>/ui/ui.<lang>.json              the UI strings (read from <I18N_DIR>/ui)
 //   <outDir>/FIXTURE.json                   what was generated, for the tests
 //
 // "Translation" is pseudo-localisation: the vowels of the prose are accented
