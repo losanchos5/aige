@@ -22,6 +22,7 @@ import { obligationPath } from '../../data/frameworks';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import { fitsSiteSuffix } from '../../lib/seo-title';
+import { comparisons, comparisonPath } from '../../data/comparisons';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 import '../../styles/crosswalk.css';
@@ -179,6 +180,24 @@ const jsonLd = [
           </tbody>
         </table>
       </div>
+    </section>
+
+    <section class="res-section cw-compare" aria-labelledby="cw-compare-heading" data-cw-compare>
+      <div class="res-section-head">
+        <h2 id="cw-compare-heading">Compare two frameworks</h2>
+        <p>One page per pair readers compare most: legal force, scope and certification side by
+        side, then a topic-by-topic clause mapping generated from this crosswalk.</p>
+      </div>
+      <ul>
+        {
+          comparisons.map((c) => (
+            <li>
+              <a href={comparisonPath(c)}>{`${c.aName} vs ${c.bName}`}</a>: differences, overlap
+              and mapping
+            </li>
+          ))
+        }
+      </ul>
     </section>
 
     <div class="res-section">
