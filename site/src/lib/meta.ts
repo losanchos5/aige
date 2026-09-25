@@ -3,12 +3,19 @@
 // Open Graph image's alternative text. Pure functions, so tests exercise them
 // directly on the same inputs the pages pass.
 import { ogCardTitle } from './og-cards';
+import { leadDescription } from './lead-sentence';
 
 /** A search snippet is capped at ~160 characters. */
 export const MAX_DESCRIPTION = 160;
 
 /** A cut at a sentence end must keep at least this much of the text. */
 const MIN_SENTENCE_CUT = 100;
+
+/** No description is shorter than this (audit ONPAGE N1): a clause cut must keep it. */
+export const MIN_DESCRIPTION = 70;
+
+/** A description should say at least this much; the next sentences are added up to it. */
+const TARGET_DESCRIPTION = 110;
 
 /** Titles longer than this lose their ` · <site name>` suffix. */
 export const MAX_SUFFIXED_TITLE = 60;
@@ -20,7 +27,10 @@ const ABBREVIATION = /(?:^|[\s(/])(?:Art|Arts|No|Nos|Sec|Ch|ch|para|paras|p|pp|v
  * Fit `text` into the description budget. Text that fits is returned whole
  * (whitespace collapsed). Longer text is cut at the last sentence end inside
  * the budget, with no ellipsis, when that keeps at least MIN_SENTENCE_CUT
- * characters; otherwise at the last word boundary, with `…`. Never mid-word.
+ * characters; otherwise its first sentence is cut at a clause break and closed
+ * with a full stop (lib/lead-sentence.ts), when that keeps MIN_DESCRIPTION.
+ * Only text with neither is cut at the last word boundary, with `…` (the
+ * built-page test in tests/seo-head.spec.ts fails on any). Never mid-word.
  */
 export function metaDescription(text: string, max = MAX_DESCRIPTION): string {
   const clean = text.replace(/\s+/g, ' ').trim();
@@ -39,6 +49,16 @@ export function metaDescription(text: string, max = MAX_DESCRIPTION): string {
     if (end >= MIN_SENTENCE_CUT) best = end;
   }
   if (best > 0) return clean.slice(0, best);
+
+  // The first sentence cut at a clause break ("; ", ": ", ", which", ...),
+  // closed with a full stop, and the next sentences while it is short.
+  const lead = leadDescription(clean, {
+    loose: true,
+    floor: MIN_DESCRIPTION + 10,
+    min: TARGET_DESCRIPTION,
+    max,
+  });
+  if (lead.length >= MIN_DESCRIPTION && lead.length <= max) return lead;
 
   // Word boundary: the whole word before the budget's last space, and `…`.
   const budget = max - 1;
