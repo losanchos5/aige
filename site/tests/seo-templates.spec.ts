@@ -139,6 +139,26 @@ test.describe('obligation titles and headings', () => {
     expect(titleOf(sb226?.page ?? '')).toContain('Utah AI disclosure duties');
   });
 
+  test('short titles do not narrow what the row covers (audit CONTENT N-R3-3)', () => {
+    const title = (id: string) => titleOf(pages.find((p) => p.row.id === id)?.page ?? '');
+    const h1 = (id: string) => h1Of(pages.find((p) => p.row.id === id)?.page ?? '');
+    // PLD Art. 11(2) covers the software, its updates and missing safety updates.
+    expect(title('AIGE-OBL-PLD-ART11-2')).not.toContain('software updates');
+    expect(h1('AIGE-OBL-PLD-ART11-2')).toContain('missing safety updates');
+    // Fake reviews are blacklisted in UCPD Annex I, not in Arts. 5–7.
+    expect(title('AIGE-OBL-UCPD-ART5-7')).toContain('Annex I');
+    expect(h1('AIGE-OBL-UCPD-ART5-7')).toContain('Annex I');
+    // UK ADM: the permission-plus-safeguards model, not "ADM safeguards" twice.
+    expect(title('AIGE-OBL-UK-ADM')).toContain('permission plus safeguards');
+    expect(h1('AIGE-OBL-UK-ADM')).toContain('permission-plus-safeguards model');
+    // Hand-shortened titles keep the row's qualifier or second duty.
+    expect(title('AIGE-OBL-EUAIA-ART26-4')).toContain('it controls');
+    expect(title('AIGE-OBL-EUAIA-ART26-11')).toContain('Annex III');
+    expect(title('AIGE-OBL-KR-ART31-1')).toContain('GenAI');
+    expect(title('AIGE-OBL-DORA-ART28')).toContain('exit plans');
+    expect(title('AIGE-OBL-OECD-P1-5')).toContain('risk management');
+  });
+
   test('titles are unique', () => {
     const titles = pages.map((p) => titleOf(p.page));
     expect(new Set(titles).size).toBe(titles.length);

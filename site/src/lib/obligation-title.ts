@@ -16,7 +16,14 @@
 //   "…", never mid-word and never on a dangling ":" or "and".
 import { obligations, type Obligation } from '../data/frameworks';
 import { frameworkOf } from './obligations';
-import { closeSentence, leadDescription } from './lead-sentence';
+import {
+  closeSentence,
+  DESCRIPTION_MAX,
+  leadDescription,
+  sentences,
+  shortenSentence,
+  withoutAsides,
+} from './lead-sentence';
 
 /** Title budget. Seo keeps its " · AI Governance Engineer" suffix only while the
  *  whole title stays within 60 characters, so a 60-character title stands alone. */
@@ -234,23 +241,30 @@ export function fitTitle(text: string, max = OBLIGATION_TITLE_MAX): string {
 /**
  * Rows whose heading has no cut that reads as a whole phrase within the budget
  * (the cut would end on "subject", "fake", "Basic" or drop the instrument's own
- * name). Each is the row's heading shortened by hand, in its own words; the
+ * name), or whose only cuts drop part of what the row covers (a qualifier such
+ * as "it controls", a second duty such as "exit plans"; audit CONTENT N-R3-3).
+ * Each is the row's heading shortened by hand, in its own words; the
  * tests hold them to the same rules (within 60 characters, no "…", unique).
  */
 const TITLE_OVERRIDES: Readonly<Record<string, string>> = {
-  'AIGE-OBL-EUAIA-ART26-4': 'EU AI Act Art. 26(4): relevant, representative input data',
-  'AIGE-OBL-EUAIA-ART26-11': 'EU AI Act Art. 26(11): informing people subject to decisions',
-  'AIGE-OBL-KR-ART31-1': 'Korea AI Act Art. 31(1): prior notice of high-impact AI',
-  'AIGE-OBL-DORA-ART28': 'DORA Art. 28(3) and 28(8): ICT third-party register',
+  'AIGE-OBL-EUAIA-ART26-4': 'EU AI Act Art. 26(4): representative input data it controls',
+  'AIGE-OBL-EUAIA-ART26-11': 'EU AI Act Art. 26(11): informing people of Annex III AI use',
+  'AIGE-OBL-KR-ART31-1': 'Korea AI Act Art. 31(1): notice of high-impact or GenAI',
+  'AIGE-OBL-DORA-ART28': 'DORA Art. 28(3), 28(8): ICT third-party register, exit plans',
   'AIGE-OBL-ISO22989-CONCEPTS': 'ISO/IEC 22989:2022 AI concepts and terminology',
   'AIGE-OBL-USCA-CPPA-ADMT': 'California CPPA regulations on automated decisionmaking',
   'AIGE-OBL-SG-GENAI': 'Singapore IMDA Model AI Governance Framework for GenAI',
-  'AIGE-OBL-SG-AGENTIC-IDENTITY': 'Singapore Agentic AI framework v1.5: agent identity',
+  'AIGE-OBL-SG-AGENTIC-IDENTITY': 'Singapore agentic AI framework: identity and authorisations',
   'AIGE-OBL-UK-DMCC-S225': 'UK DMCC Act 2024: fake and concealed-incentive reviews',
   'AIGE-OBL-CN-GBT45654': 'GB/T 45654-2025: security requirements for generative AI',
   'AIGE-OBL-CN-ANTHRO': 'China Measures for Anthropomorphic Interaction Services',
   'AIGE-OBL-OECD-P1-4B': 'OECD AI Principle 1.4(b): override, repair or decommission',
-  'AIGE-OBL-OECD-P1-5': 'OECD AI Principle 1.5(b)–(c): traceability',
+  'AIGE-OBL-OECD-P1-5': 'OECD AI Principle 1.5(b)–(c): traceability, risk management',
+  // Audit CONTENT N-R3-3: the automatic cut narrowed these three ("software
+  // updates" only; Arts. 5–7 without Annex I; the model without its subject).
+  'AIGE-OBL-PLD-ART11-2': 'EU PLD Art. 11(2): later defects in software it controls',
+  'AIGE-OBL-UCPD-ART5-7': 'UCPD Arts. 5–7, Annex I: unfair practices and fake reviews',
+  'AIGE-OBL-UK-ADM': 'UK GDPR Arts. 22A–22D: permission plus safeguards for ADM',
 };
 
 let titles: Map<string, string> | undefined;
@@ -327,14 +341,33 @@ function appliesSentence(row: Obligation): string | undefined {
  * heading stands in for a requirement with no whole clause short enough.
  */
 export function obligationDescription(row: Obligation): string {
-  // The artefact's items, "a; b, c": the longest run of whole items that fits.
-  const items = row.artefact.split(/(?<=[;,])\s/);
-  const evidence = items
-    .map((_, i) => items.slice(0, items.length - i).join(' '))
-    .map((text) => closeSentence(`Evidence: ${text.replace(/^([A-Z])(?=[a-z])/, (c) => c.toLowerCase())}`));
+  // The artefact's items are separated by "; " only: a comma sits inside an
+  // item ("eval by sex, race/ethnicity and intersectional category", "step:
+  // model, prompt, policy ..."), so a cut there would drop part of the duty
+  // (audit ONPAGE N3-3). All the items as "Evidence: ...", else the longest
+  // run of whole items as "Evidence includes: ...", else no evidence sentence.
+  // Each may drop a parenthetical aside that does not restrict it ("(physical
+  // or digital)"), never a word of the list.
+  const items = row.artefact.split(/;\s/);
+  const lower = (text: string) => text.replace(/^([A-Z])(?=[a-z])/, (c) => c.toLowerCase());
+  const evidence = items.flatMap((_, i) => {
+    const run = items.slice(0, items.length - i).join('; ');
+    const sentence = (text: string) =>
+      closeSentence(`${i === 0 ? 'Evidence' : 'Evidence includes'}: ${lower(text)}`);
+    const bare = withoutAsides(run);
+    return bare !== undefined && bare !== run ? [sentence(run), sentence(bare)] : [sentence(run)];
+  });
+  // An ", incl. ..." aside in a requirement is often the operative part ("a
+  // policy to comply with Union copyright law, incl. identifying and complying
+  // with reservations of rights"): when the whole first sentence does not fit
+  // behind the label, the heading leads instead of a cut that drops it.
+  const [first = ''] = sentences(row.requirement);
+  const label = instrumentClause(row);
+  const lead = shortenSentence(first, DESCRIPTION_MAX - label.length - 2);
+  const inclCut = lead !== undefined && /,\s+incl\.\s/.test(first) && !/\sincl\.\s/.test(lead);
   const applies = appliesSentence(row);
-  return leadDescription(row.requirement, {
-    label: instrumentClause(row),
+  return leadDescription(inclCut ? '' : row.requirement, {
+    label,
     labelRequired: true,
     fallback: obligationHeading(row),
     always: applies ? [applies] : [],
