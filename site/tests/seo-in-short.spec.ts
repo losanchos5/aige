@@ -8,6 +8,8 @@
 // citations and glossary links render). The glossary and the reading list are
 // lists, not arguments, and carry none.
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { chaptersOrdered } from '../src/data/chapters';
 
 const EXEMPT = new Set(['glossary', 'reading-list']);
@@ -48,6 +50,29 @@ test.describe('In short callout', () => {
         return a && h2 ? Boolean(a.compareDocumentPosition(h2) & Node.DOCUMENT_POSITION_FOLLOWING) : false;
       });
       expect(before, `${chapter.slug}: In short sits before the first H2`).toBe(true);
+    });
+  }
+});
+
+// CONTENT N6: text extracted from the page showed bare digits ("... 3 4 .") in
+// the In short passages. The HTML marks each citation as a linked superscript,
+// as in the rest of the chapter, and the Markdown twin keeps the [n] markers:
+// no marker is left as plain text in the callout, none is lost in the twin.
+test.describe('In short citations', () => {
+  for (const chapter of chaptersOrdered.filter((c) => !EXEMPT.has(c.slug))) {
+    test(`/bok/${chapter.slug}: In short citations are linked superscripts, and [n] in the .md twin`, () => {
+      const html = readFileSync(join('dist', 'bok', `${chapter.slug}.html`), 'utf8');
+      const aside = /<aside class="callout" data-kind="summary">([\s\S]*?)<\/aside>/.exec(html)?.[1] ?? '';
+      expect(aside, 'summary callout').not.toBe('');
+      expect(aside, 'a plain-text [n] marker').not.toMatch(/\[\d+\]/);
+      const sups = [...aside.matchAll(/<sup>([\s\S]*?)<\/sup>/g)].map((m) => m[1]);
+      for (const sup of sups) expect(sup).toMatch(/^(?:<a class="cite" href="#src-\d+"[^>]*>\d+<\/a>)+$/);
+      const linked = sups.flatMap((sup) => [...sup.matchAll(/>(\d+)</g)].map((m) => m[1]));
+
+      const md = readFileSync(join('dist', 'bok', `${chapter.slug}.md`), 'utf8');
+      const quote = /^> \*\*In short\*\*[\s\S]*?(?=\n(?!>))/m.exec(md)?.[0] ?? '';
+      expect(quote, 'In short blockquote in the .md twin').not.toBe('');
+      expect([...quote.matchAll(/\[(\d+)\]/g)].map((m) => m[1])).toEqual(linked);
     });
   }
 });
