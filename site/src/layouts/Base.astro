@@ -4,8 +4,10 @@ import '../styles/fonts.css';
 import '../styles/base.css';
 import '../styles/utilities.css';
 import '../styles/effects.css';
-import '../styles/prose.css';
-import '../styles/diagrams.css';
+// prose, figures and diagrams CSS are not global: the pages that render them
+// import styles/reading.css right after their layout, so the render-blocking
+// stylesheet every page shares stays small.
+import '../styles/print.css';
 import Seo from '../components/Seo.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
@@ -175,7 +177,7 @@ const theme = themeScript();
     <!-- Both themes are supported; the tokens set color-scheme per theme. -->
     <meta name="color-scheme" content="light dark" />
     <!-- Apply persisted theme before paint; exposes window.__setTheme. Inline
-         (public/theme.js, minified), allowed by its sha256 in the CSP. -->
+         (src/scripts/theme.js, minified), allowed by its sha256 in the CSP. -->
     <script is:inline set:html={theme.source} />
 
     {
