@@ -158,13 +158,17 @@ const competencyCount = aigpDomains.reduce((n, d) => n + d.competencies.length, 
 const title = 'Certifications, neutrally';
 const summary =
   'Who owns each AI governance certification, what the owner says it assesses, and how this open body of knowledge relates to it: facts checked on 24 Sep 2026, no ranking.';
+// The search title answers the comparison query (SXO-05, 2026-09-25 audit);
+// the H1 keeps the page's own title.
+const seoTitle = 'AI governance certifications compared: AIGP, ISO 42001';
 const description =
-  'A neutral overview of AIGP, ISO/IEC 42001 Lead Implementer and Lead Auditor, ISACA AAISM and AAIA, and how this open body of knowledge relates to each.';
+  'AI governance certifications compared: AIGP, ISO/IEC 42001 Lead Implementer and Auditor, ISACA AAISM and AAIA, and what each owner says it assesses.';
 const updated = gitDate('src/pages/for/certifications.astro');
 ---
 
 <Doc
   title={title}
+  seoTitle={seoTitle}
   summary={summary}
   description={description}
   crumbs={[{ label: 'For you', href: '/for' }, { label: 'Certifications' }]}

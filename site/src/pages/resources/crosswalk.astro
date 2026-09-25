@@ -15,10 +15,13 @@ import {
   frameworkById,
   crosswalkAsOf,
   refObligation,
+  refsByTopic,
+  type CrosswalkRef,
 } from '../../data/crosswalk';
 import { obligationPath } from '../../data/frameworks';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 import '../../styles/crosswalk.css';
@@ -27,9 +30,32 @@ import '../../styles/crosswalk-explorer.css';
 const matrix = topicMatrix();
 const frameworkCount = matrix.columns.reduce((n, c) => n + c.fws.length, 0);
 const unverifiedCount = refs.filter((r) => r.verified === false).length;
-const description =
-  'A crosswalk from 25 AI governance topics to the laws, codes, standards and controls that govern them, clause by clause, with a gap explorer and OSCAL export.';
+// Title and description answer the comparison query ("EU AI Act vs ISO 42001
+// vs NIST AI RMF", SXO-04 of the 2026-09-25 audit); the H1 stays.
+const seoTitle = 'AI governance crosswalk: EU AI Act, ISO 42001, NIST AI RMF';
+const description = `Compare the EU AI Act, ISO/IEC 42001, the NIST AI RMF and more across ${topics.length} AI governance topics, clause by clause, with a gap explorer and OSCAL export.`;
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Crosswalk' }];
+
+// The answer-first overlap of the three instruments most readers compare, read
+// from the same references the matrix renders (so it cannot drift from it):
+// per topic, the clauses each of the three files there, core ones first.
+const OVERLAP_IDS = ['eu-ai-act', 'iso-42001', 'nist-ai-rmf'];
+const overlapFws = OVERLAP_IDS.map((id) => {
+  const fw = frameworkById(id);
+  if (!fw) throw new Error(`crosswalk overlap: no framework "${id}"`);
+  return fw;
+});
+const coreFirst = (list: CrosswalkRef[]) =>
+  [...list].sort((a, b) => Number(a.strength !== 'core') - Number(b.strength !== 'core'));
+const overlapRows = topics.map((topic) => {
+  const byFw = refsByTopic(topic.id);
+  return { topic, cells: overlapFws.map((fw) => coreFirst(byFw.get(fw.id) ?? [])) };
+});
+const [euCells, isoCells, nistCells] = [0, 1, 2].map((i) => overlapRows.map((row) => row.cells[i]));
+const inAllThree = overlapRows.filter((row) => row.cells.every((cell) => cell.length > 0)).length;
+const actWithoutIso = overlapRows.filter((_, i) => euCells[i].length > 0 && isoCells[i].length === 0).length;
+const actWithoutNist = overlapRows.filter((_, i) => euCells[i].length > 0 && nistCells[i].length === 0).length;
+const OVERLAP_SHOWN = 2;
 
 // The explorer's defaults, mirrored in public/crosswalk-explorer.js.
 const DEFAULT_SOURCE = 'eu-ai-act';
@@ -91,7 +117,13 @@ const jsonLd = [
 ];
 ---
 
-<Base title="Crosswalk" description={description} image="/og/resources.png" jsonLd={jsonLd}>
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/resources.png"
+  jsonLd={jsonLd}
+>
   <PageHero
     variant="res"
     crumbs={crumbs}
@@ -100,6 +132,55 @@ const jsonLd = [
   />
 
   <div class="container res-page">
+    <section class="res-section cw-overlap" aria-labelledby="cw-overlap-heading">
+      <div class="res-section-head">
+        <h2 id="cw-overlap-heading">EU AI Act, ISO/IEC 42001 and NIST AI RMF: where they overlap</h2>
+        <p>
+          The three overlap on {inAllThree} of the {topics.length} topics in this crosswalk: each
+          files at least one clause there. They differ in force. The EU AI Act is binding law;
+          ISO/IEC 42001 is a certifiable AI management-system standard whose European adoption
+          confers no presumption of conformity with the Act; the NIST AI RMF is a voluntary
+          framework in four functions (Govern, Map, Measure, Manage). Of the topics the Act
+          reaches, {actWithoutIso} have no ISO/IEC 42001 clause here and {actWithoutNist} no NIST
+          AI RMF one. A shared topic means the instruments deal with the same thing, not that
+          meeting one meets the other.
+        </p>
+      </div>
+      <div class="res-tablewrap">
+        <table class="res-table cw-overlap-table">
+          <caption class="visually-hidden">
+            Clauses of the EU AI Act, ISO/IEC 42001 and the NIST AI RMF per crosswalk topic, core
+            references first
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Topic</th>
+              {overlapFws.map((fw) => <th scope="col">{fw.name}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {
+              overlapRows.map((row) => (
+                <tr>
+                  <td class="c-name" data-label="Topic">
+                    <a href={`#topic-${row.topic.id}`}>{row.topic.name}</a>
+                  </td>
+                  {row.cells.map((cell, i) => (
+                    <td data-label={overlapFws[i].short}>
+                      {cell.length === 0
+                        ? 'Not mapped'
+                        : cell.slice(0, OVERLAP_SHOWN).map(chipLabel).join(', ') +
+                          (cell.length > OVERLAP_SHOWN ? ` (+${cell.length - OVERLAP_SHOWN})` : '')}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <div class="res-section">
       <Callout kind="note" title="Illustrative mapping, not a conformity assessment">
         <p>{disclaimer}</p>

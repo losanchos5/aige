@@ -23,6 +23,7 @@ import { toolNotice, type ToolEntry } from '../../data/toolkit';
 import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
 import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import { site } from '../../data/site';
+import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/resources.css';
 import './toolkit.css';
 
@@ -32,6 +33,10 @@ interface Props {
   description: string;
   /** H1 on the hero; defaults to the tool's title. */
   heading?: string;
+  /** Document title (<title>, og:title) phrased for search, when the tool's
+      card title is not what a searcher types; the site-name suffix is kept only
+      when it fits (lib/seo-title.ts). Defaults to the tool's title. */
+  seoTitle?: string;
   /** One or two sentences under the H1. */
   lede: string;
   /** Open Graph card; an existing /og/*.png. */
@@ -48,6 +53,7 @@ const {
   tool,
   description,
   heading,
+  seoTitle,
   lede,
   image = '/og/default.png',
   data,
@@ -83,7 +89,13 @@ const jsonLd = [
 const island = data === undefined ? null : JSON.stringify(data).replace(/</g, '\\u003c');
 ---
 
-<Base title={tool.title} description={description} image={image} jsonLd={jsonLd}>
+<Base
+  title={seoTitle ?? tool.title}
+  titleSuffix={seoTitle ? fitsSiteSuffix(seoTitle) : undefined}
+  description={description}
+  image={image}
+  jsonLd={jsonLd}
+>
   <PageHero variant="res" crumbs={crumbs} title={heading ?? tool.title} lede={lede} />
 
   <div class="container tool-page" data-tool-page={tool.id} data-pagefind-body>

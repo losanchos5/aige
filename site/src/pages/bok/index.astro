@@ -9,6 +9,7 @@ import { bookParts, chapterNum, countWord } from '../../data/parts';
 import { readingTime } from '../../lib/reading';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { alternatesFor } from '../../lib/i18n-content';
+import { fitsSiteSuffix } from '../../lib/seo-title';
 
 const entries = await getCollection('bok');
 const minutes = new Map(entries.map((entry) => [entry.id, readingTime(entry.body ?? '')]));
@@ -28,7 +29,10 @@ const partsWord = countWord(bookParts.length);
 
 // Its own meta description: without one the landing fell back to the site-wide
 // default, which every other page already carries. Restates the sub-lede below.
-const description = `The Body of Knowledge for AI governance engineering: ${chapterCount} chapters in ${partsWord} parts, from the definition to the law. Read them in order or start from a part.`;
+// Title and description lead with the query this page should answer, "AI
+// governance body of knowledge" (SXO-10, 2026-09-25 audit); the H1 stays.
+const seoTitle = `AI Governance Body of Knowledge: ${chapterCount} open chapters`;
+const description = `The open AI governance body of knowledge: ${chapterCount} chapters in ${partsWord} parts, from the definition to the law, under ${site.license}. Read in order or start from a part.`;
 
 // Reading paths by reader (VISUAL-GUIDE §2.3 reading-paths): three routes through
 // the book as real links, each reaching into the foundations, lifecycle and law
@@ -85,7 +89,8 @@ const readingPaths = [
 ---
 
 <Base
-  title="Body of Knowledge"
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
   description={description}
   image="/og/bok.png"
   jsonLd={breadcrumbJsonLd([{ label: 'Body of Knowledge' }])}
