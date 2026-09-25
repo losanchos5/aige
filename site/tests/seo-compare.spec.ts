@@ -272,11 +272,11 @@ test.describe('comparison pages: accuracy (round 3)', () => {
   });
 
   test('every pattern listed for both serves a core clause of the row on each side', () => {
+    // Hardcoded, not imported: the same clause, or a paragraph of an EU AI Act
+    // article filed whole. Never an ISO control for its group, a NIST
+    // subcategory for its category, nor a bare NIST function (audit N-R3-5).
     const covers = (named: string, ref: string) =>
-      named === ref ||
-      named.startsWith(`${ref}.`) ||
-      named.startsWith(`${ref}(`) ||
-      (/^[A-Z]+$/.test(named) && ref.split(' ')[0] === named);
+      named === ref || (/^Art\. \d+[a-z]?$/.test(ref) && named.startsWith(`${ref}(`));
     let listed = 0;
     for (const c of comparisons) {
       const cmp = buildComparison(c);
@@ -301,6 +301,62 @@ test.describe('comparison pages: accuracy (round 3)', () => {
     }
     // The rule is strict, not empty: the three pages still name patterns.
     expect(listed).toBeGreaterThan(10);
+  });
+
+  test('a sub-clause or a whole NIST function does not stand in for the row\'s clause', () => {
+    const shared = (slug: string, topic: string) =>
+      buildComparison(comparisons.find((c) => c.slug === slug)!)
+        .rows.find((r) => r.topic.id === topic)
+        ?.shared.map((p) => p.id) ?? [];
+    // ISO/IEC 42001 A.6.2.4 (verification and validation) is not all of A.6,
+    // so the fairness eval is not a documentation pattern (audit CONTENT R1).
+    expect(shared('iso-42001-vs-eu-ai-act', 'documentation-transparency')).not.toContain(
+      'pattern-fairness-eval-suite',
+    );
+    // A.6.2.5 (deployment) is not the logging control A.6.2.8.
+    expect(shared('iso-42001-vs-eu-ai-act', 'logging-traceability')).not.toContain(
+      'pattern-deactivation-localisation--retirement-runbook',
+    );
+    // GOVERN 2.2 (training) is not all of GOVERN 2 (accountability structures).
+    expect(shared('nist-ai-rmf-vs-iso-42001', 'governance-accountability')).not.toContain(
+      'pattern-sanctioned-ai-gateway',
+    );
+    // "NIST AI RMF (Manage)" names no subcategory: MANAGE 2.4 is not served by it.
+    const oversight = shared('nist-ai-rmf-vs-eu-ai-act', 'human-oversight');
+    expect(oversight).not.toContain('pattern-runtime-guardrail');
+    expect(oversight).not.toContain('pattern-kill-switch--circuit-breaker');
+    // Exact matches still pass: the deployment row keeps its rollout pattern on
+    // both pages that file A.6.2.5 / MANAGE 2.4 / Art. 26 as core.
+    expect(shared('nist-ai-rmf-vs-iso-42001', 'deployment-change-decommissioning')).toContain(
+      'pattern-staged-rollout-with-rollback-criteria',
+    );
+    expect(shared('nist-ai-rmf-vs-eu-ai-act', 'deployment-change-decommissioning')).toContain(
+      'pattern-staged-rollout-with-rollback-criteria',
+    );
+  });
+
+  test('an ISO 42001 gap is stated for this crosswalk, not as a fact about the standard', () => {
+    // The ISO text is paywalled: "Environmental impact" is a topic this mapping
+    // does not reach on the ISO side, not one ISO/IEC 42001 is shown to omit.
+    const iso = gapQuestion(buildComparison(comparisons.find((c) => c.slug === 'iso-42001-vs-eu-ai-act')!));
+    expect(iso.a).toContain('In this crosswalk');
+    expect(iso.a).toContain('no ISO 42001 clause mapped');
+    expect(iso.a).toContain('Environmental impact');
+    expect(iso.a).toContain('not one ISO 42001 is shown to leave out');
+    for (const c of comparisons) {
+      const gap = gapQuestion(buildComparison(c));
+      expect(gap.a, c.slug).not.toMatch(/ISO(?:\/IEC)? 42001 (?:has|contains|includes) no\b/);
+      expect(text(html(comparisonPath(c))), c.slug).toContain(text(gap.a));
+    }
+  });
+
+  test('the EN 18286 answer cites a source for "not yet in the Official Journal"', () => {
+    const iso = comparisons.find((c) => c.slug === 'iso-42001-vs-eu-ai-act')!;
+    const item = iso.faq.find((f) => f.a.includes('EN 18286'));
+    expect(item?.a).toContain('not yet published in the Official Journal');
+    expect(item?.sources?.map((s) => s.url)).toContain(
+      'https://digital-strategy.ec.europa.eu/en/policies/ai-act-standardisation',
+    );
   });
 
   test('no "only" claim rests on a clause filed in passing, and the NIST gap names what is not mapped', () => {

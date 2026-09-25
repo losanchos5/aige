@@ -101,10 +101,12 @@ function side(topicId: string, frameworkId: string): SideRef[] {
 // under risk management) leaked its article's patterns into narrow topics. So a
 // pattern is listed on a row only when, on EACH side, one CORE clause of that
 // row both joins a register row listing the pattern AND is named on the
-// pattern's own "Maps to" line (the clause itself or a sub-clause of it; for the
-// NIST AI RMF also a function named as a whole, "NIST AI RMF (Manage)"). A
-// pattern whose line names the instrument without a clause ("ISO/IEC 42001")
-// cannot pass on that side. Where no pattern passes, the cell stays empty.
+// pattern's own "Maps to" line (that very clause, control or subcategory, or a
+// paragraph of an EU AI Act article the row files whole; never an ISO/IEC 42001
+// control or a NIST AI RMF subcategory standing in for its group, nor a NIST
+// function named as a whole, "NIST AI RMF (Manage)"). A pattern whose line
+// names the instrument without a clause ("ISO/IEC 42001") cannot pass on that
+// side. Where no pattern passes, the cell stays empty.
 
 /** How a pattern's "Maps to" line names each instrument this module compares. */
 const MAPS_TO_PREFIX: Readonly<Record<string, string>> = {
@@ -153,12 +155,17 @@ export function namedClauses(pattern: Pick<PatternDef, 'mapsTo'>, frameworkId: s
   return out;
 }
 
-/** Whether a named clause is the ref's clause or inside it ("A.9.2" in "A.9",
- *  "Art. 26(5)" in "Art. 26", "MANAGE 2.4" in "MANAGE 2"), or a NIST function
- *  named as a whole that holds the ref ("MANAGE" holds "MANAGE 2.4"). */
+/** Whether a named clause is the ref's own clause: the same clause, control or
+ *  subcategory, or a paragraph of the EU AI Act article the ref files whole
+ *  ("Art. 26(5)" in "Art. 26": one article, one duty holder's obligation). An
+ *  ISO/IEC 42001 control does not stand in for its group ("A.6.2.4", a
+ *  fairness eval, is not all of "A.6" and so not documentation), a NIST
+ *  subcategory for its category ("GOVERN 2.2", training, is not all of
+ *  "GOVERN 2"), nor a function named as a whole for its subcategories
+ *  ("MANAGE" is not "MANAGE 2.4"): each paired patterns with topics they do
+ *  not serve (audit CONTENT N-R3-5). */
 function covers(named: string, ref: string): boolean {
-  if (named === ref || named.startsWith(`${ref}.`) || named.startsWith(`${ref}(`)) return true;
-  return /^[A-Z]+$/.test(named) && ref.split(' ')[0] === named;
+  return named === ref || (/^Art\. \d+[a-z]?$/.test(ref) && named.startsWith(`${ref}(`));
 }
 
 /** Whether the pattern serves a core clause of this side of the row: the clause
@@ -311,8 +318,10 @@ export function overlapSummary(c: Comparison): string {
  * that the other does not (the side with more one-sided topics; B on a tie).
  * Only topics with a CORE clause on the wide side count as covered; the ones it
  * touches in passing are named apart. Stated for this mapping, never as a fact
- * about the instruments, with the pair's gapNote (what the mapping leaves out)
- * appended.
+ * about the instruments ("no ISO 42001 clause mapped", not "ISO 42001 has no
+ * clause": its text is paywalled and environmental impact, for one, is a topic
+ * this mapping does not reach there; audit CONTENT R2), with the pair's gapNote
+ * (what the mapping leaves out) appended.
  */
 export function gapQuestion(c: Comparison): Qa {
   const bSide = c.counts.bOnly >= c.counts.aOnly;
@@ -337,7 +346,7 @@ export function gapQuestion(c: Comparison): Qa {
   const covered =
     only.length === 0
       ? `In this crosswalk, no topic has a core ${wide} clause and no ${narrow} clause.`
-      : `In this crosswalk, ${only.length} of the ${c.counts.topics} topics ${only.length === 1 ? 'has' : 'have'} a core ${wide} clause and no ${narrow} clause: ${only.join('; ')}.`;
+      : `In this crosswalk, ${only.length} of the ${c.counts.topics} topics ${only.length === 1 ? 'has' : 'have'} a core ${wide} clause and no ${narrow} clause mapped: ${only.join('; ')}.`;
   const touched =
     passing.length === 0
       ? ''
@@ -345,7 +354,7 @@ export function gapQuestion(c: Comparison): Qa {
   return {
     q,
     a: withNote(
-      `${covered}${touched} The overlap table on this page lists the clauses; mappings are illustrative, not a claim of conformity.`,
+      `${covered}${touched} A topic with no ${narrow} clause here is one this mapping does not reach, not one ${inSentence(narrow)} is shown to leave out. The overlap table on this page lists the clauses; mappings are illustrative, not a claim of conformity.`,
     ),
     ...sources,
   };

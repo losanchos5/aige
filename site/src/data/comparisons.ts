@@ -127,7 +127,9 @@ export interface ComparisonDef {
 // #art_<n>), NIST AI 100-1, AI 600-1, the framework page and the crosswalks
 // page in bok/22-principles-and-standards.md [9][23][24][30], ISO/IEC 42006 in
 // the same chapter [42], ISO/IEC 42001 and 23894 and the EN 18286 notice in
-// crosswalk.ts.
+// crosswalk.ts, and the Commission's AI Act standardisation page, the source
+// of "no harmonised standard is cited in the Official Journal" in
+// bok/08-regulatory-map.md [20] and bok/09-glossary.md [10].
 const AI_ACT = 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng';
 const AI_ACT_TEXT: SourceRef = { label: 'Regulation (EU) 2024/1689, consolidated text', url: AI_ACT };
 const art = (n: string): SourceRef => ({
@@ -142,6 +144,10 @@ const OMNIBUS: SourceRef = {
 const EN_18286: SourceRef = {
   label: 'CEN-CENELEC: EN 18286 in the spotlight',
   url: 'https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/',
+};
+const EC_STANDARDISATION: SourceRef = {
+  label: 'European Commission: Standardisation of the AI Act',
+  url: 'https://digital-strategy.ec.europa.eu/en/policies/ai-act-standardisation',
 };
 const ISO_42001: SourceRef = { label: 'ISO/IEC 42001:2023', url: 'https://www.iso.org/standard/42001' };
 const ISO_42006: SourceRef = { label: 'ISO/IEC 42006:2025', url: 'https://www.iso.org/standard/44546.html' };
@@ -276,12 +282,12 @@ export const comparisons: readonly ComparisonDef[] = [
       {
         q: 'Does ISO 42001 certification give a presumption of conformity with the EU AI Act?',
         a: 'No. Only harmonised European standards whose references are published in the Official Journal (Article 40) and common specifications the Commission adopts by implementing act (Article 41) give a presumption of conformity, to the extent they cover the requirements. ISO/IEC 42001 is neither. As of 2026-09-24 no harmonised standard had been cited at all.',
-        sources: [art('40'), art('41')],
+        sources: [art('40'), art('41'), EC_STANDARDISATION],
       },
       {
         q: 'Is ISO 42001 the quality management system of Article 17?',
-        a: 'No. ISO/IEC 42001 is an AI management-system standard, not the Article 17 quality management system the Act asks of high-risk providers. The standard written for Article 17 is EN 18286:2026, published in July 2026 but not cited in the Official Journal, so it carries no presumption of conformity yet.',
-        sources: [art('17'), EN_18286],
+        a: 'No. ISO/IEC 42001 is an AI management-system standard, not the Article 17 quality management system the Act asks of high-risk providers. The standard written for Article 17 is EN 18286:2026, published by CEN-CENELEC in July 2026. Its reference is not yet published in the Official Journal (checked 2026-09-24), so it gives no presumption of conformity yet.',
+        sources: [art('17'), EN_18286, EC_STANDARDISATION],
       },
       {
         q: 'When do the EU AI Act high-risk duties apply?',
