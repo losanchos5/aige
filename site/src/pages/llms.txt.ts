@@ -126,7 +126,7 @@ export const GET: APIRoute = async (context) => {
       linkLine(
         'Remote MCP server (read-only)',
         MCP_ENDPOINT,
-        'A Model Context Protocol server (Streamable HTTP, no authentication) over the same /api/v1 data: the obligation register, the crosswalk, the glossary, the patterns, the templates and schemas, and the chapters; every answer names its source page. As of 2026-09-24 it is not deployed yet; its code and self-hosting guide are in tools/mcp-server of the repository.',
+        'A Model Context Protocol server (Streamable HTTP, no authentication) over the same /api/v1 data: the obligation register, the crosswalk, the glossary, the patterns, the templates and schemas, and the chapters; every answer names its source page. Live since 2026-09-25; its code and self-hosting guide are in tools/mcp-server of the repository.',
       ),
       linkLine(
         'Topic × framework crosswalk',

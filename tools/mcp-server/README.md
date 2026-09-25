@@ -13,8 +13,8 @@ that carry their source URL. It holds no data of its own: every answer is read f
 (cached in memory) and every answer names the page it came from. It stores nothing about the people
 who call it, needs no account and writes nothing anywhere.
 
-The planned public endpoint is `https://mcp.aigovernanceengineer.com/mcp` (Streamable HTTP, no
-authentication). As of 2026-09-24 it is not deployed yet; until it is, run it yourself (below).
+The public endpoint is `https://mcp.aigovernanceengineer.com/mcp` (Streamable HTTP, no
+authentication), live since 2026-09-25. You can also run it yourself (below).
 
 ## Tools
 
