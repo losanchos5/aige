@@ -12,7 +12,9 @@
  * and elevation as everywhere else once the page scrolls (.is-scrolled, ui.js).
  * `lang` translates the chrome's own strings (src/i18n/ui.ts; the destinations
  * stay the English pages); `alternates`, the page's hreflang set, feeds the
- * language switcher, which only appears when the page exists in two languages.
+ * language switcher, which only appears when the page exists in two languages
+ * and machine translations are published (I18N_PUBLISHED, src/i18n/locales.ts;
+ * off since 2026-09-25, so the Thesis links its Spanish version in the page).
  */
 import RegisterMark from './RegisterMark.astro';
 import ThemeToggle from './ThemeToggle.astro';
@@ -20,7 +22,7 @@ import LangSwitcher from './LangSwitcher.astro';
 import { site } from '../data/site';
 import { nav, resolveCurrent, type NavGroup, type NavItem } from '../data/nav';
 import { bookParts, bookRange } from '../data/parts';
-import { stripLocale } from '../i18n/locales';
+import { I18N_PUBLISHED, stripLocale } from '../i18n/locales';
 import { translator, type UiKey } from '../i18n/ui';
 
 interface Props {
@@ -221,7 +223,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
         </ul>
       </nav>
 
-      <LangSwitcher lang={lang} alternates={alternates} />
+      {I18N_PUBLISHED && <LangSwitcher lang={lang} alternates={alternates} />}
 
       <button
         type="button"
@@ -286,7 +288,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
       <kbd>Ctrl K</kbd>
     </button>
 
-    <LangSwitcher lang={lang} alternates={alternates} variant="drawer" />
+    {I18N_PUBLISHED && <LangSwitcher lang={lang} alternates={alternates} variant="drawer" />}
 
     <nav class="nav-panel" aria-label={t('header.menu')}>
       {

@@ -8,7 +8,8 @@
 //     are translated);
 //   - the routes the collections produce are exactly the ones lib/i18n-content.ts
 //     finds on disk, which is what the sitemap, the hreflang alternates and the
-//     language switcher are built from;
+//     language switcher are built from; both sides keep only the languages in
+//     PUBLISHED_TRANSLATED_LOCALES (src/i18n/locales.ts);
 //   - a translated page carries the English page's anchors
 //     (`assertSameAnchors`, run by the page templates after rendering both).
 //
@@ -27,7 +28,7 @@ import {
   translationIndex,
   type TranslationFile,
 } from './i18n-content';
-import type { TranslatedLocale } from '../i18n/locales';
+import { isPublishedLocale, type TranslatedLocale } from '../i18n/locales';
 
 interface TranslationMeta {
   lang: TranslatedLocale;
@@ -91,6 +92,15 @@ function check<Entry extends { id: string; data: TranslationMeta }>(
   };
 }
 
+/**
+ * Entries in a published language only (PUBLISHED_TRANSLATED_LOCALES): the
+ * others stay in the collections but make no page and are not checked here.
+ * The entry id starts with the language folder (`es/bok/...`).
+ */
+function published<Entry extends { id: string }>(entries: Entry[]): Entry[] {
+  return entries.filter((entry) => isPublishedLocale(entry.id.split('/')[0]));
+}
+
 let chaptersCache: Promise<TranslatedChapter[]> | undefined;
 let patternsCache: Promise<TranslatedPattern[]> | undefined;
 let thesesCache: Promise<TranslatedThesis[]> | undefined;
@@ -98,7 +108,7 @@ let thesesCache: Promise<TranslatedThesis[]> | undefined;
 /** Every translated chapter, in language then reading order. */
 export function translatedChapters(): Promise<TranslatedChapter[]> {
   chaptersCache ??= (async () => {
-    const entries = await getCollection('bokI18n');
+    const entries = published(await getCollection('bokI18n'));
     return entries
       .map((entry) => {
         const base = check(entry);
@@ -117,7 +127,7 @@ export function translatedPatterns(): Promise<TranslatedPattern[]> {
       getCollection('patterns'),
     ]);
     const bySlug = new Map(english.map((entry) => [entry.data.id, entry.data]));
-    return entries
+    return published(entries)
       .map((entry) => {
         const base = check(entry);
         const def = getPatternBySlug(base.file.id)!;
@@ -140,7 +150,7 @@ export function translatedPatterns(): Promise<TranslatedPattern[]> {
 
 /** Every machine-translated Thesis (fr, de, pt). */
 export function translatedTheses(): Promise<TranslatedThesis[]> {
-  thesesCache ??= (async () => (await getCollection('thesisI18n')).map((entry) => check(entry)))();
+  thesesCache ??= (async () => published(await getCollection('thesisI18n')).map((entry) => check(entry)))();
   return thesesCache;
 }
 
