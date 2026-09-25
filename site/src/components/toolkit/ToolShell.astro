@@ -3,7 +3,9 @@
  * ToolShell: the one wrapper every /toolkit tool page renders in. It owns the
  * parts a tool must not re-invent:
  * - the page chrome: Base layout, a reference PageHero with the Toolkit
- *   breadcrumb, and the page's JSON-LD (BreadcrumbList + WebApplication);
+ *   breadcrumb and the visible byline (author and the `updated` date the
+ *   JSON-LD also states), and the page's JSON-LD (BreadcrumbList +
+ *   WebApplication);
  * - the fixed notice (`toolNotice` from data/toolkit.ts), above the form;
  * - the no-JS note (`[data-tool-nojs]`, hidden by lib.js `mountTool`), while
  *   the teaching content in the `guide` slot is server-rendered, so the page
@@ -19,6 +21,7 @@
  */
 import Base from '../../layouts/Base.astro';
 import PageHero from '../PageHero.astro';
+import Byline from '../Byline.astro';
 import { toolNotice, type ToolEntry } from '../../data/toolkit';
 import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
 import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
@@ -106,7 +109,9 @@ const island = data === undefined ? null : JSON.stringify(data).replace(/</g, '\
   image={image}
   jsonLd={jsonLd}
 >
-  <PageHero variant="res" crumbs={crumbs} title={heading ?? tool.title} lede={lede} />
+  <PageHero variant="res" crumbs={crumbs} title={heading ?? tool.title} lede={lede}>
+    <Byline slot="lede" date={updated} />
+  </PageHero>
 
   <div class="container tool-page" data-tool-page={tool.id} data-pagefind-body>
     <div class="tool-top">
