@@ -170,6 +170,10 @@ UNESCO and G7 texts are principles and codes.
 
 Sources: [6][11][3][15][5][18][9][19][8][20][21][13].
 
+Side by side: [ISO/IEC 42001 vs EU AI Act](/resources/crosswalk/iso-42001-vs-eu-ai-act),
+[NIST AI RMF vs ISO/IEC 42001](/resources/crosswalk/nist-ai-rmf-vs-iso-42001) and
+[NIST AI RMF vs EU AI Act](/resources/crosswalk/nist-ai-rmf-vs-eu-ai-act).
+
 Three practical points follow. **Force decides priority.** Where the AI Act applies, it sets the
 floor and the dates. The standards and frameworks are ways to organise the work and show it. **A
 certificate is not compliance.** An ISO/IEC 42001 certificate evidences a management system. It
