@@ -2,15 +2,12 @@
    them. The inline SVGs ship semantic class names but NO styles of their own
    (the build strips the renderer's stylesheet), so every fill/stroke/colour
    below maps an archify class to a site token. Dark mode falls out of the
-   tokens. Imported once from Base.astro.
+   tokens. Loaded through reading.css by the pages that render prose, figures
+   or diagrams, not by Base.astro.
 
    public/diagram.js adds `.diagram-js` to each figure and toggles `.has-active`
    plus `.is-lit`/`.is-dim` on nodes ([data-node-id]) and edges ([data-edge-id]);
    without JS every node and edge is static and legible. */
-
-/* The hand-made conceptual infographics (src/figures/*.svg, <Figure>) share this
-   global stylesheet, so they are styled on every page that loads diagrams.css. */
-@import './figures.css';
 
 /* ---------------------------------------------------------------- figure -- */
 .diagram {

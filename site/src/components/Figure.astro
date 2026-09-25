@@ -5,9 +5,9 @@
  * canvas, a two-sentence figcaption and an optional <details> text alternative.
  * The canvas holds slotted content: an inline <svg> from src/figures, or, when
  * real navigation links are more accessible than SVG links, plain HTML (see the
- * reading-paths map on the /bok index). Styling comes from the global
- * figures.css (imported via diagrams.css in Base.astro), so light and dark both
- * follow the tokens.
+ * reading-paths map on the /bok index). Styling comes from figures.css, which
+ * the page loads through styles/reading.css imported right after its layout;
+ * light and dark both follow the tokens.
  */
 import { getFigure } from '../data/figures';
 import { hasFigureArt } from '../lib/figure-reuse';

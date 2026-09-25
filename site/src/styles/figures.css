@@ -1,7 +1,7 @@
 /* figures.css: the conceptual infographics (src/figures/*.svg) and the figure
-   that wraps them, plus the reading-paths map on the /bok index. Imported once
-   from diagrams.css (which Base.astro loads on every page), so both the chapter
-   pipeline (rehype-diagrams) and <Figure> get these styles.
+   that wraps them, plus the reading-paths map on the /bok index. Loaded through
+   reading.css by the pages that render prose, figures or diagrams (the chapter
+   pipeline, rehype-diagrams, and <Figure>), not by Base.astro.
 
    The inline SVGs carry semantic class names but map every colour to a site
    token here, so light and dark fall out of the tokens and no figure hard-codes

@@ -1,0 +1,16 @@
+/* reading.css: the stylesheets of the reading content, in the order Base.astro
+   used to load them for every page: the prose typography, the conceptual
+   figures, then the archify diagrams. Only the pages that render prose, a
+   figure or a diagram load it, so the stylesheet every page shares (tokens,
+   fonts, base, utilities, effects, print) stays small for the home and the
+   hubs. One file rather than three, so a chapter pays one request, not three.
+
+   Import it right after the page's layout (Base, Marketing, Doc) and before
+   any other component: Astro orders a page's stylesheets by where their
+   imports sit, and these rules must come after the shared stylesheet and
+   before the component and page styles, as they did when they were global.
+   tests/perf.spec.ts fails the build's test run when a page uses .prose, a
+   figure or a diagram without linking this file. */
+@import './prose.css';
+@import './figures.css';
+@import './diagrams.css';
