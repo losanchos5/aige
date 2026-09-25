@@ -144,6 +144,34 @@ test('the timeline draws every dated EU AI Act step of frameworks.ts and nothing
   for (const date of tableDates) expect(svgDates.has(date), `table date ${date} is drawn`).toBe(true);
 });
 
+test('a crowded timeline lane settles or fails fast instead of stalling the prebuild', async () => {
+  // Five more dated GPAI rows on top of the register's: trying all 12^n label
+  // placements would take minutes at 8 dates; the pruned search settles fast,
+  // and the poster then either builds or stops with a named "posters:" error
+  // (labels that cannot be placed, a search over budget, or a poster too tall).
+  const { buildTimelinePoster } = await import('../scripts/lib/posters.mjs');
+  const gpai = obligations.find((row) => row.frameworkId === 'eu-ai-act' && row.systemClass?.includes('gpai'));
+  if (!gpai) throw new Error('no GPAI row in frameworks.ts');
+  const extra = ['2025-11-03', '2026-03-02', '2027-11-02', '2029-03-01', '2030-06-03'].map((date, i) => ({
+    ...gpai,
+    id: `${gpai.id}-X${i}`,
+    appliesFrom: date,
+    milestones: [],
+  }));
+  const warn = console.warn;
+  console.warn = () => {}; // the synthetic dates have no poster label
+  const started = Date.now();
+  try {
+    const svg = buildTimelinePoster([...obligations, ...extra], def('eu-ai-act-timeline'), 'en');
+    expect(svg).toContain('<svg');
+  } catch (error) {
+    expect(String(error)).toMatch(/^Error: posters: eu-ai-act-timeline/);
+  } finally {
+    console.warn = warn;
+  }
+  expect(Date.now() - started).toBeLessThan(10_000);
+});
+
 test('the matrix poster and its table repeat deployment-options.ts cell for cell', () => {
   const text = visibleText(art('deployment-option-matrix'));
   const flat = text.replace(/-\s/g, '-').replace(/\s+/g, ' ');

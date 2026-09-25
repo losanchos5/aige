@@ -478,7 +478,7 @@ export function buildTimelinePoster(obligations, fig, lang = 'en') {
 
     // Labels: a date line and the wrapped text under the track. Each label
     // picks a width, a side of its dot and a row so that none overlap and the
-    // lane is as short as it can be (exhaustive: a lane has a handful of dates).
+    // lane is as short as it can be (an exact search, pruned; see below).
     const labels = lane.events.map((e) => {
       const key = `${lane.id}:${e.date}`;
       let words = S.events[key];
@@ -502,40 +502,64 @@ export function buildTimelinePoster(obligations, fig, lang = 'en') {
       const w = lab.variants[o.v].w;
       return o.side === 'r' ? [lab.x - 8, lab.x - 8 + w] : [lab.x + 8 - w, lab.x + 8];
     };
-    let best = null;
+    // The best combination of options, found depth first in the order of an
+    // odometer whose last label turns slowest (the order of a plain loop over
+    // every combination, so ties resolve the same way). A branch stops as soon
+    // as two placed labels clash, or when its partial score cannot beat the
+    // best found: height, narrowing and left sides only grow as labels are
+    // added. Every combination (12^n) would stall the prebuild at 7 or more
+    // dates in a lane; the budget turns a lane the search cannot settle into a
+    // build error instead.
     const n = labels.length;
-    const total = options.length ** n;
-    for (let code = 0; code < total; code += 1) {
-      const pick = [];
-      let c = code;
-      for (let i = 0; i < n; i += 1) {
-        pick.push(options[c % options.length]);
-        c = Math.floor(c / options.length);
+    const SEARCH_BUDGET = 2_000_000;
+    const boxes = labels.map((lab) => options.map((o) => boxOf(lab, o)));
+    const clashes = (i, oi, j, oj) => {
+      const [a0, a1] = boxes[i][oi];
+      const [b0, b1] = boxes[j][oj];
+      const pi = options[oi];
+      const pj = options[oj];
+      // Same row: boxes keep a gap. A second-row label's leader must not
+      // cross a first-row box.
+      if (pi.row === pj.row && a0 < b1 + 14 && b0 < a1 + 14) return true;
+      if (pi.row === 1 && pj.row === 0 && labels[i].x > b0 - 6 && labels[i].x < b1 + 6) return true;
+      if (pj.row === 1 && pi.row === 0 && labels[j].x > a0 - 6 && labels[j].x < a1 + 6) return true;
+      return false;
+    };
+    const chosen = new Array(n);
+    let best = null;
+    let steps = 0;
+    const place = (i, h0, h1, narrow, lefts) => {
+      const score = (h0 + (h1 ? 10 + h1 : 0)) * 100 + narrow * 3 + lefts;
+      if (best && score >= best.score) return;
+      if (i < 0) {
+        best = { score, pick: chosen.map((k) => options[k]), h0 };
+        return;
       }
-      let ok = true;
-      for (let i = 0; i < n && ok; i += 1) {
-        const [a0, a1] = boxOf(labels[i], pick[i]);
-        if (a0 < M || a1 > POSTER_W - M) ok = false;
-        for (let j = 0; j < n && ok; j += 1) {
-          if (j === i) continue;
-          const [b0, b1] = boxOf(labels[j], pick[j]);
-          // Same row: boxes keep a gap. A second-row label's leader must not
-          // cross a first-row box.
-          if (pick[j].row === pick[i].row && j < i && a0 < b1 + 14 && b0 < a1 + 14) ok = false;
-          if (pick[i].row === 1 && pick[j].row === 0 && labels[i].x > b0 - 6 && labels[i].x < b1 + 6) {
-            ok = false;
-          }
+      for (let k = 0; k < options.length; k += 1) {
+        steps += 1;
+        if (steps > SEARCH_BUDGET) {
+          throw new Error(
+            `posters: ${fig.id}: lane ${lane.id} has ${n} dated events and its label search passed ${SEARCH_BUDGET} steps; merge dates or split the lane`,
+          );
         }
+        const [a0, a1] = boxes[i][k];
+        if (a0 < M || a1 > POSTER_W - M) continue;
+        let ok = true;
+        for (let j = i + 1; j < n && ok; j += 1) if (clashes(i, k, j, chosen[j])) ok = false;
+        if (!ok) continue;
+        chosen[i] = k;
+        const o = options[k];
+        const h = labels[i].variants[o.v].h;
+        place(
+          i - 1,
+          o.row === 0 ? Math.max(h0, h) : h0,
+          o.row === 1 ? Math.max(h1, h) : h1,
+          narrow + o.v,
+          lefts + (o.side === 'l' ? 1 : 0),
+        );
       }
-      if (!ok) continue;
-      const h0 = Math.max(0, ...labels.map((l, i) => (pick[i].row === 0 ? l.variants[pick[i].v].h : 0)));
-      const h1 = Math.max(0, ...labels.map((l, i) => (pick[i].row === 1 ? l.variants[pick[i].v].h : 0)));
-      const height = h0 + (h1 ? 10 + h1 : 0);
-      const lefts = pick.filter((p) => p.side === 'l').length;
-      const narrow = pick.reduce((s, p) => s + p.v, 0);
-      const score = height * 100 + narrow * 3 + lefts;
-      if (!best || score < best.score) best = { score, pick, h0 };
-    }
+    };
+    place(n - 1, 0, 0, 0, 0);
     if (!best) throw new Error(`posters: ${fig.id}: labels of lane ${lane.id} cannot be placed`);
     const rowTop = [trackY + 18, trackY + 18 + best.h0 + 10];
 
