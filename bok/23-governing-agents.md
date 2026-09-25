@@ -1,3 +1,6 @@
+---
+seoTitle: "AI agent governance: registry, identity, kill switches"
+---
 # 23. Governing AI agents
 
 > An AI agent is governed when every action traces back to a registered identity, a scope someone

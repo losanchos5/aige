@@ -1,3 +1,6 @@
+---
+seoTitle: "What is an AI system? Definitions for AI governance"
+---
 # 11. AI, defined for governance
 
 > What an AI system is for governance purposes: the definitions that set scope, the kinds of AI and

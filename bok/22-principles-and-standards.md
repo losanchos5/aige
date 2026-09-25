@@ -1,3 +1,6 @@
+---
+seoTitle: "AI principles and standards: OECD, ISO/IEC, NIST, IEEE"
+---
 # 22. Principles, soft law and standards
 
 > Principles say what good looks like and standards say how to show it; this chapter maps each

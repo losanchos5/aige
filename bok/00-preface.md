@@ -1,3 +1,6 @@
+---
+seoTitle: "AI governance engineering body of knowledge: preface"
+---
 # 00. Preface
 
 > Why this book exists, who it is for, and how to use it.

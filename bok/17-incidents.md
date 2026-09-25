@@ -1,3 +1,6 @@
+---
+seoTitle: "AI incident management: classify, contain, report"
+---
 # 17. Incidents, issues and root causes
 
 > AI incident management turns a runtime signal into an event that is classified, contained,

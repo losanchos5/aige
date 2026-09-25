@@ -1,3 +1,6 @@
+---
+seoTitle: "AI governance patterns catalogue, layer by layer"
+---
 # 05. Patterns
 
 > A catalogue of reusable AI governance engineering patterns, each named to a layer of the stack, in

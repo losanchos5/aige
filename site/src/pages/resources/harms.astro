@@ -20,6 +20,7 @@ import {
 } from '../../data/harms';
 import { casesForHarm } from '../../data/cases';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { fitsSiteSuffix } from '../../lib/seo-title';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
@@ -40,8 +41,11 @@ for (const harm of harms) {
   }
 }
 
+// Title and description lead with the query the page answers, "AI harms
+// taxonomy" (SXO-11, 2026-09-25 audit); the H1 stays.
+const seoTitle = 'AI harms taxonomy: harms mapped to controls and incidents';
 const description =
-  'An atlas of the harms AI systems cause to individuals, groups, organisations, society and the environment: each with its failure mode, the control that catches it, the evidence it leaves and real incidents.';
+  'An AI harms taxonomy: harms to people, groups, organisations, society and the environment, each with a failure mode, the control that catches it and incidents.';
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Harms atlas' }];
 
 const pageUrl = new URL('/resources/harms', site.url).href;
@@ -82,7 +86,13 @@ const filters = [
 ];
 ---
 
-<Base title="Harms atlas" description={description} image="/og/resources.png" jsonLd={jsonLd}>
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/resources.png"
+  jsonLd={jsonLd}
+>
   <PageHero
     variant="res"
     crumbs={crumbs}

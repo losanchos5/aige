@@ -1,3 +1,6 @@
+---
+seoTitle: "How to run an AI governance program: roles, RACI, KPIs"
+---
 # 12. Running the AI governance program
 
 > An AI governance program is the organisation governed as a system: people hold the duties, a

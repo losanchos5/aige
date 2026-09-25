@@ -1,3 +1,6 @@
+---
+seoTitle: "AI development governance: gates, tests, technical file"
+---
 # 14. Governing AI development
 
 > AI development is governed when every decision in the build, from the use case to the release,

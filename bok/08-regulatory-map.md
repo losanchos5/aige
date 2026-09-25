@@ -1,3 +1,6 @@
+---
+seoTitle: "AI regulatory map: every obligation to its artefact"
+---
 # 08. Regulatory map (obligation → artefact → layer)
 
 > This chapter is the reverse index of every "Maps to" line in the book: for each obligation it names

@@ -1,3 +1,6 @@
+---
+seoTitle: "AI laws around the world: Korea, US, Japan, China, UK"
+---
 # 21. AI-specific laws around the world
 
 > Outside the EU, AI-specific law ranges from Korea's horizontal Basic Act to US state statutes,

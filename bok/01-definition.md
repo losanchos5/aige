@@ -1,3 +1,6 @@
+---
+seoTitle: "What is AI governance engineering? Definition and scope"
+---
 # 01. The definition
 
 > AI governance engineering is the application of engineering practice (systems thinking, product

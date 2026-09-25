@@ -1,3 +1,7 @@
+---
+seoTitle: "AI governance values and principles, put into practice"
+seoDescription: "The eight values and six principles of AI governance engineering, each with what it means in practice and the anti-pattern it rejects."
+---
 # 03. Values and principles
 
 > The eight values and six principles of the Thesis, each expanded with what it means in practice

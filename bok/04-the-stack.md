@@ -1,3 +1,7 @@
+---
+seoTitle: "AI governance architecture: the five-layer stack"
+seoDescription: "The AI governance reference architecture: five layers, from policy to assurance, where evidence is produced at the bottom and proven at the top."
+---
 # 04. The stack (five layers)
 
 > The reference architecture of AI governance engineering: five layers that answer the three

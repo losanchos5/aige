@@ -1,3 +1,7 @@
+---
+seoTitle: "AI governance glossary: 300+ terms defined"
+seoDescription: "The AI governance engineering glossary: every term defined once, alphabetically, and cross-referenced to the chapter that treats it in full."
+---
 # 09. Glossary
 
 > The canonical definitions for the book: every term defined once, alphabetically, and

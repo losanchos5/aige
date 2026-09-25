@@ -30,6 +30,7 @@ import {
 } from '../data/role';
 import { levels } from '../data/maturity';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
+import { fitsSiteSuffix } from '../lib/seo-title';
 
 const roleHref = (anchor: string) => `/bok/the-role#${anchor}`;
 const maturityHref = `/bok/maturity-model#${levels[0].anchor}`;
@@ -53,11 +54,31 @@ const reportedText = reportedStats
     return `${label}, up ${stat.value}, per ${stat.source}`;
   })
   .join('; ');
+
+// This page is the landing for the query "AI governance engineer" (SXO-06,
+// 2026-09-25 audit): the title leads with it, and four section heads are the
+// questions searchers ask, each answered in 40 to 60 words right under it from
+// the facts on this page (data/role.ts) and chapter 06. Chapter 06 carries a
+// different search title, so the two do not compete.
+const seoTitle = 'AI governance engineer: what they do, skills, salary';
+const answers = {
+  does:
+    'An AI governance engineer owns seven workflows, not documents: intake and classification, inventory and registry, evals and red teaming, policy-as-code and gates, runtime monitoring and incidents, assurance and audit evidence, and regulatory translation. Each is a running system with inputs, outputs and the stack layer it maps to.',
+  skills:
+    'The skills follow the workflows. The load-bearing ones are eval harness engineering, policy-as-code in OPA/Rego or Cedar, CI/CD pipeline engineering, observability and incident response, OSCAL and machine-readable evidence, and reading the AI Act, ISO/IEC 42001 and the NIST AI RMF. Under all seven: enough Python to glue systems together.',
+  become:
+    'There are three ways in, each from an adjacent discipline, and each brings an edge and a gap. From legal or privacy, start at policy-as-code and intake. From security or GRC, start at evals-as-evidence and the agent registry. From MLOps or ML engineering, start at eval gates in CI and runtime monitoring.',
+  // The figures are the primary medians of `market` below (tests/seo-titles.spec.ts
+  // checks that each tile value appears in this answer).
+  salary:
+    'The IAPP Salary & Jobs Report 2025-26 puts the median technical AI-governance salary at USD 221k in the tech sector, its highest band. The median across AI-governance work generally is USD 151.8k, and USD 169.7k for combined privacy-and-AI-governance roles. These are primary medians; other demand signals are reported below, not as headline figures.',
+};
 ---
 
 <Marketing
-  title="The role"
-  description="What an AI Governance Engineer does: the seven workflows it owns, the skills behind them, and how the role differs from the AI governance analyst."
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description="What an AI governance engineer does: the seven workflows the role owns, the skills behind them, IAPP salary medians and three ways into the role."
   image="/og/role.png"
   jsonLd={breadcrumbJsonLd([{ label: 'The role' }])}
 >
@@ -70,8 +91,8 @@ const reportedText = reportedStats
 
   <Section
     tone="plain"
-    title="Seven workflows the role owns."
-    lede="The engineer owns workflows, not documents: each a running system with inputs, outputs and a stack layer it maps to."
+    title="What does an AI governance engineer do?"
+    lede={answers.does}
   >
     <WorkflowGrid workflows={workflows} hrefFor={roleHref} class="bento reveal-stagger" />
     <Diagram id="role-workflows" />
@@ -83,7 +104,12 @@ const reportedText = reportedStats
     <p class="section-foot"><a class="chapter-link" href="/ai-governance">The field the role serves: what is AI governance? <span class="arrow" aria-hidden="true">→</span></a></p>
   </Section>
 
-  <Section tone="plain" rule title="Core and supporting skills, by workflow.">
+  <Section
+    tone="plain"
+    rule
+    title="What skills does an AI governance engineer need?"
+    lede={answers.skills}
+  >
     <SkillsTable skills={skills} />
     <p class="section-foot">
       <a class="chapter-link" href={roleHref('skills-by-workflow')}>
@@ -105,7 +131,12 @@ const reportedText = reportedStats
     </p>
   </Section>
 
-  <Section tone="plain" rule title="Convert from an adjacent discipline.">
+  <Section
+    tone="plain"
+    rule
+    title="How do you become an AI governance engineer?"
+    lede={answers.become}
+  >
     <ul class="ways reveal-stagger">
       {
         waysIn.map((way, i) => (
@@ -148,7 +179,11 @@ const reportedText = reportedStats
     </p>
   </Section>
 
-  <Section tone="tint" title="The market, as the primary sources report it.">
+  <Section
+    tone="tint"
+    title="How much does an AI governance engineer earn?"
+    lede={answers.salary}
+  >
     <div class="stats">
       {
         primaryStats.map((stat) => (
