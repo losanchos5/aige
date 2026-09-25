@@ -3535,7 +3535,7 @@ export const obligations: readonly Obligation[] = [
     layerN: [5, 4],
     anchor: US_FRONTIER_ANCHOR,
     scope:
-      'Large frontier developers (frontier models trained with over 10^26 operations, cost over USD 100M)',
+      'Large frontier developers (frontier models trained with over 10^26 operations; developer revenue over USD 500M under the 2026 chapter amendment)',
     appliesFrom: '2027-01-01',
     appliesStatus: 'applies-later',
     appliesNote: 'Signed 2025-12-19; effective 2027-01-01',

@@ -258,8 +258,12 @@ a legitimate aim and the means of achieving that aim are appropriate and necessa
 2025 directs federal agencies to deprioritise enforcement of statutes and regulations to the extent
 they include disparate-impact liability [41], and HUD has proposed removing its Fair Housing Act
 disparate-impact regulations, with a supplemental proposal whose comment period runs to 9 Oct 2026
-[42]. Title VII's disparate-impact text is unchanged [38], private suits continue (see *Mobley*
-below) and EU and state law are unaffected, so the impact test stays.
+[42]. For credit the move goes beyond posture: the CFPB amended Regulation B, with effect from 21 Jul
+2026, to state that ECOA does not authorize disparate-impact liability (the "effects test"), leaving
+the adverse-action rules in 12 CFR 1002.9 unchanged [83]. Title VII's disparate-impact text is
+unchanged [38], private suits continue (see *Mobley* below) and EU and state law are unaffected, so
+the impact test stays for employment, under state law and in the EU; in US credit it no longer rests
+on Regulation B [83].
 
 **Proxies.** Removing the protected attribute does not remove the effect: postcode, name, school or
 career gaps can carry the same information. Blindness also makes testing harder, because you cannot
@@ -297,10 +301,11 @@ termination (Art. 10); and a right to an explanation and review, with rectificat
 ### Credit and lending
 
 **United States.** When a creditor takes adverse action, Regulation B requires a statement of the
-specific reasons, or a notice of the right to receive them [50]. The CFPB's Circular 2022-03 states
-that creditors using complex algorithms, including AI or machine learning, must still provide the
-specific principal reasons; complexity is no excuse [51]. Where the decision rests on a consumer
-report, the FCRA adds its own adverse-action duties [52]. The engineering consequence is precise:
+specific reasons, or a notice of the right to receive them, however complex the model [50]. The
+CFPB's Circular 2022-03 said so for AI and machine learning, but the CFPB withdrew it on 12 May 2025
+while it reviews its guidance, so as of 2026-09-24 the duty rests on the regulation itself [50]
+[51]. Where the decision rests on a consumer report, the FCRA adds its own adverse-action duties
+[52]. The engineering consequence is precise:
 the reasons in the notice must be the reasons the model used, so a reason code produced by an
 attribution method is tested for fidelity against each model version (chapter 16 on
 [adverse-action notices](/bok/fairness-and-explainability#credit-adverse-action-notices-and-reason-codes)).
@@ -350,7 +355,7 @@ eval and a record.
 | Title VII disparate impact | Impact caused by a practice; business necessity; less discriminatory alternative [38] | Impact metrics; job-relatedness validation; search across candidate models | Log of alternatives considered and why each was rejected |
 | NYC Local Law 144 | Impact ratios by sex, race and ethnicity, and intersectional categories, by an independent auditor [46] | The same calculation on historical or test data | Published audit summary with its date; candidate notice record |
 | EU indirect discrimination | Particular disadvantage; objective justification; appropriate and necessary means [39] | Group-disparity metrics plus a necessity analysis | Justification section in the [FRIA](/patterns/fria-as-code) or DPIA |
-| Adverse action (ECOA, FCRA) | Specific principal reasons for the decision [50] [51] | Reason-code fidelity test against the model | Reason-code eval result and the notice template version |
+| Adverse action (ECOA, FCRA) | Specific principal reasons for the decision [50] [52] | Reason-code fidelity test against the model | Reason-code eval result and the notice template version |
 | CCD2 Art. 18(8) | Explanation, human intervention and review [53] | [Explanation artefact](/patterns/explanation-artefact) per model version | Review log with outcome and reviewer |
 
 The four-fifths rule is a rule of thumb for enforcement agencies, not a safe harbour [59]. Treat an
@@ -557,10 +562,11 @@ floor.
 - **European Union.** Providers of generative systems must mark outputs in a machine-readable,
   detectable way (AI Act Art. 50(2)), and deployers must disclose deepfakes, with lighter rules for
   evidently artistic, satirical or fictional work (Art. 50(4)) [72]. Article 50 has applied since 2
-  Aug 2026, with a marking grace period for existing generative systems until 2 Dec 2026 [79]. The
-  Digital Omnibus also added a prohibition aimed at AI generation of non-consensual intimate imagery
-  and child sexual abuse material, applying from 2 Dec 2026 [43]. Very large platforms must mark
-  generated or manipulated media prominently as part of their DSA risk mitigation [70].
+  Aug 2026 [79], with a marking grace period until 2 Dec 2026 for generative systems placed on the
+  market before 2 Aug 2026 (Art. 111(4)) [43]. The Digital Omnibus also added a prohibition aimed
+  at AI generation of non-consensual intimate imagery and child sexual abuse material, applying from
+  2 Dec 2026 [43]. Very large platforms must mark generated or manipulated media prominently as part
+  of their DSA risk mitigation [70].
 - **United States.** The TAKE IT DOWN Act (Public Law 119-12, 19 May 2025) makes it a federal crime
   to knowingly publish non-consensual intimate images, including "digital forgeries", and requires
   covered platforms to run a notice-and-removal process (within one year of enactment) that removes
@@ -660,7 +666,7 @@ claim of conformity.
 [40] Council Directive 2000/78/EC establishing a general framework for equal treatment in employment and occupation. Official Journal of the EU. 2000-11-27. https://eur-lex.europa.eu/eli/dir/2000/78/oj (verified: primary)
 [41] Executive Order 14281, Restoring Equality of Opportunity and Meritocracy (s. 4: agencies to deprioritise enforcement of disparate-impact liability; FR Doc. 2025-07378). The White House, via GovInfo (Federal Register). 2025-04-23. https://www.govinfo.gov/content/pkg/FR-2025-04-28/html/2025-07378.htm (verified: primary)
 [42] HUD's Implementation of the Fair Housing Act's Disparate Impact Standard: proposed rule (FR Doc. 2026-00590, 14 Jan 2026) and supplemental proposed rule (FR Doc. 2026-16228; comments due 9 Oct 2026). US Department of Housing and Urban Development, Federal Register. 2026-08-10. https://www.federalregister.gov/documents/2026/08/10/2026-16228/huds-implementation-of-the-fair-housing-acts-disparate-impact-standard-amendments-to-huds-title-vi (verified: primary)
-[43] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, as amended by Regulation (EU) 2026/1744 (Art. 4a special-category data for bias detection in high-risk systems; Art. 5(1)(ba) and (bb) prohibitions on NCII and CSAM generation, applying from 2 Dec 2026 under Art. 113(a)). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng (verified: primary)
+[43] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, as amended by Regulation (EU) 2026/1744 (Art. 4a special-category data for bias detection in high-risk systems; Art. 5(1)(ba) and (bb) prohibitions on NCII and CSAM generation, applying from 2 Dec 2026 under Art. 113(a); Art. 111(4): Art. 50(2) marking deadline of 2 Dec 2026 for generative systems placed on the market before 2 Aug 2026). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng (verified: primary)
 [44] Mobley v. Workday, Inc., No. 3:23-cv-00770 (N.D. Cal.), Order granting preliminary collective certification (Lin, J., ECF 128). CourtListener (court docket). 2025-05-16. https://www.courtlistener.com/docket/66831340/mobley-v-workday-inc/ (verified: primary)
 [45] Automated Employment Decision Tools (Local Law 144 of 2021 and 6 RCNY 5-300: bias audit within one year before use, published summary, notice 10 business days before use; enforced from 5 Jul 2023). NYC Department of Consumer and Worker Protection. 2023. https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page (verified: primary)
 [46] Automated Employment Decision Tools: Frequently Asked Questions (bias audit by an independent third party; selection rates and impact ratios by sex, race/ethnicity and intersectional categories). NYC Department of Consumer and Worker Protection. 2023. https://www.nyc.gov/assets/dca/downloads/pdf/about/DCWP-AEDT-FAQ.pdf (verified: primary)
@@ -668,7 +674,7 @@ claim of conformity.
 [48] "AI Omnibus enters into force" (Reg. (EU) 2026/1744, in force 27 Jul 2026; Annex III high-risk obligations from 2 Dec 2027). European Commission. 2026-07-27. https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force (verified: primary)
 [49] Directive (EU) 2024/2831 on improving working conditions in platform work, Arts. 7 (limits on processing), 9 (transparency), 10 (human oversight), 11 (human review) and 29 (transposition by 2 Dec 2026). Official Journal of the EU. 2024-10-23. https://eur-lex.europa.eu/eli/dir/2024/2831/oj (verified: primary)
 [50] 12 CFR § 1002.9 (Regulation B notifications: statement of specific reasons for adverse action). eCFR (text as of 2026-09-01). 2026-09-01. https://www.ecfr.gov/current/title-12/chapter-X/part-1002/section-1002.9 (verified: primary)
-[51] Circular 2022-03: Adverse action notification requirements in connection with credit decisions based on complex algorithms. Consumer Financial Protection Bureau. 2022-05-26. https://www.consumerfinance.gov/compliance/circulars/circular-2022-03-adverse-action-notification-requirements-in-connection-with-credit-decisions-based-on-complex-algorithms/ (verified: primary)
+[51] Circular 2022-03: Adverse action notification requirements in connection with credit decisions based on complex algorithms (withdrawn by the CFPB on 2025-05-12, 90 FR 20084, FR Doc. 2025-08286, item 14; the circular's page carries no withdrawal banner as of 2026-09-24). Consumer Financial Protection Bureau. 2022-05-26. https://www.consumerfinance.gov/compliance/circulars/circular-2022-03-adverse-action-notification-requirements-in-connection-with-credit-decisions-based-on-complex-algorithms/ (verified: primary)
 [52] 15 U.S.C. § 1681m(a) (FCRA duties of users taking adverse action on the basis of consumer reports). US Government Publishing Office, GovInfo (United States Code, 2024 edition). 2024. https://www.govinfo.gov/content/pkg/USCODE-2024-title15/html/USCODE-2024-title15-chap41-subchapIII-sec1681m.htm (verified: primary)
 [53] Directive (EU) 2023/2225 on credit agreements for consumers, Art. 18 (creditworthiness assessment; 18(3) no special-category data, social networks not an external source; 18(8) human intervention and explanation) and Art. 48 (adopt by 20 Nov 2025, apply from 20 Nov 2026). Official Journal of the EU. 2023-10-18. https://eur-lex.europa.eu/eli/dir/2023/2225/oj (verified: primary)
 [54] "Justice Department Secures Groundbreaking Settlement Agreement with Meta Platforms, Formerly Known as Facebook, to Resolve Allegations of Discriminatory Advertising" (Fair Housing Act; Special Ad Audience discontinued; Variance Reduction System for housing ads). US Department of Justice. 2022-06-21. https://www.justice.gov/opa/pr/justice-department-secures-groundbreaking-settlement-agreement-meta-platforms-formerly-known (verified: primary)
@@ -696,7 +702,8 @@ claim of conformity.
 [76] Garcia v. Character Technologies, Inc., No. 6:24-cv-01903 (M.D. Fla.): order granting in part and denying in part motions to dismiss (ECF 115, 21 May 2025); notice of resolution and order dismissing without prejudice (ECF 242 and 244, 7 Jan 2026). CourtListener (court docket). 2026-01-07. https://www.courtlistener.com/docket/69300919/garcia-v-character-technologies-inc/ (verified: primary)
 [77] Product liability (review of the regime, including digital products and AI; terms of reference 8 Dec 2025; consultation planned for the second half of 2026). Law Commission of England and Wales. 2025-12. https://lawcom.gov.uk/project/product-liability/ (verified: primary)
 [78] IEC 60812:2018, Failure modes and effects analysis (FMEA and FMECA), edition 3.0. International Electrotechnical Commission. 2018-08-10. https://webstore.iec.ch/en/publication/26359 (verified: primary)
-[79] "Safer and more transparent AI" (Art. 50 transparency live 2 Aug 2026; marking grace for existing generative systems to 2 Dec 2026). European Commission. 2026-08-02. https://commission.europa.eu/news-and-media/news/safer-and-more-transparent-ai-2026-08-02_en (verified: primary)
+[79] "Safer and more transparent AI" (Art. 50 transparency live 2 Aug 2026). European Commission. 2026-08-02. https://commission.europa.eu/news-and-media/news/safer-and-more-transparent-ai-2026-08-02_en (verified: primary)
 [80] TAKE IT DOWN Act, Public Law 119-12 (S. 146) (knowing publication of intimate images incl. digital forgeries; notice-and-removal process within one year of enactment; removal within 48 hours; FTC enforcement). US Government Publishing Office, GovInfo. 2025-05-19. https://www.govinfo.gov/content/pkg/PLAW-119publ12/html/PLAW-119publ12.htm (verified: primary)
 [81] Sexual Offences Act 2003, s. 66B (sharing or threatening to share a photograph or film which "shows, or appears to show" another person in an intimate state; in force 31 Jan 2024). legislation.gov.uk. 2024-01-31. https://www.legislation.gov.uk/ukpga/2003/42/section/66B (verified: primary)
 [82] Data (Use and Access) Act 2025, s. 138 (inserts Sexual Offences Act 2003 s. 66E, creating a purported intimate image of an adult). legislation.gov.uk. 2025. https://www.legislation.gov.uk/ukpga/2025/18/section/138 (verified: primary)
+[83] Equal Credit Opportunity Act (Regulation B): final rule (ECOA does not authorize disparate-impact liability, the effects test; amends 12 CFR 1002.4, 1002.6, 1002.8 and 1002.15 and Supplement I, not 1002.9; 91 FR 21620, FR Doc. 2026-07804; effective 2026-07-21). Consumer Financial Protection Bureau, Federal Register. 2026-04-22. https://www.federalregister.gov/documents/2026/04/22/2026-07804/equal-credit-opportunity-act-regulation-b (verified: primary)

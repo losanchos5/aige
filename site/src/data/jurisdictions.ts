@@ -90,18 +90,20 @@ export const jurisdictions: readonly Jurisdiction[] = [
     status: 'binding-horizontal',
     instruments: [
       {
-        name: 'Basic Act on the Development of AI and the Establishment of a Foundation for Trust (Act No. 20676)',
+        name: 'Basic Act on the Development of AI and the Establishment of a Foundation for Trust (Act No. 20676, as amended by Act No. 21311)',
         date: '2026-01-22',
         status: 'in-force',
-        url: 'https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=268543',
+        url: 'https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=282791&efYd=20260721',
         verified: 'primary',
+        note: 'In force 2026-01-22; the amendments to Arts. 3(5), 16(3)-(5), 17-2, 18, 22-3 and 35(1) apply from 2026-07-21.',
       },
       {
-        name: 'Enforcement Decree of the AI Basic Act (Presidential Decree No. 36053)',
+        name: 'Enforcement Decree of the AI Basic Act (Presidential Decree No. 36053, as amended)',
         date: '2026-01-22',
         status: 'in-force',
-        url: 'https://www.law.go.kr/LSW/lsInfoP.do?efYd=20260122&lsiSeq=282879',
+        url: 'https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=288781&efYd=20260820',
         verified: 'primary',
+        note: 'Amended by Presidential Decree No. 36506 (in force 2026-07-21) and No. 36580 (in force 2026-08-20).',
       },
     ],
     summary:
@@ -242,6 +244,7 @@ export const jurisdictions: readonly Jurisdiction[] = [
         status: 'adopted',
         url: 'https://www.nysenate.gov/legislation/bills/2025/S6953/amendment/B',
         verified: 'primary',
+        note: 'Text as signed 2025-12-19; the chapter amendment signed 2026-03-27 (USD 500M revenue threshold, DFS office) governs from 2027-01-01.',
       },
       {
         name: 'General Business Law Article 47, AI companion models',
@@ -566,7 +569,7 @@ export const jurisdictions: readonly Jurisdiction[] = [
         name: 'Regulation (EU) 2024/1689 (AI Act), as amended by Regulation (EU) 2026/1744',
         date: '2024-08-01',
         status: 'in-force',
-        url: 'https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng',
+        url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng',
         verified: 'primary',
       },
     ],

@@ -245,7 +245,8 @@ tags, is on the site's resources page. No commercial study guide for any certifi
   explicitly out of scope. `https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm`
   (verified: primary) (audience: governance, legal; jurisdiction: US)
 - **CFPB Circular 2022-03: adverse action and complex algorithms**: why model complexity does not
-  excuse inaccurate adverse-action reasons. `https://www.consumerfinance.gov/compliance/circulars/circular-2022-03-adverse-action-notification-requirements-in-connection-with-credit-decisions-based-on-complex-algorithms/`
+  excuse inaccurate adverse-action reasons; withdrawn by the CFPB on 12 May 2025, so read it for the
+  reasoning, since the duty itself stays in Regulation B. `https://www.consumerfinance.gov/compliance/circulars/circular-2022-03-adverse-action-notification-requirements-in-connection-with-credit-decisions-based-on-complex-algorithms/`
   (verified: primary) (audience: legal, engineering; jurisdiction: US)
 - **NAIC Model Bulletin: Use of Artificial Intelligence Systems by Insurers**: a regulator-written
   template for an AI governance programme in a regulated industry, including third-party AI. `https://content.naic.org/sites/default/files/inline-files/2023-12-4%20Model%20Bulletin_Adopted_0.pdf`
