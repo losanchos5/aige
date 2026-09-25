@@ -344,3 +344,18 @@ const jsonLd = [
   <script is:inline defer src="/crosswalk.js"></script>
   <script is:inline defer src="/crosswalk-explorer.js"></script>
 </Base>
+
+<style>
+  /* The topic sections carry over half the page's elements (about 3,500 of
+     6,200) and all sit below the fold: the browser skips their style, layout
+     and paint until one nears the viewport, which takes the long first layout
+     off the load. Each section has a top border and padding, so no margin
+     collapses through the containment; the placeholder height is about a
+     section's on a desktop (they run 800 to 3,200 px, more on a phone) and
+     `auto` keeps the real one once a section has been rendered. Anchors
+     (#topic-<id>), find in page and the drawer's clone still reach them. */
+  .cw-topic {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 2000px;
+  }
+</style>

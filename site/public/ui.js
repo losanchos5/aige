@@ -85,7 +85,11 @@
         requestAnimationFrame(apply);
       }
     }
-    apply();
+    // The first read waits for a frame: window.scrollY forces a layout, and
+    // taken while the scripts run it lands the whole page's first layout in
+    // this task. A page restored mid-scroll takes the state a frame later.
+    if (window.requestAnimationFrame) requestAnimationFrame(apply);
+    else apply();
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
