@@ -1,14 +1,19 @@
-// llms.ts: the pieces the two plain-text endpoints share, /llms.txt (the index)
-// and /llms-full.txt (every chapter and the Thesis in full). Both follow the
-// llmstxt.org convention: an H1 with the site name, a `>` blockquote summary, a
-// short paragraph, then `##` sections of `- [name](url): notes` links.
+// llms.ts: the pieces the plain-text endpoints share, /llms.txt (the index),
+// /llms-full.txt and its slices (the corpus in full, lib/llms-corpus.ts), and
+// the Markdown alternates of the content pages (/bok/<slug>.md and the like).
+// The text files follow the llmstxt.org convention: an H1 with the site name, a
+// `>` blockquote summary, a short paragraph, then `##` sections of
+// `- [name](url): notes` links.
 //
 // Everything is derived from data/site.ts, data/chapters.ts, data/patterns.ts
-// and the Markdown sources, so the two files cannot drift from what the site
+// and the Markdown sources, so the files cannot drift from what the site
 // renders.
 
-import type { Chapter } from '../data/chapters';
+import { chaptersOrdered, type Chapter } from '../data/chapters';
+import { cases, type IncidentCase } from '../data/cases';
+import { patterns, patternPath } from '../data/patterns';
 import { site } from '../data/site';
+import { getGlossary } from './glossary';
 import { stripInline } from './md-parse';
 
 /**
@@ -20,7 +25,7 @@ export function originOf(contextSite: URL | undefined): string {
 }
 
 /** Canonical path of a Body of Knowledge chapter (`trailingSlash: 'never'`). */
-export function chapterPath(chapter: Chapter): string {
+export function chapterPath(chapter: Pick<Chapter, 'slug'>): string {
   return `/bok/${chapter.slug}`;
 }
 
@@ -95,9 +100,94 @@ export function document(blocks: readonly string[]): string {
   return `${blocks.filter((block) => block !== '').join('\n\n')}\n`;
 }
 
-/** The response both endpoints return: UTF-8 plain text. */
+/** The response the text endpoints return: UTF-8 plain text. */
 export function textResponse(body: string): Response {
   return new Response(body, {
     headers: { 'content-type': 'text/plain; charset=utf-8' },
   });
+}
+
+/**
+ * A rough token count for a text, stated beside each llms-full slice so a
+ * reader can tell whether it fits its context: about four characters per token
+ * for English prose, rounded to the nearest thousand.
+ */
+export function approxTokens(text: string): string {
+  const thousands = Math.max(1, Math.round(text.length / 4 / 1000));
+  return `about ${thousands}k tokens`;
+}
+
+// ---- Markdown alternates ----------------------------------------------------
+//
+// Every English content page with a Markdown source (the chapters, the pattern
+// pages, the glossary terms, the incident cases and the Thesis) is also served
+// as clean Markdown at its URL plus `.md` (/bok/definition.md), for agents and
+// assistants that read Markdown better than HTML. Seo.astro advertises it with
+// <link rel="alternate" type="text/markdown">; /llms.txt lists it.
+
+/** Canonical path of an incident case. */
+export function casePath(entry: Pick<IncidentCase, 'id'>): string {
+  return `/cases/${entry.id}`;
+}
+
+/** The fields each Markdown alternate opens with, as YAML frontmatter. */
+export interface MarkdownMeta {
+  title: string;
+  /** One-line abstract; omitted when empty. */
+  description?: string;
+  /** Canonical path of the HTML page, e.g. /bok/definition. */
+  path: string;
+  /** YYYY-MM-DD of the last commit to the page's source. */
+  updated: string;
+}
+
+/**
+ * A Markdown alternate: YAML frontmatter (title, canonical URL, author, licence,
+ * DOI, version, last updated), then `# title`, then the body. String values are
+ * JSON-quoted, which is valid YAML and survives colons and quotes in titles.
+ */
+export function markdownDocument(meta: MarkdownMeta, body: string): string {
+  const lines = [
+    '---',
+    `title: ${JSON.stringify(meta.title)}`,
+    ...(meta.description ? [`description: ${JSON.stringify(meta.description)}`] : []),
+    `canonical: ${site.url}${meta.path}`,
+    `author: ${JSON.stringify(site.authors.join(', '))}`,
+    `license: ${JSON.stringify(`${site.license} (${site.licenseUrl})`)}`,
+    `doi: https://doi.org/${site.doi}`,
+    `version: ${JSON.stringify(site.bokVersion)}`,
+    `updated: ${meta.updated}`,
+    '---',
+    '',
+    `# ${meta.title}`,
+    '',
+    body.trim(),
+  ];
+  return `${lines.join('\n')}\n`;
+}
+
+/** The response of a Markdown alternate: UTF-8 Markdown. */
+export function markdownResponse(body: string): Response {
+  return new Response(body, {
+    headers: { 'content-type': 'text/markdown; charset=utf-8' },
+  });
+}
+
+let markdownPaths: Set<string> | undefined;
+
+/**
+ * The path of a page's Markdown alternate, or null when it has none. Takes the
+ * pathname as Astro reports it (`build.format: 'file'` adds `.html`) or clean.
+ * Only English pages have one: a translated chapter's path never matches.
+ */
+export function markdownAlternateFor(pathname: string): string | null {
+  markdownPaths ??= new Set([
+    ...chaptersOrdered.map((chapter) => chapterPath(chapter)),
+    ...patterns.map((pattern) => patternPath(pattern)),
+    ...getGlossary().map((entry) => entry.url),
+    ...cases.map((entry) => casePath(entry)),
+    '/thesis',
+  ]);
+  const clean = pathname.replace(/\.html$/, '').replace(/\/index$/, '').replace(/\/+$/, '');
+  return markdownPaths.has(clean) ? `${clean}.md` : null;
 }

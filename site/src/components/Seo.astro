@@ -6,6 +6,9 @@
  */
 import { site } from '../data/site';
 import { siteGraph, type JsonLdInput } from '../lib/jsonld';
+// The page's clean Markdown twin (<url>.md), when it has one (src/lib/llms.ts).
+import { markdownAlternateFor } from '../lib/llms';
+const markdownAlternate = markdownAlternateFor(Astro.url.pathname);
 
 interface Props {
   title: string;
@@ -87,6 +90,8 @@ const graph = siteGraph(jsonLd);
 <link rel="canonical" href={canonical} />
 
 {alternates?.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+{markdownAlternate && <link rel="alternate" type="text/markdown" href={markdownAlternate} />}
+<link rel="license" href={site.licenseUrl} />
 
 <meta property="og:type" content={article ? 'article' : 'website'} />
 <meta property="og:site_name" content={site.name} />
