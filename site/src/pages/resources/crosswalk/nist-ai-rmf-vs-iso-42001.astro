@@ -1,0 +1,13 @@
+---
+// /resources/crosswalk/nist-ai-rmf-vs-iso-42001: the NIST AI RMF and ISO/IEC 42001
+// compared (SXO-04 of the 2026-09-25 audit).
+// The body is shared (components/ComparisonPage.astro, data/comparisons.ts);
+// this file owns the page's <title> and meta description, as literals that
+// lib/llms-routes.ts reads for the llms.txt index.
+import ComparisonPage from '../../../components/ComparisonPage.astro';
+
+const title = 'NIST AI RMF vs ISO 42001: differences, overlap and mapping';
+const description = 'NIST AI RMF vs ISO/IEC 42001: a voluntary framework and a certifiable standard, compared on scope and artefacts, with a topic-by-topic clause mapping.';
+---
+
+<ComparisonPage slug="nist-ai-rmf-vs-iso-42001" title={title} description={description} />

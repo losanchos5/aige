@@ -1,0 +1,13 @@
+---
+// /resources/crosswalk/iso-42001-vs-eu-ai-act: ISO/IEC 42001 and the EU AI Act
+// compared (SXO-04 of the 2026-09-25 audit).
+// The body is shared (components/ComparisonPage.astro, data/comparisons.ts);
+// this file owns the page's <title> and meta description, as literals that
+// lib/llms-routes.ts reads for the llms.txt index.
+import ComparisonPage from '../../../components/ComparisonPage.astro';
+
+const title = 'ISO 42001 vs EU AI Act: differences, overlap and mapping';
+const description = 'ISO/IEC 42001 vs the EU AI Act: legal force, scope, certification and a topic-by-topic clause mapping with links to the obligations and patterns.';
+---
+
+<ComparisonPage slug="iso-42001-vs-eu-ai-act" title={title} description={description} />
