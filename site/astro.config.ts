@@ -15,6 +15,7 @@ import { cases } from './src/data/cases';
 import { obligations, obligationPath } from './src/data/frameworks';
 import { patterns } from './src/data/patterns';
 import { figures } from './src/data/figures';
+import { comparisonSourceFiles } from './src/data/comparisons';
 import { getGlossary } from './src/lib/glossary';
 import { gitDate } from './src/lib/reading';
 import { inSitemap } from './src/lib/sitemap-policy';
@@ -122,6 +123,10 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
     '/resources/crosswalk',
     ['src/pages/resources/crosswalk.astro', 'src/data/crosswalk.ts', 'public/crosswalk-explorer.js'],
   ],
+  // The "<A> vs <B>" comparison pages, dated by the files that also date their byline.
+  ['/resources/crosswalk/iso-42001-vs-eu-ai-act', comparisonSourceFiles('iso-42001-vs-eu-ai-act')],
+  ['/resources/crosswalk/nist-ai-rmf-vs-iso-42001', comparisonSourceFiles('nist-ai-rmf-vs-iso-42001')],
+  ['/resources/crosswalk/nist-ai-rmf-vs-eu-ai-act', comparisonSourceFiles('nist-ai-rmf-vs-eu-ai-act')],
   [
     '/resources/frameworks',
     [
@@ -483,6 +488,19 @@ export default defineConfig({
             chunk.moduleIds.some((id) => id.endsWith('/src/scripts/motion-ui.ts'))
               ? '_astro/motion-ui.[hash].js'
               : '_astro/[name].[hash].js',
+          // Astro names a CSS chunk after the first page that imports it, so the
+          // stylesheet every page shares (tokens, fonts, base, utilities,
+          // effects, print, plus the header, footer and search styles) shipped
+          // as agent-control-profile.[hash].css. It is the one chunk that
+          // defines the design tokens (--l1-ink: only appears in tokens.css),
+          // so it gets an honest name: /_astro/site.[hash].css. Only the file
+          // name changes; the content and the chunking do not.
+          assetFileNames: (asset) => {
+            const source = typeof asset.source === 'string' ? asset.source : '';
+            return asset.names.some((name) => name.endsWith('.css')) && source.includes('--l1-ink:')
+              ? '_astro/site.[hash][extname]'
+              : '_astro/[name].[hash][extname]';
+          },
         },
       },
     },

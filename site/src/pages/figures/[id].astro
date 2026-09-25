@@ -4,10 +4,14 @@
 // its caption and text alternative, where it appears, the downloads written by
 // scripts/figures-build.mjs, ready-to-paste embed snippets with the full CC BY
 // credit, a FigureCite block and an ImageObject in the JSON-LD graph.
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import Base from '../../layouts/Base.astro';
+import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import Figure from '../../components/Figure.astro';
 import Callout from '../../components/Callout.astro';
+import Byline from '../../components/Byline.astro';
 import FigureCite from '../../components/FigureCite.astro';
 import { site } from '../../data/site';
 import { figures, figureKind, figureLicense, type FigureDef } from '../../data/figures';
@@ -64,6 +68,30 @@ const kindLabel: Record<typeof kind, string> = {
 };
 const primary = pngDownload(downloads, 'light', 1600);
 const vector = downloads.find((d) => d.format === 'svg' && d.theme === 'auto');
+
+// Lighter previews of that PNG for the <picture> below, written next to it by
+// scripts/figures-build.mjs as <png name minus -1600.png>-<width>.<avif|webp>.
+// A format whose files are not in this build (sharp missing) is left out; the
+// <img> keeps the PNG itself as the fallback and as the file image search sees.
+const PREVIEW_WIDTHS = [800, 1600];
+const previewSizes = '(min-width: 26rem) 24rem, 100vw';
+const previewSources = primary
+  ? (['avif', 'webp'] as const)
+      .map((format) => ({
+        type: `image/${format}`,
+        files: PREVIEW_WIDTHS.map((width) => ({
+          width,
+          href: primary.href.replace(/-1600\.png$/, `-${width}.${format}`),
+        })),
+      }))
+      .filter((source) =>
+        source.files.every((file) => existsSync(resolve(process.cwd(), 'public', file.href.slice(1)))),
+      )
+      .map((source) => ({
+        type: source.type,
+        srcset: source.files.map((file) => `${file.href} ${file.width}w`).join(', '),
+      }))
+  : [];
 const crumbs = [{ label: 'Figures', href: '/figures' }, { label: figure.title }];
 
 const jsonLd = [
@@ -113,10 +141,14 @@ const facts: [string, string][] = [
   title={`Figure: ${figure.title}`}
   description={description}
   image={primary ? primary.href : '/og/resources.png'}
+  imageWidth={primary?.pixelWidth}
+  imageHeight={primary?.pixelHeight}
   jsonLd={jsonLd}
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
 >
-  <PageHero variant="res" crumbs={crumbs} title={figure.title} lede={figure.alt} />
+  <PageHero variant="res" crumbs={crumbs} title={figure.title} lede={figure.alt}>
+    <Byline slot="lede" date={updated} published={published} />
+  </PageHero>
 
   <div class="container res-page fg-page" data-pagefind-body>
     <section class="res-section fg-view" aria-label="The figure">
@@ -208,16 +240,22 @@ const facts: [string, string][] = [
                 </p>
                 {primary && (
                   <figure class="fg-png">
-                    <img
-                      src={primary.href}
-                      width={primary.pixelWidth}
-                      height={primary.pixelHeight}
-                      alt={figure.alt}
-                      loading="lazy"
-                      decoding="async"
-                    />
+                    <picture>
+                      {previewSources.map((source) => (
+                        <source type={source.type} srcset={source.srcset} sizes={previewSizes} />
+                      ))}
+                      <img
+                        src={primary.href}
+                        width={primary.pixelWidth}
+                        height={primary.pixelHeight}
+                        alt={figure.alt}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </picture>
                     <figcaption class="fg-meta">
-                      The PNG, light, {primary.pixelWidth} px wide, as it downloads.
+                      The PNG, light, {primary.pixelWidth} px wide, as it
+                      downloads{previewSources.length > 0 ? ' (shown here as a lighter copy)' : ''}.
                     </figcaption>
                   </figure>
                 )}
@@ -317,14 +355,19 @@ const facts: [string, string][] = [
 <style>
   /* The PNG as an <img>, so image search indexes the licensable file the
      ImageObject names (the inline SVG above stays the reading view). Small,
-     lazy and below the fold: it costs nothing until the reader gets here. */
+     lazy and below the fold: it costs nothing until the reader gets here, and
+     then the <picture> fetches an AVIF or WebP copy of 800 or 1600 px. */
   .fg-png {
     margin: var(--s-4) 0 0;
     max-width: 24rem;
   }
 
+  .fg-png picture,
   .fg-png img {
     display: block;
+  }
+
+  .fg-png img {
     width: 100%;
     height: auto;
     border: 1px solid var(--line);

@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import CitedText from '../../components/CitedText.astro';
@@ -100,6 +101,9 @@ const jsonLd = [
     isPartOf: { '@id': WEBSITE_ID },
     ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
     citation: entry.sources.map((s) => s.url),
+    // The card the page shares (og:image below), which Google lists as an
+    // Article property for rich results (audit SCHEMA N1).
+    image: new URL('/og/resources.png', site.url).href,
   },
   ...authorNodes,
   breadcrumbJsonLd(crumbs),
@@ -119,6 +123,15 @@ const jsonLd = [
 
   <div class="container res-page">
     <div class="cs-body" data-pagefind-body>
+      {/* "In short": the self-contained answer passage (GEO N4), in the chapters'
+          summary callout styling (prose.css data-kind="summary"). */}
+      <div class="prose cs-in-short">
+        <aside class="callout" data-kind="summary">
+          <p class="callout-title">In short</p>
+          <p>{entry.inShort}</p>
+        </aside>
+      </div>
+
       <dl class="cs-facts">
         <dt>Year</dt>
         <dd>{entry.year}</dd>
@@ -261,3 +274,14 @@ const jsonLd = [
     </div>
   </div>
 </Base>
+
+<style>
+  /* The In short callout opens the case body: flush at the top, one rhythm
+     step above the facts box. */
+  .cs-in-short {
+    margin-bottom: var(--s-5);
+  }
+  .cs-in-short .callout {
+    margin-top: 0;
+  }
+</style>

@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import '../../styles/reading.css';
 import Figure from '../../components/Figure.astro';
 import SignNote from '../../components/SignNote.astro';
 import { site } from '../../data/site';
@@ -126,7 +127,9 @@ const jsonLd = [
       <p class="lede">{intro}</p>
       <p class="sub">
         Version {site.bokVersion}: {chapterCount} chapters in {partsWord} parts, from the
-        definition to the law. Read them in order or start from the part you need.
+        definition to the law. Read them in order or start from the part you need. New to the
+        field? Begin with <a href="/ai-governance">the AI governance guide</a>: the definition, the
+        main frameworks and examples.
       </p>
       <nav class="part-jump" aria-label="Parts of the book">
         <ol>

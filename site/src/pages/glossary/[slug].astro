@@ -9,6 +9,7 @@
  * /bok/glossary stays the book's A-Z index.
  */
 import Base from '../../layouts/Base.astro';
+import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import CitedText from '../../components/CitedText.astro';
 import ContrastCards from '../../components/ContrastCards.astro';
@@ -28,7 +29,7 @@ import {
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import { gitDate } from '../../lib/reading';
-import { leadSentence } from '../../lib/lead-sentence';
+import { leadDescription, listSentences } from '../../lib/lead-sentence';
 import { patternsUsingTerm } from '../../lib/cross-links';
 import { patternPath } from '../../data/patterns';
 import '../../styles/resources.css';
@@ -83,8 +84,22 @@ const PATTERN_LIMIT = 10;
 const patternUses = patternsUsingTerm(entry.slug);
 // The page is generated from the glossary chapter: its last commit dates it.
 const updated = gitDate('../bok/09-glossary.md');
-// Meta description: the definition's opening sentence, not the whole paragraph.
-const description = leadSentence(entry.definition);
+// Meta description (audit ONPAGE N1, CONTENT C16): the term and the
+// definition's opening sentence, whole or cut at a clause break, never an "…";
+// while that is short, what else the page carries, so the snippet says what the
+// page is rather than repeating its first paragraph.
+const carries = [
+  sources.length > 0 ? 'sources' : '',
+  usage.length > 0 || chapterLinks.length > 0 ? 'the chapters that use it' : '',
+  patternUses.length > 0 ? 'the patterns that use it' : '',
+  related.length > 0 || contrast.length > 0 || pairs.length > 0 ? 'related terms' : '',
+].filter(Boolean);
+const description = leadDescription(entry.definition, {
+  label: entry.term,
+  lowerFirst: true,
+  loose: true,
+  extras: [listSentences('Definition with', carries), 'From the AI Governance Body of Knowledge glossary.'],
+});
 
 // Title: "<term>: definition", with the site name when it still fits 70 chars.
 const title = `${entry.term}: definition`;

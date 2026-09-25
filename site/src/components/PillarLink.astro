@@ -1,0 +1,36 @@
+---
+/**
+ * PillarLink: one quiet line that points a page at the /ai-governance pillar,
+ * the hub the chapters, patterns and section landings are spokes of (SXO-N2 of
+ * the 2026-09-25 audit: the header and footer links were the only signal on
+ * most pages). The anchor is passed in so the templates vary it; the line is
+ * boilerplate on every page of a template, so it stays out of the site search
+ * and of search snippets.
+ */
+interface Props {
+  /** The words before the link, e.g. "New to the field? Start with". */
+  lead: string;
+  /** The link text; varied per template (never the same anchor everywhere). */
+  anchor: string;
+  /** The words after the link, punctuation included (default "."). */
+  tail?: string;
+  class?: string;
+}
+
+const { lead, anchor, tail = '.', class: className } = Astro.props;
+---
+
+<p class:list={['pillar-link', className]} data-pillar-link data-pagefind-ignore data-nosnippet>
+  {lead} <a href="/ai-governance">{anchor}</a>{tail}
+</p>
+
+<style>
+  /* Quiet, like the byline: --fs-small at --ink-2 (never dimmed with
+     opacity), the link underlined as everywhere in running text. */
+  .pillar-link {
+    margin: var(--s-4) 0 0;
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+</style>

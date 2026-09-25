@@ -10,6 +10,7 @@
 // rendered once (audit C10): the facts list, the artefact with its layers, and a
 // byline that carries the review date.
 import Base from '../../layouts/Base.astro';
+import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import Citation from '../../components/Citation.astro';
@@ -19,9 +20,8 @@ import {
   obligationShortTitle,
   obligationOgPath,
   obligationHeading,
-  instrumentClause,
+  obligationDescription,
 } from '../../lib/obligation-title';
-import { leadSentence } from '../../lib/lead-sentence';
 import { patternPath } from '../../data/patterns';
 import { site } from '../../data/site';
 import {
@@ -86,17 +86,10 @@ const apiPath = obligationApiPath(row);
 // name, qualified with its instrument where the name alone would not say it.
 const shortTitle = obligationShortTitle(row);
 const heading = obligationHeading(row);
-// Meta description: "<instrument> <clause>: " and the requirement's opening
-// sentence, within 155 characters; the requirement alone when that is too long,
-// and the evidence artefact added when a one-line requirement leaves it thin.
-const requirementLead = leadSentence(row.requirement);
-const labelled = `${instrumentClause(row)}: ${requirementLead}`;
-const description =
-  labelled.length > 155
-    ? requirementLead
-    : labelled.length >= 50
-      ? labelled
-      : leadSentence(`${labelled.replace(/\.?$/, '.')} Evidence: ${row.artefact}.`);
+// Meta description: "<instrument> <clause>: " and what the row requires, in
+// whole clauses, then when it applies and, while short, its evidence artefact
+// (lib/obligation-title.ts); 110 to 158 characters, never an "…".
+const description = obligationDescription(row);
 
 // "Applies from" note, printed once: without the status and date the line
 // already shows, and with the chapter's "(verify)" working marker rendered as

@@ -6,7 +6,7 @@
 import { test, expect } from '@playwright/test';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { documentTitle, metaDescription, MAX_DESCRIPTION } from '../src/lib/meta';
+import { documentTitle, metaDescription, MAX_DESCRIPTION, MIN_DESCRIPTION } from '../src/lib/meta';
 import { getGlossary } from '../src/lib/glossary';
 import { chaptersOrdered } from '../src/data/chapters';
 
@@ -60,10 +60,13 @@ const WORD_CHAR = /[\p{L}\p{N}]/u;
 
 /**
  * `out` is a faithful snippet of `input`: the whole text, a cut at a sentence
- * end, or a cut between two words marked with `…`, never inside a word.
+ * end, the opening clauses of its first sentence closed with a full stop (its
+ * parenthetical asides may be dropped), or a cut between two words marked with
+ * `…`, never inside a word.
  */
 function expectCleanCut(input: string, out: string, label: string): void {
   const clean = input.replace(/\s+/g, ' ').trim();
+  const bare = clean.replace(/\s+\([^()]*\)/g, '');
   expect(out.length, `${label}: ${out}`).toBeLessThanOrEqual(MAX_DESCRIPTION);
   if (out === clean) return;
   if (out.endsWith('…')) {
@@ -72,9 +75,12 @@ function expectCleanCut(input: string, out: string, label: string): void {
     expect(WORD_CHAR.test(clean[head.length] ?? ''), `${label}: cut mid-word: ${out}`).toBe(false);
     expect(head, `${label}: dangling punctuation: ${out}`).not.toMatch(/[\s,;:]$/);
   } else {
-    expect(clean.startsWith(out), `${label}: not a prefix: ${out}`).toBe(true);
     expect(out, `${label}: not a sentence end: ${out}`).toMatch(/[.!?]["'”’)\]]?$/);
-    expect(out.length, `${label}: sentence cut too short`).toBeGreaterThanOrEqual(100);
+    const head = clean.startsWith(out) ? out : out.replace(/\.$/, '');
+    const source = clean.startsWith(head) ? clean : bare;
+    expect(source.startsWith(head), `${label}: not the text's own opening: ${out}`).toBe(true);
+    expect(WORD_CHAR.test(source[head.length] ?? ''), `${label}: cut mid-word: ${out}`).toBe(false);
+    expect(out.length, `${label}: cut too short`).toBeGreaterThanOrEqual(MIN_DESCRIPTION);
   }
 }
 
@@ -98,7 +104,17 @@ test.describe('meta description cuts (lib/meta.ts)', () => {
     expectCleanCut(text, out, 'abbreviation');
   });
 
-  test('without a usable sentence end, the cut falls between words, with …', () => {
+  test('a long first sentence is cut at a clause break and closed, not with …', () => {
+    const text =
+      "With exams cancelled in 2020, the grading model assigned grades from each school's history of results; four days after the results came out, the regulator reverted to teacher grades.";
+    const out = metaDescription(text);
+    expect(out).toBe(
+      "With exams cancelled in 2020, the grading model assigned grades from each school's history of results.",
+    );
+    expectCleanCut(text, out, 'clause');
+  });
+
+  test('without a usable sentence end or clause break, the cut falls between words, with …', () => {
     const text = `${'governance '.repeat(20)}engineering`;
     const out = metaDescription(text);
     expect(out.endsWith('…')).toBe(true);
@@ -148,6 +164,55 @@ test.describe('every built page', () => {
       if (/[\s,;:]…$/.test(description)) bad.push(`${route}: dangling …: ${description}`);
     }
     expect(bad, bad.join('\n')).toEqual([]);
+  });
+
+  test('no indexable page has a description that ends in … or runs under 70 characters', () => {
+    const bad: string[] = [];
+    for (const [route, html] of pages) {
+      const description = metaOf(html, 'name', 'description');
+      if (description === undefined || metaOf(html, 'name', 'robots')?.includes('noindex')) continue;
+      if (description.endsWith('…')) bad.push(`${route}: ends in …: ${description}`);
+      if (description.length < MIN_DESCRIPTION) bad.push(`${route}: ${description.length} chars: ${description}`);
+    }
+    expect(bad, bad.join('\n')).toEqual([]);
+  });
+
+  test('a figure page declares the real size of the PNG it shares', () => {
+    const figures = pages.filter(([route]) => /^\/figures\/[^/]+$/.test(route));
+    expect(figures.length).toBeGreaterThan(20);
+    let checked = 0;
+    for (const [route, html] of figures) {
+      const image = metaOf(html, 'property', 'og:image') ?? '';
+      if (!image.endsWith('.png') || image.includes('/og/')) continue;
+      // The PNG's own size, from its IHDR chunk (bytes 16 to 23).
+      const png = readFileSync(join('dist', new URL(image).pathname));
+      expect(metaOf(html, 'property', 'og:image:width'), route).toBe(String(png.readUInt32BE(16)));
+      expect(metaOf(html, 'property', 'og:image:height'), route).toBe(String(png.readUInt32BE(20)));
+      expect(metaOf(html, 'property', 'og:image:type'), route).toBe('image/png');
+      checked += 1;
+    }
+    expect(checked).toBeGreaterThan(20);
+  });
+
+  test('the Thesis pair names the other language as og:locale:alternate, and only it', () => {
+    const byRoute = new Map(pages);
+    const en = byRoute.get('/thesis') ?? '';
+    const es = byRoute.get('/es/thesis') ?? '';
+    expect(metaOf(en, 'property', 'og:locale')).toBe('en_US');
+    expect(metaOf(en, 'property', 'og:locale:alternate')).toBe('es_ES');
+    expect(metaOf(es, 'property', 'og:locale')).toBe('es_ES');
+    expect(metaOf(es, 'property', 'og:locale:alternate')).toBe('en_US');
+    const others = pages
+      .filter(([route]) => route !== '/thesis' && route !== '/es/thesis')
+      .filter(([, html]) => html.includes('og:locale:alternate'))
+      .map(([route]) => route);
+    expect(others).toEqual([]);
+  });
+
+  test('/es/thesis describes the card it shares in Spanish', () => {
+    const es = pages.find(([route]) => route === '/es/thesis')?.[1] ?? '';
+    expect(metaOf(es, 'property', 'og:image:alt')).toMatch(/^Tarjeta de «The Thesis», en inglés/);
+    expect(metaOf(es, 'name', 'twitter:image:alt')).toMatch(/^Tarjeta/);
   });
 
   test('article:author names the Person in full everywhere', () => {

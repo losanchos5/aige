@@ -1,0 +1,449 @@
+---
+/**
+ * ComparisonPage: the body of one "<A> vs <B>" page under /resources/crosswalk
+ * (SXO-04 of the 2026-09-25 audit). Each page file passes its slug and its own
+ * <title> and meta description (literals there, so llms.txt can read them); the
+ * rest comes from src/data/comparisons.ts (the answer box, the two questions,
+ * the FAQ, the "At a glance" facts) and src/lib/comparisons.ts (the per-topic
+ * overlap table, its counts, the obligation and pattern links and the sources,
+ * all derived from the crosswalk and the obligation register).
+ *
+ * Structured data: a TechArticle and the BreadcrumbList. No FAQPage markup:
+ * the questions are ordinary headings.
+ */
+import Base from '../layouts/Base.astro';
+import PageHero from './PageHero.astro';
+import Byline from './Byline.astro';
+import Callout from './Callout.astro';
+import { site } from '../data/site';
+import { disclaimer, obligationPath } from '../data/frameworks';
+import { patternPath } from '../data/patterns';
+import {
+  comparisons,
+  comparisonBySlug,
+  comparisonPath,
+  comparisonSourceFiles,
+  glance,
+  type GlanceFacts,
+} from '../data/comparisons';
+import {
+  buildComparison,
+  comparisonSources,
+  gapQuestion,
+  inSentence,
+  levelLabel,
+  type SideRef,
+} from '../lib/comparisons';
+import { breadcrumbJsonLd } from '../lib/breadcrumbs';
+import { authorNodes, authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
+import { gitCreated } from '../lib/reading';
+import { fitsSiteSuffix } from '../lib/seo-title';
+import '../styles/resources.css';
+
+interface Props {
+  slug: string;
+  title: string;
+  description: string;
+}
+
+const { slug, title, description } = Astro.props;
+const def = comparisonBySlug(slug);
+if (!def) throw new Error(`ComparisonPage: no comparison "${slug}" in src/data/comparisons.ts`);
+const cmp = buildComparison(def);
+const { fa, fb, rows, counts } = cmp;
+const ga: GlanceFacts | undefined = glance[fa.id];
+const gb: GlanceFacts | undefined = glance[fb.id];
+if (!ga || !gb) throw new Error(`ComparisonPage: no glance facts for "${ga ? fb.id : fa.id}"`);
+
+const h1 = `${def.aName} vs ${def.bName}`;
+const path = comparisonPath(def);
+const pageUrl = new URL(path, site.url).href;
+const sourceFiles = comparisonSourceFiles(slug);
+// Dated like the sitemap (astro.config.ts lists the same files): the newest
+// commit across the page, its template and the data it reads.
+const updated = lastModified(...sourceFiles);
+const published = gitCreated(sourceFiles[0]);
+
+const faq = [...def.faq, gapQuestion(cmp)];
+const sources = comparisonSources(cmp);
+const others = comparisons.filter((c) => c.slug !== slug);
+const crumbs = [
+  { label: 'Resources', href: '/resources' },
+  { label: 'Crosswalk', href: '/resources/crosswalk' },
+  { label: h1 },
+];
+
+const glanceRows: { label: string; key: keyof Omit<GlanceFacts, 'read'> }[] = [
+  { label: 'Type', key: 'type' },
+  { label: 'Issuer', key: 'issuer' },
+  { label: 'Legal force', key: 'legalForce' },
+  { label: 'Scope and reach', key: 'scope' },
+  { label: 'Certifiable', key: 'certifiable' },
+  { label: 'Key artefacts', key: 'artefacts' },
+  { label: 'Dates', key: 'dates' },
+];
+
+// How many clauses a cell shows before it points to the full crosswalk row.
+const SHOWN = 3;
+const topicHref = (id: string) => `/resources/crosswalk#topic-${id}`;
+const isLaw = (type: string) => type === 'law';
+const instrumentNode = (fw: typeof fa) => ({
+  '@type': isLaw(fw.type) ? 'Legislation' : 'CreativeWork',
+  name: fw.name,
+  ...(fw.url ? { url: fw.url } : {}),
+});
+
+const jsonLd = [
+  {
+    '@type': 'TechArticle',
+    '@id': `${pageUrl}#article`,
+    headline: title,
+    alternativeHeadline: h1,
+    description,
+    url: pageUrl,
+    mainEntityOfPage: pageUrl,
+    inLanguage: 'en',
+    datePublished: published,
+    dateModified: updated,
+    image: new URL('/og/resources.png', site.url).href,
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    about: [instrumentNode(fa), instrumentNode(fb)],
+    citation: sources.map((s) => s.url),
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+
+const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
+---
+
+<Base
+  title={title}
+  titleSuffix={fitsSiteSuffix(title)}
+  description={description}
+  image="/og/resources.png"
+  jsonLd={jsonLd}
+  article={{
+    publishedTime: `${published}T00:00:00Z`,
+    modifiedTime: `${updated}T00:00:00Z`,
+    author: site.authors[0],
+  }}
+>
+  <PageHero variant="res" crumbs={crumbs} title={h1}>
+    <Byline slot="lede" date={updated} published={published} />
+  </PageHero>
+
+  <div class="container res-page cmp" data-pagefind-body>
+    <section class="res-section" aria-label="Short answer">
+      <p class="cmp-answer" data-cmp-answer>{def.answer}</p>
+    </section>
+
+    <section class="res-section" aria-labelledby="cmp-glance">
+      <div class="res-section-head">
+        <h2 id="cmp-glance">At a glance</h2>
+        <p>
+          The two instruments side by side, as the Body of Knowledge states them; the last row links
+          the chapter sections each line comes from.
+        </p>
+      </div>
+      <div class="res-tablewrap">
+        <table class="res-table cmp-table" data-cmp-glance>
+          <caption class="visually-hidden">{fa.name} and {fb.name} compared, attribute by attribute</caption>
+          <thead>
+            <tr>
+              <th scope="col">Attribute</th>
+              <th scope="col">{fa.name}</th>
+              <th scope="col">{fb.name}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              glanceRows.map((row) => (
+                <tr>
+                  <th scope="row" class="c-name">{row.label}</th>
+                  <td data-label={def.aName}>{ga[row.key]}</td>
+                  <td data-label={def.bName}>{gb[row.key]}</td>
+                </tr>
+              ))
+            }
+            <tr>
+              <th scope="row" class="c-name">In the Body of Knowledge</th>
+              {
+                [ga, gb].map((g, i) => (
+                  <td data-label={i === 0 ? def.aName : def.bName}>
+                    <ul class="cmp-list">
+                      {g.read.map((r) => (
+                        <li>
+                          <a href={r.href}>{r.label}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </td>
+                ))
+              }
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="res-section" aria-labelledby="cmp-overlap">
+      <div class="res-section-head">
+        <h2 id="cmp-overlap">Where they overlap, topic by topic</h2>
+        <p>
+          The <a href="/resources/crosswalk">crosswalk</a> maps {counts.topics} AI governance topics.
+          Both instruments file clauses under {counts.both} of them, {counts.strong} strongly (a core
+          clause on each side); {counts.aOnly} {counts.aOnly === 1 ? 'topic is' : 'topics are'} covered
+          only by {inSentence(def.aName)}, {counts.bOnly} only by {inSentence(def.bName)}, and
+          {counts.neither} by neither. A
+          shared topic means the two deal with the same thing, not that meeting one meets the other.
+        </p>
+        <p>
+          <strong>Strong</strong>: both file a core clause. <strong>Partial</strong>: both file a
+          clause, at least one only in passing. Clause ids link to their page in the
+          <a href="/obligations">obligation register</a> where one exists; the last column names the
+          patterns whose evidence serves a register row on both sides.
+        </p>
+      </div>
+      <div class="res-tablewrap">
+        <table class="res-table cmp-table" data-cmp-overlap>
+          <caption class="visually-hidden">
+            Per-topic overlap of {fa.name} and {fb.name}, from the crosswalk, core clauses first
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Topic</th>
+              <th scope="col">What {def.aName} asks for</th>
+              <th scope="col">What {def.bName} asks for</th>
+              <th scope="col">Overlap</th>
+              <th scope="col">Patterns for both</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((row) => (
+                <tr data-level={row.level}>
+                  <th scope="row" class="c-name">
+                    <a href={topicHref(row.topic.id)}>{row.topic.name}</a>
+                  </th>
+                  {[row.a, row.b].map((list, i) => (
+                    <td data-label={i === 0 ? def.aName : def.bName}>
+                      {list.length === 0 ? (
+                        <span class="cmp-none">Not mapped</span>
+                      ) : (
+                        <ul class="cmp-list">
+                          {cellItems(list).map((s) => (
+                            <li>
+                              {s.obligation ? (
+                                <a class="cmp-clause" href={obligationPath(s.obligation)}>
+                                  {s.label}
+                                </a>
+                              ) : (
+                                <span class="cmp-clause">{s.label}</span>
+                              )}{' '}
+                              {s.title}
+                              {s.ref.verified === false && (
+                                <span class="cmp-unverified"> (not yet verified against the source)</span>
+                              )}
+                            </li>
+                          ))}
+                          {list.length > SHOWN && (
+                            <li>
+                              <a href={topicHref(row.topic.id)}>
+                                {list.length - SHOWN} more in the crosswalk
+                              </a>
+                            </li>
+                          )}
+                        </ul>
+                      )}
+                    </td>
+                  ))}
+                  <td data-label="Overlap">
+                    <span class="type-tag cmp-level">{levelLabel(row.level, cmp)}</span>
+                  </td>
+                  <td data-label="Patterns for both">
+                    {row.shared.length === 0 ? (
+                      <span class="cmp-none">None shared</span>
+                    ) : (
+                      <ul class="cmp-list">
+                        {row.shared.slice(0, SHOWN).map((p) => (
+                          <li>
+                            <a href={patternPath(p)}>{p.title}</a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="res-section cmp-qa" aria-labelledby="cmp-can-use">
+      <h2 id="cmp-can-use">Can you use {def.aName} to comply with {def.bName}?</h2>
+      <p data-cmp-qa>{def.canUse}</p>
+    </section>
+
+    <section class="res-section cmp-qa" aria-labelledby="cmp-start">
+      <h2 id="cmp-start">Which should you start with?</h2>
+      <p data-cmp-qa>{def.startWith}</p>
+    </section>
+
+    <section class="res-section cmp-qa" aria-labelledby="cmp-faq">
+      <h2 id="cmp-faq">Frequently asked questions</h2>
+      {
+        faq.map((item) => (
+          <div class="cmp-faq-item" data-cmp-faq>
+            <h3>{item.q}</h3>
+            <p>{item.a}</p>
+          </div>
+        ))
+      }
+    </section>
+
+    <div class="res-section">
+      <Callout kind="note" title="Illustrative mapping, not a conformity assessment">
+        <p>{disclaimer} A mapping cell is not evidence; see the
+        <a href="/patterns/framework-crosswalk">Framework Crosswalk pattern</a> for what turns a
+        crosswalk into an auditable control.</p>
+      </Callout>
+    </div>
+
+    <section class="res-section" aria-labelledby="cmp-sources">
+      <h2 id="cmp-sources">Sources</h2>
+      <ul class="cmp-sources" data-cmp-sources>
+        {
+          sources.map((s) => (
+            <li>
+              {s.label}: <a href={s.url} rel="noopener">{s.url}</a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="cmp-more">
+        Every clause on this page, with its note and verification status, is in the
+        <a href="/resources/crosswalk">topic × framework crosswalk</a> and its
+        <a href="/resources/crosswalk.json">JSON download</a>.
+      </p>
+      {
+        others.length > 0 && (
+          <p class="cmp-more" data-cmp-others>
+            Other comparisons:{' '}
+            {others.map((c, i) => (
+              <>
+                {i > 0 && ' · '}
+                <a href={comparisonPath(c)}>{`${c.aName} vs ${c.bName}`}</a>
+              </>
+            ))}
+          </p>
+        )
+      }
+    </section>
+  </div>
+</Base>
+
+<style>
+  /* The answer box: the neutral Callout frame (1px --line, --surface), set at
+     the lede size so it reads as the page's first answer. */
+  .cmp-answer {
+    max-width: var(--prose);
+    margin: 0;
+    padding: var(--s-4) var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+
+  .cmp-qa h2 {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    letter-spacing: var(--tracking-display);
+    color: var(--ink);
+  }
+
+  .cmp-qa p,
+  .cmp-more {
+    max-width: var(--prose);
+    margin-top: var(--s-2);
+    color: var(--ink-2);
+  }
+
+  .cmp-faq-item + .cmp-faq-item {
+    margin-top: var(--s-4);
+  }
+
+  .cmp-faq-item h3 {
+    margin-top: var(--s-4);
+    color: var(--ink);
+  }
+
+  #cmp-sources {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    letter-spacing: var(--tracking-display);
+    color: var(--ink);
+  }
+
+  .cmp-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cmp-list li + li {
+    margin-top: var(--s-1);
+  }
+
+  .cmp-clause {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
+
+  .cmp-none,
+  .cmp-unverified {
+    color: var(--ink-2);
+  }
+
+  .cmp-table th[scope='row'] {
+    text-align: left;
+    vertical-align: top;
+  }
+
+  .cmp-table td {
+    line-height: 1.5;
+  }
+
+  .cmp-sources {
+    margin-top: var(--s-3);
+    padding-left: var(--s-5);
+  }
+
+  .cmp-sources li + li {
+    margin-top: var(--s-1);
+  }
+
+  .cmp-sources a {
+    overflow-wrap: anywhere;
+  }
+
+  /* Below 720px the shared table styles stack each row as a card of labelled
+     cells; the row header joins the card as its title. */
+  @media (max-width: 720px) {
+    .cmp-table th[scope='row'] {
+      display: block;
+      width: 100%;
+      padding: 0 0 var(--s-2);
+      border: 0;
+    }
+  }
+</style>

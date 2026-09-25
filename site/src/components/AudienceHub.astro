@@ -14,6 +14,7 @@
  * (.card-lum, no lift) because they are not links.
  */
 import Marketing from '../layouts/Marketing.astro';
+import '../styles/reading.css';
 import PageHero from './PageHero.astro';
 import Section from './Section.astro';
 import RegisterList from './RegisterList.astro';
@@ -98,6 +99,11 @@ const obligationName = (o: (typeof obligations)[number]) =>
         On the <a href="/path">learning path</a>, start at{' '}
         {/* One line: a line break between a link and its separator renders as a space. */}
         {starts.map((link, i) => (<><a href={link.href}>{link.label}</a>{i < starts.length - 2 ? ', ' : i === starts.length - 2 ? ' or ' : '.'}</>))}
+      </p>
+      {/* Hub and spoke (SXO-N2): every audience hub points at the pillar. */}
+      <p class="au-path">
+        New to the field? Read <a href="/ai-governance">AI governance explained</a>: the
+        definition, the frameworks and where engineering fits.
       </p>
     </div>
   </Section>

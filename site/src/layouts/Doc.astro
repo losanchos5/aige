@@ -6,6 +6,7 @@
 // The search dialog now lives in Base, so it is available on every page.
 import type { MarkdownHeading } from 'astro';
 import Base from './Base.astro';
+import '../styles/reading.css';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
 import type { JsonLdInput } from '../lib/jsonld';
@@ -56,6 +57,8 @@ interface Props {
   activeThesis?: boolean;
   cite?: boolean;
   image?: string;
+  /** og:image:alt when the shared card's own title is in another language; see Seo. */
+  imageAlt?: string;
   jsonLd?: JsonLdInput;
   lang?: string;
   locale?: string;
@@ -96,6 +99,7 @@ const {
   activeThesis = false,
   cite = false,
   image,
+  imageAlt,
   jsonLd,
   lang,
   locale,
@@ -153,6 +157,7 @@ if (statsChapter) {
   titleSuffix={seoTitle ? fitsSiteSuffix(seoTitle) : undefined}
   description={description ?? summary}
   image={image}
+  imageAlt={imageAlt}
   jsonLd={graphNodes.length ? graphNodes : undefined}
   lang={lang}
   locale={ogLocale}

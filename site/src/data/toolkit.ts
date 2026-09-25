@@ -81,10 +81,11 @@ export const tools: readonly ToolEntry[] = [
     chapter: { label: '08. Regulatory map', href: '/bok/regulatory-map' },
   },
   // Block w2-tool-triage: the EU AI Act role and risk-class triage, built from
-  // chapter 18; question graph in src/data/triage.ts.
+  // chapter 18; question graph in src/data/triage.ts. Named for the query it
+  // answers, "EU AI Act risk classification checker" (SXO-N3, 2026-09-25 audit).
   {
     id: 'ai-act-triage',
-    title: 'EU AI Act role and risk-class triage',
+    title: 'EU AI Act risk classification checker',
     summary:
       'Walk an AI system or model through the EU AI Act as amended by the Digital Omnibus: indicative roles and risk classes with the reason behind each answer, and a classification decision record to file.',
     audience: [

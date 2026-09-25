@@ -121,18 +121,21 @@ const heroFonts = [
 // public/hero-field.js (false).
 const HERO_ART = true;
 
-// The painting at three widths (a 1440px viewport at DPR 1 takes the 1600),
-// preloaded from the head so it starts with the fonts. On a high-density
-// desktop screen the sizes claim half the viewport, so a 1200 to 1600 px wide
-// window at DPR 2 takes the 1600 (177 KB) instead of the 2400 (518 KB): the
-// painting sits under the wash, the fade and the halo, where the extra detail
-// does not show. Wider high-density windows still take the 2400.
+// The painting at four widths (a 1440px viewport at DPR 1 takes the 1600, a
+// 1920px one the 1920 at 241 KB instead of the 2400 at 518 KB), preloaded from
+// the head so it starts with the fonts. On a high-density desktop screen the
+// sizes claim half the viewport, so a 1200 to 1600 px wide window at DPR 2
+// takes the 1600 (177 KB) and a 1920 px one the 1920: the painting sits under
+// the wash, the fade and the halo, where the extra detail does not show. Only
+// a slot wider than 1920 device pixels takes the 2400. The 1920 was encoded
+// once with sharp (webp q78, effort 6) from the 2400 px JPEG master kept in
+// commit 7c38c4e; no build step touches these files.
 const heroArt = {
   href: '/hero/monet-seine-giverny-1897-2400.webp',
   srcset:
-    '/hero/monet-seine-giverny-1897-1200.webp 1200w, /hero/monet-seine-giverny-1897-1600.webp 1600w, /hero/monet-seine-giverny-1897-2400.webp 2400w',
+    '/hero/monet-seine-giverny-1897-1200.webp 1200w, /hero/monet-seine-giverny-1897-1600.webp 1600w, /hero/monet-seine-giverny-1897-1920.webp 1920w, /hero/monet-seine-giverny-1897-2400.webp 2400w',
   sizes: '(min-width: 1200px) and (min-resolution: 2dppx) 50vw, 100vw',
-  // Intrinsic size of the 2400w file (all three share its 1.24 ratio); the
+  // Intrinsic size of the 2400w file (all four share its 1.24 ratio); the
   // CSS sizes the image, so these are for validators and the aspect ratio.
   width: 2400,
   height: 1937,
@@ -190,7 +193,7 @@ const resources = [
   },
   {
     label: 'Reading list',
-    href: '/resources/reading-list',
+    href: '/bok/reading-list',
     desc: 'The sources that formed the discipline, each with a verified link and a one-line note.',
   },
   {

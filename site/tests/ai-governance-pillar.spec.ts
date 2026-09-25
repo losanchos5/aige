@@ -4,7 +4,9 @@
 // tables, the figure, the structured data); the source Markdown is checked in
 // Node against the house citation rules (STYLEGUIDE.md §6), like the chapters
 // in source-integrity.spec.ts; the sitemap and the inbound links are read from
-// the built pages the preview server serves.
+// the built pages the preview server serves. The Markdown alternate
+// (/ai-governance.md), the pillar's place in /llms.txt and /llms-full*.txt and
+// its own Open Graph card are checked in "surfaces beyond the HTML".
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { readSource } from '../src/lib/md-parse';
@@ -21,8 +23,24 @@ const SOURCE = 'guides/ai-governance.md';
 const TITLE = 'What is AI governance? Definition, frameworks, examples';
 const H1 = 'What is AI governance?';
 const AUTHOR = 'Jorge García Aibar';
-const MIN_WORDS = 4500;
-const MIN_TABLES = 5;
+const MIN_WORDS = 7000;
+const MAX_WORDS = 8500;
+const MIN_TABLES = 10;
+const FAQ_QUESTIONS = 12;
+const OG_IMAGE = `${SITE_ORIGIN}/og/ai-governance.png`;
+// Sections added after the post-launch audit (SXO-N1): each opens with a
+// 40-60 word answer, the passage an answer engine quotes.
+const ANSWER_FIRST = [
+  'Which AI regulations apply by jurisdiction?',
+  'How does AI governance apply to generative AI and LLMs?',
+  'How does AI governance relate to AI security?',
+  'What are the main challenges of AI governance?',
+];
+
+/** Words in a passage, counted like the page's wordCount (tokens with a letter or digit). */
+function wordsIn(text: string): number {
+  return text.split(/\s+/).filter((word) => /[A-Za-z0-9]/.test(word)).length;
+}
 
 async function graphOf(page: Page): Promise<JsonLdNode[]> {
   const scripts = page.locator('script[type="application/ld+json"]');
@@ -51,9 +69,14 @@ test.describe('the pillar page', () => {
   test('opens with the answer box, then a visible, dated byline', async ({ page }) => {
     const answer = page.locator('.chapter-header .lede');
     await expect(answer).toContainText('AI governance is the set of rules, roles');
-    const words = ((await answer.textContent()) ?? '').trim().split(/\s+/).length;
+    const text = ((await answer.textContent()) ?? '').trim();
+    const words = text.split(/\s+/).length;
     expect(words, `answer box is ${words} words`).toBeGreaterThanOrEqual(40);
     expect(words, `answer box is ${words} words`).toBeLessThanOrEqual(60);
+    // The definition itself comes first, as one short, quotable sentence (CONTENT-N4).
+    const definition = text.split(/(?<=\.)\s+/)[0];
+    expect(definition).toMatch(/^AI governance is /);
+    expect(wordsIn(definition), definition).toBeLessThanOrEqual(25);
 
     const byline = page.getByTestId('byline');
     await expect(byline).toContainText(`By ${AUTHOR}`);
@@ -67,7 +90,7 @@ test.describe('the pillar page', () => {
     }
   });
 
-  test(`runs to at least ${MIN_WORDS} words with ${MIN_TABLES} tables and a figure`, async ({
+  test(`runs to ${MIN_WORDS}-${MAX_WORDS} words with ${MIN_TABLES} tables and a figure`, async ({
     page,
   }) => {
     const article = page.locator('article.prose');
@@ -76,8 +99,9 @@ test.describe('the pillar page', () => {
       clone.querySelectorAll('svg, figure').forEach((node) => node.remove());
       return clone.textContent ?? '';
     })) as string;
-    const words = text.split(/\s+/).filter((word) => /[A-Za-z0-9]/.test(word)).length;
+    const words = wordsIn(text);
     expect(words, `the pillar body is ${words} words`).toBeGreaterThanOrEqual(MIN_WORDS);
+    expect(words, `the pillar body is ${words} words`).toBeLessThanOrEqual(MAX_WORDS);
 
     expect(await article.locator('table').count()).toBeGreaterThanOrEqual(MIN_TABLES);
     await expect(article.locator('figure')).toHaveCount(1);
@@ -86,13 +110,56 @@ test.describe('the pillar page', () => {
   test('asks its sections as questions and closes with a numbered source list', async ({
     page,
   }) => {
-    const h2s = await page.locator('article.prose h2').allTextContents();
-    const questions = h2s.filter((text) => text.trim().endsWith('?'));
-    expect(questions.length, h2s.join(' | ')).toBeGreaterThanOrEqual(10);
-    expect(h2s.map((t) => t.trim())).toContain('Frequently asked questions');
-    await expect(page.locator('article.prose h3')).toHaveCount(6);
+    const h2s = (await page.locator('article.prose h2').allTextContents()).map((t) => t.trim());
+    const questions = h2s.filter((text) => text.endsWith('?'));
+    expect(questions.length, h2s.join(' | ')).toBeGreaterThanOrEqual(15);
+    expect(h2s).toContain('Frequently asked questions');
+    // No section heading repeats the H1 (CONTENT-N8, GEO-N6).
+    expect(h2s).not.toContain(H1);
+    await expect(page.locator('article.prose h3')).toHaveCount(FAQ_QUESTIONS);
     const sources = page.locator('ol.sources > li');
-    expect(await sources.count()).toBeGreaterThanOrEqual(20);
+    expect(await sources.count()).toBeGreaterThanOrEqual(45);
+  });
+
+  test('opens each added section with a 40-60 word answer', async ({ page }) => {
+    for (const heading of ANSWER_FIRST) {
+      const h2 = page.locator('article.prose h2', { hasText: heading });
+      await expect(h2, heading).toHaveCount(1);
+      const first = (await h2.evaluate((el) => el.nextElementSibling?.textContent ?? '')) as string;
+      const words = wordsIn(first);
+      expect(words, `${heading} opens with ${words} words`).toBeGreaterThanOrEqual(40);
+      expect(words, `${heading} opens with ${words} words`).toBeLessThanOrEqual(60);
+    }
+  });
+
+  test('tables the regimes by jurisdiction and links the chapters behind them', async ({ page }) => {
+    const h2 = page.locator('article.prose h2#which-ai-regulations-apply-by-jurisdiction');
+    await expect(h2).toHaveCount(1);
+    // The section runs from its H2 to the next one.
+    const section = (await h2.evaluate((el) => {
+      const nodes: string[] = [];
+      for (let n = el.nextElementSibling; n && n.tagName !== 'H2'; n = n.nextElementSibling) {
+        nodes.push(n.outerHTML);
+      }
+      return nodes.join('');
+    })) as string;
+    for (const jurisdiction of [
+      'European Union',
+      'United States (federal)',
+      'United States (states)',
+      'United Kingdom',
+      'Canada',
+      'China',
+      'Singapore',
+      'South Korea',
+      'Brazil',
+      'Council of Europe',
+    ]) {
+      expect(section, jurisdiction).toContain(`<td>${jurisdiction}</td>`);
+    }
+    expect(section).toContain('href="/bok/ai-laws-worldwide');
+    expect(section).toContain('href="/bok/regulatory-map');
+    expect(section).toContain('href="/obligations/');
   });
 
   test('is a TechArticle about the glossary term "AI governance", with no FAQPage', async ({
@@ -109,6 +176,7 @@ test.describe('the pillar page', () => {
     expect(article?.datePublished).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(article?.dateModified).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(article?.mentions?.length).toBeGreaterThanOrEqual(4);
+    expect(article?.image).toBe(OG_IMAGE);
 
     const person = graph.find((node) => node['@type'] === 'Person');
     expect(person?.name).toBe(AUTHOR);
@@ -124,6 +192,52 @@ test.describe('the pillar page', () => {
 
     const crumbs = graph.find((node) => node['@type'] === 'BreadcrumbList');
     expect(crumbs?.itemListElement?.at(-1)?.name).toBe(H1);
+  });
+});
+
+test.describe('surfaces beyond the HTML', () => {
+  test('has its own Open Graph card', async ({ page, request }) => {
+    await page.goto(PATH);
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', OG_IMAGE);
+    await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute('content', OG_IMAGE);
+    const card = await request.get('/og/ai-governance.png');
+    expect(card.status()).toBe(200);
+    expect(card.headers()['content-type']).toContain('image/png');
+  });
+
+  test('has a Markdown twin, advertised from the page', async ({ page, request }) => {
+    const res = await request.get(`${PATH}.md`);
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type']).toContain('text/markdown');
+    const text = await res.text();
+    expect(text.startsWith(`---\ntitle: "${H1}"\n`)).toBe(true);
+    expect(text).toContain(`\ncanonical: ${SITE_ORIGIN}${PATH}\n`);
+    expect(text).toMatch(/\nupdated: \d{4}-\d{2}-\d{2}\n---\n\n# What is AI governance\?\n/);
+    expect(text).toContain('> AI governance is the set of rules, roles');
+    expect(text).toContain('\n## Which AI regulations apply by jurisdiction?\n');
+    expect(text).toContain('\n## Sources\n');
+    expect(text).not.toContain('<html');
+    expect(text).not.toContain('\u2014');
+
+    await page.goto(PATH);
+    const link = page.locator('head link[rel="alternate"][type="text/markdown"]');
+    await expect(link).toHaveCount(1);
+    await expect(link).toHaveAttribute('href', `${PATH}.md`);
+  });
+
+  test('leads llms.txt with its Markdown link and opens the full-text corpus', async ({
+    request,
+  }) => {
+    const index = await (await request.get('/llms.txt')).text();
+    expect(index).toContain(`(${SITE_ORIGIN}${PATH}): `);
+    expect(index).toContain(`Markdown: ${SITE_ORIGIN}${PATH}.md`);
+    for (const file of ['/llms-full.txt', '/llms-full-bok.txt']) {
+      const text = await (await request.get(file)).text();
+      const block = `# ${H1}\n\nSource: ${SITE_ORIGIN}${PATH}\n`;
+      expect(text, file).toContain(block);
+      // The first document of the file, before any chapter.
+      expect(text.indexOf(block), file).toBeLessThan(text.indexOf(`Source: ${SITE_ORIGIN}/bok/`));
+    }
   });
 });
 
@@ -183,6 +297,26 @@ test.describe('source file', () => {
     const cited = new Set([...body.matchAll(/\[(\d+)\]/g)].map((m) => Number(m[1])));
     for (const n of cited) expect(n, `[${n}] has a source`).toBeLessThanOrEqual(entries.length);
     for (const e of entries) expect(cited.has(e.n), `source [${e.n}] is cited`).toBe(true);
+  });
+
+  test('keeps sentences short and cites one OWASP edition', () => {
+    // Prose only: paragraphs and list items, not tables, headings or quotes.
+    const prose = body
+      .split(/\r?\n\s*\r?\n/)
+      .filter((block) => !/^\s*[|#>]/.test(block))
+      .join(' ')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/\[\d+\]/g, '')
+      .replace(/\s+/g, ' ');
+    const sentences = prose.split(/(?<=[.?!])\s+(?=[A-Z("])/).filter((s) => wordsIn(s) > 0);
+    const average = sentences.reduce((sum, s) => sum + wordsIn(s), 0) / sentences.length;
+    expect(average, `average sentence is ${average.toFixed(1)} words`).toBeLessThanOrEqual(20);
+
+    // OWASP ids changed meaning between editions: the page cites the 2026 lists only.
+    expect(body).not.toMatch(/LLM\d{2}:(?!2026)\d{4}/);
+    const flat = body.replace(/\s+/g, ' ');
+    expect(flat).toContain('Top 10 for LLM Applications 2026');
+    expect(flat).toContain('Top 10 for Agentic Applications 2026');
   });
 
   test('EU law is cited on EUR-Lex with EUR-Lex anchors, and no em dash anywhere', () => {

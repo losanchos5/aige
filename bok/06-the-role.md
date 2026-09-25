@@ -1,5 +1,5 @@
 ---
-seoTitle: "AI governance engineer role: workflows, ladder, market"
+seoTitle: "AI governance role in depth: workflows, career ladder"
 ---
 # 06. The role
 
@@ -40,6 +40,9 @@ requisition.
 One line separates it from its analyst neighbour, and the rest of the chapter earns that line: the AI
 governance analyst describes the system from the outside and files the description; the AI governance
 engineer reads the system directly and ships the control that changes what it does.
+
+The role also has a one-page summary: [AI governance engineer](/role), with the workflows, the
+skills, the salary medians and the ways in. This chapter is the full treatment, with its sources.
 
 ## What the role owns, by workflow
 

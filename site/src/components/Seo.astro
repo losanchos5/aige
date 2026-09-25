@@ -10,6 +10,7 @@ import { linkBreadcrumbs } from '../lib/breadcrumbs';
 import { documentTitle, metaDescription, ogImageAlt } from '../lib/meta';
 // The page's clean Markdown twin (<url>.md), when it has one (src/lib/llms.ts).
 import { markdownAlternateFor } from '../lib/llms';
+import { LOCALE_INFO, isLocale } from '../i18n/locales';
 const markdownAlternate = markdownAlternateFor(Astro.url.pathname);
 
 interface Props {
@@ -17,6 +18,14 @@ interface Props {
   description?: string;
   canonical?: string;
   image?: string;
+  /** The Open Graph image's pixel size and type, when it is not a 1200x630 PNG
+      card (a figure page shares the figure PNG itself). */
+  imageWidth?: number;
+  imageHeight?: number;
+  imageType?: string;
+  /** og:image:alt when lib/meta.ts would describe the card in the wrong
+      language (the Spanish Thesis shares the English card). */
+  imageAlt?: string;
   /** Open Graph locale, e.g. `en_US` (default) or `es_ES`. */
   locale?: string;
   /** JSON-LD structured data, merged into the site-wide @graph. */
@@ -53,6 +62,10 @@ const {
   description = site.description,
   canonical = selfUrl,
   image = '/og/default.png',
+  imageWidth = 1200,
+  imageHeight = 630,
+  imageType = 'image/png',
+  imageAlt,
   locale = 'en_US',
   jsonLd,
   alternates,
@@ -71,15 +84,26 @@ const ogImage = new URL(image, site.url).href;
 // title, so no title can carry the suffix twice, and the suffix is dropped when
 // it would push the title past 60 characters.
 const pageTitle = documentTitle(title, site.name, titleSuffix);
-// Every OG card this site ships is a 1200x630 PNG (src/pages/og/[...slug].png.ts),
-// so the dimensions and type are stated for the scrapers that pre-allocate the
-// card before fetching the bytes.
-const OG_IMAGE_WIDTH = '1200';
-const OG_IMAGE_HEIGHT = '630';
-const OG_IMAGE_TYPE = 'image/png';
+// The OG cards this site renders are 1200x630 PNGs (src/pages/og/[...slug].png.ts),
+// the default; a page that shares another image (a figure's PNG) passes its real
+// size, so scrapers that pre-allocate the image from these tags crop it right
+// (audit ONPAGE N4).
+const ogImageWidth = String(imageWidth);
+const ogImageHeight = String(imageHeight);
 // A card rendered for this page shows its title, so the title is its alternative
 // text; a shared section card is described by what it shows (lib/meta.ts).
-const ogAlt = ogImageAlt({ image, title, documentTitle: pageTitle, siteName: site.name });
+const ogAlt = imageAlt ?? ogImageAlt({ image, title, documentTitle: pageTitle, siteName: site.name });
+// og:locale:alternate for each other language the page exists in, from its
+// hreflang alternates (today only the /thesis <-> /es/thesis pair has any).
+const localeAlternates = [
+  ...new Set(
+    (alternates ?? [])
+      .map((alt) => alt.hreflang)
+      .filter(isLocale)
+      .map((lang) => LOCALE_INFO[lang].og)
+      .filter((og) => og !== locale),
+  ),
+];
 const articleAuthor = article?.author ?? site.author;
 // Exactly one ld+json block per page: Organization + WebSite + the page's nodes,
 // with the BreadcrumbList @id'd `<page url>#breadcrumb` and linked from the
@@ -107,10 +131,11 @@ const graph = {
 <meta property="og:url" content={canonical} />
 <meta property="og:image" content={ogImage} />
 <meta property="og:image:alt" content={ogAlt} />
-<meta property="og:image:width" content={OG_IMAGE_WIDTH} />
-<meta property="og:image:height" content={OG_IMAGE_HEIGHT} />
-<meta property="og:image:type" content={OG_IMAGE_TYPE} />
+<meta property="og:image:width" content={ogImageWidth} />
+<meta property="og:image:height" content={ogImageHeight} />
+<meta property="og:image:type" content={imageType} />
 <meta property="og:locale" content={locale} />
+{localeAlternates.map((alt) => <meta property="og:locale:alternate" content={alt} />)}
 
 {
   article && (

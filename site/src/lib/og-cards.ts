@@ -7,6 +7,8 @@ import { chaptersOrdered } from '../data/chapters';
 /** Top-level cards: /og/<slug>.png -> the title printed on the card. */
 export const OG_ROUTE_TITLES: Readonly<Record<string, string>> = {
   default: 'AI Governance Engineering',
+  // The pillar page's own card: it names the query the page answers.
+  'ai-governance': 'What is AI governance?',
   thesis: 'The Thesis',
   bok: 'Body of Knowledge',
   role: 'The AI Governance Engineer',

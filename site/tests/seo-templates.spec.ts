@@ -128,6 +128,7 @@ test.describe('obligation titles and headings', () => {
       }
       expect(title.length, title).toBeLessThanOrEqual(60);
       expect(title, `${row.id} ends on a dangling mark`).not.toMatch(/[:;,]…?$/);
+      expect(title, `${row.id} is cut with an ellipsis`).not.toMatch(/…$/);
     }
   });
 
@@ -153,11 +154,13 @@ test.describe('obligation titles and headings', () => {
     expect(h1Of(html('obligations', 'aige-obl-owasp-aibom.html'))).toBe('OWASP AIBOM');
   });
 
-  test('the meta description is a concise lead, not the whole requirement', () => {
+  test('the meta description names the instrument in whole sentences, 110 to 158 characters', () => {
     for (const { row, page } of pages) {
       const description = decode(/<meta name="description" content="([^"]*)"/.exec(page)?.[1] ?? '');
-      expect(description.length, row.id).toBeGreaterThanOrEqual(50);
-      expect(description.length, `${row.id}: ${description}`).toBeLessThanOrEqual(155);
+      expect(description.length, `${row.id}: ${description}`).toBeGreaterThanOrEqual(110);
+      expect(description.length, `${row.id}: ${description}`).toBeLessThanOrEqual(158);
+      expect(description, `${row.id} ends mid-sentence`).toMatch(/[.!?]["'”’)\]]?$/);
+      expect(description, row.id).not.toMatch(/…$/);
     }
   });
 
@@ -169,13 +172,15 @@ test.describe('obligation titles and headings', () => {
 });
 
 test.describe('glossary term pages', () => {
-  test('the meta description is the definition lead, within 155 characters', () => {
+  test('the meta description is the definition lead, whole sentences within 158 characters', () => {
     for (const entry of getGlossary()) {
       const file = join('dist', 'glossary', `${entry.slug}.html`);
       if (!existsSync(file)) continue;
       const page = readFileSync(file, 'utf8');
       const description = decode(/<meta name="description" content="([^"]*)"/.exec(page)?.[1] ?? '');
-      expect(description.length, `${entry.slug}: ${description}`).toBeLessThanOrEqual(155);
+      expect(description.length, `${entry.slug}: ${description}`).toBeLessThanOrEqual(158);
+      expect(description.length, `${entry.slug}: ${description}`).toBeGreaterThanOrEqual(110);
+      expect(description, `${entry.slug} ends mid-sentence`).toMatch(/[.!?]["'”’)\]]?$/);
       expect(description, entry.slug).not.toMatch(/\[\d+\]/);
     }
   });

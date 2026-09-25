@@ -1,5 +1,6 @@
-// Static OG image endpoint. One 1200x630 PNG per route, plus one per Body of
-// Knowledge chapter (`bok-<slug>`). Built at `astro build` time; served at
+// Static OG image endpoint. One 1200x630 PNG per route (the pillar page,
+// /ai-governance, has its own), plus one per Body of Knowledge chapter
+// (`bok-<slug>`). Built at `astro build` time; served at
 // /og/<slug>.png. The image content lives in src/lib/og.ts.
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { renderOg } from '../../lib/og';

@@ -1,10 +1,11 @@
 // llms-corpus.ts: the documents behind /llms-full.txt, its slices
 // (/llms-full-<slice>.txt) and the Markdown alternates of the content pages
-// (/bok/<slug>.md, /patterns/<slug>.md, /glossary/<slug>.md, /cases/<id>.md,
-// /thesis.md). One builder per kind of page, so the three surfaces serialise a
-// page the same way:
+// (/ai-governance.md, /bok/<slug>.md, /patterns/<slug>.md, /glossary/<slug>.md,
+// /cases/<id>.md, /thesis.md). One builder per kind of page, so the three
+// surfaces serialise a page the same way:
 //
-//   - chapters, pattern pages and the Thesis are their Markdown sources, H1
+//   - the pillar page, chapters, pattern pages and the Thesis are their
+//     Markdown sources, H1
 //     dropped (the caller re-emits it) and a chapter's "At a glance" points
 //     placed after its abstract, as the page shows them;
 //   - glossary terms, incident cases, the obligation register, the crosswalk,
@@ -47,7 +48,17 @@ import {
   localCitations,
   type GlossaryEntry,
 } from './glossary';
-import { PATTERNS_CHAPTER_ID, casePath, chapterPath, docLead, document, header, withoutTitle } from './llms';
+import {
+  PATTERNS_CHAPTER_ID,
+  PILLAR_PATH,
+  casePath,
+  chapterPath,
+  docLead,
+  document,
+  header,
+  withoutTitle,
+} from './llms';
+import { readSource } from './md-parse';
 import { loadPatternPages } from './pattern-pages';
 import { gitDate } from './reading';
 import { sourceText, type Source } from './sources';
@@ -145,6 +156,25 @@ export async function thesisDoc(): Promise<CorpusDoc> {
     path: '/thesis',
     description: lead.summary,
     updated: updatedOf('../THESIS.md'),
+    body: withoutTitle(source),
+  };
+}
+
+/** The pillar page's Markdown source, relative to the repo root. */
+const PILLAR_SOURCE = 'guides/ai-governance.md';
+
+/**
+ * The pillar page, "What is AI governance?": its Markdown source with the answer
+ * box as the abstract. The figure the page inserts is not part of the source.
+ */
+export function pillarDoc(): CorpusDoc {
+  const source = readSource(PILLAR_SOURCE);
+  const lead = docLead(source);
+  return {
+    title: lead.title,
+    path: PILLAR_PATH,
+    description: lead.summary,
+    updated: updatedOf(`../${PILLAR_SOURCE}`),
     body: withoutTitle(source),
   };
 }
@@ -453,8 +483,9 @@ export const llmsSlices: readonly LlmsSlice[] = [
     path: '/llms-full-bok.txt',
     title: 'Full text: the discipline and the Thesis',
     summary:
-      'The chapters of part one, The discipline (00 to 07: definition, why now, values, the stack, the pattern catalogue, the role, the maturity model), chapter 10, the reading list, and the Thesis.',
+      'The pillar page, What is AI governance?, then the chapters of part one, The discipline (00 to 07: definition, why now, values, the stack, the pattern catalogue, the role, the maturity model), chapter 10, the reading list, and the Thesis.',
     docs: async () => [
+      pillarDoc(),
       ...(await chaptersWhere((c) => c.part === 'discipline' || c.slug === 'reading-list')),
       await thesisDoc(),
     ],
@@ -530,6 +561,7 @@ async function fullDocs(): Promise<CorpusDoc[]> {
     ...(doc.path === PATTERNS_CHAPTER_PATH ? patterns : []),
   ]);
   return [
+    pillarDoc(),
     ...chapters,
     await thesisDoc(),
     obligationsDoc(),
@@ -554,7 +586,7 @@ export async function llmsFullText(id: SliceId | 'full'): Promise<string> {
     const patterns = (await patternDocs()).length;
     text = document([
       header(
-        `This file carries the complete text of the ${chapters} Body of Knowledge chapters, in reading order, with the ${patterns} pattern pages after chapter 05, then the Thesis, the obligation register, the frameworks, the crosswalk, the ${cases.length} incident cases and the harms atlas. It is large; the same corpus is split into smaller files listed in ${index}.`,
+        `This file opens with the pillar page, What is AI governance?, then carries the complete text of the ${chapters} Body of Knowledge chapters, in reading order, with the ${patterns} pattern pages after chapter 05, then the Thesis, the obligation register, the frameworks, the crosswalk, the ${cases.length} incident cases and the harms atlas. It is large; the same corpus is split into smaller files listed in ${index}.`,
       ),
       ...docs.map(fullTextBlock),
     ]);

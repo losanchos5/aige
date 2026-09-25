@@ -1,11 +1,13 @@
 ---
 import Base from '../../layouts/Base.astro';
+import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import { stages, kit, schemaOrder } from '../../data/templates';
 import { patterns } from '../../data/patterns';
 import { getSchemas } from '../../lib/schemas-library';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { fitsSiteSuffix } from '../../lib/seo-title';
 import { collectionPage, lastModified } from '../../lib/jsonld';
 import { site } from '../../data/site';
 import '../../styles/resources.css';
@@ -92,8 +94,10 @@ const sources = [
 
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Templates' }];
 const checkScript = `${site.github}/blob/main/site/scripts/schemas-check.mjs`;
-const description =
-  'JSON Schemas, filled examples and human templates for the records AI governance produces, from the use-case record to the incident record, each field tagged with the obligations it helps evidence.';
+// Search title and description (SXO-N3, 2026-09-25 audit): the query first;
+// the H1 stays.
+const seoTitle = 'AI governance templates: policy, register, incident';
+const description = `AI governance templates: ${schemas.length} JSON Schemas with filled examples and ${kit.length} policy kit templates, from the AI policy and risk register to the incident record.`;
 
 // The page as a CollectionPage of the schemas and kit templates it lists, each
 // at its row anchor, dated like the sitemap's lastmod.
@@ -121,7 +125,8 @@ const jsonLd = [
 ---
 
 <Base
-  title="Templates and schemas"
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
   description={description}
   image="/og/resources.png"
   jsonLd={jsonLd}
