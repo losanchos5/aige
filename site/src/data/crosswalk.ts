@@ -147,7 +147,7 @@ const G7_URL =
 const EN18286_URL =
   'https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/';
 const PREN18228_URL = 'https://genorma.com/en/standards/pren-18228';
-const JTC21_URL = 'https://jtc21.eu/working-groups/';
+const PREN18229_1_URL = 'https://genorma.com/en/standards/pren-18229-1';
 
 /**
  * Instruments the crosswalk maps before frameworks.ts carries them. Empty since
@@ -2447,7 +2447,7 @@ const refsV05: readonly CrosswalkRef[] = [
   }),
   sgA('logging-traceability', '2.3.3', 'When deploying, continuously monitor and test', 'related'),
   oecd('logging-traceability', '1.5(b)', 'Traceability of datasets, processes and decisions', 'core'),
-  mk('logging-traceability', 'pren-18229-1', 'prEN 18229-1', 'AI trustworthiness framework, Part 1: logging (draft; supports Art. 12)', 'core', JTC21_URL, {
+  mk('logging-traceability', 'pren-18229-1', 'prEN 18229-1', 'AI trustworthiness framework, Part 1: logging (draft; supports Art. 12)', 'core', PREN18229_1_URL, {
     verified: false,
     note: PREN_UNVERIFIED,
   }),

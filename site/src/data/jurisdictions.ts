@@ -253,7 +253,7 @@ export const jurisdictions: readonly Jurisdiction[] = [
       },
     ],
     summary:
-      'Frontier developers publish a safety protocol and disclose safety incidents within 72 hours from 1 January 2027; AI companion operators must run a self-harm protocol and remind users every three hours that they are not talking to a human.',
+      'From 1 January 2027, large frontier developers publish a safety framework and every frontier developer discloses safety incidents within 72 hours; AI companion operators must run a self-harm protocol and remind users every three hours that they are not talking to a human.',
     asOf: AS_OF,
     anchor: `${CH}#united-states-state-laws-that-bind-private-organisations`,
   },
@@ -284,8 +284,9 @@ export const jurisdictions: readonly Jurisdiction[] = [
         name: 'HB 3773, Human Rights Act amendment on AI in employment',
         date: '2026-01-01',
         status: 'in-force',
-        url: 'https://www.hinshawlaw.com/en/insights/blogs/employment-law-observer/illinois-adopts-new-ai-in-employment-regulations-what-employers-need-to-know-for-2026',
-        verified: 'secondary',
+        url: 'https://www.ilga.gov/legislation/publicacts/fulltext.asp?Name=103-0804',
+        verified: 'primary',
+        note: 'Public Act 103-0804; text read from a Web Archive capture, as ilga.gov refused connections on 2026-09-25.',
       },
     ],
     summary:

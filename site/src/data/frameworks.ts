@@ -507,7 +507,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'State of New York',
     url: 'https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models',
     summary:
-      'A frontier-AI safety law (S6953B) binding large frontier developers to publish a safety framework and disclose incidents. Signed 19 December 2025 and effective 1 January 2027 after a March 2026 chapter amendment, with oversight in an office within the New York Department of Financial Services (DFS).',
+      'A frontier-AI safety law (S6953B) binding large frontier developers to publish a safety framework and every frontier developer to report critical safety incidents. Signed 19 December 2025 and effective 1 January 2027 after a March 2026 chapter amendment, with oversight in an office within the New York Department of Financial Services (DFS).',
   },
   {
     id: 'ca-ab-2013',
@@ -565,10 +565,9 @@ export const frameworks: readonly Framework[] = [
     short: 'Illinois HB 3773',
     type: 'law',
     issuer: 'State of Illinois',
-    url:
-      'https://www.hinshawlaw.com/en/insights/blogs/employment-law-observer/illinois-adopts-new-ai-in-employment-regulations-what-employers-need-to-know-for-2026',
+    url: 'https://www.ilga.gov/legislation/publicacts/fulltext.asp?Name=103-0804',
     summary:
-      'An amendment to the Illinois Human Rights Act, effective 1 January 2026 as reported: employers may not use AI with a discriminatory effect on protected classes, nor ZIP codes as a proxy, and must notify employees and applicants.',
+      'An amendment to the Illinois Human Rights Act (Public Act 103-0804), effective 1 January 2026: employers may not use AI with a discriminatory effect on protected classes, nor ZIP codes as a proxy, and must notify employees and applicants.',
   },
   {
     id: 'nyc-ll-144',
@@ -636,9 +635,9 @@ export const frameworks: readonly Framework[] = [
     short: 'Illinois BIPA',
     type: 'law',
     issuer: 'State of Illinois',
-    url: 'https://en.wikipedia.org/wiki/Biometric_Information_Privacy_Act',
+    url: 'https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=3004&ChapterID=57',
     summary:
-      'The Illinois biometric privacy statute (2008, as reported): informed written consent before collecting biometric identifiers, a retention and destruction schedule and a private right of action with statutory damages.',
+      'The Illinois biometric privacy statute (Public Act 95-994, effective 3 October 2008): informed written consent before collecting biometric identifiers, a retention and destruction schedule and a private right of action with statutory damages.',
   },
   {
     id: 'wa-mhmda',
@@ -970,7 +969,7 @@ export const frameworks: readonly Framework[] = [
     short: 'prEN 18229-1',
     type: 'standard',
     issuer: 'CEN-CENELEC JTC 21',
-    url: 'https://jtc21.eu/working-groups/',
+    url: 'https://genorma.com/en/standards/pren-18229-1',
     summary:
       'Draft harmonised standard supporting AI Act Art. 12; its Enquiry vote closed on 20 Aug 2026, as reported by Genorma on 2026-09-24.',
   },
@@ -3531,11 +3530,11 @@ export const obligations: readonly Obligation[] = [
     requirement:
       'Publish a frontier AI safety and security framework; disclose safety incidents within 72 hours. A chapter amendment signed 2026-03-27 sets the effective date at 2027-01-01 and creates an oversight office within the New York Department of Financial Services (DFS)',
     artefact:
-      'Published frontier AI safety framework; 72-hour incident and disclosure pipeline reporting to the state; DFS oversight office',
+      'Published frontier AI safety framework; 72-hour incident and disclosure pipeline reporting to the DFS oversight office',
     layerN: [5, 4],
     anchor: US_FRONTIER_ANCHOR,
     scope:
-      'Large frontier developers (frontier models trained with over 10^26 operations, cost over USD 100M)',
+      'Large frontier developers (trained a frontier model above 10^26 operations; annual revenue over USD 500M) publish the framework; every frontier developer reports incidents within 72 hours, as amended by the chapter amendment signed 2026-03-27',
     appliesFrom: '2027-01-01',
     appliesStatus: 'applies-later',
     appliesNote: 'Signed 2025-12-19; effective 2027-01-01',
@@ -3699,7 +3698,7 @@ export const obligations: readonly Obligation[] = [
     authority: 'Illinois Department of Human Rights',
     appliesFrom: '2026-01-01',
     appliesStatus: 'in-force',
-    appliesNote: 'Effective 2026-01-01, as reported; implementing rules in draft',
+    appliesNote: 'Effective 2026-01-01 (P.A. 103-0804); implementing rules in draft, as reported',
     reviewed: REVIEWED_V050,
   },
   {
@@ -3861,7 +3860,7 @@ export const obligations: readonly Obligation[] = [
     authority: 'Private right of action',
     appliesFrom: '2008-10-03',
     appliesStatus: 'in-force',
-    appliesNote: 'Signed 2008-10-03, as reported (verify)',
+    appliesNote: 'Effective 2008-10-03 (P.A. 95-994)',
     reviewed: REVIEWED_V050,
   },
   {
