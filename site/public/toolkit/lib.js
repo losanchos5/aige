@@ -11,7 +11,8 @@
 // Formats: JSON (RFC 8259, UTF-8), CSV (RFC 4180: CRLF records, fields with a
 // comma, a double quote or a line break wrapped in double quotes, inner quotes
 // doubled), iCalendar (RFC 5545: CRLF lines folded at 75 octets, TEXT escaping,
-// UID + DTSTAMP on every VEVENT, all-day events with an exclusive DTEND).
+// a unique UID + DTSTAMP on every VEVENT, all-day events with an exclusive
+// DTEND, timed events in UTC with display alarms).
 
 // ---- Tool data island -------------------------------------------------------
 
@@ -281,14 +282,42 @@ const icsStamp = (date) =>
     .replace(/[-:]/g, '')
     .replace(/\.\d{3}Z$/, 'Z');
 
+/** A UID for an event key: a readable slug of the key plus a 32-bit FNV-1a
+ *  hash of the whole key, so two keys that share a long prefix (slug() keeps
+ *  60 characters) still get distinct UIDs, as RFC 5545 section 3.8.4.7
+ *  requires. The same key always yields the same UID.
+ *  @param {string} key
+ *  @returns {string} */
+export function icsUid(key) {
+  let hash = 0x811c9dc5;
+  for (const byte of encoder.encode(String(key))) {
+    hash ^= byte;
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  const head = slug(key).slice(0, 40).replace(/-+$/g, '') || 'event';
+  return `${head}-${hash.toString(16).padStart(8, '0')}@aigovernanceengineer.com`;
+}
+
+/** An alarm offset before the event: minutes as an RFC 5545 negative duration. */
+function icsBefore(minutes) {
+  const m = Math.round(Number(minutes));
+  if (!Number.isFinite(m) || m < 0) throw new Error(`toIcs: alarm "${minutes}" is not a number of minutes`);
+  if (m > 0 && m % 1440 === 0) return `-P${m / 1440}D`;
+  if (m > 0 && m % 60 === 0) return `-PT${m / 60}H`;
+  return `-PT${m}M`;
+}
+
 /**
- * Build an iCalendar file of all-day events.
- * events: [{ uid?, id?, date: 'YYYY-MM-DD', endDate?: 'YYYY-MM-DD' (inclusive),
- *            summary, description?, url? }]
- * A missing `uid` is derived from `id` (or the date and summary), so exporting
- * the same event twice yields the same UID and a calendar updates instead of
- * duplicating it.
- * @param {{ events: Array<{ uid?: string, id?: string, date: string, endDate?: string, summary: string, description?: string, url?: string }>, name?: string, prodId?: string, now?: Date }} calendar
+ * Build an iCalendar file.
+ * All-day events: { date: 'YYYY-MM-DD', endDate?: 'YYYY-MM-DD' (inclusive) },
+ * shown as free time. Timed events: { start: epoch ms, durationMinutes? (30) },
+ * written in UTC and shown as busy; `alarms` (minutes before the start) adds
+ * one display alarm each. Every event also takes uid?, id?, summary,
+ * description? and url?.
+ * A missing `uid` is derived from `id` (or the date and summary) with
+ * icsUid(), so exporting the same event twice yields the same UID and a
+ * calendar updates instead of duplicating it. Two events with one UID throw.
+ * @param {{ events: Array<{ uid?: string, id?: string, date?: string, endDate?: string, start?: number, durationMinutes?: number, alarms?: number[], summary: string, description?: string, url?: string }>, name?: string, prodId?: string, now?: Date }} calendar
  * @returns {string}
  */
 export function toIcs({
@@ -306,25 +335,50 @@ export function toIcs({
   ];
   if (name) lines.push(`X-WR-CALNAME:${icsText(name)}`);
   const stamp = icsStamp(now);
+  const seen = new Set();
   for (const event of events ?? []) {
-    const start = parseDate(event.date);
-    const last = parseDate(event.endDate ?? event.date);
-    if (last < start) throw new Error(`toIcs: endDate ${event.endDate} is before ${event.date}`);
-    // DTEND of a DATE event is exclusive: the day after the last day.
-    const end = new Date(last.getTime() + 86_400_000);
-    const uid =
-      event.uid ?? `${slug(event.id ?? `${event.date}-${event.summary}`)}@aigovernanceengineer.com`;
+    const timed = event.start !== undefined;
+    let when;
+    if (timed) {
+      const start = Number(event.start);
+      if (!Number.isFinite(start)) throw new Error(`toIcs: start "${event.start}" is not a time`);
+      const minutes = event.durationMinutes ?? 30;
+      if (!(Number(minutes) > 0)) throw new Error(`toIcs: durationMinutes ${minutes} is not above zero`);
+      when = [
+        `DTSTART:${icsStamp(new Date(start))}`,
+        `DTEND:${icsStamp(new Date(start + Number(minutes) * 60_000))}`,
+      ];
+    } else {
+      const start = parseDate(event.date);
+      const last = parseDate(event.endDate ?? event.date);
+      if (last < start) throw new Error(`toIcs: endDate ${event.endDate} is before ${event.date}`);
+      // DTEND of a DATE event is exclusive: the day after the last day.
+      const end = new Date(last.getTime() + 86_400_000);
+      when = [`DTSTART;VALUE=DATE:${icsDate(start)}`, `DTEND;VALUE=DATE:${icsDate(end)}`];
+    }
+    const uid = event.uid ?? icsUid(event.id ?? `${event.date ?? event.start}-${event.summary}`);
+    if (seen.has(uid)) throw new Error(`toIcs: two events share the UID ${uid}`);
+    seen.add(uid);
     lines.push(
       'BEGIN:VEVENT',
       `UID:${uid}`,
       `DTSTAMP:${stamp}`,
-      `DTSTART;VALUE=DATE:${icsDate(start)}`,
-      `DTEND;VALUE=DATE:${icsDate(end)}`,
+      ...when,
       `SUMMARY:${icsText(event.summary)}`,
     );
     if (event.description) lines.push(`DESCRIPTION:${icsText(event.description)}`);
     if (event.url) lines.push(`URL:${String(event.url).replace(/[\r\n]/g, '')}`);
-    lines.push('TRANSP:TRANSPARENT', 'END:VEVENT');
+    lines.push(`TRANSP:${timed ? 'OPAQUE' : 'TRANSPARENT'}`);
+    for (const minutes of timed ? (event.alarms ?? []) : []) {
+      lines.push(
+        'BEGIN:VALARM',
+        'ACTION:DISPLAY',
+        `TRIGGER:${icsBefore(minutes)}`,
+        `DESCRIPTION:${icsText(event.summary)}`,
+        'END:VALARM',
+      );
+    }
+    lines.push('END:VEVENT');
   }
   lines.push('END:VCALENDAR');
   return `${lines.map(foldLine).join('\r\n')}\r\n`;

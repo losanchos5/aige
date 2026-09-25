@@ -3,8 +3,8 @@
 // derives the incident class and severity of chapter 17's scale, and one clock
 // per regime of the chapter's table (EU AI Act Arts. 73, 26(5) and 55(1)(c),
 // GDPR Arts. 33 and 34, NIS2 Art. 23, DORA Art. 19): who reports to whom and
-// by when, as calendar dates. Exports: calendar reminders (.ics), an incident
-// record skeleton that validates against incident-record.v1, a Markdown
+// by when, as calendar dates. Exports: calendar reminders (.ics, one timed event
+// with alarms per deadline), an incident record skeleton that validates against incident-record.v1, a Markdown
 // summary, the link. Everything runs in this page; nothing is sent.
 //
 // `computeClocks` and `buildRecord` are pure and exported, so the tests can
@@ -653,15 +653,21 @@ function init(app, model) {
     writeFragment(params());
   }
 
+  // One timed event per dated step, at its deadline and marked busy, with a
+  // display alarm an hour before (and a day before when the deadline is more
+  // than two days after awareness): an hour-scale clock such as DORA's 4 h or
+  // NIS2's 24 h cannot wait for an all-day entry.
   function icsEvents(p, res) {
-    const recordId = cleanText(p.rid, 80) || `incident-${isoUtc(inputFromParams(p).awareMs).slice(0, 16)}`;
+    const awareMs = inputFromParams(p).awareMs;
+    const recordId = cleanText(p.rid, 80) || `incident-${isoUtc(awareMs).slice(0, 16)}`;
     const events = [];
     for (const clock of res.open) {
       for (const s of clock.steps) {
         if (s.dueMs === null) continue;
         events.push({
           id: `${recordId}-${clock.regime}-${s.id}`,
-          date: localDate(s.dueMs),
+          start: s.dueMs,
+          alarms: s.dueMs - awareMs > 2 * 86_400_000 ? [1440, 60] : [60],
           summary: `${clock.label}: ${s.label} (${statusLabel(clock.status).toLowerCase()}), due ${fmt(s.dueMs)}`,
           description: `${s.basis}. To: ${clock.to}. ${model.caveat} ${model.notice}`,
           url: shareUrl(p),

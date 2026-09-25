@@ -6,7 +6,7 @@
 // Markdown checklist, CSV (RFC 4180), JSON (the open-data envelope) and
 // iCalendar events (RFC 5545, one all-day event per date). Nothing here sends
 // anything anywhere.
-import { xml, mdCell, slug } from './lib.js';
+import { xml, mdCell } from './lib.js';
 
 export const PLAN_KIND = 'aige.obligations-plan';
 export const PLAN_VERSION = 1;
@@ -349,9 +349,12 @@ export function planJson(model, plan, { link, today }) {
 }
 
 /** One all-day event per date, for lib.js toIcs. The UID is stable for the same
- *  date and the same answers, so a re-import updates instead of duplicating. */
+ *  date and the same answers, so a re-import updates instead of duplicating;
+ *  the whole answer key goes into it (toIcs hashes it), so two plans that
+ *  differ only in their last codes do not overwrite each other. */
 export function planIcsEvents(model, plan, { link }) {
-  const key = slug(`${encodeState(model, plan).r}-${encodeState(model, plan).c}`) || 'plan';
+  const { r, c } = encodeState(model, plan);
+  const key = `${r}-${c}`;
   return planDates(plan).map((e) => {
     const clauses = [...e.starts.map((s) => s.item.row.clause), ...e.outside.map((o) => o.item.duty.article)];
     const head = clauses.length

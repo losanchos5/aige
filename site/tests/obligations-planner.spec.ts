@@ -358,6 +358,15 @@ test.describe('planner core', () => {
     const uids = icsLines.filter((l) => l.startsWith('UID:'));
     expect(new Set(uids).size).toBe(uids.length);
     for (const line of icsLines) expect(new TextEncoder().encode(line).length).toBeLessThanOrEqual(75);
+    // Another plan on the same dates keeps its own UIDs, so importing both
+    // does not overwrite one with the other (RFC 5545 section 3.8.4.7).
+    const other = planFor(model, { roles: ['provider', 'deployer', 'importer'], classes: ['high-risk-annex-iii', 'high-risk-annex-i'], ref: '2026-09-24' });
+    const otherUids = toIcs({ events: planIcsEvents(model, other, { link }) })
+      .replace(/\r\n /g, '')
+      .split('\r\n')
+      .filter((l) => l.startsWith('UID:'));
+    const unfolded = ics.replace(/\r\n /g, '').split('\r\n').filter((l) => l.startsWith('UID:'));
+    expect(unfolded.filter((u) => otherUids.includes(u))).toEqual([]);
   });
 
   test('the timeline is labelled, dated and within the figure budget', async ({ request }) => {

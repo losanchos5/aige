@@ -89,7 +89,7 @@ const sources: ToolSource[] = [
     verified: 'primary',
   },
   {
-    text: 'RFC 5545, Internet Calendaring and Scheduling Core Object Specification (iCalendar) (the reminders file: all-day events with UID and DTSTAMP). IETF. 2009-09.',
+    text: 'RFC 5545, Internet Calendaring and Scheduling Core Object Specification (iCalendar) (the reminders file: timed events in UTC with a unique UID, DTSTAMP and display alarms, VALARM). IETF. 2009-09.',
     url: 'https://www.rfc-editor.org/rfc/rfc5545',
     verified: 'primary',
   },
@@ -496,8 +496,9 @@ const sources: ToolSource[] = [
     <h3 id="ic-exports">What you can take away</h3>
     <ul>
       <li>
-        <strong>Reminders (.ics).</strong> One all-day event per dated step, on its local date, with
-        the exact time in the title <a href="#src-9" class="cite">[9]</a>.
+        <strong>Reminders (.ics).</strong> One event per dated step, at the deadline itself and marked
+        busy, with an alarm an hour before (and a day before when the deadline is more than two days
+        out); the exact time is in the title too <a href="#src-9" class="cite">[9]</a>.
       </li>
       <li>
         <strong>Record skeleton (JSON).</strong> A record that validates against the

@@ -618,6 +618,15 @@ test.describe('/toolkit/incident-clock', () => {
     expect(ics.body.startsWith('BEGIN:VCALENDAR\r\n')).toBe(true);
     expect(ics.body.match(/BEGIN:VEVENT/g)?.length).toBe(4);
     expect(ics.body).toContain('GDPR Art. 33');
+    // Timed events at the deadline (UTC), busy, each with a display alarm, and
+    // one UID per event (RFC 5545 sections 3.6.6 and 3.8.4.7).
+    const icsLines = ics.body.replace(/\r\n /g, '').split('\r\n');
+    expect(icsLines).toContain('DTSTART:20260919T150200Z'); // NIS2 early warning, 24 h
+    expect(icsLines.some((l) => l.startsWith('DTSTART;VALUE=DATE'))).toBe(false);
+    expect(icsLines.filter((l) => l === 'TRANSP:OPAQUE')).toHaveLength(4);
+    expect(icsLines.filter((l) => l === 'TRIGGER:-PT1H')).toHaveLength(4);
+    const icsUids = icsLines.filter((l) => l.startsWith('UID:'));
+    expect(new Set(icsUids).size).toBe(4);
 
     const json = await download(page, 'Download record skeleton (JSON)');
     const record = JSON.parse(json.body);

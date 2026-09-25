@@ -27,6 +27,7 @@ import { tools, toolNotice, toolById } from '../src/data/toolkit';
 import {
   toCsv,
   toIcs,
+  icsUid,
   foldLine,
   icsText,
   encodeFragment,
@@ -189,7 +190,8 @@ test.describe('toolkit lib.js', () => {
     expect(lines.slice(0, 2)).toEqual(['BEGIN:VCALENDAR', 'VERSION:2.0']);
     expect(lines.filter((l) => l.startsWith('PRODID:'))).toHaveLength(1);
     expect(lines.filter((l) => l === 'DTSTAMP:20260924T100507Z')).toHaveLength(2);
-    expect(lines).toContain('UID:gpai-legacy@aigovernanceengineer.com');
+    expect(lines).toContain(`UID:${icsUid('gpai-legacy')}`);
+    expect(icsUid('gpai-legacy')).toMatch(/^gpai-legacy-[0-9a-f]{8}@aigovernanceengineer\.com$/);
     expect(lines).toContain('UID:fixed@example.org');
     expect(lines).toContain('DTSTART;VALUE=DATE:20270802');
     expect(lines).toContain('DTEND;VALUE=DATE:20270803');
@@ -200,6 +202,57 @@ test.describe('toolkit lib.js', () => {
     expect(icsText('a;b,c\\d\r\ne')).toBe('a\\;b\\,c\\\\d\\ne');
     const folded = foldLine(`X:${'€'.repeat(40)}`);
     expect(folded.replace(/\r\n /g, '')).toBe(`X:${'€'.repeat(40)}`);
+  });
+
+  test('iCalendar UIDs stay unique past the slug length (RFC 5545 section 3.8.4.7)', () => {
+    // Seven incident-clock steps under a 48-character record id: the ids
+    // share their first 60 characters within a regime, so a truncated slug
+    // alone collided (3 distinct UIDs for 7 events).
+    const record = 'INC-2026-0925-customer-support-assistant-eu-prod';
+    const steps = [
+      'nis2_art23-early-warning', 'nis2_art23-notification', 'nis2_art23-final',
+      'dora_art19-initial', 'dora_art19-intermediate', 'dora_art19-final', 'gdpr_art33-notify',
+    ];
+    const events = steps.map((step, i) => ({
+      id: `${record}-${step}`,
+      date: `2026-10-0${i + 1}`,
+      summary: step,
+    }));
+    const uids = toIcs({ events }).split('\r\n').filter((l) => l.startsWith('UID:'));
+    expect(uids).toHaveLength(7);
+    expect(new Set(uids).size).toBe(7);
+    // Stable: the same id always gives the same UID, so a re-import updates.
+    expect(icsUid(`${record}-dora-final`)).toBe(icsUid(`${record}-dora-final`));
+    // Two events with one UID are refused rather than silently merged.
+    expect(() =>
+      toIcs({ events: [{ id: 'a', date: '2026-10-01', summary: 'x' }, { id: 'a', date: '2026-10-02', summary: 'y' }] }),
+    ).toThrow(/share the UID/);
+  });
+
+  test('iCalendar timed events: UTC start, busy, display alarms (RFC 5545 sections 3.3.5, 3.6.6)', () => {
+    const due = Date.UTC(2026, 8, 19, 15, 2, 0);
+    const ics = toIcs({
+      now: new Date(Date.UTC(2026, 8, 18, 15, 2, 0)),
+      events: [
+        { id: 'nis2-early-warning', start: due, alarms: [1440, 60], summary: 'NIS2: early warning, due 17:02' },
+        { id: 'dora-initial', start: due, durationMinutes: 15, summary: 'DORA: initial' },
+      ],
+    });
+    const lines = ics.split('\r\n');
+    expect(lines.filter((l) => l === 'DTSTART:20260919T150200Z')).toHaveLength(2);
+    expect(lines).toContain('DTEND:20260919T153200Z');
+    expect(lines).toContain('DTEND:20260919T151700Z');
+    expect(lines.filter((l) => l === 'TRANSP:OPAQUE')).toHaveLength(2);
+    expect(lines.some((l) => l.startsWith('DTSTART;VALUE=DATE'))).toBe(false);
+    expect(lines.filter((l) => l === 'BEGIN:VALARM')).toHaveLength(2);
+    expect(lines.filter((l) => l === 'ACTION:DISPLAY')).toHaveLength(2);
+    expect(lines).toContain('TRIGGER:-P1D');
+    expect(lines).toContain('TRIGGER:-PT1H');
+    expect(lines).toContain('DESCRIPTION:NIS2: early warning\\, due 17:02');
+    // Each alarm closes inside its event.
+    expect(lines.indexOf('END:VALARM')).toBeLessThan(lines.indexOf('END:VEVENT'));
+    expect(() => toIcs({ events: [{ start: Number.NaN, summary: 'x' }] })).toThrow();
+    expect(() => toIcs({ events: [{ start: due, durationMinutes: 0, summary: 'x' }] })).toThrow();
   });
 
   test('fragment codec, slugs and escaping', () => {
