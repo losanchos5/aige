@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval' https://static.cloudflareinsights.com https://admin.stocktcg.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com https://admin.stocktcg.net; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action https://buttondown.com
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-PO+5o+D4prt423FBYfiwuOrU1X1t8joAyzeNXUyzKxs=' 'wasm-unsafe-eval' https://static.cloudflareinsights.com https://admin.stocktcg.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com https://admin.stocktcg.net; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action https://buttondown.com
   Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin

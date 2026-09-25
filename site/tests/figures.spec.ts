@@ -7,6 +7,7 @@
 import { test, expect } from '@playwright/test';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { inlineScriptAllowed } from './helpers/csp';
 
 import { readSource, slugify, getHeadings } from '../src/lib/md-parse';
 import { figures } from '../src/data/figures';
@@ -98,15 +99,20 @@ test.describe('presence', () => {
 // --- 4. CSP: the figures add no inline JS -----------------------------------
 test('a chapter carrying a figure has no inline JS', async ({ page }) => {
   await page.goto('/bok/definition');
-  const offenders = await page.$$eval('script', (scripts) =>
-    scripts
-      .filter((s) => {
-        const src = s.getAttribute('src');
-        const type = (s.getAttribute('type') || '').toLowerCase();
-        return !src && !type.includes('json');
-      })
-      .map((s) => (s.textContent || '').slice(0, 60)),
-  );
+  const offenders = (
+    await page.$$eval('script', (scripts) =>
+      scripts
+        .filter((s) => {
+          const src = s.getAttribute('src');
+          const type = (s.getAttribute('type') || '').toLowerCase();
+          return !src && !type.includes('json');
+        })
+        .map((s) => s.textContent || ''),
+    )
+  )
+    // The theme bootstrap is inline but allowed by its sha256 in the CSP.
+    .filter((body) => !inlineScriptAllowed(body))
+    .map((body) => body.slice(0, 60));
   expect(offenders, `inline scripts: ${offenders.join(' | ')}`).toEqual([]);
 });
 

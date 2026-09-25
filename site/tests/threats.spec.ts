@@ -5,6 +5,7 @@
 import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { inlineScriptAllowed } from './helpers/csp';
 import {
   threats,
   taxonomies,
@@ -70,7 +71,11 @@ test.describe('threat bridge outputs (built site)', () => {
   test('the page has one card per row, anchored, with no inline script', () => {
     const html = readFileSync(PAGE, 'utf8');
     for (const row of threats) expect(html, row.id).toContain(`id="${threatAnchor(row)}"`);
-    expect(html).not.toMatch(/<script(?![^>]*\bsrc=)(?![^>]*application\/ld\+json)[^>]*>/);
+    // No inline script but the theme bootstrap, allowed by its sha256 in the CSP.
+    const inline = [
+      ...html.matchAll(/<script(?![^>]*\bsrc=)(?![^>]*application\/ld\+json)[^>]*>([\s\S]*?)<\/script>/g),
+    ];
+    expect(inline.map((m) => m[1]).filter((body) => !inlineScriptAllowed(body))).toEqual([]);
     expect(html).toContain('Illustrative, not a claim of conformity');
   });
 

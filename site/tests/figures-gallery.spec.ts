@@ -7,6 +7,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { inlineScriptAllowed } from './helpers/csp';
 
 import { figures, figureExports, figureKind, figureBudgetKb } from '../src/data/figures';
 import { diagrams } from '../src/data/diagrams';
@@ -169,11 +170,16 @@ for (const figure of built) {
     await expect(page.locator('.fc-ref')).toContainText(`${SITE_ORIGIN}/figures/${figure.id}`);
     if (figure.asOf) await expect(page.locator('main')).toContainText(`as of ${figure.asOf}`);
 
-    // CSP: no inline JS, only same-origin scripts and the JSON-LD block.
-    const inline = await page.$$eval('script', (scripts) =>
-      scripts.filter((s) => !s.getAttribute('src') && !(s.getAttribute('type') || '').includes('json')).length,
-    );
-    expect(inline).toBe(0);
+    // CSP: no inline JS, only same-origin scripts, the JSON-LD block and the
+    // theme bootstrap (allowed by its sha256 in the CSP).
+    const inline = (
+      await page.$$eval('script', (scripts) =>
+        scripts
+          .filter((s) => !s.getAttribute('src') && !(s.getAttribute('type') || '').includes('json'))
+          .map((s) => s.textContent || ''),
+      )
+    ).filter((body) => !inlineScriptAllowed(body));
+    expect(inline.length).toBe(0);
   });
 }
 

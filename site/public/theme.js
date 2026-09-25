@@ -1,5 +1,10 @@
 /* Applies the persisted theme before paint and exposes a setter.
-   Runs inline from <head>; no framework, no bundling. */
+   Base.astro inlines this file in <head>, comments stripped and lines trimmed
+   (src/lib/theme-script.ts); no framework, no bundling. The CSP in
+   public/_headers allows that inline copy by its sha256, so any change to the
+   code here needs the new hash there: the build fails and prints it until
+   then. Comments are free to change. The file itself stays served for pages
+   cached before the inline copy shipped. */
 (function () {
   'use strict';
   try {
