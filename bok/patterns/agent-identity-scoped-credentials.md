@@ -12,6 +12,19 @@ summary: "Every agent gets its own identity, owner, bounded scope and expiry bef
 before it acts, so that its actions can be attributed, its access revoked precisely and its scope
 contained. Identity is the precondition of accountability; scope is the precondition of containment.
 
+> **In short**
+> Agent Identity & Scoped Credentials is a runtime control that gives every AI agent its own
+> identity, an owner, a bounded scope and an expiry before it acts. It solves the problem of agents
+> that run on a shared service account or a static key: an agent on borrowed credentials cannot be
+> attributed, contained or revoked. Use it wherever agents act under delegated authority, calling
+> APIs, tools and other agents. The control keeps two questions apart. Channel authentication
+> secures one hop, such as a client connecting to an MCP tool server. Agent workload identity is the
+> durable identity the agent carries across every hop, under which its actions are logged and its
+> access revoked. The identity, scope, owner and expiry are recorded in the Agent Registry, and
+> credentials get the least privilege the agent's declared function needs. Its illustrative mappings
+> are EU AI Act Art. 12, 14 and 15, ISO/IEC 42001, the NIST AI RMF Manage function, CSA AICM and
+> OWASP Agentic ASI03.
+
 ## Objectives
 Make every non-human actor governable by construction: attributable, scopable, revocable, expiring.
 

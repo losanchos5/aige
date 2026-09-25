@@ -12,6 +12,19 @@ summary: "A runtime-aware inventory of every model, service and agent, each with
 an owner, a scope and an expiry, fed by the deployment pipeline rather than typed by hand. The registry
 is the object that policies evaluate and runtime controls attach to.
 
+> **In short**
+> The Agent Registry is an inventory control that keeps a runtime-aware record of every model,
+> service and agent, each entry carrying an owner, a declared scope and an expiry. It solves the
+> failure of hand-maintained inventories, which are correct on the day they are edited and wrong
+> within a week, leaving actions unattributable, scopes unenforced and stale agents with standing
+> access. Use it when an organisation deploys models and agents across teams and no single source
+> knows what is live. The registry is an API the deploy pipeline writes to: a new model or agent
+> registers itself at deploy, unregistered artefacts are denied production access, and an entry past
+> its expiry must be renewed or is deactivated. Periodic reconciliation against what is running
+> flags drift. The registry is the object that policies evaluate and runtime controls attach to. Its
+> illustrative mappings are EU AI Act Art. 49/71 and Art. 11, ISO/IEC 42001, the NIST AI RMF Map
+> function, CSA AICM and OWASP Agentic ASI10.
+
 ## Objectives
 Answer "what AI is running, and what is it allowed to do?" from a live source, and make registration a
 precondition of reaching production.

@@ -13,6 +13,19 @@ events) into an assurance store as they happen, so the status of a control is a 
 a point-in-time attestation. Trustworthiness becomes a continuously generated signal, not a static
 certificate [1].
 
+> **In short**
+> Continuous Assurance Telemetry is an assurance control that streams control decisions, such as
+> policy verdicts, eval results, guardrail actions and identity events, into one assurance store as
+> they happen. It solves the decay of point-in-time evidence: an attestation says a control existed
+> when someone looked, and says nothing about the weeks in between, during which the model was
+> retrained and an agent gained a tool. Use it when the lower layers of the stack already emit
+> structured records and the assurance function is tired of assembling binders before each audit.
+> Each control writes a timestamped record on one common schema: the control id, the subject and
+> version from the registry, the decision, the metric, value and threshold, the obligation
+> reference, an input hash, the actor and a signature. The status of each control becomes a live
+> query over the store. Its illustrative mappings are EU AI Act Art. 72, ISO/IEC 42001, the NIST AI
+> RMF Manage and Govern functions and CSA AICM.
+
 ## Objectives
 Replace periodic attestation with evidence emitted as the system runs, so "is the control working?" is
 answered by telemetry.

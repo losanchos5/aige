@@ -15,6 +15,19 @@ by group. Every signal has a threshold, an owner and a pre-agreed consequence (a
 degraded mode, an incident, a tripped breaker), and every evaluation writes an evidence record, so
 "the model is still fit and fair" is a query over telemetry rather than a belief from launch day.
 
+> **In short**
+> The Drift & Fairness Monitor is a runtime control that watches a deployed AI system for the ways
+> it moves away from the state in which it was approved. It solves a system that passed its evals at
+> go-live and then drifts into error or unfairness without any code change, while dashboards without
+> thresholds are watched by nobody. Use it for any system in production, including generative
+> systems that can degrade while every infrastructure metric stays green. The monitor tracks input,
+> label, concept, pipeline, vendor-model and usage drift, and quality and fairness by group, with or
+> without labels. Every signal has a threshold, a named owner and a pre-agreed consequence: an
+> issue, a retrain, a degraded mode, an incident or a tripped breaker. Each evaluation writes an
+> evidence record, pass or fail, from a monitoring plan kept as data. Its illustrative mappings
+> include EU AI Act Art. 4a, 15(4), 26(5) and 72, NYC Local Law 144, ISO/IEC 42001 A.6.2.6 and NIST
+> AI RMF MEASURE 2.11.
+
 ## Objectives
 Detect loss of performance or fairness in production before the people affected detect it, route
 each breach to someone who can act, and keep a continuous record that the system was watched against

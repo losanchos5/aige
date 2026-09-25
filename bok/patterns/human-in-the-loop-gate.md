@@ -12,6 +12,19 @@ summary: "A human approval step at a defined high-consequence decision point, so
 action takes effect, so that autonomy is bounded by a person exactly where the stakes justify the
 latency. Oversight is a designed checkpoint, not an afterthought.
 
+> **In short**
+> The Human-in-the-loop Gate is a runtime control that requires human approval at a defined,
+> high-consequence decision point before an AI agent's action takes effect, so autonomy is bounded
+> by a person where the stakes justify the latency. It solves a failure in both directions: full
+> autonomy over a high-consequence action removes the human oversight that the law and the risk
+> require, while manual review of every action destroys the value of the agent. Use it for an agent
+> whose actions include some that are irreversible or affect people's rights, such as a payment, a
+> denial or a publication, alongside many routine ones. Actions are classified by consequence; the
+> high-consequence class is blocked until a person with enough context approves it, and the routine
+> class stays autonomous under guardrails. Each approval logs the approver, the context and the
+> decision as evidence. Its illustrative mappings are EU AI Act Art. 14, ISO/IEC 42001, the NIST AI
+> RMF Manage function and OWASP Agentic ASI02.
+
 ## Objectives
 Insert meaningful human oversight where an action is irreversible or high-impact, and record the
 decision as evidence.

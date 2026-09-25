@@ -15,6 +15,19 @@ reporting the Code of Practice expects [1]. The same pipeline serves the deploye
 else built: it tells the provider, suspends use when the system presents a risk, and holds the
 reporting clock when the provider cannot be reached.
 
+> **In short**
+> The Incident Pipeline is an assurance control that detects, triages and reports serious AI
+> incidents on the clock, with reporting timelines and templates encoded rather than remembered. It
+> solves the gap between detection in engineering and reporting in legal: when detection, triage and
+> reporting are disconnected manual steps, the deadline is missed and the evidence is reconstructed
+> after the fact. Use it for a high-risk or GPAI system in production that is subject to
+> serious-incident reporting, including a procured system the organisation deploys but does not own.
+> The pipeline connects runtime detection to a triage workflow that keeps severity and reportability
+> in separate fields, drafts the report and starts the statutory timers. Each event is held as a
+> machine-readable incident record, reviewed blamelessly and closed with corrective and preventive
+> action, including a regression eval. Its illustrative mappings are EU AI Act Art. 72, Art. 73 and
+> Art. 55 for GPAI, ISO/IEC 42001 and the NIST AI RMF Manage function.
+
 ## Objectives
 Turn a runtime signal into a reported obligation within the legal window, and produce the incident
 record as structured evidence. Keep issues and incidents apart, rank severity on a written scale,

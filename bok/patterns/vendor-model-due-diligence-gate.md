@@ -14,6 +14,19 @@ LLM, an API-only foundation model, a vendor's agent) on a structured due-diligen
 model you do not own still enters through a control that records what you can and cannot verify about
 it. When you do not own the model, this gate is what replaces the red-team you cannot run.
 
+> **In short**
+> The Vendor / Model Due-Diligence Gate is a control that gates the procurement or integration of a
+> third-party AI system, such as SaaS with an embedded LLM, an API-only foundation model or a
+> vendor's agent, on a structured due-diligence assessment. It solves the problem that controls
+> which assume model ownership degrade when the weights, training data and guardrails belong to
+> someone else. Use it in any organisation that consumes more AI than it trains. The assessment
+> covers the provider's evaluations and red-team evidence, the model card and any AIBOM, data flows
+> and lawful basis, the tool scopes granted, incident-reporting commitments, and audit and
+> change-notification rights. The result is a registry entry with an owner and a scope, flagged
+> provider-attested where the team relied on vendor evidence, and reopened on renewal, change
+> notices and risk-tier triggers. Its illustrative mappings are EU AI Act Art. 25, 26, 27 and 53,
+> ISO/IEC 42001 Annex A.10, the GPAI Code of Practice and the NIST AI RMF Map and Govern functions.
+
 ## Objectives
 Bring bought and API-only AI under the same registry and assurance discipline as systems you build, and
 make the limits of your verification explicit rather than assumed away.

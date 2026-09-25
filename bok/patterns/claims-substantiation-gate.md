@@ -16,6 +16,19 @@ publication of a claim without live evidence, and every model release reruns the
 flags any claim the new version no longer supports. It is an eval gate pointed at marketing copy,
 sales material and the accuracy figures declared in the instructions for use.
 
+> **In short**
+> The Claims Substantiation Gate is an assurance control that keeps a register of every public
+> statement about what an AI system does and how well, and ties each claim to the eval run that
+> supports it. It solves claims that outlive their evidence, or never had any: a regression ships
+> while the old accuracy figure stays on the website. Use it wherever product pages, sales decks,
+> tenders, model cards or instructions for use state how accurate, fair, safe or autonomous a system
+> is. Each register row records the exact claim, where it appears, the eval suite and run, the
+> measured value with its interval, and the population it was measured on. A gate blocks publication
+> of a claim without live evidence, and every model release reruns the cited evals and flags claims
+> the new version no longer supports. Its illustrative mappings include EU AI Act Art. 3(12),
+> 13(3)(b)(ii) and 15(3), FTC Act s. 5, Directive 2005/29/EC Art. 5 and NIST AI RMF Measure 2.3 and
+> 2.5.
+
 ## Objectives
 Say only what the evidence supports, for the population the claim describes, and keep saying it only
 while it stays true; and be able to show, for any claim, what supported it on the day it was made.

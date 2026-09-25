@@ -16,6 +16,19 @@ reactive notifications (to the provider, authorities, affected people, customers
 a trigger starts on a clock. Templates are versioned like code, approvals are recorded, and every
 notice sent is an evidence record with its audience, template version and timestamp.
 
+> **In short**
+> The Disclosure & Notification Pipeline is an assurance control that generates every outward-facing
+> statement about an AI system from one source of truth, the registry. It covers proactive
+> disclosures, such as an AI-interaction notice, content labels, the transparency page and notices
+> to workers, and reactive notifications to providers, authorities, affected people and customers
+> that a trigger starts on a clock. It solves disclosures written once by hand per surface, which
+> drift from what is running, and reactive notices drafted under pressure with no record of what
+> went out. Use it once transparency duties attach to specific surfaces and clocks, as they do under
+> the EU AI Act and the GDPR. A duty matrix maps registry facts to duties, templates are versioned
+> like code with recorded approvals, and every notice sent is recorded with its audience, template
+> version and timestamp. Its illustrative mappings include EU AI Act Art. 26 and Art. 50, GDPR Art.
+> 33 and 34, the Korea AI Basic Act Art. 31 and ISO/IEC 42001 A.8.2.
+
 ## Objectives
 Make sure the people and bodies who must hear about an AI system hear the right thing, on time, from
 one voice, and be able to prove what was said to whom and when.

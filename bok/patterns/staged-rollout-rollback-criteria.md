@@ -15,6 +15,19 @@ written into the rollout plan before it starts and evaluated by the pipeline, ve
 the registry, and the path back has been tested. A criterion invented after the metric moved is a
 negotiation, not a control.
 
+> **In short**
+> Staged Rollout with Rollback Criteria is a runtime control that takes every change to a deployed
+> AI system, such as a retrain, a prompt change or a new vendor model version, to production in
+> stages: shadow, pilot, canary, then general availability. It solves two failures: without stages,
+> the first evidence about live behaviour is the harm itself; with stages but no pre-registered
+> criteria, each rollback becomes a debate held after the fact. Use it whenever a change can move
+> quality, safety or fairness without a line of the deployer's code changing. Each stage lists its
+> metric, threshold, window and group breakdowns in a rollout plan signed before the stage starts.
+> The registry pins model, prompt, corpus and guardrail versions, the path back is tested in shadow,
+> and a canary analysis job writes a promote, hold or roll-back verdict to the assurance store. Its
+> illustrative mappings include EU AI Act Art. 26(5) and Art. 60, ISO/IEC 42001 A.6.2.5 and NIST AI
+> RMF MANAGE 2.4.
+
 ## Objectives
 Bound the harm a bad change can do to the share of traffic or cases exposed to it, and make "roll it
 back" a decision the pipeline takes on a pre-agreed signal rather than a meeting.
