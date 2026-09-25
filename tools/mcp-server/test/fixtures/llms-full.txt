@@ -2,7 +2,7 @@
 
 > The Thesis and Body of Knowledge for AI governance engineering: turning governance obligations into policy-as-code, eval gates and machine-readable evidence.
 
-Body of Knowledge v0.4.0 by Jorge García Aibar, licensed CC BY 4.0. This file carries the complete text of the 24 Body of Knowledge chapters, in reading order, with the 33 pattern pages after chapter 05, and then the Thesis. The index is at https://aigovernanceengineer.com/llms.txt.
+Body of Knowledge v0.5.0 by Jorge García Aibar, licensed CC BY 4.0. This file carries the complete text of the 24 Body of Knowledge chapters, in reading order, with the 33 pattern pages after chapter 05, and then the Thesis. The index is at https://aigovernanceengineer.com/llms.txt.
 
 ---
 
@@ -115,16 +115,16 @@ This is not a compliance checklist, and it is not legal advice. It does not tell
 system is compliant; it tells you how to build the controls and the evidence that let someone qualified
 make that call. It is not an AI safety research agenda, an MLOps handbook, or a vendor buyer's guide;
 tools are named only as illustrative examples of a category, never as endorsements. And it is not
-finished. Version 0.4.0 is a public draft with deliberate gaps open to contributions.
+finished. Version 0.5.0 is a public draft with deliberate gaps open to contributions.
 
 ## How to cite
 
-> García Aibar, J. *AI Governance Engineering: The Body of Knowledge*, v0.4.0. 2026.
+> García Aibar, J. *AI Governance Engineering: The Body of Knowledge*, v0.5.0. 2026.
 > https://aigovernanceengineer.com/bok. Licensed CC BY 4.0.
 
 For the Thesis, cite both co-authors:
 
-> García Aibar, J., & Pols, A. *The AI Governance Engineering Thesis*, v0.4.0. 2026.
+> García Aibar, J., & Pols, A. *The AI Governance Engineering Thesis*, v0.5.0. 2026.
 > https://aigovernanceengineer.com/thesis. Licensed CC BY 4.0.
 
 Cite a specific chapter by its number and title (for example, "chapter 01, The definition"). The
@@ -134,7 +134,7 @@ the consolidated table lives in `sources/SOURCES.md`.
 
 ## Versioning
 
-This is **v0.4.0**, a public draft. Versioning is semantic in spirit: patch releases fix facts
+This is **v0.5.0**, a public draft. Versioning is semantic in spirit: patch releases fix facts
 and typos, minor releases add chapters or patterns, and a 1.0 will mark the point at which the core
 chapters (00–10) are complete and reviewed. Every change is recorded in `bok/CHANGELOG.md`. Because
 the regulatory and standards landscape moves (the Digital Omnibus reform, harmonised standards under
@@ -2314,7 +2314,7 @@ OWASP's GenAI Security Project supplies the threat vocabulary the controls are b
 The United States has no horizontal federal AI statute; the binding AI-specific rules are state laws,
 
 ### Frontier-developer laws
-Two US state laws bind only large frontier developers, not general deployers: a narrower scope than
+Two US state laws bind only frontier developers, with the heaviest duties on the large ones, not
 
 ### Other state AI laws
 These state laws reach beyond frontier developers to ordinary developers, deployers and operators:
@@ -2419,7 +2419,7 @@ the governed way the easiest way to ship, so engineers adopt governance without 
 providers; distinct from an ISO/IEC 42001 AIMS, which certifies a management system but is not
 
 ## R
-large frontier developers to publish a safety framework and disclose incidents; signed 19 December
+large frontier developers to publish a safety framework and every frontier developer to report
 
 ## S
 [137], whose loading can run arbitrary code and which the Python documentation calls not secure
@@ -3235,7 +3235,7 @@ Design retirement in from the start: the DDR already names the conditions under 
 1. **Write the DDR for your riskiest live system**, retroactively if you must, including its negative
 
 ## Sources
-[1] EU AI Act Art. 26 (deployer obligations: 26(1) use per the instructions; 26(2) oversight by competent persons with authority; 26(4) relevant and representative input data; 26(5) monitor, suspend and inform, serious incidents to the provider first; 26(6) logs kept at least six months; 26(7) inform workers; 26(8) public-authority registration; 26(9) DPIA; 26(11) inform affected persons). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26 (verified: primary)
+[1] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 26 (deployer obligations: 26(1) use per the instructions; 26(2) oversight by competent persons with authority; 26(4) relevant and representative input data; 26(5) monitor, suspend and inform, serious incidents to the provider first; 26(6) logs kept at least six months; 26(7) inform workers; 26(8) public-authority registration; 26(9) DPIA; 26(11) inform affected persons). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_26 (verified: primary)
 ---
 
 # 16. Fairness and explainability for practitioners
@@ -3447,7 +3447,7 @@ Most organisations meet AI incidents as **deployers** of a system someone else b
 One event can start several clocks. An indirect prompt injection that leaks customer data from a
 
 ### Reading the table
-DORA's four-hour clock counts from *classification* as major, capped at 24 hours from awareness [19].
+DORA's four-hour clock counts from *classification* as major, with an outer limit of 24 hours from
 
 ### One record, many reports
 The engineering answer to overlapping clocks is not a better calendar. It is one incident record that
@@ -3870,7 +3870,7 @@ trait. *Disparate impact* is a neutral practice that falls harder on a protected
 vendors are not safely outside federal age-discrimination law: in *Mobley v. Workday* the court
 
 ### Credit and lending
-specific reasons, or a notice of the right to receive them [50]. The CFPB's Circular 2022-03 states
+specific reasons, or a notice of the right to receive them [50]. The CFPB's Circular 2022-03 said in
 
 ### Housing, insurance and public services
 Department of Justice, Meta agreed to drop its "Special Ad Audience" tool and build a system to
@@ -4074,7 +4074,7 @@ One AI incident can start several clocks at once. The [Incident Pipeline](/patte
 1. **Add a jurisdiction block to every registry entry.** List where each system is offered, and for
 
 ## Sources
-[1] Basic Act on the Development of Artificial Intelligence and the Establishment of a Foundation for Trust (인공지능 발전과 신뢰 기반 조성 등에 관한 기본법; Act No. 20676, promulgated 2025-01-21, in force 2026-01-22; Art. 2 as amended 2026-01-20; Arts. 2(4) high-impact areas, 2(7) operators, 4 scope, 31 transparency, 32 safety, 33 confirmation, 34 high-impact duties, 35 impact assessment, 36 domestic representative, 40 fact-finding, 43 fines up to KRW 30M). Korean Law Information Center (MOLEG). 2026-01-22. https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=268543 (verified: primary)
+[1] Basic Act on the Development of Artificial Intelligence and the Establishment of a Foundation for Trust (인공지능 발전과 신뢰 기반 조성 등에 관한 기본법; Act No. 20676, promulgated 2025-01-21, in force 2026-01-22; as amended by Act No. 21311 of 2026-01-20, in force 2026-01-22 and, for Arts. 3(5), 16(3)-(5), 17-2, 18, 22-3 and the second sentence of 35(1), 2026-07-21; Arts. 2(4) high-impact areas, 2(7) operators, 4 scope, 31 transparency, 32 safety, 33 confirmation, 34 high-impact duties, 35 impact assessment, 36 domestic representative, 40 fact-finding, 43 fines up to KRW 30M; version in force 2026-07-21). Korean Law Information Center (MOLEG). 2026-07-21. https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=282791&efYd=20260721 (verified: primary)
 ---
 
 # 22. Principles, soft law and standards

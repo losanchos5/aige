@@ -1,6 +1,6 @@
 {
-  "notice": "Illustrative mapping from the AI Governance Engineer Body of Knowledge v0.4.0 (not a claim of conformity)",
-  "version": "0.4.0",
+  "notice": "Illustrative mapping from the AI Governance Engineer Body of Knowledge v0.5.0 (not a claim of conformity)",
+  "version": "0.5.0",
   "license": "CC BY 4.0",
   "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
   "schemaVersion": 2,
@@ -12,7 +12,7 @@
     "authors": [
       "Jorge García Aibar"
     ],
-    "parentDoi": "https://doi.org/10.5281/zenodo.22857086",
+    "parentDoi": "https://doi.org/10.5281/zenodo.22857084",
     "conceptDoi": "https://doi.org/10.5281/zenodo.22857084"
   },
   "obligation": {
