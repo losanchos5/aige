@@ -25,7 +25,8 @@ import { inSitemap } from './src/lib/sitemap-policy';
 // every page changed. Paths are relative to `site/` (the build cwd).
 const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   // The home counts the registers it links to and shows the "What applies now"
-  // band (WhatAppliesNow.astro, lib/applies-now.ts), which reads the register.
+  // band (WhatAppliesNow.astro, lib/applies-now.ts), which reads the register;
+  // the hero strip (HeroStrip.astro) names the flagship frameworks.
   [
     '/',
     [
@@ -38,6 +39,7 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       'src/components/WhatAppliesNow.astro',
       'src/lib/applies-now.ts',
       'src/data/frameworks.ts',
+      'src/components/HeroStrip.astro',
     ],
   ],
   ['/about', ['src/pages/about/index.astro', 'src/data/site.ts']],
