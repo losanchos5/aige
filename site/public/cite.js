@@ -12,7 +12,7 @@
       navigator.clipboard.writeText(text).then(
         function () {
           var original = btn.textContent;
-          btn.textContent = 'Copied';
+          btn.textContent = btn.getAttribute('data-copied') || 'Copied';
           setTimeout(function () {
             btn.textContent = original;
           }, 1500);

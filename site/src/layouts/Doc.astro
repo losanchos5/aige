@@ -18,6 +18,8 @@ import Citation from '../components/Citation.astro';
 import { getChapterBySlug } from '../data/chapters';
 import { readSource } from '../lib/md-parse';
 import { wordCount, readingTime } from '../lib/reading';
+import { translator } from '../i18n/ui';
+import { LOCALE_INFO, isLocale } from '../i18n/locales';
 
 interface Adjacent {
   slug: string;
@@ -56,6 +58,18 @@ interface Props {
   /** Open Graph `article:*` metadata; set by the dated long reads (chapters,
       the two Thesis translations). See components/Seo.astro. */
   article?: { publishedTime?: string; modifiedTime?: string; author?: string };
+  /** The Markdown the reading estimate counts, when it is not the English
+      chapter file (a translated chapter passes its own body). */
+  markdown?: string;
+  /** Where the pager's chapters live (default `/bok`; `/de/bok` on a German page). */
+  pagerBase?: string;
+  /** The URL the cite box cites, when it is not `/bok/<slug>` (a translation). */
+  citeUrl?: string;
+  /** Chapter rail links that go to a translation instead of the English page,
+      keyed by chapter slug (label in the page's language). */
+  sidebarLinks?: Record<string, { href: string; label: string }>;
+  /** The rail's Thesis link (default /thesis). */
+  thesisHref?: string;
 }
 
 const {
@@ -81,7 +95,15 @@ const {
   locale,
   alternates,
   article,
+  markdown: markdownProp,
+  pagerBase,
+  citeUrl,
+  sidebarLinks,
+  thesisHref,
 } = Astro.props;
+const t = translator(lang);
+// Open Graph locale: given, or the page language's (English pages keep Seo's default).
+const ogLocale = locale ?? (isLocale(lang) && lang !== 'en' ? LOCALE_INFO[lang].og : undefined);
 
 const withSidebar = sidebar && !wide;
 const withToc = !wide && headings.some((h) => h.depth === 2 || h.depth === 3);
@@ -111,7 +133,7 @@ const headerLayer = statsChapter?.layer ? `l${statsChapter.layer}` : undefined;
 const chapterInk = `--chapter-ink: var(--${headerLayer ? `${headerLayer}-ink` : 'ink'})`;
 if (statsChapter) {
   try {
-    const markdown = readSource(`bok/${statsChapter.id}.md`);
+    const markdown = markdownProp ?? readSource(`bok/${statsChapter.id}.md`);
     words = wordCount(markdown);
     minutes = readingTime(markdown);
   } catch {
@@ -126,7 +148,7 @@ if (statsChapter) {
   image={image}
   jsonLd={graphNodes.length ? graphNodes : undefined}
   lang={lang}
-  locale={locale}
+  locale={ogLocale}
   alternates={alternates}
   article={article}
 >
@@ -143,7 +165,7 @@ if (statsChapter) {
             aria-expanded="false"
             aria-controls="doc-sidebar"
           >
-            Chapters
+            {t('doc.chapters')}
           </button>
           <button
             type="button"
@@ -152,7 +174,7 @@ if (statsChapter) {
             data-umami-event="search-open"
             data-umami-event-location="doc-drawer"
           >
-            Search
+            {t('doc.search')}
           </button>
         </div>
       )
@@ -162,7 +184,13 @@ if (statsChapter) {
       {
         withSidebar && (
           <div id="doc-sidebar" class="doc-sidebar" data-pagefind-ignore>
-            <SidebarNav activeSlug={activeSlug} activeThesis={activeThesis} />
+            <SidebarNav
+              activeSlug={activeSlug}
+              activeThesis={activeThesis}
+              lang={lang}
+              links={sidebarLinks}
+              thesisHref={thesisHref}
+            />
           </div>
         )
       }
@@ -173,6 +201,7 @@ if (statsChapter) {
             <div class="doc-crumbs" data-pagefind-ignore>
               <Breadcrumb
                 items={crumbs}
+                lang={lang}
                 swatch={headerLayer ? `var(--${headerLayer})` : undefined}
               />
             </div>
@@ -186,7 +215,7 @@ if (statsChapter) {
         {
           withToc && (
             <details class="doc-toc-m" data-toc-mobile data-pagefind-ignore data-nosnippet>
-              <summary>On this page</summary>
+              <summary>{t('doc.onThisPage')}</summary>
               <ul>
                 {headings
                   .filter((h) => h.depth === 2 || h.depth === 3)
@@ -216,19 +245,27 @@ if (statsChapter) {
         {
           (editPath || (cite && slug)) && (
             <footer class="doc-foot">
-              {editPath && <EditOnGitHub path={editPath} />}
-              {cite && slug && <Citation title={title} slug={slug} />}
+              {editPath && <EditOnGitHub path={editPath} lang={lang} />}
+              {cite && slug && (
+                <Citation
+                  title={title}
+                  slug={slug}
+                  url={citeUrl}
+                  kind={citeUrl ? 'chapter' : undefined}
+                  lang={lang}
+                />
+              )}
             </footer>
           )
         }
 
-        {(prev || next) && <PrevNext prev={prev} next={next} />}
+        {(prev || next) && <PrevNext prev={prev} next={next} base={pagerBase} lang={lang} />}
       </div>
 
       {
         withToc && (
-          <aside class="doc-toc" aria-label="On this page" data-pagefind-ignore data-nosnippet>
-            <Toc headings={headings} />
+          <aside class="doc-toc" aria-label={t('doc.onThisPage')} data-pagefind-ignore data-nosnippet>
+            <Toc headings={headings} lang={lang} />
           </aside>
         )
       }

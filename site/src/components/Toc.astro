@@ -5,19 +5,21 @@
 // .is-past to every entry before it, so each entry reads as current, read or
 // pending: by colour only, never opacity.
 import type { MarkdownHeading } from 'astro';
+import { t } from '../i18n/ui';
 
 interface Props {
   headings: MarkdownHeading[];
+  lang?: string;
 }
 
-const { headings } = Astro.props;
+const { headings, lang = 'en' } = Astro.props;
 const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 ---
 
 {
   items.length > 0 && (
-    <nav class="toc" aria-label="On this page">
-      <p class="toc-label">On this page</p>
+    <nav class="toc" aria-label={t('doc.onThisPage', lang)}>
+      <p class="toc-label">{t('doc.onThisPage', lang)}</p>
       <div class="toc-list">
         <span class="toc-marker" data-toc-marker aria-hidden="true" />
         <ul>

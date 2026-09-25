@@ -16,6 +16,10 @@
 // suffixes; rehype-autolink-headings wraps heading text in an <a>, so nodeText
 // gathers it recursively.
 //
+// A translated file (I18N_DIR/<lang>/...) takes the placements of the chapter or
+// pattern it translates; its headings are matched through the English heading
+// at the same position, which rehype-i18n keeps on each node (`headingKey`).
+//
 // A placement whose heading cannot be found is a build error (better than a
 // silently missing figure). A diagram not yet in the generated manifest, or an
 // infographic whose src/figures/<id>.svg has not been authored/generated yet, is
@@ -34,6 +38,7 @@ import {
 } from '../data/diagrams';
 import { figures, figuresForChapter, type FigureDef } from '../data/figures';
 import { diagramIds, renderDiagramFigure } from './diagrams';
+import { classifyFile } from './i18n-content';
 
 // The hand-made infographic SVGs live under site/src/figures, resolved from the
 // build cwd (the site directory) like the generated diagram SVGs.
@@ -65,6 +70,17 @@ function nodeText(node: RootContent): string {
   return out.replace(/\s+/g, ' ').trim();
 }
 
+/**
+ * The text a placement's `section`/`sub` is matched against. On a translated
+ * page (I18N_DIR/<lang>/...) it is the English heading at the same position,
+ * which rehype-i18n keeps on the node, so an English placement lands on the
+ * same section; on an English page it is the heading's own text.
+ */
+function headingKey(node: RootContent): string {
+  const source = (node as { data?: { sourceHeading?: unknown } }).data?.sourceHeading;
+  return typeof source === 'string' ? source : nodeText(node);
+}
+
 /** Where a markdown file renders: a chapter slug or a pattern page slug. */
 type Target = { kind: 'chapter'; slug: string } | { kind: 'pattern'; slug: string };
 
@@ -76,6 +92,14 @@ function targetForFile(file: VFile | undefined): Target | undefined {
       ? file.history[file.history.length - 1]
       : undefined);
   if (!path) return undefined;
+  // A translation renders the same chapter or pattern page in another language.
+  const translation = classifyFile(path);
+  if (translation) {
+    if (translation.kind === 'thesis') return undefined;
+    const slug =
+      translation.kind === 'chapter' ? getChapter(translation.id)?.slug : translation.id;
+    return slug ? { kind: translation.kind, slug } : undefined;
+  }
   const segments = path.split(/[\\/]/);
   const base = segments.pop() ?? '';
   const id = base.replace(/\.[^.]+$/, '');
@@ -198,7 +222,7 @@ function insertFragment(
   let sectionDepth = -1;
   for (let i = 0; i < children.length; i += 1) {
     const depth = headingDepth(children[i]);
-    if (depth !== null && nodeText(children[i]) === wantSection) {
+    if (depth !== null && headingKey(children[i]) === wantSection) {
       sectionIndex = i;
       sectionDepth = depth;
       break;
@@ -219,7 +243,7 @@ function insertFragment(
     for (let i = sectionIndex + 1; i < children.length; i += 1) {
       const depth = headingDepth(children[i]);
       if (depth !== null && depth <= sectionDepth) break; // left the section
-      if (depth !== null && nodeText(children[i]) === wantSub) {
+      if (depth !== null && headingKey(children[i]) === wantSub) {
         found = i;
         targetDepth = depth;
         break;

@@ -92,12 +92,12 @@ record the retrieval date and source commit when using them in research.
 Cite the parent work, name the dataset you used, and include its URL and retrieval date:
 
 > García Aibar, J. *AI Governance Engineering: The Thesis & Body of Knowledge*
-> (v0.5.0). https://doi.org/10.5281/zenodo.22857084. Dataset: Framework crosswalk / Obligation
+> (v0.5.0). https://doi.org/10.5281/zenodo.22956197. Dataset: Framework crosswalk / Obligation
 > mappings. [Dataset URL; retrieval date; source commit].
 
 The DOI identifies the archived parent release, not a separately deposited dataset. The DOI above
-is the [concept DOI](https://doi.org/10.5281/zenodo.22857084), which resolves to the latest archived
-release; for a fixed reference use the version DOI on the Zenodo record of the release you used. See
+is the v0.5.0 version DOI; the [concept DOI](https://doi.org/10.5281/zenodo.22857084) resolves to the
+latest archived release. See
 [CITATION.cff](CITATION.cff) for citation metadata.
 Reuse is covered by this repository’s [licence](LICENSE).
 

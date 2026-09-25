@@ -12,6 +12,7 @@ import Footer from '../components/Footer.astro';
 import SearchDialog from '../components/SearchDialog.astro';
 import { site } from '../data/site';
 import type { JsonLdInput } from '../lib/jsonld';
+import { t } from '../i18n/ui';
 
 /** A responsive image preloaded from the head (href is the fallback). */
 export interface PreloadImage {
@@ -75,6 +76,10 @@ const cfBeaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
 // query string is ever sent.
 const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
 const umamiSrc = 'https://admin.stocktcg.net/script.js';
+
+// The page language drives the chrome's strings (src/i18n/ui.ts) in the
+// header, footer and search dialog; the alternates feed the header's language
+// switcher, which shows only when the page exists in two languages.
 ---
 
 <!doctype html>
@@ -178,19 +183,19 @@ const umamiSrc = 'https://admin.stocktcg.net/script.js';
     }
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">{t('a11y.skip', lang)}</a>
 
-    <Header overlay={overlayHeader} />
+    <Header overlay={overlayHeader} lang={lang} alternates={alternates} />
 
     <main id="main">
       <slot />
     </main>
 
-    <Footer />
+    <Footer lang={lang} />
 
     <!-- Global search dialog: opened by the header's [data-search-open] button
          (and Ctrl/Cmd+K) on every page. Loads Pagefind lazily on first open. -->
-    <SearchDialog />
+    <SearchDialog lang={lang} />
 
     <!-- Progressive enhancement: theme toggle, reveal-on-scroll, menu. -->
     <script is:inline defer src="/ui.js"></script>

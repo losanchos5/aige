@@ -60,7 +60,7 @@ export const site: SiteConfig = {
   licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
   bokVersion: '0.5.0',
   // The concept DOI until Zenodo mints the v0.5.0 version DOI; then set it here.
-  doi: '10.5281/zenodo.22857084',
+  doi: '10.5281/zenodo.22956197',
   conceptDoi: '10.5281/zenodo.22857084',
   newsletter: {
     provider: 'buttondown',

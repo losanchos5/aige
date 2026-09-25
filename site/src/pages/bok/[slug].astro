@@ -8,6 +8,7 @@ import { site } from '../../data/site';
 import { gitCreated, gitDate } from '../../lib/reading';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import { getGlossaryEntry } from '../../lib/glossary';
+import { alternatesFor } from '../../lib/i18n-content';
 
 export async function getStaticPaths() {
   const entries = await getCollection('bok');
@@ -148,6 +149,7 @@ const jsonLd = {
   cite={true}
   jsonLd={jsonLd}
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
+  alternates={alternatesFor(`/bok/${chapter.slug}`)}
 >
   <AtAGlance items={chapter.glance} terms={keyTerms} />
   <Content />
