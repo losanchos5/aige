@@ -2,10 +2,13 @@
 // text (a glossary definition, an obligation's requirement), so the snippet is
 // made of whole sentences instead of a paragraph cut mid-thought (audit ONPAGE
 // F3 / N1, CONTENT C16). Nothing is written: the sentences are the text's own,
-// minus its [n] citation markers, its parenthetical asides when they do not fit,
-// or the clauses after a clause break; the caller adds a label and short
-// sentences of page facts (a date, what the page carries) to reach the length a
-// snippet should have. Never an ellipsis.
+// minus its [n] citation markers, its parenthetical asides when they do not fit
+// and restrict nothing, or the clauses after a clause end ("; ", ": ", ",
+// which"); the
+// caller adds a label and short sentences of page facts (a date, what the page
+// carries) to reach the length a snippet should have. A sentence that has no
+// such opening is not paraphrased: the label leads the caller's own sentences
+// instead (ONPAGE R3). Never an ellipsis.
 
 /** A description shorter than this says too little about the page. */
 export const DESCRIPTION_MIN = 110;
@@ -21,41 +24,69 @@ const ABBREVIATION =
 const SENTENCE_END = /[.!?]["'”’)\]]?$/;
 
 /**
- * Clause breaks a sentence can be shortened at: "; ", ": ", or ", " before a
- * word that opens a qualifying clause (", which", ", where", ", incl.", ", then").
- * Not any other comma, which usually splits a list or opens an aside.
+ * Where a sentence may be shortened (audit ONPAGE R3), so the description is
+ * the sentence's own opening up to a point where it can stop without saying
+ * something else: a clause end, "; " or ": ", or a comma before a clause that
+ * only adds to what precedes it (", which", ", such as", ", e.g.", ", for
+ * example", ", including", ", in particular", ", usually", ", then", ",
+ * each", ", as proposed by"). Any other comma
+ * can split a list ("development business operators, who ..., and utilisation
+ * business operators") or open a qualifier (", created to act as ...", ",
+ * where ..."), so it is not a cut; nor is a space before a preposition
+ * ("places it on the market" before "under its own name"). The kind of each
+ * match is in its named group.
  */
-const CLAUSE_BREAK =
-  /;\s|:\s|,\s(?=(?:which|who|whose|where|when|while|whether|whatever|what|how|so|thus|each|not|but|with|without|incl\.|including|such as|e\.g\.|i\.e\.|unless|except|provided|as well as|rather than|in particular|notably|usually|often|typically|possibly|then|since|until|before|after|once|if)\s)/g;
+const CLAUSE_END =
+  /(?<end>;\s|:\s)|(?<aside>,\s(?=(?:which|such as|e\.g\.|i\.e\.|for example|for instance|including|incl\.|in particular|notably|usually|often|typically|commonly|then|each|as proposed by)\s))/g;
 
 /**
- * The looser break, tried when no clause break fits: ", " before a participle
- * or a preposition (", rendered from", ", describing its", ", at version 1.0"),
- * which usually opens a trailing qualifier but can open a list item, so the
- * cut must keep more of the sentence (LOOSE_FLOOR).
+ * Words that open a qualifier or continue a list: a clause end followed by one
+ * of them is not a place to stop ("...; unless", "...: only where", "...; and").
  */
-const LOOSE_BREAK =
-  /,\s(?=(?:[a-z]+ed|[a-z]+ing|fed|held|kept|set|run|made|taken|given|shown|known|drawn|written|in|at|by|for|to|under|within|across|through|on|over|per|via|into|from|against|between|during|among|beyond|outside|as|and so)\s)/g;
-const LOOSE_FLOOR = 50;
+const QUALIFIER =
+  /^(?:unless|except|excluding|only|provided|providing|where|wherever|when|whenever|if|save|subject to|other than|as long as|so long as|insofar|to the extent|but|and|or|nor)\b/i;
+
+/** A list enumerator at the start of an item: "(a) ", "(ii) ", "b) ", "2. ". */
+const ENUMERATOR = /^\(?(?:[a-z]|[ivx]+|\d+)[).]\s/i;
 
 /**
- * The last resort for a long sentence with no usable comma: a cut before a
- * preposition or a relative word, so the sentence ends on the noun a qualifier
- * follows ("... leads to harm" before "to health, critical infrastructure").
- * It keeps PHRASE_FLOOR characters, and never ends on a function word, on a
- * verb that wants its complement ("leads", "established") or inside a list
- * (the last item keeps two words: "develop, train" is refused).
+ * A head before ": " that ends on a word wanting what follows ("... must",
+ * "... the following", "... covers"). Before "; " or a comma clause the head
+ * is a whole clause and may end on a preposition ("the data it was validated
+ * on"), so only a dangling article or conjunction is refused there (LOOSE_END).
  */
-const PHRASE_BREAK =
-  /\s(?=(?:in|on|at|by|for|to|under|within|across|through|over|per|via|into|from|against|between|during|among|beyond|outside|around|where|which|that|who|whose|when|while|with|without)\s)/g;
-const PHRASE_FLOOR = 80;
-const FUNCTION_WORD =
-  /\b(?:a|an|the|and|or|nor|of|to|in|for|by|with|as|at|on|from|that|which|is|are|be|its|their|this|these|those|more|most|less|than|not|no|any|each|every|such|so|it|them|likely|may|can|must|will|would|could|should|has|have|had|was|were|been|also|only|both|either|lead|leads|read|apply|applies|conforms|means|[a-z]+ed)$/i;
+const OPEN_END =
+  /\b(?:a|an|the|and|or|nor|of|to|in|for|by|with|as|at|on|from|that|which|is|are|be|its|their|this|these|those|than|not|no|any|each|every|such|so|may|can|must|will|would|could|should|shall|has|have|had|was|were|been|only|unless|except|where|when|if|provided|include|includes|including|namely|following|follows|means|covers|requires|comprises|consists)$/i;
+const LOOSE_END = /\b(?:a|an|the|and|or|nor)$/i;
 
-/** True when `head` ends on a list item of one word ("develop, train"). */
-function endsInShortListItem(head: string): boolean {
-  const items = head.split(/,\s|\s(?:and|or)\s/);
-  return items.length > 1 && (items[items.length - 1] ?? '').trim().split(/\s+/).length < 2;
+/**
+ * True when the "; " clause ends of `sentence` separate the items of a list
+ * rather than whole clauses: a list after a colon ("must: keep logs; test"),
+ * an enumerated item ("(a) ...; (b) ..."), or a last item opened by "and" /
+ * "or" ("data quality; model testing; and monitoring").
+ */
+function semicolonList(sentence: string): boolean {
+  const items = sentence.split(/;\s/).map((item) => item.trim());
+  if (items.length < 2) return false;
+  if (/:\s/.test(items[0])) return true;
+  return items.some((item, i) => ENUMERATOR.test(item) || (i > 0 && /^(?:and|or)\s/i.test(item)));
+}
+
+/** A parenthetical aside after a space ("Art. 6(3)" keeps its paragraph number). */
+const ASIDE = /\s+\([^()]*\)/g;
+
+/** Words that make an aside restrictive, so it cannot be dropped. */
+const RESTRICTIVE = /\b(?:unless|except|excluding|only|provided|where|when|if|not|other than|save|subject to|but)\b/i;
+
+/** An aside inside a name: a capitalised word on both sides ("Data (Use and Access) Act"). */
+const NAME_ASIDE = /[A-Z][\w-]*\s+\([^()]*\)\s+[A-Z]/;
+
+/** `text` without its parenthetical asides; undefined when one of them
+ *  restricts it or is part of a name. */
+export function withoutAsides(text: string): string | undefined {
+  const asides = text.match(ASIDE) ?? [];
+  if (asides.some((aside) => RESTRICTIVE.test(aside)) || NAME_ASIDE.test(text)) return undefined;
+  return text.replace(ASIDE, '');
 }
 
 /** The text split into sentences, abbreviation- and initial-aware. */
@@ -92,47 +123,67 @@ export function closeSentence(text: string): string {
 /** True when every "(" in `text` is closed. */
 const balanced = (text: string): boolean => text.split('(').length === text.split(')').length;
 
-/** The longest head of `text` before a `breaks` match that fits `max` once
- *  closed, keeps at least `floor` characters and passes `accept`. */
-function cutAt(
-  text: string,
-  breaks: RegExp,
-  max: number,
-  floor: number,
-  accept: (head: string) => boolean = () => true,
-): string | undefined {
+/**
+ * True when `head` stops inside the list a colon opens: after the colon, no
+ * comma-separated list closed by "and" / "or" yet ("rules: which tools are
+ * approved" is open; "bibliography: books, papers, law and guidance" is
+ * closed).
+ */
+function openColonList(head: string): boolean {
+  const colon = head.lastIndexOf(': ');
+  if (colon < 0) return false;
+  const items = head.slice(colon + 2).split(/,\s/);
+  return items.length < 2 || !/\s(?:and|or)\s/.test(items[items.length - 1] ?? '');
+}
+
+/**
+ * The longest head of `sentence` before a CLAUSE_END that fits `max` once
+ * closed and keeps at least `floor` characters. A head is refused when it ends
+ * on a word that wants what follows, when the clause after it opens with a
+ * qualifier or an enumerator, at a "; " when the semicolons separate list
+ * items (semicolonList), and at a comma inside the list a colon opens
+ * (openColonList: "rules: which tools are approved, which data ...") or when
+ * the sentence goes on with ", and" or ", or" (the clause sits inside a list
+ * whose next item would be lost). Undefined when no head qualifies.
+ */
+function cutAtClauseEnd(sentence: string, max: number, floor: number): string | undefined {
+  const list = semicolonList(sentence);
   let best: string | undefined;
-  for (const match of text.matchAll(breaks)) {
-    const head = text.slice(0, match.index);
+  for (const match of sentence.matchAll(CLAUSE_END)) {
+    const at = match.index ?? 0;
+    const head = sentence.slice(0, at);
     if (head.length + 1 > max) break;
-    if (head.length >= floor && balanced(head) && accept(head)) best = closeSentence(head);
+    const rest = sentence.slice(at + match[0].length);
+    if (match.groups?.end?.startsWith(';') && list) continue;
+    if (match.groups?.aside !== undefined && (openColonList(head) || /,\s(?:and|or)\s/.test(rest))) continue;
+    if (head.length < floor || !balanced(head)) continue;
+    if ((match.groups?.end?.startsWith(':') ? OPEN_END : LOOSE_END).test(head)) continue;
+    if (QUALIFIER.test(rest) || ENUMERATOR.test(rest)) continue;
+    best = closeSentence(head);
   }
   return best;
 }
 
 /**
  * `sentence` within `max` characters, closed with a full stop: whole when it
- * fits; else without its parenthetical asides; else cut at the last clause
- * break inside the budget that keeps at least `floor` characters; else, when
- * `loose`, at a LOOSE_BREAK comma, then at a PHRASE_BREAK. Undefined when no
- * whole clause fits.
+ * fits; else without its parenthetical asides, when none restricts it; else
+ * its opening up to the last CLAUSE_END inside the budget that keeps at least
+ * `floor` characters and drops no qualifier or list item. Never a cut at any
+ * other comma or inside a phrase, which can drop a qualifier and turn a
+ * restricted statement into a general one (audit ONPAGE R3). Undefined when
+ * no such opening fits: the caller then uses its template or fallback.
  */
-export function shortenSentence(
-  sentence: string,
-  max: number,
-  floor = 60,
-  loose = false,
-): string | undefined {
+export function shortenSentence(sentence: string, max: number, floor = 60): string | undefined {
   const whole = closeSentence(sentence);
   if (whole.length <= max) return whole;
-  // Asides after a space only, so "Art. 6(3)" keeps its paragraph number.
-  const bare = closeSentence(sentence.replace(/\s+\([^()]*\)/g, ''));
-  if (bare.length <= max) return bare;
-  if (!loose) return cutAt(bare, CLAUSE_BREAK, max, floor);
+  const bareText = withoutAsides(sentence);
+  if (bareText !== undefined) {
+    const bare = closeSentence(bareText);
+    if (bare.length <= max) return bare;
+  }
   return (
-    cutAt(bare, CLAUSE_BREAK, max, floor) ??
-    cutAt(bare, LOOSE_BREAK, max, Math.min(floor, LOOSE_FLOOR)) ??
-    cutAt(bare, PHRASE_BREAK, max, PHRASE_FLOOR, (head) => !FUNCTION_WORD.test(head) && !endsInShortListItem(head))
+    (bareText !== undefined ? cutAtClauseEnd(bareText, max, floor) : undefined) ??
+    cutAtClauseEnd(sentence, max, floor)
   );
 }
 
@@ -202,12 +253,15 @@ export interface LeadOptions {
   /** The label must lead: the lead is shortened to leave room for it. Otherwise
    *  it leads only when it fits beside the lead and the lead does not name it. */
   labelRequired?: boolean;
-  /** The lead when no whole clause of `text` fits (e.g. the page heading). */
+  /** The lead when no opening of `text` fits (e.g. the page heading). Without
+   *  it, the label leads the first of `extras` instead: "<label>: definition
+   *  with ...", a template that does not paraphrase the text. */
   fallback?: string;
   /** Lower a plain capitalised first word behind the label (glossary prose,
    *  not register rows that open with a name). */
   lowerFirst?: boolean;
-  /** Also cut a long first sentence at a looser break (LOOSE_BREAK, PHRASE_BREAK). */
+  /** Kept for the callers that pass it: since ONPAGE R3 no cut is looser than
+   *  a clause end, whatever this says. */
   loose?: boolean;
   /** The shortest cut of the first sentence worth keeping (default 60). */
   floor?: number;
@@ -219,21 +273,45 @@ export interface LeadOptions {
   max?: number;
 }
 
+/** "Definition with ..." -> "definition with ...", behind a label. */
+const lowerOpening = (text: string): string => text.replace(/^[A-Z](?=[a-z])/, (c) => c.toLowerCase());
+
+/**
+ * "<label>: <extra>" for the first of `extras` that fits `max`, followed by the
+ * extras after it while the description is shorter than `min`: of that extra's
+ * alternatives, the longest that still leaves room to reach `min`, else the
+ * longest that fits. Undefined when no extra fits.
+ */
+function labelledTemplate(label: string, extras: readonly Extra[], min: number, max: number): string | undefined {
+  for (const [i, extra] of extras.entries()) {
+    const options = typeof extra === 'string' ? [extra] : extra;
+    const built = options
+      .map((option) => `${label}: ${lowerOpening(closeSentence(option))}`)
+      .filter((text) => text.length <= max)
+      .map((text) => appendSentences(text, extras.slice(i + 1), min, max));
+    if (built.length > 0) return built.find((text) => text.length >= min) ?? built[0];
+  }
+  return undefined;
+}
+
 /**
  * A meta description from the opening of `text`: its first sentence (shortened
- * at a clause break when it runs past the budget), the label in front, the next
+ * at a clause end when it runs past the budget), the label in front, the next
  * sentences while it is short, then the caller's `always` and `extras`
- * sentences. Whole sentences only, within `max`, never an ellipsis.
+ * sentences. When no opening of the first sentence can stand alone, the
+ * `fallback` leads, or else the label with the first extra ("<term>: definition
+ * with ..."), never a cut that changes what the text says. Whole sentences
+ * only, within `max`, never an ellipsis.
  */
 export function leadDescription(text: string, options: LeadOptions = {}): string {
-  const { label, labelRequired = false, fallback, lowerFirst = false, loose = false } = options;
+  const { label, labelRequired = false, fallback, lowerFirst = false } = options;
   const { always = [], extras = [] } = options;
   const min = options.min ?? DESCRIPTION_MIN;
   const max = options.max ?? DESCRIPTION_MAX;
   const [first = '', ...rest] = sentences(text);
   const prefix = label ? `${label}: ` : '';
   const floor = options.floor ?? 60;
-  const shorten = (room: number) => (first ? shortenSentence(first, room, floor, loose) : undefined);
+  const shorten = (room: number) => (first ? shortenSentence(first, room, floor) : undefined);
 
   // The label leads when it must, or when the lead does not name it already and
   // the labelled lead keeps the whole sentence or at least LABELLED_FLOOR
@@ -249,9 +327,19 @@ export function leadDescription(text: string, options: LeadOptions = {}): string
       prefix.length + labelledLead.length >= LABELLED_FLOOR);
   const lead = useLabel ? labelledLead : plainLead;
   let out: string;
+  let remaining = extras;
   if (lead === undefined) {
-    const alternative = fallback ?? label ?? first;
-    out = shortenSentence(alternative, max, 20) ?? closeSentence(label ?? '');
+    const template = !fallback && label ? labelledTemplate(label, extras, min, max) : undefined;
+    if (template) {
+      out = template;
+      remaining = [];
+    } else {
+      // A heading's trailing aside ("(in force 2026-02-05)", "(voluntary)")
+      // repeats what the appended sentences say; an aside inside it is part of
+      // a name ("Data (Use and Access) Act 2025") and stays.
+      const alternative = fallback?.replace(/\s*\([^()]*\)$/, '') || label || first;
+      out = shortenSentence(alternative, max, 20) ?? closeSentence(label ?? '');
+    }
   } else {
     out = useLabel ? `${prefix}${afterLabel(lead, lowerFirst)}` : lead;
   }
@@ -261,5 +349,5 @@ export function leadDescription(text: string, options: LeadOptions = {}): string
     out = appendSentences(out, rest, min, max, true);
   }
   out = appendSentences(out, always, Infinity, max);
-  return appendSentences(out, extras, min, max);
+  return appendSentences(out, remaining, min, max);
 }
