@@ -67,7 +67,9 @@ function summary(row: Obligation): z.infer<typeof obligationSummary> {
     patterns: row.patterns.map((pt) => ({
       id: pt.id,
       title: pt.title,
-      url: `${CANONICAL_SITE}/patterns/${patternSlug(pt.id)}`,
+      // From v0.5.0 the register links each pattern's own page (whose slug cannot
+      // always be derived from the id); older data linked the chapter 05 anchor.
+      url: pt.url.startsWith(`${CANONICAL_SITE}/patterns/`) ? pt.url : `${CANONICAL_SITE}/patterns/${patternSlug(pt.id)}`,
     })),
     reviewed: row.reviewed,
     url: row.url,

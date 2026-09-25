@@ -5,7 +5,10 @@
 //   GET  /         a small discovery document
 // Guards, in order: Host allowlist (DNS-rebinding guard, all routes but
 // /healthz), CORS (public, read-only, no credentials), Origin allowlist on /mcp
-// when one is configured, per-client rate limit and body-size limit on /mcp.
+// when one is configured, per-client rate limit and body-size limit on /mcp,
+// then on /mcp: JSON-RPC batch arrays refused (the protocol dropped batching in
+// revision 2025-06-18, and one POST of 100 messages would count as one request
+// against the rate limit) and a cap on the requests handled at once.
 
 import { getConnInfo } from '@hono/node-server/conninfo';
 import { createMcpHandler, type McpHttpHandler } from '@modelcontextprotocol/server';
@@ -16,7 +19,7 @@ import { cors } from 'hono/cors';
 import type { Config } from './config.js';
 import type { DataSource } from './data.js';
 import type { Logger } from './log.js';
-import { RateLimiter } from './ratelimit.js';
+import { RateLimiter, unmapIPv4 } from './ratelimit.js';
 import { createServer, SERVER_NAME, SERVER_VERSION } from './server.js';
 import { TOOL_NAMES } from './tools/index.js';
 
@@ -61,6 +64,43 @@ function jsonRpcError(code: number, message: string): { jsonrpc: '2.0'; id: null
   return { jsonrpc: '2.0', id: null, error: { code, message } };
 }
 
+/** What a POST body holds, for the guards: a batch array, a subscriptions/listen request, or anything else. */
+export function messageKind(body: string): 'batch' | 'listen' | 'other' {
+  if (/^\s*\[/.test(body)) return 'batch';
+  try {
+    const parsed = JSON.parse(body) as unknown;
+    const method = parsed !== null && typeof parsed === 'object' ? (parsed as { method?: unknown }).method : undefined;
+    return method === 'subscriptions/listen' ? 'listen' : 'other';
+  } catch {
+    return 'other';
+  }
+}
+
+/** The body passed through, calling `done` once when it ends, fails or is cancelled. */
+function untilDone(body: ReadableStream<Uint8Array>, done: () => void): ReadableStream<Uint8Array> {
+  const reader = body.getReader();
+  return new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      try {
+        const chunk = await reader.read();
+        if (chunk.done) {
+          done();
+          controller.close();
+        } else {
+          controller.enqueue(chunk.value);
+        }
+      } catch (error) {
+        done();
+        controller.error(error);
+      }
+    },
+    cancel(reason) {
+      done();
+      return reader.cancel(reason);
+    },
+  });
+}
+
 export function createApp(deps: AppDeps): App {
   const { config, data, logger } = deps;
   const startedAt = Date.now();
@@ -71,17 +111,29 @@ export function createApp(deps: AppDeps): App {
   });
   const anyOrigin = config.allowedOrigins.includes('*');
 
+  let inFlight = 0;
+
+  const peerOf = (c: Context): string | null => {
+    try {
+      const address = getConnInfo(c).remote.address;
+      return address ? unmapIPv4(address.toLowerCase()) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  // X-Forwarded-For is read only when the connection comes from the proxy (any
+  // peer when TRUSTED_PROXIES is empty); anyone else is keyed by their own address.
   const clientOf = (c: Context): string => {
-    if (config.trustProxy) {
+    const peer = peerOf(c);
+    const fromProxy =
+      config.trustProxy && (config.trustedProxies.length === 0 || (peer !== null && config.trustedProxies.includes(peer)));
+    if (fromProxy) {
       const forwarded = c.req.header('x-forwarded-for');
       const last = forwarded?.split(',').map((part) => part.trim()).filter((part) => part !== '').pop();
       if (last) return last;
     }
-    try {
-      return getConnInfo(c).remote.address ?? 'unknown';
-    } catch {
-      return 'unknown';
-    }
+    return peer ?? 'unknown';
   };
 
   const app = new Hono();
@@ -135,7 +187,10 @@ export function createApp(deps: AppDeps): App {
     c.header('RateLimit-Reset', String(decision.resetSeconds));
     if (!decision.allowed) {
       c.header('Retry-After', String(decision.resetSeconds));
-      logger.warn('rate limited', { path: c.req.path, resetSeconds: decision.resetSeconds });
+      // One warning per client and window; the refusals after it only at debug,
+      // so a client hammering the endpoint cannot flood the log.
+      const log = decision.firstRefusal ? logger.warn.bind(logger) : logger.debug.bind(logger);
+      log('rate limited', { path: c.req.path, resetSeconds: decision.resetSeconds });
       return c.json(jsonRpcError(-32000, `Too many requests; retry in ${decision.resetSeconds} s.`), 429);
     }
     return next();
@@ -150,13 +205,47 @@ export function createApp(deps: AppDeps): App {
   );
 
   app.all('/mcp', async (c) => {
-    const response = await handler.fetch(c.req.raw);
+    let longLived = false;
+    if (c.req.method === 'POST') {
+      // The body is at most MAX_BODY_BYTES here (bodyLimit ran first); the SDK reads the original.
+      const kind = messageKind(await c.req.raw.clone().text());
+      if (kind === 'batch') {
+        return c.json(jsonRpcError(-32600, 'JSON-RPC batch requests are not supported; send one message per POST.'), 400);
+      }
+      // A subscriptions/listen stream stays open for as long as the client wants
+      // it (the SDK caps how many); it is not counted as a request in progress.
+      longLived = kind === 'listen';
+    }
+    if (!longLived && inFlight >= config.maxConcurrentRequests) {
+      c.header('Retry-After', '1');
+      logger.debug('busy', { path: c.req.path, inFlight });
+      return c.json(jsonRpcError(-32000, 'Server busy; retry in 1 s.'), 503);
+    }
+    let released = longLived;
+    const release = (): void => {
+      if (!released) {
+        released = true;
+        inFlight -= 1;
+      }
+    };
+    if (!longLived) inFlight += 1;
+    let response: Response;
+    try {
+      response = await handler.fetch(c.req.raw);
+    } catch (error) {
+      release();
+      throw error;
+    }
     const headers = new Headers(response.headers);
     for (const [key, value] of c.res.headers) {
       if (!headers.has(key)) headers.set(key, value);
     }
     if (!headers.has('cache-control')) headers.set('Cache-Control', 'no-store');
-    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+    // An SSE answer is still being produced after fetch() returns: the request
+    // counts as in progress until its body ends or the client goes away.
+    const body = response.body ? untilDone(response.body, release) : null;
+    if (!body) release();
+    return new Response(body, { status: response.status, statusText: response.statusText, headers });
   });
 
   app.get('/healthz', (c) =>

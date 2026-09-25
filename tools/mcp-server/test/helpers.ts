@@ -4,7 +4,7 @@
 
 import { createHash } from 'node:crypto';
 import { readFileSync, statSync } from 'node:fs';
-import { createServer, type Server } from 'node:http';
+import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { dirname, extname, join, normalize, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -41,6 +41,8 @@ export interface FixtureServer {
   failWith(path: string, status: number | null): void;
   /** Serve this body for a path instead of the file (or restore it with null). */
   override(path: string, body: string | null): void;
+  /** Hold every answer on a path for this many milliseconds (or restore it with null). */
+  stall(path: string, ms: number | null): void;
   close(): Promise<void>;
 }
 
@@ -48,8 +50,14 @@ export async function startFixtureServer(): Promise<FixtureServer> {
   const hits = new Map<string, { total: number; conditional: number; notModified: number }>();
   const failures = new Map<string, number>();
   const overrides = new Map<string, string>();
+  const stalls = new Map<string, number>();
   const server: Server = createServer((req, res) => {
     const path = decodeURIComponent(new URL(req.url ?? '/', 'http://x').pathname);
+    const stall = stalls.get(path);
+    if (stall !== undefined) setTimeout(() => answer(req, res, path), stall);
+    else answer(req, res, path);
+  });
+  const answer = (req: IncomingMessage, res: ServerResponse, path: string): void => {
     const hit = hits.get(path) ?? { total: 0, conditional: 0, notModified: 0 };
     hit.total += 1;
     if (req.headers['if-none-match'] || req.headers['if-modified-since']) hit.conditional += 1;
@@ -93,7 +101,7 @@ export async function startFixtureServer(): Promise<FixtureServer> {
         'last-modified': modified.toUTCString(),
       })
       .end(body);
-  });
+  };
   await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
   const { port } = server.address() as AddressInfo;
   return {
@@ -101,6 +109,7 @@ export async function startFixtureServer(): Promise<FixtureServer> {
     hits,
     failWith: (path, status) => (status === null ? failures.delete(path) : failures.set(path, status)),
     override: (path, body) => (body === null ? overrides.delete(path) : overrides.set(path, body)),
+    stall: (path, ms) => (ms === null ? stalls.delete(path) : stalls.set(path, ms)),
     close: () => new Promise<void>((done) => server.close(() => done())),
   };
 }

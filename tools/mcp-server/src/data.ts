@@ -36,6 +36,7 @@ export const DATASETS = [
   { name: 'cases', title: 'Incident cases' },
   { name: 'contracts', title: 'Contract clauses and licence families' },
   { name: 'roles', title: 'Value-chain roles' },
+  { name: 'threats', title: 'Threat bridge' },
 ] as const;
 
 export type DatasetName = (typeof DATASETS)[number]['name'];

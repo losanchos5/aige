@@ -57,17 +57,22 @@
       {
         "id": "pattern-policy-card",
         "title": "Policy Card",
-        "url": "https://aigovernanceengineer.com/bok/patterns#pattern-policy-card"
+        "url": "https://aigovernanceengineer.com/patterns/policy-card"
       },
       {
         "id": "pattern-adversarial-red-team-suite",
         "title": "Adversarial Red-Team Suite",
-        "url": "https://aigovernanceengineer.com/bok/patterns#pattern-adversarial-red-team-suite"
+        "url": "https://aigovernanceengineer.com/patterns/adversarial-red-team-suite"
       },
       {
         "id": "pattern-fria-as-code",
         "title": "FRIA-as-Code",
-        "url": "https://aigovernanceengineer.com/bok/patterns#pattern-fria-as-code"
+        "url": "https://aigovernanceengineer.com/patterns/fria-as-code"
+      },
+      {
+        "id": "pattern-downstream-use-register",
+        "title": "Downstream Use Register",
+        "url": "https://aigovernanceengineer.com/patterns/downstream-use-register"
       }
     ],
     "crosswalkTopics": [

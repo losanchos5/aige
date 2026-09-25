@@ -3,6 +3,10 @@
 // aigovernanceengineer.com, one container behind Caddy). Invalid values fail
 // at start-up, not at the first request.
 
+import { isIP } from 'node:net';
+
+import { unmapIPv4 } from './ratelimit.js';
+
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 export interface Config {
@@ -24,7 +28,7 @@ export interface Config {
   maxUpstreamBytes: number;
   /** Largest request body accepted on /mcp, in bytes. */
   maxBodyBytes: number;
-  /** Requests allowed per client IP per window on /mcp. */
+  /** Requests allowed per client per window on /mcp (IPv4 address, or IPv6 /64). */
   rateLimitMax: number;
   /** Length of the rate-limit window. */
   rateLimitWindowMs: number;
@@ -38,6 +42,15 @@ export interface Config {
   allowedOrigins: string[];
   /** Take the client IP from the right-most X-Forwarded-For entry (set by the reverse proxy). */
   trustProxy: boolean;
+  /**
+   * Socket addresses of the reverse proxy. With a list, X-Forwarded-For is read
+   * only on connections from one of them (anyone else is keyed by their own
+   * address); empty, any peer is trusted, which is safe only on a network that
+   * nothing but the proxy can reach.
+   */
+  trustedProxies: string[];
+  /** MCP requests handled at once; above it /mcp answers 503 with Retry-After (listen streams excluded). */
+  maxConcurrentRequests: number;
   logLevel: LogLevel;
 }
 
@@ -88,6 +101,14 @@ function hosts(raw: string | undefined, publicUrl: string): string[] {
   return given.length > 0 ? given : fallback;
 }
 
+function addresses(name: string, raw: string | undefined): string[] {
+  const given = list(raw, []).map(unmapIPv4);
+  for (const item of given) {
+    if (isIP(item) === 0) throw new Error(`config: ${name} must list IP addresses (got "${item}")`);
+  }
+  return given;
+}
+
 function flag(raw: string | undefined, fallback: boolean): boolean {
   if (raw === undefined || raw.trim() === '') return fallback;
   return ['1', 'true', 'yes', 'on'].includes(raw.trim().toLowerCase());
@@ -123,6 +144,8 @@ export function loadConfig(env: Env = process.env): Config {
     allowedHosts: hosts(env.ALLOWED_HOSTS, publicUrl),
     allowedOrigins: list(env.ALLOWED_ORIGINS, ['*']),
     trustProxy: flag(env.TRUST_PROXY, false),
+    trustedProxies: addresses('TRUSTED_PROXIES', env.TRUSTED_PROXIES),
+    maxConcurrentRequests: int(env, 'MAX_CONCURRENT_REQUESTS', 16, 1, 10_000),
     logLevel: level as LogLevel,
   };
 }

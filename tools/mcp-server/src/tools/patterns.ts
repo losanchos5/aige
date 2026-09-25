@@ -1,7 +1,9 @@
 // patterns.ts: list_patterns and get_pattern over /api/v1/patterns.json, with
 // each pattern page's text (summary and sections) from /llms-full.txt. The
-// canonical page of a pattern is /patterns/<slug>; chapter 05 keeps the
-// #pattern-<id> anchors as the catalogue.
+// canonical page of a pattern is /patterns/<slug>, with the slug the dataset
+// publishes (it cannot always be derived from the id: the page of
+// pattern-staged-rollout-with-rollback-criteria is staged-rollout-rollback-criteria);
+// chapter 05 keeps the #pattern-<id> anchors as the catalogue.
 
 import * as z from 'zod';
 
@@ -25,8 +27,18 @@ import {
   type Register,
 } from './common.js';
 
+/** Page slug of a pattern: the published one, else derived from the id (datasets before v0.5.0). */
+export function slugOf(row: PatternRow): string {
+  return row.slug ?? patternSlug(row.id);
+}
+
 export function patternPage(row: PatternRow): string {
-  return `${CANONICAL_SITE}/patterns/${patternSlug(row.id)}`;
+  return `${CANONICAL_SITE}/patterns/${slugOf(row)}`;
+}
+
+/** The pattern's summary in the chapter 05 catalogue. */
+export function cataloguePage(row: PatternRow): string {
+  return row.section ?? `${CANONICAL_SITE}/bok/patterns#${row.id}`;
 }
 
 /** Find a pattern by slug, id, page URL or title ("kill-switch-circuit-breaker", "pattern-aibom", "Runtime Guardrail"). */
@@ -38,13 +50,13 @@ export function findPattern(rows: PatternRow[], wanted: string): PatternRow | un
   return (
     rows.find((row) => row.id === raw || slugKey(row.title) === whole) ??
     rows.find((row) => row.id === last || row.id === `pattern-${last}`) ??
-    rows.find((row) => patternSlug(row.id) === key) ??
+    rows.find((row) => slugOf(row) === key || patternSlug(row.id) === key) ??
     rows.find((row) => slugKey(row.title) === key)
   );
 }
 
 function pageOf(corpus: CorpusDocument[], row: PatternRow): CorpusDocument | undefined {
-  const slug = patternSlug(row.id);
+  const slug = slugOf(row);
   return corpus.find((doc) => doc.kind === 'pattern' && doc.slug === slug);
 }
 
@@ -64,7 +76,7 @@ const listItem = z.object({
 function item(row: PatternRow, page: CorpusDocument | undefined): z.infer<typeof listItem> {
   return {
     id: row.id,
-    slug: patternSlug(row.id),
+    slug: slugOf(row),
     title: row.title,
     layer: row.layer,
     layerName: layerName(row.layer),
@@ -143,7 +155,7 @@ export const registerPatterns: Register = (server, deps) => {
         ]);
         const row = findPattern(doc.patterns, slug);
         if (!row) {
-          const close = suggest(slug, doc.patterns.map((r) => patternSlug(r.id)));
+          const close = suggest(slug, doc.patterns.map((r) => slugOf(r)));
           return fail(
             `No pattern "${slug}".${close.length > 0 ? ` Closest slugs: ${close.join(', ')}.` : ''} Use list_patterns to see them all.`,
           );
@@ -177,7 +189,7 @@ export const registerPatterns: Register = (server, deps) => {
         return ok(text, {
           ...base,
           secondaryLayerName: layerName(row.secondaryLayer),
-          catalogueUrl: row.url,
+          catalogueUrl: cataloguePage(row),
           obligationDetails,
           sections,
           ...p,

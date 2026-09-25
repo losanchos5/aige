@@ -1,11 +1,12 @@
 // http.test.ts: the HTTP surface: health, discovery, CORS, Host and Origin
-// guards, rate limit, body limit, the legacy (2025-era) stateless leg and the
-// privacy of the logs.
+// guards, rate limit, body limit, batch refusal, the cap on requests in
+// progress, the legacy (2025-era) stateless leg and the privacy of the logs.
 
 import assert from 'node:assert/strict';
 import { request } from 'node:http';
 import { after, before, describe, it } from 'node:test';
 
+import { createLogger } from '../src/log.js';
 import { startApp, startFixtureServer, type FixtureServer, type RunningApp } from './helpers.js';
 
 let fixtures: FixtureServer;
@@ -158,6 +159,22 @@ describe('guards', () => {
     assert.equal(response.status, 413);
   });
 
+  it('refuses JSON-RPC batch arrays with 400 and still serves single messages', async () => {
+    const call = { jsonrpc: '2.0', method: 'tools/call', params: { name: 'get_term', arguments: { slug: 'abstention-band' } } };
+    const batch = await post(`${running.url}/mcp`, [{ ...call, id: 1 }, { ...call, id: 2 }], { 'mcp-protocol-version': '2025-06-18' });
+    assert.equal(batch.status, 400);
+    const body = (await batch.json()) as Record<string, any>;
+    assert.equal(body.error.code, -32600);
+    assert.match(body.error.message, /batch/);
+    const spaced = await post(`${running.url}/mcp`, ` 
+[${JSON.stringify({ ...call, id: 3 })}]`, { 'mcp-protocol-version': '2025-06-18' });
+    assert.equal(spaced.status, 400, 'leading whitespace does not hide the array');
+    await spaced.text();
+    const single = await post(`${running.url}/mcp`, { ...call, id: 4 }, { 'mcp-protocol-version': '2025-06-18' });
+    assert.equal(single.status, 200);
+    assert.equal((await rpc(single)).result.structuredContent.slug, 'abstention-band');
+  });
+
   it('answers 405 to GET on the MCP endpoint (no standalone stream)', async () => {
     const response = await fetch(`${running.url}/mcp`, { headers: { accept: 'text/event-stream' } });
     assert.equal(response.status, 405);
@@ -226,6 +243,80 @@ describe('rate limit', () => {
       await Promise.all([a.text(), b.text(), c.text()]);
     } finally {
       await proxied.close();
+    }
+  });
+
+  it('ignores X-Forwarded-For from a peer that is not a trusted proxy', async () => {
+    const guarded = await startApp(fixtures, {
+      env: { RATE_LIMIT_MAX: '1', TRUST_PROXY: 'true', TRUSTED_PROXIES: '192.0.2.10' },
+    });
+    try {
+      const a = await post(`${guarded.url}/mcp`, LEGACY_INIT, { 'x-forwarded-for': '203.0.113.2' });
+      const b = await post(`${guarded.url}/mcp`, LEGACY_INIT, { 'x-forwarded-for': '203.0.113.3' });
+      assert.deepEqual([a.status, b.status], [200, 429], 'both are keyed by the socket address');
+      await Promise.all([a.text(), b.text()]);
+    } finally {
+      await guarded.close();
+    }
+    const trusted = await startApp(fixtures, {
+      env: { RATE_LIMIT_MAX: '1', TRUST_PROXY: 'true', TRUSTED_PROXIES: '127.0.0.1' },
+    });
+    try {
+      const a = await post(`${trusted.url}/mcp`, LEGACY_INIT, { 'x-forwarded-for': '203.0.113.2' });
+      const b = await post(`${trusted.url}/mcp`, LEGACY_INIT, { 'x-forwarded-for': '203.0.113.3' });
+      assert.deepEqual([a.status, b.status], [200, 200], 'the proxy at 127.0.0.1 is trusted');
+      await Promise.all([a.text(), b.text()]);
+    } finally {
+      await trusted.close();
+    }
+  });
+
+  it('warns once per client and window, then logs refusals at debug', async () => {
+    const lines: string[] = [];
+    const quiet = await startApp(fixtures, {
+      env: { RATE_LIMIT_MAX: '1', LOG_LEVEL: 'debug' },
+      logger: createLogger('debug', (line) => lines.push(line)),
+    });
+    try {
+      for (let i = 0; i < 4; i += 1) await (await post(`${quiet.url}/mcp`, LEGACY_INIT)).text();
+      const limited = lines.map((l) => JSON.parse(l) as Record<string, unknown>).filter((l) => l.msg === 'rate limited');
+      assert.deepEqual(
+        limited.map((l) => l.level),
+        ['warn', 'debug', 'debug'],
+      );
+    } finally {
+      await quiet.close();
+    }
+  });
+});
+
+describe('requests in progress', () => {
+  it('answers 503 with Retry-After above the cap and frees the slot when the answer ends', async () => {
+    const capped = await startApp(fixtures, { env: { MAX_CONCURRENT_REQUESTS: '1', CACHE_TTL_MS: '0' } });
+    const call = (id: number): Promise<Response> =>
+      post(
+        `${capped.url}/mcp`,
+        { jsonrpc: '2.0', id, method: 'tools/call', params: { name: 'list_patterns', arguments: {} } },
+        { 'mcp-protocol-version': '2025-06-18' },
+      );
+    fixtures.stall('/api/v1/patterns.json', 400);
+    try {
+      const slow = call(1);
+      await new Promise((done) => setTimeout(done, 150));
+      const busy = await call(2);
+      assert.equal(busy.status, 503);
+      assert.equal(busy.headers.get('retry-after'), '1');
+      assert.equal(((await busy.json()) as Record<string, any>).error.code, -32000);
+      const first = await slow;
+      assert.equal(first.status, 200);
+      assert.ok(Array.isArray((await rpc(first)).result.structuredContent.patterns));
+      fixtures.stall('/api/v1/patterns.json', null);
+      const after = await call(3);
+      assert.equal(after.status, 200, 'the slot is free once the first answer ended');
+      await after.text();
+    } finally {
+      fixtures.stall('/api/v1/patterns.json', null);
+      await capped.close();
     }
   });
 });

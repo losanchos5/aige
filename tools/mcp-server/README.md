@@ -40,10 +40,10 @@ valid values, so the model can correct itself.
 
 ## Resources
 
-The catalogue (`/api/v1/index.json`), the thirteen datasets (`obligations`, `frameworks`,
+The catalogue (`/api/v1/index.json`), the fourteen datasets (`obligations`, `frameworks`,
 `crosswalk`, `glossary`, `patterns`, `maturity`, `path`, `chapters`, `jurisdictions`, `harms`,
-`cases`, `contracts`, `roles`) and the full text (`/llms-full.txt`) are MCP resources under their
-canonical `https://aigovernanceengineer.com/...` URIs. One resource template,
+`cases`, `contracts`, `roles`, `threats`) and the full text (`/llms-full.txt`) are MCP resources
+under their canonical `https://aigovernanceengineer.com/...` URIs. One resource template,
 `https://aigovernanceengineer.com/api/v1/obligations/{id}.json`, serves a single row.
 
 ## Connect a client
@@ -76,8 +76,9 @@ your projects [4]. In a JSON configuration the entry needs `"type": "http"` next
 protocol (one POST per message, no sessions) [1][2] and, for clients that still open with an
 `initialize` handshake (revisions 2025-03-26 to 2025-11-25), serves each request statelessly
 without minting a session. `GET /mcp` answers `405`, as the 2026-07-28 revision asks of a server
-that has no standalone stream [2]. Browser clients may call it directly: CORS is open, without
-credentials.
+that has no standalone stream [2]. JSON-RPC batch arrays get `400`: the protocol dropped batching in
+revision 2025-06-18 [9], and one POST carrying a hundred calls would count as a single request
+against the rate limit. Browser clients may call it directly: CORS is open, without credentials.
 
 ## Configuration
 
@@ -92,11 +93,13 @@ Every setting comes from the environment; invalid values stop the process at sta
 | `ALLOWED_HOSTS` | host of `PUBLIC_URL`, `localhost`, `127.0.0.1`, `[::1]` | `Host` values accepted on every route but `/healthz` (the DNS-rebinding guard); `*` accepts any. |
 | `ALLOWED_ORIGINS` | `*` | Browser origins allowed on `/mcp` (comma-separated). With a list, a request whose `Origin` is not on it gets `403`; requests without `Origin` (non-browser clients) pass. |
 | `TRUST_PROXY` | `false` | Key the rate limit on the right-most `X-Forwarded-For` entry. Set `true` only behind a proxy that sets it, such as Caddy. |
+| `TRUSTED_PROXIES` | empty | Socket addresses of that proxy (comma-separated). With a list, `X-Forwarded-For` is read only on connections from one of them and anyone else is keyed by their own address; empty, any peer is trusted, which is safe only on a network nothing but the proxy can reach. |
 | `CACHE_TTL_MS` | `3600000` (1 hour) | How long a fetched document is served from memory before it is revalidated. |
 | `FETCH_TIMEOUT_MS` | `10000` | Timeout of one upstream request. |
 | `MAX_UPSTREAM_BYTES` | `16777216` | Largest upstream document accepted. |
 | `MAX_BODY_BYTES` | `65536` | Largest request body on `/mcp` (`413` above it). |
-| `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW_MS` | `120` / `60000` | Requests per client per window on `/mcp` (`429` with `Retry-After` above it). |
+| `RATE_LIMIT_MAX` / `RATE_LIMIT_WINDOW_MS` | `120` / `60000` | Requests per client per window on `/mcp` (`429` with `Retry-After` above it). A client is an IPv4 address or an IPv6 /64, since an end site holds at least a /64 and can pick any address in it [10]. |
+| `MAX_CONCURRENT_REQUESTS` | `16` | MCP requests handled at once; above it `/mcp` answers `503` with `Retry-After: 1`. A `subscriptions/listen` stream does not count. |
 | `LOG_LEVEL` | `info` | `debug`, `info`, `warn` or `error`. |
 
 ## How it behaves
@@ -106,8 +109,9 @@ Every setting comes from the environment; invalid values stop the process at sta
 - **Data.** Each dataset is fetched from `API_BASE` on first use and kept in memory. Within the TTL
   it is served from memory; after it, the next reader revalidates with `If-None-Match` and
   `If-Modified-Since`, and a `304` extends the copy without a download. Concurrent readers share
-  one request. If the site cannot be reached, the last copy keeps being served and the failure is
-  logged; with no copy, the tool answers with an error that names the URL. The chapter text and the
+  one request. If the site cannot be reached, the last copy keeps being served, the failure is
+  logged and the site is asked again after a minute (or the TTL, if shorter), not on every tool
+  call; with no copy, the tool answers with an error that names the URL. The chapter text and the
   pattern pages come from `/llms-full.txt`, split into documents and headings; section anchors are
   recomputed the way the site renders them, so the URLs point at the right heading.
 - **Templates list.** The site publishes no index of its templates and schemas, so the list is
@@ -119,7 +123,8 @@ Every setting comes from the environment; invalid values stop the process at sta
   the `Mcp-Method` and `Mcp-Name` headers (a tool or resource name). No IP address, user agent,
   request body or tool argument is logged. The rate limiter keys clients by an HMAC of their
   address with a secret drawn at start-up, drops each entry when its window closes and forgets
-  everything on restart.
+  everything on restart. A client past its limit is logged once per window, not on every refused
+  request.
 - **Stateless.** No sessions, no storage, no background jobs. Any number of replicas can run side by
   side; each keeps its own cache and its own rate-limit table.
 - **Routes.** `POST /mcp` (MCP), `GET /healthz` (liveness and cache counters; never calls the site,
@@ -155,11 +160,43 @@ npm run catalogue                 # regenerate src/catalogue.generated.ts
 
 ## Deploy (Docker, compose, Caddy)
 
-The `Dockerfile` builds on `node:22-alpine`, prunes development dependencies, runs as the image's
+The `Dockerfile` builds on `node:22-alpine` pinned by digest (Node.js 22.23.3 on Alpine 3.24 as of
+2026-09-24), so a rebuild or a retagged image cannot change the base silently; Dependabot proposes
+the new digest as a pull request [11]. It prunes development dependencies, runs as the image's
 unprivileged `node` user (uid 1000) with the application files read-only, listens on port 8787 and
 declares a health check on `/healthz` [8].
 
-A compose service for a VPS where Caddy terminates TLS on a shared network (here `caddy`):
+On a VPS shared with other services, keep the server off the network the other containers share
+with Caddy: any of them could call it directly and set `X-Forwarded-For` to anything. Create a
+network that only Caddy and the server join, with a subnet whose dynamic range leaves room for a
+fixed Caddy address [12]:
+
+```bash
+docker network create --subnet 172.30.87.0/24 --ip-range 172.30.87.128/25 aige-mcp-edge
+```
+
+In Caddy's own compose file, join that network at a fixed address (`ipv4_address`) [13], next to
+the network Caddy already uses for the other sites (here `caddy`):
+
+```yaml
+services:
+  caddy:
+    # ...the existing Caddy service...
+    networks:
+      caddy: {}
+      aige-mcp-edge:
+        ipv4_address: 172.30.87.2
+
+networks:
+  caddy:
+    external: true
+  aige-mcp-edge:
+    external: true
+```
+
+The server's compose service. Docker's default `json-file` log driver does not rotate a log
+unless `max-size` is set (it is unlimited by default) [14], so the `logging` block caps the
+server's log at three files of 10 MB:
 
 ```yaml
 services:
@@ -177,12 +214,18 @@ services:
       PUBLIC_URL: https://mcp.aigovernanceengineer.com
       ALLOWED_HOSTS: mcp.aigovernanceengineer.com
       TRUST_PROXY: "true"
+      TRUSTED_PROXIES: 172.30.87.2
       LOG_LEVEL: info
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     expose: ["8787"]
-    networks: [caddy]
+    networks: [aige-mcp-edge]
 
 networks:
-  caddy:
+  aige-mcp-edge:
     external: true
 ```
 
@@ -233,6 +276,12 @@ of conformity; check the primary source before relying on them.
 [6] reverse_proxy directive (sets or augments `X-Forwarded-For`, ignores incoming `X-Forwarded-*` values unless from trusted proxies; `text/event-stream` responses are flushed immediately). Caddy. 2026. https://caddyserver.com/docs/caddyfile/directives/reverse_proxy (verified: primary)
 [7] log directive, `filter` format (`request>remote_ip delete`, `request>client_ip delete`; the `fields` block is optional). Caddy. 2026. https://caddyserver.com/docs/caddyfile/directives/log (verified: primary)
 [8] Docker and Node.js best practices (the `node` user with uid 1000; `NODE_ENV=production`; `--init` for PID 1). Node.js docker-node. 2026. https://github.com/nodejs/docker-node/blob/main/docs/BestPractices.md (verified: primary)
+[9] Key changes, revision 2025-06-18 ("Remove support for JSON-RPC batching", the first major change listed). Model Context Protocol. 2025-06-18. https://modelcontextprotocol.io/specification/2025-06-18/changelog (verified: primary)
+[10] RFC 6177, IPv6 Address Assignment to End Sites (end sites should get "at least one /64, and in most cases significantly more"). IETF. 2011-03. https://www.rfc-editor.org/rfc/rfc6177 (verified: primary)
+[11] Building best practices, "Pin base image versions" (tags are mutable; a digest pins the exact image; Dependabot with `package-ecosystem: "docker"` raises pull requests that update tags and digests). Docker Docs. 2026. https://docs.docker.com/build/building/best-practices/#pin-base-image-versions (verified: primary)
+[12] docker network connect (`--ip` assigns a static address; create the network with an `--ip-range` and pick static addresses outside it). Docker Docs. 2026. https://docs.docker.com/reference/cli/docker/network/connect/ (verified: primary)
+[13] Compose file reference, services, `networks` (`ipv4_address`: a static address for the container on that network; the network needs a subnet covering it). Docker Docs. 2026. https://docs.docker.com/reference/compose-file/services/ (verified: primary)
+[14] JSON File logging driver (`max-size` defaults to -1, unlimited; logs are not rotated unless it is set; `max-file` works only with `max-size`). Docker Docs. 2026. https://docs.docker.com/engine/logging/drivers/json-file/ (verified: primary)
 
 > This work is licensed under **CC BY 4.0**. You may share and adapt it provided you give appropriate
 > credit, link to the licence and indicate changes. Attribution: Jorge García Aibar.
