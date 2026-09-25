@@ -852,8 +852,8 @@ export const nodes: readonly PathNode[] = [
     ],
     resources: [
       {
-        title: 'OWASP Top 10 for LLM Applications',
-        url: 'https://genai.owasp.org/llm-top-10/',
+        title: 'OWASP Top 10 for LLM Applications 2026',
+        url: 'https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/',
         type: 'official',
         cost: 'free',
       },
