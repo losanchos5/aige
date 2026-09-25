@@ -168,7 +168,8 @@ const PILLAR_SOURCE = 'guides/ai-governance.md';
  * box as the abstract. The figure the page inserts is not part of the source.
  */
 export function pillarDoc(): CorpusDoc {
-  const source = readSource(PILLAR_SOURCE);
+  // The source is stored with CRLF line ends; the twin is served with LF.
+  const source = readSource(PILLAR_SOURCE).replace(/\r\n/g, '\n');
   const lead = docLead(source);
   return {
     title: lead.title,
@@ -254,6 +255,8 @@ export function caseDoc(entry: IncidentCase): CorpusDoc {
     return `- ${o.instrument} ${ref}: ${o.why}`;
   });
 
+  // The "In short" passage is the first section, as on the page (GEO R1): it
+  // is the passage written for answer engines to quote whole.
   const body = [
     `> ${entry.summary}`,
     [
@@ -264,6 +267,8 @@ export function caseDoc(entry: IncidentCase): CorpusDoc {
       ...(incidentsLine ? [`- Incident record: ${incidentsLine}`] : []),
       ...(harmLinks ? [`- Harm: ${harmLinks}`] : []),
     ].join('\n'),
+    '## In short',
+    entry.inShort,
     '## What happened',
     ...entry.happened,
     '## Failure mode',

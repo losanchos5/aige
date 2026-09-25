@@ -27,6 +27,10 @@ const MIN_WORDS = 7000;
 const MAX_WORDS = 8500;
 const MIN_TABLES = 10;
 const FAQ_QUESTIONS = 12;
+// The "In short" paragraph under the answer box: a full answer on its own,
+// in the 134-167 word band of the chapters' passages (GEO R3).
+const IN_SHORT_MIN = 134;
+const IN_SHORT_MAX = 167;
 const OG_IMAGE = `${SITE_ORIGIN}/og/ai-governance.png`;
 // Sections added after the post-launch audit (SXO-N1): each opens with a
 // 40-60 word answer, the passage an answer engine quotes.
@@ -290,6 +294,20 @@ test.describe('source file', () => {
     .map((line) => /^\[(\d+)\] .*?(https?:\/\/\S+) \(verified: (primary|secondary|reported)\)\s*$/.exec(line))
     .filter((m): m is RegExpExecArray => m !== null)
     .map((m) => ({ n: Number(m[1]), url: m[2] }));
+
+  test(`the In short paragraph runs to ${IN_SHORT_MIN}-${IN_SHORT_MAX} words`, () => {
+    const paragraph = body
+      .split(/\r?\n\s*\r?\n/)
+      .find((block) => block.trimStart().startsWith('**In short.**'));
+    expect(paragraph, 'an **In short.** paragraph').toBeDefined();
+    const text = paragraph!
+      .replace('**In short.**', '')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/\[\d+\]/g, '');
+    const words = wordsIn(text);
+    expect(words, `In short is ${words} words`).toBeGreaterThanOrEqual(IN_SHORT_MIN);
+    expect(words, `In short is ${words} words`).toBeLessThanOrEqual(IN_SHORT_MAX);
+  });
 
   test('every citation resolves, every source is cited, numbered 1..N', () => {
     expect(at).toBeGreaterThan(0);
