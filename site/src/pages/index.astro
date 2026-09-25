@@ -501,11 +501,11 @@ const resources = [
     --hero-fade-top: 0; /* free vertical fade stops (0..1) at the top, 55% and the foot */
     --hero-fade-mid: 0;
     --hero-fade-bot: 0;
-    --hero-halo: 0; /* ellipse behind the headline (0..1) */
+    --hero-halo: 0.5; /* cream ellipse behind the headline (0..1), both themes */
     --hero-halo-w: 62%;
     --hero-halo-h: 40%;
     --hero-halo-y: 45%; /* the headline's centre at 1440x900 (402px of 900) */
-    --hero-band: 0; /* veil under the floating header (0..1) */
+    --hero-band: 0; /* veil under the floating header (0..1); 0.45 in the dark theme */
     --hero-halo-blur: 0px; /* blurred halo, on only with data-halo-blur (dev: ?blur=14) */
   }
 
@@ -603,7 +603,7 @@ const resources = [
 
   .hero-art-halo {
     background: radial-gradient(
-      ellipse var(--hero-halo-w, 62%) var(--hero-halo-h, 40%) at 50% var(--hero-halo-y, 45%),
+      ellipse var(--hero-halo-w, 62%) var(--hero-halo-h, 40%) at var(--hero-halo-x, 50%) var(--hero-halo-y, 45%),
       color-mix(in srgb, var(--bg) calc(var(--hero-halo) * 100%), transparent) 0%,
       transparent 72%
     );
@@ -617,7 +617,7 @@ const resources = [
     -webkit-backdrop-filter: blur(var(--hero-halo-blur)) saturate(0.9);
     backdrop-filter: blur(var(--hero-halo-blur)) saturate(0.9);
     mask-image: radial-gradient(
-      ellipse var(--hero-halo-w, 62%) var(--hero-halo-h, 40%) at 50% var(--hero-halo-y, 45%),
+      ellipse var(--hero-halo-w, 62%) var(--hero-halo-h, 40%) at var(--hero-halo-x, 50%) var(--hero-halo-y, 45%),
       #000 22%,
       #000000ad 52%,
       #0000 80%
@@ -671,16 +671,25 @@ const resources = [
     }
   }
 
-  /* The headline's white is scoped to the hero (the header's menus use
-     --hero-ink too and keep theirs). */
+  /* Dark theme: the headline's white, scoped to the hero (the header's menus
+     use --hero-ink too and keep theirs), and the band under the floating
+     header that keeps its white links at 4.5:1 over the painting's sky. */
   :global(:root[data-theme='dark']) .hero--art {
     --hero-ink: #ffffff;
+    --hero-band: 0.45;
   }
 
   @media (prefers-color-scheme: dark) {
     :global(:root:not([data-theme='light'])) .hero--art {
       --hero-ink: #ffffff;
+      --hero-band: 0.45;
     }
+  }
+
+  /* Dev variant (?ink=dark in hero-art-dev.js): the headline in the near-black
+     --ink instead of the navy. Light theme only: the dark rules above outrank it. */
+  .hero--art[data-ink='dark'] {
+    --hero-ink: var(--ink);
   }
 
   .hero--art .hero-title {
