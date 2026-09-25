@@ -1,0 +1,120 @@
+{
+  "name": "aigovernanceengineer",
+  "title": "AI Governance Engineer",
+  "description": "Read-only Model Context Protocol server over the open data of aigovernanceengineer.com: the obligation register, the topic crosswalk, the glossary, the governance patterns, the templates and schemas, and the Body of Knowledge chapters. Every answer carries its source URL. Illustrative, not legal advice and not a claim of conformity.",
+  "version": "0.5.0",
+  "websiteUrl": "https://aigovernanceengineer.com",
+  "documentation": "https://aigovernanceengineer.com/mcp",
+  "repository": {
+    "url": "https://github.com/losanchos5/aige",
+    "source": "github",
+    "subfolder": "tools/mcp-server"
+  },
+  "license": "CC BY 4.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.aigovernanceengineer.com/mcp"
+    }
+  ],
+  "transport": {
+    "type": "streamable-http",
+    "url": "https://mcp.aigovernanceengineer.com/mcp"
+  },
+  "authentication": {
+    "required": false
+  },
+  "protocolVersions": [
+    "2026-07-28",
+    "2025-11-25",
+    "2025-06-18",
+    "2025-03-26"
+  ],
+  "capabilities": {
+    "tools": {},
+    "resources": {}
+  },
+  "tools": [
+    {
+      "name": "search_glossary",
+      "title": "Search the glossary",
+      "description": "Search the canonical terms of AI governance engineering (definitions from the Body of Knowledge glossary, chapter 09). Matches term names, acronyms and definition text; every query word must match. Returns term slugs for get_term, definitions, the canonical page URL of each term and the chapters that use it.",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_term",
+      "title": "Get a glossary term",
+      "description": "Get one glossary term by slug (e.g. \"abstention-band\"), by its id (\"t-abstention-band\"), by its page URL or by its name (\"Abstention band\", or an acronym in brackets such as \"AUP\"). Returns the definition, the canonical page, the chapters that use it and the other terms whose definitions mention it.",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_obligations",
+      "title": "List obligations",
+      "description": "Filter the obligation register (obligation → artefact → stack layer, with stable ids such as AIGE-OBL-EUAIA-ART9). All filters are optional and combine with AND. framework: an id, short name or name (\"eu-ai-act\", \"EU AI Act\", \"ISO 42001\", \"nist\"); role: a duty holder such as \"provider\", \"deployer\", \"developer\" or \"GPAI provider\" (matched in the duty holder, or in the scope of laws that name who they bind; rows with neither, such as voluntary standards, drop out); systemClass: an EU AI Act class (all-ai-systems, prohibited, high-risk-annex-iii, high-risk-annex-i, transparency-art50, gpai, gpai-systemic); appliesBefore: an ISO date, keeping rows whose first application date (appliesFrom) is on or before it (later milestones are listed with each row); status: in-force, applies-later, deferred, grace, voluntary or pending; layer: a stack layer 1-5.",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_obligation",
+      "title": "Get an obligation",
+      "description": "Get one row of the obligation register by its stable id (e.g. \"AIGE-OBL-EUAIA-ART9\", any case) or its page URL: the requirement, the artefact that evidences it, the stack layers, duty holder, application date and later milestones, the patterns that implement it, the crosswalk references joined to it, and the chapter 08 section it comes from.",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "map_clause",
+      "title": "Map a clause across frameworks",
+      "description": "Map one clause of a framework to the others through the topic crosswalk (25 governance topics against the EU AI Act, GPAI Code, GDPR, ISO/IEC 42001 and related standards, NIST AI RMF, CSA AICM, OWASP, Korea, UK, Singapore, Council of Europe, OECD, G7, CEN-CENELEC and the Chinese instruments). Give the framework (\"EU AI Act\", \"iso-42001\", \"NIST AI RMF\", \"GDPR\") and the clause as the framework writes it (\"Art. 9\", \"Article 10(2)\", \"6.1.2\", \"GOVERN 1\", \"A.6\", \"LLM01\"). Returns each topic the clause sits in, with the clauses of the other frameworks on that topic, their strength (core or related) and the obligation-register ids joined to them.",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "list_patterns",
+      "title": "List patterns",
+      "description": "List the reusable governance patterns of the Body of Knowledge (chapter 05), optionally only those of one stack layer (1 Govern-as-Code, 2 Inventory & Transparency, 3 Evals & Red Teaming as Evidence, 4 Runtime Controls & Observability, 5 Assurance & Continuous Compliance; a pattern with a secondary layer is listed under both). Returns slugs for get_pattern, summaries, the frameworks each pattern maps to and the obligation ids that list it.",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_pattern",
+      "title": "Get a pattern",
+      "description": "Get one governance pattern by slug (\"policy-card\", \"kill-switch-circuit-breaker\"), chapter 05 id (\"pattern-aibom\"), page URL or title: its layer, summary, the frameworks it maps to, the obligation ids that list it and the full text of its page (objectives, context, problem, solution, consequences, related patterns, sources).",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "list_templates",
+      "title": "List templates and schemas",
+      "description": "List the templates-and-schemas library: JSON Schemas (with a filled example and a human Markdown template) for the records a governed AI lifecycle produces, from the use-case record to the decommissioning runbook, and the organisation-wide policy kit (AI policy in YAML, prose and Rego, committee charter, RACI, literacy curriculum, contract checklist). Optionally filter by lifecycle stage (intake, build, test, release, operate, retire, organisation). Returns names for get_template.",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_template",
+      "title": "Get a template or schema",
+      "description": "Get one entry of the templates-and-schemas library by name (\"policy-card\", \"impact-assessment\", \"incident-record\", \"ai-policy\", \"raci\"), file name or URL: what it records, its lifecycle stage and stack layers, the clauses it helps evidence, and the content of its files. part picks what to return: \"schema\" (the JSON Schema), \"example\" (a filled example that validates against it), \"template\" (the human Markdown template, or the kit files) or \"all\" (default).",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "search_bok",
+      "title": "Search the Body of Knowledge",
+      "description": "Search the 24 chapters of the AI Governance Engineer Body of Knowledge and its pattern pages: chapter titles, summaries and key points, section headings and section text. Every query word must match. Returns chapters, sections (with the URL of the heading anchor) and patterns, best first, each with a snippet. Use it to find where the book treats a subject (\"human oversight\", \"post-market monitoring\", \"agent identity\", \"conformity assessment\").",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    }
+  ],
+  "data": "https://aigovernanceengineer.com/api/v1/index.json"
+}

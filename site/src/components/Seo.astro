@@ -8,6 +8,9 @@ import { site } from '../data/site';
 import { siteGraph, type JsonLdInput } from '../lib/jsonld';
 import { linkBreadcrumbs } from '../lib/breadcrumbs';
 import { documentTitle, metaDescription, ogImageAlt } from '../lib/meta';
+// The page's clean Markdown twin (<url>.md), when it has one (src/lib/llms.ts).
+import { markdownAlternateFor } from '../lib/llms';
+const markdownAlternate = markdownAlternateFor(Astro.url.pathname);
 
 interface Props {
   title: string;
@@ -95,6 +98,7 @@ const graph = {
 <link rel="license" href={site.licenseUrl} />
 
 {alternates?.map((alt) => <link rel="alternate" hreflang={alt.hreflang} href={alt.href} />)}
+{markdownAlternate && <link rel="alternate" type="text/markdown" href={markdownAlternate} />}
 
 <meta property="og:type" content={article ? 'article' : 'website'} />
 <meta property="og:site_name" content={site.name} />
