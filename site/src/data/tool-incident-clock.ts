@@ -265,8 +265,11 @@ export const incidentRoles: readonly IncidentRole[] = [
 export interface SystemTier {
   id: string;
   label: string;
-  /** Date from which the high-risk regime, Art. 73 and Art. 26(5) included,
-   *  applies (chapter 17, "Dates are moving"). */
+  /** Date from which the high-risk regime applies after the Digital Omnibus
+   *  postponed Chapter III, Sections 1 to 3 (Art. 113(c)): Art. 26(5) with it,
+   *  and Art. 73 (Chapter IX, not itself postponed) in practice, since it reaches
+   *  a system only once Art. 6 classifies it as high-risk (chapter 17, "Dates
+   *  are moving"). */
   appliesFrom?: string;
 }
 
@@ -347,6 +350,8 @@ export interface RegimeDef {
     | 'other';
   /** Number of the source in the page's list. */
   source: number;
+  /** Further sources in the page's list that the row also rests on. */
+  extraSources?: readonly number[];
 }
 
 export const regimes: readonly RegimeDef[] = [
@@ -427,12 +432,15 @@ export const regimes: readonly RegimeDef[] = [
     label: 'DORA Art. 19 with RTS 2025/301',
     who: 'Financial entities',
     trigger: 'Major ICT-related incident',
-    first: 'Within 4 hours of classification as major, and no later than 24 hours from awareness',
+    first:
+      'Within 4 hours of classification as major, and no later than 24 hours from awareness; if classified as major only after those 24 hours, within 4 hours of that classification',
     followUp:
       'Intermediate within 72 hours of the initial notification; final within one month of the latest intermediate report',
     to: 'Financial competent authority',
     recordRegime: 'sector_regulator',
-    source: 6,
+    // DORA Art. 19 sets the duty; the time limits are RTS 2025/301 Art. 5.
+    source: 7,
+    extraSources: [6],
   },
 ];
 

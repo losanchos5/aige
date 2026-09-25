@@ -130,7 +130,7 @@ export function computeClocks(data, input) {
     });
   };
   const pendingNote = () =>
-    `Not yet in application on the awareness date: the high-risk regime, this duty included, applies to ${tier.id === 'annex-iii' ? 'Annex III systems' : 'Annex I systems'} from ${tier.appliesFrom} after the Digital Omnibus. The dates are shown for planning and drills.`;
+    `Not yet in application on the awareness date: after the Digital Omnibus, high-risk classification and the Chapter III duties apply to ${tier.id === 'annex-iii' ? 'Annex III systems' : 'Annex I systems'} from ${tier.appliesFrom}, and this duty reaches a system only from then. The dates are shown for planning and drills.`;
 
   // ---- EU AI Act Art. 73 ---------------------------------------------------------
   {
@@ -356,22 +356,27 @@ export function computeClocks(data, input) {
     } else {
       const outer = addHours(aware, n.doraAfterAwarenessHours);
       const fromClass = input.classifiedMs ? addHours(input.classifiedMs, n.doraAfterClassificationHours) : null;
-      const initial = fromClass !== null && fromClass < outer ? fromClass : outer;
+      // RTS 2025/301 Art. 5(2): a classification made after the 24 hours from
+      // awareness starts its own four-hour clock, so the 24-hour limit no longer caps it.
+      const lateClass = input.classifiedMs ? input.classifiedMs > outer : false;
+      const initial = fromClass !== null && (lateClass || fromClass < outer) ? fromClass : outer;
       const intermediate = addHours(initial, n.doraIntermediateHours);
       push(
         id,
         dets.has('dora-major') ? 'due' : 'assess',
         dets.has('dora-major')
           ? 'Major ICT-related incident of a financial entity.'
-          : 'Not classified as major yet. If it is, the initial notification is due within 4 hours of classification and no later than 24 hours from awareness.',
+          : `Not classified as major yet. If it is, the initial notification is due within ${n.doraAfterClassificationHours} hours of classification and no later than ${n.doraAfterAwarenessHours} hours from awareness; a classification made after those ${n.doraAfterAwarenessHours} hours starts its own ${n.doraAfterClassificationHours}-hour clock.`,
         [
           step(
             'initial',
             'Initial notification',
             initial,
-            fromClass !== null
-              ? `Within ${n.doraAfterClassificationHours} hours of classification as major, and no later than ${n.doraAfterAwarenessHours} hours from awareness (the earlier applies)`
-              : `No later than ${n.doraAfterAwarenessHours} hours from awareness; within ${n.doraAfterClassificationHours} hours of classification as major if that is earlier`,
+            fromClass === null
+              ? `No later than ${n.doraAfterAwarenessHours} hours from awareness; within ${n.doraAfterClassificationHours} hours of classification as major if that is earlier`
+              : lateClass
+                ? `Within ${n.doraAfterClassificationHours} hours of classification as major (classified after the first ${n.doraAfterAwarenessHours} hours from awareness, RTS 2025/301 Art. 5(2))`
+                : `Within ${n.doraAfterClassificationHours} hours of classification as major, and no later than ${n.doraAfterAwarenessHours} hours from awareness (the earlier applies)`,
           ),
           step('intermediate', 'Intermediate report, if the initial one goes on its deadline', intermediate, `Within ${n.doraIntermediateHours} hours of the initial notification`),
           step('final', 'Final report, if the intermediate one goes on its deadline', addMonths(intermediate, n.doraFinalMonths), 'Within one month of the latest intermediate report'),

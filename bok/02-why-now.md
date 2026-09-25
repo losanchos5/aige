@@ -146,9 +146,9 @@ answers it.
 The same pull shows up outside the EU. [California's SB 53](/bok/ai-laws-worldwide#united-states-state-laws-that-bind-private-organisations), the Transparency in Frontier Artificial
 Intelligence Act, signed on 29 September 2025 and in force since 1 January 2026, binds large frontier
 developers (models trained with more than 10^26 operations; annual revenue above USD 500 million) to
-publish a frontier AI framework and to report critical safety incidents to the state's Office of
-Emergency Services within 15 days, with civil penalties of up to USD 1 million per violation recovered
-by the Attorney General [17][18]. Its scope is narrow (chapter 08 sets it beside the other
+publish a frontier AI framework, and every frontier developer, large or not, to report critical
+safety incidents to the state's Office of Emergency Services within 15 days, with civil penalties of
+up to USD 1 million per violation recovered by the Attorney General [17][18]. Its scope is narrow (chapter 08 sets it beside the other
 [US state laws](/bok/regulatory-map#us-federal-and-state-laws)), but what it asks for, a published
 framework and [an incident pipeline that runs on a clock](/bok/incidents#the-overlapping-clocks), is again an
 engineering deliverable.

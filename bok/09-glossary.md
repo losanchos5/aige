@@ -700,7 +700,9 @@ results, files high-impact confirmation requests and supports the high-impact me
 **Downstream modifier (GPAI).** An actor that fine-tunes or otherwise modifies a general-purpose AI
 model that someone else placed on the market. The Commission treats it as the provider of the
 modified model only when the modification uses more than one third of the original training compute,
-and limits its duties to the modification [65]. Contrast with [Downstream
+and limits its documentation, copyright-policy and training-summary duties to the modification; if
+the original model has systemic risk, the modified model is presumed to have it too, with the
+systemic-risk duties [65][76]. Contrast with [Downstream
 provider](/glossary/downstream-provider). See [ch. 15, When a deployer becomes a
 provider](/bok/governing-deployment#when-a-deployer-becomes-a-provider); [ch. 18, When a fine-tuner
 becomes a GPAI provider](/bok/eu-ai-act#when-a-fine-tuner-becomes-a-gpai-provider). (ch. 15, 18)
@@ -1264,8 +1266,9 @@ structured eval results, signed logs), as opposed to screenshots and exported sp
 
 **Major ICT-related incident (DORA).** Under the EU Digital Operational Resilience Act, an
 ICT-related incident at a financial entity that meets the classification criteria for a major
-incident. It is reported within 4 hours of classification and no later than 24 hours from awareness,
-then in intermediate and final reports [91]. See [ch. 17, The overlapping
+incident. It is reported within 4 hours of classification and no later than 24 hours from awareness
+(within 4 hours of a classification made after those 24 hours), then in intermediate and final
+reports [91]. See [ch. 17, The overlapping
 clocks](/bok/incidents#the-overlapping-clocks). (ch. 17)
 
 **Manufacturing defect.** In product liability, a departure of a unit from its own design [60]. For
@@ -1827,10 +1830,10 @@ AI](/glossary/shadow-ai). See [ch. 12, Acceptable use of AI by
 staff](/bok/governance-program#acceptable-use-of-ai-by-staff); [ch. 05, Pattern: Sanctioned AI
 Gateway](/patterns/sanctioned-ai-gateway). (ch. 05, 12)
 
-**SB 53.** California's frontier-AI transparency law (TFAIA), in force 1 Jan 2026, covering large
-frontier developers training models above 10^26 FLOP, with transparency and safety-framework
-obligations [14]. See [ch. 08, Frontier-developer
-laws](/bok/regulatory-map#frontier-developer-laws). (ch. 08, 21)
+**SB 53.** California's frontier-AI transparency law (TFAIA), in force 1 Jan 2026, covering frontier
+developers training models above 10^26 FLOP: all of them publish transparency reports and report
+critical safety incidents, and large frontier developers also publish a safety framework [14]. See
+[ch. 08, Frontier-developer laws](/bok/regulatory-map#frontier-developer-laws). (ch. 08, 21)
 
 **Self-supervised learning.** Learning by predicting parts of the input itself, such as the next
 token, over large corpora; the AI Act's definition of a general-purpose model names self-supervision
@@ -2147,8 +2150,8 @@ Runtime Controls & Observability](/bok/the-stack#layer-04-runtime-controls--obse
 [11] Policy Cards: machine-readable runtime governance artefacts for agents. arXiv 2510.24383. 2025-10. https://arxiv.org/abs/2510.24383 (verified: primary)
 [12] "Governor Hochul Signs Nation-Leading Legislation to Require AI Frameworks for AI Frontier Models" (RAISE Act, S6953B/A6453B, signed 19 Dec 2025; oversight office within the Department of Financial Services). Governor Kathy Hochul (New York State). 2025-12-19. https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models (verified: primary)
 [13] "Best AI Governance Platforms in 2026: 14 Enterprise Vendors Compared" (vendor-published comparison of the 13 Magic Quadrant vendors plus its own product; most of the category "manages the program … without any runtime data path"). Kosmoy. 2026-07-10. https://www.kosmoy.com/resources/blog/best-ai-governance-platforms-2026/ (verified: secondary)
-[14] California SB 53 / TFAIA (in force 1 Jan 2026; models above 10^26 FLOP; large frontier developers). Future of Privacy Forum. 2025-10-03. https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ (verified: secondary)
-[15] "New York Finalizes RAISE Act for Frontier AI Models; Law Takes Effect January 1, 2027" (chapter amendment signed 27 Mar 2026; effective 1 Jan 2027; framework for large frontier developers, incident reports for every frontier developer; DFS oversight office). Wiley. 2026. https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027 (verified: secondary)
+[14] California SB 53 / TFAIA (models above 10^26 FLOP; transparency reports and incident reports by all frontier developers; frameworks by large frontier developers). Future of Privacy Forum. 2025-10-03. https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/ (verified: secondary)
+[15] "New York Finalizes RAISE Act for Frontier AI Models; Law Takes Effect January 1, 2027" (chapter amendment signed 27 Mar 2026; effective 1 Jan 2027; framework for large frontier developers, critical safety incident reports for every frontier developer; DFS oversight office). Wiley. 2026. https://www.wiley.law/alert-New-York-Finalizes-RAISE-Act-for-Frontier-AI-Models-Law-Takes-Effect-January-1-2027 (verified: secondary)
 [16] The General-Purpose AI Code of Practice (published 10 Jul 2025; a voluntary tool; three chapters: Transparency, Copyright, Safety and Security). European Commission. 2025-07-10. https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai (verified: primary)
 [17] ISO/IEC 42005:2025, AI system impact assessment (companion to Art. 27 and ISO 42001 Annex A.5). ISO/IEC. 2025-05. https://www.iso.org/standard/44545.html (verified: secondary)
 [18] 《人工智能安全治理框架3.0》发布: announcement of the AI Safety Governance Framework 3.0 (TC260 under CAC guidance). Cyberspace Administration of China. 2026-09-14. https://www.cac.gov.cn/2026-09/14/c_1791137092283345.htm (verified: primary)
@@ -2209,7 +2212,7 @@ Runtime Controls & Observability](/bok/the-stack#layer-04-runtime-controls--obse
 [73] On the Opportunities and Risks of Foundation Models ("trained on broad data at scale"; defects inherited downstream; arXiv 2108.07258). Bommasani et al. (Stanford CRFM). 2021-08-16. https://arxiv.org/abs/2108.07258 (verified: primary)
 [74] Council of Europe Framework Convention on Artificial Intelligence and Human Rights, Democracy and the Rule of Law (CETS No. 225) (Art. 3 scope and private-actor declaration; Arts. 14 and 15 remedies and safeguards; Art. 16 risk and impact management). Council of Europe. 2024-09-05. https://rm.coe.int/1680afae3c (verified: primary)
 [75] Artificial Intelligence Risk Management Framework: Generative Artificial Intelligence Profile, NIST AI 600-1 (twelve risks unique to or exacerbated by generative AI; confabulation defined). NIST. 2024-07. https://doi.org/10.6028/NIST.AI.600-1 (verified: primary)
-[76] Commission Guidelines on the scope of the obligations for providers of general-purpose AI models (C(2025) 7719 final; content approved 18 Jul 2025; non-binding; indicative criterion of training compute above 10^23 FLOP with the ability to generate language, images or video). European Commission. 2025-11-19. https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act (verified: primary)
+[76] Commission Guidelines on the scope of the obligations for providers of general-purpose AI models (content approved 18 July 2025 by C(2025) 5045 final; formal text C(2025) 7719 final of 19 Nov 2025; paras. 65 to 68 on modifiers; non-binding; indicative criterion of training compute above 10^23 FLOP with the ability to generate language, images or video). European Commission. 2025-11-19. https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act (verified: primary)
 [77] "Feature Toggles (aka Feature Flags)" (release, experiment, ops and permissioning toggles; ops kill switches for graceful degradation). Pete Hodgson, martinfowler.com. 2017-10-09. https://martinfowler.com/articles/feature-toggles.html (verified: primary)
 [78] Management system standards (Harmonized Structure; Annex SL common text; integrated management systems). ISO. 2026. https://www.iso.org/management-system-standards.html (verified: primary)
 [79] Hiroshima Process International Code of Conduct for Organizations Developing Advanced AI Systems (11 actions; voluntary; builds on the OECD AI Principles). G7 / European Commission. 2023-10-30. https://digital-strategy.ec.europa.eu/en/library/hiroshima-process-international-code-conduct-advanced-ai-systems (verified: primary)
@@ -2224,7 +2227,7 @@ Runtime Controls & Observability](/bok/the-stack#layer-04-runtime-controls--obse
 [88] Opinion 28/2024 on certain data protection aspects related to the processing of personal data in the context of AI models (three-step legitimate-interest test; anonymity test and evidence). European Data Protection Board. 2024-12-17. https://www.edpb.europa.eu/system/files/2024-12/edpb_opinion_202428_ai-models_en.pdf (verified: primary)
 [89] "'Why Should I Trust You?': Explaining the Predictions of Any Classifier" (Ribeiro, Singh and Guestrin; LIME; arXiv 1602.04938). arXiv. 2016-02-16. https://arxiv.org/abs/1602.04938 (verified: primary)
 [90] "Machine Unlearning" (Bourtoule et al.; SISA training; arXiv 1912.03817). arXiv. 2019-12-09. https://arxiv.org/abs/1912.03817 (verified: primary)
-[91] Commission Delegated Regulation (EU) 2025/301 (Art. 5, time limits for major ICT-related incident reports under DORA). Publications Office of the EU (EUR-Lex). 2024-10-23. https://eur-lex.europa.eu/eli/reg_del/2025/301/oj/eng (verified: primary)
+[91] Commission Delegated Regulation (EU) 2025/301 (Art. 5, time limits for major ICT-related incident reports under DORA; Art. 5(2) late classification). Publications Office of the EU (EUR-Lex). 2024-10-23. https://eur-lex.europa.eu/eli/reg_del/2025/301/oj/eng (verified: primary)
 [92] "Membership Inference Attacks against Machine Learning Models" (Shokri et al.; arXiv 1610.05820). arXiv. 2016-10-18. https://arxiv.org/abs/1610.05820 (verified: primary)
 [93] Hierarchy of Controls (elimination, substitution, engineering controls, administrative controls, PPE). CDC / NIOSH. 2024-04-10. https://www.cdc.gov/niosh/hierarchy-of-controls/about/index.html (verified: primary)
 [94] "Model Inversion Attacks that Exploit Confidence Information and Basic Countermeasures" (Fredrikson, Jha and Ristenpart; CCS 2015). ACM. 2015-10-12. https://doi.org/10.1145/2810103.2813677 (verified: primary)

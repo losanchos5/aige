@@ -344,6 +344,9 @@ test.describe('builders-b logic', () => {
     // Without a classification time, DORA's outer limit is 24 hours.
     const outer = computeClocks(incidentModel, { awareMs: later, roles: ['dora'], tier: 'not-high-risk', facts: ['limited'], determinations: [], conditions: [] });
     expect(iso(clock(outer, 'dora_art19').steps[0].dueMs)).toBe('2028-01-11T09:00:00Z');
+    // RTS 2025/301 Art. 5(2): a classification made after those 24 hours starts its own four hours.
+    const late = computeClocks(incidentModel, { awareMs: later, classifiedMs: Date.parse('2028-01-12T09:00:00Z'), roles: ['dora'], tier: 'not-high-risk', facts: ['limited'], determinations: ['dora-major'], conditions: [] });
+    expect(iso(clock(late, 'dora_art19').steps[0].dueMs)).toBe('2028-01-12T13:00:00Z');
     expect(new Date(addMonths(Date.parse('2027-01-31T10:00:00Z'), 1)).toISOString()).toBe('2027-02-28T10:00:00.000Z');
   });
 

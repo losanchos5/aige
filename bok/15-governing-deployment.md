@@ -267,8 +267,10 @@ General-purpose models have their own test. The Commission's guidelines on GPAI 
 (content approved on 18 July 2025, adopted as C(2025) 7719 final on 19 November 2025) [16] treat an
 actor that modifies or fine-tunes a GPAI model as the provider of the modified model only in
 exceptional cases, with an indicative criterion: the modification uses more than one third of the
-original model's training compute. The obligations then cover the modification, not the whole model
-[17]. The criterion is indicative, and how it applies to
+original model's training compute. The documentation, copyright-policy and training-summary
+obligations then cover the modification, not the whole model [17]; where the original model has
+systemic risk, the guidelines presume the modified model has it too, with the full systemic-risk
+duties [16]. The criterion is indicative, and how it applies to
 distillation or repeated adapter training is a question to put to counsel (verify). The engineering
 consequence is plain either way: log the compute of every fine-tune as an artefact, because the
 question will be asked.
@@ -819,7 +821,7 @@ conformity.
 [13] Energy and AI, executive summary (data-centre electricity 415 TWh in 2024, around 945 TWh by 2030). International Energy Agency. 2025-04. https://www.iea.org/reports/energy-and-ai/executive-summary (verified: primary)
 [14] EU AI Act Annex XI, Section 1, point 2(e) (GPAI technical documentation: known or estimated energy consumption of the model). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-11 (verified: primary)
 [15] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 25 (value chain: 25(1)(a) name or trademark, (b) substantial modification, (c) changed intended purpose; 25(2) cooperation of the initial provider; 25(4) written agreement with third-party suppliers). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_25 (verified: primary)
-[16] Commission Guidelines on the scope of the obligations for providers of general-purpose AI models established by Regulation (EU) 2024/1689 (C(2025) 7719 final; content approved 18 Jul 2025). European Commission. 2025-11-19. https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act (verified: primary)
+[16] Commission Guidelines on the scope of the obligations for providers of general-purpose AI models established by Regulation (EU) 2024/1689 (C(2025) 7719 final; content approved 18 Jul 2025; paras. 67 to 68: a modified systemic-risk model is presumed to have systemic risk). European Commission. 2025-11-19. https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act (verified: primary)
 [17] Guidelines on obligations for general-purpose AI providers, FAQ (modifiers become providers only when the modification uses more than one third of the original model's training compute; obligations limited to documenting the modification). European Commission. 2025. https://digital-strategy.ec.europa.eu/en/faqs/guidelines-obligations-general-purpose-ai-providers (verified: primary)
 [18] EU AI Act Art. 13(3) (instructions for use: capabilities and limitations of performance; pre-determined changes; human oversight measures; expected lifetime and maintenance measures, including their frequency; log collection). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-13 (verified: primary)
 [19] Apache License, Version 2.0 (section 3, grant of patent licence). Apache Software Foundation. 2004-01. https://www.apache.org/licenses/LICENSE-2.0 (verified: primary)

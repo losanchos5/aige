@@ -375,7 +375,7 @@ other way. An interpretable model is the default when most of the following hold
 - **The decision has legal or similarly significant effects on a person** (credit, employment,
   benefits, insurance, education), so reasons are owed by law.
 - **The reasons must be the factors actually used.** Regulation B requires adverse-action reasons to
-  relate to the factors actually considered or scored [31]; a post-hoc approximation can drift.
+  relate to the factors actually considered or scored [57]; a post-hoc approximation can drift.
 - **The data is tabular with meaningful features**, where interpretable models are often
   competitive.
 - **Validators or regulators must reproduce the logic**, as in model risk management.
@@ -498,7 +498,7 @@ the applicant missed internal standards or a qualifying score is insufficient [3
 commentary adds the engineering detail: more than four reasons is not likely to be helpful; reasons
 must relate to and accurately describe the factors actually considered or scored; no principal
 reason may be left out; and no single selection method is required, with two reference methods that
-compare the applicant's score on each factor against average scores [31]. When the action rests on a
+compare the applicant's score on each factor against average scores [57]. When the action rests on a
 consumer report, the FCRA adds the credit score used and up to four key factors [41].
 
 The CFPB's two circulars applying these duties to complex algorithms and to sample reason forms were
@@ -518,9 +518,11 @@ can itself be an Article 22(1) decision where a third party draws strongly on it
 scoring provider, not only the lender, can owe the safeguards. In *Dun & Bradstreet Austria*
 (C-203/22, 27 February 2025) it held that the controller must explain the procedure and principles
 actually applied, that a complex mathematical formula does not meet the duty, and that trade secrets
-go to the authority or court for a case-by-case balance rather than justifying refusal [47].
-Commentators read the judgment as accepting an explanation of how a variation in the data would have
-changed the result [48]: a counterfactual explanation in legal language.
+go to the authority or court for a case-by-case balance rather than justifying refusal [47]. The
+Court added that, for profiling, the national court could find it sufficiently transparent and
+intelligible to tell the data subject how far a variation in the personal data taken into account
+would have led to a different result (para. 62) [47][48]: a counterfactual explanation in legal
+language.
 
 In the UK, the Data (Use and Access) Act 2025 replaced Article 22 with Articles 22A to 22D, which
 treat a decision as solely automated where there is no meaningful human involvement and require
@@ -567,7 +569,7 @@ all three.
 | **Stability** | Near-identical inputs get near-identical explanations and reason codes | Functional | Top-k reason overlap above a threshold under small perturbations |
 | **Sanity** | The explanation changes when the model is randomised [36] | Functional | Explanation similarity after weight randomisation below a threshold |
 | **Manipulation resistance** | Off-manifold probing cannot hide a known bias [35] | Functional | Planted-bias test model is detected by the explanation method |
-| **Reason-code consistency** | Reason codes match the factors that actually drove the decision [31] | Functional | 100% of sampled denials have reasons drawn from scored factors |
+| **Reason-code consistency** | Reason codes match the factors that actually drove the decision [57] | Functional | 100% of sampled denials have reasons drawn from scored factors |
 | **Counterfactual validity** | The suggested change flips the decision and uses only mutable features | Functional | All sampled counterfactuals valid and actionable |
 | **Comprehension** | The intended audience can state the main reason and what they could change | Human-grounded | A majority of a test panel answers both questions correctly |
 | **Decision support** | Reviewers with explanations decide better, not only faster, and are not led into automation bias | Application-grounded | Override accuracy with explanations at least equal to without |
@@ -651,11 +653,11 @@ where you ask for the provider's own disaggregated results and explanation-metho
 
 The standards shelf for this work is short. NIST SP 1270 frames bias [2], NIST IR 8312 frames
 explanation [29], and ISO/IEC TR 24027:2021 covers bias in AI systems and AI-aided decision making
-[55]; it is referenced here by number only. ISO/IEC TS 6254 is the SC 42 document on explainability
-and interpretability of machine-learning models and AI systems; its title and publication status
-were not confirmed for this edition (verify before citing it). None of these is a harmonised
-standard, and none confers a presumption of conformity with the AI Act (see [the regulatory
-map](/bok/regulatory-map#eu-ai-act-post-omnibus)).
+[55]; it is referenced here by number only. ISO/IEC TS 6254:2025 (published September 2025) is the
+SC 42 document on objectives and approaches for explainability and interpretability of
+machine-learning models and AI systems [56]; it too is referenced here by number only. None of
+these is a harmonised standard, and none confers a presumption of conformity with the AI Act (see
+[the regulatory map](/bok/regulatory-map#eu-ai-act-post-omnibus)).
 
 ### Gate conditions
 
@@ -748,7 +750,7 @@ Arts. 22A–22D · ECOA / Regulation B, FCRA · US Uniform Guidelines (29 CFR 16
 [28] "Aequitas: A Bias and Fairness Audit Toolkit" (P. Saleiro et al.). arXiv 1811.05577. 2018-11-14. https://arxiv.org/abs/1811.05577 (verified: primary)
 [29] NIST IR 8312, Four Principles of Explainable Artificial Intelligence (explanation, meaningful, explanation accuracy, knowledge limits). NIST. 2021-09-29. https://doi.org/10.6028/NIST.IR.8312 (verified: primary)
 [30] "Stop Explaining Black Box Machine Learning Models for High Stakes Decisions and Use Interpretable Models Instead" (C. Rudin; Nature Machine Intelligence 1:206-215, May 2019). arXiv 1811.10154. 2018-11-26. https://arxiv.org/abs/1811.10154 (verified: primary)
-[31] 12 CFR 1002.9 (Regulation B, notifications; 1002.9(b)(2) specific principal reasons) and Supplement I, comment 9(b)(2)-1 to -5 (more than four reasons not likely helpful; reasons must relate to factors actually considered or scored; reason-selection methods). eCFR (text as of 2026-09-01). 2026-09-01. https://www.ecfr.gov/current/title-12/chapter-X/part-1002/section-1002.9 (verified: primary)
+[31] 12 CFR 1002.9 (Regulation B, notifications; 1002.9(b)(2) specific principal reasons; the official commentary is [57]). eCFR (text as of 2026-09-01). 2026-09-01. https://www.ecfr.gov/current/title-12/chapter-X/part-1002/section-1002.9 (verified: primary)
 [32] "A Unified Approach to Interpreting Model Predictions" (S. Lundberg, S.-I. Lee; SHAP). arXiv 1705.07874. 2017-05-22. https://arxiv.org/abs/1705.07874 (verified: primary)
 [33] "'Why Should I Trust You?': Explaining the Predictions of Any Classifier" (M. T. Ribeiro, S. Singh, C. Guestrin; LIME). arXiv 1602.04938. 2016-02-16. https://arxiv.org/abs/1602.04938 (verified: primary)
 [34] "Axiomatic Attribution for Deep Networks" (M. Sundararajan, A. Taly, Q. Yan; integrated gradients; sensitivity and implementation invariance). arXiv 1703.01365. 2017-03-04. https://arxiv.org/abs/1703.01365 (verified: primary)
@@ -764,12 +766,14 @@ Arts. 22A–22D · ECOA / Regulation B, FCRA · US Uniform Guidelines (29 CFR 16
 [44] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 86 (right to explanation of individual decision-making; Annex III except point 2; subsidiary to other Union law under 86(3)). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_86 (verified: primary)
 [45] Withdrawn guidance (Circular 2022-03 on adverse-action notices for credit decisions based on complex algorithms and Circular 2023-03 on adverse-action reasons and sample forms, both withdrawn 12 May 2025). Consumer Financial Protection Bureau. 2025-05-12. https://www.consumerfinance.gov/compliance/guidance/withdrawn-guidance/ (verified: primary)
 [46] "CJEU's first ruling on Article 22 GDPR: 'credit scoring' is an automated decision" (C-634/21 SCHUFA, 7 Dec 2023; a probability value is an Art. 22(1) decision where a third party draws strongly on it). Cloisters. 2023-12-14. https://www.cloisters.com/latest/cjeus-first-ruling-on-article-22-gdpr-credit-scoring-is-an-automated-decision (verified: secondary)
-[47] CJEU, 27 February 2025, CK v Magistrat der Stadt Wien and Dun & Bradstreet Austria GmbH, C-203/22 (Art. 15(1)(h): explain "the procedure and principles actually applied"; a complex mathematical formula is not a sufficiently concise and intelligible explanation; trade secrets balanced case by case). JuLIA project case-law database. 2025-02-27. https://www.julia-project.eu/database/case-law/319 (verified: secondary)
-[48] "ECJ Ruling on Automated Decision-Making and Data Subject Access" (C-203/22 read as requiring an explanation of how variations in the data might change the outcome). Clyde & Co. 2025-03. https://clydeco.com/en/insights/2025/03/ecj-ruling-on-automated-decision-making-and-data-s (verified: secondary)
+[47] CJEU, 27 February 2025, CK v Magistrat der Stadt Wien and Dun & Bradstreet Austria GmbH, C-203/22 (paras. 58 to 62 and 74 to 76; Art. 15(1)(h): explain "the procedure and principles actually applied"; a complex mathematical formula is not a sufficiently concise and intelligible explanation; for profiling, the effect of a variation in the personal data on the result can suffice (para. 62); trade secrets balanced case by case by the authority or court). Court of Justice of the EU (EUR-Lex). 2025-02-27. https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62022CJ0203 (verified: primary)
+[48] "ECJ Ruling on Automated Decision-Making and Data Subject Access" (commentary on C-203/22: an explanation of how variations in the data might change the outcome). Clyde & Co. 2025-03. https://clydeco.com/en/insights/2025/03/ecj-ruling-on-automated-decision-making-and-data-s (verified: secondary)
 [49] Explaining decisions made with AI (co-badged ICO and The Alan Turing Institute guidance; six explanation types; under review after the Data (Use and Access) Act). Information Commissioner's Office. consulted 2026-09-24. https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/explaining-decisions-made-with-artificial-intelligence/ (verified: primary)
-[50] "The Digital Omnibus: a step back from the brink, the risks remain" (first Council compromise drops the proposed rewrite of GDPR Art. 22; GDPR amendments still in negotiation). European Digital Rights (EDRi). 2026-03-17. https://edri.org/our-work/the-digital-omnibus-a-step-back-from-the-brink-but-the-risks-remain/ (verified: secondary)
+[50] "The Digital Omnibus: a step back from the brink, but the risks remain" (first Council compromise drops the proposed rewrite of GDPR Art. 22; GDPR amendments still in negotiation). European Digital Rights (EDRi). 2026-03-17. https://edri.org/our-work/the-digital-omnibus-a-step-back-from-the-brink-but-the-risks-remain/ (verified: secondary)
 [51] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 26(11) (deployers of Annex III high-risk systems that make or assist decisions about natural persons must inform them). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_26 (verified: primary)
 [52] "Towards A Rigorous Science of Interpretable Machine Learning" (F. Doshi-Velez, B. Kim; application-grounded, human-grounded and functionally-grounded evaluation). arXiv 1702.08608. 2017-02-28. https://arxiv.org/abs/1702.08608 (verified: primary)
 [53] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 16(l) (providers of high-risk systems ensure accessibility requirements under Directives (EU) 2016/2102 and (EU) 2019/882). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_16 (verified: primary)
 [54] Web Content Accessibility Guidelines (WCAG) 2.2 (W3C Recommendation; SC 1.1.1, 1.4.1, 3.1.5). W3C. 2024-12-12. https://www.w3.org/TR/WCAG22/ (verified: primary)
 [55] ISO/IEC TR 24027:2021, Bias in AI systems and AI aided decision making (referenced by identifier and title only). ISO/IEC JTC 1/SC 42. 2021. https://www.iso.org/standard/77607.html (verified: secondary)
+[56] ISO/IEC TS 6254:2025, Information technology, Artificial intelligence: Objectives and approaches for explainability and interpretability of machine learning (ML) models and artificial intelligence (AI) systems (published, edition 1; referenced by identifier and title only). ISO/IEC JTC 1/SC 42. 2025-09. https://www.iso.org/standard/82148.html (verified: primary)
+[57] 12 CFR Part 1002, Supplement I, Official Interpretations, comments 9(b)(2)-1 to -5 (more than four reasons not likely helpful; reasons must relate to and accurately describe the factors actually considered or scored; no principal reason left out; no single reason-selection method required, two reference methods against average scores). eCFR (text as of 2026-09-01). 2026-09-01. https://www.ecfr.gov/current/title-12/chapter-X/part-1002/appendix-Supplement%20I%20to%20Part%201002 (verified: primary)
