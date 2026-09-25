@@ -132,8 +132,8 @@ decides, the gates enforce](/bok/governance-program#the-committee-decides-the-ga
 
 **AI governance engineer.** The person who holds the capability of AI governance engineering and is
 accountable for the three questions in production; a capability and a role, not necessarily a job
-title. See [ch. 06, Capability first, title second](/bok/the-role#capability-first-title-second).
-(ch. 06)
+title. See [AI governance engineer](/role); [ch. 06, Capability first, title
+second](/bok/the-role#capability-first-title-second). (ch. 06)
 
 **AI governance engineering.** The application of engineering practice (systems thinking, product
 thinking and code) to the governance of AI systems; measured by realised risk reduction and
