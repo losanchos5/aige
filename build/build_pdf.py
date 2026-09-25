@@ -82,11 +82,23 @@ PATTERN_PAGES = BOK / "patterns"
 FRONTMATTER_RE = re.compile(r"\A---\r?\n(.*?)\r?\n---\r?\n", re.S)
 
 
+def _frontmatter(text: str) -> tuple[dict[str, str], str]:
+    """Split a chapter or pattern file into its flat `key: value` frontmatter and its body."""
+    match = FRONTMATTER_RE.match(text)
+    if not match:
+        return {}, text
+    fields: dict[str, str] = {}
+    for line in match.group(1).splitlines():
+        key, _, value = line.partition(":")
+        fields[key.strip()] = value.strip().strip('"')
+    return fields, text[match.end():]
+
+
 def _chapter_label(path: Path) -> str:
     label = CHAPTER_LABELS.get(path.stem)
     if label:
         return label
-    first = path.read_text(encoding="utf-8").lstrip().splitlines()[0]
+    first = _frontmatter(path.read_text(encoding="utf-8"))[1].lstrip().splitlines()[0]
     match = re.match(r"#\s+(\d{2})\.\s+(.*)$", first)
     return f"{match.group(1)} · {match.group(2).strip()}" if match else path.stem
 
@@ -111,18 +123,6 @@ DOCS: list[tuple[str, Path, str]] = [
 def render_markdown(text: str) -> str:
     md = markdown.Markdown(extensions=["tables", "fenced_code", "toc", "attr_list"])
     return md.convert(text)
-
-
-def _frontmatter(text: str) -> tuple[dict[str, str], str]:
-    """Split a pattern file into its flat `key: value` frontmatter and its body."""
-    match = FRONTMATTER_RE.match(text)
-    if not match:
-        return {}, text
-    fields: dict[str, str] = {}
-    for line in match.group(1).splitlines():
-        key, _, value = line.partition(":")
-        fields[key.strip()] = value.strip().strip('"')
-    return fields, text[match.end():]
 
 
 def _demote(markdown_text: str) -> str:
@@ -170,7 +170,7 @@ def document_markdown(path: Path) -> str:
     """The Markdown the PDF renders for one document (chapter 05 is assembled)."""
     if path == PATTERNS_CHAPTER and PATTERN_PAGES.is_dir():
         return patterns_chapter_markdown()
-    return path.read_text(encoding="utf-8")
+    return _frontmatter(path.read_text(encoding="utf-8"))[1]
 
 
 def prefix_ids(chunk: str, key: str) -> str:
