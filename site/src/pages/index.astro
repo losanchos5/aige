@@ -234,7 +234,7 @@ const resources = [
       <a class="btn btn-primary btn-glow" style="--i:1" href="/thesis">Read the Thesis</a>
     </div>
 
-    <HeroStrip variant="frameworks" facts={facts} caption={HERO_ART} />
+    <HeroStrip variant="frameworks" facts={facts} />
 
     {!HERO_ART && <script is:inline defer src="/hero-field.js"></script>}
     {HERO_ART && <script is:inline async src="/hero-art.js"></script>}
