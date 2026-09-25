@@ -63,7 +63,7 @@ jobs:
       LANGS: ${{ github.event_name == 'workflow_dispatch' && inputs.langs || 'es,fr,de,pt' }}
       MAX_USD: ${{ github.event_name == 'workflow_dispatch' && inputs.max_usd || '0.50' }}
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # No token left in .git/config while the pipeline runs.
           persist-credentials: false
