@@ -19,6 +19,7 @@ import {
 import { obligationGroups, obligationPath } from '../../lib/obligations';
 import { layerName } from '../../lib/api';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { fitsSiteSuffix } from '../../lib/seo-title';
 import {
   authorNodes,
   authorRefs,
@@ -34,8 +35,10 @@ import '../../styles/obligations.css';
 const groups = obligationGroups();
 const instrumentCount = new Set(obligations.map((o) => o.frameworkId)).size;
 const pageUrl = new URL('/obligations', site.url).href;
-const description =
-  'Every obligation in the regulatory map with a stable id, its application date and status, the artefact that evidences it and its stack layer.';
+// Search title and description (SXO-N3, 2026-09-25 audit): the query first;
+// the H1 stays.
+const seoTitle = 'AI law obligations register: EU AI Act duties with ids';
+const description = `AI law obligations register: ${obligations.length} duties across ${instrumentCount} instruments, from the EU AI Act to US state law, each with a stable id, date, status and evidence.`;
 const crumbs = [{ label: 'Obligations' }];
 
 const statusOrder: AppliesStatus[] = [
@@ -103,7 +106,7 @@ const jsonLd = [
 ];
 ---
 
-<Base title="Obligation register" description={description} image="/og/obligations.png" jsonLd={jsonLd}>
+<Base title={seoTitle} titleSuffix={fitsSiteSuffix(seoTitle)} description={description} image="/og/obligations.png" jsonLd={jsonLd}>
   <PageHero
     variant="res"
     crumbs={crumbs}

@@ -23,7 +23,8 @@ const HUB = [
   '/figures',
   '/resources/tools',
   '/toolkit',
-  '/resources/reading-list',
+  // The canonical chapter; /resources/reading-list is its filtered view.
+  '/bok/reading-list',
   '/bok/glossary',
   '/resources/data',
   '/mcp',

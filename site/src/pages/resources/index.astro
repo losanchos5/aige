@@ -121,7 +121,9 @@ const entries = [
   },
   {
     title: 'Reading list',
-    href: '/resources/reading-list',
+    // The canonical chapter, not /resources/reading-list (its filtered view,
+    // which declares the chapter as rel=canonical).
+    href: '/bok/reading-list',
     swatch: 'var(--l5)',
     description:
       'The annotated bibliography that formed the discipline, grouped by theme, each source with a verified URL and a one-line note.',
@@ -213,7 +215,9 @@ const jsonLd = {
   >
     <p slot="note">
       Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync
-      with it.
+      with it. For the field these references serve, start with <a href="/ai-governance"
+        >AI governance: definition and frameworks</a
+      >.
     </p>
   </PageHero>
 

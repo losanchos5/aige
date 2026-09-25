@@ -18,6 +18,7 @@ import Diagram from '../components/Diagram.astro';
 import StatTile from '../components/StatTile.astro';
 import VerdictStamp from '../components/VerdictStamp.astro';
 import CtaBand from '../components/CtaBand.astro';
+import Byline from '../components/Byline.astro';
 import {
   capabilityStatement,
   analystDistinction,
@@ -31,8 +32,12 @@ import {
 import { levels } from '../data/maturity';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 import { fitsSiteSuffix } from '../lib/seo-title';
+import { lastModified } from '../lib/jsonld';
 
 const roleHref = (anchor: string) => `/bok/the-role#${anchor}`;
+// The visible author and date under the H1 (SXO-06): dated from the page
+// and its data, the same sources as the sitemap's lastmod (astro.config.ts).
+const updated = lastModified('src/pages/role.astro', 'src/data/role.ts', 'src/data/maturity.ts');
 const maturityHref = `/bok/maturity-model#${levels[0].anchor}`;
 
 const primaryStats = market.filter((stat) => stat.primary);
@@ -87,7 +92,9 @@ const answers = {
     related={{ label: 'Chapter 06 · Body of Knowledge', href: '/bok/the-role' }}
     title="What an AI Governance Engineer does."
     lede={capabilityStatement}
-  />
+  >
+    <Byline slot="lede" date={updated} />
+  </PageHero>
 
   <Section
     tone="plain"

@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Doc from '../../layouts/Doc.astro';
 import AtAGlance from '../../components/AtAGlance.astro';
 import NewsletterForm from '../../components/NewsletterForm.astro';
+import PillarLink from '../../components/PillarLink.astro';
 import { chaptersOrdered } from '../../data/chapters';
 import { site } from '../../data/site';
 import { gitCreated, gitDate } from '../../lib/reading';
@@ -144,6 +145,18 @@ const breadcrumb = {
 // DefinedTermSet that every /glossary/<slug> term page points at (lib/jsonld.ts).
 const glossarySet = chapter.slug === 'glossary' ? [glossaryTermSet(getGlossary(), updated)] : [];
 
+// Hub and spoke (SXO-N2): every chapter points at the /ai-governance pillar in
+// one line under its header, the anchor varied by part. The definition and the
+// glossary already link the pillar from their own text.
+const pillarAnchor: Record<string, string> = {
+  discipline: 'what AI governance is',
+  reference: 'AI governance explained',
+  foundations: 'AI governance: definition and frameworks',
+  lifecycle: 'the definition of AI governance',
+  law: 'what AI governance is and which frameworks shape it',
+};
+const showPillar = chapter.slug !== 'definition' && chapter.slug !== 'glossary';
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [book, article, ...authorNodes, breadcrumb, ...glossarySet],
@@ -170,6 +183,7 @@ const jsonLd = {
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
   alternates={alternatesFor(`/bok/${chapter.slug}`)}
 >
+  {showPillar && <PillarLink lead="New to the field? Start with" anchor={pillarAnchor[chapter.part]} />}
   <AtAGlance items={chapter.glance} terms={keyTerms} />
   <Content />
   {/* After the sources: the sign-up, out of the search index and of snippets so

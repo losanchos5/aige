@@ -99,6 +99,11 @@ const obligationName = (o: (typeof obligations)[number]) =>
         {/* One line: a line break between a link and its separator renders as a space. */}
         {starts.map((link, i) => (<><a href={link.href}>{link.label}</a>{i < starts.length - 2 ? ', ' : i === starts.length - 2 ? ' or ' : '.'}</>))}
       </p>
+      {/* Hub and spoke (SXO-N2): every audience hub points at the pillar. */}
+      <p class="au-path">
+        New to the field? Read <a href="/ai-governance">AI governance explained</a>: the
+        definition, the frameworks and where engineering fits.
+      </p>
     </div>
   </Section>
 
