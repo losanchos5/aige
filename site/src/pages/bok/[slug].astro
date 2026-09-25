@@ -6,8 +6,15 @@ import NewsletterForm from '../../components/NewsletterForm.astro';
 import { chaptersOrdered } from '../../data/chapters';
 import { site } from '../../data/site';
 import { gitCreated, gitDate } from '../../lib/reading';
-import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
-import { getGlossaryEntry } from '../../lib/glossary';
+import {
+  authorNodes,
+  authorRefs,
+  glossaryTermSet,
+  ORG_ID,
+  WEBSITE_ID,
+  workDoi,
+} from '../../lib/jsonld';
+import { getGlossary, getGlossaryEntry } from '../../lib/glossary';
 import { alternatesFor } from '../../lib/i18n-content';
 
 export async function getStaticPaths() {
@@ -101,6 +108,8 @@ const book = {
   // schema.org types `license` as URL|CreativeWork, so link the deed rather than
   // repeating the human-readable "CC BY 4.0" label the page chrome carries.
   ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+  // The Zenodo DOIs (version and concept) and their record pages.
+  ...workDoi,
 };
 
 const article = {
@@ -126,9 +135,13 @@ const breadcrumb = {
   ],
 };
 
+// The glossary chapter is the book's A-Z index: its graph also states the
+// DefinedTermSet that every /glossary/<slug> term page points at (lib/jsonld.ts).
+const glossarySet = chapter.slug === 'glossary' ? [glossaryTermSet(getGlossary(), updated)] : [];
+
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@graph': [book, article, ...authorNodes, breadcrumb],
+  '@graph': [book, article, ...authorNodes, breadcrumb, ...glossarySet],
 };
 ---
 

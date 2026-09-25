@@ -22,6 +22,7 @@ import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import {
   authorNodes,
   authorRefs,
+  lastModified,
   ORG_ID,
   WEBSITE_ID,
   OBLIGATION_REGISTER_ID,
@@ -69,6 +70,11 @@ const jsonLd = [
     isPartOf: { '@id': WEBSITE_ID },
     publisher: { '@id': ORG_ID },
     author: [...authorRefs],
+    dateModified: lastModified(
+      'src/pages/obligations/index.astro',
+      'src/data/frameworks.ts',
+      'src/lib/obligations.ts',
+    ),
     ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
     mainEntity: { '@id': OBLIGATION_REGISTER_ID },
   },

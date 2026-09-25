@@ -13,6 +13,7 @@ import {
 } from '../../data/stack';
 import { slugify } from '../../lib/md-parse';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { collectionPage, lastModified } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
@@ -39,13 +40,31 @@ const accessInUse = (Object.keys(toolAccessLabels) as ToolAccess[]).filter((acce
   toolCatalogue.some((def) => def.tools.some((tool) => tool.access === access)),
 );
 const pad = (n: number) => String(n).padStart(2, '0');
+const description =
+  'Tool categories for each layer of the AI governance engineering stack, with illustrative examples, licences and checked links: examples of a category, not endorsements.';
+
+// The page as a CollectionPage of its tool categories, each at its anchor,
+// dated like the sitemap's lastmod.
+const jsonLd = [
+  collectionPage({
+    path: '/resources/tools',
+    name: 'Tool categories',
+    description,
+    dateModified: lastModified('src/pages/resources/tools.astro', 'src/data/stack.ts'),
+    items: toolCatalogue.map((def) => ({
+      name: def.category,
+      url: `/resources/tools#cat-${def.id}`,
+    })),
+  }),
+  breadcrumbJsonLd(crumbs),
+];
 ---
 
 <Base
   title="Tool categories"
-  description="Tool categories for each layer of the AI governance engineering stack, with illustrative examples, licences and checked links: examples of a category, not endorsements."
+  description={description}
   image="/og/resources.png"
-  jsonLd={breadcrumbJsonLd(crumbs)}
+  jsonLd={jsonLd}
 >
   <PageHero
     variant="res"

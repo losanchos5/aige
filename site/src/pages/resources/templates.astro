@@ -6,6 +6,7 @@ import { stages, kit, schemaOrder } from '../../data/templates';
 import { patterns } from '../../data/patterns';
 import { getSchemas } from '../../lib/schemas-library';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { collectionPage, lastModified } from '../../lib/jsonld';
 import { site } from '../../data/site';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
@@ -91,13 +92,39 @@ const sources = [
 
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Templates' }];
 const checkScript = `${site.github}/blob/main/site/scripts/schemas-check.mjs`;
+const description =
+  'JSON Schemas, filled examples and human templates for the records AI governance produces, from the use-case record to the incident record, each field tagged with the obligations it helps evidence.';
+
+// The page as a CollectionPage of the schemas and kit templates it lists, each
+// at its row anchor, dated like the sitemap's lastmod.
+const jsonLd = [
+  collectionPage({
+    path: '/resources/templates',
+    name: 'Templates and schemas',
+    description,
+    dateModified: lastModified(
+      'src/pages/resources/templates.astro',
+      'src/data/templates.ts',
+      'public/schemas',
+      'public/templates',
+    ),
+    items: [
+      ...schemas.map((schema) => ({
+        name: schema.title,
+        url: `/resources/templates#schema-${schema.name}`,
+      })),
+      ...kit.map((item) => ({ name: item.title, url: `/resources/templates#kit-${item.id}` })),
+    ],
+  }),
+  breadcrumbJsonLd(crumbs),
+];
 ---
 
 <Base
   title="Templates and schemas"
-  description="JSON Schemas, filled examples and human templates for the records AI governance produces, from the use-case record to the incident record, each field tagged with the obligations it helps evidence."
+  description={description}
   image="/og/resources.png"
-  jsonLd={breadcrumbJsonLd(crumbs)}
+  jsonLd={jsonLd}
 >
   <PageHero variant="res" crumbs={crumbs} title="Templates and schemas, as code.">
     <p class="lede" slot="lede">

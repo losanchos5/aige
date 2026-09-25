@@ -8,6 +8,7 @@ import { chaptersOrdered, getChapter } from '../../data/chapters';
 import { bookParts, chapterNum, countWord } from '../../data/parts';
 import { readingTime } from '../../lib/reading';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { bookNode, BOOK_ID, collectionPage, lastModified } from '../../lib/jsonld';
 import { alternatesFor } from '../../lib/i18n-content';
 
 const entries = await getCollection('bok');
@@ -82,13 +83,36 @@ const readingPaths = [
     tail: { href: '/path', title: 'The learning path' },
   },
 ];
+
+// Structured data: the Body of Knowledge itself as a Book (with its DOIs, from
+// lib/jsonld.ts) and this landing as the CollectionPage of its chapters, dated
+// like the sitemap's lastmod (astro.config.ts SOURCE_BY_PATH).
+const jsonLd = [
+  bookNode,
+  collectionPage({
+    path: '/bok',
+    name: 'Body of Knowledge',
+    description,
+    dateModified: lastModified(
+      'src/pages/bok/index.astro',
+      'src/data/chapters.ts',
+      'src/data/parts.ts',
+    ),
+    items: chaptersOrdered.map((chapter) => ({
+      name: chapter.title,
+      url: `/bok/${chapter.slug}`,
+    })),
+    extra: { about: { '@id': BOOK_ID } },
+  }),
+  breadcrumbJsonLd([{ label: 'Body of Knowledge' }]),
+];
 ---
 
 <Base
   title="Body of Knowledge"
   description={description}
   image="/og/bok.png"
-  jsonLd={breadcrumbJsonLd([{ label: 'Body of Knowledge' }])}
+  jsonLd={jsonLd}
   alternates={alternatesFor('/bok')}
 >
   <div class="container bok-index">
