@@ -4,6 +4,18 @@
 > the traits that break classic governance, each turned into a registry field, a control and
 > evidence.
 
+> **In short**
+> An AI system, in the definitions that set governance scope, is a machine-based system that infers,
+> from the input it receives, how to generate outputs such as predictions, content, recommendations
+> or decisions that can influence physical or virtual environments [3]. Deciding which systems meet
+> that definition is the first control in the stack: it decides what enters the agent registry,
+> which obligations intake routes a system to, and which systems stay outside every other control.
+> Four texts set scope: the OECD definition (revised on 8 Nov 2023), EU AI Act Article 3(1) with the
+> Commission guidelines, ISO/IEC 22989 and NIST AI 100-1. Under the AI Act the definition is the
+> scope of the regulation and has applied since 2 Feb 2025, yet the vast majority of systems that
+> qualify carry no obligations under the Act [1]. So two decisions are recorded separately: whether
+> a system is AI at all, and which obligations and controls apply.
+
 A governance function cannot govern what it has not defined. Before a registry can list AI systems,
 before an intake can classify them and before a policy can bind them, someone has to decide which
 systems count. That decision is not a glossary exercise. It is the first control in the stack: it

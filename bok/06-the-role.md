@@ -3,6 +3,19 @@
 > The AI governance engineer as a concrete role: a capability first and a job title second, defined
 > by the workflows it owns and the evidence it produces, not by the certifications on its holder.
 
+> **In short**
+> An AI governance engineer is the person, on whatever org chart, who holds the capability of AI
+> governance engineering and is accountable for three questions in production: what AI is running,
+> what it is allowed to do, and what evidence proves it. The role is defined by the workflows it
+> owns, not by the certifications on its holder. It owns seven workflows: intake and classification,
+> inventory and registry, evals and red teaming as evidence, policy-as-code and gates, runtime
+> monitoring and incidents, assurance and audit evidence, and regulatory translation. The AI
+> governance analyst describes the system from the outside and files the description; the engineer
+> reads the system directly and ships the control that changes what it does. The market corroborates
+> the shape of the work: the IAPP Salary & Jobs Report 2025-26 puts technical AI-governance roles in
+> the tech sector at a median of USD 221,000 [6], and US postings ask for observability in 41-42% of
+> listings and Python in 27-28% [4].
+
 ## Capability first, title second
 
 The Thesis insists that AI governance engineering is a capability, not a job title (the same claim

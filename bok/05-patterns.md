@@ -3,6 +3,18 @@
 > A catalogue of reusable AI governance engineering patterns, each named to a layer of the stack, in
 > the CSIRO Responsible AI Pattern Catalogue structure.
 
+> **In short**
+> An AI governance engineering pattern is a reusable solution to a problem that recurs when you
+> engineer the governance of AI systems, written in the structure of the CSIRO Responsible AI
+> Pattern Catalogue. Each pattern keeps CSIRO's fields (summary, objectives, target users, impacted
+> stakeholders, relevant principles, context, problem, solution, consequences, related patterns) and
+> adds a Maps to line naming the standards, articles and stack layer it serves. Every pattern names
+> one of the five layers of the stack and realises one or more of the six principles. Threat IDs
+> come from the OWASP Top 10 for Agentic Applications 2026 and function labels from the NIST AI RMF.
+> A pattern is not a policy: it names the artefact an engineer ships, the point in the lifecycle
+> where it runs and the evidence it leaves behind, so it can fail a build or block an action rather
+> than describe an intention.
+
 This chapter is the catalogue. Each pattern is a reusable solution to a problem that recurs when you
 engineer the governance of AI systems. The structure follows the CSIRO Responsible AI Pattern
 Catalogue, which applies software-engineering design patterns to responsible AI across governance,

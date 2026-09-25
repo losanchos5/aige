@@ -4,6 +4,19 @@
 > public-sector directives and voluntary frameworks; this chapter dates each regime and names the
 > artefact that evidences each duty.
 
+> **In short**
+> Outside the EU, AI-specific law ranges from Korea's horizontal AI Basic Act to US state statutes,
+> public-sector directives and voluntary frameworks. Each regime has one of four statuses: binding
+> and horizontal (Korea, Italy, Japan's promotion act), binding and targeted (the US states, the US
+> federal agencies, China's departmental rules, Canada's directive), voluntary (Singapore, the
+> United Kingdom's AI-specific approach, India, Australia), or a bill (Brazil, Spain's national AI
+> bill). As of 2026-09-24, Korea's AI Basic Act has been in force since 22 Jan 2026 [1][2][3],
+> Japan's AI Promotion Act since 1 Sep 2025 [31][32] and Italy's Law 132/2025 since 10 Oct 2025
+> [46]. Most of these regimes ask for the same small set of artefacts: an inventory, a
+> classification decision, a notice, a label, a risk assessment, an incident report and a record
+> kept for a fixed period. What differs is the trigger, the wording, the clock, the recipient and
+> the enforcer, so the control is built once and parameterised per jurisdiction.
+
 ## How to read this chapter
 
 This chapter is a field guide to the AI-specific rules that sit beside the EU AI Act. It is written

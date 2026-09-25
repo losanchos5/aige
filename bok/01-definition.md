@@ -4,6 +4,19 @@
 > thinking and code) to the governance of AI systems; a capability, not a job title, measured by
 > realised risk reduction and audit-ready evidence.
 
+> **In short**
+> AI governance engineering is the application of engineering practice (systems thinking, product
+> thinking and code) to the governance of AI systems. It covers governance, risk and assurance of AI
+> systems, including autonomous agents. It is a capability, not a job title: a set of practices
+> (policy-as-code, eval gates, agent registries, continuous assurance) that a security engineer, a
+> privacy engineer, an MLOps engineer or a governance lead can each develop. It is measured by
+> exactly two tests: did the risk actually fall in production, and can a regulator or auditor read
+> the proof as machine-readable evidence. GRC engineering is its parent method; what separates it
+> from AI security engineering, its closest sibling, is the deliverable, a governed and evidenced
+> system rather than only a defended one. It governs five nested objects (models, systems, agents,
+> data and the organisation) and must answer three questions from live systems: what AI is running,
+> what is it allowed to do, and what evidence proves it.
+
 ## The definition
 
 **AI governance engineering is the application of engineering practice (systems thinking, product

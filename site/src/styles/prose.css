@@ -200,6 +200,16 @@
   --callout-glyph: '§';
   background: var(--surface);
 }
+/* "In short": the chapter's self-contained answer, right under the abstract.
+   Plain surface like a note; the body keeps full --ink, never dimmed. */
+.prose .callout[data-kind='summary'] {
+  --callout-ink: var(--l4-ink);
+  --callout-glyph: '¶';
+  background: var(--surface);
+}
+.prose .callout[data-kind='summary'] p {
+  color: var(--ink);
+}
 
 .prose .callout[data-kind='practice'] .callout-title { color: var(--l2-ink); }
 .prose .callout[data-kind='example'] .callout-title { color: var(--l1-ink); }

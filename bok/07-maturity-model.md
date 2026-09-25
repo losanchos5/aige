@@ -3,6 +3,18 @@
 > A ladder from paper to production (Documented, Inventoried, Tested, Enforced, Continuous), where
 > each level is proven by what the running systems can show, not by what a document claims.
 
+> **In short**
+> The AI governance engineering maturity model is a five-level ladder from paper to production
+> (Documented, Inventoried, Tested, Enforced, Continuous), where each level is proven by what the
+> running systems can show, not by what a document claims. Documented and Inventoried answer what AI
+> is running, first on paper, then from a live inventory. Tested and Enforced answer what it is
+> allowed to do, first by measuring, then by blocking. Continuous answers what evidence proves it,
+> from telemetry. Each level is assessed across all five layers of the stack, and you are at a level
+> only when every layer has reached it, so the overall level is the weakest layer: a floor for
+> planning, not a verdict. Level 4 also requires that the eval suite's own quality is assessed, not
+> just its existence and its teeth. The most telling cross-level metric is evidence freshness. The
+> model is not a certification; ISO/IEC 42001 certification is a Level 1-2 proof of process.
+
 ## Why a maturity model, and how to read this one
 
 Maturity models fail when they measure paperwork. This one measures the systems. A level is not a

@@ -3,6 +3,18 @@
 > Governing the run: how a deployer decides to use an AI system, chooses it, contracts for it, takes
 > it live, operates it and retires it, with every step leaving evidence that a control fired.
 
+> **In short**
+> Governing deployment and use means governing the run: how a deployer decides to use an AI system,
+> chooses it, contracts for it, takes it live, operates it and retires it, with every step leaving
+> evidence that a control fired. A deployer is anyone using an AI system under its authority, except
+> in a personal, non-professional activity; a provider develops a system or model and places it on
+> the market or puts it into service under its own name or trademark [2]. A deployer's duties begin
+> when the system is put to use and run for as long as it runs: use it as instructed, staff its
+> oversight, monitor it, suspend it when it presents a risk, keep its logs and tell people it is
+> there [1]. The lifecycle starts from a Deployment Decision Record and ends with a deactivation and
+> retirement runbook. The AI Act's high-risk rules apply to Annex III systems from 2 December 2027
+> [3].
+
 Most organisations deploy far more AI than they build. A provider's design duties are largely
 discharged when the system is placed on the market; a deployer's duties begin when the system is put
 to use, and they run for as long as it runs: use it as instructed, staff its oversight, monitor it,

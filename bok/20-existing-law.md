@@ -3,6 +3,19 @@
 > Copyright, anti-discrimination, consumer-protection and product-liability law already bind AI
 > systems; this chapter maps each duty to its evidence artefact and stack layer.
 
+> **In short**
+> The AI Act is the newest layer of law over AI systems, not the only one: intellectual property,
+> non-discrimination, consumer protection and product liability reached AI first and are enforced
+> against it today. As a US regulator put it, "there is no AI exemption from the laws on the books"
+> [1]. Each body of law asks a question an AI system must answer with evidence: did we have the
+> right to use this input, does the system disadvantage a protected group, is what we say about it
+> true, and was it defective when it left our control. Under the EU DSM Directive, Article 4 lets
+> anyone mine lawfully accessible works unless the rightholder has expressly reserved that use, and
+> AI Act Article 53(1)(c) requires GPAI providers to keep a copyright policy that complies with
+> those reservations [3][4]. The revised Product Liability Directive, (EU) 2024/2853, treats
+> software as a product and must be transposed by 9 Dec 2026 [2]. Each duty maps to an evidence
+> artefact and a stack layer.
+
 The AI Act is the newest layer of law over AI systems, not the only one. Four older bodies of law
 reached AI first and are enforced against it today: intellectual property, non-discrimination,
 consumer protection and product liability. A US regulator put the premise in one line when it

@@ -100,7 +100,7 @@ test.describe('i18n helpers', () => {
     ];
     for (const file of sources) {
       const text = readFileSync(file, 'utf8');
-      for (const m of text.matchAll(/^> \*\*((?:In practice|Example|Anti-pattern|Postings|Note|Warning)[^*]*)\*\*/gm)) {
+      for (const m of text.matchAll(/^> \*\*((?:In practice|In short|Example|Anti-pattern|Postings|Note|Warning)[^*]*)\*\*/gm)) {
         used.add(m[1]);
       }
       for (const m of text.matchAll(/\*\*(Maps to:?)\*\*/g)) used.add(m[1]);
