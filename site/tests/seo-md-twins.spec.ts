@@ -115,10 +115,10 @@ test.describe('_headers: Markdown twins', () => {
     expect(TWINS).toContain('/thesis.md');
   });
 
-  test(`every twin is noindex, canonical to its HTML page and has no font preload`, () => {
+  test(`every twin is canonical to its HTML page, not noindexed, and has no font preload`, () => {
     for (const twin of TWINS) {
       const { headers } = headersFor(twin);
-      expect(headers.get('x-robots-tag'), twin).toEqual(['noindex']);
+      expect(headers.get('x-robots-tag') ?? [], twin).toEqual([]);
       const page = twin.replace(/\.md$/, '');
       expect(headers.get('link'), twin).toEqual([`<${ORIGIN}${page}>; rel="canonical"`]);
     }

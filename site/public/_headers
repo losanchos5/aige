@@ -85,8 +85,9 @@
 /resources/threats.csv
   ! Link
   X-Robots-Tag: noindex
-# Markdown twins (<page>.md, from src/pages/**/*.md.ts): kept out of the index,
-# pointed at their HTML page by an HTTP canonical, and without the font preloads
+# Markdown twins (<page>.md, from src/pages/**/*.md.ts): consolidated into their
+# HTML page by an HTTP canonical (no noindex: Google reads noindex + canonical as
+# conflicting signals; AI crawlers still read the twin), and without the font preloads
 # of /* (the "! Link" drops those; the canonical Link is set after it). Cloudflare
 # Pages docs (pages/configuration/headers): a splat "*" greedily matches any
 # characters, one per rule, and may sit mid-pattern ("/*.jpg"); its match is
@@ -96,27 +97,21 @@
 # and no HTML page matches.
 /bok/*.md
   ! Link
-  X-Robots-Tag: noindex
   Link: <https://aigovernanceengineer.com/bok/:splat>; rel="canonical"
 /patterns/*.md
   ! Link
-  X-Robots-Tag: noindex
   Link: <https://aigovernanceengineer.com/patterns/:splat>; rel="canonical"
 /cases/*.md
   ! Link
-  X-Robots-Tag: noindex
   Link: <https://aigovernanceengineer.com/cases/:splat>; rel="canonical"
 /glossary/*.md
   ! Link
-  X-Robots-Tag: noindex
   Link: <https://aigovernanceengineer.com/glossary/:splat>; rel="canonical"
 /thesis.md
   ! Link
-  X-Robots-Tag: noindex
   Link: <https://aigovernanceengineer.com/thesis>; rel="canonical"
 /ai-governance.md
   ! Link
-  X-Robots-Tag: noindex
   Link: <https://aigovernanceengineer.com/ai-governance>; rel="canonical"
 /llms*
   ! Link
