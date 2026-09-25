@@ -15,6 +15,7 @@ import { cases } from './src/data/cases';
 import { obligations, obligationPath } from './src/data/frameworks';
 import { patterns } from './src/data/patterns';
 import { figures } from './src/data/figures';
+import { comparisonSourceFiles } from './src/data/comparisons';
 import { getGlossary } from './src/lib/glossary';
 import { gitDate } from './src/lib/reading';
 import { inSitemap } from './src/lib/sitemap-policy';
@@ -122,6 +123,10 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
     '/resources/crosswalk',
     ['src/pages/resources/crosswalk.astro', 'src/data/crosswalk.ts', 'public/crosswalk-explorer.js'],
   ],
+  // The "<A> vs <B>" comparison pages, dated by the files that also date their byline.
+  ['/resources/crosswalk/iso-42001-vs-eu-ai-act', comparisonSourceFiles('iso-42001-vs-eu-ai-act')],
+  ['/resources/crosswalk/nist-ai-rmf-vs-iso-42001', comparisonSourceFiles('nist-ai-rmf-vs-iso-42001')],
+  ['/resources/crosswalk/nist-ai-rmf-vs-eu-ai-act', comparisonSourceFiles('nist-ai-rmf-vs-eu-ai-act')],
   [
     '/resources/frameworks',
     [
