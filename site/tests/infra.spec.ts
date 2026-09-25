@@ -7,6 +7,7 @@ import { mkdtempSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
+import { cspHashOf, cspScriptHashes, inlineScriptAllowed } from './helpers/csp';
 
 const SHOT_DIR = join('tests', '__screenshots__', 'F');
 
@@ -82,20 +83,71 @@ test.describe('content-lint', () => {
 
 test.describe('same-origin scripts and CSP', () => {
   // script-src is 'self' with no 'unsafe-inline': an inline script would be
-  // blocked in production, so every executable <script> must carry a src. JSON
-  // data blocks (ld+json, the diagram notes, the page indexes) never execute.
+  // blocked in production, so every executable <script> must carry a src,
+  // except the theme bootstrap, which the CSP allows by its sha256
+  // (tests/helpers/csp.ts). JSON data blocks (ld+json, the diagram notes, the
+  // page indexes) never execute.
   const JSON_DATA = /\btype\s*=\s*["']?application\/(ld\+)?json\b/i;
 
+  /** Executable inline scripts of a built page: [opening tag, body]. */
+  const inlineScripts = (html: string) =>
+    [...html.matchAll(/(<script\b[^>]*>)([\s\S]*?)<\/script>/gi)]
+      .map((m) => [m[1], m[2]] as const)
+      .filter(([tag]) => !/\bsrc\s*=/i.test(tag) && !JSON_DATA.test(tag));
+
   for (const file of ['index.html', 'bok/the-stack.html']) {
-    test(`dist/${file} has no inline <script> and loads Motion from /_astro/`, () => {
+    test(`dist/${file} has no inline <script> but the hashed theme one, and loads Motion from /_astro/`, () => {
       const html = readFileSync(join('dist', file), 'utf8');
-      const inline = [...html.matchAll(/<script\b([^>]*)>/gi)]
-        .map((m) => m[0])
-        .filter((tag) => !/\bsrc\s*=/i.test(tag) && !JSON_DATA.test(tag));
-      expect(inline).toEqual([]);
+      const blocked = inlineScripts(html).filter(([, body]) => !inlineScriptAllowed(body));
+      expect(blocked).toEqual([]);
       expect(html).toMatch(/<script type="module" src="\/_astro\/motion-ui\.[\w-]+\.js">/);
     });
   }
+
+  // The theme bootstrap (public/theme.js) is inlined in <head> so it costs no
+  // request ahead of the stylesheets. The hash is recomputed from the bytes that
+  // shipped, so an edit to theme.js without a new hash in _headers fails here
+  // (the build already refuses it, src/lib/theme-script.ts).
+  for (const file of ['index.html', 'bok/the-stack.html', 'resources/crosswalk.html', 'figures.html', '404.html']) {
+    test(`dist/${file} inlines the theme script that the CSP hash allows`, () => {
+      const html = readFileSync(join('dist', file), 'utf8');
+      const head = html.slice(0, html.indexOf('</head>'));
+      expect(head).not.toContain('src="/theme.js"');
+      const theme = inlineScripts(head).filter(([, body]) => body.includes('__setTheme'));
+      expect(theme.length).toBe(1);
+      const [, body] = theme[0];
+      expect([...cspScriptHashes()]).toContain(cspHashOf(body));
+      // It runs before any stylesheet is parsed, as the external file did.
+      const firstCss = head.search(/<link\b[^>]*rel="?stylesheet/);
+      if (firstCss !== -1) expect(head.indexOf(body)).toBeLessThan(firstCss);
+    });
+  }
+
+  test('the site CSP lists exactly one script hash, the one of public/theme.js as inlined', () => {
+    const body = readFileSync(join('public', 'theme.js'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .join('\n');
+    expect([...cspScriptHashes()]).toEqual([cspHashOf(body)]);
+  });
+
+  test('the persisted theme applies on load and __setTheme is exposed', async ({ page }) => {
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('theme', 'dark');
+      } catch {
+        /* storage blocked in this context */
+      }
+    });
+    await page.goto('/');
+    expect(await page.evaluate(() => document.documentElement.getAttribute('data-theme'))).toBe('dark');
+    const setter = await page.evaluate(
+      () => typeof (window as unknown as { __setTheme?: unknown }).__setTheme,
+    );
+    expect(setter).toBe('function');
+  });
 
   // The shared motion runtime rides on every page: keep its gzip within 8 KiB.
   test('dist/_astro/motion-ui*.js gzips to 8192 bytes or less', () => {

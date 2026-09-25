@@ -131,6 +131,34 @@
     return -1;
   }
 
+  // First measurements wait for the first frame: read during script
+  // evaluation, a getBoundingClientRect forces the whole chapter's layout inside
+  // this task (a long task on the longest chapters). After the frame the layout
+  // is already done and the reads are free.
+  function afterFirstFrame(fn) {
+    if (!window.requestAnimationFrame) return fn();
+    requestAnimationFrame(function () {
+      setTimeout(fn, 0);
+    });
+  }
+
+  // The TOC marker and the sidebar rail used to be placed before their CSS
+  // transition could apply; placed after the first frame they would slide in
+  // from the top. Their transition is held off until the first placement has
+  // been painted, so they still simply appear in place.
+  function holdTransition(el) {
+    if (el) el.style.transition = 'none';
+  }
+
+  function releaseTransition(el) {
+    if (!el || !window.requestAnimationFrame) return;
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        el.style.transition = '';
+      });
+    });
+  }
+
   if (links.size && headings.length && 'IntersectionObserver' in window) {
     var visible = new Set();
 
@@ -200,7 +228,11 @@
     headings.forEach(function (h) {
       io.observe(h);
     });
-    setActive();
+    holdTransition(tocMarker);
+    afterFirstFrame(function () {
+      setActive();
+      releaseTransition(tocMarker);
+    });
   }
 
   /* ---- Copy citation ---- */
@@ -240,7 +272,11 @@
       if (ink) rail.style.background = ink;
     }
 
-    placeRail();
+    holdTransition(rail);
+    afterFirstFrame(function () {
+      placeRail();
+      releaseTransition(rail);
+    });
     window.addEventListener('resize', placeRail, { passive: true });
   })();
 
@@ -321,8 +357,10 @@
     }
 
     if (bar || (article && current)) {
-      place();
-      update();
+      afterFirstFrame(function () {
+        place();
+        update();
+      });
       window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener(
         'resize',

@@ -169,21 +169,28 @@
     lastFocused = null;
   }
 
-  var triggers = document.querySelectorAll('[data-cw-open]');
-  for (var t = 0; t < triggers.length; t++) {
-    (function (trigger) {
-      // aria-haspopup is set only when JS runs; with JS off these are plain
-      // in-page links, not dialog triggers.
-      trigger.setAttribute('aria-haspopup', 'dialog');
-      trigger.addEventListener('click', function (e) {
-        e.preventDefault();
-        openDrawer(
-          trigger.getAttribute('data-cw-open'),
-          trigger.getAttribute('data-cw-col'),
-        );
-      });
-    })(triggers[t]);
+  // One delegated listener for every trigger (the grid carries about 250), so
+  // wiring costs nothing on load and a click works from the first frame.
+  document.addEventListener('click', function (e) {
+    var trigger = e.target && e.target.closest ? e.target.closest('[data-cw-open]') : null;
+    if (!trigger) return;
+    e.preventDefault();
+    openDrawer(trigger.getAttribute('data-cw-open'), trigger.getAttribute('data-cw-col'));
+  });
+
+  // Run a non-urgent task once the page is idle (after load work), or soon.
+  function whenIdle(fn) {
+    if (window.requestIdleCallback) window.requestIdleCallback(fn, { timeout: 1500 });
+    else setTimeout(fn, 200);
   }
+
+  // aria-haspopup is set only when JS runs; with JS off these are plain in-page
+  // links, not dialog triggers. It is announced, never painted, so it waits
+  // for an idle moment instead of touching every trigger during load.
+  whenIdle(function () {
+    var triggers = document.querySelectorAll('[data-cw-open]');
+    for (var t = 0; t < triggers.length; t++) triggers[t].setAttribute('aria-haspopup', 'dialog');
+  });
 
   Array.prototype.forEach.call(
     document.querySelectorAll('[data-cw-close]'),
@@ -223,14 +230,16 @@
       }
     };
 
-    var applyColumns = function (list) {
+    // skipCells: the markup already shows exactly these columns (the defaults,
+    // on load), so only the chooser's own state is written and the grid's few
+    // hundred cells are left alone: no style recalculation of the table while
+    // the page is still loading.
+    var applyColumns = function (list, skipCells) {
       var on = {};
       for (var i = 0; i < list.length; i++) on[list[i]] = true;
-      var cells = grid.querySelectorAll('[data-cw-col]');
+      // Cell links carry data-cw-col too (for the drawer); only th/td toggle.
+      var cells = skipCells ? [] : grid.querySelectorAll('th[data-cw-col], td[data-cw-col]');
       for (var c = 0; c < cells.length; c++) {
-        // Cell links carry data-cw-col too (for the drawer); only th/td toggle.
-        var tag = cells[c].tagName;
-        if (tag !== 'TH' && tag !== 'TD') continue;
         var shown = !!on[cells[c].getAttribute('data-cw-col')];
         cells[c].classList.toggle('is-on', shown);
         cells[c].classList.toggle('is-off', !shown);
@@ -264,7 +273,14 @@
           return known[id];
         })
       : [];
-    applyColumns(initial.length ? initial : defaults());
+    var base = defaults();
+    var start = initial.length ? initial : base;
+    var sameAsMarkup =
+      start.length === base.length &&
+      start.every(function (id) {
+        return base.indexOf(id) !== -1;
+      });
+    applyColumns(start, sameAsMarkup);
     chooser.hidden = false;
 
     chooser.addEventListener('change', function (e) {
