@@ -87,7 +87,8 @@ export const site: SiteConfig = {
   license: 'CC BY 4.0',
   licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
   bokVersion: '0.5.0',
-  // The concept DOI until Zenodo mints the v0.5.0 version DOI; then set it here.
+  // `doi` is the version DOI Zenodo minted for the v0.5.0 release; `conceptDoi`
+  // always resolves to the latest version. Update `doi` with each new release.
   doi: '10.5281/zenodo.22956197',
   conceptDoi: '10.5281/zenodo.22857084',
   newsletter: {
