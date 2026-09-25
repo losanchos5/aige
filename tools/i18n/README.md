@@ -180,7 +180,8 @@ the same new segments twice.
 
 [`.github/workflows/i18n.yml`](../../.github/workflows/i18n.yml): `workflow_dispatch` (inputs
 `langs`, `mode` batch or sync, `max_usd` default `1.00`) and `push` to `main` on the English sources
-(sync, `0.50`). No default permissions; the job gets `contents: write` (to push the `i18n/auto-*`
+(sync, `0.50`); the `push` trigger is commented out since 2026-09-25, while the site does not publish
+the translations (`PUBLISHED_TRANSLATED_LOCALES` in `site/src/i18n/locales.ts`). No default permissions; the job gets `contents: write` (to push the `i18n/auto-*`
 branch) and `pull-requests: write` (to open the pull request), nothing else. Actions are pinned to
 commit SHAs, one run at a time (`concurrency: i18n`), only in `losanchos5/aige`. The checkout leaves
 no token in `.git/config`; the API key reaches only the translate step; the unit tests run before any

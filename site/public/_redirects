@@ -3,3 +3,34 @@ https://www.aigovernanceengineer.com/* https://aigovernanceengineer.com/:splat 3
 # Block b-glossary (v0.5.0): the A-Z index moved to the book index; each term has its own page.
 /resources/glossary /bok/glossary 301
 /glossary /bok/glossary 301
+# Machine translations hidden on 2026-09-25 (PUBLISHED_TRANSLATED_LOCALES in
+# src/i18n/locales.ts is empty): their old URLs go to the English page, with a
+# 302 because they will come back. /es/thesis, the hand translation, stays live
+# and no rule below matches it. Remove these rules when the languages are published again.
+/es / 302
+/es/ / 302
+/es/bok /bok 302
+/es/bok/ /bok 302
+/es/bok/* /bok/:splat 302
+/es/patterns/* /patterns/:splat 302
+/fr / 302
+/fr/ / 302
+/fr/bok /bok 302
+/fr/bok/ /bok 302
+/fr/bok/* /bok/:splat 302
+/fr/patterns/* /patterns/:splat 302
+/fr/thesis /thesis 302
+/de / 302
+/de/ / 302
+/de/bok /bok 302
+/de/bok/ /bok 302
+/de/bok/* /bok/:splat 302
+/de/patterns/* /patterns/:splat 302
+/de/thesis /thesis 302
+/pt / 302
+/pt/ / 302
+/pt/bok /bok 302
+/pt/bok/ /bok 302
+/pt/bok/* /bok/:splat 302
+/pt/patterns/* /patterns/:splat 302
+/pt/thesis /thesis 302

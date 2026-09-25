@@ -1,7 +1,23 @@
+---
+seoTitle: "How to run an AI governance program: roles, RACI, KPIs"
+---
 # 12. Running the AI governance program
 
 > An AI governance program is the organisation governed as a system: people hold the duties, a
 > committee decides what gates cannot, policies compile into gates, and the evidence reaches the board.
+
+> **In short**
+> An AI governance program is the organisation governed as a system: people hold the duties, a
+> committee decides what gates cannot, policies compile into gates, and the evidence reaches the
+> board. One rule runs through it: the committee decides, the gates enforce. People take the
+> decisions that need judgement, such as whether a residual risk is acceptable or an exception
+> justified, and code enforces them on every change and leaves the evidence. The law already expects
+> the organisational layer to be designed: the EU AI Act requires a high-risk provider's quality
+> management system to include an accountability framework (`Art. 17(1)(m)`) [1], ISO/IEC 42001 asks
+> for defined roles, responsibilities and authorities (clause 5.3) [2], and the NIST AI RMF for
+> documented roles (GOVERN 2.1) [3]. Each stakeholder holds a duty, a decision right and an artefact
+> that evidences the duty. AI literacy runs as role-based curricula with training records, and
+> leadership reads KPIs and KRIs computed from live systems rather than self-reported.
 
 ## The organisation as an object of governance
 

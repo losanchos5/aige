@@ -392,6 +392,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'GDPR',
         ref: 'Art. 22',
+        obligationId: 'AIGE-OBL-GDPR-ART22',
         why: 'Automated individual decision-making, including profiling, is restricted and carries safeguards [7].',
       },
       {
@@ -403,6 +404,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'EU AI Act',
         ref: 'Art. 86',
+        obligationId: 'AIGE-OBL-EUAIA-ART86',
         why: 'People affected by a decision based on a high-risk system have a right to an explanation of individual decision-making [3].',
       },
     ],
@@ -739,6 +741,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'New York City',
         ref: 'Local Law 144 of 2021',
+        obligationId: 'AIGE-OBL-USNYC-LL144',
         why: 'Employers may not use an automated employment decision tool unless it has had a bias audit within one year, the audit information is public and notices have been given; enforcement began on 5 Jul 2023 [6].',
       },
     ],
@@ -1080,6 +1083,7 @@ export const cases: readonly IncidentCase[] = [
       {
         instrument: 'NIST AI 600-1',
         ref: 'Confabulation',
+        obligationId: 'AIGE-OBL-NIST-AI600-1',
         why: 'The generative-AI profile lists confabulation, confidently stated but false content, among its twelve risks [4].',
       },
       {

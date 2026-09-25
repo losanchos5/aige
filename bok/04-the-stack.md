@@ -1,7 +1,23 @@
+---
+seoTitle: "AI governance architecture: the five-layer stack"
+seoDescription: "The AI governance reference architecture: five layers, from policy to assurance, where evidence is produced at the bottom and proven at the top."
+---
 # 04. The stack (five layers)
 
 > The reference architecture of AI governance engineering: five layers that answer the three
 > questions, where evidence is produced at the bottom and proven at the top.
+
+> **In short**
+> The AI governance engineering stack is a reference architecture of five layers, read as a build
+> order in which each layer produces an artefact that the layer above consumes. The layers are 01
+> Govern-as-Code, 02 Inventory & Transparency, 03 Evals & Red Teaming as Evidence, 04 Runtime
+> Controls & Observability and 05 Assurance & Continuous Compliance, along one spine: Policy,
+> Inventory, Evals, Runtime, Assurance. Layer 02 answers what AI is running; layers 01 and 04 answer
+> what it is allowed to do; layers 03 and 05 answer what evidence proves it. Evidence flows up: a
+> policy verdict, a registry entry, an eval result and a guardrail decision are each a structured
+> artefact with a timestamp and an owner, aggregated in layer 05 into audit-ready evidence organised
+> in `OSCAL`. Layers 01, 02 and 05 are inherited from GRC engineering; layers 03 and 04 are what AI
+> forces the discipline to add.
 
 ## How to read the stack
 

@@ -1,7 +1,23 @@
+---
+seoTitle: "AI and data protection: GDPR duties applied to AI"
+---
 # 19. Privacy and data protection law applied to AI
 
 > Data protection law already binds every AI system that touches personal data; this chapter turns
 > its duties for training, inference, rights and breaches into artefacts, stack layers and evidence.
+
+> **In short**
+> Data protection law applied to AI starts from one fact: the GDPR has applied since 25 May 2018 to
+> any processing of personal data, so it already binds every AI system trained on, retrieving from
+> or deciding about people [1]. GDPR fines for breaches of the core principles can reach EUR 20
+> million or 4% of worldwide annual turnover [1]. Each processing moment (collection for training,
+> training, retrieval indexing, inference, logging and evaluation) is a separate operation with its
+> own purpose, basis, retention and rights exposure. In SCHUFA (C-634/21) the Court of Justice held
+> that a credit score is itself an automated decision under Article 22 when lenders give it a
+> determining role [21]. For the EDPB, a model trained on personal data is anonymous only if the
+> likelihood of extracting that data, directly or through queries, is insignificant [3]. The DPO and
+> privacy counsel decide whether a lawful basis holds; the engineer builds the record, the control
+> and the signal.
 
 Privacy law was the first AI law. The GDPR has applied since 25 May 2018 to any processing of
 personal data, and a model trained on, retrieving from or deciding about people processes personal

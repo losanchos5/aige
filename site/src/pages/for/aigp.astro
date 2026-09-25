@@ -36,6 +36,7 @@ import {
 import { resolvedAigpMap, resolveAigpLink } from '../../lib/aigp-coverage';
 import { aigpHeatmapSvg } from '../../lib/aigp-heatmap';
 import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
+import { fitsSiteSuffix } from '../../lib/seo-title';
 import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import type { Source } from '../../lib/sources';
 import '../../styles/resources.css';
@@ -114,8 +115,11 @@ const sources: Source[] = [
   },
 ];
 
-const description =
-  'Where an open body of knowledge teaches each of the 58 performance indicators of the public AIGP blueprint v2.1, with a heatmap and a study path per domain.';
+// Title and description answer the study query (SXO-05, 2026-09-25 audit) and
+// keep the page's own word, "map": a coverage map, never a study guide. The H1
+// and the breadcrumb stay.
+const seoTitle = `Free AIGP study map: all ${indicatorCount} BoK v${aigpBok.version} indicators`;
+const description = `A free AIGP study map: where an open body of knowledge teaches each of the ${indicatorCount} performance indicators of the AIGP blueprint v${aigpBok.version}, domain by domain.`;
 const crumbs: Crumb[] = [
   { label: 'For you', href: '/for' },
   { label: 'Certifications', href: '/for/certifications' },
@@ -146,7 +150,13 @@ const jsonLd = [
 ];
 ---
 
-<Base title="AIGP coverage map" description={description} image="/og/path.png" jsonLd={jsonLd}>
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/path.png"
+  jsonLd={jsonLd}
+>
   <PageHero
     variant="res"
     crumbs={crumbs}

@@ -1,7 +1,22 @@
+---
+seoTitle: "AI principles and standards: OECD, ISO/IEC, NIST, IEEE"
+---
 # 22. Principles, soft law and standards
 
 > Principles say what good looks like and standards say how to show it; this chapter maps each
 > instrument to the stack layer and the evidence record that answer it.
+
+> **In short**
+> Principles say what good looks like and standards say how to show it; neither counts until it is
+> wired to a gate, a registry field or an evidence record. In rough order of force, the instruments
+> run from binding law (the AI Act), through a binding treaty (the Council of Europe Framework
+> Convention, CETS No. 225, not in force as of 2026-09-24 [5]) and harmonised standards, which give
+> a presumption of conformity once their reference is published in the Official Journal [2], to
+> international standards and frameworks (ISO/IEC 42001, the NIST AI RMF 1.0, the IEEE 7000 series)
+> and soft law (the OECD AI Principles, the UNESCO Recommendation, the G7 Hiroshima Code of Conduct,
+> the EU HLEG guidelines). The OECD AI Principles have 47 adherents and the UNESCO Recommendation
+> was adopted by 193 Member States [3][4]. Standards support, they do not confer: no certificate and
+> no coverage figure makes a system compliant.
 
 ## How to read this chapter
 

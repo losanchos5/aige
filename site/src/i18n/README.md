@@ -4,6 +4,12 @@ The site renders machine translations of the Body of Knowledge, the pattern page
 (openspec/changes/i18n-site-rendering). English is the reference and keeps its unprefixed URLs;
 every other language lives under `/<lang>/` and only where a translation exists.
 
+Switched off since 2026-09-25: `PUBLISHED_TRANSLATED_LOCALES` in `locales.ts` is empty, so no
+machine translation is built (no `/<lang>/` route, hreflang, sitemap entry or language switcher) and
+`public/_redirects` sends their old URLs to the English pages with a 302. The files, the pipeline and
+this code stay; list the languages there (and drop the 302 rules) to publish them again. The hand
+translation `/es/thesis` is always published. A fixture build (below) needs the switch on too.
+
 | File | What it is | Who writes it |
 | --- | --- | --- |
 | `locales.ts` | The locales (`en` default, `es`, `fr`, `de`, `pt`), their own names, Open Graph and Intl tags | developers |

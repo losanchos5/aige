@@ -10,6 +10,7 @@ import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { validate } from './helpers/json-schema-lite';
+import { inlineScriptAllowed } from './helpers/csp';
 import { obligations, obligationSlug } from '../src/data/frameworks';
 
 // Mirrors src/data/site.ts on purpose (see seo-schema.spec.ts).
@@ -201,7 +202,11 @@ test.describe('obligation pages', () => {
       const html = readFileSync(file, 'utf8');
       const inline = [...html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/g)].filter(
         ([, attrs, body]) =>
-          !/\bsrc=/.test(attrs) && !/type="application\/ld\+json"/.test(attrs) && body.trim() !== '',
+          !/\bsrc=/.test(attrs) &&
+          !/type="application\/ld\+json"/.test(attrs) &&
+          body.trim() !== '' &&
+          // The theme bootstrap, allowed by its sha256 in the CSP.
+          !inlineScriptAllowed(body),
       );
       expect(inline.length, file).toBe(0);
     }

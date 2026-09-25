@@ -1,7 +1,22 @@
+---
+seoTitle: "EU AI Act explained for engineers: risk, duties, dates"
+---
 # 18. The EU AI Act in one pass
 
 > The EU AI Act, as amended by the Digital Omnibus, read end to end: what it covers, how it ranks
 > risk, who carries which duty, and the date each duty starts to apply.
+
+> **In short**
+> The EU AI Act, Regulation (EU) 2024/1689, is a product-safety regulation with fundamental-rights
+> goals: directly applicable in every Member State, in force since 1 Aug 2024, with duties that
+> switch on in stages [1][2]. Four ideas carry the whole text: a definition gate (is the thing an AI
+> system, a general-purpose AI model, or neither), a risk ladder, a set of operator roles and a
+> timeline. The Digital Omnibus on AI, Regulation (EU) 2026/1744, entered into force on 27 July 2026
+> [2]. It moved the high-risk duties to 2 December 2027 for Annex III systems and to 2 August 2028
+> for Annex I, and added two prohibitions that apply from 2 December 2026. The Act's reach is
+> extraterritorial by placement and by output, so the scope question is where a system's output is
+> used, not where it is hosted [1]. Every duty names the artefact that evidences it and the stack
+> layer that produces it, and counsel confirms that the obligation was read correctly.
 
 ## How to read this chapter
 

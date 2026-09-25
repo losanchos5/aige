@@ -3,6 +3,7 @@
 // project against the preview server (baseURL from config). The pure-data and
 // generated-SVG checks live in tests/map.spec.ts.
 import { test, expect } from '@playwright/test';
+import { inlineScriptAllowed } from './helpers/csp';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/map');
@@ -113,8 +114,11 @@ test('the map canvas scrolls sideways at 390px', async ({ page }) => {
 
 // --- 6. CSP: no inline executable script ------------------------------------
 test('ships no inline executable script (CSP script-src self)', async ({ page }) => {
-  const inline = page.locator('script:not([src]):not([type="application/ld+json"])');
-  await expect(inline).toHaveCount(0);
+  const bodies = await page
+    .locator('script:not([src]):not([type="application/ld+json"])')
+    .evaluateAll((scripts) => scripts.map((s) => s.textContent || ''));
+  // The theme bootstrap is inline but allowed by its sha256 in the CSP.
+  expect(bodies.filter((body) => !inlineScriptAllowed(body))).toEqual([]);
 });
 
 // --- 7. Keyboard: Tab from the hero reaches the first map link --------------

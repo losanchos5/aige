@@ -4,14 +4,34 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { defineCollection, z } from 'astro:content';
 import { glob, type Loader } from 'astro/loaders';
 import { i18nDir } from './lib/i18n-content';
+import { isPublishedLocale } from './i18n/locales';
 
-// Files carry no frontmatter; passthrough keeps validation permissive.
+// The Thesis and the changelog files carry no frontmatter; passthrough keeps
+// validation permissive.
 const schema = z.object({}).passthrough();
 
 // The chapter files only: `[0-9][0-9]-*.md` does not descend into bok/patterns.
+// A chapter's frontmatter holds its search metadata only. The visible H1 stays
+// the numbered title ("18. The EU AI Act in one pass"); `seoTitle` is what the
+// <title>, og:title and the TechArticle headline carry instead, phrased for the
+// query a reader types, and `seoDescription` replaces the manifest summary as the
+// meta description where that summary misses the query. Both are optional here;
+// tests/seo-titles.spec.ts requires a seoTitle on every chapter.
 const bok = defineCollection({
   loader: glob({ pattern: '[0-9][0-9]-*.md', base: '../bok' }),
-  schema,
+  schema: z
+    .object({
+      /** 20-55 characters, primary keyword first, no chapter number, no site name. */
+      seoTitle: z
+        .string()
+        .min(20)
+        .max(55)
+        .refine((value) => !/^\d/.test(value), { message: 'seoTitle must not open with the chapter number' })
+        .optional(),
+      /** One or two sentences, 110-160 characters (a search snippet's budget). */
+      seoDescription: z.string().min(110).max(160).optional(),
+    })
+    .passthrough(),
 });
 
 // One file per pattern of the chapter 05 catalogue (bok/patterns/<id>.md),
@@ -93,6 +113,21 @@ function i18nGlob(pattern: string): Loader {
   };
 }
 
+/**
+ * i18nGlob limited to the languages the site publishes
+ * (PUBLISHED_TRANSLATED_LOCALES). A hidden language is not loaded at all, so its
+ * files are neither parsed nor rendered; with every language hidden the
+ * collection is empty.
+ */
+function publishedI18nGlob(locales: readonly string[], rest: string): Loader {
+  const langs = locales.filter(isPublishedLocale);
+  if (langs.length === 0) {
+    return { name: 'i18n-glob', load: async (context) => context.store.clear() };
+  }
+  const folder = langs.length === 1 ? langs[0] : `{${langs.join(',')}}`;
+  return i18nGlob(`${folder}/${rest}`);
+}
+
 const translationMeta = {
   /** The file's language; must be the folder it sits in. */
   lang: z.enum(['es', 'fr', 'de', 'pt']),
@@ -109,7 +144,7 @@ const translationMeta = {
 };
 
 const bokI18n = defineCollection({
-  loader: i18nGlob('{es,fr,de,pt}/bok/[0-9][0-9]-*.md'),
+  loader: publishedI18nGlob(['es', 'fr', 'de', 'pt'], 'bok/[0-9][0-9]-*.md'),
   // A chapter has no frontmatter of its own today; `passthrough` keeps any field
   // a future chapter gains (the contract keeps the source's other fields), and
   // `glance` lets a translation carry the chapter's "At a glance" items.
@@ -119,7 +154,7 @@ const bokI18n = defineCollection({
 });
 
 const patternsI18n = defineCollection({
-  loader: i18nGlob('{es,fr,de,pt}/patterns/*.md'),
+  loader: publishedI18nGlob(['es', 'fr', 'de', 'pt'], 'patterns/*.md'),
   // The pattern frontmatter with title and summary translated; the ids, layers
   // and order must equal the English file's (checked in lib/i18n-pages.ts).
   schema: z
@@ -137,7 +172,7 @@ const patternsI18n = defineCollection({
 
 // fr, de and pt only: the Spanish Thesis is the hand translation (THESIS.es.md).
 const thesisI18n = defineCollection({
-  loader: i18nGlob('{fr,de,pt}/THESIS.md'),
+  loader: publishedI18nGlob(['fr', 'de', 'pt'], 'THESIS.md'),
   schema: z.object(translationMeta).passthrough(),
 });
 

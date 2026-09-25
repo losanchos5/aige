@@ -12,6 +12,7 @@ import Footer from '../components/Footer.astro';
 import SearchDialog from '../components/SearchDialog.astro';
 import { site } from '../data/site';
 import type { JsonLdInput } from '../lib/jsonld';
+import { themeScript } from '../lib/theme-script';
 import { t } from '../i18n/ui';
 
 /** A responsive image preloaded from the head (href is the fallback). */
@@ -76,6 +77,11 @@ const cfBeaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
 // query string is ever sent.
 const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
 const umamiSrc = 'https://admin.stocktcg.net/script.js';
+
+// The theme bootstrap, inlined so it costs no request before the stylesheets;
+// the CSP allows it by hash (src/lib/theme-script.ts fails the build if the
+// hash in public/_headers is stale).
+const theme = themeScript();
 
 // The page language drives the chrome's strings (src/i18n/ui.ts) in the
 // header, footer and search dialog; the alternates feed the header's language
@@ -155,8 +161,9 @@ const umamiSrc = 'https://admin.stocktcg.net/script.js';
 
     <!-- Both themes are supported; the tokens set color-scheme per theme. -->
     <meta name="color-scheme" content="light dark" />
-    <!-- Apply persisted theme before paint; exposes window.__setTheme. -->
-    <script is:inline src="/theme.js"></script>
+    <!-- Apply persisted theme before paint; exposes window.__setTheme. Inline
+         (public/theme.js, minified), allowed by its sha256 in the CSP. -->
+    <script is:inline set:html={theme.source} />
 
     {
       cfBeaconToken && (

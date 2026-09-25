@@ -1,7 +1,24 @@
+---
+seoTitle: "AI governance values and principles, put into practice"
+seoDescription: "The eight values and six principles of AI governance engineering, each with what it means in practice and the anti-pattern it rejects."
+---
 # 03. Values and principles
 
 > The eight values and six principles of the Thesis, each expanded with what it means in practice
 > and the anti-pattern it rejects.
+
+> **In short**
+> The values and principles of AI governance engineering are eight preferences about what to build
+> toward and six rules of method about how to work. The eight values are: governance is code, not a
+> document; evals fail builds, reviews only recommend; evidence comes from runtime, not from a
+> point-in-time attestation; every agent carries its own identity and scope; evidence is
+> machine-readable or it is not evidence; tooling must be inspectable and composable; success is
+> measured in realised risk reduction, not framework coverage; and governance is owned with
+> engineering, not enforced from outside. The six principles are: build the control at the earliest
+> point it can block; give every control teeth; register and bound every actor before it acts;
+> instrument the build to produce its own proof; start from a named failure mode or a named harm;
+> and make the governed path the easiest path. Evals that fail the build and agent identity and
+> scope are what AI forces the discipline to add to GRC engineering.
 
 The Thesis states eight values and six principles in one line each. This chapter expands them. The
 two are deliberately different kinds of thing, and the difference is what keeps them from being the

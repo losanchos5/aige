@@ -11,7 +11,8 @@ import { site } from '../../data/site';
 import { layers } from '../../data/stack';
 import { loadPatternPages } from '../../lib/pattern-pages';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
-import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { fitsSiteSuffix } from '../../lib/seo-title';
+import { authorNodes, authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/patterns.css';
 
@@ -24,8 +25,10 @@ const groups = layers.map((layer) => ({
   pages: pages.filter((page) => page.def.layer === layer.n),
 }));
 
-const description =
-  'Reusable AI governance engineering patterns, one page each, grouped by the five stack layers: the artefact, where it runs and the evidence it leaves.';
+// Title and description lead with the query the page answers, "AI governance
+// design patterns" (SXO-11, 2026-09-25 audit); the H1 stays "Patterns".
+const seoTitle = `AI governance design patterns: ${pages.length}-pattern catalogue`;
+const description = `${pages.length} reusable AI governance design patterns, one page each, grouped by the five stack layers: the artefact, where it runs and the evidence it leaves.`;
 const crumbs = [{ label: 'Patterns' }];
 const pageUrl = new URL('/patterns', site.url).href;
 
@@ -40,6 +43,11 @@ const jsonLd = [
     isPartOf: { '@id': WEBSITE_ID },
     publisher: { '@id': ORG_ID },
     author: [...authorRefs],
+    dateModified: lastModified(
+      'src/pages/patterns/index.astro',
+      'src/data/patterns.ts',
+      '../bok/patterns',
+    ),
     hasPart: pages.map((page) => ({
       '@id': `${new URL(`/patterns/${page.def.slug}`, site.url).href}#article`,
     })),
@@ -49,7 +57,13 @@ const jsonLd = [
 ];
 ---
 
-<Base title="Patterns" description={description} image="/og/bok-patterns.png" jsonLd={jsonLd}>
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/bok-patterns.png"
+  jsonLd={jsonLd}
+>
   <PageHero
     variant="res"
     crumbs={crumbs}

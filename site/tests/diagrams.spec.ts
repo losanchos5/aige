@@ -13,6 +13,7 @@
 // catalogue. Runs in the `default` project against dist/ served by preview.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { inlineScriptAllowed } from './helpers/csp';
 
 // id -> curated title shown in the figure caption (src/data/diagrams.ts).
 const TITLES: Record<string, string> = {
@@ -91,15 +92,20 @@ test.describe('CSP: no inline script', () => {
   for (const route of ['/patterns/eval-gate-in-ci', '/role']) {
     test(`${route} has no inline JS`, async ({ page }) => {
       await page.goto(route);
-      const offenders = await page.$$eval('script', (scripts) =>
-        scripts
-          .filter((s) => {
-            const src = s.getAttribute('src');
-            const type = (s.getAttribute('type') || '').toLowerCase();
-            return !src && !type.includes('json');
-          })
-          .map((s) => `${s.getAttribute('type') || '(no type)'}: ${(s.textContent || '').slice(0, 60)}`),
-      );
+      const offenders = (
+        await page.$$eval('script', (scripts) =>
+          scripts
+            .filter((s) => {
+              const src = s.getAttribute('src');
+              const type = (s.getAttribute('type') || '').toLowerCase();
+              return !src && !type.includes('json');
+            })
+            .map((s) => ({ type: s.getAttribute('type') || '(no type)', body: s.textContent || '' })),
+        )
+      )
+        // The theme bootstrap is inline but allowed by its sha256 in the CSP.
+        .filter((s) => !inlineScriptAllowed(s.body))
+        .map((s) => `${s.type}: ${s.body.slice(0, 60)}`);
       expect(offenders, `inline scripts: ${offenders.join(' | ')}`).toEqual([]);
     });
   }

@@ -2,7 +2,7 @@
 //
 // A chapter's callouts are blockquotes led by a bold English label
 // (`> **In practice**`, `> **Example (illustrative)**`, `> **Anti-pattern**`,
-// `> **Note**`, ...), and a "Maps to" line is a paragraph led by `**Maps to:**`
+// `> **Note**`, `> **In short**`, ...), and a "Maps to" line is a paragraph led by `**Maps to:**`
 // (lib/remark-callouts.ts). callouts.json maps each English label to the label
 // every other language uses; the translation pipeline swaps the label with it,
 // and this module teaches remark-lead and remark-callouts to recognise the

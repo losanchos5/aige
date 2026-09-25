@@ -15,6 +15,18 @@ reasons and says how to contest; and run a contest path to a reviewer with the a
 information to change the outcome. The notice, the contest and the review outcome are all records, so
 the right to contest is evidenced decision by decision instead of asserted in a policy.
 
+> **In short**
+> Decision Notice & Contest Path is a runtime control for AI systems that make or shape a decision
+> about a person, such as credit, insurance, a job or access to a service. It solves a split that
+> leaves rights unevidenced: letters, appeal inboxes and explanation pages owned by different teams
+> and tied to no decision record, so nobody can show which notice a person received or what the
+> reviewer did. The system writes one record per decision, with the model version, inputs by
+> reference, outcome, reason codes and the regimes that apply. A notice service renders the notice
+> from a versioned template per regime and language: that a system was used, the principal reasons
+> and how to contest. A contest goes to a reviewer who did not take the original decision and can
+> change the outcome, and the outcome is recorded. Its illustrative mappings include EU AI Act Art.
+> 26(11) and Art. 86, GDPR Art. 22, UK GDPR Arts. 22A–22D and Regulation B 12 CFR 1002.9.
+
 ## Objectives
 Make every consequential automated decision explainable to, and contestable by, the person it
 affects, and leave a record showing that the notice went out, that the contest was heard and that

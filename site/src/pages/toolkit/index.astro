@@ -8,12 +8,15 @@ import PageHero from '../../components/PageHero.astro';
 import { tools, toolNotice } from '../../data/toolkit';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { site } from '../../data/site';
+import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../components/toolkit/toolkit.css';
 
 const crumbs = [{ label: 'Toolkit' }];
 const pageUrl = `${site.url}/toolkit`;
 const live = tools.filter((tool) => tool.status === 'live');
+const description =
+  'Free AI governance tools built from the Body of Knowledge: indicative self-checks that run in your browser, keep answers in the link and export open formats.';
 
 const jsonLd = [
   breadcrumbJsonLd(crumbs),
@@ -21,8 +24,13 @@ const jsonLd = [
     '@type': 'CollectionPage',
     '@id': `${pageUrl}#page`,
     name: 'Toolkit',
+    description,
     url: pageUrl,
     inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    dateModified: lastModified('src/pages/toolkit/index.astro', 'src/data/toolkit.ts'),
     hasPart: live.map((tool) => ({
       '@type': 'WebApplication',
       '@id': `${site.url}${tool.href}#app`,
@@ -57,8 +65,8 @@ const sources = [
 ---
 
 <Base
-  title="Toolkit"
-  description="Browser tools built from the AI governance Body of Knowledge: indicative self-checks that run in the page, keep your answers in the link and export open formats."
+  title="AI governance toolkit: free browser tools"
+  description={description}
   image="/og/toolkit.png"
   jsonLd={jsonLd}
 >

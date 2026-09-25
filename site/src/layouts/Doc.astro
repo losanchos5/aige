@@ -17,6 +17,7 @@ import EditOnGitHub from '../components/EditOnGitHub.astro';
 import Citation from '../components/Citation.astro';
 import { getChapterBySlug } from '../data/chapters';
 import { readSource } from '../lib/md-parse';
+import { fitsSiteSuffix } from '../lib/seo-title';
 import { wordCount, readingTime } from '../lib/reading';
 import { translator } from '../i18n/ui';
 import { LOCALE_INFO, isLocale } from '../i18n/locales';
@@ -28,6 +29,10 @@ interface Adjacent {
 
 interface Props {
   title: string;
+  /** The document title (<title>, og:title) when it should differ from the
+      visible H1: a chapter's search-phrased `seoTitle`. The site-name suffix is
+      kept only when it fits (lib/seo-title.ts). */
+  seoTitle?: string;
   summary?: string;
   /** Meta description; defaults to `summary`. A chapter passes the manifest's
       trimmed summary here, because its visible lede is the full blockquote and
@@ -74,6 +79,7 @@ interface Props {
 
 const {
   title,
+  seoTitle,
   summary,
   description,
   crumbs,
@@ -143,7 +149,8 @@ if (statsChapter) {
 ---
 
 <Base
-  title={title}
+  title={seoTitle ?? title}
+  titleSuffix={seoTitle ? fitsSiteSuffix(seoTitle) : undefined}
   description={description ?? summary}
   image={image}
   jsonLd={graphNodes.length ? graphNodes : undefined}

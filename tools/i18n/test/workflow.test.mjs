@@ -12,11 +12,14 @@ import { fixtureTree, REPO, scratch } from './helpers.mjs';
 
 const yml = readFileSync(join(REPO, '.github', 'workflows', 'i18n.yml'), 'utf8');
 
-test('manual runs choose languages, mode and cap; pushes to main run a small sync pass', () => {
+test('manual runs choose languages, mode and cap; the push trigger is off while the translations are hidden', () => {
   assert.match(yml, /^ {2}workflow_dispatch:\n {4}inputs:\n {6}langs:/m);
   assert.match(yml, /mode:[\s\S]*?type: choice\n {8}options:\n {10}- batch\n {10}- sync\n {8}default: batch/);
   assert.match(yml, /max_usd:[\s\S]*?default: '1\.00'/);
-  assert.match(yml, /^ {2}push:\n {4}branches: \[main\]\n {4}paths:\n {6}- 'bok\/\*\*'\n {6}- 'THESIS\.md'\n {6}- 'site\/src\/i18n\/ui\.en\.json'$/m);
+  // Commented out since 2026-09-25 (PUBLISHED_TRANSLATED_LOCALES is empty): no
+  // run spends API money on its own. Uncommenting it restores the small sync pass.
+  assert.doesNotMatch(yml, /^ {2}push:/m);
+  assert.match(yml, /^ {2}# push:\n {2}# {3}branches: \[main\]\n {2}# {3}paths:\n {2}# {5}- 'bok\/\*\*'\n {2}# {5}- 'THESIS\.md'\n {2}# {5}- 'site\/src\/i18n\/ui\.en\.json'$/m);
   assert.match(yml, /MODE: \$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.mode \|\| 'sync' \}\}/);
   assert.match(yml, /MAX_USD: \$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.max_usd \|\| '0\.50' \}\}/);
 });

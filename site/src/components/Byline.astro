@@ -1,0 +1,74 @@
+---
+/**
+ * Byline: the visible author and date line under the H1 of a reference page
+ * (glossary term, obligation, case). It names the author the JSON-LD Person
+ * node already names (site.authors), linked to /about with rel="author", and
+ * the date the page already knows, in a <time datetime>. Chapters and pattern
+ * pages carry the same author inside ChapterHeader's meta line instead of a
+ * second row. English only: the reference pages it sits on are English.
+ */
+import { site } from '../data/site';
+
+interface Props {
+  /** YYYY-MM-DD: the page's last update (or review) date. */
+  date?: string;
+  /** Label before the date (default "Updated"; an obligation says "Reviewed"). */
+  dateLabel?: string;
+  /** YYYY-MM-DD the page was first published; shown only when it differs from `date`. */
+  published?: string;
+}
+
+const { date, dateLabel = 'Updated', published } = Astro.props;
+const author = site.authors[0];
+---
+
+<p class="byline" data-byline>
+  <span>By <a rel="author" href="/about">{author}</a></span>
+  {
+    date && (
+      <span>
+        {dateLabel} <time datetime={date}>{date}</time>
+      </span>
+    )
+  }
+  {
+    published && published !== date && (
+      <span>
+        First published <time datetime={published}>{published}</time>
+      </span>
+    )
+  }
+</p>
+
+<style>
+  /* Quiet, like the chapter meta line: mono label size at --ink-2 (never dimmed
+     with opacity), middot separators, the author link underlined in --ink. */
+  .byline {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-1) var(--s-3);
+    margin: var(--s-3) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .byline span + span::before {
+    content: '·';
+    margin-right: var(--s-3);
+    color: var(--ink-2);
+  }
+
+  .byline a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 0.18em;
+  }
+
+  .byline a:hover {
+    text-decoration-color: currentColor;
+  }
+</style>

@@ -10,17 +10,39 @@ import {
   chapterAnchor,
 } from '../../data/contracts';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { collectionPage, lastModified } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Contracts' }];
+const description =
+  'The clauses to check before you deploy a third-party AI system: what each governs, the red flag, a fallback position and the evidence to keep.';
+
+// The page as a CollectionPage of its clauses and licence families, each at its
+// row anchor, dated like the sitemap's lastmod.
+const jsonLd = [
+  collectionPage({
+    path: '/resources/contracts',
+    name: 'AI contract and licence clauses',
+    description,
+    dateModified: lastModified('src/pages/resources/contracts.astro', 'src/data/contracts.ts'),
+    items: [
+      ...clauses.map((row) => ({ name: row.clause, url: `/resources/contracts#clause-${row.id}` })),
+      ...licenceTypes.map((row) => ({
+        name: row.family,
+        url: `/resources/contracts#licence-${row.id}`,
+      })),
+    ],
+  }),
+  breadcrumbJsonLd(crumbs),
+];
 ---
 
 <Base
   title="AI contract and licence clauses"
-  description="The clauses to check before you deploy a third-party AI system: what each governs, the red flag, a fallback position and the evidence to keep."
+  description={description}
   image="/og/resources.png"
-  jsonLd={breadcrumbJsonLd(crumbs)}
+  jsonLd={jsonLd}
 >
   <PageHero
     variant="res"

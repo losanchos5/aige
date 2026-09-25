@@ -1,0 +1,376 @@
+---
+/**
+ * /ai-governance, the pillar page for the head term "AI governance": what it
+ * is, why it matters now, the principles, the frameworks compared, who is
+ * responsible, maturity, implementation, examples, neighbours, tools and
+ * measurement. The body is Markdown (guides/ai-governance.md) so it can be
+ * translated like a chapter later; this page renders it through the site's
+ * Markdown pipeline (citations, tables, glossary links) with the reading
+ * chrome of the Doc layout (crumbs, on-this-page rail) and a visible byline.
+ *
+ * Doc is not used because its title is also the H1: this page needs a longer
+ * search title than its question-form H1, and no " · AI Governance Engineer"
+ * suffix (the title would pass 70 characters). The stack-layers diagram is
+ * placed at the foot of the "framework includes" section, the same placement
+ * rule rehype-diagrams applies to chapters.
+ */
+import Base from '../layouts/Base.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import ChapterHeader from '../components/ChapterHeader.astro';
+import Toc from '../components/Toc.astro';
+import EditOnGitHub from '../components/EditOnGitHub.astro';
+import * as pillar from '../../../guides/ai-governance.md';
+import { site } from '../data/site';
+import { gitCreated, gitDate } from '../lib/reading';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
+import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
+import { renderDiagramFigure } from '../lib/diagrams';
+import { getGlossaryEntry } from '../lib/glossary';
+
+const SOURCE = 'guides/ai-governance.md';
+const FIGURE_ID = 'the-stack-layers';
+const FIGURE_SECTION = 'what-does-an-ai-governance-framework-include';
+
+// remark-lead lifts the Markdown H1 and its answer-box blockquote into the
+// frontmatter, like a chapter's title and abstract.
+const h1 = (pillar.frontmatter.title as string | undefined) ?? 'What is AI governance?';
+const answer = pillar.frontmatter.summary as string | undefined;
+if (!answer) throw new Error(`${SOURCE}: the answer box (the blockquote under the H1) is missing`);
+
+// The search title is longer than the H1 and carries no site-name suffix:
+// "What is AI governance? Definition, frameworks, examples" is 55 characters.
+const title = 'What is AI governance? Definition, frameworks, examples';
+const description =
+  'AI governance defined from the primary sources: the rules, roles, controls and evidence that keep AI in bounds, the main frameworks compared, and how to run it.';
+
+const published = gitCreated(`../${SOURCE}`);
+const updated = gitDate(`../${SOURCE}`);
+
+/** `2026-09-25` -> `25 Sep 2026`, the house prose date format (STYLEGUIDE.md §2). */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function proseDate(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} ${MONTHS[m - 1]} ${y}`;
+}
+
+// The rendered body, with the diagram inserted at the foot of its section
+// (before the next H2). A missing anchor is a build error, not a silent gap.
+const html = await pillar.compiledContent();
+const sectionAt = html.indexOf(`<h2 id="${FIGURE_SECTION}"`);
+if (sectionAt < 0) throw new Error(`${SOURCE}: no H2 #${FIGURE_SECTION} to place the figure under`);
+const nextH2 = html.indexOf('<h2', sectionAt + 1);
+const insertAt = nextH2 < 0 ? html.length : nextH2;
+const body = `${html.slice(0, insertAt)}${renderDiagramFigure(FIGURE_ID)}${html.slice(insertAt)}`;
+
+// The on-this-page rail lists the question H2s only; the FAQ's H3s stay in the body.
+const headings = pillar.getHeadings().filter((heading) => heading.depth === 2);
+
+const words = body
+  .replace(/<svg[\s\S]*?<\/svg>/g, ' ')
+  .replace(/<[^>]+>/g, ' ')
+  .split(/\s+/)
+  .filter((word) => /[A-Za-z0-9]/.test(word)).length;
+
+// The term this page defines is the glossary's own entry, so the DefinedTerm
+// here and the one on /glossary/ai-governance are the same node (same @id).
+const term = getGlossaryEntry('ai-governance');
+if (!term) throw new Error('glossary: the "AI governance" term (bok/09-glossary.md) is missing');
+
+const crumbs: Crumb[] = [{ label: 'What is AI governance?' }];
+const pageUrl = new URL('/ai-governance', site.url).href;
+const glossaryUrl = new URL('/bok/glossary', site.url).href;
+const termSetId = `${glossaryUrl}#glossary`;
+const termUrl = new URL(term.url, site.url).href;
+const termId = `${termUrl}#term`;
+
+// The instruments the page compares, each named by its primary-source URL.
+const mentions = [
+  {
+    '@type': 'Legislation',
+    name: 'Regulation (EU) 2024/1689 (Artificial Intelligence Act)',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng',
+  },
+  {
+    '@type': 'Legislation',
+    name: 'Council of Europe Framework Convention on Artificial Intelligence (CETS No. 225)',
+    url: 'https://rm.coe.int/1680afae3c',
+  },
+  {
+    '@type': 'CreativeWork',
+    name: 'ISO/IEC 42001:2023, AI management systems',
+    url: 'https://www.iso.org/standard/81230.html',
+  },
+  {
+    '@type': 'CreativeWork',
+    name: 'NIST AI Risk Management Framework (AI RMF 1.0)',
+    url: 'https://doi.org/10.6028/NIST.AI.100-1',
+  },
+  {
+    '@type': 'CreativeWork',
+    name: 'OECD Recommendation of the Council on Artificial Intelligence',
+    url: 'https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449',
+  },
+  {
+    '@type': 'CreativeWork',
+    name: 'UNESCO Recommendation on the Ethics of Artificial Intelligence',
+    url: 'https://www.unesco.org/en/artificial-intelligence/recommendation-ethics',
+  },
+];
+
+const jsonLd = [
+  {
+    '@type': 'TechArticle',
+    '@id': `${pageUrl}#article`,
+    headline: title,
+    alternativeHeadline: h1,
+    description,
+    url: pageUrl,
+    mainEntityOfPage: pageUrl,
+    inLanguage: 'en',
+    datePublished: published,
+    dateModified: updated,
+    wordCount: words,
+    image: new URL('/og/default.png', site.url).href,
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    about: { '@id': termId },
+    mentions,
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+  },
+  {
+    '@type': 'DefinedTerm',
+    '@id': termId,
+    name: term.term,
+    description: term.definition,
+    url: termUrl,
+    inLanguage: 'en',
+    inDefinedTermSet: { '@id': termSetId },
+    subjectOf: { '@id': `${pageUrl}#article` },
+  },
+  {
+    '@type': 'DefinedTermSet',
+    '@id': termSetId,
+    name: `Glossary · ${site.name}`,
+    url: glossaryUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+
+const author = site.authors[0];
+const emitDiagramScript = !Astro.locals.diagramScript;
+if (emitDiagramScript) Astro.locals.diagramScript = true;
+---
+
+<Base
+  title={title}
+  titleSuffix={false}
+  description={description}
+  jsonLd={jsonLd}
+  article={{
+    publishedTime: `${published}T00:00:00Z`,
+    modifiedTime: `${updated}T00:00:00Z`,
+    author,
+  }}
+>
+  <div class="pillar container" data-mode="doc">
+    <div class="pillar-layout">
+      <div class="pillar-main">
+        <div class="pillar-crumbs" data-pagefind-ignore>
+          <Breadcrumb items={crumbs} />
+        </div>
+
+        {/* Before the <h1> in source order, like Doc's: kept out of snippets. */}
+        <details class="pillar-toc-m" data-pagefind-ignore data-nosnippet>
+          <summary>On this page</summary>
+          <ul>
+            {headings.map((h) => (
+              <li>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ul>
+        </details>
+
+        <article class="prose" data-pagefind-body>
+          <ChapterHeader title={h1} summary={answer} />
+          <p class="byline" data-testid="byline">
+            <span>By <a href="/about" rel="author">{author}</a></span>
+            <span>Published <time datetime={published}>{proseDate(published)}</time></span>
+            <span>Updated <time datetime={updated}>{proseDate(updated)}</time></span>
+            <span>{site.license}</span>
+          </p>
+          <Fragment set:html={body} />
+        </article>
+
+        <footer class="pillar-foot">
+          <p class="pillar-licence">
+            This work is licensed under <a href={site.licenseUrl}>{site.license}</a>. You may share
+            and adapt it provided you give appropriate credit, link to the licence and indicate
+            changes. Attribution: {author}.
+          </p>
+          <EditOnGitHub path={SOURCE} />
+        </footer>
+      </div>
+
+      <aside class="pillar-toc" aria-label="On this page" data-pagefind-ignore data-nosnippet>
+        <Toc headings={headings} />
+      </aside>
+    </div>
+  </div>
+
+  <script is:inline src="/ui-doc.js" defer></script>
+  <script is:inline src="/glossary-cards.js" defer></script>
+  {emitDiagramScript && <script is:inline src="/diagram.js" defer></script>}
+</Base>
+
+<style>
+  .pillar {
+    padding-block: var(--s-6) var(--s-8);
+  }
+
+  .pillar-layout {
+    --doc-well: min(1100px, 100%);
+    --doc-rail-top: calc(var(--anchor-offset) + var(--s-3));
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-6);
+    align-items: start;
+  }
+
+  .pillar-crumbs {
+    margin-bottom: var(--s-5);
+  }
+
+  /* Query container for the diagram breakout, as in Doc's .doc-main. */
+  .pillar-main {
+    min-width: 0;
+    container-type: inline-size;
+  }
+
+  .byline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-3);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .byline span + span::before {
+    content: '·';
+    margin-right: var(--s-3);
+  }
+
+  .byline a {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .pillar-foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--s-4);
+    max-width: 72ch;
+    margin-top: var(--s-7);
+    margin-inline: auto;
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .pillar-licence {
+    margin: 0;
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .pillar-toc {
+    display: none;
+  }
+
+  .pillar-toc-m {
+    margin-bottom: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+  }
+
+  .pillar-toc-m > summary {
+    padding: var(--s-3) var(--s-4);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .pillar-toc-m > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .pillar-toc-m ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 var(--s-4) var(--s-4);
+    border-top: 1px solid var(--line);
+  }
+
+  .pillar-toc-m li {
+    margin: 0;
+  }
+
+  .pillar-toc-m a {
+    display: block;
+    padding: var(--s-2) 0;
+    color: var(--ink-2);
+    text-decoration: none;
+    line-height: 1.35;
+  }
+
+  .pillar-toc-m a:hover {
+    color: var(--ink);
+  }
+
+  @media (min-width: 1100px) {
+    .pillar {
+      max-width: 1440px;
+    }
+
+    .pillar-layout {
+      grid-template-columns: minmax(0, var(--doc-well)) 220px;
+      justify-content: center;
+    }
+
+    .pillar-toc {
+      display: block;
+      position: sticky;
+      top: var(--doc-rail-top);
+      align-self: start;
+      max-height: calc(100dvh - var(--doc-rail-top) - var(--s-5));
+      overflow-y: auto;
+      padding: 0 var(--s-2) var(--s-2);
+    }
+
+    .pillar-toc-m {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1600px) {
+    .pillar {
+      max-width: 1680px;
+    }
+
+    .pillar-layout {
+      --doc-well: min(1300px, 100%);
+    }
+  }
+</style>

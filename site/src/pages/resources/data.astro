@@ -11,13 +11,21 @@ import { site } from '../../data/site';
 import { obligations, frameworks, disclaimer, OBLIGATION_ID_PATTERN } from '../../data/frameworks';
 import { datasets, API_PATH, SCHEMA_BASE, allSchemas } from '../../lib/api';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
-import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID, DATA_CATALOG_ID } from '../../lib/jsonld';
+import {
+  authorNodes,
+  authorRefs,
+  ORG_ID,
+  WEBSITE_ID,
+  DATA_CATALOG_ID,
+  lastModified,
+  workDoi,
+} from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 import '../../styles/obligations.css';
 
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Open data' }];
-/** The planned public endpoint of tools/mcp-server (its README, "Connect"). */
+/** The public endpoint of tools/mcp-server, as /mcp states it. */
 const MCP_ENDPOINT = 'https://mcp.aigovernanceengineer.com/mcp';
 const pageUrl = new URL('/resources/data', site.url).href;
 const description =
@@ -49,6 +57,10 @@ const jsonLd = [
     publisher: { '@id': ORG_ID },
     isPartOf: { '@id': WEBSITE_ID },
     ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    dateModified: lastModified('src/pages/resources/data.astro', 'src/lib/api.ts'),
+    // The Zenodo archive of the release (version and concept DOIs) holds the
+    // data files too, so the catalogue and each dataset cite it.
+    ...workDoi,
     dataset: datasets.map((d) => ({
       '@type': 'Dataset',
       '@id': `${abs(`${API_PATH}/${d.name}.json`)}#dataset`,
@@ -60,6 +72,7 @@ const jsonLd = [
       publisher: { '@id': ORG_ID },
       ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
       isAccessibleForFree: true,
+      identifier: workDoi.identifier,
       includedInDataCatalog: { '@id': DATA_CATALOG_ID },
       distribution: [
         {
@@ -70,6 +83,28 @@ const jsonLd = [
         },
       ],
     })),
+  },
+  // The two ways to read the same data by machine: the static JSON API this
+  // page documents (with its OpenAPI 3.1 description) and the MCP server (/mcp).
+  {
+    '@type': 'WebAPI',
+    '@id': `${pageUrl}#api`,
+    name: `Open data JSON API · ${site.name}`,
+    description:
+      'Static, versioned JSON under /api/v1: obligations with stable ids, frameworks, crosswalk, glossary, patterns and more, with a JSON Schema per file and an OpenAPI 3.1 description. No key, no account.',
+    url: abs(`${API_PATH}/index.json`),
+    documentation: [pageUrl, abs(`${API_PATH}/openapi.json`)],
+    provider: { '@id': ORG_ID },
+  },
+  {
+    '@type': 'WebAPI',
+    '@id': `${abs('/mcp')}#server`,
+    name: `MCP server · ${site.name}`,
+    description:
+      'A public, read-only Model Context Protocol server over the same open data: obligations, crosswalk, glossary, patterns and templates, each answer with its source.',
+    url: MCP_ENDPOINT,
+    documentation: [abs('/mcp'), `${site.github}/tree/main/tools/mcp-server`],
+    provider: { '@id': ORG_ID },
   },
   ...authorNodes,
   breadcrumbJsonLd(crumbs),

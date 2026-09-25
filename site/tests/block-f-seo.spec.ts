@@ -37,13 +37,14 @@ test.describe('structured data on a chapter page', () => {
     expect(types).toContain('TechArticle');
     expect(types).toContain('BreadcrumbList');
 
-    // The TechArticle belongs to the Book, and neither Person carries a job title.
+    // The TechArticle belongs to the Book; the Person carries the role the
+    // preface states and no employer.
     const book = graph.find((node) => node['@type'] === 'Book');
     const article = graph.find((node) => node['@type'] === 'TechArticle');
     expect(article?.isPartOf?.['@id']).toBe(book?.['@id']);
 
     for (const person of graph.filter((node) => node['@type'] === 'Person')) {
-      expect(person.jobTitle).toBeUndefined();
+      expect(person.jobTitle).toBe('AI Governance & Privacy Engineer');
       expect(person.worksFor).toBeUndefined();
     }
   });

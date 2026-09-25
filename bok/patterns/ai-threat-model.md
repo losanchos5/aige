@@ -16,6 +16,18 @@ and require every threat above tolerance to resolve to a mitigation and to the t
 mitigation works. The threat model decides what the red-team suite, the guardrails and the supply-chain
 controls cover, and it is reopened whenever the system or the threat catalogue changes.
 
+> **In short**
+> The AI Threat Model is a design-review control that records the threats to one AI system as a
+> versioned data file, not a slide. It solves a gap in generic security reviews, which do not ask
+> about training data, pre-trained components, prompts, retrieval corpora or the inference API. Use
+> it at design review for a system that trains or fine-tunes on external data, retrieves documents,
+> calls tools or serves a model through an API. The team decomposes the data flows and walks each
+> element with STRIDE, extended with the attacks catalogued by MITRE ATLAS, NIST AI 100-2 and the
+> OWASP lists. Each threat is rated and mitigated, avoided, transferred or accepted. Every mitigated
+> threat names its controls and the test that proves them, and the review fails while any threat
+> above tolerance lacks either. Its illustrative mappings include EU AI Act Art. 15(5) and Art.
+> 55(1)(d), ISO/IEC 42001 A.6.2.2 and A.6.2.4, and NIST AI RMF Map 5.1 and Measure 2.7.
+
 ## Objectives
 Turn "what can go wrong?" into a traceable chain of threat, mitigation and test, so the security
 controls of an AI system are chosen from its design rather than from habit, and an auditor can see

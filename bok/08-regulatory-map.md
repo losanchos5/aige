@@ -1,7 +1,22 @@
+---
+seoTitle: "AI regulatory map: every obligation to its artefact"
+---
 # 08. Regulatory map (obligation → artefact → layer)
 
 > This chapter is the reverse index of every "Maps to" line in the book: for each obligation it names
 > the engineering artefact that satisfies or supports it and the stack layer the artefact lives in.
+
+> **In short**
+> The regulatory map is the reverse index of every Maps to line in the Body of Knowledge: for each
+> obligation it names the engineering artefact that satisfies or supports it and the stack layer the
+> artefact lives in. It indexes the EU AI Act after the Digital Omnibus, the GPAI Code of Practice,
+> the GDPR and other EU law, ISO/IEC 42001, the NIST AI RMF, US federal and state laws and other
+> jurisdictions. Every EU AI Act date reflects Regulation (EU) 2026/1744, in force 27 July 2026:
+> high-risk obligations apply to Annex III systems from 2 December 2027 and to Annex I embedded
+> systems from 2 August 2028 [1][2]. For general-purpose AI the supervisor is the AI Office; for
+> high-risk systems it is the national market-surveillance authorities. Mappings are illustrative,
+> not a claim of conformity: an artefact supports and evidences an obligation, and the legal
+> judgement stays with lawyers, notified bodies and authorities.
 
 Every other chapter maps *forward*: a capability, then the obligations it touches. This chapter maps
 *backward*: an obligation, then the artefact and the layer that answer it. The unit of the map is a

@@ -1,7 +1,23 @@
+---
+seoTitle: "AI agent governance: registry, identity, kill switches"
+---
 # 23. Governing AI agents
 
 > An AI agent is governed when every action traces back to a registered identity, a scope someone
 > approved, a checkpoint that fired where the stakes required one and a tested way to stop it.
+
+> **In short**
+> An AI agent is an AI system that pursues a goal by choosing and taking actions: it plans, calls
+> tools, reads and writes memory and may hand work to other agents. It is governed when every action
+> traces back to a registered identity, a scope someone approved, a checkpoint that fired where the
+> stakes required one and a tested way to stop it. Four properties make an agent different to govern
+> (delegated authority, tools, memory and autonomy), and each breaks an assumption that model
+> governance relies on. An agent must be evaluated on its trajectory, the sequence of plans, tool
+> calls and memory operations, not only on its final answer. The OWASP agentic list states the first
+> principle, least agency: avoid unnecessary autonomy [1]. Autonomy is a design decision, separate
+> from capability [2]. The controls form one control plane: the agent registry, short-lived
+> credentials, a tool allow-list, human checkpoints, runtime guardrails for tool calls and per-agent
+> circuit breakers.
 
 Chapter 05 carries four agent patterns: the [Agent Registry](/patterns/agent-registry),
 [Agent Identity & Scoped Credentials](/patterns/agent-identity-scoped-credentials), the

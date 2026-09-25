@@ -13,6 +13,19 @@ Policy Card on every live request and emit a decision to telemetry and to the ci
 guardrail is where a policy written in layer 01 and a threshold tested in layer 03 become an action
 taken on a real call, not a claim about one.
 
+> **In short**
+> The Runtime Guardrail is a runtime control that places input and output guardrails on a model or
+> agent's live request path, enforcing the system's Policy Card on every call. It solves the gap
+> left by point-in-time policies and evals: once in production, the system meets prompt injection,
+> unsafe outputs and tool calls no one reviewed, and a guardrail that only logs is observability
+> mistaken for control. Use it for any agent or model acting on live inputs whose Policy Card and
+> eval thresholds have no runtime enforcement point. The input guardrail screens prompts and
+> retrieved context for injection and policy-violating requests; the output guardrail screens
+> generations and tool calls for unsafe content, data leakage and out-of-scope actions. Every call
+> emits a structured decision event to the assurance store, and a defined breach signals the circuit
+> breaker. Its illustrative mappings are EU AI Act Art. 14 and 15, ISO/IEC 42001, the NIST AI RMF
+> Manage function and OWASP Agentic ASI02 and ASI03.
+
 ## Objectives
 Enforce policy at the point of action, on inputs and outputs no eval anticipated, and make each
 enforcement a structured event the assurance and incident layers can consume.

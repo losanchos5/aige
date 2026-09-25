@@ -13,6 +13,18 @@ agent and is evaluated in the pipeline and at runtime, rather than as prose a hu
 Policy Card encodes permitted and prohibited actions, obligations and evidentiary requirements for one
 AI system, and links to the enforcement and audit pipelines that act on it [1].
 
+> **In short**
+> Policy Card is a governance-as-code control that expresses a governance rule as a machine-readable
+> artefact which travels with the model or agent, instead of prose a human must remember to apply.
+> It solves a plain problem: prose policy cannot be enforced automatically, drifts from the systems
+> it governs and leaves no evidence that it was applied. Use it when an organisation runs more than
+> a handful of AI systems and its governance function cannot review every change by hand. Each card
+> states allow and deny logic, the failure mode it addresses and the framework clauses it maps to.
+> It is stored with the system it governs and evaluated pre-merge, at deploy and, for runtime
+> constraints, at the point of action. Every evaluation emits a verdict with the rule id, input
+> hash, decision and timestamp. Its illustrative mappings are EU AI Act Art. 9, ISO/IEC 42001, the
+> NIST AI RMF Govern function, CSA AICM and OWASP Agentic ASI02 and ASI03.
+
 ## Objectives
 Turn a policy from a statement of intent into an executing control, versioned and testable, so that a
 rule change is a reviewable diff and every evaluation leaves a verdict.

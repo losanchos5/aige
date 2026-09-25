@@ -11,8 +11,12 @@ name: Translations
 # other workflow run. Merging the pull request is what publishes the files.
 #
 # Manual runs choose the languages, the mode (batch: Message Batches API, half
-# price, results within hours; sync: Messages API) and the cap. A push to main
-# that edits the English sources runs a small sync pass capped at USD 0.50.
+# price, results within hours; sync: Messages API) and the cap. The push trigger
+# (a small sync pass capped at USD 0.50 on every push to main that edits the
+# English sources) is switched off below since 2026-09-25: the site does not
+# publish the machine translations for now (PUBLISHED_TRANSLATED_LOCALES in
+# site/src/i18n/locales.ts), so every push would spend API money on pages
+# nobody sees. To re-enable it, uncomment the `push:` block.
 # A batch still processing when the job stops waiting is saved in
 # i18n/.tm/pending-batches.json on the pull request branch; run this workflow
 # again on that branch ("Use workflow from") to resume it without paying twice.
@@ -36,12 +40,13 @@ on:
         description: 'Hard spend cap for this run, in USD'
         type: string
         default: '1.00'
-  push:
-    branches: [main]
-    paths:
-      - 'bok/**'
-      - 'THESIS.md'
-      - 'site/src/i18n/ui.en.json'
+  # Off while the translations are hidden (see the header); uncomment to re-enable.
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'bok/**'
+  #     - 'THESIS.md'
+  #     - 'site/src/i18n/ui.en.json'
 
 permissions: {}
 

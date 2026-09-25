@@ -1,3 +1,7 @@
+---
+seoTitle: "AI governance reading list: annotated sources"
+seoDescription: "An annotated AI governance reading list: the laws, standards, papers and reports that formed the discipline, each with a verified URL and a note."
+---
 # 10. Reading list
 
 > The sources that formed the discipline, curated and annotated, each with a verified URL and a

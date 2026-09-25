@@ -1,8 +1,23 @@
+---
+seoTitle: "Why AI governance needs engineering now: the evidence"
+---
 # 02. Why now
 
 > AI governance engineering is forming now because the thing being governed changed shape, the market
 > began hiring for engineering skills before the profession named itself, and the law began asking for
 > engineered evidence, all between April 2025 and August 2026.
+
+> **In short**
+> AI governance engineering is forming now because the thing being governed changed shape, the
+> market began hiring for engineering skills before the profession named itself, and the law began
+> asking for engineered evidence, all between April 2025 and August 2026. Legacy governance has five
+> problems: it is written for systems that no longer exist, it reviews a continuously changing thing
+> at points in time, it arrives as a gate at the end, it mistakes framework mapping for a working
+> control, and it has no runtime data path. The evidence is concrete. An analysis of 1,997 US
+> AI-governance postings found observability platforms the most demanded skill, in 41% of postings
+> [8]. As of 2026-09-24 no harmonised standard is cited in the Official Journal, so no Article 40
+> presumption of conformity is available [4]. The Digital Omnibus moved Annex III high-risk
+> obligations to 2 December 2027 [14][19], while GPAI enforcement went live on 2 August 2026 [15].
 
 Disciplines do not appear on a schedule. They appear when an old way of working visibly stops holding
 and enough people, in enough places, start building the replacement at once. That is happening to AI

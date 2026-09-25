@@ -26,6 +26,29 @@ const OG_IMAGE_WIDTH = '1200';
 const OG_IMAGE_HEIGHT = '630';
 const OG_IMAGE_TYPE = 'image/png';
 
+// The text printed on the section cards (lib/og-cards.ts). A page on one of
+// them whose title differs from the card's describes the card, not itself.
+const SHARED_CARDS: Record<string, string> = {
+  '/og/default.png': 'AI Governance Engineering',
+  '/og/thesis.png': 'The Thesis',
+  '/og/bok.png': 'Body of Knowledge',
+  '/og/role.png': 'The AI Governance Engineer',
+  '/og/stack.png': 'The five-layer stack',
+  '/og/path.png': 'The AIGE learning path',
+  '/og/resources.png': 'Resources & reading list',
+  '/og/map.png': 'The map of the discipline',
+  '/og/about.png': 'About this site',
+  '/og/toolkit.png': 'Toolkit: governance tools in your browser',
+  '/og/obligations.png': 'The obligation register',
+  '/og/figures.png': 'Figures of the Body of Knowledge',
+  '/og/data.png': 'Open data and API',
+  '/og/mcp.png': 'The Body of Knowledge in your AI assistant',
+  '/og/for.png': 'Routes by audience',
+  '/og/bok-patterns.png': '05. Patterns',
+  '/og/bok-glossary.png': '09. Glossary',
+  '/og/bok-governing-agents.png': '23. Governing AI agents',
+};
+
 const paths: string[] = [
   ...lighthouserc.ci.collect.url.map((url: string) => new URL(url).pathname),
   '/es/thesis',
@@ -155,9 +178,16 @@ for (const path of paths) {
       expect(twitterAlt, 'missing twitter:image:alt').toHaveLength(1);
       expect(twitterAlt[0]).toBe(ogAlt[0]);
 
-      // The alt text is the page title, which is what the card renders.
+      // A card rendered for the page shows its title, so the alt is the page
+      // title; a shared section card is described by its own text instead.
       const titles = await page.locator('head > title').allTextContents();
-      expect(ogAlt[0]).toBe(titles[0].trim());
+      const image = (await metaContents(page, 'meta[property="og:image"]'))[0];
+      const shared = SHARED_CARDS[new URL(image).pathname];
+      if (shared && ogAlt[0] !== titles[0].trim()) {
+        expect(ogAlt[0]).toBe(`${shared} · ${SITE_NAME}`);
+      } else {
+        expect(ogAlt[0]).toBe(titles[0].trim());
+      }
     });
 
     test('declares a theme colour', async ({ page }) => {
@@ -203,9 +233,9 @@ test.describe('og:type', () => {
     expect(modified).toHaveLength(1);
     expect(modified[0]).toMatch(ISO_DATE_TIME);
 
+    // The same full name as the JSON-LD Person node.
     const author = await metaContents(page, 'meta[property="article:author"]');
-    expect(author).toHaveLength(1);
-    expect(author[0].trim().length).toBeGreaterThan(0);
+    expect(author).toEqual(['Jorge García Aibar']);
   });
 
   test('the Thesis translations are articles too', async ({ page }) => {

@@ -12,6 +12,19 @@ summary: "Model and data cards regenerated from the pipeline as structured evide
 structured evidence regenerated from the pipeline, so that transparency documents describe the system as
 it is now and feed the assurance layer.
 
+> **In short**
+> Model Card as Control Evidence is a transparency control that treats the model card and data card
+> as structured evidence regenerated from the pipeline, not as launch documentation written once. It
+> solves the decay of static cards: a card written at launch turns into fiction as the model,
+> prompts and datasets change, cannot be trusted as evidence and misleads the auditor it was meant
+> to satisfy. Use it for any AI system subject to transparency obligations, where cards are
+> traditionally written at launch and never touched again. The card is templated and populated from
+> the pipeline: intended use, evaluation results from the Eval Gate, datasets from the AIBOM, known
+> limitations and the owner. It is regenerated on each significant change, versioned with the model
+> and stored as structured data that a person can read and the assurance layer can consume. Its
+> illustrative mappings are EU AI Act Art. 11 and Art. 13, ISO/IEC 42001, ISO/IEC 42005 and the NIST
+> AI RMF Map and Measure functions.
+
 ## Objectives
 Convert transparency documentation from a static PDF into a versioned artefact that is both
 human-readable and machine-consumable, and that counts as control evidence.

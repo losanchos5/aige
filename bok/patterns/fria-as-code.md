@@ -17,6 +17,19 @@ assessment, or AIIA, that ISO/IEC 42005 describes, the GDPR DPIA and the EU AI A
 shared fact base with several views, each with its own trigger, reviewer and re-assessment rule. The
 pattern keeps its original name and address so that published links to it still resolve.
 
+> **In short**
+> FRIA-as-Code is a governance-as-code control that keeps the fundamental-rights impact assessment
+> as a versioned, reviewable artefact cross-referenced to the data-protection impact assessment, so
+> the rights assessment updates with the system. It solves the FRIA written once as a Word document
+> and never revisited, and the drift between a FRIA, a DPIA and a separate AI system impact
+> assessment that describe the same harms on different scales. Use it when a deployer of a high-risk
+> system owes an EU AI Act Art. 27 FRIA, a GDPR Art. 35 DPIA may already exist, or a provider
+> assesses impact under ISO/IEC 42001 and ISO/IEC 42005. One fact base per system holds the intended
+> purpose, affected groups, scored harms and mitigations linked to the controls and evals that
+> implement them; the AIIA, DPIA and FRIA are rendered as views of it. Re-assessment triggers are
+> conditions the registry evaluates. Its illustrative mappings also include EU AI Act Art. 9 and the
+> NIST AI RMF Map function.
+
 ## Objectives
 Keep the FRIA and its DPIA cross-reference live and linked to the controls they demand, so a change in
 the system triggers a review of its rights impact. Extend the same discipline to the AIIA, so that one

@@ -22,6 +22,7 @@ import {
   DEFAULT_LOCALE,
   LOCALES,
   MACHINE_THESIS_LOCALES,
+  isPublishedLocale,
   isTranslatedLocale,
   type Locale,
   type TranslatedLocale,
@@ -159,13 +160,30 @@ export function indexOf(files: TranslationFile[]): TranslationIndex {
   return { files, byEnglishPath, bokLangs, langs };
 }
 
-let indexCache: { dir: string; index: TranslationIndex } | undefined;
+let indexCache: { dir: string; onDisk: TranslationFile[]; index: TranslationIndex } | undefined;
 
-/** The translations present in `i18nDir()`, scanned once per process. */
-export function translationIndex(): TranslationIndex {
+function cached() {
   const dir = i18nDir();
-  if (indexCache?.dir !== dir) indexCache = { dir, index: indexOf(scan(dir)) };
-  return indexCache.index;
+  if (indexCache?.dir !== dir) {
+    const onDisk = scan(dir);
+    indexCache = { dir, onDisk, index: indexOf(onDisk.filter((file) => isPublishedLocale(file.lang))) };
+  }
+  return indexCache;
+}
+
+/** Every translation file in `i18nDir()`, published or not (the tests read it). */
+export function translationsOnDisk(): TranslationFile[] {
+  return cached().onDisk;
+}
+
+/**
+ * The translations the site publishes: the files in `i18nDir()` whose language
+ * is in PUBLISHED_TRANSLATED_LOCALES (src/i18n/locales.ts), scanned once per
+ * process. Everything the build derives from translations (routes, hreflang,
+ * sitemap, switcher, footer) reads this index, so the switch hides them all.
+ */
+export function translationIndex(): TranslationIndex {
+  return cached().index;
 }
 
 /** Sort languages in the site's locale order (the switcher and hreflang order). */
