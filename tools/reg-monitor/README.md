@@ -20,12 +20,15 @@ the change and decides what to edit. Nothing is published automatically.
 - **Manual runs default to a dry run**: the `dry_run` input is ticked by default, so a manual run
   prints what it would do, writes no state and opens no issue. Untick it for a real run. The
   `only` input limits a run to some source ids (comma-separated).
-- **Order of work in a run**: the unit tests and `monitor.mjs --check` run first; then the state
-  branch is checked out; then the monitor runs; then the state is committed and pushed, even when
-  the monitor step failed part-way, so sources already handled are not reported twice.
-- **Permissions**: the job alone gets `contents: write` (to push the state branch) and
-  `issues: write`; the workflow default is no permissions. The job runs only in
-  `losanchos5/aige`, not in forks. A concurrency group stops two runs overlapping.
+- **Order of work in a run**: in the `monitor` job, the unit tests and `monitor.mjs --check` run
+  first; then the state branch is checked out; then the monitor runs; then the state is handed on
+  as a short-lived artifact, even when the monitor step failed part-way. The `save-state` job then
+  commits and pushes it, so sources already handled are not reported twice.
+- **Permissions**: the workflow default is no permissions. The `monitor` job, which fetches and
+  parses the third-party pages, gets `contents: read` and `issues: write`, and its checkout leaves
+  no token in the git config. Only the `save-state` job gets `contents: write`, and it runs nothing
+  but the push of the state branch. Both jobs run only in `losanchos5/aige`, not in forks. A
+  concurrency group stops two runs overlapping.
 - **Cost**: standard GitHub-hosted runners are free for public repositories [3]. A run makes one
   request per source (plus retries), one per second, and takes a few minutes.
 
@@ -168,8 +171,8 @@ The fetched pages are untrusted input. They are only parsed as text: nothing fro
 executed, and the diff appears in the issue inside a code fence longer than any backtick run it
 contains, so page content cannot break out of the fence, and GitHub does not turn mentions or
 references inside code into notifications or links. Issue lookups skip pull requests, which the
-issues API also returns [4]. The token is the workflow's own `GITHUB_TOKEN`, scoped to the job; no
-other secret is used.
+issues API also returns [4]. The token is the workflow's own `GITHUB_TOKEN`, scoped per job, and
+the job that reads the pages cannot push with it; no other secret is used.
 
 ## Files
 

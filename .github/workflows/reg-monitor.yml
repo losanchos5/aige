@@ -9,6 +9,11 @@ name: Regulatory monitor
 # (deploy.yml), and a daily state commit there would redeploy it every day.
 # Pushes made with the GITHUB_TOKEN do not start other workflow runs, and no
 # workflow listens to that branch. See tools/reg-monitor/README.md.
+#
+# Two jobs, so the token that reads third-party pages cannot push: "monitor"
+# fetches and parses the pages with contents: read and issues: write, and hands
+# its state over as an artifact; "save-state" holds the only contents: write
+# token and does nothing but push that state to the state branch.
 
 on:
   schedule:
@@ -37,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      contents: write # push the reg-monitor-state branch
+      contents: read # the code and the reg-monitor-state branch
       issues: write # open or comment on "regulatory-change" issues
     env:
       STATE_BRANCH: reg-monitor-state
@@ -46,6 +51,9 @@ jobs:
       ONLY: ${{ inputs.only }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          # No token left in .git/config for the steps that parse fetched pages.
+          persist-credentials: false
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
@@ -55,11 +63,16 @@ jobs:
           node --test 'tools/reg-monitor/test/*.test.mjs'
           node tools/reg-monitor/monitor.mjs --check
       - name: Check out the state branch
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          b64=$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)
+          echo "::add-mask::$b64"
+          git_auth() { git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $b64" "$@"; }
           dir="$RUNNER_TEMP/reg-state"
-          if git ls-remote --exit-code --heads origin "$STATE_BRANCH" >/dev/null; then
-            git fetch --no-tags --depth=1 origin "$STATE_BRANCH"
+          if git_auth ls-remote --exit-code --heads origin "$STATE_BRANCH" >/dev/null; then
+            git_auth fetch --no-tags --depth=1 origin "$STATE_BRANCH"
             git worktree add --quiet --detach "$dir" FETCH_HEAD
           else
             # First run: an empty orphan branch, sharing no history with main.
@@ -80,14 +93,62 @@ jobs:
           node tools/reg-monitor/monitor.mjs "${args[@]}"
       # Runs even when the monitor step failed, so the sources already handled
       # (and their issues) are recorded and not reported twice.
-      - name: Save the state
+      - name: Hand the state to the save-state job
         if: ${{ always() && env.DRY_RUN == '' && env.STATE_DIR != '' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: reg-monitor-state
+          path: |
+            ${{ env.STATE_DIR }}/README.md
+            ${{ env.STATE_DIR }}/state.json
+            ${{ env.STATE_DIR }}/text/
+          if-no-files-found: ignore
+          retention-days: 1
+          overwrite: true
+
+  save-state:
+    needs: monitor
+    # After the monitor, even when it failed part-way; never on a dry run, in a
+    # fork, or when the monitor job was skipped.
+    if: ${{ always() && github.repository == 'losanchos5/aige' && needs.monitor.result != 'skipped' && !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write # push the reg-monitor-state branch; nothing else runs here
+    env:
+      STATE_BRANCH: reg-monitor-state
+    steps:
+      # No artifact means the monitor wrote no state: nothing to save.
+      - name: Take the state from the monitor job
+        id: state
+        continue-on-error: true
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: reg-monitor-state
+          path: ${{ runner.temp }}/reg-new
+      - name: Save the state
+        if: ${{ steps.state.outcome == 'success' }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          cd "$STATE_DIR"
-          [ -f state.json ] || { echo "No state written; nothing to save."; exit 0; }
-          git add -- README.md state.json
-          if [ -d text ]; then git add -- text; fi
+          new="$RUNNER_TEMP/reg-new"
+          [ -f "$new/state.json" ] || { echo "No state written; nothing to save."; exit 0; }
+          b64=$(printf 'x-access-token:%s' "$GITHUB_TOKEN" | base64 -w0)
+          echo "::add-mask::$b64"
+          git_auth() { git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $b64" "$@"; }
+          dir="$RUNNER_TEMP/reg-state"
+          git init --quiet --initial-branch="$STATE_BRANCH" "$dir"
+          cd "$dir"
+          git remote add origin "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+          if git_auth ls-remote --exit-code --heads origin "$STATE_BRANCH" >/dev/null; then
+            git_auth fetch --quiet --no-tags --depth=1 origin "$STATE_BRANCH"
+            git checkout --quiet --detach FETCH_HEAD
+          fi
+          # Mirror what the monitor left, so a source it pruned disappears here too.
+          rm -rf README.md state.json text
+          cp -R "$new/." .
+          git add -A
           if git diff --cached --quiet; then
             echo "State unchanged."
             exit 0
@@ -95,4 +156,4 @@ jobs:
           git -c user.name='github-actions[bot]' \
               -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
               commit --quiet -m "chore(reg-monitor): estado de la ejecución $GITHUB_RUN_ID"
-          git push --quiet origin "HEAD:refs/heads/$STATE_BRANCH"
+          git_auth push --quiet origin "HEAD:refs/heads/$STATE_BRANCH"

@@ -14,9 +14,25 @@ test('runs daily at 06:17 UTC and on demand with a dry-run input', () => {
   assert.match(yml, /dry_run:[\s\S]*?type: boolean\n {8}default: true/);
 });
 
-test('no default permissions; the job alone gets contents and issues write', () => {
+/** The body of one job: its lines indented four or more spaces. */
+function job(name) {
+  const m = new RegExp(`^ {2}${name}:\\n((?: {4}.*\\n?|\\n)+)`, 'm').exec(yml);
+  assert.ok(m, `job ${name} not found`);
+  return m[1];
+}
+
+test('no default permissions; only save-state can write contents, and it only pushes', () => {
   assert.match(yml, /^permissions: \{\}$/m);
-  assert.match(yml, /^ {4}permissions:\n {6}contents: write[^\n]*\n {6}issues: write/m);
+  const monitor = job('monitor');
+  const save = job('save-state');
+  // The job that fetches and parses third-party pages cannot push.
+  assert.match(monitor, /^ {4}permissions:\n {6}contents: read[^\n]*\n {6}issues: write/m);
+  assert.doesNotMatch(monitor, /contents: write/);
+  assert.match(monitor, /persist-credentials: false/);
+  // The writer holds contents: write alone and runs none of the monitor's code.
+  assert.match(save, /^ {4}permissions:\n {6}contents: write[^\n]*\n {4}\S/m);
+  assert.match(save, /^ {4}needs: monitor$/m);
+  assert.doesNotMatch(save, /monitor\.mjs|actions\/checkout|actions\/setup-node/);
   assert.doesNotMatch(yml, /pull-requests: write|actions: write|deployments: write/);
 });
 
@@ -34,8 +50,8 @@ test('every action is pinned to a full commit SHA', () => {
 
 test('state goes to the orphan branch, never to main', () => {
   assert.match(yml, /STATE_BRANCH: reg-monitor-state/);
-  assert.match(yml, /git push --quiet origin "HEAD:refs\/heads\/\$STATE_BRANCH"/);
-  assert.doesNotMatch(yml, /git push[^\n]*\bmain\b/);
+  assert.match(job('save-state'), /git_auth push --quiet origin "HEAD:refs\/heads\/\$STATE_BRANCH"/);
+  assert.doesNotMatch(yml, /git(?:_auth)? push[^\n]*\bmain\b/);
   assert.match(yml, /checkout --quiet --orphan "\$STATE_BRANCH"/);
 });
 
@@ -48,4 +64,5 @@ test('inputs reach the script through the environment, not by interpolation', ()
 test('scheduled runs are never dry runs; dry runs never save state', () => {
   assert.match(yml, /DRY_RUN: \$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.dry_run && '1' \|\| '' \}\}/);
   assert.match(yml, /if: \$\{\{ always\(\) && env\.DRY_RUN == '' && env\.STATE_DIR != '' \}\}/);
+  assert.match(job('save-state'), /!\(github\.event_name == 'workflow_dispatch' && inputs\.dry_run\)/);
 });

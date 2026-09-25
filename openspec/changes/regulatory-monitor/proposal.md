@@ -22,9 +22,10 @@ publique nada por su cuenta.
   ICO, CNIL, página AIGP de la IAPP, International AI Safety Report), cada una con su pista de
   normalización. `--check` falla si una URL no aparece en ningún fichero versionado.
 - **Workflow** `.github/workflows/reg-monitor.yml`: cron diario a las 06:17 UTC y
-  `workflow_dispatch` con entrada `dry_run` (marcada por defecto) y `only`; permisos
-  `contents: write` e `issues: write` solo en el job; grupo de concurrencia; acciones fijadas por
-  SHA; `timeout-minutes: 15`.
+  `workflow_dispatch` con entrada `dry_run` (marcada por defecto) y `only`; dos jobs: `monitor`
+  con `contents: read` e `issues: write` (sin credenciales persistidas en el checkout) y
+  `save-state`, el único con `contents: write`, que solo publica el estado; grupo de
+  concurrencia; acciones fijadas por SHA; `timeout-minutes: 15`.
 - **Estado fuera de `main`**: rama huérfana `reg-monitor-state` escrita con el `GITHUB_TOKEN`,
   porque cada push a `main` despliega el sitio.
 - **Incidencias** con la etiqueta `regulatory-change` (se crea si falta): fuente, URL, extracto del

@@ -99,14 +99,22 @@ Un día sin cambios MUST NOT producir commit.
 ### Requirement: Workflow programado y acotado
 `.github/workflows/reg-monitor.yml` SHALL ejecutarse a diario a las 06:17 UTC y con
 `workflow_dispatch`, cuya entrada `dry_run` MUST estar marcada por defecto; una ejecución en seco
-MUST NOT escribir estado ni llamar a la API de GitHub. Los permisos por defecto MUST ser vacíos y
-el job SHALL recibir solo `contents: write` e `issues: write`; cada acción MUST fijarse por SHA
-completo; el job SHALL tener `timeout-minutes: 15`, un grupo de concurrencia y ejecutarse solo en
+MUST NOT escribir estado ni llamar a la API de GitHub. Los permisos por defecto MUST ser vacíos.
+El job `monitor`, que descarga y analiza las páginas de terceros, SHALL recibir solo
+`contents: read` e `issues: write`, y su checkout MUST NOT dejar el token en la configuración de
+git (`persist-credentials: false`); entrega el estado como artefacto. Solo el job `save-state`
+SHALL recibir `contents: write`, y MUST limitarse a publicar ese estado en la rama de estado. Cada
+acción MUST fijarse por SHA completo; el job `monitor` SHALL tener `timeout-minutes: 15`; el
+workflow SHALL tener un grupo de concurrencia y sus jobs SHALL ejecutarse solo en
 `losanchos5/aige`. Las entradas MUST llegar al script por variables de entorno.
 
 #### Scenario: Ejecución manual por defecto
 - **WHEN** alguien lanza el workflow desde la pestaña Actions sin tocar las entradas
 - **THEN** el monitor imprime lo que haría, sin estado nuevo ni incidencias
+
+#### Scenario: Token de escritura lejos de las páginas
+- **WHEN** el paso que analiza las páginas se ejecuta
+- **THEN** su token no puede escribir en el repositorio; solo `save-state` publica la rama de estado
 
 #### Scenario: Acción sin fijar
 - **WHEN** un cambio del workflow usa una acción por etiqueta en lugar de SHA
