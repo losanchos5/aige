@@ -193,7 +193,7 @@ test.describe('every glossary description is the definition\'s own opening, or t
 /** An obligation page's sentences after the lead (lib/obligation-title.ts). */
 function obligationLead(description: string): string {
   let out = description.replace(/\s*From the AI governance obligation register\.$/, '');
-  const evidence = out.lastIndexOf(' Evidence: ');
+  const evidence = out.search(/ Evidence(?: includes)?: (?!.* Evidence(?: includes)?: )/);
   if (evidence > 0) out = out.slice(0, evidence);
   return out.replace(
     /\s*(?:In force since [\d-]+(?:, with a grace period)?\.|In force(?:, with a grace period)?\.|Applies from [\d-]+(?: \(deferred\))?\.|Deferred\.|Voluntary(?:; applies from [\d-]+)?\.|Draft or proposed\.)$/,
@@ -222,5 +222,60 @@ test.describe('every obligation description is the requirement\'s own opening, o
       if (why) bad.push(`${row.id}: ${why}: ${description}`);
     }
     expect(bad, bad.join('\n')).toEqual([]);
+  });
+});
+
+// Audit ONPAGE N3-3 / R3: the evidence sentence was cut at any comma, inside
+// the list a colon opens ("Evidence: evidence-preservation step: model.") or
+// inside an item ("impact-ratio eval by sex." for LL144, which requires sex,
+// race/ethnicity and intersectional categories). Only "; " separates whole
+// artefacts: the description names all of them ("Evidence: ..."), a run of
+// whole ones ("Evidence includes: ..."), or none.
+test.describe('obligation evidence is never cut inside an artefact', () => {
+  const rows = obligations.filter((row) => existsSync(join('dist', 'obligations', `${obligationSlug(row)}.html`)));
+  const lowerOpening = (text: string) => text.replace(/^([A-Z])(?=[a-z])/, (c) => c.toLowerCase());
+  const evidenceOf = (description: string) =>
+    / Evidence( includes)?: (.*?)\.(?: From the AI governance obligation register\.)?$/.exec(description);
+
+  test('every evidence sentence is all the artefacts, or a run of whole ones', () => {
+    const bad: string[] = [];
+    for (const row of rows as Obligation[]) {
+      const description = descriptionOf(join('dist', 'obligations', `${obligationSlug(row)}.html`));
+      const match = evidenceOf(description);
+      if (!match) continue;
+      const items = lowerOpening(row.artefact).replace(/\.$/, '').split(/;\s/);
+      const said = match[2];
+      // A run may drop a parenthetical aside ("(physical or digital)"), never a word.
+      const runs = items.map((_, i) => items.slice(0, i + 1).join('; '));
+      const is = (run: string) => said === run || said === run.replace(ASIDE, '');
+      if (match[1] === undefined) {
+        if (!is(runs[runs.length - 1])) bad.push(`${row.id}: "Evidence:" is not every artefact: ${description}`);
+      } else if (!runs.slice(0, -1).some(is)) {
+        bad.push(`${row.id}: "Evidence includes:" is not a run of whole artefacts: ${description}`);
+      }
+    }
+    expect(bad, bad.join('\n')).toEqual([]);
+  });
+
+  test('the three garbled rows no longer cut their evidence', () => {
+    const description = (slug: string) => descriptionOf(join('dist', 'obligations', `${slug}.html`));
+    const ll144 = description('aige-obl-usnyc-ll144');
+    expect(ll144).not.toMatch(/by sex\.$/);
+    if (ll144.includes('impact-ratio')) expect(ll144).toContain('by sex, race/ethnicity and intersectional category');
+    expect(description('aige-obl-euaia-art73-6')).not.toContain('evidence-preservation step: model.');
+    expect(description('aige-obl-cen-pren18229-1')).not.toMatch(/; structured\.$/);
+    expect(description('aige-obl-cen-pren18229-1')).not.toContain('structured.');
+  });
+
+  test('the two narrowing rows keep their operative part', () => {
+    // Art. 53(1)(c): the policy exists to honour text-and-data-mining
+    // reservations; a lead that stops at "Union copyright law." drops that.
+    const art53 = descriptionOf(join('dist', 'obligations', 'aige-obl-euaia-art53-1c.html'));
+    expect(art53).not.toContain('comply with Union copyright law.');
+    expect(art53).toMatch(/text-and-data-mining reservations|reservations of rights/);
+    // UK ADM: the permission-plus-safeguards model, not the label repeated.
+    const ukAdm = descriptionOf(join('dist', 'obligations', 'aige-obl-uk-adm.html'));
+    expect(ukAdm).toContain('permission-plus-safeguards model');
+    expect(ukAdm).not.toContain('ADM safeguards: meaningful-human-review path.');
   });
 });
