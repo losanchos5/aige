@@ -63,6 +63,23 @@ test.describe('case "In short": rendered', () => {
   }
 });
 
+// GEO R1 (round 2): the passage was on the HTML page but missing from the
+// Markdown twin and the llms-full-cases slice, the channels answer engines read.
+test.describe('case "In short": Markdown twin and llms-full-cases', () => {
+  const slice = readFileSync(join('dist', 'llms-full-cases.txt'), 'utf8');
+
+  for (const entry of cases) {
+    test(`/cases/${entry.id}.md opens its sections with "## In short"`, () => {
+      const md = readFileSync(join('dist', 'cases', `${entry.id}.md`), 'utf8');
+      const sections = [...md.matchAll(/^## (.+)$/gm)].map((m) => m[1].trim());
+      expect(sections[0]).toBe('In short');
+      const at = md.indexOf('## In short');
+      expect(md.slice(at, md.indexOf('\n## ', at + 1))).toContain(entry.inShort);
+      expect(slice).toContain(entry.inShort);
+    });
+  }
+});
+
 test.describe('toolkit byline', () => {
   const pages = tools.filter((tool) => existsSync(join('dist', `${tool.href}.html`)));
 

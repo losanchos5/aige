@@ -254,6 +254,8 @@ export function caseDoc(entry: IncidentCase): CorpusDoc {
     return `- ${o.instrument} ${ref}: ${o.why}`;
   });
 
+  // The "In short" passage is the first section, as on the page (GEO R1): it
+  // is the passage written for answer engines to quote whole.
   const body = [
     `> ${entry.summary}`,
     [
@@ -264,6 +266,8 @@ export function caseDoc(entry: IncidentCase): CorpusDoc {
       ...(incidentsLine ? [`- Incident record: ${incidentsLine}`] : []),
       ...(harmLinks ? [`- Harm: ${harmLinks}`] : []),
     ].join('\n'),
+    '## In short',
+    entry.inShort,
     '## What happened',
     ...entry.happened,
     '## Failure mode',
