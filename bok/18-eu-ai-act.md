@@ -411,6 +411,9 @@ control and the gates that run on every release. The Article 17 standard is publ
 in the Official Journal, and ISO/IEC 42001 is not the Article 17 QMS (see
 [chapter 08](/bok/regulatory-map#what-is-not-harmonised-yet), and chapter 22 on
 [harmonised standards and the presumption of conformity](/bok/principles-and-standards#how-presumption-of-conformity-works)).
+Where the Act and the voluntary instruments overlap, and where they do not, is laid out topic by
+topic in [ISO 42001 vs EU AI Act](/resources/crosswalk/iso-42001-vs-eu-ai-act) and
+[NIST AI RMF vs EU AI Act](/resources/crosswalk/nist-ai-rmf-vs-eu-ai-act).
 
 ### Conformity assessment, declaration, marking and registration
 

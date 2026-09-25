@@ -23,6 +23,7 @@ import Base from '../../layouts/Base.astro';
 import '../../styles/reading.css';
 import PageHero from '../PageHero.astro';
 import Byline from '../Byline.astro';
+import PillarLink from '../PillarLink.astro';
 import { toolNotice, type ToolEntry } from '../../data/toolkit';
 import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
 import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
@@ -131,6 +132,8 @@ const island = data === undefined ? null : JSON.stringify(data).replace(/</g, '\
           </p>
         )
       }
+      {/* Hub and spoke (SXO-R2-06): each tool points at the /ai-governance pillar. */}
+      <PillarLink lead="One task from the everyday practice of" anchor="AI governance, defined and compared" />
     </div>
 
     <div class="tool-app" data-tool-app={tool.id}>

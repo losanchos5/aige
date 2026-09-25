@@ -4,7 +4,13 @@
 // section landings, not only from the header and footer; nothing links the
 // non-canonical /resources/reading-list; the retitled hubs lead with their
 // query; /role is the landing for "AI governance engineer", carries a byline,
-// and chapter 06 and the glossary term send readers to it. Read from dist,
+// and chapter 06 and the glossary term send readers to it. Round 3 (the
+// round-2 audit's ONPAGE R2, SCHEMA R1, SXO-R2-02/05/06/07, CONTENT R7): the
+// three "<A> vs <B>" pages are linked from the glossary terms, chapters 18 and
+// 22, /resources/frameworks and the obligation pages of their instruments;
+// /role has its own WebPage node and a descriptive anchor from the home; the
+// case and tool pages link the pillar; /cases, /resources and /figures carry
+// search titles; the /obligations title counts the register. Read from dist,
 // like seo-titles.spec.ts.
 import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
@@ -12,6 +18,10 @@ import { join } from 'node:path';
 import { chaptersOrdered } from '../src/data/chapters';
 import { patterns } from '../src/data/patterns';
 import { audiences } from '../src/data/audiences';
+import { cases } from '../src/data/cases';
+import { tools } from '../src/data/toolkit';
+import { comparisons, comparisonPath } from '../src/data/comparisons';
+import { frameworks, obligations, obligationPath } from '../src/data/frameworks';
 import { inSitemap } from '../src/lib/sitemap-policy';
 
 const PILLAR = '/ai-governance';
@@ -167,7 +177,13 @@ test('nothing links the non-canonical /resources/reading-list', () => {
 // The retitled hubs of SXO-N3 and the query each leads with.
 const HUB_TITLES: { route: string; title: string }[] = [
   { route: '/stack', title: 'AI governance framework as a stack: five layers' },
-  { route: '/obligations', title: 'AI law obligations register: EU AI Act duties with ids' },
+  {
+    route: '/obligations',
+    title: `AI law obligations register: ${obligations.length} duties, ${new Set(obligations.map((o) => o.frameworkId)).size} instruments`,
+  },
+  { route: '/cases', title: 'AI incident case studies: what failed, which control' },
+  { route: '/resources', title: 'AI governance resources: frameworks, data, templates' },
+  { route: '/figures', title: 'AI governance diagrams: free figures to cite and reuse' },
   { route: '/path', title: 'AI governance learning path: four stages' },
   { route: '/map', title: 'AI governance mind map: the whole discipline' },
   { route: '/resources/templates', title: 'AI governance templates: policy, register, incident' },
@@ -189,6 +205,20 @@ test.describe('hub titles lead with their query', () => {
       expect(description.endsWith('…'), description).toBe(false);
     });
   }
+
+  test('the round-3 hubs carry hand-written descriptions of 110 to 158 characters', () => {
+    for (const route of ['/cases', '/resources', '/figures']) {
+      const description = meta(html(route), 'name', 'description') ?? '';
+      expect(description.length, `${route}: ${description}`).toBeGreaterThanOrEqual(110);
+      expect(description.length, `${route}: ${description}`).toBeLessThanOrEqual(158);
+      expect(description, route).toMatch(/\.$/);
+    }
+  });
+
+  test('the /obligations title counts every instrument, not only the EU AI Act', () => {
+    expect(new Set(obligations.map((o) => o.frameworkId)).size).toBeGreaterThan(1);
+    expect(documentTitle(html('/obligations'))).not.toMatch(/EU AI Act/);
+  });
 
   test('the retitled landings open their description with the query', () => {
     for (const route of ['/stack', '/obligations', '/path', '/map', '/resources/templates']) {
@@ -219,4 +249,127 @@ test.describe('"AI governance engineer": /role is the landing', () => {
       expect(anchors).toContain('AI governance engineer');
     });
   }
+});
+
+/** Every ld+json node of a built page, flattened from its single @graph. */
+function graph(page: string): Record<string, unknown>[] {
+  const match = /<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/.exec(page);
+  if (!match) throw new Error('no ld+json block');
+  const data = JSON.parse(match[1]) as { '@graph'?: Record<string, unknown>[] };
+  return data['@graph'] ?? [];
+}
+
+test.describe('/role: the page in the graph and the home anchor', () => {
+  test('/role carries a WebPage node about the "AI governance engineer" term', () => {
+    const nodes = graph(html('/role'));
+    const page = nodes.find((node) => node['@type'] === 'WebPage');
+    expect(page, JSON.stringify(nodes.map((node) => node['@type']))).toBeTruthy();
+    const url = String(page!.url);
+    expect(url).toMatch(/\/role$/);
+    expect(page!['@id']).toBe(`${url}#page`);
+    expect(String(page!.name)).toMatch(/^AI governance engineer\b/);
+    expect(String(page!.description).length).toBeGreaterThan(50);
+    expect(String(page!.dateModified)).toMatch(/^\d{4}-\d{2}-\d{2}/);
+    expect(page!.author).toEqual(
+      expect.arrayContaining([expect.objectContaining({ '@id': expect.any(String) })]),
+    );
+    expect(page!.publisher).toEqual({ '@id': expect.stringMatching(/#org$/) });
+    const crumbList = nodes.find((node) => node['@type'] === 'BreadcrumbList');
+    expect(crumbList?.['@id']).toBeTruthy();
+    expect(page!.breadcrumb).toEqual({ '@id': crumbList?.['@id'] });
+    expect(page!.about).toEqual({
+      '@id': expect.stringMatching(/\/glossary\/ai-governance-engineer#term$/),
+    });
+    // Salary stays page content: no Occupation, no (retired) EstimatedSalary.
+    const serialised = JSON.stringify(nodes);
+    expect(serialised).not.toContain('"Occupation"');
+    expect(serialised).not.toContain('EstimatedSalary');
+  });
+
+  test('the home links /role with a descriptive anchor', () => {
+    const anchors = linksTo(mainContent(html('/')), '/role');
+    expect(
+      anchors.some((anchor) => /AI governance engineer/i.test(anchor)),
+      anchors.join(' | '),
+    ).toBe(true);
+  });
+});
+
+test.describe('the "<A> vs <B>" pages are linked from outside the crosswalk', () => {
+  const MIN_COMPARISON_REFERRERS = 8;
+  const glossaryTerm: Record<string, string> = {
+    'eu-ai-act': '/glossary/ai-act-eu',
+    'iso-42001': '/glossary/iso-iec-42001',
+    'nist-ai-rmf': '/glossary/nist-ai-rmf',
+  };
+
+  for (const c of comparisons) {
+    const path = comparisonPath(c);
+    test(`${path} has at least ${MIN_COMPARISON_REFERRERS} referrers from <main>`, () => {
+      const referrers = indexable().filter(
+        (route) => route !== path && linksTo(mainContent(html(route)), path).length > 0,
+      );
+      expect(referrers.length, referrers.join('\n')).toBeGreaterThanOrEqual(
+        MIN_COMPARISON_REFERRERS,
+      );
+      // Not only the crosswalk cluster links it.
+      const outside = referrers.filter((route) => !route.startsWith('/resources/crosswalk'));
+      expect(outside.length, referrers.join('\n')).toBeGreaterThanOrEqual(
+        MIN_COMPARISON_REFERRERS - 4,
+      );
+    });
+
+    test(`${path} is linked as "${c.aName} vs ${c.bName}" from the pages on its instruments`, () => {
+      const anchor = `${c.aName} vs ${c.bName}`;
+      const sources = [
+        glossaryTerm[c.a],
+        glossaryTerm[c.b],
+        '/bok/principles-and-standards',
+        '/resources/frameworks',
+        ...(c.a === 'eu-ai-act' || c.b === 'eu-ai-act' ? ['/bok/eu-ai-act'] : []),
+      ];
+      for (const route of sources) {
+        expect(linksTo(mainContent(html(route)), path), route).toContain(anchor);
+      }
+      // The obligation pages of both instruments carry the "Compared side by side" line.
+      for (const frameworkId of [c.a, c.b]) {
+        const rows = obligations.filter((o) => o.frameworkId === frameworkId);
+        expect(rows.length, frameworkId).toBeGreaterThan(0);
+        for (const row of rows) {
+          const route = obligationPath(row);
+          expect(linksTo(mainContent(html(route)), path), route).toContain(anchor);
+        }
+      }
+    });
+  }
+
+  test('an obligation page of an instrument no comparison covers links none of them', () => {
+    const compared = new Set(comparisons.flatMap((c) => [c.a, c.b]));
+    const other = frameworks.find(
+      (fw) => !compared.has(fw.id) && obligations.some((o) => o.frameworkId === fw.id),
+    );
+    expect(other).toBeTruthy();
+    const row = obligations.find((o) => o.frameworkId === other!.id)!;
+    const main = mainContent(html(obligationPath(row)));
+    for (const c of comparisons) {
+      expect(linksTo(main, comparisonPath(c)), obligationPath(row)).toEqual([]);
+    }
+  });
+});
+
+test.describe('case and tool pages link the pillar', () => {
+  test('every case page links the pillar from its content', () => {
+    for (const entry of cases) {
+      const route = `/cases/${entry.id}`;
+      expect(linksTo(mainContent(html(route)), PILLAR).length, route).toBeGreaterThan(0);
+    }
+  });
+
+  test('every live toolkit tool links the pillar from its content', () => {
+    const live = tools.filter((t) => t.status === 'live');
+    expect(live.length).toBeGreaterThan(0);
+    for (const tool of live) {
+      expect(linksTo(mainContent(html(tool.href)), PILLAR).length, tool.href).toBeGreaterThan(0);
+    }
+  });
 });

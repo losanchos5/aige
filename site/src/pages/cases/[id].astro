@@ -6,6 +6,7 @@ import Callout from '../../components/Callout.astro';
 import CitedText from '../../components/CitedText.astro';
 import SourceList from '../../components/SourceList.astro';
 import Byline from '../../components/Byline.astro';
+import PillarLink from '../../components/PillarLink.astro';
 import { site } from '../../data/site';
 import { obligationPath } from '../../data/frameworks';
 import { layers } from '../../data/stack';
@@ -131,6 +132,8 @@ const jsonLd = [
           <p>{entry.inShort}</p>
         </aside>
       </div>
+      {/* Hub and spoke (SXO-R2-06): each case points at the /ai-governance pillar. */}
+      <PillarLink lead="One incident read against the controls of" anchor="AI governance and its frameworks" />
 
       <dl class="cs-facts">
         <dt>Year</dt>

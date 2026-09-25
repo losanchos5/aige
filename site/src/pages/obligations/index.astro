@@ -36,8 +36,9 @@ const groups = obligationGroups();
 const instrumentCount = new Set(obligations.map((o) => o.frameworkId)).size;
 const pageUrl = new URL('/obligations', site.url).href;
 // Search title and description (SXO-N3, 2026-09-25 audit): the query first;
-// the H1 stays.
-const seoTitle = 'AI law obligations register: EU AI Act duties with ids';
+// the H1 stays. The title counts the register (CONTENT R7 of round 2: it named
+// only the EU AI Act), so it cannot drift from the rows.
+const seoTitle = `AI law obligations register: ${obligations.length} duties, ${instrumentCount} instruments`;
 const description = `AI law obligations register: ${obligations.length} duties across ${instrumentCount} instruments, from the EU AI Act to US state law, each with a stable id, date, status and evidence.`;
 const crumbs = [{ label: 'Obligations' }];
 
