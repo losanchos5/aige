@@ -5,13 +5,32 @@ import { defineCollection, z } from 'astro:content';
 import { glob, type Loader } from 'astro/loaders';
 import { i18nDir } from './lib/i18n-content';
 
-// Files carry no frontmatter; passthrough keeps validation permissive.
+// The Thesis and the changelog files carry no frontmatter; passthrough keeps
+// validation permissive.
 const schema = z.object({}).passthrough();
 
 // The chapter files only: `[0-9][0-9]-*.md` does not descend into bok/patterns.
+// A chapter's frontmatter holds its search metadata only. The visible H1 stays
+// the numbered title ("18. The EU AI Act in one pass"); `seoTitle` is what the
+// <title>, og:title and the TechArticle headline carry instead, phrased for the
+// query a reader types, and `seoDescription` replaces the manifest summary as the
+// meta description where that summary misses the query. Both are optional here;
+// tests/seo-titles.spec.ts requires a seoTitle on every chapter.
 const bok = defineCollection({
   loader: glob({ pattern: '[0-9][0-9]-*.md', base: '../bok' }),
-  schema,
+  schema: z
+    .object({
+      /** 20-55 characters, primary keyword first, no chapter number, no site name. */
+      seoTitle: z
+        .string()
+        .min(20)
+        .max(55)
+        .refine((value) => !/^\d/.test(value), { message: 'seoTitle must not open with the chapter number' })
+        .optional(),
+      /** One or two sentences, 110-160 characters (a search snippet's budget). */
+      seoDescription: z.string().min(110).max(160).optional(),
+    })
+    .passthrough(),
 });
 
 // One file per pattern of the chapter 05 catalogue (bok/patterns/<id>.md),

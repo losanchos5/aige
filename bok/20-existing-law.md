@@ -1,3 +1,6 @@
+---
+seoTitle: "AI and existing law: IP, discrimination, liability"
+---
 # 20. Other law that already applies to AI
 
 > Copyright, anti-discrimination, consumer-protection and product-liability law already bind AI

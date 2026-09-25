@@ -1,3 +1,6 @@
+---
+seoTitle: "AI and data protection: GDPR duties applied to AI"
+---
 # 19. Privacy and data protection law applied to AI
 
 > Data protection law already binds every AI system that touches personal data; this chapter turns

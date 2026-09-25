@@ -1,3 +1,6 @@
+---
+seoTitle: "AI risk management: where it sits in the lifecycle"
+---
 # 13. Where risk management sits
 
 > Risk management is the loop that tells every other control how hard to bite: identify, assess,

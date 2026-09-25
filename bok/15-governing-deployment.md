@@ -1,3 +1,6 @@
+---
+seoTitle: "AI deployment governance: from go-live to retirement"
+---
 # 15. Governing deployment and use
 
 > Governing the run: how a deployer decides to use an AI system, chooses it, contracts for it, takes

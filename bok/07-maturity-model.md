@@ -1,3 +1,7 @@
+---
+seoTitle: "AI governance maturity model: five levels"
+seoDescription: "An AI governance maturity model in five levels (Documented, Inventoried, Tested, Enforced, Continuous), each proven by what the running systems show."
+---
 # 07. Maturity model (five levels)
 
 > A ladder from paper to production (Documented, Inventoried, Tested, Enforced, Continuous), where

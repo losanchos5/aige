@@ -1,3 +1,6 @@
+---
+seoTitle: "AI fairness and explainability: metrics and methods"
+---
 # 16. Fairness and explainability for practitioners
 
 > Fairness and explainability become controls only when they are measured, gated and filed as

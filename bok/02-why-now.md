@@ -1,3 +1,6 @@
+---
+seoTitle: "Why AI governance needs engineering now: the evidence"
+---
 # 02. Why now
 
 > AI governance engineering is forming now because the thing being governed changed shape, the market

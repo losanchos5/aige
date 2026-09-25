@@ -49,6 +49,11 @@ const { Content, headings, remarkPluginFrontmatter } = await render(entry);
 
 const title = (remarkPluginFrontmatter.title as string | undefined) ?? chapter.title;
 const summary = (remarkPluginFrontmatter.summary as string | undefined) ?? chapter.summary;
+// Search metadata from the chapter's frontmatter (content.config.ts): the query-
+// phrased title for <title>, og:title and the article headline, and the meta
+// description where the manifest summary misses the query. The H1 keeps `title`.
+const seoTitle: string | undefined = entry.data.seoTitle;
+const metaDescription = entry.data.seoDescription ?? chapter.summary;
 const editPath = `bok/${chapter.id}.md`;
 const updated = gitDate(`../${editPath}`);
 const published = gitCreated(`../${editPath}`);
@@ -106,7 +111,7 @@ const book = {
 const article = {
   '@type': 'TechArticle',
   '@id': `${chapterUrl}#article`,
-  headline: title,
+  headline: seoTitle ?? title,
   url: chapterUrl,
   inLanguage: 'en',
   datePublished: published,
@@ -134,8 +139,9 @@ const jsonLd = {
 
 <Doc
   title={title}
+  seoTitle={seoTitle}
   summary={summary}
-  description={chapter.summary}
+  description={metaDescription}
   crumbs={crumbs}
   crumbsJsonLd={false}
   headings={headings}

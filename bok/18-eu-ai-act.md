@@ -1,3 +1,6 @@
+---
+seoTitle: "EU AI Act explained for engineers: risk, duties, dates"
+---
 # 18. The EU AI Act in one pass
 
 > The EU AI Act, as amended by the Digital Omnibus, read end to end: what it covers, how it ranks

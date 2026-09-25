@@ -1,3 +1,6 @@
+---
+seoTitle: "AI governance engineer role: workflows, ladder, market"
+---
 # 06. The role
 
 > The AI governance engineer as a concrete role: a capability first and a job title second, defined
