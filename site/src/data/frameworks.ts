@@ -2791,7 +2791,7 @@ export const obligations: readonly Obligation[] = [
     framework: 'EU Product Liability Directive',
     clause: 'Art. 11(2)',
     obligation:
-      "EU Product Liability Directive Art. 11(2) no later-defect defence for software updates within the manufacturer's control",
+      "EU Product Liability Directive Art. 11(2) no later-defect defence for software, its updates or missing safety updates in the manufacturer's control",
     requirement:
       'The manufacturer cannot rely on the defect arising after placing on the market where it is due to software, incl. its updates or upgrades, or to missing safety updates, that remain within its control',
     artefact:
@@ -2868,7 +2868,7 @@ export const obligations: readonly Obligation[] = [
     frameworkId: 'eu-ucpd',
     framework: 'UCPD',
     clause: 'Arts. 5–7 and Annex I',
-    obligation: 'UCPD Arts. 5–7 unfair and misleading commercial practices, incl. fake reviews',
+    obligation: 'UCPD Arts. 5–7 and Annex I unfair and misleading commercial practices, incl. fake reviews',
     requirement:
       "No commercial practice contrary to professional diligence, or misleading, that distorts the average consumer's decisions, incl. AI-generated claims and chatbot answers; stating that reviews are genuine without reasonable checks, and false reviews, are blacklisted (Annex I points 23b and 23c)",
     artefact:
@@ -4088,7 +4088,7 @@ export const obligations: readonly Obligation[] = [
     framework: 'Other jurisdictions',
     clause: 'UK GDPR Arts. 22A–22D',
     obligation:
-      'UK ADM safeguards: Data (Use and Access) Act 2025, UK GDPR Arts. 22A–22D (in force 2026-02-05)',
+      'UK GDPR Arts. 22A–22D permission-plus-safeguards model for significant, solely automated decisions (Data (Use and Access) Act 2025)',
     requirement:
       'A permission-plus-safeguards model for significant, solely automated decisions, with tighter conditions where special-category data is used',
     artefact:

@@ -14,14 +14,17 @@ import { frameworks, obligations, disclaimer } from '../../data/frameworks';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { collectionPage, lastModified } from '../../lib/jsonld';
 import { compareLinks } from '../../lib/compare-links';
+import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Frameworks' }];
 // Block w2-fig-concepts: how the instruments relate, above the table.
 const lineage = getFigure('instrument-lineage')!;
-const description =
-  'The laws, standards, codes and control sets AI governance engineering maps against, with the obligation → artefact → stack-layer index from chapter 08.';
+// Search title and description (audit ONPAGE N3-1): the query this hub lands
+// ("AI governance frameworks"), counted from the table so it cannot drift.
+const seoTitle = `AI governance frameworks: ${frameworks.length} laws, standards and codes`;
+const description = `The ${frameworks.length} AI governance frameworks mapped here, from the EU AI Act, ISO/IEC 42001 and NIST AI RMF to US state law, with the evidence for each obligation.`;
 
 // The page as a CollectionPage of the frameworks in its table, each at its row
 // anchor, dated like the sitemap's lastmod.
@@ -42,7 +45,8 @@ const jsonLd = [
 ---
 
 <Base
-  title="Frameworks"
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
   description={description}
   image="/og/resources.png"
   jsonLd={jsonLd}
