@@ -116,6 +116,9 @@ const heroFonts = [
   '/fonts/newsreader-latin-display-italic.woff2',
 ];
 
+// Local test of a painting background instead of the gradient field.
+const HERO_ART = true;
+
 // The chapters section: its title counts chapters and parts from the data, and
 // its lede names the three parts that carry the discipline from what an AI
 // system is to the law (their titles from chapterParts, never retyped here).
@@ -178,8 +181,31 @@ const resources = [
   overlayHeader
   preloadFonts={heroFonts}
 >
-  <section class="hero hero--field" data-hero-field>
-    <div class="hero-field" aria-hidden="true"><canvas class="hero-canvas"></canvas></div>
+  <section
+    class:list={['hero', 'hero--field', { 'hero--art': HERO_ART }]}
+    data-hero-field={HERO_ART ? undefined : ''}
+  >
+    {
+      HERO_ART ? (
+        <div class="hero-art" aria-hidden="true">
+          <!-- Claude Monet, The Seine at Giverny, 1897. National Gallery of Art, Washington, open access (public domain). -->
+          <img
+            class="hero-art-img"
+            src="/hero/monet-seine-giverny-1897-2400.webp"
+            srcset="/hero/monet-seine-giverny-1897-1200.webp 1200w, /hero/monet-seine-giverny-1897-2400.webp 2400w"
+            sizes="100vw"
+            alt=""
+            decoding="async"
+            fetchpriority="high"
+          />
+          <div class="hero-art-wash"></div>
+        </div>
+      ) : (
+        <div class="hero-field" aria-hidden="true">
+          <canvas class="hero-canvas"></canvas>
+        </div>
+      )
+    }
 
     <div class="container hero-center hero-in">
       <h1 class="hero-title" style="--i:0">
@@ -219,7 +245,7 @@ const resources = [
       </button>
     </div>
 
-    <script is:inline defer src="/hero-field.js"></script>
+    {!HERO_ART && <script is:inline defer src="/hero-field.js"></script>}
   </section>
 
   <Section
@@ -436,6 +462,49 @@ const resources = [
   /* Forced colours: no canvas (hero-field.js does not start there either). */
   @media (forced-colors: active) {
     .hero-canvas {
+      display: none;
+    }
+  }
+
+  /* Painting test (HERO_ART): the painting fills the hero under a veil of the
+     page ground (--bg, so it turns into a dark veil in the dark theme). The
+     custom properties let the variants be switched at runtime. */
+  .hero--art {
+    --hero-art-x: 68%; /* horizontal focal point: >50% shows more of the right side of the painting */
+    --hero-art-y: 50%;
+    --hero-wash: 0.72; /* cream veil opacity */
+    --hero-art-scale: 1; /* optional gentle zoom; 1.04 crops edges softly */
+  }
+
+  .hero-art {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  .hero-art-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: var(--hero-art-x) var(--hero-art-y);
+    transform: scale(var(--hero-art-scale));
+    transform-origin: var(--hero-art-x) var(--hero-art-y);
+  }
+
+  .hero-art-wash {
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    opacity: var(--hero-wash);
+  }
+
+  /* Forced colours: no painting, the plain system ground. */
+  @media (forced-colors: active) {
+    .hero-art {
       display: none;
     }
   }
