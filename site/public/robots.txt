@@ -1,6 +1,26 @@
 User-agent: *
 Allow: /
 
+# AI search and assistant crawlers are welcome. These groups only restate the
+# default above, so the intent stays explicit if a CDN ever prepends its own
+# rules. Nothing on this site is blocked.
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: GPTBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: ClaudeBot
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: bingbot
+User-agent: DuckAssistBot
+User-agent: MistralAI-User
+Allow: /
+
 # Plain-text index for LLMs (llmstxt.org): /llms.txt, full corpus at /llms-full.txt
+# Markdown version of each content page: its URL plus .md (e.g. /bok/definition.md)
+# MCP server card: /.well-known/mcp.json
 
 Sitemap: https://aigovernanceengineer.com/sitemap-index.xml
