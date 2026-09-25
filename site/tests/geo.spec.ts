@@ -155,6 +155,20 @@ test.describe('llms.txt covers the sitemap', () => {
       expect(optional, row.id).toContain(`(${ORIGIN}${obligationPath(row)}): `);
     }
   });
+
+  // GEO G9: the Marketing-layout pages pass `title={seoTitle}` and a literal
+  // description, which lib/llms-routes.ts once did not read.
+  test('pages on the Marketing layout are listed with their own title and description', async ({ request }) => {
+    const text = await (await request.get('/llms.txt')).text();
+    for (const path of ['/role', '/stack', '/path']) {
+      const source = readFileSync(join('src', 'pages', `${path.slice(1)}.astro`), 'utf8');
+      const title = /const seoTitle = '([^']+)'/.exec(source)?.[1];
+      const description = /<Marketing\b[^>]*?\bdescription="([^"]+)"/s.exec(source)?.[1];
+      expect(title, `${path} seoTitle`).toBeTruthy();
+      expect(description, `${path} description`).toBeTruthy();
+      expect(text, path).toContain(`- [${title}](${ORIGIN}${path}): ${description}`);
+    }
+  });
 });
 
 // ---- llms-full slices ------------------------------------------------------------
