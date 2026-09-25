@@ -3,10 +3,10 @@
 //
 // A blockquote whose first paragraph opens with strong text matching one of the
 // callout labels (`**In practice**`, `**Example (illustrative)**`,
-// `**Anti-pattern**`, `**Postings …**`, `**Note**`, `**Warning**`) becomes an
-// <aside>:
+// `**Anti-pattern**`, `**Postings …**`, `**Note**`, `**Warning**`,
+// `**In short**`) becomes an <aside>:
 //
-//   <aside class="callout" data-kind="practice|example|anti|note">
+//   <aside class="callout" data-kind="practice|example|anti|note|summary">
 //     <p class="callout-title">In practice</p>
 //     <p>…body…</p>
 //   </aside>
@@ -15,6 +15,9 @@
 // example followed by its "Anti-pattern"), separated only by a soft line break.
 // So we split each labelled blockquote into one <aside> per label rather than
 // classifying the whole quote by its first label.
+//
+// `**In short**` is the chapter's self-contained answer paragraph, placed right
+// after the abstract (kind `summary`).
 //
 // Paragraphs that open with `**Maps to:**` get `class="maps-to"`.
 // Kinds are styled by prose.css; this plugin only produces the markup.
@@ -30,9 +33,9 @@ import { classifyFile } from './i18n-content';
 // Recognised in mdast Data by mdast-util-to-hast for the rehype stage.
 import type {} from 'mdast-util-to-hast';
 
-type CalloutKind = 'practice' | 'example' | 'anti' | 'note';
+type CalloutKind = 'practice' | 'example' | 'anti' | 'note' | 'summary';
 
-const KIND_RE = /^(In practice|Example|Anti-pattern|Postings|Note|Warning)/i;
+const KIND_RE = /^(In practice|In short|Example|Anti-pattern|Postings|Note|Warning)/i;
 
 interface Segment {
   label: string;
@@ -42,6 +45,7 @@ interface Segment {
 function kindFor(label: string): CalloutKind {
   const lower = label.toLowerCase();
   if (lower.startsWith('in practice')) return 'practice';
+  if (lower.startsWith('in short')) return 'summary';
   if (lower.startsWith('example')) return 'example';
   if (lower.startsWith('anti-pattern')) return 'anti';
   return 'note';
