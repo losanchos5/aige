@@ -83,3 +83,61 @@ Una referencia del crosswalk que no se ha podido comprobar contra su fuente SHAL
 - **WHEN** el texto de la norma solo está disponible como vista previa en imagen
 - **THEN** las tres referencias siguen `verified: false`, enlazan la ficha oficial y la nota dice
   que la cláusula no se ha comprobado
+
+### Requirement: Referencias sustituidas
+Cuando una guía, norma o edición citada ha sido sustituida, el texto SHALL citar la vigente con su
+fecha y fuente, y MAY conservar el nombre antiguo solo como etiqueta de una tradición. A 2026-09-24
+esto cubre SR 11-7 (sustituida por SR 26-2 el 17 de abril de 2026), ISO Guide 73:2009 (retirada en
+favor de ISO 31073:2022), ISO 9001:2015 (sustituida por ISO 9001:2026) e ISO/IEC 27701:2019
+(sustituida por ISO/IEC 27701:2025). `STYLEGUIDE.md` MUST recoger la regla.
+
+#### Scenario: SR 11-7 en la desambiguación
+- **WHEN** el capítulo 01 contrasta la disciplina con la gestión del riesgo de modelos
+- **THEN** conserva la etiqueta «Model risk management (SR 11-7 style)» y dice, con fuente primaria
+  de la Reserva Federal, que SR 26-2 sustituyó a SR 11-7 el 17 de abril de 2026 y deja fuera de su
+  alcance los modelos de IA generativa y agéntica
+
+#### Scenario: Guía de estilo
+- **WHEN** un autor lee la sección 10 de `STYLEGUIDE.md`
+- **THEN** la gestión del riesgo de modelos figura como «the SR 11-7 tradition» con la mención de
+  SR 26-2, y la sección 7 lista las referencias sustituidas
+
+### Requirement: Artículo de EUR-Lex en los capítulos 11 a 23
+En las listas `## Sources` de los capítulos 11 a 23, cada entrada que cite un artículo o anexo del
+Reglamento (UE) 2024/1689 SHALL enlazar el texto consolidado de EUR-Lex vigente en la fecha de la
+última comprobación (a 2026-09-24, `https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng`)
+con el ancla `#art_<n>` o `#anx_<n>`, con la etiqueta `primary`. Un considerando SHALL enlazar el
+texto del DOUE con el ancla `#rct_<n>`, porque el consolidado no reproduce los considerandos. La
+glosa MUST describir el artículo tal como se lee en el texto enlazado; si el Ómnibus lo modificó,
+la glosa MUST dar la redacción modificada. Un explorador de terceros MUST NOT figurar como fuente
+del texto legal con etiqueta `primary`.
+
+#### Scenario: Plantilla del plan de seguimiento
+- **WHEN** se lee la entrada del capítulo 14 que cita el art. 72
+- **THEN** enlaza `#art_72` del consolidado de 2026-07-27 y la glosa dice que la Comisión publica
+  una guía con plantilla antes del 2 Sep 2027, no un acto de ejecución
+
+#### Scenario: Considerando
+- **WHEN** un capítulo cita el considerando 12 o el 27
+- **THEN** la entrada enlaza el DOUE de 2024-07-12 con `#rct_12` o `#rct_27`
+
+### Requirement: Reproducciones no oficiales de textos legales
+Una entrada que cite el texto de una ley o un reglamento SHALL enlazar la publicación oficial
+(EUR-Lex, GovInfo, eCFR, legislation.gov.uk u otro diario o legislador) cuando exista. Una
+reproducción no oficial (gdpr-info.eu, el Legal Information Institute u otra copia recompuesta)
+MUST NOT llevar la etiqueta `primary`. Un repositorio que sirve el documento original del tribunal
+sin alterarlo MAY llevar `primary` y SHALL nombrarse como tal en el publicador.
+
+#### Scenario: Fair use en el capítulo 20
+- **WHEN** se lee la entrada del capítulo 20 sobre 17 U.S.C. § 107
+- **THEN** enlaza GovInfo (United States Code, edición 2024) con etiqueta `primary`, y ninguna
+  entrada `primary` de los capítulos 11 a 23 enlaza law.cornell.edu
+
+### Requirement: Registro consolidado alineado
+Cada entrada re-citada SHALL tener en su sección de `sources/SOURCES.md` una fila con el mismo
+número, la misma URL y la misma etiqueta, en todas las copias de la sección; una fila de otra
+sección MUST NOT quedar dentro de la tabla de un capítulo.
+
+#### Scenario: Comprobación por script
+- **WHEN** se comparan las listas `## Sources` de los capítulos 11 a 23 con `sources/SOURCES.md`
+- **THEN** no hay entradas sin fila, filas sin entrada ni diferencias de URL o etiqueta
