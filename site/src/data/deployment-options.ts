@@ -85,7 +85,7 @@ export const options: readonly DeploymentOption[] = [
     evidenceProduce: 'Holdout evals on your data; per-group metrics; drift reports.',
     evidenceCollect: 'Training-data description and validation report, if the model is bought.',
     roleNote:
-      'Often used for Annex III decisions about people (credit, hiring), where the deployer duties of Art. 26 and the Art. 27 FRIA apply.',
+      'Often used for Annex III decisions about people (credit, hiring), where the deployer duties of Art. 26 apply; the Art. 27 FRIA binds every deployer of credit scoring (Annex III 5(b)), but a hiring system only when the deployer is a public body or a private entity providing public services.',
     costNote: 'Cheap to run; the recurring cost is collecting ground-truth labels.',
   },
   {
@@ -102,7 +102,8 @@ export const options: readonly DeploymentOption[] = [
     ],
     evidenceProduce: 'Groundedness and red-team results; guardrail decisions; prompt versions.',
     evidenceCollect: 'Provider model card and the GPAI documentation passed downstream.',
-    roleNote: 'Art. 50 transparency applies to deployers of chatbots and synthetic content; the GPAI model duties stay upstream.',
+    roleNote:
+      'Art. 50 splits the transparency duties: the provider makes a chatbot disclose that it is an AI system and marks synthetic output (Art. 50(1), (2)); the deployer discloses deep fakes and AI-generated text published on matters of public interest (Art. 50(4)). A team that builds its own chatbot on a vendor model and puts it into service under its own name is that system\'s provider; the GPAI model duties stay upstream.',
     costNote: 'Per-token inference; energy per request far above a task-specific model.',
   },
   {

@@ -127,8 +127,9 @@ separates **automation**, which varies by degree, from **autonomy**, a much stro
 keeps for systems that can change their own goal or domain of use with no one steering them; the
 opposite of autonomy is **heteronomy**, and clause 5.13 treats the three together [6]. It also names
 the stakeholder roles around an AI system (provider, producer, customer, partner, subject and
-relevant authorities, clause 5.19) [6]. An amendment on generative AI was reported at final-draft
-stage; its publication status as of 2026-09-24 is unconfirmed (verify) [7].
+relevant authorities, clause 5.19) [6]. An amendment on generative AI (ISO/IEC 22989:2022/FDAmd 1)
+is at final-draft stage: its FDIS was registered for formal approval on 18 September 2026, and it is
+not published as of 2026-09-24 [7].
 
 The word "autonomy" therefore means two different things across the texts. In the AI Act and the
 OECD text it is a degree of independence of action, and almost every system has some. In ISO/IEC
@@ -712,7 +713,7 @@ RMF (Map, Measure) and NIST AI 600-1 · OECD AI Principles · OWASP Agentic ASI0
 [4] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 3 (definitions: (1) AI system, (3) provider, (4) deployer, (63) general-purpose AI model, (66) general-purpose AI system). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_3 (verified: primary)
 [5] Regulation (EU) 2024/1689 (AI Act), Recital 12 (AI distinguished from simpler traditional software and from rules defined solely by natural persons; inference; machine learning and logic- and knowledge-based approaches; autonomy and adaptiveness; recitals are not reproduced in the consolidated text). Publications Office of the EU (EUR-Lex). 2024-07-12. https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng#rct_12 (verified: primary)
 [6] ISO/IEC 22989:2022, Artificial intelligence concepts and terminology (AI system, term 3.1.4; autonomy and heteronomy, terms 3.1.5 and 3.1.16; clause 5.13 autonomy, heteronomy and automation; clause 5.19 AI stakeholder roles); referenced by identifier only. ISO/IEC. 2022-07. https://www.iso.org/standard/74296.html (verified: secondary)
-[7] ISO/IEC 22989:2022/Amd 1, Generative AI (reported at final-draft stage; publication status as of 2026-09-24 unconfirmed). ISO/IEC. 2025. https://www.iso.org/standard/88145.html (verified: reported)
+[7] ISO/IEC 22989:2022/FDAmd 1, Generative AI (stage 50.00, FDIS registered for formal approval on 2026-09-18; not published as of 2026-09-24). ISO/IEC JTC 1/SC 42. 2026-09-18. https://www.iso.org/standard/88145.html (verified: primary)
 [8] Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (AI system definition; trustworthy characteristics; s. 3.5 transparency, explainability, interpretability; trade-offs; Appendix B, how AI risks differ from traditional software risks). NIST. 2023-01-26. https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf (verified: primary)
 [9] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 50 (disclosure of interaction with an AI system; machine-readable marking of synthetic audio, image, video and text). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_50 (verified: primary)
 [10] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 86 (right to clear and meaningful explanations of the role of a high-risk AI system in a decision). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_86 (verified: primary)

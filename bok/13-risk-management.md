@@ -642,11 +642,12 @@ evidence, `treatment.higher_rungs_considered` proves the hierarchy was applied, 
 ## Proportionate governance: tailoring the loop
 
 The loop is the same everywhere; its intensity is not. The AI RMF sets the level of risk activity
-by risk tolerance (GOVERN 1.3) [1]. The EU AI Act, as amended by the Digital Omnibus, makes
-proportionality explicit for high-risk providers: the quality management system is proportionate to
-the size of the organisation, "in particular, if the provider is an SME, including a start-up, or an
-SMC", while providers still "respect the degree of rigour and the level of protection required"; SMEs
-and small mid-cap enterprises may also use a simplified technical-documentation form [9]. US
+by risk tolerance (GOVERN 1.3) [1]. The EU AI Act has required since 2024 that a high-risk
+provider's quality management system be proportionate to the size of its organisation, while
+providers "respect the degree of rigour and the level of protection required" [27]. The Digital
+Omnibus adds "in particular, if the provider is an SME, including a start-up, or an SMC", and opens
+the simplified technical-documentation form, until then limited to SMEs and start-ups, to small
+mid-cap enterprises [9]. US
 banking supervisors now tailor model risk management to profile, size and complexity [2].
 Proportionality lowers the cost of the loop, never the protection owed to the people on the other
 end.
@@ -769,7 +770,7 @@ layers of the stack. Mappings are illustrative, not a claim of conformity.
 [6] ISO/IEC 23894:2023, Artificial intelligence: Guidance on risk management. ISO/IEC JTC 1/SC 42. 2023-02. https://www.iso.org/standard/77304.html (verified: primary)
 [7] Crosswalk: AI RMF (1.0) and ISO/IEC FDIS 23894 (draft for comment; function to clause mapping). NIST. 2023-01-26. https://www.nist.gov/system/files/documents/2023/01/26/crosswalk_AI_RMF_1_0_ISO_IEC_23894.pdf (verified: primary)
 [8] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 9 (risk management system; 9(2) steps; 9(5) residual risk and order of measures; 9(8) "prior defined metrics and probabilistic thresholds"; 9(9) minors and vulnerable groups). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_9 (verified: primary)
-[9] Regulation (EU) 2026/1744, Digital Omnibus on AI (Art. 9 not amended; Art. 11(1) simplified documentation and Art. 17(2) proportionality for SMEs and SMCs). Publications Office of the EU (EUR-Lex). 2026-07-24. https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng (verified: primary)
+[9] Regulation (EU) 2026/1744, Digital Omnibus on AI (Art. 9 not amended; Art. 1 point (10): Art. 11(1) simplified technical-documentation form extended to SMCs; Art. 1 point (11): Art. 17(2) replaced to name SMEs, start-ups and SMCs). Publications Office of the EU (EUR-Lex). 2026-07-24. https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng (verified: primary)
 [10] "AI Omnibus enters into force" (Annex III high-risk → 2 Dec 2027; Annex I → 2 Aug 2028). European Commission. 2026-07-27. https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force (verified: primary)
 [11] Risk management in the Artificial Intelligence Act (J. Schuett; Art. 9 of the 2021 proposal; Eur. J. Risk Regul. 15 (2024) 367-385). arXiv 2212.03109. 2024. https://arxiv.org/abs/2212.03109 (verified: primary)
 [12] CEN-CENELEC JTC 21 standards tracker (no harmonised standard cited in the OJ). CEN-CENELEC JTC 21 (via kla.digital). 2026. https://kla.digital/blog/jtc-21-standards-tracker (verified: secondary)
@@ -787,3 +788,4 @@ layers of the stack. Mappings are illustrative, not a claim of conformity.
 [24] OSCAL native model (assessment layer incl. POA&M). NIST. 2026. https://pages.nist.gov/OSCAL/learn/concepts/layer/ (verified: primary)
 [25] ISO 14971:2019, Medical devices: Application of risk management to medical devices. ISO/TC 210. 2019-12. https://www.iso.org/standard/72704.html (verified: primary)
 [26] ISO/IEC TR 5469:2024, Artificial intelligence: Functional safety and AI systems. ISO/IEC JTC 1/SC 42. 2024-01. https://www.iso.org/standard/81283.html (verified: primary)
+[27] Regulation (EU) 2024/1689 (AI Act), text as published in the Official Journal (OJ L, 12.7.2024), Art. 17(2) (quality management system proportionate to the size of the provider's organisation; providers "shall, in any event, respect the degree of rigour and the level of protection required"). Publications Office of the EU (EUR-Lex). 2024-06-13. https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng#art_17 (verified: primary)

@@ -63,10 +63,11 @@ sensitivity and autonomy. The classification decides which of the controls in th
 Annex III use triggers the deployer duties of Article 26 [1] and, for public bodies, private
 entities providing public services, and credit-scoring and life- and health-insurance pricing uses,
 the Article 27 fundamental-rights impact assessment (FRIA) before first use [4]. A chatbot or a
-generator of synthetic content triggers the Article 50 transparency duties, live since 2 August 2026
-[5]. The prohibited practices of Article 5 bind deployers as well as providers, including the
-ban on systems that exploit vulnerabilities due to age, disability or a specific social or economic
-situation [6].
+generator of synthetic content triggers the Article 50 transparency duties, which apply from 2 August
+2026 [5]; a generative system already on the market before that date has until 2 December 2026 to
+meet the Article 50(2) marking duty (Article 111(4)) [8]. The prohibited practices of Article 5 bind
+deployers as well as providers, including the ban on systems that exploit vulnerabilities due to age,
+disability or a specific social or economic situation [6].
 
 ### Set performance and explainability requirements first
 
@@ -262,11 +263,12 @@ provider of that system but must cooperate; the Omnibus extended that duty to co
 documentation, known limitations and failure modes, and targeted technical access for testing and
 validation [8].
 
-General-purpose models have their own test. The Commission's guidelines of 18 July 2025 on GPAI
-obligations [16] treat an actor that modifies or fine-tunes a GPAI model as the provider
-of the modified model only in exceptional cases, with an indicative criterion: the modification uses
-more than one third of the original model's training compute. The obligations then cover the
-modification, not the whole model [17]. The criterion is indicative, and how it applies to
+General-purpose models have their own test. The Commission's guidelines on GPAI obligations
+(content approved on 18 July 2025, adopted as C(2025) 7719 final on 19 November 2025) [16] treat an
+actor that modifies or fine-tunes a GPAI model as the provider of the modified model only in
+exceptional cases, with an indicative criterion: the modification uses more than one third of the
+original model's training compute. The obligations then cover the modification, not the whole model
+[17]. The criterion is indicative, and how it applies to
 distillation or repeated adapter training is a question to put to counsel (verify). The engineering
 consequence is plain either way: log the compute of every fine-tune as an artefact, because the
 question will be asked.
@@ -803,13 +805,13 @@ conformity.
 ## Sources
 
 [1] EU AI Act Art. 26 (deployer obligations: 26(1) use per the instructions; 26(2) oversight by competent persons with authority; 26(4) relevant and representative input data; 26(5) monitor, suspend and inform, serious incidents to the provider first; 26(6) logs kept at least six months; 26(7) inform workers; 26(8) public-authority registration; 26(9) DPIA; 26(11) inform affected persons). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26 (verified: primary)
-[2] EU AI Act Art. 3 definitions: (3) provider, (4) deployer, (12) intended purpose, (13) reasonably foreseeable misuse, (23) substantial modification. European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-3 (verified: primary)
+[2] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 3 definitions: (3) provider, (4) deployer, (12) intended purpose, (13) reasonably foreseeable misuse, (23) substantial modification. Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_3 (verified: primary)
 [3] "AI Omnibus enters into force" (Reg. (EU) 2026/1744, in force 2026-07-27; Annex III high-risk rules from 2 Dec 2027; Annex I from 2 Aug 2028). European Commission. 2026-07-27. https://digital-strategy.ec.europa.eu/en/news/ai-omnibus-enters-force (verified: primary)
-[4] EU AI Act Art. 27(1) (FRIA before first use by public bodies, private entities providing public services and deployers of Annex III points 5(b) and (c)). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-27 (verified: primary)
-[5] "Safer and more transparent AI" (Art. 50 transparency obligations live 2 Aug 2026). European Commission. 2026-08-02. https://commission.europa.eu/news-and-media/news/safer-and-more-transparent-ai-2026-08-02_en (verified: primary)
-[6] EU AI Act Art. 5(1)(b) (prohibition on exploiting vulnerabilities due to age, disability or a specific social or economic situation; applies to placing on the market, putting into service and use). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5 (verified: primary)
+[4] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 27(1) (FRIA before first use by public bodies, private entities providing public services and deployers of Annex III points 5(b) and (c)). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_27 (verified: primary)
+[5] "Safer and more transparent AI" (Art. 50 transparency obligations apply from 2 Aug 2026). European Commission. 2026-08-02. https://commission.europa.eu/news-and-media/news/safer-and-more-transparent-ai-2026-08-02_en (verified: primary)
+[6] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 5(1)(b) (prohibition on exploiting vulnerabilities due to age, disability or a specific social or economic situation; applies to placing on the market, putting into service and use). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_5 (verified: primary)
 [7] EU AI Act Art. 86(1) (right to a clear and meaningful explanation from the deployer of the role of an Annex III system in a decision, except point 2 systems). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-86 (verified: primary)
-[8] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, as amended by Regulation (EU) 2026/1744 (Art. 4 replaced: providers and deployers support AI literacy; Art. 25(2) cooperation extended to technical documentation, known limitations and failure modes and targeted technical access; Art. 25(4) revised; Art. 26 unchanged). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng (verified: primary)
+[8] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, as amended by Regulation (EU) 2026/1744 (Art. 4 replaced: providers and deployers support AI literacy; Art. 25(2) cooperation extended to technical documentation, known limitations and failure modes and targeted technical access; Art. 25(4) revised; Art. 26 unchanged; Art. 111(4) transitional period for Art. 50(2) marking to 2 Dec 2026 for generative systems placed on the market before 2 Aug 2026). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng (verified: primary)
 [9] "A Careful Examination of Large Language Model Performance on Grade School Arithmetic" (GSM1k; accuracy drops of up to 8% against GSM8k; systematic overfitting in several model families) (arXiv 2405.00332). Zhang et al. 2024-05-01. https://arxiv.org/abs/2405.00332 (verified: primary)
 [10] "The Leaderboard Illusion" (undisclosed private testing of multiple variants and score retraction on Chatbot Arena) (arXiv 2504.20879). Singh et al. 2025-04-29. https://arxiv.org/abs/2504.20879 (verified: primary)
 [11] "Power Hungry Processing: Watts Driving the Cost of AI Deployment?" (multi-purpose generative architectures orders of magnitude more expensive per inference than task-specific systems, controlling for parameters) (arXiv 2311.16863; FAccT '24). Luccioni, Jernite, Strubell. 2023-11-28. https://arxiv.org/abs/2311.16863 (verified: primary)
@@ -817,7 +819,7 @@ conformity.
 [13] Energy and AI, executive summary (data-centre electricity 415 TWh in 2024, around 945 TWh by 2030). International Energy Agency. 2025-04. https://www.iea.org/reports/energy-and-ai/executive-summary (verified: primary)
 [14] EU AI Act Annex XI, Section 1, point 2(e) (GPAI technical documentation: known or estimated energy consumption of the model). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-11 (verified: primary)
 [15] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 25 (value chain: 25(1)(a) name or trademark, (b) substantial modification, (c) changed intended purpose; 25(2) cooperation of the initial provider; 25(4) written agreement with third-party suppliers). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_25 (verified: primary)
-[16] Guidelines on the scope of obligations for providers of general-purpose AI models under the AI Act. European Commission. 2025-07-18. https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act (verified: primary)
+[16] Commission Guidelines on the scope of the obligations for providers of general-purpose AI models established by Regulation (EU) 2024/1689 (C(2025) 7719 final; content approved 18 Jul 2025). European Commission. 2025-11-19. https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act (verified: primary)
 [17] Guidelines on obligations for general-purpose AI providers, FAQ (modifiers become providers only when the modification uses more than one third of the original model's training compute; obligations limited to documenting the modification). European Commission. 2025. https://digital-strategy.ec.europa.eu/en/faqs/guidelines-obligations-general-purpose-ai-providers (verified: primary)
 [18] EU AI Act Art. 13(3) (instructions for use: capabilities and limitations of performance; pre-determined changes; human oversight measures; expected lifetime and maintenance measures, including their frequency; log collection). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-13 (verified: primary)
 [19] Apache License, Version 2.0 (section 3, grant of patent licence). Apache Software Foundation. 2004-01. https://www.apache.org/licenses/LICENSE-2.0 (verified: primary)
@@ -826,7 +828,7 @@ conformity.
 [22] Llama 3.1 Community License Agreement (Acceptable Use Policy incorporated by reference; "Built with Llama" attribution; "Llama" at the start of distributed derived model names; separate licence above 700 million monthly active users on the release date). Meta. 2024-07-23. https://github.com/meta-llama/llama-models/blob/main/models/llama3_1/LICENSE (verified: primary)
 [23] NIST AI 100-2 E2025, Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations. NIST. 2025-03. https://csrc.nist.gov/pubs/ai/100/2/e2025/final (verified: primary)
 [24] MITRE ATLAS: adversarial tactics and techniques knowledge base for AI systems. MITRE. 2026. https://atlas.mitre.org/ (verified: primary)
-[25] Directive (EU) 2024/2853 on liability for defective products (software within the definition of product; transposition by 9 Dec 2026; applies to products placed on the market or put into service after that date). Publications Office of the EU (EUR-Lex). 2024-10-23. https://eur-lex.europa.eu/eli/dir/2024/2853/oj/eng (verified: secondary)
+[25] Directive (EU) 2024/2853 on liability for defective products (software within the definition of product; transposition by 9 Dec 2026; applies to products placed on the market or put into service after that date). Publications Office of the EU (EUR-Lex). 2024-10-23. https://eur-lex.europa.eu/eli/dir/2024/2853/oj/eng (verified: primary)
 [26] aiSure AI insurance (cover for losses from AI model errors, for AI vendors and corporate adopters). Munich Re. 2026. https://www.munichre.com/en/solutions/for-industry-clients/insure-ai.html (verified: primary)
 [27] Updated EU AI model contractual clauses (MCC-AI high-risk and light versions, with commentary; update of the 2023 clauses). Community of Practice on Public Procurement of AI, Public Buyers Community (European Commission). 2025-03-05. https://public-buyers-community.ec.europa.eu/communities/procurement-ai/resources/updated-eu-ai-model-contractual-clauses (verified: primary)
 [28] ISO/IEC 42001:2023, Annex A control titles (A.6.2.5 AI system deployment; A.6.2.6 operation and monitoring; A.9 use of AI systems; A.10 third-party and customer relationships), referenced by identifier only. ISO/IEC (titles checked via a secondary listing). 2023. https://www.iso.org/standard/42001 (verified: secondary)
@@ -838,8 +840,8 @@ conformity.
 [34] "Learning under Concept Drift: A Review" (IEEE TKDE 31(12); detection, understanding and adaptation) (arXiv 2004.05785). Lu et al. 2018. https://arxiv.org/abs/2004.05785 (verified: primary)
 [35] Automated Employment Decision Tools (NYC Local Law 144 of 2021: bias audit within one year before use, public summary, candidate notices; enforced from 5 Jul 2023). NYC Department of Consumer and Worker Protection. 2023. https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page (verified: primary)
 [36] Digital Operational Resilience Act (DORA): in application since 17 Jan 2025; register of information; ICT third-party risk. EIOPA. 2025. https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en (verified: primary)
-[37] DORA (Reg. (EU) 2022/2554) Art. 28(3) register of information on ICT third-party arrangements and Art. 28(8) exit strategies for ICT services supporting critical or important functions. digital-operational-resilience-act.com. 2022. https://www.digital-operational-resilience-act.com/Article_28.html (verified: secondary)
-[38] NIS2 Directive (EU) 2022/2555 Art. 21(2)(c) business continuity, backup management, disaster recovery and crisis management, and (d) supply-chain security. nis-2-directive.com. 2022. https://www.nis-2-directive.com/NIS_2_Directive_Article_21.html (verified: secondary)
+[37] Regulation (EU) 2022/2554 (DORA), Art. 28(3) register of information on ICT third-party arrangements and Art. 28(8) exit strategies for ICT services supporting critical or important functions. Publications Office of the EU (EUR-Lex). 2022-12-14. https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng#art_28 (verified: primary)
+[38] Directive (EU) 2022/2555 (NIS2), Art. 21(2)(c) business continuity, backup management, disaster recovery and crisis management, and (d) supply-chain security. Publications Office of the EU (EUR-Lex). 2022-12-14. https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng#art_21 (verified: primary)
 [39] EU AI Act Art. 19(1) (providers keep automatically generated logs for at least six months). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-19 (verified: primary)
 [40] EU AI Act Art. 18(1) (providers keep documentation for 10 years after placing on the market or putting into service). European Commission, AI Act Service Desk (Reg. (EU) 2024/1689). 2024-06-13. https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-18 (verified: primary)
 [41] AI Safety Governance Framework 3.0, §5.3 operators' guidelines (logs kept for at least six months and audited; voluntary). TC260 / CAC. 2026-09-14. https://www.cac.gov.cn/rootimages/uploadimg/1791137114683961/1791137114683961.pdf (verified: primary)
