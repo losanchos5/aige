@@ -2,9 +2,37 @@
 // SearchDialog: a native <dialog> wrapping a Pagefind-backed search. Opened by
 // any [data-search-open] element and by Ctrl/Cmd+K, closed by Esc. Pagefind is
 // loaded lazily on first open (see /search.js). Not indexed itself.
+//
+// Pagefind keeps one index per <html lang> and loads the one matching the page,
+// so a translated page searches its own language. `lang` translates the
+// dialog's strings; on a non-English page the status messages /search.js
+// writes travel as data attributes (English pages keep the script's defaults).
+import { translator } from '../i18n/ui';
+
+interface Props {
+  /** Page language (the <html lang>); English by default. */
+  lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = translator(lang);
+const messages =
+  lang === 'en'
+    ? {}
+    : {
+        'data-msg-none': t('search.none'),
+        'data-msg-unavailable': t('search.unavailable'),
+        'data-msg-searching': t('search.searching'),
+      };
 ---
 
-<dialog class="search-dialog" id="search-dialog" aria-label="Search" data-pagefind-ignore>
+<dialog
+  class="search-dialog"
+  id="search-dialog"
+  aria-label={t('search.dialog')}
+  data-pagefind-ignore
+  {...messages}
+>
   <form method="dialog" class="search-form">
     <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" width="18" height="18">
       <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"></circle>
@@ -14,8 +42,8 @@
       type="search"
       id="search-input"
       class="search-input"
-      placeholder="Search the Body of Knowledge…"
-      aria-label="Search the Body of Knowledge"
+      placeholder={t('search.placeholder')}
+      aria-label={t('search.input')}
       role="combobox"
       aria-expanded="false"
       aria-controls="search-results"
@@ -24,10 +52,10 @@
       autocorrect="off"
       spellcheck="false"
     />
-    <button type="submit" value="close" class="search-esc" aria-label="Close search">Esc</button>
+    <button type="submit" value="close" class="search-esc" aria-label={t('search.close')}>Esc</button>
   </form>
   <div class="search-status" id="search-status" role="status" aria-live="polite" hidden></div>
-  <ul class="search-results" id="search-results" role="listbox" aria-label="Search results"></ul>
+  <ul class="search-results" id="search-results" role="listbox" aria-label={t('search.results')}></ul>
 </dialog>
 
 <script is:inline src="/search.js" type="module"></script>

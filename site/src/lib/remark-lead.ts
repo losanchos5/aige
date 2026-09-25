@@ -12,6 +12,9 @@
 import type { Root, Blockquote, Paragraph } from 'mdast';
 import type { VFile } from 'vfile';
 import { toString } from 'mdast-util-to-string';
+import { englishLabelFor } from '../i18n/callouts';
+import type { TranslatedLocale } from '../i18n/locales';
+import { classifyFile } from './i18n-content';
 
 const CALLOUT_RE = /^(In practice|Example|Anti-pattern|Postings|Note|Warning)/i;
 
@@ -25,12 +28,16 @@ interface AstroData {
   frontmatter?: AstroFrontmatter;
 }
 
-function isCalloutBlockquote(node: Blockquote): boolean {
+// A translation's callout may carry its language's label (src/i18n/callouts.ts).
+function isCalloutBlockquote(node: Blockquote, lang?: TranslatedLocale): boolean {
   const first = node.children[0];
   if (!first || first.type !== 'paragraph') return false;
   const lead = (first as Paragraph).children[0];
   if (!lead || lead.type !== 'strong') return false;
-  return CALLOUT_RE.test(toString(lead).trim());
+  const label = toString(lead).trim();
+  if (CALLOUT_RE.test(label)) return true;
+  const english = lang ? englishLabelFor(label, lang) : undefined;
+  return english !== undefined && CALLOUT_RE.test(english);
 }
 
 export default function remarkLead() {
@@ -46,7 +53,8 @@ export default function remarkLead() {
 
     let summary: string | undefined;
     const next = children[0];
-    if (next && next.type === 'blockquote' && !isCalloutBlockquote(next)) {
+    const lang = classifyFile(file.path ?? file.history.at(-1))?.lang;
+    if (next && next.type === 'blockquote' && !isCalloutBlockquote(next, lang)) {
       summary = toString(next).replace(/\s+/g, ' ').trim();
       children.shift();
     }

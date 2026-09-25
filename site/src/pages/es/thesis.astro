@@ -5,6 +5,7 @@ import { site } from '../../data/site';
 import { gitCreated, gitDate } from '../../lib/reading';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { alternatesFor } from '../../lib/i18n-content';
 // THESIS.es.md sits at the repo root, next to THESIS.md. Imported directly so it
 // goes through the same Astro Markdown pipeline (remark-lead, callouts, citations,
 // diagrams, glossary) that the content collection applies to the English thesis,
@@ -67,11 +68,7 @@ const jsonLd = [
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
   lang="es"
   locale="es_ES"
-  alternates={[
-    { hreflang: 'en', href: `${site.url}/thesis` },
-    { hreflang: 'es', href: `${site.url}/es/thesis` },
-    { hreflang: 'x-default', href: `${site.url}/thesis` },
-  ]}
+  alternates={alternatesFor('/es/thesis')}
 >
   <div class="thesis-es">
     <p class="lang-switch">

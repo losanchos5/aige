@@ -2,12 +2,14 @@
 // EditOnGitHub: deep link to edit the source Markdown on GitHub. `path` is the
 // file's repo-relative path, e.g. "bok/04-the-stack.md".
 import { site } from '../data/site';
+import { t } from '../i18n/ui';
 
 interface Props {
   path: string;
+  lang?: string;
 }
 
-const { path } = Astro.props;
+const { path, lang = 'en' } = Astro.props;
 const href = `${site.github}/edit/main/${path}`;
 ---
 
@@ -31,7 +33,7 @@ const href = `${site.github}/edit/main/${path}`;
       stroke-width="1.6"
       stroke-linecap="round"></path>
   </svg>
-  Edit this page on GitHub
+  {t('edit.github', lang)}
 </a>
 
 <style>

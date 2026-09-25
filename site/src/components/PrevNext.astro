@@ -4,7 +4,10 @@
 // lift from effects.css): a small "Previous" / "Next" kicker over the chapter
 // title. Only the arrow glyph is aria-hidden, so the link's accessible name is
 // its visible text, "Previous <title>" / "Next <title>" (WCAG 2.5.3 label in
-// name).
+// name). `base` is where the chapters live (`/bok`, or `/de/bok` on a German
+// page) and `lang` translates the labels.
+import { translator } from '../i18n/ui';
+
 interface Adjacent {
   slug: string;
   shortTitle: string;
@@ -13,22 +16,25 @@ interface Adjacent {
 interface Props {
   prev?: Adjacent;
   next?: Adjacent;
+  base?: string;
+  lang?: string;
 }
 
-const { prev, next } = Astro.props;
+const { prev, next, base = '/bok', lang = 'en' } = Astro.props;
+const t = translator(lang);
 ---
 
-<nav class="pager" aria-label="Chapter navigation">
+<nav class="pager" aria-label={t('pager.chapters')}>
   {
     prev ? (
       <a
         class="pager-link prev card-lum lift"
-        href={`/bok/${prev.slug}`}
+        href={`${base}/${prev.slug}`}
         rel="prev"
       >
         <span class="dir">
           <span class="arrow" aria-hidden="true">←</span>
-          <span>Previous</span>
+          <span>{t('pager.previous')}</span>
         </span>
         <span class="name">{prev.shortTitle}</span>
       </a>
@@ -40,11 +46,11 @@ const { prev, next } = Astro.props;
     next ? (
       <a
         class="pager-link next card-lum lift"
-        href={`/bok/${next.slug}`}
+        href={`${base}/${next.slug}`}
         rel="next"
       >
         <span class="dir">
-          <span>Next</span>
+          <span>{t('pager.next')}</span>
           <span class="arrow" aria-hidden="true">→</span>
         </span>
         <span class="name">{next.shortTitle}</span>

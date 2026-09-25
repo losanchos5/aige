@@ -4,11 +4,30 @@
  * you/Reference/About columns, feeds & data and the project links, then every
  * chapter grouped by part in a full-width block) over a meta line. Identity
  * values come from data/site.ts. The tinted band, grid texture and display
- * watermark are kept.
+ * watermark are kept. `lang` translates the footer's own strings (the group
+ * titles, the blurb); the links still go to the English pages.
  */
 import RegisterMark from './RegisterMark.astro';
 import { site } from '../data/site';
 import { nav, feeds, project, type NavGroup } from '../data/nav';
+import { bookParts } from '../data/parts';
+import { translator, type UiKey } from '../i18n/ui';
+import { LOCALE_INFO } from '../i18n/locales';
+import { translationIndex } from '../lib/i18n-content';
+
+interface Props {
+  /** Page language (the <html lang>); English by default. */
+  lang?: string;
+}
+
+const { lang = 'en' } = Astro.props;
+const t = translator(lang);
+const groupLabel = (group: NavGroup) => t(`nav.${group.id}` as UiKey);
+const partLabel = (id: string, fallback: string) =>
+  bookParts.some((part) => part.id === id) ? t(`part.${id}` as UiKey) : fallback;
+// The landing (/<lang>) of every language that has machine translations, in
+// locale order; none, and the list is not rendered (lib/i18n-content.ts).
+const langs = (['es', 'fr', 'de', 'pt'] as const).filter((lang) => translationIndex().langs.has(lang));
 
 const domain = new URL(site.url).host;
 const byId = (id: NavGroup['id']) => nav.find((g) => g.id === id)!;
@@ -23,35 +42,46 @@ const about = byId('about');
 
 <footer class="site-footer">
   <div class="container">
-    <nav class="sitemap" aria-label="Site map">
+    <nav class="sitemap" aria-label={t('footer.siteMap')}>
       <div class="col col-brand">
         <RegisterMark size="sm" label={site.name} />
         <p class="blurb">
-          An open Body of Knowledge for the discipline of AI Governance
-          Engineering. Written and maintained by {site.author} · AI Governance
-          Engineer.
+          {t('footer.blurb', { author: site.author })}
         </p>
-        <ul class="brand-links" aria-label="Site">
-          <li><a href="/">Home</a></li>
-          <li><a href={map.href}>{map.label}</a></li>
+        <ul class="brand-links" aria-label={t('footer.site')}>
+          <li><a href="/">{t('footer.home')}</a></li>
+          <li><a href={map.href}>{groupLabel(map)}</a></li>
         </ul>
+        {
+          langs.length > 0 && (
+            <ul class="brand-links brand-langs" aria-label={t('footer.languages')} data-footer-langs>
+              {langs.map((lang) => (
+                <li>
+                  <a href={`/${lang}`} hreflang={lang} lang={lang}>
+                    {LOCALE_INFO[lang].autonym}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
       </div>
 
       <div class="col col-read">
-        <p class="group-title" id="fg-read">Read</p>
+        <p class="group-title" id="fg-read">{t('footer.read')}</p>
         <ul aria-labelledby="fg-read">
-          <li><a href={thesis.href}>{thesis.label}</a></li>
+          <li><a href={thesis.href}>{groupLabel(thesis)}</a></li>
           {thesis.items.map((item) => (
             <li>
               <a href={item.href}>{item.label}</a>
             </li>
           ))}
-          <li><a href={bok.href}>{bok.label}</a></li>
+          <li><a href={bok.href}>{groupLabel(bok)}</a></li>
         </ul>
       </div>
 
       <div class="col col-practice">
-        <p class="group-title" id="fg-practice">Practice</p>
+        <p class="group-title" id="fg-practice">{t('footer.practice')}</p>
         <ul aria-labelledby="fg-practice">
           {practice.items.map((item) => (
             <li>
@@ -62,9 +92,9 @@ const about = byId('about');
       </div>
 
       <div class="col col-for-you">
-        <p class="group-title" id="fg-for-you">{forYou.label}</p>
+        <p class="group-title" id="fg-for-you">{groupLabel(forYou)}</p>
         <ul aria-labelledby="fg-for-you">
-          <li><a href={forYou.href}>All routes</a></li>
+          <li><a href={forYou.href}>{t('footer.allRoutes')}</a></li>
           {forYou.items.map((item) => (
             <li>
               <a href={item.href}>{item.label}</a>
@@ -74,9 +104,9 @@ const about = byId('about');
       </div>
 
       <div class="col col-reference">
-        <p class="group-title" id="fg-reference">Reference</p>
+        <p class="group-title" id="fg-reference">{t('footer.reference')}</p>
         <ul aria-labelledby="fg-reference">
-          <li><a href={reference.href}>All resources</a></li>
+          <li><a href={reference.href}>{t('footer.allResources')}</a></li>
           {reference.items.map((item) => (
             <li>
               <a href={item.href}>{item.label}</a>
@@ -86,9 +116,9 @@ const about = byId('about');
       </div>
 
       <div class="col col-about">
-        <p class="group-title" id="fg-about">About</p>
+        <p class="group-title" id="fg-about">{t('footer.about')}</p>
         <ul aria-labelledby="fg-about">
-          <li><a href={about.href}>About</a></li>
+          <li><a href={about.href}>{t('footer.about')}</a></li>
           {about.items.map((item) => (
             <li>
               <a href={item.href}>{item.label}</a>
@@ -98,7 +128,7 @@ const about = byId('about');
       </div>
 
       <div class="col col-feeds">
-        <p class="group-title" id="fg-feeds">Feeds &amp; data</p>
+        <p class="group-title" id="fg-feeds">{t('footer.feeds')}</p>
         <ul aria-labelledby="fg-feeds">
           {feeds.map((item) => (
             <li>
@@ -120,7 +150,7 @@ const about = byId('about');
       </div>
 
       <div class="col col-project">
-        <p class="group-title" id="fg-project">Project</p>
+        <p class="group-title" id="fg-project">{t('footer.project')}</p>
         <ul aria-labelledby="fg-project">
           {project.map((item) => (
             <li>
@@ -136,12 +166,12 @@ const about = byId('about');
       </div>
 
       <div class="col col-chapters">
-        <p class="group-title" id="fg-chapters">{bok.label}, by part</p>
+        <p class="group-title" id="fg-chapters">{t('footer.byPart', { bok: groupLabel(bok) })}</p>
         <div class="fparts">
           {(bok.sections ?? []).map((section) => (
             <div class="fpart">
               <p class="fpart-title" id={`fg-part-${section.id}`}>
-                {section.label} <span class="fpart-range">{section.range}</span>
+                {partLabel(section.id, section.label)} <span class="fpart-range">{section.range}</span>
               </p>
               <ol class="fchap" aria-labelledby={`fg-part-${section.id}`}>
                 {section.items.map((item) => (
@@ -314,6 +344,12 @@ const about = byId('about');
     display: flex;
     flex-direction: column;
     gap: var(--s-2);
+  }
+
+  /* The language landings sit on one line under the brand's own links. */
+  .brand-langs {
+    flex-flow: row wrap;
+    gap: var(--s-2) var(--s-4);
   }
 
   /* Chapters by part: the parts flow into two columns on phones and three

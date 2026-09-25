@@ -20,8 +20,12 @@
 // Kinds are styled by prose.css; this plugin only produces the markup.
 
 import type { Root, Blockquote, Paragraph, PhrasingContent } from 'mdast';
+import type { VFile } from 'vfile';
 import { visit, SKIP } from 'unist-util-visit';
 import { toString } from 'mdast-util-to-string';
+import { englishLabelFor } from '../i18n/callouts';
+import type { TranslatedLocale } from '../i18n/locales';
+import { classifyFile } from './i18n-content';
 
 // Recognised in mdast Data by mdast-util-to-hast for the rehype stage.
 import type {} from 'mdast-util-to-hast';
@@ -43,8 +47,23 @@ function kindFor(label: string): CalloutKind {
   return 'note';
 }
 
-function isLabel(node: PhrasingContent): boolean {
-  return node.type === 'strong' && KIND_RE.test(toString(node).trim());
+// A translation (I18N_DIR/<lang>/...) may carry the label that callouts.json
+// maps the English one to (src/i18n/callouts.ts); its kind is the English
+// label's. An English file only ever matches the English labels.
+function englishLabel(text: string, lang: TranslatedLocale | undefined): string | undefined {
+  if (KIND_RE.test(text)) return text;
+  const english = lang ? englishLabelFor(text, lang) : undefined;
+  return english && KIND_RE.test(english) ? english : undefined;
+}
+
+function isLabel(node: PhrasingContent, lang?: TranslatedLocale): boolean {
+  return node.type === 'strong' && englishLabel(toString(node).trim(), lang) !== undefined;
+}
+
+function isMapsTo(text: string, lang: TranslatedLocale | undefined): boolean {
+  if (/^Maps to\b/i.test(text)) return true;
+  const english = lang ? englishLabelFor(text, lang) : undefined;
+  return english !== undefined && /^Maps to\b/i.test(english);
 }
 
 function trimLeadingWhitespace(nodes: PhrasingContent[]): PhrasingContent[] {
@@ -58,7 +77,7 @@ function trimLeadingWhitespace(nodes: PhrasingContent[]): PhrasingContent[] {
   return out;
 }
 
-function toAside(segment: Segment): Blockquote {
+function toAside(segment: Segment, lang?: TranslatedLocale): Blockquote {
   const title = segment.label.replace(/\.\s*$/, '');
   const titlePara: Paragraph = {
     type: 'paragraph',
@@ -69,18 +88,22 @@ function toAside(segment: Segment): Blockquote {
     type: 'blockquote',
     data: {
       hName: 'aside',
-      hProperties: { className: ['callout'], 'data-kind': kindFor(segment.label) },
+      hProperties: {
+        className: ['callout'],
+        'data-kind': kindFor(englishLabel(segment.label, lang) ?? segment.label),
+      },
     },
     children: [titlePara, ...segment.blocks],
   };
 }
 
 export default function remarkCallouts() {
-  return (tree: Root): void => {
+  return (tree: Root, file?: VFile): void => {
+    const lang = classifyFile(file?.path ?? file?.history.at(-1))?.lang;
     visit(tree, 'blockquote', (node: Blockquote, index, parent) => {
       if (index === undefined || !parent) return;
       const first = node.children[0];
-      if (!first || first.type !== 'paragraph' || !isLabel(first.children[0])) return;
+      if (!first || first.type !== 'paragraph' || !isLabel(first.children[0], lang)) return;
 
       const segments: Segment[] = [];
       let current: Segment | undefined;
@@ -96,7 +119,7 @@ export default function remarkCallouts() {
         if (block.type === 'paragraph') {
           let inline: PhrasingContent[] = [];
           for (const child of block.children) {
-            if (isLabel(child)) {
+            if (isLabel(child, lang)) {
               flushInline(inline);
               inline = [];
               current = { label: toString(child).trim(), blocks: [] };
@@ -112,7 +135,7 @@ export default function remarkCallouts() {
       }
 
       if (segments.length === 0) return;
-      const asides = segments.map(toAside);
+      const asides = segments.map((segment) => toAside(segment, lang));
       parent.children.splice(index, 1, ...asides);
       return [SKIP, index + asides.length];
     });
@@ -120,7 +143,7 @@ export default function remarkCallouts() {
     visit(tree, 'paragraph', (node: Paragraph) => {
       const lead = node.children[0];
       if (!lead || lead.type !== 'strong') return;
-      if (!/^Maps to\b/i.test(toString(lead).trim())) return;
+      if (!isMapsTo(toString(lead).trim(), lang)) return;
       node.data = {
         ...node.data,
         hProperties: { ...node.data?.hProperties, className: ['maps-to'] },

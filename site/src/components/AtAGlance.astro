@@ -24,13 +24,21 @@ interface KeyTerm {
   id: string;
 }
 
+import { translator } from '../i18n/ui';
+
 interface Props {
   items?: readonly string[];
   terms?: readonly KeyTerm[];
   class?: string;
+  /** Page language, for the two labels. */
+  lang?: string;
+  /** Language of the term names when it is not the page's (English terms on a
+      translated page). */
+  termsLang?: string;
 }
 
-const { items, terms, class: className } = Astro.props;
+const { items, terms, class: className, lang = 'en', termsLang } = Astro.props;
+const t = translator(lang);
 const count = items?.length ?? 0;
 const cols = count % 3 === 0 ? 3 : count % 2 === 0 ? 2 : 1;
 ---
@@ -38,7 +46,7 @@ const cols = count % 3 === 0 ? 3 : count % 2 === 0 ? 2 : 1;
 {
   items && items.length > 0 && (
     <aside class:list={['glance', className]} aria-labelledby="glance-label">
-      <p class="glance-label" id="glance-label">At a glance</p>
+      <p class="glance-label" id="glance-label">{t('glance.label')}</p>
       <ol class="glance-list" data-cols={cols}>
         {items.map((item, i) => (
           <li class="glance-item">
@@ -54,9 +62,9 @@ const cols = count % 3 === 0 ? 3 : count % 2 === 0 ? 2 : 1;
   terms && terms.length > 0 && (
     <div class:list={['key-terms', !(items && items.length > 0) && className]}>
       <p class="key-terms-label" id="key-terms-label">
-        Key terms in this chapter
+        {t('glance.keyTerms')}
       </p>
-      <ul class="key-terms-list" aria-labelledby="key-terms-label">
+      <ul class="key-terms-list" aria-labelledby="key-terms-label" lang={termsLang}>
         {terms.map((t) => (
           <li>
             <a class="term" href={t.url} data-term={t.id}>

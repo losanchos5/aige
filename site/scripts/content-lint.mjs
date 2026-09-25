@@ -12,6 +12,13 @@
 //   npm run lint:content            # scan ./dist
 //   node scripts/content-lint.mjs <dir>
 //
+// Translations (openspec/changes/i18n-site-rendering): the translated Markdown
+// in I18N_DIR (default <repo>/i18n) and the UI strings (site/src/i18n/ui.*.json,
+// or I18N_UI_DIR) get the same em-dash and phrase rules, and every translated
+// page in dist (/es|fr|de|pt/..., except the hand-translated /es/thesis) must
+// carry its language, the machine-translation notice, a self canonical and
+// hreflang alternates naming itself, English and x-default.
+//
 // False positives can be silenced by adding a substring to
 // scripts/content-lint.allow (one per line); any match whose surrounding text
 // contains an allowed substring is ignored.
@@ -274,6 +281,68 @@ function versionMismatches() {
   return out;
 }
 
+// ── Translations ─────────────────────────────────────────────────────────
+const TRANSLATED = ['es', 'fr', 'de', 'pt'];
+const SITE_URL = 'https://aigovernanceengineer.com';
+const I18N_DIR = process.env.I18N_DIR
+  ? resolve(process.cwd(), process.env.I18N_DIR)
+  : resolve(REPO_ROOT, 'i18n');
+const UI_DIR = resolve(process.cwd(), process.env.I18N_UI_DIR ?? 'src/i18n');
+
+/** The translation sources: <lang>/**.md under I18N_DIR and ui.*.json. */
+function translationSources() {
+  const out = [];
+  const walk = (dir) => {
+    for (const name of readdirSync(dir)) {
+      if (name.startsWith('.')) continue; // the translation memory (.tm/)
+      const full = join(dir, name);
+      if (statSync(full).isDirectory()) walk(full);
+      else if (name.endsWith('.md')) out.push(full);
+    }
+  };
+  for (const lang of TRANSLATED) {
+    const dir = join(I18N_DIR, lang);
+    if (existsSync(dir)) walk(dir);
+  }
+  if (existsSync(UI_DIR)) {
+    for (const name of readdirSync(UI_DIR)) {
+      if (/^ui\.[a-z]{2}\.json$/.test(name)) out.push(join(UI_DIR, name));
+    }
+  }
+  return out;
+}
+
+const attr = (tag, name) => new RegExp(`\\b${name}="([^"]*)"`).exec(tag)?.[1];
+
+/** The contract every translated page in dist keeps (HTML, one file). */
+function translatedPageProblems(file, raw) {
+  const rel = relative(targetDir, file).split(sep).join('/');
+  const path = `/${rel.replace(/\.html$/, '')}`; // /es/bok/x, /es/bok, /es
+  const lang = path.split('/')[1];
+  if (!TRANSLATED.includes(lang) || path === '/es/thesis') return [];
+  const out = [];
+  const htmlLang = /<html[^>]*\blang="([^"]+)"/.exec(raw)?.[1];
+  if (htmlLang !== lang) out.push(`<html lang="${htmlLang}"> on a /${lang}/ page`);
+  const canonical = /<link rel="canonical" href="([^"]+)"/.exec(raw)?.[1];
+  if (canonical !== `${SITE_URL}${path}`) out.push(`canonical ${canonical} is not ${SITE_URL}${path}`);
+  // The landing /<lang> is not a translation of one page: no notice, no alternates.
+  if (path === `/${lang}`) return out.map((snippet) => ({ file, label: 'translated page', snippet }));
+  const alternates = [...raw.matchAll(/<link rel="alternate" hreflang="[^"]*"[^>]*>/g)].map((m) => ({
+    hreflang: attr(m[0], 'hreflang'),
+    href: attr(m[0], 'href'),
+  }));
+  for (const want of [lang, 'en', 'x-default']) {
+    if (!alternates.some((alt) => alt.hreflang === want)) out.push(`no hreflang="${want}" alternate`);
+  }
+  const self = alternates.find((alt) => alt.hreflang === lang);
+  if (self && self.href !== `${SITE_URL}${path}`) out.push(`hreflang="${lang}" points to ${self.href}`);
+  // The index (/<lang>/bok) is chrome, not a translation of text: no notice.
+  if (path !== `/${lang}/bok` && !raw.includes('data-i18n-notice')) {
+    out.push('no machine-translation notice (data-i18n-notice)');
+  }
+  return out.map((snippet) => ({ file, label: 'translated page', snippet }));
+}
+
 function main() {
   if (!existsSync(targetDir)) {
     console.error(`content-lint: directory not found: ${targetDir}`);
@@ -312,6 +381,9 @@ function main() {
     // House style: no em dash anywhere in the published page.
     structural.push(...emDashes(file, raw));
 
+    // A translated page keeps its language, notice, canonical and alternates.
+    structural.push(...translatedPageProblems(file, raw));
+
     // Structural: the two resource landing pages must ship their full content.
     const rel = file.replace(/\\/g, '/');
     if (rel.endsWith('/resources/glossary.html')) {
@@ -330,11 +402,14 @@ function main() {
     }
   }
 
-  // Every other published text file, and the PNG downloads' text chunks.
+  // Every other published text file, and the PNG downloads' text chunks, and
+  // the translation sources (Markdown and UI strings) the pages are built from.
   const published = publishedFiles(targetDir);
+  const sources = translationSources();
   const others = [
     ...published.text.map((file) => [file, readFileSync(file, 'utf8')]),
     ...published.png.map((file) => [file, pngText(readFileSync(file))]),
+    ...sources.map((file) => [file, readFileSync(file, 'utf8')]),
   ];
   for (const [file, raw] of others) {
     structural.push(...emDashesIn(file, raw));
@@ -386,7 +461,8 @@ function main() {
 
   console.log(
     `content-lint: clean (${files.length} HTML file(s), ${published.text.length} other text file(s) and ` +
-      `${published.png.length} PNG download(s) scanned in ${targetDir}).`,
+      `${published.png.length} PNG download(s) scanned in ${targetDir}; ` +
+      `${sources.length} translation source(s) in ${I18N_DIR} and ${UI_DIR}).`,
   );
 }
 

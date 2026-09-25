@@ -8,6 +8,12 @@ const input = document.getElementById('search-input');
 const results = document.getElementById('search-results');
 const statusEl = document.getElementById('search-status');
 
+/* Status messages: English by default; a translated page carries its own on
+   the dialog (data-msg-none, data-msg-unavailable, data-msg-searching). */
+function msg(name, fallback) {
+  return (dialog && dialog.getAttribute(`data-msg-${name}`)) || fallback;
+}
+
 let pagefind = null;
 let loading = null;
 let selected = -1;
@@ -94,7 +100,7 @@ function render(items) {
   results.replaceChildren();
   if (!items.length) {
     setExpanded(false);
-    setStatus('No results.');
+    setStatus(msg('none', 'No results.'));
     return;
   }
   setStatus(null);
@@ -143,10 +149,10 @@ function onInput() {
     }
     const pf = await loadPagefind();
     if (!pf) {
-      setStatus('Search is unavailable.');
+      setStatus(msg('unavailable', 'Search is unavailable.'));
       return;
     }
-    setStatus('Searching…');
+    setStatus(msg('searching', 'Searching…'));
     const search = await pf.search(query);
     const data = await Promise.all(search.results.slice(0, 8).map((r) => r.data()));
     render(

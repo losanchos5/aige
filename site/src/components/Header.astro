@@ -10,22 +10,41 @@
  * `overlay` (the home) floats the bar over the full-viewport hero: fixed and
  * fully transparent at the top of the page, it takes the same ground, hairline
  * and elevation as everywhere else once the page scrolls (.is-scrolled, ui.js).
+ * `lang` translates the chrome's own strings (src/i18n/ui.ts; the destinations
+ * stay the English pages); `alternates`, the page's hreflang set, feeds the
+ * language switcher, which only appears when the page exists in two languages.
  */
 import RegisterMark from './RegisterMark.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import LangSwitcher from './LangSwitcher.astro';
 import { site } from '../data/site';
 import { nav, resolveCurrent, type NavGroup, type NavItem } from '../data/nav';
-import { bookRange } from '../data/parts';
+import { bookParts, bookRange } from '../data/parts';
+import { stripLocale } from '../i18n/locales';
+import { translator, type UiKey } from '../i18n/ui';
 
 interface Props {
   /** Float the bar, transparent until scrolled, over a full-viewport hero. */
   overlay?: boolean;
+  /** Page language (the <html lang>); English by default. */
+  lang?: string;
+  /** The page's hreflang alternates, for the language switcher. */
+  alternates?: { hreflang: string; href: string }[];
 }
 
-const { overlay = false } = Astro.props;
+const { overlay = false, lang = 'en', alternates } = Astro.props;
+const t = translator(lang);
+const groupLabel = (group: NavGroup) => t(`nav.${group.id}` as UiKey);
+// Part titles, keyed by part id (the chapter sections of the Body of Knowledge).
+const partLabel = (id: string, fallback: string) =>
+  bookParts.some((part) => part.id === id) ? t(`part.${id}` as UiKey) : fallback;
 
-const current = resolveCurrent(Astro.url.pathname);
-const currentHref = current.href;
+// A translated page (/de/bok/x) lights the same group as its English page, but
+// no English link claims to be the current page (aria-current).
+const pathname = Astro.url.pathname;
+const englishPath = stripLocale(pathname);
+const current = resolveCurrent(englishPath);
+const currentHref = englishPath === pathname ? current.href : undefined;
 const currentGroup = current.groupId;
 
 const slugify = (text: string) =>
@@ -36,7 +55,8 @@ const slugify = (text: string) =>
 const itemId = (groupId: string, item: NavItem) => `nav-${groupId}-${slugify(item.label)}`;
 const isCurrentLink = (href: string, groupId: string) =>
   currentHref === href && currentGroup === groupId;
-const leadLabel = (group: NavGroup) => (group.id === 'reference' ? 'All resources →' : group.label);
+const leadLabel = (group: NavGroup) =>
+  group.id === 'reference' ? t('header.allResources') : groupLabel(group);
 const panelItems = (group: NavGroup) => group.items.filter((i) => i.placement !== 'footer');
 const rowItems = (group: NavGroup) => panelItems(group).filter((i) => !i.num);
 const chapterOf = (group: NavGroup) => panelItems(group).filter((i) => i.num);
@@ -45,13 +65,13 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
 
 <header class="site-header" data-overlay={overlay ? '' : undefined}>
   <div class="container bar">
-    <a class="brand" href="/" aria-label={`${site.name}, home`}>
+    <a class="brand" href="/" aria-label={t('header.home', { name: site.name })}>
       <RegisterMark size="sm" label={site.name} />
       <span class="wordmark">{site.name}</span>
     </a>
 
     <div class="right">
-      <nav class="nav-desktop" aria-label="Primary">
+      <nav class="nav-desktop" aria-label={t('header.primary')}>
         <ul class="nav-top">
           {
             nav.map((group) =>
@@ -62,7 +82,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
                     href={group.href}
                     aria-current={isCurrentLink(group.href!, group.id) ? 'page' : undefined}
                   >
-                    {group.label}
+                    {groupLabel(group)}
                   </a>
                 </li>
               ) : (
@@ -78,7 +98,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
                     aria-controls={`nav-menu-${group.id}`}
                     data-nav-trigger
                   >
-                    {group.label}
+                    {groupLabel(group)}
                     <svg
                       class="chev"
                       viewBox="0 0 24 24"
@@ -110,7 +130,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
                             {leadLabel(group)}
                           </a>
                         ) : (
-                          <p class="nav-lead">{group.label}</p>
+                          <p class="nav-lead">{groupLabel(group)}</p>
                         )}
                         <p class="nav-lead-d" id={`${group.id}-lead-d`}>
                           {group.description}
@@ -144,7 +164,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
                           {group.sections.map((section) => (
                             <div class="nav-part">
                               <p class="nav-part-title" id={`nav-part-${section.id}`}>
-                                {section.label}{' '}
+                                {partLabel(section.id, section.label)}{' '}
                                 <span class="nav-part-range">{section.range}</span>
                               </p>
                               <ol
@@ -172,7 +192,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
                         </div>
                       ) : (
                         chapterOf(group).length > 0 && (
-                          <ol class="nav-menu-chapters" aria-label="Chapters">
+                          <ol class="nav-menu-chapters" aria-label={t('header.chapters')}>
                             {chapterOf(group).map((item) => (
                               <li>
                                 <a
@@ -201,13 +221,15 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
         </ul>
       </nav>
 
+      <LangSwitcher lang={lang} alternates={alternates} />
+
       <button
         type="button"
         class="icon-btn search-btn"
         data-search-open
         data-umami-event="search-open"
         data-umami-event-location="header"
-        aria-label="Search"
+        aria-label={t('header.search')}
         aria-haspopup="dialog"
         aria-expanded="false"
       >
@@ -217,7 +239,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
         </svg>
       </button>
 
-      <ThemeToggle />
+      <ThemeToggle lang={lang} />
 
       <button
         type="button"
@@ -225,7 +247,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
         data-nav-open
         aria-expanded="false"
         aria-controls="nav-drawer"
-        aria-label="Menu"
+        aria-label={t('header.menu')}
       >
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
           <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
@@ -235,14 +257,14 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
   </div>
 </header>
 
-<dialog id="nav-drawer" class="nav-drawer" aria-label="Menu">
+<dialog id="nav-drawer" class="nav-drawer" aria-label={t('header.menu')}>
   <div class="nav-drawer-in">
     <div class="nav-drawer-bar">
       <span class="nav-drawer-brand">
         <RegisterMark size="sm" label={site.name} />
-        <span class="nav-drawer-title">Menu</span>
+        <span class="nav-drawer-title">{t('header.menu')}</span>
       </span>
-      <button type="button" class="icon-btn" data-nav-close aria-label="Close menu">
+      <button type="button" class="icon-btn" data-nav-close aria-label={t('header.closeMenu')}>
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
           <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
         </svg>
@@ -260,18 +282,20 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
         <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
         <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
       </svg>
-      <span>Search</span>
+      <span>{t('header.search')}</span>
       <kbd>Ctrl K</kbd>
     </button>
 
-    <nav class="nav-panel" aria-label="Menu">
+    <LangSwitcher lang={lang} alternates={alternates} variant="drawer" />
+
+    <nav class="nav-panel" aria-label={t('header.menu')}>
       {
         nav.map((group) => (
           <section class="nav-drawer-group">
             {isDirect(group) ? (
               <>
                 <a class="nav-drawer-lead" href={group.href} aria-describedby={`d-${group.id}-lead-d`}>
-                  {group.label}
+                  {groupLabel(group)}
                 </a>
                 <p id={`d-${group.id}-lead-d`} class="nav-drawer-desc">
                   {group.description}
@@ -279,7 +303,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
               </>
             ) : (
               <>
-                <p class="nav-menu-kicker">{group.label}</p>
+                <p class="nav-menu-kicker">{groupLabel(group)}</p>
                 {group.href && (
                   <>
                     <a
@@ -310,13 +334,13 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
                 )}
                 {chapterOf(group).length > 0 && (
                   <details class="nav-drawer-chapters">
-                    <summary>Chapters {bookRange}</summary>
+                    <summary>{t('header.chapters')} {bookRange}</summary>
                     {(group.sections ?? [{ id: group.id, label: '', range: '', items: chapterOf(group) }]).map(
                       (section) => (
                         <>
                           {section.label && (
                             <p class="nav-drawer-part" id={`d-part-${section.id}`}>
-                              {section.label}{' '}
+                              {partLabel(section.id, section.label)}{' '}
                               <span class="nav-part-range">{section.range}</span>
                             </p>
                           )}
