@@ -5,6 +5,11 @@
 // no-JS fallback, forced colours), the strip's data and the text contrast
 // over the field in both themes, sampled at several points of the blobs'
 // paths, at desktop and phone widths and after a theme switch.
+//
+// The field is the hero's ground only while index.astro's HERO_ART is false.
+// The layout, header overlay and figures strip tests hold for either ground;
+// the motion, no-JS and contrast tests need the field and skip while the
+// painting is on (tests/hero-art.spec.ts covers that hero).
 
 import { test, expect, type Page } from '@playwright/test';
 
@@ -17,6 +22,11 @@ import { patterns } from '../src/data/patterns';
 import { site } from '../src/data/site';
 
 const HEADLINE = 'Governance you can run, not just read.';
+
+async function skipUnlessField(page: Page) {
+  await page.goto('/');
+  test.skip(!(await page.locator('[data-hero-field]').count()), 'HERO_ART is on');
+}
 
 test.describe('layout', () => {
   for (const { width, height } of [
@@ -108,6 +118,8 @@ test.describe('header overlay', () => {
 });
 
 test.describe('motion', () => {
+  test.beforeEach(({ page }) => skipUnlessField(page));
+
   test('the field runs and the strip scrolls when motion is allowed', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
@@ -192,6 +204,7 @@ test.describe('motion', () => {
 
 test.describe('without JavaScript', () => {
   test.use({ javaScriptEnabled: false });
+  test.beforeEach(({ page }) => skipUnlessField(page));
 
   test('the static fallback paints the field and the strip wraps', async ({ page }) => {
     await page.goto('/');
@@ -356,64 +369,68 @@ function expectAA(c: Sampled, where: string) {
   expect(c.facts, `figures strip ${where}`).toBeGreaterThanOrEqual(4.5);
 }
 
-for (const scheme of ['light', 'dark'] as const) {
-  for (const size of WIDTHS) {
-    test(`text over the field holds AA along the blobs' paths (${scheme}, ${size.width})`, async ({
-      page,
-    }) => {
-      test.slow();
-      await page.setViewportSize(size);
-      for (const t0 of [0, 40, 80, 120, 160, 200, 350, 500]) {
-        await page.unrouteAll();
-        await withT0(page, t0);
-        await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
-        await page.goto('/');
-        await expect(page.locator('.hero-canvas')).toHaveAttribute('data-state', 'static');
-        await page.evaluate(() => document.fonts.ready);
-        expectAA(await worstContrast(page), `at t=${t0}`);
-      }
+test.describe('contrast over the field', () => {
+  test.beforeEach(({ page }) => skipUnlessField(page));
+
+  for (const scheme of ['light', 'dark'] as const) {
+    for (const size of WIDTHS) {
+      test(`text over the field holds AA along the blobs' paths (${scheme}, ${size.width})`, async ({
+        page,
+      }) => {
+        test.slow();
+        await page.setViewportSize(size);
+        for (const t0 of [0, 40, 80, 120, 160, 200, 350, 500]) {
+          await page.unrouteAll();
+          await withT0(page, t0);
+          await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
+          await page.goto('/');
+          await expect(page.locator('.hero-canvas')).toHaveAttribute('data-state', 'static');
+          await page.evaluate(() => document.fonts.ready);
+          expectAA(await worstContrast(page), `at t=${t0}`);
+        }
+      });
+    }
+
+    test(`text holds AA after switching the theme to ${scheme} mid-session`, async ({ page }) => {
+      const from = scheme === 'dark' ? 'light' : 'dark';
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.emulateMedia({ colorScheme: from, reducedMotion: 'reduce' });
+      await page.goto('/');
+      await expect(page.locator('.hero-canvas')).toHaveAttribute('data-state', 'static');
+      await page.evaluate((t) => {
+        document.documentElement.setAttribute('data-theme', t);
+      }, scheme);
+      await page.waitForTimeout(200);
+      const c = await worstContrast(page);
+      expectAA(c, 'after the switch');
+      // The field under the headline keeps its colour: the clear-to-ground veil
+      // only lifts what it must, it does not wipe the box flat.
+      const flat = await page.evaluate(() => {
+        const cv = document.querySelector('.hero-canvas') as HTMLCanvasElement;
+        const gl = cv.getContext('webgl')!;
+        const px = new Uint8Array(4);
+        gl.readPixels(Math.floor(cv.width * 0.72), Math.floor(cv.height * 0.5), 1, 1, gl.RGBA,
+          gl.UNSIGNED_BYTE, px);
+        return Array.from(px.slice(0, 3));
+      });
+      const ground = scheme === 'dark' ? [18, 20, 23] : [246, 244, 238];
+      const dist = Math.max(...flat.map((v, i) => Math.abs(v - ground[i])));
+      expect(dist, 'the field shows colour right of the headline').toBeGreaterThan(8);
+    });
+
+    test(`text over the static fallback holds AA (${scheme})`, async ({ browser }) => {
+      const ctx = await browser.newContext({
+        javaScriptEnabled: false,
+        colorScheme: scheme,
+        viewport: { width: 1440, height: 900 },
+      });
+      const page = await ctx.newPage();
+      await page.goto('/', { waitUntil: 'networkidle' });
+      // The pills' boxes are measured before the capture: let the web fonts
+      // settle first, or a late swap moves the strip under the sample.
+      await page.evaluate(() => document.fonts.ready);
+      expectAA(await worstContrast(page), 'on the fallback');
+      await ctx.close();
     });
   }
-
-  test(`text holds AA after switching the theme to ${scheme} mid-session`, async ({ page }) => {
-    const from = scheme === 'dark' ? 'light' : 'dark';
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.emulateMedia({ colorScheme: from, reducedMotion: 'reduce' });
-    await page.goto('/');
-    await expect(page.locator('.hero-canvas')).toHaveAttribute('data-state', 'static');
-    await page.evaluate((t) => {
-      document.documentElement.setAttribute('data-theme', t);
-    }, scheme);
-    await page.waitForTimeout(200);
-    const c = await worstContrast(page);
-    expectAA(c, 'after the switch');
-    // The field under the headline keeps its colour: the clear-to-ground veil
-    // only lifts what it must, it does not wipe the box flat.
-    const flat = await page.evaluate(() => {
-      const cv = document.querySelector('.hero-canvas') as HTMLCanvasElement;
-      const gl = cv.getContext('webgl')!;
-      const px = new Uint8Array(4);
-      gl.readPixels(Math.floor(cv.width * 0.72), Math.floor(cv.height * 0.5), 1, 1, gl.RGBA,
-        gl.UNSIGNED_BYTE, px);
-      return Array.from(px.slice(0, 3));
-    });
-    const ground = scheme === 'dark' ? [18, 20, 23] : [246, 244, 238];
-    const dist = Math.max(...flat.map((v, i) => Math.abs(v - ground[i])));
-    expect(dist, 'the field shows colour right of the headline').toBeGreaterThan(8);
-  });
-
-  test(`text over the static fallback holds AA (${scheme})`, async ({ browser }) => {
-    const ctx = await browser.newContext({
-      javaScriptEnabled: false,
-      colorScheme: scheme,
-      viewport: { width: 1440, height: 900 },
-    });
-    const page = await ctx.newPage();
-    await page.goto('/', { waitUntil: 'networkidle' });
-    // The pills' boxes are measured before the capture: let the web fonts
-    // settle first, or a late swap moves the strip under the sample.
-    await page.evaluate(() => document.fonts.ready);
-    expectAA(await worstContrast(page), 'on the fallback');
-    await ctx.close();
-  });
-}
+});
