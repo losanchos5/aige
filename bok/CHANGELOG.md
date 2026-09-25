@@ -4,568 +4,613 @@ All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledg
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
 
-## Unreleased (v0.5.0)
+## [0.5.0] - 2026-09-25
 
-### Added
-- Stable obligation ids and one page per obligation (`site/src/data/frameworks.ts`, `/obligations`,
-  `/obligations/<id>`): every row of the regulatory map carries an id of the form
-  `AIGE-OBL-<INSTRUMENT>-<CLAUSE>` (for example `AIGE-OBL-EUAIA-ART9`), assigned once and never
-  reused; a removed row's id stays reserved. Each page shows the clause, the duty holder, the
-  application date with its status and later dates, the artefact, the layers, the patterns, the
-  crosswalk siblings, the cases that cite the same EU AI Act article, the chapter 08 section it
-  comes from, its review date, its JSON and a citation block. The sitemap dates these pages by the
-  row's review date.
-- The rows now carry the dates chapter 08 states in prose but no row held: Annex I embedded
-  systems from 2028-08-02 and legacy high-risk systems intended for public authorities by
-  2030-08-02 (`Art. 111(2)`), as later milestones on the high-risk rows.
-- A static open-data API under `/api/v1/`: a catalogue (`index.json`), one file per dataset
-  (obligations, frameworks, crosswalk, glossary, patterns, maturity, path, chapters,
-  jurisdictions, harms, cases, contracts, roles), one file per obligation, an OpenAPI 3.1
-  description and a JSON Schema (draft 2020-12) per document, all with the same notice, licence
-  and DOI envelope; `/resources/data` documents the endpoints, the id rule, the versioning and
-  stability promise and how to cite. `_headers` opens CORS and sets a one-hour cache on the API and
-  the existing downloads; the Content-Security-Policy is unchanged.
-- The citation block now serves any page (`kind`: chapter, obligation, figure, dataset or page);
-  chapters keep their existing reference and BibTeX.
-- Concept figures for the new chapters, each drawn only from what its chapter or data module
-  states, with a text description and a `/figures/<id>` permalink: the agent control plane
-  (chapter 23 and `/agents#control-plane`: registry, identity issuer, tool gateway, runtime
-  guardrail with its failure posture, human checkpoint, per-agent breaker with its six stop levels,
-  the boundary a kill switch cannot cross, telemetry kept as evidence), the governance operating
-  model (chapter 12: board, committee, the three lines and where the AI governance engineer sits),
-  harm at five levels (chapter 13, from the harms atlas), the explanation technique map (chapter
-  16), how the instruments relate (chapter 22 and `/resources/frameworks`, dated as of
-  2026-09-24) and AI laws by jurisdiction (chapter 21: a tile map from the jurisdictions dataset,
-  shaded by status, with its table, dated as of 2026-09-24).
-- Chapter 14 opens with an interactive diagram of the build as a chain of gates: intake, design
-  review, dataset admission, eval gate and release gate, each named with the pattern the chapter
-  ties to it, ending in the technical file the pipeline compiles.
-- The obligation register grows from 68 to 178 rows and from 31 to 76 instruments, so every
-  obligation the v0.5.0 chapters teach has an id and a page: GDPR articles, NIS2, DORA, the Cyber
-  Resilience Act, the Product Liability Directive, the DSM Directive, the DSA, the UCPD, the
-  Platform Work and Consumer Credit Directives, Korea's AI Basic Act article by article, US state and
-  federal law that reaches AI (California, New York, Illinois, New York City, Utah, Colorado,
-  Virginia, Minnesota, Washington, OMB, Regulation B, the FCRA, Title VII, the FTC Act, the TAKE IT
-  DOWN Act), Canada, Brazil, China's PIPL and anthropomorphic-interaction measures, the Council of
-  Europe Convention, the OECD AI Principles, the G7 Hiroshima Code, ISO/IEC 42005 and 22989, NIST AI
-  600-1, the JTC 21 deliverables and 26 more EU AI Act articles and paragraphs (among them
-  `Art. 86` and `Art. 26(11)`). Chapter 08 carries every row in its own tables, with a new section,
-  "Data protection and other EU law", and new subsections for US state privacy and sector law, US
-  federal law, Korea and treaty and soft law; its new sources, numbered 63 to 116, were verified
-  on 2026-09-24.
-- Eight development-side patterns, catalogue order 18 to 25, each with its own page, archify
-  diagram, illustrative artefact and numbered sources: **Use-Case Intake & Risk Tiering**
-  (`/patterns/use-case-intake-risk-tiering`), **AI Threat Model** (`/patterns/ai-threat-model`:
-  STRIDE extended with MITRE ATLAS, NIST AI 100-2 and the OWASP LLM and Agentic ids),
-  **Training-Data Rights Ledger** (`/patterns/training-data-rights-ledger`), **Dataset Admission
-  Gate** (`/patterns/dataset-admission-gate`), **Fairness Eval Suite**
-  (`/patterns/fairness-eval-suite`), **Explanation Artefact** (`/patterns/explanation-artefact`),
-  **Model Artefact Integrity** (`/patterns/model-artefact-integrity`: model signing, build
-  provenance, serialisation scanning, verification before load) and **Claims Substantiation Gate**
-  (`/patterns/claims-substantiation-gate`). Four of the artefacts reuse the published schemas
-  (`use-case-record.v1`, `dataset-admission-record.v1`, `eval-result.v1`, `evidence-record.v1`) and
-  validate against them. Chapter 05 gains a catalogue section per pattern with the usual anchor, and
-  chapters 11 to 23 now link the specific sentences that described these practices to the new pages
-  (the chapter 20 table no longer marks the rights ledger as proposed). Mappings are illustrative,
-  not a claim of conformity.
-- **AIGP coverage map** (`/for/aigp`, `site/src/data/aigp.ts`): the four domains, 13 competencies
-  and 58 performance indicators of the public AIGP Body of Knowledge v2.1 (effective 2026-02-02),
-  each indicator under a positional id with this site's own paraphrase of at most 12 words, the
-  sections, patterns, glossary terms, templates and tools that teach it, and a status on the house
-  criterion (taught, or partly taught with what is missing). A heatmap generated at build shows
-  the whole map; a study path per domain keeps its ticks in the browser only. Every mapped link is
-  resolved at build and the build fails on one that does not exist. No overall score. It carries
-  the notice that AIGP is a registered trademark of the IAPP, that this site is not affiliated with
-  or endorsed by the IAPP, and that the map covers an open body of knowledge and is not exam
-  preparation.
-- **Certifications, neutrally** (`/for/certifications`): who owns AIGP, the ISO/IEC 42001 Lead
-  Implementer and Lead Auditor schemes, ISACA AAISM and AAIA, what each owner says the scheme
-  assesses, and how this body of knowledge relates to each, from the owners' own pages, ISO and
-  EUR-Lex (checked 2026-09-24), in line with chapter 06 on certifications as a proxy for
-  capability.
-- **AI register entry builder** (`/toolkit/ai-register-entry`): build AI system and agent register
-  entries that validate against the published schemas, keep a register in the browser, import and
-  export it in bulk as JSON or CSV (RFC 4180, round trip without loss), download a Markdown public
-  summary without the internal fields, and read a field crosswalk (UK ATRS template v4.0, Canada
-  AIA questionnaire, EU database Annex VIII Sections A to C after the Digital Omnibus, model card,
-  ISO/IEC 42001 SoA columns marked "verify"): field names only, so one source record feeds each
-  regime.
-- **Impact assessment builder** (`/toolkit/impact-assessment`): one record for a FRIA (the six
-  elements of `Art. 27(1)`), an AI system impact assessment (elements by ISO/IEC 42005 clause id,
-  ids from the DIS, marked "verify") or an AI addendum to a DPIA (`Art. 35(7)` plus the AI-specific
-  fields); every risk has an id and every measure names the risks it addresses, the pattern that
-  implements it and its controls; a risk-to-measure matrix flags loose ends; re-open triggers are
-  part of the record; JSON, YAML and Markdown exports.
-- **Model card builder** (`/toolkit/model-card`) and a new schema `model-card.v1.json` (with its
-  example and human template): an obligation coverage checklist (`Art. 11` with Annex IV and
-  `Art. 13(3)` for high-risk systems, `Art. 53(1)` for GPAI models, ISO/IEC 42001 Annex A, NIST AI
-  RMF MAP and MEASURE), each item linked to its obligation page; exports to a Hugging Face style
-  card (YAML front matter and the Hub template's headings) and a CycloneDX 1.7 ML-BOM that
-  validates against the official schema.
-- The register entry and impact assessment schemas gain optional fields only (`public_record`;
-  `iso42005_sections`, `risks[].id`, `mitigations[].pattern`, `mitigations[].controls`): every v1
-  record written before still validates. Shared client modules `site/public/toolkit/builders.js`
-  (the schema subset validator, YAML and CSV) and `schema-form.js` (accessible forms from field
-  specs); no new dependency and no change to the content security policy.
-- Audience hubs (`/for`, `site/src/data/audiences.ts`): one route through the site for each of six
-  audiences (engineers, CISOs and risk leads, legal counsel and DPOs, executives and boards, the
-  public sector, SMEs and start-ups). Each hub names who it is for, answers the three questions
-  that audience brings with numbered sources and a link to the section of the Body of Knowledge
-  that answers it in full, walks chapters, patterns, tools, templates, datasets, figures and cases
-  in reading order, lists "start this week" actions and the obligations that matter most, with
-  status and dates read from the register. The build fails on a broken anchor, an unknown pattern,
-  figure, case, path node or obligation, or an uncited source; a toolkit tool appears on a route
-  only once the toolkit lists it as live. Illustrative, not a claim of conformity.
-- A "What applies now" band on the home page: the EU AI Act articles that already apply and the
-  next three dates with what each one switches on, computed from the obligation register at build
-  time and linked to each `/obligations/<id>`, so a date drops out on the first build after it
-  passes.
-- A read-only remote MCP server over the open data (`tools/mcp-server/`, to be deployed at
-  `https://mcp.aigovernanceengineer.com/mcp`): ten tools (`search_glossary`, `get_term`,
-  `get_obligations`, `get_obligation`, `map_clause`, `list_patterns`, `get_pattern`,
-  `list_templates`, `get_template`, `search_bok`) and the `/api/v1` datasets as resources, over
-  Streamable HTTP with the official TypeScript SDK v2 (protocol revision 2026-07-28, with a
-  stateless fallback for 2025-era clients). Every answer carries its source URL, the CC BY 4.0
-  licence and the notice "Illustrative, not legal advice and not a claim of conformity". It reads
-  the public API through a one-hour in-memory cache with conditional revalidation, keeps no data
-  about callers (no IPs, user agents or tool arguments in its logs; the rate limiter holds only
-  keyed hashes until each window closes) and ships a Dockerfile, a compose service, a Caddy site
-  block and connection instructions for Claude and other MCP clients.
+Minor release: thirteen new chapters (11 to 23) bring the book to 24 chapters in five parts; the
+patterns get their own pages and grow from 17 to 33; the site gains a reference layer (obligation ids
+and pages, glossary term pages, the harms atlas, cases, contract clauses, templates and schemas,
+crosswalk v2 with a clause explorer, the threat bridge), a browser toolkit of eleven tools, citable and
+exportable figures and posters, a static open-data API and a read-only MCP server. It folds in the
+pending patch of 2026-09-20 (China, authorship, no em dashes) and the fact-check pass of 2026-09-24
+and 2026-09-25. The Thesis wording, definition, values and principles are unchanged; only its CC BY
+attribution notice is clarified.
 
-### Changed
-- Chapter 08 and the register: the CSA row that named an "Agentic Control Supplement" now names what
-  the CSA has published (the AICM agent controls, the Agentic Trust Framework and AARM), because the
-  supplement could not be matched to a primary document; STAR for AI lists its three levels; the
-  agent-control table uses OWASP's official ASI names; the Korea row cites the Act on law.go.kr and
-  the guidance-period wording; the Colorado row describes SB 26-189; the EU AI Act lead states the
-  amended `Art. 113(c)` and how the map dates the high-risk duties that sit outside Chapter III.
-- The GPAI rows of the register (`Art. 52` to `Art. 55`) gain the 2 August 2027 milestone of
-  `Art. 111(3)` for models placed on the market before 2 August 2025, and chapter 08 states it.
-- The obligation heat matrix on `/resources/frameworks` joins each row to its instrument by the
-  register's `frameworkId`, so rows under the new chapter-08 sections land on their own instrument.
-- `/resources/obligations.json` and `/resources/obligations.csv` move to `schemaVersion` 2 at the
-  same URLs. `appliesFrom` is now an ISO date (or `null` for voluntary instruments without one) and
-  the former free text moved to `appliesNote`; each row gains `id`, `url`, `json`, `frameworkId`,
-  `clause`, `requirement`, `appliesStatus`, `milestones`, `systemClass`, `patterns`,
-  `crosswalkTopics`, `authority`, `scope` and `reviewed`. The CSV keeps its first seven columns in
-  place and appends the new ones.
-- The EU AI Act `Art. 4` row: applies since 2025-02-02 (Chapter I, `Art. 113(a)`), reworded by the
-  Digital Omnibus on 2026-07-27, in line with chapter 12.
-- Patterns get their own pages. Each of the 17 patterns of chapter 05 moved to
-  `bok/patterns/<slug>.md` (prose unchanged; sections one heading level up, citations renumbered
-  per page) and renders at `/patterns/<slug>` with the chapter layout: breadcrumb,
-  its archify diagram (moved from the chapter), glossary hover cards, its own numbered sources, a
-  "Cite this pattern" block and a pager in catalogue order. Each page adds one line under its
-  **Maps to** line naming the OWASP Agentic and NIST AI RMF sources and the "illustrative, not a
-  claim of conformity" notice; the "Related patterns" names now link to the pages.
-- `/patterns`: a new index of the catalogue grouped by the five stack layers.
-- Chapter 05 is now the catalogue: introduction, the pattern template, the pattern map and, under
-  each unchanged `## Pattern: <name>` heading, a short summary linking to the page, so every
-  published `/bok/patterns#pattern-*` link still lands on its pattern. Its sources are renumbered
-  (1-5) and a new one dates the harmonised-standards remark (none referenced in the Official
-  Journal as of 2026-09-24). The page no longer inlines 17 diagrams.
-- `/llms.txt` lists `/patterns`, every pattern page, the harms atlas, the cases, the templates and
-  the contract clauses; `/llms-full.txt` carries every pattern in full right after chapter 05.
-- The PDF build (`build/build_pdf.py`) prints every chapter file (00 to the last) and assembles
-  chapter 05 with the full text of every pattern in place of the catalogue summaries.
-- **Navigation by part.** The Body of Knowledge menu, the mobile drawer, the footer site map and the
-  chapter rail now group the chapters by the five parts of the book (the discipline, reference,
-  foundations, the lifecycle, law and standards), each with its chapter range; counts come from the
-  chapter manifest (`site/src/data/parts.ts`). Reference gains Harms atlas, Cases, Contracts and
-  Templates & schemas; About gains Methodology.
-- **Home and index by part.** The home presents the five parts (title and counts computed, no more
-  "Eleven chapters"), its resource tiles add the topic crosswalk, the map, the templates and the
-  harms atlas, and a newsletter section sits before the closing band. The `/bok` index groups the
-  chapter cards by part, with a one-line introduction and a jump list; the three reading paths now
-  run through chapters 11 to 18.
-- **Resources hub.** `/resources` lists ten references, adding the harms atlas, cases, contract
-  clauses and the templates and schemas library, each with a count computed from its data.
-- **Methodology.** New `/about/methodology`: how sources are chosen and tagged, how "as of" dates
-  are kept, the review cadence, what the build checks, how corrections and contributions work, and
-  versioning with DOIs. `bok/CONTRIBUTORS.md` defines the author, reviewer and contributor roles and
-  how reviewers are credited.
-- **Issue forms.** Report an error on a page, propose an obligation row, propose a glossary term and
-  propose a case study join the existing forms.
-- **Newsletter and analytics.** The sign-up form also closes every chapter and the home. Downloads
-  in the footer and on `/about`, newsletter sign-ups, search opening and citation copying carry
-  declarative Umami event attributes; no new script, and the newsletter note now says the address
-  goes straight to Buttondown.
-- **Toolkit** (`/toolkit`): a registry of browser tools built from the Body of Knowledge
-  (`site/src/data/toolkit.ts`), a shared `ToolShell` component with the fixed notice "Indicative,
-  not legal advice and not a conformity claim. Nothing you enter leaves your browser.", a no-JS
-  worksheet mode and print styles, and dependency-free client helpers (`site/public/toolkit/lib.js`:
-  state in the URL fragment, safe storage, JSON, CSV per RFC 4180, Markdown and iCalendar per RFC
-  5545 downloads, clipboard, SVG to PNG through a `data:` URL). No change to the content security
-  policy.
-- **Maturity self-check** (`/toolkit/maturity-self-check`): pick, per stack layer, the highest
-  observable criterion of chapter 07 met today; get the ragged per-layer profile drawn in SVG, the
-  floor and the single next move with its metrics, checklist questions and pattern link. Exports a
-  re-importable JSON profile (`/toolkit/maturity-profile.v1.schema.json`), a Markdown report and an
-  SVG or PNG image; saves profiles in the browser and compares two. `site/src/data/maturity.ts` gains
-  the chapter's criteria table, metrics per level, checklist and typical failures as data (additive;
-  no heading changed).
-- **Obligations and deadlines planner** (`/toolkit/obligations-planner`): tick your roles in the
-  EU AI Act value chain (provider, deployer, importer, distributor, authorised representative, GPAI
-  model provider, with or without systemic risk), the system classes (Annex III, Annex I, Article
-  50) and an optional reference date; get the rows of the obligation register that bind you, each
-  with its artefact, layer, patterns, the date it applies for your classes and its status read on
-  your date, plus a timeline and, apart, the importer, distributor and authorised-representative
-  duties the register does not hold as rows (Arts. 22, 23, 24 and 54, from the consolidated text).
-  Exports a Markdown checklist, a CSV, a JSON in the open-data envelope
-  (`/toolkit/obligations-plan.v1.schema.json`) and an `.ics` calendar with one all-day event per
-  date. The role mapping lives in `site/src/data/obligations-planner.ts`; no register date is
-  restated.
-- Every `/obligations/<id>` page opens with the obligation-to-evidence chain, generated from its
-  row: clause, duty holder, date, artefact, layer and the record schema its evidence is filed as,
-  with the crosswalk siblings and "As of" in the image; and carries its own Open Graph card
-  (`/og/obligations/<id>.png`). Each live tool gets one too (`/og/toolkit/<id>.png`).
-- A test fails when a register row still says "applies later" or "deferred" after its date has
-  passed (`site/tests/obligation-status-dates.spec.ts`).
-- **EU AI Act role and risk-class triage** (`/toolkit/ai-act-triage`): a versioned question graph
-  (`site/src/data/triage.ts`, question set 1.0.0 as of 2026-09-24, 20 questions in seven steps) that
-  walks an AI system or model through chapter 18: reach (`Art. 2(1)`), the `Art. 3(1)` definition,
-  the `Art. 2` exclusions, the `Art. 25(1)` triggers, the `Art. 5` screen with the Omnibus points
-  `(ba)` and `(bb)` from 2026-12-02, `Art. 6(1)` with the narrowed safety component, the eight
-  Annex III areas, the `Art. 6(3)` filter and the profiling override, the `Art. 50` cases and the
-  GPAI track with the 10^25 FLOP presumption. It returns indicative scope, EU roles and risk
-  classes with the reason and article behind each, the date each class applies from, open points
-  and the meaning of every answer; never a conformity verdict. Every question and rule cites
-  verbatim fragments of chapter 18 and the build fails if one leaves the chapter. Exports a
-  classification decision record in JSON and YAML (new schema
-  `/schemas/classification-decision-record.v1.json`, with a filled example and a human template),
-  a Markdown report and a link that opens the obligations planner with the roles and classes;
-  records re-open with the outcome recomputed. The pure engine
-  (`site/public/toolkit/ai-act-triage-engine.js`) holds no legal logic of its own.
-- **Policy Card builder** (`/toolkit/policy-card`): pick one of six governance rules (no
-  unregistered agent in production; an eval score at or above a threshold before deploy; no personal
-  data sent to an external model; human approval for a named tool; a model card present before
-  release; an expired exception blocks the build) or write one condition of your own, then set the
-  owner, scope, review date and the obligation ids the rule answers. The page builds the Policy Card
-  in Markdown, YAML and JSON (valid against `policy-card.v1.json`, checked in the browser), an
-  OPA/Rego module in Rego v1 syntax with a verdict rule and unit tests, a Cedar stub with tests, an
-  example input and a GitHub Actions CI hook, all marked "Illustrative, review before use". The
-  default card of each rule is published under `/templates/policy-cards/`, generated by the same code
-  (`site/scripts/policy-card-samples.mjs`) and checked with `opa check --strict` and `opa test` (OPA
-  1.21.0) and `cedar run-tests` (cedar-policy-cli 4.13.0).
-- **Vendor due-diligence request** (`/toolkit/vendor-due-diligence`): supply type, use tier, data
-  sensitivity, autonomy and tool access, jurisdictions and sector give a risk tier with its reasons
-  and a tiered, evidence-first request of 20 to 40 questions in the site's own wording (model or
-  system card, AIBOM, evaluation and red-team reports, incident-notice SLA, training-content
-  summary, copyright policy, sub-processors and more), each cross-referenced to crosswalk topics and
-  to CSA AICM control ids the crosswalk already carries, plus the contract-clause checklist from the
-  contracts page. Exports Markdown, CSV and a response record (JSON,
-  `vendor-due-diligence-response.v1`).
-- **Incident clock** (`/toolkit/incident-clock`): from the awareness time, roles, system tier and
-  facts, the incident class on chapter 17's severity scale and every clock the chapter states (EU AI
-  Act Art. 73, Art. 26(5) and Art. 55(1)(c) with the GPAI Code of Practice, GDPR Arts. 33 and 34,
-  NIS2 Art. 23, DORA Art. 19 with RTS 2025/301) as calendar dates, with who reports to whom, a
-  prominent "verify with counsel or the authority" notice, `.ics` reminders, a Markdown summary and
-  an incident record skeleton (JSON, `incident-record.v1`). The tool never asserts more than the
-  chapter: it applies no period-counting rules and does not decide reportability.
-- **Agent control profile** (`/toolkit/agent-control-profile`): describe one agent (autonomy, tools
-  and MCP servers with operation class and scope, data classes, memory, external actions, identity
-  model, approval points) and get the minimum control set of chapter 23 with the pattern behind each
-  control, the gaps to close, an agent register entry (JSON, `agent-register-entry.v1`) and a
-  checklist (Markdown and CSV).
-- **Fairness metric chooser** (`/toolkit/fairness-metric-chooser`): the questions chapter 16 says
-  decide the metric (harm type, ground truth, costlier error, legal frame, access to the protected
-  attribute) give the primary metric families, secondary checks, warnings and legal notes, each
-  linked to its chapter 16 section; metrics that depend on an unreliable label are deferred, not
-  dropped. Exports Markdown and JSON.
-- Shared plumbing for these four tools: `site/public/toolkit/form-kit.js` (form to fragment and
-  back, accessible error summary, UTC date arithmetic), `ToolTerms` (glossary links),
-  `ToolSourceList` (numbered sources in the house format) and `site/src/lib/tool-anchors.ts`, which
-  fails the build when a chapter heading a tool links to is renamed.
-- Figures are citable and reusable: a `/figures` gallery grouped by part and chapter (the
-  infographics and the interactive diagrams) and a `/figures/<id>` permalink per infographic with
-  its text alternative, where it appears, downloads, HTML and Markdown embed snippets with the
-  full CC BY credit, a citation with BibTeX and `ImageObject` structured data.
-- Every figure is exported at build as a standalone SVG (light and dark by colour scheme, plus
-  fixed light and dark) and as light and dark PNGs at 1600 and 3200 px, drawn with the site's
-  typefaces, each with the band "aigovernanceengineer.com · CC BY 4.0 · v<version>" and a
-  versioned file name under `/downloads/figures/`.
-- Figure entries gain `asOf`, `reviewBy`, `license`, `kind`, `pages` and a `data` table
-  fallback; a dated figure prints "As of" inside the image (the Article 73 clock now reads
-  "As of 2026-09-24"), and the build checks budgets, dates and the stamp.
-- `site/VISUAL-GUIDE.md` adds rules for data visualisation, posters and exports, and
-  interactive widgets; the content lint now also scans the published SVG, JSON, CSV, TXT, XML and
-  Markdown files and the text of the PNG downloads.
-- Eleven new figures drawn only from what the chapters already state: the five objects of
-  governance (chapter 01), the profession in numbers (02), human oversight designed and where
-  control moves when you buy AI (04), who enforces and the penalty ceilings (08), the committee
-  decides and the gates enforce (12), the risk loop on the stack, the likelihood-by-severity
-  matrix with the S5 override and the mitigation ladder (13), provenance and lineage (14) and
-  the overlapping incident clocks (17). Each has a text description under it.
-- Four reference posters, generated at build from the data and printable at any A size (portrait,
-  1 : √2): the EU AI Act timeline after the Digital Omnibus, one lane per obligation family from
-  2024 to 2030 (chapters 18 and 08, from the obligation register); the operator roles, seven
-  questions leading to each role with its duties, its evidence and the Article 25 loop (chapter 18);
-  the risk ladder with the Annex I and Annex III routes, the Article 6(3) filter, the GPAI track and
-  notes on Korea, Texas, California and Colorado (chapters 18 and 21); and the model-type by
-  deployment-option matrix (chapter 15). Each carries "As of 2026-09-24" inside the image, sits at
-  the head of its section in a scrollable, labelled region and links to its permalink with SVG and
-  PNG downloads. The timeline and the matrix also publish their data as a table.
-- Spanish editions of the timeline, the roles and the ladder posters (`/figures/eu-ai-act-timeline-es`,
-  `/figures/eu-ai-act-operator-roles-es`, `/figures/eu-ai-act-risk-ladder-es`), with the terms of the
-  Spanish text of the Act and the stamp "A fecha de 2026-09-24"; listed on `/figures`, not placed in
-  the English chapters.
+### Content
 
-### Changed
-- Diagrams: the Framework Crosswalk is drawn as one hub with five spokes and evidence on the hub;
-  the Vendor / Model Due-Diligence Gate puts the registry entry straight under the gate and the
-  rejection path last; the Runtime Guardrail keeps its assurance store outside the runtime layer;
-  the Kill Switch greys the revoked agent while the rest of the fleet runs on. The regulatory
-  wave in chapter 02 gains the 2 Dec 2026 stage (new Article 5 bans and Article 50(2) marking)
-  and the 2 Aug 2030 stage (legacy high-risk systems of public authorities).
-- `site/src/data/stack.ts`, `/resources/tools` (block b-catalogues): the tool catalogue is now one typed
-  registry. Every tool carries a checked URL, its licence (SPDX identifier where one exists), an
-  access model (open source, open standard, source-available, commercial, free service), its layers,
-  `lastChecked` 2026-09-24 and, for 22 tools, its OECD.AI Catalogue of Tools & Metrics entry. Seven
-  categories the new chapters cite (data validation and quality; data and experiment versioning;
-  fairness toolkits; explainability libraries; ML and LLM monitoring and drift; progressive delivery
-  and feature flags; model signing and artefact scanning), two policy-as-code categories that cover
-  the learning-path tools (Conftest, OPA Gatekeeper, Kyverno, the Rego Playground) and a curated
-  indexes group: 96 tools in 31 categories. The page is titled "Tool categories" and filters by
-  layer and licence (`public/catalogue-filter.js`, CSP-safe, progressive enhancement). The
-  per-layer categories on `/stack` and `/map` are derived from the same registry.
-- `bok/10-reading-list.md`, `/resources/reading-list` (block b-catalogues): 98 new entries (books,
-  courses, canonical papers, regulator guidance and every reading-list entry the chapter handoffs
-  proposed, without duplicates), for 162 in 16 themes. Every entry carries audience and jurisdiction
-  tags; the resources view filters on both. The eight existing section headings are unchanged.
-  `sources/SOURCES.md` gains rows 62-159 for chapter 10 and a short tool-catalogue section.
-
-### Changed
-- Kill switch / circuit breaker: the three generic examples (feature-flag kill switches,
-  workload-identity revocation, API-gateway circuit breakers) became named tools (Unleash, Envoy,
-  Resilience4j); workload identity stays under Agent workload identity (SPIFFE/SPIRE). mcp-scan is
-  listed under its current name, Snyk Agent Scan.
+**New chapters.**
 - Chapters 11 to 22 are written in full, replacing the stubs, in three parts: foundations (11 AI
-  defined for governance; 12 running the AI governance program; 13 where risk management sits),
-  the lifecycle (14 governing development; 15 governing deployment and use; 16 fairness and
-  explainability; 17 incidents, issues and root causes) and law and standards (18 the EU AI Act in
-  one pass; 19 privacy and data protection; 20 other law that already applies to AI, covering
-  intellectual property, non-discrimination, consumer protection, product liability and deepfakes,
-  with a dated case table and a defect-to-evidence table; 21 AI-specific laws around the world; 22
-  principles, soft law and standards). Chapter 23 (governing AI agents) is still a stub.
-- Book integration pass (block b-bok-maintenance): chapters 11 to 22 are woven into the rest of the
-  book. `site/src/data/chapters.ts` carries a one-sentence summary and an "at a glance" block for
-  chapter 02 and each of chapters 11 to 22; chapters 01 to 04, 06 to 08 and 11 to 22 gain deep
-  links to the sections that develop each topic (route-level links between chapters 11 to 22 now
-  point at the relevant section, except whole-chapter orientation references), plus links to the
-  harms atlas, the cases and the templates page.
-- `bok/08-regulatory-map.md`: the Article 73 clock table now counts the 15-, 2- and 10-day outer
-  deadlines from awareness, with the immediate duty on a causal link, and names the deployer when
-  it cannot reach the provider (`Art. 26(5)`); `Art. 75(1a)` and the scope of `Arts. 75a` to
-  `75d` are stated precisely; the South Korea row cites the Act and Enforcement Decree on
-  law.go.kr (primary) and the MSIT guidance period; the China paragraph points to chapter 21 for
-  the anthropomorphic interaction measures; the US section points to chapter 21; "What is NOT
-  harmonised yet" gives the JTC 21 stages as of 2026-09-24; the NIST AI RMF section notes that
-  1.0 "is being revised"; a pointer to chapter 18 opens the EU section; Omnibus precisions for
-  `Art. 6` and `Art. 25` are added in prose. Sources `[57]` to `[63]` added; `[34]` now cites
-  law.go.kr. No H2 or H3 renamed and no obligation-table row changed.
-- SR 11-7 superseded: chapters 01 and 02 and `STYLEGUIDE.md` section 10 now say that SR 26-2
-  (Federal Reserve, OCC and FDIC, 17 Apr 2026) replaced SR 11-7 and leaves generative and agentic
-  AI models out of its scope (new sources, verified primary). `STYLEGUIDE.md` gains a
-  "Superseded references" rule (SR 26-2, ISO 31073:2022, ISO 9001:2026, ISO/IEC 27701:2025).
-- `sources/SOURCES.md`: sections for chapters 12, 13 and 15 to 22, and a new "Site data pages"
-  part for the harms atlas, the eleven cases and the templates page; rows added for the new
-  sources of chapters 01, 02 and 08.
-- `bok/09-glossary.md`: the glossary grows from 63 to 279 terms, covering every term the new
-  chapters 11 to 22 define plus the core vocabulary of the EU AI Act, risk, privacy, fairness,
-  incidents and generative AI. Every entry is at most 60 words, cites its source when it comes from
-  a law, a standard or a paper, names the terms it is most often confused with ("Contrast with")
-  and links the exact section that develops it ("See"). Letter headings and a "Commonly confused
-  pairs" table (ten pairs, from transparency versus explainability to provider versus deployer) are
-  new. "Serious incident" now carries the four limbs of AI Act `Art. 3(49)` and points to chapter
-  17; "Model risk management" records that SR 26-2 superseded SR 11-7 on 17 Apr 2026. Sources grow
-  from 19 to 120; `sources/SOURCES.md` carries the rows.
-- Site: every term has its own canonical page at `/glossary/<term>` with its definition and
-  numbered sources, the sections that develop it, the chapters that use it, contrast cards,
-  related terms and a "Cite this term" block. `/bok/glossary` stays the book index (each term is
-  anchored and links to its page); `/resources/glossary` and `/glossary` redirect to it. Hover
-  cards and `/glossary.json` now point at the term pages.
-- `bok/23-governing-agents.md`: chapter 23, **Governing AI agents**, replaces the stub. It covers
-  what makes an agent a governance object and autonomy as a design decision (Knight Institute,
-  IMDA and CSA scales aligned to `Art. 14(3)`), the agent registry, workload identity and
-  short-lived credentials (SPIFFE/SPIRE, RFC 8693 delegation, the MCP authorization specification
-  of 2026-07-28), tool allow-lists and MCP server admission, human checkpoints, runtime guardrails
-  for tool calls with an explicit failure posture, kill-switch stop levels, memory and context
-  governance, A2A v1.0 delegation chains and accountability across hops, prompts as configuration
-  under change control, an agent incident taxonomy with OpenTelemetry GenAI telemetry, a
-  threat-to-control table (OWASP Agentic 2026, OWASP GenAI LLM Top 10 2026, MITRE ATLAS v2026.09),
-  the frameworks written for agents and the EU AI Act hooks. Sources `[1]`–`[29]`, all `primary`,
-  as of 2026-09-24; one item marked "(verify)".
-- `site/src/pages/agents.astro`: the **/agents** hub, a practitioner landing for agent governance
-  with the control plane, the six agent patterns, the ten agentic threats with their controls, the
-  chapter 08 cross-references and the runtime tool categories.
-- `tools/reg-monitor/`, `.github/workflows/reg-monitor.yml`: a **regulatory change monitor**. A
-  daily GitHub Actions job (06:17 UTC) reads 34 official pages the site already cites (EUR-Lex and
-  the Digital Omnibus, the AI Act Service Desk, the Commission's AI Act pages, CEN-CENELEC JTC 21,
-  NIST, OWASP GenAI, law.go.kr, the California, New York, Colorado and Texas legislatures, the
-  EDPB, ICO and CNIL, the IAPP AIGP page and the International AI Safety Report), reduces each to
-  stable text, compares a SHA-256 with the previous run and, on a change, opens or comments on an
-  issue labelled `regulatory-change` with a diff excerpt and the files that cite the URL. It never
-  edits or publishes the site; its state lives on the orphan branch `reg-monitor-state`, not on
-  `main`, because every push to `main` deploys. Manual runs default to a dry run. Unit tests run
-  with `node --test`; `tools/reg-monitor/README.md` explains operation and how to add a source.
-- Crosswalk v2 (`site/src/data/crosswalk.ts`, `/resources/crosswalk`): 25 topics (the twelve v0.4
-  topics keep their ids and `#topic-<id>` anchors; new: prohibited practices, fairness and
-  non-discrimination, privacy and data protection, explainability and right to explanation, AI
-  literacy and competence, conformity assessment and certification, GPAI and foundation models, IP
-  and copyright, agent identity and autonomy, content provenance and deepfakes, sandboxes and
-  real-world testing, environmental impact, deployment, change and decommissioning) and 14 columns
-  (new: GPAI Code of Practice, GDPR, ISO/IEC 42005 · 23894 · 42006, CSA AICM by control id, OWASP LLM
-  2026 and Agentic 2026 ids, Korea AI Basic Act, United Kingdom (UK GDPR Arts. 22A to 22D and ATRS
-  v4.0), Singapore (generative and agentic frameworks), treaty and soft law (CoE CETS No. 225, OECD,
-  G7 Code), CEN-CENELEC). 493 references, every `crosswalk` entry of the chapter 11 to 22 and
-  harms-atlas handoffs included; each keeps `strength`, an honest `verified` flag (28 stay unverified
-  with a note: ISO/IEC clauses whose text could not be opened, the prEN drafts and two GDPR articles
-  read only secondarily) and a URL; references checked as of 2026-09-24.
-- Column chooser on the crosswalk grid: the four v0.4 columns show by default, any other column on
-  demand, remembered per browser; every column shows without JavaScript.
-- Clause-to-clause explorer (`/resources/crosswalk#explore`, `public/crosswalk-explorer.js`): source
-  frameworks and a target side by side per topic, a gap view (target clauses no chosen source
-  reaches), topic and verified-only filters, a shareable URL fragment, and downloads of the selection
-  as CSV, JSON and an OSCAL 1.2.3 mapping collection (NIST Control Mapping model; relationship
-  `intersects-with`, gap summaries). Every export says "illustrative, not a claim of conformity"
-  inside the file.
-
-### Changed
-- `/resources/crosswalk.json` and `/resources/crosswalk.csv` move to schema version 2 at the same
-  URLs: the JSON adds `schemaVersion`, `asOf`, `columns`, `frameworks`, topic `read` links and, per
-  reference, `clauseId`, `column`, `frameworkShort` and `see`; the CSV keeps its nine columns in
-  order and appends topic, framework, column and clause ids and the BoK section.
-- Wave 1 integration pass (site shell): the navigation reaches every v0.5.0 destination (Practice:
-  Patterns, Toolkit, Agents; Reference: Obligations, Figures, Open data & API, and the glossary at
-  `/bok/glossary`, which also lights `/glossary/<slug>`); the Resources hub, the home page and
-  `llms.txt` list them with counts taken from the data. The crosswalk joins obligation rows by
-  `obligationId` and links `/obligations/<id>`; `crosswalk.json` adds `obligationId` and
-  `obligationUrl` and `crosswalk.csv` an `Obligation ID` column (fields added, same schema
-  version). Every infographic caption carries a `#figure-<id>` anchor and a link to its figure page.
-  Analytics ignore the URL fragment and query, so toolkit answers never leave the browser.
-  `/resources/reading-list` and `/resources/glossary` declare their canonical page and leave the
-  sitemap. Code comments in chapter examples meet WCAG AA contrast.
-
-### Changed
-- Source integrity sweep over chapters 11 to 23 (block w2-source-sweep): the 64 source entries that
-  cited the Future of Life Institute's AI Act Explorer for EU legal text, 57 of them tagged
-  `primary`, now cite EUR-Lex: the consolidated text of Regulation (EU) 2024/1689 of 2026-07-27 with
-  the article or annex anchor (`#art_<n>`, `#anx_<n>`), or the Official Journal text with the
-  recital anchor (`#rct_<n>`) for recitals, which the consolidated text does not reproduce. Each
-  gloss was checked against the provision as amended by the Digital Omnibus; chapter 14's Art. 72
-  entry now gives the amended wording (Commission guidance with a template by 2 Sep 2027).
-- Chapter 14's source on monetisation and the open-source exemption cites the Commission's GPAI
-  guidelines (C(2025) 7719 final, paras 82 to 84) instead of a third-party overview.
-- Unofficial reproductions of legal texts no longer stand in for the official text: seven US Code
-  and CFR entries in chapter 20 were tagged `primary` on the Legal Information Institute and now
-  cite GovInfo (United States Code, 2024 edition) or the eCFR; two in chapter 16 and the GDPR
-  entries of chapters 11 and 15 (gdpr-info.eu) move from `secondary` to the official text. Source
-  numbering is unchanged; the matching rows of `sources/SOURCES.md` are updated in place.
-
-### Added
-- The threat bridge (`/resources/threats`, `site/src/data/threats.ts`): 51 threats keyed by the ids
-  their catalogues give them (the ten `LLM01:2026` to `LLM10:2026` entries of the OWASP Top 10 for
-  LLM Applications 2026 with their 2025 ids, `ASI01` to `ASI10` of the OWASP Top 10 for Agentic
-  Applications 2026, 18 MITRE ATLAS techniques from data release v2026.09 with the mitigations ATLAS
-  links to them, and 13 `NISTAML` attack classes of NIST AI 100-2 E2025). Each row names the
-  patterns that control the threat, an example eval (an Inspect task, a promptfoo plugin, a garak
-  probe, or a test to write where none ships one), the obligation ids its evidence helps satisfy,
-  and ISO/IEC 42001 Annex A ids, CSA AICM v1.1 domains, NIST SP 800-218A tasks and NIST COSAiS use
-  cases. Catalogue and layer filters work without JavaScript; the build fails on any broken
-  reference. Published as `/api/v1/threats.json` (with its schema) and `/resources/threats.csv`.
-  Illustrative, not a claim of conformity; versions checked on 2026-09-24.
-
-### Changed
-- Four patterns reach the deployer and operate side (no heading, slug or anchor renamed):
-  [Incident Pipeline](/patterns/incident-pipeline) gains issue versus incident, a severity scale
-  mapped to the `Art. 73` classes, the incident record schema, RCA and CAPA, blameless review,
-  tabletop drills and the `Art. 26(5)` deployer duties; [FRIA-as-Code](/patterns/fria-as-code) is
-  generalised as Impact-Assessment-as-Code (ISO/IEC 42005 AIIA, DPIA and FRIA as views of one fact
-  base, with re-assessment triggers as code) at the same address; the
-  [Adversarial Red-Team Suite](/patterns/adversarial-red-team-suite) gains the step from threat
-  model to test plan; the [Vendor / Model Due-Diligence Gate](/patterns/vendor-model-due-diligence-gate)
-  gains an operate step (change and deprecation notices, detection of unannounced change,
-  reassessment by trigger and tier, a tested fallback).
-
-### Added
-- Eight patterns on the deployment and use side (block w2-patterns-b), each with its own page under
-  `/patterns/<slug>`, an archify diagram placed on that page, a `## Pattern:` section in the chapter
-  05 catalogue and an entry in `site/src/data/patterns.ts`: **Decision Notice & Contest Path**
-  (GDPR `Art. 22`, UK `Arts. 22A–22D`, AI Act `Art. 26(11)` and `Art. 86`, Regulation B adverse
-  action), **Rights Requests Against Models**, **Sanctioned AI Gateway**, **Staged Rollout with
-  Rollback Criteria**, **Drift & Fairness Monitor**, **Downstream Use Register**, **Disclosure &
-  Notification Pipeline** and **Deactivation, Localisation & Retirement Runbook**. Each follows the
-  pattern template with a `### Forces` subsection under Problem, an illustrative JSON artefact and a
-  **Maps to** line with AI Act articles, ISO/IEC 42001 Annex A ids, NIST AI RMF subcategories and,
-  where relevant, OWASP ids. Three artefacts are instances of the published schemas and validate
-  against them: an evidence record (gateway decision event), a post-market monitoring plan (the
-  deployer's monitoring plan) and a decommissioning runbook (retirement record).
-- `sources/SOURCES.md`: a section for the eight pattern pages. The public AIGP Body of Knowledge
-  v2.1 is cited by competency code (IV.C), paraphrased, with a note that the site is not affiliated
-  with or endorsed by IAPP.
-
-### Changed
-- Chapters 11 to 19, 22 and 23 link the new pattern pages from the sentences that already describe
-  the practice (for example the downstream use register and the retirement runbook in chapter 15,
-  the contest path and the fulfilment record in chapter 19, the gateway in chapter 12); the prose
-  is unchanged.
-- The pattern map and the discipline map draw the new patterns (regenerated `pattern-map.svg` and
-  `discipline-map.svg`); `site/src/data/map.ts` gains shorts for the five longest new pattern names.
-
-### Added
-- "Key terms in this chapter" (`keyTerms` in `site/src/data/chapters.ts`): five to ten glossary
-  slugs per chapter (every chapter but the glossary), rendered under "At a glance" as links to
-  `/glossary/<slug>` that open the same hover cards as the terms in the prose. The chapter page
-  fails the build on a slug the glossary does not define.
-- "What you can do this week" closes chapters 04, 06 and 07, five concrete actions each, as in the
-  chapters from 11 on.
-- The preface routes each audience into the book (governance leads, security, privacy, MLOps, risk
-  leads and CISOs, executives and boards, lawyers, the public sector, small organisations) and gains
-  a "How to use this book" section on the five parts, linked to the parts of the `/bok` index.
-
-### Changed
-- Chapters link to each other by section: every remaining chapter-to-chapter link without an anchor
-  in chapters 04, 06 and 11 to 23 now points at the section that treats the topic, and the
-  cross-links left in earlier handoffs for these chapters are applied (chapter 23 to chapters 11, 15
-  and 21 and to the obligation pages of Arts. 12, 14, 15, 25, 26 and 50; chapters 04, 11, 14, 15, 17
-  and 21 to the matching sections of chapter 23; chapter 07 to the maturity self-check; chapters 14,
-  15 and 16 to their tool categories; chapter 22 to the crosswalk explorer).
-- Chapters 01, 02, 03, 06 and 07 link the later chapters where they first introduce a topic now
-  taught in depth (risk, the lifecycle, fairness, incidents, the EU AI Act, privacy, agents), one
-  link per topic.
-- Links from chapters to a pattern point at the pattern's own page (`/patterns/<slug>`) instead of
-  its catalogue anchor, which still resolves.
+  defined for governance; 12 running the AI governance program; 13 where risk management sits), the
+  lifecycle (14 governing development; 15 governing deployment and use; 16 fairness and
+  explainability; 17 incidents, issues and root causes) and law and standards (18 the EU AI Act in one
+  pass; 19 privacy and data protection; 20 other law that already applies to AI, covering intellectual
+  property, non-discrimination, consumer protection, product liability and deepfakes, with a dated
+  case table and a defect-to-evidence table; 21 AI-specific laws around the world; 22 principles, soft
+  law and standards).
+- Chapter 23, **Governing AI agents**, replaces the stub. It covers what makes an agent a governance
+  object and autonomy as a design decision (Knight Institute, IMDA and CSA scales aligned to
+  `Art. 14(3)`), the agent registry, workload identity and short-lived credentials (SPIFFE/SPIRE,
+  RFC 8693 delegation, the MCP authorization specification of 2026-07-28), tool allow-lists and MCP
+  server admission, human checkpoints, runtime guardrails for tool calls with an explicit failure
+  posture, kill-switch stop levels, memory and context governance, A2A v1.0 delegation chains and
+  accountability across hops, prompts as configuration under change control, an agent incident
+  taxonomy with OpenTelemetry GenAI telemetry, a threat-to-control table (OWASP Agentic 2026, OWASP
+  GenAI LLM Top 10 2026, MITRE ATLAS v2026.09), the frameworks written for agents and the EU AI Act
+  hooks. Sources `[1]` to `[29]`, all `primary`, as of 2026-09-24; one item marked "(verify)".
 - `OUTLINE.md` lists the 24 chapters in five parts, with a brief for chapters 11 to 23, and describes
   the pattern pages.
 
-## [Unreleased] - 2026-09-20
+**Patterns: own pages, 17 to 33.**
+- Each of the 17 patterns of chapter 05 moved to `bok/patterns/<slug>.md` (prose unchanged; sections
+  one heading level up, citations renumbered per page) and renders at `/patterns/<slug>` with the
+  chapter layout: breadcrumb, its archify diagram (moved from the chapter), glossary hover cards, its
+  own numbered sources, a "Cite this pattern" block and a pager in catalogue order. Each page adds one
+  line under its **Maps to** line naming the OWASP Agentic and NIST AI RMF sources and the
+  "illustrative, not a claim of conformity" notice; the "Related patterns" names link to the pages.
+  `/patterns` is a new index of the catalogue grouped by the five stack layers.
+- Chapter 05 is now the catalogue: introduction, the pattern template, the pattern map and, under each
+  unchanged `## Pattern: <name>` heading, a short summary linking to the page, so every published
+  `/bok/patterns#pattern-*` link still lands on its pattern. Its sources are renumbered (1-5) and a
+  new one dates the harmonised-standards remark (none referenced in the Official Journal as of
+  2026-09-24). The page no longer inlines 17 diagrams.
+- Eight development-side patterns, catalogue order 18 to 25: **Use-Case Intake & Risk Tiering**,
+  **AI Threat Model** (STRIDE extended with MITRE ATLAS, NIST AI 100-2 and the OWASP LLM and Agentic
+  ids), **Training-Data Rights Ledger**, **Dataset Admission Gate**, **Fairness Eval Suite**,
+  **Explanation Artefact**, **Model Artefact Integrity** (model signing, build provenance,
+  serialisation scanning, verification before load) and **Claims Substantiation Gate**. Four of the
+  artefacts reuse the published schemas (`use-case-record.v1`, `dataset-admission-record.v1`,
+  `eval-result.v1`, `evidence-record.v1`) and validate against them; the chapter 20 table no longer
+  marks the rights ledger as proposed.
+- Eight deployment and use side patterns: **Decision Notice & Contest Path** (GDPR `Art. 22`, UK
+  `Arts. 22A–22D`, AI Act `Art. 26(11)` and `Art. 86`, Regulation B adverse action), **Rights Requests
+  Against Models**, **Sanctioned AI Gateway**, **Staged Rollout with Rollback Criteria**, **Drift &
+  Fairness Monitor**, **Downstream Use Register**, **Disclosure & Notification Pipeline** and
+  **Deactivation, Localisation & Retirement Runbook**. Each follows the pattern template with a
+  `### Forces` subsection under Problem and a **Maps to** line with AI Act articles, ISO/IEC 42001
+  Annex A ids, NIST AI RMF subcategories and, where relevant, OWASP ids. Three artefacts are instances
+  of the published schemas and validate against them: an evidence record (gateway decision event), a
+  post-market monitoring plan (the deployer's monitoring plan) and a decommissioning runbook
+  (retirement record).
+- Every new pattern has its own page, archify diagram, illustrative artefact, numbered sources, a
+  `## Pattern:` section with the usual anchor in the chapter 05 catalogue and an entry in
+  `site/src/data/patterns.ts`. Mappings are illustrative, not a claim of conformity.
+- Four patterns reach the deployer and operate side (no heading, slug or anchor renamed): Incident
+  Pipeline gains issue versus incident, a severity scale mapped to the `Art. 73` classes, the incident
+  record schema, RCA and CAPA, blameless review, tabletop drills and the `Art. 26(5)` deployer duties;
+  FRIA-as-Code is generalised as Impact-Assessment-as-Code (ISO/IEC 42005 AIIA, DPIA and FRIA as views
+  of one fact base, with re-assessment triggers as code) at the same address; the Adversarial Red-Team
+  Suite gains the step from threat model to test plan; the Vendor / Model Due-Diligence Gate gains an
+  operate step (change and deprecation notices, detection of unannounced change, reassessment by
+  trigger and tier, a tested fallback).
+- The pattern map and the discipline map draw the new patterns (`pattern-map.svg`,
+  `discipline-map.svg`); `site/src/data/map.ts` gains shorts for the five longest new pattern names.
 
-Pending patch, folded into the next tagged release (version 0.4.0 stays as is): China added to the
-regulatory map, and authorship and attribution clarified across the project. The Thesis wording,
-definition, values and principles are unchanged; only its CC BY attribution notice is clarified.
+**Chapter 08 and the obligation register.**
+- The register grows from 68 to 178 rows and from 31 to 76 instruments, so every obligation the new
+  chapters teach has an id and a page: GDPR articles, NIS2, DORA, the Cyber Resilience Act, the
+  Product Liability Directive, the DSM Directive, the DSA, the UCPD, the Platform Work and Consumer
+  Credit Directives, Korea's AI Basic Act article by article, US state and federal law that reaches AI
+  (California, New York, Illinois, New York City, Utah, Colorado, Virginia, Minnesota, Washington, OMB,
+  Regulation B, the FCRA, Title VII, the FTC Act, the TAKE IT DOWN Act), Canada, Brazil, China's PIPL
+  and anthropomorphic-interaction measures, the Council of Europe Convention, the OECD AI Principles,
+  the G7 Hiroshima Code, ISO/IEC 42005 and 22989, NIST AI 600-1, the JTC 21 deliverables and 26 more
+  EU AI Act articles and paragraphs (among them `Art. 86` and `Art. 26(11)`). Chapter 08 carries every
+  row in its own tables, with a new section, "Data protection and other EU law", and new subsections
+  for US state privacy and sector law, US federal law, Korea and treaty and soft law; its new sources,
+  numbered 63 to 116, were verified on 2026-09-24.
+- A **China** subsection under "Other jurisdictions": the two-tier picture (four binding CAC rules on
+  algorithmic recommendation, deep synthesis, generative AI services and AI-content labelling, plus the
+  mandatory standard GB 45438-2025; the voluntary GB/T 45654-2025 and the TC260 **AI Safety Governance
+  Framework 3.0**), a seven-row obligation-to-artefact table stamped "as of 2026-09-20", and a
+  crosswalk of the framework's **Appendix 2** (agentic AI risk management) against the OWASP Top 10 for
+  Agentic Applications 2026 and the NIST AI Agent Standards Initiative. A new "What is NOT harmonised
+  yet" bullet notes that the TC260 framework cross-references neither the Western instruments nor
+  China's own binding rules. Sources `[41]`–`[51]` (ten `primary`, one `reported`).
+- Dates: the rows carry the dates chapter 08 states in prose but no row held (Annex I embedded systems
+  from 2028-08-02 and legacy high-risk systems intended for public authorities by 2030-08-02,
+  `Art. 111(2)`, as later milestones on the high-risk rows); the GPAI rows (`Art. 52` to `Art. 55`) gain
+  the 2 August 2027 milestone of `Art. 111(3)` for models placed on the market before 2 August 2025,
+  and chapter 08 states it; the `Art. 4` row applies since 2025-02-02 (Chapter I, `Art. 113(a)`),
+  reworded by the Digital Omnibus on 2026-07-27, in line with chapter 12.
+- The Article 73 clock table counts the 15-, 2- and 10-day outer deadlines from awareness, with the
+  immediate duty on a causal link, and names the deployer when it cannot reach the provider
+  (`Art. 26(5)`); `Art. 75(1a)` and the scope of `Arts. 75a` to `75d` are stated precisely; Omnibus
+  precisions for `Art. 6` and `Art. 25` are added in prose; the EU AI Act lead states the amended
+  `Art. 113(c)` and how the map dates the high-risk duties that sit outside Chapter III; a pointer to
+  chapter 18 opens the EU section.
+- Rows and pointers: the CSA row that named an "Agentic Control Supplement" now names what the CSA has
+  published (the AICM agent controls, the Agentic Trust Framework and AARM), because the supplement
+  could not be matched to a primary document; STAR for AI lists its three levels; the agent-control
+  table uses OWASP's official ASI names; the Korea row cites the Act and Enforcement Decree on
+  law.go.kr (primary, `[34]`) with the MSIT guidance period; the Colorado row describes SB 26-189; the
+  China paragraph and the US section point to chapter 21; "What is NOT harmonised yet" gives the JTC 21
+  stages as of 2026-09-24; the NIST AI RMF section notes that 1.0 "is being revised". Sources `[57]` to
+  `[63]` added. No H2 or H3 renamed.
 
-### Changed
-- Typography: no em dashes anywhere in the published text. Every one in the Thesis (EN and ES),
-  the chapters, this changelog, the site copy, the diagrams and the figures became a comma pair, a
-  colon, a semicolon, a full stop or parentheses; the wording and meaning are unchanged. Anchors
-  that changed with a heading: the five `#layer-0N-…` sections of chapter 04 (links updated) and
-  these changelog headings. `site/scripts/content-lint.mjs` now fails the build on any em dash, and
-  `STYLEGUIDE.md` states the rule.
-- Authorship and CC BY attribution are now explicit by scope: Jorge García Aibar is the sole author
-  of the Body of Knowledge, website, datasets and project materials; the Thesis remains co-authored
-  by Jorge García Aibar and Aurélie Pols. Chapter citations, BibTeX, JSON-LD, dataset metadata,
-  `CITATION.cff`, contribution guidance and the downloadable PDF now follow that distinction.
+**Glossary.**
+- The glossary grows from 63 to 322 terms, covering every term chapters 11 to 23 define plus the core
+  vocabulary of the EU AI Act, risk, privacy, fairness, incidents and generative AI. Every entry is at
+  most 60 words, cites its source when it comes from a law, a standard or a paper, names the terms it
+  is most often confused with ("Contrast with") and links the exact section that develops it ("See").
+  Letter headings and a "Commonly confused pairs" table (ten pairs, from transparency versus
+  explainability to provider versus deployer) are new. "Serious incident" carries the four limbs of AI
+  Act `Art. 3(49)` and points to chapter 17; "Model risk management" records that SR 26-2 superseded
+  SR 11-7 on 17 Apr 2026. Sources grow from 19 to 142.
 
-### Added
-- `bok/08-regulatory-map.md`, `sources/SOURCES.md`: a **China** subsection under "Other
-  jurisdictions": the two-tier picture (four binding CAC rules on algorithmic recommendation, deep
-  synthesis, generative AI services and AI-content labelling, plus the mandatory standard GB
-  45438-2025; the voluntary GB/T 45654-2025 and the TC260 **AI Safety Governance Framework 3.0**), a
-  seven-row obligation-to-artefact table stamped "as of 2026-09-20", and a crosswalk of the
-  framework's **Appendix 2** (agentic AI risk management) against the OWASP Top 10 for Agentic
-  Applications 2026 and the NIST AI Agent Standards Initiative. A new "What is NOT harmonised yet"
-  bullet notes that the TC260 framework cross-references neither the Western instruments nor China's
-  own binding rules. Sources `[41]`–`[51]` (ten `primary`, one `reported`).
+**Integration across the book.**
+- Chapters 11 to 23 are woven into the rest of the book: `site/src/data/chapters.ts` carries a
+  one-sentence summary and an "at a glance" block for chapter 02 and each new chapter; "Key terms in
+  this chapter" (`keyTerms`, five to ten glossary slugs per chapter but the glossary) renders under "At
+  a glance" with the same hover cards as the prose, and the build fails on a slug the glossary does not
+  define.
+- Chapters link to each other by section: chapters 01 to 04, 06 to 08 and 11 to 22 gain deep links to
+  the sections that develop each topic, and every remaining chapter-to-chapter link without an anchor
+  in chapters 04, 06 and 11 to 23 points at the section that treats the topic (whole-chapter
+  orientation references aside), including chapter 23 to chapters 11, 15 and 21 and to the obligation
+  pages of Arts. 12, 14, 15, 25, 26 and 50; chapters 04, 11, 14, 15, 17 and 21 to the matching sections
+  of chapter 23; chapter 07 to the maturity self-check; chapters 14, 15 and 16 to their tool
+  categories; chapter 22 to the crosswalk explorer. Chapters 01, 02, 03, 06 and 07 link the later
+  chapters where they first introduce a topic now taught in depth (risk, the lifecycle, fairness,
+  incidents, the EU AI Act, privacy, agents), one link per topic, and chapters link the harms atlas,
+  the cases and the templates page.
+- Links to a pattern point at its own page (`/patterns/<slug>`) instead of its catalogue anchor, which
+  still resolves; chapters 11 to 23 link the new pattern pages from the sentences that already
+  describe the practice (for example the downstream use register and the retirement runbook in
+  chapter 15, the contest path and the fulfilment record in chapter 19, the gateway in chapter 12),
+  with the prose unchanged.
+- "What you can do this week" closes chapters 04, 06 and 07, five concrete actions each, as in the
+  chapters from 11 on. The preface routes each audience into the book (governance leads, security,
+  privacy, MLOps, risk leads and CISOs, executives and boards, lawyers, the public sector, small
+  organisations) and gains a "How to use this book" section on the five parts.
+- Chapter 14 opens with an interactive diagram of the build as a chain of gates: intake, design
+  review, dataset admission, eval gate and release gate, each named with the pattern the chapter ties
+  to it, ending in the technical file the pipeline compiles.
+
+**Sources, references and wording.**
+- SR 11-7 superseded: chapters 01 and 02 and `STYLEGUIDE.md` section 10 say that SR 26-2 (Federal
+  Reserve, OCC and FDIC, 17 Apr 2026) replaced SR 11-7 and leaves generative and agentic AI models out
+  of its scope; `STYLEGUIDE.md` gains a "Superseded references" rule (SR 26-2, ISO 31073:2022,
+  ISO 9001:2026, ISO/IEC 27701:2025).
+- Source integrity sweep over chapters 11 to 23: the 64 entries that cited the Future of Life
+  Institute's AI Act Explorer for EU legal text, 57 of them tagged `primary`, cite EUR-Lex: the
+  consolidated text of Regulation (EU) 2024/1689 of 2026-07-27 with the article or annex anchor
+  (`#art_<n>`, `#anx_<n>`), or the Official Journal text with the recital anchor (`#rct_<n>`) for
+  recitals, which the consolidated text does not reproduce. Each gloss was checked against the
+  provision as amended by the Digital Omnibus; chapter 14's Art. 72 entry gives the amended wording
+  (Commission guidance with a template by 2 Sep 2027), and its source on monetisation and the
+  open-source exemption cites the Commission's GPAI guidelines (C(2025) 7719 final, paras 82 to 84)
+  instead of a third-party overview.
+- Unofficial reproductions no longer stand in for the official text: seven US Code and CFR entries in
+  chapter 20 tagged `primary` on the Legal Information Institute cite GovInfo (United States Code,
+  2024 edition) or the eCFR; two in chapter 16 and the GDPR entries of chapters 11 and 15
+  (gdpr-info.eu) move from `secondary` to the official text.
+- `sources/SOURCES.md` gains sections for chapters 11 to 23, the pattern pages (the public AIGP Body of
+  Knowledge v2.1 cited by competency code IV.C, paraphrased, with a note that the site is not
+  affiliated with or endorsed by IAPP), a "Site data pages" part (harms atlas, cases, templates), rows
+  62-159 for chapter 10 and a short tool-catalogue section, and rows for the new sources of chapters
+  01, 02 and 08.
+- Typography: no em dashes anywhere in the published text. Every one in the Thesis (EN and ES), the
+  chapters, this changelog, the site copy, the diagrams and the figures became a comma pair, a colon, a
+  semicolon, a full stop or parentheses; the wording and meaning are unchanged. Anchors that changed
+  with a heading: the five `#layer-0N-…` sections of chapter 04 (links updated) and these changelog
+  headings. `STYLEGUIDE.md` states the rule.
+- Authorship and CC BY attribution are explicit by scope: Jorge García Aibar is the sole author of the
+  Body of Knowledge, website, datasets and project materials; the Thesis remains co-authored by Jorge
+  García Aibar and Aurélie Pols. Chapter citations, BibTeX, JSON-LD, dataset metadata, `CITATION.cff`,
+  contribution guidance and the downloadable PDF follow that distinction. `bok/CONTRIBUTORS.md`
+  defines the author, reviewer and contributor roles and how reviewers are credited.
+
+### Reference layer
+
+- **Obligations** (`site/src/data/frameworks.ts`, `/obligations`, `/obligations/<id>`): every row of
+  the regulatory map carries a stable id of the form `AIGE-OBL-<INSTRUMENT>-<CLAUSE>` (for example
+  `AIGE-OBL-EUAIA-ART9`), assigned once and never reused; a removed row's id stays reserved. Each page
+  shows the clause, the duty holder, the application date with its status and later dates, the
+  artefact, the layers, the patterns, the crosswalk siblings, the cases that cite the same EU AI Act
+  article, the chapter 08 section it comes from, its review date, its JSON and a citation block; it
+  opens with the obligation-to-evidence chain generated from its row (clause, duty holder, date,
+  artefact, layer and the record schema its evidence is filed as, with the crosswalk siblings and "As
+  of" in the image) and has its own Open Graph card (`/og/obligations/<id>.png`). The sitemap dates
+  these pages by the row's review date.
+- The obligation heat matrix on `/resources/frameworks` joins each row to its instrument by
+  `frameworkId`. A "What applies now" band on the home page shows the EU AI Act articles that already
+  apply and the next three dates with what each switches on, computed from the register at build and
+  linked to each `/obligations/<id>`, so a date drops out on the first build after it passes.
+- **Glossary term pages**: every term has its own canonical page at `/glossary/<term>` with its
+  definition and numbered sources, the sections that develop it, the chapters that use it, contrast
+  cards, related terms and a "Cite this term" block. `/bok/glossary` stays the book index (each term
+  anchored and linked to its page); `/resources/glossary` and `/glossary` redirect to it; hover cards
+  and `/glossary.json` point at the term pages.
+- **Harms atlas** (`/resources/harms`, `site/src/data/harms.ts`): harms by level, type, mechanism,
+  failure mode, controlling pattern and stack layers, with verified example incidents (AIID, AIAAIC,
+  OECD AIM) and the domain and subdomain of the MIT AI Risk Repository taxonomy (CC BY 4.0,
+  attributed); a level filter in pure CSS and a JSON export.
+- **Cases** (`/cases`, `/cases/<id>`, `site/src/data/cases.ts`): eleven publicly documented cases,
+  each verified against primary sources (judgments, regulators, official reports, the original
+  article) or marked `reported` where only the press covers it, and linked to its AIID (or AIAAIC or
+  OECD AIM) record, with numbered sources.
+- **Contract clauses** (`/resources/contracts`, `site/src/data/contracts.ts`): the 18 clauses to check
+  before deploying a third-party AI system (what each governs, the red flag, a fallback position and
+  the evidence to keep) and six licence types, introduced with chapter 15; the vendor due-diligence
+  tool reuses its checklist.
+- **Templates and schemas** (`/resources/templates`): a library of JSON Schemas (draft 2020-12) under
+  `/schemas/` with `$id`, required fields and `x-evidences` (obligation ids), `x-layer`, `x-pattern`
+  and `x-lifecycle-stage` annotations, 23 in v1 counting the model card and classification decision
+  record added by the toolkit; one filled example per schema that validates; human templates with the
+  same fields; and a policy kit (`ai-policy.yaml` as the single source with its prose and Rego views,
+  a committee charter, a RACI, a policy gap assessment, a literacy curriculum and the contract-clause
+  checklist), all original. `site/scripts/schemas-check.mjs` validates them at build and the chapter
+  05 shapes against them.
+- **Crosswalk v2** (`site/src/data/crosswalk.ts`, `/resources/crosswalk`): 25 topics (the twelve v0.4
+  topics keep their ids and `#topic-<id>` anchors; new: prohibited practices, fairness and
+  non-discrimination, privacy and data protection, explainability and right to explanation, AI literacy
+  and competence, conformity assessment and certification, GPAI and foundation models, IP and
+  copyright, agent identity and autonomy, content provenance and deepfakes, sandboxes and real-world
+  testing, environmental impact, deployment, change and decommissioning) and 14 columns (new: GPAI Code
+  of Practice, GDPR, ISO/IEC 42005 · 23894 · 42006, CSA AICM by control id, OWASP LLM 2026 and Agentic
+  2026 ids, Korea AI Basic Act, United Kingdom (UK GDPR Arts. 22A to 22D and ATRS v4.0), Singapore
+  (generative and agentic frameworks), treaty and soft law (CoE CETS No. 225, OECD, G7 Code),
+  CEN-CENELEC). 493 references, every `crosswalk` entry of the chapter 11 to 22 and harms-atlas
+  handoffs included; each keeps `strength`, an honest `verified` flag (28 stay unverified with a note:
+  ISO/IEC clauses whose text could not be opened, the prEN drafts and two GDPR articles read only
+  secondarily) and a URL; references checked as of 2026-09-24. Obligation rows join by
+  `obligationId` and link `/obligations/<id>`.
+- A column chooser on the crosswalk grid (the four v0.4 columns by default, any other on demand,
+  remembered per browser, every column without JavaScript) and a clause-to-clause explorer
+  (`/resources/crosswalk#explore`, `public/crosswalk-explorer.js`): source frameworks and a target side
+  by side per topic, a gap view (target clauses no chosen source reaches), topic and verified-only
+  filters, a shareable URL fragment, and downloads of the selection as CSV, JSON and an OSCAL 1.2.3
+  mapping collection (NIST Control Mapping model; relationship `intersects-with`, gap summaries). Every
+  export says "illustrative, not a claim of conformity" inside the file.
+- **Threat bridge** (`/resources/threats`, `site/src/data/threats.ts`): 51 threats keyed by the ids
+  their catalogues give them (the ten `LLM01:2026` to `LLM10:2026` entries of the OWASP Top 10 for LLM
+  Applications 2026 with their 2025 ids, `ASI01` to `ASI10` of the OWASP Top 10 for Agentic
+  Applications 2026, 18 MITRE ATLAS techniques from data release v2026.09 with the mitigations ATLAS
+  links to them, and 13 `NISTAML` attack classes of NIST AI 100-2 E2025). Each row names the patterns
+  that control the threat, an example eval (an Inspect task, a promptfoo plugin, a garak probe, or a
+  test to write where none ships one), the obligation ids its evidence helps satisfy, and ISO/IEC 42001
+  Annex A ids, CSA AICM v1.1 domains, NIST SP 800-218A tasks and NIST COSAiS use cases. Catalogue and
+  layer filters work without JavaScript; the build fails on any broken reference. Illustrative, not a
+  claim of conformity; versions checked on 2026-09-24.
+- **Tool catalogue** (`site/src/data/stack.ts`, `/resources/tools`): one typed registry. Every tool
+  carries a checked URL, its licence (SPDX identifier where one exists), an access model (open source,
+  open standard, source-available, commercial, free service), its layers, `lastChecked` 2026-09-24
+  and, for 22 tools, its OECD.AI Catalogue of Tools & Metrics entry. Seven categories the new chapters
+  cite (data validation and quality; data and experiment versioning; fairness toolkits;
+  explainability libraries; ML and LLM monitoring and drift; progressive delivery and feature flags;
+  model signing and artefact scanning), two policy-as-code categories that cover the learning-path
+  tools (Conftest, OPA Gatekeeper, Kyverno, the Rego Playground) and a curated indexes group: 96 tools
+  in 31 categories. The page is titled "Tool categories" and filters by layer and licence
+  (`public/catalogue-filter.js`, CSP-safe, progressive enhancement); the per-layer categories on
+  `/stack` and `/map` derive from the same registry. The kill switch and circuit breaker examples
+  became named tools (Unleash, Envoy, Resilience4j); workload identity stays under Agent workload
+  identity (SPIFFE/SPIRE); mcp-scan is listed under its current name, Snyk Agent Scan.
+- **Reading list** (`bok/10-reading-list.md`, `/resources/reading-list`): 98 new entries (books,
+  courses, canonical papers, regulator guidance and every entry the chapter handoffs proposed, without
+  duplicates), for 162 in 16 themes. Every entry carries audience and jurisdiction tags; the resources
+  view filters on both. The eight existing section headings are unchanged.
+- **AIGP coverage map** (`/for/aigp`, `site/src/data/aigp.ts`): the four domains, 13 competencies and
+  58 performance indicators of the public AIGP Body of Knowledge v2.1 (effective 2026-02-02), each
+  indicator under a positional id with this site's own paraphrase of at most 12 words, the sections,
+  patterns, glossary terms, templates and tools that teach it, and a status on the house criterion
+  (taught, or partly taught with what is missing). A heatmap generated at build shows the whole map; a
+  study path per domain keeps its ticks in the browser only. Every mapped link is resolved at build and
+  the build fails on one that does not exist. No overall score. It carries the notice that AIGP is a
+  registered trademark of the IAPP, that this site is not affiliated with or endorsed by the IAPP, and
+  that the map covers an open body of knowledge and is not exam preparation.
+- **Certifications, neutrally** (`/for/certifications`): who owns AIGP, the ISO/IEC 42001 Lead
+  Implementer and Lead Auditor schemes, ISACA AAISM and AAIA, what each owner says the scheme assesses,
+  and how this body of knowledge relates to each, from the owners' own pages, ISO and EUR-Lex (checked
+  2026-09-24), in line with chapter 06 on certifications as a proxy for capability.
+- **Audience hubs** (`/for`, `site/src/data/audiences.ts`): one route through the site for each of six
+  audiences (engineers, CISOs and risk leads, legal counsel and DPOs, executives and boards, the public
+  sector, SMEs and start-ups). Each hub names who it is for, answers the three questions that audience
+  brings with numbered sources and a link to the section that answers it in full, walks chapters,
+  patterns, tools, templates, datasets, figures and cases in reading order, lists "start this week"
+  actions and the obligations that matter most, with status and dates read from the register. The
+  build fails on a broken anchor, an unknown pattern, figure, case, path node or obligation, or an
+  uncited source; a toolkit tool appears on a route only once the toolkit lists it as live.
+  Illustrative, not a claim of conformity.
+- **/agents**: a practitioner landing for agent governance with the control plane, the six agent
+  patterns, the ten agentic threats with their controls, the chapter 08 cross-references and the
+  runtime tool categories.
+- **Navigation and hubs.** The Body of Knowledge menu, the mobile drawer, the footer site map and the
+  chapter rail group the chapters by the five parts of the book (the discipline, reference,
+  foundations, the lifecycle, law and standards), each with its chapter range, counted from the
+  chapter manifest (`site/src/data/parts.ts`). The navigation reaches every v0.5.0 destination
+  (Practice: Patterns, Toolkit, Agents; Reference: Obligations, Figures, Open data & API, Harms atlas,
+  Cases, Contracts, Templates & schemas and the glossary at `/bok/glossary`, which also lights
+  `/glossary/<slug>`; About: Methodology). The home presents the five parts (title and counts
+  computed, no more "Eleven chapters"), adds the topic crosswalk, the map, the templates and the harms
+  atlas to its resource tiles and a newsletter section before the closing band; the `/bok` index
+  groups the chapter cards by part, with a one-line introduction and a jump list, and the three
+  reading paths run through chapters 11 to 18; `/resources` lists ten references, each with a count
+  computed from its data. `/resources/reading-list` and `/resources/glossary` declare their canonical
+  page and leave the sitemap.
+- **Methodology** (`/about/methodology`): how sources are chosen and tagged, how "as of" dates are
+  kept, the review cadence, what the build checks, how corrections and contributions work, and
+  versioning with DOIs.
+
+### Toolkit
+
+- **Foundation** (`/toolkit`): a registry of browser tools built from the Body of Knowledge
+  (`site/src/data/toolkit.ts`), a shared `ToolShell` component with the fixed notice "Indicative, not
+  legal advice and not a conformity claim. Nothing you enter leaves your browser.", a no-JS worksheet
+  mode and print styles, and dependency-free client helpers (`site/public/toolkit/lib.js`: state in the
+  URL fragment, safe storage, JSON, CSV per RFC 4180, Markdown and iCalendar per RFC 5545 downloads,
+  clipboard, SVG to PNG through a `data:` URL); `form-kit.js` (form to fragment and back, accessible
+  error summary, UTC date arithmetic), `builders.js` (the schema subset validator, YAML and CSV) and
+  `schema-form.js` (accessible forms from field specs); `ToolTerms`, `ToolSourceList` and
+  `site/src/lib/tool-anchors.ts`, which fails the build when a chapter heading a tool links to is
+  renamed. Each live tool has its own Open Graph card (`/og/toolkit/<id>.png`). No new dependency and
+  no change to the content security policy. Eleven tools are live:
+- **Maturity self-check** (`/toolkit/maturity-self-check`): pick, per stack layer, the highest
+  observable criterion of chapter 07 met today; get the ragged per-layer profile drawn in SVG, the
+  floor and the single next move with its metrics, checklist questions and pattern link. Exports a
+  re-importable JSON profile (`/toolkit/maturity-profile.v1.schema.json`), a Markdown report and an SVG
+  or PNG image; saves profiles in the browser and compares two. `site/src/data/maturity.ts` gains the
+  chapter's criteria table, metrics per level, checklist and typical failures as data (additive; no
+  heading changed).
+- **Obligations and deadlines planner** (`/toolkit/obligations-planner`): tick your roles in the EU AI
+  Act value chain (provider, deployer, importer, distributor, authorised representative, GPAI model
+  provider, with or without systemic risk), the system classes (Annex III, Annex I, Article 50) and an
+  optional reference date; get the rows of the register that bind you, each with its artefact, layer,
+  patterns, the date it applies for your classes and its status on your date, plus a timeline and,
+  apart, the importer, distributor and authorised-representative duties the register does not hold as
+  rows (Arts. 22, 23, 24 and 54, from the consolidated text). Exports a Markdown checklist, a CSV, a
+  JSON in the open-data envelope (`/toolkit/obligations-plan.v1.schema.json`) and an `.ics` calendar.
+  The role mapping lives in `site/src/data/obligations-planner.ts`; no register date is restated.
+- **EU AI Act role and risk-class triage** (`/toolkit/ai-act-triage`): a versioned question graph
+  (`site/src/data/triage.ts`, question set 1.0.0 as of 2026-09-24, 20 questions in seven steps) that
+  walks an AI system or model through chapter 18: reach (`Art. 2(1)`), the `Art. 3(1)` definition, the
+  `Art. 2` exclusions, the `Art. 25(1)` triggers, the `Art. 5` screen with the Omnibus points `(ba)`
+  and `(bb)` from 2026-12-02, `Art. 6(1)` with the narrowed safety component, the eight Annex III
+  areas, the `Art. 6(3)` filter and the profiling override, the `Art. 50` cases and the GPAI track with
+  the 10^25 FLOP presumption. It returns indicative scope, EU roles and risk classes with the reason
+  and article behind each, the date each class applies from, open points and the meaning of every
+  answer; never a conformity verdict. Every question and rule cites verbatim fragments of chapter 18
+  and the build fails if one leaves the chapter. Exports a classification decision record in JSON and
+  YAML (new schema `/schemas/classification-decision-record.v1.json`, with a filled example and a human
+  template), a Markdown report and a link that opens the planner with the roles and classes; records
+  re-open with the outcome recomputed. The pure engine (`site/public/toolkit/ai-act-triage-engine.js`)
+  holds no legal logic of its own.
+- **Policy Card builder** (`/toolkit/policy-card`): pick one of six governance rules (no unregistered
+  agent in production; an eval score at or above a threshold before deploy; no personal data sent to
+  an external model; human approval for a named tool; a model card present before release; an expired
+  exception blocks the build) or write one condition of your own, then set the owner, scope, review
+  date and the obligation ids the rule answers. The page builds the Policy Card in Markdown, YAML and
+  JSON (valid against `policy-card.v1.json`, checked in the browser), an OPA/Rego module in Rego v1
+  syntax with a verdict rule and unit tests, a Cedar stub with tests, an example input and a GitHub
+  Actions CI hook, all marked "Illustrative, review before use". The default card of each rule is
+  published under `/templates/policy-cards/`, generated by the same code
+  (`site/scripts/policy-card-samples.mjs`) and checked with `opa check --strict` and `opa test` (OPA
+  1.21.0) and `cedar run-tests` (cedar-policy-cli 4.13.0).
+- **AI register entry builder** (`/toolkit/ai-register-entry`): build AI system and agent register
+  entries that validate against the published schemas, keep a register in the browser, import and
+  export it in bulk as JSON or CSV (RFC 4180, round trip without loss), download a Markdown public
+  summary without the internal fields, and read a field crosswalk (UK ATRS template v4.0, Canada AIA
+  questionnaire, EU database Annex VIII Sections A to C after the Digital Omnibus, model card, ISO/IEC
+  42001 SoA columns marked "verify"): field names only, so one source record feeds each regime.
+- **Impact assessment builder** (`/toolkit/impact-assessment`): one record for a FRIA (the six elements
+  of `Art. 27(1)`), an AI system impact assessment (elements by ISO/IEC 42005 clause id, ids from the
+  DIS, marked "verify") or an AI addendum to a DPIA (`Art. 35(7)` plus the AI-specific fields); every
+  risk has an id and every measure names the risks it addresses, the pattern that implements it and
+  its controls; a risk-to-measure matrix flags loose ends; re-open triggers are part of the record;
+  JSON, YAML and Markdown exports.
+- **Model card builder** (`/toolkit/model-card`) and a new schema `model-card.v1.json` (with its
+  example and human template): an obligation coverage checklist (`Art. 11` with Annex IV and
+  `Art. 13(3)` for high-risk systems, `Art. 53(1)` for GPAI models, ISO/IEC 42001 Annex A, NIST AI RMF
+  MAP and MEASURE), each item linked to its obligation page; exports to a Hugging Face style card (YAML
+  front matter and the Hub template's headings) and a CycloneDX 1.7 ML-BOM that validates against the
+  official schema.
+- The register entry and impact assessment schemas gain optional fields only (`public_record`;
+  `iso42005_sections`, `risks[].id`, `mitigations[].pattern`, `mitigations[].controls`): every v1
+  record written before still validates.
+- **Vendor due-diligence request** (`/toolkit/vendor-due-diligence`): supply type, use tier, data
+  sensitivity, autonomy and tool access, jurisdictions and sector give a risk tier with its reasons and
+  a tiered, evidence-first request of 20 to 40 questions in the site's own wording (model or system
+  card, AIBOM, evaluation and red-team reports, incident-notice SLA, training-content summary,
+  copyright policy, sub-processors and more), each cross-referenced to crosswalk topics and to CSA AICM
+  control ids the crosswalk already carries, plus the contract-clause checklist. Exports Markdown, CSV
+  and a response record (JSON, `vendor-due-diligence-response.v1`).
+- **Incident clock** (`/toolkit/incident-clock`): from the awareness time, roles, system tier and
+  facts, the incident class on chapter 17's severity scale and every clock the chapter states (EU AI
+  Act Art. 73, Art. 26(5) and Art. 55(1)(c) with the GPAI Code of Practice, GDPR Arts. 33 and 34, NIS2
+  Art. 23, DORA Art. 19 with RTS 2025/301) as calendar dates, with who reports to whom, a prominent
+  "verify with counsel or the authority" notice, `.ics` reminders, a Markdown summary and an incident
+  record skeleton (JSON, `incident-record.v1`). The tool never asserts more than the chapter: it
+  applies no period-counting rules and does not decide reportability.
+- **Agent control profile** (`/toolkit/agent-control-profile`): describe one agent (autonomy, tools and
+  MCP servers with operation class and scope, data classes, memory, external actions, identity model,
+  approval points) and get the minimum control set of chapter 23 with the pattern behind each control,
+  the gaps to close, an agent register entry (JSON, `agent-register-entry.v1`) and a checklist
+  (Markdown and CSV).
+- **Fairness metric chooser** (`/toolkit/fairness-metric-chooser`): the questions chapter 16 says
+  decide the metric (harm type, ground truth, costlier error, legal frame, access to the protected
+  attribute) give the primary metric families, secondary checks, warnings and legal notes, each linked
+  to its chapter 16 section; metrics that depend on an unreliable label are deferred, not dropped.
+  Exports Markdown and JSON.
+
+### Figures
+
+- Figures are citable and reusable: a `/figures` gallery grouped by part and chapter (the infographics
+  and the interactive diagrams) and a `/figures/<id>` permalink per infographic with its text
+  alternative, where it appears, downloads, HTML and Markdown embed snippets with the full CC BY
+  credit, a citation with BibTeX and `ImageObject` structured data. Every infographic caption carries a
+  `#figure-<id>` anchor and a link to its figure page.
+- Every figure is exported at build as a standalone SVG (light and dark by colour scheme, plus fixed
+  light and dark) and as light and dark PNGs at 1600 and 3200 px, drawn with the site's typefaces, each
+  with the band "aigovernanceengineer.com · CC BY 4.0 · v<version>" and a versioned file name under
+  `/downloads/figures/`. Figure entries gain `asOf`, `reviewBy`, `license`, `kind`, `pages` and a
+  `data` table fallback; a dated figure prints "As of" inside the image (the Article 73 clock reads "As
+  of 2026-09-24"), and the build checks budgets, dates and the stamp.
+- Concept figures for the new chapters, each drawn only from what its chapter or data module states,
+  with a text description and a permalink: the agent control plane (chapter 23 and
+  `/agents#control-plane`: registry, identity issuer, tool gateway, runtime guardrail with its failure
+  posture, human checkpoint, per-agent breaker with its six stop levels, the boundary a kill switch
+  cannot cross, telemetry kept as evidence), the governance operating model (chapter 12: board,
+  committee, the three lines and where the AI governance engineer sits), harm at five levels (chapter
+  13, from the harms atlas), the explanation technique map (chapter 16), how the instruments relate
+  (chapter 22 and `/resources/frameworks`, dated as of 2026-09-24) and AI laws by jurisdiction (chapter
+  21: a tile map from the jurisdictions dataset, shaded by status, with its table, dated as of
+  2026-09-24).
+- Eleven new figures for existing content, drawn only from what the chapters already state: the five
+  objects of governance (chapter 01), the profession in numbers (02), human oversight designed and
+  where control moves when you buy AI (04), who enforces and the penalty ceilings (08), the committee
+  decides and the gates enforce (12), the risk loop on the stack, the likelihood-by-severity matrix with
+  the S5 override and the mitigation ladder (13), provenance and lineage (14) and the overlapping
+  incident clocks (17). Each has a text description under it.
+- Four reference posters, generated at build from the data and printable at any A size (portrait,
+  1 : √2): the EU AI Act timeline after the Digital Omnibus, one lane per obligation family from 2024
+  to 2030 (chapters 18 and 08, from the register); the operator roles, seven questions leading to each
+  role with its duties, its evidence and the Article 25 loop (chapter 18); the risk ladder with the
+  Annex I and Annex III routes, the Article 6(3) filter, the GPAI track and notes on Korea, Texas,
+  California and Colorado (chapters 18 and 21); and the model-type by deployment-option matrix (chapter
+  15). Each carries "As of 2026-09-24" inside the image, sits at the head of its section in a
+  scrollable, labelled region and links to its permalink with SVG and PNG downloads; the timeline and
+  the matrix also publish their data as a table. Spanish editions of the timeline, the roles and the
+  ladder (`/figures/eu-ai-act-timeline-es`, `/figures/eu-ai-act-operator-roles-es`,
+  `/figures/eu-ai-act-risk-ladder-es`) use the terms of the Spanish text of the Act and the stamp "A
+  fecha de 2026-09-24"; they are listed on `/figures`, not placed in the English chapters.
+- Diagrams: the Framework Crosswalk is drawn as one hub with five spokes and evidence on the hub; the
+  Vendor / Model Due-Diligence Gate puts the registry entry straight under the gate and the rejection
+  path last; the Runtime Guardrail keeps its assurance store outside the runtime layer; the Kill Switch
+  greys the revoked agent while the rest of the fleet runs on. The regulatory wave in chapter 02 gains
+  the 2 Dec 2026 stage (new Article 5 bans and Article 50(2) marking) and the 2 Aug 2030 stage (legacy
+  high-risk systems of public authorities).
+- `site/VISUAL-GUIDE.md` adds rules for data visualisation, posters and exports, and interactive
+  widgets.
+
+### Data and API
+
+- A static open-data API under `/api/v1/`: a catalogue (`index.json`), one file per dataset
+  (obligations, frameworks, crosswalk, glossary, patterns, maturity, path, chapters, jurisdictions,
+  harms, cases, contracts, roles, threats), one file per obligation, an OpenAPI 3.1 description and a
+  JSON Schema (draft 2020-12) per document, all with the same notice, licence and DOI envelope;
+  `/resources/data` documents the endpoints, the id rule, the versioning and stability promise and how
+  to cite. `_headers` opens CORS and sets a one-hour cache on the API and the existing downloads, and
+  serves `/schemas/*` as `application/schema+json`; the Content-Security-Policy is unchanged.
+- `/resources/obligations.json` and `/resources/obligations.csv` move to `schemaVersion` 2 at the same
+  URLs. `appliesFrom` is an ISO date (or `null` for voluntary instruments without one) and the former
+  free text moved to `appliesNote`; each row gains `id`, `url`, `json`, `frameworkId`, `clause`,
+  `requirement`, `appliesStatus`, `milestones`, `systemClass`, `patterns`, `crosswalkTopics`,
+  `authority`, `scope` and `reviewed`. The CSV keeps its first seven columns in place and appends the
+  new ones.
+- `/resources/crosswalk.json` and `/resources/crosswalk.csv` move to schema version 2 at the same URLs:
+  the JSON adds `schemaVersion`, `asOf`, `columns`, `frameworks`, topic `read` links and, per
+  reference, `clauseId`, `column`, `frameworkShort`, `see`, `obligationId` and `obligationUrl`; the CSV
+  keeps its nine columns in order and appends topic, framework, column and clause ids, the BoK section
+  and an `Obligation ID` column.
+- `/api/v1/threats.json` (with its schema) and `/resources/threats.csv`; `/resources/harms.json`.
+- The citation block serves any page (`kind`: chapter, obligation, figure, dataset or page); chapters
+  keep their existing reference and BibTeX.
+- `/llms.txt` lists every v0.5.0 destination with counts taken from the data (`/patterns` and every
+  pattern page, the harms atlas, the cases, the templates and the contract clauses among them);
+  `/llms-full.txt` carries the 24 chapters in reading order with every pattern page in full right after
+  chapter 05, then the Thesis.
+- The PDF build (`build/build_pdf.py`) prints every chapter file (00 to the last) and assembles chapter
+  05 with the full text of every pattern in place of the catalogue summaries.
+- A read-only remote MCP server over the open data (`tools/mcp-server/`, to be deployed at
+  `https://mcp.aigovernanceengineer.com/mcp`): ten tools (`search_glossary`, `get_term`,
+  `get_obligations`, `get_obligation`, `map_clause`, `list_patterns`, `get_pattern`, `list_templates`,
+  `get_template`, `search_bok`) and the `/api/v1` datasets as resources, over Streamable HTTP with the
+  official TypeScript SDK v2 (protocol revision 2026-07-28, with a stateless fallback for 2025-era
+  clients). Every answer carries its source URL, the CC BY 4.0 licence and the notice "Illustrative,
+  not legal advice and not a claim of conformity". It reads the public API through a one-hour
+  in-memory cache with conditional revalidation, keeps no data about callers (no IPs, user agents or
+  tool arguments in its logs; the rate limiter holds only keyed hashes until each window closes) and
+  ships a Dockerfile, a compose service, a Caddy site block and connection instructions for Claude and
+  other MCP clients.
+
+### Infrastructure
+
+- **Regulatory change monitor** (`tools/reg-monitor/`, `.github/workflows/reg-monitor.yml`): a daily
+  GitHub Actions job (06:17 UTC) reads 34 official pages the site already cites (EUR-Lex and the
+  Digital Omnibus, the AI Act Service Desk, the Commission's AI Act pages, CEN-CENELEC JTC 21, NIST,
+  OWASP GenAI, law.go.kr, the California, New York, Colorado and Texas legislatures, the EDPB, ICO and
+  CNIL, the IAPP AIGP page and the International AI Safety Report), reduces each to stable text,
+  compares a SHA-256 with the previous run and, on a change, opens or comments on an issue labelled
+  `regulatory-change` with a diff excerpt and the files that cite the URL. It never edits or publishes
+  the site; its state lives on the orphan branch `reg-monitor-state`, not on `main`, because every push
+  to `main` deploys. Manual runs default to a dry run. Unit tests run with `node --test`;
+  `tools/reg-monitor/README.md` explains operation and how to add a source.
+- Build gates: the content lint fails on any em dash and also scans the published SVG, JSON, CSV, TXT,
+  XML and Markdown files and the text of the PNG downloads; a test fails when a register row still says
+  "applies later" or "deferred" after its date has passed (`site/tests/obligation-status-dates.spec.ts`).
+- **Issue forms**: report an error on a page, propose an obligation row, propose a glossary term and
+  propose a case study join the existing forms.
+- **Newsletter and analytics**: the sign-up form also closes every chapter and the home. Downloads in
+  the footer and on `/about`, newsletter sign-ups, search opening and citation copying carry
+  declarative Umami event attributes; no new script, and the newsletter note says the address goes
+  straight to Buttondown. Analytics ignore the URL fragment and query, so toolkit answers never leave
+  the browser.
+- Code comments in chapter examples meet WCAG AA contrast.
+- Dependabot keeps the MCP server's Docker base image up to date (a `docker` entry for
+  `/tools/mcp-server`, ignoring Node semver-major updates).
+
+### Fixes
+
+Fact-check pass of 2026-09-24 and 2026-09-25: every finding was checked against the primary source
+before it was applied.
+
+- **US frontier laws.** California SB 53 and New York's RAISE Act bind every frontier developer (a
+  model trained above 10^26 operations) to report critical safety incidents; only large frontier
+  developers (annual revenue above USD 500M) must publish a frontier AI framework. RAISE takes the
+  thresholds of its 2026 chapter amendment (S8828, signed 2026-03-27: no USD 100M cost test; reports
+  within 72 hours to a new office within the Department of Financial Services, or within 24 hours to
+  law enforcement or a public safety agency on imminent risk of death or serious injury). Fixed in
+  chapters 02, 08, 09, 17 and 21, the register, `jurisdictions.ts` and the incident clock notes. SB
+  53's in-force date (1 Jan 2026) now rests on the chaptered statute and the California Constitution
+  (art. IV, §8(c)(1)), not on the Future of Privacy Forum explainer (dated 2025-10-03).
+- **US credit.** The CFPB withdrew Circular 2022-03 on 12 May 2025 (90 FR 20084); the Regulation B duty
+  to give specific principal reasons (12 CFR 1002.9) is unchanged. Chapter 20 cites the Regulation B
+  final rule of 2026-04-22 (91 FR 21620, effective 2026-07-21: ECOA does not authorise disparate-impact
+  liability; 1002.9 unchanged). Fixed in chapters 10, 20 and 21 and the Decision Notice & Contest Path
+  pattern.
+- **EU AI Act.** `Art. 73` was not postponed; only Chapter III, Sections 1 to 3 were (chapter 17, with
+  the consolidated `Art. 113`). `Art. 86` has applied since 2 Aug 2026 but acts on Annex III systems
+  only from 2 Dec 2027. The `Art. 111(4)` marking grace to 2 Dec 2026 is sourced to the consolidated
+  text, not to the Commission news item. `Art. 3(49)(b)` reads "serious and irreversible disruption of
+  the management or operation of critical infrastructure". Chapter 18 cites the final `Art. 50`
+  guidelines of 20 Jul 2026. The GPAI guidelines are dated by their formal text, C(2025) 7719 final of
+  19 Nov 2025 (content approved on 18 Jul 2025 by C(2025) 5045 final), and a modifier's duties follow
+  paras. 65 to 68: `Art. 53(1)` limited to the modification, `Art. 54`, and `Arts. 52` and `55` when the
+  original model has systemic risk (chapters 15 and 18, the glossary, `triage.ts`). Chapter 13: the
+  Omnibus extends the simplified documentation form to small mid-caps (SMEs and start-ups had it since
+  2024). Chapter 15's AI Act sources cite the EUR-Lex consolidated text instead of the AI Act Service
+  Desk; contract clauses cite EUR-Lex too. `deployment-options.ts` splits the `Art. 50` duties between
+  provider and deployer and scopes the `Art. 27` FRIA.
+- **DORA.** When an incident is classified as major more than 24 hours after awareness, a new 4-hour
+  clock runs from classification (RTS 2025/301, `Art. 5(2)`): in chapters 08 and 17, the glossary, the
+  incident-clock data, logic and page, with a test.
+- **Other law.** Texas HB 149 bans social scoring only for governmental entities, and the AI-use
+  disclosure falls on government agencies and health-care providers (chapter 08, the register,
+  `roles.ts`). Korea's AI Basic Act (Act No. 21311) and Enforcement Decree (No. 36506) cite their current
+  versions, with the officials' liability exemption in the Act (`Art. 16(4)`). Spain's AESIA remit,
+  Colorado's stipulated non-enforcement order of 27 Apr 2026, Council Decision (EU) 2026/1080 (read on
+  EUR-Lex), the HLEG fallback-plan quote, ISO/IEC 25059's replacement at FDIS, ISO/IEC 22989's
+  generative AI amendment at FDIS, the CEN-CENELEC date, SPIFFE WIT-SVID (incubating), the ACS
+  unauthenticated-wire disclosure (dated) and the TC260 Appendix 2 sentence are corrected in chapters
+  11, 21, 22 and 23. Chapter 16 cites C-203/22 para. 62 from EUR-Lex, adds ISO/IEC TS 6254:2025 and the
+  Regulation B commentary as sources and corrects the EDRi title.
+- **Sources in chapters 12 to 15.** Chapter 12 cites the Whistleblower Directive (EU) 2019/1937 by
+  article; chapter 14 quotes `Art. 9(8)` and the substantial-modification definition and gives SS1/23
+  its scope; chapter 15 tags the Product Liability Directive `primary` and cites DORA `Art. 28` and
+  NIS2 `Art. 21` with their EUR-Lex anchors; the glossary cites legislation.gov.uk for UK law.
+- **Standards and threat references.** ISO/IEC 42001 crosswalk glosses name the B.x clauses of the
+  guidance annex; NIST AI 100-2 E2025 calls the class "misuse" attacks; EDPB Opinion 28/2024 puts the
+  test at para. 43; NIST SP 800-218A glosses follow the PDF; Illinois laws point to ilga.gov and prEN
+  18229-1 to its CEN stage page.
+- **Toolkit and figures.** Calendar exports give each event a unique UID and export timed events with
+  alarms instead of all-day entries (incident clock and planner); the policy-card link and CSV import
+  can no longer write to `Object.prototype`; the schema check fails instead of warning when a chapter
+  05 shape is missing or invalid; the poster label placement search is bounded; a status region's
+  first announcement waits until it is exposed; the regulatory monitor runs in two jobs so the token
+  that reads third-party pages cannot push.
+- **MCP server.** `/mcp` refuses JSON-RPC batches and caps concurrent requests; after a failed
+  revalidation the stale copy is served for up to a minute without asking again; rate limiting keys
+  IPv6 clients by their /64 and reads `X-Forwarded-For` only from trusted proxies; patterns and terms
+  resolve to their published pages and anchors; the threats dataset is served; the base image is
+  pinned by digest and the README covers a network only Caddy and the server share and rotated logs.
 
 ## [0.4.0] - 2026-09-19
 
