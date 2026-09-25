@@ -72,3 +72,15 @@
 - [x] 6.2 `--estimate` sobre el contenido real (491 peticiones; 8,46 USD en batch sin caché, 7,25 con
   caché en el mejor caso, peor caso 11,43; 16,92 USD por la Messages API)
 - [x] 6.3 `openspec validate i18n-translation-pipeline --strict`
+
+## 7. Integración con el sitio
+
+- [x] 7.1 La comprobación de estructura relee la salida con las etiquetas de callout y de "Maps to"
+  que el renderizado localizó (`localizedLabels`, opción `labels` de `parseMarkdown`); antes, con
+  `callouts.json` presente, 55 ficheros por idioma fallaban ("1p:L became 1p"). Pruebas de regresión
+  con etiquetas traducidas y con `callouts.json` real en el mock de extremo a extremo
+- [x] 7.2 El CLI sale con 1 cuando la ejecución informa de un error (tras escribir lo que pasó, el
+  informe y el resumen)
+- [x] 7.3 Pasada mock completa (es 57 ficheros, fr/de/pt 58, más `ui.<lang>.json` en `<I18N_DIR>/ui`)
+  sin errores; la segunda pasada no escribe nada ni hace peticiones. `--estimate`: 494 peticiones;
+  8,49 USD en batch sin caché, 7,26 con caché en el mejor caso, peor caso 11,46

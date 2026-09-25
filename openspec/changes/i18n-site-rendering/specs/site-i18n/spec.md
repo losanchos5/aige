@@ -112,14 +112,21 @@ Las cadenas visibles del cromo (cabecera, grupos de navegación, pie, migas, "At
 terms", cita, anterior/siguiente, aviso, selector, buscador) SHALL venir de
 `site/src/i18n/ui.en.json` mediante `t(key, lang)`. Un `ui.<lang>.json` generado por el pipeline MUST
 tener las mismas claves y marcadores `{name}` que el inglés y ninguna raya, o la build falla; una
-clave o un fichero ausentes SHALL caer al inglés. Las etiquetas de callout traducidas SHALL ser las
-de `site/src/i18n/callouts.json`. Sin traducciones, la salida de una página inglesa SHALL ser la misma
-que antes del cambio salvo espacios en blanco, excepto el selector de idioma y el par del sitemap de
-las páginas que ya existían en dos idiomas (`/thesis`, `/es/thesis`).
+clave o un fichero ausentes SHALL caer al inglés. El sitio SHALL leer los `ui.<lang>.json` de la misma
+carpeta en la que los escribe el pipeline: `I18N_UI_DIR` si está fijada; si no, `<I18N_DIR>/ui` si
+`I18N_DIR` está fijada; si no, `site/src/i18n/`, la ubicación versionada. Las etiquetas de callout
+traducidas SHALL ser las de `site/src/i18n/callouts.json`. Sin traducciones, la salida de una página
+inglesa SHALL ser la misma que antes del cambio salvo espacios en blanco, excepto el selector de idioma
+y el par del sitemap de las páginas que ya existían en dos idiomas (`/thesis`, `/es/thesis`).
 
 #### Scenario: Idioma sin cadenas
 - **WHEN** existe `/pt/bok/x` pero no `ui.pt.json`
 - **THEN** la página se construye con el cromo en inglés
+
+#### Scenario: Pasada de prueba en una carpeta aparte
+- **WHEN** `I18N_DIR=/tmp/x node tools/i18n/translate.mjs --mock` escribe `/tmp/x/ui/ui.<lang>.json`
+  y la build se lanza con `I18N_DIR=/tmp/x` y sin `I18N_UI_DIR`
+- **THEN** las páginas traducidas muestran el cromo de `/tmp/x/ui`, y nada se escribe en `site/`
 
 ### Requirement: Fechas, lint y enlaces de las traducciones
 

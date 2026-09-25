@@ -51,6 +51,13 @@ difiera de la del inglés MUST NOT escribirse.
 - **THEN** los callouts traducidos siguen empezando por `**In practice**`, `**Anti-pattern**` o la
   etiqueta inglesa correspondiente
 
+#### Scenario: Etiqueta de callout traducida
+- **WHEN** `callouts.json` asigna `En la práctica` a `In practice` y `Correspondencias:` a `Maps to:`
+- **THEN** el fichero español se escribe con `> **En la práctica**` y `**Correspondencias:**`, y la
+  comprobación de estructura, que relee la salida conociendo solo las etiquetas que puso el
+  renderizado, lo acepta; un párrafo al que la traducción añade o quita una etiqueta sigue siendo un
+  cambio de estructura y el fichero no se escribe
+
 ### Requirement: Validación de cada segmento con un reintento
 
 Cada segmento traducido SHALL validarse antes de guardarse: todos los marcadores de posición

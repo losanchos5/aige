@@ -57,3 +57,18 @@
 - [x] 5.6 Build con fixtures y build comprometida verdes; `i18n`, `nav`, `shell` y `home` en verde en
   el puerto 4460
 - [x] 5.7 `openspec validate i18n-site-rendering --strict`
+
+## 6. Integración con el pipeline
+
+- [x] 6.1 Una sola ubicación de las cadenas de interfaz para el pipeline, `ui.ts` y `content-lint`:
+  `I18N_UI_DIR`, si no `<I18N_DIR>/ui`, si no `site/src/i18n/`
+- [x] 6.2 Las fichas de capa de `/<lang>/patterns/<slug>` enlazan el capítulo de la pila en su idioma
+  cuando existe (`localizeHref`)
+- [x] 6.3 `callouts.ts` compara las etiquetas con comillas rectas: smartypants curvaba el apóstrofo de
+  "Offres d'emploi (note)." y la nota de `/fr/bok/the-role` dejaba de ser un callout. El contrato de
+  cada página traducida compara ahora los callouts por tipo y las líneas "Maps to" con el inglés
+- [x] 6.4 Las colecciones traducidas descartan las entradas de la caché de contenido cuyo fichero ya no
+  está en `I18N_DIR`: el cargador glob de Astro 5 las conservaba cuando la carpeta existe sin
+  ficheros, y la build sin `I18N_DIR` tras una con él fallaba (colecciones y escaneo discrepaban)
+- [x] 6.5 Build con la pasada mock completa (cuatro idiomas) y build comprometida verdes; `i18n`,
+  `nav`, `shell` y `layout` en verde en el puerto 4470
