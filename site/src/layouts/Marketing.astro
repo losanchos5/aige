@@ -6,6 +6,7 @@
  * section for a tinted, edge-to-edge band.
  */
 import Base from './Base.astro';
+import type { PreloadImage } from './Base.astro';
 import type { JsonLdInput } from '../lib/jsonld';
 
 interface Props {
@@ -20,10 +21,20 @@ interface Props {
   overlayHeader?: boolean;
   /** Passed to Base: extra fonts to preload. */
   preloadFonts?: string[];
+  /** Passed to Base: a hero image to preload. */
+  preloadImage?: PreloadImage;
 }
 
-const { title, description, image, jsonLd, titleSuffix, overlayHeader, preloadFonts } =
-  Astro.props;
+const {
+  title,
+  description,
+  image,
+  jsonLd,
+  titleSuffix,
+  overlayHeader,
+  preloadFonts,
+  preloadImage,
+} = Astro.props;
 ---
 
 <Base
@@ -34,6 +45,7 @@ const { title, description, image, jsonLd, titleSuffix, overlayHeader, preloadFo
   titleSuffix={titleSuffix}
   overlayHeader={overlayHeader}
   preloadFonts={preloadFonts}
+  preloadImage={preloadImage}
 >
   <div class="marketing">
     <slot />

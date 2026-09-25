@@ -3,6 +3,7 @@
 
 :root {
   /* Surfaces & ink */
+  color-scheme: light;
   --bg: #F6F4EE;
   --surface: rgba(255, 255, 255, 0.6);
   --line: #E3DFD5;
@@ -99,6 +100,7 @@
 
 /* Dark, explicit toggle */
 :root[data-theme='dark'] {
+  color-scheme: dark;
   --bg: #121417;
   --surface: rgba(255, 255, 255, 0.04);
   --line: #2A2D33;
@@ -150,7 +152,8 @@
 /* Dark, system preference (unless explicitly forced light) */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #121417;
+    color-scheme: dark;
+  --bg: #121417;
     --surface: rgba(255, 255, 255, 0.04);
     --line: #2A2D33;
     --ink: #ECEAE3;

@@ -119,6 +119,20 @@ const heroFonts = [
 // Local test of a painting background instead of the gradient field.
 const HERO_ART = true;
 
+// The painting at three widths (a 1440px viewport at DPR 1 takes the 1600),
+// preloaded from the head so it starts with the fonts.
+const heroArt = {
+  href: '/hero/monet-seine-giverny-1897-2400.webp',
+  srcset:
+    '/hero/monet-seine-giverny-1897-1200.webp 1200w, /hero/monet-seine-giverny-1897-1600.webp 1600w, /hero/monet-seine-giverny-1897-2400.webp 2400w',
+  sizes: '100vw',
+};
+
+// First-paint placeholder under the painting: sharp, 24px wide, webp q45,
+// base64 (150 bytes). Generated once from the original, not at build time.
+const HERO_LQIP =
+  'data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAABQBQCdASoYABMAPt1grE8opSSiKAqpEBuJYwCdABESxiiKM5K4GrqF079X3VsoyOKMQgAA/ucYZcdQIZ8gekDbR1k7VvcRFIQ/ZIQYi+x9ea0U0cIbGZDEOt8DambczfYpv6oAY/f8GquG9A8BTdvMuIXzdeLpWyfUssgFbKUsoAAA';
+
 // The chapters section: its title counts chapters and parts from the data, and
 // its lede names the three parts that carry the discipline from what an AI
 // system is to the law (their titles from chapterParts, never retyped here).
@@ -180,6 +194,7 @@ const resources = [
   jsonLd={jsonLd}
   overlayHeader
   preloadFonts={heroFonts}
+  preloadImage={HERO_ART ? heroArt : undefined}
 >
   <section
     class:list={['hero', 'hero--field', { 'hero--art': HERO_ART }]}
@@ -187,18 +202,21 @@ const resources = [
   >
     {
       HERO_ART ? (
-        <div class="hero-art" aria-hidden="true">
+        <div class="hero-art" aria-hidden="true" style={`--hero-lqip: url(${HERO_LQIP})`}>
           <!-- Claude Monet, The Seine at Giverny, 1897. National Gallery of Art, Washington, open access (public domain). -->
           <img
             class="hero-art-img"
-            src="/hero/monet-seine-giverny-1897-2400.webp"
-            srcset="/hero/monet-seine-giverny-1897-1200.webp 1200w, /hero/monet-seine-giverny-1897-2400.webp 2400w"
-            sizes="100vw"
+            src={heroArt.href}
+            srcset={heroArt.srcset}
+            sizes={heroArt.sizes}
             alt=""
             decoding="async"
             fetchpriority="high"
           />
           <div class="hero-art-wash"></div>
+          <div class="hero-art-fade"></div>
+          <div class="hero-art-halo"></div>
+          <div class="hero-art-band"></div>
         </div>
       ) : (
         <div class="hero-field" aria-hidden="true">
@@ -246,6 +264,9 @@ const resources = [
     </div>
 
     {!HERO_ART && <script is:inline defer src="/hero-field.js"></script>}
+    {HERO_ART && <script is:inline async src="/hero-art.js"></script>}
+    {/* DEV ONLY: remove before shipping. URL params drive the painting's layers. */}
+    {HERO_ART && <script is:inline defer src="/hero-art-dev.js"></script>}
   </section>
 
   <Section
@@ -466,23 +487,53 @@ const resources = [
     }
   }
 
-  /* Painting test (HERO_ART): the painting fills the hero under a veil of the
-     page ground (--bg, so it turns into a dark veil in the dark theme). The
-     custom properties let the variants be switched at runtime. */
+  /* Painting test (HERO_ART): the painting fills the hero under four veils of
+     the page ground (--bg, so each turns dark in the dark theme): a uniform
+     wash, a vertical fade, a halo behind the headline and a band under the
+     floating header. The custom properties let the variants be switched at
+     runtime (public/hero-art-dev.js reads them from the URL). */
   .hero--art {
     --hero-art-x: 68%; /* horizontal focal point: >50% shows more of the right side of the painting */
-    --hero-art-y: 50%;
-    --hero-wash: 0.72; /* cream veil opacity */
+    --hero-art-y: 30%; /* keeps the sky above the trees on wide windows */
+    --hero-wash: 0.3; /* cream veil opacity (the user picked 0.30 for both themes) */
     --hero-art-scale: 1; /* optional gentle zoom; 1.04 crops edges softly */
+    --hero-fade: 0; /* foot fade into the page (0..1), mikeoss.com's stops: clear to 60% */
+    --hero-fade-top: 0; /* free vertical fade stops (0..1) at the top, 55% and the foot */
+    --hero-fade-mid: 0;
+    --hero-fade-bot: 0;
+    --hero-halo: 0; /* ellipse behind the headline (0..1) */
+    --hero-halo-w: 62%;
+    --hero-halo-h: 40%;
+    --hero-halo-y: 45%; /* the headline's centre at 1440x900 (402px of 900) */
+    --hero-band: 0; /* veil under the floating header (0..1) */
+    --hero-halo-blur: 0px; /* blurred halo, on only with data-halo-blur (dev: ?blur=14) */
   }
 
+  /* Phones: the headline wraps to three lines, fills the width and sits
+     higher (its centre at 33% of the hero at 390x844), so the halo widens,
+     flattens and moves up with it. */
+  @media (max-width: 719px) {
+    .hero--art {
+      --hero-halo-w: 120%;
+      --hero-halo-h: 30%;
+      --hero-halo-y: 33%;
+    }
+  }
+
+  /* The ground carries the 24px placeholder (--hero-lqip, set inline from
+     the frontmatter), framed like the image, so the painting's colours are
+     there on the first paint. */
   .hero-art {
     position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
-    background: var(--bg);
+    background-color: var(--bg);
+    background-image: var(--hero-lqip, none);
+    background-position: var(--hero-art-x) var(--hero-art-y);
+    background-repeat: no-repeat;
+    background-size: cover;
   }
 
   .hero-art-img {
@@ -495,11 +546,90 @@ const resources = [
     transform-origin: var(--hero-art-x) var(--hero-art-y);
   }
 
-  .hero-art-wash {
+  /* The painting fades in over the placeholder once hero-art.js has seen it
+     load. Only while scripting runs: without it the image is never hidden.
+     If the script never arrives, the image shows after 3s anyway. */
+  @media (scripting: enabled) {
+    .hero-art-img:not([data-loaded]) {
+      opacity: 0;
+      animation: hero-art-failsafe 0s 3s forwards;
+    }
+  }
+
+  @keyframes hero-art-failsafe {
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-art-img {
+      transition: opacity 350ms ease-out;
+    }
+  }
+
+  .hero-art-wash,
+  .hero-art-fade,
+  .hero-art-halo,
+  .hero-art-band {
     position: absolute;
     inset: 0;
+    pointer-events: none;
+  }
+
+  .hero-art-wash {
     background: var(--bg);
     opacity: var(--hero-wash);
+  }
+
+  /* Two fades in one layer: the foot fade (--hero-fade scales mikeoss.com's
+     stops: clear for the top 60%, 70% of the ground at 86%, all of it at the
+     foot) and a free three-stop fade. */
+  .hero-art-fade {
+    background:
+      linear-gradient(
+        to bottom,
+        transparent 60%,
+        color-mix(in srgb, var(--bg) calc(var(--hero-fade) * 70%), transparent) 86%,
+        color-mix(in srgb, var(--bg) calc(var(--hero-fade) * 100%), transparent) 100%
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--bg) calc(var(--hero-fade-top) * 100%), transparent) 0%,
+        color-mix(in srgb, var(--bg) calc(var(--hero-fade-mid) * 100%), transparent) 55%,
+        color-mix(in srgb, var(--bg) calc(var(--hero-fade-bot) * 100%), transparent) 100%
+      );
+  }
+
+  .hero-art-halo {
+    background: radial-gradient(
+      ellipse var(--hero-halo-w, 62%) var(--hero-halo-h, 40%) at 50% var(--hero-halo-y, 45%),
+      color-mix(in srgb, var(--bg) calc(var(--hero-halo) * 100%), transparent) 0%,
+      transparent 72%
+    );
+  }
+
+  /* The blurred halo, mikeoss.com's technique behind its headline: the
+     painting behind the headline is blurred, not tinted (a light tint may
+     stay), inside a radial mask on the halo's ellipse. Only with
+     data-halo-blur, so backdrop-filter costs nothing while it is off. */
+  .hero--art[data-halo-blur] .hero-art-halo {
+    -webkit-backdrop-filter: blur(var(--hero-halo-blur)) saturate(0.9);
+    backdrop-filter: blur(var(--hero-halo-blur)) saturate(0.9);
+    mask-image: radial-gradient(
+      ellipse var(--hero-halo-w, 62%) var(--hero-halo-h, 40%) at 50% var(--hero-halo-y, 45%),
+      #000 22%,
+      #000000ad 52%,
+      #0000 80%
+    );
+  }
+
+  .hero-art-band {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--bg) calc(var(--hero-band) * 100%), transparent) 0,
+      transparent 9rem
+    );
   }
 
   /* Forced colours: no painting, the plain system ground. */
@@ -507,6 +637,63 @@ const resources = [
     .hero-art {
       display: none;
     }
+  }
+
+  /* Text over the painting. The headline keeps its navy in the light theme
+     and turns pure white in the dark one; the floating header (only while it
+     floats over this hero, unscrolled) sets its links in full --ink (light)
+     or white (dark) instead of the muted --ink-2. --hero-text-shadow (0..1,
+     default 0) scales an optional shadow: a cream glow in light, a soft dark
+     shadow in dark. --hero-nav-weight sets the links' weight over the hero.
+     These live on <body> because the header sits outside the hero. */
+  :global(body:has(.hero--art)) {
+    --hero-text-shadow: 0;
+    --hero-nav-weight: 400;
+    --hero-nav-ink: var(--ink);
+    --hero-shadow:
+      0 0 2px color-mix(in srgb, var(--bg) calc(var(--hero-text-shadow) * 100%), transparent),
+      0 0 18px color-mix(in srgb, var(--bg) calc(var(--hero-text-shadow) * 100%), transparent);
+  }
+
+  :global(:root[data-theme='dark'] body:has(.hero--art)) {
+    --hero-nav-ink: #ffffff;
+    --hero-shadow:
+      0 1px 2px rgb(0 0 0 / calc(0.35 * var(--hero-text-shadow))),
+      0 0 24px rgb(0 0 0 / calc(0.25 * var(--hero-text-shadow)));
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light']) body:has(.hero--art)) {
+      --hero-nav-ink: #ffffff;
+      --hero-shadow:
+        0 1px 2px rgb(0 0 0 / calc(0.35 * var(--hero-text-shadow))),
+        0 0 24px rgb(0 0 0 / calc(0.25 * var(--hero-text-shadow)));
+    }
+  }
+
+  /* The headline's white is scoped to the hero (the header's menus use
+     --hero-ink too and keep theirs). */
+  :global(:root[data-theme='dark']) .hero--art {
+    --hero-ink: #ffffff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .hero--art {
+      --hero-ink: #ffffff;
+    }
+  }
+
+  .hero--art .hero-title {
+    text-shadow: var(--hero-shadow);
+  }
+
+  :global(body:has(.hero--art) .site-header[data-overlay]:not(.is-scrolled) :is(.wordmark, .nav-link, .nav-trigger, .chev, .icon-btn)) {
+    color: var(--hero-nav-ink);
+    text-shadow: var(--hero-shadow);
+  }
+
+  :global(body:has(.hero--art) .site-header[data-overlay]:not(.is-scrolled) :is(.nav-link, .nav-trigger)) {
+    font-weight: var(--hero-nav-weight);
   }
 
   /* Headline and CTA, centred in the space above the strip. The top padding
