@@ -30,6 +30,15 @@ const metaDescription =
 // of the English original (`translationOfWork`). Dates come from the git history
 // of THESIS.es.md, so the two pages are dated independently.
 const thesisUrl = new URL('/es/thesis', site.url).href;
+// breadcrumbJsonLd opens every trail with an English "Home"; this page is in
+// Spanish, so its first crumb reads "Inicio" (audit HL-05).
+const crumbList = breadcrumbJsonLd([{ label: 'La Tesis' }]);
+const breadcrumb = {
+  ...crumbList,
+  itemListElement: (crumbList.itemListElement as Record<string, unknown>[]).map((item, i) =>
+    i === 0 ? { ...item, name: 'Inicio' } : item,
+  ),
+};
 const jsonLd = [
   {
     '@type': 'TechArticle',
@@ -49,7 +58,7 @@ const jsonLd = [
     ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
   },
   ...authorNodes,
-  breadcrumbJsonLd([{ label: 'La Tesis' }]),
+  breadcrumb,
 ];
 ---
 
@@ -64,6 +73,7 @@ const jsonLd = [
   wide={true}
   activeThesis={true}
   image="/og/thesis.png"
+  imageAlt={`Tarjeta de «The Thesis», en inglés · ${site.name}`}
   jsonLd={jsonLd}
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
   lang="es"
