@@ -1,0 +1,285 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import CitedText from '../../components/CitedText.astro';
+import SourceList from '../../components/SourceList.astro';
+import { site } from '../../data/site';
+import { layers } from '../../data/stack';
+import {
+  harms,
+  harmsByLevel,
+  harmSources,
+  levelLabel,
+  levelSummary,
+  mechanismLabel,
+  mitLabel,
+  mitDomainOf,
+  mitAttribution,
+  incidentDbLabel,
+} from '../../data/harms';
+import { casesForHarm } from '../../data/cases';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+import '../../styles/harms.css';
+
+const groups = harmsByLevel();
+const incidentCount = new Set(
+  harms.flatMap((harm) => harm.exampleIncidents.map((ref) => `${ref.db}:${ref.id}`)),
+).size;
+const layerName = (n: number) => layers.find((layer) => layer.n === n)?.name ?? `Layer ${n}`;
+
+// Every [n] a harm row cites must exist in harmSources, or the build fails.
+for (const harm of harms) {
+  for (const n of [...harm.sources, ...[...harm.description.matchAll(/\[(\d+)\]/g)].map((m) => Number(m[1]))]) {
+    if (n < 1 || n > harmSources.length) {
+      throw new Error(`harms.ts: row "${harm.id}" cites [${n}], which is not in harmSources`);
+    }
+  }
+}
+
+const description =
+  'An atlas of the harms AI systems cause to individuals, groups, organisations, society and the environment: each with its failure mode, the control that catches it, the evidence it leaves and real incidents.';
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Harms atlas' }];
+
+const pageUrl = new URL('/resources/harms', site.url).href;
+const jsonLd = [
+  {
+    '@type': 'Dataset',
+    '@id': `${pageUrl}#dataset`,
+    name: `AI harms atlas · ${site.name}`,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    version: site.bokVersion,
+    keywords: ['AI harms', 'AI incidents', 'AI risk taxonomy', 'AI governance', 'failure modes'],
+    creator: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    isBasedOn: [
+      'https://doi.org/10.1016/j.patter.2026.101517',
+      'https://incidentdatabase.ai/',
+    ],
+    distribution: [
+      {
+        '@type': 'DataDownload',
+        name: 'Harms atlas (JSON)',
+        encodingFormat: 'application/json',
+        contentUrl: new URL('/resources/harms.json', site.url).href,
+      },
+    ],
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+
+const filters = [
+  { id: 'hf-all', label: 'All levels', count: harms.length },
+  ...groups.map((g) => ({ id: `hf-${g.level}`, label: levelLabel[g.level], count: g.rows.length })),
+];
+---
+
+<Base title="Harms atlas" description={description} image="/og/resources.png" jsonLd={jsonLd}>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="What AI harms, and what catches it."
+    lede="Start from a named harm, not a feature list. Each row gives the level it lands on, the mechanism behind it, a failure mode you can test for, the control and stack layer that catch it, the evidence that control leaves, and incidents that show it is not hypothetical."
+  />
+
+  <div class="container res-page">
+    <div class="res-section">
+      <Callout kind="note" title="Illustrative, not a claim of conformity">
+        <p>The mapping of each harm to a failure mode, a control and a layer is our engineering
+        judgement. Naming a control does not guarantee the harm is prevented, and an incident record
+        is the database's account, often of allegations: read the record before relying on it.
+        Incident records checked on 2026-09-24.</p>
+        <p>Harms rarely stay on one level. A risk score computed on individuals becomes a harm to a
+        group when it tracks nationality, and an enforcement action against the organisation that
+        ran it: the Dutch childcare-benefits case went from one to the other
+        <span class="prose"><CitedText text="[8]" prefix="hs" /></span>. See it written up as a <a
+        href="/cases/dutch-childcare-benefits">case</a>.</p>
+      </Callout>
+    </div>
+
+    <section class="res-section" aria-labelledby="hm-heading">
+      <div class="res-section-head">
+        <h2 id="hm-heading">The atlas</h2>
+        <p>{harms.length} harms across five levels, {incidentCount} incident records. Read each card as
+        a sentence: this harm happens through this failure mode, is caught by this control in this
+        layer, and leaves this evidence.</p>
+        <p class="ob-xref">
+          Cross-reference: <a href="/cases">incident cases</a> ·
+          <a href="/bok/patterns">the pattern catalogue</a> ·
+          <a href="/resources/frameworks">the obligation index</a>.
+        </p>
+        <p class="ob-export">
+          <a
+            class="ob-dl"
+            href="/resources/harms.json"
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file="/resources/harms.json"
+            data-umami-event-location="harms">Download JSON</a>
+        </p>
+      </div>
+
+      <div class="hm-list" data-pagefind-body>
+        <fieldset class="ob-filter">
+          <legend>Filter by level</legend>
+          <div class="ob-chips">
+            {
+              filters.map((f, i) => (
+                <span>
+                  <input
+                    class="ob-radio"
+                    type="radio"
+                    name="hm-level-filter"
+                    id={f.id}
+                    value={f.id.replace('hf-', '')}
+                    checked={i === 0}
+                  />
+                  <label class="ob-chip" for={f.id}>
+                    {f.label} <span class="hm-count">({f.count})</span>
+                  </label>
+                </span>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        {
+          groups.map(({ level, rows }) => (
+            <section
+              class="hm-group ob-group"
+              data-level={level}
+              aria-labelledby={`hm-level-${level}`}
+              id={`level-${level}`}
+            >
+              <div class="ob-group-head">
+                <h3 id={`hm-level-${level}`}>{levelLabel[level]}</h3>
+                <span class="ob-group-count">{rows.length} harms</span>
+              </div>
+              <p class="hm-level-summary">{levelSummary[level]}</p>
+              <ul class="hm-cards">
+                {rows.map((harm) => {
+                  const related = casesForHarm(harm.id);
+                  return (
+                    <li>
+                      <article class="hm-card" id={`harm-${harm.id}`} aria-labelledby={`harm-${harm.id}-t`}>
+                        <h4 id={`harm-${harm.id}-t`}>{harm.harmType}</h4>
+                        <ul class="hm-mech" aria-label="Mechanism">
+                          {harm.mechanism.map((m) => (
+                            <li class="type-tag">{mechanismLabel[m]}</li>
+                          ))}
+                        </ul>
+                        <p class="hm-desc prose">
+                          <CitedText text={harm.description} prefix="hs" />
+                        </p>
+                        <dl class="hm-facts">
+                          <dt>Failure mode</dt>
+                          <dd>{harm.failureMode}</dd>
+                          <dt>Caught by</dt>
+                          <dd>
+                            <span class="hm-control">
+                              {harm.controllingPattern.patternId ? (
+                                <a
+                                  class="hm-control-name"
+                                  href={`/bok/patterns#${harm.controllingPattern.patternId}`}
+                                >
+                                  {harm.controllingPattern.name}
+                                </a>
+                              ) : (
+                                <span>
+                                  <span class="hm-control-name">{harm.controllingPattern.name}</span>{' '}
+                                  <span class="hm-proposed">(not yet a catalogued pattern)</span>
+                                </span>
+                              )}
+                              <span
+                                class="ticks ticks--coded"
+                                role="img"
+                                aria-label={`Layer ${harm.layerN
+                                  .map((n) => `${n}, ${layerName(n)}`)
+                                  .join('; ')}`}
+                              >
+                                {harm.layerN.map((n) => (
+                                  <span class="tk-key">
+                                    <span class="tk" data-l={n} aria-hidden="true" />L{n}
+                                  </span>
+                                ))}
+                              </span>
+                            </span>
+                          </dd>
+                          <dt>Evidence</dt>
+                          <dd>{harm.evidence}</dd>
+                          <dt>MIT taxonomy</dt>
+                          <dd>
+                            <ul>
+                              {harm.mitTaxonomy.map((code) => (
+                                <li>
+                                  {mitLabel(code)} <span class="hm-db">({mitDomainOf(code)})</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </dd>
+                          <dt>Incidents</dt>
+                          <dd>
+                            {harm.exampleIncidents.length > 0 ? (
+                              <ul>
+                                {harm.exampleIncidents.map((ref) => (
+                                  <li>
+                                    <abbr class="hm-db" title={incidentDbLabel[ref.db]}>
+                                      {ref.db === 'AIID' ? `AIID ${ref.id}` : ref.db}
+                                    </abbr>{' '}
+                                    <a href={ref.url} rel="noopener">
+                                      {ref.title}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <span>No single incident record: the evidence is the study cited above.</span>
+                            )}
+                          </dd>
+                          {related.length > 0 && (
+                            <>
+                              <dt>Cases</dt>
+                              <dd>
+                                <ul>
+                                  {related.map((c) => (
+                                    <li>
+                                      <a href={`/cases/${c.id}`}>{c.short}</a>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </dd>
+                            </>
+                          )}
+                        </dl>
+                      </article>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="res-section" aria-labelledby="hm-src-heading">
+      <div class="res-section-head">
+        <h2 id="hm-src-heading">Sources and attribution</h2>
+        <p class="hm-attrib">{mitAttribution}</p>
+      </div>
+      <div class="prose hm-sources-wrap">
+        <SourceList sources={harmSources} prefix="hs" />
+      </div>
+    </section>
+  </div>
+</Base>

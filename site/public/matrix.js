@@ -33,7 +33,9 @@
   var domRows = document.querySelectorAll('[data-obligation-row]');
   for (var r = 0; r < domRows.length; r++) {
     var el = domRows[r];
-    var cell = el.querySelector('.c-oblig');
+    // The obligation's name is the link in the cell; the id printed under it
+    // is not part of the key.
+    var cell = el.querySelector('.c-oblig .ob-name') || el.querySelector('.c-oblig');
     var hit = cell ? byText[norm(cell.textContent)] : null;
     if (hit) {
       el._mfw = hit.f;

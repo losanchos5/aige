@@ -1,7 +1,8 @@
 // diagrams.ts: the typed manifest of the interactive diagrams rendered from the
 // archify IR under site/diagrams/. Each entry names the generated diagram, the
 // curated title and caption shown in its <figcaption>, and where in the Body of
-// Knowledge (chapter slug + exact heading text) the figure is placed.
+// Knowledge (chapter slug + exact heading text, or a pattern page) the figure is
+// placed.
 //
 // Each placement's `at` picks where the figure lands: 'lead' opens the chapter
 // (before its first H2, after the intro), 'head' sits immediately under the
@@ -10,6 +11,12 @@
 // src/lib/rehype-diagrams.ts). Chapter slugs match src/data/chapters.ts; the
 // `section`/`sub` strings must match the chapter's real H2/H3 heading text,
 // because rehype-diagrams matches them by normalised heading text.
+//
+// A placement with `pattern` targets one pattern page instead of a chapter: the
+// figure is inserted into bok/patterns/<pattern>.md (rendered at
+// /patterns/<pattern>), with `at`/`section`/`sub` resolved against that file's
+// own headings. Its `chapter` stays 'patterns' (the chapter the pattern belongs
+// to), so consumers that group figures by chapter still file it under chapter 05.
 //
 // Some diagrams also appear on a standalone page (see src/components/Diagram.astro
 // usage): those placements live in the page, not here.
@@ -22,8 +29,17 @@ export type DiagramType =
   | 'lifecycle';
 
 export interface DiagramPlacement {
-  /** Chapter URL slug (src/data/chapters.ts `slug`). */
+  /** Chapter URL slug (src/data/chapters.ts `slug`). With `pattern`, the chapter
+   *  the pattern belongs to ('patterns'). */
   chapter: string;
+  /**
+   * Pattern page slug (src/data/patterns.ts `slug`): when set, the figure goes
+   * into bok/patterns/<pattern>.md (/patterns/<pattern>), not into the chapter.
+   * `at`, `section` and `sub` then refer to the pattern file's own headings,
+   * where the H1 has been lifted out, so `'lead'` lands after the Summary and
+   * before the first H2 ("Objectives").
+   */
+  pattern?: string;
   /**
    * Where the figure is inserted relative to its anchor (default `'foot'`):
    * - `'lead'`: before the chapter's first H2, as an opening figure after the
@@ -66,7 +82,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'How a model or prompt change moves through an eval gate in CI: capability and adversarial evals against a versioned suite, a threshold that ships the release or blocks it and files the result against the registry. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Eval Gate in CI', at: 'head' },
+      { chapter: 'patterns', pattern: 'eval-gate-in-ci', at: 'lead' },
     ],
   },
   {
@@ -76,7 +92,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'The runtime incident pipeline and kill switch: a signal trips a circuit breaker that revokes one agent’s scope without breaking the fleet, while triage opens a reportable incident on the statutory clock. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Incident Pipeline', at: 'head' },
+      { chapter: 'patterns', pattern: 'incident-pipeline', at: 'lead' },
     ],
   },
   {
@@ -86,7 +102,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'How the deploy pipeline registers each agent, issues it a scoped workload identity, and files signed evidence an auditor can attribute, with a policy gate that denies the unregistered. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Agent Registry', at: 'head' },
+      { chapter: 'patterns', pattern: 'agent-registry', at: 'lead' },
     ],
   },
   {
@@ -136,7 +152,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'A governance rule travels as a versioned policy card that a policy engine evaluates at one gate, recording an allow-or-deny verdict against every change. Start by writing one card for one obligation and wiring it to that gate. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Policy Card', at: 'head' },
+      { chapter: 'patterns', pattern: 'policy-card', at: 'lead' },
     ],
   },
   {
@@ -145,7 +161,7 @@ export const diagrams: readonly DiagramDef[] = [
     title: 'AIBOM at Build',
     caption:
       'The build step emits an AI bill of materials that lands on the registry entry and feeds the vulnerability-matching and documentation consumers. If your build does not emit it, you cannot answer what is running. Generated from the Body of Knowledge.',
-    placements: [{ chapter: 'patterns', section: 'Pattern: AIBOM', at: 'head' }],
+    placements: [{ chapter: 'patterns', pattern: 'aibom', at: 'lead' }],
   },
   {
     id: 'model-card-evidence',
@@ -154,11 +170,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'The model card is generated from real training and eval outputs, checked against a schema at one gate, and attached to the release as control evidence. A hand-written card is documentation; a generated, validated one is a control. Generated from the Body of Knowledge.',
     placements: [
-      {
-        chapter: 'patterns',
-        section: 'Pattern: Model Card as Control Evidence',
-        at: 'head',
-      },
+      { chapter: 'patterns', pattern: 'model-card-as-control-evidence', at: 'lead' },
     ],
   },
   {
@@ -168,11 +180,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'Runtime signals are checked against controls continuously, and every check writes an evidence record an auditor can read from the assurance store. Continuous means the evidence is produced by the data path, not a quarterly exercise. Generated from the Body of Knowledge.',
     placements: [
-      {
-        chapter: 'patterns',
-        section: 'Pattern: Continuous Assurance Telemetry',
-        at: 'head',
-      },
+      { chapter: 'patterns', pattern: 'continuous-assurance-telemetry', at: 'lead' },
     ],
   },
   {
@@ -182,7 +190,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'The fundamental-rights impact assessment is captured as data at intake, assessed and mitigated, then approved at a human gate and stored machine-readable beside the DPIA. Run it before deploying a high-risk system and keep the record where the auditor looks. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: FRIA-as-Code', at: 'head' },
+      { chapter: 'patterns', pattern: 'fria-as-code', at: 'lead' },
     ],
   },
   {
@@ -192,7 +200,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'One internal control set is the hub that external frameworks map onto, with evidence attached once to the hub and reused for all of them. The crosswalk is an index, not the end state; the hub is what you maintain. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Framework Crosswalk', at: 'head' },
+      { chapter: 'patterns', pattern: 'framework-crosswalk', at: 'lead' },
     ],
   },
   {
@@ -202,11 +210,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'Controls, assessments and evidence become OSCAL documents that a validator checks and assurance consumers read without anyone re-typing them. Choose the format your assessor can ingest and generate it from data you already hold. Generated from the Body of Knowledge.',
     placements: [
-      {
-        chapter: 'patterns',
-        section: 'Pattern: Machine-Readable Evidence (OSCAL)',
-        at: 'head',
-      },
+      { chapter: 'patterns', pattern: 'machine-readable-evidence-oscal', at: 'lead' },
     ],
   },
   {
@@ -216,7 +220,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'A versioned adversarial suite built from a threat taxonomy runs in CI or on a schedule, and every finding is fixed or accepted on the record and filed as evidence, with fixes feeding back into the suite. Treat red-team findings like test failures, with an owner and a deadline. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Adversarial Red-Team Suite', at: 'head' },
+      { chapter: 'patterns', pattern: 'adversarial-red-team-suite', at: 'lead' },
     ],
   },
   {
@@ -226,7 +230,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'Input and output guardrails on the model or agent path enforce the same policy card that CI evaluated and emit a decision event on every call to the assurance store and, on a breach, to the circuit breaker. A guardrail without events is a filter, not a control. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Runtime Guardrail', at: 'head' },
+      { chapter: 'patterns', pattern: 'runtime-guardrail', at: 'lead' },
     ],
   },
   {
@@ -236,7 +240,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'A breaker trips on a signal and revokes one agent’s scope while the rest of the fleet keeps running, and the trip itself becomes an incident record. Design the breaker per agent scope before you need it and test the trip in staging. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Kill Switch / Circuit Breaker', at: 'head' },
+      { chapter: 'patterns', pattern: 'kill-switch-circuit-breaker', at: 'lead' },
     ],
   },
   {
@@ -246,7 +250,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'An agent receives a short-lived, scoped credential from its registry entry at deploy time, and every downstream call is verified and attributed in the audit log. No registry entry, no credential, no access. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Agent Identity & Scoped Credentials', at: 'head' },
+      { chapter: 'patterns', pattern: 'agent-identity-scoped-credentials', at: 'lead' },
     ],
   },
   {
@@ -256,7 +260,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'For the actions the policy marks as needing a human, the agent pauses, a named reviewer decides within a time box, and the decision is logged as evidence. Define which actions need a human by policy, not by habit. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Human-in-the-loop Gate', at: 'head' },
+      { chapter: 'patterns', pattern: 'human-in-the-loop-gate', at: 'lead' },
     ],
   },
   {
@@ -266,7 +270,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'Discovery scans the places AI hides, matches each finding against the registry, and turns unknowns into registry entries or blocks, leaving a discovery report. Run it before you claim your inventory is complete. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Shadow-AI Discovery', at: 'head' },
+      { chapter: 'patterns', pattern: 'shadow-ai-discovery', at: 'lead' },
     ],
   },
   {
@@ -276,7 +280,7 @@ export const diagrams: readonly DiagramDef[] = [
     caption:
       'A procured model or tool enters the inventory only after a gate that checks its documentation, evals and contract terms, and the outcome is recorded with any conditions. The gate is where deployer duties start, so keep its checklist versioned. Generated from the Body of Knowledge.',
     placements: [
-      { chapter: 'patterns', section: 'Pattern: Vendor / Model Due-Diligence Gate', at: 'head' },
+      { chapter: 'patterns', pattern: 'vendor-model-due-diligence-gate', at: 'lead' },
     ],
   },
   {
@@ -292,8 +296,152 @@ export const diagrams: readonly DiagramDef[] = [
     type: 'lifecycle',
     title: 'The regulatory window',
     caption:
-      'The obligations that are live now and the deferred deadlines that follow them, as the chapter states them as of 2026-09-24. Pick the next stage and map its obligations to artefacts in chapter 08. Generated from the Body of Knowledge.',
+      'The obligations that are live now and the dates the Omnibus sets for what follows (new bans and marking, the deferred high-risk deadlines, legacy public-authority systems), as the chapter states them as of 2026-09-24. Pick the next stage and map its obligations to artefacts in chapter 08. Generated from the Body of Knowledge.',
     placements: [{ chapter: 'why-now', at: 'lead' }],
+  },
+  // Block w2-fig-concepts (v0.5.0): the build lifecycle as a chain of gates,
+  // each gate naming the pattern chapter 14 ties to it; opens chapter 14.
+  {
+    id: 'build-chain-of-gates',
+    type: 'lifecycle',
+    title: 'The build as a chain of gates',
+    caption:
+      'The build from intake to release as a chain of gates, each reading a structured record and each named with the pattern that implements it, ending in a technical file the pipeline compiles from those records. Find the first stage whose gate cannot refuse a missing record, and wire that one first. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'governing-development', at: 'lead' }],
+  },
+  // Block w2-patterns-a (v0.5.0): the diagrams of the eight development-side
+  // patterns, each opening its pattern page.
+  {
+    id: 'use-case-intake-tiering',
+    type: 'workflow',
+    title: 'Use-Case Intake and Risk Tiering',
+    caption:
+      'A use-case request becomes a structured record, passes the prohibited-use screen, gets a computed tier and switches on the gates that tier requires before the registry entry exists. Put every new AI request through this one path. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'use-case-intake-risk-tiering', at: 'lead' }],
+  },
+  {
+    id: 'ai-threat-model',
+    type: 'workflow',
+    title: 'AI Threat Model',
+    caption:
+      'Threats are enumerated per data-flow element with STRIDE, extended with AI-specific attack classes, and each one is mitigated with a named test or accepted by a named owner. Fail the design review on any threat without a test. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'ai-threat-model', at: 'lead' }],
+  },
+  {
+    id: 'training-data-rights-ledger',
+    type: 'dataflow',
+    title: 'Training-Data Rights Ledger',
+    caption:
+      'Every training source enters a ledger row with its acquisition channel, licence or legal basis and reservation check, and lineage joins the rows to the models they trained. Query it when rights change, instead of retraining everything. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'training-data-rights-ledger', at: 'lead' }],
+  },
+  {
+    id: 'dataset-admission-gate',
+    type: 'workflow',
+    title: 'Dataset Admission Gate',
+    caption:
+      'A dataset version is checked and signed into an admission record, and a read-time policy lets a job read it only for an admitted use, logging each read in lineage. Make every training job present its use case before it reads. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'dataset-admission-gate', at: 'lead' }],
+  },
+  {
+    id: 'fairness-eval-suite',
+    type: 'workflow',
+    title: 'Fairness Eval Suite',
+    caption:
+      'A fairness policy fixed before the run drives group and intersectional metrics, a proxy scan and a counterfactual flip test, gated on intervals and repeated on live decisions. Write the policy first, then let the suite fail the build. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'fairness-eval-suite', at: 'lead' }],
+  },
+  {
+    id: 'explanation-artefact',
+    type: 'dataflow',
+    title: 'Explanation Artefact',
+    caption:
+      'Each consequential decision writes an explanation record with model, method and reason codes pinned, which is tested for fidelity and reused for notices, access requests and appeals. Answer every explanation duty from the same record. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'explanation-artefact', at: 'lead' }],
+  },
+  {
+    id: 'model-artefact-integrity',
+    type: 'workflow',
+    title: 'Model Artefact Integrity',
+    caption:
+      'The build signs a manifest of every model file and attaches provenance, the registry holds digest and signer, and serving verifies both before it loads a model. Refuse any load that does not match its registry entry. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'model-artefact-integrity', at: 'lead' }],
+  },
+  {
+    id: 'claims-substantiation-gate',
+    type: 'workflow',
+    title: 'Claims Substantiation Gate',
+    caption:
+      'Each public claim becomes a register row bound to the eval run behind it; rules check scope and interval before publication, and each release revalidates or pulls the claim. Register a claim before it reaches the copy. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'claims-substantiation-gate', at: 'lead' }],
+  },
+  // Block w2-patterns-b (v0.5.0): one diagram per deployment-side pattern, each
+  // placed on its own pattern page.
+  {
+    id: 'decision-notice-contest-path',
+    type: 'sequence',
+    title: 'Decision Notice and Contest Path',
+    caption:
+      'The decision is recorded with its reason codes, the notice is generated from that record, and a contest reaches a reviewer who can change the outcome and logs it. Tie every notice to a decision record before you write the template. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'decision-notice-contest-path', at: 'lead' }],
+  },
+  {
+    id: 'rights-requests-against-models',
+    type: 'workflow',
+    title: 'Rights Requests Against Models',
+    caption:
+      'One request is located through a data map, fanned out to a handler per store, answered in the weights by suppression now and retraining later, and closed with a fulfilment record. Build the data map before the first request arrives. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'rights-requests-against-models', at: 'lead' }],
+  },
+  {
+    id: 'sanctioned-ai-gateway',
+    type: 'architecture',
+    title: 'Sanctioned AI Gateway',
+    caption:
+      'Staff reach approved AI tools through one gateway that applies the acceptable-use card by data class and emits a decision event per call, while discovery finds the tools used around it. Make the gateway the fastest route. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'sanctioned-ai-gateway', at: 'lead' }],
+  },
+  {
+    id: 'staged-rollout-rollback-criteria',
+    type: 'lifecycle',
+    title: 'Staged Rollout with Rollback Criteria',
+    caption:
+      'A change moves from a registered plan through shadow, pilot and canary to general availability, and a tripped criterion rolls it back to the pinned baseline. Register the criteria before the stage starts. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'staged-rollout-rollback-criteria', at: 'lead' }],
+  },
+  {
+    id: 'drift-fairness-monitor',
+    type: 'dataflow',
+    title: 'Drift and Fairness Monitor',
+    caption:
+      'Live traffic, late labels and feedback by group are checked against thresholds; a breach pages an owner or opens an incident, and every check writes an evidence record. Give every signal an owner before you give it a chart. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'drift-fairness-monitor', at: 'lead' }],
+  },
+  {
+    id: 'downstream-use-register',
+    type: 'dataflow',
+    title: 'Downstream Use Register',
+    caption:
+      'Intended and prohibited uses as a Policy Card, a register that grants each consumer access for its approved use, and a monitor for use outside it. Register consumers before they get the outputs. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'downstream-use-register', at: 'lead' }],
+  },
+  {
+    id: 'disclosure-notification-pipeline',
+    type: 'workflow',
+    title: 'Disclosure and Notification Pipeline',
+    caption:
+      'Registry facts and triggers feed a duty matrix, notices are drafted from versioned templates and approved by one owner, and every disclosure and notice sent is recorded. Generate the transparency page from the registry, not by hand. Generated from the Body of Knowledge.',
+    placements: [{ chapter: 'patterns', pattern: 'disclosure-notification-pipeline', at: 'lead' }],
+  },
+  {
+    id: 'deactivation-localisation-retirement-runbook',
+    type: 'workflow',
+    title: 'Deactivation, Localisation and Retirement Runbook',
+    caption:
+      'A threshold or legal trigger goes to a named owner, evidence is frozen first, then a degraded mode, a regional switch or the full stop, and retirement ends in a recorded runbook. Drill the switches before a trigger fires. Generated from the Body of Knowledge.',
+    placements: [
+      { chapter: 'patterns', pattern: 'deactivation-localisation-retirement-runbook', at: 'lead' },
+    ],
   },
 ] as const;
 
@@ -302,9 +450,19 @@ export function getDiagram(id: string): DiagramDef | undefined {
   return diagrams.find((diagram) => diagram.id === id);
 }
 
-/** Diagrams with at least one placement in the given chapter slug. */
+/** Diagrams with at least one placement in the given chapter's own Markdown
+ *  (placements aimed at a pattern page are not in the chapter). */
 export function diagramsForChapter(slug: string): DiagramDef[] {
   return diagrams.filter((diagram) =>
-    diagram.placements.some((placement) => placement.chapter === slug),
+    diagram.placements.some(
+      (placement) => placement.chapter === slug && placement.pattern === undefined,
+    ),
+  );
+}
+
+/** Diagrams with at least one placement on the given pattern page. */
+export function diagramsForPattern(slug: string): DiagramDef[] {
+  return diagrams.filter((diagram) =>
+    diagram.placements.some((placement) => placement.pattern === slug),
   );
 }

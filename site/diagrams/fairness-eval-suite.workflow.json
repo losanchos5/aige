@@ -1,0 +1,88 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Fairness Eval Suite",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "policy-first",
+        "label": "Policy first",
+        "focus": ["policy", "groups"],
+        "note": "The metric, the threshold and the minimum cell size are fixed before the run."
+      },
+      {
+        "id": "measure",
+        "label": "Measure",
+        "focus": ["groups", "proxy", "flip", "gate"],
+        "note": "Group and intersectional metrics with intervals, a proxy scan and a counterfactual flip test."
+      },
+      {
+        "id": "decide-and-watch",
+        "label": "Decide and watch",
+        "focus": ["gate", "results", "blocked", "live"],
+        "note": "The gate judges the interval, files the results, and the same metrics run on live decisions."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "l1", "label": "Layer 01 Govern-as-Code" },
+    { "id": "l3", "label": "Layer 03 Evals & Red Teaming as Evidence" },
+    { "id": "evidence", "label": "Evidence and monitoring" },
+    { "id": "blocked", "label": "Build fails", "variant": "exception" }
+  ],
+  "phases": [
+    { "id": "decide", "label": "Policy", "fromCol": 0, "toCol": 0 },
+    { "id": "run", "label": "Run the suite", "fromCol": 1, "toCol": 3, "variant": "emphasis" },
+    { "id": "gate", "label": "Gate + file", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["policy", "groups", "proxy", "flip", "gate", "results"],
+  "nodes": [
+    { "id": "policy", "lane": "l1", "col": 0, "type": "external", "label": "Fairness policy", "sublabel": "metric, floor, min cell", "width": 170 },
+    { "id": "groups", "lane": "l3", "col": 1, "type": "backend", "label": "Group metrics", "sublabel": "incl. intersections", "tag": "with intervals", "width": 164 },
+    { "id": "proxy", "lane": "l3", "col": 2, "type": "backend", "label": "Proxy scan", "sublabel": "features predict group?", "width": 170 },
+    { "id": "flip", "lane": "l3", "col": 3, "type": "backend", "label": "Counterfactual flip", "sublabel": "change only the group", "width": 168 },
+    { "id": "gate", "lane": "l3", "col": 4, "type": "security", "label": "Gate on the interval", "sublabel": "small cells listed", "tag": "pass / fail", "width": 168 },
+    { "id": "results", "lane": "evidence", "col": 5, "type": "database", "label": "Eval results", "sublabel": "per metric and slice", "width": 164 },
+    { "id": "live", "lane": "evidence", "col": 4, "type": "backend", "label": "Live monitoring", "sublabel": "same metrics, rolling", "width": 168 },
+    { "id": "blocked", "lane": "blocked", "col": 5, "type": "backend", "label": "Release blocked", "sublabel": "unless justified", "width": 160 }
+  ],
+  "edges": [
+    { "id": "policy-groups", "from": "policy", "to": "groups", "label": "configure", "variant": "default" },
+    { "id": "groups-proxy", "from": "groups", "to": "proxy", "label": "then", "variant": "emphasis" },
+    { "id": "proxy-flip", "from": "proxy", "to": "flip", "label": "then", "variant": "emphasis" },
+    { "id": "flip-gate", "from": "flip", "to": "gate", "label": "scores", "variant": "emphasis" },
+    { "id": "gate-results", "from": "gate", "to": "results", "label": "file", "variant": "emphasis" },
+    { "id": "gate-blocked", "from": "gate", "to": "blocked", "label": "below floor", "variant": "security", "role": "error" },
+    { "id": "gate-live", "from": "gate", "to": "live", "label": "after release", "variant": "dashed", "role": "branch" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Choose, then measure",
+      "items": [
+        "Common fairness criteria conflict, so the metric is a decision with an owner",
+        "The policy names the metric, the threshold, the minimum cell and the approver",
+        "Commit it before looking at the next run"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Intervals, not points",
+      "items": [
+        "Every rate and ratio carries a confidence interval",
+        "Cells below the minimum are reported as insufficient data, never as passes",
+        "Search for the worst slice, not only the listed groups"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Release and after",
+      "items": [
+        "Results feed the model card's disaggregated metrics",
+        "The same metrics run on live decisions so drift raises an alert"
+      ]
+    }
+  ]
+}

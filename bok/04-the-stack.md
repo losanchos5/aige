@@ -189,14 +189,21 @@ screenshot pasted into a slide.
 - A failing eval blocks the deploy; the gate has teeth, not just a report.
 - Every eval run emits a structured result (suite id, model version, score, threshold, pass/fail,
   timestamp) filed against the registry entry.
-- Thresholds trace to a named failure mode or obligation, not to a round number chosen for comfort.
+- Thresholds trace to a named failure mode or obligation, not to a round number chosen for comfort,
+  and the certainty they demand follows the risk tier (chapter 11 sets the
+  [certainty required by risk tier](/bok/ai-defined#certainty-required-by-risk-tier); chapter 14
+  sizes the suite for the [statistical validity of evals](/bok/governing-development#statistical-validity-of-evals)).
 
 **Anti-patterns.**
 
 - The one-off pre-launch evaluation whose results are pasted into a slide and never re-run when the
   model or its prompts change.
 - The "risk review board" that rates findings low/medium/high monthly but has no mechanism to stop a
-  launch already scheduled: recommendation without consequence.
+  launch already scheduled: recommendation without consequence. The fix is a committee that
+  decides what code cannot while the gates enforce the decision
+  ([the committee decides, the gates enforce](/bok/governance-program#the-committee-decides-the-gates-enforce),
+  chapter 12), with the risk appetite
+  [compiled into gates](/bok/risk-management#risk-appetite-and-tolerance-compiled-into-gates) (chapter 13).
 
 **Evidence to the next layer.** An eval proves the system was safe *at test time*. The system then
 meets inputs no eval anticipated. Layer 04 carries the same thresholds into production as runtime
@@ -225,7 +232,9 @@ an agent without breaking the fleet. Register and bound every actor before it ac
 before it has an identity, an owner and a scope. A **guardian agent**, an agent whose job is to
 review, constrain or stop other agents at runtime, is one way to build the mediation point; it is
 itself an agent, so it needs its own identity, scope and kill switch, and its decisions are evidence
-like any other guardrail's [16].
+like any other guardrail's [16]. Chapter 23 treats
+[governing AI agents](/bok/governing-agents#what-makes-an-agent-a-governance-object) end to end, including
+[identity, delegation and MCP authorization for agents](/bok/governing-agents#identity-and-short-lived-credentials).
 
 **Reference tools and standards (illustrative).** Guardrail frameworks such as NVIDIA NeMo Guardrails,
 Meta LlamaFirewall and Lakera enforce input/output and tool-call policy; observability tools such as
@@ -317,7 +326,8 @@ system but does not by itself satisfy it, and confers no presumption of conformi
 - An auditor's question is answered by a query against the evidence store, not an evidence-collection
   sprint.
 - A serious-incident pipeline can detect, triage and report on the clock, with the Art. 73 timelines
-  encoded, not remembered.
+  encoded, not remembered (chapter 17 walks
+  [the response lifecycle](/bok/incidents#the-response-lifecycle)).
 - The assurance store measures realised risk reduction (the failure-mode rate, the time-to-detect,
   the blast radius), not framework coverage.
 
@@ -348,14 +358,22 @@ corpora, prompts and outputs each carry a lawful basis, a provenance, a retentio
 rights, and each is an object the stack must be able to name. In layer 02 this is the **data card** and
 the lineage record (where a dataset came from, what it may be used for, when it must be deleted),
 attached to the registry entry beside the model card. In layer 01 it is retention-and-residency policy
-as code. In layer 03 it is data-quality and bias tests run against the set, not assumed of it. The EU
+as code, with [privacy by design and privacy-enhancing technologies](/bok/privacy-and-ai#minimisation-privacy-by-design-and-pets)
+(chapter 19) where personal data is involved. In layer 03 it is data-quality and bias tests run
+against the set, not assumed of it, behind a
+[dataset admission gate](/bok/governing-development#data-for-training-and-testing) (chapter 14);
+chapter 16 sets out
+[the data you need to test for bias](/bok/fairness-and-explainability#protected-characteristics-proxies-and-the-data-you-need-to-test).
+The EU
 AI Act treats this as a first-class duty: Article 10 requires representative, relevant and
 error-checked datasets for high-risk systems, and the post-Omnibus Article 4a gives a narrow lawful
 basis to process special-category data *for bias detection*, conditioned on pseudonymisation and
 deletion once bias is corrected (see chapter 08). The engineering commitment is that a RAG corpus is
 governed like a model: versioned, its provenance and licence recorded in the AIBOM, its snapshot tied
 to the eval that tested the system on it, so "what was in the corpus when this answer was produced?" is
-a query, not a guess. Data with no card, no lineage and no retention rule is the ungoverned object that
+a query, not a guess. Prompts, retrieved passages and outputs at run time need the same rules
+([inference-time data governance](/bok/governing-deployment#inference-time-data-governance),
+chapter 15). Data with no card, no lineage and no retention rule is the ungoverned object that
 makes every layer above it unprovable.
 
 ## Designing human oversight (Article 14)
@@ -371,9 +389,13 @@ a reviewer who sees a confident machine output will tend to confirm it, so overs
 that a person can clear in two seconds under load will be cleared in two seconds, and its quality falls
 silently as volume rises. The engineering answer is to classify actions by consequence and place a
 designed checkpoint only where the stakes justify the latency (the
-[**Human-in-the-loop Gate**](/bok/patterns#pattern-human-in-the-loop-gate) pattern in chapter 05), giving the reviewer enough context to disagree, logging the approver and the decision as
+[**Human-in-the-loop Gate**](/patterns/human-in-the-loop-gate) pattern in chapter 05), giving the reviewer enough context to disagree, logging the approver and the decision as
 evidence, and monitoring the oversight itself (approval rate, time-to-decide, override rate) as a
-signal that can degrade. Oversight you do not measure is oversight you cannot claim.
+signal that can degrade. Oversight you do not measure is oversight you cannot claim. The EU High-Level
+Expert Group's [human-in-the-loop, on-the-loop and in-command](/bok/principles-and-standards#eu-hleg-guidelines-and-altai)
+approaches (chapter 22) name the placement choices, and chapter 16 tests whether explanations
+actually help reviewers resist automation bias
+([testing explanation quality](/bok/fairness-and-explainability#testing-explanation-quality)).
 
 ## Third-party and procured AI
 
@@ -387,12 +409,16 @@ behaviour. The layers do not disappear, but layer 03 shrinks to boundary evals a
 vendor's own evidence, and layer 04 shrinks to the perimeter you control. What grows to compensate is
 inventory and assurance: the vendor's system still needs a registry entry, an owner and a scope; its
 supplier documentation, model card and any AIBOM become evidence you collect rather than produce; and
-the due-diligence itself becomes a gate. This is the
-[**Vendor / Model Due-Diligence Gate**](/bok/patterns#pattern-vendor--model-due-diligence-gate)
+the due-diligence itself becomes a gate, written into a
+[third-party AI policy](/bok/governance-program#third-party-ai-policy) (chapter 12). This is the
+[**Vendor / Model Due-Diligence Gate**](/patterns/vendor-model-due-diligence-gate)
 pattern (chapter 05), anchored in ISO/IEC 42001 Annex A.10 (third-party and customer relationships) and the EU
-AI Act's split of duties between provider and deployer (see chapter 08). The rule of thumb: the less of
-the model you own, the more of your control budget moves from testing it to bounding it and evidencing
-the supplier.
+AI Act's split of duties between provider and deployer (see chapter 08, and
+[who you are in the value chain](/bok/eu-ai-act#who-you-are-in-the-value-chain) in chapter 18). The
+rule of thumb: the less of the model you own, the more of your control budget moves from testing it
+to bounding it and evidencing the supplier. Chapter 15 covers the
+[build, buy or adapt](/bok/governing-deployment#build-buy-or-adapt) decision and its evidence burden,
+and chapter 20 the [licences and indemnities of procured models](/bok/existing-law#model-licences-and-vendor-indemnities).
 
 ## The cost of the stack
 
@@ -410,7 +436,7 @@ the first budget round, which is its own governance failure.
 ## The minimum viable stack for a team of one
 
 Most AI governance functions are small, and many are a single person: in the adjacent GRC discipline,
-roughly half of teams are four people or fewer and about one in six is a team of one [14]. A team of
+roughly half of teams are four people or fewer and nearly one in five (18.5%) is a team of one [14]. A team of
 one cannot build all five layers at depth, but it can build the spine thinly, end to end: one vertical
 slice that touches every layer beats one layer built out and four left on paper. Start where the
 leverage is highest and the cost is lowest:
@@ -432,13 +458,15 @@ leverage is highest and the cost is lowest:
 The order is deliberate: see it, rule it, test it, contain it, prove it. A thin vertical slice answers
 all three questions for one system today and widens as the team grows. The alternative, a thick layer
 01 of policies with no inventory beneath them, answers none of the three questions, and is exactly the
-framework theatre the discipline exists to end.
+framework theatre the discipline exists to end. How much of the risk loop a small function runs is
+set by chapter 13's [tailoring matrix](/bok/risk-management#the-tailoring-matrix).
 
 ## One system through the five layers
 
 `csa-01`, the customer-service assistant from the boxes above, is one system, not five. Below is the
 single artefact it produces at each layer: short excerpts of the schemas defined in chapter 05, each
-illustrative.
+illustrative. Full JSON Schemas with filled examples for these records, and
+[how to use them](/resources/templates#tpl-how), are on the templates page.
 
 **Layer 01: Govern-as-Code.** A Policy Card verdict (illustrative):
 
@@ -477,6 +505,20 @@ illustrative.
 ```
 
 The five excerpts are one data path from policy to proof, keyed on the same registry id.
+
+## What you can do this week
+
+1. **Draw one slice.** Pick one system and write down, for each of the five layers, the one artefact
+   it produces today and the one it lacks. The gaps are your backlog, in build order.
+2. **Wire the registry to the deploy.** Make one deployment pipeline write the registry entry (id,
+   owner, scope, expiry) and fail when a field is empty.
+3. **Give one policy teeth.** Move one rule that matters, a registered owner or a data-residency
+   check, into code in the pipeline, blocking on failure, and log every verdict with its rule id.
+4. **Gate one release on one eval.** Put one adversarial eval against your highest-risk agent in CI,
+   with a threshold traced to a named failure mode, so a regression fails the build.
+5. **Drill one stop and keep the record.** Trip the kill switch on one agent in staging, time the
+   stop, and check that the stop and the guardrail events reached one evidence store, keyed to the
+   registry id.
 
 ## Sources
 

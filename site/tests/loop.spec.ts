@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { chaptersOrdered } from '../src/data/chapters';
 
 // The home governance loop (GovernanceLoop.astro + public/loop.js) and the
 // home's section backgrounds. The loop replaced an archify figure whose hover
@@ -344,8 +345,14 @@ test.describe('home section backgrounds', () => {
     expect(find('A build order')).toMatchObject({ tone: 'tint', variant: 'a', opacity: 0.35 });
     expect(find('Eight values')).toMatchObject({ tone: 'mesh', variant: 'b', opacity: 0.45 });
     expect(find('The role is')).toMatchObject({ tone: 'mesh', variant: 'a', opacity: 0.6 });
-    expect(find('Eleven chapters')).toMatchObject({ tone: 'mesh', variant: 'c', opacity: 0.45 });
+    // The chapters section's title counts the chapters from the data.
+    expect(find(`${chaptersOrdered.length} chapters`)).toMatchObject({
+      tone: 'mesh',
+      variant: 'c',
+      opacity: 0.45,
+    });
     expect(find('Curated resources')).toMatchObject({ tone: 'tint', variant: 'b', opacity: 0.35 });
+    expect(find('Follow the changes')).toMatchObject({ tone: 'mesh', variant: 'c', opacity: 0.35 });
     // Only the dark verdict band has neither a tint nor a mesh.
     expect(sections.filter((s) => s.tone === 'plain')).toHaveLength(0);
     for (let i = 1; i < sections.length; i++) {

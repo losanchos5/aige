@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 482" class="figc" role="img" aria-labelledby="fig-provenance-lineage-t fig-provenance-lineage-d">
+  <title id="fig-provenance-lineage-t">Provenance and lineage</title>
+  <desc id="fig-provenance-lineage-d">Provenance records where a dataset came from and on what terms; lineage traces it through pipeline jobs and runs, backward from a model to its sources and forward from a dataset to every model that used it.</desc>
+
+  <text class="mono muted" x="16" y="20" font-size="13.5">Where data came from, where it went</text>
+
+  <!-- Source: provenance -->
+  <rect class="panel" x="112" y="34" width="136" height="46" rx="8"/>
+  <text class="disp" x="180" y="53" font-size="14.5" text-anchor="middle">Source</text>
+  <text class="ink2" x="180" y="71" font-size="13" text-anchor="middle">licence, rights</text>
+  <text class="disp" x="268" y="50" font-size="13.5">Provenance</text>
+  <text class="ink2" x="268" y="68" font-size="13">where from,</text>
+  <text class="ink2" x="268" y="86" font-size="13">on what terms</text>
+  <line class="stroke-arrow" x1="180" y1="80" x2="180" y2="92"/>
+  <path class="arrow" d="M174 92 h12 l-6 9 z"/>
+
+  <!-- Dataset (store glyph) -->
+  <rect class="panel" x="112" y="104" width="136" height="46" rx="8"/>
+  <ellipse class="glyph" cx="130" cy="117" rx="8" ry="3"/>
+  <path class="glyph" d="M122 117 v13 a8 3 0 0 0 16 0 v-13"/>
+  <text class="disp" x="148" y="124" font-size="14.5">Dataset</text>
+  <text class="ink2" x="148" y="141" font-size="13">datasheet</text>
+  <line class="stroke-arrow" x1="180" y1="150" x2="180" y2="162"/>
+  <path class="arrow" d="M174 162 h12 l-6 9 z"/>
+
+  <!-- Pipeline -->
+  <rect class="panel" x="112" y="174" width="136" height="46" rx="8"/>
+  <text class="disp" x="180" y="193" font-size="14.5" text-anchor="middle">Pipeline</text>
+  <text class="ink2" x="180" y="211" font-size="13" text-anchor="middle">jobs and runs</text>
+  <path class="stroke-arrow" d="M180 220 V230 M144 230 H216 M144 230 V238 M216 230 V238"/>
+  <path class="arrow" d="M138 238 h12 l-6 9 z"/>
+  <path class="arrow" d="M210 238 h12 l-6 9 z"/>
+
+  <!-- Two models (model hexagons) -->
+  <path class="glyph" d="M122 250 h44 l10 17 l-10 17 h-44 l-10 -17 z"/>
+  <text x="144" y="272" font-size="13" text-anchor="middle">Model A</text>
+  <path class="glyph" d="M194 250 h44 l10 17 l-10 17 h-44 l-10 -17 z"/>
+  <text x="216" y="272" font-size="13" text-anchor="middle">Model B</text>
+
+  <!-- Backward lineage: from a model up to its sources -->
+  <path class="stroke-arrow" d="M112 267 H100 V57 H103"/>
+  <path class="arrow" d="M103 51 v12 l9 -6 z"/>
+  <text class="disp" x="8" y="148" font-size="13.5">Backward</text>
+  <text class="ink2" x="8" y="166" font-size="13">what fed</text>
+  <text class="ink2" x="8" y="184" font-size="13">this model?</text>
+
+  <!-- Forward lineage: from a dataset down to the models that used it -->
+  <path class="stroke-arrow" d="M248 127 H260 V267 H257"/>
+  <path class="arrow" d="M257 261 v12 l-9 -6 z"/>
+  <text class="disp" x="268" y="170" font-size="13.5">Forward</text>
+  <text class="ink2" x="268" y="188" font-size="13">which models</text>
+  <text class="ink2" x="268" y="206" font-size="13">used this</text>
+  <text class="ink2" x="268" y="224" font-size="13">dataset?</text>
+
+  <text class="ink2" x="16" y="312" font-size="13">An erasure request or a licence withdrawal</text>
+  <text class="ink2" x="16" y="330" font-size="13">asks the forward question.</text>
+
+  <!-- Granularity, by where rights attach -->
+  <text class="mono muted" x="16" y="358" font-size="13">Granularity, by where rights attach</text>
+  <text class="ink2" x="16" y="378" font-size="13">Dataset level: the default</text>
+  <text class="ink2" x="16" y="396" font-size="13">Record level: rights attach to records</text>
+  <text class="ink2" x="16" y="414" font-size="13">Feature level: sensitive derived proxies</text>
+
+  <!-- Evidence: lineage events (document with a check) -->
+  <rect class="panel" x="8" y="426" width="344" height="48" rx="10"/>
+  <path class="glyph" d="M20 437 h12 l5 5 v17 h-17 z"/>
+  <path class="glyph" d="M32 437 v5 h5"/>
+  <path class="glyph-check" d="M23 450 l3 3 l6 -7"/>
+  <text class="disp" x="48" y="447" font-size="14.5">Lineage events</text>
+  <text class="ink2" x="48" y="465" font-size="13">about datasets, jobs and runs</text>
+</svg>

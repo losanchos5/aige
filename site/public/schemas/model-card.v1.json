@@ -1,0 +1,647 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/model-card.v1.json",
+  "title": "Model card",
+  "description": "A model or system card as a record: what the model is, what it is for and not for, the data it was built and tested on, how it performs across groups and conditions, its limits, and the links to the rest of the technical file. The same record renders a Hugging Face style card and a CycloneDX ML-BOM component, so the card an auditor reads is the card production produced.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 11",
+    "EU AI Act Annex IV",
+    "EU AI Act Art. 13",
+    "EU AI Act Art. 53(1)(a)",
+    "EU AI Act Art. 53(1)(b)",
+    "ISO/IEC 42001 A.6",
+    "ISO/IEC 42001 A.8",
+    "NIST AI RMF MAP 1.1",
+    "NIST AI RMF MEASURE 2.1"
+  ],
+  "x-layer": [
+    2
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-model-card-as-control-evidence",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-aibom"
+  ],
+  "x-lifecycle-stage": "build",
+  "x-recommended": [
+    "intended_uses",
+    "out_of_scope_uses",
+    "datasets",
+    "metrics",
+    "limitations",
+    "contact"
+  ],
+  "type": "object",
+  "required": [
+    "name",
+    "version",
+    "developer"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/model-card.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "name": {
+      "type": "string",
+      "description": "Model or system name, as the registry and the card title use it.",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "description": "Version the card describes (a semantic version, a date or a build id). One card per version.",
+      "minLength": 1,
+      "x-evidences": [
+        "EU AI Act Annex IV"
+      ]
+    },
+    "registry_id": {
+      "type": "string",
+      "description": "Registry id of the model or system (the id of its register entry), so the card files against it."
+    },
+    "developer": {
+      "type": "string",
+      "description": "Organisation that developed the model and answers for the card (the provider, for the EU AI Act).",
+      "minLength": 1,
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(a)"
+      ]
+    },
+    "contact": {
+      "type": "string",
+      "description": "Contact for questions about the model: a role mailbox or a support page, not a person.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(a)"
+      ]
+    },
+    "summary": {
+      "type": "string",
+      "description": "The model in one sentence."
+    },
+    "description": {
+      "type": "string",
+      "description": "What the model is and does, in a paragraph.",
+      "x-evidences": [
+        "EU AI Act Annex IV"
+      ]
+    },
+    "license": {
+      "type": "string",
+      "description": "Licence of the model weights or service, as an SPDX identifier where one exists (for example \"apache-2.0\")."
+    },
+    "languages": {
+      "type": "array",
+      "description": "Natural languages the model handles (ISO 639-1 codes where possible).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "base_model": {
+      "type": "string",
+      "description": "The model it was fine-tuned or adapted from, if any."
+    },
+    "model_type": {
+      "type": "string",
+      "description": "Kind of model (for example \"gradient-boosted trees\" or \"decoder-only transformer\")."
+    },
+    "task": {
+      "type": "string",
+      "description": "The task it performs (for example \"binary classification\" or \"text generation\")."
+    },
+    "architecture_family": {
+      "type": "string",
+      "description": "Architecture family (for example \"transformer\" or \"convolutional neural network\").",
+      "x-evidences": [
+        "EU AI Act Annex IV"
+      ]
+    },
+    "architecture": {
+      "type": "string",
+      "description": "Specific architecture (for example \"ResNet-50\")."
+    },
+    "learning_approach": {
+      "type": "string",
+      "enum": [
+        "supervised",
+        "unsupervised",
+        "reinforcement-learning",
+        "semi-supervised",
+        "self-supervised"
+      ],
+      "description": "Overall learning approach, with the CycloneDX model card values."
+    },
+    "library": {
+      "type": "string",
+      "description": "Main library or framework the model is built with."
+    },
+    "tags": {
+      "type": "array",
+      "description": "Free tags for search and grouping.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "repository": {
+      "type": "string",
+      "format": "uri",
+      "description": "Source repository or model hub page."
+    },
+    "paper": {
+      "type": "string",
+      "format": "uri",
+      "description": "Paper or technical report, if any."
+    },
+    "intended_uses": {
+      "type": "array",
+      "description": "Intended uses: the tasks and contexts the model is for.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)",
+        "NIST AI RMF MAP 1.1"
+      ]
+    },
+    "users": {
+      "type": "array",
+      "description": "Intended users (roles, not names).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "NIST AI RMF MAP 1.1"
+      ]
+    },
+    "downstream_use": {
+      "type": "string",
+      "description": "How the model may be integrated into other systems or fine-tuned, and on what terms.",
+      "x-evidences": [
+        "EU AI Act Art. 53(1)(b)"
+      ]
+    },
+    "out_of_scope_uses": {
+      "type": "array",
+      "description": "Uses the model is not for, including reasonably foreseeable misuse.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "datasets": {
+      "type": "array",
+      "description": "Datasets used to train, validate, test or fine-tune the model.",
+      "items": {
+        "type": "object",
+        "description": "One dataset.",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Dataset name or id (a dataset card id where one exists).",
+            "minLength": 1
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "training",
+              "validation",
+              "testing",
+              "fine_tuning",
+              "other"
+            ],
+            "description": "What the dataset was used for."
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Link to the dataset or its data card."
+          },
+          "description": {
+            "type": "string",
+            "description": "Provenance, scope and known gaps, in a sentence or two."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "EU AI Act Annex IV",
+        "ISO/IEC 42001 A.7"
+      ]
+    },
+    "training_data": {
+      "type": "string",
+      "description": "Training data: sources, provenance, selection and known gaps.",
+      "x-evidences": [
+        "EU AI Act Annex IV",
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "preprocessing": {
+      "type": "string",
+      "description": "Preprocessing, labelling and cleaning applied to the data."
+    },
+    "training_procedure": {
+      "type": "string",
+      "description": "Training procedure: methods, key design choices and the compute used.",
+      "x-evidences": [
+        "EU AI Act Annex IV",
+        "EU AI Act Art. 53(1)(a)"
+      ]
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Input formats the model accepts.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "outputs": {
+      "type": "array",
+      "description": "Output formats the model produces.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "evaluation_data": {
+      "type": "string",
+      "description": "Testing data: what it is and why it represents the intended use.",
+      "x-evidences": [
+        "NIST AI RMF MEASURE 2.1"
+      ]
+    },
+    "metrics": {
+      "type": "array",
+      "description": "Performance results, overall and by slice (group or condition).",
+      "items": {
+        "type": "object",
+        "description": "One result.",
+        "required": [
+          "type",
+          "value"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Metric (for example \"accuracy\", \"AUC\" or \"false positive rate\").",
+            "minLength": 1
+          },
+          "value": {
+            "type": "string",
+            "description": "Result, as text so units and precision are kept.",
+            "minLength": 1
+          },
+          "slice": {
+            "type": "string",
+            "description": "Group or condition the result is for; empty for overall."
+          },
+          "lower_bound": {
+            "type": "string",
+            "description": "Lower bound of the confidence interval."
+          },
+          "upper_bound": {
+            "type": "string",
+            "description": "Upper bound of the confidence interval."
+          },
+          "dataset": {
+            "type": "string",
+            "description": "Dataset the result was measured on."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)",
+        "NIST AI RMF MEASURE 2.1"
+      ]
+    },
+    "metrics_rationale": {
+      "type": "string",
+      "description": "Why these metrics fit the intended purpose, and the thresholds they were held to.",
+      "x-evidences": [
+        "EU AI Act Annex IV"
+      ]
+    },
+    "fairness_assessments": {
+      "type": "array",
+      "description": "Assessments of groups at risk: benefits, harms and the mitigation.",
+      "items": {
+        "type": "object",
+        "description": "One group assessed.",
+        "required": [
+          "group_at_risk"
+        ],
+        "properties": {
+          "group_at_risk": {
+            "type": "string",
+            "description": "The group assessed.",
+            "minLength": 1
+          },
+          "benefits": {
+            "type": "string",
+            "description": "Expected benefits to the group."
+          },
+          "harms": {
+            "type": "string",
+            "description": "Expected or observed harms to the group."
+          },
+          "mitigation": {
+            "type": "string",
+            "description": "How the harms are mitigated."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "NIST AI RMF MEASURE 2.11"
+      ]
+    },
+    "limitations": {
+      "type": "array",
+      "description": "Known technical limitations, including conditions under which performance drops.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "tradeoffs": {
+      "type": "array",
+      "description": "Performance trade-offs made on purpose.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "ethical_considerations": {
+      "type": "array",
+      "description": "Risks to people and society, each with its mitigation.",
+      "items": {
+        "type": "object",
+        "description": "One consideration.",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The risk or consideration.",
+            "minLength": 1
+          },
+          "mitigation": {
+            "type": "string",
+            "description": "How it is mitigated."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "recommendations": {
+      "type": "string",
+      "description": "Recommendations for users and deployers."
+    },
+    "human_oversight": {
+      "type": "string",
+      "description": "Human oversight measures, including the technical measures that help people interpret the outputs.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(d)",
+        "EU AI Act Art. 14"
+      ]
+    },
+    "explainability": {
+      "type": "string",
+      "description": "What the system provides to explain its output.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "output_interpretation": {
+      "type": "string",
+      "description": "How to interpret the output and use it appropriately.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "predetermined_changes": {
+      "type": "string",
+      "description": "Changes to the model and its performance that were planned in advance, and how they are controlled.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(c)"
+      ]
+    },
+    "compute_and_lifetime": {
+      "type": "string",
+      "description": "Compute and hardware needed, expected lifetime, and maintenance and update measures.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(e)"
+      ]
+    },
+    "logging": {
+      "type": "string",
+      "description": "How logs are produced, collected, stored and read.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(f)",
+        "EU AI Act Art. 12"
+      ]
+    },
+    "cybersecurity": {
+      "type": "string",
+      "description": "Robustness and cybersecurity measures, and the attacks tested.",
+      "x-evidences": [
+        "EU AI Act Annex IV",
+        "EU AI Act Art. 15"
+      ]
+    },
+    "environmental": {
+      "type": "object",
+      "description": "Environmental impact of training and operation.",
+      "properties": {
+        "hardware": {
+          "type": "string",
+          "description": "Hardware type used for training."
+        },
+        "hours": {
+          "type": "string",
+          "description": "Hours of training compute."
+        },
+        "cloud_provider": {
+          "type": "string",
+          "description": "Cloud provider, if any."
+        },
+        "region": {
+          "type": "string",
+          "description": "Compute region."
+        },
+        "energy_kwh": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Known or estimated energy consumed in training, in kWh."
+        },
+        "co2_emitted": {
+          "type": "string",
+          "description": "Carbon emitted, with its unit and method (for example \"120 kg CO2eq, location-based\")."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "NIST AI RMF MEASURE 2.12"
+      ]
+    },
+    "applicability": {
+      "type": "object",
+      "description": "Which documentation duties the card is read against. Drives the coverage checklist.",
+      "properties": {
+        "high_risk": {
+          "type": "boolean",
+          "description": "Part of a high-risk AI system under the EU AI Act (Art. 11 and Art. 13 apply)."
+        },
+        "gpai": {
+          "type": "boolean",
+          "description": "A general-purpose AI model under the EU AI Act (Art. 53 applies)."
+        }
+      },
+      "additionalProperties": false
+    },
+    "gpai": {
+      "type": "object",
+      "description": "For a general-purpose AI model: the Art. 53 documentation, by link.",
+      "properties": {
+        "technical_documentation": {
+          "type": "string",
+          "format": "uri",
+          "description": "Technical documentation of the model for the AI Office and national authorities (Annex XI).",
+          "x-evidences": [
+            "EU AI Act Art. 53(1)(a)"
+          ]
+        },
+        "downstream_information": {
+          "type": "string",
+          "format": "uri",
+          "description": "Information and documentation for downstream providers (Annex XII).",
+          "x-evidences": [
+            "EU AI Act Art. 53(1)(b)"
+          ]
+        },
+        "copyright_policy": {
+          "type": "string",
+          "format": "uri",
+          "description": "Policy to comply with Union copyright law.",
+          "x-evidences": [
+            "EU AI Act Art. 53(1)(c)"
+          ]
+        },
+        "training_content_summary": {
+          "type": "string",
+          "format": "uri",
+          "description": "Public summary of the content used for training, on the AI Office template.",
+          "x-evidences": [
+            "EU AI Act Art. 53(1)(d)"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "links": {
+      "type": "object",
+      "description": "The rest of the technical file, by link: the card is one part of it.",
+      "properties": {
+        "instructions_for_use": {
+          "type": "string",
+          "format": "uri",
+          "description": "Instructions for use for deployers.",
+          "x-evidences": [
+            "EU AI Act Art. 13"
+          ]
+        },
+        "risk_management": {
+          "type": "string",
+          "format": "uri",
+          "description": "Risk management record or risk register.",
+          "x-evidences": [
+            "EU AI Act Annex IV"
+          ]
+        },
+        "impact_assessment": {
+          "type": "string",
+          "format": "uri",
+          "description": "Impact assessment (AIIA, DPIA addendum or FRIA).",
+          "x-evidences": [
+            "ISO/IEC 42001 A.5"
+          ]
+        },
+        "post_market_monitoring": {
+          "type": "string",
+          "format": "uri",
+          "description": "Post-market monitoring plan and performance evaluation.",
+          "x-evidences": [
+            "EU AI Act Annex IV"
+          ]
+        },
+        "declaration_of_conformity": {
+          "type": "string",
+          "format": "uri",
+          "description": "EU declaration of conformity, where one exists.",
+          "x-evidences": [
+            "EU AI Act Annex IV"
+          ]
+        },
+        "aibom": {
+          "type": "string",
+          "format": "uri",
+          "description": "The AIBOM the card is part of (for example a CycloneDX ML-BOM).",
+          "x-evidences": [
+            "EU AI Act Art. 11"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "standards_applied": {
+      "type": "array",
+      "description": "Harmonised standards or other specifications applied, in full or in part.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Annex IV"
+      ]
+    },
+    "change_log": {
+      "type": "string",
+      "description": "Relevant changes since the previous version of the card.",
+      "x-evidences": [
+        "EU AI Act Annex IV"
+      ]
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date",
+      "description": "When the card was last updated."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

@@ -33,6 +33,42 @@ test.describe('Body of Knowledge chapters', () => {
       expect(order).toBeTruthy();
     });
   }
+
+  test('every chapter but the glossary names five to ten key terms', () => {
+    for (const chapter of chaptersOrdered) {
+      const count = chapter.keyTerms?.length ?? 0;
+      if (chapter.slug === 'glossary') {
+        expect(count, chapter.id).toBe(0);
+        continue;
+      }
+      expect(count, chapter.id).toBeGreaterThanOrEqual(5);
+      expect(count, chapter.id).toBeLessThanOrEqual(10);
+      expect(new Set(chapter.keyTerms).size, chapter.id).toBe(count);
+    }
+  });
+
+  for (const chapter of chaptersOrdered) {
+    const keyTerms = chapter.keyTerms ?? [];
+    if (keyTerms.length === 0) continue;
+    test(`/bok/${chapter.slug} lists its key terms as glossary links before the first H2`, async ({
+      page,
+    }) => {
+      await page.goto(`/bok/${chapter.slug}`);
+      const row = page.locator('article.prose > .key-terms');
+      await expect(row).toHaveCount(1);
+      await expect(row.locator('.key-terms-label')).toHaveText('Key terms in this chapter');
+      const hrefs = await row
+        .locator('a.term')
+        .evaluateAll((els) => els.map((el) => el.getAttribute('href') ?? ''));
+      expect(hrefs).toEqual(keyTerms.map((slug) => `/glossary/${slug}`));
+      const order = await page.evaluate(() => {
+        const k = document.querySelector('article.prose > .key-terms');
+        const h2 = document.querySelector('article.prose h2');
+        return k && h2 ? k.compareDocumentPosition(h2) & Node.DOCUMENT_POSITION_FOLLOWING : 0;
+      });
+      expect(order).toBeTruthy();
+    });
+  }
 });
 
 test.describe('the-stack pipeline output', () => {

@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import { chaptersOrdered } from '../src/data/chapters';
+import { bookParts, countWord } from '../src/data/parts';
 
 test.describe('home page', () => {
   test('hero shows the headline and its CTA; the loop section links the BoK', async ({ page }) => {
@@ -61,9 +63,55 @@ test.describe('home page', () => {
     await expect(page.locator('[data-testid="value-pair"]')).toHaveCount(8);
   });
 
-  test('the Body of Knowledge renders eleven chapter cards', async ({ page }) => {
+  test('the Body of Knowledge renders one card per part and links every chapter', async ({
+    page,
+  }) => {
     await page.goto('/');
-    await expect(page.locator('[data-testid="chapter-card"]')).toHaveCount(11);
+    const section = page.locator('.parts-sec');
+    // The title counts the chapters from the data; no hard-coded "Eleven".
+    await expect(section.locator('.sec-title')).toHaveText(
+      `${chaptersOrdered.length} chapters in ${countWord(bookParts.length)} parts, versioned and open.`,
+    );
+    await expect(section.locator('[data-testid="part-card"]')).toHaveCount(bookParts.length);
+    await expect(section.locator('[data-testid="chapter-link"]')).toHaveCount(
+      chaptersOrdered.length,
+    );
+    for (const chapter of chaptersOrdered) {
+      await expect(section.locator(`a[href="/bok/${chapter.slug}"]`)).toHaveCount(1);
+    }
+    // Each part title opens that part on the /bok index.
+    for (const part of bookParts) {
+      await expect(
+        section.getByRole('link', { name: part.title, exact: true }),
+      ).toHaveAttribute('href', `/bok#part-${part.id}`);
+    }
+    // The newer parts are named in the lede.
+    for (const id of ['foundations', 'lifecycle', 'law']) {
+      const title = bookParts.find((p) => p.id === id)!.title;
+      await expect(section.locator('.sec-lede')).toContainText(title);
+    }
+  });
+
+  test('the resource tiles include the topic crosswalk and the map', async ({ page }) => {
+    await page.goto('/');
+    const tiles = page.locator('.tiles');
+    await expect(tiles.locator('a[href="/resources/crosswalk"]')).toHaveCount(1);
+    await expect(tiles.locator('a[href="/map"]')).toHaveCount(1);
+  });
+
+  test('the newsletter form sits before the closing band, with its Umami event', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const form = page.locator('.nl-sec form.newsletter');
+    await expect(form).toHaveCount(1);
+    await expect(form).toHaveAttribute('action', /buttondown\.com/);
+    await expect(form.locator('input[type="email"]')).toHaveAttribute('id', 'nl-email-home');
+    const submit = form.locator('button[type="submit"]');
+    await expect(submit).toHaveAttribute('data-umami-event', 'newsletter-subscribe');
+    await expect(submit).toHaveAttribute('data-umami-event-location', 'home');
+    // Section order: resources, newsletter, then the closing band.
+    await expect(page.locator('.nl-sec + .band')).toHaveCount(1);
   });
 
   test('value cards are flat: no resting shadow and no lift (they are not links)', async ({ page }) => {

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/ai-system-register-entry.v1.json",
+  "id": "credit-afford-03",
+  "version": "3.2.0",
+  "owner": "team-retail-credit-models",
+  "scope": [
+    "credit:affordability-score",
+    "applications:read"
+  ],
+  "expiry": "2027-03-31",
+  "name": "Consumer loan affordability model",
+  "purpose": "Scores the affordability of consumer loan applications to support, not replace, a credit analyst's decision.",
+  "system_type": "ml_model",
+  "role": "provider_and_deployer",
+  "risk_classification": {
+    "eu_ai_act_category": "high_risk_annex_iii",
+    "annex_iii_point": "5(b)",
+    "internal_tier": "high",
+    "rationale": "Evaluates the creditworthiness of natural persons; not a fraud-detection use.",
+    "classification_record": "https://evidence.example.org/classification/credit-afford-03",
+    "decided_at": "2026-05-12"
+  },
+  "lifecycle_stage": "in_validation",
+  "use_case_record": "uc-2026-017",
+  "components": [
+    {
+      "type": "model",
+      "ref": "gbm-affordability",
+      "version": "3.2.0"
+    },
+    {
+      "type": "dataset",
+      "ref": "loan-apps-2019-2025",
+      "version": "2026-04-30"
+    }
+  ],
+  "aibom": "https://evidence.example.org/aibom/credit-afford-03/3.2.0.cdx.json",
+  "jurisdictions": [
+    "ES",
+    "PT"
+  ],
+  "personal_data": true,
+  "affected_persons": [
+    "consumer loan applicants"
+  ],
+  "human_oversight": "human_in_the_loop",
+  "eu_database_registration": {
+    "required": true
+  },
+  "evidence": [
+    "https://evidence.example.org/fria/fria-2026-004",
+    "https://evidence.example.org/test-reports/tr-credit-afford-03-3.2.0"
+  ],
+  "last_reviewed": "2026-09-15"
+}

@@ -7,8 +7,10 @@
 // Coverage: presence of every figure at every placement, the standalone viewer,
 // the strict-CSP promise (no inline JS), unique element ids on the page that
 // carries three figures, the highlight/pin/escape interaction (incl. reduced
-// motion), the in-chapter insertion point, and an axe sweep of two diagram
-// pages. Runs in the `default` project against dist/ served by preview.
+// motion), the insertion point on a pattern page, and an axe sweep of two
+// diagram pages. The pattern diagrams live on the pattern pages
+// (/patterns/<slug>, placed by data/diagrams.ts `pattern`), not in the chapter 05
+// catalogue. Runs in the `default` project against dist/ served by preview.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -26,14 +28,14 @@ const TITLES: Record<string, string> = {
 
 const IDS = Object.keys(TITLES);
 
-// Every place a figure is embedded: the three patterns in /bok/patterns, the
+// Every place a figure is embedded: three pattern pages under /patterns, the
 // role sequence in the chapter and on /role, the maturity lifecycle, and the two
 // dataflow/architecture figures that appear both in a chapter and on a resource
 // or marketing page.
 const PLACEMENTS: ReadonlyArray<{ id: string; route: string }> = [
-  { id: 'eval-gate-ci', route: '/bok/patterns' },
-  { id: 'incident-kill-switch', route: '/bok/patterns' },
-  { id: 'agent-identity-registry', route: '/bok/patterns' },
+  { id: 'eval-gate-ci', route: '/patterns/eval-gate-in-ci' },
+  { id: 'incident-kill-switch', route: '/patterns/incident-pipeline' },
+  { id: 'agent-identity-registry', route: '/patterns/agent-registry' },
   { id: 'role-workflows', route: '/bok/the-role' },
   { id: 'role-workflows', route: '/role' },
   { id: 'maturity-levels', route: '/bok/maturity-model' },
@@ -86,7 +88,7 @@ test.describe('standalone viewer', () => {
 // a data block (type contains "json"); anything else is an executable inline
 // script and a CSP violation.
 test.describe('CSP: no inline script', () => {
-  for (const route of ['/bok/patterns', '/role']) {
+  for (const route of ['/patterns/eval-gate-in-ci', '/role']) {
     test(`${route} has no inline JS`, async ({ page }) => {
       await page.goto(route);
       const offenders = await page.$$eval('script', (scripts) =>
@@ -104,25 +106,28 @@ test.describe('CSP: no inline script', () => {
 });
 
 // ---- 4. Unique ids ---------------------------------------------------------
-// The three SVGs on /bok/patterns each prefix their internal ids with <id>-, so
-// the document must have no duplicate ids at all.
-test('no duplicate element ids on /bok/patterns (three figures)', async ({ page }) => {
-  await page.goto('/bok/patterns');
-  const dupes = await page.evaluate(() => {
-    const seen = new Set<string>();
-    const dup = new Set<string>();
-    for (const el of Array.from(document.querySelectorAll('[id]'))) {
-      const id = (el as HTMLElement).id;
-      if (seen.has(id)) dup.add(id);
-      else seen.add(id);
-    }
-    return Array.from(dup);
+// Each SVG prefixes its internal ids with <id>-, so a page must have no
+// duplicate ids at all: a pattern page (one diagram plus the chapter chrome) and
+// chapter 04 (two diagrams and infographics on one page).
+for (const route of ['/patterns/eval-gate-in-ci', '/bok/the-stack']) {
+  test(`no duplicate element ids on ${route}`, async ({ page }) => {
+    await page.goto(route);
+    const dupes = await page.evaluate(() => {
+      const seen = new Set<string>();
+      const dup = new Set<string>();
+      for (const el of Array.from(document.querySelectorAll('[id]'))) {
+        const id = (el as HTMLElement).id;
+        if (seen.has(id)) dup.add(id);
+        else seen.add(id);
+      }
+      return Array.from(dup);
+    });
+    expect(dupes, `duplicate ids: ${dupes.join(', ')}`).toEqual([]);
   });
-  expect(dupes, `duplicate ids: ${dupes.join(', ')}`).toEqual([]);
-});
+}
 
 // ---- 5. Interaction --------------------------------------------------------
-// Exercise the eval-gate-ci figure on /bok/patterns: hover lights a connected
+// Exercise the eval-gate-ci figure on its pattern page: hover lights a connected
 // edge and marks the figure active; keyboard focus + Enter pins a node and fills
 // the note panel; Escape releases the pin.
 async function exerciseEvalGate(page: Page): Promise<void> {
@@ -151,25 +156,25 @@ async function exerciseEvalGate(page: Page): Promise<void> {
   await expect(node).toHaveAttribute('aria-pressed', 'false');
 }
 
-test.describe('interaction (eval-gate-ci on /bok/patterns)', () => {
+test.describe('interaction (eval-gate-ci on /patterns/eval-gate-in-ci)', () => {
   test('hover lights an edge, Enter pins, Escape releases', async ({ page }) => {
-    await page.goto('/bok/patterns');
+    await page.goto('/patterns/eval-gate-in-ci');
     await exerciseEvalGate(page);
   });
 
   test('still interactive with reduced motion', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/bok/patterns');
+    await page.goto('/patterns/eval-gate-in-ci');
     await exerciseEvalGate(page);
   });
 });
 
-// ---- 6. In-chapter placement ----------------------------------------------
-// The eval-gate-ci figure opens its pattern ('head' placement): its nearest
-// preceding heading is the H2 "Pattern: Eval Gate in CI" and the next heading
-// is that pattern's first H3, "Objectives".
-test('eval-gate-ci opens its pattern, under the H2 and above the first H3', async ({ page }) => {
-  await page.goto('/bok/patterns');
+// ---- 6. Placement on the pattern page ---------------------------------------
+// The eval-gate-ci figure opens its pattern page ('lead' placement with
+// `pattern`): no section heading precedes it (the H1 lives in the page header)
+// and the next heading is the pattern's first H2, "Objectives".
+test('eval-gate-ci opens its pattern page, above the first H2', async ({ page }) => {
+  await page.goto('/patterns/eval-gate-in-ci');
   const rel = await page.evaluate(() => {
     const fig = document.querySelector('figure.diagram[data-diagram="eval-gate-ci"]');
     if (!fig) return { prev: null as string | null, next: null as string | null, nextTag: null as string | null };
@@ -184,9 +189,9 @@ test('eval-gate-ci opens its pattern, under the H2 and above the first H3', asyn
     const txt = (el: Element | null) => (el ? (el.textContent || '').replace(/\s+/g, ' ').trim() : null);
     return { prev: txt(prev), next: txt(next), nextTag: next ? next.tagName.toLowerCase() : null };
   });
-  expect(rel.prev).toBe('Pattern: Eval Gate in CI');
+  expect(rel.prev).toBeNull();
   expect(rel.next).toBe('Objectives');
-  expect(rel.nextTag).toBe('h3');
+  expect(rel.nextTag).toBe('h2');
 });
 
 // ---- 6b. Lead figures open the chapter -------------------------------------
@@ -233,11 +238,11 @@ function rectsIntersect(
 }
 
 test.describe('breakout', () => {
-  test('the patterns figure is wider than the reading column and clears the TOC', async ({
+  test('the pattern figure is wider than the reading column and clears the TOC', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/bok/patterns');
+    await page.goto('/patterns/eval-gate-in-ci');
 
     const figure = page.locator('figure.diagram').first();
     await expect(figure).toBeVisible();
@@ -267,7 +272,7 @@ test.describe('breakout', () => {
 
   test('on a narrow phone the figure is not wider than the article', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/bok/patterns');
+    await page.goto('/patterns/eval-gate-in-ci');
     const figure = page.locator('figure.diagram').first();
     await expect(figure).toBeVisible();
     const figBox = await figure.boundingBox();
@@ -278,7 +283,7 @@ test.describe('breakout', () => {
 
 // ---- 7. Accessibility (axe) ------------------------------------------------
 test.describe('accessibility', () => {
-  for (const route of ['/bok/patterns', '/resources/tools']) {
+  for (const route of ['/patterns/eval-gate-in-ci', '/resources/tools']) {
     test(`${route} has no serious/critical axe violations`, async ({ page }) => {
       await page.goto(route);
       await page.waitForLoadState('domcontentloaded');
@@ -303,7 +308,7 @@ test.describe('enlarge', () => {
   test('Enlarge opens the dialog, focuses Close, stays interactive, axe-clean', async ({
     page,
   }) => {
-    await page.goto('/bok/patterns');
+    await page.goto('/patterns/eval-gate-in-ci');
     const figure = page.locator('figure.diagram[data-diagram="eval-gate-ci"]');
     await expect(figure).toHaveClass(/diagram-js/);
 
@@ -335,7 +340,7 @@ test.describe('enlarge', () => {
   test('Escape closes the dialog, restores the diagram, returns focus to Enlarge', async ({
     page,
   }) => {
-    await page.goto('/bok/patterns');
+    await page.goto('/patterns/eval-gate-in-ci');
     const figure = page.locator('figure.diagram[data-diagram="eval-gate-ci"]');
     await expect(figure).toHaveClass(/diagram-js/);
 

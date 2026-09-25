@@ -1,0 +1,96 @@
+[
+  {
+    "name": "complete card for the version is allowed",
+    "request": {
+      "principal": "Pipeline::\"release\"",
+      "action": "Action::\"release\"",
+      "resource": "System::\"credit-afford\"",
+      "context": {
+        "subject": "credit-afford@3.2.0",
+        "model_card": {
+          "model_version": "credit-afford@3.2.0",
+          "sections": [
+            "intended_use",
+            "limitations",
+            "evaluation",
+            "training_data-other"
+          ]
+        }
+      }
+    },
+    "entities": [],
+    "decision": "allow",
+    "reason": [
+      "pc-model-card-before-release.baseline"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "missing card is denied",
+    "request": {
+      "principal": "Pipeline::\"release\"",
+      "action": "Action::\"release\"",
+      "resource": "System::\"credit-afford\"",
+      "context": {
+        "subject": "credit-afford@3.2.0"
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "docs.model-card-present.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "missing section is denied",
+    "request": {
+      "principal": "Pipeline::\"release\"",
+      "action": "Action::\"release\"",
+      "resource": "System::\"credit-afford\"",
+      "context": {
+        "subject": "credit-afford@3.2.0",
+        "model_card": {
+          "model_version": "credit-afford@3.2.0",
+          "sections": [
+            "intended_use",
+            "limitations",
+            "training_data-other"
+          ]
+        }
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "docs.model-card-present.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "card for another version is denied",
+    "request": {
+      "principal": "Pipeline::\"release\"",
+      "action": "Action::\"release\"",
+      "resource": "System::\"credit-afford\"",
+      "context": {
+        "subject": "credit-afford@3.2.0",
+        "model_card": {
+          "model_version": "credit-afford@3.1.0",
+          "sections": [
+            "intended_use",
+            "limitations",
+            "evaluation",
+            "training_data-other"
+          ]
+        }
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "docs.model-card-present.v1"
+    ],
+    "num_errors": 0
+  }
+]

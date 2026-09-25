@@ -1,0 +1,10 @@
+{
+  "registry": "The registry entry holds the facts disclosures draw on: purpose, provider, version, jurisdictions, and whether the system talks to people, generates content or decides about them.",
+  "trigger": "An incident, a personal data breach, a material change, a deprecation or a retirement emits a trigger that starts a clock.",
+  "matrix": "The duty matrix maps registry facts and triggers to audiences, surfaces, templates and clocks, per jurisdiction.",
+  "templates": "Templates per audience and language live in version control; a template change is a reviewed diff, and holding statements exist in skeleton.",
+  "approve": "One owner approves what goes out, so the organisation speaks with one voice.",
+  "proactive": "Proactive disclosures: the AI-interaction notice, content labels, the transparency page and system card, and notices to workers and affected people.",
+  "reactive": "Triggered notifications to the provider, authorities, affected people, business customers and the public, each on its clock.",
+  "record": "Each notice sent records its audience, trigger, template version, approver, channel and timestamp."
+}

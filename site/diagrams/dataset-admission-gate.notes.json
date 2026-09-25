@@ -1,0 +1,9 @@
+{
+  "dataset": "A dataset version, with its data card and a content-addressed snapshot, submitted by the data owner and steward.",
+  "checks": "Admission checks: rights from the ledger, lawful basis, licence, quality, quantity per group, representativeness, bias examination and integrity.",
+  "record": "The admission record admits, admits with conditions or rejects the version for named pipelines and use cases, signed by the data owner.",
+  "policy": "A read-time policy denies any read the admission record does not permit for the job's use case and target system.",
+  "job": "A training, evaluation or retrieval-index job presents its use-case id and target system before it reads a byte.",
+  "evidence": "Each allowed read is logged and lineage joins the admission record to the run that used it.",
+  "denied": "A read with no admission for that use is denied and the attempt is recorded."
+}

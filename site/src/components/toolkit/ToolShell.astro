@@ -1,0 +1,132 @@
+---
+/**
+ * ToolShell: the one wrapper every /toolkit tool page renders in. It owns the
+ * parts a tool must not re-invent:
+ * - the page chrome: Base layout, a reference PageHero with the Toolkit
+ *   breadcrumb, and the page's JSON-LD (BreadcrumbList + WebApplication);
+ * - the fixed notice (`toolNotice` from data/toolkit.ts), above the form;
+ * - the no-JS note (`[data-tool-nojs]`, hidden by lib.js `mountTool`), while
+ *   the teaching content in the `guide` slot is server-rendered, so the page
+ *   still teaches without JavaScript;
+ * - the tool's data as a non-executable JSON island (`data-tool-data`) and its
+ *   client module `/toolkit/<id>.js`, an external same-origin file, as the CSP
+ *   (`script-src 'self'`, no inline scripts) requires;
+ * - print styles (toolkit.css): notice, result and guide print; chrome and
+ *   controls do not.
+ *
+ * Slots: default = the interactive tool (form, result, exports); `guide` = the
+ * teaching content; `sources` = the numbered sources list.
+ */
+import Base from '../../layouts/Base.astro';
+import PageHero from '../PageHero.astro';
+import { toolNotice, type ToolEntry } from '../../data/toolkit';
+import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
+import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { site } from '../../data/site';
+import '../../styles/resources.css';
+import './toolkit.css';
+
+interface Props {
+  tool: ToolEntry;
+  /** Meta description (50-160 characters). */
+  description: string;
+  /** H1 on the hero; defaults to the tool's title. */
+  heading?: string;
+  /** One or two sentences under the H1. */
+  lede: string;
+  /** Open Graph card; an existing /og/*.png. */
+  image?: string;
+  /** Serialisable data the client script reads from the JSON island. */
+  data?: unknown;
+  /** Override the client module (default `/toolkit/<id>.js`). */
+  script?: string;
+  /** What the tool needs JavaScript for, in the no-JS note. */
+  needsJs?: string;
+}
+
+const {
+  tool,
+  description,
+  heading,
+  lede,
+  image = '/og/default.png',
+  data,
+  script = `/toolkit/${tool.id}.js`,
+  needsJs = 'the live result and the exports',
+} = Astro.props;
+
+const crumbs: Crumb[] = [{ label: 'Toolkit', href: '/toolkit' }, { label: tool.title }];
+const pageUrl = new URL(tool.href, site.url).href;
+
+const jsonLd = [
+  breadcrumbJsonLd(crumbs),
+  {
+    '@type': 'WebApplication',
+    '@id': `${pageUrl}#app`,
+    name: tool.title,
+    description,
+    url: pageUrl,
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Any (runs in a web browser)',
+    browserRequirements: 'Requires JavaScript for the live result; the guide reads without it.',
+    isAccessibleForFree: true,
+    inLanguage: 'en',
+    creator: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    license: site.licenseUrl,
+    ...(tool.chapter ? { isBasedOn: new URL(tool.chapter.href, site.url).href } : {}),
+  },
+];
+
+// `<` is escaped so no string in the data can close the island early.
+const island = data === undefined ? null : JSON.stringify(data).replace(/</g, '\\u003c');
+---
+
+<Base title={tool.title} description={description} image={image} jsonLd={jsonLd}>
+  <PageHero variant="res" crumbs={crumbs} title={heading ?? tool.title} lede={lede} />
+
+  <div class="container tool-page" data-tool-page={tool.id} data-pagefind-body>
+    <div class="tool-top">
+      <p class="tool-notice" id="tool-notice" data-tool-notice>
+        <strong>{toolNotice}</strong>
+      </p>
+      <p class="tool-nojs" data-tool-nojs>
+        JavaScript is off or has not loaded, so {needsJs} are not available. The questions, the
+        criteria and the guide below still work as a worksheet you can read and fill in by hand.
+      </p>
+      {
+        tool.chapter && (
+          <p class="tool-built">
+            Built from <a href={tool.chapter.href}>{tool.chapter.label}</a> of the Body of
+            Knowledge. Runs entirely in this page: no account and no upload.
+          </p>
+        )
+      }
+    </div>
+
+    <div class="tool-app" data-tool-app={tool.id}>
+      <slot />
+    </div>
+
+    {
+      Astro.slots.has('guide') && (
+        <div class="tool-guide tool-block">
+          <slot name="guide" />
+        </div>
+      )
+    }
+
+    {
+      Astro.slots.has('sources') && (
+        <section class="tool-sources tool-block prose" aria-labelledby="tool-sources-title">
+          <h2 id="tool-sources-title">Sources</h2>
+          <slot name="sources" />
+        </section>
+      )
+    }
+  </div>
+
+  {island && <script is:inline type="application/json" data-tool-data set:html={island} />}
+  <script is:inline type="module" src={script}></script>
+</Base>

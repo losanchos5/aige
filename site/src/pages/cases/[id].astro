@@ -1,0 +1,248 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import CitedText from '../../components/CitedText.astro';
+import SourceList from '../../components/SourceList.astro';
+import { site } from '../../data/site';
+import { obligationPath } from '../../data/frameworks';
+import { layers } from '../../data/stack';
+import { harms, incidentDbLabel } from '../../data/harms';
+import {
+  cases,
+  caseEvidenceLabel,
+  casesDisclaimer,
+  type IncidentCase,
+} from '../../data/cases';
+import { citedNumbers } from '../../lib/sources';
+import { gitDate, gitCreated } from '../../lib/reading';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+import '../../styles/harms.css';
+
+export function getStaticPaths() {
+  return cases.map((c, i) => ({
+    params: { id: c.id },
+    props: {
+      entry: c,
+      prev: i > 0 ? cases[i - 1] : undefined,
+      next: i < cases.length - 1 ? cases[i + 1] : undefined,
+    },
+  }));
+}
+
+interface Props {
+  entry: IncidentCase;
+  prev?: IncidentCase;
+  next?: IncidentCase;
+}
+
+const { entry, prev, next } = Astro.props;
+
+// Build-time integrity: every [n] must have a source row, every source row must
+// be cited, and every harm id must exist in the atlas.
+const prose = [
+  ...entry.happened,
+  ...entry.failureMode,
+  ...entry.control.text,
+  ...entry.obligations.map((o) => o.why),
+];
+const cited = citedNumbers(prose);
+for (const n of cited) {
+  if (n < 1 || n > entry.sources.length) {
+    throw new Error(`cases.ts: "${entry.id}" cites [${n}] but has ${entry.sources.length} sources`);
+  }
+}
+entry.sources.forEach((_, i) => {
+  if (!cited.has(i + 1)) {
+    throw new Error(`cases.ts: "${entry.id}" source [${i + 1}] is never cited`);
+  }
+});
+const relatedHarms = entry.harms.map((id) => {
+  const harm = harms.find((h) => h.id === id);
+  if (!harm) throw new Error(`cases.ts: "${entry.id}" names unknown harm "${id}"`);
+  return harm;
+});
+
+const layerName = (n: number) => layers.find((layer) => layer.n === n)?.name ?? `Layer ${n}`;
+const pageUrl = new URL(`/cases/${entry.id}`, site.url).href;
+const updated = gitDate('src/data/cases.ts');
+const published = gitCreated('src/data/cases.ts');
+const crumbs = [{ label: 'Cases', href: '/cases' }, { label: entry.short }];
+
+const jsonLd = [
+  {
+    '@type': 'Article',
+    '@id': `${pageUrl}#article`,
+    headline: entry.title,
+    description: entry.summary,
+    url: pageUrl,
+    inLanguage: 'en',
+    datePublished: published,
+    dateModified: updated,
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    citation: entry.sources.map((s) => s.url),
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Base
+  title={entry.title}
+  description={entry.summary}
+  image="/og/resources.png"
+  jsonLd={jsonLd}
+  article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
+>
+  <PageHero variant="res" crumbs={crumbs} title={entry.title} lede={entry.summary} />
+
+  <div class="container res-page">
+    <div class="cs-body" data-pagefind-body>
+      <dl class="cs-facts">
+        <dt>Year</dt>
+        <dd>{entry.year}</dd>
+        <dt>Jurisdiction</dt>
+        <dd>{entry.jurisdiction}</dd>
+        <dt>Sector</dt>
+        <dd>{entry.sector}</dd>
+        <dt>Evidence base</dt>
+        <dd>
+          <span class:list={['type-tag', entry.evidence === 'reported' && 'cs-tag-reported']}>
+            {caseEvidenceLabel[entry.evidence]}
+          </span>
+        </dd>
+        <dt>Incident record</dt>
+        <dd>
+          {
+            entry.incidents.map((ref, i) => (
+              <>
+                {i > 0 && ' · '}
+                <a href={ref.url} rel="noopener">
+                  {ref.db === 'AIID' ? `AIID ${ref.id}` : incidentDbLabel[ref.db]}
+                </a>
+              </>
+            ))
+          }
+        </dd>
+        <dt>Harm</dt>
+        <dd>
+          {
+            relatedHarms.map((harm, i) => (
+              <>
+                {i > 0 && ' · '}
+                <a href={`/resources/harms#harm-${harm.id}`}>{harm.harmType}</a>
+              </>
+            ))
+          }
+        </dd>
+      </dl>
+
+      <div class="prose">
+        <h2 id="what-happened">What happened</h2>
+        {
+          entry.happened.map((p) => (
+            <p>
+              <CitedText text={p} />
+            </p>
+          ))
+        }
+
+        <h2 id="failure-mode">Failure mode</h2>
+        {
+          entry.failureMode.map((p) => (
+            <p>
+              <CitedText text={p} />
+            </p>
+          ))
+        }
+
+        <h2 id="control">Which control would have caught it</h2>
+        {
+          entry.control.text.map((p) => (
+            <p>
+              <CitedText text={p} />
+            </p>
+          ))
+        }
+        <p>
+          Patterns:{' '}
+          {
+            entry.control.controls.map((ctl, i) => (
+              <>
+                {i > 0 && ' · '}
+                {ctl.patternId ? <a href={`/bok/patterns#${ctl.patternId}`}>{ctl.name}</a> : ctl.name}
+              </>
+            ))
+          }
+        </p>
+
+        <h2 id="evidence">The evidence that would have existed</h2>
+        <p>What an auditor could have read, and the stack layer that produces it.</p>
+      </div>
+
+      <ul class="cs-evidence">
+        {
+          entry.evidenceArtefacts.map((item) => (
+            <li>
+              <span
+                class="ticks ticks--coded"
+                role="img"
+                aria-label={`Layer ${item.layerN}, ${layerName(item.layerN)}`}
+              >
+                <span class="tk-key">
+                  <span class="tk" data-l={item.layerN} aria-hidden="true" />L{item.layerN}
+                </span>
+              </span>
+              <span>{item.artefact}</span>
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="prose">
+        <h2 id="obligations">Obligations it touches today</h2>
+        <p>As of 2026-09-24. Mappings are illustrative, not a claim of conformity.</p>
+      </div>
+      <ul class="cs-oblig prose">
+        {
+          entry.obligations.map((o) => (
+            <li>
+              <span class="cs-oblig-ref">
+                <span>{o.instrument}</span>
+                {o.obligationId ? (
+                  <a href={obligationPath({ id: o.obligationId })}>{o.ref}</a>
+                ) : (
+                  o.ref
+                )}
+              </span>
+              <CitedText text={o.why} />
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="res-section">
+        <Callout kind="note" title="How to read this case">
+          <p>{casesDisclaimer}</p>
+        </Callout>
+      </div>
+
+      <div class="prose cs-sources-wrap">
+        <h2 id="sources">Sources</h2>
+        <SourceList sources={entry.sources} />
+      </div>
+
+      <nav class="cs-nav" aria-label="More cases">
+        {prev ? <a href={`/cases/${prev.id}`}>← {prev.short}</a> : <span />}
+        <a href="/cases">All cases</a>
+        {next ? <a href={`/cases/${next.id}`}>{next.short} →</a> : <span />}
+      </nav>
+    </div>
+  </div>
+</Base>

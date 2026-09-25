@@ -1,0 +1,52 @@
+{
+  "notice": "Illustrative mapping from the AI Governance Engineer Body of Knowledge v0.5.0 (not a claim of conformity)",
+  "version": "0.5.0",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "schemaVersion": 2,
+  "schema": "https://aigovernanceengineer.com/api/v1/schemas/obligation.json",
+  "self": "https://aigovernanceengineer.com/api/v1/obligations/aige-obl-iso42001-a2.json",
+  "source": "https://aigovernanceengineer.com/obligations/aige-obl-iso42001-a2",
+  "citation": {
+    "title": "AI Governance Engineering: The Thesis & Body of Knowledge",
+    "authors": [
+      "Jorge García Aibar"
+    ],
+    "parentDoi": "https://doi.org/10.5281/zenodo.22857084",
+    "conceptDoi": "https://doi.org/10.5281/zenodo.22857084"
+  },
+  "obligation": {
+    "id": "AIGE-OBL-ISO42001-A2",
+    "url": "https://aigovernanceengineer.com/obligations/aige-obl-iso42001-a2",
+    "json": "https://aigovernanceengineer.com/api/v1/obligations/aige-obl-iso42001-a2.json",
+    "framework": "ISO/IEC 42001",
+    "frameworkId": "iso-42001",
+    "clause": "A.2",
+    "obligation": "A.2 Policies related to AI",
+    "requirement": "AI policy set and its governance",
+    "artefact": "Policy-as-code library; versioned policy repository",
+    "layers": [
+      1
+    ],
+    "dutyHolder": null,
+    "scope": null,
+    "authority": null,
+    "appliesFrom": null,
+    "appliesStatus": "voluntary",
+    "appliesNote": "Voluntary management-system standard (2023); no presumption of conformity",
+    "milestones": [],
+    "systemClass": [],
+    "patterns": [
+      {
+        "id": "pattern-sanctioned-ai-gateway",
+        "title": "Sanctioned AI Gateway",
+        "url": "https://aigovernanceengineer.com/patterns/sanctioned-ai-gateway"
+      }
+    ],
+    "crosswalkTopics": [
+      "governance-accountability"
+    ],
+    "reviewed": "2026-09-19",
+    "chapter": "https://aigovernanceengineer.com/bok/regulatory-map#isoiec-42001-42005-and-42006"
+  }
+}

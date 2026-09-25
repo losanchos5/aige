@@ -1,0 +1,246 @@
+---
+// /obligations: the obligation register. Every row of the regulatory map
+// (src/data/frameworks.ts, faithful to bok/08-regulatory-map.md) with its
+// stable id, grouped by framework, each linking to its own page. Two pure-CSS
+// radio filters (status and layer; no JavaScript, CSP-safe) narrow the list;
+// the combined rules live in styles/obligations.css.
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import { site } from '../../data/site';
+import {
+  obligations,
+  frameworks,
+  disclaimer,
+  appliesStatusLabels,
+  type AppliesStatus,
+  type StackLayer,
+} from '../../data/frameworks';
+import { obligationGroups, obligationPath } from '../../lib/obligations';
+import { layerName } from '../../lib/api';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import {
+  authorNodes,
+  authorRefs,
+  ORG_ID,
+  WEBSITE_ID,
+  OBLIGATION_REGISTER_ID,
+} from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/harms.css';
+import '../../styles/obligations.css';
+
+const groups = obligationGroups();
+const instrumentCount = new Set(obligations.map((o) => o.frameworkId)).size;
+const pageUrl = new URL('/obligations', site.url).href;
+const description =
+  'Every obligation in the regulatory map with a stable id, its application date and status, the artefact that evidences it and its stack layer.';
+const crumbs = [{ label: 'Obligations' }];
+
+const statusOrder: AppliesStatus[] = [
+  'in-force',
+  'applies-later',
+  'deferred',
+  'grace',
+  'voluntary',
+  'pending',
+];
+const statusCount = (s: AppliesStatus) => obligations.filter((o) => o.appliesStatus === s).length;
+const statusFilters = [
+  { id: 'obx-st-all', label: 'All statuses' },
+  ...statusOrder
+    .filter((s) => statusCount(s) > 0)
+    .map((s) => ({ id: `obx-st-${s}`, label: appliesStatusLabels[s] })),
+];
+const layerFilters = [
+  { id: 'obx-l-all', label: 'All layers', l: undefined },
+  ...[1, 2, 3, 4, 5].map((n) => ({ id: `obx-l-${n}`, label: `L${n}`, l: String(n) })),
+];
+const layerClass = (layerN: readonly StackLayer[]) => layerN.map((n) => `has-l${n}`);
+
+const jsonLd = [
+  {
+    '@type': 'CollectionPage',
+    '@id': `${pageUrl}#page`,
+    name: `Obligation register · ${site.name}`,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    mainEntity: { '@id': OBLIGATION_REGISTER_ID },
+  },
+  {
+    '@type': 'DefinedTermSet',
+    '@id': OBLIGATION_REGISTER_ID,
+    name: 'AI Governance Engineer obligation register',
+    description:
+      'Obligations from AI laws, standards, codes and control sets, each with a stable AIGE-OBL identifier. Mappings are illustrative, not a claim of conformity.',
+    url: pageUrl,
+    hasDefinedTerm: obligations.map((o) => {
+      const url = new URL(obligationPath(o), site.url).href;
+      return {
+        '@type': 'DefinedTerm',
+        '@id': `${url}#obligation`,
+        termCode: o.id,
+        name: o.obligation,
+        description: o.requirement,
+        url,
+        inDefinedTermSet: { '@id': OBLIGATION_REGISTER_ID },
+      };
+    }),
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Base title="Obligation register" description={description} image="/og/obligations.png" jsonLd={jsonLd}>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="Every obligation, with an id you can cite."
+    lede="The rows of the regulatory map, one page each: the clause, who it binds, when it applies, the engineering artefact that evidences it and the stack layer that artefact lives in. The ids do not change when the wording or the dates do."
+  />
+
+  <div class="container res-page">
+    <div class="res-section">
+      <Callout kind="note" title="Illustrative mapping, not a conformity assessment">
+        <p>{disclaimer} Dates and statuses are stamped with the date each row was last
+        checked; the legal reading of an obligation stays with lawyers, notified bodies and
+        authorities.</p>
+      </Callout>
+    </div>
+
+    <section class="res-section" aria-labelledby="obx-heading">
+      <div class="res-section-head">
+        <h2 id="obx-heading">{obligations.length} obligations, {instrumentCount} instruments</h2>
+        <p>
+          Each id reads <code>AIGE-OBL-&lt;instrument&gt;-&lt;clause&gt;</code> and is never
+          reused. The rows come from <a href="/bok/regulatory-map">chapter 08</a>; the same
+          data is in the <a href="/resources/frameworks">obligation matrix</a> and in the <a
+          href="/resources/data">open data API</a>.
+        </p>
+        <p class="ob-export">
+          <a class="ob-dl" href="/api/v1/obligations.json">JSON (API)</a>
+          <a
+            class="ob-dl"
+            href="/resources/obligations.csv"
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file="/resources/obligations.csv"
+            data-umami-event-location="obligations">Download CSV</a>
+          <a
+            class="ob-dl"
+            href="/resources/obligations.json"
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file="/resources/obligations.json"
+            data-umami-event-location="obligations">Download JSON</a>
+        </p>
+      </div>
+
+      <div class="obx-index">
+        <fieldset class="ob-filter">
+          <legend>Filter by status</legend>
+          <div class="ob-chips">
+            {
+              statusFilters.map((f, i) => (
+                <span>
+                  <input class="ob-radio" type="radio" name="obx-status" id={f.id} checked={i === 0} />
+                  <label class="ob-chip" for={f.id}>{f.label}</label>
+                </span>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <fieldset class="ob-filter">
+          <legend>Filter by stack layer</legend>
+          <div class="ob-chips">
+            {
+              layerFilters.map((f, i) => (
+                <span>
+                  <input class="ob-radio" type="radio" name="obx-layer" id={f.id} checked={i === 0} />
+                  <label class="ob-chip" for={f.id} data-l={f.l}>{f.label}</label>
+                </span>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <p class="obx-legend">
+          Statuses are as of each row's review date. <strong>Deferred</strong> means an amending act
+          moved the date later (the Digital Omnibus for the EU high-risk duties);
+          <strong>Draft or proposed</strong> means the instrument is not final.
+        </p>
+
+        <nav class="obx-jump" aria-label="Frameworks in the register">
+          {groups.map((g) => <a href={`#${g.anchor}`}>{g.framework}</a>)}
+        </nav>
+
+        {
+          groups.map((g) => (
+            <section class="obx-group" id={g.anchor} aria-labelledby={`${g.anchor}-h`}>
+              <div class="obx-group-head">
+                <h3 id={`${g.anchor}-h`}>{g.framework}</h3>
+                <span class="obx-count">{g.rows.length} rows</span>
+              </div>
+              <ul class="obx-rows">
+                {g.rows.map((row) => (
+                  <li class:list={['obx-row', `st-${row.appliesStatus}`, ...layerClass(row.layerN)]}>
+                    <div class="obx-name">
+                      <a class="obx-title" href={obligationPath(row)}>
+                        {row.obligation}
+                      </a>
+                      <code class="obx-id">{row.id}</code>
+                    </div>
+                    <div class="obx-applies">
+                      {row.appliesFrom ? (
+                        <time datetime={row.appliesFrom}>{row.appliesFrom}</time>
+                      ) : (
+                        <span>No date</span>
+                      )}
+                      <span class="type-tag">{appliesStatusLabels[row.appliesStatus]}</span>
+                    </div>
+                    <span
+                      class="ticks ticks--coded"
+                      role="img"
+                      aria-label={`Layers: ${row.layerN.map((n) => `${n} ${layerName(n)}`).join(', ')}`}
+                    >
+                      {row.layerN.map((n) => (
+                        <span class="tk-key">
+                          <span class="tk" data-l={n} aria-hidden="true" />L{n}
+                        </span>
+                      ))}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="res-section" aria-labelledby="obx-ids-heading">
+      <div class="res-section-head">
+        <h2 id="obx-ids-heading">How the ids work</h2>
+        <p>
+          An id is assigned once. New wording, a moved date or a better artefact keeps the id; a
+          removed row keeps its id reserved, so it is never reused; a split row keeps the id on
+          the part that carries the original meaning. The instrument codes and the full
+          stability promise are on the <a href="/resources/data">open data page</a>. The <a
+          href="/resources/frameworks">frameworks page</a> describes all {frameworks.length}
+          instruments the map covers, including those with no row of their own.
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>

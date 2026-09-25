@@ -1,0 +1,348 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/use-case-record.v1.json",
+  "title": "Use-case record",
+  "description": "The intake record for a proposed AI use: the problem, the intended purpose and its limits, who is affected, whether AI is the right tool, the preliminary classification and which assessments it triggers. Scaffolds the register entry.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 6",
+    "EU AI Act Art. 9(2)",
+    "EU AI Act Art. 27",
+    "GDPR Art. 35",
+    "ISO/IEC 42001 A.5",
+    "ISO/IEC 42001 A.6",
+    "NIST AI RMF MAP 1.1",
+    "NIST AI RMF MAP 3.3"
+  ],
+  "x-layer": [
+    1,
+    2
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-fria-as-code",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-registry",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-use-case-intake--risk-tiering"
+  ],
+  "x-lifecycle-stage": "intake",
+  "type": "object",
+  "required": [
+    "record_id",
+    "title",
+    "business_owner",
+    "intended_purpose",
+    "affected_persons",
+    "preliminary_classification",
+    "decision"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/use-case-record.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "record_id": {
+      "type": "string",
+      "description": "Identifier of this intake record (for example \"uc-2026-017\").",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "description": "Short name of the use case.",
+      "minLength": 1
+    },
+    "business_owner": {
+      "type": "string",
+      "description": "Business role accountable for the outcome.",
+      "minLength": 1
+    },
+    "business_problem": {
+      "type": "string",
+      "description": "The problem to solve and why it matters, without naming a solution.",
+      "x-evidences": [
+        "NIST AI RMF MAP 1.4"
+      ]
+    },
+    "intended_purpose": {
+      "type": "string",
+      "description": "What the system will be used for, by whom and in which context. This sentence travels into the instructions for use.",
+      "minLength": 1,
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)",
+        "NIST AI RMF MAP 1.1"
+      ]
+    },
+    "out_of_scope_uses": {
+      "type": "array",
+      "description": "Uses the system must not be put to. Each becomes a deny rule or a documented limitation.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "NIST AI RMF MAP 3.3"
+      ]
+    },
+    "users": {
+      "type": "array",
+      "description": "Who operates the system.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "affected_persons": {
+      "type": "array",
+      "description": "Who is affected by its outputs, including people who never touch it.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 27(1)(c)",
+        "NIST AI RMF MAP 1.1"
+      ]
+    },
+    "decision_authority": {
+      "type": "string",
+      "enum": [
+        "advisory",
+        "human_decides",
+        "automated_with_review",
+        "fully_automated"
+      ],
+      "description": "How much the output decides on its own.",
+      "x-evidences": [
+        "GDPR Art. 22"
+      ]
+    },
+    "ai_justification": {
+      "type": "object",
+      "description": "The \"should AI be used at all\" test.",
+      "required": [
+        "why_ai"
+      ],
+      "properties": {
+        "alternatives_considered": {
+          "type": "array",
+          "description": "Non-AI or simpler options considered.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "why_ai": {
+          "type": "string",
+          "description": "Why AI is the right tool here, given the alternatives.",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "NIST AI RMF MANAGE 2.1"
+      ]
+    },
+    "success_metrics": {
+      "type": "array",
+      "description": "How success is measured, set before building.",
+      "items": {
+        "type": "object",
+        "description": "One success metric.",
+        "required": [
+          "metric",
+          "target"
+        ],
+        "properties": {
+          "metric": {
+            "type": "string",
+            "description": "Metric name.",
+            "minLength": 1
+          },
+          "target": {
+            "type": "string",
+            "description": "Target value or range.",
+            "minLength": 1
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "higher_is_better",
+              "lower_is_better",
+              "within_range"
+            ],
+            "description": "Which way is good."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "EU AI Act Art. 9(8)"
+      ]
+    },
+    "error_appetite": {
+      "type": "string",
+      "description": "Which errors are tolerable and which are not (for example \"false declines worse than false approvals below 5k EUR\").",
+      "x-evidences": [
+        "NIST AI RMF MAP 1.5"
+      ]
+    },
+    "data_sources": {
+      "type": "array",
+      "description": "Data the use case needs, flagged for privacy screening.",
+      "items": {
+        "type": "object",
+        "description": "One data source.",
+        "required": [
+          "name",
+          "personal_data"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Data source.",
+            "minLength": 1
+          },
+          "personal_data": {
+            "type": "boolean",
+            "description": "Contains personal data."
+          },
+          "special_category": {
+            "type": "boolean",
+            "description": "Contains special-category data."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "GDPR Art. 35"
+      ]
+    },
+    "jurisdictions": {
+      "type": "array",
+      "description": "Where it will be used.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "preliminary_classification": {
+      "type": "object",
+      "description": "Classification at onset. Confirmed later in the register entry.",
+      "required": [
+        "eu_ai_act_category",
+        "internal_tier",
+        "rationale"
+      ],
+      "properties": {
+        "eu_ai_act_category": {
+          "type": "string",
+          "enum": [
+            "not_assessed",
+            "out_of_scope",
+            "minimal",
+            "transparency",
+            "high_risk_annex_i",
+            "high_risk_annex_iii",
+            "gpai",
+            "gpai_systemic_risk",
+            "prohibited"
+          ],
+          "description": "Preliminary EU AI Act category.",
+          "x-evidences": [
+            "EU AI Act Art. 6"
+          ]
+        },
+        "internal_tier": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "description": "Preliminary internal tier."
+        },
+        "rationale": {
+          "type": "string",
+          "description": "Why, in a few sentences.",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 6"
+      ]
+    },
+    "assessments_required": {
+      "type": "array",
+      "description": "Assessments this use case triggers, each tracked to completion.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "aiia",
+          "dpia",
+          "fria",
+          "vendor_due_diligence",
+          "real_world_testing_plan",
+          "none"
+        ]
+      },
+      "x-evidences": [
+        "EU AI Act Art. 27",
+        "GDPR Art. 35",
+        "ISO/IEC 42001 A.5"
+      ]
+    },
+    "decision": {
+      "type": "object",
+      "description": "The intake decision.",
+      "required": [
+        "outcome",
+        "decided_by",
+        "decided_at"
+      ],
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "approved_with_conditions",
+            "rejected",
+            "deferred"
+          ],
+          "description": "Intake decision."
+        },
+        "conditions": {
+          "type": "array",
+          "description": "Conditions attached.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "decided_by": {
+          "type": "string",
+          "description": "Deciding role or forum.",
+          "minLength": 1
+        },
+        "decided_at": {
+          "type": "string",
+          "format": "date",
+          "description": "Decision date."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "NIST AI RMF MANAGE 1.1"
+      ]
+    },
+    "register_entry": {
+      "type": "string",
+      "description": "Registry id created from this record, once approved."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

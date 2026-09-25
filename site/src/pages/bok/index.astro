@@ -5,6 +5,7 @@ import Figure from '../../components/Figure.astro';
 import SignNote from '../../components/SignNote.astro';
 import { site } from '../../data/site';
 import { chaptersOrdered, getChapter } from '../../data/chapters';
+import { bookParts, chapterNum, countWord } from '../../data/parts';
 import { readingTime } from '../../lib/reading';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 
@@ -19,20 +20,28 @@ const intro =
 const signUrl = `${site.github}/edit/main/bok/CONTRIBUTORS.md`;
 const issueUrl = `${site.github}/issues/new?template=sign-the-thesis.yml`;
 
+// Counts and part names come from the data (chapters.ts via parts.ts), never
+// typed here, so a new chapter or part updates the copy with no edit.
+const chapterCount = chaptersOrdered.length;
+const partsWord = countWord(bookParts.length);
+
 // Its own meta description: without one the landing fell back to the site-wide
 // default, which every other page already carries. Restates the sub-lede below.
-const description = `The Body of Knowledge for AI governance engineering: ${chaptersOrdered.length} chapters, from the definition to the reading list. Read them in order or jump to a layer.`;
+const description = `The Body of Knowledge for AI governance engineering: ${chapterCount} chapters in ${partsWord} parts, from the definition to the law. Read them in order or start from a part.`;
 
 // Reading paths by reader (VISUAL-GUIDE §2.3 reading-paths): three routes through
-// the book as real links. Chapter titles come from chapters.ts; the newcomer
-// route ends in the learning path. Headings and subtitles use the preface's own
-// framing of who the book is for.
-const byOrder = new Map(chaptersOrdered.map((chapter) => [chapter.order, chapter]));
-const node = (order: number) => {
-  const chapter = byOrder.get(order)!;
+// the book as real links, each reaching into the foundations, lifecycle and law
+// parts. Chapter titles come from chapters.ts, looked up by slug so a
+// renumbering cannot point a node at the wrong chapter; the newcomer route ends
+// in the learning path. Headings and subtitles use the preface's own framing of
+// who the book is for.
+const bySlug = new Map(chaptersOrdered.map((chapter) => [chapter.slug, chapter]));
+const node = (slug: string) => {
+  const chapter = bySlug.get(slug);
+  if (!chapter) throw new Error(`reading path: no chapter with slug "${slug}"`);
   return {
     href: `/bok/${chapter.slug}`,
-    num: String(order).padStart(2, '0'),
+    num: chapterNum(chapter.order),
     title: chapter.shortTitle,
   };
 };
@@ -40,17 +49,35 @@ const readingPaths = [
   {
     heading: 'Building this month',
     sub: 'stop shipping documents, start shipping controls',
-    nodes: [node(4), node(5), node(8)],
+    nodes: [
+      node('the-stack'),
+      node('patterns'),
+      node('governing-development'),
+      node('governing-deployment'),
+      node('incidents'),
+    ],
   },
   {
     heading: 'Assuring & advising',
     sub: 'extend the threat model to models and agents',
-    nodes: [node(1), node(2), node(8), node(7)],
+    nodes: [
+      node('risk-management'),
+      node('fairness-and-explainability'),
+      node('eu-ai-act'),
+      node('regulatory-map'),
+      node('maturity-model'),
+    ],
   },
   {
     heading: 'New to the discipline',
     sub: 'the founding text, in order',
-    nodes: [node(0), node(1), node(6)],
+    nodes: [
+      node('preface'),
+      node('definition'),
+      node('ai-defined'),
+      node('governance-program'),
+      node('the-role'),
+    ],
     tail: { href: '/path', title: 'The learning path' },
   },
 ];
@@ -67,32 +94,59 @@ const readingPaths = [
       <h1>The Body of Knowledge</h1>
       <p class="lede">{intro}</p>
       <p class="sub">
-        Version {site.bokVersion}: {chaptersOrdered.length} chapters, from the definition to the
-        reading list. Read them in order or jump to the layer you are building.
+        Version {site.bokVersion}: {chapterCount} chapters in {partsWord} parts, from the
+        definition to the law. Read them in order or start from the part you need.
       </p>
+      <nav class="part-jump" aria-label="Parts of the book">
+        <ol>
+          {
+            bookParts.map((part) => (
+              <li>
+                <a href={`#part-${part.id}`}>
+                  <span class="pj-title">{part.title}</span>
+                  <span class="pj-range">{part.range}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
     </header>
 
-    <ol class="chapter-grid">
-      {
-        chaptersOrdered.map((chapter) => (
-          <li>
-            <a class="chapter-card" href={`/bok/${chapter.slug}`}>
-              <span class="card-top">
-                <span class="num">{String(chapter.order).padStart(2, '0')}</span>
-                <span class="time">{minutes.get(chapter.id) ?? 1} min</span>
-              </span>
-              <span class="title">{chapter.shortTitle}</span>
-              <span class="summary">{chapter.summary}</span>
-            </a>
-          </li>
-        ))
-      }
-    </ol>
+    {
+      bookParts.map((part) => (
+        <section class="bok-part" aria-labelledby={`part-${part.id}`}>
+          <header class="part-head">
+            <h2 id={`part-${part.id}`}>{part.title}</h2>
+            <p class="part-range">Chapters {part.range}</p>
+            <p class="part-intro">{part.intro}</p>
+          </header>
+          <ol class="chapter-grid">
+            {part.chapters.map((chapter) => (
+              <li>
+                <a
+                  class="chapter-card"
+                  href={`/bok/${chapter.slug}`}
+                  data-testid="bok-chapter-card"
+                >
+                  <span class="card-top">
+                    <span class="num">{chapterNum(chapter.order)}</span>
+                    <span class="time">{minutes.get(chapter.id) ?? 1} min</span>
+                  </span>
+                  <span class="title">{chapter.shortTitle}</span>
+                  <span class="summary">{chapter.summary}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))
+    }
 
     <Figure
       class="reading-paths"
       title="Reading paths"
-      caption="Three routes through the Body of Knowledge, one per reader, as real links. Pick your column and start at its first node. Drawn from chapter 00."
+      caption="Three routes through the Body of Knowledge, one per reader, each reaching into the foundations, the lifecycle and the law. Pick your column and start at its first node. Drawn from chapter 00."
     >
       <div class="rp-cols">
         {
@@ -167,9 +221,68 @@ const readingPaths = [
       color: var(--muted);
     }
 
+    /* Jump list: one link per part under the header, each with its range. */
+    .part-jump ol {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-2) var(--s-3);
+      margin: var(--s-5) 0 0;
+      padding: 0;
+    }
+
+    .part-jump a {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--s-2);
+      min-height: 44px;
+      padding: var(--s-2) var(--s-3);
+      border: 1px solid var(--line);
+      border-radius: var(--r-sm);
+      color: var(--ink);
+      text-decoration: none;
+      font-size: var(--fs-small);
+    }
+
+    .part-jump a:hover {
+      border-color: var(--ink-2);
+    }
+
+    .pj-range {
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      color: var(--ink-2);
+    }
+
+    /* One section per part: its heading, range and introduction over the
+       part's chapter cards. The heading clears the sticky header on a jump. */
+    .bok-part {
+      margin-top: var(--s-7);
+    }
+
+    .part-head h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--fs-h2);
+      scroll-margin-top: var(--anchor-offset);
+    }
+
+    .part-range {
+      margin-top: var(--s-2);
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      color: var(--ink-2);
+    }
+
+    .part-intro {
+      margin-top: var(--s-2);
+      max-width: 60ch;
+      color: var(--ink-2);
+    }
+
     .chapter-grid {
       list-style: none;
-      margin: var(--s-7) 0 0;
+      margin: var(--s-5) 0 0;
       padding: 0;
       display: grid;
       gap: var(--s-4);

@@ -5,9 +5,9 @@
 //
 // Links policy: every `PathLink.href` is an internal, absolute path. A
 // `/bok/<slug>#frag` fragment is the `#slug` github-slugger produces for that
-// chapter heading (see src/lib/md-parse.ts); a `/resources/glossary#t-…`
-// fragment is `termId(term)` from src/lib/glossary.ts. tests/data.spec.ts
-// resolves both against the source Markdown, so a broken anchor fails the build.
+// chapter heading (see src/lib/md-parse.ts); a glossary link is the term's own
+// page, `/glossary/<slug>` (termSlug in src/lib/glossary.ts). tests/data.spec.ts
+// resolves both against their sources, so a broken link fails the build.
 //
 // Resources policy: external URLs are curated, illustrative and not
 // endorsements. A URL drawn from bok/10-reading-list.md is trusted as verified;
@@ -417,7 +417,7 @@ export const nodes: readonly PathNode[] = [
       { label: 'The agent shift', href: '/bok/why-now#the-agent-shift' },
       {
         label: 'Agent (agentic AI)',
-        href: '/resources/glossary#t-agent-agentic-ai',
+        href: '/glossary/agent-agentic-ai',
       },
     ],
     resources: [
@@ -491,7 +491,7 @@ export const nodes: readonly PathNode[] = [
         href: '/bok/the-role#inventory-and-registry',
       },
       { label: 'Pattern: agent registry', href: '/bok/patterns#pattern-agent-registry' },
-      { label: 'Agent registry', href: '/resources/glossary#t-agent-registry' },
+      { label: 'Agent registry', href: '/glossary/agent-registry' },
     ],
     resources: [
       {
@@ -562,7 +562,7 @@ export const nodes: readonly PathNode[] = [
         label: 'Pattern: shadow AI discovery',
         href: '/bok/patterns#pattern-shadow-ai-discovery',
       },
-      { label: 'Shadow AI', href: '/resources/glossary#t-shadow-ai' },
+      { label: 'Shadow AI', href: '/glossary/shadow-ai' },
     ],
     resources: [
       {
@@ -596,7 +596,7 @@ export const nodes: readonly PathNode[] = [
         label: 'Layer 01 · Govern-as-Code',
         href: '/bok/the-stack#layer-01-govern-as-code',
       },
-      { label: 'Policy-as-code', href: '/resources/glossary#t-policy-as-code' },
+      { label: 'Policy-as-code', href: '/glossary/policy-as-code' },
     ],
     resources: [
       {
@@ -637,7 +637,7 @@ export const nodes: readonly PathNode[] = [
         label: 'Layer 01 · Govern-as-Code',
         href: '/bok/the-stack#layer-01-govern-as-code',
       },
-      { label: 'Policy-as-code', href: '/resources/glossary#t-policy-as-code' },
+      { label: 'Policy-as-code', href: '/glossary/policy-as-code' },
     ],
     resources: [
       {
@@ -664,7 +664,7 @@ export const nodes: readonly PathNode[] = [
       "Machine-readable governance artefacts that describe a policy's intent and scope in a schema an agent runtime can consume directly. An emerging way to make policy portable across the stack.",
     links: [
       { label: 'Pattern: policy card', href: '/bok/patterns#pattern-policy-card' },
-      { label: 'Policy Card', href: '/resources/glossary#t-policy-card' },
+      { label: 'Policy Card', href: '/glossary/policy-card' },
     ],
     resources: [
       {
@@ -731,7 +731,7 @@ export const nodes: readonly PathNode[] = [
       'Turn a fundamental-rights or data-protection impact assessment into a versioned, executable artefact generated from a template, cross-referenced to the registry entry, not filed as a one-off document.',
     links: [
       { label: 'Pattern: FRIA as code', href: '/bok/patterns#pattern-fria-as-code' },
-      { label: 'FRIA', href: '/resources/glossary#t-fria' },
+      { label: 'FRIA', href: '/glossary/fria' },
     ],
     resources: [
       {
@@ -817,7 +817,7 @@ export const nodes: readonly PathNode[] = [
         label: 'The limits of the eval gate',
         href: '/bok/definition#the-limits-of-the-eval-gate',
       },
-      { label: 'Eval gate', href: '/resources/glossary#t-eval-gate' },
+      { label: 'Eval gate', href: '/glossary/eval-gate' },
     ],
     resources: [
       {
@@ -848,7 +848,7 @@ export const nodes: readonly PathNode[] = [
         label: 'Evals and red teaming as evidence',
         href: '/bok/the-role#evals-and-red-teaming-as-evidence',
       },
-      { label: 'Red teaming', href: '/resources/glossary#t-red-teaming' },
+      { label: 'Red teaming', href: '/glossary/red-teaming' },
     ],
     resources: [
       {
@@ -905,7 +905,7 @@ export const nodes: readonly PathNode[] = [
         cost: 'free',
       },
       {
-        title: 'Gandalf by Lakera (prompt-injection game)',
+        title: "Lakera's Gandalf, now Agent Breaker (prompt-injection game)",
         url: 'https://gandalf.lakera.ai/',
         type: 'tool',
         cost: 'free',
@@ -967,7 +967,7 @@ export const nodes: readonly PathNode[] = [
       },
       {
         label: 'Runtime data path',
-        href: '/resources/glossary#t-runtime-data-path',
+        href: '/glossary/runtime-data-path',
       },
     ],
     resources: [
@@ -1008,7 +1008,7 @@ export const nodes: readonly PathNode[] = [
         label: 'Every agent carries its own identity and scope',
         href: '/bok/values-and-principles#4-every-agent-carries-its-own-identity-and-scope',
       },
-      { label: 'NHI', href: '/resources/glossary#t-nhi' },
+      { label: 'NHI', href: '/glossary/nhi' },
     ],
     resources: [
       {
@@ -1074,7 +1074,7 @@ export const nodes: readonly PathNode[] = [
       'The Model Context Protocol connects agents to tools, and every connection is attack surface. Learn to secure the protocol before you let an agent act through it.',
     links: [
       { label: 'The agent shift', href: '/bok/why-now#the-agent-shift' },
-      { label: 'MCP', href: '/resources/glossary#t-mcp' },
+      { label: 'MCP', href: '/glossary/mcp' },
     ],
     resources: [
       {
@@ -1108,7 +1108,7 @@ export const nodes: readonly PathNode[] = [
         label: 'Runtime monitoring and incidents',
         href: '/bok/the-role#runtime-monitoring-and-incidents',
       },
-      { label: 'Serious incident', href: '/resources/glossary#t-serious-incident' },
+      { label: 'Serious incident', href: '/glossary/serious-incident' },
     ],
     resources: [
       {
@@ -1145,7 +1145,7 @@ export const nodes: readonly PathNode[] = [
         label: 'Assurance and audit evidence',
         href: '/bok/the-role#assurance-and-audit-evidence',
       },
-      { label: 'OSCAL', href: '/resources/glossary#t-oscal' },
+      { label: 'OSCAL', href: '/glossary/oscal' },
     ],
     resources: [
       {
@@ -1259,7 +1259,7 @@ export const nodes: readonly PathNode[] = [
       { label: 'The five levels', href: '/bok/maturity-model#the-five-levels' },
       {
         label: 'Continuous assurance',
-        href: '/resources/glossary#t-continuous-assurance',
+        href: '/glossary/continuous-assurance',
       },
     ],
     resources: [

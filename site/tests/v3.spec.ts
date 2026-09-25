@@ -3,59 +3,20 @@ import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { frameworks, obligations } from '../src/data/frameworks';
 
-// An independent copy of ObligationMatrix's obligation → framework-id join, used
-// only as a test oracle: it lets us compute, straight from the data, exactly
-// which frameworks the matrix's inclusion rule (a framework gets a row iff at
-// least one obligation resolves to it) should select. If the component's join and
-// this one ever drift, the row-count assertion below fails.
-function resolveFwId(framework: string, obligation: string): string {
-  const f = framework;
-  const t = obligation;
-  if (f === 'EU AI Act') return 'eu-ai-act';
-  if (f === 'GPAI Code of Practice') return 'gpai-code-of-practice';
-  if (f === 'ISO/IEC 42001') return 'iso-42001';
-  if (f === 'ISO/IEC 42006') return 'iso-42006';
-  if (f === 'ISO/IEC 23894') return 'iso-23894';
-  if (f === 'NIST AI RMF') return 'nist-ai-rmf';
-  if (f === 'NIST (agent, cyber and misuse work)') {
-    if (/agent standards/i.test(t)) return 'nist-ai-agent-standards';
-    if (/8596/.test(t)) return 'nist-ir-8596';
-    return 'nist-ai-800-1';
-  }
-  if (f === 'CSA AICM / STAR for AI')
-    return /star/i.test(t) ? 'csa-star-for-ai' : 'csa-aicm';
-  if (f === 'OWASP GenAI Security Project') {
-    if (/agentic/i.test(t)) return 'owasp-agentic-top-10';
-    if (/llm/i.test(t)) return 'owasp-llm-top-10';
-    if (/acs|agent control/i.test(t)) return 'owasp-acs';
-    if (/aibom/i.test(t)) return 'owasp-aibom';
-    return 'owasp-llm-top-10';
-  }
-  if (f === 'US frontier-developer laws')
-    return /raise/i.test(t) ? 'ny-raise-act' : 'ca-sb-53';
-  if (f === 'US state AI laws')
-    return /texas|traiga/i.test(t) ? 'tx-traiga' : 'co-ai-act';
-  if (f === 'China') {
-    if (/algorithmic recommendation/i.test(t)) return 'cn-algo-recommendation';
-    if (/deep synthesis/i.test(t)) return 'cn-deep-synthesis';
-    if (/45654/.test(t)) return 'cn-gbt-45654';
-    if (/generative ai services/i.test(t)) return 'cn-genai-measures';
-    if (/45438|labelling/i.test(t)) return 'cn-content-labelling';
-    if (/tc260|framework 3\.0/i.test(t)) return 'cn-tc260-framework';
-    return 'cn-tc260-framework';
-  }
-  if (f === 'Other jurisdictions') {
-    if (/korea/i.test(t)) return 'kr-ai-basic-act';
-    if (/singapore|imda/i.test(t)) return 'sg-genai-framework';
-    if (/etsi|304 223/i.test(t)) return 'etsi-en-304-223';
-    return 'uk-duaa';
-  }
-  return f;
-}
+// The matrix joins each obligation to its catalogue framework through the row's
+// own `frameworkId` (schema version 2), so the inclusion rule (a framework gets a
+// row iff at least one obligation names it) can be computed straight from the
+// data. Before schema version 2 the component guessed the join from the group
+// name and the obligation text; that guess could not follow the v0.5.0 rows,
+// which sit under new chapter-08 headings.
+const frameworkIdSet = new Set(frameworks.map((fw) => fw.id));
+const includedFwIds = new Set(obligations.map((o) => o.frameworkId));
 
-const includedFwIds = new Set(
-  obligations.map((o) => resolveFwId(o.framework, o.obligation)),
-);
+test('every obligation frameworkId names a framework the matrix can draw', () => {
+  for (const o of obligations) {
+    expect(frameworkIdSet.has(o.frameworkId), o.id).toBe(true);
+  }
+});
 
 // Block V3: the obligation heat matrix (/resources/frameworks), StatTile
 // count-up and the MaturityLadder draw-on (/role). Acceptance assertions plus

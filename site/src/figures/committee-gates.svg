@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 486" class="figc" role="img" aria-labelledby="fig-committee-gates-t fig-committee-gates-d">
+  <title id="fig-committee-gates-t">The committee decides, the gates enforce</title>
+  <desc id="fig-committee-gates-d">Most use cases pass intake and go straight to the gates; review triggers route the rest to the committee, which records exceptions as data in a register that the policy gate reads, so the verdict shows a release passed under an exception and the build fails again once it expires.</desc>
+
+  <text class="mono muted" x="16" y="20" font-size="13.5">Most use cases never reach the committee</text>
+
+  <!-- Use case at intake -->
+  <rect class="panel" x="100" y="32" width="160" height="42" rx="8"/>
+  <text class="disp" x="180" y="51" font-size="14.5" text-anchor="middle">Use case</text>
+  <text class="ink2" x="180" y="67" font-size="13" text-anchor="middle">intake and tier</text>
+  <line class="stroke-arrow" x1="180" y1="74" x2="180" y2="86"/>
+  <path class="arrow" d="M174 86 h12 l-6 9 z"/>
+
+  <!-- Review triggers route the rest -->
+  <rect class="panel" x="100" y="98" width="160" height="42" rx="8"/>
+  <text class="disp" x="180" y="117" font-size="14.5" text-anchor="middle">Review triggers</text>
+  <text class="ink2" x="180" y="133" font-size="13" text-anchor="middle">set in the charter</text>
+
+  <!-- No trigger: straight to the gate -->
+  <text class="mono muted" x="268" y="112" font-size="13">no trigger</text>
+  <path class="stroke-arrow" d="M260 119 H332 V342 H273"/>
+  <path class="arrow" d="M273 336 v12 l-9 -6 z"/>
+
+  <!-- Triggered: the committee decides (human role glyph) -->
+  <text class="mono muted" x="190" y="156" font-size="13">triggered</text>
+  <line class="stroke-arrow" x1="180" y1="140" x2="180" y2="152"/>
+  <path class="arrow" d="M174 152 h12 l-6 9 z"/>
+  <rect class="panel" x="40" y="164" width="240" height="56" rx="8"/>
+  <circle class="glyph" cx="60" cy="181" r="4"/>
+  <path class="glyph" d="M53 195 a7 6 0 0 1 14 0"/>
+  <text class="disp" x="78" y="187" font-size="14.5">AI governance committee</text>
+  <text class="ink2" x="78" y="207" font-size="13">risk acceptance, exceptions</text>
+  <text class="mono muted" x="170" y="238" font-size="13">records</text>
+  <line class="stroke-arrow" x1="160" y1="220" x2="160" y2="234"/>
+  <path class="arrow" d="M154 234 h12 l-6 9 z"/>
+
+  <!-- The exception register: data with an expiry (store glyph) -->
+  <rect class="panel" x="40" y="246" width="240" height="54" rx="8"/>
+  <ellipse class="glyph" cx="60" cy="260" rx="9" ry="3.2"/>
+  <path class="glyph" d="M51 260 v16 a9 3.2 0 0 0 18 0 v-16"/>
+  <text class="disp" x="78" y="268" font-size="14.5">Exception register</text>
+  <text class="ink2" x="78" y="288" font-size="13">rule, system, controls, expiry</text>
+  <text class="mono muted" x="190" y="316" font-size="13">reads</text>
+  <line class="stroke-arrow" x1="180" y1="300" x2="180" y2="310"/>
+  <path class="arrow" d="M174 310 h12 l-6 9 z"/>
+
+  <!-- The one gate: the policy gate (diamond) -->
+  <path class="glyph" d="M180 320 l84 22 l-84 22 l-84 -22 z"/>
+  <text class="mono" x="180" y="347" font-size="13" text-anchor="middle">Policy gate</text>
+  <line class="stroke-arrow" x1="180" y1="364" x2="180" y2="376"/>
+  <path class="arrow" d="M174 376 h12 l-6 9 z"/>
+
+  <!-- Evidence: the verdict (document with a check) -->
+  <rect class="panel" x="8" y="388" width="344" height="66" rx="10"/>
+  <path class="glyph" d="M20 400 h12 l5 5 v17 h-17 z"/>
+  <path class="glyph" d="M32 400 v5 h5"/>
+  <path class="glyph-check" d="M23 413 l3 3 l6 -7"/>
+  <text class="disp" x="48" y="410" font-size="14.5">Verdict record</text>
+  <text class="ink2" x="48" y="429" font-size="13">Live: allow, with the exception id</text>
+  <text class="ink2" x="48" y="446" font-size="13">Expired: the rule fails the build again</text>
+
+  <text class="ink2" x="16" y="476" font-size="13.5">No one has to remember the expiry.</text>
+</svg>

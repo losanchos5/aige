@@ -45,6 +45,49 @@
   margin-inline: auto;
 }
 
+/* Dual canvas: a stacked SVG and its wide variant (<id>-wide.svg). Exactly one
+   is displayed, so the hidden one leaves the accessibility tree; the wide one
+   takes over from 834 px and may grow a little past the 560-px cap, since its
+   viewBox is twice as wide (text stays at or above 1:1 in the reading well). */
+.figure--infographic .figure-canvas--dual > svg + svg {
+  display: none;
+}
+
+@media (min-width: 834px) {
+  .figure--infographic .figure-canvas--dual > svg:first-child {
+    display: none;
+  }
+
+  .figure--infographic .figure-canvas--dual > svg + svg {
+    display: block;
+    max-width: 760px;
+  }
+}
+
+/* A poster (kind 'poster', 1000 units wide) placed in a chapter keeps a legible
+   width instead of the 560px cap: it fills the well and, below 760px, scrolls
+   sideways inside a focusable region (WCAG scrollable-region), so its 16-unit
+   text never renders under 12px. Its permalink gives the full size. */
+.figure--poster .figure-canvas.figure-canvas--poster {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.figure--poster .figure-canvas.figure-canvas--poster > svg {
+  max-width: 1000px;
+  min-width: 760px;
+}
+
+.figure-canvas--poster:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.figure-poster-link {
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
 .figure-figcaption {
   display: flex;
   flex-direction: column;
@@ -61,6 +104,30 @@
   font-size: var(--fs-small);
   color: var(--muted);
   text-wrap: pretty;
+}
+
+/* The caption's link to the figure's permalink page (downloads, embed snippets
+   and citation). --ink-2 keeps AA on every figure frame in both themes. */
+.figure-permalink {
+  align-self: flex-start;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.figure-permalink:hover {
+  color: var(--ink);
+}
+
+.figure-permalink:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* A deep link to the figure (/bok/<chapter>#figure-<id>) clears the header. */
+.figure--infographic[id] {
+  scroll-margin-top: var(--anchor-offset, 96px);
 }
 
 /* Text alternative: a plain, collapsible full description in the chapter's
@@ -210,6 +277,18 @@
 .figc .chip-bg { rx: 5; }
 .figc .cell { stroke: var(--line); stroke-width: 1; }
 .figc .cell-empty { fill: color-mix(in srgb, var(--ink) 4%, var(--bg)); }
+/* Text on a solid-ink fill (a .glyph-fill shape): the ground colour, so the
+   exporter resolves it per theme instead of an inline var() it cannot read. */
+.figc .on-ink { fill: var(--bg); }
+
+/* Poster marks (scripts/lib/posters.mjs): a timeline dot drawn over an ink bar
+   (dot-on, haloed in the ground colour) or as a ring (dot-off), a ground-colour
+   mask behind a glyph or label that sits on a line, and inverse text on an ink
+   band. All from the tokens, so both themes and the exports follow. */
+.figc .dot-on { fill: var(--ink); stroke: var(--bg); stroke-width: 3; }
+.figc .dot-off { fill: var(--bg); stroke: var(--ink); stroke-width: 2.5; }
+.figc .dot-mask { fill: var(--bg); }
+.figc .inv-tx { fill: var(--bg); }
 
 /* Links inside a figure SVG (pattern-map): the label is the visible text, the
    whole <a> is the target. Keep the ink colour; underline on hover/focus. */
@@ -338,3 +417,15 @@
   background: var(--ink);
   color: var(--bg);
 }
+
+/* ------------------------------------------ status tiles (block w2-fig-concepts) -- */
+/* The jurisdiction tile map (src/figures/jurisdiction-tiles.svg) encodes how
+   binding a regime is. Status is not a stack layer, so it is an ink ramp, never
+   a hue (VISUAL-GUIDE §4.3), and the outline carries it too: solid ink for a
+   horizontal binding regime, a tint with a heavy stroke for a targeted one, a
+   hairline for voluntary guidance and a dashed line for a bill. */
+.figc .tile-h { fill: var(--ink); stroke: var(--ink); stroke-width: 1.5; }
+.figc .tile-h-tx { fill: var(--bg); }
+.figc .tile-t { fill: color-mix(in srgb, var(--ink) 22%, var(--bg)); stroke: var(--ink); stroke-width: 1.5; }
+.figc .tile-v { fill: var(--bg); stroke: var(--ink-2); stroke-width: 1; }
+.figc .tile-b { fill: var(--bg); stroke: var(--ink-2); stroke-width: 1.5; stroke-dasharray: 4 3; }

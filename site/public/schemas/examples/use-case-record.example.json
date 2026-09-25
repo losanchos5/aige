@@ -1,0 +1,76 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/use-case-record.v1.json",
+  "record_id": "uc-2026-017",
+  "title": "Affordability scoring for consumer loans",
+  "business_owner": "head-of-retail-credit",
+  "business_problem": "Manual affordability checks take two days and vary between analysts.",
+  "intended_purpose": "Score the affordability of consumer loan applications up to 30k EUR so that a credit analyst decides faster and more consistently.",
+  "out_of_scope_uses": [
+    "mortgage decisions",
+    "fraud detection",
+    "automatic decline without analyst review",
+    "marketing segmentation"
+  ],
+  "users": [
+    "credit analysts"
+  ],
+  "affected_persons": [
+    "consumer loan applicants"
+  ],
+  "decision_authority": "human_decides",
+  "ai_justification": {
+    "alternatives_considered": [
+      "static affordability rules",
+      "more analysts"
+    ],
+    "why_ai": "Rules miss income volatility patterns the historical data shows; the model is advisory and the analyst decides."
+  },
+  "success_metrics": [
+    {
+      "metric": "median time to decision",
+      "target": "under 4 hours",
+      "direction": "lower_is_better"
+    },
+    {
+      "metric": "default rate at 12 months",
+      "target": "no worse than the manual baseline",
+      "direction": "lower_is_better"
+    }
+  ],
+  "error_appetite": "A wrongful decline harms the applicant more than a wrongful approval harms the bank at these amounts; thresholds favour referral to an analyst.",
+  "data_sources": [
+    {
+      "name": "loan applications 2019-2025",
+      "personal_data": true,
+      "special_category": false
+    },
+    {
+      "name": "repayment history",
+      "personal_data": true,
+      "special_category": false
+    }
+  ],
+  "jurisdictions": [
+    "ES",
+    "PT"
+  ],
+  "preliminary_classification": {
+    "eu_ai_act_category": "high_risk_annex_iii",
+    "internal_tier": "high",
+    "rationale": "Creditworthiness evaluation of natural persons (Annex III point 5(b)); personal data at scale."
+  },
+  "assessments_required": [
+    "fria",
+    "dpia"
+  ],
+  "decision": {
+    "outcome": "approved_with_conditions",
+    "conditions": [
+      "FRIA and DPIA approved before any production use",
+      "analyst review of every decline"
+    ],
+    "decided_by": "ai-governance-committee",
+    "decided_at": "2026-05-12"
+  },
+  "register_entry": "credit-afford-03"
+}

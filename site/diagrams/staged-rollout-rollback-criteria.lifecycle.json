@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Staged Rollout with Rollback Criteria",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [980, 680],
+    "views": [
+      {
+        "id": "stages",
+        "label": "Stages with a purpose",
+        "focus": ["registered", "shadow", "pilot", "canary", "ga"],
+        "note": "Each stage limits exposure while evidence accumulates, and the plan with its criteria is registered before the first one."
+      },
+      {
+        "id": "criteria-decide",
+        "label": "Criteria decide",
+        "focus": ["canary", "hold", "rollback"],
+        "note": "A stage verdict is taken by the pipeline against pre-registered criteria: promote, hold for more evidence, or roll back."
+      },
+      {
+        "id": "tested-way-back",
+        "label": "A tested way back",
+        "focus": ["rollback", "restored"],
+        "note": "The flag or blue-green switch returns traffic to the pinned baseline, and the rollback is recorded as evidence."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "main", "label": "Release stages" },
+    { "id": "waiting", "label": "Stage verdict" },
+    { "id": "recovery", "label": "Rollback path" },
+    { "id": "terminal", "label": "Outcome" }
+  ],
+  "states": [
+    { "id": "registered", "type": "start", "label": "Plan registered", "sublabel": "criteria set first", "lane": "main", "col": 0, "step": "01", "tag": "before" },
+    { "id": "shadow", "type": "active", "label": "Shadow", "sublabel": "outputs not used", "lane": "main", "col": 1, "step": "02", "tag": "no exposure" },
+    { "id": "pilot", "type": "active", "label": "Pilot", "sublabel": "trained users", "lane": "main", "col": 2, "step": "03", "tag": "small group" },
+    { "id": "canary", "type": "decision", "label": "Canary", "sublabel": "vs control group", "lane": "main", "col": 3, "step": "04", "tag": "share of traffic" },
+    { "id": "ga", "type": "success", "label": "General availability", "sublabel": "criteria stay live", "lane": "main", "col": 4, "step": "05", "tag": "all traffic" },
+    { "id": "hold", "type": "waiting", "label": "Hold", "sublabel": "more evidence", "lane": "waiting", "col": 1, "tag": "verdict", "width": 112 },
+    { "id": "rollback", "type": "active", "label": "Rolling back", "sublabel": "flag or blue-green", "lane": "recovery", "col": 2, "tag": "automatic", "width": 128 },
+    { "id": "restored", "type": "success", "label": "Baseline restored", "sublabel": "rollback recorded", "lane": "terminal", "col": 2, "tag": "evidence" }
+  ],
+  "transitions": [
+    { "from": "canary", "to": "hold", "variant": "dashed", "route": "straight", "fromSide": "bottom", "toSide": "top" },
+    { "from": "hold", "to": "rollback", "variant": "security" },
+    { "from": "ga", "to": "rollback", "variant": "dashed", "route": "straight", "fromSide": "bottom", "toSide": "top" },
+    { "from": "rollback", "to": "restored", "variant": "emphasis", "route": "straight", "fromSide": "bottom", "toSide": "top" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Criteria before the stage",
+      "items": [
+        "Metric, threshold, window and group breakdowns are written into the plan first",
+        "A threshold change is a reviewed diff, not a dashboard edit",
+        "A criterion invented after the metric moved is a negotiation"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "The pipeline decides",
+      "items": [
+        "Canary analysis compares candidate and control per metric and per group",
+        "The verdict is promote, hold or roll back",
+        "Vendor model versions go through the same stages"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "A tested way back",
+      "items": [
+        "Versions are pinned in the registry for baseline and candidate",
+        "The switch back is exercised in shadow, before anyone depends on it"
+      ]
+    }
+  ]
+}

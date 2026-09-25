@@ -1,0 +1,85 @@
+name: Propose an obligation row
+description: Propose an obligation for the regulatory map, with the engineering artefact that evidences it and its stack layer.
+title: "[Obligation] "
+labels: ["obligation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The regulatory map (chapter 08) is the reverse index of the book: for each obligation, the
+        artefact that satisfies or supports it and the stack layer that produces it. Mappings are
+        illustrative, not a claim of conformity. Cite the official text (for EU law, its EUR-Lex
+        identifier) and tag it `primary`, `secondary` or `reported` as in `STYLEGUIDE.md` §6.
+  - type: input
+    id: instrument
+    attributes:
+      label: Instrument
+      description: The law, regulation, standard or code, with its official identifier.
+      placeholder: Regulation (EU) 2024/1689 (AI Act)
+    validations:
+      required: true
+  - type: input
+    id: reference
+    attributes:
+      label: Article, clause or control
+      placeholder: Art. 12(1)
+    validations:
+      required: true
+  - type: input
+    id: duty-holder
+    attributes:
+      label: Duty holder
+      description: Who the obligation binds (provider, deployer, importer, controller...).
+    validations:
+      required: true
+  - type: textarea
+    id: obligation
+    attributes:
+      label: The obligation, in one or two sentences
+      description: Paraphrase the text; do not paste paid standard text.
+    validations:
+      required: true
+  - type: textarea
+    id: artefact
+    attributes:
+      label: Engineering artefact that evidences it
+      description: The record, control or pipeline output that shows the obligation is met (for example an eval result, a registry entry, a signed log).
+    validations:
+      required: true
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Stack layer
+      options:
+        - Layer 01 Govern-as-Code
+        - Layer 02 Inventory & Transparency
+        - Layer 03 Evals & Red Teaming as Evidence
+        - Layer 04 Runtime Controls & Observability
+        - Layer 05 Assurance & Continuous Compliance
+        - More than one, or not sure
+    validations:
+      required: true
+  - type: input
+    id: applies-from
+    attributes:
+      label: Applies from (optional)
+      description: The date the obligation applies, as the official text states it (YYYY-MM-DD).
+    validations:
+      required: false
+  - type: input
+    id: source
+    attributes:
+      label: Source URL
+      description: A link to the official text.
+    validations:
+      required: true
+  - type: dropdown
+    id: verified
+    attributes:
+      label: Verification tag
+      options:
+        - "primary: I opened the official text"
+        - "secondary: a reputable outlet reports it"
+        - "reported: only secondary sources carry it"
+    validations:
+      required: true

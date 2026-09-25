@@ -1,20 +1,30 @@
 // /resources/obligations.json: a static endpoint that exports the obligation
-// index (the same `obligations` array the frameworks page renders) as JSON. The
-// disclaimer travels in a top-level `notice` field, alongside the BoK version,
-// licence and source URL, so it cannot be stripped in transit. Pagefind indexes
-// HTML only, so this endpoint is not searched; check-links only verifies the
-// file exists behind the download link.
+// register (the same `obligations` array the frameworks page renders) as JSON.
+// The disclaimer travels in a top-level `notice` field, alongside the BoK
+// version, licence and source URL, so it cannot be stripped in transit.
+//
+// Schema version 2 (v0.5.0): every row gains a stable `id`, its page `url`,
+// `clause`, `requirement`, `appliesStatus`, `milestones`, `systemClass`,
+// `patterns`, `reviewed` and more; `appliesFrom` is now an ISO date (or null)
+// and the former free text moved to `appliesNote`. The record is the one the
+// API publishes at /api/v1/obligations.json (src/lib/api.ts), and it validates
+// against /api/v1/schemas/obligations.json. Pagefind indexes HTML only, so this
+// endpoint is not searched; check-links only verifies the file exists behind
+// the download link.
 import type { APIRoute } from 'astro';
 import { obligations } from '../../data/frameworks';
 import { site } from '../../data/site';
+import { NOTICE, obligationRecord, schemaUrl, jsonResponse } from '../../lib/api';
 
-export const GET: APIRoute = () => {
-  const notice = `Illustrative mapping from the AI Governance Engineer Body of Knowledge v${site.bokVersion} (not a claim of conformity)`;
-
-  const payload = {
-    notice,
+export const GET: APIRoute = () =>
+  jsonResponse({
+    notice: NOTICE,
     version: site.bokVersion,
     license: site.license,
+    licenseUrl: site.licenseUrl,
+    schemaVersion: 2,
+    schema: schemaUrl('obligations'),
+    self: `${site.url}/resources/obligations.json`,
     source: `${site.url}/resources/frameworks`,
     // Identifies the parent archived work, not a separate dataset deposit.
     citation: {
@@ -23,18 +33,5 @@ export const GET: APIRoute = () => {
       parentDoi: `https://doi.org/${site.doi}`,
       conceptDoi: `https://doi.org/${site.conceptDoi}`,
     },
-    obligations: obligations.map((row) => ({
-      framework: row.framework,
-      obligation: row.obligation,
-      artefact: row.artefact,
-      layers: row.layerN,
-      dutyHolder: row.dutyHolder ?? null,
-      appliesFrom: row.applies ?? null,
-      chapter: `${site.url}/bok/regulatory-map#${row.anchor}`,
-    })),
-  };
-
-  return new Response(`${JSON.stringify(payload, null, 2)}\n`, {
-    headers: { 'content-type': 'application/json; charset=utf-8' },
+    obligations: obligations.map(obligationRecord),
   });
-};

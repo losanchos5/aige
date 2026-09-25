@@ -13,6 +13,7 @@
   Cache-Control: public, max-age=31536000, immutable
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
 /pagefind/*
   Cache-Control: public, max-age=3600
 /og/*
@@ -29,3 +30,35 @@
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'none'; object-src 'none'; frame-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'none'
   X-Robots-Tag: noindex
   Cache-Control: public, max-age=3600
+/schemas/*
+  Content-Type: application/schema+json; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/schemas/examples/*
+  ! Content-Type
+  Content-Type: application/json; charset=utf-8
+/api/v1/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/api/v1/schemas/*
+  Content-Type: application/schema+json; charset=utf-8
+/resources/obligations.json
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/resources/obligations.csv
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/resources/crosswalk.json
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/resources/crosswalk.csv
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/resources/harms.json
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/glossary.json
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
+/downloads/figures/*
+  Cache-Control: public, max-age=86400

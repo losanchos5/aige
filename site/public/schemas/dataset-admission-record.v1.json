@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/dataset-admission-record.v1.json",
+  "title": "Dataset admission record",
+  "description": "The verdict of the dataset admission gate: whether one dataset version may enter one pipeline, which checks ran and who or what decided. Shaped like the evidence record in chapter 05 (control_id, subject, decision, input_hash, actor, timestamp, signature).",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 10",
+    "ISO/IEC 42001 A.7",
+    "NIST AI RMF MAP 4.1",
+    "NIST AI RMF MEASURE 2.1"
+  ],
+  "x-layer": [
+    3
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-eval-gate-in-ci",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-aibom",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-dataset-admission-gate"
+  ],
+  "x-lifecycle-stage": "build",
+  "type": "object",
+  "required": [
+    "control_id",
+    "subject",
+    "pipeline",
+    "decision",
+    "checks",
+    "actor",
+    "timestamp"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/dataset-admission-record.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "control_id": {
+      "type": "string",
+      "description": "The gate that decided (for example \"data.admission.v1\").",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "string",
+      "description": "The dataset, as \"dataset_id@version\".",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "pipeline": {
+      "type": "string",
+      "enum": [
+        "training",
+        "fine_tuning",
+        "validation",
+        "testing",
+        "evaluation",
+        "retrieval_index"
+      ],
+      "description": "The pipeline the dataset asks to enter."
+    },
+    "target_system": {
+      "type": "string",
+      "description": "The system the pipeline builds, as \"id@version\".",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "dataset_card": {
+      "type": "string",
+      "format": "uri",
+      "description": "Link to the dataset card that was checked."
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "admit",
+        "admit_with_conditions",
+        "reject"
+      ],
+      "description": "The gate's decision."
+    },
+    "checks": {
+      "type": "array",
+      "description": "Checks the gate ran: card completeness, lawful basis, licence, quality and bias thresholds, retention set.",
+      "items": {
+        "type": "object",
+        "description": "One check.",
+        "required": [
+          "check_id",
+          "result"
+        ],
+        "properties": {
+          "check_id": {
+            "type": "string",
+            "description": "Check identifier.",
+            "minLength": 1
+          },
+          "requirement": {
+            "type": "string",
+            "description": "Obligation or policy the check enforces."
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "waived"
+            ],
+            "description": "Outcome."
+          },
+          "detail": {
+            "type": "string",
+            "description": "Measured value or reason."
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "EU AI Act Art. 10"
+      ]
+    },
+    "conditions": {
+      "type": "array",
+      "description": "Conditions attached to an admission.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "input_hash": {
+      "type": "string",
+      "description": "Digest of the dataset snapshot that was checked.",
+      "pattern": "^[a-z0-9-]+:.+$"
+    },
+    "actor": {
+      "type": "string",
+      "description": "The pipeline or role that ran the gate.",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the gate decided."
+    },
+    "signature": {
+      "type": "string",
+      "description": "Detached signature over the record, prefixed with the algorithm (for example \"ed25519:<base64>\"). Makes the record tamper-evident in the evidence store.",
+      "pattern": "^[a-z0-9-]+:.+$"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

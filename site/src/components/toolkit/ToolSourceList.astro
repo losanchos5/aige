@@ -1,0 +1,30 @@
+---
+/**
+ * ToolSourceList: the numbered sources of a toolkit page in the house format,
+ * "[n] Title (gloss). Publisher. Date. URL (verified: tag)", with `src-<n>`
+ * anchors the in-text citations point to.
+ */
+export interface ToolSource {
+  /** "Title (gloss). Publisher. Date." */
+  text: string;
+  url: string;
+  verified: 'primary' | 'secondary' | 'reported';
+}
+
+interface Props {
+  sources: readonly ToolSource[];
+}
+
+const { sources } = Astro.props;
+---
+
+<ol class="sources">
+  {
+    sources.map((source, i) => (
+      <li id={`src-${i + 1}`}>
+        <span class="src-num">[{i + 1}]</span> {source.text} <a href={source.url}>{source.url}</a>{' '}
+        <span class="verified">(verified: {source.verified})</span>
+      </li>
+    ))
+  }
+</ol>

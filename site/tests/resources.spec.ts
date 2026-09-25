@@ -2,24 +2,60 @@
 // reading-comfort review shots at 390/1440 in light (and glossary in dark),
 // written to tests/__screenshots__/E/.
 import { test, expect } from '@playwright/test';
-import { frameworks, obligations } from '../src/data/frameworks';
+import { frameworks, obligations, obligationPath } from '../src/data/frameworks';
 import { topics, columns } from '../src/data/crosswalk';
+import { harms } from '../src/data/harms';
+import { cases } from '../src/data/cases';
+import { clauses } from '../src/data/contracts';
+import { allTools } from '../src/data/stack';
+import { figures } from '../src/data/figures';
+import { datasets } from '../src/lib/api';
 
-test('hub renders six resource cards, each with a count', async ({ page }) => {
+// The hub's destinations, in order: every reference page the site publishes.
+const HUB = [
+  '/resources/frameworks',
+  '/obligations',
+  '/resources/crosswalk',
+  '/resources/harms',
+  '/cases',
+  '/resources/contracts',
+  '/resources/templates',
+  '/figures',
+  '/resources/tools',
+  '/toolkit',
+  '/resources/reading-list',
+  '/bok/glossary',
+  '/resources/data',
+  '/map',
+];
+
+test('hub renders one resource card per reference, each with a count', async ({ page }) => {
   await page.goto('/resources');
   const cards = page.locator('[data-resource-card]');
-  await expect(cards).toHaveCount(6);
+  await expect(cards).toHaveCount(HUB.length);
+  for (let i = 0; i < HUB.length; i++) {
+    await expect(cards.nth(i)).toHaveAttribute('href', HUB[i]);
+  }
 
   const counts = page.locator('[data-resource-count]');
-  await expect(counts).toHaveCount(6);
-  for (let i = 0; i < 6; i++) {
+  await expect(counts).toHaveCount(HUB.length);
+  for (let i = 0; i < HUB.length; i++) {
     await expect(counts.nth(i)).not.toHaveText('');
   }
 
   // Counts are computed from the data, not hard-coded prose.
-  await expect(page.locator('body')).toContainText(
+  const body = page.locator('body');
+  await expect(body).toContainText(
     `${frameworks.length} frameworks · ${obligations.length} obligations`,
   );
+  await expect(body).toContainText(`${harms.length} harms`);
+  await expect(body).toContainText(`${cases.length} cases`);
+  await expect(body).toContainText(`${clauses.length} clauses`);
+  await expect(body).toContainText(`${obligations.length} obligation pages`);
+  await expect(body).toContainText(`${figures.length} infographics`);
+  await expect(body).toContainText(`${allTools().length} tools`);
+  await expect(body).toContainText(`${datasets.length} datasets`);
+  await expect(page.locator('.hero--page')).toContainText(`${HUB.length} references`);
 });
 
 test('crosswalk renders a row per topic and a column per framework family', async ({ page }) => {
@@ -136,21 +172,99 @@ test('crosswalk CSV and JSON export the data with the notice', async ({ page }) 
   expect(await json.text()).toContain(notice);
 });
 
-test('every crosswalk "Obligation row →" link resolves on the frameworks page', async ({
+test('crosswalk exports use schema 2 and keep the v1 fields', async ({ page }) => {
+  const json = await (await page.request.get('/resources/crosswalk.json')).json();
+  expect(json.schemaVersion).toBe(2);
+  expect(json.topics).toHaveLength(topics.length);
+  expect(json.columns).toHaveLength(columns.length);
+  expect(json.frameworks.length).toBeGreaterThanOrEqual(columns.length);
+  const fields = [
+    'topic',
+    'framework',
+    'reference',
+    'label',
+    'title',
+    'strength',
+    'verified',
+    'note',
+    'url',
+    'obligation',
+    'chapter',
+    'obligationId',
+    'obligationUrl',
+    'clauseId',
+    'column',
+    'see',
+  ];
+  for (const field of fields) {
+    expect(json.references[0], field).toHaveProperty(field);
+  }
+
+  const csv = await (await page.request.get('/resources/crosswalk.csv')).text();
+  const header = csv.split('\r\n')[1];
+  // The nine v1 columns keep their order; v2 appends the machine ids.
+  expect(
+    header.startsWith(
+      'Topic,Framework,Reference,Title,Strength,Verified,Note,Source URL,Obligation,',
+    ),
+  ).toBe(true);
+  expect(header).toContain('Clause ID');
+});
+
+test('crosswalk column chooser: four default columns, more on demand, remembered', async ({
   page,
 }) => {
   await page.goto('/resources/crosswalk');
-  const links = page.locator('a[href^="/resources/frameworks#ob-"]');
-  const count = await links.count();
+  const visibleHeads = page.locator('th.cw-colh:visible');
+  const defaults = columns.filter((c) => c.defaultVisible).length;
+  await expect(visibleHeads).toHaveCount(defaults);
 
-  const frameworksHtml = await (await page.request.get('/resources/frameworks')).text();
+  const chooser = page.locator('[data-cw-cols]');
+  await expect(chooser).toBeVisible();
+  await chooser.locator('summary').click();
+  await chooser.getByLabel('GDPR').check();
+  await expect(page.locator('th.cw-colh[data-cw-col="gdpr"]')).toBeVisible();
+  await expect(page.locator('td[data-cw-col="gdpr"]').first()).toBeVisible();
+
+  // Remembered in this browser (localStorage) across a reload.
+  await page.reload();
+  await expect(page.locator('th.cw-colh[data-cw-col="gdpr"]')).toBeVisible();
+
+  await page.locator('[data-cw-cols] summary').click();
+  await page.locator('[data-cw-cols-all]').click();
+  await expect(visibleHeads).toHaveCount(columns.length);
+  await page.locator('[data-cw-cols-reset]').click();
+  await expect(visibleHeads).toHaveCount(defaults);
+});
+
+test('crosswalk at 390 px: every column on, still no horizontal page scroll', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/resources/crosswalk');
+  await page.locator('[data-cw-cols] summary').click();
+  await page.locator('[data-cw-cols-all]').click();
+  const overflow = await page.evaluate(
+    () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test('every crosswalk "Obligation page →" link opens a register page', async ({ page }) => {
+  await page.goto('/resources/crosswalk');
+  const links = page.locator('a.cw-ref-oblig');
+  const count = await links.count();
+  expect(count).toBeGreaterThan(0);
+
+  const paths = new Set(obligations.map((row) => obligationPath(row)));
   const seen = new Set<string>();
   for (let i = 0; i < count; i++) {
-    const href = await links.nth(i).getAttribute('href');
-    const id = (href as string).split('#')[1];
-    if (seen.has(id)) continue;
-    seen.add(id);
-    expect(frameworksHtml).toContain(`id="${id}"`);
+    const href = (await links.nth(i).getAttribute('href')) as string;
+    expect(paths.has(href), href).toBe(true);
+    if (seen.has(href)) continue;
+    seen.add(href);
+    const res = await page.request.get(href);
+    expect(res.status(), href).toBe(200);
   }
 });
 
@@ -164,6 +278,18 @@ test.describe('crosswalk without JavaScript', () => {
     expect(href).toMatch(/^#topic-/);
     await rowh.click();
     expect(new URL(page.url()).hash).toBe(href);
+  });
+
+  test('every column shows and the explorer says it needs JavaScript', async ({ page }) => {
+    await page.goto('/resources/crosswalk');
+    await expect(page.locator('th.cw-colh:visible')).toHaveCount(columns.length);
+    await expect(page.locator('[data-cw-cols]')).toBeHidden();
+    await expect(page.locator('[data-cwx-form]')).toBeHidden();
+    // Playwright's text matchers skip <noscript>, so read its text directly.
+    const note = await page
+      .locator('#explore noscript')
+      .evaluate((node) => node.textContent ?? '');
+    expect(note).toContain('The explorer needs JavaScript');
   });
 });
 
@@ -201,6 +327,66 @@ test('tools page renders at least fifteen tools', async ({ page }) => {
   expect(await page.locator('[data-tool]').count()).toBeGreaterThanOrEqual(15);
 });
 
+// v0.5.0 (block b-catalogues): the catalogue carries metadata and filters.
+test('tools page is titled "Tool categories" and links every tool out over https', async ({
+  page,
+}) => {
+  await page.goto('/resources/tools');
+  await expect(page).toHaveTitle(/^Tool categories · /);
+  const tools = page.locator('[data-tool]');
+  const count = await tools.count();
+  expect(count).toBeGreaterThanOrEqual(80);
+  for (let i = 0; i < count; i++) {
+    const href = await tools.nth(i).locator('a.tc-name').getAttribute('href');
+    expect(href?.startsWith('https://')).toBe(true);
+    await expect(tools.nth(i).locator('.tc-licence')).not.toHaveText('');
+  }
+  // The disclaimer stays.
+  await expect(page.locator('main')).toContainText('Examples, not endorsements');
+});
+
+test('tools filter narrows by layer and by licence, and counts', async ({ page }) => {
+  await page.goto('/resources/tools');
+  const controls = page.locator('.tc-controls');
+  await expect(controls).toBeVisible();
+  const status = page.locator('.tc-count');
+  await expect(status).toContainText('Showing all');
+
+  await page.locator('label[for="tc-layer-3"]').click();
+  await expect(status).toContainText('Showing');
+  const visible = page.locator('[data-tool]:not([hidden])');
+  const n = await visible.count();
+  expect(n).toBeGreaterThan(0);
+  for (let i = 0; i < n; i++) {
+    const layerList = (await visible.nth(i).getAttribute('data-layers')) ?? '';
+    expect(layerList.split(' ')).toContain('3');
+  }
+  await expect(page).toHaveURL(/[?&]layers=3/);
+
+  await page.locator('label[for="tc-layer-all"]').click();
+  await page.locator('label[for="tc-access-commercial"]').click();
+  const commercial = page.locator('[data-tool]:not([hidden])');
+  const c = await commercial.count();
+  expect(c).toBeGreaterThan(0);
+  for (let i = 0; i < c; i++) {
+    await expect(commercial.nth(i)).toHaveAttribute('data-access', 'commercial');
+  }
+  // A category with no visible tool is hidden with it.
+  await expect(page.locator('#cat-policy-engines')).toBeHidden();
+});
+
+test('tools filter state can be linked', async ({ page }) => {
+  await page.goto('/resources/tools?layers=4&access=open-source');
+  await expect(page.locator('#tc-layer-4')).toBeChecked();
+  await expect(page.locator('#tc-access-open-source')).toBeChecked();
+  const visible = page.locator('[data-tool]:not([hidden])');
+  const n = await visible.count();
+  expect(n).toBeGreaterThan(0);
+  for (let i = 0; i < n; i++) {
+    await expect(visible.nth(i)).toHaveAttribute('data-access', 'open-source');
+  }
+});
+
 test('reading list renders links, all https', async ({ page }) => {
   await page.goto('/resources/reading-list');
   const links = page.locator('a[data-reading-item]');
@@ -211,6 +397,55 @@ test('reading list renders links, all https', async ({ page }) => {
     expect(href).toBeTruthy();
     expect(href?.startsWith('https://')).toBe(true);
   }
+});
+
+test('reading list filters by audience and jurisdiction', async ({ page }) => {
+  await page.goto('/resources/reading-list');
+  const status = page.locator('.rl-status');
+  await expect(page.locator('.rl-controls')).toBeVisible();
+  await expect(status).toContainText('Showing all');
+
+  await page.locator('label[for="rl-jurisdiction-eu"]').click();
+  const visible = page.locator('.rd-item:not([hidden])');
+  const n = await visible.count();
+  expect(n).toBeGreaterThan(0);
+  for (let i = 0; i < n; i++) {
+    const keys = (await visible.nth(i).getAttribute('data-jurisdiction')) ?? '';
+    expect(keys.split(' ')).toContain('eu');
+  }
+
+  await page.locator('label[for="rl-audience-legal"]').click();
+  const both = page.locator('.rd-item:not([hidden])');
+  const m = await both.count();
+  expect(m).toBeGreaterThan(0);
+  expect(m).toBeLessThanOrEqual(n);
+  for (let i = 0; i < m; i++) {
+    const audience = (await both.nth(i).getAttribute('data-audience')) ?? '';
+    expect(audience.split(' ')).toContain('legal');
+  }
+});
+
+test('reading list points to the book chapter as its canonical text', async ({ page }) => {
+  await page.goto('/resources/reading-list');
+  await expect(page.locator('.lede a[href="/bok/reading-list"]')).toHaveCount(1);
+});
+
+// Base.astro forwards a `canonical` prop to Seo: the chapter is the canonical
+// text, so the filtered view declares it and stays out of the sitemap.
+test('reading list declares /bok/reading-list as rel=canonical', async ({ page, request }) => {
+  await page.goto('/resources/reading-list');
+  const canonicals = await page
+    .locator('link[rel="canonical"]')
+    .evaluateAll((nodes) => nodes.map((node) => node.getAttribute('href')));
+  expect(canonicals).toEqual(['https://aigovernanceengineer.com/bok/reading-list']);
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    'content',
+    'https://aigovernanceengineer.com/bok/reading-list',
+  );
+
+  const sitemap = await (await request.get('/sitemap-0.xml')).text();
+  expect(sitemap).not.toContain('<loc>https://aigovernanceengineer.com/resources/reading-list</loc>');
+  expect(sitemap).toContain('<loc>https://aigovernanceengineer.com/bok/reading-list</loc>');
 });
 
 test('glossary renders terms and a working jump bar', async ({ page }) => {

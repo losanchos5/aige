@@ -1,0 +1,497 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/agent-register-entry.v1.json",
+  "title": "Agent register entry",
+  "description": "One entry in the agent registry: a non-human actor with an owner, a declared scope, a workload identity, bounded tools and a kill switch. Same core as the registry entry in chapter 05 (id, version, owner, scope, expiry), with the fields runtime controls need.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 14",
+    "EU AI Act Art. 12",
+    "EU AI Act Art. 26",
+    "ISO/IEC 42001 A.6",
+    "ISO/IEC 42001 A.9",
+    "NIST AI RMF GOVERN 1.6",
+    "NIST AI RMF MANAGE 2.4"
+  ],
+  "x-layer": [
+    2,
+    4
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-registry",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-identity--scoped-credentials",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-kill-switch--circuit-breaker"
+  ],
+  "x-lifecycle-stage": "intake",
+  "x-recommended": [
+    "workload_identity",
+    "tools",
+    "autonomy_level",
+    "human_oversight",
+    "kill_switch",
+    "status"
+  ],
+  "type": "object",
+  "required": [
+    "id",
+    "version",
+    "owner",
+    "scope",
+    "expiry"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/agent-register-entry.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "id": {
+      "type": "string",
+      "description": "Stable agent identifier (for example \"csa-01\").",
+      "minLength": 1,
+      "x-evidences": [
+        "NIST AI RMF GOVERN 1.6"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "description": "Version of the agent (prompt, model, tools and policies) this entry describes.",
+      "minLength": 1
+    },
+    "owner": {
+      "type": "string",
+      "description": "Accountable owning team. Ownerless agents lose their identity.",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "array",
+      "description": "Declared scope as permission strings (for example \"refunds:read\"). The identity provider issues nothing wider.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "ISO/IEC 42001 A.9"
+      ]
+    },
+    "expiry": {
+      "type": "string",
+      "format": "date",
+      "description": "Date after which the entry, and with it the agent's workload identity, lapses unless renewed.",
+      "x-evidences": [
+        "NIST AI RMF GOVERN 1.6"
+      ]
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name."
+    },
+    "purpose": {
+      "type": "string",
+      "description": "What the agent is for, in one sentence.",
+      "x-evidences": [
+        "NIST AI RMF MAP 1.1"
+      ]
+    },
+    "parent_system": {
+      "type": "string",
+      "description": "Registry id of the AI system the agent belongs to, if any."
+    },
+    "base_models": {
+      "type": "array",
+      "description": "Registry ids or vendor model identifiers the agent runs on.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 11"
+      ]
+    },
+    "workload_identity": {
+      "type": "object",
+      "description": "The non-human identity the agent authenticates with.",
+      "required": [
+        "type",
+        "identifier"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "spiffe",
+            "oidc_client",
+            "service_account",
+            "other"
+          ],
+          "description": "Kind of identity issued."
+        },
+        "identifier": {
+          "type": "string",
+          "description": "The identity string (for example a SPIFFE ID).",
+          "minLength": 1
+        },
+        "issuer": {
+          "type": "string",
+          "description": "Who issues and rotates the credential."
+        },
+        "credential_ttl_seconds": {
+          "type": "integer",
+          "description": "Lifetime of an issued credential, in seconds. Short-lived by default.",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "ISO/IEC 42001 A.9"
+      ]
+    },
+    "tools": {
+      "type": "array",
+      "description": "Tools the agent may call, each bounded. A tool not listed is denied.",
+      "items": {
+        "type": "object",
+        "description": "One tool the agent may call.",
+        "required": [
+          "name",
+          "operations"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Tool or API name.",
+            "minLength": 1
+          },
+          "operations": {
+            "type": "array",
+            "description": "Operations allowed on the tool.",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "requires_approval": {
+            "type": "boolean",
+            "description": "Whether each call needs a human approval (human-in-the-loop gate)."
+          },
+          "limits": {
+            "type": "string",
+            "description": "Rate, amount or time limits enforced at the tool boundary."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "EU AI Act Art. 14",
+        "ISO/IEC 42001 A.9"
+      ]
+    },
+    "data_access": {
+      "type": "array",
+      "description": "Data the agent can reach, by class.",
+      "items": {
+        "type": "object",
+        "description": "One data domain.",
+        "required": [
+          "domain",
+          "classification",
+          "access"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Data domain or store.",
+            "minLength": 1
+          },
+          "classification": {
+            "type": "string",
+            "enum": [
+              "public",
+              "internal",
+              "confidential",
+              "restricted"
+            ],
+            "description": "Highest data class reachable."
+          },
+          "access": {
+            "type": "string",
+            "enum": [
+              "read",
+              "write",
+              "read_write"
+            ],
+            "description": "Access mode."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "delegation": {
+      "type": "object",
+      "description": "Delegation limits. Delegated agents need their own entries.",
+      "required": [
+        "can_spawn_agents"
+      ],
+      "properties": {
+        "can_spawn_agents": {
+          "type": "boolean",
+          "description": "Whether the agent may create sub-agents."
+        },
+        "can_delegate_to": {
+          "type": "array",
+          "description": "Registry ids of agents it may delegate to.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "autonomy_level": {
+      "type": "string",
+      "enum": [
+        "suggest_only",
+        "act_with_approval",
+        "act_and_report",
+        "act_autonomously"
+      ],
+      "description": "Highest level of autonomy the agent is allowed.",
+      "x-evidences": [
+        "EU AI Act Art. 14",
+        "NIST AI RMF MAP 3.5"
+      ]
+    },
+    "human_oversight": {
+      "type": "object",
+      "description": "How humans oversee the agent.",
+      "required": [
+        "mode"
+      ],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "human_in_the_loop",
+            "human_on_the_loop",
+            "human_in_command"
+          ],
+          "description": "Oversight mode."
+        },
+        "approval_required_for": {
+          "type": "array",
+          "description": "Actions that always need a human approval.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "overseer_role": {
+          "type": "string",
+          "description": "Role that oversees the agent. Its members need a current training record.",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 14",
+        "EU AI Act Art. 26(2)"
+      ]
+    },
+    "spend_limit": {
+      "type": "object",
+      "description": "Budget the agent can commit or move.",
+      "required": [
+        "currency",
+        "amount",
+        "period"
+      ],
+      "properties": {
+        "currency": {
+          "type": "string",
+          "description": "ISO 4217 currency code.",
+          "pattern": "^[A-Z]{3}$"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Maximum spend or value moved per period.",
+          "minimum": 0
+        },
+        "period": {
+          "type": "string",
+          "enum": [
+            "per_action",
+            "per_hour",
+            "per_day",
+            "per_month"
+          ],
+          "description": "Period the limit applies to."
+        }
+      },
+      "additionalProperties": false
+    },
+    "kill_switch": {
+      "type": "object",
+      "description": "The stop control and when it was last exercised.",
+      "required": [
+        "mechanism",
+        "owner"
+      ],
+      "properties": {
+        "mechanism": {
+          "type": "string",
+          "description": "How the agent is stopped (for example \"revoke identity and drain queue\").",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "description": "Who can pull it.",
+          "minLength": 1
+        },
+        "last_drill": {
+          "type": "string",
+          "format": "date",
+          "description": "Date of the last tested stop."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 14",
+        "NIST AI RMF MANAGE 2.4"
+      ]
+    },
+    "runtime_policies": {
+      "type": "array",
+      "description": "Ids of the policy cards evaluated at runtime for this agent.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "eval_suites": {
+      "type": "array",
+      "description": "Ids of the eval suites that gate its releases.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 15"
+      ]
+    },
+    "logging": {
+      "type": "string",
+      "description": "Where the agent's action log is written, and its retention.",
+      "x-evidences": [
+        "EU AI Act Art. 12"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "suspended",
+        "expired",
+        "retired"
+      ],
+      "description": "Current status. Only \"active\" agents hold a live identity."
+    },
+    "registered_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the entry was first written."
+    },
+    "public_record": {
+      "type": "object",
+      "description": "Optional. What a public register or transparency record asks for that the internal entry does not: the responsible organisation, a contact, a plain-language description and the registration details. One source record then feeds a UK ATRS record, a Canada AIA, an EU database registration (Annex VIII) and a model or system card; the field crosswalk is on /toolkit/ai-register-entry.",
+      "properties": {
+        "organisation": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Organisation responsible for the system (the provider or the deployer), as a public record names it."
+        },
+        "address": {
+          "type": "string",
+          "description": "The organisation's address and other contact details, where a register asks for them."
+        },
+        "contact_email": {
+          "type": "string",
+          "format": "email",
+          "description": "Contact address of the team or organisation responsible: a role mailbox, not a person."
+        },
+        "website_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Public page with more information about the system."
+        },
+        "one_sentence_description": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "The system in one plain-language sentence."
+        },
+        "description": {
+          "type": "string",
+          "description": "Plain-language overview for the public: what the system is and why it is used."
+        },
+        "data_and_logic": {
+          "type": "string",
+          "description": "Basic, concise description of the information the system uses (data, inputs) and of its operating logic.",
+          "x-evidences": [
+            "EU AI Act Annex VIII"
+          ]
+        },
+        "trade_name": {
+          "type": "string",
+          "description": "Trade name and any additional unambiguous reference that identifies and traces the system."
+        },
+        "market_status": {
+          "type": "string",
+          "enum": [
+            "not_yet_placed",
+            "on_the_market",
+            "in_service",
+            "withdrawn",
+            "recalled"
+          ],
+          "description": "Status of the system on the market or in service.",
+          "x-evidences": [
+            "EU AI Act Annex VIII"
+          ]
+        },
+        "region": {
+          "type": "string",
+          "description": "Primary region or area whose public the system affects."
+        },
+        "authorised_representative": {
+          "type": "string",
+          "description": "Name and contact details of the authorised representative, where one is required."
+        },
+        "certificate": {
+          "type": "string",
+          "description": "Type, number and expiry date of any notified-body certificate, with the notified body's name or number."
+        },
+        "declaration_of_conformity": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to the EU declaration of conformity, where one exists."
+        },
+        "instructions_for_use": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to the electronic instructions for use."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 49",
+        "EU AI Act Art. 71",
+        "EU AI Act Annex VIII"
+      ]
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

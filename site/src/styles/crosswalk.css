@@ -70,6 +70,9 @@
    travels with the content (attachment: local) and slides over the shade at
    the far end, so the shade shows only while there is more to scroll. */
 .cw-scroll {
+  /* A containing block for the cells' absolutely positioned .visually-hidden
+     labels: without it they escape the scroller and widen the page at 390px. */
+  position: relative;
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);

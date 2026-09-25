@@ -1,0 +1,401 @@
+---
+/**
+ * AudienceHub: one /for/<slug> page, rendered from its entry in
+ * src/data/audiences.ts through src/lib/audiences.ts. In order: the hero (with
+ * a breadcrumb back to /for), who the route is for, the three questions the
+ * audience brings (answered in brief, with numbered sources and a link to the
+ * full treatment), the route through the site in reading order (tools appear
+ * only once they are live in the toolkit registry), the "start this week"
+ * actions, the obligations that matter most (status and date read from the
+ * register), the sources, the other routes and a closing band.
+ *
+ * No script. Every tinted band goes through <Section tone="tint">, so --muted
+ * stays AA there (DESIGN.md hard constraint 3). The question cards are flat
+ * (.card-lum, no lift) because they are not links.
+ */
+import Marketing from '../layouts/Marketing.astro';
+import PageHero from './PageHero.astro';
+import Section from './Section.astro';
+import RegisterList from './RegisterList.astro';
+import CitedText from './CitedText.astro';
+import SourceList from './SourceList.astro';
+import Callout from './Callout.astro';
+import CtaBand from './CtaBand.astro';
+import { audiences, audiencePath, type Audience } from '../data/audiences';
+import {
+  resolveRoute,
+  resolveObligations,
+  pathLinks,
+  fillDates,
+  validateAudiences,
+  liveSiblingHubs,
+} from '../lib/audiences';
+import { disclaimer } from '../data/frameworks';
+import { site } from '../data/site';
+import { WEBSITE_ID } from '../lib/jsonld';
+import { breadcrumbJsonLd } from '../lib/breadcrumbs';
+import '../styles/pages.css';
+import '../styles/resources.css';
+
+interface Props {
+  audience: Audience;
+}
+
+validateAudiences();
+
+const { audience: a } = Astro.props;
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const route = resolveRoute(a);
+const obligations = resolveObligations(a);
+const starts = pathLinks(a);
+const first = route[0].steps[0];
+
+// The other hubs, including those another block owns once their page exists.
+const others = [
+  ...audiences
+    .filter((other) => other.id !== a.id)
+    .map((other) => ({ title: other.navLabel, description: other.summary, href: audiencePath(other) })),
+  ...liveSiblingHubs().map((hub) => ({
+    title: hub.label,
+    description: hub.summary,
+    href: `/for/${hub.slug}`,
+  })),
+];
+
+const crumbs = [{ label: 'For you', href: '/for' }, { label: a.label }];
+const pageUrl = new URL(audiencePath(a), site.url).href;
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#webpage`,
+    name: a.metaTitle,
+    description: a.description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    audience: { '@type': 'Audience', audienceType: a.roles.join(', ') },
+  },
+  breadcrumbJsonLd(crumbs),
+];
+
+// An obligation's name, prefixed with its instrument when the name does not
+// already carry it (the ISO and OWASP rows name only the clause).
+const obligationName = (o: (typeof obligations)[number]) =>
+  o.row.obligation.startsWith(o.instrument) ? o.row.obligation : `${o.instrument} · ${o.row.obligation}`;
+---
+
+<Marketing title={a.metaTitle} description={a.description} image="/og/for.png" jsonLd={jsonLd}>
+  <PageHero variant="res" crumbs={crumbs} title={a.title} lede={a.lede} />
+
+  <Section tone="plain" id="who" title="Who this is for.">
+    <div class="well au-who" data-pagefind-body>
+      <p>{a.who}</p>
+      <ul class="chips" aria-label="Written for">
+        {a.roles.map((role) => <li class="chip">{role}</li>)}
+      </ul>
+      <p class="au-path">
+        On the <a href="/path">learning path</a>, start at{' '}
+        {/* One line: a line break between a link and its separator renders as a space. */}
+        {starts.map((link, i) => (<><a href={link.href}>{link.label}</a>{i < starts.length - 2 ? ', ' : i === starts.length - 2 ? ' or ' : '.'}</>))}
+      </p>
+    </div>
+  </Section>
+
+  <Section
+    tone="tint"
+    id="questions"
+    title="Three questions you bring."
+    lede="Each one answered in brief here, and in full in the Body of Knowledge."
+  >
+    <ol class="au-questions" data-pagefind-body>
+      {
+        a.questions.map((q, i) => (
+          <li class="au-q card-lum">
+            <p class="au-qidx" aria-hidden="true">
+              {pad(i + 1)}
+            </p>
+            <h3 class="au-qtitle">{q.question}</h3>
+            <p class="prose au-answer">
+              <CitedText text={fillDates(q.answer)} />
+            </p>
+            <p class="au-qlink">
+              <a class="chapter-link" href={q.link.href}>
+                {q.link.label} <span class="arrow" aria-hidden="true">→</span>
+              </a>
+            </p>
+          </li>
+        ))
+      }
+    </ol>
+  </Section>
+
+  <Section
+    tone="plain"
+    id="route"
+    title="Your route through the site."
+    lede="In reading order: chapters at the section that matters, then the patterns, tools, templates, datasets and figures that turn them into work."
+  >
+    <div class="au-route" data-pagefind-body>
+      {
+        route.map((phase) => (
+          <div class="au-phase">
+            <h3 class="au-phase-title">{phase.title}</h3>
+            <div class="well">
+              <RegisterList
+                items={phase.steps.map((step) => ({
+                  title: step.title,
+                  description: `${step.kindLabel} · ${step.why}`,
+                  href: step.href,
+                  index: step.index,
+                  swatch: step.swatch,
+                }))}
+              />
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </Section>
+
+  <Section tone="tint" id="this-week" title="Start this week.">
+    <ol class="au-week" data-pagefind-body>
+      {
+        a.thisWeek.map((w, i) => (
+          <li>
+            <span class="au-widx" aria-hidden="true">
+              {pad(i + 1)}
+            </span>
+            <span class="au-wbody">
+              <span class="au-waction">{w.action}</span>
+              <a class="chapter-link" href={w.link.href}>
+                {w.link.label} <span class="arrow" aria-hidden="true">→</span>
+              </a>
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+  </Section>
+
+  <Section
+    tone="plain"
+    id="obligations"
+    title="The obligations that matter most."
+    lede={a.obligationsWhy}
+  >
+    <div class="res-tablewrap">
+      <table class="res-table au-table">
+        <caption class="visually-hidden">
+          Obligations for this route ({a.label}), with status, date and evidence
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Obligation</th>
+            <th scope="col">Applies</th>
+            <th scope="col">Evidence</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            obligations.map((o) => (
+              <tr>
+                <td class="c-name" data-label="Obligation">
+                  <a href={o.href}>{obligationName(o)}</a>
+                  <span class="au-oid">{o.row.id}</span>
+                </td>
+                <td data-label="Applies">
+                  {o.status}
+                  {o.applies && (
+                    <>
+                      {' · '}
+                      <time datetime={o.row.appliesFrom}>{o.applies}</time>
+                    </>
+                  )}
+                </td>
+                <td class="c-summary" data-label="Evidence">
+                  {o.row.artefact}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="au-callout">
+      <Callout kind="note" title="Illustrative, not a claim of conformity">
+        <p>
+          {disclaimer} The selection is this route’s reading of what matters first; status and dates
+          come from the obligation register as reviewed for each row. Indicative, not legal advice.
+        </p>
+      </Callout>
+    </div>
+    <p class="section-foot">
+      <a class="chapter-link" href="/obligations">
+        Every obligation in the register <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
+
+  <Section tone="tint" id="sources" title="Sources">
+    <div class="prose au-sources">
+      <SourceList sources={a.sources} />
+    </div>
+  </Section>
+
+  <Section tone="plain" id="other-routes" title="Other routes.">
+    <div class="well"><RegisterList items={others} /></div>
+  </Section>
+
+  <CtaBand
+    title="Start at the top of the route."
+    sub={`Step 01 is ${first.title}. Each step after it builds on the one before.`}
+    primary={{ label: 'Open step 01', href: first.href }}
+    secondary={{ label: 'All routes', href: '/for' }}
+  />
+</Marketing>
+
+<style>
+  .au-who > * + * {
+    margin-top: var(--s-5);
+  }
+
+  .au-who > p:first-child {
+    margin: 0;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .au-path {
+    color: var(--ink-2);
+  }
+
+  .au-path a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .au-questions {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 960px) {
+    .au-questions {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .au-q {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding: var(--s-5);
+  }
+
+  .au-qidx {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--ink-2);
+  }
+
+  .au-qtitle {
+    margin: 0;
+    font-size: var(--fs-h3);
+    line-height: 1.25;
+  }
+
+  /* .prose carries the citation chip styles; reset its reading-column layout
+     inside a card. */
+  .au-answer {
+    margin: 0;
+    max-width: none;
+    font-size: 1rem;
+    color: var(--ink-2);
+  }
+
+  .au-qlink {
+    margin: auto 0 0;
+    padding-top: var(--s-2);
+  }
+
+  .au-route {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+
+  .au-phase-title {
+    margin: 0 0 var(--s-3);
+    font-size: var(--fs-h3);
+  }
+
+  .au-week {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: var(--prose);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .au-week > li {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: var(--s-4);
+    padding: var(--s-4) 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .au-widx {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--ink-2);
+    padding-top: 0.25em;
+    text-align: center;
+  }
+
+  .au-wbody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    min-width: 0;
+  }
+
+  .au-waction {
+    color: var(--ink);
+    font-weight: 600;
+    line-height: 1.4;
+    text-wrap: pretty;
+  }
+
+  .au-table a {
+    color: var(--ink);
+  }
+
+  .au-oid {
+    display: block;
+    margin-top: var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+
+  .au-callout {
+    margin-top: var(--s-5);
+    max-width: var(--prose);
+  }
+
+  .au-sources {
+    margin: 0;
+  }
+</style>

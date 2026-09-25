@@ -1,0 +1,283 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Rights Requests Against Models",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "locate",
+        "label": "Locate the data",
+        "focus": [
+          "request",
+          "map",
+          "router"
+        ],
+        "note": "The request is matched on a subject key against a data map built from lineage the organisation already keeps."
+      },
+      {
+        "id": "act-per-store",
+        "label": "Act per store",
+        "focus": [
+          "router",
+          "sources",
+          "rag",
+          "evals",
+          "weights"
+        ],
+        "note": "Each store has a pre-agreed response; the weights get output suppression now and retraining on a schedule."
+      },
+      {
+        "id": "close-with-record",
+        "label": "Close with a record",
+        "focus": [
+          "retrain",
+          "record"
+        ],
+        "note": "The fulfilment record lists every location, the action taken and when the remaining gap closes."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "intake",
+      "label": "Request"
+    },
+    {
+      "id": "route",
+      "label": "Layer 02 Inventory & Transparency"
+    },
+    {
+      "id": "stores",
+      "label": "Data stores"
+    },
+    {
+      "id": "model",
+      "label": "Model weights",
+      "variant": "exception"
+    },
+    {
+      "id": "evidence",
+      "label": "Layer 05 Evidence"
+    }
+  ],
+  "phases": [
+    {
+      "id": "locate",
+      "label": "Locate",
+      "fromCol": 0,
+      "toCol": 2
+    },
+    {
+      "id": "act",
+      "label": "Act per store",
+      "fromCol": 3,
+      "toCol": 4,
+      "variant": "emphasis"
+    },
+    {
+      "id": "close",
+      "label": "Record",
+      "fromCol": 5,
+      "toCol": 5,
+      "variant": "dashed"
+    }
+  ],
+  "mainPath": [
+    "request",
+    "map",
+    "router",
+    "rag",
+    "record"
+  ],
+  "nodes": [
+    {
+      "id": "request",
+      "lane": "intake",
+      "col": 0,
+      "type": "external",
+      "label": "Rights request",
+      "sublabel": "access, erasure",
+      "width": 156
+    },
+    {
+      "id": "map",
+      "lane": "route",
+      "col": 1,
+      "type": "database",
+      "label": "Data map",
+      "sublabel": "lineage, subject key",
+      "width": 162
+    },
+    {
+      "id": "router",
+      "lane": "route",
+      "col": 2,
+      "type": "backend",
+      "label": "Fan-out router",
+      "sublabel": "one handler per store",
+      "width": 168
+    },
+    {
+      "id": "sources",
+      "lane": "stores",
+      "col": 3,
+      "type": "database",
+      "label": "Sources, snapshots",
+      "sublabel": "delete, flag models",
+      "yOffset": -88,
+      "width": 168
+    },
+    {
+      "id": "rag",
+      "lane": "stores",
+      "col": 3,
+      "type": "database",
+      "label": "Index and logs",
+      "sublabel": "delete, re-index",
+      "width": 168
+    },
+    {
+      "id": "evals",
+      "lane": "stores",
+      "col": 3,
+      "type": "database",
+      "label": "Eval sets",
+      "sublabel": "replace records",
+      "yOffset": 88,
+      "width": 168
+    },
+    {
+      "id": "weights",
+      "lane": "model",
+      "col": 3,
+      "type": "security",
+      "label": "Output filter",
+      "sublabel": "suppress now",
+      "width": 156
+    },
+    {
+      "id": "retrain",
+      "lane": "model",
+      "col": 4,
+      "type": "backend",
+      "label": "Scheduled retrain",
+      "sublabel": "closes the gap",
+      "width": 162
+    },
+    {
+      "id": "record",
+      "lane": "evidence",
+      "col": 5,
+      "type": "database",
+      "label": "Fulfilment record",
+      "sublabel": "per location",
+      "width": 162
+    }
+  ],
+  "edges": [
+    {
+      "id": "request-map",
+      "from": "request",
+      "to": "map",
+      "label": "match",
+      "variant": "emphasis"
+    },
+    {
+      "id": "map-router",
+      "from": "map",
+      "to": "router",
+      "variant": "emphasis"
+    },
+    {
+      "id": "router-sources",
+      "from": "router",
+      "to": "sources",
+      "role": "branch"
+    },
+    {
+      "id": "router-rag",
+      "from": "router",
+      "to": "rag",
+      "variant": "emphasis"
+    },
+    {
+      "id": "router-evals",
+      "from": "router",
+      "to": "evals",
+      "role": "branch"
+    },
+    {
+      "id": "router-weights",
+      "from": "router",
+      "to": "weights",
+      "label": "weights",
+      "variant": "security",
+      "role": "branch"
+    },
+    {
+      "id": "weights-retrain",
+      "from": "weights",
+      "to": "retrain",
+      "label": "schedule",
+      "variant": "dashed"
+    },
+    {
+      "id": "rag-record",
+      "from": "rag",
+      "to": "record",
+      "label": "done",
+      "variant": "emphasis"
+    },
+    {
+      "id": "sources-record",
+      "from": "sources",
+      "to": "record",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "id": "evals-record",
+      "from": "evals",
+      "to": "record",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "id": "retrain-record",
+      "from": "retrain",
+      "to": "record",
+      "variant": "dashed",
+      "role": "branch"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "The model is one more location",
+      "items": [
+        "Data sits in sources, snapshots, indexes, logs, eval sets and possibly the weights",
+        "A data map built from data cards and the AIBOM says where",
+        "One request fans out to one handler per store"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "A ladder for the weights",
+      "items": [
+        "Output suppression now, tested like any control",
+        "Retraining without the data on a schedule",
+        "Unlearning only as a claim to test"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Closed with evidence",
+      "items": [
+        "The fulfilment record lists each location and the action taken",
+        "It dates the remaining gap until the retrain ships"
+      ]
+    }
+  ]
+}

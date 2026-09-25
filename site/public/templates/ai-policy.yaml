@@ -1,0 +1,164 @@
+# ai-policy.yaml: the AI policy as data, the single source for two views.
+#   ai-policy.md    the prose policy people read and approve (one section per key below)
+#   ai-policy.rego  the executable skeleton a policy engine evaluates (rules[].rego)
+# Change the policy here, then regenerate or hand-edit both views in the same pull request, so the
+# prose and the code cannot drift. Illustrative, not a claim of conformity, and not legal advice.
+# Part of https://aigovernanceengineer.com/resources/templates
+# This work is licensed under CC BY 4.0. Attribution: Jorge García Aibar.
+
+policy:
+  id: ai-policy
+  version: "1.0.0"
+  title: AI policy
+  owner: ai-governance-committee
+  approved_by: board-risk-committee
+  effective_from: "2026-10-01"
+  review_by: "2027-10-01"
+  evidences:
+    - ISO/IEC 42001 5.2
+    - ISO/IEC 42001 A.2
+    - NIST AI RMF GOVERN 1.2
+    - NIST AI RMF GOVERN 1.4
+    - EU AI Act Art. 17
+
+scope:
+  applies_to:
+    - every AI system, model and agent the organisation builds, buys or runs
+    - generative AI tools used by staff and contractors for work
+  excludes:
+    - AI used only in research sandboxes with synthetic or public data and no production access
+  definitions:
+    ai_system: A system that infers from its inputs how to generate outputs such as predictions, content, recommendations or decisions.
+    agent: An AI system that can take actions through tools on its own initiative.
+    record: A structured document that validates against a schema in the templates library.
+
+principles:
+  - id: earliest-block
+    statement: Build each control at the earliest point where it can block.
+  - id: teeth
+    statement: Give every control teeth; a control that cannot fail a build or stop an action is advice.
+  - id: register-first
+    statement: Register and bound every actor before it acts.
+  - id: self-proving
+    statement: Instrument the build to produce its own proof.
+  - id: harm-first
+    statement: Start every control from a named failure mode or harm.
+  - id: governed-path
+    statement: Make the governed path the easiest path.
+
+roles:
+  - id: ai-governance-committee
+    duty: Approves this policy, high and critical tier use cases, exceptions and residual-risk acceptance above the owner's authority.
+    charter: committee-charter.md
+  - id: system-owner
+    duty: Accountable for one AI system through its lifecycle and for every record filed against it.
+  - id: ai-governance-engineer
+    duty: Implements this policy as code, runs the gates and maintains the evidence store.
+  - id: privacy-office
+    duty: Owns DPIA addenda and the lawful-basis checks in dataset cards.
+  - id: security
+    duty: Owns agent identity, adversarial testing and AI security incidents.
+  - id: model-risk
+    duty: Challenges models independently and signs test reports for high and critical tiers.
+  - id: internal-audit
+    duty: Tests that the controls run, from the evidence store.
+
+rules:
+  - id: register-before-production
+    statement: No AI system or agent reaches production without a current register entry naming an owner, a declared scope and an expiry.
+    applies_to: [ai_system, agent]
+    enforcement: [deploy]
+    rego: deny
+    records: [ai-system-register-entry, agent-register-entry]
+    evidences: [EU AI Act Art. 49, ISO/IEC 42001 A.4, NIST AI RMF GOVERN 1.6]
+  - id: classify-at-intake
+    statement: Every new use of AI is recorded at intake, classified, and routed to the assessments its class requires before build work starts.
+    applies_to: [ai_system, agent]
+    enforcement: [deploy]
+    rego: deny
+    records: [use-case-record]
+    evidences: [EU AI Act Art. 6, ISO/IEC 42001 A.5, NIST AI RMF MAP 1.1]
+  - id: impact-assessment-before-use
+    statement: Each assessment the intake routes a system to (AI impact assessment, DPIA addendum or FRIA) is approved before first use.
+    applies_to: [ai_system]
+    enforcement: [deploy]
+    rego: deny
+    records: [impact-assessment]
+    evidences: [EU AI Act Art. 27, GDPR Art. 35, ISO/IEC 42005]
+  - id: data-admission
+    statement: No dataset enters a training, evaluation or retrieval pipeline without a dataset card and an admit decision from the admission gate.
+    applies_to: [dataset]
+    enforcement: [pre_merge]
+    rego: deny
+    records: [dataset-card, dataset-admission-record]
+    evidences: [EU AI Act Art. 10, ISO/IEC 42001 A.7]
+  - id: eval-gate
+    statement: A release ships only if every blocking suite in its test plan has a passing result for that exact version.
+    applies_to: [ai_system, agent]
+    enforcement: [pre_merge, deploy]
+    rego: deny
+    records: [test-plan, eval-result, test-report]
+    evidences: [EU AI Act Art. 15, EU AI Act Art. 9(8), NIST AI RMF MEASURE 2.3]
+  - id: go-no-go
+    statement: High and critical tier releases need a signed go or conditional-go decision for that exact version.
+    applies_to: [ai_system, agent]
+    enforcement: [deploy]
+    rego: deny
+    records: [go-no-go]
+    evidences: [EU AI Act Art. 17, NIST AI RMF MANAGE 1.1]
+  - id: agents-bounded-spend
+    statement: Agents act only through registered tools and operations, while active, and within their spend limit; anything above the limit needs a human approval.
+    applies_to: [agent]
+    enforcement: [runtime]
+    rego: deny, require_approval
+    records: [agent-register-entry, policy-card, evidence-record]
+    evidences: [EU AI Act Art. 14, ISO/IEC 42001 A.9, NIST AI RMF MANAGE 2.4]
+  - id: oversight-competence
+    statement: Only people with a current training record for a system may approve, override or stop its outputs.
+    applies_to: [ai_system, agent]
+    enforcement: [runtime]
+    rego: deny
+    records: [training-record]
+    evidences: [EU AI Act Art. 4, EU AI Act Art. 26(2), ISO/IEC 42001 7.2, NIST AI RMF GOVERN 2.2]
+  - id: sanctioned-genai-tools
+    statement: Staff use only approved generative AI tools, and never enter confidential or restricted data into a tool not approved for that class.
+    applies_to: [staff_use]
+    enforcement: [runtime]
+    rego: deny
+    records: [training-record, evidence-record]
+    evidences: [ISO/IEC 42001 A.9, ISO/IEC 42001 7.3]
+  - id: vendor-due-diligence
+    statement: No third-party AI product is bought or renewed without an assessed due-diligence response that is still in date, with its conditions written into the contract.
+    applies_to: [procurement]
+    enforcement: [periodic]
+    rego: deny
+    records: [vendor-due-diligence-response]
+    evidences: [EU AI Act Art. 25, GDPR Art. 28, ISO/IEC 42001 A.10, NIST AI RMF GOVERN 6.1]
+  - id: incident-handling
+    statement: Any harm, near miss or out-of-policy action involving an AI system is recorded as an incident within one working day and assessed against every reporting regime.
+    applies_to: [ai_system, agent]
+    enforcement: [periodic]
+    rego: null  # a process control: evidenced by incident records, not decided by the engine
+    records: [incident-record, risk-register-entry]
+    evidences: [EU AI Act Art. 73, NIST AI RMF MANAGE 4.3]
+  - id: decommission-by-runbook
+    statement: Systems are retired by runbook, with identity revoked, the register entry retired, evidence archived and data disposed of.
+    applies_to: [ai_system, agent]
+    enforcement: [periodic]
+    rego: null  # a process control: evidenced by the runbook's step records
+    records: [decommissioning-runbook]
+    evidences: [NIST AI RMF GOVERN 1.7, EU AI Act Art. 18]
+
+exceptions:
+  requested_by: system-owner
+  approved_by: ai-governance-committee
+  max_duration_days: 90
+  record: An exception is a signed verdict override with an expiry, filed in the evidence store.
+
+review:
+  cadence: annual
+  triggers:
+    - a change in law or in a standard the organisation relies on
+    - a serious incident
+    - an internal audit finding against this policy
+    - a new class of AI use (for example the first agent with write access to money or personal data)

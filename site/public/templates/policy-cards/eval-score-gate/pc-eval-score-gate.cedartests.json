@@ -1,0 +1,100 @@
+[
+  {
+    "name": "score at the minimum is allowed",
+    "request": {
+      "principal": "Pipeline::\"ci\"",
+      "action": "Action::\"deploy\"",
+      "resource": "System::\"credit-afford\"",
+      "context": {
+        "subject": "credit-afford@3.2.0",
+        "eval": {
+          "suite_id": "safety-core",
+          "model_version": "credit-afford@3.2.0",
+          "score": {
+            "__extn": {
+              "fn": "decimal",
+              "arg": "0.90"
+            }
+          }
+        }
+      }
+    },
+    "entities": [],
+    "decision": "allow",
+    "reason": [
+      "pc-eval-score-gate.baseline"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "score below the minimum is denied",
+    "request": {
+      "principal": "Pipeline::\"ci\"",
+      "action": "Action::\"deploy\"",
+      "resource": "System::\"credit-afford\"",
+      "context": {
+        "subject": "credit-afford@3.2.0",
+        "eval": {
+          "suite_id": "safety-core",
+          "model_version": "credit-afford@3.2.0",
+          "score": {
+            "__extn": {
+              "fn": "decimal",
+              "arg": "0.89"
+            }
+          }
+        }
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "evals.min-score.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "missing result is denied",
+    "request": {
+      "principal": "Pipeline::\"ci\"",
+      "action": "Action::\"deploy\"",
+      "resource": "System::\"credit-afford\"",
+      "context": {
+        "subject": "credit-afford@3.2.0"
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "evals.min-score.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "result for another version is denied",
+    "request": {
+      "principal": "Pipeline::\"ci\"",
+      "action": "Action::\"deploy\"",
+      "resource": "System::\"credit-afford\"",
+      "context": {
+        "subject": "credit-afford@3.2.0",
+        "eval": {
+          "suite_id": "safety-core",
+          "model_version": "credit-afford@3.1.0",
+          "score": {
+            "__extn": {
+              "fn": "decimal",
+              "arg": "0.90"
+            }
+          }
+        }
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "evals.min-score.v1"
+    ],
+    "num_errors": 0
+  }
+]

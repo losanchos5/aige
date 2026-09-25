@@ -1,0 +1,33 @@
+---
+/**
+ * CitedText: renders a string from a data file that carries `[n]` citation
+ * markers, turning each marker into the same chip the chapters use
+ * (`sup > a.cite`, styled by prose.css under a `.prose` ancestor) linked to
+ * `#<prefix>-<n>` in the page's source list. Plain runs render as text, so no
+ * `set:html` is needed.
+ */
+import { citeSegments } from '../lib/sources';
+
+interface Props {
+  text: string;
+  /** The id prefix of the source list rows (`<prefix>-<n>`). */
+  prefix?: string;
+}
+
+const { text, prefix = 'src' } = Astro.props;
+const segments = citeSegments(text);
+---
+
+{
+  segments.map((segment) =>
+    'cite' in segment ? (
+      <sup>
+        <a class="cite" href={`#${prefix}-${segment.cite}`} aria-label={`Source ${segment.cite}`}>
+          {segment.cite}
+        </a>
+      </sup>
+    ) : (
+      segment.text
+    ),
+  )
+}

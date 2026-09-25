@@ -1,10 +1,12 @@
 // rehype-diagrams: at build, insert the interactive diagram figures declared in
 // src/data/diagrams.ts AND the hand-made conceptual infographics declared in
-// src/data/figures.ts into the Body of Knowledge chapters. The markdown file is
-// mapped to its chapter slug from the vfile path (basename `NN-slug.md` ->
-// chapters.ts id -> slug); for each placement the plugin resolves the anchor by
-// matching heading TEXT (normalised) and inserts the figure hast at the point
-// named by `at`:
+// src/data/figures.ts into the Body of Knowledge chapters and the pattern pages.
+// The markdown file is mapped to its target from the vfile path: a chapter
+// (basename `NN-slug.md` -> chapters.ts id -> slug) takes the placements whose
+// `chapter` is that slug and that name no `pattern`; a pattern file
+// (`bok/patterns/<slug>.md`) takes the placements whose `pattern` is its slug.
+// For each placement the plugin resolves the anchor by matching heading TEXT
+// (normalised) and inserts the figure hast at the point named by `at`:
 //   - 'lead': before the chapter's first H2 (an opening figure after the intro);
 //   - 'head': immediately after the anchor heading (the H2 `section`, or the H3
 //     `sub` inside it when given);
@@ -25,8 +27,12 @@ import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fromHtml } from 'hast-util-from-html';
 import { getChapter } from '../data/chapters';
-import { diagramsForChapter, type DiagramPlacement } from '../data/diagrams';
-import { figuresForChapter, type FigureDef } from '../data/figures';
+import {
+  diagramsForChapter,
+  diagramsForPattern,
+  type DiagramPlacement,
+} from '../data/diagrams';
+import { figures, figuresForChapter, type FigureDef } from '../data/figures';
 import { diagramIds, renderDiagramFigure } from './diagrams';
 
 // The hand-made infographic SVGs live under site/src/figures, resolved from the
@@ -59,17 +65,40 @@ function nodeText(node: RootContent): string {
   return out.replace(/\s+/g, ' ').trim();
 }
 
-/** The chapter slug for the markdown file being processed, if it is a chapter. */
-function chapterSlugForFile(file: VFile | undefined): string | undefined {
+/** Where a markdown file renders: a chapter slug or a pattern page slug. */
+type Target = { kind: 'chapter'; slug: string } | { kind: 'pattern'; slug: string };
+
+/** The chapter or pattern page the markdown file being processed belongs to. */
+function targetForFile(file: VFile | undefined): Target | undefined {
   const path =
     file?.path ??
     (Array.isArray(file?.history) && file.history.length > 0
       ? file.history[file.history.length - 1]
       : undefined);
   if (!path) return undefined;
-  const base = path.split(/[\\/]/).pop() ?? '';
+  const segments = path.split(/[\\/]/);
+  const base = segments.pop() ?? '';
   const id = base.replace(/\.[^.]+$/, '');
-  return getChapter(id)?.slug;
+  // bok/patterns/<slug>.md: one pattern of the chapter 05 catalogue.
+  if (segments.at(-1) === 'patterns' && segments.at(-2) === 'bok') {
+    return { kind: 'pattern', slug: id };
+  }
+  const chapterSlug = getChapter(id)?.slug;
+  return chapterSlug ? { kind: 'chapter', slug: chapterSlug } : undefined;
+}
+
+/** True when `placement` lands in the file rendered for `target`. */
+function placedIn(placement: DiagramPlacement, target: Target): boolean {
+  return target.kind === 'pattern'
+    ? placement.pattern === target.slug
+    : placement.pattern === undefined && placement.chapter === target.slug;
+}
+
+/** "chapter <slug>" or "pattern <slug>", for build errors. */
+function where(placement: DiagramPlacement): string {
+  return placement.pattern !== undefined
+    ? `pattern "${placement.pattern}"`
+    : `chapter "${placement.chapter}"`;
 }
 
 function escapeHtml(value: string): string {
@@ -87,12 +116,34 @@ function renderFigureFigure(def: FigureDef): string {
   const svgPath = resolve(FIGURES_DIR, `${def.id}.svg`);
   if (!existsSync(svgPath)) return '';
   const svg = readFileSync(svgPath, 'utf8').trim();
+  // Optional wide variant (src/figures/<id>-wide.svg, e.g. values-principles in
+  // two columns): both SVGs are inlined and figures.css shows exactly one, so
+  // the hidden one never reaches the accessibility tree. A poster (kind
+  // 'poster') keeps a legible width: it fills the well and, on a narrow screen,
+  // scrolls sideways inside a focusable, labelled region (see figures.css).
+  const poster = def.kind === 'poster';
+  const widePath = resolve(FIGURES_DIR, `${def.id}-wide.svg`);
+  const wide = !poster && existsSync(widePath) ? readFileSync(widePath, 'utf8').trim() : '';
+  const canvas = poster
+    ? `<div class="figure-canvas figure-canvas--poster" tabindex="0" role="region" ` +
+      `aria-label="${escapeHtml(def.title).replace(/"/g, '&quot;')}: poster, scroll sideways on a narrow screen">${svg}</div>`
+    : wide
+      ? `<div class="figure-canvas figure-canvas--dual">${svg}${wide}</div>`
+      : `<div class="figure-canvas">${svg}</div>`;
+  // id="figure-<id>" is the deep link the figure's permalink page uses for
+  // "Where it appears"; the caption links that page (downloads, citation). A
+  // poster's link also carries figure-poster-link: it is the way to the full
+  // size, which figures-posters.spec checks.
+  const permalinkText = poster
+    ? 'Full-size poster, downloads and citation'
+    : 'Permalink, downloads and citation';
   return (
-    `<figure class="figure figure--infographic" data-figure="${def.id}">` +
-    `<div class="figure-canvas">${svg}</div>` +
+    `<figure class="figure figure--infographic${poster ? ' figure--poster' : ''}" id="figure-${def.id}" data-figure="${def.id}">` +
+    canvas +
     `<figcaption class="figure-figcaption">` +
     `<span class="figure-fig-title">${escapeHtml(def.title)}</span>` +
     `<span class="figure-fig-desc">${escapeHtml(def.caption)}</span>` +
+    `<a class="figure-permalink${poster ? ' figure-poster-link' : ''}" href="/figures/${def.id}">${permalinkText}</a>` +
     `</figcaption>` +
     `<details class="figure-alt">` +
     `<summary class="figure-alt-summary" data-pagefind-ignore>Text description</summary>` +
@@ -128,7 +179,7 @@ function insertFragment(
     }
     if (firstH2 < 0) {
       throw new Error(
-        `rehype-diagrams: no H2 heading found in chapter "${placement.chapter}" for lead figure "${label}".`,
+        `rehype-diagrams: no H2 heading found in ${where(placement)} for lead figure "${label}".`,
       );
     }
     children.splice(firstH2, 0, ...fragment.children);
@@ -138,7 +189,7 @@ function insertFragment(
   // 'head'/'foot' both anchor on the H2 `section` (and optional H3 `sub`).
   if (!placement.section) {
     throw new Error(
-      `rehype-diagrams: placement for figure "${label}" in chapter "${placement.chapter}" needs a "section" for at="${at}".`,
+      `rehype-diagrams: placement for figure "${label}" in ${where(placement)} needs a "section" for at="${at}".`,
     );
   }
   const wantSection = placement.section.replace(/\s+/g, ' ').trim();
@@ -155,7 +206,7 @@ function insertFragment(
   }
   if (sectionIndex < 0) {
     throw new Error(
-      `rehype-diagrams: heading "${placement.section}" not found in chapter "${placement.chapter}" for figure "${label}".`,
+      `rehype-diagrams: heading "${placement.section}" not found in ${where(placement)} for figure "${label}".`,
     );
   }
 
@@ -176,7 +227,7 @@ function insertFragment(
     }
     if (found < 0) {
       throw new Error(
-        `rehype-diagrams: sub-heading "${placement.sub}" not found under "${placement.section}" in chapter "${placement.chapter}" for figure "${label}".`,
+        `rehype-diagrams: sub-heading "${placement.sub}" not found under "${placement.section}" in ${where(placement)} for figure "${label}".`,
       );
     }
     targetIndex = found;
@@ -204,27 +255,32 @@ function insertFragment(
 
 export default function rehypeDiagrams() {
   return (tree: Root, file: VFile): void => {
-    const slug = chapterSlugForFile(file);
-    if (!slug) return;
+    const target = targetForFile(file);
+    if (!target) return;
 
     // Pass 1: interactive archify diagrams.
-    const defs = diagramsForChapter(slug);
+    const defs =
+      target.kind === 'pattern' ? diagramsForPattern(target.slug) : diagramsForChapter(target.slug);
     const available = new Set(diagramIds());
     for (const def of defs) {
       // Skip diagrams whose IR has not been built into an SVG yet.
       if (!available.has(def.id)) continue;
       for (const placement of def.placements) {
-        if (placement.chapter !== slug) continue;
+        if (!placedIn(placement, target)) continue;
         insertFragment(tree, renderDiagramFigure(def.id), placement, def.id);
       }
     }
 
     // Pass 2: hand-made conceptual infographics.
-    for (const figure of figuresForChapter(slug)) {
+    const infographics =
+      target.kind === 'pattern'
+        ? figures.filter((figure) => figure.placements.some((p) => p.pattern === target.slug))
+        : figuresForChapter(target.slug);
+    for (const figure of infographics) {
       const html = renderFigureFigure(figure);
       if (!html) continue; // SVG not authored/generated yet
       for (const placement of figure.placements) {
-        if (placement.chapter !== slug) continue;
+        if (!placedIn(placement, target)) continue;
         insertFragment(tree, html, placement, figure.id);
       }
     }

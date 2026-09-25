@@ -1,14 +1,44 @@
 // nav.spec.ts: the navigation data model (data/nav.ts) and its rendered surfaces
-//: every internal href resolves, descriptions stay short, the footer sitemap
-// covers every public route, and axe finds nothing serious/critical with a
-// desktop panel open (1440) or the drawer open (390), in light and dark.
+//: every internal href resolves, descriptions stay short, the Body of Knowledge
+// is grouped by part, the footer sitemap covers every public route (a
+// collection's detail pages through their index), and axe finds nothing
+// serious/critical with a desktop panel open (1440) or the drawer open (390),
+// in light and dark.
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { readdirSync, statSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { nav, feeds, allHrefs } from '../src/data/nav';
+import { chapterParts, chaptersOrdered } from '../src/data/chapters';
+import { bookParts } from '../src/data/parts';
 
 const DIST = 'dist';
+
+// Collections whose detail pages are linked from their index page rather than
+// from the footer (the footer links the index). Add a prefix here when a new
+// collection of generated detail pages lands.
+const DETAIL_COLLECTIONS: { prefix: string; index: string }[] = [
+  { prefix: '/cases/', index: '/cases' },
+  { prefix: '/obligations/', index: '/obligations' },
+  { prefix: '/patterns/', index: '/patterns' },
+  { prefix: '/figures/', index: '/figures' },
+  // One page per glossary term; the glossary chapter links every one of them.
+  { prefix: '/glossary/', index: '/bok/glossary' },
+  { prefix: '/toolkit/', index: '/toolkit' },
+];
+
+// Built pages the host answers with a redirect (public/_redirects, copied to
+// dist): not destinations, so the footer must not link them. Today that is
+// /resources/glossary, kept built for local previews and 301'd to /bok/glossary.
+function redirectedRoutes(): Set<string> {
+  const text = readFileSync(join(DIST, '_redirects'), 'utf8');
+  const out = new Set<string>();
+  for (const line of text.split(/\r?\n/)) {
+    const [from, , status] = line.trim().split(/\s+/);
+    if (from?.startsWith('/') && /^30[178]$/.test(status ?? '')) out.add(from);
+  }
+  return out;
+}
 
 function htmlFiles(dir: string): string[] {
   const out: string[] = [];
@@ -71,21 +101,116 @@ test('the footer sitemap links every model href and every public route', async (
     ).toHaveCount(1);
   }
 
+  const redirected = redirectedRoutes();
   const routes = htmlFiles(DIST)
     .map(toRoute)
     .filter(
       (route) =>
         !route.startsWith('/og/') &&
         !route.startsWith('/diagrams/') &&
-        route !== '/404',
+        route !== '/404' &&
+        !redirected.has(route),
     );
+  for (const route of redirected) {
+    await expect(
+      sitemap.locator(`a[href="${route}"]`),
+      `footer must not link the redirected route ${route}`,
+    ).toHaveCount(0);
+  }
 
-  for (const route of routes) {
+  const detailOf = (route: string) =>
+    DETAIL_COLLECTIONS.find((c) => route.startsWith(c.prefix) && route !== c.index);
+
+  for (const route of routes.filter((r) => !detailOf(r))) {
     await expect(
       sitemap.locator(`a[href="${route}"]`).first(),
       `footer should link the built route ${route}`,
     ).toHaveCount(1);
   }
+
+  // Detail pages: their collection index is in the footer (checked above) and
+  // links each of them.
+  for (const collection of DETAIL_COLLECTIONS) {
+    const details = routes.filter((r) => detailOf(r) === collection);
+    if (details.length === 0) continue;
+    await page.goto(collection.index);
+    for (const route of details) {
+      await expect(
+        page.locator(`main a[href="${route}"]`).first(),
+        `${collection.index} should link its detail page ${route}`,
+      ).toHaveCount(1);
+    }
+  }
+});
+
+test('the Body of Knowledge group lists every chapter once, grouped by part in order', () => {
+  const bok = nav.find((g) => g.id === 'bok')!;
+  expect(bok.sections, 'bok has part sections').toBeTruthy();
+  const sections = bok.sections!;
+  expect(sections.map((s) => s.id)).toEqual(chapterParts.map((p) => p.id));
+  expect(sections.map((s) => s.label)).toEqual(chapterParts.map((p) => p.title));
+
+  const inSections = sections.flatMap((s) => s.items.map((i) => i.href));
+  expect(new Set(inSections).size).toBe(inSections.length);
+  expect([...inSections].sort()).toEqual(
+    chaptersOrdered.map((c) => `/bok/${c.slug}`).sort(),
+  );
+  expect(bok.items.map((i) => i.href)).toEqual(chaptersOrdered.map((c) => `/bok/${c.slug}`));
+
+  // The count in the description is computed, not typed.
+  expect(bok.description).toContain(`${chaptersOrdered.length} chapters`);
+  for (const section of sections) {
+    expect(section.range).toMatch(/^\d{2}(–\d{2})?(, \d{2}(–\d{2})?)*$/);
+  }
+});
+
+test('Practice, Reference and About carry the new destinations', () => {
+  const hrefsOf = (id: string) => nav.find((g) => g.id === id)!.items.map((i) => i.href);
+  expect(hrefsOf('practice')).toEqual(
+    expect.arrayContaining(['/patterns', '/toolkit', '/agents']),
+  );
+  expect(hrefsOf('reference')).toEqual(
+    expect.arrayContaining([
+      '/obligations',
+      '/resources/harms',
+      '/cases',
+      '/resources/contracts',
+      '/resources/templates',
+      '/figures',
+      '/resources/data',
+      '/bok/glossary',
+    ]),
+  );
+  // The chapter is the glossary's home; the old A-Z page only redirects to it.
+  expect(hrefsOf('reference')).not.toContain('/resources/glossary');
+  expect(hrefsOf('about')).toEqual(
+    expect.arrayContaining(['/about/changelog', '/about/contributors', '/about/methodology']),
+  );
+});
+
+test('the footer groups the chapters under one named list per part', async ({ page }) => {
+  await page.goto('/');
+  const sitemap = page.locator('nav[aria-label="Site map"]');
+  // Each part's list is named by its caption: the part title and its range.
+  for (const part of bookParts) {
+    const name = `${part.title} ${part.range}`;
+    const list = sitemap.getByRole('list', { name, exact: true });
+    await expect(list, `footer list for ${name}`).toHaveCount(1);
+  }
+  await expect(sitemap.locator('.fchap a')).toHaveCount(chaptersOrdered.length);
+});
+
+test('the desktop Body of Knowledge panel shows one named list per part', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await page.locator('header.site-header').getByRole('button', { name: 'Body of Knowledge' }).click();
+  const menu = page.locator('#nav-menu-bok');
+  await expect(menu).toBeVisible();
+  for (const part of bookParts) {
+    const name = `${part.title} ${part.range}`;
+    await expect(menu.getByRole('list', { name, exact: true }), name).toBeVisible();
+  }
+  await expect(menu.locator('.nav-menu-chapters a')).toHaveCount(chaptersOrdered.length);
 });
 
 const schemes = ['light', 'dark'] as const;

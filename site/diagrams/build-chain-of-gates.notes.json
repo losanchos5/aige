@@ -1,0 +1,9 @@
+{
+  "use-case": "Intake approval closes the use-case stage: the use-case record is written at intake, stored as fields on the registry entry (the Agent Registry pattern) and read by every later gate.",
+  "design": "The design review is the gate between an approved use case and spending compute; it signs a design record that fixes the oversight model, as in the Human-in-the-loop Gate pattern, and the controls built in.",
+  "data": "The dataset admission gate asks whether the data may be used and is fit for the purpose; the licence goes into the AIBOM so that a licence change surfaces in the next build.",
+  "testing": "The eval gate asks whether the system meets thresholds fixed before the tests ran; each test type is a suite behind the Eval Gate in CI.",
+  "release": "The release gate reads the records the earlier gates produced, including regenerated cards (the Model Card as Control Evidence pattern), and refuses to open while any is missing or stale.",
+  "blocked": "A failing gate blocks the build: a result below a threshold fixed in advance, or a record that is missing or stale, stops the release.",
+  "technical-file": "A documentation job assembles the technical file on every release candidate, fails when a row is stale, and emits it as Machine-Readable Evidence (OSCAL) with a human-readable rendering."
+}

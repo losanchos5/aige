@@ -1,0 +1,233 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Use-Case Intake & Risk Tiering",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "record-and-screen",
+        "label": "Record and screen",
+        "focus": [
+          "request",
+          "record",
+          "screen",
+          "blocked"
+        ],
+        "note": "Every request becomes a use-case record, and prohibited uses stop at the first screen."
+      },
+      {
+        "id": "compute-the-tier",
+        "label": "Compute the tier",
+        "focus": [
+          "screen",
+          "tier",
+          "gates"
+        ],
+        "note": "A versioned rule computes the tier from declared profile fields, and the tier switches gates on."
+      },
+      {
+        "id": "register-the-system",
+        "label": "Register the system",
+        "focus": [
+          "gates",
+          "registry"
+        ],
+        "note": "The record becomes the registry entry, and deployment refuses any system without one."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "team",
+      "label": "Product team"
+    },
+    {
+      "id": "l1",
+      "label": "Layer 01 Govern-as-Code"
+    },
+    {
+      "id": "l2",
+      "label": "Layer 02 Inventory & Transparency"
+    },
+    {
+      "id": "blocked",
+      "label": "Blocked",
+      "variant": "exception"
+    }
+  ],
+  "phases": [
+    {
+      "id": "ask",
+      "label": "Request",
+      "fromCol": 0,
+      "toCol": 0
+    },
+    {
+      "id": "classify",
+      "label": "Record, screen, tier",
+      "fromCol": 1,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "bind",
+      "label": "Gates + registry",
+      "fromCol": 4,
+      "toCol": 4,
+      "variant": "dashed"
+    }
+  ],
+  "mainPath": [
+    "request",
+    "record",
+    "screen",
+    "tier",
+    "gates",
+    "registry"
+  ],
+  "nodes": [
+    {
+      "id": "request",
+      "lane": "team",
+      "col": 0,
+      "type": "external",
+      "label": "Use-case request",
+      "sublabel": "built or bought",
+      "width": 160
+    },
+    {
+      "id": "record",
+      "lane": "l1",
+      "col": 1,
+      "type": "backend",
+      "label": "Use-case record",
+      "sublabel": "purpose, users, data",
+      "width": 164
+    },
+    {
+      "id": "screen",
+      "lane": "l1",
+      "col": 2,
+      "type": "security",
+      "label": "Prohibited-use screen",
+      "sublabel": "then the AI Act ladder",
+      "width": 176
+    },
+    {
+      "id": "tier",
+      "lane": "l1",
+      "col": 3,
+      "type": "backend",
+      "label": "Tier rule",
+      "sublabel": "profile fields to tier",
+      "tag": "versioned",
+      "width": 164
+    },
+    {
+      "id": "gates",
+      "lane": "l1",
+      "col": 4,
+      "type": "security",
+      "label": "Gates switched on",
+      "sublabel": "evals, DPIA, FRIA",
+      "width": 164
+    },
+    {
+      "id": "registry",
+      "lane": "l2",
+      "col": 4,
+      "type": "database",
+      "label": "Registry entry",
+      "sublabel": "no stub, no deploy",
+      "width": 160
+    },
+    {
+      "id": "blocked",
+      "lane": "blocked",
+      "col": 3,
+      "type": "backend",
+      "label": "Blocked at intake",
+      "sublabel": "prohibited practice",
+      "width": 164
+    }
+  ],
+  "edges": [
+    {
+      "id": "request-record",
+      "from": "request",
+      "to": "record",
+      "label": "submit",
+      "variant": "default",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "record-screen",
+      "from": "record",
+      "to": "screen",
+      "label": "screen",
+      "variant": "emphasis"
+    },
+    {
+      "id": "screen-blocked",
+      "from": "screen",
+      "to": "blocked",
+      "label": "prohibited",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "id": "screen-tier",
+      "from": "screen",
+      "to": "tier",
+      "label": "classify",
+      "variant": "emphasis"
+    },
+    {
+      "id": "tier-gates",
+      "from": "tier",
+      "to": "gates",
+      "label": "tier",
+      "variant": "emphasis"
+    },
+    {
+      "id": "gates-registry",
+      "from": "gates",
+      "to": "registry",
+      "label": "write entry",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "top"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "One path in",
+      "items": [
+        "Every use case, built or bought, enters through the same form-plus-code intake",
+        "The use-case record states purpose, out-of-scope uses, affected persons and data",
+        "Prohibited practices are screened first and never tiered"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "A tier computed, not negotiated",
+      "items": [
+        "A versioned rule reads autonomy, decision impact, exposure, reversibility and data class",
+        "The tier selects assessments, eval categories, approvers and review cadence",
+        "A disputed tier changes a factor, with evidence, in a reviewed change"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "The record is the entry",
+      "items": [
+        "No intake record, no deployment: the inventory is complete by construction",
+        "A new purpose, population or data source reopens intake"
+      ]
+    }
+  ]
+}

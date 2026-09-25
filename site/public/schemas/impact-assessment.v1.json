@@ -1,0 +1,444 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/impact-assessment.v1.json",
+  "title": "Impact assessment",
+  "description": "One schema for three assessments, told apart by `type`: an AI system impact assessment (aiia), an AI addendum to a data protection impact assessment (dpia_addendum) and a fundamental rights impact assessment (fria). Shared fields carry the risks, mitigations and outcome; type-specific fields carry what each instrument asks for.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 27",
+    "EU AI Act Art. 27(1)",
+    "EU AI Act Art. 27(3)",
+    "EU AI Act Art. 27(4)",
+    "GDPR Art. 35",
+    "GDPR Art. 35(7)",
+    "ISO/IEC 42005",
+    "ISO/IEC 42001 A.5",
+    "NIST AI RMF MAP 5.1"
+  ],
+  "x-layer": [
+    1,
+    2
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-fria-as-code"
+  ],
+  "x-lifecycle-stage": "intake",
+  "type": "object",
+  "required": [
+    "assessment_id",
+    "type",
+    "subject",
+    "assessor",
+    "risks",
+    "mitigations",
+    "outcome",
+    "approvals"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/impact-assessment.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "assessment_id": {
+      "type": "string",
+      "description": "Identifier of the assessment.",
+      "minLength": 1
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "aiia",
+        "dpia_addendum",
+        "fria"
+      ],
+      "description": "Which assessment this is. aiia: AI system impact assessment (ISO/IEC 42005 style); dpia_addendum: AI-specific addendum to a GDPR DPIA; fria: fundamental rights impact assessment by a deployer.",
+      "x-evidences": [
+        "ISO/IEC 42005",
+        "GDPR Art. 35",
+        "EU AI Act Art. 27"
+      ]
+    },
+    "subject": {
+      "type": "string",
+      "description": "The governed object as registry id and version, \"id@version\" (for example \"csa-01@2026-09-18\"). The key every record is filed against.",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "assessor": {
+      "type": "string",
+      "description": "Role that led the assessment.",
+      "minLength": 1
+    },
+    "consulted": {
+      "type": "array",
+      "description": "Stakeholders and experts consulted, including representatives of affected groups.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "NIST AI RMF MAP 5.2"
+      ]
+    },
+    "related_assessments": {
+      "type": "array",
+      "description": "Ids of related assessments. A FRIA may build on an existing DPIA rather than repeat it.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 27(4)"
+      ]
+    },
+    "processes": {
+      "type": "string",
+      "description": "fria: the deployer's processes in which the system is used, in line with its intended purpose.",
+      "x-evidences": [
+        "EU AI Act Art. 27(1)(a)"
+      ]
+    },
+    "period_and_frequency": {
+      "type": "string",
+      "description": "fria: how long and how often the system will be used.",
+      "x-evidences": [
+        "EU AI Act Art. 27(1)(b)"
+      ]
+    },
+    "affected_categories": {
+      "type": "array",
+      "description": "Categories of persons and groups likely to be affected.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 27(1)(c)"
+      ]
+    },
+    "processing_description": {
+      "type": "string",
+      "description": "dpia_addendum: systematic description of the processing and its purposes, including the AI-specific steps (training, inference, retention of prompts and outputs).",
+      "x-evidences": [
+        "GDPR Art. 35(7)(a)"
+      ]
+    },
+    "necessity_and_proportionality": {
+      "type": "string",
+      "description": "dpia_addendum: why the processing, and the use of AI for it, is necessary and proportionate.",
+      "x-evidences": [
+        "GDPR Art. 35(7)(b)"
+      ]
+    },
+    "ai_specific": {
+      "type": "object",
+      "description": "dpia_addendum and aiia: questions a classic DPIA template does not ask.",
+      "properties": {
+        "training_vs_operational_data": {
+          "type": "string",
+          "description": "How training data and operational data differ in source, basis and retention."
+        },
+        "automated_decision_making": {
+          "type": "boolean",
+          "description": "Whether decisions with legal or similarly significant effect are taken solely by automated means.",
+          "x-evidences": [
+            "GDPR Art. 22"
+          ]
+        },
+        "inferences": {
+          "type": "string",
+          "description": "What the system infers about people, and whether those inferences are stored."
+        },
+        "memorisation_and_extraction": {
+          "type": "string",
+          "description": "Risk that personal data is memorised by the model and extracted from it."
+        }
+      },
+      "additionalProperties": false
+    },
+    "iso42005_sections": {
+      "type": "array",
+      "description": "aiia: the documented elements of the assessment, keyed by ISO/IEC 42005 clause id (for example \"6.3.4\" for intended use). Clause ids as listed in the INCITS/AI crosswalk to the NIST AI RMF; the risks and mitigations below carry the impacts and the measures.",
+      "items": {
+        "type": "object",
+        "description": "One documented element.",
+        "required": [
+          "clause",
+          "text"
+        ],
+        "properties": {
+          "clause": {
+            "type": "string",
+            "pattern": "^[0-9]+(\\.[0-9]+)*$",
+            "description": "Clause id, for example \"6.3.4\"."
+          },
+          "heading": {
+            "type": "string",
+            "description": "The clause's heading."
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What the assessment records under it."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "ISO/IEC 42005"
+      ]
+    },
+    "risks": {
+      "type": "array",
+      "description": "Specific risks of harm to the people and groups affected.",
+      "items": {
+        "type": "object",
+        "description": "One risk of harm.",
+        "required": [
+          "right_or_interest",
+          "description",
+          "likelihood",
+          "severity"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Short id of the risk inside this assessment (for example \"R1\"), so each mitigation can name the risks it addresses."
+          },
+          "right_or_interest": {
+            "type": "string",
+            "description": "The right, freedom or interest at stake (for example \"non-discrimination\", \"privacy\").",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "description": "How harm could occur.",
+            "minLength": 1
+          },
+          "affected_group": {
+            "type": "string",
+            "description": "Who would bear it."
+          },
+          "likelihood": {
+            "type": "integer",
+            "description": "1 to 5.",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "severity": {
+            "type": "integer",
+            "description": "1 to 5.",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "risk_register_id": {
+            "type": "string",
+            "description": "Matching risk register entry, if any."
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "EU AI Act Art. 27(1)(d)",
+        "GDPR Art. 35(7)(c)",
+        "ISO/IEC 42005"
+      ]
+    },
+    "human_oversight_measures": {
+      "type": "string",
+      "description": "fria: how the oversight measures in the instructions for use are implemented.",
+      "x-evidences": [
+        "EU AI Act Art. 27(1)(e)",
+        "EU AI Act Art. 14"
+      ]
+    },
+    "mitigations": {
+      "type": "array",
+      "description": "Measures to take if the risks materialise, and measures to prevent them.",
+      "items": {
+        "type": "object",
+        "description": "One mitigation.",
+        "required": [
+          "measure",
+          "status"
+        ],
+        "properties": {
+          "measure": {
+            "type": "string",
+            "description": "The measure.",
+            "minLength": 1
+          },
+          "addresses": {
+            "type": "array",
+            "description": "Ids of the risks it addresses (for example \"R1\"); older records may name the rights instead.",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "pattern": {
+            "type": "string",
+            "format": "uri",
+            "description": "The pattern that implements the measure: a page under https://aigovernanceengineer.com/patterns/."
+          },
+          "controls": {
+            "type": "array",
+            "description": "Controls or obligations the measure implements, by id (for example \"ISO/IEC 42001 A.5\" or \"AIGE-OBL-EUAIA-ART27\").",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "owner": {
+            "type": "string",
+            "description": "Owner.",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "planned",
+              "in_place",
+              "verified"
+            ],
+            "description": "Status."
+          },
+          "evidence": {
+            "type": "string",
+            "format": "uri",
+            "description": "Record that proves it runs."
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "EU AI Act Art. 27(1)(f)",
+        "GDPR Art. 35(7)(d)"
+      ]
+    },
+    "governance_and_complaints": {
+      "type": "string",
+      "description": "fria: internal governance and complaint mechanisms if the risks materialise.",
+      "x-evidences": [
+        "EU AI Act Art. 27(1)(f)"
+      ]
+    },
+    "dpo_advice": {
+      "type": "string",
+      "description": "dpia_addendum: the data protection officer's advice and how it was taken into account.",
+      "x-evidences": [
+        "GDPR Art. 35(2)"
+      ]
+    },
+    "residual_risk": {
+      "type": "string",
+      "description": "What remains after mitigation, in a sentence."
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "proceed",
+        "proceed_with_mitigations",
+        "do_not_proceed",
+        "prior_consultation_required"
+      ],
+      "description": "Outcome. prior_consultation_required applies when a DPIA shows high residual risk.",
+      "x-evidences": [
+        "GDPR Art. 36"
+      ]
+    },
+    "authority_notification": {
+      "type": "object",
+      "description": "fria: notification of the results.",
+      "required": [
+        "required"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean",
+          "description": "Whether the results must be notified to the market surveillance authority."
+        },
+        "authority": {
+          "type": "string",
+          "description": "Authority notified."
+        },
+        "notified_at": {
+          "type": "string",
+          "format": "date",
+          "description": "When."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 27(3)"
+      ]
+    },
+    "approvals": {
+      "type": "array",
+      "description": "Approvals by role.",
+      "items": {
+        "type": "object",
+        "description": "One approval.",
+        "required": [
+          "role",
+          "decision",
+          "timestamp"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "The approving role, not a personal name.",
+            "minLength": 1
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "approve_with_conditions",
+              "reject",
+              "abstain"
+            ],
+            "description": "What this approver decided."
+          },
+          "conditions": {
+            "type": "string",
+            "description": "Conditions attached to the approval, if any."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the approver decided (RFC 3339)."
+          },
+          "signature": {
+            "type": "string",
+            "description": "Detached signature over the record, prefixed with the algorithm (for example \"ed25519:<base64>\"). Makes the record tamper-evident in the evidence store.",
+            "pattern": "^[a-z0-9-]+:.+$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "review_triggers": {
+      "type": "array",
+      "description": "Changes that reopen the assessment (new purpose, new data, new group affected, incident).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "next_review": {
+      "type": "string",
+      "format": "date",
+      "description": "Next scheduled review."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,9 @@
+{
+  "copy": "A draft public claim about accuracy, fairness, safety, autonomy or AI capability, on a site, in a deck or in the instructions for use.",
+  "row": "The claims register row: the exact text, every place it appears, the system and version, the metric, the claimed value and the owner.",
+  "evidence": "The cited eval run, with the measured value, its interval, the population and conditions measured and the date.",
+  "rules": "Substantiation rules as code: the measured population matches the claim's scope and the lower interval bound supports the figure.",
+  "publish": "Only a claim with live, passing evidence is published.",
+  "release": "Every model release reruns the cited suites and revalidates each claim that depends on them.",
+  "withdrawn": "A claim the evidence no longer supports is pulled from the copy, with its history kept."
+}

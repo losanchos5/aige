@@ -1,0 +1,319 @@
+---
+// /resources/data: documentation for the open data and the static API under
+// /api/v1/. The endpoint table, the schema list and the JSON-LD DataCatalog are
+// all built from the registry in src/lib/api.ts, so the page cannot list a
+// dataset the API does not publish.
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import Citation from '../../components/Citation.astro';
+import { site } from '../../data/site';
+import { obligations, frameworks, disclaimer, OBLIGATION_ID_PATTERN } from '../../data/frameworks';
+import { datasets, API_PATH, SCHEMA_BASE, allSchemas } from '../../lib/api';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID, DATA_CATALOG_ID } from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+import '../../styles/obligations.css';
+
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Open data' }];
+/** The planned public endpoint of tools/mcp-server (its README, "Connect"). */
+const MCP_ENDPOINT = 'https://mcp.aigovernanceengineer.com/mcp';
+const pageUrl = new URL('/resources/data', site.url).href;
+const description =
+  'The open data behind the site as static JSON: obligations with stable ids, frameworks, crosswalk, glossary, patterns and more, with schemas and an OpenAPI file.';
+const abs = (path: string) => new URL(path, site.url).href;
+
+// Instrument codes, read off the ids themselves: the second segment of
+// AIGE-OBL-<INSTRUMENT>-<CLAUSE>, with the instruments that use it.
+const codes = new Map<string, Set<string>>();
+for (const row of obligations) {
+  const code = row.id.split('-')[2];
+  const name = frameworks.find((f) => f.id === row.frameworkId)?.short ?? row.frameworkId;
+  if (!codes.has(code)) codes.set(code, new Set());
+  codes.get(code)!.add(name);
+}
+const exampleRow = obligations.find((o) => o.id === 'AIGE-OBL-EUAIA-ART9') ?? obligations[0];
+const exampleSlug = exampleRow.id.toLowerCase();
+const schemaNames = Object.keys(allSchemas());
+
+const jsonLd = [
+  {
+    '@type': 'DataCatalog',
+    '@id': DATA_CATALOG_ID,
+    name: `Open data · ${site.name}`,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    creator: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    dataset: datasets.map((d) => ({
+      '@type': 'Dataset',
+      '@id': `${abs(`${API_PATH}/${d.name}.json`)}#dataset`,
+      name: `${d.title} · ${site.name}`,
+      description: `${d.description} ${disclaimer}`,
+      url: abs(d.page),
+      version: site.bokVersion,
+      creator: [...authorRefs],
+      publisher: { '@id': ORG_ID },
+      ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+      isAccessibleForFree: true,
+      includedInDataCatalog: { '@id': DATA_CATALOG_ID },
+      distribution: [
+        {
+          '@type': 'DataDownload',
+          name: `${d.title} (JSON)`,
+          encodingFormat: 'application/json',
+          contentUrl: abs(`${API_PATH}/${d.name}.json`),
+        },
+      ],
+    })),
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Base title="Open data and API" description={description} image="/og/data.png" jsonLd={jsonLd}>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="The data behind the site, as files you can build on."
+    lede="Every register on this site is published as static JSON under a versioned path, with a JSON Schema per file, an OpenAPI description and a CC BY 4.0 licence. No key, no account, no rate limit of ours: fetch it, cache it, cite it."
+  />
+
+  <div class="container res-page">
+    <div class="res-section">
+      <Callout kind="note" title="Illustrative mapping, not a conformity assessment">
+        <p>{disclaimer} The same notice travels inside every file, in a top-level
+        <code>notice</code> field, so it survives being copied into another system.</p>
+      </Callout>
+    </div>
+
+    <section class="res-section" aria-labelledby="dt-endpoints">
+      <div class="res-section-head">
+        <h2 id="dt-endpoints">Endpoints</h2>
+        <p>
+          All paths are relative to <code>{site.url}{API_PATH}</code>. Start from the catalogue
+          (<a href={`${API_PATH}/index.json`}><code>index.json</code></a>) or the OpenAPI 3.1
+          description (<a href={`${API_PATH}/openapi.json`}><code>openapi.json</code></a>).
+        </p>
+      </div>
+      <div class="res-tablewrap">
+        <table class="res-table">
+          <thead>
+            <tr>
+              <th scope="col">Endpoint</th>
+              <th scope="col">What it holds</th>
+              <th scope="col">Schema</th>
+              <th scope="col">Page</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              datasets.map((d) => (
+                <tr>
+                  <td data-label="Endpoint">
+                    <a href={`${API_PATH}/${d.name}.json`}>
+                      <code>{d.name}.json</code>
+                    </a>
+                  </td>
+                  <td data-label="What it holds">{d.description}</td>
+                  <td data-label="Schema">
+                    <a href={`${API_PATH}/schemas/${d.name}.json`}>v{d.schemaVersion}</a>
+                  </td>
+                  <td data-label="Page">
+                    <a href={d.page}>{d.title}</a>
+                  </td>
+                </tr>
+              ))
+            }
+            <tr>
+              <td data-label="Endpoint">
+                <a href={`${API_PATH}/obligations/${exampleSlug}.json`}>
+                  <code>obligations/&#123;id&#125;.json</code>
+                </a>
+              </td>
+              <td data-label="What it holds">
+                One obligation, keyed by its id in lower case ({obligations.length} files).
+              </td>
+              <td data-label="Schema">
+                <a href={`${API_PATH}/schemas/obligation.json`}>v2</a>
+              </td>
+              <td data-label="Page">
+                <a href="/obligations">Obligation register</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="dt-envelope">
+      <h2 id="dt-envelope">The envelope</h2>
+      <p>Every file wraps its data in the same top-level fields:</p>
+      <ul>
+        <li><code>notice</code>: the disclaimer above, with the Body of Knowledge version.</li>
+        <li><code>version</code>: the Body of Knowledge version the file was built from ({site.bokVersion}).</li>
+        <li><code>license</code> and <code>licenseUrl</code>: {site.license} and its deed.</li>
+        <li><code>schemaVersion</code> and <code>schema</code>: the shape version and the JSON Schema the file validates against.</li>
+        <li><code>self</code> and <code>source</code>: the file's own URL and the page that renders the same data.</li>
+        <li><code>citation</code>: the title, authors and DOIs to cite (see below).</li>
+      </ul>
+      <p>
+        Schemas are JSON Schema draft 2020-12, one per file, at <code>{SCHEMA_BASE}/&lt;name&gt;.json</code>:
+        {schemaNames.map((name, i) => (
+          <>
+            {i > 0 && ', '}
+            <a href={`${API_PATH}/schemas/${name}.json`}>{name}</a>
+          </>
+        ))}.
+        Every record is a closed object: a field is always present, and absent values are
+        <code>null</code> or an empty list, never missing.
+      </p>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="dt-ids">
+      <h2 id="dt-ids">Obligation ids</h2>
+      <p>
+        Each obligation carries an id of the form <code>AIGE-OBL-&lt;INSTRUMENT&gt;-&lt;CLAUSE&gt;</code>,
+        for example <a href={`/obligations/${exampleSlug}`}><code>{exampleRow.id}</code></a>. Ids use
+        upper-case letters, digits and hyphens only (the pattern is
+        <code>{OBLIGATION_ID_PATTERN.source}</code>); URLs use the same id in lower case.
+      </p>
+      <ul>
+        <li>An id is assigned once. New wording, a moved date, a better artefact or a changed layer keeps the id.</li>
+        <li>A removed row keeps its id reserved; it is never reused for another obligation.</li>
+        <li>A split row keeps the id on the part that carries the original meaning; the new part gets a new id.</li>
+      </ul>
+      <p>The instrument codes in use:</p>
+    </section>
+    <div class="res-tablewrap">
+      <table class="res-table">
+        <thead>
+          <tr>
+            <th scope="col">Code</th>
+            <th scope="col">Instrument</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            [...codes].map(([code, names]) => (
+              <tr>
+                <td data-label="Code">
+                  <code>{code}</code>
+                </td>
+                <td data-label="Instrument">{[...names].join(' · ')}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <section class="res-section prose" aria-labelledby="dt-versioning">
+      <h2 id="dt-versioning">Versioning and stability</h2>
+      <ul>
+        <li>
+          <strong>The path is the contract.</strong> Everything under <code>{API_PATH}/</code>
+          keeps its URL and its meaning for as long as v1 exists. A breaking change ships under a
+          new path, and the old one stays up alongside it.
+        </li>
+        <li>
+          <strong>Fields are added, not taken away.</strong> Within a <code>schemaVersion</code>, a
+          file may gain fields; no field is removed, renamed or retyped. A breaking change to one
+          file bumps its <code>schemaVersion</code> and is recorded in the <a
+          href="/about/changelog">changelog</a>.
+        </li>
+        <li>
+          <strong>The data moves with the book.</strong> Files are rebuilt on every release; the
+          <code>version</code> field says which edition of the Body of Knowledge they come from, and
+          each obligation carries the date it was last <code>reviewed</code>.
+        </li>
+        <li>
+          <strong>The older downloads stay.</strong> <a href="/resources/obligations.json"><code>/resources/obligations.json</code></a>
+          and its CSV keep their URLs. They moved to <code>schemaVersion</code> 2 in v0.5.0:
+          <code>appliesFrom</code> became an ISO date (or <code>null</code>) and the former free
+          text moved to <code>appliesNote</code>. The CSV keeps its first seven columns in place
+          and appends the new ones.
+        </li>
+      </ul>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="dt-access">
+      <h2 id="dt-access">Access</h2>
+      <p>
+        The files are static. They are served with <code>Access-Control-Allow-Origin: *</code>, so
+        a browser application on any origin can read them, and with
+        <code>Cache-Control: public, max-age=3600</code>. There is no key and no authentication.
+        Please cache what you fetch; the data changes with releases, not by the minute.
+      </p>
+      {/* Wider than a phone: a named, focusable scroll region (axe
+          scrollable-region-focusable), like the Shiki blocks in the chapters. */}
+      <pre tabindex="0" role="region" aria-label="Example requests with curl and jq"><code>{`# The catalogue
+curl -s ${site.url}${API_PATH}/index.json
+
+# One obligation, by its id in lower case
+curl -s ${site.url}${API_PATH}/obligations/${exampleSlug}.json
+
+# Every EU AI Act obligation that applies on a given date (jq)
+curl -s ${site.url}${API_PATH}/obligations.json \\
+  | jq '.obligations[] | select(.frameworkId == "eu-ai-act" and .appliesFrom != null
+        and .appliesFrom <= "2027-12-02") | {id, appliesFrom, appliesStatus}'`}</code></pre>
+      <p>Other files that predate the API and stay where they are:</p>
+      <ul>
+        <li><a href="/resources/crosswalk.json"><code>/resources/crosswalk.json</code></a> and <a href="/resources/crosswalk.csv">CSV</a></li>
+        <li><a href="/resources/harms.json"><code>/resources/harms.json</code></a></li>
+        <li><a href="/glossary.json"><code>/glossary.json</code></a> (short definitions for hover cards)</li>
+        <li>The governance templates and their JSON Schemas on the <a href="/resources/templates">templates page</a></li>
+      </ul>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="dt-mcp">
+      <h2 id="dt-mcp">Remote MCP server (read-only)</h2>
+      <p>
+        The same data is served to AI assistants by a read-only Model Context Protocol server:
+        it answers questions about the obligation register, the crosswalk, the glossary, the
+        patterns, the templates and schemas and the chapters, and every answer names the page it
+        was read from. It holds no data of its own, needs no account and stores nothing about the
+        people who call it. Its endpoint is <code>{MCP_ENDPOINT}</code> (Streamable HTTP, no
+        authentication). As of 2026-09-24 the endpoint is not deployed yet; the server's code, its
+        tools and a guide to run it yourself are in
+        <a href={`${site.github}/tree/main/tools/mcp-server`}><code>tools/mcp-server</code></a>
+        of the repository.
+      </p>
+      <pre tabindex="0" role="region" aria-label="Adding the MCP server to Claude Code"><code>{`claude mcp add --transport http aige ${MCP_ENDPOINT}`}</code></pre>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="dt-cite">
+      <h2 id="dt-cite">How to cite</h2>
+      <p>
+        The data is part of the archived Body of Knowledge, not a separate deposit.{' '}
+        {site.doi !== site.conceptDoi ? (
+          <>
+            Cite the release DOI <a href={`https://doi.org/${site.doi}`}>{site.doi}</a> (this
+            version) or the concept DOI{' '}
+            <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a> (always the latest),
+            and
+          </>
+        ) : (
+          <>
+            Cite the concept DOI <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a>
+            {' '}(always the latest; this version's own DOI follows its Zenodo release), and
+          </>
+        )}{' '}
+        name the file and the date you fetched it. For a single obligation, cite its id and its page:
+        every obligation page carries its own citation block. Attribution under {site.license}:
+        {site.authors.join(', ')}.
+      </p>
+    </section>
+
+    <div class="obx-cite">
+      <Citation title="Open data and API" url="/resources/data" kind="dataset" />
+    </div>
+  </div>
+
+  <script is:inline defer src="/cite.js"></script>
+</Base>

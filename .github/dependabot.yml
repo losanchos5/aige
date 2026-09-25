@@ -1,5 +1,6 @@
-# Dependabot keeps npm dependencies (in site/) and the GitHub Actions used by the
-# workflows (in .github/workflows/, rooted at /) up to date. Minor and patch
+# Dependabot keeps npm dependencies (in site/), the GitHub Actions used by the
+# workflows (in .github/workflows/, rooted at /) and the digest-pinned base image
+# of the MCP server (tools/mcp-server/Dockerfile) up to date. Minor and patch
 # updates are grouped into a single PR per ecosystem to cut review noise; major
 # updates still arrive as their own PRs.
 version: 2
@@ -22,3 +23,12 @@ updates:
         update-types:
           - minor
           - patch
+  - package-ecosystem: docker
+    directory: /tools/mcp-server
+    schedule:
+      interval: weekly
+    ignore:
+      # Stay on the Node.js 22 line; a major upgrade is a deliberate change.
+      - dependency-name: node
+        update-types:
+          - version-update:semver-major

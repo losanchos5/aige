@@ -4,13 +4,27 @@
 // a header row and one row per reference follow. Fields are RFC 4180-escaped
 // (via the shared csv helper). Pagefind indexes HTML only, so this endpoint is
 // not searched; check-links only verifies the file exists behind the download link.
+//
+// Schema version 2 (BoK v0.5.0) keeps the nine v1 columns in their order and
+// appends the machine ids (topic, framework, column, clause) and the BoK section,
+// so a v1 reader that addresses columns by position keeps working.
 import type { APIRoute } from 'astro';
-import { topics, refs, chipLabel, frameworkById } from '../../data/crosswalk';
+import {
+  topics,
+  refs,
+  chipLabel,
+  clauseId,
+  columnOf,
+  frameworkById,
+  crosswalkAsOf,
+  crosswalkSchemaVersion,
+  refObligation,
+} from '../../data/crosswalk';
 import { site } from '../../data/site';
 import { csvRow } from '../../lib/csv';
 
 export const GET: APIRoute = () => {
-  const notice = `Illustrative mapping from the AI Governance Engineer Body of Knowledge v${site.bokVersion} (not a claim of conformity)`;
+  const notice = `Illustrative mapping from the AI Governance Engineer Body of Knowledge v${site.bokVersion} (not a claim of conformity); crosswalk schema ${crosswalkSchemaVersion}, references checked as of ${crosswalkAsOf}`;
 
   const topicName = new Map(topics.map((t) => [t.id, t.name] as const));
 
@@ -24,6 +38,12 @@ export const GET: APIRoute = () => {
     'Note',
     'Source URL',
     'Obligation',
+    'Topic ID',
+    'Framework ID',
+    'Column',
+    'Clause ID',
+    'BoK section',
+    'Obligation ID',
   ];
 
   const lines = [
@@ -39,7 +59,13 @@ export const GET: APIRoute = () => {
         r.verified === false ? 'no' : 'yes',
         r.note ?? '',
         r.url ?? '',
-        r.obligation ?? '',
+        refObligation(r)?.obligation ?? '',
+        r.topic,
+        r.framework,
+        columnOf(r.framework)?.id ?? '',
+        clauseId(r),
+        r.see ? new URL(r.see, site.url).href : '',
+        refObligation(r)?.id ?? '',
       ]),
     ),
   ];

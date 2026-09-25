@@ -39,7 +39,19 @@ regulatory exposure (EU AI Act high-risk, GPAI, out of scope), by data sensitivi
 The engineer builds intake as a form-plus-code path, not a meeting: a request that scaffolds a
 registry entry, triggers the right impact assessment (FRIA, DPIA), and routes the system to the
 controls its class requires. The NIST AI RMF's Map function is the natural vocabulary for the
-classification step. **Maps to** Inventory & Transparency.
+classification step. Intake asks, in order: whether the problem needs AI at all
+([strategy, value and whether to use AI at all](/bok/governance-program#strategy-value-and-whether-to-use-ai-at-all),
+chapter 12); whether the system counts as AI
+([the definitional decision and its registry fields](/bok/ai-defined#from-definition-element-to-registry-field),
+chapter 11); what the [use-case record](/bok/governing-development#the-use-case-record) says about
+purpose and decision authority (chapter 14); which risk tier the
+[use-case risk profile](/bok/risk-management#contributing-factors-and-the-use-case-risk-profile) gives
+it (chapter 13); and where it sits on [the AI Act risk ladder](/bok/eu-ai-act#the-risk-ladder)
+(chapter 18). A system that is bought rather than built enters with a
+[Deployment Decision Record](/bok/governing-deployment#the-deployment-decision-record) (chapter 15).
+The [Use-Case Intake & Risk Tiering](/patterns/use-case-intake-risk-tiering) pattern builds the
+intake, and the [AI Act triage](/toolkit/ai-act-triage) drafts the classification decision record.
+**Maps to** Inventory & Transparency.
 
 ### Inventory and registry
 
@@ -47,7 +59,9 @@ The engineer owns the inventory of models and the **agent registry**, the runtim
 every non-human actor, each with an owner, a declared scope, a status and a kill switch. The
 capability that distinguishes the engineer here is the runtime data path: the registry is fed by the
 deployment pipeline and by discovery against production, not typed into a spreadsheet, and every
-non-human actor in it carries its own identity. **Maps to** Inventory & Transparency.
+non-human actor in it carries its own identity; chapter 23 sets out what
+[an agent's registry entry](/bok/governing-agents#the-agent-registry) has to carry. **Maps to**
+Inventory & Transparency.
 
 ### Evals and red teaming as evidence
 
@@ -73,7 +87,9 @@ The engineer instruments runtime: guardrail decisions, tool-call mediation, drif
 behaviour stream into observability (Langfuse, Arize Phoenix over OpenTelemetry as examples). They own
 the detection-to-report path for serious incidents, including the EU AI Act's Article 73 clock for
 high-risk systems, and they own the tested **kill switch** for agents, with the threat model that
-says which runtime failures the controls are built against [5]. **Maps to** Runtime Controls &
+says which runtime failures the controls are built against [5]. Chapter 17 covers
+[incident response](/bok/incidents#the-response-lifecycle) and
+[root-cause analysis](/bok/incidents#root-cause-analysis). **Maps to** Runtime Controls &
 Observability.
 
 ### Assurance and audit evidence
@@ -89,7 +105,8 @@ The engineer reads the obligation well enough to build the control that meets it
 article, an ISO/IEC 42001 control or a NIST AI RMF subcategory into a gate, a registry field or an
 evidence artefact, and back, so an auditor can trace the control to the obligation. This is
 translation, not legal advice; the engineer depends on Legal to confirm the obligation is read right.
-**Maps to** all five layers; it is the spine that chapter 08 indexes.
+**Maps to** all five layers; it is the spine that chapter 08 indexes, and chapter 18 reads
+[the EU AI Act in one pass](/bok/eu-ai-act#how-to-read-this-chapter) for the engineer who has to translate it.
 
 ## Skills, by workflow
 
@@ -206,7 +223,9 @@ Reading the postings against the workflows above, three mistakes recur.
 - **Certifications as a proxy for capability.** Descriptions list AIGP, CIPP, CISSP and CISM as if a
   certificate produced a control. The Axial data shows certs appear in under 11% of postings each [4];
   the load-bearing skills (eval harnesses, policy-as-code, the runtime data path) are the ones the
-  JD under-specifies. Ask for the workflow, then the cert if it helps.
+  JD under-specifies. Ask for the workflow, then the cert if it helps. What each scheme assesses,
+  and how this book relates to it, is set out neutrally on the
+  [certifications page](/for/certifications).
 - **Analyst work under an engineer title.** In our reading of the postings, "AI Governance
   Engineer" titles often describe intake, mapping and reporting (analyst work) at engineer pay. The tell is the absence of any build: no
   eval gate, no registry integration, no evidence pipeline.
@@ -227,6 +246,20 @@ Reading the postings against the workflows above, three mistakes recur.
 (post-market monitoring), Art. 73 (serious-incident reporting) · ISO/IEC 42001 (roles,
 responsibilities and competence) · NIST AI RMF (Govern) · OWASP Top 10 for Agentic Applications 2026.
 Mappings are illustrative, not a claim of conformity.
+
+## What you can do this week
+
+1. **Map the seven workflows.** Write down who owns intake, inventory, evals, policy-as-code,
+   runtime and incidents, assurance and regulatory translation today, and mark the ones nobody owns.
+2. **Own one workflow outright.** Pick the one with the least build in it (often the registry or
+   the eval gate) and ship one control there that blocks or records, not one that recommends.
+3. **Rewrite one job description.** Replace the list of certifications with the workflows the hire
+   will own and the artefacts they will ship in their first quarter.
+4. **Practise one core skill on a real system.** From the skills table, take the core skill your
+   workflow lacks and use it once on a live pipeline: one policy in `OPA/Rego`, one eval in a
+   harness, one trace in OpenTelemetry.
+5. **Translate one article in a pair.** Sit a lawyer or DPO with an engineer and turn one AI Act
+   article into a gate, a registry field or an evidence artefact, and back again.
 
 ## Sources
 

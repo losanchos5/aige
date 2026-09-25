@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Decision Notice & Contest Path",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [920, 640],
+    "views": [
+      {
+        "id": "record-then-notify",
+        "label": "Record, then notify",
+        "focus": ["system", "record", "notice", "person"],
+        "note": "The decision is recorded with its reason codes, and the notice is generated from that record."
+      },
+      {
+        "id": "contest-with-authority",
+        "label": "Contest with authority",
+        "focus": ["person", "reviewer", "record"],
+        "note": "A contest reaches a reviewer who sees the record and the person's representations and can change the outcome."
+      },
+      {
+        "id": "outcome-as-evidence",
+        "label": "Outcome as evidence",
+        "focus": ["reviewer", "record", "person"],
+        "note": "The outcome and its reason go back to the person and into the decision record."
+      }
+    ]
+  },
+  "participants": [
+    { "id": "system", "type": "backend", "label": "Decision system", "sublabel": "scores or decides" },
+    { "id": "record", "type": "database", "label": "Decision record", "sublabel": "reasons, version" },
+    { "id": "notice", "type": "backend", "label": "Notice service", "sublabel": "per-regime template" },
+    { "id": "person", "type": "external", "label": "Affected person", "sublabel": "applicant" },
+    { "id": "reviewer", "type": "security", "label": "Reviewer", "sublabel": "can change it" }
+  ],
+  "segments": [
+    { "from": 150, "to": 262, "label": "Record, then notify" },
+    { "from": 262, "to": 432, "label": "Contest with authority" },
+    { "from": 432, "to": 566, "label": "Outcome as evidence" }
+  ],
+  "messages": [
+    { "id": "decide", "from": "system", "to": "record", "y": 190, "label": "decision, reason codes", "variant": "default" },
+    { "id": "trigger", "from": "record", "to": "notice", "y": 222, "label": "decision event", "variant": "default" },
+    { "id": "notify", "from": "notice", "to": "person", "y": 254, "label": "reasons, how to contest", "variant": "emphasis" },
+    { "id": "contest", "from": "person", "to": "reviewer", "y": 320, "label": "contest", "variant": "security" },
+    { "id": "context", "from": "reviewer", "to": "record", "y": 372, "label": "read inputs and reasons", "variant": "dashed" },
+    { "id": "outcome", "from": "reviewer", "to": "person", "y": 470, "label": "outcome and reason", "variant": "return" },
+    { "id": "log", "from": "reviewer", "to": "record", "y": 530, "label": "log outcome, correction", "variant": "emphasis" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "One record behind every notice",
+      "items": [
+        "The decision record holds model version, inputs, outcome and reason codes",
+        "The notice is rendered from it with a versioned template per regime",
+        "An eval checks the reasons are the factors the model used"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "A contest that can change the outcome",
+      "items": [
+        "The reviewer did not take the original decision",
+        "The reviewer sees the inputs, the reasons and the representations",
+        "A reviewer who confirms nearly everything is a signal, not a safeguard"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Recorded as evidence",
+      "items": [
+        "Notice version, send time, contest and outcome sit in one record",
+        "Overturn rates by reason code feed the drift and fairness monitor"
+      ]
+    }
+  ]
+}

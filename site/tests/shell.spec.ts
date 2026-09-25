@@ -136,13 +136,44 @@ test.describe('desktop grouped nav', () => {
   });
 
   test('a chapter surfaced by Practice lights Practice, not Body of Knowledge', async ({ page }) => {
-    await page.goto('/bok/patterns');
+    await page.goto('/bok/maturity-model');
     const header = page.locator('header.site-header');
     await expect(header.locator('[data-nav-group="practice"]')).toHaveAttribute('data-current', '');
     await expect(header.locator('[data-nav-group="bok"]')).not.toHaveAttribute('data-current', '');
     await expect(
-      header.locator('#nav-menu-practice a[href="/bok/patterns"]'),
+      header.locator('#nav-menu-practice a[href="/bok/maturity-model"]'),
     ).toHaveAttribute('aria-current', 'page');
+  });
+
+  test('a pattern page lights Practice and its Patterns link', async ({ page }) => {
+    await page.goto('/patterns/eval-gate-in-ci');
+    const header = page.locator('header.site-header');
+    await expect(header.locator('[data-nav-group="practice"]')).toHaveAttribute('data-current', '');
+    await expect(header.locator('#nav-menu-practice a[href="/patterns"]')).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  });
+
+  test('the new reference destinations light Reference', async ({ page }) => {
+    const header = page.locator('header.site-header');
+    for (const [path, href] of [
+      ['/obligations/aige-obl-euaia-art9', '/obligations'],
+      ['/figures/art73-clock', '/figures'],
+      ['/resources/data', '/resources/data'],
+      // A term page belongs to the Glossary item, whose href is the chapter.
+      ['/glossary/serious-incident', '/bok/glossary'],
+    ] as const) {
+      await page.goto(path);
+      await expect(header.locator('[data-nav-group="reference"]'), path).toHaveAttribute(
+        'data-current',
+        '',
+      );
+      await expect(
+        header.locator(`#nav-menu-reference a[href="${href}"]`),
+        path,
+      ).toHaveAttribute('aria-current', 'page');
+    }
   });
 });
 

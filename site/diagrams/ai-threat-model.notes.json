@@ -1,0 +1,10 @@
+{
+  "design": "The design record and its data-flow diagram: data sources, training pipeline, model artefact, retrieval corpus, prompts, tools and the inference API.",
+  "stride": "Each data-flow element is walked with the six STRIDE categories, with trust boundaries marked.",
+  "aiclasses": "The list is extended with AI-specific attack classes from MITRE ATLAS, NIST AI 100-2 and the OWASP Top 10 lists: poisoning, evasion, extraction, prompt injection, unsafe model files.",
+  "decide": "Each threat is rated on the organisation's likelihood and severity scales and mitigated, avoided, transferred or accepted.",
+  "tests": "Every mitigated threat names the test that proves the mitigation: a red-team case, an eval, a pipeline check or a guardrail test.",
+  "gate": "The design review is a gate: it fails while any threat above tolerance has no mitigation or no test.",
+  "register": "Accepted threats become risk-register entries with a named acceptor.",
+  "blocked": "A design with an untested threat above tolerance does not pass review."
+}

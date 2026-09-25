@@ -1,0 +1,455 @@
+/* crosswalk-explorer.css: crosswalk v2 on /resources/crosswalk. The column
+   chooser and optional columns of the grid, the extra lines of the topic
+   sections (framework name, BoK links), and the clause-to-clause explorer
+   (#explore). Tokens only, so light and dark both follow; text stays on ink and
+   ink-2 (never dimmed with opacity, which would drop contrast below AA). The
+   explorer's markup ships hidden and public/crosswalk-explorer.js reveals it;
+   without JavaScript only the <noscript> note shows. */
+
+/* ---- Optional columns ------------------------------------------------------ */
+/* Hidden from the first paint unless the chooser switched them on (.is-on);
+   a default column the reader switched off takes .is-off. The <noscript> rule
+   in CrosswalkMatrix.astro shows every column when scripts do not run. */
+.cw-grid .cw-col-opt:not(.is-on),
+.cw-grid .is-off {
+  display: none;
+}
+
+/* ---- Column chooser -------------------------------------------------------- */
+.cw-cols {
+  margin: 0 0 var(--s-4);
+}
+
+.cw-cols[hidden] {
+  display: none;
+}
+
+.cw-cols-d {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+}
+
+.cw-cols-sum {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 44px;
+  padding: 0 var(--s-4);
+  cursor: pointer;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.cw-cols-sum:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: var(--r-lg);
+}
+
+.cw-cols-count {
+  font-size: var(--fs-label);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+}
+
+.cw-cols-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--s-4);
+  padding: var(--s-2) var(--s-4) var(--s-4);
+}
+
+.cw-cols-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.cw-cols-group legend,
+.cwx-src-group legend,
+.cwx-field-label {
+  padding: 0;
+  margin-bottom: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.cw-cols-opt,
+.cwx-check {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 32px;
+  color: var(--ink);
+  font-size: var(--fs-small);
+}
+
+.cw-cols-opt input,
+.cwx-check input,
+.cwx-toggle input,
+.cwx-seg input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  flex: none;
+  accent-color: var(--ink);
+}
+
+.cw-cols-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin: 0;
+}
+
+.cw-cols-btn,
+.cwx-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cw-cols-btn:hover,
+.cwx-btn:hover:not(:disabled) {
+  border-color: var(--ink-2);
+}
+
+.cw-cols-btn:focus-visible,
+.cwx-btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.cwx-btn:disabled {
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+/* ---- Topic sections: framework name and Body-of-Knowledge links ---------- */
+.cw-ref-fw {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+}
+
+.cw-read {
+  font-size: var(--fs-small);
+}
+
+.cw-read a,
+.cw-ref-see {
+  color: var(--ink);
+  text-underline-offset: 0.15em;
+}
+
+.cw-ref-see {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.03em;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.cw-ref-see:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* ---- Explorer -------------------------------------------------------------- */
+.cwx {
+  scroll-margin-top: var(--anchor-offset);
+}
+
+.cwx [hidden] {
+  display: none !important;
+}
+
+.cwx-nojs,
+.cwx-fine {
+  max-width: var(--prose);
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+.cwx-fine {
+  margin-top: var(--s-5);
+}
+
+.cwx-form {
+  display: grid;
+  gap: var(--s-4);
+  margin: 0;
+}
+
+.cwx-src {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+}
+
+.cwx-src-sum {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 44px;
+  padding: 0 var(--s-4);
+  cursor: pointer;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.cwx-src-sum:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: var(--r-lg);
+}
+
+.cwx-src-count {
+  font-size: var(--fs-label);
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.cwx-src-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr));
+  gap: var(--s-4);
+  padding: var(--s-2) var(--s-4) var(--s-4);
+}
+
+.cwx-src-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.cwx-check input:disabled + span {
+  text-decoration: line-through;
+  color: var(--ink-2);
+}
+
+.cwx-fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--s-4) var(--s-5);
+}
+
+.cwx-field {
+  display: grid;
+  gap: 0;
+  min-width: min(100%, 14rem);
+  flex: 1 1 14rem;
+}
+
+.cwx-field select {
+  min-height: 44px;
+  width: 100%;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-small);
+}
+
+.cwx-field select:focus-visible,
+.cwx-toggle input:focus-visible,
+.cwx-seg input:focus-visible,
+.cwx-check input:focus-visible,
+.cw-cols-opt input:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.cwx-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  color: var(--ink);
+  font-size: var(--fs-small);
+}
+
+.cwx-view {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.cwx-view legend {
+  flex-basis: 100%;
+}
+
+.cwx-seg {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 32px;
+  color: var(--ink);
+  font-size: var(--fs-small);
+}
+
+.cwx-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: var(--s-4);
+}
+
+.cwx-status {
+  margin-top: var(--s-4);
+  max-width: var(--prose);
+  color: var(--ink);
+  font-size: var(--fs-small);
+}
+
+.cwx-out {
+  margin-top: var(--s-4);
+}
+
+.cwx-none {
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+/* Side-by-side rows: topic, then the source and target clause lists. One
+   column on phones, three from 900 px. */
+.cwx-head {
+  display: none;
+}
+
+.cwx-row {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-4) 0;
+  border-top: 1px solid var(--line);
+}
+
+.cwx-topic {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.cwx-topic a {
+  color: var(--ink);
+  text-decoration: none;
+  text-underline-offset: 0.15em;
+}
+
+.cwx-topic a:hover {
+  text-decoration: underline;
+}
+
+.cwx-side-label {
+  margin: 0 0 var(--s-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.cwx-clauses,
+.cwx-gaps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-2);
+}
+
+.cwx-clause {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-1) var(--s-2);
+  min-width: 0;
+}
+
+.cwx-gaps .cwx-clause {
+  padding-bottom: var(--s-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.cwx-fw,
+.cwx-link,
+.cwx-gap-topics {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.02em;
+  color: var(--ink-2);
+}
+
+.cwx-title {
+  color: var(--ink);
+  font-size: var(--fs-small);
+  overflow-wrap: anywhere;
+}
+
+.cwx-link {
+  text-decoration: none;
+}
+
+.cwx-link:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.cwx-gap-topics {
+  flex-basis: 100%;
+}
+
+@media (min-width: 900px) {
+  .cwx-head {
+    display: grid;
+    grid-template-columns: 12rem 1fr 1fr;
+    gap: var(--s-4);
+    padding-bottom: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .cwx-row {
+    grid-template-columns: 12rem 1fr 1fr;
+    gap: var(--s-4);
+  }
+
+  .cwx-side-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}

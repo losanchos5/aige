@@ -19,7 +19,7 @@ producir scroll horizontal en ningún ancho entre 320 y 1517 px.
 - **THEN** la caja de la capa mesh empieza en x = 0, mide lo mismo que el viewport y el ancho de
   scroll del documento es igual al ancho del viewport
 
-#### Scenario: Glosario sin capas decorativas
+#### Scenario: Glosario sin mesh
 - **WHEN** se abre `/resources/glossary`
 - **THEN** la cabecera no tiene capa mesh ni capa de textura (ruta auditada por Lighthouse) y el
   ancho de scroll de la cabecera es igual a su ancho visible

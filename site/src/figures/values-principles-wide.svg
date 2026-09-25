@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 397" class="figc figc--wide" role="img" aria-labelledby="fig-values-principles-wide-t fig-values-principles-wide-d">
+  <title id="fig-values-principles-wide-t">Values and principles</title>
+  <desc id="fig-values-principles-wide-d">Two groups: the eight values as affirmations of which way to lean, and the six principles as commitments to act.</desc>
+  <text class="mono muted" x="16" y="20" font-size="13.5">Eight values · six principles</text>
+  <text class="disp" x="16" y="54" font-size="15">Eight values: which way to lean</text>
+  <line class="rule" x1="16" y1="62" x2="344" y2="62"/>
+  <text class="mono muted" x="16" y="83" font-size="13.5">01</text>
+  <text x="44" y="83" font-size="14">Governance is code, not a document</text>
+  <text class="mono muted" x="16" y="108" font-size="13.5">02</text>
+  <text x="44" y="108" font-size="14">Evals fail builds; reviews only</text>
+  <text x="44" y="125" font-size="14">recommend</text>
+  <text class="mono muted" x="16" y="150" font-size="13.5">03</text>
+  <text x="44" y="150" font-size="14">Evidence comes from runtime, not from a</text>
+  <text x="44" y="167" font-size="14">point-in-time attestation</text>
+  <text class="mono muted" x="16" y="192" font-size="13.5">04</text>
+  <text x="44" y="192" font-size="14">Every agent carries its own identity and</text>
+  <text x="44" y="209" font-size="14">scope</text>
+  <text class="mono muted" x="16" y="234" font-size="13.5">05</text>
+  <text x="44" y="234" font-size="14">Evidence is machine-readable or it is</text>
+  <text x="44" y="251" font-size="14">not evidence</text>
+  <text class="mono muted" x="16" y="276" font-size="13.5">06</text>
+  <text x="44" y="276" font-size="14">Tooling must be inspectable and</text>
+  <text x="44" y="293" font-size="14">composable</text>
+  <text class="mono muted" x="16" y="318" font-size="13.5">07</text>
+  <text x="44" y="318" font-size="14">Success is measured in realised risk</text>
+  <text x="44" y="335" font-size="14">reduction, not framework coverage</text>
+  <text class="mono muted" x="16" y="360" font-size="13.5">08</text>
+  <text x="44" y="360" font-size="14">Governance is owned with engineering,</text>
+  <text x="44" y="377" font-size="14">not enforced from outside</text>
+  <text class="disp" x="376" y="54" font-size="15">Six principles: what to do on Monday</text>
+  <line class="rule" x1="376" y1="62" x2="704" y2="62"/>
+  <text class="mono muted" x="376" y="83" font-size="13.5">01</text>
+  <text x="404" y="83" font-size="14">Build the control at the earliest point</text>
+  <text x="404" y="100" font-size="14">it can block</text>
+  <text class="mono muted" x="376" y="125" font-size="13.5">02</text>
+  <text x="404" y="125" font-size="14">Give every control teeth, or call it a</text>
+  <text x="404" y="142" font-size="14">signal</text>
+  <text class="mono muted" x="376" y="167" font-size="13.5">03</text>
+  <text x="404" y="167" font-size="14">Register and bound every actor before it</text>
+  <text x="404" y="184" font-size="14">acts</text>
+  <text class="mono muted" x="376" y="209" font-size="13.5">04</text>
+  <text x="404" y="209" font-size="14">Instrument the build to produce its own</text>
+  <text x="404" y="226" font-size="14">proof</text>
+  <text class="mono muted" x="376" y="251" font-size="13.5">05</text>
+  <text x="404" y="251" font-size="14">Start from a named failure mode or a</text>
+  <text x="404" y="268" font-size="14">named harm</text>
+  <text class="mono muted" x="376" y="293" font-size="13.5">06</text>
+  <text x="404" y="293" font-size="14">Make the governed path the easiest path</text>
+</svg>

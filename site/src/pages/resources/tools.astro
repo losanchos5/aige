@@ -3,13 +3,18 @@ import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import Diagram from '../../components/Diagram.astro';
-import { layers, toolsByCategory } from '../../data/stack';
+import {
+  layers,
+  toolCatalogue,
+  toolAccessLabels,
+  toolLayers,
+  TOOLS_LAST_CHECKED,
+  type ToolAccess,
+} from '../../data/stack';
 import { slugify } from '../../lib/md-parse';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
-
-const groups = toolsByCategory();
 
 // The representative chapter-05 pattern for each layer, used for the "Patterns
 // for this layer" cross-link. The anchor is computed with the same slugger
@@ -23,11 +28,22 @@ const layerPattern: Record<number, string> = {
 };
 const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}`)}`;
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Tools' }];
+
+const toolCount = toolCatalogue.reduce((n, def) => n + def.tools.length, 0);
+const oecdCount = toolCatalogue.reduce(
+  (n, def) => n + def.tools.filter((tool) => tool.oecd).length,
+  0,
+);
+// Only the access models the catalogue actually uses become filter chips.
+const accessInUse = (Object.keys(toolAccessLabels) as ToolAccess[]).filter((access) =>
+  toolCatalogue.some((def) => def.tools.some((tool) => tool.access === access)),
+);
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
 <Base
-  title="Tools"
-  description="Reference tool categories for each layer of the AI governance engineering stack, with illustrative examples: the substance, not an endorsement of any brand."
+  title="Tool categories"
+  description="Tool categories for each layer of the AI governance engineering stack, with illustrative examples, licences and checked links: examples of a category, not endorsements."
   image="/og/resources.png"
   jsonLd={breadcrumbJsonLd(crumbs)}
 >
@@ -37,19 +53,22 @@ const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Tools' }];
     title="Tool categories, by layer."
   >
     <p class="lede" slot="lede">
-      The reference tool categories that fill each layer of the stack, with the examples the Body
-      of Knowledge names. The category is the substance; the brands are illustrative. See how they
-      fit together in <a href="/stack">the stack</a>.
+      The tool categories that fill each layer of the stack, with {toolCount} illustrative examples
+      across {toolCatalogue.length} categories. The category is the substance; the brands are
+      examples, each with its licence and a checked link. See how they fit together in
+      <a href="/stack">the stack</a>.
     </p>
   </PageHero>
 
   <div class="container res-page">
     <div class="res-section">
-      <Callout kind="note" title="Illustrative, not an endorsement">
+      <Callout kind="note" title="Examples, not endorsements">
         <p>Tools are named as category examples to make the substance concrete. Naming a tool is not
-        a recommendation, and the list is neither exhaustive nor current; treat it as a map of the
-        category, not a shortlist.</p>
-        <p>Tool examples reviewed as of 2026-09-19.</p>
+        a recommendation, and the list is neither exhaustive nor a shortlist; treat it as a map of
+        the category.</p>
+        <p>Links, licences and access models checked as of {TOOLS_LAST_CHECKED}. Licences are SPDX
+        identifiers where one exists. An <strong>OECD.AI</strong> link marks the {oecdCount} tools
+        that have an entry in the OECD.AI Catalogue of Tools &amp; Metrics.</p>
       </Callout>
     </div>
 
@@ -73,50 +92,261 @@ const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Tools' }];
       </ul>
 
       <Diagram id="reference-toolchain" />
+    </section>
 
-      <ul class="tl-groups">
-        {
-          groups.map((group) => (
-            <li class="tl-group">
-              <div class="tl-group-head">
-                <h3>{group.category}</h3>
-                <span class="ticks" role="img" aria-label={`Layers ${group.layers.join(', ')}`}>
-                  {group.layers.map((n) => (
-                    <span class="tk" data-l={n} aria-hidden="true" />
-                  ))}
+    <section
+      class="res-section tc-root"
+      aria-labelledby="tc-heading"
+      data-filter-root
+      data-filter-noun="tools"
+    >
+      <div class="res-section-head">
+        <h2 id="tc-heading">The catalogue</h2>
+        <p>Every category says what it does for governance and where the Body of Knowledge treats
+        it. Filter by layer or by licence; the counts update as you choose.</p>
+      </div>
+
+      <div class="tc-controls" data-filter-controls hidden>
+        <fieldset class="ob-filter">
+          <legend>Filter by layer</legend>
+          <div class="ob-chips">
+            <span>
+              <input class="ob-radio" type="radio" name="tc-layer" id="tc-layer-all" value="" data-filter-key="layers" checked />
+              <label class="ob-chip" for="tc-layer-all">All layers</label>
+            </span>
+            {
+              layers.map((layer) => (
+                <span>
+                  <input
+                    class="ob-radio"
+                    type="radio"
+                    name="tc-layer"
+                    id={`tc-layer-${layer.n}`}
+                    value={String(layer.n)}
+                    data-filter-key="layers"
+                  />
+                  <label class="ob-chip" data-l={layer.n} for={`tc-layer-${layer.n}`}>
+                    L{layer.n} <span class="tc-chip-name">{layer.name}</span>
+                  </label>
                 </span>
-              </div>
-              <ul class="tl-tools">
-                {group.examples.map((example) => (
-                  <li class="tl-tool" data-tool>
-                    <span class="tl-name">{example}</span>
-                    <span class="ticks" role="img" aria-label={`Layers ${group.layers.join(', ')}`}>
-                      {group.layers.map((n) => (
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <fieldset class="ob-filter">
+          <legend>Filter by licence</legend>
+          <div class="ob-chips">
+            <span>
+              <input class="ob-radio" type="radio" name="tc-access" id="tc-access-all" value="" data-filter-key="access" checked />
+              <label class="ob-chip" for="tc-access-all">All licences</label>
+            </span>
+            {
+              accessInUse.map((access) => (
+                <span>
+                  <input
+                    class="ob-radio"
+                    type="radio"
+                    name="tc-access"
+                    id={`tc-access-${access}`}
+                    value={access}
+                    data-filter-key="access"
+                  />
+                  <label class="ob-chip" for={`tc-access-${access}`}>
+                    {toolAccessLabels[access]}
+                  </label>
+                </span>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <p class="tc-count" data-filter-count aria-live="polite" role="status"></p>
+      </div>
+
+      <ul class="tl-groups tc-groups">
+        {
+          toolCatalogue.map((def) => {
+            const firstLayer = def.layers[0];
+            return (
+              <li class="tl-group tc-group" id={`cat-${def.id}`} data-filter-group>
+                <div class="tl-group-head">
+                  <h3>{def.category}</h3>
+                  {def.layers.length > 0 ? (
+                    <span class="ticks" role="img" aria-label={`Layers ${def.layers.join(', ')}`}>
+                      {def.layers.map((n) => (
                         <span class="tk" data-l={n} aria-hidden="true" />
                       ))}
                     </span>
-                  </li>
-                ))}
-              </ul>
-              <p class="tl-xref">
-                <a href={`/resources/frameworks#ob-layer-${group.layers[0]}`}>
-                  Obligations this answers →
-                </a>
-                <a href={patternHref(layerPattern[group.layers[0]])}>
-                  Patterns for this layer →
-                </a>
-              </p>
-            </li>
-          ))
+                  ) : (
+                    <span class="tc-across">Across layers</span>
+                  )}
+                </div>
+                <p class="tc-summary">{def.summary}</p>
+                <ul class="tl-tools">
+                  {def.tools.map((tool) => {
+                    const toolLayerList = toolLayers(tool, def);
+                    return (
+                      <li
+                        class="tl-tool tc-tool"
+                        data-tool
+                        data-filter-item
+                        data-layers={toolLayerList.join(' ')}
+                        data-access={tool.access}
+                      >
+                        <div class="tc-tool-top">
+                          <a class="tl-name tc-name" href={tool.url} target="_blank" rel="noopener">
+                            {tool.name}
+                            <span class="ext" aria-hidden="true">↗</span>
+                          </a>
+                          <span class="ticks" role="img" aria-label={`Layers ${toolLayerList.join(', ')}`}>
+                            {toolLayerList.map((n) => (
+                              <span class="tk" data-l={n} aria-hidden="true" />
+                            ))}
+                          </span>
+                        </div>
+                        <p class="tc-meta">
+                          <span class="tc-licence">{tool.licence}</span>
+                          <span class="tc-access">{toolAccessLabels[tool.access]}</span>
+                          {tool.oecd && (
+                            <a class="tc-oecd" href={tool.oecd} target="_blank" rel="noopener">
+                              OECD.AI<span class="visually-hidden"> catalogue entry for {tool.name}</span>
+                              <span class="ext" aria-hidden="true">↗</span>
+                            </a>
+                          )}
+                        </p>
+                        {tool.note && <p class="tc-note">{tool.note}</p>}
+                      </li>
+                    );
+                  })}
+                </ul>
+                <p class="tl-xref">
+                  <a href={def.chapter.href}>{def.chapter.label} →</a>
+                  {firstLayer && (
+                    <a href={`/resources/frameworks#ob-layer-${firstLayer}`}>
+                      Obligations this answers →
+                    </a>
+                  )}
+                  {firstLayer && (
+                    <a href={patternHref(layerPattern[firstLayer])}>
+                      Patterns for layer {pad(firstLayer)} →
+                    </a>
+                  )}
+                </p>
+              </li>
+            );
+          })
         }
       </ul>
+
+      <p class="tc-empty" data-filter-empty hidden>No tool in the catalogue matches both filters.</p>
     </section>
   </div>
+
+  <script is:inline defer src="/catalogue-filter.js"></script>
 </Base>
 
 <style>
-  /* Reciprocal cross-links in each category card: to the obligations that layer
-     answers and to the layer's patterns. */
+  /* The filter hides with the `hidden` attribute; the card and row rules below
+     set `display`, so the attribute needs the explicit rule to win. */
+  [data-filter-item][hidden],
+  [data-filter-group][hidden],
+  [data-filter-controls][hidden],
+  [data-filter-empty][hidden] {
+    display: none !important;
+  }
+
+  .tc-controls {
+    margin-bottom: var(--s-5);
+  }
+
+  .tc-chip-name {
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .tc-count {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--ink-2);
+  }
+
+  .tc-empty {
+    margin-top: var(--s-5);
+    color: var(--ink-2);
+  }
+
+  .tc-summary {
+    margin: 0 0 var(--s-3);
+    color: var(--ink-2);
+    font-size: var(--fs-small);
+    line-height: 1.5;
+  }
+
+  .tc-across {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  /* A tool row: name and layer ticks on top, licence and access below. */
+  .tc-tool {
+    display: block;
+  }
+
+  .tc-tool-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+
+  .tc-name {
+    color: var(--ink);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  .tc-name:hover {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .tc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-3);
+    margin: var(--s-1) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.02em;
+    color: var(--ink-2);
+  }
+
+  .tc-licence {
+    overflow-wrap: anywhere;
+  }
+
+  .tc-oecd {
+    color: var(--ink-2);
+  }
+
+  .tc-oecd:hover {
+    color: var(--ink);
+  }
+
+  .tc-note {
+    margin: var(--s-1) 0 0;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+    line-height: 1.45;
+  }
+
+  /* Reciprocal cross-links in each category card: to the chapter that treats
+     the category, the obligations its layer answers and the layer's patterns. */
   .tl-xref {
     display: flex;
     flex-wrap: wrap;

@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1414" class="figc" role="img" aria-labelledby="fig-eu-ai-act-operator-roles-t fig-eu-ai-act-operator-roles-d">
+  <title id="fig-eu-ai-act-operator-roles-t">EU AI Act operator roles</title>
+  <desc id="fig-eu-ai-act-operator-roles-d">Seven questions down a spine, each leading to an EU AI Act operator role with its duties and evidence, an Article 25 loop to provider and a registry entry.</desc>
+  <text class="mono muted" x="40" y="56" font-size="17">EU AI Act · operators under Art. 3(8), for one system</text>
+  <text class="disp" x="40" y="108" font-size="40">Which role do you hold for this system?</text>
+  <text class="ink2" x="40" y="146" font-size="19">Ask every question: roles name tasks, not organisations, so you can hold several for one system.</text>
+  <line class="rule" x1="40" y1="170" x2="960" y2="170"/>
+  <line class="stroke-arrow" x1="54" y1="251" x2="54" y2="926"/>
+  <path class="arrow" d="M54 932 L47 922.2 L61 922.2 Z"/>
+  <rect class="dot-mask" x="41" y="238" width="26" height="26"/>
+  <path class="glyph" d="M54 240 L65 251 L54 262 L43 251 Z"/>
+  <text x="84" y="234" font-size="17">Do you develop an AI system, or have it</text>
+  <text x="84" y="256" font-size="17">developed, and place it on the market or</text>
+  <text x="84" y="278" font-size="17">into service under your own name?</text>
+  <line class="stroke-arrow" x1="436" y1="251" x2="468" y2="251"/>
+  <path class="arrow" d="M472 251 L462.2 244 L462.2 258 Z"/>
+  <text class="mono muted" x="455" y="243" font-size="16" text-anchor="middle">yes</text>
+  <rect class="panel" x="474" y="196" width="410" height="110" rx="8"/>
+  <text class="disp" x="486" y="225" font-size="19">Provider</text>
+  <text class="mono muted" x="872" y="225" font-size="16" text-anchor="end">Art. 3(3)</text>
+  <text x="486" y="248" font-size="16">Arts. 8 to 17, 43 to 49, 72, 73; 50(1), 50(2)</text>
+  <path class="glyph" d="M486 258 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 268 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="272" font-size="16">Technical documentation, QMS records, eval</text>
+  <text class="ink2" x="510" y="292" font-size="16">results, declaration</text>
+  <rect class="dot-mask" x="41" y="356" width="26" height="26"/>
+  <path class="glyph" d="M54 358 L65 369 L54 380 L43 369 Z"/>
+  <text x="84" y="363" font-size="17">Do you place a general-purpose AI model</text>
+  <text x="84" y="385" font-size="17">on the market?</text>
+  <line class="stroke-arrow" x1="436" y1="369" x2="468" y2="369"/>
+  <path class="arrow" d="M472 369 L462.2 362 L462.2 376 Z"/>
+  <text class="mono muted" x="455" y="361" font-size="16" text-anchor="middle">yes</text>
+  <rect class="panel" x="474" y="314" width="410" height="110" rx="8"/>
+  <text class="disp" x="486" y="343" font-size="19">GPAI provider</text>
+  <text class="mono muted" x="872" y="343" font-size="16" text-anchor="end">Art. 53</text>
+  <text x="486" y="366" font-size="16">Arts. 53 to 55</text>
+  <path class="glyph" d="M486 376 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 386 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="390" font-size="16">Model documentation, training summary,</text>
+  <text class="ink2" x="510" y="410" font-size="16">copyright policy</text>
+  <rect class="dot-mask" x="41" y="464" width="26" height="26"/>
+  <path class="glyph" d="M54 466 L65 477 L54 488 L43 477 Z"/>
+  <text x="84" y="460" font-size="17">Do you place a high-risk AI safety</text>
+  <text x="84" y="482" font-size="17">component on the market with your Annex</text>
+  <text x="84" y="504" font-size="17">I, Section A product, under your name?</text>
+  <line class="stroke-arrow" x1="436" y1="477" x2="468" y2="477"/>
+  <path class="arrow" d="M472 477 L462.2 470 L462.2 484 Z"/>
+  <text class="mono muted" x="455" y="469" font-size="16" text-anchor="middle">yes</text>
+  <rect class="panel" x="474" y="432" width="410" height="90" rx="8"/>
+  <text class="disp" x="486" y="461" font-size="19">Product manufacturer</text>
+  <text class="mono muted" x="872" y="461" font-size="16" text-anchor="end">Art. 25(3)</text>
+  <text x="486" y="484" font-size="16">Provider duties (Art. 16)</text>
+  <path class="glyph" d="M486 494 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 504 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="508" font-size="16">As a provider</text>
+  <rect class="dot-mask" x="41" y="562" width="26" height="26"/>
+  <path class="glyph" d="M54 564 L65 575 L54 586 L43 575 Z"/>
+  <text x="84" y="558" font-size="17">Are you established in the EU and placing</text>
+  <text x="84" y="580" font-size="17">on the market a system that bears a</text>
+  <text x="84" y="602" font-size="17">non-EU provider&#39;s name?</text>
+  <line class="stroke-arrow" x1="436" y1="575" x2="468" y2="575"/>
+  <path class="arrow" d="M472 575 L462.2 568 L462.2 582 Z"/>
+  <text class="mono muted" x="455" y="567" font-size="16" text-anchor="middle">yes</text>
+  <rect class="panel" x="474" y="530" width="410" height="90" rx="8"/>
+  <text class="disp" x="486" y="559" font-size="19">Importer</text>
+  <text class="mono muted" x="872" y="559" font-size="16" text-anchor="end">Art. 3(6)</text>
+  <text x="486" y="582" font-size="16">Art. 23: verify; keep copies 10 years</text>
+  <path class="glyph" d="M486 592 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 602 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="606" font-size="16">Import verification record</text>
+  <rect class="dot-mask" x="41" y="660" width="26" height="26"/>
+  <path class="glyph" d="M54 662 L65 673 L54 684 L43 673 Z"/>
+  <text x="84" y="656" font-size="17">Do you make the system available on the</text>
+  <text x="84" y="678" font-size="17">EU market without being its provider or</text>
+  <text x="84" y="700" font-size="17">importer?</text>
+  <line class="stroke-arrow" x1="436" y1="673" x2="468" y2="673"/>
+  <path class="arrow" d="M472 673 L462.2 666 L462.2 680 Z"/>
+  <text class="mono muted" x="455" y="665" font-size="16" text-anchor="middle">yes</text>
+  <rect class="panel" x="474" y="628" width="410" height="90" rx="8"/>
+  <text class="disp" x="486" y="657" font-size="19">Distributor</text>
+  <text class="mono muted" x="872" y="657" font-size="16" text-anchor="end">Art. 3(7)</text>
+  <text x="486" y="680" font-size="16">Art. 24: verify marking and documents</text>
+  <path class="glyph" d="M486 690 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 700 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="704" font-size="16">Distribution check record</text>
+  <rect class="dot-mask" x="41" y="758" width="26" height="26"/>
+  <path class="glyph" d="M54 760 L65 771 L54 782 L43 771 Z"/>
+  <text x="84" y="754" font-size="17">Are you established in the EU and acting</text>
+  <text x="84" y="776" font-size="17">under a written mandate from a non-EU</text>
+  <text x="84" y="798" font-size="17">provider?</text>
+  <line class="stroke-arrow" x1="436" y1="771" x2="468" y2="771"/>
+  <path class="arrow" d="M472 771 L462.2 764 L462.2 778 Z"/>
+  <text class="mono muted" x="455" y="763" font-size="16" text-anchor="middle">yes</text>
+  <rect class="panel" x="474" y="726" width="410" height="90" rx="8"/>
+  <text class="disp" x="486" y="755" font-size="19">Authorised representative</text>
+  <text class="mono muted" x="872" y="755" font-size="16" text-anchor="end">Art. 3(5)</text>
+  <text x="486" y="778" font-size="16">Arts. 22, 54: verify; keep documents 10 years</text>
+  <path class="glyph" d="M486 788 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 798 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="802" font-size="16">Mandate; document copies</text>
+  <rect class="dot-mask" x="41" y="856" width="26" height="26"/>
+  <path class="glyph" d="M54 858 L65 869 L54 880 L43 869 Z"/>
+  <text x="84" y="852" font-size="17">Do you use the system under your own</text>
+  <text x="84" y="874" font-size="17">authority, other than for purely personal,</text>
+  <text x="84" y="896" font-size="17">non-professional use?</text>
+  <line class="stroke-arrow" x1="436" y1="869" x2="468" y2="869"/>
+  <path class="arrow" d="M472 869 L462.2 862 L462.2 876 Z"/>
+  <text class="mono muted" x="455" y="861" font-size="16" text-anchor="middle">yes</text>
+  <rect class="panel" x="474" y="824" width="410" height="90" rx="8"/>
+  <text class="disp" x="486" y="853" font-size="19">Deployer</text>
+  <text class="mono muted" x="872" y="853" font-size="16" text-anchor="end">Art. 3(4)</text>
+  <text x="486" y="876" font-size="16">Arts. 26, 27, 50(3), 50(4), 86</text>
+  <path class="glyph" d="M486 886 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 896 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="900" font-size="16">Use logs, oversight roster, FRIA, notices</text>
+  <path class="glyph" d="M41 941 v20 a13 5 0 0 0 26 0 v-20"/><ellipse class="glyph" cx="54" cy="941" rx="13" ry="5"/>
+  <text class="disp" x="84" y="954" font-size="17">Registry entry per system: its roles as a list, such as [&quot;provider&quot;, &quot;deployer&quot;]</text>
+  <text class="ink2" x="84" y="980" font-size="16">No role applies: not an operator for this system. An affected person holds protections, not duties</text>
+  <text class="ink2" x="84" y="1001" font-size="16">(Art. 2(1)(g)).</text>
+  <rect class="panel" x="40" y="1027" width="920" height="172" rx="8" stroke-dasharray="6 4"/>
+  <text x="52" y="1055" font-size="17">Art. 25(1): a distributor, importer, deployer or other third party becomes the provider of a high-risk system,</text>
+  <text x="52" y="1077" font-size="17">with all Art. 16 duties, when it:</text>
+  <text class="mono" x="60" y="1103" font-size="16">(a)</text>
+  <text x="92" y="1103" font-size="16">puts its name or trademark on a high-risk system already on the market;</text>
+  <text class="mono" x="60" y="1127" font-size="16">(b)</text>
+  <text x="92" y="1127" font-size="16">makes a substantial modification to a high-risk system that stays high-risk;</text>
+  <text class="mono" x="60" y="1151" font-size="16">(c)</text>
+  <text x="92" y="1151" font-size="16">changes the intended purpose of a system, including a general-purpose AI system, so that it becomes high-risk.</text>
+  <text class="ink2" x="52" y="1179" font-size="16">The initial provider must cooperate (Art. 25(2)); a written agreement fixes the information and access (Art. 25(4)).</text>
+  <line class="stroke-arrow" x1="930" y1="251" x2="930" y2="1027"/>
+  <line class="stroke-arrow" x1="884" y1="575" x2="930" y2="575"/>
+  <line class="stroke-arrow" x1="884" y1="673" x2="930" y2="673"/>
+  <line class="stroke-arrow" x1="884" y1="869" x2="930" y2="869"/>
+  <line class="stroke-arrow" x1="930" y1="251" x2="892" y2="251"/>
+  <path class="arrow" d="M886 251 L895.8 244 L895.8 258 Z"/>
+  <rect class="dot-mask" x="890.4" y="296" width="79.2" height="26" rx="4"/>
+  <text class="mono" x="930" y="315" font-size="16" text-anchor="middle">Art. 25</text>
+  <line class="rule" x1="40" y1="1332" x2="960" y2="1332"/>
+  <text class="mono muted" x="40" y="1357" font-size="16">Source: chapter 18, Who you are in the value chain (role table and Article 25).</text>
+  <text class="mono muted" x="40" y="1384" font-size="16">As of 2026-09-24 · a reading aid, not legal advice; illustrative, not a claim of conformity</text>
+</svg>

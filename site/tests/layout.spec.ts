@@ -30,6 +30,21 @@ const PHONE_PAGES = [
   '/resources/frameworks',
   '/resources/crosswalk',
   '/resources/glossary',
+  // v0.5.0 destinations: one index and one detail page of each collection.
+  '/obligations',
+  '/obligations/aige-obl-euaia-art9',
+  '/resources/data',
+  '/patterns',
+  '/patterns/eval-gate-in-ci',
+  '/figures',
+  '/figures/art73-clock',
+  '/glossary/serious-incident',
+  '/toolkit',
+  '/agents',
+  '/cases',
+  '/cases/clearview-ai',
+  '/resources/harms',
+  '/bok',
 ];
 
 async function measure(page: import('@playwright/test').Page) {

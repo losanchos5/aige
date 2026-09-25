@@ -1,0 +1,482 @@
+{
+  "$comment": "Official pages the site cites, checked daily by tools/reg-monitor. Every URL must appear verbatim in a tracked file (node tools/reg-monitor/monitor.mjs --check). Hints: select = elements whose text is kept (every match, in document order); drop = elements removed inside them; attributes = selector@attr values read as lines; dropLines / strip = regular expressions removed from the text; linkPattern = keep the href of matching links; minChars = shortest acceptable normalised text. transport = fetch (default) or curl. See README.md.",
+  "sources": [
+    {
+      "id": "eu-ai-act-oj",
+      "name": "EU AI Act (Regulation (EU) 2024/1689), EUR-Lex page and its consolidated versions",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng",
+      "jurisdiction": "EU",
+      "category": "law",
+      "hints": {
+        "select": [
+          "#consLegVersions"
+        ],
+        "linkPattern": "CELEX",
+        "minChars": 20
+      },
+      "notes": "Only the list of consolidated versions is read: a new date in it means a new consolidation of the Act. The Official Journal text itself never changes."
+    },
+    {
+      "id": "eu-ai-act-consolidated",
+      "name": "EU AI Act, consolidated text of 2026-07-27",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng",
+      "jurisdiction": "EU",
+      "category": "law",
+      "hints": {
+        "select": [
+          "#document1"
+        ]
+      }
+    },
+    {
+      "id": "eu-ai-omnibus",
+      "name": "Digital Omnibus on AI (Regulation (EU) 2026/1744)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng",
+      "jurisdiction": "EU",
+      "category": "law",
+      "hints": {
+        "select": [
+          "#consLegVersions",
+          "#document1"
+        ],
+        "linkPattern": "CELEX"
+      }
+    },
+    {
+      "id": "ec-ai-act-standardisation",
+      "name": "European Commission: Standardisation of the AI Act (harmonised standards)",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/ai-act-standardisation",
+      "jurisdiction": "EU",
+      "category": "standard",
+      "hints": {
+        "select": [
+          ".content_main_wrapper",
+          ".cnct-page-footer"
+        ],
+        "linkPattern": "eur-lex|/library/"
+      }
+    },
+    {
+      "id": "ec-gpai-code-of-practice",
+      "name": "European Commission: General-Purpose AI Code of Practice (contents and signatories)",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai",
+      "jurisdiction": "EU",
+      "category": "guidance",
+      "hints": {
+        "select": [
+          ".content_main_wrapper",
+          ".cnct-page-footer"
+        ],
+        "linkPattern": "/library/|/redirection/document/"
+      }
+    },
+    {
+      "id": "ec-gpai-guidelines",
+      "name": "European Commission: Guidelines on the scope of obligations for GPAI model providers",
+      "url": "https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act",
+      "jurisdiction": "EU",
+      "category": "guidance",
+      "hints": {
+        "select": [
+          "#block-cnt-theme-main-page-content"
+        ],
+        "drop": [
+          ".views-element-container",
+          ".sidebar",
+          ".cnt-full-width"
+        ],
+        "linkPattern": "/redirection/document/"
+      }
+    },
+    {
+      "id": "ec-gpai-faq",
+      "name": "European Commission: General-purpose AI models in the AI Act, questions and answers",
+      "url": "https://digital-strategy.ec.europa.eu/en/faqs/general-purpose-ai-models-ai-act-questions-answers",
+      "jurisdiction": "EU",
+      "category": "guidance",
+      "hints": {
+        "select": [
+          "#block-cnt-theme-main-page-content"
+        ],
+        "drop": [
+          ".views-element-container",
+          ".sidebar",
+          ".cnt-full-width"
+        ]
+      }
+    },
+    {
+      "id": "ec-high-risk-guidelines",
+      "name": "European Commission: Guidelines on high-risk AI systems",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems",
+      "jurisdiction": "EU",
+      "category": "guidance",
+      "hints": {
+        "select": [
+          ".content_main_wrapper",
+          ".cnct-page-footer"
+        ],
+        "linkPattern": "/library/|/redirection/document/"
+      }
+    },
+    {
+      "id": "ec-ai-generated-content-code",
+      "name": "European Commission: Code of Practice on AI-generated content",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content",
+      "jurisdiction": "EU",
+      "category": "guidance",
+      "hints": {
+        "select": [
+          ".content_main_wrapper",
+          ".cnct-page-footer"
+        ],
+        "linkPattern": "/library/|/redirection/document/"
+      }
+    },
+    {
+      "id": "ec-serious-incident-guidance",
+      "name": "European Commission: draft guidance and reporting template for serious AI incidents",
+      "url": "https://digital-strategy.ec.europa.eu/en/consultations/ai-act-commission-issues-draft-guidance-and-reporting-template-serious-ai-incidents-and-seeks",
+      "jurisdiction": "EU",
+      "category": "guidance",
+      "hints": {
+        "select": [
+          "#block-cnt-theme-main-page-content"
+        ],
+        "drop": [
+          ".views-element-container",
+          ".sidebar",
+          ".cnt-full-width"
+        ],
+        "linkPattern": "/redirection/document/|/library/"
+      }
+    },
+    {
+      "id": "ai-act-service-desk-gpai-enforcement",
+      "name": "AI Act Service Desk: Commission enforcement powers over GPAI providers (FAQ)",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/faq/commissions-enforcement-powers-related-ai-act-obligations-providers-most-advanced-models",
+      "jurisdiction": "EU",
+      "category": "guidance",
+      "hints": {
+        "select": [
+          "#block-sip-theme-digitalomnibusdisclaimer",
+          "#block-sip-theme-main-page-content"
+        ]
+      }
+    },
+    {
+      "id": "ai-act-service-desk-art-113",
+      "name": "AI Act Service Desk: Article 113, entry into force and application",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113",
+      "jurisdiction": "EU",
+      "category": "law",
+      "hints": {
+        "select": [
+          "#block-sip-theme-digitalomnibusdisclaimer",
+          "#block-sip-theme-main-page-content"
+        ]
+      }
+    },
+    {
+      "id": "cen-cenelec-jtc21-qms",
+      "name": "CEN-CENELEC JTC 21 news: AI quality management (EN in the spotlight)",
+      "url": "https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/",
+      "jurisdiction": "EU",
+      "category": "standard",
+      "hints": {
+        "select": [
+          ".page-title",
+          ".post-date",
+          ".content-text"
+        ]
+      }
+    },
+    {
+      "id": "edpb-opinion-28-2024",
+      "name": "EDPB Opinion 28/2024 on data protection aspects of AI models",
+      "url": "https://www.edpb.europa.eu/documents/opinion-of-the-board-art-64/opinion-282024-on-certain-data-protection-aspects-related-to_en",
+      "jurisdiction": "EU",
+      "category": "guidance",
+      "hints": {
+        "select": [
+          ".document-full__content"
+        ],
+        "linkPattern": "\\.pdf$"
+      }
+    },
+    {
+      "id": "ico-ai-data-protection",
+      "name": "ICO: Guidance on AI and data protection",
+      "url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/artificial-intelligence/guidance-on-ai-and-data-protection/",
+      "jurisdiction": "UK",
+      "category": "guidance",
+      "hints": {
+        "select": [
+          "main"
+        ]
+      }
+    },
+    {
+      "id": "ico-adm-consultation",
+      "name": "ICO: consultation on draft guidance on automated decision-making, including profiling",
+      "url": "https://ico.org.uk/about-the-ico/ico-and-stakeholder-consultations/2026/03/ico-consultation-on-the-draft-guidance-about-automated-decision-making-including-profiling/",
+      "jurisdiction": "UK",
+      "category": "guidance",
+      "hints": {
+        "select": [
+          "main"
+        ]
+      }
+    },
+    {
+      "id": "cnil-ai-recommendations",
+      "name": "CNIL: recommendations on the development of AI systems",
+      "url": "https://www.cnil.fr/en/ai-cnil-finalises-its-recommendations-development-artificial-intelligence-systems",
+      "jurisdiction": "FR",
+      "category": "guidance",
+      "hints": {
+        "select": [
+          "main"
+        ]
+      }
+    },
+    {
+      "id": "nist-ai-rmf",
+      "name": "NIST AI Risk Management Framework",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "jurisdiction": "US",
+      "category": "framework",
+      "hints": {
+        "select": [
+          ".nist-page__region--content"
+        ],
+        "drop": [
+          ".paragraph--type--tagged-content-list",
+          ".views-element-container"
+        ]
+      }
+    },
+    {
+      "id": "nist-airc-playbook",
+      "name": "NIST AI Resource Center: AI RMF Playbook",
+      "url": "https://airc.nist.gov/airmf-resources/playbook/",
+      "jurisdiction": "US",
+      "category": "framework",
+      "hints": {
+        "select": [
+          "main"
+        ]
+      }
+    },
+    {
+      "id": "nist-ir-8596",
+      "name": "NIST IR 8596 Cyber AI Profile (CSRC publication page)",
+      "url": "https://csrc.nist.gov/pubs/ir/8596/iprd",
+      "jurisdiction": "US",
+      "category": "framework",
+      "hints": {
+        "select": [
+          "#body-section"
+        ],
+        "linkPattern": "/pubs/|\\.pdf$"
+      }
+    },
+    {
+      "id": "nist-ai-800-1",
+      "name": "NIST AI 800-1, Managing Misuse Risk for Dual-Use Foundation Models (announcement page)",
+      "url": "https://www.nist.gov/news-events/news/2025/01/updated-guidelines-managing-misuse-risk-dual-use-foundation-models",
+      "jurisdiction": "US",
+      "category": "framework",
+      "hints": {
+        "select": [
+          ".nist-page__region--content"
+        ],
+        "drop": [
+          ".paragraph--type--tagged-content-list",
+          ".views-element-container"
+        ],
+        "linkPattern": "\\.pdf$|nvlpubs|doi\\.org"
+      }
+    },
+    {
+      "id": "owasp-llm-top-10",
+      "name": "OWASP GenAI Security Project: Top 10 for LLM Applications (index)",
+      "url": "https://genai.owasp.org/llm-top-10/",
+      "jurisdiction": "International",
+      "category": "framework",
+      "hints": {
+        "select": [
+          "#content"
+        ]
+      }
+    },
+    {
+      "id": "owasp-llm-top-10-2026",
+      "name": "OWASP GenAI Security Project: Top 10 for LLM Applications 2026",
+      "url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+      "jurisdiction": "International",
+      "category": "framework",
+      "hints": {
+        "select": [
+          "main"
+        ],
+        "linkPattern": "\\.pdf$"
+      }
+    },
+    {
+      "id": "owasp-agentic-top-10",
+      "name": "OWASP GenAI Security Project: Top 10 for Agentic Applications 2026",
+      "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "jurisdiction": "International",
+      "category": "framework",
+      "hints": {
+        "select": [
+          "main"
+        ],
+        "linkPattern": "\\.pdf$"
+      }
+    },
+    {
+      "id": "kr-ai-basic-act",
+      "name": "Korea: AI Basic Act (law.go.kr, version in force 2026-07-21)",
+      "url": "https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=282791",
+      "jurisdiction": "KR",
+      "category": "law",
+      "hints": {
+        "select": [
+          ".pophead"
+        ],
+        "attributes": [
+          "#lsNm@value",
+          "#lsiSeq@value",
+          "#ancYd@value",
+          "#ancNo@value",
+          "#nwYn@value"
+        ],
+        "minChars": 20
+      },
+      "notes": "law.go.kr loads the article text by script, so only the server-rendered facts are read: title, law name, version sequence, promulgation date and number, and the undocumented nwYn field (observed \"Y\" on this version in force and empty on the superseded 2025 version on 2026-09-24). Amendments may only show as changes of these fields; check the page by hand now and then."
+    },
+    {
+      "id": "kr-ai-basic-act-decree",
+      "name": "Korea: Enforcement Decree of the AI Basic Act (law.go.kr)",
+      "url": "https://www.law.go.kr/LSW/lsInfoP.do?efYd=20260122&lsiSeq=282879",
+      "jurisdiction": "KR",
+      "category": "law",
+      "hints": {
+        "select": [
+          ".pophead"
+        ],
+        "attributes": [
+          "#lsNm@value",
+          "#lsiSeq@value",
+          "#ancYd@value",
+          "#ancNo@value",
+          "#nwYn@value"
+        ],
+        "minChars": 20
+      },
+      "notes": "Same limitation as kr-ai-basic-act: the text is loaded by script; only the server-rendered facts are read."
+    },
+    {
+      "id": "ca-sb-53",
+      "name": "California SB 53, Transparency in Frontier Artificial Intelligence Act (bill status)",
+      "url": "https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260SB53",
+      "jurisdiction": "US-CA",
+      "category": "law"
+    },
+    {
+      "id": "ca-sb-243",
+      "name": "California SB 243, companion chatbots (bill status)",
+      "url": "https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260SB243",
+      "jurisdiction": "US-CA",
+      "category": "law"
+    },
+    {
+      "id": "ny-raise-act",
+      "name": "New York S6953B, RAISE Act (NY Senate bill page)",
+      "url": "https://www.nysenate.gov/legislation/bills/2025/S6953/amendment/B",
+      "jurisdiction": "US-NY",
+      "category": "law",
+      "transport": "curl",
+      "hints": {
+        "select": [
+          ".node--bill"
+        ],
+        "drop": [
+          "form",
+          ".c-detail--social",
+          ".c-bill--vote-widget",
+          ".c-bill--message-form"
+        ]
+      },
+      "notes": "nysenate.gov answered 403 to Node fetch and 200 to curl on 2026-09-24, so this source uses the curl transport."
+    },
+    {
+      "id": "ny-gbl-article-47",
+      "name": "New York General Business Law Article 47, AI companion models",
+      "url": "https://www.nysenate.gov/legislation/laws/GBS/A47",
+      "jurisdiction": "US-NY",
+      "category": "law",
+      "transport": "curl",
+      "hints": {
+        "select": [
+          "main"
+        ],
+        "drop": [
+          "form"
+        ]
+      },
+      "notes": "Uses the curl transport for the same reason as ny-raise-act."
+    },
+    {
+      "id": "co-sb26-189",
+      "name": "Colorado SB26-189, Automated Decision-Making Technology (bill page)",
+      "url": "https://leg.colorado.gov/bills/sb26-189",
+      "jurisdiction": "US-CO",
+      "category": "law",
+      "hints": {
+        "select": [
+          "main"
+        ]
+      }
+    },
+    {
+      "id": "tx-hb-149",
+      "name": "Texas HB 149, Responsible Artificial Intelligence Governance Act (enrolled text, PDF)",
+      "url": "https://capitol.texas.gov/tlodocs/89R/billtext/pdf/HB00149F.pdf",
+      "jurisdiction": "US-TX",
+      "category": "law"
+    },
+    {
+      "id": "iapp-aigp",
+      "name": "IAPP AIGP certification page (links the AIGP body of knowledge)",
+      "url": "https://iapp.org/certify/aigp/",
+      "jurisdiction": "International",
+      "category": "certification",
+      "hints": {
+        "select": [
+          "main"
+        ],
+        "linkPattern": "\\.pdf"
+      }
+    },
+    {
+      "id": "intl-ai-safety-report",
+      "name": "International AI Safety Report 2026",
+      "url": "https://internationalaisafetyreport.org/publication/international-ai-safety-report-2026",
+      "jurisdiction": "International",
+      "category": "report",
+      "hints": {
+        "select": [
+          "header.c-content-item-header"
+        ],
+        "drop": [
+          "nav"
+        ],
+        "linkPattern": "/sites/default/files/.+\\.pdf$"
+      },
+      "notes": "Only the header (title, date, language downloads) is read, not the full report text on the page."
+    }
+  ]
+}

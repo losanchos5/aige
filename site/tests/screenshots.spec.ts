@@ -69,3 +69,45 @@ for (const scheme of schemes) {
     });
   }
 }
+
+// Wave 1 integration: layout review shots of the v0.5.0 destinations (the
+// index and one detail page of each new collection, plus the hubs they hang
+// from) at phone and desktop width, both colour schemes. Review only, not a
+// baseline: they go to the gitignored test-results/review/W1/ so a run never
+// dirties the committed shots above.
+const v050Pages = [
+  { name: 'home', path: '/' },
+  { name: 'bok', path: '/bok' },
+  { name: 'obligations', path: '/obligations' },
+  { name: 'obligation', path: '/obligations/aige-obl-euaia-art9' },
+  { name: 'patterns', path: '/patterns' },
+  { name: 'pattern', path: '/patterns/agent-registry' },
+  { name: 'figures', path: '/figures' },
+  { name: 'figure', path: '/figures/art73-clock' },
+  { name: 'toolkit', path: '/toolkit' },
+  { name: 'self-check', path: '/toolkit/maturity-self-check' },
+  { name: 'agents', path: '/agents' },
+  { name: 'term', path: '/glossary/serious-incident' },
+  { name: 'cases', path: '/cases' },
+  { name: 'case', path: '/cases/clearview-ai' },
+  { name: 'harms', path: '/resources/harms' },
+  { name: 'data', path: '/resources/data' },
+  { name: 'resources', path: '/resources' },
+];
+
+for (const scheme of schemes) {
+  for (const shot of v050Pages) {
+    for (const width of [390, 1440]) {
+      test(`v0.5.0 ${shot.name} ${width} ${scheme}`, async ({ page }) => {
+        await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
+        await page.setViewportSize({ width, height: 1200 });
+        await page.goto(shot.path);
+        await page.waitForLoadState('networkidle');
+        await page.screenshot({
+          path: `test-results/review/W1/${shot.name}-${width}-${scheme}.png`,
+          fullPage: true,
+        });
+      });
+    }
+  }
+}

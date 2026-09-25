@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/instructions-for-use.v1.json",
+  "title": "Instructions for use",
+  "description": "The information a provider gives deployers so they can use a high-risk system correctly, one field per element the EU AI Act lists for instructions for use. Generated from the register entry, design record and test report, then reviewed.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 13",
+    "EU AI Act Art. 13(3)",
+    "EU AI Act Art. 26(1)",
+    "ISO/IEC 42001 A.8",
+    "NIST AI RMF MAP 2.2"
+  ],
+  "x-layer": [
+    2
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-model-card-as-control-evidence"
+  ],
+  "x-lifecycle-stage": "release",
+  "type": "object",
+  "required": [
+    "document_id",
+    "subject",
+    "provider",
+    "intended_purpose",
+    "performance",
+    "known_risks",
+    "human_oversight_measures",
+    "issued"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/instructions-for-use.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "document_id": {
+      "type": "string",
+      "description": "Identifier of this version of the instructions.",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "string",
+      "description": "The governed object as registry id and version, \"id@version\" (for example \"csa-01@2026-09-18\"). The key every record is filed against.",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "provider": {
+      "type": "object",
+      "description": "Who provides the system.",
+      "required": [
+        "name",
+        "contact"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Provider name.",
+          "minLength": 1
+        },
+        "contact": {
+          "type": "string",
+          "description": "Contact point.",
+          "minLength": 1
+        },
+        "authorised_representative": {
+          "type": "string",
+          "description": "Authorised representative, where applicable."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(a)"
+      ]
+    },
+    "intended_purpose": {
+      "type": "string",
+      "description": "The intended purpose and context of use.",
+      "minLength": 1,
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "performance": {
+      "type": "object",
+      "description": "Declared accuracy, robustness and cybersecurity.",
+      "required": [
+        "accuracy"
+      ],
+      "properties": {
+        "accuracy": {
+          "type": "array",
+          "description": "Declared accuracy metrics.",
+          "items": {
+            "type": "object",
+            "description": "One declared metric.",
+            "required": [
+              "metric",
+              "value"
+            ],
+            "properties": {
+              "metric": {
+                "type": "string",
+                "description": "Metric.",
+                "minLength": 1
+              },
+              "value": {
+                "type": "string",
+                "description": "Declared value.",
+                "minLength": 1
+              },
+              "conditions": {
+                "type": "string",
+                "description": "Conditions it was measured under."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "robustness": {
+          "type": "string",
+          "description": "Robustness tested against, and its limits."
+        },
+        "cybersecurity": {
+          "type": "string",
+          "description": "Cybersecurity measures and residual exposure."
+        },
+        "circumstances_affecting_performance": {
+          "type": "array",
+          "description": "Known or foreseeable circumstances that change performance.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)",
+        "EU AI Act Art. 15"
+      ]
+    },
+    "known_risks": {
+      "type": "array",
+      "description": "Known or foreseeable risks to health, safety or fundamental rights, including from foreseeable misuse.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "explanation_capabilities": {
+      "type": "string",
+      "description": "What the system can provide to explain its output.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "performance_by_group": {
+      "type": "array",
+      "description": "Performance for specific persons or groups, where relevant.",
+      "items": {
+        "type": "object",
+        "description": "One group.",
+        "required": [
+          "group",
+          "note"
+        ],
+        "properties": {
+          "group": {
+            "type": "string",
+            "description": "Group of persons.",
+            "minLength": 1
+          },
+          "note": {
+            "type": "string",
+            "description": "How performance differs, or \"no material difference found\".",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "input_data_specifications": {
+      "type": "string",
+      "description": "What input data the system expects, and data it must not receive.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "training_data_information": {
+      "type": "string",
+      "description": "Relevant information on training, validation and test data.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "output_interpretation": {
+      "type": "string",
+      "description": "How to interpret the output and use it appropriately.",
+      "minLength": 1,
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(b)"
+      ]
+    },
+    "predetermined_changes": {
+      "type": "array",
+      "description": "Changes to the system and its performance that were pre-determined at the initial conformity assessment.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(c)"
+      ]
+    },
+    "human_oversight_measures": {
+      "type": "string",
+      "description": "Oversight measures, including technical measures that help deployers interpret outputs.",
+      "minLength": 1,
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(d)",
+        "EU AI Act Art. 14"
+      ]
+    },
+    "resources_and_maintenance": {
+      "type": "object",
+      "description": "Resources, lifetime and maintenance.",
+      "properties": {
+        "compute_and_hardware": {
+          "type": "string",
+          "description": "Computational and hardware resources needed."
+        },
+        "expected_lifetime": {
+          "type": "string",
+          "description": "Expected lifetime of the system."
+        },
+        "maintenance": {
+          "type": "string",
+          "description": "Maintenance and care, including software updates."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(e)"
+      ]
+    },
+    "logging": {
+      "type": "string",
+      "description": "How deployers collect, store and interpret the logs.",
+      "x-evidences": [
+        "EU AI Act Art. 13(3)(f)",
+        "EU AI Act Art. 12"
+      ]
+    },
+    "issued": {
+      "type": "string",
+      "format": "date",
+      "description": "Date this version was issued."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

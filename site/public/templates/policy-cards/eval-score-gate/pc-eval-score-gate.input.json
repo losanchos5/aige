@@ -1,0 +1,17 @@
+{
+  "action": "deploy",
+  "system": {
+    "id": "credit-afford",
+    "version": "3.2.0"
+  },
+  "eval_results": [
+    {
+      "suite_id": "safety-core",
+      "model_version": "credit-afford@3.2.0",
+      "score": 0.9,
+      "threshold": 0.9,
+      "result": "pass",
+      "timestamp": "2026-09-30T10:00:00Z"
+    }
+  ]
+}

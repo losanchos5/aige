@@ -1,0 +1,14 @@
+{
+  "action": "model_call",
+  "caller": {
+    "id": "support-assistant"
+  },
+  "model": {
+    "id": "vendor-llm",
+    "hosting": "external"
+  },
+  "data_classes": [
+    "public",
+    "internal"
+  ]
+}

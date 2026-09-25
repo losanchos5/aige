@@ -120,3 +120,9 @@ export function siteGraph(pageJsonLd?: JsonLdInput): Record<string, unknown> {
   });
   return { '@context': 'https://schema.org', '@graph': graph };
 }
+
+/** @id of the obligation register as a schema.org DefinedTermSet (/obligations). */
+export const OBLIGATION_REGISTER_ID = `${site.url}/obligations#register`;
+
+/** @id of the open-data catalogue as a schema.org DataCatalog (/resources/data). */
+export const DATA_CATALOG_ID = `${site.url}/resources/data#catalog`;

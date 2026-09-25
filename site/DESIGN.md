@@ -3,7 +3,9 @@
 ## Purpose
 
 This site is the home of AI Governance Engineering: the Thesis, the Body of Knowledge, the Role,
-Stack, Path and Map, and a Resources section (frameworks, crosswalk, glossary, tools, reading list).
+Stack, Path, Patterns, Toolkit, Agents and Map, and a Resources section (frameworks, the obligation
+register, crosswalk, harms atlas, cases, contracts, templates and schemas, figures, tools, reading
+list, glossary and the open data behind them).
 This file is the source of truth for any design tool or agent auditing or modifying the visual
 system: it lists every token, primitive and constraint that actually exists in the codebase; do not
 invent colors, fonts or components beyond what is documented here.
@@ -168,8 +170,12 @@ needs no pause control; it also pauses while a step is active, and is absent und
   section's mesh fades over its top and bottom tenth (`mask-image`), so neighbouring meshes meet
   without a seam. On the home page no body section sits on the bare ground (Jordi, 2026-09-24):
   loop `b` 0.5, questions `c` 0.5, stack tint + `a` 0.35, values `b` 0.45, role `a` 0.6, chapters
-  `c` 0.45, resources tint + `b` 0.35; neighbours never share a composition. One mesh per section, several per
+  `c` 0.45, resources tint + `b` 0.35, newsletter `c` 0.35; neighbours never share a composition. One mesh per section, several per
   page; never directly under a table or a node grid (the loop sits on its own opaque panel).
+- **`BookParts`** (`site/src/components/BookParts.astro`), the Body of Knowledge by part on the
+  home: one `.card-lum` per part (no `.lift`: the card is not a link; its title links the part on
+  the /bok index and its chapter rows link the chapters) with the chapter range and a one-sentence
+  intro from `data/parts.ts`. One column on phones, two from 600px, a six-track grid from 960px.
 - **`.card-lum`** (`effects.css`), a flat card: 1px `--line` hairline, `--surface` fill, no
   shadow. A masked `--grad-border` ring fades in around its edge on hover/focus-within (`opacity`,
   not layout).

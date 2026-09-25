@@ -5,11 +5,18 @@ Pipeline: Markdown -> one HTML (python-markdown: tables, fenced_code, toc, attr_
 Playwright/Chromium page.pdf (A4, print_background, ~18mm margins, page numbers in the footer).
 
 Outputs (written to aige/dist/), where <v> is `bokVersion` read from site/src/data/site.ts:
-  - AI-Governance-Engineering-BoK-v<v>.pdf         cover + TOC + thesis + chapters 00-10 + contributors + changelog
+  - AI-Governance-Engineering-BoK-v<v>.pdf         cover + TOC + thesis + every chapter (00-NN) + contributors + changelog
   - AI-Governance-Engineering-Thesis-v<v>.pdf      cover + thesis only
   - site-preview.html                              light theme, sticky left TOC, max-width 780px (website preview)
 
+Chapter 05 is assembled: the catalogue (bok/05-patterns.md) keeps its introduction and template,
+then every pattern page (bok/patterns/<slug>.md, in `order`) follows in full, one heading level
+down, in place of the catalogue's per-pattern summaries; the catalogue's own sources close the
+chapter. The PDF therefore reads as the single chapter 05 did before the patterns got their pages.
+
 Run:  python build/build_pdf.py            (from the aige/ directory, or any cwd; paths are resolved from this file)
+      python build/build_pdf.py --html-only   (site-preview.html only, no browser needed)
+The release copies dist/AI-Governance-Engineering-BoK-v<v>.pdf to site/public/downloads/aige-bok-v<v>.pdf.
 """
 
 from __future__ import annotations
@@ -20,6 +27,7 @@ import shutil
 from pathlib import Path
 
 import markdown
+from markdown.extensions.toc import slugify as md_slugify
 
 AIGE = Path(__file__).resolve().parent.parent          # .../aige
 DIST = AIGE / "dist"
@@ -52,20 +60,49 @@ THESIS_CREDITS = ("Jorge García Aibar & Aurélie Pols",)
 HOME = "aigovernanceengineer.com"
 LICENCE = "CC BY 4.0"
 
+# Short TOC labels for the chapters whose H1 is longer than the table of contents wants. Any other
+# chapter is labelled from its own H1 ("11. AI, defined for governance" -> "11 · AI, defined for
+# governance"), so a new chapter file joins the PDF without editing this script.
+CHAPTER_LABELS: dict[str, str] = {
+    "00-preface": "00 · Preface",
+    "01-definition": "01 · The definition",
+    "02-why-now": "02 · Why now",
+    "03-values-principles": "03 · Values and principles",
+    "04-the-stack": "04 · The stack (five layers)",
+    "05-patterns": "05 · Patterns",
+    "06-the-role": "06 · The role",
+    "07-maturity-model": "07 · Maturity model",
+    "08-regulatory-map": "08 · Regulatory map",
+    "09-glossary": "09 · Glossary",
+    "10-reading-list": "10 · Reading list",
+}
+
+PATTERNS_CHAPTER = BOK / "05-patterns.md"
+PATTERN_PAGES = BOK / "patterns"
+FRONTMATTER_RE = re.compile(r"\A---\r?\n(.*?)\r?\n---\r?\n", re.S)
+
+
+def _chapter_label(path: Path) -> str:
+    label = CHAPTER_LABELS.get(path.stem)
+    if label:
+        return label
+    first = path.read_text(encoding="utf-8").lstrip().splitlines()[0]
+    match = re.match(r"#\s+(\d{2})\.\s+(.*)$", first)
+    return f"{match.group(1)} · {match.group(2).strip()}" if match else path.stem
+
+
+def _chapter_docs() -> list[tuple[str, Path, str]]:
+    """Every bok/NN-*.md chapter, in file-name order (the reading order)."""
+    return [
+        (f"ch{path.name[:2]}", path, _chapter_label(path))
+        for path in sorted(BOK.glob("[0-9][0-9]-*.md"))
+    ]
+
+
 # Order of documents in the full Body-of-Knowledge PDF. (key, path, short TOC label)
 DOCS: list[tuple[str, Path, str]] = [
     ("thesis", AIGE / "THESIS.md", "The Thesis"),
-    ("ch00", BOK / "00-preface.md", "00 · Preface"),
-    ("ch01", BOK / "01-definition.md", "01 · The definition"),
-    ("ch02", BOK / "02-why-now.md", "02 · Why now"),
-    ("ch03", BOK / "03-values-principles.md", "03 · Values and principles"),
-    ("ch04", BOK / "04-the-stack.md", "04 · The stack (five layers)"),
-    ("ch05", BOK / "05-patterns.md", "05 · Patterns"),
-    ("ch06", BOK / "06-the-role.md", "06 · The role"),
-    ("ch07", BOK / "07-maturity-model.md", "07 · Maturity model"),
-    ("ch08", BOK / "08-regulatory-map.md", "08 · Regulatory map"),
-    ("ch09", BOK / "09-glossary.md", "09 · Glossary"),
-    ("ch10", BOK / "10-reading-list.md", "10 · Reading list"),
+    *_chapter_docs(),
     ("contributors", BOK / "CONTRIBUTORS.md", "Contributors & signatories"),
     ("changelog", BOK / "CHANGELOG.md", "Changelog"),
 ]
@@ -74,6 +111,66 @@ DOCS: list[tuple[str, Path, str]] = [
 def render_markdown(text: str) -> str:
     md = markdown.Markdown(extensions=["tables", "fenced_code", "toc", "attr_list"])
     return md.convert(text)
+
+
+def _frontmatter(text: str) -> tuple[dict[str, str], str]:
+    """Split a pattern file into its flat `key: value` frontmatter and its body."""
+    match = FRONTMATTER_RE.match(text)
+    if not match:
+        return {}, text
+    fields: dict[str, str] = {}
+    for line in match.group(1).splitlines():
+        key, _, value = line.partition(":")
+        fields[key.strip()] = value.strip().strip('"')
+    return fields, text[match.end():]
+
+
+def _demote(markdown_text: str) -> str:
+    """Push every ATX heading one level down (outside fenced code)."""
+    out, fenced = [], False
+    for line in markdown_text.splitlines():
+        if line.lstrip().startswith("```"):
+            fenced = not fenced
+        elif not fenced and re.match(r"#{1,5}\s", line):
+            line = "#" + line
+        out.append(line)
+    return "\n".join(out)
+
+
+def patterns_chapter_markdown() -> str:
+    """Chapter 05 for print: the catalogue's intro and template, then each pattern page in full
+    (one level down) where the catalogue has its summary, then the catalogue's own sources.
+    Links to /patterns/<slug> become in-document links to the pattern's heading."""
+    catalogue = PATTERNS_CHAPTER.read_text(encoding="utf-8")
+    head, _, rest = catalogue.partition("\n## Pattern: ")
+    _, _, sources = rest.partition("\n## Sources\n")
+
+    pages = []
+    for path in sorted(PATTERN_PAGES.glob("*.md")):
+        fields, body = _frontmatter(path.read_text(encoding="utf-8"))
+        pages.append((int(fields.get("order", "0")), fields.get("id", path.stem), fields.get("title", path.stem), body))
+    pages.sort()
+
+    anchors = {slug: f"#ch05-{md_slugify(f'Pattern: {title}', '-')}" for _, slug, title, _ in pages}
+
+    def local_links(text: str) -> str:
+        return re.sub(
+            r"\]\(/patterns/([a-z0-9-]+)\)",
+            lambda m: f"]({anchors[m.group(1)]})" if m.group(1) in anchors else m.group(0),
+            text,
+        )
+
+    parts = [local_links(head.rstrip())]
+    parts += [local_links(_demote(body.strip())) for _, _, _, body in pages]
+    parts.append(f"## Sources\n{sources.rstrip()}")
+    return "\n\n".join(parts) + "\n"
+
+
+def document_markdown(path: Path) -> str:
+    """The Markdown the PDF renders for one document (chapter 05 is assembled)."""
+    if path == PATTERNS_CHAPTER and PATTERN_PAGES.is_dir():
+        return patterns_chapter_markdown()
+    return path.read_text(encoding="utf-8")
 
 
 def prefix_ids(chunk: str, key: str) -> str:
@@ -105,7 +202,7 @@ def build_content() -> str:
     """Concatenated <section> blocks for every document, in order."""
     parts = []
     for key, path, _label in DOCS:
-        text = path.read_text(encoding="utf-8")
+        text = document_markdown(path)
         chunk = render_markdown(text)
         chunk = prefix_ids(chunk, key)
         chunk = decorate(chunk)

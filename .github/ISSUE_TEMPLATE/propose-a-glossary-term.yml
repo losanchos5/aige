@@ -1,0 +1,56 @@
+name: Propose a glossary term
+description: Propose a term for the glossary (chapter 09), defined once and linked to the chapter that treats it.
+title: "[Glossary] "
+labels: ["glossary"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The glossary defines every term once and points to the chapter that treats it in full. A
+        term needs a source for its definition and a chapter where it actually appears. Use the
+        canonical spellings in `STYLEGUIDE.md` §8.
+  - type: input
+    id: term
+    attributes:
+      label: Term
+      placeholder: Eval gate
+    validations:
+      required: true
+  - type: textarea
+    id: definition
+    attributes:
+      label: Definition
+      description: One paragraph, in plain English, in your own words. Say what it is and, if it helps, what it is not.
+    validations:
+      required: true
+  - type: input
+    id: chapter
+    attributes:
+      label: Chapter that treats it
+      description: The chapter and section where the term is used or should be (for example "04 The stack, Layer 03").
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source URL
+      description: The standard, regulation, paper or official page the definition rests on.
+    validations:
+      required: true
+  - type: dropdown
+    id: verified
+    attributes:
+      label: Verification tag
+      options:
+        - "primary: I opened the official source"
+        - "secondary: a reputable outlet reports it"
+        - "reported: only secondary sources carry it"
+    validations:
+      required: true
+  - type: input
+    id: related
+    attributes:
+      label: Related terms (optional)
+      description: Terms already in the glossary that this one should cross-reference.
+    validations:
+      required: false

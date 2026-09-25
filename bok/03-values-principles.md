@@ -17,6 +17,12 @@ measured risk reduction (7) are inherited from GRC engineering, the parent disci
 the build (2) and agent identity and scope (4) are what AI forces us to add; the model that must
 be tested and the autonomous actor that must be bounded have no analogue in classic GRC.
 
+These are the book's own values and principles. The principle sets published by others are treated
+elsewhere: chapter 11 traces
+[the published responsible-AI principle sets to artefacts](/bok/ai-defined#responsible-ai-principle-sets-engineered),
+and chapter 22 has the
+[OECD AI Principles mapped to the stack](/bok/principles-and-standards#the-five-principles-and-five-recommendations).
+
 ---
 
 ## The eight values
@@ -79,6 +85,8 @@ An agent acting on a shared service account or a static key is ungovernable: you
 actions, revoke its access precisely, or bound what it may do. We prefer every non-human actor to have
 its own identity, an owner, and a scope of permitted actions, established *before* it is allowed to
 act. Identity is the precondition of accountability; scope is the precondition of containment.
+Chapter 23 builds both for agents, starting from
+[identity and short-lived credentials](/bok/governing-agents#identity-and-short-lived-credentials).
 
 > **In practice** Each agent is issued a distinct workload identity, registered with an owner and a
 > declared scope; a misbehaving agent is traced to its identity and its access revoked without
@@ -139,7 +147,8 @@ Governance that sits apart and grants or denies passage is a bottleneck engineer
 Governance owned jointly with engineering, built into the paved path, adopted because it is the
 easiest way to ship, becomes part of how things are made. We prefer shared ownership: the governance
 function builds the tooling, engineering builds on it, and the gate is a stage in a pipeline both own,
-not a meeting one side dreads.
+not a meeting one side dreads. Chapter 12 describes the
+[governance culture](/bok/governance-program#governance-culture) that shared ownership depends on.
 
 > **In practice** The eval gate and policy checks ship as part of the standard pipeline template;
 > engineers adopt them because the paved path is also the fastest path, and governance co-maintains
@@ -211,7 +220,8 @@ Wire each control to emit its own record as it runs, so assurance falls out of t
 being assembled by hand before an audit. If demonstrating a control needs a screenshot, we have not
 finished building it. The commitment is to instrumentation: every gate, guardrail and check writes a
 structured, signed record as it fires, so the audit is a query and the same records drive continuous
-assurance and incident response.
+assurance and incident response (chapter 17 specifies
+[the incident record](/bok/incidents#the-incident-record)).
 
 > **In practice** Every gate and guardrail writes a structured, signed record; the audit trail builds
 > itself, and the evidence store answers both the auditor and the on-call engineer.
@@ -222,8 +232,13 @@ assurance and incident response.
 
 Design each control against a specific way the system fails or a specific harm it can do to a person,
 and start there, not from a framework checklist. Threat models (prompt injection, tool misuse, agent
-identity abuse, data exfiltration) and fundamental-rights impact assessments are the inputs to design,
+identity abuse, data exfiltration) and
+[fundamental-rights impact assessments](/bok/eu-ai-act#fundamental-rights-impact-assessment-article-27)
+are the inputs to design,
 not paperwork produced afterward. If we cannot name the risk a control answers, we do not build it.
+Chapter 13 shows how to go about
+[identifying risk sources, factors and stakeholders](/bok/risk-management#identifying-risk-sources-factors-and-stakeholders),
+and the [harms atlas](/resources/harms) lists harms by level, each with the control that catches it.
 
 > **In practice** The agent's design starts from its OWASP Agentic threat model [4] and its FRIA; the
 > controls that ship are exactly the ones those two documents demanded, and they map back to them.

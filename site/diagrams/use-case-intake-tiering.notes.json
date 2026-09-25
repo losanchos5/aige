@@ -1,0 +1,9 @@
+{
+  "request": "A proposed AI use case, built or bought, arriving from a product team or a procurement request.",
+  "record": "The structured use-case record: intended purpose, out-of-scope uses, users and affected persons, decision authority, success metrics, error appetite, data sources and jurisdictions.",
+  "screen": "The prohibited-practice screen runs first; then the system is placed on the AI Act ladder, including the Art. 6(3) filter and its profiling override.",
+  "tier": "A versioned tier rule computes the internal tier from declared profile fields such as autonomy, decision impact, exposure, reversibility and data class.",
+  "gates": "The tier selects the assessments, eval categories and thresholds, approvers and review cadence the system must clear.",
+  "registry": "The intake record becomes the registry entry; deployment refuses any system without one.",
+  "blocked": "A use case that hits the prohibited-practice screen is blocked at intake and never tiered."
+}

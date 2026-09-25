@@ -1,0 +1,81 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/impact-assessment.v1.json",
+  "assessment_id": "fria-2026-004",
+  "type": "fria",
+  "subject": "credit-afford-03@3.2.0",
+  "assessor": "ai-governance-lead",
+  "consulted": [
+    "privacy-office",
+    "legal",
+    "customer-care",
+    "consumer association liaison"
+  ],
+  "related_assessments": [
+    "dpia-2026-011"
+  ],
+  "processes": "Consumer loan origination: the score supports the analyst's affordability decision for applications up to 30k EUR.",
+  "period_and_frequency": "Continuous from go-live, about 1,500 applications a day, reviewed yearly.",
+  "affected_categories": [
+    "consumer loan applicants",
+    "applicants over 60",
+    "self-employed applicants"
+  ],
+  "risks": [
+    {
+      "right_or_interest": "non-discrimination",
+      "description": "Scores that lean on age-correlated features decline older applicants more often.",
+      "affected_group": "applicants over 60",
+      "likelihood": 2,
+      "severity": 4,
+      "risk_register_id": "rk-0042"
+    },
+    {
+      "right_or_interest": "access to credit and an effective remedy",
+      "description": "An applicant cannot understand or contest a decline influenced by the score.",
+      "affected_group": "declined applicants",
+      "likelihood": 2,
+      "severity": 3
+    }
+  ],
+  "human_oversight_measures": "Analysts decide every application with the score, reason codes and data shown; overrides are logged and sampled monthly.",
+  "mitigations": [
+    {
+      "measure": "Fairness eval gate on age bands, threshold 0.80",
+      "addresses": [
+        "non-discrimination"
+      ],
+      "owner": "model-validation",
+      "status": "verified",
+      "evidence": "https://evidence.example.org/test-reports/tr-credit-afford-03-3.2.0"
+    },
+    {
+      "measure": "Reason codes in the decline letter and a human review on request",
+      "addresses": [
+        "access to credit and an effective remedy"
+      ],
+      "owner": "retail-credit-operations",
+      "status": "in_place"
+    }
+  ],
+  "governance_and_complaints": "Complaints about a decision reach customer care and, if they allege discrimination, open an AI incident; the AI governance committee reviews them quarterly.",
+  "residual_risk": "Low, with the weekly fairness monitoring in the PMM plan.",
+  "outcome": "proceed_with_mitigations",
+  "authority_notification": {
+    "required": true,
+    "authority": "national market surveillance authority"
+  },
+  "approvals": [
+    {
+      "role": "head-of-retail-credit",
+      "decision": "approve",
+      "timestamp": "2026-08-19T16:00:00Z"
+    }
+  ],
+  "review_triggers": [
+    "new product line",
+    "new country",
+    "fairness ratio below threshold",
+    "incident alleging discrimination"
+  ],
+  "next_review": "2027-08-19"
+}

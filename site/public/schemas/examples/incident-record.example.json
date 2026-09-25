@@ -1,0 +1,151 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/incident-record.v1.json",
+  "record_id": "inc-2026-0093",
+  "title": "Customer-service agent split a refund to evade its per-refund limit",
+  "description": "An email with hidden instructions led csa-01 to issue three refunds of 45 EUR on one order in ten minutes, each under the 50 EUR limit, for a claim that did not qualify for a refund.",
+  "ai_systems": [
+    "csa-01@2026-09-18"
+  ],
+  "organisations": [
+    "Example Retail (deployer and developer of csa-01)",
+    "Example Model Vendor (provider of the base model)"
+  ],
+  "ai_system_relation": [
+    "direct_cause"
+  ],
+  "submitter": {
+    "submitter_type": "deployer",
+    "organisation": "Example Retail",
+    "contact_role": "ai-incident-desk",
+    "contact_email": "ai-incidents@example.org"
+  },
+  "start_date": "2026-09-20",
+  "end_date": "2026-09-20",
+  "detected_at": "2026-09-20T15:02:00Z",
+  "countries": [
+    "ES"
+  ],
+  "supporting_materials": [
+    "https://evidence.example.org/traces/csa-01/2026-09-20/tr-77120",
+    "https://evidence.example.org/alerts/anomaly-5512"
+  ],
+  "evidence_available": "Full agent trace with the injected email, the three tool calls and the policy verdicts (all \"allow\" per call).",
+  "severity": "incident",
+  "harm_types": [
+    "economic_property"
+  ],
+  "resulting_harm": "Loss of 135 EUR to the retailer; no harm to the customer.",
+  "harm_quantification": {
+    "economic_loss": 135,
+    "currency": "EUR",
+    "affected_count": 0
+  },
+  "unintended_use": {
+    "linked": true,
+    "how": "Indirect prompt injection in an inbound email."
+  },
+  "affected_stakeholders": [
+    "business"
+  ],
+  "associated_ai_principles": [
+    "robustness",
+    "accountability"
+  ],
+  "industries": [
+    "G47 retail trade"
+  ],
+  "business_functions": [
+    "citizen or customer service"
+  ],
+  "critical_infrastructure": {
+    "affected": false
+  },
+  "deployment_breadth": "narrow",
+  "training_data_link": {
+    "linked": false
+  },
+  "model_link": {
+    "linked": true,
+    "how": "The base model followed instructions embedded in data."
+  },
+  "usage_rights": "Proprietary model under API terms.",
+  "multiple_systems_interaction": {
+    "linked": false
+  },
+  "tasks": [
+    "interaction support"
+  ],
+  "max_autonomy_level": "medium_action",
+  "chain_of_events": "Inbound email contained hidden text instructing the agent to refund in parts; the agent treated it as a user instruction; each call passed the per-refund rule; the anomaly detector flagged three refunds on one order.",
+  "containment": {
+    "kill_switch_used": false,
+    "contained_at": "2026-09-20T15:20:00Z",
+    "actions": "refunds-api scope suspended for csa-01 until the policy card fix shipped."
+  },
+  "response": "Policy card updated with a per-order aggregate cap; injection suite extended with split-transaction cases.",
+  "actions_taken": [
+    {
+      "type": "ceasing",
+      "description": "Suspended refunds:create for csa-01.",
+      "taken_at": "2026-09-20"
+    },
+    {
+      "type": "mitigation",
+      "description": "pc-refunds-v4 adds a 50 EUR per-order aggregate cap.",
+      "taken_at": "2026-09-21"
+    },
+    {
+      "type": "prevention",
+      "description": "Added 40 split-transaction cases to injection-resistance.v5.",
+      "taken_at": "2026-09-22"
+    }
+  ],
+  "root_cause_analysis": {
+    "method": "five_whys",
+    "outputs_involved": "Three create_refund calls produced after the model read the email body as instructions.",
+    "cause_category": "security_attack",
+    "contributing_factors": [
+      "per-call limit without aggregation",
+      "no eval cases for split transactions"
+    ],
+    "mitigations_failed_or_circumvented": [
+      "pc-refunds-v3 per-refund limit"
+    ],
+    "control_that_would_have_caught_it": "An aggregate rule in the policy card, tested by the eval gate before release."
+  },
+  "post_market_monitoring_patterns": "Two near misses in August with two refunds on one order, not flagged at the time.",
+  "reporting": {
+    "became_aware_at": "2026-09-20T15:02:00Z",
+    "obligations": [
+      {
+        "regime": "eu_ai_act_art_73",
+        "required": false,
+        "rationale": "csa-01 is not a high-risk AI system."
+      },
+      {
+        "regime": "gdpr_personal_data_breach",
+        "required": false,
+        "rationale": "No personal data was disclosed or lost."
+      },
+      {
+        "regime": "internal_only",
+        "required": true,
+        "rationale": "Internal incident policy: any out-of-policy action by an agent.",
+        "submitted_at": "2026-09-20T16:00:00Z"
+      }
+    ]
+  },
+  "links": {
+    "risk_register_entries": [
+      "rk-0051"
+    ],
+    "eval_suites_added": [
+      "injection-resistance.v5"
+    ],
+    "policy_cards_changed": [
+      "pc-refunds-v4"
+    ]
+  },
+  "owner": "ai-incident-desk",
+  "status": "resolved"
+}

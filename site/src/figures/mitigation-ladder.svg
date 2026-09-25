@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 494" class="figc" role="img" aria-labelledby="fig-mitigation-ladder-t fig-mitigation-ladder-d">
+  <title id="fig-mitigation-ladder-t">The mitigation ladder</title>
+  <desc id="fig-mitigation-ladder-d">Five rungs worked top down (eliminate, substitute, engineer, administrative, accept and monitor), each with its stack control and its evidence; transfer sits beside the ladder, and the ladder ends in acceptance.</desc>
+
+  <text class="mono muted" x="16" y="20" font-size="13.5">Work top down, and write down why</text>
+
+  <!-- The ladder: two rails and five rungs -->
+  <line class="axis" x1="16" y1="32" x2="16" y2="380"/>
+  <line class="axis" x1="38" y1="32" x2="38" y2="380"/>
+  <line class="axis" x1="16" y1="32" x2="38" y2="32"/>
+  <line class="axis" x1="16" y1="100" x2="38" y2="100"/>
+  <line class="axis" x1="16" y1="170" x2="38" y2="170"/>
+  <line class="axis" x1="16" y1="240" x2="38" y2="240"/>
+  <line class="axis" x1="16" y1="310" x2="38" y2="310"/>
+  <line class="axis" x1="16" y1="380" x2="38" y2="380"/>
+  <text class="mono" x="27" y="54" font-size="13" text-anchor="middle">1</text>
+  <text class="mono" x="27" y="124" font-size="13" text-anchor="middle">2</text>
+  <text class="mono" x="27" y="194" font-size="13" text-anchor="middle">3</text>
+  <text class="mono" x="27" y="264" font-size="13" text-anchor="middle">4</text>
+  <text class="mono" x="27" y="334" font-size="13" text-anchor="middle">5</text>
+
+  <!-- 1 Eliminate -->
+  <text class="disp" x="52" y="54" font-size="15">Eliminate</text>
+  <text class="ink2" x="344" y="54" font-size="13" text-anchor="end">legal floor: AI Act bans</text>
+  <text class="ink2" x="52" y="72" font-size="13">Policy deny; prohibited-use blocklist</text>
+  <path class="glyph" d="M52 79 h8 l4 4 v11 h-12 z"/>
+  <path class="glyph-check" d="M54 88 l2.5 2.5 l4.5 -5"/>
+  <text x="72" y="91" font-size="13">Deny verdict</text>
+
+  <!-- 2 Substitute -->
+  <text class="disp" x="52" y="124" font-size="15">Substitute</text>
+  <text class="ink2" x="52" y="142" font-size="13">Design record; narrower registry scope</text>
+  <path class="glyph" d="M52 149 h8 l4 4 v11 h-12 z"/>
+  <path class="glyph-check" d="M54 158 l2.5 2.5 l4.5 -5"/>
+  <text x="72" y="161" font-size="13">Design decision linked to the risk id</text>
+
+  <!-- 3 Engineer -->
+  <text class="disp" x="52" y="194" font-size="15">Engineer</text>
+  <text class="ink2" x="52" y="212" font-size="13">Eval gate, guardrail, approval, kill switch</text>
+  <path class="glyph" d="M52 219 h8 l4 4 v11 h-12 z"/>
+  <path class="glyph-check" d="M54 228 l2.5 2.5 l4.5 -5"/>
+  <text x="72" y="231" font-size="13">Eval results, guardrail events</text>
+
+  <!-- 4 Administrative -->
+  <text class="disp" x="52" y="264" font-size="15">Administrative</text>
+  <text class="ink2" x="52" y="282" font-size="13">Instructions for use; training records</text>
+  <path class="glyph" d="M52 289 h8 l4 4 v11 h-12 z"/>
+  <path class="glyph-check" d="M54 298 l2.5 2.5 l4.5 -5"/>
+  <text x="72" y="301" font-size="13">Training attestations</text>
+
+  <!-- 5 Accept and monitor -->
+  <text class="disp" x="52" y="334" font-size="15">Accept and monitor</text>
+  <text class="ink2" x="52" y="352" font-size="13">Signed acceptance; telemetry; review date</text>
+  <path class="glyph" d="M52 359 h8 l4 4 v11 h-12 z"/>
+  <path class="glyph-check" d="M54 368 l2.5 2.5 l4.5 -5"/>
+  <text x="72" y="371" font-size="13">Acceptance record; monitoring signal</text>
+
+  <!-- Transfer sits beside the ladder, not on it -->
+  <rect x="8" y="396" width="344" height="62" rx="8" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="4 3"/>
+  <text class="disp" x="20" y="416" font-size="14">Beside the ladder: transfer</text>
+  <text class="ink2" x="20" y="434" font-size="13">Insurance, indemnities: moves the financial</text>
+  <text class="ink2" x="20" y="450" font-size="13">consequence, not the harm to the person</text>
+
+  <text class="ink2" x="16" y="482" font-size="13.5">Every rung leaves a residual.</text>
+</svg>

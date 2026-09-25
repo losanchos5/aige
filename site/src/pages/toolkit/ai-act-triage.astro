@@ -1,0 +1,916 @@
+---
+// /toolkit/ai-act-triage: the EU AI Act role and risk-class triage. The
+// versioned question graph lives in src/data/triage.ts and is built from
+// chapter 18; the pure engine (public/toolkit/ai-act-triage-engine.js) turns the
+// answers into an indicative outcome and a classification decision record, and
+// the client module (public/toolkit/ai-act-triage.js) runs the form, the link
+// state and the exports. Every question, option, rule and reason is rendered
+// here as well, so the page works as a worksheet without JavaScript.
+//
+// The build fails if a fragment of chapter 18 that the graph cites is no longer
+// in the chapter, if a cited section is gone, or if a role or class label drifts
+// from roles.ts and frameworks.ts: the tool never asserts what the chapter
+// does not.
+import ToolShell from '../../components/toolkit/ToolShell.astro';
+import { toolById, tools, toolNotice } from '../../data/toolkit';
+import {
+  questionSet,
+  steps,
+  questions,
+  classRules,
+  roleRules,
+  scopeRules,
+  reReviewTriggers,
+  legalReviewStates,
+  classLabels,
+  classOrder,
+  roleLabels,
+  plannerHandoff,
+  basisItems,
+  plainChapterText,
+  triageModel,
+} from '../../data/triage';
+import { roles } from '../../data/roles';
+import { systemClassLabels } from '../../data/frameworks';
+import { readSource, getHeadings, slugify } from '../../lib/md-parse';
+import { site } from '../../data/site';
+
+const tool = toolById('ai-act-triage');
+const chapterHref = tool.chapter?.href ?? questionSet.chapterPath;
+
+// ---- Build-time checks: the house rule, enforced ----------------------------------
+const chapterMd = readSource(questionSet.chapterFile);
+const chapterPlain = plainChapterText(chapterMd);
+const headingSlugs = new Map(
+  getHeadings(chapterMd)
+    .filter((heading) => heading.depth >= 2)
+    .map((heading) => [heading.text, slugify(heading.text)]),
+);
+for (const item of basisItems()) {
+  if (!headingSlugs.has(item.section)) {
+    throw new Error(`ai-act-triage: ${item.where} cites section "${item.section}", not in chapter 18`);
+  }
+  for (const fragment of item.basis) {
+    if (!chapterPlain.includes(plainChapterText(fragment))) {
+      throw new Error(`ai-act-triage: ${item.where} cites text not in chapter 18: "${fragment}"`);
+    }
+  }
+}
+for (const [id, entry] of Object.entries(roleLabels)) {
+  const row = roles.find((role) => role.id === id);
+  if (!row || row.role !== entry.label) {
+    throw new Error(`ai-act-triage: role ${id} label drifts from roles.ts`);
+  }
+}
+for (const id of classOrder) {
+  if (id !== 'minimal' && systemClassLabels[id] !== classLabels[id].label) {
+    throw new Error(`ai-act-triage: class ${id} label drifts from frameworks.ts`);
+  }
+}
+
+const sectionHref = (heading: string) => `${chapterHref}#${headingSlugs.get(heading)}`;
+const planner = tools.find((entry) => entry.id === 'obligations-planner');
+
+// Everything the client needs, as data (no markup): the JSON island.
+const data = {
+  ...triageModel(sectionHref),
+  notice: toolNotice,
+  page: new URL(tool.href, site.url).href,
+  chapter: new URL(chapterHref, site.url).href,
+  planner: { href: '/toolkit/obligations-planner', live: planner?.status === 'live' },
+  registerHref: '/obligations',
+};
+
+const stepNumber = new Map(steps.map((step, i) => [step.id, i + 1]));
+const byStep = steps.map((step) => ({
+  ...step,
+  n: stepNumber.get(step.id),
+  questions: questions
+    .filter((question) => question.step === step.id)
+    .map((question) => ({
+      ...question,
+      eurLexHref: `${questionSet.consolidatedText}#${question.eurLex}`,
+      sectionHref: sectionHref(question.section),
+      multi: question.kind === 'multi',
+    })),
+}));
+
+// The rules, written out for the worksheet: grouped by what they give.
+const classRuleGroups = classOrder.map((id) => ({
+  id,
+  label: classLabels[id].label,
+  article: classLabels[id].article,
+  rules: classRules.filter((rule) => rule.cls === id),
+}));
+const roleRuleGroups = (Object.keys(roleLabels) as (keyof typeof roleLabels)[]).map((id) => ({
+  id,
+  label: roleLabels[id].label,
+  article: roleLabels[id].article,
+  rules: roleRules.filter((rule) => rule.role === id),
+}));
+
+const schemaUrl = '/schemas/classification-decision-record.v1.json';
+const exampleUrl = '/schemas/examples/classification-decision-record.example.json';
+const templateUrl = '/templates/classification-decision-record.md';
+
+const sources = [
+  {
+    text: '18. The EU AI Act in one pass: every question, option, rule, reason and date this tool shows, and the illustrative classification decision record it extends. AI Governance Engineering Body of Knowledge. 2026-09-24.',
+    url: `${site.url}${chapterHref}`,
+    verified: 'primary',
+  },
+  {
+    text: 'Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 Jul 2026 incorporating Regulation (EU) 2026/1744: Arts. 2, 3, 5, 6, 25, 50 to 53 and Annexes I and III, the anchors each question links to. Publications Office of the EU (EUR-Lex). 2026-07-27.',
+    url: questionSet.consolidatedText,
+    verified: 'primary',
+  },
+  {
+    text: 'Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence (Artificial Intelligence Act), original text; OJ L, 2024/1689, 12.7.2024. Publications Office of the EU (EUR-Lex). 2024-07-12.',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng',
+    verified: 'primary',
+  },
+  {
+    text: 'Regulation (EU) 2026/1744 (Digital Omnibus on AI) of 8 Jul 2026: new Art. 5(1)(ba), (bb), (1a), (1b); Art. 3(14) and Art. 6(1a) to (1c); Art. 2(2) and 2(13); Art. 25(2); Art. 111(4); Art. 113 dates; OJ L, 2026/1744, 24.7.2026, in force on the third day after publication. Publications Office of the EU (EUR-Lex). 2026-07-24.',
+    url: 'https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng',
+    verified: 'primary',
+  },
+  {
+    text: 'Commission Guidelines on the definition of an artificial intelligence system (seven elements; four families that may fall outside; non-binding), as cited in chapter 18. European Commission. 2025-02-06.',
+    url: 'https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-ai-system-definition-facilitate-first-ai-acts-rules-application',
+    verified: 'primary',
+  },
+  {
+    text: 'Commission Guidelines on the scope of the obligations for providers of general-purpose AI models (C(2025) 7719 final; 10^23 FLOP indicative criterion; one-third modification criterion; monetisation), as cited in chapter 18. European Commission. 2025-11-19.',
+    url: 'https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act',
+    verified: 'primary',
+  },
+  {
+    text: 'Draft Commission guidelines on the classification of high-risk AI systems (Art. 6; still a draft as of 2026-09-24), as cited in chapter 18. European Commission. 2026-05-19.',
+    url: 'https://digital-strategy.ec.europa.eu/en/library/draft-commission-guidelines-classification-high-risk-ai-systems',
+    verified: 'primary',
+  },
+];
+---
+
+<ToolShell
+  tool={tool}
+  heading="Role and risk class, triaged."
+  description="Triage an AI system or model under the EU AI Act: indicative roles and risk classes with the reason for each answer, and a versioned decision record."
+  lede="Answer the questions chapter 18 asks, in its order: definition, reach, role, prohibited practices, high-risk, transparency and the GPAI track. You get indicative roles and classes with the reason behind each answer, and a classification decision record to file. Not a verdict: counsel confirms the reading."
+  image="/og/bok-eu-ai-act.png"
+  data={data}
+  needsJs="the live result, the link state and the record exports"
+>
+  <form class="tool-form" id="tri-form" data-tri-form novalidate>
+    <div
+      class="tool-errors"
+      id="tri-errors"
+      data-tri-errors
+      tabindex="-1"
+      role="group"
+      aria-labelledby="tri-errors-title"
+      hidden
+    >
+      <h2 id="tri-errors-title"><span data-tri-errors-count>Some answers are missing</span></h2>
+      <ul data-tri-errors-list></ul>
+    </div>
+
+    <p class="tool-intro">
+      Answer with the system as it is intended and used, not as it is marketed. Questions that do
+      not apply to your earlier answers are skipped. Question set {questionSet.version}, as of
+      {questionSet.asOf}, read against {questionSet.basis}
+      <a href="#src-2" class="cite">[2]</a>.
+    </p>
+
+    <fieldset class="tool-fieldset tri-system" aria-describedby="tri-system-hint">
+      <legend class="tool-legend">The system</legend>
+      <p class="tool-hint" id="tri-system-hint">
+        The record is filed against one system or model and its intended purpose: re-run the
+        triage whenever the purpose changes.
+      </p>
+      <div class="tool-field">
+        <label for="tri-name">Name</label>
+        <input
+          class="tool-input"
+          id="tri-name"
+          name="name"
+          type="text"
+          maxlength="120"
+          autocomplete="off"
+          required
+          data-tri-field="name"
+        />
+        <p class="tool-error" id="tri-name-error" hidden>Name the system.</p>
+      </div>
+      <div class="tool-field">
+        <label for="tri-registry-id">Registry id (optional)</label>
+        <input
+          class="tool-input"
+          id="tri-registry-id"
+          name="registry-id"
+          type="text"
+          maxlength="80"
+          autocomplete="off"
+          aria-describedby="tri-registry-id-hint"
+          data-hint-id="tri-registry-id-hint"
+          data-tri-field="registry-id"
+        />
+        <p class="tool-hint" id="tri-registry-id-hint">
+          The id in your AI system register, so the record files next to the entry.
+        </p>
+      </div>
+      <div class="tool-field tri-wide">
+        <label for="tri-purpose">Intended purpose</label>
+        <textarea
+          class="tool-input tri-textarea"
+          id="tri-purpose"
+          name="purpose"
+          rows="3"
+          maxlength="600"
+          required
+          aria-describedby="tri-purpose-hint"
+          data-hint-id="tri-purpose-hint"
+          data-tri-field="purpose"></textarea>
+        <p class="tool-hint" id="tri-purpose-hint">
+          What it is used for, by whom and in which context. The classification follows the
+          intended purpose, not the technology.
+        </p>
+        <p class="tool-error" id="tri-purpose-error" hidden>State its intended purpose.</p>
+      </div>
+    </fieldset>
+
+    {
+      byStep.map((step) => (
+        <section class="tri-step" data-tri-step={step.id} aria-labelledby={`tri-step-${step.id}`}>
+          <h2 id={`tri-step-${step.id}`} class="tri-step-title">
+            <span class="tri-step-n">{step.n}</span> {step.title}
+          </h2>
+          <p class="tool-intro">{step.lede}</p>
+          {step.questions.map((question) => (
+            <fieldset
+              class="tool-fieldset"
+              id={`tri-q-${question.id}`}
+              data-tri-q={question.id}
+              aria-describedby={`tri-q-${question.id}-hint`}
+            >
+              <legend class="tool-legend">{question.prompt}</legend>
+              <p class="tool-hint" id={`tri-q-${question.id}-hint`}>
+                {question.hint} {question.multi ? 'Tick all that apply.' : 'Choose one.'}
+              </p>
+              <p class="tri-cite-line">
+                Rests on{' '}
+                <a href={question.eurLexHref} rel="noopener">
+                  {question.article}
+                </a>{' '}
+                · <a href={question.sectionHref}>chapter 18: {question.section}</a>
+                {question.askWhen && <span class="tri-when-note"> · {question.askWhen}</span>}
+              </p>
+              <p class="tool-error" id={`tri-q-${question.id}-error`} hidden>
+                Answer this question.
+              </p>
+              <ul class="tool-options">
+                {question.options.map((option) => (
+                  <li class="tool-option">
+                    <input
+                      type={question.multi ? 'checkbox' : 'radio'}
+                      id={`tri-${question.id}-${option.value}`}
+                      name={`q-${question.id}`}
+                      value={option.value}
+                    />
+                    <label for={`tri-${question.id}-${option.value}`}>
+                      <span class="tool-option-text">{option.label}</span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+              <details class="tri-means">
+                <summary>What each answer means</summary>
+                <dl>
+                  {question.options.map((option) => (
+                    <>
+                      <dt>{option.label}</dt>
+                      <dd>{option.means}</dd>
+                    </>
+                  ))}
+                </dl>
+              </details>
+            </fieldset>
+          ))}
+        </section>
+      ))
+    }
+
+    <section class="tri-step" aria-labelledby="tri-step-record">
+      <h2 id="tri-step-record" class="tri-step-title">
+        <span class="tri-step-n">{steps.length + 1}</span> The decision record
+      </h2>
+      <p class="tool-intro">
+        Who reviewed the triage, when, and what should make you run it again. The record is the
+        output of intake and classification: it lives in the registry, next to the system.
+      </p>
+      <fieldset class="tool-fieldset" aria-describedby="tri-record-hint">
+        <legend class="tool-legend">Review</legend>
+        <p class="tool-hint" id="tri-record-hint">
+          Write roles, not personal names. The reviewer is needed for the exports, not for the
+          result.
+        </p>
+        <div class="tri-pair">
+          <div class="tool-field">
+            <label for="tri-reviewer">Reviewing role or forum</label>
+            <input
+              class="tool-input"
+              id="tri-reviewer"
+              name="reviewer"
+              type="text"
+              maxlength="120"
+              autocomplete="off"
+              data-tri-field="reviewer"
+            />
+            <p class="tool-error" id="tri-reviewer-error" hidden>
+              Name the reviewing role before you export the record.
+            </p>
+          </div>
+          <div class="tool-field">
+            <label for="tri-decided-at">Decision date</label>
+            <input
+              class="tool-input"
+              id="tri-decided-at"
+              name="decided-at"
+              type="date"
+              data-tri-field="decided-at"
+            />
+          </div>
+          <div class="tool-field">
+            <label for="tri-legal-review">Legal review</label>
+            <select
+              class="tool-select"
+              id="tri-legal-review"
+              name="legal-review"
+              data-tri-field="legal-review"
+            >
+              {legalReviewStates.map((state) => <option value={state.value}>{state.label}</option>)}
+            </select>
+          </div>
+          <div class="tool-field">
+            <label for="tri-review-by">Review by (optional)</label>
+            <input
+              class="tool-input"
+              id="tri-review-by"
+              name="review-by"
+              type="date"
+              data-tri-field="review-by"
+            />
+          </div>
+        </div>
+        <div class="tool-field tri-wide">
+          <label for="tri-note">Reviewer note (optional)</label>
+          <textarea
+            class="tool-input tri-textarea"
+            id="tri-note"
+            name="note"
+            rows="3"
+            maxlength="1200"
+            aria-describedby="tri-note-hint"
+            data-hint-id="tri-note-hint"
+            data-tri-field="note"></textarea>
+          <p class="tool-hint" id="tri-note-hint">
+            The facts a carve-out or a filter rests on, what counsel said, what is still open.
+          </p>
+        </div>
+      </fieldset>
+      <fieldset class="tool-fieldset" aria-describedby="tri-triggers-hint">
+        <legend class="tool-legend">Re-review triggers</legend>
+        <p class="tool-hint" id="tri-triggers-hint">
+          Events that should re-open the record. The tool ticks the ones your answers suggest;
+          change them as you need.
+        </p>
+        <ul class="tool-options">
+          {
+            reReviewTriggers.map((trigger) => (
+              <li class="tool-option">
+                <input
+                  type="checkbox"
+                  id={`tri-trigger-${trigger.id}`}
+                  name="trigger"
+                  value={trigger.id}
+                />
+                <label for={`tri-trigger-${trigger.id}`}>
+                  <span class="tool-option-text">{trigger.label}</span>
+                  <span class="tool-option-level">{trigger.article}</span>
+                </label>
+              </li>
+            ))
+          }
+        </ul>
+      </fieldset>
+    </section>
+
+    <div class="tool-buttons" data-tool-js data-print-hide hidden>
+      <button type="submit" class="btn btn-primary">Show the triage</button>
+      <button type="button" class="btn btn-secondary" data-tri-reset>Clear answers</button>
+    </div>
+  </form>
+
+  <section
+    class="tool-result tool-block tri-result"
+    id="tri-result"
+    data-tri-result
+    aria-labelledby="tri-result-title"
+    hidden
+  >
+    <h2 id="tri-result-title" tabindex="-1">Indicative triage</h2>
+    <p class="tool-intro" data-tri-summary></p>
+    <p class="tri-warning" data-tri-version-warning hidden></p>
+
+    <div class="tri-scope" data-tri-scope>
+      <h3>Scope</h3>
+      <p class="tri-scope-status" data-tri-scope-status></p>
+      <ul class="tri-reasons" data-tri-scope-reasons></ul>
+    </div>
+
+    <div class="tri-columns">
+      <div>
+        <h3>Roles</h3>
+        <ul class="tri-list" data-tri-roles></ul>
+      </div>
+      <div>
+        <h3>Risk ladder and GPAI track</h3>
+        <ol class="tri-ladder" data-tri-classes></ol>
+      </div>
+    </div>
+
+    <div class="tri-box" data-tri-if hidden>
+      <h3>If it were in scope</h3>
+      <p></p>
+    </div>
+
+    <div class="tri-box" data-tri-open hidden>
+      <h3>Open points</h3>
+      <ul class="tri-reasons"></ul>
+    </div>
+
+    <div class="tri-box" data-tri-notes hidden>
+      <h3>What follows</h3>
+      <ul class="tri-reasons"></ul>
+    </div>
+
+    <div class="tri-box">
+      <h3>Next: the obligations</h3>
+      <div data-tri-handoff></div>
+    </div>
+
+    <div class="tool-table-wrap">
+      <table class="tool-table tri-table">
+        <caption>Your answers, and what each one means</caption>
+        <thead>
+          <tr>
+            <th scope="col">Question</th>
+            <th scope="col">Answer</th>
+            <th scope="col">Article</th>
+            <th scope="col">What it means</th>
+          </tr>
+        </thead>
+        <tbody data-tri-answers></tbody>
+      </table>
+    </div>
+
+    <p class="tool-hint">
+      An engineer's reading, not legal advice and not a conformity claim. The engineer builds the
+      control and the evidence; counsel confirms that the obligation was read correctly
+      <a href="#src-1" class="cite">[1]</a>.
+    </p>
+
+    <div class="tool-actions" data-print-hide>
+      <button type="button" class="btn btn-secondary" data-action="copy">Copy link</button>
+      <button type="button" class="btn btn-secondary" data-action="json">Download record (JSON)</button>
+      <button type="button" class="btn btn-secondary" data-action="yaml">Download record (YAML)</button>
+      <button type="button" class="btn btn-secondary" data-action="md">Download report (Markdown)</button>
+      <button type="button" class="btn btn-secondary" data-action="print">Print</button>
+    </div>
+    <p class="tool-status" role="status" data-tri-status></p>
+  </section>
+
+  <section
+    class="tool-block tri-import"
+    id="tri-import-section"
+    aria-labelledby="tri-import-title"
+    data-tri-import-box
+    data-tool-js
+    data-print-hide
+    hidden
+  >
+    <h2 id="tri-import-title">Re-open a record</h2>
+    <div class="tool-field">
+      <label for="tri-import">Import a JSON decision record</label>
+      <input
+        class="tool-input"
+        id="tri-import"
+        type="file"
+        accept=".json,application/json"
+        aria-describedby="tri-import-hint"
+        data-tri-import
+      />
+      <p class="tool-hint" id="tri-import-hint">
+        A record exported by this tool. It is read in this browser; the outcome is recomputed from
+        its answers, never read from the file.
+      </p>
+      <p class="tool-error" id="tri-import-error" data-tri-import-error hidden></p>
+    </div>
+    <p class="tool-status" role="status" data-tri-import-status></p>
+  </section>
+
+  <Fragment slot="guide">
+    <h2 id="tri-how">How the triage works</h2>
+    <p>
+      The chapter reads the Act as four ideas: a definition gate, a risk ladder, a set of operator
+      roles and a timeline <a href="#src-1" class="cite">[1]</a>. The triage asks them in that
+      order, and skips what your earlier answers rule out.
+    </p>
+    <ol>
+      {
+        steps.map((step) => (
+          <li>
+            <strong>{step.title}.</strong> {step.lede}
+          </li>
+        ))
+      }
+    </ol>
+
+    <h2 id="tri-read">How to read the result</h2>
+    <ul>
+      <li>
+        <strong>Indicative, never a verdict.</strong> The result names the roles and classes your
+        answers imply, with the reason and the article behind each. It never declares conformity:
+        that is a claim about evidence, not about answers.
+      </li>
+      <li>
+        <strong>Roles are per system.</strong> A role attaches to an activity on a specific
+        system, not to a company: an in-house system is often <code>["provider", "deployer"]</code>
+        <a href="#src-1" class="cite">[1]</a>.
+      </li>
+      <li>
+        <strong>Classes stack.</strong> One system can sit on two rungs at once: an Annex III chatbot
+        carries both the high-risk duties and the Art. 50 disclosure duty. A system built on your
+        own GPAI model has the model track as well.
+      </li>
+      <li>
+        <strong>Out of scope assigns nothing.</strong> When the definition, reach or an exclusion
+        takes it out, the result shows what the other answers would give, so you know what to plan
+        for if the facts change.
+      </li>
+      <li>
+        <strong>Open points are the work.</strong> A "not sure" answer never disappears: it becomes
+        an open point in the record until someone settles it.
+      </li>
+    </ul>
+
+    <h2 id="tri-rules">The rules, written out</h2>
+    <p>
+      Without JavaScript, answer the questions above and read the outcome off these rules. They are
+      the same data the live result runs on (question set {questionSet.version}).
+    </p>
+    <h3 id="tri-rules-scope">Scope</h3>
+    <p>In scope unless one of these holds (a "not settled" rule keeps the triage going):</p>
+    <ul>
+      {
+        scopeRules.map((rule) => (
+          <li>
+            <strong>{rule.scope === 'out-of-scope' ? 'Out of scope' : 'Not settled'}</strong> when{' '}
+            {rule.explain.charAt(0).toLowerCase() + rule.explain.slice(1)} {rule.reason} (
+            <a href={sectionHref(rule.section)}>{rule.article}</a>)
+          </li>
+        ))
+      }
+    </ul>
+    <h3 id="tri-rules-classes">Classes</h3>
+    <ul>
+      {
+        classRuleGroups.map((group) => (
+          <li>
+            <strong>{group.label}</strong> ({group.article}) when:
+            <ul>
+              {group.rules.map((rule) => (
+                <li>
+                  {rule.explain} {rule.reason}
+                  {rule.appliesFrom && <> Applies from {rule.appliesFrom}.</>}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+    <h3 id="tri-rules-roles">Roles</h3>
+    <ul>
+      {
+        roleRuleGroups.map((group) => (
+          <li>
+            <strong>{group.label}</strong> ({group.article}) when:
+            <ul>
+              {group.rules.map((rule) => (
+                <li>
+                  {rule.explain} {rule.reason}
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 id="tri-record">The classification decision record</h2>
+    <p>
+      The chapter asks for a classification decision record for every Annex III candidate, with the
+      Art. 6(3) condition relied on and the profiling flag stated explicitly, filed in the registry
+      and re-evaluated whenever the intended purpose changes <a href="#src-1" class="cite">[1]</a>.
+      The record lives in Layer 2 (Inventory &amp; Transparency); the rule that computes it lives in
+      Layer 1. The exported record carries the question-set version, every answer with its
+      article and meaning, the outcome with its reasons, the reviewer, the date, the legal-review
+      state and the re-review triggers.
+    </p>
+    <ul>
+      <li><a href={schemaUrl}>JSON Schema</a> (draft 2020-12)</li>
+      <li><a href={exampleUrl}>Filled example</a> (a CV screening system under Annex III, point 4)</li>
+      <li><a href={templateUrl}>Human template</a> (the same fields as a document)</li>
+      <li>The whole library: <a href="/resources/templates">templates and schemas</a></li>
+    </ul>
+    <p>
+      The JSON export re-opens here: import it above and the outcome is recomputed from its answers
+      with the question set this page runs. A record made with another version loads the answers
+      that still exist and says what it dropped.
+    </p>
+
+    <h2 id="tri-handoff">Hand-off to the obligations planner</h2>
+    <p>
+      The result opens the obligations planner with the roles and classes it found, in the part of
+      the link after <code>#</code>, which the browser keeps to itself. The planner reads role
+      codes (<code>r</code>), class codes (<code>c</code>) and a reference date (<code>d</code>,
+      the decision date); the triage adds <code>from</code> and <code>qs</code> so the plan can say
+      where its answers came from:
+    </p>
+    <pre><code>/toolkit/obligations-planner#v=1&amp;r=pr.de&amp;c=h3&amp;d=2026-09-24&amp;from=ai-act-triage&amp;qs={questionSet.version}</code></pre>
+    <ul>
+      {
+        Object.entries(plannerHandoff.roleCodes).map(([role, code]) => (
+          <li>
+            <code>{code}</code>: {roleLabels[role as keyof typeof roleLabels].label}
+          </li>
+        ))
+      }
+      <li>
+        <code>{plannerHandoff.systemicGpaiRoleCode}</code>: a general-purpose AI model provider
+        whose model has systemic risk
+      </li>
+      {
+        Object.entries(plannerHandoff.classCodes).map(([cls, code]) => (
+          <li>
+            <code>{code}</code>: {classLabels[cls as keyof typeof classLabels].label}
+          </li>
+        ))
+      }
+    </ul>
+    <p>
+      The planner adds the duties every AI system carries (AI literacy and the Art. 5 screen) by
+      itself. Out of scope, there is nothing to hand off. Until the planner is published, the
+      <a href="/obligations">obligation register</a> lists every EU AI Act duty with its holder and
+      the classes it applies to.
+    </p>
+
+    <h2 id="tri-not">What this is not</h2>
+    <p>
+      It is an engineer's reading of the Act, not legal advice, not a conformity assessment and
+      not a certification. The Commission's classification guidelines were still a draft as of
+      2026-09-24 <a href="#src-7" class="cite">[7]</a>, and until they are final the defence is a
+      good record, not a good argument. The definition and GPAI guidelines it relies on are not
+      binding <a href="#src-5" class="cite">[5]</a><a href="#src-6" class="cite">[6]</a>. The
+      tool asserts only what <a href={chapterHref}>chapter 18</a> states; mappings are
+      illustrative, not a claim of conformity.
+    </p>
+
+    <h2 id="tri-version">Question set and versioning</h2>
+    <p>
+      Question set <code>{questionSet.id}</code> version {questionSet.version}, as of
+      {questionSet.asOf}. A change to a rule, a question's meaning or an option value is a major
+      version; a new question or option is a minor one; a wording fix is a patch. Question ids and
+      option values stay stable within a major version, because saved records and copied links carry
+      them. The graph has {questions.length} questions in {steps.length} steps.
+    </p>
+  </Fragment>
+
+  <ol class="sources" slot="sources">
+    {
+      sources.map((source, i) => (
+        <li id={`src-${i + 1}`}>
+          <span class="src-num">[{i + 1}]</span> {source.text} <a href={source.url}>{source.url}</a>{' '}
+          <span class="verified">(verified: {source.verified})</span>
+        </li>
+      ))
+    }
+  </ol>
+</ToolShell>
+
+<style>
+  .tri-step {
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  .tri-step[hidden] {
+    display: none;
+  }
+
+  .tri-step-title {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-3);
+    margin-top: var(--s-4);
+  }
+
+  .tri-step-n {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .tri-cite-line {
+    margin: 0 0 var(--s-3);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .tri-system,
+  .tri-system > * + * {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .tri-system .tool-field + .tool-field {
+    margin-top: var(--s-3);
+  }
+
+  .tri-wide {
+    max-width: var(--prose);
+  }
+
+  .tri-textarea {
+    min-height: 5rem;
+    resize: vertical;
+    font: inherit;
+  }
+
+  .tri-pair {
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    margin-bottom: var(--s-4);
+  }
+
+  .tri-means {
+    margin-top: var(--s-3);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .tri-means summary {
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    color: var(--ink);
+  }
+
+  .tri-means dt {
+    margin-top: var(--s-2);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .tri-means dd {
+    margin: 0;
+  }
+
+  .tri-result h3 {
+    margin-bottom: var(--s-2);
+  }
+
+  .tri-scope,
+  .tri-box {
+    max-width: var(--prose);
+  }
+
+  .tri-scope-status {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .tri-columns {
+    display: grid;
+    gap: var(--s-5);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  }
+
+  .tri-list,
+  .tri-ladder {
+    display: grid;
+    gap: var(--s-3);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tri-list > :global(li),
+  .tri-ladder > :global(li) {
+    padding: var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+  }
+
+  .tri-ladder > :global(li[data-state='given']) {
+    border: 2px solid var(--ink);
+  }
+
+  .tri-ladder > :global(li[data-state='not']) {
+    color: var(--ink-2);
+  }
+
+  .tri-result :global(.tri-art),
+  .tri-result :global(.tri-not) {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .tri-result :global(.tri-when) {
+    margin: var(--s-1) 0 0;
+    font-size: var(--fs-small);
+    color: var(--ink);
+  }
+
+  .tri-result :global(li ul),
+  .tri-reasons {
+    margin: var(--s-2) 0 0;
+    padding-left: var(--s-5);
+  }
+
+  .tri-result :global(li ul li + li),
+  .tri-reasons :global(li + li) {
+    margin-top: var(--s-1);
+  }
+
+  .tri-warning {
+    padding: var(--s-3) var(--s-4);
+    border: 2px solid var(--block);
+    border-radius: var(--r-sm);
+    color: var(--ink);
+  }
+
+  .tri-warning[hidden] {
+    display: none;
+  }
+
+  .tri-table td,
+  .tri-table th {
+    overflow-wrap: anywhere;
+  }
+
+  .tri-import > * + * {
+    margin-top: var(--s-4);
+  }
+
+  /* The guide lives in ToolShell's slot, so these rules key on elements this
+     page authors (scoped), not on ToolShell's .tool-guide wrapper. */
+  pre {
+    overflow-x: auto;
+    max-width: 100%;
+    padding: var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    font-size: var(--fs-small);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  pre code {
+    white-space: inherit;
+    overflow-wrap: anywhere;
+  }
+
+  /* toolkit.css gives .tool-buttons display: flex, which beats the [hidden]
+     UA rule; without JavaScript the submit row must stay hidden. */
+  .tool-buttons[hidden] {
+    display: none;
+  }
+
+  .cite {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    text-decoration: none;
+  }
+
+  @media print {
+    .tri-means,
+    .tri-import {
+      display: none;
+    }
+  }
+</style>

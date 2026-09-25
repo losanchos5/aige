@@ -1,2 +1,5 @@
 https://www.aigovernanceengineer.com/* https://aigovernanceengineer.com/:splat 301
 /manifesto /thesis 301
+# Block b-glossary (v0.5.0): the A-Z index moved to the book index; each term has its own page.
+/resources/glossary /bok/glossary 301
+/glossary /bok/glossary 301

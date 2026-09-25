@@ -1,0 +1,45 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/policy-card.v1.json",
+  "card_id": "pc-registered-agents-only",
+  "version": "1.0.0",
+  "title": "Registered agents only",
+  "owner": "ai-governance-engineering",
+  "applies_to": [
+    "agent:*"
+  ],
+  "source_policy": "ai-policy.yaml#rules/register-before-production",
+  "rules": [
+    {
+      "rule_id": "agents.registered-only.v1",
+      "description": "No agent runs in production unless it has an active entry in the agent registry, with an owner and an expiry that has not passed.",
+      "effect": "deny",
+      "condition": "in production, the agent has no registry entry, or its entry is not active, names no owner, has no expiry or has expired",
+      "failure_mode": "An agent that nobody owns or bounded acts in production (a shadow agent).",
+      "enforcement_points": [
+        "deploy",
+        "runtime"
+      ],
+      "implementation": {
+        "engine": "opa_rego",
+        "module": "policies/pc-registered-agents-only.rego",
+        "entrypoint": "data.aige.cards.pc_registered_agents_only.verdict"
+      },
+      "maps_to": [
+        "AIGE-OBL-EUAIA-ART49-71",
+        "AIGE-OBL-NIST-AGENTS",
+        "AIGE-OBL-OWASP-AGENTIC"
+      ]
+    }
+  ],
+  "exceptions": "Requested by the system owner, approved by the AI governance committee for at most 90 days, and recorded as a signed verdict override with an expiry.",
+  "effective_from": "2026-10-01",
+  "review_by": "2027-04-01",
+  "extensions": {
+    "generated_by": "https://aigovernanceengineer.com/toolkit/policy-card",
+    "template": "registered-agents-only",
+    "notice": "Illustrative, review before use. Indicative, not legal advice and not a conformity claim.",
+    "cedar_module": "policies/pc-registered-agents-only.cedar",
+    "ci_hook": ".github/workflows/policy-card-pc-registered-agents-only.yml",
+    "approval_pending_from": "ai-governance-committee"
+  }
+}

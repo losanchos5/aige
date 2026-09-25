@@ -1,0 +1,352 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/dataset-card.v1.json",
+  "title": "Dataset card",
+  "description": "The card that travels with a dataset: what it contains, where it came from, the right to use it, how representative it is, how it was checked and when it must be deleted. Datasheet-style documentation made machine-readable.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 10",
+    "EU AI Act Art. 4a",
+    "EU AI Act Art. 53(1)(d)",
+    "GDPR Art. 6",
+    "GDPR Art. 9",
+    "ISO/IEC 42001 A.7",
+    "NIST AI RMF MAP 4.1"
+  ],
+  "x-layer": [
+    2
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-aibom",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-model-card-as-control-evidence",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-training-data-rights-ledger"
+  ],
+  "x-lifecycle-stage": "build",
+  "type": "object",
+  "required": [
+    "dataset_id",
+    "version",
+    "name",
+    "owner",
+    "description",
+    "provenance",
+    "lawful_basis",
+    "licence",
+    "retention"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/dataset-card.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "dataset_id": {
+      "type": "string",
+      "description": "Stable dataset identifier.",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "description": "Dataset version or snapshot date.",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name.",
+      "minLength": 1
+    },
+    "owner": {
+      "type": "string",
+      "description": "Data owner (accountable).",
+      "minLength": 1
+    },
+    "steward": {
+      "type": "string",
+      "description": "Data steward (day-to-day custody).",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "description": "Why the dataset exists and what it is for.",
+      "minLength": 1
+    },
+    "composition": {
+      "type": "object",
+      "description": "What the dataset contains.",
+      "properties": {
+        "record_count": {
+          "type": "integer",
+          "description": "Number of records.",
+          "minimum": 0
+        },
+        "unit": {
+          "type": "string",
+          "description": "What one record is (for example \"one loan application\")."
+        },
+        "features": {
+          "type": "array",
+          "description": "Main fields or modalities.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "time_range": {
+          "type": "string",
+          "description": "Period the data covers."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 10"
+      ]
+    },
+    "collection": {
+      "type": "object",
+      "description": "How it was collected.",
+      "properties": {
+        "method": {
+          "type": "string",
+          "description": "How the data was collected or generated (including synthetic data)."
+        },
+        "sources": {
+          "type": "array",
+          "description": "Upstream sources.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 10"
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Where it came from and how it was transformed.",
+      "properties": {
+        "upstream": {
+          "type": "array",
+          "description": "Links to upstream datasets or sources.",
+          "items": {
+            "type": "string",
+            "format": "uri",
+            "description": "Upstream dataset or source."
+          }
+        },
+        "lineage": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to the lineage record (for example an OpenLineage or W3C PROV graph)."
+        },
+        "aibom_ref": {
+          "type": "string",
+          "description": "Where the dataset appears in the AIBOM."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 10",
+        "ISO/IEC 42001 A.7"
+      ]
+    },
+    "personal_data": {
+      "type": "boolean",
+      "description": "Whether it contains personal data."
+    },
+    "lawful_basis": {
+      "type": "string",
+      "enum": [
+        "consent",
+        "contract",
+        "legal_obligation",
+        "vital_interests",
+        "public_task",
+        "legitimate_interests",
+        "not_personal_data"
+      ],
+      "description": "Lawful basis for processing it for this purpose.",
+      "x-evidences": [
+        "GDPR Art. 6"
+      ]
+    },
+    "special_category": {
+      "type": "object",
+      "description": "Special-category data and the condition relied on.",
+      "required": [
+        "present"
+      ],
+      "properties": {
+        "present": {
+          "type": "boolean",
+          "description": "Whether special-category data is present."
+        },
+        "condition": {
+          "type": "string",
+          "description": "The processing condition relied on."
+        },
+        "bias_detection_only": {
+          "type": "boolean",
+          "description": "Processed only to detect and correct bias, pseudonymised and deleted once corrected.",
+          "x-evidences": [
+            "EU AI Act Art. 4a"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "GDPR Art. 9",
+        "EU AI Act Art. 4a"
+      ]
+    },
+    "licence": {
+      "type": "object",
+      "description": "The right to use the data.",
+      "required": [
+        "name",
+        "allows_training"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Licence or contract that grants use (SPDX id where one exists).",
+          "minLength": 1
+        },
+        "allows_training": {
+          "type": "boolean",
+          "description": "Whether training use is permitted."
+        },
+        "tdm_opt_out_checked": {
+          "type": "boolean",
+          "description": "Whether text-and-data-mining reservations were checked for scraped content."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 53(1)(c)",
+        "NIST AI RMF MAP 4.1"
+      ]
+    },
+    "representativeness": {
+      "type": "object",
+      "description": "Who the data does and does not represent.",
+      "properties": {
+        "populations": {
+          "type": "array",
+          "description": "Populations the data covers.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "known_gaps": {
+          "type": "array",
+          "description": "Groups or conditions under-represented or missing.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 10"
+      ]
+    },
+    "quality_checks": {
+      "type": "array",
+      "description": "Quality and bias checks run against this version.",
+      "items": {
+        "type": "object",
+        "description": "One check.",
+        "required": [
+          "check",
+          "result"
+        ],
+        "properties": {
+          "check": {
+            "type": "string",
+            "description": "Check name.",
+            "minLength": 1
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "waived"
+            ],
+            "description": "Outcome."
+          },
+          "run_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When it ran."
+          }
+        },
+        "additionalProperties": false
+      },
+      "x-evidences": [
+        "EU AI Act Art. 10",
+        "ISO/IEC 42001 A.7"
+      ]
+    },
+    "intended_uses": {
+      "type": "array",
+      "description": "Uses the dataset is fit for.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "prohibited_uses": {
+      "type": "array",
+      "description": "Uses it must not be put to.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "splits": {
+      "type": "array",
+      "description": "Training, validation and test splits, if any.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "EU AI Act Art. 10"
+      ]
+    },
+    "retention": {
+      "type": "object",
+      "description": "When it must go.",
+      "required": [
+        "rule"
+      ],
+      "properties": {
+        "until": {
+          "type": "string",
+          "format": "date",
+          "description": "Date the data must be deleted or reviewed."
+        },
+        "rule": {
+          "type": "string",
+          "description": "The retention rule, as enforced in code.",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "GDPR Art. 6"
+      ]
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

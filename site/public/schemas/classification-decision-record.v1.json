@@ -1,0 +1,486 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/classification-decision-record.v1.json",
+  "title": "Classification decision record",
+  "description": "The recorded EU AI Act triage of one AI system or model: the question set and version it was answered against, every answer with its article and meaning, the indicative scope, operator roles and risk classes with their reasons, the high-risk screen with the Art. 6(3) condition and the explicit profiling flag, the reviewer, the date, the legal-review state and the events that re-open it.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). Produced by https://aigovernanceengineer.com/toolkit/ai-act-triage from chapter 18 of the Body of Knowledge. The outcome is indicative: an engineer's reading, not legal advice and not a conformity claim; counsel confirms the reading. x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity.",
+  "x-evidences": [
+    "EU AI Act Art. 6(3)",
+    "EU AI Act Art. 6(4)",
+    "EU AI Act Art. 49(2)",
+    "EU AI Act Art. 25",
+    "EU AI Act Art. 2",
+    "EU AI Act Art. 5",
+    "EU AI Act Art. 50",
+    "EU AI Act Art. 52"
+  ],
+  "x-layer": [
+    1,
+    2
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-policy-card",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-agent-registry"
+  ],
+  "x-lifecycle-stage": "intake",
+  "type": "object",
+  "required": [
+    "$schema",
+    "kind",
+    "version",
+    "record_id",
+    "system",
+    "question_set",
+    "answers",
+    "outcome",
+    "rationale",
+    "reviewer",
+    "decided_at",
+    "legal_review",
+    "re_review",
+    "notice"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/classification-decision-record.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "kind": {
+      "type": "string",
+      "const": "aige.classification-decision-record",
+      "description": "Record kind. The triage refuses to re-open a file of any other kind."
+    },
+    "version": {
+      "type": "integer",
+      "const": 1,
+      "description": "Major version of the record format."
+    },
+    "record_id": {
+      "type": "string",
+      "description": "Identifier of this decision, stable for the same system and date (for example \"cdr-2026-09-24-cv-screen-02\").",
+      "pattern": "^cdr-[a-z0-9-]+$"
+    },
+    "system": {
+      "type": "object",
+      "description": "The AI system or model the decision is filed against.",
+      "required": [
+        "name",
+        "intended_purpose"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the system or model.",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "registry_id": {
+          "type": "string",
+          "description": "Id of the entry in the AI system register, so the record files next to it.",
+          "maxLength": 80
+        },
+        "intended_purpose": {
+          "type": "string",
+          "description": "What it is used for, by whom and in which context. The classification follows the intended purpose; a change of purpose re-opens the record.",
+          "minLength": 1,
+          "maxLength": 600,
+          "x-evidences": [
+            "EU AI Act Art. 6"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "question_set": {
+      "type": "object",
+      "description": "The versioned question graph the answers were given against.",
+      "required": [
+        "id",
+        "version",
+        "as_of",
+        "basis"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Question-set id.",
+          "const": "aige.eu-ai-act-triage"
+        },
+        "version": {
+          "type": "string",
+          "description": "Semantic version of the question set. A new major version changes a rule, a question's meaning or an option value.",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$"
+        },
+        "as_of": {
+          "type": "string",
+          "description": "Date the question set reads the law as of.",
+          "format": "date"
+        },
+        "basis": {
+          "type": "string",
+          "description": "The legal text read, as amended.",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "description": "Where the question set runs.",
+          "format": "uri"
+        }
+      },
+      "additionalProperties": false
+    },
+    "answers": {
+      "type": "array",
+      "description": "Every visible question that was answered, in the order asked, with the article it rests on and what the answer means.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "question",
+          "article",
+          "values"
+        ],
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "Question id, stable within a major version of the question set.",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "article": {
+            "type": "string",
+            "description": "The article the question rests on.",
+            "minLength": 1
+          },
+          "values": {
+            "type": "array",
+            "description": "Option values chosen (one for a single-choice question).",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+            }
+          },
+          "labels": {
+            "type": "array",
+            "description": "The options as the reader saw them.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "means": {
+            "type": "array",
+            "description": "What each chosen answer means, in the chapter's terms: the reason behind the answer.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "description": "The indicative outcome, recomputed from the answers whenever the record is re-opened.",
+      "required": [
+        "scope",
+        "scope_reasons",
+        "roles",
+        "classes",
+        "high_risk_screen",
+        "open_points"
+      ],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "enum": [
+            "in-scope",
+            "out-of-scope",
+            "undetermined"
+          ],
+          "description": "Whether the Act reaches the system or model on these answers. Out of scope, no role or class is given.",
+          "x-evidences": [
+            "EU AI Act Art. 2",
+            "EU AI Act Art. 3(1)"
+          ]
+        },
+        "scope_reasons": {
+          "type": "array",
+          "description": "Why, with the article, for every scope rule that held.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "roles": {
+          "type": "array",
+          "description": "Indicative EU operator roles for this system. Roles name tasks, not organisations.",
+          "items": {
+            "type": "object",
+            "required": [
+              "role",
+              "article",
+              "reasons"
+            ],
+            "properties": {
+              "role": {
+                "type": "string",
+                "enum": [
+                  "eu-provider",
+                  "eu-downstream-provider",
+                  "eu-deployer",
+                  "eu-importer",
+                  "eu-distributor",
+                  "eu-authorised-representative",
+                  "eu-product-manufacturer",
+                  "eu-gpai-provider"
+                ],
+                "description": "Role id, as in the EU role table (roles dataset)."
+              },
+              "label": {
+                "type": "string",
+                "description": "Role name."
+              },
+              "article": {
+                "type": "string",
+                "description": "Where the Act defines the role."
+              },
+              "reasons": {
+                "type": "array",
+                "description": "Why the role follows from the answers.",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "x-evidences": [
+            "EU AI Act Art. 3(3)",
+            "EU AI Act Art. 3(4)",
+            "EU AI Act Art. 25"
+          ]
+        },
+        "classes": {
+          "type": "array",
+          "description": "Indicative risk classes (rungs) and the GPAI track. Several can apply at once.",
+          "items": {
+            "type": "object",
+            "required": [
+              "class",
+              "article",
+              "reasons"
+            ],
+            "properties": {
+              "class": {
+                "type": "string",
+                "enum": [
+                  "prohibited",
+                  "high-risk-annex-i",
+                  "high-risk-annex-iii",
+                  "transparency-art50",
+                  "minimal",
+                  "gpai",
+                  "gpai-systemic"
+                ],
+                "description": "Class id, as in the obligation register's system classes, plus minimal."
+              },
+              "label": {
+                "type": "string",
+                "description": "Class name."
+              },
+              "article": {
+                "type": "string",
+                "description": "The article the class rests on."
+              },
+              "applies_from": {
+                "type": "string",
+                "description": "First date the class's duties apply, where the chapter gives one.",
+                "format": "date"
+              },
+              "reasons": {
+                "type": "array",
+                "description": "Why the class follows from the answers.",
+                "minItems": 1,
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "x-evidences": [
+            "EU AI Act Art. 5",
+            "EU AI Act Art. 6",
+            "EU AI Act Art. 50",
+            "EU AI Act Art. 51"
+          ]
+        },
+        "high_risk_screen": {
+          "type": "object",
+          "description": "The high-risk screen as the chapter's illustrative record states it: the Annex III area, the Art. 6(3) condition relied on and the explicit profiling flag.",
+          "required": [
+            "annex_iii_areas",
+            "art_6_3_conditions",
+            "profiling",
+            "high_risk"
+          ],
+          "properties": {
+            "annex_i": {
+              "type": "string",
+              "enum": [
+                "no",
+                "section-a",
+                "section-b",
+                "unsure",
+                "not-asked"
+              ],
+              "description": "Annex I coverage of the product."
+            },
+            "annex_iii_areas": {
+              "type": "array",
+              "description": "Annex III areas the intended purpose falls in.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "biometrics",
+                  "critical-infrastructure",
+                  "education",
+                  "employment",
+                  "essential-services",
+                  "law-enforcement",
+                  "migration",
+                  "justice-democracy"
+                ]
+              }
+            },
+            "art_6_3_conditions": {
+              "type": "array",
+              "description": "The Art. 6(3) conditions claimed.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "narrow-procedural-task",
+                  "improves-human-activity",
+                  "detects-patterns",
+                  "preparatory-task"
+                ]
+              },
+              "x-evidences": [
+                "EU AI Act Art. 6(3)",
+                "EU AI Act Art. 6(4)"
+              ]
+            },
+            "profiling": {
+              "type": [
+                "boolean",
+                "null"
+              ],
+              "description": "Whether the system profiles natural persons; null when not asked or not settled. Profiling makes an Annex III system high-risk whatever condition is claimed."
+            },
+            "high_risk": {
+              "type": "boolean",
+              "description": "Whether a high-risk class (Annex I or Annex III) follows."
+            }
+          },
+          "additionalProperties": false
+        },
+        "open_points": {
+          "type": "array",
+          "description": "Decisions or checks still missing. A record with open points is a draft.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "description": "Consequences to act on (for example a FRIA, a registration, a notification clock).",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "rationale": {
+      "type": "string",
+      "description": "The outcome in one paragraph, plus the reviewer's note.",
+      "minLength": 1
+    },
+    "reviewer": {
+      "type": "string",
+      "description": "Reviewing role or forum. Roles, not personal names.",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "decided_at": {
+      "type": "string",
+      "description": "Decision date.",
+      "format": "date"
+    },
+    "legal_review": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "confirmed",
+        "not-sought"
+      ],
+      "description": "Whether counsel has confirmed the reading. The engineer builds the evidence; counsel confirms the obligation was read correctly."
+    },
+    "re_review": {
+      "type": "object",
+      "description": "What re-opens the record.",
+      "required": [
+        "triggers"
+      ],
+      "properties": {
+        "triggers": {
+          "type": "array",
+          "description": "Events that should re-open the record.",
+          "items": {
+            "type": "string",
+            "enum": [
+              "intended-purpose-change",
+              "brand-change",
+              "substantial-modification",
+              "annex-iii-configuration",
+              "eu-reach-change",
+              "annex-iii-amended",
+              "classification-guidelines-final",
+              "compute-threshold",
+              "safeguard-failure",
+              "significant-design-change",
+              "leaves-research"
+            ]
+          },
+          "x-evidences": [
+            "EU AI Act Art. 25(1)",
+            "EU AI Act Art. 111(2)"
+          ]
+        },
+        "review_by": {
+          "type": "string",
+          "description": "Latest date for the next review.",
+          "format": "date"
+        }
+      },
+      "additionalProperties": false
+    },
+    "notice": {
+      "type": "string",
+      "description": "The fixed notice: indicative, not legal advice and not a conformity claim.",
+      "minLength": 1
+    },
+    "link": {
+      "type": "string",
+      "description": "The link that reproduces the triage (the answers travel after #).",
+      "format": "uri"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

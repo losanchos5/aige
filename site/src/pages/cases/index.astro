@@ -1,0 +1,88 @@
+---
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import { site } from '../../data/site';
+import { cases, caseEvidenceLabel, casesDisclaimer } from '../../data/cases';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+import '../../styles/harms.css';
+
+const description =
+  'Publicly documented AI incidents written as engineering post-mortems: what happened, the failure mode, the control that would have caught it, the evidence it would have left and the obligations it touches today.';
+const crumbs = [{ label: 'Cases' }];
+const pageUrl = new URL('/cases', site.url).href;
+
+const jsonLd = [
+  {
+    '@type': 'CollectionPage',
+    '@id': `${pageUrl}#page`,
+    name: `AI incident cases · ${site.name}`,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+    hasPart: cases.map((c) => ({ '@id': `${new URL(`/cases/${c.id}`, site.url).href}#article` })),
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Base title="Cases" description={description} image="/og/resources.png" jsonLd={jsonLd}>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="Which control would have caught this?"
+    lede="Public AI incidents, read as engineering post-mortems. Each case sets out what happened from the court, regulator or original record, the failure mode behind it, the control that would have caught it, the evidence that control would have left, and the obligations the case touches today."
+  />
+
+  <div class="container res-page">
+    <div class="res-section">
+      <Callout kind="note" title="Illustrative, not a legal determination">
+        <p>{casesDisclaimer}</p>
+        <p>Every figure on this page is sourced on the case page it links to. Cases marked
+        "Reported" rest on press reports only.</p>
+      </Callout>
+    </div>
+
+    <section class="res-section" aria-labelledby="cs-heading">
+      <div class="res-section-head">
+        <h2 id="cs-heading">{cases.length} cases</h2>
+        <p>Each links to its incident record and to the harm it illustrates in the <a
+        href="/resources/harms">harms atlas</a>. The controls are patterns from <a
+        href="/bok/patterns">the catalogue</a>.</p>
+      </div>
+
+      <ul class="cs-cards">
+        {
+          cases.map((c) => (
+            <li>
+              <article class="cs-card" aria-labelledby={`cs-${c.id}`}>
+                <ul class="cs-meta" aria-label="Case facts">
+                  <li class="type-tag">{c.year}</li>
+                  <li class="type-tag">{c.jurisdiction}</li>
+                  <li class:list={['type-tag', c.evidence === 'reported' && 'cs-tag-reported']}>
+                    {caseEvidenceLabel[c.evidence]}
+                  </li>
+                </ul>
+                <h3 id={`cs-${c.id}`}>
+                  <a href={`/cases/${c.id}`}>{c.title}</a>
+                </h3>
+                <p>{c.summary}</p>
+                <p class="cs-controls">
+                  <strong>Would have caught it:</strong>{' '}
+                  {c.control.controls.map((ctl) => ctl.name).join(' · ')}
+                </p>
+              </article>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</Base>

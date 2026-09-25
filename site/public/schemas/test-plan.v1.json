@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/test-plan.v1.json",
+  "title": "Test plan",
+  "description": "What will be tested before a release and how the release will be judged: suites by category, each with its metric, threshold and failure mode, set before testing starts.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 9(6)",
+    "EU AI Act Art. 9(8)",
+    "EU AI Act Art. 15",
+    "EU AI Act Art. 60",
+    "ISO/IEC 42001 A.6",
+    "NIST AI RMF MEASURE 2.1",
+    "NIST AI RMF MEASURE 2.11"
+  ],
+  "x-layer": [
+    3
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-eval-gate-in-ci",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-adversarial-red-team-suite"
+  ],
+  "x-lifecycle-stage": "test",
+  "type": "object",
+  "required": [
+    "plan_id",
+    "subject",
+    "suites",
+    "exit_criteria",
+    "owner"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/test-plan.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "plan_id": {
+      "type": "string",
+      "description": "Identifier of the plan.",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "string",
+      "description": "The governed object as registry id and version, \"id@version\" (for example \"csa-01@2026-09-18\"). The key every record is filed against.",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "design_record": {
+      "type": "string",
+      "description": "Id of the design record whose requirements the plan verifies."
+    },
+    "scope": {
+      "type": "string",
+      "description": "What is and is not tested, and why."
+    },
+    "categories": {
+      "type": "array",
+      "description": "Test categories covered. A missing category needs a reason in `scope`.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "capability",
+          "robustness",
+          "adversarial",
+          "fairness",
+          "privacy",
+          "safety",
+          "security",
+          "explainability",
+          "performance",
+          "regression",
+          "human_oversight",
+          "real_world"
+        ]
+      },
+      "x-evidences": [
+        "NIST AI RMF MEASURE 2.1"
+      ]
+    },
+    "suites": {
+      "type": "array",
+      "description": "Suites to run, each with its metric, threshold and failure mode.",
+      "items": {
+        "type": "object",
+        "description": "One suite.",
+        "required": [
+          "suite_id",
+          "category",
+          "metric",
+          "threshold",
+          "failure_mode",
+          "blocking"
+        ],
+        "properties": {
+          "suite_id": {
+            "type": "string",
+            "description": "Versioned suite id; results are filed under it.",
+            "minLength": 1
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "capability",
+              "robustness",
+              "adversarial",
+              "fairness",
+              "privacy",
+              "safety",
+              "security",
+              "explainability",
+              "performance",
+              "regression",
+              "human_oversight",
+              "real_world"
+            ],
+            "description": "Category."
+          },
+          "metric": {
+            "type": "string",
+            "description": "Metric the suite measures.",
+            "minLength": 1
+          },
+          "threshold": {
+            "type": "string",
+            "description": "Threshold, fixed before testing.",
+            "minLength": 1
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "higher_is_better",
+              "lower_is_better"
+            ],
+            "description": "Which way is good."
+          },
+          "failure_mode": {
+            "type": "string",
+            "description": "The failure mode or harm it guards against.",
+            "minLength": 1
+          },
+          "requirement": {
+            "type": "string",
+            "description": "Requirement id in the design record it verifies."
+          },
+          "dataset": {
+            "type": "string",
+            "description": "Test dataset, as \"dataset_id@version\"."
+          },
+          "blocking": {
+            "type": "boolean",
+            "description": "Whether a failure blocks the release."
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "EU AI Act Art. 9(8)",
+        "NIST AI RMF MEASURE 2.3"
+      ]
+    },
+    "environments": {
+      "type": "array",
+      "description": "Where tests run (for example CI, staging, shadow in production).",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "entry_criteria": {
+      "type": "array",
+      "description": "What must be true before testing starts.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "exit_criteria": {
+      "type": "array",
+      "description": "What must be true to recommend release.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "EU AI Act Art. 9(8)"
+      ]
+    },
+    "real_world_testing": {
+      "type": "object",
+      "description": "Testing in real-world conditions, if any.",
+      "required": [
+        "planned"
+      ],
+      "properties": {
+        "planned": {
+          "type": "boolean",
+          "description": "Whether testing in real-world conditions is planned."
+        },
+        "plan": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to the real-world testing plan."
+        },
+        "informed_consent_required": {
+          "type": "boolean",
+          "description": "Whether participants must give informed consent."
+        }
+      },
+      "additionalProperties": false,
+      "x-evidences": [
+        "EU AI Act Art. 60"
+      ]
+    },
+    "owner": {
+      "type": "string",
+      "description": "Role accountable for the plan.",
+      "minLength": 1
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "Role that approved the plan.",
+      "minLength": 1
+    },
+    "approved_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Approval date."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

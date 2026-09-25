@@ -2,11 +2,13 @@
 /**
  * ToolsTable, the flattened tool catalogue: one row per illustrative tool,
  * grouped by category, with the stack layer(s) the category belongs to shown
- * as colour ticks. Brands are illustrative, not endorsed (see the note above
+ * as colour ticks. Each tool links out to the checked URL the catalogue
+ * (data/stack.ts) records for it; licences and filters live on
+ * /resources/tools. Brands are illustrative, not endorsed (see the note above
  * this table on the page). Matches the house table style: 1px rules, mono
  * uppercase header, no shadow. Scrolls horizontally on narrow screens.
  */
-import type { FlattenedToolCategory } from '../data/stack';
+import { findTool, type FlattenedToolCategory } from '../data/stack';
 
 interface Props {
   rows: FlattenedToolCategory[];
@@ -35,7 +37,19 @@ const pad = (n: number) => String(n).padStart(2, '0');
                   {cat.category}
                 </th>
               )}
-              <td class="tool">{tool}</td>
+              <td class="tool">
+                {(() => {
+                  const meta = findTool(tool);
+                  return meta ? (
+                    <a href={meta.url} target="_blank" rel="noopener">
+                      {tool}
+                      <span class="ext" aria-hidden="true">↗</span>
+                    </a>
+                  ) : (
+                    tool
+                  );
+                })()}
+              </td>
               {i === 0 && (
                 <td rowspan={cat.examples.length} class="layers">
                   <span class="ticks">
@@ -104,6 +118,23 @@ const pad = (n: number) => String(n).padStart(2, '0');
     font-size: 0.75rem;
     color: var(--ink-2);
     white-space: nowrap;
+  }
+
+  .tool a {
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .tool a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .ext {
+    font-size: 0.85em;
+    color: var(--muted);
+    margin-left: 0.15em;
   }
 
   .ticks {

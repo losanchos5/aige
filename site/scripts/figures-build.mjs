@@ -2,30 +2,73 @@
 // figures-build: generate the data-driven conceptual infographics from the typed
 // data modules, so they stay in sync with the Body of Knowledge:
 //   - src/figures/values-principles.svg  (from src/data/values.ts)
+//   - src/figures/values-principles-wide.svg (the same, two columns, from 834 px)
 //   - src/figures/maturity-grid.svg      (from src/data/maturity.ts + stack.ts)
 //   - src/figures/pattern-map.svg        (from src/data/patterns.ts + stack.ts)
 //   - src/figures/discipline-map.svg     (the whole discipline map; see map-build.mjs)
+//   - the reference posters (scripts/lib/posters.mjs): eu-ai-act-timeline
+//     (frameworks.ts), eu-ai-act-operator-roles (roles.ts), eu-ai-act-risk-ladder
+//     (frameworks.ts dates), deployment-option-matrix (deployment-options.ts)
+//     and the Spanish editions of the first three (ids ending in -es)
 // The other figures under src/figures are hand-authored. All figures are inlined
 // into the chapters by src/lib/rehype-diagrams.ts and declared in
 // src/data/figures.ts.
 //
-//   node scripts/figures-build.mjs           # (re)write the generated SVGs
+// Then, for EVERY figure in figures.ts, it writes the reusable exports under
+// public/downloads/figures/ (git-ignored, rebuilt on every build): a standalone
+// SVG that follows the viewer's colour scheme, a light and a dark SVG, and light
+// and dark PNGs at 1600 and 3200 px, each with the attribution band
+// "aigovernanceengineer.com · <licence> · v<bokVersion>" (see
+// scripts/lib/figure-export.mjs and VISUAL-GUIDE.md §5). File names come from
+// figureExports() in figures.ts, which the /figures pages link. PNGs are cached
+// by content hash in .figures-cache/ so an unchanged figure is not re-rendered.
+// It also validates every entry: size budget by kind, asOf/reviewBy dates, the
+// "As of <date>" stamp inside a dated figure, and the data-viz table fallback.
+//
+//   node scripts/figures-build.mjs           # (re)write generated SVGs + exports
 //   node scripts/figures-build.mjs --check   # verify they are up to date (no writes)
+//   node scripts/figures-build.mjs --no-export  # generated SVGs only, no exports
 //
 // The data modules are TypeScript; they carry no runtime imports (only type-only
 // imports, which erase), so scripts/lib/load-ts.mjs transpiles each with the
 // installed `typescript` and imports it from a data: URL, no extra tooling.
-import { existsSync, readFileSync, writeFileSync, mkdirSync, renameSync, rmSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import {
+  existsSync,
+  readFileSync,
+  readdirSync,
+  writeFileSync,
+  mkdirSync,
+  renameSync,
+  rmSync,
+} from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadTs } from './lib/load-ts.mjs';
 import { loadMap, renderMap } from './map-build.mjs';
+import { POSTERS } from './lib/posters.mjs';
+import { woffToSfnt } from './lib/woff.mjs';
+import {
+  FALLBACK_FONT_CANDIDATES,
+  RENDER_FONTS,
+  cmapCoverage,
+  exportCss,
+  readSiteStyles,
+  renderPng,
+  standaloneSvg,
+  withPngText,
+} from './lib/figure-export.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE = resolve(HERE, '..');
-const DATA = join(SITE, 'src', 'data');
 const OUT = join(SITE, 'src', 'figures');
-const CHECK = process.argv.slice(2).includes('--check');
+const EXPORT_DIR = join(SITE, 'public', 'downloads', 'figures');
+const CACHE_DIR = join(SITE, '.figures-cache');
+const ARGS = process.argv.slice(2);
+const CHECK = ARGS.includes('--check');
+const NO_EXPORT = ARGS.includes('--no-export');
+// Bump when the export layout changes, so every cached PNG is re-rendered.
+const EXPORT_REV = '1';
 
 const esc = (s) =>
   String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -109,6 +152,45 @@ function buildValuesPrinciples(values, principles, fig) {
   const H = y + 8;
   return (
     open(W, H, 'img', 'values-principles', fig.title, fig.alt) + parts.join('\n') + `\n</svg>\n`
+  );
+}
+
+// The same figure as two columns (values left, principles right) for wide wells.
+// rehype-diagrams inlines it next to the stacked SVG when src/figures/<id>-wide.svg
+// exists, and figures.css shows exactly one of the two: the stacked figure below
+// 834 px, the two-column one from 834 px (VISUAL-GUIDE.md §2.3). It is not a
+// figure of its own: no figures.ts entry, no permalink and no exports.
+function buildValuesPrinciplesWide(values, principles, fig) {
+  const W = 720;
+  const COL = 360; // x of the second column; each keeps the stacked figure's 328-px text width
+  const parts = [];
+  parts.push(`  <text class="mono muted" x="16" y="20" font-size="13.5">Eight values · six principles</text>`);
+
+  const column = (x0, label, items) => {
+    let y = 54;
+    parts.push(`  <text class="disp" x="${x0 + 16}" y="${y}" font-size="15">${esc(label)}</text>`);
+    y += 8;
+    parts.push(`  <line class="rule" x1="${x0 + 16}" y1="${y}" x2="${x0 + 344}" y2="${y}"/>`);
+    y += 8;
+    for (const item of items) {
+      const lines = wrap(item.title, 40);
+      const top = y + 13;
+      parts.push(`  <text class="mono muted" x="${x0 + 16}" y="${top}" font-size="13.5">${pad2(item.n)}</text>`);
+      lines.forEach((ln, i) => {
+        parts.push(`  <text x="${x0 + 44}" y="${top + i * 17}" font-size="14">${esc(ln)}</text>`);
+      });
+      y = top + (lines.length - 1) * 17 + 12;
+    }
+    return y;
+  };
+
+  const yValues = column(0, 'Eight values: which way to lean', values);
+  const yPrinciples = column(COL, 'Six principles: what to do on Monday', principles);
+  const H = Math.max(yValues, yPrinciples) + 8;
+  return (
+    open(W, H, 'img', 'values-principles-wide', fig.title, fig.alt, 'figc--wide') +
+    parts.join('\n') +
+    `\n</svg>\n`
   );
 }
 
@@ -256,33 +338,375 @@ function emit(name, svg, budgetKb = 12) {
   return changed ? 1 : 0;
 }
 
+// ------------------------------------------------------------- validation -- //
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const isIsoDate = (value) =>
+  ISO_DATE.test(value) && new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value;
+
+/** Visible text of an SVG (tags stripped, entities for & < > decoded). */
+const svgText = (svg) =>
+  svg
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ');
+
+/** Language of a figure SVG: its root lang attribute, English by default. */
+const svgLang = (svg) => /^<svg\b[^>]*\slang="([a-z-]+)"/.exec(svg.trim())?.[1] ?? 'en';
+
+/**
+ * The dated stamp inside a figure: "As of <date>", or in a Spanish figure
+ * (root lang="es") its translation "A fecha de <date>".
+ */
+function hasStamp(svg, asOf) {
+  const text = svgText(svg).toLowerCase();
+  if (text.includes(`as of ${asOf}`)) return true;
+  return svgLang(svg) === 'es' && text.includes(`a fecha de ${asOf}`);
+}
+
+/**
+ * A standalone export of a non-English figure keeps its language: the root
+ * says lang="<lang>", while the <title> and <desc> it takes from figures.ts
+ * stay marked as English, the language of the site that describes it.
+ */
+function localiseExport(out, lang) {
+  if (lang === 'en') return out;
+  return out
+    .replace(/(<svg\b[^>]*?)\slang="en"/, `$1 lang="${lang}"`)
+    .replace(/<title id="([^"]+)">/, '<title id="$1" lang="en">')
+    .replace(/<desc id="([^"]+)">/, '<desc id="$1" lang="en">');
+}
+
+/**
+ * Check every figure entry against the rules the exports and pages rely on.
+ * Returns the list of problems (the build fails on any) and prints warnings.
+ */
+function validateFigures(figuresMod) {
+  const { figures, figureBudgetKb, figureKind } = figuresMod;
+  const problems = [];
+  const today = new Date().toISOString().slice(0, 10);
+  const seen = new Set();
+  for (const figure of figures) {
+    const where = `figures.ts "${figure.id}"`;
+    if (seen.has(figure.id)) problems.push(`${where}: duplicate id`);
+    seen.add(figure.id);
+    const kind = figureKind(figure);
+    if (!(kind in figureBudgetKb)) problems.push(`${where}: unknown kind "${kind}"`);
+    for (const key of ['asOf', 'reviewBy']) {
+      if (figure[key] !== undefined && !isIsoDate(figure[key])) {
+        problems.push(`${where}: ${key} "${figure[key]}" is not a YYYY-MM-DD date`);
+      }
+    }
+    if (figure.reviewBy && !figure.asOf) problems.push(`${where}: reviewBy without asOf`);
+    if (figure.asOf && figure.reviewBy && figure.reviewBy <= figure.asOf) {
+      problems.push(`${where}: reviewBy must be after asOf`);
+    }
+    if (figure.reviewBy && figure.reviewBy < today) {
+      console.warn(
+        `figures-build: warning: ${where} passed its reviewBy date ${figure.reviewBy}; re-check it against its chapter.`,
+      );
+    }
+    if (figure.license !== undefined && !String(figure.license).trim()) {
+      problems.push(`${where}: empty license`);
+    }
+    for (const page of figure.pages ?? []) {
+      if (!page.startsWith('/')) problems.push(`${where}: page "${page}" must be a site path`);
+    }
+    if (kind === 'data-viz') {
+      const table = figure.data;
+      if (!table || !table.rows?.length) {
+        problems.push(`${where}: a data-viz figure needs its data table fallback (data.rows)`);
+      } else {
+        table.rows.forEach((row, i) => {
+          if (row.length !== table.columns.length) {
+            problems.push(
+              `${where}: data row ${i + 1} has ${row.length} cells for ${table.columns.length} columns`,
+            );
+          }
+        });
+        if (!table.source?.trim()) problems.push(`${where}: data table needs a source line`);
+      }
+    }
+
+    const file = join(OUT, `${figure.id}.svg`);
+    if (!existsSync(file)) continue; // not authored yet: rehype-diagrams skips it too
+    const svg = readFileSync(file, 'utf8');
+    const kb = Buffer.byteLength(svg, 'utf8') / 1024;
+    const budget = figureBudgetKb[kind] ?? 12;
+    if (kb > budget) {
+      problems.push(
+        `${where}: ${figure.id}.svg is ${kb.toFixed(1)} KB, over the ${budget} KB ${kind} budget`,
+      );
+    }
+    if (figure.asOf && !hasStamp(svg, figure.asOf)) {
+      problems.push(`${where}: dated figure must print "As of ${figure.asOf}" inside ${figure.id}.svg`);
+    }
+  }
+  return problems;
+}
+
+// ---------------------------------------------------------------- exports -- //
+
+const sha = (...parts) => {
+  const hash = createHash('sha256');
+  for (const part of parts) hash.update(part);
+  return hash.digest('hex');
+};
+
+function readJson(path) {
+  try {
+    return JSON.parse(readFileSync(path, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+/** Write `data` atomically, only when it differs from what is on disk. */
+function writeIfChanged(dest, data) {
+  const buf = Buffer.isBuffer(data) ? data : Buffer.from(data, 'utf8');
+  if (existsSync(dest) && readFileSync(dest).equals(buf)) return false;
+  const tmp = `${dest}.tmp-${process.pid}`;
+  writeFileSync(tmp, buf);
+  renameSync(tmp, dest);
+  return true;
+}
+
+/**
+ * Decode the site's WOFF/WOFF2 faces to TTF under .figures-cache/fonts, for
+ * resvg (which reads only TrueType/OpenType). Returns the files and a hash.
+ */
+function renderFonts() {
+  const dir = join(CACHE_DIR, 'fonts');
+  mkdirSync(dir, { recursive: true });
+  const files = [];
+  const hash = createHash('sha256');
+  const covers = [];
+  for (const [pkg, file] of RENDER_FONTS) {
+    const src = join(SITE, 'node_modules', pkg, 'files', file);
+    if (!existsSync(src)) throw new Error(`figures-build: font ${pkg}/${file} is not installed`);
+    const raw = readFileSync(src);
+    hash.update(raw);
+    const ttf = woffToSfnt(raw);
+    const dest = join(dir, `${file.replace(/\.woff2?$/, '')}.ttf`);
+    writeIfChanged(dest, ttf);
+    files.push(dest);
+    covers.push(cmapCoverage(ttf));
+  }
+  // Glyph fallback for characters outside the Latin subsets (e.g. U+2192).
+  const fallback = FALLBACK_FONT_CANDIDATES.find((path) => existsSync(path));
+  let fallbackCovers = () => false;
+  if (fallback) {
+    const ttf = readFileSync(fallback);
+    hash.update(ttf);
+    files.push(fallback);
+    fallbackCovers = cmapCoverage(ttf);
+  }
+  return {
+    files,
+    hash: hash.digest('hex'),
+    covers: (cp) => covers.some((has) => has(cp)),
+    fallbackCovers,
+  };
+}
+
+/** Warn for every character of a figure that no loaded face can draw in a PNG. */
+function warnMissingGlyphs(figure, svg, fonts) {
+  const missing = new Set();
+  for (const ch of svgText(svg)) {
+    const cp = ch.codePointAt(0);
+    if (cp > 0x20 && !fonts.covers(cp) && !fonts.fallbackCovers(cp)) missing.add(ch);
+  }
+  if (missing.size) {
+    const list = [...missing].map((ch) => `U+${ch.codePointAt(0).toString(16).toUpperCase()}`);
+    console.warn(
+      `figures-build: warning: "${figure.id}" PNGs cannot draw ${list.join(', ')}: no site or fallback face has it.`,
+    );
+  }
+}
+
+/** Site path whose page holds the figure's #anchors (first placement, else page). */
+function fragmentBase(figure) {
+  const chapter = figure.placements[0]?.chapter;
+  if (chapter) return `/bok/${chapter}`;
+  return figure.pages?.[0] ?? `/figures/${figure.id}`;
+}
+
+async function exportFigures(figuresMod, site) {
+  const { figures, figureExports, figureLicense } = figuresMod;
+  mkdirSync(EXPORT_DIR, { recursive: true });
+  const styles = readSiteStyles(SITE);
+  const fonts = renderFonts();
+  const cachePath = join(CACHE_DIR, 'renders.json');
+  const cache = readJson(cachePath) ?? {};
+  const nextCache = {};
+  const expected = new Set();
+  const jobs = [];
+  const author = site.authors[0];
+  const started = Date.now();
+  let written = 0;
+
+  for (const figure of figures) {
+    const src = join(OUT, `${figure.id}.svg`);
+    if (!existsSync(src)) {
+      console.warn(`figures-build: warning: no src/figures/${figure.id}.svg yet; no exports for it.`);
+      continue;
+    }
+    const license = figureLicense(figure);
+    const sourceSvg = readFileSync(src, 'utf8');
+    warnMissingGlyphs(figure, sourceSvg, fonts);
+    const common = {
+      svg: sourceSvg,
+      figure,
+      siteUrl: site.url,
+      version: site.bokVersion,
+      license,
+      licenseUrl: site.licenseUrl,
+      author,
+      fragmentBase: fragmentBase(figure),
+    };
+    const cssFor = (theme, faces) =>
+      exportCss(theme, { rules: styles.rules, tokens: styles.tokens, siteUrl: site.url, faces });
+
+    for (const entry of figureExports(figure.id, site.bokVersion)) {
+      expected.add(entry.file);
+      const dest = join(EXPORT_DIR, entry.file);
+      if (entry.format === 'svg') {
+        const out = localiseExport(
+          standaloneSvg({ ...common, theme: entry.theme, css: cssFor(entry.theme, true) }),
+          svgLang(sourceSvg),
+        );
+        if (writeIfChanged(dest, out)) written += 1;
+        continue;
+      }
+      // PNG: drawn from a single-theme SVG without @font-face; resvg gets the
+      // decoded faces directly.
+      const renderSvg = standaloneSvg({
+        ...common,
+        theme: entry.theme,
+        css: cssFor(entry.theme, false),
+      });
+      const key = sha(EXPORT_REV, fonts.hash, String(entry.width), renderSvg);
+      nextCache[entry.file] = key;
+      if (cache[entry.file] === key && existsSync(dest)) continue;
+      jobs.push(
+        renderPng(renderSvg, entry.width, fonts.files).then((png) => {
+          const tagged = withPngText(png, [
+            ['Title', figure.title],
+            ['Author', author],
+            ['Description', figure.alt],
+            ['Copyright', `${author}. ${license} (${site.licenseUrl}).`],
+            ['Source', `${site.url}/figures/${figure.id}`],
+          ]);
+          writeIfChanged(dest, tagged);
+          written += 1;
+        }),
+      );
+    }
+  }
+  await Promise.all(jobs);
+
+  // Drop exports no figure produces any more (an old version, a removed id).
+  for (const name of readdirSync(EXPORT_DIR)) {
+    if (!expected.has(name)) rmSync(join(EXPORT_DIR, name), { force: true });
+  }
+  writeFileSync(cachePath, `${JSON.stringify(nextCache, null, 2)}\n`, 'utf8');
+  const secs = ((Date.now() - started) / 1000).toFixed(1);
+  console.log(
+    `figures-build: ${expected.size} export(s) for v${site.bokVersion} in public/downloads/figures ` +
+      `(${written} written, ${jobs.length} PNG rendered, ${secs}s)`,
+  );
+}
+
+/**
+ * Astro caches compiled Markdown keyed on the source, not on the figure SVGs
+ * that rehype-diagrams inlines, so drop its data store whenever any figure SVG
+ * changed since the last run, generated or hand-authored. With ASTRO_CACHE_DIR
+ * set (parallel worktrees) only that cache is touched.
+ */
+function purgeAstroCacheIfFiguresChanged(changedGenerated) {
+  const names = existsSync(OUT)
+    ? readdirSync(OUT)
+        .filter((name) => name.endsWith('.svg'))
+        .sort()
+    : [];
+  const digest = sha(...names.map((name) => `${name}\n${readFileSync(join(OUT, name), 'utf8')}`));
+  const statePath = join(CACHE_DIR, 'sources.json');
+  const previous = readJson(statePath)?.digest;
+  mkdirSync(CACHE_DIR, { recursive: true });
+  writeFileSync(statePath, `${JSON.stringify({ digest }, null, 2)}\n`, 'utf8');
+  if (!changedGenerated && previous === digest) return;
+  const cacheDir = process.env.ASTRO_CACHE_DIR;
+  const stale = cacheDir
+    ? [join(resolve(SITE, cacheDir), 'data-store.json')]
+    : [join(SITE, '.astro', 'data-store.json'), join(SITE, 'node_modules', '.astro')];
+  for (const path of stale) {
+    if (existsSync(path)) rmSync(path, { recursive: true, force: true });
+  }
+}
+
 async function main() {
   if (!CHECK) mkdirSync(OUT, { recursive: true });
 
-  const [{ values, principles }, { layers }, { levels }, { patterns }, { figures }, { map }] =
-    await Promise.all([
-      loadTs('src/data/values.ts', SITE),
-      loadTs('src/data/stack.ts', SITE),
-      loadTs('src/data/maturity.ts', SITE),
-      loadTs('src/data/patterns.ts', SITE),
-      loadTs('src/data/figures.ts', SITE),
-      loadMap(SITE),
-    ]);
+  const [
+    { values, principles },
+    { layers },
+    { levels },
+    { patterns },
+    figuresMod,
+    { map },
+    { site },
+    { obligations },
+    { roles },
+    deployment,
+  ] = await Promise.all([
+    loadTs('src/data/values.ts', SITE),
+    loadTs('src/data/stack.ts', SITE),
+    loadTs('src/data/maturity.ts', SITE),
+    loadTs('src/data/patterns.ts', SITE),
+    loadTs('src/data/figures.ts', SITE),
+    loadMap(SITE),
+    loadTs('src/data/site.ts', SITE),
+    loadTs('src/data/frameworks.ts', SITE),
+    loadTs('src/data/roles.ts', SITE),
+    loadTs('src/data/deployment-options.ts', SITE),
+  ]);
+  const { figures, figureBudgetKb, figureKind } = figuresMod;
   const fig = (id) => figures.find((f) => f.id === id);
+  const budget = (id) => figureBudgetKb[figureKind(fig(id))];
 
   const outputs = [
-    ['values-principles.svg', buildValuesPrinciples(values, principles, fig('values-principles')), 12],
-    ['maturity-grid.svg', buildMaturityGrid(layers, levels, fig('maturity-grid')), 12],
-    ['pattern-map.svg', buildPatternMap(patterns, layers, fig('pattern-map')), 12],
-    ['discipline-map.svg', buildDisciplineMap(map, fig('discipline-map')), 48],
+    ['values-principles.svg', buildValuesPrinciples(values, principles, fig('values-principles'))],
+    [
+      'values-principles-wide.svg',
+      buildValuesPrinciplesWide(values, principles, fig('values-principles')),
+    ],
+    ['maturity-grid.svg', buildMaturityGrid(layers, levels, fig('maturity-grid'))],
+    ['pattern-map.svg', buildPatternMap(patterns, layers, fig('pattern-map'))],
+    ['discipline-map.svg', buildDisciplineMap(map, fig('discipline-map'))],
   ];
+  // Reference posters: generated only for the ids declared in figures.ts.
+  const posterData = { obligations, roles, deployment };
+  for (const [id, build] of POSTERS) {
+    if (fig(id)) outputs.push([`${id}.svg`, build(posterData, fig(id))]);
+  }
 
   let problems = 0;
   let changed = 0;
-  for (const [name, svg, budget] of outputs) {
-    const r = emit(name, svg, budget);
+  for (const [name, svg] of outputs) {
+    // A wide variant (<id>-wide.svg) shares its figure's budget.
+    const r = emit(name, svg, budget(name.replace(/(-wide)?\.svg$/, '')));
     if (CHECK) problems += r;
     else changed += r;
+  }
+
+  const invalid = validateFigures(figuresMod);
+  if (invalid.length) {
+    console.error(`figures-build: ${invalid.length} figure problem(s):`);
+    for (const line of invalid) console.error(`  ${line}`);
+    process.exit(1);
   }
 
   if (CHECK) {
@@ -294,14 +718,8 @@ async function main() {
     return;
   }
 
-  // Astro caches compiled Markdown keyed on the source, not on the figure SVGs
-  // that rehype-diagrams inlines, so drop the cache when a figure changed to
-  // force a recompile (mirrors scripts/diagrams-build.mjs).
-  if (changed > 0) {
-    for (const stale of [join(SITE, '.astro', 'data-store.json'), join(SITE, 'node_modules', '.astro')]) {
-      if (existsSync(stale)) rmSync(stale, { recursive: true, force: true });
-    }
-  }
+  purgeAstroCacheIfFiguresChanged(changed > 0);
+  if (!NO_EXPORT) await exportFigures(figuresMod, site);
 }
 
 main().catch((err) => {

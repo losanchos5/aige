@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 624" class="figc" role="img" aria-labelledby="fig-harm-levels-t fig-harm-levels-d">
+  <title id="fig-harm-levels-t">Harm at five levels</title>
+  <desc id="fig-harm-levels-d">Five harm levels from one person to the environment, each with an example harm from the atlas and the control, by stack layer, that catches it.</desc>
+
+  <text class="mono muted" x="16" y="18" font-size="13.5">Where harm lands, level by level</text>
+
+  <!-- Individual -->
+  <rect class="panel" x="8" y="28" width="344" height="70" rx="8"/>
+  <text class="disp" x="18" y="47" font-size="14.5">Individual</text>
+  <text class="ink2" x="130" y="47" font-size="13">one person</text>
+  <text x="18" y="66" font-size="13">Discrimination in consequential decisions</text>
+  <text class="mono muted" x="18" y="88" font-size="13">caught by</text>
+  <rect class="l3-bg" x="100" y="75" width="96" height="19" rx="5"/>
+  <text class="l3-tx" x="108" y="89" font-size="13">Eval Gate in CI</text>
+
+  <!-- Group -->
+  <rect class="panel" x="8" y="106" width="344" height="70" rx="8"/>
+  <text class="disp" x="18" y="125" font-size="14.5">Group</text>
+  <text class="ink2" x="130" y="125" font-size="13">a group or community as such</text>
+  <text x="18" y="144" font-size="13">Exclusion through under-representation in data</text>
+  <text class="mono muted" x="18" y="166" font-size="13">caught by</text>
+  <rect class="l2-bg" x="100" y="153" width="196" height="19" rx="5"/>
+  <text class="l2-tx" x="108" y="167" font-size="13">Model Card as Control Evidence</text>
+
+  <!-- Organisation -->
+  <rect class="panel" x="8" y="184" width="344" height="70" rx="8"/>
+  <text class="disp" x="18" y="203" font-size="14.5">Organisation</text>
+  <text class="ink2" x="130" y="203" font-size="13">builds, buys or deploys</text>
+  <text x="18" y="222" font-size="13">Security compromise through prompt injection</text>
+  <text class="mono muted" x="18" y="244" font-size="13">caught by</text>
+  <rect class="l4-bg" x="100" y="231" width="120" height="19" rx="5"/>
+  <text class="l4-tx" x="108" y="245" font-size="13">Runtime Guardrail</text>
+
+  <!-- Society -->
+  <rect class="panel" x="8" y="262" width="344" height="70" rx="8"/>
+  <text class="disp" x="18" y="281" font-size="14.5">Society</text>
+  <text class="ink2" x="130" y="281" font-size="13">shared systems</text>
+  <text x="18" y="300" font-size="13">Job displacement and task transformation</text>
+  <text class="mono muted" x="18" y="322" font-size="13">caught by</text>
+  <rect class="l1-bg" x="100" y="309" width="188" height="19" rx="5"/>
+  <text class="l1-tx" x="108" y="323" font-size="13">Workforce impact assessment</text>
+
+  <!-- Environment -->
+  <rect class="panel" x="8" y="340" width="344" height="86" rx="8"/>
+  <text class="disp" x="18" y="359" font-size="14.5">Environment</text>
+  <text class="ink2" x="130" y="359" font-size="13">the physical environment</text>
+  <text x="18" y="378" font-size="13">Energy demand and emissions of</text>
+  <text x="18" y="394" font-size="13">training and inference</text>
+  <text class="mono muted" x="18" y="416" font-size="13">caught by</text>
+  <rect class="l5-bg" x="100" y="403" width="196" height="19" rx="5"/>
+  <text class="l5-tx" x="108" y="417" font-size="13">Energy and emissions telemetry</text>
+
+  <!-- The atlas holds every harm with its record -->
+  <line class="stroke-arrow" x1="180" y1="426" x2="180" y2="436"/>
+  <path class="arrow" d="M174 436 h12 l-6 9 z"/>
+  <rect class="panel" x="8" y="448" width="344" height="52" rx="10"/>
+  <ellipse class="glyph" cx="28" cy="462" rx="9" ry="3.2"/>
+  <path class="glyph" d="M19 462 v16 a9 3.2 0 0 0 18 0 v-16"/>
+  <text class="disp" x="46" y="468" font-size="14.5">Harms atlas</text>
+  <text class="ink2" x="46" y="487" font-size="13">incidents, failure mode, control, evidence</text>
+
+  <!-- Legend: chip colour is the layer of the control, named exactly -->
+  <text class="mono muted" x="16" y="522" font-size="13">Chip colour: the control's layer</text>
+  <rect class="l1-bg" x="16" y="530" width="12" height="12" rx="2"/>
+  <text x="36" y="541" font-size="13">Layer 01 Govern-as-Code</text>
+  <rect class="l2-bg" x="16" y="548" width="12" height="12" rx="2"/>
+  <text x="36" y="559" font-size="13">Layer 02 Inventory &amp; Transparency</text>
+  <rect class="l3-bg" x="16" y="566" width="12" height="12" rx="2"/>
+  <text x="36" y="577" font-size="13">Layer 03 Evals &amp; Red Teaming as Evidence</text>
+  <rect class="l4-bg" x="16" y="584" width="12" height="12" rx="2"/>
+  <text x="36" y="595" font-size="13">Layer 04 Runtime Controls &amp; Observability</text>
+  <rect class="l5-bg" x="16" y="602" width="12" height="12" rx="2"/>
+  <text x="36" y="613" font-size="13">Layer 05 Assurance &amp; Continuous Compliance</text>
+</svg>

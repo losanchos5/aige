@@ -8,12 +8,10 @@
  * map tree, the chapter sections and the diagrams/nodes/resources that reach the
  * branch. Every node in both halves is a link. The scroll region carries the
  * wide canvas sideways on a phone; public/map.js only adds expand/collapse-all
- * and deep-linking, so the page works with no JS. When the LinkedIn kit has
- * published a PNG (src/data/map-export.json + the file under public/), a download
- * link is shown; a fresh checkout has neither, and the block is omitted.
+ * and deep-linking, so the page works with no JS. The downloads (SVG, light and
+ * dark PNG) and the citation live on the figure's permalink,
+ * /figures/discipline-map#downloads, which the build exports on every run.
  */
-import fs from 'node:fs';
-import { resolve } from 'node:path';
 import Marketing from '../layouts/Marketing.astro';
 import PageHero from '../components/PageHero.astro';
 import Section from '../components/Section.astro';
@@ -90,43 +88,10 @@ function chapterNote(branchChapters: readonly string[]): string {
   return lo === hi ? `ch. ${lo}` : `ch. ${lo}–${hi}`;
 }
 
-// The published-PNG download, only when both the export manifest and the file it
-// names exist (the LinkedIn kit writes them). Guarded so a checkout without them
-// still builds: the precedent is the About-page PDF link.
-interface MapDownload {
-  href: string;
-  size: string;
-  width: number;
-  height: number;
-  bokVersion: string;
-}
-let download: MapDownload | null = null;
-try {
-  const manifest = JSON.parse(
-    fs.readFileSync(resolve(process.cwd(), 'src/data/map-export.json'), 'utf8'),
-  );
-  const rel = String(manifest.file ?? '').replace(/^\/+/, '');
-  const candidates = rel.startsWith('downloads/') ? [rel] : [`downloads/${rel}`, rel];
-  const found = candidates.find(
-    (candidate) => candidate && fs.existsSync(resolve(process.cwd(), 'public', candidate)),
-  );
-  if (found) {
-    const bytes = Number(manifest.bytes ?? fs.statSync(resolve(process.cwd(), 'public', found)).size);
-    const size =
-      bytes >= 1024 * 1024
-        ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-        : `${Math.round(bytes / 1024)} KB`;
-    download = {
-      href: `/${found}`,
-      size,
-      width: Number(manifest.width ?? 2400),
-      height: Number(manifest.height ?? 3000),
-      bokVersion: String(manifest.bokVersion ?? site.bokVersion),
-    };
-  }
-} catch {
-  // No published map export in this environment; the download block is omitted.
-}
+// The downloads block: the figure permalink carries the SVG and the light and
+// dark PNG exports (scripts/figures-build.mjs writes them at build time, named
+// after the Body of Knowledge version), the embed snippets and the citation.
+const downloadHref = `/figures/${figure.id}#downloads`;
 
 // The map is a collection of the whole site read as one page; Seo.astro merges
 // these nodes into the page's single ld+json graph.
@@ -252,19 +217,13 @@ const jsonLd = [
       }
     </div>
 
-    {
-      download && (
-        <p class="map-download">
-          <a href={download.href} download>
-            Download the map (PNG, {download.width}×{download.height}, {download.size})
-          </a>
-          <span class="map-download-meta">
-            {' '}
-            · rendered from Body of Knowledge v{download.bokVersion}
-          </span>
-        </p>
-      )
-    }
+    <p class="map-download">
+      <a href={downloadHref}>Cite or download this map</a>
+      <span class="map-download-meta">
+        {' '}
+        · SVG, and PNG in light and dark, rendered from Body of Knowledge v{site.bokVersion}
+      </span>
+    </p>
   </Section>
 
   <script is:inline defer src="/map.js"></script>

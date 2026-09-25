@@ -23,14 +23,16 @@ strong as its weakest layer.
 spreadsheet inventory, a risk register, a review that happens before launch. The rules are written and
 someone is accountable, but nothing executes. Typical evidence: policy documents, a populated
 spreadsheet, meeting minutes. Typical failure that moves you back: the document was last edited a
-quarter ago and no longer matches production; the artefact is stale before it is signed.
+quarter ago and no longer matches production; the artefact is stale before it is signed. Chapter 13
+shows what the risk register looks like at each level
+([risk practice by maturity level](/bok/risk-management#risk-practice-by-maturity-level)).
 
 **Level 2: Inventoried.** There is a real inventory of models and an
-**[agent registry](/bok/patterns#pattern-agent-registry)**, and it is
+**[agent registry](/patterns/agent-registry)**, and it is
 fed by a runtime data path rather than typed by hand: a deploy registers a system with an owner, a
 scope and a status. You can answer *what is running* on any given day. Typical evidence: a registry
 with an owner and a class for every system; a discovery job reconciling registry against production.
-Typical failure: [shadow AI](/bok/patterns#pattern-shadow-ai-discovery). A system or agent reaches
+Typical failure: [shadow AI](/patterns/shadow-ai-discovery). A system or agent reaches
 production without registering, so the inventory is complete only for the honest.
 
 **Level 3: Tested.** Systems are evaluated against defined tests (capability, safety and adversarial
@@ -40,11 +42,12 @@ consequences. Typical evidence: versioned eval suites; stored, timestamped eval 
 findings. Typical failure: the eval is run once before launch, pasted into a slide, and never re-run
 when the model or its prompts change.
 
-**Level 4: Enforced.** The tests bite. [Policy-as-code](/bok/patterns#pattern-policy-card) and
-**[eval gates](/bok/patterns#pattern-eval-gate-in-ci)** run in CI/CD and at
+**Level 4: Enforced.** The tests bite. [Policy-as-code](/patterns/policy-card) and
+**[eval gates](/patterns/eval-gate-in-ci)** run in CI/CD and at
 admission, and a failing control blocks the merge or the deploy. Identity precedes autonomy: an agent
-with no owner, scope or **[kill switch](/bok/patterns#pattern-kill-switch--circuit-breaker)** is
-denied a workload identity. Governance is now a property of
+with no owner, scope or **[kill switch](/patterns/kill-switch-circuit-breaker)** is
+denied a [workload identity](/bok/governing-agents#identity-and-short-lived-credentials). Governance is
+now a property of
 the build, not a checkpoint after it. But a blocking gate is only as good as the test behind it, so
 Level 4 has a second condition that is easy to skip: the eval suite's own *quality* is assessed, not
 just its existence and its teeth. A gate that blocks on a trivial or stale suite is Level 4 by the
@@ -59,9 +62,9 @@ the block is real but the assurance is not.
 
 **Level 5: Continuous.** Assurance is produced continuously from the runtime data path. Guardrail
 decisions, tool-call mediation, drift and agent behaviour stream into observability;
-**[continuous assurance](/bok/patterns#pattern-continuous-assurance-telemetry)** turns production
+**[continuous assurance](/patterns/continuous-assurance-telemetry)** turns production
 behaviour into a live control signal; evidence is emitted as
-[machine-readable artefacts](/bok/patterns#pattern-machine-readable-evidence-oscal) (`OSCAL`, signed
+[machine-readable artefacts](/patterns/machine-readable-evidence-oscal) (`OSCAL`, signed
 logs) as the pipeline and runtime operate. The audit is a
 query. On one vendor's comparison of the AI-governance platform category, most of it does not reach
 this end state, because it "manages the program … without any runtime data path" [1]. Typical evidence: a live assurance store;
@@ -76,11 +79,11 @@ its column.
 
 | Layer | 1 Documented | 2 Inventoried | 3 Tested | 4 Enforced | 5 Continuous |
 |---|---|---|---|---|---|
-| **1 Govern-as-Code** | Policies written as prose | Policies indexed, mapped to systems | Policy checks run and report, non-blocking | [Policy-as-code](/bok/patterns#pattern-policy-card) blocks merge/deploy | [Policy verdicts](/bok/patterns#pattern-continuous-assurance-telemetry) stream to assurance, versioned |
-| **2 Inventory & Transparency** | Spreadsheet inventory | Registry fed by deploy; owner + scope per system | Registry reconciled against production | [Registry gates deployment](/bok/patterns#pattern-agent-registry); no entry, no identity | Registry live off [runtime discovery](/bok/patterns#pattern-shadow-ai-discovery); drift auto-flagged |
-| **3 Evals & Red Teaming as Evidence** | Evals described in a plan | Eval suites exist and are versioned | Evals run, results stored, non-blocking | [Eval gate](/bok/patterns#pattern-eval-gate-in-ci) fails the build on regression; suite coverage and adversarial quality assessed | Evals run continuously; results are live evidence |
-| **4 Runtime Controls & Observability** | Guardrails named in a design | Guardrails deployed, not measured | Guardrail decisions logged | [Kill switch](/bok/patterns#pattern-kill-switch--circuit-breaker) tested; tool-calls mediated and enforced | Runtime signals drive control decisions in real time |
-| **5 Assurance & Continuous Compliance** | Evidence gathered by hand for audit | Evidence templated per control | Structured evidence produced per run | Evidence required to pass the gate | [Machine-readable evidence](/bok/patterns#pattern-machine-readable-evidence-oscal) emitted continuously; audit = query |
+| **1 Govern-as-Code** | Policies written as prose | Policies indexed, mapped to systems | Policy checks run and report, non-blocking | [Policy-as-code](/patterns/policy-card) blocks merge/deploy | [Policy verdicts](/patterns/continuous-assurance-telemetry) stream to assurance, versioned |
+| **2 Inventory & Transparency** | Spreadsheet inventory | Registry fed by deploy; owner + scope per system | Registry reconciled against production | [Registry gates deployment](/patterns/agent-registry); no entry, no identity | Registry live off [runtime discovery](/patterns/shadow-ai-discovery); drift auto-flagged |
+| **3 Evals & Red Teaming as Evidence** | Evals described in a plan | Eval suites exist and are versioned | Evals run, results stored, non-blocking | [Eval gate](/patterns/eval-gate-in-ci) fails the build on regression; suite coverage and adversarial quality assessed | Evals run continuously; results are live evidence |
+| **4 Runtime Controls & Observability** | Guardrails named in a design | Guardrails deployed, not measured | Guardrail decisions logged | [Kill switch](/patterns/kill-switch-circuit-breaker) tested; tool-calls mediated and enforced | Runtime signals drive control decisions in real time |
+| **5 Assurance & Continuous Compliance** | Evidence gathered by hand for audit | Evidence templated per control | Structured evidence produced per run | Evidence required to pass the gate | [Machine-readable evidence](/patterns/machine-readable-evidence-oscal) emitted continuously; audit = query |
 
 **Partial maturity is the normal state.** Almost no real function sits at one clean level across all
 five layers; the usual picture is a ragged line: inventory at Level 4, evals at Level 2, assurance at
@@ -109,7 +112,9 @@ Each level has metrics you can read off the systems. Track the trend, not the si
 
 The single most telling cross-level metric is evidence freshness. At Level 1 the freshest evidence is
 a quarter old; at Level 5 it is as old as the last pipeline run. If your evidence ages in months, you
-are not yet continuous, whatever the dashboard says.
+are not yet continuous, whatever the dashboard says. These are engineering metrics; the board-level
+set that reports them upward is in chapter 12
+([KPIs and KRIs for leadership and the board](/bok/governance-program#kpis-and-kris-for-leadership-and-the-board)).
 
 ## Self-assessment checklist
 
@@ -131,7 +136,9 @@ Answer each with the system, not the intention. A "no" caps you at the level bel
 
 If you can say yes to a whole level and to every layer within it, you are at that level. The first
 "no" is your next piece of work, and the smallest step to the next level is almost always to close
-the weakest layer, not to add a sixth control to the strongest one.
+the weakest layer, not to add a sixth control to the strongest one. Run the checklist as a tool: the
+[maturity self-check](/toolkit/maturity-self-check) draws your per-layer profile, names the floor and
+the next move, and exports it.
 
 ## How this relates to certification and other assessments
 
@@ -144,7 +151,9 @@ says little about whether an **eval gate** blocks a build or whether evidence is
 Level 4-5 properties. And it is not a harmonised standard: the certificate confers no presumption of
 conformity with the EU AI Act, because none is yet cited in the Official Journal [3]. Reaching Level 5
 supports a 42001 audit by producing evidence continuously; it does not replace the certificate, and the
-certificate does not prove you are past Level 2.
+certificate does not prove you are past Level 2. Whatever the scheme, run
+[an audit programme](/bok/governing-deployment#an-audit-programme-not-an-audit), not a single audit
+(chapter 15).
 
 **OWASP AI Maturity Assessment (AIMA).** OWASP's GenAI Security Project publishes an AI Maturity
 Assessment reported at v1.0 (Aug 2025) [4]. It is complementary: where AIMA scores the *breadth* of an
@@ -156,7 +165,8 @@ coverage; use this ladder to find whether the covered controls actually fire.
 third-party ISO/IEC 42001 certification with the validated assessment [1][5]. Its Level 2 aligns with
 the *Enforced* end of this ladder, but, like 42001, it attests a programme rather than measuring the
 freshness of runtime evidence, the property continuous assurance (Level 5) makes cheap to produce and
-hard to fake.
+hard to fake. Certificates of persons (AIGP, ISO/IEC 42001 Lead Implementer and Lead Auditor, AAISM,
+AAIA) are a different thing again: see the [certifications page](/for/certifications).
 
 > **In practice**
 > A function in a large telco assessed itself honestly and landed at Level 2 for inventory but Level 1
@@ -170,6 +180,20 @@ hard to fake.
 (post-market monitoring) · ISO/IEC 42001 (AIMS) and ISO/IEC 42005 (impact assessment) · NIST AI RMF
 (Govern, Measure, Manage) · OWASP Top 10 for Agentic Applications 2026 · CSA AICM / STAR for AI.
 Mappings are illustrative, not a claim of conformity.
+
+## What you can do this week
+
+1. **Score each layer, not the function.** Answer the self-assessment checklist per layer, from the
+   systems rather than the intention, and take the lowest level as your overall level.
+2. **Measure evidence freshness.** For each control, record the age of its most recent evidence
+   artefact. The oldest one is where the next sprint starts.
+3. **Reconcile the registry once.** Compare what the registry lists with what is running in
+   production, and count the systems and agents that never registered.
+4. **Raise the weakest layer by one level.** Ship the smallest step there (a versioned eval suite
+   with stored results, or a registry that gates a deploy) before adding a control to the strongest
+   layer.
+5. **Find one blocked release.** Show a release that a failing eval or policy check stopped, with the
+   reason logged. If there is none, you are not yet at Enforced, whatever the dashboard says.
 
 ## Sources
 

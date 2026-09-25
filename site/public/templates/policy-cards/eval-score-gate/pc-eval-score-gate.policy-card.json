@@ -1,0 +1,46 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/policy-card.v1.json",
+  "card_id": "pc-eval-score-gate",
+  "version": "1.0.0",
+  "title": "Eval score gate before deploy",
+  "owner": "ai-governance-engineering",
+  "applies_to": [
+    "tier:high",
+    "tier:critical"
+  ],
+  "source_policy": "ai-policy.yaml#rules/eval-gate",
+  "rules": [
+    {
+      "rule_id": "evals.min-score.v1",
+      "description": "A version merges or deploys only if its safety-core eval result for that exact version scores at least 0.90.",
+      "effect": "deny",
+      "condition": "there is no safety-core result for the exact system version, or a result scores below 0.90",
+      "failure_mode": "A regressed model version ships because nothing checked the eval result for that exact version.",
+      "enforcement_points": [
+        "pre_merge",
+        "deploy"
+      ],
+      "implementation": {
+        "engine": "opa_rego",
+        "module": "policies/pc-eval-score-gate.rego",
+        "entrypoint": "data.aige.cards.pc_eval_score_gate.verdict"
+      },
+      "maps_to": [
+        "AIGE-OBL-EUAIA-ART15",
+        "AIGE-OBL-NISTRMF-MEASURE",
+        "AIGE-OBL-ISO42001-A6"
+      ]
+    }
+  ],
+  "exceptions": "Requested by the system owner, approved by the AI governance committee for at most 90 days, and recorded as a signed verdict override with an expiry.",
+  "effective_from": "2026-10-01",
+  "review_by": "2027-04-01",
+  "extensions": {
+    "generated_by": "https://aigovernanceengineer.com/toolkit/policy-card",
+    "template": "eval-score-gate",
+    "notice": "Illustrative, review before use. Indicative, not legal advice and not a conformity claim.",
+    "cedar_module": "policies/pc-eval-score-gate.cedar",
+    "ci_hook": ".github/workflows/policy-card-pc-eval-score-gate.yml",
+    "approval_pending_from": "ai-governance-committee"
+  }
+}

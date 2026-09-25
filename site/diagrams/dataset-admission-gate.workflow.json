@@ -1,0 +1,87 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Dataset Admission Gate",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "admit",
+        "label": "Admit a version",
+        "focus": ["dataset", "checks", "record"],
+        "note": "A dataset version passes rights, quality, representativeness, bias and integrity checks before the owner signs."
+      },
+      {
+        "id": "read-time",
+        "label": "Check at read time",
+        "focus": ["job", "policy", "record", "denied"],
+        "note": "A job presents its use case; the policy denies the read unless the record admits that use."
+      },
+      {
+        "id": "evidence",
+        "label": "Leave evidence",
+        "focus": ["policy", "evidence"],
+        "note": "Each allowed read joins the admission record to the training run in lineage."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "owner", "label": "Data owner and steward" },
+    { "id": "l1", "label": "Layer 01 Govern-as-Code" },
+    { "id": "job", "label": "Training or eval job" },
+    { "id": "l2", "label": "Layer 02 Inventory & Transparency" },
+    { "id": "denied", "label": "Read denied", "variant": "exception" }
+  ],
+  "phases": [
+    { "id": "prepare", "label": "Prepare", "fromCol": 0, "toCol": 0 },
+    { "id": "admission", "label": "Check + sign", "fromCol": 1, "toCol": 2, "variant": "emphasis" },
+    { "id": "use", "label": "Read + record", "fromCol": 3, "toCol": 4, "variant": "dashed" }
+  ],
+  "mainPath": ["dataset", "checks", "record", "policy", "evidence"],
+  "nodes": [
+    { "id": "dataset", "lane": "owner", "col": 0, "type": "external", "label": "Dataset version", "sublabel": "card and snapshot", "width": 160 },
+    { "id": "checks", "lane": "l1", "col": 1, "type": "backend", "label": "Admission checks", "sublabel": "rights, quality, bias", "width": 164 },
+    { "id": "record", "lane": "l1", "col": 2, "type": "security", "label": "Admission record", "sublabel": "signed by the owner", "tag": "admit / reject", "width": 168 },
+    { "id": "policy", "lane": "l1", "col": 3, "type": "security", "label": "Read-time policy", "sublabel": "use case admitted?", "width": 164 },
+    { "id": "job", "lane": "job", "col": 3, "type": "backend", "label": "Training job", "sublabel": "presents use-case id", "width": 164 },
+    { "id": "evidence", "lane": "l2", "col": 4, "type": "database", "label": "Lineage and evidence", "sublabel": "record joined to run", "width": 168 },
+    { "id": "denied", "lane": "denied", "col": 4, "type": "backend", "label": "Read denied", "sublabel": "no admission for this use", "width": 176 }
+  ],
+  "edges": [
+    { "id": "dataset-checks", "from": "dataset", "to": "checks", "label": "submit", "variant": "default", "fromSide": "bottom", "toSide": "top" },
+    { "id": "checks-record", "from": "checks", "to": "record", "label": "sign", "variant": "emphasis" },
+    { "id": "record-policy", "from": "record", "to": "policy", "label": "publish", "variant": "emphasis" },
+    { "id": "job-policy", "from": "job", "to": "policy", "label": "request read", "variant": "default", "fromSide": "top", "toSide": "bottom" },
+    { "id": "policy-evidence", "from": "policy", "to": "evidence", "label": "allow and log", "variant": "emphasis" },
+    { "id": "policy-denied", "from": "policy", "to": "denied", "label": "deny", "variant": "security", "role": "error" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Admit before training",
+      "items": [
+        "Rights come first: ledger row, lawful basis, licence, reservation check",
+        "Then quality, quantity per group, representativeness and a bias examination",
+        "Admit a content-addressed, signed snapshot"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Checked at read time",
+      "items": [
+        "The job presents its use-case id and target system",
+        "The policy denies any read the record does not admit",
+        "The checklist lives as code, so a missing field fails the run"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Evidence by construction",
+      "items": [
+        "The data owner signs; the steward operates the checks",
+        "Lineage joins each admission record to the runs that read it"
+      ]
+    }
+  ]
+}

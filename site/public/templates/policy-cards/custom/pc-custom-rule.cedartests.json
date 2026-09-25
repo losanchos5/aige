@@ -1,0 +1,59 @@
+[
+  {
+    "name": "input that does not match gets the default",
+    "request": {
+      "principal": "Caller::\"example\"",
+      "action": "Action::\"deploy\"",
+      "resource": "Resource::\"example\"",
+      "context": {
+        "system": {
+          "risk_tier": "prohibited-other"
+        }
+      }
+    },
+    "entities": [],
+    "decision": "allow",
+    "reason": [
+      "pc-custom-rule.baseline"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "input that matches gets the effect",
+    "request": {
+      "principal": "Caller::\"example\"",
+      "action": "Action::\"deploy\"",
+      "resource": "Resource::\"example\"",
+      "context": {
+        "system": {
+          "risk_tier": "prohibited"
+        }
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "custom.rule.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "other action is out of scope",
+    "request": {
+      "principal": "Caller::\"example\"",
+      "action": "Action::\"deploy-other\"",
+      "resource": "Resource::\"example\"",
+      "context": {
+        "system": {
+          "risk_tier": "prohibited"
+        }
+      }
+    },
+    "entities": [],
+    "decision": "allow",
+    "reason": [
+      "pc-custom-rule.baseline"
+    ],
+    "num_errors": 0
+  }
+]

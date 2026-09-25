@@ -1,10 +1,13 @@
 // /glossary.json: a static endpoint the in-chapter hover cards fetch once to
-// look up a term's definition and its glossary link. Shape:
-//   [{ term, slug, definition, url: '/resources/glossary#<slug>' }]
-// `slug` matches GlossaryIndex's `termId`, so `url` resolves to the term's <dt>.
+// look up a term's definition and its page, and an open dataset of the book's
+// terms. Shape, one object per term:
+//   { term, slug, definition, url, anchor, chapters }
+// `slug` is the term's `t-…` id (the hover cards' `data-term` key); `url` is the
+// term's canonical page, /glossary/<page-slug>; `anchor` is its entry in the
+// book index, /bok/glossary#<slug>; `definition` is clipped to <=240 chars on a
+// sentence boundary where it can be.
 import type { APIRoute } from 'astro';
 import { getGlossary } from '../lib/glossary';
-import { glossarySlug } from '../lib/rehype-glossary';
 
 const MAX_DEF = 240;
 
@@ -23,15 +26,14 @@ function clip(definition: string, max = MAX_DEF): string {
 }
 
 export const GET: APIRoute = () => {
-  const entries = getGlossary().map((entry) => {
-    const slug = glossarySlug(entry.term);
-    return {
-      term: entry.term,
-      slug,
-      definition: clip(entry.definition),
-      url: `/resources/glossary#${slug}`,
-    };
-  });
+  const entries = getGlossary().map((entry) => ({
+    term: entry.term,
+    slug: entry.id,
+    definition: clip(entry.definition),
+    url: entry.url,
+    anchor: `/bok/glossary#${entry.id}`,
+    chapters: entry.chapterRefs,
+  }));
 
   return new Response(JSON.stringify(entries), {
     headers: { 'content-type': 'application/json; charset=utf-8' },

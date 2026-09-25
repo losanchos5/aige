@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 572" class="figc" role="img" aria-labelledby="fig-explanation-techniques-t fig-explanation-techniques-d">
+  <title id="fig-explanation-techniques-t">The explanation technique map</title>
+  <desc id="fig-explanation-techniques-d">Explanation techniques on two axes, global or local and model-agnostic or model-specific, each tested before its explanation record is kept.</desc>
+
+  <text class="mono muted" x="16" y="18" font-size="13.5">Two axes: scope and access</text>
+
+  <!-- Scope: the two columns -->
+  <text class="disp" x="16" y="42" font-size="14.5">Global</text>
+  <text class="ink2" x="16" y="59" font-size="13">the whole model</text>
+  <text class="disp" x="192" y="42" font-size="14.5">Local</text>
+  <text class="ink2" x="192" y="59" font-size="13">one output</text>
+
+  <!-- Access, row 1: model-agnostic -->
+  <text class="mono" x="16" y="84" font-size="13">Model-agnostic</text>
+  <text class="ink2" x="134" y="84" font-size="13">inputs and outputs only</text>
+  <rect class="panel" x="8" y="92" width="168" height="124" rx="8"/>
+  <text x="18" y="112" font-size="13">Global surrogate models</text>
+  <text x="18" y="132" font-size="13">Permutation feature</text>
+  <text x="18" y="148" font-size="13">importance</text>
+  <text x="18" y="168" font-size="13">Partial dependence</text>
+  <rect class="panel" x="184" y="92" width="168" height="124" rx="8"/>
+  <text x="194" y="112" font-size="13">LIME</text>
+  <text x="194" y="130" font-size="13">KernelSHAP</text>
+  <text x="194" y="150" font-size="13">Counterfactual</text>
+  <text x="194" y="166" font-size="13">explanations</text>
+  <text x="194" y="186" font-size="13">Nearest-example</text>
+  <text x="194" y="202" font-size="13">explanations</text>
+
+  <!-- Access, row 2: model-specific -->
+  <text class="mono" x="16" y="242" font-size="13">Model-specific</text>
+  <text class="ink2" x="134" y="242" font-size="13">uses the internals</text>
+  <rect class="panel" x="8" y="250" width="168" height="108" rx="8"/>
+  <text x="18" y="270" font-size="13">Coefficients of an</text>
+  <text x="18" y="286" font-size="13">interpretable model</text>
+  <text x="18" y="306" font-size="13">Tree structure</text>
+  <text x="18" y="326" font-size="13">Probing of internal</text>
+  <text x="18" y="342" font-size="13">representations</text>
+  <rect class="panel" x="184" y="250" width="168" height="108" rx="8"/>
+  <text x="194" y="270" font-size="13">TreeSHAP</text>
+  <text x="194" y="290" font-size="13">Integrated gradients</text>
+  <text x="194" y="310" font-size="13">Attention or circuit</text>
+  <text x="194" y="326" font-size="13">analysis (research)</text>
+
+  <!-- An explanation is an output: it gets evals (Layer 03) -->
+  <line class="stroke-arrow" x1="180" y1="358" x2="180" y2="372"/>
+  <path class="arrow" d="M174 372 h12 l-6 9 z"/>
+  <text class="mono muted" x="192" y="376" font-size="13">an output: test it</text>
+  <rect class="l3-band" x="8" y="384" width="344" height="48" rx="8"/>
+  <text class="disp" x="18" y="403" font-size="14.5">Explanation tests</text>
+  <text class="ink2" x="18" y="421" font-size="13">fidelity, stability, sanity, comprehension</text>
+  <line class="stroke-arrow" x1="180" y1="432" x2="180" y2="444"/>
+  <path class="arrow" d="M174 444 h12 l-6 9 z"/>
+
+  <!-- The evidence: one record per explained decision (Layer 04) -->
+  <rect class="l4-band" x="8" y="456" width="344" height="56" rx="10"/>
+  <path class="glyph" d="M20 468 h12 l5 5 v17 h-17 z"/>
+  <path class="glyph" d="M32 468 v5 h5"/>
+  <path class="glyph-check" d="M23 481 l3 3 l6 -7"/>
+  <text class="disp" x="48" y="478" font-size="14.5">Explanation record</text>
+  <text class="ink2" x="48" y="497" font-size="13">method, version, baseline, reason codes</text>
+
+  <!-- Legend: layers named exactly -->
+  <rect class="l3-band" x="16" y="530" width="12" height="12" rx="2"/>
+  <text x="36" y="541" font-size="13">Layer 03 Evals &amp; Red Teaming as Evidence</text>
+  <rect class="l4-band" x="16" y="548" width="12" height="12" rx="2"/>
+  <text x="36" y="559" font-size="13">Layer 04 Runtime Controls &amp; Observability</text>
+</svg>

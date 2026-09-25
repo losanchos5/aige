@@ -12,9 +12,11 @@ the Thesis is co-authored by Jorge García Aibar and Aurélie Pols.
   anything else.
 - **Suggest a source.** Found a stronger primary source, or a claim that needs one? Add a row to
   `sources/SOURCES.md` under the relevant chapter section and reference it from the copy.
-- **Contribute to a chapter or pattern.** Extend or sharpen a chapter, add a pattern to
-  `bok/05-patterns.md`, or propose a new chapter from `OUTLINE.md`. Follow `STYLEGUIDE.md`; accepted
-  substantive contributions are credited in `bok/CONTRIBUTORS.md` but do not confer co-authorship.
+- **Contribute to a chapter or pattern.** Extend or sharpen a chapter, add a pattern as its own file
+  under `bok/patterns/` (with its summary in the `bok/05-patterns.md` catalogue; STYLEGUIDE §4 has the
+  frontmatter and the checklist), or propose a new chapter from `OUTLINE.md`. Follow `STYLEGUIDE.md`;
+  accepted substantive contributions are credited in `bok/CONTRIBUTORS.md` but do not confer
+  co-authorship.
 
 ## Rules every PR must follow
 

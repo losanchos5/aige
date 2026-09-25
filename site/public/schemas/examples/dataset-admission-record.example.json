@@ -1,0 +1,39 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/dataset-admission-record.v1.json",
+  "control_id": "data.admission.v1",
+  "subject": "loan-apps-2019-2025@2026-04-30",
+  "pipeline": "training",
+  "target_system": "credit-afford-03@3.2.0",
+  "dataset_card": "https://evidence.example.org/cards/loan-apps-2019-2025/2026-04-30",
+  "decision": "admit",
+  "checks": [
+    {
+      "check_id": "card.complete",
+      "result": "pass"
+    },
+    {
+      "check_id": "lawful_basis.present",
+      "requirement": "GDPR Art. 6",
+      "result": "pass",
+      "detail": "legitimate_interests, balancing test LIA-2026-009"
+    },
+    {
+      "check_id": "licence.allows_training",
+      "result": "pass"
+    },
+    {
+      "check_id": "quality.missing_income",
+      "requirement": "EU AI Act Art. 10",
+      "result": "pass",
+      "detail": "0.4% missing"
+    },
+    {
+      "check_id": "retention.set",
+      "result": "pass"
+    }
+  ],
+  "input_hash": "sha256:5d41402abc4b2a76b9719d911017c592ae2f1d4b5c1e3b0f7a9d2c8e6f4b1a37",
+  "actor": "ci-data-gate",
+  "timestamp": "2026-05-02T08:10:44Z",
+  "signature": "ed25519:Mv3k9pQy2hS8dT1rW6xZ0aB4cE7fG5jK"
+}

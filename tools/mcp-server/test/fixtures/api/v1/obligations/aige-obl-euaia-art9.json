@@ -1,0 +1,86 @@
+{
+  "notice": "Illustrative mapping from the AI Governance Engineer Body of Knowledge v0.5.0 (not a claim of conformity)",
+  "version": "0.5.0",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "schemaVersion": 2,
+  "schema": "https://aigovernanceengineer.com/api/v1/schemas/obligation.json",
+  "self": "https://aigovernanceengineer.com/api/v1/obligations/aige-obl-euaia-art9.json",
+  "source": "https://aigovernanceengineer.com/obligations/aige-obl-euaia-art9",
+  "citation": {
+    "title": "AI Governance Engineering: The Thesis & Body of Knowledge",
+    "authors": [
+      "Jorge García Aibar"
+    ],
+    "parentDoi": "https://doi.org/10.5281/zenodo.22857084",
+    "conceptDoi": "https://doi.org/10.5281/zenodo.22857084"
+  },
+  "obligation": {
+    "id": "AIGE-OBL-EUAIA-ART9",
+    "url": "https://aigovernanceengineer.com/obligations/aige-obl-euaia-art9",
+    "json": "https://aigovernanceengineer.com/api/v1/obligations/aige-obl-euaia-art9.json",
+    "framework": "EU AI Act",
+    "frameworkId": "eu-ai-act",
+    "clause": "Art. 9",
+    "obligation": "EU AI Act Art. 9 risk management system",
+    "requirement": "Risk management system across the high-risk lifecycle",
+    "artefact": "Risk register as code; threat models; linkage to FRIA and eval results",
+    "layers": [
+      1,
+      3
+    ],
+    "dutyHolder": "Provider",
+    "scope": null,
+    "authority": "National MSA",
+    "appliesFrom": "2027-12-02",
+    "appliesStatus": "deferred",
+    "appliesNote": "2027-12-02 (Annex III)",
+    "milestones": [
+      {
+        "date": "2028-08-02",
+        "systemClass": [
+          "high-risk-annex-i"
+        ],
+        "note": "Applies to Annex I embedded (product safety-component) systems"
+      },
+      {
+        "date": "2030-08-02",
+        "systemClass": [],
+        "note": "Deadline for legacy high-risk systems intended for use by public authorities (Art. 111(2))"
+      }
+    ],
+    "systemClass": [
+      "high-risk-annex-iii",
+      "high-risk-annex-i"
+    ],
+    "patterns": [
+      {
+        "id": "pattern-policy-card",
+        "title": "Policy Card",
+        "url": "https://aigovernanceengineer.com/patterns/policy-card"
+      },
+      {
+        "id": "pattern-adversarial-red-team-suite",
+        "title": "Adversarial Red-Team Suite",
+        "url": "https://aigovernanceengineer.com/patterns/adversarial-red-team-suite"
+      },
+      {
+        "id": "pattern-fria-as-code",
+        "title": "FRIA-as-Code",
+        "url": "https://aigovernanceengineer.com/patterns/fria-as-code"
+      },
+      {
+        "id": "pattern-downstream-use-register",
+        "title": "Downstream Use Register",
+        "url": "https://aigovernanceengineer.com/patterns/downstream-use-register"
+      }
+    ],
+    "crosswalkTopics": [
+      "risk-management",
+      "impact-assessment",
+      "robustness-security-evals"
+    ],
+    "reviewed": "2026-09-24",
+    "chapter": "https://aigovernanceengineer.com/bok/regulatory-map#eu-ai-act-post-omnibus"
+  }
+}

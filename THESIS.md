@@ -1,6 +1,6 @@
 # The AI Governance Engineering Thesis
 
-Version 0.4.0 · 2026-09-19 · Jorge García Aibar and Aurélie Pols
+Version 0.5.0 · 2026-09-25 · Jorge García Aibar and Aurélie Pols
 
 ---
 
@@ -190,13 +190,13 @@ Chapter 01 draws every one of these lines in full.
 
 ## Authors
 
-**Jorge García Aibar (v0.1–v0.4.0)**, AI Governance & Privacy Engineer. LinkedIn:
+**Jorge García Aibar (v0.1–v0.5.0)**, AI Governance & Privacy Engineer. LinkedIn:
 https://www.linkedin.com/in/jorgara
 
-**Aurélie Pols (v0.1–v0.4.0)**, Responsible AI (EU/Global), Privacy & Data Governance. LinkedIn:
+**Aurélie Pols (v0.1–v0.5.0)**, Responsible AI (EU/Global), Privacy & Data Governance. LinkedIn:
 https://www.linkedin.com/in/aureliepols
 
-**Co-authors wanted.** This is version 0.4.0: a public draft, deliberately incomplete. It was
+**Co-authors wanted.** This is version 0.5.0: a public draft, deliberately incomplete. It was
 started by one practitioner and it needs many. If you build governance for AI systems (policy-as-
 code, agent registries, eval gates, runtime guardrails, continuous assurance) and you can bring a
 verified fact, a pattern that worked, or a sharper argument, you are invited to co-author. The

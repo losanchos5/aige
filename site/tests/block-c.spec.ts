@@ -55,7 +55,7 @@ test('the artefact cell links to the matching pattern where a 1:1 map exists', a
   const row = page.locator('[data-obligation-row]', {
     hasText: 'Art. 15 accuracy, robustness and cybersecurity',
   });
-  const link = row.locator('a[href="/bok/patterns#pattern-eval-gate-in-ci"]');
+  const link = row.locator('a[href="/patterns/eval-gate-in-ci"]');
   await expect(link).toHaveCount(1);
 });
 
@@ -73,6 +73,7 @@ test.describe('obligation export endpoints', () => {
     // A header row and at least one obligation row follow.
     const lines = text.split(/\r?\n/).filter(Boolean);
     expect(lines[1]).toContain('Framework,Obligation,Artefact');
+    expect(lines[1]).toContain(',ID,');
     expect(lines.length).toBeGreaterThan(40);
   });
 
@@ -88,6 +89,14 @@ test.describe('obligation export endpoints', () => {
     expect(body.source).toContain('/resources/frameworks');
     expect(Array.isArray(body.obligations)).toBe(true);
     expect(body.obligations.length).toBeGreaterThan(40);
+    // Schema version 2 (v0.5.0): stable ids, ISO appliesFrom, the old text in appliesNote.
+    expect(body.schemaVersion).toBe(2);
+    const art9 = body.obligations.find(
+      (row: { id: string }) => row.id === 'AIGE-OBL-EUAIA-ART9',
+    );
+    expect(art9.appliesFrom).toBe('2027-12-02');
+    expect(art9.appliesNote).toBe('2027-12-02 (Annex III)');
+    expect(art9.url).toBe('https://aigovernanceengineer.com/obligations/aige-obl-euaia-art9');
   });
 });
 
@@ -100,10 +109,14 @@ test('the header exposes the Patterns nav item', async ({ page }) => {
   const practice = header.locator('[data-nav-group="practice"]');
   const patterns = practice.getByRole('link', { name: 'Patterns' });
   await expect(patterns).toBeVisible();
-  await expect(patterns).toHaveAttribute('href', '/bok/patterns');
+  // v0.5.0: the item opens the pattern index (one page per pattern); the
+  // catalogue chapter stays reachable from the Body of Knowledge.
+  await expect(patterns).toHaveAttribute('href', '/patterns');
 
-  const res = await page.goto('/bok/patterns');
-  expect(res?.status()).toBe(200);
+  for (const path of ['/patterns', '/bok/patterns']) {
+    const res = await page.goto(path);
+    expect(res?.status(), path).toBe(200);
+  }
 });
 
 test.describe('mobile on-this-page TOC', () => {

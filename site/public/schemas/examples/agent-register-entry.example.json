@@ -1,0 +1,81 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/agent-register-entry.v1.json",
+  "id": "csa-01",
+  "version": "2026-09-18",
+  "owner": "team-support-platform",
+  "scope": [
+    "orders:read",
+    "refunds:read",
+    "refunds:create"
+  ],
+  "expiry": "2026-12-17",
+  "name": "Customer-service agent",
+  "purpose": "Answers order questions and issues small refunds within policy.",
+  "base_models": [
+    "vendor-llm-large-2026-07"
+  ],
+  "workload_identity": {
+    "type": "spiffe",
+    "identifier": "spiffe://example.org/agents/csa-01",
+    "issuer": "platform-identity",
+    "credential_ttl_seconds": 900
+  },
+  "tools": [
+    {
+      "name": "orders-api",
+      "operations": [
+        "get_order",
+        "list_orders"
+      ],
+      "requires_approval": false
+    },
+    {
+      "name": "refunds-api",
+      "operations": [
+        "create_refund"
+      ],
+      "requires_approval": false,
+      "limits": "Up to 50 EUR per refund, business hours only (policy card pc-refunds-v3)."
+    }
+  ],
+  "data_access": [
+    {
+      "domain": "orders",
+      "classification": "confidential",
+      "access": "read"
+    }
+  ],
+  "delegation": {
+    "can_spawn_agents": false
+  },
+  "autonomy_level": "act_and_report",
+  "human_oversight": {
+    "mode": "human_on_the_loop",
+    "approval_required_for": [
+      "refunds above 50 EUR",
+      "account changes"
+    ],
+    "overseer_role": "support-team-leads"
+  },
+  "spend_limit": {
+    "currency": "EUR",
+    "amount": 500,
+    "period": "per_day"
+  },
+  "kill_switch": {
+    "mechanism": "Revoke the SPIFFE identity and drain the task queue.",
+    "owner": "platform-on-call",
+    "last_drill": "2026-09-02"
+  },
+  "runtime_policies": [
+    "pc-refunds-v3",
+    "pc-pii-output-v2"
+  ],
+  "eval_suites": [
+    "injection-resistance.v4",
+    "refund-policy-adherence.v2"
+  ],
+  "logging": "OpenTelemetry traces to the evidence store, kept 400 days.",
+  "status": "active",
+  "registered_at": "2026-06-19T09:12:00Z"
+}

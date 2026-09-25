@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/post-market-monitoring-plan.v1.json",
+  "title": "Post-market monitoring plan",
+  "description": "How a provider watches a system after release: the data it collects, the metrics and thresholds, the triggers and the actions they fire, and how findings feed incidents, risk and retraining. Part of the technical documentation for a high-risk system.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 72",
+    "EU AI Act Annex IV(9)",
+    "EU AI Act Art. 9(2)",
+    "ISO/IEC 42001 9.1",
+    "ISO/IEC 42001 A.6",
+    "NIST AI RMF MANAGE 4.1",
+    "NIST AI RMF MEASURE 3.1"
+  ],
+  "x-layer": [
+    5
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-continuous-assurance-telemetry",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-incident-pipeline",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-drift--fairness-monitor"
+  ],
+  "x-lifecycle-stage": "operate",
+  "type": "object",
+  "required": [
+    "plan_id",
+    "subject",
+    "data_sources",
+    "metrics",
+    "triggers",
+    "review_cadence",
+    "owner"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/post-market-monitoring-plan.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "plan_id": {
+      "type": "string",
+      "description": "Identifier of the plan.",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "string",
+      "description": "The governed object as registry id and version, \"id@version\" (for example \"csa-01@2026-09-18\"). The key every record is filed against.",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "scope": {
+      "type": "string",
+      "description": "What the plan covers, including deployers whose data flows back."
+    },
+    "data_sources": {
+      "type": "array",
+      "description": "Data collected actively and systematically after release.",
+      "items": {
+        "type": "object",
+        "description": "One source.",
+        "required": [
+          "source",
+          "type"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Source.",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "telemetry",
+              "deployer_feedback",
+              "user_complaint",
+              "incident",
+              "eval_rerun",
+              "audit",
+              "other"
+            ],
+            "description": "Kind of source."
+          },
+          "owner": {
+            "type": "string",
+            "description": "Who owns the feed.",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "EU AI Act Art. 72"
+      ]
+    },
+    "metrics": {
+      "type": "array",
+      "description": "Metrics, thresholds and cadence.",
+      "items": {
+        "type": "object",
+        "description": "One monitored metric.",
+        "required": [
+          "metric",
+          "threshold",
+          "cadence"
+        ],
+        "properties": {
+          "metric": {
+            "type": "string",
+            "description": "Metric.",
+            "minLength": 1
+          },
+          "threshold": {
+            "type": "string",
+            "description": "Alert threshold.",
+            "minLength": 1
+          },
+          "cadence": {
+            "type": "string",
+            "description": "How often it is computed.",
+            "minLength": 1
+          },
+          "failure_mode": {
+            "type": "string",
+            "description": "Failure mode it watches."
+          },
+          "alert_route": {
+            "type": "string",
+            "description": "Where alerts go."
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "NIST AI RMF MEASURE 3.1"
+      ]
+    },
+    "drift_signals": {
+      "type": "array",
+      "description": "Input, prediction or outcome drift signals watched.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "triggers": {
+      "type": "array",
+      "description": "Triggers and the action each fires.",
+      "items": {
+        "type": "object",
+        "description": "One trigger.",
+        "required": [
+          "condition",
+          "action",
+          "owner"
+        ],
+        "properties": {
+          "condition": {
+            "type": "string",
+            "description": "Condition that fires.",
+            "minLength": 1
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "investigate",
+              "recalibrate",
+              "retrain",
+              "rollback",
+              "suspend",
+              "open_incident",
+              "notify_deployers"
+            ],
+            "description": "Action."
+          },
+          "owner": {
+            "type": "string",
+            "description": "Who acts.",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "x-evidences": [
+        "NIST AI RMF MANAGE 4.1"
+      ]
+    },
+    "feedback_channels": {
+      "type": "array",
+      "description": "How users, deployers and affected persons report problems.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "x-evidences": [
+        "NIST AI RMF MEASURE 3.3"
+      ]
+    },
+    "incident_process": {
+      "type": "string",
+      "format": "uri",
+      "description": "Link to the incident process the plan feeds.",
+      "x-evidences": [
+        "EU AI Act Art. 73"
+      ]
+    },
+    "retraining_policy": {
+      "type": "string",
+      "description": "When retraining happens; a retrained model goes through the release gate as a new version."
+    },
+    "review_cadence": {
+      "type": "string",
+      "description": "How often the plan and its findings are reviewed.",
+      "minLength": 1
+    },
+    "owner": {
+      "type": "string",
+      "description": "Accountable role.",
+      "minLength": 1
+    },
+    "effective_from": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the plan applies from."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

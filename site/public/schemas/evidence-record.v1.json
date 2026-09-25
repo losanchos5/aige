@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/evidence-record.v1.json",
+  "title": "Evidence record",
+  "description": "The common, signed record every control writes to the assurance store, as published in chapter 05: which control decided what about which subject, against which metric and obligation, on which input, when and by whom. Other records (verdicts, eval results, admissions, go/no-go) can be normalised into it on ingest.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 12",
+    "EU AI Act Art. 17",
+    "EU AI Act Art. 72",
+    "ISO/IEC 42001 9.1",
+    "NIST AI RMF MEASURE 3.1",
+    "NIST AI RMF MANAGE 4.1"
+  ],
+  "x-layer": [
+    5
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-continuous-assurance-telemetry",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-machine-readable-evidence-oscal",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-model-artefact-integrity",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-sanctioned-ai-gateway"
+  ],
+  "x-lifecycle-stage": "organisation",
+  "type": "object",
+  "required": [
+    "control_id",
+    "subject",
+    "decision",
+    "actor",
+    "timestamp",
+    "signature"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/evidence-record.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "control_id": {
+      "type": "string",
+      "description": "The control that produced the record (for example \"guardrail.output.pii.v2\").",
+      "minLength": 1
+    },
+    "subject": {
+      "type": "string",
+      "description": "The governed object as registry id and version, \"id@version\" (for example \"csa-01@2026-09-18\"). The key every record is filed against.",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "fail",
+        "allow",
+        "deny",
+        "alert"
+      ],
+      "description": "What the control decided."
+    },
+    "metric": {
+      "type": "string",
+      "description": "Metric measured, if any."
+    },
+    "value": {
+      "type": "number",
+      "description": "Measured value."
+    },
+    "threshold": {
+      "type": "number",
+      "description": "Threshold compared with."
+    },
+    "obligation": {
+      "type": "string",
+      "description": "Obligation the control helps evidence (for example \"EU AI Act Art. 15\")."
+    },
+    "failure_mode": {
+      "type": "string",
+      "description": "Failure mode the control guards against."
+    },
+    "input_hash": {
+      "type": "string",
+      "description": "Digest of the input the decision was made on, prefixed with the algorithm (for example \"sha256:<hex>\"). Lets an auditor prove which input produced the record without storing it.",
+      "pattern": "^[a-z0-9-]+:.+$"
+    },
+    "actor": {
+      "type": "string",
+      "description": "The system, agent or role that acted.",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When (RFC 3339)."
+    },
+    "signature": {
+      "type": "string",
+      "description": "Detached signature over the record, prefixed with the algorithm (for example \"ed25519:<base64>\"). Makes the record tamper-evident in the evidence store.",
+      "pattern": "^[a-z0-9-]+:.+$"
+    },
+    "record_ref": {
+      "type": "string",
+      "format": "uri",
+      "description": "Link to the full source record (eval result, go/no-go, incident) when this is a normalised copy."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

@@ -15,6 +15,7 @@ import RegisterMark from './RegisterMark.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { site } from '../data/site';
 import { nav, resolveCurrent, type NavGroup, type NavItem } from '../data/nav';
+import { bookRange } from '../data/parts';
 
 interface Props {
   /** Float the bar, transparent until scrolled, over a full-viewport hero. */
@@ -138,24 +139,57 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
                         </ul>
                       )}
 
-                      {chapterOf(group).length > 0 && (
-                        <ol class="nav-menu-chapters" aria-label="Chapters">
-                          {chapterOf(group).map((item) => (
-                            <li>
-                              <a
-                                href={item.href}
-                                aria-current={
-                                  isCurrentLink(item.href, group.id) ? 'page' : undefined
-                                }
+                      {group.sections ? (
+                        <div class="nav-parts">
+                          {group.sections.map((section) => (
+                            <div class="nav-part">
+                              <p class="nav-part-title" id={`nav-part-${section.id}`}>
+                                {section.label}{' '}
+                                <span class="nav-part-range">{section.range}</span>
+                              </p>
+                              <ol
+                                class="nav-menu-chapters"
+                                aria-labelledby={`nav-part-${section.id}`}
                               >
-                                <span class="num" aria-hidden="true">
-                                  {item.num}
-                                </span>
-                                <span class="ch-label">{item.label}</span>
-                              </a>
-                            </li>
+                                {section.items.map((item) => (
+                                  <li>
+                                    <a
+                                      href={item.href}
+                                      aria-current={
+                                        isCurrentLink(item.href, group.id) ? 'page' : undefined
+                                      }
+                                    >
+                                      <span class="num" aria-hidden="true">
+                                        {item.num}
+                                      </span>
+                                      <span class="ch-label">{item.label}</span>
+                                    </a>
+                                  </li>
+                                ))}
+                              </ol>
+                            </div>
                           ))}
-                        </ol>
+                        </div>
+                      ) : (
+                        chapterOf(group).length > 0 && (
+                          <ol class="nav-menu-chapters" aria-label="Chapters">
+                            {chapterOf(group).map((item) => (
+                              <li>
+                                <a
+                                  href={item.href}
+                                  aria-current={
+                                    isCurrentLink(item.href, group.id) ? 'page' : undefined
+                                  }
+                                >
+                                  <span class="num" aria-hidden="true">
+                                    {item.num}
+                                  </span>
+                                  <span class="ch-label">{item.label}</span>
+                                </a>
+                              </li>
+                            ))}
+                          </ol>
+                        )
                       )}
                       </div>
                     </div>
@@ -171,6 +205,8 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
         type="button"
         class="icon-btn search-btn"
         data-search-open
+        data-umami-event="search-open"
+        data-umami-event-location="header"
         aria-label="Search"
         aria-haspopup="dialog"
         aria-expanded="false"
@@ -213,7 +249,13 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
       </button>
     </div>
 
-    <button type="button" class="nav-drawer-search" data-search-open>
+    <button
+      type="button"
+      class="nav-drawer-search"
+      data-search-open
+      data-umami-event="search-open"
+      data-umami-event-location="drawer"
+    >
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
         <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
         <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
@@ -268,19 +310,33 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
                 )}
                 {chapterOf(group).length > 0 && (
                   <details class="nav-drawer-chapters">
-                    <summary>Chapters 00–10</summary>
-                    <ol>
-                      {chapterOf(group).map((item) => (
-                        <li>
-                          <a href={item.href}>
-                            <span class="num" aria-hidden="true">
-                              {item.num}
-                            </span>
-                            <span>{item.label}</span>
-                          </a>
-                        </li>
-                      ))}
-                    </ol>
+                    <summary>Chapters {bookRange}</summary>
+                    {(group.sections ?? [{ id: group.id, label: '', range: '', items: chapterOf(group) }]).map(
+                      (section) => (
+                        <>
+                          {section.label && (
+                            <p class="nav-drawer-part" id={`d-part-${section.id}`}>
+                              {section.label}{' '}
+                              <span class="nav-part-range">{section.range}</span>
+                            </p>
+                          )}
+                          <ol
+                            aria-labelledby={section.label ? `d-part-${section.id}` : undefined}
+                          >
+                            {section.items.map((item) => (
+                              <li>
+                                <a href={item.href}>
+                                  <span class="num" aria-hidden="true">
+                                    {item.num}
+                                  </span>
+                                  <span>{item.label}</span>
+                                </a>
+                              </li>
+                            ))}
+                          </ol>
+                        </>
+                      ),
+                    )}
                   </details>
                 )}
               </>
@@ -557,6 +613,12 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     border-bottom: 1px solid var(--line);
     box-shadow: 0 12px 32px color-mix(in srgb, var(--ink) 8%, transparent);
     padding-block: var(--s-5) var(--s-6);
+    /* The Body of Knowledge panel lists every chapter: on a short window it
+       scrolls inside itself rather than running off the bottom of the screen
+       (the header is sticky, so the page cannot scroll it into view). */
+    max-height: calc(100dvh - 72px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .nav-menu[hidden] {
@@ -754,6 +816,52 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     color: var(--hero-ink);
   }
 
+  /* The Body of Knowledge by part: one named list per part, the parts flowed
+     into columns (two, three from 1024px, four from 1280px, so a column stays
+     wide enough for "22 Principles & Standards" on one line) and never split
+     across a column, so a part and its chapters always read as one block. */
+  .nav-parts {
+    columns: 2;
+    column-gap: var(--s-6);
+  }
+
+  @media (min-width: 1024px) {
+    .nav-parts {
+      columns: 3;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .nav-parts {
+      columns: 4;
+    }
+  }
+
+  .nav-part {
+    break-inside: avoid;
+    padding-bottom: var(--s-4);
+  }
+
+  .nav-part .nav-menu-chapters {
+    columns: 1;
+  }
+
+  /* Sentence-case mono caption over each part's list (not an eyebrow: it names
+     the list below it, like the footer's group titles). */
+  .nav-part-title,
+  .nav-drawer-part {
+    margin: 0 0 var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .nav-part-range {
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+
   /* ---------- Icon buttons + burger ---------- */
   .icon-btn {
     display: inline-flex;
@@ -940,6 +1048,14 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     margin: var(--s-2) 0 0;
     padding: 0;
     columns: 2;
+  }
+
+  .nav-drawer-part {
+    margin-top: var(--s-4);
+  }
+
+  .nav-drawer-chapters .nav-drawer-part + ol {
+    margin-top: var(--s-1);
   }
 
   .nav-drawer-chapters a {

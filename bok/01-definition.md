@@ -15,6 +15,8 @@ and owners, not as documents. *Systems thinking and product thinking* mean we tr
 whole that spans data, model, pipeline, runtime and organisation, delivered as a product to the
 engineers who are its users. *The governance of AI systems* is the subject: the whole span of
 governance, risk and assurance for AI, including autonomous agents, not one narrow slice of it.
+Chapter 11 settles [what counts as an AI system](/bok/ai-defined#four-definitions-compared) for
+governance purposes, and why that decision is itself the first control.
 
 The framing is borrowed, deliberately. GRC engineering defines itself as "the application of software
 engineering practice, systems thinking and product thinking to governance, risk and compliance" [1].
@@ -54,7 +56,7 @@ confused with it. Each shares a border; none is the same thing.
 |---|---|---|
 | **AI safety research** | Studies whether powerful models are safe in principle (alignment, dangerous capabilities). | Engineers the controls and evidence for AI systems in production; consumes safety research, does not conduct it. |
 | **MLOps / LLMOps** | Builds, deploys and serves models and pipelines reliably. | Governs what MLOps ships: adds policy, evals-as-evidence, registry and assurance as gates on the same pipeline. |
-| **Model risk management (SR 11-7 style)** | Validates models, checks for conceptual soundness and back-tests, in the banking tradition. | Extends beyond model validation to runtime behaviour, agents, rights impact and continuous, machine-readable evidence. |
+| **Model risk management (SR 11-7 style)** | Validates models, checks for conceptual soundness and back-tests, in the banking tradition; in the US, SR 11-7 was superseded by SR 26-2 on 17 Apr 2026 [6]. | Extends beyond model validation to runtime behaviour, agents, rights impact and continuous, machine-readable evidence. |
 | **AI compliance / legal** | Interprets obligations (EU AI Act, GDPR) and advises on them. | Turns the obligation into an executable control and readable evidence; needs legal, does not replace it. |
 | **Responsible AI / AI ethics** | Sets the values and principles (fairness, transparency, accountability). | Implements those values as running controls; ethics sets the target, engineering hits it and proves it. |
 | **GRC engineering** (the parent) | Applies engineering practice to governance, risk and compliance generally. | Same method, specialised to AI: models, agents, evals, AIBOM, runtime AI controls. |
@@ -66,9 +68,16 @@ safe; we ask whether the deployed system is governed, and prove it. **MLOps** an
 serving?"; we answer "is it allowed to serve, and what evidence says so?" We govern the very
 pipeline MLOps runs. **Model risk management** in the SR 11-7 tradition validates a model at points in
 time; we govern the system continuously, including agents that have no analogue in a credit model.
+The tradition's US reference text changed on 17 Apr 2026, when the Federal Reserve, the OCC and the
+FDIC replaced SR 11-7 with SR 26-2 ([SR 11-7, now SR 26-2](/bok/ai-laws-worldwide#sector-rules-that-already-reach-ai),
+in chapter 21) [6]. The new guidance places generative and agentic AI models outside its scope [7],
+so the systems this book cares most about are the ones bank model validation now leaves to other
+controls; chapter 13 sets out where
+[model risk management meets AI risk management](/bok/risk-management#what-this-chapter-settles).
 **AI compliance and legal** tell you what the law requires; we build the control that meets it and the
 evidence that shows it, and we depend on lawyers to tell us we got the obligation right. **Responsible
-AI and AI ethics** set the values; without engineering, those values stay on a poster. **GRC
+AI and AI ethics** set the values; without engineering, those values stay on a poster (chapter 16
+turns one of them, [fairness, into metrics and eval gates](/bok/fairness-and-explainability#group-fairness-metrics)). **GRC
 engineering** is the parent method, and we are its AI specialisation. We inherit three of the five
 stack layers almost unchanged (Govern-as-Code, Inventory & Transparency, and Assurance & Continuous
 Compliance, which carry policy as code, the asset inventory and machine-readable evidence) along
@@ -98,11 +107,14 @@ What, concretely, does this discipline govern? Five nested objects, each needing
   and machine users. Most risk is here, not in the raw model.
 - **Agents.** Systems that act: browse, execute code, call APIs, move money, delegate to other
   agents. Governed with identity, bounded scope, tool mediation, runtime guardrails and kill switches.
-  This is the hardest and newest object, and the one legacy governance cannot see.
+  This is the hardest and newest object, and the one legacy governance cannot see; chapter 23 covers
+  [governing agents](/bok/governing-agents#what-makes-an-agent-a-governance-object) end to end.
 - **Data.** Training data, retrieval corpora, prompts and outputs, with their lawful basis, rights,
-  provenance and retention. Governed with data cards, DPIAs and lineage.
+  provenance and retention. Governed with data cards, DPIAs and lineage; chapter 19 applies
+  [data protection law to AI](/bok/privacy-and-ai#principles-applied-to-ai).
 - **The organisation.** The roles, decision rights, escalation paths and accountability that surround
-  all of the above. Governed with an operating model, RACI and an incident pipeline. A control with no
+  all of the above. Governed with an operating model, RACI and an incident pipeline (chapter 12 maps
+  [the stakeholders and their duties](/bok/governance-program#the-stakeholder-map)). A control with no
   owner is not a control.
 
 The discipline is coherent only when it addresses all five. A model card with no agent registry, or an
@@ -147,10 +159,15 @@ follow directly:
 
 None of this argues against the gate; it argues for how the gate must be run. The eval suite is itself
 an artefact to be governed: its coverage measured, its cases maintained adversarially, its thresholds
-traced to named failure modes rather than round numbers. And a passing gate *obliges* runtime
-monitoring (layer 04) rather than replacing it. An eval is the control at build time; the guardrail
-and the trace are the control at run time, against the inputs no eval anticipated. A discipline that
-treats a green gate as proof of safety has rebuilt framework theatre with a faster pipeline.
+traced to named failure modes rather than round numbers, and its size set by the threshold it has to
+resolve (chapter 14 shows how to
+[size the suite from the threshold](/bok/governing-development#statistical-validity-of-evals)). The
+same caution applies to [public benchmarks and leaderboards](/bok/governing-deployment#what-public-benchmarks-and-leaderboards-cannot-tell-you),
+which score a model on someone else's cases rather than on your task. And a passing gate
+*obliges* runtime monitoring (layer 04) rather than replacing it. An eval is the control at build
+time; the guardrail and the trace are the control at run time, against the inputs no eval
+anticipated. A discipline that treats a green gate as proof of safety has rebuilt framework
+theatre with a faster pipeline.
 
 > **In practice**
 > Inside a large telco, the difference between "governed" and "documented" came down to those three
@@ -171,3 +188,5 @@ claim of conformity.
 [3] "Global AI Regulations Fuel Billion-Dollar Market for AI Governance Platforms" (AI governance spending USD 492M in 2026, over USD 1B by 2030). Gartner. 2026-02-17. https://www.gartner.com/en/newsroom/press-releases/2026-02-17-gartner-global-ai-regulations-fuel-billion-dollar-market-for-ai-governance-platforms (verified: primary)
 [4] "AI Governance Engineering". Visure Solutions. 2026. https://visuresolutions.com/ai-engineering/ai-governance-engineering/ (verified: primary)
 [5] Top 10 for Agentic Applications 2026. OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
+[6] SR 26-2, Revised Guidance on Model Risk Management (Federal Reserve, OCC and FDIC; supersedes SR 11-7 of 2011-04-04 and SR 21-8; most relevant to banking organisations above USD 30 billion in total assets). Board of Governors of the Federal Reserve System. 2026-04-17. https://www.federalreserve.gov/supervisionreg/srletters/SR2602.htm (verified: primary)
+[7] Revised Guidance on Model Risk Management, attachment to SR 26-2 (footnote 3: generative AI and agentic AI models "are not within the scope of this guidance"; the principles apply to traditional statistical and quantitative models and non-generative, non-agentic AI models; effective challenge). Federal Reserve, OCC and FDIC. 2026-04-17. https://www.federalreserve.gov/supervisionreg/srletters/SR2602a1.pdf (verified: primary)

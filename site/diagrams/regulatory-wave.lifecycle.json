@@ -16,8 +16,10 @@
         "focus": [
           "omnibus",
           "gpai",
+          "bans",
           "annex3",
-          "annex1"
+          "annex1",
+          "public"
         ],
         "note": "Obligations arrive in stages over a short window, so the stack has to exist before the dates."
       },
@@ -31,24 +33,26 @@
         "note": "The Digital Omnibus is in force and GPAI enforcement is live, both since summer 2026."
       },
       {
-        "id": "the-deadlines",
-        "label": "The deferred deadlines",
+        "id": "the-next-flips",
+        "label": "The next flips",
         "focus": [
+          "bans",
           "annex3",
-          "annex1"
+          "annex1",
+          "public"
         ],
-        "note": "The Omnibus deferred the high-risk obligations to 2027 and 2028, giving runway, not relief."
+        "note": "Dated in the Omnibus: new bans and marking in December 2026, deferred high-risk dates in 2027 and 2028, legacy public systems in 2030."
       }
     ]
   },
   "lanes": [
     {
       "id": "main",
-      "label": "Live now"
+      "label": "Dated stages"
     },
     {
-      "id": "deferred",
-      "label": "Deferred by the Omnibus"
+      "id": "legacy",
+      "label": "Legacy systems"
     },
     {
       "id": "terminal",
@@ -79,26 +83,48 @@
       "width": 118
     },
     {
+      "id": "bans",
+      "type": "neutral",
+      "label": "New Art. 5 bans",
+      "sublabel": "+ Art. 50(2) marking",
+      "tag": "2 December 2026",
+      "step": "03",
+      "lane": "main",
+      "col": 2,
+      "width": 124
+    },
+    {
       "id": "annex3",
       "type": "neutral",
       "label": "Annex III",
-      "sublabel": "high-risk applies",
+      "sublabel": "deferred high-risk",
       "tag": "2 December 2027",
-      "step": "03",
-      "lane": "deferred",
-      "col": 1,
+      "step": "04",
+      "lane": "main",
+      "col": 3,
       "width": 118
     },
     {
       "id": "annex1",
       "type": "neutral",
       "label": "Annex I",
-      "sublabel": "embedded high-risk",
+      "sublabel": "deferred, embedded",
       "tag": "2 August 2028",
-      "step": "04",
-      "lane": "deferred",
-      "col": 2,
+      "step": "05",
+      "lane": "main",
+      "col": 4,
       "width": 118
+    },
+    {
+      "id": "public",
+      "type": "neutral",
+      "label": "Public authorities",
+      "sublabel": "legacy high-risk",
+      "tag": "2 August 2030",
+      "step": "06",
+      "lane": "legacy",
+      "col": 2,
+      "width": 124
     },
     {
       "id": "stack",
@@ -108,7 +134,7 @@
       "type": "success",
       "col": 2,
       "width": 150,
-      "step": "05",
+      "step": "07",
       "tag": "build order, ch. 04"
     }
   ],
@@ -121,24 +147,32 @@
     {
       "id": "t2",
       "from": "gpai",
-      "to": "annex3",
-      "label": "deferred to",
-      "labelDy": -25
+      "to": "bans"
     },
     {
       "id": "t3",
+      "from": "bans",
+      "to": "annex3"
+    },
+    {
+      "id": "t4",
       "from": "annex3",
       "to": "annex1"
     },
     {
-      "id": "t4",
+      "id": "t5",
       "from": "annex1",
+      "to": "public"
+    },
+    {
+      "id": "t6",
+      "from": "public",
       "to": "stack",
       "label": "build before",
       "variant": "emphasis",
       "labelAt": [
-        710,
-        350
+        762,
+        372
       ]
     }
   ],
@@ -154,17 +188,18 @@
     },
     {
       "dot": "emerald",
-      "title": "Runway, not relief",
+      "title": "The next flips, dated in the Omnibus",
       "items": [
-        "Annex III high-risk obligations moved to 2 December 2027",
-        "Annex I embedded high-risk moved to 2 August 2028",
-        "The extra time is more runway to do the engineering, not less of it"
+        "2 December 2026: new Article 5 bans on AI-generated intimate imagery without consent and child sexual abuse material, and Article 50(2) marking for generative systems placed on the market before 2 August 2026",
+        "Annex III high-risk obligations moved to 2 December 2027, Annex I embedded high-risk to 2 August 2028",
+        "High-risk systems for public authorities already on the market must comply by 2 August 2030"
       ]
     },
     {
       "dot": "amber",
-      "title": "What to do with it",
+      "title": "Runway, not relief",
       "items": [
+        "The extra time is more runway to do the engineering, not less of it",
         "Pick the next stage and map its obligations to artefacts in chapter 08",
         "Build the stack before the dates, not after them"
       ]

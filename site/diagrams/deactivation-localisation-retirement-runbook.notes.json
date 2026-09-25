@@ -1,0 +1,11 @@
+{
+  "threshold": "Threshold triggers: a floor breached and not recovered within a window, a fairness gap above its limit, an incident severity.",
+  "legal": "Legal triggers: the deployer's duty to suspend and inform, a provider's corrective action, an authority's measure, a newly prohibited practice.",
+  "decide": "A named decision owner, with the time allowed, decides and records the decision.",
+  "preserve": "Evidence first: logs frozen, a legal hold applied and the pinned versions snapshotted before anything stops.",
+  "degrade": "Graduated modes built as tested toggles: advice-only, raised thresholds, grounded-only, scoped off for one group or language, back to pilot.",
+  "localise": "Per-jurisdiction rule sets and regional flags switch one market off without touching the others.",
+  "off": "The full stop, with the fallback process taking over.",
+  "retire": "Retirement steps: dependencies from the downstream use register, sunset notices, archive or dispose, identities revoked, registry entry set to retired, discovery confirms no copy runs.",
+  "record": "Each decision and step is recorded in the decommissioning runbook record, with its owner, time and evidence."
+}

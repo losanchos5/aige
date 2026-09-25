@@ -4,7 +4,7 @@ This guide governs every file in this repository. It exists so that chapters wri
 people, at different times, read as one book. Read it before you write. If a rule here conflicts with
 your instinct, follow the rule or open a pull request to change the rule. Do not quietly diverge.
 
-Version 0.4.0 · 2026-09-19. Maintainer: Jorge García Aibar.
+Version 0.5.0 · 2026-09-25. Maintainer: Jorge García Aibar.
 
 ---
 
@@ -43,7 +43,7 @@ We write as practitioners, for practitioners. The reader is building something o
   cells short; put prose in the paragraphs around the table, not inside it.
 - **Callout boxes** are plain blockquotes with a bold label (see §4 and §5).
 - **Dates.** Write `2 Aug 2026` in prose, `2026-08-02` in tables and front matter. Today's reference
-  date for v0.4.0 is 2026-09-19.
+  date for v0.5.0 is 2026-09-24.
 - **Numbers.** Spell out one to nine in prose unless paired with a unit or a percentage; use figures
   for 10 and above and for all money, versions and article numbers.
 - **Dashes.** No em dashes (U+2014). Use a comma pair, a colon, a semicolon, a full stop or parentheses
@@ -87,8 +87,26 @@ Mappings are illustrative, not a claim of conformity.
 
 ## 4. Pattern template (CSIRO style)
 
-Patterns live in the single catalogue file `bok/05-patterns.md` (one `##` section per pattern) and follow the CSIRO Responsible AI
-Pattern Catalogue structure [see 04 sources]. Use these headings, in this order:
+Since v0.5.0 each pattern is one file, `bok/patterns/<slug>.md`, rendered at `/patterns/<slug>`;
+the chapter 05 catalogue (`bok/05-patterns.md`) keeps one `## Pattern: <name>` section per pattern
+with its summary and a link to the page, so every `#pattern-*` anchor stays valid. Patterns follow
+the CSIRO Responsible AI Pattern Catalogue structure [see 04 sources].
+
+A pattern file opens with this frontmatter, and nothing else (the content schema is strict, so any
+other field fails the build):
+
+```yaml
+---
+id: <slug>              # the file name: lower case, digits and hyphens
+title: <Name>           # no "Pattern: " prefix; quoted if it contains : / & ( )
+layer: <1-5>            # home layer: the first "Layer NN" of its Maps to line
+secondaryLayer: <1-5>   # optional, only when the Maps to line names a second layer
+order: <n>              # position in the catalogue, 1..N with no gaps, its index in patterns.ts
+summary: "<one sentence of 50 to 160 characters: the lede and the meta description>"
+---
+```
+
+Then use these headings, in this order:
 
 ```
 # Pattern: <name>
@@ -123,9 +141,18 @@ Benefits and trade-offs (cost, latency, false positives, maintenance).
 Links to other patterns in the catalogue.
 
 **Maps to:** standards / articles / layer (1–5) this pattern serves.
+
+## Sources
+Numbered from [1] with no gaps; every source cited at least once.
 ```
 
-Target 12–15 patterns. Each pattern names the **layer** (1 Govern-as-Code … 5 Assurance) it belongs
+A new pattern also needs, in the same change: an entry in `site/src/data/patterns.ts` (`id` =
+`pattern-<github-slugger slug of the title>`, `slug`, `layer`, `mapsTo`), a `## Pattern: <name>`
+section in `bok/05-patterns.md` with its summary and a link to `/patterns/<slug>`, rows in
+`sources/SOURCES.md` and, if it has a diagram, a placement `{ chapter: 'patterns', pattern: '<slug>' }`
+in `site/src/data/diagrams.ts`. The build fails when any of these disagree.
+
+Target 12–20 patterns. Each pattern names the **layer** (1 Govern-as-Code … 5 Assurance) it belongs
 to so the catalogue and the stack (chapter 04) stay consistent.
 
 ## 5. The "In practice" box and the "Maps to" line
@@ -169,6 +196,11 @@ to so the catalogue and the stack (chapter 04) stay consistent.
   Congress).
 - Never invent a statistic, a date, a version or a quote. If you need one and cannot source it,
   restructure the sentence so it does not need one.
+- **Superseded references.** When an instrument is replaced, cite the current one and, where the old
+  name is a tradition readers know, say both. As of 2026-09-24: SR 11-7 was superseded by SR 26-2
+  (17 Apr 2026; chapters 01, 13, 21); ISO Guide 73:2009 is withdrawn in favour of ISO 31073:2022
+  (chapter 13); ISO 9001:2015 was replaced by ISO 9001:2026 and ISO/IEC 27701:2019 by the standalone
+  ISO/IEC 27701:2025 (chapter 22). Reuse those chapters' verified source rows.
 - Prefer the complement honestly stated: IAPP says "only 1.5% will not need more staff"; if you write
   "98.5%", show the derivation ("100 − 1.5%") so the reader sees it is arithmetic, not a survey line.
 
@@ -217,8 +249,9 @@ switch**, **FRIA** (Fundamental Rights Impact Assessment), **DPIA**, **model car
 The single most important editorial job of this book is to say what AI governance engineering is
 **not**. Whenever a chapter risks blurring into a neighbour, add a one-line contrast. The canonical
 neighbours (full treatment in chapter 01): AI safety research, MLOps/LLMOps, model risk management
-(SR 11-7 style), AI compliance/legal, Responsible AI / AI ethics, GRC engineering (the parent), AI
-security engineering (the sibling), and Visure's "AI governance for engineering" (governing AI used
+(the SR 11-7 tradition; in the US, SR 26-2 has replaced SR 11-7 since 17 Apr 2026), AI
+compliance/legal, Responsible AI / AI ethics, GRC engineering (the parent), AI security engineering
+(the sibling), and Visure's "AI governance for engineering" (governing AI used
 _inside_ engineering workflows, the opposite direction). Never let the reader confuse the discipline
 with any of these.
 

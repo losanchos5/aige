@@ -1,0 +1,24 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/training-record.v1.json",
+  "record_id": "tr-2026-0311",
+  "person_ref": "hr:7f3a91",
+  "role": "credit analyst, oversight of credit-afford-03",
+  "module_id": "M4-human-oversight",
+  "curriculum_version": "2026.2",
+  "completed_at": "2026-08-12",
+  "assessment": {
+    "score": 86,
+    "pass_mark": 75,
+    "passed": true
+  },
+  "attestation": {
+    "policy": "AI acceptable-use policy",
+    "policy_version": "1.3"
+  },
+  "grants": [
+    "decide with credit-afford-03 scores",
+    "override credit-afford-03 scores"
+  ],
+  "valid_until": "2027-08-12",
+  "delivered_by": "ai-governance-office"
+}

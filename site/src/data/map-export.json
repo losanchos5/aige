@@ -1,9 +1,9 @@
 {
-  "bokVersion": "0.4.0",
-  "gitSha": "e7c41ed56ce987eade8bb3d6cc1bd4d71afe8a9c",
-  "file": "/downloads/aige-discipline-map-v0.4.0.png",
+  "bokVersion": "0.5.0",
+  "gitSha": "a29f6817948dc7844cd9e8a9b8012e91b70fdaa4",
+  "file": "/downloads/aige-discipline-map-v0.5.0.png",
   "width": 2400,
   "height": 3000,
-  "bytes": 1308291,
-  "renderedAt": "2026-09-21T11:41:06.505Z"
+  "bytes": 1324801,
+  "renderedAt": "2026-09-25T01:20:29.010Z"
 }

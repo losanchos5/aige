@@ -1,0 +1,182 @@
+---
+/**
+ * ContrastCards: one card per commonly confused pair of glossary terms (the
+ * `## Commonly confused pairs` table of bok/09-glossary.md, parsed by
+ * lib/glossary.ts). Each card names both terms with the first sentence of
+ * their definitions, then the difference and why it matters for controls.
+ * On a term page the current term is marked and not linked. Static markup,
+ * no script; tokens only, so light and dark both follow.
+ */
+import {
+  getGlossary,
+  firstSentence,
+  type ContrastPair,
+  type GlossaryEntry,
+} from '../lib/glossary';
+
+interface Props {
+  pairs: readonly ContrastPair[];
+  /** Page slug of the term being viewed, if any. */
+  current?: string;
+  /** Heading level of each card title (default 3). */
+  level?: 2 | 3 | 4;
+}
+
+const { pairs, current, level = 3 } = Astro.props;
+const bySlug = new Map(getGlossary().map((entry) => [entry.slug, entry]));
+const Title = `h${level}` as 'h2' | 'h3' | 'h4';
+
+const cards = pairs.map((pair) => {
+  const a = bySlug.get(pair.a);
+  const b = bySlug.get(pair.b);
+  if (!a || !b) {
+    throw new Error(`ContrastCards: unknown term in pair ${pair.a} / ${pair.b}`);
+  }
+  return { pair, sides: [a, b] as [GlossaryEntry, GlossaryEntry], id: `cc-${pair.a}--${pair.b}` };
+});
+---
+
+{
+  cards.length > 0 && (
+    <ul class="cc-list">
+      {cards.map(({ pair, sides, id }) => (
+        <li class="cc-card">
+          <Title class="cc-title" id={id}>
+            {sides.map((side, i) => (
+              <>
+                {i === 1 && <span class="cc-vs"> versus </span>}
+                {side.slug === current ? (
+                  <span class="cc-current">{side.term}</span>
+                ) : (
+                  <a href={side.url}>{side.term}</a>
+                )}
+              </>
+            ))}
+          </Title>
+          <dl class="cc-sides">
+            {sides.map((side) => (
+              <div class:list={['cc-side', side.slug === current && 'is-current']}>
+                <dt>{side.term}</dt>
+                <dd>{firstSentence(side.definition)}</dd>
+              </div>
+            ))}
+          </dl>
+          <p class="cc-row">
+            <span class="cc-key">The difference</span>
+            {pair.difference}.
+          </p>
+          <p class="cc-row">
+            <span class="cc-key">Why it matters</span>
+            {pair.why}.
+          </p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .cc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
+  }
+
+  .cc-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    min-width: 0;
+    padding: var(--s-4) var(--s-5) var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+  }
+
+  .cc-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    line-height: 1.25;
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  .cc-title a {
+    color: inherit;
+    text-decoration-color: var(--line);
+    text-underline-offset: 0.18em;
+  }
+
+  .cc-title a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .cc-vs {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .cc-sides {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--s-3);
+    margin: 0;
+  }
+
+  @media (min-width: 560px) {
+    .cc-sides {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .cc-side {
+    min-width: 0;
+    padding: var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+  }
+
+  .cc-side.is-current {
+    border-color: var(--ink-2);
+  }
+
+  .cc-side dt {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .cc-side dd {
+    margin: var(--s-1) 0 0;
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .cc-row {
+    margin: 0;
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .cc-key {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+</style>

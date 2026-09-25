@@ -2,21 +2,42 @@
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import ReadingList from '../../components/ReadingList.astro';
-import { getReadingList } from '../../lib/reading-list';
+import {
+  AUDIENCES,
+  audienceLabels,
+  getReadingList,
+  readingJurisdictions,
+} from '../../lib/reading-list';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { site } from '../../data/site';
 import '../../styles/pages.css';
 import '../../styles/resources.css';
 
+// Canonical: the book chapter (/bok/reading-list) is the canonical text; this
+// page renders the same items from the same Markdown, plus a filter. A 301 was
+// ruled out: it would drop the filter, and content-lint requires this page to
+// be built with its links. The page declares the chapter as rel=canonical
+// through Base's `canonical` prop, and the sitemap leaves this URL out.
+const CANONICAL_PATH = '/bok/reading-list';
+
 const groups = getReadingList();
 const itemCount = groups.reduce((n, group) => n + group.items.length, 0);
+const jurisdictions = readingJurisdictions(groups);
+const audienceCount = (audience: string) =>
+  groups.reduce(
+    (n, group) =>
+      n + group.items.filter((item) => (item.audience as string[]).includes(audience)).length,
+    0,
+  );
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Reading list' }];
 ---
 
 <Base
   title="Reading list"
-  description="The annotated bibliography that formed AI governance engineering, grouped by theme, each source with a verified URL and a one-line note on why it matters."
+  description="The annotated bibliography of AI governance engineering: books, courses, papers, law and guidance, each with a verified URL, filterable by audience and jurisdiction."
   image="/og/resources.png"
   jsonLd={breadcrumbJsonLd(crumbs)}
+  canonical={`${site.url}${CANONICAL_PATH}`}
 >
   <PageHero
     variant="res"
@@ -25,8 +46,9 @@ const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Reading li
   >
     <p class="lede" slot="lede">
       A working bibliography, not a canon. {itemCount} sources across {groups.length} themes, each
-      annotated in one line, each with a verified URL and a verification tag drawn from the book's
-      research digest.
+      annotated in one line, each with a verified URL, a verification tag and the audience and
+      jurisdiction it serves. The canonical text is <a href={CANONICAL_PATH}>chapter 10 of the
+      Body of Knowledge</a>; this view adds the filter.
     </p>
     <p slot="note">
       Verification tags: <strong>primary</strong> (the source itself); <strong>secondary</strong>
@@ -35,8 +57,102 @@ const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Reading li
   </PageHero>
 
   <div class="container res-page">
-    <div class="res-section">
+    <div
+      class="res-section rl-root"
+      data-filter-root
+      data-filter-noun="sources"
+    >
+      <div class="rl-controls" data-filter-controls hidden>
+        <fieldset class="ob-filter">
+          <legend>Filter by audience</legend>
+          <div class="ob-chips">
+            <span>
+              <input class="ob-radio" type="radio" name="rl-audience" id="rl-audience-all" value="" data-filter-key="audience" checked />
+              <label class="ob-chip" for="rl-audience-all">Everyone</label>
+            </span>
+            {
+              AUDIENCES.map((audience) => (
+                <span>
+                  <input
+                    class="ob-radio"
+                    type="radio"
+                    name="rl-audience"
+                    id={`rl-audience-${audience}`}
+                    value={audience}
+                    data-filter-key="audience"
+                  />
+                  <label class="ob-chip" for={`rl-audience-${audience}`}>
+                    {audienceLabels[audience]} <span class="rl-count">({audienceCount(audience)})</span>
+                  </label>
+                </span>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <fieldset class="ob-filter">
+          <legend>Filter by jurisdiction</legend>
+          <div class="ob-chips">
+            <span>
+              <input class="ob-radio" type="radio" name="rl-jurisdiction" id="rl-jurisdiction-all" value="" data-filter-key="jurisdiction" checked />
+              <label class="ob-chip" for="rl-jurisdiction-all">All</label>
+            </span>
+            {
+              jurisdictions.map((j) => (
+                <span>
+                  <input
+                    class="ob-radio"
+                    type="radio"
+                    name="rl-jurisdiction"
+                    id={`rl-jurisdiction-${j.key}`}
+                    value={j.key}
+                    data-filter-key="jurisdiction"
+                  />
+                  <label class="ob-chip" for={`rl-jurisdiction-${j.key}`}>
+                    {j.label === 'global' ? 'Global' : j.label}
+                    <span class="rl-count">({j.count})</span>
+                  </label>
+                </span>
+              ))
+            }
+          </div>
+        </fieldset>
+
+        <p class="rl-status" data-filter-count aria-live="polite" role="status"></p>
+      </div>
+
       <ReadingList groups={groups} />
+
+      <p class="rl-empty" data-filter-empty hidden>No source in the list matches both filters.</p>
     </div>
   </div>
+
+  <script is:inline defer src="/catalogue-filter.js"></script>
 </Base>
+
+<style>
+  [data-filter-controls][hidden],
+  [data-filter-empty][hidden] {
+    display: none !important;
+  }
+
+  .rl-controls {
+    margin-bottom: var(--s-5);
+  }
+
+  .rl-count {
+    text-transform: none;
+  }
+
+  .rl-status {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--ink-2);
+  }
+
+  .rl-empty {
+    margin-top: var(--s-5);
+    color: var(--ink-2);
+  }
+</style>

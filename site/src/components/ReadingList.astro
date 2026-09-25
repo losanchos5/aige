@@ -2,10 +2,12 @@
 /**
  * ReadingList: the annotated bibliography as numbered register sections. Each
  * group is a numbered section; each item carries its title (a link out where a
- * URL exists, with a mono "↗" and rel="noopener"), a one-line note and a mono
- * "verified" chip when the source is tagged.
+ * URL exists, with a mono "↗" and rel="noopener"), a one-line note, a mono
+ * "verified" chip when the source is tagged, and its audience and
+ * jurisdiction tags. The data-filter-* attributes are the hooks the optional
+ * filter (public/catalogue-filter.js) reads; without it every item shows.
  */
-import type { ReadingGroup } from '../lib/reading-list';
+import { audienceLabels, jurisdictionKey, type ReadingGroup } from '../lib/reading-list';
 
 interface Props {
   groups: ReadingGroup[];
@@ -13,19 +15,29 @@ interface Props {
 
 const { groups } = Astro.props;
 const pad = (n: number) => String(n).padStart(2, '0');
+const groupId = (heading: string) =>
+  `rd-${heading
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')}`;
 ---
 
 <ol class="rd-list">
   {
     groups.map((group, i) => (
-      <li class="rd-group">
+      <li class="rd-group" data-filter-group>
         <div class="rd-group-head">
           <span class="rd-num">{pad(i + 1)}</span>
-          <h2>{group.group}</h2>
+          <h2 id={groupId(group.group)}>{group.group}</h2>
         </div>
         <ul class="rd-items">
           {group.items.map((item) => (
-            <li class="rd-item">
+            <li
+              class="rd-item"
+              data-filter-item
+              data-audience={item.audience.join(' ')}
+              data-jurisdiction={item.jurisdiction.map(jurisdictionKey).join(' ')}
+            >
               <div class="rd-item-top">
                 <span class="rd-title">
                   {item.url ? (
@@ -40,6 +52,20 @@ const pad = (n: number) => String(n).padStart(2, '0');
                 {item.verified && <span class="vchip">verified: {item.verified}</span>}
               </div>
               {item.note && <p class="rd-note">{item.note}</p>}
+              {(item.audience.length > 0 || item.jurisdiction.length > 0) && (
+                <p class="rd-tags">
+                  <span>
+                    <span class="visually-hidden">For: </span>
+                    {item.audience.map((a) => audienceLabels[a]).join(' · ')}
+                  </span>
+                  {item.jurisdiction.length > 0 && (
+                    <span class="rd-juris">
+                      <span class="visually-hidden">Jurisdiction: </span>
+                      {item.jurisdiction.join(', ')}
+                    </span>
+                  )}
+                </p>
+              )}
             </li>
           ))}
         </ul>
@@ -47,3 +73,27 @@ const pad = (n: number) => String(n).padStart(2, '0');
     ))
   }
 </ol>
+
+<style>
+  /* The filter hides with the `hidden` attribute; keep it authoritative. */
+  [data-filter-item][hidden],
+  [data-filter-group][hidden] {
+    display: none !important;
+  }
+
+  .rd-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-3);
+    margin-top: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.02em;
+    color: var(--ink-2);
+  }
+
+  .rd-juris {
+    padding-left: var(--s-3);
+    border-left: 1px solid var(--line);
+  }
+</style>

@@ -1,0 +1,89 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Disclosure & Notification Pipeline",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "one-source",
+        "label": "One source of truth",
+        "focus": ["registry", "trigger", "matrix"],
+        "note": "Registry facts and triggers feed a duty matrix that names each audience, surface and clock."
+      },
+      {
+        "id": "templates-and-approval",
+        "label": "Templates, one voice",
+        "focus": ["matrix", "templates", "approve"],
+        "note": "Notices are drafted from versioned templates and approved by one owner."
+      },
+      {
+        "id": "sent-and-recorded",
+        "label": "Sent and recorded",
+        "focus": ["proactive", "reactive", "record"],
+        "note": "Every disclosure published and every notice sent leaves a record with audience, template version and time."
+      }
+    ]
+  },
+  "lanes": [
+    { "id": "sources", "label": "Sources" },
+    { "id": "pipeline", "label": "Layer 05 Assurance & Continuous Compliance" },
+    { "id": "audiences", "label": "Audiences" },
+    { "id": "evidence", "label": "Evidence" }
+  ],
+  "phases": [
+    { "id": "select", "label": "Select duties", "fromCol": 0, "toCol": 1 },
+    { "id": "draft", "label": "Draft + approve", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "send", "label": "Send + record", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "mainPath": ["registry", "matrix", "templates", "approve", "reactive", "record"],
+  "nodes": [
+    { "id": "registry", "lane": "sources", "col": 0, "type": "database", "label": "Registry entry", "sublabel": "facts per system", "yOffset": -44, "width": 158 },
+    { "id": "trigger", "lane": "sources", "col": 0, "type": "external", "label": "Trigger", "sublabel": "incident, change", "yOffset": 44, "width": 158 },
+    { "id": "matrix", "lane": "pipeline", "col": 1, "type": "security", "label": "Duty matrix", "sublabel": "audience, clock", "width": 156 },
+    { "id": "templates", "lane": "pipeline", "col": 2, "type": "backend", "label": "Templates", "sublabel": "versioned as code", "width": 156 },
+    { "id": "approve", "lane": "pipeline", "col": 3, "type": "backend", "label": "Approval", "sublabel": "one voice", "width": 150 },
+    { "id": "proactive", "lane": "audiences", "col": 4, "type": "external", "label": "Disclosures", "sublabel": "notice, card, page", "yOffset": -44, "width": 158 },
+    { "id": "reactive", "lane": "audiences", "col": 4, "type": "external", "label": "Notified parties", "sublabel": "provider, authority", "yOffset": 44, "width": 158 },
+    { "id": "record", "lane": "evidence", "col": 5, "type": "database", "label": "Notice records", "sublabel": "who, what, when", "width": 156 }
+  ],
+  "edges": [
+    { "id": "registry-matrix", "from": "registry", "to": "matrix", "label": "facts", "variant": "emphasis" },
+    { "id": "trigger-matrix", "from": "trigger", "to": "matrix", "label": "event", "variant": "security", "role": "branch" },
+    { "id": "matrix-templates", "from": "matrix", "to": "templates", "label": "duties", "variant": "emphasis" },
+    { "id": "templates-approve", "from": "templates", "to": "approve", "label": "draft", "variant": "emphasis" },
+    { "id": "approve-proactive", "from": "approve", "to": "proactive", "label": "publish", "role": "branch" },
+    { "id": "approve-reactive", "from": "approve", "to": "reactive", "label": "send", "variant": "emphasis" },
+    { "id": "proactive-record", "from": "proactive", "to": "record", "variant": "dashed", "role": "branch" },
+    { "id": "reactive-record", "from": "reactive", "to": "record", "label": "logged", "variant": "emphasis" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Generated, not hand-written",
+      "items": [
+        "The transparency page and system card are rebuilt from the registry on every release",
+        "A duty matrix maps registry facts to notices, surfaces and clocks",
+        "A rendering test fails the build when a notice disappears from a surface"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Triggers start clocks",
+      "items": [
+        "An incident, breach, material change or retirement emits a trigger",
+        "The pipeline selects the audiences and starts each clock",
+        "Holding statements exist in skeleton before any incident"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Every notice is evidence",
+      "items": [
+        "Each notice records audience, template version, approver and time",
+        "The deployment decision and incident records point at them"
+      ]
+    }
+  ]
+}

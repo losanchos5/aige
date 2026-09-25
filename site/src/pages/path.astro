@@ -6,7 +6,9 @@
  * done / learning / skipped; progress persists per browser. Content comes from
  * src/data/path.ts; the map, drawer and progress live in PathMap / PathDrawer /
  * public/path.js. With no JS every node body is a native <details> and every
- * link is in the DOM.
+ * link is in the DOM. A "By audience" list closes the map: one link per
+ * audience hub (src/data/audiences.ts), each of which names the path nodes it
+ * starts at, plus the AIGP coverage map for readers studying from the blueprint.
  */
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/pages.css';
@@ -16,6 +18,7 @@ import PathMap from '../components/PathMap.astro';
 import PathDrawer from '../components/PathDrawer.astro';
 import CtaBand from '../components/CtaBand.astro';
 import { stages, nodes, entries, crossStageEdges } from '../data/path';
+import { audiences, audiencePath } from '../data/audiences';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 
 const edges = crossStageEdges();
@@ -97,6 +100,30 @@ const legend = [
     <PathMap stages={stages} nodes={nodes} edges={edges} entries={entries} />
   </Section>
 
+  <Section
+    tone="tint"
+    id="by-audience"
+    title="By audience."
+    lede="Each route orders the chapters, patterns, templates and tools one job needs, and names the path nodes to start at."
+  >
+    <ul class="audience-list" aria-label="Routes by audience">
+      {
+        audiences.map((audience) => (
+          <li class="audience-item">
+            <a class="audience-link" href={audiencePath(audience)}>
+              {audience.navLabel}
+            </a>
+            <span class="audience-summary">{audience.summary}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="audience-aigp">
+      Studying from the AIGP blueprint? The <a href="/for/aigp">AIGP coverage map</a> shows where
+      the book teaches each indicator, with a study path per domain.
+    </p>
+  </Section>
+
   <CtaBand
     title="Own the role, not just the reading."
     sub="The path maps to chapter 06: the role in full, workflow by workflow, against the stack that carries it."
@@ -111,6 +138,52 @@ const legend = [
 </Marketing>
 
 <style>
+  /* By audience: a two-column list on tablets and up, one link per hub with
+     its one-line summary under it. */
+  .audience-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-4) var(--s-6);
+  }
+
+  @media (min-width: 720px) {
+    .audience-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .audience-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    min-width: 0;
+  }
+
+  .audience-link {
+    font-weight: 600;
+    color: var(--ink);
+    text-underline-offset: 0.15em;
+  }
+
+  .audience-summary {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .audience-aigp {
+    margin: var(--s-5) 0 0;
+    max-width: var(--prose);
+    color: var(--ink-2);
+  }
+
+  .audience-aigp a {
+    color: var(--ink);
+  }
+
   /* The key in one row on wide screens (three kinds, then three states), two
      rows of three on tablets, a list on phones. Each sample repeats its node
      treatment from PathNode.astro, so the legend distinguishes by form. */

@@ -12,10 +12,12 @@ knowledge**. It is written for practitioners who build governance for AI systems
 code, agent registries, eval gates, runtime guardrails, machine-readable evidence) and who measure
 their work by realised risk reduction and audit-ready evidence, not by framework coverage.
 
-It is **version 0.4.0**: the Thesis restated as affirmations over a peer-reviewed revision of the
-first public draft, still deliberately incomplete and open to contributions. The Body of Knowledge,
-website, datasets and project materials are authored by **Jorge García Aibar**. The Thesis is the sole
-exception: it is co-authored by **Jorge García Aibar and Aurélie Pols** and is open for signatures.
+It is **version 0.5.0**: 24 chapters, 13 of them new (11 to 23, from AI defined for governance through
+the programme, the lifecycle and the law to governing agents), 33 patterns with their own pages, an
+open-data API and a browser toolkit, still deliberately incomplete and open to contributions. The
+Body of Knowledge, website, datasets and project materials are authored by **Jorge García Aibar**.
+The Thesis is the sole exception: it is co-authored by **Jorge García Aibar and Aurélie Pols** and
+is open for signatures.
 
 **Home:** https://aigovernanceengineer.com (the Thesis at `/thesis`, Body of Knowledge at `/bok`).
 Source repository: `github.com/losanchos5/aige`.
@@ -26,7 +28,7 @@ Source repository: `github.com/losanchos5/aige`.
   AI governance, eight values, six principles, what AI governance engineers build).
 - **[bok/01-definition.md](bok/01-definition.md)**: what the discipline is, and the eight neighbours
   it is not.
-- **[OUTLINE.md](OUTLINE.md)**: the full table of contents (chapters 00–10) with a brief for each.
+- **[OUTLINE.md](OUTLINE.md)**: the full table of contents with a brief for each chapter.
 
 ## Structure
 
@@ -42,12 +44,14 @@ aige/
 │   ├── 02-why-now.md          The five problems with the evidence; market, regulatory and agent signals
 │   ├── 03-values-principles.md  The eight values and six principles, expanded
 │   ├── 04-the-stack.md        The five-layer reference architecture
-│   ├── 05-patterns.md         Pattern catalogue (CSIRO template), 14 patterns
+│   ├── 05-patterns.md         Pattern catalogue (CSIRO template): one summary per pattern
+│   ├── patterns/              One file per pattern (bok/patterns/<slug>.md, /patterns/<slug>)
 │   ├── 06-the-role.md         The AI governance engineer, by workflow, skills and market
 │   ├── 07-maturity-model.md   Five levels from Documented to Continuous
 │   ├── 08-regulatory-map.md   Obligation → artefact → layer reverse index
 │   ├── 09-glossary.md         Canonical definitions, alphabetical
 │   ├── 10-reading-list.md     Annotated bibliography
+│   ├── 11-…23-*.md            AI defined, the programme, the lifecycle, the law, governing agents
 │   ├── CONTRIBUTORS.md        Authorship, contributors, SIGNATORIES
 │   └── CHANGELOG.md           Version history
 ├── sources/
@@ -56,7 +60,7 @@ aige/
     └── build_pdf.py       Assembles the Markdown into dist/site-preview.html (PDF export optional)
 ```
 
-Chapters 00–10 are drafted; contributions that extend the catalogue, mappings and arguments are
+Chapters 00–23 are drafted; contributions that extend the catalogue, mappings and arguments are
 welcome and credited.
 
 ## The five-layer stack
@@ -88,12 +92,13 @@ record the retrieval date and source commit when using them in research.
 Cite the parent work, name the dataset you used, and include its URL and retrieval date:
 
 > García Aibar, J. *AI Governance Engineering: The Thesis & Body of Knowledge*
-> (v0.4.0). https://doi.org/10.5281/zenodo.22857086. Dataset: Framework crosswalk / Obligation
+> (v0.5.0). https://doi.org/10.5281/zenodo.22857084. Dataset: Framework crosswalk / Obligation
 > mappings. [Dataset URL; retrieval date; source commit].
 
-The DOI identifies the archived parent release, not a separately deposited dataset. For a fixed
-reference use the version DOI above; the [concept DOI](https://doi.org/10.5281/zenodo.22857084)
-resolves to the latest archived release. See [CITATION.cff](CITATION.cff) for citation metadata.
+The DOI identifies the archived parent release, not a separately deposited dataset. The DOI above
+is the [concept DOI](https://doi.org/10.5281/zenodo.22857084), which resolves to the latest archived
+release; for a fixed reference use the version DOI on the Zenodo record of the release you used. See
+[CITATION.cff](CITATION.cff) for citation metadata.
 Reuse is covered by this repository’s [licence](LICENSE).
 
 ## How to contribute

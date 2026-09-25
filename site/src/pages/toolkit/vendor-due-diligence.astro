@@ -1,0 +1,452 @@
+---
+// /toolkit/vendor-due-diligence: a tiered, evidence-first due-diligence
+// request for an AI vendor or model. The reader describes the supply (type, use
+// tier, data sensitivity, autonomy and tool access, jurisdiction, sector); the
+// client module (public/toolkit/vendor-due-diligence.js) sets the tier by the
+// stated rule, selects the artefact requests and the contract clauses, and
+// exports a Markdown request, a CSV and, once the answers are in, a
+// vendor-due-diligence-response.v1 record. The full question bank, the tier
+// rule and the clause checklist are rendered here, so the page works as a
+// worksheet without JavaScript.
+import ToolShell from '../../components/toolkit/ToolShell.astro';
+import ToolTerms from '../../components/toolkit/ToolTerms.astro';
+import ToolSourceList from '../../components/toolkit/ToolSourceList.astro';
+import type { ToolSource } from '../../components/toolkit/ToolSourceList.astro';
+import { toolById, toolNotice } from '../../data/toolkit';
+import {
+  vendorDdData,
+  supplyTypes,
+  useTiers,
+  dataClasses,
+  autonomyLevels,
+  jurisdictions,
+  sectors,
+  providerRoles,
+  aiActCategories,
+  decisions,
+  vendorTierRule,
+} from '../../data/tool-vendor-dd';
+import { site } from '../../data/site';
+import '../../components/toolkit/tool-docs.css';
+
+const tool = toolById('vendor-due-diligence');
+const data = vendorDdData(site.url, toolNotice, site.license);
+const areas = [...new Set(data.questions.map((q) => q.area))];
+const scoreName = ['', 'low', 'medium', 'high', 'critical'];
+
+const radioGroups = [
+  { id: 'vdd-supply', name: 's', legend: 'What are you buying?', hint: 'The route decides what you can test and what you must collect.', options: supplyTypes },
+  { id: 'vdd-use', name: 'u', legend: 'What does the use decide?', hint: 'The use, not the product, sets the obligations.', options: useTiers },
+  { id: 'vdd-data', name: 'dc', legend: 'The most sensitive data the supplier will see', hint: 'Prompts, files, logs and anything a connector can read.', options: dataClasses },
+  { id: 'vdd-autonomy', name: 'a', legend: 'Autonomy and tool access', hint: 'What the product or its agent can do in your systems.', options: autonomyLevels },
+] as const;
+
+const sources: ToolSource[] = [
+  {
+    text: 'Vendor / Model Due-Diligence Gate (pattern: gate procured and API-only AI on a structured assessment; record what you can and cannot verify; re-open on renewal or material change). AI Governance Engineering Body of Knowledge. 2026-09-24.',
+    url: `${site.url}/patterns/vendor-model-due-diligence-gate`,
+    verified: 'primary',
+  },
+  {
+    text: '15. Governing deployment: "Build, buy or adapt" (three routes, three evidence burdens), "Vendor contracts and licence terms" and "Monitoring third parties while you run". AI Governance Engineering Body of Knowledge. 2026-09-24.',
+    url: `${site.url}/bok/governing-deployment#vendor-contracts-and-licence-terms`,
+    verified: 'primary',
+  },
+  {
+    text: 'Contracts and licences: the AI vendor contract clause checklist (red flag, fallback, evidence) and the licence families of open-weight models; an engineering checklist, not legal advice. AI Governance Engineer. 2026-09-24.',
+    url: `${site.url}/resources/contracts`,
+    verified: 'primary',
+  },
+  {
+    text: 'Topic crosswalk v2 (25 topics across the EU AI Act, ISO/IEC, NIST AI RMF, CSA AICM and other instruments; the CSA AICM control ids each topic maps to). AI Governance Engineer. 2026-09-24.',
+    url: `${site.url}/resources/crosswalk`,
+    verified: 'primary',
+  },
+  {
+    text: 'CSA AI Controls Matrix (AICM) v1.1 (control objectives across 18 domains; cited here by control id and short title only). Cloud Security Alliance. 2026-06-22.',
+    url: 'https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1',
+    verified: 'secondary',
+  },
+  {
+    text: 'Vendor due-diligence response, JSON Schema v1 (supplier answers keyed to the obligations they help evidence, plus the buyer\'s assessment and reassessment date). AI Governance Engineer templates and schemas library. 2026-09-24.',
+    url: `${site.url}/schemas/vendor-due-diligence-response.v1.json`,
+    verified: 'primary',
+  },
+];
+---
+
+<ToolShell
+  tool={tool}
+  heading="Ask for artefacts, not assurances."
+  description="Build a tiered AI vendor due-diligence request: the artefacts to ask for, mapped to crosswalk topics and CSA AICM ids, and the contract clauses to check."
+  lede="Describe what you are buying and what it will touch. The tool sets a risk tier, then asks the supplier for 20 to 38 artefacts (model card, AIBOM, eval and red-team reports, incident SLA, training-content summary, copyright policy, sub-processors), each mapped to the crosswalk, plus the contract clauses to check."
+  image="/og/bok-governing-deployment.png"
+  data={data}
+>
+  <form class="tool-form" id="vdd-form" data-vdd-form novalidate>
+    <div class="tool-errors" id="vdd-errors" data-vdd-errors tabindex="-1" role="group" aria-labelledby="vdd-errors-title" hidden>
+      <h2 id="vdd-errors-title">Check these first</h2>
+      <ul></ul>
+    </div>
+
+    <fieldset class="tool-fieldset" id="vdd-who" aria-describedby="vdd-who-hint">
+      <legend class="tool-legend">Supplier and product</legend>
+      <p class="tool-hint" id="vdd-who-hint">These names appear in the request, the file names and the link you copy.</p>
+      <div class="tk-fields">
+        <div class="tool-field" id="vdd-vn-field" data-field data-describes="vdd-vn">
+          <label for="vdd-vn">Supplier (required)</label>
+          <input class="tool-input" id="vdd-vn" name="vn" type="text" maxlength="120" autocomplete="off" />
+          <p class="tool-error" id="vdd-vn-error" hidden></p>
+        </div>
+        <div class="tool-field" id="vdd-pn-field" data-field data-describes="vdd-pn">
+          <label for="vdd-pn">Product or model (required)</label>
+          <input class="tool-input" id="vdd-pn" name="pn" type="text" maxlength="120" autocomplete="off" />
+          <p class="tool-error" id="vdd-pn-error" hidden></p>
+        </div>
+        <div class="tool-field">
+          <label for="vdd-pv">Version</label>
+          <input class="tool-input" id="vdd-pv" name="pv" type="text" maxlength="60" autocomplete="off" />
+        </div>
+        <div class="tool-field">
+          <label for="vdd-rq">Requesting team</label>
+          <input class="tool-input" id="vdd-rq" name="rq" type="text" maxlength="120" autocomplete="off" />
+        </div>
+      </div>
+    </fieldset>
+
+    {
+      radioGroups.map((group) => (
+        <fieldset class="tool-fieldset" id={group.id} data-field data-hint-id={`${group.id}-hint`} aria-describedby={`${group.id}-hint`}>
+          <legend class="tool-legend">{group.legend}</legend>
+          <p class="tool-hint" id={`${group.id}-hint`}>{group.hint}</p>
+          <p class="tool-error" id={`${group.id}-error`} hidden />
+          <ul class="tool-options">
+            {group.options.map((option) => (
+              <li class="tool-option">
+                <input type="radio" id={`${group.id}-${option.id}`} name={group.name} value={option.id} />
+                <label for={`${group.id}-${option.id}`}>
+                  {'score' in option && option.score && (
+                    <span class="tool-option-level">reads {scoreName[option.score]}</span>
+                  )}
+                  <span class="tool-option-text">{option.label}</span>
+                </label>
+              </li>
+            ))}
+          </ul>
+        </fieldset>
+      ))
+    }
+
+    <fieldset class="tool-fieldset" id="vdd-juris" data-field data-hint-id="vdd-juris-hint" aria-describedby="vdd-juris-hint">
+      <legend class="tool-legend">Where it will be used, and your sector</legend>
+      <p class="tool-hint" id="vdd-juris-hint">Tick every jurisdiction of use; the sector flags add the questions their regimes make relevant.</p>
+      <p class="tool-error" id="vdd-juris-error" hidden></p>
+      <ul class="tool-options">
+        {
+          jurisdictions.map((option) => (
+            <li class="tool-option">
+              <input type="checkbox" id={`vdd-j-${option.id}`} name="j" value={option.id} />
+              <label for={`vdd-j-${option.id}`}>
+                <span class="tool-option-text">{option.label}</span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="tk-group-label">If any of these is true</p>
+      <ul class="tool-options">
+        {
+          sectors.map((option) => (
+            <li class="tool-option">
+              <input type="checkbox" id={`vdd-sc-${option.id}`} name="sc" value={option.id} />
+              <label for={`vdd-sc-${option.id}`}>
+                <span class="tool-option-text">{option.label}</span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </fieldset>
+
+    <div class="tool-buttons" data-tool-js data-print-hide hidden>
+      <button type="submit" class="btn btn-primary">Build the request</button>
+      <button type="button" class="btn btn-secondary" data-vdd-reset>Clear</button>
+    </div>
+  </form>
+
+  <section class="tool-result tool-block" id="vdd-result" data-vdd-result aria-labelledby="vdd-result-title" hidden>
+    <h2 id="vdd-result-title" tabindex="-1">Your request</h2>
+    <div class="tk-summary" data-vdd-tier></div>
+
+    <h3>Artefacts to request</h3>
+    <p class="tool-hint">
+      Tick a request once the artefact itself has arrived; what stays unticked goes to the record's
+      open questions. Unverifiable answers are recorded, not assumed.
+    </p>
+    <div class="tk-summary" data-vdd-questions></div>
+
+    <h3>Contract clauses to check</h3>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>Clause checklist from the contracts page</caption>
+        <thead>
+          <tr>
+            <th scope="col">Clause</th>
+            <th scope="col">Red flag</th>
+            <th scope="col">Fallback</th>
+            <th scope="col">Evidence to keep</th>
+          </tr>
+        </thead>
+        <tbody data-vdd-clauses></tbody>
+      </table>
+    </div>
+    <div data-vdd-licences hidden>
+      <h3>Licence checks for open weights</h3>
+      <ul class="tk-list"></ul>
+    </div>
+
+    <div class="tool-actions" data-print-hide>
+      <button type="button" class="btn btn-secondary" data-action="md">Download request (Markdown)</button>
+      <button type="button" class="btn btn-secondary" data-action="csv">Download requests and clauses (CSV)</button>
+      <button type="button" class="btn btn-secondary" data-action="copy">Copy link</button>
+      <button type="button" class="btn btn-secondary" data-action="print">Print</button>
+    </div>
+    <p class="tool-status" role="status" data-vdd-status></p>
+
+    <form class="tool-form" id="vdd-response" data-vdd-response data-print-hide novalidate>
+      <h3 id="vdd-response-title">Record the answers</h3>
+      <p class="tool-hint">
+        When the supplier replies, record the answers the response schema requires and your
+        decision, then download a record that validates against
+        <a href="/resources/templates#schema-vendor-due-diligence-response">vendor-due-diligence-response.v1</a>.
+      </p>
+      <div class="tool-errors" id="vdd-response-errors" data-vdd-response-errors tabindex="-1" role="group" aria-labelledby="vdd-response-errors-title" hidden>
+        <h4 id="vdd-response-errors-title">The record still needs</h4>
+        <ul></ul>
+      </div>
+      <fieldset class="tool-fieldset" aria-labelledby="vdd-answers-legend">
+        <legend class="tool-legend" id="vdd-answers-legend">The supplier's answers</legend>
+        <div class="tk-fields">
+          <div class="tool-field" id="vdd-xd-field" data-field data-describes="vdd-xd">
+            <label for="vdd-xd">Answers received on</label>
+            <input class="tool-input" id="vdd-xd" name="xd" type="date" />
+            <p class="tool-error" id="vdd-xd-error" hidden></p>
+          </div>
+          <div class="tool-field" id="vdd-xp-field" data-field data-describes="vdd-xp">
+            <label for="vdd-xp">Supplier's role under the EU AI Act</label>
+            <select class="tool-select" id="vdd-xp" name="xp">
+              <option value="">Choose</option>
+              {providerRoles.map((r) => <option value={r.id}>{r.label}</option>)}
+            </select>
+            <p class="tool-error" id="vdd-xp-error" hidden></p>
+          </div>
+          <div class="tool-field">
+            <label for="vdd-xc">Supplier's own classification</label>
+            <select class="tool-select" id="vdd-xc" name="xc">
+              <option value="">Not stated</option>
+              {aiActCategories.map((c) => <option value={c.id}>{c.label}</option>)}
+            </select>
+          </div>
+          <div class="tool-field" id="vdd-xt-field" data-field data-describes="vdd-xt">
+            <label for="vdd-xt">Our data trains their models</label>
+            <select class="tool-select" id="vdd-xt" name="xt">
+              <option value="">Choose</option>
+              <option value="no">No</option>
+              <option value="yes">Yes</option>
+            </select>
+            <p class="tool-error" id="vdd-xt-error" hidden></p>
+          </div>
+          <div class="tool-field">
+            <label for="vdd-xo">We can opt out</label>
+            <select class="tool-select" id="vdd-xo" name="xo">
+              <option value="">Not stated</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+          <div class="tool-field" id="vdd-xh-field" data-field data-describes="vdd-xh">
+            <label for="vdd-xh">Incident notice window (hours)</label>
+            <input class="tool-input" id="vdd-xh" name="xh" type="number" min="0" max="99999" step="1" inputmode="numeric" />
+            <p class="tool-error" id="vdd-xh-error" hidden></p>
+          </div>
+          <div class="tool-field" id="vdd-xn-field" data-field data-describes="vdd-xn">
+            <label for="vdd-xn">Change notice (days)</label>
+            <input class="tool-input" id="vdd-xn" name="xn" type="number" min="0" max="99999" step="1" inputmode="numeric" />
+            <p class="tool-error" id="vdd-xn-error" hidden></p>
+          </div>
+          <div class="tool-field">
+            <label for="vdd-xa">We may audit or receive audit reports</label>
+            <select class="tool-select" id="vdd-xa" name="xa">
+              <option value="">Not stated</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset class="tool-fieldset" aria-labelledby="vdd-assess-legend">
+        <legend class="tool-legend" id="vdd-assess-legend">Your assessment</legend>
+        <div class="tk-fields">
+          <div class="tool-field" id="vdd-xe-field" data-field data-describes="vdd-xe">
+            <label for="vdd-xe">Decision</label>
+            <select class="tool-select" id="vdd-xe" name="xe">
+              <option value="">Choose</option>
+              {decisions.map((d) => <option value={d.id}>{d.label}</option>)}
+            </select>
+            <p class="tool-error" id="vdd-xe-error" hidden></p>
+          </div>
+          <div class="tool-field" id="vdd-xv-field" data-field data-describes="vdd-xv">
+            <label for="vdd-xv">Reviewing role</label>
+            <input class="tool-input" id="vdd-xv" name="xv" type="text" maxlength="120" autocomplete="off" />
+            <p class="tool-error" id="vdd-xv-error" hidden></p>
+          </div>
+          <div class="tool-field" id="vdd-xw-field" data-field data-describes="vdd-xw">
+            <label for="vdd-xw">Reviewed on</label>
+            <input class="tool-input" id="vdd-xw" name="xw" type="date" />
+            <p class="tool-error" id="vdd-xw-error" hidden></p>
+          </div>
+          <div class="tool-field" id="vdd-xb-field" data-field data-describes="vdd-xb" data-hint-id="vdd-xb-hint">
+            <label for="vdd-xb">Reassess by</label>
+            <input class="tool-input" id="vdd-xb" name="xb" type="date" aria-describedby="vdd-xb-hint" />
+            <p class="tool-hint" id="vdd-xb-hint">The renewal date or earlier; the gate also re-opens on every material change notice.</p>
+            <p class="tool-error" id="vdd-xb-error" hidden></p>
+          </div>
+        </div>
+        <div class="tool-field">
+          <label for="vdd-xk">Conditions (one per line)</label>
+          <textarea class="tool-input" id="vdd-xk" name="xk" maxlength="2000"></textarea>
+        </div>
+      </fieldset>
+      <div class="tool-buttons">
+        <button type="submit" class="btn btn-primary">Download response record (JSON)</button>
+      </div>
+    </form>
+  </section>
+
+  <div class="tool-field tk-import tool-block" data-tool-js data-print-hide hidden>
+    <label for="vdd-import">Reopen a response record made by this tool</label>
+    <input class="tool-input" id="vdd-import" type="file" accept=".json,application/json" data-vdd-import aria-describedby="vdd-import-hint" />
+    <p class="tool-hint" id="vdd-import-hint">Read in this browser only; the inputs and answers are restored and the request recomputed.</p>
+    <p class="tool-error" data-vdd-import-error hidden></p>
+  </div>
+
+  <Fragment slot="guide">
+    <h2 id="vdd-how">How the request is built</h2>
+    <p>
+      When you do not own the model, the due-diligence gate is what replaces the red team you
+      cannot run <a href="#src-1" class="cite">[1]</a>. The less of the model you own, the more of
+      your control budget moves from testing it to bounding it and evidencing the supplier
+      <a href="#src-2" class="cite">[2]</a>. So every request asks for an artefact you can file
+      against the registry entry, and whatever the supplier cannot provide is recorded as
+      unverified and compensated by bounding the integration: least-privilege scopes, boundary
+      evals and tighter observation of the traffic you control.
+    </p>
+
+    <h3 id="vdd-tier">The tier rule</h3>
+    <p>{vendorTierRule}</p>
+    <div class="tool-table-wrap">
+      <table class="tool-table">
+        <caption>What each answer reads as</caption>
+        <thead>
+          <tr>
+            <th scope="col">Dimension</th>
+            <th scope="col">Answer</th>
+            <th scope="col">Reads</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            [
+              ['Use', useTiers],
+              ['Data', dataClasses],
+              ['Autonomy and tool access', autonomyLevels],
+            ].flatMap(([dimension, options]) =>
+              (options as typeof useTiers).map((option) => (
+                <tr>
+                  <th scope="row">{dimension as string}</th>
+                  <td data-label="Answer">{option.label}</td>
+                  <td data-label="Reads">{scoreName[option.score ?? 1]}</td>
+                </tr>
+              )),
+            )
+          }
+          <tr>
+            <th scope="row">Regulatory context</th>
+            <td data-label="Answer">A financial entity under DORA, or an essential or important entity under NIS2</td>
+            <td data-label="Reads">medium</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="vdd-bank">The question bank</h3>
+    <p>
+      {data.questions.length} requests in this site's own words. Each one is cross-referenced to
+      topics of the <a href="/resources/crosswalk">crosswalk</a>
+      <a href="#src-4" class="cite">[4]</a> and to CSA AICM control ids
+      <a href="#src-5" class="cite">[5]</a> only, so a supplier can answer from the control evidence
+      it already keeps. The tool asks all of them, or the subset the tier and the facts call for;
+      without JavaScript, use the list as a worksheet and skip what clearly does not apply.
+    </p>
+    {
+      areas.map((area) => (
+        <>
+          <h4>{area}</h4>
+          <ul class="tk-cards">
+            {data.questions
+              .filter((q) => q.area === area)
+              .map((q) => (
+                <li class="tk-card" id={`vdd-q-${q.id}`}>
+                  <p>
+                    <strong>{q.id}.</strong> {q.ask}
+                  </p>
+                  <p class="tool-hint">Artefact: {q.artefact}.</p>
+                  <p class="tk-refs">
+                    Crosswalk:{' '}
+                    {q.topics.map((t, i) => (
+                      <>
+                        {i > 0 && '; '}
+                        <a href={`/resources/crosswalk#topic-${t.id}`}>{t.name}</a>
+                      </>
+                    ))}
+                    {q.aicm.length > 0 && ` · CSA AICM: ${q.aicm.map((c) => `${c.id} ${c.title}`).join('; ')}`}
+                  </p>
+                </li>
+              ))}
+          </ul>
+        </>
+      ))
+    }
+
+    <h3 id="vdd-clauses">The contract clauses</h3>
+    <p>
+      The clause checklist comes from the <a href="/resources/contracts">contracts page</a>
+      <a href="#src-3" class="cite">[3]</a>: the tool lists the clauses the tier and the facts make
+      relevant, each with its red flag, a fallback position and the evidence to keep. A clause
+      that matters at runtime must become a check (the no-training setting read back, the version
+      pin held in the registry); a clause nothing checks is a hope <a href="#src-2" class="cite">[2]</a>.
+    </p>
+
+    <h3 id="vdd-record">The response record</h3>
+    <p>
+      Once the answers are in, the tool writes a record for the
+      <a href="/resources/templates#schema-vendor-due-diligence-response">vendor-due-diligence-response.v1</a>
+      schema <a href="#src-6" class="cite">[6]</a>: the supplier's answers, the requests still open,
+      and your decision with its conditions, reviewer and reassessment date. Re-open the gate on
+      renewal and on every material change notice.
+    </p>
+
+    <h2 id="vdd-not">What this is not</h2>
+    <p>
+      Not legal advice and not a conformity claim. The questions are this site's, not a copy of any
+      published questionnaire; the crosswalk and AICM mappings are illustrative, not a claim of
+      conformity, and the contract checklist names what to look for, while the legal reading of a
+      contract stays with counsel. The tier rule is the tool's own: write your thresholds into your
+      <a href="/bok/governance-program#third-party-ai-policy">third-party AI policy</a>.
+    </p>
+
+    <ToolTerms id="vdd-terms" terms={['AIBOM', 'Model card', 'Sub-processor', 'Serious incident', 'Deployer', 'Provider']} />
+  </Fragment>
+
+  <ToolSourceList slot="sources" sources={sources} />
+</ToolShell>

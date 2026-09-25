@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/eval-result.v1.json",
+  "title": "Eval result",
+  "description": "The structured result of one eval suite run against one system version, filed against its registry entry. Exactly the shape published in chapter 05 (suite_id, model_version, score, threshold, result, timestamp), with optional fields for direction, failure mode and provenance.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 15",
+    "EU AI Act Art. 9(8)",
+    "EU AI Act Art. 55",
+    "ISO/IEC 42001 A.6",
+    "NIST AI RMF MEASURE 2.3",
+    "NIST AI RMF MEASURE 2.5"
+  ],
+  "x-layer": [
+    3
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-eval-gate-in-ci",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-adversarial-red-team-suite",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-fairness-eval-suite"
+  ],
+  "x-lifecycle-stage": "test",
+  "type": "object",
+  "required": [
+    "suite_id",
+    "model_version",
+    "score",
+    "threshold",
+    "result",
+    "timestamp"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/eval-result.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "suite_id": {
+      "type": "string",
+      "description": "Versioned id of the eval suite (for example \"injection-resistance.v4\").",
+      "minLength": 1,
+      "x-evidences": [
+        "EU AI Act Art. 15"
+      ]
+    },
+    "model_version": {
+      "type": "string",
+      "description": "The system or model tested, as \"id@version\" from the registry.",
+      "pattern": "^[^@\\s]+@[^@\\s]+$"
+    },
+    "score": {
+      "type": "number",
+      "description": "The measured score."
+    },
+    "threshold": {
+      "type": "number",
+      "description": "The threshold the score is compared with, traced to a failure mode or obligation.",
+      "x-evidences": [
+        "EU AI Act Art. 9(8)"
+      ]
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "fail"
+      ],
+      "description": "Pass or fail against the threshold. A fail blocks the pipeline."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the run finished (RFC 3339)."
+    },
+    "direction": {
+      "type": "string",
+      "enum": [
+        "higher_is_better",
+        "lower_is_better"
+      ],
+      "description": "How the score compares with the threshold."
+    },
+    "metric": {
+      "type": "string",
+      "description": "Name of the metric the score measures."
+    },
+    "failure_mode": {
+      "type": "string",
+      "description": "The failure mode or harm the suite tests for.",
+      "x-evidences": [
+        "NIST AI RMF MEASURE 2.6"
+      ]
+    },
+    "obligation": {
+      "type": "string",
+      "description": "The obligation the threshold traces to, if any (for example \"EU AI Act Art. 15\")."
+    },
+    "sample_size": {
+      "type": "integer",
+      "description": "Number of test cases in the run.",
+      "minimum": 0
+    },
+    "run_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "Link to the run log."
+    },
+    "input_hash": {
+      "type": "string",
+      "description": "Digest of the suite and dataset snapshot used.",
+      "pattern": "^[a-z0-9-]+:.+$"
+    },
+    "signature": {
+      "type": "string",
+      "description": "Detached signature over the record, prefixed with the algorithm (for example \"ed25519:<base64>\"). Makes the record tamper-evident in the evidence store.",
+      "pattern": "^[a-z0-9-]+:.+$"
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,90 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/policy-card.v1.json",
+  "card_id": "pc-refunds",
+  "version": "v4",
+  "title": "Refunds issued by customer-service agents",
+  "owner": "payments-risk",
+  "applies_to": [
+    "csa-01"
+  ],
+  "source_policy": "ai-policy.yaml#rules/agents-bounded-spend",
+  "rules": [
+    {
+      "rule_id": "refunds.per-refund-limit.v3",
+      "description": "An agent may not issue a single refund above 50 EUR.",
+      "effect": "deny",
+      "condition": "refund.amount > 50 EUR",
+      "failure_mode": "agent moves money beyond its mandate",
+      "enforcement_points": [
+        "runtime",
+        "pre_merge"
+      ],
+      "implementation": {
+        "engine": "opa_rego",
+        "module": "policies/refunds.rego",
+        "entrypoint": "data.refunds.deny"
+      },
+      "maps_to": [
+        "EU AI Act Art. 14",
+        "OWASP Agentic ASI02"
+      ]
+    },
+    {
+      "rule_id": "refunds.per-order-cap.v4",
+      "description": "Refunds on one order may not add up to more than 50 EUR within 24 hours without approval.",
+      "effect": "require_approval",
+      "condition": "sum(refunds on order in 24h) + refund.amount > 50 EUR",
+      "failure_mode": "limit evasion by splitting a refund",
+      "enforcement_points": [
+        "runtime"
+      ],
+      "implementation": {
+        "engine": "opa_rego",
+        "module": "policies/refunds.rego",
+        "entrypoint": "data.refunds.require_approval"
+      },
+      "maps_to": [
+        "EU AI Act Art. 14"
+      ]
+    },
+    {
+      "rule_id": "refunds.business-hours.v1",
+      "description": "Refunds are issued only in business hours, when a team lead is on duty.",
+      "effect": "deny",
+      "condition": "request time outside 08:00 to 20:00 local",
+      "failure_mode": "unsupervised action",
+      "enforcement_points": [
+        "runtime"
+      ],
+      "implementation": {
+        "engine": "opa_rego",
+        "module": "policies/refunds.rego",
+        "entrypoint": "data.refunds.deny"
+      }
+    }
+  ],
+  "exceptions": "Payments-risk may grant a time-limited exception, recorded as a signed verdict override with an expiry.",
+  "effective_from": "2026-09-21",
+  "review_by": "2027-03-21",
+  "approved": {
+    "role": "payments-risk-lead",
+    "decision": "approve",
+    "timestamp": "2026-09-21T09:00:00Z"
+  },
+  "sample_verdicts": [
+    {
+      "rule_id": "refunds.per-order-cap.v4",
+      "decision": "require_approval",
+      "input_hash": "sha256:0c1f5e8a2b7d4c9e6f3a1b8d5c2e9f7a4b1d8c5e2f9a6b3d0c7e4f1a8b5c2d9e",
+      "timestamp": "2026-09-22T10:41:07Z",
+      "subject": "csa-01@2026-09-22",
+      "enforcement_point": "runtime"
+    },
+    {
+      "rule_id": "refunds.per-refund-limit.v3",
+      "decision": "allow",
+      "input_hash": "sha256:7a2e9c4b1f8d5a3c0e7b4d1a8f5c2e9b6d3a0f7c4e1b8d5a2f9c6e3b0d7a4f1c",
+      "timestamp": "2026-09-22T10:43:55Z"
+    }
+  ]
+}

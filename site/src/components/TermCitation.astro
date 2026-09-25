@@ -1,0 +1,132 @@
+---
+// TermCitation: the glossary-term variant of Citation ("Cite this chapter"): a
+// "Cite this term" disclosure with an APA-ish reference and a BibTeX entry that
+// point at the term's own page. The copy buttons are wired by ui-doc.js
+// (CSP-safe, no inline JS) and are harmless no-ops without it.
+import { site } from '../data/site';
+
+interface Props {
+  term: string;
+  /** Root-relative term page, e.g. /glossary/agent-registry. */
+  path: string;
+}
+
+const { term, path } = Astro.props;
+const url = `${site.url}${path}`;
+const reference = `García Aibar, J. (2026). ${term}. In AI Governance Engineering: The Thesis & Body of Knowledge (v${site.bokVersion}), Glossary. https://doi.org/${site.doi}. ${url}. ${site.license}`;
+const key = `aige2026${path.replace('/glossary/', '').replace(/[^a-z0-9]/g, '')}`;
+// The literal backslash escapes the ampersand for BibTeX.
+const bibtex = `@misc{${key},
+  author  = {${site.authors.join(' and ')}},
+  title   = {{${term}}},
+  note    = {Glossary, AI Governance Engineering: The Thesis \\& Body of Knowledge, version ${site.bokVersion}},
+  year    = {2026},
+  doi     = {${site.doi}},
+  url     = {${url}}
+}`;
+---
+
+<details class="tc-box">
+  <summary>Cite this term</summary>
+  <div class="tc-body">
+    <p class="tc-apa">
+      García Aibar, J. (2026). <em>{term}</em>. In <em>AI Governance Engineering: The Thesis &amp;
+      Body of Knowledge</em> (v{site.bokVersion}), Glossary.{' '}
+      <a href={`https://doi.org/${site.doi}`}>https://doi.org/{site.doi}</a>. {url}. {site.license}
+    </p>
+    <button type="button" class="tc-copy" data-copy-cite={reference}>Copy</button>
+    <p class="tc-label">BibTeX</p>
+    <pre class="tc-bibtex"><code>{bibtex}</code></pre>
+    <button type="button" class="tc-copy" data-copy-cite={bibtex}>Copy BibTeX</button>
+  </div>
+</details>
+
+<style>
+  .tc-box {
+    min-width: 0;
+    max-width: 100%;
+    font-size: 0.9375rem;
+  }
+
+  .tc-box > summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    list-style: none;
+  }
+
+  .tc-box > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .tc-box > summary::before {
+    content: '+ ';
+  }
+
+  .tc-box[open] > summary::before {
+    content: '– ';
+  }
+
+  .tc-box > summary:hover {
+    color: var(--ink);
+  }
+
+  .tc-body {
+    margin-top: var(--s-3);
+    padding: var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+  }
+
+  .tc-apa {
+    margin: 0;
+    color: var(--ink-2);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .tc-label {
+    margin: var(--s-4) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .tc-bibtex {
+    max-width: 100%;
+    margin: var(--s-2) 0 0;
+    padding: var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .tc-bibtex code {
+    font-family: inherit;
+  }
+
+  .tc-copy {
+    margin-top: var(--s-3);
+    padding: var(--s-1) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    color: var(--ink);
+    font: inherit;
+    font-size: var(--fs-small);
+    cursor: pointer;
+  }
+
+  .tc-copy:hover {
+    border-color: var(--ink-2);
+  }
+</style>

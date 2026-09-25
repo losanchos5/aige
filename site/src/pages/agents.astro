@@ -1,0 +1,551 @@
+---
+/**
+ * /agents, the practitioner landing for governing AI agents. A short framing,
+ * the agent control plane as a list (each item links to its section in chapter
+ * 23), the agent patterns, the ten OWASP agentic threats with the control and
+ * pattern for each, the cross-references into chapters 04, 08 and 18, the
+ * runtime tool categories (read from src/data/stack.ts) and the harms and
+ * incident material. The reasoning and every source live in chapter 23
+ * (bok/23-governing-agents.md); this page only routes the reader there.
+ */
+import Marketing from '../layouts/Marketing.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import RegisterList from '../components/RegisterList.astro';
+import ResourceCard from '../components/ResourceCard.astro';
+import Callout from '../components/Callout.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Figure from '../components/Figure.astro';
+import { getFigure } from '../data/figures';
+import controlPlaneSvg from '../figures/agent-control-plane.svg?raw';
+import { layers } from '../data/stack';
+import { slugify } from '../lib/md-parse';
+import { breadcrumbJsonLd } from '../lib/breadcrumbs';
+import '../styles/pages.css';
+import '../styles/resources.css';
+
+const chapter = '/bok/governing-agents';
+const ch = (heading: string) => `${chapter}#${slugify(heading)}`;
+// Same slugger rehype-slug uses, so the anchors always match /bok/patterns.
+const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}`)}`;
+const layer = (n: 1 | 2 | 3 | 4 | 5) => `var(--l${n})`;
+
+const properties = [
+  {
+    title: 'Delegated authority',
+    description:
+      'It acts on someone’s behalf. The question is whose authority it used, and whether that was narrower than theirs.',
+  },
+  {
+    title: 'Tools',
+    description:
+      'Its output is an effect in a system of record, not text a person reads first.',
+  },
+  {
+    title: 'Memory',
+    description:
+      'What it keeps persists across sessions, users and tasks, and one poisoned write outlives the session that made it.',
+  },
+  {
+    title: 'Autonomy',
+    description:
+      'Steps happen with no person between them, so the design has to say where a person decides and how anyone stops it.',
+  },
+];
+
+// Block w2-fig-concepts: the control plane as one figure, above the list.
+const controlPlaneFigure = getFigure('agent-control-plane')!;
+
+const controlPlane = [
+  {
+    title: 'Agent registry',
+    description:
+      'Every agent with an owner, a purpose, an autonomy level, its tools, pinned versions, stop handles and an expiry.',
+    href: ch('The agent registry'),
+    swatch: layer(2),
+  },
+  {
+    title: 'Identity issuer',
+    description:
+      'Short-lived, attested workload credentials; delegation that names the agent, never impersonation of the user.',
+    href: ch('Identity and short-lived credentials'),
+    swatch: layer(4),
+  },
+  {
+    title: 'Tool gateway and allow-list',
+    description:
+      'Deny by default: pinned tool definitions, scopes, rates and egress per tool, and admitted MCP servers only.',
+    href: ch('Tool and MCP server permissions'),
+    swatch: layer(4),
+  },
+  {
+    title: 'Runtime guardrail',
+    description:
+      'Every tool call checked before it runs, with a failure posture decided per operation class and execution budgets.',
+    href: ch('Runtime guardrails for tool calls'),
+    swatch: layer(4),
+  },
+  {
+    title: 'Human checkpoint',
+    description:
+      'Approval where the stakes or irreversibility demand it, showing the raw call and bound to its parameters.',
+    href: ch('Human checkpoints and approval design'),
+    swatch: layer(4),
+  },
+  {
+    title: 'Circuit breaker and kill switch',
+    description:
+      'Stop levels from one task to a fleet segment, drilled on a schedule and verified to hold.',
+    href: ch('Kill switch and per-agent circuit breakers'),
+    swatch: layer(4),
+  },
+  {
+    title: 'Memory controls',
+    description:
+      'Write gates, isolation per user and task, retention as code and rollback to a known-good state.',
+    href: ch('Memory and context governance'),
+    swatch: layer(4),
+  },
+  {
+    title: 'Delegation across hops',
+    description:
+      'The originating principal and every actor stay on the record, and scope narrows at each hop.',
+    href: ch('Accountability across hops'),
+    swatch: layer(4),
+  },
+  {
+    title: 'Prompt and configuration change control',
+    description:
+      'System prompts and tool descriptions versioned, reviewed, gated by evals and rolled back by hash.',
+    href: ch('Prompts as configuration under change control'),
+    swatch: layer(3),
+  },
+  {
+    title: 'Telemetry and evidence',
+    description:
+      'Traces that carry identity, tool calls, verdicts and approvals, kept as evidence and fed to incident response.',
+    href: ch('Agent incidents and telemetry'),
+    swatch: layer(5),
+  },
+];
+
+const patterns = [
+  {
+    name: 'Agent Registry',
+    description: 'The runtime-aware inventory every other control attaches to.',
+    count: 'Layer 02 · Inventory & Transparency',
+    swatch: layer(2),
+  },
+  {
+    name: 'Agent Identity & Scoped Credentials',
+    description: 'One identity per agent, with an owner, a bounded scope and an expiry.',
+    count: 'Layer 04 · Runtime Controls & Observability',
+    swatch: layer(4),
+  },
+  {
+    name: 'Human-in-the-loop Gate',
+    description: 'A designed checkpoint where the consequence justifies the latency.',
+    count: 'Layer 04 · Runtime Controls & Observability',
+    swatch: layer(4),
+  },
+  {
+    name: 'Runtime Guardrail',
+    description: 'Input, output and tool-call mediation at the enforcement point.',
+    count: 'Layer 04 · Runtime Controls & Observability',
+    swatch: layer(4),
+  },
+  {
+    name: 'Kill Switch / Circuit Breaker',
+    description: 'A tested way to stop one agent without breaking the fleet.',
+    count: 'Layer 04 · Runtime Controls & Observability',
+    swatch: layer(4),
+  },
+  {
+    name: 'Shadow-AI Discovery',
+    description: 'Finds the agents that never registered, so the registry stays true.',
+    count: 'Layer 02 · Inventory & Transparency',
+    swatch: layer(2),
+  },
+];
+
+// OWASP Top 10 for Agentic Applications 2026 (official entry names), with the
+// control and pattern chapter 23 assigns to each. Keep in step with the
+// chapter's "Threats mapped to controls" table.
+const threats = [
+  {
+    id: 'ASI01',
+    name: 'Agent Goal Hijack',
+    control: 'Instruction provenance; checkpoints before writes; trajectory evals',
+    pattern: 'Runtime Guardrail',
+  },
+  {
+    id: 'ASI02',
+    name: 'Tool Misuse and Exploitation',
+    control: 'Tool allow-list; per-tool rate, egress and budgets',
+    pattern: 'Runtime Guardrail',
+  },
+  {
+    id: 'ASI03',
+    name: 'Identity and Privilege Abuse',
+    control: 'Workload identity; short-lived delegated tokens; audience checks',
+    pattern: 'Agent Identity & Scoped Credentials',
+  },
+  {
+    id: 'ASI04',
+    name: 'Agentic Supply Chain Vulnerabilities',
+    control: 'MCP server admission; pinned tool definitions',
+    pattern: 'AIBOM',
+  },
+  {
+    id: 'ASI05',
+    name: 'Unexpected Code Execution (RCE)',
+    control: 'Sandboxed execution; deny by default',
+    pattern: 'Runtime Guardrail',
+  },
+  {
+    id: 'ASI06',
+    name: 'Memory & Context Poisoning',
+    control: 'Memory write gate; isolation; rollback',
+    pattern: 'Runtime Guardrail',
+  },
+  {
+    id: 'ASI07',
+    name: 'Insecure Inter-Agent Communication',
+    control: 'Mutual authentication; signed Agent Cards; peer allow-list',
+    pattern: 'Agent Identity & Scoped Credentials',
+  },
+  {
+    id: 'ASI08',
+    name: 'Cascading Failures',
+    control: 'Depth and fan-out limits; per-agent breakers',
+    pattern: 'Kill Switch / Circuit Breaker',
+  },
+  {
+    id: 'ASI09',
+    name: 'Human-Agent Trust Exploitation',
+    control: 'Approvals that show the raw call; oversight metrics',
+    pattern: 'Human-in-the-loop Gate',
+  },
+  {
+    id: 'ASI10',
+    name: 'Rogue Agents',
+    control: 'Registry with expiry; discovery; drilled kill switch',
+    pattern: 'Agent Registry',
+  },
+];
+
+const crossRefs = [
+  {
+    title: 'The agent-control table (chapter 08)',
+    description:
+      'TC260 Framework 3.0 Appendix 2, the OWASP agentic list and the NIST agent initiative, control by control.',
+    href: '/bok/regulatory-map#china',
+  },
+  {
+    title: 'NIST AI Agent Standards Initiative (chapter 08)',
+    description: 'Agent identity, authentication, authorisation and agent security.',
+    href: '/bok/regulatory-map#newer-nist-ai-work',
+  },
+  {
+    title: 'OWASP GenAI Security Project (chapter 08)',
+    description: 'The agentic threat list, the 2026 LLM list and the Agent Control Standard.',
+    href: '/bok/regulatory-map#owasp-genai-security-project',
+  },
+  {
+    title: 'CSA AICM and STAR for AI (chapter 08)',
+    description: 'The AI Controls Matrix and its extensions towards agents.',
+    href: '/bok/regulatory-map#csa-aicm-and-star-for-ai',
+  },
+  {
+    title: 'Frameworks written for agents (chapter 23)',
+    description: 'NIST, CSA, Singapore’s IMDA, TC260 and OWASP, with their status.',
+    href: ch('Frameworks written for agents'),
+  },
+  {
+    title: 'EU AI Act hooks for agents (chapter 23)',
+    description: 'Articles 12, 14, 15, 25, 26 and 50 and the GPAI duties, with the agent artefact for each.',
+    href: ch('EU AI Act hooks for agents'),
+  },
+  {
+    title: 'Deployer duties, Article 26 (chapter 18)',
+    description: 'Oversight by competent people, monitoring, suspension and log retention.',
+    href: '/bok/eu-ai-act#deployer-duties-article-26',
+  },
+  {
+    title: 'Designing human oversight (chapter 04)',
+    description: 'Automation bias, oversight that degrades, and how to measure it.',
+    href: '/bok/the-stack#designing-human-oversight-article-14',
+  },
+];
+
+// The runtime tool categories an agent control plane draws on, read from the
+// stack data so this page and /resources/tools never disagree.
+const AGENT_CATEGORIES = new Set([
+  'Agent-discovery tools',
+  'Guardrail frameworks',
+  'MCP / tool-call security',
+  'Kill switch / circuit breaker',
+  'Agent workload identity',
+  'Observability',
+]);
+const toolRows = layers.flatMap((l) =>
+  l.toolCategories
+    .filter((c) => AGENT_CATEGORIES.has(c.category))
+    .map((c) => ({ category: c.category, examples: c.examples, layerN: l.n })),
+);
+
+const failures = [
+  {
+    title: 'An agent acting beyond its mandate',
+    description: 'Harms atlas: operational disruption when an agent holds standing credentials broader than its task.',
+    href: '/resources/harms#harm-agent-operational-failure',
+  },
+  {
+    title: 'Prompt injection',
+    description: 'Harms atlas: security compromise through instructions hidden in content the agent reads.',
+    href: '/resources/harms#harm-prompt-injection',
+  },
+  {
+    title: 'Over-reliance',
+    description: 'Harms atlas: institutions acting on generated output without independent checks.',
+    href: '/resources/harms#harm-over-reliance',
+  },
+  {
+    title: 'The agent incident taxonomy (chapter 23)',
+    description: 'Eleven failure classes with the detection signal, the first containment and the threat IDs.',
+    href: ch('An agent incident taxonomy'),
+  },
+  {
+    title: 'AI-specific failure modes (chapter 17)',
+    description: 'Tool misuse, cascading failures and rogue behaviour inside the wider incident process.',
+    href: '/bok/incidents#ai-specific-failure-modes',
+  },
+];
+
+const description =
+  'How to govern AI agents: registry, workload identity, tool permissions, human checkpoints, runtime guardrails, kill switch, memory and delegation chains.';
+---
+
+<Marketing
+  title="Governing AI agents"
+  description={description}
+  image="/og/bok-governing-agents.png"
+  jsonLd={breadcrumbJsonLd([{ label: 'Agents' }])}
+>
+  <PageHero
+    variant="page"
+    related={{ label: 'Chapter 23 · Body of Knowledge', href: chapter }}
+    title="Govern the agent, not only the model."
+    lede="An agent acts under delegated authority: it calls tools, keeps memory and hands work to other agents. This page is the way in: the control plane that bounds an agent, the patterns that build it and the threats it has to hold against, each linked to its section of chapter 23."
+  />
+
+  <Section tone="plain" rule id="why" title="Four properties make an agent a different object.">
+    <div class="well"><RegisterList items={properties} /></div>
+    <p class="ag-note">
+      OWASP’s agentic list names the first principle <strong>least agency</strong>: avoid autonomy
+      the task does not need. The cheapest agent control is the agent you did not build.
+    </p>
+    <p class="section-foot">
+      <a class="chapter-link" href={ch('What makes an agent a governance object')}>
+        Autonomy levels and minimum controls in chapter 23 <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
+
+  <Section
+    tone="tint"
+    id="control-plane"
+    title="The agent control plane, component by component."
+    lede="Ten components sit around every agent in production. Each one leaves evidence, and each links to its section in chapter 23."
+  >
+    <div class="ag-plane">
+      <Figure
+        id="agent-control-plane"
+        title={controlPlaneFigure.title}
+        caption={controlPlaneFigure.caption}
+        description={controlPlaneFigure.description}
+      >
+        <Fragment set:html={controlPlaneSvg} />
+      </Figure>
+      <div class="well"><RegisterList items={controlPlane} /></div>
+    </div>
+    <p class="section-foot">
+      <a class="chapter-link" href="/toolkit/agent-control-profile">
+        Write down one agent’s control profile in the toolkit <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
+
+  <Section tone="plain" id="patterns" title="Six patterns that build it.">
+    <ul class="rc-grid ag-grid">
+      {
+        patterns.map((p, i) => (
+          <ResourceCard
+            title={p.name}
+            href={patternHref(p.name)}
+            description={p.description}
+            count={p.count}
+            index={String(i + 1).padStart(2, '0')}
+            swatch={p.swatch}
+          />
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section
+    tone="tint"
+    id="threats"
+    title="Ten agentic threats, and the control for each."
+    lede="The OWASP Top 10 for Agentic Applications 2026, each threat mapped to the control that contains it and the pattern that implements the control."
+  >
+    <div class="res-tablewrap">
+      <table class="res-table ag-table">
+        <caption class="visually-hidden">
+          OWASP agentic threats ASI01 to ASI10 with the control and the pattern for each
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Threat</th>
+            <th scope="col">Control</th>
+            <th scope="col">Pattern</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            threats.map((t) => (
+              <tr id={`threat-${t.id.toLowerCase()}`}>
+                <td class="c-name" data-label="Threat">
+                  <span class="ag-id">{t.id}</span> {t.name}
+                </td>
+                <td class="c-summary" data-label="Control">{t.control}</td>
+                <td data-label="Pattern">
+                  <a href={patternHref(t.pattern)}>{t.pattern}</a>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="ag-callout">
+      <Callout kind="note" title="Illustrative, not a claim of conformity">
+        <p>The mappings are the book’s reading of the threats, reviewed as of 2026-09-24. The
+        full table in chapter 23 adds the related OWASP LLM 2026 entries, example MITRE ATLAS
+        techniques and the stack layer, with sources.</p>
+      </Callout>
+    </div>
+    <p class="section-foot">
+      <a class="chapter-link" href={ch('Threats mapped to controls')}>
+        The full threat-to-control table <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
+
+  <Section tone="plain" id="frameworks" title="Where the frameworks and the law meet it.">
+    <div class="well"><RegisterList items={crossRefs} /></div>
+  </Section>
+
+  <Section
+    tone="tint"
+    id="tools"
+    title="Tool categories for the control plane."
+    lede="The categories that fill the runtime layer for agents, with the examples the Body of Knowledge names. The category is the substance; the brands are illustrative, not an endorsement."
+  >
+    <div class="res-tablewrap">
+      <table class="res-table ag-table">
+        <caption class="visually-hidden">
+          Tool categories for agent governance, with illustrative examples and their stack layer
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Category</th>
+            <th scope="col">Examples (illustrative)</th>
+            <th scope="col">Layer</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            toolRows.map((row) => (
+              <tr>
+                <td class="c-name" data-label="Category">{row.category}</td>
+                <td class="c-summary" data-label="Examples">{row.examples.join(' · ')}</td>
+                <td class="c-layers" data-label="Layer">
+                  <span class="ticks" role="img" aria-label={`Layer ${row.layerN}`}>
+                    <span class="tk" data-l={row.layerN} aria-hidden="true" />
+                  </span>
+                  <span class="ag-ln">L{row.layerN}</span>
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="section-foot">
+      <a class="chapter-link" href="/resources/tools">
+        Every tool category, by layer <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </p>
+  </Section>
+
+  <Section tone="plain" id="failures" title="When agents fail.">
+    <div class="well"><RegisterList items={failures} /></div>
+  </Section>
+
+  <CtaBand
+    title="Read the whole chapter."
+    sub="Chapter 23 sets out autonomy levels, identity and MCP authorisation, checkpoints, memory, delegation chains and the EU AI Act hooks, with every source."
+    primary={{ label: 'Read chapter 23', href: chapter }}
+    secondary={{ label: 'Browse all patterns', href: '/patterns' }}
+  />
+</Marketing>
+
+<style>
+  .ag-note {
+    max-width: 62ch;
+    margin: var(--s-6) 0 0;
+    color: var(--ink-2);
+  }
+
+  .ag-grid {
+    margin: 0;
+  }
+
+  .ag-id {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    margin-right: var(--s-1);
+  }
+
+  .ag-ln {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--ink-2);
+    margin-left: var(--s-1);
+  }
+
+  .ag-callout {
+    margin-top: var(--s-5);
+  }
+
+  /* The control plane: the portrait figure beside the ten components it draws
+     on wide screens (a tall figure alone on a 1168px row leaves two empty
+     gutters), stacked above them below 1024px. */
+  .ag-plane {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .ag-plane > :global(figure) {
+    margin: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .ag-plane {
+      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+      align-items: start;
+    }
+  }
+</style>

@@ -9,6 +9,9 @@
  * figures.css (imported via diagrams.css in Base.astro), so light and dark both
  * follow the tokens.
  */
+import { getFigure } from '../data/figures';
+import { hasFigureArt } from '../lib/figure-reuse';
+
 interface Props {
   /** Short title (≤ 6 words) shown in the figcaption. */
   title: string;
@@ -19,18 +22,35 @@ interface Props {
   description?: string;
   /** Extra class on the <figure> (e.g. a figure-specific layout hook). */
   class?: string;
-  /** Optional data-figure id for styling/testing hooks. */
+  /** Optional data-figure id for styling/testing hooks. When it names a figure
+   *  of src/data/figures.ts, the <figure> also gets id="figure-<id>" and the
+   *  caption links the figure's permalink page. */
   id?: string;
+  /** Link the permalink page from the caption (default true for a known
+   *  figure); the permalink page itself passes false. */
+  permalink?: boolean;
 }
 
-const { title, caption, description, class: className, id } = Astro.props;
+const { title, caption, description, class: className, id, permalink = true } = Astro.props;
+const known = id !== undefined && getFigure(id) !== undefined && hasFigureArt(id);
 ---
 
-<figure class:list={['figure', 'figure--infographic', className]} data-figure={id}>
+<figure
+  class:list={['figure', 'figure--infographic', className]}
+  id={known ? `figure-${id}` : undefined}
+  data-figure={id}
+>
   <div class="figure-canvas"><slot /></div>
   <figcaption class="figure-figcaption">
     <span class="figure-fig-title">{title}</span>
     {caption && <span class="figure-fig-desc">{caption}</span>}
+    {
+      known && permalink && (
+        <a class="figure-permalink" href={`/figures/${id}`}>
+          Permalink, downloads and citation
+        </a>
+      )
+    }
   </figcaption>
   {
     description && (

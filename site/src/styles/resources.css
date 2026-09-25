@@ -40,6 +40,12 @@
   color: var(--ink-2);
 }
 
+/* A long inline URL or path in a section lede (the API base on /resources/data)
+   breaks where it must instead of widening the page at 390px. */
+.res-section-head p code {
+  overflow-wrap: anywhere;
+}
+
 /* External-link marker: a small mono up-right arrow, no icon font. */
 .ext {
   font-family: var(--font-mono);
@@ -752,9 +758,15 @@
   margin: var(--s-2) 0 0;
   color: var(--ink-2);
   line-height: 1.55;
+  /* A long legal token ("22A–22D", a clause id) breaks rather than widening
+     the page when text is enlarged to 200% at 390px (WCAG 1.4.4). */
+  overflow-wrap: anywhere;
 }
 
 .gl-ch {
+  /* An atomic inline: the line may break before the chip, which the markup
+     places straight after the definition's last word. */
+  display: inline-block;
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: 0.02em;

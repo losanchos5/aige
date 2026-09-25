@@ -1,8 +1,9 @@
 ---
-// SidebarNav: the chapter rail. The Thesis on top, then the eleven BoK chapters
-// with mono 00–10 indices. The active row carries aria-current and shows a
-// neutral ink tick. No per-row layer colour: chapters are not layers (SL-06).
-import { chaptersOrdered } from '../data/chapters';
+// SidebarNav: the chapter rail. The Thesis on top, then every BoK chapter with
+// its mono two-digit index, grouped under a caption per part of the book (from
+// data/parts.ts). The active row carries aria-current and shows a neutral ink
+// tick. No per-row layer colour: chapters are not layers (SL-06).
+import { bookParts, chapterNum } from '../data/parts';
 
 interface Props {
   activeSlug?: string;
@@ -16,7 +17,13 @@ const { activeSlug, activeThesis = false } = Astro.props;
   <span class="nav-rail" data-nav-rail aria-hidden="true"></span>
 
   <div class="sidebar-tools">
-    <button type="button" class="sidebar-search" data-search-open>
+    <button
+      type="button"
+      class="sidebar-search"
+      data-search-open
+      data-umami-event="search-open"
+      data-umami-event-location="sidebar"
+    >
       <span>Search</span>
       <kbd>Ctrl K</kbd>
     </button>
@@ -32,26 +39,33 @@ const { activeSlug, activeThesis = false } = Astro.props;
   </a>
 
   <p class="nav-label">Body of Knowledge</p>
-  <ol class="nav-list">
-    {
-      chaptersOrdered.map((chapter) => (
-        <li>
-          <a
-            href={`/bok/${chapter.slug}`}
-            class="nav-item"
-            data-chapter-slug={chapter.slug}
-            aria-current={activeSlug === chapter.slug ? 'page' : undefined}
-          >
-            <span class="nav-track" aria-hidden="true">
-              <span class="nav-fill" />
-            </span>
-            <span class="nav-num">{String(chapter.order).padStart(2, '0')}</span>
-            <span class="nav-title">{chapter.shortTitle}</span>
-          </a>
-        </li>
-      ))
-    }
-  </ol>
+  {
+    bookParts.map((part) => (
+      <Fragment>
+        <p class="nav-part" id={`sb-part-${part.id}`}>
+          {part.title} <span class="nav-part-range">{part.range}</span>
+        </p>
+        <ol class="nav-list" aria-labelledby={`sb-part-${part.id}`}>
+          {part.chapters.map((chapter) => (
+            <li>
+              <a
+                href={`/bok/${chapter.slug}`}
+                class="nav-item"
+                data-chapter-slug={chapter.slug}
+                aria-current={activeSlug === chapter.slug ? 'page' : undefined}
+              >
+                <span class="nav-track" aria-hidden="true">
+                  <span class="nav-fill" />
+                </span>
+                <span class="nav-num">{chapterNum(chapter.order)}</span>
+                <span class="nav-title">{chapter.shortTitle}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </Fragment>
+    ))
+  }
 </nav>
 
 <style>
@@ -139,6 +153,24 @@ const { activeSlug, activeThesis = false } = Astro.props;
     list-style: none;
     margin: 0;
     padding: 0;
+  }
+
+  /* One caption per part of the book, naming the list under it: sentence-case
+     mono in --ink-2 (never --muted), the chapter range beside it. */
+  .nav-part {
+    margin: var(--s-4) 0 var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+
+  .nav-label + .nav-part {
+    margin-top: 0;
+  }
+
+  .nav-part-range {
+    font-weight: 400;
   }
 
   /* --layer-ink is the row's accent, used by the hover tint and copied onto the

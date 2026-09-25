@@ -1,0 +1,82 @@
+[
+  {
+    "name": "unblocked classes may go external",
+    "request": {
+      "principal": "Service::\"support-assistant\"",
+      "action": "Action::\"model_call\"",
+      "resource": "Model::\"vendor-llm\"",
+      "context": {
+        "model_hosting": "external",
+        "data_classes": [
+          "public",
+          "internal"
+        ]
+      }
+    },
+    "entities": [],
+    "decision": "allow",
+    "reason": [
+      "pc-no-personal-data-external.baseline"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "blocked class to external model is denied",
+    "request": {
+      "principal": "Service::\"support-assistant\"",
+      "action": "Action::\"model_call\"",
+      "resource": "Model::\"vendor-llm\"",
+      "context": {
+        "model_hosting": "external",
+        "data_classes": [
+          "public",
+          "internal",
+          "personal"
+        ]
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "data.no-personal-data-external.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "unclassified request is denied",
+    "request": {
+      "principal": "Service::\"support-assistant\"",
+      "action": "Action::\"model_call\"",
+      "resource": "Model::\"vendor-llm\"",
+      "context": {
+        "model_hosting": "external"
+      }
+    },
+    "entities": [],
+    "decision": "deny",
+    "reason": [
+      "data.no-personal-data-external.v1"
+    ],
+    "num_errors": 0
+  },
+  {
+    "name": "blocked class to internal model is allowed",
+    "request": {
+      "principal": "Service::\"support-assistant\"",
+      "action": "Action::\"model_call\"",
+      "resource": "Model::\"internal-llm\"",
+      "context": {
+        "model_hosting": "internal",
+        "data_classes": [
+          "personal"
+        ]
+      }
+    },
+    "entities": [],
+    "decision": "allow",
+    "reason": [
+      "pc-no-personal-data-external.baseline"
+    ],
+    "num_errors": 0
+  }
+]

@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1414" class="figc" lang="es" role="img" aria-labelledby="fig-eu-ai-act-operator-roles-es-t fig-eu-ai-act-operator-roles-es-d">
+  <title id="fig-eu-ai-act-operator-roles-es-t" lang="en">EU AI Act roles, in Spanish</title>
+  <desc id="fig-eu-ai-act-operator-roles-es-d" lang="en">Spanish edition: seven questions leading to EU AI Act operator roles, from proveedor to responsable del despliegue, with the Article 25 loop and a registry.</desc>
+  <text class="mono muted" x="40" y="56" font-size="17">Reglamento de IA de la UE · operadores del art. 3(8), para un sistema</text>
+  <text class="disp" x="40" y="108" font-size="40">¿Qué rol tiene en este sistema?</text>
+  <text class="ink2" x="40" y="146" font-size="19">Responda a todas: los roles nombran tareas, no organizaciones, y puede tener varios en un sistema.</text>
+  <line class="rule" x1="40" y1="170" x2="960" y2="170"/>
+  <line class="stroke-arrow" x1="54" y1="251" x2="54" y2="994"/>
+  <path class="arrow" d="M54 1000 L47 990.2 L61 990.2 Z"/>
+  <rect class="dot-mask" x="41" y="238" width="26" height="26"/>
+  <path class="glyph" d="M54 240 L65 251 L54 262 L43 251 Z"/>
+  <text x="84" y="234" font-size="17">¿Desarrolla un sistema de IA, o lo</text>
+  <text x="84" y="256" font-size="17">encarga, y lo introduce en el mercado o lo</text>
+  <text x="84" y="278" font-size="17">pone en servicio con su propio nombre?</text>
+  <line class="stroke-arrow" x1="436" y1="251" x2="468" y2="251"/>
+  <path class="arrow" d="M472 251 L462.2 244 L462.2 258 Z"/>
+  <text class="mono muted" x="455" y="243" font-size="16" text-anchor="middle">sí</text>
+  <rect class="panel" x="474" y="196" width="410" height="110" rx="8"/>
+  <text class="disp" x="486" y="225" font-size="19">Proveedor</text>
+  <text class="mono muted" x="872" y="225" font-size="16" text-anchor="end">art. 3(3)</text>
+  <text x="486" y="248" font-size="16">Arts. 8 a 17, 43 a 49, 72, 73; 50(1), 50(2)</text>
+  <path class="glyph" d="M486 258 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 268 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="272" font-size="16">Documentación técnica, registros de calidad,</text>
+  <text class="ink2" x="510" y="292" font-size="16">evaluaciones, declaración</text>
+  <rect class="dot-mask" x="41" y="367" width="26" height="26"/>
+  <path class="glyph" d="M54 369 L65 380 L54 391 L43 380 Z"/>
+  <text x="84" y="374" font-size="17">¿Introduce en el mercado un modelo de IA</text>
+  <text x="84" y="396" font-size="17">de uso general?</text>
+  <line class="stroke-arrow" x1="436" y1="380" x2="468" y2="380"/>
+  <path class="arrow" d="M472 380 L462.2 373 L462.2 387 Z"/>
+  <text class="mono muted" x="455" y="372" font-size="16" text-anchor="middle">sí</text>
+  <rect class="panel" x="474" y="314" width="410" height="132" rx="8"/>
+  <text class="disp" x="486" y="343" font-size="19">Proveedor de modelos de uso general</text>
+  <text class="mono muted" x="486" y="365" font-size="16">art. 53</text>
+  <text x="486" y="388" font-size="16">Arts. 53 a 55</text>
+  <path class="glyph" d="M486 398 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 408 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="412" font-size="16">Documentación del modelo, resumen del</text>
+  <text class="ink2" x="510" y="432" font-size="16">entrenamiento, política de derechos de autor</text>
+  <rect class="dot-mask" x="41" y="489" width="26" height="26"/>
+  <path class="glyph" d="M54 491 L65 502 L54 513 L43 502 Z"/>
+  <text x="84" y="474" font-size="17">¿Introduce en el mercado, con su nombre,</text>
+  <text x="84" y="496" font-size="17">un componente de seguridad de IA de alto</text>
+  <text x="84" y="518" font-size="17">riesgo junto con su producto del anexo I,</text>
+  <text x="84" y="540" font-size="17">sección A?</text>
+  <line class="stroke-arrow" x1="436" y1="502" x2="468" y2="502"/>
+  <path class="arrow" d="M472 502 L462.2 495 L462.2 509 Z"/>
+  <text class="mono muted" x="455" y="494" font-size="16" text-anchor="middle">sí</text>
+  <rect class="panel" x="474" y="457" width="410" height="90" rx="8"/>
+  <text class="disp" x="486" y="486" font-size="19">Fabricante del producto</text>
+  <text class="mono muted" x="872" y="486" font-size="16" text-anchor="end">art. 25(3)</text>
+  <text x="486" y="509" font-size="16">Obligaciones del proveedor (art. 16)</text>
+  <path class="glyph" d="M486 519 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 529 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="533" font-size="16">Como un proveedor</text>
+  <rect class="dot-mask" x="41" y="590" width="26" height="26"/>
+  <path class="glyph" d="M54 592 L65 603 L54 614 L43 603 Z"/>
+  <text x="84" y="586" font-size="17">¿Está establecido en la UE e introduce en</text>
+  <text x="84" y="608" font-size="17">el mercado un sistema con el nombre de</text>
+  <text x="84" y="630" font-size="17">un proveedor de fuera de la UE?</text>
+  <line class="stroke-arrow" x1="436" y1="603" x2="468" y2="603"/>
+  <path class="arrow" d="M472 603 L462.2 596 L462.2 610 Z"/>
+  <text class="mono muted" x="455" y="595" font-size="16" text-anchor="middle">sí</text>
+  <rect class="panel" x="474" y="558" width="410" height="90" rx="8"/>
+  <text class="disp" x="486" y="587" font-size="19">Importador</text>
+  <text class="mono muted" x="872" y="587" font-size="16" text-anchor="end">art. 3(6)</text>
+  <text x="486" y="610" font-size="16">Art. 23: verificar; conservar copias 10 años</text>
+  <path class="glyph" d="M486 620 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 630 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="634" font-size="16">Registro de verificación de la importación</text>
+  <rect class="dot-mask" x="41" y="688" width="26" height="26"/>
+  <path class="glyph" d="M54 690 L65 701 L54 712 L43 701 Z"/>
+  <text x="84" y="695" font-size="17">¿Comercializa el sistema en la UE sin ser</text>
+  <text x="84" y="717" font-size="17">su proveedor ni su importador?</text>
+  <line class="stroke-arrow" x1="436" y1="701" x2="468" y2="701"/>
+  <path class="arrow" d="M472 701 L462.2 694 L462.2 708 Z"/>
+  <text class="mono muted" x="455" y="693" font-size="16" text-anchor="middle">sí</text>
+  <rect class="panel" x="474" y="656" width="410" height="90" rx="8"/>
+  <text class="disp" x="486" y="685" font-size="19">Distribuidor</text>
+  <text class="mono muted" x="872" y="685" font-size="16" text-anchor="end">art. 3(7)</text>
+  <text x="486" y="708" font-size="16">Art. 24: verificar marcado y documentos</text>
+  <path class="glyph" d="M486 718 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 728 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="732" font-size="16">Registro de comprobación de la distribución</text>
+  <rect class="dot-mask" x="41" y="796" width="26" height="26"/>
+  <path class="glyph" d="M54 798 L65 809 L54 820 L43 809 Z"/>
+  <text x="84" y="792" font-size="17">¿Está establecido en la UE y actúa con un</text>
+  <text x="84" y="814" font-size="17">mandato escrito de un proveedor de fuera</text>
+  <text x="84" y="836" font-size="17">de la UE?</text>
+  <line class="stroke-arrow" x1="436" y1="809" x2="468" y2="809"/>
+  <path class="arrow" d="M472 809 L462.2 802 L462.2 816 Z"/>
+  <text class="mono muted" x="455" y="801" font-size="16" text-anchor="middle">sí</text>
+  <rect class="panel" x="474" y="754" width="410" height="110" rx="8"/>
+  <text class="disp" x="486" y="783" font-size="19">Representante autorizado</text>
+  <text class="mono muted" x="872" y="783" font-size="16" text-anchor="end">art. 3(5)</text>
+  <text x="486" y="806" font-size="16">Arts. 22, 54: verificar; conservar documentos 10</text>
+  <text x="486" y="826" font-size="16">años</text>
+  <path class="glyph" d="M486 836 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 846 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="850" font-size="16">Mandato; copias de los documentos</text>
+  <rect class="dot-mask" x="41" y="914" width="26" height="26"/>
+  <path class="glyph" d="M54 916 L65 927 L54 938 L43 927 Z"/>
+  <text x="84" y="910" font-size="17">¿Usa el sistema bajo su propia autoridad,</text>
+  <text x="84" y="932" font-size="17">salvo para una actividad personal de</text>
+  <text x="84" y="954" font-size="17">carácter no profesional?</text>
+  <line class="stroke-arrow" x1="436" y1="927" x2="468" y2="927"/>
+  <path class="arrow" d="M472 927 L462.2 920 L462.2 934 Z"/>
+  <text class="mono muted" x="455" y="919" font-size="16" text-anchor="middle">sí</text>
+  <rect class="panel" x="474" y="872" width="410" height="110" rx="8"/>
+  <text class="disp" x="486" y="901" font-size="19">Responsable del despliegue</text>
+  <text class="mono muted" x="872" y="901" font-size="16" text-anchor="end">art. 3(4)</text>
+  <text x="486" y="924" font-size="16">Arts. 26, 27, 50(3), 50(4), 86</text>
+  <path class="glyph" d="M486 934 h9 l5 5 v13 h-14 z"/><path class="glyph-check" d="M489 944 l3 3 l5 -6"/>
+  <text class="ink2" x="510" y="948" font-size="16">Registros de uso, turnos de supervisión,</text>
+  <text class="ink2" x="510" y="968" font-size="16">evaluación de impacto (art. 27), avisos</text>
+  <path class="glyph" d="M41 1009 v20 a13 5 0 0 0 26 0 v-20"/><ellipse class="glyph" cx="54" cy="1009" rx="13" ry="5"/>
+  <text class="disp" x="84" y="1022" font-size="17">Registro por sistema: sus roles como lista, p. ej. [&quot;provider&quot;, &quot;deployer&quot;]</text>
+  <text class="ink2" x="84" y="1048" font-size="16">Ningún rol: no es operador de este sistema. La persona afectada tiene protecciones, no obligaciones</text>
+  <text class="ink2" x="84" y="1069" font-size="16">(art. 2(1)(g)).</text>
+  <rect class="panel" x="40" y="1095" width="920" height="192" rx="8" stroke-dasharray="6 4"/>
+  <text x="52" y="1123" font-size="17">Art. 25(1): un distribuidor, importador, responsable del despliegue u otro tercero pasa a ser el proveedor de un</text>
+  <text x="52" y="1145" font-size="17">sistema de alto riesgo, con todas las obligaciones del art. 16, cuando:</text>
+  <text class="mono" x="60" y="1171" font-size="16">(a)</text>
+  <text x="92" y="1171" font-size="16">pone su nombre o marca en un sistema de alto riesgo ya introducido en el mercado;</text>
+  <text class="mono" x="60" y="1195" font-size="16">(b)</text>
+  <text x="92" y="1195" font-size="16">hace una modificación sustancial de un sistema de alto riesgo que sigue siéndolo;</text>
+  <text class="mono" x="60" y="1219" font-size="16">(c)</text>
+  <text x="92" y="1219" font-size="16">cambia la finalidad prevista de un sistema, incluido un sistema de IA de uso general, de modo que pasa a ser de</text>
+  <text x="92" y="1239" font-size="16">alto riesgo.</text>
+  <text class="ink2" x="52" y="1267" font-size="16">El proveedor inicial debe cooperar (art. 25(2)); un acuerdo escrito fija la información y el acceso (art. 25(4)).</text>
+  <line class="stroke-arrow" x1="930" y1="251" x2="930" y2="1095"/>
+  <line class="stroke-arrow" x1="884" y1="603" x2="930" y2="603"/>
+  <line class="stroke-arrow" x1="884" y1="701" x2="930" y2="701"/>
+  <line class="stroke-arrow" x1="884" y1="927" x2="930" y2="927"/>
+  <line class="stroke-arrow" x1="930" y1="251" x2="892" y2="251"/>
+  <path class="arrow" d="M886 251 L895.8 244 L895.8 258 Z"/>
+  <rect class="dot-mask" x="890.4" y="296" width="79.2" height="26" rx="4"/>
+  <text class="mono" x="930" y="315" font-size="16" text-anchor="middle">Art. 25</text>
+  <line class="rule" x1="40" y1="1332" x2="960" y2="1332"/>
+  <text class="mono muted" x="40" y="1357" font-size="16">Fuente: capítulo 18, Who you are in the value chain (tabla de roles y artículo 25).</text>
+  <text class="mono muted" x="40" y="1384" font-size="16">A fecha de 2026-09-24 · orientativo: no es asesoramiento jurídico ni declaración de conformidad</text>
+</svg>
