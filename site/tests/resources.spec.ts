@@ -26,6 +26,7 @@ const HUB = [
   '/resources/reading-list',
   '/bok/glossary',
   '/resources/data',
+  '/mcp',
   '/map',
 ];
 

@@ -124,6 +124,11 @@ export const GET: APIRoute = async (context) => {
         'The machine-readable list of every /api/v1 dataset with its schema and page.',
       ),
       linkLine(
+        'MCP server: how to connect',
+        url('/mcp'),
+        'How to connect Claude, Claude Code or any MCP client to the public read-only server, and the ten tools it offers.',
+      ),
+      linkLine(
         'Remote MCP server (read-only)',
         MCP_ENDPOINT,
         'A Model Context Protocol server (Streamable HTTP, no authentication) over the same /api/v1 data: the obligation register, the crosswalk, the glossary, the patterns, the templates and schemas, and the chapters; every answer names its source page. Live since 2026-09-25; its code and self-hosting guide are in tools/mcp-server of the repository.',

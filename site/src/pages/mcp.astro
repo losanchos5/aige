@@ -1,0 +1,157 @@
+---
+// /mcp: the public, read-only Model Context Protocol server over the site's
+// open data (tools/mcp-server, deployed at mcp.aigovernanceengineer.com). The
+// page tells a reader what the server answers and how to connect a client in a
+// minute; the server's README in the repository holds the operator details.
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Callout from '../components/Callout.astro';
+import { site } from '../data/site';
+import { obligations } from '../data/frameworks';
+import { patterns } from '../data/patterns';
+import { getGlossary } from '../lib/glossary';
+import { breadcrumbJsonLd } from '../lib/breadcrumbs';
+import { authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
+import '../styles/resources.css';
+import '../styles/pages.css';
+
+const ENDPOINT = 'https://mcp.aigovernanceengineer.com/mcp';
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'MCP server' }];
+const pageUrl = new URL('/mcp', site.url).href;
+const description =
+  'Ask Claude or any MCP client about AI governance and get answers read from this Body of Knowledge: obligations, crosswalk, glossary, patterns and templates, each with its source.';
+const repo = `${site.github}/tree/main/tools/mcp-server`;
+
+const tools = [
+  { name: 'search_bok', what: 'Chapters, sections and pattern pages that match a question, best first, each with its anchor URL.', ask: 'Where does the book explain the Art. 6(3) filter?' },
+  { name: 'get_obligations', what: 'Rows of the obligation register filtered by framework, role, system class, status, layer or date.', ask: 'What applies to a deployer of a high-risk system before December 2027?' },
+  { name: 'get_obligation', what: 'One obligation by its stable id, with milestones, patterns and crosswalk references.', ask: 'Show me AIGE-OBL-EUAIA-ART9 and the evidence it expects.' },
+  { name: 'map_clause', what: 'The clauses of other frameworks that sit on the same topic as a given clause.', ask: 'What does ISO/IEC 42001 say where the AI Act has Art. 9?' },
+  { name: 'search_glossary', what: 'Glossary terms whose name or definition match, each with its term page.', ask: 'Define deployer and contrast it with provider.' },
+  { name: 'get_term', what: 'One term: definition, source, the chapters that use it and related terms.', ask: 'What is a serious incident under the AI Act?' },
+  { name: 'list_patterns', what: 'The engineering patterns, optionally for one stack layer.', ask: 'Which patterns live in the runtime layer?' },
+  { name: 'get_pattern', what: 'One pattern in full: problem, solution, consequences and what it maps to.', ask: 'Walk me through the Kill Switch pattern.' },
+  { name: 'list_templates', what: 'The library of JSON Schemas, filled examples and human templates.', ask: 'Which templates exist for impact assessments?' },
+  { name: 'get_template', what: 'One template or schema with the content of its files.', ask: 'Give me the incident record schema and an example.' },
+];
+
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    name: `MCP server · ${site.name}`,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+  },
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Base title="MCP server: the Body of Knowledge in your AI assistant" description={description} image="/og/mcp.png" jsonLd={jsonLd}>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="Ask your AI assistant. It answers from the Body of Knowledge."
+    lede="A public Model Context Protocol server gives Claude, and any other MCP client, direct access to this site: the obligation register, the crosswalk, the glossary, the patterns and the templates. Every answer names the page it was read from. No account, no key, nothing stored."
+  />
+
+  <div class="container res-page">
+    <section class="res-section" aria-labelledby="mcp-endpoint">
+      <div class="res-section-head">
+        <h2 id="mcp-endpoint">The endpoint</h2>
+        <p>Live since 2026-09-25. Streamable HTTP, read-only, no authentication.</p>
+      </div>
+      <pre tabindex="0" role="region" aria-label="MCP server endpoint"><code>{ENDPOINT}</code></pre>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="mcp-connect">
+      <div class="res-section-head">
+        <h2 id="mcp-connect">Connect it in a minute</h2>
+      </div>
+      <h3>Claude (web and desktop)</h3>
+      <p>
+        On Pro and Max plans open <em>Customize &gt; Connectors</em>, choose <em>Add custom
+        connector</em>, paste the endpoint above and leave the OAuth fields empty. On Team and
+        Enterprise plans an owner adds it once under <em>Organization settings &gt; Connectors</em>;
+        members then switch it on from <em>Customize &gt; Connectors</em>.
+      </p>
+      <h3>Claude Code</h3>
+      <pre tabindex="0" role="region" aria-label="Claude Code command"><code>{`claude mcp add --transport http aige ${ENDPOINT}`}</code></pre>
+      <p>Add <code>--scope project</code> to share it with your team through <code>.mcp.json</code>.</p>
+      <h3>Any other MCP client (Cursor, VS Code, agents you build)</h3>
+      <pre tabindex="0" role="region" aria-label="JSON configuration"><code>{`{
+  "mcpServers": {
+    "aige": { "type": "http", "url": "${ENDPOINT}" }
+  }
+}`}</code></pre>
+    </section>
+
+    <section class="res-section" aria-labelledby="mcp-tools">
+      <div class="res-section-head">
+        <h2 id="mcp-tools">What it answers</h2>
+        <p>
+          Ten read-only tools over {obligations.length} obligations, {patterns.length} patterns and
+          {' '}{getGlossary().length} glossary terms, plus the crosswalk, the templates and the full
+          text of the book.
+        </p>
+      </div>
+      <div class="res-tablewrap" tabindex="0" role="region" aria-label="MCP tools">
+        <table class="res-table">
+          <thead>
+            <tr>
+              <th scope="col">Tool</th>
+              <th scope="col">What it returns</th>
+              <th scope="col">Try asking</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              tools.map((tool) => (
+                <tr>
+                  <td data-label="Tool"><code>{tool.name}</code></td>
+                  <td data-label="What it returns">{tool.what}</td>
+                  <td data-label="Try asking">“{tool.ask}”</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="mcp-trust">
+      <div class="res-section-head">
+        <h2 id="mcp-trust">What you can rely on</h2>
+      </div>
+      <ul>
+        <li>
+          <strong>Sourced answers.</strong> Every answer carries the canonical page to cite, the
+          dataset it came from, the Body of Knowledge version (v{site.bokVersion}) and the CC BY 4.0
+          licence.
+        </li>
+        <li>
+          <strong>Same data as the site.</strong> The server holds nothing of its own: it reads the
+          <a href="/resources/data">open data API</a>, so it is never ahead of or behind these pages.
+        </li>
+        <li>
+          <strong>Private by design.</strong> No account, no key, no conversation stored; request logs
+          keep no client address.
+        </li>
+        <li>
+          <strong>Open source.</strong> The code, its tests and a guide to run it yourself are in
+          <a href={repo}><code>tools/mcp-server</code></a>.
+        </li>
+      </ul>
+      <Callout kind="note" title="Illustrative, not legal advice">
+        <p>
+          Mappings and obligation rows are illustrative, not legal advice and not a claim of
+          conformity. Check the primary source each answer links before relying on it.
+        </p>
+      </Callout>
+    </section>
+  </div>
+</Base>

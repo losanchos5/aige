@@ -243,6 +243,11 @@ export const nav: NavGroup[] = [
         description: 'The registers as static JSON with schemas, an OpenAPI file and stable ids.',
       },
       {
+        label: 'MCP server',
+        href: '/mcp',
+        description: 'Ask Claude or any MCP client and get answers read from this site, with sources.',
+      },
+      {
         label: 'Tools',
         href: '/resources/tools',
         description: 'Reference tool categories per layer: examples, not endorsements.',
