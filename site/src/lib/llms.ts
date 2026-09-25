@@ -119,11 +119,15 @@ export function approxTokens(text: string): string {
 
 // ---- Markdown alternates ----------------------------------------------------
 //
-// Every English content page with a Markdown source (the chapters, the pattern
-// pages, the glossary terms, the incident cases and the Thesis) is also served
-// as clean Markdown at its URL plus `.md` (/bok/definition.md), for agents and
-// assistants that read Markdown better than HTML. Seo.astro advertises it with
+// Every English content page with a Markdown source (the pillar page
+// /ai-governance, the chapters, the pattern pages, the glossary terms, the
+// incident cases and the Thesis) is also served as clean Markdown at its URL
+// plus `.md` (/bok/definition.md), for agents and assistants that read Markdown
+// better than HTML. Seo.astro advertises it with
 // <link rel="alternate" type="text/markdown">; /llms.txt lists it.
+
+/** Canonical path of the pillar page, "What is AI governance?" (guides/ai-governance.md). */
+export const PILLAR_PATH = '/ai-governance';
 
 /** Canonical path of an incident case. */
 export function casePath(entry: Pick<IncidentCase, 'id'>): string {
@@ -182,6 +186,7 @@ let markdownPaths: Set<string> | undefined;
  */
 export function markdownAlternateFor(pathname: string): string | null {
   markdownPaths ??= new Set([
+    PILLAR_PATH,
     ...chaptersOrdered.map((chapter) => chapterPath(chapter)),
     ...patterns.map((pattern) => patternPath(pattern)),
     ...getGlossary().map((entry) => entry.url),
