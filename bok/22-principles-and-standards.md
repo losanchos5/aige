@@ -725,8 +725,12 @@ starting point for a crosswalk file, not a claim that the rows are equivalent.
 Sources: [7][1][10][9][40][52]; the ISO/IEC 42001 clause and Annex A ids follow [chapter
 08](/bok/regulatory-map#isoiec-42001-42005-and-42006) and the site's
 [crosswalk](/resources/crosswalk), whose [explorer](/resources/crosswalk#explore) derives these pairs
-for any two instruments and exports them as an OSCAL mapping collection. Mappings are illustrative,
-not a claim of conformity.
+for any two instruments and exports them as an OSCAL mapping collection. Three pairs have a page of
+their own that compares them topic by topic: [ISO 42001 vs EU AI
+Act](/resources/crosswalk/iso-42001-vs-eu-ai-act), [NIST AI RMF vs ISO
+42001](/resources/crosswalk/nist-ai-rmf-vs-iso-42001) and [NIST AI RMF vs EU AI
+Act](/resources/crosswalk/nist-ai-rmf-vs-eu-ai-act). Mappings are illustrative, not a claim of
+conformity.
 
 The engineering rule is the one from the [regulatory
 translation](/bok/the-role#regulatory-translation) workflow: build each control once, tag it with

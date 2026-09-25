@@ -44,6 +44,7 @@ import {
   obligationApiPath,
 } from '../../lib/obligations';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { comparisonsFor } from '../../lib/compare-links';
 import {
   authorNodes,
   authorRefs,
@@ -73,6 +74,8 @@ if (!section) throw new Error(`frameworks.ts: ${row.id} anchor "${row.anchor}" i
 const fw = frameworkOf(row);
 const rowPatterns = patternsFor(row);
 const topics = crosswalkFor(row);
+// The "<A> vs <B>" pages that compare this row's instrument (ONPAGE R2).
+const compared = comparisonsFor(fw.id);
 const relatedCases = casesFor(row);
 const { prev, next } = neighbours(row);
 const layerOf = (n: number) => layers.find((layer) => layer.n === n);
@@ -159,6 +162,21 @@ const jsonLd = [
           <a href={`/resources/frameworks#fw-${fw.id}`}>{fw.name}</a>
           <span class="type-tag">{fw.type}</span>
         </dd>
+        {
+          compared.length > 0 && (
+            <>
+              <dt>Compared side by side</dt>
+              <dd>
+                {compared.map((link, i) => (
+                  <>
+                    {i > 0 && ' · '}
+                    <a href={link.href}>{link.label}</a>
+                  </>
+                ))}
+              </dd>
+            </>
+          )
+        }
         <dt>Clause</dt>
         <dd>{row.clause}</dd>
         {
