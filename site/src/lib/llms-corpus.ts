@@ -168,7 +168,8 @@ const PILLAR_SOURCE = 'guides/ai-governance.md';
  * box as the abstract. The figure the page inserts is not part of the source.
  */
 export function pillarDoc(): CorpusDoc {
-  const source = readSource(PILLAR_SOURCE);
+  // The source is stored with CRLF line ends; the twin is served with LF.
+  const source = readSource(PILLAR_SOURCE).replace(/\r\n/g, '\n');
   const lead = docLead(source);
   return {
     title: lead.title,
