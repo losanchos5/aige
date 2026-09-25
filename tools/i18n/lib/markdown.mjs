@@ -106,16 +106,31 @@ export function splitRow(line) {
   };
 }
 
+/** A regex matching a line led by one of these exact bold labels, shaped like LABEL_RE. */
+function exactLabelRe(labels) {
+  const alts = [...new Set(labels ?? [])]
+    .filter((l) => typeof l === 'string' && /^\*\*[^*\n]+\*\*$/.test(l))
+    .sort((a, b) => b.length - a.length)
+    .map((l) => l.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return alts.length ? new RegExp(`^(${alts.join('|')})(?:[ \\t]+(.*))?$`) : null;
+}
+
 /**
  * Parse Markdown text (LF line endings, no frontmatter) into blocks.
+ * @param opts.labels  localized labels recognised besides the English ones, as
+ *   exact bold strings: { callout: ["**En la práctica**", ...], lead:
+ *   ["**Correspondencias:**"] }. A translation carries the labels callouts.json
+ *   gives for its language (localizedLabels lists them); parsing it back with
+ *   them is what lets the structure check compare it with its English source,
+ *   since otherwise a localized label reads as plain text.
  * @returns {{ blocks: object[], segments: object[], eofNewline: boolean }}
  */
-export function parseMarkdown(text, { file = '<text>' } = {}) {
+export function parseMarkdown(text, { file = '<text>', labels } = {}) {
   if (text.includes('\r')) throw new MarkdownError(`${file}: CR characters; normalise line endings to LF first`);
   const eofNewline = text.endsWith('\n');
   const body = eofNewline ? text.slice(0, -1) : text;
   const lines = body === '' ? [] : body.split('\n');
-  const ctx = { file };
+  const ctx = { file, calloutRe: exactLabelRe(labels?.callout), leadRe: exactLabelRe(labels?.lead) };
   const blocks = parseBlocks(lines, ctx, { quote: false, offsets: lines.map((_, i) => i + 1) });
   markSources(blocks);
   return { blocks, segments: collectSegments(blocks), eofNewline };
@@ -338,7 +353,7 @@ function parseBlocks(lines, ctx, opts) {
     for (let k = 0; k < plines.length - 1; k++) {
       if (/(?: {2,}|\\)$/.test(plines[k])) fail(ctx, lineNo(i + k), 'hard line breaks are not supported');
     }
-    blocks.push(paragraph(plines, opts));
+    blocks.push(paragraph(plines, opts, ctx));
     i = j;
   }
   return blocks;
@@ -363,21 +378,26 @@ function sliceIndent(line, width) {
 
 /**
  * A paragraph split into runs: each run is an optional label (a callout label
- * inside a quote, or the "**Maps to:**" lead) and the text that follows it.
+ * inside a quote, or the "**Maps to:**" lead) and the text that follows it;
+ * `labelKind` says which ("callout" or "lead"). The English labels are always
+ * recognised; ctx.calloutRe and ctx.leadRe add the localized ones of a translation.
  */
-function paragraph(plines, opts) {
+function paragraph(plines, opts, ctx = {}) {
   const runs = [];
   let cur = null;
   plines.forEach((raw, idx) => {
     const l = raw.replace(/^[ \t]+/, '').replace(/[ \t]+$/, '');
-    const label = (opts.quote && LABEL_RE.exec(l)) || (idx === 0 && MAPS_TO_RE.exec(l));
+    let label = null;
+    let labelKind = null;
+    if (opts.quote && (label = LABEL_RE.exec(l) || ctx.calloutRe?.exec(l) || null)) labelKind = 'callout';
+    else if (idx === 0 && (label = MAPS_TO_RE.exec(l) || ctx.leadRe?.exec(l) || null)) labelKind = 'lead';
     if (label) {
-      cur = { label: label[1], labelOwnLine: label[2] === undefined, parts: label[2] !== undefined ? [label[2]] : [] };
+      cur = { label: label[1], labelKind, labelOwnLine: label[2] === undefined, parts: label[2] !== undefined ? [label[2]] : [] };
       runs.push(cur);
       return;
     }
     if (!cur) {
-      cur = { label: null, labelOwnLine: false, parts: [] };
+      cur = { label: null, labelKind: null, labelOwnLine: false, parts: [] };
       runs.push(cur);
     }
     cur.parts.push(l);
@@ -431,6 +451,33 @@ function collectSegments(blocks) {
     s.n = n;
   });
   return out;
+}
+
+/**
+ * The localized labels a render with `labelMap` puts in place of the English
+ * ones, by kind, in the shape parseMarkdown's `labels` option takes. Blocks kept
+ * verbatim (the Sources section) keep their English labels and are skipped.
+ */
+export function localizedLabels(blocks, labelMap = () => undefined) {
+  const out = { callout: new Set(), lead: new Set() };
+  const walk = (list) => {
+    for (const b of list) {
+      if (b.verbatim) continue;
+      if (b.type === 'paragraph') {
+        for (const r of b.runs) {
+          if (!r.label) continue;
+          const l = labelMap(r.label);
+          if (l !== undefined && l !== null && l !== r.label) out[r.labelKind].add(l);
+        }
+      } else if (b.type === 'blockquote') {
+        walk(b.children);
+      } else if (b.type === 'list') {
+        for (const it of b.items) walk(it.children);
+      }
+    }
+  };
+  walk(blocks);
+  return { callout: [...out.callout], lead: [...out.lead] };
 }
 
 // ---------------------------------------------------------------------------

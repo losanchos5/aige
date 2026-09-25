@@ -47,7 +47,11 @@ Options:
   --summary <file>      write a Markdown summary (the pull request body in CI)
 
 Environment: ANTHROPIC_API_KEY (sync, batch); I18N_DIR (default <repo>/i18n);
-I18N_UI_DIR (default site/src/i18n, or <I18N_DIR>/ui when I18N_DIR is set).`;
+I18N_UI_DIR (default site/src/i18n, or <I18N_DIR>/ui when I18N_DIR is set).
+
+Exit status: 0 when the run reported no error; 1 when it failed or reported one
+(a file kept out because its structure changed, an API error), after writing
+the files that passed, the report and the summary; 2 for bad arguments.`;
 
 function fail(msg, code = 2) {
   console.error(`translate: ${msg}`);
@@ -233,6 +237,8 @@ async function main() {
     mkdirSync(dirname(opts.summaryPath), { recursive: true });
     writeFileSync(opts.summaryPath, summaryMarkdown(report));
   }
+  // Whatever passed is written; an error still fails the run, so it is seen.
+  if (report.errors.length) process.exitCode = 1;
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) await main();

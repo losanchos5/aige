@@ -3,12 +3,12 @@
 
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
 
 import { parseCli, summaryMarkdown } from '../translate.mjs';
-import { REPO } from './helpers.mjs';
+import { fixtureTree, REPO, scratch } from './helpers.mjs';
 
 const yml = readFileSync(join(REPO, '.github', 'workflows', 'i18n.yml'), 'utf8');
 
@@ -97,6 +97,31 @@ test('CLI: --mock refuses to write into the repository i18n/', () => {
   const r = spawnSync(process.execPath, [join(REPO, 'tools', 'i18n', 'translate.mjs'), '--mock'], { env, encoding: 'utf8' });
   assert.equal(r.status, 2);
   assert.match(r.stderr, /set I18N_DIR/);
+});
+
+test('CLI: exit 0 on a clean mock run with the real callout labels, 1 when a file is kept out', () => {
+  const s = scratch();
+  try {
+    const root = fixtureTree(s.dir, ['bok/03-values-principles.md']);
+    const cli = (callouts, out) => spawnSync(process.execPath, [join(REPO, 'tools', 'i18n', 'translate.mjs'), '--mock', '--langs', 'es'], {
+      env: { ...process.env, I18N_DIR: join(s.dir, out), I18N_SOURCE_ROOT: root, I18N_CALLOUTS: callouts },
+      encoding: 'utf8',
+    });
+    const ok = cli(join(REPO, 'site', 'src', 'i18n', 'callouts.json'), 'ok');
+    assert.equal(ok.status, 0, ok.stderr);
+    assert.doesNotMatch(ok.stderr, /error:/);
+    assert.match(readFileSync(join(s.dir, 'ok', 'es', 'bok', '03-values-principles.md'), 'utf8'), /^> \*\*En la práctica\*\* /m);
+    // A label the parser cannot read back as one (bold inside the label) changes
+    // the structure: the file is kept out and the run fails visibly.
+    const bad = join(s.dir, 'bad-callouts.json');
+    writeFileSync(bad, JSON.stringify({ 'In practice': { es: 'En *la* práctica' } }));
+    const ko = cli(bad, 'ko');
+    assert.equal(ko.status, 1);
+    assert.match(ko.stderr, /error: bok\/03-values-principles\.md \(es\): structure changed at block \d+: 1p:LL became 1p:tL/);
+    assert.ok(!existsSync(join(s.dir, 'ko', 'es', 'bok', '03-values-principles.md')));
+  } finally {
+    s.cleanup();
+  }
 });
 
 test('the pull request summary carries languages, files, segments and spend, and no em dash', () => {

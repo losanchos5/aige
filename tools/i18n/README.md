@@ -39,7 +39,8 @@ A batch still processing is recorded in `i18n/.tm/pending-batches.json`. The glo
 `i18n/glossary-lock.json` (see [Terminology](#terminology)). `I18N_DIR` moves all of `i18n/` to
 another directory (tests and fixtures do this); `I18N_UI_DIR` moves the UI files (by default
 `site/src/i18n`, or `<I18N_DIR>/ui` when `I18N_DIR` is set, so a scratch run never writes into the
-site).
+site). The site (`site/src/i18n/ui.ts`) and its content lint read the UI files by the same rule, so
+a build with the same variables finds what a run wrote.
 
 ## Running it
 
@@ -68,6 +69,11 @@ a known price), `--force` (re-render files whose `sourceHash` matches), `--full`
 ignore the memory and the hashes), `--cache-ttl 5m|1h|off`, `--concurrency`, `--poll-seconds`,
 `--max-wait-minutes`, `--no-wait`, `--date`, `--report <json>`, `--summary <md>`.
 
+Exit status: 0 when the run reported no error; 1 when it failed or reported one (a file kept out
+because its structure changed, an API error), after writing the files that passed, the report and
+the summary; 2 for bad arguments. In the workflow a 1 marks the job failed, and the pull request is
+still opened with what was written.
+
 ## How a run works
 
 1. **Plan.** Every English source is parsed. A file whose translation already carries the same
@@ -93,9 +99,13 @@ ignore the memory and the hashes), `--cache-ttl 5m|1h|off`, `--concurrency`, `--
 5. **Write.** Each file is rendered from the memory with its prose re-wrapped at about 100
    characters (never inside bold, a link or code, never starting a line with something that would
    open another block), then parsed again: if its structure (every heading level, list, item, table
-   shape, quote and code block) differs from the English, the file is not written and the run reports
-   it. A file with a segment still untranslated (the cap, an API error, a batch in progress) is not
-   written either, so a `sourceHash` is only ever stamped on a complete file.
+   shape, quote and code block, and which paragraphs are led by a callout or "Maps to" label)
+   differs from the English, the file is not written and the run reports it. The output is parsed
+   back knowing the localized labels that render put in (`**En la práctica**`, `**Zuordnung:**`),
+   and only those, so a translated label counts as a label exactly where the English one did, while
+   a label the translation adds or loses is still a structure change. A file with a segment still
+   untranslated (the cap, an API error, a batch in progress) is not written either, so a
+   `sourceHash` is only ever stamped on a complete file.
 
 Hand edits to a translated file survive until the English file changes; then the file is rendered
 again from the memory. Lasting corrections belong in the glossary lock (terminology) or in the
@@ -111,17 +121,18 @@ which the system prompt passes. Token counts are an approximation, so no key is 
 3 tokens per placeholder, and output tokens = source tokens x 1.4 (es, pt), 1.45 (fr) or 1.5 (de)
 plus the JSON framing. The first real run prints the real spend from the API's usage figures.
 
-`--estimate` on the content of v0.5.0 (2026-09-25, empty memory): 57 files for `es` (no Thesis) and
-58 for `fr`, `de`, `pt`; about 10,800 segments per language, of which 1,300 have nothing to translate
-and about 8,300 unique ones are sent; 491 requests; about 1.44 million source tokens in total.
+`--estimate` on the content of 2026-09-25 (empty memory): 57 files for `es` (no Thesis) and 58 for
+`fr`, `de`, `pt`, plus `ui.<lang>.json`; about 10,900 segments per language, of which 1,300 have
+nothing to translate and about 8,400 unique ones are sent; 494 requests; about 1.44 million source
+tokens in total.
 
 | Language | Requests | Segments | Input tokens | Output tokens | Sync | Sync + cache | Batch | Batch + cache |
 |---|---|---|---|---|---|---|---|---|
-| es | 122 | 8,292 | 1,109,538 | 604,549 | 4.13 | 3.53 | 2.07 | 1.76 |
-| fr | 123 | 8,347 | 1,119,682 | 629,592 | 4.27 | 3.66 | 2.13 | 1.83 |
-| de | 123 | 8,347 | 1,119,718 | 645,606 | 4.35 | 3.74 | 2.17 | 1.87 |
-| pt | 123 | 8,347 | 1,121,125 | 610,977 | 4.18 | 3.57 | 2.09 | 1.78 |
-| Total | 491 | 33,333 | 4,470,063 | 2,490,724 | 16.92 | 14.49 | 8.46 | 7.25 |
+| es | 122 | 8,367 | 1,110,588 | 606,066 | 4.14 | 3.54 | 2.07 | 1.77 |
+| fr | 124 | 8,422 | 1,126,336 | 631,152 | 4.28 | 3.67 | 2.14 | 1.83 |
+| de | 124 | 8,422 | 1,126,372 | 647,173 | 4.36 | 3.75 | 2.18 | 1.87 |
+| pt | 124 | 8,422 | 1,127,790 | 612,514 | 4.19 | 3.58 | 2.10 | 1.79 |
+| Total | 494 | 33,633 | 4,491,086 | 2,496,905 | 16.98 | 14.53 | 8.49 | 7.26 |
 
 USD. "+ cache" is the best case, every request after the first reading the cached system prompt;
 in a batch, cache hits are best effort, so the real figure lies between the two batch columns.
@@ -132,8 +143,9 @@ is added to the spend so far and to the worst case of the requests still in flig
 pass the cap, the request is not sent and its segments wait for a later run. After each answer the
 reservation is replaced by the real cost from the usage the API returns, and the final spend is
 printed. In batch mode every request of the batch is reserved at once, so a batch is trimmed to what
-fits under the cap before it is created. For the full pass above that worst case is USD 11.43 in a
-batch (USD 22.85 through the Messages API), so a cap of 12 covers the whole batch.
+fits under the cap before it is created. For the full pass above that worst case is USD 11.46 in a
+batch (USD 22.93 through the Messages API): a cap of 12 covers the whole batch, and the cap of 10
+the first full pass uses sends 430 of the 494 requests (all of es, fr and de, half of pt).
 
 ## The first full pass
 
@@ -141,13 +153,19 @@ batch (USD 22.85 through the Messages API), so a cap of 12 covers the whole batc
    allow GitHub Actions to create pull requests (Settings, Actions, General, Workflow permissions,
    "Allow GitHub Actions to create and approve pull requests").
 2. Actions, **Translations**, Run workflow on `main` with `mode` = `batch`, `langs` =
-   `es,fr,de,pt`, `max_usd` = `12`.
-3. Expected spend: about USD 7 to 8.5 by the estimate above (the approximation errs high), never
-   more than 12. Most batches end within an hour; the job waits up to five hours.
-4. The workflow opens a pull request from `i18n/auto-<run id>` with the files, the memory and a
-   summary (languages, files, segments, English kept, real spend). Review and merge it. Pull requests
+   `es,fr,de,pt`, `max_usd` = `10`.
+3. Expected spend: about USD 6.3 to 7.4 by the estimate above (the approximation errs high), never
+   more than 10. The cap trims the batch to 430 of its 494 requests (see
+   [the cap](#cost-and-the-cap)): es, fr and de complete, pt about half; Portuguese files that miss
+   a segment are not written yet, and every segment that came back stays in the memory. Most
+   batches end within an hour; the job waits up to five hours.
+4. The workflow pushes the branch `i18n/auto-<run id>` with the files, the memory and a summary
+   (languages, files, segments, English kept, real spend, errors) and opens a pull request from it
+   when the repository allows GitHub Actions to create pull requests; otherwise it logs a notice and
+   a maintainer opens the pull request from the pushed branch. Review and merge it. Pull requests
    opened with the workflow's token do not start `ci.yml` on their own: close and reopen the pull
-   request (or push a commit to it) to run the checks.
+   request (or push a commit to it) to run the checks. Then run the workflow on `main` again with
+   `langs` = `pt`, `mode` = `batch`, `max_usd` = `2` for the rest of Portuguese (about USD 1).
 5. If the job stops waiting while the batch is still processing, the batch id is committed in
    `i18n/.tm/pending-batches.json` on that branch. Run the workflow again **on that branch** ("Use
    workflow from", `mode` = `batch`): it resumes the batch, applies the results, pushes to the same
@@ -210,12 +228,14 @@ or an acronym is not rendered as locked.
 back byte for byte; a mock translation of every real source keeps the same blocks, link targets and
 code under the site's own Markdown parser (mdast with GFM, when `site/node_modules` is installed;
 skipped otherwise); placeholders round-trip on every real segment; validation, the em dash rule,
-the glossary lock and the system prompt; mock mode end to end on the real content into a scratch
-`I18N_DIR`, sourceHash skipping and an English edit that re-translates one segment; the hard cap and
-the retry-then-fallback rule with a fake client; batch creation, interruption and resume with a fake
-client; the official SDK itself against a fake `fetch` that answers like the API (request shape,
-cached system prompt, structured output, batch JSONL results, an authentication error stopping the
-run); the workflow file; the CLI; no em dash in any of these files.
+the glossary lock and the system prompt; localized callout and "Maps to" labels passing the
+structure check, which still catches a label added or lost; mock mode end to end on the real content
+into a scratch `I18N_DIR` with the real `callouts.json`, sourceHash skipping and an English edit
+that re-translates one segment; the hard cap and the retry-then-fallback rule with a fake client;
+batch creation, interruption and resume with a fake client; the official SDK itself against a fake
+`fetch` that answers like the API (request shape, cached system prompt, structured output, batch
+JSONL results, an authentication error stopping the run); the workflow file; the CLI and its exit
+status; no em dash in any of these files.
 
 ## Known limits
 

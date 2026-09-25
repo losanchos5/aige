@@ -17,21 +17,39 @@ import { fakeClient, fixtureTree, glossary, REPO, scratch, scratchDirs, silent }
 
 const DATE = '2026-09-25';
 
+const CALLOUTS = join(REPO, 'site', 'src', 'i18n', 'callouts.json');
+
 test('mock mode end to end on the real content, into a scratch I18N_DIR', async () => {
   const s = scratch();
   try {
-    const dirs = scratchDirs(s.dir);
+    // The real callouts.json, as a real run uses it: labels are localized, and
+    // the structure check must still see them as labels (regression: every
+    // file with a callout or a "Maps to:" line failed with "1p:L became 1p").
+    assert.ok(existsSync(CALLOUTS), 'site/src/i18n/callouts.json');
+    const dirs = scratchDirs(s.dir, { I18N_CALLOUTS: CALLOUTS });
     const report = await run({ mode: 'mock', dirs, date: DATE, log: silent });
     assert.deepEqual(report.errors, []);
     assert.equal(report.fallbacks.length, 0);
     const thesisEs = readFileSync(join(REPO, 'THESIS.es.md'), 'utf8');
+    const hasUi = existsSync(join(REPO, 'site', 'src', 'i18n', 'ui.en.json'));
     for (const lang of ['es', 'fr', 'de', 'pt']) {
       const bok = readdirSync(join(dirs.i18nDir, lang, 'bok'));
       assert.equal(bok.length, 24, `${lang}: 24 chapters`);
       assert.equal(readdirSync(join(dirs.i18nDir, lang, 'patterns')).length, readdirSync(join(REPO, 'bok', 'patterns')).length);
       assert.equal(existsSync(join(dirs.i18nDir, lang, 'THESIS.md')), lang !== 'es', `${lang}: Thesis only for fr, de, pt`);
       assert.ok(existsSync(join(dirs.tmDir, `${lang}.jsonl`)));
+      assert.equal(existsSync(join(dirs.uiDir, `ui.${lang}.json`)), hasUi, `${lang}: UI strings in <I18N_DIR>/ui`);
+      const pl = report.perLang[lang];
+      assert.deepEqual(pl.deferred, [], `${lang}: nothing deferred`);
+      assert.equal(pl.written.length, pl.files, `${lang}: every file written`);
     }
+    // The labels are the localized ones, in a quote and on the "Maps to" line.
+    const valuesEs = readFileSync(join(dirs.i18nDir, 'es', 'bok', '03-values-principles.md'), 'utf8');
+    assert.match(valuesEs, /^> \*\*En la práctica\*\* /m);
+    assert.match(valuesEs, /^> \*\*Antipatrón\*\* /m);
+    assert.doesNotMatch(valuesEs, /^> \*\*(?:In practice|Anti-pattern)\*\*/m);
+    assert.match(readFileSync(join(dirs.i18nDir, 'de', 'bok', '08-regulatory-map.md'), 'utf8'), /^\*\*Zuordnung:\*\* /m);
+    assert.match(readFileSync(join(dirs.i18nDir, 'fr', 'bok', '00-preface.md'), 'utf8'), /^\*\*Correspondances :\*\* /m);
     assert.equal(readFileSync(join(REPO, 'THESIS.es.md'), 'utf8'), thesisEs, 'the hand-translated Spanish Thesis is untouched');
 
     for (const [rel, out] of [
@@ -67,12 +85,19 @@ test('mock mode end to end on the real content, into a scratch I18N_DIR', async 
     assert.notEqual(f.summary, undefined);
     assert.match(f.summary, /[áéíóú]/);
 
-    // A second run pays for nothing: every file is skipped by its sourceHash.
+    // A second run pays for nothing and writes nothing: every Markdown file is
+    // skipped by its sourceHash; ui.<lang>.json has no frontmatter to carry one
+    // (the site rejects unknown keys), so it is rendered from the translation
+    // memory, with no request, and left alone because it is identical.
     const again = await run({ mode: 'mock', dirs, date: DATE, log: silent });
+    assert.deepEqual(again.errors, []);
     for (const pl of Object.values(again.perLang)) {
-      assert.equal(pl.skipped.length, pl.files);
+      assert.equal(pl.skipped.length, pl.files - (hasUi ? 1 : 0));
       assert.equal(pl.segments.toTranslate, 0);
+      assert.equal(pl.requests, 0);
       assert.equal(pl.written.length, 0);
+      assert.equal(pl.unchanged.length, hasUi ? 1 : 0);
+      assert.deepEqual(pl.deferred, []);
     }
   } finally {
     s.cleanup();

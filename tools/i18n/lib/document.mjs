@@ -6,7 +6,7 @@ import { join } from 'node:path';
 
 import { THESIS_LANGS } from './config.mjs';
 import { formatScalar, renderFrontmatter, splitFrontmatter } from './frontmatter.mjs';
-import { parseMarkdown, renderMarkdown, structureSignature } from './markdown.mjs';
+import { localizedLabels, parseMarkdown, renderMarkdown, structureSignature } from './markdown.mjs';
 import { EM_DASH, sourceHash } from './segment.mjs';
 
 /** Frontmatter fields whose values are prose a reader sees. */
@@ -126,8 +126,12 @@ export function renderTranslation(doc, lang, tr, { model, date, labelMap }) {
   }
   const body = renderMarkdown(doc.parsed, (seg) => tr(seg), labelMap);
   const out = renderFrontmatter(fields) + body;
-  // The structure must survive one to one: same headings, lists, tables, code.
-  const again = parseMarkdown(body, { file: `${doc.src.rel} (${lang})` });
+  // The structure must survive one to one: same headings, lists, tables, code,
+  // callout and "Maps to" labels. The output is parsed back knowing the
+  // localized labels this render put in (and only those), so a label that
+  // callouts.json translated still counts as a label, like its English source.
+  const labels = localizedLabels(doc.parsed.blocks, labelMap);
+  const again = parseMarkdown(body, { file: `${doc.src.rel} (${lang})`, labels });
   const a = structureSignature(doc.parsed.blocks);
   const b = structureSignature(again.blocks);
   if (a.length !== b.length || a.some((x, i) => x !== b[i])) {

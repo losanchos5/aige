@@ -5,9 +5,11 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
+import { renderTranslation } from '../lib/document.mjs';
 import { splitFrontmatter } from '../lib/frontmatter.mjs';
+import { localizeLabel } from '../lib/glossary.mjs';
 import {
-  escapeLeading, MarkdownError, parseMarkdown, renderMarkdown, structureSignature, wrapText,
+  escapeLeading, localizedLabels, MarkdownError, parseMarkdown, renderMarkdown, structureSignature, wrapText,
 } from '../lib/markdown.mjs';
 import { mockTranslate } from '../lib/mock.mjs';
 import { protect, restore } from '../lib/protect.mjs';
@@ -84,6 +86,79 @@ test('labels stay in English unless mapped, and the Sources section is never a s
   assert.deepEqual(p.segments.map((s) => s.source), ['Text.']);
   const out = renderMarkdown(p, (s) => `T(${s.source})`, (l) => (l === '**In practice (illustrative)**' ? '**En la práctica (ilustrativo)**' : undefined));
   assert.equal(out, '> **En la práctica (ilustrativo)**\n> T(Text.)\n\n## Sources\n\n[1] Kept verbatim.\n');
+});
+
+// Regression: with callouts.json present, every file with a callout or a "Maps
+// to:" line failed the structure check ("1p:L became 1p", "0p:L became 0p",
+// "1p:LL became 1p"), because the output was parsed back with the English
+// labels only, so a localized label read as plain text.
+test('localized labels pass the structure check, which still catches a real change', () => {
+  const md = [
+    '# 99. Labels',
+    '',
+    '> **In practice** A practice that runs long enough to be wrapped when it is translated, well past the',
+    '> hundred-character line.',
+    '> **Anti-pattern** The anti-pattern.',
+    '',
+    '> **Example (illustrative)**',
+    '> An example on its own line.',
+    '',
+    '> A plain quote.',
+    '',
+    '- **Maps to:** a list item that leads with the mapping label.',
+    '',
+    '**Maps to:** the mapping line.',
+    '',
+    '## Sources',
+    '',
+    '> **Note** Kept verbatim.',
+    '',
+  ].join('\n');
+  const callouts = {
+    present: true,
+    map: {
+      'In practice': { es: 'En la práctica', fr: 'En pratique' },
+      'Anti-pattern': { es: 'Antipatrón', fr: 'Anti-patron' },
+      'Example (illustrative)': { es: 'Ejemplo (ilustrativo)', fr: 'Exemple (illustratif)' },
+      Note: { es: 'Nota', fr: 'Remarque' },
+      'Maps to:': { es: 'Correspondencias:', fr: 'Correspondances :' },
+    },
+  };
+  const doc = { src: { rel: 'bok/99-labels.md', kind: 'bok' }, hash: 'h', frontmatter: [], parsed: parseMarkdown(md), segments: [] };
+  const tr = (s) => `${s.source} (translated, and a little longer than the English source)`;
+  const opts = (lang) => ({ model: 'mock', date: '2026-09-25', labelMap: (l) => localizeLabel(callouts, l, lang) });
+  const sig = structureSignature(doc.parsed.blocks);
+  assert.ok(sig.includes('1p:LL') && sig.includes('0p:L') && sig.includes('2p:L'), 'two labels in a callout, Maps to at the top and in a list');
+
+  for (const lang of ['es', 'fr']) {
+    const { labelMap } = opts(lang);
+    const body = splitFrontmatter(renderTranslation(doc, lang, tr, opts(lang))).body;
+    // Parsed back with the labels the render put in, the structure is the source's.
+    assert.deepEqual(structureSignature(parseMarkdown(body, { labels: localizedLabels(doc.parsed.blocks, labelMap) }).blocks), sig);
+    // With the English labels only it is not: that was the bug.
+    assert.notDeepEqual(structureSignature(parseMarkdown(body).blocks), sig);
+    // Sources stays English, labels included.
+    assert.ok(body.endsWith('## Sources\n\n> **Note** Kept verbatim.\n'), `${lang}: Sources verbatim`);
+  }
+  const es = splitFrontmatter(renderTranslation(doc, 'es', tr, opts('es'))).body;
+  assert.match(es, /^> \*\*En la práctica\*\* A practice/m);
+  assert.match(es, /^> \*\*Antipatrón\*\* The anti-pattern/m);
+  assert.match(es, /^> \*\*Ejemplo \(ilustrativo\)\*\*\n> An example/m);
+  assert.match(es, /^- \*\*Correspondencias:\*\* a list item/m);
+  assert.match(es, /^\*\*Correspondencias:\*\* the mapping line/m);
+  assert.match(splitFrontmatter(renderTranslation(doc, 'fr', tr, opts('fr'))).body, /^\*\*Correspondances :\*\* the mapping line/m);
+  assert.deepEqual(localizedLabels(doc.parsed.blocks, opts('es').labelMap), {
+    callout: ['**En la práctica**', '**Antipatrón**', '**Ejemplo (ilustrativo)**'],
+    lead: ['**Correspondencias:**'],
+  });
+
+  // Not weaker: a translation that turns plain text into a label is still a
+  // structure change, and so is a label that stops being one.
+  const inject = (label) => (s) => (s.source === 'A plain quote.' ? `${label} injected` : undefined);
+  assert.throws(() => renderTranslation(doc, 'es', inject('**En la práctica**'), opts('es')), /structure changed at block \d+: 1p became 1p:L$/);
+  assert.throws(() => renderTranslation(doc, 'es', inject('**Correspondencias:**'), opts('es')), /structure changed at block \d+: 1p became 1p:L$/);
+  const unbold = { model: 'mock', date: '2026-09-25', labelMap: (l) => (l === '**In practice**' ? 'En la práctica' : undefined) };
+  assert.throws(() => renderTranslation(doc, 'es', () => undefined, unbold), /structure changed at block \d+: 1p:LL became 1p:tL$/);
 });
 
 test('unsupported constructs fail loudly with the line number', () => {
