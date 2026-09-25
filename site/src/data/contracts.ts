@@ -26,7 +26,7 @@ export const references = {
   },
   'aia-26': {
     label: 'EU AI Act Art. 26',
-    url: 'https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-26',
+    url: 'https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_26',
   },
   'aia-13': {
     label: 'EU AI Act Art. 13',
@@ -50,23 +50,23 @@ export const references = {
   },
   'gdpr-28': {
     label: 'GDPR Art. 28',
-    url: 'https://gdpr-info.eu/art-28-gdpr/',
+    url: 'https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng#art_28',
   },
   'gdpr-33': {
     label: 'GDPR Art. 33',
-    url: 'https://gdpr-info.eu/art-33-gdpr/',
+    url: 'https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng#art_33',
   },
   'gdpr-44': {
     label: 'GDPR Art. 44',
-    url: 'https://gdpr-info.eu/art-44-gdpr/',
+    url: 'https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng#art_44',
   },
   'dora-28': {
     label: 'DORA Art. 28',
-    url: 'https://www.digital-operational-resilience-act.com/Article_28.html',
+    url: 'https://eur-lex.europa.eu/eli/reg/2022/2554/oj/eng#art_28',
   },
   'nis2-21': {
     label: 'NIS2 Art. 21(2)(d)',
-    url: 'https://www.nis-2-directive.com/NIS_2_Directive_Article_21.html',
+    url: 'https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng#art_21',
   },
   'pld-2024-2853': {
     label: 'Product Liability Directive (EU) 2024/2853',

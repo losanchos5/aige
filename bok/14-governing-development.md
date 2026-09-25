@@ -343,7 +343,7 @@ sources to describe [28].
 
 The EU AI Act requires high-risk systems to be tested "throughout the development process, and, in
 any event, prior to their being placed on the market", against "prior defined metrics and
-probabilistic thresholds appropriate to the intended purpose" (Art. 9(8)) [13]. The NIST AI RMF
+probabilistic thresholds that are appropriate to the intended purpose" (Art. 9(8)) [13]. The NIST AI RMF
 asks that test sets, metrics and tools are documented (MEASURE 2.1) and that the system is shown to
 be valid and reliable, with the limits of generalisation documented (MEASURE 2.5) [3]. The
 operative words are *prior defined*. Freeze the test plan in the repository before evaluation
@@ -419,9 +419,9 @@ objectivity", and the standing to effect change, and it keeps the three componen
 conceptual soundness, ongoing monitoring and outcomes analysis [7]. It also draws a line the
 engineer must notice: generative and agentic AI models "are not within the scope of this guidance",
 while its principles apply to traditional models and "non-generative, non-agentic AI models"
-[7]. In the UK, the PRA's SS1/23 applies to banks with internal-model approval, makes
-independent model validation one of its five principles and addresses AI and machine-learning
-techniques [34].
+[7]. In the UK, the PRA's SS1/23 applies to banks, building societies and PRA-designated
+investment firms with internal-model approval, makes independent model validation one of its five
+principles and addresses AI and machine-learning techniques [34].
 
 AI governance engineering takes from this tradition the validator's independence, the documented
 challenge and tiering by materiality. It adds validation as a re-runnable suite with evidence records
@@ -540,8 +540,10 @@ move is to generate the database payload from the registry entry, so that the re
 ### Substantial modification
 
 A **substantial modification** is a change after placing on the market "which is not foreseen or
-planned in the initial conformity assessment and as a result of which the compliance of the AI
-system with the requirements is affected" [5]. It triggers a new conformity assessment (Art.
+planned in the initial conformity assessment carried out by the provider and as a result of which
+the compliance of the AI system with the requirements set out in Chapter III, Section 2 is affected
+or results in a modification to the intended purpose for which the AI system has been assessed"
+[5]. It triggers a new conformity assessment (Art.
 43(4)); for systems that keep learning after release, changes the provider pre-determined at the
 initial assessment and described in the technical documentation are not substantial modifications
 [39], which is why Annex IV point 2(f) asks for those pre-determined changes and the technical
@@ -828,7 +830,7 @@ illustrative, not a claim of conformity.
 [31] Adding Error Bars to Evals: A Statistical Approach to Language Model Evaluations (Evan Miller; arXiv 2411.00640). arXiv. 2024-11-01. https://arxiv.org/abs/2411.00640 (verified: primary)
 [32] Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena (Zheng et al.; position, verbosity and self-enhancement biases; over 80% agreement with human preferences; arXiv 2306.05685). arXiv. 2023-06-09. https://arxiv.org/abs/2306.05685 (verified: primary)
 [33] Proving Test Set Contamination in Black Box Language Models (Oren et al.; arXiv 2310.17623). arXiv. 2023-10-26. https://arxiv.org/abs/2310.17623 (verified: primary)
-[34] SS1/23, Model risk management principles for banks (five principles incl. independent model validation; UK banks and building societies with internal-model approval; addresses AI and machine-learning techniques; published 17 May 2023, in effect from 17 May 2024). Bank of England, Prudential Regulation Authority. 2023-05-17. https://www.bankofengland.co.uk/prudential-regulation/publication/2023/may/model-risk-management-principles-for-banks-ss (verified: primary)
+[34] SS1/23, Model risk management principles for banks (five principles incl. independent model validation; UK-incorporated banks, building societies and PRA-designated investment firms with internal-model approval; addresses AI and machine-learning techniques; first published 17 May 2023, in effect from 17 May 2024; current version published and effective 23 Apr 2026 after low-impact amendments). Bank of England, Prudential Regulation Authority. 2026-04-23. https://www.bankofengland.co.uk/prudential-regulation/publication/2023/may/model-risk-management-principles-for-banks-ss (verified: primary)
 [35] model-transparency: supply chain security for ML (OpenSSF-linked model signing; signs an in-toto statement of file paths and digests through Sigstore or conventional keys; verification recomputes the hashes). Sigstore (GitHub). 2026. https://github.com/sigstore/model-transparency (verified: primary)
 [36] pickle: Python object serialization ("The pickle module is not secure. Only unpickle data you trust."). Python Software Foundation. 2026. https://docs.python.org/3/library/pickle.html (verified: primary)
 [37] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Art. 2 (2(8) research, testing and development before placing on the market excluded, except testing in real-world conditions; 2(12) systems under free and open-source licences excluded unless high-risk, Art. 5 or Art. 50). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_2 (verified: primary)
