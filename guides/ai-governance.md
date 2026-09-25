@@ -8,8 +8,11 @@
 what it is allowed to do, and what evidence proves it. The rules come from law such as the EU AI
 Act, standards such as ISO/IEC 42001 and frameworks such as the NIST AI RMF. An organisation turns
 them into roles: a board, a committee, an owner per system. It builds controls: an inventory, risk
-tiers, release tests, runtime guardrails. And it keeps records an auditor can read. This page
-defines the term, compares the frameworks and laws, and shows how to run the work. It follows the
+tiers, release tests, runtime guardrails. And it keeps records an auditor can read. Any
+organisation that builds, buys or uses AI systems whose failure can harm people, break the law or
+cost money needs it. Start by registering what is running, routing every new use case through one
+intake and writing the key rules as code. This page defines the term, compares the frameworks and
+laws, and shows how to run the work. It follows the
 [Body of Knowledge](/bok), which treats each topic in full.
 
 ## How is AI governance defined?
