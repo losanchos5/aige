@@ -104,7 +104,7 @@ test.describe('same-origin scripts and CSP', () => {
     });
   }
 
-  // The theme bootstrap (public/theme.js) is inlined in <head> so it costs no
+  // The theme bootstrap (src/scripts/theme.js) is inlined in <head> so it costs no
   // request ahead of the stylesheets. The hash is recomputed from the bytes that
   // shipped, so an edit to theme.js without a new hash in _headers fails here
   // (the build already refuses it, src/lib/theme-script.ts).
@@ -123,8 +123,8 @@ test.describe('same-origin scripts and CSP', () => {
     });
   }
 
-  test('the site CSP lists exactly one script hash, the one of public/theme.js as inlined', () => {
-    const body = readFileSync(join('public', 'theme.js'), 'utf8')
+  test('the site CSP lists exactly one script hash, the one of src/scripts/theme.js as inlined', () => {
+    const body = readFileSync(join('src', 'scripts', 'theme.js'), 'utf8')
       .replace(/\/\*[\s\S]*?\*\//g, '')
       .split(/\r?\n/)
       .map((line) => line.trim())

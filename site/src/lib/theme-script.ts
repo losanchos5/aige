@@ -1,13 +1,14 @@
 // theme-script.ts: the theme bootstrap that Base.astro inlines in <head>.
 //
-// public/theme.js is the one source. It used to load as <script src>, a
+// src/scripts/theme.js is the one source. It used to load as <script src>, a
 // parser-blocking request ahead of every stylesheet on every page; inlined, the
 // persisted theme still lands before first paint with no request at all. The
 // site CSP (public/_headers) has no 'unsafe-inline', so the inline script runs
 // only because script-src lists the sha256 of these exact bytes. The build
 // fails here when the two disagree, and tests/infra.spec.ts re-checks the
 // built HTML against dist/_headers, so an edit to theme.js cannot silently
-// ship a page whose theme script the browser refuses.
+// ship a page whose theme script the browser refuses. It lives under src/, not
+// public/, so no dead copy of it is served as /theme.js.
 //
 // Pages render from the site directory (the build cwd), like src/lib/og.ts.
 import { createHash } from 'node:crypto';
@@ -37,12 +38,12 @@ export function cspHash(body: string): string {
  */
 export function themeScript(): { source: string; hash: string } {
   if (cached) return cached;
-  const source = minify(readFileSync(resolve(process.cwd(), 'public/theme.js'), 'utf8'));
+  const source = minify(readFileSync(resolve(process.cwd(), 'src/scripts/theme.js'), 'utf8'));
   const hash = cspHash(source);
   const headers = readFileSync(resolve(process.cwd(), 'public/_headers'), 'utf8');
   if (!headers.includes(hash)) {
     throw new Error(
-      `public/_headers: the site-wide script-src must list ${hash}, the hash of the inline theme script (public/theme.js).`,
+      `public/_headers: the site-wide script-src must list ${hash}, the hash of the inline theme script (src/scripts/theme.js).`,
     );
   }
   cached = { source, hash };

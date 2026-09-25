@@ -162,7 +162,7 @@ const theme = themeScript();
     <!-- Both themes are supported; the tokens set color-scheme per theme. -->
     <meta name="color-scheme" content="light dark" />
     <!-- Apply persisted theme before paint; exposes window.__setTheme. Inline
-         (public/theme.js, minified), allowed by its sha256 in the CSP. -->
+         (src/scripts/theme.js, minified), allowed by its sha256 in the CSP. -->
     <script is:inline set:html={theme.source} />
 
     {
