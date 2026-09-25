@@ -100,6 +100,9 @@ const jsonLd = [
     isPartOf: { '@id': WEBSITE_ID },
     ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
     citation: entry.sources.map((s) => s.url),
+    // The card the page shares (og:image below), which Google lists as an
+    // Article property for rich results (audit SCHEMA N1).
+    image: new URL('/og/resources.png', site.url).href,
   },
   ...authorNodes,
   breadcrumbJsonLd(crumbs),

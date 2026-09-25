@@ -16,6 +16,7 @@
 //   "…", never mid-word and never on a dangling ":" or "and".
 import { obligations, type Obligation } from '../data/frameworks';
 import { frameworkOf } from './obligations';
+import { closeSentence, leadDescription } from './lead-sentence';
 
 /** Title budget. Seo keeps its " · AI Governance Engineer" suffix only while the
  *  whole title stays within 60 characters, so a 60-character title stands alone. */
@@ -84,55 +85,209 @@ export function obligationHeading(row: Obligation): string {
 }
 
 const DANGLING =
-  /(?:\s+(?:and|or|of|for|the|with|to|in|on|a|an|by|incl\.?|including|as|at|from|that|which|whose|about|within|without|outside|before|after|under|into|over|against|per|via|between|across|than|Arts?\.))+$/i;
+  /(?:\s+(?:and|or|of|for|the|with|to|in|on|a|an|by|incl\.?|including|as|at|from|that|which|whose|about|within|without|outside|before|after|under|into|over|against|per|via|between|across|than|subject|kept|Arts?\.))+$/i;
 
-/** Cut `text` to `max` characters on a word boundary, ending in "…". */
-function cutOnWord(text: string, max: number): string {
-  const budget = max - 1;
-  const boundary = text[budget] === ' ' ? budget : text.lastIndexOf(' ', budget);
-  let cut = boundary > 0 ? text.slice(0, boundary) : text.slice(0, budget);
-  // No half-open bracket, no dangling punctuation or connective.
-  const open = cut.lastIndexOf('(');
-  if (open > cut.lastIndexOf(')')) cut = cut.slice(0, open);
-  for (let prev = ''; prev !== cut; ) {
-    prev = cut;
-    cut = cut.replace(/[\s,;:–-]+$/, '').replace(DANGLING, '');
+/** Places a name can stop and still be a whole noun phrase: before a comma or a
+ *  semicolon, before "and" / "or", or before a word that opens a qualifier (a
+ *  preposition, a relative pronoun or an -ing participle: "... data in bias
+ *  detection", "... policy honouring ..."). */
+const PHRASE_BREAK =
+  /(?<list>[,;]\s|\s(?=(?:and|or)\s))|\s(?=(?:with|within|without|for|of|in|on|by|that|which|to|under|from|at|against|as|via|into|per|after|before|about|outside|beyond|during|between|across|over|through|including|incl\.|where|when|while)\s)|(?<participle>\s(?=[a-z]+ing\s(?!(?:and|or)\s)))/g;
+
+/** `text` without trailing punctuation or dangling connectives ("... logs kept"). */
+function trimEnd(text: string): string {
+  let out = text;
+  for (let prev = ''; prev !== out; ) {
+    prev = out;
+    out = out.replace(/[\s,;:–-]+$/, '').replace(DANGLING, '');
   }
-  return `${cut}…`;
+  return out;
 }
 
-/** Fit `text` into `max` characters, keeping as much of its meaning as possible. */
-export function fitTitle(text: string, max = OBLIGATION_TITLE_MAX): string {
-  if (text.length <= max) return text;
+const balanced = (text: string): boolean => text.split('(').length === text.split(')').length;
+
+/**
+ * `text` and every whole phrase it opens with, longest first: the cuts before a
+ * PHRASE_BREAK that leave no dangling word or half-open bracket, and no list
+ * whose last item lost its noun: a cut keeps at least two words of the last
+ * item it ends on, so "fake and concealed reviews" never becomes "fake" nor
+ * "autonomy, tool use and loss of control" becomes "... and loss" (a list of
+ * single words, "consent and retention", stays whole). `from` keeps the first
+ * characters (the instrument and clause) out of the cut.
+ */
+function phrases(text: string, from = 0): string[] {
+  const out = [text];
+  for (const match of text.matchAll(PHRASE_BREAK)) {
+    if ((match.index ?? 0) <= from) continue;
+    const head = trimEnd(text.slice(0, match.index));
+    if (head.length <= from || !balanced(head)) continue;
+    const items = head
+      .slice(from)
+      .replace(/^[\s:,;]+/, '')
+      .split(/[,;]\s|\s(?:and|or)\s/).map(words);
+    const last = items[items.length - 1] ?? [];
+    if (match.groups?.list !== undefined && last.length < 2) continue;
+    if (match.groups?.participle !== undefined && words(head.slice(from)).length < 2) continue;
+    if (items.length > 1 && last.length < 2 && !items.every((item) => item.length === 1)) continue;
+    out.push(head);
+  }
+  return [...new Set(out)].sort((a, b) => b.length - a.length);
+}
+
+/** A clause reference opens here: "Art. 16", "action 3", "Appendix 2", "§5.3". */
+const REFERENCE = /^(?:Arts?\.|Articles?|§.*|s\.|Sec\.|Section|[Aa]ctions?|Commitment|Appendix|Annex|Principle|para\.)$/;
+
+/** The heading's prefix with its instrument written as the framework's short
+ *  name ("Council of Europe Convention Art. 16" -> "CoE Convention Art. 16"). */
+function shortPrefix(prefix: string, shortName: string): string | undefined {
+  const tokens = words(prefix);
+  const at = tokens.findIndex((token, i) => i > 0 && REFERENCE.test(token));
+  if (at <= 0) return undefined;
+  const instrument = tokens.slice(0, at).join(' ');
+  // Same instrument, or a short name that already ends in the reference word
+  // ("OECD AI Principles" + "Principle 1.4(b)").
+  const lastShort = norm(words(shortName).pop() ?? '');
+  if (instrument === shortName || lastShort.startsWith(norm(tokens[at]))) return undefined;
+  return `${shortName} ${tokens.slice(at).join(' ')}`;
+}
+
+/** A heading split into the instrument and clause it opens with and the topic
+ *  after them: at its first ": ", else at the first lower-case word that is not
+ *  part of the name ("and 25", "of Europe", "for Labelling"). */
+function splitHeading(heading: string): { prefix: string; topic: string } {
+  const colon = heading.indexOf(': ');
+  if (colon > 0) return { prefix: heading.slice(0, colon), topic: heading.slice(colon + 2) };
+  const tokens = heading.split(' ');
+  for (let i = 1; i < tokens.length; i++) {
+    if (!/^[a-z]/.test(tokens[i])) continue;
+    if (/^(?:and|or|to|of|for|with)$/.test(tokens[i]) && /^[A-Z0-9(§]/.test(tokens[i + 1] ?? '')) continue;
+    return { prefix: tokens.slice(0, i).join(' '), topic: tokens.slice(i).join(' ') };
+  }
+  return { prefix: heading, topic: '' };
+}
+
+const wordCount = (text: string): number => words(text).length;
+
+/**
+ * Complete titles for a heading, best first, each within `max` characters and
+ * none cut mid-phrase or ending in "…" (audit ONPAGE N2): the heading itself;
+ * without its trailing parenthesis; before a "; " aside; then the instrument
+ * and clause, as the heading names them or as `instrumentClause` shortens them,
+ * with as much of the topic as fits ("China PIPL Art. 24: automated
+ * decision-making"); then the heading's own opening phrase; then the
+ * instrument and clause alone.
+ */
+export function titleCandidates(
+  heading: string,
+  names: { clauseLabel?: string; shortName?: string } = {},
+  max = OBLIGATION_TITLE_MAX,
+): string[] {
+  const { clauseLabel, shortName } = names;
+  const out: string[] = [];
+  const fits = (text: string) => text.length <= max;
   // 1. Drop a trailing parenthesis: "(voluntary)", "(in force 2023-01-10)".
-  const bare = text.replace(/\s*\([^()]*\)$/, '');
-  if (bare.length <= max) return bare;
-  // 2. Cut before a semicolon or an ", incl." aside inside the budget (a plain
-  //    comma usually splits a list, so it is not a clean place to stop).
+  const bare = heading.replace(/\s*\([^()]*\)$/, '');
+  out.push(heading, bare);
+  // 2. Cut before a semicolon or an ", incl." aside (a plain comma usually
+  //    splits a list, so it is not a clean place to stop).
   const stop = Math.max(bare.lastIndexOf('; ', max), bare.lastIndexOf(', incl. ', max));
-  if (stop >= 30) {
-    const head = bare.slice(0, stop);
-    if (head.split('(').length === head.split(')').length) return head;
+  if (stop >= 30 && balanced(bare.slice(0, stop))) out.push(bare.slice(0, stop));
+  // 3. "<instrument clause>: <topic phrase>", the variant that keeps the most
+  //    words of the topic first; the heading's own wording wins a tie.
+  const { prefix, topic } = splitHeading(bare);
+  if (topic) {
+    const short = shortName ? shortPrefix(prefix, shortName) : undefined;
+    const labels = [...new Set([prefix, short, clauseLabel].filter((l): l is string => !!l))];
+    const ranked: { title: string; kept: number; rank: number }[] = [];
+    labels.forEach((label, rank) => {
+      const joiner = label.includes(':') ? ' ' : ': ';
+      // A reference the label already carries ("§5.3") is not repeated in the topic.
+      const own = new Set(words(label).map(norm));
+      const rest = words(topic);
+      const last = () => rest[rest.length - 1];
+      while (rest.length > 1 && /[\d§]/.test(last()) && own.has(norm(last()))) rest.pop();
+      const phrase = phrases(rest.join(' ')).find((p) => fits(`${label}${joiner}${p}`));
+      if (phrase) ranked.push({ title: `${label}${joiner}${phrase}`, kept: wordCount(phrase), rank });
+    });
+    ranked.sort((a, b) => b.kept - a.kept || a.rank - b.rank);
+    out.push(...ranked.map((r) => r.title));
   }
-  // 3. A word boundary, with "…".
-  return cutOnWord(bare, max);
+  // 4. The heading's opening phrase: "China Measures for Labelling AI-Generated
+  //    Synthetic Content" (before "with GB 45438-2025").
+  out.push(...phrases(bare, topic ? prefix.length : 0).filter((p) => p.length >= 20));
+  // 5. The instrument and clause alone.
+  if (clauseLabel) out.push(clauseLabel, clauseLabel.replace(/\s*\([^()]*\)$/, ''));
+  if (topic) out.push(prefix);
+  return [...new Set(out.filter(fits))];
 }
+
+/** Fit `text` into `max` characters: the best complete title, never with "…".
+ *  Falls back to the text's first `max` characters on a word boundary only if
+ *  no phrase fits, which no register row does (tests/seo-templates.spec.ts). */
+export function fitTitle(text: string, max = OBLIGATION_TITLE_MAX): string {
+  const [best] = titleCandidates(text, {}, max);
+  if (best) return best;
+  const boundary = text.lastIndexOf(' ', max);
+  return trimEnd(text.slice(0, boundary > 0 ? boundary : max));
+}
+
+/**
+ * Rows whose heading has no cut that reads as a whole phrase within the budget
+ * (the cut would end on "subject", "fake", "Basic" or drop the instrument's own
+ * name). Each is the row's heading shortened by hand, in its own words; the
+ * tests hold them to the same rules (within 60 characters, no "…", unique).
+ */
+const TITLE_OVERRIDES: Readonly<Record<string, string>> = {
+  'AIGE-OBL-EUAIA-ART26-4': 'EU AI Act Art. 26(4): relevant, representative input data',
+  'AIGE-OBL-EUAIA-ART26-11': 'EU AI Act Art. 26(11): informing people subject to decisions',
+  'AIGE-OBL-KR-ART31-1': 'Korea AI Act Art. 31(1): prior notice of high-impact AI',
+  'AIGE-OBL-DORA-ART28': 'DORA Art. 28(3) and 28(8): ICT third-party register',
+  'AIGE-OBL-ISO22989-CONCEPTS': 'ISO/IEC 22989:2022 AI concepts and terminology',
+  'AIGE-OBL-USCA-CPPA-ADMT': 'California CPPA regulations on automated decisionmaking',
+  'AIGE-OBL-SG-GENAI': 'Singapore IMDA Model AI Governance Framework for GenAI',
+  'AIGE-OBL-SG-AGENTIC-IDENTITY': 'Singapore Agentic AI framework v1.5: agent identity',
+  'AIGE-OBL-UK-DMCC-S225': 'UK DMCC Act 2024: fake and concealed-incentive reviews',
+  'AIGE-OBL-CN-GBT45654': 'GB/T 45654-2025: security requirements for generative AI',
+  'AIGE-OBL-CN-ANTHRO': 'China Measures for Anthropomorphic Interaction Services',
+  'AIGE-OBL-OECD-P1-4B': 'OECD AI Principle 1.4(b): override, repair or decommission',
+  'AIGE-OBL-OECD-P1-5': 'OECD AI Principle 1.5(b)–(c): traceability',
+};
 
 let titles: Map<string, string> | undefined;
 
-/** Short titles for every row, unique: rows whose fitted headings coincide fall
- *  back to their fitted "<instrument> <clause>" labels. */
+/** Short titles for every row, unique: a row whose best title another row also
+ *  takes moves to its next candidate that nobody else has. */
 function allTitles(): Map<string, string> {
   if (titles) return titles;
-  const first = new Map(obligations.map((row) => [row.id, fitTitle(obligationHeading(row))]));
-  const counts = new Map<string, number>();
-  for (const title of first.values()) counts.set(title, (counts.get(title) ?? 0) + 1);
-  titles = new Map(
+  const options = new Map(
     obligations.map((row) => {
-      const title = first.get(row.id) ?? '';
-      return [row.id, (counts.get(title) ?? 0) > 1 ? fitTitle(instrumentClause(row)) : title];
+      const list = [
+        ...(TITLE_OVERRIDES[row.id] ? [TITLE_OVERRIDES[row.id]] : []),
+        ...titleCandidates(obligationHeading(row), {
+          clauseLabel: instrumentClause(row),
+          shortName: frameworkOf(row).short,
+        }),
+      ];
+      return [row.id, list.length ? list : [fitTitle(obligationHeading(row))]];
     }),
   );
+  const chosen = new Map([...options].map(([id, list]) => [id, 0]));
+  for (let changed = true; changed; ) {
+    changed = false;
+    const counts = new Map<string, number>();
+    for (const [id, i] of chosen) {
+      const title = options.get(id)![i];
+      counts.set(title, (counts.get(title) ?? 0) + 1);
+    }
+    for (const [id, i] of chosen) {
+      const list = options.get(id)!;
+      if ((counts.get(list[i]) ?? 0) > 1 && i < list.length - 1) {
+        chosen.set(id, i + 1);
+        changed = true;
+      }
+    }
+  }
+  titles = new Map([...chosen].map(([id, i]) => [id, options.get(id)![i]]));
   return titles;
 }
 
@@ -144,4 +299,45 @@ export function obligationShortTitle(row: Obligation): string {
 /** Path of the obligation's Open Graph card. */
 export function obligationOgPath(row: Pick<Obligation, 'id'>): string {
   return `/og/obligations/${row.id.toLowerCase()}.png`;
+}
+
+/** When the row applies, as one sentence, from its date and status. */
+function appliesSentence(row: Obligation): string | undefined {
+  const date = row.appliesFrom;
+  switch (row.appliesStatus) {
+    case 'in-force':
+      return date ? `In force since ${date}.` : 'In force.';
+    case 'grace':
+      return date ? `In force since ${date}, with a grace period.` : 'In force, with a grace period.';
+    case 'applies-later':
+      return date ? `Applies from ${date}.` : undefined;
+    case 'deferred':
+      return date ? `Applies from ${date} (deferred).` : 'Deferred.';
+    case 'voluntary':
+      return date ? `Voluntary; applies from ${date}.` : 'Voluntary.';
+    case 'pending':
+      return 'Draft or proposed.';
+  }
+}
+
+/**
+ * The page's meta description (audit ONPAGE N1 / N6, CONTENT C16): the
+ * instrument and clause, what the row requires (its opening clauses, whole),
+ * when it applies, then the evidence artefact while the snippet is short. The
+ * heading stands in for a requirement with no whole clause short enough.
+ */
+export function obligationDescription(row: Obligation): string {
+  // The artefact's items, "a; b, c": the longest run of whole items that fits.
+  const items = row.artefact.split(/(?<=[;,])\s/);
+  const evidence = items
+    .map((_, i) => items.slice(0, items.length - i).join(' '))
+    .map((text) => closeSentence(`Evidence: ${text.replace(/^([A-Z])(?=[a-z])/, (c) => c.toLowerCase())}`));
+  const applies = appliesSentence(row);
+  return leadDescription(row.requirement, {
+    label: instrumentClause(row),
+    labelRequired: true,
+    fallback: obligationHeading(row),
+    always: applies ? [applies] : [],
+    extras: [evidence, 'From the AI governance obligation register.'],
+  });
 }

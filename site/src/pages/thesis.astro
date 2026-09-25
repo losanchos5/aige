@@ -5,7 +5,7 @@ import Diagram from '../components/Diagram.astro';
 import SignNote from '../components/SignNote.astro';
 import { site } from '../data/site';
 import { gitCreated, gitDate } from '../lib/reading';
-import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
+import { authorNodes, authorRefs, BOOK_ID, ORG_ID, WEBSITE_ID, workDoi } from '../lib/jsonld';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 import { alternatesFor } from '../lib/i18n-content';
 
@@ -32,7 +32,10 @@ const issueUrl = `${site.github}/issues/new?template=sign-the-thesis.yml`;
 
 // The Thesis as a TechArticle, dated from the git history of THESIS.md. The
 // Person nodes and the Organization / WebSite ids come from lib/jsonld.ts, which
-// merges this into the page's single ld+json graph.
+// merges this into the page's single ld+json graph. The Thesis is archived with
+// the Body of Knowledge under one Zenodo record, so it carries that record's
+// DOIs (audit SCHEMA S7) and names the Book it opens; `workTranslation` points
+// at the Spanish edition, which names this node as its `translationOfWork`.
 const thesisUrl = new URL('/thesis', site.url).href;
 const jsonLd = [
   {
@@ -47,7 +50,9 @@ const jsonLd = [
     image: new URL('/og/thesis.png', site.url).href,
     author: [...authorRefs],
     publisher: { '@id': ORG_ID },
-    isPartOf: { '@id': WEBSITE_ID },
+    isPartOf: [{ '@id': WEBSITE_ID }, { '@id': BOOK_ID }],
+    identifier: workDoi.identifier,
+    workTranslation: { '@id': `${new URL('/es/thesis', site.url).href}#article` },
     // URL, not the "CC BY 4.0" label: schema.org types `license` as URL|CreativeWork.
     ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
   },

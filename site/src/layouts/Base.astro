@@ -26,6 +26,11 @@ interface Props {
   title: string;
   description?: string;
   image?: string;
+  /** og:image size, type and alt when not a 1200x630 card; see Seo. */
+  imageWidth?: number;
+  imageHeight?: number;
+  imageType?: string;
+  imageAlt?: string;
   lang?: string;
   locale?: string;
   jsonLd?: JsonLdInput;
@@ -52,6 +57,10 @@ const {
   title,
   description,
   image,
+  imageWidth,
+  imageHeight,
+  imageType,
+  imageAlt,
   lang = 'en',
   locale,
   jsonLd,
@@ -98,6 +107,10 @@ const theme = themeScript();
       title={title}
       description={description}
       image={image}
+      imageWidth={imageWidth}
+      imageHeight={imageHeight}
+      imageType={imageType}
+      imageAlt={imageAlt}
       locale={locale}
       jsonLd={jsonLd}
       alternates={alternates}

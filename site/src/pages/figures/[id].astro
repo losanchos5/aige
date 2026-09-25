@@ -113,6 +113,8 @@ const facts: [string, string][] = [
   title={`Figure: ${figure.title}`}
   description={description}
   image={primary ? primary.href : '/og/resources.png'}
+  imageWidth={primary?.pixelWidth}
+  imageHeight={primary?.pixelHeight}
   jsonLd={jsonLd}
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
 >

@@ -113,6 +113,21 @@ test.describe('page-specific nodes', () => {
     expect(article?.datePublished).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
+  test('/es/thesis names its breadcrumb root in Spanish', async ({ page }) => {
+    const graph = await graphOf(page, '/es/thesis');
+    const trail = graph.find((node) => node['@type'] === 'BreadcrumbList');
+    const names = (trail?.itemListElement ?? []).map((item: JsonLdNode) => item.name);
+    expect(names).toEqual(['Inicio', 'La Tesis']);
+  });
+
+  test('a case Article carries the image it shares', async ({ page }) => {
+    for (const path of ['/cases/a-level-grading-2020', '/cases/chatbot-code-leak-reported']) {
+      const graph = await graphOf(page, path);
+      const article = graph.find((node) => node['@type'] === 'Article');
+      expect(article?.image, path).toBe(`${SITE_ORIGIN}/og/resources.png`);
+    }
+  });
+
   test('/thesis is an English TechArticle with both dates', async ({ page }) => {
     const graph = await graphOf(page, '/thesis');
     const article = graph.find((node) => node['@type'] === 'TechArticle');
@@ -323,6 +338,15 @@ test.describe('entity and hub graph', () => {
         'https://zenodo.org/records/22857084',
       ]),
     );
+  });
+
+  test('/thesis carries the archive DOIs and points at its Spanish translation', async ({ page }) => {
+    const graph = await graphOf(page, '/thesis');
+    const article = graph.find((node) => node['@type'] === 'TechArticle');
+    expect(doisOf(article)).toEqual([VERSION_DOI, CONCEPT_DOI]);
+    expect(article?.workTranslation?.['@id']).toBe(`${SITE_ORIGIN}/es/thesis#article`);
+    const parents = [article?.isPartOf].flat().map((ref: JsonLdNode) => ref?.['@id']);
+    expect(parents).toEqual(expect.arrayContaining([`${SITE_ORIGIN}/#website`, `${SITE_ORIGIN}/bok#book`]));
   });
 
   test('a chapter carries the same Book, DOIs included', async ({ page }) => {

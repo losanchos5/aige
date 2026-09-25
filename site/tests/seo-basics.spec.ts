@@ -183,7 +183,10 @@ for (const path of paths) {
       const titles = await page.locator('head > title').allTextContents();
       const image = (await metaContents(page, 'meta[property="og:image"]'))[0];
       const shared = SHARED_CARDS[new URL(image).pathname];
-      if (shared && ogAlt[0] !== titles[0].trim()) {
+      if (path === '/es/thesis') {
+        // The Spanish Thesis shares the English card and describes it in Spanish.
+        expect(ogAlt[0]).toBe(`Tarjeta de «The Thesis», en inglés · ${SITE_NAME}`);
+      } else if (shared && ogAlt[0] !== titles[0].trim()) {
         expect(ogAlt[0]).toBe(`${shared} · ${SITE_NAME}`);
       } else {
         expect(ogAlt[0]).toBe(titles[0].trim());
