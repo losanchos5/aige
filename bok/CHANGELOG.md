@@ -12,8 +12,8 @@ and pages, glossary term pages, the harms atlas, cases, contract clauses, templa
 crosswalk v2 with a clause explorer, the threat bridge), a browser toolkit of eleven tools, citable and
 exportable figures and posters, a static open-data API and a read-only MCP server. It folds in the
 pending patch of 2026-09-20 (China, authorship, no em dashes) and the fact-check pass of 2026-09-24
-and 2026-09-25. The Thesis wording, definition, values and principles are unchanged; only its CC BY
-attribution notice is clarified.
+and 2026-09-25. The Thesis definition, values and principles are unchanged; its CC BY attribution
+notice is clarified and its fifth problem attributes its evidence more precisely (see Fixes).
 
 ### Content
 
@@ -552,6 +552,29 @@ attribution notice is clarified.
 Fact-check pass of 2026-09-24 and 2026-09-25: every finding was checked against the primary source
 before it was applied.
 
+- **Thesis and chapter 01.** Vendor sources are no longer presented as fact: the fifth problem sets
+  Gartner's own criterion ("automated policy enforcement at runtime") beside a category comparison
+  published by a competitor in it and IBM's account of its Magic Quadrant placement (June 2026), and
+  the agent-breach figure is a security vendor's 2026 survey; GRC engineering is dated "since about
+  2024" and "as of today" became "as of 2026-09-24" (Thesis in English and Spanish, preface).
+  Chapter 01 cites Gartner's spending forecast (USD 492 million in 2026, over USD 1 billion by 2030).
+  One model of the three questions runs through chapter 01, `/stack` and the home: Inventory &
+  Transparency answers what is running; Govern-as-Code and Runtime Controls & Observability answer
+  what it may do (the first writes the bound, the second enforces it on the live call); Evals & Red
+  Teaming and Assurance & Continuous Compliance answer what evidence proves it. The three layers
+  inherited from GRC engineering are named as the Thesis and chapter 04 name them.
+- **Chapters 00 to 10 (debt and date pass, 2026-09-24).** Dated statements are current as of
+  2026-09-24. Vendor figures are attributed, not asserted: the runtime-data-path finding is one
+  vendor's comparison published by a competitor in the category, the Magic Quadrant is reported by a
+  vendor named in it, and the agentic-breach figure is a security vendor's 2026 survey (chapters 02,
+  03 and 05); chapters 02 and 06 no longer cite individual job postings as evidence, and chapter 02
+  cites primary sources for SB 53 and the Omnibus dates. Chapters 04, 05 and 08, the glossary and the reading list cite EUR-Lex
+  and the Commission for EU texts; the reading list adds the consolidated AI Act, Regulation (EU)
+  2026/1744 and the International AI Safety Report 2026 and marks the AI Act Explorer as secondary
+  commentary. Chapter 04 cites OSCAL and the harmonised-standards status on primary sources, states
+  the layer-to-question model and the three inherited layers, and gives the guardian agent its
+  Gartner note; chapter 08 names Spain's AESIA with its Royal Decree 729/2023 and dates the NIST
+  drafts it cites as of 2026-09-24.
 - **US frontier laws.** California SB 53 and New York's RAISE Act bind every frontier developer (a
   model trained above 10^26 operations) to report critical safety incidents; only large frontier
   developers (annual revenue above USD 500M) must publish a frontier AI framework. RAISE takes the
