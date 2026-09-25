@@ -74,3 +74,38 @@ jobs:
             fi
           done
           echo "Smoke test passed."
+      # IndexNow (Bing and Copilot, Yandex, Seznam, Naver): after a push to main,
+      # submit the sitemap URLs so those engines recrawl without waiting. The key
+      # is public by design and lives at site/public/<key>.txt. Best effort: a
+      # failure here is logged as a warning and never fails the deploy.
+      - name: Submit sitemap URLs to IndexNow
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        continue-on-error: true
+        env:
+          INDEXNOW_KEY: 9f39919d3ae4eac155054e1f1f03cdeb
+          INDEXNOW_HOST: aigovernanceengineer.com
+        run: |
+          node --input-type=module -e '
+            import { readFileSync, writeFileSync } from "node:fs";
+            const host = process.env.INDEXNOW_HOST;
+            const key = process.env.INDEXNOW_KEY;
+            const xml = readFileSync("dist/sitemap-0.xml", "utf8");
+            const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)]
+              .map((m) => m[1].trim().replace(/&amp;/g, "&"))
+              .filter((u) => u.startsWith("https://" + host + "/"))
+              .slice(0, 10000);
+            const body = { host, key, keyLocation: "https://" + host + "/" + key + ".txt", urlList: urls };
+            writeFileSync("/tmp/indexnow.json", JSON.stringify(body));
+            console.log("IndexNow: submitting " + urls.length + " URLs");
+          ' || { echo "::warning::IndexNow payload not built"; exit 0; }
+          status=$(curl --silent --show-error --max-time 60 \
+            --retry 3 --retry-delay 10 \
+            --output /tmp/indexnow-body.txt --write-out '%{http_code}' \
+            -X POST -H 'Content-Type: application/json; charset=utf-8' \
+            --data-binary @/tmp/indexnow.json \
+            https://api.indexnow.org/indexnow) || status=error
+          echo "IndexNow responded ${status}"
+          case "${status}" in
+            200|202) ;;
+            *) echo "::warning::IndexNow submission returned ${status}"; cat /tmp/indexnow-body.txt || true ;;
+          esac
