@@ -25,8 +25,9 @@ const t = translator(lang);
 const groupLabel = (group: NavGroup) => t(`nav.${group.id}` as UiKey);
 const partLabel = (id: string, fallback: string) =>
   bookParts.some((part) => part.id === id) ? t(`part.${id}` as UiKey) : fallback;
-// The landing (/<lang>) of every language that has machine translations, in
-// locale order; none, and the list is not rendered (lib/i18n-content.ts).
+// The landing (/<lang>) of every language that has published machine
+// translations, in locale order; none (PUBLISHED_TRANSLATED_LOCALES is empty
+// today), and the list is not rendered (lib/i18n-content.ts).
 const langs = (['es', 'fr', 'de', 'pt'] as const).filter((lang) => translationIndex().langs.has(lang));
 
 const domain = new URL(site.url).host;

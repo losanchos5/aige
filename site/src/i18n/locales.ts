@@ -14,6 +14,24 @@ export const TRANSLATED_LOCALES = ['es', 'fr', 'de', 'pt'] as const;
 export type TranslatedLocale = (typeof TRANSLATED_LOCALES)[number];
 
 /**
+ * The switch: the machine-translated languages the site publishes. A language
+ * listed here gets its /<lang>/ routes, its hreflang alternates, its sitemap
+ * entries, its footer link and the language switcher; one left out keeps its
+ * files in i18n/ (and the pipeline in tools/i18n/) but builds nothing. Empty
+ * since 2026-09-25: the machine translations are hidden until their quality is
+ * reviewed (the SEO audit found mixed languages and broken headings), and
+ * public/_redirects sends their old URLs to the English pages with a 302.
+ * To publish again: list the languages here (e.g. ['es', 'fr', 'de', 'pt'])
+ * and remove the matching 302 rules from public/_redirects. /es/thesis, the
+ * hand translation of the Thesis, is not a machine translation and is always
+ * published.
+ */
+export const PUBLISHED_TRANSLATED_LOCALES: readonly TranslatedLocale[] = [];
+
+/** True when at least one machine-translated language is published. */
+export const I18N_PUBLISHED = PUBLISHED_TRANSLATED_LOCALES.length > 0;
+
+/**
  * The languages that get a machine translation of the Thesis. Spanish is not
  * one of them: /es/thesis is the hand translation (THESIS.es.md), which the
  * pipeline never overwrites and the site always serves.
@@ -43,6 +61,11 @@ export function isLocale(value: unknown): value is Locale {
 
 export function isTranslatedLocale(value: unknown): value is TranslatedLocale {
   return typeof value === 'string' && (TRANSLATED_LOCALES as readonly string[]).includes(value);
+}
+
+/** True for a machine-translated language the site publishes (PUBLISHED_TRANSLATED_LOCALES). */
+export function isPublishedLocale(value: unknown): value is TranslatedLocale {
+  return typeof value === 'string' && (PUBLISHED_TRANSLATED_LOCALES as readonly string[]).includes(value);
 }
 
 /** The locale of a page from its path: `/de/bok/x` is `de`, `/bok/x` is `en`. */

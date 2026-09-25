@@ -3,11 +3,14 @@
 // It checks whatever build is in dist against the translations the test process
 // can see, so it passes on both builds the change cares about:
 //
-//   - the committed build (I18N_DIR unset, i18n/<lang>/ empty): no translated
-//     route at all, /es/thesis still the hand translation, English pages with no
-//     language switcher and no new alternates;
+//   - the committed build: the machine translations are switched off
+//     (PUBLISHED_TRANSLATED_LOCALES in src/i18n/locales.ts is empty since
+//     2026-09-25; their files stay in i18n/<lang>/): no translated route at
+//     all, /es/thesis still the hand translation linked from /thesis, no
+//     language switcher anywhere, no new alternates, and public/_redirects
+//     sends the old translated URLs to the English pages;
 //   - a fixture build, with pseudo-localised translations (two chapters and one
-//     pattern in es and de, the Thesis in de):
+//     pattern in es and de, the Thesis in de), with the switch on:
 //
 //       node tests/fixtures/i18n/generate.mjs <tmp>
 //       I18N_DIR=<tmp> npm run build
@@ -31,11 +34,12 @@ import {
   indexOf,
   localizeHref,
   translationIndex,
+  translationsOnDisk,
   type TranslationFile,
 } from '../src/lib/i18n-content';
 import { placeholders, t, uiProblems } from '../src/i18n/ui';
 import { calloutMap, englishLabelFor } from '../src/i18n/callouts';
-import { TRANSLATED_LOCALES } from '../src/i18n/locales';
+import { I18N_PUBLISHED, TRANSLATED_LOCALES, isPublishedLocale } from '../src/i18n/locales';
 import { nav } from '../src/data/nav';
 import { chapterParts, chaptersOrdered } from '../src/data/chapters';
 
@@ -294,13 +298,20 @@ test.describe('translated routes in the build', () => {
     expect(await alternatesOn(page)).toEqual(alternatesFor('/es/thesis'));
     await page.goto('/thesis');
     expect(await alternatesOn(page)).toEqual(alternatesFor('/thesis'));
-    // Both languages exist, so the switcher offers them.
+    // Both languages exist: the page links its Spanish version in plain text,
+    // and the switcher offers it too when machine translations are published.
+    await expect(page.locator('main a[href="/es/thesis"][hreflang="es"]')).toHaveText('Leer en español');
     const switcher = page.locator('header.site-header [data-lang-switcher]');
-    await expect(switcher).toHaveCount(1);
-    await expect(switcher.locator('a[hreflang="es"]')).toHaveAttribute('href', '/es/thesis');
+    await expect(switcher).toHaveCount(I18N_PUBLISHED ? 1 : 0);
+    if (I18N_PUBLISHED) {
+      await expect(switcher.locator('a[hreflang="es"]')).toHaveAttribute('href', '/es/thesis');
+    }
+    await page.goto('/es/thesis');
+    await expect(page.locator('main a[href="/thesis"][hreflang="en"]')).toHaveText('Read in English');
   });
 
   test('on a phone the switcher moves into the menu drawer', async ({ page }) => {
+    test.skip(!I18N_PUBLISHED, 'machine translations are switched off: no switcher');
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/thesis');
     await expect(page.locator('header.site-header [data-lang-switcher]')).toBeHidden();
@@ -330,6 +341,112 @@ test.describe('translated routes in the build', () => {
     await expect(page.locator('[data-lang-switcher]')).toHaveCount(0);
     await expect(page.locator('nav[aria-label="Site map"] [data-footer-langs]')).toHaveCount(0);
     await expect(page.locator('header.site-header [data-search-open]')).toHaveAttribute('aria-label', 'Search');
+  });
+});
+
+// ── The switch off ───────────────────────────────────────────────────────
+
+/** Every built HTML file under dist, as a site path with its `.html`. */
+function htmlFilesInDist(): string[] {
+  return htmlRoutes(DIST).map((route) => `${route}.html`);
+}
+
+/** The host's path redirect rules (public/_redirects, copied to dist). */
+function redirectRules(): { from: string; to: string; status: string }[] {
+  return readFileSync(join(DIST, '_redirects'), 'utf8')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith('/'))
+    .map((line) => {
+      const [from, to, status] = line.split(/\s+/);
+      return { from, to, status };
+    });
+}
+
+/** True when a Cloudflare Pages source pattern (a trailing `*` splat) matches `path`. */
+function ruleMatches(from: string, path: string): boolean {
+  return from.endsWith('*') ? path.startsWith(from.slice(0, -1)) : path === from;
+}
+
+test.describe('machine translations switched off', () => {
+  test.skip(I18N_PUBLISHED, 'machine translations are published (PUBLISHED_TRANSLATED_LOCALES)');
+
+  test('the translation files stay on disk, but nothing but /es/thesis is built or listed', () => {
+    // The committed i18n/ holds the translations; a scratch I18N_DIR may be empty.
+    if (!process.env.I18N_DIR) expect(translationsOnDisk().length).toBeGreaterThan(0);
+    expect(index.files).toEqual([]);
+    expect(translatedRoutesInDist()).toEqual(['/es/thesis']);
+    const langPrefix = new RegExp(`^${SITE}/(${TRANSLATED_LOCALES.join('|')})(/|$)`);
+    const listed = sitemapUrls().filter((u) => langPrefix.test(u.loc)).map((u) => u.loc.slice(SITE.length));
+    expect(listed).toEqual(['/es/thesis']);
+  });
+
+  test('no page carries the language switcher, the footer languages or a translation notice', () => {
+    const files = htmlFilesInDist();
+    expect(files.length).toBeGreaterThan(100);
+    for (const file of files) {
+      const html = readFileSync(join(DIST, file), 'utf8');
+      expect(html, file).not.toMatch(/data-lang-switcher|data-footer-langs|data-i18n-notice/);
+    }
+  });
+
+  test('no hreflang points at a hidden translation; /thesis and /es/thesis stay paired', () => {
+    // Any alternate under /es, /fr, /de or /pt other than the hand translation.
+    const langPrefix = new RegExp(`^${SITE}/(${TRANSLATED_LOCALES.join('|')})(/|$)`);
+    const isHidden = (href: string) => href !== `${SITE}/es/thesis` && langPrefix.test(href);
+    const pair = [
+      { hreflang: 'en', href: `${SITE}/thesis` },
+      { hreflang: 'es', href: `${SITE}/es/thesis` },
+      { hreflang: 'x-default', href: `${SITE}/thesis` },
+    ];
+    for (const url of sitemapUrls()) {
+      const path = url.loc.slice(SITE.length);
+      if (path === '/thesis' || path === '/es/thesis') expect(url.links, path).toEqual(pair);
+      for (const link of url.links) expect(isHidden(link.href), `sitemap ${path}: ${link.href}`).toBe(false);
+    }
+    for (const file of htmlFilesInDist()) {
+      const html = readFileSync(join(DIST, file), 'utf8');
+      const tags = [...html.matchAll(/<link\b[^>]*\brel="alternate"[^>]*\bhreflang="([^"]+)"[^>]*>/g)].map((m) => ({
+        hreflang: m[1],
+        href: /\bhref="([^"]+)"/.exec(m[0])?.[1] ?? '',
+      }));
+      if (file === '/thesis.html' || file === '/es/thesis.html') expect(tags, file).toEqual(pair);
+      for (const tag of tags) expect(isHidden(tag.href), `${file}: ${tag.href}`).toBe(false);
+    }
+  });
+});
+
+test.describe('redirects of the hidden translations', () => {
+  const oldUrls = (lang: string): [string, string][] => [
+    [`/${lang}`, '/'],
+    [`/${lang}/`, '/'],
+    [`/${lang}/bok`, '/bok'],
+    [`/${lang}/bok/values-and-principles`, '/bok/values-and-principles'],
+    [`/${lang}/patterns/policy-card`, '/patterns/policy-card'],
+    ...(lang === 'es' ? [] : ([[`/${lang}/thesis`, '/thesis']] as [string, string][])),
+  ];
+
+  test('a hidden language sends its old URLs to the English page with a 302; a published one has no rule', () => {
+    const rules = redirectRules();
+    for (const lang of TRANSLATED_LOCALES) {
+      for (const [from, to] of oldUrls(lang)) {
+        const rule = rules.find((r) => ruleMatches(r.from, from));
+        if (isPublishedLocale(lang)) {
+          expect(rule, `${from} must not be redirected while ${lang} is published`).toBeUndefined();
+          continue;
+        }
+        expect(rule, `a rule for ${from}`).toBeDefined();
+        expect(rule!.status, from).toBe('302');
+        const splat = rule!.from.endsWith('*') ? from.slice(rule!.from.length - 1) : '';
+        expect(rule!.to.replace(':splat', splat), from).toBe(to);
+      }
+    }
+  });
+
+  test('no rule catches the hand-translated /es/thesis', () => {
+    for (const rule of redirectRules()) {
+      expect(ruleMatches(rule.from, '/es/thesis'), rule.from).toBe(false);
+    }
   });
 });
 
@@ -444,6 +561,7 @@ test.describe('each translated page', () => {
 
 test.describe('fixture build', () => {
   test.skip(!fixture, 'no fixture build (I18N_DIR/FIXTURE.json)');
+  test.skip(!I18N_PUBLISHED, 'machine translations are switched off (PUBLISHED_TRANSLATED_LOCALES)');
 
   test('links between translated pages stay in the language and their anchors resolve', async ({ page }) => {
     await page.goto('/es/bok/values-and-principles');

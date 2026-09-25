@@ -426,9 +426,11 @@ export default defineConfig({
   trailingSlash: 'never',
   build: { format: 'file' },
   // English is the default language and keeps its unprefixed URLs; every other
-  // language lives under /<lang>/ and only where a translation exists (the
-  // [lang] routes emit nothing for a language without one). /es/thesis, the
-  // hand translation, is a static route and always wins.
+  // language lives under /<lang>/ and only where a published translation exists
+  // (the [lang] routes emit nothing for a language without one, nor for one left
+  // out of PUBLISHED_TRANSLATED_LOCALES in src/i18n/locales.ts, which is every
+  // machine-translated language since 2026-09-25). /es/thesis, the hand
+  // translation, is a static route and always wins.
   i18n: {
     defaultLocale: DEFAULT_LOCALE,
     locales: [...LOCALES],
@@ -440,7 +442,8 @@ export default defineConfig({
       // serialize below replaces the pairs with alternatesFor(), the same list
       // the pages' hreflang tags and the language switcher use, so the sitemap
       // and the HTML always agree (and x-default is included); the home and the
-      // /<lang> landings are not translations of each other and get none.
+      // /<lang> landings are not translations of each other and get none. With
+      // the machine translations switched off, only /thesis and /es/thesis pair.
       i18n: {
         defaultLocale: DEFAULT_LOCALE,
         locales: Object.fromEntries(LOCALES.map((lang) => [lang, lang])),
