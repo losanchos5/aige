@@ -265,8 +265,10 @@ validation [8].
 General-purpose models have their own test. The Commission's guidelines of 18 July 2025 on GPAI
 obligations [16] treat an actor that modifies or fine-tunes a GPAI model as the provider
 of the modified model only in exceptional cases, with an indicative criterion: the modification uses
-more than one third of the original model's training compute. The obligations then cover the
-modification, not the whole model [17]. The criterion is indicative, and how it applies to
+more than one third of the original model's training compute. The documentation, copyright-policy
+and training-summary obligations then cover the modification, not the whole model [17]; where the
+original model has systemic risk, the guidelines presume the modified model has it too, with the full
+systemic-risk duties [16]. The criterion is indicative, and how it applies to
 distillation or repeated adapter training is a question to put to counsel (verify). The engineering
 consequence is plain either way: log the compute of every fine-tune as an artefact, because the
 question will be asked.

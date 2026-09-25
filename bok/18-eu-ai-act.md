@@ -256,7 +256,8 @@ The information must reach people at the latest at first interaction or exposure
 date have until 2 Dec 2026 to mark outputs (`Art. 111(4)`) [2]. The final Code of Practice on
 Transparency of AI-generated Content (10 June 2026) has a provider section on marking and a deployer
 section on labelling, and the Commission and the AI Board confirmed it as an adequate voluntary tool;
-draft `Art. 50` guidelines were published on 8 May 2026 [9]. Law outside the Act also reaches
+the Commission published its guidelines on the `Art. 50` transparency obligations on 20 July 2026,
+after a draft of 8 May 2026 [9][14]. Law outside the Act also reaches
 synthetic media: see [deepfakes and synthetic media](/bok/existing-law#deepfakes-and-synthetic-media)
 in chapter 20.
 
@@ -333,8 +334,10 @@ when released openly [2].
 A modifier becomes the provider of a new GPAI model only if the change is significant for generality,
 capabilities or systemic risk. The guidelines' indicative criterion is modification compute above one
 third of the original training compute (or, if unknown, a third of 10^25 FLOP for a systemic-risk
-original and of 10^23 FLOP otherwise), and the modifier's duties are then limited to the modification
-and its data [7]. Keep this test apart from `Art. 25`: fine-tuning a *model* changes GPAI-provider
+original and of 10^23 FLOP otherwise), and the modifier's `Art. 53(1)` duties are then limited to the
+modification and its data; `Art. 54` applies, and where the original is a systemic-risk model the
+modified model is presumed to have systemic risk, so the modifier notifies the Commission (`Art. 52`)
+and meets the `Art. 55` duties [7]. Keep this test apart from `Art. 25`: fine-tuning a *model* changes GPAI-provider
 status; changing a *system's* intended purpose into Annex III changes high-risk provider status. Two
 tests, two objects, two registry fields.
 
@@ -421,8 +424,8 @@ monitoring system; the plan is its versioned configuration.
 Serious incidents are reported to the market surveillance authority immediately after a causal link,
 or its reasonable likelihood, is established, and in any event on the `Art. 73` clocks, each counted
 from when the provider (or deployer) becomes aware of the incident: 15 days in general, two days for
-a widespread infringement or serious disruption of critical infrastructure, and 10 days after a death
-[1]. Chapter 08 holds the [reporting-clock table](/bok/regulatory-map#eu-ai-act-post-omnibus);
+a widespread infringement or a serious and irreversible disruption of the management or operation of
+critical infrastructure (`Art. 3(49)(b)`), and 10 days after a death [1]. Chapter 08 holds the [reporting-clock table](/bok/regulatory-map#eu-ai-act-post-omnibus);
 chapter 17 treats [incidents](/bok/incidents#the-overlapping-clocks) end to end. Providers of high-risk systems under the AI
 Office's direct competence report to the AI Office instead (`Art. 75(1a)`) [2].
 
@@ -738,10 +741,11 @@ Mappings are illustrative, not a claim of conformity.
 [4] Commission Guidelines on prohibited artificial intelligence practices, as defined by the AI Act (non-binding; authoritative interpretation reserved to the CJEU). European Commission. 2025-02-04. https://digital-strategy.ec.europa.eu/en/library/commission-publishes-guidelines-prohibited-artificial-intelligence-ai-practices-defined-ai-act (verified: primary)
 [5] Draft Commission guidelines on the classification of high-risk AI systems (Art. 6; Annex I and Annex III sections; practical examples; draft for targeted consultation). European Commission. 2026-05-19. https://digital-strategy.ec.europa.eu/en/library/draft-commission-guidelines-classification-high-risk-ai-systems (verified: primary)
 [6] Guidelines for providers and deployers of AI high-risk systems (policy page: classification guidelines still in draft, consultation open until 23 July 2026; application dates 2 Dec 2027 and 2 Aug 2028). European Commission. 2026. https://digital-strategy.ec.europa.eu/en/policies/guidelines-ai-high-risk-systems (verified: primary)
-[7] Commission Guidelines on the scope of the obligations for providers of general-purpose AI models established by Regulation (EU) 2024/1689 (C(2025) 7719 final; 10^23 FLOP indicative criterion; one-third modification criterion; monetisation; notification within two weeks; fines from 2 Aug 2026). European Commission. 2025-07-18. https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act (verified: primary)
+[7] Commission Guidelines on the scope of the obligations for providers of general-purpose AI models established by Regulation (EU) 2024/1689 (content approved 18 July 2025 by C(2025) 5045 final; formal text C(2025) 7719 final of 19 Nov 2025; paras. 65 to 68 on modifiers; 10^23 FLOP indicative criterion; one-third modification criterion; monetisation; notification within two weeks; fines from 2 Aug 2026). European Commission. 2025-07-18. https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act (verified: primary)
 [8] The General-Purpose AI Code of Practice (published 10 July 2025; Transparency, Copyright, and Safety and Security chapters; confirmed as an adequate voluntary tool). European Commission. 2025-07-10. https://digital-strategy.ec.europa.eu/en/policies/contents-code-gpai (verified: primary)
-[9] Code of Practice on Transparency of AI-generated Content (final version 10 June 2026; provider marking and detection, deployer labelling; confirmed as an adequate voluntary tool; draft Art. 50 guidelines of 8 May 2026). European Commission. 2026-06-10. https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content (verified: primary)
+[9] Code of Practice on Transparency of AI-generated Content (final version 10 June 2026; provider marking and detection, deployer labelling; confirmed as an adequate voluntary tool; Art. 50 guidelines: draft 8 May 2026, final 20 July 2026). European Commission. 2026-06-10. https://digital-strategy.ec.europa.eu/en/policies/code-practice-ai-generated-content (verified: primary)
 [10] SB26-189 Automated Decision-Making Technology (signed 14 May 2026; developer and deployer duties; covered technology from 1 Jan 2027; deployer records kept at least three years). Colorado General Assembly. 2026-05-14. https://leg.colorado.gov/bills/sb26-189 (verified: primary)
 [11] Texas Responsible Artificial Intelligence Governance Act (HB 149), enrolled text (Sec. 552.001 definitions of developer and deployer). Texas Legislature (89R). 2025. https://capitol.texas.gov/tlodocs/89R/billtext/pdf/HB00149F.pdf (verified: primary)
 [12] Framework Act on the Development of Artificial Intelligence and the Establishment of a Foundation for Trust (인공지능 발전과 신뢰 기반 조성 등에 관한 기본법), Act No. 21311 as amended 20 Jan 2026, version in force 21 Jul 2026 (Art. 2(7) to (9) roles; Art. 4 reach; Arts. 31 to 36 duties and domestic representative). Korea Ministry of Government Legislation (law.go.kr). 2026-07-21. https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=282791 (verified: primary)
 [13] ISO/IEC 22989:2022, Artificial intelligence concepts and terminology (edition 1; AI stakeholder roles). ISO/IEC JTC 1/SC 42. 2022-07. https://www.iso.org/standard/74296.html (verified: primary)
+[14] Guidelines on transparency obligations for providers and deployers of AI systems (Art. 50; final text after the draft of 8 May 2026; obligations apply from 2 Aug 2026). European Commission. 2026-07-20. https://digital-strategy.ec.europa.eu/en/library/guidelines-transparency-obligations-providers-and-deployers-ai-systems (verified: primary)

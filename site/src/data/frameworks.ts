@@ -497,7 +497,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'State of California',
     url: 'https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB53',
     summary:
-      'A frontier-AI transparency law in force 1 January 2026, binding large frontier developers (models above ~10^26 FLOP; developer revenue over USD 500M) to publish a frontier AI framework and report critical safety incidents to the California Office of Emergency Services within 15 days.',
+      'A frontier-AI transparency law in force 1 January 2026, binding large frontier developers (models above ~10^26 FLOP; developer revenue over USD 500M) to publish a frontier AI framework, and every frontier developer to report critical safety incidents to the California Office of Emergency Services within 15 days.',
   },
   {
     id: 'ny-raise-act',
@@ -507,7 +507,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'State of New York',
     url: 'https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models',
     summary:
-      'A frontier-AI safety law (S6953B) binding large frontier developers to publish a safety framework and disclose incidents. Signed 19 December 2025 and effective 1 January 2027 after a March 2026 chapter amendment, with oversight in an office within the New York Department of Financial Services (DFS).',
+      'A frontier-AI safety law (S6953B) binding large frontier developers to publish a safety framework and every frontier developer to report critical safety incidents. Signed 19 December 2025 and effective 1 January 2027 after a March 2026 chapter amendment, with oversight in an office within the New York Department of Financial Services (DFS).',
   },
   {
     id: 'ca-ab-2013',
@@ -730,7 +730,7 @@ export const frameworks: readonly Framework[] = [
     issuer: 'State of Texas',
     url: 'https://capitol.texas.gov/tlodocs/89R/billtext/pdf/HB00149F.pdf',
     summary:
-      'The Texas Responsible Artificial Intelligence Governance Act (HB 149), in force 1 January 2026. Intent-based prohibitions (e.g. social scoring, unlawful discrimination), disclosure duties and a regulatory sandbox, enforced by the Attorney General and preempting local AI rules.',
+      'The Texas Responsible Artificial Intelligence Governance Act (HB 149), in force 1 January 2026. Intent-based prohibitions (e.g. behaviour manipulation, unlawful discrimination, and social scoring by governmental entities), AI-use disclosure by government agencies and health care providers, and a regulatory sandbox, enforced by the Attorney General and preempting local AI rules.',
   },
   {
     id: 'co-ai-act',
@@ -2689,7 +2689,7 @@ export const obligations: readonly Obligation[] = [
     clause: 'Art. 19',
     obligation: 'DORA Art. 19 major ICT-related incident reporting',
     requirement:
-      'Report major ICT-related incidents: initial notification within 4 hours of classification as major and no later than 24 hours from awareness, intermediate report within 72 hours of the initial notification, final report within one month of the latest intermediate report',
+      'Report major ICT-related incidents: initial notification within 4 hours of classification as major and no later than 24 hours from awareness (within 4 hours of a classification made after those 24 hours), intermediate report within 72 hours of the initial notification, final report within one month of the latest intermediate report',
     artefact:
       'Classification record with a timestamp; per-regime clock; consistent cause coding for recurring-incident aggregation',
     layerN: [5],
@@ -3516,7 +3516,7 @@ export const obligations: readonly Obligation[] = [
     layerN: [5, 4],
     anchor: US_FRONTIER_ANCHOR,
     scope:
-      'Large frontier developers (models trained above ~10^26 FLOP; developer revenue over USD 500M)',
+      'Frontier developers (models trained above ~10^26 FLOP); the framework duty binds large frontier developers (developer revenue over USD 500M)',
     appliesFrom: '2026-01-01',
     appliesStatus: 'in-force',
     appliesNote: 'In force 2026-01-01',
@@ -3535,7 +3535,7 @@ export const obligations: readonly Obligation[] = [
     layerN: [5, 4],
     anchor: US_FRONTIER_ANCHOR,
     scope:
-      'Large frontier developers (frontier models trained with over 10^26 operations, cost over USD 100M)',
+      'Frontier developers (models trained above 10^26 operations); the framework duty binds large frontier developers (revenue over USD 500M), the thresholds of the 2026 chapter amendment',
     appliesFrom: '2027-01-01',
     appliesStatus: 'applies-later',
     appliesNote: 'Signed 2025-12-19; effective 2027-01-01',
@@ -3568,7 +3568,7 @@ export const obligations: readonly Obligation[] = [
     clause: 'HB 149',
     obligation: 'Texas TRAIGA (HB 149; in force 2026-01-01)',
     requirement:
-      'Intent-based prohibitions (social scoring, unlawful discrimination); AI-use disclosure; a regulatory sandbox; Attorney-General enforcement; local AI rules preempted',
+      'Intent-based prohibitions on developing or deploying AI (behaviour manipulation, unlawful discrimination); social scoring banned for governmental entities; AI-use disclosure by government agencies and health care providers; a regulatory sandbox; Attorney-General enforcement; local AI rules preempted',
     artefact:
       'Prohibited-use policy-as-code; AI-use disclosure controls; complaint and incident handling',
     layerN: [1, 4],

@@ -256,7 +256,7 @@ export const roles: readonly Role[] = [
       'Develops an AI system that is offered, sold, leased, given or otherwise provided in Texas.',
     sourceRef: 'Texas HB 149, Sec. 552.001',
     duties:
-      "Subject to the Act's intent-based prohibitions (for example on social scoring and unlawful discrimination), enforced by the Attorney General.",
+      "Subject to the Act's intent-based prohibitions on developing or deploying AI (for example to manipulate people toward self-harm, harm or crime, or to discriminate unlawfully), enforced by the Attorney General; the social-scoring ban binds only governmental entities (Sec. 552.053).",
     nearestEuRole: 'Provider',
     anchor: CROSS_REGIME_ANCHOR,
   },
@@ -267,7 +267,7 @@ export const roles: readonly Role[] = [
     definition: 'Deploys an AI system for use in Texas.',
     sourceRef: 'Texas HB 149, Sec. 552.001',
     duties:
-      "Subject to the Act's intent-based prohibitions and AI-use disclosure duties, enforced by the Attorney General.",
+      "Subject to the Act's intent-based prohibitions, enforced by the Attorney General; the AI-use disclosure duty falls only on governmental agencies and on providers of health care services or treatment (Sec. 552.051).",
     nearestEuRole: 'Deployer',
     anchor: CROSS_REGIME_ANCHOR,
   },

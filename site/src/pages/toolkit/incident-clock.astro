@@ -79,7 +79,7 @@ const sources: ToolSource[] = [
     verified: 'primary',
   },
   {
-    text: 'Commission Delegated Regulation (EU) 2025/301, RTS on the content and time limits for major ICT-related incident reports under DORA (initial notification within 4 hours of classification and 24 hours of awareness; intermediate within 72 hours; final within one month). Publications Office of the EU (EUR-Lex). 2024-10-23.',
+    text: 'Commission Delegated Regulation (EU) 2025/301, RTS on the content and time limits for major ICT-related incident reports under DORA (Art. 5(1): initial notification within 4 hours of classification and no later than 24 hours from awareness; Art. 5(2): within 4 hours of a classification made after those 24 hours; intermediate within 72 hours; final within one month). Publications Office of the EU (EUR-Lex). 2024-10-23.',
     url: 'https://eur-lex.europa.eu/eli/reg_del/2025/301/oj/eng',
     verified: 'primary',
   },
@@ -159,7 +159,7 @@ const sources: ToolSource[] = [
         <div class="tool-field" id="ic-ct-field" data-field data-describes="ic-ct" data-hint-id="ic-ct-hint">
           <label for="ic-ct">Classified as major under DORA (optional)</label>
           <input class="tool-input" id="ic-ct" name="ct" type="datetime-local" aria-describedby="ic-ct-hint" />
-          <p class="tool-hint" id="ic-ct-hint">DORA counts four hours from classification, capped at 24 hours from awareness.</p>
+          <p class="tool-hint" id="ic-ct-hint">DORA counts four hours from classification, no later than 24 hours from awareness; a classification made after those 24 hours starts its own four hours.</p>
           <p class="tool-error" id="ic-ct-error" hidden></p>
         </div>
       </div>
@@ -428,7 +428,12 @@ const sources: ToolSource[] = [
             regimes.map((regime) => (
               <tr>
                 <th scope="row">
-                  {regime.label} <a href={`#src-${regime.source}`} class="cite">[{regime.source}]</a>
+                  {regime.label}{' '}
+                  {[regime.source, ...(regime.extraSources ?? [])]
+                    .sort((x, y) => x - y)
+                    .map((n) => (
+                      <a href={`#src-${n}`} class="cite">[{n}]</a>
+                    ))}
                 </th>
                 <td data-label="Who reports">{regime.who}</td>
                 <td data-label="Trigger">{regime.trigger}</td>
@@ -446,8 +451,9 @@ const sources: ToolSource[] = [
     <ul>
       <li>
         <strong>The triggers are not the same event.</strong> GDPR, NIS2 and Art. 73 count from
-        awareness; DORA's four hours count from classification as major, capped at 24 hours from
-        awareness; Art. 73 also asks for the report immediately once a causal link, or its
+        awareness; DORA's four hours count from classification as major, no later than 24 hours from
+        awareness, and a classification made after those 24 hours starts its own four hours; Art. 73
+        also asks for the report immediately once a causal link, or its
         reasonable likelihood, is established. The chapter's advice is a timestamp per trigger, not
         one "opened at" (<a href={ch(A.reading)}>reading the table</a>).
       </li>
@@ -459,10 +465,12 @@ const sources: ToolSource[] = [
         fundamental-rights infringements. Which regimes count as equivalent is a legal call.
       </li>
       <li>
-        <strong>The high-risk regime is not in application yet.</strong> After the Digital
-        Omnibus, Art. 73 and the deployer duties apply to Annex III systems from 2 Dec 2027 and to
-        Annex I systems from 2 Aug 2028 <a href="#src-8" class="cite">[8]</a>; the GPAI duties of
-        Art. 55 already apply. For an earlier awareness date the tool marks those clocks "not yet in
+        <strong>The high-risk regime is not in application yet.</strong> The Digital Omnibus
+        postponed high-risk classification and the Chapter III duties, the deployer duties included,
+        to 2 Dec 2027 for Annex III systems and 2 Aug 2028 for Annex I systems
+        <a href="#src-8" class="cite">[8]</a>. Art. 73 was not itself postponed, but it reaches a
+        system only once it is classified as high-risk, so in practice it follows the same dates
+        (verify with counsel); the GPAI duties of Art. 55 already apply. For an earlier awareness date the tool marks those clocks "not yet in
         application" and still shows the dates, for planning and drills.
       </li>
       <li>

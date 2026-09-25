@@ -1083,7 +1083,8 @@ export const questions: readonly TriageQuestion[] = [
     basis: [
       'A modifier becomes the provider of a new GPAI model only if the change is significant for generality, capabilities or systemic risk.',
       'modification compute above one third of the original training compute (or, if unknown, a third of 10^25 FLOP for a systemic-risk original and of 10^23 FLOP otherwise)',
-      "the modifier's duties are then limited to the modification and its data",
+      "the modifier's Art. 53(1) duties are then limited to the modification and its data",
+      'where the original is a systemic-risk model the modified model is presumed to have systemic risk',
       'Two tests, two objects, two registry fields.',
     ],
     showIf: { all: [IS_GPAI, { q: 'activity', in: ['develop'] }] },
@@ -1097,7 +1098,7 @@ export const questions: readonly TriageQuestion[] = [
       {
         value: 'modified-above',
         label: 'We modified it with more than one third of the original training compute (if unknown: a third of 10^25 FLOP for a systemic-risk original, of 10^23 FLOP otherwise)',
-        means: 'Provider of a new GPAI model on the guidelines’ indicative criterion; your duties are limited to the modification and its data.',
+        means: 'Provider of a new GPAI model on the guidelines’ indicative criterion: your Art. 53(1) duties are limited to the modification and its data, and Art. 54 applies; if the original model has systemic risk, the modified one is presumed to have it, so notify the Commission (Art. 52) and meet Art. 55.',
       },
       {
         value: 'modified-below',
