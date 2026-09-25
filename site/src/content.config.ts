@@ -1,5 +1,9 @@
+import { existsSync } from 'node:fs';
+import { isAbsolute, relative, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { glob, type Loader } from 'astro/loaders';
+import { i18nDir } from './lib/i18n-content';
 
 // Files carry no frontmatter; passthrough keeps validation permissive.
 const schema = z.object({}).passthrough();
@@ -49,4 +53,92 @@ const meta = defineCollection({
   schema,
 });
 
-export const collections = { bok, patterns, thesis, meta };
+// Translations (openspec/changes/i18n-site-rendering). The pipeline writes them
+// into I18N_DIR (default <repo>/i18n; the tests point it at pseudo-localised
+// fixtures): <lang>/bok/<chapter-id>.md, <lang>/patterns/<slug>.md and
+// <lang>/THESIS.md. Every file opens with the translation frontmatter below;
+// lib/i18n-pages.ts cross-checks it against the file's place and its English
+// source, and a route exists only for a file that exists. An empty or missing
+// folder yields empty collections (and no translated route at all).
+const i18nBase = pathToFileURL(`${i18nDir()}/`);
+// The entry id is the path without `.md` (`es/bok/03-values-principles`), so the
+// language and the source id can be read back from it.
+const i18nId = ({ entry }: { entry: string }) => entry.replace(/\.md$/, '');
+
+/**
+ * Astro's glob loader over I18N_DIR, minus what it keeps from an earlier sync.
+ * When its folder exists but no file matches, Astro 5's glob loader returns
+ * before it drops the entries it did not see (astro/dist/content/loaders/glob.js),
+ * so the content cache keeps the translations of the previous build: a build
+ * without I18N_DIR right after one with it, or after a language folder is
+ * emptied, would find routes for files that are gone (and lib/i18n-pages.ts
+ * stops it, since collections and folder scan disagree). Every entry whose file
+ * is not in the current folder any more is dropped here.
+ */
+function i18nGlob(pattern: string): Loader {
+  const inner = glob({ pattern, base: i18nBase, generateId: i18nId });
+  return {
+    name: 'i18n-glob',
+    load: async (context) => {
+      await inner.load(context);
+      const root = fileURLToPath(context.config.root);
+      const dir = i18nDir();
+      for (const entry of context.store.values()) {
+        const file = entry.filePath ? resolve(root, entry.filePath) : '';
+        const rel = file ? relative(dir, file) : '';
+        const inside = rel !== '' && !rel.startsWith('..') && !isAbsolute(rel);
+        if (!inside || !existsSync(file)) context.store.delete(entry.id);
+      }
+    },
+  };
+}
+
+const translationMeta = {
+  /** The file's language; must be the folder it sits in. */
+  lang: z.enum(['es', 'fr', 'de', 'pt']),
+  /** Repo-relative path of the English file (`bok/03-values-principles.md`). */
+  source: z.string().min(1),
+  /** sha256 (hex) of the English file with LF line endings, when it was translated. */
+  sourceHash: z.string().regex(/^[0-9a-f]{64}$/, 'sourceHash must be 64 lower-case hex digits'),
+  /** "machine: <model id>". */
+  translatedBy: z.string().regex(/^machine: \S+/, 'translatedBy must read "machine: <model id>"'),
+  /** ISO date (a YAML date or a string), kept as `YYYY-MM-DD...`. */
+  translatedAt: z
+    .union([z.date(), z.string().regex(/^\d{4}-\d{2}-\d{2}/)])
+    .transform((value) => (value instanceof Date ? value.toISOString().slice(0, 10) : value)),
+};
+
+const bokI18n = defineCollection({
+  loader: i18nGlob('{es,fr,de,pt}/bok/[0-9][0-9]-*.md'),
+  // A chapter has no frontmatter of its own today; `passthrough` keeps any field
+  // a future chapter gains (the contract keeps the source's other fields), and
+  // `glance` lets a translation carry the chapter's "At a glance" items.
+  schema: z
+    .object({ ...translationMeta, glance: z.array(z.string().min(1)).optional() })
+    .passthrough(),
+});
+
+const patternsI18n = defineCollection({
+  loader: i18nGlob('{es,fr,de,pt}/patterns/*.md'),
+  // The pattern frontmatter with title and summary translated; the ids, layers
+  // and order must equal the English file's (checked in lib/i18n-pages.ts).
+  schema: z
+    .object({
+      ...translationMeta,
+      id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+      title: z.string().min(2),
+      layer,
+      secondaryLayer: layer.optional(),
+      summary: z.string().min(20).max(400),
+      order: z.number().int().min(1),
+    })
+    .strict(),
+});
+
+// fr, de and pt only: the Spanish Thesis is the hand translation (THESIS.es.md).
+const thesisI18n = defineCollection({
+  loader: i18nGlob('{fr,de,pt}/THESIS.md'),
+  schema: z.object(translationMeta).passthrough(),
+});
+
+export const collections = { bok, patterns, thesis, meta, bokI18n, patternsI18n, thesisI18n };

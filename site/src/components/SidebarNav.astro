@@ -4,16 +4,26 @@
 // data/parts.ts). The active row carries aria-current and shows a neutral ink
 // tick. No per-row layer colour: chapters are not layers (SL-06).
 import { bookParts, chapterNum } from '../data/parts';
+import { translator, type UiKey } from '../i18n/ui';
 
 interface Props {
   activeSlug?: string;
   activeThesis?: boolean;
+  /** Page language; translates the rail's labels. */
+  lang?: string;
+  /** Chapters that link to a translation instead of the English page, by slug. */
+  links?: Record<string, { href: string; label: string }>;
+  /** The Thesis link (default /thesis). */
+  thesisHref?: string;
 }
 
-const { activeSlug, activeThesis = false } = Astro.props;
+const { activeSlug, activeThesis = false, lang = 'en', links, thesisHref = '/thesis' } = Astro.props;
+const t = translator(lang);
+// On a translated page an English chapter title is marked as English.
+const englishLang = lang === 'en' ? undefined : 'en';
 ---
 
-<nav class="sidebar-nav" aria-label="Chapters">
+<nav class="sidebar-nav" aria-label={t('sidebar.chapters')}>
   <span class="nav-rail" data-nav-rail aria-hidden="true"></span>
 
   <div class="sidebar-tools">
@@ -24,32 +34,32 @@ const { activeSlug, activeThesis = false } = Astro.props;
       data-umami-event="search-open"
       data-umami-event-location="sidebar"
     >
-      <span>Search</span>
+      <span>{t('sidebar.search')}</span>
       <kbd>Ctrl K</kbd>
     </button>
   </div>
 
   <a
-    href="/thesis"
+    href={thesisHref}
     class="nav-item nav-thesis"
     aria-current={activeThesis ? 'page' : undefined}
   >
     <span class="nav-num">§</span>
-    <span class="nav-title">The Thesis</span>
+    <span class="nav-title">{t('sidebar.thesis')}</span>
   </a>
 
-  <p class="nav-label">Body of Knowledge</p>
+  <p class="nav-label">{t('sidebar.bok')}</p>
   {
     bookParts.map((part) => (
       <Fragment>
         <p class="nav-part" id={`sb-part-${part.id}`}>
-          {part.title} <span class="nav-part-range">{part.range}</span>
+          {t(`part.${part.id}` as UiKey)} <span class="nav-part-range">{part.range}</span>
         </p>
         <ol class="nav-list" aria-labelledby={`sb-part-${part.id}`}>
           {part.chapters.map((chapter) => (
             <li>
               <a
-                href={`/bok/${chapter.slug}`}
+                href={links?.[chapter.slug]?.href ?? `/bok/${chapter.slug}`}
                 class="nav-item"
                 data-chapter-slug={chapter.slug}
                 aria-current={activeSlug === chapter.slug ? 'page' : undefined}
@@ -58,7 +68,11 @@ const { activeSlug, activeThesis = false } = Astro.props;
                   <span class="nav-fill" />
                 </span>
                 <span class="nav-num">{chapterNum(chapter.order)}</span>
-                <span class="nav-title">{chapter.shortTitle}</span>
+                {links?.[chapter.slug] ? (
+                  <span class="nav-title">{links[chapter.slug].label}</span>
+                ) : (
+                  <span class="nav-title" lang={englishLang}>{chapter.shortTitle}</span>
+                )}
               </a>
             </li>
           ))}

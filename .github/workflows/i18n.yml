@@ -1,0 +1,148 @@
+name: Translations
+
+# Machine translation of the Body of Knowledge, the patterns, the Thesis (fr,
+# de, pt; the Spanish Thesis is the hand translation THESIS.es.md) and the site
+# UI strings into es, fr, de and pt, with Claude Haiku 4.5 (tools/i18n).
+#
+# It never pushes to main: when files change it commits them to a branch
+# i18n/auto-<run id> and opens a pull request for review. Every run has a hard
+# USD cap (--max-usd). deploy.yml does not depend on this workflow: a failure
+# here changes nothing on main, and pushes made with the GITHUB_TOKEN start no
+# other workflow run. Merging the pull request is what publishes the files.
+#
+# Manual runs choose the languages, the mode (batch: Message Batches API, half
+# price, results within hours; sync: Messages API) and the cap. A push to main
+# that edits the English sources runs a small sync pass capped at USD 0.50.
+# A batch still processing when the job stops waiting is saved in
+# i18n/.tm/pending-batches.json on the pull request branch; run this workflow
+# again on that branch ("Use workflow from") to resume it without paying twice.
+# See tools/i18n/README.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      langs:
+        description: 'Target languages, comma-separated (es,fr,de,pt)'
+        type: string
+        default: 'es,fr,de,pt'
+      mode:
+        description: 'batch (Message Batches API, 50% cheaper, slower) or sync (Messages API)'
+        type: choice
+        options:
+          - batch
+          - sync
+        default: batch
+      max_usd:
+        description: 'Hard spend cap for this run, in USD'
+        type: string
+        default: '1.00'
+  push:
+    branches: [main]
+    paths:
+      - 'bok/**'
+      - 'THESIS.md'
+      - 'site/src/i18n/ui.en.json'
+
+permissions: {}
+
+concurrency:
+  group: i18n
+  cancel-in-progress: false
+
+jobs:
+  translate:
+    # Forks get the file but not the job: only the canonical repository runs it.
+    if: github.repository == 'losanchos5/aige'
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    permissions:
+      contents: write # push the i18n/auto-* branch; never main
+      pull-requests: write # open the pull request
+    env:
+      MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'sync' }}
+      LANGS: ${{ github.event_name == 'workflow_dispatch' && inputs.langs || 'es,fr,de,pt' }}
+      MAX_USD: ${{ github.event_name == 'workflow_dispatch' && inputs.max_usd || '0.50' }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          # No token left in .git/config while the pipeline runs.
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tools/i18n/package-lock.json
+      - name: Check the inputs
+        run: |
+          set -euo pipefail
+          case "$MODE" in batch|sync) ;; *) echo "::error::mode must be batch or sync"; exit 1 ;; esac
+          [[ "$MAX_USD" =~ ^[0-9]+(\.[0-9]+)?$ ]] || { echo "::error::max_usd must be a number, like 1.00"; exit 1; }
+          [[ "$LANGS" =~ ^(es|fr|de|pt)(,(es|fr|de|pt))*$ ]] || { echo "::error::langs must list es, fr, de or pt, comma-separated"; exit 1; }
+      - name: Install and test the pipeline (offline)
+        working-directory: tools/i18n
+        run: |
+          npm ci
+          npm test
+      - name: Translate
+        id: translate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::the repository secret ANTHROPIC_API_KEY is not set"
+            exit 1
+          fi
+          node tools/i18n/translate.mjs "--$MODE" --langs "$LANGS" --max-usd "$MAX_USD" \
+            --max-wait-minutes 300 \
+            --report "$RUNNER_TEMP/i18n-report.json" --summary "$RUNNER_TEMP/i18n-summary.md"
+      # Runs even when the translation failed part-way: what was translated
+      # (and paid for) is kept in the translation memory and reaches review.
+      - name: Commit to an i18n/auto branch and open a pull request
+        if: ${{ always() && steps.translate.outcome != 'skipped' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.run_id }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          # Only what the pipeline writes: i18n/ and the translated UI strings.
+          git add -A -- i18n
+          for f in site/src/i18n/ui.*.json; do
+            if [ -e "$f" ] && [ "$f" != site/src/i18n/ui.en.json ]; then git add -- "$f"; fi
+          done
+          if git diff --cached --quiet; then
+            echo "No translation changes."
+            exit 0
+          fi
+          # A run started on an i18n/auto-* branch (resuming a batch) adds to
+          # that branch and its pull request; any other run opens a new one.
+          if [[ "$REF_NAME" == i18n/auto-* ]]; then
+            branch="$REF_NAME"
+            base=""
+          else
+            branch="i18n/auto-$RUN_ID"
+            base="$REF_NAME"
+            git switch -q -c "$branch"
+          fi
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit -q -m "chore(i18n): traducción automática de la ejecución $RUN_ID"
+          b64=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
+          echo "::add-mask::$b64"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $b64" \
+              push -q origin "HEAD:refs/heads/$branch"
+          body="$RUNNER_TEMP/i18n-summary.md"
+          if [ ! -s "$body" ]; then
+            printf 'Machine translation run %s: the pipeline stopped before writing its summary; see the run log.\n' "$RUN_ID" > "$body"
+          fi
+          printf '\nRun: %s/%s/actions/runs/%s\n' "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$RUN_ID" >> "$body"
+          if [ -z "$base" ]; then
+            gh pr comment "$branch" --body-file "$body"
+          else
+            # Needs "Allow GitHub Actions to create and approve pull requests" in the repo
+            # settings; without it the branch is still pushed and a maintainer opens the PR.
+            gh pr create --base "$base" --head "$branch" \
+              --title "i18n: traducción automática ($RUN_ID)" --body-file "$body" \
+              || echo "::notice::Could not open the pull request; branch $branch is pushed, open it by hand."
+          fi

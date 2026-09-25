@@ -11,6 +11,7 @@ import { join } from 'node:path';
 import { nav, feeds, allHrefs } from '../src/data/nav';
 import { chapterParts, chaptersOrdered } from '../src/data/chapters';
 import { bookParts } from '../src/data/parts';
+import { TRANSLATED_LOCALES } from '../src/i18n/locales';
 
 const DIST = 'dist';
 
@@ -25,6 +26,15 @@ const DETAIL_COLLECTIONS: { prefix: string; index: string }[] = [
   // One page per glossary term; the glossary chapter links every one of them.
   { prefix: '/glossary/', index: '/bok/glossary' },
   { prefix: '/toolkit/', index: '/toolkit' },
+  // Translations (openspec/changes/i18n-site-rendering): a language's chapters
+  // hang off its book index, every other page of the language off its landing
+  // /<lang>, which the footer links. A collection only counts when its index is
+  // built: /es/thesis (the hand translation) stays linked from the footer when
+  // there is no /es landing.
+  ...TRANSLATED_LOCALES.flatMap((lang) => [
+    { prefix: `/${lang}/bok/`, index: `/${lang}/bok` },
+    { prefix: `/${lang}/`, index: `/${lang}` },
+  ]),
 ];
 
 // Built pages the host answers with a redirect (public/_redirects, copied to
@@ -118,8 +128,11 @@ test('the footer sitemap links every model href and every public route', async (
     ).toHaveCount(0);
   }
 
+  const built = new Set(routes);
   const detailOf = (route: string) =>
-    DETAIL_COLLECTIONS.find((c) => route.startsWith(c.prefix) && route !== c.index);
+    DETAIL_COLLECTIONS.find(
+      (c) => route.startsWith(c.prefix) && route !== c.index && built.has(c.index),
+    );
 
   for (const route of routes.filter((r) => !detailOf(r))) {
     await expect(

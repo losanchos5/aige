@@ -1,0 +1,74 @@
+---
+/**
+ * TranslationNotice: the note every machine-translated page opens with, in the
+ * page's language: which model translated it, that the English page is the
+ * reference (with a link to it) and a way to report an error (a prefilled
+ * GitHub issue naming the page and the translation file). When the English
+ * file has changed since the translation was made (its sourceHash no longer
+ * matches), a second line says so. Kept out of the search index and of
+ * snippets, like the rest of the page chrome.
+ */
+import { site } from '../data/site';
+import { translator } from '../i18n/ui';
+
+interface Props {
+  lang: string;
+  /** The model id from the translation's `translatedBy`. */
+  model: string;
+  /** The English page this one translates (a site path). */
+  englishHref: string;
+  /** This page's path, for the report. */
+  path: string;
+  /** Repo-relative path of the translation file, for the report. */
+  file: string;
+  /** The English file changed after the translation was made. */
+  stale?: boolean;
+}
+
+const { lang, model, englishHref, path, file, stale = false } = Astro.props;
+const t = translator(lang);
+const report = new URL(`${site.github}/issues/new`);
+report.searchParams.set('title', `[i18n ${lang}] ${path}`);
+report.searchParams.set('labels', 'translation');
+report.searchParams.set(
+  'body',
+  `Page: ${site.url}${path}\nTranslation file: ${file}\nEnglish reference: ${site.url}${englishHref}\n\nWhat is wrong (quote the passage):\n`,
+);
+---
+
+<div class="i18n-notice" role="note" data-i18n-notice data-pagefind-ignore data-nosnippet>
+  <p>
+    {t('notice.machine', { model })}{' '}
+    <a href={englishHref} hreflang="en" data-i18n-english>{t('notice.english')}</a>
+    <span aria-hidden="true"> · </span>
+    <a href={report.href} target="_blank" rel="noopener noreferrer" data-i18n-report>{t('notice.report')}</a>
+  </p>
+  {stale && <p class="i18n-stale" data-i18n-stale>{t('notice.stale')}</p>}
+</div>
+
+<style>
+  /* Same register as the Spanish Thesis's sign note: a neutral tint, a hairline
+     and the body size, so it reads as a note about the page, not as content. */
+  .i18n-notice {
+    margin: 0 0 var(--s-5);
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--tint-bg);
+    font-size: var(--fs-small);
+  }
+
+  .i18n-notice p {
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  .i18n-notice p + p {
+    margin-top: var(--s-2);
+  }
+
+  .i18n-notice a {
+    color: var(--ink);
+    font-weight: 600;
+  }
+</style>

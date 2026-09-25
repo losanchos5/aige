@@ -9,6 +9,7 @@ import rehypeCitations from './src/lib/rehype-citations';
 import rehypeTables from './src/lib/rehype-tables';
 import rehypeDiagrams from './src/lib/rehype-diagrams';
 import rehypeGlossary from './src/lib/rehype-glossary';
+import rehypeI18n from './src/lib/rehype-i18n';
 import { chaptersOrdered } from './src/data/chapters';
 import { cases } from './src/data/cases';
 import { obligations, obligationPath } from './src/data/frameworks';
@@ -17,6 +18,8 @@ import { figures } from './src/data/figures';
 import { getGlossary } from './src/lib/glossary';
 import { gitDate } from './src/lib/reading';
 import { inSitemap } from './src/lib/sitemap-policy';
+import { alternatesFor, translationFilePath, translationIndex } from './src/lib/i18n-content';
+import { DEFAULT_LOCALE, LOCALES } from './src/i18n/locales';
 
 // Sitemap URL -> the source file(s) whose last commit dates the page: the page
 // itself plus, for a data-driven page, the module or Markdown it renders. The
@@ -58,6 +61,37 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
     ],
   ],
   ['/bok', ['src/pages/bok/index.astro', 'src/data/chapters.ts', 'src/data/parts.ts']],
+  // Translations (openspec/changes/i18n-site-rendering): each translated page is
+  // dated by its own translation file, never by the English one, and the
+  // /<lang>/bok index by the translations it lists. A route exists only when its
+  // file does (src/lib/i18n-content.ts), so nothing is listed without one.
+  ...translationIndex().files.map(
+    (file) => [file.path, [translationFilePath(file)]] as [string, string[]],
+  ),
+  ...[...translationIndex().bokLangs].map(
+    (lang) =>
+      [
+        `/${lang}/bok`,
+        [
+          'src/pages/[lang]/bok/index.astro',
+          ...translationIndex()
+            .files.filter((file) => file.kind === 'chapter' && file.lang === lang)
+            .map(translationFilePath),
+        ],
+      ] as [string, string[]],
+  ),
+  ...[...translationIndex().langs].map(
+    (lang) =>
+      [
+        `/${lang}`,
+        [
+          'src/pages/[lang]/index.astro',
+          ...translationIndex()
+            .files.filter((file) => file.lang === lang)
+            .map(translationFilePath),
+        ],
+      ] as [string, string[]],
+  ),
   ['/cases', ['src/pages/cases/index.astro', 'src/data/cases.ts']],
   ['/map', ['src/pages/map.astro', 'src/data/map.ts']],
   ['/path', ['src/pages/path.astro', 'src/data/path.ts', 'src/data/audiences.ts']],
@@ -388,8 +422,26 @@ export default defineConfig({
   ...(cacheDir ? { cacheDir } : {}),
   trailingSlash: 'never',
   build: { format: 'file' },
+  // English is the default language and keeps its unprefixed URLs; every other
+  // language lives under /<lang>/ and only where a translation exists (the
+  // [lang] routes emit nothing for a language without one). /es/thesis, the
+  // hand translation, is a static route and always wins.
+  i18n: {
+    defaultLocale: DEFAULT_LOCALE,
+    locales: [...LOCALES],
+    routing: { prefixDefaultLocale: false },
+  },
   integrations: [
     sitemap({
+      // Pair each page with its translations (<xhtml:link rel="alternate">).
+      // serialize below replaces the pairs with alternatesFor(), the same list
+      // the pages' hreflang tags and the language switcher use, so the sitemap
+      // and the HTML always agree (and x-default is included); the home and the
+      // /<lang> landings are not translations of each other and get none.
+      i18n: {
+        defaultLocale: DEFAULT_LOCALE,
+        locales: Object.fromEntries(LOCALES.map((lang) => [lang, lang])),
+      },
       // /og/* are the generated Open Graph cards, /diagrams/* the static SVG
       // assets and /404 the error page: none of them is a destination. Nor are
       // the pages whose canonical URL is another page (src/lib/sitemap-policy.ts).
@@ -400,10 +452,13 @@ export default defineConfig({
       // lastmod rather than a made-up one.
       serialize: (item) => {
         const pathname = pathnameOf(item.url);
+        const alternates = alternatesFor(pathname);
+        const links = alternates?.map((alt) => ({ url: alt.href, lang: alt.hreflang }));
+        const paired = { ...item, links };
         const reviewed = REVIEWED_BY_PATH.get(pathname);
-        if (reviewed) return { ...item, lastmod: reviewed };
+        if (reviewed) return { ...paired, lastmod: reviewed };
         const sources = SOURCE_BY_PATH.get(pathname);
-        return sources ? { ...item, lastmod: lastmodOf(sources) } : item;
+        return sources ? { ...paired, lastmod: lastmodOf(sources) } : paired;
       },
     }),
   ],
@@ -446,6 +501,10 @@ export default defineConfig({
     remarkPlugins: [remarkLead, remarkCallouts],
     rehypePlugins: [
       rehypeSlug,
+      // A translated file (I18N_DIR/<lang>/...) takes the English file's heading
+      // ids by position and keeps its links in its language; before autolink,
+      // so the heading links use those ids. A no-op on English files.
+      rehypeI18n,
       [rehypeAutolinkHeadings, { behavior: 'wrap' }],
       rehypeCitations,
       rehypeTables,

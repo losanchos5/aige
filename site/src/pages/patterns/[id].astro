@@ -16,6 +16,7 @@ import { tools } from '../../data/toolkit';
 import { loadPatternPages, type PatternPage } from '../../lib/pattern-pages';
 import { gitCreated, gitDate } from '../../lib/reading';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { alternatesFor } from '../../lib/i18n-content';
 
 export async function getStaticPaths() {
   const pages = await loadPatternPages();
@@ -117,6 +118,7 @@ const jsonLd = [
   image={ogImage}
   jsonLd={jsonLd}
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
+  alternates={alternatesFor(`/patterns/${def.slug}`)}
 >
   <p class="pp-meta" data-pagefind-ignore>
     {

@@ -37,8 +37,8 @@ immediately.
 
 ## Solution
 Have each control write a timestamped, structured record to a common assurance store, on one schema.
-Fix the schema first: a minimum useful evidence record is `{control_id, subject (model/agent/system id
-+ version from the registry), decision (pass/fail/allow/deny/alert), metric + value + threshold,
+Fix the schema first: a minimum useful evidence record is `{control_id, subject (model/agent/system
+id + version from the registry), decision (pass/fail/allow/deny/alert), metric + value + threshold,
 failure_mode/obligation ref, input_hash, actor, timestamp, signature}`. Normalise every tool's output
 into that shape on ingest, so heterogeneous sources compose into one queryable store keyed on the
 registry id.

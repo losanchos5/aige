@@ -1,0 +1,233 @@
+---
+/**
+ * LangSwitcher: the language menu. It lists only the languages the current
+ * page exists in (its hreflang alternates, lib/i18n-content.ts
+ * `alternatesFor`), each by its own name, and renders nothing on a page that
+ * exists in one language, which is every page with no translation. No
+ * JavaScript (CSP-safe):
+ *
+ *   - `bar` (the header, from 840px): a native <details> disclosure whose
+ *     summary shows the current language's code, so its accessible name
+ *     ("Language: DE") contains the visible text;
+ *   - `drawer` (the mobile menu, below 840px, where the bar has no room for a
+ *     fourth button): the same links as one labelled row.
+ */
+import { LOCALE_INFO, isLocale } from '../i18n/locales';
+import { t } from '../i18n/ui';
+
+interface Props {
+  /** The page language. */
+  lang?: string;
+  /** The page's hreflang alternates (x-default is ignored). */
+  alternates?: { hreflang: string; href: string }[];
+  variant?: 'bar' | 'drawer';
+}
+
+const { lang = 'en', alternates = [], variant = 'bar' } = Astro.props;
+
+// Same-origin paths, so the links work on a preview host too.
+const options = alternates
+  .filter((alt) => isLocale(alt.hreflang))
+  .map((alt) => {
+    const code = alt.hreflang as keyof typeof LOCALE_INFO;
+    return {
+      code,
+      name: LOCALE_INFO[code].autonym,
+      href: new URL(alt.href).pathname,
+      current: code === lang,
+    };
+  });
+const show = options.length > 1 && options.some((option) => option.current);
+const label = t('switcher.label', lang);
+---
+
+{
+  show && variant === 'bar' && (
+    <details class="lang-switcher" data-lang-switcher>
+      <summary class="lang-btn">
+        <span class="visually-hidden">{label}: </span>
+        <span class="lang-code">{lang.toUpperCase()}</span>
+        <svg class="lang-chev" viewBox="0 0 24 24" width="12" height="12" fill="none" aria-hidden="true">
+          <path
+            d="m6 9 6 6 6-6"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </summary>
+      <ul class="lang-list">
+        {options.map((option) => (
+          <li>
+            <a
+              href={option.href}
+              hreflang={option.code}
+              lang={option.code}
+              aria-current={option.current ? 'true' : undefined}
+            >
+              <span class="lang-list-code" aria-hidden="true">
+                {option.code.toUpperCase()}
+              </span>
+              {option.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}
+{
+  show && variant === 'drawer' && (
+    <div class="lang-row" data-lang-switcher-drawer>
+      <p class="lang-row-label" id="lang-row-label">
+        {label}
+      </p>
+      <ul aria-labelledby="lang-row-label">
+        {options.map((option) => (
+          <li>
+            <a
+              href={option.href}
+              hreflang={option.code}
+              lang={option.code}
+              aria-current={option.current ? 'true' : undefined}
+            >
+              {option.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+<style>
+  .lang-switcher {
+    position: relative;
+  }
+
+  /* Below 840px the bar has no room for a fourth button: the drawer row takes
+     over (the burger opens it). */
+  @media (max-width: 839px) {
+    .lang-switcher {
+      display: none;
+    }
+  }
+
+  /* Same 44px footprint and hairline as the header's icon buttons. */
+  .lang-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 var(--s-2);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .lang-btn::-webkit-details-marker {
+    display: none;
+  }
+
+  .lang-btn:hover {
+    border-color: var(--ink-2);
+  }
+
+  .lang-chev {
+    color: var(--muted);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .lang-chev {
+      transition: transform var(--dur) var(--ease);
+    }
+  }
+
+  .lang-switcher[open] .lang-chev {
+    transform: rotate(180deg);
+  }
+
+  .lang-list {
+    position: absolute;
+    top: calc(100% + var(--s-2));
+    right: 0;
+    z-index: 30;
+    min-width: 12rem;
+    margin: 0;
+    padding: var(--s-2);
+    list-style: none;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    box-shadow: var(--shadow-1);
+  }
+
+  .lang-list li {
+    margin: 0;
+  }
+
+  .lang-list a {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-sm);
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .lang-list a:hover {
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  .lang-list a[aria-current='true'],
+  .lang-row a[aria-current='true'] {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .lang-list-code {
+    min-width: 2ch;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--muted);
+  }
+
+  /* The drawer row: a mono label over the languages, like the drawer's kickers. */
+  .lang-row {
+    margin-top: var(--s-4);
+  }
+
+  .lang-row-label {
+    margin: 0 0 var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .lang-row ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lang-row a {
+    display: inline-block;
+    padding: var(--s-2) 0;
+    color: var(--ink-2);
+  }
+</style>
