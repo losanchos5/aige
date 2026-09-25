@@ -265,7 +265,7 @@ export const nav: NavGroup[] = [
       },
       {
         label: 'Reading list',
-        href: '/resources/reading-list',
+        href: '/bok/reading-list',
         description: 'The annotated bibliography that formed the discipline.',
       },
     ],

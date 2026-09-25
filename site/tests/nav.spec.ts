@@ -12,6 +12,7 @@ import { nav, feeds, allHrefs } from '../src/data/nav';
 import { chapterParts, chaptersOrdered } from '../src/data/chapters';
 import { bookParts } from '../src/data/parts';
 import { TRANSLATED_LOCALES } from '../src/i18n/locales';
+import { NOT_IN_SITEMAP } from '../src/lib/sitemap-policy';
 
 const DIST = 'dist';
 
@@ -112,6 +113,10 @@ test('the footer sitemap links every model href and every public route', async (
   }
 
   const redirected = redirectedRoutes();
+  // Built pages that declare another page as canonical (src/lib/sitemap-policy.ts,
+  // e.g. /resources/reading-list, a filtered view of /bok/reading-list): the
+  // sitewide footer links their canonical instead, never them.
+  const nonCanonical = new Set(NOT_IN_SITEMAP.map((entry) => entry.path));
   const routes = htmlFiles(DIST)
     .map(toRoute)
     .filter(
@@ -119,12 +124,13 @@ test('the footer sitemap links every model href and every public route', async (
         !route.startsWith('/og/') &&
         !route.startsWith('/diagrams/') &&
         route !== '/404' &&
-        !redirected.has(route),
+        !redirected.has(route) &&
+        !nonCanonical.has(route),
     );
-  for (const route of redirected) {
+  for (const route of [...redirected, ...nonCanonical]) {
     await expect(
       sitemap.locator(`a[href="${route}"]`),
-      `footer must not link the redirected route ${route}`,
+      `footer must not link the redirected or non-canonical route ${route}`,
     ).toHaveCount(0);
   }
 
