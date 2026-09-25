@@ -549,14 +549,30 @@ export function h(tag, attrs = {}, ...children) {
   return el;
 }
 
+// A tool's first message usually goes to a live region that sat hidden inside
+// its result section until the same task revealed it, and screen readers only
+// announce changes to a region already in the accessibility tree. So a region
+// that has not spoken yet waits long enough to be exposed, empty, before its
+// first text; later messages keep the short delay. A newer message cancels a
+// pending one, so the latest always wins.
+const spokenRegions = new WeakSet();
+const pendingAnnouncements = new WeakMap();
+
 /** Put a message in a live region (`role="status"`). Cleared first, then set
- *  on the next tick, so repeating the same message is announced again. */
+ *  after a delay, so repeating the same message is announced again. */
 export function announce(region, message) {
   if (!region) return;
+  window.clearTimeout(pendingAnnouncements.get(region));
   region.textContent = '';
-  window.setTimeout(() => {
-    region.textContent = message;
-  }, 40);
+  const delay = spokenRegions.has(region) ? 40 : 300;
+  pendingAnnouncements.set(
+    region,
+    window.setTimeout(() => {
+      region.textContent = message;
+      spokenRegions.add(region);
+      pendingAnnouncements.delete(region);
+    }, delay),
+  );
 }
 
 /** Move focus to a heading or container that is not focusable by default. */
