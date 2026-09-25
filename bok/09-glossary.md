@@ -112,6 +112,14 @@ individual or state body doing AI business, split into development business oper
 and provide AI, and utilisation business operators, who offer products or services built on it [25].
 See [ch. 18, The same roles across regimes](/bok/eu-ai-act#the-same-roles-across-regimes). (ch. 18, 21)
 
+**AI governance.** The rules, roles, processes and technical controls an organisation or a state
+uses to decide which AI systems it builds or uses, what they may do, and how it proves they stay
+within those limits. It draws on law such as the AI Act [2], management-system standards [48],
+risk frameworks [30] and principle sets [31]. Contrast with [AI governance
+engineering](/glossary/ai-governance-engineering). See [What is AI governance?](/ai-governance);
+[ch. 12, The organisation as an object of
+governance](/bok/governance-program#the-organisation-as-an-object-of-governance). (ch. 01, 12, 22)
+
 **AI governance committee.** The cross-functional body that takes the decisions a gate cannot:
 accepting residual risk above a product owner's authority, granting exceptions, weighing value
 trade-offs and approving the policy set. It decides; the pipeline's gates enforce its decisions and

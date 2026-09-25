@@ -62,6 +62,7 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       'src/figures/agent-control-plane.svg',
     ],
   ],
+  ['/ai-governance', ['src/pages/ai-governance.astro', '../guides/ai-governance.md']],
   ['/bok', ['src/pages/bok/index.astro', 'src/data/chapters.ts', 'src/data/parts.ts']],
   // Translations (openspec/changes/i18n-site-rendering): each translated page is
   // dated by its own translation file, never by the English one, and the
