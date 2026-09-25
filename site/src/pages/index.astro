@@ -131,7 +131,9 @@ const HERO_ART = true;
 // once with sharp (webp q78, effort 6) from the 2400 px JPEG master kept in
 // commit 7c38c4e; no build step touches these files.
 const heroArt = {
-  href: '/hero/monet-seine-giverny-1897-2400.webp',
+  // The plain src (and the preload href) only serve a browser without srcset:
+  // the 1600, not the 2400 at 518 KB (audit ONPAGE R4).
+  href: '/hero/monet-seine-giverny-1897-1600.webp',
   srcset:
     '/hero/monet-seine-giverny-1897-1200.webp 1200w, /hero/monet-seine-giverny-1897-1600.webp 1600w, /hero/monet-seine-giverny-1897-1920.webp 1920w, /hero/monet-seine-giverny-1897-2400.webp 2400w',
   sizes: '(min-width: 1200px) and (min-resolution: 2dppx) 50vw, 100vw',

@@ -79,6 +79,9 @@ test.describe('the painting', () => {
     expect(l.imagesrcset).toBe(i.srcset);
     expect(l.imagesizes).toBe(i.sizes);
     expect(l.href).toBe(i.src);
+    // The plain src is the fallback for a browser without srcset: the 1600w,
+    // never the 518 KB 2400w (audit ONPAGE R4).
+    expect(i.src).toBe('/hero/monet-seine-giverny-1897-1600.webp');
     expect(l.fetchpriority).toBe('high');
     expect(i.fetchpriority).toBe('high');
   });
