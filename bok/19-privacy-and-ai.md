@@ -604,7 +604,7 @@ Pipeline](/patterns/incident-pipeline) a personal-data-breach branch with its ow
 from the awareness timestamp, and keep the Omnibus proposal's 96 hours and high-risk threshold as a
 parameter, not today's rule [30].
 
-**Maps to:** GDPR `Art. 4(12)`, `Arts. 32–34` · EU AI Act `Art. 15`, `Art. 73` · OWASP LLM02:2025 ·
+**Maps to:** GDPR `Art. 4(12)`, `Arts. 32–34` · EU AI Act `Art. 15`, `Art. 73` · OWASP LLM02:2026 ·
 OWASP Agentic ASI01 [50] · NIST AI RMF (Manage) · layers 03, 04 and 05. Mappings are illustrative,
 not a claim of conformity.
 
@@ -792,7 +792,7 @@ illustrative, not a claim of conformity.
 [44] Shokri et al., "Membership Inference Attacks against Machine Learning Models" (arXiv 1610.05820). arXiv. 2016-10-18. https://arxiv.org/abs/1610.05820 (verified: primary)
 [45] Fredrikson, Jha and Ristenpart, "Model Inversion Attacks that Exploit Confidence Information and Basic Countermeasures" (CCS 2015). ACM. 2015-10-12. https://doi.org/10.1145/2810103.2813677 (verified: primary)
 [46] Greshake et al., "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection" (data theft via injected prompts in retrieved content; arXiv 2302.12173). arXiv. 2023-02-23. https://arxiv.org/abs/2302.12173 (verified: primary)
-[47] LLM02:2025 Sensitive Information Disclosure (OWASP Top 10 for LLM Applications, 2025 edition). OWASP GenAI Security Project. 2025. https://genai.owasp.org/llmrisk/llm022025-sensitive-information-disclosure/ (verified: primary)
+[47] LLM02:2026 Sensitive Information Disclosure (OWASP Top 10 for LLM Applications 2026; inference-time disclosure of live context, including through prompt injection; entry text in github.com/GenAI-Security-Project/GenAI-LLM-Top10, 2026/final). OWASP GenAI Security Project. 2026-08-03. https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ (verified: primary)
 [48] Guidelines 9/2022 on personal data breach notification under GDPR, version 2.0. European Data Protection Board. 2023-03-28. https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-92022-personal-data-breach-notification-under_en (verified: primary)
 [49] "La Agencia publica unas orientaciones sobre Inteligencia Artificial agéntica desde la perspectiva de protección de datos" (press release; guidance on agentic AI and data protection). Agencia Española de Protección de Datos. 2026-02-18. https://www.aepd.es/prensa-y-comunicacion/notas-de-prensa/la-agencia-publica-unas-orientaciones-sobre-inteligencia (verified: primary)
 [50] Top 10 for Agentic Applications 2026 (ASI01 Agent Goal Hijack). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
