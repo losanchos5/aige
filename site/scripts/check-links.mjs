@@ -3,7 +3,11 @@
 // HTML file (dist/**/*.html by default), resolves every internal `href`/`src`
 //, including `#anchors`, which must match an id/name in the target document,
 // and reports each unresolved target. External links (http(s):, mailto:, tel:,
-// data:, protocol-relative //) are left alone.
+// data:, protocol-relative //) are left alone, except the hreflang alternates:
+// every <link rel="alternate" hreflang> of a page and every <xhtml:link> of the
+// sitemap names an absolute URL on the site's own origin, and each must resolve
+// to a built page, so a translated page (/<lang>/...) can never point at a
+// language version that was not built, nor the other way round.
 //
 //   npm run check:links            # scan ./dist
 //   node scripts/check-links.mjs <dir>
@@ -71,6 +75,23 @@ function resolveRelative(file, pathname) {
 }
 
 const EXTERNAL = /^(?:[a-z][a-z0-9+.-]*:|\/\/)/i;
+const ORIGIN = 'https://aigovernanceengineer.com';
+
+/** The hreflang alternates of a page (absolute URLs). */
+function alternatesOf(html) {
+  const out = [];
+  for (const m of html.matchAll(/<link\b[^>]*\bhreflang="[^"]*"[^>]*>/g)) {
+    const href = /\bhref="([^"]*)"/.exec(m[0])?.[1];
+    if (href) out.push(href);
+  }
+  return out;
+}
+
+/** The dist file an absolute same-origin URL maps to, or null for another origin. */
+function fileOfUrl(url) {
+  if (!url.startsWith(`${ORIGIN}/`) && url !== ORIGIN) return null;
+  return resolveAbsolute(decodeURIComponent(new URL(url).pathname));
+}
 
 function linksOf(html) {
   const out = [];
@@ -114,6 +135,27 @@ function main() {
 
       if (fragment && !anchorsOf(target).has(fragment)) {
         broken.push({ file, link: value, reason: `no id/name "${fragment}"` });
+      }
+    }
+
+    for (const href of alternatesOf(html)) {
+      const target = fileOfUrl(href);
+      checked++;
+      if (!target) broken.push({ file, link: href, reason: 'hreflang alternate on another origin' });
+      else if (!existsSync(target)) broken.push({ file, link: href, reason: `no file at ${target}` });
+    }
+  }
+
+  // The sitemap's language pairs (<xhtml:link rel="alternate" hreflang href>).
+  for (const name of existsSync(dist) ? readdirSync(dist) : []) {
+    if (!/^sitemap-\d+\.xml$/.test(name)) continue;
+    const file = join(dist, name);
+    const xml = readFileSync(file, 'utf8');
+    for (const m of xml.matchAll(/<xhtml:link\b[^>]*\bhref="([^"]*)"/g)) {
+      const target = fileOfUrl(m[1]);
+      checked++;
+      if (!target || !existsSync(target)) {
+        broken.push({ file, link: m[1], reason: target ? `no file at ${target}` : 'another origin' });
       }
     }
   }
