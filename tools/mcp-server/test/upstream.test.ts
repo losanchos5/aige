@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { after, before, describe, it } from 'node:test';
 
 import { silentLogger } from '../src/log.js';
-import { Upstream, UpstreamError } from '../src/upstream.js';
+import { RETRY_AFTER_FAILURE_MS, Upstream, UpstreamError } from '../src/upstream.js';
 import { startFixtureServer, type FixtureServer } from './helpers.js';
 
 let fixtures: FixtureServer;
@@ -79,6 +79,30 @@ describe('upstream cache', () => {
     } finally {
       fixtures.failWith(path, null);
     }
+  });
+
+  it('waits before asking a failing upstream again, then retries', async () => {
+    const path = '/api/v1/crosswalk.json';
+    let now = 0;
+    const u = upstream(10 * 60_000, () => now);
+    const first = await u.text(`${fixtures.url}${path}`);
+    fixtures.failWith(path, 503);
+    try {
+      now = 11 * 60_000;
+      for (let i = 0; i < 5; i += 1) assert.equal(await u.text(`${fixtures.url}${path}`), first);
+      assert.equal(fixtures.hits.get(path)?.total, 2, 'one failed revalidation, then the stale copy from memory');
+      assert.equal(u.getStats().errors, 1);
+      now += RETRY_AFTER_FAILURE_MS + 1;
+      assert.equal(await u.text(`${fixtures.url}${path}`), first);
+      assert.equal(fixtures.hits.get(path)?.total, 3, 'retried once the delay passed');
+    } finally {
+      fixtures.failWith(path, null);
+    }
+    now += RETRY_AFTER_FAILURE_MS + 1;
+    assert.equal(await u.text(`${fixtures.url}${path}`), first);
+    now += 1000;
+    await u.text(`${fixtures.url}${path}`);
+    assert.equal(fixtures.hits.get(path)?.total, 4, 'a successful revalidation restores the TTL');
   });
 
   it('reports the status when there is no copy', async () => {

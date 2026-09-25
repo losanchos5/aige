@@ -5,9 +5,12 @@
 // after it the next reader revalidates with If-None-Match / If-Modified-Since,
 // and a 304 extends the entry without a new download. Concurrent readers of the
 // same URL share one request. When the upstream fails and a copy is held, the
-// stale copy is served and the failure is logged (stale-if-error); with no copy
-// the error reaches the caller. Parsed JSON is cached next to the text so a
-// dataset is parsed once per download, not once per tool call.
+// stale copy is served and the failure is logged (stale-if-error), and the next
+// attempt waits for the retry delay (one minute, or the TTL if shorter), so a
+// site that is down or hanging costs one request per document per minute, not
+// one per tool call; with no copy the error reaches the caller. Parsed JSON is
+// cached next to the text so a dataset is parsed once per download, not once
+// per tool call.
 
 import type { Logger } from './log.js';
 
@@ -37,8 +40,13 @@ interface Entry {
   etag: string | null;
   lastModified: string | null;
   fetchedAt: number;
+  /** Set after a failed revalidation: serve this stale copy without asking again until then. */
+  retryAt?: number;
   json?: unknown;
 }
+
+/** Longest wait before a failed revalidation is tried again. */
+export const RETRY_AFTER_FAILURE_MS = 60_000;
 
 export interface UpstreamStats {
   entries: number;
@@ -94,7 +102,8 @@ export class Upstream {
 
   private async entry(url: string): Promise<Entry> {
     const cached = this.cache.get(url);
-    if (cached && this.now() - cached.fetchedAt < this.options.ttlMs) return cached;
+    const now = this.now();
+    if (cached && (now - cached.fetchedAt < this.options.ttlMs || (cached.retryAt ?? 0) > now)) return cached;
     const pending = this.inflight.get(url);
     if (pending) return pending;
     const request = this.revalidate(url, cached).finally(() => this.inflight.delete(url));
@@ -112,12 +121,16 @@ export class Upstream {
       this.stats.errors += 1;
       this.stats.lastErrorAt = new Date(this.now()).toISOString();
       if (cached) {
+        const retryInMs = Math.min(this.options.ttlMs, RETRY_AFTER_FAILURE_MS);
         this.options.logger.warn('upstream failed, serving the stale copy', {
           url,
           error,
           ageMs: this.now() - cached.fetchedAt,
+          retryInMs,
         });
-        return cached;
+        const held: Entry = { ...cached, retryAt: this.now() + retryInMs };
+        this.cache.set(url, held);
+        return held;
       }
       throw error instanceof UpstreamError
         ? error
@@ -141,7 +154,7 @@ export class Upstream {
       this.stats.notModified += 1;
       await response.body?.cancel();
       this.options.logger.debug('upstream not modified', { url, ms: this.now() - started });
-      return { ...cached, fetchedAt: this.now() };
+      return { ...cached, fetchedAt: this.now(), retryAt: undefined };
     }
     if (!response.ok) {
       await response.body?.cancel();
