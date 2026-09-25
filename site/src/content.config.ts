@@ -129,7 +129,7 @@ const patternsI18n = defineCollection({
       title: z.string().min(2),
       layer,
       secondaryLayer: layer.optional(),
-      summary: z.string().min(20).max(400),
+      summary: z.string().min(20).max(800),
       order: z.number().int().min(1),
     })
     .strict(),
