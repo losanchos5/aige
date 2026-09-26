@@ -23,6 +23,8 @@ import { comparisons, comparisonPath } from '../data/comparisons';
 import { tools as toolkitTools, toolNotice } from '../data/toolkit';
 import { audiences, audiencePath } from '../data/audiences';
 import { researchPath, writtenThemes } from '../data/research';
+import { profiles as controlProfiles, controlsIn, controlPagePath, profilePath } from '../data/controls';
+import { profilePageMeta } from '../lib/controls-md';
 import { liveSiblingHubs } from '../lib/audiences';
 import { firstSentence, getGlossary } from '../lib/glossary';
 import { hasFigureArt } from '../lib/figure-reuse';
@@ -191,25 +193,28 @@ export const GET: APIRoute = async (context) => {
     ]),
 
     // Block orp-shell (open reference project): the open control profiles and
-    // the research notes. The profile pages move to a dynamic template in a
-    // later block, so each line falls back to the page's own title and
-    // description when src/pages no longer holds a static file for it.
+    // the research notes. The profiles, and the page of each specified control
+    // once control pages are on, come from the registry (src/data/controls):
+    // each profile line carries the <title> and description of its page
+    // (lib/controls-md.ts profilePageMeta), each control page its own. The
+    // crosswalk is listed here once its page exists.
     section('Controls and research', [
       described(
         '/controls',
         'Open AI governance controls',
         'Open control profiles for AI governance: each control with its evidence, mapped to the five-layer stack and reviewed in the open. Versioned and CC BY 4.0.',
       ),
-      described(
-        '/controls/evaluation-environment',
-        'AI evaluation environment controls',
-        'An open control profile for AI evaluation environments: isolation, tool access, telemetry and evidence requirements. Draft v0.1.',
-      ),
-      described(
-        '/controls/agent-runtime',
-        'AI agent runtime controls',
-        'An open control profile for AI agents at runtime: identity, tool mediation, execution limits, stop conditions and telemetry. Draft v0.1, from chapter 23.',
-      ),
+      ...(hasStaticRoute('/controls/crosswalk') ? [described('/controls/crosswalk', 'AI controls crosswalk')] : []),
+      ...controlProfiles.flatMap((profile) => {
+        const meta = profilePageMeta(profile.slug);
+        return [
+          described(profilePath(profile), meta.seoTitle, meta.description),
+          ...controlsIn(profile.slug).flatMap((c) => {
+            const path = controlPagePath(c);
+            return path ? [page(c.pageTitle ?? c.title, path, c.pageDescription)] : [];
+          }),
+        ];
+      }),
       described(
         '/research',
         'AI governance research notes',
