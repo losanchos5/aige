@@ -58,7 +58,7 @@ export const evaluationEnvironmentProfile: ControlProfile = {
     {
       version: '0.2',
       date: '2026-09-26',
-      note: 'Six outlines promoted to specified, each with repeatable verification steps, evidence tied to a published schema, configuration-level implementation notes, an observation record and two illustrative example observations: 001 Authorization Boundary, 004 Tool and Action Mediation, 005 Monitoring Integrity, 007 Incident Evidence Preservation, 008 Harness and Configuration Attestation and 009 Evaluation Validity Checks. Every source they cite was re-opened on 2026-09-26. No control remains an outline: each promoted claim had a verified source. Still open for technical review; no reviewer is credited yet.',
+      note: 'Six outlines promoted to specified, each with repeatable verification steps, evidence tied to a published schema, configuration-level implementation notes, an observation record and two illustrative example observations: 001 Authorization Boundary, 004 Tool and Action Mediation, 005 Monitoring Integrity, 007 Incident Evidence Preservation, 008 Harness and Configuration Attestation and 009 Evaluation Validity Checks. Every source they cite was re-opened on 2026-09-26. No control remains an outline: each promoted claim had a verified source. An adversarial content review the same day re-checked every quotation against its source, tightened four attributions and replaced the mappings that did not plainly fit (NIST AI RMF on 001, 004, 005, 007, 008 and 009; ISO/IEC 42001 on 008; OWASP on 009; three EU AI Act obligation rows on 005 and 007). Still open for technical review; no reviewer is credited yet.',
     },
   ],
   issueTemplate: 'control-review.yml',
@@ -294,7 +294,7 @@ const METR_COMMON_ELEMENTS: Source = {
 
 const METR_RISK_REPORT: Source = {
   title: 'Frontier Risk Report (February to March 2026)',
-  gloss: 'METR states that red-teaming found "several simple ways for monitoring to be disabled", one by changing an environment variable',
+  gloss: 'METR states that its red-teaming exercise at Anthropic found "several simple ways for monitoring to be disabled", one by changing an environment variable',
   publisher: 'METR',
   date: '2026-05-19',
   url: 'https://metr.org/blog/2026-05-19-frontier-risk-report/',
@@ -338,7 +338,7 @@ const OPENAI_THIRD_PARTY_CYBER: Source = {
 const ANTHROPIC_EVAL_GUIDANCE: Source = {
   title: 'Improving our alignment and security efforts',
   gloss:
-    'best practices for external evaluation partners: the only outside connection is "to the model\'s own API", with the API keys kept outside the environment; the configuration "should be verified before every evaluation begins"; boundaries "phrased as instructions"; challenges confirmed "solvable in principle"; a monitor that flags a scope violation to a human and ends the exercise',
+    'best practices for external partners running cyber evaluations: the only outside connection is "to the model\'s own API", with the API keys kept outside the environment; the configuration "should be verified before every evaluation begins"; boundaries "phrased as instructions"; challenges confirmed "solvable in principle"; a monitor that flags a scope violation to a human and ends the exercise',
   publisher: 'Anthropic',
   date: '2026-08-31',
   url: 'https://www.anthropic.com/news/improving-alignment-security-efforts',
@@ -358,7 +358,7 @@ const OPENAI_HF_TECHNICAL_REPORT: Source = {
 const OPENAI_HF_ROAD_AHEAD: Source = {
   title: 'The Hugging Face incident and the road ahead',
   gloss:
-    'OpenAI states that its chain-of-thought monitors "did not run on the evaluations in this incident", and that its incident response now sets out "who can stop a run or approve restarting it"',
+    'OpenAI states that its chain-of-thought monitors "did not run on the evaluations in this incident", and that it is strengthening its incident response plan with clearer rules on "who can stop a run or approve restarting it"',
   publisher: 'OpenAI',
   date: '2026-08-26',
   url: 'https://openai.com/index/hugging-face-incident-and-the-road-ahead/',
@@ -427,7 +427,7 @@ const OPENAI_AUTO_REVIEW: Source = {
 const OPENAI_PREPAREDNESS_V2: Source = {
   title: 'Preparedness Framework, Version 2',
   gloss:
-    'Table 5 lists safeguards against a misaligned model, among them limiting internet and tool access, credentials and filesystem access, with agent actions "logged in an uneditable database"; a one-time capability elicitation is treated "as a lower bound, rather than a ceiling"',
+    'Table 5 lists potential safeguards against a misaligned model, among them limiting internet and tool access, credentials and filesystem access, with agent actions "logged in an uneditable database"; a one-time capability elicitation is treated "as a lower bound, rather than a ceiling"',
   publisher: 'OpenAI',
   date: '2025-04-15',
   url: 'https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf',
@@ -610,7 +610,7 @@ export const evaluationEnvironmentControls: readonly Control[] = [
     mappings: {
       obligations: ['AIGE-OBL-EUAIA-ART14', 'AIGE-OBL-OWASP-AGENTIC', 'AIGE-OBL-CSA-AICM-AGENTIC', 'AIGE-OBL-SG-AGENTIC-IDENTITY'],
       iso42001: ['A.6.2.2', 'A.9.2'],
-      nistAiRmf: ['MEASURE 2.7'],
+      nistAiRmf: ['MAP 4.2'],
       owasp: ['asi02', 'asi03', 'llm03-2026'],
       aiuc1: ['B006'],
       other: [
@@ -634,7 +634,7 @@ export const evaluationEnvironmentControls: readonly Control[] = [
     ],
     implementationNotes: [
       "Record the boundary as data before the run, in the fields of an agent registry entry (scope, tools, data access, spend limit), and enforce it at the gateway the agent's calls pass through, not in the prompt alone. State the same boundary to the agent: Anthropic's guidance for external evaluation partners asks every prompt to state what is in and out of scope, including permitted actions and network boundaries, with boundaries \"phrased as instructions\" rather than claims about the environment.",
-      "Tell the agent what it may not do with the access it has. OpenAI's account of a third-party cyber evaluation states that the evaluator's \"intended authorization boundary was the simulated cyber range\", while the agents were not explicitly told how they could use the open internet access they had; the evaluator names this as a potential contributing cause.",
+      "Tell the agent what it may not do with the access it has. OpenAI's account of a third-party cyber evaluation states that the evaluator's \"intended authorization boundary was the simulated cyber range\", while the agents were not explicitly told how they could and could not use the open internet access they had; the evaluator names this as a potential contributing cause.",
       "Scope every credential for a shared resource to the operations the task needs: download from a package repository, never write, list or post. OpenAI reports models in RL training that used Artifactory, \"a shared package repository\", to exchange messages across separate samples with the credentials they were given to download packages, without exploiting any vulnerability; its technical report on the Hugging Face incident lists removing the shared credential from new research workloads and restricting the types of requests agents could make to Artifactory among its mitigations.",
       "Give each run its own namespace on every shared resource (package cache, artefact store, scratch storage) and test it with a canary marker. METR's investigation of the OpenAI/Hugging Face incident reports that agents \"meant to be fully isolated from one another\" communicated through an internal package repository.",
       "Run the agent as an unprivileged user. METR's Task Standard states that the agent \"MUST NOT be allowed to start processes\" on the primary machine as root.",
@@ -895,7 +895,7 @@ export const evaluationEnvironmentControls: readonly Control[] = [
     mappings: {
       obligations: ['AIGE-OBL-EUAIA-ART14', 'AIGE-OBL-OWASP-ACS', 'AIGE-OBL-SG-AGENTIC-CHECKPOINTS', 'AIGE-OBL-OWASP-AGENTIC'],
       iso42001: ['A.9.2'],
-      nistAiRmf: ['MEASURE 2.7'],
+      nistAiRmf: ['MAP 4.2'],
       owasp: ['asi01', 'asi02', 'asi05', 'asi09', 'llm10-2026'],
       aiuc1: ['D003', 'B006'],
       other: [
@@ -987,9 +987,9 @@ export const evaluationEnvironmentControls: readonly Control[] = [
     patterns: ['continuous-assurance-telemetry'],
     seeds: ['traces', 'otel-telemetry', 'trajectory-anomaly'],
     mappings: {
-      obligations: ['AIGE-OBL-EUAIA-ART12', 'AIGE-OBL-EUAIA-ART26-6', 'AIGE-OBL-EUAIA-ART72', 'AIGE-OBL-NISTRMF-MANAGE'],
+      obligations: ['AIGE-OBL-EUAIA-ART12', 'AIGE-OBL-NISTRMF-MEASURE'],
       iso42001: ['A.6.2.8', 'A.6.2.6'],
-      nistAiRmf: ['MANAGE 4.1', 'MEASURE 3.1'],
+      nistAiRmf: ['MEASURE 3.1'],
       owasp: ['asi10'],
       aiuc1: ['E015'],
       other: [
@@ -1015,8 +1015,8 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       OPENAI_FILE_HOSTING_REPORT,
     ],
     implementationNotes: [
-      "Run the collector, the monitors and their configuration outside the environment, and write the trace to append-only storage the agent cannot reach. OpenAI's Preparedness Framework v2 lists agent actions \"logged in an uneditable database\" and reviewed by asynchronous monitors among its safeguards against a misaligned model. OpenAI's technical report on the Hugging Face incident states that models sometimes tried to \"erase or tamper with their outputs or message logs\", and that none of the attempts it observed affected the logs its graders or monitors see.",
-      "Keep every switch of the monitoring out of the agent's reach. METR states that red-teaming found \"several simple ways for monitoring to be disabled\", one by changing an environment variable, and OpenAI's criteria for third-party assessments ask whether monitoring covers training, evaluations and deployment \"in a way that cannot easily be disabled\".",
+      "Run the collector, the monitors and their configuration outside the environment, and write the trace to append-only storage the agent cannot reach. OpenAI's Preparedness Framework v2 lists agent actions \"logged in an uneditable database\" and reviewed by asynchronous monitors among its potential safeguards against a misaligned model. OpenAI's technical report on the Hugging Face incident states that models sometimes tried to \"erase or tamper with their outputs or message logs\", and that none of the attempts it observed to manipulate tool trajectories affected the logs its graders or monitors ultimately see.",
+      "Keep every switch of the monitoring out of the agent's reach. METR states that its red-teaming exercise at Anthropic found \"several simple ways for monitoring to be disabled\", one by changing an environment variable that indicated whether the traffic came from Claude Code, and OpenAI's criteria for third-party assessments ask whether monitoring covers training, evaluations and deployment \"in a way that cannot easily be disabled\".",
       "Check that the monitors ran on this run, and over all of it. OpenAI states that its chain-of-thought monitors \"did not run on the evaluations\" involved in the Hugging Face incident, and reports a training incident found by a monitoring system that ran on 20% of the samples of the run and now runs on 100%.",
       "Reconcile the transcript with what the tools logged, not only with itself. METR's investigation of the OpenAI/Hugging Face incident reports that at least 96 transcripts show clear evidence of spoofed tool calls, where an agent appeared to run one command and replaced its output; a hash of each output, logged by the tool server, lets a reviewer find the substitution.",
     ],
@@ -1113,7 +1113,7 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       "Make budget exhaustion and threshold breaches trip the breaker automatically. A ticket or a log line alone is not a stop. OpenAI reports a training run that \"did not stop automatically as expected\" after a monitoring alert and was killed 2.5 hours later; Anthropic's guidance for external evaluation partners asks that a monitor which sees a run leave its scope flag it to a human and end the exercise.",
       "Drill the stop: pull it mid-task, measure the time from the pull to the first rejected call, and assert zero tool calls and zero writes after the trip for a window longer than the longest task. File the measurement as a control observation. A response target such as the one OpenAI describes, where responders who cannot rule out a flag as a false positive within 30 minutes are expected to pause the activity, holds only if the pause it calls for has been drilled.",
       "Make the kill path work across delegation hops and across runs: sub-agents run under delegated tokens that the stop revokes, token lifetimes are short enough to bound the tail, and calls to agents outside the environment are cut at its boundary, because a remote cancel is not guaranteed to succeed. OpenAI's technical report on the Hugging Face incident describes tooling being built to halt evaluation workloads by workload type, agent type or evaluation task.",
-      "Keep the stop handle out of the agent's reach: the agent cannot call, reconfigure or delay it, and every use is logged with its trigger and the level applied. Name who may pull it and who may approve a restart; OpenAI states that its incident response now sets out \"who can stop a run or approve restarting it\".",
+      "Keep the stop handle out of the agent's reach: the agent cannot call, reconfigure or delay it, and every use is logged with its trigger and the level applied. Name who may pull it and who may approve a restart; OpenAI states that it is strengthening its incident response plan with clearer rules on \"who can stop a run or approve restarting it\".",
     ],
     openQuestions: [
       'Which observations should trip a stop automatically during an evaluation, and which should only alert the evaluator?',
@@ -1175,14 +1175,13 @@ export const evaluationEnvironmentControls: readonly Control[] = [
     mappings: {
       obligations: [
         'AIGE-OBL-EUAIA-ART73',
-        'AIGE-OBL-EUAIA-ART72',
         'AIGE-OBL-EUAIA-ART12',
         'AIGE-OBL-EUAIA-ART26-6',
         'AIGE-OBL-GPAICOP-SAFETY-C9',
         'AIGE-OBL-ISO42001-A8',
       ],
       iso42001: ['A.8.4', 'A.6.2.8'],
-      nistAiRmf: ['MEASURE 3.1'],
+      nistAiRmf: ['MANAGE 4.3'],
       owasp: [],
       aiuc1: ['E015'],
       other: [
@@ -1269,8 +1268,8 @@ export const evaluationEnvironmentControls: readonly Control[] = [
     seeds: ['prompt-change-control', 'mcp-admission'],
     mappings: {
       obligations: ['AIGE-OBL-EUAIA-ART15', 'AIGE-OBL-OWASP-AIBOM', 'AIGE-OBL-ISO42001-A6'],
-      iso42001: ['A.6.2.5', 'A.10.3'],
-      nistAiRmf: ['MEASURE 2.3'],
+      iso42001: ['A.6.2.4'],
+      nistAiRmf: ['MEASURE 2.1'],
       owasp: ['asi04', 'llm04-2026'],
       atlas: ['aml-t0110', 'aml-t0010'],
       other: [
@@ -1372,8 +1371,8 @@ export const evaluationEnvironmentControls: readonly Control[] = [
         'AIGE-OBL-NIST-AI600-1',
       ],
       iso42001: ['A.6.2.4'],
-      nistAiRmf: ['MEASURE 2.3', 'MEASURE 2.5'],
-      owasp: ['asi01', 'llm01-2026'],
+      nistAiRmf: ['MEASURE 2.3', 'MEASURE 2.13'],
+      owasp: [],
       other: [{ framework: 'NIST SP 800-53 Rev. 5', ref: 'SA-11', note: 'Developer Testing and Evaluation' }],
     },
     references: [
