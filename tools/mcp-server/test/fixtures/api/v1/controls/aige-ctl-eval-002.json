@@ -1,0 +1,287 @@
+{
+  "notice": "Illustrative mapping from the AI Governance Engineer Body of Knowledge v0.5.0 (not a claim of conformity)",
+  "version": "0.5.0",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "schemaVersion": 1,
+  "schema": "https://aigovernanceengineer.com/api/v1/schemas/control.json",
+  "self": "https://aigovernanceengineer.com/api/v1/controls/aige-ctl-eval-002.json",
+  "source": "https://aigovernanceengineer.com/controls/evaluation-environment#aige-ctl-eval-002",
+  "citation": {
+    "title": "AI Governance Engineering: The Thesis & Body of Knowledge",
+    "authors": [
+      "Jorge García Aibar"
+    ],
+    "parentDoi": "https://doi.org/10.5281/zenodo.22956197",
+    "conceptDoi": "https://doi.org/10.5281/zenodo.22857084"
+  },
+  "control": {
+    "id": "AIGE-CTL-EVAL-002",
+    "profile": "evaluation-environment",
+    "url": "https://aigovernanceengineer.com/controls/evaluation-environment#aige-ctl-eval-002",
+    "json": "https://aigovernanceengineer.com/api/v1/controls/aige-ctl-eval-002.json",
+    "title": "Network Egress Control",
+    "version": "0.1",
+    "status": "draft",
+    "reviewerStatus": "open",
+    "depth": "specified",
+    "objective": "Outbound connections from an evaluation environment reach only the destinations on the run's egress allow-list, and every other connection attempt is refused and logged.",
+    "failureModes": [
+      "A connection from the environment to a host that is not on the run's egress allow-list succeeds.",
+      "A run starts in an environment with no egress policy attached, or with a policy that allows every destination although the task did not declare that it needs the internet.",
+      "A permitted destination, such as a package mirror, a cache or a tool server, carries data onward to a party or to another run that nobody listed.",
+      "The run leaves no flow log, so the connections it made cannot be compared with its allow-list."
+    ],
+    "scope": "Every network path out of the environment a run executes in: the agent's container or virtual machine, auxiliary machines, DNS, and the tools, MCP servers and proxies the run can call. Resources shared between runs count as destinations. Inbound operator access is out of scope.",
+    "enforcementPoints": [
+      "deploy",
+      "runtime"
+    ],
+    "verification": [
+      {
+        "kind": "inspect",
+        "text": "Before the run, inspect the egress policy attached to the task environment: deny by default, with an allow-list naming each permitted destination (for example the LLM API proxy and the progress server) and nothing else unless the task declares that it needs the internet."
+      },
+      {
+        "kind": "test",
+        "text": "At admission, from inside the environment, attempt one connection to a destination that is not on the allow-list and one to a listed destination; the first must be refused and logged, the second must succeed."
+      },
+      {
+        "kind": "observe",
+        "text": "After the run, compare the run's flow log with its allow-list: every outbound connection matches a listed destination, and every refused attempt is recorded with its time and target."
+      }
+    ],
+    "evidence": [
+      {
+        "artefact": "The egress policy and allow-list attached to the run, with its hash recorded in the run record",
+        "schemaId": null,
+        "schema": null,
+        "layer": 4
+      },
+      {
+        "artefact": "Admission test verdict: the refused connection to an unlisted destination",
+        "schemaId": "evidence-record",
+        "schema": "https://aigovernanceengineer.com/schemas/evidence-record.v1.json",
+        "layer": 4
+      },
+      {
+        "artefact": "Flow log of the run, allowed and refused connections, kept outside the environment",
+        "schemaId": null,
+        "schema": null,
+        "layer": 4
+      },
+      {
+        "artefact": "One observation per run comparing observed connections with the allow-list",
+        "schemaId": "control-observation",
+        "schema": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
+        "layer": 5
+      }
+    ],
+    "failureResponse": {
+      "effect": "deny",
+      "text": "Connections to unlisted destinations are refused at the enforcement point and logged. A run whose environment has no egress policy attached is not started; a run in which an unlisted connection succeeded is stopped and its result is withheld until the connection is explained."
+    },
+    "layer": 4,
+    "secondaryLayers": [],
+    "patterns": [
+      {
+        "slug": "runtime-guardrail",
+        "title": "Runtime Guardrail",
+        "url": "https://aigovernanceengineer.com/patterns/runtime-guardrail"
+      },
+      {
+        "slug": "sanctioned-ai-gateway",
+        "title": "Sanctioned AI Gateway",
+        "url": "https://aigovernanceengineer.com/patterns/sanctioned-ai-gateway"
+      }
+    ],
+    "seeds": [
+      {
+        "id": "egress-filter",
+        "title": "Output and egress filter",
+        "url": "https://aigovernanceengineer.com/bok/governing-agents#the-tool-allow-list"
+      },
+      {
+        "id": "tool-allow-list",
+        "title": "Tool allow-list, deny by default",
+        "url": "https://aigovernanceengineer.com/bok/governing-agents#the-tool-allow-list"
+      },
+      {
+        "id": "sandbox",
+        "title": "Code runs only in a sandbox",
+        "url": "https://aigovernanceengineer.com/bok/governing-agents#runtime-guardrails-for-tool-calls"
+      }
+    ],
+    "mappings": {
+      "obligations": [
+        {
+          "id": "AIGE-OBL-EUAIA-ART15",
+          "name": "EU AI Act Art. 15 accuracy, robustness and cybersecurity",
+          "url": "https://aigovernanceengineer.com/obligations/aige-obl-euaia-art15"
+        },
+        {
+          "id": "AIGE-OBL-OWASP-LLM",
+          "name": "Top 10 for LLM Applications 2026",
+          "url": "https://aigovernanceengineer.com/obligations/aige-obl-owasp-llm"
+        },
+        {
+          "id": "AIGE-OBL-OWASP-AGENTIC",
+          "name": "Top 10 for Agentic Applications 2026",
+          "url": "https://aigovernanceengineer.com/obligations/aige-obl-owasp-agentic"
+        }
+      ],
+      "iso42001": [
+        {
+          "id": "A.6.2.6",
+          "title": "AI system operation and monitoring"
+        }
+      ],
+      "nistAiRmf": [
+        {
+          "id": "MEASURE 2.7",
+          "title": "Security and resilience are evaluated and documented"
+        }
+      ],
+      "owasp": [
+        {
+          "id": "asi02",
+          "externalId": "ASI02",
+          "name": "Tool Misuse and Exploitation",
+          "url": "https://aigovernanceengineer.com/resources/threats#threat-asi02"
+        },
+        {
+          "id": "llm02-2026",
+          "externalId": "LLM02:2026",
+          "name": "Sensitive Information Disclosure",
+          "url": "https://aigovernanceengineer.com/resources/threats#threat-llm02-2026"
+        }
+      ],
+      "atlas": [
+        {
+          "id": "aml-t0086",
+          "externalId": "AML.T0086",
+          "name": "Exfiltration via AI Agent Tool Invocation",
+          "url": "https://aigovernanceengineer.com/resources/threats#threat-aml-t0086"
+        }
+      ],
+      "aiuc1": [],
+      "csaAicm": [],
+      "other": [
+        {
+          "framework": "MITRE ATLAS mitigation",
+          "ref": "AML.M0032",
+          "note": "Segmentation of AI Agent Components"
+        },
+        {
+          "framework": "NIST SP 800-53 Rev. 5",
+          "ref": "SC-7",
+          "note": "Boundary Protection"
+        },
+        {
+          "framework": "NIST SP 800-53 Rev. 5",
+          "ref": "SC-7(5)",
+          "note": "Deny by default, allow by exception"
+        }
+      ]
+    },
+    "references": [
+      {
+        "n": 3,
+        "title": "Governing AI agents",
+        "text": "Governing AI agents (AI Governance Engineering Body of Knowledge v0.5.0, chapter 23, section \"The tool allow-list\"). AI Governance Engineer (Jorge García Aibar). 2026-09.",
+        "url": "https://aigovernanceengineer.com/bok/governing-agents#the-tool-allow-list",
+        "verified": "primary"
+      },
+      {
+        "n": 8,
+        "title": "Governing AI agents",
+        "text": "Governing AI agents (AI Governance Engineering Body of Knowledge v0.5.0, chapter 23, section \"Runtime guardrails for tool calls\"). AI Governance Engineer (Jorge García Aibar). 2026-09.",
+        "url": "https://aigovernanceengineer.com/bok/governing-agents#runtime-guardrails-for-tool-calls",
+        "verified": "primary"
+      },
+      {
+        "n": 4,
+        "title": "METR Task Standard, STANDARD.md",
+        "text": "METR Task Standard, STANDARD.md (version 0.5.0; unless a task declares the full_internet permission, the task machines \"MUST NOT have internet access\" except to an LLM API, an LLM API proxy or a hardened local server). METR (GitHub). 2024-10-30.",
+        "url": "https://raw.githubusercontent.com/METR/task-standard/main/STANDARD.md",
+        "verified": "primary"
+      },
+      {
+        "n": 5,
+        "title": "Brief independent investigation of agents' behavior, reasoning and collaboration in the OpenAI / Hugging Face hacking incident",
+        "text": "Brief independent investigation of agents' behavior, reasoning and collaboration in the OpenAI / Hugging Face hacking incident (METR states that agents \"meant to be fully isolated from one another\" communicated through an internal package repository, reports spoofed tool calls in at least 96 transcripts and transcripts missing components after container resets). METR. 2026-08-26.",
+        "url": "https://metr.org/blog/2026-08-26-openai-hugging-face-incident-investigation/",
+        "verified": "primary"
+      },
+      {
+        "n": 9,
+        "title": "Vivaria server environment variables",
+        "text": "Vivaria server environment variables (no-internet task environments connected to a separate Docker network and optionally sandboxed with iptables rules; model API requests can be routed through a separate proxy service). METR. 2026.",
+        "url": "https://vivaria.metr.org/reference/config/",
+        "verified": "primary"
+      },
+      {
+        "n": 10,
+        "title": "MCP Security Best Practices (2026-07-28)",
+        "text": "MCP Security Best Practices (2026-07-28) (token passthrough \"is explicitly forbidden\"; egress proxies and network policies for server-side clients). Model Context Protocol. 2026-07-28.",
+        "url": "https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices",
+        "verified": "primary"
+      },
+      {
+        "n": 6,
+        "title": "OWASP Top 10 for Agentic Applications for 2026",
+        "text": "OWASP Top 10 for Agentic Applications for 2026 (ASI01 Agent Goal Hijack to ASI10 Rogue Agents). OWASP GenAI Security Project. 2025-12-09.",
+        "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+        "verified": "primary"
+      },
+      {
+        "n": 11,
+        "title": "OWASP GenAI LLM Top 10 2026",
+        "text": "OWASP GenAI LLM Top 10 2026 (LLM01:2026 Prompt Injection to LLM10:2026 Improper Output Handling; resource page dated 3 Aug 2026). OWASP GenAI Security Project. 2026-08-03.",
+        "url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+        "verified": "primary"
+      },
+      {
+        "n": 12,
+        "title": "MITRE ATLAS data, release v2026.09",
+        "text": "MITRE ATLAS data, release v2026.09 (16 tactics, 120 techniques, 88 sub-techniques, 40 mitigations; technique names and technique-to-mitigation links read from dist/v6/ATLAS-2026.09.yaml). MITRE. 2026-09-15.",
+        "url": "https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.09",
+        "verified": "primary"
+      },
+      {
+        "n": 7,
+        "title": "NIST SP 800-53 Rev. 5, Security and Privacy Controls for Information Systems and Organizations",
+        "text": "NIST SP 800-53 Rev. 5, Security and Privacy Controls for Information Systems and Organizations (control catalogue cited by control id; publication page of Revision 5 with update 1 of 10 Dec 2020). NIST. 2020-12-10.",
+        "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
+        "verified": "primary"
+      }
+    ],
+    "implementationNotes": [
+      "Attach a default-deny egress policy to every task environment (a network policy, a firewall rule set or an egress proxy, by category) that lists each permitted destination explicitly, for example the LLM API proxy and the progress server. Enforce it on the resolved address, and serve DNS from a resolver that answers only for listed names: DNS is an egress path too.",
+      "Record the allow-list with the run: its hash goes in the run record next to the environment version, so the flow log can later be compared with what was declared, not with what was intended.",
+      "Keep a flow log per run at the enforcement point, outside anything the agent can reach or change, with refused attempts as well as allowed connections.",
+      "At admission, run a canary from inside the environment: one connection to a reserved test address that is not on the list. Expect a refused connection and a log entry; a success blocks the run.",
+      "Treat resources shared between runs (package mirrors, caches, artefact stores) as destinations with their own entry and a per-run scope. METR's public investigation of the OpenAI/Hugging Face incident reports that agents meant to be \"fully isolated from one another\" communicated through a shared internal package repository."
+    ],
+    "openQuestions": [
+      "How should the egress allow-list of a run be recorded so that a third party can compare it with the connections actually observed?",
+      "When a task needs the internet (what METR's Task Standard calls the full_internet permission), which part of this control still applies, and what should the run record say instead?"
+    ],
+    "observation": {
+      "subjectKind": "eval-environment",
+      "expected": "Outbound connections only to the destinations on the run's egress allow-list; every other attempt refused and logged.",
+      "observedExample": "1 connection to an unlisted host during run 88213, in an environment with no egress policy attached: fail."
+    },
+    "observationSchema": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
+    "examples": [
+      {
+        "status": "pass",
+        "url": "https://aigovernanceengineer.com/controls/examples/control-observation.aige-ctl-eval-002.pass.json"
+      },
+      {
+        "status": "fail",
+        "url": "https://aigovernanceengineer.com/controls/examples/control-observation.aige-ctl-eval-002.fail.json"
+      }
+    ]
+  }
+}
