@@ -210,7 +210,7 @@ queda fuera del bloque va al handoff `D:/Documents/aige-wt/handoffs/orp-<bloque>
 
 - [x] 20.1 Merge de cada ola en `feat/open-reference-project` con `union-merge.py` para los registros compartidos; aplicar las peticiones de los handoffs.
 - [x] 20.2 `build.sh` en verde y `grep -rl orp-stub site/dist` vacío.
-- [ ] 20.3 `npm test`, `test:a11y`, `test:visual` (PNGs sin stagear) y `lhci` al final en verde.
+- [x] 20.3 `npm test`, `test:a11y`, `test:visual` (PNGs sin stagear) y `lhci` al final en verde.
 - [x] 20.4 `code-reviewer` sobre el diff integrado; CRITICAL y HIGH resueltos.
 - [ ] 20.5 Aprobación editorial de Jordi de la nota de investigación.
 - [ ] 20.6 PR hacia `main`, CI en verde, merge, deploy y smoke en prod (rutas 200, `/incidents` 301, JSON de controles, `llms.txt`, OG).
