@@ -2,7 +2,7 @@
   "$schema": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
   "control_id": "AIGE-CTL-EVAL-003",
   "profile": "evaluation-environment",
-  "control_version": "0.1",
+  "control_version": "0.2",
   "subject": "run-88215@2026-09-26",
   "subject_kind": "eval-run",
   "expected": "No credential other than the run's own short-lived, audience-bound tokens is readable in the environment or appears in the run's artefacts, and none is accepted after the run.",
