@@ -32,6 +32,7 @@ import {
   controlById,
   controlPath,
   profilePath,
+  otherFrameworkId,
   type Control,
 } from '../data/controls';
 import { frameworks, obligationById, obligationPath } from '../data/frameworks';
@@ -118,12 +119,6 @@ interface FrameworkMeta {
 
 const natural = (a: string, b: string): number => a.localeCompare(b, 'en', { numeric: true, sensitivity: 'base' });
 
-const kebab = (text: string): string =>
-  text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
 const OBLIGATIONS_PREFIX = 'obligations-';
 
 /** True for the frameworks built from the obligation register (one per instrument). */
@@ -204,7 +199,7 @@ function collectEntries(rows: readonly Control[]): Entry[] {
         push({ framework: 'mitre-atlas', ref: o.ref, name: o.note ?? o.ref, url: null, note: null, detail: o.ref, control: c.id });
       } else {
         push({
-          framework: `other-${kebab(o.framework)}`,
+          framework: `other-${otherFrameworkId(o.framework)}`,
           ref: o.ref,
           name: o.note ?? o.ref,
           url: null,
@@ -275,6 +270,10 @@ function rowsOf(meta: FrameworkMeta, entries: readonly Entry[], order: ReadonlyM
       slot = { row: { ref: e.ref, name: e.name, url: e.url, note: e.note, controls: [] }, details: new Map() };
       byRef.set(e.ref, slot);
     }
+    // An "other" mapping that lands on a row of a built-in framework (an ATLAS
+    // id also mapped through `atlas`) carries no url: keep the catalogue's.
+    if (slot.row.url === null && e.url !== null) slot.row = { ...slot.row, name: e.name, url: e.url };
+    if (slot.row.note === null && e.note !== null) slot.row = { ...slot.row, note: e.note };
     if (!slot.row.controls.includes(e.control)) slot.row.controls.push(e.control);
     if (!slot.details.has(e.detail)) slot.details.set(e.detail, e.name);
   }
@@ -352,7 +351,8 @@ export function crosswalkProfiles(rows: readonly Control[] = registryControls) {
 // ---- The Markdown twin ------------------------------------------------------
 
 const abs = (path: string): string => new URL(path, site.url).href;
-const cell = (text: string): string => (text === '' ? ' ' : text.replace(/\|/g, '\|').replace(/\s+/g, ' '));
+/** A table cell: pipes escaped, newlines and runs of whitespace folded to one space. */
+const cell = (text: string): string => (text === '' ? ' ' : text.replace(/\|/g, '\\|').replace(/\s+/g, ' '));
 const controlLabel = (id: string): string => {
   const c = controlById(id);
   return c ? `[${c.id}](${abs(controlPath(c))}) ${c.title}` : id;

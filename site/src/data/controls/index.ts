@@ -52,7 +52,7 @@
 // `controls` and `observationExamples`. Everything that lists profiles (the
 // /controls pages, the API, llms.txt, the sitemap, the tests) iterates these
 // arrays. The profile page also needs its <title> and description in
-// ../../lib/controls-md.ts PAGE_META.
+// ./page-meta.ts PAGE_META.
 // `controlProblems()` returns every broken reference; the profile pages fail the
 // build on any, and tests/orp-core.spec.ts checks the same. This module never
 // imports ./cases.ts (cases link to controls, not the other way round).
@@ -112,7 +112,7 @@ export type { ObservationExample };
 export const CONTROL_PAGES_ENABLED = true;
 
 /** Profile slugs that name static routes under /controls/, never a profile. */
-export const RESERVED_PROFILE_SLUGS: readonly string[] = ['crosswalk', 'examples'];
+export const RESERVED_PROFILE_SLUGS: readonly string[] = ['crosswalk', 'examples', 'index'];
 
 /** The shape of a DOI (10.<registrant>/<suffix>). */
 export const DOI_PATTERN = /^10\.\d{4,9}\/\S+$/;
@@ -162,6 +162,8 @@ export interface ControlProfile {
   issueTemplate: 'control-review.yml';
   /** DOI of this profile version, once deposited (DOI_PATTERN). */
   doi?: string;
+  /** The version `doi` was minted for; required with `doi` and equal to `version`, so a stale version DOI fails the build. */
+  doiVersion?: string;
   /** Concept DOI shared by every version of this profile (DOI_PATTERN). */
   conceptDoi?: string;
 }
@@ -383,6 +385,13 @@ export function profileArticleId(profile: string | Pick<ControlProfile, 'slug'>)
   return `${new URL(profilePath(profile), site.url).href}#article`;
 }
 
+/**
+ * Which DOI a profile is cited with: its version DOI (`profile`), else its
+ * concept DOI (`profile-concept`), else the project concept DOI
+ * (`project-concept`, site.conceptDoi).
+ */
+export type ProfileDoiKind = 'profile' | 'profile-concept' | 'project-concept';
+
 /** How to cite a profile: the text, its own DOIs (null until deposited) and the canonical URL. */
 export interface ProfileCitation {
   text: string;
@@ -390,14 +399,17 @@ export interface ProfileCitation {
   doi: string | null;
   /** Concept DOI of the profile, or null. */
   conceptDoi: string | null;
-  /** The DOI to display: the profile's own, else the project's concept DOI (site.conceptDoi). */
+  /** The DOI to display: the profile version's, else the profile's concept DOI, else the project's (site.conceptDoi). */
   effectiveDoi: string;
+  /** Which of the three `effectiveDoi` is. */
+  doiKind: ProfileDoiKind;
   url: string;
 }
 
 export function profileCitation(profile: ControlProfile): ProfileCitation {
   const url = new URL(profilePath(profile), site.url).href;
-  const effectiveDoi = profile.doi ?? site.conceptDoi;
+  const doiKind: ProfileDoiKind = profile.doi ? 'profile' : profile.conceptDoi ? 'profile-concept' : 'project-concept';
+  const effectiveDoi = profile.doi ?? profile.conceptDoi ?? site.conceptDoi;
   const authors = profile.authors.map((id) => personById(id)?.name ?? id).join(', ');
   const year = profile.updated.slice(0, 4);
   return {
@@ -405,6 +417,7 @@ export function profileCitation(profile: ControlProfile): ProfileCitation {
     doi: profile.doi ?? null,
     conceptDoi: profile.conceptDoi ?? null,
     effectiveDoi,
+    doiKind,
     url,
   };
 }
@@ -458,6 +471,19 @@ export function sourceNumber(sources: readonly Source[], src: Pick<Source, 'url'
 
 // ---------------------------------------------------------------------------
 // Validation
+
+/**
+ * The kebab id an "other" mapping's framework name gets in the crosswalk
+ * (lib/controls-crosswalk.ts, `other-<id>`): "NIST SP 800-218A" is
+ * "nist-sp-800-218a". The validator requires it to be non-empty and to come
+ * from a single name, so two spellings never share a table.
+ */
+export function otherFrameworkId(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const VERSION = /^\d+\.\d+(?:\.\d+)?$/;
@@ -526,6 +552,8 @@ export function controlRegistryProblems(registry: ControlRegistry): string[] {
   const schemaIds = new Set([...schemaOrder, 'control-observation']);
   const chapterSlugs = new Set(chapters.map((ch) => ch.slug));
   const profileSlugs = new Set<string>();
+  // Kebab id -> the first "other" framework name that produced it.
+  const otherFrameworks = new Map<string, string>();
 
   // Profiles
   const prefixes = new Map<string, string>();
@@ -537,6 +565,10 @@ export function controlRegistryProblems(registry: ControlRegistry): string[] {
     profileSlugs.add(p.slug);
     if (p.doi !== undefined && !DOI_PATTERN.test(p.doi)) problems.push(`${at}: malformed doi ${p.doi}`);
     if (p.conceptDoi !== undefined && !DOI_PATTERN.test(p.conceptDoi)) problems.push(`${at}: malformed conceptDoi ${p.conceptDoi}`);
+    if (p.doi !== undefined && p.doiVersion !== p.version) {
+      problems.push(`${at}: doi was minted for v${p.doiVersion ?? '(no doiVersion)'}, the profile is v${p.version}: record the new version's DOI or drop the stale one`);
+    }
+    if (p.doi === undefined && p.doiVersion !== undefined) problems.push(`${at}: doiVersion without a doi`);
     if (!p.title.trim() || !p.shortTitle.trim()) problems.push(`${at}: empty title`);
     if (!p.summary.trim() || !p.scope.trim()) problems.push(`${at}: empty summary or scope`);
     if (!VERSION.test(p.version)) problems.push(`${at}: bad version ${p.version}`);
@@ -665,6 +697,12 @@ export function controlRegistryProblems(registry: ControlRegistry): string[] {
     for (const id of m.csaAicm ?? []) if (!/^[A-Z&]{2,4}-\d{2}$/.test(id)) problems.push(`${at}: malformed CSA AICM id ${id}`);
     for (const o of m.other ?? []) {
       if (!o.framework.trim() || !o.ref.trim()) problems.push(`${at}: incomplete "other" mapping`);
+      const fwId = otherFrameworkId(o.framework);
+      const named = otherFrameworks.get(fwId);
+      if (o.framework.trim() && !fwId) problems.push(`${at}: "other" framework ${o.framework} has an empty id`);
+      else if (named !== undefined && named !== o.framework) {
+        problems.push(`${at}: "other" framework ${o.framework} has the id ${fwId} of ${named}: use one name`);
+      } else if (fwId) otherFrameworks.set(fwId, o.framework);
     }
     for (const src of c.references) {
       if (!/^https?:\/\//.test(src.url)) problems.push(`${at}: reference without an absolute url (${src.title})`);

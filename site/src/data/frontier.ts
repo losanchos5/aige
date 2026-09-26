@@ -25,12 +25,17 @@ import type { LayerNumber } from './stack';
 import type { Source } from '../lib/sources';
 import { controls, controlsIn, profileBySlug, profileIdRange } from './controls';
 
-/** The status line of a profile link, read from the registry: id range and version. */
-const profileVersion = (slug: string): string => profileBySlug(slug)?.version ?? '';
+/** The status line of a profile link, read from the registry: id range and version.
+ *  Throws on an unknown slug, so a renamed profile fails the build. */
+const profileVersion = (slug: string): string => {
+  const profile = profileBySlug(slug);
+  if (!profile) throw new Error(`frontier: unknown control profile ${slug}`);
+  return profile.version;
+};
 
-/** A count as prose: "three", "nine", "12". */
+/** A count as prose: "none", "three", "nine", "12". */
 const countWord = (n: number): string =>
-  ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'][n] ?? String(n);
+  ['none', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'][n] ?? String(n);
 
 // How many controls are specified in full, read from the registry: the
 // evaluation environment profile in its own section, every profile in #ecosystem.
@@ -44,7 +49,9 @@ const specified = controls.filter((c) => c.depth === 'specified').length;
 const specifiedClause =
   specified === controls.length
     ? 'in full for every control'
-    : `in full for ${countWord(specified)} control${specified === 1 ? '' : 's'} so far, in draft for the rest`;
+    : specified === 0
+      ? 'in draft for every control so far'
+      : `in full for ${countWord(specified)} control${specified === 1 ? '' : 's'} so far, in draft for the rest`;
 
 export interface FrontierLink {
   title: string;
