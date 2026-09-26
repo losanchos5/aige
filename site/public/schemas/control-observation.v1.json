@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
+  "title": "Control observation",
+  "description": "One observation of one open reference control on one subject: what the control expects, what was observed, whether it held, when, and the evidence the observation rests on. The record an adapter, a test or a reviewer would emit against a control of an open control profile (for example AIGE-CTL-EVAL-002). Draft for review; the profiles and this record are illustrative, not a claim of conformity.",
+  "$comment": "AI Governance Engineer templates and schemas library, v1. CC BY 4.0 (attribution: Jorge García Aibar). x-evidences names the obligations a field or record helps evidence: an illustrative mapping, not a claim of conformity and not legal advice. https://aigovernanceengineer.com/resources/templates",
+  "x-evidences": [
+    "EU AI Act Art. 12",
+    "EU AI Act Art. 15",
+    "EU AI Act Art. 17",
+    "ISO/IEC 42001 9.1",
+    "NIST AI RMF MEASURE 3.1",
+    "NIST AI RMF MANAGE 4.1"
+  ],
+  "x-layer": [
+    4,
+    5
+  ],
+  "x-pattern": [
+    "https://aigovernanceengineer.com/bok/patterns#pattern-continuous-assurance-telemetry",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-machine-readable-evidence-oscal",
+    "https://aigovernanceengineer.com/bok/patterns#pattern-eval-gate-in-ci"
+  ],
+  "x-lifecycle-stage": "operate",
+  "type": "object",
+  "required": [
+    "control_id",
+    "subject",
+    "subject_kind",
+    "expected",
+    "observed",
+    "status",
+    "timestamp",
+    "evidence"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "const": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
+      "description": "The URI of this schema, so a record says what it claims to be."
+    },
+    "control_id": {
+      "type": "string",
+      "pattern": "^AIGE-CTL-[A-Z0-9]+-[0-9]{3}$",
+      "description": "Stable id of the control observed, AIGE-CTL-<PROFILE>-<NNN> (for example \"AIGE-CTL-EVAL-002\"). The control's JSON is https://aigovernanceengineer.com/api/v1/controls/<id in lower case>.json."
+    },
+    "profile": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Slug of the control profile the control belongs to (for example \"evaluation-environment\")."
+    },
+    "control_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+      "description": "Version of the control specification the observation was made against (for example \"0.1\")."
+    },
+    "subject": {
+      "type": "string",
+      "pattern": "^[^@\\s]+@[^@\\s]+$",
+      "description": "The observed object as id and version, \"id@version\" (for example \"eval-env-eu-west@2026-09-26\"). The key the observation is filed against."
+    },
+    "subject_kind": {
+      "type": "string",
+      "enum": [
+        "eval-environment",
+        "eval-run",
+        "agent",
+        "tool-server",
+        "harness",
+        "model-artefact"
+      ],
+      "description": "What kind of object the subject is."
+    },
+    "expected": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What a conforming observation shows, as the control states it (for example \"outbound connections only to the destinations on the run's egress allow-list\")."
+    },
+    "observed": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What was actually observed, stated as a fact with counts where there are any (for example \"1 connection to an unlisted host during run 88213\")."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pass",
+        "fail",
+        "not_applicable"
+      ],
+      "description": "Whether the observation meets the expectation. Use not_applicable when the control does not apply to this subject, and say why in notes."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the observation was made (RFC 3339)."
+    },
+    "enforcement_point": {
+      "type": "string",
+      "enum": [
+        "pre_merge",
+        "deploy",
+        "runtime",
+        "periodic"
+      ],
+      "description": "Where in the lifecycle the observation was made, in the terms of the policy card."
+    },
+    "verification_kind": {
+      "type": "string",
+      "enum": [
+        "inspect",
+        "test",
+        "observe",
+        "attest"
+      ],
+      "description": "Which verification procedure of the control produced it: inspecting configuration, running a test, observing a run, or recording an attestation."
+    },
+    "observer": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The adapter, test harness or role that made the observation (for example \"egress-flow-log-adapter\" or \"evaluation lead\"). Write a system or a role, never a person's name."
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The records the observation rests on, so a third party can check it without trusting the observer.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artefact"
+        ],
+        "properties": {
+          "artefact": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What the evidence is, in words (for example \"flow log of run 88213\")."
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Where the evidence is kept."
+          },
+          "hash": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+:.+$",
+            "description": "Digest of the evidence, prefixed with the algorithm (for example \"sha256:<hex>\"), so it can be shown to be unchanged."
+          },
+          "schema": {
+            "type": "string",
+            "format": "uri",
+            "description": "Schema the evidence record validates against, when it is a structured record (for example the evidence-record or eval-result schema)."
+          }
+        }
+      }
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Id of the evaluation run, deployment or job the observation belongs to, when there is one."
+    },
+    "notes": {
+      "type": "string",
+      "description": "Anything a reviewer needs to read the observation: scope limits, why a control is not applicable, follow-up."
+    },
+    "signature": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+:.+$",
+      "description": "Detached signature over the record, prefixed with the algorithm (for example \"ed25519:<base64>\"). Makes the observation tamper-evident in the evidence store."
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Organisation-specific fields. Validators ignore their content; keep evidence-bearing fields in the core record."
+    }
+  },
+  "additionalProperties": false
+}

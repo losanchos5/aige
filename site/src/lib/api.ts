@@ -62,6 +62,24 @@ import {
   THREATS_AS_OF,
 } from '../data/threats';
 import { obligationById } from '../data/frameworks';
+// Block orp-controls-content: the open control profiles dataset.
+import {
+  profiles as controlProfiles,
+  controls,
+  controlApiPath,
+  controlPath,
+  profilePath,
+  profileSources,
+  sourceNumber,
+  nistAiRmfSubcategories,
+  CONTROLS_AS_OF,
+  type Control,
+  type ControlProfile,
+} from '../data/controls';
+import { observationExamples } from '../data/controls/evaluation-environment';
+import { personById } from '../data/people';
+import { threatById } from '../data/threats';
+import { agentControls, agentAnchors, agentChapter } from '../data/tool-agent-controls';
 import { getGlossary, termId } from './glossary';
 import { sourceText } from './sources';
 import { obligationApiPath } from './obligations';
@@ -267,6 +285,267 @@ export const obligationSchema = s.obj(
   },
   'One obligation → artefact → layer row.',
 );
+
+// ---------------------------------------------------------------------------
+// Block orp-controls-content: open control profiles (schema version 1). One
+// record per control of src/data/controls, shared by /api/v1/controls.json and
+// /api/v1/controls/<id>.json. Every optional field of the data module is
+// emitted as null or [] so the schema can stay closed.
+
+const CONTROL_STATUSES = ['draft', 'in-review', 'stable', 'retired'] as const;
+const REVIEWER_STATUSES = ['open', 'in-progress', 'reviewed'] as const;
+const CONTROL_DEPTHS = ['specified', 'derived', 'stub'] as const;
+const ENFORCEMENT_POINTS = ['pre_merge', 'deploy', 'runtime', 'periodic'] as const;
+const POLICY_EFFECTS = ['deny', 'allow', 'require_approval', 'alert'] as const;
+const VERIFICATION_KINDS = ['inspect', 'test', 'observe', 'attest'] as const;
+const SUBJECT_KINDS = ['eval-environment', 'eval-run', 'agent', 'tool-server', 'harness', 'model-artefact'] as const;
+const VERIFICATION_TAGS = ['primary', 'secondary', 'reported'] as const;
+
+const personName = (id: string) => personById(id)?.name ?? id;
+
+function threatRef(id: string) {
+  const row = threatById(id);
+  return {
+    id,
+    externalId: row?.externalId ?? id,
+    name: row?.name ?? id,
+    url: abs(`/resources/threats#${row ? threatAnchor(row) : `threat-${id}`}`),
+  };
+}
+
+/** One control as the API publishes it. */
+export function controlRecord(row: Control) {
+  const sources = profileSources(row.profile);
+  const m = row.mappings;
+  return {
+    id: row.id,
+    profile: row.profile,
+    url: abs(controlPath(row)),
+    json: abs(controlApiPath(row)),
+    title: row.title,
+    version: row.version,
+    status: row.status,
+    reviewerStatus: row.reviewerStatus,
+    depth: row.depth,
+    objective: row.objective,
+    failureModes: [...row.failureModes],
+    scope: row.scope,
+    enforcementPoints: [...row.enforcementPoints],
+    verification: row.verification.map((v) => ({ kind: v.kind, text: v.text })),
+    evidence: row.evidence.map((e) => ({
+      artefact: e.artefact,
+      schemaId: e.schemaId ?? null,
+      schema: e.schemaId ? abs(`/schemas/${e.schemaId}.v1.json`) : null,
+      layer: e.layer,
+    })),
+    failureResponse: { effect: row.failureResponse.effect, text: row.failureResponse.text },
+    layer: row.layer,
+    secondaryLayers: [...(row.secondaryLayers ?? [])],
+    patterns: row.patterns.map((slug) => {
+      const p = getPatternBySlug(slug);
+      return { slug, title: p?.title ?? slug, url: abs(p ? patternPath(p) : '/patterns') };
+    }),
+    seeds: row.seeds.map((id) => {
+      const seed = agentControls.find((a) => a.id === id);
+      return {
+        id,
+        title: seed?.title ?? id,
+        url: abs(seed ? `${agentChapter}#${agentAnchors[seed.anchor]}` : agentChapter),
+      };
+    }),
+    mappings: {
+      obligations: m.obligations.map((id) => ({
+        id,
+        name: obligationById(id)?.obligation ?? id,
+        url: abs(`/obligations/${id.toLowerCase()}`),
+      })),
+      iso42001: m.iso42001.map((id) => ({ id, title: iso42001Controls[id] ?? id })),
+      nistAiRmf: m.nistAiRmf.map((id) => ({ id, title: nistAiRmfSubcategories[id] ?? id })),
+      owasp: m.owasp.map(threatRef),
+      atlas: (m.atlas ?? []).map(threatRef),
+      aiuc1: [...(m.aiuc1 ?? [])],
+      csaAicm: [...(m.csaAicm ?? [])],
+      other: (m.other ?? []).map((o) => ({ framework: o.framework, ref: o.ref, note: o.note ?? null })),
+    },
+    references: row.references.map((src) => ({
+      n: sourceNumber(sources, src),
+      title: src.title,
+      text: sourceText(src),
+      url: src.url,
+      verified: src.verified,
+    })),
+    implementationNotes: [...row.implementationNotes],
+    openQuestions: [...row.openQuestions],
+    observation: row.observation
+      ? {
+          subjectKind: row.observation.subjectKind,
+          expected: row.observation.expected,
+          observedExample: row.observation.observedExample,
+        }
+      : null,
+    observationSchema: abs('/schemas/control-observation.v1.json'),
+    examples: observationExamples
+      .filter((e) => e.controlId === row.id)
+      .map((e) => ({ status: e.status, url: abs(e.path) })),
+  };
+}
+
+const threatRefSchema = s.obj({
+  id: s.str('Row id in threats.json (lower case).'),
+  externalId: s.str('The id as the catalogue prints it.'),
+  name: s.str("The catalogue's name for the threat."),
+  url: s.uri('Card on the threat bridge page.'),
+});
+
+export const controlSchema = s.obj(
+  {
+    id: {
+      type: 'string',
+      pattern: '^AIGE-CTL-[A-Z0-9]+-[0-9]{3}$',
+      description: 'Stable id, AIGE-CTL-<PROFILE>-<NNN>. Never changed, never reused.',
+    },
+    profile: s.str('Slug of the control profile.'),
+    url: s.uri('The control on its profile page.'),
+    json: s.uri('This record on its own, in the API.'),
+    title: s.str('Title.'),
+    version: s.str('Version of the control specification (the profile version).'),
+    status: s.enumOf(CONTROL_STATUSES, 'Publication status.'),
+    reviewerStatus: s.enumOf(REVIEWER_STATUSES, 'Technical review status; open means no one has reviewed it yet.'),
+    depth: s.enumOf(CONTROL_DEPTHS, 'specified: written in full; derived: restates a chapter-23 seed; stub: outline with open questions.'),
+    objective: s.str('The outcome the control secures, in one sentence.'),
+    failureModes: s.arr(s.str('Observable event.'), 'Events that mean the control failed.'),
+    scope: s.str('The subject it applies to, and what is out of scope.'),
+    enforcementPoints: s.arr(s.enumOf(ENFORCEMENT_POINTS, 'Enforcement point.'), 'Where the control is enforced.'),
+    verification: s.arr(
+      s.obj({
+        kind: s.enumOf(VERIFICATION_KINDS, 'Kind of procedure.'),
+        text: s.str('What a third party does, and what it expects.'),
+      }),
+      'How a third party verifies the control; empty for outlines.',
+    ),
+    evidence: s.arr(
+      s.obj({
+        artefact: s.str('The artefact, in words.'),
+        schemaId: s.strOrNull('Schema id in the templates library, when one fits.'),
+        schema: s.uriOrNull('URL of that schema.'),
+        layer,
+      }),
+      'The evidence the control leaves.',
+    ),
+    failureResponse: s.obj({
+      effect: s.enumOf(POLICY_EFFECTS, 'Effect, in policy-card terms.'),
+      text: s.str('What happens when the control fails.'),
+    }),
+    layer,
+    secondaryLayers: layerList,
+    patterns: s.arr(
+      s.obj({ slug: s.str('Pattern slug.'), title: s.str('Pattern title.'), url: s.uri('Pattern page.') }),
+      'Patterns that implement the control.',
+    ),
+    seeds: s.arr(
+      s.obj({ id: s.str('Agent control id.'), title: s.str('Agent control title.'), url: s.uri('Chapter 23 section.') }),
+      'Chapter-23 agent controls the control builds on.',
+    ),
+    mappings: s.obj(
+      {
+        obligations: s.arr(
+          s.obj({ id: s.str('Obligation id.'), name: s.str('Obligation.'), url: s.uri('Obligation page.') }),
+          'Obligation rows the evidence helps satisfy.',
+        ),
+        iso42001: s.arr(s.obj({ id: s.str('Annex A id.'), title: s.str('Short title.') }), 'ISO/IEC 42001 Annex A controls.'),
+        nistAiRmf: s.arr(s.obj({ id: s.str('Subcategory id.'), title: s.str('Short title.') }), 'NIST AI RMF 1.0 subcategories.'),
+        owasp: s.arr(threatRefSchema, 'OWASP LLM 2026 and Agentic 2026 rows.'),
+        atlas: s.arr(threatRefSchema, 'MITRE ATLAS technique rows.'),
+        aiuc1: s.arr(s.str('AIUC-1 requirement id.'), 'AIUC-1 requirements, only where read on the public requirement page; empty until then.'),
+        csaAicm: s.arr(s.str('CSA AICM control id.'), 'CSA AICM controls, only when verified.'),
+        other: s.arr(
+          s.obj({
+            framework: s.str('Framework or specification.'),
+            ref: s.str('Control, clause or element.'),
+            note: s.strOrNull('Short gloss.'),
+          }),
+          'Other mappings (NIST SP 800-53, RFCs, ATLAS mitigations).',
+        ),
+      },
+      'Illustrative mappings, not a claim of conformity.',
+    ),
+    references: s.arr(
+      s.obj({
+        n: s.int('Number of the source in the profile source list.', 1),
+        title: s.str('Source title.'),
+        text: s.str('Source in the house format.'),
+        url: s.uri('Source URL.'),
+        verified: s.enumOf(VERIFICATION_TAGS, 'Verification tag.'),
+      }),
+      'Sources the control rests on.',
+    ),
+    implementationNotes: s.arr(s.str('Note.'), 'Tool-neutral implementation notes; empty for outlines.'),
+    openQuestions: s.arr(s.str('Question.'), 'Questions a technical reviewer should settle.'),
+    observation: {
+      type: ['object', 'null'],
+      description: 'What an observation of the control records, with one illustrative example; null until the control is specified.',
+      additionalProperties: false,
+      required: ['subjectKind', 'expected', 'observedExample'],
+      properties: {
+        subjectKind: s.enumOf(SUBJECT_KINDS, 'Kind of subject observed.'),
+        expected: s.str('What a conforming observation shows.'),
+        observedExample: s.str('One illustrative observation, with its result.'),
+      },
+    },
+    observationSchema: s.uri('Schema of a control observation record (control-observation.v1.json).'),
+    examples: s.arr(
+      s.obj({
+        status: s.enumOf(['pass', 'fail'], 'Result the example shows.'),
+        url: s.uri('Example observation, valid against the observation schema.'),
+      }),
+      'Illustrative example observations; empty for controls not yet specified.',
+    ),
+  },
+  'One reference control: a draft control specification, open for technical review.',
+);
+
+function controlProfileRecord(p: ControlProfile) {
+  return {
+    slug: p.slug,
+    title: p.title,
+    shortTitle: p.shortTitle,
+    url: abs(profilePath(p)),
+    version: p.version,
+    status: p.status,
+    reviewerStatus: p.reviewerStatus,
+    summary: p.summary,
+    scope: p.scope,
+    published: p.published,
+    updated: p.updated,
+    authors: p.authors.map(personName),
+    reviewers: p.reviewers.map(personName),
+    changelog: p.changelog.map((e) => ({ version: e.version, date: e.date, note: e.note })),
+    reviewForm: `${site.github}/issues/new?template=${p.issueTemplate}`,
+    controls: controls.filter((c) => c.profile === p.slug).map((c) => c.id),
+  };
+}
+
+const controlProfileSchema = s.obj({
+  slug: s.str('Profile slug.'),
+  title: s.str('Title.'),
+  shortTitle: s.str('Short title.'),
+  url: s.uri('Profile page.'),
+  version: s.str('Profile version.'),
+  status: s.enumOf(CONTROL_STATUSES, 'Publication status.'),
+  reviewerStatus: s.enumOf(REVIEWER_STATUSES, 'Technical review status.'),
+  summary: s.str('What the profile is and how far it goes.'),
+  scope: s.str('The systems it covers, and what it leaves out.'),
+  published: s.date('First published.'),
+  updated: s.date('Last updated.'),
+  authors: s.arr(s.str('Author name.'), 'Authors.'),
+  reviewers: s.arr(s.str('Reviewer name.'), 'Named technical reviewers; empty means open for technical review.'),
+  changelog: s.arr(
+    s.obj({ version: s.str('Version.'), date: s.date('Date.'), note: s.str('What changed.') }),
+    'Version history.',
+  ),
+  reviewForm: s.uri('GitHub issue form for a review of the profile.'),
+  controls: s.arr(s.str('Control id.'), 'Ids of its controls, in order.'),
+});
 
 // ---------------------------------------------------------------------------
 // The dataset registry.
@@ -1148,6 +1427,26 @@ export const datasets: readonly Dataset[] = [
       ),
     },
   },
+  // Block orp-controls-content: the open control profiles. Draft control
+  // specifications with stable ids; one file per control under /controls/.
+  {
+    name: 'controls',
+    title: 'Open control profiles',
+    description:
+      'Open control profiles: draft control specifications for AI evaluation environments and agents at runtime, each reference control with its objective, failure modes, enforcement points, verification, evidence, mappings and sources. Illustrative, not a claim of conformity.',
+    schemaVersion: 1,
+    page: '/controls',
+    build: () => ({
+      asOf: CONTROLS_AS_OF,
+      profiles: controlProfiles.map(controlProfileRecord),
+      controls: controls.map(controlRecord),
+    }),
+    properties: {
+      asOf: s.date('Date the profiles were last checked against their sources.'),
+      profiles: s.arr(controlProfileSchema, 'The control profiles.'),
+      controls: s.arr(controlSchema, 'Every control, in profile and id order.'),
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -1226,6 +1525,28 @@ export function obligationDocument(row: Obligation): Record<string, unknown> {
   };
 }
 
+/** Block orp-controls-content: schema of one control document (/api/v1/controls/<id>.json). */
+export function controlDocumentSchema(): JsonSchema {
+  const properties = { ...envelopeSchema, control: controlSchema };
+  return {
+    $schema: JSON_SCHEMA_DIALECT,
+    $id: schemaUrl('control'),
+    title: 'One reference control (AI Governance Engineer open data, schema version 1)',
+    description: `One control of an open control profile, with the shared envelope. A draft control specification, open for technical review. ${disclaimer}`,
+    type: 'object',
+    additionalProperties: false,
+    required: Object.keys(properties),
+    properties,
+  };
+}
+
+export function controlDocument(row: Control): Record<string, unknown> {
+  return {
+    ...envelope('control', 1, abs(controlApiPath(row)), controlPath(row)),
+    control: controlRecord(row),
+  };
+}
+
 /** Catalogue entry for one dataset. */
 function catalogueEntry(d: Dataset) {
   return {
@@ -1248,12 +1569,14 @@ export function indexPayload(): Record<string, unknown> {
       documentation: abs('/resources/data'),
       itemTemplates: {
         obligation: `${API_BASE}/obligations/{id}.json`,
+        control: `${API_BASE}/controls/{id}.json`,
       },
     },
     datasets: datasets.map(catalogueEntry),
     schemas: [
       ...datasets.map((d) => ({ name: d.name, url: schemaUrl(d.name) })),
       { name: 'obligation', url: schemaUrl('obligation') },
+      { name: 'control', url: schemaUrl('control') },
       { name: 'index', url: schemaUrl('index') },
     ],
   };
@@ -1268,6 +1591,7 @@ export function indexSchema(): JsonSchema {
       documentation: s.uri('Human documentation.'),
       itemTemplates: s.obj({
         obligation: s.str('URL template of a single obligation; {id} is the lower-case obligation id.'),
+        control: s.str('URL template of a single control; {id} is the lower-case control id.'),
       }),
     }),
     datasets: s.arr(
@@ -1304,6 +1628,7 @@ export function allSchemas(): Record<string, JsonSchema> {
   return {
     ...Object.fromEntries(datasets.map((d) => [d.name, datasetSchema(d)])),
     obligation: obligationDocumentSchema(),
+    control: controlDocumentSchema(),
     index: indexSchema(),
   };
 }
@@ -1356,6 +1681,25 @@ export function openApiDocument(): Record<string, unknown> {
         },
       },
     },
+    '/controls/{id}.json': {
+      get: {
+        operationId: 'getControl',
+        summary: 'One reference control',
+        parameters: [
+          {
+            name: 'id',
+            in: 'path',
+            required: true,
+            description: 'Control id in lower case, e.g. aige-ctl-eval-002.',
+            schema: { type: 'string', pattern: '^aige-ctl-[a-z0-9]+-[0-9]{3}$' },
+          },
+        ],
+        responses: {
+          ...okJson('The control with the shared envelope.', 'control'),
+          '404': { description: 'No control has that id.' },
+        },
+      },
+    },
     '/schemas/{name}.json': {
       get: {
         operationId: 'getSchema',
@@ -1365,7 +1709,7 @@ export function openApiDocument(): Record<string, unknown> {
             name: 'name',
             in: 'path',
             required: true,
-            description: 'Schema name: a dataset name, obligation or index.',
+            description: 'Schema name: a dataset name, obligation, control or index.',
             schema: { type: 'string', enum: Object.keys(allSchemas()) },
           },
         ],

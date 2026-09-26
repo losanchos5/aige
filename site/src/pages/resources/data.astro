@@ -11,6 +11,7 @@ import Citation from '../../components/Citation.astro';
 import { site } from '../../data/site';
 import { obligations, frameworks, disclaimer, OBLIGATION_ID_PATTERN } from '../../data/frameworks';
 import { datasets, API_PATH, SCHEMA_BASE, allSchemas } from '../../lib/api';
+import { controls, controlSlug } from '../../data/controls';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import {
   authorNodes,
@@ -180,6 +181,23 @@ const jsonLd = [
               </td>
               <td data-label="Page">
                 <a href="/obligations">Obligation register</a>
+              </td>
+            </tr>
+            <tr>
+              <td data-label="Endpoint">
+                <a href={`${API_PATH}/controls/${controlSlug(controls[0])}.json`}>
+                  <code>controls/&#123;id&#125;.json</code>
+                </a>
+              </td>
+              <td data-label="What it holds">
+                One reference control, keyed by its id in lower case ({controls.length} files). Draft
+                control specifications, open for technical review.
+              </td>
+              <td data-label="Schema">
+                <a href={`${API_PATH}/schemas/control.json`}>v1</a>
+              </td>
+              <td data-label="Page">
+                <a href="/controls">Open control profiles</a>
               </td>
             </tr>
           </tbody>

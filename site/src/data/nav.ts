@@ -354,6 +354,7 @@ export const feeds: NavItem[] = [
   { label: 'Obligations JSON', href: '/resources/obligations.json', event: 'download' },
   { label: 'Harms JSON', href: '/resources/harms.json', event: 'download' },
   { label: 'Open data API', href: '/api/v1/index.json', event: 'download' },
+  { label: 'Open controls JSON', href: '/api/v1/controls.json', event: 'download' },
 ];
 
 // Off-site project links.
