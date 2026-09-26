@@ -17,14 +17,14 @@ models are affected?" when a licence, an opt-out or an order changes the answer.
 > **In short**
 > The Training-Data Rights Ledger is an inventory control that keeps one ledger row per training
 > source, not per merged dataset, recording how the data was acquired, on what licence or legal
-> basis, whether rights reservations were checked and which uses are permitted. It solves a
-> mismatch: rights are decided per source, while evidence is kept per project if at all, so nobody
-> can say which sources trained which model version, and one unlawful source contaminates every
-> model trained on it. Use it when a provider trains or fine-tunes on a mix of internal, licensed,
-> open, crawled and user data. The corpus build and the Dataset Admission Gate fail on a source with
-> no row, and each training run records the rows it read, so forward lineage names the models a
-> withdrawal or order affects. Its illustrative mappings include EU AI Act Art. 10(2)(b) and
-> 53(1)(c)–(d), Directive (EU) 2019/790 Art. 4(3), GDPR Art. 5(1)(b) and NIST AI RMF Govern 6.1.
+> basis, whether rights reservations were checked and which uses are permitted. It solves rights
+> decided per source but evidenced per project, if at all, so nobody can say which sources trained
+> which model version, and one unlawful source contaminates every model trained on it. Use it when a
+> provider trains or fine-tunes on mixed internal, licensed, open, crawled and user data. The corpus
+> build and the Dataset Admission Gate fail on a source with no row, and each training run records
+> the rows it read, so forward lineage names the models a withdrawal or order affects. Its
+> illustrative mappings include EU AI Act Art. 10(2)(b) and 53(1)(c)–(d), Directive (EU) 2019/790
+> Art. 4(3), GDPR Art. 5(1)(b) and NIST AI RMF Govern 6.1.
 
 ## Objectives
 Make the right to train a recorded, queryable fact before training, and keep it true afterwards, so

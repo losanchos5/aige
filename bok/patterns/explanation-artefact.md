@@ -20,15 +20,15 @@ appeal) from the same record.
 > **In short**
 > The Explanation Artefact is a runtime control that writes one structured explanation record for
 > every consequential decision an AI system makes or supports about a person. It solves explanations
-> that are generated on the fly, sent and forgotten: nobody can reproduce what a customer was told
-> once the model, method or baseline has changed, and reason codes can name factors the model did
-> not use. Use it where a system declines, prices, ranks, flags or scores people and someone will
-> ask why. Each record pins the model version, the explanation method with its version and baseline,
-> reason codes drawn from scored factors, the notice template and the contest route. An explanation
-> suite in CI tests fidelity, stability, sanity and reason-code consistency, and the same record
-> answers an adverse-action notice, an access request, an AI Act explanation request or an appeal.
-> Its illustrative mappings include EU AI Act Art. 86 and 13(3)(b)(iv), GDPR Art. 15(1)(h) and 22,
-> Regulation B and NIST AI RMF Measure 2.9.
+> generated on the fly, sent and forgotten: nobody can reproduce what a customer was told once the
+> model, method or baseline changes, and reason codes can name factors the model did not use. Use it
+> where a system declines, prices, ranks, flags or scores people and someone will ask why. Each
+> record pins the model version, the explanation method, its version and baseline, reason codes
+> drawn from scored factors, the notice template and the contest route. An explanation suite in CI
+> tests fidelity, stability, sanity and reason-code consistency, and the same record answers an
+> adverse-action notice, access request, AI Act explanation request or appeal. Its illustrative
+> mappings include EU AI Act Art. 86 and 13(3)(b)(iv), GDPR Art. 15(1)(h) and 22, Regulation B and
+> NIST AI RMF Measure 2.9.
 
 ## Objectives
 Make every explanation reproducible, checkable and reusable: reproducible because what produced it is
