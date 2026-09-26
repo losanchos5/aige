@@ -6,8 +6,11 @@ a completed, reviewed core (1.0).
 
 ## Unreleased
 
-Open reference project (OpenSpec change `open-reference-project`), in progress. Nothing below is
-released yet; the pages exist as placeholders until their content lands.
+Open reference project (OpenSpec change `open-reference-project`). Nothing below is released
+yet. It ships two draft control profiles with 40 controls (9 for the evaluation environment, 31
+for agents at runtime, open for technical review), `/frontier`, `/research` with one draft note,
+`/contribute`, incident notes on ten cases (seven of them new, from 2026 training and evaluation
+incidents), and the MCP server 0.6.0 with the `list_controls` and `get_control` tools.
 
 ### Added
 - New routes: `/controls` (open control profiles), `/controls/evaluation-environment` and
