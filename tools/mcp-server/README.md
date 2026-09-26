@@ -2,8 +2,8 @@
 
 > A read-only remote Model Context Protocol server over the open data of aigovernanceengineer.com:
 > the obligation register, the topic crosswalk, the glossary, the patterns, the templates and
-> schemas, and the Body of Knowledge chapters. Illustrative, not legal advice and not a claim of
-> conformity.
+> schemas, the open control profiles and the Body of Knowledge chapters. Illustrative, not legal
+> advice and not a claim of conformity.
 
 The site already publishes its data as static JSON under [`/api/v1`](https://aigovernanceengineer.com/resources/data).
 This server puts an MCP layer in front of that API so an assistant can ask the questions a
@@ -37,14 +37,19 @@ valid values, so the model can correct itself.
 | `list_templates` | `stage?` | The templates-and-schemas library: JSON Schemas with a filled example and a human template, and the policy kit. |
 | `get_template` | `name`, `part?` (`all`, `schema`, `example`, `template`) | One library entry with the content of its files. |
 | `search_bok` | `query`, `kind?`, `limit?` | Chapters (title, summary, key points), sections (heading, anchor URL, text) and pattern pages, best first. |
+| `list_controls` | `profile?`, `layer?`, `status?`, `depth?`, `query?` | The reference controls of the open control profiles (draft control specifications, ids such as `AIGE-CTL-EVAL-002`), filtered with AND by profile slug, stack layer (primary or secondary), publication status, depth (`specified`, `derived`, `stub`) and words in the id, title or objective. |
+| `get_control` | `id` (id in any case, `EVAL-002`, page or JSON URL, or title) | One control: objective, failure modes, scope, enforcement points, verification, evidence, failure response, patterns, the illustrative mappings, numbered references, implementation notes, open questions, the observation it records and the example observations. |
 
 ## Resources
 
-The catalogue (`/api/v1/index.json`), the fourteen datasets (`obligations`, `frameworks`,
+The catalogue (`/api/v1/index.json`), the fifteen datasets (`obligations`, `frameworks`,
 `crosswalk`, `glossary`, `patterns`, `maturity`, `path`, `chapters`, `jurisdictions`, `harms`,
-`cases`, `contracts`, `roles`, `threats`) and the full text (`/llms-full.txt`) are MCP resources
-under their canonical `https://aigovernanceengineer.com/...` URIs. One resource template,
-`https://aigovernanceengineer.com/api/v1/obligations/{id}.json`, serves a single row.
+`cases`, `contracts`, `roles`, `threats`, `controls`) and the full text (`/llms-full.txt`) are MCP
+resources under their canonical `https://aigovernanceengineer.com/...` URIs. Two resource
+templates serve a single record: `https://aigovernanceengineer.com/api/v1/obligations/{id}.json`
+(one obligation row, e.g. `aige-obl-euaia-art9`) and
+`https://aigovernanceengineer.com/api/v1/controls/{id}.json` (one control, e.g.
+`aige-ctl-eval-002`).
 
 ## Connect a client
 
@@ -202,7 +207,7 @@ server's log at three files of 10 MB:
 services:
   aige-mcp:
     build: ./tools/mcp-server
-    image: aige-mcp:0.5.0
+    image: aige-mcp:0.6.0
     restart: unless-stopped
     init: true
     read_only: true
