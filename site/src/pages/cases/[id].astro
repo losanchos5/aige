@@ -214,7 +214,7 @@ const jsonLd = [
           </span>
         </dd>
         <dt>Incident record</dt>
-        <dd>
+        <dd>{entry.incidents.length === 0 && 'None yet'}
           {
             entry.incidents.map((ref, i) => (
               <>
