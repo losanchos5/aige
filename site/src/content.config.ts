@@ -63,6 +63,45 @@ const patterns = defineCollection({
     }),
 });
 
+// One file per written research note (research/<slug>.md at the repo root),
+// rendered at /research/<slug>. The frontmatter is the note's provenance: its
+// version, review status, named authors and reviewers, and the controls and
+// patterns it argues for. src/lib/research-pages.ts cross-checks it against
+// data/research.ts, data/people.ts, the control registry and data/patterns.ts.
+const isoDate = z
+  .union([z.date(), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)])
+  .transform((value) => (value instanceof Date ? value.toISOString().slice(0, 10) : value));
+const research = defineCollection({
+  loader: glob({ pattern: '*.md', base: '../research' }),
+  schema: z
+    .object({
+      /** URL id: /research/<id>. Must equal the file name without `.md`. */
+      id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+      /** The note's title: its H1 and <title>; must equal data/research.ts. */
+      title: z.string().min(10).max(120),
+      /** One or two sentences, 50-160 characters: the lede and meta description. */
+      summary: z.string().min(50).max(160),
+      /** A published note needs at least one named reviewer. */
+      status: z.enum(['draft', 'review', 'published']),
+      /** The note's own semantic version (not the Body of Knowledge's). */
+      version: z.string().regex(/^\d+\.\d+\.\d+$/, 'version must be semver (MAJOR.MINOR.PATCH)'),
+      /** First published, YYYY-MM-DD. */
+      date: isoDate,
+      /** Last substantive revision, YYYY-MM-DD. */
+      updated: isoDate.optional(),
+      /** Ids of data/people.ts. */
+      authors: z.array(z.string().min(1)).min(1),
+      /** Ids of data/people.ts; empty until a named reviewer has reviewed the note. */
+      reviewers: z.array(z.string().min(1)).default([]),
+      /** Control ids the note argues for (AIGE-CTL-<PROFILE>-NNN). */
+      relatedControls: z.array(z.string().regex(/^AIGE-CTL-[A-Z]+-\d{3}$/)).default([]),
+      /** Pattern slugs of data/patterns.ts. */
+      relatedPatterns: z.array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)).default([]),
+      keywords: z.array(z.string().min(1)).optional(),
+    })
+    .strict(),
+});
+
 const thesis = defineCollection({
   loader: glob({ pattern: 'THESIS.md', base: '..' }),
   schema,
@@ -176,4 +215,4 @@ const thesisI18n = defineCollection({
   schema: z.object(translationMeta).passthrough(),
 });
 
-export const collections = { bok, patterns, thesis, meta, bokI18n, patternsI18n, thesisI18n };
+export const collections = { bok, patterns, research, thesis, meta, bokI18n, patternsI18n, thesisI18n };
