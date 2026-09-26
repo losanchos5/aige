@@ -183,7 +183,7 @@ test.describe('research pages in dist', () => {
         expect(html, id).toContain(`id="${id}"`);
       }
       const related = html.slice(html.indexOf('id="related-controls"'), html.indexOf('id="related-patterns"'));
-      const links = [...related.matchAll(/href="(\/controls\/evaluation-environment#aige-ctl-eval-00\d)"/g)];
+      const links = [...related.matchAll(/href="(\/controls\/evaluation-environment[#/]aige-ctl-eval-00\d)"/g)];
       expect(links.length).toBeGreaterThanOrEqual(5);
       // The cite box carries the note's own version and the concept DOI.
       expect(html).toContain('data-copy-cite="García Aibar, J. (2026). ' + theme.title + ' (v0.1.0).');
