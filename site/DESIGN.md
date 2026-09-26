@@ -169,8 +169,9 @@ needs no pause control; it also pauses while a step is active, and is absent und
   any mesh a `tone="tint"` band carries (Section's `mesh` on a tint band). A
   section's mesh fades over its top and bottom tenth (`mask-image`), so neighbouring meshes meet
   without a seam. On the home page no body section sits on the bare ground (Jordi, 2026-09-24):
-  loop `b` 0.5, questions `c` 0.5, stack tint + `a` 0.35, values `b` 0.45, role `a` 0.6, chapters
-  `c` 0.45, resources tint + `b` 0.35, newsletter `c` 0.35; neighbours never share a composition. One mesh per section, several per
+  loop `b` 0.5, questions `c` 0.5, stack tint + `a` 0.35, operates `c` 0.4, values `b` 0.45, role
+  `a` 0.6, chapters `c` 0.45, resources tint + `b` 0.35, newsletter `c` 0.35; neighbours never share
+  a composition. One mesh per section, several per
   page; never directly under a table or a node grid (the loop sits on its own opaque panel).
 - **`BookParts`** (`site/src/components/BookParts.astro`), the Body of Knowledge by part on the
   home: one `.card-lum` per part (no `.lift`: the card is not a link; its title links the part on
@@ -211,9 +212,20 @@ needs no pause control; it also pauses while a step is active, and is absent und
 - **`.hero--field`** (scoped in `site/src/pages/index.astro`, home only): the full-viewport
   (`min-height: 100svh`) hero: a `.hero-field` layer holding `.hero-canvas` (the WebGL gradient
   field, `public/hero-field.js`, with a static CSS radial-gradient fallback painted from the same
-  `--field-1..3` tokens for no-JS/no-WebGL and first paint), the centred `.hero-title` + CTA
-  (`.hero-center`), and the `.hero-facts` strip. `--muted` is re-scoped to `--ink-2` on it in
-  `effects.css`, same as `.sec--mesh`/`.hero--page`.
+  `--field-1..3` tokens for no-JS/no-WebGL and first paint), the centred `.hero-center` block, and
+  the `.hero-facts` strip. `--muted` is re-scoped to `--ink-2` on it in `effects.css`, same as
+  `.sec--mesh`/`.hero--page`. The `.hero-center` block, in order (each child rises in with the
+  `.hero-in` stagger, `--i` 0 to 3, transform only): the `.hero-title`; the `.hero-lede` (one
+  sentence, body face at 17 to 20px, weight 500, `max-width: 56ch`, ink `--hero-copy` = `--ink`,
+  white over the painting in the dark theme, never dimmed); `.hero-ctas`, two buttons: the
+  gradient primary (`.btn-primary.btn-glow`, "Explore the Stack") and `.hero-btn-quiet` ("Open
+  controls", a `.btn` on an opaque `--bg` plate with the `--ink` border and label, so it never
+  depends on the painting); and `.hero-links`, two text links (the Thesis, the frontier route) in
+  mono at `--fs-small`, underlined, `--hero-copy`, arrows `aria-hidden`. Over the painting the halo
+  is 90% x 60% at 44% (phones 160% x 56% at 34%), sized so the lede and the links hold 4.5:1 on
+  average and 4.3:1 at their worst pixel in both themes (`tests/hero-art.spec.ts`); on phones the
+  block tightens (`gap: --s-5`, less padding, the buttons on one row) so the strip stays in the
+  first viewport at 390x844.
 - **`.hero-facts`** (`pages/index.astro`), the strip of figures under the headline: label | value
   pairs computed from the content modules (stack layers, workflows, chapters, values, frameworks,
   patterns, BoK version, license), doubled into an `aria-hidden`+`inert` copy for the seamless

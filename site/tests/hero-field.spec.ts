@@ -1,10 +1,11 @@
 // hero-field.spec.ts: the home hero, a full-viewport gradient field
 // (public/hero-field.js) under a floating, transparent header, the serif
-// headline centred on it, one CTA and a strip of figures. Covers the layout,
-// the header's overlay mode, the motion rules (reduced motion, pause control,
-// no-JS fallback, forced colours), the strip's data and the text contrast
-// over the field in both themes, sampled at several points of the blobs'
-// paths, at desktop and phone widths and after a theme switch.
+// headline centred on it with its lede, two CTAs and two text links, and a
+// strip of figures. Covers the layout, the header's overlay mode, the motion
+// rules (reduced motion, pause control, no-JS fallback, forced colours), the
+// strip's data and the text contrast over the field in both themes, sampled
+// at several points of the blobs' paths, at desktop and phone widths and
+// after a theme switch.
 //
 // The field is the hero's ground only while index.astro's HERO_ART is false.
 // The layout, header overlay and figures strip tests hold for either ground;
@@ -79,12 +80,23 @@ test.describe('layout', () => {
     ).toBe(true);
   });
 
-  test('the hero carries exactly one CTA, to the Thesis', async ({ page }) => {
+  test('the hero carries two CTAs (the Stack, the controls) and two text links', async ({
+    page,
+  }) => {
     await page.goto('/');
-    const links = page.locator('.hero--field .hero-center a');
-    await expect(links).toHaveCount(1);
-    await expect(links).toHaveAttribute('href', '/thesis');
-    await expect(links).toHaveText('Read the Thesis');
+    await expect(page.locator('.hero--field .hero-center a')).toHaveCount(4);
+    const ctas = page.locator('.hero--field .hero-ctas a');
+    await expect(ctas).toHaveCount(2);
+    await expect(ctas.nth(0)).toHaveAttribute('href', '/stack');
+    await expect(ctas.nth(0)).toHaveText('Explore the Stack');
+    await expect(ctas.nth(1)).toHaveAttribute('href', '/controls');
+    await expect(ctas.nth(1)).toHaveText('Open controls');
+    const links = page.locator('.hero--field .hero-links a');
+    await expect(links).toHaveCount(2);
+    await expect(links.nth(0)).toHaveAttribute('href', '/thesis');
+    await expect(links.nth(0)).toHaveAccessibleName('Read the Thesis');
+    await expect(links.nth(1)).toHaveAttribute('href', '/frontier');
+    await expect(links.nth(1)).toHaveAccessibleName('Frontier labs & evaluators');
   });
 });
 
@@ -154,7 +166,7 @@ test.describe('motion', () => {
     const toggle = page.locator('.motion-toggle');
     // Off screen (clipped by the hero) until keyboard focus reaches it.
     await expect(toggle).not.toBeInViewport();
-    await page.locator('.hero-center a').focus();
+    await page.locator('.hero-links a').last().focus();
     await page.keyboard.press('Tab');
     await expect(toggle).toBeFocused();
     await expect(toggle).toBeInViewport();
