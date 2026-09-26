@@ -343,6 +343,11 @@ test.describe('home section backgrounds', () => {
     expect(find('The discipline, defined')).toMatchObject({ tone: 'mesh', variant: 'b', opacity: 0.5 });
     expect(find('Three questions')).toMatchObject({ tone: 'mesh', variant: 'c', opacity: 0.5 });
     expect(find('A build order')).toMatchObject({ tone: 'tint', variant: 'a', opacity: 0.35 });
+    expect(find('Where AI Governance Engineering operates')).toMatchObject({
+      tone: 'mesh',
+      variant: 'c',
+      opacity: 0.4,
+    });
     expect(find('Eight values')).toMatchObject({ tone: 'mesh', variant: 'b', opacity: 0.45 });
     expect(find('The role is')).toMatchObject({ tone: 'mesh', variant: 'a', opacity: 0.6 });
     // The chapters section's title counts the chapters from the data.
