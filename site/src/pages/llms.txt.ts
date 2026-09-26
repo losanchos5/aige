@@ -22,6 +22,7 @@ import { cases } from '../data/cases';
 import { comparisons, comparisonPath } from '../data/comparisons';
 import { tools as toolkitTools, toolNotice } from '../data/toolkit';
 import { audiences, audiencePath } from '../data/audiences';
+import { researchPath, writtenThemes } from '../data/research';
 import { liveSiblingHubs } from '../lib/audiences';
 import { firstSentence, getGlossary } from '../lib/glossary';
 import { hasFigureArt } from '../lib/figure-reuse';
@@ -189,6 +190,36 @@ export const GET: APIRoute = async (context) => {
         .map((tool) => page(`Toolkit: ${tool.title}`, tool.href, tool.summary)),
     ]),
 
+    // Block orp-shell (open reference project): the open control profiles and
+    // the research notes. The profile pages move to a dynamic template in a
+    // later block, so each line falls back to the page's own title and
+    // description when src/pages no longer holds a static file for it.
+    section('Controls and research', [
+      described(
+        '/controls',
+        'Open AI governance controls',
+        'Open control profiles for AI governance: each control with its evidence, mapped to the five-layer stack and reviewed in the open. Versioned and CC BY 4.0.',
+      ),
+      described(
+        '/controls/evaluation-environment',
+        'AI evaluation environment controls',
+        'An open control profile for AI evaluation environments: isolation, tool access, telemetry and evidence requirements. Draft v0.1.',
+      ),
+      described(
+        '/controls/agent-runtime',
+        'AI agent runtime controls',
+        'An open control profile for AI agents at runtime: identity, tool mediation, execution limits, stop conditions and telemetry. Draft v0.1, from chapter 23.',
+      ),
+      described(
+        '/research',
+        'AI governance research notes',
+        'Technical notes on the open questions of AI governance engineering: what is assumed, what the evidence shows and what would settle each one.',
+      ),
+      ...writtenThemes().map((theme) =>
+        page(`Research note: ${theme.title}`, researchPath(theme), `Draft. ${theme.question}`),
+      ),
+    ]),
+
     section('Data, API and MCP', [
       page(
         'Open data and API',
@@ -223,7 +254,7 @@ export const GET: APIRoute = async (context) => {
       ),
     ]),
 
-    section('Cases, harms and threats', [
+    section('Incidents, harms and threats', [
       page(
         'Cases',
         '/cases',
@@ -264,6 +295,11 @@ export const GET: APIRoute = async (context) => {
       ),
       ...audiences.map((audience) => page(audience.navLabel, audiencePath(audience), audience.summary)),
       ...liveSiblingHubs().map((hub) => page(hub.label, `/for/${hub.slug}`, hub.summary)),
+      described(
+        '/frontier',
+        'Frontier AI evaluation assurance',
+        'Engineering assurance for frontier AI: evaluation environment controls, runtime safeguards and machine-verifiable evidence on the five-layer stack.',
+      ),
     ]),
 
     section('Thesis', [
@@ -333,6 +369,11 @@ export const GET: APIRoute = async (context) => {
       ),
       described('/about/changelog', 'Changelog'),
       described('/about/contributors', 'Contributors'),
+      described(
+        '/contribute',
+        'Contribute to open AI controls',
+        'How to contribute to the open controls and research notes: issue forms for a control review, a mapping or a correction, and how review works.',
+      ),
     ]),
   ];
 
