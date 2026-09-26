@@ -1,0 +1,76 @@
+---
+/**
+ * GlossaryJump: the line and the A-Z row that open /bok/glossary, right under
+ * its header, so the first screen on a phone reaches the terms (audit
+ * 2026-09-26 SXO-N-04: at 390 px it showed the header and no term). It states
+ * how many terms there are and links each letter to the chapter's own letter
+ * heading (`## A` renders as `#a`), only the letters that exist. Chapter
+ * furniture, so it stays out of the site search and of snippets.
+ */
+import { getGlossary, getGlossaryLetters } from '../lib/glossary';
+import { slugify } from '../lib/md-parse';
+
+const count = getGlossary().length;
+const letters = getGlossaryLetters();
+---
+
+<nav class="gl-az" aria-label="Glossary, A to Z" data-glossary-jump data-pagefind-ignore data-nosnippet>
+  <p class="gl-az-line">{count} terms, each with its own page. Jump to a letter:</p>
+  <ul class="gl-az-row">
+    {
+      letters.map((letter) => (
+        <li>
+          <a href={`#${slugify(letter)}`}>{letter}</a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .gl-az {
+    margin: 0 0 var(--s-5);
+  }
+
+  .gl-az-line {
+    margin: 0 0 var(--s-2);
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--ink-2);
+  }
+
+  .gl-az-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gl-az-row li {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* 26 x 36 px targets, past the 24 px WCAG 2.5.8 minimum: twelve to a row at
+     390 px, so the whole row fits in two lines within the first screen. */
+  .gl-az-row a {
+    display: grid;
+    place-items: center;
+    width: 1.625rem;
+    height: 2.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .gl-az-row a:hover,
+  .gl-az-row a:focus-visible {
+    border-color: currentColor;
+  }
+</style>
