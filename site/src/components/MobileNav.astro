@@ -1,0 +1,565 @@
+---
+/**
+ * MobileNav: the phone menu (below 840px), a modal <dialog> sibling of the
+ * header (so the header still holds exactly one search button and one theme
+ * toggle). Built from the same grouped `nav` as the desktop bar, but shaped
+ * for a small screen: every group is one full-width row (its name and a
+ * one-line hint), so all seven fit on the first screen; a group row is an
+ * accordion button (aria-expanded + region) whose items are compact rows,
+ * the whole row the link. The Thesis and the map have no items: their row is
+ * the link. The group holding the current page starts open and the page's own
+ * row carries aria-current. A sticky bar keeps search and close in reach at
+ * any scroll depth. Opening, closing, the scroll lock and the one-group-open
+ * accordion are in /nav.js (CSP script-src 'self'); focus containment and
+ * Escape come from showModal().
+ */
+import RegisterMark from './RegisterMark.astro';
+import LangSwitcher from './LangSwitcher.astro';
+import { site } from '../data/site';
+import { nav, resolveCurrent, type NavGroup } from '../data/nav';
+import { bookParts } from '../data/parts';
+import { I18N_PUBLISHED, stripLocale } from '../i18n/locales';
+import { translator, type UiKey } from '../i18n/ui';
+
+interface Props {
+  /** Page language (the <html lang>); English by default. */
+  lang?: string;
+  /** The page's hreflang alternates, for the language switcher. */
+  alternates?: { hreflang: string; href: string }[];
+}
+
+const { lang = 'en', alternates } = Astro.props;
+const t = translator(lang);
+const groupLabel = (group: NavGroup) => t(`nav.${group.id}` as UiKey);
+const partLabel = (id: string, fallback: string) =>
+  bookParts.some((part) => part.id === id) ? t(`part.${id}` as UiKey) : fallback;
+
+// Same resolution as the desktop bar: a translated page opens its group but no
+// English link claims to be the current page.
+const pathname = Astro.url.pathname;
+const englishPath = stripLocale(pathname);
+const current = resolveCurrent(englishPath);
+const currentHref = englishPath === pathname ? current.href : undefined;
+const currentGroup = current.groupId;
+
+const panelItems = (group: NavGroup) => group.items.filter((i) => i.placement !== 'footer');
+const rowItems = (group: NavGroup) => panelItems(group).filter((i) => !i.num);
+const chapterOf = (group: NavGroup) => panelItems(group).filter((i) => i.num);
+const isDirect = (group: NavGroup) => panelItems(group).length === 0;
+const isCurrent = (href: string | undefined, group: NavGroup) =>
+  href !== undefined && currentHref === href && currentGroup === group.id;
+const hintOf = (group: NavGroup) => group.hint ?? group.description;
+// Chapter groups: the part sections when the group has them, else one
+// unnamed section holding every chapter.
+const sectionsOf = (group: NavGroup) =>
+  group.sections ?? [{ id: group.id, label: '', range: '', items: chapterOf(group) }];
+---
+
+<dialog id="nav-drawer" class="nav-drawer" aria-label={t('header.menu')}>
+  <div class="mnav">
+    <div class="mnav-bar">
+      <RegisterMark size="sm" label={site.name} />
+      <button
+        type="button"
+        class="mnav-search"
+        data-search-open
+        data-umami-event="search-open"
+        data-umami-event-location="drawer"
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+          <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
+          <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+        </svg>
+        <span>{t('header.search')}</span>
+      </button>
+      <button type="button" class="mnav-close" data-nav-close aria-label={t('header.closeMenu')}>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" aria-hidden="true">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="nav-panel" aria-label={t('header.menu')}>
+      <ul class="mnav-groups">
+        {
+          nav.map((group) => {
+            const open = currentGroup === group.id;
+            return (
+              <li class="mnav-group" data-current={open ? '' : undefined}>
+                {isDirect(group) ? (
+                  <a
+                    class="mnav-row"
+                    href={group.href}
+                    aria-labelledby={`mnav-${group.id}-l`}
+                    aria-describedby={`mnav-${group.id}-h`}
+                    aria-current={isCurrent(group.href, group) ? 'page' : undefined}
+                  >
+                    <span class="mnav-text">
+                      <span class="mnav-label" id={`mnav-${group.id}-l`}>
+                        {groupLabel(group)}
+                      </span>
+                      <span class="mnav-hint" id={`mnav-${group.id}-h`}>
+                        {hintOf(group)}
+                      </span>
+                    </span>
+                    <svg class="mnav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+                      <path
+                        d="M5 12h13m-5-5 5 5-5 5"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </a>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      class="mnav-row mnav-toggle"
+                      id={`mnav-${group.id}-b`}
+                      aria-expanded={open ? 'true' : 'false'}
+                      aria-controls={`mnav-${group.id}-r`}
+                      aria-labelledby={`mnav-${group.id}-l`}
+                      aria-describedby={`mnav-${group.id}-h`}
+                      data-mnav-toggle
+                    >
+                      <span class="mnav-text">
+                        <span class="mnav-label" id={`mnav-${group.id}-l`}>
+                          {groupLabel(group)}
+                        </span>
+                        <span class="mnav-hint" id={`mnav-${group.id}-h`}>
+                          {hintOf(group)}
+                        </span>
+                      </span>
+                      <svg class="mnav-icon mnav-chev" viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+                        <path
+                          d="m6 9 6 6 6-6"
+                          stroke="currentColor"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </button>
+
+                    <div
+                      class="mnav-region"
+                      id={`mnav-${group.id}-r`}
+                      role="region"
+                      aria-labelledby={`mnav-${group.id}-l`}
+                      hidden={!open}
+                    >
+                      <ul class="mnav-items">
+                        {group.href && (
+                          <li>
+                            <a
+                              class="mnav-item mnav-overview"
+                              href={group.href}
+                              aria-current={isCurrent(group.href, group) ? 'page' : undefined}
+                            >
+                              <span class="mnav-item-label">{group.overview ?? groupLabel(group)}</span>
+                              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
+                                <path
+                                  d="M5 12h13m-5-5 5 5-5 5"
+                                  stroke="currentColor"
+                                  stroke-width="1.6"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                />
+                              </svg>
+                            </a>
+                          </li>
+                        )}
+                        {rowItems(group).map((item) => (
+                          <li>
+                            <a
+                              class="mnav-item"
+                              href={item.href}
+                              aria-current={isCurrent(item.href, group) ? 'page' : undefined}
+                            >
+                              <span class="mnav-item-label">{item.label}</span>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {chapterOf(group).length > 0 &&
+                        sectionsOf(group).map((section) => (
+                          <>
+                            {section.label && (
+                              <p class="mnav-part" id={`mnav-part-${section.id}`}>
+                                {partLabel(section.id, section.label)}{' '}
+                                <span class="mnav-part-range">{section.range}</span>
+                              </p>
+                            )}
+                            <ol
+                              class="mnav-items mnav-chapters"
+                              aria-labelledby={section.label ? `mnav-part-${section.id}` : undefined}
+                            >
+                              {section.items.map((item) => (
+                                <li>
+                                  <a
+                                    class="mnav-item"
+                                    href={item.href}
+                                    aria-current={isCurrent(item.href, group) ? 'page' : undefined}
+                                  >
+                                    <span class="mnav-num" aria-hidden="true">
+                                      {item.num}
+                                    </span>
+                                    <span class="mnav-item-label">{item.label}</span>
+                                  </a>
+                                </li>
+                              ))}
+                            </ol>
+                          </>
+                        ))}
+                    </div>
+                  </>
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+
+    {
+      I18N_PUBLISHED && (
+        <div class="mnav-lang">
+          <LangSwitcher lang={lang} alternates={alternates} variant="drawer" />
+        </div>
+      )
+    }
+
+    <div class="mnav-foot">
+      <a href={site.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  /* ---------- The dialog ---------- */
+  .nav-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: auto;
+    width: min(100%, 26rem);
+    /* Override the UA `dialog:modal` max-width/max-height caps that otherwise
+       shrink the panel and knock it off the right edge. */
+    max-width: 100%;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* The sticky bar's height: an open group's row sticks just under it, and
+       scrolled-to rows clear it. */
+    --mnav-bar-h: 69px;
+  }
+
+  .nav-drawer::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .nav-drawer[open] {
+      animation: mnav-drawer-in var(--dur) var(--ease);
+    }
+  }
+
+  @keyframes mnav-drawer-in {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  @media (min-width: 840px) {
+    .nav-drawer {
+      display: none;
+    }
+  }
+
+  .mnav {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  /* ---------- Sticky bar: brand mark, search, close ---------- */
+  .mnav-bar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-3) var(--s-4);
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mnav-search {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-width: 0;
+    min-height: 44px;
+    padding: 0 var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    color: var(--ink-2);
+    font: inherit;
+    font-size: 1rem;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .mnav-search:hover {
+    border-color: var(--ink-2);
+  }
+
+  .mnav-close {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .mnav-close:hover {
+    border-color: var(--ink-2);
+  }
+
+  /* ---------- Group rows ---------- */
+  .mnav-groups {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .mnav-group {
+    border-bottom: 1px solid var(--line);
+  }
+
+  /* The row: a button (groups with items) or a link (the Thesis, the map),
+     full width, the group's name over its one-line hint. */
+  .mnav-row {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    width: 100%;
+    min-height: 60px;
+    margin: 0;
+    padding: var(--s-3) var(--s-4);
+    border: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: inherit;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    scroll-margin-top: var(--mnav-bar-h);
+  }
+
+  .mnav-row:hover {
+    background: var(--tint-bg);
+  }
+
+  .mnav-row:focus-visible {
+    outline-offset: -3px;
+  }
+
+  /* The open group's row sticks under the bar while its items scroll past, so
+     it can be folded again from anywhere in a long list (the 26 chapters). */
+  .mnav-toggle[aria-expanded='true'] {
+    position: sticky;
+    top: var(--mnav-bar-h);
+    z-index: 1;
+    border-bottom: 1px solid var(--line);
+    background: var(--tint-bg);
+  }
+
+  .mnav-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mnav-label {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.1875rem;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .mnav-hint {
+    color: var(--ink-2);
+    font-size: var(--fs-small);
+    line-height: 1.35;
+  }
+
+  .mnav-icon {
+    flex: none;
+    color: var(--ink-2);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mnav-chev {
+      transition: transform var(--dur) var(--ease);
+    }
+  }
+
+  .mnav-toggle[aria-expanded='true'] .mnav-chev {
+    transform: rotate(180deg);
+  }
+
+  /* The group holding the current page: an ink bar on its row's left edge. */
+  .mnav-group[data-current] > .mnav-row {
+    box-shadow: inset 3px 0 0 var(--hero-ink);
+  }
+
+  /* ---------- An open group's items ---------- */
+  .mnav-region {
+    padding: var(--s-2) var(--s-4) var(--s-4);
+  }
+
+  .mnav-region[hidden] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .mnav-region:not([hidden]) {
+      animation: mnav-region-in var(--dur) var(--ease);
+    }
+  }
+
+  /* Transform only: an opacity ramp would be blended into the contrast
+     checks (DESIGN.md, hard constraint 1). */
+  @keyframes mnav-region-in {
+    from {
+      transform: translateY(-6px);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  .mnav-items {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 var(--s-2);
+    border-left: 1px solid var(--line);
+  }
+
+  /* One compact row per destination: the whole row is the link, 44px or
+     taller (WCAG 2.5.8 asks 24; 44 matches the bar's buttons). */
+  .mnav-item {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 44px;
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-sm);
+    color: var(--ink);
+    font-size: 1rem;
+    line-height: 1.3;
+    text-decoration: none;
+  }
+
+  .mnav-item:hover {
+    background: var(--tint-bg);
+  }
+
+  .mnav-item:hover .mnav-item-label {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .mnav-item-label {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mnav-overview {
+    font-weight: 600;
+  }
+
+  .mnav-overview svg {
+    flex: none;
+    color: var(--ink-2);
+  }
+
+  .mnav-item[aria-current='page'] {
+    background: var(--tint-bg);
+    box-shadow: inset 3px 0 0 var(--hero-ink);
+    font-weight: 600;
+  }
+
+  .mnav-num {
+    flex: none;
+    min-width: 2ch;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+
+  /* Sentence-case mono caption naming each part's chapter list. */
+  .mnav-part {
+    margin: var(--s-4) 0 var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .mnav-part-range {
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+
+  .mnav-lang {
+    padding: var(--s-4) var(--s-4) 0;
+  }
+
+  /* ---------- Foot ---------- */
+  .mnav-foot {
+    margin-top: auto;
+    padding: var(--s-2) var(--s-4) var(--s-4);
+  }
+
+  .mnav-foot a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .mnav-foot a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+</style>

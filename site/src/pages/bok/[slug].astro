@@ -4,6 +4,7 @@ import Doc from '../../layouts/Doc.astro';
 import AtAGlance from '../../components/AtAGlance.astro';
 import NewsletterForm from '../../components/NewsletterForm.astro';
 import PillarLink from '../../components/PillarLink.astro';
+import GlossaryJump from '../../components/GlossaryJump.astro';
 import { chaptersOrdered } from '../../data/chapters';
 import { site } from '../../data/site';
 import { gitCreated, gitDate } from '../../lib/reading';
@@ -55,7 +56,14 @@ export async function getStaticPaths() {
 const { entry, chapter, prev, next } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await render(entry);
 
-const title = (remarkPluginFrontmatter.title as string | undefined) ?? chapter.title;
+// The glossary is the page for the query "AI governance glossary" (audit
+// 2026-09-26 SXO-N-04): its H1 names the topic, and the chapter number stays in
+// the breadcrumb above it, as on every chapter. The Markdown keeps "09. Glossary".
+const GLOSSARY_H1 = 'AI governance glossary';
+const isGlossary = chapter.slug === 'glossary';
+const title = isGlossary
+  ? GLOSSARY_H1
+  : ((remarkPluginFrontmatter.title as string | undefined) ?? chapter.title);
 const summary = (remarkPluginFrontmatter.summary as string | undefined) ?? chapter.summary;
 // Search metadata from the chapter's frontmatter (content.config.ts): the query-
 // phrased title for <title>, og:title and the article headline, and the meta
@@ -129,6 +137,8 @@ const article = {
   image: new URL(ogPath, site.url).href,
   isPartOf: { '@id': bookId },
   author: [...authorRefs],
+  // On the article itself too, as the pillar, the comparisons and the cases do.
+  publisher: { '@id': ORG_ID },
 };
 
 const breadcrumb = {
@@ -143,7 +153,7 @@ const breadcrumb = {
 
 // The glossary chapter is the book's A-Z index: its graph also states the
 // DefinedTermSet that every /glossary/<slug> term page points at (lib/jsonld.ts).
-const glossarySet = chapter.slug === 'glossary' ? [glossaryTermSet(getGlossary(), updated)] : [];
+const glossarySet = isGlossary ? [glossaryTermSet(getGlossary(), updated)] : [];
 
 // Hub and spoke (SXO-N2): every chapter points at the /ai-governance pillar in
 // one line under its header, the anchor varied by part. The definition and the
@@ -184,6 +194,7 @@ const jsonLd = {
   alternates={alternatesFor(`/bok/${chapter.slug}`)}
 >
   {showPillar && <PillarLink lead="New to the field? Start with" anchor={pillarAnchor[chapter.part]} />}
+  {isGlossary && <GlossaryJump />}
   <AtAGlance items={chapter.glance} terms={keyTerms} />
   <Content />
   {/* After the sources: the sign-up, out of the search index and of snippets so

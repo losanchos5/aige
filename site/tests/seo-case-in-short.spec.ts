@@ -7,9 +7,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { cases } from '../src/data/cases';
 import { tools } from '../src/data/toolkit';
+import { IN_SHORT_MAX, IN_SHORT_MIN, extractorWords } from './helpers/in-short';
 
-const MIN_WORDS = 130;
-const MAX_WORDS = 170;
+const MIN_WORDS = IN_SHORT_MIN;
+const MAX_WORDS = IN_SHORT_MAX;
 
 const words = (text: string) => text.split(/\s+/).filter(Boolean).length;
 const plain = (html: string) =>
@@ -28,6 +29,8 @@ test.describe('case "In short": data', () => {
       const n = words(entry.inShort);
       expect(n, `${n} words`).toBeGreaterThanOrEqual(MIN_WORDS);
       expect(n, `${n} words`).toBeLessThanOrEqual(MAX_WORDS);
+      const extracted = extractorWords(entry.inShort);
+      expect(extracted, `${extracted} extracted words`).toBeLessThanOrEqual(MAX_WORDS);
       // Plain prose: no citation markers, no em dash, no page-relative phrasing.
       expect(entry.inShort).not.toMatch(/\[\d+\]/);
       expect(entry.inShort).not.toContain('—');

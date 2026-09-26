@@ -22,6 +22,8 @@ export interface SiteConfig {
   url: string;
   description: string;
   linkedin: string;
+  /** The project's own LinkedIn Page (the author's profile is `linkedin`). */
+  linkedinPage: string;
   email: string;
   github: string;
   /** The author's full name, as the JSON-LD Person and every byline state it. */
@@ -56,6 +58,7 @@ export const site: SiteConfig = {
   description:
     'The Thesis and Body of Knowledge for AI governance engineering: turning governance obligations into policy-as-code, eval gates and machine-readable evidence.',
   linkedin: 'https://www.linkedin.com/in/jorgara',
+  linkedinPage: 'https://www.linkedin.com/company/aigovernance-engineer/',
   email: 'jorgegarciaaibar@gmail.com',
   github: 'https://github.com/losanchos5/aige',
   author: 'Jorge García Aibar',

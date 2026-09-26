@@ -33,7 +33,7 @@ const { items, swatch = 'var(--ink)', rule = false, class: className, lang = 'en
   <ol>
     {
       items.map((crumb, i) => (
-        <li>
+        <li class:list={{ current: !crumb.href }}>
           {i > 0 && (
             <span class="sep" aria-hidden="true">
               ›
@@ -71,6 +71,8 @@ const { items, swatch = 'var(--ink)', rule = false, class: className, lang = 'en
     flex-wrap: wrap;
     align-items: center;
     gap: var(--s-2);
+    flex: 1 1 auto;
+    min-width: 0;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -102,8 +104,24 @@ const { items, swatch = 'var(--ink)', rule = false, class: className, lang = 'en
   }
 
   /* The current page's crumb: a touch stronger than the muted links. It is the
-     one crumb long enough to wrap on a phone, so it gets a real line-height. */
+     one crumb long enough to overflow a phone's line, and it used to wrap: a
+     trail that fit one line in the fallback monospace took two once JetBrains
+     Mono loaded, pushing the page down 20px (CLS 0.22 on the glossary terms,
+     audit of 2026-09-26). Sub-pixel width differences decide a trail that
+     just fits, so instead the crumb takes what is left of the first line
+     (flex-basis 0, so it never starts a line of its own) and truncates with
+     an ellipsis: the trail is one line with either font. The page's <h1>,
+     right below, carries the full title. */
+  .crumbs li.current {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
   .crumbs [aria-current='page'] {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: var(--ink-2);
     line-height: 1.3;
   }

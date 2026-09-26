@@ -16,17 +16,17 @@ switches, and the retirement steps from dependency analysis to a retired registr
 switches as tested toggles, drill them on a calendar, and record every decision and step as evidence.
 
 > **In short**
-> The Deactivation, Localisation & Retirement Runbook is a runtime control that writes down, before
-> it is needed, how an AI system is degraded, switched off, restricted to the jurisdictions where it
-> may run and finally retired. It solves systems that have an on switch and a hope: when a trigger
-> fires, nobody knows who may decide, logs are overwritten and the only action left is to turn off
-> everything, everywhere. Use it for any deployed system that a breached performance floor, an
-> incident or a legal duty such as EU AI Act Art. 26(5) could force to stop. Each runbook names the
-> threshold and legal triggers, the deciding role, the evidence frozen first, graduated modes short
-> of shutdown, per-jurisdiction switches and the retirement steps up to a retired registry entry.
-> The switches are tested toggles, drilled on a calendar, and every step is recorded as evidence.
-> Its illustrative mappings include EU AI Act Art. 5, 20 and 79, ISO/IEC 42001 A.6.2.5 and NIST AI
-> RMF MANAGE 2.4.
+> The Deactivation, Localisation & Retirement Runbook is a runtime control that writes down in
+> advance how an AI system is degraded, switched off, restricted to the jurisdictions where it may
+> run and finally retired. It solves systems with an on switch and a hope: when a trigger fires,
+> nobody knows who may decide, logs are overwritten and the only action left is turning everything
+> off, everywhere. Use it for any deployed system that a breached performance floor, an incident or
+> a legal duty such as EU AI Act Art. 26(5) could force to stop. Each runbook names the threshold
+> and legal triggers, the deciding role, the evidence frozen first, graduated modes short of
+> shutdown, per-jurisdiction switches and retirement steps up to a retired registry entry. The
+> switches are tested toggles drilled on a calendar; every step is recorded as evidence. Its
+> illustrative mappings include EU AI Act Art. 5, 20 and 79, ISO/IEC 42001 A.6.2.5 and NIST AI RMF
+> MANAGE 2.4.
 
 ## Objectives
 Make stopping, restricting and retiring an AI system an executable, tested procedure with a named

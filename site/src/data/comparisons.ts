@@ -20,8 +20,9 @@
 //   crosswalk.ts already cite: the EUR-Lex article, the ISO or NIST page.
 // - `comparisons`: per pair, the answer box and the two question answers (40 to
 //   60 words each, tests/seo-compare.spec.ts counts them), the "In short"
-//   passage (130 to 170 words) and the FAQ, grounded in the same chapters. No
-//   fact here is new to the repository.
+//   passage (130 to 170 words), the FAQ and the next-step tools, grounded in
+//   the same chapters and in data/toolkit.ts. No fact here is new to the
+//   repository.
 //
 // Everything else on the page (the per-topic overlap table, its counts, the
 // obligation and pattern links, the sources) is derived from crosswalk.ts and
@@ -114,6 +115,11 @@ export interface ComparisonDef {
    *  crosswalk counts (lib/comparisons.ts fillCounts), so the numbers cannot
    *  drift from the overlap table. */
   inShort: string;
+  /** The next step (SXO-N-06 of the 2026-09-26 audit): one to three toolkit
+   *  pages (data/toolkit.ts ids), each linked by what it lets the reader do,
+   *  with one line on what it produces. The line restates the tool's own
+   *  summary in toolkit.ts. */
+  nextSteps: readonly { tool: string; anchor: string; why: string }[];
   /** Hand-written FAQ items; the page adds one generated from the crosswalk. */
   faq: readonly Qa[];
   /** A sentence (and its sources) appended to the generated coverage-gap
@@ -278,6 +284,23 @@ export const comparisons: readonly ComparisonDef[] = [
       'If your AI systems reach the EU market or their output is used there, start with the Act: its duties apply in stages, prohibitions and AI literacy since 2 February 2025 and Annex III high-risk duties from 2 December 2027. Add ISO/IEC 42001 for a certifiable management system around that work; it shares its clause structure with ISO/IEC 27001.',
     inShort:
       "ISO/IEC 42001 and the EU AI Act work on many of the same topics but are different kinds of instrument. The EU AI Act is binding law: prohibitions and AI literacy apply since 2 February 2025, GPAI obligations since 2 August 2025 and Annex III high-risk duties from 2 December 2027, and fines for prohibited practices reach EUR 35 million or 7% of worldwide annual turnover. ISO/IEC 42001 is a voluntary AI management-system standard; certification bodies audit organisations against it, under ISO/IEC 42006. A 42001 certificate evidences a management system and confers no presumption of conformity with the Act: only harmonised standards cited in the Official Journal and the Commission's common specifications do. In the crosswalk, both file clauses under {both} of {topics} topics, {strong} of them strongly. The AIMS still earns its place: its risk assessment, impact assessment and documentation processes produce evidence the Act's duties ask for.",
+    nextSteps: [
+      {
+        tool: 'ai-act-triage',
+        anchor: 'Check where your system falls under the EU AI Act',
+        why: 'The EU AI Act risk classification checker: indicative roles and risk classes, each with its article, and a decision record to file.',
+      },
+      {
+        tool: 'obligations-planner',
+        anchor: 'List the EU AI Act obligations and deadlines that bind you',
+        why: 'The obligations planner: the register rows for your roles, the artefact that evidences each and the date it applies.',
+      },
+      {
+        tool: 'ai-register-entry',
+        anchor: 'Build the AI register both instruments start from',
+        why: 'The AI register entry builder: entries that validate against the published schemas, each field mapped to the EU database and an ISO/IEC 42001 Statement of Applicability.',
+      },
+    ],
     faq: [
       {
         q: 'Does ISO 42001 certification give a presumption of conformity with the EU AI Act?',
@@ -310,6 +333,23 @@ export const comparisons: readonly ComparisonDef[] = [
       'Start with the NIST AI RMF to organise risk work: it is voluntary, non-sector-specific, and its four functions and 19 categories give you identifiers to tag controls with. Move to ISO/IEC 42001 when you need a certificate as proof of a working management system; the same identifiers then feed its Statement of Applicability.',
     inShort:
       'The NIST AI RMF and ISO/IEC 42001 are both voluntary, and only ISO/IEC 42001 is certifiable. The NIST AI RMF 1.0 (NIST AI 100-1, 26 January 2023) is a US-origin risk framework, non-sector-specific and use-case agnostic, organised in four functions (Govern, Map, Measure and Manage) and 19 categories. There is no 2.0; NIST states that 1.0 is being revised. ISO/IEC 42001 is the international AI management-system standard: certification bodies audit organisations against clauses 4 to 10 and a Statement of Applicability over the Annex A controls, under ISO/IEC 42006. NIST hosts a crosswalk from the RMF to ISO/IEC 42001, and in this crosswalk both file clauses under {both} of {topics} topics, {strong} of them strongly. A common route is to organise risk work with the RMF, tag controls with its category and subcategory identifiers, and move to ISO/IEC 42001 when a certificate is needed as proof of a working management system.',
+    nextSteps: [
+      {
+        tool: 'maturity-self-check',
+        anchor: 'Read your governance maturity, layer by layer',
+        why: 'The maturity self-check: your profile across the five stack layers, the floor it sets and the one move that raises it.',
+      },
+      {
+        tool: 'impact-assessment',
+        anchor: 'Write an AI system impact assessment as one record',
+        why: 'The impact assessment builder: every risk linked to the measure and pattern that mitigate it, and the triggers that reopen it.',
+      },
+      {
+        tool: 'ai-register-entry',
+        anchor: 'Build the AI system inventory both frameworks start from',
+        why: 'The AI register entry builder: entries that validate against the published schemas, each field mapped to an ISO/IEC 42001 Statement of Applicability.',
+      },
+    ],
     faq: [
       {
         q: 'Is there an official crosswalk between the NIST AI RMF and ISO 42001?',
@@ -342,6 +382,23 @@ export const comparisons: readonly ComparisonDef[] = [
       "If your AI systems reach the EU market or their output is used there, start with the Act: its scope and risk tiers decide which duties apply and from when. Use the NIST AI RMF alongside it as the working method for risk management; it is use-case agnostic, and its functions map onto the Act's risk, testing and monitoring duties.",
     inShort:
       "The EU AI Act is binding law and the NIST AI RMF is voluntary guidance. The Act reaches providers placing AI systems or GPAI models on the EU market wherever they are established, and providers and deployers in third countries whose output is used in the Union, so it can apply to US companies. It fines prohibited practices up to EUR 35 million or 7% of worldwide annual turnover, and its Annex III high-risk duties apply from 2 December 2027. The NIST AI RMF 1.0 (NIST AI 100-1) is US-origin and use-case agnostic, with no penalties and no certification scheme. It gives no presumption of conformity with the Act, but its four functions, Govern, Map, Measure and Manage, organise the risk management, testing and monitoring the Act's high-risk articles require. In this crosswalk both file clauses under {both} of {topics} topics, {strong} of them strongly, so one set of evidence can serve both.",
+    nextSteps: [
+      {
+        tool: 'ai-act-triage',
+        anchor: 'Check where your system falls under the EU AI Act',
+        why: 'The EU AI Act risk classification checker: indicative roles and risk classes, each with its article, and a decision record to file.',
+      },
+      {
+        tool: 'obligations-planner',
+        anchor: 'List the EU AI Act obligations and deadlines that bind you',
+        why: 'The obligations planner: the register rows for your roles, the artefact that evidences each and the date it applies.',
+      },
+      {
+        tool: 'impact-assessment',
+        anchor: 'Write a FRIA or an AI system impact assessment as one record',
+        why: 'The impact assessment builder: every risk linked to the measure and pattern that mitigate it, and the triggers that reopen it.',
+      },
+    ],
     faq: [
       {
         q: 'Does the EU AI Act apply to US companies?',

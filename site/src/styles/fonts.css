@@ -41,6 +41,56 @@
     U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* Metric-matched fallbacks for JetBrains Mono, so the swap moves nothing.
+   Every JetBrains Mono glyph advances 0.600em (ascent 1.020, descent 0.300,
+   no line gap); the system monospace the browser shows until it loads is
+   narrower on Windows (Consolas, 0.550em), and the wider mono text then
+   rewrapped breadcrumbs, glance boxes and definitions after the first paint
+   (CLS up to 0.22, performance audit of 2026-09-26). A monospace font has one
+   advance, so size-adjust = 0.600 / its advance matches every line width;
+   the overrides are JetBrains Mono's metrics divided by that size-adjust (the
+   browser scales them by it). One family per advance: Consolas; Menlo and
+   DejaVu Sans Mono (0.602em, macOS and most Linux); Liberation Mono, Droid
+   Sans Mono and Courier New (0.600em). A face whose local() font is missing
+   is skipped, and --font-mono falls through to the next. */
+@font-face {
+  font-family: 'JetBrains Mono Fallback Consolas';
+  src: local('Consolas');
+  size-adjust: 109.13%;
+  ascent-override: 93.47%;
+  descent-override: 27.49%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Fallback Menlo';
+  src: local('Menlo Regular'), local('Menlo-Regular'), local('DejaVu Sans Mono'),
+    local('DejaVuSansMono');
+  size-adjust: 99.66%;
+  ascent-override: 102.35%;
+  descent-override: 30.1%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono Fallback Courier';
+  src: local('Liberation Mono'), local('LiberationMono'), local('Droid Sans Mono'),
+    local('DroidSansMono'), local('Courier New'), local('CourierNewPSMT');
+  size-adjust: 100%;
+  ascent-override: 102%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
+/* The mono stack with those fallbacks ahead of the generic ones. It restates
+   the --font-mono token (styles/tokens.css, imported before this file in
+   Base.astro, so this declaration wins) next to the faces it names. */
+:root {
+  --font-mono:
+    'JetBrains Mono Variable', 'JetBrains Mono Fallback Consolas', 'JetBrains Mono Fallback Menlo',
+    'JetBrains Mono Fallback Courier', ui-monospace, monospace;
+}
+
 @font-face {
   font-family: 'Newsreader Display';
   font-style: normal;

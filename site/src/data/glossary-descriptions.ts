@@ -23,7 +23,7 @@ export const glossaryDescriptions: Readonly<Record<string, string>> = {
   'ai-business-operator-korea':
     "AI business operator (Korea): under Korea's AI Basic Act, a person or body doing AI business, either developing AI or building products or services on it.",
   'ai-governance':
-    'AI governance: the rules, roles, processes and technical controls an organisation or state uses to decide which AI it builds or uses and what that AI may do.',
+    'AI governance: the set of rules, roles, controls and evidence that keeps AI systems within the limits an organisation or a state has chosen.',
   'ai-incident':
     'AI incident: for the OECD, an event where the development, use or malfunction of AI systems directly or indirectly leads to harm, such as to health or rights.',
   'ai-literacy':
@@ -33,7 +33,7 @@ export const glossaryDescriptions: Readonly<Record<string, string>> = {
   'ai-regulatory-sandbox':
     'AI regulatory sandbox: an EU AI Act framework, set up by a competent authority, in which providers develop and test innovative AI for a limited time.',
   'ai-system-impact-assessment':
-    'AI system impact assessment: assessing how an AI system and its foreseeable uses may affect individuals, groups and society, guided by ISO/IEC 42005:2025.',
+    'AI system impact assessment: an AI impact assessment (AIIA), per ISO/IEC 42005, of how a system and its foreseeable uses may affect people and society.',
   'ai-system-lifecycle-oecd':
     'AI system lifecycle (OECD): the iterative phases of an AI system, from design and data through building, testing and deployment to operation and retirement.',
   'authorised-representative':
@@ -185,7 +185,7 @@ export const glossaryDescriptions: Readonly<Record<string, string>> = {
   'tabletop-exercise':
     'Tabletop exercise: a scheduled, scored rehearsal of an incident playbook against a named failure mode, whose records are tagged as a drill.',
   'tdm-exception':
-    'TDM exception: the EU copyright exception for text and data mining of lawfully accessible works, including AI training, unless the rightholder has opted out.',
+    'TDM exception: two EU text and data mining exceptions, one for research that no opt-out overrides and one for anyone, AI training included, unless opted out.',
   'testing-in-real-world-conditions':
     'Testing in real-world conditions: under the AI Act, temporary testing of an AI system outside a lab under a plan the market surveillance authority approved.',
   'token-passthrough':

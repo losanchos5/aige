@@ -11,6 +11,14 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { chaptersOrdered } from '../src/data/chapters';
+import { readSource } from '../src/lib/md-parse';
+import {
+  IN_SHORT_MAX,
+  IN_SHORT_MIN,
+  extractorWords,
+  inShortProse,
+  spaceWords,
+} from './helpers/in-short';
 
 const EXEMPT = new Set(['glossary', 'reading-list']);
 const MIN_WORDS = 110;
@@ -50,6 +58,31 @@ test.describe('In short callout', () => {
         return a && h2 ? Boolean(a.compareDocumentPosition(h2) & Node.DOCUMENT_POSITION_FOLLOWING) : false;
       });
       expect(before, `${chapter.slug}: In short sits before the first H2`).toBe(true);
+    });
+  }
+});
+
+// GEO audit 2026-09-26 (N3/G4): the rendered check above allows slack for how
+// citations render; the passage as written is held to the band answer engines
+// quote, 134-167 words, under both counts in helpers/in-short.ts.
+test.describe('In short source length', () => {
+  for (const chapter of chaptersOrdered.filter((c) => !EXEMPT.has(c.slug))) {
+    test(`bok/${chapter.id}.md: In short of ${IN_SHORT_MIN}-${IN_SHORT_MAX} words`, () => {
+      const lines = readSource(`bok/${chapter.id}.md`).split(/\r?\n/);
+      const start = lines.findIndex((line) => line.trim() === '> **In short**');
+      expect(start, 'a "> **In short**" line').toBeGreaterThanOrEqual(0);
+      const body: string[] = [];
+      for (let i = start + 1; i < lines.length && lines[i].startsWith('>'); i++) {
+        body.push(lines[i].replace(/^>\s?/, ''));
+      }
+      const prose = inShortProse(body.join(' '));
+      for (const [kind, count] of [
+        ['words', spaceWords(prose)],
+        ['extracted words', extractorWords(prose)],
+      ] as const) {
+        expect(count, `${chapter.slug}: ${count} ${kind}`).toBeGreaterThanOrEqual(IN_SHORT_MIN);
+        expect(count, `${chapter.slug}: ${count} ${kind}`).toBeLessThanOrEqual(IN_SHORT_MAX);
+      }
     });
   }
 });

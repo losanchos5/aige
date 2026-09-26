@@ -19,6 +19,7 @@ import { site } from '../data/site';
 import { obligations, obligationPath } from '../data/frameworks';
 import { figures } from '../data/figures';
 import { cases } from '../data/cases';
+import { comparisons, comparisonPath } from '../data/comparisons';
 import { tools as toolkitTools, toolNotice } from '../data/toolkit';
 import { audiences, audiencePath } from '../data/audiences';
 import { liveSiblingHubs } from '../lib/audiences';
@@ -91,7 +92,7 @@ export const GET: APIRoute = async (context) => {
 
   const blocks = [
     header(
-      `This file indexes every page of the English site. Each chapter, pattern, glossary term, incident case and the Thesis also has a clean Markdown version at its URL plus .md (linked on its line below, except the glossary terms, where the rule applies as is). The full text is at ${url('/llms-full.txt')}, and in smaller slices listed under "Full text".`,
+      `This file indexes every page of the English site. Each chapter, pattern, glossary term, incident case and framework comparison, the pillar page, the role page and the Thesis also has a clean Markdown version at its URL plus .md (linked on its line below, except the glossary terms, where the rule applies as is). The full text is at ${url('/llms-full.txt')}, and in smaller slices listed under "Full text".`,
     ),
 
     section('Start here', [
@@ -169,6 +170,17 @@ export const GET: APIRoute = async (context) => {
         'The clauses to check before you deploy a third-party AI system: what each governs, the red flag, a fallback position and the evidence to keep. An engineering checklist, not legal advice.',
       ),
     ]),
+
+    // The "<A> vs <B>" pages under /resources/crosswalk (GEO S5 of the
+    // 2026-09-26 audit): the highest-intent comparison queries get a section
+    // of their own instead of falling through to "More pages".
+    section(
+      'Comparisons',
+      comparisons.map((c) => {
+        const path = comparisonPath(c);
+        return described(path, `${c.aName} vs ${c.bName}`, c.answer);
+      }),
+    ),
 
     section('Toolkit', [
       page('Toolkit', '/toolkit', `Browser tools built from the book that produce documents you keep. ${toolNotice}`),
@@ -296,7 +308,7 @@ export const GET: APIRoute = async (context) => {
       linkLine(
         'Full text: everything',
         url('/llms-full.txt'),
-        `Every chapter, every pattern, the Thesis, the obligation register, the frameworks, the crosswalk, the incident cases and the harms atlas, as Markdown, in one file (${approxTokens(fullText)}). Too large for most context windows: prefer the slices below.`,
+        `The pillar page, every chapter, every pattern, the role page, the Thesis, the obligation register, the frameworks, the crosswalk, the framework comparisons, the incident cases and the harms atlas, as Markdown, in one file (${approxTokens(fullText)}). Too large for most context windows: prefer the slices below.`,
       ),
       ...sliceLines,
     ]),

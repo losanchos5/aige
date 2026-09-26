@@ -1,0 +1,100 @@
+---
+/**
+ * NextStep: the "what to do next" list of a page that ends a reading path in a
+ * decision (SXO-N-06 of the 2026-09-26 audit: the comparison pages and /role
+ * linked no tool, and Action was the weakest persona score). One to three
+ * toolkit pages, each linked by what it lets the reader do, with one line on
+ * what it produces. The page supplies the heading. Tool ids resolve through
+ * data/toolkit.ts `toolById`, which throws on an unknown id, so a renamed or
+ * retired tool fails the build instead of shipping a dead link.
+ */
+import { toolById, toolNotice } from '../data/toolkit';
+
+interface Props {
+  /** Toolkit id, link text (what the reader does) and one line on why. */
+  steps: readonly { tool: string; anchor: string; why: string }[];
+  class?: string;
+}
+
+const { steps, class: className } = Astro.props;
+if (steps.length < 1 || steps.length > 3) {
+  throw new Error(`NextStep: 1 to 3 tools, got ${steps.length}`);
+}
+const items = steps.map((step) => ({ ...step, href: toolById(step.tool).href }));
+---
+
+<div class:list={['next-step', className]} data-next-step>
+  <ul class="next-step-list">
+    {
+      items.map((item) => (
+        <li class="next-step-item">
+          <a class="next-step-link" href={item.href}>
+            {item.anchor} <span class="arrow" aria-hidden="true">→</span>
+          </a>
+          <p class="next-step-why">{item.why}</p>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="next-step-note">{toolNotice}</p>
+</div>
+
+<style>
+  /* Bordered cards on the --surface frame of the comparison answer box, one
+     column on phones and up to three from 720px. Text at --ink/--ink-2, never
+     dimmed with opacity (the contrast gates). */
+  .next-step-list {
+    list-style: none;
+    margin: var(--s-4) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .next-step-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    padding: var(--s-4) var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    min-width: 0;
+  }
+
+  .next-step-link {
+    font-weight: 600;
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+
+  .next-step-link .arrow {
+    display: inline-block;
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .next-step-why {
+    margin: 0;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .next-step-note {
+    margin: var(--s-3) 0 0;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .next-step-link:hover .arrow {
+      transform: translateX(3px);
+    }
+  }
+
+  @media (min-width: 720px) {
+    .next-step-list {
+      grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    }
+  }
+</style>

@@ -9,7 +9,8 @@
  * obligation and pattern links, the question wording and the sources, all
  * derived from the crosswalk and the obligation register). The Markdown twin
  * (/resources/crosswalk/<slug>.md, lib/llms-corpus.ts comparisonDoc) prints the
- * same pieces.
+ * same pieces. After "Which should you start with?" comes the next step: the
+ * pair's one to three toolkit pages (SXO-N-06 of the 2026-09-26 audit).
  *
  * Structured data: a TechArticle and the BreadcrumbList. No FAQPage markup:
  * the questions are ordinary headings.
@@ -23,6 +24,7 @@ import PageHero from './PageHero.astro';
 import Byline from './Byline.astro';
 import Callout from './Callout.astro';
 import PillarLink from './PillarLink.astro';
+import NextStep from './NextStep.astro';
 import { site } from '../data/site';
 import { disclaimer, obligationPath } from '../data/frameworks';
 import { patternPath } from '../data/patterns';
@@ -310,6 +312,12 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
     <section class="res-section cmp-qa" aria-labelledby="cmp-start">
       <h2 id="cmp-start">Which should you start with?</h2>
       <p data-cmp-qa>{def.startWith}</p>
+    </section>
+
+    <section class="res-section cmp-qa" aria-labelledby="cmp-next">
+      <h2 id="cmp-next">Next step</h2>
+      <p>Put the comparison to work on your own systems, in the browser.</p>
+      <NextStep steps={def.nextSteps} />
     </section>
 
     <section class="res-section cmp-qa" aria-labelledby="cmp-faq">

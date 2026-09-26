@@ -438,7 +438,7 @@ test.describe('entity and hub graph', () => {
       expect(collection?.author?.[0]?.['@id']).toBe(PERSON_ID);
       expect(collection?.publisher?.['@id']).toBe(`${SITE_ORIGIN}/#org`);
       expect(collection?.dateModified).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      // A hub with a breadcrumb trail points at it (the /resources landing has none).
+      // A hub with a breadcrumb trail points at it (/resources has one since round 5).
       if (graph.some((node) => node['@type'] === 'BreadcrumbList')) {
         expect(collection?.breadcrumb?.['@id']).toBe(`${url}#breadcrumb`);
       }

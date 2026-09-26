@@ -1,6 +1,7 @@
 // /llms-full-<slice>.txt: the corpus of /llms-full.txt cut into files a common
-// context window can hold (the parts of the book, the regulatory register, the
-// patterns, the glossary, the cases), each with the same header and the same
+// context window can hold (the parts of the book, the regulatory map with the
+// crosswalk and comparisons, the obligation register, the patterns, the
+// glossary, the cases), each with the same header and the same
 // per-document format. /llms.txt lists them with an approximate token size.
 // The slices are defined in lib/llms-corpus.ts.
 import type { APIRoute, GetStaticPaths } from 'astro';

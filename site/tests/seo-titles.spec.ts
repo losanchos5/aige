@@ -94,8 +94,10 @@ test.describe('chapter search titles', () => {
       const headline = /"headline":"([^"]*)"/.exec(page)?.[1];
       expect(headline).toBe(seoTitle);
 
-      // The visible title is unchanged: the numbered H1 from the file.
-      expect(h1(page)).toBe(chapter.title);
+      // The visible title is unchanged: the numbered H1 from the file. The
+      // glossary alone names its topic (round 5, SXO-N-04), its number kept in
+      // the breadcrumb.
+      expect(h1(page)).toBe(chapter.slug === 'glossary' ? 'AI governance glossary' : chapter.title);
     });
   }
 

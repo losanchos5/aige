@@ -234,7 +234,7 @@ export const audiences: readonly Audience[] = [
     metaTitle: 'AI governance for engineers',
     description:
       'A route for ML, platform and security engineers: the five-layer stack, eval gates, runtime controls, evidence schemas and the obligations a pipeline evidences.',
-    title: 'Build the controls that leave the evidence.',
+    title: 'AI governance for engineers: controls that leave evidence.',
     lede: 'For the people who write the pipeline, the service or the agent: where a governance rule becomes code, what each stage should record, and which obligation that record answers.',
     summary:
       'ML, platform, MLOps, application and security engineers who build and run AI systems.',
@@ -696,7 +696,7 @@ export const audiences: readonly Audience[] = [
     metaTitle: 'AI governance for legal counsel and DPOs',
     description:
       'A route for counsel, DPOs and compliance: the EU AI Act, data protection and existing law, read as obligations with the artefact each one expects and its date.',
-    title: 'Turn each obligation into a record someone can check.',
+    title: 'AI governance for legal and DPOs: records someone can check.',
     lede: 'For the people who advise on the law, write the assessments and answer the regulator: the AI-specific law next to the law that already applies, each duty with the artefact that evidences it.',
     summary:
       'In-house counsel, data protection officers, privacy and compliance leads, and contract managers.',
@@ -913,7 +913,7 @@ export const audiences: readonly Audience[] = [
     metaTitle: 'AI governance for executives and boards',
     description:
       'A short route for boards and executives: the decisions that are yours, the indicators to ask for, and what the EU AI Act dates mean for the organisation.',
-    title: 'Ask for evidence, not assurances.',
+    title: 'AI governance for boards: ask for evidence, not assurances.',
     lede: 'For the people who set strategy, approve risk appetite and answer for outcomes: the decisions that are yours, the few numbers to ask for, and what a working governance function can show you.',
     summary:
       'Board members, executive committees, and chief AI, data and technology officers.',
@@ -1109,7 +1109,7 @@ export const audiences: readonly Audience[] = [
     metaTitle: 'AI governance for the public sector',
     description:
       'A route for public bodies: the impact assessment before first use, registration, notice and explanation to citizens, procurement clauses and the 2030 deadline.',
-    title: 'Govern the AI that decides about citizens.',
+    title: 'Public sector AI governance: AI that decides about citizens.',
     lede: 'For ministries, agencies, municipalities and operators of public services that buy, build or run AI: the duties you meet before buying, before first use and while it runs, in that order.',
     summary:
       'Public bodies and operators of public services: CIOs, service owners, procurement and oversight.',
