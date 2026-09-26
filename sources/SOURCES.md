@@ -2665,7 +2665,13 @@ or pattern row is named in the Verified column. No new external source was added
 mapped: the data-and-privacy requirement pages read on 2026-09-26 (A001, A002, A004, A007) govern
 policies communicated to customers and output leakage, not the admission of training data. The
 published `training-record` schema (AI literacy training of people) is not used as evidence of a
-model training run.
+model training run. Content review (block orp2-review-derived, 2026-09-26): the Art. 4a and Art.
+10(5) facts of row 24 were re-read in the primary text of Regulation (EU) 2026/1744 as published in
+the Official Journal (L series, 24.7.2026; Art. 1 point (6) inserts Art. 4a, Art. 1 point (9)(b)
+deletes Art. 10(5); entry into force on the third day after publication, 27 July 2026), fetched from
+the Publications Office (CELEX 32026R1744) because the EUR-Lex pages answered with a bot challenge;
+DATA-007 now also states the Art. 4a(1)(e) alternative, deletion at the end of the retention period
+if that comes first.
 
 | # | Claim | Source | Publisher | Date | URL | Verified | Used in |
 |---|---|---|---|---|---|---|---|
@@ -2774,6 +2780,11 @@ above. Every external row reuses a row already verified elsewhere in this file, 
 (the Verified column names the section and row); no new external source was added. The AIUC-1 row
 is a cross-reference, not part of the derivation: E010 and E015 were mapped only after their public
 requirement pages were read on 2026-09-26, and the mapping implies no affiliation with AIUC.
+Content review (block orp2-review-derived, 2026-09-26): DEPLOY-005 no longer maps Art. 60, since
+testing in real-world conditions is a pre-market duty of providers and the control covers changes to
+systems already in use; row 21 stays because DEPLOY-005 restates the pattern's Art. 60 boundary in an
+implementation note. DEPLOY-008 keeps Art. 9 (row 31) because its evidence schema,
+post-market-monitoring-plan.v1, names Art. 9(2) among the obligations it evidences.
 
 | # | Claim | Source | Publisher | Date | URL | Verified | Used in |
 |---|---|---|---|---|---|---|---|

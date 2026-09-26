@@ -375,7 +375,7 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
       'Oversight is undifferentiated: every output waits for review, which destroys the value of the system, or none does, which removes the oversight the risk requires.',
     ],
     scope:
-      'Deployed AI systems whose outputs inform or take decisions that people oversee, in particular high-risk systems. For AI agents, the checkpoint and approval controls of the Agent Runtime profile apply as well.',
+      'Deployed AI systems whose outputs inform or take decisions that people oversee, in particular high-risk systems. For AI agents, the checkpoint and approval controls of the Agent Runtime profile apply as well, and for an agent with an Annex III purpose AIGE-CTL-AGENT-030 restates the same oversight duty.',
     enforcementPoints: ['deploy', 'runtime'],
     evidence: [
       {
@@ -497,7 +497,7 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
       { kind: 'chapter', ref: 'governing-deployment' },
     ],
     mappings: {
-      obligations: ['AIGE-OBL-EUAIA-ART26-5', 'AIGE-OBL-EUAIA-ART60'],
+      obligations: ['AIGE-OBL-EUAIA-ART26-5'],
       iso42001: ['A.6.2.5', 'A.6.2.6'],
       nistAiRmf: ['MANAGE 1.1', 'MEASURE 2.3', 'MANAGE 2.4'],
       owasp: [],
@@ -507,6 +507,7 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
       'Give each stage a purpose: shadow proves behaviour on real traffic, a pilot with trained users proves oversight works, and a canary against a control group proves no regression at scale.',
       'Each stage lists metric, comparison, threshold, window and the group breakdowns that matter; where outcome labels arrive after the stage ends, lean on proxies such as disagreement, overrides, complaints and groundedness.',
       'Review the criteria with their owners on the maintenance calendar: criteria that are too tight produce rollback fatigue.',
+      'A provider or prospective provider that pilots an Annex III system with real users before placing it on the market is testing in real-world conditions, which Art. 60 governs; that pre-market pilot is outside this control, which covers changes to systems already in use.',
     ],
     openQuestions: [
       'How long each stage runs and how much exposure it takes are left to the plan; the source material gives illustrative values only and no method to size a stage for a per-group regression.',
@@ -523,7 +524,7 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
       'The path back is used for the first time during an incident, untested.',
     ],
     scope:
-      "Deployed AI systems with versioned components, including models reached through a provider's API, whose versions change on the provider's schedule.",
+      "Deployed AI systems with versioned components, including models reached through a provider's API, whose versions change on the provider's schedule. Verifying a model artefact's signature and provenance before load is AIGE-CTL-ASSURE-010.",
     enforcementPoints: ['deploy', 'runtime'],
     evidence: [
       {
@@ -718,7 +719,7 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
       'Everything is kept indefinitely, so the personal data in the logs outlives the storage-limitation ceiling.',
     ],
     scope:
-      "Deployers of high-risk AI systems, for the logs under their control; the same schedule covers the deployer's decision records (decision record, go-live decision, conditions and dissent), kept for the life of the system plus the limitation period counsel sets.",
+      "Deployers of high-risk AI systems, for the logs under their control; the same schedule covers the deployer's decision records (decision record, go-live decision, conditions and dissent), kept for the life of the system plus the limitation period counsel sets. For an agent with an Annex III purpose AIGE-CTL-AGENT-030 carries the same six-month floor, and the provider's retention of documentation and logs is AIGE-CTL-ASSURE-008.",
     enforcementPoints: ['runtime', 'periodic'],
     evidence: [
       {
@@ -815,7 +816,7 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
       'A degraded mode or the suspension path fails the first time it is used, because it was never drilled.',
     ],
     scope:
-      "Every deployed AI system that a breached floor, an incident or a legal duty could force to stop, including systems embedded in a supplier's product. For agents, the kill switch and circuit breaker controls of the Agent Runtime profile are the instant form.",
+      "Every deployed AI system that a breached floor, an incident or a legal duty could force to stop, including systems embedded in a supplier's product. For agents, the kill switch and circuit breaker controls of the Agent Runtime profile (AIGE-CTL-AGENT-011 and AIGE-CTL-AGENT-010) are the instant form.",
     enforcementPoints: ['runtime', 'periodic'],
     evidence: [
       {

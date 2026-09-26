@@ -333,7 +333,7 @@ export const dataAdmissionAndPrivacyControls: readonly Control[] = [
     verification: [
       {
         kind: 'inspect',
-        text: 'Each admission record validates against dataset-admission-record.v1: subject, pipeline, target system, linked data card, decision, the checks with the obligation each enforces, the content hash of the admitted snapshot, the actor and a signature.',
+        text: 'Each admission record validates against dataset-admission-record.v1 and carries what the pattern lists: subject, pipeline, target system, linked data card, decision, the checks with the obligation each enforces, the content hash of the admitted snapshot, the actor and a signature.',
       },
       {
         kind: 'test',
@@ -498,7 +498,7 @@ export const dataAdmissionAndPrivacyControls: readonly Control[] = [
       'No DPIA exists and no decision that one was not needed was recorded.',
     ],
     scope:
-      'Personal data in datasets used for training, fine-tuning and retrieval, and the stages that process it. Transfers, automated decision-making and the rights path are outside this control; the fundamental rights impact assessment is covered only where it builds on the DPIA.',
+      'Personal data in datasets used for training, fine-tuning and retrieval, and the stages that process it. Transfers, automated decision-making and the rights path are outside this control; the fundamental rights impact assessment, which complements the DPIA rather than repeating it, is left to the FRIA-as-Code pattern.',
     enforcementPoints: ['runtime', 'periodic'],
     verification: [
       {
@@ -614,11 +614,11 @@ export const dataAdmissionAndPrivacyControls: readonly Control[] = [
     evidence: [
       { artefact: 'PII and special-category filter log kept with each snapshot', layer: 1 },
       { artefact: 'Personal-data flag and retention rule on the dataset card', schemaId: 'dataset-card', layer: 2 },
-      { artefact: 'Screening and retention-set checks on the admission record', schemaId: 'dataset-admission-record', layer: 1 },
+      { artefact: 'Retention-set check on the admission record', schemaId: 'dataset-admission-record', layer: 1 },
     ],
     failureResponse: {
       effect: 'deny',
-      text: 'A snapshot with no scan log, or a special-category field with no documented condition, is not admitted; a feature with neither a reason nor a measured contribution is removed.',
+      text: 'A snapshot with no scan log does not enter training; a feature with neither a reason nor a measured contribution is removed, and a special-category field needs a documented condition before it stays.',
     },
     layer: 1,
     secondaryLayers: [3],
@@ -649,7 +649,7 @@ export const dataAdmissionAndPrivacyControls: readonly Control[] = [
     id: 'AIGE-CTL-DATA-007',
     title: 'Special-Category Data Conditions',
     objective:
-      'Special-category data in a dataset is recorded with the Art. 9(2) condition relied on, and when it is processed for bias detection and correction under Art. 4a it is used only where other data would not do, pseudonymised, access-controlled, not transmitted onwards and deleted once the bias is corrected, with the records of processing stating why it was strictly necessary.',
+      'Special-category data in a dataset is recorded with the Art. 9(2) condition relied on, and when it is processed for bias detection and correction under Art. 4a it is used only where other data would not do, pseudonymised, access-controlled, not transmitted onwards and deleted once the bias is corrected or its retention period ends, whichever comes first, with the records of processing stating why it was strictly necessary.',
     failureModes: [
       'Special-category data is present in a dataset whose card says it is not, or with no condition recorded.',
       'Data admitted for bias detection is kept after the bias was corrected, used for another purpose or passed on.',
@@ -661,7 +661,7 @@ export const dataAdmissionAndPrivacyControls: readonly Control[] = [
     verification: [
       {
         kind: 'inspect',
-        text: 'For each dataset processed under Art. 4a, the records of processing hold the strictly-necessary reason and a deletion log shows the data deleted once the bias was corrected.',
+        text: 'For each dataset processed under Art. 4a, the records of processing hold the strictly-necessary reason and a deletion log shows the data deleted once the bias was corrected or its retention period ended, whichever came first.',
       },
     ],
     evidence: [
@@ -693,7 +693,7 @@ export const dataAdmissionAndPrivacyControls: readonly Control[] = [
     },
     references: [CH19.special, CH19.ropa, CH14.rights, PATTERN.gate, AI_ACT_ART4A, GDPR],
     implementationNotes: [
-      'After the Digital Omnibus, the narrow basis to process special-category data for bias detection sits in Art. 4a rather than the deleted Art. 10(5); record which one a legacy card relies on and re-check it.',
+      'After the Digital Omnibus (Regulation (EU) 2026/1744, in force 27 July 2026), the narrow basis to process special-category data for bias detection sits in Art. 4a; Art. 10(5) was deleted, so a card that still names Art. 10(5) points at a basis that no longer exists.',
       'Generate the records-of-processing entries from the registry, the data cards and the basis registry, so the Art. 4a reason does not go stale with the next pipeline change.',
     ],
     openQuestions: [
@@ -828,13 +828,13 @@ export const dataAdmissionAndPrivacyControls: readonly Control[] = [
       },
     ],
     evidence: [
-      { artefact: 'Datasets used to train, validate, test or fine-tune the model, by version, on the model card', schemaId: 'model-card', layer: 2 },
+      { artefact: 'Datasets used to train, validate, test or fine-tune the model on the model card, each named by its dataset card id or linked to its data card, with its role', schemaId: 'model-card', layer: 2 },
       { artefact: 'Link to the lineage record (for example an OpenLineage or W3C PROV graph) on the dataset card', schemaId: 'dataset-card', layer: 2 },
       { artefact: 'Training run record with the code commit, the hashes of the admitted snapshots and the admission records and ledger rows read', layer: 2 },
     ],
     failureResponse: {
       effect: 'alert',
-      text: 'A training run that does not record the admission records and ledger rows it read is flagged to the model owner: until its lineage is restored, a withdrawal or an order cannot be traced to that model version.',
+      text: 'A training run that does not record the admission records and ledger rows it read has no backward lineage: until it is restored, a withdrawal or an order cannot be traced to that model version. Which response fits the gap is left to technical review.',
     },
     layer: 2,
     patterns: ['training-data-rights-ledger', 'dataset-admission-gate', 'aibom'],
@@ -858,6 +858,7 @@ export const dataAdmissionAndPrivacyControls: readonly Control[] = [
     ],
     openQuestions: [
       'The site publishes no schema for a model training run (the published training-record schema covers AI literacy training): should one be published, or should the model card and AIBOM carry the run fields?',
+      'Should a training run with no recorded lineage block the release of the model version it produced, or only raise an alert to its owner?',
     ],
   },
   {
@@ -930,7 +931,7 @@ export const dataAdmissionAndPrivacyControls: readonly Control[] = [
     verification: [
       {
         kind: 'test',
-        text: 'A consumer with no registration has no credential to the output API or table, and a registration whose declared use meets a prohibited-use rule on the card is refused.',
+        text: 'A consumer with no registration has no credential to the output API or table, and a registration whose declared use meets a prohibited-use rule on the card goes to review as a new purpose instead of receiving a credential.',
       },
     ],
     evidence: [
