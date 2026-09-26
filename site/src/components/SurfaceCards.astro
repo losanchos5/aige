@@ -1,0 +1,171 @@
+---
+/**
+ * SurfaceCards: a row of luminous cards for the home page's "Where AI
+ * Governance Engineering operates" band, one per surface (evals, runtime,
+ * assurance). A clone of DefinitionCards (mono index with the layer swatch, a
+ * short title, one sentence) that ends in a short list of links to the pages
+ * that carry the surface: a control profile or pattern, then the layer in
+ * chapter 04. The card itself is not a link, so it takes no .lift; the links
+ * do the work. Laid out on the shared .bento grid (effects.css), three equal
+ * columns from 960px; in bento's two-column step the last card spans the row.
+ * Each <li> carries --i for a .reveal-stagger class passed in.
+ */
+export interface SurfaceLink {
+  label: string;
+  href: string;
+}
+
+export interface SurfaceItem {
+  /** Mono index label, e.g. `Layer 03`. */
+  index: string;
+  /** Card title. */
+  title: string;
+  /** One sentence. */
+  body: string;
+  /** Layer colour for the index swatch, e.g. `var(--l3)`. */
+  swatch?: string;
+  /** The pages that carry the surface, in reading order. */
+  links: readonly SurfaceLink[];
+}
+
+interface Props {
+  items: readonly SurfaceItem[];
+  class?: string;
+}
+
+const { items, class: className } = Astro.props;
+---
+
+<ol class:list={['cards', 'bento', className]}>
+  {
+    items.map((item, i) => (
+      <li style={`--i:${i}`}>
+        <div class="card card-lum" style={`--tint:${item.swatch ?? 'var(--ink)'}`}>
+          <p class="head">
+            <span class="square" aria-hidden="true" />
+            <span class="idx">{item.index}</span>
+          </p>
+          <h3 class="title">{item.title}</h3>
+          <p class="body">{item.body}</p>
+          <ul class="links" role="list">
+            {item.links.map((link) => (
+              <li>
+                <a class="chapter-link" href={link.href}>
+                  {link.label} <span class="arrow" aria-hidden="true">→</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  /* Gap and the one/two-column steps come from .bento; this resets the list
+     and holds three columns (not bento's four) from 960px. */
+  .cards {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media (min-width: 600px) and (max-width: 959.98px) {
+    .cards > li:last-child:nth-child(odd) {
+      grid-column: span 2;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .cards {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Surface (border, radius, background, shadow) comes from .card-lum in
+     effects.css; this rule keeps only the card's own layout. */
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    height: 100%;
+    padding: var(--s-5);
+  }
+
+  .head {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0;
+  }
+
+  .square {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--tint);
+    border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  }
+
+  .idx {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--ink-2);
+  }
+
+  .title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    letter-spacing: var(--tracking-display);
+  }
+
+  .body {
+    margin: 0;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  /* The links sit at the foot of the card (margin-top: auto keeps the three
+     lists level when the sentences wrap differently). */
+  .links {
+    display: grid;
+    gap: var(--s-2);
+    margin: auto 0 0;
+    padding: var(--s-3) 0 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+
+  /* The "Read in chapter N →" link of pages.css, which the home does not
+     load: body face at the small size, --ink-2, a moving arrow. Inline here
+     rather than inline-flex, so a label that wraps keeps its arrow at the
+     end of its last line. */
+  .chapter-link {
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .chapter-link .arrow {
+    display: inline-block;
+    transition: transform var(--dur) var(--ease);
+  }
+
+  .chapter-link:hover {
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .chapter-link:hover .arrow {
+      transform: translateX(3px);
+    }
+  }
+</style>
