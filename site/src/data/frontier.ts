@@ -160,7 +160,7 @@ export const frontierSources: readonly Source[] = [
   },
   {
     title: 'Third-party cyber evaluations involving OpenAI models',
-    gloss: 'the evaluator's "intended authorization boundary"; OpenAI will review how to "set expectations for isolation, credential handling, monitoring, and stop conditions"',
+    gloss: 'the evaluator\'s "intended authorization boundary"; OpenAI will review how to "set expectations for isolation, credential handling, monitoring, and stop conditions"',
     publisher: 'OpenAI',
     date: '2026-08-04',
     url: 'https://openai.com/index/third-party-cyber-evaluations-involving-openai-models/',
