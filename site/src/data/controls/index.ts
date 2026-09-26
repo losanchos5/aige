@@ -75,6 +75,11 @@ import {
   type ObservationExample,
 } from './evaluation-environment';
 import { agentRuntimeProfile, agentRuntimeControls } from './agent-runtime';
+import {
+  deploymentAndMonitoringProfile,
+  deploymentAndMonitoringControls,
+  observationExamples as deploymentAndMonitoringObservationExamples,
+} from './deployment-and-monitoring';
 import { CONTROL_ID_PATTERN } from './ids';
 
 export const CONTROLS_AS_OF = '2026-09-26';
@@ -280,16 +285,27 @@ export const depthLabels: Readonly<Record<ControlDepth, string>> = {
 // ---------------------------------------------------------------------------
 // The registry
 
-export const profiles: readonly ControlProfile[] = [evaluationEnvironmentProfile, agentRuntimeProfile];
+export const profiles: readonly ControlProfile[] = [
+  evaluationEnvironmentProfile,
+  agentRuntimeProfile,
+  deploymentAndMonitoringProfile,
+];
 
-export const controls: readonly Control[] = [...evaluationEnvironmentControls, ...agentRuntimeControls];
+export const controls: readonly Control[] = [
+  ...evaluationEnvironmentControls,
+  ...agentRuntimeControls,
+  ...deploymentAndMonitoringControls,
+];
 
 /**
  * Example observations of every profile (public/controls/examples/), one pass
  * and one fail per specified control; each profile module exports its own list.
  * Illustrative records, not results of any real evaluation.
  */
-export const observationExamples: readonly ObservationExample[] = [...evaluationEnvironmentObservationExamples];
+export const observationExamples: readonly ObservationExample[] = [
+  ...evaluationEnvironmentObservationExamples,
+  ...deploymentAndMonitoringObservationExamples,
+];
 
 // ---------------------------------------------------------------------------
 // Lookups and paths
