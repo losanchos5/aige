@@ -24,9 +24,22 @@ interface Props {
       Thesis (/thesis and its translations), which is co-authored and states
       its own authorship. */
   byline?: boolean;
+  /** Print the site's BoK version before the date (default true). A versioned
+      artefact that states its own version under the H1 (a research note, a
+      control profile) passes false, so the reader sees one version, not two. */
+  siteVersion?: boolean;
 }
 
-const { title, summary, updated, words, minutes, layer, lang = 'en' } = Astro.props;
+const {
+  title,
+  summary,
+  updated,
+  words,
+  minutes,
+  layer,
+  lang = 'en',
+  siteVersion = true,
+} = Astro.props;
 const isThesis = /(^|\/)thesis(\.html)?\/?$/.test(Astro.url.pathname);
 const byline = (Astro.props.byline ?? !isThesis) && Boolean(updated);
 
@@ -56,8 +69,8 @@ const metaBits: MetaBit[] = [];
 // "By" is written here only in English: the UI strings carry no label for it, so
 // a translated page shows the linked name alone.
 if (byline) metaBits.push({ text: lang === 'en' ? 'By' : '', author: true });
-if (updated)
-  metaBits.push({ text: `v${site.bokVersion}` }, { text: labels.updated, datetime: updated });
+if (updated && siteVersion) metaBits.push({ text: `v${site.bokVersion}` });
+if (updated) metaBits.push({ text: labels.updated, datetime: updated });
 if (minutes && words)
   metaBits.push(
     { text: `${minutes} ${labels.read}` },

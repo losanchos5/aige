@@ -9,7 +9,9 @@ import { parseCorpus, plainHeading } from '../src/corpus.js';
 import { RateLimiter, clientBucket } from '../src/ratelimit.js';
 import { LAYERS, patternSlug } from '../src/tools/common.js';
 import { refKey } from '../src/tools/crosswalk.js';
+import { findControl } from '../src/tools/controls.js';
 import { normalise, score, snippet, suggest, tokens } from '../src/text.js';
+import type { ControlRecord } from '../src/types.js';
 import { readFixture } from './helpers.js';
 
 describe('config', () => {
@@ -94,6 +96,22 @@ describe('clause keys', () => {
   it('turns pattern ids into page slugs', () => {
     assert.equal(patternSlug('pattern-kill-switch--circuit-breaker'), 'kill-switch-circuit-breaker');
     assert.equal(patternSlug('pattern-aibom'), 'aibom');
+  });
+});
+
+describe('control lookup', () => {
+  const rows = [
+    { id: 'AIGE-CTL-EVAL-002', title: 'Egress is deny by default' },
+    { id: 'AIGE-CTL-EVAL-003', title: 'Credentials are scoped to the run' },
+  ] as unknown as ControlRecord[];
+
+  it('ignores the query string of a URL or a path', () => {
+    const base = 'https://aigovernanceengineer.com';
+    assert.equal(findControl(rows, `${base}/api/v1/controls/aige-ctl-eval-002.json?v=1`)?.id, 'AIGE-CTL-EVAL-002');
+    assert.equal(findControl(rows, `${base}/controls/evaluation-environment?ref=x#aige-ctl-eval-003`)?.id, 'AIGE-CTL-EVAL-003');
+    assert.equal(findControl(rows, '/api/v1/controls/aige-ctl-eval-003.json?utm_source=a')?.id, 'AIGE-CTL-EVAL-003');
+    assert.equal(findControl(rows, 'eval-002')?.id, 'AIGE-CTL-EVAL-002');
+    assert.equal(findControl(rows, 'Egress is deny by default')?.id, 'AIGE-CTL-EVAL-002');
   });
 });
 

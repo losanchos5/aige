@@ -93,7 +93,7 @@ describe('health and discovery', () => {
     assert.equal(response.status, 200);
     const body = (await response.json()) as Record<string, any>;
     assert.equal(body.status, 'ok');
-    assert.equal(body.version, '0.5.0');
+    assert.equal(body.version, '0.6.0');
     assert.equal(typeof body.upstream.entries, 'number');
     assert.equal(fixtures.hits.size, before);
   });

@@ -18,6 +18,7 @@ import {
 } from '../../lib/jsonld';
 import { getGlossary, getGlossaryEntry } from '../../lib/glossary';
 import { alternatesFor } from '../../lib/i18n-content';
+import { chapterLinkProblems, chapterLinksFor } from '../../data/chapter-links';
 
 export async function getStaticPaths() {
   const entries = await getCollection('bok');
@@ -167,6 +168,19 @@ const pillarAnchor: Record<string, string> = {
 };
 const showPillar = chapter.slug !== 'definition' && chapter.slug !== 'glossary';
 
+// Links to the open reference project (data/chapter-links.ts), rendered after
+// the chapter as page furniture and added to the on-this-page TOC; the chapter
+// Markdown is never edited for them. A key that is not a chapter fails the build.
+const chapterLinkIssues = chapterLinkProblems();
+if (chapterLinkIssues.length > 0) {
+  throw new Error(`chapter-links.ts:\n  - ${chapterLinkIssues.join('\n  - ')}`);
+}
+const openLinks = chapterLinksFor(chapter.slug);
+const tocHeadings =
+  openLinks.length > 0
+    ? [...headings, { depth: 2, slug: 'related-open-reference', text: 'Related in the open reference' }]
+    : headings;
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [book, article, ...authorNodes, breadcrumb, ...glossarySet],
@@ -180,7 +194,7 @@ const jsonLd = {
   description={metaDescription}
   crumbs={crumbs}
   crumbsJsonLd={false}
-  headings={headings}
+  headings={tocHeadings}
   prev={prev}
   next={next}
   editPath={editPath}
@@ -197,6 +211,24 @@ const jsonLd = {
   {isGlossary && <GlossaryJump />}
   <AtAGlance items={chapter.glance} terms={keyTerms} />
   <Content />
+  {
+    openLinks.length > 0 && (
+      <section class="chapter-related" aria-labelledby="related-open-reference" data-pagefind-ignore>
+        <h2 id="related-open-reference">Related in the open reference</h2>
+        <p>
+          Where this chapter is put to work in the open reference project: draft material, open for
+          technical review.
+        </p>
+        <ul>
+          {openLinks.map((link) => (
+            <li>
+              <a href={link.href}>{link.label}</a>: {link.note}.
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
   {/* After the sources: the sign-up, out of the search index and of snippets so
       it never shows up as chapter text. Renders nothing without an endpoint. */}
   <div class="chapter-newsletter" data-pagefind-ignore data-nosnippet>
@@ -205,6 +237,11 @@ const jsonLd = {
 </Doc>
 
 <style>
+  /* The open-reference links sit apart from the chapter's sources list. */
+  .chapter-related {
+    margin-top: var(--s-7);
+  }
+
   /* A hairline and one --s-7 step set the sign-up apart from the sources list;
      an empty wrapper (no endpoint configured) collapses to nothing. */
   .chapter-newsletter:not(:empty) {

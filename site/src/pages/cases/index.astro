@@ -2,6 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
+import FlowDiagram from '../../components/FlowDiagram.astro';
+import ContributeCta from '../../components/ContributeCta.astro';
 import { site } from '../../data/site';
 import { cases, caseEvidenceLabel, casesDisclaimer } from '../../data/cases';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
@@ -16,8 +18,44 @@ import '../../styles/harms.css';
 const seoTitle = 'AI incident case studies: what failed, which control';
 const description =
   'Public AI incidents as engineering post-mortems: what happened, the failure mode, the control that would have caught it and the evidence it would have left.';
-const crumbs = [{ label: 'Cases' }];
+const crumbs = [{ label: 'Incidents' }];
 const pageUrl = new URL('/cases', site.url).href;
+
+// "From incident to control": the five steps a post-mortem goes through to
+// become a control requirement and an evidence requirement. Each step links
+// the place on the site that develops it (anchors: the H2 slugs of chapter 17,
+// and the schema rows of /resources/templates).
+const incidentToControl = [
+  {
+    label: 'Incident',
+    sub: 'The record: what happened, when, to whom',
+    href: '/bok/incidents#the-incident-record',
+    layer: 5,
+  },
+  {
+    label: 'Failure mode',
+    sub: 'Why the system let it happen',
+    href: '/bok/incidents#ai-specific-failure-modes',
+  },
+  {
+    label: 'Control gap',
+    sub: 'The control that was missing or did not hold',
+    href: '/patterns/incident-pipeline',
+    layer: 4,
+  },
+  {
+    label: 'Control requirement',
+    sub: 'The control, stated so it can be verified',
+    href: '/controls',
+    layer: 1,
+  },
+  {
+    label: 'Evidence requirement',
+    sub: 'The record the control must leave',
+    href: '/resources/templates#schema-incident-record',
+    layer: 5,
+  },
+] as const;
 
 const jsonLd = [
   {
@@ -96,5 +134,37 @@ const jsonLd = [
         }
       </ul>
     </section>
+
+    <section class="res-section" id="from-incident-to-control" aria-labelledby="cs-method">
+      <div class="res-section-head">
+        <h2 id="cs-method">From incident to control</h2>
+        <p>A post-mortem is useful to an engineering function when it ends in a requirement, not a
+        lesson. Each case here is read the same way: the incident record fixes what happened, the
+        failure mode says why the system let it happen, and the gap between that failure and the
+        controls in place names the control that was missing. That control is then written as a
+        requirement someone can verify, and paired with the evidence it must leave, so the next
+        review checks a record instead of a promise. Cases with an incident note carry the full
+        chain: system boundary, control assumptions, controls by moment, evidence requirements and
+        the <a href="/controls">open controls</a> they relate to.</p>
+      </div>
+      <FlowDiagram
+        id="incident-to-control"
+        title="From incident to control"
+        desc="Five steps from a public incident to a control requirement and the evidence it must leave."
+        steps={incidentToControl}
+      />
+      <p class="cs-method-work">Put it to work: run the reporting deadlines of an incident in the <a
+      href="/toolkit/incident-clock">incident clock</a>, and turn the fix into a risk-register entry
+      and an eval case with <a href="/bok/incidents#capa-from-incident-to-risk-register-and-eval-suite">corrective
+      and preventive action</a>.</p>
+      <ContributeCta kind="incident" title="A failure mode from a public incident" />
+    </section>
   </div>
 </Base>
+
+<style>
+  .cs-method-work {
+    max-width: var(--prose);
+    margin: var(--s-5) 0;
+  }
+</style>

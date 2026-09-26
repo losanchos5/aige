@@ -15,6 +15,7 @@ import { cases } from './src/data/cases';
 import { obligations, obligationPath } from './src/data/frameworks';
 import { patterns } from './src/data/patterns';
 import { figures } from './src/data/figures';
+import { researchPath, writtenThemes } from './src/data/research';
 import { comparisonSourceFiles } from './src/data/comparisons';
 import { getGlossary } from './src/lib/glossary';
 import { gitDate } from './src/lib/reading';
@@ -45,9 +46,24 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       'src/lib/applies-now.ts',
       'src/data/frameworks.ts',
       'src/components/HeroStrip.astro',
+      // Block orp-shell: the open-work list (orp-core, src/data/work.ts).
+      'src/data/work.ts',
+      'src/components/SurfaceCards.astro',
+      'src/components/OpenWork.astro',
     ],
   ],
-  ['/about', ['src/pages/about/index.astro', 'src/data/site.ts']],
+  // Block orp-shell: /about adds the research interests, the open questions and
+  // the open work (orp-core data modules).
+  [
+    '/about',
+    [
+      'src/pages/about/index.astro',
+      'src/data/site.ts',
+      'src/data/people.ts',
+      'src/data/open-questions.ts',
+      'src/data/work.ts',
+    ],
+  ],
   ['/about/changelog', ['src/pages/about/changelog.astro', '../bok/CHANGELOG.md']],
   ['/about/contributors', ['src/pages/about/contributors.astro', '../bok/CONTRIBUTORS.md']],
   // Block b-nav-shell (navigation and site shell): the methodology page states
@@ -97,7 +113,8 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         ],
       ] as [string, string[]],
   ),
-  ['/cases', ['src/pages/cases/index.astro', 'src/data/cases.ts']],
+  // Block orp-shell: /cases adds the "From incident to control" flow diagram.
+  ['/cases', ['src/pages/cases/index.astro', 'src/data/cases.ts', 'src/components/FlowDiagram.astro']],
   ['/map', ['src/pages/map.astro', 'src/data/map.ts']],
   ['/path', ['src/pages/path.astro', 'src/data/path.ts', 'src/data/audiences.ts']],
   // The Resources hub counts the registers it links to, so their data modules
@@ -378,6 +395,44 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         ],
       ] as [string, string[]],
   ),
+  // Block orp-shell (open reference project): the open control profiles, the
+  // frontier audience route, the research notes and the contribution page.
+  // Some sources are written by other blocks of the same change (the control
+  // registry and people of orp-core, the profile template of
+  // orp-controls-pages, the notes of orp-research); until they land, gitDate
+  // falls back to the changelog date for a path git does not know, so the
+  // lastmod stays a real, past date.
+  [
+    '/controls',
+    [
+      'src/pages/controls/index.astro',
+      'src/data/controls/index.ts',
+      'src/data/controls/evaluation-environment.ts',
+      'src/data/controls/agent-runtime.ts',
+      'src/data/people.ts',
+    ],
+  ],
+  ...(['evaluation-environment', 'agent-runtime'] as const).map(
+    (profile) =>
+      [
+        `/controls/${profile}`,
+        [
+          'src/pages/controls/[profile].astro',
+          'src/components/ControlRecord.astro',
+          `src/data/controls/${profile}.ts`,
+        ],
+      ] as [string, string[]],
+  ),
+  ['/frontier', ['src/pages/frontier.astro', 'src/data/frontier.ts']],
+  ['/research', ['src/pages/research/index.astro', 'src/data/research.ts']],
+  ...writtenThemes().map(
+    (theme) =>
+      [
+        researchPath(theme),
+        ['src/pages/research/[slug].astro', `../research/${theme.slug}.md`],
+      ] as [string, string[]],
+  ),
+  ['/contribute', ['src/pages/contribute.astro', 'src/data/work.ts']],
 ]);
 
 // Pages dated by their content rather than by git: each /obligations/<id> page

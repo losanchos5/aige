@@ -4,19 +4,25 @@
  * big mono index led by an outlined layer-colour square, the name + tagline,
  * an inherited/new tag, and a labelled grid of the layer's
  * evidence: the question it answers, what it proves, its artefacts, tool
- * categories with illustrative examples, and the frameworks it maps to. Closes
- * with a back-link to the layer's heading in chapter 04.
+ * categories with illustrative examples, the frameworks it maps to and, when
+ * `controlsHref` is given, the open controls whose home layer it is (counted
+ * from src/data/controls). Closes with a back-link to the layer's heading in
+ * chapter 04.
  */
 import type { Layer } from '../data/stack';
+import { controlsForLayer } from '../data/controls';
 
 interface Props {
   layer: Layer;
   /** Full href to the layer's heading in the chapter. */
   href: string;
+  /** Where the open controls of this layer are listed (e.g. /controls#layer-3). */
+  controlsHref?: string;
 }
 
-const { layer, href } = Astro.props;
+const { layer, href, controlsHref } = Astro.props;
 const index = String(layer.n).padStart(2, '0');
+const controlCount = controlsHref ? controlsForLayer(layer.n).length : 0;
 ---
 
 <article class="layer-panel card-lum" style={`--band: var(${layer.colorVar});`}>
@@ -83,6 +89,28 @@ const index = String(layer.n).padStart(2, '0');
           </ul>
         </dd>
       </div>
+
+      {
+        controlsHref && (
+          <div class="field field-wide">
+            <dt class="field-label">Controls anchored here</dt>
+            <dd>
+              {controlCount > 0 ? (
+                <>
+                  <a href={controlsHref}>
+                    {controlCount} draft reference {controlCount === 1 ? 'control' : 'controls'}
+                  </a>{' '}
+                  in the open control profiles, each with the evidence it must leave.
+                </>
+              ) : (
+                <>
+                  None in the draft profiles yet: <a href={controlsHref}>the open controls by layer</a>.
+                </>
+              )}
+            </dd>
+          </div>
+        )
+      }
     </dl>
 
     <a class="chapter-link" href={href}>

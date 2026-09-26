@@ -1,0 +1,121 @@
+---
+/**
+ * OpenWork: the project's open work (src/data/work.ts) as an ordered list: the
+ * artefact linked, its state with a dot, its version, one sentence and the
+ * date it last changed. Every state is the real one; nothing is shown as
+ * reviewed or published before it is. Text in --ink-2, so the list reads on a
+ * plain, tinted or mesh ground.
+ */
+import { work as allWork, WORK_STATUS_LABEL, workProblems, type WorkItem } from '../data/work';
+import { formatDate } from '../lib/applies-now';
+
+interface Props {
+  /** Defaults to every row of work.ts. */
+  items?: readonly WorkItem[];
+}
+
+const problems = workProblems();
+if (problems.length > 0) {
+  throw new Error(`work: ${problems.length} problem(s) in the open work list:\n${problems.join('\n')}`);
+}
+
+const { items = allWork } = Astro.props;
+---
+
+<ol class="work-list" role="list">
+  {
+    items.map((item) => (
+      <li class="work-item" data-status={item.status}>
+        <a class="work-title" href={item.href}>
+          {item.title}
+        </a>
+        <p class="work-meta">
+          <span class="work-dot" aria-hidden="true" />
+          <span>{WORK_STATUS_LABEL[item.status]}</span>
+          {item.version && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>v{item.version}</span>
+            </>
+          )}
+          <span aria-hidden="true">·</span>
+          <span>
+            Updated <time datetime={item.updated}>{formatDate(item.updated)}</time>
+          </span>
+        </p>
+        <p class="work-note">{item.note}</p>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .work-list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .work-item {
+    display: grid;
+    gap: var(--s-1);
+    padding: var(--s-3) 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .work-item:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .work-title {
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 0.18em;
+  }
+
+  .work-title:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .work-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-1) var(--s-2);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .work-dot {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--l4-ink);
+  }
+
+  .work-item[data-status='in-review'] .work-dot {
+    background: var(--l1-ink);
+  }
+
+  .work-item[data-status='in-progress'] .work-dot {
+    background: var(--l2-ink);
+  }
+
+  .work-item[data-status='planned'] .work-dot {
+    background: transparent;
+    border: 1px solid var(--ink-2);
+  }
+
+  .work-note {
+    margin: 0;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+</style>

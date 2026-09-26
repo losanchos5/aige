@@ -4,6 +4,26 @@ All notable changes to *AI Governance Engineering: The Thesis & Body of Knowledg
 Versioning is semantic in spirit: patch = fact/typo fixes, minor = new chapters or patterns, major =
 a completed, reviewed core (1.0).
 
+## Unreleased
+
+Open reference project (OpenSpec change `open-reference-project`). Nothing below is released
+yet. It ships two draft control profiles with 40 controls (9 for the evaluation environment, 31
+for agents at runtime, open for technical review), `/frontier`, `/research` with one draft note,
+`/contribute`, incident notes on ten cases (seven of them new, from 2026 training and evaluation
+incidents), and the MCP server 0.6.0 with the `list_controls` and `get_control` tools.
+
+### Added
+- New routes: `/controls` (open control profiles), `/controls/evaluation-environment` and
+  `/controls/agent-runtime` (two draft profiles, v0.1, open for technical review), `/frontier` (a
+  route for frontier labs and evaluators), `/research` and one draft research note,
+  `/research/the-evaluation-environment-is-part-of-the-system`, and `/contribute` (how to review a
+  control, propose a mapping or send a correction).
+- Navigation: Controls under Practice, Frontier labs & evaluators under For you, Research under
+  Reference and Contribute under About. The Cases item is labelled Incidents; its URL stays
+  `/cases`, and `/incidents` redirects there (301).
+- `/llms.txt` gains a "Controls and research" section; the Markdown twins of the profiles and notes
+  get their canonical header rule in `_headers`.
+
 ## [0.5.0] - 2026-09-25
 
 Minor release: thirteen new chapters (11 to 23) bring the book to 24 chapters in five parts; the

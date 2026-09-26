@@ -11,6 +11,8 @@ import { patterns } from '../src/data/patterns';
 import { cases } from '../src/data/cases';
 import { obligations, obligationPath } from '../src/data/frameworks';
 import { getGlossary } from '../src/lib/glossary';
+import { researchPath, writtenThemes } from '../src/data/research';
+import { profiles, profilePath } from '../src/data/controls';
 
 const ORIGIN = 'https://aigovernanceengineer.com';
 
@@ -21,7 +23,9 @@ const MARKDOWN_PAGES = [
   ...patterns.map((p) => `/patterns/${p.slug}`),
   ...getGlossary().map((e) => e.url),
   ...cases.map((c) => `/cases/${c.id}`),
+  ...profiles.map((p) => profilePath(p)),
   '/thesis',
+  ...writtenThemes().map((t) => researchPath(t)),
 ];
 
 test.describe('Markdown alternates', () => {

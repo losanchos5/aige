@@ -82,6 +82,7 @@ export const schemaOrder: readonly string[] = [
   'policy-card',
   'training-record',
   'evidence-record',
+  'control-observation',
 ];
 
 export interface KitFile {

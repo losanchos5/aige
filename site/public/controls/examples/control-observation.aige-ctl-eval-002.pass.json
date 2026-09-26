@@ -1,0 +1,34 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
+  "control_id": "AIGE-CTL-EVAL-002",
+  "profile": "evaluation-environment",
+  "control_version": "0.1",
+  "subject": "eval-env-eu-west@2026-09-26",
+  "subject_kind": "eval-environment",
+  "expected": "Outbound connections only to the destinations on the run's egress allow-list; every other attempt refused and logged.",
+  "observed": "Run 88212: 1,406 outbound connections, all to the 2 listed destinations (LLM API proxy, progress server); the admission canary to an unlisted test address was refused and logged.",
+  "status": "pass",
+  "timestamp": "2026-09-26T08:15:04Z",
+  "enforcement_point": "runtime",
+  "verification_kind": "observe",
+  "observer": "egress-flow-log-adapter",
+  "evidence": [
+    {
+      "artefact": "flow log of run 88212",
+      "url": "https://evidence.example/runs/88212/flows.jsonl",
+      "hash": "sha256:4b1d7e0a3c6f9b2e5d8a1c4f7b0e3d6a9c2f5b8e1d4a7c0f3b6e9d2a5c8f1b4e"
+    },
+    {
+      "artefact": "egress allow-list attached to the run",
+      "url": "https://evidence.example/runs/88212/egress-allow-list.json",
+      "hash": "sha256:0c3f6a9d2b5e8c1f4a7d0b3e6c9f2a5d8b1e4c7f0a3d6b9e2c5f8a1d4b7e0c3f"
+    },
+    {
+      "artefact": "evidence record of the admission canary (refused connection)",
+      "url": "https://evidence.example/runs/88212/admission.json",
+      "schema": "https://aigovernanceengineer.com/schemas/evidence-record.v1.json"
+    }
+  ],
+  "run_id": "88212",
+  "notes": "Illustrative example, not the result of a real evaluation."
+}

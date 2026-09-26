@@ -32,6 +32,8 @@ const tools = [
   { name: 'get_term', what: 'One term: definition, source, the chapters that use it and related terms.', ask: 'What is a serious incident under the AI Act?' },
   { name: 'list_patterns', what: 'The engineering patterns, optionally for one stack layer.', ask: 'Which patterns live in the runtime layer?' },
   { name: 'get_pattern', what: 'One pattern in full: problem, solution, consequences and what it maps to.', ask: 'Walk me through the Kill Switch pattern.' },
+  { name: 'list_controls', what: 'The reference controls of the open control profiles, filtered by profile, layer, status, depth or words.', ask: 'Which evaluation environment controls are specified in full?' },
+  { name: 'get_control', what: 'One draft control specification: objective, failure modes, verification, evidence, mappings and sources.', ask: 'Show me AIGE-CTL-EVAL-002 and how a third party verifies it.' },
   { name: 'list_templates', what: 'The library of JSON Schemas, filled examples and human templates.', ask: 'Which templates exist for impact assessments?' },
   { name: 'get_template', what: 'One template or schema with the content of its files.', ask: 'Give me the incident record schema and an example.' },
 ];
@@ -98,9 +100,9 @@ const jsonLd = [
       <div class="res-section-head">
         <h2 id="mcp-tools">What it answers</h2>
         <p>
-          Ten read-only tools over {obligations.length} obligations, {patterns.length} patterns and
-          {' '}{getGlossary().length} glossary terms, plus the crosswalk, the templates and the full
-          text of the book.
+          Twelve read-only tools over {obligations.length} obligations, {patterns.length} patterns and
+          {' '}{getGlossary().length} glossary terms, plus the crosswalk, the templates, the open
+          control profiles and the full text of the book.
         </p>
       </div>
       <div class="res-tablewrap" tabindex="0" role="region" aria-label="MCP tools">

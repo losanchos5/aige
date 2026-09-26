@@ -14,8 +14,9 @@ their work by realised risk reduction and audit-ready evidence, not by framework
 
 It is **version 0.5.0**: 24 chapters, 13 of them new (11 to 23, from AI defined for governance through
 the programme, the lifecycle and the law to governing agents), 33 patterns with their own pages, an
-open-data API and a browser toolkit, still deliberately incomplete and open to contributions. The
-Body of Knowledge, website, datasets and project materials are authored by **Jorge García Aibar**.
+open-data API, a browser toolkit, and open control profiles and research notes (draft), still
+deliberately incomplete and open to contributions. The Body of Knowledge, website, datasets and
+project materials are authored by **Jorge García Aibar**.
 The Thesis is the sole exception: it is co-authored by **Jorge García Aibar and Aurélie Pols** and
 is open for signatures.
 
@@ -54,6 +55,7 @@ aige/
 │   ├── 11-…23-*.md            AI defined, the programme, the lifecycle, the law, governing agents
 │   ├── CONTRIBUTORS.md        Authorship, contributors, SIGNATORIES
 │   └── CHANGELOG.md           Version history
+├── research/              Technical notes (research/<slug>.md, served at /research/<slug>)
 ├── sources/
 │   └── SOURCES.md         Consolidated, verified source table (one section per chapter)
 └── build/
@@ -110,6 +112,10 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the full contribution guide. In s
    add the row to `sources/SOURCES.md` under your chapter's section.
 3. Open a pull request. Keep the voice practitioner-direct; name categories, not vendors; never invent
    a statistic.
+
+To review a control profile or a research note, propose a failure mode, share an implementation
+example or map a control to a clause, use the GitHub issue forms listed at
+https://aigovernanceengineer.com/contribute.
 
 ## How to sign
 

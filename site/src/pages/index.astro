@@ -1,10 +1,13 @@
 ---
 /**
  * Home: the discipline, defined. A full-viewport hero (the headline over a
- * painting, one CTA, a strip of frameworks and figures), the definition with the
- * governance loop, the three questions, the five-layer stack, the eight values,
- * the role, a verdict beat, the Body of Knowledge by part, the resources, the
- * newsletter and a closing CTA. All copy and every figure come from the typed
+ * painting, one supporting sentence, two CTAs to the Stack and the open
+ * controls, two text links to the Thesis and the frontier route, a strip of
+ * frameworks and figures), the definition with the governance loop, the three
+ * questions, the five-layer stack, where the discipline operates (evals,
+ * runtime, assurance), the eight values, the role, a verdict beat, the Body of
+ * Knowledge by part, the resources, the newsletter beside the open work and a
+ * closing CTA. All copy and every figure come from the typed
  * content modules; no number appears here that a primary source does not carry,
  * and every count is computed from the data.
  *
@@ -30,6 +33,8 @@ import ResourceTiles from '../components/ResourceTiles.astro';
 import NewsletterForm from '../components/NewsletterForm.astro';
 import WhatAppliesNow from '../components/WhatAppliesNow.astro';
 import HeroStrip from '../components/HeroStrip.astro';
+import SurfaceCards, { type SurfaceItem } from '../components/SurfaceCards.astro';
+import OpenWork from '../components/OpenWork.astro';
 import { site } from '../data/site';
 import { WEBSITE_ID } from '../lib/jsonld';
 import { definition, values } from '../data/values';
@@ -84,6 +89,46 @@ const questions = [
     title: 'What evidence proves it?',
     body: 'Structured eval results and machine-readable evidence emitted as the build runs, so assurance is a live query rather than a point-in-time attestation assembled by hand.',
     swatch: 'var(--l3)',
+  },
+];
+
+// The three surfaces where a governance claim becomes something that runs:
+// layers 03, 04 and 05 of the stack, each with its swatch, one sentence and
+// the pages that carry it (the control profile or pattern, then the layer in
+// chapter 04). The anchors are the chapter's own heading ids.
+const surfaces: SurfaceItem[] = [
+  {
+    index: 'Layer 03',
+    title: 'Evals',
+    body: 'Evaluation results become evidence when the metrics and thresholds are fixed before the run and a failure blocks the release.',
+    swatch: 'var(--l3)',
+    links: [
+      { label: 'Evaluation environment controls', href: '/controls/evaluation-environment' },
+      { label: 'Pattern: Eval Gate in CI', href: '/patterns/eval-gate-in-ci' },
+      { label: 'Layer 03 in the stack', href: '/bok/the-stack#layer-03-evals--red-teaming-as-evidence' },
+    ],
+  },
+  {
+    index: 'Layer 04',
+    title: 'Runtime',
+    body: 'Every model, tool call and agent runs under an identity, a scope and a stop handle, enforced at the point where it acts.',
+    swatch: 'var(--l4)',
+    links: [
+      { label: 'Agent runtime controls', href: '/controls/agent-runtime' },
+      { label: 'Pattern: Kill Switch / Circuit Breaker', href: '/patterns/kill-switch-circuit-breaker' },
+      { label: 'Layer 04 in the stack', href: '/bok/the-stack#layer-04-runtime-controls--observability' },
+    ],
+  },
+  {
+    index: 'Layer 05',
+    title: 'Assurance',
+    body: 'Controls emit structured records as they run, so conformity is a query over evidence rather than a document assembled by hand.',
+    swatch: 'var(--l5)',
+    links: [
+      { label: 'Pattern: Machine-Readable Evidence', href: '/patterns/machine-readable-evidence-oscal' },
+      { label: 'Open data and schemas', href: '/resources/data' },
+      { label: 'Layer 05 in the stack', href: '/bok/the-stack#layer-05-assurance--continuous-compliance' },
+    ],
   },
 ];
 
@@ -155,13 +200,18 @@ const partTitle = (id: string) => bookParts.find((part) => part.id === id)?.titl
 const chaptersTitle = `${chaptersOrdered.length} chapters in ${countWord(bookParts.length)} parts, versioned and open.`;
 const chaptersLede = `The Body of Knowledge is at v${site.bokVersion} and published under ${site.license}. ${partTitle('foundations')}, ${partTitle('lifecycle')}, and ${partTitle('law')} carry the discipline from what an AI system is, through its life, to the law that binds it.`;
 
-// Eight tiles, two full rows of the four-column bento: the references a reader
-// reaches for first. The hub (/resources) lists every one.
+// Eleven tiles on the four-column bento: the references a reader reaches for
+// first, the open controls second. The hub (/resources) lists every one.
 const resources = [
   {
     label: 'Frameworks',
     href: '/resources/frameworks',
     desc: 'The obligations (EU AI Act, ISO/IEC 42001, NIST AI RMF) mapped to the artefacts that satisfy them.',
+  },
+  {
+    label: 'Open controls',
+    href: '/controls',
+    desc: 'Control profiles with the evidence each control leaves, versioned and reviewed in the open.',
   },
   {
     label: 'MCP server',
@@ -192,6 +242,11 @@ const resources = [
     label: 'Obligation register',
     href: '/obligations',
     desc: 'Every obligation with a stable id, its duty holder, date, status, artefact and stack layer.',
+  },
+  {
+    label: 'Research notes',
+    href: '/research',
+    desc: 'Technical notes on the open questions: what is assumed, what the evidence shows, what would settle it.',
   },
   {
     label: 'Reading list',
@@ -252,7 +307,18 @@ const resources = [
         <span class="hero-line">Governance you can <em>run</em>,</span>
         <span class="hero-line">not just read.</span>
       </h1>
-      <a class="btn btn-primary btn-glow" style="--i:1" href="/thesis">Read the Thesis</a>
+      <p class="hero-lede" style="--i:1">
+        An open reference architecture for turning AI safety, risk and policy claims into eval
+        gates, runtime controls and machine-verifiable evidence.
+      </p>
+      <div class="hero-ctas" style="--i:2">
+        <a class="btn btn-primary btn-glow" href="/stack">Explore the Stack</a>
+        <a class="btn hero-btn-quiet" href="/controls">Open controls</a>
+      </div>
+      <p class="hero-links" style="--i:3">
+        <a href="/thesis">Read the Thesis<span aria-hidden="true"> →</span></a>
+        <a href="/frontier">Frontier labs &amp; evaluators<span aria-hidden="true"> →</span></a>
+      </p>
     </div>
 
     <HeroStrip variant="frameworks" facts={facts} />
@@ -277,6 +343,8 @@ const resources = [
       <a href="/ai-governance">What is AI governance? →</a>
       <span class="sec-link-sep" aria-hidden="true">·</span>
       <a href="/bok">Open the Body of Knowledge →</a>
+      <span class="sec-link-sep" aria-hidden="true">·</span>
+      <a href="/controls">See the open controls →</a>
     </p>
     <script is:inline defer src="/countup.js"></script>
   </Section>
@@ -311,6 +379,23 @@ const resources = [
     <p class="sec-link" slot="foot"><a href="/stack">Explore the stack →</a></p>
   </Section>
   <script is:inline defer src="/story.js"></script>
+
+  <Section
+    tone="mesh"
+    mesh="c"
+    meshK={0.4}
+    id="where-it-operates"
+    class="operate-sec"
+    title="Where AI Governance Engineering operates."
+    lede="Three surfaces where a governance claim becomes something that runs: the evaluation gate, the runtime control and the assurance record."
+  >
+    <SurfaceCards items={surfaces} class="reveal-stagger" />
+    <p class="sec-link" slot="foot">
+      <a href="/controls">Browse the open controls →</a>
+      <span class="sec-link-sep" aria-hidden="true">·</span>
+      <a href="/frontier">For frontier labs and evaluators →</a>
+    </p>
+  </Section>
 
   <Section
     tone="mesh"
@@ -411,11 +496,19 @@ const resources = [
     title="Follow the changes."
     lede="Every chapter shows the date it last changed, and every release is written up in the changelog. Get an email when a chapter changes, or follow the feed."
   >
-    <NewsletterForm location="home" />
+    <div class="nl-grid">
+      <NewsletterForm location="home" />
+      <div class="nl-work">
+        <h3 class="nl-work-title">Open work</h3>
+        <OpenWork />
+      </div>
+    </div>
     <p class="sec-link" slot="foot">
       <a href="/rss.xml">RSS feed →</a>
       <span class="sec-link-sep" aria-hidden="true">·</span>
       <a href="/about/changelog">Changelog →</a>
+      <span class="sec-link-sep" aria-hidden="true">·</span>
+      <a href="/contribute">Contribute →</a>
     </p>
   </Section>
 
@@ -431,10 +524,12 @@ const resources = [
   /* Hero: the whole first viewport. A moving gradient field (hero-field.js
      paints it on the canvas; the div's own background is the static fallback
      for no JS, no WebGL and the first paint), the headline centred on it in
-     the serif display cut, one CTA, and a strip of figures along the foot.
+     the serif display cut, its lede, CTAs and links, and a strip of figures
+     along the foot.
      The header floats over it (Base overlayHeader), so the hero starts at the
      top of the viewport and its top padding clears the bar. */
   .hero--field {
+    --hero-copy: var(--ink); /* the lede and the links: full ink, white over the painting in dark */
     position: relative;
     isolation: isolate;
     overflow: hidden;
@@ -496,10 +591,10 @@ const resources = [
     --hero-fade-top: 0; /* free vertical fade stops (0..1) at the top, 55% and the foot */
     --hero-fade-mid: 0;
     --hero-fade-bot: 0;
-    --hero-halo: 0.5; /* cream ellipse behind the headline (0..1), both themes */
-    --hero-halo-w: 62%;
-    --hero-halo-h: 40%;
-    --hero-halo-y: 42%; /* the headline's centre at 1440x900 379px of 900 */
+    --hero-halo: 0.5; /* cream ellipse behind the headline and its copy (0..1), both themes */
+    --hero-halo-w: 90%; /* wide enough that the lede's line ends hold 4.3:1 in the dark theme */
+    --hero-halo-h: 60%;
+    --hero-halo-y: 44%; /* the centre of the headline-to-links block at 1440x900 (400px of 900) */
     --hero-band: 0; /* veil under the floating header (0..1); 0.45 in the dark theme */
   }
 
@@ -511,13 +606,13 @@ const resources = [
   }
 
   /* Phones: the headline wraps to three lines, fills the width and sits
-     higher (its centre at 33% of the hero at 390x844), so the halo widens,
-     flattens and moves up with it. */
+     higher, so the halo widens past the edges, centres on the lede (34% of
+     the hero at 390x844) and reaches down over the CTAs and the links. */
   @media (max-width: 719px) {
     .hero--art {
-      --hero-halo-w: 120%;
-      --hero-halo-h: 30%;
-      --hero-halo-y: 33%;
+      --hero-halo-w: 160%;
+      --hero-halo-h: 56%;
+      --hero-halo-y: 34%;
     }
   }
 
@@ -649,12 +744,14 @@ const resources = [
      header that keeps its white links at 4.5:1 over the painting's sky. */
   :global(:root[data-theme='dark']) .hero--art {
     --hero-ink: #ffffff;
+    --hero-copy: #ffffff;
     --hero-band: 0.45;
   }
 
   @media (prefers-color-scheme: dark) {
     :global(:root:not([data-theme='light'])) .hero--art {
       --hero-ink: #ffffff;
+      --hero-copy: #ffffff;
       --hero-band: 0.45;
     }
   }
@@ -663,9 +760,10 @@ const resources = [
     color: var(--hero-nav-ink);
   }
 
-  /* Headline and CTA, centred in the space above the strip. The top padding
-     clears the floating header (about 65px, in rem so it grows with text
-     zoom as the bar does) and the bottom one keeps the CTA off the strip. */
+  /* Headline, lede, CTAs and links, centred in the space above the strip.
+     The top padding clears the floating header (about 65px, in rem so it
+     grows with text zoom as the bar does) and the bottom one keeps the links
+     off the strip. */
   .hero-center {
     position: relative;
     z-index: 1;
@@ -703,6 +801,80 @@ const resources = [
     font-style: italic;
   }
 
+  /* The supporting sentence: body face at a step above body size, weight 500
+     and the full ink (--hero-copy), never dimmed: it sits over the painting,
+     where only the halo and the wash hold its contrast. */
+  .hero-lede {
+    max-width: 56ch;
+    margin: 0;
+    font-size: clamp(1.0625rem, 0.98rem + 0.35vw, 1.25rem);
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--hero-copy);
+    text-wrap: balance;
+  }
+
+  /* Two buttons: the gradient primary (the Stack) and a quiet one (the open
+     controls) on an opaque plate of the page ground, so its label never
+     depends on the painting behind it. */
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-3);
+  }
+
+  .hero-btn-quiet {
+    background: var(--bg);
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-btn-quiet:hover {
+      background: color-mix(in srgb, var(--ink) 8%, var(--bg));
+    }
+  }
+
+  /* Two text links under the buttons (the Thesis, the frontier route): mono
+     at the small size, underlined, in the full ink. */
+  .hero-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-2) var(--s-5);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    font-weight: 500;
+    line-height: 1.5;
+  }
+
+  .hero-links a {
+    color: var(--hero-copy);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.25em;
+  }
+
+  .hero-links a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  /* Phones: the four blocks close up a step, the padding tightens (the
+     header still clears by about 20px) and the two buttons share a row, so
+     the strip stays in the first viewport at 390x844. */
+  @media (max-width: 719px) {
+    .hero-center {
+      gap: var(--s-5);
+      padding-block: calc(4.5rem + var(--s-4)) var(--s-5);
+    }
+
+    .hero-ctas .btn {
+      padding-inline: var(--s-4);
+    }
+  }
+
   /* Hero entrance: a short, staggered rise on load (not scroll-driven). A lift
      only, transform and no opacity: the copy sits in the first viewport, where
      axe and Lighthouse blend a fractional opacity into the contrast ratio.
@@ -732,6 +904,33 @@ const resources = [
     font-size: var(--fs-small);
     line-height: 1.4;
     color: var(--ink-2);
+  }
+
+  /* Follow the changes: the newsletter form, then the open work under it at
+     every width. Side by side, the list (six rows) left the form's column
+     half empty on desktop; stacked, each row's note keeps one line. The
+     column is minmax(0, 1fr): an auto track grows to its widest unbreakable
+     line and pushed the page sideways at 390px with text at 200%. */
+  .nl-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-6);
+    align-items: start;
+  }
+
+  @media (min-width: 960px) {
+    .nl-grid {
+      gap: var(--s-7);
+    }
+  }
+
+  .nl-work-title {
+    margin: 0 0 var(--s-3);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+    letter-spacing: var(--tracking-display);
   }
 
   /* Stack story: the static mark and its caption pin on the left; the

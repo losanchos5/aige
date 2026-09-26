@@ -62,7 +62,7 @@ export const KNOWN_ROUTES: Readonly<Record<string, { label: string; source: stri
     source: 'src/pages/resources/templates.astro',
   },
   '/obligations': { label: 'Obligation register', source: 'src/pages/obligations/index.astro' },
-  '/cases': { label: 'Cases', source: 'src/pages/cases/index.astro' },
+  '/cases': { label: 'Incidents', source: 'src/pages/cases/index.astro' },
   '/agents': { label: 'Governing AI agents', source: 'src/pages/agents.astro' },
   '/toolkit': { label: 'Toolkit', source: 'src/pages/toolkit/index.astro' },
 };

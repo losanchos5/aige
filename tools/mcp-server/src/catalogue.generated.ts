@@ -970,6 +970,48 @@ export const catalogue: readonly TemplateEntry[] = [
     ]
   },
   {
+    "name": "control-observation",
+    "kind": "schema",
+    "title": "Control observation",
+    "description": "One observation of one open reference control on one subject: what the control expects, what was observed, whether it held, when, and the evidence the observation rests on. The record an adapter, a test or a reviewer would emit against a control of an open control profile (for example AIGE-CTL-EVAL-002). Draft for review; the profiles and this record are illustrative, not a claim of conformity.",
+    "stage": "operate",
+    "stageLabel": "Operate and monitor",
+    "layers": [
+      4,
+      5
+    ],
+    "patterns": [
+      "pattern-continuous-assurance-telemetry",
+      "pattern-machine-readable-evidence-oscal",
+      "pattern-eval-gate-in-ci"
+    ],
+    "evidences": [
+      "EU AI Act Art. 12",
+      "EU AI Act Art. 15",
+      "EU AI Act Art. 17",
+      "ISO/IEC 42001 9.1",
+      "NIST AI RMF MEASURE 3.1",
+      "NIST AI RMF MANAGE 4.1"
+    ],
+    "files": [
+      {
+        "role": "schema",
+        "format": "json",
+        "path": "/schemas/control-observation.v1.json"
+      },
+      {
+        "role": "example",
+        "format": "json",
+        "path": "/schemas/examples/control-observation.example.json"
+      },
+      {
+        "role": "template",
+        "format": "markdown",
+        "path": "/templates/control-observation.md"
+      }
+    ]
+  },
+  {
     "name": "ai-policy",
     "kind": "kit",
     "title": "AI policy (YAML, prose and Rego)",

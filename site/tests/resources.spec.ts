@@ -18,6 +18,7 @@ const HUB = [
   '/resources/crosswalk',
   '/resources/harms',
   '/cases',
+  '/controls',
   '/resources/contracts',
   '/resources/templates',
   '/figures',
@@ -28,6 +29,7 @@ const HUB = [
   '/bok/glossary',
   '/resources/data',
   '/mcp',
+  '/research',
   '/map',
 ];
 

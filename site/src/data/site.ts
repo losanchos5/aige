@@ -81,6 +81,9 @@ export const site: SiteConfig = {
         'EU AI Act',
         'ISO/IEC 42001',
         'NIST AI Risk Management Framework',
+        'AI evaluation environments',
+        'Agent runtime safeguards',
+        'Machine-readable assurance evidence',
       ],
       // LinkedIn and the GitHub account that owns the project repository. TODO:
       // add the ORCID iD here once one exists (none has been registered yet).

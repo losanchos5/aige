@@ -1,0 +1,29 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
+  "control_id": "AIGE-CTL-EVAL-003",
+  "profile": "evaluation-environment",
+  "control_version": "0.1",
+  "subject": "run-88214@2026-09-26",
+  "subject_kind": "eval-run",
+  "expected": "No credential other than the run's own short-lived, audience-bound tokens is readable in the environment or appears in the run's artefacts, and none is accepted after the run.",
+  "observed": "Secret scan of transcript, memory store, logs and file system snapshot: 0 matches. A run token replayed against another tool server was rejected with an audience error; replayed after the run, it was rejected as expired.",
+  "status": "pass",
+  "timestamp": "2026-09-26T11:03:40Z",
+  "enforcement_point": "runtime",
+  "verification_kind": "test",
+  "observer": "run-artefact-secret-scanner",
+  "evidence": [
+    {
+      "artefact": "secret scan report of run 88214",
+      "url": "https://evidence.example/runs/88214/secret-scan.json",
+      "hash": "sha256:7e0b3d6a9c2f5b8e1d4a7c0f3b6e9d2a5c8f1b4e7d0a3c6f9b2e5d8a1c4f7b0e"
+    },
+    {
+      "artefact": "credential issuance log of run 88214",
+      "url": "https://evidence.example/runs/88214/issuance.json",
+      "schema": "https://aigovernanceengineer.com/schemas/evidence-record.v1.json"
+    }
+  ],
+  "run_id": "88214",
+  "notes": "Illustrative example, not the result of a real evaluation."
+}

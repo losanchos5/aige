@@ -1,0 +1,76 @@
+name: Share an implementation example
+description: Share how you implement a control or pattern, with the evidence it leaves behind.
+title: "[Implementation] "
+labels: ["implementation-example"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        An implementation example shows one way to put a control or pattern into practice: a
+        configuration, a pipeline step, a test, a runtime policy or an evidence export, and the
+        record it produces. Name tools by category (for example "policy engine", "egress proxy",
+        "trace store"), not by product; examples are illustrative and never an endorsement of a
+        vendor. Remove every secret, token, hostname and internal name before you paste anything.
+  - type: input
+    id: control-id
+    attributes:
+      label: Control id or pattern slug
+      description: The AIGE-CTL-... id or the pattern slug this example implements.
+      placeholder: AIGE-CTL-EVAL-003
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of example
+      options:
+        - Configuration
+        - Pipeline step
+        - Test or eval
+        - Runtime policy
+        - Evidence export
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example
+      description: The snippet or a description of the setup. No secrets; tools by category.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence it produces
+      description: The record the example leaves behind (a log line, a signed report, a CI result) and where it is kept.
+    validations:
+      required: true
+  - type: dropdown
+    id: licence
+    attributes:
+      label: Licence
+      description: Accepted examples are published under the project's licence.
+      options:
+        - I wrote it and agree to publish it under CC BY 4.0
+        - It comes from a public source under a compatible licence (cited below)
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source (optional)
+      description: The public URL of the original, if the example is not your own work.
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: The example contains no secrets, credentials, hostnames or confidential material.
+          required: true
+        - label: Tools are named by category, and the example does not endorse or require a vendor.
+          required: true
+        - label: If the example is accepted, I may be credited by name in bok/CONTRIBUTORS.md.
+          required: false

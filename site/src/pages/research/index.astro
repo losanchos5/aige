@@ -1,0 +1,158 @@
+---
+// /research: the index of the research notes. What a note is, every written
+// note with its status line (version, state, review), the planned themes
+// (listed as not yet written, never linked: they have no page) and how a note
+// is reviewed. The notes come from lib/research-pages.ts (research/<slug>.md,
+// validated against data/research.ts); nav.spec requires every written note
+// to be linked from <main> here.
+import Doc from '../../layouts/Doc.astro';
+import StatusLine from '../../components/StatusLine.astro';
+import PillarLink from '../../components/PillarLink.astro';
+import { personById } from '../../data/people';
+import { researchPath, researchThemes, researchProblems } from '../../data/research';
+import { loadResearchPages } from '../../lib/research-pages';
+import { collectionPage, lastModified } from '../../lib/jsonld';
+
+const seoTitle = 'AI governance research notes';
+const description =
+  'Technical notes on the open questions of AI governance engineering: what is assumed, what the evidence shows and what would settle each one.';
+const summary =
+  'Technical notes on the open questions of AI governance engineering: what is assumed, what the public evidence shows and what would settle each one.';
+
+const problems = researchProblems();
+if (problems.length > 0) {
+  throw new Error(`research: ${problems.length} problem(s) in the themes:\n${problems.join('\n')}`);
+}
+
+const pages = await loadResearchPages();
+const notes = pages.map(({ entry, theme }) => ({
+  href: researchPath(theme),
+  title: entry.data.title,
+  summary: entry.data.summary,
+  version: entry.data.version,
+  status: entry.data.status,
+  updated: entry.data.updated ?? entry.data.date,
+  reviewers: entry.data.reviewers
+    .map((id) => personById(id))
+    .filter((p) => p !== undefined)
+    .map((p) => ({ name: p.name, href: p.href })),
+}));
+const planned = researchThemes.filter((theme) => theme.status === 'planned');
+
+const updated = lastModified(
+  'src/pages/research/index.astro',
+  'src/data/research.ts',
+  ...pages.map(({ theme }) => `../research/${theme.slug}.md`),
+);
+
+const headings = [
+  { depth: 2, slug: 'notes', text: 'Notes' },
+  { depth: 2, slug: 'planned-themes', text: 'Planned themes (not yet written)' },
+  { depth: 2, slug: 'how-a-note-is-reviewed', text: 'How a note is reviewed' },
+];
+
+const jsonLd = collectionPage({
+  path: '/research',
+  name: seoTitle,
+  description,
+  dateModified: updated,
+  items: notes.map((note) => ({ name: note.title, url: note.href })),
+});
+---
+
+<Doc
+  title="Research notes"
+  seoTitle={seoTitle}
+  summary={summary}
+  description={description}
+  crumbs={[{ label: 'Research notes' }]}
+  headings={headings}
+  updated={updated}
+  editPath="site/src/data/research.ts"
+  sidebar={false}
+  image="/og/research.png"
+  jsonLd={jsonLd}
+>
+  <p>
+    A research note takes one open question of AI governance engineering and sets out what is
+    assumed, what the public evidence shows and what would settle it. Each note is versioned, cites
+    a numbered source for each factual claim, names its author and says which controls and patterns
+    it argues for. A note stays a draft until a named reviewer has checked it; none has been
+    reviewed yet.
+  </p>
+  <PillarLink lead="Each note works on one open question of" anchor="governing AI systems in practice" />
+
+  <h2 id="notes">Notes</h2>
+  <ol class="rn-list" role="list">
+    {
+      notes.map((note) => (
+        <li class="rn-item">
+          <a class="rn-title" href={note.href}>
+            {note.title}
+          </a>
+          <StatusLine
+            version={note.version}
+            status={note.status}
+            reviewers={note.reviewers}
+            updated={note.updated}
+          />
+          <p class="rn-summary">{note.summary}</p>
+        </li>
+      ))
+    }
+  </ol>
+
+  <h2 id="planned-themes">Planned themes (not yet written)</h2>
+  <p>
+    The questions the next notes will take up. They are not written yet, so none has a page; each
+    is listed here so that anyone working on the same question can say so.
+  </p>
+  <ul class="rn-planned">
+    {
+      planned.map((theme) => (
+        <li>
+          <strong>{theme.title}.</strong> {theme.question}
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2 id="how-a-note-is-reviewed">How a note is reviewed</h2>
+  <p>
+    A note is first published as a draft, with a 0.x version and a status line that says it is
+    open for technical review. Anyone can review it through the issue form linked from the note: name the
+    claim, say whether the cited source supports it, and give a source if it does not. A review
+    that changes the note bumps its version and is credited by name. A note is marked published
+    only once a named reviewer has reviewed it. The versioning rules are in the
+    <a href="/about/methodology#control-profiles-versioning-status-and-review">methodology</a>; the ways to take part are on
+    <a href="/contribute">how to contribute</a>.
+  </p>
+</Doc>
+
+<style>
+  /* One row per note: the title link, its status line and its summary. */
+  .rn-list {
+    display: grid;
+    gap: var(--s-5);
+    margin: var(--s-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .rn-item {
+    margin: 0;
+    padding: var(--s-4) 0 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .rn-title {
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .rn-summary {
+    margin: var(--s-2) 0 0;
+    color: var(--ink-2);
+  }
+</style>

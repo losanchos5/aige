@@ -1,6 +1,7 @@
 // hero-art.spec.ts: the home hero while index.astro's HERO_ART is on: Monet's
-// "The Seine at Giverny" under veils of the page ground, the serif headline
-// and one CTA over it, the frameworks strip along its foot and the floating
+// "The Seine at Giverny" under veils of the page ground, the serif headline,
+// its lede, two CTAs and two text links over it, the frameworks strip along
+// its foot and the floating
 // header above. Covers the image (it loads, is revealed, and is the request
 // the head preloads), the text contrast over the painting in both themes at
 // desktop and phone widths, the strip's motion and its pause control, and
@@ -91,7 +92,9 @@ test.describe('the painting', () => {
 // The glyphs are made transparent, the first viewport is captured once the
 // painting is decoded, and every pixel under the text is checked against the
 // ink the text is drawn in (its computed colour): each headline line's box,
-// the <em>, the header's wordmark and links, and the strip's text. The
+// the <em>, the lede's lines, the two text links under the CTAs, the header's
+// wordmark and links, and the strip's text. The CTAs are left out: each sits
+// on its own opaque fill. The
 // thresholds sit a hair under today's worst pixels (headline 2.84, at the top
 // of the "G" in the dark theme at 1440; <em> 3.25; header 4.76 worst and 5.20
 // mean; strip 5.30), so the guard holds now and trips when a veil is thinned
@@ -134,6 +137,15 @@ async function measure(page: Page) {
       target(`headline line ${n + 1}`, el, [el.getBoundingClientRect()]),
     );
     const em = document.querySelector('.hero-title em')!;
+    // The lede by its line boxes (a range over its text), not its block box,
+    // whose empty corners on a short last line would sample bare painting.
+    const ledeEl = document.querySelector('.hero-lede')!;
+    const range = document.createRange();
+    range.selectNodeContents(ledeEl);
+    const lede = target('lede', ledeEl, [...range.getClientRects()]);
+    const links = [...document.querySelectorAll('.hero-links a')].map((el) =>
+      target(`link "${el.textContent!.trim()}"`, el, [...el.getClientRects()]),
+    );
     const nav = [
       ...document.querySelectorAll('header.site-header .bar :is(.wordmark, .nav-link, .nav-trigger)'),
     ]
@@ -149,7 +161,14 @@ async function measure(page: Page) {
           el.checkVisibility(),
       )
       .map((el) => target(`strip "${el.textContent!.trim()}"`, el, [...el.getClientRects()]));
-    return { lines, em: target('em "run"', em, [...em.getClientRects()]), nav, strip };
+    return {
+      lines,
+      em: target('em "run"', em, [...em.getClientRects()]),
+      lede,
+      links,
+      nav,
+      strip,
+    };
   });
 
   // Transparent ink, with transitions off: base.css's reduced-motion rule
@@ -157,7 +176,7 @@ async function measure(page: Page) {
   // mid-change.
   await page.evaluate(() => {
     for (const el of document.querySelectorAll<HTMLElement>(
-      '.hero-title, .hero-title *, header.site-header .bar, header.site-header .bar *, .hero-facts, .hero-facts *',
+      '.hero-title, .hero-title *, .hero-lede, .hero-lede *, .hero-links, .hero-links *, header.site-header .bar, header.site-header .bar *, .hero-facts, .hero-facts *',
     )) {
       el.style.setProperty('transition', 'none', 'important');
       el.style.setProperty('color', 'transparent', 'important');
@@ -197,6 +216,8 @@ async function measure(page: Page) {
   return {
     lines: geo.lines.map(sample),
     em: sample(geo.em),
+    lede: sample(geo.lede),
+    links: geo.links.map(sample),
     nav: geo.nav.map(sample),
     strip: geo.strip.map(sample),
   };
@@ -224,6 +245,13 @@ for (const scheme of ['light', 'dark'] as const) {
         expect(line.worst, `${line.name} ${at}`).toBeGreaterThanOrEqual(2.8);
       }
       expect(m.em.worst, `${m.em.name} ${at}`).toBeGreaterThanOrEqual(3);
+      // The supporting copy is body-size text: AA on average, a hair under at
+      // its worst pixel, like the header links.
+      for (const t of [m.lede, ...m.links]) {
+        expect(t.mean, `${t.name} mean ${at}`).toBeGreaterThanOrEqual(4.5);
+        expect(t.worst, `${t.name} worst ${at}`).toBeGreaterThanOrEqual(4.3);
+      }
+      expect(m.links).toHaveLength(2);
       // The wordmark always; the links only on the desktop bar (a phone keeps
       // them in the drawer).
       expect(m.nav.length).toBeGreaterThan(size.width >= 1024 ? 1 : 0);
@@ -232,6 +260,13 @@ for (const scheme of ['light', 'dark'] as const) {
         expect(link.worst, `${link.name} worst ${at}`).toBeGreaterThanOrEqual(4.3);
       }
       expect(m.strip.length).toBeGreaterThan(0);
+      // The frameworks line is the strip at every width, on screen (sample()
+      // fails a target with no on-screen box); phones leave the figures out.
+      const names = m.strip.map((item) => item.name);
+      expect(names, `frameworks line ${at}`).toContain('strip "frameworks mapped"');
+      if (size.width < 720) {
+        expect(names.filter((n) => /^strip "(Stack layers|License)"$/i.test(n))).toEqual([]);
+      }
       for (const item of m.strip) {
         expect(item.worst, `${item.name} ${at}`).toBeGreaterThanOrEqual(4.3);
       }
@@ -242,6 +277,20 @@ for (const scheme of ['light', 'dark'] as const) {
 // --- The strip ----------------------------------------------------------------
 
 test.describe('the strip', () => {
+  test('phones keep the frameworks line in the first viewport and drop the figures', async ({
+    page,
+  }) => {
+    await page.setViewportSize(SIZES[1]);
+    await page.goto('/');
+    await expect(page.locator('.hero-facts .strip-kicker--link')).toBeInViewport({ ratio: 1 });
+    await expect(page.locator('.hero-facts .facts-window')).toBeInViewport();
+    await expect(page.locator('.hero-facts .facts--line')).toBeHidden();
+
+    await page.setViewportSize(SIZES[0]);
+    await expect(page.locator('.hero-facts .facts--line')).toBeVisible();
+    await expect(page.locator('.hero-facts .strip-kicker--link')).toBeInViewport({ ratio: 1 });
+  });
+
   test('scrolls when motion is allowed', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
@@ -263,14 +312,14 @@ test.describe('the strip', () => {
     ).toBe('none');
   });
 
-  test('the keyboard reaches the pause control from the CTA', async ({ page }) => {
+  test('the keyboard reaches the pause control from the last hero link', async ({ page }) => {
     await page.setViewportSize(SIZES[0]);
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
     const toggle = page.locator('.motion-toggle');
     // Off screen (clipped by the hero) until keyboard focus reaches it.
     await expect(toggle).not.toBeInViewport();
-    await page.locator('.hero-center a').focus();
+    await page.locator('.hero-links a').last().focus();
     await page.keyboard.press('Tab');
     await expect(toggle).toBeFocused();
     await expect(toggle).toBeInViewport();

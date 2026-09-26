@@ -3,6 +3,9 @@ https://www.aigovernanceengineer.com/* https://aigovernanceengineer.com/:splat 3
 # Block b-glossary (v0.5.0): the A-Z index moved to the book index; each term has its own page.
 /resources/glossary /bok/glossary 301
 /glossary /bok/glossary 301
+# Block orp-shell (open reference project): the nav calls the cases Incidents; /incidents redirects to them.
+/incidents /cases 301
+/incidents/* /cases/:splat 301
 # Machine translations hidden on 2026-09-25 (PUBLISHED_TRANSLATED_LOCALES in
 # src/i18n/locales.ts is empty): their old URLs go to the English page, with a
 # 302 because they will come back. /es/thesis, the hand translation, stays live

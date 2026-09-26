@@ -1,11 +1,12 @@
 // llms-corpus.ts: the documents behind /llms-full.txt, its slices
 // (/llms-full-<slice>.txt) and the Markdown alternates of the content pages
 // (/ai-governance.md, /bok/<slug>.md, /patterns/<slug>.md, /glossary/<slug>.md,
-// /cases/<id>.md, /resources/crosswalk/<pair>.md, /role.md, /thesis.md). One
-// builder per kind of page, so the three surfaces serialise a page the same way:
+// /cases/<id>.md, /resources/crosswalk/<pair>.md, /role.md, /thesis.md,
+// /research/<slug>.md). One builder per kind of page, so the three surfaces
+// serialise a page the same way:
 //
-//   - the pillar page, chapters, pattern pages and the Thesis are their
-//     Markdown sources, H1
+//   - the pillar page, chapters, pattern pages, the Thesis and the research
+//     notes (after a status line) are their Markdown sources, H1
 //     dropped (the caller re-emits it) and a chapter's "At a glance" points
 //     placed after its abstract, as the page shows them;
 //   - glossary terms, incident cases, the obligation register, the crosswalk,
@@ -49,6 +50,9 @@ import {
   mitLabel,
 } from '../data/harms';
 import { patternPath } from '../data/patterns';
+import { controlById, controlHref } from '../data/controls';
+import { personById } from '../data/people';
+import { researchPath } from '../data/research';
 import {
   analystDistinction,
   analystVsEngineer,
@@ -99,6 +103,7 @@ import { lastModified } from './jsonld';
 import { pageMeta, staticRoutes } from './llms-routes';
 import { readSource } from './md-parse';
 import { loadPatternPages } from './pattern-pages';
+import { loadResearchPages } from './research-pages';
 import { termDate } from './glossary-dates';
 import { gitDate } from './reading';
 import { sourceText, type Source } from './sources';
@@ -112,6 +117,8 @@ export interface CorpusDoc {
   description?: string;
   /** YYYY-MM-DD of the last commit to the page's source. */
   updated: string;
+  /** The document's own version, when it has one (a research note). */
+  version?: string;
   body: string;
 }
 
@@ -198,6 +205,44 @@ export async function thesisDoc(): Promise<CorpusDoc> {
     updated: updatedOf('../THESIS.md'),
     body: withoutTitle(source),
   };
+}
+
+let researchCache: CorpusDoc[] | undefined;
+
+const RESEARCH_STATUS: Readonly<Record<string, string>> = {
+  draft: 'Draft',
+  review: 'In review',
+  published: 'Published',
+};
+
+/**
+ * Every written research note in register order; the frontmatter is not part
+ * of `body`, which opens with a status line (version, state, review, author) so
+ * a reader of the Markdown or of /llms-full.txt knows what it is reading.
+ */
+export async function researchDocs(): Promise<CorpusDoc[]> {
+  if (researchCache) return researchCache;
+  const pages = await loadResearchPages();
+  researchCache = pages.map(({ entry, theme }) => {
+    const data = entry.data;
+    const review =
+      data.reviewers.length === 0
+        ? 'open for technical review, not yet reviewed'
+        : `reviewed by ${data.reviewers.map((id) => personById(id)?.name ?? id).join(', ')}`;
+    const authors = data.authors.map((id) => personById(id)?.name ?? id).join(', ');
+    const status = `> **Status:** ${RESEARCH_STATUS[data.status] ?? data.status} v${data.version}, ${review}. By ${authors}. Review it at ${abs('/contribute')}.`;
+    return {
+      title: data.title,
+      path: researchPath(theme),
+      description: data.summary,
+      updated: updatedOf(`../research/${theme.slug}.md`),
+      version: data.version,
+      body: `${status}
+
+${withoutTitle(entry.body ?? '')}`,
+    };
+  });
+  return researchCache;
 }
 
 /** The pillar page's Markdown source, relative to the repo root. */
@@ -295,6 +340,54 @@ export function caseDoc(entry: IncidentCase): CorpusDoc {
     return `- ${o.instrument} ${ref}: ${o.why}`;
   });
 
+  // The incident note, where the case has one: the same sections, in the same
+  // order, as the page renders them.
+  const refLine = (refs: IncidentCase['preventiveControls']) =>
+    (refs ?? [])
+      .map((ctl) => (ctl.patternId ? `[${ctl.name}](${abs(`/bok/patterns#${ctl.patternId}`)})` : ctl.name))
+      .join(' · ');
+  const moments = [
+    ['Preventive', entry.preventiveControls],
+    ['Detective', entry.detectiveControls],
+    ['Responsive', entry.responsiveControls],
+  ] as const;
+  const presentMoments = moments.filter(([, refs]) => refs !== undefined);
+  const note: string[] = [
+    ...(entry.systemBoundary ? ['## System boundary', entry.systemBoundary] : []),
+    ...(entry.controlAssumptions
+      ? [
+          '## Control assumptions',
+          'What the controls below take for granted. Challenge any of them.',
+          entry.controlAssumptions.map((a) => `- ${a}`).join('\n'),
+        ]
+      : []),
+    ...(presentMoments.length > 0
+      ? ['## Controls by moment', presentMoments.map(([label, refs]) => `- ${label}: ${refLine(refs)}`).join('\n')]
+      : []),
+    ...(entry.evidenceRequirements
+      ? [
+          '## Evidence requirements',
+          'The evidence each control must leave, written as acceptance criteria.',
+          entry.evidenceRequirements.map((r) => `- ${r}`).join('\n'),
+        ]
+      : []),
+    ...(entry.relatedControls
+      ? [
+          '## Related open controls',
+          'Draft control specifications from the open control profiles, open for technical review.',
+          entry.relatedControls
+            .map((id) => {
+              const control = controlById(id);
+              return control ? `- [${control.id}](${abs(controlHref(control.id))}) ${control.title}` : `- ${id}`;
+            })
+            .join('\n'),
+        ]
+      : []),
+    ...(entry.openQuestions
+      ? ['## Open questions', entry.openQuestions.map((q) => `- ${q}`).join('\n')]
+      : []),
+  ];
+
   // The "In short" passage is the first section, as on the page (GEO R1): it
   // is the passage written for answer engines to quote whole.
   const body = [
@@ -322,6 +415,7 @@ export function caseDoc(entry: IncidentCase): CorpusDoc {
     '## Obligations it touches today',
     'As of 2026-09-24. Mappings are illustrative, not a claim of conformity.',
     obligationLines.join('\n'),
+    ...note,
     '## How to read this case',
     casesDisclaimer,
     '## Sources',
@@ -845,6 +939,7 @@ async function fullDocs(): Promise<CorpusDoc[]> {
     pillarDoc(),
     ...withRole(chapters),
     await thesisDoc(),
+    ...(await researchDocs()),
     obligationsDoc(),
     frameworksDoc(),
     crosswalkDoc(),
@@ -868,7 +963,7 @@ export async function llmsFullText(id: SliceId | 'full'): Promise<string> {
     const patterns = (await patternDocs()).length;
     text = document([
       header(
-        `This file opens with the pillar page, What is AI governance?, then carries the complete text of the ${chapters} Body of Knowledge chapters, in reading order, with the ${patterns} pattern pages after chapter 05 and the role landing after chapter 06, then the Thesis, the obligation register, the frameworks, the crosswalk, the ${comparisons.length} framework comparisons, the ${cases.length} incident cases and the harms atlas. It is large; the same corpus is split into smaller files listed in ${index}.`,
+        `This file opens with the pillar page, What is AI governance?, then carries the complete text of the ${chapters} Body of Knowledge chapters, in reading order, with the ${patterns} pattern pages after chapter 05 and the role landing after chapter 06, then the Thesis, the research notes, the obligation register, the frameworks, the crosswalk, the ${comparisons.length} framework comparisons, the ${cases.length} incident cases and the harms atlas. It is large; the same corpus is split into smaller files listed in ${index}.`,
       ),
       ...docs.map(fullTextBlock),
     ]);

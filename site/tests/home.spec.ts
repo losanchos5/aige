@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { chaptersOrdered } from '../src/data/chapters';
 import { bookParts, countWord } from '../src/data/parts';
+import { work } from '../src/data/work';
 
 test.describe('home page', () => {
   test('hero shows the headline and its CTA; the loop section links the BoK', async ({ page }) => {
@@ -12,6 +13,55 @@ test.describe('home page', () => {
     await expect(
       page.locator('.loop-sec').getByRole('link', { name: 'Open the Body of Knowledge →' }),
     ).toHaveAttribute('href', '/bok');
+    await expect(
+      page.locator('.loop-sec .sec-link a[href="/controls"]'),
+    ).toHaveCount(1);
+  });
+
+  test('the hero carries its lede, two CTAs and two text links', async ({ page }) => {
+    await page.goto('/');
+    const hero = page.locator('.hero--field');
+    await expect(hero.locator('.hero-lede')).toHaveText(
+      'An open reference architecture for turning AI safety, risk and policy claims into eval gates, runtime controls and machine-verifiable evidence.',
+    );
+    const ctas = hero.locator('.hero-ctas a');
+    await expect(ctas).toHaveCount(2);
+    await expect(ctas.nth(0)).toHaveText('Explore the Stack');
+    await expect(ctas.nth(0)).toHaveAttribute('href', '/stack');
+    await expect(ctas.nth(0)).toHaveClass(/\bbtn-primary\b/);
+    await expect(ctas.nth(1)).toHaveText('Open controls');
+    await expect(ctas.nth(1)).toHaveAttribute('href', '/controls');
+    await expect(ctas.nth(1)).toHaveClass(/\bhero-btn-quiet\b/);
+    const links = hero.locator('.hero-links a');
+    await expect(links).toHaveCount(2);
+    // The arrows are aria-hidden, so the accessible names stay the bare labels.
+    await expect(
+      hero.getByRole('link', { name: 'Read the Thesis', exact: true }),
+    ).toHaveAttribute('href', '/thesis');
+    await expect(
+      hero.getByRole('link', { name: 'Frontier labs & evaluators', exact: true }),
+    ).toHaveAttribute('href', '/frontier');
+  });
+
+  test('"Where it operates" follows the stack with three surfaces and their links', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    const band = page.locator('#where-it-operates');
+    await expect(band.locator('.sec-title')).toHaveText('Where AI Governance Engineering operates.');
+    await expect(band.locator('.card')).toHaveCount(3);
+    await expect(band.locator('.card .title')).toHaveText(['Evals', 'Runtime', 'Assurance']);
+    // Link cards only take .lift; these cards are not links.
+    await expect(band.locator('.card.lift')).toHaveCount(0);
+    await expect(band.locator('a[href="/controls/evaluation-environment"]')).toHaveCount(1);
+    await expect(band.locator('a[href="/controls/agent-runtime"]')).toHaveCount(1);
+    await expect(band.locator('.sec-link a[href="/controls"]')).toHaveCount(1);
+    await expect(band.locator('.sec-link a[href="/frontier"]')).toHaveCount(1);
+    // It sits between the stack and the values.
+    const titles = await page.locator('main section.sec .sec-title').allTextContents();
+    const at = titles.findIndex((t) => t.startsWith('Where AI Governance Engineering'));
+    expect(titles[at - 1]).toMatch(/^A build order/);
+    expect(titles[at + 1]).toMatch(/^Eight values/);
   });
 
   test('the loop section, under the hero, holds the governance loop', async ({ page }) => {
@@ -92,11 +142,19 @@ test.describe('home page', () => {
     }
   });
 
-  test('the resource tiles include the topic crosswalk and the map', async ({ page }) => {
+  test('the resource tiles include the topic crosswalk, the map, the controls and the research notes', async ({
+    page,
+  }) => {
     await page.goto('/');
     const tiles = page.locator('.tiles');
     await expect(tiles.locator('a[href="/resources/crosswalk"]')).toHaveCount(1);
     await expect(tiles.locator('a[href="/map"]')).toHaveCount(1);
+    await expect(tiles.locator('a[href="/controls"]')).toHaveCount(1);
+    await expect(tiles.locator('a[href="/research"]')).toHaveCount(1);
+    const hrefs = await tiles.locator('a').evaluateAll((els) => els.map((a) => a.getAttribute('href')));
+    // Open controls second; Research notes right before the Reading list.
+    expect(hrefs[1]).toBe('/controls');
+    expect(hrefs.indexOf('/research')).toBe(hrefs.indexOf('/bok/reading-list') - 1);
   });
 
   test('the newsletter form sits before the closing band, with its Umami event', async ({
@@ -112,6 +170,15 @@ test.describe('home page', () => {
     await expect(submit).toHaveAttribute('data-umami-event-location', 'home');
     // Section order: resources, newsletter, then the closing band.
     await expect(page.locator('.nl-sec + .band')).toHaveCount(1);
+  });
+
+  test('the newsletter band lists the open work and links /contribute', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('.nl-sec .work-list > li')).toHaveCount(work.length);
+    for (const item of work) {
+      await expect(page.locator(`.nl-sec .work-list a[href="${item.href}"]`).first()).toBeVisible();
+    }
+    await expect(page.locator('.nl-sec .sec-link a[href="/contribute"]')).toHaveCount(1);
   });
 
   test('value cards are flat: no resting shadow and no lift (they are not links)', async ({ page }) => {

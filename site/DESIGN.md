@@ -169,8 +169,9 @@ needs no pause control; it also pauses while a step is active, and is absent und
   any mesh a `tone="tint"` band carries (Section's `mesh` on a tint band). A
   section's mesh fades over its top and bottom tenth (`mask-image`), so neighbouring meshes meet
   without a seam. On the home page no body section sits on the bare ground (Jordi, 2026-09-24):
-  loop `b` 0.5, questions `c` 0.5, stack tint + `a` 0.35, values `b` 0.45, role `a` 0.6, chapters
-  `c` 0.45, resources tint + `b` 0.35, newsletter `c` 0.35; neighbours never share a composition. One mesh per section, several per
+  loop `b` 0.5, questions `c` 0.5, stack tint + `a` 0.35, operates `c` 0.4, values `b` 0.45, role
+  `a` 0.6, chapters `c` 0.45, resources tint + `b` 0.35, newsletter `c` 0.35; neighbours never share
+  a composition. One mesh per section, several per
   page; never directly under a table or a node grid (the loop sits on its own opaque panel).
 - **`BookParts`** (`site/src/components/BookParts.astro`), the Body of Knowledge by part on the
   home: one `.card-lum` per part (no `.lift`: the card is not a link; its title links the part on
@@ -211,19 +212,65 @@ needs no pause control; it also pauses while a step is active, and is absent und
 - **`.hero--field`** (scoped in `site/src/pages/index.astro`, home only): the full-viewport
   (`min-height: 100svh`) hero: a `.hero-field` layer holding `.hero-canvas` (the WebGL gradient
   field, `public/hero-field.js`, with a static CSS radial-gradient fallback painted from the same
-  `--field-1..3` tokens for no-JS/no-WebGL and first paint), the centred `.hero-title` + CTA
-  (`.hero-center`), and the `.hero-facts` strip. `--muted` is re-scoped to `--ink-2` on it in
-  `effects.css`, same as `.sec--mesh`/`.hero--page`.
+  `--field-1..3` tokens for no-JS/no-WebGL and first paint), the centred `.hero-center` block, and
+  the `.hero-facts` strip. `--muted` is re-scoped to `--ink-2` on it in `effects.css`, same as
+  `.sec--mesh`/`.hero--page`. The `.hero-center` block, in order (each child rises in with the
+  `.hero-in` stagger, `--i` 0 to 3, transform only): the `.hero-title`; the `.hero-lede` (one
+  sentence, body face at 17 to 20px, weight 500, `max-width: 56ch`, ink `--hero-copy` = `--ink`,
+  white over the painting in the dark theme, never dimmed); `.hero-ctas`, two buttons: the
+  gradient primary (`.btn-primary.btn-glow`, "Explore the Stack") and `.hero-btn-quiet` ("Open
+  controls", a `.btn` on an opaque `--bg` plate with the `--ink` border and label, so it never
+  depends on the painting); and `.hero-links`, two text links (the Thesis, the frontier route) in
+  mono at `--fs-small`, underlined, `--hero-copy`, arrows `aria-hidden`. Over the painting the halo
+  is 90% x 60% at 44% (phones 160% x 56% at 34%), sized so the lede and the links hold 4.5:1 on
+  average and 4.3:1 at their worst pixel in both themes (`tests/hero-art.spec.ts`); on phones the
+  block tightens (`gap: --s-5`, less padding, the buttons on one row) so the strip stays in the
+  first viewport at 390x844.
 - **`.hero-facts`** (`pages/index.astro`), the strip of figures under the headline: label | value
   pairs computed from the content modules (stack layers, workflows, chapters, values, frameworks,
   patterns, BoK version, license), doubled into an `aria-hidden`+`inert` copy for the seamless
   marquee, with the keyboard-only `.motion-toggle` pause control (see Motion tokens). Reduced motion or no JS
-  keeps it a static, centred, wrapping list.
+  keeps it a static, centred, wrapping list. The home uses the `frameworks` variant
+  (`components/HeroStrip.astro`): the "N frameworks mapped" link and its wordmark marquee, then the
+  figures as a thin still line (`.facts--line`). Phones (`max-width: 719px`, the hero's phone
+  breakpoint) drop the figures line and keep the frameworks line, so the strip is one line inside
+  the first viewport at 390x844 (`tests/hero-art.spec.ts` checks the frameworks link is on screen
+  there); desktop and tablet keep both.
 - **Header overlay mode** (`Header.astro` prop `overlay`, threaded from `Base.astro`/`Marketing.astro`
   `overlayHeader`, home only), `data-overlay` makes the bar `position: fixed`, fully transparent (no
   ground, blur, hairline or shadow, `--muted` re-scoped to `--ink-2`) until `.is-scrolled` (`ui.js`,
   >8px), when it falls back to the normal frosted/solid bar. The shader keeps the header's `--ink-2`
   text ≥ 5:1 wherever it floats over the field.
+
+### Open reference primitives
+
+Shared by `/controls`, the control profiles, `/frontier`, `/research`, `/contribute` and `/cases`
+(open-reference-project, 2026-09-26). None ships a script or an animation.
+
+- **`FlowDiagram`** (`site/src/components/FlowDiagram.astro`), a chain of 2 to 7 steps in HTML and
+  CSS: an `<ol aria-label>` inside `figure.flow`, each step a `.flow-node` (link or span) with an
+  optional layer swatch (`data-layer`, `--l1..--l5` fill with its `-ink` hairline) and a `sub`
+  line. A container query picks the layout from the figure's own width: a column below 760px, a
+  row from 760px (from 1000px when there are more than five steps, `data-wide`). The arrows are
+  empty CSS pseudo-elements in an opaque wire ink; labels stay at 16px on a phone. Class names
+  never use the `figure-*`, `figc` or `diagram*` families (their stylesheets ship per page).
+- **`StatusLine`** (`StatusLine.astro`), the version and review state under a title, never above
+  one: `v0.1 · Draft · Open for technical review · Updated 26 Sep 2026`, built on `.meta` but in
+  sentence case and `--ink-2`, with the dot in the state's layer ink (draft `--l4-ink`, in review
+  `--l1-ink`, published/stable `--l5-ink`, retired `--l3-ink`). With no reviewers it always says
+  "Open for technical review".
+- **`Provenance`** (`Provenance.astro`), `nav.prov` of pills in the `EditOnGitHub` style: version,
+  DOI, cite, edit on GitHub, open an issue (`data-umami-event="open-issue"`).
+- **`ContributeCta`** (`ContributeCta.astro`), one `.btn.btn-primary` that opens the GitHub issue
+  form for its `kind` (control, assumption, implementation, mapping, note, incident) with the
+  title prefilled, plus a text link to `/contribute`. No heading. An `<aside aria-label>` by
+  default; `landmark={false}` renders a `<div>` where the call repeats per record.
+- **`OpenWork`** (`OpenWork.astro`), `ol.work-list` from `data/work.ts`: title link, state with a
+  dot, version, date, one sentence; text in `--ink-2`, so it reads on any ground. Only true states.
+- **`ControlRecord`** (`ControlRecord.astro`), one control as `section.ctl[data-control]` with the
+  anchor on its H2 (inside `.prose`, for the TOC) and the record as a `dl.cs-facts` (case-page
+  style from `styles/harms.css`); the foot links the control's JSON
+  (`data-umami-event="control-download"`) and its review form.
 
 ## Hard constraints
 

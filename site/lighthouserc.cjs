@@ -35,6 +35,8 @@ module.exports = {
         '/agents',
         '/for',
         '/for/engineers',
+        '/frontier',
+        '/controls/evaluation-environment',
       ].map((path) => `http://localhost:${PORT}${path}`),
       settings: {
         preset: 'desktop',

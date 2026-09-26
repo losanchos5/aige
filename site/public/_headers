@@ -43,6 +43,12 @@
 /schemas/examples/*
   ! Content-Type
   Content-Type: application/json; charset=utf-8
+/controls/examples/*
+  ! Link
+  X-Robots-Tag: noindex
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
 /api/v1/*
   ! Link
   X-Robots-Tag: noindex
@@ -105,6 +111,12 @@
 /cases/*.md
   ! Link
   Link: <https://aigovernanceengineer.com/cases/:splat>; rel="canonical"
+/controls/*.md
+  ! Link
+  Link: <https://aigovernanceengineer.com/controls/:splat>; rel="canonical"
+/research/*.md
+  ! Link
+  Link: <https://aigovernanceengineer.com/research/:splat>; rel="canonical"
 /glossary/*.md
   ! Link
   Link: <https://aigovernanceengineer.com/glossary/:splat>; rel="canonical"

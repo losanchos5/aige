@@ -1,0 +1,189 @@
+---
+// /research/<slug>: one page per written research note, rendered from
+// research/<slug>.md with the reading layout (Doc, no chapter rail): breadcrumb,
+// on-this-page TOC, the note's status line (version, state, review), its own
+// numbered sources (rehype-citations), then the controls and patterns it
+// argues for, the review call and a cite block that carries the note's own
+// version. lib/research-pages.ts fails the build when a note, its theme in
+// data/research.ts and the people, controls and patterns it names disagree.
+// No Byline: the ChapterHeader already names the author under the H1.
+import { render } from 'astro:content';
+import Doc from '../../layouts/Doc.astro';
+import StatusLine from '../../components/StatusLine.astro';
+import PillarLink from '../../components/PillarLink.astro';
+import ContributeCta from '../../components/ContributeCta.astro';
+import Citation from '../../components/Citation.astro';
+import { site } from '../../data/site';
+import { controlById, controlHref } from '../../data/controls';
+import { getPatternBySlug, patternPath } from '../../data/patterns';
+import { personById } from '../../data/people';
+import { researchPath, researchProblems } from '../../data/research';
+import { loadResearchPages, researchCitations, type ResearchPage } from '../../lib/research-pages';
+import { gitCreated, gitDate } from '../../lib/reading';
+import { authorNodes, doiIdentifier, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+
+export async function getStaticPaths() {
+  const problems = researchProblems();
+  if (problems.length > 0) {
+    throw new Error(`research: ${problems.length} problem(s) in the themes:\n${problems.join('\n')}`);
+  }
+  const pages = await loadResearchPages();
+  return pages.map((page) => ({ params: { slug: page.theme.slug }, props: { page } }));
+}
+
+interface Props {
+  page: ResearchPage;
+}
+
+const { page } = Astro.props;
+const { entry, theme } = page;
+const d = entry.data;
+const { Content, headings } = await render(entry);
+
+const path = researchPath(theme);
+const pageUrl = new URL(path, site.url).href;
+const editPath = `research/${theme.slug}.md`;
+// The note's own dates win over git's: the frontmatter says when the text was
+// first published and last revised; a later commit (a typo, a link) moves the
+// modified date forward, never back.
+const noteUpdated = d.updated ?? d.date;
+const published = [d.date, gitCreated(`../${editPath}`)].sort()[0] ?? d.date;
+const updated = [gitDate(`../${editPath}`), noteUpdated].sort().at(-1) ?? noteUpdated;
+
+const authors = d.authors.map((id) => personById(id)).filter((p) => p !== undefined);
+const reviewers = d.reviewers
+  .map((id) => personById(id))
+  .filter((p) => p !== undefined)
+  .map((p) => ({ name: p.name, href: p.href }));
+const controls = d.relatedControls.map((id) => controlById(id)).filter((c) => c !== undefined);
+const patternRows = d.relatedPatterns
+  .map((slug) => getPatternBySlug(slug))
+  .filter((p) => p !== undefined);
+
+const crumbs = [{ label: 'Research notes', href: '/research' }, { label: d.title }];
+
+// After the note's own headings (Abstract ... Sources), the sections this page adds.
+const related = [
+  ...(controls.length > 0 ? [{ depth: 2, slug: 'related-controls', text: 'Related controls' }] : []),
+  ...(patternRows.length > 0 ? [{ depth: 2, slug: 'related-patterns', text: 'Related patterns' }] : []),
+  { depth: 2, slug: 'review-this-note', text: 'Review this note' },
+  { depth: 2, slug: 'cite', text: 'Cite this note' },
+];
+
+const STATUS_LABEL: Readonly<Record<typeof d.status, string>> = {
+  draft: 'Draft',
+  review: 'In review',
+  published: 'Published',
+};
+
+const citations = researchCitations(entry.body ?? '');
+
+const jsonLd = [
+  {
+    '@type': 'ScholarlyArticle',
+    '@id': `${pageUrl}#article`,
+    headline: d.title,
+    name: d.title,
+    description: d.summary,
+    url: pageUrl,
+    mainEntityOfPage: pageUrl,
+    inLanguage: 'en',
+    datePublished: published,
+    dateModified: updated,
+    version: d.version,
+    creativeWorkStatus: STATUS_LABEL[d.status],
+    image: new URL('/og/research.png', site.url).href,
+    author: authors.map((person) => ({ '@id': person.jsonLdId ?? `${site.url}${person.href}` })),
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    identifier: doiIdentifier(
+      site.conceptDoi,
+      'Concept DOI of the archived project; the note has no DOI of its own yet',
+    ),
+    ...(d.keywords && d.keywords.length > 0 ? { keywords: d.keywords.join(', ') } : {}),
+    ...(citations.length > 0 ? { citation: citations } : {}),
+  },
+  ...authorNodes,
+];
+---
+
+<Doc
+  title={d.title}
+  summary={d.summary}
+  description={d.summary}
+  crumbs={crumbs}
+  headings={[...headings, ...related]}
+  updated={updated}
+  editPath={editPath}
+  sidebar={false}
+  siteVersion={false}
+  image="/og/research.png"
+  jsonLd={jsonLd}
+  article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
+>
+  <StatusLine version={d.version} status={d.status} reviewers={reviewers} />
+  {/* Hub and spoke: each note points at the /ai-governance pillar once. */}
+  <PillarLink lead="A technical note on one open question of" anchor="AI governance engineering" />
+  <Content />
+  {
+    controls.length > 0 && (
+      <section aria-labelledby="related-controls">
+        <h2 id="related-controls">Related controls</h2>
+        <p>
+          The draft controls this note argues for. Each is a draft control specification, open for
+          technical review; none is a claim of conformity.
+        </p>
+        <ul>
+          {controls.map((c) => (
+            <li>
+              <a href={controlHref(c.id)}>
+                {c.id} {c.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  {
+    patternRows.length > 0 && (
+      <section aria-labelledby="related-patterns">
+        <h2 id="related-patterns">Related patterns</h2>
+        <p>The patterns of the catalogue that build the controls this note names.</p>
+        <ul>
+          {patternRows.map((p) => (
+            <li>
+              <a href={patternPath(p)}>{p.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  <section aria-labelledby="review-this-note">
+    <h2 id="review-this-note">Review this note</h2>
+    <p>
+      {
+        reviewers.length === 0
+          ? 'This note has not been reviewed yet. '
+          : `Reviewed by ${reviewers.map((r) => r.name).join(', ')}. `
+      }
+      If a claim is wrong, unsourced or overstated, say which one and why; a review that changes
+      the note is credited by name.
+    </p>
+    <ContributeCta kind="note" title={d.title} />
+  </section>
+  <section aria-labelledby="cite">
+    <h2 id="cite">Cite this note</h2>
+    <p>Cite the note with its version: a later version may change what it argues.</p>
+    <Citation
+      title={d.title}
+      url={path}
+      kind="page"
+      label="Cite this note"
+      version={d.version}
+      doi={site.conceptDoi}
+    />
+  </section>
+</Doc>

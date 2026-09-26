@@ -9,7 +9,9 @@
 // usage: <Citation title slug />) or `url` (any page, absolute or site-relative).
 // `kind` sets the default label ("Cite this obligation") and the BibTeX shape;
 // it defaults to `chapter` when a slug is given and `page` otherwise. `label`
-// overrides the summary text.
+// overrides the summary text. `version` and `doi` cite an item with its own
+// version (a research note) and a DOI other than this release's version DOI;
+// without them the reference carries the Body of Knowledge version and DOI.
 import { site } from '../data/site';
 import { translator } from '../i18n/ui';
 
@@ -23,9 +25,28 @@ interface Props {
   label?: string;
   /** Page language: translates the box's labels (the reference stays as cited). */
   lang?: string;
+  /** The cited item's own version (e.g. a research note's 0.1.0); default: the Body of Knowledge version. */
+  version?: string;
+  /** DOI to cite (e.g. the concept DOI); default: this release's version DOI (site.doi). */
+  doi?: string;
 }
 
-const { title, slug, url: urlProp, kind: kindProp, label: labelProp, lang = 'en' } = Astro.props;
+const {
+  title,
+  slug,
+  url: urlProp,
+  kind: kindProp,
+  label: labelProp,
+  lang = 'en',
+  version: itemVersion,
+  doi: doiProp,
+} = Astro.props;
+const doi = doiProp ?? site.doi;
+// An item with its own version carries it after its title; the work is then
+// cited without the Body of Knowledge version, which would read as the item's.
+const version = itemVersion ?? site.bokVersion;
+const itemNote = itemVersion ? ` (v${itemVersion})` : '';
+const workNote = itemVersion ? '' : ` (v${site.bokVersion})`;
 const kind: CitationKind = kindProp ?? (slug ? 'chapter' : 'page');
 const t = translator(lang);
 // The copy buttons say "Copied" in the page language (ui-doc.js, cite.js); an
@@ -52,7 +73,7 @@ const cleanTitle = kind === 'chapter' ? title.replace(/^\d+\.\s*/, '') : title;
 // APA marks a data set in square brackets after the title.
 const typeNote = kind === 'dataset' ? ' [Data set]' : '';
 const work = 'AI Governance Engineering: The Thesis & Body of Knowledge';
-const reference = `García Aibar, J. (2026). ${cleanTitle}${typeNote}. In ${work} (v${site.bokVersion}). https://doi.org/${site.doi}. ${url}. ${site.license}`;
+const reference = `García Aibar, J. (2026). ${cleanTitle}${itemNote}${typeNote}. In ${work}${workNote}. https://doi.org/${doi}. ${url}. ${site.license}`;
 
 // BibTeX for the whole work. A chapter keeps the original entry (the chapter
 // field names it); any other page is cited as its own titled item published in
@@ -64,20 +85,20 @@ const bibtex =
   title   = {{AI Governance Engineering: The Thesis \\& Body of Knowledge}},
   chapter = {${cleanTitle}},
   year    = {2026},
-  version = {${site.bokVersion}},
-  doi     = {${site.doi}},
+  version = {${version}},
+  doi     = {${doi}},
   url     = {${url}},
-  note    = {Version ${site.bokVersion}}
+  note    = {Version ${version}}
 }`
     : `@misc{aige2026${kind},
   author       = {${site.authors.join(' and ')}},
   title        = {{${cleanTitle}}},
   howpublished = {In AI Governance Engineering: The Thesis \\& Body of Knowledge},
   year         = {2026},
-  version      = {${site.bokVersion}},
-  doi          = {${site.doi}},
+  version      = {${version}},
+  doi          = {${doi}},
   url          = {${url}},
-  note         = {Version ${site.bokVersion}}
+  note         = {Version ${version}}
 }`;
 
 const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
@@ -88,9 +109,9 @@ const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encod
     <summary>{label}</summary>
     <div class="cite-body">
       <p class="cite-apa" data-cite-text>
-        García Aibar, J. (2026). <em>{cleanTitle}</em>{typeNote}. In <em>AI Governance
-        Engineering: The Thesis &amp; Body of Knowledge</em> (v{site.bokVersion}).{' '}
-        <a href={`https://doi.org/${site.doi}`}>https://doi.org/{site.doi}</a>. {url}. {site.license}
+        García Aibar, J. (2026). <em>{cleanTitle}</em>{itemNote}{typeNote}. In <em>AI Governance
+        Engineering: The Thesis &amp; Body of Knowledge</em>{workNote}.{' '}
+        <a href={`https://doi.org/${doi}`}>https://doi.org/{doi}</a>. {url}. {site.license}
       </p>
       <button
         type="button"

@@ -20,7 +20,7 @@ const tags: Record<Props['kind'], string> = {
 };
 ---
 
-<aside class:list={['callout', `callout-${kind}`, className]}>
+<aside class:list={['callout', `callout-${kind}`, className]} aria-label={title}>
   <p class="tag">{tags[kind]}</p>
   <p class="title">{title}</p>
   <div class="body"><slot /></div>

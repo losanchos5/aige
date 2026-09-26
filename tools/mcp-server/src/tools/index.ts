@@ -4,6 +4,7 @@ import type { McpServer } from '@modelcontextprotocol/server';
 
 import { registerBok } from './bok.js';
 import type { ToolDeps } from './common.js';
+import { registerControls } from './controls.js';
 import { registerCrosswalk } from './crosswalk.js';
 import { registerGlossary } from './glossary.js';
 import { registerObligations } from './obligations.js';
@@ -22,6 +23,8 @@ export const TOOL_NAMES = [
   'list_templates',
   'get_template',
   'search_bok',
+  'list_controls',
+  'get_control',
 ] as const;
 
 export function registerTools(server: McpServer, deps: ToolDeps): void {
@@ -31,4 +34,5 @@ export function registerTools(server: McpServer, deps: ToolDeps): void {
   registerPatterns(server, deps);
   registerTemplates(server, deps);
   registerBok(server, deps);
+  registerControls(server, deps);
 }

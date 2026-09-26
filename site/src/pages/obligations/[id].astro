@@ -2,8 +2,8 @@
 // /obligations/<id>: one page per obligation-register row, keyed by its stable
 // id in lower case. Everything on the page is data that already exists: the row
 // (src/data/frameworks.ts, faithful to chapter 08), the patterns it lists, the
-// crosswalk topics that join it, the cases that cite the same EU AI Act article
-// and the section of chapter 08 it comes from. The sitemap dates the page by the
+// crosswalk topics that join it, the cases that cite the same EU AI Act article,
+// the open controls whose evidence it names (lib/cross-links.ts) and the section of chapter 08 it comes from. The sitemap dates the page by the
 // row's `reviewed` field (astro.config.ts), not by git. The header figure is the
 // obligation-to-evidence chain (components/obligations/EvidenceChain.astro), and
 // the page's Open Graph card is its own (/og/obligations/<id>.png). Each fact is
@@ -44,6 +44,8 @@ import {
   obligationApiPath,
 } from '../../lib/obligations';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { controlsForObligation } from '../../lib/cross-links';
+import { controlHref, profileBySlug } from '../../data/controls';
 import { comparisonsFor } from '../../lib/compare-links';
 import {
   authorNodes,
@@ -77,6 +79,7 @@ const topics = crosswalkFor(row);
 // The "<A> vs <B>" pages that compare this row's instrument (ONPAGE R2).
 const compared = comparisonsFor(fw.id);
 const relatedCases = casesFor(row);
+const openControls = controlsForObligation(row.id);
 const { prev, next } = neighbours(row);
 const layerOf = (n: number) => layers.find((layer) => layer.n === n);
 
@@ -334,6 +337,28 @@ const jsonLd = [
                 {relatedCases.map((c) => (
                   <li>
                     <a href={`/cases/${c.id}`}>{c.title}</a> ({c.year})
+                  </li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+
+        {
+          openControls.length > 0 && (
+            <>
+              <h2 id="controls">Open controls that evidence it</h2>
+              <p>
+                Draft controls in the <a href="/controls">open control profiles</a> that map to
+                this row: each states a requirement and the evidence it must leave behind.
+              </p>
+              <ul>
+                {openControls.map((c) => (
+                  <li>
+                    <a href={controlHref(c.id)}>
+                      <code>{c.id}</code> {c.title}
+                    </a>{' '}
+                    ({profileBySlug(c.profile)?.shortTitle ?? c.profile} profile)
                   </li>
                 ))}
               </ul>
