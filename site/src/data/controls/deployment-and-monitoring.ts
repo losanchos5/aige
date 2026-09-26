@@ -46,6 +46,7 @@ import { threatSources, SRC } from '../threats';
 import { getPatternBySlug } from '../patterns';
 import { site } from '../site';
 import { AIUC1_REQUIREMENTS } from './evaluation-environment';
+import { AI_ACT_ART4A } from './data-admission-and-privacy';
 
 const PROFILE = 'deployment-and-monitoring';
 
@@ -80,7 +81,8 @@ export const observationExamples: readonly ObservationExample[] = [];
 // ---------------------------------------------------------------------------
 // References. The Body of Knowledge first (chapter sections, pattern pages),
 // then rows already verified elsewhere on the site (sources/SOURCES.md
-// chapters 15 to 17, ../threats.ts threatSources), reused with the same URL.
+// chapters 15 to 17, ../threats.ts threatSources), reused with the same URL;
+// the Art. 4a row is the data profile's own Source object.
 
 /** A section of a Body of Knowledge chapter, as a numbered reference. */
 function chapter(slug: string, number: string, title: string, anchor: string, heading: string): Source {
@@ -172,7 +174,6 @@ function aiActArticle(article: string, gloss: string): Source {
 
 const ART = {
   4: aiActArticle('4', 'providers and deployers take measures to support the AI literacy of their staff'),
-  '4a': aiActArticle('4a', 'conditions for processing special categories of personal data for bias detection and correction; para. 2 covers deployers of high-risk systems'),
   5: aiActArticle('5', 'prohibited practices, binding on deployers as well as providers'),
   9: aiActArticle('9', 'risk management system across the lifecycle of a high-risk system'),
   13: aiActArticle('13', 'instructions for use: capabilities and limitations of performance; pre-determined changes; human oversight measures; expected lifetime and maintenance; log collection'),
@@ -615,7 +616,7 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
       'Checks that pass leave no record, so the absence of breaches cannot be shown.',
     ],
     scope:
-      'Every AI system in production, built or procured: providers of high-risk systems keep a post-market monitoring plan, and deployers monitor operation on the basis of the instructions for use.',
+      'Every AI system in production, built or procured: providers of high-risk systems keep a post-market monitoring plan, and deployers monitor operation on the basis of the instructions for use. Whether each check is still firing is the live control status of AIGE-CTL-ASSURE-005.',
     enforcementPoints: ['runtime', 'periodic'],
     evidence: [
       {
@@ -696,7 +697,7 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
       nistAiRmf: ['MEASURE 2.11'],
       owasp: [],
     },
-    references: [CH16.monitoring, CH15.fairness, PATTERN.monitor, ART[15], ART['4a'], ISO_SOURCE, NIST_RMF],
+    references: [CH16.monitoring, CH15.fairness, PATTERN.monitor, ART[15], AI_ACT_ART4A, ISO_SOURCE, NIST_RMF],
     implementationNotes: [
       'Where the group attribute is not held at runtime, choose between a consented sample or panel, periodic audits under the Art. 4a conditions, or outcome-free rates with the attribute joined in a secured environment.',
       'The contest channel is a sensor: complaints, appeals and explanation requests by group, with their outcomes, feed the same threshold and issue path as every other signal.',

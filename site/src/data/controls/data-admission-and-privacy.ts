@@ -168,7 +168,7 @@ const AI_ACT_ART10: Source = {
   verified: 'primary',
 };
 
-const AI_ACT_ART4A: Source = {
+export const AI_ACT_ART4A: Source = {
   title: 'Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27, Arts. 4a and 10',
   gloss: 'as amended by Reg. (EU) 2026/1744: Art. 10(5) deleted; Art. 4a inserted for special-category data in bias detection and correction',
   publisher: 'Publications Office of the EU (EUR-Lex)',
