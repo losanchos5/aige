@@ -32,7 +32,15 @@ const DEPTHS = ['specified', 'derived', 'stub'] as const;
 /** Find a control by id (any case, with or without the AIGE- prefix), page or JSON URL, or title. */
 export function findControl(rows: ControlRecord[], wanted: string): ControlRecord | undefined {
   const raw = wanted.trim();
-  const last = (raw.split(/[/#?]/).filter((part) => part !== '').pop() ?? raw).replace(/\.json$/i, '');
+  // A URL keeps its fragment (the page anchor) or else its path; the query never counts.
+  let rest = raw.replace(/\?[^#]*/, '');
+  try {
+    const url = new URL(raw);
+    rest = url.hash ? url.hash.slice(1) : url.pathname;
+  } catch {
+    // Not a URL: an id, a bare path or a title.
+  }
+  const last = (rest.split(/[/#]/).filter((part) => part !== '').pop() ?? raw).replace(/\.json$/i, '');
   const key = last.toUpperCase();
   const title = slugKey(raw);
   return (
