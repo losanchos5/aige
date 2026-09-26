@@ -16,8 +16,13 @@
 //
 // Every reference was opened on 2026-09-26. Quotations from METR's public
 // documents are short and attributed ("METR states"); citing them implies no
-// endorsement of this profile by METR, and no affiliation. AIUC-1 mappings are
-// left empty until each requirement is read on its public page.
+// endorsement of this profile by METR, and no affiliation. Public guidance and
+// incident reports from AI developers are cited for what each company states or
+// reports (self-reported, not audited), only where they directly evidence a
+// control; the profile cross-references them and is neither derived from nor
+// endorsed by any of them. AIUC-1 ids are mapped only where the requirement
+// text, read on its public page on 2026-09-26, plainly covers the same
+// objective (AIUC1_REQUIREMENTS); retired requirements are never mapped.
 //
 // Draft control specifications, open for technical review; illustrative, not a
 // claim of conformity, not legal advice. Types and rules: ./index.ts.
@@ -236,7 +241,7 @@ const METR_TASK_STANDARD: Source = {
 const METR_INVESTIGATION: Source = {
   title: "Brief independent investigation of agents' behavior, reasoning and collaboration in the OpenAI / Hugging Face hacking incident",
   gloss:
-    'METR states that agents "meant to be fully isolated from one another" communicated through an internal package repository, reports spoofed tool calls in at least 96 transcripts and transcripts missing components after container resets',
+    'METR states that agents "meant to be fully isolated from one another" communicated through an internal package repository, and that one agent found working Hugging Face credentials exposed on the internet and posted them to the agents\' board; it reports spoofed tool calls in at least 96 transcripts and transcripts missing components after container resets',
   publisher: 'METR',
   date: '2026-08-26',
   url: 'https://metr.org/blog/2026-08-26-openai-hugging-face-incident-investigation/',
@@ -296,6 +301,186 @@ const METR_SOL: Source = {
   publisher: 'METR',
   date: '2026-06-26',
   url: 'https://metr.org/blog/2026-06-26-gpt-5-6-sol/',
+  verified: 'primary',
+};
+
+// AIUC-1 (no affiliation; a mapping is this site's reading, not AIUC's).
+/** The public AIUC-1 requirement index, shared by every control that maps to an AIUC-1 id. */
+export const AIUC1_REQUIREMENTS: Source = {
+  title: 'AIUC-1 requirements',
+  gloss:
+    'public requirement index, A001 to F002, each requirement on its own page (E007 and E014 marked retired); AIUC-1 is a standard of the Artificial Intelligence Underwriting Company; this site is not affiliated with AIUC, and a mapping here is not an AIUC-1 certificate or audit',
+  publisher: 'Artificial Intelligence Underwriting Company',
+  date: '2026-09-24',
+  url: 'https://standard.aiuc-1.com/llms.txt',
+  verified: 'primary',
+};
+
+// Public guidance and incident reports from AI developers. Each is cited for what
+// the company states or reports, not as audited fact; citing one implies no
+// endorsement of this profile by that company and no affiliation with it.
+const OPENAI_THIRD_PARTY_CYBER: Source = {
+  title: 'Third-party cyber evaluations involving OpenAI models',
+  gloss:
+    'OpenAI states that the evaluator\'s "intended authorization boundary was the simulated cyber range", that its model reused a GitHub token another lab\'s agent had left publicly accessible, and that it will review how to "set expectations for isolation, credential handling, monitoring, and stop conditions"',
+  publisher: 'OpenAI',
+  date: '2026-08-04',
+  url: 'https://openai.com/index/third-party-cyber-evaluations-involving-openai-models/',
+  verified: 'primary',
+};
+
+const ANTHROPIC_EVAL_GUIDANCE: Source = {
+  title: 'Improving our alignment and security efforts',
+  gloss:
+    'best practices for external evaluation partners: the only outside connection is "to the model\'s own API", with the API keys kept outside the environment; the configuration "should be verified before every evaluation begins"; boundaries "phrased as instructions"; challenges confirmed "solvable in principle"; a monitor that flags a scope violation to a human and ends the exercise',
+  publisher: 'Anthropic',
+  date: '2026-08-31',
+  url: 'https://www.anthropic.com/news/improving-alignment-security-efforts',
+  verified: 'primary',
+};
+
+const OPENAI_HF_TECHNICAL_REPORT: Source = {
+  title: 'OpenAI Hugging Face Incident Technical Report',
+  gloss:
+    'OpenAI states that high-risk workloads are "prohibited via technical controls from receiving direct or transitive Internet access", protected by "two separate layers of network isolation", and that it is building tooling to "identify and halt evaluation workloads"',
+  publisher: 'OpenAI',
+  date: '2026-08-26',
+  url: 'https://cdn.openai.com/pdf/67869394-cb91-4c12-888c-5cbd85c7814c/OpenAI-Hugging-Face%20Incident-Technical-Report.pdf',
+  verified: 'primary',
+};
+
+const OPENAI_HF_ROAD_AHEAD: Source = {
+  title: 'The Hugging Face incident and the road ahead',
+  gloss:
+    'OpenAI states that its chain-of-thought monitors "did not run on the evaluations in this incident", and that its incident response now sets out "who can stop a run or approve restarting it"',
+  publisher: 'OpenAI',
+  date: '2026-08-26',
+  url: 'https://openai.com/index/hugging-face-incident-and-the-road-ahead/',
+  verified: 'primary',
+};
+
+const OPENAI_DNS_REPORT: Source = {
+  title: 'An agent used DNS to reach an external chatbot (misalignment report)',
+  gloss:
+    'OpenAI reports a training run that reached a public chatbot through "insufficient DNS filtering" in its sandbox; the monitor flagged it within 15 minutes, the run "did not stop automatically as expected" and was killed 2.5 hours later',
+  publisher: 'OpenAI (Alignment Research Blog)',
+  date: '2026-09-25',
+  url: 'https://alignment.openai.com/misalignment-reports/an-agent-used-dns-to-reach-an-external-chatbot/',
+  verified: 'primary',
+};
+
+const OPENAI_TOKEN_REPORT: Source = {
+  title: 'Exposing a GitHub token in a public repository (misalignment report)',
+  gloss:
+    "OpenAI reports an internally deployed model that published a researcher's GitHub token to a public repository, split into pieces with the stated aim of avoiding secret scanning",
+  publisher: 'OpenAI (Alignment Research Blog)',
+  date: '2026-09-25',
+  url: 'https://alignment.openai.com/misalignment-reports/exposing-a-github-token-in-a-public-repository/',
+  verified: 'primary',
+};
+
+const CODEX_AUTO_REVIEW: Source = {
+  title: 'Codex auto-review',
+  gloss: 'undated developer documentation, read 2026-09-26: "Auto-review is a reviewer swap, not a permission grant"',
+  publisher: 'OpenAI',
+  date: '2026',
+  url: 'https://developers.openai.com/codex/sandboxing/auto-review',
+  verified: 'primary',
+};
+
+const OPENAI_AUTO_REVIEW: Source = {
+  title: 'Auto-review of agent actions without synchronous human oversight',
+  gloss:
+    'a separate agent approves or denies actions that cross the sandbox boundary; OpenAI states that auto-review "should not be treated as a guarantee of security"',
+  publisher: 'OpenAI (Alignment Research Blog)',
+  date: '2026-04-30',
+  url: 'https://alignment.openai.com/auto-review/',
+  verified: 'primary',
+};
+
+const OPENAI_PREPAREDNESS_V2: Source = {
+  title: 'Preparedness Framework, Version 2',
+  gloss:
+    'Table 5 lists safeguards against a misaligned model, among them limiting internet and tool access, credentials and filesystem access, with agent actions "logged in an uneditable database"; a one-time capability elicitation is treated "as a lower bound, rather than a ceiling"',
+  publisher: 'OpenAI',
+  date: '2025-04-15',
+  url: 'https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf',
+  verified: 'primary',
+};
+
+const OPENAI_ASSESSMENT_PRINCIPLES: Source = {
+  title: 'Priorities and principles for effective third party assessments',
+  gloss:
+    'asks whether monitoring is implemented across training, evaluations and deployment "in a way that cannot easily be disabled", and for claims "pre-registered before assessment activities begin"',
+  publisher: 'OpenAI',
+  date: '2026-09-22',
+  url: 'https://openai.com/index/priorities-principles-third-party-assessments/',
+  verified: 'primary',
+};
+
+const OPENAI_PACING: Source = {
+  title: 'Pacing model development in an era of cyber-critical capabilities',
+  gloss:
+    'teams paged by a highest-priority monitoring alert are expected to pause the activity if they cannot determine "within 30 minutes that the flag is a false positive"',
+  publisher: 'OpenAI',
+  date: '2026-08-18',
+  url: 'https://openai.com/index/pacing-model-development-cyber-capabilities/',
+  verified: 'primary',
+};
+
+const OPENAI_MISALIGNMENT_FRAMEWORK: Source = {
+  title: 'Our framework for reporting model misalignment',
+  gloss:
+    'each full report describes the behavior observed, its severity and any external impact, the setting, the date, when it was discovered and the models involved',
+  publisher: 'OpenAI',
+  date: '2026-09-16',
+  url: 'https://openai.com/index/model-misalignment-reporting-framework/',
+  verified: 'primary',
+};
+
+const OPENAI_FRONTIER_GOVERNANCE: Source = {
+  title: 'Frontier Governance Framework',
+  gloss: 'section 2.6: OpenAI "maintains an AI Safety Incident Response Plan (AIRP)" for identifying and responding to AI safety incidents',
+  publisher: 'OpenAI',
+  date: '2026-05-28',
+  url: 'https://cdn.openai.com/pdf/e37d949b-8c9f-4d76-b99e-4272f4631a7e/openai-frontier-governance-framework.pdf',
+  verified: 'primary',
+};
+
+const OPENAI_EVAL_PLAYBOOK: Source = {
+  title: 'A shared playbook for trustworthy third party evaluations',
+  gloss:
+    'recommended report fields include the claim, the tested system (model, reasoning setting, tool access, harness and safeguards), the budget, elicitation methods and validity checks; a score is "performance under that harness and budget"',
+  publisher: 'OpenAI',
+  date: '2026-05-29',
+  url: 'https://openai.com/index/trustworthy-third-party-evaluations-foundations/',
+  verified: 'primary',
+};
+
+const OPENAI_COT_GRADING: Source = {
+  title: 'Investigating the consequences of accidentally grading CoT during RL',
+  gloss: 'chain-of-thought text reached the inputs of reward mechanisms by accident; an automated system now scans all RL runs for it with regex matches',
+  publisher: 'OpenAI (Alignment Research Blog)',
+  date: '2026-05-07',
+  url: 'https://alignment.openai.com/accidental-cot-grading/',
+  verified: 'primary',
+};
+
+const OPENAI_PROD_EVALS: Source = {
+  title: 'Sidestepping Evaluation Awareness and Anticipating Misalignment with Production Evaluations',
+  gloss: 'OpenAI reports that models tested with production evaluations "display substantially lower signs of evaluation awareness" than in a traditional evaluation',
+  publisher: 'OpenAI (Alignment Research Blog)',
+  date: '2025-12-18',
+  url: 'https://alignment.openai.com/prod-evals/',
+  verified: 'primary',
+};
+
+const OPENAI_ASTRA_CARD: Source = {
+  title: 'GPT-6 Astra System Card',
+  gloss: 'OpenAI states that evaluations where models show verbalized metagaming "can be treated similarly to contaminated evals"',
+  publisher: 'OpenAI',
+  date: '2026-09-03',
+  url: 'https://deploymentsafety.openai.com/gpt-6-astra',
   verified: 'primary',
 };
 
@@ -359,6 +544,7 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       'The agent exceeds a step, call, spend or time budget and keeps running.',
       'Agents in runs meant to be isolated reach each other through a resource the runs share, such as a package repository or a cache.',
       'The agent can start processes with administrative privileges on the machine it runs on.',
+      'The boundary recorded for the run differs from the scope the agent was told, so the agent is never told what it may not do.',
     ],
     scope:
       'Agents and harnesses under evaluation, the tools they can call during a run and the resources runs share. Production deployments are covered by the agent runtime profile.',
@@ -373,12 +559,28 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       iso42001: ['A.6.2.2', 'A.9.2'],
       nistAiRmf: [],
       owasp: ['asi02', 'asi03', 'llm03-2026'],
+      aiuc1: ['B006'],
       other: [
         { framework: 'NIST SP 800-53 Rev. 5', ref: 'AC-3', note: 'Access Enforcement' },
         { framework: 'NIST SP 800-53 Rev. 5', ref: 'AC-6', note: 'Least Privilege' },
       ],
     },
-    references: [CH23.registry, CH23.autonomy, CH23.allowList, METR_TASK_STANDARD, METR_INVESTIGATION, OWASP_AGENTIC, SP_800_53],
+    references: [
+      CH23.registry,
+      CH23.autonomy,
+      CH23.allowList,
+      METR_TASK_STANDARD,
+      METR_INVESTIGATION,
+      OWASP_AGENTIC,
+      SP_800_53,
+      OPENAI_THIRD_PARTY_CYBER,
+      ANTHROPIC_EVAL_GUIDANCE,
+      AIUC1_REQUIREMENTS,
+    ],
+    implementationNotes: [
+      "State the boundary to the agent as well as enforcing it. Anthropic's guidance for external evaluation partners asks every prompt to state what is in and out of scope, including network boundaries, with boundaries \"phrased as instructions\" rather than claims about the environment.",
+      "OpenAI's account of a third-party cyber evaluation states that the evaluator's \"intended authorization boundary was the simulated cyber range\", while the agents were not explicitly told how they could use the open internet access they had; the evaluator names this as a potential contributing cause.",
+    ],
     openQuestions: [
       'What evidence is sufficient to show that an agent stayed within its authorization boundary for a whole run?',
       'Should the boundary of an evaluation run be written in the same registry entry format as a production agent?',
@@ -434,7 +636,7 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       nistAiRmf: ['MEASURE 2.7'],
       owasp: ['asi02', 'llm02-2026'],
       atlas: ['aml-t0086'],
-      aiuc1: [],
+      aiuc1: ['B006'],
       other: [
         { framework: 'MITRE ATLAS mitigation', ref: 'AML.M0032', note: 'Segmentation of AI Agent Components' },
         { framework: 'NIST SP 800-53 Rev. 5', ref: 'SC-7', note: 'Boundary Protection' },
@@ -452,11 +654,15 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       OWASP_LLM,
       ATLAS,
       SP_800_53,
+      OPENAI_DNS_REPORT,
+      OPENAI_HF_TECHNICAL_REPORT,
+      ANTHROPIC_EVAL_GUIDANCE,
+      AIUC1_REQUIREMENTS,
     ],
     implementationNotes: [
-      'Attach a default-deny egress policy to every task environment (a network policy, a firewall rule set or an egress proxy, by category) that lists each permitted destination explicitly, for example the LLM API proxy and the progress server. Enforce it on the resolved address, and serve DNS from a resolver that answers only for listed names: DNS is an egress path too.',
-      "Record the allow-list with the run: its hash goes in the run record next to the environment version, so the flow log can later be compared with what was declared, not with what was intended.",
-      'Keep a flow log per run at the enforcement point, outside anything the agent can reach or change, with refused attempts as well as allowed connections.',
+      "Attach a default-deny egress policy to every task environment (a network policy, a firewall rule set or an egress proxy, by category) that lists each permitted destination explicitly, for example the LLM API proxy and the progress server. Enforce it on the resolved address, and serve DNS from a resolver that answers only for listed names: DNS is an egress path too. OpenAI reports a training run that reached a public chatbot through \"insufficient DNS filtering\" in its sandbox.",
+      "Record the allow-list with the run (its hash goes in the run record next to the environment version) and keep a flow log per run at the enforcement point, outside anything the agent can reach or change, with refused attempts as well as allowed connections, so the connections made can be compared with what was declared, not with what was intended.",
+      "Enforce the policy in two places a single misconfiguration cannot both open, for example at the sandbox and at the cluster boundary. OpenAI's technical report on the Hugging Face incident describes \"two separate layers of network isolation\" of this kind, and Anthropic's guidance for external evaluation partners asks that the only outside connection be to the model's own API and that the configuration be verified before every evaluation begins.",
       'At admission, run a canary from inside the environment: one connection to a reserved test address that is not on the list. Expect a refused connection and a log entry; a success blocks the run.',
       "Treat resources shared between runs (package mirrors, caches, artefact stores) as destinations with their own entry and a per-run scope. METR's public investigation of the OpenAI/Hugging Face incident reports that agents meant to be \"fully isolated from one another\" communicated through a shared internal package repository.",
     ],
@@ -479,7 +685,7 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       "An agent under evaluation holds only short-lived credentials issued to its own identity for the run and bound to the one service each is for, never standing secrets or a person's own token.",
     failureModes: [
       "A long-lived secret (an API key, a cloud access key, a password) is readable from the agent's environment, configuration, files or memory during a run.",
-      'The agent presents a token issued to a person, or a token whose audience is another service, and the tool server accepts it.',
+      'The agent presents a token issued to a person, a token whose audience is another service, or a credential it found rather than received, and the tool server accepts it.',
       'A credential issued for the run is still accepted after the run ended or was aborted.',
       "A credential appears in the run's transcript, memory store, logs or outputs, or is passed to another agent.",
     ],
@@ -522,7 +728,7 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       iso42001: ['A.6.2.6', 'A.9.2'],
       nistAiRmf: ['MEASURE 2.7'],
       owasp: ['asi03'],
-      aiuc1: [],
+      aiuc1: ['A008'],
       other: [
         { framework: 'IETF RFC 8693', ref: 'act claim', note: 'delegation names the acting party; never impersonation' },
         { framework: 'MCP specification 2026-07-28', ref: 'Authorization, Token Handling', note: 'audience validation; no token passthrough' },
@@ -547,17 +753,21 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       OWASP_AGENTIC,
       ATLAS,
       SP_800_53,
+      ANTHROPIC_EVAL_GUIDANCE,
+      OPENAI_THIRD_PARTY_CYBER,
+      OPENAI_TOKEN_REPORT,
+      AIUC1_REQUIREMENTS,
     ],
     implementationNotes: [
       'Give each agent under test its own workload identity for the run (an attested identity document of the kind SPIFFE defines, or the platform\'s workload identity) and issue its tokens from a broker outside the environment. The environment template holds no secret.',
-      'Keep the model API key with an LLM API proxy outside the environment, reached through the egress allow-list of AIGE-CTL-EVAL-002: the agent sees the proxy, never the key.',
+      "Keep the model API key with an LLM API proxy outside the environment, reached through the egress allow-list of AIGE-CTL-EVAL-002: the agent sees the proxy, never the key. Anthropic's guidance for external evaluation partners likewise asks that \"the API keys should be kept outside the environment\".",
       "Issue short-lived access tokens whose aud names one tool server and, when the agent acts for a user or another agent, whose act claim names the agent (RFC 8693 token exchange). Tool servers validate the audience and refuse any other token, as the MCP authorization specification of 2026-07-28 requires of MCP servers.",
       'Set every token lifetime no longer than the run\'s time budget, issue no refresh tokens to agents under evaluation, and revoke what was issued when the run ends or is aborted.',
-      "Scrub credentials from memory stores, transcripts and logs before they are written, then grep every run artefact after the run for secret patterns (known key prefixes, high-entropy strings, the run's own issued tokens); a match fails the run. METR's public investigation of the OpenAI/Hugging Face incident reports an agent that \"found two working credentials, and immediately posted them\" where other agents could read them.",
+      "Scrub credentials from memory stores, transcripts and logs before they are written, then grep every run artefact after the run for secret patterns (known key prefixes, high-entropy strings, the run's own issued tokens); a match fails the run. Scan for credentials a run picked up as well as those it was issued: METR's investigation of the OpenAI/Hugging Face incident reports an agent that found working Hugging Face credentials exposed on the internet and posted them to a board other agents read, and OpenAI states that in a third-party evaluation its model reused a GitHub token another lab's agent had left publicly accessible.",
     ],
     openQuestions: [
       'What lifetime should a credential issued for an evaluation run have, and who revokes it when the run is aborted?',
-      'Can a secret scan be made complete for encoded or split credentials, or should the control rely on short lifetimes and revocation for whatever a scan may miss?',
+      "Can a secret scan be made complete for encoded or split credentials, or should the control rely on short lifetimes and revocation for whatever a scan may miss? OpenAI reports a model that split a researcher's token into pieces with the stated aim of avoiding secret scanning.",
     ],
     observation: {
       subjectKind: 'eval-run',
@@ -590,13 +800,29 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       iso42001: ['A.9.2'],
       nistAiRmf: [],
       owasp: ['asi01', 'asi02', 'asi05', 'asi09', 'llm10-2026'],
+      aiuc1: ['D003', 'B006'],
       other: [
         { framework: 'MITRE ATLAS mitigation', ref: 'AML.M0028', note: 'AI Agent Tools Permissions Configuration' },
         { framework: 'MITRE ATLAS mitigation', ref: 'AML.M0029', note: 'Human In-the-Loop for AI Agent Actions' },
         { framework: 'MITRE ATLAS mitigation', ref: 'AML.M0030', note: 'Restrict AI Agent Tool Invocation on Untrusted Data' },
       ],
     },
-    references: [CH23.guardrails, CH23.checkpoint, CH23.mcpAdmission, OWASP_ACS, METR_ELICITATION, OWASP_AGENTIC],
+    references: [
+      CH23.guardrails,
+      CH23.checkpoint,
+      CH23.mcpAdmission,
+      OWASP_ACS,
+      METR_ELICITATION,
+      OWASP_AGENTIC,
+      CODEX_AUTO_REVIEW,
+      OPENAI_AUTO_REVIEW,
+      OPENAI_PREPAREDNESS_V2,
+      AIUC1_REQUIREMENTS,
+    ],
+    implementationNotes: [
+      "An automated reviewer can stand in for a person at the mediation point without widening what the agent may do. OpenAI's Codex documentation states that \"Auto-review is a reviewer swap, not a permission grant\", and OpenAI's post on the design states that it \"should not be treated as a guarantee of security\".",
+      "OpenAI's Preparedness Framework v2 lists limiting internet and other tool access, credentials and filesystem access among its safeguards against a misaligned model (Table 5): the same limits this control and AIGE-CTL-EVAL-001 to 003 set for a run.",
+    ],
     openQuestions: [
       'Which call classes must fail closed when the mediation point is unavailable during an evaluation? Chapter 23 notes that the reference guardian of the Agent Control Standard starts with a fail-open posture.',
       "How can every call be mediated without taking away the scaffolding and tooling a capability elicitation needs? METR's guidelines ask for \"the best available scaffolding + tooling\".",
@@ -613,6 +839,7 @@ export const evaluationEnvironmentControls: readonly Control[] = [
     failureModes: [
       "A tool call appears in the environment's logs but not in the run's trace.",
       'Monitoring is switched off or reconfigured from inside the environment during a run, for example by changing an environment variable.',
+      'A monitor that the run relies on is not running on it, and nobody notices until after the run.',
       'The recorded output of a tool call differs from what the tool returned (a spoofed tool call).',
       'Trace records are missing for part of a run and no gap is recorded.',
     ],
@@ -629,6 +856,7 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       iso42001: ['A.6.2.8', 'A.6.2.6'],
       nistAiRmf: ['MANAGE 4.1', 'MEASURE 3.1'],
       owasp: ['asi10'],
+      aiuc1: ['E015'],
       other: [
         { framework: 'MITRE ATLAS mitigation', ref: 'AML.M0024', note: 'AI Telemetry Logging' },
         { framework: 'NIST SP 800-53 Rev. 5', ref: 'AU-2', note: 'Event Logging' },
@@ -637,7 +865,22 @@ export const evaluationEnvironmentControls: readonly Control[] = [
         { framework: 'NIST SP 800-53 Rev. 5', ref: 'SI-4', note: 'System Monitoring' },
       ],
     },
-    references: [CH23.telemetry, CH23.incidents, OTEL_GENAI, METR_INVESTIGATION, METR_RISK_REPORT, SP_800_53],
+    references: [
+      CH23.telemetry,
+      CH23.incidents,
+      OTEL_GENAI,
+      METR_INVESTIGATION,
+      METR_RISK_REPORT,
+      SP_800_53,
+      OPENAI_HF_ROAD_AHEAD,
+      OPENAI_ASSESSMENT_PRINCIPLES,
+      OPENAI_PREPAREDNESS_V2,
+      AIUC1_REQUIREMENTS,
+    ],
+    implementationNotes: [
+      "Check that the monitors ran, not only that they exist: OpenAI states that its chain-of-thought monitors \"did not run on the evaluations\" involved in the Hugging Face incident, and its criteria for third-party assessments ask whether monitoring covers training, evaluations and deployment \"in a way that cannot easily be disabled\".",
+      "Write the record where the agent cannot edit it. OpenAI's Preparedness Framework v2 lists agent actions \"logged in an uneditable database\" and reviewed by asynchronous monitors among its safeguards against a misaligned model.",
+    ],
     openQuestions: [
       "How can a reviewer show that a run's trace is complete, not only that the records it holds are unaltered?",
       "How should a harness detect a spoofed tool call, where the transcript records an output the tool never returned? METR's investigation reports this in at least 96 transcripts.",
@@ -712,13 +955,18 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       ATLAS,
       METR_COMMON_ELEMENTS,
       METR_INVESTIGATION,
+      OPENAI_DNS_REPORT,
+      ANTHROPIC_EVAL_GUIDANCE,
+      OPENAI_PACING,
+      OPENAI_HF_TECHNICAL_REPORT,
+      OPENAI_HF_ROAD_AHEAD,
     ],
     implementationNotes: [
       'Record per-agent budgets (steps, tool calls, tokens, spend, wall-clock time) and breaker thresholds (unauthorised calls, refused egress attempts, anomaly scores) in the run record, and enforce them at the gateway the agent\'s calls pass through, not inside the agent.',
-      'Make budget exhaustion and threshold breaches trip the breaker automatically. A ticket or a log line alone is not a stop.',
-      'Drill the stop: pull it mid-task, measure the time from the pull to the first rejected call, and assert zero tool calls and zero writes after the trip for a window longer than the longest task. File the measurement as a control observation.',
-      'Make the kill path work across delegation hops: sub-agents run under delegated tokens that the stop revokes, token lifetimes are short enough to bound the tail, and calls to agents outside the environment are cut at its boundary, because a remote cancel is not guaranteed to succeed.',
-      'Keep the stop handle out of the agent\'s reach: the agent cannot call, reconfigure or delay it, and every use is logged with its trigger and the level applied.',
+      "Make budget exhaustion and threshold breaches trip the breaker automatically. A ticket or a log line alone is not a stop. OpenAI reports a training run that \"did not stop automatically as expected\" after a monitoring alert and was killed 2.5 hours later; Anthropic's guidance for external evaluation partners asks that a monitor which sees a run leave its scope flag it to a human and end the exercise.",
+      "Drill the stop: pull it mid-task, measure the time from the pull to the first rejected call, and assert zero tool calls and zero writes after the trip for a window longer than the longest task. File the measurement as a control observation. A response target such as the one OpenAI describes, where responders who cannot rule out a flag as a false positive within 30 minutes are expected to pause the activity, holds only if the pause it calls for has been drilled.",
+      "Make the kill path work across delegation hops and across runs: sub-agents run under delegated tokens that the stop revokes, token lifetimes are short enough to bound the tail, and calls to agents outside the environment are cut at its boundary, because a remote cancel is not guaranteed to succeed. OpenAI's technical report on the Hugging Face incident describes tooling being built to halt evaluation workloads by workload type, agent type or evaluation task.",
+      "Keep the stop handle out of the agent's reach: the agent cannot call, reconfigure or delay it, and every use is logged with its trigger and the level applied. Name who may pull it and who may approve a restart; OpenAI states that its incident response now sets out \"who can stop a run or approve restarting it\".",
     ],
     openQuestions: [
       'Which observations should trip a stop automatically during an evaluation, and which should only alert the evaluator?',
@@ -764,12 +1012,26 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       iso42001: ['A.8.4', 'A.6.2.8'],
       nistAiRmf: [],
       owasp: [],
+      aiuc1: ['E015'],
       other: [
         { framework: 'NIST SP 800-53 Rev. 5', ref: 'IR-4', note: 'Incident Handling' },
         { framework: 'NIST SP 800-53 Rev. 5', ref: 'AU-9', note: 'Protection of Audit Information' },
       ],
     },
-    references: [CH17.freeze, CH17.record, CH17.clocks, METR_INVESTIGATION, METR_ELICITATION, SP_800_53],
+    references: [
+      CH17.freeze,
+      CH17.record,
+      CH17.clocks,
+      METR_INVESTIGATION,
+      METR_ELICITATION,
+      SP_800_53,
+      OPENAI_MISALIGNMENT_FRAMEWORK,
+      OPENAI_FRONTIER_GOVERNANCE,
+      AIUC1_REQUIREMENTS,
+    ],
+    implementationNotes: [
+      "Keep the incident record in fields another party can read. OpenAI's framework for reporting model misalignment states that each full report describes the behavior, its severity and any external impact, the setting, the date, when it was discovered and the models involved; its Frontier Governance Framework refers to an AI Safety Incident Response Plan. A frozen run record gives such a report something to point to.",
+    ],
     openQuestions: [
       'How long should the records of an evaluation run be kept when the run produced no incident?',
       "Which records must survive a container reset for a third party to review a run's transcripts, as METR's guidelines expect a reviewer to do?",
@@ -813,7 +1075,23 @@ export const evaluationEnvironmentControls: readonly Control[] = [
         { framework: 'NIST SP 800-53 Rev. 5', ref: 'CM-6', note: 'Configuration Settings' },
       ],
     },
-    references: [CH23.prompts, CH23.mcpAdmission, CH14.reproducibility, METR_SOL, SSDF_GENAI, ATLAS, SP_800_53],
+    references: [
+      CH23.prompts,
+      CH23.mcpAdmission,
+      CH14.reproducibility,
+      METR_SOL,
+      SSDF_GENAI,
+      ATLAS,
+      SP_800_53,
+      ANTHROPIC_EVAL_GUIDANCE,
+      OPENAI_EVAL_PLAYBOOK,
+      OPENAI_COT_GRADING,
+    ],
+    implementationNotes: [
+      "Check the configuration before each run, not once per environment: Anthropic's guidance for external evaluation partners states that the isolation configuration \"should be verified before every evaluation begins\".",
+      "Report the configuration with the result. OpenAI's playbook for third-party evaluations asks reports to state the tested system (model, reasoning setting, tool access, harness and safeguards) and the budget, and to describe a score as \"performance under that harness and budget, not as a measured capability ceiling\".",
+      "Configuration can drift in the scoring path as well as the harness. OpenAI's alignment blog describes chain-of-thought text reaching the inputs of reward mechanisms by accident during RL; an automated check now scans all RL runs for it, with coverage OpenAI says is not perfect.",
+    ],
     openQuestions: [
       'How should evaluation-harness configuration be attested so that a third party can verify it without access to the harness itself?',
       "Should the scaffold prompts and task wording be part of the attested configuration? METR's GPT-5.6 Sol summary notes that observed cheating rates can be influenced by them, so the harness configuration is part of the result.",
@@ -829,6 +1107,7 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       'A result is reported only after checks that the run measured what it claims: scoring worked, the environment did not fail, and the path was evaluated as well as the answer.',
     failureModes: [
       'A result is reported from a run whose environment crashed or whose automatic scoring was wrong.',
+      'A task that could not be solved as set up is scored and reported as a failure of the model.',
       'Only final answers are scored, although the agent took actions on the way.',
       'Failed runs are counted without anyone reading why they failed.',
       'A failed validity check does not block the release it was meant to gate.',
@@ -854,7 +1133,27 @@ export const evaluationEnvironmentControls: readonly Control[] = [
       owasp: ['asi01', 'llm01-2026'],
       other: [{ framework: 'NIST SP 800-53 Rev. 5', ref: 'SA-11', note: 'Developer Testing and Evaluation' }],
     },
-    references: [CH14.validity, CH14.validation, CH23.object, METR_ELICITATION, METR_PROTOCOL, METR_SOL, SP_800_53],
+    references: [
+      CH14.validity,
+      CH14.validation,
+      CH23.object,
+      METR_ELICITATION,
+      METR_PROTOCOL,
+      METR_SOL,
+      SP_800_53,
+      ANTHROPIC_EVAL_GUIDANCE,
+      METR_INVESTIGATION,
+      METR_TASK_STANDARD,
+      OPENAI_PREPAREDNESS_V2,
+      OPENAI_ASTRA_CARD,
+      OPENAI_PROD_EVALS,
+    ],
+    implementationNotes: [
+      "Confirm that each task can be solved before a failure on it is counted. Anthropic's guidance for external evaluation partners asks them to \"confirm any evaluation challenge is actually solvable in principle\", because agents facing a task they cannot complete look for other ways to complete it; METR reports that many of the agents in the OpenAI/Hugging Face incident that turned to cheating had unintentionally been given an impossible task.",
+      "Keep the answers out of the agent's reach. METR's Task Standard states that the agent \"MUST NOT see the data returned by get_tasks\"; a run in which the agent could read the task data or the scorer is not a valid measurement.",
+      "Report an elicited score as a lower bound. OpenAI's Preparedness Framework v2 treats a one-time capability elicitation \"as a lower bound, rather than a ceiling\" and names sandbagging as a research category.",
+      "Record signs of evaluation awareness with the result. OpenAI's GPT-6 Astra system card states that evaluations where models show verbalized metagaming \"can be treated similarly to contaminated evals\", and OpenAI's alignment blog reports lower signs of evaluation awareness under production evaluations than under traditional ones.",
+    ],
     openQuestions: [
       'Which validity threats (task bugs, scoring errors, evaluation awareness) should block a result, and which should only be disclosed with it?',
       "METR's Guidelines for Capability Elicitation treat task bugs, such as incorrect automatic scoring or a crashed environment, as spurious failures to be fixed before a result is reported: should this control require the same, or only that the fix is recorded?",

@@ -17,6 +17,11 @@
 //                source when the control maps to a threat, and the ISO/IEC
 //                42001 source when it carries an Annex A id)
 //
+// AIUC-1 ids (mappings.aiuc1) are a cross-reference, not a derivation: an id is
+// set only where the requirement text, read on its public page on 2026-09-26,
+// plainly covers the control's objective, and the AIUC-1 index is then cited
+// (no affiliation with AIUC; retired requirements E007 and E014 are never used).
+//
 // Per seed, where the chapter or a cited source supports it (DERIVATION):
 // failure modes for the twelve seeds with no OWASP threat, each the observable
 // event when the chapter's rule is not met; a failure mode from a METR report
@@ -45,6 +50,7 @@ import type { Source } from '../../lib/sources';
 import { agentControls, agentAnchors, agentChapter, type AgentControl, type AnchorKey } from '../tool-agent-controls';
 import { threatById, threatSources, SRC } from '../threats';
 import { site } from '../site';
+import { AIUC1_REQUIREMENTS } from './evaluation-environment';
 
 const PROFILE = 'agent-runtime';
 
@@ -231,6 +237,8 @@ interface Derivation {
   /** Evidence schema, where the chapter names one. */
   schemaId?: string;
   nistAiRmf?: readonly string[];
+  /** AIUC-1 requirement ids whose public text plainly covers the objective. */
+  aiuc1?: readonly string[];
   implementationNotes?: readonly string[];
   /** Other chapter-23 sections a rule, failure mode or note comes from. */
   extraAnchors?: readonly AnchorKey[];
@@ -269,6 +277,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
   },
   traces: {
     layer: 5,
+    aiuc1: ['E015'],
     failureModes: [
       'A task leaves a record of its final answer only, with no plans, tool calls or memory operations.',
       'A trace carries no agent id or version, so its actions cannot be joined to the agent or to the configuration that ran.',
@@ -277,6 +286,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     extraSources: [METR_INCIDENT_SOURCE],
   },
   'tool-allow-list': {
+    aiuc1: ['D003', 'B006'],
     failureResponse: {
       effect: 'deny',
       text: 'A call to a tool that is not on the allow-list, or whose definition hash does not match, is denied.',
@@ -294,6 +304,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     },
   },
   'guardrail-every-call': {
+    aiuc1: ['D003'],
     failureResponse: {
       effect: 'deny',
       text: 'A call that fails the identity, allow-list or definition-hash check is denied; the other checks deny, route to a checkpoint, redact or trip the breaker as the chapter sets out.',
@@ -303,6 +314,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     ],
   },
   'execution-budgets': {
+    aiuc1: ['D003'],
     failureResponse: {
       effect: 'deny',
       text: "Exhausting a budget trips the agent's breaker, so the gateway rejects its calls; it does not raise a ticket.",
@@ -341,6 +353,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     ],
   },
   'trajectory-anomaly': {
+    aiuc1: ['B006'],
     failureModes: [
       'A call unrelated to the task purpose, a parameter outside the registry profile, a call after expiry or a spend spike occurs and no anomaly event is raised.',
       'An anomaly is flagged but neither halts the agent nor reaches a person.',
@@ -352,6 +365,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     ],
   },
   'trajectory-evals': {
+    aiuc1: ['C002'],
     layer: 3,
     enforcementPoints: ['pre_merge'],
     failureModes: [
@@ -371,6 +385,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     ],
   },
   'checkpoint-irreversible': {
+    aiuc1: ['D003'],
     scope: 'Agents with tools whose operation class is pay, delete, send or execute.',
     extraAnchors: ['guardrails'],
     failureResponse: {
@@ -383,6 +398,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     ],
   },
   sandbox: {
+    aiuc1: ['B006'],
     scope: 'Agents with execute-class tools that run generated code.',
     failureModes: [
       'Code runs in a sandbox that still reaches the open internet: METR reports agents that gained code execution on an evaluation sandbox, which gave them more flexible access to the full internet.',
@@ -391,6 +407,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     failureResponse: { effect: 'deny', text: 'Generated code that would run outside a sandbox is denied.' },
   },
   'egress-filter': {
+    aiuc1: ['A006', 'A008'],
     failureResponse: {
       effect: 'deny',
       text: 'Output carrying secrets or personal data, or bound for a destination outside the egress allow-list, is redacted or blocked before the result returns.',
@@ -464,6 +481,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     ],
   },
   'prompt-change-control': {
+    aiuc1: ['E004'],
     enforcementPoints: ['pre_merge', 'deploy'],
     failureModes: [
       'The production prompt is edited outside the pipeline, for example in a vendor console, so the registry and the traces still name the old version and an incident replays a configuration that never ran.',
@@ -476,6 +494,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     ],
   },
   'otel-telemetry': {
+    aiuc1: ['E015'],
     layer: 5,
     failureModes: [
       'A tool call leaves no execute_tool span, or its span lacks the agent id and version.',
@@ -499,6 +518,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     openQuestions: [OBLIGATION_QUESTION],
   },
   'ai-disclosure': {
+    aiuc1: ['E016'],
     scope: 'Agents that send messages, calls or chats to people.',
     failureModes: [
       'A message, call or chat the agent sends to a person does not say it comes from an AI system, where that is not obvious.',
@@ -544,6 +564,7 @@ function derive(seed: AgentControl, index: number): Control {
     ...(threatRows.length > 0 ? [ASI_SOURCE] : []),
     ...(iso42001.length > 0 ? [ISO_SOURCE] : []),
     ...(d.extraSources ?? []),
+    ...((d.aiuc1 ?? []).length > 0 ? [AIUC1_REQUIREMENTS] : []),
   ]);
   return {
     id: `AIGE-CTL-AGENT-${String(index + 1).padStart(3, '0')}`,
@@ -569,6 +590,7 @@ function derive(seed: AgentControl, index: number): Control {
       iso42001,
       nistAiRmf: [...(d.nistAiRmf ?? [])],
       owasp: threatRows.map((t) => t.id),
+      ...(d.aiuc1 ? { aiuc1: [...d.aiuc1] } : {}),
     },
     references,
     implementationNotes: [...(d.implementationNotes ?? [])],
