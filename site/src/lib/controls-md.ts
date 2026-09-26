@@ -142,6 +142,11 @@ const PAGE_META: Readonly<Record<string, ProfilePageMeta>> = {
     description:
       'An open control profile for AI agents at runtime: identity, tool mediation, execution limits, stop conditions and telemetry. Draft v0.1, from chapter 23.',
   },
+  'data-admission-and-privacy': {
+    seoTitle: 'AI data governance controls',
+    description:
+      'An open control profile for AI training data: dataset admission, rights ledger, lawful basis, purpose limits, special categories and lineage. Draft v0.1.',
+  },
 };
 
 /** The page metadata of a profile; throws for a profile with none, so a new profile fails the build until it has its own. */
