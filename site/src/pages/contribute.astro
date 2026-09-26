@@ -1,35 +1,149 @@
 ---
-// /contribute: STUB of the contribution page (block orp-shell, open reference
-// project). It carries the final title and description and every anchor other
-// pages link to (paths, good-review, provenance). Block orp-contribute
-// replaces the body with the issue forms and the review guidance.
+// /contribute: how to test and improve the engineering model (block
+// orp-contribute, open reference project). Ten contribution paths, nine of them
+// a GitHub issue form in .github/ISSUE_TEMPLATE/ and one the contributing guide
+// for a pull request; what a good control review contains; and where licence,
+// versions and credit are recorded. The <title>, the description and the
+// anchors (paths, good-review, provenance) are fixed: other pages link them.
+// No script.
 import Marketing from '../layouts/Marketing.astro';
 import PageHero from '../components/PageHero.astro';
 import Section from '../components/Section.astro';
+import RegisterList from '../components/RegisterList.astro';
+import type { RegisterItem } from '../components/RegisterList.astro';
+import Provenance from '../components/Provenance.astro';
+import CtaBand from '../components/CtaBand.astro';
 import { site } from '../data/site';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
-import { authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
+import { collectionPage, lastModified } from '../lib/jsonld';
 import { fitsSiteSuffix } from '../lib/seo-title';
 import '../styles/pages.css';
 
 const seoTitle = 'Contribute to open AI controls';
 const description =
   'How to contribute to the open controls and research notes: issue forms for a control review, a mapping or a correction, and how review works.';
-const crumbs = [{ label: 'Contribute' }];
-const pageUrl = new URL('/contribute', site.url).href;
+const crumbs = [{ label: 'About', href: '/about' }, { label: 'Contribute' }];
+
+const issueForm = (file: string) => `${site.github}/issues/new?template=${file}`;
+const blob = (path: string) => `${site.github}/blob/main/${path}`;
+
+/**
+ * A contribution path: a register row plus the Umami attributes of its link
+ * (event `contribute`, `kind` naming the form; declarative, counted only where
+ * analytics is enabled). RegisterList spreads `attrs` onto the row link once
+ * RegisterItem carries the field (requested from the integrator); until then
+ * it ignores them.
+ */
+type PathItem = RegisterItem & { href: string; attrs?: Record<string, string> };
+
+const form = (file: string, kind: string, title: string, description: string): PathItem => ({
+  title,
+  description,
+  href: issueForm(file),
+  attrs: { 'data-umami-event': 'contribute', 'data-umami-event-kind': kind },
+});
+
+// The ten paths, the control work first. Every template named here exists in
+// .github/ISSUE_TEMPLATE/ (tests/contribute.spec.ts checks it).
+const paths: PathItem[] = [
+  form(
+    'control-review.yml',
+    'control-review',
+    'Review a control profile',
+    'Test one control against an environment you know: does it hold as written, and what evidence could you produce?',
+  ),
+  form(
+    'failure-mode-proposal.yml',
+    'failure-mode',
+    'Propose a failure mode',
+    'A way an AI system or agent breaks that a control should catch, backed by a public record.',
+  ),
+  form(
+    'implementation-example.yml',
+    'implementation-example',
+    'Contribute an implementation example',
+    'A configuration, pipeline step, test, runtime policy or evidence export that implements a control, with the record it leaves.',
+  ),
+  form(
+    'framework-mapping.yml',
+    'framework-mapping',
+    'Map a control to a framework clause',
+    'Link a control to a clause of a law, standard or framework, with the official URL and how strong the mapping is.',
+  ),
+  form(
+    'technical-correction.yml',
+    'technical-correction',
+    'Correct a technical error',
+    'A wrong requirement, evidence statement, mapping, threat id, version or date, with the source that shows it.',
+  ),
+  form(
+    'research-review.yml',
+    'research-review',
+    'Review a research note',
+    'Check a draft note, one section of it or a single claim against its sources.',
+  ),
+  form(
+    'propose-a-case.yml',
+    'incident-case',
+    'Propose an incident case',
+    'A documented incident, the failure behind it and the control that would have caught it.',
+  ),
+  form(
+    'propose-an-obligation.yml',
+    'obligation',
+    'Propose an obligation row',
+    'An obligation missing from the register, with its instrument, its date and its status.',
+  ),
+  form(
+    'suggest-a-source.yml',
+    'source',
+    'Suggest a source',
+    'A stronger primary source for a claim, or a claim that still needs one.',
+  ),
+  {
+    title: 'Open a pull request',
+    description: 'For a change you can make yourself: the contributing guide sets the rules every pull request follows.',
+    href: blob('CONTRIBUTING.md'),
+  },
+];
+
+// What a control review states. No links: RegisterList renders plain rows.
+const reviewParts: RegisterItem[] = [
+  {
+    title: 'The control and the version reviewed',
+    description: 'The control id, for example AIGE-CTL-EVAL-001, and the version of the profile you read.',
+  },
+  {
+    title: 'The environment you tested it in',
+    description:
+      'By category, such as a containerised evaluation harness or an agent calling MCP tool servers. Never a vendor or product name.',
+  },
+  {
+    title: 'Whether the requirement is testable as written',
+    description: 'Could you decide pass or fail from the text alone, or did you have to guess what it meant?',
+  },
+  {
+    title: 'The evidence you could or could not produce',
+    description: 'The record the environment actually leaves, and the part of the evidence requirement it cannot meet.',
+  },
+  {
+    title: 'The source behind any objection',
+    description: 'A public document, specification or incident record that supports the change, not an opinion alone.',
+  },
+  {
+    title: 'What should change',
+    description: 'The wording, the evidence requirement or the mapping you would put in its place.',
+  },
+];
 
 const jsonLd = [
-  {
-    '@type': 'WebPage',
-    '@id': `${pageUrl}#page`,
+  collectionPage({
+    path: '/contribute',
     name: seoTitle,
     description,
-    url: pageUrl,
-    inLanguage: 'en',
-    isPartOf: { '@id': WEBSITE_ID },
-    publisher: { '@id': ORG_ID },
-    author: [...authorRefs],
-  },
+    dateModified: lastModified('src/pages/contribute.astro'),
+    items: paths.map((p) => ({ name: p.title, url: p.href })),
+  }),
   breadcrumbJsonLd(crumbs),
 ];
 ---
@@ -45,25 +159,65 @@ const jsonLd = [
     variant="res"
     crumbs={crumbs}
     title="Help improve the engineering model"
-    lede="The controls, patterns, mappings and evidence formats on this site only get better when someone tests them against a real system. This page is being prepared and is published in full in the next release."
+    lede="The engineering model on this site is a set of requirements, patterns, framework mappings and evidence formats. It only improves when someone tests it against a real system and records where it holds and where it does not."
   />
 
-  <Section tone="plain" id="paths" title="Ways to contribute">
-    <p><!-- orp-stub -->
-      Until the new issue forms are listed here, the ways to contribute are on the
-      <a href="/about">about page</a> and in the <a href={`${site.github}/blob/main/CONTRIBUTING.md`}>contributing guide</a>.
+  <Section
+    tone="plain"
+    id="paths"
+    title="Ways to contribute"
+    lede="Nine of these paths open a GitHub issue form that asks for the fields needed to act on the report; the tenth is a pull request. Each needs a GitHub account; this site sends nothing."
+  >
+    <p>
+      Open for review now: the draft control specifications in the
+      <a href="/controls">open control profiles</a>, the draft <a href="/research">research notes</a>
+      and the <a href="/cases">incident cases</a> they draw on, all built on
+      <a href="/ai-governance">what AI governance means</a> in engineering terms.
     </p>
+    <RegisterList items={paths} class="contrib-paths" />
   </Section>
 
-  <Section tone="tint" id="good-review" title="What a good control review contains">
-    <p>What a useful review of a control states, and the evidence it rests on, is set out here in the next release.</p>
+  <Section
+    tone="tint"
+    id="good-review"
+    title="What a good control review contains"
+    lede="A review is useful when someone else can repeat it. Whether the control holds or fails, it states these six things."
+  >
+    <RegisterList items={reviewParts} />
+    <p>
+      The control review form asks for each of them. A review that finds a control holds as written
+      is as useful as one that finds a gap.
+    </p>
   </Section>
 
   <Section tone="plain" id="provenance" title="Licence, versions and credit">
     <p>
-      Everything here is licensed {site.license} and versioned in the
-      <a href="/about/changelog">changelog</a>; contributors are credited on the
-      <a href="/about/contributors">contributors page</a>.
+      Everything on this site is licensed <a href={site.licenseUrl}>{site.license}</a>, and so is a
+      contribution once it is merged. Each release is archived on Zenodo: version {site.bokVersion} is
+      DOI <a href={`https://doi.org/${site.doi}`}>{site.doi}</a>, and the concept DOI
+      <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a> always resolves to the
+      latest release. Citation metadata is in <a href={blob('CITATION.cff')}>CITATION.cff</a>, and
+      every change is recorded in the <a href="/about/changelog">changelog</a>.
     </p>
+    <p>
+      Accepted substantive contributions are credited by name in <code>bok/CONTRIBUTORS.md</code>,
+      shown on the <a href="/about/contributors">contributors page</a>; contributing does not by
+      itself confer co-authorship. A control profile or research note moves from draft to published
+      only once a credited reviewer has reviewed it; the <a href="/about/methodology">methodology</a>
+      sets out how sources, review and corrections work.
+    </p>
+    <Provenance
+      version={site.bokVersion}
+      editPath="site/src/pages/contribute.astro"
+      doi={site.doi}
+      citeHref={blob('CITATION.cff')}
+    />
   </Section>
+
+  <CtaBand
+    title="Review the first control profile"
+    sub="Draft controls for AI evaluation environments, each open for technical review."
+    primary={{ label: 'Review the first control profile', href: '/controls/evaluation-environment' }}
+    secondary={{ label: 'Open an issue', href: `${site.github}/issues/new/choose` }}
+  />
 </Marketing>
