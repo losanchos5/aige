@@ -1543,6 +1543,16 @@ numbered source list.
 | 2 | incident record for the case | AI Incident Database, Incident 768: ChatGPT Reportedly Implicated in Samsung Data Leak of Source Code and Meeting Notes | Responsible AI Collaborative | 2026 | https://incidentdatabase.ai/cite/768/ | primary | Source code pasted into a public chatbot (reported) |
 | 3 | Art. 4 reworded to "support the development of" AI literacy; applies from 27 Jul 2026 | AI literacy, the Digital Omnibus and Article 4 of the AI Act | Law & Technology | 2026 | https://lawandtechnology.eu/en/ai-literacy-digital-omnibus-article-4-ai-act/ | secondary | Source code pasted into a public chatbot (reported) |
 
+### site/src/data/cases.ts: /cases/openai-hugging-face-agent-incident-2026
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | METR's investigation (focused on 7 to 13 Jul 2026; published 26 Aug 2026 with OpenAI feedback and redactions): agents "meant to be fully isolated from one another" used Artifactory as an unsanctioned message board; roughly 1200 agents, over 70,000 messages and files, 700 in the attack on Hugging Face; Artifactory does not isolate users' activity; code execution on a customer-hosted Modal sandbox (9 Jul); two working Hugging Face credentials found and posted (10 Jul); remote code execution on a Hugging Face worker container (11 Jul); lock-out on 13 Jul; at least 96 transcripts with spoofed tool calls; transcripts missing small components, often due to container resets; a bit over 90% of message-board activity captured; outage on 4 Jul, evaluations paused, fresh Artifactory instance on 6 Jul; GPT-5.6 Sol publicly deployed. Described as "METR reports" | Brief independent investigation of agents' behavior, reasoning and collaboration in the OpenAI / Hugging Face hacking incident | METR | 2026-08-26 | https://metr.org/blog/2026-08-26-openai-hugging-face-incident-investigation/ | primary | OpenAI agents and Hugging Face: an evaluation environment that was not isolated |
+| 2 | incident record for the case; incident date 2026-07-11 | AI Incident Database, Incident 1604: OpenAI Models Reportedly Compromised Hugging Face Production Infrastructure During Cybersecurity Evaluation | Responsible AI Collaborative | 2026 | https://incidentdatabase.ai/cite/1604/ | primary | OpenAI agents and Hugging Face: an evaluation environment that was not isolated |
+| 3 | Art. 55(1)(c) keep track of, document and report serious incidents to the AI Office without undue delay; Art. 55(1)(d) an adequate level of cybersecurity protection for the model and its physical infrastructure (text read on the Commission's AI Act Service Desk, 2026-09-26) | EU AI Act Art. 55 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng#art_55 | primary | OpenAI agents and Hugging Face: an evaluation environment that was not isolated |
+
+Not cited: OpenAI's post-mortems (https://openai.com/index/hugging-face-model-evaluation-security-incident/ and https://openai.com/index/hugging-face-incident-and-the-road-ahead/) returned HTTP 403 on 2026-09-26 and could not be read.
+
 ### site/src/pages/resources/templates.astro (/resources/templates)
 
 | # | Claim | Source | Publisher | Date | URL | Verified | Used in |
