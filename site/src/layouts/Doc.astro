@@ -144,7 +144,14 @@ const headerLayer = statsChapter?.layer ? `l${statsChapter.layer}` : undefined;
 // The ink that colours the reading chrome (prose.css reads it for the h2 dash).
 // Set on the layout root so the prose and both rails inherit it: the layer's ink
 // when there is one, the neutral --ink otherwise.
-const chapterInk = `--chapter-ink: var(--${headerLayer ? `${headerLayer}-ink` : 'ink'})`;
+const chapterInk =
+  `--chapter-ink: var(--${headerLayer ? `${headerLayer}-ink` : 'ink'})` +
+  (headerLayer ? '' : '; --chapter-dash: linear-gradient(90deg, var(--l1-ink), var(--l3-ink), var(--l4-ink))');
+// The header mesh of a band without a layer: one composition per part of the
+// book, so each part has its own mood without a layer colour (SL-06). Pages
+// outside the book (Thesis, patterns, About) take composition a.
+const partMesh = { discipline: 'a', foundations: 'c', lifecycle: 'b', law: 'd', reference: 'e' } as const;
+const headerMesh = statsChapter ? partMesh[statsChapter.part] : 'a';
 if (statsChapter) {
   try {
     const markdown = markdownProp ?? readSource(`bok/${statsChapter.id}.md`);
@@ -253,6 +260,7 @@ if (statsChapter) {
             words={words}
             minutes={minutes}
             layer={headerLayer}
+            mesh={headerMesh}
             lang={lang}
             siteVersion={siteVersion}
           />
@@ -288,6 +296,10 @@ if (statsChapter) {
       }
     </div>
   </div>
+
+  {/* Full-width bands after the reading layout (a closing mesh band with the
+      related links and the sign-up): outside the grid, so they span the page. */}
+  <slot name="after" />
 
   {withSidebar && <div class="doc-scrim" data-drawer-close hidden />}
 

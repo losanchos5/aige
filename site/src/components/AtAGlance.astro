@@ -45,7 +45,7 @@ const cols = count % 3 === 0 ? 3 : count % 2 === 0 ? 2 : 1;
 
 {
   items && items.length > 0 && (
-    <aside class:list={['glance', className]} aria-labelledby="glance-label">
+    <aside class:list={['glance', 'pause', className]} aria-labelledby="glance-label">
       <p class="glance-label" id="glance-label">{t('glance.label')}</p>
       <ol class="glance-list" data-cols={cols}>
         {items.map((item, i) => (
@@ -78,16 +78,14 @@ const cols = count % 3 === 0 ? 3 : count % 2 === 0 ? 2 : 1;
 }
 
 <style>
-  /* A flat box: --surface fill and a 1px --line frame, no shadow, no hover
-     ring and no accent rule (the list is not a set of layers). It is its own
-     inline-size container so the grid below can size to the box. */
+  /* A pause panel (effects.css .pause: the faint ground under a still mesh)
+     with a 1px --line frame, no shadow, no hover ring and no accent rule (the
+     list is not a set of layers). It is its own inline-size container so the
+     grid below can size to the box. */
   .glance {
     container-type: inline-size;
     margin: var(--s-5) 0 var(--s-6);
     padding: var(--s-5);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--surface);
   }
 
   /* Same bleed as .prose > .diagram: take the whole well, not the 72ch column. */

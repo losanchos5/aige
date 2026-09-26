@@ -47,15 +47,17 @@
 /* A short dash above each section title, under the register rule.
    --chapter-ink is set by Doc.astro: the layer's ink for a chapter about one
    stack layer (the same one that tints its header band), --ink everywhere else
-   (audit SL-06). The fallback serves prose outside Doc. */
+   (audit SL-06). Without a layer, Doc sets --chapter-dash to the site's
+   three-ink gradient instead: colour without a layer claim. The fallback
+   serves prose outside Doc. */
 .prose h2::before {
   content: '';
   display: block;
-  width: 24px;
+  width: 40px;
   height: 3px;
   margin-bottom: var(--s-3);
   border-radius: 2px;
-  background: var(--chapter-ink, var(--ink));
+  background: var(--chapter-dash, var(--chapter-ink, var(--ink)));
 }
 
 .prose h3 {
@@ -217,6 +219,99 @@
 .prose .callout[data-kind='practice'] .callout-title { color: var(--l2-ink); }
 .prose .callout[data-kind='example'] .callout-title { color: var(--l1-ink); }
 .prose .callout[data-kind='anti'] .callout-title { color: var(--l3-ink); }
+
+/* ---- Callout bands (visual-rhythm) ----
+   The three worked kinds (practice, example, anti) are the chapter's rests:
+   at the top level of the prose they break out to the whole reading well,
+   like the figures, on a stronger tint of their kind with a soft glow and the
+   gradient ring, while their text keeps the prose column's measure (the extra
+   width goes into the inline padding: 50cqw - 50% is half the well's surplus
+   over the column, since % padding resolves against the column). Off a
+   chapter, or on a phone, the well is the column and the band is a card.
+   The note and "In short" kinds stay in the column and only take the ring. */
+.prose > .callout[data-kind] {
+  border: 1px solid transparent;
+  border-radius: var(--r-lg);
+  box-shadow: none;
+  background:
+    linear-gradient(var(--surface), var(--surface)) padding-box,
+    linear-gradient(var(--bg), var(--bg)) padding-box,
+    var(--grad-ring) border-box;
+}
+
+.prose > .callout:is([data-kind='practice'], [data-kind='example'], [data-kind='anti']) {
+  --co-tint: var(--l2);
+  --co-glow: var(--glow-2);
+  --co-extra: 0px;
+  margin-block: var(--s-6);
+  padding-block: var(--s-5);
+  padding-inline: calc(var(--co-extra) + var(--s-6)) calc(var(--co-extra) + var(--s-5));
+  background:
+    radial-gradient(60% 120% at 100% 0%, var(--co-glow), transparent 70%) padding-box,
+    linear-gradient(
+        color-mix(in srgb, var(--co-tint) 62%, var(--bg)),
+        color-mix(in srgb, var(--co-tint) 62%, var(--bg))
+      )
+      padding-box,
+    var(--grad-ring) border-box;
+}
+
+/* The breakout itself only inside a query container (Doc's .doc-main, the
+   pillar's .pillar-main): elsewhere cq units would fall back to the viewport. */
+:is(.doc-main, .pillar-main)
+  .prose
+  > .callout:is([data-kind='practice'], [data-kind='example'], [data-kind='anti']) {
+  --co-extra: calc(50cqw - 50%);
+  width: 100cqw;
+  margin-inline: calc(50% - 50cqw);
+}
+
+.prose > .callout:is([data-kind='practice'], [data-kind='example'], [data-kind='anti'])::before {
+  left: calc(var(--co-extra) + var(--s-3));
+  top: var(--s-5);
+}
+
+.prose > .callout[data-kind='example'] {
+  --co-tint: var(--l1);
+  --co-glow: var(--glow-1);
+}
+
+.prose > .callout[data-kind='anti'] {
+  --co-tint: var(--l3);
+  --co-glow: var(--glow-3);
+}
+
+/* ---- Table frames (visual-rhythm) ----
+   A table at the top level of the prose takes the whole well (room for its
+   columns, and a rest for the eye) on an opaque ground inside the gradient
+   ring: never a mesh under a table. */
+.prose > .table-scroll {
+  margin-block: var(--s-6);
+  border: 1px solid transparent;
+  border-radius: var(--r-lg);
+  background:
+    linear-gradient(var(--bg), var(--bg)) padding-box,
+    var(--grad-ring) border-box;
+}
+
+:is(.doc-main, .pillar-main) .prose > .table-scroll {
+  width: 100cqw;
+  margin-inline: calc(50% - 50cqw);
+}
+
+/* The ring is the table's outer edge: drop the cells' outer borders. */
+.prose > .table-scroll :is(th, td):first-child {
+  border-left: 0;
+}
+.prose > .table-scroll :is(th, td):last-child {
+  border-right: 0;
+}
+.prose > .table-scroll table > :first-child > tr:first-child > :is(th, td) {
+  border-top: 0;
+}
+.prose > .table-scroll table > :last-child > tr:last-child > td {
+  border-bottom: 0;
+}
 
 /* ---- "Maps to:" register line ---- */
 .prose .maps-to {

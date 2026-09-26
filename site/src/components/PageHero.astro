@@ -174,13 +174,14 @@ const landing = variant === 'page';
   }
 
   /* Reference variant: dense pages get an H1-scale title, a tighter band
-     (--s-6 against the landing's --s-8) and a faint wash of mesh. (Moved here
+     (--s-6 against the landing's --s-8) and a soft wash of mesh. (Moved here
      from .res-hero / .res-head / .res-title in the page and resources
-     stylesheets.) */
+     stylesheets.) The wash went from .35 to .65 (visual-rhythm): at .35 the
+     reference pages read as cream from the first screen. */
   .hero--res {
     min-height: 0;
     padding-block: var(--s-6) var(--s-5);
-    --mesh-alpha: 0.35;
+    --mesh-alpha: 0.65;
   }
 
   .hero--res .hero-title {

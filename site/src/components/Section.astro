@@ -4,17 +4,19 @@
  * renders `<section class="section sec sec--{tone}">` with an inert gradient
  * mesh when `tone="mesh"` (aria-hidden, pointer-events:none via effects.css),
  * an optional head (title + lede) and the page content. `mesh` picks the
- * mesh's composition (a, the default, drifts on a mesh band; b and c are
- * still) and also lays a still mesh over a `tone="tint"` band; `meshK` scales its strength. `tone="dark"`
- * re-scopes the dark token set in effects.css so children render with audited
- * dark contrast. No eyebrow above the title and no dot/grid texture: the audit
+ * mesh's composition (a, the default, drifts on a mesh band; b to e are
+ * still) and also lays a still mesh over a `tone="tint"` or `tone="deep"`
+ * band; `meshK` scales its strength. `hue` colours a tint band in one of the
+ * five tones (a mood, not a layer claim). `tone="dark"` re-scopes the dark
+ * token set in effects.css so children render with audited dark contrast;
+ * `tone="deep"` is the same set on the L1 navy. No eyebrow above the title and no dot/grid texture: the audit
  * (SL-04, SL-18) retired both.
  *
  * Slots: default (body) and "foot" (a trailing row, e.g. a .sec-link).
  */
 interface Props {
   /** Background treatment. */
-  tone?: 'plain' | 'tint' | 'dark' | 'mesh';
+  tone?: 'plain' | 'tint' | 'dark' | 'mesh' | 'deep';
   /** id for in-page anchors. */
   id?: string;
   /** Extra class(es) on the <section>. */
@@ -29,8 +31,12 @@ interface Props {
   rule?: boolean;
   /** Widen the inner container past the default max. */
   wide?: boolean;
-  /** Mesh composition; on a tint band it also adds the mesh. */
-  mesh?: 'a' | 'b' | 'c';
+  /** Mesh composition; on a tint band it also adds the mesh. a drifts on a
+      mesh band; b, c, d and e stay still. */
+  mesh?: 'a' | 'b' | 'c' | 'd' | 'e';
+  /** Tone of a tint band (l1..l5): a coloured ground instead of the pale
+      default. A mood, not a layer claim. */
+  hue?: 'l1' | 'l2' | 'l3' | 'l4' | 'l5';
   /** Mesh strength, a factor on --mesh-alpha (default 1). */
   meshK?: number;
 }
@@ -46,13 +52,19 @@ const {
   wide = false,
   mesh,
   meshK,
+  hue,
 } = Astro.props;
 
 const hasHead = Boolean(title || lede);
-const hasMesh = tone === 'mesh' || (tone === 'tint' && mesh !== undefined);
+const hasMesh =
+  tone === 'mesh' || ((tone === 'tint' || tone === 'deep') && mesh !== undefined);
 ---
 
-<section id={id} class:list={['section', 'sec', `sec--${tone}`, className]}>
+<section
+  id={id}
+  class:list={['section', 'sec', `sec--${tone}`, className]}
+  data-hue={tone === 'tint' ? hue : undefined}
+>
   {
     hasMesh && (
       <div

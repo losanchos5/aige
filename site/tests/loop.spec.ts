@@ -325,39 +325,48 @@ test.describe('home section backgrounds', () => {
       els.map((el) => {
         const mesh = el.querySelector(':scope > .bg-mesh');
         const variant = mesh
-          ? mesh.classList.contains('bg-mesh--b')
-            ? 'b'
-            : mesh.classList.contains('bg-mesh--c')
-              ? 'c'
-              : 'a'
+          ? (['b', 'c', 'd', 'e'].find((k) => mesh.classList.contains(`bg-mesh--${k}`)) ?? 'a')
           : null;
         return {
           title: el.querySelector('.sec-title')?.textContent?.trim() ?? '',
           tone: [...el.classList].find((c) => c.startsWith('sec--'))?.slice(5),
+          hue: (el as HTMLElement).dataset.hue ?? null,
           variant,
           opacity: mesh ? Number(getComputedStyle(mesh).opacity) : null,
         };
       }),
     );
     const find = (start: string) => sections.find((s) => s.title.startsWith(start))!;
-    expect(find('The discipline, defined')).toMatchObject({ tone: 'mesh', variant: 'b', opacity: 0.5 });
-    expect(find('Three questions')).toMatchObject({ tone: 'mesh', variant: 'c', opacity: 0.5 });
-    expect(find('A build order')).toMatchObject({ tone: 'tint', variant: 'a', opacity: 0.35 });
+    expect(find('The discipline, defined')).toMatchObject({ tone: 'mesh', variant: 'b', opacity: 0.85 });
+    expect(find('Three questions')).toMatchObject({ tone: 'tint', hue: 'l1', variant: 'd', opacity: 0.6 });
+    expect(find('A build order')).toMatchObject({ tone: 'mesh', variant: 'e', opacity: 0.8 });
+    // The deep band carries the dark token set, whose --mesh-alpha is 0.55:
+    // meshK 0.7 x 0.55.
     expect(find('Where AI Governance Engineering operates')).toMatchObject({
-      tone: 'mesh',
+      tone: 'deep',
       variant: 'c',
-      opacity: 0.4,
+      opacity: 0.385,
     });
-    expect(find('Eight values')).toMatchObject({ tone: 'mesh', variant: 'b', opacity: 0.45 });
-    expect(find('The role is')).toMatchObject({ tone: 'mesh', variant: 'a', opacity: 0.6 });
+    expect(find('Eight values')).toMatchObject({ tone: 'tint', hue: 'l4', variant: 'b', opacity: 0.5 });
+    expect(find('The role is')).toMatchObject({ tone: 'mesh', variant: 'a', opacity: 0.9 });
     // The chapters section's title counts the chapters from the data.
     expect(find(`${chaptersOrdered.length} chapters`)).toMatchObject({
-      tone: 'mesh',
+      tone: 'tint',
+      hue: 'l5',
       variant: 'c',
-      opacity: 0.45,
+      opacity: 0.5,
     });
-    expect(find('Curated resources')).toMatchObject({ tone: 'tint', variant: 'b', opacity: 0.35 });
-    expect(find('Follow the changes')).toMatchObject({ tone: 'mesh', variant: 'c', opacity: 0.35 });
+    expect(find('Curated resources')).toMatchObject({ tone: 'mesh', variant: 'd', opacity: 0.8 });
+    expect(find('What applies now')).toMatchObject({ tone: 'tint', hue: 'l3', variant: 'e', opacity: 0.5 });
+    expect(find('Follow the changes')).toMatchObject({ tone: 'mesh', variant: 'c', opacity: 0.75 });
+    // Neighbouring tint bands never share a tone, and a deep band never sits
+    // next to the dark verdict band.
+    for (let i = 1; i < sections.length; i++) {
+      const [a, b] = [sections[i - 1], sections[i]];
+      if (a.hue && b.hue) expect(a.hue, `${a.title} / ${b.title}`).not.toBe(b.hue);
+      const darkish = (t?: string) => t === 'dark' || t === 'deep';
+      expect(darkish(a.tone) && darkish(b.tone), `${a.title} / ${b.title}`).toBe(false);
+    }
     // Only the dark verdict band has neither a tint nor a mesh.
     expect(sections.filter((s) => s.tone === 'plain')).toHaveLength(0);
     for (let i = 1; i < sections.length; i++) {

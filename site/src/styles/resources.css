@@ -11,6 +11,22 @@
   padding-block: var(--s-5) var(--s-8);
 }
 
+/* A reference page composed of bands (<Section class="res-band">): a tighter
+   rhythm than the landing sections, since the content is dense. The first
+   band sits under the hero, the last keeps the page's closing air. */
+.sec.res-band {
+  padding-block: var(--s-7);
+}
+
+.sec.res-band--last {
+  padding-bottom: var(--s-8);
+}
+
+.res-band > .sec-inner > .res-section:first-child,
+.res-band > .sec-inner > .res-section-head:first-child {
+  margin-top: 0;
+}
+
 /* Sub-section rhythm: a running register rule between stacked blocks. */
 .res-section {
   margin-top: var(--s-7);
