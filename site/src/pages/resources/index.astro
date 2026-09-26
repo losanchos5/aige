@@ -10,6 +10,8 @@ import { getReadingList } from '../../lib/reading-list';
 import { getGlossary } from '../../lib/glossary';
 import { harms, levelOrder } from '../../data/harms';
 import { cases } from '../../data/cases';
+import { controls, profiles } from '../../data/controls';
+import { researchThemes, writtenThemes } from '../../data/research';
 import { clauses, licenceTypes } from '../../data/contracts';
 import { kit } from '../../data/templates';
 import { getSchemas } from '../../lib/schemas-library';
@@ -80,6 +82,14 @@ const entries = [
     description:
       'Public AI incidents written as engineering post-mortems: what failed, which control would have caught it and what evidence it would have left.',
     count: `${cases.length} cases`,
+  },
+  {
+    title: 'Open control profiles',
+    href: '/controls',
+    swatch: 'var(--l4)',
+    description:
+      'Draft control specifications for AI evaluation environments and agent runtimes, each control with its failure modes, verification and the evidence it leaves.',
+    count: `${controls.length} controls · ${profiles.length} profiles`,
   },
   {
     title: 'Contracts',
@@ -156,6 +166,14 @@ const entries = [
     count: '10 tools · no account',
   },
   {
+    title: 'Research notes',
+    href: '/research',
+    swatch: 'var(--l5)',
+    description:
+      'Technical notes on the open questions of the discipline: what is assumed, what the evidence shows and what would settle each one, versioned and open for review.',
+    count: `${writtenThemes().length} ${writtenThemes().length === 1 ? 'note' : 'notes'} · ${researchThemes.length - writtenThemes().length} planned`,
+  },
+  {
     title: 'The map',
     href: '/map',
     swatch: 'var(--l3)',
@@ -229,7 +247,7 @@ const jsonLd = [breadcrumbJsonLd(crumbs), collection];
     variant="res"
     crumbs={crumbs}
     title="AI governance resources: curated, sourced, versioned."
-    lede={`${cardCount[0].toUpperCase()}${cardCount.slice(1)} references drawn straight from the Body of Knowledge: the frameworks the discipline maps against, the obligation register and the crosswalk that reads each topic across them, the harms atlas and the incident cases, contract clauses, templates and schemas for governance records, the figures, the tool categories that fill each layer and the browser toolkit, the sources that formed it, the terms it uses, the open data behind every page and the map that lays the whole discipline on one canvas.`}
+    lede={`${cardCount[0].toUpperCase()}${cardCount.slice(1)} references drawn straight from the Body of Knowledge: the frameworks the discipline maps against, the obligation register and the crosswalk that reads each topic across them, the harms atlas and the incident cases, the open control profiles, contract clauses, templates and schemas for governance records, the figures, the tool categories that fill each layer and the browser toolkit, the sources that formed it, the terms it uses, the open data behind every page, the research notes and the map that lays the whole discipline on one canvas.`}
   >
     <p slot="note">
       Everything here is extracted from the Body of Knowledge v{site.bokVersion} and stays in sync

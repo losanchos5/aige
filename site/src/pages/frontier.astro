@@ -39,7 +39,7 @@ import {
   type FrontierLink,
 } from '../data/frontier';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
-import { authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
+import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
 import { fitsSiteSuffix } from '../lib/seo-title';
 import '../styles/pages.css';
 import '../styles/resources.css';
@@ -64,6 +64,8 @@ const jsonLd = [
     isPartOf: { '@id': WEBSITE_ID },
     publisher: { '@id': ORG_ID },
     author: [...authorRefs],
+    // The same sources as the sitemap's lastmod (astro.config.ts SOURCE_BY_PATH).
+    dateModified: lastModified('src/pages/frontier.astro', 'src/data/frontier.ts'),
     audience: { '@type': 'Audience', audienceType: frontierRoles.join(', ') },
   },
   breadcrumbJsonLd(crumbs),
