@@ -222,7 +222,7 @@ test.describe('TDM exception keeps the two articles apart', () => {
     const definition = getGlossaryEntry('tdm-exception')?.definition ?? '';
     expect(definition).not.toContain('Articles 3 and 4');
     expect(definition).toMatch(/Article 3 covers scientific research by research organisations and cultural heritage institutions/);
-    expect(definition).toMatch(/Article 4 lets anyone .* unless the rightholder has reserved that use/);
+    expect(definition).toMatch(/Article 4 lets anyone .* unless the rightholder has reserved it/);
   });
 });
 
