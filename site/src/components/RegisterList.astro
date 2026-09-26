@@ -14,6 +14,8 @@ export interface RegisterItem {
   swatch?: string;
   /** Mono index label; auto-numbered from 01 when omitted. */
   index?: string;
+  /** Extra attributes on the row link, e.g. Umami data-umami-event. */
+  attrs?: Record<string, string>;
 }
 
 interface Props {
@@ -33,7 +35,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
       const Inner = item.href ? 'a' : 'div';
       return (
         <li class="row" style={`--tint:${swatch}`}>
-          <Inner class="rowlink" {...(item.href ? { href: item.href } : {})}>
+          <Inner class="rowlink" {...(item.href ? { href: item.href, ...(item.attrs ?? {}) } : {})}>
             <span class="cell idx" aria-hidden="true">
               {idx}
             </span>

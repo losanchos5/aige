@@ -39,7 +39,7 @@ import {
   type FrontierLink,
 } from '../data/frontier';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
-import { authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
+import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
 import { fitsSiteSuffix } from '../lib/seo-title';
 import '../styles/pages.css';
 import '../styles/resources.css';
@@ -64,10 +64,20 @@ const jsonLd = [
     isPartOf: { '@id': WEBSITE_ID },
     publisher: { '@id': ORG_ID },
     author: [...authorRefs],
+    // The same sources as the sitemap's lastmod (astro.config.ts SOURCE_BY_PATH).
+    dateModified: lastModified('src/pages/frontier.astro', 'src/data/frontier.ts'),
     audience: { '@type': 'Audience', audienceType: frontierRoles.join(', ') },
   },
   breadcrumbJsonLd(crumbs),
 ];
+
+// Umami attributes (declarative) on the rows that lead to the open data API and the MCP server.
+const docsEvent = (href: string): Record<string, string> | undefined =>
+  href === '/mcp'
+    ? { 'data-umami-event': 'mcp-docs-click', 'data-umami-event-from': '/frontier' }
+    : href === '/resources/data' || href.startsWith('/api/v1')
+      ? { 'data-umami-event': 'api-docs-click', 'data-umami-event-from': '/frontier' }
+      : undefined;
 
 const toRows = (links: readonly FrontierLink[]) =>
   links.map((l) => ({
@@ -75,6 +85,7 @@ const toRows = (links: readonly FrontierLink[]) =>
     description: l.description,
     href: l.href,
     ...(l.layer ? { swatch: `var(--l${l.layer})` } : {}),
+    ...(docsEvent(l.href) ? { attrs: docsEvent(l.href) } : {}),
   }));
 
 // Plain and tinted bands alternate: #who is plain, so the blocks start tinted.

@@ -64,9 +64,27 @@ describe('resources', () => {
     await assert.rejects(client.readResource({ uri: `${CANONICAL_API}/obligations/..%2F..%2Fsecret.json` }));
   });
 
-  it('lists the obligation template', async () => {
+  it('lists the obligation and control templates', async () => {
     const { resourceTemplates } = await client.listResourceTemplates();
     assert.ok(resourceTemplates.some((t) => t.uriTemplate === `${CANONICAL_API}/obligations/{id}.json`));
+    assert.ok(resourceTemplates.some((t) => t.uriTemplate === `${CANONICAL_API}/controls/{id}.json`));
+  });
+
+  it('reads one control through the template and rejects a malformed id', async () => {
+    const result = await client.readResource({ uri: `${CANONICAL_API}/controls/aige-ctl-eval-002.json` });
+    const content = result.contents[0] as { text?: string; mimeType?: string };
+    assert.equal(content.mimeType, 'application/json');
+    const doc = JSON.parse(content.text ?? '{}') as { control: { id: string }; notice: string };
+    assert.equal(doc.control.id, 'AIGE-CTL-EVAL-002');
+    assert.match(doc.notice, /not a claim of conformity/);
+    await assert.rejects(client.readResource({ uri: `${CANONICAL_API}/controls/..%2F..%2Fsecret.json` }));
+  });
+
+  it('reads the controls dataset under its canonical URI', async () => {
+    const result = await client.readResource({ uri: `${CANONICAL_API}/controls.json` });
+    const doc = JSON.parse((result.contents[0] as { text?: string }).text ?? '{}') as { controls: unknown[]; profiles: unknown[] };
+    assert.ok(doc.controls.length > 0);
+    assert.ok(doc.profiles.length > 0);
   });
 });
 

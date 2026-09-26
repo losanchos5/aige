@@ -1,8 +1,8 @@
 // resources.ts: the open datasets as MCP resources. Each resource URI is the
 // canonical public URL of the document (https://aigovernanceengineer.com/...),
 // so a client that can fetch the web may also read it directly; the server
-// reads it through the same cache as the tools (from API_BASE). One resource
-// template serves the per-obligation documents.
+// reads it through the same cache as the tools (from API_BASE). Two resource
+// templates serve the per-obligation and per-control documents.
 
 import { ResourceTemplate, type McpServer } from '@modelcontextprotocol/server';
 
@@ -54,6 +54,24 @@ export function registerResources(server: McpServer, data: DataSource): void {
         throw new Error(`Not an obligation id: "${id}". Ids look like aige-obl-euaia-art9.`);
       }
       return { contents: [{ uri: uri.href, mimeType: 'application/json', text: await data.obligationItemText(id) }] };
+    },
+  );
+
+  server.registerResource(
+    'control',
+    new ResourceTemplate(`${CANONICAL_API}/controls/{id}.json`, { list: undefined }),
+    {
+      title: 'One control',
+      description: `One reference control of the open control profiles by its lower-case id, e.g. aige-ctl-eval-002. A draft control specification, open for technical review. ${ATTRIBUTION}`,
+      mimeType: 'application/json',
+    },
+    async (uri, variables) => {
+      const raw = variables.id;
+      const id = (Array.isArray(raw) ? raw[0] : raw)?.toLowerCase() ?? '';
+      if (!/^aige-ctl-[a-z0-9]+-[0-9]{3}$/.test(id)) {
+        throw new Error(`Not a control id: "${id}". Ids look like aige-ctl-eval-002.`);
+      }
+      return { contents: [{ uri: uri.href, mimeType: 'application/json', text: await data.controlItemText(id) }] };
     },
   );
 

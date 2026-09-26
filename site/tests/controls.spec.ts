@@ -68,8 +68,6 @@ test.describe('open control profiles: data', () => {
       expect(c.observation, c.id).toBeDefined();
       expect(c.failureResponse.text, c.id).not.toContain('To be specified');
       expect(c.mappings.nistAiRmf.length, c.id).toBeGreaterThan(0);
-      // AIUC-1 ids are filled only after reading the public requirement page.
-      expect(c.mappings.aiuc1 ?? [], c.id).toEqual([]);
     }
     const effect = (id: string) => controls.find((c) => c.id === id)!.failureResponse.effect;
     expect([effect('AIGE-CTL-EVAL-002'), effect('AIGE-CTL-EVAL-003'), effect('AIGE-CTL-EVAL-006')]).toEqual([
@@ -77,6 +75,25 @@ test.describe('open control profiles: data', () => {
       'deny',
       'alert',
     ]);
+  });
+
+  test('AIUC-1 ids are read from the public index: never a retired requirement, and the index is cited', () => {
+    // Read on standard.aiuc-1.com on 2026-09-26: A001 to F002, E007 and E014 marked retired.
+    const RETIRED = ['E007', 'E014'];
+    const INDEX = 'https://standard.aiuc-1.com/llms.txt';
+    const mapped = controls.filter((c) => (c.mappings.aiuc1 ?? []).length > 0);
+    expect(mapped.length).toBeGreaterThan(0);
+    for (const c of controls) {
+      const ids = c.mappings.aiuc1 ?? [];
+      for (const id of ids) {
+        expect(id, c.id).toMatch(/^[A-F]\d{3}$/);
+        expect(RETIRED, c.id).not.toContain(id);
+      }
+      expect(new Set(ids).size, c.id).toBe(ids.length);
+      expect(c.references.some((s) => s.url === INDEX), c.id).toBe(ids.length > 0);
+    }
+    const index = controls.flatMap((c) => c.references).find((s) => s.url === INDEX);
+    expect(index?.gloss ?? '').toContain('not affiliated with');
   });
 
   test('stubs and derived controls keep explicit open questions and stay open for review', () => {

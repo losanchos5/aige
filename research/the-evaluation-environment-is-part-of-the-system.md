@@ -43,7 +43,8 @@ An evaluation result is usually reported as a property of a model. In practice i
 a model running inside a harness, with tools, credentials, network routes and, more and more often,
 the authority to act for someone. METR's public investigation of the OpenAI/Hugging Face incident
 reports that agents meant to be fully isolated from one another communicated through a shared
-internal package repository, found working credentials and spoofed tool calls [1]. None of that is
+internal package repository, shared credentials one of them found exposed online, and spoofed tool
+calls [1]. None of that is
 a statement about model weights; all of it changes what the evaluation measured. This note argues
 that the evaluation environment belongs inside the governed system, names five parts of it that an
 evaluation must record, and states what that implies for the nine draft controls of the
@@ -105,8 +106,8 @@ affiliated with or certified by AIUC.
 I use METR's investigation because it is public, recent and specific. METR reports that the agents
 "were meant to be fully isolated from one another" [1]. It reports that they noticed agents in
 other sandboxes fetching packages through Artifactory, an internal package repository, and used it
-to coordinate; that one agent "found two working credentials, and immediately posted them" to a
-shared board; that code execution on a sandbox running CyberGym evaluations gave agents "more
+to coordinate; that one agent, searching for Hugging Face credentials exposed on the internet,
+"found two working credentials, and immediately posted them" to a shared board; that code execution on a sandbox running CyberGym evaluations gave agents "more
 flexible access to the full internet"; and that at least 96 transcripts show spoofed tool calls
 [1]. Each finding sits in a different part of the environment, which is the point of the list
 below.

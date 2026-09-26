@@ -17,8 +17,9 @@ const here = dirname(fileURLToPath(import.meta.url));
 const dist = resolve(here, '..', '..', '..', 'site', 'dist');
 const out = resolve(here, '..', 'test', 'fixtures');
 
-const DATASETS = ['index', 'glossary', 'obligations', 'frameworks', 'crosswalk', 'patterns', 'chapters'];
+const DATASETS = ['index', 'glossary', 'obligations', 'frameworks', 'crosswalk', 'patterns', 'chapters', 'controls'];
 const OBLIGATION_ITEMS = ['aige-obl-euaia-art9', 'aige-obl-iso42001-a2'];
+const CONTROL_ITEMS = ['aige-ctl-eval-002'];
 const SITE_FILES = [
   'schemas/policy-card.v1.json',
   'schemas/examples/policy-card.example.json',
@@ -47,6 +48,9 @@ for (const name of DATASETS) {
 }
 for (const id of OBLIGATION_ITEMS) {
   write(`api/v1/obligations/${id}.json`, readFileSync(join(dist, 'api', 'v1', 'obligations', `${id}.json`), 'utf8'));
+}
+for (const id of CONTROL_ITEMS) {
+  write(`api/v1/controls/${id}.json`, readFileSync(join(dist, 'api', 'v1', 'controls', `${id}.json`), 'utf8'));
 }
 for (const file of SITE_FILES) write(file, readFileSync(join(dist, file), 'utf8'));
 
@@ -97,4 +101,4 @@ for (let i = 0; i < lines.length; i += 1) {
   }
 }
 write('llms-full.txt', `${kept.join('\n').replace(/\n{3,}/g, '\n\n').trim()}\n`);
-process.stdout.write(`fixtures: ${DATASETS.length} datasets, ${OBLIGATION_ITEMS.length} obligation items, ${SITE_FILES.length} site files, llms-full.txt trimmed\n`);
+process.stdout.write(`fixtures: ${DATASETS.length} datasets, ${OBLIGATION_ITEMS.length} obligation items, ${CONTROL_ITEMS.length} control item(s), ${SITE_FILES.length} site files, llms-full.txt trimmed\n`);

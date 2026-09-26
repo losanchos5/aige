@@ -47,6 +47,8 @@ const SHARED_CARDS: Record<string, string> = {
   '/og/for.png': 'Routes by audience',
   '/og/controls.png': 'Open AI governance controls',
   '/og/frontier.png': 'Engineering assurance for frontier AI',
+  '/og/research.png': 'Research and technical notes',
+  '/og/contribute.png': 'Contribute to the project',
   '/og/bok-patterns.png': '05. Patterns',
   '/og/bok-glossary.png': '09. Glossary',
   '/og/bok-governing-agents.png': '23. Governing AI agents',
