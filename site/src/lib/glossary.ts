@@ -249,6 +249,7 @@ const ALIASES: Record<string, string[]> = {
   'Responsible-AI licence (OpenRAIL)': ['OpenRAIL'],
   'ISO/IEC 42001': ['ISO 42001'],
   'ISO/IEC 42005': ['ISO 42005'],
+  'AI system impact assessment': ['AI impact assessment', 'AIIA'],
   'NIST AI RMF': ['AI RMF'],
   'EU declaration of conformity': ['declaration of conformity'],
   'Training, validation and testing data': ['training data', 'validation data', 'testing data'],

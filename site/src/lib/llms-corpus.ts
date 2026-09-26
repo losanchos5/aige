@@ -99,6 +99,7 @@ import { lastModified } from './jsonld';
 import { pageMeta, staticRoutes } from './llms-routes';
 import { readSource } from './md-parse';
 import { loadPatternPages } from './pattern-pages';
+import { termDate } from './glossary-dates';
 import { gitDate } from './reading';
 import { sourceText, type Source } from './sources';
 
@@ -266,7 +267,7 @@ export function glossaryDoc(entry: GlossaryEntry): CorpusDoc {
     title: entry.term,
     path: entry.url,
     description: firstSentence(entry.definition),
-    updated: updatedOf('../bok/09-glossary.md'),
+    updated: termDate(entry.slug),
     body,
   };
 }

@@ -499,7 +499,7 @@ export const DESCRIPTION_LEADS: Readonly<Record<string, string>> = {
   'AIGE-OBL-USWA-MHMDA':
     'Washington MHMDA: separate consent to collect and to share consumer health data, incl. algorithm- or ML-derived data, and signed authorisation for any sale.',
   'AIGE-OBL-USFED-TITLE7-703K':
-    'Title VII: disparate impact is illegal unless job-related and consistent with business necessity, and a less discriminatory alternative can still be required.',
+    'Title VII: disparate impact is unlawful unless job-related and consistent with business necessity; a less discriminatory alternative can still be required.',
   'AIGE-OBL-USFED-TAKEITDOWN':
     'TAKE IT DOWN Act: covered platforms remove non-consensual intimate images, incl. AI forgeries, and known identical copies within 48 hours of a valid request.',
   'AIGE-OBL-KR-ART34':

@@ -315,7 +315,7 @@ export const roleAnswers = {
   // The figures are the primary medians of `market` above (tests/seo-titles.spec.ts
   // checks that each tile value appears in this answer).
   salary:
-    'The IAPP Salary & Jobs Report 2025-26 puts the median technical AI-governance salary at USD 221k in the tech sector, its highest band. The median across AI-governance work generally is USD 151.8k, and USD 169.7k for combined privacy-and-AI-governance roles. These are primary medians; other demand signals are reported below, not as headline figures.',
+    'The IAPP Salary & Jobs Report 2025-26 puts the median technical AI-governance salary at USD 221k in the tech sector, its highest band. The median across AI-governance work generally is USD 151.8k, and USD 169.7k for combined privacy-and-AI-governance roles. These are primary medians, not job-board averages.',
 } as const;
 
 /**

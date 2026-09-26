@@ -127,7 +127,7 @@ oversight where it is needed. Runtime controls, an incident process and evidence
 the obligation it serves. Roles and decision rights hold it together.
 
 Most frameworks list the same components in different words. The list below groups them by what
-they do, and names the layer of the [five-layer stack](/stack) that produces each one. The stack is
+they do, and names the layer of the [AI governance framework in five layers](/stack) that produces each one. The stack is
 the Body of Knowledge's reference architecture. Its order is a build order, because each layer
 consumes what the layer before it produces
 ([how to read the stack](/bok/the-stack#how-to-read-the-stack)).
