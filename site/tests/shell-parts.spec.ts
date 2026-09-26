@@ -1,5 +1,5 @@
 // shell-parts.spec.ts: the Body of Knowledge as a book in parts across the site
-// shell (the /bok index, the drawer, the chapter rail), the newsletter at the
+// shell (the /bok index, the chapter rail), the newsletter at the
 // end of each chapter, the declarative Umami events and the methodology page.
 import { test, expect } from '@playwright/test';
 import { chaptersOrdered } from '../src/data/chapters';
@@ -57,25 +57,7 @@ test.describe('/bok index by part', () => {
   });
 });
 
-test('the drawer folds the chapters under one caption per part', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 800 });
-  await page.goto('/');
-  await page.locator('.burger').click();
-  const drawer = page.locator('#nav-drawer');
-  await expect(drawer).toHaveJSProperty('open', true);
-  const chapters = drawer.locator('details.nav-drawer-chapters');
-  const first = chaptersOrdered[0].order;
-  const last = chaptersOrdered[chaptersOrdered.length - 1].order;
-  await expect(chapters.locator('summary')).toHaveText(
-    `Chapters ${String(first).padStart(2, '0')}–${String(last).padStart(2, '0')}`,
-  );
-  await chapters.locator('summary').click();
-  for (const part of bookParts) {
-    const name = `${part.title} ${part.range}`;
-    await expect(chapters.getByRole('list', { name, exact: true }), name).toBeVisible();
-  }
-  await expect(chapters.locator('a')).toHaveCount(chaptersOrdered.length);
-});
+// The drawer's chapters by part: tests/mobile-nav.spec.ts.
 
 test('the chapter rail groups its rows by part', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
