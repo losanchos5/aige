@@ -29,3 +29,11 @@ const { sources, prefix = 'src' } = Astro.props;
     ))
   }
 </ol>
+
+<style>
+  /* A long bare URL wraps inside the row on a phone instead of widening the
+     page. */
+  .sources a {
+    overflow-wrap: anywhere;
+  }
+</style>

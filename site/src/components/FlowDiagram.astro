@@ -157,6 +157,9 @@ const wide = steps.length > 5;
     font-size: 1rem;
     font-weight: 600;
     line-height: 1.3;
+    /* A narrow node (seven in a row) hyphenates a long word ("Authoriza-
+       tion") before it falls back to breaking anywhere. */
+    hyphens: auto;
     overflow-wrap: anywhere;
   }
 
@@ -235,6 +238,25 @@ const wide = steps.length > 5;
     .flow[data-wide] .flow-steps {
       grid-auto-flow: column;
       grid-auto-columns: minmax(0, 1fr);
+    }
+
+    /* Six or seven nodes in a row are narrow: the swatch moves above the
+       label and the side padding tightens, so a long word ("Authorization")
+       keeps its line instead of breaking inside the word. */
+    .flow[data-wide] .flow-node {
+      flex-direction: column;
+      gap: var(--s-2);
+      padding-inline: var(--s-3);
+    }
+
+    .flow[data-wide] .flow-swatch {
+      margin-top: 0;
+    }
+
+    /* A step with no layer keeps its label on the same line as its
+       neighbours': the swatch's height plus the gap. */
+    .flow[data-wide]:has(.flow-swatch) .flow-step[data-layer='none'] .flow-text {
+      margin-top: calc(12px + var(--s-2));
     }
 
     .flow[data-wide] .flow-step:not(:last-child)::after {

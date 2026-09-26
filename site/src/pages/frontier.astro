@@ -202,13 +202,6 @@ const stackRows = layers.map((layer) => ({
     margin-top: var(--s-7);
   }
 
-  /* Seven steps in a row leave each node narrow at the 1200px container:
-     hyphenate a long label ("Authorization") instead of breaking it
-     anywhere. */
-  .fr-chain :global(.flow-label) {
-    hyphens: auto;
-  }
-
   /* .prose carries the citation chip styles; drop the outer margin a
      Section body does not need. */
   .fr-prose {
