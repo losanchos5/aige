@@ -906,18 +906,20 @@ const resources = [
     color: var(--ink-2);
   }
 
-  /* Follow the changes: the newsletter form and the open work side by side
-     from 960px (the list, the longer of the two, takes the wider column),
-     stacked below. */
+  /* Follow the changes: the newsletter form, then the open work under it at
+     every width. Side by side, the list (six rows) left the form's column
+     half empty on desktop; stacked, each row's note keeps one line. The
+     column is minmax(0, 1fr): an auto track grows to its widest unbreakable
+     line and pushed the page sideways at 390px with text at 200%. */
   .nl-grid {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--s-6);
     align-items: start;
   }
 
   @media (min-width: 960px) {
     .nl-grid {
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
       gap: var(--s-7);
     }
   }
