@@ -241,7 +241,9 @@ const jsonLd = [
     illustrative, not a claim of conformity; an empty cell means no mapping has been verified yet.
     AIUC-1 ids point at the public requirement index of the Artificial Intelligence Underwriting
     Company, cited here as a reference; this project is not affiliated with AIUC, and each mapping
-    is our own reading of the requirement text.
+    is our own reading of the requirement text. The same mappings, read from the framework side
+    and across every profile, are in the
+    <a href={`/controls/crosswalk#by-profile-${profile.slug}`}>controls crosswalk</a>.
   </p>
   <div class="res-tablewrap cp-tablewrap" role="region" aria-labelledby="mappings" tabindex="0">
     <table class="res-table cp-table">
@@ -290,14 +292,9 @@ const jsonLd = [
             <li>
               {q.question}{' '}
               <span class="cp-qids">
-                (
-                {q.controls.map((c, i) => (
-                  <>
-                    {i > 0 && ', '}
-                    <a href={`#${controlAnchor(c)}`}>{c.id.slice(-3)}</a>
-                  </>
-                ))}
-                )
+                ({q.controls.map((c, i) => (
+                  <>{i > 0 && ', '}<a href={`#${controlAnchor(c)}`}>{c.id.slice(-3)}</a></>
+                ))})
               </span>
             </li>
           ))}
@@ -334,18 +331,14 @@ const jsonLd = [
   <ul>
     <li>
       Each control as JSON, for example{' '}
-      <a href={`/api/v1/controls/${controlAnchor(rows[0])}.json`} data-umami-event="control-download" data-umami-event-id={rows[0].id} data-umami-event-format="json">
-        {rows[0].id}
-      </a>
-      : the link sits at the foot of every control above.
+      <a href={`/api/v1/controls/${controlAnchor(rows[0])}.json`} data-umami-event="control-download" data-umami-event-id={rows[0].id} data-umami-event-format="json">{rows[0].id}</a>:
+      the link sits at the foot of every control above.
     </li>
     {
       machine.map((l) => (
         <li>
-          <a href={l.href} {...machineEvent(l)}>
-            {l.label}
-          </a>
-          : {l.note}.
+          <a href={l.href} {...machineEvent(l)}>{l.label}</a>:
+          {l.note}.
         </li>
       ))
     }

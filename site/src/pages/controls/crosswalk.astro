@@ -196,16 +196,18 @@ const jsonLd = collectionPage({
               {fw.note}{' '}
               {plural(fw.rows.length, 'id')}, {plural(pairsOf(fw), 'mapping')}.
               {fw.url && (
-                <>
-                  {' '}
-                  <a href={fw.url} {...external(fw.url)}>
-                    Source
-                  </a>
-                  .
-                </>
+                <>{' '}<a href={fw.url} {...external(fw.url)}>Source</a>.</>
               )}
             </p>
-            <div class="res-tablewrap cp-tablewrap" role="region" aria-labelledby={fw.id} tabindex="0">
+            {/* An instrument can sit both in the obligation register and among the
+                threat catalogues under one name (OWASP): the register's regions
+                are named with their group, so every landmark name is unique. */}
+            <div
+              class="res-tablewrap cp-tablewrap"
+              role="region"
+              aria-labelledby={level === 3 ? `obligations ${fw.id}` : fw.id}
+              tabindex="0"
+            >
               <table class="res-table cp-table">
                 <caption class={fw.id === 'aiuc1' ? 'cw-caption' : 'visually-hidden'}>
                   {fw.id === 'aiuc1' ? AIUC1_NOTE : `The controls mapped to each clause or id of ${fw.name}`}
@@ -223,9 +225,7 @@ const jsonLd = collectionPage({
                         <span>
                           <span class="cp-ids">
                             {r.url ? (
-                              <a href={r.url} {...external(r.url)}>
-                                {r.ref}
-                              </a>
+                              <a href={r.url} {...external(r.url)}>{r.ref}</a>
                             ) : (
                               r.ref
                             )}
@@ -240,9 +240,7 @@ const jsonLd = collectionPage({
                             const c = control(id);
                             return (
                               <li>
-                                <a href={controlPath(c)} class="cp-ids" data-pair={`${fw.id}|${r.ref}|${c.id}`}>
-                                  {c.id}
-                                </a>{' '}
+                                <a href={controlPath(c)} class="cp-ids" data-pair={`${fw.id}|${r.ref}|${c.id}`}>{c.id}</a>{' '}
                                 {c.title}
                               </li>
                             );
@@ -295,9 +293,7 @@ const jsonLd = collectionPage({
                 <tr>
                   <td class="c-name" data-label="Control">
                     <span>
-                      <a href={controlPath(row.control)} class="cp-ids">
-                        {row.control.id}
-                      </a>{' '}
+                      <a href={controlPath(row.control)} class="cp-ids">{row.control.id}</a>{' '}
                       {row.control.title}
                     </span>
                   </td>
@@ -328,10 +324,8 @@ const jsonLd = collectionPage({
     {
       dataset && (
         <li>
-          <a href={dataset.href} {...machineEvent(dataset)}>
-            All controls as JSON
-          </a>
-          : the crosswalk is its <code>crosswalk</code> key, with the same frameworks, rows and
+          <a href={dataset.href} {...machineEvent(dataset)}>All controls as JSON</a>:
+          the crosswalk is its <code>crosswalk</code> key, with the same frameworks, rows and
           mappings as this page, in the envelope of the open data API.
         </li>
       )
@@ -339,19 +333,14 @@ const jsonLd = collectionPage({
     {
       schema && (
         <li>
-          <a href={schema.href} {...machineEvent(schema)}>
-            JSON Schema of the controls dataset
-          </a>
-          : the <code>crosswalk</code> key is a closed object.
+          <a href={schema.href} {...machineEvent(schema)}>JSON Schema of the controls dataset</a>:
+          the <code>crosswalk</code> key is a closed object.
         </li>
       )
     }
     <li>
       This page as Markdown:{' '}
-      <a href={`${path}.md`} data-umami-event="control-download" data-umami-event-id="crosswalk" data-umami-event-format="md">
-        {path}.md
-      </a>
-      .
+      <a href={`${path}.md`} data-umami-event="control-download" data-umami-event-id="crosswalk" data-umami-event-format="md">{path}.md</a>.
     </li>
   </ul>
 

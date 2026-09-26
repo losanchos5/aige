@@ -159,7 +159,9 @@ const jsonLd = [
 
   <p class="cp-part">
     <code>{c.id}</code>, a control of the <a href={profileHref}>{profile.title}</a> (draft
-    v{profile.version}). <a href={controlAnchorPath(c)}>See it among the other controls of the profile</a>.
+    v{profile.version}). <a href={controlAnchorPath(c)}>See it among the other controls of the profile</a>,
+    or its mappings beside every other control's in the
+    <a href={`/controls/crosswalk#by-profile-${profile.slug}`}>controls crosswalk</a>.
   </p>
 
   <Callout kind="note" title="Draft for review, not a claim of conformity">
@@ -356,10 +358,8 @@ const jsonLd = [
     {
       machine.map((l) => (
         <li>
-          <a href={l.href} {...machineEvent(l)}>
-            {l.label}
-          </a>
-          : {l.note}.
+          <a href={l.href} {...machineEvent(l)}>{l.label}</a>:
+          {l.note}.
         </li>
       ))
     }
