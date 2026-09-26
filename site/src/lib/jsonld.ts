@@ -54,12 +54,14 @@ export const authorRefs: readonly { '@id': string }[] = authorNodes.map((person)
   '@id': person['@id'] as string,
 }));
 
-// The site's own presences only: the project repository, from data/site.ts.
-// The author's personal profiles (LinkedIn, the GitHub account) stay on the
-// Person node, so engines never read the person and the project as one entity;
-// the Zenodo DOIs identify the Book, not the organisation. Add the project's
-// own LinkedIn Page here once data/site.ts states one.
-const orgSameAs = [site.github].filter((url) => url && !url.startsWith(origin));
+// The site's own presences only: the project repository and the project's
+// LinkedIn Page, from data/site.ts. The author's personal profiles (LinkedIn,
+// the GitHub account) stay on the Person node, so engines never read the person
+// and the project as one entity; the Zenodo DOIs identify the Book, not the
+// organisation.
+const orgSameAs = [site.github, site.linkedinPage].filter(
+  (url) => url && !url.startsWith(origin),
+);
 
 // The logo is the 180x180 PNG the site already serves for the home-screen icon;
 // it is a real, rasterised mark, which Organization.logo requires (an SVG

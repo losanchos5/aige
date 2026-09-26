@@ -21,6 +21,7 @@ const ORG_ID = `${SITE_ORIGIN}/#org`;
 const PERSON_ID = `${SITE_ORIGIN}/#person-jorge-garcia-aibar`;
 const PERSONAL_PROFILES = ['https://www.linkedin.com/in/jorgara', 'https://github.com/losanchos5'];
 const PROJECT_REPO = 'https://github.com/losanchos5/aige';
+const PROJECT_LINKEDIN_PAGE = 'https://www.linkedin.com/company/aigovernance-engineer/';
 
 /** The built HTML of a clean route (`/bok` → dist/bok.html or dist/bok/index.html). */
 function html(route: string): string {
@@ -102,7 +103,7 @@ test.describe('Organization and Person sameAs', () => {
       const org = byType(nodes, 'Organization');
       const orgSameAs = [org?.sameAs ?? []].flat() as string[];
 
-      expect(orgSameAs).toContain(PROJECT_REPO);
+      expect(orgSameAs).toEqual([PROJECT_REPO, PROJECT_LINKEDIN_PAGE]);
       for (const url of orgSameAs) {
         expect(url, `personal profile on the Organization: ${url}`).not.toMatch(/linkedin\.com\/in\//);
         expect(PERSONAL_PROFILES).not.toContain(url);
@@ -114,6 +115,11 @@ test.describe('Organization and Person sameAs', () => {
       }
     });
   }
+});
+
+test('the footer project links include the LinkedIn Page', () => {
+  const footer = /<footer[\s\S]*?<\/footer>/.exec(html('/'))?.[0] ?? '';
+  expect(footer).toContain(`href="${PROJECT_LINKEDIN_PAGE}"`);
 });
 
 // ONPAGE O-1: each hub H1 names its topic (the editorial line follows it).

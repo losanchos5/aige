@@ -319,6 +319,7 @@ export const feeds: NavItem[] = [
 export const project: NavItem[] = [
   { label: 'GitHub', href: site.github, external: true },
   { label: 'LinkedIn', href: site.linkedin, external: true },
+  { label: 'LinkedIn Page', href: site.linkedinPage, external: true },
   { label: 'DOI', href: `https://doi.org/${site.doi}`, external: true },
 ];
 
