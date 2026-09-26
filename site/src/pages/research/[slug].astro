@@ -118,7 +118,7 @@ const jsonLd = [
   jsonLd={jsonLd}
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
 >
-  <StatusLine version={d.version} status={d.status} reviewers={reviewers} updated={noteUpdated} />
+  <StatusLine version={d.version} status={d.status} reviewers={reviewers} />
   {/* Hub and spoke: each note points at the /ai-governance pillar once. */}
   <PillarLink lead="A technical note on one open question of" anchor="AI governance engineering" />
   <Content />
