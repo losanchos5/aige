@@ -1,24 +1,44 @@
 // orp-core.spec.ts: the open-reference core data (src/data/controls, people,
-// work, open-questions). Pure Node: the modules are imported and checked; no
-// page is needed. Block orp-core (open-reference-project, wave 0).
+// work, open-questions) and the indexes the control mappings resolve against
+// (src/data/aiuc1.ts, src/data/nist-ai-rmf.ts). Pure Node: the modules are
+// imported and checked; no page is needed. Counts are read from the registry,
+// so a new profile or control needs no edit here. Block orp-core
+// (open-reference-project, wave 0), extended by orp2-core
+// (open-reference-project-2, wave 0).
 import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
   controls,
   profiles,
+  observationExamples,
   controlProblems,
+  controlRegistryProblems,
   controlIdSequenceProblems,
   controlsIn,
   controlById,
   controlHref,
   controlPath,
+  controlAnchorPath,
+  controlPagePath,
   controlApiPath,
+  controlsUpdated,
+  profileArticleId,
+  profileCitation,
+  profileIdRange,
   profileSources,
   sourceNumber,
+  nistAiRmfSubcategories,
+  CONTROL_PAGES_ENABLED,
+  RESERVED_PROFILE_SLUGS,
+  type Control,
+  type ControlProfile,
+  type ControlRegistry,
 } from '../src/data/controls';
-import { evaluationEnvironmentProfile } from '../src/data/controls/evaluation-environment';
-import { agentRuntimeProfile, agentRuntimeAnchorHeadings, KEPT_VERBATIM } from '../src/data/controls/agent-runtime';
+import { agentRuntimeAnchorHeadings, KEPT_VERBATIM } from '../src/data/controls/agent-runtime';
+import { aiuc1Requirements, aiuc1ById } from '../src/data/aiuc1';
+import { nistAiRmfSubcategoryIndex } from '../src/data/nist-ai-rmf';
+import { site } from '../src/data/site';
 import { agentControls } from '../src/data/tool-agent-controls';
 import { people, peopleProblems } from '../src/data/people';
 import { work, workProblems } from '../src/data/work';
@@ -34,12 +54,24 @@ test.describe('open control registry', () => {
     expect(controlProblems()).toEqual([]);
   });
 
-  test('two profiles, 40 controls, ids in order', () => {
-    expect(profiles.map((p) => p.slug)).toEqual(['evaluation-environment', 'agent-runtime']);
-    expect(controls).toHaveLength(40);
+  test('every profile runs 001 up with a prefix of its own, in profile order', () => {
+    // The first two profiles keep their place; later profiles are appended.
+    expect(profiles.slice(0, 2).map((p) => p.slug)).toEqual(['evaluation-environment', 'agent-runtime']);
+    const prefixes = new Set<string>();
+    const inOrder: string[] = [];
+    for (const p of profiles) {
+      const rows = controlsIn(p.slug);
+      expect(rows.length, p.slug).toBeGreaterThan(0);
+      const prefix = rows[0].id.split('-')[2];
+      expect(prefixes.has(prefix), `${p.slug} reuses ${prefix}`).toBe(false);
+      prefixes.add(prefix);
+      expect(rows.map((c) => c.id), p.slug).toEqual(ids(prefix, rows.length));
+      inOrder.push(...rows.map((c) => c.id));
+    }
+    expect(controls.map((c) => c.id)).toEqual(inOrder);
     expect(controlsIn('evaluation-environment').map((c) => c.id)).toEqual(ids('EVAL', 9));
-    expect(controlsIn('agent-runtime').map((c) => c.id)).toEqual(ids('AGENT', 31));
-    expect(controls.map((c) => c.id)).toEqual([...ids('EVAL', 9), ...ids('AGENT', 31)]);
+    expect(controlsIn('agent-runtime').map((c) => c.id)).toEqual(ids('AGENT', agentControls.length));
+    expect(profiles.every((p) => !RESERVED_PROFILE_SLUGS.includes(p.slug))).toBe(true);
   });
 
   test('a deleted id listed as retired is an occupied slot, not a gap', () => {
@@ -63,27 +95,35 @@ test.describe('open control registry', () => {
     });
   });
 
-  test('evaluation environment controls: 002, 003 and 006 specified, the rest outlines, all open for review', () => {
+  test('evaluation environment controls: 002, 003 and 006 stay specified, the rest specified or outlines, all open for review', () => {
     const specified = ['AIGE-CTL-EVAL-002', 'AIGE-CTL-EVAL-003', 'AIGE-CTL-EVAL-006'];
     for (const row of controlsIn('evaluation-environment')) {
-      expect(row.depth).toBe(specified.includes(row.id) ? 'specified' : 'stub');
+      if (specified.includes(row.id)) expect(row.depth, row.id).toBe('specified');
+      else expect(['specified', 'stub'], row.id).toContain(row.depth);
       expect(row.reviewerStatus).toBe('open');
       expect(row.openQuestions.length).toBeGreaterThan(0);
     }
   });
 
   test('no profile names a reviewer, so every one stays open', () => {
-    for (const p of [evaluationEnvironmentProfile, agentRuntimeProfile]) {
-      expect(p.reviewers).toEqual([]);
-      expect(p.reviewerStatus).toBe('open');
-      expect(p.status).toBe('draft');
+    for (const p of profiles) {
+      expect(p.reviewers, p.slug).toEqual([]);
+      expect(p.reviewerStatus, p.slug).toBe('open');
+      expect(p.status, p.slug).toBe('draft');
     }
   });
 
   test('paths and lookups', () => {
     const c = controlById('aige-ctl-eval-002');
     expect(c?.id).toBe('AIGE-CTL-EVAL-002');
-    expect(controlPath(c!)).toBe('/controls/evaluation-environment#aige-ctl-eval-002');
+    // A specified control gets its own page once control pages are on; its
+    // anchor on the profile page stays either way.
+    expect(controlAnchorPath(c!)).toBe('/controls/evaluation-environment#aige-ctl-eval-002');
+    expect(controlPagePath(c!)).toBe(CONTROL_PAGES_ENABLED ? '/controls/evaluation-environment/aige-ctl-eval-002' : null);
+    expect(controlPath(c!)).toBe(controlPagePath(c!) ?? controlAnchorPath(c!));
+    // Any other control never has a page: its canonical URL is the anchor.
+    const derived = controlById('AIGE-CTL-AGENT-031')!;
+    expect(controlPagePath(derived)).toBeNull();
     expect(controlHref('AIGE-CTL-AGENT-031')).toBe('/controls/agent-runtime#aige-ctl-agent-031');
     expect(controlApiPath(c!)).toBe('/api/v1/controls/aige-ctl-eval-002.json');
     expect(() => controlHref('AIGE-CTL-EVAL-099')).toThrow();
@@ -99,6 +139,153 @@ test.describe('open control registry', () => {
     for (const heading of Object.values(agentRuntimeAnchorHeadings)) {
       expect(md, heading).toMatch(new RegExp(`^#{2,3} ${heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'm'));
     }
+  });
+});
+
+test.describe('profile helpers', () => {
+  test('the TechArticle @id, the citation and the dates come from the profile', () => {
+    const p = profiles[0];
+    expect(profileArticleId(p)).toBe(`${site.url}/controls/${p.slug}#article`);
+    const cite = profileCitation(p);
+    expect(cite.url).toBe(`${site.url}/controls/${p.slug}`);
+    expect(cite.doi).toBe(p.doi ?? null);
+    expect(cite.conceptDoi).toBe(p.conceptDoi ?? null);
+    expect(cite.effectiveDoi).toBe(p.doi ?? site.conceptDoi);
+    expect(cite.text).toContain(p.title);
+    expect(cite.text).toContain(`https://doi.org/${cite.effectiveDoi}`);
+    const withDoi = profileCitation({ ...p, doi: '10.5281/zenodo.1', conceptDoi: '10.5281/zenodo.2' });
+    expect([withDoi.doi, withDoi.conceptDoi, withDoi.effectiveDoi]).toEqual(['10.5281/zenodo.1', '10.5281/zenodo.2', '10.5281/zenodo.1']);
+    expect(controlsUpdated()).toBe([...profiles.map((q) => q.updated)].sort().at(-1));
+  });
+
+  test('the id range of a profile is read from its controls', () => {
+    const rows = controlsIn('agent-runtime');
+    expect(profileIdRange('agent-runtime')).toBe(`AIGE-CTL-AGENT-001 to ${String(rows.length).padStart(3, '0')}`);
+    expect(profileIdRange('evaluation-environment')).toBe('AIGE-CTL-EVAL-001 to 009');
+    expect(() => profileIdRange('no-such-profile')).toThrow();
+  });
+});
+
+test.describe('mapping indexes', () => {
+  test('AIUC-1: every requirement of the public index, two retired, every mapped id verified on its page', () => {
+    expect(aiuc1Requirements).toHaveLength(53);
+    expect(new Set(aiuc1Requirements.map((r) => r.id)).size).toBe(53);
+    expect(aiuc1Requirements.filter((r) => r.retired).map((r) => r.id)).toEqual(['E007', 'E014']);
+    for (const r of aiuc1Requirements) {
+      expect(r.id, r.id).toMatch(/^[A-F]\d{3}$/);
+      expect(r.id.startsWith(r.domain), r.id).toBe(true);
+      expect(r.url, r.id).toMatch(/^https:\/\/standard\.aiuc-1\.com\//);
+    }
+    const mapped = new Set(controls.flatMap((c) => c.mappings.aiuc1 ?? []));
+    expect(mapped.size).toBeGreaterThan(0);
+    for (const id of mapped) {
+      expect(aiuc1ById(id)?.retired, id).toBeUndefined();
+      expect(aiuc1ById(id)?.verified, id).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
+  });
+
+  test('NIST AI RMF: the 72 subcategories of AI 100-1, and every mapped id resolves', () => {
+    const count = (fn: string) => nistAiRmfSubcategoryIndex.filter((s) => s.fn === fn).length;
+    expect([count('GOVERN'), count('MAP'), count('MEASURE'), count('MANAGE')]).toEqual([19, 18, 22, 13]);
+    expect(Object.keys(nistAiRmfSubcategories)).toHaveLength(72);
+    for (const s of nistAiRmfSubcategoryIndex) {
+      expect(s.id.startsWith(`${s.fn} `), s.id).toBe(true);
+      expect(s.text.trim(), s.id).not.toBe('');
+    }
+    for (const id of controls.flatMap((c) => c.mappings.nistAiRmf)) expect(nistAiRmfSubcategories[id], id).toBeTruthy();
+    // The short titles the pages already printed are kept.
+    expect(nistAiRmfSubcategories['MEASURE 2.7']).toBe('Security and resilience are evaluated and documented');
+  });
+});
+
+test.describe('registry rules: negative cases', () => {
+  const registry = (): ControlRegistry => ({ profiles, controls, observationExamples });
+  /** The registry with one control patched. */
+  const patched = (id: string, patch: Partial<Control>): ControlRegistry => ({
+    ...registry(),
+    controls: controls.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+  });
+  /** The registry with one profile patched. */
+  const patchedProfile = (slug: string, patch: Partial<ControlProfile>): ControlRegistry => ({
+    ...registry(),
+    profiles: profiles.map((p) => (p.slug === slug ? { ...p, ...patch } : p)),
+  });
+  const problems = (reg: ControlRegistry) => controlRegistryProblems(reg);
+  const flags = (reg: ControlRegistry, text: string) => problems(reg).some((p) => p.includes(text));
+  const SPEC = 'AIGE-CTL-EVAL-002';
+  const DERIVED = 'AIGE-CTL-AGENT-001';
+
+  test('the registry as published passes', () => {
+    expect(problems(registry())).toEqual([]);
+  });
+
+  test('derivedFrom names a pattern, a record schema or a chapter that exists', () => {
+    const ok = patched(DERIVED, {
+      derivedFrom: [
+        { kind: 'pattern', ref: 'eval-gate-in-ci' },
+        { kind: 'schema', ref: 'dataset-card' },
+        { kind: 'chapter', ref: 'incidents' },
+      ],
+    });
+    expect(problems(ok)).toEqual([]);
+    expect(flags(patched(DERIVED, { derivedFrom: [{ kind: 'pattern', ref: 'no-such-pattern' }] }), 'unknown pattern no-such-pattern')).toBe(true);
+    expect(flags(patched(DERIVED, { derivedFrom: [{ kind: 'schema', ref: 'no-such-schema' }] }), 'unknown record schema no-such-schema')).toBe(true);
+    expect(flags(patched(DERIVED, { derivedFrom: [{ kind: 'chapter', ref: 'no-such-chapter' }] }), 'unknown chapter')).toBe(true);
+    const twice = { kind: 'pattern', ref: 'eval-gate-in-ci' } as const;
+    expect(flags(patched(DERIVED, { derivedFrom: [twice, twice] }), 'repeated derivedFrom')).toBe(true);
+  });
+
+  test('a derived control needs a seed or a derivedFrom source', () => {
+    expect(flags(patched(DERIVED, { seeds: [] }), 'derived control with no seed and no derivedFrom source')).toBe(true);
+    expect(problems(patched(DERIVED, { seeds: [], derivedFrom: [{ kind: 'pattern', ref: 'eval-gate-in-ci' }] }))).toEqual([]);
+  });
+
+  test('an AIUC-1 id must be in the public index and not retired', () => {
+    expect(flags(patched(SPEC, { mappings: { ...controlById(SPEC)!.mappings, aiuc1: ['E007'] } }), 'is retired')).toBe(true);
+    expect(flags(patched(SPEC, { mappings: { ...controlById(SPEC)!.mappings, aiuc1: ['A099'] } }), 'not in the public index')).toBe(true);
+    expect(flags(patched(SPEC, { mappings: { ...controlById(SPEC)!.mappings, aiuc1: ['G001'] } }), 'malformed AIUC-1 id')).toBe(true);
+  });
+
+  test('a specified control: 2 to 4 verification steps, page title and description, one pass and one fail example', () => {
+    const c = controlById(SPEC)!;
+    expect(flags(patched(SPEC, { verification: c.verification.slice(0, 1) }), '2 to 4 verification steps')).toBe(true);
+    const five = [...c.verification, ...c.verification, ...c.verification].slice(0, 5);
+    expect(flags(patched(SPEC, { verification: five }), '2 to 4 verification steps')).toBe(true);
+    expect(flags(patched(SPEC, { pageTitle: undefined }), 'no pageTitle')).toBe(true);
+    expect(flags(patched(SPEC, { pageDescription: undefined }), 'no pageDescription')).toBe(true);
+    expect(flags(patched(SPEC, { pageTitle: 'x'.repeat(71) }), 'pageTitle longer than 70')).toBe(true);
+    expect(flags(patched(SPEC, { pageDescription: 'Too short to describe a page.' }), 'pageDescription is')).toBe(true);
+    expect(flags(patched(SPEC, { pageDescription: 'y'.repeat(161) }), 'pageDescription is')).toBe(true);
+    const other = controlById('AIGE-CTL-EVAL-003')!;
+    expect(flags(patched(SPEC, { pageTitle: other.pageTitle }), 'duplicate pageTitle')).toBe(true);
+    expect(flags(patched(SPEC, { pageDescription: other.pageDescription }), 'duplicate pageDescription')).toBe(true);
+    const noFail = { ...registry(), observationExamples: observationExamples.filter((e) => !(e.controlId === SPEC && e.status === 'fail')) };
+    expect(flags(noFail, 'exactly one pass and one fail')).toBe(true);
+    const onStub = {
+      ...registry(),
+      observationExamples: [...observationExamples, { controlId: 'AIGE-CTL-EVAL-001', status: 'pass' as const, path: '/controls/examples/control-observation.aige-ctl-eval-001.pass.json' }],
+    };
+    const stubbed = controlById('AIGE-CTL-EVAL-001')!.depth !== 'specified';
+    expect(flags(onStub, 'is not a specified control')).toBe(stubbed);
+  });
+
+  test('profile slugs crosswalk and examples are reserved, DOIs are well formed, prefixes are unique', () => {
+    const eval_ = profiles[0];
+    for (const slug of RESERVED_PROFILE_SLUGS) {
+      const reg: ControlRegistry = {
+        ...registry(),
+        profiles: [...profiles, { ...eval_, slug }],
+      };
+      expect(flags(reg, `slug ${slug} is reserved`), slug).toBe(true);
+    }
+    expect(flags(patchedProfile(eval_.slug, { doi: 'zenodo.22956197' }), 'malformed doi')).toBe(true);
+    expect(flags(patchedProfile(eval_.slug, { conceptDoi: 'https://doi.org/10.5281/zenodo.1' }), 'malformed conceptDoi')).toBe(true);
+    expect(problems(patchedProfile(eval_.slug, { doi: '10.5281/zenodo.22956197', conceptDoi: '10.5281/zenodo.22857084' }))).toEqual([]);
+    // A second profile whose ids reuse the EVAL prefix.
+    const copy: ControlProfile = { ...eval_, slug: 'eval-copy' };
+    const copied = controlsIn(eval_.slug).map((c) => ({ ...c, profile: 'eval-copy' }));
+    const reg: ControlRegistry = { ...registry(), profiles: [...profiles, copy], controls: [...controls, ...copied] };
+    expect(flags(reg, 'id prefix EVAL already used by evaluation-environment')).toBe(true);
   });
 });
 
