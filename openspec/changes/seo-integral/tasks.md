@@ -13,9 +13,9 @@
 
 ## Ronda 5 (auditoría 2026-09-26, aige-media/seo/2026-09-26/COMPARISON.md)
 
-- [ ] 11. ui: precarga de JetBrains Mono (CLS), tarjeta entera clicable en el menú móvil, área táctil de la cabecera
-- [ ] 12. gloss: fecha por término, sameAs Wikidata/Wikipedia, definición única, impact-assessment, tdm-exception, H1 del glosario, namespaces del sitemap
-- [ ] 13. role: /stack como página de "AI governance framework", /role.md + In short + datePublished, siguiente paso, llms
-- [ ] 14. meta: /resources (description + breadcrumb), publisher en capítulos, sameAs Organization/Person, H1 de hubs
-- [ ] 15. insh: In short <= 167 palabras, descripciones y H1 de obligaciones
+- [x] 11. ui: precarga de JetBrains Mono (CLS), tarjeta entera clicable en el menú móvil, área táctil de la cabecera
+- [x] 12. gloss: fecha por término, sameAs Wikidata/Wikipedia, definición única, impact-assessment, tdm-exception, H1 del glosario, namespaces del sitemap
+- [x] 13. role: /stack como página de "AI governance framework", /role.md + In short + datePublished, siguiente paso, llms
+- [x] 14. meta: /resources (description + breadcrumb), publisher en capítulos, sameAs Organization/Person, H1 de hubs
+- [x] 15. insh: In short <= 167 palabras, descripciones y H1 de obligaciones
 - [ ] 16. integración: build, tests, PR, despliegue, re-auditoría
