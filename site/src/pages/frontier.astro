@@ -1,0 +1,91 @@
+---
+// /frontier: STUB of the audience route for frontier labs and evaluators (block
+// orp-shell, open reference project). It carries the final title and
+// description and every anchor other pages link to: who,
+// evaluation-environments, runtime-safeguards, assurance, incidents,
+// stack-map, open-questions and sources. Block orp-frontier replaces the body.
+import Marketing from '../layouts/Marketing.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import { site } from '../data/site';
+import { breadcrumbJsonLd } from '../lib/breadcrumbs';
+import { authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
+import { fitsSiteSuffix } from '../lib/seo-title';
+import '../styles/pages.css';
+
+const seoTitle = 'Frontier AI evaluation assurance';
+const description =
+  'Engineering assurance for frontier AI: evaluation environment controls, runtime safeguards and machine-verifiable evidence on the five-layer stack.';
+const crumbs = [{ label: 'For you', href: '/for' }, { label: 'Frontier labs & evaluators' }];
+const pageUrl = new URL('/frontier', site.url).href;
+
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    name: seoTitle,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+  },
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Marketing
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/frontier.png"
+  jsonLd={jsonLd}
+>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="Engineering assurance for frontier AI"
+    lede="For the teams that evaluate, deploy and assure frontier systems. This page is being prepared and is published in full in the next release."
+  />
+
+  <Section tone="plain" id="who" title="Who this route is for">
+    <p><!-- orp-stub -->Evaluation and red-team engineers, assurance teams, agent platform engineers and third-party evaluators.</p>
+  </Section>
+
+  <Section tone="tint" id="evaluation-environments" title="Evaluation environments">
+    <p>
+      Where the controls on this site apply to the environment a model is evaluated in; the draft
+      <a href="/controls/evaluation-environment">evaluation environment profile</a> is in preparation.
+    </p>
+  </Section>
+
+  <Section tone="plain" id="runtime-safeguards" title="Runtime safeguards">
+    <p>
+      Identity, tool mediation and stop handles for agents at runtime, as
+      <a href="/bok/governing-agents">chapter 23</a> sets them out.
+    </p>
+  </Section>
+
+  <Section tone="tint" id="assurance" title="Assurance evidence">
+    <p>How controls leave machine-readable evidence is set out here in the next release.</p>
+  </Section>
+
+  <Section tone="plain" id="incidents" title="Incidents">
+    <p>
+      Public incidents read as engineering post-mortems are in <a href="/cases">the incident cases</a>.
+    </p>
+  </Section>
+
+  <Section tone="tint" id="stack-map" title="Where it sits on the stack">
+    <p>How this route maps to <a href="/stack">the five-layer stack</a> is drawn here in the next release.</p>
+  </Section>
+
+  <Section tone="plain" id="open-questions" title="Open questions">
+    <p>The open questions for this route are listed here, linked to <a href="/research">the research notes</a>.</p>
+  </Section>
+
+  <Section tone="tint" id="sources" title="Sources">
+    <p>The sources this route cites are listed here with the full page.</p>
+  </Section>
+</Marketing>

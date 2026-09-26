@@ -29,6 +29,10 @@ const DETAIL_COLLECTIONS: { prefix: string; index: string }[] = [
   { prefix: '/toolkit/', index: '/toolkit' },
   // Framework comparisons (/resources/crosswalk/<a>-vs-<b>); the crosswalk links each one.
   { prefix: '/resources/crosswalk/', index: '/resources/crosswalk' },
+  // Block orp-shell: the control profiles hang off /controls, the research
+  // notes off /research; each index links every detail page from <main>.
+  { prefix: '/controls/', index: '/controls' },
+  { prefix: '/research/', index: '/research' },
   // Translations (openspec/changes/i18n-site-rendering): a language's chapters
   // hang off its book index, every other page of the language off its landing
   // /<lang>, which the footer links. A collection only counts when its index is
@@ -188,8 +192,9 @@ test('the Body of Knowledge group lists every chapter once, grouped by part in o
 test('Practice, Reference and About carry the new destinations', () => {
   const hrefsOf = (id: string) => nav.find((g) => g.id === id)!.items.map((i) => i.href);
   expect(hrefsOf('practice')).toEqual(
-    expect.arrayContaining(['/patterns', '/toolkit', '/agents']),
+    expect.arrayContaining(['/patterns', '/controls', '/toolkit', '/agents']),
   );
+  expect(hrefsOf('for-you')).toContain('/frontier');
   expect(hrefsOf('reference')).toEqual(
     expect.arrayContaining([
       '/obligations',
@@ -200,12 +205,16 @@ test('Practice, Reference and About carry the new destinations', () => {
       '/figures',
       '/resources/data',
       '/bok/glossary',
+      '/research',
     ]),
   );
+  // The incident cases keep their /cases URL under the label "Incidents".
+  const reference = nav.find((g) => g.id === 'reference')!;
+  expect(reference.items.find((i) => i.href === '/cases')?.label).toBe('Incidents');
   // The chapter is the glossary's home; the old A-Z page only redirects to it.
   expect(hrefsOf('reference')).not.toContain('/resources/glossary');
   expect(hrefsOf('about')).toEqual(
-    expect.arrayContaining(['/about/changelog', '/about/contributors', '/about/methodology']),
+    expect.arrayContaining(['/about/changelog', '/about/contributors', '/about/methodology', '/contribute']),
   );
 });
 

@@ -143,6 +143,10 @@ const HUBS: { route: string; keyword: RegExp }[] = [
   { route: '/toolkit', keyword: /^AI governance toolkit\b/ },
   { route: '/toolkit/model-card', keyword: /^Model card template\b/ },
   { route: '/toolkit/incident-clock', keyword: /^AI incident reporting deadlines\b/ },
+  { route: '/controls', keyword: /^Open AI governance controls\b/ },
+  { route: '/frontier', keyword: /^Frontier AI evaluation assurance\b/ },
+  { route: '/research', keyword: /^AI governance research notes\b/ },
+  { route: '/contribute', keyword: /^Contribute to open AI controls\b/ },
 ];
 
 test.describe('hub titles name their query', () => {

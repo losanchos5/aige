@@ -112,8 +112,8 @@ export const nav: NavGroup[] = [
   {
     id: 'practice',
     label: 'Practice',
-    description: 'How the discipline is done: the role, stack, patterns, tools, path and agents.',
-    hint: 'Role, stack, patterns, path, toolkit, agents',
+    description: 'How the discipline is done: role, stack, patterns, controls, tools, path and agents.',
+    hint: 'Role, stack, patterns, controls, path, agents',
     items: [
       {
         label: 'What is AI governance?',
@@ -134,6 +134,11 @@ export const nav: NavGroup[] = [
         label: 'Patterns',
         href: '/patterns',
         description: 'Reusable patterns, each named to the stack layer it serves.',
+      },
+      {
+        label: 'Controls',
+        href: '/controls',
+        description: 'Open control profiles for evaluation environments and agent runtime, with their evidence.',
       },
       {
         label: 'Learning path',
@@ -160,8 +165,8 @@ export const nav: NavGroup[] = [
   {
     id: 'for-you',
     label: 'For you',
-    description: 'Six routes through the site, one per audience, with what to do this week.',
-    hint: 'Routes by role, AIGP and certifications',
+    description: 'Routes through the site by audience, plus frontier labs, AIGP and certifications.',
+    hint: 'Routes by role, frontier labs, certifications',
     overview: 'All audiences',
     href: '/for',
     items: [
@@ -196,6 +201,11 @@ export const nav: NavGroup[] = [
         description: 'Proportionate governance: the floor, what the law eases, a first week.',
       },
       {
+        label: 'Frontier labs & evaluators',
+        href: '/frontier',
+        description: 'Evaluation environments, runtime safeguards and assurance evidence for frontier labs.',
+      },
+      {
         label: 'AIGP coverage map',
         href: '/for/aigp',
         description: 'Where the book teaches each AIGP BoK v2.1 indicator, with study paths.',
@@ -210,8 +220,8 @@ export const nav: NavGroup[] = [
   {
     id: 'reference',
     label: 'Reference',
-    description: 'Frameworks, obligations, crosswalk, harms, cases, templates, figures, data, glossary.',
-    hint: 'Frameworks, obligations, crosswalk, glossary',
+    description: 'Frameworks, obligations, crosswalk, harms, incidents, research, figures, data, glossary.',
+    hint: 'Frameworks, obligations, incidents, research',
     overview: 'All resources',
     href: '/resources',
     items: [
@@ -241,9 +251,14 @@ export const nav: NavGroup[] = [
         description: 'OWASP, MITRE ATLAS and NIST threat ids mapped to the pattern and test that answer each.',
       },
       {
-        label: 'Cases',
+        label: 'Incidents',
         href: '/cases',
         description: 'Public AI incidents as post-mortems: which control would have caught them.',
+      },
+      {
+        label: 'Research',
+        href: '/research',
+        description: 'Technical notes on open questions: drafts, methods and what would settle them.',
       },
       {
         label: 'Contracts',
@@ -299,8 +314,8 @@ export const nav: NavGroup[] = [
   {
     id: 'about',
     label: 'About',
-    description: 'Who writes this, how it is versioned, how to cite it.',
-    hint: 'Who writes this, changelog, methodology',
+    description: 'Who writes this, how it is versioned and cited, how to contribute.',
+    hint: 'Who writes this, changelog, contribute',
     overview: 'About the project',
     href: '/about',
     items: [
@@ -318,6 +333,11 @@ export const nav: NavGroup[] = [
         label: 'Methodology',
         href: '/about/methodology',
         description: 'How sources are chosen and tagged, dates kept current and errors corrected.',
+      },
+      {
+        label: 'Contribute',
+        href: '/contribute',
+        description: 'Propose a control, an implementation, a mapping or a correction; how review works.',
       },
     ],
   },
@@ -342,6 +362,7 @@ export const project: NavItem[] = [
   { label: 'LinkedIn', href: site.linkedin, external: true },
   { label: 'LinkedIn Page', href: site.linkedinPage, external: true },
   { label: 'DOI', href: `https://doi.org/${site.doi}`, external: true },
+  { label: 'Contribute', href: '/contribute' },
 ];
 
 /**

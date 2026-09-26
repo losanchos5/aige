@@ -24,6 +24,12 @@ export const OG_ROUTE_TITLES: Readonly<Record<string, string>> = {
   data: 'Open data and API',
   mcp: 'The Body of Knowledge in your AI assistant',
   for: 'Routes by audience',
+  // Block orp-shell (open reference project): the open control profiles, the
+  // frontier audience route, the research notes and the contribution page.
+  controls: 'Open AI governance controls',
+  frontier: 'Engineering assurance for frontier AI',
+  research: 'Research and technical notes',
+  contribute: 'Contribute to the project',
 };
 
 /** Card slug of a framework comparison page (/resources/crosswalk/<slug>). */

@@ -1,0 +1,109 @@
+---
+// /controls/agent-runtime: STUB of the Agent Runtime Control Profile (block
+// orp-shell, open reference project). It carries the final title and
+// description and every anchor other pages link to: scope,
+// how-to-read-a-control, one section per control (aige-ctl-agent-001..031, one
+// per agent control of chapter 23 in the order of
+// src/data/tool-agent-controls.ts), mappings, open-questions, changelog,
+// sources, machine-readable and review. Block orp-controls-pages deletes this
+// file and renders the profile from the control registry through
+// src/pages/controls/[profile].astro.
+import Marketing from '../../layouts/Marketing.astro';
+import PageHero from '../../components/PageHero.astro';
+import Section from '../../components/Section.astro';
+import { site } from '../../data/site';
+import { agentControls } from '../../data/tool-agent-controls';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { fitsSiteSuffix } from '../../lib/seo-title';
+import '../../styles/pages.css';
+
+const seoTitle = 'AI agent runtime controls';
+const description =
+  'An open control profile for AI agents at runtime: identity, tool mediation, execution limits, stop conditions and telemetry. Draft v0.1, from chapter 23.';
+const crumbs = [
+  { label: 'Open control profiles', href: '/controls' },
+  { label: 'Agent runtime' },
+];
+const pageUrl = new URL('/controls/agent-runtime', site.url).href;
+
+// One section per agent control of chapter 23, in module order.
+const controls = agentControls.map((seed, i) => {
+  const num = String(i + 1).padStart(3, '0');
+  return { id: `AIGE-CTL-AGENT-${num}`, anchor: `aige-ctl-agent-${num}`, title: seed.title };
+});
+
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    name: seoTitle,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+  },
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Marketing
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/controls.png"
+  jsonLd={jsonLd}
+>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="Agent Runtime Control Profile"
+    lede="Draft v0.1, open for technical review. This page is being prepared; the draft profile is published in the next release."
+  />
+
+  <Section tone="plain" id="scope" title="Scope">
+    <p><!-- orp-stub -->
+      The profile covers AI agents that use tools in production. Its controls restate the agent
+      controls of <a href="/bok/governing-agents">chapter 23</a>; every one of them is a draft.
+      Illustrative, not a claim of conformity.
+    </p>
+  </Section>
+
+  <Section tone="tint" id="how-to-read-a-control" title="How to read a control">
+    <p>Each control will state its objective, the evidence it leaves, its enforcement point and the chapter section it comes from.</p>
+  </Section>
+
+  {
+    controls.map((control, i) => (
+      <Section tone={i % 2 === 0 ? 'plain' : 'tint'} id={control.anchor} title={`${control.id} ${control.title}`}>
+        <p>This control is being derived from chapter 23; its record is published with the profile in the next release.</p>
+      </Section>
+    ))
+  }
+
+  <Section tone="plain" id="mappings" title="Mappings">
+    <p>The mapping of each control to obligations and to the OWASP Agentic threats is published with the profile.</p>
+  </Section>
+
+  <Section tone="tint" id="open-questions" title="Open questions">
+    <p>The questions this draft leaves open are listed here with the profile.</p>
+  </Section>
+
+  <Section tone="plain" id="changelog" title="Changelog">
+    <p>Version 0.1 of this profile is in preparation and has not been published yet.</p>
+  </Section>
+
+  <Section tone="tint" id="sources" title="Sources">
+    <p>The sources behind each control are listed here with the profile.</p>
+  </Section>
+
+  <Section tone="plain" id="machine-readable" title="Machine-readable">
+    <p>A JSON version of the profile is published with it under the <a href="/resources/data">open data API</a>.</p>
+  </Section>
+
+  <Section tone="tint" id="review" title="Review this profile">
+    <p>Technical review opens with the first published draft. See <a href="/contribute">how to contribute</a>.</p>
+  </Section>
+</Marketing>

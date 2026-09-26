@@ -105,6 +105,12 @@
 /cases/*.md
   ! Link
   Link: <https://aigovernanceengineer.com/cases/:splat>; rel="canonical"
+/controls/*.md
+  ! Link
+  Link: <https://aigovernanceengineer.com/controls/:splat>; rel="canonical"
+/research/*.md
+  ! Link
+  Link: <https://aigovernanceengineer.com/research/:splat>; rel="canonical"
 /glossary/*.md
   ! Link
   Link: <https://aigovernanceengineer.com/glossary/:splat>; rel="canonical"
