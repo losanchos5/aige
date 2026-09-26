@@ -1,4 +1,3 @@
-import { existsSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import rehypeSlug from 'rehype-slug';
@@ -417,8 +416,7 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   // the lastmod stays a real, past date. The control routes are generated from
   // the registry (src/data/controls), so a new profile or a new specified
   // control needs no edit here; their lastmod comes from `profile.updated`
-  // (CONTROLS_DATE_BY_PATH below), these sources only back it up. The
-  // crosswalk is listed once its page exists.
+  // (CONTROLS_DATE_BY_PATH below), these sources only back it up.
   [
     '/controls',
     [
@@ -446,14 +444,18 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         ['src/pages/controls/[profile]/[control].astro', `src/data/controls/${profile}.ts`],
       ] as [string, string[]],
   ),
-  ...(existsSync('src/pages/controls/crosswalk.astro')
-    ? [
-        [
-          '/controls/crosswalk',
-          ['src/pages/controls/crosswalk.astro', 'src/lib/controls-crosswalk.ts'],
-        ] as [string, string[]],
-      ]
-    : []),
+  // The crosswalk renders every profile's mappings against the NIST AI RMF and
+  // AIUC-1 indexes.
+  [
+    '/controls/crosswalk',
+    [
+      'src/pages/controls/crosswalk.astro',
+      'src/lib/controls-crosswalk.ts',
+      ...controlProfiles.map((profile) => `src/data/controls/${profile.slug}.ts`),
+      'src/data/aiuc1.ts',
+      'src/data/nist-ai-rmf.ts',
+    ],
+  ],
   ['/frontier', ['src/pages/frontier.astro', 'src/data/frontier.ts']],
   ['/research', ['src/pages/research/index.astro', 'src/data/research.ts']],
   ...writtenThemes().map(
@@ -475,10 +477,12 @@ const REVIEWED_BY_PATH = new Map<string, string>(
 );
 
 // The open control pages are dated by the registry, not by git: a profile page
-// and each control page it holds by the profile's `updated` date, /controls by
-// the newest of them (the same dates their JSON-LD dateModified states).
+// and each control page it holds by the profile's `updated` date, /controls and
+// /controls/crosswalk by the newest of them (the same dates their JSON-LD
+// dateModified states).
 const CONTROLS_DATE_BY_PATH = new Map<string, string>([
   ['/controls', controlsUpdated()],
+  ['/controls/crosswalk', controlsUpdated()],
   ...controlProfiles.map((profile) => [profilePath(profile), profile.updated] as [string, string]),
   ...controlPages.map(
     ({ path, profile }) => [path, profileBySlug(profile)?.updated ?? controlsUpdated()] as [string, string],

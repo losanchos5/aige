@@ -36,7 +36,6 @@ import {
   type CrosswalkFramework,
 } from '../../lib/controls-crosswalk';
 import { machineLinks, machineEvent, CONTROLS_DATASET_PATH, CONTROLS_SCHEMA_PATH } from '../../lib/controls-md';
-import { OG_ROUTE_TITLES } from '../../lib/og-cards';
 import { collectionPage } from '../../lib/jsonld';
 import '../../styles/resources.css';
 
@@ -98,8 +97,8 @@ const headings = [
 
 const crumbs = [{ label: 'Open control profiles', href: '/controls' }, { label: 'Crosswalk' }];
 
-// The page's own card once lib/og-cards.ts registers it, the controls card until then.
-const image = OG_ROUTE_TITLES['controls-crosswalk'] ? '/og/controls-crosswalk.png' : '/og/controls.png';
+// The page's own card (lib/og-cards.ts OG_ROUTE_TITLES['controls-crosswalk']).
+const image = '/og/controls-crosswalk.png';
 
 const jsonLd = collectionPage({
   path,
