@@ -290,7 +290,8 @@ test.describe('/toolkit', () => {
   test('lists the registry and links the live tool', async ({ page }) => {
     await page.goto('/toolkit');
     await expect(page.locator('h1')).toHaveCount(1);
-    await expect(page.locator('.tool-notice')).toHaveText(NOTICE);
+    // The first notice is the tool disclaimer; the second points to the MCP server.
+    await expect(page.locator('.tool-notice').first()).toHaveText(NOTICE);
     const cards = page.locator('[data-tool-card]');
     await expect(cards).toHaveCount(tools.length);
     const live = page.locator('[data-tool-card="maturity-self-check"] a');
