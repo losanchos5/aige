@@ -98,9 +98,7 @@ test.describe('/contribute body', () => {
     await expect(page.locator('a[href="/controls/evaluation-environment"]').first()).toBeAttached();
   });
 
-  // Needs RegisterItem to pass `attrs` to the row link (requested from the
-  // integrator); drop the fixme once RegisterList spreads them.
-  test.fixme('each issue-form path carries the contribute Umami event', async ({ page }) => {
+  test('each issue-form path carries the contribute Umami event', async ({ page }) => {
     await page.goto('/contribute');
     const forms = page.locator('#paths ol.register > li a[href*="/issues/new?template="]');
     await expect(forms).toHaveCount(9);
