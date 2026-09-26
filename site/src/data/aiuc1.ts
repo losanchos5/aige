@@ -89,7 +89,7 @@ export const aiuc1Requirements: readonly Aiuc1Requirement[] = [
   { id: 'E005', title: 'Document data storage security', domain: 'E', url: 'https://standard.aiuc-1.com/accountability/assess-cloud-vs-on-prem-processing' },
   { id: 'E006', title: 'Conduct vendor due diligence', domain: 'E', url: 'https://standard.aiuc-1.com/accountability/conduct-vendor-due-diligence' },
   { id: 'E007', title: 'Document system change approvals', domain: 'E', url: 'https://standard.aiuc-1.com/accountability/document-system-change-approvals', retired: true },
-  { id: 'E008', title: 'Review internal processes', domain: 'E', url: 'https://standard.aiuc-1.com/accountability/review-internal-processes' },
+  { id: 'E008', title: 'Review internal processes', domain: 'E', url: 'https://standard.aiuc-1.com/accountability/review-internal-processes', verified: '2026-09-26' },
   { id: 'E009', title: 'Monitor third-party access', domain: 'E', url: 'https://standard.aiuc-1.com/accountability/monitor-3rd-party-access' },
   { id: 'E010', title: 'Establish AI acceptable use policy', domain: 'E', url: 'https://standard.aiuc-1.com/accountability/establish-ai-acceptable-use-policy' },
   { id: 'E011', title: 'Record processing locations', domain: 'E', url: 'https://standard.aiuc-1.com/accountability/record-processing-locations' },
