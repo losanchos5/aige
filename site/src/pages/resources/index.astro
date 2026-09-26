@@ -19,6 +19,7 @@ import { diagrams } from '../../data/diagrams';
 import { tools as toolkitTools } from '../../data/toolkit';
 import { countWord } from '../../data/parts';
 import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
@@ -164,19 +165,29 @@ const entries = [
   },
 ];
 
-// Search title (SXO-R2-07, 2026-09-25 round 2): the query first; the H1 stays.
+// Search title (SXO-R2-07, 2026-09-25 round 2): the query first. The H1 names
+// the topic too (ONPAGE O-1, 2026-09-26) and keeps the editorial line after it.
 const seoTitle = 'AI governance resources: frameworks, data, templates';
+
+const description =
+  'AI governance resources, sourced and versioned: frameworks, the obligation register, crosswalk, harms, cases, templates, figures, tools and open data.';
 
 const cards = entries.map((entry, i) => ({ ...entry, index: String(i + 1).padStart(2, '0') }));
 const cardCount = countWord(cards.length);
 
+// Home > Resources, as on the sibling hubs (/toolkit, /bok, /resources/*):
+// the same crumbs drive the visible trail and the BreadcrumbList, which
+// Seo.astro ids and links from the CollectionPage (linkBreadcrumbs).
+const crumbs = [{ label: 'Resources' }];
+
 // The landing is a collection of the reference pages above; Seo.astro merges
-// this node into the page's single ld+json graph.
+// these nodes into the page's single ld+json graph.
 const resourcesUrl = new URL('/resources', site.url).href;
-const jsonLd = {
+const collection = {
   '@type': 'CollectionPage',
   '@id': `${resourcesUrl}#page`,
   name: `Resources · ${site.name}`,
+  description,
   url: resourcesUrl,
   inLanguage: 'en',
   isPartOf: { '@id': WEBSITE_ID },
@@ -204,18 +215,20 @@ const jsonLd = {
     description: card.description,
   })),
 };
+const jsonLd = [breadcrumbJsonLd(crumbs), collection];
 ---
 
 <Marketing
   title={seoTitle}
   titleSuffix={fitsSiteSuffix(seoTitle)}
-  description="AI governance resources, sourced and versioned: frameworks, the obligation register, crosswalk, harms, cases, templates, figures, tools and open data."
+  description={description}
   image="/og/resources.png"
   jsonLd={jsonLd}
 >
   <PageHero
     variant="res"
-    title="Curated, sourced, versioned."
+    crumbs={crumbs}
+    title="AI governance resources: curated, sourced, versioned."
     lede={`${cardCount[0].toUpperCase()}${cardCount.slice(1)} references drawn straight from the Body of Knowledge: the frameworks the discipline maps against, the obligation register and the crosswalk that reads each topic across them, the harms atlas and the incident cases, contract clauses, templates and schemas for governance records, the figures, the tool categories that fill each layer and the browser toolkit, the sources that formed it, the terms it uses, the open data behind every page and the map that lays the whole discipline on one canvas.`}
   >
     <p slot="note">

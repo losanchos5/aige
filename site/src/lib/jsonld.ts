@@ -54,18 +54,14 @@ export const authorRefs: readonly { '@id': string }[] = authorNodes.map((person)
   '@id': person['@id'] as string,
 }));
 
-// The site's own presences: the project repository plus the profile links the
-// site already states for its authors. Nothing invented: every URL comes from
-// data/site.ts. An author's page on this site is not another presence of it.
-const orgSameAs = [
-  site.github,
-  ...site.authorDetails.flatMap((author) => [
-    ...(author.url ? [author.url] : []),
-    ...(author.sameAs ?? []),
-  ]),
-]
-  .filter((url) => !url.startsWith(origin))
-  .filter((url, i, all) => all.indexOf(url) === i);
+// The site's own presences only: the project repository and the project's
+// LinkedIn Page, from data/site.ts. The author's personal profiles (LinkedIn,
+// the GitHub account) stay on the Person node, so engines never read the person
+// and the project as one entity; the Zenodo DOIs identify the Book, not the
+// organisation.
+const orgSameAs = [site.github, site.linkedinPage].filter(
+  (url) => url && !url.startsWith(origin),
+);
 
 // The logo is the 180x180 PNG the site already serves for the home-screen icon;
 // it is a real, rasterised mark, which Organization.logo requires (an SVG
