@@ -27,6 +27,7 @@ export const OG_ROUTE_TITLES: Readonly<Record<string, string>> = {
   // Block orp-shell (open reference project): the open control profiles, the
   // frontier audience route, the research notes and the contribution page.
   controls: 'Open AI governance controls',
+  'controls-crosswalk': 'AI governance controls crosswalk',
   frontier: 'Engineering assurance for frontier AI',
   research: 'Research and technical notes',
   contribute: 'Contribute to the project',
