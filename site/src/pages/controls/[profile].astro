@@ -68,6 +68,21 @@ const counts = depthCounts(profile.slug);
 const reviewers = profileReviewers(profile);
 const mappings = mappingRows(profile.slug);
 const machine = machineLinks();
+// Umami attributes of a machine-readable link (declarative, no script): the
+// controls dataset is a control-download, the schemas and the observation's
+// example and template a schema-download naming the schema and the file.
+const machineEvent = (href: string): Record<string, string> => {
+  if (href.includes('control-observation')) {
+    return { 'data-umami-event': 'schema-download', 'data-umami-event-schema': 'control-observation', 'data-umami-event-file': href };
+  }
+  if (href.endsWith('/schemas/controls.json')) {
+    return { 'data-umami-event': 'schema-download', 'data-umami-event-schema': 'controls', 'data-umami-event-file': href };
+  }
+  if (href.endsWith('/controls.json')) {
+    return { 'data-umami-event': 'control-download', 'data-umami-event-id': 'all', 'data-umami-event-format': 'json' };
+  }
+  return {};
+};
 const path = profilePath(profile);
 const pageUrl = new URL(path, site.url).href;
 const issueForm = `${site.github}/issues/new?template=${profile.issueTemplate}`;
@@ -312,7 +327,7 @@ const jsonLd = [
   <ul>
     <li>
       Each control as JSON, for example{' '}
-      <a href={`/api/v1/controls/${controlAnchor(rows[0])}.json`} data-umami-event="control-download" data-umami-event-control={rows[0].id}>
+      <a href={`/api/v1/controls/${controlAnchor(rows[0])}.json`} data-umami-event="control-download" data-umami-event-id={rows[0].id} data-umami-event-format="json">
         {rows[0].id}
       </a>
       : the link sits at the foot of every control above.
@@ -320,7 +335,7 @@ const jsonLd = [
     {
       machine.map((l) => (
         <li>
-          <a href={l.href} {...(l.event ? { 'data-umami-event': l.event } : {})}>
+          <a href={l.href} {...machineEvent(l.href)}>
             {l.label}
           </a>
           : {l.note}.
@@ -328,8 +343,8 @@ const jsonLd = [
       ))
     }
     <li>
-      This page as Markdown: <a href={`${path}.md`}>{path}.md</a>. Every dataset of the site is in
-      the <a href="/resources/data">open data API</a>.
+      This page as Markdown: <a href={`${path}.md`} data-umami-event="control-download" data-umami-event-id={profile.slug} data-umami-event-format="md">{path}.md</a>. Every dataset of the site is in
+      the <a href="/resources/data" data-umami-event="api-docs-click" data-umami-event-from={path}>open data API</a>.
     </li>
   </ul>
 

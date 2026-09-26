@@ -298,7 +298,7 @@ const draftNote =
                 const n = sourceNumber(sources, src);
                 return (
                   <li>
-                    <a class="cite" href={`#src-${n}`}>
+                    <a class="cite" href={`#src-${n}`} data-umami-event="control-ref-click" data-umami-event-control={c.id}>
                       [{n}]
                     </a>{' '}
                     {src.title}
@@ -369,7 +369,8 @@ const draftNote =
       class="ctl-json"
       href={controlApiPath(c)}
       data-umami-event="control-download"
-      data-umami-event-control={c.id}
+      data-umami-event-id={c.id}
+      data-umami-event-format="json"
     >
       {c.id} as JSON
     </a>

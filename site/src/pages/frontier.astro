@@ -69,12 +69,21 @@ const jsonLd = [
   breadcrumbJsonLd(crumbs),
 ];
 
+// Umami attributes (declarative) on the rows that lead to the open data API and the MCP server.
+const docsEvent = (href: string): Record<string, string> | undefined =>
+  href === '/mcp'
+    ? { 'data-umami-event': 'mcp-docs-click', 'data-umami-event-from': '/frontier' }
+    : href === '/resources/data' || href.startsWith('/api/v1')
+      ? { 'data-umami-event': 'api-docs-click', 'data-umami-event-from': '/frontier' }
+      : undefined;
+
 const toRows = (links: readonly FrontierLink[]) =>
   links.map((l) => ({
     title: l.title,
     description: l.description,
     href: l.href,
     ...(l.layer ? { swatch: `var(--l${l.layer})` } : {}),
+    ...(docsEvent(l.href) ? { attrs: docsEvent(l.href) } : {}),
   }));
 
 // Plain and tinted bands alternate: #who is plain, so the blocks start tinted.
