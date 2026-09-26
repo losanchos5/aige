@@ -1,0 +1,79 @@
+name: Review a research note
+description: Review a research note (/research) or one of its claims against the sources.
+title: "[Research review] "
+labels: ["research-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Research notes are drafts, open for review. A review checks a note, a section or a single
+        claim against the evidence and says whether it holds. A claim you mark as contradicted
+        needs a source that contradicts it. Include nothing confidential from your organisation.
+  - type: input
+    id: note
+    attributes:
+      label: Note slug or URL
+      placeholder: https://aigovernanceengineer.com/research/the-evaluation-environment-is-part-of-the-system
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Note version
+      description: The version shown in the status line of the note.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope of the review
+      options:
+        - Whole note
+        - One section
+        - One claim
+    validations:
+      required: true
+  - type: textarea
+    id: claim
+    attributes:
+      label: Claim or section reviewed
+      description: Quote the claim, or name the section, exactly as the note states it.
+    validations:
+      required: true
+  - type: dropdown
+    id: verdict
+    attributes:
+      label: Verdict
+      options:
+        - Supported
+        - Contradicted
+        - Unsourced
+        - Unclear
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source URL
+      description: Required if the verdict is "Contradicted"; recommended otherwise.
+    validations:
+      required: false
+  - type: textarea
+    id: comment
+    attributes:
+      label: Comment
+      description: Your reasoning, and what the note should say instead.
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: If my verdict is "Contradicted", I have given a source that contradicts the claim.
+          required: true
+        - label: The review contains nothing confidential.
+          required: true
+        - label: If the review is accepted, I may be credited by name in bok/CONTRIBUTORS.md.
+          required: false

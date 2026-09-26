@@ -1,0 +1,61 @@
+name: Propose a technical correction
+description: Correct a requirement, evidence statement, mapping, threat id, version or date in a control or research note.
+title: "[Correction] "
+labels: ["correction"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to challenge a technical statement in a control profile or a research note.
+        For a typo, a broken link or a layout problem on any other page, use "Report an error on a
+        page". Corrections are checked against the source and, when they hold, ship with a version
+        bump and a changelog line.
+  - type: input
+    id: url
+    attributes:
+      label: Page URL
+      description: The page and, if you can, the section anchor.
+      placeholder: https://aigovernanceengineer.com/controls/evaluation-environment#aige-ctl-eval-001
+    validations:
+      required: true
+  - type: input
+    id: id
+    attributes:
+      label: Control id or note slug (optional)
+      placeholder: AIGE-CTL-EVAL-001
+    validations:
+      required: false
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of correction
+      options:
+        - Wrong requirement
+        - Wrong evidence statement
+        - Wrong mapping
+        - Wrong threat id
+        - Wrong version or date
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What is wrong
+      description: Quote the statement and say why it does not hold.
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Proposed fix
+      description: The corrected wording or value.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source URL
+      description: The primary source (standard, official documentation, paper) that supports the correction.
+    validations:
+      required: true

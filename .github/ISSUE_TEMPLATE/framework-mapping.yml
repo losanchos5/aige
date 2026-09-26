@@ -1,0 +1,69 @@
+name: Propose a framework mapping
+description: Map a control to a clause of a law, standard or framework, with the official source.
+title: "[Mapping] "
+labels: ["mapping"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A mapping links one control to one clause and says how strongly the control supports it.
+        Mappings are illustrative, not a claim of conformity: a control can support a clause, it
+        does not make a system compliant. Link the official text of the clause and tag it
+        `primary`, `secondary` or `reported` as in `STYLEGUIDE.md` §6. Do not paste paid standard
+        text; paraphrase it.
+  - type: input
+    id: control-id
+    attributes:
+      label: Control id
+      placeholder: AIGE-CTL-EVAL-002
+    validations:
+      required: true
+  - type: input
+    id: framework
+    attributes:
+      label: Framework, law or standard
+      description: With its official identifier.
+      placeholder: ISO/IEC 42001:2023
+    validations:
+      required: true
+  - type: input
+    id: clause
+    attributes:
+      label: Clause, article or control
+      placeholder: Annex A.6.2.4
+    validations:
+      required: true
+  - type: dropdown
+    id: strength
+    attributes:
+      label: Strength of the mapping
+      options:
+        - "core: the control is a direct way to meet the clause"
+        - "partial: the control supports part of the clause"
+        - "in passing: the clause mentions what the control does"
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Official URL of the clause
+      description: A link to the official text (for EU law, its EUR-Lex page).
+    validations:
+      required: true
+  - type: dropdown
+    id: verified
+    attributes:
+      label: Verification tag
+      options:
+        - "primary: I opened the official text"
+        - "secondary: a reputable outlet reports it"
+        - "reported: only secondary sources carry it"
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why the control maps to the clause
+      description: One or two sentences on what the clause asks for and which part of the control evidences it.
+    validations:
+      required: true

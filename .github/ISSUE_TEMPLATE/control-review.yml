@@ -1,0 +1,80 @@
+name: Review a control
+description: Review one control in an open control profile (/controls) against a system you know.
+title: "[Control review] "
+labels: ["control-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The control profiles at https://aigovernanceengineer.com/controls are draft control
+        specifications, open for technical review. A useful review says whether one control is
+        testable as written in an environment you know, and what evidence you could or could not
+        produce for it. Describe the environment by category (for example "container sandbox",
+        "managed agent platform", "on-premise eval cluster"), never by vendor or product. Do not
+        include anything confidential: no internal names, hostnames, credentials, logs or incident
+        details from your organisation.
+  - type: input
+    id: control-id
+    attributes:
+      label: Control id
+      description: The id shown on the control, in the form AIGE-CTL-<PROFILE>-<NNN>.
+      placeholder: AIGE-CTL-EVAL-001
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Profile version
+      description: The version shown in the status line of the profile page.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: verdict
+    attributes:
+      label: Verdict
+      options:
+        - Holds as written
+        - Needs a wording change
+        - Not testable as written
+        - Missing evidence requirement
+        - Should be split or merged
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment you tested or reasoned against
+      description: A category, not a vendor or product (for example "container sandbox with an egress proxy").
+    validations:
+      required: true
+  - type: textarea
+    id: finding
+    attributes:
+      label: Finding
+      description: What holds, what does not, and what you would change. Quote the requirement you are reviewing.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence you could or could not produce
+      description: For each evidence item the control asks for, say whether your environment can produce it and, if not, why.
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source (optional)
+      description: A public URL (standard, paper, official documentation) that supports your objection, if there is one.
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: The review contains nothing confidential and names no vendor as a requirement.
+          required: true
+        - label: If the review is accepted, I may be credited by name in bok/CONTRIBUTORS.md.
+          required: false

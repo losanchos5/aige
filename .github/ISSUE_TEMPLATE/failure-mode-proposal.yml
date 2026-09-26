@@ -1,0 +1,83 @@
+name: Propose a failure mode
+description: Propose a failure mode of an AI system or agent that a control should catch.
+title: "[Failure mode] "
+labels: ["failure-mode"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A failure mode is a way a system breaks that a control can detect or prevent: where it
+        happens, the signal it leaves and the control that would catch it. A proposal needs a
+        public record (an incident report, a paper, an advisory). Describe systems by category,
+        never by vendor, and include nothing confidential from your organisation.
+  - type: input
+    id: name
+    attributes:
+      label: Failure mode
+      description: A short name.
+      placeholder: Eval harness can read the grader's reference answers
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Two to five sentences on what fails and under which conditions.
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where it happens
+      options:
+        - Harness
+        - Tools and MCP
+        - Credentials and identity
+        - Network
+        - Delegation
+        - Model
+        - Data
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: signal
+    attributes:
+      label: Signal
+      description: What an operator could observe when it happens (a log line, a metric, a trace pattern, an output).
+    validations:
+      required: true
+  - type: input
+    id: related-control
+    attributes:
+      label: Related control or pattern (optional)
+      description: The AIGE-CTL-... id or the pattern slug that should catch it, if there is one.
+      placeholder: AIGE-CTL-AGENT-004
+    validations:
+      required: false
+  - type: input
+    id: evidence-url
+    attributes:
+      label: Evidence URL
+      description: The public incident report, paper or advisory that shows the failure mode.
+    validations:
+      required: true
+  - type: dropdown
+    id: verified
+    attributes:
+      label: Verification tag
+      options:
+        - "primary: I opened the primary record"
+        - "secondary: a reputable outlet reports it"
+        - "reported: only secondary sources carry it"
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: The proposal rests on public information and contains nothing confidential.
+          required: true
+        - label: If the proposal is accepted, I may be credited by name in bok/CONTRIBUTORS.md.
+          required: false
