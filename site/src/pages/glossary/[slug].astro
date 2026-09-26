@@ -86,9 +86,11 @@ for (const slug of Object.keys(glossaryDescriptions)) {
 for (const slug of Object.keys(glossaryLinks)) {
   if (!bySlug.has(slug)) throw new Error(`glossary-links: "${slug}" is not a glossary term`);
 }
-// sameAs, other names and the tools that put the term to work (data/glossary-links.ts).
+// sameAs, other names, the tools that put the term to work and where the open
+// reference project uses it (data/glossary-links.ts).
 const extras = glossaryLinks[entry.slug] ?? {};
 const tools = extras.tools ?? [];
+const openLinks = extras.open ?? [];
 const compared = comparisonsForTerm(entry.slug);
 
 const pairs = contrastPairsFor(entry.slug);
@@ -268,6 +270,21 @@ const jsonLd = [
               <dt>Put it to work</dt>
               <dd>
                 {tools.map((link, i) => (
+                  <>
+                    {i > 0 && ' · '}
+                    <a href={link.href}>{link.label}</a>
+                  </>
+                ))}
+              </dd>
+            </>
+          )
+        }
+        {
+          openLinks.length > 0 && (
+            <>
+              <dt>In the open reference</dt>
+              <dd>
+                {openLinks.map((link, i) => (
                   <>
                     {i > 0 && ' · '}
                     <a href={link.href}>{link.label}</a>

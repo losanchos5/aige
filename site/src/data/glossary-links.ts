@@ -6,7 +6,10 @@
 //                  `sameAs` on the DefinedTerm), each identifier checked by hand;
 //   alternateName  other names the term goes by (DefinedTerm `alternateName`);
 //   tools          the toolkit pages and templates that put the term to work,
-//                  shown as a "Put it to work" line on the term page.
+//                  shown as a "Put it to work" line on the term page;
+//   open           where the term is at work in the open reference project (the
+//                  control profiles and the frontier route), shown as an "In
+//                  the open reference" line after "Put it to work".
 //
 // Read by src/pages/glossary/[slug].astro and, for the head term, by
 // src/pages/ai-governance.astro, so the one DefinedTerm node both pages state
@@ -21,7 +24,22 @@ export interface TermExtras {
   sameAs?: readonly string[];
   alternateName?: readonly string[];
   tools?: readonly TermLink[];
+  open?: readonly TermLink[];
 }
+
+// The open-reference links shared by several terms (block orp-crosslinks).
+const EVAL_PROFILE: TermLink = {
+  label: 'Evaluation environment control profile',
+  href: '/controls/evaluation-environment',
+};
+const RUNTIME_PROFILE: TermLink = {
+  label: 'Agent runtime control profile',
+  href: '/controls/agent-runtime',
+};
+const FRONTIER_RUNTIME: TermLink = {
+  label: 'Runtime safeguards for frontier AI',
+  href: '/frontier#runtime-safeguards',
+};
 
 export const glossaryLinks: Readonly<Record<string, TermExtras>> = {
   // Wikidata Q130610796, "governance of artificial intelligence" (alias "AI
@@ -43,6 +61,22 @@ export const glossaryLinks: Readonly<Record<string, TermExtras>> = {
         label: 'Impact assessment template and schema',
         href: '/resources/templates#schema-impact-assessment',
       },
+    ],
+  },
+  // Open reference project (block orp-crosslinks, 2026-09-26): the control
+  // profiles and the frontier route where the term is put to work.
+  'eval-gate': { open: [EVAL_PROFILE] },
+  'evals-as-evidence': { open: [EVAL_PROFILE] },
+  'kill-switch': { open: [FRONTIER_RUNTIME, RUNTIME_PROFILE] },
+  'workload-identity': { open: [FRONTIER_RUNTIME, RUNTIME_PROFILE] },
+  'machine-readable-evidence': {
+    open: [{ label: 'Assurance evidence for frontier AI', href: '/frontier#assurance' }],
+  },
+  'policy-card': { open: [{ label: 'Open control profiles', href: '/controls' }] },
+  'agent-registry': {
+    open: [
+      { label: 'Frontier labs and evaluators', href: '/frontier#who' },
+      { label: 'The agent registry in chapter 23', href: '/bok/governing-agents#the-agent-registry' },
     ],
   },
 };

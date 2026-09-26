@@ -111,7 +111,11 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
         {
           layers.map((layer, i) => (
             <div class="story-row" data-story-row data-n={layer.n} style={`--i:${i}`}>
-              <StackLayerPanel layer={layer} href={stackHref(layer.chapterAnchor)} />
+              <StackLayerPanel
+                layer={layer}
+                href={stackHref(layer.chapterAnchor)}
+                controlsHref={`/controls#layer-${layer.n}`}
+              />
             </div>
           ))
         }

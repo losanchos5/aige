@@ -7,7 +7,8 @@
 // catalogue order. lib/pattern-pages.ts fails the build when a file, its
 // data/patterns.ts entry and its catalogue section disagree. After the prose,
 // the reverse relations (lib/cross-links.ts): the register rows the pattern
-// builds the evidence for and the incident cases that call for it.
+// builds the evidence for, the incident cases that call for it and the open
+// controls (src/data/controls) that name it.
 import { render } from 'astro:content';
 import Doc from '../../layouts/Doc.astro';
 import PatternFoot from '../../components/PatternFoot.astro';
@@ -20,7 +21,8 @@ import { loadPatternPages, type PatternPage } from '../../lib/pattern-pages';
 import { gitCreated, gitDate } from '../../lib/reading';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import { alternatesFor } from '../../lib/i18n-content';
-import { obligationsEvidencedBy, casesCallingFor } from '../../lib/cross-links';
+import { obligationsEvidencedBy, casesCallingFor, controlsForPattern } from '../../lib/cross-links';
+import { controlHref, profileBySlug } from '../../data/controls';
 import { obligationPath } from '../../lib/obligations';
 import { obligationHeading } from '../../lib/obligation-title';
 
@@ -67,12 +69,16 @@ const crumbs = [{ label: 'Patterns', href: '/patterns' }, { label: def.title }];
 // Reverse relations, listed after the prose and added to the on-this-page TOC.
 const evidenced = obligationsEvidencedBy(def.id);
 const calledFor = casesCallingFor(def.id);
+const relatedControls = controlsForPattern(def.slug);
 const related = [
   ...(evidenced.length > 0
     ? [{ depth: 2, slug: 'obligations-evidenced', text: 'Obligations this pattern evidences' }]
     : []),
   ...(calledFor.length > 0
     ? [{ depth: 2, slug: 'cases-calling-for-it', text: 'Cases where it applies' }]
+    : []),
+  ...(relatedControls.length > 0
+    ? [{ depth: 2, slug: 'related-controls', text: 'Related controls' }]
     : []),
 ];
 
@@ -185,6 +191,27 @@ const jsonLd = [
           {calledFor.map((c) => (
             <li>
               <a href={`/cases/${c.id}`}>{c.title}</a> ({c.year})
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  {
+    relatedControls.length > 0 && (
+      <section class="pp-related" aria-labelledby="related-controls">
+        <h2 id="related-controls">Related controls</h2>
+        <p>
+          Draft controls in the <a href="/controls">open control profiles</a> that build on this
+          pattern. A control states the requirement and the evidence it must leave behind.
+        </p>
+        <ul>
+          {relatedControls.map((c) => (
+            <li>
+              <a href={controlHref(c.id)}>
+                <code>{c.id}</code> {c.title}
+              </a>{' '}
+              ({profileBySlug(c.profile)?.shortTitle ?? c.profile} profile)
             </li>
           ))}
         </ul>

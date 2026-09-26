@@ -6,7 +6,8 @@
 // CSS radio filters (catalogue and layer; native inputs, no JavaScript, so the
 // CSP holds) narrow the list; without :has() support every row stays visible.
 // The build fails if any row names a pattern, obligation, control id or related
-// row that does not exist (threatProblems()).
+// row that does not exist (threatProblems()). Where an open control profile
+// maps a threat (lib/cross-links.ts controlsForThreat), the Control entry links it.
 import Base from '../../layouts/Base.astro';
 import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
@@ -37,6 +38,8 @@ import {
   type ThreatTaxonomyId,
 } from '../../data/threats';
 import { layerName } from '../../lib/api';
+import { controlsForThreat } from '../../lib/cross-links';
+import { controlHref } from '../../data/controls';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import '../../styles/resources.css';
@@ -241,6 +244,7 @@ const ticksLabel = (layers: readonly number[]) =>
                   {rows.map((row) => {
                     const anchor = threatAnchor(row);
                     const related = relatedOf(row);
+                    const openControls = controlsForThreat(row.id);
                     return (
                       <li class:list={['tb-row', ...row.layers.map((n) => `has-l${n}`)]}>
                         <article class="tb-card" id={anchor} aria-labelledby={`${anchor}-t`}>
@@ -270,6 +274,19 @@ const ticksLabel = (layers: readonly number[]) =>
                                   );
                                 })}
                               </ul>
+                              {openControls.length > 0 && (
+                                <p class="tb-open">
+                                  Open control profile:{' '}
+                                  {openControls.map((c, i) => (
+                                    <>
+                                      {i > 0 && ' · '}
+                                      <a href={controlHref(c.id)}>
+                                        <code>{c.id}</code> {c.title}
+                                      </a>
+                                    </>
+                                  ))}
+                                </p>
+                              )}
                             </dd>
                             <dt>Test</dt>
                             <dd>
@@ -431,3 +448,10 @@ const ticksLabel = (layers: readonly number[]) =>
     </section>
   </div>
 </Base>
+
+<style>
+  /* The open-control line under the Control entry's pattern links. */
+  .tb-open {
+    margin-top: var(--s-2);
+  }
+</style>

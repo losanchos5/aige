@@ -9,9 +9,17 @@
 // - `patternsUsingTerm`: pattern pages (bok/patterns/<slug>.md) whose prose uses
 //   a glossary term, found with the same whole-word matchers that list the
 //   chapters that use it (lib/glossary.ts termMatchers).
+// - `controlsForPattern`, `controlsForThreat`, `controlsForObligation`: the open
+//   control profiles (src/data/controls) that name a pattern, a threat row or an
+//   obligation, for the "Related controls" furniture of those pages.
+// - `casesForControl`: incident cases whose note lists the control among its
+//   related controls. The join lives here, not in src/data/controls, so the
+//   registry never imports cases.ts (cases.ts validates its control ids against
+//   the registry, and the reverse import would be a cycle).
 import { obligations, type Obligation } from '../data/frameworks';
 import { cases, type IncidentCase } from '../data/cases';
 import { patterns, type PatternDef } from '../data/patterns';
+import { controls, type Control } from '../data/controls';
 import { termMatchers } from './glossary';
 import { readSource } from './md-parse';
 
@@ -73,4 +81,34 @@ export function patternsUsingTerm(slug: string): TermInPattern[] {
     }
   }
   return usage.get(slug) ?? [];
+}
+
+/** Open controls that list the pattern (by slug, as /patterns/<slug>), in registry order. */
+export function controlsForPattern(slug: string): Control[] {
+  return controls.filter((c) => c.patterns.includes(slug));
+}
+
+/** Open controls mapped to a threat row (lower-case ids of data/threats.ts: OWASP or MITRE ATLAS). */
+export function controlsForThreat(threatId: string): Control[] {
+  const wanted = threatId.toLowerCase();
+  return controls.filter(
+    (c) => c.mappings.owasp.includes(wanted) || (c.mappings.atlas ?? []).includes(wanted),
+  );
+}
+
+/** Open controls whose evidence the register row `obligationId` (AIGE-OBL-...) names, in registry order. */
+export function controlsForObligation(obligationId: string): Control[] {
+  const wanted = obligationId.toUpperCase();
+  return controls.filter((c) => c.mappings.obligations.includes(wanted));
+}
+
+/** Incident cases whose note lists the control (AIGE-CTL-...) among its related controls. */
+export function casesForControl(controlId: string): IncidentCase[] {
+  const wanted = controlId.toUpperCase();
+  return cases.filter((c) => {
+    // `relatedControls` is an optional incident-note field (data/cases.ts);
+    // read defensively so this join holds before and after it exists.
+    const related = (c as IncidentCase & { relatedControls?: readonly string[] }).relatedControls ?? [];
+    return related.some((id) => id.toUpperCase() === wanted);
+  });
 }

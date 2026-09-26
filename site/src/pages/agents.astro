@@ -5,7 +5,8 @@
  * 23), the agent patterns, the ten OWASP agentic threats with the control and
  * pattern for each, the cross-references into chapters 04, 08 and 18, the
  * runtime tool categories (read from src/data/stack.ts) and the harms and
- * incident material. The reasoning and every source live in chapter 23
+ * incident material, and a pointer from the control plane to the toolkit
+ * profile and the open agent runtime control profile. The reasoning and every source live in chapter 23
  * (bok/23-governing-agents.md); this page only routes the reader there.
  */
 import Marketing from '../layouts/Marketing.astro';
@@ -20,6 +21,7 @@ import Figure from '../components/Figure.astro';
 import { getFigure } from '../data/figures';
 import controlPlaneSvg from '../figures/agent-control-plane.svg?raw';
 import { layers } from '../data/stack';
+import { agentControls } from '../data/tool-agent-controls';
 import { slugify } from '../lib/md-parse';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 import '../styles/pages.css';
@@ -370,6 +372,12 @@ const description =
       </Figure>
       <div class="well"><RegisterList items={controlPlane} /></div>
     </div>
+    <p class="ag-note">
+      Chapter 23 sets out {agentControls.length} agent controls across these components. The
+      <a href="/toolkit/agent-control-profile">agent control profile tool</a> picks the ones one
+      agent needs; the <a href="/controls/agent-runtime">agent runtime control profile</a> states
+      each as a draft reference control with the evidence it must leave, open for technical review.
+    </p>
     <p class="section-foot">
       <a class="chapter-link" href="/toolkit/agent-control-profile">
         Write down one agent’s control profile in the toolkit <span class="arrow" aria-hidden="true">→</span>
