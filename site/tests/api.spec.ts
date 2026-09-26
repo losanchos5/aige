@@ -12,6 +12,7 @@ import { join, relative } from 'node:path';
 import { validate } from './helpers/json-schema-lite';
 import { inlineScriptAllowed } from './helpers/csp';
 import { obligations, obligationSlug } from '../src/data/frameworks';
+import { controls, controlSlug } from '../src/data/controls';
 
 // Mirrors src/data/site.ts on purpose (see seo-schema.spec.ts).
 const SITE_ORIGIN = 'https://aigovernanceengineer.com';
@@ -95,9 +96,9 @@ test.describe('open-data API', () => {
     expect(doc.openapi).toBe('3.1.0');
     const paths = Object.keys(doc.paths as Json);
     for (const path of paths) {
-      const concrete = path
-        .replace('{id}', obligationSlug(obligations[0]))
-        .replace('{name}', 'obligations');
+      // {id} is filled per path prefix: an obligation id or a control id.
+      const id = path.startsWith('/controls/') ? controlSlug(controls[0]) : obligationSlug(obligations[0]);
+      const concrete = path.replace('{id}', id).replace('{name}', 'obligations');
       expect(existsSync(join(API_DIR, concrete.replace(/^\//, ''))), path).toBe(true);
     }
     // Every response schema is a $ref to a published schema.
