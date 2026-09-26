@@ -4,8 +4,9 @@
 // built files in dist (no browser) and skips when there is no build. The
 // script runs under a preloaded fetch stub (tests/fixtures/zenodo-fetch-stub.mjs)
 // that logs every request: the dry runs must log none, the stubbed deposit
-// must go to the sandbox unless --production is passed. Block orp2-release
-// (open-reference-project-2).
+// must go to the sandbox unless --production is passed, and the token never
+// goes to a link on another origin. Block orp2-release
+// (open-reference-project-2), hardened by orp2-review-fixes.
 import { test, expect } from '@playwright/test';
 import { existsSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -30,9 +31,11 @@ const bundleName = `${SLUG}-v${profile.version}`;
 const title = `AIGE Control Profile: ${profile.title} v${profile.version}`;
 
 /** Runs the script with the fetch stub; the token is set only when given. */
-function run(args: string[], opts: { token?: string; fetchLog: string; mode?: 'deny' | 'fake' }) {
+function run(args: string[], opts: { token?: string; fetchLog: string; mode?: 'deny' | 'fake'; bucketOrigin?: string }) {
   const env: NodeJS.ProcessEnv = { ...process.env, FETCH_LOG: opts.fetchLog, FETCH_MODE: opts.mode ?? 'deny' };
   delete env.ZENODO_TOKEN;
+  delete env.FETCH_BUCKET_ORIGIN;
+  if (opts.bucketOrigin) env.FETCH_BUCKET_ORIGIN = opts.bucketOrigin;
   if (opts.token) env.ZENODO_TOKEN = opts.token;
   const res = spawnSync(process.execPath, ['--import', STUB, SCRIPT, ...args], { env, encoding: 'utf8' });
   return { status: res.status, stdout: res.stdout, stderr: res.stderr };
@@ -54,7 +57,8 @@ test.describe('profile DOI on the built site', () => {
       const row = (api.profiles as Json[]).find((r) => r.slug === p.slug)!;
       expect(row.doi, p.slug).toBe(p.doi ?? null);
       expect(row.conceptDoi, p.slug).toBe(p.conceptDoi ?? null);
-      expect(row.citation.doi).toBe(p.doi ?? site.conceptDoi);
+      expect(row.citation.doi).toBe(p.doi ?? p.conceptDoi ?? site.conceptDoi);
+      expect(row.citation.doiKind).toBe(p.doi ? 'profile' : p.conceptDoi ? 'profile-concept' : 'project-concept');
       expect(row.citation.url).toBe(`${site.url}/controls/${p.slug}`);
       expect(row.citation.text).toContain(`https://doi.org/${row.citation.doi}`);
     }
@@ -62,16 +66,18 @@ test.describe('profile DOI on the built site', () => {
     const row = (api.profiles as Json[]).find((r) => r.slug === SLUG)!;
     expect(row.doi).toBeNull();
     expect(row.citation.doi).toBe(site.conceptDoi);
+    expect(row.citation.doiKind).toBe('project-concept');
   });
 
   test('the closed dataset schema requires the new profile fields', () => {
-    test.skip(!existsSync(DATASET_SCHEMA), 'no dataset schema file in dist');
+    test.skip(!existsSync(DATASET_SCHEMA) && !process.env.CI, 'no dataset schema file in dist');
     const schema = readJson(DATASET_SCHEMA);
     const item = schema.properties.profiles.items;
     expect(item.additionalProperties).toBe(false);
     for (const key of ['doi', 'conceptDoi', 'citation']) expect(item.required).toContain(key);
     expect(item.properties.doi.type).toEqual(['string', 'null']);
-    expect(item.properties.citation.required).toEqual(['text', 'doi', 'url']);
+    expect(item.properties.citation.required).toEqual(['text', 'doi', 'doiKind', 'url']);
+    expect(item.properties.citation.properties.doiKind.enum).toEqual(['profile', 'profile-concept', 'project-concept']);
   });
 
   test('the Markdown twin names the effective DOI and the profile version', () => {
@@ -178,18 +184,23 @@ test.describe('scripts/profile-release.mjs', () => {
       expect(res.status, res.stderr).toBe(0);
       expect(requests(fetchLog)).toEqual([]);
       expect(res.stderr).toContain('ZENODO_TOKEN is not set');
+      expect(res.stderr).toContain('dist/releases, which must never be deployed');
       expect(existsSync(join(dir, 'CITATION.cff'))).toBe(true);
     } finally {
       rmSync(join('dist', 'releases'), { recursive: true, force: true });
     }
   });
 
-  test('the only network call sits behind the token and dry-run guard', () => {
+  // The dry runs above prove, through the fetch stub, that no request is made
+  // without a token or with --dry-run. The stub only sees fetch, so this checks
+  // that the script loads no other network module (static or dynamic import).
+  test('the script loads no network module besides fetch', () => {
     const src = readFileSync(SCRIPT, 'utf8');
-    expect(src.match(/\bfetch\(/g)?.length).toBe(1);
-    expect(src).not.toMatch(/from 'node:(http|https|net|tls)'/);
-    expect(src).toContain("if (opts.dryRun || !token)");
-    expect(src).not.toMatch(/console\.log|writeFileSync\([^)]*token/i);
+    const specifiers = [...src.matchAll(/(?:\bfrom\s*|\bimport\s*\(\s*|\brequire\s*\(\s*)['"]([^'"]+)['"]/g)].map((m) => m[1]);
+    expect(specifiers.length).toBeGreaterThan(0);
+    for (const spec of specifiers) {
+      expect(spec, spec).not.toMatch(/^(node:)?(http|https|http2|net|tls|dgram|dns|undici)$/);
+    }
   });
 
   test('with a token: a draft on the sandbox, published only with --publish, the token never printed', () => {
@@ -211,6 +222,22 @@ test.describe('scripts/profile-release.mjs', () => {
     expect(res.stderr).toContain('reserved DOI: 10.5072/zenodo.4242');
     expect(res.stderr).toContain('https://sandbox.zenodo.org/deposit/4242');
     expect(res.stdout + res.stderr).not.toContain(TOKEN);
+    // Nor is the token written into any file of the bundle.
+    const all = (d: string): string[] =>
+      readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? all(join(d, e.name)) : [join(d, e.name)]));
+    for (const file of all(join(out, bundleName))) expect(readFileSync(file, 'utf8'), file).not.toContain(TOKEN);
+  });
+
+  test('never sends the token to a link on another origin than the API', () => {
+    const out = test.info().outputPath('releases');
+    const fetchLog = test.info().outputPath('fetch-foreign.log');
+    const res = run([SLUG, '--out', out], { token: TOKEN, fetchLog, mode: 'fake', bucketOrigin: 'https://files.example.org' });
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain('another origin (https://files.example.org)');
+    const calls = requests(fetchLog);
+    expect(calls).toHaveLength(1);
+    for (const c of calls) expect(new URL(c.url).origin).toBe('https://sandbox.zenodo.org');
+    expect(res.stdout + res.stderr).not.toContain(TOKEN);
   });
 
   test('--production --publish goes to zenodo.org and publishes', () => {
@@ -221,6 +248,7 @@ test.describe('scripts/profile-release.mjs', () => {
     const calls = requests(fetchLog);
     for (const c of calls) expect(new URL(c.url).origin).toBe('https://zenodo.org');
     expect(calls.at(-1)).toMatchObject({ method: 'POST', url: 'https://zenodo.org/api/deposit/depositions/4242/actions/publish' });
+    expect(res.stderr).toContain(`doi: '10.5072/zenodo.4242', doiVersion: '${profile.version}'`);
     expect(res.stdout + res.stderr).not.toContain(TOKEN);
   });
 

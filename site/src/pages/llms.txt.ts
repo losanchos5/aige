@@ -25,6 +25,7 @@ import { audiences, audiencePath } from '../data/audiences';
 import { researchPath, writtenThemes } from '../data/research';
 import { profiles as controlProfiles, controlsIn, controlPagePath, profilePath } from '../data/controls';
 import { profilePageMeta } from '../lib/controls-md';
+import { CONTROLS_CROSSWALK_PATH, CROSSWALK_DESCRIPTION, CROSSWALK_TITLE } from '../lib/controls-crosswalk';
 import { liveSiblingHubs } from '../lib/audiences';
 import { firstSentence, getGlossary } from '../lib/glossary';
 import { hasFigureArt } from '../lib/figure-reuse';
@@ -197,14 +198,15 @@ export const GET: APIRoute = async (context) => {
     // once control pages are on, come from the registry (src/data/controls):
     // each profile line carries the <title> and description of its page
     // (lib/controls-md.ts profilePageMeta), each control page its own. The
-    // crosswalk is listed here once its page exists.
+    // crosswalk line carries the page's title and description
+    // (lib/controls-crosswalk.ts).
     section('Controls and research', [
       described(
         '/controls',
         'Open AI governance controls',
         'Open control profiles for AI governance: each control with its evidence, mapped to the five-layer stack and reviewed in the open. Versioned and CC BY 4.0.',
       ),
-      ...(hasStaticRoute('/controls/crosswalk') ? [described('/controls/crosswalk', 'AI controls crosswalk')] : []),
+      described(CONTROLS_CROSSWALK_PATH, CROSSWALK_TITLE, CROSSWALK_DESCRIPTION),
       ...controlProfiles.flatMap((profile) => {
         const meta = profilePageMeta(profile.slug);
         return [

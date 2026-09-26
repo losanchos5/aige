@@ -7,18 +7,16 @@
 // and review links, and a Markdown twin. No page is a stub, none says it is
 // certified and none carries an em dash.
 import { test, expect } from '@playwright/test';
-import { profiles, controlsIn, controlAnchor, profilePath } from '../src/data/controls';
-import { readFileSync } from 'node:fs';
+import { profiles, controlsIn, controlAnchor, profilePath, statusLabels } from '../src/data/controls';
+import { profilePageMeta } from '../src/data/controls/page-meta';
 
 const ORIGIN = 'https://aigovernanceengineer.com';
 const EM_DASH = String.fromCharCode(0x2014);
 
-/** Each profile's page title, read from PAGE_META in src/lib/controls-md.ts (that module imports JSON
- *  without an import attribute, so the test reads its source instead of importing it). */
-const PAGE_META_SRC = readFileSync('src/lib/controls-md.ts', 'utf8');
-const TITLES: Record<string, string> = Object.fromEntries(
-  profiles.map((p) => [p.slug, new RegExp(`'${p.slug}': \\{\\s*seoTitle: '([^']+)'`).exec(PAGE_META_SRC)?.[1] ?? '']),
-);
+/** Each profile's page title, from src/data/controls/page-meta.ts (no JSON import, so Playwright
+ *  imports it; lib/controls-md.ts re-exports it for the pages). Throws for a profile with none. */
+const TITLES: Record<string, string> = Object.fromEntries(profiles.map((p) => [p.slug, profilePageMeta(p.slug).seoTitle]));
+const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 type JsonLdNode = Record<string, unknown> & { '@type'?: string | string[] };
 
@@ -44,7 +42,8 @@ for (const profile of profiles) {
   test.describe(path, () => {
     test('keeps its title, renders every control at its anchor and carries the draft notices', async ({ page }) => {
       await page.goto(path);
-      await expect(page).toHaveTitle(new RegExp(`^${TITLES[profile.slug]}\\b`));
+      expect(TITLES[profile.slug], profile.slug).toBeTruthy();
+      await expect(page).toHaveTitle(new RegExp(`^${escapeRegExp(TITLES[profile.slug])}\\b`));
       await expect(page.locator('h1')).toHaveCount(1);
 
       const prose = page.locator('article.prose');
@@ -73,7 +72,7 @@ for (const profile of profiles) {
       const graph = await graphOf(page);
       const article = graph.find((n) => n['@type'] === 'TechArticle');
       expect(article?.['@id']).toBe(`${ORIGIN}${path}#article`);
-      expect(article?.creativeWorkStatus).toBe('Draft');
+      expect(article?.creativeWorkStatus).toBe(statusLabels[profile.status]);
       const set = graph.find((n) => n['@type'] === 'DefinedTermSet');
       expect(set?.['@id']).toBe(`${ORIGIN}${path}#profile`);
       const terms = (set?.hasDefinedTerm ?? []) as JsonLdNode[];

@@ -48,7 +48,11 @@ test.describe('data admission and privacy profile data', () => {
       expect(row.openQuestions.length, row.id).toBeGreaterThan(0);
       expect(row.observation, row.id).toBeUndefined();
     }
-    expect(observationExamples).toEqual([]);
+    // Every example observation belongs to a specified control of this profile
+    // (none while all its controls are derived).
+    for (const e of observationExamples) {
+      expect(rows.find((c) => c.id === e.controlId)?.depth, e.path).toBe('specified');
+    }
   });
 
   test('every control derives from a pattern page or a published record schema that exists', () => {

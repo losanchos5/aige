@@ -25,7 +25,8 @@ export const GET: APIRoute = ({ props }) => {
         path: controlPagePath(control) as string,
         updated: profile.updated,
         version: profile.version,
-        // The profile's own DOI once deposited, else the project concept DOI.
+        // The profile version's DOI, else the profile's concept DOI, else the
+        // project concept DOI (profileCitation doiKind).
         doi: profileCitation(profile).effectiveDoi,
       },
       controlMarkdown(control),

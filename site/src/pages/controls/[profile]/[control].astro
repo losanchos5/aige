@@ -78,9 +78,9 @@ const sources = controlSources(c);
 const related = controlRelations(c);
 const examples = controlExamples(c);
 const reviewers = profileReviewers(profile);
-// The DOI this control is cited with: its profile's own once deposited, else
-// the project concept DOI (as on the profile page), and the data file it is
-// built from.
+// The DOI this control is cited with: its profile version's once deposited,
+// else the profile's concept DOI, else the project concept DOI (cite.doiKind,
+// as on the profile page), and the data file it is built from.
 const cite = profileCitation(profile);
 const editPath = `site/src/data/controls/${profile.slug}.ts`;
 const issueForm = `${site.github}/issues/new?template=${profile.issueTemplate}`;
@@ -117,7 +117,7 @@ const jsonLd = [
     url: pageUrl,
     inLanguage: 'en',
     version: profile.version,
-    creativeWorkStatus: 'Draft',
+    creativeWorkStatus: statusLabels[profile.status],
     datePublished: profile.published,
     dateModified: profile.updated,
     image: new URL('/og/controls.png', site.url).href,
@@ -158,7 +158,7 @@ const jsonLd = [
   </div>
 
   <p class="cp-part">
-    <code>{c.id}</code>, a control of the <a href={profileHref}>{profile.title}</a> (draft
+    <code>{c.id}</code>, a control of the <a href={profileHref}>{profile.title}</a> ({statusLabels[profile.status].toLowerCase()}
     v{profile.version}). <a href={controlAnchorPath(c)}>See it among the other controls of the profile</a>,
     or its mappings beside every other control's in the
     <a href={`/controls/crosswalk#by-profile-${profile.slug}`}>controls crosswalk</a>.
@@ -374,12 +374,18 @@ const jsonLd = [
   <ContributeCta kind="control" title={`${c.id} ${c.title} (${profile.shortTitle} v${profile.version})`} />
 
   <div id="cite" class="cp-cite">
-    <p class="cp-doi-note" data-doi-kind={cite.doi ? 'profile' : 'project-concept'}>
+    <p class="cp-doi-note" data-doi-kind={cite.doiKind}>
       {
-        cite.doi ? (
+        cite.doiKind === 'profile' ? (
           <>
             DOI of the profile version this control belongs to:{' '}
-            <a href={`https://doi.org/${cite.doi}`}>{cite.doi}</a>.
+            <a href={`https://doi.org/${cite.effectiveDoi}`}>{cite.effectiveDoi}</a>.
+          </>
+        ) : cite.doiKind === 'profile-concept' ? (
+          <>
+            This control's profile version has no DOI of its own yet: it is cited with the concept
+            DOI of the profile, <a href={`https://doi.org/${cite.effectiveDoi}`}>{cite.effectiveDoi}</a>,
+            which resolves to its latest archived version.
           </>
         ) : (
           <>

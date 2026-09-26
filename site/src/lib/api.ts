@@ -304,6 +304,7 @@ const VERIFICATION_KINDS = ['inspect', 'test', 'observe', 'attest'] as const;
 const SUBJECT_KINDS = ['eval-environment', 'eval-run', 'agent', 'tool-server', 'harness', 'model-artefact'] as const;
 const VERIFICATION_TAGS = ['primary', 'secondary', 'reported'] as const;
 const DERIVED_FROM_KINDS = ['pattern', 'schema', 'chapter'] as const;
+const PROFILE_DOI_KINDS = ['profile', 'profile-concept', 'project-concept'] as const;
 
 const personName = (id: string) => personById(id)?.name ?? id;
 
@@ -323,7 +324,9 @@ function derivedFromPath(src: ControlSource): string {
     const p = getPatternBySlug(src.ref);
     return p ? patternPath(p) : `/patterns/${src.ref}`;
   }
-  if (src.kind === 'schema') return `/schemas/${src.ref}.v1.json`;
+  // The schema's row in the templates library, the link the page and the
+  // Markdown twin give (lib/controls-md.ts derivedSources).
+  if (src.kind === 'schema') return `/resources/templates#schema-${src.ref}`;
   const chapter = chapters.find((c) => c.slug === src.ref);
   return `/bok/${chapter?.slug ?? src.ref}`;
 }
@@ -369,7 +372,7 @@ export function controlRecord(row: Control) {
       };
     }),
     // Site material a derived control restates: a pattern page, a record schema
-    // file of the templates library or a chapter page (always present, [] when none).
+    // row of the templates library or a chapter page (always present, [] when none).
     derivedFrom: (row.derivedFrom ?? []).map((src) => ({
       kind: src.kind,
       ref: src.ref,
@@ -472,7 +475,7 @@ export const controlSchema = s.obj(
       s.obj({
         kind: s.enumOf(DERIVED_FROM_KINDS, 'What the source is: a pattern, a record schema or a chapter.'),
         ref: s.str('Pattern slug, record schema id or chapter slug.'),
-        url: s.uri('Pattern page, schema file or chapter page.'),
+        url: s.uri('Pattern page, the schema row of the templates library or chapter page.'),
       }),
       'Site material a derived control restates; empty when none.',
     ),
@@ -536,8 +539,8 @@ export const controlSchema = s.obj(
 
 function controlProfileRecord(p: ControlProfile) {
   // Block orp2-release: the profile's own DOIs (null until deposited) and how
-  // to cite it, with the effective DOI (the profile's, else the project's
-  // concept DOI).
+  // to cite it, with the effective DOI (the version's, else the profile's
+  // concept DOI, else the project's) and which of the three it is.
   const cite = profileCitation(p);
   return {
     slug: p.slug,
@@ -558,7 +561,7 @@ function controlProfileRecord(p: ControlProfile) {
     controls: controls.filter((c) => c.profile === p.slug).map((c) => c.id),
     doi: cite.doi,
     conceptDoi: cite.conceptDoi,
-    citation: { text: cite.text, doi: cite.effectiveDoi, url: cite.url },
+    citation: { text: cite.text, doi: cite.effectiveDoi, doiKind: cite.doiKind, url: cite.url },
   };
 }
 
@@ -587,7 +590,8 @@ const controlProfileSchema = s.obj({
   citation: s.obj(
     {
       text: s.str('Ready-to-copy reference to the profile version.'),
-      doi: s.str('DOI the reference cites: the profile DOI when there is one, else the project concept DOI.'),
+      doi: s.str('DOI the reference cites: the profile version DOI when there is one, else the profile concept DOI, else the project concept DOI.'),
+      doiKind: s.enumOf(PROFILE_DOI_KINDS, 'Which DOI `doi` is: profile (version DOI), profile-concept or project-concept.'),
       url: s.uri('Profile page.'),
     },
     'How to cite this profile version.',

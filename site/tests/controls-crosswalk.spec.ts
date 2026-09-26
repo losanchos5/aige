@@ -7,20 +7,23 @@
 // gets a table, and the language holds: "not a claim of conformity", never
 // "compliant", "certified" or U+2014. Block orp2-crosswalk
 // (open-reference-project-2, wave 1). Also the `derivedFrom` sources the
-// controls dataset publishes per control: each url resolves in dist.
+// controls dataset publishes per control: each url resolves in dist (a record
+// schema is its row of /resources/templates, the link the page and the twin
+// give too).
 import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { validate } from './helpers/json-schema-lite';
 import { controls, controlPath, type Control } from '../src/data/controls';
 import { obligationById } from '../src/data/frameworks';
-import { threatById } from '../src/data/threats';
+import { threatById, threats } from '../src/data/threats';
 import { patterns } from '../src/data/patterns';
 import { chapters } from '../src/data/chapters';
 import { schemaOrder } from '../src/data/templates';
 import { controlRecord } from '../src/lib/api';
 import {
   buildControlsCrosswalk,
+  crosswalkMarkdown,
   crosswalkPairKeys,
   crosswalkPairs,
   profileCrosswalk,
@@ -145,6 +148,36 @@ test.describe('controls crosswalk data', () => {
     expect(ids.filter((id) => order.includes(id))).toEqual(present);
     const aiuc = ids.indexOf('aiuc1');
     if (aiuc >= 0) expect(ids.slice(0, aiuc).some((id) => id.startsWith('other-'))).toBe(false);
+  });
+
+  test('a Markdown table cell escapes pipes and folds newlines (synthetic row)', () => {
+    const row: Control = {
+      ...controls[0],
+      mappings: {
+        obligations: [],
+        iso42001: [],
+        nistAiRmf: [],
+        owasp: [],
+        other: [{ framework: 'Pipe Test Framework', ref: 'P|1', note: 'left | right\nnext line' }],
+      },
+    };
+    const md = crosswalkMarkdown([row]);
+    const line = md.split('\n').find((l) => l.startsWith('| P'));
+    expect(line).toBeDefined();
+    expect(line).toContain('| P\\|1 | left \\| right next line | ');
+    // Four unescaped pipes: the three columns hold.
+    expect(line!.replace(/\\\|/g, '').split('|').length - 1).toBe(4);
+  });
+
+  test('an "other" MITRE ATLAS mapping on a catalogue row keeps the catalogue url and name', () => {
+    const t = threats.find((x) => x.taxonomy === 'mitre-atlas')!;
+    const none = { obligations: [], iso42001: [], nistAiRmf: [], owasp: [] };
+    // The "other" mapping comes first, so it opens the row without a url.
+    const first: Control = { ...controls[0], mappings: { ...none, other: [{ framework: 'MITRE ATLAS', ref: t.externalId, note: 'own words' }] } };
+    const second: Control = { ...controls[1], mappings: { ...none, atlas: [t.id] } };
+    const fw = buildControlsCrosswalk([first, second]).frameworks.find((f) => f.id === 'mitre-atlas')!;
+    expect(fw.rows).toHaveLength(1);
+    expect(fw.rows[0]).toMatchObject({ ref: t.externalId, name: t.name, url: t.url, controls: [first.id, second.id] });
   });
 
   test('the reverse view covers every live control of every profile', () => {
@@ -278,18 +311,35 @@ test.describe('derivedFrom in the controls dataset', () => {
     return join(DIST, path.endsWith('.json') ? path : `${path}.html`);
   };
 
-  test('every control carries derivedFrom, and every url resolves in dist', () => {
+  /** The url's file exists in dist and, when it has a fragment, holds that id. */
+  const resolves = (url: string): boolean => {
+    const file = distFileOf(url);
+    if (!existsSync(file)) return false;
+    const hash = new URL(url).hash.slice(1);
+    return hash === '' || read(file).includes(`id="${hash}"`);
+  };
+
+  test('every control carries derivedFrom, every url resolves in dist, and the page and twin link the same url', () => {
     const doc = readJson(DATASET);
     for (const c of doc.controls as Json[]) {
       const sources = c.derivedFrom as { kind: string; ref: string; url: string }[];
       expect(Array.isArray(sources), String(c.id)).toBe(true);
       for (const src of sources) {
-        expect(existsSync(distFileOf(src.url)), `${c.id} ${src.kind} ${src.ref}: ${src.url}`).toBe(true);
+        expect(resolves(src.url), `${c.id} ${src.kind} ${src.ref}: ${src.url}`).toBe(true);
+      }
+      // A derived control names its sources on the profile page and in its twin.
+      if (sources.length === 0 || c.depth !== 'derived') continue;
+      const page = mainOf(read(join(DIST, 'controls', `${c.profile}.html`)));
+      const twin = read(join(DIST, 'controls', `${c.profile}.md`));
+      for (const src of sources) {
+        const { pathname, hash } = new URL(src.url);
+        expect(page.includes(`href="${pathname}${hash}"`), `${c.id} page links ${src.url}`).toBe(true);
+        expect(twin.includes(`(${src.url})`), `${c.id} twin links ${src.url}`).toBe(true);
       }
     }
   });
 
-  test('each kind of source maps to a url that exists (pattern page, schema file, chapter page)', () => {
+  test('each kind of source maps to a url that exists (pattern page, schema row of the templates library, chapter page)', () => {
     const row = {
       ...controls[0],
       derivedFrom: [
@@ -300,8 +350,8 @@ test.describe('derivedFrom in the controls dataset', () => {
     };
     const record = controlRecord(row);
     expect(record.derivedFrom.map((d) => d.kind)).toEqual(['pattern', 'schema', 'chapter']);
-    expect(record.derivedFrom[1].url).toBe(`${SITE_ORIGIN}/schemas/${schemaOrder[0]}.v1.json`);
-    for (const src of record.derivedFrom) expect(existsSync(distFileOf(src.url)), src.url).toBe(true);
+    expect(record.derivedFrom[1].url).toBe(`${SITE_ORIGIN}/resources/templates#schema-${schemaOrder[0]}`);
+    for (const src of record.derivedFrom) expect(resolves(src.url), src.url).toBe(true);
     expect(controlRecord({ ...controls[0], derivedFrom: undefined }).derivedFrom).toEqual([]);
   });
 });

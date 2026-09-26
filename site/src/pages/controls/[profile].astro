@@ -77,9 +77,10 @@ const machine = machineLinks();
 const path = profilePath(profile);
 const pageUrl = new URL(path, site.url).href;
 const issueForm = `${site.github}/issues/new?template=${profile.issueTemplate}`;
-const citeTitle = `${profile.title} v${profile.version} (draft)`;
-// Block orp2-release: the DOI this profile is cited with (its own once
-// deposited, else the project concept DOI) and the data file it is built from.
+const citeTitle = `${profile.title} v${profile.version} (${statusLabels[profile.status].toLowerCase()})`;
+// Block orp2-release: the DOI this profile is cited with (its version DOI once
+// deposited, else its concept DOI, else the project concept DOI; cite.doiKind)
+// and the data file it is built from.
 const cite = profileCitation(profile);
 const editPath = `site/src/data/controls/${profile.slug}.ts`;
 
@@ -113,7 +114,7 @@ const jsonLd = [
     url: pageUrl,
     inLanguage: 'en',
     version: profile.version,
-    creativeWorkStatus: 'Draft',
+    creativeWorkStatus: statusLabels[profile.status],
     datePublished: profile.published,
     dateModified: profile.updated,
     image: new URL('/og/controls.png', site.url).href,
@@ -358,11 +359,17 @@ const jsonLd = [
   <ContributeCta kind="control" title={`${profile.title} v${profile.version}`} />
 
   <div id="cite" class="cp-cite">
-    <p class="cp-doi-note" data-doi-kind={cite.doi ? 'profile' : 'project-concept'}>
+    <p class="cp-doi-note" data-doi-kind={cite.doiKind}>
       {
-        cite.doi ? (
+        cite.doiKind === 'profile' ? (
           <>
-            DOI of this profile version: <a href={`https://doi.org/${cite.doi}`}>{cite.doi}</a>.
+            DOI of this profile version: <a href={`https://doi.org/${cite.effectiveDoi}`}>{cite.effectiveDoi}</a>.
+          </>
+        ) : cite.doiKind === 'profile-concept' ? (
+          <>
+            This version has no DOI of its own yet: it is cited with the concept DOI of the profile,{' '}
+            <a href={`https://doi.org/${cite.effectiveDoi}`}>{cite.effectiveDoi}</a>, which resolves
+            to its latest archived version.
           </>
         ) : (
           <>
