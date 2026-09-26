@@ -34,23 +34,17 @@ import { site } from '../data/site';
 import { personById } from '../data/people';
 import { sourceText } from './sources';
 import { datasetByName } from './api';
-import { sourcePath } from './md-parse';
-import { existsSync } from 'node:fs';
+import observationSchema from '../../public/schemas/control-observation.v1.json';
 
 // ---- Machine-readable links ---------------------------------------------------
 //
 // The controls dataset (/api/v1/controls.json and its generated schema) and the
 // control-observation record (public/schemas/control-observation.v1.json, its
-// example and its template) ship with the controls-content block. A page links
-// each one only when it exists in the same build, so check:links holds on a
-// branch that does not carry them yet; once they land the links appear on
-// their own, with no change here.
+// example and its template). The dataset is linked only when lib/api.ts
+// registers it; the observation files ship in site/public.
 
 /** Whether the `controls` dataset is registered in lib/api.ts. */
 export const hasControlsDataset = (): boolean => datasetByName('controls') !== undefined;
-
-/** Whether a file under site/public exists (path relative to public/, no leading slash). */
-const hasPublicFile = (rel: string): boolean => existsSync(sourcePath(`site/public/${rel}`));
 
 export const CONTROLS_DATASET_PATH = '/api/v1/controls.json';
 export const CONTROLS_SCHEMA_PATH = '/api/v1/schemas/controls.json';
@@ -84,22 +78,50 @@ export function machineLinks(): MachineLink[] {
       event: 'schema-download',
     });
   }
-  if (hasPublicFile(OBSERVATION_SCHEMA_PATH.slice(1))) {
-    out.push({
-      label: 'Control observation schema',
-      href: OBSERVATION_SCHEMA_PATH,
-      note: 'the record a check of a control emits: control_id, subject, expected, observed, status, timestamp, evidence',
-      event: 'schema-download',
-    });
-  }
-  if (hasPublicFile(OBSERVATION_EXAMPLE_PATH.slice(1))) {
-    out.push({ label: 'Observation example', href: OBSERVATION_EXAMPLE_PATH, note: 'a filled record that validates against the schema' });
-  }
-  if (hasPublicFile(OBSERVATION_TEMPLATE_PATH.slice(1))) {
-    out.push({ label: 'Observation template', href: OBSERVATION_TEMPLATE_PATH, note: 'the same fields in Markdown, with short guidance' });
-  }
+  out.push({
+    label: 'Control observation schema',
+    href: OBSERVATION_SCHEMA_PATH,
+    note: 'the record a check of a control emits: control_id, subject, expected, observed, status, timestamp, evidence',
+    event: 'schema-download',
+  });
+  out.push({
+    label: 'Observation example',
+    href: OBSERVATION_EXAMPLE_PATH,
+    note: 'a filled record that validates against the schema',
+    event: 'schema-download',
+  });
+  out.push({
+    label: 'Observation template',
+    href: OBSERVATION_TEMPLATE_PATH,
+    note: 'the same fields in Markdown, with short guidance',
+    event: 'schema-download',
+  });
   return out;
 }
+
+/**
+ * The declarative Umami attributes of a machine-readable link (no script),
+ * from its `event`: the controls dataset is a control-download, the schemas and
+ * the observation's example and template a schema-download naming the schema
+ * and the file.
+ */
+export function machineEvent(link: MachineLink): Record<string, string> {
+  if (link.event === 'control-download') {
+    return { 'data-umami-event': 'control-download', 'data-umami-event-id': 'all', 'data-umami-event-format': 'json' };
+  }
+  if (link.event === 'schema-download') {
+    const schema = link.href.includes('control-observation') ? 'control-observation' : 'controls';
+    return { 'data-umami-event': 'schema-download', 'data-umami-event-schema': schema, 'data-umami-event-file': link.href };
+  }
+  return {};
+}
+
+/** The statuses an observation may carry, read from the schema's enum. */
+export const OBSERVATION_STATUSES: readonly string[] = observationSchema.properties.status.enum;
+
+/** The statuses as prose: "pass, fail or not_applicable". */
+export const observationStatusText = (): string =>
+  `${OBSERVATION_STATUSES.slice(0, -1).join(', ')} or ${OBSERVATION_STATUSES[OBSERVATION_STATUSES.length - 1]}`;
 
 /** The <title> (bare, without the site suffix) and meta description of each profile page. */
 export interface ProfilePageMeta {
@@ -356,7 +378,7 @@ export function controlsMarkdown(profile: ControlProfile): string {
       '',
       `Depth: ${depthLabels.specified} controls carry a verification procedure, evidence, notes and an observation example; "${depthLabels.derived}" controls restate one agent control of chapter 23 and add nothing it does not say; "${depthLabels.stub}" controls are skeletons with open questions.`,
       '',
-      'An observation is what a check of a control would emit: control_id, subject, expected, observed, status (pass, fail or unknown), timestamp and evidence[].',
+      `An observation is what a check of a control would emit: control_id, subject, expected, observed, status (${observationStatusText()}), timestamp and evidence[].`,
     ].join('\n'),
     ...rows.map((c) => controlBlock(c, profile)),
     '## Mappings',

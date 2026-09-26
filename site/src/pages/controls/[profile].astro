@@ -40,6 +40,8 @@ import {
   profileReviewers,
   mappingRows,
   machineLinks,
+  machineEvent,
+  observationStatusText,
 } from '../../lib/controls-md';
 import { agentChapter } from '../../data/tool-agent-controls';
 import { site } from '../../data/site';
@@ -68,21 +70,6 @@ const counts = depthCounts(profile.slug);
 const reviewers = profileReviewers(profile);
 const mappings = mappingRows(profile.slug);
 const machine = machineLinks();
-// Umami attributes of a machine-readable link (declarative, no script): the
-// controls dataset is a control-download, the schemas and the observation's
-// example and template a schema-download naming the schema and the file.
-const machineEvent = (href: string): Record<string, string> => {
-  if (href.includes('control-observation')) {
-    return { 'data-umami-event': 'schema-download', 'data-umami-event-schema': 'control-observation', 'data-umami-event-file': href };
-  }
-  if (href.endsWith('/schemas/controls.json')) {
-    return { 'data-umami-event': 'schema-download', 'data-umami-event-schema': 'controls', 'data-umami-event-file': href };
-  }
-  if (href.endsWith('/controls.json')) {
-    return { 'data-umami-event': 'control-download', 'data-umami-event-id': 'all', 'data-umami-event-format': 'json' };
-  }
-  return {};
-};
 const path = profilePath(profile);
 const pageUrl = new URL(path, site.url).href;
 const issueForm = `${site.github}/issues/new?template=${profile.issueTemplate}`;
@@ -226,7 +213,7 @@ const jsonLd = [
   </p>
   <p>
     An observation is what a check of a control would emit: the control id, the subject checked,
-    what was expected, what was observed, a status (pass, fail or unknown), a timestamp and the
+    what was expected, what was observed, a status ({observationStatusText()}), a timestamp and the
     evidence behind it.
   </p>
 
@@ -339,7 +326,7 @@ const jsonLd = [
     {
       machine.map((l) => (
         <li>
-          <a href={l.href} {...machineEvent(l.href)}>
+          <a href={l.href} {...machineEvent(l)}>
             {l.label}
           </a>
           : {l.note}.

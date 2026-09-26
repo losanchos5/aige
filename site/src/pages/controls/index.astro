@@ -10,8 +10,8 @@
 // Anchors other pages link to: intro, chain, properties, profiles, by-layer
 // (h3 layer-1..layer-5), ecosystem, adoption, how-to-review. The build fails on
 // any broken reference in the registry (controlProblems). The controls dataset
-// and the observation schema are linked only when they exist in the same build
-// (lib/controls-md.ts machineLinks).
+// and the observation schema, example and template links and their Umami
+// events come from lib/controls-md.ts (machineLinks, machineEvent).
 import Marketing from '../../layouts/Marketing.astro';
 import PageHero from '../../components/PageHero.astro';
 import Section from '../../components/Section.astro';
@@ -32,7 +32,7 @@ import {
 } from '../../data/controls';
 import { layers } from '../../data/stack';
 import { site } from '../../data/site';
-import { depthCounts, profileReviewers, machineLinks } from '../../lib/controls-md';
+import { depthCounts, profileReviewers, machineLinks, machineEvent } from '../../lib/controls-md';
 import { collectionPage, lastModified } from '../../lib/jsonld';
 import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/pages.css';
@@ -49,21 +49,6 @@ if (problems.length > 0) {
 const pad = (n: number) => String(n).padStart(2, '0');
 const issueForm = `${site.github}/issues/new?template=control-review.yml`;
 const machine = machineLinks();
-// Umami attributes of a machine-readable link (declarative, no script): the
-// controls dataset is a control-download, the schemas and the observation's
-// example and template a schema-download naming the schema and the file.
-const machineEvent = (href: string): Record<string, string> => {
-  if (href.includes('control-observation')) {
-    return { 'data-umami-event': 'schema-download', 'data-umami-event-schema': 'control-observation', 'data-umami-event-file': href };
-  }
-  if (href.endsWith('/schemas/controls.json')) {
-    return { 'data-umami-event': 'schema-download', 'data-umami-event-schema': 'controls', 'data-umami-event-file': href };
-  }
-  if (href.endsWith('/controls.json')) {
-    return { 'data-umami-event': 'control-download', 'data-umami-event-id': 'all', 'data-umami-event-format': 'json' };
-  }
-  return {};
-};
 const firstProfile = profiles[0];
 
 const chain = [
@@ -344,7 +329,7 @@ const jsonLd = collectionPage({
         {
           machine.map((l) => (
             <li>
-              <a href={l.href} {...machineEvent(l.href)}>
+              <a href={l.href} {...machineEvent(l)}>
                 {l.label}
               </a>
               : {l.note}.
