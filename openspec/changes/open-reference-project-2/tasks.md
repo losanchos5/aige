@@ -15,13 +15,13 @@ nuevo añade su import en `controls/index.ts` y su sección en `sources/SOURCES.
 
 ## 1. orp2-core (ola 0)
 
-- [ ] 1.1 Tipos en `controls/index.ts`: `derivedFrom?` (`pattern|schema|chapter`), `pageTitle?`, `pageDescription?` en `Control`; `doi?`, `conceptDoi?` en `ControlProfile`; `observationExamples` concatenado por perfil; verificar con `astro check` dentro de `build.sh`.
-- [ ] 1.2 `site/src/data/aiuc1.ts` (ids leídos en `standard.aiuc-1.com/llms.txt` y en la página pública de cada id usado, con `verified`) y `site/src/data/nist-ai-rmf.ts` (subcategorías del NIST AI 100-1 del documento primario, al menos todas las de GOVERN/MAP/MEASURE/MANAGE que citen los perfiles previstos); verificar que todos los ids ya usados en el registro resuelven.
-- [ ] 1.3 `controlProblems()`: `derivedFrom` resuelve; `aiuc1` contra el índice sin retirados; `specified` con 2-4 verificaciones, `pageTitle` ≤ 70 y `pageDescription` 70-160 únicos, dos ejemplos pass/fail; slugs de perfil reservados (`crosswalk`, `examples`); prefijo único por perfil; verificar con casos negativos en `tests/orp-core.spec.ts`.
-- [ ] 1.4 `controlPath()` devuelve la página para `specified` y el ancla para el resto; `@id` estable del `TechArticle` de perfil; `profileCitation()`; verificar que `check:links` sigue verde.
-- [ ] 1.5 Registros derivados del registro: `SOURCE_BY_PATH` y `lastmod` (desde `profile.updated`) en `astro.config.ts` para perfiles, páginas de control y `/controls/crosswalk`; líneas de `llms.txt.ts` iteradas; `DETAIL_COLLECTIONS` por perfil generado; `dateModified` de `/controls` = máximo de `profile.updated`; verificar `seo-infra.spec` y `geo.spec` dirigidos.
-- [ ] 1.6 Mantenimiento: recuentos de `orp-core.spec.ts`, `controls.spec.ts` y `about.spec.ts` derivados del registro; rango de `frontier.ts` derivado; `personSlug` exportado en `lib/jsonld.ts` y usado en `people.ts`; verificar los tres specs dirigidos.
-- [ ] 1.7 Build verde con `build.sh`, `openspec validate open-reference-project-2 --strict` verde y handoff `orp2-core.json` con contratos publicados.
+- [x] 1.1 Tipos en `controls/index.ts`: `derivedFrom?` (`pattern|schema|chapter`), `pageTitle?`, `pageDescription?` en `Control`; `doi?`, `conceptDoi?` en `ControlProfile`; `observationExamples` concatenado por perfil; verificar con `astro check` dentro de `build.sh`.
+- [x] 1.2 `site/src/data/aiuc1.ts` (ids leídos en `standard.aiuc-1.com/llms.txt` y en la página pública de cada id usado, con `verified`) y `site/src/data/nist-ai-rmf.ts` (subcategorías del NIST AI 100-1 del documento primario, al menos todas las de GOVERN/MAP/MEASURE/MANAGE que citen los perfiles previstos); verificar que todos los ids ya usados en el registro resuelven.
+- [x] 1.3 `controlProblems()`: `derivedFrom` resuelve; `aiuc1` contra el índice sin retirados; `specified` con 2-4 verificaciones, `pageTitle` ≤ 70 y `pageDescription` 70-160 únicos, dos ejemplos pass/fail; slugs de perfil reservados (`crosswalk`, `examples`); prefijo único por perfil; verificar con casos negativos en `tests/orp-core.spec.ts`.
+- [x] 1.4 `controlPath()` devuelve la página para `specified` y el ancla para el resto; `@id` estable del `TechArticle` de perfil; `profileCitation()`; verificar que `check:links` sigue verde.
+- [x] 1.5 Registros derivados del registro: `SOURCE_BY_PATH` y `lastmod` (desde `profile.updated`) en `astro.config.ts` para perfiles, páginas de control y `/controls/crosswalk`; líneas de `llms.txt.ts` iteradas; `DETAIL_COLLECTIONS` por perfil generado; `dateModified` de `/controls` = máximo de `profile.updated`; verificar `seo-infra.spec` y `geo.spec` dirigidos.
+- [x] 1.6 Mantenimiento: recuentos de `orp-core.spec.ts`, `controls.spec.ts` y `about.spec.ts` derivados del registro; rango de `frontier.ts` derivado; `personSlug` exportado en `lib/jsonld.ts` y usado en `people.ts`; verificar los tres specs dirigidos.
+- [x] 1.7 Build verde con `build.sh`, `openspec validate open-reference-project-2 --strict` verde y handoff `orp2-core.json` con contratos publicados.
 
 ## 2. orp2-evalenv (ola 0)
 
