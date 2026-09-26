@@ -33,7 +33,7 @@ import {
 } from '../../data/controls';
 import { layers } from '../../data/stack';
 import { site } from '../../data/site';
-import { depthCounts, profileReviewers, machineLinks, machineEvent } from '../../lib/controls-md';
+import { depthCounts, derivedPhrase, profileReviewers, machineLinks, machineEvent } from '../../lib/controls-md';
 import { collectionPage } from '../../lib/jsonld';
 import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/pages.css';
@@ -95,7 +95,7 @@ const profileCards = profiles.map((profile) => {
   const counts = depthCounts(profile.slug);
   const parts = [
     counts.specified > 0 ? `${counts.specified} ${depthLabels.specified.toLowerCase()}` : '',
-    counts.derived > 0 ? `${counts.derived} derived from chapter 23` : '',
+    counts.derived > 0 ? `${counts.derived} derived from ${derivedPhrase(profile.slug)}` : '',
     counts.stub > 0 ? `${counts.stub} draft outline${counts.stub === 1 ? '' : 's'}` : '',
   ].filter(Boolean);
   const rows = controlsIn(profile.slug);

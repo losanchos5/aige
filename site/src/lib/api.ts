@@ -406,7 +406,7 @@ export const controlSchema = s.obj(
       description: 'Stable id, AIGE-CTL-<PROFILE>-<NNN>. Never changed, never reused.',
     },
     profile: s.str('Slug of the control profile.'),
-    url: s.uri('The control on its profile page.'),
+    url: s.uri('Canonical page of the control: its own page when it is specified, its anchor on the profile page otherwise.'),
     json: s.uri('This record on its own, in the API.'),
     title: s.str('Title.'),
     version: s.str('Version of the control specification (the profile version).'),

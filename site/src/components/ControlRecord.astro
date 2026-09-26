@@ -10,7 +10,14 @@
  * enforcement points, verification, evidence, failure response, layers,
  * patterns, seeds, mappings, references, notes, open questions, observation.
  * Empty optional rows are left out; the core rows say "To be specified" rather
- * than disappear. The foot links the control's JSON and its review form.
+ * than disappear. The foot links the control's own page (specified controls,
+ * once control pages are on), its JSON and its review form.
+ *
+ * `standalone` renders the record on the control's own page
+ * (pages/controls/[profile]/[control].astro): the page's H1 is the control
+ * title, so the section heading becomes "The control record" (#record), and the
+ * foot is left out, since that page has its own machine-readable and review
+ * sections.
  *
  * References cite the profile's source list by number (`#src-<n>`), so the page
  * must render `SourceList sources={profileSources(slug)} prefix="src"`. No
@@ -24,6 +31,7 @@ import {
   type ControlProfile,
   controlAnchor,
   controlApiPath,
+  controlPagePath,
   nistAiRmfSubcategories,
   verificationLabels,
   subjectKindLabels,
@@ -37,6 +45,7 @@ import { getPatternBySlug, patternPath, type PatternDef } from '../data/patterns
 import { agentControls, agentAnchors, agentChapter, type AgentControl } from '../data/tool-agent-controls';
 import { obligationPath } from '../data/frameworks';
 import { iso42001Controls, threatById, threatAnchor, obligationLabel } from '../data/threats';
+import { derivedSources } from '../lib/controls-md';
 
 interface Props {
   control: Control;
@@ -45,9 +54,11 @@ interface Props {
   sources: readonly Source[];
   /** Position in the profile, 0-based (defaults to the id's number). */
   index?: number;
+  /** On the control's own page: "The control record" heading, no foot. */
+  standalone?: boolean;
 }
 
-const { control: c, profile, sources, index } = Astro.props;
+const { control: c, profile, sources, index, standalone = false } = Astro.props;
 const number = c.id.slice(-3);
 const position = index ?? Number(number) - 1;
 const TBD = 'To be specified.';
@@ -66,17 +77,30 @@ const hasMappings =
   m.obligations.length + m.iso42001.length + m.nistAiRmf.length + m.owasp.length +
     (m.atlas?.length ?? 0) + (m.aiuc1?.length ?? 0) + (m.csaAicm?.length ?? 0) + (m.other?.length ?? 0) >
   0;
-const draftNote =
-  c.depth === 'stub'
-    ? 'Draft outline: objective, failure modes and open questions only; requires technical review before it can be verified.'
-    : c.depth === 'derived'
-      ? 'Derived from the agent controls of chapter 23 and restated as a control; requires technical review.'
-      : undefined;
+const stubNote =
+  'Draft outline: objective, failure modes and open questions only; requires technical review before it can be verified.';
+// A derived control names the site material it restates (lib/controls-md.ts).
+const restates = c.depth === 'derived' ? derivedSources(c) : [];
+const pagePath = standalone ? null : controlPagePath(c);
 ---
 
 <section class="ctl" data-control={c.id} data-depth={c.depth} data-index={position}>
-  <h2 id={controlAnchor(c)}>{number} {c.title}</h2>
-  {draftNote && <p class="ctl-state">{draftNote}</p>}
+  {standalone ? <h2 id="record">The control record</h2> : <h2 id={controlAnchor(c)}>{number} {c.title}</h2>}
+  {c.depth === 'stub' && <p class="ctl-state">{stubNote}</p>}
+  {
+    c.depth === 'derived' && (
+      <p class="ctl-state">
+        Derived from{' '}
+        {restates.map((s, i) => (
+          <>
+            {i > 0 && (i === restates.length - 1 ? ' and ' : ', ')}
+            <a href={s.href}>{s.label}</a>
+          </>
+        ))}{' '}
+        and restated as a control; requires technical review.
+      </p>
+    )
+  }
 
   <dl class="cs-facts ctl-facts">
     <dt>Id</dt>
@@ -364,18 +388,27 @@ const draftNote =
     }
   </dl>
 
-  <div class="ctl-foot">
-    <a
-      class="ctl-json"
-      href={controlApiPath(c)}
-      data-umami-event="control-download"
-      data-umami-event-id={c.id}
-      data-umami-event-format="json"
-    >
-      {c.id} as JSON
-    </a>
-    <ContributeCta kind="control" title={`${c.id} ${c.title} (${profile.shortTitle} v${profile.version})`} landmark={false} />
-  </div>
+  {
+    !standalone && (
+      <div class="ctl-foot">
+        {pagePath && (
+          <a class="ctl-page" href={pagePath}>
+            {c.id} control page
+          </a>
+        )}
+        <a
+          class="ctl-json"
+          href={controlApiPath(c)}
+          data-umami-event="control-download"
+          data-umami-event-id={c.id}
+          data-umami-event-format="json"
+        >
+          {c.id} as JSON
+        </a>
+        <ContributeCta kind="control" title={`${c.id} ${c.title} (${profile.shortTitle} v${profile.version})`} landmark={false} />
+      </div>
+    )
+  }
 </section>
 
 <style>
@@ -420,6 +453,7 @@ const draftNote =
     margin: 0;
   }
 
+  .ctl-page,
   .ctl-json {
     font-family: var(--font-mono);
     font-size: var(--fs-small);
@@ -429,6 +463,7 @@ const draftNote =
     text-underline-offset: 0.18em;
   }
 
+  .ctl-page:hover,
   .ctl-json:hover {
     text-decoration-color: currentColor;
   }

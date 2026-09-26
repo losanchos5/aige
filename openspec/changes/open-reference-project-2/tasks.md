@@ -50,9 +50,9 @@ nuevo añade su import en `controls/index.ts` y su sección en `sources/SOURCES.
 
 ## 6. orp2-pages (ola 1)
 
-- [ ] 6.1 `pages/controls/[profile]/[control].astro` y `[control].md.ts` solo para `specified`, con registro, casos, patrones, obligaciones, amenazas, ejemplos descargables, CTA, cita, JSON y `TechArticle` con `isPartOf`.
-- [ ] 6.2 La sección de cada control `specified` en su perfil enlaza su página desde `<main>`.
-- [ ] 6.3 `tests/control-pages.spec.ts` (una página por `specified`, ninguna para el resto, canonical, ld+json, twin, títulos y descripciones únicos); build verde y handoff con peticiones.
+- [x] 6.1 `pages/controls/[profile]/[control].astro` y `[control].md.ts` solo para `specified`, con registro, casos, patrones, obligaciones, amenazas, ejemplos descargables, CTA, cita, JSON y `TechArticle` con `isPartOf`.
+- [x] 6.2 La sección de cada control `specified` en su perfil enlaza su página desde `<main>`.
+- [x] 6.3 `tests/control-pages.spec.ts` (una página por `specified`, ninguna para el resto, canonical, ld+json, twin, títulos y descripciones únicos); build verde y handoff con peticiones.
 
 ## 7. orp2-release (ola 1)
 
