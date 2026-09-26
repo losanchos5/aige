@@ -104,6 +104,16 @@ for (const profile of profiles) {
       await expect(link).toHaveAttribute('href', `${path}.md`);
     });
 
+    test('the review buttons inside the prose keep a label colour distinct from their fill', async ({ page }) => {
+      await page.goto(path);
+      const button = page.locator('article.prose a.btn-primary').first();
+      const [color, fill] = await button.evaluate((el) => {
+        const s = getComputedStyle(el);
+        return [s.color, s.backgroundColor];
+      });
+      expect(color).not.toBe(fill);
+    });
+
     test('no horizontal scroll at 390px', async ({ page }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(path);

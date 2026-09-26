@@ -391,6 +391,14 @@ const jsonLd = [
     margin-top: var(--s-2);
   }
 
+  /* The review buttons (ContributeCta) sit inside .prose here, whose link rule
+     (.prose a: --ink, underlined) outranks .btn-primary and left the label ink
+     on ink. Restore the button's own colours. */
+  :global(.prose a.btn-primary) {
+    color: var(--bg);
+    text-decoration: none;
+  }
+
   /* Long bare URLs in the numbered sources wrap inside the well at 390px. */
   .cp-sources :global(a) {
     overflow-wrap: anywhere;
