@@ -1,0 +1,30 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
+  "control_id": "AIGE-CTL-EVAL-009",
+  "profile": "evaluation-environment",
+  "control_version": "0.2",
+  "subject": "suite-run-88279@2026-09-26",
+  "subject_kind": "eval-run",
+  "expected": "Every task was shown to be solvable, the scorer passed its known-answer check, every failed run was read and classified, and contaminated runs were excluded or reported.",
+  "observed": "Suite run 88279: all 200 tasks had a reference solution; the scorer accepted 200 known-correct and rejected 200 known-incorrect submissions; all 37 failed runs and a sample of 40 successes were read, and 2 successes were excluded for reward hacking and reported.",
+  "status": "pass",
+  "timestamp": "2026-09-26T17:44:08Z",
+  "enforcement_point": "pre_merge",
+  "verification_kind": "observe",
+  "observer": "evaluation lead",
+  "evidence": [
+    {
+      "artefact": "task admission and scorer check records of suite run 88279",
+      "url": "https://evidence.example/suites/88279/checks.json",
+      "hash": "sha256:5ad5b1cf5a67e92f0decd7665b50eb5d9d5153cc9ff59d953530e8b7402240f8",
+      "schema": "https://aigovernanceengineer.com/schemas/evidence-record.v1.json"
+    },
+    {
+      "artefact": "signed test report of suite run 88279",
+      "url": "https://evidence.example/suites/88279/test-report.json",
+      "schema": "https://aigovernanceengineer.com/schemas/test-report.v1.json"
+    }
+  ],
+  "run_id": "88279",
+  "notes": "Illustrative example, not the result of a real evaluation."
+}

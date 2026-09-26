@@ -175,6 +175,10 @@ export interface Control {
   implementationNotes: readonly string[];
   openQuestions: readonly string[];
   observation?: ControlObservation;
+  /** Keyword-led <title> for the control's own page (specified controls only; at most 70 characters). */
+  pageTitle?: string;
+  /** Meta description for the control's own page (specified controls only; 70 to 160 characters). */
+  pageDescription?: string;
 }
 
 /** Alias kept for callers that name the definition rather than the record. */

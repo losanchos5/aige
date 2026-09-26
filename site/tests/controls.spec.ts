@@ -24,7 +24,7 @@ const API_DIR = join('dist', 'api', 'v1');
 const DATASET = join(API_DIR, 'controls.json');
 const PAGE = join('dist', 'controls', 'evaluation-environment.html');
 const SCHEMA_ID = 'https://aigovernanceengineer.com/schemas/control-observation.v1.json';
-const SPECIFIED = ['AIGE-CTL-EVAL-002', 'AIGE-CTL-EVAL-003', 'AIGE-CTL-EVAL-006'];
+const SPECIFIED = Array.from({ length: 9 }, (_, i) => `AIGE-CTL-EVAL-${String(i + 1).padStart(3, '0')}`);
 
 type Json = Record<string, unknown>;
 const readJson = (file: string): Json => JSON.parse(readFileSync(file, 'utf8')) as Json;

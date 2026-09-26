@@ -64,7 +64,7 @@ test.describe('open control registry', () => {
   });
 
   test('evaluation environment controls: 002, 003 and 006 specified, the rest outlines, all open for review', () => {
-    const specified = ['AIGE-CTL-EVAL-002', 'AIGE-CTL-EVAL-003', 'AIGE-CTL-EVAL-006'];
+    const specified = ids('EVAL', 9);
     for (const row of controlsIn('evaluation-environment')) {
       expect(row.depth).toBe(specified.includes(row.id) ? 'specified' : 'stub');
       expect(row.reviewerStatus).toBe('open');
