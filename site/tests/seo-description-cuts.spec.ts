@@ -21,7 +21,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { obligations, obligationSlug, type Obligation } from '../src/data/frameworks';
 import { getGlossary } from '../src/lib/glossary';
-import { instrumentClause, obligationHeading } from '../src/lib/obligation-title';
+import { DESCRIPTION_LEADS, instrumentClause, obligationHeading } from '../src/lib/obligation-title';
+import { frameworkOf } from '../src/lib/obligations';
 import { leadDescription, shortenSentence } from '../src/lib/lead-sentence';
 import { glossaryDescriptions } from '../src/data/glossary-descriptions';
 
@@ -280,7 +281,7 @@ test.describe('every glossary description is the definition\'s own opening, or i
 
 /** An obligation page's sentences after the lead (lib/obligation-title.ts). */
 function obligationLead(description: string): string {
-  let out = description.replace(/\s*From the AI governance obligation register\.$/, '');
+  let out = description.replace(/\s*Duty holder: [^.]*\.$/, '');
   const evidence = out.search(/ Evidence(?: includes)?: (?!.* Evidence(?: includes)?: )/);
   if (evidence > 0) out = out.slice(0, evidence);
   return out.replace(
@@ -302,11 +303,23 @@ test.describe('every obligation description is the requirement\'s own opening, o
       const description = descriptionOf(join('dist', 'obligations', `${obligationSlug(row)}.html`));
       const lead = obligationLead(description);
       const prefix = `${instrumentClause(row)}: `;
+      const heading = obligationHeading(row);
+      // A lead written by hand (CONTENT C-3) opens with the instrument, as the
+      // heading, the short name or the clause label names it.
+      if (DESCRIPTION_LEADS[row.id]) {
+        const names = [instrumentClause(row), heading.split(': ')[0], frameworkOf(row).short];
+        if (!description.startsWith(DESCRIPTION_LEADS[row.id])) bad.push(`${row.id}: not its own lead: ${description}`);
+        if (!names.some((name) => description.startsWith(`${name}: `))) bad.push(`${row.id}: names no instrument: ${description}`);
+        continue;
+      }
       // The requirement behind its instrument and clause, or else the page
-      // heading, which states no requirement to distort.
-      const why = lead.startsWith(prefix)
-        ? unfaithful(lead.slice(prefix.length), row.requirement)
-        : unfaithful(lead, obligationHeading(row));
+      // heading (with or without the colon after its reference, which can make
+      // it open like "<instrument> <clause>: "), which states no requirement to
+      // distort.
+      const why =
+        (lead.startsWith(prefix) ? unfaithful(lead.slice(prefix.length), row.requirement) : 'no requirement') &&
+        unfaithful(lead, heading) &&
+        unfaithful(lead, heading.replace(': ', ' '));
       if (why) bad.push(`${row.id}: ${why}: ${description}`);
     }
     expect(bad, bad.join('\n')).toEqual([]);

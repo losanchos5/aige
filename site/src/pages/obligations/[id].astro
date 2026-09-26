@@ -86,11 +86,13 @@ const apiPath = obligationApiPath(row);
 
 // <title>: the heading fitted to the title budget (lib/obligation-title.ts,
 // shared with the Open Graph card). The H1 is the heading in full: the register's
-// name, qualified with its instrument where the name alone would not say it.
+// name, qualified with its instrument where the name alone would not say it, as
+// "<reference>: <duty>" like the title.
 const shortTitle = obligationShortTitle(row);
 const heading = obligationHeading(row);
 // Meta description: "<instrument> <clause>: " and what the row requires, in
-// whole clauses, then when it applies and, while short, its evidence artefact
+// whole clauses (or a hand-shortened lead where none fits), then when it applies
+// and, while short, its evidence artefact and duty holder
 // (lib/obligation-title.ts); 110 to 158 characters, never an "…".
 const description = obligationDescription(row);
 

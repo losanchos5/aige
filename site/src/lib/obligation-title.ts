@@ -4,10 +4,12 @@
 // title and the page's og:image:alt (the title) describes it.
 //
 // Every string here is assembled from the register row and its framework
-// (src/data/frameworks.ts); nothing is written by hand:
+// (src/data/frameworks.ts), except the few titles and description leads
+// shortened by hand in the row's own words (TITLE_OVERRIDES, DESCRIPTION_LEADS):
 // - `obligationHeading` is the row's own name, qualified with its instrument
 //   when the name does not say it ("MAP" -> "NIST AI RMF MAP", "AIBOM" ->
-//   "OWASP AIBOM"), so the H1 never collides with a glossary term (audit F14).
+//   "OWASP AIBOM"), so the H1 never collides with a glossary term (audit F14),
+//   with a colon between the reference and the duty (audit ONPAGE O-3).
 // - `instrumentClause` joins the instrument's short name and the clause without
 //   the stutter of a clause that restates it ("Brazil LGPD" + "LGPD Art. 20" ->
 //   "Brazil LGPD Art. 20"; audit F4 / C9).
@@ -17,8 +19,10 @@
 import { obligations, type Obligation } from '../data/frameworks';
 import { frameworkOf } from './obligations';
 import {
+  appendSentences,
   closeSentence,
   DESCRIPTION_MAX,
+  DESCRIPTION_MIN,
   leadDescription,
   sentences,
   shortenSentence,
@@ -78,9 +82,61 @@ function namesInstrument(row: Obligation): boolean {
  * minus the trailing words of the short name the obligation repeats ("OWASP
  * Agentic" + "Top 10 for Agentic Applications 2026" -> "OWASP Top 10 for ...").
  * A name that is the start of its clause label ("Transparency" for "Transparency
- * chapter") takes the fuller label.
+ * chapter") takes the fuller label. A colon then separates the instrument and
+ * clause from the duty (headingWithSeparator).
  */
 export function obligationHeading(row: Obligation): string {
+  return headingWithSeparator(namedHeading(row), row);
+}
+
+/** Words that join the parts of a name ("Council of Europe", "Provisions on
+ *  Deep Synthesis", "Measures for Labelling ... with GB 45438-2025"). */
+const NAME_JOINER = /^(?:and|or|of|for|on|to|with|&)$/;
+
+/**
+ * `heading` as "<instrument and clause>: <duty>", the form the short titles
+ * take (audit ONPAGE O-3: "EU AI Act Art. 9 risk management system" ran the
+ * reference and the duty together). The reference ends after the row's clause
+ * where the heading quotes it ("EU AI Act Art. 9"), else after the number of
+ * its first article or section ("New York GBL Article 47", "FTC Act s. 5"),
+ * else before the first lower-case word that does not join a name ("NYC Local
+ * Law 144", "Title VII"). A heading that is a name with no duty after it ("NIST
+ * AI RMF GOVERN", "GPAI Code Transparency chapter", "China Provisions on Deep
+ * Synthesis (in force ...)") stays as it is, and so does one whose cut would
+ * fall inside the instrument's short name ("Utah AI | disclosure duties").
+ */
+function headingWithSeparator(heading: string, row: Obligation): string {
+  if (heading.includes(': ')) return heading;
+  const join = (at: number): string => {
+    const reference = heading.slice(0, at).trimEnd();
+    const duty = heading.slice(at).trimStart();
+    if (!duty || /^[([]/.test(duty) || row.clause.endsWith(duty)) return heading;
+    const short = frameworkOf(row).short;
+    if (heading.startsWith(`${short} `) && reference.length < short.length) return heading;
+    return `${reference}: ${duty}`;
+  };
+  // 1. After the clause, where the heading quotes it whole.
+  const quoted = heading.indexOf(`${row.clause} `);
+  if (quoted >= 0 && (quoted === 0 || heading[quoted - 1] === ' ')) {
+    return join(quoted + row.clause.length);
+  }
+  // 2. After an article's or a section's number; 3. before the duty's first word.
+  const tokens = heading.split(' ');
+  for (let i = 1; i < tokens.length; i++) {
+    const token = tokens[i];
+    if (REFERENCE.test(token) && tokens[i + 1] !== undefined) {
+      return join(tokens.slice(0, i + 2).join(' ').length);
+    }
+    if (token.startsWith('(')) return heading;
+    if (!/^[a-z]/.test(token)) continue;
+    if (NAME_JOINER.test(token) && /^[A-Z0-9(§]/.test(tokens[i + 1] ?? '')) continue;
+    return join(tokens.slice(0, i).join(' ').length);
+  }
+  return heading;
+}
+
+/** The heading as the register names it, before the separator is placed. */
+function namedHeading(row: Obligation): string {
   if (namesInstrument(row)) return row.obligation;
   const short = words(frameworkOf(row).short);
   const found = short.findIndex((token) => hasWord(row.obligation, token));
@@ -275,9 +331,16 @@ function allTitles(): Map<string, string> {
   if (titles) return titles;
   const options = new Map(
     obligations.map((row) => {
+      // A heading that only the separator's colon puts over the budget keeps
+      // every word without it ("EU AI Act Art. 20 corrective actions and duty
+      // of information"), rather than lose its last duty to the cut.
+      const heading = obligationHeading(row);
+      const named = namedHeading(row);
+      const whole = heading.length > OBLIGATION_TITLE_MAX && named.length <= OBLIGATION_TITLE_MAX;
       const list = [
         ...(TITLE_OVERRIDES[row.id] ? [TITLE_OVERRIDES[row.id]] : []),
-        ...titleCandidates(obligationHeading(row), {
+        ...(whole ? [named] : []),
+        ...titleCandidates(heading, {
           clauseLabel: instrumentClause(row),
           shortName: frameworkOf(row).short,
         }),
@@ -366,11 +429,81 @@ export function obligationDescription(row: Obligation): string {
   const lead = shortenSentence(first, DESCRIPTION_MAX - label.length - 2);
   const inclCut = lead !== undefined && /,\s+incl\.\s/.test(first) && !/\sincl\.\s/.test(lead);
   const applies = appliesSentence(row);
-  return leadDescription(inclCut ? '' : row.requirement, {
-    label,
-    labelRequired: true,
-    fallback: obligationHeading(row),
-    always: applies ? [applies] : [],
-    extras: [evidence, 'From the AI governance obligation register.'],
-  });
+  // Who the duty binds, from the register, in place of the old "From the AI
+  // governance obligation register." padding, which said nothing about the
+  // duty (audit CONTENT C-3).
+  const holder = row.dutyHolder ?? row.scope;
+  const extras = [evidence, ...(holder ? [`Duty holder: ${lower(holder)}.`] : [])];
+  const own = DESCRIPTION_LEADS[row.id];
+  if (own) {
+    return appendSentences(appendSentences(own, applies ? [applies] : [], Infinity), extras, DESCRIPTION_MIN);
+  }
+  const build = (fallback: string) =>
+    leadDescription(inclCut ? '' : row.requirement, {
+      label,
+      labelRequired: true,
+      fallback,
+      always: applies ? [applies] : [],
+      extras,
+    });
+  // The heading leads with its colon, unless that one character costs an
+  // evidence item the heading without it keeps.
+  const separated = build(obligationHeading(row));
+  const named = build(namedHeading(row));
+  return named.length > separated.length + 1 ? named : separated;
 }
+
+/**
+ * Rows whose requirement has no opening that fits behind its label, so the
+ * generated snippet fell back to the heading and a date and named no duty
+ * (audit CONTENT C-3: "NYC Local Law 144 automated employment decision tools.
+ * In force since 2023-07-05." said nothing of the bias audit). Each is the
+ * row's requirement shortened by hand, in its own words: who must do what,
+ * under which instrument, keeping every qualifier that limits the duty ("to
+ * the extent it controls", "where feasible", "known identical copies"); a
+ * procedural detail the page states in full (a retention period, "Art. 73(2)
+ * to (9) applying mutatis mutandis") may go. The tests hold them to the other
+ * descriptions' rules (110 to 158 characters, whole sentences).
+ */
+export const DESCRIPTION_LEADS: Readonly<Record<string, string>> = {
+  'AIGE-OBL-EUAIA-ART18':
+    'EU AI Act Art. 18: providers keep technical and QMS documentation, notified-body changes and decisions and the EU declaration for authorities for 10 years.',
+  'AIGE-OBL-EUAIA-ART26-4':
+    'EU AI Act Art. 26(4): to the extent it controls the input data, a deployer ensures they are relevant and sufficiently representative for the intended purpose.',
+  'AIGE-OBL-EUAIA-ART26-7':
+    "EU AI Act Art. 26(7): before putting a high-risk system into service at work, employer deployers inform workers' representatives and the affected workers.",
+  'AIGE-OBL-EUAIA-ART26-11':
+    'EU AI Act Art. 26(11): deployers of Annex III systems that make or assist decisions about natural persons tell those persons they are subject to the system.',
+  'AIGE-OBL-EUAIA-ART73-6':
+    'EU AI Act Art. 73(6): providers investigate a serious incident without delay and alter nothing that may affect evaluating causes before informing authorities.',
+  'AIGE-OBL-EUAIA-ART75-1A':
+    "EU AI Act Art. 75(1a): providers of high-risk systems under the AI Office's exclusive competence report serious incidents to the AI Office.",
+  'AIGE-OBL-GDPR-ART15-1H':
+    'GDPR Art. 15(1)(h): on request, confirm automated decision-making and give meaningful information on the logic, significance and envisaged consequences.',
+  'AIGE-OBL-GDPR-ART15-17-21':
+    'GDPR Arts. 15–17 and 21: access, rectification, erasure and objection requests reach every place the data lives, incl. the model where it holds personal data.',
+  'AIGE-OBL-GDPR-ART33-34':
+    'GDPR Arts. 33–34: notify the authority without undue delay, within 72 hours where feasible; tell data subjects without undue delay if high risk is likely.',
+  'AIGE-OBL-GDPR-ART35-36':
+    'GDPR Arts. 35–36: assess the impact before processing likely to result in a high risk, and consult the supervisory authority where residual risk stays high.',
+  'AIGE-OBL-PLD-ART4':
+    'EU PLD Art. 4(1): software is a product; AI manufacturers are strictly liable for defective systems placed on the market or put into service after 2026-12-09.',
+  'AIGE-OBL-OWASP-LLM':
+    'OWASP Top 10 for LLM Applications 2026: the LLM threat catalogue, incl. Excessive Agency at #3, met by prompt-injection and output-handling controls.',
+  'AIGE-OBL-USCA-SB53-WHISTLE':
+    'California SB 53: no gag or retaliation on covered employees who report catastrophic risk; notice of rights; anonymous channels at large frontier developers.',
+  'AIGE-OBL-USNYC-LL144':
+    'NYC Local Law 144: independent bias audit of automated employment decision tools within a year before use, published summary, candidate and employee notice.',
+  'AIGE-OBL-USMN-MCDPA':
+    'Minnesota CDPA: a consumer may question a profiling result, be told the reason, review and correct the personal data used and have the decision re-evaluated.',
+  'AIGE-OBL-USWA-MHMDA':
+    'Washington MHMDA: separate consent to collect and to share consumer health data, incl. algorithm- or ML-derived data, and signed authorisation for any sale.',
+  'AIGE-OBL-USFED-TITLE7-703K':
+    'Title VII: disparate impact is illegal unless job-related and consistent with business necessity, and a less discriminatory alternative can still be required.',
+  'AIGE-OBL-USFED-TAKEITDOWN':
+    'TAKE IT DOWN Act: covered platforms remove non-consensual intimate images, incl. AI forgeries, and known identical copies within 48 hours of a valid request.',
+  'AIGE-OBL-KR-ART34':
+    'Korea AI Act Art. 34: high-impact AI operators need risk management, explanation and user-protection plans, human supervision, and publish the main content.',
+  'AIGE-OBL-COE-ART14-2':
+    'CoE Convention Art. 14(2)(a)–(b): document information on systems that can significantly affect human rights, enough for affected people to contest decisions.',
+};

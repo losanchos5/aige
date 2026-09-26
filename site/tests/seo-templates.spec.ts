@@ -135,7 +135,7 @@ test.describe('obligation titles and headings', () => {
   test('the two known look-alikes keep their correct titles', () => {
     const art10 = pages.find((p) => p.row.id === 'AIGE-OBL-EUAIA-ART10');
     const sb226 = pages.find((p) => p.row.id === 'AIGE-OBL-USUT-SB226');
-    expect(titleOf(art10?.page ?? '')).toContain('EU AI Act Art. 10 data and data governance');
+    expect(titleOf(art10?.page ?? '')).toContain('EU AI Act Art. 10: data and data governance');
     expect(titleOf(sb226?.page ?? '')).toContain('Utah AI disclosure duties');
   });
 
@@ -182,6 +182,66 @@ test.describe('obligation titles and headings', () => {
       expect(description, `${row.id} ends mid-sentence`).toMatch(/[.!?]["'”’)\]]?$/);
       expect(description, row.id).not.toMatch(/…$/);
     }
+  });
+
+  // Audit CONTENT C-3: 20 snippets ended in "From the AI governance obligation
+  // register." and the LL144 one no longer said what the law requires.
+  test('the meta description states the duty, never the register boilerplate', () => {
+    const descriptionOf = (page: string) =>
+      decode(/<meta name="description" content="([^"]*)"/.exec(page)?.[1] ?? '');
+    for (const { row, page } of pages) {
+      expect(descriptionOf(page), row.id).not.toContain('From the AI governance obligation register');
+    }
+    const ll144 = descriptionOf(pages.find((p) => p.row.id === 'AIGE-OBL-USNYC-LL144')?.page ?? '');
+    expect(ll144).toContain('NYC Local Law 144');
+    expect(ll144).toContain('bias audit');
+    expect(ll144).toContain('published summary');
+    expect(ll144).toContain('candidate and employee notice');
+  });
+
+  // Audit ONPAGE O-3: the H1 ran the reference and the duty together ("EU AI
+  // Act Art. 9 risk management system"). It separates them with a colon, as the
+  // short titles do; only a heading that is an instrument's name, with no duty
+  // after it, has none.
+  test('the H1 separates the reference from the duty with a colon', () => {
+    const NAME_ONLY = new Set([
+      'AIGE-OBL-GPAICOP-SAFETY',
+      'AIGE-OBL-GPAICOP-TRANSPARENCY',
+      'AIGE-OBL-GPAICOP-COPYRIGHT',
+      'AIGE-OBL-NISTRMF-GOVERN',
+      'AIGE-OBL-NISTRMF-MAP',
+      'AIGE-OBL-NISTRMF-MEASURE',
+      'AIGE-OBL-NISTRMF-MANAGE',
+      'AIGE-OBL-NIST-AGENTS',
+      'AIGE-OBL-CSA-AICM-CATASTROPHIC',
+      'AIGE-OBL-OWASP-AGENTIC',
+      'AIGE-OBL-OWASP-LLM',
+      'AIGE-OBL-OWASP-ACS',
+      'AIGE-OBL-OWASP-AIBOM',
+      'AIGE-OBL-USCA-SB53',
+      'AIGE-OBL-USNY-RAISE',
+      'AIGE-OBL-USTX-TRAIGA',
+      'AIGE-OBL-USCA-SB942',
+      'AIGE-OBL-USUT-SB226',
+      'AIGE-OBL-KR-AIBASIC',
+      'AIGE-OBL-SG-GENAI',
+      'AIGE-OBL-CAN-DADM',
+      'AIGE-OBL-CN-ALGOREC',
+      'AIGE-OBL-CN-DEEPSYN',
+      'AIGE-OBL-CN-GENAI',
+      'AIGE-OBL-CN-LABEL',
+      'AIGE-OBL-CN-ANTHRO',
+    ]);
+    for (const { row, page } of pages) {
+      const h1 = h1Of(page);
+      if (NAME_ONLY.has(row.id)) expect(h1, row.id).not.toContain(': ');
+      else expect(h1, row.id).toMatch(/\S: \S/);
+    }
+    const h1 = (id: string) => h1Of(pages.find((p) => p.row.id === id)?.page ?? '');
+    expect(h1('AIGE-OBL-EUAIA-ART9')).toBe('EU AI Act Art. 9: risk management system');
+    expect(h1('AIGE-OBL-USNYC-LL144')).toBe('NYC Local Law 144: automated employment decision tools');
+    expect(h1('AIGE-OBL-USFED-FTC-S5')).toBe('FTC Act s. 5: substantiation of AI performance claims');
+    expect(h1('AIGE-OBL-USNY-GBL47')).toBe('New York GBL Article 47: AI companion models');
   });
 
   test('no "(verify)" working marker reaches the page', () => {
