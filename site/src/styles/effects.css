@@ -436,6 +436,13 @@
   --muted: var(--ink-2);
   --line: color-mix(in srgb, #eceae3 18%, transparent);
   --surface: rgba(255, 255, 255, 0.06);
+  /* The layer fills go back to the pastels: the dark set's fills are deep
+     mixes that vanish on the navy (layer swatches, chips). */
+  --l1: #cbd8f0;
+  --l2: #cfdcd3;
+  --l3: #edd4d8;
+  --l4: #f1dab4;
+  --l5: #d1e4bc;
 }
 
 /* ------------------------------------------------ Muted text over the mesh */
@@ -497,4 +504,54 @@
   .prose > :is(.diagram, .figure--infographic) {
     padding: var(--s-5);
   }
+}
+
+/* --------------------------------------------------- Full-bleed bands (CSS) */
+
+/* A band behind a block that lives inside a centred container, painted with
+   the border-image trick: a solid border image, filled, with a 100vmax
+   horizontal outset. Outset border images are ink overflow, so the band
+   reaches both viewport edges without widening the page (no horizontal
+   scroll) and without any markup change. Used where the page is not built
+   from <Section>s: the reference pages' .res-section blocks, the detail
+   pages' closing navigation and the marketing layout's plain bands.
+   --band-fill picks the colour; --muted is re-scoped as on every tint. */
+.bleed {
+  --band-fill: var(--tint-l1);
+  --muted: var(--ink-2);
+  border-image: conic-gradient(var(--band-fill) 0 0) fill 0 / / 0 100vmax;
+}
+
+/* ------------------------------------------ Marketing bands (visual-rhythm) */
+
+/* Landing pages alternate plain and tint Sections. Without markup changes:
+   a tint band that names no hue takes one in turn (blue, amber, sage), and a
+   plain band gets a soft two-glow wash in the padding box, alternating two
+   pairs of tones, so no band on a landing is bare cream. The home page names
+   every hue and has no plain band, so these rules leave it alone. */
+.marketing > .sec--tint:not([data-hue]):nth-child(3n + 1 of .sec--tint:not([data-hue])) {
+  --tint-bg: var(--tint-l1);
+}
+
+.marketing > .sec--tint:not([data-hue]):nth-child(3n + 2 of .sec--tint:not([data-hue])) {
+  --tint-bg: var(--tint-l4);
+}
+
+.marketing > .sec--tint:not([data-hue]):nth-child(3n of .sec--tint:not([data-hue])) {
+  --tint-bg: var(--tint-l2);
+}
+
+.marketing > .sec--plain {
+  --wash-1: var(--glow-1);
+  --wash-2: var(--glow-4);
+  --muted: var(--ink-2);
+  background:
+    radial-gradient(48% 70% at 0% 0%, color-mix(in srgb, var(--wash-1) 55%, transparent), transparent 72%),
+    radial-gradient(44% 64% at 100% 100%, color-mix(in srgb, var(--wash-2) 50%, transparent), transparent 72%),
+    var(--bg);
+}
+
+.marketing > .sec--plain:nth-child(even of .sec--plain) {
+  --wash-1: var(--glow-2);
+  --wash-2: var(--glow-3);
 }

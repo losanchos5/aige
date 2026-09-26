@@ -17,22 +17,22 @@
 
 > Primer envío a producción (2026-09-27, «bien, a prod»): los grupos 1, 2, 7 y 8. Lo que Doc aplica a nivel de layout (cabecera, pausas, avisos y tablas) ya llega a patrones, Thesis, About, research, perfiles de control y certifications. Los grupos 3 a 6 van en un segundo PR con este mismo cambio abierto.
 
-- [ ] 3.1 `patterns/[id].astro`: mover `pp-related` al slot `after` como banda de cierre con mesh quieto. Verificar con capturas de un patrón y sin desbordamiento a 390 px.
-- [ ] 3.2 `ai-governance.astro`: pasar `mesh` a su `ChapterHeader`, fijar `--chapter-dash`, añadir la banda de cierre si procede y comprobar que las figuras del splice por `<h2` quedan en pausa. Verificar con capturas y axe de `/ai-governance`.
+- [x] 3.1 `patterns/[id].astro`: mover `pp-related` al slot `after` como banda de cierre con mesh quieto. Verificar con capturas de un patrón y sin desbordamiento a 390 px. (2026-09-27, segundo PR; sin compilación local por falta de memoria y sin tests por decisión de Jordi: la build la hace el workflow de deploy)
+- [x] 3.2 `ai-governance.astro`: pasar `mesh` a su `ChapterHeader`, fijar `--chapter-dash`, añadir la banda de cierre si procede y comprobar que las figuras del splice por `<h2` quedan en pausa. Verificar con capturas y axe de `/ai-governance`. (2026-09-27, segundo PR; sin compilación local por falta de memoria y sin tests por decisión de Jordi: la build la hace el workflow de deploy)
 - [ ] 3.3 Repasar Thesis, About ×4, research, `controls/[profile]` y certifications, que heredan las primitivas de Doc, y corregir cualquier tabla o aviso que rompa. Verificar con capturas de las 8 rutas a 1440 y 390 px.
 
 ## 4. Hubs de referencia
 
-- [ ] 4.1 Pasar a bandas `Section` (cabeceras y figuras en tinte por tono con mesh, tablas en liso) crosswalk y sus 3 comparativas (`ComparisonPage.astro`), reading-list, tools, harms, threats, contracts, templates, data, obligations, patterns, figures, cases y toolkit. Verificar con build, capturas de cada hub y ninguna pareja de vecinas iguales.
+- [x] 4.1 Pasar a bandas `Section` (cabeceras y figuras en tinte por tono con mesh, tablas en liso) crosswalk y sus 3 comparativas (`ComparisonPage.astro`), reading-list, tools, harms, threats, contracts, templates, data, obligations, patterns, figures, cases y toolkit. Verificar con build, capturas de cada hub y ninguna pareja de vecinas iguales. (2026-09-27, segundo PR; sin compilación local por falta de memoria y sin tests por decisión de Jordi: la build la hace el workflow de deploy)
 - [ ] 4.2 Glosario (`/resources/glossary`, sin mesh por Lighthouse): sus bandas usan solo tintes, sin mesh. Verificar con lhci en `/bok/glossary`.
 
 ## 5. Fichas de detalle
 
-- [ ] 5.1 `obligations/[id]`, `glossary/[slug]`, `cases/[id]` y `figures/[id]`: añadir una banda de cierre con relacionados y siguiente, y panelear figuras y tablas con `.pause` o el aro. Verificar con capturas de una ficha de cada tipo y axe completo.
+- [x] 5.1 `obligations/[id]`, `glossary/[slug]`, `cases/[id]` y `figures/[id]`: añadir una banda de cierre con relacionados y siguiente, y panelear figuras y tablas con `.pause` o el aro. Verificar con capturas de una ficha de cada tipo y axe completo. (2026-09-27, segundo PR; sin compilación local por falta de memoria y sin tests por decisión de Jordi: la build la hace el workflow de deploy)
 
 ## 6. Landings de marketing
 
-- [ ] 6.1 Pasar `/controls`, `/role`, `/stack`, `/agents`, `/for`, `AudienceHub` (`/for/[slug]`), `/frontier` (`blockTone`), `/contribute`, `/path` y `/map` de la alternancia plain/tint a tintes por tono con alguna banda mesh o `deep`, sin vecinas iguales. Verificar con capturas por ruta y axe.
+- [x] 6.1 Pasar `/controls`, `/role`, `/stack`, `/agents`, `/for`, `AudienceHub` (`/for/[slug]`), `/frontier` (`blockTone`), `/contribute`, `/path` y `/map` de la alternancia plain/tint a tintes por tono con alguna banda mesh o `deep`, sin vecinas iguales. Verificar con capturas por ruta y axe. (2026-09-27, segundo PR; sin compilación local por falta de memoria y sin tests por decisión de Jordi: la build la hace el workflow de deploy)
 
 ## 7. Specs, tests y documentación
 

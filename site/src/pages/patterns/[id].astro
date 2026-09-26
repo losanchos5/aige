@@ -11,6 +11,7 @@
 // controls (src/data/controls) that name it.
 import { render } from 'astro:content';
 import Doc from '../../layouts/Doc.astro';
+import Section from '../../components/Section.astro';
 import PatternFoot from '../../components/PatternFoot.astro';
 import PillarLink from '../../components/PillarLink.astro';
 import { layers } from '../../data/stack';
@@ -164,61 +165,70 @@ const jsonLd = [
   {/* Hub and spoke (SXO-N2): each pattern points at the /ai-governance pillar. */}
   <PillarLink lead="One working control on the engineering side of" anchor="AI governance" />
   <Content />
-  {
-    evidenced.length > 0 && (
-      <section class="pp-related" aria-labelledby="obligations-evidenced">
-        <h2 id="obligations-evidenced">Obligations this pattern evidences</h2>
-        <p>
-          Register rows that list this pattern among the patterns that build their evidence.
-          Mappings are illustrative, not a claim of conformity.
-        </p>
-        <ul>
-          {evidenced.map((row) => (
-            <li>
-              <a href={obligationPath(row)}>{obligationHeading(row)}</a>
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-  }
-  {
-    calledFor.length > 0 && (
-      <section class="pp-related" aria-labelledby="cases-calling-for-it">
-        <h2 id="cases-calling-for-it">Cases where it applies</h2>
-        <p>Incident post-mortems that name this pattern as a control that would have caught the failure.</p>
-        <ul>
-          {calledFor.map((c) => (
-            <li>
-              <a href={`/cases/${c.id}`}>{c.title}</a> ({c.year})
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-  }
-  {
-    relatedControls.length > 0 && (
-      <section class="pp-related" aria-labelledby="related-controls">
-        <h2 id="related-controls">Related controls</h2>
-        <p>
-          Draft controls in the <a href="/controls">open control profiles</a> that build on this
-          pattern. A control states the requirement and the evidence it must leave behind.
-        </p>
-        <ul>
-          {relatedControls.map((c) => (
-            <li>
-              <a href={controlHref(c.id)}>
-                <code>{c.id}</code> {c.title}
-              </a>{' '}
-              ({profileBySlug(c.profile)?.shortTitle ?? c.profile} profile)
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-  }
   <PatternFoot title={def.title} slug={def.slug} editPath={editPath} prev={prev} next={next} />
+  {/* The pattern's close: the related registers on a full-width, still mesh
+      band after the reading layout (Doc's "after" slot), only when there is
+      something to list. */}
+  {(evidenced.length > 0 || calledFor.length > 0 || relatedControls.length > 0) && (
+  <Section tone="mesh" mesh="e" meshK={0.9} class="pp-close" slot="after">
+    <div class="prose pp-close-inner">
+      {
+        evidenced.length > 0 && (
+          <section class="pp-related" aria-labelledby="obligations-evidenced">
+            <h2 id="obligations-evidenced">Obligations this pattern evidences</h2>
+            <p>
+              Register rows that list this pattern among the patterns that build their evidence.
+              Mappings are illustrative, not a claim of conformity.
+            </p>
+            <ul>
+              {evidenced.map((row) => (
+                <li>
+                  <a href={obligationPath(row)}>{obligationHeading(row)}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+      {
+        calledFor.length > 0 && (
+          <section class="pp-related" aria-labelledby="cases-calling-for-it">
+            <h2 id="cases-calling-for-it">Cases where it applies</h2>
+            <p>Incident post-mortems that name this pattern as a control that would have caught the failure.</p>
+            <ul>
+              {calledFor.map((c) => (
+                <li>
+                  <a href={`/cases/${c.id}`}>{c.title}</a> ({c.year})
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+      {
+        relatedControls.length > 0 && (
+          <section class="pp-related" aria-labelledby="related-controls">
+            <h2 id="related-controls">Related controls</h2>
+            <p>
+              Draft controls in the <a href="/controls">open control profiles</a> that build on this
+              pattern. A control states the requirement and the evidence it must leave behind.
+            </p>
+            <ul>
+              {relatedControls.map((c) => (
+                <li>
+                  <a href={controlHref(c.id)}>
+                    <code>{c.id}</code> {c.title}
+                  </a>{' '}
+                  ({profileBySlug(c.profile)?.shortTitle ?? c.profile} profile)
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+    </div>
+  </Section>
+  )}
 </Doc>
 
 <style>
@@ -252,5 +262,11 @@ const jsonLd = [
 
   .pp-cat {
     color: var(--ink-2);
+  }
+
+  /* The close band's registers: the first one sits at the band's top edge. */
+  .pp-close-inner > :global(.pp-related:first-child h2) {
+    margin-top: 0;
+    border-top: 0;
   }
 </style>
