@@ -55,6 +55,16 @@ export interface NavGroup {
    * renderers draw the sections when a group has them.
    */
   sections?: NavSection[];
+  /**
+   * Mobile menu only: one short line under the group's name in the collapsed
+   * row (<= 48 chars), so every group reads at a glance before it is opened.
+   */
+  hint?: string;
+  /**
+   * Mobile menu only: the label of the row, first in the open group, that
+   * links the group's landing page (`href`).
+   */
+  overview?: string;
 }
 
 // Every chapter, as a compact panel/footer row (number + short title).
@@ -78,6 +88,7 @@ export const nav: NavGroup[] = [
     id: 'thesis',
     label: 'The Thesis',
     description: 'The argument the site is built to make, end to end.',
+    hint: 'The argument, end to end',
     href: '/thesis',
     items: [
       {
@@ -92,6 +103,8 @@ export const nav: NavGroup[] = [
     id: 'bok',
     label: 'Body of Knowledge',
     description: `${chaptersOrdered.length} chapters in ${countWord(bookParts.length)} parts, from the definition to the law.`,
+    hint: `${chaptersOrdered.length} chapters in ${countWord(bookParts.length)} parts`,
+    overview: 'Book index, all parts',
     href: '/bok',
     items: chapterItems,
     sections: chapterSections,
@@ -100,6 +113,7 @@ export const nav: NavGroup[] = [
     id: 'practice',
     label: 'Practice',
     description: 'How the discipline is done: the role, stack, patterns, tools, path and agents.',
+    hint: 'Role, stack, patterns, path, toolkit, agents',
     items: [
       {
         label: 'What is AI governance?',
@@ -147,6 +161,8 @@ export const nav: NavGroup[] = [
     id: 'for-you',
     label: 'For you',
     description: 'Six routes through the site, one per audience, with what to do this week.',
+    hint: 'Routes by role, AIGP and certifications',
+    overview: 'All audiences',
     href: '/for',
     items: [
       {
@@ -195,6 +211,8 @@ export const nav: NavGroup[] = [
     id: 'reference',
     label: 'Reference',
     description: 'Frameworks, obligations, crosswalk, harms, cases, templates, figures, data, glossary.',
+    hint: 'Frameworks, obligations, crosswalk, glossary',
+    overview: 'All resources',
     href: '/resources',
     items: [
       {
@@ -274,6 +292,7 @@ export const nav: NavGroup[] = [
     id: 'map',
     label: 'The map',
     description: 'The discipline as a mind map: chapters, layers and patterns on one canvas.',
+    hint: 'The discipline on one canvas',
     href: '/map',
     items: [],
   },
@@ -281,6 +300,8 @@ export const nav: NavGroup[] = [
     id: 'about',
     label: 'About',
     description: 'Who writes this, how it is versioned, how to cite it.',
+    hint: 'Who writes this, changelog, methodology',
+    overview: 'About the project',
     href: '/about',
     items: [
       {
