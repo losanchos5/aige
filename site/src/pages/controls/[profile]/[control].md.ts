@@ -17,7 +17,6 @@ export const GET: APIRoute = ({ props }) => {
   const control = (props as { control: Control }).control;
   const profile = profileOf(control);
   const { description } = controlPageMeta(control);
-  const doi = profileCitation(profile).doi;
   return markdownResponse(
     markdownDocument(
       {
@@ -26,7 +25,8 @@ export const GET: APIRoute = ({ props }) => {
         path: controlPagePath(control) as string,
         updated: profile.updated,
         version: profile.version,
-        ...(doi ? { doi } : {}),
+        // The profile's own DOI once deposited, else the project concept DOI.
+        doi: profileCitation(profile).effectiveDoi,
       },
       controlMarkdown(control),
     ),

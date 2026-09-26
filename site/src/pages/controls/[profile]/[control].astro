@@ -24,6 +24,7 @@ import ControlRecord from '../../../components/ControlRecord.astro';
 import SourceList from '../../../components/SourceList.astro';
 import ContributeCta from '../../../components/ContributeCta.astro';
 import Citation from '../../../components/Citation.astro';
+import Provenance from '../../../components/Provenance.astro';
 import {
   type Control,
   controls,
@@ -34,6 +35,7 @@ import {
   profilePath,
   profileArticleId,
   profileCitation,
+  statusLabels,
   subjectKindLabels,
 } from '../../../data/controls';
 import {
@@ -76,7 +78,12 @@ const sources = controlSources(c);
 const related = controlRelations(c);
 const examples = controlExamples(c);
 const reviewers = profileReviewers(profile);
-const citation = profileCitation(profile);
+// The DOI this control is cited with: its profile's own once deposited, else
+// the project concept DOI (as on the profile page), and the data file it is
+// built from.
+const cite = profileCitation(profile);
+const editPath = `site/src/data/controls/${profile.slug}.ts`;
+const issueForm = `${site.github}/issues/new?template=${profile.issueTemplate}`;
 const machine = machineLinks();
 
 const crumbs = [
@@ -140,6 +147,14 @@ const jsonLd = [
   <div class="cp-head" data-pagefind-ignore>
     <Byline date={profile.updated} dateLabel="Updated" published={profile.published} />
     <StatusLine version={profile.version} status={profile.status} reviewers={reviewers} />
+    <Provenance
+      version={profile.version}
+      status={statusLabels[profile.status]}
+      editPath={editPath}
+      doi={cite.effectiveDoi}
+      citeHref="#cite"
+      issueHref={issueForm}
+    />
   </div>
 
   <p class="cp-part">
@@ -358,14 +373,32 @@ const jsonLd = [
   </p>
   <ContributeCta kind="control" title={`${c.id} ${c.title} (${profile.shortTitle} v${profile.version})`} />
 
-  <Citation
-    title={`${c.id} ${c.title}`}
-    url={path}
-    kind="page"
-    label="Cite this control"
-    version={profile.version}
-    doi={citation.doi ?? undefined}
-  />
+  <div id="cite" class="cp-cite">
+    <p class="cp-doi-note" data-doi-kind={cite.doi ? 'profile' : 'project-concept'}>
+      {
+        cite.doi ? (
+          <>
+            DOI of the profile version this control belongs to:{' '}
+            <a href={`https://doi.org/${cite.doi}`}>{cite.doi}</a>.
+          </>
+        ) : (
+          <>
+            This control's profile has no DOI of its own yet: it is cited with the project concept
+            DOI, <a href={`https://doi.org/${cite.effectiveDoi}`}>{cite.effectiveDoi}</a>, which
+            resolves to the latest archived version of the whole project.
+          </>
+        )
+      }
+    </p>
+    <Citation
+      title={`${c.id} ${c.title}`}
+      url={path}
+      kind="page"
+      label="Cite this control"
+      version={profile.version}
+      doi={cite.effectiveDoi}
+    />
+  </div>
 </Doc>
 
 <style>
@@ -379,6 +412,15 @@ const jsonLd = [
 
   .cp-head :global(.status-line) {
     margin: var(--s-2) 0 0;
+  }
+
+  .cp-cite {
+    margin-top: var(--s-6);
+  }
+
+  .cp-doi-note {
+    font-size: var(--fs-label);
+    color: var(--ink-2);
   }
 
   .cp-part {
