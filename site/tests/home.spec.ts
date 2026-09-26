@@ -28,10 +28,10 @@ test.describe('home page', () => {
     await expect(ctas).toHaveCount(2);
     await expect(ctas.nth(0)).toHaveText('Explore the Stack');
     await expect(ctas.nth(0)).toHaveAttribute('href', '/stack');
-    await expect(ctas.nth(0)).toHaveClass(/btn-primary/);
+    await expect(ctas.nth(0)).toHaveClass(/\bbtn-primary\b/);
     await expect(ctas.nth(1)).toHaveText('Open controls');
     await expect(ctas.nth(1)).toHaveAttribute('href', '/controls');
-    await expect(ctas.nth(1)).toHaveClass(/hero-btn-quiet/);
+    await expect(ctas.nth(1)).toHaveClass(/\bhero-btn-quiet\b/);
     const links = hero.locator('.hero-links a');
     await expect(links).toHaveCount(2);
     // The arrows are aria-hidden, so the accessible names stay the bare labels.
