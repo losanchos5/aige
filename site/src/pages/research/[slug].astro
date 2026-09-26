@@ -113,6 +113,7 @@ const jsonLd = [
   updated={updated}
   editPath={editPath}
   sidebar={false}
+  siteVersion={false}
   image="/og/research.png"
   jsonLd={jsonLd}
   article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
@@ -182,13 +183,3 @@ const jsonLd = [
     />
   </section>
 </Doc>
-
-<style>
-  /* The review button sits inside .prose, whose `.prose a` rule (ink text,
-     underline) outranks .btn-primary and would paint ink on ink. Restore the
-     button's own colours here; the same fix belongs in ContributeCta. */
-  :global(.prose .contrib a.btn-primary) {
-    color: var(--bg);
-    text-decoration: none;
-  }
-</style>

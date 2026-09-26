@@ -11,7 +11,8 @@
  *   passes behind a fixed kicker ("The discipline in figures").
  * - `frameworks`: flagship framework names as italic wordmarks in the marquee,
  *   behind a kicker that counts every framework mapped and links to the
- *   catalogue; the figures move to a thinner still line under it.
+ *   catalogue; the figures move to a thinner still line under it, which
+ *   phones (under 720px) leave out.
  *
  * `caption` adds the museum label that credits the painting.
  *
@@ -533,6 +534,15 @@ const NGA_URL = 'https://www.nga.gov/collection/art-object-page.46655.html';
   @media (min-width: 1280px) {
     .facts--line {
       justify-content: space-between;
+    }
+  }
+
+  /* Phones: the figures line goes and the frameworks line with its wordmarks
+     stays, so the strip reads as one line in the first viewport at 390x844,
+     under the lede, the CTAs and the links. */
+  @media (max-width: 719px) {
+    .hero-facts--frameworks .facts--line {
+      display: none;
     }
   }
 

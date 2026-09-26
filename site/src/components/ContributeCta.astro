@@ -74,4 +74,18 @@ const Tag = landmark ? 'aside' : 'div';
   .contrib-link:hover {
     text-decoration-color: currentColor;
   }
+
+  /* Inside .prose (a note, a profile), `.prose a` (ink, underlined) would
+     outrank .btn-primary and paint the label ink on ink: the scoped rule
+     restores the button's own label colour and drops the underline. */
+  .contrib a.btn-primary {
+    color: var(--bg);
+    text-decoration: none;
+  }
+
+  /* A visible ring on both links in either theme, whatever the ground. */
+  .contrib a:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
 </style>

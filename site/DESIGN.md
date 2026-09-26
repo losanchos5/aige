@@ -230,7 +230,12 @@ needs no pause control; it also pauses while a step is active, and is absent und
   pairs computed from the content modules (stack layers, workflows, chapters, values, frameworks,
   patterns, BoK version, license), doubled into an `aria-hidden`+`inert` copy for the seamless
   marquee, with the keyboard-only `.motion-toggle` pause control (see Motion tokens). Reduced motion or no JS
-  keeps it a static, centred, wrapping list.
+  keeps it a static, centred, wrapping list. The home uses the `frameworks` variant
+  (`components/HeroStrip.astro`): the "N frameworks mapped" link and its wordmark marquee, then the
+  figures as a thin still line (`.facts--line`). Phones (`max-width: 719px`, the hero's phone
+  breakpoint) drop the figures line and keep the frameworks line, so the strip is one line inside
+  the first viewport at 390x844 (`tests/hero-art.spec.ts` checks the frameworks link is on screen
+  there); desktop and tablet keep both.
 - **Header overlay mode** (`Header.astro` prop `overlay`, threaded from `Base.astro`/`Marketing.astro`
   `overlayHeader`, home only), `data-overlay` makes the bar `position: fixed`, fully transparent (no
   ground, blur, hairline or shadow, `--muted` re-scoped to `--ink-2`) until `.is-scrolled` (`ui.js`,

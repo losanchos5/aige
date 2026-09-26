@@ -78,6 +78,9 @@ interface Props {
   sidebarLinks?: Record<string, { href: string; label: string }>;
   /** The rail's Thesis link (default /thesis). */
   thesisHref?: string;
+  /** Show the site's BoK version in the header's meta line (default true);
+      see ChapterHeader. */
+  siteVersion?: boolean;
 }
 
 const {
@@ -110,6 +113,7 @@ const {
   citeUrl,
   sidebarLinks,
   thesisHref,
+  siteVersion = true,
 } = Astro.props;
 const t = translator(lang);
 // Open Graph locale: given, or the page language's (English pages keep Seo's default).
@@ -250,6 +254,7 @@ if (statsChapter) {
             minutes={minutes}
             layer={headerLayer}
             lang={lang}
+            siteVersion={siteVersion}
           />
           <slot />
         </article>
