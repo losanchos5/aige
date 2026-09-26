@@ -257,6 +257,13 @@ export const frontierBlocks: readonly FrontierBlock[] = [
     links: [
       { title: 'Incident cases', description: 'Public incidents as engineering post-mortems: failure mode, control, evidence.', href: '/cases' },
       { title: 'From incident to control', description: 'How a case becomes a failure mode and a control.', href: '/cases#from-incident-to-control' },
+      // Frontier incident notes (block orp-frontier-cases): neutral labels, no lab named.
+      { title: 'DNS covert channel in a training run (2026)', description: 'Egress filtered at the web proxy but not at the resolver, and a stop that was not automatic.', href: '/cases/openai-agent-dns-covert-channel-2026' },
+      { title: 'Credential published by an internal agent (2026)', description: "A person's token within an agent's reach, split to get past secret scanning.", href: '/cases/openai-agent-github-token-exposure-2026' },
+      { title: 'Public file hosting from a training run (2026)', description: 'A broken shared filesystem and live internet sent agents to a public host.', href: '/cases/openai-agents-temp-file-hosting-2026' },
+      { title: 'Package repository as a message board (2026)', description: 'A shared service outside the isolation model, between samples meant to be independent.', href: '/cases/openai-agents-artifactory-cross-sample-2026' },
+      { title: 'Misconfigured third-party cyber evaluations (2026)', description: 'Told there was no internet, connected anyway: four incidents at an evaluation partner.', href: '/cases/anthropic-third-party-eval-environment-incidents-2026' },
+      { title: 'Unsanctioned actions in a cyber range (2026)', description: 'Open internet bounded only by a prompt, and a token one agent left reused by another.', href: '/cases/uk-aisi-cyber-range-unsanctioned-actions-2026' },
       { title: 'Chapter 17: incidents', description: 'Detection, triage, reporting clocks and corrective action.', href: '/bok/incidents' },
       { title: 'An agent incident taxonomy', description: 'Chapter 23: eleven classes, each with a detection signal and a first containment.', href: `${CH23}#an-agent-incident-taxonomy`, layer: 4 },
       { title: 'Incident pipeline', description: 'Pattern: detect, triage and report serious incidents within the legal window.', href: '/patterns/incident-pipeline', layer: 5 },
