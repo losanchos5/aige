@@ -43,6 +43,12 @@
 /schemas/examples/*
   ! Content-Type
   Content-Type: application/json; charset=utf-8
+/controls/examples/*
+  ! Link
+  X-Robots-Tag: noindex
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
 /api/v1/*
   ! Link
   X-Robots-Tag: noindex
