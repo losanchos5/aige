@@ -18,6 +18,7 @@ import { figures } from './src/data/figures';
 import { comparisonSourceFiles } from './src/data/comparisons';
 import { getGlossary } from './src/lib/glossary';
 import { gitDate } from './src/lib/reading';
+import { termDate } from './src/lib/glossary-dates';
 import { inSitemap } from './src/lib/sitemap-policy';
 import { alternatesFor, translationFilePath, translationIndex } from './src/lib/i18n-content';
 import { DEFAULT_LOCALE, LOCALES } from './src/i18n/locales';
@@ -181,16 +182,6 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ],
   ['/resources/data', ['src/pages/resources/data.astro', 'src/lib/api.ts']],
   ['/mcp', ['src/pages/mcp.astro']],
-  // Block b-glossary (v0.5.0): one canonical page per glossary term, all rendered
-  // from the same template and the glossary chapter (src/lib/glossary.ts).
-  ...getGlossary().map(
-    (entry) =>
-      [entry.url, ['src/pages/glossary/[slug].astro', '../bok/09-glossary.md']] as [
-        string,
-        string[],
-      ],
-  ),
-
   // One page per incident case, all rendered from the same template and dataset.
   ...cases.map(
     (entry) =>
@@ -397,6 +388,14 @@ const REVIEWED_BY_PATH = new Map<string, string>(
   obligations.map((row) => [obligationPath(row), row.reviewed] as [string, string]),
 );
 
+// Each /glossary/<slug> page is dated by the last commit that changed its own
+// term in bok/09-glossary.md (src/lib/glossary-dates.ts), the date the page
+// shows and its JSON-LD states, not by the chapter file, which would date all
+// 300+ terms alike (audit 2026-09-26 CONTENT C-1).
+const TERM_DATE_BY_PATH = new Map<string, string>(
+  getGlossary().map((entry) => [entry.url, termDate(entry.slug)] as [string, string]),
+);
+
 // gitDate shells out to `git log` per file, and several pages share a source
 // (chapters.ts, role.ts, stack.ts), so each path is asked for once per build.
 const dateCache = new Map<string, string>();
@@ -458,6 +457,9 @@ export default defineConfig({
       // assets and /404 the error page: none of them is a destination. Nor are
       // the pages whose canonical URL is another page (src/lib/sitemap-policy.ts).
       filter: (page) => inSitemap(pathnameOf(page)),
+      // No page carries Google News or video entries, so their namespaces are
+      // not declared on <urlset> (audit 2026-09-26 SITEMAP SM-1).
+      namespaces: { news: false, video: false },
       // Every indexable route is dated by the last commit that touched what it
       // is built from (lib/reading.ts gitDate), so an edit moves the page's
       // lastmod without a manual step. A path missing from the map gets no
@@ -467,8 +469,8 @@ export default defineConfig({
         const alternates = alternatesFor(pathname);
         const links = alternates?.map((alt) => ({ url: alt.href, lang: alt.hreflang }));
         const paired = { ...item, links };
-        const reviewed = REVIEWED_BY_PATH.get(pathname);
-        if (reviewed) return { ...paired, lastmod: reviewed };
+        const dated = REVIEWED_BY_PATH.get(pathname) ?? TERM_DATE_BY_PATH.get(pathname);
+        if (dated) return { ...paired, lastmod: dated };
         const sources = SOURCE_BY_PATH.get(pathname);
         return sources ? { ...paired, lastmod: lastmodOf(sources) } : paired;
       },

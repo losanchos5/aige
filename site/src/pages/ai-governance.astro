@@ -29,6 +29,7 @@ import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
 import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
 import { renderDiagramFigure } from '../lib/diagrams';
 import { getGlossaryEntry } from '../lib/glossary';
+import { glossaryLinks } from '../data/glossary-links';
 
 const SOURCE = 'guides/ai-governance.md';
 const FIGURE_ID = 'the-stack-layers';
@@ -86,6 +87,9 @@ const glossaryUrl = new URL('/bok/glossary', site.url).href;
 const termSetId = `${glossaryUrl}#glossary`;
 const termUrl = new URL(term.url, site.url).href;
 const termId = `${termUrl}#term`;
+// The same concept in Wikidata and Wikipedia, stated on both pages that carry
+// the node (data/glossary-links.ts, audit 2026-09-26 GEO S1).
+const termSameAs = glossaryLinks[term.slug]?.sameAs;
 
 // The instruments the page compares, each named by its primary-source URL.
 const mentions = [
@@ -150,6 +154,7 @@ const jsonLd = [
     url: termUrl,
     inLanguage: 'en',
     inDefinedTermSet: { '@id': termSetId },
+    ...(termSameAs ? { sameAs: [...termSameAs] } : {}),
     subjectOf: { '@id': `${pageUrl}#article` },
   },
   {
