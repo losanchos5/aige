@@ -1,17 +1,51 @@
 ---
-// /frontier: STUB of the audience route for frontier labs and evaluators (block
-// orp-shell, open reference project). It carries the final title and
-// description and every anchor other pages link to: who,
+// /frontier: the audience route for frontier labs and evaluators (OpenSpec
+// change open-reference-project, block orp-frontier). It shows where the
+// controls, patterns and evidence formats of this site apply to frontier AI
+// evaluation, runtime safeguards, assurance and incidents, and names the
+// existing certification schemes with public facts only. Frontier work is one
+// application domain of the discipline, not an axis of the site, so the page
+// follows the audience hub template (src/components/AudienceHub.astro).
+//
+// Copy, link lists and sources live in src/data/frontier.ts; the build throws
+// on any problem frontierProblems() reports. No script. Every tinted band goes
+// through <Section tone="tint">, so --muted stays AA there (DESIGN.md hard
+// constraint 3). The anchors other pages link to are fixed: who,
 // evaluation-environments, runtime-safeguards, assurance, incidents,
-// stack-map, open-questions and sources. Block orp-frontier replaces the body.
+// stack-map, open-questions and sources.
 import Marketing from '../layouts/Marketing.astro';
+import '../styles/reading.css';
 import PageHero from '../components/PageHero.astro';
 import Section from '../components/Section.astro';
+import RegisterList from '../components/RegisterList.astro';
+import CitedText from '../components/CitedText.astro';
+import SourceList from '../components/SourceList.astro';
+import FlowDiagram from '../components/FlowDiagram.astro';
+import ContributeCta from '../components/ContributeCta.astro';
+import CtaBand from '../components/CtaBand.astro';
 import { site } from '../data/site';
+import { layers } from '../data/stack';
+import {
+  frontierBlocks,
+  frontierChain,
+  frontierHero,
+  frontierNot,
+  frontierOpening,
+  frontierOpenQuestions,
+  frontierProblems,
+  frontierRoles,
+  frontierSources,
+  frontierStackMap,
+  type FrontierLink,
+} from '../data/frontier';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 import { authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
 import { fitsSiteSuffix } from '../lib/seo-title';
 import '../styles/pages.css';
+import '../styles/resources.css';
+
+const problems = frontierProblems();
+if (problems.length) throw new Error(`frontier.ts:\n${problems.join('\n')}`);
 
 const seoTitle = 'Frontier AI evaluation assurance';
 const description =
@@ -30,9 +64,31 @@ const jsonLd = [
     isPartOf: { '@id': WEBSITE_ID },
     publisher: { '@id': ORG_ID },
     author: [...authorRefs],
+    audience: { '@type': 'Audience', audienceType: frontierRoles.join(', ') },
   },
   breadcrumbJsonLd(crumbs),
 ];
+
+const toRows = (links: readonly FrontierLink[]) =>
+  links.map((l) => ({
+    title: l.title,
+    description: l.description,
+    href: l.href,
+    ...(l.layer ? { swatch: `var(--l${l.layer})` } : {}),
+  }));
+
+// Plain and tinted bands alternate: #who is plain, so the blocks start tinted.
+const blockTone = (i: number): 'plain' | 'tint' => (i % 2 === 0 ? 'tint' : 'plain');
+const stackTone = blockTone(frontierBlocks.length);
+const questionsTone = blockTone(frontierBlocks.length + 1);
+const sourcesTone = blockTone(frontierBlocks.length + 2);
+
+const stackRows = layers.map((layer) => ({
+  title: `Layer ${String(layer.n).padStart(2, '0')}: ${layer.name}`,
+  description: frontierStackMap[layer.n],
+  href: `/bok/the-stack#${layer.chapterAnchor}`,
+  swatch: `var(${layer.colorVar})`,
+}));
 ---
 
 <Marketing
@@ -42,50 +98,142 @@ const jsonLd = [
   image="/og/frontier.png"
   jsonLd={jsonLd}
 >
-  <PageHero
-    variant="res"
-    crumbs={crumbs}
-    title="Engineering assurance for frontier AI"
-    lede="For the teams that evaluate, deploy and assure frontier systems. This page is being prepared and is published in full in the next release."
+  <PageHero variant="res" crumbs={crumbs} title={frontierHero.title} lede={frontierHero.lede} />
+
+  <Section tone="plain" id="who" title="Who this route is for.">
+    <div class="well fr-who" data-pagefind-body>
+      {frontierOpening.map((p) => <p>{p}</p>)}
+      <ul class="chips" aria-label="Written for">
+        {frontierRoles.map((role) => <li class="chip">{role}</li>)}
+      </ul>
+      <p class="fr-note">{frontierNot}</p>
+      <p class="fr-note">
+        New to the field? Read <a href="/ai-governance">AI governance explained</a>: the
+        definition, the frameworks and where engineering fits.
+      </p>
+    </div>
+    <div class="fr-chain">
+      <FlowDiagram
+        id="frontier-chain"
+        title="From the model to the assurance record"
+        desc="Each step links to where this site treats it; the swatch marks its layer on the stack."
+        steps={frontierChain}
+      />
+    </div>
+  </Section>
+
+  {
+    frontierBlocks.map((block, i) => (
+      <Section tone={blockTone(i)} id={block.id} title={block.title} lede={block.lede}>
+        <div class="prose fr-prose" data-pagefind-body>
+          {block.paragraphs.map((p) => (
+            <p>
+              <CitedText text={p} />
+            </p>
+          ))}
+        </div>
+        <div class="well fr-links">
+          <RegisterList items={toRows(block.links)} />
+        </div>
+      </Section>
+    ))
+  }
+
+  <Section
+    tone={stackTone}
+    id="stack-map"
+    title="Where it sits on the stack."
+    lede="The same five layers as every other route, read for frontier evaluation and deployment."
+  >
+    <div class="well"><RegisterList items={stackRows} /></div>
+  </Section>
+
+  <Section tone={questionsTone} id="open-questions" title="Open questions.">
+    <div class="well fr-questions" data-pagefind-body>
+      <ol class="fr-qlist">
+        {frontierOpenQuestions.map((q) => <li>{q}</li>)}
+      </ol>
+      <p class="fr-note">
+        Each one is a candidate for a <a href="/research">research note</a>. If you work on one of
+        them, or think this route gets the engineering wrong, <a href="/contribute">contribute</a>:
+        corrections are reviewed in the open.
+      </p>
+      <ContributeCta kind="assumption" title="Frontier route" />
+    </div>
+  </Section>
+
+  <Section tone={sourcesTone} id="sources" title="Sources">
+    <div class="prose fr-sources">
+      <SourceList sources={frontierSources} />
+    </div>
+  </Section>
+
+  <CtaBand
+    title="Start with the evaluation environment profile."
+    sub="Nine draft controls for the environment a model is evaluated in, each with its enforcement point and evidence."
+    primary={{ label: 'Open the profile', href: '/controls/evaluation-environment' }}
+    secondary={{ label: 'All routes', href: '/for' }}
   />
-
-  <Section tone="plain" id="who" title="Who this route is for">
-    <p><!-- orp-stub -->Evaluation and red-team engineers, assurance teams, agent platform engineers and third-party evaluators.</p>
-  </Section>
-
-  <Section tone="tint" id="evaluation-environments" title="Evaluation environments">
-    <p>
-      Where the controls on this site apply to the environment a model is evaluated in; the draft
-      <a href="/controls/evaluation-environment">evaluation environment profile</a> is in preparation.
-    </p>
-  </Section>
-
-  <Section tone="plain" id="runtime-safeguards" title="Runtime safeguards">
-    <p>
-      Identity, tool mediation and stop handles for agents at runtime, as
-      <a href="/bok/governing-agents">chapter 23</a> sets them out.
-    </p>
-  </Section>
-
-  <Section tone="tint" id="assurance" title="Assurance evidence">
-    <p>How controls leave machine-readable evidence is set out here in the next release.</p>
-  </Section>
-
-  <Section tone="plain" id="incidents" title="Incidents">
-    <p>
-      Public incidents read as engineering post-mortems are in <a href="/cases">the incident cases</a>.
-    </p>
-  </Section>
-
-  <Section tone="tint" id="stack-map" title="Where it sits on the stack">
-    <p>How this route maps to <a href="/stack">the five-layer stack</a> is drawn here in the next release.</p>
-  </Section>
-
-  <Section tone="plain" id="open-questions" title="Open questions">
-    <p>The open questions for this route are listed here, linked to <a href="/research">the research notes</a>.</p>
-  </Section>
-
-  <Section tone="tint" id="sources" title="Sources">
-    <p>The sources this route cites are listed here with the full page.</p>
-  </Section>
 </Marketing>
+
+<style>
+  .fr-who > * + * {
+    margin-top: var(--s-5);
+  }
+
+  .fr-who > p:first-child {
+    margin: 0;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .fr-note {
+    color: var(--ink-2);
+  }
+
+  .fr-note a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  .fr-chain {
+    margin-top: var(--s-7);
+  }
+
+  /* Seven steps in a row leave each node narrow at the 1200px container:
+     hyphenate a long label ("Authorization") instead of breaking it
+     anywhere. */
+  .fr-chain :global(.flow-label) {
+    hyphens: auto;
+  }
+
+  /* .prose carries the citation chip styles; drop the outer margin a
+     Section body does not need. */
+  .fr-prose {
+    margin: 0;
+  }
+
+  .fr-links {
+    margin-top: var(--s-6);
+  }
+
+  .fr-questions > * + * {
+    margin-top: var(--s-5);
+  }
+
+  .fr-qlist {
+    margin: 0;
+    padding-left: 1.25em;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+
+  .fr-sources {
+    margin: 0;
+  }
+</style>
