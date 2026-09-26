@@ -6,6 +6,37 @@ a completed, reviewed core (1.0).
 
 ## Unreleased
 
+Open reference project, second iteration (OpenSpec change `open-reference-project-2`). Nothing
+below is released yet. The control catalogue grows to five draft profiles and 79 reference
+controls, every one open for technical review and none reviewed yet.
+
+### Added
+- Three derived profiles, v0.1: `/controls/data-admission-and-privacy` (12 controls),
+  `/controls/deployment-and-monitoring` (15) and `/controls/assurance-and-evidence` (12). Each
+  control restates a pattern, a record schema or a chapter of this site and names it in
+  `derivedFrom`.
+- A page per fully specified control, `/controls/<profile>/<id>`, with its example observations,
+  related cases, citation and Markdown twin. The profile anchors stay.
+- `/controls/crosswalk`: the controls read from each framework (EU AI Act and GDPR obligations,
+  ISO/IEC 42001 Annex A, NIST AI RMF, OWASP, MITRE ATLAS, NIST SP 800-53, AIUC-1 and others), with
+  the reverse view per profile. Illustrative, not a claim of conformity. The same data is the
+  `crosswalk` key of `/api/v1/controls.json`.
+- Per-profile DOI fields (`doi`, `conceptDoi`) shown in the citation, provenance, JSON and twin
+  when a profile version is deposited; until then the project concept DOI is cited.
+  `site/scripts/profile-release.mjs` builds the release bundle and the Zenodo metadata (dry run
+  without a token, sandbox by default).
+- Mapping indexes: the 53 AIUC-1 requirements from its public index and the 72 NIST AI RMF 1.0
+  subcategories from NIST AI 100-1; mappings are now checked against them at build time.
+
+### Changed
+- Evaluation Environment profile v0.2: controls 001, 004, 005, 007, 008 and 009 are now specified
+  in full (all nine are), each with verification steps, evidence, notes and two example
+  observations, after a source-by-source review.
+- Profile dates in the sitemap and JSON-LD come from each profile's `updated` date; counts in
+  `/controls`, `/frontier`, `llms.txt` and the tests are read from the registry.
+
+### First iteration (open-reference-project)
+
 Open reference project (OpenSpec change `open-reference-project`). Nothing below is released
 yet. It ships two draft control profiles with 40 controls (9 for the evaluation environment, 31
 for agents at runtime, open for technical review), `/frontier`, `/research` with one draft note,

@@ -26,14 +26,14 @@ nuevo añade su import en `controls/index.ts` y su sección en `sources/SOURCES.
 ## 2. orp2-evalenv (ola 0)
 
 - [x] 2.1 Leer `D:/Documents/aige-wt/handoffs/research-openai-alignment.md` y `research-labs.md` y reabrir cada URL que se cite; decidir por control (001, 004, 005, 007, 008, 009) si se promueve o sigue `stub`, y registrar el motivo en el handoff.
-- [ ] 2.2 Para cada promovido: 2-4 verificaciones repetibles, evidencia con `schemaId` publicado, notas de implementación a nivel de configuración, `observation`, `pageTitle`, `pageDescription` y referencias verificadas; también `pageTitle`/`pageDescription` para 002, 003 y 006.
+- [x] 2.2 Para cada promovido: 2-4 verificaciones repetibles, evidencia con `schemaId` publicado, notas de implementación a nivel de configuración, `observation`, `pageTitle`, `pageDescription` y referencias verificadas; también `pageTitle`/`pageDescription` para 002, 003 y 006.
 - [x] 2.3 Dos observaciones de ejemplo (pass y fail) por promovido en `public/controls/examples/`, validadas por `schemas-check`.
 - [x] 2.4 Perfil v0.2, `updated`, changelog v0.2 (promovidos y los que siguen `stub` con motivo), revisores vacíos; sección de `sources/SOURCES.md` actualizada en orden de primer uso.
 - [x] 2.5 Build verde, `tests/controls.spec.ts` dirigido verde y handoff `orp2-evalenv.json`.
 
 ## 3. Integración ola 0 (integrador)
 
-- [ ] 3.1 Merge de `wt/orp2-core` y `wt/orp2-evalenv` en `feat/open-reference-project-2`, build verde y `controlProblems()` vacío con las reglas nuevas.
+- [x] 3.1 Merge de `wt/orp2-core` y `wt/orp2-evalenv` en `feat/open-reference-project-2`, build verde y `controlProblems()` vacío con las reglas nuevas.
 
 ## 4. orp2-data, orp2-deploy, orp2-assure (ola 1, un agente por perfil)
 
@@ -62,7 +62,7 @@ nuevo añade su import en `controls/index.ts` y su sección en `sources/SOURCES.
 
 ## 8. Integración ola 1 (integrador)
 
-- [ ] 8.1 Merge de los seis bloques, `union-merge.py` en registros append-only, peticiones de handoff aplicadas (`og-cards`, `_headers`, `lighthouserc.cjs`, `seo-titles` HUBS, `seo-basics`), entrada en `bok/CHANGELOG.md`; build verde con ≥ 70 controles y `controlProblems()` vacío.
+- [x] 8.1 Merge de los seis bloques, `union-merge.py` en registros append-only, peticiones de handoff aplicadas (`og-cards`, `_headers`, `lighthouserc.cjs`, `seo-titles` HUBS, `seo-basics`), entrada en `bok/CHANGELOG.md`; build verde con ≥ 70 controles y `controlProblems()` vacío.
 
 ## 9. Ola 2: revisión
 
