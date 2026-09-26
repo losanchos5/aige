@@ -1,0 +1,408 @@
+---
+// /controls/<profile>: one open control profile (src/data/controls), rendered
+// with the reading layout (Doc) without the chapter rail: the title, byline and
+// status line, a draft notice, the scope, how to read a control, one
+// ControlRecord per control (inside .prose, so the TOC and ui-doc.js see each
+// control's H2 anchor), the mappings table, the open questions of every
+// control in one list, the changelog, the numbered sources the records cite
+// (#src-N), the machine-readable versions and the review call. The Markdown
+// twin (/controls/<profile>.md) is built from the same data by
+// lib/controls-md.ts.
+//
+// The build fails on any broken reference in the registry (controlProblems)
+// and on a profile with no page title and description (profilePageMeta).
+// Draft control specifications, open for technical review; illustrative, not a
+// claim of conformity.
+import Doc from '../../layouts/Doc.astro';
+import Byline from '../../components/Byline.astro';
+import StatusLine from '../../components/StatusLine.astro';
+import Callout from '../../components/Callout.astro';
+import ControlRecord from '../../components/ControlRecord.astro';
+import SourceList from '../../components/SourceList.astro';
+import ContributeCta from '../../components/ContributeCta.astro';
+import Citation from '../../components/Citation.astro';
+import {
+  type ControlProfile,
+  profiles,
+  controlsIn,
+  controlProblems,
+  controlAnchor,
+  controlPath,
+  profilePath,
+  profileSources,
+  depthLabels,
+} from '../../data/controls';
+import {
+  profilePageMeta,
+  controlHeading,
+  aggregatedQuestions,
+  depthCounts,
+  profileReviewers,
+  mappingRows,
+  machineLinks,
+} from '../../lib/controls-md';
+import { agentChapter } from '../../data/tool-agent-controls';
+import { site } from '../../data/site';
+import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import '../../styles/resources.css';
+
+export function getStaticPaths() {
+  return profiles.map((profile) => ({ params: { profile: profile.slug }, props: { profile } }));
+}
+
+interface Props {
+  profile: ControlProfile;
+}
+
+const problems = controlProblems();
+if (problems.length > 0) {
+  throw new Error(`controls: ${problems.length} problem(s) in the registry:\n${problems.join('\n')}`);
+}
+
+const { profile } = Astro.props;
+const { seoTitle, description } = profilePageMeta(profile.slug);
+const rows = controlsIn(profile.slug);
+const sources = profileSources(profile.slug);
+const questions = aggregatedQuestions(profile.slug);
+const counts = depthCounts(profile.slug);
+const reviewers = profileReviewers(profile);
+const mappings = mappingRows(profile.slug);
+const machine = machineLinks();
+const path = profilePath(profile);
+const pageUrl = new URL(path, site.url).href;
+const issueForm = `${site.github}/issues/new?template=${profile.issueTemplate}`;
+const citeTitle = `${profile.title} v${profile.version} (draft)`;
+
+const crumbs = [{ label: 'Open control profiles', href: '/controls' }, { label: profile.shortTitle }];
+
+// The on-this-page list, by hand: the fixed sections around one entry per control.
+const headings = [
+  { depth: 2, slug: 'scope', text: 'Scope' },
+  { depth: 2, slug: 'how-to-read-a-control', text: 'How to read a control' },
+  ...rows.map((c) => ({ depth: 2, slug: controlAnchor(c), text: controlHeading(c) })),
+  { depth: 2, slug: 'mappings', text: 'Mappings' },
+  { depth: 2, slug: 'open-questions', text: 'Open questions' },
+  { depth: 2, slug: 'changelog', text: 'Changelog' },
+  { depth: 2, slug: 'sources', text: 'Sources' },
+  { depth: 2, slug: 'machine-readable', text: 'Machine-readable' },
+  { depth: 2, slug: 'review', text: 'Review this profile' },
+];
+
+// The depth sentence of "How to read a control", counted from the data.
+const depthLine = [
+  counts.specified > 0 ? `${counts.specified} specified` : '',
+  counts.derived > 0 ? `${counts.derived} derived from chapter 23` : '',
+  counts.stub > 0 ? `${counts.stub} draft outline${counts.stub === 1 ? '' : 's'}` : '',
+]
+  .filter(Boolean)
+  .join(', ');
+
+const setId = `${pageUrl}#profile`;
+const jsonLd = [
+  {
+    '@type': 'TechArticle',
+    '@id': `${pageUrl}#article`,
+    headline: profile.title,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    version: profile.version,
+    creativeWorkStatus: 'Draft',
+    datePublished: profile.published,
+    dateModified: profile.updated,
+    image: new URL('/og/controls.png', site.url).href,
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    ...(sources.length > 0 ? { citation: sources.map((s) => s.url) } : {}),
+    isBasedOn: [
+      agentChapter,
+      '/bok/incidents',
+      '/bok/governing-development',
+      ...[...new Set(rows.flatMap((c) => c.patterns))].map((slug) => `/patterns/${slug}`),
+    ].map((p) => new URL(p, site.url).href),
+    about: { '@id': setId },
+  },
+  {
+    '@type': 'DefinedTermSet',
+    '@id': setId,
+    name: profile.title,
+    description: profile.summary,
+    url: pageUrl,
+    inLanguage: 'en',
+    version: profile.version,
+    hasDefinedTerm: rows.map((c) => ({
+      '@type': 'DefinedTerm',
+      '@id': new URL(controlPath(c), site.url).href,
+      termCode: c.id,
+      name: c.title,
+      description: c.objective,
+      url: new URL(controlPath(c), site.url).href,
+      inDefinedTermSet: { '@id': setId },
+    })),
+  },
+];
+---
+
+<Doc
+  title={profile.title}
+  seoTitle={seoTitle}
+  summary={profile.summary}
+  description={description}
+  crumbs={crumbs}
+  headings={headings}
+  sidebar={false}
+  image="/og/controls.png"
+  jsonLd={jsonLd}
+  article={{ publishedTime: `${profile.published}T00:00:00Z`, modifiedTime: `${profile.updated}T00:00:00Z` }}
+>
+  <div class="cp-head" data-pagefind-ignore>
+    <Byline date={profile.updated} dateLabel="Updated" published={profile.published} />
+    <StatusLine version={profile.version} status={profile.status} reviewers={reviewers} />
+  </div>
+
+  <Callout kind="note" title="Draft for review, not a claim of conformity">
+    <p>
+      These are draft control specifications, open for technical review. They are illustrative:
+      not legal advice, not a standard and binding on no one. Nothing here is marked reviewed until
+      a named reviewer has reviewed it. <a href="/controls">About the open control profiles</a>.
+    </p>
+  </Callout>
+
+  <h2 id="scope">Scope</h2>
+  <p>{profile.scope}</p>
+  <p>
+    {rows.length} controls, {rows[0].id} to {rows[rows.length - 1].id}. Each one is anchored to a
+    layer of <a href="/stack">the five-layer stack</a> and to the <a href="/patterns">patterns</a>
+    that implement it.
+  </p>
+
+  <h2 id="how-to-read-a-control">How to read a control</h2>
+  <p>
+    Every control has a stable id that never changes and is never reused, and the same record:
+  </p>
+  <ul>
+    <li><strong>Objective</strong>: the outcome the control secures, in one sentence.</li>
+    <li><strong>Failure modes</strong>: observable events that mean the control failed.</li>
+    <li>
+      <strong>Scope</strong>, <strong>enforcement points</strong> (on a pull request, at deploy,
+      at runtime or on a schedule) and the <strong>failure response</strong> (deny, hold for
+      approval or alert).
+    </li>
+    <li>
+      <strong>Verification</strong>: how a third party would check it (inspect, test, observe or
+      attest).
+    </li>
+    <li><strong>Evidence</strong>: the artefact it leaves and the stack layer that keeps it.</li>
+    <li>
+      <strong>Mappings</strong>: obligations, ISO/IEC 42001 Annex A, the NIST AI RMF, OWASP and
+      other references, each id checked against the site's registers.
+    </li>
+  </ul>
+  <p>
+    Depth says how far a control is written. <strong>{depthLabels.specified}</strong>: a
+    verification procedure, evidence, implementation notes and an observation example.
+    <strong>{depthLabels.derived}</strong>: one agent control of
+    <a href={agentChapter}>chapter 23</a> restated as a control, adding nothing the chapter does
+    not say. <strong>{depthLabels.stub}</strong>: objective, failure modes, scope and open
+    questions only. This profile: {depthLine}.
+  </p>
+  <p>
+    An observation is what a check of a control would emit: the control id, the subject checked,
+    what was expected, what was observed, a status (pass, fail or unknown), a timestamp and the
+    evidence behind it.
+  </p>
+
+  {rows.map((c, i) => <ControlRecord control={c} profile={profile} sources={sources} index={i} />)}
+
+  <h2 id="mappings">Mappings</h2>
+  <p>
+    Every control against the obligations, standards and threats it answers. Mappings are
+    illustrative, not a claim of conformity; an empty cell means no mapping has been verified yet.
+  </p>
+  <div class="res-tablewrap cp-tablewrap" role="region" aria-labelledby="mappings" tabindex="0">
+    <table class="res-table cp-table">
+      <caption class="visually-hidden">
+        Mappings of the {profile.shortTitle.toLowerCase()} controls to obligations, ISO/IEC 42001,
+        the NIST AI RMF, OWASP, AIUC-1 and the stack layer
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Control</th>
+          <th scope="col">Obligations</th>
+          <th scope="col">ISO/IEC 42001</th>
+          <th scope="col">NIST AI RMF</th>
+          <th scope="col">OWASP</th>
+          <th scope="col">AIUC-1</th>
+          <th scope="col">Layer</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          mappings.map((r) => (
+            <tr>
+              <td class="c-name" data-label="Control">
+                <a href={`#${controlAnchor(r.control)}`}>{r.control.id}</a> {r.control.title}
+              </td>
+              <td class="cp-ids" data-label="Obligations">{r.obligations.join(', ') || 'None yet'}</td>
+              <td class="cp-ids" data-label="ISO/IEC 42001">{r.iso42001.join(', ') || 'None yet'}</td>
+              <td class="cp-ids" data-label="NIST AI RMF">{r.nistAiRmf.join(', ') || 'None yet'}</td>
+              <td class="cp-ids" data-label="OWASP">{r.owasp.join(', ') || 'None yet'}</td>
+              <td class="cp-ids" data-label="AIUC-1">{r.aiuc1.join(', ') || 'None yet'}</td>
+              <td class="c-layers" data-label="Layer">{r.layer}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="open-questions">Open questions</h2>
+  {
+    questions.length > 0 ? (
+      <>
+        <p>The questions this draft leaves open, with the controls that raise each one.</p>
+        <ul class="cp-questions">
+          {questions.map((q) => (
+            <li>
+              {q.question}{' '}
+              <span class="cp-qids">
+                (
+                {q.controls.map((c, i) => (
+                  <>
+                    {i > 0 && ', '}
+                    <a href={`#${controlAnchor(c)}`}>{c.id.slice(-3)}</a>
+                  </>
+                ))}
+                )
+              </span>
+            </li>
+          ))}
+        </ul>
+      </>
+    ) : (
+      <p>No open questions are recorded yet.</p>
+    )
+  }
+
+  <h2 id="changelog">Changelog</h2>
+  <ul>
+    {
+      profile.changelog.map((e) => (
+        <li>
+          <strong>v{e.version}</strong> (<time datetime={e.date}>{e.date}</time>): {e.note}
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2 id="sources">Sources</h2>
+  {
+    sources.length > 0 ? (
+      <div class="cp-sources">
+        <SourceList sources={sources} prefix="src" />
+      </div>
+    ) : (
+      <p>No sources are cited yet: the controls of this draft cite theirs as they are specified.</p>
+    )
+  }
+
+  <h2 id="machine-readable">Machine-readable</h2>
+  <ul>
+    <li>
+      Each control as JSON, for example{' '}
+      <a href={`/api/v1/controls/${controlAnchor(rows[0])}.json`} data-umami-event="control-download" data-umami-event-control={rows[0].id}>
+        {rows[0].id}
+      </a>
+      : the link sits at the foot of every control above.
+    </li>
+    {
+      machine.map((l) => (
+        <li>
+          <a href={l.href} {...(l.event ? { 'data-umami-event': l.event } : {})}>
+            {l.label}
+          </a>
+          : {l.note}.
+        </li>
+      ))
+    }
+    <li>
+      This page as Markdown: <a href={`${path}.md`}>{path}.md</a>. Every dataset of the site is in
+      the <a href="/resources/data">open data API</a>.
+    </li>
+  </ul>
+
+  <h2 id="review">Review this profile</h2>
+  <p>
+    Review happens in the open, on GitHub. Pick a control, check it against a system you run or
+    know, and say what is wrong or missing: an objective that cannot be verified, a failure mode
+    that is not observable, a mapping that does not hold. Each control has its own button above;
+    this one reviews the profile as a whole, through the <a href={issueForm}>control review form</a>.
+  </p>
+  <ContributeCta kind="control" title={`${profile.title} v${profile.version}`} />
+
+  <Citation title={citeTitle} url={path} kind="page" />
+</Doc>
+
+<style>
+  .cp-head {
+    margin: 0 0 var(--s-5);
+  }
+
+  .cp-head :global(.byline) {
+    margin-top: 0;
+  }
+
+  .cp-head :global(.status-line) {
+    margin: var(--s-2) 0 0;
+  }
+
+  /* The mappings table sits in the reading well: the res-table look, not the
+     prose table's full grid, and the ids may break at any point on a phone. */
+  .cp-tablewrap {
+    margin-top: var(--s-5);
+  }
+
+  .cp-table th,
+  .cp-table td {
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+  }
+
+  .cp-table .c-name {
+    min-width: 14rem;
+  }
+
+  .cp-ids {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+    overflow-wrap: anywhere;
+  }
+
+  .cp-qids {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+  }
+
+  .cp-questions li + li {
+    margin-top: var(--s-2);
+  }
+
+  /* Long bare URLs in the numbered sources wrap inside the well at 390px. */
+  .cp-sources :global(a) {
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 720px) {
+    .cp-table td {
+      border: 0;
+    }
+
+    .cp-table .c-name {
+      min-width: 0;
+    }
+  }
+</style>
