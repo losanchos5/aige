@@ -1,0 +1,30 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
+  "control_id": "AIGE-CTL-EVAL-007",
+  "profile": "evaluation-environment",
+  "control_version": "0.2",
+  "subject": "run-88261@2026-09-26",
+  "subject_kind": "eval-run",
+  "expected": "After an incident is declared, the environment snapshot, trace, transcript and configuration of the run are frozen with their hashes before any reset, the incident record links them, and every transcript gap is recorded.",
+  "observed": "Freeze drill on run 88261: environment snapshot, trace, transcript and configuration captured with their hashes 42 s after the test incident was declared and before the reset; a delete request on the frozen trace was refused; the incident record lists all four hashes.",
+  "status": "pass",
+  "timestamp": "2026-09-26T15:10:33Z",
+  "enforcement_point": "periodic",
+  "verification_kind": "test",
+  "observer": "incident-freeze-drill",
+  "evidence": [
+    {
+      "artefact": "freeze record of run 88261",
+      "url": "https://evidence.example/runs/88261/freeze.json",
+      "hash": "sha256:e1a82a68fdc110fbd11ae5e3079dec9530ffe52daf624040adb38ee9ca190457",
+      "schema": "https://aigovernanceengineer.com/schemas/evidence-record.v1.json"
+    },
+    {
+      "artefact": "incident record of the drill",
+      "url": "https://evidence.example/incidents/drill-88261.json",
+      "schema": "https://aigovernanceengineer.com/schemas/incident-record.v1.json"
+    }
+  ],
+  "run_id": "88261",
+  "notes": "Illustrative example, not the result of a real evaluation."
+}
