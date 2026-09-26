@@ -12,6 +12,7 @@
 import { chaptersOrdered, type Chapter } from '../data/chapters';
 import { cases, type IncidentCase } from '../data/cases';
 import { comparisons, comparisonPath } from '../data/comparisons';
+import { profiles, profilePath } from '../data/controls';
 import { patterns, patternPath } from '../data/patterns';
 import { researchPath, writtenThemes } from '../data/research';
 import { site } from '../data/site';
@@ -200,6 +201,7 @@ export function markdownAlternateFor(pathname: string): string | null {
     ...getGlossary().map((entry) => entry.url),
     ...cases.map((entry) => casePath(entry)),
     ...comparisons.map((c) => comparisonPath(c)),
+    ...profiles.map(profilePath),
     ROLE_PATH,
     '/thesis',
     ...writtenThemes().map(researchPath),

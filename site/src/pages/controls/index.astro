@@ -1,42 +1,126 @@
 ---
-// /controls: STUB of the open control profiles index (block orp-shell, open
-// reference project). It carries the final title and description and every
-// anchor the other pages of the change link to (intro, chain, properties,
-// profiles, by-layer with layer-1..layer-5, ecosystem, adoption,
-// how-to-review), and links both profile pages from <main> so the footer
-// sitemap check reaches them. Block orp-controls-pages replaces the body with
-// the page built on the control registry.
+// /controls: the open control profiles (src/data/controls), the landing that
+// explains what a profile is and lists the profiles. The chain from a concept
+// to the evidence a control leaves (FlowDiagram), the seven properties every
+// control is written to meet, one card per profile with its state and counts,
+// every control by its home layer of the stack, how the profiles relate to
+// certification schemes and frameworks, how to adopt one and how to review a
+// control. Every number is computed from the registry.
+//
+// Anchors other pages link to: intro, chain, properties, profiles, by-layer
+// (h3 layer-1..layer-5), ecosystem, adoption, how-to-review. The build fails on
+// any broken reference in the registry (controlProblems). The controls dataset
+// and the observation schema are linked only when they exist in the same build
+// (lib/controls-md.ts machineLinks).
 import Marketing from '../../layouts/Marketing.astro';
 import PageHero from '../../components/PageHero.astro';
 import Section from '../../components/Section.astro';
-import { site } from '../../data/site';
+import RegisterList from '../../components/RegisterList.astro';
+import FlowDiagram from '../../components/FlowDiagram.astro';
+import StatusLine from '../../components/StatusLine.astro';
+import ContributeCta from '../../components/ContributeCta.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import {
+  profiles,
+  controls,
+  controlsIn,
+  controlsForLayer,
+  controlPath,
+  controlProblems,
+  profilePath,
+  depthLabels,
+} from '../../data/controls';
 import { layers } from '../../data/stack';
-import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
-import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { site } from '../../data/site';
+import { depthCounts, profileReviewers, machineLinks } from '../../lib/controls-md';
+import { collectionPage, lastModified } from '../../lib/jsonld';
 import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/pages.css';
 
 const seoTitle = 'Open AI governance controls';
 const description =
   'Open control profiles for AI governance: each control with its evidence, mapped to the five-layer stack and reviewed in the open. Versioned and CC BY 4.0.';
-const crumbs = [{ label: 'Open control profiles' }];
-const pageUrl = new URL('/controls', site.url).href;
-const pad = (n: number) => String(n).padStart(2, '0');
 
-const jsonLd = [
-  {
-    '@type': 'WebPage',
-    '@id': `${pageUrl}#page`,
-    name: seoTitle,
-    description,
-    url: pageUrl,
-    inLanguage: 'en',
-    isPartOf: { '@id': WEBSITE_ID },
-    publisher: { '@id': ORG_ID },
-    author: [...authorRefs],
-  },
-  breadcrumbJsonLd(crumbs),
+const problems = controlProblems();
+if (problems.length > 0) {
+  throw new Error(`controls: ${problems.length} problem(s) in the registry:\n${problems.join('\n')}`);
+}
+
+const pad = (n: number) => String(n).padStart(2, '0');
+const issueForm = `${site.github}/issues/new?template=control-review.yml`;
+const machine = machineLinks();
+const firstProfile = profiles[0];
+
+const chain = [
+  { label: 'Concept', sub: 'What governance means for the system', href: '/bok/definition' },
+  { label: 'Pattern', sub: 'A reusable way to build it', href: '/patterns' },
+  { label: 'Control', sub: 'What must hold, and how to check it', href: '#profiles' },
+  { label: 'Implementation', sub: 'The tool or config that enforces it', href: '/toolkit' },
+  { label: 'Evidence', sub: 'The record a third party can read', href: '/resources/templates', layer: 5 as const },
 ];
+
+const properties = [
+  {
+    title: 'One objective',
+    description: 'The outcome it secures, in one sentence a reviewer can hold it to.',
+  },
+  {
+    title: 'Named failure modes',
+    description: 'The observable events that mean it failed, not only what it intends.',
+  },
+  {
+    title: 'An enforcement point',
+    description: 'Where it acts: on a pull request, at deploy, at runtime or on a schedule.',
+  },
+  {
+    title: 'A verification someone else can run',
+    description: 'How a third party who did not build it would check it: inspect, test, observe or attest.',
+  },
+  {
+    title: 'Evidence it leaves',
+    description: 'The artefact it produces and the stack layer that keeps it, in a machine-readable shape where one exists.',
+  },
+  {
+    title: 'A failure response',
+    description: 'What happens when it fails: deny the action, hold it for a human decision or raise an alert.',
+  },
+  {
+    title: 'Checked mappings and sources',
+    description: 'The obligations, standards and threats it answers, each id checked against the site registers, and the sources it rests on.',
+  },
+];
+
+const profileCards = profiles.map((profile) => {
+  const counts = depthCounts(profile.slug);
+  const parts = [
+    counts.specified > 0 ? `${counts.specified} ${depthLabels.specified.toLowerCase()}` : '',
+    counts.derived > 0 ? `${counts.derived} derived from chapter 23` : '',
+    counts.stub > 0 ? `${counts.stub} draft outline${counts.stub === 1 ? '' : 's'}` : '',
+  ].filter(Boolean);
+  const rows = controlsIn(profile.slug);
+  return {
+    profile,
+    total: rows.length,
+    range: `${rows[0].id} to ${rows[rows.length - 1].id}`,
+    breakdown: parts.join(', '),
+    reviewers: profileReviewers(profile),
+  };
+});
+
+const byLayer = layers.map((layer) => ({ layer, rows: controlsForLayer(layer.n) }));
+
+const jsonLd = collectionPage({
+  path: '/controls',
+  name: seoTitle,
+  description,
+  dateModified: lastModified(
+    'src/pages/controls/index.astro',
+    'src/data/controls/index.ts',
+    'src/data/controls/evaluation-environment.ts',
+    'src/data/controls/agent-runtime.ts',
+  ),
+  items: profiles.map((profile) => ({ name: profile.title, url: profilePath(profile) })),
+});
 ---
 
 <Marketing
@@ -47,71 +131,324 @@ const jsonLd = [
   jsonLd={jsonLd}
 >
   <PageHero
-    variant="res"
-    crumbs={crumbs}
-    title="Open control profiles"
-    lede="Draft control specifications for AI systems: what each control requires, where it is enforced and the evidence it leaves. This page is being prepared; the first two draft profiles are published in the next release."
+    variant="page"
+    related={{ label: 'Chapter 23 · Governing AI agents', href: '/bok/governing-agents' }}
+    title="Open control profiles: reference controls for AI systems."
+    lede="Draft control specifications for AI systems, open for technical review: what each control requires, where it is enforced, how a third party would verify it and the evidence it leaves, with a JSON version and an observation schema. Illustrative, not a claim of conformity."
   />
 
-  <Section tone="plain" id="intro" title="What a control profile is">
-    <p><!-- orp-stub -->
-      A control profile is a versioned set of reference controls for one kind of system, each
-      anchored to a layer of <a href="/stack">the five-layer stack</a> and to the
-      <a href="/patterns">patterns</a> that implement it. Illustrative, not a claim of conformity.
-    </p>
+  <Section tone="plain" id="intro" title="What a control profile is.">
+    <div class="well">
+      <p>
+        A control profile is a versioned set of reference controls for one kind of system: the
+        environment a model or agent is evaluated in, or an agent acting in production. Each
+        control is anchored to a layer of <a href="/stack">the five-layer stack</a> and to the
+        <a href="/patterns">patterns</a> that implement it, and it states the evidence it leaves
+        in a shape a machine can read.
+      </p>
+      <p>
+        The profiles are draft control specifications, written in the open and licensed
+        {site.license}. Every control keeps a stable id, every change is in the changelog, and
+        nothing is marked reviewed until a named reviewer has reviewed it. They are illustrative,
+        not a claim of conformity and not legal advice.
+      </p>
+    </div>
   </Section>
 
-  <Section tone="tint" id="chain" title="From concept to evidence">
-    <p>
-      The chain from a concept to a pattern, a control, an implementation and the evidence it
-      leaves is drawn here in the next release.
-    </p>
+  <Section
+    tone="mesh"
+    mesh="b"
+    id="chain"
+    title="From concept to evidence."
+    lede="A control is the step where an idea from the Body of Knowledge becomes something a system must do and a reviewer can check."
+  >
+    <FlowDiagram
+      steps={chain}
+      title="From concept to evidence"
+      desc="A concept is built by a pattern, stated as a control, enforced by an implementation and proven by the evidence it leaves."
+    />
   </Section>
 
-  <Section tone="plain" id="properties" title="What makes a control useful">
-    <p>The properties every control in these profiles is written to meet are listed here in the next release.</p>
+  <Section tone="plain" id="properties" title="Seven properties of a useful control.">
+    <div class="well"><RegisterList items={properties} /></div>
   </Section>
 
-  <Section tone="tint" id="profiles" title="Profiles">
-    <p>Two profiles are in preparation, both drafts open for technical review:</p>
-    <ul>
-      <li><a href="/controls/evaluation-environment">Evaluation Environment Control Profile</a> (draft v0.1)</li>
-      <li><a href="/controls/agent-runtime">Agent Runtime Control Profile</a> (draft v0.1)</li>
+  <Section
+    tone="tint"
+    id="profiles"
+    title="Profiles."
+    lede={`${controls.length} reference controls across ${profiles.length} profiles, all drafts open for technical review.`}
+  >
+    <ul class="cp-cards" role="list">
+      {
+        profileCards.map((card) => (
+          <li class="cp-card card-lum">
+            <h3 class="cp-card-title">
+              <a href={profilePath(card.profile)}>{card.profile.title}</a>
+            </h3>
+            <StatusLine
+              version={card.profile.version}
+              status={card.profile.status}
+              reviewers={card.reviewers}
+              updated={card.profile.updated}
+            />
+            <p class="cp-card-summary">{card.profile.summary}</p>
+            <p class="cp-card-count">
+              {card.total} controls ({card.range}): {card.breakdown}.
+            </p>
+          </li>
+        ))
+      }
     </ul>
   </Section>
 
-  <Section tone="plain" id="by-layer" title="Controls by stack layer">
-    <p>Each control is anchored to one layer of the stack; the controls of each layer are listed here in the next release.</p>
+  <Section
+    tone="plain"
+    id="by-layer"
+    title="Controls by stack layer."
+    lede="Each control has one home layer of the stack, where it is enforced or where its evidence is kept."
+  >
     {
-      layers.map((layer) => (
-        <>
-          <h3 id={`layer-${layer.n}`}>
+      byLayer.map(({ layer, rows }) => (
+        <div class="cp-layer" style={`--cp-l: var(${layer.colorVar})`}>
+          <h3 id={`layer-${layer.n}`} class="cp-layer-title">
+            <span class="cp-swatch" aria-hidden="true" />
             Layer {pad(layer.n)}: {layer.name}
           </h3>
-          <p>
-            No controls are listed for this layer yet. Read{' '}
-            <a href={`/bok/the-stack#${layer.chapterAnchor}`}>layer {pad(layer.n)} in chapter 04</a>.
-          </p>
-        </>
+          {rows.length > 0 ? (
+            <ul class="cp-layer-list">
+              {rows.map((c) => (
+                <li>
+                  <a href={controlPath(c)}>
+                    <span class="cp-id">{c.id}</span> {c.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p class="cp-layer-empty">
+              No control has this layer as its home layer yet. Read{' '}
+              <a href={`/bok/the-stack#${layer.chapterAnchor}`}>layer {pad(layer.n)} in chapter 04</a>.
+            </p>
+          )}
+        </div>
       ))
     }
   </Section>
 
-  <Section tone="tint" id="ecosystem" title="How the profiles relate to frameworks">
-    <p>
-      How these open profiles map to existing frameworks and certification schemes is set out
-      here in the next release. This project certifies nothing.
-    </p>
+  <Section tone="tint" id="ecosystem" title="How these profiles relate to certifications and frameworks.">
+    <div class="well">
+      <p>
+        Several public schemes already say what an AI system should control. The profiles here do
+        not replace any of them: they are an open implementation layer, the controls an engineer
+        builds and the evidence they leave, mapped to those schemes where the mapping has been
+        checked.
+      </p>
+      <ul>
+        <li>
+          <a href="https://aiuc-1.com/" rel="noopener">AIUC-1</a>, a standard of the Artificial
+          Intelligence Underwriting Company for AI agents: 53 requirements in six domains, with
+          certification by accredited auditors.
+        </li>
+        <li>
+          <a href="https://www.iso.org/standard/81230.html" rel="noopener">ISO/IEC 42001:2023</a>,
+          the AI management system standard, whose Annex A lists reference controls.
+        </li>
+        <li>
+          The <a href="https://www.nist.gov/itl/ai-risk-management-framework" rel="noopener">NIST AI
+          Risk Management Framework</a>, organised in the Govern, Map, Measure and Manage functions and
+          their subcategories.
+        </li>
+        <li>
+          The <a href="https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1" rel="noopener">CSA AI
+          Controls Matrix</a> of the Cloud Security Alliance.
+        </li>
+      </ul>
+      <p>
+        Each control lists its mappings, and each profile page gathers them in one table. This
+        project is not affiliated with AIUC, ISO, NIST or the Cloud Security Alliance, and following
+        a profile here is not conformity with any of their schemes. See also
+        <a href="/resources/frameworks">the frameworks</a> and
+        <a href="/resources/crosswalk">the crosswalk</a>.
+      </p>
+    </div>
   </Section>
 
-  <Section tone="plain" id="adoption" title="Adopting a profile">
-    <p>How a team can adopt a profile step by step, starting from the layer it already runs, is set out here in the next release.</p>
+  <Section tone="plain" id="adoption" title="How to adopt a profile.">
+    <ol class="cp-steps well">
+      <li>
+        <strong>Pick the profile that matches the system.</strong> An evaluation harness and the
+        environment around it take the
+        <a href={profilePath('evaluation-environment')}>evaluation environment profile</a>; an agent
+        that acts through tools in production takes the
+        <a href={profilePath('agent-runtime')}>agent runtime profile</a>.
+      </li>
+      <li>
+        <strong>Map each control to your maturity level.</strong> Mark which controls you already
+        run, which you can evidence and which are gaps, level by level of
+        <a href="/bok/maturity-model">the maturity model</a>.
+      </li>
+      <li>
+        <strong>Use the mappings.</strong> Each control names the obligations, standards and
+        threats it answers, so a gap reads straight onto <a href="/obligations">the obligation
+        register</a>.
+      </li>
+      <li>
+        <strong>Emit observations.</strong> Record every check of a control as an observation
+        (control id, subject, expected, observed, status, timestamp and evidence), so the result is
+        evidence a third party can read, not a claim.
+      </li>
+    </ol>
   </Section>
 
-  <Section tone="tint" id="how-to-review" title="How to review a control">
-    <p>
-      Every control will be open for technical review through an issue form. Until then, see
-      <a href="/contribute">how to contribute</a>.
-    </p>
+  <Section tone="tint" id="how-to-review" title="How to review a control.">
+    <div class="well">
+      <p>
+        Every control is open for technical review. Pick one, check it against a system you run or
+        know, and open the <a href={issueForm}>control review form</a> on GitHub: say what is
+        wrong or missing, with the evidence. Reviews, their answers and every change stay public.
+      </p>
+      <ul>
+        {
+          machine.map((l) => (
+            <li>
+              <a href={l.href} {...(l.event ? { 'data-umami-event': l.event } : {})}>
+                {l.label}
+              </a>
+              : {l.note}.
+            </li>
+          ))
+        }
+        <li>
+          Each profile page links every control as JSON, and the whole site's data is in
+          <a href="/resources/data">the open data API</a> and on <a href="/mcp">the MCP server</a>.
+        </li>
+      </ul>
+    </div>
+    <div class="cp-review-cta">
+      <ContributeCta kind="control" title="Open control profiles" />
+    </div>
   </Section>
+
+  <CtaBand
+    title="Read the first profile."
+    sub={`${firstProfile.title}, v${firstProfile.version}: ${controlsIn(firstProfile.slug).length} draft controls for the environment a model or agent is evaluated in.`}
+    primary={{ label: 'Read the first profile', href: profilePath(firstProfile) }}
+    secondary={{ label: 'Review on GitHub', href: issueForm }}
+  />
 </Marketing>
+
+<style>
+  .cp-cards {
+    display: grid;
+    gap: var(--s-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 760px) {
+    .cp-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .cp-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding: var(--s-5);
+  }
+
+  .cp-card-title {
+    margin: 0;
+    font-size: var(--fs-h3);
+  }
+
+  .cp-card-title a {
+    color: var(--ink);
+  }
+
+  .cp-card :global(.status-line) {
+    margin: 0;
+  }
+
+  .cp-card-summary,
+  .cp-card-count {
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  .cp-card-count {
+    font-size: var(--fs-small);
+  }
+
+  .cp-layer + .cp-layer {
+    margin-top: var(--s-6);
+  }
+
+  .cp-layer-title {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0 0 var(--s-3);
+    font-size: var(--fs-h3);
+  }
+
+  .cp-swatch {
+    flex: none;
+    width: 0.75em;
+    height: 0.75em;
+    border-radius: 2px;
+    background: var(--cp-l);
+  }
+
+  .cp-layer-list {
+    margin: 0;
+    padding-left: 1.1em;
+  }
+
+  .cp-layer-list li + li {
+    margin-top: var(--s-1);
+  }
+
+  @media (min-width: 900px) {
+    .cp-layer-list {
+      columns: 2;
+      column-gap: var(--s-7);
+    }
+
+    .cp-layer-list li {
+      break-inside: avoid;
+    }
+  }
+
+  .cp-layer-list a {
+    color: var(--ink);
+  }
+
+  .cp-id {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+    margin-right: var(--s-1);
+  }
+
+  .cp-layer-empty {
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  .cp-steps {
+    margin: 0;
+    padding-left: 1.4em;
+  }
+
+  .cp-steps li + li {
+    margin-top: var(--s-3);
+  }
+
+  .cp-review-cta {
+    margin-top: var(--s-5);
+  }
+</style>
