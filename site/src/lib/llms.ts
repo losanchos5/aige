@@ -13,6 +13,7 @@ import { chaptersOrdered, type Chapter } from '../data/chapters';
 import { cases, type IncidentCase } from '../data/cases';
 import { comparisons, comparisonPath } from '../data/comparisons';
 import { patterns, patternPath } from '../data/patterns';
+import { researchPath, writtenThemes } from '../data/research';
 import { site } from '../data/site';
 import { getGlossary } from './glossary';
 import { stripInline } from './md-parse';
@@ -123,9 +124,9 @@ export function approxTokens(text: string): string {
 // Every English content page with a Markdown source (the pillar page
 // /ai-governance, the chapters, the pattern pages, the glossary terms, the
 // incident cases, the framework comparisons under /resources/crosswalk, the
-// role landing /role and the Thesis) is also served as clean Markdown at its URL
-// plus `.md` (/bok/definition.md), for agents and assistants that read Markdown
-// better than HTML. Seo.astro advertises it with
+// role landing /role, the Thesis and the research notes) is also served as
+// clean Markdown at its URL plus `.md` (/bok/definition.md), for agents and
+// assistants that read Markdown better than HTML. Seo.astro advertises it with
 // <link rel="alternate" type="text/markdown">; /llms.txt lists it.
 
 /** Canonical path of the pillar page, "What is AI governance?" (guides/ai-governance.md). */
@@ -148,6 +149,8 @@ export interface MarkdownMeta {
   path: string;
   /** YYYY-MM-DD of the last commit to the page's source. */
   updated: string;
+  /** The document's own version (a research note's); default: the Body of Knowledge version. */
+  version?: string;
 }
 
 /**
@@ -164,7 +167,7 @@ export function markdownDocument(meta: MarkdownMeta, body: string): string {
     `author: ${JSON.stringify(site.authors.join(', '))}`,
     `license: ${JSON.stringify(`${site.license} (${site.licenseUrl})`)}`,
     `doi: https://doi.org/${site.doi}`,
-    `version: ${JSON.stringify(site.bokVersion)}`,
+    `version: ${JSON.stringify(meta.version ?? site.bokVersion)}`,
     `updated: ${meta.updated}`,
     '---',
     '',
@@ -199,6 +202,7 @@ export function markdownAlternateFor(pathname: string): string | null {
     ...comparisons.map((c) => comparisonPath(c)),
     ROLE_PATH,
     '/thesis',
+    ...writtenThemes().map(researchPath),
   ]);
   const clean = pathname.replace(/\.html$/, '').replace(/\/index$/, '').replace(/\/+$/, '');
   return markdownPaths.has(clean) ? `${clean}.md` : null;

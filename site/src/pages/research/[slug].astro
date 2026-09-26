@@ -1,87 +1,194 @@
 ---
-// /research/<slug>: STUB of a research note page (block orp-shell, open
-// reference project), one per written theme of src/data/research.ts. It
-// carries the note's title, a description built from the theme's question and
-// every anchor other pages link to (abstract, related-controls,
-// review-this-note, cite). Block orp-research replaces it with the page that
-// renders ../research/<slug>.md.
-import type { GetStaticPaths } from 'astro';
-import Marketing from '../../layouts/Marketing.astro';
-import PageHero from '../../components/PageHero.astro';
-import Section from '../../components/Section.astro';
+// /research/<slug>: one page per written research note, rendered from
+// research/<slug>.md with the reading layout (Doc, no chapter rail): breadcrumb,
+// on-this-page TOC, the note's status line (version, state, review), its own
+// numbered sources (rehype-citations), then the controls and patterns it
+// argues for, the review call and a cite block that carries the note's own
+// version. lib/research-pages.ts fails the build when a note, its theme in
+// data/research.ts and the people, controls and patterns it names disagree.
+// No Byline: the ChapterHeader already names the author under the H1.
+import { render } from 'astro:content';
+import Doc from '../../layouts/Doc.astro';
+import StatusLine from '../../components/StatusLine.astro';
+import PillarLink from '../../components/PillarLink.astro';
+import ContributeCta from '../../components/ContributeCta.astro';
+import Citation from '../../components/Citation.astro';
 import { site } from '../../data/site';
-import { researchPath, writtenThemes, type ResearchTheme } from '../../data/research';
-import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
-import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
-import { fitsSiteSuffix } from '../../lib/seo-title';
-import '../../styles/pages.css';
+import { controlById, controlHref } from '../../data/controls';
+import { getPatternBySlug, patternPath } from '../../data/patterns';
+import { personById } from '../../data/people';
+import { researchPath } from '../../data/research';
+import { loadResearchPages, researchCitations, type ResearchPage } from '../../lib/research-pages';
+import { gitCreated, gitDate } from '../../lib/reading';
+import { authorNodes, doiIdentifier, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 
-export const getStaticPaths = (() =>
-  writtenThemes().map((theme) => ({ params: { slug: theme.slug }, props: { theme } }))) satisfies GetStaticPaths;
+export async function getStaticPaths() {
+  const pages = await loadResearchPages();
+  return pages.map((page) => ({ params: { slug: page.theme.slug }, props: { page } }));
+}
 
 interface Props {
-  theme: ResearchTheme;
+  page: ResearchPage;
 }
 
-const { theme } = Astro.props;
-const seoTitle = theme.title;
-// The theme's question, then the note's state: a meta description of 110 to
-// 158 characters that says what the page answers and that it is a draft.
-const description = `${theme.question} A draft note, open for review.`;
-if (description.length < 110 || description.length > 158) {
-  throw new Error(`/research/${theme.slug}: description is ${description.length} characters, want 110 to 158`);
-}
-const crumbs = [{ label: 'Research notes', href: '/research' }, { label: theme.title }];
+const { page } = Astro.props;
+const { entry, theme } = page;
+const d = entry.data;
+const { Content, headings } = await render(entry);
+
 const path = researchPath(theme);
 const pageUrl = new URL(path, site.url).href;
+const editPath = `research/${theme.slug}.md`;
+// The note's own dates win over git's: the frontmatter says when the text was
+// first published and last revised; a later commit (a typo, a link) moves the
+// modified date forward, never back.
+const noteUpdated = d.updated ?? d.date;
+const published = [d.date, gitCreated(`../${editPath}`)].sort()[0] ?? d.date;
+const updated = [gitDate(`../${editPath}`), noteUpdated].sort().at(-1) ?? noteUpdated;
+
+const authors = d.authors.map((id) => personById(id)).filter((p) => p !== undefined);
+const reviewers = d.reviewers
+  .map((id) => personById(id))
+  .filter((p) => p !== undefined)
+  .map((p) => ({ name: p.name, href: p.href }));
+const controls = d.relatedControls.map((id) => controlById(id)).filter((c) => c !== undefined);
+const patternRows = d.relatedPatterns
+  .map((slug) => getPatternBySlug(slug))
+  .filter((p) => p !== undefined);
+
+const crumbs = [{ label: 'Research notes', href: '/research' }, { label: d.title }];
+
+// After the note's own headings (Abstract ... Sources), the sections this page adds.
+const related = [
+  ...(controls.length > 0 ? [{ depth: 2, slug: 'related-controls', text: 'Related controls' }] : []),
+  ...(patternRows.length > 0 ? [{ depth: 2, slug: 'related-patterns', text: 'Related patterns' }] : []),
+  { depth: 2, slug: 'review-this-note', text: 'Review this note' },
+  { depth: 2, slug: 'cite', text: 'Cite this note' },
+];
+
+const STATUS_LABEL: Readonly<Record<typeof d.status, string>> = {
+  draft: 'Draft',
+  review: 'In review',
+  published: 'Published',
+};
+
+const citations = researchCitations(entry.body ?? '');
 
 const jsonLd = [
   {
-    '@type': 'WebPage',
-    '@id': `${pageUrl}#page`,
-    name: seoTitle,
-    description,
+    '@type': 'ScholarlyArticle',
+    '@id': `${pageUrl}#article`,
+    headline: d.title,
+    name: d.title,
+    description: d.summary,
     url: pageUrl,
+    mainEntityOfPage: pageUrl,
     inLanguage: 'en',
-    isPartOf: { '@id': WEBSITE_ID },
+    datePublished: published,
+    dateModified: updated,
+    version: d.version,
+    creativeWorkStatus: STATUS_LABEL[d.status],
+    image: new URL('/og/research.png', site.url).href,
+    author: authors.map((person) => ({ '@id': person.jsonLdId ?? `${site.url}${person.href}` })),
     publisher: { '@id': ORG_ID },
-    author: [...authorRefs],
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    identifier: doiIdentifier(
+      site.conceptDoi,
+      'Concept DOI of the archived project; the note has no DOI of its own yet',
+    ),
+    ...(d.keywords && d.keywords.length > 0 ? { keywords: d.keywords.join(', ') } : {}),
+    ...(citations.length > 0 ? { citation: citations } : {}),
   },
-  breadcrumbJsonLd(crumbs),
+  ...authorNodes,
 ];
 ---
 
-<Marketing
-  title={seoTitle}
-  titleSuffix={fitsSiteSuffix(seoTitle)}
-  description={description}
+<Doc
+  title={d.title}
+  summary={d.summary}
+  description={d.summary}
+  crumbs={crumbs}
+  headings={[...headings, ...related]}
+  updated={updated}
+  editPath={editPath}
+  sidebar={false}
   image="/og/research.png"
   jsonLd={jsonLd}
+  article={{ publishedTime: `${published}T00:00:00Z`, modifiedTime: `${updated}T00:00:00Z` }}
 >
-  <PageHero
-    variant="res"
-    crumbs={crumbs}
-    title={theme.title}
-    lede="Draft note, open for technical review. This page is being prepared; the draft is published in the next release."
-  />
-
-  <Section tone="plain" id="abstract" title="Abstract">
-    <p><!-- orp-stub -->The question this note answers: {theme.question}</p>
-  </Section>
-
-  <Section tone="tint" id="related-controls" title="Related controls">
+  <StatusLine version={d.version} status={d.status} reviewers={reviewers} updated={noteUpdated} />
+  {/* Hub and spoke: each note points at the /ai-governance pillar once. */}
+  <PillarLink lead="A technical note on one open question of" anchor="AI governance engineering" />
+  <Content />
+  {
+    controls.length > 0 && (
+      <section aria-labelledby="related-controls">
+        <h2 id="related-controls">Related controls</h2>
+        <p>
+          The draft controls this note argues for. Each is a draft control specification, open for
+          technical review; none is a claim of conformity.
+        </p>
+        <ul>
+          {controls.map((c) => (
+            <li>
+              <a href={controlHref(c.id)}>
+                {c.id} {c.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  {
+    patternRows.length > 0 && (
+      <section aria-labelledby="related-patterns">
+        <h2 id="related-patterns">Related patterns</h2>
+        <p>The patterns of the catalogue that build the controls this note names.</p>
+        <ul>
+          {patternRows.map((p) => (
+            <li>
+              <a href={patternPath(p)}>{p.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+  <section aria-labelledby="review-this-note">
+    <h2 id="review-this-note">Review this note</h2>
     <p>
-      The note argues for controls of the draft
-      <a href="/controls/evaluation-environment">evaluation environment profile</a>; the list is
-      published with the note.
+      {
+        reviewers.length === 0
+          ? 'This note has not been reviewed yet. '
+          : `Reviewed by ${reviewers.map((r) => r.name).join(', ')}. `
+      }
+      If a claim is wrong, unsourced or overstated, say which one and why; a review that changes
+      the note is credited by name.
     </p>
-  </Section>
+    <ContributeCta kind="note" title={d.title} />
+  </section>
+  <section aria-labelledby="cite">
+    <h2 id="cite">Cite this note</h2>
+    <p>Cite the note with its version: a later version may change what it argues.</p>
+    <Citation
+      title={d.title}
+      url={path}
+      kind="page"
+      label="Cite this note"
+      version={d.version}
+      doi={site.conceptDoi}
+    />
+  </section>
+</Doc>
 
-  <Section tone="plain" id="review-this-note" title="Review this note">
-    <p>Technical review opens with the published draft. See <a href="/contribute">how to contribute</a>.</p>
-  </Section>
-
-  <Section tone="tint" id="cite" title="Cite this note">
-    <p>A citation with the note's version is published with the draft.</p>
-  </Section>
-</Marketing>
+<style>
+  /* The review button sits inside .prose, whose `.prose a` rule (ink text,
+     underline) outranks .btn-primary and would paint ink on ink. Restore the
+     button's own colours here; the same fix belongs in ContributeCta. */
+  :global(.prose .contrib a.btn-primary) {
+    color: var(--bg);
+    text-decoration: none;
+  }
+</style>
