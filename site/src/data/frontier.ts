@@ -23,10 +23,28 @@
 
 import type { LayerNumber } from './stack';
 import type { Source } from '../lib/sources';
-import { profileBySlug, profileIdRange } from './controls';
+import { controls, controlsIn, profileBySlug, profileIdRange } from './controls';
 
 /** The status line of a profile link, read from the registry: id range and version. */
 const profileVersion = (slug: string): string => profileBySlug(slug)?.version ?? '';
+
+/** A count as prose: "three", "nine", "12". */
+const countWord = (n: number): string =>
+  ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'][n] ?? String(n);
+
+// How many controls are specified in full, read from the registry: the
+// evaluation environment profile in its own section, every profile in #ecosystem.
+const evalRows = controlsIn('evaluation-environment');
+const evalSpecified = evalRows.filter((c) => c.depth === 'specified').length;
+const evalSpecifiedClause =
+  evalSpecified === evalRows.length
+    ? `all ${countWord(evalSpecified)} are specified in full`
+    : `${countWord(evalSpecified)} of them ${evalSpecified === 1 ? 'is' : 'are'} specified in full`;
+const specified = controls.filter((c) => c.depth === 'specified').length;
+const specifiedClause =
+  specified === controls.length
+    ? 'in full for every control'
+    : `in full for ${countWord(specified)} control${specified === 1 ? '' : 's'} so far, in draft for the rest`;
 
 export interface FrontierLink {
   title: string;
@@ -225,7 +243,7 @@ export const frontierBlocks: readonly FrontierBlock[] = [
     lede: 'An evaluation result is only as good as the environment that produced it.',
     paragraphs: [
       'The EU AI Act asks every provider of a general-purpose AI model to keep technical documentation of it (Art. 53) and, for models with systemic risk, to evaluate them, including conducting and documenting adversarial testing (Art. 55) [1]. The GPAI Code of Practice lists the capability to use tools, and affordances such as access to tools and the level of human oversight, among the model characteristics that bear on systemic risk [2]. Neither says what the environment around the model must enforce while it is being tested.',
-      "Public evaluation practice gives a starting point. METR's Task Standard (v0.5.0) states that, unless a task declares the full_internet permission, the task machines \"MUST NOT have internet access\" except to a small set of destinations such as an LLM API proxy [3]. METR's Guidelines for Capability Elicitation treat task bugs, such as incorrect automatic scoring or a crashed environment, as spurious failures to be fixed before a result is reported [4]. The evaluation environment profile turns such practices into numbered draft controls: egress, credentials, isolation, stop conditions and the run record, each with the point where it is enforced; three of them are specified in full, with a verification procedure and the evidence they leave.",
+      `Public evaluation practice gives a starting point. METR's Task Standard (v0.5.0) states that, unless a task declares the full_internet permission, the task machines \"MUST NOT have internet access\" except to a small set of destinations such as an LLM API proxy [3]. METR's Guidelines for Capability Elicitation treat task bugs, such as incorrect automatic scoring or a crashed environment, as spurious failures to be fixed before a result is reported [4]. The evaluation environment profile turns such practices into numbered draft controls: egress, credentials, isolation, stop conditions and the run record, each with the point where it is enforced; ${evalSpecifiedClause}, with a verification procedure and the evidence they leave.`,
     ],
     links: [
       { title: 'Evaluation environment control profile', description: `${profileIdRange('evaluation-environment')}, draft v${profileVersion('evaluation-environment')}, open for technical review.`, href: '/controls/evaluation-environment', layer: 3 },
@@ -299,7 +317,7 @@ export const frontierBlocks: readonly FrontierBlock[] = [
     lede: 'Schemes that already exist, and what an open implementation layer adds to them.',
     paragraphs: [
       'AIUC-1 lists 53 requirements in six domains, from data and privacy to society, two of them now marked retired [10]; its certificates are issued centrally on an audit report prepared by an accredited auditor [11]. ISO/IEC 42001 sets requirements for an AI management system [12], and ISO/IEC 42006 sets the requirements for the bodies that audit and certify against it [13]. The NIST AI RMF organises outcomes under govern, map, measure and manage [8].',
-      'These schemes say what must be true. The controls on this site add the engineering layer underneath: for each control, the point where it is enforced, how a third party would check that it held and the evidence record it leaves (in full for three controls so far, in draft for the rest). A certification or framework can map to them; they do not replace one and confer no certification. This site is not affiliated with, reviewed by or certified by AIUC, ISO, NIST, METR or any AI developer whose guidance it cites.',
+      `These schemes say what must be true. The controls on this site add the engineering layer underneath: for each control, the point where it is enforced, how a third party would check that it held and the evidence record it leaves (${specifiedClause}). A certification or framework can map to them; they do not replace one and confer no certification. This site is not affiliated with, reviewed by or certified by AIUC, ISO, NIST, METR or any AI developer whose guidance it cites.`,
       'Public guidance from frontier developers and evaluators now uses the same terms for the environment around a model: an authorization boundary, and expectations for isolation, credential handling, monitoring and stop conditions [14]; a sandbox whose only outside connection is the model API, with keys kept outside it, a configuration checked before every evaluation and challenges confirmed solvable [15]. The profiles on this site cross-reference that guidance where it evidences a control. They are not derived from it, and no developer or evaluator has reviewed or endorsed them.',
     ],
     links: [
