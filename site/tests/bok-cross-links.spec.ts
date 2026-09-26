@@ -24,6 +24,7 @@ import {
   controlsForPattern,
   controlsForObligation,
   controlsForThreat,
+  casesForControl,
 } from '../src/lib/cross-links';
 
 const EM_DASH = String.fromCharCode(0x2014);
@@ -77,6 +78,10 @@ test.describe('open-reference links: data', () => {
     );
   });
 
+  test('casesForControl joins a control to the incident cases that name it', () => {
+    expect(casesForControl('AIGE-CTL-EVAL-002').map((c) => c.id)).toContain('openai-hugging-face-agent-incident-2026');
+  });
+
   test('no em dash in the chapter links or the open glossary links', () => {
     const text = JSON.stringify({ chapterLinks, glossaryLinks });
     expect(text.includes(EM_DASH)).toBe(false);
@@ -84,7 +89,7 @@ test.describe('open-reference links: data', () => {
 });
 
 test.describe('open-reference links: built site', () => {
-  test.skip(!BUILT, 'run npm run build first');
+  test.skip(!BUILT && !process.env.CI, 'run npm run build first');
 
   test('every chapter link resolves to a built page and anchor', () => {
     for (const [slug, links] of Object.entries(chapterLinks)) {

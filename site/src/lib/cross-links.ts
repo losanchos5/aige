@@ -105,10 +105,5 @@ export function controlsForObligation(obligationId: string): Control[] {
 /** Incident cases whose note lists the control (AIGE-CTL-...) among its related controls. */
 export function casesForControl(controlId: string): IncidentCase[] {
   const wanted = controlId.toUpperCase();
-  return cases.filter((c) => {
-    // `relatedControls` is an optional incident-note field (data/cases.ts);
-    // read defensively so this join holds before and after it exists.
-    const related = (c as IncidentCase & { relatedControls?: readonly string[] }).relatedControls ?? [];
-    return related.some((id) => id.toUpperCase() === wanted);
-  });
+  return cases.filter((c) => (c.relatedControls ?? []).some((id) => id.toUpperCase() === wanted));
 }
