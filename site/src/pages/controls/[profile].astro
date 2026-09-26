@@ -27,6 +27,7 @@ import {
   controlsIn,
   controlProblems,
   controlAnchor,
+  controlAnchorPath,
   controlPath,
   profilePath,
   profileArticleId,
@@ -37,7 +38,7 @@ import {
   profilePageMeta,
   controlHeading,
   aggregatedQuestions,
-  depthCounts,
+  depthLine as profileDepthLine,
   profileReviewers,
   mappingRows,
   machineLinks,
@@ -67,7 +68,6 @@ const { seoTitle, description } = profilePageMeta(profile.slug);
 const rows = controlsIn(profile.slug);
 const sources = profileSources(profile.slug);
 const questions = aggregatedQuestions(profile.slug);
-const counts = depthCounts(profile.slug);
 const reviewers = profileReviewers(profile);
 const mappings = mappingRows(profile.slug);
 const machine = machineLinks();
@@ -91,14 +91,9 @@ const headings = [
   { depth: 2, slug: 'review', text: 'Review this profile' },
 ];
 
-// The depth sentence of "How to read a control", counted from the data.
-const depthLine = [
-  counts.specified > 0 ? `${counts.specified} specified` : '',
-  counts.derived > 0 ? `${counts.derived} derived from chapter 23` : '',
-  counts.stub > 0 ? `${counts.stub} draft outline${counts.stub === 1 ? '' : 's'}` : '',
-]
-  .filter(Boolean)
-  .join(', ');
+// The depth sentence of "How to read a control", counted from the data; a
+// derived count names what this profile's derived controls restate.
+const depthLine = profileDepthLine(profile.slug);
 
 const setId = `${pageUrl}#profile`;
 const jsonLd = [
@@ -136,9 +131,12 @@ const jsonLd = [
     url: pageUrl,
     inLanguage: 'en',
     version: profile.version,
+    // The term's @id stays the control's anchor on this page (stable whatever
+    // its depth); its url is the canonical page: the control's own page when it
+    // is specified, the anchor otherwise.
     hasDefinedTerm: rows.map((c) => ({
       '@type': 'DefinedTerm',
-      '@id': new URL(controlPath(c), site.url).href,
+      '@id': new URL(controlAnchorPath(c), site.url).href,
       termCode: c.id,
       name: c.title,
       description: c.objective,
@@ -207,10 +205,11 @@ const jsonLd = [
   </ul>
   <p>
     Depth says how far a control is written. <strong>{depthLabels.specified}</strong>: a
-    verification procedure, evidence, implementation notes and an observation example.
-    <strong>{depthLabels.derived}</strong>: one agent control of
-    <a href={agentChapter}>chapter 23</a> restated as a control, adding nothing the chapter does
-    not say. <strong>{depthLabels.stub}</strong>: objective, failure modes, scope and open
+    verification procedure, evidence, implementation notes, two example observations and a page
+    of its own. <strong>{depthLabels.derived}</strong>: restates existing site material (an agent
+    control of <a href={agentChapter}>chapter 23</a>, a pattern, a record schema or a chapter,
+    named on each control) and adds nothing that material does not say.
+    <strong>{depthLabels.stub}</strong>: objective, failure modes, scope and open
     questions only. This profile: {depthLine}.
   </p>
   <p>

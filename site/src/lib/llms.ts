@@ -12,7 +12,7 @@
 import { chaptersOrdered, type Chapter } from '../data/chapters';
 import { cases, type IncidentCase } from '../data/cases';
 import { comparisons, comparisonPath } from '../data/comparisons';
-import { profiles, profilePath } from '../data/controls';
+import { controls, controlPagePath, profiles, profilePath } from '../data/controls';
 import { patterns, patternPath } from '../data/patterns';
 import { researchPath, writtenThemes } from '../data/research';
 import { site } from '../data/site';
@@ -204,6 +204,8 @@ export function markdownAlternateFor(pathname: string): string | null {
     ...cases.map((entry) => casePath(entry)),
     ...comparisons.map((c) => comparisonPath(c)),
     ...profiles.map(profilePath),
+    // The page of each specified control (/controls/<profile>/<id>), once control pages are on.
+    ...controls.map(controlPagePath).filter((p): p is string => p !== null),
     ROLE_PATH,
     '/thesis',
     ...writtenThemes().map(researchPath),

@@ -1,0 +1,418 @@
+---
+// /controls/<profile>/<id>: the page of one specified control of an open
+// control profile (src/data/controls), in the reading layout (Doc) without the
+// chapter rail, like its profile page. The H1 is the control title; the
+// document <title> and meta description are the control's `pageTitle` and
+// `pageDescription`. Under the byline and status line of its profile: the
+// full record (ControlRecord, standalone), its two example observations
+// (public/controls/examples/) rendered and downloadable, the incident cases
+// that name it, its patterns, obligations and threats, its own numbered
+// sources, the machine-readable versions, the review call and the citation
+// with the profile version. One TechArticle, part of the profile's article
+// (profileArticleId). The Markdown twin (<path>.md) is built from the same
+// data by lib/controls-md.ts controlMarkdown.
+//
+// Only specified controls get a page (controlPagePath); derived and outline
+// controls keep their anchor on the profile page as canonical URL.
+// A draft control specification, open for technical review; illustrative, not
+// a claim of conformity.
+import Doc from '../../../layouts/Doc.astro';
+import Byline from '../../../components/Byline.astro';
+import StatusLine from '../../../components/StatusLine.astro';
+import Callout from '../../../components/Callout.astro';
+import ControlRecord from '../../../components/ControlRecord.astro';
+import SourceList from '../../../components/SourceList.astro';
+import ContributeCta from '../../../components/ContributeCta.astro';
+import Citation from '../../../components/Citation.astro';
+import {
+  type Control,
+  controls,
+  controlSlug,
+  controlPagePath,
+  controlAnchorPath,
+  controlApiPath,
+  profilePath,
+  profileArticleId,
+  profileCitation,
+  subjectKindLabels,
+} from '../../../data/controls';
+import {
+  controlPageMeta,
+  controlSources,
+  controlRelations,
+  controlExamples,
+  exampleStatusLabel,
+  profileOf,
+  profileReviewers,
+  layerText,
+  machineLinks,
+  machineEvent,
+  OBSERVATION_SCHEMA_PATH,
+} from '../../../lib/controls-md';
+import { patternPath } from '../../../data/patterns';
+import { obligationPath } from '../../../data/frameworks';
+import { obligationLabel, threatAnchor, taxonomyOf } from '../../../data/threats';
+import { casePath } from '../../../lib/llms';
+import { site } from '../../../data/site';
+import { authorRefs, ORG_ID } from '../../../lib/jsonld';
+
+export function getStaticPaths() {
+  return controls
+    .filter((c) => c.depth === 'specified' && controlPagePath(c) !== null)
+    .map((c) => ({ params: { profile: c.profile, control: controlSlug(c) }, props: { control: c } }));
+}
+
+interface Props {
+  control: Control;
+}
+
+const { control: c } = Astro.props;
+const profile = profileOf(c);
+const { seoTitle, description } = controlPageMeta(c);
+const path = controlPagePath(c) as string;
+const pageUrl = new URL(path, site.url).href;
+const profileHref = profilePath(profile);
+const sources = controlSources(c);
+const related = controlRelations(c);
+const examples = controlExamples(c);
+const reviewers = profileReviewers(profile);
+const citation = profileCitation(profile);
+const machine = machineLinks();
+
+const crumbs = [
+  { label: 'Open control profiles', href: '/controls' },
+  { label: profile.shortTitle, href: profileHref },
+  { label: c.id },
+];
+
+// The on-this-page list: the record, the examples, then only the sections this
+// control has something for.
+const headings = [
+  { depth: 2, slug: 'record', text: 'The control record' },
+  { depth: 2, slug: 'examples', text: 'Example observations' },
+  ...(related.cases.length > 0 ? [{ depth: 2, slug: 'related-cases', text: 'Related cases' }] : []),
+  ...(related.patterns.length > 0 ? [{ depth: 2, slug: 'patterns', text: 'Patterns' }] : []),
+  ...(related.obligations.length > 0 ? [{ depth: 2, slug: 'obligations', text: 'Obligations' }] : []),
+  ...(related.threats.length > 0 ? [{ depth: 2, slug: 'threats', text: 'Threats' }] : []),
+  ...(sources.length > 0 ? [{ depth: 2, slug: 'sources', text: 'Sources' }] : []),
+  { depth: 2, slug: 'machine-readable', text: 'Machine-readable' },
+  { depth: 2, slug: 'review', text: 'Review this control' },
+];
+
+const jsonLd = [
+  {
+    '@type': 'TechArticle',
+    '@id': `${pageUrl}#article`,
+    headline: seoTitle,
+    alternativeHeadline: `${c.id} ${c.title}`,
+    identifier: c.id,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    version: profile.version,
+    creativeWorkStatus: 'Draft',
+    datePublished: profile.published,
+    dateModified: profile.updated,
+    image: new URL('/og/controls.png', site.url).href,
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    // Part of its profile's TechArticle (/controls/<profile>#article).
+    isPartOf: { '@id': profileArticleId(profile) },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    ...(sources.length > 0 ? { citation: sources.map((s) => s.url) } : {}),
+  },
+];
+---
+
+<Doc
+  title={c.title}
+  seoTitle={seoTitle}
+  summary={c.objective}
+  description={description}
+  crumbs={crumbs}
+  headings={headings}
+  sidebar={false}
+  siteVersion={false}
+  image="/og/controls.png"
+  jsonLd={jsonLd}
+  article={{ publishedTime: `${profile.published}T00:00:00Z`, modifiedTime: `${profile.updated}T00:00:00Z` }}
+>
+  <div class="cp-head" data-pagefind-ignore>
+    <Byline date={profile.updated} dateLabel="Updated" published={profile.published} />
+    <StatusLine version={profile.version} status={profile.status} reviewers={reviewers} />
+  </div>
+
+  <p class="cp-part">
+    <code>{c.id}</code>, a control of the <a href={profileHref}>{profile.title}</a> (draft
+    v{profile.version}). <a href={controlAnchorPath(c)}>See it among the other controls of the profile</a>.
+  </p>
+
+  <Callout kind="note" title="Draft for review, not a claim of conformity">
+    <p>
+      This is a draft control specification, open for technical review. It is illustrative: not
+      legal advice, not a standard and binding on no one. Nothing here is marked reviewed until a
+      named reviewer has reviewed it. <a href="/controls">About the open control profiles</a>.
+    </p>
+  </Callout>
+
+  <ControlRecord control={c} profile={profile} sources={sources} standalone />
+
+  <h2 id="examples">Example observations</h2>
+  <p>
+    Two illustrative records of a check of this control, one that passes and one that fails. Each
+    validates against the
+    <a
+      href={OBSERVATION_SCHEMA_PATH}
+      data-umami-event="schema-download"
+      data-umami-event-schema="control-observation"
+      data-umami-event-file={OBSERVATION_SCHEMA_PATH}>control observation schema</a
+    >; neither is the result of a real evaluation.
+  </p>
+  {
+    examples.map(({ example, record, json }) => (
+      <section class="cx" data-status={record.status} aria-labelledby={`example-${record.status}`}>
+        <h3 id={`example-${record.status}`}>
+          {exampleStatusLabel(record.status)}: {record.subject}
+        </h3>
+        <dl class="cs-facts cx-facts">
+          <dt>Status</dt>
+          <dd>
+            <code>{record.status}</code>
+          </dd>
+          <dt>Subject</dt>
+          <dd>
+            <code>{record.subject}</code> ({subjectKindLabels[record.subject_kind] ?? record.subject_kind})
+          </dd>
+          <dt>Expected</dt>
+          <dd>{record.expected}</dd>
+          <dt>Observed</dt>
+          <dd>{record.observed}</dd>
+          <dt>Timestamp</dt>
+          <dd>
+            <time datetime={record.timestamp}>{record.timestamp}</time>
+          </dd>
+          {record.observer && (
+            <>
+              <dt>Observer</dt>
+              <dd>{record.observer}</dd>
+            </>
+          )}
+          {(record.evidence ?? []).length > 0 && (
+            <>
+              <dt>Evidence</dt>
+              <dd>
+                <ul class="cx-list">
+                  {(record.evidence ?? []).map((ev) => (
+                    <li>
+                      {ev.artefact}
+                      {ev.hash && (
+                        <>
+                          {' · '}
+                          <code class="cx-hash">{ev.hash}</code>
+                        </>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </>
+          )}
+          {record.notes && (
+            <>
+              <dt>Notes</dt>
+              <dd>{record.notes}</dd>
+            </>
+          )}
+        </dl>
+        <p class="cx-download">
+          <a
+            href={example.path}
+            download
+            data-umami-event="control-download"
+            data-umami-event-id={c.id}
+            data-umami-event-format="json"
+          >
+            Download the {record.status} example (JSON)
+          </a>
+        </p>
+        <details class="cx-json">
+          <summary>The {record.status} record as JSON</summary>
+          <pre tabindex="0"><code>{json}</code></pre>
+        </details>
+      </section>
+    ))
+  }
+
+  {
+    related.cases.length > 0 && (
+      <>
+        <h2 id="related-cases">Related cases</h2>
+        <p>Incident cases on this site that list this control among their related controls.</p>
+        <ul>
+          {related.cases.map((k) => (
+            <li>
+              <a href={casePath(k)}>{k.title}</a>: {k.summary}
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
+  {
+    related.patterns.length > 0 && (
+      <>
+        <h2 id="patterns">Patterns</h2>
+        <p>The patterns that implement this control.</p>
+        <ul>
+          {related.patterns.map((p) => (
+            <li>
+              <a href={patternPath(p)}>{p.title}</a> · {layerText(p.layer)}
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
+  {
+    related.obligations.length > 0 && (
+      <>
+        <h2 id="obligations">Obligations</h2>
+        <p>
+          The obligations this control helps evidence, from the obligation register. Mappings are
+          illustrative, not a claim of conformity.
+        </p>
+        <ul>
+          {related.obligations.map((o) => (
+            <li>
+              <a href={obligationPath(o)}>{obligationLabel(o.id)}</a> <code>{o.id}</code>: {o.requirement}
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
+  {
+    related.threats.length > 0 && (
+      <>
+        <h2 id="threats">Threats</h2>
+        <p>The entries of the threat catalogues this control answers.</p>
+        <ul>
+          {related.threats.map((t) => (
+            <li>
+              <a href={`/resources/threats#${threatAnchor(t)}`}>
+                {t.externalId} {t.name}
+              </a>{' '}
+              ({taxonomyOf(t).name})
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+
+  {
+    sources.length > 0 && (
+      <>
+        <h2 id="sources">Sources</h2>
+        <div class="cp-sources">
+          <SourceList sources={sources} prefix="src" />
+        </div>
+      </>
+    )
+  }
+
+  <h2 id="machine-readable">Machine-readable</h2>
+  <ul>
+    <li>
+      <a href={controlApiPath(c)} data-umami-event="control-download" data-umami-event-id={c.id} data-umami-event-format="json">
+        {c.id} as JSON
+      </a>: this record on its own, in the open data API.
+    </li>
+    <li>
+      This page as Markdown: <a href={`${path}.md`} data-umami-event="control-download" data-umami-event-id={c.id} data-umami-event-format="md">{path}.md</a>.
+    </li>
+    <li>
+      The whole profile: <a href={profileHref}>{profile.title}</a>, also as
+      <a href={`${profileHref}.md`} data-umami-event="control-download" data-umami-event-id={profile.slug} data-umami-event-format="md">Markdown</a>.
+    </li>
+    {
+      machine.map((l) => (
+        <li>
+          <a href={l.href} {...machineEvent(l)}>
+            {l.label}
+          </a>
+          : {l.note}.
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2 id="review">Review this control</h2>
+  <p>
+    Review happens in the open, on GitHub. Check this control against a system you run or know and
+    say what is wrong or missing: a verification step a third party could not repeat, a failure mode
+    that is not observable, a mapping that does not hold. <a href="/contribute">How review works</a>.
+  </p>
+  <ContributeCta kind="control" title={`${c.id} ${c.title} (${profile.shortTitle} v${profile.version})`} />
+
+  <Citation
+    title={`${c.id} ${c.title}`}
+    url={path}
+    kind="page"
+    label="Cite this control"
+    version={profile.version}
+    doi={citation.doi ?? undefined}
+  />
+</Doc>
+
+<style>
+  .cp-head {
+    margin: 0 0 var(--s-5);
+  }
+
+  .cp-head :global(.byline) {
+    margin-top: 0;
+  }
+
+  .cp-head :global(.status-line) {
+    margin: var(--s-2) 0 0;
+  }
+
+  .cp-part {
+    color: var(--ink-2);
+  }
+
+  .cx {
+    margin-top: var(--s-6);
+  }
+
+  .cx-list {
+    margin: 0;
+    padding-left: 1.1em;
+  }
+
+  .cx-hash {
+    overflow-wrap: anywhere;
+  }
+
+  .cx-facts code {
+    font-size: 1em;
+    overflow-wrap: anywhere;
+  }
+
+  .cx-download {
+    margin-top: var(--s-3);
+  }
+
+  .cx-json summary {
+    cursor: pointer;
+  }
+
+  .cx-json pre {
+    margin-top: var(--s-3);
+    font-size: var(--fs-small);
+  }
+</style>

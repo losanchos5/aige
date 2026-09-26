@@ -28,7 +28,8 @@
 //   its prefix when it checks the sequence.
 // - The public anchor of a control is its id in lower case on the profile page
 //   (/controls/<profile>#aige-ctl-eval-002) and its JSON is
-//   /api/v1/controls/<id in lower case>.json.
+//   /api/v1/controls/<id in lower case>.json. A specified control also has a
+//   page of its own, /controls/<profile>/<id in lower case>, its canonical URL.
 //
 // DEPTH. `specified` controls carry a verification procedure (2 to 4 steps),
 // evidence, notes, an observation, one pass and one fail example observation
@@ -88,12 +89,12 @@ export type { ObservationExample };
 
 /**
  * Whether a `specified` control has a page of its own
- * (/controls/<profile>/<id in lower case>). Off until the route
- * src/pages/controls/[profile]/[control].astro exists, so no link points at a
- * page that is not built; while off, `controlPath` gives every control its
- * profile anchor and no control page is listed anywhere.
+ * (/controls/<profile>/<id in lower case>), built by
+ * src/pages/controls/[profile]/[control].astro with its Markdown twin. While
+ * off, `controlPath` gives every control its profile anchor and no control page
+ * is listed anywhere (the sitemap, llms.txt, the nav test).
  */
-export const CONTROL_PAGES_ENABLED = false;
+export const CONTROL_PAGES_ENABLED = true;
 
 /** Profile slugs that name static routes under /controls/, never a profile. */
 export const RESERVED_PROFILE_SLUGS: readonly string[] = ['crosswalk', 'examples'];
@@ -114,7 +115,7 @@ const EM_DASH = String.fromCharCode(0x2014);
 
 export type ControlStatus = 'draft' | 'in-review' | 'stable' | 'retired';
 export type ReviewerStatus = 'open' | 'in-progress' | 'reviewed';
-/** specified: written in full; derived: promoted from a chapter-23 seed; stub: skeleton. */
+/** specified: written in full; derived: restates site material (a chapter-23 seed, a pattern, a record schema or a chapter); stub: skeleton. */
 export type ControlDepth = 'specified' | 'derived' | 'stub';
 export type VerificationKind = 'inspect' | 'test' | 'observe' | 'attest';
 export type SubjectKind = 'eval-environment' | 'eval-run' | 'agent' | 'tool-server' | 'harness' | 'model-artefact';
@@ -273,7 +274,7 @@ export const reviewerStatusLabels: Readonly<Record<ReviewerStatus, string>> = {
 
 export const depthLabels: Readonly<Record<ControlDepth, string>> = {
   specified: 'Specified',
-  derived: 'Derived from chapter 23',
+  derived: 'Derived from site material',
   stub: 'Draft outline',
 };
 
