@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import { resolve } from 'node:path';
 import Doc from '../../layouts/Doc.astro';
 import NewsletterForm from '../../components/NewsletterForm.astro';
+import OpenWork from '../../components/OpenWork.astro';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import {
   authorRefs,
@@ -12,6 +13,8 @@ import {
   WEBSITE_ID,
 } from '../../lib/jsonld';
 import { site } from '../../data/site';
+import { people } from '../../data/people';
+import { openQuestions } from '../../data/open-questions';
 
 // Link the built Body-of-Knowledge PDF only when it exists at build time, so a
 // checkout without the generated file (build/build_pdf.py not run) still builds.
@@ -41,6 +44,8 @@ const author = site.authorDetails[0];
 const experience =
   'Two and a half years designing and operating an AI governance framework inside a large telco, sitting between Legal, Security and Engineering, and covering the governance, security, compliance, business and model-performance dimensions of AI risk.';
 const githubProfile = author.sameAs?.find((url) => url.startsWith('https://github.com/'));
+// The subjects the author works on, as data/people.ts states them.
+const researchInterests = people[0].researchInterests ?? [];
 
 // /about is the author's profile page: its main entity is the Person node
 // (lib/jsonld.ts), which Seo.astro adds to the graph because it is referenced.
@@ -55,7 +60,13 @@ const jsonLd = [
     isPartOf: { '@id': WEBSITE_ID },
     publisher: { '@id': ORG_ID },
     mainEntity: authorRefs[0],
-    dateModified: lastModified('src/pages/about/index.astro', 'src/data/site.ts'),
+    dateModified: lastModified(
+      'src/pages/about/index.astro',
+      'src/data/site.ts',
+      'src/data/people.ts',
+      'src/data/open-questions.ts',
+      'src/data/work.ts',
+    ),
   },
   breadcrumbJsonLd([{ label: 'About' }]),
 ];
@@ -108,11 +119,37 @@ const jsonLd = [
     </dd>
   </dl>
 
+  <h2 id="research-interests">Research interests</h2>
+  <ul>
+    {researchInterests.map((interest) => <li>{interest}</li>)}
+  </ul>
+
+  <h2 id="open-questions">Current open questions</h2>
+  <p>
+    The questions I am working on and have not settled. Each links to where the work on it lives;
+    a question leaves this list when a reviewed note or control answers it.
+  </p>
+  <ol>
+    {
+      openQuestions.map((q) => (
+        <li>{q.href ? <a href={q.href}>{q.question}</a> : q.question}</li>
+      ))
+    }
+  </ol>
+
+  <h2 id="open-work">Open work</h2>
+  <p>
+    What is in progress, with its real state. Nothing here is marked reviewed until a named
+    reviewer is credited; until then each item is open for technical review.
+  </p>
+  <OpenWork />
+
   <h2 id="work-together">Let’s work together</h2>
   <p>
-    I’m {site.author}. I’m interested in research collaborations, practical governance patterns
-    and conversations with teams turning AI governance into working controls. If you are building
-    eval gates, agent registries or machine-readable evidence, let’s compare notes.
+    I’m {site.author}. I am particularly interested in collaborations around independent assessment
+    methodology, evaluation-environment controls, agent runtime safeguards, machine-readable
+    evidence, open control profiles and reference implementations. If you are building or assessing
+    any of these, compare notes with me.
   </p>
   <p>
     Email me at <a href={`mailto:${site.email}`}>{site.email}</a> or{' '}

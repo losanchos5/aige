@@ -50,6 +50,37 @@ const forms = [
     href: form('sign-the-thesis.yml'),
     what: 'your name under the definition, values and principles',
   },
+  // The review forms of the open control profiles and research notes.
+  {
+    label: 'Review a control',
+    href: form('control-review.yml'),
+    what: 'one control of an open control profile, checked against a system you know or the sources it cites',
+  },
+  {
+    label: 'Propose a failure mode',
+    href: form('failure-mode-proposal.yml'),
+    what: 'a way an AI system or agent fails that a control should catch, with the record that shows it',
+  },
+  {
+    label: 'Share an implementation example',
+    href: form('implementation-example.yml'),
+    what: 'how you implement a control or pattern, and the evidence it leaves behind',
+  },
+  {
+    label: 'Propose a framework mapping',
+    href: form('framework-mapping.yml'),
+    what: 'a control mapped to a clause of a law, standard or framework, with the official source',
+  },
+  {
+    label: 'Propose a technical correction',
+    href: form('technical-correction.yml'),
+    what: 'a wrong requirement, evidence statement, mapping, threat id, version or date in a control or research note',
+  },
+  {
+    label: 'Review a research note',
+    href: form('research-review.yml'),
+    what: 'a research note, or one of its claims, checked against the sources it cites',
+  },
 ];
 
 // Numbered sources, in the house format; [n] in the text links #src-n.
@@ -74,6 +105,11 @@ const headings = [
   { depth: 2, slug: 'what-the-build-checks', text: 'What the build checks' },
   { depth: 2, slug: 'corrections-and-contributions', text: 'Corrections and contributions' },
   { depth: 2, slug: 'versioning-and-doi', text: 'Versioning and DOI' },
+  {
+    depth: 2,
+    slug: 'control-profiles-versioning-status-and-review',
+    text: 'Control profiles: versioning, status and review',
+  },
   { depth: 2, slug: 'what-this-is-not', text: 'What this is not' },
   { depth: 2, slug: 'sources', text: 'Sources' },
 ];
@@ -293,6 +329,40 @@ const partsWord = countWord(bookParts.length);
     Citation metadata lives in <a href={blob('CITATION.cff')}>CITATION.cff</a>, and every chapter
     offers a ready-made citation and BibTeX entry.
   </p>
+
+  <h2 id="control-profiles-versioning-status-and-review">Control profiles: versioning, status and review</h2>
+  <p>
+    The <a href="/controls">open control profiles</a> and the <a href="/research">research notes</a>
+    are versioned on their own, apart from the book. Each profile and each note carries its own
+    semantic version<sup><a class="cite" href="#src-1">1</a></sup> and a status shown beside it: a
+    research note is draft, review or published; a control profile and each of its controls is
+    draft, in review, stable or retired. Today every profile and every note is a draft, open for
+    technical review.
+  </p>
+  <ul>
+    <li>
+      <strong>Published means reviewed.</strong> A note is published, and a profile or control
+      marked reviewed or stable, only when a named reviewer is credited in
+      <a href={blob('bok/CONTRIBUTORS.md')}>bok/CONTRIBUTORS.md</a>. Until then it says "Open for
+      technical review".
+    </li>
+    <li>
+      <strong>Every version bump is recorded.</strong> A substantive change (a requirement, an
+      evidence statement, a mapping, a claim) bumps the version and adds a changelog line: in the
+      profile's own changelog, or in <a href={blob('bok/CHANGELOG.md')}>bok/CHANGELOG.md</a> for a
+      note. A wording fix that does not change the meaning needs no bump.
+    </li>
+    <li>
+      <strong>What a review is.</strong> A review is a written objection or confirmation against the
+      sources the control or note cites, filed in the open through one of the review forms listed
+      under <a href="#corrections-and-contributions">corrections and contributions</a>. An objection
+      that holds changes the text and bumps the version; a confirmation is credited by name.
+    </li>
+    <li>
+      <strong>No claim without evidence.</strong> No reviewer, endorsement or adoption is named on the
+      site unless it can be pointed to: a credited review, a public issue or a public implementation.
+    </li>
+  </ul>
 
   <h2 id="what-this-is-not">What this is not</h2>
   <p>
