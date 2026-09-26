@@ -129,6 +129,8 @@ const article = {
   image: new URL(ogPath, site.url).href,
   isPartOf: { '@id': bookId },
   author: [...authorRefs],
+  // On the article itself too, as the pillar, the comparisons and the cases do.
+  publisher: { '@id': ORG_ID },
 };
 
 const breadcrumb = {
