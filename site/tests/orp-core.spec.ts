@@ -17,7 +17,7 @@ import {
   sourceNumber,
 } from '../src/data/controls';
 import { evaluationEnvironmentProfile } from '../src/data/controls/evaluation-environment';
-import { agentRuntimeProfile, agentRuntimeAnchorHeadings } from '../src/data/controls/agent-runtime';
+import { agentRuntimeProfile, agentRuntimeAnchorHeadings, KEPT_VERBATIM } from '../src/data/controls/agent-runtime';
 import { agentControls } from '../src/data/tool-agent-controls';
 import { people, peopleProblems } from '../src/data/people';
 import { work, workProblems } from '../src/data/work';
@@ -47,7 +47,10 @@ test.describe('open control registry', () => {
     rows.forEach((row, i) => {
       expect(row.depth).toBe('derived');
       expect(row.seeds).toEqual([agentControls[i].id]);
-      expect(row.objective).toBe(agentControls[i].rule);
+      // Objectives are restated as outcomes (orp-controls-runtime); rules that already
+      // state one are kept word for word.
+      expect(row.objective.trim()).not.toBe('');
+      if (KEPT_VERBATIM.has(agentControls[i].id)) expect(row.objective).toBe(agentControls[i].rule);
     });
   });
 
