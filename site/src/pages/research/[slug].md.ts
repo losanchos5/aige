@@ -6,6 +6,7 @@ import type { APIRoute, GetStaticPaths } from 'astro';
 import { researchPath, writtenThemes } from '../../data/research';
 import { researchDocs } from '../../lib/llms-corpus';
 import { markdownDocument, markdownResponse } from '../../lib/llms';
+import { site } from '../../data/site';
 
 export const getStaticPaths: GetStaticPaths = () =>
   writtenThemes().map((theme) => ({ params: { slug: theme.slug } }));
@@ -13,5 +14,5 @@ export const getStaticPaths: GetStaticPaths = () =>
 export const GET: APIRoute = async ({ params }) => {
   const doc = (await researchDocs()).find((d) => d.path === researchPath(params.slug ?? ''));
   if (!doc) throw new Error(`no research note for /research/${params.slug}.md`);
-  return markdownResponse(markdownDocument(doc, doc.body));
+  return markdownResponse(markdownDocument({ ...doc, doi: site.conceptDoi }, doc.body));
 };

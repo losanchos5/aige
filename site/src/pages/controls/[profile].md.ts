@@ -15,7 +15,7 @@ export const GET: APIRoute = ({ props }) => {
   const { description } = profilePageMeta(profile.slug);
   return markdownResponse(
     markdownDocument(
-      { title: profile.title, description, path: profilePath(profile), updated: profile.updated },
+      { title: profile.title, description, path: profilePath(profile), updated: profile.updated, version: profile.version },
       controlsMarkdown(profile),
     ),
   );

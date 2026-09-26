@@ -152,6 +152,8 @@ export interface MarkdownMeta {
   updated: string;
   /** The document's own version (a research note's); default: the Body of Knowledge version. */
   version?: string;
+  /** The DOI the document cites (a research note: the concept DOI); default: site.doi. */
+  doi?: string;
 }
 
 /**
@@ -167,7 +169,7 @@ export function markdownDocument(meta: MarkdownMeta, body: string): string {
     `canonical: ${site.url}${meta.path}`,
     `author: ${JSON.stringify(site.authors.join(', '))}`,
     `license: ${JSON.stringify(`${site.license} (${site.licenseUrl})`)}`,
-    `doi: https://doi.org/${site.doi}`,
+    `doi: https://doi.org/${meta.doi ?? site.doi}`,
     `version: ${JSON.stringify(meta.version ?? site.bokVersion)}`,
     `updated: ${meta.updated}`,
     '---',
