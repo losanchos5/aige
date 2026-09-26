@@ -135,7 +135,7 @@ const PAGE_META: Readonly<Record<string, ProfilePageMeta>> = {
   'evaluation-environment': {
     seoTitle: 'AI evaluation environment controls',
     description:
-      'An open control profile for AI evaluation environments: isolation, tool access, telemetry and evidence requirements. Draft v0.1.',
+      'An open control profile for AI evaluation environments: isolation, tool access, telemetry and evidence requirements. Draft v0.2.',
   },
   'agent-runtime': {
     seoTitle: 'AI agent runtime controls',

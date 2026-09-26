@@ -23,7 +23,9 @@
 
 import type { LayerNumber } from './stack';
 import type { Source } from '../lib/sources';
-import { profileBySlug, profileIdRange } from './controls';
+import { controls, profileBySlug, profileIdRange } from './controls';
+
+const SPECIFIED_COUNT = controls.filter((c) => c.depth === 'specified').length;
 
 /** The status line of a profile link, read from the registry: id range and version. */
 const profileVersion = (slug: string): string => profileBySlug(slug)?.version ?? '';
@@ -299,7 +301,7 @@ export const frontierBlocks: readonly FrontierBlock[] = [
     lede: 'Schemes that already exist, and what an open implementation layer adds to them.',
     paragraphs: [
       'AIUC-1 lists 53 requirements in six domains, from data and privacy to society, two of them now marked retired [10]; its certificates are issued centrally on an audit report prepared by an accredited auditor [11]. ISO/IEC 42001 sets requirements for an AI management system [12], and ISO/IEC 42006 sets the requirements for the bodies that audit and certify against it [13]. The NIST AI RMF organises outcomes under govern, map, measure and manage [8].',
-      'These schemes say what must be true. The controls on this site add the engineering layer underneath: for each control, the point where it is enforced, how a third party would check that it held and the evidence record it leaves (in full for three controls so far, in draft for the rest). A certification or framework can map to them; they do not replace one and confer no certification. This site is not affiliated with, reviewed by or certified by AIUC, ISO, NIST, METR or any AI developer whose guidance it cites.',
+      `These schemes say what must be true. The controls on this site add the engineering layer underneath: for each control, the point where it is enforced, how a third party would check that it held and the evidence record it leaves (in full for ${SPECIFIED_COUNT} controls so far, in draft for the rest). A certification or framework can map to them; they do not replace one and confer no certification. This site is not affiliated with, reviewed by or certified by AIUC, ISO, NIST, METR or any AI developer whose guidance it cites.`,
       'Public guidance from frontier developers and evaluators now uses the same terms for the environment around a model: an authorization boundary, and expectations for isolation, credential handling, monitoring and stop conditions [14]; a sandbox whose only outside connection is the model API, with keys kept outside it, a configuration checked before every evaluation and challenges confirmed solvable [15]. The profiles on this site cross-reference that guidance where it evidences a control. They are not derived from it, and no developer or evaluator has reviewed or endorsed them.',
     ],
     links: [
