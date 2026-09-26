@@ -515,11 +515,11 @@ export const assuranceAndEvidenceControls: readonly Control[] = [
       'The post-market monitoring plan of a high-risk system is a document, not the versioned configuration of the telemetry that collects the data.',
     ],
     scope:
-      'Controls of AI systems in production whose decisions reach the assurance store, and, for high-risk systems, the post-market monitoring their provider runs under Art. 72. What a control decides, and the monitoring of model performance itself, are out of scope.',
+      'Controls of AI systems in production whose decisions reach the assurance store, and, for high-risk systems, the post-market monitoring their provider runs under Art. 72. What a control decides, and the monitoring of model performance itself, are out of scope: the monitoring plan with its thresholds, owners and consequences is AIGE-CTL-DEPLOY-008.',
     enforcementPoints: ['runtime', 'periodic'],
     evidence: [
       {
-        artefact: 'Live query per control over the evidence records it emitted, with the time of its latest record',
+        artefact: 'Evidence records each control emits to the assurance store, which the live status query of that control reads',
         schemaId: 'evidence-record',
         layer: 5,
       },
@@ -599,7 +599,6 @@ export const assuranceAndEvidenceControls: readonly Control[] = [
     title: 'Machine-Readable Evidence in OSCAL',
     derivedFrom: [
       { kind: 'pattern', ref: 'machine-readable-evidence-oscal' },
-      { kind: 'schema', ref: 'evidence-record' },
       { kind: 'chapter', ref: 'patterns' },
     ],
     objective:
@@ -614,7 +613,7 @@ export const assuranceAndEvidenceControls: readonly Control[] = [
     enforcementPoints: ['runtime', 'periodic'],
     evidence: [
       { artefact: 'OSCAL assessment-results for each control result, with component definitions of the controls that produced them', layer: 5 },
-      { artefact: 'Evidence records the OSCAL results are generated from', schemaId: 'evidence-record', layer: 5 },
+      { artefact: 'Structured records the controls already produce, the starting point the pattern assumes (for example evidence records)', schemaId: 'evidence-record', layer: 5 },
     ],
     failureResponse: RESPONSE_TO_SPECIFY,
     layer: 5,
@@ -660,11 +659,12 @@ export const assuranceAndEvidenceControls: readonly Control[] = [
       "Personal data in the logs is kept without reconciling the log retention rule with the GDPR's storage limitation.",
     ],
     scope:
-      "Evidence records, logs and documentation of AI systems, above all high-risk systems whose provider keeps documentation under Art. 18 and logs under Art. 19. The deployer's parallel log duty is covered in chapter 15.",
+      "Evidence records, logs and documentation of AI systems, above all high-risk systems whose provider keeps documentation under Art. 18 and logs under Art. 19. The deployer's parallel log duty (Art. 26(6), chapter 15) is AIGE-CTL-DEPLOY-010.",
     enforcementPoints: ['periodic'],
     evidence: [
+      { artefact: 'Retention rule per evidence class, keyed to its obligation, with its storage and any legal hold', layer: 5 },
       {
-        artefact: 'Retention rule per evidence class, keyed to its obligation, with its storage (write-once for signed records) and any legal hold',
+        artefact: 'Signed evidence records kept on write-once storage',
         schemaId: 'evidence-record',
         layer: 5,
       },
@@ -839,10 +839,11 @@ export const assuranceAndEvidenceControls: readonly Control[] = [
     enforcementPoints: ['deploy'],
     evidence: [
       {
-        artefact: 'Admission record per model file: format, scan result for code-executing imports and, for third-party models, upstream source and content digest',
+        artefact: 'Scan result for code-executing imports per serialised file, with the quarantine decision',
         schemaId: 'evidence-record',
         layer: 2,
       },
+      { artefact: 'Upstream source and content digest of each third-party model, recorded in its registry entry', layer: 2 },
     ],
     failureResponse: {
       effect: 'deny',
@@ -927,7 +928,7 @@ export const assuranceAndEvidenceControls: readonly Control[] = [
     references: [P.aibom, CH14.annexIv, OWASP_AIBOM_GENERATOR, OWASP_LLM, ATLAS, ISO_42001, AI_ACT],
     implementationNotes: [
       'Generate the AIBOM in the build, for example with the OWASP AIBOM generator (illustrative), covering models, datasets and weights with their provenance and licences.',
-      'The transparency and eval layers read the AIBOM to know what to document and what to test; chapter 14 draws Annex IV items 1(b) and 1(c) (interaction with other systems; software versions) from it.',
+      'Transparency documents can be generated from the AIBOM, as the pattern notes; chapter 14 draws Annex IV items 1(b) and 1(c) (interaction with other systems; software versions) from it.',
     ],
     openQuestions: [
       VERIFICATION_TODO,
