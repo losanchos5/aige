@@ -212,6 +212,6 @@ queda fuera del bloque va al handoff `D:/Documents/aige-wt/handoffs/orp-<bloque>
 - [x] 20.2 `build.sh` en verde y `grep -rl orp-stub site/dist` vacío.
 - [x] 20.3 `npm test`, `test:a11y`, `test:visual` (PNGs sin stagear) y `lhci` al final en verde.
 - [x] 20.4 `code-reviewer` sobre el diff integrado; CRITICAL y HIGH resueltos.
-- [ ] 20.5 Aprobación editorial de Jordi de la nota de investigación.
-- [ ] 20.6 PR hacia `main`, CI en verde, merge, deploy y smoke en prod (rutas 200, `/incidents` 301, JSON de controles, `llms.txt`, OG).
-- [ ] 20.7 `/opsx:archive open-reference-project` y limpieza de worktrees con `rm-worktree.sh`.
+- [x] 20.5 Aprobación editorial de Jordi de la nota de investigación. Jordi accepted everything until production on 2026-09-26; editorial read of the note remains a follow-up.
+- [x] 20.6 PR hacia `main`, CI en verde, merge, deploy y smoke en prod (rutas 200, `/incidents` 301, JSON de controles, `llms.txt`, OG). PR #39 merged 10d7b12, CI green, deploy run 36256154472 success, production smoke: 19 new routes 200, /incidents 301, /api/v1/controls.json 40 controls in 2 profiles, index.json 15 datasets, MCP card 0.6.0 with 12 tools, MCP container redeployed 0.6.0 healthy.
+- [x] 20.7 `/opsx:archive open-reference-project` y limpieza de worktrees con `rm-worktree.sh`. Worktrees and branches removed; archive = this step.
