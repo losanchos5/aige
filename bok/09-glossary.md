@@ -116,10 +116,10 @@ individual or state body doing AI business, split into development business oper
 and provide AI, and utilisation business operators, who offer products or services built on it [25].
 See [ch. 18, The same roles across regimes](/bok/eu-ai-act#the-same-roles-across-regimes). (ch. 18, 21)
 
-**AI governance.** The rules, roles, processes and technical controls an organisation or a state
-uses to decide which AI systems it builds or uses, what they may do, and how it proves they stay
-within those limits. It draws on law such as the AI Act [2], management-system standards [48],
-risk frameworks [30] and principle sets [31]. Contrast with [AI governance
+**AI governance.** The set of rules, roles, controls and evidence that keeps AI systems within the
+limits an organisation or a state has chosen. It decides which systems may run and what they may do,
+and draws on law such as the AI Act [2], management-system standards [48], risk frameworks [30] and
+principle sets [31]. Contrast with [AI governance
 engineering](/glossary/ai-governance-engineering). See [What is AI governance?](/ai-governance);
 [ch. 12, The organisation as an object of
 governance](/bok/governance-program#the-organisation-as-an-object-of-governance). (ch. 01, 12, 22)
@@ -200,8 +200,9 @@ system](/bok/eu-ai-act#what-counts-as-an-ai-system). (ch. 11, 18)
 
 **AI system impact assessment.** An assessment of how an AI system and its foreseeable applications
 may affect individuals, groups and society, performed across the lifecycle and updated as needed;
-ISO/IEC 42005:2025 gives the guidance [17]. Contrast with [FRIA](/glossary/fria). See [ch. 14,
-Impact assessments compared](/bok/governing-development#impact-assessments-compared). (ch. 14)
+ISO/IEC 42005:2025 gives the guidance [17]. Often called an AI impact assessment (AIIA). Contrast
+with [FRIA](/glossary/fria). See [ch. 14, Impact assessments
+compared](/bok/governing-development#impact-assessments-compared). (ch. 14)
 
 **AI system lifecycle (OECD).** The OECD's iterative phases of an AI system: plan and design;
 collect and process data; build or adapt models; test, evaluate, verify and validate; deploy;
@@ -1980,10 +1981,11 @@ standards (GB and GB/T) and publishes the voluntary AI Safety Governance Framewo
 in 2025, 3.0 on 14 September 2026) [19]. See [ch. 21, China: what chapter 08 does not already
 cover](/bok/ai-laws-worldwide#china-what-chapter-08-does-not-already-cover). (ch. 08, 21)
 
-**TDM exception.** The EU copyright exception for text and data mining (DSM Directive Articles 3
-and 4) that lets anyone copy lawfully accessible works for mining, including AI training, unless the
-rightholder has reserved that use; for content made publicly available online the reservation must
-be made in an appropriate manner, such as machine-readable means [115]. Contrast with [Fair
+**TDM exception.** Two EU copyright exceptions for text and data mining (DSM Directive) [115].
+Article 3 covers scientific research by research organisations and cultural heritage institutions;
+no reservation or contract can override it (Article 7(1)). Article 4 lets anyone mine lawfully
+accessible works, AI training included, unless the rightholder has reserved it, for online content
+in an appropriate manner such as machine-readable means. Contrast with [Fair
 use](/glossary/fair-use) and [Rights reservation (TDM
 opt-out)](/glossary/rights-reservation-tdm-opt-out). See [ch. 20, Copyright and training
 data](/bok/existing-law#copyright-and-training-data). (ch. 20)
@@ -2262,7 +2264,7 @@ Runtime Controls & Observability](/bok/the-stack#layer-04-runtime-controls--obse
 [112] IEC 61025:2006, Fault tree analysis (FTA) (edition 2.0). IEC. 2006-12-13. https://webstore.iec.ch/en/publication/4311 (verified: primary)
 [113] "A Unified Approach to Interpreting Model Predictions" (Lundberg and Lee; SHAP; arXiv 1705.07874). arXiv. 2017-05-22. https://arxiv.org/abs/1705.07874 (verified: primary)
 [114] "System Cards, a new resource for understanding how AI systems work" (documents a whole system of models, AI and non-AI components, where a model card documents one model). Meta AI. 2022-02-23. https://ai.meta.com/blog/system-cards-a-new-resource-for-understanding-how-ai-systems-work/ (verified: primary)
-[115] Directive (EU) 2019/790 on copyright and related rights in the Digital Single Market (Arts. 3 and 4: text and data mining for research and a general exception subject to a machine-readable reservation). Official Journal of the EU (EUR-Lex). 2019-04-17. https://eur-lex.europa.eu/eli/dir/2019/790/oj (verified: primary)
+[115] Directive (EU) 2019/790 on copyright and related rights in the Digital Single Market (Art. 3: text and data mining for scientific research by research organisations and cultural heritage institutions; Art. 4: a general exception subject to an express reservation, in an appropriate manner such as machine-readable means for content made publicly available online; Art. 7(1): contract terms contrary to Art. 3 are unenforceable). Official Journal of the EU (EUR-Lex). 2019-04-17. https://eur-lex.europa.eu/eli/dir/2019/790/oj (verified: primary)
 [116] Proving Test Set Contamination in Black Box Language Models (Oren et al.; arXiv 2310.17623). arXiv. 2023-10-26. https://arxiv.org/abs/2310.17623 (verified: primary)
 [117] The IIA's Three Lines Model: an update of the Three Lines of Defense (governing body; management's first- and second-line roles; internal audit as third line; third-line independence). The Institute of Internal Auditors. 2020-07. https://www.theiia.org/en/content/position-papers/2020/the-iias-three-lines-model-an-update-of-the-three-lines-of-defense/ (verified: primary)
 [118] Template for general-purpose AI model providers to summarise their training content (mandatory under Art. 53(1)(d); applicable from 2 Aug 2025, legacy models by 2 Aug 2027). European Commission. 2025-07-24. https://digital-strategy.ec.europa.eu/en/faqs/template-general-purpose-ai-model-providers-summarise-their-training-content (verified: primary)
