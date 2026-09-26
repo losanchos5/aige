@@ -1,0 +1,436 @@
+---
+// /controls/crosswalk: the open control profiles read from the framework side
+// (lib/controls-crosswalk.ts). One table per framework some control maps to,
+// each row a clause or id with the controls that map to it (linked by
+// controlPath, so a specified control's own page wins over its profile anchor
+// once control pages exist), then the reverse view: each profile's controls
+// with their ids per framework. The Markdown twin (/controls/crosswalk.md) and
+// the `crosswalk` key of /api/v1/controls.json are built from the same
+// function. Static: no client script, the framework index is plain anchors.
+//
+// Illustrative, not a claim of conformity. The tables reuse the mobile card
+// pattern of the profile pages (res-table, `data-label` cells).
+import Doc from '../../layouts/Doc.astro';
+import Byline from '../../components/Byline.astro';
+import Callout from '../../components/Callout.astro';
+import ContributeCta from '../../components/ContributeCta.astro';
+import {
+  type Control,
+  controlById,
+  controlPath,
+  controlProblems,
+  controlsUpdated,
+  profilePath,
+} from '../../data/controls';
+import {
+  buildControlsCrosswalk,
+  crosswalkPairs,
+  crosswalkProfiles,
+  isObligationFramework,
+  profileCrosswalk,
+  AIUC1_NOTE,
+  CONTROLS_CROSSWALK_PATH,
+  CROSSWALK_DESCRIPTION,
+  CROSSWALK_DISCLAIMER,
+  CROSSWALK_TITLE,
+  type CrosswalkFramework,
+} from '../../lib/controls-crosswalk';
+import { machineLinks, machineEvent, CONTROLS_DATASET_PATH, CONTROLS_SCHEMA_PATH } from '../../lib/controls-md';
+import { collectionPage } from '../../lib/jsonld';
+import '../../styles/resources.css';
+
+// Literals, so lib/llms-routes.ts can read them; they must equal the lib's.
+const title = 'AI governance controls crosswalk';
+const description =
+  'Open AI governance controls read from the framework side: each EU AI Act obligation, ISO/IEC 42001 clause, NIST AI RMF or OWASP id, with its controls.';
+if (title !== CROSSWALK_TITLE || description !== CROSSWALK_DESCRIPTION) {
+  throw new Error('controls/crosswalk: title or description differs from lib/controls-crosswalk.ts');
+}
+
+const problems = controlProblems();
+if (problems.length > 0) {
+  throw new Error(`controls: ${problems.length} problem(s) in the registry:\n${problems.join('\n')}`);
+}
+
+const path = CONTROLS_CROSSWALK_PATH;
+const updated = controlsUpdated();
+const crosswalk = buildControlsCrosswalk();
+const pairs = crosswalkPairs(crosswalk);
+const obligationFrameworks = crosswalk.frameworks.filter(isObligationFramework);
+const otherFrameworks = crosswalk.frameworks.filter((fw) => !isObligationFramework(fw));
+const reverse = crosswalkProfiles().map((profile) => ({ profile, rows: profileCrosswalk(profile.slug) }));
+const controlCount = new Set(crosswalk.frameworks.flatMap((fw) => fw.rows.flatMap((r) => r.controls))).size;
+
+/** The control of an id the crosswalk lists; the registry validates, so a miss is a bug. */
+function control(id: string): Control {
+  const row = controlById(id);
+  if (!row) throw new Error(`controls/crosswalk: unknown control ${id}`);
+  return row;
+}
+
+const external = (url: string) => (/^https?:\/\//.test(url) ? { rel: 'noopener' } : {});
+const pairsOf = (fw: CrosswalkFramework) => fw.rows.reduce((n, r) => n + r.controls.length, 0);
+const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+// The dataset and schema links, with the Umami attributes the profile pages use.
+const machine = machineLinks();
+const dataset = machine.find((l) => l.href === CONTROLS_DATASET_PATH);
+const schema = machine.find((l) => l.href === CONTROLS_SCHEMA_PATH);
+
+// Framework sections in order: the obligation register's instruments as h3
+// under one h2, then every other framework as an h2.
+const sections = [
+  ...obligationFrameworks.map((fw) => ({ fw, level: 3 as const })),
+  ...otherFrameworks.map((fw) => ({ fw, level: 2 as const })),
+];
+
+const headings = [
+  { depth: 2, slug: 'about', text: 'What this crosswalk is' },
+  { depth: 2, slug: 'frameworks', text: 'Frameworks' },
+  ...(obligationFrameworks.length > 0 ? [{ depth: 2, slug: 'obligations', text: 'Obligation register' }] : []),
+  ...sections.map(({ fw, level }) => ({ depth: level, slug: fw.id, text: fw.name })),
+  { depth: 2, slug: 'by-profile', text: 'By profile' },
+  ...reverse.map(({ profile }) => ({ depth: 3, slug: `by-profile-${profile.slug}`, text: profile.title })),
+  { depth: 2, slug: 'machine-readable', text: 'Machine-readable' },
+  { depth: 2, slug: 'propose-a-mapping', text: 'Propose a mapping' },
+];
+
+const crumbs = [{ label: 'Open control profiles', href: '/controls' }, { label: 'Crosswalk' }];
+
+// The page's own card (lib/og-cards.ts OG_ROUTE_TITLES['controls-crosswalk']).
+const image = '/og/controls-crosswalk.png';
+
+const jsonLd = collectionPage({
+  path,
+  name: title,
+  description,
+  dateModified: updated,
+  items: crosswalk.frameworks.map((fw) => ({ name: fw.name, url: `${path}#${fw.id}` })),
+});
+---
+
+<Doc
+  title={title}
+  seoTitle={title}
+  description={description}
+  summary="Every open reference control read from the framework side: for each obligation, clause or id, the controls that map to it; for each profile, its controls with their ids per framework."
+  crumbs={crumbs}
+  headings={headings}
+  sidebar={false}
+  siteVersion={false}
+  image={image}
+  jsonLd={jsonLd}
+>
+  <div class="cw-head" data-pagefind-ignore>
+    <Byline date={updated} dateLabel="Updated" />
+  </div>
+
+  <Callout kind="note" title="Illustrative, not a claim of conformity">
+    <p>
+      {CROSSWALK_DISCLAIMER} The controls are draft control specifications, open for technical
+      review: not legal advice, not a standard and binding on no one. An id listed here says that a
+      control addresses the same objective, not that following the control meets the framework.
+    </p>
+  </Callout>
+
+  <h2 id="about">What this crosswalk is</h2>
+  <p>
+    The <a href="/controls">open control profiles</a> map each control to the obligations, standards
+    and threat catalogues it answers. This page turns those mappings around: one table per framework,
+    one row per clause or id, with the controls that map to it. It is generated at build time from
+    the same registry as the profile pages, so it lists {plural(pairs, 'mapping')} of
+    {plural(controlCount, 'control')} across {plural(crosswalk.frameworks.length, 'framework')}, and a
+    framework with no mapping has no table. Every id is checked against the site's registers or the
+    framework's public index before it is published.
+  </p>
+  <p>
+    Each mapping is illustrative, not a claim of conformity. For the frameworks themselves, see
+    <a href="/resources/frameworks">the frameworks</a>; for how they overlap topic by topic, see
+    <a href="/resources/crosswalk">the framework crosswalk</a>.
+  </p>
+
+  <h2 id="frameworks">Frameworks</h2>
+  <ul class="cw-index">
+    {
+      obligationFrameworks.length > 0 && (
+        <li>
+          <a href="#obligations">Obligation register</a>
+          <ul>
+            {obligationFrameworks.map((fw) => (
+              <li>
+                <a href={`#${fw.id}`}>{fw.name}</a> <span class="cw-count">({plural(fw.rows.length, 'id')})</span>
+              </li>
+            ))}
+          </ul>
+        </li>
+      )
+    }
+    {
+      otherFrameworks.map((fw) => (
+        <li>
+          <a href={`#${fw.id}`}>{fw.name}</a> <span class="cw-count">({plural(fw.rows.length, 'id')})</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  {
+    sections.map(({ fw, level }, i) => {
+      const Heading = level === 3 ? 'h3' : 'h2';
+      return (
+        <>
+          {level === 3 && i === 0 && (
+            <>
+              <h2 id="obligations">Obligation register</h2>
+              <p>
+                Rows of the site's <a href="/obligations">obligation register</a> (ids AIGE-OBL-*),
+                grouped by the instrument each belongs to. Each id links to its register page, which
+                names the requirement, the evidence it asks for and the source.
+              </p>
+            </>
+          )}
+          <section class="cw-framework" data-crosswalk-framework={fw.id}>
+            <Heading id={fw.id}>{fw.name}</Heading>
+            <p class="cw-meta">
+              {fw.note}{' '}
+              {plural(fw.rows.length, 'id')}, {plural(pairsOf(fw), 'mapping')}.
+              {fw.url && (
+                <>{' '}<a href={fw.url} {...external(fw.url)}>Source</a>.</>
+              )}
+            </p>
+            {/* An instrument can sit both in the obligation register and among the
+                threat catalogues under one name (OWASP): the register's regions
+                are named with their group, so every landmark name is unique. */}
+            <div
+              class="res-tablewrap cp-tablewrap"
+              role="region"
+              aria-labelledby={level === 3 ? `obligations ${fw.id}` : fw.id}
+              tabindex="0"
+            >
+              <table class="res-table cp-table">
+                <caption class={fw.id === 'aiuc1' ? 'cw-caption' : 'visually-hidden'}>
+                  {fw.id === 'aiuc1' ? AIUC1_NOTE : `The controls mapped to each clause or id of ${fw.name}`}
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Clause or id</th>
+                    <th scope="col">Controls</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fw.rows.map((r) => (
+                    <tr>
+                      <td class="c-name" data-label="Clause or id">
+                        <span>
+                          <span class="cp-ids">
+                            {r.url ? (
+                              <a href={r.url} {...external(r.url)}>{r.ref}</a>
+                            ) : (
+                              r.ref
+                            )}
+                          </span>{' '}
+                          {r.name}
+                          {r.note && <span class="cw-rownote">{r.note}</span>}
+                        </span>
+                      </td>
+                      <td data-label="Controls">
+                        <ul class="cw-controls">
+                          {r.controls.map((id) => {
+                            const c = control(id);
+                            return (
+                              <li>
+                                <a href={controlPath(c)} class="cp-ids" data-pair={`${fw.id}|${r.ref}|${c.id}`}>{c.id}</a>{' '}
+                                {c.title}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      );
+    })
+  }
+
+  <h2 id="by-profile">By profile</h2>
+  <p>
+    The same mappings read from the control side: each control of a profile with the ids it maps to,
+    framework by framework. NIST SP 800-53 ids appear here as the control cites them, not by family.
+    AIUC-1: {AIUC1_NOTE}
+  </p>
+  {
+    reverse.map(({ profile, rows }) => (
+      <section class="cw-profile" data-crosswalk-profile={profile.slug}>
+        <h3 id={`by-profile-${profile.slug}`}>{profile.title}</h3>
+        <p class="cw-meta">
+          {plural(rows.length, 'control')}, v{profile.version}. <a href={profilePath(profile)}>The profile page</a> has
+          each control in full.
+        </p>
+        <div
+          class="res-tablewrap cp-tablewrap"
+          role="region"
+          aria-labelledby={`by-profile-${profile.slug}`}
+          tabindex="0"
+        >
+          <table class="res-table cp-table">
+            <caption class="visually-hidden">
+              The ids each control of the {profile.shortTitle.toLowerCase()} profile maps to, per framework
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Control</th>
+                <th scope="col">Ids per framework</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr>
+                  <td class="c-name" data-label="Control">
+                    <span>
+                      <a href={controlPath(row.control)} class="cp-ids">{row.control.id}</a>{' '}
+                      {row.control.title}
+                    </span>
+                  </td>
+                  <td data-label="Ids per framework">
+                    {row.frameworks.length > 0 ? (
+                      <ul class="cw-refs">
+                        {row.frameworks.map((f) => (
+                          <li>
+                            <a href={`#${f.id}`}>{f.name}</a>: <span class="cp-ids">{f.refs.join(', ')}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      'None yet'
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    ))
+  }
+
+  <h2 id="machine-readable">Machine-readable</h2>
+  <ul>
+    {
+      dataset && (
+        <li>
+          <a href={dataset.href} {...machineEvent(dataset)}>All controls as JSON</a>:
+          the crosswalk is its <code>crosswalk</code> key, with the same frameworks, rows and
+          mappings as this page, in the envelope of the open data API.
+        </li>
+      )
+    }
+    {
+      schema && (
+        <li>
+          <a href={schema.href} {...machineEvent(schema)}>JSON Schema of the controls dataset</a>:
+          the <code>crosswalk</code> key is a closed object.
+        </li>
+      )
+    }
+    <li>
+      This page as Markdown:{' '}
+      <a href={`${path}.md`} data-umami-event="control-download" data-umami-event-id="crosswalk" data-umami-event-format="md">{path}.md</a>.
+    </li>
+  </ul>
+
+  <h2 id="propose-a-mapping">Propose a mapping</h2>
+  <p>
+    A mapping that does not hold, or one that is missing: say so on GitHub. Name the control, the
+    framework and the clause or id, and quote the public text the mapping rests on. Mappings are
+    added only when an id can be checked against the framework's own public text.
+  </p>
+  <ContributeCta kind="mapping" title={title} />
+</Doc>
+
+<style>
+  .cw-head {
+    margin: 0 0 var(--s-5);
+  }
+
+  .cw-head :global(.byline) {
+    margin-top: 0;
+  }
+
+  .cw-index ul {
+    margin-top: var(--s-2);
+  }
+
+  .cw-count,
+  .cw-meta {
+    color: var(--ink-2);
+  }
+
+  .cw-meta {
+    font-size: var(--fs-label);
+  }
+
+  /* The mapping tables of the profile pages ([profile].astro): the res-table
+     look inside the reading well, ids in mono that may break anywhere on a phone. */
+  .cp-tablewrap {
+    margin-top: var(--s-4);
+  }
+
+  .cp-table th,
+  .cp-table td {
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+  }
+
+  .cp-table .c-name {
+    min-width: 14rem;
+  }
+
+  .cp-ids {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    overflow-wrap: anywhere;
+  }
+
+  .cw-caption {
+    caption-side: top;
+    text-align: left;
+    padding: var(--s-2) var(--s-3);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .cw-rownote {
+    display: block;
+    margin-top: var(--s-1);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .cw-controls,
+  .cw-refs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cw-controls li + li,
+  .cw-refs li + li {
+    margin-top: var(--s-1);
+  }
+
+  @media (max-width: 720px) {
+    .cp-table td {
+      border: 0;
+    }
+
+    .cp-table .c-name {
+      min-width: 0;
+    }
+  }
+</style>

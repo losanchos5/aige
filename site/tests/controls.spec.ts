@@ -13,18 +13,21 @@ import { validateAgainst } from './helpers/schema-library';
 import {
   controls,
   profiles,
+  observationExamples,
   controlProblems,
   controlsIn,
   controlAnchor,
 } from '../src/data/controls';
-import { observationExamples } from '../src/data/controls/evaluation-environment';
+import { aiuc1ById, aiuc1Requirements, AIUC1_INDEX } from '../src/data/aiuc1';
 
 const EM_DASH = String.fromCharCode(0x2014);
 const API_DIR = join('dist', 'api', 'v1');
 const DATASET = join(API_DIR, 'controls.json');
 const PAGE = join('dist', 'controls', 'evaluation-environment.html');
 const SCHEMA_ID = 'https://aigovernanceengineer.com/schemas/control-observation.v1.json';
-const SPECIFIED = ['AIGE-CTL-EVAL-002', 'AIGE-CTL-EVAL-003', 'AIGE-CTL-EVAL-006'];
+/** The specified controls, read from the registry (002, 003 and 006 at least). */
+const SPECIFIED = controls.filter((c) => c.depth === 'specified').map((c) => c.id);
+const FIRST_SPECIFIED = ['AIGE-CTL-EVAL-002', 'AIGE-CTL-EVAL-003', 'AIGE-CTL-EVAL-006'];
 
 type Json = Record<string, unknown>;
 const readJson = (file: string): Json => JSON.parse(readFileSync(file, 'utf8')) as Json;
@@ -39,15 +42,34 @@ test.describe('open control profiles: data', () => {
     expect(controlProblems()).toEqual([]);
   });
 
-  test('ids run in order in both profiles, and titles are unique', () => {
+  test('ids run in order in every profile, each with its own prefix, and titles are unique', () => {
     expect(evalControls().map((c) => c.id)).toEqual(ids('EVAL', 9));
-    expect(controlsIn('agent-runtime').map((c) => c.id)).toEqual(ids('AGENT', 31));
+    const prefixes = new Set<string>();
+    for (const p of profiles) {
+      const rows = controlsIn(p.slug);
+      const prefix = rows[0]?.id.split('-')[2] ?? '';
+      expect(prefixes.has(prefix), p.slug).toBe(false);
+      prefixes.add(prefix);
+      expect(rows.map((c) => c.id), p.slug).toEqual(ids(prefix, rows.length));
+    }
     const titles = controls.map((c) => c.title.toLowerCase());
     expect(new Set(titles).size).toBe(titles.length);
   });
 
-  test('exactly 002, 003 and 006 are specified', () => {
-    expect(controls.filter((c) => c.depth === 'specified').map((c) => c.id)).toEqual(SPECIFIED);
+  test('002, 003 and 006 stay specified, and every specified control has a page title and description', () => {
+    expect(SPECIFIED).toEqual(expect.arrayContaining(FIRST_SPECIFIED));
+    const pageTitles = new Set<string>();
+    const pageDescriptions = new Set<string>();
+    for (const c of controls.filter((row) => row.depth === 'specified')) {
+      expect(c.pageTitle?.length ?? 0, c.id).toBeGreaterThan(0);
+      expect(c.pageTitle!.length, c.id).toBeLessThanOrEqual(70);
+      expect(c.pageDescription!.length, c.id).toBeGreaterThanOrEqual(70);
+      expect(c.pageDescription!.length, c.id).toBeLessThanOrEqual(160);
+      pageTitles.add(c.pageTitle!.toLowerCase());
+      pageDescriptions.add(c.pageDescription!.toLowerCase());
+    }
+    expect(pageTitles.size).toBe(SPECIFIED.length);
+    expect(pageDescriptions.size).toBe(SPECIFIED.length);
   });
 
   test('a specified control is complete: failure modes, verification, evidence, notes, sources, observation', () => {
@@ -68,6 +90,7 @@ test.describe('open control profiles: data', () => {
       expect(c.failureResponse.text, c.id).not.toContain('To be specified');
       expect(c.mappings.nistAiRmf.length, c.id).toBeGreaterThan(0);
     }
+    // The first three specified controls keep their failure effects.
     const effect = (id: string) => controls.find((c) => c.id === id)!.failureResponse.effect;
     expect([effect('AIGE-CTL-EVAL-002'), effect('AIGE-CTL-EVAL-003'), effect('AIGE-CTL-EVAL-006')]).toEqual([
       'deny',
@@ -77,15 +100,17 @@ test.describe('open control profiles: data', () => {
   });
 
   test('AIUC-1 ids are read from the public index: never a retired requirement, and the index is cited', () => {
-    // Read on standard.aiuc-1.com on 2026-09-26: A001 to F002, E007 and E014 marked retired.
-    const RETIRED = ['E007', 'E014'];
-    const INDEX = 'https://standard.aiuc-1.com/llms.txt';
+    // src/data/aiuc1.ts, read on standard.aiuc-1.com: A001 to F002, E007 and E014 marked retired.
+    const RETIRED = aiuc1Requirements.filter((r) => r.retired).map((r) => r.id);
+    expect(RETIRED).toEqual(['E007', 'E014']);
+    const INDEX = AIUC1_INDEX.url;
     const mapped = controls.filter((c) => (c.mappings.aiuc1 ?? []).length > 0);
     expect(mapped.length).toBeGreaterThan(0);
     for (const c of controls) {
       const ids = c.mappings.aiuc1 ?? [];
       for (const id of ids) {
         expect(id, c.id).toMatch(/^[A-F]\d{3}$/);
+        expect(aiuc1ById(id), `${c.id} ${id}`).toBeDefined();
         expect(RETIRED, c.id).not.toContain(id);
       }
       expect(new Set(ids).size, c.id).toBe(ids.length);
@@ -158,7 +183,10 @@ test.describe('control-observation record', () => {
       expect(doc.control_id, file).toBe(example.controlId);
       expect(doc.status, file).toBe(example.status);
       const row = controls.find((c) => c.id === example.controlId)!;
+      expect(row.depth, file).toBe('specified');
       expect(doc.subject_kind, file).toBe(row.observation!.subjectKind);
+      expect(doc.control_version, file).toBe(row.version);
+      expect(String(doc.notes ?? ''), file).toMatch(/illustrative example/i);
       expect(readFileSync(file, 'utf8').includes(EM_DASH), file).toBe(false);
     }
   });

@@ -21,7 +21,7 @@ export const ORG_ID = `${site.url}/#org`;
 export const WEBSITE_ID = `${site.url}/#website`;
 
 /** `AI Governance Engineer` -> `ai-governance-engineer`, for Person @ids. */
-function personSlug(name: string): string {
+export function personSlug(name: string): string {
   return name
     .normalize('NFKD')
     .replace(/[̀-ͯ]/g, '')

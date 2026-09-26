@@ -13,6 +13,7 @@ import { chapterParts, chaptersOrdered } from '../src/data/chapters';
 import { bookParts } from '../src/data/parts';
 import { TRANSLATED_LOCALES } from '../src/i18n/locales';
 import { NOT_IN_SITEMAP } from '../src/lib/sitemap-policy';
+import { profiles as controlProfiles, profilePath } from '../src/data/controls';
 
 const DIST = 'dist';
 
@@ -30,7 +31,11 @@ const DETAIL_COLLECTIONS: { prefix: string; index: string }[] = [
   // Framework comparisons (/resources/crosswalk/<a>-vs-<b>); the crosswalk links each one.
   { prefix: '/resources/crosswalk/', index: '/resources/crosswalk' },
   // Block orp-shell: the control profiles hang off /controls, the research
-  // notes off /research; each index links every detail page from <main>.
+  // notes off /research; each index links every detail page from <main>. A
+  // specified control's page (/controls/<profile>/<id>) hangs off its profile
+  // page, one collection per profile of the registry; they come first, since
+  // the first matching prefix wins.
+  ...controlProfiles.map((profile) => ({ prefix: `${profilePath(profile)}/`, index: profilePath(profile) })),
   { prefix: '/controls/', index: '/controls' },
   { prefix: '/research/', index: '/research' },
   // Translations (openspec/changes/i18n-site-rendering): a language's chapters

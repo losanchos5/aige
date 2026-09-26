@@ -21,14 +21,19 @@ import ControlRecord from '../../components/ControlRecord.astro';
 import SourceList from '../../components/SourceList.astro';
 import ContributeCta from '../../components/ContributeCta.astro';
 import Citation from '../../components/Citation.astro';
+import Provenance from '../../components/Provenance.astro';
 import {
   type ControlProfile,
   profiles,
   controlsIn,
   controlProblems,
   controlAnchor,
+  controlAnchorPath,
   controlPath,
   profilePath,
+  profileArticleId,
+  profileCitation,
+  statusLabels,
   profileSources,
   depthLabels,
 } from '../../data/controls';
@@ -36,7 +41,7 @@ import {
   profilePageMeta,
   controlHeading,
   aggregatedQuestions,
-  depthCounts,
+  depthLine as profileDepthLine,
   profileReviewers,
   mappingRows,
   machineLinks,
@@ -66,14 +71,18 @@ const { seoTitle, description } = profilePageMeta(profile.slug);
 const rows = controlsIn(profile.slug);
 const sources = profileSources(profile.slug);
 const questions = aggregatedQuestions(profile.slug);
-const counts = depthCounts(profile.slug);
 const reviewers = profileReviewers(profile);
 const mappings = mappingRows(profile.slug);
 const machine = machineLinks();
 const path = profilePath(profile);
 const pageUrl = new URL(path, site.url).href;
 const issueForm = `${site.github}/issues/new?template=${profile.issueTemplate}`;
-const citeTitle = `${profile.title} v${profile.version} (draft)`;
+const citeTitle = `${profile.title} v${profile.version} (${statusLabels[profile.status].toLowerCase()})`;
+// Block orp2-release: the DOI this profile is cited with (its version DOI once
+// deposited, else its concept DOI, else the project concept DOI; cite.doiKind)
+// and the data file it is built from.
+const cite = profileCitation(profile);
+const editPath = `site/src/data/controls/${profile.slug}.ts`;
 
 const crumbs = [{ label: 'Open control profiles', href: '/controls' }, { label: profile.shortTitle }];
 
@@ -90,26 +99,22 @@ const headings = [
   { depth: 2, slug: 'review', text: 'Review this profile' },
 ];
 
-// The depth sentence of "How to read a control", counted from the data.
-const depthLine = [
-  counts.specified > 0 ? `${counts.specified} specified` : '',
-  counts.derived > 0 ? `${counts.derived} derived from chapter 23` : '',
-  counts.stub > 0 ? `${counts.stub} draft outline${counts.stub === 1 ? '' : 's'}` : '',
-]
-  .filter(Boolean)
-  .join(', ');
+// The depth sentence of "How to read a control", counted from the data; a
+// derived count names what this profile's derived controls restate.
+const depthLine = profileDepthLine(profile.slug);
 
 const setId = `${pageUrl}#profile`;
 const jsonLd = [
   {
     '@type': 'TechArticle',
-    '@id': `${pageUrl}#article`,
+    // Stable @id: a control's own page points at it with isPartOf.
+    '@id': profileArticleId(profile),
     headline: profile.title,
     description,
     url: pageUrl,
     inLanguage: 'en',
     version: profile.version,
-    creativeWorkStatus: 'Draft',
+    creativeWorkStatus: statusLabels[profile.status],
     datePublished: profile.published,
     dateModified: profile.updated,
     image: new URL('/og/controls.png', site.url).href,
@@ -134,9 +139,12 @@ const jsonLd = [
     url: pageUrl,
     inLanguage: 'en',
     version: profile.version,
+    // The term's @id stays the control's anchor on this page (stable whatever
+    // its depth); its url is the canonical page: the control's own page when it
+    // is specified, the anchor otherwise.
     hasDefinedTerm: rows.map((c) => ({
       '@type': 'DefinedTerm',
-      '@id': new URL(controlPath(c), site.url).href,
+      '@id': new URL(controlAnchorPath(c), site.url).href,
       termCode: c.id,
       name: c.title,
       description: c.objective,
@@ -163,6 +171,14 @@ const jsonLd = [
   <div class="cp-head" data-pagefind-ignore>
     <Byline date={profile.updated} dateLabel="Updated" published={profile.published} />
     <StatusLine version={profile.version} status={profile.status} reviewers={reviewers} />
+    <Provenance
+      version={profile.version}
+      status={statusLabels[profile.status]}
+      editPath={editPath}
+      doi={cite.effectiveDoi}
+      citeHref="#cite"
+      issueHref={issueForm}
+    />
   </div>
 
   <Callout kind="note" title="Draft for review, not a claim of conformity">
@@ -205,10 +221,11 @@ const jsonLd = [
   </ul>
   <p>
     Depth says how far a control is written. <strong>{depthLabels.specified}</strong>: a
-    verification procedure, evidence, implementation notes and an observation example.
-    <strong>{depthLabels.derived}</strong>: one agent control of
-    <a href={agentChapter}>chapter 23</a> restated as a control, adding nothing the chapter does
-    not say. <strong>{depthLabels.stub}</strong>: objective, failure modes, scope and open
+    verification procedure, evidence, implementation notes, two example observations and a page
+    of its own. <strong>{depthLabels.derived}</strong>: restates existing site material (an agent
+    control of <a href={agentChapter}>chapter 23</a>, a pattern, a record schema or a chapter,
+    named on each control) and adds nothing that material does not say.
+    <strong>{depthLabels.stub}</strong>: objective, failure modes, scope and open
     questions only. This profile: {depthLine}.
   </p>
   <p>
@@ -225,7 +242,9 @@ const jsonLd = [
     illustrative, not a claim of conformity; an empty cell means no mapping has been verified yet.
     AIUC-1 ids point at the public requirement index of the Artificial Intelligence Underwriting
     Company, cited here as a reference; this project is not affiliated with AIUC, and each mapping
-    is our own reading of the requirement text.
+    is our own reading of the requirement text. The same mappings, read from the framework side
+    and across every profile, are in the
+    <a href={`/controls/crosswalk#by-profile-${profile.slug}`}>controls crosswalk</a>.
   </p>
   <div class="res-tablewrap cp-tablewrap" role="region" aria-labelledby="mappings" tabindex="0">
     <table class="res-table cp-table">
@@ -274,14 +293,9 @@ const jsonLd = [
             <li>
               {q.question}{' '}
               <span class="cp-qids">
-                (
-                {q.controls.map((c, i) => (
-                  <>
-                    {i > 0 && ', '}
-                    <a href={`#${controlAnchor(c)}`}>{c.id.slice(-3)}</a>
-                  </>
-                ))}
-                )
+                ({q.controls.map((c, i) => (
+                  <>{i > 0 && ', '}<a href={`#${controlAnchor(c)}`}>{c.id.slice(-3)}</a></>
+                ))})
               </span>
             </li>
           ))}
@@ -318,18 +332,14 @@ const jsonLd = [
   <ul>
     <li>
       Each control as JSON, for example{' '}
-      <a href={`/api/v1/controls/${controlAnchor(rows[0])}.json`} data-umami-event="control-download" data-umami-event-id={rows[0].id} data-umami-event-format="json">
-        {rows[0].id}
-      </a>
-      : the link sits at the foot of every control above.
+      <a href={`/api/v1/controls/${controlAnchor(rows[0])}.json`} data-umami-event="control-download" data-umami-event-id={rows[0].id} data-umami-event-format="json">{rows[0].id}</a>:
+      the link sits at the foot of every control above.
     </li>
     {
       machine.map((l) => (
         <li>
-          <a href={l.href} {...machineEvent(l)}>
-            {l.label}
-          </a>
-          : {l.note}.
+          <a href={l.href} {...machineEvent(l)}>{l.label}</a>:
+          {l.note}.
         </li>
       ))
     }
@@ -348,7 +358,30 @@ const jsonLd = [
   </p>
   <ContributeCta kind="control" title={`${profile.title} v${profile.version}`} />
 
-  <Citation title={citeTitle} url={path} kind="page" />
+  <div id="cite" class="cp-cite">
+    <p class="cp-doi-note" data-doi-kind={cite.doiKind}>
+      {
+        cite.doiKind === 'profile' ? (
+          <>
+            DOI of this profile version: <a href={`https://doi.org/${cite.effectiveDoi}`}>{cite.effectiveDoi}</a>.
+          </>
+        ) : cite.doiKind === 'profile-concept' ? (
+          <>
+            This version has no DOI of its own yet: it is cited with the concept DOI of the profile,{' '}
+            <a href={`https://doi.org/${cite.effectiveDoi}`}>{cite.effectiveDoi}</a>, which resolves
+            to its latest archived version.
+          </>
+        ) : (
+          <>
+            This profile has no DOI of its own yet: it is cited with the project concept DOI,{' '}
+            <a href={`https://doi.org/${cite.effectiveDoi}`}>{cite.effectiveDoi}</a>, which resolves
+            to the latest archived version of the whole project.
+          </>
+        )
+      }
+    </p>
+    <Citation title={citeTitle} url={path} kind="page" doi={cite.effectiveDoi} />
+  </div>
 </Doc>
 
 <style>
@@ -362,6 +395,15 @@ const jsonLd = [
 
   .cp-head :global(.status-line) {
     margin: var(--s-2) 0 0;
+  }
+
+  .cp-cite {
+    margin-top: var(--s-6);
+  }
+
+  .cp-doi-note {
+    font-size: var(--fs-label);
+    color: var(--ink-2);
   }
 
   /* The mappings table sits in the reading well: the res-table look, not the

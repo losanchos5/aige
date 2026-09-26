@@ -9,6 +9,7 @@
 // JSON-LD @id is the one lib/jsonld.ts gives the same Person node, so a profile
 // or note can point at that node instead of minting a second one.
 import { site } from './site';
+import { personSlug } from '../lib/jsonld';
 
 // U+2014, built from its code point so this file itself stays free of it.
 const EM_DASH = String.fromCharCode(0x2014);
@@ -24,16 +25,6 @@ export interface Person {
   jsonLdId?: string;
   /** Subjects the person works on, restated for /about and the Person node. */
   researchInterests?: readonly string[];
-}
-
-/** The slug lib/jsonld.ts uses for Person @ids (its personSlug, restated). */
-function personSlug(name: string): string {
-  return name
-    .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 }
 
 export const people: readonly Person[] = [

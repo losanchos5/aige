@@ -1,0 +1,25 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
+  "control_id": "AIGE-CTL-EVAL-007",
+  "profile": "evaluation-environment",
+  "control_version": "0.2",
+  "subject": "run-88262@2026-09-26",
+  "subject_kind": "eval-run",
+  "expected": "After an incident is declared, the environment snapshot, trace, transcript and configuration of the run are frozen with their hashes before any reset, the incident record links them, and every transcript gap is recorded.",
+  "observed": "Incident on run 88262: snapshot and trace frozen before the reset, but 14 minutes of transcript lost in a container reset with no gap recorded in the incident record.",
+  "status": "fail",
+  "timestamp": "2026-09-26T16:25:14Z",
+  "enforcement_point": "runtime",
+  "verification_kind": "observe",
+  "observer": "incident-record-review",
+  "evidence": [
+    {
+      "artefact": "incident record of run 88262",
+      "url": "https://evidence.example/incidents/88262.json",
+      "hash": "sha256:4ff31bb35a49f085ad5b7b2a87497df62a8507568c0fd90e34e2e3f4f0496d02",
+      "schema": "https://aigovernanceengineer.com/schemas/incident-record.v1.json"
+    }
+  ],
+  "run_id": "88262",
+  "notes": "Illustrative example, not the result of a real evaluation. The gap was entered in the incident record, and transcripts are now written to write-once storage as they are produced."
+}

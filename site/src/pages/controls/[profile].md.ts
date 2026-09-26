@@ -3,7 +3,7 @@
 // page (lib/controls-md.ts), under the header of lib/llms.ts. Seo.astro links
 // it from the profile page (lib/llms.ts markdownAlternateFor).
 import type { APIRoute, GetStaticPaths } from 'astro';
-import { profiles, profilePath, type ControlProfile } from '../../data/controls';
+import { profiles, profilePath, profileCitation, type ControlProfile } from '../../data/controls';
 import { controlsMarkdown, profilePageMeta } from '../../lib/controls-md';
 import { markdownDocument, markdownResponse } from '../../lib/llms';
 
@@ -15,7 +15,16 @@ export const GET: APIRoute = ({ props }) => {
   const { description } = profilePageMeta(profile.slug);
   return markdownResponse(
     markdownDocument(
-      { title: profile.title, description, path: profilePath(profile), updated: profile.updated, version: profile.version },
+      {
+        title: profile.title,
+        description,
+        path: profilePath(profile),
+        updated: profile.updated,
+        version: profile.version,
+        // The profile version's DOI, else the profile's concept DOI, else the
+        // project concept DOI (profileCitation doiKind).
+        doi: profileCitation(profile).effectiveDoi,
+      },
       controlsMarkdown(profile),
     ),
   );

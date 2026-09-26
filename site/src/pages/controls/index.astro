@@ -27,13 +27,14 @@ import {
   controlsForLayer,
   controlPath,
   controlProblems,
+  controlsUpdated,
   profilePath,
   depthLabels,
 } from '../../data/controls';
 import { layers } from '../../data/stack';
 import { site } from '../../data/site';
-import { depthCounts, profileReviewers, machineLinks, machineEvent } from '../../lib/controls-md';
-import { collectionPage, lastModified } from '../../lib/jsonld';
+import { depthCounts, derivedPhrase, profileReviewers, machineLinks, machineEvent } from '../../lib/controls-md';
+import { collectionPage } from '../../lib/jsonld';
 import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/pages.css';
 
@@ -94,7 +95,7 @@ const profileCards = profiles.map((profile) => {
   const counts = depthCounts(profile.slug);
   const parts = [
     counts.specified > 0 ? `${counts.specified} ${depthLabels.specified.toLowerCase()}` : '',
-    counts.derived > 0 ? `${counts.derived} derived from chapter 23` : '',
+    counts.derived > 0 ? `${counts.derived} derived from ${derivedPhrase(profile.slug)}` : '',
     counts.stub > 0 ? `${counts.stub} draft outline${counts.stub === 1 ? '' : 's'}` : '',
   ].filter(Boolean);
   const rows = controlsIn(profile.slug);
@@ -113,12 +114,8 @@ const jsonLd = collectionPage({
   path: '/controls',
   name: seoTitle,
   description,
-  dateModified: lastModified(
-    'src/pages/controls/index.astro',
-    'src/data/controls/index.ts',
-    'src/data/controls/evaluation-environment.ts',
-    'src/data/controls/agent-runtime.ts',
-  ),
+  // The newest profile's `updated` date, the same date the sitemap gives /controls.
+  dateModified: controlsUpdated(),
   items: profiles.map((profile) => ({ name: profile.title, url: profilePath(profile) })),
 });
 ---
@@ -276,6 +273,12 @@ const jsonLd = collectionPage({
         <a href="/resources/crosswalk">the crosswalk</a>.
       </p>
       <p>
+        Browse the controls by framework in the
+        <a href="/controls/crosswalk">controls crosswalk</a>: for each obligation, clause or id,
+        the controls that map to it, and for each profile, its controls with their ids per
+        framework.
+      </p>
+      <p>
         Public guidance from frontier developers and evaluators now uses the same terms for the
         environment around a model: OpenAI's account of
         <a href="https://openai.com/index/third-party-cyber-evaluations-involving-openai-models/" rel="noopener">third-party
@@ -329,10 +332,8 @@ const jsonLd = collectionPage({
         {
           machine.map((l) => (
             <li>
-              <a href={l.href} {...machineEvent(l)}>
-                {l.label}
-              </a>
-              : {l.note}.
+              <a href={l.href} {...machineEvent(l)}>{l.label}</a>:
+              {l.note}.
             </li>
           ))
         }

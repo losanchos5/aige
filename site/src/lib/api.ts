@@ -70,19 +70,22 @@ import {
   controlPath,
   profilePath,
   profileSources,
+  profileCitation,
   sourceNumber,
   nistAiRmfSubcategories,
+  observationExamples,
   CONTROLS_AS_OF,
   type Control,
   type ControlProfile,
+  type ControlSource,
 } from '../data/controls';
-import { observationExamples } from '../data/controls/evaluation-environment';
 import { personById } from '../data/people';
 import { threatById } from '../data/threats';
 import { agentControls, agentAnchors, agentChapter } from '../data/tool-agent-controls';
 import { getGlossary, termId } from './glossary';
 import { sourceText } from './sources';
 import { obligationApiPath } from './obligations';
+import { buildControlsCrosswalk, type ControlsCrosswalk } from './controls-crosswalk';
 
 // ---------------------------------------------------------------------------
 // URLs
@@ -300,6 +303,8 @@ const POLICY_EFFECTS = ['deny', 'allow', 'require_approval', 'alert'] as const;
 const VERIFICATION_KINDS = ['inspect', 'test', 'observe', 'attest'] as const;
 const SUBJECT_KINDS = ['eval-environment', 'eval-run', 'agent', 'tool-server', 'harness', 'model-artefact'] as const;
 const VERIFICATION_TAGS = ['primary', 'secondary', 'reported'] as const;
+const DERIVED_FROM_KINDS = ['pattern', 'schema', 'chapter'] as const;
+const PROFILE_DOI_KINDS = ['profile', 'profile-concept', 'project-concept'] as const;
 
 const personName = (id: string) => personById(id)?.name ?? id;
 
@@ -311,6 +316,19 @@ function threatRef(id: string) {
     name: row?.name ?? id,
     url: abs(`/resources/threats#${row ? threatAnchor(row) : `threat-${id}`}`),
   };
+}
+
+/** Site path of the material a derived control restates. */
+function derivedFromPath(src: ControlSource): string {
+  if (src.kind === 'pattern') {
+    const p = getPatternBySlug(src.ref);
+    return p ? patternPath(p) : `/patterns/${src.ref}`;
+  }
+  // The schema's row in the templates library, the link the page and the
+  // Markdown twin give (lib/controls-md.ts derivedSources).
+  if (src.kind === 'schema') return `/resources/templates#schema-${src.ref}`;
+  const chapter = chapters.find((c) => c.slug === src.ref);
+  return `/bok/${chapter?.slug ?? src.ref}`;
 }
 
 /** One control as the API publishes it. */
@@ -353,6 +371,13 @@ export function controlRecord(row: Control) {
         url: abs(seed ? `${agentChapter}#${agentAnchors[seed.anchor]}` : agentChapter),
       };
     }),
+    // Site material a derived control restates: a pattern page, a record schema
+    // row of the templates library or a chapter page (always present, [] when none).
+    derivedFrom: (row.derivedFrom ?? []).map((src) => ({
+      kind: src.kind,
+      ref: src.ref,
+      url: abs(derivedFromPath(src)),
+    })),
     mappings: {
       obligations: m.obligations.map((id) => ({
         id,
@@ -405,7 +430,7 @@ export const controlSchema = s.obj(
       description: 'Stable id, AIGE-CTL-<PROFILE>-<NNN>. Never changed, never reused.',
     },
     profile: s.str('Slug of the control profile.'),
-    url: s.uri('The control on its profile page.'),
+    url: s.uri('Canonical page of the control: its own page when it is specified, its anchor on the profile page otherwise.'),
     json: s.uri('This record on its own, in the API.'),
     title: s.str('Title.'),
     version: s.str('Version of the control specification (the profile version).'),
@@ -445,6 +470,14 @@ export const controlSchema = s.obj(
     seeds: s.arr(
       s.obj({ id: s.str('Agent control id.'), title: s.str('Agent control title.'), url: s.uri('Chapter 23 section.') }),
       'Chapter-23 agent controls the control builds on.',
+    ),
+    derivedFrom: s.arr(
+      s.obj({
+        kind: s.enumOf(DERIVED_FROM_KINDS, 'What the source is: a pattern, a record schema or a chapter.'),
+        ref: s.str('Pattern slug, record schema id or chapter slug.'),
+        url: s.uri('Pattern page, the schema row of the templates library or chapter page.'),
+      }),
+      'Site material a derived control restates; empty when none.',
     ),
     mappings: s.obj(
       {
@@ -505,6 +538,10 @@ export const controlSchema = s.obj(
 );
 
 function controlProfileRecord(p: ControlProfile) {
+  // Block orp2-release: the profile's own DOIs (null until deposited) and how
+  // to cite it, with the effective DOI (the version's, else the profile's
+  // concept DOI, else the project's) and which of the three it is.
+  const cite = profileCitation(p);
   return {
     slug: p.slug,
     title: p.title,
@@ -522,6 +559,9 @@ function controlProfileRecord(p: ControlProfile) {
     changelog: p.changelog.map((e) => ({ version: e.version, date: e.date, note: e.note })),
     reviewForm: `${site.github}/issues/new?template=${p.issueTemplate}`,
     controls: controls.filter((c) => c.profile === p.slug).map((c) => c.id),
+    doi: cite.doi,
+    conceptDoi: cite.conceptDoi,
+    citation: { text: cite.text, doi: cite.effectiveDoi, doiKind: cite.doiKind, url: cite.url },
   };
 }
 
@@ -545,7 +585,65 @@ const controlProfileSchema = s.obj({
   ),
   reviewForm: s.uri('GitHub issue form for a review of the profile.'),
   controls: s.arr(s.str('Control id.'), 'Ids of its controls, in order.'),
+  doi: s.strOrNull('DOI of this profile version (without the resolver); null until the version is deposited.'),
+  conceptDoi: s.strOrNull('Concept DOI shared by every version of this profile; null until the first version is deposited.'),
+  citation: s.obj(
+    {
+      text: s.str('Ready-to-copy reference to the profile version.'),
+      doi: s.str('DOI the reference cites: the profile version DOI when there is one, else the profile concept DOI, else the project concept DOI.'),
+      doiKind: s.enumOf(PROFILE_DOI_KINDS, 'Which DOI `doi` is: profile (version DOI), profile-concept or project-concept.'),
+      url: s.uri('Profile page.'),
+    },
+    'How to cite this profile version.',
+  ),
 });
+
+// Block orp2-crosswalk: the controls read from the framework side
+// (lib/controls-crosswalk.ts), published as the `crosswalk` key of the
+// controls dataset. Site paths (obligation pages) become absolute URLs.
+
+function crosswalkRecord(crosswalk: ControlsCrosswalk) {
+  return {
+    frameworks: crosswalk.frameworks.map((fw) => ({
+      id: fw.id,
+      name: fw.name,
+      url: fw.url === null ? null : abs(fw.url),
+      note: fw.note,
+      rows: fw.rows.map((r) => ({
+        ref: r.ref,
+        name: r.name,
+        url: r.url === null ? null : abs(r.url),
+        note: r.note,
+        controls: [...r.controls],
+      })),
+    })),
+  };
+}
+
+const crosswalkSchema = s.obj(
+  {
+    frameworks: s.arr(
+      s.obj({
+        id: s.str('Stable framework id, also the anchor of its table on /controls/crosswalk.'),
+        name: s.str('Framework name.'),
+        url: s.uriOrNull('Public source of the framework, when there is one.'),
+        note: s.strOrNull('Note on the framework or on how its rows are read.'),
+        rows: s.arr(
+          s.obj({
+            ref: s.str('Clause or id as the framework prints it (for NIST SP 800-53, the control family).'),
+            name: s.str('Its name or text.'),
+            url: s.uriOrNull('Public page of the clause or id, when there is one.'),
+            note: s.strOrNull('Note on the row.'),
+            controls: s.arr(s.str('Control id (AIGE-CTL-...).'), 'The controls that map to it, in registry order.'),
+          }),
+          'One row per clause or id some control maps to, sorted naturally.',
+        ),
+      }),
+      'Only frameworks some control maps to, in a fixed order.',
+    ),
+  },
+  'The controls read from the framework side: each clause or id with the controls that map to it. Illustrative, not a claim of conformity.',
+);
 
 // ---------------------------------------------------------------------------
 // The dataset registry.
@@ -1440,11 +1538,13 @@ export const datasets: readonly Dataset[] = [
       asOf: CONTROLS_AS_OF,
       profiles: controlProfiles.map(controlProfileRecord),
       controls: controls.map(controlRecord),
+      crosswalk: crosswalkRecord(buildControlsCrosswalk(controls)),
     }),
     properties: {
       asOf: s.date('Date the profiles were last checked against their sources.'),
       profiles: s.arr(controlProfileSchema, 'The control profiles.'),
       controls: s.arr(controlSchema, 'Every control, in profile and id order.'),
+      crosswalk: crosswalkSchema,
     },
   },
 ];

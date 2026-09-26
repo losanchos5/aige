@@ -17,12 +17,27 @@ import { patterns } from './src/data/patterns';
 import { figures } from './src/data/figures';
 import { researchPath, writtenThemes } from './src/data/research';
 import { comparisonSourceFiles } from './src/data/comparisons';
+import {
+  profiles as controlProfiles,
+  controls,
+  controlPagePath,
+  controlsUpdated,
+  profileBySlug,
+  profilePath,
+} from './src/data/controls';
 import { getGlossary } from './src/lib/glossary';
 import { gitDate } from './src/lib/reading';
 import { termDate } from './src/lib/glossary-dates';
 import { inSitemap } from './src/lib/sitemap-policy';
 import { alternatesFor, translationFilePath, translationIndex } from './src/lib/i18n-content';
 import { DEFAULT_LOCALE, LOCALES } from './src/i18n/locales';
+
+// The control pages the registry builds: one per specified control, and none
+// while CONTROL_PAGES_ENABLED is off (src/data/controls/index.ts).
+const controlPages = controls.flatMap((c) => {
+  const path = controlPagePath(c);
+  return path ? [{ path, profile: c.profile }] : [];
+});
 
 // Sitemap URL -> the source file(s) whose last commit dates the page: the page
 // itself plus, for a data-driven page, the module or Markdown it renders. The
@@ -397,32 +412,50 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ),
   // Block orp-shell (open reference project): the open control profiles, the
   // frontier audience route, the research notes and the contribution page.
-  // Some sources are written by other blocks of the same change (the control
-  // registry and people of orp-core, the profile template of
-  // orp-controls-pages, the notes of orp-research); until they land, gitDate
-  // falls back to the changelog date for a path git does not know, so the
-  // lastmod stays a real, past date.
+  // gitDate falls back to the changelog date for a path git does not know, so
+  // the lastmod stays a real, past date. The control routes are generated from
+  // the registry (src/data/controls), so a new profile or a new specified
+  // control needs no edit here; their lastmod comes from `profile.updated`
+  // (CONTROLS_DATE_BY_PATH below), these sources only back it up.
   [
     '/controls',
     [
       'src/pages/controls/index.astro',
       'src/data/controls/index.ts',
-      'src/data/controls/evaluation-environment.ts',
-      'src/data/controls/agent-runtime.ts',
+      ...controlProfiles.map((profile) => `src/data/controls/${profile.slug}.ts`),
       'src/data/people.ts',
     ],
   ],
-  ...(['evaluation-environment', 'agent-runtime'] as const).map(
+  ...controlProfiles.map(
     (profile) =>
       [
-        `/controls/${profile}`,
+        profilePath(profile),
         [
           'src/pages/controls/[profile].astro',
           'src/components/ControlRecord.astro',
-          `src/data/controls/${profile}.ts`,
+          `src/data/controls/${profile.slug}.ts`,
         ],
       ] as [string, string[]],
   ),
+  ...controlPages.map(
+    ({ path, profile }) =>
+      [
+        path,
+        ['src/pages/controls/[profile]/[control].astro', `src/data/controls/${profile}.ts`],
+      ] as [string, string[]],
+  ),
+  // The crosswalk renders every profile's mappings against the NIST AI RMF and
+  // AIUC-1 indexes.
+  [
+    '/controls/crosswalk',
+    [
+      'src/pages/controls/crosswalk.astro',
+      'src/lib/controls-crosswalk.ts',
+      ...controlProfiles.map((profile) => `src/data/controls/${profile.slug}.ts`),
+      'src/data/aiuc1.ts',
+      'src/data/nist-ai-rmf.ts',
+    ],
+  ],
   ['/frontier', ['src/pages/frontier.astro', 'src/data/frontier.ts']],
   ['/research', ['src/pages/research/index.astro', 'src/data/research.ts']],
   ...writtenThemes().map(
@@ -442,6 +475,19 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
 const REVIEWED_BY_PATH = new Map<string, string>(
   obligations.map((row) => [obligationPath(row), row.reviewed] as [string, string]),
 );
+
+// The open control pages are dated by the registry, not by git: a profile page
+// and each control page it holds by the profile's `updated` date, /controls and
+// /controls/crosswalk by the newest of them (the same dates their JSON-LD
+// dateModified states).
+const CONTROLS_DATE_BY_PATH = new Map<string, string>([
+  ['/controls', controlsUpdated()],
+  ['/controls/crosswalk', controlsUpdated()],
+  ...controlProfiles.map((profile) => [profilePath(profile), profile.updated] as [string, string]),
+  ...controlPages.map(
+    ({ path, profile }) => [path, profileBySlug(profile)?.updated ?? controlsUpdated()] as [string, string],
+  ),
+]);
 
 // Each /glossary/<slug> page is dated by the last commit that changed its own
 // term in bok/09-glossary.md (src/lib/glossary-dates.ts), the date the page
@@ -524,7 +570,10 @@ export default defineConfig({
         const alternates = alternatesFor(pathname);
         const links = alternates?.map((alt) => ({ url: alt.href, lang: alt.hreflang }));
         const paired = { ...item, links };
-        const dated = REVIEWED_BY_PATH.get(pathname) ?? TERM_DATE_BY_PATH.get(pathname);
+        const dated =
+          REVIEWED_BY_PATH.get(pathname) ??
+          TERM_DATE_BY_PATH.get(pathname) ??
+          CONTROLS_DATE_BY_PATH.get(pathname);
         if (dated) return { ...paired, lastmod: dated };
         const sources = SOURCE_BY_PATH.get(pathname);
         return sources ? { ...paired, lastmod: lastmodOf(sources) } : paired;

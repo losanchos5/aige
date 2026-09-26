@@ -7,6 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { obligations, obligationPath } from '../src/data/frameworks';
+import { profiles, controls, controlPagePath, controlsUpdated, profileBySlug, profilePath } from '../src/data/controls';
 import { NOT_IN_SITEMAP, inSitemap } from '../src/lib/sitemap-policy';
 
 // Every indexable route is every HTML page the build writes, less the ones the
@@ -80,6 +81,14 @@ test.describe('sitemap', () => {
     // An obligation page is dated by the review date of its register row, not by git.
     for (const row of obligations) {
       expect(lastmodFor(obligationPath(row)), row.id).toBe(row.reviewed);
+    }
+    // The open control pages are dated by the registry: each profile page, and
+    // each control page it holds, by the profile's `updated`; /controls by the newest.
+    expect(lastmodFor('/controls')).toBe(controlsUpdated());
+    for (const p of profiles) expect(lastmodFor(profilePath(p)), p.slug).toBe(p.updated);
+    for (const c of controls) {
+      const path = controlPagePath(c);
+      if (path) expect(lastmodFor(path), c.id).toBe(profileBySlug(c.profile)!.updated);
     }
   });
 });

@@ -57,6 +57,44 @@ versioned on their own, apart from the book.
 - **Sources.** Cite as in the book: `[n]` markers with matching rows in `sources/SOURCES.md`, under a
   section headed `## research/<slug>.md` for a note.
 
+### Cutting a profile release (maintainers)
+
+Each version of a control profile can get its own DOI on Zenodo. Until it has one, the profile is
+cited with the project concept DOI. `site/scripts/profile-release.mjs` packages one version from the
+built site and, with a token, deposits it. It has no dependencies and reads the token from the
+`ZENODO_TOKEN` environment variable at run time; never write the token into a file, a commit or a
+log.
+
+1. **Build.** `cd site && npm run build`. The script reads `dist/` and stops if it is missing.
+2. **Dry run.** `node scripts/profile-release.mjs <slug> --dry-run`. It writes
+   `dist/releases/<slug>-v<version>/` (the profile JSON with its controls, the Markdown twin, the
+   observation schema, the example observations, `README.md`, `CITATION.cff` and `SHA256SUMS`) and
+   prints the Zenodo metadata as JSON. No network request is made (the same happens with no token).
+   `dist/releases/` is a working directory and must never be deployed. `npm run build` empties
+   `dist/`, so the deploy workflow, which builds from a clean checkout, never ships it; but a manual
+   `wrangler pages deploy dist` run after a release would publish the bundle with the site. Rebuild
+   before any manual deploy, or pass `--out <dir>` to write the bundle outside `dist/`.
+3. **Sandbox.** Create a token on `sandbox.zenodo.org` (scopes `deposit:write` and
+   `deposit:actions`) and run the script with `ZENODO_TOKEN` set and no flags. It creates a draft
+   deposition on the sandbox, uploads the files and sets the metadata; check the draft there.
+4. **Production.** Only after the maintainer has approved the release: with a `zenodo.org` token,
+   run `node scripts/profile-release.mjs <slug> --production`, review the draft on Zenodo and
+   publish it there, or run once with `--production --publish`. Every run creates a new deposition,
+   so publish the draft you reviewed rather than running again.
+5. **Record the DOI.** Write the minted version DOI into the profile's `doi` field in
+   `site/src/data/controls/<slug>.ts`, with `doiVersion` set to the profile version it was minted
+   for, and, for the first deposited version, its concept DOI into `conceptDoi` (after `--publish`
+   the script prints the fields to paste). The build fails when `doiVersion` differs from
+   `version`, so bumping the version without a new DOI forces you to remove or replace the old one;
+   until then the profile is cited with its concept DOI. Add a changelog line to the profile,
+   rebuild and open a PR. Never write a DOI before
+   the deposit exists. The script refuses to deposit a profile that already has a `conceptDoi`: a
+   later version is created from the existing record with Zenodo's "New version", so that it shares
+   the concept DOI.
+
+The GitHub and Zenodo integration is not used for profiles: it mints a DOI for a snapshot of the whole
+repository on each GitHub release, not for one version of one profile.
+
 ## Rules every PR must follow
 
 - **Cite every factual claim.** Each factual statement carries a `[n]` marker with a matching row in

@@ -36,7 +36,11 @@ module.exports = {
         '/for',
         '/for/engineers',
         '/frontier',
+        '/controls',
         '/controls/evaluation-environment',
+        '/controls/evaluation-environment/aige-ctl-eval-002',
+        '/controls/crosswalk',
+        '/controls/data-admission-and-privacy',
       ].map((path) => `http://localhost:${PORT}${path}`),
       settings: {
         preset: 'desktop',

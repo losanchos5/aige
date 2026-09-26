@@ -28,17 +28,31 @@
 //   its prefix when it checks the sequence.
 // - The public anchor of a control is its id in lower case on the profile page
 //   (/controls/<profile>#aige-ctl-eval-002) and its JSON is
-//   /api/v1/controls/<id in lower case>.json.
+//   /api/v1/controls/<id in lower case>.json. A specified control also has a
+//   page of its own, /controls/<profile>/<id in lower case>, its canonical URL.
 //
-// DEPTH. `specified` controls carry a verification procedure, evidence, notes
-// and an observation example; `derived` controls restate one seed from
-// ./tool-agent-controls.ts (chapter 23) and add nothing the chapter does not
-// say; `stub` controls are skeletons with open questions.
+// DEPTH. `specified` controls carry a verification procedure (2 to 4 steps),
+// evidence, notes, an observation, one pass and one fail example observation
+// (`observationExamples`) and a page title and description of their own;
+// `derived` controls restate material the site already publishes (a seed from
+// ./tool-agent-controls.ts, or a pattern, record schema or chapter named in
+// `derivedFrom`) and add nothing that material does not say; `stub` controls
+// are skeletons with open questions.
 //
 // Every reference resolves: pattern slugs (./patterns.ts), seeds
-// (./tool-agent-controls.ts), obligation ids (./frameworks.ts), ISO/IEC 42001
-// Annex A ids and OWASP / ATLAS rows (./threats.ts), NIST AI RMF subcategories
-// (the map below), schema ids (./templates.ts), people (./people.ts).
+// (./tool-agent-controls.ts), `derivedFrom` sources (./patterns.ts,
+// ./templates.ts schemaOrder, ./chapters.ts), obligation ids (./frameworks.ts),
+// ISO/IEC 42001 Annex A ids and OWASP / ATLAS rows (./threats.ts), NIST AI RMF
+// subcategories (../nist-ai-rmf.ts), AIUC-1 requirements (../aiuc1.ts, never a
+// retired one), schema ids (./templates.ts), people (./people.ts).
+//
+// ADDING A PROFILE. A profile lives in ./<slug>.ts and exports
+// `<camel>Profile`, `<camel>Controls` and `observationExamples` (possibly
+// empty); this module imports the three and appends them to `profiles`,
+// `controls` and `observationExamples`. Everything that lists profiles (the
+// /controls pages, the API, llms.txt, the sitemap, the tests) iterates these
+// arrays. The profile page also needs its <title> and description in
+// ./page-meta.ts PAGE_META.
 // `controlProblems()` returns every broken reference; the profile pages fail the
 // build on any, and tests/orp-core.spec.ts checks the same. This module never
 // imports ./cases.ts (cases link to controls, not the other way round).
@@ -51,14 +65,57 @@ import { obligations, OBLIGATION_ID_PATTERN } from '../frameworks';
 import { agentControls } from '../tool-agent-controls';
 import { schemaOrder } from '../templates';
 import { personById } from '../people';
-import { evaluationEnvironmentProfile, evaluationEnvironmentControls } from './evaluation-environment';
+import { chapters } from '../chapters';
+import { site } from '../site';
+import { aiuc1ById } from '../aiuc1';
+import { nistAiRmfSubcategories } from '../nist-ai-rmf';
+import {
+  evaluationEnvironmentProfile,
+  evaluationEnvironmentControls,
+  observationExamples as evaluationEnvironmentObservationExamples,
+  type ObservationExample,
+} from './evaluation-environment';
 import { agentRuntimeProfile, agentRuntimeControls } from './agent-runtime';
+import {
+  dataAdmissionAndPrivacyProfile,
+  dataAdmissionAndPrivacyControls,
+  observationExamples as dataAdmissionAndPrivacyObservationExamples,
+} from './data-admission-and-privacy';
+import {
+  assuranceAndEvidenceProfile,
+  assuranceAndEvidenceControls,
+  observationExamples as assuranceAndEvidenceObservationExamples,
+} from './assurance-and-evidence';
+import {
+  deploymentAndMonitoringProfile,
+  deploymentAndMonitoringControls,
+  observationExamples as deploymentAndMonitoringObservationExamples,
+} from './deployment-and-monitoring';
 import { CONTROL_ID_PATTERN } from './ids';
 
 export const CONTROLS_AS_OF = '2026-09-26';
 
 /** The shape every control id must match (./ids.ts). */
 export { CONTROL_ID_PATTERN };
+
+/** NIST AI RMF 1.0 subcategories: id -> short title (../nist-ai-rmf.ts). */
+export { nistAiRmfSubcategories };
+export type { ObservationExample };
+
+/**
+ * Whether a `specified` control has a page of its own
+ * (/controls/<profile>/<id in lower case>), built by
+ * src/pages/controls/[profile]/[control].astro with its Markdown twin. While
+ * off, `controlPath` gives every control its profile anchor and no control page
+ * is listed anywhere (the sitemap, llms.txt, the nav test).
+ */
+export const CONTROL_PAGES_ENABLED = true;
+
+/** Profile slugs that name static routes under /controls/, never a profile. */
+export const RESERVED_PROFILE_SLUGS: readonly string[] = ['crosswalk', 'examples', 'index'];
+
+/** The shape of a DOI (10.<registrant>/<suffix>). */
+export const DOI_PATTERN = /^10\.\d{4,9}\/\S+$/;
 
 /**
  * Ids of controls whose rows were deleted outright (a retired control that keeps
@@ -73,7 +130,7 @@ const EM_DASH = String.fromCharCode(0x2014);
 
 export type ControlStatus = 'draft' | 'in-review' | 'stable' | 'retired';
 export type ReviewerStatus = 'open' | 'in-progress' | 'reviewed';
-/** specified: written in full; derived: promoted from a chapter-23 seed; stub: skeleton. */
+/** specified: written in full; derived: restates site material (a chapter-23 seed, a pattern, a record schema or a chapter); stub: skeleton. */
 export type ControlDepth = 'specified' | 'derived' | 'stub';
 export type VerificationKind = 'inspect' | 'test' | 'observe' | 'attest';
 export type SubjectKind = 'eval-environment' | 'eval-run' | 'agent' | 'tool-server' | 'harness' | 'model-artefact';
@@ -103,6 +160,12 @@ export interface ControlProfile {
   changelog: readonly { version: string; date: string; note: string }[];
   /** The GitHub issue form a review of this profile uses. */
   issueTemplate: 'control-review.yml';
+  /** DOI of this profile version, once deposited (DOI_PATTERN). */
+  doi?: string;
+  /** The version `doi` was minted for; required with `doi` and equal to `version`, so a stale version DOI fails the build. */
+  doiVersion?: string;
+  /** Concept DOI shared by every version of this profile (DOI_PATTERN). */
+  conceptDoi?: string;
 }
 
 export interface ControlVerification {
@@ -135,6 +198,13 @@ export interface ControlMappings {
   csaAicm?: readonly string[];
   /** Anything else (NIST SP 800-53, RFC 8693, ATLAS mitigations...). */
   other?: readonly { framework: string; ref: string; note?: string }[];
+}
+
+/** One piece of site material a derived control restates. */
+export interface ControlSource {
+  kind: 'pattern' | 'schema' | 'chapter';
+  /** Pattern slug, record schema id or chapter slug. */
+  ref: string;
 }
 
 export interface ControlObservation {
@@ -170,11 +240,18 @@ export interface Control {
   patterns: readonly string[];
   /** Ids from ./tool-agent-controls.ts agentControls the control builds on. */
   seeds: readonly string[];
+  /** Site material a derived control restates: a pattern slug (./patterns.ts),
+   *  a record schema id (./templates.ts schemaOrder) or a chapter slug (./chapters.ts). */
+  derivedFrom?: readonly ControlSource[];
   mappings: ControlMappings;
   references: readonly Source[];
   implementationNotes: readonly string[];
   openQuestions: readonly string[];
   observation?: ControlObservation;
+  /** Keyword-led <title> for the control's own page (specified controls only; at most 70 characters). */
+  pageTitle?: string;
+  /** Meta description for the control's own page (specified controls only; 70 to 160 characters). */
+  pageDescription?: string;
 }
 
 /** Alias kept for callers that name the definition rather than the record. */
@@ -182,19 +259,6 @@ export type ControlDef = Control;
 
 // ---------------------------------------------------------------------------
 // Local label maps
-
-/** NIST AI RMF 1.0 subcategories the profiles may cite: id -> short title.
- *  Only ids the site already uses elsewhere. */
-export const nistAiRmfSubcategories: Readonly<Record<string, string>> = {
-  'GOVERN 1.7': 'Decommissioning and phasing out AI systems safely',
-  'MEASURE 2.3': 'Performance or assurance criteria measured for deployment-like conditions',
-  'MEASURE 2.5': 'The system is demonstrated to be valid and reliable',
-  'MEASURE 2.6': 'The system is evaluated regularly for safety risks',
-  'MEASURE 2.7': 'Security and resilience are evaluated and documented',
-  'MEASURE 3.1': 'Existing, unanticipated and emergent risks are tracked',
-  'MANAGE 2.4': 'Mechanisms to supersede, disengage or deactivate AI systems',
-  'MANAGE 4.1': 'Post-deployment monitoring plans are implemented',
-};
 
 export const verificationLabels: Readonly<Record<VerificationKind, string>> = {
   inspect: 'Inspect',
@@ -227,16 +291,40 @@ export const reviewerStatusLabels: Readonly<Record<ReviewerStatus, string>> = {
 
 export const depthLabels: Readonly<Record<ControlDepth, string>> = {
   specified: 'Specified',
-  derived: 'Derived from chapter 23',
+  derived: 'Derived from site material',
   stub: 'Draft outline',
 };
 
 // ---------------------------------------------------------------------------
 // The registry
 
-export const profiles: readonly ControlProfile[] = [evaluationEnvironmentProfile, agentRuntimeProfile];
+export const profiles: readonly ControlProfile[] = [
+  evaluationEnvironmentProfile,
+  agentRuntimeProfile,
+  dataAdmissionAndPrivacyProfile,
+  assuranceAndEvidenceProfile,
+  deploymentAndMonitoringProfile,
+];
 
-export const controls: readonly Control[] = [...evaluationEnvironmentControls, ...agentRuntimeControls];
+export const controls: readonly Control[] = [
+  ...evaluationEnvironmentControls,
+  ...agentRuntimeControls,
+  ...dataAdmissionAndPrivacyControls,
+  ...assuranceAndEvidenceControls,
+  ...deploymentAndMonitoringControls,
+];
+
+/**
+ * Example observations of every profile (public/controls/examples/), one pass
+ * and one fail per specified control; each profile module exports its own list.
+ * Illustrative records, not results of any real evaluation.
+ */
+export const observationExamples: readonly ObservationExample[] = [
+  ...evaluationEnvironmentObservationExamples,
+  ...dataAdmissionAndPrivacyObservationExamples,
+  ...assuranceAndEvidenceObservationExamples,
+  ...deploymentAndMonitoringObservationExamples,
+];
 
 // ---------------------------------------------------------------------------
 // Lookups and paths
@@ -269,9 +357,20 @@ export function profilePath(profile: string | Pick<ControlProfile, 'slug'>): str
   return `/controls/${typeof profile === 'string' ? profile : profile.slug}`;
 }
 
-/** Site path of a control: its profile page and its anchor. */
-export function controlPath(row: Pick<Control, 'id' | 'profile'>): string {
+/** The control's section on its profile page, whatever its depth. */
+export function controlAnchorPath(row: Pick<Control, 'id' | 'profile'>): string {
   return `${profilePath(row.profile)}#${controlAnchor(row)}`;
+}
+
+/** Site path of a specified control's own page; null for any other control, or while CONTROL_PAGES_ENABLED is off. */
+export function controlPagePath(row: Pick<Control, 'id' | 'profile' | 'depth'>): string | null {
+  if (!CONTROL_PAGES_ENABLED || row.depth !== 'specified') return null;
+  return `${profilePath(row.profile)}/${controlSlug(row)}`;
+}
+
+/** Canonical site path of a control: its own page when it has one, else its profile anchor. */
+export function controlPath(row: Pick<Control, 'id' | 'profile' | 'depth'>): string {
+  return controlPagePath(row) ?? controlAnchorPath(row);
 }
 
 /** Site path of a control by id; throws on an unknown id, so a typo fails the build. */
@@ -279,6 +378,62 @@ export function controlHref(id: string): string {
   const row = controlById(id);
   if (!row) throw new Error(`controls: unknown control id ${id}`);
   return controlPath(row);
+}
+
+/** Stable JSON-LD @id of a profile page's TechArticle (control pages point at it with isPartOf). */
+export function profileArticleId(profile: string | Pick<ControlProfile, 'slug'>): string {
+  return `${new URL(profilePath(profile), site.url).href}#article`;
+}
+
+/**
+ * Which DOI a profile is cited with: its version DOI (`profile`), else its
+ * concept DOI (`profile-concept`), else the project concept DOI
+ * (`project-concept`, site.conceptDoi).
+ */
+export type ProfileDoiKind = 'profile' | 'profile-concept' | 'project-concept';
+
+/** How to cite a profile: the text, its own DOIs (null until deposited) and the canonical URL. */
+export interface ProfileCitation {
+  text: string;
+  /** DOI of this profile version, or null until one is deposited. */
+  doi: string | null;
+  /** Concept DOI of the profile, or null. */
+  conceptDoi: string | null;
+  /** The DOI to display: the profile version's, else the profile's concept DOI, else the project's (site.conceptDoi). */
+  effectiveDoi: string;
+  /** Which of the three `effectiveDoi` is. */
+  doiKind: ProfileDoiKind;
+  url: string;
+}
+
+export function profileCitation(profile: ControlProfile): ProfileCitation {
+  const url = new URL(profilePath(profile), site.url).href;
+  const doiKind: ProfileDoiKind = profile.doi ? 'profile' : profile.conceptDoi ? 'profile-concept' : 'project-concept';
+  const effectiveDoi = profile.doi ?? profile.conceptDoi ?? site.conceptDoi;
+  const authors = profile.authors.map((id) => personById(id)?.name ?? id).join(', ');
+  const year = profile.updated.slice(0, 4);
+  return {
+    text: `${authors} (${year}). ${profile.title} (v${profile.version}, ${statusLabels[profile.status].toLowerCase()}). ${site.name}. https://doi.org/${effectiveDoi}. ${url}`,
+    doi: profile.doi ?? null,
+    conceptDoi: profile.conceptDoi ?? null,
+    effectiveDoi,
+    doiKind,
+    url,
+  };
+}
+
+/** The newest `updated` date across the profiles (YYYY-MM-DD): the date of /controls. */
+export function controlsUpdated(): string {
+  return profiles.map((p) => p.updated).reduce((newest, d) => (d > newest ? d : newest));
+}
+
+/** The id range of a profile, as prose: "AIGE-CTL-EVAL-001 to 009". */
+export function profileIdRange(slug: string): string {
+  const rows = controlsIn(slug);
+  if (rows.length === 0) throw new Error(`controls: profile ${slug} has no controls`);
+  const first = rows[0].id;
+  const last = rows[rows.length - 1].id;
+  return first === last ? first : `${first} to ${last.slice(-3)}`;
 }
 
 /** Path of a control's JSON document. */
@@ -316,6 +471,19 @@ export function sourceNumber(sources: readonly Source[], src: Pick<Source, 'url'
 
 // ---------------------------------------------------------------------------
 // Validation
+
+/**
+ * The kebab id an "other" mapping's framework name gets in the crosswalk
+ * (lib/controls-crosswalk.ts, `other-<id>`): "NIST SP 800-218A" is
+ * "nist-sp-800-218a". The validator requires it to be non-empty and to come
+ * from a single name, so two spellings never share a table.
+ */
+export function otherFrameworkId(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const VERSION = /^\d+\.\d+(?:\.\d+)?$/;
@@ -358,23 +526,49 @@ export function controlIdSequenceProblems(
   return problems;
 }
 
+/** The three lists `controlProblems` checks; tests pass altered copies. */
+export interface ControlRegistry {
+  profiles: readonly ControlProfile[];
+  controls: readonly Control[];
+  observationExamples: readonly ObservationExample[];
+}
+
 /** Every broken reference or rule in the registry; empty when all hold. */
 export function controlProblems(): string[] {
+  return controlRegistryProblems({ profiles, controls, observationExamples });
+}
+
+/** The rules of `controlProblems` over any registry. Pure, so tests can feed it broken rows. */
+export function controlRegistryProblems(registry: ControlRegistry): string[] {
+  const { profiles, controls, observationExamples } = registry;
+  const controlsIn = (slug: string) => controls.filter((c) => c.profile === slug);
+  const profileBySlug = (slug: string) => profiles.find((p) => p.slug === slug);
   const problems: string[] = [];
   const patternSlugs = new Set(patterns.map((p) => p.slug));
   const seedIds = new Set(agentControls.map((a) => a.id));
   const obligationIds = new Set(obligations.map((o) => o.id));
   const threatTaxonomy = new Map(threats.map((t) => [t.id, t.taxonomy]));
+  const recordSchemaIds = new Set(schemaOrder);
   const schemaIds = new Set([...schemaOrder, 'control-observation']);
+  const chapterSlugs = new Set(chapters.map((ch) => ch.slug));
   const profileSlugs = new Set<string>();
+  // Kebab id -> the first "other" framework name that produced it.
+  const otherFrameworks = new Map<string, string>();
 
   // Profiles
   const prefixes = new Map<string, string>();
   for (const p of profiles) {
     const at = `controls ${p.slug}`;
     if (!KEBAB.test(p.slug)) problems.push(`${at}: slug must be lower-case kebab`);
+    if (RESERVED_PROFILE_SLUGS.includes(p.slug)) problems.push(`${at}: slug ${p.slug} is reserved for a route under /controls/`);
     if (profileSlugs.has(p.slug)) problems.push(`${at}: duplicate profile slug`);
     profileSlugs.add(p.slug);
+    if (p.doi !== undefined && !DOI_PATTERN.test(p.doi)) problems.push(`${at}: malformed doi ${p.doi}`);
+    if (p.conceptDoi !== undefined && !DOI_PATTERN.test(p.conceptDoi)) problems.push(`${at}: malformed conceptDoi ${p.conceptDoi}`);
+    if (p.doi !== undefined && p.doiVersion !== p.version) {
+      problems.push(`${at}: doi was minted for v${p.doiVersion ?? '(no doiVersion)'}, the profile is v${p.version}: record the new version's DOI or drop the stale one`);
+    }
+    if (p.doi === undefined && p.doiVersion !== undefined) problems.push(`${at}: doiVersion without a doi`);
     if (!p.title.trim() || !p.shortTitle.trim()) problems.push(`${at}: empty title`);
     if (!p.summary.trim() || !p.scope.trim()) problems.push(`${at}: empty summary or scope`);
     if (!VERSION.test(p.version)) problems.push(`${at}: bad version ${p.version}`);
@@ -408,6 +602,8 @@ export function controlProblems(): string[] {
   // Controls
   const ids = new Set<string>();
   const titles = new Set<string>();
+  const pageTitles = new Set<string>();
+  const pageDescriptions = new Set<string>();
   const profileOrder = profiles.map((p) => p.slug);
   let lastProfile = -1;
   for (const c of controls) {
@@ -459,6 +655,21 @@ export function controlProblems(): string[] {
     }
     for (const slug of c.patterns) if (!patternSlugs.has(slug)) problems.push(`${at}: unknown pattern ${slug}`);
     for (const id of c.seeds) if (!seedIds.has(id)) problems.push(`${at}: unknown seed ${id}`);
+    const sourceKeys = new Set<string>();
+    for (const src of c.derivedFrom ?? []) {
+      const key = `${src.kind} ${src.ref}`;
+      if (sourceKeys.has(key)) problems.push(`${at}: repeated derivedFrom ${key}`);
+      sourceKeys.add(key);
+      if (src.kind === 'pattern') {
+        if (!patternSlugs.has(src.ref)) problems.push(`${at}: derivedFrom names unknown pattern ${src.ref}`);
+      } else if (src.kind === 'schema') {
+        if (!recordSchemaIds.has(src.ref)) problems.push(`${at}: derivedFrom names unknown record schema ${src.ref}`);
+      } else if (src.kind === 'chapter') {
+        if (!chapterSlugs.has(src.ref)) problems.push(`${at}: derivedFrom names unknown chapter ${src.ref}`);
+      } else {
+        problems.push(`${at}: unknown derivedFrom kind ${String((src as { kind: unknown }).kind)}`);
+      }
+    }
 
     const m = c.mappings;
     for (const id of m.obligations) {
@@ -477,10 +688,21 @@ export function controlProblems(): string[] {
       if (!tax) problems.push(`${at}: unknown ATLAS row ${id}`);
       else if (tax !== 'mitre-atlas') problems.push(`${at}: ${id} is not an ATLAS row`);
     }
-    for (const id of m.aiuc1 ?? []) if (!/^[A-F]\d{3}$/.test(id)) problems.push(`${at}: malformed AIUC-1 id ${id}`);
+    for (const id of m.aiuc1 ?? []) {
+      const requirement = aiuc1ById(id);
+      if (!/^[A-F]\d{3}$/.test(id)) problems.push(`${at}: malformed AIUC-1 id ${id}`);
+      else if (!requirement) problems.push(`${at}: AIUC-1 id ${id} is not in the public index (src/data/aiuc1.ts)`);
+      else if (requirement.retired) problems.push(`${at}: AIUC-1 requirement ${id} is retired`);
+    }
     for (const id of m.csaAicm ?? []) if (!/^[A-Z&]{2,4}-\d{2}$/.test(id)) problems.push(`${at}: malformed CSA AICM id ${id}`);
     for (const o of m.other ?? []) {
       if (!o.framework.trim() || !o.ref.trim()) problems.push(`${at}: incomplete "other" mapping`);
+      const fwId = otherFrameworkId(o.framework);
+      const named = otherFrameworks.get(fwId);
+      if (o.framework.trim() && !fwId) problems.push(`${at}: "other" framework ${o.framework} has an empty id`);
+      else if (named !== undefined && named !== o.framework) {
+        problems.push(`${at}: "other" framework ${o.framework} has the id ${fwId} of ${named}: use one name`);
+      } else if (fwId) otherFrameworks.set(fwId, o.framework);
     }
     for (const src of c.references) {
       if (!/^https?:\/\//.test(src.url)) problems.push(`${at}: reference without an absolute url (${src.title})`);
@@ -494,14 +716,36 @@ export function controlProblems(): string[] {
     const profile = profileBySlug(c.profile);
     if (profile && c.version !== profile.version) problems.push(`${at}: version differs from its profile`);
 
+    // Page title and description (required on a specified control, checked wherever present)
+    if (c.pageTitle !== undefined) {
+      if (!c.pageTitle.trim()) problems.push(`${at}: empty pageTitle`);
+      if (tooLong(c.pageTitle, 70)) problems.push(`${at}: pageTitle longer than 70 characters`);
+      if (pageTitles.has(c.pageTitle.toLowerCase())) problems.push(`${at}: duplicate pageTitle ${c.pageTitle}`);
+      pageTitles.add(c.pageTitle.toLowerCase());
+    }
+    if (c.pageDescription !== undefined) {
+      const n = c.pageDescription.length;
+      if (n < 70 || n > 160) problems.push(`${at}: pageDescription is ${n} characters (70 to 160)`);
+      if (pageDescriptions.has(c.pageDescription.toLowerCase())) problems.push(`${at}: duplicate pageDescription`);
+      pageDescriptions.add(c.pageDescription.toLowerCase());
+    }
+
     // Depth rules
     if (c.depth === 'specified') {
-      if (c.verification.length === 0) problems.push(`${at}: specified control with no verification`);
+      if (c.verification.length < 2 || c.verification.length > 4) {
+        problems.push(`${at}: specified control needs 2 to 4 verification steps, has ${c.verification.length}`);
+      }
       if (c.evidence.length === 0) problems.push(`${at}: specified control with no evidence`);
       if (c.implementationNotes.length === 0) problems.push(`${at}: specified control with no implementation note`);
       if (!c.observation) problems.push(`${at}: specified control with no observation`);
+      if (c.pageTitle === undefined) problems.push(`${at}: specified control with no pageTitle`);
+      if (c.pageDescription === undefined) problems.push(`${at}: specified control with no pageDescription`);
+      const statuses = observationExamples.filter((e) => e.controlId === c.id).map((e) => e.status).sort();
+      if (statuses.join(' ') !== 'fail pass') {
+        problems.push(`${at}: specified control needs exactly one pass and one fail example observation, has [${statuses.join(', ')}]`);
+      }
     } else if (c.depth === 'derived') {
-      if (c.seeds.length === 0) problems.push(`${at}: derived control with no seed`);
+      if (c.seeds.length + (c.derivedFrom?.length ?? 0) === 0) problems.push(`${at}: derived control with no seed and no derivedFrom source`);
       if (c.evidence.length === 0) problems.push(`${at}: derived control with no evidence`);
       if (c.openQuestions.length === 0) problems.push(`${at}: derived control with no open question`);
     } else if (c.depth === 'stub') {
@@ -519,6 +763,19 @@ export function controlProblems(): string[] {
   }
   for (const id of retiredControlIds) {
     if (!CONTROL_ID_PATTERN.test(id)) problems.push(`controls: malformed retired id ${id}`);
+  }
+
+  // Example observations: each names a specified control and its own file.
+  const examplePaths = new Set<string>();
+  for (const e of observationExamples) {
+    const at = `controls example ${e.path}`;
+    const row = controls.find((c) => c.id === e.controlId);
+    if (!row) problems.push(`${at}: unknown control ${e.controlId}`);
+    else if (row.depth !== 'specified') problems.push(`${at}: ${e.controlId} is not a specified control`);
+    const expected = `/controls/examples/control-observation.${e.controlId.toLowerCase()}.${e.status}.json`;
+    if (e.path !== expected) problems.push(`${at}: path should be ${expected}`);
+    if (examplePaths.has(e.path)) problems.push(`${at}: listed twice`);
+    examplePaths.add(e.path);
   }
   return problems;
 }

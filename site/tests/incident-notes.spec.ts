@@ -113,15 +113,17 @@ test.describe('incident notes: dist', () => {
     }
   });
 
-  test('related controls link their anchor on a built profile page', () => {
+  test('related controls link their page or their anchor on a built profile page', () => {
     for (const c of noted) {
       const page = read('cases', `${c.id}.html`);
       for (const id of c.relatedControls ?? []) {
         const href = controlHref(id);
         expect(page, `${c.id} links ${href}`).toContain(`href="${href}"`);
+        // A specified control links its own page; the others an anchor on the profile page.
         const [path, anchor] = href.split('#');
         const target = read(`${path.slice(1)}.html`);
-        expect(target, `${href} resolves`).toContain(`id="${anchor}"`);
+        if (anchor !== undefined) expect(target, `${href} resolves`).toContain(`id="${anchor}"`);
+        else expect(target, `${href} resolves`).toContain('<h1');
       }
     }
   });

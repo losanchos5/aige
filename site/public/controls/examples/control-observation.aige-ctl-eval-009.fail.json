@@ -1,0 +1,25 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
+  "control_id": "AIGE-CTL-EVAL-009",
+  "profile": "evaluation-environment",
+  "control_version": "0.2",
+  "subject": "suite-run-88280@2026-09-26",
+  "subject_kind": "eval-run",
+  "expected": "Every task was shown to be solvable, the scorer passed its known-answer check, every failed run was read and classified, and contaminated runs were excluded or reported.",
+  "observed": "Suite run 88280: 12 of 200 tasks had no evidence of being solvable and their failures were counted against the model; the failed runs on them were not read.",
+  "status": "fail",
+  "timestamp": "2026-09-26T18:03:51Z",
+  "enforcement_point": "pre_merge",
+  "verification_kind": "inspect",
+  "observer": "evaluation lead",
+  "evidence": [
+    {
+      "artefact": "task admission records of suite run 88280",
+      "url": "https://evidence.example/suites/88280/admission.json",
+      "hash": "sha256:535914ef9ae0356d994acb197670cc2f539efcc1c8c37ba44a5ede63136f918a",
+      "schema": "https://aigovernanceengineer.com/schemas/evidence-record.v1.json"
+    }
+  ],
+  "run_id": "88280",
+  "notes": "Illustrative example, not the result of a real evaluation. The result was not released; the 12 tasks were checked, 9 fixed and rerun, and 3 excluded with the exclusion reported."
+}

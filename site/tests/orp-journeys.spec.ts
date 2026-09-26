@@ -106,11 +106,12 @@ test.describe('journey b: engineer', () => {
 
     await page.goto(layer);
     await expect(page.locator('#layer-4')).toBeAttached();
-    // A control whose home layer is 4, listed under that heading.
+    // A control whose home layer is 4, listed under that heading and anchored on its profile page
+    // (specified controls link their own page instead; this journey follows the anchor).
     const control = await step(
       page,
       request,
-      '.cp-layer:has(#layer-4) a[href^="/controls/"]',
+      '.cp-layer:has(#layer-4) a[href^="/controls/"][href*="#"]',
       '/controls#layer-4',
     );
     const [profilePath, anchor] = control.split('#');

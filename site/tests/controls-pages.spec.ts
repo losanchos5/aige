@@ -7,15 +7,16 @@
 // and review links, and a Markdown twin. No page is a stub, none says it is
 // certified and none carries an em dash.
 import { test, expect } from '@playwright/test';
-import { profiles, controlsIn, controlAnchor, profilePath } from '../src/data/controls';
+import { profiles, controlsIn, controlAnchor, profilePath, statusLabels } from '../src/data/controls';
+import { profilePageMeta } from '../src/data/controls/page-meta';
 
 const ORIGIN = 'https://aigovernanceengineer.com';
 const EM_DASH = String.fromCharCode(0x2014);
 
-const TITLES: Record<string, string> = {
-  'evaluation-environment': 'AI evaluation environment controls',
-  'agent-runtime': 'AI agent runtime controls',
-};
+/** Each profile's page title, from src/data/controls/page-meta.ts (no JSON import, so Playwright
+ *  imports it; lib/controls-md.ts re-exports it for the pages). Throws for a profile with none. */
+const TITLES: Record<string, string> = Object.fromEntries(profiles.map((p) => [p.slug, profilePageMeta(p.slug).seoTitle]));
+const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 type JsonLdNode = Record<string, unknown> & { '@type'?: string | string[] };
 
@@ -26,8 +27,10 @@ async function graphOf(page: import('@playwright/test').Page): Promise<JsonLdNod
   return (data['@graph'] ?? [data]) as JsonLdNode[];
 }
 
-test('the registry has the two profiles this spec expects', () => {
-  expect(profiles.map((p) => p.slug)).toEqual(['evaluation-environment', 'agent-runtime']);
+test('the registry keeps its first two profiles, and their titles', () => {
+  expect(profiles.slice(0, 2).map((p) => p.slug)).toEqual(['evaluation-environment', 'agent-runtime']);
+  expect(TITLES['evaluation-environment']).toBe('AI evaluation environment controls');
+  expect(TITLES['agent-runtime']).toBe('AI agent runtime controls');
   expect(controlsIn('evaluation-environment')).toHaveLength(9);
   expect(controlsIn('agent-runtime')).toHaveLength(31);
 });
@@ -39,7 +42,8 @@ for (const profile of profiles) {
   test.describe(path, () => {
     test('keeps its title, renders every control at its anchor and carries the draft notices', async ({ page }) => {
       await page.goto(path);
-      await expect(page).toHaveTitle(new RegExp(`^${TITLES[profile.slug]}\\b`));
+      expect(TITLES[profile.slug], profile.slug).toBeTruthy();
+      await expect(page).toHaveTitle(new RegExp(`^${escapeRegExp(TITLES[profile.slug])}\\b`));
       await expect(page.locator('h1')).toHaveCount(1);
 
       const prose = page.locator('article.prose');
@@ -68,7 +72,7 @@ for (const profile of profiles) {
       const graph = await graphOf(page);
       const article = graph.find((n) => n['@type'] === 'TechArticle');
       expect(article?.['@id']).toBe(`${ORIGIN}${path}#article`);
-      expect(article?.creativeWorkStatus).toBe('Draft');
+      expect(article?.creativeWorkStatus).toBe(statusLabels[profile.status]);
       const set = graph.find((n) => n['@type'] === 'DefinedTermSet');
       expect(set?.['@id']).toBe(`${ORIGIN}${path}#profile`);
       const terms = (set?.hasDefinedTerm ?? []) as JsonLdNode[];
