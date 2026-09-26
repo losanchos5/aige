@@ -12,6 +12,7 @@ import type { Config } from './config.js';
 import type { Upstream } from './upstream.js';
 import type {
   ChaptersDoc,
+  ControlsDoc,
   CrosswalkDoc,
   Envelope,
   FrameworksDoc,
@@ -37,6 +38,7 @@ export const DATASETS = [
   { name: 'contracts', title: 'Contract clauses and licence families' },
   { name: 'roles', title: 'Value-chain roles' },
   { name: 'threats', title: 'Threat bridge' },
+  { name: 'controls', title: 'Open control profiles' },
 ] as const;
 
 export type DatasetName = (typeof DATASETS)[number]['name'];
@@ -70,6 +72,10 @@ export class DataSource {
     return this.upstream.text(`${this.config.apiBase}/obligations/${id.toLowerCase()}.json`);
   }
 
+  controlItemText(id: string): Promise<string> {
+    return this.upstream.text(`${this.config.apiBase}/controls/${id.toLowerCase()}.json`);
+  }
+
   index(): Promise<IndexDoc> {
     return this.upstream.json<IndexDoc>(this.datasetUrl('index'));
   }
@@ -96,6 +102,10 @@ export class DataSource {
 
   chapters(): Promise<ChaptersDoc> {
     return this.upstream.json<ChaptersDoc>(this.datasetUrl('chapters'));
+  }
+
+  controls(): Promise<ControlsDoc> {
+    return this.upstream.json<ControlsDoc>(this.datasetUrl('controls'));
   }
 
   /** A file of the site (schema, example, template) as text. */
