@@ -260,6 +260,13 @@ for (const scheme of ['light', 'dark'] as const) {
         expect(link.worst, `${link.name} worst ${at}`).toBeGreaterThanOrEqual(4.3);
       }
       expect(m.strip.length).toBeGreaterThan(0);
+      // The frameworks line is the strip at every width, on screen (sample()
+      // fails a target with no on-screen box); phones leave the figures out.
+      const names = m.strip.map((item) => item.name);
+      expect(names, `frameworks line ${at}`).toContain('strip "frameworks mapped"');
+      if (size.width < 720) {
+        expect(names.filter((n) => /^strip "(Stack layers|License)"$/i.test(n))).toEqual([]);
+      }
       for (const item of m.strip) {
         expect(item.worst, `${item.name} ${at}`).toBeGreaterThanOrEqual(4.3);
       }
@@ -270,6 +277,20 @@ for (const scheme of ['light', 'dark'] as const) {
 // --- The strip ----------------------------------------------------------------
 
 test.describe('the strip', () => {
+  test('phones keep the frameworks line in the first viewport and drop the figures', async ({
+    page,
+  }) => {
+    await page.setViewportSize(SIZES[1]);
+    await page.goto('/');
+    await expect(page.locator('.hero-facts .strip-kicker--link')).toBeInViewport({ ratio: 1 });
+    await expect(page.locator('.hero-facts .facts-window')).toBeInViewport();
+    await expect(page.locator('.hero-facts .facts--line')).toBeHidden();
+
+    await page.setViewportSize(SIZES[0]);
+    await expect(page.locator('.hero-facts .facts--line')).toBeVisible();
+    await expect(page.locator('.hero-facts .strip-kicker--link')).toBeInViewport({ ratio: 1 });
+  });
+
   test('scrolls when motion is allowed', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
