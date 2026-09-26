@@ -13,8 +13,14 @@ import {
   WEBSITE_ID,
 } from '../../lib/jsonld';
 import { site } from '../../data/site';
-import { people } from '../../data/people';
-import { openQuestions } from '../../data/open-questions';
+import { people, peopleProblems } from '../../data/people';
+import { openQuestions, openQuestionProblems } from '../../data/open-questions';
+import { workProblems } from '../../data/work';
+
+const orpProblems = [...peopleProblems(), ...openQuestionProblems(), ...workProblems()];
+if (orpProblems.length > 0) {
+  throw new Error(`about: ${orpProblems.length} problem(s) in people, open questions or work:\n${orpProblems.join('\n')}`);
+}
 
 // Link the built Body-of-Knowledge PDF only when it exists at build time, so a
 // checkout without the generated file (build/build_pdf.py not run) still builds.

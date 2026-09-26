@@ -17,12 +17,16 @@ import { site } from '../../data/site';
 import { controlById, controlHref } from '../../data/controls';
 import { getPatternBySlug, patternPath } from '../../data/patterns';
 import { personById } from '../../data/people';
-import { researchPath } from '../../data/research';
+import { researchPath, researchProblems } from '../../data/research';
 import { loadResearchPages, researchCitations, type ResearchPage } from '../../lib/research-pages';
 import { gitCreated, gitDate } from '../../lib/reading';
 import { authorNodes, doiIdentifier, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 
 export async function getStaticPaths() {
+  const problems = researchProblems();
+  if (problems.length > 0) {
+    throw new Error(`research: ${problems.length} problem(s) in the themes:\n${problems.join('\n')}`);
+  }
   const pages = await loadResearchPages();
   return pages.map((page) => ({ params: { slug: page.theme.slug }, props: { page } }));
 }

@@ -9,7 +9,7 @@ import Doc from '../../layouts/Doc.astro';
 import StatusLine from '../../components/StatusLine.astro';
 import PillarLink from '../../components/PillarLink.astro';
 import { personById } from '../../data/people';
-import { researchPath, researchThemes } from '../../data/research';
+import { researchPath, researchThemes, researchProblems } from '../../data/research';
 import { loadResearchPages } from '../../lib/research-pages';
 import { collectionPage, lastModified } from '../../lib/jsonld';
 
@@ -18,6 +18,11 @@ const description =
   'Technical notes on the open questions of AI governance engineering: what is assumed, what the evidence shows and what would settle each one.';
 const summary =
   'Technical notes on the open questions of AI governance engineering: what is assumed, what the public evidence shows and what would settle each one.';
+
+const problems = researchProblems();
+if (problems.length > 0) {
+  throw new Error(`research: ${problems.length} problem(s) in the themes:\n${problems.join('\n')}`);
+}
 
 const pages = await loadResearchPages();
 const notes = pages.map(({ entry, theme }) => ({

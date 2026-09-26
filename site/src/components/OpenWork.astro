@@ -6,12 +6,17 @@
  * reviewed or published before it is. Text in --ink-2, so the list reads on a
  * plain, tinted or mesh ground.
  */
-import { work as allWork, WORK_STATUS_LABEL, type WorkItem } from '../data/work';
+import { work as allWork, WORK_STATUS_LABEL, workProblems, type WorkItem } from '../data/work';
 import { formatDate } from '../lib/applies-now';
 
 interface Props {
   /** Defaults to every row of work.ts. */
   items?: readonly WorkItem[];
+}
+
+const problems = workProblems();
+if (problems.length > 0) {
+  throw new Error(`work: ${problems.length} problem(s) in the open work list:\n${problems.join('\n')}`);
 }
 
 const { items = allWork } = Astro.props;
