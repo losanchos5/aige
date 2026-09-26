@@ -29,6 +29,7 @@ import {
   controlAnchor,
   controlPath,
   profilePath,
+  profileArticleId,
   profileSources,
   depthLabels,
 } from '../../data/controls';
@@ -103,7 +104,8 @@ const setId = `${pageUrl}#profile`;
 const jsonLd = [
   {
     '@type': 'TechArticle',
-    '@id': `${pageUrl}#article`,
+    // Stable @id: a control's own page points at it with isPartOf.
+    '@id': profileArticleId(profile),
     headline: profile.title,
     description,
     url: pageUrl,

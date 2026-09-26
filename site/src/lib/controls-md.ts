@@ -12,7 +12,7 @@ import {
   type Control,
   type ControlProfile,
   controlsIn,
-  controlPath,
+  controlAnchorPath,
   controlApiPath,
   profilePath,
   profileSources,
@@ -318,7 +318,7 @@ function controlBlock(c: Control, profile: ControlProfile): string {
   }
   bullets.push(`- JSON: ${abs(controlApiPath(c))}`);
 
-  return [`## ${c.id} ${c.title}`, `Anchor: ${abs(controlPath(c))}`, bullets.join('\n')].join('\n\n');
+  return [`## ${c.id} ${c.title}`, `Anchor: ${abs(controlAnchorPath(c))}`, bullets.join('\n')].join('\n\n');
 }
 
 /** The mappings table of a profile, as a Markdown table. */

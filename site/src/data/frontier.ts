@@ -23,6 +23,10 @@
 
 import type { LayerNumber } from './stack';
 import type { Source } from '../lib/sources';
+import { profileBySlug, profileIdRange } from './controls';
+
+/** The status line of a profile link, read from the registry: id range and version. */
+const profileVersion = (slug: string): string => profileBySlug(slug)?.version ?? '';
 
 export interface FrontierLink {
   title: string;
@@ -224,7 +228,7 @@ export const frontierBlocks: readonly FrontierBlock[] = [
       "Public evaluation practice gives a starting point. METR's Task Standard (v0.5.0) states that, unless a task declares the full_internet permission, the task machines \"MUST NOT have internet access\" except to a small set of destinations such as an LLM API proxy [3]. METR's Guidelines for Capability Elicitation treat task bugs, such as incorrect automatic scoring or a crashed environment, as spurious failures to be fixed before a result is reported [4]. The evaluation environment profile turns such practices into numbered draft controls: egress, credentials, isolation, stop conditions and the run record, each with the point where it is enforced; three of them are specified in full, with a verification procedure and the evidence they leave.",
     ],
     links: [
-      { title: 'Evaluation environment control profile', description: 'AIGE-CTL-EVAL-001 to 009, draft v0.1, open for technical review.', href: '/controls/evaluation-environment', layer: 3 },
+      { title: 'Evaluation environment control profile', description: `${profileIdRange('evaluation-environment')}, draft v${profileVersion('evaluation-environment')}, open for technical review.`, href: '/controls/evaluation-environment', layer: 3 },
       { title: 'Eval gate in CI', description: 'Pattern: a model or agent ships only above a documented threshold; the run is the evidence.', href: '/patterns/eval-gate-in-ci', layer: 3 },
       { title: 'Adversarial red-team suite', description: 'Pattern: a versioned suite built from a threat taxonomy, run in CI or on a schedule.', href: '/patterns/adversarial-red-team-suite', layer: 3 },
       { title: 'Layer 03: evals and red teaming as evidence', description: 'Chapter 04 on what an evaluation must record to count as evidence.', href: '/bok/the-stack#layer-03-evals--red-teaming-as-evidence', layer: 3 },
@@ -240,7 +244,7 @@ export const frontierBlocks: readonly FrontierBlock[] = [
       "Isolation is a claim to test, not to assume. METR's public investigation of a 2026 agent hacking incident reports that agents meant to be \"fully isolated from one another\" communicated through a shared internal package repository [7]. The agent runtime profile states each boundary as a control with the evidence it should leave; its verification procedures are still to be written in review, so that a team can show the boundary held rather than assert it.",
     ],
     links: [
-      { title: 'Agent runtime control profile', description: 'AIGE-CTL-AGENT-001 to 031, derived from chapter 23, draft v0.1.', href: '/controls/agent-runtime', layer: 4 },
+      { title: 'Agent runtime control profile', description: `${profileIdRange('agent-runtime')}, derived from chapter 23, draft v${profileVersion('agent-runtime')}.`, href: '/controls/agent-runtime', layer: 4 },
       { title: 'Agent identity and scoped credentials', description: 'Pattern: one identity per agent, credentials scoped to the task and short-lived.', href: '/patterns/agent-identity-scoped-credentials', layer: 4 },
       { title: 'Runtime guardrail', description: 'Pattern: guardrails on the live request path that emit a decision event for each call.', href: '/patterns/runtime-guardrail', layer: 4 },
       { title: 'Kill switch and circuit breaker', description: 'Pattern: a tested stop for one agent that leaves the rest of the fleet running.', href: '/patterns/kill-switch-circuit-breaker', layer: 4 },

@@ -27,13 +27,14 @@ import {
   controlsForLayer,
   controlPath,
   controlProblems,
+  controlsUpdated,
   profilePath,
   depthLabels,
 } from '../../data/controls';
 import { layers } from '../../data/stack';
 import { site } from '../../data/site';
 import { depthCounts, profileReviewers, machineLinks, machineEvent } from '../../lib/controls-md';
-import { collectionPage, lastModified } from '../../lib/jsonld';
+import { collectionPage } from '../../lib/jsonld';
 import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/pages.css';
 
@@ -113,12 +114,8 @@ const jsonLd = collectionPage({
   path: '/controls',
   name: seoTitle,
   description,
-  dateModified: lastModified(
-    'src/pages/controls/index.astro',
-    'src/data/controls/index.ts',
-    'src/data/controls/evaluation-environment.ts',
-    'src/data/controls/agent-runtime.ts',
-  ),
+  // The newest profile's `updated` date, the same date the sitemap gives /controls.
+  dateModified: controlsUpdated(),
   items: profiles.map((profile) => ({ name: profile.title, url: profilePath(profile) })),
 });
 ---

@@ -591,6 +591,9 @@ export const evaluationEnvironmentControls: readonly Control[] = [
     ...base,
     id: 'AIGE-CTL-EVAL-002',
     title: 'Network Egress Control',
+    pageTitle: 'Network egress control for AI evaluation environments',
+    pageDescription:
+      'Draft control AIGE-CTL-EVAL-002: an AI evaluation run reaches only the destinations on its egress allow-list; any other connection is refused and logged.',
     depth: 'specified',
     objective:
       "Outbound connections from an evaluation environment reach only the destinations on the run's egress allow-list, and every other connection attempt is refused and logged.",
@@ -680,6 +683,9 @@ export const evaluationEnvironmentControls: readonly Control[] = [
     ...base,
     id: 'AIGE-CTL-EVAL-003',
     title: 'Credential Isolation',
+    pageTitle: 'Credential isolation for AI evaluation environments',
+    pageDescription:
+      'Draft control AIGE-CTL-EVAL-003: an agent under evaluation holds only short-lived credentials bound to its own identity and one service, no standing secrets.',
     depth: 'specified',
     objective:
       "An agent under evaluation holds only short-lived credentials issued to its own identity for the run and bound to the one service each is for, never standing secrets or a person's own token.",
@@ -892,6 +898,9 @@ export const evaluationEnvironmentControls: readonly Control[] = [
     ...base,
     id: 'AIGE-CTL-EVAL-006',
     title: 'Stop Conditions',
+    pageTitle: 'Stop conditions for AI evaluation runs',
+    pageDescription:
+      'Draft control AIGE-CTL-EVAL-006: stop conditions, budgets and a stop handle set before an AI evaluation run starts; a stop halts the run in a measured time.',
     depth: 'specified',
     objective:
       "Every evaluation run has stop conditions, budgets and a stop handle defined before it starts, and a stop, pulled by hand or tripped by a breaker, halts the agent's calls and writes within a measured time across every hop it delegated to inside the environment.",

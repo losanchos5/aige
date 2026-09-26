@@ -72,11 +72,11 @@ import {
   profileSources,
   sourceNumber,
   nistAiRmfSubcategories,
+  observationExamples,
   CONTROLS_AS_OF,
   type Control,
   type ControlProfile,
 } from '../data/controls';
-import { observationExamples } from '../data/controls/evaluation-environment';
 import { personById } from '../data/people';
 import { threatById } from '../data/threats';
 import { agentControls, agentAnchors, agentChapter } from '../data/tool-agent-controls';
