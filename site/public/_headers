@@ -114,6 +114,9 @@
 /ai-governance.md
   ! Link
   Link: <https://aigovernanceengineer.com/ai-governance>; rel="canonical"
+/role.md
+  ! Link
+  Link: <https://aigovernanceengineer.com/role>; rel="canonical"
 /resources/crosswalk/*.md
   ! Link
   Link: <https://aigovernanceengineer.com/resources/crosswalk/:splat>; rel="canonical"

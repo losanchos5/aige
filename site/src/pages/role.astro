@@ -5,6 +5,10 @@
  * what employers get wrong, the market (primary medians only), and the maturity
  * ladder. Content comes from src/data/role.ts and src/data/maturity.ts; every
  * section links back to its heading in chapter 06 (or the maturity model).
+ * Under the H1 sits the "In short" passage, in the chapters' summary callout
+ * (reading.css), and after the ways in, the next step: three toolkit pages
+ * (GEO S2, SXO-N-06 of the 2026-09-26 audit). The Markdown twin (/role.md,
+ * lib/llms-corpus.ts roleDoc) prints the same pieces; Seo.astro advertises it.
  */
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/reading.css';
@@ -20,6 +24,7 @@ import StatTile from '../components/StatTile.astro';
 import VerdictStamp from '../components/VerdictStamp.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Byline from '../components/Byline.astro';
+import NextStep from '../components/NextStep.astro';
 import {
   capabilityStatement,
   analystDistinction,
@@ -29,6 +34,10 @@ import {
   waysIn,
   employerMistakes,
   market,
+  roleAnswers,
+  roleInShort,
+  roleNextStepIntro,
+  roleNextSteps,
 } from '../data/role';
 import { levels } from '../data/maturity';
 import { breadcrumbId, breadcrumbJsonLd } from '../lib/breadcrumbs';
@@ -36,11 +45,15 @@ import { fitsSiteSuffix } from '../lib/seo-title';
 import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
 import { getGlossaryEntry } from '../lib/glossary';
 import { site } from '../data/site';
+import { gitCreated } from '../lib/reading';
 
 const roleHref = (anchor: string) => `/bok/the-role#${anchor}`;
 // The visible author and date under the H1 (SXO-06): dated from the page
 // and its data, the same sources as the sitemap's lastmod (astro.config.ts).
 const updated = lastModified('src/pages/role.astro', 'src/data/role.ts', 'src/data/maturity.ts');
+// First published: the day the page file was added (GEO S2: the WebPage node
+// had dateModified only), shown in the byline and stated in the JSON-LD.
+const published = gitCreated('src/pages/role.astro');
 const maturityHref = `/bok/maturity-model#${levels[0].anchor}`;
 
 const primaryStats = market.filter((stat) => stat.primary);
@@ -65,22 +78,11 @@ const reportedText = reportedStats
 
 // This page is the landing for the query "AI governance engineer" (SXO-06,
 // 2026-09-25 audit): the title leads with it, and four section heads are the
-// questions searchers ask, each answered in 40 to 60 words right under it from
-// the facts on this page (data/role.ts) and chapter 06. Chapter 06 carries a
-// different search title, so the two do not compete.
+// questions searchers ask, each answered in 40 to 60 words right under it
+// (roleAnswers in data/role.ts). Chapter 06 carries a different search title,
+// so the two do not compete.
 const seoTitle = 'AI governance engineer: what they do, skills, salary';
-const answers = {
-  does:
-    'An AI governance engineer owns seven workflows, not documents: intake and classification, inventory and registry, evals and red teaming, policy-as-code and gates, runtime monitoring and incidents, assurance and audit evidence, and regulatory translation. Each is a running system with inputs, outputs and the stack layer it maps to.',
-  skills:
-    'The skills follow the workflows. The load-bearing ones are eval harness engineering, policy-as-code in OPA/Rego or Cedar, CI/CD pipeline engineering, observability and incident response, OSCAL and machine-readable evidence, and reading the AI Act, ISO/IEC 42001 and the NIST AI RMF. Under all seven: enough Python to glue systems together.',
-  become:
-    'There are three ways in, each from an adjacent discipline, and each brings an edge and a gap. From legal or privacy, start at policy-as-code and intake. From security or GRC, start at evals-as-evidence and the agent registry. From MLOps or ML engineering, start at eval gates in CI and runtime monitoring.',
-  // The figures are the primary medians of `market` below (tests/seo-titles.spec.ts
-  // checks that each tile value appears in this answer).
-  salary:
-    'The IAPP Salary & Jobs Report 2025-26 puts the median technical AI-governance salary at USD 221k in the tech sector, its highest band. The median across AI-governance work generally is USD 151.8k, and USD 169.7k for combined privacy-and-AI-governance roles. These are primary medians; other demand signals are reported below, not as headline figures.',
-};
+const answers = roleAnswers;
 
 const description =
   'What an AI governance engineer does: the seven workflows the role owns, the skills behind them, IAPP salary medians and three ways into the role.';
@@ -103,6 +105,7 @@ const jsonLd = [
     isPartOf: { '@id': WEBSITE_ID },
     publisher: { '@id': ORG_ID },
     author: [...authorRefs],
+    datePublished: published,
     dateModified: updated,
     breadcrumb: { '@id': breadcrumbId(pageUrl) },
     ...(roleTerm ? { about: { '@id': `${new URL(roleTerm.url, site.url).href}#term` } } : {}),
@@ -124,8 +127,17 @@ const jsonLd = [
     title="What an AI Governance Engineer does."
     lede={capabilityStatement}
   >
-    <Byline slot="lede" date={updated} />
+    <Byline slot="lede" date={updated} published={published} />
   </PageHero>
+
+  <Section tone="plain">
+    <div class="prose role-in-short">
+      <aside class="callout" data-kind="summary" data-role-in-short>
+        <p class="callout-title">In short</p>
+        <p>{roleInShort}</p>
+      </aside>
+    </div>
+  </Section>
 
   <Section
     tone="plain"
@@ -191,6 +203,15 @@ const jsonLd = [
         Read in chapter 06 <span class="arrow" aria-hidden="true">→</span>
       </a>
     </p>
+  </Section>
+
+  <Section
+    tone="plain"
+    id="next-step"
+    title="Next step: start one workflow this week."
+    lede={roleNextStepIntro}
+  >
+    <NextStep steps={roleNextSteps} />
   </Section>
 
   <Section tone="plain" title="Three tells an employer has the role wrong.">
@@ -268,6 +289,13 @@ const jsonLd = [
 </Marketing>
 
 <style>
+  /* In short: the chapters' summary callout, left-aligned with the section
+     heads (.prose centres its column by default). */
+  .role-in-short {
+    max-width: var(--prose);
+    margin-inline: 0;
+  }
+
   /* Three ways in */
   .ways {
     list-style: none;

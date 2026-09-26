@@ -163,7 +163,11 @@ test.describe('llms.txt covers the sitemap', () => {
     for (const path of ['/role', '/stack', '/path']) {
       const source = readFileSync(join('src', 'pages', `${path.slice(1)}.astro`), 'utf8');
       const title = /const seoTitle = '([^']+)'/.exec(source)?.[1];
-      const description = /<Marketing\b[^>]*?\bdescription="([^"]+)"/s.exec(source)?.[1];
+      // A literal prop, or `description={description}` with the string in a
+      // `const description = '...'`, as /role passes it (llms-routes reads both).
+      const description =
+        /<Marketing\b[^>]*?\bdescription="([^"]+)"/s.exec(source)?.[1] ??
+        /\bconst description\s*=\s*'([^']+)'/.exec(source)?.[1];
       expect(title, `${path} seoTitle`).toBeTruthy();
       expect(description, `${path} description`).toBeTruthy();
       expect(text, path).toContain(`- [${title}](${ORIGIN}${path}): ${description}`);
@@ -173,7 +177,7 @@ test.describe('llms.txt covers the sitemap', () => {
 
 // ---- llms-full slices ------------------------------------------------------------
 
-const SLICES = ['bok', 'foundations', 'lifecycle', 'law', 'regulatory', 'patterns', 'glossary', 'cases'];
+const SLICES = ['bok', 'foundations', 'lifecycle', 'law', 'regulatory', 'obligations', 'patterns', 'glossary', 'cases'];
 // About 200k tokens at four characters per token: a common context window.
 const MAX_SLICE_CHARS = 800_000;
 
@@ -199,7 +203,8 @@ test.describe('llms-full slices', () => {
   test('cases, harms and obligations are in the corpus', async ({ request }) => {
     const full = await (await request.get('/llms-full.txt')).text();
     const casesSlice = await (await request.get('/llms-full-cases.txt')).text();
-    const regulatory = await (await request.get('/llms-full-regulatory.txt')).text();
+    // The register has had its own slice since the 2026-09-26 audit (GEO N7).
+    const register = await (await request.get('/llms-full-obligations.txt')).text();
     const glossary = await (await request.get('/llms-full-glossary.txt')).text();
     for (const entry of cases) {
       expect(full, entry.id).toContain(`Source: ${ORIGIN}/cases/${entry.id}\n`);
@@ -208,7 +213,7 @@ test.describe('llms-full slices', () => {
     expect(full).toContain(`Source: ${ORIGIN}/resources/harms\n`);
     expect(casesSlice).toContain(`Source: ${ORIGIN}/resources/harms\n`);
     for (const row of obligations) {
-      expect(regulatory, row.id).toContain(`Source: ${ORIGIN}${obligationPath(row)}\n`);
+      expect(register, row.id).toContain(`Source: ${ORIGIN}${obligationPath(row)}\n`);
       expect(full, row.id).toContain(`Source: ${ORIGIN}${obligationPath(row)}\n`);
     }
     for (const entry of getGlossary()) {
