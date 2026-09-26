@@ -185,6 +185,7 @@ test.describe('control-observation record', () => {
       const row = controls.find((c) => c.id === example.controlId)!;
       expect(row.depth, file).toBe('specified');
       expect(doc.subject_kind, file).toBe(row.observation!.subjectKind);
+      expect(doc.control_version, file).toBe(row.version);
       expect(String(doc.notes ?? ''), file).toMatch(/illustrative example/i);
       expect(readFileSync(file, 'utf8').includes(EM_DASH), file).toBe(false);
     }
