@@ -147,6 +147,11 @@ const PAGE_META: Readonly<Record<string, ProfilePageMeta>> = {
     description:
       'An open control profile for AI training data: dataset admission, rights ledger, lawful basis, purpose limits, special categories and lineage. Draft v0.1.',
   },
+  'assurance-and-evidence': {
+    seoTitle: 'AI assurance and evidence controls',
+    description:
+      'An open control profile for AI assurance: eval gates, test plans and reports, signed evidence records, OSCAL, model integrity and AIBOM. Draft v0.1.',
+  },
 };
 
 /** The page metadata of a profile; throws for a profile with none, so a new profile fails the build until it has its own. */

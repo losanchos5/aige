@@ -8,14 +8,17 @@
 // certified and none carries an em dash.
 import { test, expect } from '@playwright/test';
 import { profiles, controlsIn, controlAnchor, profilePath } from '../src/data/controls';
+import { readFileSync } from 'node:fs';
 
 const ORIGIN = 'https://aigovernanceengineer.com';
 const EM_DASH = String.fromCharCode(0x2014);
 
-const TITLES: Record<string, string> = {
-  'evaluation-environment': 'AI evaluation environment controls',
-  'agent-runtime': 'AI agent runtime controls',
-};
+/** Each profile's page title, read from PAGE_META in src/lib/controls-md.ts (that module imports JSON
+ *  without an import attribute, so the test reads its source instead of importing it). */
+const PAGE_META_SRC = readFileSync('src/lib/controls-md.ts', 'utf8');
+const TITLES: Record<string, string> = Object.fromEntries(
+  profiles.map((p) => [p.slug, new RegExp(`'${p.slug}': \\{\\s*seoTitle: '([^']+)'`).exec(PAGE_META_SRC)?.[1] ?? '']),
+);
 
 type JsonLdNode = Record<string, unknown> & { '@type'?: string | string[] };
 
@@ -26,8 +29,10 @@ async function graphOf(page: import('@playwright/test').Page): Promise<JsonLdNod
   return (data['@graph'] ?? [data]) as JsonLdNode[];
 }
 
-test('the registry has the two profiles this spec expects', () => {
-  expect(profiles.map((p) => p.slug)).toEqual(['evaluation-environment', 'agent-runtime']);
+test('the registry keeps its first two profiles, and their titles', () => {
+  expect(profiles.slice(0, 2).map((p) => p.slug)).toEqual(['evaluation-environment', 'agent-runtime']);
+  expect(TITLES['evaluation-environment']).toBe('AI evaluation environment controls');
+  expect(TITLES['agent-runtime']).toBe('AI agent runtime controls');
   expect(controlsIn('evaluation-environment')).toHaveLength(9);
   expect(controlsIn('agent-runtime')).toHaveLength(31);
 });

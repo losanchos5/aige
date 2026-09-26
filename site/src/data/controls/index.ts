@@ -80,6 +80,11 @@ import {
   dataAdmissionAndPrivacyControls,
   observationExamples as dataAdmissionAndPrivacyObservationExamples,
 } from './data-admission-and-privacy';
+import {
+  assuranceAndEvidenceProfile,
+  assuranceAndEvidenceControls,
+  observationExamples as assuranceAndEvidenceObservationExamples,
+} from './assurance-and-evidence';
 import { CONTROL_ID_PATTERN } from './ids';
 
 export const CONTROLS_AS_OF = '2026-09-26';
@@ -289,12 +294,14 @@ export const profiles: readonly ControlProfile[] = [
   evaluationEnvironmentProfile,
   agentRuntimeProfile,
   dataAdmissionAndPrivacyProfile,
+  assuranceAndEvidenceProfile,
 ];
 
 export const controls: readonly Control[] = [
   ...evaluationEnvironmentControls,
   ...agentRuntimeControls,
   ...dataAdmissionAndPrivacyControls,
+  ...assuranceAndEvidenceControls,
 ];
 
 /**
@@ -305,6 +312,7 @@ export const controls: readonly Control[] = [
 export const observationExamples: readonly ObservationExample[] = [
   ...evaluationEnvironmentObservationExamples,
   ...dataAdmissionAndPrivacyObservationExamples,
+  ...assuranceAndEvidenceObservationExamples,
 ];
 
 // ---------------------------------------------------------------------------
