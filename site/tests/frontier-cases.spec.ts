@@ -142,7 +142,7 @@ test.describe('frontier cases: data', () => {
 });
 
 test.describe('frontier cases: dist', () => {
-  test.skip(!hasDist, 'dist not built');
+  test.skip(!hasDist && !process.env.CI, 'dist not built');
 
   test('each case page renders the note sections, the "On this page" list and its related controls', () => {
     for (const id of NEW_IDS) {

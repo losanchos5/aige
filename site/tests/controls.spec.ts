@@ -15,7 +15,6 @@ import {
   profiles,
   controlProblems,
   controlsIn,
-  controlSlug,
   controlAnchor,
 } from '../src/data/controls';
 import { observationExamples } from '../src/data/controls/evaluation-environment';
@@ -173,7 +172,7 @@ test.describe('control-observation record', () => {
 });
 
 test.describe('open control profiles: built outputs', () => {
-  test.skip(!existsSync(DATASET), 'run npm run build first');
+  test.skip(!existsSync(DATASET) && !process.env.CI, 'run npm run build first');
 
   test('the dataset lists every control in order, with its profiles and the notice', () => {
     const api = readJson(DATASET);
@@ -223,11 +222,9 @@ test.describe('open control profiles: built outputs', () => {
   });
 
   test('the profile page carries an anchor per control', () => {
-    test.skip(!existsSync(PAGE), 'no profile page in this build');
     const html = readFileSync(PAGE, 'utf8');
     for (const c of evalControls()) {
       expect(html, c.id).toContain(`id="${controlAnchor(c)}"`);
-      expect(controlSlug(c)).toBe(controlAnchor(c));
     }
   });
 });

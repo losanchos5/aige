@@ -141,7 +141,7 @@ test.describe('research note sources', () => {
 });
 
 test.describe('research pages in dist', () => {
-  test.skip(!existsSync('dist'), 'needs a build (npm run build)');
+  test.skip(!existsSync('dist') && !process.env.CI, 'needs a build (npm run build)');
 
   for (const theme of writtenThemes()) {
     const path = researchPath(theme);

@@ -79,7 +79,7 @@ const EVENTS = [
 ] as const;
 
 test.describe('Umami events in dist', () => {
-  test.skip(!hasDist, 'dist not built');
+  test.skip(!hasDist && !process.env.CI, 'dist not built');
 
   test('every event name is kebab-case, within 50 characters, and only on a link or a button', () => {
     const files = htmlFiles(DIST);

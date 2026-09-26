@@ -23,7 +23,7 @@ const NEW_FORMS = [
 ];
 const BODY_TYPES = new Set(['markdown', 'input', 'textarea', 'dropdown', 'checkboxes']);
 const ISSUE_FORM = /\/issues\/new\?template=([a-z-]+\.yml)$/;
-const EM_DASH = '—';
+const EM_DASH = String.fromCharCode(0x2014);
 
 const built = () => readFileSync(join('dist', 'contribute.html'), 'utf8');
 

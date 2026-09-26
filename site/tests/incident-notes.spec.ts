@@ -97,7 +97,7 @@ test.describe('incident notes: data', () => {
 });
 
 test.describe('incident notes: dist', () => {
-  test.skip(!hasDist, 'dist not built');
+  test.skip(!hasDist && !process.env.CI, 'dist not built');
 
   test('noted cases render their sections and an "On this page" list; the others do not', () => {
     for (const c of cases) {
