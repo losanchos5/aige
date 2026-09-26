@@ -21,6 +21,7 @@ import ControlRecord from '../../components/ControlRecord.astro';
 import SourceList from '../../components/SourceList.astro';
 import ContributeCta from '../../components/ContributeCta.astro';
 import Citation from '../../components/Citation.astro';
+import Provenance from '../../components/Provenance.astro';
 import {
   type ControlProfile,
   profiles,
@@ -30,6 +31,8 @@ import {
   controlPath,
   profilePath,
   profileArticleId,
+  profileCitation,
+  statusLabels,
   profileSources,
   depthLabels,
 } from '../../data/controls';
@@ -75,6 +78,10 @@ const path = profilePath(profile);
 const pageUrl = new URL(path, site.url).href;
 const issueForm = `${site.github}/issues/new?template=${profile.issueTemplate}`;
 const citeTitle = `${profile.title} v${profile.version} (draft)`;
+// Block orp2-release: the DOI this profile is cited with (its own once
+// deposited, else the project concept DOI) and the data file it is built from.
+const cite = profileCitation(profile);
+const editPath = `site/src/data/controls/${profile.slug}.ts`;
 
 const crumbs = [{ label: 'Open control profiles', href: '/controls' }, { label: profile.shortTitle }];
 
@@ -165,6 +172,14 @@ const jsonLd = [
   <div class="cp-head" data-pagefind-ignore>
     <Byline date={profile.updated} dateLabel="Updated" published={profile.published} />
     <StatusLine version={profile.version} status={profile.status} reviewers={reviewers} />
+    <Provenance
+      version={profile.version}
+      status={statusLabels[profile.status]}
+      editPath={editPath}
+      doi={cite.effectiveDoi}
+      citeHref="#cite"
+      issueHref={issueForm}
+    />
   </div>
 
   <Callout kind="note" title="Draft for review, not a claim of conformity">
@@ -350,7 +365,24 @@ const jsonLd = [
   </p>
   <ContributeCta kind="control" title={`${profile.title} v${profile.version}`} />
 
-  <Citation title={citeTitle} url={path} kind="page" />
+  <div id="cite" class="cp-cite">
+    <p class="cp-doi-note" data-doi-kind={cite.doi ? 'profile' : 'project-concept'}>
+      {
+        cite.doi ? (
+          <>
+            DOI of this profile version: <a href={`https://doi.org/${cite.doi}`}>{cite.doi}</a>.
+          </>
+        ) : (
+          <>
+            This profile has no DOI of its own yet: it is cited with the project concept DOI,{' '}
+            <a href={`https://doi.org/${cite.effectiveDoi}`}>{cite.effectiveDoi}</a>, which resolves
+            to the latest archived version of the whole project.
+          </>
+        )
+      }
+    </p>
+    <Citation title={citeTitle} url={path} kind="page" doi={cite.effectiveDoi} />
+  </div>
 </Doc>
 
 <style>
@@ -364,6 +396,15 @@ const jsonLd = [
 
   .cp-head :global(.status-line) {
     margin: var(--s-2) 0 0;
+  }
+
+  .cp-cite {
+    margin-top: var(--s-6);
+  }
+
+  .cp-doi-note {
+    font-size: var(--fs-label);
+    color: var(--ink-2);
   }
 
   /* The mappings table sits in the reading well: the res-table look, not the
