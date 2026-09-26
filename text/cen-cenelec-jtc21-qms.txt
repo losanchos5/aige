@@ -1,0 +1,19 @@
+POSTED: 2026-07-31
+EN 18286 in the Spotlight: Supporting Compliance with the AI Act
+A significant milestone has been reached in European AI standardization. The first standard in support of the implementation of the AI Act, EN 18286: 2026 ‘Artificial intelligence – Quality management system for EU AI Act regulatory purposes’, has been published. This standard is a fundamental step towards regulatory compliance.
+EN 18286: 2026 ‘Artificial intelligence – Quality management system for EU AI Act regulatory purposes’ specifies the requirements and provides guidance for the definition, implementation, and maintenance of a quality management system for organizations that provide AI systems. It is not specific to any sector but forms part of a broader suite of related standards that are developed to establish a consistent and comprehensive framework for high-risk AI system deployment.
+Why this standard matters
+This standard changes everything. It is the first of its kind, being a fundamental step to demonstrate compliance when applying a high-risk AI system.
+Together with the rest of the standards for high-risk AI, EN 18286: 2026 contributes to building the foundations needed for trustworthy, secure, and responsible AI across Europe. More specifically, EN 18286 is important because it is the first harmonized European standard for the AI Act regulatory purposes, focused on the quality management system required for high-risk AI systems. It provides organizations with a concrete framework for governance, life cycle control, documentation, and consistency in how AI systems are developed and maintained.
+The benefits of using EN 18286
+Using this standard will support an organization in meeting applicable regulatory requirements. A high-risk AI system is an artificial intelligence application that poses significant potential harm to people's health, safety or fundamental human rights. Key examples include AI used in critical infrastructure, hiring and employment, and law enforcement. Standards on high-risk AI, such as EN 18286, are important because AI system failures or biased decisions can deeply ruin lives, deny essential public or private services, and cause physical or societal harm.
+EN 18286 represents a major step towards providing organizations with a practical and structured framework for implementing AI governance and demonstrating conformity with the requirements of the EU AI Act.
+In practice, what this means is that companies will have a clearer route to demonstrate conformity with the AI Act, especially Article 17, which sets requirements for high-risk AI providers. It also matters beyond compliance: harmonized standards create legal certainty, help turn regulation into usable engineering practice, and support a more common European approach to trustworthy AI.
+This is a significant milestone as it is one of the first building blocks in the broader standardization landscape that will support the AI Act across risk management, cybersecurity, logging, and other critical areas.
+Contact:
+Yannis CHOURMOUZIADIS
+IChourmouziadis@cencenelec.eu
+TAGS:
+artificial intelligence
+EN in the spotlight
+European Standardization

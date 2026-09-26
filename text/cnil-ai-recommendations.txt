@@ -1,0 +1,67 @@
+Home
+AI: The CNIL finalises its recommendations on the development of artificial intelligence systems and announces its upcoming work
+AI: The CNIL finalises its recommendations on the development of artificial intelligence systems and announces its upcoming work
+22 July 2025
+The CNIL publishes its latest AI recommendations, clarifying GDPR applicability to models, security requirements, and conditions for annotating training data. It will continue its work through sector-specific analyses and tools for compliance assessment.
+Print the article
+Partager cette page par courriel
+Decrease the size of the font
+Increase the size of the font
+The CNIL’s new AI recommendations
+AI models trained on personal data may fall under the GDPR
+The opinion adopted by the European data protection board (EDPB) in December 2024 reminds that the GDPR often applies to AI models trained on personal data due to their memorisation capabilities.
+In its new recommendations, the CNIL guides stakeholders in conducting and documenting the analysis required to determine whether the use of their model falls under the GDPR. It also proposes concrete solutions to prevent personal data processing, such as implementing robust filters within the system encapsulating the model.
+Annotation compliance and AI system development security must be ensured
+Two practical fact sheets are made available to professionals:
+Annotating data
+The data annotation phase is crucial to ensure both the quality of the trained model and the protection of individuals’ rights, while also fostering the development of more reliable and efficient AI systems.
+Ensuring secure AI system development
+The CNIL details the risks and measures to consider during AI system development to ensure it takes place in a secure environment.
+Consult the recommendations
+Recommendations developed in consultation with AI actors
+As with previous publications, the three new recommendations were developed following a public consultation. Companies, researchers, academics, associations, legal and technical experts, trade unions, and professional federations all contributed to shaping practical and relevant guidance for the CNIL.
+Read the summary of the questionnaire responses (in French)
+Read the summary of contributions (in French)
+Practicals tools: summary sheet and check-list available
+To help professionals easily apply these recommendations, the CNIL provides two practical tools :
+A summary of the recommendations
+A check-list of key compliance points
+These tools help quickly verify that data protection requirements are being met during AI system development.
+AI and the GDPR: The CNIL unveils its future Work
+The publication of these new recommendations marks a key step for the CNIL. It reflects a wish to support AI development that respects data protection while encouraging innovation.
+As part of its 2025–2028 strategic plan, the CNIL will continue its work across several complementary areas.
+Sector-specific recommendations
+Given the diverse contexts of AI usage, the CNIL is developing sector-specific recommendations to provide legal certainty and promote responsible AI use.
+AI and Education
+The CNIL recently published two FAQs for educators and data controllers (school principals, ministries, academic authorities). These provide guidance on AI usage in educational missions, offer practical advice, and clarify legal obligations and compliance requirements.
+AI and Health
+In the health sector, the CNIL promotes co-regulation and regularly engages with health authorities to create cross-cutting recommendations. It actively participates in the French national Authority for Health's work on AI system use in healthcare. A fact sheet summarizing the rules for AI development in healthcare, with real-world examples, will be published soon.
+AI and the Workplace
+While AI deployment in professional contexts holds promise, it also raises significant concerns for fundamental rights and freedoms of individuals — employees, clients, users, and contractors. The CNIL has begun a reflection process with sector stakeholders (solution developers, employers, unions, public and academic institutions, etc.) to define a framework for these uses.
+Upcoming recommendations on the responsibilities of AI value chain actors
+In the second half of 2025, the CNIL will release new recommendations to clarify the responsibilities of actors in the AI system creation chain (model designers, reusers, integrators, etc.) under the GDPR.
+Key goals include:
+clarifying GDPR implications for non-anonymised models;
+studying the case of open source, which is critical to AI technology development
+These recommendations will undergo public consultation to involve the broader community.
+Technical tools for professionals
+To facilitate practical implementation of its recommendations, the CNIL is developing tailored technical tools.
+It launched the PANAME project (Privacy Auditing of AI Models) in partnership with the French Cybersecurity Agency (ANSSI), the iPoP research program (Interdisciplinary Project on Privacy), and the French center of expertise for digital platform regulation (PEReN). The project aims to create a software library to assess whether a model processes personal data. This tool will provide concrete, operational solutions to AI developers and users, bridging CNIL’s guidance with real-world implementation.
+Research on explainability in AI (xAI)
+Launched in summer 2024, research on AI model explainability (xAI) is underway. The CNIL will soon publish initial findings on its LINC lab website. These results combine mathematical analyses of techniques with quantitative and qualitative insights from social sciences, in collaboration with researchers from SciencesPo and the Center for Research in Economics and Statistics (CREST).
+This work will provide legal certainty for stakeholders aiming to responsibly implement these technologies in key sectors, helping foster innovative and rights-respecting AI.
+Texte reference
+Read more
+AI how-to sheets
+All CNIL's content on artificial intelligence
+#Artificial intelligence
+This can also interest you ...
+The role of the Data Protection Officer (DPO) in the age of artificial intelligence: survey results ...
+22 September 2026
+Artificial intelligence
+AI: the CNIL updates its traceability tool for open-weights AI models
+26 August 2026
+Artificial intelligence
+EDPB sheds light on anonymisation and web scraping for generative AI and adopts final version of ...
+09 July 2026
+EDPB

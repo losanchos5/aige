@@ -1,0 +1,8 @@
+#lsNm@value: 인공지능 발전과 신뢰 기반 조성 등에 관한 기본법
+#lsiSeq@value: 282791
+#ancYd@value: 20260120
+#ancNo@value: 21311
+#nwYn@value: Y
+법령
+- 인공지능 발전과 신뢰 기반 조성 등에 관한 기본법
+(신구법 비교는 공포단위 서비스입니다)

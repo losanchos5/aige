@@ -1,0 +1,46 @@
+Page Contents
+Page Contents
+The 3 chapters of the code
+Signatories of the code of practice
+The code of practice helps industry comply with the AI Act legal obligations on safety, transparency and copyright of general-purpose AI models.
+The General-Purpose AI (GPAI) code of practice is a voluntary tool, prepared by independent experts in a multi-stakeholder process, designed to help industry comply with the AI Act’s obligations for providers of general-purpose AI models. Read more about the timeline and the drafting process of the code.
+The code was published on July 10, 2025. It is complemented by Commission guidelines [https://digital-strategy.ec.europa.eu/en/library/guidelines-scope-obligations-providers-general-purpose-ai-models-under-ai-act] on key concepts related to general-purpose AI models. The Commission [https://digital-strategy.ec.europa.eu/en/library/commission-opinion-assessment-general-purpose-ai-code-practice] and the AI Board have confirmed that the code is an adequate voluntary tool for providers of GPAI models to demonstrate compliance with the AI Act.
+Following the endorsement, AI model providers who voluntarily sign it can show they comply with the AI Act by adhering to the code. This will reduce their administrative burden and give them more legal certainty and trust than if they proved compliance through other methods. Find more information on the questions and answers (Q&A) about the GPAI code of practice. Signatories of the Code have established the Signatory Taskforce, chaired by the AI Office, to facilitate a coherent application of the Code. The Vademecum [https://ec.europa.eu/newsroom/dae/redirection/document/124170] contains the rules of procedure and the list of members.
+Providers of general-purpose AI models may sign the code by completing the Signatory Form [https://ec.europa.eu/newsroom/dae/redirection/document/118312] and sending the signed form to EU-AIOFFICE-CODE-SIGNATURES@ec.europa.eu. Potential Signatories may also email this address to ask any questions on the process of signing up to the code. Read more information about the signature process [https://digital-strategy.ec.europa.eu/en/library/ai-office-invites-providers-sign-gpai-code-practice] in this this dedicated Q&A.
+The 3 chapters of the code
+Below you can download the code, consisting of three separately authored chapters: Transparency, Copyright, and Safety and Security.
+The Chapters on Transparency and Copyright offer all providers of general-purpose AI models a way to demonstrate compliance with their obligations under Article 53 AI Act.
+The Chapters on Safety and Security is only relevant to the small number of providers of the most advanced models, those that are subject to the AI Act's obligations for providers of general-purpose AI models with systemic risk under Article 55 AI Act.
+Transparency
+The Transparency chapter (PDF) [https://ec.europa.eu/newsroom/dae/redirection/document/118120] offers a user-friendly Model Documentation Form (DOCX) [https://ec.europa.eu/newsroom/dae/redirection/document/118118] which allows providers to easily document the information necessary to comply with the AI Act obligation to on model providers to ensure sufficient transparency.
+Copyright
+The Copyright chapter (PDF) [https://ec.europa.eu/newsroom/dae/redirection/document/118115] offers providers practical solutions to meet the AI Act's obligation to put in place a policy to comply with EU copyright law.
+Safety and Security
+The Safety and Security chapter (PDF) [https://ec.europa.eu/newsroom/dae/redirection/document/118119] outlines concrete state-of-the-art practices for managing systemic risks, i.e. risks from the most advanced models. Providers can rely on this chapter to comply with the AI Act obligations for providers of general-purpose AI models with systemic risk.
+Signatories of the code of practice
+Some signatories may not appear immediately, but we are making sure to continuously update the list as signatures are confirmed.
+AI Studio Delta
+Aleph Alpha
+Almawave
+Amazon
+Anthropic
+Black Forest Labs
+Bria AI
+Cohere
+Domyn
+Dweve
+Fastweb
+Google
+IBM
+LINAGORA
+Microsoft
+Mistral AI
+Open Hippo
+OpenAI
+Pleias
+ServiceNow
+WRITER
+In addition, xAI signed up to the Safety and Security Chapter; this means that it will have to demonstrate compliance with the AI Act’s obligations concerning transparency and copyright via alternative adequate means.
+Last update
+31 July 2026
+Print as PDF

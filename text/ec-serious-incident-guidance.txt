@@ -1,0 +1,20 @@
+Opening: 26 September 2025
+Closing: 07 November 2025
+Stakeholders are encouraged to provide feedback and examples on the interplay with other reporting regimes in this public consultation.
+GettyImages © Khanchit Khirisutchalual
+Under the EU AI Act, providers of high-risk AI systems will be required to report serious incidents to national authorities. This new obligation, set out in Article 73, aims to detect risks early, ensure accountability, enable quick action, and build public trust in AI technologies.
+While the rules will only become applicable from August 2026, you can already download the draft guidance and reporting template below. Both these documents will help providers to prepare. The draft guidance clarifies definitions, offers practical examples, and explains how the new rules relate to other legal obligations.
+The EU’s approach also seeks alignment with international initiatives, such as the OECD’s AI Incidents Monitor and Common Reporting Framework.
+Participate in the consultation process until november 7.
+Downloads
+Draft Guidance article 73 AI Act - incident reporting
+Download
+[https://ec.europa.eu/newsroom/dae/redirection/document/119624]
+Incident report for serious incidents under the AI Act (High-risk AI systems)
+Download
+[https://ec.europa.eu/newsroom/dae/redirection/document/119623]
+Related topics
+Artificial intelligence
+Last update
+4 November 2025
+Print as PDF

@@ -1,0 +1,77 @@
+TOP 10 FOR GEN AI
+2025 Top 10 Risk & Mitigations for LLMs and Gen AI Apps
+Expore the latest Top 10 risks, vulnerabilities and mitigations for developing and securing generative AI and large language model applications across the development, deployment and management lifecycle.
+Read the OWASP Top 10 for LLMs 2023-24
+Download
+LLM01:2025 Prompt Injection
+A Prompt Injection Vulnerability occurs when user prompts alter the...
+Read More
+LLM02:2025 Sensitive Information Disclosure
+Sensitive information can affect both the LLM and its application...
+Read More
+LLM03:2025 Supply Chain
+LLM supply chains are susceptible to various vulnerabilities, which can...
+Read More
+LLM04:2025 Data and Model Poisoning
+Data poisoning occurs when pre-training, fine-tuning, or embedding data is...
+Read More
+LLM05:2025 Improper Output Handling
+Improper Output Handling refers specifically to insufficient validation, sanitization, and...
+Read More
+LLM06:2025 Excessive Agency
+An LLM-based system is often granted a degree of agency...
+Read More
+LLM07:2025 System Prompt Leakage
+The system prompt leakage vulnerability in LLMs refers to the...
+Read More
+LLM08:2025 Vector and Embedding Weaknesses
+Vectors and embeddings vulnerabilities present significant security risks in systems...
+Read More
+LLM09:2025 Misinformation
+Misinformation from LLMs poses a core vulnerability for applications relying...
+Read More
+LLM10:2025 Unbounded Consumption
+Unbounded Consumption refers to the process where a Large Language...
+Read More
+Document Versions and Translations
+April 11, 2024
+LLM Top 10 for LLMs 2024
+May 4, 2024
+OWASP Top 10 for LLM Overview Presentation
+May 7, 2024
+LLM Top 10 for LLMs 2024 – Chinese
+1
+2
+3
+4
+Next
+Top 10 2025 de riesgos y mitigaciones para LLMs y aplicaciones de IA Generativa
+View »
+March 12, 2025
+OWASP Top 10 para Aplicações de LLM e IA Generativa (2025)
+View »
+March 12, 2025
+OWASP大型語言模型及生成式 AI 十大風險（2025)
+View »
+March 12, 2025
+2025 में LLM Applications के लि ए OWASP के शी र्ष 10
+View »
+July 22, 2025
+OWASP Τοπ-10 για Εφαρμογές LLM 2025
+View »
+July 22, 2025
+LLM 애플리케이션을 위한 OWASP Top 10 2025
+View »
+July 22, 2025
+OWASP Top 10 для LLM и генеративного ИИ (2025)
+View »
+March 12, 2025
+OWASP大型语言模型与生成式AI十大风险（2025）
+View »
+March 12, 2025
+die OWASP Top 10 für LLM & Generative KI (2025)
+View »
+March 12, 2025
+大規模言語モデル（LLM）アプリケーションに関するOWASP Top 10
+View »
+July 22, 2025

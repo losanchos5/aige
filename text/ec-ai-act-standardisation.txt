@@ -1,0 +1,31 @@
+Harmonised standards will offer legal certainty under the AI Act, support innovation, and position the EU to set global benchmarks for trustworthy AI.
+Ensuring an effective and clear implementation of the AI Act is a priority for the Commission. The AI Act regulates regulates ‘high-risk’ AI systems that impact safety, health, and fundamental rights, for example, in critical infrastructure and law enforcement, among other areas (see article 6 and annex III of the AI Act). These requirements need to be fulfilled before placement on the market, ensuring high-risk AI systems are monitored throughout their lifecycle.
+Standards translate legal requirements into common technical language, simplifying compliance for companies and other stakeholders.
+European harmonised standards serve several crucial functions:
+Legal certainty and reduced compliance costs: European harmonised standards provide a clear pathway to compliance for businesses of all sizes.
+Market benchmarking: European harmonised standards often become de facto global benchmarks. For example, standards currently under development focused on setting methodologies for risk management and quality management are strong candidates to become market benchmarks in the future.
+Innovation and competitiveness: European harmonised standards foster trust and market acceptance, enabling developers who adopt them to compete on a global scale while ensuring their solutions meet the highest safety standards.
+How are standards developed and what are the current standards?
+The European Committee for Standardisation (CEN) and European Committee for Electrotechnical Standardisation (CENELEC) are European Standardisation Organisations. Working groups in these 2 organisations are actively developing harmonised standards for high-risk AI systems. They work together in a Joint Technical Committee called JTC 21.
+The European Commission has requested that CEN and CENELEC develop standards in ten key areas:
+risk management
+governance and quality of datasets
+record keeping
+transparency
+human oversight
+accuracy
+robustness
+cybersecurity
+quality management
+conformity assessment
+Once harmonised standards are published by CEN and CENELEC, the Commission assesses whether they meet the intended objectives and legal requirements of the AI Act. After this final step, the standards are referenced in the Official Journal of the EU. [https://eur-lex.europa.eu/]
+The application of standards remains voluntary. Providers can choose any other framework to demonstrate their compliance with the AI Act. However, harmonised standards referenced in the Official Journal of the EU provide legal certainty. Companies that apply harmonised standards are presumed to be compliant with the legal requirements.
+On 30 October 2025, prEN 18286: Artificial Intelligence - Quality Management System for EU AI Act Regulatory Purposes became the first harmonised standard for AI to enter public enquiry, allowing for national standardisation bodies to provide comments on the draft before its final publication. This harmonised standard is specifically designed to help providers of high-risk AI systems comply with the AI Act's Article 17 requirements, offering a product-focused framework for AI lifecycle governance.
+AI standards as the key to global alignment
+European Standardisation organisations do not work on standards in isolation. An 'international first' approach is one of the guiding principles of standardisation. This means international standards, when available and aligned with EU requirements, can become European harmonised standards.
+European Standardisation organisations and European companies are actively engaging with international standardisation bodies and therefore contributing to build a broader global framework of AI standards.
+For instance, ISO/IEC SC 42 is already developing AI-related international standards, and European representatives are actively shaping this process. This alignment is crucial to avoid regulatory fragmentation and to ensure that AI developers can operate across multiple markets without redundant compliance efforts.
+The benchmarks and standards established today will define the role of AI in our society for generations to come. By fostering the development of European harmonised standards, the EU can advance and lead the safe development and adoption of AI systems globally.
+Last update
+3 August 2026
+Print as PDF

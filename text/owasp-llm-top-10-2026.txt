@@ -1,0 +1,18 @@
+GEN AI SECURITY
+resources
+Whitepapers/Guides
+OWASP GenAI LLM Top 10 2026
+August 3, 2026
+About
+OWASP Top 10 for LLM Applications 2026 is the latest community-driven guide to the most critical security risks facing applications powered by large language models. Developed by hundreds of AI security experts, this edition introduces updated rankings, expanded threat coverage, and new research grounded in thousands of real-world AI security incidents. The guide provides practical explanations, attack scenarios, and actionable mitigations for developers, architects, security teams, and CISOs, while mapping risks to leading industry frameworks including NIST, MITRE ATLAS, CWE, and the OWASP Top 10 for Agentic Applications, making it an essential resource for building and securing modern AI
+Download
+Additional Resources
+September 1, 2026
+Resources
+GenAI Security Industry Framework Crosswalk
+September 1, 2026
+Resources
+Agent Control Standard (ACS)
+August 3, 2026
+Resources
+OWASP GenAI LLM Top 10 2026

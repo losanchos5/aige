@@ -1,0 +1,377 @@
+SB26-189
+Automated Decision-Making Technology
+Type
+Bill
+Session
+2026 Regular Session
+Subjects
+Labor & Employment
+Telecommunications & Information Technology
+Concerning the use of automated decision-making technology in consequential decisions, and, in connection therewith, making an appropriation.
+Recent Bill (PDF)
+Recent Fiscal Note (PDF)
+Bill Summary:
+In 2024, the general assembly enacted Senate Bill 24-205, which created consumer protections in interactions with artificial intelligence systems. The act repeals and reenacts those provisions with new requirements regarding the use of automated decision-making technology in consequential decisions.
+The act defines an 'automated decision-making technology' (ADMT) as a technology that processes personal data and uses computation to generate output, including predictions, recommendations, classifications, rankings, scores, or other information that is used to make, guide, or assist a decision, judgment, or determination concerning an individual. The act defines a 'consequential decision' as a decision that relates to an individual's access to, eligibility for, or compensation related to education, employment, housing, financial or lending services, insurance, health-care services, or essential government services and public benefits.
+The act requires the developer of an ADMT (developer) that is used to materially influence a consequential decision (covered ADMT), starting January 1, 2027, to provide a deployer of a covered ADMT (deployer) with technical documentation describing the covered ADMT's intended uses, categories of training data, known limitations, and instructions for appropriate use and human review. Developers must notify deployers of material updates or modifications to the covered ADMT. Both developers and deployers are required to retain records necessary to demonstrate compliance with the act for at least 3 years.
+The act establishes consumer notice requirements, mandating that deployers provide clear and conspicuous notice to consumers at the point of interaction with a covered ADMT. A deployer is required to provide a consumer with a plain language description of a covered ADMT's role within 30 days after the covered ADMT makes a consequential decision that results in an adverse outcome for the consumer. The attorney general must adopt rules to clarify these post-adverse outcome disclosure requirements by January 1, 2027.
+Consumers have the right to request personal data and correction of factually incorrect personal data used by a covered ADMT. The act also grants consumers the right to request meaningful human review and reconsideration following a covered ADMT making a consequential decision resulting in an adverse outcome.
+The attorney general is directed to enforce the act through the 'Colorado Consumer Protection Act', and a violation of the act is deemed a deceptive trade practice. Before initiating an action before January 1, 2030, the attorney general must provide the developer or deployer with a 60-day notice and opportunity to cure the alleged violation, if a cure is deemed possible. The act does not create a new private right of action but establishes how fault is allocated between developers and deployers in civil actions alleging unlawful discrimination under existing law.
+Specified entities are exempted from the requirements of the act to the extent the entities comply with other legal obligations.
+(Note: This summary applies to this bill as enacted.)
+Prime Sponsors
+Senator
+Robert Rodriguez
+Senator
+James Coleman
+Representative
+Monica Duran
+Representative
+Jennifer Bacon
+Committees
+Senate
+Business, Labor, & Technology
+Appropriations
+House
+Judiciary
+Appropriations
+Share:
+If you require reasonable accessibility accommodation to access this content, please email accessibility@coleg.gov.
+Status
+Became Law
+Introduced
+Passed
+Became Law
+Related Documents & Information
+Bill Text
+Fiscal
+Committees
+Votes
+Amendments
+Bill History
+Sponsors
+Session Laws
+Bill Text
+Fiscal
+Committees
+Votes
+Amendments
+Bill History
+Sponsors
+Session Laws
+All Versions (7)
+Date
+Version
+Documents
+05/14/2026
+Signed Act
+PDF
+05/12/2026
+Final Act
+PDF
+05/09/2026
+Rerevised
+PDF
+05/08/2026
+Revised
+PDF
+05/07/2026
+Reengrossed
+PDF
+05/06/2026
+Engrossed
+PDF
+05/01/2026
+Introduced
+PDF
+Preamended Versions (3)
+Date
+Version
+Documents
+05/08/2026
+House Judiciary Preamend
+PDF
+05/06/2026
+Senate Appropriations Preamend
+PDF
+05/06/2026
+Senate Business, Labor, & Technology Preamend
+PDF
+Fiscal Notes (3)
+Date
+Version
+Documents
+09/08/2026
+Final Fiscal Note
+PDF
+05/06/2026
+First Revised Fiscal Note
+PDF
+05/04/2026
+Initial Fiscal Note
+PDF
+Budget Staff Analysis (2)
+Date
+Version
+Documents
+05/08/2026
+SA2
+PDF
+05/05/2026
+SA1
+PDF
+05/08/2026 | House Appropriations (1)
+Activity
+Vote
+Documents
+Refer Senate Bill 26-189 to the Committee of the Whole.
+The motion passed on a vote of 10-1.
+Vote summary
+Hearing Summary
+Committee Report: PDF
+05/08/2026 | House Judiciary (1)
+Activity
+Vote
+Documents
+Refer Senate Bill 26-189, as amended, to the Committee on Appropriations.
+The motion passed on a vote of 11-0.
+Vote summary
+Committee Report: PDF
+05/06/2026 | Senate Appropriations (2)
+Activity
+Vote
+Documents
+Adopt amendment J.001
+The motion passed without objection.
+Vote summary
+Refer Senate Bill 26-189, as amended, to the Committee of the Whole.
+The motion passed on a vote of 7-0.
+Vote summary
+Hearing Summary
+Committee Report: PDF
+05/05/2026 | Senate Business, Labor, & Technology (3)
+Activity
+Vote
+Documents
+Adopt amendment L.001
+The motion passed without objection.
+Vote summary
+Adopt amendment L.002
+The motion passed without objection.
+Vote summary
+Refer Senate Bill 26-189, as amended, to the Committee on Appropriations.
+The motion passed on a vote of 5-0.
+Vote summary
+Hearing Summary
+Committee Report: PDF
+Senate Votes (3)
+Date
+Calendar
+Motion
+Vote
+Vote Document
+05/12/2026
+House Amendments
+REPASS
+34
+AYE
+1
+NO
+0
+OTHER
+Vote record
+05/12/2026
+House Amendments
+CONCUR
+34
+AYE
+1
+NO
+0
+OTHER
+Vote record
+05/07/2026
+Third Reading
+BILL
+34
+AYE
+1
+NO
+0
+OTHER
+Vote record
+House Votes (2)
+Date
+Calendar
+Motion
+Vote
+Vote Document
+05/09/2026
+Third Reading
+BILL
+57
+AYE
+6
+NO
+2
+OTHER
+Vote record
+05/09/2026
+Third Reading
+PERM
+50
+AYE
+13
+NO
+2
+OTHER
+Vote record
+Amendments (6)
+Date
+Amendment Number
+Committee/ Floor Hearing
+Status
+Documents
+05/08/2026
+L.006
+HOU Judiciary
+Passed [*]
+PDF
+05/06/2026
+L.004
+Second Reading
+Passed [**]
+PDF
+05/06/2026
+L.003
+Second Reading
+Passed [**]
+PDF
+05/06/2026
+J.001
+SEN Appropriations
+Passed [*]
+PDF
+05/05/2026
+L.002
+SEN Business, Labor, & Technology
+Passed [*]
+PDF
+05/05/2026
+L.001
+SEN Business, Labor, & Technology
+Passed [*]
+PDF
+* Amendments passed in committee are not incorporated into the measure unless adopted by the full House or Senate.
+** The status of Second Reading amendments may be subsequently affected by the adoption of an amendment to the Committee of the Whole Report. Refer to the House or Senate Journal for additional information.
+Bill history (15)
+Date
+Location
+Action
+05/14/2026
+Governor
+Governor Signed
+05/12/2026
+Governor
+Sent to the Governor
+05/12/2026
+House
+Signed by the Speaker of the House
+05/12/2026
+Senate
+Signed by the President of the Senate
+05/12/2026
+Senate
+Senate Considered House Amendments - Result was to Concur - Repass
+05/09/2026
+House
+House Third Reading Passed - No Amendments
+05/08/2026
+House
+House Second Reading Special Order - Passed with Amendments - Committee
+05/08/2026
+House
+House Committee on Appropriations Refer Unamended to House Committee of the Whole
+05/08/2026
+House
+House Committee on Judiciary Refer Amended to Appropriations
+05/07/2026
+House
+Introduced In House - Assigned to Judiciary
+05/07/2026
+Senate
+Senate Third Reading Passed - No Amendments
+05/06/2026
+Senate
+Senate Second Reading Special Order - Passed with Amendments - Committee, Floor
+05/06/2026
+Senate
+Senate Committee on Appropriations Refer Amended to Senate Committee of the Whole
+05/05/2026
+Senate
+Senate Committee on Business, Labor, & Technology Refer Amended to Appropriations
+05/01/2026
+Senate
+Introduced In Senate - Assigned to Business, Labor, & Technology
+Sponsors
+Prime Sponsor
+Sen. J. Coleman
+Sen. R. Rodriguez
+Rep. J. Bacon
+Rep. M. Duran
+Sponsor
+Sen. M. Baisley
+Rep. B. Titone
+Co-Sponsor
+Sen. J. Amabile
+Sen. M. Ball
+Sen. A. Benavidez
+Sen. J. Bridges
+Sen. L. Cutter
+Sen. T. Exum
+Sen. L. Frizell
+Sen. B. Kirkmeyer
+Sen. C. Kolker
+Sen. W. Lindstedt
+Sen. J. Marchman
+Sen. B. Pelton
+Sen. R. Pelton
+Sen. J. Rich
+Sen. C. Simpson
+Sen. M. Snyder
+Rep. A. Boesenecker
+Rep. K. Brown
+Rep. J. Caldwell
+Rep. M. Carter
+Rep. C. Clifford
+Rep. R. English
+Rep. A. Flanell
+Rep. L. Goldstein
+Rep. R. Gonzalez
+Rep. E. Hamrick
+Rep. J. Jackson
+Rep. S. Lieder
+Rep. M. Lindsay
+Rep. J. McCluskie
+Rep. K. McCormick
+Rep. K. Nguyen
+Rep. A. Paschal
+Rep. M. Rutinel
+Rep. S. Slaugh
+Rep. L. Smith
+Rep. T. Story
+Rep. E. Velasco
+Rep. T. Winter
+Session laws (1)
+Effective Date
+Chapter #
+Title
+Documents
+05/14/2026
+131
+Automated Decision-Making Technology
+PDF
+Quick Links
+Find My Legislator
+Find a Bill
+How a Bill Becomes a Law

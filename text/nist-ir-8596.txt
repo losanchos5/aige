@@ -1,0 +1,61 @@
+Publications
+NIST IR 8596
+(Initial Preliminary Draft)
+Cybersecurity Framework Profile for Artificial Intelligence (Cyber AI Profile): NIST Community Profile
+Share to Facebook
+Share to X
+Share to LinkedIn
+Share ia Email
+Documentation
+Topics
+Date Published: December 16, 2025
+Comments Due: January 30, 2026 (public comment period is CLOSED)
+Email Questions to:
+[email protected]
+Planning Note (04/21/2026):
+Learn more about our Spring 2026 Cyber AI Profile Virtual Working Sessions (April 28, May 5, and May 12, 2026)
+Author(s)
+Katerina Megas (NIST), Barbara Cuthill (NIST), Marissa Dotter (MITRE), Michael Garris (MITRE), Ishika Khemani (MITRE), Bronwyn Patrick (MITRE), Noah Schiro (MITRE), Julie Nethery Snyder (MITRE), Mohammad Zarei (MITRE)
+Announcement
+Draft for Public Comment
+AI has become a driving force behind today’s technological development, transforming industries and redefining how society operates. Advancements in AI technology introduce both cybersecurity opportunities and challenges to organizations.
+NIST’s preliminary draft Cyber AI Profile can help organizations strategically adopt AI while addressing and prioritizing cybersecurity risks stemming from its advancements.
+The Cyber AI Profile addresses the following Focus Areas:
+Securing AI System Components (Secure)
+Conducting AI-Enabled Cyber Defense (Defend)
+Thwarting AI-enabled Cyber Attacks (Thwart)
+The profile is open for comments until January 30, 2026. Your feedback is crucial in shaping the next and final version of this publication.
+NOTE: A call for patent claims is included in this draft. For additional information, see the Information Technology Laboratory (ITL) Patent Policy – Inclusion of Patents in ITL Publications.
+January 2026 Event: Cyber AI Workshop #2
+Save the date for a workshop on January 14, 2026 to discuss the Preliminary Draft of the Cyber AI Profile and hear updates regarding the SP 800-53 Control Overlays for Securing AI Systems (COSAiS). Details and registration information will be posted later this month.
+Questions?
+Email the team: [email protected]. To stay up to date on this Profile and follow its progress, we recommend joining the NCCoE Cyber AI Community of Interest (COI).
+Abstract
+The Cybersecurity Framework Profile for Artificial Intelligence (AI) Profile (“Cyber AI Profile” or “The Profile”) will provide guidelines for managing cybersecurity risk related to AI systems as well as identifying opportunities for using AI to enhance cybersecurity capabilities. The Profile is organized using the NIST Cybersecurity Framework 2.0 outcomes (Functions, Categories, and Subcategories). This Preliminary Draft is shared along with a request for public comment to solicit feedback on the planned direction and content. Comments received will inform the initial public draft. More information about this project, including a roadmap, is available on the National Cybersecurity Center of Excellence (NCCoE) Cyber AI Profile project page.
+The Cybersecurity Framework Profile for Artificial Intelligence (AI) Profile (“Cyber AI Profile” or “The Profile”) will provide guidelines for managing cybersecurity risk related to AI systems as well as identifying opportunities for using AI to enhance cybersecurity capabilities. The Profile is...
+See full abstract
+The Cybersecurity Framework Profile for Artificial Intelligence (AI) Profile (“Cyber AI Profile” or “The Profile”) will provide guidelines for managing cybersecurity risk related to AI systems as well as identifying opportunities for using AI to enhance cybersecurity capabilities. The Profile is organized using the NIST Cybersecurity Framework 2.0 outcomes (Functions, Categories, and Subcategories). This Preliminary Draft is shared along with a request for public comment to solicit feedback on the planned direction and content. Comments received will inform the initial public draft. More information about this project, including a roadmap, is available on the National Cybersecurity Center of Excellence (NCCoE) Cyber AI Profile project page.
+Hide full abstract
+Keywords
+artificial Intelligence; Community Profile; Cyber AI Profile; Cybersecurity Framework; risk management
+Control Families
+None selected
+Documentation
+Publication:
+https://doi.org/10.6028/NIST.IR.8596.iprd
+Download URL
+[https://nvlpubs.nist.gov/nistpubs/ir/2025/NIST.IR.8596.iprd.pdf]
+Supplemental Material:
+Cyber AI Profile project
+Related NIST Publications:
+IR 8578 [/pubs/ir/8578/final]
+IR 8607 [/pubs/ir/8607/final]
+Document History:
+12/16/25: IR 8596 (Draft)
+Topics
+Security and Privacy
+risk management
+Technologies
+artificial intelligence
+Applications
+cybersecurity framework

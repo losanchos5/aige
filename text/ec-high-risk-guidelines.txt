@@ -1,0 +1,15 @@
+The guidelines clarify the classification of AI systems as high-risk under the AI Act and a list of practical examples to assist in the classification.
+The Commission has developed draft guidelines [https://digital-strategy.ec.europa.eu/en/library/draft-commission-guidelines-classification-high-risk-ai-systems] making use of the feedback obtained through a public consultation with diverse stakeholders and the input provided by the Member States through the AI Board. Though not legally binding, they reflect the Commission's interpretation and will guide enforcement. In time, they will be complemented with other guidelines aimed to facilitate compliance with the obligations for high-risk AI systems.
+The draft guidelines are presented in a user-friendly manner on the AI Act Single Information platform.
+Following the publication of the draft, another targeted stakeholder consultation is open until 23 July 2026. Feedback received is going to be incorporated in the final version of the guidelines before adoption by the Commission.
+Key points of the draft guidelines
+The guidelines help providers and deployers of AI systems to assess whether their AI system is high-risk or not.
+A list of examples strives to cover all areas and use cases, but they are not to be considered as exhaustive and may be updated over time.
+Application and enforcement timeline
+A limited use cases of AI are considered as high-risk when they endanger health, safety or fundamental rights. To ensure that they are trustworthy, providers and deployers of high-risk AI systems must comply with requirements and obligations.
+Following the political agreement on the 'AI Omnibus', there is a new enforcement timeline:
+Rules for systems used in certain high-risk areas — including biometrics, critical infrastructure, education, employment, migration, asylum and border control — apply from 2 December 2027.
+For systems integrated into products such as robotics and industrial machinery, the rules apply from 2 August 2028.
+Last update
+6 July 2026
+Print as PDF

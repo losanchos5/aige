@@ -1,0 +1,53 @@
+3 February 2026 —
+Annual Report
+International AI Safety Report 2026
+The second International AI Safety Report, published in February 2026, is the next iteration of the comprehensive review of latest scientific research on the capabilities and risks of general-purpose AI systems. Led by Turing Award winner Yoshua Bengio and authored by over 100 AI experts, the report is backed by over 30 countries and international organisations. It represents the largest global collaboration on AI safety to date.
+Translated versions in the other 5 official UN languages can be found under the 'More Languages' button. The 'Extended Summary for Policymakers' can be found on the main 'Publications' page.
+Download
+English
+[/sites/default/files/2026-02/<token>.pdf]
+More languages
+Français
+[/sites/default/files/2026-02/<token>.pdf]
+Español
+[/sites/default/files/2026-02/<token>.pdf]
+Русский
+[/sites/default/files/2026-02/<token>.pdf]
+中文简体
+[/sites/default/files/2026-02/<token>.pdf]
+العربية
+[/sites/default/files/2026-02/<token>.pdf]
+Share
+Share
+Share via Email
+Share on Linkedin
+Share on X
+Share on Bluesky
+Y. Bengio, S. Clare, C. Prunkl, M. Murray,
+M. Andriushchenko, B. Bucknall, R. Bommasani,
+S. Casper, T. Davidson, R. Douglas,
+D. Duvenaud, P. Fox, U. Gohar, R. Hadshar,
+A. Ho, T. Hu, C. Jones, S. Kapoor, A. Kasirzadeh,
+S. Manning, N. Maslej, V. Mavroudis,
+C. McGlynn, R. Moulange, J. Newman, K. Y. Ng,
+P. Paskov, S. Rismani, G. Sastry, E. Seger,
+S. Singer, C. Stix, L. Velasco, N. Wheeler,
+D. Acemoglu, V. Conitzer, T. G. Dietterich,
+E. W. Felten, F. Heintz, G. Hinton, N. Jennings,
+S. Leavy, T. Ludermir, V. Marda, H. Margetts,
+J. McDermid, J. Munga, A. Narayanan, A. Nelson,
+C. Neppel, S. D. Ramchurn, S. Russell,
+M. Schaake, B. Schölkopf, A. Soto, L. Tiedrich,
+G. Varoquaux, A. Yao, Y.-Q. Zhang, L. A. Aguirre,
+O. Ajala, F. Albalawi, N. AlMalek, C. Busch,
+J. Collas, A. C. P. de L. F. de Carvalho, A. Gill,
+A. H. Hatip, J. Heikkilä, C. Johnson, G. Jolly,
+Z. Katzir, M. N. Kerema, H. Kitano, A. Krüger,
+K. M. Lee, J. R. López Portillo, A. McLysaght,
+O. Molchanovskyi, A. Monti, M. Nemer, N. Oliver,
+R. Pezoa, A. Plonk, B. Ravindran, H. Riza,
+C. Rugege, H. Sheikh, D. Wong, Y. Zeng, L. Zhu,
+D. Privitera, S. Mindermann, “International
+AI Safety Report 2026” (DSIT 2026/001, 2026);
+https://internationalaisafetyreport.org
+Copy Citation
