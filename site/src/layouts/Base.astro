@@ -156,6 +156,18 @@ const theme = themeScript();
       type="font/woff2"
       crossorigin
     />
+    {/* The mono sets the breadcrumbs, labels and clause codes near the top of
+        most pages: found only once the CSS was parsed, it swapped in after the
+        first paint (CLS 0.13 to 0.22, performance audit of 2026-09-26). Its
+        metric-matched fallback (styles/fonts.css) keeps a late swap from
+        moving anything. */}
+    <link
+      rel="preload"
+      href="/fonts/jetbrains-mono-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     {
       preloadFonts.map((href) => (
         <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />
