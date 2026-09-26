@@ -1,0 +1,70 @@
+---
+// /contribute: STUB of the contribution page (block orp-shell, open reference
+// project). It carries the final title and description and every anchor other
+// pages link to (paths, good-review, provenance). Block orp-contribute
+// replaces the body with the issue forms and the review guidance.
+import Marketing from '../layouts/Marketing.astro';
+import PageHero from '../components/PageHero.astro';
+import Section from '../components/Section.astro';
+import { site } from '../data/site';
+import { breadcrumbJsonLd } from '../lib/breadcrumbs';
+import { authorRefs, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
+import { fitsSiteSuffix } from '../lib/seo-title';
+import '../styles/pages.css';
+
+const seoTitle = 'Contribute to open AI controls';
+const description =
+  'How to contribute to the open controls and research notes: issue forms for a control review, a mapping or a correction, and how review works.';
+const crumbs = [{ label: 'Contribute' }];
+const pageUrl = new URL('/contribute', site.url).href;
+
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    name: seoTitle,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+  },
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Marketing
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/contribute.png"
+  jsonLd={jsonLd}
+>
+  <!-- orp-stub -->
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="Help improve the engineering model"
+    lede="The controls, patterns, mappings and evidence formats on this site only get better when someone tests them against a real system. This page is being prepared and is published in full in the next release."
+  />
+
+  <Section tone="plain" id="paths" title="Ways to contribute">
+    <p>
+      Until the new issue forms are listed here, the ways to contribute are on the
+      <a href="/about">about page</a> and in the <a href={`${site.github}/blob/main/CONTRIBUTING.md`}>contributing guide</a>.
+    </p>
+  </Section>
+
+  <Section tone="tint" id="good-review" title="What a good control review contains">
+    <p>What a useful review of a control states, and the evidence it rests on, is set out here in the next release.</p>
+  </Section>
+
+  <Section tone="plain" id="provenance" title="Licence, versions and credit">
+    <p>
+      Everything here is licensed {site.license} and versioned in the
+      <a href="/about/changelog">changelog</a>; contributors are credited on the
+      <a href="/about/contributors">contributors page</a>.
+    </p>
+  </Section>
+</Marketing>

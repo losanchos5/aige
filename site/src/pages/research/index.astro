@@ -1,0 +1,83 @@
+---
+// /research: STUB of the research notes index (block orp-shell, open reference
+// project). It carries the final title and description and every anchor
+// other pages link to (notes, planned-themes, how-a-note-is-reviewed), and
+// links every written note from <main> so the footer sitemap check reaches
+// them. The planned themes are listed without a link: they have no page yet.
+// Block orp-research replaces the body.
+import Marketing from '../../layouts/Marketing.astro';
+import PageHero from '../../components/PageHero.astro';
+import Section from '../../components/Section.astro';
+import { site } from '../../data/site';
+import { researchPath, researchThemes, writtenThemes } from '../../data/research';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { fitsSiteSuffix } from '../../lib/seo-title';
+import '../../styles/pages.css';
+
+const seoTitle = 'AI governance research notes';
+const description =
+  'Technical notes on the open questions of AI governance engineering: what is assumed, what the evidence shows and what would settle each one.';
+const crumbs = [{ label: 'Research notes' }];
+const pageUrl = new URL('/research', site.url).href;
+
+const written = writtenThemes();
+const planned = researchThemes.filter((theme) => theme.status === 'planned');
+
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    name: seoTitle,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+  },
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Marketing
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/research.png"
+  jsonLd={jsonLd}
+>
+  <!-- orp-stub -->
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="Research notes"
+    lede="Technical notes on the open questions of AI governance engineering. This page is being prepared; the first note is published as a draft in the next release."
+  />
+
+  <Section tone="plain" id="notes" title="Notes">
+    <p>Draft notes, open for technical review:</p>
+    <ul>
+      {
+        written.map((theme) => (
+          <li>
+            <a href={researchPath(theme)}>{theme.title}</a> (draft)
+          </li>
+        ))
+      }
+    </ul>
+  </Section>
+
+  <Section tone="tint" id="planned-themes" title="Planned themes (not yet written)">
+    <ul>
+      {planned.map((theme) => <li>{theme.question}</li>)}
+    </ul>
+  </Section>
+
+  <Section tone="plain" id="how-a-note-is-reviewed" title="How a note is reviewed">
+    <p>
+      Every note is a draft until a named reviewer has checked it. How review works is set out in
+      the next release; until then, see <a href="/contribute">how to contribute</a>.
+    </p>
+  </Section>
+</Marketing>

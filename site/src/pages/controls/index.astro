@@ -1,0 +1,118 @@
+---
+// /controls: STUB of the open control profiles index (block orp-shell, open
+// reference project). It carries the final title and description and every
+// anchor the other pages of the change link to (intro, chain, properties,
+// profiles, by-layer with layer-1..layer-5, ecosystem, adoption,
+// how-to-review), and links both profile pages from <main> so the footer
+// sitemap check reaches them. Block orp-controls-pages replaces the body with
+// the page built on the control registry.
+import Marketing from '../../layouts/Marketing.astro';
+import PageHero from '../../components/PageHero.astro';
+import Section from '../../components/Section.astro';
+import { site } from '../../data/site';
+import { layers } from '../../data/stack';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { fitsSiteSuffix } from '../../lib/seo-title';
+import '../../styles/pages.css';
+
+const seoTitle = 'Open AI governance controls';
+const description =
+  'Open control profiles for AI governance: each control with its evidence, mapped to the five-layer stack and reviewed in the open. Versioned and CC BY 4.0.';
+const crumbs = [{ label: 'Open control profiles' }];
+const pageUrl = new URL('/controls', site.url).href;
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    name: seoTitle,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+  },
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Marketing
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/controls.png"
+  jsonLd={jsonLd}
+>
+  <!-- orp-stub -->
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="Open control profiles"
+    lede="Draft control specifications for AI systems: what each control requires, where it is enforced and the evidence it leaves. This page is being prepared; the first two draft profiles are published in the next release."
+  />
+
+  <Section tone="plain" id="intro" title="What a control profile is">
+    <p>
+      A control profile is a versioned set of reference controls for one kind of system, each
+      anchored to a layer of <a href="/stack">the five-layer stack</a> and to the
+      <a href="/patterns">patterns</a> that implement it. Illustrative, not a claim of conformity.
+    </p>
+  </Section>
+
+  <Section tone="tint" id="chain" title="From concept to evidence">
+    <p>
+      The chain from a concept to a pattern, a control, an implementation and the evidence it
+      leaves is drawn here in the next release.
+    </p>
+  </Section>
+
+  <Section tone="plain" id="properties" title="What makes a control useful">
+    <p>The properties every control in these profiles is written to meet are listed here in the next release.</p>
+  </Section>
+
+  <Section tone="tint" id="profiles" title="Profiles">
+    <p>Two profiles are in preparation, both drafts open for technical review:</p>
+    <ul>
+      <li><a href="/controls/evaluation-environment">Evaluation Environment Control Profile</a> (draft v0.1)</li>
+      <li><a href="/controls/agent-runtime">Agent Runtime Control Profile</a> (draft v0.1)</li>
+    </ul>
+  </Section>
+
+  <Section tone="plain" id="by-layer" title="Controls by stack layer">
+    <p>Each control is anchored to one layer of the stack; the controls of each layer are listed here in the next release.</p>
+    {
+      layers.map((layer) => (
+        <>
+          <h3 id={`layer-${layer.n}`}>
+            Layer {pad(layer.n)}: {layer.name}
+          </h3>
+          <p>
+            No controls are listed for this layer yet. Read{' '}
+            <a href={`/bok/the-stack#${layer.chapterAnchor}`}>layer {pad(layer.n)} in chapter 04</a>.
+          </p>
+        </>
+      ))
+    }
+  </Section>
+
+  <Section tone="tint" id="ecosystem" title="How the profiles relate to frameworks">
+    <p>
+      How these open profiles map to existing frameworks and certification schemes is set out
+      here in the next release. This project certifies nothing.
+    </p>
+  </Section>
+
+  <Section tone="plain" id="adoption" title="Adopting a profile">
+    <p>How a team can adopt a profile step by step, starting from the layer it already runs, is set out here in the next release.</p>
+  </Section>
+
+  <Section tone="tint" id="how-to-review" title="How to review a control">
+    <p>
+      Every control will be open for technical review through an issue form. Until then, see
+      <a href="/contribute">how to contribute</a>.
+    </p>
+  </Section>
+</Marketing>

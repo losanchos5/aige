@@ -1,0 +1,88 @@
+---
+// /research/<slug>: STUB of a research note page (block orp-shell, open
+// reference project), one per written theme of src/data/research.ts. It
+// carries the note's title, a description built from the theme's question and
+// every anchor other pages link to (abstract, related-controls,
+// review-this-note, cite). Block orp-research replaces it with the page that
+// renders ../research/<slug>.md.
+import type { GetStaticPaths } from 'astro';
+import Marketing from '../../layouts/Marketing.astro';
+import PageHero from '../../components/PageHero.astro';
+import Section from '../../components/Section.astro';
+import { site } from '../../data/site';
+import { researchPath, writtenThemes, type ResearchTheme } from '../../data/research';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { fitsSiteSuffix } from '../../lib/seo-title';
+import '../../styles/pages.css';
+
+export const getStaticPaths = (() =>
+  writtenThemes().map((theme) => ({ params: { slug: theme.slug }, props: { theme } }))) satisfies GetStaticPaths;
+
+interface Props {
+  theme: ResearchTheme;
+}
+
+const { theme } = Astro.props;
+const seoTitle = theme.title;
+// The theme's question, then the note's state: a meta description of 110 to
+// 158 characters that says what the page answers and that it is a draft.
+const description = `${theme.question} A draft note, open for review.`;
+if (description.length < 110 || description.length > 158) {
+  throw new Error(`/research/${theme.slug}: description is ${description.length} characters, want 110 to 158`);
+}
+const crumbs = [{ label: 'Research notes', href: '/research' }, { label: theme.title }];
+const path = researchPath(theme);
+const pageUrl = new URL(path, site.url).href;
+
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    name: seoTitle,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+  },
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Marketing
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/research.png"
+  jsonLd={jsonLd}
+>
+  <!-- orp-stub -->
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title={theme.title}
+    lede="Draft note, open for technical review. This page is being prepared; the draft is published in the next release."
+  />
+
+  <Section tone="plain" id="abstract" title="Abstract">
+    <p>The question this note answers: {theme.question}</p>
+  </Section>
+
+  <Section tone="tint" id="related-controls" title="Related controls">
+    <p>
+      The note argues for controls of the draft
+      <a href="/controls/evaluation-environment">evaluation environment profile</a>; the list is
+      published with the note.
+    </p>
+  </Section>
+
+  <Section tone="plain" id="review-this-note" title="Review this note">
+    <p>Technical review opens with the published draft. See <a href="/contribute">how to contribute</a>.</p>
+  </Section>
+
+  <Section tone="tint" id="cite" title="Cite this note">
+    <p>A citation with the note's version is published with the draft.</p>
+  </Section>
+</Marketing>
