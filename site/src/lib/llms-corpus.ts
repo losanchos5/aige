@@ -49,6 +49,7 @@ import {
   mitLabel,
 } from '../data/harms';
 import { patternPath } from '../data/patterns';
+import { controlById, controlHref } from '../data/controls';
 import {
   analystDistinction,
   analystVsEngineer,
@@ -295,6 +296,54 @@ export function caseDoc(entry: IncidentCase): CorpusDoc {
     return `- ${o.instrument} ${ref}: ${o.why}`;
   });
 
+  // The incident note, where the case has one: the same sections, in the same
+  // order, as the page renders them.
+  const refLine = (refs: IncidentCase['preventiveControls']) =>
+    (refs ?? [])
+      .map((ctl) => (ctl.patternId ? `[${ctl.name}](${abs(`/bok/patterns#${ctl.patternId}`)})` : ctl.name))
+      .join(' · ');
+  const moments = [
+    ['Preventive', entry.preventiveControls],
+    ['Detective', entry.detectiveControls],
+    ['Responsive', entry.responsiveControls],
+  ] as const;
+  const presentMoments = moments.filter(([, refs]) => refs !== undefined);
+  const note: string[] = [
+    ...(entry.systemBoundary ? ['## System boundary', entry.systemBoundary] : []),
+    ...(entry.controlAssumptions
+      ? [
+          '## Control assumptions',
+          'What the controls below take for granted. Challenge any of them.',
+          entry.controlAssumptions.map((a) => `- ${a}`).join('\n'),
+        ]
+      : []),
+    ...(presentMoments.length > 0
+      ? ['## Controls by moment', presentMoments.map(([label, refs]) => `- ${label}: ${refLine(refs)}`).join('\n')]
+      : []),
+    ...(entry.evidenceRequirements
+      ? [
+          '## Evidence requirements',
+          'The evidence each control must leave, written as acceptance criteria.',
+          entry.evidenceRequirements.map((r) => `- ${r}`).join('\n'),
+        ]
+      : []),
+    ...(entry.relatedControls
+      ? [
+          '## Related open controls',
+          'Draft control specifications from the open control profiles, open for technical review.',
+          entry.relatedControls
+            .map((id) => {
+              const control = controlById(id);
+              return control ? `- [${control.id}](${abs(controlHref(control.id))}) ${control.title}` : `- ${id}`;
+            })
+            .join('\n'),
+        ]
+      : []),
+    ...(entry.openQuestions
+      ? ['## Open questions', entry.openQuestions.map((q) => `- ${q}`).join('\n')]
+      : []),
+  ];
+
   // The "In short" passage is the first section, as on the page (GEO R1): it
   // is the passage written for answer engines to quote whole.
   const body = [
@@ -322,6 +371,7 @@ export function caseDoc(entry: IncidentCase): CorpusDoc {
     '## Obligations it touches today',
     'As of 2026-09-24. Mappings are illustrative, not a claim of conformity.',
     obligationLines.join('\n'),
+    ...note,
     '## How to read this case',
     casesDisclaimer,
     '## Sources',

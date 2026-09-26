@@ -7,6 +7,7 @@ import CitedText from '../../components/CitedText.astro';
 import SourceList from '../../components/SourceList.astro';
 import Byline from '../../components/Byline.astro';
 import PillarLink from '../../components/PillarLink.astro';
+import ContributeCta from '../../components/ContributeCta.astro';
 import { site } from '../../data/site';
 import { obligationPath } from '../../data/frameworks';
 import { layers } from '../../data/stack';
@@ -15,8 +16,12 @@ import {
   cases,
   caseEvidenceLabel,
   casesDisclaimer,
+  caseNoteProblems,
+  hasIncidentNote,
   type IncidentCase,
 } from '../../data/cases';
+import { controlById, controlHref } from '../../data/controls';
+import type { ControlRef } from '../../data/harms';
 import { citedNumbers } from '../../lib/sources';
 import { gitDate, gitCreated } from '../../lib/reading';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
@@ -46,6 +51,13 @@ interface Props {
 
 const { entry, prev, next } = Astro.props;
 
+// Build-time integrity of the incident notes (control ids, pattern ids, no
+// empty lists), as /resources/threats does for its rows.
+const noteProblems = caseNoteProblems();
+if (noteProblems.length > 0) {
+  throw new Error(`cases.ts incident notes:\n${noteProblems.join('\n')}`);
+}
+
 // Build-time integrity: every [n] must have a source row, every source row must
 // be cited, and every harm id must exist in the atlas.
 const prose = [
@@ -53,6 +65,10 @@ const prose = [
   ...entry.failureMode,
   ...entry.control.text,
   ...entry.obligations.map((o) => o.why),
+  ...(entry.systemBoundary ? [entry.systemBoundary] : []),
+  ...(entry.controlAssumptions ?? []),
+  ...(entry.evidenceRequirements ?? []),
+  ...(entry.openQuestions ?? []),
 ];
 const cited = citedNumbers(prose);
 for (const n of cited) {
@@ -75,7 +91,7 @@ const layerName = (n: number) => layers.find((layer) => layer.n === n)?.name ?? 
 const pageUrl = new URL(`/cases/${entry.id}`, site.url).href;
 const updated = gitDate('src/data/cases.ts');
 const published = gitCreated('src/data/cases.ts');
-const crumbs = [{ label: 'Cases', href: '/cases' }, { label: entry.short }];
+const crumbs = [{ label: 'Incidents', href: '/cases' }, { label: entry.short }];
 // <title>: the case's short name and what the page is (audit F5): the full
 // headline stays the H1. A "(reported)" tag stays on the page, not in the title.
 const pageTitle = `${entry.short.replace(/\s*\([^)]*\)$/, '')}: AI incident case study`;
@@ -86,6 +102,55 @@ const controls = entry.control.controls.map((ctl) => {
   if (!pattern) throw new Error(`cases.ts: "${entry.id}" names unknown pattern "${ctl.patternId}"`);
   return { name: ctl.name, href: patternPath(pattern) };
 });
+
+// The incident note (optional fields of cases.ts), rendered only where written.
+const linkRef = (ctl: ControlRef) => {
+  const pattern = ctl.patternId ? patternById(ctl.patternId) : undefined;
+  return { name: ctl.name, href: pattern ? patternPath(pattern) : undefined };
+};
+const moments = [
+  {
+    id: 'controls-preventive',
+    label: 'Preventive',
+    lede: 'Before the failure: design choices and release gates.',
+    refs: entry.preventiveControls,
+  },
+  {
+    id: 'controls-detective',
+    label: 'Detective',
+    lede: 'While it happens: what notices it.',
+    refs: entry.detectiveControls,
+  },
+  {
+    id: 'controls-responsive',
+    label: 'Responsive',
+    lede: 'After it: what contains it and feeds the fix back.',
+    refs: entry.responsiveControls,
+  },
+]
+  .filter((m) => m.refs !== undefined)
+  .map((m) => ({ ...m, links: (m.refs ?? []).map(linkRef) }));
+const relatedControls = (entry.relatedControls ?? []).map((id) => {
+  const control = controlById(id);
+  if (!control) throw new Error(`cases.ts: "${entry.id}" names unknown control "${id}"`);
+  return { id: control.id, title: control.title, href: controlHref(control.id) };
+});
+const hasNote = hasIncidentNote(entry);
+// "On this page": every H2 the case renders, in order (cases with a note only).
+const toc = [
+  { id: 'what-happened', text: 'What happened' },
+  { id: 'failure-mode', text: 'Failure mode' },
+  { id: 'control', text: 'Which control would have caught it' },
+  { id: 'evidence', text: 'The evidence that would have existed' },
+  { id: 'obligations', text: 'Obligations it touches today' },
+  ...(entry.systemBoundary ? [{ id: 'system-boundary', text: 'System boundary' }] : []),
+  ...(entry.controlAssumptions ? [{ id: 'control-assumptions', text: 'Control assumptions' }] : []),
+  ...(moments.length > 0 ? [{ id: 'controls-by-moment', text: 'Controls by moment' }] : []),
+  ...(entry.evidenceRequirements ? [{ id: 'evidence-requirements', text: 'Evidence requirements' }] : []),
+  ...(relatedControls.length > 0 ? [{ id: 'related-controls', text: 'Related open controls' }] : []),
+  ...(entry.openQuestions ? [{ id: 'open-questions', text: 'Open questions' }] : []),
+  { id: 'sources', text: 'Sources' },
+];
 
 const jsonLd = [
   {
@@ -174,6 +239,21 @@ const jsonLd = [
         </dd>
       </dl>
 
+      {
+        hasNote && (
+          <nav class="cs-toc" aria-label="On this page">
+            <p class="cs-toc-title">On this page</p>
+            <ol>
+              {toc.map((item) => (
+                <li>
+                  <a href={`#${item.id}`}>{item.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+
       <div class="prose">
         <h2 id="what-happened">What happened</h2>
         {
@@ -258,6 +338,91 @@ const jsonLd = [
         }
       </ul>
 
+      {
+        hasNote && (
+          <div class="prose cs-note">
+            {entry.systemBoundary && (
+              <>
+                <h2 id="system-boundary">System boundary</h2>
+                <p>
+                  <CitedText text={entry.systemBoundary} />
+                </p>
+              </>
+            )}
+            {entry.controlAssumptions && (
+              <>
+                <h2 id="control-assumptions">Control assumptions</h2>
+                <p>What the controls below take for granted. Challenge any of them.</p>
+                <ul>
+                  {entry.controlAssumptions.map((a) => (
+                    <li>
+                      <CitedText text={a} />
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {moments.length > 0 && (
+              <>
+                <h2 id="controls-by-moment">Controls by moment</h2>
+                {moments.map((m) => (
+                  <>
+                    <h3 id={m.id}>{m.label}</h3>
+                    <p>{m.lede}</p>
+                    <ul>
+                      {m.links.map((ctl) => (
+                        <li>{ctl.href ? <a href={ctl.href}>{ctl.name}</a> : ctl.name}</li>
+                      ))}
+                    </ul>
+                  </>
+                ))}
+              </>
+            )}
+            {entry.evidenceRequirements && (
+              <>
+                <h2 id="evidence-requirements">Evidence requirements</h2>
+                <p>The evidence each control must leave, written as acceptance criteria.</p>
+                <ul>
+                  {entry.evidenceRequirements.map((r) => (
+                    <li>
+                      <CitedText text={r} />
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {relatedControls.length > 0 && (
+              <>
+                <h2 id="related-controls">Related open controls</h2>
+                <p>
+                  Draft control specifications from the <a href="/controls">open control profiles</a>,
+                  open for technical review.
+                </p>
+                <ul>
+                  {relatedControls.map((c) => (
+                    <li>
+                      <a href={c.href}>{c.id}</a> {c.title}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            {entry.openQuestions && (
+              <>
+                <h2 id="open-questions">Open questions</h2>
+                <ul>
+                  {entry.openQuestions.map((q) => (
+                    <li>
+                      <CitedText text={q} />
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        )
+      }
+
       <div class="res-section">
         <Callout kind="note" title="How to read this case">
           <p>{casesDisclaimer}</p>
@@ -268,6 +433,8 @@ const jsonLd = [
         <h2 id="sources">Sources</h2>
         <SourceList sources={entry.sources} />
       </div>
+
+      <ContributeCta kind="incident" title={entry.title} landmark={false} />
 
       <nav class="cs-nav" aria-label="More cases">
         {prev ? <a href={`/cases/${prev.id}`}>← {prev.short}</a> : <span />}
@@ -286,5 +453,29 @@ const jsonLd = [
   }
   .cs-in-short .callout {
     margin-top: 0;
+  }
+  /* "On this page" on cases with an incident note: a quiet numbered list under
+     the facts box, headed in the facts box's label type. */
+  .cs-toc {
+    margin: 0 0 var(--s-6);
+    font-size: var(--fs-small);
+  }
+  .cs-toc-title {
+    margin: 0 0 var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .cs-toc ol {
+    margin: 0;
+    padding-left: var(--s-5);
+  }
+  .cs-toc li {
+    margin: 0 0 var(--s-1);
+  }
+  .cs-note h3 {
+    scroll-margin-top: var(--anchor-offset);
   }
 </style>

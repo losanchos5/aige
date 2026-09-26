@@ -121,6 +121,11 @@ const s = {
     items,
     description,
   }),
+  arrOrNull: (items: JsonSchema, description: string): JsonSchema => ({
+    type: ['array', 'null'],
+    items,
+    description,
+  }),
   /** A closed object: every property is required (absent values are null). */
   obj: (properties: Record<string, JsonSchema>, description?: string): JsonSchema => ({
     type: 'object',
@@ -784,46 +789,61 @@ export const datasets: readonly Dataset[] = [
     name: 'cases',
     title: 'Incident cases',
     description:
-      'Publicly documented AI incidents written as engineering post-mortems, with the control that would have caught them, the evidence it would have left and the obligations they touch.',
+      'Publicly documented AI incidents written as engineering post-mortems, with the control that would have caught them, the evidence it would have left and the obligations they touch; some carry an incident note (system boundary, control assumptions, controls by moment, evidence requirements, related open controls, open questions), null where not written.',
     schemaVersion: 1,
     page: '/cases',
-    build: () => ({
-      cases: cases.map((c) => ({
-        id: c.id,
-        url: abs(`/cases/${c.id}`),
-        title: c.title,
-        short: c.short,
-        year: c.year,
-        jurisdiction: c.jurisdiction,
-        sector: c.sector,
-        evidence: c.evidence,
-        summary: c.summary,
-        happened: [...c.happened],
-        failureMode: [...c.failureMode],
-        control: [...c.control.text],
-        controls: c.control.controls.map((ctl) => ({
-          name: ctl.name,
-          patternId: ctl.patternId ?? null,
+    build: () => {
+      const noteRef = (ctl: { name: string; patternId?: string }) => ({
+        name: ctl.name,
+        patternId: ctl.patternId ?? null,
+      });
+      return {
+        cases: cases.map((c) => ({
+          id: c.id,
+          url: abs(`/cases/${c.id}`),
+          title: c.title,
+          short: c.short,
+          year: c.year,
+          jurisdiction: c.jurisdiction,
+          sector: c.sector,
+          evidence: c.evidence,
+          summary: c.summary,
+          happened: [...c.happened],
+          failureMode: [...c.failureMode],
+          control: [...c.control.text],
+          controls: c.control.controls.map((ctl) => ({
+            name: ctl.name,
+            patternId: ctl.patternId ?? null,
+          })),
+          evidenceArtefacts: c.evidenceArtefacts.map((e) => ({
+            artefact: e.artefact,
+            layer: e.layerN,
+          })),
+          obligations: c.obligations.map((o) => ({
+            instrument: o.instrument,
+            ref: o.ref,
+            why: o.why,
+          })),
+          harms: [...c.harms],
+          incidents: c.incidents.map((i) => ({ db: i.db, id: i.id, title: i.title, url: i.url })),
+          sources: c.sources.map((source, i) => ({
+            n: i + 1,
+            text: sourceText(source),
+            url: source.url,
+            verified: source.verified,
+          })),
+          // Incident note: always emitted, null where the case has none.
+          systemBoundary: c.systemBoundary ?? null,
+          controlAssumptions: c.controlAssumptions ? [...c.controlAssumptions] : null,
+          preventiveControls: c.preventiveControls ? c.preventiveControls.map(noteRef) : null,
+          detectiveControls: c.detectiveControls ? c.detectiveControls.map(noteRef) : null,
+          responsiveControls: c.responsiveControls ? c.responsiveControls.map(noteRef) : null,
+          evidenceRequirements: c.evidenceRequirements ? [...c.evidenceRequirements] : null,
+          relatedControls: c.relatedControls ? [...c.relatedControls] : null,
+          openQuestions: c.openQuestions ? [...c.openQuestions] : null,
         })),
-        evidenceArtefacts: c.evidenceArtefacts.map((e) => ({
-          artefact: e.artefact,
-          layer: e.layerN,
-        })),
-        obligations: c.obligations.map((o) => ({
-          instrument: o.instrument,
-          ref: o.ref,
-          why: o.why,
-        })),
-        harms: [...c.harms],
-        incidents: c.incidents.map((i) => ({ db: i.db, id: i.id, title: i.title, url: i.url })),
-        sources: c.sources.map((source, i) => ({
-          n: i + 1,
-          text: sourceText(source),
-          url: source.url,
-          verified: source.verified,
-        })),
-      })),
-    }),
+      };
+    },
     properties: {
       cases: s.arr(
         s.obj({
@@ -874,6 +894,20 @@ export const datasets: readonly Dataset[] = [
             }),
             'Numbered sources.',
           ),
+          systemBoundary: s.strOrNull('Incident note: what the analysis treats as the system; null when the case has no note.'),
+          controlAssumptions: s.arrOrNull(s.str('Assumption; [n] markers point into sources.'), 'Incident note: assumptions the controls rest on.'),
+          preventiveControls: s.arrOrNull(
+            s.obj({ name: s.str('Control name.'), patternId: s.strOrNull('Pattern id, when catalogued.') }),
+            'Incident note: controls that act before the failure.'),
+          detectiveControls: s.arrOrNull(
+            s.obj({ name: s.str('Control name.'), patternId: s.strOrNull('Pattern id, when catalogued.') }),
+            'Incident note: controls that notice it while it happens.'),
+          responsiveControls: s.arrOrNull(
+            s.obj({ name: s.str('Control name.'), patternId: s.strOrNull('Pattern id, when catalogued.') }),
+            'Incident note: controls that contain it and feed the fix back.'),
+          evidenceRequirements: s.arrOrNull(s.str('Acceptance criterion.'), 'Incident note: the evidence each control must leave.'),
+          relatedControls: s.arrOrNull(s.str('Control id (AIGE-CTL-...).'), 'Incident note: open reference controls the case bears on.'),
+          openQuestions: s.arrOrNull(s.str('Question.'), 'Incident note: questions the case leaves open.'),
         }),
         'The cases.',
       ),
