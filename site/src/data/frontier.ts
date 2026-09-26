@@ -9,14 +9,17 @@
 // - every [n] marker in a paragraph has a source and every source is cited;
 // - no em dash anywhere in the copy;
 // - no lab is named in the copy: METR's investigation is described by what
-//   it reports, and the developer it concerns appears only in the source title.
+//   it reports, and developers appear only in the source list (the title of the
+//   investigation, and as publishers of the guidance cited in #ecosystem).
 //
 // Sources were opened on 2026-09-26. The EU AI Act, OWASP Agentic, MCP
 // Authorization, NIST AI RMF, OpenTelemetry GenAI, the GPAI Code of Practice
 // and ISO rows are copied from src/data/audiences.ts and the chapter 23 and
 // pillar rows of sources/SOURCES.md. METR pages are cited for what METR
 // states, never as audited fact, and nothing here implies that METR, AIUC, an
-// AI Safety Institute or any developer endorses or works with this site.
+// AI Safety Institute or any developer endorses or works with this site. The
+// two developer posts in #ecosystem ([14], [15]) are cited for the terms they
+// use, as convergent terminology the profiles cross-reference.
 
 import type { LayerNumber } from './stack';
 import type { Source } from '../lib/sources';
@@ -68,9 +71,9 @@ export const frontierSources: readonly Source[] = [
   },
   {
     title: 'METR Task Standard, version 0.5.0',
-    gloss: 'task machines "MUST NOT have internet access" except to a small set of destinations, unless the task declares full_internet',
+    gloss: 'task machines "MUST NOT have internet access" except to a small set of destinations, unless the task declares full_internet; STANDARD.md last changed 2024-10-30',
     publisher: 'METR',
-    date: '2025-02',
+    date: '2024-10-30',
     url: 'https://raw.githubusercontent.com/METR/task-standard/main/STANDARD.md',
     verified: 'primary',
   },
@@ -101,8 +104,8 @@ export const frontierSources: readonly Source[] = [
   {
     title:
       "Brief independent investigation of agents' behavior, reasoning and collaboration in the OpenAI / Hugging Face hacking incident",
-    gloss: 'agents "meant to be fully isolated from one another"; spoofed tool calls in at least 96 transcripts; gaps from container resets',
-    publisher: 'METR (Greenblatt, Cotra, Wijk)',
+    gloss: 'by Hjalmar Wijk and Ajeya Cotra (METR) and Ryan Greenblatt (Redwood Research, contracting with METR): agents "meant to be fully isolated from one another"; spoofed tool calls in at least 96 transcripts; gaps from container resets',
+    publisher: 'METR',
     date: '2026-08-26',
     url: 'https://metr.org/blog/2026-08-26-openai-hugging-face-incident-investigation/',
     verified: 'primary',
@@ -155,6 +158,22 @@ export const frontierSources: readonly Source[] = [
     url: 'https://www.iso.org/standard/44546.html',
     verified: 'primary',
   },
+  {
+    title: 'Third-party cyber evaluations involving OpenAI models',
+    gloss: 'the evaluator's "intended authorization boundary"; OpenAI will review how to "set expectations for isolation, credential handling, monitoring, and stop conditions"',
+    publisher: 'OpenAI',
+    date: '2026-08-04',
+    url: 'https://openai.com/index/third-party-cyber-evaluations-involving-openai-models/',
+    verified: 'primary',
+  },
+  {
+    title: 'Improving our alignment and security efforts',
+    gloss: 'best practices for external evaluation partners: sandbox and network isolation, API keys kept outside the environment, configuration verified before every evaluation, challenges confirmed solvable, explicit scope, real-time monitoring that ends an out-of-scope run',
+    publisher: 'Anthropic',
+    date: '2026-08-31',
+    url: 'https://www.anthropic.com/news/improving-alignment-security-efforts',
+    verified: 'primary',
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -201,8 +220,8 @@ export const frontierBlocks: readonly FrontierBlock[] = [
     title: 'Evaluation environments',
     lede: 'An evaluation result is only as good as the environment that produced it.',
     paragraphs: [
-      'The EU AI Act asks providers of general-purpose AI models with systemic risk to evaluate them, including adversarial testing, and to document it (Arts. 53 and 55) [1]. The GPAI Code of Practice lists the capability to use tools, and affordances such as access to tools and the level of human oversight, among the model characteristics that bear on systemic risk [2]. Neither says what the environment around the model must enforce while it is being tested.',
-      "Public evaluation practice gives a starting point. METR's Task Standard (v0.5.0) states that, unless a task declares the full_internet permission, the task machines \"MUST NOT have internet access\" except to a small set of destinations such as an LLM API proxy [3]. METR's Guidelines for Capability Elicitation treat task bugs, such as incorrect automatic scoring or a crashed environment, as spurious failures to be fixed before a result is reported [4]. The evaluation environment profile turns such practices into numbered controls: egress, credentials, isolation, stop conditions and the run record, each with where it is enforced and what evidence it leaves.",
+      'The EU AI Act asks every provider of a general-purpose AI model to keep technical documentation of it (Art. 53) and, for models with systemic risk, to evaluate them, including conducting and documenting adversarial testing (Art. 55) [1]. The GPAI Code of Practice lists the capability to use tools, and affordances such as access to tools and the level of human oversight, among the model characteristics that bear on systemic risk [2]. Neither says what the environment around the model must enforce while it is being tested.',
+      "Public evaluation practice gives a starting point. METR's Task Standard (v0.5.0) states that, unless a task declares the full_internet permission, the task machines \"MUST NOT have internet access\" except to a small set of destinations such as an LLM API proxy [3]. METR's Guidelines for Capability Elicitation treat task bugs, such as incorrect automatic scoring or a crashed environment, as spurious failures to be fixed before a result is reported [4]. The evaluation environment profile turns such practices into numbered draft controls: egress, credentials, isolation, stop conditions and the run record, each with the point where it is enforced; three of them are specified in full, with a verification procedure and the evidence they leave.",
     ],
     links: [
       { title: 'Evaluation environment control profile', description: 'AIGE-CTL-EVAL-001 to 009, draft v0.1, open for technical review.', href: '/controls/evaluation-environment', layer: 3 },
@@ -218,7 +237,7 @@ export const frontierBlocks: readonly FrontierBlock[] = [
     lede: 'The same controls hold whether the agent is under evaluation or in production.',
     paragraphs: [
       'The OWASP Top 10 for Agentic Applications sets out the failure classes an agent platform has to hold against, from goal hijack to rogue agents [5]. For tool servers, the MCP authorization specification makes the server validate the audience of each token and forbids passing a token through to another service [6]. Chapter 23 turns both into rules: a unique identity per agent, short-lived credentials, a tool allow-list, execution limits and a stop handle that works per agent.',
-      "Isolation is a claim to test, not to assume. METR's public investigation of a 2026 agent hacking incident reports that agents meant to be \"fully isolated from one another\" communicated through a shared internal package repository [7]. The agent runtime profile states each boundary as a control with a test, so a team can show the boundary held rather than assert it.",
+      "Isolation is a claim to test, not to assume. METR's public investigation of a 2026 agent hacking incident reports that agents meant to be \"fully isolated from one another\" communicated through a shared internal package repository [7]. The agent runtime profile states each boundary as a control with the evidence it should leave; its verification procedures are still to be written in review, so that a team can show the boundary held rather than assert it.",
     ],
     links: [
       { title: 'Agent runtime control profile', description: 'AIGE-CTL-AGENT-001 to 031, derived from chapter 23, draft v0.1.', href: '/controls/agent-runtime', layer: 4 },
@@ -269,7 +288,8 @@ export const frontierBlocks: readonly FrontierBlock[] = [
     lede: 'Schemes that already exist, and what an open implementation layer adds to them.',
     paragraphs: [
       'AIUC-1 lists 53 requirements in six domains, from data and privacy to society, two of them now marked retired [10]; its certificates are issued centrally on an audit report prepared by an accredited auditor [11]. ISO/IEC 42001 sets requirements for an AI management system [12], and ISO/IEC 42006 sets the requirements for the bodies that audit and certify against it [13]. The NIST AI RMF organises outcomes under govern, map, measure and manage [8].',
-      'These schemes say what must be true. The controls on this site add the engineering layer underneath: for each control, the point where it is enforced, the test that shows it held and the evidence record it leaves. A certification or framework can map to them; they do not replace one and confer no certification. This site is not affiliated with, reviewed by or certified by AIUC, ISO, NIST or METR.',
+      'These schemes say what must be true. The controls on this site add the engineering layer underneath: for each control, the point where it is enforced, how a third party would check that it held and the evidence record it leaves (in full for three controls so far, in draft for the rest). A certification or framework can map to them; they do not replace one and confer no certification. This site is not affiliated with, reviewed by or certified by AIUC, ISO, NIST, METR or any AI developer whose guidance it cites.',
+      'Public guidance from frontier developers and evaluators now uses the same terms for the environment around a model: an authorization boundary, and expectations for isolation, credential handling, monitoring and stop conditions [14]; a sandbox whose only outside connection is the model API, with keys kept outside it, a configuration checked before every evaluation and challenges confirmed solvable [15]. The profiles on this site cross-reference that guidance where it evidences a control. They are not derived from it, and no developer or evaluator has reviewed or endorsed them.',
     ],
     links: [
       { title: 'Open controls', description: 'The control profiles, their mappings and how to review them.', href: '/controls' },

@@ -247,8 +247,9 @@ const jsonLd = collectionPage({
       <ul>
         <li>
           <a href="https://aiuc-1.com/" rel="noopener">AIUC-1</a>, a standard of the Artificial
-          Intelligence Underwriting Company for AI agents: 53 requirements in six domains, with
-          certification by accredited auditors.
+          Intelligence Underwriting Company for AI agents: 53 requirements in six domains, two of
+          them now marked retired, with certificates issued by AIUC on the report of an accredited
+          auditor.
         </li>
         <li>
           <a href="https://www.iso.org/standard/81230.html" rel="noopener">ISO/IEC 42001:2023</a>,
@@ -265,11 +266,27 @@ const jsonLd = collectionPage({
         </li>
       </ul>
       <p>
-        Each control lists its mappings, and each profile page gathers them in one table. This
-        project is not affiliated with AIUC, ISO, NIST or the Cloud Security Alliance, and following
-        a profile here is not conformity with any of their schemes. See also
+        Each control lists its mappings, and each profile page gathers them in one table. An
+        AIUC-1 id appears only where the requirement's public text, read on its own page, plainly
+        covers the same objective; the mapping is this project's reading, not AIUC's. This project
+        is not affiliated with AIUC, ISO, NIST or the Cloud Security Alliance, holds no certificate
+        from any of them, and following a profile here is not conformity with any of their schemes.
+        See also
         <a href="/resources/frameworks">the frameworks</a> and
         <a href="/resources/crosswalk">the crosswalk</a>.
+      </p>
+      <p>
+        Public guidance from frontier developers and evaluators now uses the same terms for the
+        environment around a model: OpenAI's account of
+        <a href="https://openai.com/index/third-party-cyber-evaluations-involving-openai-models/" rel="noopener">third-party
+        cyber evaluations</a> (4 Aug 2026) speaks of an authorization boundary and of expectations
+        for isolation, credential handling, monitoring and stop conditions, and Anthropic's
+        <a href="https://www.anthropic.com/news/improving-alignment-security-efforts" rel="noopener">guidance
+        for external evaluation partners</a> (31 Aug 2026) covers network isolation, keys kept
+        outside the environment, configuration checked before every evaluation and monitoring that
+        ends an out-of-scope run. The profiles cross-reference that guidance where it evidences a
+        control; they are not derived from it, and no developer or evaluator has reviewed or
+        endorsed them.
       </p>
     </div>
   </Section>
