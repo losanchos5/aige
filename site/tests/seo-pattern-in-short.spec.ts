@@ -10,12 +10,14 @@
 import { test, expect } from '@playwright/test';
 import { readSource } from '../src/lib/md-parse';
 import { patterns } from '../src/data/patterns';
+import { IN_SHORT_MAX, IN_SHORT_MIN, extractorWords, inShortProse } from './helpers/in-short';
 
 const LABEL = '**In short**';
-// The source paragraph is written to 130-170 words; the rendered block (label
-// included) is allowed a little slack either side.
-const SOURCE_MIN = 130;
-const SOURCE_MAX = 170;
+// The source paragraph is held to the band answer engines quote (134-167
+// words, helpers/in-short.ts); the rendered block (label included) is allowed
+// a little slack either side.
+const SOURCE_MIN = IN_SHORT_MIN;
+const SOURCE_MAX = IN_SHORT_MAX;
 const RENDERED_MIN = 110;
 const RENDERED_MAX = 190;
 
@@ -43,6 +45,8 @@ test.describe('pattern "In short" blocks: sources', () => {
       const count = words(text);
       expect(count, `${pattern.slug} In short has ${count} words`).toBeGreaterThanOrEqual(SOURCE_MIN);
       expect(count, `${pattern.slug} In short has ${count} words`).toBeLessThanOrEqual(SOURCE_MAX);
+      const extracted = extractorWords(inShortProse(text));
+      expect(extracted, `${pattern.slug} In short has ${extracted} extracted words`).toBeLessThanOrEqual(SOURCE_MAX);
       // Self-contained: it names the pattern and never leans on the page around it.
       expect(text).toContain(pattern.title);
       expect(text).not.toMatch(/\bthis pattern\b|\bsee (above|below)\b/i);

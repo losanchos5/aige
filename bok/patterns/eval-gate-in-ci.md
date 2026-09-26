@@ -14,15 +14,15 @@ result is the evidence; a failing eval blocks the build.
 
 > **In short**
 > Eval Gate in CI is an evaluation control that wires an evaluation suite into the CI/CD pipeline,
-> so a model or agent must pass a defined test, above a documented threshold, before it can ship. It
-> solves evaluations run once before launch and pasted into a slide, which prove nothing after the
-> next change, and a review board that can rate findings but not stop a launch. Use it for a model
-> or agent that is retrained, re-prompted or given new tools, whose pipeline already runs functional
-> tests. The suite, versioned with the model, runs at least one capability eval and one adversarial
-> eval; each threshold traces to a named failure mode or obligation. A result below it fails the
-> build, and every result is filed against the registry entry, so the eval run is the control and
-> its result the evidence. Its illustrative mappings are EU AI Act Art. 15 and 55, ISO/IEC 42001,
-> the NIST AI RMF Measure function and OWASP Agentic ASI01 and ASI02.
+> so a model or agent must pass a defined test, above a documented threshold, before it ships. It
+> solves one-off pre-launch evaluations pasted into a slide, which prove nothing after the next
+> change, and a review board that can rate findings but not stop a launch. Use it for a model or
+> agent retrained, re-prompted or given new tools, whose pipeline already runs functional tests. The
+> suite, versioned with the model, runs at least one capability and one adversarial eval; each
+> threshold traces to a named failure mode or obligation. A result below it fails the build, and
+> every result is filed against the registry entry, so the eval run is the control and its result
+> the evidence. Its illustrative mappings are EU AI Act Art. 15 and 55, ISO/IEC 42001, the NIST AI
+> RMF Measure function and OWASP Agentic ASI01 and ASI02.
 
 ## Objectives
 Make "give every control teeth" concrete: give a testable property a consequence, so failure stops a

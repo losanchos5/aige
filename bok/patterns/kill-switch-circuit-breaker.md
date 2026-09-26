@@ -14,15 +14,15 @@ only where it can be withdrawn.
 
 > **In short**
 > The Kill Switch / Circuit Breaker is a runtime control that provides a tested mechanism to stop
-> one AI agent or a class of agents at the point of action, revoking access and halting tool calls
+> one agent or a class of agents at the point of action, revoking access and halting tool calls
 > without breaking the rest of the fleet. It solves agents that cannot be stopped precisely: on
 > shared credentials, an incident forces a choice between leaving the agent running and rotating a
 > secret that halts every agent. Use it wherever agents call tools or move data or money and one
-> failure can cascade. Each agent is bound to its own identity so access can be revoked per agent,
-> and a circuit breaker at the tool-call boundary trips on a defined signal: a threshold breach, an
-> anomaly or a manual pull. The kill switch is tested on a schedule, because an untested kill switch
-> is not a control. Its illustrative mappings are EU AI Act Art. 14 and 15, ISO/IEC 42001, the NIST
-> AI RMF Manage function, CSA AICM and OWASP Agentic ASI02 and ASI10.
+> failure can cascade. Each agent has its own identity, so access can be revoked per agent, and a
+> circuit breaker at the tool-call boundary trips on a defined signal: a threshold breach, an
+> anomaly or a manual pull. The kill switch is tested on a schedule, since an untested kill switch
+> is not a control. Its illustrative mappings are EU AI Act Art. 14 and 15, ISO/IEC 42001, NIST AI
+> RMF Manage, CSA AICM and OWASP Agentic ASI02 and ASI10.
 
 ## Objectives
 Bound the blast radius of a misbehaving or compromised agent, and make "stop it" a control that has been

@@ -18,16 +18,16 @@ the remaining gap closes.
 
 > **In short**
 > Rights Requests Against Models is a data-protection control that routes each data-subject request
-> for access, rectification, erasure or objection to every place the person's data sits in an AI
+> for access, rectification, erasure or objection to everywhere the person's data sits in an AI
 > system: source systems, training snapshots, retrieval indexes, prompt and output logs, eval sets
 > and, where the model is not anonymous, the weights. It solves request tooling built for databases
-> that stops at the CRM, so an erasure closes on time and is still incomplete. Use it wherever a
-> controller answers GDPR requests and personal data has flowed into AI pipelines. A data map keyed
-> by a pseudonymous subject key fans each request out to a handler per location, each with a
-> pre-agreed response on a ladder from immediate deletion to output suppression and scheduled
-> retraining. The release gate checks that pending erasures reach the next training set, and each
-> request closes with a fulfilment record. Its illustrative mappings include GDPR Art. 12(3), Arts.
-> 15–17 and Art. 21, EU AI Act Art. 26(6) and OWASP LLM02:2026.
+> that stops at the CRM, so an erasure closes on time yet incomplete. Use it wherever a controller
+> answers GDPR requests and personal data has flowed into AI pipelines. A data map keyed by a
+> pseudonymous subject key fans each request out to a handler per location, each with a pre-agreed
+> response on a ladder from immediate deletion to output suppression and scheduled retraining. The
+> release gate checks that pending erasures reach the next training set, and each request closes
+> with a fulfilment record. Its illustrative mappings include GDPR Arts. 12(3), 15–17 and 21, EU AI
+> Act Art. 26(6) and OWASP LLM02:2026.
 
 ## Objectives
 Honour data-subject rights inside the deadline across the whole AI data estate, not only the

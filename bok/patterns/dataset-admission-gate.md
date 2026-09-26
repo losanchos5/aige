@@ -21,13 +21,13 @@ in a wiki.
 > validation, testing, evaluation or retrieval-index job read a dataset version only if an admission
 > record admits it for that use. It solves data entering models through the path of least
 > resistance, with rights, quality, bias or poisoning problems found after training, when the fix is
-> a retrain. Use it where data platforms let any team read any table it can reach and training jobs
-> start from notebooks. Each admission record names the pipeline, the target system, the linked data
-> card, the decision, the rights, quality, representativeness, bias and integrity checks with the
-> obligation each enforces, the content hash of the signed snapshot and a signature. The job
-> presents its use-case id at read time, and the policy denies the read unless the record admits it.
-> Its illustrative mappings include EU AI Act Art. 10(2)–(4) and Art. 4a, GDPR Art. 5(1)(b) and
-> 6(4), ISO/IEC 42001 A.7.2 and OWASP LLM05:2026.
+> a retrain. Use it where any team can read any table it reaches and training jobs start from
+> notebooks. Each admission record names the pipeline, the target system, the linked data card, the
+> decision, the rights, quality, representativeness, bias and integrity checks with the obligation
+> each enforces, the signed snapshot's content hash and a signature. The job presents its use-case
+> id at read time, and the policy denies the read unless the record admits it. Its illustrative
+> mappings include EU AI Act Arts. 10(2)–(4) and 4a, GDPR Art. 5(1)(b) and 6(4), ISO/IEC 42001 A.7.2
+> and OWASP LLM05:2026.
 
 ## Objectives
 Decide whether data may be used, and whether it is fit for the purpose, before a model learns from
