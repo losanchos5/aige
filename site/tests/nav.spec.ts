@@ -27,6 +27,8 @@ const DETAIL_COLLECTIONS: { prefix: string; index: string }[] = [
   // One page per glossary term; the glossary chapter links every one of them.
   { prefix: '/glossary/', index: '/bok/glossary' },
   { prefix: '/toolkit/', index: '/toolkit' },
+  // Framework comparisons (/resources/crosswalk/<a>-vs-<b>); the crosswalk links each one.
+  { prefix: '/resources/crosswalk/', index: '/resources/crosswalk' },
   // Translations (openspec/changes/i18n-site-rendering): a language's chapters
   // hang off its book index, every other page of the language off its landing
   // /<lang>, which the footer links. A collection only counts when its index is
