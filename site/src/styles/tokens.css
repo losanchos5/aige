@@ -83,7 +83,29 @@
   --shadow-3: 0 6px 16px rgb(21 23 28 / 0.08), 0 22px 56px rgb(21 23 28 / 0.13);
   --grad-border: linear-gradient(135deg, var(--l1), var(--l3), var(--l4));
   --grad-cta: linear-gradient(135deg, var(--l1-ink), var(--ink));
+  /* The resting gradient frame of the reading pauses (figures, At a glance,
+     callout bands, tables): the three identity tones pushed a third of the way
+     to their inks, so the ring reads on the ground. Declared once: var()
+     resolves per theme, so dark gets mid tones from its own fills and inks. */
+  --grad-ring: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--l1-ink) 35%, var(--l1)),
+    color-mix(in srgb, var(--l3-ink) 30%, var(--l3)),
+    color-mix(in srgb, var(--l4-ink) 30%, var(--l4))
+  );
   --tint-bg: color-mix(in srgb, var(--l1) 18%, var(--bg));
+  /* Tinted bands by tone (Section `hue`) and the deep colour band (Section
+     tone="deep"). A tone tint is a mood, not a layer claim: it never labels a
+     layer, so it may sit behind any content (SL-06 governs the layer swatches). */
+  --tint-l1: color-mix(in srgb, var(--l1) 42%, var(--bg));
+  --tint-l2: color-mix(in srgb, var(--l2) 48%, var(--bg));
+  --tint-l3: color-mix(in srgb, var(--l3) 42%, var(--bg));
+  --tint-l4: color-mix(in srgb, var(--l4) 40%, var(--bg));
+  --tint-l5: color-mix(in srgb, var(--l5) 42%, var(--bg));
+  --deep-bg: var(--l1-ink);
+  /* Pause panels (figures, the At a glance box, closing asides): a faint ink
+     ground under a still, soft mesh. */
+  --pause-bg: color-mix(in srgb, var(--ink) 3%, var(--bg));
   --band-bg: #15171c;
   --tex-line: color-mix(in srgb, var(--ink) 9%, transparent);
 
@@ -139,6 +161,13 @@
   );
   --grad-cta: linear-gradient(135deg, var(--l1-ink), var(--ink));
   --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
+  --tint-l1: color-mix(in srgb, var(--l1-ink) 13%, var(--bg));
+  --tint-l2: color-mix(in srgb, var(--l2-ink) 12%, var(--bg));
+  --tint-l3: color-mix(in srgb, var(--l3-ink) 12%, var(--bg));
+  --tint-l4: color-mix(in srgb, var(--l4-ink) 11%, var(--bg));
+  --tint-l5: color-mix(in srgb, var(--l5-ink) 11%, var(--bg));
+  --deep-bg: #1f3a63;
+  --pause-bg: color-mix(in srgb, var(--ink) 4%, var(--bg));
   --band-bg: #0b0d10;
   --tex-line: color-mix(in srgb, var(--ink) 8%, transparent);
 
@@ -190,6 +219,13 @@
     );
     --grad-cta: linear-gradient(135deg, var(--l1-ink), var(--ink));
     --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
+    --tint-l1: color-mix(in srgb, var(--l1-ink) 13%, var(--bg));
+    --tint-l2: color-mix(in srgb, var(--l2-ink) 12%, var(--bg));
+    --tint-l3: color-mix(in srgb, var(--l3-ink) 12%, var(--bg));
+    --tint-l4: color-mix(in srgb, var(--l4-ink) 11%, var(--bg));
+    --tint-l5: color-mix(in srgb, var(--l5-ink) 11%, var(--bg));
+    --deep-bg: #1f3a63;
+    --pause-bg: color-mix(in srgb, var(--ink) 4%, var(--bg));
     --band-bg: #0b0d10;
     --tex-line: color-mix(in srgb, var(--ink) 8%, transparent);
 

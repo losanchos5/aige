@@ -18,6 +18,10 @@ interface Props {
   minutes?: number;
   /** Layer key (l1..l5) that tints the band; omit for a neutral band. */
   layer?: string;
+  /** Mesh composition (a..e) under a band without a layer. Doc picks it from
+      the chapter's part of the book, so the five parts each get their own mood
+      without claiming a layer colour (SL-06). Omit for composition a. */
+  mesh?: 'a' | 'b' | 'c' | 'd' | 'e';
   /** Page language, passed down by Doc; drives the meta line's labels. */
   lang?: string;
   /** Show the author in the meta line. Default: on every dated page except the
@@ -37,6 +41,7 @@ const {
   words,
   minutes,
   layer,
+  mesh = 'a',
   lang = 'en',
   siteVersion = true,
 } = Astro.props;
@@ -81,6 +86,14 @@ if (updated) metaBits.push({ text: site.license });
 
 <header class="chapter-header">
   <div class="ch-band" data-layer={layer}>
+    {
+      !layer && (
+        <div
+          class:list={['bg-mesh', 'ch-mesh', mesh === 'a' ? 'bg-mesh--still' : `bg-mesh--${mesh}`]}
+          aria-hidden="true"
+        />
+      )
+    }
     <h1 data-pagefind-meta="title">{title}</h1>
     {summary && <p class="lede">{summary}</p>}
     {
@@ -171,6 +184,19 @@ if (updated) metaBits.push({ text: site.license });
   .ch-band[data-layer='l5'] {
     --ch-tint: color-mix(in srgb, var(--l5) 22%, var(--bg));
     --ch-glow: var(--glow-5);
+  }
+
+  /* The still mesh of a band without a layer: behind the text inside the
+     band's isolated stacking context, a little softer than a section mesh so
+     the H1 keeps the page's strongest contrast. --muted is re-scoped as on
+     every mesh surface. */
+  .ch-mesh {
+    z-index: -1;
+    --mesh-k: 0.8;
+  }
+
+  .ch-band:has(.ch-mesh) {
+    --muted: var(--ink-2);
   }
 
   /* Radial glow, anchored top-right. */

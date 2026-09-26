@@ -154,25 +154,51 @@ needs no pause control; it also pauses while a step is active, and is absent und
 
 ## Primitives
 
-- **`<Section tone="plain|tint|dark|mesh">`** (`site/src/components/Section.astro`): the shared
+- **`<Section tone="plain|tint|dark|mesh|deep">`** (`site/src/components/Section.astro`): the shared
   section shell: `<section class="section sec sec--{tone}">`, an inert `.bg-mesh` when
-  `tone="mesh"` (or when a `tone="tint"` band passes `mesh`), an optional head (H2 or H1-scale
-  title + lede, no kicker) and slotted content over `.sec-inner` (`z-index: 1`). `mesh="a|b|c"`
-  picks the composition and `meshK` its strength.
+  `tone="mesh"` (or when a `tone="tint"` or `tone="deep"` band passes `mesh`), an optional head (H2
+  or H1-scale title + lede, no kicker) and slotted content over `.sec-inner` (`z-index: 1`).
+  `mesh="a|b|c|d|e"` picks the composition and `meshK` its strength. `hue="l1..l5"` colours a tint
+  band with `--tint-l1..l5` (blue, sage, rose, amber, lime; a mood, never a layer label).
+  `tone="deep"` is the dark token set on `--deep-bg` (the L1 navy, `#1f3a63` in both themes) with
+  `--muted` at `--ink-2`; never next to a dark or another deep band (visual-rhythm, 2026-09-26).
 - **`.bg-mesh`** (`effects.css`), the identity element: five soft radial glows (`--glow-1..5`)
   split across two pseudo-elements that overhang the host by 20% and drift slowly (see Motion).
   Absolute, `contain: strict`, `aria-hidden`, `pointer-events: none`; the host clips it. Strength is
   `--mesh-alpha × --mesh-k`: `--mesh-alpha` is `1` light / `0.55` dark by default, `0.7` in
   PageHero, `0.25` inside CtaBand; `--mesh-k` (Section's `meshK`) is `1` by default. Compositions
   are custom properties (`--m1..5` colour, `--m1..5-at` centre): `a` (default) is the home role
-  section's and drifts; `.bg-mesh--b` mirrors it and `.bg-mesh--c` turns it around, both still, as is
-  any mesh a `tone="tint"` band carries (Section's `mesh` on a tint band). A
+  section's and drifts; `.bg-mesh--b` mirrors it, `.bg-mesh--c` turns it around, `.bg-mesh--d` leans
+  cool and `.bg-mesh--e` warm, all still, as is `a` with `.bg-mesh--still` and any mesh a
+  `tone="tint"` band carries (Section's `mesh` on a tint band). A
   section's mesh fades over its top and bottom tenth (`mask-image`), so neighbouring meshes meet
-  without a seam. On the home page no body section sits on the bare ground (Jordi, 2026-09-24):
-  loop `b` 0.5, questions `c` 0.5, stack tint + `a` 0.35, operates `c` 0.4, values `b` 0.45, role
-  `a` 0.6, chapters `c` 0.45, resources tint + `b` 0.35, newsletter `c` 0.35; neighbours never share
-  a composition. One mesh per section, several per
+  without a seam. On the home page no body section sits on the bare ground (Jordi, 2026-09-24,
+  stronger since visual-rhythm 2026-09-26): loop `b` 0.85, questions tint `l1` + `d` 0.6, stack `e`
+  0.8, operates deep + `c` 0.7, values tint `l4` + `b` 0.5, role `a` 0.9, chapters tint `l5` + `c`
+  0.5, resources `d` 0.8, what applies now tint `l3` + `e` 0.5, newsletter `c` 0.75; neighbours never
+  share a composition or a hue. The PageHero `res` variant runs its mesh at 0.65. One mesh per section, several per
   page; never directly under a table or a node grid (the loop sits on its own opaque panel).
+- **`.pause`** (`effects.css`, visual-rhythm): the rest between runs of text. A rounded panel whose
+  background is painted in layers: three soft radial glows and `--pause-bg` in the padding box,
+  `--grad-ring` (the three identity tones pushed a third of the way to their inks) in the border
+  box under a transparent 1px border. One paint, no pseudo-element, no motion. `.pause--alt` (and
+  every even figure) turns the glows around. Used by the top-level figures of the prose
+  (`.prose > .diagram`, `.prose > .figure--infographic`) and by `AtAGlance`. The figure's own canvas
+  stays opaque, so no glow sits under its nodes.
+- **Reading rhythm** (`prose.css`, visual-rhythm): top-level practice, example and anti callouts are
+  bands across the reading well on a 62% tint of their kind with the gradient ring, their text kept
+  at the prose measure (`padding-inline: calc(50cqw - 50%) + step`); note and "In short" stay in the
+  column with the ring. Top-level tables take the well on an opaque ground inside the ring, the
+  cells' outer borders dropped. The breakouts apply only under `.doc-main` / `.pillar-main` (query
+  containers); elsewhere cq units would fall back to the viewport. The H2 dash is the three-ink
+  gradient (`--chapter-dash`) on a page without a layer.
+- **Chapter header mesh** (`ChapterHeader.astro` `mesh`, picked in `Doc.astro`): a still mesh inside
+  `.ch-band` at `meshK` 0.8, one composition per part of the book: discipline `a` (still),
+  foundations `c`, lifecycle `b`, law `d`, reference `e`. It gives every chapter colour without a
+  layer claim (SL-06); a chapter with a `layer` keeps its layer tint and no mesh.
+- **Doc `after` slot** (`Doc.astro`): full-width bands after the reading layout. The BoK chapters
+  close on a still mesh `e` band with the open-reference links and the sign-up, rendered only when
+  it has something to hold.
 - **`BookParts`** (`site/src/components/BookParts.astro`), the Body of Knowledge by part on the
   home: one `.card-lum` per part (no `.lift`: the card is not a link; its title links the part on
   the /bok index and its chapter rows link the chapters) with the chapter range and a one-sentence

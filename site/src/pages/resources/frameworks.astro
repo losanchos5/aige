@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
+import Section from '../../components/Section.astro';
 import FrameworkTable from '../../components/FrameworkTable.astro';
 import ObligationMatrix from '../../components/ObligationMatrix.astro';
 import ObligationTable from '../../components/ObligationTable.astro';
@@ -58,16 +59,19 @@ const jsonLd = [
     lede="The horizontal law, the management standards, the voluntary codes and the control sets the discipline is built against, then the reverse index that names, for each obligation, the engineering artefact that evidences it and the layer it lives in."
   />
 
-  <div class="container res-page">
-    <div class="res-section">
-      <Callout kind="note" title="Illustrative mapping, not a conformity assessment">
-        <p>{disclaimer} No artefact named here guarantees compliance, and no standard cited confers a
-        presumption of conformity. An artefact supports and evidences an obligation; the legal
-        judgement of conformity stays with lawyers, notified bodies and authorities.</p>
-      </Callout>
-    </div>
+  {/* The page as a run of bands (visual-rhythm): the note, the frameworks
+      head and the lineage figure on a blue tint with a still mesh; the table
+      on the plain ground (never a mesh under a table); the reverse index
+      head and its diagram on a sage tint; the matrix and the long table
+      plain again. */}
+  <Section tone="tint" hue="l1" mesh="d" meshK={0.7} class="res-band res-band--first">
+    <Callout kind="note" title="Illustrative mapping, not a conformity assessment">
+      <p>{disclaimer} No artefact named here guarantees compliance, and no standard cited confers a
+      presumption of conformity. An artefact supports and evidences an obligation; the legal
+      judgement of conformity stays with lawyers, notified bodies and authorities.</p>
+    </Callout>
 
-    <section class="res-section" aria-labelledby="fw-heading">
+    <div class="res-section">
       <div class="res-section-head">
         <h2 id="fw-heading">Frameworks</h2>
         <p>{frameworks.length} instruments: laws, standards, codes and control sets. External links
@@ -87,49 +91,55 @@ const jsonLd = [
       >
         <Fragment set:html={lineageSvg} />
       </Figure>
-      <FrameworkTable frameworks={frameworks} />
-    </section>
+    </div>
+  </Section>
 
-    <section class="res-section" aria-labelledby="ob-heading">
-      <div class="res-section-head">
-        <h2 id="ob-heading">Obligation → artefact → layer</h2>
-        <p>{obligations.length} rows, grouped by framework. Read each as a sentence: this obligation
-        is answered by this artefact, which lives in this layer. Filter by the layer you are
-        building, or by EU AI Act duty holder.</p>
-        <p class="ob-xref">
-          Cross-reference: <a href="/obligations">the obligation register</a> (one page per row,
-          with a stable id) · <a href="/resources/tools">tools by layer</a> ·
-          <a href="/patterns">the patterns</a> ·
-          <a href="/resources/crosswalk">topic crosswalk</a>.
-        </p>
-        <p class="ob-export">
-          <a
-            class="ob-dl"
-            href="/resources/obligations.csv"
-            download
-            target="_blank"
-            rel="noopener"
-            data-umami-event="download"
-            data-umami-event-file="/resources/obligations.csv"
-            data-umami-event-location="frameworks">Download CSV</a>
-          <a
-            class="ob-dl"
-            href="/resources/obligations.json"
-            download
-            target="_blank"
-            rel="noopener"
-            data-umami-event="download"
-            data-umami-event-file="/resources/obligations.json"
-            data-umami-event-location="frameworks">Download JSON</a>
-          <a class="ob-dl" href="/api/v1/obligations.json">API</a>
-          <a class="ob-dl" href="/resources/data">About the data</a>
-        </p>
-      </div>
-      <Diagram id="obligation-to-evidence" />
-      <ObligationMatrix frameworks={frameworks} obligations={obligations} />
-      <ObligationTable obligations={obligations} />
-    </section>
-  </div>
+  <Section class="res-band">
+    <FrameworkTable frameworks={frameworks} />
+  </Section>
+
+  <Section tone="tint" hue="l2" class="res-band">
+    <div class="res-section-head">
+      <h2 id="ob-heading">Obligation → artefact → layer</h2>
+      <p>{obligations.length} rows, grouped by framework. Read each as a sentence: this obligation
+      is answered by this artefact, which lives in this layer. Filter by the layer you are
+      building, or by EU AI Act duty holder.</p>
+      <p class="ob-xref">
+        Cross-reference: <a href="/obligations">the obligation register</a> (one page per row,
+        with a stable id) · <a href="/resources/tools">tools by layer</a> ·
+        <a href="/patterns">the patterns</a> ·
+        <a href="/resources/crosswalk">topic crosswalk</a>.
+      </p>
+      <p class="ob-export">
+        <a
+          class="ob-dl"
+          href="/resources/obligations.csv"
+          download
+          target="_blank"
+          rel="noopener"
+          data-umami-event="download"
+          data-umami-event-file="/resources/obligations.csv"
+          data-umami-event-location="frameworks">Download CSV</a>
+        <a
+          class="ob-dl"
+          href="/resources/obligations.json"
+          download
+          target="_blank"
+          rel="noopener"
+          data-umami-event="download"
+          data-umami-event-file="/resources/obligations.json"
+          data-umami-event-location="frameworks">Download JSON</a>
+        <a class="ob-dl" href="/api/v1/obligations.json">API</a>
+        <a class="ob-dl" href="/resources/data">About the data</a>
+      </p>
+    </div>
+    <Diagram id="obligation-to-evidence" />
+  </Section>
+
+  <Section class="res-band res-band--last">
+    <ObligationMatrix frameworks={frameworks} obligations={obligations} />
+    <ObligationTable obligations={obligations} />
+  </Section>
 
   <script is:inline defer src="/matrix.js"></script>
 </Base>

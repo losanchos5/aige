@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Doc from '../../layouts/Doc.astro';
+import Section from '../../components/Section.astro';
 import AtAGlance from '../../components/AtAGlance.astro';
 import NewsletterForm from '../../components/NewsletterForm.astro';
 import PillarLink from '../../components/PillarLink.astro';
@@ -211,41 +212,74 @@ const jsonLd = {
   {isGlossary && <GlossaryJump />}
   <AtAGlance items={chapter.glance} terms={keyTerms} />
   <Content />
-  {
-    openLinks.length > 0 && (
-      <section class="chapter-related" aria-labelledby="related-open-reference" data-pagefind-ignore>
-        <h2 id="related-open-reference">Related in the open reference</h2>
-        <p>
-          Where this chapter is put to work in the open reference project: draft material, open for
-          technical review.
-        </p>
-        <ul>
-          {openLinks.map((link) => (
-            <li>
-              <a href={link.href}>{link.label}</a>: {link.note}.
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-  }
-  {/* After the sources: the sign-up, out of the search index and of snippets so
-      it never shows up as chapter text. Renders nothing without an endpoint. */}
-  <div class="chapter-newsletter" data-pagefind-ignore data-nosnippet>
-    <NewsletterForm location="chapter" />
-  </div>
+  {/* The chapter's close: a full-width, still mesh band after the reading
+      layout (Doc's "after" slot), so the page ends on colour, not on the
+      sources list. Only when it has something to hold. */}
+  {(openLinks.length > 0 || site.newsletter.action) && (
+  <Section tone="mesh" mesh="e" meshK={0.9} class="chapter-close" slot="after">
+    <div class="chapter-close-inner">
+      {
+        openLinks.length > 0 && (
+          <section class="chapter-related" aria-labelledby="related-open-reference" data-pagefind-ignore>
+            <h2 id="related-open-reference">Related in the open reference</h2>
+            <p>
+              Where this chapter is put to work in the open reference project: draft material, open for
+              technical review.
+            </p>
+            <ul>
+              {openLinks.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>: {link.note}.
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+      {/* After the sources: the sign-up, out of the search index and of snippets so
+          it never shows up as chapter text. Renders nothing without an endpoint. */}
+      <div class="chapter-newsletter" data-pagefind-ignore data-nosnippet>
+        <NewsletterForm location="chapter" />
+      </div>
+    </div>
+  </Section>
+  )}
 </Doc>
 
 <style>
-  /* The open-reference links sit apart from the chapter's sources list. */
-  .chapter-related {
-    margin-top: var(--s-7);
+  /* The close band's content keeps the reading measure, centred like the
+     prose column above it. */
+  .chapter-close-inner {
+    max-width: 72ch;
+    margin-inline: auto;
   }
 
-  /* A hairline and one --s-7 step set the sign-up apart from the sources list;
-     an empty wrapper (no endpoint configured) collapses to nothing. */
-  .chapter-newsletter:not(:empty) {
-    margin-top: var(--s-7);
+  .chapter-related h2 {
+    margin: 0 0 var(--s-3);
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    line-height: 1.15;
+  }
+
+  .chapter-related ul {
+    margin: var(--s-4) 0 0;
+    padding-left: 1.2em;
+  }
+
+  .chapter-related li + li {
+    margin-top: var(--s-2);
+  }
+
+  .chapter-related a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+
+  /* A hairline and one --s-6 step set the sign-up apart from the links; an
+     empty wrapper (no endpoint configured) collapses to nothing. */
+  .chapter-related + .chapter-newsletter:not(:empty) {
+    margin-top: var(--s-6);
     padding-top: var(--s-5);
     border-top: 1px solid var(--line);
   }

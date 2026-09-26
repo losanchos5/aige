@@ -55,6 +55,35 @@
   --m5-at: 88% 30%;
 }
 
+/* d and e: two more still compositions, so the chapter headers of the five
+   parts of the book (ChapterHeader) and longer runs of mesh bands never repeat
+   a neighbour. d leans cool (blue, sage, lime), e warm (peach, rose). */
+.bg-mesh--d {
+  --m1: var(--glow-2);
+  --m1-at: 10% 30%;
+  --m2: var(--glow-1);
+  --m2-at: 70% 8%;
+  --m3: var(--glow-5);
+  --m3-at: 92% 70%;
+  --m4: var(--glow-1);
+  --m4-at: 40% 96%;
+  --m5: var(--glow-4);
+  --m5-at: 60% 50%;
+}
+
+.bg-mesh--e {
+  --m1: var(--glow-4);
+  --m1-at: 90% 18%;
+  --m2: var(--glow-3);
+  --m2-at: 30% 8%;
+  --m3: var(--glow-4);
+  --m3-at: 12% 86%;
+  --m4: var(--glow-2);
+  --m4-at: 78% 92%;
+  --m5: var(--glow-1);
+  --m5-at: 48% 46%;
+}
+
 .bg-mesh::before,
 .bg-mesh::after {
   content: '';
@@ -84,10 +113,10 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .bg-mesh:not(.bg-mesh--b, .bg-mesh--c, .sec--tint > *)::before {
+  .bg-mesh:not(.bg-mesh--b, .bg-mesh--c, .bg-mesh--d, .bg-mesh--e, .bg-mesh--still, .sec--tint > *)::before {
     animation: mesh-drift-a 34s ease-in-out infinite alternate;
   }
-  .bg-mesh:not(.bg-mesh--b, .bg-mesh--c, .sec--tint > *)::after {
+  .bg-mesh:not(.bg-mesh--b, .bg-mesh--c, .bg-mesh--d, .bg-mesh--e, .bg-mesh--still, .sec--tint > *)::after {
     animation: mesh-drift-b 42s ease-in-out infinite alternate;
   }
 
@@ -346,11 +375,20 @@
   --muted: var(--ink-2);
 }
 
+/* A tint band in one tone (Section `hue`): a stronger, coloured ground than the
+   default pale blue, so consecutive bands read as distinct rooms. */
+.sec--tint[data-hue='l1'] { --tint-bg: var(--tint-l1); }
+.sec--tint[data-hue='l2'] { --tint-bg: var(--tint-l2); }
+.sec--tint[data-hue='l3'] { --tint-bg: var(--tint-l3); }
+.sec--tint[data-hue='l4'] { --tint-bg: var(--tint-l4); }
+.sec--tint[data-hue='l5'] { --tint-bg: var(--tint-l5); }
+
 /* Dark band. Re-scopes the full dark token set (surfaces, ink, lines, the five
    layers and their inks, plus the effect tokens) so children render with the
    already-audited dark contrast regardless of the page's own theme. The band
    itself follows --band-bg (deep slate on light pages, near-black on dark). */
-.sec--dark {
+.sec--dark,
+.sec--deep {
   background: var(--band-bg);
   color: var(--ink);
 
@@ -390,6 +428,16 @@
   --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
 }
 
+/* Deep band: the dark token set on the L1 navy instead of slate, a colour
+   field for one statement per page. --muted (#8e9199) is 3.6:1 on the navy,
+   so it takes --ink-2 like every other tinted surface. */
+.sec--deep {
+  background: var(--deep-bg);
+  --muted: var(--ink-2);
+  --line: color-mix(in srgb, #eceae3 18%, transparent);
+  --surface: rgba(255, 255, 255, 0.06);
+}
+
 /* ------------------------------------------------ Muted text over the mesh */
 
 /* --muted drops below AA over the gradient mesh too (12px mono labels on the
@@ -403,4 +451,50 @@
 .hero--page,
 .hero--field {
   --muted: var(--ink-2);
+}
+
+/* ------------------------------------------------------------------- Pauses */
+
+/* A pause panel: the rest between runs of text. Figures, the At a glance box
+   and closing asides sit on a rounded panel of the faint --pause-bg under a
+   still, soft mesh painted in the panel's own background (no pseudo-element,
+   no animation, one paint). The content inside keeps its own opaque frame, so
+   no mesh ever sits directly under a figure's nodes or a table. --muted is
+   re-scoped as on every other tinted surface. .pause--alt turns the mesh
+   around, so two pauses in a row do not look alike. */
+.pause,
+.prose > :is(.diagram, .figure--infographic) {
+  --pause-g1: var(--glow-1);
+  --pause-g2: var(--glow-4);
+  --pause-g3: var(--glow-3);
+  --muted: var(--ink-2);
+  border: 1px solid transparent;
+  border-radius: var(--r-lg);
+  /* The mesh layers and the ground fill the padding box; the gradient ring
+     (--grad-ring) shows through the transparent 1px border. */
+  background:
+    radial-gradient(55% 70% at 6% 0%, color-mix(in srgb, var(--pause-g1) 75%, transparent), transparent 72%) padding-box,
+    radial-gradient(50% 70% at 98% 100%, color-mix(in srgb, var(--pause-g2) 70%, transparent), transparent 72%) padding-box,
+    radial-gradient(40% 55% at 80% 6%, color-mix(in srgb, var(--pause-g3) 55%, transparent), transparent 70%) padding-box,
+    linear-gradient(var(--pause-bg), var(--pause-bg)) padding-box,
+    var(--grad-ring) border-box;
+}
+
+.pause--alt,
+.prose > :is(.diagram, .figure--infographic):nth-of-type(even) {
+  --pause-g1: var(--glow-2);
+  --pause-g2: var(--glow-3);
+  --pause-g3: var(--glow-5);
+}
+
+/* In the reading well the figure itself becomes the pause: it already breaks
+   out to the well (diagrams.css, figures.css), so it only gains the padding. */
+.prose > :is(.diagram, .figure--infographic) {
+  padding: var(--s-3);
+}
+
+@media (min-width: 840px) {
+  .prose > :is(.diagram, .figure--infographic) {
+    padding: var(--s-5);
+  }
 }
