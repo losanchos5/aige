@@ -225,6 +225,36 @@ needs no pause control; it also pauses while a step is active, and is absent und
   >8px), when it falls back to the normal frosted/solid bar. The shader keeps the header's `--ink-2`
   text ≥ 5:1 wherever it floats over the field.
 
+### Open reference primitives
+
+Shared by `/controls`, the control profiles, `/frontier`, `/research`, `/contribute` and `/cases`
+(open-reference-project, 2026-09-26). None ships a script or an animation.
+
+- **`FlowDiagram`** (`site/src/components/FlowDiagram.astro`), a chain of 2 to 7 steps in HTML and
+  CSS: an `<ol aria-label>` inside `figure.flow`, each step a `.flow-node` (link or span) with an
+  optional layer swatch (`data-layer`, `--l1..--l5` fill with its `-ink` hairline) and a `sub`
+  line. A container query picks the layout from the figure's own width: a column below 760px, a
+  row from 760px (from 1000px when there are more than five steps, `data-wide`). The arrows are
+  empty CSS pseudo-elements in an opaque wire ink; labels stay at 16px on a phone. Class names
+  never use the `figure-*`, `figc` or `diagram*` families (their stylesheets ship per page).
+- **`StatusLine`** (`StatusLine.astro`), the version and review state under a title, never above
+  one: `v0.1 · Draft · Open for technical review · Updated 26 Sep 2026`, built on `.meta` but in
+  sentence case and `--ink-2`, with the dot in the state's layer ink (draft `--l4-ink`, in review
+  `--l1-ink`, published/stable `--l5-ink`, retired `--l3-ink`). With no reviewers it always says
+  "Open for technical review".
+- **`Provenance`** (`Provenance.astro`), `nav.prov` of pills in the `EditOnGitHub` style: version,
+  DOI, cite, edit on GitHub, open an issue (`data-umami-event="open-issue"`).
+- **`ContributeCta`** (`ContributeCta.astro`), one `.btn.btn-primary` that opens the GitHub issue
+  form for its `kind` (control, assumption, implementation, mapping, note, incident) with the
+  title prefilled, plus a text link to `/contribute`. No heading. An `<aside aria-label>` by
+  default; `landmark={false}` renders a `<div>` where the call repeats per record.
+- **`OpenWork`** (`OpenWork.astro`), `ol.work-list` from `data/work.ts`: title link, state with a
+  dot, version, date, one sentence; text in `--ink-2`, so it reads on any ground. Only true states.
+- **`ControlRecord`** (`ControlRecord.astro`), one control as `section.ctl[data-control]` with the
+  anchor on its H2 (inside `.prose`, for the TOC) and the record as a `dl.cs-facts` (case-page
+  style from `styles/harms.css`); the foot links the control's JSON
+  (`data-umami-event="control-download"`) and its review form.
+
 ## Hard constraints
 
 1. Any animation of an element that may sit in the initial viewport is **transform-only, never

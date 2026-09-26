@@ -1,0 +1,119 @@
+---
+/**
+ * StatusLine: the version and review state of a versioned artefact (a control
+ * profile, a research note), as one quiet line under its title:
+ *
+ *   v0.1 · Draft · Open for technical review · Updated 26 Sep 2026
+ *
+ * It sits under the H1 or beside a card title, never above a heading (no
+ * eyebrows). The dot takes the state's layer ink; the separators are
+ * aria-hidden, so a screen reader hears the four facts. With no reviewers the
+ * line says "Open for technical review": nothing is shown as reviewed until a
+ * named reviewer has reviewed it.
+ */
+import { formatDate } from '../lib/applies-now';
+
+type Status = 'draft' | 'review' | 'in-review' | 'published' | 'stable' | 'retired';
+
+interface Props {
+  version?: string;
+  status: Status;
+  reviewers?: readonly { name: string; href?: string }[];
+  /** YYYY-MM-DD. */
+  updated?: string;
+  class?: string;
+}
+
+const { version, status, reviewers = [], updated, class: extra } = Astro.props;
+
+const LABELS: Readonly<Record<Status, string>> = {
+  draft: 'Draft',
+  review: 'In review',
+  'in-review': 'In review',
+  published: 'Published',
+  stable: 'Stable',
+  retired: 'Retired',
+};
+---
+
+<p class:list={['meta', 'status-line', extra]} data-status={status}>
+  <span class="meta-dot" aria-hidden="true"></span>
+  {
+    version && (
+      <>
+        <span>v{version}</span>
+        <span class="sl-sep" aria-hidden="true">·</span>
+      </>
+    )
+  }
+  <span>{LABELS[status]}</span>
+  <span class="sl-sep" aria-hidden="true">·</span>
+  {
+    reviewers.length === 0 ? (
+      <span>Open for technical review</span>
+    ) : (
+      <span>
+        Reviewed by{' '}
+        {reviewers.map((r, i) => (
+          <>
+            {i > 0 && ', '}
+            {r.href ? <a href={r.href}>{r.name}</a> : r.name}
+          </>
+        ))}
+      </span>
+    )
+  }
+  {
+    updated && (
+      <>
+        <span class="sl-sep" aria-hidden="true">·</span>
+        <span>
+          Updated <time datetime={updated}>{formatDate(updated)}</time>
+        </span>
+      </>
+    )
+  }
+</p>
+
+<style>
+  /* .meta (effects.css) sets the mono label size and the dot; this line keeps
+     sentence case, wraps on a phone and reads in --ink-2 on any ground. */
+  .status-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-2);
+    line-height: 1.5;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink-2);
+  }
+
+  .status-line .meta-dot {
+    align-self: center;
+  }
+
+  .status-line[data-status='draft'] .meta-dot {
+    background: var(--l4-ink);
+  }
+
+  .status-line[data-status='review'] .meta-dot,
+  .status-line[data-status='in-review'] .meta-dot {
+    background: var(--l1-ink);
+  }
+
+  .status-line[data-status='published'] .meta-dot,
+  .status-line[data-status='stable'] .meta-dot {
+    background: var(--l5-ink);
+  }
+
+  .status-line[data-status='retired'] .meta-dot {
+    background: var(--l3-ink);
+  }
+
+  .status-line a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 0.18em;
+  }
+</style>

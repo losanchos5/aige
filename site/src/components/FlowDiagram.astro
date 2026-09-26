@@ -1,0 +1,257 @@
+---
+/**
+ * FlowDiagram: a short chain of steps (2 to 7) drawn in HTML and CSS, for the
+ * "concept -> pattern -> control -> evidence" kind of figure the open reference
+ * pages use. One ordered list, two layouts, picked by the figure's own width
+ * (a container query, not the viewport):
+ *
+ *   column (narrow): the steps stacked, a down arrow between each pair;
+ *   row (760px and up, 1000px when there are more than five steps): the steps
+ *     side by side, a right arrow in each gap.
+ *
+ * The order is the list's order, so a screen reader reads the chain as it is
+ * drawn; the arrows are empty pseudo-elements and carry no text. A step with a
+ * layer shows that layer's swatch; a step with `href` is a link. No script, no
+ * animation, no transition. Class names stay clear of the figure-* / figc /
+ * diagram* families, whose stylesheets ship only with the pages that use them.
+ */
+import type { LayerNumber } from '../data/stack';
+
+export interface FlowStep {
+  label: string;
+  /** One short line under the label. */
+  sub?: string;
+  href?: string;
+  layer?: LayerNumber;
+}
+
+interface Props {
+  steps: readonly FlowStep[];
+  /** Names the chain: the list's aria-label and the caption's first line. */
+  title: string;
+  /** One sentence under the title in the caption. */
+  desc?: string;
+  id?: string;
+}
+
+const { steps, title, desc, id } = Astro.props;
+if (steps.length < 2 || steps.length > 7) {
+  throw new Error(`FlowDiagram "${title}": ${steps.length} steps; a flow takes 2 to 7`);
+}
+const wide = steps.length > 5;
+---
+
+<figure class="flow" id={id} data-wide={wide ? '' : undefined}>
+  <ol class="flow-steps" role="list" aria-label={title}>
+    {
+      steps.map((step) => (
+        <li class="flow-step" data-layer={step.layer ?? 'none'}>
+          {step.href ? (
+            <a class="flow-node" href={step.href}>
+              {step.layer && <span class="flow-swatch" aria-hidden="true" />}
+              <span class="flow-text">
+                <span class="flow-label">{step.label}</span>
+                {step.layer && <span class="visually-hidden">(layer {step.layer})</span>}
+                {step.sub && <span class="flow-sub">{step.sub}</span>}
+              </span>
+            </a>
+          ) : (
+            <span class="flow-node">
+              {step.layer && <span class="flow-swatch" aria-hidden="true" />}
+              <span class="flow-text">
+                <span class="flow-label">{step.label}</span>
+                {step.layer && <span class="visually-hidden">(layer {step.layer})</span>}
+                {step.sub && <span class="flow-sub">{step.sub}</span>}
+              </span>
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+  <figcaption class="flow-cap">
+    <span class="flow-title">{title}</span>
+    {desc && <span class="flow-desc">{desc}</span>}
+  </figcaption>
+</figure>
+
+<style>
+  .flow {
+    container: flow / inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    margin: var(--s-5) 0;
+    /* Opaque wire ink, 3:1 against the ground in both themes (as the loop). */
+    --flow-wire: color-mix(in srgb, var(--ink) 55%, var(--bg));
+    --flow-gap: var(--s-5);
+  }
+
+  .flow-steps {
+    display: grid;
+    gap: var(--flow-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .flow-step {
+    position: relative;
+    display: flex;
+    min-width: 0;
+  }
+
+  /* Layer colour: a step that belongs to one layer shows its swatch. */
+  .flow-step[data-layer='1'] { --flow-layer: var(--l1); --flow-layer-ink: var(--l1-ink); }
+  .flow-step[data-layer='2'] { --flow-layer: var(--l2); --flow-layer-ink: var(--l2-ink); }
+  .flow-step[data-layer='3'] { --flow-layer: var(--l3); --flow-layer-ink: var(--l3-ink); }
+  .flow-step[data-layer='4'] { --flow-layer: var(--l4); --flow-layer-ink: var(--l4-ink); }
+  .flow-step[data-layer='5'] { --flow-layer: var(--l5); --flow-layer-ink: var(--l5-ink); }
+
+  .flow-node {
+    display: flex;
+    flex: 1;
+    align-items: flex-start;
+    gap: var(--s-3);
+    min-width: 0;
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: linear-gradient(var(--surface), var(--surface)), var(--bg);
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  a.flow-node:hover {
+    border-color: var(--ink-2);
+  }
+
+  a.flow-node:hover .flow-label {
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+
+  a.flow-node:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .flow-swatch {
+    flex: none;
+    width: 12px;
+    height: 12px;
+    margin-top: 0.3em;
+    border: 1px solid var(--flow-layer-ink);
+    border-radius: 2px;
+    background: var(--flow-layer);
+  }
+
+  .flow-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    min-width: 0;
+  }
+
+  .flow-label {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  .flow-sub {
+    font-size: var(--fs-small);
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+
+  /* Arrows, column layout: a wire down the gap and a chevron at its end. */
+  .flow-step:not(:last-child)::after,
+  .flow-step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .flow-step:not(:last-child)::after {
+    top: 100%;
+    left: var(--s-5);
+    width: 0;
+    height: var(--flow-gap);
+    border-left: 2px solid var(--flow-wire);
+  }
+
+  .flow-step:not(:last-child)::before {
+    top: calc(100% + var(--flow-gap) - 9px);
+    left: calc(var(--s-5) - 4px);
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--flow-wire);
+    border-bottom: 2px solid var(--flow-wire);
+    transform: rotate(45deg);
+  }
+
+  .flow-cap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .flow-title {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* Row layout: five steps or fewer from 760px, six or seven from 1000px. */
+  @container flow (min-width: 760px) {
+    .flow:not([data-wide]) .flow-steps {
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
+    }
+
+    .flow:not([data-wide]) .flow-step:not(:last-child)::after {
+      top: 50%;
+      left: 100%;
+      width: var(--flow-gap);
+      height: 0;
+      border-left: 0;
+      border-top: 2px solid var(--flow-wire);
+    }
+
+    .flow:not([data-wide]) .flow-step:not(:last-child)::before {
+      top: calc(50% - 4px);
+      left: calc(100% + var(--flow-gap) - 9px);
+      border-right: 2px solid var(--flow-wire);
+      border-bottom: 0;
+      border-top: 2px solid var(--flow-wire);
+    }
+  }
+
+  @container flow (min-width: 1000px) {
+    .flow[data-wide] .flow-steps {
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
+    }
+
+    .flow[data-wide] .flow-step:not(:last-child)::after {
+      top: 50%;
+      left: 100%;
+      width: var(--flow-gap);
+      height: 0;
+      border-left: 0;
+      border-top: 2px solid var(--flow-wire);
+    }
+
+    .flow[data-wide] .flow-step:not(:last-child)::before {
+      top: calc(50% - 4px);
+      left: calc(100% + var(--flow-gap) - 9px);
+      border-right: 2px solid var(--flow-wire);
+      border-bottom: 0;
+      border-top: 2px solid var(--flow-wire);
+    }
+  }
+</style>

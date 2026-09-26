@@ -1,0 +1,100 @@
+---
+/**
+ * Provenance: where a versioned artefact comes from and how to act on it, as a
+ * row of quiet pills in the style of EditOnGitHub: its version (and state), its
+ * DOI, how to cite it, the source file on GitHub and an issue to open against
+ * it. Links only; no script. "Open an issue" carries the Umami event
+ * `open-issue` (declarative, counted only where analytics is enabled).
+ */
+import { site } from '../data/site';
+
+interface Props {
+  version: string;
+  /** Shown after the version, e.g. "Draft". */
+  status?: string;
+  /** Repo-relative path of the source file, e.g. "site/src/data/controls/agent-runtime.ts". */
+  editPath: string;
+  /** A DOI such as site.conceptDoi, without the resolver. */
+  doi?: string;
+  /** Where the citation block lives, e.g. "#cite". */
+  citeHref?: string;
+  /** Issue URL; defaults to the repository's issue chooser. */
+  issueHref?: string;
+}
+
+const { version, status, editPath, doi, citeHref, issueHref } = Astro.props;
+const editHref = `${site.github}/edit/main/${editPath}`;
+const issue = issueHref ?? `${site.github}/issues/new/choose`;
+---
+
+<nav class="prov" aria-label="Provenance">
+  <ul class="prov-list" role="list">
+    <li class="prov-pill prov-version">v{version}{status && ` · ${status}`}</li>
+    {
+      doi && (
+        <li>
+          <a class="prov-pill" href={`https://doi.org/${doi}`} target="_blank" rel="noopener noreferrer">
+            DOI {doi}
+          </a>
+        </li>
+      )
+    }
+    {
+      citeHref && (
+        <li>
+          <a class="prov-pill" href={citeHref}>
+            Cite
+          </a>
+        </li>
+      )
+    }
+    <li>
+      <a class="prov-pill" href={editHref} target="_blank" rel="noopener noreferrer">Edit on GitHub</a>
+    </li>
+    <li>
+      <a class="prov-pill" href={issue} target="_blank" rel="noopener noreferrer" data-umami-event="open-issue">
+        Open an issue
+      </a>
+    </li>
+  </ul>
+</nav>
+
+<style>
+  .prov-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin: var(--s-4) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The EditOnGitHub pill: hairline, surface fill, mono label in --ink-2. */
+  .prov-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 var(--s-3);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  a.prov-pill:hover {
+    border-color: var(--ink-2);
+    color: var(--ink);
+  }
+
+  a.prov-pill:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .prov-version {
+    color: var(--ink);
+  }
+</style>
