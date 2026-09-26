@@ -113,6 +113,7 @@ test.describe('_headers: Markdown twins', () => {
       expect(TWINS.some((p) => p.startsWith(prefix)), prefix).toBe(true);
     }
     expect(TWINS).toContain('/thesis.md');
+    expect(TWINS).toContain('/role.md');
   });
 
   test(`every twin is canonical to its HTML page, not noindexed, and has no font preload`, () => {

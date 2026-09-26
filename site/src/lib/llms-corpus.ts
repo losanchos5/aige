@@ -1,17 +1,17 @@
 // llms-corpus.ts: the documents behind /llms-full.txt, its slices
 // (/llms-full-<slice>.txt) and the Markdown alternates of the content pages
 // (/ai-governance.md, /bok/<slug>.md, /patterns/<slug>.md, /glossary/<slug>.md,
-// /cases/<id>.md, /resources/crosswalk/<pair>.md, /thesis.md). One builder per
-// kind of page, so the three surfaces serialise a page the same way:
+// /cases/<id>.md, /resources/crosswalk/<pair>.md, /role.md, /thesis.md). One
+// builder per kind of page, so the three surfaces serialise a page the same way:
 //
 //   - the pillar page, chapters, pattern pages and the Thesis are their
 //     Markdown sources, H1
 //     dropped (the caller re-emits it) and a chapter's "At a glance" points
 //     placed after its abstract, as the page shows them;
 //   - glossary terms, incident cases, the obligation register, the crosswalk,
-//     the framework comparisons, the frameworks and the harms atlas are
-//     written out from their datasets, with the same headings, fields and
-//     sources as their pages.
+//     the framework comparisons, the frameworks, the harms atlas and the role
+//     landing are written out from their datasets, with the same headings,
+//     fields and sources as their pages.
 //
 // Links in the generated documents are absolute, so a document still resolves
 // once it is copied out of the file it came in.
@@ -49,8 +49,24 @@ import {
   mitLabel,
 } from '../data/harms';
 import { patternPath } from '../data/patterns';
+import {
+  analystDistinction,
+  analystVsEngineer,
+  capabilityStatement,
+  employerMistakes,
+  market,
+  roleAnswers,
+  roleInShort,
+  roleNextStepIntro,
+  roleNextSteps,
+  skills,
+  waysIn,
+  workflows,
+} from '../data/role';
+import { levels } from '../data/maturity';
 import { site } from '../data/site';
 import { layers } from '../data/stack';
+import { toolById, toolNotice } from '../data/toolkit';
 import {
   contrastPairsFor,
   firstSentence,
@@ -61,6 +77,7 @@ import {
 import {
   PATTERNS_CHAPTER_ID,
   PILLAR_PATH,
+  ROLE_PATH,
   casePath,
   chapterPath,
   docLead,
@@ -416,6 +433,16 @@ export function crosswalkDoc(): CorpusDoc {
   };
 }
 
+/**
+ * A next-step list (SXO-N-06): each toolkit page linked by what it lets the
+ * reader do, with its line, then the toolkit's notice, as NextStep.astro
+ * renders them.
+ */
+function nextStepBlock(steps: readonly { tool: string; anchor: string; why: string }[]): string {
+  const lines = steps.map((step) => `- [${step.anchor}](${abs(toolById(step.tool).href)}): ${step.why}`);
+  return [lines.join('\n'), toolNotice].join('\n\n');
+}
+
 /** A Markdown table cell: pipes escaped, one line. */
 const mdCell = (text: string) => text.replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
 
@@ -506,6 +533,9 @@ export function comparisonDoc(def: ComparisonDef): CorpusDoc {
     def.canUse,
     '## Which should you start with?',
     def.startWith,
+    '## Next step',
+    'Put the comparison to work on your own systems, in the browser.',
+    nextStepBlock(def.nextSteps),
     '## Frequently asked questions',
     ...faq,
     '## Illustrative mapping, not a conformity assessment',
@@ -529,6 +559,91 @@ export function comparisonDoc(def: ComparisonDef): CorpusDoc {
 /** Every framework comparison, in the order of the crosswalk hub. */
 export function comparisonDocs(): CorpusDoc[] {
   return comparisons.map(comparisonDoc);
+}
+
+/**
+ * The role landing (/role, GEO S2 of the 2026-09-26 audit), as the page states
+ * it: the capability statement, the In short passage, the four question
+ * answers with the workflows, skills, ways in and salary medians, the analyst
+ * contrast, the next step, the employer tells and the maturity ladder, each
+ * section linked to its heading in chapter 06 or 07. Title and description are
+ * the page file's own literals, read as llms.txt reads them.
+ */
+export function roleDoc(): CorpusDoc {
+  const route = staticRoutes().find((r) => r.path === ROLE_PATH);
+  const meta = route ? pageMeta(route) : { title: '', description: '' };
+  const chapter = (anchor: string) => abs(`/bok/the-role#${anchor}`);
+  const workflowLayer = (n: (typeof workflows)[number]['layerN']) =>
+    n === 'all' ? 'all layers' : layerLabel(n);
+
+  const body = [
+    `> ${capabilityStatement}`,
+    '## In short',
+    roleInShort,
+    '## What does an AI governance engineer do?',
+    roleAnswers.does,
+    workflows
+      .map((w) => `- **${w.name}** (${workflowLayer(w.layerN)}): ${w.summary} [Chapter 06](${chapter(w.anchor)})`)
+      .join('\n'),
+    '## What skills does an AI governance engineer need?',
+    roleAnswers.skills,
+    [
+      '| Workflow | Core skills | Supporting skills |',
+      '|---|---|---|',
+      ...skills.map(
+        (area) =>
+          `| ${[area.area, area.core.join('; '), area.supporting.join('; ') || 'None'].map(mdCell).join(' | ')} |`,
+      ),
+    ].join('\n'),
+    `Read in chapter 06: ${chapter('skills-by-workflow')}`,
+    '## One line separates the two',
+    analystDistinction,
+    [
+      '| Dimension | Analyst | Engineer |',
+      '|---|---|---|',
+      ...analystVsEngineer.map((row) => `| ${[row.dimension, row.analyst, row.engineer].map(mdCell).join(' | ')} |`),
+    ].join('\n'),
+    '## How do you become an AI governance engineer?',
+    roleAnswers.become,
+    waysIn.map((way) => `- **${way.title}**: ${way.summary}`).join('\n'),
+    `Read in chapter 06: ${chapter('three-ways-in')}`,
+    '## Next step: start one workflow this week',
+    roleNextStepIntro,
+    nextStepBlock(roleNextSteps),
+    '## Three tells an employer has the role wrong',
+    employerMistakes.map((text, i) => `${i + 1}. ${text}`).join('\n'),
+    '## How much does an AI governance engineer earn?',
+    roleAnswers.salary,
+    market
+      .filter((stat) => stat.primary)
+      .map(
+        (stat) =>
+          `- ${stat.value}: ${stat.label}. Source: ${stat.sourceUrl ? `[${stat.source}](${stat.sourceUrl})` : stat.source}`,
+      )
+      .join('\n'),
+    '## Maturity, from paper to production, in five levels',
+    levels
+      .map(
+        (level) =>
+          `- Level ${level.n}, ${level.name}: ${level.summary} [Chapter 07](${abs(`/bok/maturity-model#${level.anchor}`)})`,
+      )
+      .join('\n'),
+    '## Read more',
+    [
+      `- [The role in full: chapter 06](${abs('/bok/the-role')})`,
+      `- [The program the role works inside: chapter 12](${abs('/bok/governance-program')})`,
+      `- [The field the role serves: what is AI governance?](${abs(PILLAR_PATH)})`,
+      `- [The Thesis](${abs('/thesis')})`,
+    ].join('\n'),
+  ].join('\n\n');
+
+  return {
+    title: meta.title || 'What an AI Governance Engineer does',
+    path: ROLE_PATH,
+    description: meta.description || capabilityStatement,
+    updated: lastModified('src/pages/role.astro', 'src/data/role.ts', 'src/data/maturity.ts'),
+    body,
+  };
 }
 
 /** The harms atlas, grouped by level, with its numbered sources. */
@@ -589,6 +704,7 @@ export type SliceId =
   | 'lifecycle'
   | 'law'
   | 'regulatory'
+  | 'obligations'
   | 'patterns'
   | 'glossary'
   | 'cases';
@@ -614,10 +730,25 @@ async function chaptersWhere(keep: (chapter: Chapter) => boolean): Promise<Corpu
   return (await chapterDocs()).filter((doc) => paths.has(doc.path));
 }
 
-// The slices follow the parts of the book, with chapter 08 (the regulatory map)
-// beside the register it tabulates, so each stays well under the ~200k-token
-// window of common models. Chapter 09 is in no slice: the glossary slice
-// carries every one of its terms, term by term.
+/** The role landing sits right after chapter 06, the chapter it presents. */
+const ROLE_CHAPTER_PATH = chapterPath(
+  chaptersOrdered.find((c) => c.slug === 'the-role') ?? { slug: 'the-role' },
+);
+
+/** `docs` with the role landing inserted after chapter 06 (at the end if absent). */
+function withRole(docs: readonly CorpusDoc[]): CorpusDoc[] {
+  const at = docs.findIndex((doc) => doc.path === ROLE_CHAPTER_PATH);
+  const role = roleDoc();
+  return at < 0 ? [...docs, role] : [...docs.slice(0, at + 1), role, ...docs.slice(at + 1)];
+}
+
+// The slices follow the parts of the book, so each stays well under the
+// ~200k-token window of common models. Chapter 08 (the regulatory map) sits
+// with the frameworks, the crosswalk and the comparisons; the obligation
+// register it tabulates has a slice of its own (GEO N7 of the 2026-09-26
+// audit: together they had grown to about 138k tokens). The regulatory slice
+// keeps its URL. Chapter 09 is in no slice: the glossary slice carries every
+// one of its terms, term by term.
 /** The slices of /llms-full.txt, each small enough for a common context window. */
 export const llmsSlices: readonly LlmsSlice[] = [
   {
@@ -625,10 +756,10 @@ export const llmsSlices: readonly LlmsSlice[] = [
     path: '/llms-full-bok.txt',
     title: 'Full text: the discipline and the Thesis',
     summary:
-      'The pillar page, What is AI governance?, then the chapters of part one, The discipline (00 to 07: definition, why now, values, the stack, the pattern catalogue, the role, the maturity model), chapter 10, the reading list, and the Thesis.',
+      'The pillar page, What is AI governance?, then the chapters of part one, The discipline (00 to 07: definition, why now, values, the stack, the pattern catalogue, the role, the maturity model), with the role landing (/role) after chapter 06, chapter 10, the reading list, and the Thesis.',
     docs: async () => [
       pillarDoc(),
-      ...(await chaptersWhere((c) => c.part === 'discipline' || c.slug === 'reading-list')),
+      ...withRole(await chaptersWhere((c) => c.part === 'discipline' || c.slug === 'reading-list')),
       await thesisDoc(),
     ],
   },
@@ -659,16 +790,22 @@ export const llmsSlices: readonly LlmsSlice[] = [
   {
     id: 'regulatory',
     path: '/llms-full-regulatory.txt',
-    title: 'Full text: regulatory map, obligations and crosswalk',
+    title: 'Full text: regulatory map, crosswalk and comparisons',
     summary:
-      'Chapter 08, the regulatory map, then the obligation register row by row, the frameworks, the topic × framework crosswalk and the framework comparisons (ISO 42001, NIST AI RMF and the EU AI Act, pair by pair).',
+      'Chapter 08, the regulatory map, then the frameworks, the topic × framework crosswalk and the framework comparisons (ISO 42001, NIST AI RMF and the EU AI Act, pair by pair). The obligation register is in its own slice.',
     docs: async () => [
       ...(await chaptersWhere((c) => c.slug === 'regulatory-map')),
-      obligationsDoc(),
       frameworksDoc(),
       crosswalkDoc(),
       ...comparisonDocs(),
     ],
+  },
+  {
+    id: 'obligations',
+    path: '/llms-full-obligations.txt',
+    title: 'Full text: obligation register',
+    summary: `The obligation register row by row: the ${obligations.length} obligations the Body of Knowledge maps, each with its stable id, clause, duty holder, status, dates, evidence artefact and stack layer.`,
+    docs: async () => [obligationsDoc()],
   },
   {
     id: 'patterns',
@@ -705,7 +842,7 @@ async function fullDocs(): Promise<CorpusDoc[]> {
   ]);
   return [
     pillarDoc(),
-    ...chapters,
+    ...withRole(chapters),
     await thesisDoc(),
     obligationsDoc(),
     frameworksDoc(),
@@ -730,7 +867,7 @@ export async function llmsFullText(id: SliceId | 'full'): Promise<string> {
     const patterns = (await patternDocs()).length;
     text = document([
       header(
-        `This file opens with the pillar page, What is AI governance?, then carries the complete text of the ${chapters} Body of Knowledge chapters, in reading order, with the ${patterns} pattern pages after chapter 05, then the Thesis, the obligation register, the frameworks, the crosswalk, the ${comparisons.length} framework comparisons, the ${cases.length} incident cases and the harms atlas. It is large; the same corpus is split into smaller files listed in ${index}.`,
+        `This file opens with the pillar page, What is AI governance?, then carries the complete text of the ${chapters} Body of Knowledge chapters, in reading order, with the ${patterns} pattern pages after chapter 05 and the role landing after chapter 06, then the Thesis, the obligation register, the frameworks, the crosswalk, the ${comparisons.length} framework comparisons, the ${cases.length} incident cases and the harms atlas. It is large; the same corpus is split into smaller files listed in ${index}.`,
       ),
       ...docs.map(fullTextBlock),
     ]);

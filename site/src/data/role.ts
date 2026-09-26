@@ -8,6 +8,10 @@
 // percentage is stated in a primary source), so it lives in the chapter prose,
 // not as a figure here. Employer names from the postings footnote, and every
 // forbidden claim, are deliberately omitted.
+//
+// The page's search copy lives here too, so /role and its Markdown twin
+// (/role.md, lib/llms-corpus.ts roleDoc) print the same words: the four
+// question answers, the "In short" passage and the next-step tools.
 
 export type WorkflowLayer = 1 | 2 | 3 | 4 | 5 | 'all';
 
@@ -294,5 +298,68 @@ export const market: readonly MarketStat[] = [
     source: 'IAPP Salary & Jobs Report 2025-26',
     sourceUrl: 'https://iapp.org/resources/article/salary-survey-summary/',
     primary: true,
+  },
+] as const;
+
+// This page is the landing for the query "AI governance engineer" (SXO-06,
+// 2026-09-25 audit): four section heads are the questions searchers ask, each
+// answered in 40 to 60 words right under it from the facts in this module and
+// chapter 06.
+export const roleAnswers = {
+  does:
+    'An AI governance engineer owns seven workflows, not documents: intake and classification, inventory and registry, evals and red teaming, policy-as-code and gates, runtime monitoring and incidents, assurance and audit evidence, and regulatory translation. Each is a running system with inputs, outputs and the stack layer it maps to.',
+  skills:
+    'The skills follow the workflows. The load-bearing ones are eval harness engineering, policy-as-code in OPA/Rego or Cedar, CI/CD pipeline engineering, observability and incident response, OSCAL and machine-readable evidence, and reading the AI Act, ISO/IEC 42001 and the NIST AI RMF. Under all seven: enough Python to glue systems together.',
+  become:
+    'There are three ways in, each from an adjacent discipline, and each brings an edge and a gap. From legal or privacy, start at policy-as-code and intake. From security or GRC, start at evals-as-evidence and the agent registry. From MLOps or ML engineering, start at eval gates in CI and runtime monitoring.',
+  // The figures are the primary medians of `market` above (tests/seo-titles.spec.ts
+  // checks that each tile value appears in this answer).
+  salary:
+    'The IAPP Salary & Jobs Report 2025-26 puts the median technical AI-governance salary at USD 221k in the tech sector, its highest band. The median across AI-governance work generally is USD 151.8k, and USD 169.7k for combined privacy-and-AI-governance roles. These are primary medians; other demand signals are reported below, not as headline figures.',
+} as const;
+
+/**
+ * "In short": the self-contained passage an answer engine can quote whole
+ * (GEO S2 of the 2026-09-26 audit), 134 to 167 words, placed under the H1 as
+ * the chapters place theirs. Every clause restates this module: the capability
+ * statement, the seven `workflows`, the core `skills`, `analystDistinction`,
+ * the three `waysIn` and the first `market` median (tests/seo-role-next.spec.ts
+ * checks the length, the workflows and the figure).
+ */
+export const roleInShort =
+  'An AI governance engineer holds the capability of AI governance engineering and is accountable for three questions in production: what AI is running, what it is allowed to do, and what evidence proves it. The role owns seven workflows, each a running system rather than a document: intake and classification, inventory and registry, evals and red teaming as evidence, policy-as-code and gates, runtime monitoring and incidents, assurance and audit evidence, and regulatory translation. The load-bearing skills follow them: eval harness engineering, policy-as-code in OPA/Rego or Cedar, CI/CD pipelines, observability and incident response, OSCAL evidence, and enough law-reading to parse an article without mistaking it for advice. The analyst describes the system from the outside; the engineer reads it directly and ships the control. People come in from legal or privacy, from security or GRC, and from MLOps. The IAPP Salary & Jobs Report 2025-26 puts the median technical AI-governance salary at USD 221k in the tech sector.';
+
+/** The line under the next-step heading; "two or three workflows" is the
+ *  third employer tell's own measure of a first hire. */
+export const roleNextStepIntro =
+  'Whichever way in, a first hire owns two or three workflows. Each tool below starts one of them in the browser and leaves you a record to keep.';
+
+/** One next-step tool: a toolkit id (data/toolkit.ts), the link text and why. */
+export interface RoleNextStep {
+  tool: string;
+  anchor: string;
+  why: string;
+}
+
+/**
+ * The next step from /role (SXO-N-06 of the 2026-09-26 audit: the page linked
+ * no tool): one toolkit page per workflow a first hire can start this week,
+ * intake and classification, inventory and registry, policy-as-code and gates.
+ */
+export const roleNextSteps: readonly RoleNextStep[] = [
+  {
+    tool: 'ai-act-triage',
+    anchor: 'Classify one system with the EU AI Act risk classification checker',
+    why: 'Intake and classification: indicative roles and risk classes, each with its article, and a decision record to file.',
+  },
+  {
+    tool: 'ai-register-entry',
+    anchor: 'Start the registry with the AI register entry builder',
+    why: 'Inventory and registry: entries with an owner, a scope and an expiry that validate against the published schemas.',
+  },
+  {
+    tool: 'policy-card',
+    anchor: 'Turn one rule into policy-as-code with the Policy Card builder',
+    why: 'Policy-as-code and gates: a Policy Card, an OPA/Rego module with unit tests and the CI hook that runs it.',
   },
 ] as const;
