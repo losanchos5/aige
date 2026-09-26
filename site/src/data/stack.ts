@@ -1451,6 +1451,26 @@ export const minimumViableStack: MinimumViableStack = {
   ],
 } as const;
 
+/**
+ * The /stack answer to "What is an AI governance framework?" (SXO-N-02 of the
+ * 2026-09-26 audit: that query's results are "what is" explainers, and /stack
+ * carried the title but never used the phrase). 40 to 80 words, answer first.
+ * The definition is the pillar's (guides/ai-governance.md: the rules, roles,
+ * controls and evidence that keep AI in bounds); the build order and what each
+ * layer does are chapter 04's ("How to read the stack"). The layer names are
+ * the `layers` above, verbatim (tests/seo-role-next.spec.ts checks both).
+ */
+export const frameworkAnswer =
+  "An AI governance framework is the set of rules, roles, controls and evidence that keeps an organisation's AI systems within bounds. Here it is built as five layers, read as a build order: Govern-as-Code writes the rules, Inventory & Transparency records what is running, Evals & Red Teaming as Evidence tests it, Runtime Controls & Observability enforces the rules on the live call, and Assurance & Continuous Compliance turns the evidence into proof.";
+
+/**
+ * The components most AI governance frameworks list, in the pillar's words
+ * (guides/ai-governance.md, "What does an AI governance framework include?"),
+ * each produced by one of the five layers.
+ */
+export const frameworkComponents =
+  'Most frameworks list the same components in different words: an inventory of AI systems and a way to classify them by risk, policies written so they can be checked, impact assessments, tests before release, human oversight where it is needed, runtime controls, an incident process and the evidence that ties each control to the obligation it serves. The five layers below produce each of them.';
+
 export interface FlattenedToolCategory {
   /** Tool category name. */
   category: string;

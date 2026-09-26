@@ -16,7 +16,13 @@ import StackFlow from '../components/StackFlow.astro';
 import ToolsTable from '../components/ToolsTable.astro';
 import Callout from '../components/Callout.astro';
 import CtaBand from '../components/CtaBand.astro';
-import { layers, minimumViableStack, toolsByCategory } from '../data/stack';
+import {
+  frameworkAnswer,
+  frameworkComponents,
+  layers,
+  minimumViableStack,
+  toolsByCategory,
+} from '../data/stack';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 import { fitsSiteSuffix } from '../lib/seo-title';
 
@@ -42,7 +48,10 @@ const howToRead = [
   },
 ];
 
-// Search title (SXO-N3, 2026-09-25 audit): the query first; the H1 stays.
+// Search title (SXO-N3, 2026-09-25 audit): the query first. The H1 and the
+// first section answer the same query, "AI governance framework" (SXO-N-02,
+// 2026-09-26 audit): the H1 names it and the question section defines it
+// before the stack is drawn, then sends the reader to the pillar and to /bok.
 const seoTitle = 'AI governance framework as a stack: five layers';
 
 const mvsItems = minimumViableStack.steps.map((step) => ({
@@ -62,9 +71,17 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
   <PageHero
     variant="page"
     related={{ label: 'Chapter 04 · Body of Knowledge', href: '/bok/the-stack' }}
-    title="Five layers. One evidence chain."
+    title="An AI governance framework in five layers."
     lede="The reference architecture of AI governance engineering: five layers that turn governance from a stack of parallel documents into one system with a data path from policy to proof."
   />
+
+  <Section tone="plain" title="What is an AI governance framework?" lede={frameworkAnswer}>
+    <p class="well framework-more" data-framework-more>
+      {frameworkComponents} For what AI governance is and how the EU AI Act, ISO/IEC 42001 and the
+      NIST AI RMF compare, read <a href="/ai-governance">AI governance, explained</a>; for every
+      chapter behind this stack, open <a href="/bok">the full body of knowledge</a>.
+    </p>
+  </Section>
 
   <Section tone="plain" rule title="Follow one artefact from policy to proof.">
     <div class="reveal"><StackFlow /></div>
@@ -272,6 +289,11 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
 
   .mvs {
     margin-top: var(--s-5);
+  }
+
+  .framework-more {
+    color: var(--ink-2);
+    text-wrap: pretty;
   }
 
   @media (min-width: 900px) {
