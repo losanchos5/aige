@@ -232,7 +232,8 @@ test.describe('mobile drawer', () => {
     const drawer = page.locator('#nav-drawer');
     await expect(burger).toBeVisible();
 
-    const navLink = page.locator('.nav-panel a', { hasText: 'Body of Knowledge' });
+    // The Body of Knowledge is a group row (an accordion button) in the drawer.
+    const navLink = page.locator('.nav-panel button', { hasText: 'Body of Knowledge' });
     await expect(navLink).toBeHidden();
 
     await burger.click();

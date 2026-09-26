@@ -1,7 +1,7 @@
 /* Grouped navigation behaviour, loaded from a same-origin file so the CSP
    script-src 'self' holds (no inline JS). Two parts: the desktop disclosure
    panels (WAI-ARIA "disclosure navigation" pattern) and the mobile <dialog>
-   drawer. No globals; every query is guarded. */
+   drawer with its accordion of groups. No globals; every query is guarded. */
 (function () {
   'use strict';
 
@@ -269,8 +269,43 @@
     });
   }
 
+  // The drawer's groups: an accordion, one group open at a time. Each group
+  // row is a <button aria-expanded aria-controls> over its region; the group
+  // holding the current page is rendered open (MobileNav.astro).
+  function initDrawerGroups() {
+    var drawer = document.getElementById('nav-drawer');
+    if (!drawer) return;
+    var toggles = Array.prototype.slice.call(drawer.querySelectorAll('[data-mnav-toggle]'));
+
+    function regionFor(toggle) {
+      var id = toggle.getAttribute('aria-controls');
+      return id ? document.getElementById(id) : null;
+    }
+    function setOpen(toggle, open) {
+      var region = regionFor(toggle);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (region) region.hidden = !open;
+    }
+
+    toggles.forEach(function (toggle) {
+      toggle.addEventListener('click', function () {
+        var open = toggle.getAttribute('aria-expanded') !== 'true';
+        toggles.forEach(function (other) {
+          if (other !== toggle) setOpen(other, false);
+        });
+        setOpen(toggle, open);
+        // Folding a long group above this one (or this one, from its sticky
+        // row deep in the list) moves the row: bring it back under the bar.
+        if (typeof toggle.scrollIntoView === 'function') {
+          toggle.scrollIntoView({ block: 'nearest' });
+        }
+      });
+    });
+  }
+
   ready(function () {
     initDesktop();
     initDrawer();
+    initDrawerGroups();
   });
 })();

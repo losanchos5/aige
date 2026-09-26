@@ -5,8 +5,9 @@
  * its name via aria-label). Right: the grouped desktop nav (WAI-ARIA disclosure
  * navigation), a search button, the theme toggle and a burger. At >=840px the
  * group bar shows inline; below that it collapses into a modal <dialog> drawer
- * (a sibling of the header, so the header still holds exactly one search button
- * and one theme toggle). All behaviour is in /nav.js (CSP script-src 'self').
+ * (MobileNav, a sibling of the header, so the header still holds exactly one
+ * search button and one theme toggle). All behaviour is in /nav.js (CSP
+ * script-src 'self').
  * `overlay` (the home) floats the bar over the full-viewport hero: fixed and
  * fully transparent at the top of the page, it takes the same ground, hairline
  * and elevation as everywhere else once the page scrolls (.is-scrolled, ui.js).
@@ -19,9 +20,10 @@
 import RegisterMark from './RegisterMark.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import LangSwitcher from './LangSwitcher.astro';
+import MobileNav from './MobileNav.astro';
 import { site } from '../data/site';
 import { nav, resolveCurrent, type NavGroup, type NavItem } from '../data/nav';
-import { bookParts, bookRange } from '../data/parts';
+import { bookParts } from '../data/parts';
 import { I18N_PUBLISHED, stripLocale } from '../i18n/locales';
 import { translator, type UiKey } from '../i18n/ui';
 
@@ -259,124 +261,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
   </div>
 </header>
 
-<dialog id="nav-drawer" class="nav-drawer" aria-label={t('header.menu')}>
-  <div class="nav-drawer-in">
-    <div class="nav-drawer-bar">
-      <span class="nav-drawer-brand">
-        <RegisterMark size="sm" label={site.name} />
-        <span class="nav-drawer-title">{t('header.menu')}</span>
-      </span>
-      <button type="button" class="icon-btn" data-nav-close aria-label={t('header.closeMenu')}>
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
-          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-        </svg>
-      </button>
-    </div>
-
-    <button
-      type="button"
-      class="nav-drawer-search"
-      data-search-open
-      data-umami-event="search-open"
-      data-umami-event-location="drawer"
-    >
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" aria-hidden="true">
-        <circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.6"></circle>
-        <path d="m16 16 4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
-      </svg>
-      <span>{t('header.search')}</span>
-      <kbd>Ctrl K</kbd>
-    </button>
-
-    {I18N_PUBLISHED && <LangSwitcher lang={lang} alternates={alternates} variant="drawer" />}
-
-    <nav class="nav-panel" aria-label={t('header.menu')}>
-      {
-        nav.map((group) => (
-          <section class="nav-drawer-group">
-            {isDirect(group) ? (
-              <>
-                <a class="nav-drawer-lead" href={group.href} aria-describedby={`d-${group.id}-lead-d`}>
-                  {groupLabel(group)}
-                </a>
-                <p id={`d-${group.id}-lead-d`} class="nav-drawer-desc">
-                  {group.description}
-                </p>
-              </>
-            ) : (
-              <>
-                <p class="nav-menu-kicker">{groupLabel(group)}</p>
-                {group.href && (
-                  <>
-                    <a
-                      class="nav-drawer-lead"
-                      href={group.href}
-                      aria-describedby={`d-${group.id}-lead-d`}
-                    >
-                      {leadLabel(group)}
-                    </a>
-                    <p id={`d-${group.id}-lead-d`} class="nav-drawer-desc">
-                      {group.description}
-                    </p>
-                  </>
-                )}
-                {rowItems(group).length > 0 && (
-                  <ul class="nav-drawer-list">
-                    {rowItems(group).map((item) => (
-                      <li>
-                        <a href={item.href} aria-describedby={`d-${itemId(group.id, item)}-d`}>
-                          {item.label}
-                        </a>
-                        <p id={`d-${itemId(group.id, item)}-d`} class="nav-drawer-desc">
-                          {item.description}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {chapterOf(group).length > 0 && (
-                  <details class="nav-drawer-chapters">
-                    <summary>{t('header.chapters')} {bookRange}</summary>
-                    {(group.sections ?? [{ id: group.id, label: '', range: '', items: chapterOf(group) }]).map(
-                      (section) => (
-                        <>
-                          {section.label && (
-                            <p class="nav-drawer-part" id={`d-part-${section.id}`}>
-                              {partLabel(section.id, section.label)}{' '}
-                              <span class="nav-part-range">{section.range}</span>
-                            </p>
-                          )}
-                          <ol
-                            aria-labelledby={section.label ? `d-part-${section.id}` : undefined}
-                          >
-                            {section.items.map((item) => (
-                              <li>
-                                <a href={item.href}>
-                                  <span class="num" aria-hidden="true">
-                                    {item.num}
-                                  </span>
-                                  <span>{item.label}</span>
-                                </a>
-                              </li>
-                            ))}
-                          </ol>
-                        </>
-                      ),
-                    )}
-                  </details>
-                )}
-              </>
-            )}
-          </section>
-        ))
-      }
-    </nav>
-
-    <div class="nav-drawer-foot">
-      <a href={site.github} target="_blank" rel="noopener noreferrer">GitHub</a>
-    </div>
-  </div>
-</dialog>
+<MobileNav lang={lang} alternates={alternates} />
 
 <script is:inline defer src="/nav.js"></script>
 
@@ -554,8 +439,11 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin: 0;
-    padding: 0;
+    /* A 25px hit area (WCAG 2.5.8 asks 24) around the 15px label: the
+       padding grows the box, the equal negative margin keeps the bar's
+       layout exactly as it was. */
+    margin: -5px 0;
+    padding: 5px 0;
     border: 0;
     background: none;
     color: var(--ink-2);
@@ -602,7 +490,8 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -6px;
+    /* 6px under the label, as before the hit-area padding (5px of it). */
+    bottom: -1px;
     height: 2px;
     background: var(--ink);
     transform: scaleX(0);
@@ -713,15 +602,6 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
   .nav-menu-body {
     align-self: center;
     min-width: 0;
-  }
-
-  .nav-menu-kicker {
-    margin: 0 0 var(--s-4);
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--muted);
   }
 
   .nav-lead {
@@ -874,8 +754,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
 
   /* Sentence-case mono caption over each part's list (not an eyebrow: it names
      the list below it, like the footer's group titles). */
-  .nav-part-title,
-  .nav-drawer-part {
+  .nav-part-title {
     margin: 0 0 var(--s-1);
     font-family: var(--font-mono);
     font-size: var(--fs-label);
@@ -910,210 +789,6 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     display: inline-flex;
   }
 
-  /* ---------- Mobile drawer (<840px) ---------- */
-  .nav-drawer {
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: auto;
-    width: min(100%, 26rem);
-    /* Override the UA `dialog:modal` max-width/max-height caps that otherwise
-       shrink the panel and knock it off the right edge. */
-    max-width: 100%;
-    height: 100dvh;
-    max-height: none;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    border-left: 1px solid var(--line);
-    background: var(--bg);
-    color: var(--ink);
-    overflow-y: auto;
-  }
-
-  .nav-drawer::backdrop {
-    background: rgba(0, 0, 0, 0.4);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .nav-drawer[open] {
-      animation: drawer-in var(--dur) var(--ease);
-    }
-  }
-
-  @keyframes drawer-in {
-    from {
-      transform: translateX(100%);
-    }
-    to {
-      transform: none;
-    }
-  }
-
-  .nav-drawer-in {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-4);
-    min-height: 100%;
-    padding: var(--s-4);
-  }
-
-  .nav-drawer-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .nav-drawer-brand {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--s-3);
-  }
-
-  .nav-drawer-title {
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .nav-drawer-search {
-    display: flex;
-    align-items: center;
-    gap: var(--s-2);
-    width: 100%;
-    padding: var(--s-3) var(--s-4);
-    border: 1px solid var(--line);
-    border-radius: var(--r-sm);
-    background: var(--surface);
-    color: var(--ink-2);
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-  }
-
-  .nav-drawer-search span {
-    flex: 1;
-  }
-
-  .nav-drawer-search kbd {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    color: var(--muted);
-    border: 1px solid var(--line);
-    border-radius: var(--r-sm);
-    padding: 2px 6px;
-  }
-
-  /* The shortcut hint means nothing without a keyboard: hide it on touch. */
-  @media (hover: none) {
-    .nav-drawer-search kbd {
-      display: none;
-    }
-  }
-
-  .nav-panel {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-5);
-  }
-
-  .nav-drawer-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
-  }
-
-  .nav-drawer-group .nav-menu-kicker {
-    margin: 0;
-  }
-
-  .nav-drawer-lead {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.0625rem;
-    color: var(--ink);
-    text-decoration: none;
-  }
-
-  .nav-drawer-desc {
-    margin: 0;
-    color: var(--ink-2);
-    font-size: 0.875rem;
-    line-height: 1.4;
-  }
-
-  .nav-drawer-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-3);
-    list-style: none;
-    margin: var(--s-2) 0 0;
-    padding: 0;
-  }
-
-  .nav-drawer-list a {
-    color: var(--ink);
-    font-weight: 600;
-    text-decoration: none;
-  }
-
-  .nav-drawer-chapters summary {
-    cursor: pointer;
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .nav-drawer-chapters ol {
-    list-style: none;
-    margin: var(--s-2) 0 0;
-    padding: 0;
-    columns: 2;
-  }
-
-  .nav-drawer-part {
-    margin-top: var(--s-4);
-  }
-
-  .nav-drawer-chapters .nav-drawer-part + ol {
-    margin-top: var(--s-1);
-  }
-
-  .nav-drawer-chapters a {
-    display: flex;
-    gap: var(--s-2);
-    padding: var(--s-1) 0;
-    color: var(--ink);
-    font-size: 0.9375rem;
-    text-decoration: none;
-  }
-
-  .nav-drawer-chapters .num {
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    color: var(--muted);
-  }
-
-  .nav-drawer-foot {
-    margin-top: auto;
-    padding-top: var(--s-4);
-    border-top: 1px solid var(--line);
-  }
-
-  .nav-drawer-foot a {
-    color: var(--ink-2);
-    text-decoration: none;
-  }
-
-  .nav-drawer-foot a:hover {
-    color: var(--ink);
-  }
-
   /* Scroll lock while the drawer is open (nav.js toggles the class on <html>). */
   :global(html.nav-locked) {
     overflow: hidden;
@@ -1125,9 +800,6 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
       display: block;
     }
     .burger {
-      display: none;
-    }
-    .nav-drawer {
       display: none;
     }
   }
