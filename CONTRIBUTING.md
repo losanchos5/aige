@@ -70,6 +70,10 @@ log.
    `dist/releases/<slug>-v<version>/` (the profile JSON with its controls, the Markdown twin, the
    observation schema, the example observations, `README.md`, `CITATION.cff` and `SHA256SUMS`) and
    prints the Zenodo metadata as JSON. No network request is made (the same happens with no token).
+   `dist/releases/` is a working directory and must never be deployed. `npm run build` empties
+   `dist/`, so the deploy workflow, which builds from a clean checkout, never ships it; but a manual
+   `wrangler pages deploy dist` run after a release would publish the bundle with the site. Rebuild
+   before any manual deploy, or pass `--out <dir>` to write the bundle outside `dist/`.
 3. **Sandbox.** Create a token on `sandbox.zenodo.org` (scopes `deposit:write` and
    `deposit:actions`) and run the script with `ZENODO_TOKEN` set and no flags. It creates a draft
    deposition on the sandbox, uploads the files and sets the metadata; check the draft there.
@@ -78,8 +82,12 @@ log.
    publish it there, or run once with `--production --publish`. Every run creates a new deposition,
    so publish the draft you reviewed rather than running again.
 5. **Record the DOI.** Write the minted version DOI into the profile's `doi` field in
-   `site/src/data/controls/<slug>.ts` and, for the first deposited version, its concept DOI into
-   `conceptDoi`. Add a changelog line to the profile, rebuild and open a PR. Never write a DOI before
+   `site/src/data/controls/<slug>.ts`, with `doiVersion` set to the profile version it was minted
+   for, and, for the first deposited version, its concept DOI into `conceptDoi` (after `--publish`
+   the script prints the fields to paste). The build fails when `doiVersion` differs from
+   `version`, so bumping the version without a new DOI forces you to remove or replace the old one;
+   until then the profile is cited with its concept DOI. Add a changelog line to the profile,
+   rebuild and open a PR. Never write a DOI before
    the deposit exists. The script refuses to deposit a profile that already has a `conceptDoi`: a
    later version is created from the existing record with Zenodo's "New version", so that it shares
    the concept DOI.

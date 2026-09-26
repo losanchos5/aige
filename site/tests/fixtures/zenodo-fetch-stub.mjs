@@ -3,6 +3,8 @@
 // the file named by FETCH_LOG (URL, method and whether it carried the bearer
 // token). With FETCH_MODE=fake it answers like the Zenodo deposit API; in any
 // other mode a call is a test failure: it throws, so the script exits non-zero.
+// FETCH_BUCKET_ORIGIN, when set, puts the bucket link on that origin (a
+// hostile or broken answer the script must refuse to send the token to).
 import { appendFileSync } from 'node:fs';
 
 const json = (status, body) =>
@@ -22,7 +24,8 @@ globalThis.fetch = async (input, init = {}) => {
   const html = `${origin}/deposit/4242`;
   const reserved = { prereserve_doi: { doi: '10.5072/zenodo.4242' } };
   if (method === 'POST' && pathname === '/api/deposit/depositions') {
-    return json(201, { id: 4242, links: { bucket: `${origin}/api/files/bucket-4242`, html }, metadata: reserved });
+    const bucketOrigin = process.env.FETCH_BUCKET_ORIGIN || origin;
+    return json(201, { id: 4242, links: { bucket: `${bucketOrigin}/api/files/bucket-4242`, html }, metadata: reserved });
   }
   if (method === 'PUT' && pathname.startsWith('/api/files/bucket-4242/')) return json(201, { key: pathname });
   if (method === 'PUT' && pathname === '/api/deposit/depositions/4242') {

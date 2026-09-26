@@ -22,7 +22,18 @@
 // Zenodo sandbox (https://sandbox.zenodo.org) unless --production is given,
 // uploads the files, sets the metadata and publishes only with --publish. The
 // token is read from the environment at run time and is never printed,
-// logged or written to disk.
+// logged or written to disk, and it is sent only to the origin of the chosen
+// Zenodo API (a link Zenodo returns on another origin is refused).
+//
+// dist/releases is a working directory, not part of the site: never deploy it.
+// `npm run build` empties dist, so the CI deploy never ships it, but a manual
+// `wrangler pages deploy dist` after a release run would. Pass --out to write
+// the bundle elsewhere.
+//
+// Once Zenodo mints the version DOI, record it in the profile module
+// (src/data/controls/<slug>.ts) as `doi`, with `doiVersion` set to the profile
+// version it was minted for; the registry validator fails the build when
+// `doiVersion` differs from `version`, so a stale version DOI cannot stay.
 //
 // A control profile is a set of draft control specifications, illustrative,
 // not a claim of conformity.
@@ -103,6 +114,7 @@ function loadProfile(slug) {
     throw new ReleaseError(`no profile "${slug}" in api/v1/controls.json (profiles: ${known})`);
   }
   const ids = new Set(profile.controls);
+  if (ids.size === 0) throw new ReleaseError(`profile ${slug} has no controls: nothing to release`);
   const controls = (data.controls ?? []).filter((c) => ids.has(c.id));
   if (controls.length !== ids.size) {
     throw new ReleaseError(`profile ${slug}: ${ids.size} control ids but ${controls.length} control records`);
@@ -124,10 +136,12 @@ function crosswalkFor(crosswalk, ids) {
   return { ...crosswalk, frameworks };
 }
 
-/** The dist file behind an absolute site URL (the example observations). */
+/** The dist file behind an absolute site URL (the example observations); it must stay inside dist. */
 function distFileOf(url) {
   const path = decodeURIComponent(new URL(url).pathname).replace(/^\/+/, '');
-  return join(DIST, ...path.split('/'));
+  const file = resolve(DIST, ...path.split('/'));
+  if (!file.startsWith(DIST + sep)) throw new ReleaseError(`${url} resolves outside site/dist`);
+  return file;
 }
 
 /**
@@ -227,8 +241,10 @@ function keywordsOf(profile) {
 
 function readme({ profile, controls, crosswalk, title, examples, slug, conceptDoi, source }) {
   const doiLine = profile.doi
-    ? `DOI of this version: https://doi.org/${profile.doi}`
-    : `This version has no DOI of its own yet; it is cited with the project concept DOI, https://doi.org/${conceptDoi}.`;
+    ? `DOI of this version (v${profile.version}): https://doi.org/${profile.doi}`
+    : profile.conceptDoi
+      ? `This version has no DOI of its own yet; it is cited with the concept DOI of the profile, https://doi.org/${profile.conceptDoi}.`
+      : `This version has no DOI of its own yet; it is cited with the project concept DOI, https://doi.org/${conceptDoi}.`;
   return `# ${title}
 
 ${profile.summary}
@@ -326,6 +342,9 @@ function buildBundle(opts) {
   const authors = authorsOf(profile);
 
   const outParent = opts.out ? resolve(process.cwd(), opts.out) : join(DIST, 'releases');
+  if (!opts.out) {
+    log('warning: writing the bundle to dist/releases, which must never be deployed. The CI build empties dist, but a manual `wrangler pages deploy dist` would ship it; rebuild first, or pass --out.');
+  }
   const dir = join(outParent, `${profile.slug}-v${profile.version}`);
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(join(dir, 'examples'), { recursive: true });
@@ -370,6 +389,11 @@ function buildBundle(opts) {
 
 async function zenodo(api, token, method, path, { json, body, contentType } = {}) {
   const url = path.startsWith('https://') ? path : `${api}${path}`;
+  // The token goes only to the API origin chosen by --production, never to a
+  // link on another origin, whatever Zenodo returns.
+  if (new URL(url).origin !== new URL(api).origin) {
+    throw new ReleaseError(`Zenodo returned a link on another origin (${new URL(url).origin}); the token is not sent there. Nothing more was uploaded.`);
+  }
   let res;
   try {
     res = await fetch(url, {
@@ -440,6 +464,9 @@ async function deposit(bundle, opts, token) {
   const published = await zenodo(api, token, 'POST', `/deposit/depositions/${id}/actions/publish`);
   log(`published: DOI ${published.doi ?? reserved}, concept DOI ${published.conceptdoi ?? '(not returned)'}`);
   log(`record: ${published.links?.record_html ?? published.links?.html ?? '(no link returned)'}`);
+  log(
+    `Record it in src/data/controls/${bundle.profile.slug}.ts: doi: '${published.doi ?? reserved}', doiVersion: '${bundle.profile.version}'${published.conceptdoi ? `, conceptDoi: '${published.conceptdoi}'` : ''}.`,
+  );
 }
 
 // ---------------------------------------------------------------------------
