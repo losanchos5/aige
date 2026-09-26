@@ -48,6 +48,8 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       'src/components/HeroStrip.astro',
       // Block orp-shell: the open-work list (orp-core, src/data/work.ts).
       'src/data/work.ts',
+      'src/components/SurfaceCards.astro',
+      'src/components/OpenWork.astro',
     ],
   ],
   // Block orp-shell: /about adds the research interests, the open questions and
@@ -421,7 +423,7 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
         ],
       ] as [string, string[]],
   ),
-  ['/frontier', ['src/pages/frontier.astro']],
+  ['/frontier', ['src/pages/frontier.astro', 'src/data/frontier.ts']],
   ['/research', ['src/pages/research/index.astro', 'src/data/research.ts']],
   ...writtenThemes().map(
     (theme) =>
