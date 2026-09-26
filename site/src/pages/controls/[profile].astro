@@ -21,15 +21,19 @@ import ControlRecord from '../../components/ControlRecord.astro';
 import SourceList from '../../components/SourceList.astro';
 import ContributeCta from '../../components/ContributeCta.astro';
 import Citation from '../../components/Citation.astro';
+import Provenance from '../../components/Provenance.astro';
 import {
   type ControlProfile,
   profiles,
   controlsIn,
   controlProblems,
   controlAnchor,
+  controlAnchorPath,
   controlPath,
   profilePath,
   profileArticleId,
+  profileCitation,
+  statusLabels,
   profileSources,
   depthLabels,
 } from '../../data/controls';
@@ -37,7 +41,7 @@ import {
   profilePageMeta,
   controlHeading,
   aggregatedQuestions,
-  depthCounts,
+  depthLine as profileDepthLine,
   profileReviewers,
   mappingRows,
   machineLinks,
@@ -67,7 +71,6 @@ const { seoTitle, description } = profilePageMeta(profile.slug);
 const rows = controlsIn(profile.slug);
 const sources = profileSources(profile.slug);
 const questions = aggregatedQuestions(profile.slug);
-const counts = depthCounts(profile.slug);
 const reviewers = profileReviewers(profile);
 const mappings = mappingRows(profile.slug);
 const machine = machineLinks();
@@ -75,6 +78,10 @@ const path = profilePath(profile);
 const pageUrl = new URL(path, site.url).href;
 const issueForm = `${site.github}/issues/new?template=${profile.issueTemplate}`;
 const citeTitle = `${profile.title} v${profile.version} (draft)`;
+// Block orp2-release: the DOI this profile is cited with (its own once
+// deposited, else the project concept DOI) and the data file it is built from.
+const cite = profileCitation(profile);
+const editPath = `site/src/data/controls/${profile.slug}.ts`;
 
 const crumbs = [{ label: 'Open control profiles', href: '/controls' }, { label: profile.shortTitle }];
 
@@ -91,14 +98,9 @@ const headings = [
   { depth: 2, slug: 'review', text: 'Review this profile' },
 ];
 
-// The depth sentence of "How to read a control", counted from the data.
-const depthLine = [
-  counts.specified > 0 ? `${counts.specified} specified` : '',
-  counts.derived > 0 ? `${counts.derived} derived from chapter 23` : '',
-  counts.stub > 0 ? `${counts.stub} draft outline${counts.stub === 1 ? '' : 's'}` : '',
-]
-  .filter(Boolean)
-  .join(', ');
+// The depth sentence of "How to read a control", counted from the data; a
+// derived count names what this profile's derived controls restate.
+const depthLine = profileDepthLine(profile.slug);
 
 const setId = `${pageUrl}#profile`;
 const jsonLd = [
@@ -136,9 +138,12 @@ const jsonLd = [
     url: pageUrl,
     inLanguage: 'en',
     version: profile.version,
+    // The term's @id stays the control's anchor on this page (stable whatever
+    // its depth); its url is the canonical page: the control's own page when it
+    // is specified, the anchor otherwise.
     hasDefinedTerm: rows.map((c) => ({
       '@type': 'DefinedTerm',
-      '@id': new URL(controlPath(c), site.url).href,
+      '@id': new URL(controlAnchorPath(c), site.url).href,
       termCode: c.id,
       name: c.title,
       description: c.objective,
@@ -165,6 +170,14 @@ const jsonLd = [
   <div class="cp-head" data-pagefind-ignore>
     <Byline date={profile.updated} dateLabel="Updated" published={profile.published} />
     <StatusLine version={profile.version} status={profile.status} reviewers={reviewers} />
+    <Provenance
+      version={profile.version}
+      status={statusLabels[profile.status]}
+      editPath={editPath}
+      doi={cite.effectiveDoi}
+      citeHref="#cite"
+      issueHref={issueForm}
+    />
   </div>
 
   <Callout kind="note" title="Draft for review, not a claim of conformity">
@@ -207,10 +220,11 @@ const jsonLd = [
   </ul>
   <p>
     Depth says how far a control is written. <strong>{depthLabels.specified}</strong>: a
-    verification procedure, evidence, implementation notes and an observation example.
-    <strong>{depthLabels.derived}</strong>: one agent control of
-    <a href={agentChapter}>chapter 23</a> restated as a control, adding nothing the chapter does
-    not say. <strong>{depthLabels.stub}</strong>: objective, failure modes, scope and open
+    verification procedure, evidence, implementation notes, two example observations and a page
+    of its own. <strong>{depthLabels.derived}</strong>: restates existing site material (an agent
+    control of <a href={agentChapter}>chapter 23</a>, a pattern, a record schema or a chapter,
+    named on each control) and adds nothing that material does not say.
+    <strong>{depthLabels.stub}</strong>: objective, failure modes, scope and open
     questions only. This profile: {depthLine}.
   </p>
   <p>
@@ -350,7 +364,24 @@ const jsonLd = [
   </p>
   <ContributeCta kind="control" title={`${profile.title} v${profile.version}`} />
 
-  <Citation title={citeTitle} url={path} kind="page" />
+  <div id="cite" class="cp-cite">
+    <p class="cp-doi-note" data-doi-kind={cite.doi ? 'profile' : 'project-concept'}>
+      {
+        cite.doi ? (
+          <>
+            DOI of this profile version: <a href={`https://doi.org/${cite.doi}`}>{cite.doi}</a>.
+          </>
+        ) : (
+          <>
+            This profile has no DOI of its own yet: it is cited with the project concept DOI,{' '}
+            <a href={`https://doi.org/${cite.effectiveDoi}`}>{cite.effectiveDoi}</a>, which resolves
+            to the latest archived version of the whole project.
+          </>
+        )
+      }
+    </p>
+    <Citation title={citeTitle} url={path} kind="page" doi={cite.effectiveDoi} />
+  </div>
 </Doc>
 
 <style>
@@ -364,6 +395,15 @@ const jsonLd = [
 
   .cp-head :global(.status-line) {
     margin: var(--s-2) 0 0;
+  }
+
+  .cp-cite {
+    margin-top: var(--s-6);
+  }
+
+  .cp-doi-note {
+    font-size: var(--fs-label);
+    color: var(--ink-2);
   }
 
   /* The mappings table sits in the reading well: the res-table look, not the

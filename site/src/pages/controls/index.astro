@@ -33,7 +33,7 @@ import {
 } from '../../data/controls';
 import { layers } from '../../data/stack';
 import { site } from '../../data/site';
-import { depthCounts, profileReviewers, machineLinks, machineEvent } from '../../lib/controls-md';
+import { depthCounts, derivedPhrase, profileReviewers, machineLinks, machineEvent } from '../../lib/controls-md';
 import { collectionPage } from '../../lib/jsonld';
 import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/pages.css';
@@ -95,7 +95,7 @@ const profileCards = profiles.map((profile) => {
   const counts = depthCounts(profile.slug);
   const parts = [
     counts.specified > 0 ? `${counts.specified} ${depthLabels.specified.toLowerCase()}` : '',
-    counts.derived > 0 ? `${counts.derived} derived from chapter 23` : '',
+    counts.derived > 0 ? `${counts.derived} derived from ${derivedPhrase(profile.slug)}` : '',
     counts.stub > 0 ? `${counts.stub} draft outline${counts.stub === 1 ? '' : 's'}` : '',
   ].filter(Boolean);
   const rows = controlsIn(profile.slug);
@@ -271,6 +271,12 @@ const jsonLd = collectionPage({
         See also
         <a href="/resources/frameworks">the frameworks</a> and
         <a href="/resources/crosswalk">the crosswalk</a>.
+      </p>
+      <p>
+        Browse the controls by framework in the
+        <a href="/controls/crosswalk">controls crosswalk</a>: for each obligation, clause or id,
+        the controls that map to it, and for each profile, its controls with their ids per
+        framework.
       </p>
       <p>
         Public guidance from frontier developers and evaluators now uses the same terms for the

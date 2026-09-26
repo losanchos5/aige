@@ -37,28 +37,28 @@ nuevo añade su import en `controls/index.ts` y su sección en `sources/SOURCES.
 
 ## 4. orp2-data, orp2-deploy, orp2-assure (ola 1, un agente por perfil)
 
-- [ ] 4.1 `data-admission-and-privacy.ts`: 8-12 controles `AIGE-CTL-DATA-NNN` derivados de `dataset-admission-gate`, `training-data-rights-ledger`, `downstream-use-register`, esquemas `dataset-admission-record`, `dataset-card`, `training-record`, capítulos 14 y 19, obligaciones GDPR y Art. 10; verificar recuento y `derivedFrom` en `controls.spec.ts`.
+- [x] 4.1 `data-admission-and-privacy.ts`: 8-12 controles `AIGE-CTL-DATA-NNN` derivados de `dataset-admission-gate`, `training-data-rights-ledger`, `downstream-use-register`, esquemas `dataset-admission-record`, `dataset-card`, `training-record`, capítulos 14 y 19, obligaciones GDPR y Art. 10; verificar recuento y `derivedFrom` en `controls.spec.ts`.
 - [x] 4.2 `deployment-and-monitoring.ts`: 10-15 controles `AIGE-CTL-DEPLOY-NNN` desde `staged-rollout-rollback-criteria`, `human-in-the-loop-gate`, `shadow-ai-discovery`, `sanctioned-ai-gateway`, esquemas de despliegue y monitorización, capítulos 15-17, Arts. 9, 14, 26, 72, 73; verificar igual.
-- [ ] 4.3 `assurance-and-evidence.ts`: 8-12 controles `AIGE-CTL-ASSURE-NNN` desde `machine-readable-evidence-oscal`, `continuous-assurance-telemetry`, `eval-gate-in-ci`, `model-artefact-integrity`, `aibom`, esquemas de evidencia y pruebas, capítulos 05, 14, 18, 22, ISO/IEC 42001 cláusula 9, NIST AI RMF MEASURE/MANAGE, AIUC-1 dominio E; verificar igual.
-- [ ] 4.4 Cada perfil: import en `controls/index.ts`, sección en `sources/SOURCES.md` solo con filas reutilizadas, mapeos solo a ids existentes; build verde y handoff `orp2-<perfil>.json`.
+- [x] 4.3 `assurance-and-evidence.ts`: 8-12 controles `AIGE-CTL-ASSURE-NNN` desde `machine-readable-evidence-oscal`, `continuous-assurance-telemetry`, `eval-gate-in-ci`, `model-artefact-integrity`, `aibom`, esquemas de evidencia y pruebas, capítulos 05, 14, 18, 22, ISO/IEC 42001 cláusula 9, NIST AI RMF MEASURE/MANAGE, AIUC-1 dominio E; verificar igual.
+- [x] 4.4 Cada perfil: import en `controls/index.ts`, sección en `sources/SOURCES.md` solo con filas reutilizadas, mapeos solo a ids existentes; build verde y handoff `orp2-<perfil>.json`.
 
 ## 5. orp2-crosswalk (ola 1)
 
-- [ ] 5.1 `site/src/lib/controls-crosswalk.ts` (`buildControlsCrosswalk`) y clave `crosswalk` en el dataset `controls` con esquema cerrado; verificar `schemas-check` y el JSON validado.
-- [ ] 5.2 `pages/controls/crosswalk.astro` (una tabla por marco con `data-label`, vista inversa por perfil, avisos, nota AIUC, sin JS) y `crosswalk.md.ts`; enlace desde `/controls` (`#ecosystem`).
-- [ ] 5.3 `tests/controls-crosswalk.spec.ts` (ids resuelven, pares = registro, sin "compliant"/"certified"/U+2014, un ld+json `CollectionPage`); build verde y handoff con peticiones (OG, `_headers`, lhci, HUBS).
+- [x] 5.1 `site/src/lib/controls-crosswalk.ts` (`buildControlsCrosswalk`) y clave `crosswalk` en el dataset `controls` con esquema cerrado; verificar `schemas-check` y el JSON validado.
+- [x] 5.2 `pages/controls/crosswalk.astro` (una tabla por marco con `data-label`, vista inversa por perfil, avisos, nota AIUC, sin JS) y `crosswalk.md.ts`; enlace desde `/controls` (`#ecosystem`).
+- [x] 5.3 `tests/controls-crosswalk.spec.ts` (ids resuelven, pares = registro, sin "compliant"/"certified"/U+2014, un ld+json `CollectionPage`); build verde y handoff con peticiones (OG, `_headers`, lhci, HUBS).
 
 ## 6. orp2-pages (ola 1)
 
-- [ ] 6.1 `pages/controls/[profile]/[control].astro` y `[control].md.ts` solo para `specified`, con registro, casos, patrones, obligaciones, amenazas, ejemplos descargables, CTA, cita, JSON y `TechArticle` con `isPartOf`.
-- [ ] 6.2 La sección de cada control `specified` en su perfil enlaza su página desde `<main>`.
-- [ ] 6.3 `tests/control-pages.spec.ts` (una página por `specified`, ninguna para el resto, canonical, ld+json, twin, títulos y descripciones únicos); build verde y handoff con peticiones.
+- [x] 6.1 `pages/controls/[profile]/[control].astro` y `[control].md.ts` solo para `specified`, con registro, casos, patrones, obligaciones, amenazas, ejemplos descargables, CTA, cita, JSON y `TechArticle` con `isPartOf`.
+- [x] 6.2 La sección de cada control `specified` en su perfil enlaza su página desde `<main>`.
+- [x] 6.3 `tests/control-pages.spec.ts` (una página por `specified`, ninguna para el resto, canonical, ld+json, twin, títulos y descripciones únicos); build verde y handoff con peticiones.
 
 ## 7. orp2-release (ola 1)
 
-- [ ] 7.1 Mostrar `doi`/`conceptDoi` en cita, `Provenance`, registro JSON del perfil y front matter del twin (o el DOI de concepto del proyecto si no hay); verificar en `controls.spec.ts`.
-- [ ] 7.2 `site/scripts/profile-release.mjs` (paquete en `dist/releases/`, `CITATION.cff`, README, metadatos Zenodo, dry-run sin red, sandbox por defecto, `--production`, `--publish`) y test en dry-run; `site/scripts/README` o sección en `CONTRIBUTING.md` con los pasos y por qué no la integración GitHub-Zenodo.
-- [ ] 7.3 Build verde y handoff `orp2-release.json`.
+- [x] 7.1 Mostrar `doi`/`conceptDoi` en cita, `Provenance`, registro JSON del perfil y front matter del twin (o el DOI de concepto del proyecto si no hay); verificar en `controls.spec.ts`.
+- [x] 7.2 `site/scripts/profile-release.mjs` (paquete en `dist/releases/`, `CITATION.cff`, README, metadatos Zenodo, dry-run sin red, sandbox por defecto, `--production`, `--publish`) y test en dry-run; `site/scripts/README` o sección en `CONTRIBUTING.md` con los pasos y por qué no la integración GitHub-Zenodo.
+- [x] 7.3 Build verde y handoff `orp2-release.json`.
 
 ## 8. Integración ola 1 (integrador)
 
