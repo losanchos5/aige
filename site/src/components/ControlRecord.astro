@@ -1,0 +1,434 @@
+---
+/**
+ * ControlRecord: one control of an open control profile, as the profile page
+ * shows it (src/data/controls). A <section> per control whose H2 carries the
+ * control's anchor (the id in lower case), so the page's TOC and
+ * public/ui-doc.js, which watch `.prose h2[id]`, pick it up; the page wraps the
+ * records in `.prose`. Under the heading, a line on the draft state for outline
+ * and derived controls, then the record as a definition list in the case-page
+ * style (`.cs-facts`, styles/harms.css): id, objective, failure modes, scope,
+ * enforcement points, verification, evidence, failure response, layers,
+ * patterns, seeds, mappings, references, notes, open questions, observation.
+ * Empty optional rows are left out; the core rows say "To be specified" rather
+ * than disappear. The foot links the control's JSON and its review form.
+ *
+ * References cite the profile's source list by number (`#src-<n>`), so the page
+ * must render `SourceList sources={profileSources(slug)} prefix="src"`. No
+ * client script.
+ */
+import '../styles/harms.css';
+import ContributeCta from './ContributeCta.astro';
+import type { Source } from '../lib/sources';
+import {
+  type Control,
+  type ControlProfile,
+  controlAnchor,
+  controlApiPath,
+  nistAiRmfSubcategories,
+  verificationLabels,
+  subjectKindLabels,
+  statusLabels,
+  reviewerStatusLabels,
+  sourceNumber,
+} from '../data/controls';
+import { enforcementLabels, effectLabels } from '../data/policy-card';
+import { layers, type Layer } from '../data/stack';
+import { getPatternBySlug, patternPath, type PatternDef } from '../data/patterns';
+import { agentControls, agentAnchors, agentChapter, type AgentControl } from '../data/tool-agent-controls';
+import { obligationPath } from '../data/frameworks';
+import { iso42001Controls, threatById, threatAnchor, obligationLabel } from '../data/threats';
+
+interface Props {
+  control: Control;
+  profile: ControlProfile;
+  /** The profile's numbered sources (profileSources(profile.slug)). */
+  sources: readonly Source[];
+  /** Position in the profile, 0-based (defaults to the id's number). */
+  index?: number;
+}
+
+const { control: c, profile, sources, index } = Astro.props;
+const number = c.id.slice(-3);
+const position = index ?? Number(number) - 1;
+const TBD = 'To be specified.';
+
+const layerOf = (n: number) => layers.find((l) => l.n === n);
+const layerRows = [c.layer, ...(c.secondaryLayers ?? [])].map((n) => layerOf(n)).filter((l): l is Layer => l !== undefined);
+const patternRows = c.patterns.map((slug) => getPatternBySlug(slug)).filter((p): p is PatternDef => p !== undefined);
+const seedRows = c.seeds.map((id) => agentControls.find((a) => a.id === id)).filter((a): a is AgentControl => a !== undefined);
+const threatRow = (id: string) => {
+  const t = threatById(id);
+  if (!t) throw new Error(`ControlRecord ${c.id}: unknown threat ${id}`);
+  return t;
+};
+const m = c.mappings;
+const hasMappings =
+  m.obligations.length + m.iso42001.length + m.nistAiRmf.length + m.owasp.length +
+    (m.atlas?.length ?? 0) + (m.aiuc1?.length ?? 0) + (m.csaAicm?.length ?? 0) + (m.other?.length ?? 0) >
+  0;
+const draftNote =
+  c.depth === 'stub'
+    ? 'Draft outline: objective, failure modes and open questions only; requires technical review before it can be verified.'
+    : c.depth === 'derived'
+      ? 'Derived from the agent controls of chapter 23 and restated as a control; requires technical review.'
+      : undefined;
+---
+
+<section class="ctl" data-control={c.id} data-depth={c.depth} data-index={position}>
+  <h2 id={controlAnchor(c)}>{number} {c.title}</h2>
+  {draftNote && <p class="ctl-state">{draftNote}</p>}
+
+  <dl class="cs-facts ctl-facts">
+    <dt>Id</dt>
+    <dd>
+      <code>{c.id}</code> · v{c.version} · {statusLabels[c.status]} · {reviewerStatusLabels[c.reviewerStatus]}
+    </dd>
+
+    <dt>Objective</dt>
+    <dd>{c.objective}</dd>
+
+    <dt>Failure modes</dt>
+    <dd>
+      {
+        c.failureModes.length > 0 ? (
+          <ul class="ctl-list">
+            {c.failureModes.map((f) => (
+              <li>{f}</li>
+            ))}
+          </ul>
+        ) : (
+          TBD
+        )
+      }
+    </dd>
+
+    <dt>Scope</dt>
+    <dd>{c.scope}</dd>
+
+    <dt>Enforcement points</dt>
+    <dd>
+      <ul class="ctl-list">
+        {c.enforcementPoints.map((e) => (
+          <li>{enforcementLabels[e]}</li>
+        ))}
+      </ul>
+    </dd>
+
+    <dt>Verification</dt>
+    <dd>
+      {
+        c.verification.length > 0 ? (
+          <ul class="ctl-list">
+            {c.verification.map((v) => (
+              <li>
+                <strong>{verificationLabels[v.kind]}:</strong> {v.text}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          TBD
+        )
+      }
+    </dd>
+
+    <dt>Evidence</dt>
+    <dd>
+      {
+        c.evidence.length > 0 ? (
+          <ul class="ctl-list">
+            {c.evidence.map((ev) => (
+              <li>
+                {ev.artefact} · Layer {String(ev.layer).padStart(2, '0')}
+                {ev.schemaId && (
+                  <>
+                    {' · '}
+                    <a href={`/resources/templates#schema-${ev.schemaId}`}>{ev.schemaId}.v1</a>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          TBD
+        )
+      }
+    </dd>
+
+    <dt>Failure response</dt>
+    <dd>
+      <strong>{effectLabels[c.failureResponse.effect]}.</strong> {c.failureResponse.text}
+    </dd>
+
+    <dt>{layerRows.length > 1 ? 'Layers' : 'Layer'}</dt>
+    <dd>
+      {
+        layerRows.map((l, i) => (
+          <>
+            {i > 0 && ', '}
+            <a href={`/bok/the-stack#${l.chapterAnchor}`}>
+              Layer {String(l.n).padStart(2, '0')} {l.name}
+            </a>
+          </>
+        ))
+      }
+    </dd>
+
+    {
+      patternRows.length > 0 && (
+        <>
+          <dt>Patterns</dt>
+          <dd>
+            {patternRows.map((p, i) => (
+              <>
+                {i > 0 && ', '}
+                <a href={patternPath(p)}>{p.title}</a>
+              </>
+            ))}
+          </dd>
+        </>
+      )
+    }
+
+    {
+      seedRows.length > 0 && (
+        <>
+          <dt>Seeded from</dt>
+          <dd>
+            {seedRows.map((s, i) => (
+              <>
+                {i > 0 && ', '}
+                <a href={`${agentChapter}#${agentAnchors[s.anchor]}`}>{s.title}</a>
+              </>
+            ))}
+          </dd>
+        </>
+      )
+    }
+
+    {
+      hasMappings && (
+        <>
+          <dt>Mappings</dt>
+          <dd>
+            <ul class="ctl-list ctl-maps">
+              {m.obligations.length > 0 && (
+                <li>
+                  <span class="ctl-k">Obligations:</span>{' '}
+                  {m.obligations.map((id, i) => (
+                    <>
+                      {i > 0 && '; '}
+                      <a href={obligationPath({ id })}>{obligationLabel(id)}</a>
+                    </>
+                  ))}
+                </li>
+              )}
+              {m.iso42001.length > 0 && (
+                <li>
+                  <span class="ctl-k">ISO/IEC 42001:</span>{' '}
+                  {m.iso42001.map((id) => `${id} ${iso42001Controls[id]}`).join('; ')}
+                </li>
+              )}
+              {m.nistAiRmf.length > 0 && (
+                <li>
+                  <span class="ctl-k">NIST AI RMF:</span>{' '}
+                  {m.nistAiRmf.map((id) => `${id} ${nistAiRmfSubcategories[id]}`).join('; ')}
+                </li>
+              )}
+              {m.owasp.length > 0 && (
+                <li>
+                  <span class="ctl-k">OWASP:</span>{' '}
+                  {m.owasp.map((id, i) => {
+                    const t = threatRow(id);
+                    return (
+                      <>
+                        {i > 0 && '; '}
+                        <a href={`/resources/threats#${threatAnchor(t)}`}>
+                          {t.externalId} {t.name}
+                        </a>
+                      </>
+                    );
+                  })}
+                </li>
+              )}
+              {(m.atlas ?? []).length > 0 && (
+                <li>
+                  <span class="ctl-k">MITRE ATLAS:</span>{' '}
+                  {(m.atlas ?? []).map((id, i) => {
+                    const t = threatRow(id);
+                    return (
+                      <>
+                        {i > 0 && '; '}
+                        <a href={`/resources/threats#${threatAnchor(t)}`}>
+                          {t.externalId} {t.name}
+                        </a>
+                      </>
+                    );
+                  })}
+                </li>
+              )}
+              {(m.aiuc1 ?? []).length > 0 && (
+                <li>
+                  <span class="ctl-k">AIUC-1:</span> {(m.aiuc1 ?? []).join(', ')}
+                </li>
+              )}
+              {(m.csaAicm ?? []).length > 0 && (
+                <li>
+                  <span class="ctl-k">CSA AICM:</span> {(m.csaAicm ?? []).join(', ')}
+                </li>
+              )}
+              {(m.other ?? []).map((o) => (
+                <li>
+                  <span class="ctl-k">{o.framework}:</span> {o.ref}
+                  {o.note && ` (${o.note})`}
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </>
+      )
+    }
+
+    {
+      c.references.length > 0 && (
+        <>
+          <dt>References</dt>
+          <dd>
+            <ul class="ctl-list">
+              {c.references.map((src) => {
+                const n = sourceNumber(sources, src);
+                return (
+                  <li>
+                    <a class="cite" href={`#src-${n}`}>
+                      [{n}]
+                    </a>{' '}
+                    {src.title}
+                    {src.gloss && ` (${src.gloss})`}
+                  </li>
+                );
+              })}
+            </ul>
+          </dd>
+        </>
+      )
+    }
+
+    {
+      c.implementationNotes.length > 0 && (
+        <>
+          <dt>Implementation notes</dt>
+          <dd>
+            <ul class="ctl-list">
+              {c.implementationNotes.map((note) => (
+                <li>{note}</li>
+              ))}
+            </ul>
+          </dd>
+        </>
+      )
+    }
+
+    {
+      c.openQuestions.length > 0 && (
+        <>
+          <dt>Open questions</dt>
+          <dd>
+            <ul class="ctl-list">
+              {c.openQuestions.map((q) => (
+                <li>{q}</li>
+              ))}
+            </ul>
+          </dd>
+        </>
+      )
+    }
+
+    {
+      c.observation && (
+        <>
+          <dt>Observation</dt>
+          <dd>
+            <ul class="ctl-list">
+              <li>
+                <span class="ctl-k">Subject:</span> {subjectKindLabels[c.observation.subjectKind]}
+              </li>
+              <li>
+                <span class="ctl-k">Expected:</span> {c.observation.expected}
+              </li>
+              <li>
+                <span class="ctl-k">Example:</span> {c.observation.observedExample}
+              </li>
+            </ul>
+          </dd>
+        </>
+      )
+    }
+  </dl>
+
+  <div class="ctl-foot">
+    <a
+      class="ctl-json"
+      href={controlApiPath(c)}
+      data-umami-event="control-download"
+      data-umami-event-control={c.id}
+    >
+      {c.id} as JSON
+    </a>
+    <ContributeCta kind="control" title={`${c.id} ${c.title} (${profile.shortTitle} v${profile.version})`} landmark={false} />
+  </div>
+</section>
+
+<style>
+  .ctl {
+    margin-top: var(--s-7);
+  }
+
+  .ctl:first-of-type {
+    margin-top: var(--s-6);
+  }
+
+  .ctl-state {
+    color: var(--ink-2);
+  }
+
+  .ctl-list {
+    margin: 0;
+    padding-left: 1.1em;
+  }
+
+  .ctl-list li + li {
+    margin-top: var(--s-1);
+  }
+
+  .ctl-k {
+    font-weight: 600;
+  }
+
+  .ctl-facts code {
+    font-size: 1em;
+  }
+
+  .ctl-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-5);
+    margin-top: var(--s-4);
+  }
+
+  .ctl-foot :global(.contrib) {
+    margin: 0;
+  }
+
+  .ctl-json {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 0.18em;
+  }
+
+  .ctl-json:hover {
+    text-decoration-color: currentColor;
+  }
+</style>

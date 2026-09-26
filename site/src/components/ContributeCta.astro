@@ -1,0 +1,77 @@
+---
+/**
+ * ContributeCta: one call to act on the thing the reader is looking at: review
+ * a control, challenge an assumption, share an implementation, propose a
+ * mapping, review a note or propose a failure mode. Each kind opens its GitHub
+ * issue form (.github/ISSUE_TEMPLATE/<form>) with the title prefilled, and a
+ * second link explains how review works (/contribute). No heading: it sits at
+ * the end of a section that already has one.
+ *
+ * `landmark={false}` renders a plain <div> instead of the complementary
+ * landmark, for pages that repeat the call once per record (a profile page has
+ * one per control).
+ */
+import { site } from '../data/site';
+
+type ContributeKind = 'control' | 'assumption' | 'implementation' | 'mapping' | 'note' | 'incident';
+
+/** Kind -> issue form, button label and the tag the issue title starts with. */
+const FORMS: Readonly<Record<ContributeKind, { form: string; label: string; tag: string }>> = {
+  control: { form: 'control-review.yml', label: 'Review this control', tag: 'Control review' },
+  assumption: { form: 'technical-correction.yml', label: 'Challenge this assumption', tag: 'Correction' },
+  implementation: { form: 'implementation-example.yml', label: 'Share an implementation', tag: 'Implementation' },
+  mapping: { form: 'framework-mapping.yml', label: 'Propose a framework mapping', tag: 'Mapping' },
+  note: { form: 'research-review.yml', label: 'Review this note', tag: 'Research review' },
+  incident: { form: 'failure-mode-proposal.yml', label: 'Propose a failure mode', tag: 'Failure mode' },
+};
+
+interface Props {
+  kind: ContributeKind;
+  /** What the issue is about (a control id, a page title); prefills the issue title. */
+  title?: string;
+  /** Default true: an <aside aria-label="Contribute">; false: a plain <div>. */
+  landmark?: boolean;
+}
+
+const { kind, title, landmark = true } = Astro.props;
+const form = FORMS[kind];
+const issueTitle = title ? `[${form.tag}] ${title}` : `[${form.tag}] `;
+const href = `${site.github}/issues/new?template=${form.form}&title=${encodeURIComponent(issueTitle)}`;
+const Tag = landmark ? 'aside' : 'div';
+---
+
+<Tag class="contrib" aria-label={landmark ? 'Contribute' : undefined}>
+  <a
+    class="btn btn-primary"
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    data-umami-event="contribute"
+    data-umami-event-kind={kind}
+  >
+    {form.label}
+  </a>
+  <a class="contrib-link" href="/contribute">How review works</a>
+</Tag>
+
+<style>
+  .contrib {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-5);
+    margin: var(--s-5) 0 0;
+  }
+
+  .contrib-link {
+    font-size: var(--fs-small);
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line);
+    text-underline-offset: 0.18em;
+  }
+
+  .contrib-link:hover {
+    text-decoration-color: currentColor;
+  }
+</style>
