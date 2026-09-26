@@ -1,0 +1,24 @@
+{
+  "$schema": "https://aigovernanceengineer.com/schemas/control-observation.v1.json",
+  "control_id": "AIGE-CTL-EVAL-003",
+  "profile": "evaluation-environment",
+  "control_version": "0.1",
+  "subject": "run-88215@2026-09-26",
+  "subject_kind": "eval-run",
+  "expected": "No credential other than the run's own short-lived, audience-bound tokens is readable in the environment or appears in the run's artefacts, and none is accepted after the run.",
+  "observed": "Secret scan found 1 long-lived API key in an environment variable of the agent container and the same key in the transcript at step 212.",
+  "status": "fail",
+  "timestamp": "2026-09-26T12:27:55Z",
+  "enforcement_point": "runtime",
+  "verification_kind": "test",
+  "observer": "run-artefact-secret-scanner",
+  "evidence": [
+    {
+      "artefact": "secret scan report of run 88215",
+      "url": "https://evidence.example/runs/88215/secret-scan.json",
+      "hash": "sha256:2a5d8b1e4c7f0a3d6b9e2c5f8a1d4b7e0c3f6a9d2b5e8c1f4a7d0b3e6c9f2a5d"
+    }
+  ],
+  "run_id": "88215",
+  "notes": "Illustrative example, not the result of a real evaluation. The key was revoked, the run stopped and its result withheld."
+}
