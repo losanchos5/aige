@@ -22,6 +22,7 @@ import {
   profiles,
   profilePath,
   profileArticleId,
+  statusLabels,
   type Control,
 } from '../src/data/controls';
 
@@ -166,7 +167,7 @@ for (const c of specified) {
       expect(article.url).toBe(`${ORIGIN}${path}`);
       expect(article.headline).toBe(c.pageTitle);
       expect(article.version).toBe(profile.version);
-      expect(article.creativeWorkStatus).toBe('Draft');
+      expect(article.creativeWorkStatus).toBe(statusLabels[profile.status]);
       expect(article.datePublished).toBe(profile.published);
       expect(article.dateModified).toBe(profile.updated);
     });

@@ -150,11 +150,18 @@ test.describe('profile helpers', () => {
     expect(cite.url).toBe(`${site.url}/controls/${p.slug}`);
     expect(cite.doi).toBe(p.doi ?? null);
     expect(cite.conceptDoi).toBe(p.conceptDoi ?? null);
-    expect(cite.effectiveDoi).toBe(p.doi ?? site.conceptDoi);
+    expect(cite.effectiveDoi).toBe(p.doi ?? p.conceptDoi ?? site.conceptDoi);
     expect(cite.text).toContain(p.title);
     expect(cite.text).toContain(`https://doi.org/${cite.effectiveDoi}`);
-    const withDoi = profileCitation({ ...p, doi: '10.5281/zenodo.1', conceptDoi: '10.5281/zenodo.2' });
+    const withDoi = profileCitation({ ...p, doi: '10.5281/zenodo.1', doiVersion: p.version, conceptDoi: '10.5281/zenodo.2' });
     expect([withDoi.doi, withDoi.conceptDoi, withDoi.effectiveDoi]).toEqual(['10.5281/zenodo.1', '10.5281/zenodo.2', '10.5281/zenodo.1']);
+    expect(withDoi.doiKind).toBe('profile');
+    // No version DOI: the profile's concept DOI, then the project's, each labelled.
+    const conceptOnly = profileCitation({ ...p, doi: undefined, doiVersion: undefined, conceptDoi: '10.5281/zenodo.2' });
+    expect([conceptOnly.effectiveDoi, conceptOnly.doiKind]).toEqual(['10.5281/zenodo.2', 'profile-concept']);
+    expect(conceptOnly.text).toContain('https://doi.org/10.5281/zenodo.2');
+    const none = profileCitation({ ...p, doi: undefined, doiVersion: undefined, conceptDoi: undefined });
+    expect([none.effectiveDoi, none.doiKind]).toEqual([site.conceptDoi, 'project-concept']);
     expect(controlsUpdated()).toBe([...profiles.map((q) => q.updated)].sort().at(-1));
   });
 
@@ -269,8 +276,9 @@ test.describe('registry rules: negative cases', () => {
     expect(flags(onStub, 'is not a specified control')).toBe(stubbed);
   });
 
-  test('profile slugs crosswalk and examples are reserved, DOIs are well formed, prefixes are unique', () => {
+  test('profile slugs crosswalk, examples and index are reserved, DOIs are well formed, prefixes are unique', () => {
     const eval_ = profiles[0];
+    expect(RESERVED_PROFILE_SLUGS).toEqual(expect.arrayContaining(['crosswalk', 'examples', 'index']));
     for (const slug of RESERVED_PROFILE_SLUGS) {
       const reg: ControlRegistry = {
         ...registry(),
@@ -280,12 +288,28 @@ test.describe('registry rules: negative cases', () => {
     }
     expect(flags(patchedProfile(eval_.slug, { doi: 'zenodo.22956197' }), 'malformed doi')).toBe(true);
     expect(flags(patchedProfile(eval_.slug, { conceptDoi: 'https://doi.org/10.5281/zenodo.1' }), 'malformed conceptDoi')).toBe(true);
-    expect(problems(patchedProfile(eval_.slug, { doi: '10.5281/zenodo.22956197', conceptDoi: '10.5281/zenodo.22857084' }))).toEqual([]);
+    expect(
+      problems(patchedProfile(eval_.slug, { doi: '10.5281/zenodo.22956197', doiVersion: eval_.version, conceptDoi: '10.5281/zenodo.22857084' })),
+    ).toEqual([]);
+    // A version DOI records the version it was minted for: none, or an older
+    // one after a version bump, fails; so does a doiVersion with no doi.
+    expect(flags(patchedProfile(eval_.slug, { doi: '10.5281/zenodo.22956197' }), 'doi was minted for v(no doiVersion)')).toBe(true);
+    expect(flags(patchedProfile(eval_.slug, { doi: '10.5281/zenodo.22956197', doiVersion: '0.0.1' }), 'doi was minted for v0.0.1')).toBe(true);
+    expect(flags(patchedProfile(eval_.slug, { doiVersion: eval_.version }), 'doiVersion without a doi')).toBe(true);
     // A second profile whose ids reuse the EVAL prefix.
     const copy: ControlProfile = { ...eval_, slug: 'eval-copy' };
     const copied = controlsIn(eval_.slug).map((c) => ({ ...c, profile: 'eval-copy' }));
     const reg: ControlRegistry = { ...registry(), profiles: [...profiles, copy], controls: [...controls, ...copied] };
     expect(flags(reg, 'id prefix EVAL already used by evaluation-environment')).toBe(true);
+  });
+
+  test('an "other" framework name gives a non-empty crosswalk id, and one id comes from one name', () => {
+    const m = controlById(SPEC)!.mappings;
+    const withOther = (other: { framework: string; ref: string }[]) => patched(SPEC, { mappings: { ...m, other: [...(m.other ?? []), ...other] } });
+    expect(flags(withOther([{ framework: '---', ref: 'X-1' }]), 'has an empty id')).toBe(true);
+    // "NIST SP 800-53 Rev. 5" is already used; this spelling has the same kebab id.
+    expect(flags(withOther([{ framework: 'nist sp 800 53 rev 5', ref: 'AC-3' }]), 'has the id nist-sp-800-53-rev-5 of NIST SP 800-53 Rev. 5')).toBe(true);
+    expect(problems(withOther([{ framework: 'NIST SP 800-53 Rev. 5', ref: 'AC-3' }]))).toEqual([]);
   });
 });
 
