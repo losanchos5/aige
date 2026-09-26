@@ -1,6 +1,6 @@
 {
   "name": "@aige/mcp-server",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "private": true,
   "description": "Read-only remote MCP server over the AI Governance Engineer open data API (/api/v1).",
   "license": "CC-BY-4.0",

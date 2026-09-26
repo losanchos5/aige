@@ -416,6 +416,106 @@ describe('search_bok', () => {
   });
 });
 
+describe('list_controls', () => {
+  it('lists every control of every profile with its status and URLs', async () => {
+    const { text, data } = await call('list_controls', {});
+    const doc = JSON.parse(readFixture('api/v1/controls.json')) as { controls: { id: string }[]; profiles: unknown[] };
+    assert.equal(data.total, doc.controls.length);
+    assert.deepEqual(data.controls.map((c: Structured) => c.id), doc.controls.map((c) => c.id));
+    assert.equal(data.profiles.length, doc.profiles.length);
+    const egress = data.controls.find((c: Structured) => c.id === 'AIGE-CTL-EVAL-002');
+    assert.equal(egress.profile, 'evaluation-environment');
+    assert.equal(egress.depth, 'specified');
+    assert.equal(egress.url, 'https://aigovernanceengineer.com/controls/evaluation-environment#aige-ctl-eval-002');
+    assert.equal(egress.json, 'https://aigovernanceengineer.com/api/v1/controls/aige-ctl-eval-002.json');
+    assert.equal(data.source, 'https://aigovernanceengineer.com/controls');
+    assert.match(text, /open for technical review/);
+    assertProvenance(data, text);
+  });
+
+  it('filters by profile, depth, layer and free text', async () => {
+    const specified = await call('list_controls', { profile: 'evaluation-environment', depth: 'specified' });
+    assert.deepEqual(
+      specified.data.controls.map((c: Structured) => c.id),
+      ['AIGE-CTL-EVAL-002', 'AIGE-CTL-EVAL-003', 'AIGE-CTL-EVAL-006'],
+    );
+    assert.equal(specified.data.source, 'https://aigovernanceengineer.com/controls/evaluation-environment');
+    assert.deepEqual(specified.data.filters, { profile: 'evaluation-environment', depth: 'specified' });
+
+    const layer5 = await call('list_controls', { layer: 5 });
+    assert.ok(layer5.data.total > 0);
+    for (const c of layer5.data.controls) assert.ok(c.layer === 5 || c.secondaryLayers.includes(5), c.id);
+
+    const egress = await call('list_controls', { query: 'network egress' });
+    assert.ok(egress.data.controls.some((c: Structured) => c.id === 'AIGE-CTL-EVAL-002'));
+    for (const c of egress.data.controls) assert.match(`${c.id} ${c.title} ${c.objective}`.toLowerCase(), /egress/);
+
+    const none = await call('list_controls', { status: 'stable' });
+    assert.equal(none.isError, false);
+    assert.equal(none.data.total, 0);
+  });
+
+  it('rejects an unknown profile with the valid slugs', async () => {
+    const { text, isError } = await call('list_controls', { profile: 'no-such-profile' });
+    assert.equal(isError, true);
+    assert.match(text, /evaluation-environment/);
+  });
+});
+
+describe('get_control', () => {
+  it('gets the full record with mappings, references, observation and examples', async () => {
+    const { text, data, isError } = await call('get_control', { id: 'AIGE-CTL-EVAL-002' });
+    assert.equal(isError, false);
+    assert.equal(data.id, 'AIGE-CTL-EVAL-002');
+    assert.equal(data.title, 'Network Egress Control');
+    assert.equal(data.layerName, 'Runtime Controls & Observability');
+    assert.ok(data.failureModes.length > 0);
+    assert.ok(data.verification.length > 0);
+    assert.ok(data.mappings.obligations.some((o: Structured) => o.id === 'AIGE-OBL-EUAIA-ART15'));
+    assert.ok(data.mappings.iso42001.some((c: Structured) => c.id === 'A.6.2.6'));
+    assert.ok(data.references.length > 0);
+    assert.ok(data.references.every((r: Structured) => Number.isInteger(r.n) && r.url.startsWith('http')));
+    assert.ok(data.observation, 'a specified control records an observation');
+    assert.deepEqual(data.examples.map((e: Structured) => e.status).sort(), ['fail', 'pass']);
+    assert.equal(data.profileInfo.slug, 'evaluation-environment');
+    assert.equal(data.source, data.url);
+    assert.equal(data.dataset, 'https://aigovernanceengineer.com/api/v1/controls/aige-ctl-eval-002.json');
+    assert.match(text, /Mappings \(illustrative, not a claim of conformity\)/);
+    assert.match(text, /open for technical review/);
+    assertProvenance(data, text);
+  });
+
+  it('accepts any case, the short id, the URLs and the title', async () => {
+    for (const wanted of [
+      'aige-ctl-eval-002',
+      'EVAL-002',
+      'https://aigovernanceengineer.com/controls/evaluation-environment#aige-ctl-eval-002',
+      'https://aigovernanceengineer.com/api/v1/controls/aige-ctl-eval-002.json',
+      'Network Egress Control',
+    ]) {
+      const { data, isError } = await call('get_control', { id: wanted });
+      assert.equal(isError, false, wanted);
+      assert.equal(data.id, 'AIGE-CTL-EVAL-002', wanted);
+    }
+  });
+
+  it('returns a stub with a null observation and no examples', async () => {
+    const { data, isError } = await call('get_control', { id: 'AIGE-CTL-EVAL-001' });
+    assert.equal(isError, false);
+    assert.equal(data.depth, 'stub');
+    assert.equal(data.observation, null);
+    assert.deepEqual(data.examples, []);
+    assert.ok(data.openQuestions.length > 0);
+  });
+
+  it('suggests ids for an unknown control', async () => {
+    const { text, isError } = await call('get_control', { id: 'AIGE-CTL-EVAL-020' });
+    assert.equal(isError, true);
+    assert.match(text, /AIGE-CTL-EVAL-0/);
+    assert.match(text, /list_controls/);
+  });
+});
+
 describe('upstream failure', () => {
   it('turns an unavailable dataset into a readable tool error', async () => {
     running.data.upstream.clear();

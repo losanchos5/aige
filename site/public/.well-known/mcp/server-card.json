@@ -1,8 +1,8 @@
 {
   "name": "aigovernanceengineer",
   "title": "AI Governance Engineer",
-  "description": "Read-only Model Context Protocol server over the open data of aigovernanceengineer.com: the obligation register, the topic crosswalk, the glossary, the governance patterns, the templates and schemas, and the Body of Knowledge chapters. Every answer carries its source URL. Illustrative, not legal advice and not a claim of conformity.",
-  "version": "0.5.0",
+  "description": "Read-only Model Context Protocol server over the open data of aigovernanceengineer.com: the obligation register, the topic crosswalk, the glossary, the governance patterns, the templates and schemas, the open control profiles, and the Body of Knowledge chapters. Every answer carries its source URL. Illustrative, not legal advice and not a claim of conformity.",
+  "version": "0.6.0",
   "websiteUrl": "https://aigovernanceengineer.com",
   "documentation": "https://aigovernanceengineer.com/mcp",
   "repository": {
@@ -111,6 +111,22 @@
       "name": "search_bok",
       "title": "Search the Body of Knowledge",
       "description": "Search the 24 chapters of the AI Governance Engineer Body of Knowledge and its pattern pages: chapter titles, summaries and key points, section headings and section text. Every query word must match. Returns chapters, sections (with the URL of the heading anchor) and patterns, best first, each with a snippet. Use it to find where the book treats a subject (\"human oversight\", \"post-market monitoring\", \"agent identity\", \"conformity assessment\").",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "list_controls",
+      "title": "List controls",
+      "description": "List the reference controls of the open control profiles (draft control specifications with stable ids such as AIGE-CTL-EVAL-002, open for technical review). All filters are optional and combine with AND: profile (a profile slug such as \"evaluation-environment\", or its title), layer (stack layer 1-5, primary or secondary), status (draft, in-review, stable, retired), depth (specified: written in full; derived: restates a chapter 23 seed; stub: outline with open questions) and query (words that must all appear in the id, title or objective). Returns ids for get_control, each control's profile, depth, status, layer, objective and URLs.",
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_control",
+      "title": "Get a control",
+      "description": "Get one reference control of the open control profiles by its stable id (e.g. \"AIGE-CTL-EVAL-002\", any case, or \"EVAL-002\"), its page or JSON URL, or its title: objective, failure modes, scope, enforcement points, verification steps, the evidence it leaves (with schema ids), the failure response, stack layers, patterns, the illustrative mappings (obligation ids, ISO/IEC 42001 Annex A, NIST AI RMF, OWASP, MITRE ATLAS, others), numbered references, implementation notes, open questions, the observation it records and example observations. A draft control specification, open for technical review.",
       "annotations": {
         "readOnlyHint": true
       }
