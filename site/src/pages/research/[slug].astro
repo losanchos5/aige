@@ -182,3 +182,13 @@ const jsonLd = [
     />
   </section>
 </Doc>
+
+<style>
+  /* The review button sits inside .prose, whose `.prose a` rule (ink text,
+     underline) outranks .btn-primary and would paint ink on ink. Restore the
+     button's own colours here; the same fix belongs in ContributeCta. */
+  :global(.prose .contrib a.btn-primary) {
+    color: var(--bg);
+    text-decoration: none;
+  }
+</style>
