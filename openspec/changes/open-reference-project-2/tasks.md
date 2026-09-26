@@ -56,9 +56,9 @@ nuevo añade su import en `controls/index.ts` y su sección en `sources/SOURCES.
 
 ## 7. orp2-release (ola 1)
 
-- [ ] 7.1 Mostrar `doi`/`conceptDoi` en cita, `Provenance`, registro JSON del perfil y front matter del twin (o el DOI de concepto del proyecto si no hay); verificar en `controls.spec.ts`.
-- [ ] 7.2 `site/scripts/profile-release.mjs` (paquete en `dist/releases/`, `CITATION.cff`, README, metadatos Zenodo, dry-run sin red, sandbox por defecto, `--production`, `--publish`) y test en dry-run; `site/scripts/README` o sección en `CONTRIBUTING.md` con los pasos y por qué no la integración GitHub-Zenodo.
-- [ ] 7.3 Build verde y handoff `orp2-release.json`.
+- [x] 7.1 Mostrar `doi`/`conceptDoi` en cita, `Provenance`, registro JSON del perfil y front matter del twin (o el DOI de concepto del proyecto si no hay); verificar en `controls.spec.ts`.
+- [x] 7.2 `site/scripts/profile-release.mjs` (paquete en `dist/releases/`, `CITATION.cff`, README, metadatos Zenodo, dry-run sin red, sandbox por defecto, `--production`, `--publish`) y test en dry-run; `site/scripts/README` o sección en `CONTRIBUTING.md` con los pasos y por qué no la integración GitHub-Zenodo.
+- [x] 7.3 Build verde y handoff `orp2-release.json`.
 
 ## 8. Integración ola 1 (integrador)
 

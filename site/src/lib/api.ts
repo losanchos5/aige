@@ -70,6 +70,7 @@ import {
   controlPath,
   profilePath,
   profileSources,
+  profileCitation,
   sourceNumber,
   nistAiRmfSubcategories,
   observationExamples,
@@ -505,6 +506,10 @@ export const controlSchema = s.obj(
 );
 
 function controlProfileRecord(p: ControlProfile) {
+  // Block orp2-release: the profile's own DOIs (null until deposited) and how
+  // to cite it, with the effective DOI (the profile's, else the project's
+  // concept DOI).
+  const cite = profileCitation(p);
   return {
     slug: p.slug,
     title: p.title,
@@ -522,6 +527,9 @@ function controlProfileRecord(p: ControlProfile) {
     changelog: p.changelog.map((e) => ({ version: e.version, date: e.date, note: e.note })),
     reviewForm: `${site.github}/issues/new?template=${p.issueTemplate}`,
     controls: controls.filter((c) => c.profile === p.slug).map((c) => c.id),
+    doi: cite.doi,
+    conceptDoi: cite.conceptDoi,
+    citation: { text: cite.text, doi: cite.effectiveDoi, url: cite.url },
   };
 }
 
@@ -545,6 +553,16 @@ const controlProfileSchema = s.obj({
   ),
   reviewForm: s.uri('GitHub issue form for a review of the profile.'),
   controls: s.arr(s.str('Control id.'), 'Ids of its controls, in order.'),
+  doi: s.strOrNull('DOI of this profile version (without the resolver); null until the version is deposited.'),
+  conceptDoi: s.strOrNull('Concept DOI shared by every version of this profile; null until the first version is deposited.'),
+  citation: s.obj(
+    {
+      text: s.str('Ready-to-copy reference to the profile version.'),
+      doi: s.str('DOI the reference cites: the profile DOI when there is one, else the project concept DOI.'),
+      url: s.uri('Profile page.'),
+    },
+    'How to cite this profile version.',
+  ),
 });
 
 // ---------------------------------------------------------------------------
