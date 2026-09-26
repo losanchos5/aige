@@ -77,6 +77,7 @@ import {
   CONTROLS_AS_OF,
   type Control,
   type ControlProfile,
+  type ControlSource,
 } from '../data/controls';
 import { personById } from '../data/people';
 import { threatById } from '../data/threats';
@@ -84,6 +85,7 @@ import { agentControls, agentAnchors, agentChapter } from '../data/tool-agent-co
 import { getGlossary, termId } from './glossary';
 import { sourceText } from './sources';
 import { obligationApiPath } from './obligations';
+import { buildControlsCrosswalk, type ControlsCrosswalk } from './controls-crosswalk';
 
 // ---------------------------------------------------------------------------
 // URLs
@@ -301,6 +303,7 @@ const POLICY_EFFECTS = ['deny', 'allow', 'require_approval', 'alert'] as const;
 const VERIFICATION_KINDS = ['inspect', 'test', 'observe', 'attest'] as const;
 const SUBJECT_KINDS = ['eval-environment', 'eval-run', 'agent', 'tool-server', 'harness', 'model-artefact'] as const;
 const VERIFICATION_TAGS = ['primary', 'secondary', 'reported'] as const;
+const DERIVED_FROM_KINDS = ['pattern', 'schema', 'chapter'] as const;
 
 const personName = (id: string) => personById(id)?.name ?? id;
 
@@ -312,6 +315,17 @@ function threatRef(id: string) {
     name: row?.name ?? id,
     url: abs(`/resources/threats#${row ? threatAnchor(row) : `threat-${id}`}`),
   };
+}
+
+/** Site path of the material a derived control restates. */
+function derivedFromPath(src: ControlSource): string {
+  if (src.kind === 'pattern') {
+    const p = getPatternBySlug(src.ref);
+    return p ? patternPath(p) : `/patterns/${src.ref}`;
+  }
+  if (src.kind === 'schema') return `/schemas/${src.ref}.v1.json`;
+  const chapter = chapters.find((c) => c.slug === src.ref);
+  return `/bok/${chapter?.slug ?? src.ref}`;
 }
 
 /** One control as the API publishes it. */
@@ -354,6 +368,13 @@ export function controlRecord(row: Control) {
         url: abs(seed ? `${agentChapter}#${agentAnchors[seed.anchor]}` : agentChapter),
       };
     }),
+    // Site material a derived control restates: a pattern page, a record schema
+    // file of the templates library or a chapter page (always present, [] when none).
+    derivedFrom: (row.derivedFrom ?? []).map((src) => ({
+      kind: src.kind,
+      ref: src.ref,
+      url: abs(derivedFromPath(src)),
+    })),
     mappings: {
       obligations: m.obligations.map((id) => ({
         id,
@@ -446,6 +467,14 @@ export const controlSchema = s.obj(
     seeds: s.arr(
       s.obj({ id: s.str('Agent control id.'), title: s.str('Agent control title.'), url: s.uri('Chapter 23 section.') }),
       'Chapter-23 agent controls the control builds on.',
+    ),
+    derivedFrom: s.arr(
+      s.obj({
+        kind: s.enumOf(DERIVED_FROM_KINDS, 'What the source is: a pattern, a record schema or a chapter.'),
+        ref: s.str('Pattern slug, record schema id or chapter slug.'),
+        url: s.uri('Pattern page, schema file or chapter page.'),
+      }),
+      'Site material a derived control restates; empty when none.',
     ),
     mappings: s.obj(
       {
@@ -564,6 +593,53 @@ const controlProfileSchema = s.obj({
     'How to cite this profile version.',
   ),
 });
+
+// Block orp2-crosswalk: the controls read from the framework side
+// (lib/controls-crosswalk.ts), published as the `crosswalk` key of the
+// controls dataset. Site paths (obligation pages) become absolute URLs.
+
+function crosswalkRecord(crosswalk: ControlsCrosswalk) {
+  return {
+    frameworks: crosswalk.frameworks.map((fw) => ({
+      id: fw.id,
+      name: fw.name,
+      url: fw.url === null ? null : abs(fw.url),
+      note: fw.note,
+      rows: fw.rows.map((r) => ({
+        ref: r.ref,
+        name: r.name,
+        url: r.url === null ? null : abs(r.url),
+        note: r.note,
+        controls: [...r.controls],
+      })),
+    })),
+  };
+}
+
+const crosswalkSchema = s.obj(
+  {
+    frameworks: s.arr(
+      s.obj({
+        id: s.str('Stable framework id, also the anchor of its table on /controls/crosswalk.'),
+        name: s.str('Framework name.'),
+        url: s.uriOrNull('Public source of the framework, when there is one.'),
+        note: s.strOrNull('Note on the framework or on how its rows are read.'),
+        rows: s.arr(
+          s.obj({
+            ref: s.str('Clause or id as the framework prints it (for NIST SP 800-53, the control family).'),
+            name: s.str('Its name or text.'),
+            url: s.uriOrNull('Public page of the clause or id, when there is one.'),
+            note: s.strOrNull('Note on the row.'),
+            controls: s.arr(s.str('Control id (AIGE-CTL-...).'), 'The controls that map to it, in registry order.'),
+          }),
+          'One row per clause or id some control maps to, sorted naturally.',
+        ),
+      }),
+      'Only frameworks some control maps to, in a fixed order.',
+    ),
+  },
+  'The controls read from the framework side: each clause or id with the controls that map to it. Illustrative, not a claim of conformity.',
+);
 
 // ---------------------------------------------------------------------------
 // The dataset registry.
@@ -1458,11 +1534,13 @@ export const datasets: readonly Dataset[] = [
       asOf: CONTROLS_AS_OF,
       profiles: controlProfiles.map(controlProfileRecord),
       controls: controls.map(controlRecord),
+      crosswalk: crosswalkRecord(buildControlsCrosswalk(controls)),
     }),
     properties: {
       asOf: s.date('Date the profiles were last checked against their sources.'),
       profiles: s.arr(controlProfileSchema, 'The control profiles.'),
       controls: s.arr(controlSchema, 'Every control, in profile and id order.'),
+      crosswalk: crosswalkSchema,
     },
   },
 ];

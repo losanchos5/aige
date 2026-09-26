@@ -44,9 +44,9 @@ nuevo añade su import en `controls/index.ts` y su sección en `sources/SOURCES.
 
 ## 5. orp2-crosswalk (ola 1)
 
-- [ ] 5.1 `site/src/lib/controls-crosswalk.ts` (`buildControlsCrosswalk`) y clave `crosswalk` en el dataset `controls` con esquema cerrado; verificar `schemas-check` y el JSON validado.
-- [ ] 5.2 `pages/controls/crosswalk.astro` (una tabla por marco con `data-label`, vista inversa por perfil, avisos, nota AIUC, sin JS) y `crosswalk.md.ts`; enlace desde `/controls` (`#ecosystem`).
-- [ ] 5.3 `tests/controls-crosswalk.spec.ts` (ids resuelven, pares = registro, sin "compliant"/"certified"/U+2014, un ld+json `CollectionPage`); build verde y handoff con peticiones (OG, `_headers`, lhci, HUBS).
+- [x] 5.1 `site/src/lib/controls-crosswalk.ts` (`buildControlsCrosswalk`) y clave `crosswalk` en el dataset `controls` con esquema cerrado; verificar `schemas-check` y el JSON validado.
+- [x] 5.2 `pages/controls/crosswalk.astro` (una tabla por marco con `data-label`, vista inversa por perfil, avisos, nota AIUC, sin JS) y `crosswalk.md.ts`; enlace desde `/controls` (`#ecosystem`).
+- [x] 5.3 `tests/controls-crosswalk.spec.ts` (ids resuelven, pares = registro, sin "compliant"/"certified"/U+2014, un ld+json `CollectionPage`); build verde y handoff con peticiones (OG, `_headers`, lhci, HUBS).
 
 ## 6. orp2-pages (ola 1)
 
