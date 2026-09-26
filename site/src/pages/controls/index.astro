@@ -332,10 +332,8 @@ const jsonLd = collectionPage({
         {
           machine.map((l) => (
             <li>
-              <a href={l.href} {...machineEvent(l)}>
-                {l.label}
-              </a>
-              : {l.note}.
+              <a href={l.href} {...machineEvent(l)}>{l.label}</a>:
+              {l.note}.
             </li>
           ))
         }

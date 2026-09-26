@@ -178,6 +178,7 @@ for (const c of specified) {
 
       const main = page.locator('main');
       await expect(main.locator(`a[href="${profilePath(profile)}"]`).first()).toHaveCount(1);
+      await expect(main.locator(`a[href="/controls/crosswalk#by-profile-${profile.slug}"]`)).toHaveCount(1);
       await expect(main.locator('h2#record')).toHaveCount(1);
       await expect(main.locator('h2#examples')).toHaveCount(1);
       await expect(main.locator(`a[href="/api/v1/controls/${controlSlug(c)}.json"]`).first()).toHaveCount(1);
@@ -214,3 +215,29 @@ for (const c of specified) {
     });
   });
 }
+
+// The journey of block orp2-seo-qa: /controls -> profile -> control page ->
+// crosswalk -> back, every hop a link in <main>, read from dist.
+test('the journey /controls, profile, control page, crosswalk and back links in <main>', () => {
+  const mainOf = (route: string): string => {
+    const page = readFileSync(join('dist', `${route}.html`), 'utf8');
+    return /<main[\s\S]*?<\/main>/.exec(page)?.[0] ?? '';
+  };
+  const hrefs = (route: string): Set<string> =>
+    new Set([...mainOf(route).matchAll(/href="([^"]*)"/g)].map((m) => m[1].split('#')[0]));
+  const crosswalk = hrefs('/controls/crosswalk');
+  expect(hrefs('/controls').has('/controls/crosswalk')).toBe(true);
+  expect(crosswalk.has('/controls')).toBe(true);
+  for (const profile of profiles) {
+    const path = profilePath(profile);
+    expect(hrefs('/controls').has(path), path).toBe(true);
+    expect(hrefs(path).has('/controls/crosswalk'), path).toBe(true);
+    expect(crosswalk.has(path), path).toBe(true);
+  }
+  for (const c of specified) {
+    const path = pathOf(c);
+    expect(hrefs(profilePath(c.profile)).has(path), path).toBe(true);
+    expect(hrefs(path).has('/controls/crosswalk'), path).toBe(true);
+    expect(crosswalk.has(path), path).toBe(true);
+  }
+});

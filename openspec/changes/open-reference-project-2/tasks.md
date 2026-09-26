@@ -67,7 +67,7 @@ nuevo añade su import en `controls/index.ts` y su sección en `sources/SOURCES.
 ## 9. Ola 2: revisión
 
 - [x] 9.1 Revisión de contenido adversarial: cada afirmación de los controles nuevos o promovidos contra su fuente abierta (URL, cita, fecha); cada `derived` contra su patrón o esquema; mapeos AIUC-1 contra la página pública; corregir o degradar a `stub`/`derived`.
-- [ ] 9.2 SEO/OG + QA/a11y: títulos, descripciones, ld+json, OG, `llms.txt`, sitemap, recorrido `/controls` → perfil → control → crosswalk en móvil y escritorio, sin grupo de nav nuevo; comprobar que el servidor MCP no depende de slugs de perfil fijos.
+- [x] 9.2 SEO/OG + QA/a11y: títulos, descripciones, ld+json, OG, `llms.txt`, sitemap, recorrido `/controls` → perfil → control → crosswalk en móvil y escritorio, sin grupo de nav nuevo; comprobar que el servidor MCP no depende de slugs de perfil fijos.
 - [ ] 9.3 `code-reviewer` sobre el diff completo; corregir CRITICAL y HIGH.
 
 ## 10. Verificación, PR y despliegue (integrador)

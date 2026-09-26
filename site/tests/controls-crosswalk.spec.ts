@@ -305,3 +305,29 @@ test.describe('derivedFrom in the controls dataset', () => {
     expect(controlRecord({ ...controls[0], derivedFrom: undefined }).derivedFrom).toEqual([]);
   });
 });
+
+// Block orp2-seo-qa: axe's landmark-unique. OWASP's lists sit both in the
+// obligation register and among the threat catalogues under one name, so each
+// scrollable table region must still get a name of its own.
+test('every table region of the crosswalk has a unique accessible name', () => {
+  test.skip(!hasDist && !process.env.CI, 'dist not built');
+  const main = mainOf(read(PAGE));
+  const headings = new Map(
+    [...main.matchAll(/<h[23][^>]*\bid="([^"]+)"[^>]*>([\s\S]*?)<\/h[23]>/g)].map((m) => [
+      m[1],
+      decode(m[2].replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim(),
+    ]),
+  );
+  const names = [...main.matchAll(/role="region"[^>]*aria-labelledby="([^"]+)"/g)].map((m) =>
+    m[1]
+      .split(' ')
+      .map((id) => {
+        expect(headings.has(id), id).toBe(true);
+        return headings.get(id);
+      })
+      .join(' '),
+  );
+  expect(names.length).toBeGreaterThan(5);
+  const dupes = names.filter((name, i) => names.indexOf(name) !== i);
+  expect(dupes, dupes.join('\n')).toEqual([]);
+});

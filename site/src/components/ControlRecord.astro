@@ -92,10 +92,7 @@ const pagePath = standalone ? null : controlPagePath(c);
       <p class="ctl-state">
         Derived from{' '}
         {restates.map((s, i) => (
-          <>
-            {i > 0 && (i === restates.length - 1 ? ' and ' : ', ')}
-            <a href={s.href}>{s.label}</a>
-          </>
+          <>{i > 0 && (i === restates.length - 1 ? ' and ' : ', ')}<a href={s.href}>{s.label}</a></>
         ))}{' '}
         and restated as a control; requires technical review.
       </p>
@@ -187,12 +184,7 @@ const pagePath = standalone ? null : controlPagePath(c);
     <dd>
       {
         layerRows.map((l, i) => (
-          <>
-            {i > 0 && ', '}
-            <a href={`/bok/the-stack#${l.chapterAnchor}`}>
-              Layer {String(l.n).padStart(2, '0')} {l.name}
-            </a>
-          </>
+          <>{i > 0 && ', '}<a href={`/bok/the-stack#${l.chapterAnchor}`}>{`Layer ${String(l.n).padStart(2, '0')} ${l.name}`}</a></>
         ))
       }
     </dd>
@@ -203,10 +195,7 @@ const pagePath = standalone ? null : controlPagePath(c);
           <dt>Patterns</dt>
           <dd>
             {patternRows.map((p, i) => (
-              <>
-                {i > 0 && ', '}
-                <a href={patternPath(p)}>{p.title}</a>
-              </>
+              <>{i > 0 && ', '}<a href={patternPath(p)}>{p.title}</a></>
             ))}
           </dd>
         </>
@@ -219,10 +208,7 @@ const pagePath = standalone ? null : controlPagePath(c);
           <dt>Seeded from</dt>
           <dd>
             {seedRows.map((s, i) => (
-              <>
-                {i > 0 && ', '}
-                <a href={`${agentChapter}#${agentAnchors[s.anchor]}`}>{s.title}</a>
-              </>
+              <>{i > 0 && ', '}<a href={`${agentChapter}#${agentAnchors[s.anchor]}`}>{s.title}</a></>
             ))}
           </dd>
         </>
@@ -239,10 +225,7 @@ const pagePath = standalone ? null : controlPagePath(c);
                 <li>
                   <span class="ctl-k">Obligations:</span>{' '}
                   {m.obligations.map((id, i) => (
-                    <>
-                      {i > 0 && '; '}
-                      <a href={obligationPath({ id })}>{obligationLabel(id)}</a>
-                    </>
+                    <>{i > 0 && '; '}<a href={obligationPath({ id })}>{obligationLabel(id)}</a></>
                   ))}
                 </li>
               )}
@@ -264,12 +247,7 @@ const pagePath = standalone ? null : controlPagePath(c);
                   {m.owasp.map((id, i) => {
                     const t = threatRow(id);
                     return (
-                      <>
-                        {i > 0 && '; '}
-                        <a href={`/resources/threats#${threatAnchor(t)}`}>
-                          {t.externalId} {t.name}
-                        </a>
-                      </>
+                      <>{i > 0 && '; '}<a href={`/resources/threats#${threatAnchor(t)}`}>{`${t.externalId} ${t.name}`}</a></>
                     );
                   })}
                 </li>
@@ -280,12 +258,7 @@ const pagePath = standalone ? null : controlPagePath(c);
                   {(m.atlas ?? []).map((id, i) => {
                     const t = threatRow(id);
                     return (
-                      <>
-                        {i > 0 && '; '}
-                        <a href={`/resources/threats#${threatAnchor(t)}`}>
-                          {t.externalId} {t.name}
-                        </a>
-                      </>
+                      <>{i > 0 && '; '}<a href={`/resources/threats#${threatAnchor(t)}`}>{`${t.externalId} ${t.name}`}</a></>
                     );
                   })}
                 </li>
