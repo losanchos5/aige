@@ -39,8 +39,8 @@ nuevo añade su import en `controls/index.ts` y su sección en `sources/SOURCES.
 
 - [ ] 4.1 `data-admission-and-privacy.ts`: 8-12 controles `AIGE-CTL-DATA-NNN` derivados de `dataset-admission-gate`, `training-data-rights-ledger`, `downstream-use-register`, esquemas `dataset-admission-record`, `dataset-card`, `training-record`, capítulos 14 y 19, obligaciones GDPR y Art. 10; verificar recuento y `derivedFrom` en `controls.spec.ts`.
 - [ ] 4.2 `deployment-and-monitoring.ts`: 10-15 controles `AIGE-CTL-DEPLOY-NNN` desde `staged-rollout-rollback-criteria`, `human-in-the-loop-gate`, `shadow-ai-discovery`, `sanctioned-ai-gateway`, esquemas de despliegue y monitorización, capítulos 15-17, Arts. 9, 14, 26, 72, 73; verificar igual.
-- [ ] 4.3 `assurance-and-evidence.ts`: 8-12 controles `AIGE-CTL-ASSURE-NNN` desde `machine-readable-evidence-oscal`, `continuous-assurance-telemetry`, `eval-gate-in-ci`, `model-artefact-integrity`, `aibom`, esquemas de evidencia y pruebas, capítulos 05, 14, 18, 22, ISO/IEC 42001 cláusula 9, NIST AI RMF MEASURE/MANAGE, AIUC-1 dominio E; verificar igual.
-- [ ] 4.4 Cada perfil: import en `controls/index.ts`, sección en `sources/SOURCES.md` solo con filas reutilizadas, mapeos solo a ids existentes; build verde y handoff `orp2-<perfil>.json`.
+- [x] 4.3 `assurance-and-evidence.ts`: 8-12 controles `AIGE-CTL-ASSURE-NNN` desde `machine-readable-evidence-oscal`, `continuous-assurance-telemetry`, `eval-gate-in-ci`, `model-artefact-integrity`, `aibom`, esquemas de evidencia y pruebas, capítulos 05, 14, 18, 22, ISO/IEC 42001 cláusula 9, NIST AI RMF MEASURE/MANAGE, AIUC-1 dominio E; verificar igual.
+- [x] 4.4 Cada perfil: import en `controls/index.ts`, sección en `sources/SOURCES.md` solo con filas reutilizadas, mapeos solo a ids existentes; build verde y handoff `orp2-<perfil>.json`.
 
 ## 5. orp2-crosswalk (ola 1)
 
