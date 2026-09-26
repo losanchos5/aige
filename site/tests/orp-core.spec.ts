@@ -8,6 +8,7 @@ import {
   controls,
   profiles,
   controlProblems,
+  controlIdSequenceProblems,
   controlsIn,
   controlById,
   controlHref,
@@ -39,6 +40,14 @@ test.describe('open control registry', () => {
     expect(controlsIn('evaluation-environment').map((c) => c.id)).toEqual(ids('EVAL', 9));
     expect(controlsIn('agent-runtime').map((c) => c.id)).toEqual(ids('AGENT', 31));
     expect(controls.map((c) => c.id)).toEqual([...ids('EVAL', 9), ...ids('AGENT', 31)]);
+  });
+
+  test('a deleted id listed as retired is an occupied slot, not a gap', () => {
+    const live = ids('EVAL', 9).filter((id) => id !== 'AIGE-CTL-EVAL-004');
+    expect(controlIdSequenceProblems('t', 'EVAL', live, [])).not.toEqual([]);
+    expect(controlIdSequenceProblems('t', 'EVAL', live, ['AIGE-CTL-EVAL-004'])).toEqual([]);
+    expect(controlIdSequenceProblems('t', 'EVAL', ids('EVAL', 9), ['AIGE-CTL-EVAL-010'])).toEqual([]);
+    expect(controlIdSequenceProblems('t', 'EVAL', ids('EVAL', 9), ['AIGE-CTL-EVAL-011'])).not.toEqual([]);
   });
 
   test('each agent runtime control restates one chapter-23 seed, in module order', () => {

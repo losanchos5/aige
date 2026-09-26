@@ -5,6 +5,7 @@ import { defineCollection, z } from 'astro:content';
 import { glob, type Loader } from 'astro/loaders';
 import { i18nDir } from './lib/i18n-content';
 import { isPublishedLocale } from './i18n/locales';
+import { CONTROL_ID_PATTERN } from './data/controls/ids';
 
 // The Thesis and the changelog files carry no frontmatter; passthrough keeps
 // validation permissive.
@@ -79,8 +80,8 @@ const research = defineCollection({
       id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
       /** The note's title: its H1 and <title>; must equal data/research.ts. */
       title: z.string().min(10).max(120),
-      /** One or two sentences, 50-160 characters: the lede and meta description. */
-      summary: z.string().min(50).max(160),
+      /** One or two sentences, 70-160 characters: the lede and meta description. */
+      summary: z.string().min(70).max(160),
       /** A published note needs at least one named reviewer. */
       status: z.enum(['draft', 'review', 'published']),
       /** The note's own semantic version (not the Body of Knowledge's). */
@@ -94,7 +95,7 @@ const research = defineCollection({
       /** Ids of data/people.ts; empty until a named reviewer has reviewed the note. */
       reviewers: z.array(z.string().min(1)).default([]),
       /** Control ids the note argues for (AIGE-CTL-<PROFILE>-NNN). */
-      relatedControls: z.array(z.string().regex(/^AIGE-CTL-[A-Z]+-\d{3}$/)).default([]),
+      relatedControls: z.array(z.string().regex(CONTROL_ID_PATTERN)).default([]),
       /** Pattern slugs of data/patterns.ts. */
       relatedPatterns: z.array(z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)).default([]),
       keywords: z.array(z.string().min(1)).optional(),

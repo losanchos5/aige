@@ -20,10 +20,12 @@
 // - Upper-case ASCII letters and digits for <PROFILE>, three digits for <NNN>
 //   (CONTROL_ID_PATTERN), in the family of the AIGE-OBL-... obligation ids.
 // - Within a profile the numbers run 001, 002, ... in data order, one prefix per
-//   profile.
-// - An id is assigned once and never changes: new wording keeps the id. A
-//   control that is removed has its id moved to `retiredControlIds` and the id
-//   is never reused.
+//   profile, with no gap (controlIdSequenceProblems).
+// - An id is assigned once and never changes: new wording keeps the id, and an
+//   id is never reused. Retiring a control keeps its row with `status:
+//   'retired'`, so the sequence stays whole. A row deleted outright has its id
+//   moved to `retiredControlIds`; the validator counts it as an occupied slot of
+//   its prefix when it checks the sequence.
 // - The public anchor of a control is its id in lower case on the profile page
 //   (/controls/<profile>#aige-ctl-eval-002) and its JSON is
 //   /api/v1/controls/<id in lower case>.json.
@@ -51,15 +53,18 @@ import { schemaOrder } from '../templates';
 import { personById } from '../people';
 import { evaluationEnvironmentProfile, evaluationEnvironmentControls } from './evaluation-environment';
 import { agentRuntimeProfile, agentRuntimeControls } from './agent-runtime';
+import { CONTROL_ID_PATTERN } from './ids';
 
 export const CONTROLS_AS_OF = '2026-09-26';
 
-/** The shape every control id must match. */
-export const CONTROL_ID_PATTERN = /^AIGE-CTL-[A-Z0-9]+-\d{3}$/;
+/** The shape every control id must match (./ids.ts). */
+export { CONTROL_ID_PATTERN };
 
 /**
- * Ids of controls that were removed. They stay here so they are never reused;
- * an id in this list must not appear in `controls`.
+ * Ids of controls whose rows were deleted outright (a retired control that keeps
+ * its row carries `status: 'retired'` instead). They stay here so they are never
+ * reused and so the id sequence of their profile keeps no gap; an id in this
+ * list must not appear in `controls`.
  */
 export const retiredControlIds: readonly string[] = [];
 
@@ -325,6 +330,34 @@ function tooLong(text: string, max: number): boolean {
   return text.length > max;
 }
 
+/**
+ * The id rule of one profile: its live ids, in data order, and the deleted ids
+ * of the same prefix (`retired`) together fill 001, 002, ... with no gap, and
+ * the live ids rise in data order. A deleted id is an occupied slot, never a
+ * gap. Pure, so tests can feed it a simulated retirement.
+ */
+export function controlIdSequenceProblems(
+  at: string,
+  prefix: string,
+  liveIds: readonly string[],
+  retired: readonly string[],
+): string[] {
+  const problems: string[] = [];
+  const idOf = (n: number) => `AIGE-CTL-${prefix}-${String(n).padStart(3, '0')}`;
+  const ofPrefix = new RegExp(`^AIGE-CTL-${prefix}-\\d{3}$`);
+  const deleted = new Set(retired.filter((id) => ofPrefix.test(id) && !liveIds.includes(id)));
+  const total = liveIds.length + deleted.size;
+  const expected: string[] = [];
+  for (let n = 1; n <= total; n++) if (!deleted.has(idOf(n))) expected.push(idOf(n));
+  liveIds.forEach((id, i) => {
+    if (id !== expected[i]) problems.push(`${at}: control ${i + 1} is ${id}, expected ${expected[i] ?? 'no further control'}`);
+  });
+  for (const id of deleted) {
+    if (Number(id.slice(-3)) > total) problems.push(`${at}: retired id ${id} leaves a gap in the sequence`);
+  }
+  return problems;
+}
+
 /** Every broken reference or rule in the registry; empty when all hold. */
 export function controlProblems(): string[] {
   const problems: string[] = [];
@@ -368,10 +401,7 @@ export function controlProblems(): string[] {
     const owner = prefixes.get(prefix);
     if (owner && owner !== p.slug) problems.push(`${at}: id prefix ${prefix} already used by ${owner}`);
     prefixes.set(prefix, p.slug);
-    rows.forEach((row, i) => {
-      const expected = `AIGE-CTL-${prefix}-${String(i + 1).padStart(3, '0')}`;
-      if (row.id !== expected) problems.push(`${at}: control ${i + 1} is ${row.id}, expected ${expected}`);
-    });
+    problems.push(...controlIdSequenceProblems(at, prefix, rows.map((r) => r.id), retiredControlIds));
     if (JSON.stringify(p).includes(EM_DASH)) problems.push(`${at}: em dash`);
   }
 
@@ -435,8 +465,8 @@ export function controlProblems(): string[] {
       if (!OBLIGATION_ID_PATTERN.test(id)) problems.push(`${at}: malformed obligation id ${id}`);
       else if (!obligationIds.has(id)) problems.push(`${at}: unknown obligation ${id}`);
     }
-    for (const id of m.iso42001) if (!(id in iso42001Controls)) problems.push(`${at}: unknown ISO/IEC 42001 control ${id}`);
-    for (const id of m.nistAiRmf) if (!(id in nistAiRmfSubcategories)) problems.push(`${at}: unknown NIST AI RMF subcategory ${id}`);
+    for (const id of m.iso42001) if (!Object.hasOwn(iso42001Controls, id)) problems.push(`${at}: unknown ISO/IEC 42001 control ${id}`);
+    for (const id of m.nistAiRmf) if (!Object.hasOwn(nistAiRmfSubcategories, id)) problems.push(`${at}: unknown NIST AI RMF subcategory ${id}`);
     for (const id of m.owasp) {
       const tax = threatTaxonomy.get(id);
       if (!tax) problems.push(`${at}: unknown OWASP row ${id}`);
@@ -482,7 +512,7 @@ export function controlProblems(): string[] {
     }
     if (c.observation) {
       const o = c.observation;
-      if (!(o.subjectKind in subjectKindLabels)) problems.push(`${at}: unknown subject kind ${o.subjectKind}`);
+      if (!Object.hasOwn(subjectKindLabels, o.subjectKind)) problems.push(`${at}: unknown subject kind ${o.subjectKind}`);
       if (!o.expected.trim() || !o.observedExample.trim()) problems.push(`${at}: incomplete observation`);
     }
     if (JSON.stringify(c).includes(EM_DASH)) problems.push(`${at}: em dash`);

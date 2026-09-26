@@ -2343,7 +2343,7 @@ export function caseNoteProblems(): string[] {
     }
     const seen = new Set<string>();
     for (const id of c.relatedControls ?? []) {
-      if (!controlById(id)) problems.push(`${c.id}: unknown control "${id}"`);
+      if (controlById(id)?.id !== id) problems.push(`${c.id}: unknown control "${id}"`);
       if (seen.has(id)) problems.push(`${c.id}: control "${id}" listed twice`);
       seen.add(id);
     }
