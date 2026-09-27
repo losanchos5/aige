@@ -845,3 +845,33 @@
 .ob-dl:hover {
   border-color: var(--ink-2);
 }
+
+/* ---- Reference pages in bands (visual-rhythm) ----
+   On a page still built as one .res-page column, every second top-level
+   block becomes a full-bleed tinted band (the .bleed technique from
+   effects.css, inlined here because the blocks are page markup), the tones
+   turning blue, amber, sage, rose so no two bands repeat. A tint is not a
+   mesh, so tables may sit on it. The detail pages close on a band too: the
+   "more cases / more obligations / more figures" navigation. */
+.res-page > .res-section:nth-child(even of .res-section),
+.res-page .cs-nav,
+.res-page .fg-pager {
+  --band-fill: var(--tint-l1);
+  --muted: var(--ink-2);
+  padding-block: var(--s-6);
+  border-image: conic-gradient(var(--band-fill) 0 0) fill 0 / / 0 100vmax;
+}
+
+.res-page > .res-section:nth-child(4n of .res-section) {
+  --band-fill: var(--tint-l4);
+}
+
+.res-page > .res-section:nth-child(6n of .res-section) {
+  --band-fill: var(--tint-l2);
+}
+
+.res-page .cs-nav,
+.res-page .fg-pager {
+  --band-fill: var(--tint-l3);
+  margin-top: var(--s-7);
+}
