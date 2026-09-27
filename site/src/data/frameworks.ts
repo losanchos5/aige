@@ -25,7 +25,7 @@
 //   ISO42001, ISO42005, ISO42006, ISO23894, ISO22989, NISTRMF (NIST AI RMF
 //   functions), NIST (other NIST work), CSA, OWASP, CEN (CEN-CENELEC JTC 21),
 //   USCA, USNY, USTX, USCO, USIL, USUT, USVA, USMN, USWA (US states), USNYC (New
-//   York City), USFED (US federal), KR, SG, UK, CAN (Canada), BR (Brazil), ETSI,
+//   York City), USFED (US federal), USGAO (US GAO audit framework), KR, SG, UK, CAN (Canada), BR (Brazil), ETSI,
 //   CN (China), COE (Council of Europe), OECD and G7.
 // - <CLAUSE> is the article, clause, function or document number the row names
 //   (ART9, ART4A, ART49-71, A5, GOVERN, IR8596); a paragraph or point joins it
@@ -203,6 +203,7 @@ const US_FRONTIER_ANCHOR = 'frontier-developer-laws';
 const US_STATE_ANCHOR = 'other-state-ai-laws';
 const US_PRIVACY_ANCHOR = 'state-privacy-and-sector-laws';
 const US_FEDERAL_ANCHOR = 'federal-law-that-already-reaches-ai';
+const US_OVERSIGHT_ANCHOR = 'federal-audit-and-oversight';
 const KOREA_ANCHOR = 'south-korea-article-by-article';
 const UK_ANCHOR = 'united-kingdom';
 const INTL_ANCHOR = 'treaty-and-international-soft-law';
@@ -720,6 +721,16 @@ export const frameworks: readonly Framework[] = [
     url: 'https://www.govinfo.gov/content/pkg/PLAW-119publ12/html/PLAW-119publ12.htm',
     summary:
       'A US federal law enacted on 19 May 2025 that criminalises knowing publication of non-consensual intimate images, including digital forgeries, and requires covered platforms to run a notice-and-removal process by 19 May 2026, removing reported images within 48 hours.',
+  },
+  {
+    id: 'us-gao-ai-accountability',
+    name: 'GAO AI Accountability Framework (GAO-21-519SP)',
+    short: 'GAO AI Accountability',
+    type: 'framework',
+    issuer: 'U.S. Government Accountability Office',
+    url: 'https://www.gao.gov/products/gao-21-519sp',
+    summary:
+      'An audit framework published on 30 June 2021: four principles (governance, data, performance, monitoring) and 31 key practices, each with questions for the entity and procedures for auditors and third-party assessors. Written for federal agencies and other entities; binds no one.',
   },
   {
     id: 'tx-traiga',
@@ -4044,6 +4055,84 @@ export const obligations: readonly Obligation[] = [
     appliesStatus: 'in-force',
     appliesNote: 'Enacted 2025-05-19; the notice-and-removal process was due by 2026-05-19',
     reviewed: REVIEWED_V050,
+  },
+
+  // US federal audit and oversight
+  {
+    id: 'AIGE-OBL-USGAO-GOV',
+    frameworkId: 'us-gao-ai-accountability',
+    framework: 'US federal audit and oversight',
+    clause: 'principle 1 (governance), practices 1.1 to 1.9',
+    obligation: 'GAO AI Accountability Framework principle 1: governance',
+    requirement:
+      'Clear goals, roles and delegation of authority, values, a multidisciplinary workforce, stakeholder involvement and an AI-specific risk management plan, plus documented technical specifications, compliance with applicable law and transparency to external stakeholders',
+    artefact:
+      'Registry entry with owner and intended purpose; RACI; risk register as code; compliance mapping; published system card',
+    layerN: [1, 2, 5],
+    anchor: US_OVERSIGHT_ANCHOR,
+    scope: 'Federal agencies and other entities; auditors and third-party assessors',
+    authority: 'U.S. Government Accountability Office; inspectors general',
+    appliesFrom: '2021-06-30',
+    appliesStatus: 'voluntary',
+    appliesNote: 'Non-binding audit framework; published 2021-06-30',
+    reviewed: '2026-09-27',
+  },
+  {
+    id: 'AIGE-OBL-USGAO-DATA',
+    frameworkId: 'us-gao-ai-accountability',
+    framework: 'US federal audit and oversight',
+    clause: 'principle 2 (data), practices 2.1 to 2.8',
+    obligation: 'GAO AI Accountability Framework principle 2: data',
+    requirement:
+      'Document the sources and origins of development data and assess their reliability, categorisation, variable selection and any synthetic, imputed or augmented data; assess the dependencies, bias, security and privacy of the data used in operation',
+    artefact:
+      'Dataset datasheet with lineage; data-quality and representativeness evals; data-flow map',
+    layerN: [2, 3],
+    anchor: US_OVERSIGHT_ANCHOR,
+    scope: 'Federal agencies and other entities; auditors and third-party assessors',
+    authority: 'U.S. Government Accountability Office; inspectors general',
+    appliesFrom: '2021-06-30',
+    appliesStatus: 'voluntary',
+    appliesNote: 'Non-binding audit framework; published 2021-06-30',
+    reviewed: '2026-09-27',
+  },
+  {
+    id: 'AIGE-OBL-USGAO-PERF',
+    frameworkId: 'us-gao-ai-accountability',
+    framework: 'US federal audit and oversight',
+    clause: 'principle 3 (performance), practices 3.1 to 3.9',
+    obligation: 'GAO AI Accountability Framework principle 3: performance',
+    requirement:
+      'Catalogue components, define precise, consistent and reproducible metrics, assess each component and the whole system against them, identify biases and define procedures for human supervision',
+    artefact:
+      'Eval suite with versioned metrics per component and system; bias eval; human-oversight procedure',
+    layerN: [3, 4],
+    anchor: US_OVERSIGHT_ANCHOR,
+    scope: 'Federal agencies and other entities; auditors and third-party assessors',
+    authority: 'U.S. Government Accountability Office; inspectors general',
+    appliesFrom: '2021-06-30',
+    appliesStatus: 'voluntary',
+    appliesNote: 'Non-binding audit framework; published 2021-06-30',
+    reviewed: '2026-09-27',
+  },
+  {
+    id: 'AIGE-OBL-USGAO-MON',
+    frameworkId: 'us-gao-ai-accountability',
+    framework: 'US federal audit and oversight',
+    clause: 'principle 4 (monitoring), practices 4.1 to 4.5',
+    obligation: 'GAO AI Accountability Framework principle 4: monitoring',
+    requirement:
+      "Plan continuous or routine monitoring, set the acceptable range of data and model drift, document monitoring results and corrective actions, and reassess the system's utility and the conditions for scaling it",
+    artefact:
+      'Monitoring plan with drift thresholds; monitoring log with corrective actions; periodic review record',
+    layerN: [4, 5],
+    anchor: US_OVERSIGHT_ANCHOR,
+    scope: 'Federal agencies and other entities; auditors and third-party assessors',
+    authority: 'U.S. Government Accountability Office; inspectors general',
+    appliesFrom: '2021-06-30',
+    appliesStatus: 'voluntary',
+    appliesNote: 'Non-binding audit framework; published 2021-06-30',
+    reviewed: '2026-09-27',
   },
 
   // Other jurisdictions

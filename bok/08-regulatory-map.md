@@ -575,6 +575,24 @@ and [deepfakes and synthetic media](/bok/existing-law#deepfakes-and-synthetic-me
 | FTC Act s. 5 (`15 U.S.C. 45`) | Businesses making AI claims | Deceptive acts or practices are unlawful: claims about an AI system's accuracy, performance or fairness need competent and reliable evidence before they are made [104][105] | Claims register linked to current eval runs; substantiation gate on release copy | 1 · 3 · 5 |
 | TAKE IT DOWN Act (Public Law 119-12), process due 2026-05-19 | Covered platforms | Covered platforms run a notice-and-removal process and remove reported non-consensual intimate images, incl. AI-generated forgeries, and known identical copies within 48 hours of a valid request [106] | Takedown pipeline with a 48-hour clock, owner and log; matching of identical copies | 4 · 5 |
 
+### Federal audit and oversight
+
+Auditors bring their own lens. The GAO AI Accountability Framework (GAO-21-519SP, 30 June 2021)
+binds no one, but it is what the US Government Accountability Office, inspectors general and
+third-party assessors use to audit an AI system, and it holds "other entities" to the same practices
+as federal agencies [120]. It has four principles (governance, data, performance, monitoring) and 31
+key practices, each with questions for the entity and audit procedures for the assessor. An entity
+that can answer those questions from its own records is ready for the audit. It does not replace the
+NIST AI RMF (the operational risk process) or a binding law such as the EU AI Act; it is the check
+applied to both.
+
+| Framework | Scope | What it asks for | Engineering artefact | Layer |
+|---|---|---|---|---|
+| GAO AI Accountability Framework, principle 1 (governance), practices 1.1 to 1.9 | Federal agencies and other entities; auditors and third-party assessors | Clear goals, roles and delegation of authority, values, a multidisciplinary workforce, stakeholder involvement and an AI-specific risk management plan, plus documented technical specifications, compliance with applicable law and transparency to external stakeholders [120] | Registry entry with owner and intended purpose; RACI; risk register as code; compliance mapping; published system card | 1 · 2 · 5 |
+| GAO AI Accountability Framework, principle 2 (data), practices 2.1 to 2.8 | Federal agencies and other entities; auditors and third-party assessors | Document the sources and origins of development data and assess their reliability, categorisation, variable selection and any synthetic, imputed or augmented data; assess the dependencies, bias, security and privacy of the data used in operation [120] | Dataset datasheet with lineage; data-quality and representativeness evals; data-flow map | 2 · 3 |
+| GAO AI Accountability Framework, principle 3 (performance), practices 3.1 to 3.9 | Federal agencies and other entities; auditors and third-party assessors | Catalogue components, define precise, consistent and reproducible metrics, assess each component and the whole system against them, identify biases and define procedures for human supervision [120] | Eval suite with versioned metrics per component and system; bias eval; human-oversight procedure | 3 · 4 |
+| GAO AI Accountability Framework, principle 4 (monitoring), practices 4.1 to 4.5 | Federal agencies and other entities; auditors and third-party assessors | Plan continuous or routine monitoring, set the acceptable range of data and model drift, document monitoring results and corrective actions, and reassess the system's utility and the conditions for scaling it [120] | Monitoring plan with drift thresholds; monitoring log with corrective actions; periodic review record | 4 · 5 |
+
 ## Other jurisdictions
 
 The map's spine is the EU AI Act, but a governance function working across borders answers to more
@@ -905,3 +923,4 @@ instruments named above map onto the five-layer stack (chapter 04) and the patte
 [116] "OECD launches global framework to monitor application of G7 Hiroshima AI Code of Conduct" (reporting framework launched 7 February 2025; first reports by 15 April 2025). OECD. 2025-02-07. https://www.oecd.org/en/about/news/press-releases/2025/02/oecd-launches-global-framework-to-monitor-application-of-g7-hiroshima-ai-code-of-conduct.html (verified: primary)
 [118] Public Act 103-0804, HB 3773 (amends the Illinois Human Rights Act, 775 ILCS 5/2-102(L): no AI with a discriminatory effect on protected classes, no ZIP codes as a proxy, notice of AI use; IDHR to adopt rules; approved 9 Aug 2024, effective 1 Jan 2026; text and bill status read from Web Archive captures of 2025-03-29 and 2025-06-17, as ilga.gov refused connections on 2026-09-25). Illinois General Assembly. 2024-08-09. https://www.ilga.gov/legislation/publicacts/fulltext.asp?Name=103-0804 (verified: primary)
 [119] 740 ILCS 14, Biometric Information Privacy Act (Source: P.A. 95-994, eff. 10-3-08; s. 15 retention schedule, written release, secure storage; s. 20 right of action, USD 1,000 negligent or USD 5,000 intentional or reckless per violation; text read from the Web Archive capture of 2025-06-18, as ilga.gov refused connections on 2026-09-25). Illinois General Assembly. 2008-10-03. https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=3004&ChapterID=57 (verified: primary)
+[120] Artificial Intelligence: An Accountability Framework for Federal Agencies and Other Entities, GAO-21-519SP (four principles: governance, data, performance, monitoring; 31 key practices, each with questions for entities and procedures for auditors and third-party assessors). U.S. Government Accountability Office. 2021-06-30. https://www.gao.gov/products/gao-21-519sp (verified: primary)

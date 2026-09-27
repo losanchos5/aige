@@ -27,6 +27,13 @@ controls, every one open for technical review and none reviewed yet.
   without a token, sandbox by default).
 - Mapping indexes: the 53 AIUC-1 requirements from its public index and the 72 NIST AI RMF 1.0
   subcategories from NIST AI 100-1; mappings are now checked against them at build time.
+- The GAO AI Accountability Framework (GAO-21-519SP, 2021): a new "Federal audit and oversight"
+  section in chapter 08 with one register row per principle (`AIGE-OBL-USGAO-GOV`, `-DATA`,
+  `-PERF`, `-MON`), and a fifteenth crosswalk column that maps 27 of its 31 key practices to the
+  topics they audit.
+- The impact-assessment builder cites the Catalan Data Protection Authority's FRIA model (method,
+  risk matrices and four use cases) and the EDPB's draft DPIA template (public consultation closed
+  9 June 2026).
 
 ### Changed
 - Evaluation Environment profile v0.2: controls 001, 004, 005, 007, 008 and 009 are now specified
