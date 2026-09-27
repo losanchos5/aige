@@ -317,6 +317,7 @@ export const FRAMEWORK_FAMILIES: readonly FrameworkFamily[] = [
       'us-title-vii-ugesp',
       'us-ftc-act',
       'us-take-it-down',
+      'us-gao-ai-accountability',
     ],
   },
   {

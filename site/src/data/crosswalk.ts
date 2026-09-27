@@ -15,7 +15,8 @@
 // (/obligations/<id>) and a reworded row never breaks the join. Mappings are
 // illustrative, not a claim of conformity.
 //
-// Version 2 (BoK v0.5.0) widens the grid to 25 topics and 14 columns, keeps a
+// Version 2 (BoK v0.5.0) widens the grid to 25 topics and 14 columns (15 since
+// the GAO audit column of 2026-09-27), keeps a
 // fallback list for instruments the register does not carry yet
 // (`crosswalkInstruments`, looked up after frameworks.ts), and gives every
 // reference a `clauseId` token that the explorer and the OSCAL export reuse.
@@ -142,6 +143,8 @@ const SG_AGENTIC_URL =
   'https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf';
 const COE_URL = 'https://rm.coe.int/1680afae3c';
 const OECD_URL = 'https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449';
+/** GAO-21-519SP, opened 2026-09-27 (framework summary, pp. 5-8). */
+const GAO_URL = 'https://www.gao.gov/products/gao-21-519sp';
 const G7_URL =
   'https://digital-strategy.ec.europa.eu/en/library/hiroshima-process-international-code-conduct-advanced-ai-systems';
 const EN18286_URL =
@@ -461,7 +464,7 @@ export const topics: readonly Topic[] = [
 ];
 
 /**
- * The fourteen columns, in display order. The v0.4 columns keep their ids (eu,
+ * The fifteen columns, in display order. The v0.4 columns keep their ids (eu,
  * iso, nist, cn) and stay the default view; the rest join through the column
  * chooser. Multi-instrument columns prefix their chips from chipPrefix.
  */
@@ -508,6 +511,13 @@ export const columns: readonly CrosswalkColumn[] = [
     id: 'intl',
     label: 'Treaty and soft law',
     frameworks: ['coe-cets-225', 'oecd-ai-principles', 'g7-hiroshima-coc'],
+    group: 'codes',
+  },
+  // The auditor's lens: what an assessor asks for, against the same topics.
+  {
+    id: 'gao',
+    label: 'GAO AI Accountability',
+    frameworks: ['us-gao-ai-accountability'],
     group: 'codes',
   },
   {
@@ -2233,6 +2243,13 @@ const oecd = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra
   mk(t, 'oecd-ai-principles', ref, title, s, OECD_URL, x);
 const g7 = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
   mk(t, 'g7-hiroshima-coc', ref, title, s, G7_URL, x);
+/** GAO key practice; '1.6' joins the principle-1 row, and so on per principle. */
+const GAO_ROWS = ['GOV', 'DATA', 'PERF', 'MON'] as const;
+const gao = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
+  mk(t, 'us-gao-ai-accountability', ref, title, s, GAO_URL, {
+    obligationId: `AIGE-OBL-USGAO-${GAO_ROWS[Number(ref.split('.')[0]) - 1]}`,
+    ...x,
+  });
 
 // Titles reused across topics.
 const T_ART_86 = 'Right to explanation of individual decision-making';
@@ -2987,8 +3004,40 @@ const refsV05: readonly CrosswalkRef[] = [
   }),
 ];
 
-/** Every topic → clause reference: the v0.4 set, then the v0.5.0 additions. */
-export const refs: readonly CrosswalkRef[] = [...refsV04, ...refsV05];
+// GAO AI Accountability Framework (GAO-21-519SP): each key practice under the
+// topic it audits, titled with GAO's own label and statement (pp. 5-8).
+const refsGao: readonly CrosswalkRef[] = [
+  gao('risk-management', '1.6', 'Risk management: implement an AI-specific risk management plan to systematically identify, analyze, and mitigate risks', 'core'),
+  gao('governance-accountability', '1.2', 'Roles and responsibilities: define clear roles, responsibilities, and delegation of authority for the AI system', 'core'),
+  gao('governance-accountability', '1.1', 'Clear goals: define clear goals and objectives for the AI system', 'related'),
+  gao('governance-accountability', '1.3', 'Values: demonstrate a commitment to values and principles established by the entity', 'related'),
+  gao('impact-assessment', '1.5', 'Stakeholder involvement: include diverse perspectives from a community of stakeholders throughout the AI life cycle', 'related'),
+  gao('data-governance', '2.1', 'Sources: document sources and origins of data used to develop the models', 'core'),
+  gao('data-governance', '2.2', 'Reliability: assess reliability of data used to develop the models', 'core'),
+  gao('data-governance', '2.4', 'Variable selection: assess data variables used in the AI component models', 'related'),
+  gao('data-governance', '2.5', 'Enhancement: assess the use of synthetic, imputed, and/or augmented data', 'related'),
+  gao('documentation-transparency', '1.9', 'Transparency: enable external stakeholders to access information on the design, operation, and limitations of the AI system', 'core'),
+  gao('documentation-transparency', '3.5', 'Documentation: document the methods for assessment, performance metrics, and outcomes of the AI system', 'core'),
+  gao('documentation-transparency', '1.7', 'Specifications: establish and document technical specifications', 'related'),
+  gao('inventory-registration', '3.1', 'Documentation: catalog model and non-model components, along with operating specifications and parameters', 'related'),
+  gao('logging-traceability', '4.3', 'Traceability: document results of monitoring activities and any corrective actions taken', 'core'),
+  gao('human-oversight', '3.9', 'Human supervision: define and develop procedures for human supervision of the AI system', 'core'),
+  gao('robustness-security-evals', '3.7', 'Assessment: assess performance against defined metrics to ensure the AI system functions as intended and is sufficiently robust', 'core'),
+  gao('robustness-security-evals', '3.2', 'Metrics: define performance metrics that are precise, consistent, and reproducible', 'related'),
+  gao('incident-monitoring', '4.1', 'Planning: develop plans for continuous or routine monitoring of the AI system', 'core'),
+  gao('incident-monitoring', '4.2', 'Drift: establish the range of data and model drift that is acceptable', 'core'),
+  gao('supply-chain', '2.6', 'Dependency: assess interconnectivities and dependencies of data streams that operationalize the AI system', 'related'),
+  gao('fairness-non-discrimination', '2.7', 'Bias: assess reliability, quality, and representativeness of the data used in operation, including potential biases', 'core'),
+  gao('fairness-non-discrimination', '3.8', 'Bias: identify potential biases, inequities, and other societal concerns resulting from the AI system', 'core'),
+  gao('privacy-data-protection', '2.8', 'Security and privacy: assess data security and privacy for the AI system', 'core'),
+  gao('ai-literacy', '1.4', 'Workforce: recruit, develop, and retain personnel with multidisciplinary skills and experiences', 'related'),
+  gao('conformity-assessment', '1.8', 'Compliance: ensure the AI system complies with relevant laws, regulations, standards, and guidance', 'related'),
+  gao('deployment-change-decommissioning', '4.4', 'Ongoing assessment: assess the utility of the AI system to ensure its relevance to the current context', 'related'),
+  gao('deployment-change-decommissioning', '4.5', 'Scaling: identify conditions, if any, under which the AI system may be scaled or expanded beyond its current use', 'related'),
+];
+
+/** Every topic → clause reference: the v0.4 set, the v0.5.0 additions, then GAO. */
+export const refs: readonly CrosswalkRef[] = [...refsV04, ...refsV05, ...refsGao];
 
 // frameworks.ts wins over crosswalkInstruments when both carry an id.
 const byId = new Map<string, Framework>([

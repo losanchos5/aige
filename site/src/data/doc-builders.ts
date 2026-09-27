@@ -1564,6 +1564,16 @@ export const impactSources: readonly BuilderSource[] = [
     url: `${SITE}/patterns/fria-as-code`,
     verified: 'primary',
   },
+  {
+    text: 'FRIA model: Guide and use cases. FRIA methodology for AI design and development (planning and scoping, data collection and risk analysis, risk management; risk matrices for likelihood and severity; four use cases: learning analytics, human resources, medical imaging, care of the elderly). Catalan Data Protection Authority (APDCAT), DPO Network working group coordinated by Alessandro Mantelero and Joana Marí; CC BY-NC-ND 4.0. 2025.',
+    url: 'https://www.dpdenxarxa.cat/pluginfile.php/2468/mod_folder/content/0/FRIA_en_def.pdf',
+    verified: 'primary',
+  },
+  {
+    text: 'Template for Data Protection Impact Assessment, v1, with an explainer (DOCX template). European Data Protection Board. Draft put to public consultation from 14 April to 9 June 2026; not final as of 2026-09-27.',
+    url: 'https://www.edpb.europa.eu/public-consultations/template-for-data-protection-impact-assessment_en',
+    verified: 'primary',
+  },
 ];
 
 export const modelCardSources: readonly BuilderSource[] = [
