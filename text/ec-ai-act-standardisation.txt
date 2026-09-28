@@ -26,6 +26,3 @@ European Standardisation organisations do not work on standards in isolation. An
 European Standardisation organisations and European companies are actively engaging with international standardisation bodies and therefore contributing to build a broader global framework of AI standards.
 For instance, ISO/IEC SC 42 is already developing AI-related international standards, and European representatives are actively shaping this process. This alignment is crucial to avoid regulatory fragmentation and to ensure that AI developers can operate across multiple markets without redundant compliance efforts.
 The benchmarks and standards established today will define the role of AI in our society for generations to come. By fostering the development of European harmonised standards, the EU can advance and lead the safe development and adoption of AI systems globally.
-Last update
-3 August 2026
-Print as PDF

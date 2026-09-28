@@ -10,6 +10,3 @@ A limited use cases of AI are considered as high-risk when they endanger health,
 Following the political agreement on the 'AI Omnibus', there is a new enforcement timeline:
 Rules for systems used in certain high-risk areas — including biometrics, critical infrastructure, education, employment, migration, asylum and border control — apply from 2 December 2027.
 For systems integrated into products such as robotics and industrial machinery, the rules apply from 2 August 2028.
-Last update
-6 July 2026
-Print as PDF
