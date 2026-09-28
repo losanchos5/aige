@@ -23,6 +23,22 @@ export interface Source {
   verified: Verification;
 }
 
+/**
+ * Singapore's Model AI Governance Framework for Agentic AI, v1.5, shared by the
+ * control profiles (data/controls/imda-agentic.ts) so every page cites it with
+ * one title, date and gloss. Dated by the 5 June 2026 update whose text is
+ * quoted; first published 20 May 2026.
+ */
+export const IMDA_AGENTIC: Source = {
+  title: 'Model AI Governance Framework for Agentic AI, v1.5',
+  gloss:
+    'published 2026-05-20, updated 2026-06-05; four dimensions: assess and bound the risks upfront, make humans meaningfully accountable, implement technical controls and processes, enable end-user responsibility',
+  publisher: 'IMDA',
+  date: '2026-06-05',
+  url: 'https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf',
+  verified: 'primary',
+};
+
 /** The house-format line for a source, without its `[n]` prefix. */
 export function sourceText(source: Source): string {
   const gloss = source.gloss ? ` (${source.gloss})` : '';

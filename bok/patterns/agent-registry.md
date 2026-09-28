@@ -52,6 +52,11 @@ with an owner, a declared scope and an expiry after which the entry must be rene
 Deny production access to unregistered artefacts. Reconcile periodically against what is actually
 running (see [Shadow-AI Discovery](/patterns/shadow-ai-discovery)) and flag drift.
 
+Singapore's framework for agentic AI asks for the same object without calling it a registry: to
+prevent agent sprawl, "all agent identities (and their attendant permissions) should be issued from
+and tracked by a centralised system", which lets an organisation "track its deployed agents,
+identify any anomalies, and remove identities that are no longer required" (IMDA, p. 23) [3].
+
 Illustrative schema for a registry entry:
 
 ```json
@@ -86,3 +91,4 @@ the NIST AI RMF [2]. Mappings are illustrative, not a claim of conformity.
 
 [1] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [2] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[3] Model AI Governance Framework for Agentic AI, v1.5 (section 2.1.2, agent identity, p. 23: identities "catalogued and centrally managed", issued from and tracked by a centralised system; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

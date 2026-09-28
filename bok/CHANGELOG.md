@@ -34,6 +34,19 @@ controls, every one open for technical review and none reviewed yet.
 - The impact-assessment builder cites the Catalan Data Protection Authority's FRIA model (method,
   risk matrices and four use cases) and the EDPB's draft DPIA template (public consultation closed
   9 June 2026).
+- `/resources/dpia-lists`: the national GDPR Art. 35(4) DPIA lists in the EDPB register, read for
+  what AI systems do (named AI, automated decisions, profiling, biometrics, employee monitoring,
+  scoring), with the item numbers and the EU AI Act Annex III areas they clearly overlap, and the
+  AI Act links to the DPIA (Art. 26(9); Art. 27(4) as amended by the Digital Omnibus). Also the
+  `dpia-lists` dataset of the open API (`/api/v1/dpia-lists.json`, CC BY 4.0), which records who
+  contributed what: idea, Aurélie Pols; research and data, Jorge García Aibar.
+- A sixteenth crosswalk column, the AI Verify Testing Framework (Singapore, 2025), with a cell only
+  where one of IMDA's official 2025 crosswalks (NIST Generative AI Profile, G7 Code of Conduct,
+  ISO/IEC 42001) cites the check.
+- Singapore's Model AI Governance Framework for Agentic AI v1.5 as a page-cited source in 21
+  patterns and as a cross-reference on 55 reference controls (direct or partial fit, stated per
+  control). It never uses the terms kill switch, circuit breaker or registry, and the site does not
+  attribute them to it.
 
 ### Changed
 - Evaluation Environment profile v0.2: controls 001, 004, 005, 007, 008 and 009 are now specified

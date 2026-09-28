@@ -292,8 +292,9 @@ the vendor and transfer map, the oversight design, and the rights path for data 
 Article 35(7) sets the minimum content, and where residual risk stays high the controller consults
 the authority first, which has up to eight weeks to respond [1]. The EDPB expects to see DPIAs and
 also decisions that one was not needed [3], so "no DPIA" is an artefact too. Deployers of high-risk
-systems use the provider's Article 13 information for their DPIA [14], and the Article 27 FRIA
-complements a DPIA rather than repeating it [15]; the
+systems use the provider's Article 13 information for their DPIA [14], and where a DPIA already
+meets part of Article 27 the FRIA may cross-reference or include the relevant DPIA sections rather
+than repeat them (Article 27(4), as replaced by the Digital Omnibus) [15]; the
 [FRIA-as-Code](/patterns/fria-as-code) pattern writes the shared fields once. The
 templates page has an [AI DPIA addendum](/resources/templates#schema-impact-assessment) in its
 impact-assessment schema.

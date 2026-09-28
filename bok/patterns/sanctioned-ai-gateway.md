@@ -121,6 +121,11 @@ Illustrative gateway decision event, as an evidence record:
 > confidential data with redaction of personal identifiers, and routes it through the gateway. Usage
 > moves to the sanctioned route within weeks because it is now the easiest one.
 
+Singapore's framework for agentic AI describes a similar choke point for agent traffic: "defining
+controls on the MCP layer, such as filtering sensitive data that passes through the servers, logging
+all agent-to-system interactions, or whitelisting only trusted servers" (IMDA, section 2.3.1, p. 34)
+[7]. It is a gateway for agents, not for the AI tools staff choose.
+
 ## Consequences
 Acceptable use becomes enforceable and measurable: the organisation can show what was sent where,
 under which rule, and how much use happens outside the gateway. The cost is the gateway itself,
@@ -150,3 +155,4 @@ Threat ids follow the OWASP Top 10 for LLM Applications 2026 [3], control ids IS
 [4] Regulation (EU) 2016/679 (General Data Protection Regulation; Art. 5(1)(c) data minimisation). Publications Office of the EU (EUR-Lex). 2016-04-27. https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng (verified: primary)
 [5] ISO/IEC 42001:2023, AI management system, Annex A controls referenced by identifier and short title only (A.2 policies related to AI; A.9.2 processes for responsible use of AI systems; A.10.3 suppliers). ISO/IEC (titles checked via a secondary listing). 2023-12. https://www.iso.org/standard/42001 (verified: secondary)
 [6] Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (GOVERN 2.2 personnel and partners receive AI risk management training; GOVERN 6.1 policies for third-party AI risks; MANAGE 3.1 third-party risks regularly monitored). NIST. 2023-01-26. https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf (verified: primary)
+[7] Model AI Governance Framework for Agentic AI, v1.5 (section 2.3.1, p. 34: controls on the MCP layer; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

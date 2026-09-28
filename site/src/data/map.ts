@@ -331,6 +331,7 @@ export const FRAMEWORK_FAMILIES: readonly FrameworkFamily[] = [
       'uk-atrs',
       'sg-genai-framework',
       'sg-agentic-framework',
+      'sg-ai-verify',
       'canada-dadm',
       'br-lgpd',
       'cn-pipl',

@@ -43,6 +43,24 @@ import {
   mitSubdomains,
 } from '../data/harms';
 import { cases, casesForHarm } from '../data/cases';
+import {
+  lists as dpiaLists,
+  topicOrder as dpiaTopicOrder,
+  topicLabel as dpiaTopicLabel,
+  topicMeaning as dpiaTopicMeaning,
+  tagOrder as dpiaTagOrder,
+  tagLabel as dpiaTagLabel,
+  annexIII,
+  annexIIIOrder,
+  listFlag,
+  listAnnexIII,
+  listAnchor as dpiaListAnchor,
+  contributors as dpiaContributors,
+  reviewers as dpiaReviewers,
+  dpiaSources,
+  DPIA_AS_OF,
+  DPIA_SCHEMA_VERSION,
+} from '../data/dpia-lists';
 import { clauses, licenceTypes, references as contractReferences } from '../data/contracts';
 import { regimes, roles, rolesChapterPath } from '../data/roles';
 import { layers } from '../data/stack';
@@ -1522,6 +1540,170 @@ export const datasets: readonly Dataset[] = [
           ),
         }),
         'The rows.',
+      ),
+    },
+  },
+  // The national DPIA lists (Art. 35(4) GDPR) of the EDPB register, the items
+  // that catch what AI systems do and their Annex III overlaps. Carries who
+  // contributed what (CRediT roles) and an empty reviewers list until a review
+  // is recorded (src/data/dpia-lists.ts).
+  {
+    name: 'dpia-lists',
+    title: 'National DPIA lists',
+    description:
+      'The national GDPR Art. 35(4) DPIA lists in the EDPB register, each read in full for the items on AI, automated decisions, profiling or scoring, biometrics, employee monitoring and large-scale monitoring, with their original wording and the EU AI Act Annex III areas they clearly overlap.',
+    schemaVersion: DPIA_SCHEMA_VERSION,
+    page: '/resources/dpia-lists',
+    extra: () => ({
+      contributors: dpiaContributors.map((c) => ({
+        name: c.name,
+        roles: [...c.roles],
+        label: c.label,
+        url: c.url ?? null,
+      })),
+      reviewers: dpiaReviewers.map((r) => ({ name: r.name, date: r.date, version: r.version })),
+    }),
+    extraSchema: {
+      contributors: s.arr(
+        s.obj({
+          name: s.str('Name as the person wishes to appear.'),
+          roles: s.arr(
+            s.enumOf(['conceptualization', 'investigation', 'data-curation'], 'CRediT role.'),
+            'Contributor roles (CRediT taxonomy).',
+          ),
+          label: s.str('How the page labels the contribution.'),
+          url: s.uriOrNull('Profile link.'),
+        }),
+        'Who contributed what to this dataset.',
+      ),
+      reviewers: s.arr(
+        s.obj({
+          name: s.str('Reviewer.'),
+          date: s.date('Date the review closed.'),
+          version: s.str('Dataset version reviewed.'),
+        }),
+        'Completed reviews of this dataset; empty until one is recorded.',
+      ),
+    },
+    build: () => ({
+      asOf: DPIA_AS_OF,
+      topics: dpiaTopicOrder.map((t) => ({ id: t, label: dpiaTopicLabel[t], meaning: dpiaTopicMeaning[t] })),
+      tags: dpiaTagOrder.map((t) => ({ id: t, label: dpiaTagLabel[t] })),
+      annexIII: annexIIIOrder.map((a) => ({ id: a, point: annexIII[a].point, label: annexIII[a].label })),
+      lists: dpiaLists.map((list) => ({
+        id: list.id,
+        url: abs(`/resources/dpia-lists#${dpiaListAnchor(list)}`),
+        country: list.country,
+        authority: list.authority,
+        authorityShort: list.authorityShort,
+        authorityOriginal: list.authorityOriginal,
+        titleOriginal: list.titleOriginal,
+        titleEn: list.titleEn,
+        adopted: list.adopted,
+        edpbOpinion: { ...list.edpbOpinion },
+        document: list.url,
+        national: list.nationalUrl,
+        language: list.language,
+        method: list.method,
+        itemCount: list.itemCount,
+        aiNamed: list.aiNamed,
+        aiNamedInRegister: list.aiNamedInRegister,
+        lastUpdate: list.lastUpdate,
+        updateEvidence: list.updateEvidenceUrl,
+        note: list.note ?? null,
+        flags: Object.fromEntries(dpiaTopicOrder.map((t) => [t, listFlag(list, t)])),
+        annexIII: listAnnexIII(list),
+        items: list.items.map((item) => ({
+          n: item.n,
+          original: item.original,
+          summary: item.summary,
+          tags: [...item.tags],
+          annexIII: [...item.annexIII],
+          overlapNote: item.overlapNote ?? null,
+        })),
+      })),
+      sources: dpiaSources.map((source, i) => ({
+        n: i + 1,
+        text: sourceText(source),
+        url: source.url,
+        verified: source.verified,
+      })),
+    }),
+    properties: {
+      asOf: s.date('Date the EDPB register and the list documents were last checked.'),
+      topics: s.arr(
+        s.obj({
+          id: s.enumOf(dpiaTopicOrder, 'Topic id.'),
+          label: s.str('Label.'),
+          meaning: s.str('What a true flag means.'),
+        }),
+        'The six flags each list is read for.',
+      ),
+      tags: s.arr(
+        s.obj({ id: s.enumOf(dpiaTagOrder, 'Tag id.'), label: s.str('Label.') }),
+        'The tags items carry.',
+      ),
+      annexIII: s.arr(
+        s.obj({
+          id: s.enumOf(annexIIIOrder, 'Area id.'),
+          point: s.int('Annex III point.', 1, 8),
+          label: s.str('Area name.'),
+        }),
+        'EU AI Act Annex III high-risk areas.',
+      ),
+      lists: s.arr(
+        s.obj({
+          id: s.str('List id: lower-case country code.'),
+          url: s.uri('Row on the page.'),
+          country: s.str('Country.'),
+          authority: s.str('Supervisory authority, in English.'),
+          authorityShort: s.str('Short name of the authority.'),
+          authorityOriginal: s.str('Authority name, original and English.'),
+          titleOriginal: s.str("The list's title in its own language."),
+          titleEn: s.str('The title in English.'),
+          adopted: s.date('Date the list was adopted or published.'),
+          edpbOpinion: s.obj({
+            n: s.str('Opinion number.'),
+            date: s.dateOrNull('Date the opinion was adopted, where stated.'),
+            url: s.uri('Opinion page.'),
+          }),
+          document: s.uri('The list document in the EDPB register (English).'),
+          national: s.uriOrNull('The national original, where found.'),
+          language: s.str('ISO 639-1 code of the national original.'),
+          method: s.enumOf(['enumerated', 'scored', 'mixed'], 'Enumerated list, scored criteria or both.'),
+          itemCount: s.int('Items or criteria in the list.', 1),
+          aiNamed: s.bool('The current version names artificial intelligence expressly.'),
+          aiNamedInRegister: s.bool('The version in the EDPB register names it.'),
+          lastUpdate: s.strOrNull('Latest dated change found (YYYY, YYYY-MM or YYYY-MM-DD).'),
+          updateEvidence: s.strOrNull('Where the change is documented.'),
+          note: s.strOrNull('Caveat about the list or its sources.'),
+          flags: s.obj(
+            Object.fromEntries(dpiaTopicOrder.map((t) => [t, s.bool(dpiaTopicMeaning[t])])),
+            'Topic flags, derived from the items.',
+          ),
+          annexIII: s.arr(s.enumOf(annexIIIOrder, 'Area id.'), 'Annex III areas the items clearly overlap.'),
+          items: s.arr(
+            s.obj({
+              n: s.str('Item number as the list prints it.'),
+              original: s.str("The item's wording in the list's language."),
+              summary: s.str('What the item covers, in our own words.'),
+              tags: s.arr(s.enumOf(dpiaTagOrder, 'Tag id.'), 'What the item covers.'),
+              annexIII: s.arr(s.enumOf(annexIIIOrder, 'Area id.'), 'Annex III areas it clearly overlaps.'),
+              overlapNote: s.strOrNull('Which Annex III point, and any exclusion.'),
+            }),
+            'Items relevant to what AI systems do.',
+          ),
+        }),
+        'One record per list in the EDPB register.',
+      ),
+      sources: s.arr(
+        s.obj({
+          n: s.int('Source number.', 1),
+          text: s.str('Source in the house format.'),
+          url: s.uri('Source URL.'),
+          verified: s.enumOf(['primary', 'secondary', 'reported'], 'Verification tag.'),
+        }),
+        'Numbered sources.',
       ),
     },
   },

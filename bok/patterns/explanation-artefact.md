@@ -138,6 +138,10 @@ Illustrative explanation record for a declined credit-limit increase:
 > now answers "why was this customer declined?" with the stored record and a fresh recomputation side
 > by side.
 
+Singapore's framework for agentic AI warns that "chain-of-thought reasoning, which is sometimes used
+for explainability, is not analogous to human reasoning and may not be a faithful explanation of the
+agent's actions" (IMDA, section 2.2.2, p. 30) [11]: the fidelity risk this pattern tests for.
+
 ## Consequences
 Explanations become evidence: reproducible, testable and reusable across duties, with their accuracy
 checked rather than assumed. The costs: storage and retention for a record per decision; an
@@ -173,3 +177,4 @@ conformity.
 [8] Data (Use and Access) Act 2025, s. 80 (replaces UK GDPR Art. 22 with Arts. 22A–22D; Art. 22C safeguards: information, representations, human intervention, contest; in force 5 Feb 2026). legislation.gov.uk. 2025. https://www.legislation.gov.uk/ukpga/2025/18/section/80 (verified: primary)
 [9] Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (MEASURE 2.8 transparency and accountability risks "examined and documented"; MEASURE 2.9 model "explained, validated, and documented" and output "interpreted within its context"). NIST. 2023-01-26. https://doi.org/10.6028/NIST.AI.100-1 (verified: primary)
 [10] NIST AI RMF to ISO/IEC FDIS 42001 crosswalk (provider: Microsoft; lists the Annex B implementation-guidance clauses, whose numbers mirror the Annex A control ids, e.g. B.8.2 system documentation and information for users; the ISO text was not opened). NIST AI Resource Center. 2023. https://airc.nist.gov/docs/NIST_AI_RMF_to_ISO_IEC_42001_Crosswalk.pdf (verified: secondary)
+[11] Model AI Governance Framework for Agentic AI, v1.5 (section 2.2.2, p. 30: chain-of-thought may not be a faithful explanation; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

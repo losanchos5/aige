@@ -156,6 +156,11 @@ Illustrative monitoring plan for a support assistant, as a post-market monitorin
 > HR portal; the metric falls back under threshold, and the issue, the change and the recovery are all
 > in the assurance store.
 
+Singapore's framework for agentic AI asks organisations to "continuously test the agentic system
+even post-deployment to ensure that it works as expected and is not affected by model drift or other
+changes in the environment" (IMDA, section 2.3.3, p. 44) [7]. Fairness by group in production is not
+covered.
+
 ## Consequences
 Drift and unfairness are caught as signals with owners rather than discovered as incidents, and
 periodic audits become cheap because the telemetry already exists. The cost is labelling and sampling
@@ -184,3 +189,4 @@ illustrative, not a claim of conformity.
 [4] Automated Employment Decision Tools (NYC Local Law 144 of 2021: bias audit within one year before use, public summary, candidate notices; enforced from 5 Jul 2023). NYC Department of Consumer and Worker Protection. 2023. https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page (verified: primary)
 [5] Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (MEASURE 2.4 functionality and behaviour monitored in production; MEASURE 2.11 fairness and bias evaluated and documented; MEASURE 3.1 existing, unanticipated and emergent risks tracked; MANAGE 4.1 post-deployment monitoring plans). NIST. 2023-01-26. https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf (verified: primary)
 [6] ISO/IEC 42001:2023, AI management system, Annex A controls referenced by identifier and short title only (A.5.4 assessing AI system impact on individuals or groups of individuals; A.6.2.6 AI system operation and monitoring). ISO/IEC (titles checked via a secondary listing). 2023-12. https://www.iso.org/standard/42001 (verified: secondary)
+[7] Model AI Governance Framework for Agentic AI, v1.5 (section 2.3.3, p. 44: testing after deployment for model drift; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

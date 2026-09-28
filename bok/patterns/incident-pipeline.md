@@ -151,6 +151,10 @@ authority; if it cannot reach the provider, `Art. 73` applies to the deployer. E
 - **Log retention** under the deployer's control for at least six months (`Art. 26(6)`), longer while
   an incident is open [2].
 
+Singapore's framework for agentic AI covers the debugging step: "Logging and tracing each step of an
+agent workflow and agent-to-agent interactions help to identify points of failure" (IMDA, section
+2.3.3, p. 43) [8]. It does not cover external incident reporting or its deadlines.
+
 ## Consequences
 Reporting happens on time and the record is audit-ready. Severity and reportability stay separate,
 reviews teach instead of blame, and each closed incident hardens the controls through CAPA. The cost
@@ -181,3 +185,4 @@ conformity.
 [5] Regulation (EU) 2016/679 (GDPR), Art. 33 (notification of a personal data breach to the supervisory authority within 72 hours where feasible). Publications Office of the EU (EUR-Lex). 2016-04-27. https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng (verified: primary)
 [6] "Postmortem Culture: Learning from Failure" (Site Reliability Engineering, ch. 15; blameless postmortems; postmortem triggers set in advance). Google. 2016. https://sre.google/sre-book/postmortem-culture/ (verified: primary)
 [7] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[8] Model AI Governance Framework for Agentic AI, v1.5 (section 2.3.3, p. 43: logging and tracing to debug incidents; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

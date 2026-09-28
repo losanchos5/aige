@@ -67,6 +67,10 @@ the guardrail's signals cross a threshold.
 > attempt and its output guardrail redacts an account number the model was about to return; both
 > decisions are emitted to the assurance store, and a burst of blocks trips the circuit breaker.
 
+Singapore's framework for agentic AI puts the same control at run time: "Runtime controls address
+this by monitoring and intervening during execution, such as rate limits to prevent excessive tool
+use or input validation" (IMDA, section 2.3.1, p. 34) [5].
+
 ## Consequences
 The tested control holds on live traffic and every enforcement leaves evidence; the guardrail is also
 the sensor the breaker and the incident pipeline read. The cost is per-call latency, false positives to
@@ -92,3 +96,4 @@ the NIST AI RMF [4]. Mappings are illustrative, not a claim of conformity.
 [2] OWASP GenAI Security Project unveils the Agent Control Standard (ACS) and 2026 Top 10 for LLM Applications. OWASP GenAI Security Project. 2026-09-01. https://genai.owasp.org/2026/09/01/owasp-genai-security-project-unveils-2026-top-10-for-llm-applications-new-agent-control-standard-and-sponsors-as-community-tops-30000-members/ (verified: primary)
 [3] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [4] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[5] Model AI Governance Framework for Agentic AI, v1.5 (section 2.3.1, p. 34: runtime controls that monitor and intervene during execution; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

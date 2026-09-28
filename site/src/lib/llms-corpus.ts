@@ -799,6 +799,7 @@ export type SliceId =
   | 'lifecycle'
   | 'law'
   | 'regulatory'
+  | 'crosswalk'
   | 'obligations'
   | 'patterns'
   | 'glossary'
@@ -841,8 +842,8 @@ function withRole(docs: readonly CorpusDoc[]): CorpusDoc[] {
 // ~200k-token window of common models. Chapter 08 (the regulatory map) sits
 // with the frameworks, the crosswalk and the comparisons; the obligation
 // register it tabulates has a slice of its own (GEO N7 of the 2026-09-26
-// audit: together they had grown to about 138k tokens). The regulatory slice
-// keeps its URL. Chapter 09 is in no slice: the glossary slice carries every
+// audit: together they had grown to about 138k tokens), and so has the
+// crosswalk since 2026-09-28. The regulatory slice keeps its URL. Chapter 09 is in no slice: the glossary slice carries every
 // one of its terms, term by term.
 /** The slices of /llms-full.txt, each small enough for a common context window. */
 export const llmsSlices: readonly LlmsSlice[] = [
@@ -885,15 +886,24 @@ export const llmsSlices: readonly LlmsSlice[] = [
   {
     id: 'regulatory',
     path: '/llms-full-regulatory.txt',
-    title: 'Full text: regulatory map, crosswalk and comparisons',
+    title: 'Full text: regulatory map, frameworks and comparisons',
     summary:
-      'Chapter 08, the regulatory map, then the frameworks, the topic × framework crosswalk and the framework comparisons (ISO 42001, NIST AI RMF and the EU AI Act, pair by pair). The obligation register is in its own slice.',
+      'Chapter 08, the regulatory map, then the frameworks and the framework comparisons (ISO 42001, NIST AI RMF and the EU AI Act, pair by pair). The obligation register and the crosswalk are in their own slices.',
     docs: async () => [
       ...(await chaptersWhere((c) => c.slug === 'regulatory-map')),
       frameworksDoc(),
-      crosswalkDoc(),
       ...comparisonDocs(),
     ],
+  },
+  // The crosswalk left the regulatory slice when its sixteenth column (AI
+  // Verify, 2026-09-28) took that slice past about 100k tokens.
+  {
+    id: 'crosswalk',
+    path: '/llms-full-crosswalk.txt',
+    title: 'Full text: topic × framework crosswalk',
+    summary:
+      'The topic × framework crosswalk, topic by topic: every clause of each law, standard and code that governs it, with its strength, verification and source.',
+    docs: async () => [crosswalkDoc()],
   },
   {
     id: 'obligations',

@@ -169,6 +169,8 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
     ],
   ],
   ['/resources/harms', ['src/pages/resources/harms.astro', 'src/data/harms.ts', 'src/data/cases.ts']],
+  // The national DPIA lists, dated by their template and the dataset they render.
+  ['/resources/dpia-lists', ['src/pages/resources/dpia-lists.astro', 'src/data/dpia-lists.ts']],
   // The glossary and the reading list are parsed from their BoK chapters
   // (src/lib/glossary.ts, src/lib/reading-list.ts).
   ['/resources/glossary', ['src/pages/resources/glossary.astro', '../bok/09-glossary.md']],

@@ -241,6 +241,12 @@ export const nav: NavGroup[] = [
         description: 'One governance topic per row, across the instruments that bind it.',
       },
       {
+        label: 'National DPIA lists',
+        href: '/resources/dpia-lists',
+        description: 'The GDPR Art. 35(4) lists by country, read for AI and mapped to Annex III.',
+        placement: 'footer',
+      },
+      {
         label: 'Harms atlas',
         href: '/resources/harms',
         description: 'AI harms by level, each with its failure mode, control, evidence and incidents.',

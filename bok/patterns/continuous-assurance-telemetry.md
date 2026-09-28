@@ -81,6 +81,11 @@ both are single preprints. Expose the current status of each control as a query 
 > over emitted guardrail decisions; if the control stops firing, the tile goes red within minutes, not
 > at the next audit.
 
+Singapore's framework for agentic AI asks for the monitoring half of this pattern: "Organisations
+should continuously monitor and log agent behaviour post-deployment, and establish reporting and
+failsafe mechanisms for agent failures or unexpected behaviours" (IMDA, section 2.3.3, p. 43) [4].
+It does not describe streaming control decisions to an assurance store.
+
 ## Consequences
 The audit becomes a query and drift is visible in near real time. The cost is building the pipeline and
 storage, and defining a common evidence schema across tools.
@@ -102,3 +107,4 @@ conformity.
 [1] TAIP: NIST TEVV outputs as reusable AI Assurance Objects; trustworthiness as a continuously generated signal (arXiv 2603.03340; submitted 15 Feb 2026). 2026-02. https://arxiv.org/abs/2603.03340 (verified: primary)
 [2] AAGATE: NIST AI RMF-aligned, Kubernetes-native governance control plane for agentic AI (arXiv 2510.25863). 2025-10. https://arxiv.org/abs/2510.25863 (verified: primary)
 [3] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[4] Model AI Governance Framework for Agentic AI, v1.5 (section 2.3.3, p. 43: continuous monitoring and logging after deployment; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

@@ -136,6 +136,11 @@ Illustrative decision notice record, written by the notice service and completed
 > contests with a settlement statement, a second-line reviewer overturns the decline, and the
 > overturn rate for reason code R07 enters the next threshold review of the model.
 
+Singapore's framework for agentic AI asks for "human contact points who are responsible for the
+agents, whom the users can alert if the agents malfunction or if they are dissatisfied with a
+decision" (IMDA, section 2.4.2, p. 47) [13]. It does not describe a contest path with the power to
+change the outcome.
+
 ## Consequences
 Each person's notice and contest can be produced on request, and the contest channel becomes a sensor
 for model error and unfairness. The cost is a notice service with per-regime templates to keep
@@ -171,3 +176,4 @@ illustrative, not a claim of conformity.
 [10] ISO/IEC 42001:2023, AI management system, Annex A controls referenced by identifier and short title only (A.8.2 system documentation and information for users; A.9.2 processes for responsible use of AI systems). ISO/IEC (titles checked via a secondary listing). 2023-12. https://www.iso.org/standard/42001 (verified: secondary)
 [11] Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (MAP 3.5 human oversight processes; MEASURE 3.3 feedback and appeal processes for end users and impacted communities; MANAGE 4.1 post-deployment monitoring plans, including appeal and override). NIST. 2023-01-26. https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf (verified: primary)
 [12] Withdrawn guidance (Circular 2022-03 on adverse-action notices for credit decisions based on complex algorithms, 87 FR 35864, withdrawn on 12 May 2025 by the notice at 90 FR 20084). Consumer Financial Protection Bureau. 2025-05-12. https://www.consumerfinance.gov/compliance/guidance/withdrawn-guidance/ (verified: primary)
+[13] Model AI Governance Framework for Agentic AI, v1.5 (section 2.4.2, p. 47: human contact points for users dissatisfied with a decision; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

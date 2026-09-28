@@ -1,0 +1,124 @@
+/* dpia-lists.css: /resources/dpia-lists. Builds on resources.css (.res-table,
+   .res-section) and pages.css; only the page's own pieces live here. Colour
+   never carries meaning on its own: every flag cell says "Yes", "No" or "Not
+   extracted" in words. */
+
+.dl-credit {
+  margin: 0 0 var(--s-5);
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+.dl-credit a {
+  color: var(--ink);
+}
+
+.dl-auth,
+.dl-sub {
+  display: block;
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+  font-weight: 400;
+}
+
+.dl-table .dl-date {
+  white-space: nowrap;
+}
+
+.dl-table th abbr {
+  text-decoration: none;
+  cursor: help;
+}
+
+.dl-flag.is-yes {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.dl-flag.is-no {
+  color: var(--ink-2);
+}
+
+.dl-docs a {
+  display: block;
+  white-space: nowrap;
+}
+
+/* ---- Items per list ------------------------------------------------------ */
+.dl-lists {
+  display: grid;
+  gap: var(--s-5);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
+}
+
+.dl-list {
+  padding: var(--s-4) var(--s-5) var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+}
+
+.dl-list h3 {
+  margin: 0 0 var(--s-3);
+}
+
+.dl-note {
+  margin: 0 0 var(--s-3);
+  color: var(--ink-2);
+  font-size: var(--fs-small);
+}
+
+.dl-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-4);
+}
+
+.dl-items > li {
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--line);
+}
+
+.dl-items > li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.dl-items p {
+  margin: 0 0 var(--s-2);
+  line-height: 1.5;
+}
+
+.dl-item-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  align-items: baseline;
+}
+
+.dl-n {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+}
+
+.dl-quote {
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.dl-tags {
+  list-style: none;
+  margin: 0 0 var(--s-2);
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+}
+
+.dl-annex {
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}

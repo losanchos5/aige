@@ -498,7 +498,7 @@ export const dataAdmissionAndPrivacyControls: readonly Control[] = [
       'No DPIA exists and no decision that one was not needed was recorded.',
     ],
     scope:
-      'Personal data in datasets used for training, fine-tuning and retrieval, and the stages that process it. Transfers, automated decision-making and the rights path are outside this control; the fundamental rights impact assessment, which complements the DPIA rather than repeating it, is left to the FRIA-as-Code pattern.',
+      'Personal data in datasets used for training, fine-tuning and retrieval, and the stages that process it. Transfers, automated decision-making and the rights path are outside this control; the fundamental rights impact assessment, which may cross-reference or include the relevant DPIA sections rather than repeat them, is left to the FRIA-as-Code pattern.',
     enforcementPoints: ['runtime', 'periodic'],
     verification: [
       {

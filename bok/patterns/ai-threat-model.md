@@ -139,6 +139,10 @@ Illustrative threat entry, one row of the model's data file:
 > with a pipeline check, and a scoped tool with a denial test. The design review gate now fails on
 > any threat row whose `tests` list is empty.
 
+Singapore's framework for agentic AI makes threat modelling part of the upfront risk assessment:
+"Threat modelling also makes risk assessment more rigorous by systematically identifying specific
+ways in which an attacker may take to compromise the system" (IMDA, section 2.1.1, p. 17) [11].
+
 ## Consequences
 The red-team suite, the guardrails and the supply-chain checks trace back to named threats, and the
 security case for a release is a query over the file. The costs: threat modelling takes skilled
@@ -174,3 +178,4 @@ illustrative, not a claim of conformity.
 [8] Regulation (EU) 2024/1689 (AI Act): Art. 15(5) resilience against exploitation of vulnerabilities (data poisoning, model poisoning through pre-trained components, adversarial examples or model evasion, confidentiality attacks, model flaws); Art. 55(1)(d) cybersecurity protection for GPAI models with systemic risk (text read on the Commission's AI Act Service Desk, 2026-09-24). Publications Office of the EU (EUR-Lex). 2024-07-12. https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng (verified: primary)
 [9] Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (MAP 5.1 likelihood and magnitude of each identified impact; MEASURE 2.7 security and resilience "evaluated and documented"). NIST. 2023-01-26. https://doi.org/10.6028/NIST.AI.100-1 (verified: primary)
 [10] NIST AI RMF to ISO/IEC FDIS 42001 crosswalk (provider: Microsoft; lists the Annex B implementation-guidance clauses, whose numbers mirror the Annex A control ids, e.g. B.6.2.2 AI system requirements and specification, B.6.2.4 AI system verification and validation; the ISO text was not opened). NIST AI Resource Center. 2023. https://airc.nist.gov/docs/NIST_AI_RMF_to_ISO_IEC_42001_Crosswalk.pdf (verified: secondary)
+[11] Model AI Governance Framework for Agentic AI, v1.5 (section 2.1.1, p. 17: threat modelling as part of the upfront risk assessment; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

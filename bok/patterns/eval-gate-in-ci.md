@@ -69,6 +69,11 @@ Illustrative schema for the result:
 > regression suite before deploy; a release that drops resistance below the floor fails the pipeline and
 > does not ship until fixed.
 
+Singapore's framework for agentic AI sets the same expectation before release: "Organisations should
+test agents for safety and security before deployment. This provides confidence that the agents work
+as expected and controls are effective" (IMDA, section 2.3.2, p. 38) [3]. It does not say that a
+failed evaluation blocks the release.
+
 ## Consequences
 Regressions are caught before production and evidence accrues automatically. The trade-off is eval
 maintenance, run-time cost in CI, and the need to tune thresholds to avoid flaky gates.
@@ -90,3 +95,4 @@ the NIST AI RMF [2]. Mappings are illustrative, not a claim of conformity.
 
 [1] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [2] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[3] Model AI Governance Framework for Agentic AI, v1.5 (section 2.3.2, p. 38: testing agents before deployment; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

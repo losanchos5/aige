@@ -720,7 +720,7 @@ export const audiences: readonly Audience[] = [
       {
         question: 'How do the FRIA and the DPIA fit together?',
         answer:
-          'Where a DPIA already meets an obligation of Article 27, the fundamental rights impact assessment complements that DPIA (Art. 27(4)) [1]. One assessment record, cross-referenced, can serve both, instead of two documents that drift apart.',
+          'Where a DPIA already meets an obligation of Article 27, the deployer may cross-reference the relevant DPIA sections in the fundamental rights impact assessment, or include parts of them (Art. 27(4), as replaced by the Digital Omnibus) [1]. One assessment record, cross-referenced, can serve both, instead of two documents that drift apart.',
         link: {
           label: 'Fundamental rights impact assessment',
           href: '/bok/eu-ai-act#fundamental-rights-impact-assessment-article-27',
@@ -1125,7 +1125,7 @@ export const audiences: readonly Audience[] = [
       {
         question: 'Do we need a fundamental rights impact assessment?',
         answer:
-          'Yes, before first use of an Annex III high-risk system, if you are a body governed by public law or a private entity providing public services; systems for critical infrastructure (Annex III point 2) are excepted. Where your DPIA already meets part of it, the FRIA complements the DPIA (Art. 27(1), 27(4)) [1].',
+          'Yes, before first use of an Annex III high-risk system, if you are a body governed by public law or a private entity providing public services; systems for critical infrastructure (Annex III point 2) are excepted. Where your DPIA already meets part of it, the FRIA may cross-reference or include the relevant DPIA sections (Art. 27(1), 27(4)) [1].',
         link: {
           label: 'Fundamental rights impact assessment',
           href: '/bok/eu-ai-act#fundamental-rights-impact-assessment-article-27',
