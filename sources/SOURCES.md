@@ -589,6 +589,7 @@ pages the OWASP Agentic and NIST AI RMF rows back the note under each **Maps to*
 | 4 | Okta Agent SSO GA 24 Aug 2026; Cross App Access as the official MCP Enterprise-Managed Authorization extension | Okta brings first-class identity to AI agents with Agent SSO | Okta | 2026-08-24 | https://www.okta.com/newsroom/press-releases/okta-brings-first-class-identity-to-ai-agents-with-agent-sso/ | primary | Solution |
 | 5 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
 | 6 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 7 | Section 2.1.2 (agent identity), pp. 23-24: an agent "should have its own unique, cryptographically verifiable identity"; authorisations "scoped, time- or session-bound, non-transferable", least privilege by default, bounded by the authorising human | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution |
 
 #### bok/patterns/agent-registry.md (Agent Registry)
 
@@ -596,6 +597,7 @@ pages the OWASP Agentic and NIST AI RMF rows back the note under each **Maps to*
 |---|---|---|---|---|---|---|---|
 | 1 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
 | 2 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 3 | Section 2.1.2 (agent identity), p. 23: to prevent agent sprawl, "all agent identities (and their attendant permissions) should be issued from and tracked by a centralised system"; the word "registry" is not used | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution |
 
 #### bok/patterns/aibom.md (AIBOM)
 
@@ -611,6 +613,7 @@ pages the OWASP Agentic and NIST AI RMF rows back the note under each **Maps to*
 | 1 | TAIP: NIST TEVV outputs as reusable AI Assurance Objects; trustworthiness as a continuously generated signal | TAIP (arXiv 2603.03340; submitted 15 Feb 2026) | n/a | 2026-02 | https://arxiv.org/abs/2603.03340 | primary | Summary; Solution |
 | 2 | AAGATE: NIST AI RMF-aligned, Kubernetes-native governance control plane for agentic AI in production | AAGATE (arXiv 2510.25863) | n/a | 2025-10 | https://arxiv.org/abs/2510.25863 | primary | Solution |
 | 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 4 | Section 2.3.3, p. 43: continuous monitoring and logging after deployment (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([4] on the page) |
 
 #### bok/patterns/eval-gate-in-ci.md (Eval Gate in CI)
 
@@ -618,6 +621,7 @@ pages the OWASP Agentic and NIST AI RMF rows back the note under each **Maps to*
 |---|---|---|---|---|---|---|---|
 | 1 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
 | 2 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 3 | Section 2.3.2, p. 38: testing agents before deployment (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([3] on the page) |
 
 #### bok/patterns/framework-crosswalk.md (Framework Crosswalk)
 
@@ -641,6 +645,7 @@ pages the OWASP Agentic and NIST AI RMF rows back the note under each **Maps to*
 | 1 | EU AI Act Art. 14 (human oversight of high-risk AI systems) | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Solution |
 | 2 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
 | 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 4 | Section 2.2.2 (design for meaningful human oversight), pp. 29-30: "significant checkpoints or action boundaries that require human approval"; approval requests "contextual and digestible"; human override rate; deny by default when approval infrastructure fails | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution |
 
 #### bok/patterns/incident-pipeline.md (Incident Pipeline)
 
@@ -656,6 +661,7 @@ pages the OWASP Agentic and NIST AI RMF rows back the note under each **Maps to*
 | 1 | By 2029, >50% of successful attacks on AI agents will exploit access-control weaknesses and prompt injection | Press release (securing AI market) | Gartner | 2026-08-26 | https://www.gartner.com/en/newsroom/press-releases/2026-08-26-gartner-forecasts-the-market-for-securing-ai-will-reach-almost-5-billion-in-2027 | primary | Context |
 | 2 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
 | 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 4 | Section 2.1.2, p. 19: mechanisms to take agents offline; section 2.3.3, p. 43: stop agent workflow and escalate; the document does not use the terms kill switch or circuit breaker (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([4] on the page) |
 
 #### bok/patterns/machine-readable-evidence-oscal.md (Machine-Readable Evidence (OSCAL))
 
@@ -678,6 +684,7 @@ pages the OWASP Agentic and NIST AI RMF rows back the note under each **Maps to*
 | 1 | Policy Cards: machine-readable, deployment-layer governance artefacts for AI agents linked to enforcement/audit pipelines | Policy Cards (arXiv 2510.24383) | Wong et al. | 2025-10 | https://arxiv.org/abs/2510.24383 | primary | Summary |
 | 2 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
 | 3 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 4 | Section 2.1.2, p. 19: deterministic limits, bound by design (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([4] on the page) |
 
 #### bok/patterns/runtime-guardrail.md (Runtime Guardrail)
 
@@ -687,6 +694,7 @@ pages the OWASP Agentic and NIST AI RMF rows back the note under each **Maps to*
 | 2 | OWASP Agent Control Standard (ACS) unveiled Sept 2026 | OWASP GenAI release wave | OWASP GenAI Security Project | 2026-09-01 | https://genai.owasp.org/2026/09/01/owasp-genai-security-project-unveils-2026-top-10-for-llm-applications-new-agent-control-standard-and-sponsors-as-community-tops-30000-members/ | primary | Solution |
 | 3 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
 | 4 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 5 | Section 2.3.1, p. 34: runtime controls that monitor and intervene during execution (direct fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([5] on the page) |
 
 #### bok/patterns/shadow-ai-discovery.md (Shadow-AI Discovery)
 
@@ -696,6 +704,7 @@ pages the OWASP Agentic and NIST AI RMF rows back the note under each **Maps to*
 | 2 | A security vendor's 2026 survey: one in eight AI breaches involved agentic systems | 2026 AI Threat Landscape Report (vendor survey) | HiddenLayer | 2026 | https://www.hiddenlayer.com/report-and-guide/threatreport2026 | primary | Problem |
 | 3 | OWASP Top 10 for Agentic Applications 2026 (ASI IDs used in per-pattern maps) | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
 | 4 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 5 | Section 1.2.3, p. 12: agent sprawl as a risk; section 2.1.2, p. 23: central cataloguing of agent identities (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([5] on the page) |
 
 #### bok/patterns/vendor-model-due-diligence-gate.md (Vendor / Model Due-Diligence Gate)
 
@@ -1575,7 +1584,7 @@ Not cited: OpenAI's post-mortems (https://openai.com/index/hugging-face-model-ev
 |---|---|---|---|---|---|---|---|
 | 1 | "Least-Agency" (avoid unnecessary autonomy); ASI01 to ASI10 official names; per-tool least-privilege profiles for ASI02; auto-approved ping tool used for DNS exfiltration; tool poisoning (ASI02) versus compromised source (ASI04); ASI09 approvals without independent validation | OWASP Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Opening; tools; checkpoints; memory; multi-agent; threats |
 | 2 | Autonomy as a deliberate design decision separate from capability; five levels by user role (operator, collaborator, consultant, approver, observer) | Levels of Autonomy for AI Agents (Feng, McDonald, Zhang; arXiv 2506.12469) | Knight First Amendment Institute at Columbia University / arXiv | 2025-06-14 (v2 2025-07-28) | https://arxiv.org/abs/2506.12469 | primary | Autonomy is a design decision |
-| 3 | Four levels of human involvement; agent identity unique, cryptographically verifiable, accounted for, differentiated by capacity, catalogued and centrally managed; authorisations time- or session-bound, non-transferable, bounded by the authorising human; checkpoint kinds; approvals contextual and digestible; system-level enforcement of approval; version 1.5 published 2026-05-20 | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-05-20 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Autonomy; registry; identity; checkpoints; frameworks |
+| 3 | Four levels of human involvement; agent identity unique, cryptographically verifiable, accounted for, differentiated by capacity, catalogued and centrally managed; authorisations time- or session-bound, non-transferable, bounded by the authorising human; checkpoint kinds; approvals contextual and digestible; system-level enforcement of approval; version 1.5 published 2026-05-20; published 2026-05-20, updated 2026-06-05 | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Autonomy; registry; identity; checkpoints; frameworks |
 | 4 | Autonomy tiers Intern to Principal; promotion criteria; "You can stop one agent without stopping the business"; ATF v1, February 2026, CC BY 4.0 | Agentic Trust Framework v1 | CSAI Foundation / Cloud Security Alliance | 2026-02 | https://agentictrustframework.ai/ | primary | Autonomy; kill switch; frameworks |
 | 5 | Arts. 12, 14(3)-(4), 15(4)-(5), 25, 26(1)-(2), (5)-(6), 50(1), 53, 55; Art. 50 applies from 2 Aug 2026; Art. 113 as amended: Annex III high-risk from 2 Dec 2027, Annex I from 2 Aug 2028 | Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27 as amended by Regulation (EU) 2026/1744 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | Autonomy; checkpoints; kill switch; memory; telemetry; EU AI Act hooks |
 | 6 | Appendix 2: unique identity and minimum permissions by decision mode; credentials revoked at task end; deny by default when approval fails or no rule exists; execution limits; memory retention, isolation, no credentials in memory; decommissioning | AI Safety Governance Framework 3.0, Appendix 2 | TC260 / CAC | 2026-09-14 | https://www.cac.gov.cn/rootimages/uploadimg/1791137114683961/1791137114683961.pdf | primary | Registry; identity; tools; guardrails; kill switch; memory; frameworks |
@@ -1680,6 +1689,7 @@ only, from secondary listings, as the rest of the book does.
 | 5 | GDPR Art. 33 personal data breach notification within 72 hours where feasible | Regulation (EU) 2016/679 | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary (chapter 17 row [17]) | Severity section |
 | 6 | Blameless postmortems; postmortem triggers set in advance | Postmortem Culture: Learning from Failure (SRE book, ch. 15) | Google | 2016 | https://sre.google/sre-book/postmortem-culture/ | primary (chapter 17 row [11]) | Root cause, CAPA and blameless review |
 | 7 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 8 | Section 2.3.3, p. 43: logging and tracing to debug incidents (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([8] on the page) |
 
 #### bok/patterns/fria-as-code.md (FRIA-as-Code, generalised as Impact-Assessment-as-Code)
 
@@ -1701,6 +1711,7 @@ only, from secondary listings, as the rest of the book does.
 | 4 | NIST adversarial machine learning taxonomy, predictive and generative attack classes with NISTAML ids | NIST AI 100-2 E2025 | NIST | 2025-03-24 | https://csrc.nist.gov/pubs/ai/100/2/e2025/final | primary | Threat-model step |
 | 5 | SP 800-218A recommendation R1 on SSDF 1.1 task PW.1.1: risk modelling that includes AI model-specific vulnerability and threat types | NIST SP 800-218A | NIST | 2024-07 | https://csrc.nist.gov/pubs/sp/800/218/a/final | primary | Threat-model step |
 | 6 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 7 | Section 2.2.1, p. 26: red teaming and threat modelling as a cybersecurity-team responsibility (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([7] on the page) |
 
 #### bok/patterns/vendor-model-due-diligence-gate.md (Vendor / Model Due-Diligence Gate)
 
@@ -1714,6 +1725,7 @@ only, from secondary listings, as the rest of the book does.
 | 6 | NIST AI RMF Playbook MANAGE 3.1, 3.2, 2.4 | NIST AI RMF Playbook, MANAGE | NIST | 2023 | https://airc.nist.gov/airmf-resources/playbook/manage/ | primary (chapter 15 row [30]) | Operate step |
 | 7 | NIST AI RMF Playbook GOVERN 6.1, 6.2 (contingency for failures in high-risk third-party systems) | NIST AI RMF Playbook, GOVERN | NIST | 2023 | https://airc.nist.gov/airmf-resources/playbook/govern/ | primary (chapter 15 row [29]) | Operate step |
 | 8 | NIST AI RMF 1.0 functions (Govern, Map, Measure, Manage) | AI Risk Management Framework 1.0 | NIST | 2023-01-26 | https://www.nist.gov/itl/ai-risk-management-framework | primary | Maps to note |
+| 9 | Section 2.2.1, p. 28: security and control features to request from external providers (direct fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([9] on the page) |
 
 #### site/src/data/threats.ts and /resources/threats (threat bridge)
 
@@ -1814,7 +1826,7 @@ HB 3773 and BIPA dates, and the register's `url` for both now points to ilga.gov
 | 104 | deceptive-practices prong added by the Wheeler-Lea Act of 21 March 1938 | 15 U.S.C. § 45(a)(1), Unfair methods of competition and unfair or deceptive acts or practices unlawful | Legal Information Institute, Cornell Law School | 2026-09-24 | https://www.law.cornell.edu/uscode/text/15/45 | secondary | Reg. map (FTC Act s. 5 (15 U.S.C. 45)) |
 | 105 | competent and reliable evidence required for AI accuracy claims | "FTC Order Requires Workado to Back Up Artificial Intelligence Detection Claims" | Federal Trade Commission | 2025-04-28 | https://www.ftc.gov/news-events/news/press-releases/2025/04/ftc-order-requires-workado-back-artificial-intelligence-detection-claims | primary | Reg. map (FTC Act s. 5 (15 U.S.C. 45)) |
 | 106 | enacted 19 May 2025; s. 3: covered platforms establish a notice-and-removal process within one year of enactment and remove reported images, and known identical copies, within 48 hours; enforced by the FTC | TAKE IT DOWN Act, Public Law 119-12 | US Government Publishing Office, GovInfo | 2025-05-19 | https://www.govinfo.gov/content/pkg/PLAW-119publ12/html/PLAW-119publ12.htm | primary | Reg. map (TAKE IT DOWN Act (Public Law 119-12), process due 2026-05-19) |
-| 107 | agent identity unique, accounted for and centrally managed; authorisations scoped, time- or session-bound, non-transferable and bounded by the authorising human; significant checkpoints for high-stakes, irreversible, outlier and user-defined actions; approvals enforced through system-level controls | Model AI Governance Framework for Agentic AI, version 1.5 | IMDA | 2026-05-20 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Reg. map (Singapore: IMDA Model AI Governance Framework for Agentic AI (identity and authorisations); Singapore: IMDA Model AI Governance Framework for Agentic AI (human checkpoints)) |
+| 107 | agent identity unique, accounted for and centrally managed; authorisations scoped, time- or session-bound, non-transferable and bounded by the authorising human; significant checkpoints for high-stakes, irreversible, outlier and user-defined actions; approvals enforced through system-level controls; published 2026-05-20, updated 2026-06-05 | Model AI Governance Framework for Agentic AI, version 1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Reg. map (Singapore: IMDA Model AI Governance Framework for Agentic AI (identity and authorisations); Singapore: IMDA Model AI Governance Framework for Agentic AI (human checkpoints)) |
 | 108 | in effect 1 April 2019; systems procured before 24 June 2025 comply by 24 June 2026; 6.1 algorithmic impact assessment published before production; Appendix C requirements by impact level; notice, explanation, peer review, recourse, reporting | Directive on Automated Decision-Making | Treasury Board of Canada Secretariat | 2025-06-24 | https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=32592 | primary | Reg. map (Canada: Directive on Automated Decision-Making (federal institutions)) |
 | 109 | Art. 20 review of decisions taken solely on automated processing; Art. 65 entry into force, incl. Arts. 52 to 54 from 1 August 2021 | Lei Geral de Proteção de Dados Pessoais, Lei n. 13.709/2018, compiled text | Presidência da República (Brazil) | 2026-09-24 | https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/lei/l13709compilado.htm | primary | Reg. map (Brazil: LGPD Art. 20 (review of automated decisions)) |
 | 110 | Art. 24 automated decision-making; Arts. 55–56 personal information protection impact assessment kept at least three years; in force 1 November 2021 | Personal Information Protection Law of the People's Republic of China, English translation for reference | National People's Congress | 2021-12-29 | http://en.npc.gov.cn.cdurl.cn/2021-12/29/c_694559.htm | primary | Reg. map (China: Personal Information Protection Law, Arts. 24 and 55–56) |
@@ -1849,6 +1861,7 @@ ids, which stay secondary because the ISO text was not opened).
 | 3 | Regulation (EU) 2026/1744 (Digital Omnibus on AI), of 8 July 2026, amending Reg. (EU) 2024/1689; OJ L, 24 July 2026; in force 27 Jul 2026; Annex III high-risk obligations moved to 2 Dec 2027 | Regulation (EU) 2026/1744 | Publications Office of the EU (EUR-Lex) | 2026-07-24 | https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng | primary | Solution |
 | 4 | Directive on Automated Decision-Making (algorithmic impact assessment before production; Appendix B impact levels I to IV defined by reversibility and duration) | Directive on Automated Decision-Making | Treasury Board of Canada Secretariat | 2025-06-24 | https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=32592 | primary | Solution |
 | 5 | NIST AI RMF to ISO/IEC FDIS 42001 crosswalk (provider: Microsoft; lists the Annex B implementation-guidance clauses, whose numbers mirror the Annex A control ids, e.g. B.5.2 AI system impact assessment process, B.9.4 intended use of the AI system; the ISO text was not opened) | NIST AI RMF to ISO/IEC FDIS 42001 crosswalk | NIST AI Resource Center | 2023 | https://airc.nist.gov/docs/NIST_AI_RMF_to_ISO_IEC_42001_Crosswalk.pdf | secondary | Maps to note |
+| 6 | Section 2.1.1, pp. 15-17: suitability of agentic use cases, impact and likelihood factors (direct fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([6] on the page) |
 
 #### bok/patterns/ai-threat-model.md (AI Threat Model)
 
@@ -1864,6 +1877,7 @@ ids, which stay secondary because the ISO text was not opened).
 | 8 | Regulation (EU) 2024/1689 (AI Act): Art. 15(5) resilience against exploitation of vulnerabilities (data poisoning, model poisoning through pre-trained components, adversarial examples or model evasion, confidentiality attacks, model flaws); Art. 55(1)(d) cybersecurity protection for GPAI models with systemic risk (text read on the Commission's AI Act Service Desk, 2026-09-24) | Regulation (EU) 2024/1689 (AI Act) | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Solution |
 | 9 | Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (MAP 5.1 likelihood and magnitude of each identified impact; MEASURE 2.7 security and resilience "evaluated and documented") | Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 | NIST | 2023-01-26 | https://doi.org/10.6028/NIST.AI.100-1 | primary | Solution; Maps to note |
 | 10 | NIST AI RMF to ISO/IEC FDIS 42001 crosswalk (provider: Microsoft; lists the Annex B implementation-guidance clauses, whose numbers mirror the Annex A control ids, e.g. B.6.2.2 AI system requirements and specification, B.6.2.4 AI system verification and validation; the ISO text was not opened) | NIST AI RMF to ISO/IEC FDIS 42001 crosswalk | NIST AI Resource Center | 2023 | https://airc.nist.gov/docs/NIST_AI_RMF_to_ISO_IEC_42001_Crosswalk.pdf | secondary | Maps to note |
+| 11 | Section 2.1.1, p. 17: threat modelling as part of the upfront risk assessment (direct fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([11] on the page) |
 
 #### bok/patterns/training-data-rights-ledger.md (Training-Data Rights Ledger)
 
@@ -1928,6 +1942,7 @@ ids, which stay secondary because the ISO text was not opened).
 | 8 | Data (Use and Access) Act 2025, s. 80 (replaces UK GDPR Art. 22 with Arts. 22A–22D; Art. 22C safeguards: information, representations, human intervention, contest; in force 5 Feb 2026) | Data (Use and Access) Act 2025, s. 80 | legislation.gov.uk | 2025 | https://www.legislation.gov.uk/ukpga/2025/18/section/80 | primary | Solution |
 | 9 | Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (MEASURE 2.8 transparency and accountability risks "examined and documented"; MEASURE 2.9 model "explained, validated, and documented" and output "interpreted within its context") | Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 | NIST | 2023-01-26 | https://doi.org/10.6028/NIST.AI.100-1 | primary | Solution; Maps to note |
 | 10 | NIST AI RMF to ISO/IEC FDIS 42001 crosswalk (provider: Microsoft; lists the Annex B implementation-guidance clauses, whose numbers mirror the Annex A control ids, e.g. B.8.2 system documentation and information for users; the ISO text was not opened) | NIST AI RMF to ISO/IEC FDIS 42001 crosswalk | NIST AI Resource Center | 2023 | https://airc.nist.gov/docs/NIST_AI_RMF_to_ISO_IEC_42001_Crosswalk.pdf | secondary | Maps to note |
+| 11 | Section 2.2.2, p. 30: chain-of-thought may not be a faithful explanation (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([11] on the page) |
 
 #### bok/patterns/model-artefact-integrity.md (Model Artefact Integrity)
 
@@ -1990,6 +2005,7 @@ and carries its tag. Mappings are illustrative, not a claim of conformity.
 | 10 | ISO/IEC 42001 Annex A ids: A.8.2 system documentation and information for users; A.9.2 processes for responsible use of AI systems | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
 | 11 | NIST AI RMF subcategories MAP 3.5, MEASURE 3.3, MANAGE 4.1 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Maps to note |
 | 12 | Circular 2022-03 withdrawn on 12 May 2025 (87 FR 35864; withdrawal notice 90 FR 20084); the Regulation B duty is unchanged | Withdrawn guidance | Consumer Financial Protection Bureau | 2025-05-12 | https://www.consumerfinance.gov/compliance/guidance/withdrawn-guidance/ | primary | Context |
+| 13 | Section 2.4.2, p. 47: human contact points for users dissatisfied with a decision (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([13] on the page) |
 
 #### bok/patterns/rights-requests-against-models.md (Rights Requests Against Models)
 
@@ -2016,6 +2032,7 @@ and carries its tag. Mappings are illustrative, not a claim of conformity.
 | 4 | GDPR Art. 5(1)(c) data minimisation | Regulation (EU) 2016/679 | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary | Forces |
 | 5 | ISO/IEC 42001 Annex A ids: A.2 policies related to AI; A.9.2 processes for responsible use; A.10.3 suppliers | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
 | 6 | NIST AI RMF subcategories GOVERN 2.2, GOVERN 6.1, MANAGE 3.1 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Maps to note |
+| 7 | Section 2.3.1, p. 34: controls on the MCP layer (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([7] on the page) |
 
 #### bok/patterns/staged-rollout-rollback-criteria.md (Staged Rollout with Rollback Criteria)
 
@@ -2027,6 +2044,7 @@ and carries its tag. Mappings are illustrative, not a claim of conformity.
 | 4 | AI Act Art. 26(5) monitor, suspend and inform; Art. 60 testing in real-world conditions | Regulation (EU) 2024/1689 | Publications Office of the EU (EUR-Lex) | 2024-07-12 | https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng | primary | Context |
 | 5 | NIST AI RMF subcategories MANAGE 1.1, MEASURE 2.3, MANAGE 2.4 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Context; Maps to note |
 | 6 | ISO/IEC 42001 Annex A ids: A.6.2.5 AI system deployment; A.6.2.6 operation and monitoring | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
+| 7 | Section 2.3.3, p. 42: gradual deployment of agents (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([7] on the page) |
 
 #### bok/patterns/drift-fairness-monitor.md (Drift & Fairness Monitor)
 
@@ -2038,6 +2056,7 @@ and carries its tag. Mappings are illustrative, not a claim of conformity.
 | 4 | NYC Local Law 144: bias audit within one year before use | Automated Employment Decision Tools | NYC Department of Consumer and Worker Protection | 2023 | https://www.nyc.gov/site/dca/about/automated-employment-decision-tools.page | primary | Context |
 | 5 | NIST AI RMF subcategories MEASURE 2.4, MEASURE 2.11, MEASURE 3.1, MANAGE 4.1 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Context; Maps to note |
 | 6 | ISO/IEC 42001 Annex A ids: A.5.4 impact on individuals or groups; A.6.2.6 operation and monitoring | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
+| 7 | Section 2.3.3, p. 44: testing after deployment for model drift (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([7] on the page) |
 
 #### bok/patterns/downstream-use-register.md (Downstream Use Register)
 
@@ -2063,6 +2082,7 @@ and carries its tag. Mappings are illustrative, not a claim of conformity.
 | 7 | Competency IV.C lists establishing external communication plans (paraphrased; not affiliated with or endorsed by IAPP) | AIGP Body of Knowledge and Exam Blueprint, version 2.1 | IAPP | 2025-09-09 | https://prod.iapp.org/media/pdf/certification/AIGP_Cert_BOK_2025_FINAL_v2.1.0.pdf | primary | Context |
 | 8 | ISO/IEC 42001 Annex A ids: A.8.2, A.8.3 external reporting, A.8.4 communication of incidents, A.8.5 information for interested parties | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
 | 9 | NIST AI RMF subcategories GOVERN 4.2, GOVERN 5.1, MANAGE 4.3 | AI RMF 1.0, NIST AI 100-1 | NIST | 2023-01-26 | https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf | primary | Maps to note |
+| 10 | Section 2.4.2, p. 47: disclosing agent interaction to users (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([10] on the page) |
 
 #### bok/patterns/deactivation-localisation-retirement-runbook.md (Deactivation, Localisation & Retirement Runbook)
 
@@ -2074,6 +2094,7 @@ and carries its tag. Mappings are illustrative, not a claim of conformity.
 | 4 | ASI10 Rogue Agents | Top 10 for Agentic Applications 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary | Maps to note |
 | 5 | ISO/IEC 42001 Annex A ids: A.6.2.5, A.6.2.6 | ISO/IEC 42001:2023 | ISO/IEC (titles via a secondary listing) | 2023-12 | https://www.iso.org/standard/42001 | secondary | Maps to note |
 ## site/src/pages/toolkit/obligations-planner.astro (/toolkit/obligations-planner)
+| 6 | Section 2.3.3, p. 44: termination and fallback after catastrophic malfunction (partial fit) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | Solution ([6] on the page) |
 
 Block w2-tool-planner, checked 2026-09-24. The `#` column matches the page's `[n]` markers. The
 planner reads the EU AI Act and GPAI Code of Practice rows of the obligation register (chapter 08,
@@ -2293,7 +2314,7 @@ illustrative, not a claim of conformity.
 
 | # | Claim | Source | Publisher | Date | URL | Verified | Used in |
 |---|---|---|---|---|---|---|---|
-| 1 | a deployer becomes provider on name or trademark, substantial modification or a change of intended purpose (Art. 25(1)); the FRIA complements a DPIA that already meets part of Art. 27 (Art. 27(4)); interaction notice and marking (Art. 50); notice to people subject to Annex III decisions (Art. 26(11)); right to an explanation (Art. 86) | Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 July 2026 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | Legal and DPO hub, questions 1 to 3 |
+| 1 | a deployer becomes provider on name or trademark, substantial modification or a change of intended purpose (Art. 25(1)); where a DPIA already meets part of Art. 27, the FRIA may cross-reference or include the relevant DPIA sections (Art. 27(4) as replaced by Reg. (EU) 2026/1744); interaction notice and marking (Art. 50); notice to people subject to Annex III decisions (Art. 26(11)); right to an explanation (Art. 86) | Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 July 2026 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | Legal and DPO hub, questions 1 to 3 |
 | 2 | information and access rights, and automated individual decisions (Arts. 13 to 15 and 22) | Regulation (EU) 2016/679 (General Data Protection Regulation) | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng | primary | Legal and DPO hub, question 3 |
 
 ### site/src/data/audiences.ts: /for/executives-board
@@ -2307,7 +2328,7 @@ illustrative, not a claim of conformity.
 
 | # | Claim | Source | Publisher | Date | URL | Verified | Used in |
 |---|---|---|---|---|---|---|---|
-| 1 | FRIA before first use for bodies governed by public law and private entities providing public services, Annex III point 2 excepted (Art. 27(1)), complementing the DPIA (Art. 27(4)); registration by public-authority deployers (Arts. 26(8), 49); notice (Art. 26(11)) and explanation (Art. 86); legacy systems intended for public authorities comply by 2 August 2030 (Art. 111(2), date rendered from the register) | Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 July 2026 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | Public sector hub, questions 1 to 3 |
+| 1 | FRIA before first use for bodies governed by public law and private entities providing public services, Annex III point 2 excepted (Art. 27(1)), reusing the DPIA by cross-reference or inclusion (Art. 27(4) as replaced by Reg. (EU) 2026/1744); registration by public-authority deployers (Arts. 26(8), 49); notice (Art. 26(11)) and explanation (Art. 86); legacy systems intended for public authorities comply by 2 August 2030 (Art. 111(2), date rendered from the register) | Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 27 July 2026 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | Public sector hub, questions 1 to 3 |
 | 2 | mandatory for government departments and for arm's-length bodies that deliver public or frontline services or deal directly with the public | Algorithmic Transparency Recording Standard hub | Government Digital Service (GOV.UK) | 2025-05-08 | https://www.gov.uk/government/collections/algorithmic-transparency-recording-standard-hub | primary | Public sector hub, question 2 |
 
 ### site/src/data/audiences.ts: /for/smes
@@ -2548,7 +2569,7 @@ the source.
 | 23 | The `act` claim "provides a means within a JWT to express that delegation has occurred and identify the acting party" | RFC 8693, OAuth 2.0 Token Exchange | IETF | 2020-01 | https://www.rfc-editor.org/rfc/rfc8693.html | primary | EVAL-003 |
 | 24 | MCP servers MUST validate that access tokens were issued specifically for them; "MUST NOT accept or transit any other tokens"; clients MUST send the RFC 8707 `resource` parameter | MCP specification 2026-07-28, Authorization | Model Context Protocol | 2026-07-28 | https://modelcontextprotocol.io/specification/2026-07-28/basic/authorization | primary | EVAL-003 |
 | 25 | SVIDs are "short lived cryptographic identity documents"; Workload API for automatic rotation | SPIFFE overview | SPIFFE project | 2026 | https://spiffe.io/docs/latest/spiffe-about/overview/ | primary | EVAL-003 |
-| 26 | Agent identity unique and "cryptographically verifiable"; authorisations "time- or session-bound, non-transferable"; version 1.5 published 20 May 2026 (updated 5 Jun 2026) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-05-20 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | EVAL-003 |
+| 26 | Agent identity unique and "cryptographically verifiable"; authorisations "time- or session-bound, non-transferable"; version 1.5 published 20 May 2026 (updated 5 Jun 2026) | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | EVAL-003 |
 | 27 | An internally deployed model "published a researcher's GitHub token in the public openai/codex repository", split into pieces with the stated aim of avoiding secret scanning; keys deactivated; the model was brought back with "enforced auto-review on all actions"; report updated 25 Sep 2026; described as what OpenAI reports | Exposing a GitHub token in a public repository (misalignment report) | OpenAI (Alignment Research Blog) | 2026-09-25 | https://alignment.openai.com/misalignment-reports/exposing-a-github-token-in-a-public-repository/ | primary (company report) | EVAL-003, 004 |
 | 28 | Checkpoint placement by operation class | Where to put a checkpoint (BoK ch. 23) | AI Governance Engineer (Jorge García Aibar) | 2026-09 | https://aigovernanceengineer.com/bok/governing-agents#where-to-put-a-checkpoint | primary | EVAL-004 |
 | 29 | Admission of an MCP server as a supplier; pinned tool definitions | Admitting an MCP server (BoK ch. 23) | AI Governance Engineer (Jorge García Aibar) | 2026-09 | https://aigovernanceengineer.com/bok/governing-agents#admitting-an-mcp-server | primary | EVAL-004, 008 |
@@ -2841,3 +2862,50 @@ post-market-monitoring-plan.v1, names Art. 9(2) among the obligations it evidenc
 | 51 | ASI01 Agent Goal Hijack to ASI10 Rogue Agents | OWASP Top 10 for Agentic Applications for 2026 | OWASP GenAI Security Project | 2025-12-09 | https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ | primary (reused: bok/01-definition.md, row [5]) | DEPLOY-013 |
 | 52 | approved-tool catalogue, one gateway, data-class rules, access on attestation, a signed decision event per call | Pattern: Sanctioned AI Gateway (pattern page) | AI Governance Engineering Body of Knowledge | 2026-09 | https://aigovernanceengineer.com/patterns/sanctioned-ai-gateway | primary | DEPLOY-014 |
 | 53 | LLM01:2026 Prompt Injection to LLM10:2026 Improper Output Handling; resource page dated 3 Aug 2026 | OWASP GenAI LLM Top 10 2026 | OWASP GenAI Security Project | 2026-08-03 | https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/ | primary (reused: bok/09-glossary.md, row [84]) | DEPLOY-014 |
+
+## site/src/data/controls/imda-agentic.ts (IMDA cross-references on the open controls)
+
+Cross-references from 55 reference controls (21 direct, 34 partial fits) to the IMDA framework,
+opened on 2026-09-28; every quote was checked against the page it cites. The constant lives in
+`site/src/lib/sources.ts` (`IMDA_AGENTIC`) and replaces the local copy in
+`evaluation-environment.ts`.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | Four dimensions (assess and bound the risks upfront; make humans meaningfully accountable; implement technical controls and processes; enable end-user responsibility); agent identity unique, cryptographically verifiable, catalogued and centrally managed (p. 23); authorisations scoped, time- or session-bound, non-transferable (p. 24); checkpoints for high-stakes, irreversible, outlier and user-defined actions (p. 29); override rate and response time as oversight indicators, deny by default when approval infrastructures fail (p. 30); runtime controls, MCP whitelisting, sandboxed code execution (p. 34); gradual rollout (p. 42); stop and escalate (p. 43); alert thresholds, OpenTelemetry, log immutability, termination and fallback (p. 44); change-review triggers (p. 45); version 1.5 published 2026-05-20, updated 2026-06-05; the document never uses the terms kill switch, circuit breaker or registry | Model AI Governance Framework for Agentic AI, v1.5 | IMDA | 2026-06-05 | https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf | primary | 55 controls (`mappings.other`, `references`) |
+
+## site/src/data/crosswalk.ts: AI Verify column (2026-09-28)
+
+Sixteenth crosswalk column. Cells use the ids of the 2025 checklist (Principle > Outcome > Process,
+x.y.z) and are set only where one of the 2025 official crosswalks cites the check; the 2023 NIST AI
+RMF crosswalk uses the pre-2025 numbering (it still has a twelfth principle, "Organisational
+Considerations") and is cited here for its existence, never for a check id. Tables were rebuilt from
+text coordinates and checked against the rendered pages. Idea: Aurélie Pols.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | 11 principles; process checks and technical tests for traditional and generative AI; updated framework released 29 May 2025; MVP launched 25 May 2022, open-sourced 7 June 2023 | AI Verify Testing Framework (framework page) | AI Verify Foundation / IMDA | 2025-05-29 | https://aiverifyfoundation.sg/tools/ai-verify-testing-framework/ | primary | `sg-ai-verify` framework entry; every cell url |
+| 2 | Process ids and wording of each cell (107 process checks and 5 technical tests) | AI Verify Testing Framework, For Traditional and Generative AI (PDF, 118 pages) | AI Verify Foundation / IMDA | 2025-05 | https://file.go.gov.sg/aivtf-pdf.pdf | primary | cell titles |
+| 3 | The same ids as a checklist | AI Verify Testing Framework checklist (Excel) | AI Verify Foundation / IMDA | 2025-05 | https://file.go.gov.sg/aivtf-excel.xlsx | primary | cell ids |
+| 4 | AI RMF 1.0 categories (GOVERN 1 to MANAGE 4) mapped to principles and checks in the pre-2025 numbering; not cited by id | Crosswalk: AI RMF (1.0) and AI Verify | IMDA | 2023-10-13 | https://go.gov.sg/crosswalk-aivfxairmf | primary | column notes |
+| 5 | Each NIST AI 600-1 action id (GV-1.1-001 ...) mapped to one or more AI Verify check ids; 212 rows | Crosswalk Between NIST AI Risk Management Framework: Generative AI Profile (AI 600-1) and Singapore/IMDA AI Verify Testing Framework | IMDA | 2025-05-28 | https://file.go.gov.sg/crosswalk-aivtfxairmf-genaiprofile.pdf | primary | cells citing GV-, MP-, MS-, MG- action ids |
+| 6 | Each of the 11 Actions of the Code of Conduct and its lettered items mapped to AI Verify checks | Crosswalk between AI Verify testing framework and G7's Code of Conduct | IMDA | 2025-05-29 | https://go.gov.sg/crosswalk-aivtf-coc | primary | cells citing G7 Actions |
+| 7 | ISO/IEC 42001:2023 Annex A control groups (A.2 to A.10) mapped to AI Verify process checks; no mapping for main clauses 4 to 10 | Crosswalk between ISO/IEC 42001:2023 and Singapore's AI Verify Testing Framework | IMDA | 2025-07-21 | https://go.gov.sg/crosswalk-aivtf-iso42001 | primary | cells citing Annex A groups |
+
+## site/src/data/dpia-lists.ts (/resources/dpia-lists)
+
+The 18 Art. 35(4) lists in the EDPB register, each read in full on 2026-09-28 (the English file in
+the register and, for 16, the national original); every list document, national original and EDPB
+opinion is linked from its row in the data and on the page. AI Act text read on EUR-Lex (consolidated
+text of 27 July 2026) and on the Publications Office's copy of the same Official Journal text. The
+`#` column matches the page's numbered source list. Idea: Aurélie Pols.
+
+| # | Claim | Source | Publisher | Date | URL | Verified | Used in |
+|---|---|---|---|---|---|---|---|
+| 1 | DPIA where processing is likely to result in a high risk (Art. 35(1)); the three cases that always need one (35(3)); national lists of operations that need one (35(4)) and that do not (35(5)) | Regulation (EU) 2016/679 (General Data Protection Regulation), Art. 35 | Publications Office of the EU (EUR-Lex) | 2016-04-27 | https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng#art_35 | primary | Where the lists come from |
+| 2 | Nine criteria; processing meeting two or more generally needs a DPIA; adopted 4 October 2017, endorsed by the EDPB on 25 May 2018 | Guidelines on DPIA, WP248 rev.01 | Article 29 Working Party | 2017-10-04 | https://ec.europa.eu/newsroom/article29/items/611236/en | primary | Where the lists come from |
+| 3 | Art. 26(9) verbatim; Art. 27(4) verbatim as replaced (cross-reference or include the relevant DPIA sections); Annex III area headings | Regulation (EU) 2024/1689 (Artificial Intelligence Act), consolidated text of 2026-07-27 | Publications Office of the EU (EUR-Lex) | 2026-07-27 | https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng | primary | AI Act section |
+| 4 | 18 Art. 35(4) lists in the register view, re-checked on 2026-09-28 | EDPB register of national DPIA lists (consistency mechanism, black list) | European Data Protection Board | 2026-09-28 | https://www.edpb.europa.eu/search_en?key=high+risk+&type%5Bconsistency_mechanism%7Cblack_list%5D=consistency_mechanism%7Cblack_list&date= | primary | table; findings |
+| 5 | 22 opinions on draft Art. 35(4) lists adopted on 25 September 2018 (Austria, Belgium, Bulgaria, Czech Republic, Germany, Estonia, Greece, Finland, France, Hungary, Ireland, Italy, Lithuania, Latvia, Malta, Netherlands, Poland, Portugal, Romania, Sweden, Slovakia, United Kingdom) | What's subject to a DPIA under the GDPR? EDPB on draft lists of 22 supervisory authorities | IAPP | 2018 | https://iapp.org/news/a/whats-subject-to-a-dpia-under-the-gdpr-edpb-on-draft-lists-of-22-supervisory-authorities | secondary | findings |
+| 6 | Art. 1, point (13)(a) replaces Art. 27(4): the 2024 "shall complement that data protection impact assessment" becomes cross-reference or inclusion of the relevant DPIA sections; Arts. 26 and 27 apply to Annex III systems from 2 December 2027 | Regulation (EU) 2026/1744 (Digital Omnibus on AI) | Publications Office of the EU (EUR-Lex) | 2026-07-24 | https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng | primary | AI Act section |
+| 7 | Opinions 1/2018 to 22/2018 of 25 September 2018; later Art. 35(4) opinions 24/2018 to 27/2018 (4 December 2018) and 01/2019, 2/2019, 6/2019, 7/2019, 10/2019: 31 found | Opinion 1/2018 on the draft list of the competent supervisory authority (Art. 35.4 GDPR), and the EDPB opinion series | European Data Protection Board | 2018-09-25 | https://www.edpb.europa.eu/documents/opinion-of-the-board-art-64/opinion-12018-on-the-draft-list-of-the-competent-supervisory_en | primary | findings |

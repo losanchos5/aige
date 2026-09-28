@@ -141,6 +141,11 @@ Illustrative retirement record, as a decommissioning runbook:
 > grounded-only answers there with health topics scoped off, other markets are untouched, and the
 > decision, the toggles and the notices are in the assurance store.
 
+Singapore's framework for agentic AI covers the decision to stop: "In the event of catastrophic
+agentic malfunction or compromise, commensurate measures such as termination and fallback solutions
+should be considered" (IMDA, section 2.3.3, p. 44) [6]. It gives no runbook and no localisation or
+retirement procedure.
+
 ## Consequences
 Stopping becomes proportionate and fast, localisation is a switch rather than a redeploy, and
 retirement leaves a complete, retained record instead of a gap. The cost is building and testing the
@@ -170,3 +175,4 @@ conformity.
 [3] AIGP Body of Knowledge and Exam Blueprint, version 2.1 (competency IV.C, governing AI deployment and use: a policy and controls to deactivate or localise an AI system as necessary; approved 9 Sep 2025, effective 2 Feb 2026; cited by competency code and paraphrased; this site is not affiliated with or endorsed by IAPP). IAPP. 2025-09-09. https://prod.iapp.org/media/pdf/certification/AIGP_Cert_BOK_2025_FINAL_v2.1.0.pdf (verified: primary)
 [4] Top 10 for Agentic Applications 2026 (ASI10 Rogue Agents). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [5] ISO/IEC 42001:2023, AI management system, Annex A controls referenced by identifier and short title only (A.6.2.5 AI system deployment; A.6.2.6 AI system operation and monitoring). ISO/IEC (titles checked via a secondary listing). 2023-12. https://www.iso.org/standard/42001 (verified: secondary)
+[6] Model AI Governance Framework for Agentic AI, v1.5 (section 2.3.3, p. 44: termination and fallback after catastrophic malfunction; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

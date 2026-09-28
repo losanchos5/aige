@@ -58,6 +58,11 @@ it, and escalate the unclaimed. Feed the result back into the Agent Registry's d
 > team's cloud account with no registry entry; it is auto-registered as unclaimed, its owner is
 > notified, and its scope is frozen until claimed.
 
+Singapore's framework for agentic AI names the risk this pattern answers, "the uncontrolled
+proliferation of AI agents without centralised management" (IMDA, section 1.2.3, p. 12), and answers
+it with central cataloguing of agent identities (p. 23) [5]. It does not describe finding agents
+that run outside the catalogue.
+
 ## Consequences
 The inventory converges on reality and the blind spot shrinks. The cost is discovery integration and the
 process to triage and claim what it finds.
@@ -79,3 +84,4 @@ the NIST AI RMF [4]. Mappings are illustrative, not a claim of conformity.
 [2] 2026 AI Threat Landscape Report (vendor survey; key finding stated on the report page: one in eight breaches were agentic). HiddenLayer. 2026. https://www.hiddenlayer.com/report-and-guide/threatreport2026 (verified: primary)
 [3] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [4] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[5] Model AI Governance Framework for Agentic AI, v1.5 (section 1.2.3, p. 12: agent sprawl as a risk; section 2.1.2, p. 23: central cataloguing of agent identities; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

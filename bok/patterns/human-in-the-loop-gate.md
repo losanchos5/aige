@@ -53,6 +53,13 @@ approval step with enough context to decide, and block the action until approval
 context and the decision as evidence. Keep the routine class autonomous under guardrails. This realises
 the EU AI Act Art. 14 human-oversight requirement [1] at the point of action.
 
+Singapore's framework for agentic AI describes the same gate: organisations "should define
+significant checkpoints or action boundaries that require human approval, especially before
+sensitive actions are executed", irreversible ones among them, and keep approval requests
+"contextual and digestible, while making the risk clear" (IMDA, p. 29). It also asks them to track
+the human override rate, since a low rate "may signal rubber-stamping behaviours", and to deny
+action by default when the approval infrastructure fails (p. 30) [4].
+
 > **Example (illustrative)** An agent can draft and queue refunds autonomously, but any refund above a
 > threshold is held for a named human approver, whose decision is logged against the transaction.
 
@@ -77,3 +84,4 @@ the NIST AI RMF [3]. Mappings are illustrative, not a claim of conformity.
 [1] Regulation (EU) 2024/1689 (AI Act), Art. 14 (human oversight of high-risk AI systems). Publications Office of the EU (EUR-Lex). 2024-07-12. https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng (verified: primary)
 [2] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [3] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[4] Model AI Governance Framework for Agentic AI, v1.5 (section 2.2.2, design for meaningful human oversight, pp. 29-30: checkpoints that require human approval; override rate; deny by default when approval infrastructure fails; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

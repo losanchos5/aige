@@ -92,6 +92,7 @@ import {
   observationExamples as deploymentAndMonitoringObservationExamples,
 } from './deployment-and-monitoring';
 import { CONTROL_ID_PATTERN } from './ids';
+import { withImdaAgentic } from './imda-agentic';
 
 export const CONTROLS_AS_OF = '2026-09-26';
 
@@ -306,13 +307,15 @@ export const profiles: readonly ControlProfile[] = [
   deploymentAndMonitoringProfile,
 ];
 
+// Each control gains its IMDA Agentic AI cross-reference here (./imda-agentic.ts),
+// so the profile files stay as derived and the cross-reference lives in one place.
 export const controls: readonly Control[] = [
   ...evaluationEnvironmentControls,
   ...agentRuntimeControls,
   ...dataAdmissionAndPrivacyControls,
   ...assuranceAndEvidenceControls,
   ...deploymentAndMonitoringControls,
-];
+].map(withImdaAgentic);
 
 /**
  * Example observations of every profile (public/controls/examples/), one pass

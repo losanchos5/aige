@@ -168,6 +168,7 @@ export const GET: APIRoute = async (context) => {
         '/resources/crosswalk.json',
         'The same mapping as JSON, with the disclaimer, version and licence in the payload.',
       ),
+      described('/resources/dpia-lists', 'National DPIA lists and the EU AI Act'),
       page(
         'AI contract and licence clauses',
         '/resources/contracts',

@@ -466,6 +466,12 @@ export function obligationDescription(row: Obligation): string {
  * descriptions' rules (110 to 158 characters, whole sentences).
  */
 export const DESCRIPTION_LEADS: Readonly<Record<string, string>> = {
+  // The generic leads of these two GAO rows fell to 92 and 93 characters (the
+  // requirement's first sentence does not fit behind the label), under the 110 floor.
+  'AIGE-OBL-USGAO-GOV':
+    'GAO AI Accountability Framework principle 1: governance through clear goals and roles, values, skills and an AI risk plan.',
+  'AIGE-OBL-USGAO-PERF':
+    'GAO AI Accountability Framework principle 3: performance, with defined metrics, bias checks and human supervision.',
   'AIGE-OBL-EUAIA-ART18':
     'EU AI Act Art. 18: providers keep technical and QMS documentation, notified-body changes and decisions and the EU declaration for authorities for 10 years.',
   'AIGE-OBL-EUAIA-ART26-4':

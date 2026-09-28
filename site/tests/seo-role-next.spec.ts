@@ -215,19 +215,23 @@ test.describe('llms: comparisons section and the regulatory split', () => {
     const llms = dist('llms.txt');
     const regulatory = dist('llms-full-regulatory.txt');
     const register = dist('llms-full-obligations.txt');
-    for (const path of ['/llms-full-regulatory.txt', '/llms-full-obligations.txt']) {
+    const crosswalk = dist('llms-full-crosswalk.txt');
+    for (const path of ['/llms-full-regulatory.txt', '/llms-full-obligations.txt', '/llms-full-crosswalk.txt']) {
       expect(llms, path).toMatch(new RegExp(`\\(${ORIGIN.replace(/[.]/g, '\\.')}${path.replace(/[.]/g, '\\.')}\\): .*about \\d+k tokens`));
     }
     // About four characters per token (lib/llms.ts approxTokens).
-    for (const [name, body] of [['regulatory', regulatory], ['obligations', register]] as const) {
+    for (const [name, body] of [['regulatory', regulatory], ['obligations', register], ['crosswalk', crosswalk]] as const) {
       expect(body.length, `${name}: ${Math.round(body.length / 4000)}k tokens`).toBeLessThanOrEqual(400_000);
     }
     expect(register).toContain(`Source: ${ORIGIN}/obligations\n`);
     expect(regulatory).not.toContain(`Source: ${ORIGIN}/obligations\n`);
     expect(register.match(/^## AIGE-OBL-/gm)?.length).toBe(obligations.length);
-    for (const path of ['/bok/regulatory-map', '/resources/frameworks', '/resources/crosswalk']) {
+    for (const path of ['/bok/regulatory-map', '/resources/frameworks']) {
       expect(regulatory, path).toContain(`Source: ${ORIGIN}${path}\n`);
     }
+    // The crosswalk has its own slice since its AI Verify column (2026-09-28).
+    expect(crosswalk).toContain(`Source: ${ORIGIN}/resources/crosswalk\n`);
+    expect(regulatory).not.toContain(`Source: ${ORIGIN}/resources/crosswalk\n`);
     for (const c of comparisons) expect(regulatory, c.slug).toContain(`Source: ${ORIGIN}${comparisonPath(c)}\n`);
   });
 });

@@ -68,6 +68,10 @@ Illustrative schema for the verdict:
 > refunds tool only up to a bounded amount and never outside business hours; the same card is evaluated
 > in CI against the agent's declared scope and at runtime by the tool-call guardrail.
 
+Singapore's framework for agentic AI argues the premise of this pattern: "In general, prefer
+deterministic rather than non-deterministic limits, and bound by design" (IMDA, section 2.1.2, p.
+19) [4]. It does not describe a machine-readable policy artefact.
+
 ## Consequences
 Rules become enforceable and auditable, and the crosswalk generates itself. The cost is authoring and
 maintaining cards, and the discipline to keep the executable version authoritative over the prose.
@@ -89,3 +93,4 @@ the NIST AI RMF [3]. Mappings are illustrative, not a claim of conformity.
 [1] Policy Cards: machine-readable, deployment-layer governance artefacts for AI agents, linked to enforcement and audit pipelines (arXiv 2510.24383). 2025-10. https://arxiv.org/abs/2510.24383 (verified: primary)
 [2] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [3] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[4] Model AI Governance Framework for Agentic AI, v1.5 (section 2.1.2, p. 19: deterministic limits, bound by design; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

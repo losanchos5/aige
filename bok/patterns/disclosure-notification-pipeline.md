@@ -136,6 +136,11 @@ Illustrative disclosure manifest generated from the registry, with one notice se
 > change notice to business customers 30 days ahead from the approved template, and a check in CI fails
 > the build when a redesigned chat widget no longer renders the AI-interaction notice.
 
+Singapore's framework for agentic AI says where the notice belongs: "Declare upfront in the user
+interface that the users are interacting with agents at the point of interaction, rather than
+writing it only in separate documentation" (IMDA, section 2.4.2, p. 47) [10]. It says what to
+disclose, not how to generate or record the notices.
+
 ## Consequences
 What the organisation says about its AI matches what runs, notices go out on time from approved
 templates, and each one is provable. The cost is the duty matrix to maintain as laws change, template
@@ -167,3 +172,4 @@ illustrative, not a claim of conformity.
 [7] AIGP Body of Knowledge and Exam Blueprint, version 2.1 (competency IV.C, governing AI deployment and use: establish external communication plans; approved 9 Sep 2025, effective 2 Feb 2026; cited by competency code and paraphrased; this site is not affiliated with or endorsed by IAPP). IAPP. 2025-09-09. https://prod.iapp.org/media/pdf/certification/AIGP_Cert_BOK_2025_FINAL_v2.1.0.pdf (verified: primary)
 [8] ISO/IEC 42001:2023, AI management system, Annex A controls referenced by identifier and short title only (A.8.2 system documentation and information for users; A.8.3 external reporting; A.8.4 communication of incidents; A.8.5 information for interested parties). ISO/IEC (titles checked via a secondary listing). 2023-12. https://www.iso.org/standard/42001 (verified: secondary)
 [9] Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (GOVERN 4.2 impacts documented and communicated more broadly; GOVERN 5.1 feedback from those external to the team; MANAGE 4.3 incidents and errors communicated to relevant AI actors, including affected communities). NIST. 2023-01-26. https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf (verified: primary)
+[10] Model AI Governance Framework for Agentic AI, v1.5 (section 2.4.2, p. 47: disclosing agent interaction to users; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

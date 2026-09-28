@@ -16,7 +16,7 @@
 // illustrative, not a claim of conformity.
 //
 // Version 2 (BoK v0.5.0) widens the grid to 25 topics and 14 columns (15 since
-// the GAO audit column of 2026-09-27), keeps a
+// the GAO audit column of 2026-09-27, 16 with AI Verify on 2026-09-28), keeps a
 // fallback list for instruments the register does not carry yet
 // (`crosswalkInstruments`, looked up after frameworks.ts), and gives every
 // reference a `clauseId` token that the explorer and the OSCAL export reuse.
@@ -145,6 +145,9 @@ const COE_URL = 'https://rm.coe.int/1680afae3c';
 const OECD_URL = 'https://legalinstruments.oecd.org/en/instruments/OECD-LEGAL-0449';
 /** GAO-21-519SP, opened 2026-09-27 (framework summary, pp. 5-8). */
 const GAO_URL = 'https://www.gao.gov/products/gao-21-519sp';
+/** AI Verify Testing Framework (traditional and generative AI, updated 29 May 2025),
+ *  opened 2026-09-28; process ids (x.y.z) as in its PDF and Excel checklist. */
+const AIV_URL = 'https://aiverifyfoundation.sg/tools/ai-verify-testing-framework/';
 const G7_URL =
   'https://digital-strategy.ec.europa.eu/en/library/hiroshima-process-international-code-conduct-advanced-ai-systems';
 const EN18286_URL =
@@ -464,7 +467,7 @@ export const topics: readonly Topic[] = [
 ];
 
 /**
- * The fifteen columns, in display order. The v0.4 columns keep their ids (eu,
+ * The sixteen columns, in display order. The v0.4 columns keep their ids (eu,
  * iso, nist, cn) and stay the default view; the rest join through the column
  * chooser. Multi-instrument columns prefix their chips from chipPrefix.
  */
@@ -507,6 +510,8 @@ export const columns: readonly CrosswalkColumn[] = [
     frameworks: ['sg-genai-framework', 'sg-agentic-framework'],
     group: 'codes',
   },
+  // AI Verify: Singapore's testing framework, joined through its official crosswalks.
+  { id: 'aiverify', label: 'AI Verify', frameworks: ['sg-ai-verify'], group: 'codes' },
   {
     id: 'intl',
     label: 'Treaty and soft law',
@@ -2250,6 +2255,9 @@ const gao = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra 
     obligationId: `AIGE-OBL-USGAO-${GAO_ROWS[Number(ref.split('.')[0]) - 1]}`,
     ...x,
   });
+/** AI Verify process check or technical test (x.y.z); the register has no row for it. */
+const aiv = (t: string, ref: string, title: string, s: RefStrength, x: RefExtra = {}) =>
+  mk(t, 'sg-ai-verify', ref, title, s, AIV_URL, x);
 
 // Titles reused across topics.
 const T_ART_86 = 'Right to explanation of individual decision-making';
@@ -3036,8 +3044,184 @@ const refsGao: readonly CrosswalkRef[] = [
   gao('deployment-change-decommissioning', '4.5', 'Scaling: identify conditions, if any, under which the AI system may be scaled or expanded beyond its current use', 'related'),
 ];
 
-/** Every topic → clause reference: the v0.4 set, the v0.5.0 additions, then GAO. */
-export const refs: readonly CrosswalkRef[] = [...refsV04, ...refsV05, ...refsGao];
+// AI Verify Testing Framework (2025 checklist ids): a cell only where one of the
+// four official IMDA crosswalks (NIST AI RMF GenAI Profile 2025, G7 Hiroshima
+// Process Code of Conduct 2025, ISO/IEC 42001 2025; the 2023 NIST AI RMF
+// crosswalk uses the pre-2025 numbering and is never cited by id) cites the
+// check; each note names the crosswalk row. Topics with no such row stay empty.
+const refsAiVerify: readonly CrosswalkRef[] = [
+  aiv('risk-management', '4.3.1', 'Safety: assess risks, risk metrics and risk levels of the AI system in each specific use case', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps GV-1.3-001/002/007 (GOVERN 1.3) and MG-1.3-001 (MANAGE 1.3) to 4.3.1; AI Verify x ISO/IEC 42001 crosswalk maps group A.6 to it.',
+  }),
+  aiv('risk-management', '4.7.1', 'Safety: identify and track residual risk that cannot be measured or mitigated, and assess the organisation\'s tolerance for it', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-3.2-001 (MEASURE 3) and MS-1.1-009 to 4.7.1; AI Verify x ISO/IEC 42001 crosswalk lists it under the A.6.2 group.',
+  }),
+  aiv('risk-management', '4.2.1', 'Safety: carry out an assessment of materiality on key stakeholders, highlighting the risks of the proposed AI solution', 'related', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps GV-1.3-001 (GOVERN 1.3) and MP-1.1-003 to 4.2.1.',
+  }),
+  aiv('governance-accountability', '9.1.1', 'Accountability: establish policies on the development and use of AI aligned with other organisational policies', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.2 (Policies related to AI) to 9.1.1; AI Verify x G7 Code of Conduct crosswalk maps Action 5.c to it.',
+  }),
+  aiv('governance-accountability', '9.5.2', 'Accountability: clear internal governance mechanisms and roles, including a cross-departmental AI governance committee', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps GV-2.1-002 and GV-2.1-004 (GOVERN 2, roles and responsibilities) to 9.5.2; AI Verify x G7 Code of Conduct crosswalk maps Action 5.d to outcome 9.5.',
+  }),
+  aiv('impact-assessment', '11.2.1', 'Inclusive growth, societal and environmental well-being: assess the impact of the AI system on individuals and society', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.5.4 and A.5.5 (impacts on individuals and on society) to 11.2.1.',
+  }),
+  aiv('impact-assessment', '4.2.1', 'Safety: carry out an assessment of materiality on key stakeholders', 'related', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.5.2 and A.5.3 (impact assessment process and its documentation) to 4.2.1 among other Safety checks.',
+  }),
+  aiv('data-governance', '8.1.1', 'Data Governance: put in place measures to ensure data quality over time', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.7 (Data for AI systems) to 8.1.1; AI Verify x NIST AI 600-1 crosswalk maps MP-2.3-002 and MS-2.10-003 (MEASURE 2.10) to it.',
+  }),
+  aiv('data-governance', '8.2.1', 'Data Governance: understand the lineage of data (origin, collection, curation, movement) through a data provenance record', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps groups A.4 and A.7 (A.7.2 to A.7.6, incl. A.7.5 Data provenance) to 8.2.1; AI Verify x NIST AI 600-1 crosswalk maps MP-2.1-001/002 and MP-2.2-001 (MAP 2) to it.',
+  }),
+  aiv('documentation-transparency', '1.1.6', 'Transparency: publicly report accuracy, intended use cases, limitations, risk assessment and mitigations to stakeholders', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.8 to 1.1.6; AI Verify x G7 Code of Conduct crosswalk maps Actions 3.b and 3.c to it; AI Verify x NIST AI 600-1 crosswalk maps GV-1.2-001.',
+  }),
+  aiv('documentation-transparency', '1.7.2', 'Transparency: make model or system cards publicly available where warranted by public interest', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.8 and the A.6.2 group (incl. A.6.2.7 technical documentation) to 1.7.2.',
+  }),
+  aiv('documentation-transparency', '1.1.1', 'Transparency: design an in-house policy on communication to consumers that articulates the principles for transparency', 'related', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.8 to 1.1.1; AI Verify x NIST AI 600-1 crosswalk maps GV-1.2-001 and MP-5.1-003 to it.',
+  }),
+  aiv('inventory-registration', '9.12.1', 'Accountability: inventory AI systems and their data, tooling, computing and human resources according to risk priorities', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps GV-1.6-003 (GOVERN 1.6, AI system inventory) to 9.12.1; AI Verify x ISO/IEC 42001 crosswalk maps A.4 to it. AI Verify has no registration-with-authorities check.',
+  }),
+  aiv('inventory-registration', '5.5.1', 'Security: identify, track and protect AI-related assets (models, data, prompts, logs, assessments)', 'related', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps GV-1.6-001, -002 and -003 (GOVERN 1.6) to 5.5.1.',
+  }),
+  aiv('logging-traceability', '3.4.1', 'Reproducibility: log all inputs and inference outputs of the model and keep them for a reasonable time for review', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps the A.6.2 group (incl. A.6.2.8 recording of event logs) to 3.4.1; AI Verify x G7 Code of Conduct crosswalk maps Action 1.b (traceability) to 3.1.1 to 3.4.1.',
+  }),
+  aiv('logging-traceability', '9.8.1', 'Accountability: process or governance-by-design technology for auditability: versioned code, models and data, and an audit trail of deployments and inputs/outputs', 'core', {
+    note: 'No ISO or NIST crosswalk row cites 9.8.1; AI Verify x G7 Code of Conduct crosswalk maps Actions 5 and 5.c to it, and the check itself names the audit trail.',
+  }),
+  aiv('logging-traceability', '5.10.1', 'Security: monitor and log inputs to the AI system (queries, prompts, requests)', 'related', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps the A.6.2 group to 5.10.1; AI Verify x NIST AI 600-1 crosswalk maps MS-2.6-006 to it.',
+  }),
+  aiv('human-oversight', '10.3.1', 'Human Agency and Oversight: define the role of the human in oversight and control of the AI system (in, over or out of the loop)', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.3 (Internal organization) to 10.3.1; no crosswalk row ties it to A.9 or MANAGE 2.4, so the topic fit rests on the check\'s wording.',
+  }),
+  aiv('human-oversight', '10.3.2', 'Human Agency and Oversight: flag decisions the model is significantly unsure of for human review, and monitor human overrides', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-4.2-004 to 10.3.2.',
+  }),
+  aiv('human-oversight', '9.4.1', 'Accountability: a manual to deactivate the AI model and a communications plan for disengagement', 'related', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MG-2.4-001 and MG-2.4-004 (MANAGE 2.4, disengage or deactivate) to 9.4.1.',
+  }),
+  aiv('runtime-guardrails', '4.8.1', 'Safety: assess harms and implement measures that prevent the model generating unlawful or harmful content (CSAM, NCII, CBRN, offensive cyber)', 'related', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MG-2.2-005 (MANAGE 2) to 4.8.1; AI Verify x ISO/IEC 42001 crosswalk maps groups A.5 and A.6.1 to it.',
+  }),
+  aiv('robustness-security-evals', '4.1.1', 'Safety (technical test): run use-case benchmarks and red-teaming to evaluate for safety and possible harms (e.g. hallucination, toxicity)', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-2.3-001 to -004, MS-2.6-007 and MS-2.7-007 (MEASURE 2) to 4.1.1; AI Verify x G7 Code of Conduct crosswalk maps Action 1 to Safety 4.1.1 to 4.8.1.',
+  }),
+  aiv('robustness-security-evals', '6.1.1', 'Robustness (technical test): compare accuracy with and without added noise to document and monitor performance', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-2.3-001 (MEASURE 2.3) to 6.1.1.',
+  }),
+  aiv('robustness-security-evals', '5.2.1', 'Security: conduct security risk assessments that model threats and risks to the AI system', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-2.7-001, -002, -004 and -009 (MEASURE 2.7) to 5.2.1; AI Verify x G7 Code of Conduct crosswalk maps Action 1 to it.',
+  }),
+  aiv('robustness-security-evals', '5.9.1', 'Security: release AI systems only after appropriate and effective security checks and evaluation', 'related', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-4.2-001 and -002 to 5.9.1; AI Verify x G7 Code of Conduct crosswalk maps Actions 6.b and 6.c to it.',
+  }),
+  aiv('incident-monitoring', '9.5.4', 'Accountability: enable an incident management process to report and respond to actions or decisions that affect the AI system\'s outcome', 'core', {
+    note: 'Cited by all three 2025 crosswalks: ISO/IEC 42001 A.8 (incl. A.8.4); NIST AI 600-1 MG-4.3-001/003, MG-2.4-002/003 and GV-4.3-002/003; G7 Actions 2.a to 2.c and 4.',
+  }),
+  aiv('incident-monitoring', '1.5.1', 'Transparency: communicate to end users whenever an incident has occurred', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.8 (incl. A.8.4 Communication of incidents) to 1.5.1; AI Verify x G7 Code of Conduct crosswalk maps Actions 2.a to 2.c and 4 to it.',
+  }),
+  aiv('incident-monitoring', '1.6.1', 'Transparency: give end users and external parties the means to report adverse impacts, with whistleblower protection', 'related', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.3 (incl. A.3.3 Reporting of concerns) and A.8 to 1.6.1; AI Verify x G7 Code of Conduct crosswalk maps Actions 2.a to 2.c and 4 to it.',
+  }),
+  aiv('incident-monitoring', '5.11.1', 'Security: monitor AI system outputs and behaviour after deployment and alert system owners to issues', 'related', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-2.6-005 and -006 to 5.11.1; AI Verify x ISO/IEC 42001 crosswalk maps the A.6.2 group (incl. A.6.2.6 operation and monitoring) to it.',
+  }),
+  aiv('supply-chain', '9.7.1', 'Accountability: clear responsibilities between parties in the supply chain, set in service level agreements and contracts', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.10 (Third-party and customer relationships) to 9.7.1; AI Verify x NIST AI 600-1 crosswalk maps MG-3.1-001/002/003/005 (MANAGE 3.1) and GV-6.1 actions to it.',
+  }),
+  aiv('supply-chain', '5.3.1', 'Security: secure the supply chain by assessing and monitoring its security risks across the life cycle', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps GV-6.2-001, -003, -004 and -007 (GOVERN 6.2) and GV-6.1-006 to 5.3.1.',
+  }),
+  aiv('supply-chain', '4.5.2', 'Safety: continuously monitor third-party systems, with a fallback plan and contracts that assign liability', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps all seven GV-6.2 actions (GOVERN 6.2) to 4.5.2.',
+  }),
+  aiv('supply-chain', '9.3.1', 'Accountability: select AI system suppliers aligned with the organisation\'s approach, with remedial action when they underperform', 'related', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.10 and A.9 to 9.3.1.',
+  }),
+  aiv('fairness-non-discrimination', '7.1.1', 'Fairness (technical test): measure algorithmic fairness of predictions against ground truth, with metrics chosen for the sensitive feature', 'core', {
+    note: 'AI Verify x G7 Code of Conduct crosswalk maps Action 11 to Fairness 7.1.1 to 7.11.1; technical test for traditional AI.',
+  }),
+  aiv('fairness-non-discrimination', '7.2.1', 'Fairness (technical test): benchmark and red-team for harms against individuals or groups (generative AI)', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-2.11-002 (MEASURE 2.11, fairness and bias) to 7.2.1.',
+  }),
+  aiv('fairness-non-discrimination', '7.8.1', 'Fairness: check that training data is representative of the end-user population, resampling or collecting more data where needed', 'related', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-2.11-004 and -005 (MEASURE 2.11) and GV-1.3-005 to 7.8.1.',
+  }),
+  aiv('privacy-data-protection', '8.3.1', 'Data Governance: data protection, consent, collection, use, withdrawal and retention comply with regulatory requirements or industry standards', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.7 to 8.3.1; AI Verify x NIST AI 600-1 crosswalk maps MS-2.2-003 and GV-1.1-001; AI Verify x G7 Code of Conduct crosswalk maps Action 5.a to it and Action 11.c to outcome 8.3.',
+  }),
+  aiv('privacy-data-protection', '8.3.2', 'Data Governance: detect personal or sensitive data in generated output and apply anonymisation and privacy-enhancing technologies', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-2.2-004, MP-4.1-009 and MG-2.2-009 to 8.3.2.',
+  }),
+  aiv('privacy-data-protection', '1.4.1', 'Transparency: publish a privacy policy on the use of personal data in the AI system', 'related', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.8 to 1.4.1; AI Verify x G7 Code of Conduct crosswalk maps Action 11 to it.',
+  }),
+  aiv('explainability', '2.2.1', 'Explainability: document the rationale and trade-offs of a less explainable model and apply explainable AI techniques', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-2.9-001 (MEASURE 2.9, explained and interpreted) and MS-4.2-003 to 2.2.1.',
+  }),
+  aiv('explainability', '1.1.4', 'Transparency: tell people using or affected by the system the factors behind a decision and that it was made wholly or partly by an automated system', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps A.8 (incl. A.8.2 information for users) to 1.1.4.',
+  }),
+  aiv('ai-literacy', '9.5.3', 'Accountability: policies, procedures and training so that staff know their duties and the organisation\'s risk management practices', 'related', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps GV-1.5-001 to 9.5.3; no row ties it to GOVERN 2.2 or ISO/IEC 42001 7.2, so the fit rests on the check\'s wording.',
+  }),
+  aiv('ai-literacy', '5.1.1', 'Security: training and guidance on AI security risks for all personnel, including developers, system owners and senior leaders', 'related', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MP-3.4-003 (MAP 3.4) and GV-2.1-003 to 5.1.1.',
+  }),
+  aiv('ai-literacy', '8.4.1', 'Data Governance: ensure team competency in data governance roles and responsibilities', 'related', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MP-3.4-002 and MP-3.4-003 (MAP 3.4) to 8.4.1.',
+  }),
+  aiv('gpai-foundation-models', '4.1.1', 'Safety (technical test): run benchmarks and red-teaming to evaluate a generative model for safety and possible harms', 'related', {
+    note: 'AI Verify x G7 Code of Conduct crosswalk maps Action 1 (advanced AI systems) to Safety 4.1.1 to 4.8.1; AI Verify addresses the deploying organisation, not model-provider duties.',
+  }),
+  aiv('gpai-foundation-models', '4.8.1', 'Safety: identify and prevent content that violates laws or is harmful, including CBRN information and offensive cyber capabilities', 'related', {
+    note: 'AI Verify x G7 Code of Conduct crosswalk maps Action 1.c (CBRN, offensive cyber and other risks) to Safety 4.1.1 to 4.8.1.',
+  }),
+  aiv('ip-copyright', '8.5.1', 'Data Governance: address risks from third parties, including infringement of their rights (copyright, intellectual property)', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps GV-6.1-001/002 (GOVERN 6.1) and MP-4.1-001/002/006 (MAP 4.1) to 8.5.1; AI Verify x G7 Code of Conduct crosswalk maps Action 11 and AI Verify x ISO/IEC 42001 crosswalk maps A.7 to it.',
+  }),
+  aiv('ip-copyright', '8.1.1', 'Data Governance: verify data quality, including intellectual property and privacy risks', 'related', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MP-4.1-004, -005 and -010 (MAP 4.1) to 8.1.1; the check names intellectual property.',
+  }),
+  aiv('content-provenance', '4.9.1', 'Safety: establish policies for content provenance: identify provenance harms such as deepfakes and trace content origin', 'core', {
+    note: 'AI Verify x G7 Code of Conduct crosswalk maps Actions 7 and 7.a to 4.9.1; AI Verify x NIST AI 600-1 crosswalk maps GV-6.1-003/008 and MG-2.2-002/003/007 to it.',
+  }),
+  aiv('content-provenance', '4.9.2', 'Safety: evaluate content provenance mechanisms, including the effectiveness and reliability of watermarks', 'core', {
+    note: 'AI Verify x G7 Code of Conduct crosswalk maps Actions 7, 7.b and 10 to 4.9.2.',
+  }),
+  aiv('content-provenance', '1.1.3', 'Transparency: labelling or disclaimers so users know when they interact with an AI system and understand content lineage', 'core', {
+    note: 'AI Verify x G7 Code of Conduct crosswalk maps Actions 7.d and 10.a to 1.1.3; AI Verify x ISO/IEC 42001 crosswalk maps A.8 to it.',
+  }),
+  aiv('environmental-impact', '11.1.1', 'Inclusive growth, societal and environmental well-being: determine that the AI system benefits the environment (e.g. energy and water use)', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps MS-2.12-001 to -004 (MEASURE 2.12, environmental impact) to 11.1.1.',
+  }),
+  aiv('deployment-change-decommissioning', '9.4.1', 'Accountability: a policy to deactivate, decommission and phase out AI systems safely', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps GV-1.7-001/002 (GOVERN 1.7) and MG-2.4-001/004 (MANAGE 2.4) to 9.4.1; AI Verify x ISO/IEC 42001 crosswalk maps A.9 and A.4 to it.',
+  }),
+  aiv('deployment-change-decommissioning', '5.14.1', 'Security: proper and secure disposal of data and models', 'core', {
+    note: 'AI Verify x NIST AI 600-1 crosswalk maps GV-1.7-002 (GOVERN 1.7, decommissioning) to 5.14.1.',
+  }),
+  aiv('deployment-change-decommissioning', '6.5.1', 'Robustness: review changes in code, input data and output data to decide when a new robustness review is due', 'core', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps the A.6.2 group (incl. A.6.2.5 deployment, A.6.2.6 operation) to 6.5.1; AI Verify x G7 Code of Conduct crosswalk maps Action 1 to it.',
+  }),
+  aiv('deployment-change-decommissioning', '4.6.1', 'Safety: deployment strategies such as blue-green and canary deployments', 'related', {
+    note: 'AI Verify x ISO/IEC 42001 crosswalk maps the A.6.2 group (incl. A.6.2.5 deployment) to 4.6.1.',
+  }),
+];
+
+/** Every topic → clause reference: the v0.4 set, the v0.5.0 additions, then GAO and AI Verify. */
+export const refs: readonly CrosswalkRef[] = [...refsV04, ...refsV05, ...refsGao, ...refsAiVerify];
 
 // frameworks.ts wins over crosswalkInstruments when both carry an id.
 const byId = new Map<string, Framework>([

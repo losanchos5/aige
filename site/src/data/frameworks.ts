@@ -815,6 +815,16 @@ export const frameworks: readonly Framework[] = [
       'Voluntary guidance launched on 22 Jan 2026; version 1.5 (20 May 2026, updated 5 Jun 2026) has four dimensions: assess and bound the risks upfront, make humans meaningfully accountable, implement technical controls and processes, enable end-user responsibility.',
   },
   {
+    id: 'sg-ai-verify',
+    name: 'AI Verify Testing Framework (Singapore, IMDA / AI Verify Foundation)',
+    short: 'AI Verify',
+    type: 'framework',
+    issuer: 'IMDA / AI Verify Foundation',
+    url: 'https://aiverifyfoundation.sg/tools/ai-verify-testing-framework/',
+    summary:
+      "Singapore's voluntary testing framework for traditional and generative AI (updated 29 May 2025): process checks and technical tests against 11 governance principles. IMDA publishes official crosswalks to the NIST AI RMF, the NIST Generative AI Profile, the G7 Hiroshima Process Code of Conduct and ISO/IEC 42001.",
+  },
+  {
     id: 'cn-algo-recommendation',
     name: 'China Provisions on Algorithmic Recommendation (2022)',
     short: 'China Algo. Rec.',

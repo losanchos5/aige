@@ -143,6 +143,11 @@ Illustrative rollout plan, registered before the shadow stage:
 > cohort to the baseline within minutes, and the stage verdict and the rollback event land in the
 > assurance store before anyone has called a meeting.
 
+Singapore's framework for agentic AI recommends the staging: "Organisations should consider
+gradually rolling out agents into production to control the amount of risk exposure" (IMDA, section
+2.3.3, p. 42) [7]. It stages by the users, tools and systems an agent is exposed to rather than by
+share of traffic, and does not mention rollback criteria.
+
 ## Consequences
 Regressions are caught while they affect a few users, and every promotion or rollback leaves a record
 tied to criteria set in advance. The cost is slower releases, canary infrastructure, the statistical
@@ -171,3 +176,4 @@ illustrative, not a claim of conformity.
 [4] Regulation (EU) 2024/1689 laying down harmonised rules on artificial intelligence (Artificial Intelligence Act), of 13 June 2024; OJ L, 2024/1689, 12.7.2024 (Art. 26(5) monitor, suspend and inform; Art. 60 testing of high-risk AI systems in real-world conditions outside sandboxes). Publications Office of the EU (EUR-Lex). 2024-07-12. https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng (verified: primary)
 [5] Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1 (MANAGE 1.1 determination whether deployment should proceed; MEASURE 2.3 performance demonstrated for conditions similar to deployment; MANAGE 2.4 supersede, disengage or deactivate). NIST. 2023-01-26. https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf (verified: primary)
 [6] ISO/IEC 42001:2023, AI management system, Annex A controls referenced by identifier and short title only (A.6.2.5 AI system deployment; A.6.2.6 AI system operation and monitoring). ISO/IEC (titles checked via a secondary listing). 2023-12. https://www.iso.org/standard/42001 (verified: secondary)
+[7] Model AI Governance Framework for Agentic AI, v1.5 (section 2.3.3, p. 42: gradual deployment of agents; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

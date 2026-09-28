@@ -28,7 +28,7 @@
 // Draft control specifications, open for technical review; illustrative, not a
 // claim of conformity, not legal advice. Types and rules: ./index.ts.
 import type { Control, ControlProfile } from './index';
-import type { Source } from '../../lib/sources';
+import { IMDA_AGENTIC, type Source } from '../../lib/sources';
 import { threatSources, SRC } from '../threats';
 import { site } from '../site';
 
@@ -185,15 +185,6 @@ const SPIFFE: Source = {
   publisher: 'SPIFFE project',
   date: '2026',
   url: 'https://spiffe.io/docs/latest/spiffe-about/overview/',
-  verified: 'primary',
-};
-
-const IMDA_AGENTIC: Source = {
-  title: 'Model AI Governance Framework for Agentic AI, v1.5',
-  gloss: 'agent identity unique and "cryptographically verifiable"; authorisations "time- or session-bound, non-transferable"',
-  publisher: 'IMDA',
-  date: '2026-05-20',
-  url: 'https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf',
   verified: 'primary',
 };
 

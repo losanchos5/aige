@@ -111,6 +111,9 @@ failure_mode: >-
 blocking: true
 ```
 
+Singapore's framework for agentic AI lists "Conducting regular red teaming and threat modelling"
+among the responsibilities of the cybersecurity team (IMDA, section 2.2.1, p. 26) [7].
+
 ## Consequences
 Adversarial coverage grows over time instead of resetting each launch, and the triage record shows what
 was found, fixed or accepted. The cost is maintaining the taxonomy and suite, the compute to run
@@ -138,3 +141,4 @@ the NIST AI RMF [6]. Mappings are illustrative, not a claim of conformity.
 [4] NIST AI 100-2 E2025, Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations (predictive and generative AI attack classes with NISTAML identifiers). NIST. 2025-03-24. https://csrc.nist.gov/pubs/ai/100/2/e2025/final (verified: primary)
 [5] NIST SP 800-218A, Secure Software Development Practices for Generative AI and Dual-Use Foundation Models: An SSDF Community Profile (recommendation R1 on SSDF 1.1 task PW.1.1: include AI model-specific vulnerability and threat types in risk modelling). NIST. 2024-07. https://csrc.nist.gov/pubs/sp/800/218/a/final (verified: primary)
 [6] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[7] Model AI Governance Framework for Agentic AI, v1.5 (section 2.2.1, p. 26: red teaming and threat modelling as a cybersecurity-team responsibility; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

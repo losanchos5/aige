@@ -887,11 +887,12 @@ test.describe('obligation register', () => {
     for (const row of obligations.filter((o) => o.frameworkId === 'kr-ai-basic-act')) {
       expect(row.appliesStatus, row.id).toBe('grace');
     }
-    // Every instrument carries at least one row, except the UK ATRS, which the
-    // crosswalk cites clause by clause but chapter 08 does not map.
+    // Every instrument carries at least one row, except the UK ATRS and the AI
+    // Verify Testing Framework, which the crosswalk cites check by check but
+    // chapter 08 does not map.
     const withRows = new Set(obligations.map((o) => o.frameworkId));
     const withoutRows = frameworks.filter((f) => !withRows.has(f.id)).map((f) => f.id);
-    expect(withoutRows).toEqual(['uk-atrs']);
+    expect(withoutRows.sort()).toEqual(['sg-ai-verify', 'uk-atrs']);
   });
 
   test('patterns exist; EU rows list exactly the patterns whose "Maps to" names the article', () => {

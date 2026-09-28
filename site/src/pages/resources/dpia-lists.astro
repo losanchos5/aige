@@ -1,0 +1,440 @@
+---
+// /resources/dpia-lists: the national DPIA lists (Art. 35(4) GDPR) in the EDPB
+// register, the items that catch what AI systems do, and where those items
+// overlap the EU AI Act Annex III high-risk areas. Data: src/data/dpia-lists.ts;
+// the same rows are the dpia-lists dataset of the open API (src/lib/api.ts).
+import Base from '../../layouts/Base.astro';
+import '../../styles/reading.css';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import CitedText from '../../components/CitedText.astro';
+import SourceList from '../../components/SourceList.astro';
+import { site } from '../../data/site';
+import {
+  lists,
+  listsByCountry,
+  listFlag,
+  listAnchor,
+  itemAnchor,
+  topicOrder,
+  topicLabel,
+  topicMeaning,
+  tagLabel,
+  methodLabel,
+  languageName,
+  annexIIIOrder,
+  annexIIILabel,
+  annexIIICounts,
+  listsWith,
+  listsWithout,
+  allItems,
+  adoptionRange,
+  updatedAfter2019,
+  methodCounts,
+  contributors,
+  reviewers,
+  dpiaSources,
+  DPIA_AS_OF,
+  OPINIONS_SEPT_2018,
+  OPINIONS_TOTAL,
+} from '../../data/dpia-lists';
+import { API_PATH } from '../../lib/api';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { fitsSiteSuffix } from '../../lib/seo-title';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+import '../../styles/dpia-lists.css';
+
+// Every [n] the page cites must exist in dpiaSources, or the build fails.
+const PROSE_CITES = [1, 2, 3, 4, 5, 6, 7];
+for (const n of PROSE_CITES) {
+  if (n < 1 || n > dpiaSources.length) throw new Error(`dpia-lists: [${n}] is not in dpiaSources`);
+}
+
+const rows = listsByCountry();
+const aiNamed = listsWith('ai').sort((a, b) => a.country.localeCompare(b.country, 'en'));
+const aiInRegister = lists.filter((l) => l.aiNamedInRegister);
+const aiOnlyNational = aiNamed.filter((l) => !l.aiNamedInRegister);
+const germany = lists.find((l) => l.id === 'de');
+const germanyAi = germany?.items.find((i) => i.n === '11');
+const range = adoptionRange();
+const updated = updatedAfter2019();
+const overlaps = annexIIICounts();
+const noOverlap = annexIIIOrder.filter((a) => !overlaps.some((o) => o.area === a));
+const methods = methodCounts();
+const itemCount = allItems().length;
+const totalItems = lists.reduce((sum, l) => sum + l.itemCount, 0);
+const fmtDate = (iso: string) => {
+  if (/^\d{4}$/.test(iso)) return iso;
+  if (/^\d{4}-\d{2}$/.test(iso)) {
+    return new Date(`${iso}-01T00:00:00Z`).toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' });
+  }
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'UTC',
+  });
+};
+const countryList = (items: { country: string }[]) =>
+  items.length <= 1
+    ? (items[0]?.country ?? '')
+    : `${items
+        .slice(0, -1)
+        .map((i) => i.country)
+        .join(', ')} and ${items[items.length - 1].country}`;
+const count = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+const areaName = (a: Parameters<typeof annexIIILabel>[0]) => annexIIILabel(a).replace(/^\d+\. /, '').toLowerCase();
+const joinAnd = (parts: string[], last = 'and') =>
+  parts.length <= 1 ? (parts[0] ?? '') : `${parts.slice(0, -1).join(', ')} ${last} ${parts[parts.length - 1]}`;
+const overlapRest = joinAnd(
+  overlaps.slice(1).map((o) => `${areaName(o.area)} (${count(o.lists.length, 'list', 'lists')}, ${count(o.items, 'item', 'items')})`),
+);
+const noOverlapText = joinAnd(noOverlap.map(areaName), 'or');
+const updatedText = joinAnd(updated.map((l) => `${l.country} (${fmtDate(l.lastUpdate!)})`));
+
+const seoTitle = 'GDPR DPIA lists by country, mapped to the AI Act';
+const description = `The ${lists.length} national GDPR Art. 35(4) DPIA lists in the EDPB register, read in full: which name AI, profiling, scoring or biometrics, mapped to AI Act Annex III.`;
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'National DPIA lists' }];
+
+const pageUrl = new URL('/resources/dpia-lists', site.url).href;
+const apiUrl = new URL(`${API_PATH}/dpia-lists.json`, site.url).href;
+const jsonLd = [
+  {
+    '@type': 'Dataset',
+    '@id': `${pageUrl}#dataset`,
+    name: `National DPIA lists and the EU AI Act · ${site.name}`,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    version: site.bokVersion,
+    dateModified: DPIA_AS_OF,
+    keywords: ['DPIA', 'GDPR Article 35(4)', 'EU AI Act', 'Annex III', 'data protection impact assessment'],
+    creator: [...authorRefs],
+    contributor: contributors
+      .filter((c) => c.roles.includes('conceptualization'))
+      .map((c) => ({ '@type': 'Person', name: c.name, ...(c.url ? { url: c.url } : {}) })),
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    isBasedOn: [dpiaSources[3].url, ...lists.map((l) => l.url)],
+    distribution: [
+      {
+        '@type': 'DataDownload',
+        name: 'National DPIA lists (JSON)',
+        encodingFormat: 'application/json',
+        contentUrl: apiUrl,
+      },
+    ],
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/resources.png"
+  jsonLd={jsonLd}
+>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="Which national DPIA lists already catch AI."
+    lede={`Under Art. 35(4) GDPR each supervisory authority publishes the processing that always needs a data protection impact assessment. This page reads the ${lists.length} lists in the EDPB register in full for what AI systems typically do (named AI, automated decisions, profiling or scoring, biometrics, employee monitoring, large-scale monitoring) and marks where an item overlaps an EU AI Act Annex III high-risk area.`}
+  />
+
+  <div class="container res-page">
+    <p class="dl-credit">
+      {
+        contributors.map((c, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true"> · </span>}
+            <span>
+              {c.label}: {c.url ? <a href={c.url} rel="noopener">{c.name}</a> : c.name}
+            </span>
+          </>
+        ))
+      }
+      {
+        reviewers.length > 0 && (
+          <>
+            <span aria-hidden="true"> · </span>
+            <span>
+              Reviewed by{' '}
+              {reviewers.map((r) => `${r.name} (v${r.version}, ${r.date})`).join(', ')}
+            </span>
+          </>
+        )
+      }
+    </p>
+
+    <div class="res-section">
+      <Callout kind="note" title="Illustrative, not a claim of conformity">
+        <p>A national list says when a DPIA is always required; it never says a DPIA is not needed
+        for processing it leaves out, because Art. 35(1) still applies. The Annex III overlaps are
+        our reading of where an item names a use inside an Annex III area, assuming an AI system is
+        used; they classify no one's system and are not legal advice. The register and the list
+        documents were checked on {DPIA_AS_OF}.</p>
+      </Callout>
+    </div>
+
+    <section class="res-section prose" aria-labelledby="dl-law">
+      <h2 id="dl-law">Where the lists come from</h2>
+      <p>
+        <CitedText
+          text="A controller carries out a DPIA before processing that is likely to result in a high risk to people's rights and freedoms, in particular when it uses new technologies (Art. 35(1)) [1]. Three cases always need one: a systematic and extensive evaluation of personal aspects based on automated processing, including profiling, on which decisions with legal or similarly significant effects are based; large-scale processing of special categories of data or of criminal-conviction data; and large-scale systematic monitoring of a publicly accessible area (Art. 35(3)) [1]. Each supervisory authority then publishes a list of the kinds of processing that always need a DPIA in its territory (Art. 35(4)), and may publish a list of those that never do (Art. 35(5)) [1]."
+          prefix="ds"
+        />
+      </p>
+      <p>
+        <CitedText
+          text="The lists build on the nine criteria of the WP248 rev.01 guidelines: evaluation or scoring; automated decisions with legal or similarly significant effect; systematic monitoring; sensitive or highly personal data; large-scale processing; matching or combining datasets; vulnerable data subjects; innovative use of new technological or organisational solutions; and processing that prevents people from exercising a right or using a service or contract. Processing that meets two or more generally needs a DPIA [2]."
+          prefix="ds"
+        />
+      </p>
+      <h3 id="dl-ai-act">How the EU AI Act points back to the DPIA</h3>
+      <p>
+        <CitedText
+          text="Art. 26(9) of the AI Act ties a deployer's DPIA to the provider's instructions [3]:"
+          prefix="ds"
+        />
+      </p>
+      <blockquote>
+        <p>"Where applicable, deployers of high-risk AI systems shall use the information provided
+        under Article 13 of this Regulation to comply with their obligation to carry out a data
+        protection impact assessment under Article 35 of Regulation (EU) 2016/679 or Article 27 of
+        Directive (EU) 2016/680."</p>
+      </blockquote>
+      <p>
+        <CitedText
+          text="Art. 27(4), as replaced by the Digital Omnibus, lets the fundamental rights impact assessment (FRIA) reuse the DPIA instead of repeating it [3][6]:"
+          prefix="ds"
+        />
+      </p>
+      <blockquote>
+        <p>"If any of the obligations laid down in this Article is already met through the data
+        protection impact assessment conducted pursuant to Article 35 of Regulation (EU) 2016/679
+        or Article 27 of Directive (EU) 2016/680, the deployer may, when conducting the fundamental
+        rights impact assessment referred to in paragraph 1 of this Article, include
+        cross-references to the relevant sections of that data protection impact assessment or
+        include relevant parts thereof in the fundamental rights impact assessment."</p>
+      </blockquote>
+      <p>
+        <CitedText
+          text={'The 2024 text said instead that the FRIA "shall complement" the DPIA; the consolidated text of 27 July 2026 carries the wording above, and the same amending act moved the application of Arts. 26 and 27 for Annex III systems to 2 December 2027 [3][6]. Where a national list already makes a DPIA mandatory for an Annex III use, the FRIA can point to that record. To build both from one record, see the'}
+          prefix="ds"
+        />{' '}
+        <a href="/toolkit/impact-assessment">impact-assessment builder</a> and the
+        <a href="/patterns/fria-as-code">FRIA-as-Code</a> pattern.
+      </p>
+    </section>
+
+    <section class="res-section" aria-labelledby="dl-table">
+      <div class="res-section-head">
+        <h2 id="dl-table">The {lists.length} lists</h2>
+        <p>
+          One row per list in the EDPB register, by country. "Yes" means at least one item of the
+          list covers the topic (for "AI named", that the list uses the words); the items are
+          below. The register holds each list in English; the national original is linked where it
+          was found.
+        </p>
+        <p class="ob-export">
+          <a
+            class="ob-dl"
+            href={`${API_PATH}/dpia-lists.json`}
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file={`${API_PATH}/dpia-lists.json`}
+            data-umami-event-location="dpia-lists">Download JSON</a
+          >
+        </p>
+      </div>
+      <div class="res-tablewrap" tabindex="0" role="region" aria-label="Table of the national DPIA lists, scrollable">
+        <table class="res-table dl-table">
+          <thead>
+            <tr>
+              <th scope="col">Country and authority</th>
+              <th scope="col">Adopted</th>
+              <th scope="col">Method</th>
+              {
+                topicOrder.map((t) => (
+                  <th scope="col">
+                    <abbr title={topicMeaning[t]}>{topicLabel[t]}</abbr>
+                  </th>
+                ))
+              }
+              <th scope="col">Documents</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((list) => (
+                <tr id={listAnchor(list)}>
+                  <td data-label="Country" class="c-name">
+                    <a href={`#${listAnchor(list)}-items`}>{list.country}</a>
+                    <span class="dl-auth">{list.authorityShort}</span>
+                  </td>
+                  <td data-label="Adopted" class="dl-date">
+                    <time datetime={list.adopted}>{fmtDate(list.adopted)}</time>
+                    <span class="dl-sub">
+                      <a href={list.edpbOpinion.url} rel="noopener">EDPB Opinion {list.edpbOpinion.n}</a>
+                    </span>
+                  </td>
+                  <td data-label="Method">
+                    {methodLabel[list.method]}
+                    <span class="dl-sub">{list.itemCount} items</span>
+                  </td>
+                  {topicOrder.map((t) => {
+                    const value = listFlag(list, t);
+                    return (
+                      <td data-label={topicLabel[t]} class:list={['dl-flag', value ? 'is-yes' : 'is-no']}>
+                        {value ? 'Yes' : 'No'}
+                      </td>
+                    );
+                  })}
+                  <td data-label="Documents" class="dl-docs">
+                    <a href={list.url} rel="noopener">
+                      Register (EN)<span class="visually-hidden">: {list.country} DPIA list</span>
+                    </a>
+                    {list.nationalUrl && (
+                      <a href={list.nationalUrl} rel="noopener">
+                        National ({languageName[list.language] ?? list.language})<span class="visually-hidden"
+                          >: {list.country}</span
+                        >
+                      </a>
+                    )}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="dl-findings">
+      <h2 id="dl-findings">What the lists show</h2>
+      <ul>
+        <li>
+          <strong>{aiNamed.length} of {lists.length} lists name AI:</strong> {countryList(aiNamed)}.
+          Counting only the versions in the EDPB register, {aiInRegister.length} do{aiOnlyNational.length > 0 && (
+            <>: {countryList(aiOnlyNational)}'s register version says "deep learning", and its national version of 2020 adds "Künstliche Intelligenz"</>
+          )}.
+          {germany && germanyAi && (
+            <>
+              {' '}Only Germany makes the use of AI a trigger on its own (<a
+                href={`#${itemAnchor(germany, germanyAi)}`}>item 11</a
+              >); in the other lists AI is an example of new technology or of scoring, or one
+              level of a scored criterion.
+            </>
+          )}
+        </li>
+        <li>
+          <strong>
+            {listsWith('biometrics').length} cover biometrics, {listsWith('profiling-scoring').length} profiling
+            or scoring, and {listsWith('automated-decision').length} automated decisions
+          </strong>
+          {listsWithout('automated-decision').length > 0 && (
+            <> (not {countryList(listsWithout('automated-decision'))})</>
+          )}: the processing behind Annex III points 1 and 5 was a DPIA trigger years before the
+          AI Act. {listsWith('employee-monitoring').length} cover employee monitoring.
+        </li>
+        <li>
+          <strong>By item count, the most frequent Annex III overlap is {areaName(overlaps[0].area)}:</strong>{' '}
+          {count(overlaps[0].lists.length, 'list', 'lists')}, {count(overlaps[0].items, 'item', 'items')}.
+          {overlaps.length > 1 && <> Then {overlapRest}.</>}
+          {noOverlap.length > 0 && <> No item overlaps {noOverlapText}.</>}
+        </li>
+        <li>
+          <strong>The lists predate the AI Act.</strong> They were adopted between{' '}
+          {fmtDate(range.first.adopted)} ({range.first.country}) and {fmtDate(range.last.adopted)}{' '}
+          ({range.last.country}), years before Regulation (EU) 2024/1689. Only{' '}
+          {count(updated.length, 'list shows', 'lists show')} a dated change after 2019: {updatedText}; see their
+          notes below.
+        </li>
+        <li>
+          <CitedText
+            text={`The EDPB adopted ${OPINIONS_SEPT_2018} opinions on draft lists on 25 September 2018 [5][7] and ${OPINIONS_TOTAL} Art. 35(4) opinions in all, into 2019 [7], but its register holds ${lists.length} lists [4], including the EEA states Iceland and Liechtenstein. Austria, Belgium, Malta, the Netherlands, Portugal, Romania, Slovakia and Sweden had a 2018 opinion and have no list in the register. Each number is right for its own source and date.`}
+            prefix="ds"
+          />
+        </li>
+        <li>
+          {methods.enumerated} lists enumerate processing types, {methods.scored} score criteria (a DPIA
+          follows from how many are met) and {methods.mixed} mixes both. Together they hold{' '}
+          {totalItems} items or criteria, {itemCount} of them on what AI systems do.
+        </li>
+      </ul>
+    </section>
+
+    <section class="res-section" aria-labelledby="dl-items">
+      <div class="res-section-head">
+        <h2 id="dl-items">The items, list by list</h2>
+        <p>
+          Each list's items on AI or algorithms, automated decisions, profiling or scoring,
+          biometrics, employee monitoring, large-scale monitoring or new technology, with the item
+          number as the list prints it, the list's own wording and our summary. An Annex III overlap
+          is marked only where the item names a use inside the area.
+        </p>
+      </div>
+      <div class="dl-lists">
+        {
+          rows.map((list) => (
+            <section class="dl-list" aria-labelledby={`${listAnchor(list)}-items`}>
+              <h3 id={`${listAnchor(list)}-items`}>
+                {list.country} <span class="dl-auth">{list.authority}</span>
+              </h3>
+              <p class="dl-note">
+                {methodLabel[list.method]}, {list.itemCount} items, adopted {fmtDate(list.adopted)}.
+                {list.note && <> {list.note}</>}
+              </p>
+              <ul class="dl-items">
+                {list.items.map((item) => (
+                  <li id={itemAnchor(list, item)}>
+                    <p class="dl-item-head">
+                      <span class="dl-n">Item {item.n}</span>
+                    </p>
+                    <p>{item.summary}</p>
+                    <p class="dl-quote" lang={list.language}>
+                      <q>{item.original}</q>
+                    </p>
+                    <ul class="dl-tags" aria-label="Covers">
+                      {item.tags.map((t) => (
+                        <li class="type-tag">{tagLabel[t]}</li>
+                      ))}
+                    </ul>
+                    {item.annexIII.length > 0 && (
+                      <p class="dl-annex">
+                        Annex III overlap: {item.annexIII.map((a) => annexIIILabel(a)).join(' · ')}.
+                        {item.overlapNote && <> {item.overlapNote}</>}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="res-section" aria-labelledby="dl-src-heading">
+      <div class="res-section-head">
+        <h2 id="dl-src-heading">Sources</h2>
+        <p>
+          The list documents and the EDPB opinions are linked from their rows. Machine-readable:
+          <a href={`${API_PATH}/dpia-lists.json`}><code>{API_PATH}/dpia-lists.json</code></a>
+          (<a href="/resources/data">open data and API</a>), {site.license}.
+        </p>
+      </div>
+      <div class="prose">
+        <SourceList sources={dpiaSources} prefix="ds" />
+      </div>
+    </section>
+  </div>
+</Base>

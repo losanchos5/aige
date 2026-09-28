@@ -112,6 +112,11 @@ exit) is set out in [chapter 15](/bok/governing-deployment#when-the-provider-fai
 > two subgroup metrics; the team records a migration decision with a compensating threshold, and a
 > scheduled drill proves the switch to the manual queue takes under ten minutes.
 
+For agents built or run by others, Singapore's framework for agentic AI lists what to ask for:
+"Request and evaluate technical security and control features e.g. strong authentication measures
+such as scoped API keys, per-agent identity tokens, and observability" (IMDA, section 2.2.1, p. 28)
+[9].
+
 ## Consequences
 Procured AI is inventoried and bounded, and the reliance on provider-supplied evidence is explicit
 rather than hidden. The cost is real: layers 03 and 04 give less assurance over a model you do not own,
@@ -145,3 +150,4 @@ conformity.
 [6] NIST AI RMF Playbook, MANAGE (3.1 third-party risks monitored; 3.2 pre-trained models monitored; 2.4 supersede, disengage or deactivate). NIST. 2023. https://airc.nist.gov/airmf-resources/playbook/manage/ (verified: primary)
 [7] NIST AI RMF Playbook, GOVERN (6.1 third-party risk policies; 6.2 contingency processes for failures in third-party systems deemed high-risk). NIST. 2023. https://airc.nist.gov/airmf-resources/playbook/govern/ (verified: primary)
 [8] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[9] Model AI Governance Framework for Agentic AI, v1.5 (section 2.2.1, p. 28: security and control features to request from external providers; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

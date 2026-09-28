@@ -152,6 +152,11 @@ filter claim travel in `extensions`):
 > committee slot. A second request, to rank applicants by predicted default, trips the profiling
 > override at the first question and is routed as high-risk before anyone books a meeting.
 
+Singapore's framework for agentic AI starts from the same intake question: "When considering if an
+agentic use case is suitable for development or deployment, first identify and assess the risk
+against the benefits" (IMDA, section 2.1.1, p. 15), and lists impact and likelihood factors on pp.
+15-17 [6].
+
 ## Consequences
 Every system has a purpose, a class and a tier on record before it costs compute; review effort
 follows risk; the inventory is complete because deployment depends on it; and each classification is
@@ -181,3 +186,4 @@ conformity.
 [3] Regulation (EU) 2026/1744 (Digital Omnibus on AI), of 8 July 2026, amending Reg. (EU) 2024/1689; OJ L, 24 July 2026; in force 27 Jul 2026; Annex III high-risk obligations moved to 2 Dec 2027. Publications Office of the EU (EUR-Lex). 2026-07-24. https://eur-lex.europa.eu/eli/reg/2026/1744/oj/eng (verified: primary)
 [4] Directive on Automated Decision-Making (algorithmic impact assessment before production; Appendix B impact levels I to IV defined by reversibility and duration). Treasury Board of Canada Secretariat. 2025-06-24. https://www.tbs-sct.canada.ca/pol/doc-eng.aspx?id=32592 (verified: primary)
 [5] NIST AI RMF to ISO/IEC FDIS 42001 crosswalk (provider: Microsoft; lists the Annex B implementation-guidance clauses, whose numbers mirror the Annex A control ids, e.g. B.5.2 AI system impact assessment process, B.9.4 intended use of the AI system; the ISO text was not opened). NIST AI Resource Center. 2023. https://airc.nist.gov/docs/NIST_AI_RMF_to_ISO_IEC_42001_Crosswalk.pdf (verified: secondary)
+[6] Model AI Governance Framework for Agentic AI, v1.5 (section 2.1.1, pp. 15-17: suitability of agentic use cases, impact and likelihood factors; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

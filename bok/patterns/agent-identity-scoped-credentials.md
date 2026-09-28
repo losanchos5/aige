@@ -59,6 +59,12 @@ workload-identity system (SPIFFE/SPIRE) or a first-class agent identity from an 
 registry, not of the transport protocol. Secure the channel *and* issue the workload identity; scope
 its credentials to the least privilege the agent's declared function needs.
 
+Singapore's framework for agentic AI sets the same bar: an agent "should have its own unique,
+cryptographically verifiable identity" (p. 23), and its authorisations "should generally be scoped,
+time- or session-bound, non-transferable, and follow the principle of least privilege by default,
+with explicit escalation paths for elevated permissions", never wider than what the authorising
+human may do (IMDA, p. 24) [7].
+
 > **Example (illustrative)** A data-analysis agent authenticates with an issuer-bound credential and a
 > scope limited to read-only access to one dataset; its every action is logged under its own identity,
 > and its credential expires with its registry entry.
@@ -86,3 +92,4 @@ the NIST AI RMF [6]. Mappings are illustrative, not a claim of conformity.
 [4] "Okta brings first-class identity to AI agents with Agent SSO" (GA 24 Aug 2026; Cross App Access as MCP EMA extension). Okta. 2026-08-24. https://www.okta.com/newsroom/press-releases/okta-brings-first-class-identity-to-ai-agents-with-agent-sso/ (verified: primary)
 [5] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [6] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[7] Model AI Governance Framework for Agentic AI, v1.5 (section 2.1.2, agent identity, pp. 23-24: unique, cryptographically verifiable identity; scoped, time- or session-bound, non-transferable authorisations bounded by the authorising human; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)

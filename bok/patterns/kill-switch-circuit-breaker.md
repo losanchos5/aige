@@ -58,6 +58,12 @@ is not a control.
 > unauthorised-tool-call rate crosses a threshold, revoking just that agent's scope while the rest of
 > the fleet keeps running; the pull is drilled monthly.
 
+Singapore's framework for agentic AI asks for the capability without naming it: "Design mechanisms
+and procedures to take agents offline and limit their potential scope of impact when they
+malfunction" (IMDA, section 2.1.2, p. 19), and, when potential failures are detected, to "stop agent
+workflow and escalate to a human supervisor" (p. 43) [4]. The document uses neither of the terms in
+this pattern's name and does not ask for drills.
+
 ## Consequences
 Incidents are contained to one agent and recovery is fast. The cost is per-agent identity plumbing and
 the engineering to make revocation instant and safe.
@@ -79,3 +85,4 @@ the NIST AI RMF [3]. Mappings are illustrative, not a claim of conformity.
 [1] "Gartner Forecasts the Market for Securing AI Will Reach Almost $5 Billion in 2027" (>50% of agent attacks exploit access-control and prompt injection by 2029). Gartner. 2026-08-26. https://www.gartner.com/en/newsroom/press-releases/2026-08-26-gartner-forecasts-the-market-for-securing-ai-will-reach-almost-5-billion-in-2027 (verified: primary)
 [2] Top 10 for Agentic Applications 2026 (ASI IDs). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [3] AI Risk Management Framework (AI RMF 1.0; Govern, Map, Measure, Manage). NIST. 2023-01-26. https://www.nist.gov/itl/ai-risk-management-framework (verified: primary)
+[4] Model AI Governance Framework for Agentic AI, v1.5 (section 2.1.2, p. 19: mechanisms to take agents offline; section 2.3.3, p. 43: stop agent workflow and escalate; the document does not use the terms kill switch or circuit breaker; published 2026-05-20, updated 2026-06-05). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)
