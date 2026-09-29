@@ -12,8 +12,10 @@
 // the optional `obligationId` join: where a clause has an obligations[] row in
 // frameworks.ts, `obligationId` carries that row's stable id (AIGE-OBL-...), so
 // the UI links the crosswalk cell to the row's page in the obligation register
-// (/obligations/<id>) and a reworded row never breaks the join. Mappings are
-// illustrative, not a claim of conformity.
+// (/obligations/<id>) and a reworded row never breaks the join. A ref that names
+// no row but has exactly one row with the same framework and the same whole
+// clause is joined to it automatically (`withClauseJoin`, 2026-09-29). Mappings
+// are illustrative, not a claim of conformity.
 //
 // Version 2 (BoK v0.5.0) widens the grid to 25 topics and 14 columns (15 since
 // the GAO audit column of 2026-09-27, 16 with AI Verify on 2026-09-28), keeps a
@@ -27,6 +29,7 @@
 
 import type { Framework, Obligation, StackLayer } from './frameworks';
 import { frameworks, obligations } from './frameworks';
+import { clauseKey } from '../lib/obligation-lookup-core.js';
 
 export { disclaimer } from './frameworks';
 
@@ -3220,8 +3223,34 @@ const refsAiVerify: readonly CrosswalkRef[] = [
   }),
 ];
 
-/** Every topic → clause reference: the v0.4 set, the v0.5.0 additions, then GAO and AI Verify. */
-export const refs: readonly CrosswalkRef[] = [...refsV04, ...refsV05, ...refsGao, ...refsAiVerify];
+/** Adds `obligationId` to a ref that declares none when exactly one register
+ *  row has the same framework and the same whole clause (by `clauseKey`, the
+ *  lookup box's normalizer, so 'Article 14' joins 'Art. 14' but 1.4 never
+ *  joins 14); zero or
+ *  several candidates leave the ref unjoined. Done on the data, not in
+ *  `refObligation`, so the page, the JSON/CSV/OSCAL exports and the API all see
+ *  the same join. Ranges and sub-clauses are not expanded on purpose. */
+function withClauseJoin(list: readonly CrosswalkRef[]): CrosswalkRef[] {
+  const rows = new Map<string, Obligation[]>();
+  for (const row of obligations) {
+    const key = `${row.frameworkId}|${clauseKey(row.clause)}`;
+    rows.set(key, [...(rows.get(key) ?? []), row]);
+  }
+  return list.map((r) => {
+    if (r.obligationId || r.obligation) return r;
+    const hits = rows.get(`${r.framework}|${clauseKey(r.ref)}`) ?? [];
+    return hits.length === 1 ? { ...r, obligationId: hits[0].id } : r;
+  });
+}
+
+/** Every topic → clause reference: the v0.4 set, the v0.5.0 additions, then GAO
+ *  and AI Verify, with the exact-clause join applied. */
+export const refs: readonly CrosswalkRef[] = withClauseJoin([
+  ...refsV04,
+  ...refsV05,
+  ...refsGao,
+  ...refsAiVerify,
+]);
 
 // frameworks.ts wins over crosswalkInstruments when both carry an id.
 const byId = new Map<string, Framework>([

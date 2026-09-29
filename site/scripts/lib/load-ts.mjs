@@ -25,7 +25,9 @@ async function toDataUrl(relPath, siteRoot, cache) {
     [...js.matchAll(/from\s+['"](\.[^'"]+)['"]/g)].map((m) => m[1]),
   );
   for (const spec of specifiers) {
-    const target = spec.endsWith('.ts')
+    // An explicit extension is taken as written (crosswalk.ts imports the plain
+    // ES module ../lib/obligation-lookup-core.js); a bare './x' means './x.ts'.
+    const target = /\.(?:ts|js|mjs)$/.test(spec)
       ? join(dir, spec)
       : `${join(dir, spec)}.ts`;
     const url = await toDataUrl(target, siteRoot, cache);

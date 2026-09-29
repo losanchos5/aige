@@ -1,12 +1,14 @@
 ---
 // /obligations: the obligation register. Every row of the regulatory map
 // (src/data/frameworks.ts, faithful to bok/08-regulatory-map.md) with its
-// stable id, grouped by framework, each linking to its own page. Two pure-CSS
-// radio filters (status and layer; no JavaScript, CSP-safe) narrow the list;
-// the combined rules live in styles/obligations.css.
+// stable id, grouped by framework, each linking to its own page. The "Look up
+// an article" box (ObligationLookup.astro) jumps straight to a row by its
+// clause; two pure-CSS radio filters (status and layer; no JavaScript,
+// CSP-safe) narrow the list; the combined rules live in styles/obligations.css.
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
+import ObligationLookup from '../../components/ObligationLookup.astro';
 import { site } from '../../data/site';
 import {
   obligations,
@@ -122,6 +124,10 @@ const jsonLd = [
         checked; the legal reading of an obligation stays with lawyers, notified bodies and
         authorities.</p>
       </Callout>
+    </div>
+
+    <div class="res-section">
+      <ObligationLookup />
     </div>
 
     <section class="res-section" aria-labelledby="obx-heading">
