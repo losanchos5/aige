@@ -27,6 +27,6 @@
 - [x] 4.1 `site/tests/obligation-lookup.spec.ts`: casos del spec sobre la lógica, índice (rutas
       existentes, tamaño), unión (Art. 87, 6.1.2 sin unir, mínimo 410 refs unidas), interfaz
       (teclado, `?q=`, `#lookup`, sin JS, crosswalk), tile de portada
-- [ ] 4.2 Build completo, `npm test`, `test:a11y`, `test:visual` (regenerar solo capturas afectadas
+- [x] 4.2 Build completo, `npm test`, `test:a11y`, `test:visual` (regenerar solo capturas afectadas
       y revisarlas), lhci al final
-- [ ] 4.3 Commit por ruta, PR con el token de losanchos5
+- [x] 4.3 Commit por ruta, PR con el token de losanchos5
