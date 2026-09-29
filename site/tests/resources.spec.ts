@@ -1,6 +1,6 @@
-// resources.spec.ts: acceptance checks for Block E (the Resources section) plus
-// reading-comfort review shots at 390/1440 in light (and glossary in dark),
-// written to tests/__screenshots__/E/.
+// resources.spec.ts: acceptance checks for Block E (the Resources section).
+// The reading-comfort review shots into tests/__screenshots__/E/ live in
+// resources.screenshots.spec.ts (the `visual` project).
 import { test, expect } from '@playwright/test';
 import { frameworks, obligations, obligationPath } from '../src/data/frameworks';
 import { topics, columns } from '../src/data/crosswalk';
@@ -464,41 +464,4 @@ test('glossary renders terms and a working jump bar', async ({ page }) => {
     expect(href).toMatch(/^#gl-/);
     await expect(page.locator(href as string)).toHaveCount(1);
   }
-});
-
-// ---- Review screenshots ----------------------------------------------------
-const routes = [
-  { name: 'hub', path: '/resources' },
-  { name: 'frameworks', path: '/resources/frameworks' },
-  { name: 'tools', path: '/resources/tools' },
-  { name: 'reading-list', path: '/resources/reading-list' },
-  { name: 'glossary', path: '/resources/glossary' },
-  { name: 'crosswalk', path: '/resources/crosswalk' },
-];
-const widths = [390, 1440];
-
-for (const shot of routes) {
-  for (const width of widths) {
-    test(`screenshot ${shot.name} ${width} light`, async ({ page }) => {
-      await page.emulateMedia({ colorScheme: 'light' });
-      await page.setViewportSize({ width, height: 1200 });
-      await page.goto(shot.path);
-      await page.waitForLoadState('networkidle');
-      await page.screenshot({
-        path: `tests/__screenshots__/E/${shot.name}-${width}-light.png`,
-        fullPage: true,
-      });
-    });
-  }
-}
-
-test('screenshot glossary 1440 dark', async ({ page }) => {
-  await page.emulateMedia({ colorScheme: 'dark' });
-  await page.setViewportSize({ width: 1440, height: 1200 });
-  await page.goto('/resources/glossary');
-  await page.waitForLoadState('networkidle');
-  await page.screenshot({
-    path: 'tests/__screenshots__/E/glossary-1440-dark.png',
-    fullPage: true,
-  });
 });

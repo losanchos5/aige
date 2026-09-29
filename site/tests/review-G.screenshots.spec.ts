@@ -2,10 +2,10 @@ import { test } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-// Block G design review shots (excluded from the acceptance run by the
-// "screenshot" grep). 1440x900 viewport (not full page), reduced motion, both
-// colour schemes, with localStorage.theme pinned so the explicit-toggle path is
-// exercised, not just the media query. Written to tests/__screenshots__/G/.
+// Block G design review shots, run by the `visual` project (npm run
+// test:visual), never by `npm test`. 1440x900 viewport (not full page),
+// reduced motion, both colour schemes, with localStorage.theme pinned so the
+// explicit-toggle path is exercised, not just the media query. Written to tests/__screenshots__/G/.
 const DIR = join('tests', '__screenshots__', 'G');
 const schemes = ['dark', 'light'] as const;
 const pages = [
