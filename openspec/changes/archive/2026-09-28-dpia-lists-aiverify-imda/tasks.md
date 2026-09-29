@@ -30,4 +30,4 @@ Los datos de investigación llegan en `D:/Documents/aige-wt/handoffs/` (`dpia-li
 - [x] 4.3 Crear `site/tests/dpia-lists.spec.ts` (datos, página construida, API).
 - [x] 4.4 `npm run build` y `npm test` en verde (fallos previos documentados contra `origin/main`).
 - [x] 4.5 `openspec validate dpia-lists-aiverify-imda --strict`.
-- [ ] 4.6 Commit por ruta, push, PR contra `main` y CI en verde.
+- [x] 4.6 Commit por ruta, push, PR contra `main` y CI en verde.
