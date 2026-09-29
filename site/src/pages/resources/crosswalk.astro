@@ -4,6 +4,7 @@ import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import CrosswalkMatrix from '../../components/CrosswalkMatrix.astro';
 import CrosswalkDrawer from '../../components/CrosswalkDrawer.astro';
+import ObligationLookup from '../../components/ObligationLookup.astro';
 import { site } from '../../data/site';
 import { disclaimer } from '../../data/frameworks';
 import {
@@ -133,6 +134,10 @@ const jsonLd = [
   />
 
   <div class="container res-page">
+    <div class="res-section">
+      <ObligationLookup />
+    </div>
+
     <section class="res-section cw-overlap" aria-labelledby="cw-overlap-heading">
       <div class="res-section-head">
         <h2 id="cw-overlap-heading">EU AI Act, ISO/IEC 42001 and NIST AI RMF: where they overlap</h2>

@@ -200,7 +200,7 @@ const partTitle = (id: string) => bookParts.find((part) => part.id === id)?.titl
 const chaptersTitle = `${chaptersOrdered.length} chapters in ${countWord(bookParts.length)} parts, versioned and open.`;
 const chaptersLede = `The Body of Knowledge is at v${site.bokVersion} and published under ${site.license}. ${partTitle('foundations')}, ${partTitle('lifecycle')}, and ${partTitle('law')} carry the discipline from what an AI system is, through its life, to the law that binds it.`;
 
-// Eleven tiles on the four-column bento: the references a reader reaches for
+// Twelve tiles on the four-column bento: the references a reader reaches for
 // first, the open controls second. The hub (/resources) lists every one.
 const resources = [
   {
@@ -242,6 +242,11 @@ const resources = [
     label: 'Obligation register',
     href: '/obligations',
     desc: 'Every obligation with a stable id, its duty holder, date, status, artefact and stack layer.',
+  },
+  {
+    label: 'Look up an article',
+    href: '/obligations#lookup',
+    desc: 'What does Article X require, and what else covers it? Type "AI Act 14" or "GDPR 35" and land on the answer.',
   },
   {
     label: 'Research notes',

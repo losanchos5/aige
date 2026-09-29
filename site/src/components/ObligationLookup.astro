@@ -1,0 +1,206 @@
+---
+// ObligationLookup.astro: the "Look up an article" box on /obligations and
+// /resources/crosswalk. The reader types "AI Act 14", "GDPR 35" or
+// "42001 A.6" and lands on the obligation page, or on the crosswalk topic when
+// the clause has no register row. /obligation-lookup.js (ES module, CSP-safe)
+// fetches /obligations/lookup.json on first focus and ranks it with the same
+// code the build used (src/lib/obligation-lookup-core.js). Without JavaScript
+// the examples are plain links and the form reloads /obligations with ?q=, where
+// the whole register is listed. One per page: the input carries id="lookup",
+// so /obligations#lookup focuses it natively (the fragment scroll focuses a
+// focusable target and would blur anything a script had focused instead).
+import { obligationById } from '../data/frameworks';
+import { obligationPath } from '../lib/obligations';
+
+interface Props {
+  /** Heading level of the box title on the host page. */
+  headingLevel?: 2 | 3;
+}
+const { headingLevel = 2 } = Astro.props;
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
+
+// Examples are real rows; a renamed id fails the build here, not in production.
+const examples = [
+  ['AI Act 14', 'AIGE-OBL-EUAIA-ART14'],
+  ['AI Act 50', 'AIGE-OBL-EUAIA-ART50'],
+  ['GDPR 22', 'AIGE-OBL-GDPR-ART22'],
+  ['ISO 42001 A.6', 'AIGE-OBL-ISO42001-A6'],
+  ['NIST GOVERN', 'AIGE-OBL-NISTRMF-GOVERN'],
+].map(([label, id]) => {
+  const row = obligationById(id);
+  if (!row) throw new Error(`ObligationLookup: example ${id} is not in the register`);
+  return { label, href: obligationPath(row) };
+});
+---
+
+<form
+  class="olk"
+  id="olk"
+  role="search"
+  action="/obligations"
+  method="get"
+  aria-labelledby="olk-heading"
+  data-olk
+  data-index="/obligations/lookup.json"
+  data-pagefind-ignore
+>
+  <Heading class="olk-heading" id="olk-heading">Look up an article</Heading>
+  <p class="olk-lede" id="olk-hint">
+    What does Article X require, and what else covers it? Type the instrument and the clause.
+  </p>
+  <div class="olk-field">
+    <label class="visually-hidden" for="lookup">Instrument and article or clause</label>
+    <input
+      class="olk-input"
+      id="lookup"
+      name="q"
+      type="search"
+      placeholder="AI Act 14, GDPR 35, ISO 42001 A.6"
+      role="combobox"
+      aria-expanded="false"
+      aria-controls="olk-results"
+      aria-autocomplete="list"
+      aria-describedby="olk-hint"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+    />
+    <button class="olk-go" type="submit">Look up</button>
+  </div>
+  <ul class="olk-results" id="olk-results" role="listbox" aria-label="Matching articles"></ul>
+  <p class="olk-status" id="olk-status" role="status" aria-live="polite"></p>
+  <p class="olk-empty" hidden>
+    No article in the register or the crosswalk matches. Try the instrument and the number
+    ("AI Act 14"), or <button class="olk-site" type="button" data-search-open>search the whole
+    site</button>.
+  </p>
+  <p class="olk-examples">
+    <span class="olk-examples-label">Try</span>
+    {examples.map((e) => <a class="olk-example" href={e.href}>{e.label}</a>)}
+  </p>
+</form>
+
+<script is:inline type="module" src="/obligation-lookup.js"></script>
+
+<style>
+  .olk {
+    display: grid;
+    gap: var(--s-3);
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+  }
+  .olk-heading {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+  .olk-lede {
+    color: var(--muted);
+    max-width: 60ch;
+  }
+  .olk-field {
+    display: flex;
+    gap: var(--s-2);
+  }
+  .olk-input {
+    /* #lookup lands on the input: leave room for the heading and lede above. */
+    scroll-margin-top: calc(var(--anchor-offset) + 7rem);
+    flex: 1;
+    min-width: 0;
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 1.0625rem;
+  }
+  .olk-go {
+    flex: none;
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--ink);
+    border-radius: var(--r-sm);
+    background: var(--ink);
+    color: var(--bg);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .olk-results {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-1);
+  }
+  .olk-results:empty,
+  .olk-status:empty {
+    display: none;
+  }
+  .olk-status,
+  .olk-empty {
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+  .olk-site {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .olk-examples {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-3);
+    font-size: 0.9375rem;
+  }
+  .olk-examples-label {
+    color: var(--muted);
+  }
+  .olk-example {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+  }
+  /* Rows are built by /obligation-lookup.js at runtime, so they never carry the
+     scope attribute: rules go through :global(), anchored on the scoped list. */
+  .olk-results :global(.olk-row a) {
+    display: grid;
+    grid-template-columns: minmax(9rem, max-content) 1fr;
+    gap: var(--s-1) var(--s-3);
+    padding: var(--s-2) var(--s-3);
+    border-radius: var(--r-sm);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .olk-results :global(.olk-row a:hover),
+  .olk-results :global(.olk-opt[aria-selected='true']) {
+    background: var(--bg);
+    outline: 1px solid var(--line);
+  }
+  .olk-results :global(.olk-ref) {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .olk-results :global(.olk-title) {
+    font-size: 0.9375rem;
+  }
+  .olk-results :global(.olk-kind) {
+    margin-left: var(--s-2);
+    color: var(--muted);
+    font-size: 0.8125rem;
+  }
+  @media (max-width: 560px) {
+    .olk {
+      padding: var(--s-4);
+    }
+    .olk-results :global(.olk-row a) {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
