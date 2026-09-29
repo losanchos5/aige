@@ -114,6 +114,13 @@ export function computeProfile(model, params) {
   if (level.id === 'approver' || level.id === 'observer') {
     add('checkpoint-irreversible', `The ${level.name} row: a person approves critical or irreversible steps, or none are allowed`);
   }
+  if (['collaborator', 'consultant', 'approver'].includes(level.id)) {
+    add('plan-review', 'A person approves its steps: let them see and edit the plan before it runs');
+  }
+  if (index >= 1) add('approval-request', 'A person approves some of its actions');
+  if (level.id === 'approver' || level.id === 'observer') {
+    add('approver-outliers', 'Its approvals are logged: watch the approvers as well as the rates');
+  }
 
   // 2. What the agent can do.
   const ops = new Set(tools.map((t) => t.op).filter(Boolean));
@@ -132,6 +139,8 @@ export function computeProfile(model, params) {
   if (irreversible.length && level.id !== 'operator' && !cps.includes('irreversible')) {
     gaps.push(`The agent can ${joinList(irreversible)}, but no approval point covers irreversible actions.`);
   }
+  if (ops.has('pay')) add('payment-protocols', 'It makes or approves payments');
+  if (cps.includes('user-defined')) add('user-thresholds', 'A user-defined approval point is named');
   if (ops.has('execute')) add('sandbox', 'It runs generated code (execute class)');
   const sensitiveTools = tools.filter((t) => t.dataClass === 'confidential' || t.dataClass === 'restricted');
   if (ops.has('send') || sensitiveTools.length) {
@@ -163,6 +172,9 @@ export function computeProfile(model, params) {
     gaps.push("The agent holds the user's own token, so its actions cannot be told apart from the user's: exchange it for a delegated token that names the agent.");
   }
   if (params.idm === 'delegated') add('delegated-token', 'It acts on behalf of users');
+  if (params.idm === 'delegated' || params.idm === 'user-token') {
+    add('user-enters-secrets', 'It acts for users, who may have to key in passwords or API keys');
+  }
 
   // 5. Memory and data.
   const personal = params.pd === 'yes' || params.sp === 'yes';
@@ -180,10 +192,21 @@ export function computeProfile(model, params) {
     add('hop-accountability', params.ma === 'external' ? 'It calls agents of another organisation' : 'It calls or delegates to other agents');
   }
   if (params.ma === 'external') add('remote-agents', 'It depends on agents you do not run');
+  if (params.ma === 'internal' || params.ma === 'external' || mem.includes('shared')) {
+    add('inter-agent-messages', 'It exchanges messages or memory with other agents');
+  }
+  if (params.ma === 'internal' || params.ma === 'external') {
+    add('monitoring-agents', 'It works alongside other agents: an agent that monitors them is governed like any other');
+  }
 
   // 7. Always.
   add('prompt-change-control', 'Every agent: its behaviour is set by configuration');
   add('otel-telemetry', 'Every agent: the logs are evidence');
+  add('restrictions-tested', 'Every agent: prove the restrictions hold by attempting what is denied');
+  add('agent-threat-model', 'Every agent: its threats depend on what it can reach');
+  if (ext.includes('messages') || params.idm === 'delegated' || params.idm === 'user-token') {
+    add('user-information', 'People use it or receive what it sends');
+  }
   if (params.hr === 'yes' || params.hr === 'unsure') {
     add('ai-act-high-risk', params.hr === 'yes' ? 'Its purpose is an Annex III use case' : 'Its purpose may be an Annex III use case: classify it');
   }

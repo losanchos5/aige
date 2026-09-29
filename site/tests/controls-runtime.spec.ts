@@ -1,4 +1,4 @@
-// controls-runtime.spec.ts: the Agent Runtime Control Profile v0.1
+// controls-runtime.spec.ts: the Agent Runtime Control Profile v0.2
 // (src/data/controls/agent-runtime.ts). Pure Node over the data, plus one read
 // of dist/controls/agent-runtime.html for the control anchors (run after the
 // build). Block orp-controls-runtime (open-reference-project, wave 1).
@@ -12,7 +12,7 @@ import { agentControls, agentChapter } from '../src/data/tool-agent-controls';
 
 const EM_DASH = String.fromCharCode(0x2014);
 const rows = controlsIn('agent-runtime');
-const ids = Array.from({ length: 31 }, (_, i) => `AIGE-CTL-AGENT-${String(i + 1).padStart(3, '0')}`);
+const ids = Array.from({ length: 42 }, (_, i) => `AIGE-CTL-AGENT-${String(i + 1).padStart(3, '0')}`);
 
 /** rehype-slug ids of every heading in chapter 23 (github-slugger, as the site renders them). */
 function chapterAnchors(): Set<string> {
@@ -29,12 +29,25 @@ function chapterAnchors(): Set<string> {
 }
 
 test.describe('agent runtime profile data', () => {
-  test('31 controls, ids in order', () => {
+  test('42 controls, ids in order', () => {
     expect(rows.map((c) => c.id)).toEqual(ids);
   });
 
   test('each control restates one distinct chapter-23 seed, in module order', () => {
-    expect(agentControls).toHaveLength(31);
+    // Published ids are a public contract: a seed inserted anywhere but the end
+    // would renumber AIGE-CTL-AGENT-0nn, so the order is frozen here.
+    expect(agentControls.map((a) => a.id)).toEqual([
+      'registry-entry', 'own-identity', 'read-only-tools', 'traces', 'tool-allow-list',
+      'checkpoint-before-writes', 'guardrail-every-call', 'execution-budgets', 'approval-log',
+      'per-agent-breaker', 'drilled-kill-switch', 'trajectory-anomaly', 'trajectory-evals',
+      'reversible-only', 'checkpoint-irreversible', 'sandbox', 'egress-filter', 'mcp-admission',
+      'mcp-local', 'mcp-authorization', 'short-lived-credentials', 'delegated-token',
+      'memory-governance', 'memory-personal-data', 'hop-accountability', 'remote-agents',
+      'data-classes', 'prompt-change-control', 'otel-telemetry', 'ai-act-high-risk', 'ai-disclosure',
+      'plan-review', 'approval-request', 'approver-outliers', 'monitoring-agents',
+      'inter-agent-messages', 'user-enters-secrets', 'payment-protocols', 'restrictions-tested',
+      'user-information', 'user-thresholds', 'agent-threat-model',
+    ]);
     const seen = new Set<string>();
     rows.forEach((row, i) => {
       expect(row.seeds, row.id).toEqual([agentControls[i].id]);
@@ -115,9 +128,10 @@ test.describe('agent runtime profile data', () => {
 
   test('the profile is an honest draft with no reviewer', () => {
     expect(agentRuntimeProfile.title).toBe('Agent Runtime Control Profile');
-    expect(agentRuntimeProfile.version).toBe('0.1');
+    expect(agentRuntimeProfile.version).toBe('0.2');
     expect(agentRuntimeProfile.reviewers).toEqual([]);
     expect(agentRuntimeProfile.changelog).toEqual([
+      expect.objectContaining({ version: '0.2', date: '2026-09-29' }),
       expect.objectContaining({ version: '0.1', date: '2026-09-26' }),
     ]);
     expect(agentRuntimeProfile.summary).toMatch(/chapter 23/);

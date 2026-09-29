@@ -469,7 +469,13 @@ test.describe('builders-b logic', () => {
       'checkpoint-irreversible', 'egress-filter', 'mcp-admission', 'mcp-authorization',
       'short-lived-credentials', 'memory-governance', 'memory-personal-data', 'hop-accountability',
       'prompt-change-control', 'otel-telemetry', 'ai-disclosure',
+      // The IMDA-derived controls (AGENT-032 to 042) this agent triggers.
+      'plan-review', 'approval-request', 'approver-outliers', 'payment-protocols',
+      'inter-agent-messages', 'monitoring-agents', 'restrictions-tested', 'agent-threat-model',
+      'user-information',
     ]));
+    expect(ids).not.toContain('user-thresholds');
+    expect(ids).not.toContain('user-enters-secrets');
     expect(ids).not.toContain('read-only-tools');
     expect(ids).not.toContain('checkpoint-before-writes');
     expect(ids).not.toContain('ai-act-high-risk');
@@ -489,8 +495,13 @@ test.describe('builders-b logic', () => {
     expect(entry.kill_switch.last_drill).toBe('2026-09-10');
 
     // An Operator with write tools and the user's token: two gaps.
-    const operator = computeProfile(agentModel, { ...params, al: 'operator', idm: 'user-token', cp: '' });
-    expect(operator.controls.map((c: { id: string }) => c.id)).toContain('read-only-tools');
+    const operator = computeProfile(agentModel, { ...params, al: 'operator', idm: 'user-token', cp: 'user-defined' });
+    const operatorIds = operator.controls.map((c: { id: string }) => c.id);
+    expect(operatorIds).toContain('read-only-tools');
+    expect(operatorIds).toContain('user-enters-secrets');
+    expect(operatorIds).toContain('user-thresholds');
+    expect(operatorIds).not.toContain('plan-review');
+    expect(operatorIds).not.toContain('approval-request');
     expect(operator.gaps.length).toBe(2);
     expect(validateAgainst('agent-register-entry', buildEntry(agentModel, { aid: 'x', own: 'o', exp: '2026-12-31', al: 'operator', idm: 'workload', t1: 'search', o1: 'read' }, computeProfile(agentModel, { aid: 'x', own: 'o', exp: '2026-12-31', al: 'operator', idm: 'workload', t1: 'search', o1: 'read' })))).toEqual([]);
     const rows = checklistRows(agentModel, profile);
