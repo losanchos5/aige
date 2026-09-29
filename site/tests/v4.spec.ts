@@ -1,7 +1,7 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 // V4: glossary hover cards + reading progress register. Assertions run in the
-// `default` project; the screenshots below are review shots into V4/.
+// `default` project; the review shots into V4/ live in v4.screenshots.spec.ts.
 
 test.describe('glossary term links', () => {
   test('the-stack links >= 5 terms to their pages and book-index anchors', async ({ page }) => {
@@ -80,40 +80,4 @@ test('glossary.json is valid with >= 50 entries', async ({ page }) => {
     expect(entry.url).toBe(`/glossary/${entry.slug.replace(/^t-/, '')}`);
     expect(entry.anchor).toBe(`/bok/glossary#${entry.slug}`);
   }
-});
-
-// ---- Review screenshots into tests/__screenshots__/V4/ ----
-
-const DIR = 'tests/__screenshots__/V4';
-
-async function midTermHover(page: Page) {
-  const terms = page.locator('a.term');
-  const count = await terms.count();
-  const target = terms.nth(Math.min(count - 1, Math.floor(count / 2)));
-  await target.scrollIntoViewIfNeeded();
-  await target.hover();
-  await expect(page.locator('#term-card')).toBeVisible();
-  // Let the 160ms opacity fade settle so the review shot is fully opaque.
-  await page.waitForTimeout(250);
-}
-
-for (const scheme of ['light', 'dark'] as const) {
-  test(`screenshot the-stack 1440 ${scheme} (tooltip + progress)`, async ({ page }) => {
-    await page.emulateMedia({ colorScheme: scheme });
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('/bok/the-stack');
-    await page.waitForLoadState('networkidle');
-    await midTermHover(page);
-    await page.screenshot({ path: `${DIR}/the-stack-1440-${scheme}.png` });
-  });
-}
-
-test('screenshot the-stack 390 light', async ({ page }) => {
-  await page.emulateMedia({ colorScheme: 'light' });
-  await page.setViewportSize({ width: 390, height: 780 });
-  await page.goto('/bok/the-stack');
-  await page.waitForLoadState('networkidle');
-  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 3));
-  await page.waitForTimeout(200);
-  await page.screenshot({ path: `${DIR}/the-stack-390-light.png` });
 });

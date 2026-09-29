@@ -3,13 +3,11 @@
 // playwright.config; no browser is needed for the request-only checks.
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
 import { cspHashOf, cspScriptHashes, inlineScriptAllowed } from './helpers/csp';
-
-const SHOT_DIR = join('tests', '__screenshots__', 'F');
 
 /** Big-endian PNG width from the IHDR chunk (bytes 16..20). */
 function pngWidth(buf: Buffer): number {
@@ -18,8 +16,6 @@ function pngWidth(buf: Buffer): number {
 }
 
 test.describe('OG images', () => {
-  test.beforeAll(() => mkdirSync(SHOT_DIR, { recursive: true }));
-
   for (const slug of ['default', 'thesis', 'bok-the-stack', 'path']) {
     test(`/og/${slug}.png is a 1200px-wide PNG`, async ({ request }) => {
       const res = await request.get(`/og/${slug}.png`);
@@ -27,8 +23,6 @@ test.describe('OG images', () => {
       expect(res.headers()['content-type']).toContain('image/png');
       const body = await res.body();
       expect(pngWidth(body)).toBe(1200);
-      // Keep a copy for visual review of Block F.
-      writeFileSync(join(SHOT_DIR, `${slug}.png`), body);
     });
   }
 });
