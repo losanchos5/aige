@@ -24,12 +24,12 @@
 
 ## 3. Tanda 2: tiempo y plantillas por ítem (PR C)
 
-- [ ] 3.1 Primitivas RelationRadial (egocéntrica, se omite con menos de 3 relaciones) y BowTie/cadena sobre `lib/evidence-chain.ts`
-- [ ] 3.2 Bloque obligaciones: `/obligations` (reloj de aplicación + isotipo de estados) y `/obligations/[id]` (tira + constelación)
-- [ ] 3.3 Bloque patrones y audiencias: `/patterns/[id]` (reloj normativo + vecindario), `/for/[slug]` (calendario), `/resources/ai-act-deadlines` + `/es` (eje con hoy)
-- [ ] 3.4 Bloque casos y glosario: `/cases/[id]` (pajarita), `/glossary/[slug]` (huella + vecindario)
-- [ ] 3.5 Bloque controles: `/controls` (carriles de aplicación), `/controls/[profile]` (tabla periódica + heatmap de cobertura), `/controls/[profile]/[control]` (anatomía + pass/fail + constelación)
-- [ ] 3.6 Tests de sincronía, build, `npm test`, a11y completo (A11Y_FULL=1), perf.spec
+- [x] 3.1 Primitivas RelationRadial (egocéntrica, se omite con menos de 3 relaciones) y BowTie/cadena sobre `lib/evidence-chain.ts`
+- [x] 3.2 Bloque obligaciones: `/obligations` (reloj de aplicación + isotipo de estados) y `/obligations/[id]` (tira + constelación)
+- [x] 3.3 Bloque patrones y audiencias: `/patterns/[id]` (reloj normativo + vecindario), `/for/[slug]` (calendario), `/resources/ai-act-deadlines` + `/es` (eje con hoy)
+- [x] 3.4 Bloque casos y glosario: `/cases/[id]` (pajarita), `/glossary/[slug]` (huella + vecindario)
+- [x] 3.5 Bloque controles: `/controls` (carriles de aplicación), `/controls/[profile]` (tabla periódica + heatmap de cobertura), `/controls/[profile]/[control]` (anatomía + pass/fail + constelación)
+- [x] 3.6 Tests de sincronía, build, `npm test`, a11y completo (A11Y_FULL=1), perf.spec
 - [ ] 3.7 Revisión, capturas, commit por ruta, PR C, CI verde
 
 ## 4. Cierre
