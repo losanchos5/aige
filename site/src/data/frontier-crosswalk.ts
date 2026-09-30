@@ -1941,11 +1941,12 @@ export function frontierProblems(): string[] {
   const problems: string[] = [];
   const dimIds = new Set(dimensions.map((d) => d.id));
   const colFws = new Set(frontierColumns.flatMap((c) => c.frameworks));
-  const isoIds = new Set(
-    generalRefs.filter((r) => r.framework === 'iso-42001' && r.verified !== false).map((r) => r.ref),
+  const isoTitles = new Map(
+    generalRefs.filter((r) => r.framework === 'iso-42001' && r.verified !== false).map((r) => [r.ref, r.title]),
   );
 
   if (new Set(dimensions.map((d) => d.id)).size !== dimensions.length) problems.push('duplicate dimension id');
+  if (dimensions.length < 12) problems.push(`only ${dimensions.length} dimensions, the floor is 12`);
   for (const fw of colFws) {
     if (!frontierFrameworkById(fw)) problems.push(`column framework ${fw} does not resolve`);
     if (!frontierDocById(fw)) problems.push(`column framework ${fw} has no document`);
@@ -1963,11 +1964,15 @@ export function frontierProblems(): string[] {
       if (!r.ref.trim()) problems.push(`${at}: lab ref without a section or page`);
       if (r.url?.includes('.pdf') && !/#page=\d+$/.test(r.url)) problems.push(`${at}: PDF url without #page=`);
     }
-    if (r.framework === 'nist-ai-rmf' && !nistAiRmfSubcategoryById(r.ref)) {
-      problems.push(`${at}: not a NIST AI RMF subcategory in nist-ai-rmf.ts`);
+    if (r.framework === 'nist-ai-rmf') {
+      const sub = nistAiRmfSubcategoryById(r.ref);
+      if (!sub) problems.push(`${at}: not a NIST AI RMF subcategory in nist-ai-rmf.ts`);
+      else if (r.title !== `${r.ref}: ${sub.text}`) problems.push(`${at}: title is not "<id>: <statement>" as NIST prints it`);
     }
     if (r.framework === 'iso-42001') {
-      if (!isoIds.has(r.ref)) problems.push(`${at}: ISO clause not among the general crosswalk's verified ones`);
+      const title = isoTitles.get(r.ref);
+      if (title === undefined) problems.push(`${at}: ISO clause not among the general crosswalk's verified ones`);
+      else if (r.title !== title) problems.push(`${at}: ISO title differs from the general crosswalk's`);
       if (r.quote) problems.push(`${at}: ISO text must not be quoted`);
     }
   }
@@ -1978,7 +1983,11 @@ export function frontierProblems(): string[] {
     seen.add(key);
   }
 
+  const gapKeys = new Set<string>();
   for (const g of frontierGaps) {
+    const gapKey = `${g.topic}|${g.framework}`;
+    if (gapKeys.has(gapKey)) problems.push(`duplicate gap ${gapKey}`);
+    gapKeys.add(gapKey);
     if (!dimIds.has(g.topic)) problems.push(`gap ${g.framework} ${g.topic}: unknown dimension`);
     if (!colFws.has(g.framework)) problems.push(`gap ${g.framework} ${g.topic}: framework is not a column`);
     if (!g.note.trim()) problems.push(`gap ${g.framework} ${g.topic}: empty note`);

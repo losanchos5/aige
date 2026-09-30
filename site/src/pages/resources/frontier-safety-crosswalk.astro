@@ -45,14 +45,14 @@ if (problems.length > 0) {
 }
 
 const matrix = frontierMatrix();
-const labDocs = frontierDocs.filter((d) => d.companion !== undefined || !['nist-ai-rmf', 'iso-42001'].includes(d.frameworkId));
 const labIds = new Set(frontierColumns.filter((c) => c.group === 'labs').flatMap((c) => c.frameworks));
+const labDocs = frontierDocs.filter((d) => labIds.has(d.frameworkId));
 const unverified = frontierRefs.filter((r) => r.verified === false);
 const unverifiedLab = unverified.filter((r) => labIds.has(r.framework)).length;
 const quoteCount = frontierRefs.filter((r) => r.quote).length;
 const P = 'fs';
 
-const seoTitle = 'Frontier safety frameworks crosswalk';
+const seoTitle = 'Frontier safety crosswalk';
 const description = `Anthropic's RSP, OpenAI's Preparedness Framework and Google DeepMind's Frontier Safety Framework mapped to NIST AI RMF and ISO/IEC 42001, section by section.`;
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Frontier safety crosswalk' }];
 const pageUrl = new URL(FRONTIER_CROSSWALK_PATH, site.url).href;
@@ -63,7 +63,7 @@ const jsonLd = [
   {
     '@type': 'Dataset',
     '@id': `${pageUrl}#dataset`,
-    name: `Frontier safety frameworks crosswalk · ${site.name}`,
+    name: `Frontier safety crosswalk · ${site.name}`,
     description,
     url: pageUrl,
     inLanguage: 'en',
@@ -220,7 +220,7 @@ const fwShort = (id: string): string => frontierFrameworkById(id)?.short ?? id;
         matrix={matrix}
         chooser={false}
         caption="One governance dimension per row; three lab policies, then NIST AI RMF and ISO/IEC 42001. Select a dimension or a cell to read the mapped sections."
-        regionLabel="Frontier safety frameworks crosswalk (scrolls sideways on small screens)"
+        regionLabel="Frontier safety crosswalk (scrolls sideways on small screens)"
       />
     </section>
 
@@ -352,7 +352,7 @@ const fwShort = (id: string): string => frontierFrameworkById(id)?.short ?? id;
     </section>
 
     <div class="obx-cite">
-      <Citation title="Frontier safety frameworks crosswalk" url={FRONTIER_CROSSWALK_PATH} kind="dataset" />
+      <Citation title="Frontier safety crosswalk" url={FRONTIER_CROSSWALK_PATH} kind="dataset" />
     </div>
   </div>
 

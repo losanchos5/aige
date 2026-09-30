@@ -52,6 +52,8 @@ const groups: { id: ColumnGroup; label: string }[] = [
   { id: 'codes', label: 'Codes and frameworks' },
   { id: 'standards', label: 'Standards and controls' },
 ];
+// Only the groups this matrix has columns in: an empty fieldset would show a bare legend.
+const usedGroups = groups.filter((g) => columns.some((c) => c.group === g.id));
 const defaultCount = columns.filter((c) => c.defaultVisible).length;
 ---
 
@@ -86,7 +88,7 @@ const defaultCount = columns.filter((c) => c.defaultVisible).length;
       </summary>
       <div class="cw-cols-body">
         {
-          groups.map((group) => (
+          usedGroups.map((group) => (
             <fieldset class="cw-cols-group">
               <legend>{group.label}</legend>
               {columns
