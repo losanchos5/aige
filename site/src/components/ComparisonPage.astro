@@ -25,8 +25,12 @@ import Byline from './Byline.astro';
 import Callout from './Callout.astro';
 import PillarLink from './PillarLink.astro';
 import NextStep from './NextStep.astro';
+import Chart from './Chart.astro';
+import ComparisonButterfly from './ComparisonButterfly.astro';
 import { site } from '../data/site';
 import { disclaimer, obligationPath } from '../data/frameworks';
+import { crosswalkAsOf } from '../data/crosswalk';
+import { stacked100 } from '../lib/charts';
 import { patternPath } from '../data/patterns';
 import {
   comparisons,
@@ -124,6 +128,49 @@ const jsonLd = [
 ];
 
 const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
+
+// The overlap bar beside "In short": the topics either instrument reaches,
+// split by overlap level (the counts overlapSummary states), each series in the
+// state the butterfly's group swatch repeats. 'figc' mode: reading.css brings
+// figures.css. A topic neither reaches stays outside the bar, named in its label.
+const partial = counts.both - counts.strong;
+const passingNote = (n: number) => (n > 0 ? ` (${n} in passing)` : '');
+const barBase = {
+  title: 'Topic overlap at a glance',
+  desc: `The ${rows.length} crosswalk topics ${def.aName} or ${def.bName} reaches, by overlap level: ${counts.strong} strong, ${partial} partial, ${counts.aOnly} ${def.aName} only and ${counts.bOnly} ${def.bName} only.`,
+  source: 'the topic × framework crosswalk',
+  asOf: crosswalkAsOf,
+  unit: 'share of topics',
+  itemHeader: 'Topics',
+  series: [
+    { label: `Strong: ${counts.strong}` },
+    { label: `Partial: ${partial}`, state: 'hatched' as const },
+    { label: `${def.aName} only: ${counts.aOnly}${passingNote(counts.aPassing)}`, state: 'outline' as const },
+    { label: `${def.bName} only: ${counts.bOnly}${passingNote(counts.bPassing)}`, state: 'dashed' as const },
+  ],
+  items: [
+    {
+      label: counts.neither > 0 ? `${rows.length} of ${counts.topics} topics` : `All ${counts.topics} topics`,
+      values: [counts.strong, partial, counts.aOnly, counts.bOnly],
+    },
+  ],
+};
+const barWide = stacked100({ ...barBase, id: 'cmp-bar-w', width: 960 });
+const barNarrow = stacked100({ ...barBase, id: 'cmp-bar-n', width: 340 });
+const oneSided = counts.aOnly + counts.bOnly;
+// The same four counts as headline tiles above the bar, each with the swatch
+// of its series (the butterfly's group headings repeat them).
+const inPassing = (n: number) => (n > 0 ? `, ${n} of them in passing` : '');
+const stats = [
+  { n: counts.strong, label: 'Strong', gloss: 'both file a core clause', swatch: 'fill' },
+  { n: partial, label: 'Partial', gloss: 'both file a clause, at least one side only related ones', swatch: 'hatch' },
+  { n: counts.aOnly, label: `${def.aName} only`, gloss: `no ${def.bName} clause mapped${inPassing(counts.aPassing)}`, swatch: 'line' },
+  { n: counts.bOnly, label: `${def.bName} only`, gloss: `no ${def.aName} clause mapped${inPassing(counts.bPassing)}`, swatch: 'dash' },
+];
+const barCaption =
+  `Of the ${counts.topics} crosswalk topics, ${counts.both} have a clause in both and ${counts.strong} of those a core clause on each side` +
+  (counts.neither > 0 ? `; ${counts.neither} ${counts.neither === 1 ? 'is' : 'are'} reached by neither and ${counts.neither === 1 ? 'sits' : 'sit'} outside the bar.` : '.') +
+  ` The ${oneSided} one-sided ${oneSided === 1 ? 'topic is' : 'topics are'} the ones to plan for separately; the topic-by-topic chart further down names ${oneSided === 1 ? 'it' : 'them'}.`;
 ---
 
 <Base
@@ -153,6 +200,19 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
           <p>{inShort}</p>
         </aside>
       </div>
+      <ul class="cmp-stats" aria-label="Crosswalk topics by overlap level">
+        {
+          stats.map((s) => (
+            <li class="cmp-stat">
+              <span class:list={['cmp-sw', `cmp-sw-${s.swatch}`]} aria-hidden="true" />
+              <span class="cmp-stat-n">{s.n}</span>
+              <span class="cmp-stat-label">{s.label}</span>
+              <span class="cmp-stat-gloss">{s.gloss}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <Chart id="cmp-bar" chart={barWide} narrow={barNarrow} title="Topic overlap at a glance" caption={barCaption} />
     </section>
 
     <section class="res-section" aria-labelledby="cmp-glance">
@@ -227,6 +287,7 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
           own "Maps to" line names that clause. Otherwise the cell is empty.
         </p>
       </div>
+      <ComparisonButterfly cmp={cmp} asOf={crosswalkAsOf} />
       <div class="res-tablewrap">
         <table class="res-table cmp-table" data-cmp-overlap>
           <caption class="visually-hidden">
@@ -426,6 +487,99 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
     color: var(--ink);
     font-size: 1.0625rem;
     line-height: 1.6;
+  }
+
+  /* Headline tiles above the overlap bar: the count in the display face, the
+     series swatch (the bar's own states) before it. */
+  .cmp-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(9rem, 40%), 1fr));
+    gap: var(--s-3);
+    max-width: 60rem;
+    margin: var(--s-6) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cmp-stat {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: baseline;
+    column-gap: var(--s-2);
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+  }
+
+  .cmp-stat-n {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 2.5rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  .cmp-stat-label {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  @media (max-width: 480px) {
+    .cmp-stat {
+      grid-template-columns: auto 1fr;
+      padding: var(--s-3);
+    }
+
+    .cmp-stat-n {
+      font-size: 2rem;
+    }
+
+    .cmp-stat-label {
+      grid-column: 1 / -1;
+      margin-top: var(--s-1);
+    }
+  }
+
+  .cmp-stat-gloss {
+    grid-column: 1 / -1;
+    margin-top: var(--s-2);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .cmp-sw {
+    align-self: center;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+    box-sizing: border-box;
+  }
+
+  .cmp-sw-fill {
+    background: color-mix(in srgb, var(--ink) 55%, var(--bg));
+    border: 1.25px solid var(--ink-2);
+  }
+
+  .cmp-sw-hatch {
+    background: repeating-linear-gradient(45deg, var(--ink-2) 0 1.6px, var(--bg) 1.6px 4px);
+    border: 1.25px solid var(--ink);
+  }
+
+  .cmp-sw-line {
+    background: var(--bg);
+    border: 1.5px solid var(--ink);
+  }
+
+  .cmp-sw-dash {
+    background: var(--bg);
+    border: 1.5px dashed var(--ink);
+  }
+
+  .cmp-stats + :global(.chart-fig) {
+    margin-top: var(--s-3);
   }
 
   .cmp-qa h2 {

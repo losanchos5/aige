@@ -1,0 +1,449 @@
+---
+/**
+ * ComparisonButterfly: the hero of "Where they overlap, topic by topic" on the
+ * three "<A> vs <B>" pages (ComparisonPage.astro). One row per crosswalk topic
+ * either instrument reaches: A's clauses grow left from the centre, B's grow
+ * right, one square per clause (solid = core, hatched = related), rows grouped
+ * by overlap level (strong, partial, A only, B only) so the reader sees where
+ * one instrument asks for much more than the other and where only one is
+ * present. Read from buildComparison() rows, the same rows as the table below.
+ *
+ * HTML and CSS rather than an SVG from the chart kit (src/lib/charts/): 25 rows
+ * with the core/related split measured about 22 KB as a kit divergingBars SVG,
+ * twice the 12 KB data-viz budget. It keeps the kit's contract by hand: the
+ * figure carries role img with a one-sentence name, the Source and As of lines
+ * inside the canvas, a figcaption and the data as a table in a <details>
+ * (chart.css frame classes); state by fill or hatch, never colour alone; text
+ * in full ink; no script. Motion: the bars grow out of the axis on scroll,
+ * transform only, only where scroll timelines exist and motion is allowed.
+ */
+import { levelLabel, type Comparison, type OverlapLevel, type SideRef } from '../lib/comparisons';
+import '../styles/chart.css';
+
+interface Props {
+  cmp: Comparison;
+  /** YYYY-MM-DD of the crosswalk data, printed as "As of". */
+  asOf: string;
+  id?: string;
+}
+
+const { cmp, asOf, id = 'cmp-butterfly' } = Astro.props;
+const { def, rows, counts } = cmp;
+
+const ORDER: OverlapLevel[] = ['strong', 'partial', 'a-only', 'b-only'];
+// The group's swatch: the same state the overlap bar at the top of the page
+// draws for that level.
+const SWATCH: Record<OverlapLevel, string> = { strong: 'fill', partial: 'hatch', 'a-only': 'line', 'b-only': 'dash' };
+const GLOSS: Record<OverlapLevel, string> = {
+  strong: 'a core clause on each side',
+  partial: 'both file a clause, at least one side only related ones',
+  'a-only': `no ${def.bName} clause mapped`,
+  'b-only': `no ${def.aName} clause mapped`,
+};
+
+const split = (list: SideRef[]) => {
+  const core = list.filter((s) => s.ref.strength === 'core').length;
+  return { core, related: list.length - core };
+};
+
+const groups = ORDER.map((level) => ({
+  level,
+  rows: rows
+    .filter((row) => row.level === level)
+    .map((row) => ({ row, a: split(row.a), b: split(row.b) })),
+})).filter((group) => group.rows.length > 0);
+
+const topicsWord = (n: number) => (n === 1 ? 'topic' : 'topics');
+const title = 'Clauses per topic, side by side';
+const name =
+  `${def.aName} clauses (left) and ${def.bName} clauses (right) for each of the ${rows.length} crosswalk topics either reaches, ` +
+  `core and related, grouped by overlap level: ${groups.map((g) => `${g.rows.length} ${levelLabel(g.level, cmp).toLowerCase()}`).join(', ')}.`;
+const caption =
+  `Each square is one clause the crosswalk files under the topic: solid for a core clause, hatched for a related one. ` +
+  `Look for the long one-sided rows and the groups at the bottom: that is where one instrument asks for more, or alone.`;
+const tableRows = groups.flatMap((g) =>
+  g.rows.map(({ row, a, b }) => [row.topic.name, a.core, a.related, b.core, b.related, levelLabel(row.level, cmp, row.passing)]),
+);
+const columns = ['Topic', `${def.aName} core`, `${def.aName} related`, `${def.bName} core`, `${def.bName} related`, 'Overlap'];
+const squares = (n: { core: number; related: number }) => [
+  ...Array.from({ length: n.core }, () => 'core'),
+  ...Array.from({ length: n.related }, () => 'rel'),
+];
+---
+
+<figure class="chart-fig cb" id={id} data-cmp-butterfly>
+  <div class="chart-canvas">
+    <div class="cb-plot" role="img" aria-label={name}>
+      <div class="cb-head" aria-hidden="true">
+        <span class="cb-side-name cb-a">{def.aName}</span>
+        <span class="cb-legend">
+          <span class="cb-key"><span class="cb-sq cb-core"></span>Core clause</span>
+          <span class="cb-key"><span class="cb-sq cb-rel"></span>Related clause</span>
+        </span>
+        <span class="cb-side-name cb-b">{def.bName}</span>
+      </div>
+      {
+        groups.map((g) => (
+          <div class="cb-group" data-level={g.level}>
+            <p class="cb-group-head">
+              <span class:list={['cb-sw', `cb-sw-${SWATCH[g.level]}`]} />
+              <span class="cb-group-name">{levelLabel(g.level, cmp)}</span>
+              <span class="cb-group-count">
+                {g.rows.length} {topicsWord(g.rows.length)}
+              </span>
+              <span class="cb-group-gloss">{GLOSS[g.level]}</span>
+            </p>
+            <ul class="cb-rows">
+              {g.rows.map(({ row, a, b }) => (
+                <li class="cb-row" data-topic={row.topic.id}>
+                  <span class="cb-label">
+                    <span class="cb-topic">{row.topic.name}</span>
+                    {row.passing && <span class="cb-note">in passing</span>}
+                  </span>
+                  {[a, b].map((n, i) => (
+                    <span class:list={['cb-side', i === 0 ? 'cb-a' : 'cb-b']} data-side={i === 0 ? 'a' : 'b'}>
+                      {n.core + n.related === 0 ? (
+                        <span class="cb-none">not mapped</span>
+                      ) : (
+                        <>
+                          <span class="cb-bar">
+                            {squares(n).map((kind) => (
+                              <span class:list={['cb-sq', kind === 'core' ? 'cb-core' : 'cb-rel']} />
+                            ))}
+                          </span>
+                          <span class="cb-n">{n.core + n.related}</span>
+                        </>
+                      )}
+                    </span>
+                  ))}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+      <p class="cb-stamp">
+        <span>Source: the topic × framework crosswalk, {counts.topics} topics</span>
+        <span>As of {asOf}</span>
+      </p>
+    </div>
+  </div>
+  <figcaption class="chart-caption">
+    <span class="chart-title">{title}</span>
+    <span class="chart-desc">{caption}</span>
+  </figcaption>
+  <details class="chart-alt">
+    <summary class="chart-alt-summary" data-pagefind-ignore>Data table</summary>
+    <div class="chart-table-wrap" role="region" tabindex="0" aria-label={`${title}: ${def.aName} and ${def.bName}`}>
+      <table class="chart-table">
+        <caption>{`${title}: ${def.aName} and ${def.bName}`}</caption>
+        <thead>
+          <tr>{columns.map((column) => <th scope="col">{column}</th>)}</tr>
+        </thead>
+        <tbody>
+          {
+            tableRows.map((row) => (
+              <tr>
+                {row.map((cell, i) =>
+                  i === 0 ? <th scope="row">{cell}</th> : <td class:list={[typeof cell === 'number' && 'num']}>{cell}</td>,
+                )}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+</figure>
+
+<style>
+  /* Wide: A's bar | topic | B's bar, the two axes at the inner edges of the
+     bars. Narrow (the figure under 560px): the topic on its own line, the two
+     bars under it meeting at one centre axis. */
+  .cb-plot {
+    --sq: 18px;
+    --sq-gap: 4px;
+    --label: minmax(11rem, 15rem);
+    font-size: var(--fs-small);
+    color: var(--ink);
+    padding: var(--s-2) var(--s-2) 0;
+  }
+
+  .cb-head,
+  .cb-row {
+    display: grid;
+    grid-template-columns: 1fr var(--label) 1fr;
+    grid-template-areas: 'a label b';
+    column-gap: 0;
+    align-items: center;
+  }
+
+  .cb-head {
+    padding-bottom: var(--s-3);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .cb-side-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.125rem;
+    letter-spacing: var(--tracking-display, -0.01em);
+    line-height: 1.2;
+  }
+
+  .cb-side-name.cb-a {
+    grid-area: a;
+    text-align: right;
+    padding-right: var(--s-3);
+  }
+
+  .cb-side-name.cb-b {
+    grid-area: b;
+    padding-left: var(--s-3);
+  }
+
+  .cb-legend {
+    grid-area: label;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-1) var(--s-3);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .cb-key {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  /* Groups: a centred heading on a hairline, the swatch of the level first. */
+  .cb-group-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 2px var(--s-2);
+    margin: var(--s-5) 0 var(--s-2);
+    text-align: center;
+  }
+
+  .cb-group-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.125rem;
+  }
+
+  .cb-group-count {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cb-group-gloss {
+    flex-basis: 100%;
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  .cb-sw {
+    align-self: center;
+    display: inline-block;
+    width: 22px;
+    height: 12px;
+    border-radius: 2px;
+    box-sizing: border-box;
+  }
+
+  .cb-sw-fill,
+  .cb-core {
+    background: color-mix(in srgb, var(--ink) 55%, var(--bg));
+    border: 1.25px solid var(--ink-2);
+  }
+
+  .cb-sw-hatch,
+  .cb-rel {
+    background: repeating-linear-gradient(45deg, var(--ink-2) 0 1.6px, var(--bg) 1.6px 4px);
+    border: 1.25px solid var(--ink);
+  }
+
+  .cb-sw-line {
+    background: var(--bg);
+    border: 1.5px solid var(--ink);
+  }
+
+  .cb-sw-dash {
+    background: var(--bg);
+    border: 1.5px dashed var(--ink);
+  }
+
+  .cb-rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cb-row {
+    min-height: calc(var(--sq) + 14px);
+  }
+
+  .cb-row:hover {
+    background: color-mix(in srgb, var(--ink) 4%, var(--bg));
+  }
+
+  .cb-label {
+    grid-area: label;
+    padding: 4px var(--s-3);
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .cb-topic {
+    color: var(--ink);
+  }
+
+  .cb-note {
+    display: block;
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+
+  /* One side: squares from the axis outward, then the count. The left side
+     reverses the row so the same markup grows leftward. */
+  .cb-side {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-width: 0;
+    padding: 0 var(--s-2);
+  }
+
+  .cb-side.cb-a {
+    grid-area: a;
+    flex-direction: row-reverse;
+    border-right: 1.5px solid var(--ink);
+  }
+
+  .cb-side.cb-b {
+    grid-area: b;
+    border-left: 1.5px solid var(--ink);
+  }
+
+  .cb-bar {
+    display: flex;
+    gap: var(--sq-gap);
+  }
+
+  .cb-a .cb-bar {
+    flex-direction: row-reverse;
+    transform-origin: right center;
+  }
+
+  .cb-b .cb-bar {
+    transform-origin: left center;
+  }
+
+  .cb-sq {
+    display: inline-block;
+    flex: none;
+    width: var(--sq);
+    height: var(--sq);
+    border-radius: 2px;
+    box-sizing: border-box;
+  }
+
+  .cb-key .cb-sq {
+    width: 12px;
+    height: 12px;
+  }
+
+  .cb-n {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--fs-small);
+    color: var(--ink);
+  }
+
+  .cb-none {
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .cb-stamp {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: var(--s-5) 0 var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--muted);
+  }
+
+  @container (max-width: 559px) {
+    .cb-plot {
+      --sq: 12px;
+      --sq-gap: 2px;
+      padding: var(--s-1) 0 0;
+    }
+
+    .cb-head {
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas:
+        'a b'
+        'label label';
+      row-gap: var(--s-2);
+    }
+
+    .cb-row {
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas:
+        'label label'
+        'a b';
+      padding-bottom: 6px;
+    }
+
+    .cb-side-name {
+      font-size: 1rem;
+    }
+
+    .cb-label {
+      padding: 6px var(--s-2) 2px;
+    }
+
+    .cb-side {
+      min-height: calc(var(--sq) + 6px);
+      padding: 0 6px;
+    }
+
+    .cb-side.cb-a {
+      border-right: 0;
+    }
+  }
+
+  /* The bars grow out of their axis as the row scrolls in: transform only
+     (axe blends fractional opacity into contrast), only with scroll timelines
+     and when motion is allowed; everyone else sees them drawn. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .cb-bar {
+        animation: cb-grow linear both;
+        animation-timeline: view();
+        animation-range: entry 10% entry 90%;
+      }
+
+      @keyframes cb-grow {
+        from {
+          transform: scaleX(0.15);
+        }
+
+        to {
+          transform: none;
+        }
+      }
+    }
+  }
+</style>
