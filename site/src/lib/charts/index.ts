@@ -68,8 +68,9 @@
 //           unit, callouts? })
 //     Three-set overlap; 'upset' is the narrow variant (same table).
 //
-//   ladder({ steps: [{ label, detail?, href? }], highlight?, highlightLabel?, orientation? })
+//   ladder({ steps: [{ label, detail?, href?, key? }], highlight?, highlightLabel?, orientation? })
 //     Ascending steps; 'vertical' is the narrow variant.
+//     A step key wraps its marks in <g data-step> for a page script to light.
 //
 // Helpers for new primitives: linearScale, timeScale, textWidth, fitText,
 // wrapText, open, close, assemble, markStyles, shape, targets, words.

@@ -11,6 +11,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import ToolShell from '../../components/toolkit/ToolShell.astro';
+import Chart from '../../components/Chart.astro';
+import { lanes, type Shape } from '../../lib/charts';
 import { toolById, toolNotice } from '../../data/toolkit';
 import {
   policyCardTemplates,
@@ -76,6 +78,51 @@ const templates = policyCardTemplates.map((template) => ({
 const curated = templates.filter((template) => template.id !== 'custom');
 const effects = Object.keys(effectLabels) as PolicyEffect[];
 const points = Object.keys(enforcementLabels) as EnforcementPoint[];
+
+// The lanes chart of the curated rules: one lane per enforcement point, one
+// row per template, the marker's shape saying the effect (the diamond is the
+// gate: deny). Lane names are the short forms of enforcementLabels.
+const laneNames: Record<EnforcementPoint, string> = {
+  pre_merge: 'Pull request',
+  deploy: 'Deploy',
+  runtime: 'Runtime',
+  periodic: 'Schedule',
+};
+const effectShape: Record<PolicyEffect, Shape> = {
+  deny: 'diamond',
+  require_approval: 'square',
+  alert: 'circle',
+  allow: 'triangle',
+};
+const effectName = (effect: PolicyEffect) => effect.charAt(0).toUpperCase() + effect.slice(1).replace('_', ' ');
+const usedEffects = effects.filter((effect) => curated.some((template) => template.effect === effect));
+const countWords = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+const countWord = (n: number) => countWords[n] ?? String(n);
+const lanesInput = {
+  title: `${countWord(curated.length)} rules on the delivery pipeline`,
+  desc: `Where each of the ${curated.length} rule templates is enforced, from the pull request to the schedule, with its effect as the marker's shape.`,
+  source: 'Policy Card templates, chapter 05 [1]',
+  rowHeader: 'Rule template',
+  columns: points.map((point) => ({ key: point, label: laneNames[point] })),
+  rows: curated.map((template) => ({
+    label: template.title,
+    href: `#pc-g-${template.id}`,
+    marks: template.enforcementPoints.map((point) => ({
+      column: point,
+      shape: effectShape[template.effect],
+      status: template.effect,
+    })),
+  })),
+  legend: usedEffects.map((effect) => ({ label: effectName(effect), shape: effectShape[effect] })),
+};
+const lanesWide = lanes({ ...lanesInput, id: 'pc-lanes-w', width: 640 });
+const lanesNarrow = lanes({ ...lanesInput, id: 'pc-lanes-n', width: 340, orientation: 'vertical' });
+const effectTally = usedEffects
+  .map((effect) => {
+    const n = curated.filter((template) => template.effect === effect).length;
+    return `${countWord(n).toLowerCase()} ${effect}`;
+  })
+  .join(', ');
 
 // Everything the client needs, as data (no markup): the JSON island.
 const data = {
@@ -210,6 +257,7 @@ const cite = (n: number) => `#src-${n}`;
       <legend class="tool-legend">1. The rule</legend>
       <p class="tool-hint" id="pc-rule-hint">
         Six curated rules, or one condition of your own on one field of the input.
+        <a href="#pc-lanes">See where each rule acts</a>.
       </p>
       <ul class="tool-options">
         {
@@ -513,6 +561,14 @@ const cite = (n: number) => `#src-${n}`;
       the failure mode it starts from, the obligations it helps evidence by default and the pattern
       it builds. Without JavaScript, use this list and the fields above as a worksheet.
     </p>
+    <Chart
+      id="pc-lanes"
+      chart={lanesWide}
+      narrow={lanesNarrow}
+      title={lanesInput.title}
+      caption={`Where each rule template acts, from the pull request to the schedule, and with what effect (${effectTally}). Pick a template by the point you need to guard, then open it below.`}
+      tableLabel="The rules and where they act, as a table"
+    />
     <div class="pc-guide-list">
       {
         curated.map((template) => (

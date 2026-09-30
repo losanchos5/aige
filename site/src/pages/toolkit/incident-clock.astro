@@ -8,6 +8,9 @@
 // without JavaScript. The tool never asserts more than the chapter.
 import ToolShell from '../../components/toolkit/ToolShell.astro';
 import ToolTerms from '../../components/toolkit/ToolTerms.astro';
+import Figure from '../../components/Figure.astro';
+import { getFigure } from '../../data/figures';
+import clocksSvg from '../../figures/incident-clocks.svg?raw';
 import ToolSourceList from '../../components/toolkit/ToolSourceList.astro';
 import type { ToolSource } from '../../components/toolkit/ToolSourceList.astro';
 import { toolById, toolNotice } from '../../data/toolkit';
@@ -31,6 +34,7 @@ import { chapterAnchorTitles } from '../../lib/tool-anchors';
 import '../../components/toolkit/tool-docs.css';
 
 const tool = toolById('incident-clock');
+const clocks = getFigure('incident-clocks')!;
 // Fails the build if a chapter-17 heading the tool links to is renamed.
 chapterAnchorTitles('bok/17-incidents.md', A);
 const data = incidentClockData(site.url, toolNotice, site.license);
@@ -370,6 +374,9 @@ const sources: ToolSource[] = [
 
   <Fragment slot="guide">
     <h2 id="ic-how">How the tool reads chapter 17</h2>
+    <Figure id="incident-clocks" title={clocks.title} caption={clocks.caption} description={clocks.description}>
+      <Fragment set:html={clocksSvg} />
+    </Figure>
     <p>
       Two decisions, kept apart <a href="#src-1" class="cite">[1]</a>. <strong>Severity</strong> is a
       judgement about harm on the internal scale; <strong>reportability</strong> is a separate test,
