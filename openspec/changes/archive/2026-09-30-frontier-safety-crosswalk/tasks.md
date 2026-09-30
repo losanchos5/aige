@@ -25,9 +25,9 @@
 
 ## 5. Entrega
 
-- [ ] 5.1 Commit por ruta, PR con cuerpo en handoffs/PR-labs-body.md, CI verde
-- [ ] 5.2 Merge coordinado con aige-18, deploy, smoke en prod (página, JSON, CSV, sitemap, llms.txt)
-- [ ] 5.3 Archivo OpenSpec, borrado de worktree y ramas, memoria
+- [x] 5.1 Commit por ruta, PR con cuerpo en handoffs/PR-labs-body.md, CI verde
+- [x] 5.2 Merge coordinado con aige-18, deploy, smoke en prod (página, JSON, CSV, sitemap, llms.txt)
+- [x] 5.3 Archivo OpenSpec, borrado de worktree y ramas, memoria
 
 ## Flecos (fuera de v1)
 
