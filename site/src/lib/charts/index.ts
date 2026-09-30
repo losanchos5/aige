@@ -9,7 +9,8 @@
 //            or 'chart' (chart.css only; required on /, /resources,
 //            /resources/crosswalk, /cases and /patterns, see tests/perf.spec.ts)
 //   width    viewBox width; 340 gives the phone variant (1:1 text at 390 px)
-//   lang     'es' prints "A fecha de" / "Fuente:" and Spanish region words
+//   lang     'es' prints every fixed word in Spanish ("A fecha de", "Fuente:",
+//            "Hoy", table headings such as "Fecha", "Total", "no aplica")
 // and returns ChartOutput { svg, table, width, height } where table is
 // { caption, columns, rows } holding exactly the data drawn.
 //
@@ -18,12 +19,18 @@
 // 'dashed' | 'hatched' carries status by shape, never colour alone; Shape
 // 'circle' | 'square' | 'diamond' | 'triangle'. Any label that does not fit
 // its box throws at build, naming the label: shorten the wording. An em dash
-// (U+2014) in any label throws too.
+// (U+2014) in any label throws too, and so does an empty input (no items).
+// Marks with an href are links named by their <title>; linked marks must keep
+// the 24 px pointer-target spacing of WCAG 2.5.8 (the primitives default to a
+// 24 px pitch when marks link), else the build throws naming both marks.
+// Chart.astro enforces the rest at the page: a wide chart over 360 units needs
+// a narrow variant or scroll, a pair must share one table, ids are unique on
+// the page, and every rendered SVG stays within 12 KB (VISUAL-GUIDE §1.12).
 //
 // Primitives (see each module's interface for every option):
 //
 //   dotMatrix({ groups: [{ label, items: [{ label, state?, tone?, status?, href? }] }],
-//               unit?, cell?, legend?, focusable? })
+//               unit?, cell?, gap?, legend?, focusable? })
 //     Waffle / isotype: one cell per record, grouped. /controls mosaic,
 //     /resources corpus, /obligations status isotype.
 //
@@ -40,19 +47,22 @@
 //   divergingBars({ left: { label }, right: { label },
 //                   items: [{ label, left, right, note? }], segments?, unit })
 //     Butterfly; left/right may be [core, related] with segments: ['core','related'].
-//   dumbbell({ items: [{ label, from, to }], fromLabel, toLabel, domain?, today? })
-//     Date to date (YYYY-MM-DD), e.g. the AI Act Omnibus deferrals.
+//   dumbbell({ items: [{ label, from, to }], fromLabel, toLabel, domain?, today?, labelWidth? })
+//     Date to date (YYYY-MM-DD), e.g. the AI Act Omnibus deferrals; the wide
+//     label column defaults to 40 % of the width (at most 260).
 //
 //   timeStrip({ from, to, events: TimePoint[], today?, orientation? })
 //   beeswarm({ from, to, points: TimePoint[], today?, orientation?, legend? })
-//   timeLanes({ from, to, lanes: [{ label, items: [{ label, start, end?, ... }] }], today? })
+//   timeLanes({ from, to, lanes: [{ label, items: [{ label, start, end?, ... }] }], today?,
+//               labels?: 'inline' (default, label next to each mark) | 'none' })
 //     TimePoint = { date, label, shape?, state?, tone?, status?, href? };
 //     orientation 'vertical' is the narrow variant (time top to bottom).
 //
 //   lanes({ columns: [{ key, label }], rowHeader,
 //           rows: [{ label, href?, marks: [{ column, shape, state?, tone?, status }] }],
-//           legend? })
-//     Swimlane: columns = enforcement points, rows = items, shape = effect.
+//           legend?, orientation? })
+//     Swimlane: columns = enforcement points, rows = items, shape = effect;
+//     'vertical' (narrow) stacks the lanes as bands, each listing its items.
 //
 //   venn3({ sets: [A, B, C], items: [{ label, sets: string[] }], layout: 'venn' | 'upset',
 //           unit, callouts? })
@@ -61,9 +71,10 @@
 //   ladder({ steps: [{ label, detail?, href? }], highlight?, highlightLabel?, orientation? })
 //     Ascending steps; 'vertical' is the narrow variant.
 //
-// Helpers for new primitives: linearScale, bandScale, timeScale, textWidth,
-// fitText, wrapText, open, close, assemble, markStyles, shape.
+// Helpers for new primitives: linearScale, timeScale, textWidth, fitText,
+// wrapText, open, close, assemble, markStyles, shape, targets, words.
 export type {
+  Box,
   Cell,
   ChartBase,
   ChartMode,
@@ -73,13 +84,13 @@ export type {
   MarkState,
   Shape,
   Tone,
-  BandScale,
   LinearScale,
   TimeScale,
+  Words,
 } from './core';
 export {
   assemble,
-  bandScale,
+  claimIds,
   close,
   esc,
   fitText,
@@ -90,8 +101,10 @@ export {
   parseDay,
   shape,
   stampLines,
+  targets,
   textWidth,
   timeScale,
+  words,
   wrapText,
 } from './core';
 export { dotMatrix, type DotGroup, type DotItem, type DotMatrixInput } from './dotmatrix';

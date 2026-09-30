@@ -15,12 +15,15 @@
 // the phone variant.
 import {
   assemble,
+  besideLine,
   fitText,
   fmt,
   legend,
   linearScale,
+  linkText,
   markClass,
   markStyles,
+  nonEmpty,
   r1,
   shape,
   table,
@@ -28,7 +31,7 @@ import {
   textWidth,
   timeScale,
   tip,
-  wrapMark,
+  words,
   wrapText,
   type ChartBase,
   type ChartOutput,
@@ -86,15 +89,15 @@ function axisTop(out: string[], f: Frame, ticks: { at: number; label: string }[]
   return y + 8;
 }
 
-/** Item label: beside the bar (wide, up to two lines) or above it (narrow). */
-function itemLabel(out: string[], f: Frame, label: string, y: number, barH: number, href?: string): { rowTop: number; barY: number } {
-  const lines = wrapText(label, f.labelW, 13, 'body', 2, 'item label');
+/** Item label: beside the bar (wide) or above it (narrow), up to `maxLines`. */
+function itemLabel(out: string[], f: Frame, label: string, y: number, barH: number, href?: string, maxLines = 2): { rowTop: number; barY: number } {
+  const lines = wrapText(label, f.labelW, 13, 'body', maxLines, 'item label');
   const els = lines.map((line, i) =>
     f.wide
       ? text(L, y + barH / 2 + 4.5 - ((lines.length - 1) * 15) / 2 + i * 15, line, { size: 13, where: 'item label' })
       : text(f.x0 + 6, y + 13 + i * 15, line, { size: 13, where: 'item label' }),
   );
-  out.push(href ? wrapMark(els.join(''), label, { href }) : els.join(''));
+  out.push(href ? linkText(els.join(''), label, href) : els.join(''));
   if (f.wide) return { rowTop: y, barY: y + Math.max(0, ((lines.length - 1) * 15) / 2) };
   return { rowTop: y, barY: y + lines.length * 15 + 5 };
 }
@@ -113,6 +116,7 @@ function sorted(items: BarItem[], sort: RankedBarsInput['sort']): BarItem[] {
 }
 
 function rankedCore(input: RankedBarsInput, style: 'bar' | 'lollipop'): ChartOutput {
+  nonEmpty(input.items, 'items', `bars ${input.id}`);
   const W = input.width ?? 640;
   const f = frame(W, input.labelWidth);
   const items = sorted(input.items, input.sort ?? 'desc');
@@ -158,7 +162,7 @@ function rankedCore(input: RankedBarsInput, style: 'bar' | 'lollipop'): ChartOut
   });
   return {
     svg,
-    table: table(input.tableCaption ?? input.title, [input.itemHeader ?? 'Item', input.unit], items.map((i) => [i.label, i.value])),
+    table: table(input.tableCaption ?? input.title, [input.itemHeader ?? words(input.lang).item, input.unit], items.map((i) => [i.label, i.value])),
     width: W,
     height,
   };
@@ -188,6 +192,9 @@ export interface StackedBarsInput extends ChartBase {
 }
 
 function stackedCore(input: StackedBarsInput, percent: boolean): ChartOutput {
+  nonEmpty(input.items, 'items', `stacked ${input.id}`);
+  nonEmpty(input.series, 'series', `stacked ${input.id}`);
+  const w = words(input.lang);
   const W = input.width ?? 640;
   const f = frame(W, input.labelWidth);
   for (const item of input.items) {
@@ -252,7 +259,7 @@ function stackedCore(input: StackedBarsInput, percent: boolean): ChartOutput {
     svg,
     table: table(
       input.tableCaption ?? input.title,
-      [input.itemHeader ?? 'Item', ...input.series.map((sr) => sr.label), 'Total'],
+      [input.itemHeader ?? w.item, ...input.series.map((sr) => sr.label), w.total],
       input.items.map((item, i) => [item.label, ...item.values, totals[i]]),
     ),
     width: W,
@@ -284,6 +291,8 @@ const PART_STATES: MarkState[] = ['filled', 'hatched', 'outline', 'dashed'];
 
 /** A butterfly chart: left values grow left, right values grow right. */
 export function divergingBars(input: DivergingBarsInput): ChartOutput {
+  nonEmpty(input.items, 'items', `diverging ${input.id}`);
+  const w = words(input.lang);
   const W = input.width ?? 720;
   const wide = W >= WIDE_AT;
   const parts = input.segments ?? [''];
@@ -340,7 +349,7 @@ export function divergingBars(input: DivergingBarsInput): ChartOutput {
       const ly = wide ? y + BAR_H / 2 + 4.5 - ((all.length - 1) * 15) / 2 + i * 15 : y + 13 + i * 15;
       return text(cx, ly, line, { size: isNote ? 12 : 13, cls: isNote ? 'ink2' : '', anchor: 'middle', where: 'item label' });
     });
-    rows.push(item.href ? wrapMark(labelEls.join(''), item.label, { href: item.href }) : labelEls.join(''));
+    rows.push(item.href ? linkText(labelEls.join(''), item.label, item.href) : labelEls.join(''));
     const barY = wide ? y + Math.max(0, ((all.length - 1) * 15) / 2) : y + all.length * 15 + 5;
     const side = (vals: number[], dir: -1 | 1, zero: number, tone: Tone | undefined, who: string) => {
       let acc = 0;
@@ -369,10 +378,10 @@ export function divergingBars(input: DivergingBarsInput): ChartOutput {
   out.push(...rows);
   const named = input.segments !== undefined;
   const columns = [
-    input.itemHeader ?? 'Item',
+    input.itemHeader ?? w.item,
     ...parts.map((p) => (named ? `${input.left.label} (${p})` : input.left.label)),
     ...parts.map((p) => (named ? `${input.right.label} (${p})` : input.right.label)),
-    ...(items.some((i) => i.note) ? ['Note'] : []),
+    ...(items.some((i) => i.note) ? [w.note] : []),
   ];
   const tableRows = items.map((i) => [i.label, ...i.l, ...i.r, ...(items.some((x) => x.note) ? [i.note ?? ''] : [])]);
   const { svg, height } = assemble({
@@ -401,13 +410,17 @@ export interface DumbbellInput extends ChartBase {
   today?: string;
   todayLabel?: string;
   itemHeader?: string;
+  /** Wide label column width (default 40 % of the width, at most 260: the
+   *  dates need less room than a value axis). Labels take up to three lines. */
   labelWidth?: number;
 }
 
 /** Date-to-date moves: an outline dot at `from`, a filled dot at `to`. */
 export function dumbbell(input: DumbbellInput): ChartOutput {
+  nonEmpty(input.items, 'items', `dumbbell ${input.id}`);
+  const w = words(input.lang);
   const W = input.width ?? 640;
-  const f = frame(W, input.labelWidth);
+  const f = frame(W, input.labelWidth ?? Math.min(260, Math.round(W * 0.4)));
   const dates = input.items.flatMap((i) => [i.from, i.to]).sort();
   const domain = input.domain ?? [`${dates[0].slice(0, 4)}-01-01`, `${Number(dates[dates.length - 1].slice(0, 4)) + 1}-01-01`];
   const ts = timeScale(domain[0], domain[1], [f.x0 + 8, f.x1 + VALUE_W - 8]);
@@ -431,7 +444,7 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
   const rows: string[] = [];
   const H = 16;
   for (const item of input.items) {
-    const { barY } = itemLabel(rows, f, item.label, y, H, item.href);
+    const { barY } = itemLabel(rows, f, item.label, y, H, item.href, 3);
     const cy = barY + H / 2;
     const xa = ts.map(item.from);
     const xb = ts.map(item.to);
@@ -451,9 +464,9 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
   if (input.today) {
     const x = r1(ts.map(input.today));
     out.push(`<line class="today" x1="${x}" y1="${r1(gridTop - 4)}" x2="${x}" y2="${r1(y - 4)}"/>`);
-    const label = `${input.todayLabel ?? 'Today'} ${input.today}`;
-    const end = x + 4 + textWidth(label, 12, 'mono') > W - L;
-    out.push(text(end ? x - 4 : x + 4, y + 10, label, { size: 12, cls: 'mono', anchor: end ? 'end' : 'start', where: 'today label' }));
+    const label = `${input.todayLabel ?? w.today} ${input.today}`;
+    fitText(label, W - 2 * L, 12, 'mono', 'today label');
+    out.push(text(besideLine(x, textWidth(label, 12, 'mono'), W, L), y + 10, label, { size: 12, cls: 'mono', where: 'today label' }));
     y += 14;
   }
   out.push(...rows);
@@ -470,7 +483,7 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
     svg,
     table: table(
       input.tableCaption ?? input.title,
-      [input.itemHeader ?? 'Item', input.fromLabel, input.toLabel],
+      [input.itemHeader ?? w.item, input.fromLabel, input.toLabel],
       input.items.map((i) => [i.label, i.from, i.to]),
     ),
     width: W,

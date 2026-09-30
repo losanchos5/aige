@@ -12,7 +12,11 @@
 /* ----------------------------------------------------------------- frame -- */
 /* The figure is a size container: the wide/narrow pair and the canvas padding
    switch on its own width, not the viewport's. */
+/* Size containment gives the figure no intrinsic width, so it takes the full
+   width itself; else a flex parent would shrink it to 0. */
 .chart-fig {
+  width: 100%;
+  min-width: 0;
   margin: var(--s-6) 0;
   display: flex;
   flex-direction: column;
@@ -48,6 +52,12 @@
    enough to show the wide SVG at 1:1, chosen by Chart.astro. */
 .chart-pair > .chart-w {
   display: none;
+}
+
+/* A capped variant sits centred in a wider canvas. */
+.chart-n,
+.chart-w {
+  margin-inline: auto;
 }
 
 @container (min-width: 480px) { .chart-sw-480 > .chart-w { display: block; } .chart-sw-480 > .chart-n { display: none; } }

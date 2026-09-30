@@ -10,10 +10,12 @@ import {
   fitText,
   linearScale,
   markClass,
+  nonEmpty,
   r1,
   table,
   text,
   tip,
+  words,
   wrapText,
   type ChartBase,
   type ChartOutput,
@@ -44,6 +46,7 @@ const L = 12;
 const MASKS = [7, 3, 5, 6, 1, 2, 4] as const;
 
 export function venn3(input: Venn3Input): ChartOutput {
+  nonEmpty(input.items, 'items', `venn3 ${input.id}`);
   const [A, B, C] = input.sets;
   const keys = [A.key, B.key, C.key];
   if (new Set(keys).size !== 3) throw new Error(`charts(venn3 ${input.id}): set keys must differ`);
@@ -141,6 +144,7 @@ export function venn3(input: Venn3Input): ChartOutput {
   } else {
     W = input.width ?? 340;
     const rows = MASKS.filter((m) => regions.get(m)!.length > 0).sort((a, b) => regions.get(b)!.length - regions.get(a)!.length);
+    nonEmpty(rows, 'item in any of the three sets', `venn3 ${input.id}`);
     let y = 4;
     const key = wrapText(`${es ? 'Puntos' : 'Dots'}: ${names.join(' · ')}`, W - 2 * L, 12, 'body', 2, 'dot key');
     for (const line of key) {
@@ -180,13 +184,13 @@ export function venn3(input: Venn3Input): ChartOutput {
     out.push(text(L, bottom, line, { size: 12.5, cls: 'ink2', where: 'none line' }));
   }
   const { svg, height } = assemble({ base: input, width: W, bottom, body: out, cls: input.layout === 'venn' ? 'ch-venn' : 'ch-upset' });
-  const yes = es ? 'Sí' : 'Yes';
+  const w = words(input.lang);
   return {
     svg,
     table: table(
       input.tableCaption ?? input.title,
-      [input.itemHeader ?? 'Item', ...names],
-      input.items.map((item) => [item.label, ...keys.map((k) => (item.sets.includes(k) ? yes : 'No'))]),
+      [input.itemHeader ?? w.item, ...names],
+      input.items.map((item) => [item.label, ...keys.map((k) => (item.sets.includes(k) ? w.yes : w.no))]),
     ),
     width: W,
     height,

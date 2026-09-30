@@ -7,11 +7,13 @@
 // change of direction.
 import {
   assemble,
+  fitText,
+  linkText,
   markClass,
   r1,
   table,
   text,
-  wrapMark,
+  words,
   wrapText,
   type ChartBase,
   type ChartOutput,
@@ -47,11 +49,13 @@ export function ladder(input: LadderInput): ChartOutput {
   }
   const vertical = input.orientation === 'vertical';
   const W = input.width ?? (vertical ? 340 : 640);
+  const w = words(input.lang);
   const out: string[] = [];
   let bottom: number;
   if (!vertical) {
     const gap = 6;
     const stepW = (W - 2 * L - (n - 1) * gap) / n;
+    if (input.highlightLabel) fitText(input.highlightLabel, stepW, 12, 'mono', 'highlight label');
     const blocks = input.steps.map((s) => ({
       name: wrapText(s.label, stepW - 16, 13.5, 'body', 3, 'step label'),
       detail: s.detail ? wrapText(s.detail, stepW - 16, 12.5, 'body', 4, 'step detail') : [],
@@ -73,7 +77,7 @@ export function ladder(input: LadderInput): ChartOutput {
         ty += 16;
         return text(tx, ty, line, { size: 13.5, weight: 600, cls: hi ? 'on-ink' : '', where: 'step label' });
       });
-      out.push(step.href ? wrapMark(nameEls.join(''), step.label, { href: step.href }) : nameEls.join(''));
+      out.push(step.href ? linkText(nameEls.join(''), step.label, step.href) : nameEls.join(''));
       if (blocks[i].detail.length) ty += 6;
       for (const line of blocks[i].detail) {
         ty += 15;
@@ -89,6 +93,7 @@ export function ladder(input: LadderInput): ChartOutput {
     const seg = 8;
     const meterW = n * (seg + 3) - 3;
     const tx = L + meterW + 12;
+    if (input.highlightLabel) fitText(input.highlightLabel, W - L - tx - 8, 12, 'mono', 'highlight label');
     let y = 8;
     input.steps.forEach((step, i) => {
       const hi = input.highlight === i;
@@ -107,7 +112,7 @@ export function ladder(input: LadderInput): ChartOutput {
         ty += 16;
         return text(tx, ty, line, { size: 13.5, weight: hi ? 700 : 600, where: 'step label' });
       });
-      out.push(step.href ? wrapMark(nameEls.join(''), step.label, { href: step.href }) : nameEls.join(''));
+      out.push(step.href ? linkText(nameEls.join(''), step.label, step.href) : nameEls.join(''));
       if (extra) {
         ty += 16;
         out.push(text(tx, ty, input.highlightLabel!, { size: 12, cls: 'mono', where: 'highlight label' }));
@@ -135,12 +140,12 @@ export function ladder(input: LadderInput): ChartOutput {
     svg,
     table: table(
       input.tableCaption ?? input.title,
-      ['Level', input.stepHeader ?? 'Step', ...(withDetail ? ['Detail'] : []), ...(hiCol ? ['Highlighted'] : [])],
+      [w.level, input.stepHeader ?? w.step, ...(withDetail ? [w.detail] : []), ...(hiCol ? [w.highlighted] : [])],
       input.steps.map((s, i) => [
         i + 1,
         s.label,
         ...(withDetail ? [s.detail ?? ''] : []),
-        ...(hiCol ? [input.highlight === i ? input.highlightLabel ?? 'Yes' : ''] : []),
+        ...(hiCol ? [input.highlight === i ? input.highlightLabel ?? w.yes : ''] : []),
       ]),
     ),
     width: W,

@@ -23,7 +23,7 @@
  * inside a focusable region instead of shrinking; with a HeatGrid (which
  * returns `sticky`) the row labels stay in view.
  */
-import type { ChartOutput } from '../lib/charts';
+import { claimIds, type ChartOutput } from '../lib/charts';
 import '../styles/chart.css';
 
 interface Props {
@@ -51,6 +51,29 @@ if (!mode) throw new Error(`Chart "${title}": the SVG root carries neither class
 if (narrow && modeOf(narrow.svg) !== mode) {
   throw new Error(`Chart "${title}": the wide and narrow variants use different style modes`);
 }
+// A wide chart alone would shrink on a phone until its 12 px text reads at
+// about 6 px (640 units in a 344 px canvas): it needs a narrow variant or a
+// scroll region (spec: "Móvil sin scroll de página").
+if (!narrow && !scroll && chart.width > 360) {
+  throw new Error(`Chart "${title}": a ${chart.width}-wide chart needs a narrow variant or scroll`);
+}
+if (narrow && JSON.stringify(narrow.table) !== JSON.stringify(chart.table)) {
+  throw new Error(`Chart "${title}": the wide and narrow variants must draw the same table`);
+}
+// The SVGs this figure renders: each within the 12 KB data-viz budget
+// (VISUAL-GUIDE §1.12), and no id repeated on the page.
+const rendered = [
+  ...(narrow ? [narrow.svg] : []),
+  ...(scroll && chart.sticky ? [chart.sticky.head, chart.sticky.body] : [chart.svg]),
+];
+const BUDGET = 12 * 1024;
+for (const svg of rendered) {
+  const bytes = new TextEncoder().encode(svg).length;
+  if (bytes > BUDGET) {
+    throw new Error(`Chart "${title}": an SVG of ${bytes} bytes passes the ${BUDGET}-byte budget; drop links or tooltips, or split the chart`);
+  }
+}
+claimIds(Astro.request, rendered, title);
 // First switch point where the canvas (container minus padding and border)
 // shows the wide SVG at 1:1 or larger.
 const STEPS = [480, 560, 640, 720, 800, 900, 1000];

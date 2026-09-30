@@ -73,6 +73,116 @@ export interface ChartBase {
   tableCaption?: string;
 }
 
+// ----------------------------------------------------------------- words -- //
+
+/** Every fixed word a primitive prints or puts in its table, per language, so
+ *  a Spanish page never shows English chrome. */
+export interface Words {
+  source: string;
+  asOf: string;
+  today: string;
+  total: string;
+  na: string;
+  notApplicable: string;
+  inTotal: string;
+  date: string;
+  item: string;
+  status: string;
+  lane: string;
+  start: string;
+  end: string;
+  to: string;
+  level: string;
+  step: string;
+  detail: string;
+  highlighted: string;
+  group: string;
+  state: string;
+  layer: string;
+  note: string;
+  yes: string;
+  no: string;
+  none: string;
+  filled: string;
+  outline: string;
+  dashed: string;
+  hatched: string;
+}
+
+const WORDS: Record<'en' | 'es', Words> = {
+  en: {
+    source: 'Source',
+    asOf: 'As of',
+    today: 'Today',
+    total: 'Total',
+    na: 'n/a',
+    notApplicable: 'not applicable',
+    inTotal: 'in total',
+    date: 'Date',
+    item: 'Item',
+    status: 'Status',
+    lane: 'Lane',
+    start: 'Start',
+    end: 'End',
+    to: 'to',
+    level: 'Level',
+    step: 'Step',
+    detail: 'Detail',
+    highlighted: 'Highlighted',
+    group: 'Group',
+    state: 'State',
+    layer: 'Layer',
+    note: 'Note',
+    yes: 'Yes',
+    no: 'No',
+    none: 'None',
+    filled: 'Filled',
+    outline: 'Outline',
+    dashed: 'Dashed',
+    hatched: 'Hatched',
+  },
+  es: {
+    source: 'Fuente',
+    asOf: 'A fecha de',
+    today: 'Hoy',
+    total: 'Total',
+    na: 'no aplica',
+    notApplicable: 'no aplica',
+    inTotal: 'en total',
+    date: 'Fecha',
+    item: 'Elemento',
+    status: 'Estado',
+    lane: 'Carril',
+    start: 'Inicio',
+    end: 'Fin',
+    to: 'a',
+    level: 'Nivel',
+    step: 'Paso',
+    detail: 'Detalle',
+    highlighted: 'Destacado',
+    group: 'Grupo',
+    state: 'Estado',
+    layer: 'Capa',
+    note: 'Nota',
+    yes: 'Sí',
+    no: 'No',
+    none: 'Ninguno',
+    filled: 'Relleno',
+    outline: 'Contorno',
+    dashed: 'Discontinuo',
+    hatched: 'Rayado',
+  },
+};
+
+/** The fixed words for a chart's `lang` (English by default). */
+export const words = (lang?: 'en' | 'es'): Words => WORDS[lang === 'es' ? 'es' : 'en'];
+
+/** Throw a named error when a primitive gets nothing to draw (an empty filter
+ *  result would otherwise crash deep in a scale, or draw an empty frame). */
+export function nonEmpty(list: readonly unknown[], what: string, where: string): void {
+  if (!list.length) throw new Error(`charts(${where}): no ${what} to draw`);
+}
+
 // ------------------------------------------------------------------ text -- //
 
 /** Escape the five XML-significant characters for text nodes and attributes. */
@@ -116,7 +226,7 @@ export function textWidth(text: string, px: number, face: Face = 'body'): number
 /** Throw when a label carries an em dash (content-lint would fail the build
  *  later, far from the cause). */
 export function checkCopy(text: string, where: string): void {
-  if (String(text).includes('—')) {
+  if (String(text).includes('\u2014')) {
     throw new Error(`charts(${where}): label "${text}" contains an em dash (U+2014); use , : ; or ( )`);
   }
 }
@@ -193,9 +303,6 @@ export function text(x: number, y: number, value: Cell, o: TextOptions = {}): st
   return `<text ${attrs.join(' ')}>${esc(value)}</text>`;
 }
 
-/** The face a class list sets, for measuring. */
-export const faceOf = (cls = ''): Face => (/\b(mono|num)\b/.test(cls) ? 'mono' : /\bdisp\b/.test(cls) ? 'disp' : 'body');
-
 // ---------------------------------------------------------------- scales -- //
 
 export interface LinearScale {
@@ -253,32 +360,6 @@ export function linearScale(values: readonly number[], range: [number, number], 
   const [r0, rr] = range;
   const map = (v: number) => r0 + ((v - d0) / (d1 - d0)) * (rr - r0);
   return { domain: [d0, d1], range, ticks, map };
-}
-
-export interface BandScale {
-  keys: string[];
-  /** Distance between the starts of two bands. */
-  step: number;
-  /** Thickness of one band. */
-  band: number;
-  /** Start of the band for `key`; throws for an unknown key. */
-  pos(key: string): number;
-  center(key: string): number;
-}
-
-/** A band scale: one band per key across `range`, `padding` of the step empty. */
-export function bandScale(keys: readonly string[], range: [number, number], padding = 0.2): BandScale {
-  if (new Set(keys).size !== keys.length) throw new Error('charts(band): duplicate keys');
-  const n = Math.max(1, keys.length);
-  const step = (range[1] - range[0]) / n;
-  const band = step * (1 - padding);
-  const index = new Map(keys.map((k, i) => [k, i]));
-  const pos = (key: string) => {
-    const i = index.get(key);
-    if (i === undefined) throw new Error(`charts(band): unknown key "${key}"`);
-    return range[0] + i * step + (step - band) / 2;
-  };
-  return { keys: [...keys], step, band, pos, center: (key) => pos(key) + band / 2 };
 }
 
 /** Days since 1970-01-01 (UTC) of a YYYY-MM-DD string; throws on anything else. */
@@ -415,21 +496,90 @@ export function shape(kind: Shape, cx: number, cy: number, r: number, attrs: str
   }
 }
 
+/** Bounding box of shape(kind, cx, cy, r). */
+export function shapeBox(kind: Shape, cx: number, cy: number, r: number): Box {
+  if (kind === 'triangle') {
+    const h = r * 1.15;
+    return { x: cx - h, y: cy - h, w: 2 * h, h: h * 1.8 };
+  }
+  const half = kind === 'square' ? r * 0.9 : kind === 'diamond' ? r * 1.2 : r;
+  return { x: cx - half, y: cy - half, w: 2 * half, h: 2 * half };
+}
+
+/** A <rect>; `inner` its children (a <title>). */
+export function rect(x: number, y: number, w: number, h: number, attrs: string, inner = ''): string {
+  const open = `<rect x="${r1(x)}" y="${r1(y)}" width="${r1(w)}" height="${r1(h)}" ${attrs}`;
+  return inner ? `${open}>${inner}</rect>` : `${open}/>`;
+}
+
 /** A native tooltip: the <title> child of a mark. */
 export const tip = (value: string): string => {
   checkCopy(value, 'tooltip');
   return `<title>${esc(value)}</title>`;
 };
 
+/** A text label that links: the visible text is the target, the full label
+ *  its name (a wrapped label is split over several <text> elements). */
+export const linkText = (els: string, label: string, href: string): string =>
+  `<a href="${esc(href)}" aria-label="${esc(label)}">${els}</a>`;
+
+export interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** Pointer-target size of WCAG 2.2 criterion 2.5.8 (VISUAL-GUIDE §5). */
+export const TARGET_PX = 24;
+
 /**
- * Wrap a mark so it can carry information to keyboard users: a link when
- * `href` is set, else (when `focusable`) a focusable group with role img and
- * the tooltip as its name. Without either, the mark stays as drawn.
+ * The marks of one chart, named and (when linked) checked as pointer targets.
+ * `mark(draw, name, box, o)` draws a mark (`draw(inner)` returns it with
+ * `inner` as its children) as:
+ *  - a link when `o.href` is set: `<a href><title>name</title>mark</a>`, the
+ *    <title> being both the link's accessible name and its tooltip;
+ *  - a focusable group with role img, named by its <title>, when `o.focusable`;
+ *  - else the mark with its <title> tooltip.
+ * Every link is a pointer target that must meet criterion 2.5.8: a target
+ * under 24 x 24 px passes only if a 24 px circle centred on it meets no other
+ * target and no other such circle (the spacing exception). A link that breaks
+ * this throws, naming both marks: widen the chart, raise the pitch or drop a
+ * link. Primitives set their default pitch to 24 when marks carry links.
  */
-export function wrapMark(markSvg: string, label: string, o: { href?: string; focusable?: boolean }): string {
-  if (o.href) return `<a href="${esc(o.href)}" aria-label="${esc(label)}">${markSvg}</a>`;
-  if (o.focusable) return `<g class="mk-focus" tabindex="0" role="img" aria-label="${esc(label)}">${markSvg}</g>`;
-  return markSvg;
+export function targets(where: string) {
+  const placed: (Box & { name: string })[] = [];
+  const R = TARGET_PX / 2 - 0.05; // rounding slack: coordinates print to 0.1
+  const small = (b: Box) => b.w < TARGET_PX - 0.05 || b.h < TARGET_PX - 0.05;
+  const centre = (b: Box): [number, number] => [b.x + b.w / 2, b.y + b.h / 2];
+  const reach = ([px, py]: [number, number], b: Box) =>
+    Math.hypot(Math.max(b.x - px, 0, px - b.x - b.w), Math.max(b.y - py, 0, py - b.y - b.h));
+  const claim = (box: Box, name: string) => {
+    for (const other of placed) {
+      const a = centre(box);
+      const b = centre(other);
+      const clash =
+        (small(box) && reach(a, other) < R) ||
+        (small(other) && reach(b, box) < R) ||
+        (small(box) && small(other) && Math.hypot(a[0] - b[0], a[1] - b[1]) < 2 * R);
+      if (clash) {
+        throw new Error(
+          `charts(${where}): linked marks "${other.name}" and "${name}" sit closer than the ${TARGET_PX}px pointer-target spacing (WCAG 2.5.8); widen the chart, raise the pitch or drop a link`,
+        );
+      }
+    }
+    placed.push({ ...box, name });
+  };
+  return {
+    mark(draw: (inner: string) => string, name: string, box: Box, o: { href?: string; focusable?: boolean } = {}): string {
+      if (o.href) {
+        claim(box, name);
+        return `<a href="${esc(o.href)}">${tip(name)}${draw('')}</a>`;
+      }
+      if (o.focusable) return `<g class="mk-focus" tabindex="0" role="img">${tip(name)}${draw('')}</g>`;
+      return draw(tip(name));
+    },
+  };
 }
 
 // ------------------------------------------------------------ svg shell -- //
@@ -472,13 +622,13 @@ export const close = (): string => '</svg>';
  *  then "As of YYYY-MM-DD". */
 export function stampLines(base: Pick<ChartBase, 'source' | 'asOf' | 'lang'>, maxPx: number): string[] {
   const lines: string[] = [];
+  const w = words(base.lang);
   if (base.source) {
-    const src = base.lang === 'es' ? `Fuente: ${base.source}` : `Source: ${base.source}`;
-    lines.push(...wrapText(src, maxPx, 12, 'mono', 3, 'source line'));
+    lines.push(...wrapText(`${w.source}: ${base.source}`, maxPx, 12, 'mono', 3, 'source line'));
   }
   if (base.asOf) {
     parseDay(base.asOf, 'asOf');
-    lines.push(base.lang === 'es' ? `A fecha de ${base.asOf}` : `As of ${base.asOf}`);
+    lines.push(`${w.asOf} ${base.asOf}`);
   }
   return lines;
 }
@@ -540,15 +690,42 @@ export function table(caption: string, columns: string[], rows: Cell[][]): Chart
 }
 
 /** Default wording of a mark state in tables and tooltips. */
-export const stateWords: Record<MarkState, string> = {
-  filled: 'Filled',
-  outline: 'Outline',
-  dashed: 'Dashed',
-  hatched: 'Hatched',
-};
+export const stateWord = (state: MarkState, lang?: 'en' | 'es'): string => words(lang)[state];
 
-/** "Layer 03" for tones 1 to 5, "" for ink. */
-export const layerWord = (tone: Tone | undefined): string => (tone ? `Layer 0${tone}` : '');
+/** "Layer 03" ("Capa 03") for tones 1 to 5, "" for ink. */
+export const layerWord = (tone: Tone | undefined, lang?: 'en' | 'es'): string => (tone ? `${words(lang).layer} 0${tone}` : '');
+
+/** Start x of a start-anchored label of width `w` beside a vertical line at
+ *  `x`: right of it when it fits, else left of it, else clamped inside. */
+export function besideLine(x: number, w: number, W: number, pad = 12): number {
+  if (x + 4 + w <= W - pad) return x + 4;
+  if (x - 4 - w >= pad) return x - 4 - w;
+  return Math.max(pad, W - pad - w);
+}
+
+const chartIds = new WeakMap<object, Map<string, string>>();
+
+/**
+ * For Chart.astro: record every id in the SVGs one chart renders, keyed by the
+ * page render (Astro.request), and throw when an id repeats on the page. A
+ * repeated id sends aria-labelledby and the hatch fill url(#...) to the first
+ * element with it, which may sit in the hidden variant, so hatched marks in
+ * the visible one would render empty with no error.
+ */
+export function claimIds(page: object, svgs: string[], title: string): void {
+  const seen = chartIds.get(page) ?? new Map<string, string>();
+  chartIds.set(page, seen);
+  const here = new Set<string>();
+  for (const svg of svgs) {
+    for (const m of svg.matchAll(/\sid="([^"]+)"/g)) {
+      const id = m[1];
+      if (here.has(id)) throw new Error(`Chart "${title}": id "${id}" appears in two of its SVGs; the wide and narrow variants need different ids`);
+      if (seen.has(id)) throw new Error(`Chart "${title}": id "${id}" is already used by chart "${seen.get(id)}" on this page`);
+      here.add(id);
+    }
+  }
+  for (const id of here) seen.set(id, title);
+}
 
 /** A legend row: swatches (shape or bar) with their labels, wrapping onto new
  *  rows when the width runs out. Returns the elements and the bottom y. */

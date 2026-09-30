@@ -8,15 +8,20 @@
 //
 // Besides the whole SVG, the result carries `sticky`: the row-label column and
 // the grid as two SVGs, so Chart.astro can keep the labels in view while the
-// grid scrolls inside a focusable region at narrow widths.
+// grid scrolls inside a focusable region at narrow widths. The pair is built
+// only when read (Chart.astro reads it only with `scroll`), so a stamp that
+// fits the whole SVG but not the narrower grid throws only when the pair is
+// actually rendered.
 import {
   assemble,
   close,
   esc,
   fitText,
   fmt,
+  linkText,
   markClass,
   markStyles,
+  nonEmpty,
   open,
   r1,
   stampLines,
@@ -24,7 +29,7 @@ import {
   text,
   textWidth,
   tip,
-  wrapMark,
+  words,
   type ChartBase,
   type ChartOutput,
   type Tone,
@@ -60,6 +65,9 @@ const MARGIN_H = 40; // column-total bars
 
 export function heatGrid(input: HeatGridInput): ChartOutput {
   const { rows, columns, values } = input;
+  nonEmpty(rows, 'rows', `heatGrid ${input.id}`);
+  nonEmpty(columns, 'columns', `heatGrid ${input.id}`);
+  const w = words(input.lang);
   if (values.length !== rows.length || values.some((r) => r.length !== columns.length)) {
     throw new Error(`charts(heatGrid ${input.id}): values must be ${rows.length} rows of ${columns.length} cells`);
   }
@@ -97,7 +105,7 @@ export function heatGrid(input: HeatGridInput): ChartOutput {
       const h = (t / cmax) * MARGIN_H;
       const x = c * cell + cell * 0.2;
       grid.push(
-        `<rect x="${r1(x)}" y="${r1(mTop + MARGIN_H - h)}" width="${r1(cell * 0.6)}" height="${r1(h)}" class="${markClass('filled', tone)}">${tip(`${columns[c].label}: ${fmt(t)} ${input.unit} in total`)}</rect>`,
+        `<rect x="${r1(x)}" y="${r1(mTop + MARGIN_H - h)}" width="${r1(cell * 0.6)}" height="${r1(h)}" class="${markClass('filled', tone)}">${tip(`${columns[c].label}: ${fmt(t)} ${input.unit} ${w.inTotal}`)}</rect>`,
       );
       grid.push(text(c * cell + cell / 2, mTop + MARGIN_H - h - 4, fmt(t), { size: 12, cls: 'num', anchor: 'middle', where: 'column total' }));
     });
@@ -111,7 +119,7 @@ export function heatGrid(input: HeatGridInput): ChartOutput {
     columns.forEach((col, c) => {
       const v = values[r][c];
       const x = c * cell;
-      const name = `${row.label} · ${col.label}: ${v === null ? 'not applicable' : `${fmt(v)} ${input.unit}`}`;
+      const name = `${row.label} · ${col.label}: ${v === null ? w.notApplicable : `${fmt(v)} ${input.unit}`}`;
       let mark: string;
       if (v === null) {
         mark = `<rect x="${x + 1}" y="${y + 1}" width="${cell - 2}" height="${cell - 2}" ${marks.attrs('hatched', 0)}>${tip(name)}</rect>`;
@@ -129,15 +137,15 @@ export function heatGrid(input: HeatGridInput): ChartOutput {
     });
     if (input.marginals) {
       const rmax = Math.max(1, ...rowTotals);
-      const w = (rowTotals[r] / rmax) * (MARGIN_W - 28);
+      const bw = (rowTotals[r] / rmax) * (MARGIN_W - 28);
       grid.push(
-        `<rect x="${r1(gridW + 8)}" y="${r1(y + cell * 0.25)}" width="${r1(w)}" height="${r1(cell * 0.5)}" class="${markClass('filled', tone)}">${tip(`${row.label}: ${fmt(rowTotals[r])} ${input.unit} in total`)}</rect>`,
+        `<rect x="${r1(gridW + 8)}" y="${r1(y + cell * 0.25)}" width="${r1(bw)}" height="${r1(cell * 0.5)}" class="${markClass('filled', tone)}">${tip(`${row.label}: ${fmt(rowTotals[r])} ${input.unit} ${w.inTotal}`)}</rect>`,
       );
-      grid.push(text(gridW + 12 + w, y + cell / 2 + 4, fmt(rowTotals[r]), { size: 12, cls: 'num', where: 'row total' }));
+      grid.push(text(gridW + 12 + bw, y + cell / 2 + 4, fmt(rowTotals[r]), { size: 12, cls: 'num', where: 'row total' }));
     }
     if (row.href) {
       // The row label links to the row's page (grid coordinates are separate).
-      labels[labels.length - 1] = wrapMark(labels[labels.length - 1], row.label, { href: row.href });
+      labels[labels.length - 1] = linkText(labels[labels.length - 1], row.label, row.href);
     }
   });
   const gridBottom = gridTop + rows.length * cell;
@@ -157,33 +165,40 @@ export function heatGrid(input: HeatGridInput): ChartOutput {
 
   // The sticky pair: the labels alone (hidden from assistive tech, since the
   // grid SVG names the chart, unless they are links) and the grid with the
-  // stamp.
-  const bodyW = Math.max(gridW + extraW + L, 300);
-  const stamp = stampLines(input, bodyW - L);
-  const headH = Math.max(whole.height, Math.ceil(gridBottom + (stamp.length ? 22 + (stamp.length - 1) * 16 : 0) + 12));
-  const head =
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${LW} ${headH}" width="${LW}" height="${headH}" class="${input.mode ?? 'figc'} ch-heat-head" ${interactive ? `role="group" aria-label="${esc(input.rowHeader)}"` : 'aria-hidden="true"'}>` +
-    `${labels.join('')}${close()}`;
-  const stampEls = stamp.map((line, i) => text(4, gridBottom + 22 + i * 16, line, { size: 12, cls: 'mono muted', where: 'stamp' }));
-  const body =
-    open({ id: `${input.id}-s`, title: input.title, desc: input.desc, width: bodyW, height: headH, mode: input.mode, role: 'img', cls: 'ch-heat', lang: input.lang }) +
-    marks.defs() +
-    `<g transform="translate(4 0)">${grid.join('')}</g>` +
-    stampEls.join('') +
-    close();
+  // stamp. Built on first read and kept.
+  let sticky: { head: string; body: string } | undefined;
+  const buildSticky = () => {
+    const bodyW = Math.max(gridW + extraW + L, 300);
+    const stamp = stampLines(input, bodyW - L);
+    const headH = Math.max(whole.height, Math.ceil(gridBottom + (stamp.length ? 22 + (stamp.length - 1) * 16 : 0) + 12));
+    const head =
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${LW} ${headH}" width="${LW}" height="${headH}" class="${input.mode ?? 'figc'} ch-heat-head" ${interactive ? `role="group" aria-label="${esc(input.rowHeader)}"` : 'aria-hidden="true"'}>` +
+      `${labels.join('')}${close()}`;
+    const stampEls = stamp.map((line, i) => text(4, gridBottom + 22 + i * 16, line, { size: 12, cls: 'mono muted', where: 'stamp' }));
+    const body =
+      open({ id: `${input.id}-s`, title: input.title, desc: input.desc, width: bodyW, height: headH, mode: input.mode, role: 'img', cls: 'ch-heat', lang: input.lang }) +
+      marks.defs() +
+      `<g transform="translate(4 0)">${grid.join('')}</g>` +
+      stampEls.join('') +
+      close();
+    return { head, body };
+  };
 
-  const columnsOut = [input.rowHeader, ...columns.map((c) => c.label), ...(input.marginals ? ['Total'] : [])];
+  const columnsOut = [input.rowHeader, ...columns.map((c) => c.label), ...(input.marginals ? [w.total] : [])];
   const rowsOut = rows.map((row, r) => [
     row.label,
-    ...values[r].map((v) => (v === null ? 'n/a' : v)),
+    ...values[r].map((v) => (v === null ? w.na : v)),
     ...(input.marginals ? [rowTotals[r]] : []),
   ]);
-  if (input.marginals) rowsOut.push(['Total', ...colTotals, rowTotals.reduce((a, b) => a + b, 0)]);
+  if (input.marginals) rowsOut.push([w.total, ...colTotals, rowTotals.reduce((a, b) => a + b, 0)]);
   return {
     svg: whole.svg,
     table: table(input.tableCaption ?? input.title, columnsOut, rowsOut),
     width: W,
     height: whole.height,
-    sticky: { head, body },
+    get sticky() {
+      sticky ??= buildSticky();
+      return sticky;
+    },
   };
 }
