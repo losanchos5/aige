@@ -6,8 +6,8 @@ módulos de datos, no del componente.
 
 ## 1. Preparación
 
-- [ ] 1.1 Fusionar origin/main en `feat/page-visuals-t3` cuando entren #72 y #73, y verificar que `openspec/specs/chart-primitives` y `page-visuals` existen y que `venn3` tiene el layout `euler`
-- [ ] 1.2 Crear los worktrees `pv3-k1` y `pv3-k2` desde `feat/page-visuals-t3` con junction de `node_modules` y `.archify`, y verificar que `build.sh` arranca en cada uno
+- [x] 1.1 Fusionar origin/main en `feat/page-visuals-t3` cuando entren #72 y #73, y verificar que `openspec/specs/chart-primitives` y `page-visuals` existen y que `venn3` tiene el layout `euler`
+- [x] 1.2 Crear los worktrees `pv3-k1` y `pv3-k2` desde `feat/page-visuals-t3` con junction de `node_modules` y `.archify`, y verificar que `build.sh` arranca en cada uno
 
 ## 2. Kit K1: primitivas nuevas (implementador, PW_PORT 4462)
 
