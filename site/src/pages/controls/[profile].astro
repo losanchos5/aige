@@ -1,9 +1,11 @@
 ---
 // /controls/<profile>: one open control profile (src/data/controls), rendered
 // with the reading layout (Doc) without the chapter rail: the title, byline and
-// status line, a draft notice, the scope, how to read a control, one
+// status line, a draft notice, the scope with the profile's periodic table of
+// tiles (ControlPeriodicTable), how to read a control, one
 // ControlRecord per control (inside .prose, so the TOC and ui-doc.js see each
-// control's H2 anchor), the mappings table, the open questions of every
+// control's H2 anchor), the framework coverage grid (ControlCoverage) and the
+// mappings table, the open questions of every
 // control in one list, the changelog, the numbered sources the records cite
 // (#src-N), the machine-readable versions and the review call. The Markdown
 // twin (/controls/<profile>.md) is built from the same data by
@@ -18,6 +20,8 @@ import Byline from '../../components/Byline.astro';
 import StatusLine from '../../components/StatusLine.astro';
 import Callout from '../../components/Callout.astro';
 import ControlRecord from '../../components/ControlRecord.astro';
+import ControlPeriodicTable from '../../components/controls/ControlPeriodicTable.astro';
+import ControlCoverage from '../../components/controls/ControlCoverage.astro';
 import SourceList from '../../components/SourceList.astro';
 import ContributeCta from '../../components/ContributeCta.astro';
 import Citation from '../../components/Citation.astro';
@@ -196,6 +200,7 @@ const jsonLd = [
     layer of <a href="/stack">the five-layer stack</a> and to the <a href="/patterns">patterns</a>
     that implement it.
   </p>
+  <ControlPeriodicTable profile={profile} />
 
   <h2 id="how-to-read-a-control">How to read a control</h2>
   <p>
@@ -246,6 +251,7 @@ const jsonLd = [
     and across every profile, are in the
     <a href={`/controls/crosswalk#by-profile-${profile.slug}`}>controls crosswalk</a>.
   </p>
+  <ControlCoverage profile={profile} />
   <div class="res-tablewrap cp-tablewrap" role="region" aria-labelledby="mappings" tabindex="0">
     <table class="res-table cp-table">
       <caption class="visually-hidden">

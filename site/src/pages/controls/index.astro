@@ -3,12 +3,14 @@
 // explains what a profile is and lists the profiles. The chain from a concept
 // to the evidence a control leaves (FlowDiagram), the seven properties every
 // control is written to meet, a mosaic of every control by profile, layer and
-// failure response (ControlMosaic), one card per profile with its state and counts,
+// failure response (ControlMosaic), where the controls act on the pipeline by
+// profile, enforcement point and response (ControlLanes), one card per profile
+// with its state and counts,
 // every control by its home layer of the stack, how the profiles relate to
 // certification schemes and frameworks, how to adopt one and how to review a
 // control. Every number is computed from the registry.
 //
-// Anchors other pages link to: intro, chain, properties, profiles, by-layer
+// Anchors other pages link to: intro, chain, properties, where, profiles, by-layer
 // (h3 layer-1..layer-5), ecosystem, adoption, how-to-review. The build fails on
 // any broken reference in the registry (controlProblems). The controls dataset
 // and the observation schema, example and template links and their Umami
@@ -19,6 +21,7 @@ import Section from '../../components/Section.astro';
 import RegisterList from '../../components/RegisterList.astro';
 import FlowDiagram from '../../components/FlowDiagram.astro';
 import ControlMosaic from '../../components/ControlMosaic.astro';
+import ControlLanes from '../../components/controls/ControlLanes.astro';
 import StatusLine from '../../components/StatusLine.astro';
 import ContributeCta from '../../components/ContributeCta.astro';
 import CtaBand from '../../components/CtaBand.astro';
@@ -170,6 +173,16 @@ const jsonLd = collectionPage({
 
   <Section tone="plain" id="properties" title="Seven properties of a useful control.">
     <div class="well"><RegisterList items={properties} /></div>
+  </Section>
+
+  <Section
+    tone="mesh"
+    mesh="d"
+    id="where"
+    title="Where the controls act."
+    lede="Two of the seven properties drawn for every control: the enforcement point where it acts and what it does when it fails."
+  >
+    <ControlLanes />
   </Section>
 
   <Section
