@@ -103,6 +103,7 @@ export const figures: readonly FigureDef[] = [
     description:
       'Three panels, one per question. What AI is running? Answered by Layer 02 Inventory & Transparency: the inventory and the agent registry, fed by a runtime data path. What is it allowed to do? Answered by Layer 01 Govern-as-Code and Layer 04 Runtime Controls & Observability: identity before autonomy, scope before action. What evidence proves it? Answered by Layer 03 Evals & Red Teaming as Evidence and Layer 05 Assurance & Continuous Compliance: evidence as a by-product of the build.',
     placements: [{ chapter: 'definition', section: 'The three questions', at: 'head' }],
+    pages: ['/stack'],
   },
   {
     id: 'values-principles',
@@ -131,6 +132,7 @@ export const figures: readonly FigureDef[] = [
         at: 'head',
       },
     ],
+    pages: ['/stack'],
   },
   {
     id: 'maturity-grid',
@@ -360,6 +362,7 @@ export const figures: readonly FigureDef[] = [
         at: 'head',
       },
     ],
+    pages: ['/ai-governance'],
   },
   {
     id: 'harm-levels',
@@ -485,6 +488,7 @@ export const figures: readonly FigureDef[] = [
     description:
       'Twenty jurisdictions, one equal tile each, in rough geographic order, as of 2026-09-24. Binding, horizontal (a statute in force that applies across sectors): the European Union, South Korea, Japan (a promotional act with no penalties) and Italy. Binding, targeted (rules limited to a use, a sector, a class of developer or the public sector): the United States federal agencies, Canada\'s directive, China\'s departmental rules and, in the United States inset, California, Colorado, Illinois, New York, Texas, Utah and New York City. Voluntary (frameworks and guidance with no penalty attached): the United Kingdom, India, Singapore and Australia. Bill (not law yet): Brazil and Spain\'s national AI bill. The status is a reading aid, not legal advice; the table lists each jurisdiction\'s main instrument and its key date.',
     placements: [{ chapter: 'ai-laws-worldwide', section: 'The landscape at a glance', at: 'head' }],
+    pages: ['/ai-governance'],
     kind: 'data-viz',
     // Statuses move monthly: re-check against chapter 21 and jurisdictions.ts.
     asOf: '2026-09-24',
