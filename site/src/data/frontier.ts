@@ -329,6 +329,7 @@ export const frontierBlocks: readonly FrontierBlock[] = [
     ],
     links: [
       { title: 'Open controls', description: 'The control profiles, their mappings and how to review them.', href: '/controls' },
+      { title: 'Frontier safety frameworks crosswalk', description: 'The published frontier safety policies mapped to NIST AI RMF and ISO/IEC 42001, as a coverage map.', href: '/resources/frontier-safety-crosswalk' },
     ],
   },
 ];

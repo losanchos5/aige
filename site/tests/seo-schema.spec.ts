@@ -51,6 +51,7 @@ const PAGES: { path: string; type: string }[] = [
   { path: '/thesis', type: 'TechArticle' },
   { path: '/es/thesis', type: 'TechArticle' },
   { path: '/resources/crosswalk', type: 'Dataset' },
+  { path: '/resources/frontier-safety-crosswalk', type: 'Dataset' },
   { path: '/map', type: 'CollectionPage' },
 ];
 
@@ -198,6 +199,7 @@ test.describe('page-specific nodes', () => {
       { path: '/thesis', type: 'TechArticle' },
       { path: '/es/thesis', type: 'TechArticle' },
       { path: '/resources/crosswalk', type: 'Dataset' },
+      { path: '/resources/frontier-safety-crosswalk', type: 'Dataset' },
     ];
 
     for (const { path, type } of licensed) {

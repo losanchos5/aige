@@ -52,8 +52,9 @@ export interface Topic {
   read?: readonly { label: string; href: string }[];
 }
 
-/** How the column chooser groups the columns. */
-export type ColumnGroup = 'law' | 'codes' | 'standards';
+/** How the column chooser groups the columns. 'labs' is used only by the
+ *  frontier safety crosswalk (frontier-crosswalk.ts), for the labs' own policies. */
+export type ColumnGroup = 'law' | 'labs' | 'codes' | 'standards';
 
 export interface CrosswalkColumn {
   /** Column id, e.g. 'eu', 'iso', 'nist', 'cn'. */

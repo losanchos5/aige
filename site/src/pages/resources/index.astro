@@ -5,6 +5,7 @@ import ResourceCard from '../../components/ResourceCard.astro';
 import { site } from '../../data/site';
 import { frameworks, obligations } from '../../data/frameworks';
 import { topics, columns } from '../../data/crosswalk';
+import { frontierRefs, dimensions } from '../../data/frontier-crosswalk';
 import { allTools, toolCatalogue } from '../../data/stack';
 import { getReadingList } from '../../lib/reading-list';
 import { getGlossary } from '../../lib/glossary';
@@ -66,6 +67,14 @@ const entries = [
     description:
       'One governance topic per row, read across to the EU, ISO, NIST and Chinese instruments that bind it, down to the article, clause or control.',
     count: `${topics.length} topics · ${columns.length} columns`,
+  },
+  {
+    title: 'Frontier safety frameworks crosswalk',
+    href: '/resources/frontier-safety-crosswalk',
+    swatch: 'var(--l3)',
+    description:
+      'The published frontier safety frameworks of three developers, mapped to NIST AI RMF and ISO/IEC 42001 across governance dimensions. A coverage map, not a conformity claim.',
+    count: `${frontierRefs.length} references · ${dimensions.length} dimensions`,
   },
   {
     title: 'Harms atlas',

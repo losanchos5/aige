@@ -152,9 +152,9 @@ test.describe('home page', () => {
     await expect(tiles.locator('a[href="/controls"]')).toHaveCount(1);
     await expect(tiles.locator('a[href="/research"]')).toHaveCount(1);
     const hrefs = await tiles.locator('a').evaluateAll((els) => els.map((a) => a.getAttribute('href')));
-    // Open controls second; Research notes right before the Reading list.
+    // Open controls second; Research notes last.
     expect(hrefs[1]).toBe('/controls');
-    expect(hrefs.indexOf('/research')).toBe(hrefs.indexOf('/bok/reading-list') - 1);
+    expect(hrefs.at(-1)).toBe('/research');
   });
 
   test('the newsletter form sits before the closing band, with its Umami event', async ({

@@ -156,6 +156,10 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
     '/resources/crosswalk',
     ['src/pages/resources/crosswalk.astro', 'src/data/crosswalk.ts', 'public/crosswalk-explorer.js'],
   ],
+  [
+    '/resources/frontier-safety-crosswalk',
+    ['src/pages/resources/frontier-safety-crosswalk.astro', 'src/data/frontier-crosswalk.ts'],
+  ],
   // The "<A> vs <B>" comparison pages, dated by the files that also date their byline.
   ['/resources/crosswalk/iso-42001-vs-eu-ai-act', comparisonSourceFiles('iso-42001-vs-eu-ai-act')],
   ['/resources/crosswalk/nist-ai-rmf-vs-iso-42001', comparisonSourceFiles('nist-ai-rmf-vs-iso-42001')],

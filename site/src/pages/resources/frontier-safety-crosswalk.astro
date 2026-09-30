@@ -1,0 +1,414 @@
+---
+// /resources/frontier-safety-crosswalk: the frontier safety frameworks
+// crosswalk. The three frontier labs' own safety policies and the NIST AI RMF
+// and ISO/IEC 42001, one row per governance dimension, from
+// src/data/frontier-crosswalk.ts. The grid, the drawer and public/crosswalk.js
+// are the general crosswalk's, fed another matrix and without the column
+// chooser (all five columns always show). Every dimension has an <article
+// id="topic-<id>">: the no-JS jump target and what the drawer clones.
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import CrosswalkMatrix from '../../components/CrosswalkMatrix.astro';
+import CrosswalkDrawer from '../../components/CrosswalkDrawer.astro';
+import SourceList from '../../components/SourceList.astro';
+import CitedText from '../../components/CitedText.astro';
+import Citation from '../../components/Citation.astro';
+import { site } from '../../data/site';
+import {
+  FRONTIER_CROSSWALK_AS_OF,
+  FRONTIER_CROSSWALK_PATH,
+  dimensions,
+  frontierColumns,
+  frontierCrosswalkSources,
+  frontierDocs,
+  frontierFrameworkById,
+  frontierLimits,
+  frontierMatrix,
+  frontierProblems,
+  frontierReadings,
+  frontierRefs,
+  gapsFor,
+} from '../../data/frontier-crosswalk';
+import { chipLabel } from '../../data/crosswalk';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { fitsSiteSuffix } from '../../lib/seo-title';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+import '../../styles/crosswalk.css';
+
+const problems = frontierProblems();
+if (problems.length > 0) {
+  throw new Error(`frontier-crosswalk.ts invariants failed:\n${problems.join('\n')}`);
+}
+
+const matrix = frontierMatrix();
+const labDocs = frontierDocs.filter((d) => d.companion !== undefined || !['nist-ai-rmf', 'iso-42001'].includes(d.frameworkId));
+const labIds = new Set(frontierColumns.filter((c) => c.group === 'labs').flatMap((c) => c.frameworks));
+const unverified = frontierRefs.filter((r) => r.verified === false);
+const unverifiedLab = unverified.filter((r) => labIds.has(r.framework)).length;
+const quoteCount = frontierRefs.filter((r) => r.quote).length;
+const P = 'fs';
+
+const seoTitle = 'Frontier safety frameworks crosswalk';
+const description = `Anthropic's RSP, OpenAI's Preparedness Framework and Google DeepMind's Frontier Safety Framework mapped to NIST AI RMF and ISO/IEC 42001, section by section.`;
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Frontier safety crosswalk' }];
+const pageUrl = new URL(FRONTIER_CROSSWALK_PATH, site.url).href;
+const jsonUrl = `${FRONTIER_CROSSWALK_PATH}.json`;
+const csvUrl = `${FRONTIER_CROSSWALK_PATH}.csv`;
+
+const jsonLd = [
+  {
+    '@type': 'Dataset',
+    '@id': `${pageUrl}#dataset`,
+    name: `Frontier safety frameworks crosswalk · ${site.name}`,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    version: site.bokVersion,
+    dateModified: FRONTIER_CROSSWALK_AS_OF,
+    keywords: [
+      'frontier AI safety',
+      'Responsible Scaling Policy',
+      'Preparedness Framework',
+      'Frontier Safety Framework',
+      'NIST AI RMF',
+      'ISO/IEC 42001',
+      'crosswalk',
+    ],
+    creator: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    distribution: [
+      {
+        '@type': 'DataDownload',
+        name: 'Frontier safety crosswalk (CSV)',
+        encodingFormat: 'text/csv',
+        contentUrl: new URL(csvUrl, site.url).href,
+      },
+      {
+        '@type': 'DataDownload',
+        name: 'Frontier safety crosswalk (JSON)',
+        encodingFormat: 'application/json',
+        contentUrl: new URL(jsonUrl, site.url).href,
+      },
+    ],
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+
+/** "8 Jul 2026" for prose (STYLEGUIDE: dates in prose, ISO in data). */
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const proseDate = (iso: string): string => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} ${MONTHS[m - 1]} ${y}`;
+};
+const fwShort = (id: string): string => frontierFrameworkById(id)?.short ?? id;
+---
+
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/frontier-safety-crosswalk.png"
+  jsonLd={jsonLd}
+>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="How the frontier labs govern themselves, mapped to NIST AI RMF and ISO/IEC 42001"
+    lede="Three frontier labs publish the policy that decides when a model is too capable to train or ship as is. This page lays them side by side, dimension by dimension, and shows where the same question sits in the NIST AI RMF and ISO/IEC 42001."
+  />
+
+  <div class="container res-page">
+    <section class="res-section" aria-labelledby="fs-versions-heading">
+      <div class="res-section-head">
+        <h2 id="fs-versions-heading">The versions mapped</h2>
+        <p>
+          As of {proseDate(FRONTIER_CROSSWALK_AS_OF)}. Each policy is versioned by its lab; a new
+          version can move, rename or drop a section, so every cell below names the version it was
+          read in.
+        </p>
+      </div>
+      <ul class="fs-docs" role="list">
+        {
+          labDocs.map((doc) => (
+            <li class="fs-doc">
+              <p class="fs-doc-issuer mono">{doc.issuer}</p>
+              <p class="fs-doc-name">
+                <a href={doc.url} rel="noopener">{doc.name}</a>
+              </p>
+              <p class="fs-doc-meta">
+                {doc.version} · effective <time datetime={doc.effective}>{proseDate(doc.effective)}</time>
+                {doc.pdfUrl && (
+                  <>
+                    {' · '}
+                    <a href={doc.pdfUrl} rel="noopener">PDF</a>
+                  </>
+                )}
+              </p>
+              {doc.companion && (
+                <p class="fs-doc-comp">
+                  Companion: <a href={doc.companion.url} rel="noopener">{doc.companion.name}</a> (
+                  <time datetime={doc.companion.date}>{proseDate(doc.companion.date)}</time>).{' '}
+                  {doc.companion.note}
+                </p>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="fs-read-heading">
+      <h2 id="fs-read-heading">How to read this</h2>
+      <p>
+        These are voluntary policies that each lab writes, applies and revises for itself. None of
+        them is a law, a standard or a certification scheme. Two of the labs also publish a
+        separate compliance document for California's frontier AI law; those are noted beside
+        their policy above, not mapped as columns.
+      </p>
+      <p>
+        A cell is coverage, not compliance. It says that a section of the document deals with the
+        dimension in that row. It does not say that the lab meets its own policy, that the policy
+        meets the NIST AI RMF or ISO/IEC 42001, or that two cells in a row ask for the same thing.
+        A solid chip marks a section that is mainly about the row; a dashed chip marks one that
+        touches it. Where a document has nothing on a row, the row says so rather than stretching
+        a section to fill the cell.
+      </p>
+      <p>
+        NIST AI RMF and ISO/IEC 42001 are generic: they govern any AI system, not frontier models.
+        Their cells show where an organisation that runs either would file the same question, with
+        NIST's subcategories as NIST prints them and ISO clauses by number and title only.
+      </p>
+    </section>
+
+    <section class="res-section" aria-labelledby="fs-grid-heading">
+      <div class="res-section-head">
+        <h2 id="fs-grid-heading">Dimension × framework</h2>
+        <p>
+          {dimensions.length} dimensions · {frontierColumns.length} columns · {frontierRefs.length}
+          references ({quoteCount} with a verbatim quote). Select a row or a cell to read the
+          sections in full.
+        </p>
+        <p class="ob-export">
+          <a
+            class="ob-dl"
+            href={csvUrl}
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file={csvUrl}
+            data-umami-event-location="frontier-crosswalk">Download CSV</a>
+          <a
+            class="ob-dl"
+            href={jsonUrl}
+            download
+            target="_blank"
+            rel="noopener"
+            data-umami-event="download"
+            data-umami-event-file={jsonUrl}
+            data-umami-event-location="frontier-crosswalk">Download JSON</a>
+        </p>
+      </div>
+      <CrosswalkMatrix
+        matrix={matrix}
+        chooser={false}
+        caption="One governance dimension per row; three lab policies, then NIST AI RMF and ISO/IEC 42001. Select a dimension or a cell to read the mapped sections."
+        regionLabel="Frontier safety frameworks crosswalk (scrolls sideways on small screens)"
+      />
+    </section>
+
+    <section class="res-section" aria-labelledby="fs-topics-heading">
+      <div class="res-section-head">
+        <h2 id="fs-topics-heading">By dimension</h2>
+        <p>Each dimension: the question it answers, a short neutral reading, then every mapped section.</p>
+      </div>
+      {
+        matrix.rows.map(({ topic, cells }) => (
+          <article id={`topic-${topic.id}`} class="cw-topic prose" data-cw-topic>
+            <h3>{topic.name}</h3>
+            <p class="fs-q">{topic.question}</p>
+            <p>
+              <CitedText text={topic.summary} prefix={P} />
+            </p>
+            <ul class="cw-refs">
+              {cells.flat().map((r) => (
+                <li data-fw={r.framework}>
+                  <span
+                    class:list={[
+                      'cw-chip',
+                      r.strength === 'related' && 'is-related',
+                      r.verified === false && 'is-unverified',
+                    ]}
+                    data-strength={r.strength}
+                    title={r.verified === false ? 'Not yet verified against the source' : undefined}
+                  >
+                    {chipLabel(r)}
+                    {r.verified === false ? ' ?' : ''}
+                  </span>
+                  {r.strength === 'related' && <span class="visually-hidden"> related</span>}
+                  {r.verified === false && (
+                    <span class="visually-hidden"> not yet verified against the source</span>
+                  )}
+                  <span class="cw-ref-fw">{fwShort(r.framework)}</span>
+                  <span class="cw-ref-title">{r.title}</span>
+                  {r.quote && <q class="fs-quote">{r.quote}</q>}
+                  {r.note && <span class="cw-ref-note">{r.note}</span>}
+                  {r.url && (
+                    <a class="cw-ref-link" href={r.url} rel="noopener">
+                      Source ↗
+                    </a>
+                  )}
+                </li>
+              ))}
+              {gapsFor(topic.id).map((g) => (
+                <li data-fw={g.framework} class="fs-gap">
+                  <span class="cw-ref-fw">{fwShort(g.framework)}</span>
+                  <span class="cw-ref-title">No section maps.</span>
+                  <span class="cw-ref-note">{g.note}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))
+      }
+    </section>
+
+    <section class="res-section prose" aria-labelledby="fs-readings-heading">
+      <h2 id="fs-readings-heading">Three readings</h2>
+      {
+        frontierReadings.map((reading) => (
+          <>
+            <h3>{reading.title}</h3>
+            <p>
+              <CitedText text={reading.text} prefix={P} />
+            </p>
+            {reading.links.length > 0 && (
+              <p class="ob-xref">
+                {reading.links.map((l, i) => (
+                  <>
+                    {i > 0 && ' · '}
+                    <a href={l.href}>{l.label}</a>
+                  </>
+                ))}
+              </p>
+            )}
+          </>
+        ))
+      }
+    </section>
+
+    <section class="res-section prose" aria-labelledby="fs-limits-heading">
+      <h2 id="fs-limits-heading">Limits and method</h2>
+      <ul>
+        {
+          frontierLimits.map((text) => (
+            <li>
+              <CitedText text={text} prefix={P} />
+            </li>
+          ))
+        }
+        <li>
+          {unverified.length === 0
+            ? 'Every reference was read in the version named above.'
+            : `${unverified.length} of ${frontierRefs.length} references carry a “?” (${unverifiedLab} in the lab columns): each says why in its note.`}
+        </li>
+      </ul>
+      <Callout kind="note" title="Coverage, not conformity">
+        <p>
+          Illustrative mapping from the AI Governance Engineer Body of Knowledge. A cell is not
+          evidence that anyone meets anything; see the <a href="/bok/patterns#pattern-framework-crosswalk"
+          >Framework Crosswalk pattern</a> for what turns a crosswalk into an auditable control.
+        </p>
+      </Callout>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="fs-sources-heading">
+      <h2 id="fs-sources-heading">Sources</h2>
+      <SourceList sources={frontierCrosswalkSources} prefix={P} />
+    </section>
+
+    <section class="res-section prose" aria-labelledby="fs-cite-heading">
+      <h2 id="fs-cite-heading">Download and cite</h2>
+      <p>
+        The dataset is <a href={jsonUrl}>JSON</a> and <a href={csvUrl}>CSV</a>, schema version 1,
+        with a notice inside each file that it is a coverage mapping and not a claim of conformity.
+        It is part of the archived Body of Knowledge, not a separate deposit: cite the concept DOI{' '}
+        <a href={`https://doi.org/${site.conceptDoi}`}>{site.conceptDoi}</a>, this page and the date
+        you fetched it. Attribution under {site.license}: {site.authors.join(', ')}.
+      </p>
+      <p>
+        Related: <a href="/resources/crosswalk">the topic crosswalk</a> of laws and standards ·{' '}
+        <a href="/frontier">frontier AI evaluation assurance</a> · <a href="/controls">the open
+        controls</a> · <a href="/bok/reading-list#frontier-safety-frameworks-the-labs-own-commitments"
+        >the reading list</a>.
+      </p>
+    </section>
+
+    <div class="obx-cite">
+      <Citation title="Frontier safety frameworks crosswalk" url={FRONTIER_CROSSWALK_PATH} kind="dataset" />
+    </div>
+  </div>
+
+  <CrosswalkDrawer />
+  <script is:inline defer src="/inert.js"></script>
+  <script is:inline defer src="/crosswalk.js"></script>
+  <script is:inline defer src="/cite.js"></script>
+</Base>
+
+<style>
+  .fs-docs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  }
+  .fs-doc {
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: var(--s-3) var(--s-4);
+    background: var(--bg);
+  }
+  .fs-doc p {
+    margin: 0;
+  }
+  .fs-doc-issuer {
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+  .fs-doc-name {
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    margin-block: var(--s-1) !important;
+  }
+  .fs-doc-meta,
+  .fs-doc-comp {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+  .fs-doc-comp {
+    margin-top: var(--s-2) !important;
+  }
+  .fs-q {
+    font-style: italic;
+    color: var(--ink-2);
+  }
+  .fs-quote {
+    display: block;
+    font-size: var(--fs-small);
+  }
+  .fs-gap .cw-ref-title {
+    color: var(--ink-2);
+  }
+  .cw-topic {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 1200px;
+  }
+</style>

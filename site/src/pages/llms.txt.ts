@@ -168,6 +168,11 @@ export const GET: APIRoute = async (context) => {
         '/resources/crosswalk.json',
         'The same mapping as JSON, with the disclaimer, version and licence in the payload.',
       ),
+      page(
+        'Frontier safety frameworks crosswalk',
+        '/resources/frontier-safety-crosswalk',
+        'Three published frontier safety frameworks (Anthropic RSP, OpenAI Preparedness Framework, Google DeepMind Frontier Safety Framework) mapped to NIST AI RMF and ISO/IEC 42001 across 13 governance dimensions. A coverage map, not a conformity claim. Also as .csv and .json.',
+      ),
       described('/resources/dpia-lists', 'National DPIA lists and the EU AI Act'),
       page(
         'AI contract and licence clauses',

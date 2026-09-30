@@ -506,6 +506,8 @@ general deployers: a narrower scope than the EU AI Act's risk-tiering. They ask 
 developers to publish safety frameworks and every frontier developer to report critical safety
 incidents to the state [18][19][25]. California's whistleblower protection is met in practice by
 [a channel for raising concerns](/bok/governance-program#a-channel-for-raising-concerns) (chapter 12).
+The [frontier safety frameworks crosswalk](/resources/frontier-safety-crosswalk) maps three published
+frameworks to the NIST AI RMF and ISO/IEC 42001, as a coverage map rather than a conformity claim.
 
 | Law | Scope | Obligation | Engineering artefact | Layer |
 |---|---|---|---|---|
