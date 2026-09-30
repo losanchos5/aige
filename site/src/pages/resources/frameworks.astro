@@ -9,12 +9,14 @@ import ObligationMatrix from '../../components/ObligationMatrix.astro';
 import ObligationTable from '../../components/ObligationTable.astro';
 import Diagram from '../../components/Diagram.astro';
 import Figure from '../../components/Figure.astro';
+import Chart from '../../components/Chart.astro';
 import { getFigure } from '../../data/figures';
 import lineageSvg from '../../figures/instrument-lineage.svg?raw';
 import { frameworks, obligations, disclaimer } from '../../data/frameworks';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { collectionPage, lastModified } from '../../lib/jsonld';
 import { compareLinks } from '../../lib/compare-links';
+import { FRAMEWORK_TABLE_ID, frameworkMosaic, withoutObligations } from '../../lib/page-visuals/framework-mosaic';
 import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
@@ -22,6 +24,11 @@ import '../../styles/pages.css';
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Frameworks' }];
 // Block w2-fig-concepts: how the instruments relate, above the table.
 const lineage = getFigure('instrument-lineage')!;
+// Page visuals T3: the instruments as tiles by type, sized by their obligation
+// rows (lib/page-visuals/framework-mosaic.ts); those without a row are named
+// under it instead of drawn at a size they do not have.
+const mosaic = frameworkMosaic();
+const unmapped = withoutObligations();
 // Search title and description (audit ONPAGE N3-1): the query this hub lands
 // ("AI governance frameworks"), counted from the table so it cannot drift.
 const seoTitle = `AI governance frameworks: ${frameworks.length} laws, standards and codes`;
@@ -91,11 +98,30 @@ const jsonLd = [
       >
         <Fragment set:html={lineageSvg} />
       </Figure>
+      <Chart
+        title="Where the obligations sit"
+        caption="Each tile is one instrument, as large as the obligation rows filed under it in the index below, grouped by type. Pick the instruments that carry most rows first; a tile links to its row in the table, a +N tile to the table."
+        chart={mosaic.wide}
+        narrow={mosaic.narrow}
+        class="fw-mosaic"
+      />
+      {
+        unmapped.length > 0 && (
+          <p class="fw-unmapped">
+            No obligation rows yet, so not drawn:{' '}
+            {unmapped.map((fw, i) => (
+              <>{i > 0 && ', '}<a href={`#fw-${fw.id}`}>{fw.short}</a> ({fw.type})</>
+            ))}.
+          </p>
+        )
+      }
     </div>
   </Section>
 
   <Section class="res-band">
-    <FrameworkTable frameworks={frameworks} />
+    <div id={FRAMEWORK_TABLE_ID}>
+      <FrameworkTable frameworks={frameworks} />
+    </div>
   </Section>
 
   <Section tone="tint" hue="l2" class="res-band">
@@ -143,3 +169,11 @@ const jsonLd = [
 
   <script is:inline defer src="/matrix.js"></script>
 </Base>
+
+<style>
+  .fw-unmapped {
+    margin-top: var(--s-2);
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+</style>
