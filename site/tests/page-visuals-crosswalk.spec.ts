@@ -12,7 +12,10 @@
 // - the overlap bar's four counts, the numbers its series labels print and
 //   the headline tiles above it;
 // - the butterfly's rows: one per topic either side reaches, in the group of
-//   its overlap level, one square per clause, core and related, per side.
+//   its overlap level, one square per clause, core and related, per side;
+// - the hatch means one thing on these pages, a related clause: no overlap
+//   level is drawn hatched, and each level keeps one drawing in the tiles,
+//   the bar and the butterfly's group heads.
 import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -136,6 +139,29 @@ test.describe('comparison pages: overlap bar and clause butterfly', () => {
       // Series columns 1-4: "Strong: 13", "EU AI Act only: 5 (1 in passing)".
       expect(head.slice(1, 5).map((h) => Number(/: (\d+)/.exec(h)?.[1]))).toEqual(values);
       expect(head[3].startsWith(`${c.aName} only`) && head[4].startsWith(`${c.bName} only`)).toBe(true);
+    });
+
+    test(`${c.slug}: the hatch marks only related clauses, and each overlap level keeps one drawing in the tiles, the bar and the butterfly`, () => {
+      const page = html(comparisonPath(c));
+      // Every hatched element is a related-clause square, plus the butterfly's key.
+      const related = rows.reduce((sum, r) => sum + r.a.related + r.b.related, 0);
+      expect((page.match(/class="[^"]*\bov-hatch\b/g) ?? []).length).toBe(related + 1);
+      const bar = slice(page, 'id="cmp-bar"', '</figure>');
+      expect(bar, 'no bar series is hatched').not.toMatch(/\bmk-hatch-/);
+      // The drawing of each level, in level order: tile swatches, the bar's
+      // series (the first state each series draws, in legend order) and the
+      // butterfly's group swatch for each level that has rows.
+      const order = ['strong', 'partial', 'a-only', 'b-only'];
+      const tiles = [...slice(page, 'class="cmp-stats"', '</ul>').matchAll(/class="cmp-sw ov-(\w+)"/g)].map((m) => m[1]);
+      const wide = slice(bar, 'aria-labelledby="cmp-bar-w-t', '</svg>');
+      const series = [...new Set([...wide.matchAll(/class="mk mk-(\w+)-0"/g)].map((m) => m[1]))];
+      const groups = new Map([...slice(page, 'data-cmp-butterfly', '</figure>').matchAll(/data-level="([^"]+)"[^>]*>\s*<p class="cb-group-head"[^>]*>\s*<span class="cb-sw ov-(\w+)"/g)].map((m) => [m[1], m[2]]));
+      expect(tiles).toHaveLength(order.length);
+      expect(new Set(tiles).size, 'four distinct drawings').toBe(order.length);
+      expect(tiles).not.toContain('hatch');
+      expect(series).toEqual(tiles);
+      expect([...groups.keys()]).toEqual(order.filter((level) => rows.some((r) => r.level === level)));
+      for (const [level, swatch] of groups) expect(swatch, level).toBe(tiles[order.indexOf(level)]);
     });
 
     test(`${c.slug}: the butterfly draws one row per topic, in its level's group, a square per clause`, () => {

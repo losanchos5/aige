@@ -1,5 +1,5 @@
 // dpia-visuals.ts: the three charts of /resources/dpia-lists, each as a wide
-// and a narrow (340) variant, all computed from data/dpia-lists.ts:
+// and a narrow (NARROW_WIDTH) variant, all computed from data/dpia-lists.ts:
 //
 //   annex     country x EU AI Act Annex III area: how many of a list's items
 //             overlap each area (countGrid), with the totals per area and per
@@ -13,7 +13,7 @@
 //             solid enumerated, hatched scored, outlined mixed.
 //
 // Nothing here is typed by hand: every count and date comes from the rows.
-import { beeswarm, stackedBars, type ChartMode, type ChartOutput, type TimePoint } from '../charts';
+import { NARROW_WIDTH, beeswarm, stackedBars, type ChartMode, type ChartOutput, type TimePoint } from '../charts';
 import { countGrid } from './count-grid';
 import {
   lists,
@@ -79,7 +79,7 @@ export function annexChart(): Pair {
   };
   return {
     wide: countGrid({ ...base, id: 'dl-annex-w', width: 640 }),
-    narrow: countGrid({ ...base, id: 'dl-annex-n', width: 340 }),
+    narrow: countGrid({ ...base, id: 'dl-annex-n', width: NARROW_WIDTH }),
   };
 }
 
@@ -143,7 +143,7 @@ export function timelineChart(): Pair {
   };
   return {
     wide: beeswarm({ ...base, id: 'dl-time-w', width: 640 }),
-    narrow: beeswarm({ ...base, id: 'dl-time-n', width: 340, orientation: 'vertical', length: 420 }),
+    narrow: beeswarm({ ...base, id: 'dl-time-n', width: NARROW_WIDTH, orientation: 'vertical', length: 420 }),
   };
 }
 
@@ -169,6 +169,6 @@ export function sizesChart(): Pair {
   };
   return {
     wide: stackedBars({ ...base, id: 'dl-size-w', width: 640 }),
-    narrow: stackedBars({ ...base, id: 'dl-size-n', width: 340 }),
+    narrow: stackedBars({ ...base, id: 'dl-size-n', width: NARROW_WIDTH }),
   };
 }

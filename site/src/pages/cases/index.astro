@@ -14,6 +14,7 @@ import { fitsSiteSuffix } from '../../lib/seo-title';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 import '../../styles/harms.css';
+import { NARROW_WIDTH } from '../../lib/charts';
 
 // Search title and description (SXO-R2-07, 2026-09-25 round 2): the query
 // first; the H1 stays.
@@ -87,7 +88,7 @@ const timeline = {
   })),
 };
 const timelineWide = caseYears({ ...timeline, id: 'cs-years-w', width: 720, nameLastYear: true });
-const timelineNarrow = caseYears({ ...timeline, id: 'cs-years-n', width: 340 });
+const timelineNarrow = caseYears({ ...timeline, id: 'cs-years-n', width: NARROW_WIDTH });
 
 const jsonLd = [
   {

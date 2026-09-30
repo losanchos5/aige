@@ -1,9 +1,10 @@
-/* overlap-marks.css: the four drawings of the overlap levels on the
-   "<A> vs <B>" pages, shared by the headline tiles (ComparisonPage.astro) and
-   the butterfly (ComparisonButterfly.astro): fill = strong, hatch = partial,
-   line = A only, dash = B only, the same states the overlap bar draws. The
-   butterfly's clause squares reuse fill (core) and hatch (related). Sizes stay
-   with each component; these rules give only the drawing. */
+/* overlap-marks.css: the drawings of the overlap levels on the "<A> vs <B>"
+   pages, shared by the headline tiles (ComparisonPage.astro) and the
+   butterfly (ComparisonButterfly.astro): fill = strong, line = partial,
+   dash = A only, dot = B only, the same states the overlap bar draws. Hatch
+   means one thing there: a related clause (the butterfly's squares, beside
+   fill for a core clause). Sizes stay with each component; these rules give
+   only the drawing. */
 .ov-fill {
   background: color-mix(in srgb, var(--ink) 55%, var(--bg));
   border: 1.25px solid var(--ink-2);
@@ -24,12 +25,18 @@
   border: 1.5px dashed var(--ink);
 }
 
+.ov-dot {
+  background: var(--bg);
+  border: 2px dotted var(--ink);
+}
+
 /* Print keeps the fills: they are the data, not decoration. */
 @media print {
   .ov-fill,
   .ov-hatch,
   .ov-line,
-  .ov-dash {
+  .ov-dash,
+  .ov-dot {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -40,7 +47,8 @@
   .ov-fill,
   .ov-hatch,
   .ov-line,
-  .ov-dash {
+  .ov-dash,
+  .ov-dot {
     forced-color-adjust: none;
     border-color: CanvasText;
   }
@@ -54,7 +62,8 @@
   }
 
   .ov-line,
-  .ov-dash {
+  .ov-dash,
+  .ov-dot {
     background: Canvas;
   }
 }

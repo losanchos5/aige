@@ -9,7 +9,7 @@
 // the same shape and drawing as on the /obligations clock and isotype and
 // the /obligations/<id> strip), so no two statuses ever share a mark.
 import { regulatoryClock, CLOCK_LABEL_MAX, type ClockRow } from '../page-charts/regulatory-clock';
-import { textWidth, type ChartOutput } from '../charts/core';
+import { NARROW_WIDTH, textWidth, type ChartOutput } from '../charts/core';
 import {
   appliesStatusLabels,
   appliesStatusMark,
@@ -102,6 +102,6 @@ export function obligationClock(rows: readonly Obligation[], copy: ClockCopy): {
   };
   return {
     wide: regulatoryClock({ ...base, id: `${copy.id}-w` }),
-    narrow: regulatoryClock({ ...base, id: `${copy.id}-n`, width: 340, orientation: 'vertical' }),
+    narrow: regulatoryClock({ ...base, id: `${copy.id}-n`, width: NARROW_WIDTH, orientation: 'vertical' }),
   };
 }

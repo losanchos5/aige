@@ -30,7 +30,7 @@ import ComparisonButterfly from './ComparisonButterfly.astro';
 import { site } from '../data/site';
 import { disclaimer, obligationPath } from '../data/frameworks';
 import { crosswalkAsOf } from '../data/crosswalk';
-import { stacked100 } from '../lib/charts';
+import { NARROW_WIDTH, stacked100 } from '../lib/charts';
 import { patternPath } from '../data/patterns';
 import {
   comparisons,
@@ -133,7 +133,8 @@ const cellItems = (list: SideRef[]) => list.slice(0, SHOWN);
 
 // The overlap bar beside "In short": the topics either instrument reaches,
 // split by overlap level (the counts overlapSummary states), each series in the
-// state the butterfly's group swatch repeats. 'figc' mode: reading.css brings
+// state the butterfly's group swatch repeats (never the hatch, which the
+// butterfly keeps for a related clause). 'figc' mode: reading.css brings
 // figures.css. A topic neither reaches stays outside the bar, named in its label.
 const partial = counts.both - counts.strong;
 const passingNote = (n: number) => (n > 0 ? ` (${n} in passing)` : '');
@@ -146,9 +147,9 @@ const barBase = {
   itemHeader: 'Topics',
   series: [
     { label: `Strong: ${counts.strong}` },
-    { label: `Partial: ${partial}`, state: 'hatched' as const },
-    { label: `${def.aName} only: ${counts.aOnly}${passingNote(counts.aPassing)}`, state: 'outline' as const },
-    { label: `${def.bName} only: ${counts.bOnly}${passingNote(counts.bPassing)}`, state: 'dashed' as const },
+    { label: `Partial: ${partial}`, state: 'outline' as const },
+    { label: `${def.aName} only: ${counts.aOnly}${passingNote(counts.aPassing)}`, state: 'dashed' as const },
+    { label: `${def.bName} only: ${counts.bOnly}${passingNote(counts.bPassing)}`, state: 'dotted' as const },
   ],
   items: [
     {
@@ -158,16 +159,16 @@ const barBase = {
   ],
 };
 const barWide = stacked100({ ...barBase, id: 'cmp-bar-w', width: 960 });
-const barNarrow = stacked100({ ...barBase, id: 'cmp-bar-n', width: 340 });
+const barNarrow = stacked100({ ...barBase, id: 'cmp-bar-n', width: NARROW_WIDTH });
 const oneSided = counts.aOnly + counts.bOnly;
 // The same four counts as headline tiles above the bar, each with the swatch
 // of its series (the butterfly's group headings repeat them).
 const inPassing = (n: number) => (n > 0 ? `, ${n} of them in passing` : '');
 const stats = [
   { n: counts.strong, label: levelLabel('strong', cmp), gloss: levelGloss('strong', cmp), swatch: 'fill' },
-  { n: partial, label: levelLabel('partial', cmp), gloss: levelGloss('partial', cmp), swatch: 'hatch' },
-  { n: counts.aOnly, label: levelLabel('a-only', cmp), gloss: `${levelGloss('a-only', cmp)}${inPassing(counts.aPassing)}`, swatch: 'line' },
-  { n: counts.bOnly, label: levelLabel('b-only', cmp), gloss: `${levelGloss('b-only', cmp)}${inPassing(counts.bPassing)}`, swatch: 'dash' },
+  { n: partial, label: levelLabel('partial', cmp), gloss: levelGloss('partial', cmp), swatch: 'line' },
+  { n: counts.aOnly, label: levelLabel('a-only', cmp), gloss: `${levelGloss('a-only', cmp)}${inPassing(counts.aPassing)}`, swatch: 'dash' },
+  { n: counts.bOnly, label: levelLabel('b-only', cmp), gloss: `${levelGloss('b-only', cmp)}${inPassing(counts.bPassing)}`, swatch: 'dot' },
 ];
 const barCaption =
   `Of the ${counts.topics} crosswalk topics, ${counts.both} have a clause in both and ${counts.strong} of those a core clause on each side` +

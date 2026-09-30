@@ -11,6 +11,7 @@
 // Built on the chart kit's shell and helpers (src/lib/charts/core.ts), in
 // 'chart' mode for /cases (tests/perf.spec.ts keeps figures.css off it).
 import {
+  minText,
   assemble,
   fitText,
   legend,
@@ -80,6 +81,7 @@ export function caseYears(input: CaseYearsInput): ChartOutput {
     }
   }
   const W = input.width ?? 640;
+  const sm = minText(W);
   const wide = W >= 480;
   const r = wide ? 10 : 8;
   // Vertical glyph pitch: linked marks keep 24 px apart.
@@ -106,8 +108,8 @@ export function caseYears(input: CaseYearsInput): ChartOutput {
   out.push(...lg.els);
   let y = lg.bottom + 24;
   const axisTitle = input.axisTitle ?? 'Cases per year';
-  fitText(axisTitle, W - 2 * L, 12, 'mono', 'axis title');
-  out.push(text(L, y, axisTitle, { size: 12, cls: 'mono muted', where: 'axis title' }));
+  fitText(axisTitle, W - 2 * L, sm, 'mono', 'axis title');
+  out.push(text(L, y, axisTitle, { size: sm, cls: 'mono muted', where: 'axis title' }));
   // Room for the count above the tallest stack.
   const top = y + 28;
   const base = top + maxStack * PITCH + 4;
@@ -149,7 +151,7 @@ export function caseYears(input: CaseYearsInput): ChartOutput {
       );
     }
     out.push(
-      text(cx(i), base + 19, year, { size: 12, cls: accent ? 'num' : 'num muted', anchor: 'middle', weight: accent ? 700 : 400, where: 'year' }),
+      text(cx(i), base + 19, year, { size: sm, cls: accent ? 'num' : 'num muted', anchor: 'middle', weight: accent ? 700 : 400, where: 'year' }),
     );
   });
   out.push(`<line class="axis" x1="${L}" y1="${r1(base)}" x2="${r1(L + years.length * colW)}" y2="${r1(base)}"/>`);

@@ -19,11 +19,11 @@ módulos de datos, no del componente.
 
 ## 3. Kit K2: legibilidad y deudas (implementador, PW_PORT 4463)
 
-- [ ] 3.1 `NARROW_WIDTH = 280`, texto mínimo 12,5 en estrecho y la comprobación de Chart.astro (D5); verificar que la build falla con un gráfico de prueba a 340 con texto de 12
-- [ ] 3.2 Migrar los ~20 sitios que dibujan el estrecho a 340 y ajustar etiquetas hasta que la build pase; verificar sin scroll horizontal a 320 en las páginas afectadas
-- [ ] 3.3 Helper `asOfMark` en core usado por timeStrip, beeswarm, timeLanes y dumbbell (D6); verificar con un test que las cuatro dibujan la misma marca
-- [ ] 3.4 Mariposa: la trama solo para «related» (D6); verificar en `page-visuals-crosswalk.spec.ts`
-- [ ] 3.5 `jurisdiction-tiles` y `governance-operating-model` sin texto de 11 px a 390; verificar con `figures*.spec.ts`
+- [x] 3.1 `NARROW_WIDTH = 280`, texto mínimo 12,5 en estrecho y la comprobación de Chart.astro (D5); verificar que la build falla con un gráfico de prueba a 340 con texto de 12
+- [x] 3.2 Migrar los ~20 sitios que dibujan el estrecho a 340 y ajustar etiquetas hasta que la build pase; verificar sin scroll horizontal a 320 en las páginas afectadas
+- [x] 3.3 Helper `asOfMark` en core usado por timeStrip, beeswarm, timeLanes y dumbbell (D6); verificar con un test que las cuatro dibujan la misma marca
+- [x] 3.4 Mariposa: la trama solo para «related» (D6); verificar en `page-visuals-crosswalk.spec.ts`
+- [x] 3.5 `jurisdiction-tiles` y `governance-operating-model` sin texto de 11 px a 390; verificar con `figures*.spec.ts`
 - [ ] 3.6 Fusionar K1 y K2 en `feat/page-visuals-t3`, build y `chart-primitives.spec.ts`; quitar los worktrees con `rm-worktree.sh`
 
 ## 4. Páginas (cinco implementadores en paralelo, un worktree por bloque)

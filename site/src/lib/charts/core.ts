@@ -18,7 +18,7 @@
 /** 0 = ink (not a layer); 1 to 5 = the stack layers (--l1..--l5). */
 export type Tone = 0 | 1 | 2 | 3 | 4 | 5;
 /** How a mark is drawn: solid, outlined, dashed outline or hatched. */
-export type MarkState = 'filled' | 'outline' | 'dashed' | 'hatched';
+export type MarkState = 'filled' | 'outline' | 'dashed' | 'dotted' | 'hatched';
 /** Mark shapes (VISUAL-GUIDE §1.7 keeps the diamond for a gate or a deny). */
 export type Shape = 'circle' | 'square' | 'diamond' | 'triangle';
 /** Type faces of the site: body (Instrument Sans), display, mono. */
@@ -65,13 +65,23 @@ export interface ChartBase {
    *  keeps free of figures.css (/, /resources, /resources/crosswalk, /cases,
    *  /patterns). */
   mode?: ChartMode;
-  /** viewBox width; each primitive documents its default. Pass the narrow
-   *  width (340: the canvas a 390 px phone gives, text at 1:1) for the
-   *  narrow variant of a pair. */
+  /** viewBox width; each primitive documents its default. Pass
+   *  NARROW_WIDTH (280) for the narrow variant of a pair. */
   width?: number;
   /** Caption of the table alternative (default: the title). */
   tableCaption?: string;
 }
+
+/** viewBox width of the narrow variant of a pair. A 320 px phone gives the
+ *  chart canvas about 274 px (Chart.astro CANVAS_320), so text of
+ *  NARROW_TEXT reads at 12.2 px there; Chart.astro fails the build when a
+ *  chart a phone shows would print text under 12 px. */
+export const NARROW_WIDTH = 280;
+/** Smallest font size of a chart under 480 units wide (a narrow variant). */
+export const NARROW_TEXT = 12.5;
+/** Smallest font size a chart `W` wide prints (ticks, stamp, notes): 12 on a
+ *  wide variant (shown at 1:1 or larger), NARROW_TEXT under 480 units. */
+export const minText = (W: number): number => (W < 480 ? NARROW_TEXT : 12);
 
 // ----------------------------------------------------------------- words -- //
 
@@ -106,6 +116,7 @@ export interface Words {
   filled: string;
   outline: string;
   dashed: string;
+  dotted: string;
   hatched: string;
 }
 
@@ -139,6 +150,7 @@ const WORDS: Record<'en' | 'es', Words> = {
     filled: 'Filled',
     outline: 'Outline',
     dashed: 'Dashed',
+    dotted: 'Dotted',
     hatched: 'Hatched',
   },
   es: {
@@ -170,6 +182,7 @@ const WORDS: Record<'en' | 'es', Words> = {
     filled: 'Relleno',
     outline: 'Contorno',
     dashed: 'Discontinuo',
+    dotted: 'Punteado',
     hatched: 'Rayado',
   },
 };
@@ -441,7 +454,7 @@ export function timeScale(from: string, to: string, range: [number, number], max
 
 /** Class list of a mark in a state and tone (see figures.css "chart marks"). */
 export function markClass(state: MarkState = 'filled', tone: Tone = 0): string {
-  const s = state === 'filled' ? 'fill' : state === 'outline' ? 'line' : state === 'dashed' ? 'dash' : 'hatch';
+  const s = state === 'filled' ? 'fill' : state === 'outline' ? 'line' : state === 'dashed' ? 'dash' : state === 'dotted' ? 'dot' : 'hatch';
   return `mk mk-${s}-${tone}`;
 }
 
@@ -620,11 +633,11 @@ export const close = (): string => '</svg>';
 
 /** The provenance lines printed inside the image: "Source: ..." (wrapped)
  *  then "As of YYYY-MM-DD". */
-export function stampLines(base: Pick<ChartBase, 'source' | 'asOf' | 'lang'>, maxPx: number): string[] {
+export function stampLines(base: Pick<ChartBase, 'source' | 'asOf' | 'lang'>, maxPx: number, size = 12): string[] {
   const lines: string[] = [];
   const w = words(base.lang);
   if (base.source) {
-    lines.push(...wrapText(`${w.source}: ${base.source}`, maxPx, 12, 'mono', 3, 'source line'));
+    lines.push(...wrapText(`${w.source}: ${base.source}`, maxPx, size, 'mono', 3, 'source line'));
   }
   if (base.asOf) {
     parseDay(base.asOf, 'asOf');
@@ -648,13 +661,14 @@ export interface AssembleOptions {
 /** Close a chart: the stamp under the content, then the shell around it. */
 export function assemble(o: AssembleOptions): { svg: string; height: number } {
   const x = o.x ?? 12;
-  const lines = stampLines(o.base, o.width - 2 * x);
+  const size = minText(o.width);
+  const lines = stampLines(o.base, o.width - 2 * x, size);
   let y = o.bottom;
   const stamp: string[] = [];
   if (lines.length) {
     y += 22;
     for (const line of lines) {
-      stamp.push(text(x, y, line, { size: 12, cls: 'mono muted', where: 'stamp' }));
+      stamp.push(text(x, y, line, { size, cls: 'mono muted', where: 'stamp' }));
       y += 16;
     }
     y -= 16;
@@ -701,6 +715,88 @@ export function besideLine(x: number, w: number, W: number, pad = 12): number {
   if (x + 4 + w <= W - pad) return x + 4;
   if (x - 4 - w >= pad) return x - 4 - w;
   return Math.max(pad, W - pad - w);
+}
+
+// ----------------------------------------------------------------- as of -- //
+
+/** Height of the as-of key (AsOfMark.key) above a vertical time axis. */
+export const AS_OF_KEY_H = 22;
+
+/** The as-of mark of a time chart, from asOfMark. */
+export interface AsOfMark {
+  /** Position of the date along the time axis (x when time runs along x). */
+  at: number;
+  /** "As of YYYY-MM-DD" ("A fecha de" with lang 'es'). */
+  label: string;
+  /** Width of the label at `size`. */
+  w: number;
+  size: number;
+  /** The dashed line across the time axis at `at`, over each [from, to] span
+   *  of the other axis (several spans leave gaps, e.g. over labels). */
+  line(spans: [number, number][]): string;
+  /** The label with its baseline at y: centred on the line, clamped inside. */
+  centred(y: number): string;
+  /** The label with its baseline at y: right of the line when it fits, else
+   *  left of it, else clamped inside. */
+  beside(y: number): string;
+  /** For a vertical time axis, where a label on the line would sit on the
+   *  marks: a key at the top (a dashed swatch and the label). Returns its
+   *  elements and the y under it. */
+  key(y: number): { els: string[]; bottom: number };
+}
+
+/** "As of YYYY-MM-DD" ("A fecha de" with lang 'es'), the label of the as-of
+ *  mark, for a chart that draws the line without a time scale (an agenda). */
+export function asOfLabel(asOf: string, lang?: 'en' | 'es', label?: string): string {
+  parseDay(asOf, 'asOf');
+  return `${label ?? words(lang).asOf} ${asOf}`;
+}
+
+/**
+ * The one "as of" mark every time chart draws: a dashed line of class "today"
+ * at the dataset's as-of date (never the build clock) and the label "As of
+ * YYYY-MM-DD" ("A fecha de" in Spanish) in mono at the chart's smallest text
+ * size. Throws when the date falls outside the scale or the label does not
+ * fit the width. `o.label` replaces "As of" only for a reference date that is
+ * not the data's as-of (e.g. "EU AI Act in force").
+ */
+export function asOfMark(
+  scale: TimeScale,
+  asOf: string,
+  lang: 'en' | 'es' | undefined,
+  o: { width: number; axis: 'x' | 'y'; label?: string; pad?: number },
+): AsOfMark {
+  const at = scale.map(asOf);
+  const pad = o.pad ?? 12;
+  const W = o.width;
+  const size = minText(W);
+  const label = asOfLabel(asOf, lang, o.label);
+  fitText(label, W - 2 * pad, size, 'mono', 'as-of label');
+  const w = textWidth(label, size, 'mono');
+  const draw = (x: number, y: number) => text(x, y, label, { size, cls: 'mono', where: 'as-of label' });
+  return {
+    at,
+    label,
+    w,
+    size,
+    line(spans) {
+      const ends = spans.map(([a, b]) => (o.axis === 'x' ? [r1(at), r1(a), r1(at), r1(b)] : [r1(a), r1(at), r1(b), r1(at)]));
+      if (ends.length === 1) {
+        const [x1, y1, x2, y2] = ends[0];
+        return `<line class="today" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;
+      }
+      return `<path class="today" d="${ends.map(([x1, y1, x2, y2]) => `M${x1} ${y1}L${x2} ${y2}`).join('')}"/>`;
+    },
+    centred: (y) => draw(Math.max(pad, Math.min(at - w / 2, W - pad - w)), y),
+    beside: (y) => draw(besideLine(at, w, W, pad), y),
+    key(y) {
+      fitText(label, W - 2 * pad - 28, size, 'mono', 'as-of label');
+      return {
+        els: [`<line class="today" x1="${pad}" y1="${r1(y + 10)}" x2="${pad + 22}" y2="${r1(y + 10)}"/>`, draw(pad + 28, y + 14)],
+        bottom: y + AS_OF_KEY_H,
+      };
+    },
+  };
 }
 
 const chartIds = new WeakMap<object, Map<string, string>>();

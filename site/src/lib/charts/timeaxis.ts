@@ -1,7 +1,7 @@
 // timeaxis.ts: charts on a time axis. Time runs left to right (horizontal) or
 // top to bottom (vertical, for narrow widths); ticks are 1 January of round
-// years (month starts on short spans), at most six; an optional dashed "today"
-// line with its date. Marks carry their state by shape and fill, never colour
+// years (month starts on short spans), at most six; an optional dashed as-of
+// line with its date (core asOfMark, shared with dumbbell and the page charts). Marks carry their state by shape and fill, never colour
 // alone, and each has a native tooltip. Linked marks are pointer targets and
 // must keep the 24 px spacing of WCAG 2.5.8 (core.ts targets), else the build
 // throws naming both.
@@ -17,11 +17,14 @@
 // (measure / wrapTo); the lane grouping itself (posters.mjs timelineModel) is
 // domain logic and stays with the caller, who passes lanes already grouped.
 import {
+  AS_OF_KEY_H,
+  asOfMark,
+  NARROW_WIDTH,
   assemble,
-  besideLine,
   fitText,
   legend,
   markStyles,
+  minText,
   nonEmpty,
   parseDay,
   r1,
@@ -50,8 +53,11 @@ export interface TimeBase extends ChartBase {
   /** Domain, YYYY-MM-DD; every date drawn must fall inside it. */
   from: string;
   to: string;
-  /** A dashed "today" line (inside the domain), labelled "Today <date>". */
+  /** The data's as-of date (YYYY-MM-DD, inside the domain): a dashed line
+   *  labelled "As of <date>" (core asOfMark), never the build clock. */
   today?: string;
+  /** Replaces "As of" only when the line marks a reference date that is not
+   *  the as-of (e.g. "EU AI Act in force"). */
   todayLabel?: string;
   /** 'horizontal' (default) or 'vertical' (time top to bottom). */
   orientation?: 'horizontal' | 'vertical';
@@ -92,31 +98,11 @@ function legendBlock(input: TimeBase, W: number, marks: ReturnType<typeof markSt
   return lg.bottom + 12;
 }
 
-function checkToday(input: TimeBase, ts: TimeScale) {
-  if (input.today) ts.map(input.today); // throws when outside the domain
-}
-
-/** "Today <date>", measured against the room it gets. */
-function todayText(input: TimeBase, maxPx: number): { label: string; w: number } {
-  const label = `${input.todayLabel ?? words(input.lang).today} ${input.today}`;
-  fitText(label, maxPx, 12, 'mono', 'today label');
-  return { label, w: textWidth(label, 12, 'mono') };
-}
-
-/** A today label beside the dashed line at x (horizontal charts). */
-function todayBeside(input: TimeBase, out: string[], x: number, y: number, W: number) {
-  const { label, w } = todayText(input, W - 2 * L);
-  out.push(text(besideLine(x, w, W, L), y, label, { size: 12, cls: 'mono', where: 'today label' }));
-}
-
-/** Vertical charts name the today line in a key above the axis, since a label
- *  on the line would sit on the marks. Returns the y under the key. */
-function todayKey(input: TimeBase, out: string[], y: number, W: number): number {
-  if (!input.today) return y;
-  const { label } = todayText(input, W - 2 * L - 28);
-  out.push(`<line class="today" x1="${L}" y1="${r1(y + 10)}" x2="${L + 22}" y2="${r1(y + 10)}"/>`);
-  out.push(text(L + 28, y + 14, label, { size: 12, cls: 'mono', where: 'today label' }));
-  return y + 22;
+/** The as-of mark on `ts` (throws when the date falls outside it). Vertical
+ *  charts name it in a key above the axis (AS_OF_KEY_H tall), since a label
+ *  on the line would sit on the marks. */
+function asOfLine(input: TimeBase, ts: TimeScale, W: number, axis: 'x' | 'y') {
+  return input.today ? asOfMark(ts, input.today, input.lang, { width: W, axis, label: input.todayLabel, pad: L }) : undefined;
 }
 
 function pointTable(input: TimeBase, points: TimePoint[]) {
@@ -143,20 +129,22 @@ export function beeswarm(input: BeeswarmInput): ChartOutput {
   const where = `beeswarm ${input.id}`;
   nonEmpty(input.points, 'points', where);
   const vertical = input.orientation === 'vertical';
-  const W = input.width ?? (vertical ? 340 : 640);
+  const W = input.width ?? (vertical ? NARROW_WIDTH : 640);
   const r = input.r ?? 5;
   const linked = input.points.some((p) => p.href);
   const bin = Math.max(2 * r + 2, linked ? 24 : 0);
   const marks = markStyles(input.id);
   const hits = targets(where);
   const out: string[] = [];
+  const sm = minText(W);
   let y = legendBlock(input, W, marks, out, 4);
-  if (input.today && !vertical) y += 20;
-  if (vertical) y = todayKey(input, out, y, W);
+  const keyAt = y;
+  if (input.today) y += vertical ? AS_OF_KEY_H : 20;
   const axisLen = vertical ? (input.length ?? 480) : W - 2 * L - 16;
   const start = vertical ? y + 16 : L + 8;
   const ts = timeScale(input.from, input.to, [start, start + axisLen]);
-  checkToday(input, ts);
+  const mark = asOfLine(input, ts, W, vertical ? 'y' : 'x');
+  if (mark && vertical) out.push(...mark.key(keyAt).els);
   // Bin each point (chronological order) and count the stack height.
   const stacks = new Map<number, number>();
   const placed = chrono(input.points, (p) => p.date).map((p) => {
@@ -181,14 +169,9 @@ export function beeswarm(input: BeeswarmInput): ChartOutput {
     for (const t of ts.ticks) {
       const x = ts.map(t.date);
       out.push(`<line class="tick" x1="${r1(x)}" y1="${r1(axisY)}" x2="${r1(x)}" y2="${r1(axisY + 5)}"/>`);
-      out.push(text(x, axisY + 19, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+      out.push(text(x, axisY + 19, t.label, { size: sm, cls: 'num muted', anchor: 'middle', where: 'tick' }));
     }
-    if (input.today) {
-      const x = ts.map(input.today);
-      out.push(`<line class="today" x1="${r1(x)}" y1="${r1(y)}" x2="${r1(x)}" y2="${r1(axisY + 5)}"/>`);
-      const { label, w } = todayText(input, W - 2 * L);
-      out.push(text(Math.max(L, Math.min(x - w / 2, W - L - w)), y - 4, label, { size: 12, cls: 'mono', where: 'today label' }));
-    }
+    if (mark) out.push(mark.line([[y, axisY + 5]]), mark.centred(y - 4));
     bottom = axisY + 19;
   } else {
     const axisX = L + 44;
@@ -201,12 +184,9 @@ export function beeswarm(input: BeeswarmInput): ChartOutput {
     for (const t of ts.ticks) {
       const ty = ts.map(t.date);
       out.push(`<line class="tick" x1="${axisX - 5}" y1="${r1(ty)}" x2="${axisX}" y2="${r1(ty)}"/>`);
-      out.push(text(axisX - 8, ty + 4, t.label, { size: 12, cls: 'num muted', anchor: 'end', where: 'tick' }));
+      out.push(text(axisX - 8, ty + 4, t.label, { size: sm, cls: 'num muted', anchor: 'end', where: 'tick' }));
     }
-    if (input.today) {
-      const ty = ts.map(input.today);
-      out.push(`<line class="today" x1="${axisX - 5}" y1="${r1(ty)}" x2="${W - L}" y2="${r1(ty)}"/>`);
-    }
+    if (mark) out.push(mark.line([[axisX - 5, W - L]]));
     bottom = start + axisLen + 4;
   }
   out.push(...dots);
@@ -234,10 +214,11 @@ export function timeStrip(input: TimeStripInput): ChartOutput {
   const where = `timeStrip ${input.id}`;
   nonEmpty(input.events, 'events', where);
   const vertical = input.orientation === 'vertical';
-  const W = input.width ?? (vertical ? 340 : 640);
+  const W = input.width ?? (vertical ? NARROW_WIDTH : 640);
   const marks = markStyles(input.id);
   const hits = targets(where);
   const out: string[] = [];
+  const sm = minText(W);
   let y = legendBlock(input, W, marks, out, 2);
   const events = chrono(input.events, (e) => e.date);
   const R = 5.5;
@@ -249,7 +230,7 @@ export function timeStrip(input: TimeStripInput): ChartOutput {
   let bottom: number;
   if (!vertical) {
     const ts = timeScale(input.from, input.to, [L + 8, W - L - 8]);
-    checkToday(input, ts);
+    const mark = asOfLine(input, ts, W, 'x');
     // Greedy label rows: each label takes the lowest row where it clears the
     // previous label by 6px; more than three rows is a layout error.
     const ends: number[] = [];
@@ -270,13 +251,9 @@ export function timeStrip(input: TimeStripInput): ChartOutput {
     for (const t of ts.ticks) {
       const x = ts.map(t.date);
       out.push(`<line class="tick" x1="${r1(x)}" y1="${r1(axisY)}" x2="${r1(x)}" y2="${r1(axisY + 5)}"/>`);
-      out.push(text(x, axisY + 19, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+      out.push(text(x, axisY + 19, t.label, { size: sm, cls: 'num muted', anchor: 'middle', where: 'tick' }));
     }
-    if (input.today) {
-      const x = ts.map(input.today);
-      out.push(`<line class="today" x1="${r1(x)}" y1="${r1(axisY - 12)}" x2="${r1(x)}" y2="${r1(axisY + 24)}"/>`);
-      todayBeside(input, out, x, axisY + 36, W);
-    }
+    if (mark) out.push(mark.line([[axisY - 12, axisY + 24]]), mark.beside(axisY + 36));
     for (const { e, x, left, row } of placed) {
       const ly = axisY - 18 - row * 17; // row 0 sits just above the axis
       out.push(`<line class="rule" x1="${r1(x)}" y1="${r1(ly + 4)}" x2="${r1(x)}" y2="${r1(axisY - 6)}"/>`);
@@ -286,21 +263,20 @@ export function timeStrip(input: TimeStripInput): ChartOutput {
     bottom = axisY + (input.today ? 36 : 19);
   } else {
     const len = input.length ?? Math.max(240, events.length * 36);
-    y = todayKey(input, out, y, W);
+    const keyAt = y;
+    if (input.today) y += AS_OF_KEY_H;
     const start = y + 18;
     const ts = timeScale(input.from, input.to, [start, start + len]);
-    checkToday(input, ts);
+    const mark = asOfLine(input, ts, W, 'y');
+    if (mark) out.push(...mark.key(keyAt).els);
     const axisX = L + 44;
     out.push(`<line class="axis" x1="${axisX}" y1="${r1(start)}" x2="${axisX}" y2="${r1(start + len)}"/>`);
     for (const t of ts.ticks) {
       const ty = ts.map(t.date);
       out.push(`<line class="tick" x1="${axisX - 5}" y1="${r1(ty)}" x2="${axisX}" y2="${r1(ty)}"/>`);
-      out.push(text(axisX - 8, ty + 4, t.label, { size: 12, cls: 'num muted', anchor: 'end', where: 'tick' }));
+      out.push(text(axisX - 8, ty + 4, t.label, { size: sm, cls: 'num muted', anchor: 'end', where: 'tick' }));
     }
-    if (input.today) {
-      const ty = ts.map(input.today);
-      out.push(`<line class="today" x1="${axisX - 5}" y1="${r1(ty)}" x2="${W - L}" y2="${r1(ty)}"/>`);
-    }
+    if (mark) out.push(mark.line([[axisX - 5, W - L]]));
     // Labels to the right; pushed down (with a leader) when they would overlap.
     let prev = -Infinity;
     const labelX = axisX + 22;
@@ -359,10 +335,11 @@ export function timeLanes(input: TimeLanesInput): ChartOutput {
   const w = words(input.lang);
   const vertical = input.orientation === 'vertical';
   const inline = (input.labels ?? 'inline') === 'inline';
-  const W = input.width ?? (vertical ? 340 : 720);
+  const W = input.width ?? (vertical ? NARROW_WIDTH : 720);
   const marks = markStyles(input.id);
   const hits = targets(where);
   const out: string[] = [];
+  const sm = minText(W);
   let y = legendBlock(input, W, marks, out, 4);
   const itemName = (lane: string, it: TimeLaneItem) =>
     `${lane} · ${it.label} · ${it.start}${it.end ? ` ${w.to} ${it.end}` : ''}${statusOf(it, input.lang) ? ` · ${statusOf(it, input.lang)}` : ''}`;
@@ -387,9 +364,9 @@ export function timeLanes(input: TimeLanesInput): ChartOutput {
     const LW = input.labelWidth ?? Math.min(180, Math.round(W * 0.3));
     const x0 = L + LW + 8;
     const ts = timeScale(input.from, input.to, [x0 + 6, W - L - 6]);
-    checkToday(input, ts);
+    const mark = asOfLine(input, ts, W, 'x');
     y += 16;
-    for (const t of ts.ticks) out.push(text(ts.map(t.date), y, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+    for (const t of ts.ticks) out.push(text(ts.map(t.date), y, t.label, { size: sm, cls: 'num muted', anchor: 'middle', where: 'tick' }));
     y += 8;
     const gridTop = y;
     out.push(`<line class="axis" x1="${x0}" y1="${r1(y)}" x2="${W - L}" y2="${r1(y)}"/>`);
@@ -424,16 +401,16 @@ export function timeLanes(input: TimeLanesInput): ChartOutput {
       const x = r1(ts.map(t.date));
       out.push(`<line class="rule" x1="${x}" y1="${r1(gridTop)}" x2="${x}" y2="${r1(y)}"/>`);
     }
-    if (input.today) {
-      const x = ts.map(input.today);
-      out.push(`<line class="today" x1="${r1(x)}" y1="${r1(gridTop - 4)}" x2="${r1(x)}" y2="${r1(y + 4)}"/>`);
-      todayBeside(input, rows, x, y + 18, W);
+    if (mark) {
+      out.push(mark.line([[gridTop - 4, y + 4]]));
+      rows.push(mark.beside(y + 18));
       y += 18;
     }
     out.push(...rows);
     bottom = y;
   } else {
-    y = todayKey(input, out, y, W);
+    const keyAt = y;
+    if (input.today) y += AS_OF_KEY_H;
     const axisX = L + 44;
     const colW = (W - L - axisX - 6) / Math.max(1, input.lanes.length);
     // Lane labels head their columns, up to three lines each.
@@ -445,12 +422,13 @@ export function timeLanes(input: TimeLanesInput): ChartOutput {
     const start = y + headH + 16;
     const len = input.length ?? 480;
     const ts = timeScale(input.from, input.to, [start, start + len]);
-    checkToday(input, ts);
+    const mark = asOfLine(input, ts, W, 'y');
+    if (mark) out.push(...mark.key(keyAt).els);
     out.push(`<line class="axis" x1="${axisX}" y1="${r1(start)}" x2="${axisX}" y2="${r1(start + len)}"/>`);
     for (const t of ts.ticks) {
       const ty = ts.map(t.date);
       out.push(`<line class="rule" x1="${axisX - 5}" y1="${r1(ty)}" x2="${W - L}" y2="${r1(ty)}"/>`);
-      out.push(text(axisX - 8, ty + 4, t.label, { size: 12, cls: 'num muted', anchor: 'end', where: 'tick' }));
+      out.push(text(axisX - 8, ty + 4, t.label, { size: sm, cls: 'num muted', anchor: 'end', where: 'tick' }));
     }
     let labelsBottom = 0;
     input.lanes.forEach((lane, i) => {
@@ -472,10 +450,7 @@ export function timeLanes(input: TimeLanesInput): ChartOutput {
         labelsBottom = Math.max(labelsBottom, prev + 4);
       }
     });
-    if (input.today) {
-      const ty = ts.map(input.today);
-      out.push(`<line class="today" x1="${axisX - 5}" y1="${r1(ty)}" x2="${W - L}" y2="${r1(ty)}"/>`);
-    }
+    if (mark) out.push(mark.line([[axisX - 5, W - L]]));
     bottom = Math.max(start + len + 4, labelsBottom);
   }
   const flat = input.lanes.flatMap((lane) => lane.items.map((it) => ({ lane: lane.label, it })));

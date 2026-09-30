@@ -8,6 +8,8 @@
 // UpSet draws one bar per non-empty region, largest first, with a three-dot
 // membership mark. All return the same table: one row per item, Yes/No per set.
 import {
+  NARROW_WIDTH,
+  minText,
   assemble,
   fitText,
   linearScale,
@@ -207,14 +209,14 @@ export function venn3(input: Venn3Input): ChartOutput {
     bottom = cy + 1.155 * d + R + 20;
     callouts();
   } else {
-    W = input.width ?? 340;
+    W = input.width ?? NARROW_WIDTH;
     const rows = MASKS.filter((m) => regions.get(m)!.length > 0).sort((a, b) => regions.get(b)!.length - regions.get(a)!.length);
     nonEmpty(rows, 'item in any of the three sets', `venn3 ${input.id}`);
     let y = 4;
-    const key = wrapText(`${es ? 'Puntos' : 'Dots'}: ${names.join(' · ')}`, W - 2 * L, 12, 'body', 2, 'dot key');
+    const key = wrapText(`${es ? 'Puntos' : 'Dots'}: ${names.join(' · ')}`, W - 2 * L, minText(W), 'body', 2, 'dot key');
     for (const line of key) {
       y += 16;
-      out.push(text(L, y, line, { size: 12, cls: 'ink2', where: 'dot key' }));
+      out.push(text(L, y, line, { size: minText(W), cls: 'ink2', where: 'dot key' }));
     }
     y += 10;
     const x0 = L + 52;

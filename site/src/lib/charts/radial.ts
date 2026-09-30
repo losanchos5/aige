@@ -12,7 +12,7 @@
 // the sectors in two columns either side of the centre, each family on the
 // side with fewer rows so far (ties to the right), one node per 24 px row, so
 // linked nodes keep the WCAG 2.5.8 spacing and labels never collide; 'list'
-// (narrow, 340 by default and whenever the width is under 480) stacks the
+// (narrow, NARROW_WIDTH by default and whenever the width is under 480) stacks the
 // sectors under the centre as branches off one spine, text at 1:1 on a phone.
 // Node labels are one line and throw, naming the label, when they do not fit.
 // A family draws at most `maxPerFamily` nodes (default 6) and a "+N more"
@@ -25,6 +25,7 @@ import {
   assemble,
   fitText,
   markStyles,
+  minText,
   r1,
   table,
   targets,
@@ -214,8 +215,8 @@ export function relationRadial(input: RelationRadialInput): ChartOutput | null {
       side.fams.forEach((x, i) => {
         if (i) ty += FAMILY_GAP;
         const head = `${x.f.label} (${x.items.length})`;
-        fitText(head, labelW + 16, 12, 'mono', 'family label');
-        out.push(text(right ? dotX - 6 : dotX + 6, ty + 15, head, { size: 12, cls: 'mono muted', anchor, where: 'family label' }));
+        fitText(head, labelW + 16, minText(W), 'mono', 'family label');
+        out.push(text(right ? dotX - 6 : dotX + 6, ty + 15, head, { size: minText(W), cls: 'mono muted', anchor, where: 'family label' }));
         ty += HEAD;
         for (const item of x.shown) {
           const ny = ty + PITCH / 2;
@@ -250,8 +251,8 @@ export function relationRadial(input: RelationRadialInput): ChartOutput | null {
     families.forEach((x, i) => {
       if (i) ty += FAMILY_GAP;
       const head = `${x.f.label} (${x.items.length})`;
-      fitText(head, W - L - (spineX + 14), 12, 'mono', 'family label');
-      out.push(text(spineX + 14, ty + 15, head, { size: 12, cls: 'mono muted', where: 'family label' }));
+      fitText(head, W - L - (spineX + 14), minText(W), 'mono', 'family label');
+      out.push(text(spineX + 14, ty + 15, head, { size: minText(W), cls: 'mono muted', where: 'family label' }));
       ty += HEAD;
       for (const item of x.shown) {
         const ny = ty + PITCH / 2;

@@ -13,7 +13,7 @@
 // nothing here adds a fact. Labels that do not fit a node are shortened by
 // the shared shortener (labels.ts: on a word boundary with an ellipsis; the
 // full name stays in the tooltip and in the table).
-import { relationRadial, type ChartOutput, type RelationFamily } from '../charts';
+import { NARROW_WIDTH, radialLabelWidth, relationRadial, type ChartOutput, type RelationFamily } from '../charts';
 import { textWidth } from '../charts/core';
 import { centreLabel, shortenToFit } from './labels';
 import { patterns, type PatternDef } from '../../data/patterns';
@@ -24,9 +24,9 @@ import { frameworkOf } from '../obligations';
 import { instrumentClause, obligationHeading } from '../obligation-title';
 
 /** Widest node label: the room a 640-wide radial leaves each label column
- *  (the 340-wide list gives 266). */
+ *  (the NARROW_WIDTH list gives more). */
 export const NODE_LABEL_MAX = 176;
-const LIST_LABEL_MAX = 260;
+const LIST_LABEL_MAX = radialLabelWidth(NARROW_WIDTH, 'list', '');
 const NODE_PX = 13;
 
 /** `full`, or the shared shortener's form of it that fits `max` px. */
@@ -82,7 +82,7 @@ export function neighbourhoodFamilies(def: PatternDef, body: string, max = NODE_
   ];
 }
 
-/** The wide (640) and narrow (340) neighbourhood, or null under three relations. */
+/** The wide (640) and narrow (NARROW_WIDTH) neighbourhood, or null under three relations. */
 export function patternNeighbourhood(def: PatternDef, body: string): { wide: ChartOutput; narrow: ChartOutput } | null {
   const base = {
     title: `Around ${def.title}`,
@@ -94,6 +94,6 @@ export function patternNeighbourhood(def: PatternDef, body: string): { wide: Cha
   };
   const wide = relationRadial({ ...base, id: 'pp-hood-w', families: neighbourhoodFamilies(def, body) });
   if (!wide) return null;
-  const narrow = relationRadial({ ...base, id: 'pp-hood-n', width: 340, families: neighbourhoodFamilies(def, body, LIST_LABEL_MAX) });
+  const narrow = relationRadial({ ...base, id: 'pp-hood-n', width: NARROW_WIDTH, families: neighbourhoodFamilies(def, body, LIST_LABEL_MAX) });
   return { wide, narrow: narrow! };
 }
