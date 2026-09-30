@@ -143,7 +143,7 @@ const fwShort = (id: string): string => frontierFrameworkById(id)?.short ?? id;
                 <a href={doc.url} rel="noopener">{doc.name}</a>
               </p>
               <p class="fs-doc-meta">
-                {doc.version} · effective <time datetime={doc.effective}>{proseDate(doc.effective)}</time>
+                {doc.version} · dated <time datetime={doc.effective}>{proseDate(doc.effective)}</time>
                 {doc.pdfUrl && (
                   <>
                     {' · '}

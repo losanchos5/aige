@@ -1251,7 +1251,7 @@ export const frontierRefs: readonly FrontierRef[] = [
     url: 'https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf#page=16',
     strength: 'core',
     verified: true,
-    note: 'Sets SAG responsibilities and membership, OpenAI Leadership (CEO or designee) as final decision maker, and oversight by the Board\'s Safety and Security Committee, which may reverse decisions.',
+    note: 'Sets SAG responsibilities and membership, OpenAI Leadership (CEO or designee) as final decision maker, and oversight by the Board\'s Safety and Security Committee, with the Board able to reverse a decision.',
     quote: 'Making all final decisions, including accepting any residual risks and making deployment go/no-go decisions, informed by SAG\'s recommendations.',
   },
   {
@@ -1808,12 +1808,12 @@ export const frontierRefs: readonly FrontierRef[] = [
   {
     topic: 'regulatory',
     framework: 'anthropic-rsp',
-    ref: '§1 fn. 1',
-    title: '1. Our Recommendations for Industry-Wide Safety',
+    ref: 'Intro fn. 1',
+    title: 'Introduction',
     url: 'https://www-cdn.anthropic.com/files/4zrzovbb/website/0bacdc8440ea96e62a8766d99ebe1d4eea6d5f3a.pdf#page=4',
     strength: 'core',
     verified: true,
-    note: 'Statutory definitions of catastrophic risk, such as those in California SB 53, are addressed in separate compliance frameworks.',
+    note: 'Statutory definitions of catastrophic risk, such as those in California SB 53, are addressed in separate compliance frameworks (footnote 1 to the Introduction, printed at the foot of p. 4).',
     quote: 'Where laws such as California SB 53 define this or similar terms with specific thresholds, we address those requirements in separate compliance frameworks.',
   },
   {
@@ -1834,7 +1834,7 @@ export const frontierRefs: readonly FrontierRef[] = [
     url: 'https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/strengthening-our-frontier-safety-framework/frontier-safety-framework_3-1.pdf#page=17',
     strength: 'related',
     verified: true,
-    note: 'The only link to public authorities is the aim to share information with government authorities when a CCL poses unmitigated material risk; the text does not mention SB 53, the EU AI Act or the GPAI Code of Practice.',
+    note: 'Apart from engaging governments where appropriate (§1.3.2), the link to public authorities is the aim to share information with government authorities when a CCL poses unmitigated material risk; the text names no law, and SB 53 appears only in footnote 1, as the address of Anthropic\'s compliance framework among other examples of frontier safety frameworks.',
     quote: 'If we assess that a model has reached a CCL that poses an unmitigated and material risk to overall public safety',
   },
   {
@@ -1867,7 +1867,7 @@ export const frontierLabFrameworks: readonly Framework[] = frontierDocs
     type: 'framework' as const,
     issuer: d.issuer,
     url: d.url,
-    summary: `${d.name}, ${d.version}, effective ${d.effective}. Voluntary; published by ${d.issuer}.`,
+    summary: `${d.name}, ${d.version}, dated ${d.effective}. Voluntary; published by ${d.issuer}.`,
   }));
 
 const LAB_IDS = new Set(frontierLabFrameworks.map((f) => f.id));
