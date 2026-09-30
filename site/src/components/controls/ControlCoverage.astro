@@ -1,0 +1,141 @@
+---
+/**
+ * ControlCoverage: where a profile is anchored in the frameworks and where it
+ * has gaps, at the head of #mappings on a profile page. A heat grid of
+ * control x framework: one column per register the mappings check against
+ * (obligations, ISO/IEC 42001 Annex A, NIST AI RMF, OWASP, MITRE ATLAS,
+ * AIUC-1, and "Other" for CSA AICM and every other mapping) with the number of ids the control maps to, drawn as an ink square
+ * whose area grows with the count and the count printed beside it (no
+ * category colour, VISUAL-GUIDE §4.3), and a last column for the IMDA Agentic
+ * AI cross-reference, whose fit is the drawing: solid direct, outlined
+ * partial. An empty row is a control with no verified mapping; a pale column
+ * a framework the profile barely touches. The foot counts, per column, the
+ * controls with at least one id and the ids in all.
+ *
+ * A real HTML table (it is the data), so it needs no second table: the
+ * mappings table under it keeps the ids themselves. Row headers link to the
+ * control's section (#aige-ctl-...), 28 px apart. Narrow, the headers stand
+ * vertical and a row shows only the control number; it fits a phone with no
+ * sideways scroll. HTML and CSS; the frame comes from chart.css.
+ */
+import '../../styles/chart.css';
+import '../../styles/control-visuals.css';
+import { controlsIn, CONTROLS_AS_OF, type ControlProfile } from '../../data/controls';
+import { COVERAGE_COLUMNS, coverageCount, imdaFit, tileHref } from '../../lib/page-visuals/control-visuals';
+
+interface Props {
+  profile: ControlProfile;
+}
+
+const { profile } = Astro.props;
+const rows = controlsIn(profile.slug);
+const counts = rows.map((c) => COVERAGE_COLUMNS.map((col) => coverageCount(c, col.key)));
+const max = Math.max(1, ...counts.flat());
+/** Side of the square: area proportional to the count, 6 to 18 px. */
+const side = (n: number) => Math.round((6 + 12 * Math.sqrt(n / max)) * 10) / 10;
+const fits = rows.map((c) => imdaFit(c));
+const foot = COVERAGE_COLUMNS.map((_, i) => ({
+  controls: counts.filter((r) => r[i] > 0).length,
+  ids: counts.reduce((s, r) => s + r[i], 0),
+}));
+const imdaFoot = { direct: fits.filter((f) => f === 'direct').length, partial: fits.filter((f) => f === 'partial').length };
+const empty = rows.filter((_, i) => counts[i].every((n) => n === 0) && !fits[i]).length;
+const fitWord = { direct: 'Direct fit', partial: 'Partial fit' } as const;
+
+const title = 'Framework coverage, control by control';
+const caption = `The number of ids each control maps to in each framework, and its IMDA Agentic AI fit. ${
+  empty === 0 ? 'Every control has at least one verified mapping' : `${empty} of ${rows.length} controls have no verified mapping yet`
+}; pale columns are frameworks the profile barely touches.`;
+---
+
+<figure class="chart-fig ccv" aria-labelledby="ccv-title" data-pagefind-ignore>
+  <div class="chart-canvas ccv-canvas">
+    <table class="ccv-table">
+      <caption class="visually-hidden">
+        {profile.title}: ids mapped per control and framework, and the IMDA Agentic AI fit
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col" class="ccv-corner">Control</th>
+          {
+            COVERAGE_COLUMNS.map((col) => (
+              <th scope="col" class="ccv-col">
+                <span class="ccv-h" title={col.label}>{col.short}</span>
+              </th>
+            ))
+          }
+          <th scope="col" class="ccv-col">
+            <span class="ccv-h">IMDA agentic</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((c, r) => (
+            <tr class:list={[counts[r].every((n) => n === 0) && !fits[r] && 'ccv-void']}>
+              <th scope="row" class="ccv-row">
+                <a href={tileHref(c)}>
+                  <span class="ccv-num">{c.id.slice(-3)}</span>
+                  <span class="ccv-title">{c.title}</span>
+                </a>
+              </th>
+              {counts[r].map((n) =>
+                n > 0 ? (
+                  <td class="ccv-cell ccv-n" style={`--sq:${side(n)}px`}>{n}</td>
+                ) : (
+                  <td class="ccv-cell ccv-zero"><span class="visually-hidden">0</span></td>
+                ),
+              )}
+              <td class:list={['ccv-cell', fits[r] ? `ccv-fit ccv-${fits[r]}` : 'ccv-zero']}>
+                <span class="visually-hidden">{fits[r] ? fitWord[fits[r]!] : 'None'}</span>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <th scope="row" class="ccv-row">
+            <span class="ccv-foot-k"><span class="ccv-long">Controls mapped</span><span class="ccv-short" aria-hidden="true">Mapped</span></span>
+          </th>
+          {
+            foot.map((f) => (
+              <td class="ccv-cell ccv-foot">
+                {f.controls}
+                <span class="ccv-of">/{rows.length}</span>
+              </td>
+            ))
+          }
+          <td class="ccv-cell ccv-foot">
+            {imdaFoot.direct + imdaFoot.partial}
+            <span class="ccv-of">/{rows.length}</span>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row" class="ccv-row">
+            <span class="ccv-foot-k"><span class="ccv-long">Ids in all</span><span class="ccv-short" aria-hidden="true">Ids</span></span>
+          </th>
+          {foot.map((f) => <td class="ccv-cell ccv-foot">{f.ids}</td>)}
+          <td class="ccv-cell ccv-foot ccv-foot-imda">
+            {imdaFoot.direct}D {imdaFoot.partial}P
+            <span class="visually-hidden">: {imdaFoot.direct} direct, {imdaFoot.partial} partial</span>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    <ul class="ccv-key" role="list">
+      <li>
+        <span class="ccv-sq" style={`--sq:${side(1)}px`} aria-hidden="true" />
+        <span class="ccv-sq" style={`--sq:${side(max)}px`} aria-hidden="true" />
+        Square area grows with the ids mapped (1 to {max}); the count is printed beside it
+      </li>
+      <li><span class="ccv-glyph ccv-direct" aria-hidden="true" /> IMDA direct fit (D)</li>
+      <li><span class="ccv-glyph ccv-partial" aria-hidden="true" /> IMDA partial fit (P)</li>
+    </ul>
+    <p class="ccv-stamp">Source: {profile.title} v{profile.version} mappings (data/controls) · As of {CONTROLS_AS_OF}</p>
+  </div>
+  <figcaption class="chart-caption">
+    <span class="chart-title" id="ccv-title">{title}</span>
+    <span class="chart-desc">{caption}</span>
+  </figcaption>
+</figure>

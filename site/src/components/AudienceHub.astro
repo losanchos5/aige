@@ -7,7 +7,9 @@
  * full treatment), the route through the site in reading order (tools appear
  * only once they are live in the toolkit registry), the "start this week"
  * actions, the obligations that matter most (status and date read from the
- * register), the sources, the other routes and a closing band.
+ * register, headed by the route's regulatory clock: what switches on and
+ * when, against the rows' review date), the sources, the other routes and a
+ * closing band.
  *
  * No script. Every tinted band goes through <Section tone="tint">, so --muted
  * stays AA there (DESIGN.md hard constraint 3). The question cards are flat
@@ -22,6 +24,7 @@ import CitedText from './CitedText.astro';
 import SourceList from './SourceList.astro';
 import Callout from './Callout.astro';
 import CtaBand from './CtaBand.astro';
+import RegulatoryClock from './RegulatoryClock.astro';
 import { audiences, audiencePath, type Audience } from '../data/audiences';
 import {
   resolveRoute,
@@ -190,6 +193,16 @@ const obligationName = (o: (typeof obligations)[number]) =>
     title="The obligations that matter most."
     lede={a.obligationsWhy}
   >
+    <div class="au-clock">
+      <RegulatoryClock
+        rows={obligations.map((o) => o.row)}
+        id="au-clock"
+        title="What switches on, and when"
+        caption="The obligations of this route on the date each first applies, drawn by status, and on its later dated steps (a square, filled once reached); the dashed line is the date the rows were last reviewed. Treat what comes before the line as work for now, and read what comes after it as the time left to prepare."
+        desc={`The obligations that matter most on the ${a.label} route, on the dates they first apply and on their later steps, against the register's review date.`}
+        tableCaption={`When the obligations on the ${a.label} route apply`}
+      />
+    </div>
     <div class="res-tablewrap">
       <table class="res-table au-table">
         <caption class="visually-hidden">
@@ -394,6 +407,14 @@ const obligationName = (o: (typeof obligations)[number]) =>
     font-size: var(--fs-label);
     color: var(--ink-2);
     overflow-wrap: anywhere;
+  }
+
+  .au-clock {
+    max-width: 760px;
+  }
+
+  .au-clock :global(.chart-fig) {
+    margin-top: 0;
   }
 
   .au-callout {

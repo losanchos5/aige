@@ -171,6 +171,25 @@ export const appliesStatusLabels: Readonly<Record<AppliesStatus, string>> = {
   pending: 'Draft or proposed',
 };
 
+/**
+ * How every visual draws a status (the application clock and the status
+ * isotype on /obligations, the strip on /obligations/<id>, the regulatory
+ * clock on pattern and audience pages): one shape and one drawing each, never
+ * a colour, and no two statuses alike. A date a row first applies is a circle,
+ * or a triangle when the row is in force but softened (grace period) or not
+ * final (draft or proposed); the square is kept for later dated steps.
+ */
+export const appliesStatusMark: Readonly<
+  Record<AppliesStatus, { shape: 'circle' | 'triangle'; state: 'filled' | 'outline' | 'dashed' | 'hatched' }>
+> = {
+  'in-force': { shape: 'circle', state: 'filled' },
+  grace: { shape: 'triangle', state: 'filled' },
+  'applies-later': { shape: 'circle', state: 'outline' },
+  deferred: { shape: 'circle', state: 'hatched' },
+  voluntary: { shape: 'circle', state: 'dashed' },
+  pending: { shape: 'triangle', state: 'dashed' },
+};
+
 /** Human labels for the EU AI Act system classes. */
 export const systemClassLabels: Readonly<Record<SystemClass, string>> = {
   prohibited: 'Prohibited practice',
@@ -4858,6 +4877,16 @@ export const obligations: readonly Obligation[] = [
     reviewed: REVIEWED_V050,
   },
 ] as const;
+
+/**
+ * The as-of date of a set of rows: the newest date one of them was checked
+ * against its sources. Every time visual marks "As of" this date (the whole
+ * register on /obligations, the rows drawn on a pattern or audience page),
+ * never the build clock, so a page moves only when the register does.
+ */
+export function registerAsOf(rows: readonly Pick<Obligation, 'reviewed'>[] = obligations): string {
+  return rows.reduce((max, row) => (row.reviewed > max ? row.reviewed : max), '');
+}
 
 /** The obligation with this stable id, if any (ids are case-insensitive in URLs). */
 export function obligationById(id: string): Obligation | undefined {

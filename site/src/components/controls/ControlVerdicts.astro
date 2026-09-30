@@ -1,0 +1,102 @@
+---
+/**
+ * ControlVerdicts: pass against fail, side by side, at the head of a control
+ * page's #examples. The two example observations of the control
+ * (controlExamples, public/controls/examples/) share what was expected; the
+ * figure states it once over both columns and sets what each check observed
+ * under its verdict stamp (VerdictStamp: PASS in the layer-5 colour, FAIL in
+ * the layer-3 colour), with the subject, the time and the evidence hashes as
+ * chips (the first 8 hex digits; the full hash is in the record below). The
+ * two record sections under it keep every field and the downloads.
+ *
+ * A pass matches the expectation, a fail departs from it: the column heads
+ * say so in words and with = / ≠, not by colour alone. Narrow, the columns
+ * stack, pass first. If the two examples ever expect different things, each
+ * column prints its own expectation. No script; HTML and CSS, the frame from
+ * chart.css. Illustrative records, not results of a real evaluation.
+ */
+import '../../styles/chart.css';
+import '../../styles/control-visuals.css';
+import VerdictStamp from '../VerdictStamp.astro';
+import { subjectKindLabels } from '../../data/controls';
+import type { ControlExample } from '../../lib/controls-md';
+
+interface Props {
+  examples: ControlExample[];
+}
+
+const { examples } = Astro.props;
+const records = examples.map((e) => e.record);
+const shared = records.length > 1 && records.every((r) => r.expected === records[0].expected) ? records[0].expected : null;
+const isPass = (status: string) => status === 'pass';
+const chip = (hash: string) => {
+  const [algo, hex] = hash.includes(':') ? hash.split(':', 2) : ['', hash];
+  return `${algo ? `${algo}:` : ''}${hex.slice(0, 8)}…`;
+};
+---
+
+{
+  records.length > 0 && (
+    <figure class="chart-fig cvx" aria-labelledby="cvx-title" data-pagefind-ignore>
+      <div class="chart-canvas cvx-canvas">
+        {shared && (
+          <div class="cvx-expected">
+            <p class="cvx-k">Expected, in both checks</p>
+            <p class="cvx-exp-text">{shared}</p>
+          </div>
+        )}
+        <div class="cvx-cols">
+          {records.map((r) => (
+            <section class:list={['cvx-col', isPass(r.status) ? 'cvx-pass' : 'cvx-fail']} aria-label={`${r.status} example`}>
+              <header class="cvx-head">
+                <VerdictStamp verdict={isPass(r.status) ? 'pass' : 'block'} label={r.status.toUpperCase()} class="cvx-stamp" />
+                <span class="cvx-rel">
+                  <span class="cvx-sym" aria-hidden="true">
+                    {isPass(r.status) ? '=' : '≠'}
+                  </span>
+                  {isPass(r.status) ? 'Matches what was expected' : 'Departs from what was expected'}
+                </span>
+              </header>
+              <p class="cvx-subject">
+                <code>{r.subject}</code>
+                <span class="cvx-kind">{subjectKindLabels[r.subject_kind] ?? r.subject_kind}</span>
+              </p>
+              {!shared && (
+                <>
+                  <p class="cvx-k">Expected</p>
+                  <p class="cvx-text">{r.expected}</p>
+                </>
+              )}
+              <p class="cvx-k">Observed</p>
+              <p class="cvx-obs">{r.observed}</p>
+              {(r.evidence ?? []).length > 0 && (
+                <>
+                  <p class="cvx-k">Evidence</p>
+                  <ul class="cvx-ev" role="list">
+                    {(r.evidence ?? []).map((ev) => (
+                      <li>
+                        <span class="cvx-art">{ev.artefact}</span>
+                        {ev.hash && <code class="cvx-hash">{chip(ev.hash)}</code>}
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              <p class="cvx-time">
+                <time datetime={r.timestamp}>{r.timestamp}</time>
+              </p>
+            </section>
+          ))}
+        </div>
+      </div>
+      <figcaption class="chart-caption">
+        <span class="chart-title" id="cvx-title">
+          Pass and fail, side by side
+        </span>
+        <span class="chart-desc">
+          The same check, run twice: what a conforming observation shows and what a failing one looks like. Each record is in full, with its JSON, below.
+        </span>
+      </figcaption>
+    </figure>
+  )
+}

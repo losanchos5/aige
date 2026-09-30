@@ -1,0 +1,135 @@
+---
+/**
+ * ObligationConstellation: everything one register row connects to, as an ego
+ * network (the chart kit's relationRadial) on /obligations/<id>: the clause at
+ * the centre; the patterns that build it and the open controls that evidence
+ * it, both in the colour of their stack layer; the cases that cite the same EU
+ * AI Act article; and the other frameworks that file a clause under the same
+ * crosswalk topic. Solid edge and filled node: a direct relation (the row names
+ * the pattern, the control maps to the row, the framework's clause is core to
+ * the topic); dashed and outlined: a looser one (the case only cites the same
+ * article, the framework's clauses only touch the topic). Every relation comes
+ * from the joins the page already lists (lib/obligations.ts,
+ * lib/cross-links.ts), so the lists under the figure stay its long form.
+ * Under three relations the kit returns null and nothing is drawn. Generated
+ * per page, not registered in figures.ts; 'figc' mode (the page loads
+ * figures.css). Wide, the radial layout at 960 units (the longest pattern name
+ * needs a 306 px label column); narrow, the list layout.
+ */
+import Chart from '../Chart.astro';
+import { relationRadial, radialLabelWidth, type RelationFamily, type Tone } from '../../lib/charts';
+import { fitsCentre, shortenToFit } from '../../lib/page-visuals/labels';
+import { patternPath, type PatternDef } from '../../data/patterns';
+import { controlHref, type Control } from '../../data/controls';
+import type { IncidentCase } from '../../data/cases';
+import type { Obligation } from '../../data/frameworks';
+import type { CrosswalkTopic } from '../../lib/obligations';
+import { instrumentClause } from '../../lib/obligation-title';
+import { frameworkOf } from '../../lib/obligations';
+
+interface Props {
+  row: Obligation;
+  patterns: PatternDef[];
+  controls: Control[];
+  cases: IncidentCase[];
+  topics: CrosswalkTopic[];
+}
+
+const { row, patterns, controls, cases, topics } = Astro.props;
+
+/** Node labels share one budget, the narrow layout's label column (at 13 px),
+ *  so both variants print the same words; a longer name is shortened by the
+ *  shared shortener (the full name and the control id stay in the node's
+ *  title and the table). */
+const LABEL_PX = radialLabelWidth(340, 'list', '') - 1;
+const short = (label: string) => shortenToFit(label, LABEL_PX, 13);
+
+// The other frameworks under the row's topics: one node each, core when any
+// of its clauses is core to a shared topic; the link goes to the first topic
+// section on this page that lists it.
+const byFramework = new Map<string, { clauses: string[]; core: boolean; topic: string }>();
+for (const t of topics) {
+  for (const sib of t.siblings) {
+    const entry = byFramework.get(sib.frameworkName) ?? { clauses: [], core: false, topic: t.topic.id };
+    if (!entry.clauses.includes(sib.label)) entry.clauses.push(sib.label);
+    entry.core ||= sib.ref.strength === 'core';
+    byFramework.set(sib.frameworkName, entry);
+  }
+}
+
+const families: RelationFamily[] = [
+  {
+    label: 'Patterns',
+    layered: true,
+    items: patterns.map((p) => ({
+      label: short(p.title),
+      name: p.title,
+      href: patternPath(p),
+      tone: p.layer as Tone,
+    })),
+  },
+  {
+    label: 'Open controls',
+    layered: true,
+    items: controls.map((c) => ({
+      label: short(c.title),
+      name: `${c.id} ${c.title}`,
+      href: controlHref(c.id),
+      tone: c.layer as Tone,
+    })),
+  },
+  {
+    label: 'Cases',
+    relationLabels: { core: 'Core', related: 'Cites the article' },
+    items: cases.map((c) => ({ label: c.short, name: c.title, href: `/cases/${c.id}`, strength: 'related' as const })),
+  },
+  {
+    label: 'Same crosswalk topic',
+    relationLabels: { core: 'Core clause', related: 'Related clause' },
+    items: [...byFramework.entries()].map(([framework, e]) => ({
+      label: framework,
+      name: `${framework} ${e.clauses.join(', ')}`,
+      href: `#topic-${e.topic}`,
+      strength: e.core ? ('core' as const) : ('related' as const),
+    })),
+  },
+];
+const count = families.reduce((sum, f) => sum + f.items.length, 0);
+// The centre box of the wide layout is at least 132 wide (116 px of text) and
+// holds three lines: the instrument and clause, else the clause alone, else
+// the instrument's short name.
+const centre = [instrumentClause(row), row.clause, frameworkOf(row).short].find(fitsCentre) ?? row.id;
+const base = {
+  title: 'What this obligation connects to',
+  desc: `${centre} and its ${count} relations: ${families
+    .filter((f) => f.items.length)
+    .map((f) => `${f.items.length} ${f.label.toLowerCase()}`)
+    .join(', ')}.`,
+  centre: { label: centre },
+  families,
+  relationLabels: { core: 'Direct', related: 'Looser' },
+  maxPerFamily: 6,
+  tableCaption: `Relations of ${row.id}`,
+};
+const wide = relationRadial({ ...base, id: 'obn-w', width: 960 });
+const narrow = relationRadial({ ...base, id: 'obn-n', width: 340 });
+---
+
+{
+  wide && narrow && (
+    <Chart
+      class="obn"
+      chart={wide}
+      narrow={narrow}
+      title="What this obligation connects to"
+      caption="Solid edges are direct relations, dashed ones looser (a case that cites the same article, a framework whose clauses only touch the topic); patterns and controls take the colour of their stack layer. Select a node to open it; the lists below give every relation in full."
+      tableLabel="Data table: every relation"
+    />
+  )
+}
+
+<style>
+  :global(.obn) {
+    margin: var(--s-4) 0 var(--s-7);
+  }
+</style>

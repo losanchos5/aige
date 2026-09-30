@@ -72,6 +72,35 @@
 //     Ascending steps; 'vertical' is the narrow variant.
 //     A step key wraps its marks in <g data-step> for a page script to light.
 //
+//   relationRadial({ centre: { label }, families: [{ label, layered?, relationLabels?,
+//                    items: [{ label, name?, href?, strength?: 'core' | 'related', tone? }] }],
+//                    relationLabels?, maxPerFamily?, layout?: 'radial' | 'list' }): ChartOutput | null
+//     Ego network for per-item pages: the item at the centre, up to six
+//     families as sectors, solid edge + filled node = core, dashed + outlined =
+//     related; layer tone only in a layered family. Returns null under three
+//     relations (RADIAL_MIN_RELATIONS): skip the figure, keep the lists.
+//     'list' (default under 480 wide) is the narrow variant. Table: Family |
+//     Item | Relation, every relation (a family draws at most 6, then "+N more").
+//     radialLabelWidth(width, layout, centre) is the room a node label gets,
+//     for callers that shorten their labels to fit.
+//
+//   bowTie({ preventive, event, detective?, responsive?, harms, evidence, kickers?,
+//            orientation?: 'row' | 'column', maxItems? })
+//   controlChain({ failureModes, enforcement: ('pre_merge'|'deploy'|'runtime'|'periodic')[],
+//                  stageLabels?, verification, decision: { label, state? }, evidence, kickers?,
+//                  orientation?, maxItems? })
+//     Chains on the evidence-chain engine: one panel per stage, 'row' (900
+//     wide) or 'column' (340, narrow); items are { label, name?, href?, detail? }
+//     and evidence items add layer (1-5). The terminal panel is always the
+//     evidence (document-with-check glyph in the layer colour); the one
+//     diamond is the gate: the bow-tie's event, the control's decision (its
+//     state from the caller: hatched for "to be specified", decided by
+//     isResponseToSpecify). Table: Step | Item | Detail.
+//
+//   glyph(kind, x, y, { tone? }): the §1.7 glyph vocabulary in a 24 px box
+//     (building, person, calendar, package, layers, evidence, card, gate,
+//     warning, pipeline, magnifier), shared with lib/evidence-chain.ts.
+//
 // Helpers for new primitives: linearScale, timeScale, textWidth, fitText,
 // wrapText, open, close, assemble, markStyles, shape, targets, words.
 export type {
@@ -138,3 +167,17 @@ export {
 export { lanes, type LaneMark, type LanesInput } from './lanes';
 export { venn3, type Venn3Input, type VennSet } from './venn';
 export { ladder, type LadderInput, type LadderStep } from './ladder';
+export { relationRadial, radialLabelWidth, RADIAL_MIN_RELATIONS, type RelationFamily, type RelationItem, type RelationRadialInput, type RelationStrength } from './radial';
+export {
+  bowTie,
+  controlChain,
+  type BowTieInput,
+  type BowTieStage,
+  type ControlChainInput,
+  type ControlChainStage,
+  type EvidenceItem,
+  type FlowBase,
+  type FlowItem,
+  type PipelineStage,
+} from './flow';
+export { glyph, type GlyphKind, type GlyphOptions } from './glyphs';

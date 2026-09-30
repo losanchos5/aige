@@ -1,0 +1,45 @@
+---
+/**
+ * TermNeighbourhood: the ego network at the head of "Related terms" on
+ * /glossary/<slug> (OpenSpec page-visuals, wave 2): the term at the centre,
+ * related terms on solid edges, the terms it is contrasted with on dashed
+ * ones, and the patterns that use it most in their layer colour, each node a
+ * link. Generated per term (lib/page-visuals/term-visuals.ts), not registered
+ * in data/figures.ts; under three relations it renders nothing and the page
+ * keeps its lists. The wide layout needs more than the reading column, so
+ * once the page container is at full width the figure leaves the column;
+ * below that the narrow list shows. 'figc' mode: the page loads figures.css.
+ */
+import Chart from './Chart.astro';
+import type { TermVisual } from '../lib/page-visuals/term-visuals';
+
+interface Props {
+  chart: TermVisual;
+}
+
+const { chart } = Astro.props;
+---
+
+<div class="gt-neighbourhood">
+  <Chart
+    chart={chart.wide}
+    narrow={chart.narrow}
+    title="The term's neighbourhood"
+    caption="Terms related to this one on solid edges, terms it is often confused with on dashed edges, and the patterns that use it most in the colour of their layer. Follow a dashed edge to check the distinction before you use either term."
+    tableLabel="Neighbourhood as a table"
+  />
+</div>
+
+<style>
+  .gt-neighbourhood :global(.chart-fig) {
+    margin: var(--s-4) 0 var(--s-5);
+  }
+
+  /* The container is at its full width (var(--container)) from here: the
+     figure leaves the 72ch column so the two label columns show at 1:1. */
+  @media (min-width: 1240px) {
+    .gt-neighbourhood {
+      width: min(1000px, calc(var(--container) - 2 * var(--s-4)));
+    }
+  }
+</style>

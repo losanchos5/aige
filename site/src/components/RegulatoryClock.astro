@@ -1,0 +1,34 @@
+---
+/**
+ * RegulatoryClock: when a set of register rows starts to apply, as a wide
+ * staircase (560) and a narrow agenda (340) in one Chart, drawn by
+ * lib/page-visuals/register-clock-rows.ts from the rows' own dates, statuses and
+ * steps, against the newest review date among them (never the build clock).
+ * Renders nothing when no row has a date. Per-item template (pattern and
+ * audience pages): not registered in figures.ts. The page must load
+ * figures.css (reading.css), as the SVGs are in 'figc' mode.
+ */
+import Chart from './Chart.astro';
+import { obligationClock } from '../lib/page-visuals/register-clock-rows';
+import type { Obligation } from '../data/frameworks';
+import '../styles/time-charts.css';
+
+interface Props {
+  rows: readonly Obligation[];
+  /** Prefix of the two SVG ids, unique on the page. */
+  id: string;
+  /** Figcaption title (at most six words); also the SVG title. */
+  title: string;
+  /** Two sentences: what it shows, what the reader does with it. */
+  caption: string;
+  /** One sentence for the SVG <desc>. */
+  desc: string;
+  tableCaption: string;
+  class?: string;
+}
+
+const { rows, id, title, caption, desc, tableCaption, class: className } = Astro.props;
+const clock = obligationClock(rows, { id, title, desc, tableCaption });
+---
+
+{clock && <Chart chart={clock.wide} narrow={clock.narrow} title={title} caption={caption} class={className} />}

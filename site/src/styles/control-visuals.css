@@ -1,0 +1,1097 @@
+/* control-visuals.css: the wave-2 control visuals (OpenSpec page-visuals,
+   block controls), one sheet for the components under
+   src/components/controls/: ControlLanes (/controls), ControlPeriodicTable
+   and ControlCoverage (/controls/<profile>), ControlVerdicts (a control's
+   page). A plain stylesheet rather than scoped <style> blocks: Astro scoping
+   stamps an attribute on every element, and these figures repeat hundreds of
+   small elements on pages that are built many times. Every rule sits under its
+   figure's root class (.clx, .cpt, .ccv, .cvx), which also keeps it above the
+   reading layout's .prose rules. The marks are in control-marks.css. Colours
+   only from tokens.css; no text dimmed with opacity; motion is transform only,
+   on screen, never on reduced motion, and print keeps the final state. */
+
+/* ---- Where the controls act (ControlLanes, /controls) ---- */
+
+.clx {
+  --cvm: 14px;
+}
+
+.clx .clx-canvas {
+  padding: var(--s-5);
+}
+
+@container (max-width: 479px) {
+  .clx .clx-canvas {
+    padding: var(--s-3);
+  }
+}
+
+.clx .clx-stages,
+.clx .clx-rows,
+.clx .clx-cells,
+.clx .clx-key {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Narrow: the four lanes as a 2 x 2 headline, then one card per profile
+   with its four lanes as rows. */
+.clx .clx-stages {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+
+.clx .clx-stage {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: 2px var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  border-top: 2px solid var(--ink);
+  background: var(--surface);
+}
+
+.clx .clx-stage-name {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.clx .clx-stage-key {
+  grid-row: 2;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+}
+
+.clx .clx-stage-n {
+  grid-row: span 2;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.75rem, 1.3rem + 1.8vw, 2.75rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.clx .clx-mix {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-3);
+  margin-top: var(--s-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--ink);
+  --cvm: 11px;
+}
+
+.clx .clx-mix-i {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.clx .clx-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.clx .clx-name {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-2);
+  font-weight: 600;
+}
+
+.clx .clx-name a {
+  color: var(--ink);
+}
+
+.clx .clx-name-n,
+.clx .clx-count,
+.clx .clx-key-n {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.clx .clx-cells {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
+}
+
+.clx .clx-cell {
+  display: grid;
+  grid-template-columns: 6.5rem 2rem minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 28px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.clx .clx-k {
+  font-size: var(--fs-small);
+  color: var(--ink);
+}
+
+.clx .clx-count {
+  font-size: var(--fs-small);
+  text-align: right;
+}
+
+.clx .clx-marks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding-block: 2px;
+}
+
+/* Wide: a pipeline of chevrons over four lanes, the profiles as rows. */
+@container (min-width: 760px) {
+  .clx .clx-grid {
+    display: grid;
+    grid-template-columns: minmax(8rem, 11rem) repeat(4, minmax(0, 1fr));
+    column-gap: 0;
+  }
+
+  .clx .clx-stages {
+    grid-column: 2 / -1;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0;
+    margin-bottom: 0;
+  }
+
+  /* The chevron: each stage head points into the next. */
+  .clx .clx-stage {
+    padding: var(--s-3) calc(var(--s-3) + 16px) var(--s-3) calc(var(--s-3) + 12px);
+    border-top: 0;
+    background: var(--surface);
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%, 14px 50%);
+  }
+
+  .clx .clx-stage:first-child {
+    clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%);
+    padding-left: var(--s-3);
+  }
+
+  .clx .clx-stage + .clx-stage {
+    margin-left: -8px;
+  }
+
+  .clx .clx-rows {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    gap: 0;
+    margin-top: var(--s-3);
+  }
+
+  .clx .clx-row {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    border-top: 1px solid var(--line);
+  }
+
+  .clx .clx-row:last-child {
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .clx .clx-name {
+    flex-direction: column;
+    gap: 0;
+    margin: 0;
+    padding: var(--s-3) var(--s-3) var(--s-3) 0;
+    line-height: 1.3;
+  }
+
+  .clx .clx-cells {
+    grid-column: 2 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    border-top: 0;
+  }
+
+  .clx .clx-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--s-1);
+    min-height: 0;
+    padding: var(--s-3);
+    border-bottom: 0;
+    border-left: 1px dashed var(--line);
+  }
+
+  /* The lane's name is in the pipeline head: here only for assistive tech. */
+  .clx .clx-k {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .clx .clx-cell {
+    position: relative;
+  }
+
+  .clx .clx-count {
+    text-align: left;
+    font-size: var(--fs-label);
+  }
+
+  .clx .clx-empty .clx-count {
+    color: var(--ink-2);
+  }
+}
+
+@container (min-width: 1000px) {
+  .clx {
+    --cvm: 16px;
+  }
+
+  .clx .clx-marks {
+    gap: 5px;
+  }
+}
+
+.clx .clx-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  margin-top: var(--s-5);
+  font-size: var(--fs-small);
+  color: var(--ink);
+}
+
+.clx .clx-key li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.clx .clx-key-note {
+  color: var(--ink-2);
+}
+
+.clx .clx-stamp {
+  margin: var(--s-4) 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* Motion: on screen only and never on reduced motion, the marks of a lane
+   slide in along the pipeline as the chart scrolls into view (transform
+   only). Print has no scroll timeline and keeps the final state. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    @container (min-width: 760px) {
+      .clx .clx-marks {
+        animation: clx-in linear both;
+        animation-timeline: view();
+        animation-range: entry 5% cover 35%;
+      }
+    }
+  }
+}
+
+@keyframes clx-in {
+  from {
+    transform: translateX(-24px);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@media print {
+  .clx .clx-marks {
+    animation: none;
+    transform: none;
+  }
+
+  .clx .clx-stage {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Forced colours: the chevrons lose their fill; a system border keeps each
+   stage head a box. */
+@media (forced-colors: active) {
+  .clx .clx-stage {
+    clip-path: none;
+    border: 1px solid CanvasText;
+  }
+
+  .clx .clx-stage + .clx-stage {
+    margin-left: 0;
+  }
+}
+
+/* ---- Periodic table of a profile (ControlPeriodicTable) ---- */
+
+/* At the top level of the prose, the figure takes the whole reading well
+   (the chapter-figure breakout, in cq units of Doc's .doc-main). */
+.doc-main .prose > .cpt {
+  width: 100cqw;
+  margin-inline: calc(50% - 50cqw);
+}
+
+.cpt .cpt-canvas {
+  padding: var(--s-5);
+}
+
+.cpt .cpt-grid,
+.cpt .cpt-key {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cpt .cpt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr));
+  gap: var(--s-2);
+}
+
+.cpt .cpt-grid > li,
+.cpt .cpt-key > li {
+  margin: 0;
+}
+
+/* The tile: --k / --p are the layer's ink and pastel (control-marks.css). */
+.cpt .cpt-tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  height: 100%;
+  min-height: 8rem;
+  box-sizing: border-box;
+  padding: 0 var(--s-2) var(--s-2);
+  border: 1.5px solid var(--ink-2);
+  border-top: 0;
+  border-radius: var(--r-sm);
+  background:
+    linear-gradient(color-mix(in srgb, var(--k) 60%, var(--p)), color-mix(in srgb, var(--k) 60%, var(--p))) top / 100% 7px no-repeat,
+    color-mix(in srgb, var(--p) 45%, var(--surface));
+  color: var(--ink);
+  text-decoration: none;
+  overflow: hidden;
+}
+
+
+
+.cpt .cpt-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-top: calc(7px + var(--s-2));
+}
+
+.cpt .cpt-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.75rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.cpt .cpt-layer {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--k);
+  font-weight: 600;
+}
+
+.cpt .cpt-title {
+  flex: 1;
+  font-size: var(--fs-small);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
+.cpt .cpt-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  --cvm: 14px;
+}
+
+.cpt .cpt-pips {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.cpt .cpt-pip {
+  box-sizing: border-box;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid var(--ink-2);
+  border-radius: 1.5px;
+}
+
+.cpt .cpt-on {
+  border-color: var(--ink);
+  background: var(--ink);
+}
+
+.cpt .cpt-tile:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.cpt .cpt-tile:hover .cpt-title {
+  text-decoration: underline;
+}
+
+/* A phone: three tiles a row, no sideways scroll. */
+@container (max-width: 479px) {
+  .cpt .cpt-canvas {
+    padding: var(--s-2);
+  }
+
+  .cpt .cpt-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .cpt .cpt-tile {
+    min-height: 7rem;
+    padding: 0 6px 6px;
+  }
+
+  .cpt .cpt-num {
+    font-size: 1.35rem;
+  }
+
+  .cpt .cpt-title {
+    font-size: var(--fs-label);
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+  }
+
+  .cpt .cpt-pip {
+    width: 8px;
+    height: 8px;
+  }
+
+  .cpt .cpt-foot {
+    --cvm: 12px;
+  }
+}
+
+.cpt .cpt-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3) var(--s-6);
+  margin-top: var(--s-5);
+  font-size: var(--fs-small);
+  color: var(--ink);
+}
+
+.cpt .cpt-key-pips {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0;
+}
+
+.cpt .cpt-key {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.cpt .cpt-key li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.cpt .cpt-key-n {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+
+.cpt .cpt-swatch {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--ink-2);
+  border-radius: 2px;
+}
+
+.cpt .cpt-derived {
+  border-style: dashed;
+}
+
+.cpt .cpt-stub {
+  border-style: dotted;
+}
+
+.cpt .cpt-bar-key {
+  width: 16px;
+  height: 6px;
+  background: color-mix(in srgb, var(--k) 60%, var(--p));
+}
+
+.cpt .cpt-stamp {
+  margin: var(--s-4) 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* Motion: transform only, on screen, never on reduced motion. */
+@media screen and (prefers-reduced-motion: no-preference) {
+  .cpt .cpt-tile {
+    transition: transform var(--dur, 160ms) var(--ease, ease-out);
+  }
+
+  .cpt .cpt-tile:hover,
+  .cpt .cpt-tile:focus-visible {
+    transform: translateY(-3px);
+  }
+}
+
+@media print {
+  .cpt .cpt-tile,
+  .cpt .cpt-pip,
+  .cpt .cpt-derived {
+  border-style: dashed;
+}
+
+.cpt .cpt-stub {
+  border-style: dotted;
+}
+
+.cpt .cpt-bar-key {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Forced colours: the layer bar and the lit pips are backgrounds; redraw
+   them in system colours so "lit" and the depth border survive. */
+@media (forced-colors: active) {
+  .cpt .cpt-tile {
+    border-top: 6px solid CanvasText;
+  }
+
+  .cpt .cpt-pip,
+  .cpt .cpt-on {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  .cpt .cpt-on {
+    background: CanvasText;
+  }
+
+  .cpt .cpt-tile:focus-visible {
+    outline-color: Highlight;
+  }
+}
+
+/* ---- Framework coverage (ControlCoverage) ---- */
+
+.doc-main .prose > .ccv {
+  width: 100cqw;
+  margin-inline: calc(50% - 50cqw);
+}
+
+.ccv .ccv-canvas {
+  padding: var(--s-5);
+}
+
+.ccv .ccv-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: var(--fs-small);
+  margin: 0;
+}
+
+/* Undo the prose table look: this grid draws its own rules. */
+.ccv .ccv-table :where(th, td) {
+  position: static;
+  border: 0;
+  padding: 0;
+  background: none;
+  vertical-align: middle;
+}
+
+.ccv .ccv-table .ccv-corner {
+  width: 45%;
+  text-align: left;
+  vertical-align: bottom;
+  padding: 0 var(--s-2) var(--s-2) 0;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.ccv .ccv-table .ccv-col {
+  vertical-align: bottom;
+  text-align: left;
+  padding: 0 var(--s-1) var(--s-2);
+  font-weight: 600;
+  color: var(--ink);
+  border-bottom: 2px solid var(--ink);
+}
+
+.ccv .ccv-table .ccv-corner {
+  border-bottom: 2px solid var(--ink);
+}
+
+.ccv .ccv-h {
+  display: block;
+  font-size: var(--fs-label);
+  line-height: 1.2;
+}
+
+.ccv .ccv-table .ccv-row {
+  text-align: left;
+  font-weight: 400;
+  padding-right: var(--s-2);
+}
+
+.ccv .ccv-row a {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 28px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.ccv .ccv-row a:hover .ccv-title,
+.ccv .ccv-row a:focus-visible .ccv-title {
+  text-decoration: underline;
+}
+
+.ccv .ccv-num {
+  flex: none;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ccv .ccv-title {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ccv .ccv-table tbody tr:nth-child(n) {
+  border-top: 1px solid var(--line);
+  background: none;
+}
+
+.ccv .ccv-table tbody tr:nth-child(odd) {
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+}
+
+/* A control with no verified mapping: its row is hatched, the gap made
+   visible (the hatch is behind the row header only, never behind text). */
+.ccv .ccv-void .ccv-row {
+  background: repeating-linear-gradient(-45deg, var(--line) 0 1px, transparent 1px 6px);
+}
+
+.ccv .ccv-table .ccv-cell {
+  height: 28px;
+  padding: 0 var(--s-1);
+  border-left: 1px dashed var(--line);
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* The marks are drawn before the cell's text: a count is an ink square of
+   side --sq (area grows with the count) then the number; an empty cell a
+   small dot (its "0" is for assistive tech); the IMDA fit a square, solid
+   direct, hollow partial. */
+.ccv .ccv-n::before,
+.ccv .ccv-sq {
+  content: '';
+  display: inline-block;
+  width: var(--sq);
+  height: var(--sq);
+  margin-right: 4px;
+  vertical-align: middle;
+  background: var(--ink);
+  border-radius: 1.5px;
+}
+
+.ccv .ccv-zero::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  vertical-align: middle;
+  border-radius: 50%;
+  background: var(--ink-2);
+}
+
+.ccv .ccv-fit::before,
+.ccv .ccv-glyph {
+  content: '';
+  display: inline-block;
+  box-sizing: border-box;
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  border: 2px solid var(--ink);
+  border-radius: 2px;
+}
+
+.ccv .ccv-direct::before,
+.ccv .ccv-glyph.ccv-direct {
+  background: var(--ink);
+}
+
+.ccv .ccv-partial::before,
+.ccv .ccv-glyph.ccv-partial {
+  background: var(--bg);
+}
+
+.ccv .ccv-table tfoot tr:first-child :is(th, td) {
+  border-top: 2px solid var(--ink);
+}
+
+.ccv .ccv-foot {
+  font-weight: 600;
+}
+
+.ccv .ccv-foot-k {
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.ccv .ccv-of {
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.ccv .ccv-short {
+  display: none;
+}
+
+/* Narrow: the headers stand vertical and a row shows only its number. */
+@container (max-width: 599px) {
+  .ccv .ccv-canvas {
+    padding: var(--s-3) var(--s-2);
+  }
+
+  .ccv .ccv-table .ccv-corner {
+    width: 4rem;
+  }
+
+  /* Hidden to the eye only: the title stays the row link's accessible name. */
+  .ccv .ccv-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ccv .ccv-h {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    max-height: 7rem;
+  }
+
+  .ccv .ccv-table .ccv-cell {
+    font-size: var(--fs-label);
+  }
+
+  .ccv .ccv-n::before {
+    margin-right: 2px;
+  }
+
+  /* The foot names shrink to one word; the full name stays for assistive tech. */
+  .ccv .ccv-long {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .ccv .ccv-short {
+    display: inline;
+  }
+
+  .ccv .ccv-table .ccv-foot-imda {
+    white-space: normal;
+    line-height: 1.2;
+  }
+
+  .ccv .ccv-of {
+    display: none;
+  }
+}
+
+.ccv .ccv-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  margin: var(--s-5) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-small);
+  color: var(--ink);
+}
+
+.ccv .ccv-key li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin: 0;
+}
+
+.ccv .ccv-key .ccv-sq {
+  margin-right: 0;
+}
+
+.ccv .ccv-stamp {
+  margin: var(--s-4) 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+@media print {
+  .ccv .ccv-cell::before,
+  .ccv .ccv-sq,
+  .ccv .ccv-glyph {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Forced colours: the squares are backgrounds; keep them solid and the
+   partial fit hollow in system colours. */
+@media (forced-colors: active) {
+  .ccv .ccv-cell::before,
+  .ccv .ccv-sq,
+  .ccv .ccv-glyph {
+    forced-color-adjust: none;
+    background: CanvasText;
+    border-color: CanvasText;
+  }
+
+  .ccv .ccv-partial::before,
+  .ccv .ccv-glyph.ccv-partial {
+    background: Canvas;
+  }
+}
+
+/* ---- Pass and fail side by side (ControlVerdicts) ---- */
+
+.doc-main .prose > .cvx {
+  width: 100cqw;
+  margin-inline: calc(50% - 50cqw);
+}
+
+.cvx .cvx-canvas {
+  padding: var(--s-5);
+}
+
+.cvx .cvx-canvas :where(p) {
+  margin: 0;
+}
+
+.cvx .cvx-k {
+  margin-top: var(--s-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.cvx .cvx-expected {
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.cvx .cvx-expected .cvx-k {
+  margin-top: 0;
+}
+
+.cvx .cvx-exp-text {
+  margin-top: var(--s-1);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.cvx .cvx-cols {
+  display: grid;
+  gap: var(--s-4);
+  margin-top: var(--s-4);
+}
+
+@container (min-width: 640px) {
+  .cvx .cvx-cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* --v: the verdict's ink (VerdictStamp's colours). */
+.cvx .cvx-pass {
+  --v: var(--l5-ink);
+}
+
+.cvx .cvx-fail {
+  --v: var(--l3-ink);
+}
+
+.cvx .cvx-col {
+  display: flex;
+  flex-direction: column;
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--v);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+}
+
+.cvx .cvx-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+}
+
+.cvx .cvx-head .cvx-stamp {
+  padding: 0.45em 0.75em;
+  border-width: 2px;
+  transform: rotate(-3deg);
+  font-size: var(--fs-small);
+}
+
+.cvx .cvx-rel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cvx .cvx-sym {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--v);
+}
+
+.cvx .cvx-subject {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--s-1) var(--s-2);
+  margin-top: var(--s-3);
+}
+
+.cvx .cvx-subject code {
+  overflow-wrap: anywhere;
+}
+
+.cvx .cvx-kind {
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.cvx .cvx-obs,
+.cvx .cvx-text {
+  margin-top: var(--s-1);
+  color: var(--ink);
+  line-height: 1.5;
+}
+
+.cvx .cvx-obs {
+  padding-left: var(--s-3);
+  border-left: 3px solid var(--v);
+}
+
+.cvx .cvx-ev {
+  margin: var(--s-1) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  font-size: var(--fs-small);
+  color: var(--ink);
+}
+
+.cvx .cvx-ev li {
+  margin: 0;
+}
+
+.cvx .cvx-art {
+  margin-right: var(--s-2);
+}
+
+.cvx .cvx-hash {
+  display: inline-block;
+  padding: 1px 6px;
+  border: 1px solid var(--v);
+  border-radius: var(--r-sm);
+  font-size: var(--fs-label);
+  color: var(--ink);
+  background: none;
+  white-space: nowrap;
+}
+
+.cvx .cvx-time {
+  margin-top: auto;
+  padding-top: var(--s-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+}
+
+@media print {
+  .cvx .cvx-col {
+    break-inside: avoid;
+  }
+}
+
+@media (forced-colors: active) {
+  .cvx .cvx-col {
+    border-top-color: CanvasText;
+  }
+}

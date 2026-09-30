@@ -301,3 +301,65 @@
 .chart .venn { fill: var(--ink); fill-opacity: 0.05; stroke: var(--ink); stroke-width: 1.5; }
 .chart .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: normal; text-transform: none; }
 .chart .mk-focus:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Chain and radial primitives (flow.ts, radial.ts, glyphs.ts): the glyph
+   vocabulary of VISUAL-GUIDE §1.7, the layer fills and strokes of the
+   evidence glyph, the terminal (evidence) panel and the relation edges. The
+   layer rules follow the glyph rules so a layered glyph takes the layer. */
+.chart .glyph {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart .glyph-check {
+  fill: none;
+  stroke: var(--l5-ink);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart .l1-bg { fill: var(--l1); }
+.chart .l2-bg { fill: var(--l2); }
+.chart .l3-bg { fill: var(--l3); }
+.chart .l4-bg { fill: var(--l4); }
+.chart .l5-bg { fill: var(--l5); }
+
+.chart .l1-st { stroke: var(--l1-ink); }
+.chart .l2-st { stroke: var(--l2-ink); }
+.chart .l3-st { stroke: var(--l3-ink); }
+.chart .l4-st { stroke: var(--l4-ink); }
+.chart .l5-st { stroke: var(--l5-ink); }
+
+.chart .panel-end {
+  fill: color-mix(in srgb, var(--ink) 3%, var(--bg));
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.chart .edge { stroke: var(--ink-2); stroke-width: 1.25; fill: none; }
+.chart .edge-dash { stroke-dasharray: 4 3; }
+
+/* Forced colours: redraw the chain and radial primitives in system colours,
+   keeping the encoding (solid, outlined, dashed, hatched) by shape. */
+@media (forced-colors: active) {
+  .chart:is(.ch-flow, .ch-radial) {
+    forced-color-adjust: none;
+  }
+
+  .chart:is(.ch-flow, .ch-radial) text { fill: CanvasText; }
+  .chart:is(.ch-flow, .ch-radial) a text { fill: LinkText; }
+  .chart:is(.ch-flow, .ch-radial) .on-ink { fill: Canvas; }
+  .chart:is(.ch-flow, .ch-radial) :is(.panel, .panel-end) { fill: Canvas; stroke: CanvasText; }
+  .chart:is(.ch-flow, .ch-radial) :is(.glyph, .glyph-check, .edge, .rule, .stroke-arrow, .l1-st, .l2-st, .l3-st, .l4-st, .l5-st) { stroke: CanvasText; }
+  .chart:is(.ch-flow, .ch-radial) :is(.l1-bg, .l2-bg, .l3-bg, .l4-bg, .l5-bg, .hatch-bg) { fill: Canvas; }
+  .chart:is(.ch-flow, .ch-radial) .arrow { fill: CanvasText; }
+  .chart:is(.ch-flow, .ch-radial) :is([class*="mk-fill-"], .mk-hi) { fill: CanvasText; stroke: CanvasText; }
+  .chart:is(.ch-flow, .ch-radial) :is([class*="mk-line-"], [class*="mk-dash-"]) { fill: Canvas; stroke: CanvasText; }
+  .chart:is(.ch-flow, .ch-radial) [class*="mk-hatch-"] { stroke: CanvasText; }
+  .chart:is(.ch-flow, .ch-radial) [class*="hatch-"]:not(.hatch-bg):not([class*="mk-"]) { stroke: CanvasText; }
+  .chart:is(.ch-flow, .ch-radial) a:focus-visible { outline-color: Highlight; }
+}

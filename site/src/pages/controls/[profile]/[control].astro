@@ -4,9 +4,11 @@
 // chapter rail, like its profile page. The H1 is the control title; the
 // document <title> and meta description are the control's `pageTitle` and
 // `pageDescription`. Under the byline and status line of its profile: the
-// full record (ControlRecord, standalone), its two example observations
-// (public/controls/examples/) rendered and downloadable, the incident cases
-// that name it, its patterns, obligations and threats, its own numbered
+// control from failure to evidence (ControlAnatomy), the full record
+// (ControlRecord, standalone), its two example observations
+// (public/controls/examples/) side by side (ControlVerdicts), then rendered and
+// downloadable, the traceability constellation (ControlConstellation), the
+// incident cases that name it, its patterns, obligations and threats, its own numbered
 // sources, the machine-readable versions, the review call and the citation
 // with the profile version. One TechArticle, part of the profile's article
 // (profileArticleId). The Markdown twin (<path>.md) is built from the same
@@ -21,6 +23,9 @@ import Byline from '../../../components/Byline.astro';
 import StatusLine from '../../../components/StatusLine.astro';
 import Callout from '../../../components/Callout.astro';
 import ControlRecord from '../../../components/ControlRecord.astro';
+import ControlAnatomy from '../../../components/controls/ControlAnatomy.astro';
+import ControlVerdicts from '../../../components/controls/ControlVerdicts.astro';
+import ControlConstellation from '../../../components/controls/ControlConstellation.astro';
 import SourceList from '../../../components/SourceList.astro';
 import ContributeCta from '../../../components/ContributeCta.astro';
 import Citation from '../../../components/Citation.astro';
@@ -172,6 +177,8 @@ const jsonLd = [
     </p>
   </Callout>
 
+  <ControlAnatomy control={c} profile={profile} />
+
   <ControlRecord control={c} profile={profile} sources={sources} standalone />
 
   <h2 id="examples">Example observations</h2>
@@ -185,6 +192,7 @@ const jsonLd = [
       data-umami-event-file={OBSERVATION_SCHEMA_PATH}>control observation schema</a
     >; neither is the result of a real evaluation.
   </p>
+  <ControlVerdicts examples={examples} />
   {
     examples.map(({ example, record, json }) => (
       <section class="cx" data-status={record.status} aria-labelledby={`example-${record.status}`}>
@@ -259,6 +267,8 @@ const jsonLd = [
       </section>
     ))
   }
+
+  <ControlConstellation control={c} profile={profile} />
 
   {
     related.cases.length > 0 && (

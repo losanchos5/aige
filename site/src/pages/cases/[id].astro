@@ -8,6 +8,7 @@ import SourceList from '../../components/SourceList.astro';
 import Byline from '../../components/Byline.astro';
 import PillarLink from '../../components/PillarLink.astro';
 import ContributeCta from '../../components/ContributeCta.astro';
+import CaseBowTie from '../../components/CaseBowTie.astro';
 import { site } from '../../data/site';
 import { obligationPath } from '../../data/frameworks';
 import { layers } from '../../data/stack';
@@ -199,6 +200,9 @@ const jsonLd = [
       </div>
       {/* Hub and spoke (SXO-R2-06): each case points at the /ai-governance pillar. */}
       <PillarLink lead="One incident read against the controls of" anchor="AI governance and its frameworks" />
+      {/* The incident at a glance (page-visuals wave 2): controls, the
+          incident, harms and the evidence, generated from this record. */}
+      <CaseBowTie entry={entry} />
 
       <dl class="cs-facts">
         <dt>Year</dt>

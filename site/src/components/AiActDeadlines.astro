@@ -9,6 +9,9 @@ import CitedText from './CitedText.astro';
 import SourceList from './SourceList.astro';
 import Chart from './Chart.astro';
 import { dumbbell } from '../lib/charts';
+import { milestoneAxis } from '../lib/page-charts/milestone-axis';
+import { deadlineAxisItems } from '../lib/page-visuals/deadline-axis';
+import '../styles/time-charts.css';
 import {
   AI_ACT_TIMELINE_AS_OF,
   AI_ACT_TIMELINE_REVIEW_BY,
@@ -69,6 +72,14 @@ const UI = {
     months: (n: number) => `+${n} ${n === 1 ? 'month' : 'months'}`,
     moveSource: 'Regulation (EU) 2026/1744 [2]',
     moveTable: 'The deferred dates',
+    axisTitle: 'The AI Act on one axis',
+    axisCaption:
+      'Every milestone below on one time axis: solid once it applies, outlined while it is upcoming, and square where the Digital Omnibus set or moved the date; the bar runs up to the dashed line, the date of the last check of this page. The next deadline is in bold, and each label leads to its entry.',
+    axisDesc: (n: number, from: string, to: string) => `${n} AI Act milestones from ${from} to ${to} on one time axis, marked as applying or upcoming on the date of the last check of this page.`,
+    axisTable: 'The milestones',
+    axisMilestone: 'Milestone',
+    axisBasis: { a: 'Regulation (EU) 2024/1689', b: 'Set or moved by the Omnibus' },
+    axisSource: 'Regulation (EU) 2024/1689 [1] and Regulation (EU) 2026/1744 [2]',
     spain: 'Spain: supervisor, sandbox and a bill',
     spainLede: 'Spain has a working AI supervisor and a sandbox, and a national AI bill that is still in parliament.',
     status: { bill: 'Bill, not law', 'in-force': 'In force', call: 'Open call', guidance: 'Guidance' } as Record<SpainStatus, string>,
@@ -121,6 +132,14 @@ const UI = {
     months: (n: number) => `+${n} ${n === 1 ? 'mes' : 'meses'}`,
     moveSource: 'Reglamento (UE) 2026/1744 [2]',
     moveTable: 'Las fechas aplazadas',
+    axisTitle: 'El Reglamento en un solo eje',
+    axisCaption:
+      'Todos los hitos de abajo en un solo eje temporal: rellenos cuando ya se aplican, en contorno mientras están pendientes y cuadrados donde el Digital Omnibus fijó o trasladó la fecha; la barra llega hasta la línea discontinua, la fecha de la última revisión de esta página. El próximo plazo va en negrita, y cada etiqueta lleva a su hito.',
+    axisDesc: (n: number, from: string, to: string) => `${n} hitos del Reglamento de IA entre ${from} y ${to} en un solo eje temporal, marcados como aplicables o pendientes en la fecha de la última revisión de esta página.`,
+    axisTable: 'Los hitos',
+    axisMilestone: 'Hito',
+    axisBasis: { a: 'Reglamento (UE) 2024/1689', b: 'Fijada o trasladada por el Omnibus' },
+    axisSource: 'Reglamento (UE) 2024/1689 [1] y Reglamento (UE) 2026/1744 [2]',
     spain: 'España: autoridad, espacio controlado de pruebas y un proyecto de ley',
     spainLede: 'España tiene una autoridad de supervisión de la IA en marcha y un espacio controlado de pruebas, y un proyecto de ley de IA que sigue en tramitación parlamentaria.',
     status: { bill: 'Proyecto, no es ley', 'in-force': 'En vigor', call: 'Convocatoria abierta', guidance: 'Guías' } as Record<SpainStatus, string>,
@@ -207,6 +226,31 @@ const moveChart = moves.length
 const moveWide = moveChart && dumbbell({ ...moveChart, id: `aad-moved-w-${lang}`, width: 640 });
 const moveNarrow = moveChart && dumbbell({ ...moveChart, id: `aad-moved-n-${lang}`, width: 340 });
 
+// "The AI Act on one axis": every milestone at its date, applied solid and
+// upcoming outlined, square where the Omnibus set or moved the date, against
+// the page's check date (never the build clock). Generated from the dataset
+// in the page's language.
+const axisItems = deadlineAxisItems(lang);
+const axisChart = {
+  title: UI.axisTitle,
+  desc: UI.axisDesc(axisItems.length, axisItems[0].date, axisItems[axisItems.length - 1].date),
+  source: UI.axisSource,
+  asOf: AI_ACT_TIMELINE_AS_OF,
+  today: AI_ACT_TIMELINE_AS_OF,
+  lang,
+  items: axisItems,
+  tableCaption: UI.axisTable,
+  copy: {
+    applied: UI.applied,
+    upcoming: UI.upcoming,
+    basis: UI.axisBasis,
+    milestone: UI.axisMilestone,
+    basisHead: UI.colBasis,
+  },
+};
+const axisWide = milestoneAxis({ ...axisChart, id: `aad-axis-w-${lang}`, width: 640 });
+const axisNarrow = milestoneAxis({ ...axisChart, id: `aad-axis-n-${lang}`, width: 340, orientation: 'vertical' });
+
 const basisLabel = (m: TimelineMilestone) =>
   m.basis === 'omnibus' ? (es ? 'Reglamento (UE) 2026/1744' : 'Regulation (EU) 2026/1744') : (es ? 'Reglamento (UE) 2024/1689' : 'Regulation (EU) 2024/1689');
 ---
@@ -244,6 +288,7 @@ const basisLabel = (m: TimelineMilestone) =>
       <h2 id="aad-timeline">{UI.timeline}</h2>
       <p>{UI.timelineLede}</p>
     </div>
+    <Chart chart={axisWide} narrow={axisNarrow} title={UI.axisTitle} caption={UI.axisCaption} tableLabel={UI.axisTable} />
     <ol class="aad-timeline prose">
       {
         aiActMilestones.map((m) => {

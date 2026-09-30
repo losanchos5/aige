@@ -1,0 +1,64 @@
+---
+/**
+ * ControlConstellation: the traceability of a control in one figure, at the
+ * start of the relations of its page (before #related-cases; the lists under
+ * it stay as the detail). The control at the centre; around it the incident
+ * cases that name it, the patterns that implement it (in their layer colour),
+ * the obligations it maps to, the threat rows it answers (OWASP and ATLAS),
+ * the standards (ISO/IEC 42001 Annex A, NIST AI RMF, AIUC-1, CSA AICM and the
+ * other mappings: NIST SP 800-53, ATLAS mitigations, RFCs) and its IMDA
+ * Agentic AI cross-reference, whose fit is the edge: solid direct, dashed
+ * partial. Drawn by the chart kit's relationRadial from
+ * lib/page-visuals/control-visuals.ts (constellationFamilies); with fewer
+ * than three relations it draws nothing and the page keeps its lists.
+ *
+ * Per-item template, not registered in figures.ts; 'figc' mode (the reading
+ * layout loads figures.css). A 860-wide radial with a 340-wide list for
+ * phones; at the top level of the prose it breaks out to the reading well.
+ */
+import Chart from '../Chart.astro';
+import { relationRadial, radialLabelWidth } from '../../lib/charts';
+import { constellationFamilies } from '../../lib/page-visuals/control-visuals';
+import { CONTROLS_AS_OF, type Control, type ControlProfile } from '../../data/controls';
+
+interface Props {
+  control: Control;
+  profile: ControlProfile;
+}
+
+const { control: c, profile } = Astro.props;
+const WIDE = 860;
+const NARROW = 340;
+const centre = { label: c.title };
+const title = 'What this control traces to';
+const base = {
+  title,
+  centre,
+  source: `${profile.shortTitle} v${profile.version}, ${c.id} mappings`,
+  asOf: CONTROLS_AS_OF,
+  mode: 'figc' as const,
+  tableCaption: `${c.id}: cases, patterns, obligations, threats, standards and IMDA fit`,
+  relationLabels: { core: 'Mapped', related: 'Partial fit' },
+};
+const familiesWide = constellationFamilies(c, radialLabelWidth(WIDE, 'radial', centre.label) - 1);
+const familiesNarrow = constellationFamilies(c, radialLabelWidth(NARROW, 'list', centre.label) - 1);
+const total = familiesWide.reduce((s, f) => s + f.items.length, 0);
+const touched = familiesWide.filter((f) => f.items.length > 0).length;
+const desc = `${c.id} at the centre of ${total} relations in ${touched} families.`;
+const wide = relationRadial({ ...base, desc, id: 'ctl-web-w', width: WIDE, layout: 'radial', families: familiesWide });
+const narrow = relationRadial({ ...base, desc, id: 'ctl-web-n', width: NARROW, layout: 'list', families: familiesNarrow });
+const caption = `${total} relations in ${touched} families: each node opens the case, pattern, obligation or threat, and a dashed edge is a partial fit. The lists below give each one in full.`;
+---
+
+{
+  wide && narrow && (
+    <Chart class="ctl-web" chart={wide} narrow={narrow} title={title} caption={caption} tableLabel="Every relation" />
+  )
+}
+
+<style>
+  :global(.doc-main .prose > .chart-fig.ctl-web) {
+    width: 100cqw;
+    margin-inline: calc(50% - 50cqw);
+  }
+</style>

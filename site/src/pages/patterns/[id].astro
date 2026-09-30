@@ -8,7 +8,10 @@
 // data/patterns.ts entry and its catalogue section disagree. After the prose,
 // the reverse relations (lib/cross-links.ts): the register rows the pattern
 // builds the evidence for, the incident cases that call for it and the open
-// controls (src/data/controls) that name it.
+// controls (src/data/controls) that name it. Two per-item visuals head them
+// (not registered in figures.ts): the pattern's neighbourhood (the kit's
+// relationRadial, skipped under three relations) and the regulatory clock of
+// the obligations it evidences (skipped when none has a date).
 import { render } from 'astro:content';
 import Doc from '../../layouts/Doc.astro';
 import Section from '../../components/Section.astro';
@@ -26,6 +29,9 @@ import { obligationsEvidencedBy, casesCallingFor, controlsForPattern } from '../
 import { controlHref, profileBySlug } from '../../data/controls';
 import { obligationPath } from '../../lib/obligations';
 import { obligationHeading } from '../../lib/obligation-title';
+import Chart from '../../components/Chart.astro';
+import RegulatoryClock from '../../components/RegulatoryClock.astro';
+import { patternNeighbourhood } from '../../lib/page-visuals/pattern-neighbourhood';
 
 export async function getStaticPaths() {
   const pages = await loadPatternPages();
@@ -71,6 +77,7 @@ const crumbs = [{ label: 'Patterns', href: '/patterns' }, { label: def.title }];
 const evidenced = obligationsEvidencedBy(def.id);
 const calledFor = casesCallingFor(def.id);
 const relatedControls = controlsForPattern(def.slug);
+const hood = patternNeighbourhood(def, entry.body ?? '');
 const related = [
   ...(evidenced.length > 0
     ? [{ depth: 2, slug: 'obligations-evidenced', text: 'Obligations this pattern evidences' }]
@@ -169,8 +176,20 @@ const jsonLd = [
   {/* The pattern's close: the related registers on a full-width, still mesh
       band after the reading layout (Doc's "after" slot), only when there is
       something to list. */}
-  {(evidenced.length > 0 || calledFor.length > 0 || relatedControls.length > 0) && (
+  {(hood || evidenced.length > 0 || calledFor.length > 0 || relatedControls.length > 0) && (
   <Section tone="mesh" mesh="e" meshK={0.9} class="pp-close" slot="after">
+    {
+      hood && (
+        <div class="pp-hood">
+          <Chart
+            chart={hood.wide}
+            narrow={hood.narrow}
+            title={`Around ${def.title}`}
+            caption="The patterns listed with this one, in their layer colour, and the obligations, open controls and incident cases that name it. Follow a node to see why the pattern is worth building, and what to build with it."
+          />
+        </div>
+      )
+    }
     <div class="prose pp-close-inner">
       {
         evidenced.length > 0 && (
@@ -180,6 +199,14 @@ const jsonLd = [
               Register rows that list this pattern among the patterns that build their evidence.
               Mappings are illustrative, not a claim of conformity.
             </p>
+            <RegulatoryClock
+              rows={evidenced}
+              id="pp-clock"
+              title="When these obligations apply"
+              caption="Each obligation this pattern evidences, on the date it first applies, drawn by its status in the register, and on each later dated step (a square, filled once reached); the dashed line is the date the rows were last reviewed. What comes before the line is already due, so the pattern's evidence is needed now; what comes after it sets the deadline to build it by."
+              desc={`The obligations ${def.title} evidences, on the dates they first apply and on their later steps, against the register's review date.`}
+              tableCaption={`When the obligations ${def.title} evidences apply`}
+            />
             <ul>
               {evidenced.map((row) => (
                 <li>
@@ -262,6 +289,17 @@ const jsonLd = [
 
   .pp-cat {
     color: var(--ink-2);
+  }
+
+  /* The neighbourhood heads the close band, wider than the reading column so
+     its two-sided layout shows on desktop (the list below 720 px). */
+  .pp-hood {
+    max-width: 760px;
+    margin-inline: auto;
+  }
+
+  .pp-hood :global(.chart-fig) {
+    margin-top: 0;
   }
 
   /* The close band's registers: the first one sits at the band's top edge. */

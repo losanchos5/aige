@@ -1,0 +1,263 @@
+/* obligation-visuals.css: what the obligation visuals need beyond the chart
+   kit's sheets (chart.css, figures.css): the drawing of the status isotype on
+   /obligations (HTML squares) and the forced-colours and print rules of the
+   application clock (/obligations) and the application strip
+   (/obligations/<id>), which are SVGs of the kit's classes in either style
+   mode. Colours only through tokens; status is a drawing, never a colour. The
+   squares restate the site-wide status encoding (appliesStatusMark in
+   data/frameworks.ts) on a square: the drawing is the mark's (solid, outline,
+   dashed, hatched) and a triangle is the square's lower-left half, cut on the
+   diagonal (solid for grace, a dashed square split by its diagonal for draft
+   or proposed). */
+
+/* ---- Status squares (ObligationIsotype.astro) ------------------------------ */
+.obi-sq,
+.obi-swatch {
+  display: block;
+  box-sizing: border-box;
+  width: var(--obi-cell, 14px);
+  height: var(--obi-cell, 14px);
+  border-radius: 2px;
+  border: 1.5px solid var(--ink);
+  background: var(--bg);
+}
+
+:is(.obi-sq, .obi-swatch).st-in-force {
+  background: color-mix(in srgb, var(--ink) 55%, var(--bg));
+  border-color: var(--ink-2);
+}
+
+/* In force, softened by a grace period: a filled triangle, half solid. */
+:is(.obi-sq, .obi-swatch).st-grace {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--ink) 55%, var(--bg)) 0 50%, var(--bg) 50% 100%);
+}
+
+:is(.obi-sq, .obi-swatch).st-applies-later {
+  background: var(--bg);
+}
+
+:is(.obi-sq, .obi-swatch).st-deferred {
+  background: repeating-linear-gradient(-45deg, var(--ink) 0 1.4px, var(--bg) 1.4px 3.6px);
+}
+
+:is(.obi-sq, .obi-swatch).st-voluntary {
+  border-style: dashed;
+}
+
+/* Draft or proposed: a dashed triangle, the dashed square cut by its diagonal. */
+:is(.obi-sq, .obi-swatch).st-pending {
+  border-style: dashed;
+  background: linear-gradient(
+    135deg,
+    var(--bg) calc(50% - 0.75px),
+    var(--ink) calc(50% - 0.75px) calc(50% + 0.75px),
+    var(--bg) calc(50% + 0.75px)
+  );
+}
+
+@media print {
+  .obi-sq,
+  .obi-swatch,
+  svg:is(.ch-obclock, .ch-obstrip) {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .obi-sq {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---- Isotype layout ---------------------------------------------------------- */
+.obi {
+  --obi-cell: 13px;
+  margin: 0 0 var(--s-6);
+}
+
+.obi-canvas {
+  padding: var(--s-5);
+}
+
+@container (max-width: 479px) {
+  .obi-canvas {
+    padding: var(--s-3);
+  }
+}
+
+.obi-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  margin: 0 0 var(--s-5);
+  padding: 0 0 var(--s-4);
+  list-style: none;
+  border-bottom: 1px solid var(--line);
+  font-size: var(--fs-small);
+  color: var(--ink);
+}
+
+.obi-key li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.obi-key .obi-swatch {
+  --obi-cell: 16px;
+  flex: none;
+}
+
+.obi-key-n {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Groups flow in balanced columns, a group never split. */
+.obi-groups {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  columns: 12.5rem;
+  column-gap: var(--s-6);
+}
+
+.obi-group {
+  break-inside: avoid;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: var(--s-4);
+}
+
+/* A phone: two columns of groups, so 31 groups do not run 2,000 px long. */
+@container (max-width: 479px) {
+  .obi-groups {
+    columns: 2;
+    column-gap: var(--s-4);
+  }
+
+  .obi-group {
+    padding-bottom: var(--s-3);
+  }
+
+  .obi-group .obi-name {
+    font-size: 0.8125rem;
+  }
+}
+
+.obi-name {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-2);
+  padding-top: var(--s-1);
+  border-top: 1.5px solid var(--ink);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.obi-name:hover span:first-child,
+.obi-name:focus-visible span:first-child {
+  text-decoration: underline;
+}
+
+.obi-name:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.obi-n {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+
+.obi-cells {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.obi-stamp {
+  margin: var(--s-3) 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* The page's radio filters (obligations.css) shrink the squares they leave out. */
+.obx-index:has(#obx-st-in-force:checked) .obi-sq:not(.st-in-force),
+.obx-index:has(#obx-st-grace:checked) .obi-sq:not(.st-grace),
+.obx-index:has(#obx-st-applies-later:checked) .obi-sq:not(.st-applies-later),
+.obx-index:has(#obx-st-deferred:checked) .obi-sq:not(.st-deferred),
+.obx-index:has(#obx-st-voluntary:checked) .obi-sq:not(.st-voluntary),
+.obx-index:has(#obx-st-pending:checked) .obi-sq:not(.st-pending),
+.obx-index:has(#obx-l-1:checked) .obi-sq:not(.has-l1),
+.obx-index:has(#obx-l-2:checked) .obi-sq:not(.has-l2),
+.obx-index:has(#obx-l-3:checked) .obi-sq:not(.has-l3),
+.obx-index:has(#obx-l-4:checked) .obi-sq:not(.has-l4),
+.obx-index:has(#obx-l-5:checked) .obi-sq:not(.has-l5) {
+  transform: scale(0.35);
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  .obi-sq {
+    transition: transform var(--dur, 160ms) var(--ease, ease-out);
+  }
+}
+
+/* ---- Forced colours --------------------------------------------------------- */
+/* Backgrounds and authored SVG colours give way to the system palette; keep
+   solid, half, outlined, hatched, dashed and the cut dashed square in system
+   colours. */
+@media (forced-colors: active) {
+  .obi-sq,
+  .obi-swatch {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+    background: Canvas;
+  }
+
+  :is(.obi-sq, .obi-swatch).st-in-force {
+    background: CanvasText;
+  }
+
+  :is(.obi-sq, .obi-swatch).st-grace {
+    background: linear-gradient(135deg, CanvasText 0 50%, Canvas 50% 100%);
+  }
+
+  :is(.obi-sq, .obi-swatch).st-deferred {
+    background: repeating-linear-gradient(-45deg, CanvasText 0 1.4px, Canvas 1.4px 3.6px);
+  }
+
+  :is(.obi-sq, .obi-swatch).st-pending {
+    background: linear-gradient(
+      135deg,
+      Canvas calc(50% - 0.75px),
+      CanvasText calc(50% - 0.75px) calc(50% + 0.75px),
+      Canvas calc(50% + 0.75px)
+    );
+  }
+
+  svg:is(.ch-obclock, .ch-obstrip) {
+    forced-color-adjust: none;
+  }
+
+  svg:is(.ch-obclock, .ch-obstrip) text { fill: CanvasText; }
+  svg:is(.ch-obclock, .ch-obstrip) a text { fill: LinkText; }
+  svg:is(.ch-obclock, .ch-obstrip) :is(.axis, .tick, .rule, .today) { stroke: CanvasText; }
+  svg:is(.ch-obclock, .ch-obstrip) [class*="mk-fill-"] { fill: CanvasText; stroke: CanvasText; }
+  svg:is(.ch-obclock, .ch-obstrip) :is([class*="mk-line-"], [class*="mk-dash-"]) { fill: Canvas; stroke: CanvasText; }
+  svg:is(.ch-obclock, .ch-obstrip) [class*="mk-hatch-"] { stroke: CanvasText; }
+  svg:is(.ch-obclock, .ch-obstrip) .hatch-bg { fill: Canvas; }
+  svg:is(.ch-obclock, .ch-obstrip) [class*="hatch-"]:not(.hatch-bg):not([class*="mk-"]) { stroke: CanvasText; }
+  svg:is(.ch-obclock, .ch-obstrip) a:focus-visible { outline-color: Highlight; }
+}

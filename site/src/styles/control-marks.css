@@ -1,0 +1,86 @@
+/* control-marks.css: the failure-response marks of the control visuals
+   (components/controls/ControlLanes.astro, ControlPeriodicTable.astro), so
+   the lanes on /controls and the tiles on a profile page draw a response the
+   same way: the shape is the response (diamond deny, square hold for
+   approval, ring alert, triangle allow) and a hatched square is a response
+   still to be specified, never an alert (isResponseToSpecify). The colour is
+   the control's home stack layer (--lN fill, --lN-ink stroke), as in the
+   /controls mosaic; the shape alone carries the response, so it survives
+   forced colours and print. Sizes: --cvm (default 14px). */
+.cvm {
+  --k: var(--ink);
+  --p: var(--ink-2);
+  display: inline-block;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--cvm, 14px);
+  height: var(--cvm, 14px);
+  border: 2px solid var(--k);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--k) 60%, var(--p));
+}
+
+.cvm-l1 { --k: var(--l1-ink); --p: var(--l1); }
+.cvm-l2 { --k: var(--l2-ink); --p: var(--l2); }
+.cvm-l3 { --k: var(--l3-ink); --p: var(--l3); }
+.cvm-l4 { --k: var(--l4-ink); --p: var(--l4); }
+.cvm-l5 { --k: var(--l5-ink); --p: var(--l5); }
+
+/* A diamond is the square turned a quarter, shrunk to keep its footprint. */
+.cvm-deny {
+  transform: rotate(45deg) scale(0.8);
+}
+
+.cvm-alert {
+  border-radius: 50%;
+  background: var(--hole, var(--bg));
+}
+
+.cvm-allow {
+  border: 0;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  background: var(--k);
+}
+
+.cvm-tbs {
+  background: repeating-linear-gradient(-45deg, var(--k) 0 1.5px, var(--hole, var(--bg)) 1.5px 4.5px);
+}
+
+/* Dark: the layer inks are pastels of one lightness, so a layered ring's
+   inside takes the layer's dark tint (the /controls mosaic does the same);
+   an ink mark (a legend swatch) keeps the ground, so its ring stays hollow. */
+:root[data-theme='dark'] :is(.cvm-l1, .cvm-l2, .cvm-l3, .cvm-l4, .cvm-l5) {
+  --hole: var(--p);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) :is(.cvm-l1, .cvm-l2, .cvm-l3, .cvm-l4, .cvm-l5) {
+    --hole: var(--p);
+  }
+}
+
+/* Print: the fills are the data. */
+@media print {
+  .cvm {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Forced colours drop backgrounds: redraw solid, ring and hatch in system
+   colours (the layer colour cannot survive; the tables still give it). */
+@media (forced-colors: active) {
+  .cvm {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+    background: CanvasText;
+  }
+
+  .cvm-alert {
+    background: Canvas;
+  }
+
+  .cvm-tbs {
+    background: repeating-linear-gradient(-45deg, CanvasText 0 1.5px, Canvas 1.5px 4.5px);
+  }
+}

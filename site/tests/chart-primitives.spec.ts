@@ -17,6 +17,8 @@ import { resolve } from 'node:path';
 
 import {
   beeswarm,
+  bowTie,
+  controlChain,
   divergingBars,
   dotMatrix,
   dumbbell,
@@ -26,6 +28,7 @@ import {
   linearScale,
   lollipop,
   rankedBars,
+  relationRadial,
   stacked100,
   stackedBars,
   timeLanes,
@@ -33,6 +36,7 @@ import {
   venn3,
   type Cell,
   type ChartOutput,
+  type RelationFamily,
 } from '../src/lib/charts';
 import { enforcementLabels } from '../src/data/policy-card';
 
@@ -109,6 +113,36 @@ const vennItems = [
   { label: 'Unfiled topic', sets: [] },
 ];
 const steps = [{ label: 'Minimal risk', detail: 'No new duties' }, { label: 'Transparency', detail: 'Art. 50 duties' }, { label: 'High risk' }];
+const families: RelationFamily[] = [
+  {
+    label: 'Patterns',
+    layered: true,
+    items: [
+      { label: 'Policy card', tone: 1, strength: 'related' },
+      { label: 'Eval gate in CI', tone: 3, href: '/patterns/eval-gate-in-ci' },
+    ],
+  },
+  { label: 'ISO 42001', items: [{ label: 'A.6.2.4', strength: 'related' }, { label: 'A.6.2.6' }] },
+  { label: 'Cases', items: [{ label: 'Chatbot refund', name: 'Chatbot refund policy case', href: '/cases/chatbot' }] },
+];
+const bow = {
+  preventive: [{ label: 'Eval gate in CI', href: '/patterns/eval-gate-in-ci' }],
+  event: [{ label: 'Chatbot invents a refund policy' }],
+  detective: [{ label: 'Output monitoring' }],
+  responsive: [],
+  harms: [{ label: 'Financial loss' }],
+  evidence: [
+    { label: 'Eval report', layer: 3 as const },
+    { label: 'Incident record', layer: 5 as const },
+  ],
+};
+const anatomy = {
+  failureModes: [{ label: 'Unsigned model deployed' }],
+  enforcement: ['deploy', 'runtime'] as ('deploy' | 'runtime')[],
+  verification: [{ label: 'Test' }],
+  decision: { label: 'To be specified', state: 'hatched' as const },
+  evidence: [{ label: 'Admission record', layer: 4 as const, href: '/resources/templates#schema-admission' }],
+};
 
 interface Case {
   name: string;
@@ -225,6 +259,44 @@ const CASES: Case[] = [
       [1, 'Minimal risk', 'No new duties', ''],
       [2, 'Transparency', 'Art. 50 duties', ''],
       [3, 'High risk', '', 'This system'],
+    ],
+  },
+  {
+    name: 'relationRadial',
+    make: (id) => relationRadial({ ...base, id, title, desc, centre: { label: 'Art. 15 Accuracy' }, families })!,
+    marks: 1,
+    // Core before related, then by label, inside each family.
+    rows: [
+      ['Patterns', 'Eval gate in CI', 'Core'],
+      ['Patterns', 'Policy card', 'Related'],
+      ['ISO 42001', 'A.6.2.6', 'Core'],
+      ['ISO 42001', 'A.6.2.4', 'Related'],
+      ['Cases', 'Chatbot refund policy case', 'Core'],
+    ],
+  },
+  {
+    name: 'bowTie',
+    make: (id) => bowTie({ ...base, id, title, desc, ...bow }),
+    // The empty responsive stage is left out.
+    rows: [
+      ['Preventive', 'Eval gate in CI', ''],
+      ['Failure mode', 'Chatbot invents a refund policy', ''],
+      ['Detective', 'Output monitoring', ''],
+      ['Harms', 'Financial loss', ''],
+      ['Evidence', 'Eval report', 'Layer 03'],
+      ['Evidence', 'Incident record', 'Layer 05'],
+    ],
+  },
+  {
+    name: 'controlChain',
+    make: (id) => controlChain({ ...base, id, title, desc, ...anatomy }),
+    rows: [
+      ['Failure modes', 'Unsigned model deployed', ''],
+      ['Enforcement', 'deploy', ''],
+      ['Enforcement', 'runtime', ''],
+      ['Verification', 'Test', ''],
+      ['Decision', 'To be specified', ''],
+      ['Evidence', 'Admission record', 'Layer 04'],
     ],
   },
 ];
@@ -345,6 +417,21 @@ const THROWS: { name: string; run: () => unknown; label: RegExp }[] = [
     name: 'a dumbbell with no items (an empty filter result)',
     run: () => dumbbell({ ...base, id: 'ch-x', title, desc, fromLabel: 'From', toLabel: 'To', items: [] }),
     label: /dumbbell ch-x\): no items to draw/,
+  },
+  {
+    name: 'a radial node label wider than its row',
+    run: () => relationRadial({ ...base, id: 'ch-x', title, desc, width: 340, centre: { label: 'Centre' }, families: [{ label: 'Cases', items: [{ label: LONG }, { label: 'B' }, { label: 'C' }] }] }),
+    label: new RegExp(`label "${LONG}"`),
+  },
+  {
+    name: 'a layer tone in a family that is not layered',
+    run: () => relationRadial({ ...base, id: 'ch-x', title, desc, centre: { label: 'Centre' }, families: [{ label: 'Cases', items: [{ label: 'A', tone: 2 }, { label: 'B' }, { label: 'C' }] }] }),
+    label: /family "Cases" is not layered/,
+  },
+  {
+    name: 'a bow-tie item past two lines',
+    run: () => bowTie({ ...base, id: 'ch-x', title, desc, ...bow, event: [{ label: `${LONG} ${LONG}` }] }),
+    label: /label ".*Extraordinarily/,
   },
   {
     name: 'a heat grid with no rows',
@@ -500,4 +587,159 @@ test('vertical lanes fit the real enforcement-point labels at 340 and list each 
     expect(narrow.svg).toMatch(new RegExp(`<text x="12" y="[\\d.]+" font-size="13" font-weight="600">${c.key}:`));
   }
   expect((narrow.svg.match(/>Registry entry required<\/text>/g) ?? []).length, 'once per lane it acts in').toBe(2);
+});
+
+// ---- 7. the per-item primitives: radial and chains ------------------------
+test('relationRadial draws nothing under three relations, so the page keeps its lists', () => {
+  const make = (n: number) =>
+    relationRadial({ ...base, id: 'ch-r', title, desc, centre: { label: 'Centre' }, families: [{ label: 'Cases', items: families[1].items.concat(families[2].items).slice(0, n) }] });
+  expect(make(2)).toBeNull();
+  expect(make(3)).not.toBeNull();
+});
+
+/** One element of an SVG: tag, attributes, parent (index, -1 at the root)
+ *  and its own text. */
+interface SvgEl {
+  tag: string;
+  attr: Record<string, string>;
+  parent: number;
+  text: string;
+}
+const unescape = (t: string) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+/** The SVG's elements in document order, parsed once, so the checks below
+ *  read elements, classes and parents, not the order of the serialisation. */
+function parseSvg(svg: string): SvgEl[] {
+  const els: SvgEl[] = [];
+  const open: number[] = [];
+  for (const m of svg.matchAll(/<(\/?)([a-zA-Z]+)((?:\s+[^\s=>/]+="[^"]*")*)\s*(\/?)>|([^<]+)/g)) {
+    if (m[5] !== undefined) {
+      if (open.length) els[open[open.length - 1]].text += unescape(m[5]);
+    } else if (m[1]) {
+      open.pop();
+    } else {
+      const attr = Object.fromEntries([...m[3].matchAll(/([^\s=]+)="([^"]*)"/g)].map((a) => [a[1], unescape(a[2])]));
+      els.push({ tag: m[2], attr, parent: open.length ? open[open.length - 1] : -1, text: '' });
+      if (!m[4]) open.push(els.length - 1);
+    }
+  }
+  return els;
+}
+const titleOf = (els: SvgEl[], i: number) => els.find((e) => e.parent === i && e.tag === 'title')?.text;
+
+/** Each node's drawing, keyed by its <title> (linked nodes carry it on the <a>). */
+const radialNodes = (svg: string) => {
+  const els = parseSvg(svg);
+  const nodes = new Map<string, { state: string; tone: number }>();
+  els.forEach((e, i) => {
+    const m = e.tag === 'circle' ? /^mk mk-(\w+)-(\d)$/.exec(e.attr.class ?? '') : null;
+    const name = m && (titleOf(els, i) ?? (els[e.parent]?.tag === 'a' ? titleOf(els, e.parent) : undefined));
+    if (m && name) nodes.set(name, { state: m[1], tone: Number(m[2]) });
+  });
+  return nodes;
+};
+/** Straight segments drawn by the edge path of class `cls`. */
+const edges = (svg: string, cls: string) =>
+  (parseSvg(svg).find((e) => e.tag === 'path' && e.attr.class === cls)?.attr.d.match(/L/g) ?? []).length;
+/** Closed four-point paths shaped as a rhombus (top, right, bottom, left). */
+const diamondsIn = (svg: string) =>
+  parseSvg(svg).filter((e) => {
+    if (e.tag !== 'path' || !/Z\s*$/.test(e.attr.d ?? '') || /[CQAHV]/i.test(e.attr.d)) return false;
+    const pts = [...e.attr.d.matchAll(/[ML]\s*([\d.]+)[\s,]+([\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+    return pts.length === 4 && pts[0][0] === pts[2][0] && pts[1][1] === pts[3][1] && pts[1][0] > pts[3][0] && pts[2][1] > pts[0][1];
+  }).length;
+
+for (const layout of ['radial', 'list'] as const) {
+  test(`relationRadial (${layout}): core relations are solid edges to filled nodes, related ones dashed to outlined nodes, layer tone only in a layered family`, () => {
+    const { svg } = relationRadial({ ...base, id: 'ch-r', title, desc, centre: { label: 'Centre' }, families, layout })!;
+    const nodes = radialNodes(svg);
+    const all = families.flatMap((f) => f.items.map((item) => ({ f, item })));
+    for (const { f, item } of all) {
+      const related = item.strength === 'related';
+      const drawn = nodes.get(`${item.name ?? item.label} · ${related ? 'Related' : 'Core'}`);
+      expect(drawn, item.label).toEqual({ state: related ? 'line' : 'fill', tone: f.layered ? (item.tone ?? 0) : 0 });
+    }
+    expect(edges(svg, 'edge edge-dash'), 'one dashed edge per related relation').toBe(all.filter((x) => x.item.strength === 'related').length);
+    expect(edges(svg, 'edge'), 'one solid edge per core relation').toBe(all.filter((x) => x.item.strength !== 'related').length);
+  });
+}
+
+test('relationRadial: the wide variant sets the sectors either side of the centre, the narrow one stacks them in one column at 12 px or more', () => {
+  const nodeXs = (svg: string) => new Set([...svg.matchAll(/<circle cx="([\d.]+)"[^>]*r="5.5"/g)].map((m) => m[1]));
+  const wide = relationRadial({ ...base, id: 'ch-w', title, desc, centre: { label: 'Centre' }, families })!;
+  const narrow = relationRadial({ ...base, id: 'ch-n', title, desc, width: 340, centre: { label: 'Centre' }, families })!;
+  expect(nodeXs(wide.svg).size, 'two sides').toBe(2);
+  expect(nodeXs(narrow.svg).size, 'one column').toBe(1);
+  expect(narrow.width).toBe(340);
+  const sizes = [...narrow.svg.matchAll(/font-size="([\d.]+)"/g)].map((m) => Number(m[1]));
+  expect(Math.min(...sizes)).toBeGreaterThanOrEqual(12);
+  expect(narrow.table).toEqual(wide.table);
+});
+
+const CHAINS: { name: string; make: (id: string, orientation: 'row' | 'column') => ChartOutput; layer: number; kickers: string[] }[] = [
+  {
+    name: 'bowTie',
+    make: (id, orientation) => bowTie({ ...base, id, title, desc, ...bow, orientation }),
+    layer: bow.evidence[0].layer,
+    kickers: ['Preventive', 'Failure mode', 'Detective', 'Harms', 'Evidence'],
+  },
+  {
+    name: 'controlChain',
+    make: (id, orientation) => controlChain({ ...base, id, title, desc, ...anatomy, orientation }),
+    layer: anatomy.evidence[0].layer,
+    kickers: ['Failure modes', 'Enforcement', 'Verification', 'Decision', 'Evidence'],
+  },
+];
+
+for (const c of CHAINS) {
+  test(`${c.name}: the evidence is the terminal panel, with the document-with-check glyph in its layer colour, and the figure has one diamond`, () => {
+    for (const orientation of ['row', 'column'] as const) {
+      const { svg } = c.make('ch-e', orientation);
+      const panels = [...svg.matchAll(/<rect class="(panel|panel-end)" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)].map((m) => ({
+        cls: m[1],
+        x: Number(m[2]),
+        y: Number(m[3]),
+        w: Number(m[4]),
+        h: Number(m[5]),
+      }));
+      const last = panels[panels.length - 1];
+      expect(panels.filter((p) => p.cls === 'panel-end'), orientation).toEqual([last]);
+      expect(orientation === 'row' ? Math.max(...panels.map((p) => p.x)) : Math.max(...panels.map((p) => p.y)), 'last in reading order').toBe(orientation === 'row' ? last.x : last.y);
+      const check = new RegExp(String.raw`<path class="glyph-check l${c.layer}-st" d="[^"]+" transform="translate\(([\d.]+) ([\d.]+)\)"`).exec(svg);
+      expect(check, 'layer-coloured check').not.toBeNull();
+      const [gx, gy] = [Number(check![1]), Number(check![2])];
+      expect(gx >= last.x && gx + 24 <= last.x + last.w && gy >= last.y && gy + 24 <= last.y + last.h, 'glyph inside the terminal panel').toBe(true);
+      expect(diamondsIn(svg), 'the gate is the only diamond').toBe(1);
+      // Every hatch the chart uses has its pattern in the chart's own <defs>.
+      for (const m of svg.matchAll(/url\(#([^)]+)\)/g)) expect(svg).toContain(`<pattern id="${m[1]}"`);
+    }
+  });
+
+  test(`${c.name}: the row reads left to right, the column (narrow, 340) top to bottom`, () => {
+    const row = c.make('ch-w', 'row');
+    const column = c.make('ch-n', 'column');
+    expect(column.width).toBe(340);
+    const at = (svg: string) => c.kickers.map((k) => textAt(svg, k)!);
+    const r = at(row.svg);
+    const col = at(column.svg);
+    expect(new Set(r.map((p) => p.y)).size, 'one row').toBe(1);
+    expect(r.every((p, i) => i === 0 || p.x > r[i - 1].x), 'left to right').toBe(true);
+    expect(new Set(col.map((p) => p.x)).size, 'one column').toBe(1);
+    expect(col.every((p, i) => i === 0 || p.y > col[i - 1].y), 'top to bottom').toBe(true);
+    expect(column.table).toEqual(row.table);
+  });
+}
+
+test('controlChain lights exactly the enforcement points it is given on the four-stage track', () => {
+  const { svg } = controlChain({ ...base, id: 'ch-p', title, desc, ...anatomy });
+  const els = parseSvg(svg);
+  const STAGES = ['pre_merge', 'deploy', 'runtime', 'periodic'];
+  // Each stage label and the mark drawn just before it in the same group.
+  const stages = els.flatMap((e, i) => {
+    if (e.tag !== 'text' || !STAGES.includes(e.text)) return [];
+    const mark = els.slice(0, i).reverse().find((o) => o.parent === e.parent && o.tag !== 'title');
+    return [{ stage: e.text, cls: mark?.attr.class ?? '' }];
+  });
+  expect(stages.map((x) => x.stage)).toEqual(STAGES);
+  expect(stages.filter((x) => /(^| )mk-fill-/.test(x.cls)).map((x) => x.stage)).toEqual(anatomy.enforcement);
+  expect(stages.filter((x) => /(^| )mk-line-/.test(x.cls)).map((x) => x.stage)).toEqual(STAGES.filter((k) => !anatomy.enforcement.includes(k as never)));
 });

@@ -489,3 +489,35 @@
 .figc .venn { fill: var(--ink); fill-opacity: 0.05; stroke: var(--ink); stroke-width: 1.5; }
 .figc .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: normal; text-transform: none; }
 .figc .mk-focus:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* Chain and radial primitives (flow.ts, radial.ts): the terminal (evidence)
+   panel and the relation edges; the glyph and layer rules above serve them. */
+.figc .panel-end {
+  fill: color-mix(in srgb, var(--ink) 3%, var(--bg));
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.figc .edge { stroke: var(--ink-2); stroke-width: 1.25; fill: none; }
+.figc .edge-dash { stroke-dasharray: 4 3; }
+
+/* Forced colours: redraw the chain and radial primitives in system colours,
+   keeping the encoding (solid, outlined, dashed, hatched) by shape. */
+@media (forced-colors: active) {
+  .figc:is(.ch-flow, .ch-radial) {
+    forced-color-adjust: none;
+  }
+
+  .figc:is(.ch-flow, .ch-radial) text { fill: CanvasText; }
+  .figc:is(.ch-flow, .ch-radial) a text { fill: LinkText; }
+  .figc:is(.ch-flow, .ch-radial) .on-ink { fill: Canvas; }
+  .figc:is(.ch-flow, .ch-radial) :is(.panel, .panel-end) { fill: Canvas; stroke: CanvasText; }
+  .figc:is(.ch-flow, .ch-radial) :is(.glyph, .glyph-check, .edge, .rule, .stroke-arrow, .l1-st, .l2-st, .l3-st, .l4-st, .l5-st) { stroke: CanvasText; }
+  .figc:is(.ch-flow, .ch-radial) :is(.l1-bg, .l2-bg, .l3-bg, .l4-bg, .l5-bg, .hatch-bg) { fill: Canvas; }
+  .figc:is(.ch-flow, .ch-radial) .arrow { fill: CanvasText; }
+  .figc:is(.ch-flow, .ch-radial) :is([class*="mk-fill-"], .mk-hi) { fill: CanvasText; stroke: CanvasText; }
+  .figc:is(.ch-flow, .ch-radial) :is([class*="mk-line-"], [class*="mk-dash-"]) { fill: Canvas; stroke: CanvasText; }
+  .figc:is(.ch-flow, .ch-radial) [class*="mk-hatch-"] { stroke: CanvasText; }
+  .figc:is(.ch-flow, .ch-radial) [class*="hatch-"]:not(.hatch-bg):not([class*="mk-"]) { stroke: CanvasText; }
+  .figc:is(.ch-flow, .ch-radial) a:focus-visible { outline-color: Highlight; }
+}
