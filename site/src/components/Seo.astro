@@ -94,7 +94,7 @@ const ogImageHeight = String(imageHeight);
 // text; a shared section card is described by what it shows (lib/meta.ts).
 const ogAlt = imageAlt ?? ogImageAlt({ image, title, documentTitle: pageTitle, siteName: site.name });
 // og:locale:alternate for each other language the page exists in, from its
-// hreflang alternates (today only the /thesis <-> /es/thesis pair has any).
+// hreflang alternates (today only the hand-written pairs of HAND_TRANSLATED_ES).
 const localeAlternates = [
   ...new Set(
     (alternates ?? [])

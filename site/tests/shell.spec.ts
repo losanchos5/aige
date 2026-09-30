@@ -96,11 +96,13 @@ test.describe('desktop grouped nav', () => {
 
   test('a pointer press outside the bar closes the panel', async ({ page }) => {
     await page.goto('/');
-    await page.locator('header.site-header').getByRole('button', { name: 'Reference' }).click();
-    await expect(page.locator('#nav-menu-reference')).toBeVisible();
+    // A short group: a long one (Reference) fills a 720px window and scrolls
+    // inside itself, leaving no page below it to press on.
+    await page.locator('header.site-header').getByRole('button', { name: 'Practice' }).click();
+    await expect(page.locator('#nav-menu-practice')).toBeVisible();
     // Click a non-interactive line in the footer, well below the panel.
     await page.locator('.site-footer .meta').click();
-    await expect(page.locator('#nav-menu-reference')).toBeHidden();
+    await expect(page.locator('#nav-menu-practice')).toBeHidden();
   });
 
   test('moving focus out of the bar closes the panel', async ({ page }) => {

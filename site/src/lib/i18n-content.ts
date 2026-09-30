@@ -193,9 +193,17 @@ function ordered<T extends string>(langs: Iterable<T>): T[] {
 }
 
 /**
+ * English pages with a hand-written Spanish version at `/es<path>`. They are
+ * not machine translations: they are always published, whatever
+ * PUBLISHED_TRANSLATED_LOCALES says, and carry no machine-translation notice
+ * (scripts/content-lint.mjs keeps the same list).
+ */
+export const HAND_TRANSLATED_ES: ReadonlySet<string> = new Set(['/thesis', '/resources/ai-act-deadlines']);
+
+/**
  * The page a path renders in `lang` when that page exists, else undefined. Paths
  * are clean (no `.html`, no trailing slash) and may carry a language prefix.
- * Spanish always has the hand-translated Thesis at /es/thesis.
+ * Spanish always has the hand-written pages in HAND_TRANSLATED_ES.
  */
 export function pathIn(
   englishPath: string,
@@ -203,7 +211,7 @@ export function pathIn(
   index: TranslationIndex = translationIndex(),
 ): string | undefined {
   if (lang === DEFAULT_LOCALE) return englishPath;
-  if (englishPath === '/thesis' && lang === 'es') return '/es/thesis';
+  if (lang === 'es' && HAND_TRANSLATED_ES.has(englishPath)) return `/es${englishPath}`;
   if (englishPath === '/bok') return index.bokLangs.has(lang) ? `/${lang}/bok` : undefined;
   return index.byEnglishPath.get(englishPath)?.has(lang) ? `/${lang}${englishPath}` : undefined;
 }

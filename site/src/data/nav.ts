@@ -236,6 +236,17 @@ export const nav: NavGroup[] = [
         description: 'Every obligation with a stable id, its date, status, artefact and layer.',
       },
       {
+        label: 'AI Act deadlines',
+        href: '/resources/ai-act-deadlines',
+        description: 'What applies when under the EU AI Act after the Digital Omnibus, updated by milestone.',
+      },
+      {
+        label: 'Plazos del Reglamento de IA (español)',
+        href: '/es/resources/ai-act-deadlines',
+        description: 'The AI Act deadlines in Spanish.',
+        placement: 'footer',
+      },
+      {
         label: 'Crosswalk',
         href: '/resources/crosswalk',
         description: 'One governance topic per row, across the instruments that bind it.',

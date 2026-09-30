@@ -44,12 +44,14 @@ function typesOf(graph: JsonLdNode[]): string[] {
 
 // One page per shape the site builds: the home page (which the WebSite node
 // itself describes), a Body of Knowledge chapter, the two Thesis translations,
-// the crosswalk dataset and the map.
+// the two AI Act deadlines pages, the crosswalk dataset and the map.
 const PAGES: { path: string; type: string }[] = [
   { path: '/', type: 'Organization' },
   { path: '/bok/definition', type: 'TechArticle' },
   { path: '/thesis', type: 'TechArticle' },
   { path: '/es/thesis', type: 'TechArticle' },
+  { path: '/resources/ai-act-deadlines', type: 'TechArticle' },
+  { path: '/es/resources/ai-act-deadlines', type: 'TechArticle' },
   { path: '/resources/crosswalk', type: 'Dataset' },
   { path: '/resources/frontier-safety-crosswalk', type: 'Dataset' },
   { path: '/map', type: 'CollectionPage' },

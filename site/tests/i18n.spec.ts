@@ -27,6 +27,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import {
+  HAND_TRANSLATED_ES,
   alternatesFor,
   classifyRelative,
   headingMismatch,
@@ -229,10 +230,13 @@ function translatedRoutesInDist(): string[] {
   return out.sort();
 }
 
-/** The routes the translations in I18N_DIR should produce, plus the hand Thesis. */
+/** The hand-written Spanish pages (HAND_TRANSLATED_ES), always built. */
+const HAND_ES = [...HAND_TRANSLATED_ES].map((path) => `/es${path}`).sort();
+
+/** The routes the translations in I18N_DIR should produce, plus the hand-written pages. */
 function expectedTranslatedRoutes(): string[] {
   return [
-    '/es/thesis',
+    ...HAND_ES,
     ...index.files.map((file) => file.path),
     ...[...index.bokLangs].map((lang) => `/${lang}/bok`),
     ...[...index.langs].map((lang) => `/${lang}`),
@@ -336,7 +340,7 @@ test.describe('translated routes in the build', () => {
 
   test('with no translations, nothing translated is built and the chrome stays English', async ({ page }) => {
     test.skip(hasTranslations, 'the build has translations');
-    expect(translatedRoutesInDist()).toEqual(['/es/thesis']);
+    expect(translatedRoutesInDist()).toEqual(HAND_ES);
     await page.goto('/bok/values-and-principles');
     await expect(page.locator('[data-lang-switcher]')).toHaveCount(0);
     await expect(page.locator('nav[aria-label="Site map"] [data-footer-langs]')).toHaveCount(0);
@@ -371,14 +375,14 @@ function ruleMatches(from: string, path: string): boolean {
 test.describe('machine translations switched off', () => {
   test.skip(I18N_PUBLISHED, 'machine translations are published (PUBLISHED_TRANSLATED_LOCALES)');
 
-  test('the translation files stay on disk, but nothing but /es/thesis is built or listed', () => {
+  test('the translation files stay on disk, but only the hand-written pages are built or listed', () => {
     // The committed i18n/ holds the translations; a scratch I18N_DIR may be empty.
     if (!process.env.I18N_DIR) expect(translationsOnDisk().length).toBeGreaterThan(0);
     expect(index.files).toEqual([]);
-    expect(translatedRoutesInDist()).toEqual(['/es/thesis']);
+    expect(translatedRoutesInDist()).toEqual(HAND_ES);
     const langPrefix = new RegExp(`^${SITE}/(${TRANSLATED_LOCALES.join('|')})(/|$)`);
     const listed = sitemapUrls().filter((u) => langPrefix.test(u.loc)).map((u) => u.loc.slice(SITE.length));
-    expect(listed).toEqual(['/es/thesis']);
+    expect(listed).toEqual(HAND_ES);
   });
 
   test('no page carries the language switcher, the footer languages or a translation notice', () => {
@@ -390,18 +394,24 @@ test.describe('machine translations switched off', () => {
     }
   });
 
-  test('no hreflang points at a hidden translation; /thesis and /es/thesis stay paired', () => {
-    // Any alternate under /es, /fr, /de or /pt other than the hand translation.
+  test('no hreflang points at a hidden translation; the hand-written pairs stay paired', () => {
+    // Any alternate under /es, /fr, /de or /pt other than a hand-written page.
     const langPrefix = new RegExp(`^${SITE}/(${TRANSLATED_LOCALES.join('|')})(/|$)`);
-    const isHidden = (href: string) => href !== `${SITE}/es/thesis` && langPrefix.test(href);
-    const pair = [
-      { hreflang: 'en', href: `${SITE}/thesis` },
-      { hreflang: 'es', href: `${SITE}/es/thesis` },
-      { hreflang: 'x-default', href: `${SITE}/thesis` },
+    const isHidden = (href: string) => !HAND_ES.some((es) => href === `${SITE}${es}`) && langPrefix.test(href);
+    const pairOf = (english: string) => [
+      { hreflang: 'en', href: `${SITE}${english}` },
+      { hreflang: 'es', href: `${SITE}/es${english}` },
+      { hreflang: 'x-default', href: `${SITE}${english}` },
     ];
+    const pairs = new Map<string, ReturnType<typeof pairOf>>();
+    for (const english of HAND_TRANSLATED_ES) {
+      pairs.set(english, pairOf(english));
+      pairs.set(`/es${english}`, pairOf(english));
+    }
     for (const url of sitemapUrls()) {
       const path = url.loc.slice(SITE.length);
-      if (path === '/thesis' || path === '/es/thesis') expect(url.links, path).toEqual(pair);
+      const pair = pairs.get(path);
+      if (pair) expect(url.links, path).toEqual(pair);
       for (const link of url.links) expect(isHidden(link.href), `sitemap ${path}: ${link.href}`).toBe(false);
     }
     for (const file of htmlFilesInDist()) {
@@ -410,7 +420,8 @@ test.describe('machine translations switched off', () => {
         hreflang: m[1],
         href: /\bhref="([^"]+)"/.exec(m[0])?.[1] ?? '',
       }));
-      if (file === '/thesis.html' || file === '/es/thesis.html') expect(tags, file).toEqual(pair);
+      const pair = pairs.get(file.replace(/\.html$/, ''));
+      if (pair) expect(tags, file).toEqual(pair);
       for (const tag of tags) expect(isHidden(tag.href), `${file}: ${tag.href}`).toBe(false);
     }
   });
@@ -443,9 +454,9 @@ test.describe('redirects of the hidden translations', () => {
     }
   });
 
-  test('no rule catches the hand-translated /es/thesis', () => {
+  test('no rule catches a hand-written Spanish page', () => {
     for (const rule of redirectRules()) {
-      expect(ruleMatches(rule.from, '/es/thesis'), rule.from).toBe(false);
+      for (const path of HAND_ES) expect(ruleMatches(rule.from, path), `${rule.from} catches ${path}`).toBe(false);
     }
   });
 });

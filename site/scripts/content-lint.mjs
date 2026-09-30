@@ -284,6 +284,9 @@ function versionMismatches() {
 
 // ── Translations ─────────────────────────────────────────────────────────
 const TRANSLATED = ['es', 'fr', 'de', 'pt'];
+// Hand-written Spanish pages (HAND_TRANSLATED_ES in src/lib/i18n-content.ts):
+// not machine translations, so they carry no machine-translation notice.
+const HAND_TRANSLATED_PAGES = new Set(['/es/thesis', '/es/resources/ai-act-deadlines']);
 const SITE_URL = 'https://aigovernanceengineer.com';
 const I18N_DIR = process.env.I18N_DIR
   ? resolve(process.cwd(), process.env.I18N_DIR)
@@ -326,7 +329,7 @@ function translatedPageProblems(file, raw) {
   const rel = relative(targetDir, file).split(sep).join('/');
   const path = `/${rel.replace(/\.html$/, '')}`; // /es/bok/x, /es/bok, /es
   const lang = path.split('/')[1];
-  if (!TRANSLATED.includes(lang) || path === '/es/thesis') return [];
+  if (!TRANSLATED.includes(lang) || HAND_TRANSLATED_PAGES.has(path)) return [];
   const out = [];
   const htmlLang = /<html[^>]*\blang="([^"]+)"/.exec(raw)?.[1];
   if (htmlLang !== lang) out.push(`<html lang="${htmlLang}"> on a /${lang}/ page`);

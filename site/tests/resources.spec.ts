@@ -15,6 +15,7 @@ import { datasets } from '../src/lib/api';
 const HUB = [
   '/resources/frameworks',
   '/obligations',
+  '/resources/ai-act-deadlines',
   '/resources/crosswalk',
   '/resources/frontier-safety-crosswalk',
   '/resources/harms',

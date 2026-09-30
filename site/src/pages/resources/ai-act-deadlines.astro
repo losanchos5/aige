@@ -1,0 +1,70 @@
+---
+// /resources/ai-act-deadlines: what applies when under the EU AI Act after the
+// Digital Omnibus, with the Spanish supervisor, sandbox and bill. Updated by
+// milestone. The body (components/AiActDeadlines.astro) and the data
+// (data/ai-act-timeline.ts) are shared with the hand-written Spanish page
+// /es/resources/ai-act-deadlines.
+import Base from '../../layouts/Base.astro';
+import '../../styles/reading.css';
+import PageHero from '../../components/PageHero.astro';
+import AiActDeadlines from '../../components/AiActDeadlines.astro';
+import { site } from '../../data/site';
+import { AI_ACT_TIMELINE_AS_OF, aiActMilestones } from '../../data/ai-act-timeline';
+import { DEADLINES_PATH } from '../../lib/ai-act-deadlines';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { alternatesFor } from '../../lib/i18n-content';
+import { fitsSiteSuffix } from '../../lib/seo-title';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+
+const seoTitle = 'EU AI Act deadlines';
+const description =
+  'Every EU AI Act application date after the Digital Omnibus, with the articles each one switches on, plus the Spanish AI supervisor, sandbox and bill.';
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'AI Act deadlines' }];
+
+const pageUrl = new URL(DEADLINES_PATH.en, site.url).href;
+const esUrl = new URL(DEADLINES_PATH.es, site.url).href;
+const jsonLd = [
+  {
+    '@type': 'TechArticle',
+    '@id': `${pageUrl}#article`,
+    headline: 'EU AI Act deadlines after the Digital Omnibus: what applies when',
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    dateModified: AI_ACT_TIMELINE_AS_OF,
+    image: new URL('/og/ai-act-deadlines.png', site.url).href,
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    workTranslation: { '@id': `${esUrl}#article` },
+    about: ['Regulation (EU) 2024/1689', 'Regulation (EU) 2026/1744'],
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+---
+
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/ai-act-deadlines.png"
+  jsonLd={jsonLd}
+  alternates={alternatesFor(DEADLINES_PATH.en)}
+  article={{ modifiedTime: `${AI_ACT_TIMELINE_AS_OF}T00:00:00Z` }}
+>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    mesh={false}
+    title="EU AI Act deadlines after the Digital Omnibus: what applies when"
+    lede={`The ${aiActMilestones.length} dates on which something under Regulation (EU) 2024/1689 starts to apply, as Regulation (EU) 2026/1744 left them, with the articles each date switches on, who it concerns and what the Omnibus moved. For Spain: the supervisor, the sandbox and the national AI bill, which is still in parliament.`}
+  />
+
+  <div class="container res-page">
+    <AiActDeadlines lang="en" />
+  </div>
+</Base>

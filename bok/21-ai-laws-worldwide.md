@@ -586,7 +586,9 @@ Spain has an operational AI supervisor, a live sandbox and a national AI bill th
   so check each guide against the amended Act [49].
 
 The guides are the most practical public template set for the EU high-risk requirements; chapter 18
-maps the articles they implement.
+maps the articles they implement. The [AI Act deadlines](/resources/ai-act-deadlines#spain) page
+tracks the bill's parliamentary stage, the sandbox and AESIA's designation by milestone, in English
+and [Spanish](/es/resources/ai-act-deadlines#spain).
 
 ## Singapore: model frameworks and AI Verify
 
