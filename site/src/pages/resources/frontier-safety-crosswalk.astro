@@ -11,6 +11,7 @@ import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import CrosswalkMatrix from '../../components/CrosswalkMatrix.astro';
 import CrosswalkDrawer from '../../components/CrosswalkDrawer.astro';
+import CoverageMap from '../../components/CoverageMap.astro';
 import SourceList from '../../components/SourceList.astro';
 import CitedText from '../../components/CitedText.astro';
 import Citation from '../../components/Citation.astro';
@@ -23,6 +24,7 @@ import {
   frontierCrosswalkSources,
   frontierDocs,
   frontierFrameworkById,
+  frontierGaps,
   frontierLimits,
   frontierMatrix,
   frontierProblems,
@@ -185,6 +187,25 @@ const fwShort = (id: string): string => frontierFrameworkById(id)?.short ?? id;
         Their cells show where an organisation that runs either would file the same question, with
         NIST's subcategories as NIST prints them and ISO clauses by number and title only.
       </p>
+    </section>
+
+    <section class="res-section" id="coverage" aria-labelledby="fs-coverage-heading">
+      <div class="res-section-head">
+        <h2 id="fs-coverage-heading">Coverage at a glance</h2>
+        <p>
+          How deeply each document deals with each dimension. The number counts the sections
+          mainly about the row; more sections is not better coverage, and a filled cell says
+          nothing about whether anyone meets it. Select a cell to read the sections.
+        </p>
+      </div>
+      <CoverageMap
+        topics={dimensions}
+        columns={frontierColumns}
+        refs={frontierRefs}
+        gaps={frontierGaps}
+        shortLabels={{ rsp: 'RSP', pf: 'PF', fsf: 'FSF', nist: 'NIST', iso: 'ISO' }}
+        label="Coverage map: one row per dimension, one cell per document"
+      />
     </section>
 
     <section class="res-section" aria-labelledby="fs-grid-heading">
@@ -359,6 +380,7 @@ const fwShort = (id: string): string => frontierFrameworkById(id)?.short ?? id;
   <CrosswalkDrawer />
   <script is:inline defer src="/inert.js"></script>
   <script is:inline defer src="/crosswalk.js"></script>
+  <script is:inline defer src="/coverage-map.js"></script>
   <script is:inline defer src="/cite.js"></script>
 </Base>
 

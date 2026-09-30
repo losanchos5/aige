@@ -1,0 +1,397 @@
+/* Coverage map (CoverageMap.astro, OpenSpec change frontier-coverage-map).
+   One hue from the layer-1 pair, three core steps: --l1 with ink text, a 70%
+   mix with --bg text, and --l1-ink with --bg text (all AA in both themes, since
+   --l1/--l1-ink swap roles in dark). Related is pale with a dashed outline,
+   gap a dotted one. The lenses never dim with opacity (axe blends fractional
+   opacity): a cell off the lens goes to --bg with --muted text, which keeps
+   AA. Motion is colour-only and drops under prefers-reduced-motion. */
+
+.cov {
+  --cov-core-1: var(--l1);
+  --cov-core-2: color-mix(in srgb, var(--l1-ink) 70%, var(--l1));
+  --cov-core-3: var(--l1-ink);
+  --cov-label-w: minmax(9rem, 1.5fr);
+  --cov-cell-h: 2.5rem;
+  margin: 0 0 var(--s-6);
+}
+
+/* ---- Lenses ---------------------------------------------------------------- */
+.cov-lenses {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
+  margin: 0 0 var(--s-4);
+  padding: 0;
+  border: 0;
+}
+
+.cov-lenses[hidden] {
+  display: none;
+}
+
+.cov-lenses-legend {
+  float: left;
+  margin-right: var(--s-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.cov-lenses label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  padding: 0.3em 0.8em;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: var(--fs-small);
+  cursor: pointer;
+}
+
+.cov-lenses label:has(input:checked) {
+  border-color: var(--ink);
+  background: var(--tint-bg);
+}
+
+.cov-lenses label:has(input:focus-visible) {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.cov-lens-note {
+  display: none;
+  flex-basis: 100%;
+  margin: 0;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.cov[data-lens='all'] .cov-lens-note[data-for='all'],
+.cov[data-lens='labs-vs-standards'] .cov-lens-note[data-for='labs-vs-standards'],
+.cov[data-lens='gaps'] .cov-lens-note[data-for='gaps'] {
+  display: block;
+}
+
+/* ---- Key ------------------------------------------------------------------- */
+.cov-key {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  margin: 0 0 var(--s-4);
+  padding: 0;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.cov-key > li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+}
+
+.cov-key > li > .cov-swatch:last-of-type {
+  margin-right: var(--s-1);
+}
+
+/* ---- Grid ------------------------------------------------------------------ */
+.cov-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cov-row {
+  position: relative; /* containing block for .visually-hidden */
+  display: grid;
+  grid-template-columns: var(--cov-label-w) repeat(var(--cov-cols), minmax(0, 1fr)) 6.5rem;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+.cov-head,
+.cov-foot {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.cov-head {
+  align-items: end;
+  padding-bottom: var(--s-2);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: var(--s-1);
+}
+
+.cov-foot {
+  padding-top: var(--s-2);
+  border-top: 1px solid var(--line);
+  margin-top: var(--s-1);
+}
+
+.cov-colhead,
+.cov-total {
+  text-align: center;
+  line-height: 1.25;
+}
+
+.cov-short {
+  display: none;
+}
+
+.cov-label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--cov-cell-h);
+  padding: 0 var(--s-2) 0 0;
+  font-size: var(--fs-small);
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.cov-label:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* ---- Cells ------------------------------------------------------------------ */
+.cov-cell,
+.cov-swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  font-family: var(--font-mono);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.cov-cell {
+  height: var(--cov-cell-h);
+}
+
+.cov-swatch {
+  min-width: 2.25rem;
+  height: 1.5rem;
+  padding: 0 0.4em;
+  font-size: var(--fs-label);
+}
+
+.cov-cell[data-state='core'][data-level='1'],
+.cov-swatch[data-state='core'][data-level='1'] {
+  background: var(--cov-core-1);
+  color: var(--ink);
+}
+
+.cov-cell[data-state='core'][data-level='2'],
+.cov-swatch[data-state='core'][data-level='2'] {
+  background: var(--cov-core-2);
+  color: var(--bg);
+}
+
+.cov-cell[data-state='core'][data-level='3'],
+.cov-swatch[data-state='core'][data-level='3'] {
+  background: var(--cov-core-3);
+  color: var(--bg);
+}
+
+.cov-cell[data-state='related'],
+.cov-swatch[data-state='related'] {
+  background: var(--bg);
+  border: 1px dashed var(--l1-ink);
+  color: var(--ink-2);
+  font-weight: 500;
+}
+
+.cov-cell[data-state='gap'],
+.cov-swatch[data-state='gap'],
+.cov-cell[data-state='none'] {
+  background: var(--bg);
+  border: 2px dotted var(--block);
+  color: var(--block);
+  font-weight: 500;
+}
+
+.cov-cell[data-state='none'] {
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+.cov-cell:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Crosshair: the row by :has(), the column by .is-col-hot (coverage-map.js). */
+.cov-rows > .cov-row:has(a:hover, a:focus-visible) {
+  background: var(--pause-bg);
+  box-shadow: 0 0 0 1px var(--line);
+  border-radius: var(--r-sm);
+}
+
+.cov-cell.is-col-hot,
+.cov-colhead.is-col-hot,
+.cov-total.is-col-hot {
+  box-shadow: 0 0 0 2px var(--line);
+}
+
+.cov-colhead.is-col-hot,
+.cov-total.is-col-hot {
+  color: var(--ink);
+  border-radius: var(--r-sm);
+}
+
+/* ---- Consensus ------------------------------------------------------------- */
+.cov-consensus {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding-left: var(--s-2);
+}
+
+.cov-dots {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.cov-dot {
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--l1-ink);
+  border-radius: 50%;
+}
+
+.cov-dot[data-on] {
+  background: var(--l1-ink);
+}
+
+.cov-count {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: var(--ink-2);
+}
+
+.cov-conshead {
+  padding-left: var(--s-2);
+}
+
+/* ---- Divergence marks (only under the labs-vs-standards lens) ------------------ */
+.cov-divmark {
+  display: none;
+  flex: none;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 2px;
+}
+
+.cov-divmark[data-kind='labs'] {
+  background: var(--l1-ink);
+}
+
+.cov-divmark[data-kind='standards'] {
+  border: 2px solid var(--l1-ink);
+}
+
+/* ---- Lenses: what each one emphasises ---------------------------------------- */
+.cov[data-lens='gaps'] .cov-cell:not([data-state='gap']),
+.cov[data-lens='labs-vs-standards'] .cov-row:not([data-divergence]) .cov-cell {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.cov[data-lens='gaps'] .cov-cell[data-state='gap'] {
+  background: color-mix(in srgb, var(--l3) 55%, var(--bg));
+  border-width: 3px;
+}
+
+.cov[data-lens='labs-vs-standards'] .cov-cell[data-div] {
+  outline: 3px solid var(--ink);
+  outline-offset: -1px;
+}
+
+/* The thin-side outline must not swallow the focus ring (WCAG 2.4.7). */
+.cov[data-lens='labs-vs-standards'] .cov-cell[data-div]:focus-visible {
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 5px var(--bg),
+    0 0 0 7px var(--ink);
+}
+
+.cov[data-lens='labs-vs-standards'] .cov-divmark,
+.cov-lens-note .cov-divmark {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+/* ---- Short column headers before the long ones collide ------------------------ */
+@media (max-width: 900px) {
+  .cov-long {
+    display: none;
+  }
+
+  .cov-short {
+    display: inline;
+  }
+}
+
+/* ---- Narrow screens: label on its own line ---------------------------------------- */
+@media (max-width: 640px) {
+  .cov-row {
+    grid-template-columns: repeat(var(--cov-cols), minmax(0, 1fr)) auto;
+    row-gap: 2px;
+  }
+
+  .cov-rows > .cov-row {
+    padding-top: var(--s-2);
+  }
+
+  .cov-label {
+    grid-column: 1 / span var(--cov-cols);
+    grid-row: 1;
+    min-height: 0;
+  }
+
+  .cov-consensus {
+    grid-column: -2 / -1;
+    grid-row: 1;
+    padding-left: 0;
+  }
+
+  .cov-dots {
+    display: none;
+  }
+
+  .cov-corner {
+    display: none;
+  }
+
+  /* "Main in" is spelled out in the key; the count column stays narrow. */
+  .cov-conshead {
+    visibility: hidden;
+    width: 2.5em;
+    padding-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cov-cell,
+  .cov-swatch {
+    transition: none;
+  }
+}

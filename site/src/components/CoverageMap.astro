@@ -1,0 +1,174 @@
+---
+/**
+ * CoverageMap, a topic × column coverage heatmap drawn from the numbers in
+ * src/lib/coverage.ts (OpenSpec change frontier-coverage-map). One row per
+ * topic, one cell per column, a consensus mark per row and totals per column.
+ *
+ * A cell's state never rests on colour alone: core cells are solid fills in
+ * three steps of one hue with the core count printed; related-only cells are
+ * pale with a dashed outline (the dashed chip of CrosswalkMatrix); gap cells
+ * have a dotted outline and the word "gap". Every cell is a link to the
+ * topic's <article> (#topic-<id>), so with JS off it jumps there natively;
+ * public/crosswalk.js already opens its drawer for any [data-cw-open] and
+ * highlights the refs of [data-cw-col]. The column headers and marks are
+ * aria-hidden: each cell's aria-label carries topic, column and state.
+ *
+ * The lens radios ship in a hidden fieldset that public/coverage-map.js
+ * reveals; it sets data-lens on the root and coverage-map.css does the rest.
+ * Cells the "Labs vs standards" lens points at carry data-div; the rows it
+ * marks carry data-divergence.
+ */
+import { computeCoverage, type CoverageCell, type CoverageGap } from '../lib/coverage';
+import type { CrosswalkColumn, CrosswalkRef, Topic } from '../data/crosswalk';
+import '../styles/coverage-map.css';
+
+interface Props {
+  topics: readonly Topic[];
+  columns: readonly CrosswalkColumn[];
+  refs: readonly CrosswalkRef[];
+  gaps?: readonly CoverageGap[];
+  /** Column id -> short header label for narrow screens. */
+  shortLabels?: Record<string, string>;
+  /** Accessible name of the map. */
+  label: string;
+}
+
+const { topics, columns, refs, gaps = [], shortLabels = {}, label } = Astro.props;
+const { rows, columns: totals } = computeCoverage({ topics, columns, refs, gaps });
+const topicName = new Map(topics.map((t) => [t.id, t.name]));
+const labCol = new Set(columns.filter((c) => c.group === 'labs').map((c) => c.id));
+const n = columns.length;
+
+const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
+
+function describe(cell: CoverageCell): string {
+  if (cell.state === 'gap') return 'documented gap, no section maps';
+  if (cell.state === 'none') return 'no section mapped';
+  const main = cell.core ? plural(cell.core, 'section mainly about it', 'sections mainly about it') : 'no section mainly about it';
+  const touch = cell.related ? `, ${plural(cell.related, 'section touching it', 'sections touching it')}` : '';
+  return main + touch;
+}
+
+function shown(cell: CoverageCell): string {
+  if (cell.state === 'core') return String(cell.core);
+  if (cell.state === 'related') return 'rel';
+  return cell.state;
+}
+
+// The "Labs vs standards" lens points at the thin side of a divergent row:
+// the non-lab cells without a core ref in a 'labs' row, the lab cells without
+// one in a 'standards' row.
+function pointed(divergence: readonly string[], col: string, cell: CoverageCell): boolean {
+  if (cell.state === 'core') return false;
+  if (divergence.includes('labs')) return !labCol.has(col);
+  if (divergence.includes('standards')) return labCol.has(col);
+  return false;
+}
+
+const divergenceLabel: Record<string, string> = {
+  labs: 'Main coverage in all three labs, not in every standard',
+  standards: 'Main coverage in a standard, not in every lab',
+};
+---
+
+<div class="cov" id="coverage-map" data-coverage-map data-lens="all" style={`--cov-cols: ${n}`}>
+  <fieldset class="cov-lenses" data-cov-lenses hidden>
+    <legend class="cov-lenses-legend">Lens</legend>
+    <label><input type="radio" name="cov-lens" value="all" checked /> All</label>
+    <label><input type="radio" name="cov-lens" value="labs-vs-standards" /> Labs vs standards</label>
+    <label><input type="radio" name="cov-lens" value="gaps" /> Gaps only</label>
+    <p class="cov-lens-note" data-for="all">Every cell with its depth of coverage.</p>
+    <p class="cov-lens-note" data-for="labs-vs-standards">
+      <span class="cov-divmark" data-kind="labs" aria-hidden="true"></span> All three labs have a
+      section mainly about the dimension and a standard does not.
+      <span class="cov-divmark" data-kind="standards" aria-hidden="true"></span> A standard has one
+      and a lab does not. The outlined cells are the thin side.
+    </p>
+    <p class="cov-lens-note" data-for="gaps">
+      Cells where a document has nothing on the dimension. Open one to read why.
+    </p>
+  </fieldset>
+
+  <ul class="cov-key" aria-label="Key">
+    <li><span class="cov-swatch" data-state="core" data-level="1" aria-hidden="true">1</span><span class="cov-swatch" data-state="core" data-level="2" aria-hidden="true">2</span><span class="cov-swatch" data-state="core" data-level="3" aria-hidden="true">3</span> Sections mainly about the dimension</li>
+    <li><span class="cov-swatch" data-state="related" aria-hidden="true">rel</span> Only sections that touch it</li>
+    <li><span class="cov-swatch" data-state="gap" aria-hidden="true">gap</span> Documented gap</li>
+    <li><span class="cov-count" aria-hidden="true">4/5</span> Documents with a section mainly about it (“Main in”)</li>
+  </ul>
+
+  <div class="cov-grid" role="group" aria-label={label}>
+    <div class="cov-row cov-head" aria-hidden="true">
+      <span class="cov-corner">Dimension</span>
+      {
+        columns.map((c) => (
+          <span class="cov-colhead" data-col={c.id} data-group={c.group}>
+            <span class="cov-long">{c.label}</span>
+            <span class="cov-short">{shortLabels[c.id] ?? c.label}</span>
+          </span>
+        ))
+      }
+      <span class="cov-conshead">Main in</span>
+    </div>
+
+    <ol class="cov-rows">
+      {
+        rows.map((row) => {
+          const name = topicName.get(row.topic) ?? row.topic;
+          return (
+            <li class="cov-row" data-topic={row.topic} data-divergence={row.divergence.join(' ') || undefined}>
+              <a class="cov-label" href={`#topic-${row.topic}`} data-cw-open={row.topic}>
+                {name}
+                {row.divergence.map((d) => (
+                  <span class="cov-divmark" data-kind={d}>
+                    <span class="visually-hidden">: {divergenceLabel[d]}</span>
+                  </span>
+                ))}
+              </a>
+              {row.cells.map((cell, i) => (
+                <a
+                  class="cov-cell"
+                  href={`#topic-${row.topic}`}
+                  data-cw-open={row.topic}
+                  data-cw-col={cell.col}
+                  data-state={cell.state}
+                  data-level={cell.level || undefined}
+                  data-div={pointed(row.divergence, cell.col, cell) ? '' : undefined}
+                  aria-label={`${name}, ${columns[i].label}: ${describe(cell)}`}
+                >
+                  <span aria-hidden="true">{shown(cell)}</span>
+                </a>
+              ))}
+              <span class="cov-consensus">
+                <span class="cov-dots" aria-hidden="true">
+                  {row.cells.map((cell) => (
+                    <span class="cov-dot" data-on={cell.state === 'core' ? '' : undefined} />
+                  ))}
+                </span>
+                <span class="cov-count" aria-hidden="true">{row.consensus}/{n}</span>
+                <span class="visually-hidden">
+                  {name}: a section mainly about it in {row.consensus} of {n} documents
+                </span>
+              </span>
+            </li>
+          );
+        })
+      }
+    </ol>
+
+    <div class="cov-row cov-foot">
+      <span class="cov-corner">Dimensions covered</span>
+      {
+        totals.map((t, i) => (
+          <span class="cov-total" data-col={t.col}>
+            <span aria-hidden="true">{t.covered}/{rows.length}</span>
+            <span class="visually-hidden">
+              {columns[i].label}: {t.covered} of {rows.length} dimensions covered, {t.core} with a
+              section mainly about them
+            </span>
+          </span>
+        ))
+      }
+      <span class="cov-conshead" aria-hidden="true"></span>
+    </div>
+  </div>
+</div>
