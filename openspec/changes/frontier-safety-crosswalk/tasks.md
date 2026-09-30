@@ -2,24 +2,24 @@
 
 ## 1. Investigación y datos
 
-- [ ] 1.1 Mapear RSP, PF y FSF vigentes a las 13 dimensiones (handoffs/labs-refs-{rsp,pf,fsf}.json) y NIST/ISO (labs-refs-standards.json); verificar versión y fecha de cada documento
-- [ ] 1.2 Crear `site/src/data/frontier-crosswalk.ts` (as-of, schema 1, docs, dimensiones, columnas, refs, gaps, `frontierMatrix()`, `frontierProblems()`, fuentes); verificar que `frontierProblems()` devuelve []
-- [ ] 1.3 Extender `ColumnGroup` con `labs` y dar a `CrosswalkMatrix` las props `chooser` y `caption`; verificar que `/resources/crosswalk` renderiza igual (tests de resources/crosswalk en verde)
+- [x] 1.1 Mapear RSP, PF y FSF vigentes a las 13 dimensiones (handoffs/labs-refs-{rsp,pf,fsf}.json) y NIST/ISO (labs-refs-standards.json); verificar versión y fecha de cada documento
+- [x] 1.2 Crear `site/src/data/frontier-crosswalk.ts` (as-of, schema 1, docs, dimensiones, columnas, refs, gaps, `frontierMatrix()`, `frontierProblems()`, fuentes); verificar que `frontierProblems()` devuelve []
+- [x] 1.3 Extender `ColumnGroup` con `labs` y dar a `CrosswalkMatrix` las props `chooser` y `caption`; verificar que `/resources/crosswalk` renderiza igual (tests de resources/crosswalk en verde)
 
 ## 2. Página y exports
 
-- [ ] 2.1 Crear `resources/frontier-safety-crosswalk.astro` con las 8 secciones, JSON-LD Dataset + Breadcrumb, título ≤60 con sufijo y descripción 50-160; verificar en build
-- [ ] 2.2 Crear `frontier-safety-crosswalk.json.ts` y `.csv.ts` con `notice` y schemaVersion 1; verificar que parsean y cuentan lo mismo que el dataset
-- [ ] 2.3 OG card en `lib/og-cards.ts`; verificar `/og/...png` en dist
+- [x] 2.1 Crear `resources/frontier-safety-crosswalk.astro` con las 8 secciones, JSON-LD Dataset + Breadcrumb, título ≤60 con sufijo y descripción 50-160; verificar en build
+- [x] 2.2 Crear `frontier-safety-crosswalk.json.ts` y `.csv.ts` con `notice` y schemaVersion 1; verificar que parsean y cuentan lo mismo que el dataset
+- [x] 2.3 OG card en `lib/og-cards.ts`; verificar `/og/...png` en dist
 
 ## 3. Cableado y contenido BoK
 
-- [ ] 3.1 nav.ts, resources/index.astro, tile en index.astro, enlace en frontier.ts (sin nombrar labs), llms.txt.ts, SOURCE_BY_PATH, lighthouserc, seo-schema PAGES, smoke paths; verificar build y smoke
-- [ ] 3.2 Frase con enlace en bok/08 §"Frontier-developer laws" y bok/10 §"Frontier safety frameworks"; 5 entradas de glosario en bok/09; actualizar reading list y SOURCES.md si cambia una versión; verificar content-lint
+- [x] 3.1 nav.ts, resources/index.astro, tile en index.astro, enlace en frontier.ts (sin nombrar labs), llms.txt.ts, SOURCE_BY_PATH, lighthouserc, seo-schema PAGES, smoke paths; verificar build y smoke
+- [x] 3.2 Frase con enlace en bok/08 §"Frontier-developer laws" y bok/10 §"Frontier safety frameworks"; 5 entradas de glosario en bok/09; actualizar reading list y SOURCES.md si cambia una versión; verificar content-lint
 
 ## 4. Tests y verificación
 
-- [ ] 4.1 `site/tests/frontier-crosswalk.spec.ts` bajo test-audit (invariantes, 5×N, drawer con foco, exports, anclas sin JS, axe ambos temas, 390 px); verificar con PW_PORT=4451
+- [x] 4.1 `site/tests/frontier-crosswalk.spec.ts` bajo test-audit (invariantes, 5×N, drawer con foco, exports, anclas sin JS, axe ambos temas, 390 px); verificar con PW_PORT=4451
 - [ ] 4.2 Fact-check independiente (handoffs/labs-factcheck.md) y corrección; 0 verified:false en columnas de labs o listadas con nota
 - [ ] 4.3 code-reviewer y arreglo de CRITICAL/HIGH; `npm test` completo en verde con PW_PORT=4451
 
