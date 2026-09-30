@@ -18,6 +18,7 @@ import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import Figure from '../../components/Figure.astro';
+import Chart from '../../components/Chart.astro';
 import SourceList from '../../components/SourceList.astro';
 import { site } from '../../data/site';
 import { chaptersOrdered } from '../../data/chapters';
@@ -36,6 +37,7 @@ import {
 } from '../../data/aigp';
 import { resolvedAigpMap, resolveAigpLink } from '../../lib/aigp-coverage';
 import { aigpHeatmapSvg } from '../../lib/aigp-heatmap';
+import { domainChapters, examWeight } from '../../lib/page-visuals/aigp-visuals';
 import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
 import { fitsSiteSuffix } from '../../lib/seo-title';
 import { authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
@@ -96,6 +98,12 @@ const heatmapDescription = [
     return `Domain ${domain.code}, ${domain.title} (${rangeText(domain.questions)} questions): ${parts.join('; ')}.`;
   }),
 ].join(' ');
+
+// Page visuals T3 (lib/page-visuals/aigp-visuals.ts): the competencies as
+// tiles sized by their question range, and the domains flowing into the
+// chapters their indicators link to.
+const weight = examWeight();
+const toChapters = domainChapters();
 
 // Study paths: the first link of each indicator, per domain, repeats merged.
 const paths = aigpDomains.map((domain) => ({
@@ -183,7 +191,9 @@ const jsonLd = [
       <p class="ag-toc-title">On this page</p>
       <ol>
         <li><a href="#how-to-read">How to read the map</a></li>
+        <li><a href="#exam-weight">Where the exam weighs</a></li>
         <li><a href="#heatmap">The heatmap</a></li>
+        <li><a href="#domain-chapters">From the domains to the chapters</a></li>
         <li><a href="#study-paths">Study paths, one per domain</a></li>
         {
           domains.map((domain) => (
@@ -240,6 +250,23 @@ const jsonLd = [
       </div>
     </section>
 
+    <section class="res-section" aria-labelledby="exam-weight">
+      <div class="res-section-head">
+        <h2 id="exam-weight">Where the exam weighs</h2>
+        <p>
+          The {competencyCount} competencies sized by the midpoint of the question range the
+          blueprint gives each, grouped by domain, with a bar for the share of their indicators this
+          site marks taught. Weigh your reading by the size of a tile, then open it.
+        </p>
+      </div>
+      <Chart
+        title="Where the exam weighs"
+        caption="Each tile is one competency, as large as the midpoint of its exam question range (4 to 6 questions draws as 5); the bar along its foot is the share of its indicators marked taught. A tile links to the competency's table below."
+        chart={weight.wide}
+        narrow={weight.narrow}
+      />
+    </section>
+
     <section class="res-section" aria-labelledby="heatmap">
       <div class="res-section-head">
         <h2 id="heatmap">The heatmap</h2>
@@ -257,6 +284,22 @@ const jsonLd = [
       >
         <Fragment set:html={heatmap} />
       </Figure>
+    </section>
+
+    <section class="res-section" aria-labelledby="domain-chapters">
+      <div class="res-section-head">
+        <h2 id="domain-chapters">From the domains to the chapters</h2>
+        <p>
+          Which chapters of the body of knowledge each domain's indicators link to, as wide as the
+          number of indicators. A chapter that several domains feed is worth reading early.
+        </p>
+      </div>
+      <Chart
+        title="From the domains to the chapters"
+        caption="Each ribbon runs from a domain to a chapter, as wide as the number of the domain's indicators that link into that chapter; an indicator that links two chapters counts in both. The chapters with fewer links are grouped as Other; the table lists every pair drawn."
+        chart={toChapters.wide}
+        narrow={toChapters.narrow}
+      />
     </section>
 
     <section class="res-section" aria-labelledby="study-paths" data-ag-study>

@@ -3,9 +3,11 @@ import Base from '../../layouts/Base.astro';
 import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
+import Chart from '../../components/Chart.astro';
 import { stages, kit, schemaOrder } from '../../data/templates';
 import { patterns } from '../../data/patterns';
 import { getSchemas } from '../../lib/schemas-library';
+import { recordsRing, recordInstrumentGrid } from '../../lib/page-visuals/template-visuals';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { fitsSiteSuffix } from '../../lib/seo-title';
 import { collectionPage, lastModified } from '../../lib/jsonld';
@@ -22,6 +24,12 @@ const schemas = [...getSchemas()].sort((a, b) => rank(a.name) - rank(b.name));
 const byStage = stages
   .map((stage) => ({ ...stage, rows: schemas.filter((s) => s.stage === stage.id) }))
   .filter((stage) => stage.rows.length > 0);
+
+// Page visuals T3 (lib/page-visuals/template-visuals.ts): the records ring
+// over the stage list, and the record x instrument matrix of x-evidences marks
+// after the schema tables.
+const ring = recordsRing();
+const matrix = recordInstrumentGrid();
 
 const patternTitle = new Map(patterns.map((p) => [p.id, p.title]));
 const patternHref = (id: string) => `/bok/patterns#${id}`;
@@ -160,6 +168,13 @@ const jsonLd = [
         chapter (registry entry, verdict, eval result, evidence record) validate against these
         schemas, and the site build checks that on every release.</p>
       </div>
+      <Chart
+        title="The records ring"
+        caption="Each record in the lifecycle stage it belongs to, the organisation-wide ones in the centre; a circle is as large as the record's fields, its inner disc the share of them that is required. Follow the ring to see what a system leaves behind at each step; a name links to its row below."
+        chart={ring.wide}
+        narrow={ring.narrow}
+        class="tpl-ring"
+      />
       <ol class="tpl-stages">
         {
           byStage.map((stage) => (
@@ -253,6 +268,21 @@ const jsonLd = [
           </div>
         ))
       }
+    </section>
+
+    <section class="res-section" aria-labelledby="tpl-marks">
+      <div class="res-section-head">
+        <h2 id="tpl-marks">Which record evidences which instrument</h2>
+        <p>Every <code>x-evidences</code> mark in the schemas above, on the record or on one of its
+        fields, counted by the instrument it cites. Read down the column of the instrument you answer
+        to for the records its marks rest on, and start with those.</p>
+      </div>
+      <Chart
+        title="Evidence marks, record by instrument"
+        caption="One row per record, one column per instrument its marks cite, with the count of marks in each cell and the totals at the ends. A record name links to its row in the tables above."
+        chart={matrix.wide}
+        narrow={matrix.narrow}
+      />
     </section>
 
     <section class="res-section" aria-labelledby="tpl-kit">

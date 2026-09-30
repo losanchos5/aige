@@ -19,6 +19,9 @@ export interface SchemaSummary {
   /** First sentence of the schema description. */
   purpose: string;
   evidences: string[];
+  /** Every x-evidences mark in the schema, the record's own first, then each
+   *  field's (nested fields included), in file order: one entry per mark. */
+  evidenceMarks: string[];
   layers: number[];
   /** Anchor ids of the chapter-05 patterns (`pattern-*`). */
   patterns: string[];
@@ -41,6 +44,20 @@ const asStrings = (value: unknown, where: string): string[] => {
   }
   return value as string[];
 };
+
+/** Every x-evidences list in `node`, its own first, then its children's in key order. */
+function collectMarks(node: unknown, where: string, into: string[] = []): string[] {
+  if (node === null || typeof node !== 'object') return into;
+  const record = node as Record<string, unknown>;
+  if ('x-evidences' in record) into.push(...asStrings(record['x-evidences'], `${where} x-evidences`));
+  for (const [key, value] of Object.entries(record)) {
+    if (key !== 'x-evidences') collectMarks(value, `${where}/${key}`, into);
+  }
+  return into;
+}
+
+// `$schema` and `extensions` are envelope, not record fields.
+const ENVELOPE = new Set(['$schema', 'extensions']);
 
 let cache: SchemaSummary[] | undefined;
 
@@ -67,15 +84,15 @@ export function getSchemas(): SchemaSummary[] {
       title: String(raw.title),
       purpose: firstSentence(String(raw.description)),
       evidences: asStrings(raw['x-evidences'], `${file} x-evidences`),
+      evidenceMarks: collectMarks(raw, file),
       layers: layers as number[],
       patterns: asStrings(raw['x-pattern'], `${file} x-pattern`).map((url) =>
         url.replace(PATTERN_PREFIX, ''),
       ),
       stage: String(raw['x-lifecycle-stage']) as LifecycleStage,
-      requiredCount: asStrings(raw.required, `${file} required`).length,
-      // `$schema` and `extensions` are envelope, not record fields.
-      fieldCount: Object.keys(properties).filter((k) => k !== '$schema' && k !== 'extensions')
+      requiredCount: asStrings(raw.required, `${file} required`).filter((k) => !ENVELOPE.has(k))
         .length,
+      fieldCount: Object.keys(properties).filter((k) => !ENVELOPE.has(k)).length,
       schemaHref: `/schemas/${file}`,
       exampleHref: `/schemas/examples/${name}.example.json`,
       templateHref: `/templates/${name}.md`,
