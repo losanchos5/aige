@@ -110,7 +110,7 @@ test.describe('frontier crosswalk: page', () => {
     for (const doc of labs) {
       await expect(cards.filter({ hasText: doc.issuer }).first()).toContainText(doc.version);
     }
-    await expect(page.locator('a[href="/frontier"]').first()).toBeVisible();
+    await expect(page.locator('main a[href="/frontier"]').first()).toBeVisible();
   });
 
   test('a cell opens the drawer on its dimension; Esc closes it and returns focus', async ({
