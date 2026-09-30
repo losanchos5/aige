@@ -1,0 +1,293 @@
+/* chart.css: the frame of src/components/Chart.astro and, for charts in
+   'chart' mode, the token classes of the chart kit (src/lib/charts/) under a
+   .chart root. The five pages tests/perf.spec.ts keeps free of figures.css,
+   prose.css and diagrams.css (/, /resources, /resources/crosswalk, /cases,
+   /patterns) draw their charts with these rules, so this sheet must never
+   open a .figc, .prose or .diagram rule. The SVG rules below mirror the ones
+   figures.css keeps under .figc (the exporter reads only that sheet); keep
+   the two in step: tests/chart-primitives.spec.ts checks that every class a
+   primitive emits is styled in both. Colours come only from tokens.css, so
+   light and dark follow the theme; nothing here dims text with opacity. */
+
+/* ----------------------------------------------------------------- frame -- */
+/* The figure is a size container: the wide/narrow pair and the canvas padding
+   switch on its own width, not the viewport's. */
+.chart-fig {
+  margin: var(--s-6) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  container-type: inline-size;
+}
+
+.chart-canvas {
+  padding: var(--s-3);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-1);
+}
+
+/* A phone gives the canvas about 344px: a narrow SVG drawn 340 wide keeps its
+   12px text at 1:1. */
+@container (max-width: 479px) {
+  .chart-canvas {
+    padding: 6px;
+  }
+}
+
+.chart-canvas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-inline: auto;
+}
+
+/* Wide/narrow pair: exactly one is displayed, so the other leaves the
+   accessibility tree. The switch point (chart-sw-<px>) is the first one wide
+   enough to show the wide SVG at 1:1, chosen by Chart.astro. */
+.chart-pair > .chart-w {
+  display: none;
+}
+
+@container (min-width: 480px) { .chart-sw-480 > .chart-w { display: block; } .chart-sw-480 > .chart-n { display: none; } }
+@container (min-width: 560px) { .chart-sw-560 > .chart-w { display: block; } .chart-sw-560 > .chart-n { display: none; } }
+@container (min-width: 640px) { .chart-sw-640 > .chart-w { display: block; } .chart-sw-640 > .chart-n { display: none; } }
+@container (min-width: 720px) { .chart-sw-720 > .chart-w { display: block; } .chart-sw-720 > .chart-n { display: none; } }
+@container (min-width: 800px) { .chart-sw-800 > .chart-w { display: block; } .chart-sw-800 > .chart-n { display: none; } }
+@container (min-width: 900px) { .chart-sw-900 > .chart-w { display: block; } .chart-sw-900 > .chart-n { display: none; } }
+@container (min-width: 1000px) { .chart-sw-1000 > .chart-w { display: block; } .chart-sw-1000 > .chart-n { display: none; } }
+
+/* Dense matrices scroll sideways inside a labelled, focusable region, never
+   the page; the SVG keeps its natural size. With a sticky pair, the label
+   column stays in view while the grid scrolls under it. */
+.chart-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.chart-scroll svg {
+  width: auto;
+  max-width: none;
+}
+
+.chart-scroll:focus-visible,
+.chart-table-wrap:focus-visible,
+.chart-alt-summary:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.chart-sticky-row {
+  display: flex;
+  width: max-content;
+}
+
+.chart-sticky-head {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--bg);
+}
+
+.chart-caption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.chart-title {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.chart-desc {
+  max-width: 72ch;
+  font-size: var(--fs-small);
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+/* The table alternative: the same rows the chart draws. */
+.chart-alt {
+  border-top: 1px solid var(--line);
+  padding-top: var(--s-3);
+}
+
+.chart-alt-summary {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.chart-table-wrap {
+  margin-top: var(--s-3);
+  overflow-x: auto;
+}
+
+.chart-table {
+  border-collapse: collapse;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.chart-table caption {
+  text-align: left;
+  padding-bottom: var(--s-2);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.chart-table th,
+.chart-table td {
+  padding: var(--s-1) var(--s-3) var(--s-1) 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.chart-table thead th {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.chart-table td.num {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------- chart-mode SVG rules -- */
+/* Mirror of the figures.css rules the kit uses, under .chart. */
+.chart {
+  color: var(--ink);
+}
+
+.chart text {
+  fill: var(--ink);
+  font-family: var(--font-body);
+}
+
+.chart .disp {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Mono figure labels keep the face but not the global .mono capitals: several
+   are 30–40 character phrases (audit SL-05), so they read in sentence case. */
+.chart .mono {
+  font-family: var(--font-mono);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.chart .muted {
+  fill: var(--muted);
+}
+
+.chart .ink2 {
+  fill: var(--ink-2);
+}
+
+/* Panels and rules */
+.chart .panel {
+  fill: color-mix(in srgb, var(--ink) 3%, var(--bg));
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.chart .rule {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.chart .axis {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.chart .arrow {
+  fill: var(--muted);
+}
+
+.chart .stroke-arrow {
+  stroke: var(--muted);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.chart .cell { stroke: var(--line); stroke-width: 1; }
+.chart .cell-empty { fill: color-mix(in srgb, var(--ink) 4%, var(--bg)); }
+/* Text on a solid-ink fill (the highlighted ladder step): the ground colour. */
+.chart .on-ink { fill: var(--bg); }
+
+/* Links inside a chart: the label is the visible text, the whole <a> is the
+   target. Keep the ink colour; underline on hover/focus. */
+.chart a text {
+  fill: var(--ink);
+  text-decoration: none;
+}
+
+.chart a:hover text,
+.chart a:focus-visible text {
+  text-decoration: underline;
+}
+
+.chart a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.chart .mk { stroke-width: 1.25; stroke-linejoin: round; }
+.chart .mk-fill-0 { fill: color-mix(in srgb, var(--ink) 55%, var(--bg)); stroke: var(--ink-2); }
+.chart .mk-fill-1 { fill: color-mix(in srgb, var(--l1-ink) 60%, var(--l1)); stroke: var(--l1-ink); }
+.chart .mk-fill-2 { fill: color-mix(in srgb, var(--l2-ink) 60%, var(--l2)); stroke: var(--l2-ink); }
+.chart .mk-fill-3 { fill: color-mix(in srgb, var(--l3-ink) 60%, var(--l3)); stroke: var(--l3-ink); }
+.chart .mk-fill-4 { fill: color-mix(in srgb, var(--l4-ink) 60%, var(--l4)); stroke: var(--l4-ink); }
+.chart .mk-fill-5 { fill: color-mix(in srgb, var(--l5-ink) 60%, var(--l5)); stroke: var(--l5-ink); }
+.chart .mk-line-0 { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5; }
+.chart .mk-line-1 { fill: var(--bg); stroke: var(--l1-ink); stroke-width: 1.5; }
+.chart .mk-line-2 { fill: var(--bg); stroke: var(--l2-ink); stroke-width: 1.5; }
+.chart .mk-line-3 { fill: var(--bg); stroke: var(--l3-ink); stroke-width: 1.5; }
+.chart .mk-line-4 { fill: var(--bg); stroke: var(--l4-ink); stroke-width: 1.5; }
+.chart .mk-line-5 { fill: var(--bg); stroke: var(--l5-ink); stroke-width: 1.5; }
+.chart .mk-dash-0 { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.chart .mk-dash-1 { fill: var(--bg); stroke: var(--l1-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.chart .mk-dash-2 { fill: var(--bg); stroke: var(--l2-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.chart .mk-dash-3 { fill: var(--bg); stroke: var(--l3-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.chart .mk-dash-4 { fill: var(--bg); stroke: var(--l4-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.chart .mk-dash-5 { fill: var(--bg); stroke: var(--l5-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.chart .mk-hatch-0 { stroke: var(--ink); }
+.chart .mk-hatch-1 { stroke: var(--l1-ink); }
+.chart .mk-hatch-2 { stroke: var(--l2-ink); }
+.chart .mk-hatch-3 { stroke: var(--l3-ink); }
+.chart .mk-hatch-4 { stroke: var(--l4-ink); }
+.chart .mk-hatch-5 { stroke: var(--l5-ink); }
+.chart .hatch-bg { fill: var(--bg); }
+.chart .hatch-0 { stroke: var(--ink-2); stroke-width: 1.6; }
+.chart .hatch-1 { stroke: var(--l1-ink); stroke-width: 1.6; }
+.chart .hatch-2 { stroke: var(--l2-ink); stroke-width: 1.6; }
+.chart .hatch-3 { stroke: var(--l3-ink); stroke-width: 1.6; }
+.chart .hatch-4 { stroke: var(--l4-ink); stroke-width: 1.6; }
+.chart .hatch-5 { stroke: var(--l5-ink); stroke-width: 1.6; }
+/* The one accent: the value the caption is about, in solid ink. */
+.chart .mk-hi { fill: var(--ink); stroke: var(--ink); }
+.chart .heat-0 { fill: var(--ink); }
+.chart .heat-1 { fill: var(--l1-ink); }
+.chart .heat-2 { fill: var(--l2-ink); }
+.chart .heat-3 { fill: var(--l3-ink); }
+.chart .heat-4 { fill: var(--l4-ink); }
+.chart .heat-5 { fill: var(--l5-ink); }
+/* Axes, the today line, stems and the Venn circles (a faint fill, so the
+   overlaps read darker; no text sits on the fill alone). */
+.chart .tick { stroke: var(--muted); stroke-width: 1; }
+.chart .today { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 4 3; fill: none; }
+.chart .stem { stroke: var(--ink-2); stroke-width: 2; fill: none; }
+.chart .venn { fill: var(--ink); fill-opacity: 0.05; stroke: var(--ink); stroke-width: 1.5; }
+.chart .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: normal; text-transform: none; }
+.chart .mk-focus:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }

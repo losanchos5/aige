@@ -429,3 +429,63 @@
 .figc .tile-t { fill: color-mix(in srgb, var(--ink) 22%, var(--bg)); stroke: var(--ink); stroke-width: 1.5; }
 .figc .tile-v { fill: var(--bg); stroke: var(--ink-2); stroke-width: 1; }
 .figc .tile-b { fill: var(--bg); stroke: var(--ink-2); stroke-width: 1.5; stroke-dasharray: 4 3; }
+
+/* ----------------------------------------------------- chart primitives -- */
+/* Classes of the build-time chart kit (src/lib/charts/). The same rules are
+   mirrored under .chart in chart.css for the pages that must not load this
+   sheet (tests/perf.spec.ts); keep the two in step (tests/chart-primitives
+   checks that every class a primitive emits is styled in both).
+   Marks are mk-<state>-<tone>: tone 0 is ink, 1-5 the stack layers. A filled
+   mark takes a mid tone (the ink over the pastel) so it stands 3:1 off the
+   ground next to an outlined one; a hatched mark gets its fill from a
+   <pattern> in the SVG (hatch-<tone> lines on hatch-bg), so its class only
+   sets the stroke. Heat cells are the ink at a fill-opacity the primitive
+   caps at 0.38, so ink text on them keeps its contrast. */
+.figc .mk { stroke-width: 1.25; stroke-linejoin: round; }
+.figc .mk-fill-0 { fill: color-mix(in srgb, var(--ink) 55%, var(--bg)); stroke: var(--ink-2); }
+.figc .mk-fill-1 { fill: color-mix(in srgb, var(--l1-ink) 60%, var(--l1)); stroke: var(--l1-ink); }
+.figc .mk-fill-2 { fill: color-mix(in srgb, var(--l2-ink) 60%, var(--l2)); stroke: var(--l2-ink); }
+.figc .mk-fill-3 { fill: color-mix(in srgb, var(--l3-ink) 60%, var(--l3)); stroke: var(--l3-ink); }
+.figc .mk-fill-4 { fill: color-mix(in srgb, var(--l4-ink) 60%, var(--l4)); stroke: var(--l4-ink); }
+.figc .mk-fill-5 { fill: color-mix(in srgb, var(--l5-ink) 60%, var(--l5)); stroke: var(--l5-ink); }
+.figc .mk-line-0 { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5; }
+.figc .mk-line-1 { fill: var(--bg); stroke: var(--l1-ink); stroke-width: 1.5; }
+.figc .mk-line-2 { fill: var(--bg); stroke: var(--l2-ink); stroke-width: 1.5; }
+.figc .mk-line-3 { fill: var(--bg); stroke: var(--l3-ink); stroke-width: 1.5; }
+.figc .mk-line-4 { fill: var(--bg); stroke: var(--l4-ink); stroke-width: 1.5; }
+.figc .mk-line-5 { fill: var(--bg); stroke: var(--l5-ink); stroke-width: 1.5; }
+.figc .mk-dash-0 { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.figc .mk-dash-1 { fill: var(--bg); stroke: var(--l1-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.figc .mk-dash-2 { fill: var(--bg); stroke: var(--l2-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.figc .mk-dash-3 { fill: var(--bg); stroke: var(--l3-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.figc .mk-dash-4 { fill: var(--bg); stroke: var(--l4-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.figc .mk-dash-5 { fill: var(--bg); stroke: var(--l5-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.figc .mk-hatch-0 { stroke: var(--ink); }
+.figc .mk-hatch-1 { stroke: var(--l1-ink); }
+.figc .mk-hatch-2 { stroke: var(--l2-ink); }
+.figc .mk-hatch-3 { stroke: var(--l3-ink); }
+.figc .mk-hatch-4 { stroke: var(--l4-ink); }
+.figc .mk-hatch-5 { stroke: var(--l5-ink); }
+.figc .hatch-bg { fill: var(--bg); }
+.figc .hatch-0 { stroke: var(--ink-2); stroke-width: 1.6; }
+.figc .hatch-1 { stroke: var(--l1-ink); stroke-width: 1.6; }
+.figc .hatch-2 { stroke: var(--l2-ink); stroke-width: 1.6; }
+.figc .hatch-3 { stroke: var(--l3-ink); stroke-width: 1.6; }
+.figc .hatch-4 { stroke: var(--l4-ink); stroke-width: 1.6; }
+.figc .hatch-5 { stroke: var(--l5-ink); stroke-width: 1.6; }
+/* The one accent: the value the caption is about, in solid ink. */
+.figc .mk-hi { fill: var(--ink); stroke: var(--ink); }
+.figc .heat-0 { fill: var(--ink); }
+.figc .heat-1 { fill: var(--l1-ink); }
+.figc .heat-2 { fill: var(--l2-ink); }
+.figc .heat-3 { fill: var(--l3-ink); }
+.figc .heat-4 { fill: var(--l4-ink); }
+.figc .heat-5 { fill: var(--l5-ink); }
+/* Axes, the today line, stems and the Venn circles (a faint fill, so the
+   overlaps read darker; no text sits on the fill alone). */
+.figc .tick { stroke: var(--muted); stroke-width: 1; }
+.figc .today { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 4 3; fill: none; }
+.figc .stem { stroke: var(--ink-2); stroke-width: 2; fill: none; }
+.figc .venn { fill: var(--ink); fill-opacity: 0.05; stroke: var(--ink); stroke-width: 1.5; }
+.figc .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: normal; text-transform: none; }
+.figc .mk-focus:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }

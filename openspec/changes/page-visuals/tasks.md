@@ -2,12 +2,12 @@
 
 ## 1. Tanda 0: primitivas y contrato (PR A)
 
-- [ ] 1.1 `site/src/lib/charts/core.ts`: escalas lineal y de banda (≤6 marcas redondas), medición de texto portada de `scripts/lib/svg-text.mjs` con fallo duro si desborda, `open()` con role/title/desc, sello As of y línea Source, salida `{ svg, table }`; sin imports de runtime
-- [ ] 1.2 `site/src/components/Chart.astro`: figcaption, `<details>` con la tabla, par ancho/estrecho, modos `.figc` y `.chart`; hoja `.chart` propia sin enlazar `figures.css`
-- [ ] 1.3 Primitivas DotMatrix, HeatGrid y Bars (ordenadas, apiladas, 100 %, mariposa, dumbbell, piruleta)
-- [ ] 1.4 Primitivas TimeAxis (tira, beeswarm con marca de hoy, carriles; reutilizando `timelineModel/measure/wrapTo` de `scripts/lib/posters.mjs`), Lanes, Venn3 con UpSet estrecho y Ladder
-- [ ] 1.5 Clases de gráfico en `site/src/styles/figures.css` para el exportador; tokens claro/oscuro
-- [ ] 1.6 Tests de las primitivas bajo test-audit (salida determinista, tabla igual a los datos, fallo por desborde, contrato a11y); verificar con `npm run build` y el spec nuevo
+- [x] 1.1 `site/src/lib/charts/core.ts`: escalas lineal y de banda (≤6 marcas redondas), medición de texto portada de `scripts/lib/svg-text.mjs` con fallo duro si desborda, `open()` con role/title/desc, sello As of y línea Source, salida `{ svg, table }`; sin imports de runtime
+- [x] 1.2 `site/src/components/Chart.astro`: figcaption, `<details>` con la tabla, par ancho/estrecho, modos `.figc` y `.chart`; hoja `.chart` propia sin enlazar `figures.css`
+- [x] 1.3 Primitivas DotMatrix, HeatGrid y Bars (ordenadas, apiladas, 100 %, mariposa, dumbbell, piruleta)
+- [x] 1.4 Primitivas TimeAxis (tira, beeswarm con marca de hoy, carriles; reutilizando `timelineModel/measure/wrapTo` de `scripts/lib/posters.mjs`), Lanes, Venn3 con UpSet estrecho y Ladder
+- [x] 1.5 Clases de gráfico en `site/src/styles/figures.css` para el exportador; tokens claro/oscuro
+- [x] 1.6 Tests de las primitivas bajo test-audit (salida determinista, tabla igual a los datos, fallo por desborde, contrato a11y); verificar con `npm run build` y el spec nuevo
 - [ ] 1.7 code-reviewer, arreglo de CRITICAL/HIGH, commit por ruta, PR A, CI verde
 
 ## 2. Tanda 1: victorias rápidas (PR B)

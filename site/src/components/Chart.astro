@@ -1,0 +1,123 @@
+---
+/**
+ * Chart: the frame for any primitive of the chart kit (src/lib/charts/).
+ * A canvas with the SVG (or a wide/narrow pair that the figure's own width
+ * switches between, so exactly one is in the accessibility tree), a
+ * figcaption, and the primitive's table rendered as an HTML <table> inside a
+ * <details> (the accessible, copyable form of the same data).
+ *
+ * Style mode comes from the primitive's `mode` (the SVG root class):
+ *  - 'figc': the SVG classes are styled by figures.css, which this component
+ *    does not load; the page must (reading.css), as for <Figure>.
+ *  - 'chart': styled by chart.css alone, for /, /resources,
+ *    /resources/crosswalk, /cases and /patterns (tests/perf.spec.ts).
+ * The frame itself (chart-* classes) always comes from chart.css, which never
+ * opens a .figc, .prose or .diagram rule. No script: tooltips are native
+ * <title>s, marks with an href are links.
+ *
+ *   const wide = dotMatrix({ id: 'cm-w', ... });
+ *   const narrow = dotMatrix({ id: 'cm-n', width: 340, ... });
+ *   <Chart title="93 controls, 5 profiles" caption="..." chart={wide} narrow={narrow} />
+ *
+ * `scroll` (the region's accessible name) lets a dense chart scroll sideways
+ * inside a focusable region instead of shrinking; with a HeatGrid (which
+ * returns `sticky`) the row labels stay in view.
+ */
+import type { ChartOutput } from '../lib/charts';
+import '../styles/chart.css';
+
+interface Props {
+  /** The chart, or the wide variant of a pair. */
+  chart: ChartOutput;
+  /** The narrow variant (drawn about 340 wide), shown below the switch point. */
+  narrow?: ChartOutput;
+  /** Short title (at most six words) for the figcaption. */
+  title: string;
+  /** Two sentences: what it shows, what the reader does with it. */
+  caption?: string;
+  /** Accessible name of a sideways-scroll region; omit to let the SVG shrink. */
+  scroll?: string;
+  /** Summary of the table disclosure (default "Data table"). */
+  tableLabel?: string;
+  class?: string;
+  id?: string;
+}
+
+const { chart, narrow, title, caption, scroll, tableLabel = 'Data table', class: className, id } = Astro.props;
+
+const modeOf = (svg: string) => /^<svg[^>]*\sclass="(figc|chart)\b/.exec(svg)?.[1];
+const mode = modeOf(chart.svg);
+if (!mode) throw new Error(`Chart "${title}": the SVG root carries neither class figc nor chart`);
+if (narrow && modeOf(narrow.svg) !== mode) {
+  throw new Error(`Chart "${title}": the wide and narrow variants use different style modes`);
+}
+// First switch point where the canvas (container minus padding and border)
+// shows the wide SVG at 1:1 or larger.
+const STEPS = [480, 560, 640, 720, 800, 900, 1000];
+const switchAt = STEPS.find((step) => step >= chart.width + 26) ?? STEPS[STEPS.length - 1];
+const { table } = chart;
+const isNum = (value: string | number) => typeof value === 'number';
+const cap = (width: number) => `max-width: ${Math.ceil(width)}px`;
+---
+
+<figure class:list={['chart-fig', className]} data-chart-mode={mode} id={id}>
+  <div class:list={['chart-canvas', narrow && ['chart-pair', `chart-sw-${switchAt}`]]}>
+    {
+      narrow && (
+        <div class="chart-n" style={cap(narrow.width * 1.15)}>
+          <Fragment set:html={narrow.svg} />
+        </div>
+      )
+    }
+    <div class:list={[narrow && 'chart-w']} style={scroll ? undefined : cap(chart.width)}>
+      {
+        scroll ? (
+          <div class="chart-scroll" role="region" tabindex="0" aria-label={scroll}>
+            {chart.sticky ? (
+              <div class="chart-sticky-row">
+                <div class="chart-sticky-head">
+                  <Fragment set:html={chart.sticky.head} />
+                </div>
+                <Fragment set:html={chart.sticky.body} />
+              </div>
+            ) : (
+              <Fragment set:html={chart.svg} />
+            )}
+          </div>
+        ) : (
+          <Fragment set:html={chart.svg} />
+        )
+      }
+    </div>
+  </div>
+  <figcaption class="chart-caption">
+    <span class="chart-title">{title}</span>
+    {caption && <span class="chart-desc">{caption}</span>}
+  </figcaption>
+  <details class="chart-alt">
+    <summary class="chart-alt-summary" data-pagefind-ignore>{tableLabel}</summary>
+    <div class="chart-table-wrap" role="region" tabindex="0" aria-label={table.caption}>
+      <table class="chart-table">
+        <caption>{table.caption}</caption>
+        <thead>
+          <tr>{table.columns.map((column) => <th scope="col">{column}</th>)}</tr>
+        </thead>
+        <tbody>
+          {
+            table.rows.map((row) => (
+              <tr>
+                {row.map((cell, i) =>
+                  i === 0 ? (
+                    <th scope="row">{cell}</th>
+                  ) : (
+                    <td class:list={[isNum(cell) && 'num']}>{cell}</td>
+                  ),
+                )}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+</figure>
