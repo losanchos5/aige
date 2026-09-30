@@ -38,6 +38,7 @@ import {
   summarise,
   scopeWords,
 } from './ai-act-triage-engine.js';
+import { lightLadder } from './ai-act-triage-ladder.js';
 
 const root = document.querySelector('[data-tool-app="ai-act-triage"]');
 const data = readToolData();
@@ -53,12 +54,15 @@ function init(app, model) {
   const result = app.querySelector('[data-tri-result]');
   const status = app.querySelector('[data-tri-status]');
   const importBox = app.querySelector('[data-tri-import-box]');
+  const ladderBox = result.querySelector('[data-tri-ladder]');
+  const ladderLive = ladderBox?.querySelector('[data-tri-lad-live]');
   const field = (name) => form.querySelector(`[data-tri-field="${name}"]`);
   const questionById = new Map(model.questions.map((q) => [q.id, q]));
 
   let shown = false; // a result has been rendered at least once
   let triggersTouched = false; // the reader changed the re-review triggers
   let versionWarning = ''; // a link or record made with another question set
+  let ladderSaid = ''; // the ladder reading last shown
 
   // ---- Reading and writing the form ---------------------------------------------------
 
@@ -345,6 +349,14 @@ function init(app, model) {
         );
       }),
     );
+
+    // The risk ladder and the GPAI track, lit from the same outcome. The
+    // status region already reads the classes out on submit and on load; a
+    // live edit after that changes the ladder silently, so its own polite
+    // region says what changed.
+    const reading = lightLadder(ladderBox, model.ladder, evaluation);
+    if (shown && ladderSaid && reading !== ladderSaid) announce(ladderLive, reading);
+    ladderSaid = reading;
 
     // What the other answers would give, when the scope screen took it out.
     const ifBox = result.querySelector('[data-tri-if]');

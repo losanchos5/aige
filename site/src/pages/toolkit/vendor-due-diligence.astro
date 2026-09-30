@@ -10,6 +10,10 @@
 // worksheet without JavaScript.
 import ToolShell from '../../components/toolkit/ToolShell.astro';
 import ToolTerms from '../../components/toolkit/ToolTerms.astro';
+import Figure from '../../components/Figure.astro';
+import Diagram from '../../components/Diagram.astro';
+import { getFigure } from '../../data/figures';
+import procuredSvg from '../../figures/procured-ai-control.svg?raw';
 import ToolSourceList from '../../components/toolkit/ToolSourceList.astro';
 import type { ToolSource } from '../../components/toolkit/ToolSourceList.astro';
 import { toolById, toolNotice } from '../../data/toolkit';
@@ -33,6 +37,7 @@ const tool = toolById('vendor-due-diligence');
 const data = vendorDdData(site.url, toolNotice, site.license);
 const areas = [...new Set(data.questions.map((q) => q.area))];
 const scoreName = ['', 'low', 'medium', 'high', 'critical'];
+const procured = getFigure('procured-ai-control')!;
 
 const radioGroups = [
   { id: 'vdd-supply', name: 's', legend: 'What are you buying?', hint: 'The route decides what you can test and what you must collect.', options: supplyTypes },
@@ -341,6 +346,15 @@ const sources: ToolSource[] = [
       unverified and compensated by bounding the integration: least-privilege scopes, boundary
       evals and tighter observation of the traffic you control.
     </p>
+    <Figure
+      id="procured-ai-control"
+      title={procured.title}
+      caption={procured.caption}
+      description={procured.description}
+    >
+      <Fragment set:html={procuredSvg} />
+    </Figure>
+    <Diagram id="vendor-due-diligence-gate" />
 
     <h3 id="vdd-tier">The tier rule</h3>
     <p>{vendorTierRule}</p>
