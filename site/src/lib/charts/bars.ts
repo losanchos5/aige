@@ -400,7 +400,9 @@ export function divergingBars(input: DivergingBarsInput): ChartOutput {
 
 export interface DumbbellInput extends ChartBase {
   /** from and to are YYYY-MM-DD dates. */
-  items: { label: string; from: string; to: string; href?: string }[];
+  /** `note` (optional) is printed beside the later dot, e.g. the delay
+   *  ("+16 months"), and fills a table column headed `noteHeader`. */
+  items: { label: string; from: string; to: string; href?: string; note?: string }[];
   /** Legend and table words for the two ends ("Original date", "New date"). */
   fromLabel: string;
   toLabel: string;
@@ -410,6 +412,9 @@ export interface DumbbellInput extends ChartBase {
   today?: string;
   todayLabel?: string;
   itemHeader?: string;
+  /** Table heading of the note column (default "Note"); used only when an
+   *  item has a note. */
+  noteHeader?: string;
   /** Wide label column width (default 40 % of the width, at most 260: the
    *  dates need less room than a value axis). Labels take up to three lines. */
   labelWidth?: number;
@@ -455,6 +460,17 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
     }
     rows.push(shape('circle', xa, cy, 5.5, `class="${markClass('outline', 0)}"`, tip(`${item.label} · ${input.fromLabel}: ${item.from}`)));
     rows.push(shape('circle', xb, cy, 5.5, `class="${markClass('filled', 0)}"`, tip(`${item.label} · ${input.toLabel}: ${item.to}`)));
+    if (item.note) {
+      // Beside the later dot when it fits, else before the earlier one.
+      const nw = textWidth(item.note, 12, 'mono');
+      const after = Math.max(xa, xb) + 10;
+      const before = Math.min(xa, xb) - 10 - nw;
+      if (after + nw > W - L && before < f.x0) {
+        throw new Error(`charts(dumbbell ${input.id}): note "${item.note}" fits neither after nor before "${item.label}"; shorten the wording`);
+      }
+      const nx = after + nw <= W - L ? after : before;
+      rows.push(text(nx, cy + 4, item.note, { size: 12, cls: 'mono', weight: 600, where: 'dumbbell note' }));
+    }
     y = barY + H + 10;
   }
   for (const t of ts.ticks) {
@@ -479,12 +495,13 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
     role: input.items.some((i) => i.href) ? 'group' : 'img',
     cls: 'ch-dumbbell',
   });
+  const noted = input.items.some((i) => i.note);
   return {
     svg,
     table: table(
       input.tableCaption ?? input.title,
-      [input.itemHeader ?? w.item, input.fromLabel, input.toLabel],
-      input.items.map((i) => [i.label, i.from, i.to]),
+      [input.itemHeader ?? w.item, input.fromLabel, input.toLabel, ...(noted ? [input.noteHeader ?? w.note] : [])],
+      input.items.map((i) => [i.label, i.from, i.to, ...(noted ? [i.note ?? ''] : [])]),
     ),
     width: W,
     height,

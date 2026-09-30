@@ -375,6 +375,7 @@ export const figures: readonly FigureDef[] = [
         at: 'foot',
       },
     ],
+    pages: ['/resources/harms'],
   },
   {
     id: 'explanation-techniques',

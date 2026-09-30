@@ -3,6 +3,9 @@ import Base from '../../layouts/Base.astro';
 import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
+import Figure from '../../components/Figure.astro';
+import { getFigure } from '../../data/figures';
+import harmLevelsSvg from '../../figures/harm-levels.svg?raw';
 import CitedText from '../../components/CitedText.astro';
 import SourceList from '../../components/SourceList.astro';
 import { site } from '../../data/site';
@@ -28,6 +31,8 @@ import '../../styles/pages.css';
 import '../../styles/harms.css';
 
 const groups = harmsByLevel();
+// The chapter 13 figure, one example harm per level: the way into the atlas.
+const harmLevels = getFigure('harm-levels')!;
 const incidentCount = new Set(
   harms.flatMap((harm) => harm.exampleIncidents.map((ref) => `${ref.db}:${ref.id}`)),
 ).size;
@@ -114,6 +119,12 @@ const filters = [
         <span class="prose"><CitedText text="[8]" prefix="hs" /></span>. See it written up as a <a
         href="/cases/dutch-childcare-benefits">case</a>.</p>
       </Callout>
+    </div>
+
+    <div class="res-section">
+      <Figure id="harm-levels" title={harmLevels.title} caption={harmLevels.caption} description={harmLevels.description}>
+        <Fragment set:html={harmLevelsSvg} />
+      </Figure>
     </div>
 
     <section class="res-section" aria-labelledby="hm-heading">

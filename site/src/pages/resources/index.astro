@@ -2,6 +2,10 @@
 import Marketing from '../../layouts/Marketing.astro';
 import PageHero from '../../components/PageHero.astro';
 import ResourceCard from '../../components/ResourceCard.astro';
+import Section from '../../components/Section.astro';
+import Chart from '../../components/Chart.astro';
+import { corpusIsotype, type CorpusRow } from '../../lib/page-charts/corpus-isotype';
+import type { Tone } from '../../lib/charts';
 import { site } from '../../data/site';
 import { frameworks, obligations } from '../../data/frameworks';
 import { topics, columns } from '../../data/crosswalk';
@@ -211,6 +215,51 @@ const description =
 const cards = entries.map((entry, i) => ({ ...entry, index: String(i + 1).padStart(2, '0') }));
 const cardCount = countWord(cards.length);
 
+// "The corpus in dots": the weight of each resource that counts records, from
+// the same numbers as the cards above (the MCP server and the map count tools
+// and branches, not records, so they have no row). Name, link and tone come
+// from the card, so a row cannot drift from it.
+const records: Record<string, { count: number; noun: string }> = {
+  Frameworks: { count: frameworks.length, noun: 'frameworks' },
+  'Obligation register': { count: obligations.length, noun: 'obligations' },
+  'AI Act deadlines': { count: aiActMilestones.length, noun: 'milestones' },
+  Crosswalk: { count: topics.length, noun: 'topics' },
+  'Frontier safety crosswalk': { count: frontierRefs.length, noun: 'references' },
+  'Harms atlas': { count: harms.length, noun: 'harms' },
+  Cases: { count: cases.length, noun: 'cases' },
+  'Open control profiles': { count: controls.length, noun: 'controls' },
+  Contracts: { count: clauses.length, noun: 'clauses' },
+  'Templates & schemas': { count: schemaCount, noun: 'schemas' },
+  Figures: { count: figures.length + diagrams.length, noun: 'figures' },
+  Tools: { count: toolCount, noun: 'tools' },
+  Toolkit: { count: liveToolkit, noun: liveToolkit === 1 ? 'live tool' : 'live tools' },
+  'Reading list': { count: readingCount, noun: 'sources' },
+  Glossary: { count: glossaryCount, noun: 'terms' },
+  'Open data & API': { count: datasets.length, noun: 'datasets' },
+  'Research notes': { count: writtenThemes().length, noun: writtenThemes().length === 1 ? 'note' : 'notes' },
+};
+const corpusRows: CorpusRow[] = entries.flatMap((entry) => {
+  const r = records[entry.title];
+  if (!r || r.count === 0) return [];
+  const tone = Number(/--l([1-5])/.exec(entry.swatch)?.[1] ?? 0) as Tone;
+  return [{ label: entry.title, href: entry.href, tone, ...r }];
+});
+const corpusTotal = corpusRows.reduce((n, row) => n + row.count, 0);
+// Records per dot: the smallest round unit that keeps the longest row within
+// 36 dots, so it reads at 1:1 on a phone.
+const corpusMax = Math.max(...corpusRows.map((row) => row.count));
+const corpusUnit = [5, 10, 20, 50, 100].find((unit) => corpusMax / unit <= 36) ?? 100;
+const corpus = {
+  title: 'The corpus in dots',
+  desc: `${corpusRows.length} resources as rows of dots, one dot for every ${corpusUnit} records, largest first: ${corpusTotal} records in all.`,
+  source: `the registers behind each page, Body of Knowledge v${site.bokVersion}`,
+  mode: 'chart' as const,
+  unit: corpusUnit,
+  rows: corpusRows,
+};
+const corpusWide = corpusIsotype({ ...corpus, id: 'rc-corpus-w', width: 760 });
+const corpusNarrow = corpusIsotype({ ...corpus, id: 'rc-corpus-n', width: 340 });
+
 // Home > Resources, as on the sibling hubs (/toolkit, /bok, /resources/*):
 // the same crumbs drive the visible trail and the BreadcrumbList, which
 // Seo.astro ids and links from the CollectionPage (linkBreadcrumbs).
@@ -274,6 +323,16 @@ const jsonLd = [breadcrumbJsonLd(crumbs), collection];
       >.
     </p>
   </PageHero>
+
+  <Section tone="tint" class="rc-corpus">
+    <Chart
+      chart={corpusWide}
+      narrow={corpusNarrow}
+      title="The corpus in dots"
+      caption={`Every resource that counts records, one dot for every ${corpusUnit}, largest first: ${corpusTotal} records across ${corpusRows.length} resources. The longest rows are where the depth is; each row opens its resource.`}
+      tableLabel="Records per resource"
+    />
+  </Section>
 
   <section class="section">
     <div class="container">
