@@ -28,12 +28,12 @@ módulos de datos, no del componente.
 
 ## 4. Páginas (cinco implementadores en paralelo, un worktree por bloque)
 
-- [ ] 4.1 Bloque A, controles (`pv3-a`, 4464): `/controls` evidencia por el stack (sustituye `#by-layer`, anclas `layer-N` en `<details>`); `/controls/crosswalk` flujo perfiles a marcos, índice como mapa de calor (sustituye `ul.cw-index`), 15 cláusulas más cubiertas; test de sincronía con `controls` y `buildControlsCrosswalk()`
-- [ ] 4.2 Bloque B, riesgos (`pv3-b`, 4465): `/resources/threats` flujo catálogo, capa y herramienta y mapa de calor AICM; `/resources/harms` diana de niveles por dominio MIT y flujo mecanismo, nivel y capa; test de sincronía con `threats.ts` y `harms.ts`
-- [ ] 4.3 Bloque C, agentes y frontera (`pv3-c`, 4466): AutonomyLadder en `/agents` y `/toolkit/agent-control-profile` (D7); flujo ASI a patrón en `/agents`; EvalBoundary en `/frontier` y en la nota de `/research` (D8); casos x control EVAL; waffle AIUC-1; test de sincronía con `tool-agent-controls.ts`, `evaluation-environment.ts`, `cases.ts` y `aiuc1.ts`
-- [ ] 4.4 Bloque D, catálogos (`pv3-d`, 4467): treemap de instrumentos en `/resources/frameworks`; anillo de registros y matriz registro x instrumento (desde `getSchemas()` con prefijos normalizados) en `/resources/templates`; treemap del examen y flujo dominios a capítulos en `/for/aigp`; test de sincronía con `frameworks.ts`, `schemas-library.ts` y `aigp.ts`
-- [ ] 4.5 Bloque E, libro y stack (`pv3-e`, 4468): LayerMatrix en `/stack`; etapa x capa y anillos de progreso (ampliando `public/path.js`, ≤15 KB gzip) en `/path`; espina del libro en `/bok`; atlas en `/figures`; espina mini en `/figures/[id]`; regenerar las capturas de `/stack` y `/role`; tests de sincronía y de `/path` con y sin JavaScript
-- [ ] 4.6 Fusionar los cinco bloques por rutas en `feat/page-visuals-t3` y quitar sus worktrees
+- [x] 4.1 Bloque A, controles (`pv3-a`, 4464): `/controls` evidencia por el stack (sustituye `#by-layer`, anclas `layer-N` en `<details>`); `/controls/crosswalk` flujo perfiles a marcos, índice como mapa de calor (sustituye `ul.cw-index`), 15 cláusulas más cubiertas; test de sincronía con `controls` y `buildControlsCrosswalk()`
+- [x] 4.2 Bloque B, riesgos (`pv3-b`, 4465): `/resources/threats` flujo catálogo, capa y herramienta y mapa de calor AICM; `/resources/harms` diana de niveles por dominio MIT y flujo mecanismo, nivel y capa; test de sincronía con `threats.ts` y `harms.ts`
+- [x] 4.3 Bloque C, agentes y frontera (`pv3-c`, 4466): AutonomyLadder en `/agents` y `/toolkit/agent-control-profile` (D7); flujo ASI a patrón en `/agents`; EvalBoundary en `/frontier` y en la nota de `/research` (D8); casos x control EVAL; waffle AIUC-1; test de sincronía con `tool-agent-controls.ts`, `evaluation-environment.ts`, `cases.ts` y `aiuc1.ts`
+- [x] 4.4 Bloque D, catálogos (`pv3-d`, 4467): treemap de instrumentos en `/resources/frameworks`; anillo de registros y matriz registro x instrumento (desde `getSchemas()` con prefijos normalizados) en `/resources/templates`; treemap del examen y flujo dominios a capítulos en `/for/aigp`; test de sincronía con `frameworks.ts`, `schemas-library.ts` y `aigp.ts`
+- [x] 4.5 Bloque E, libro y stack (`pv3-e`, 4468): LayerMatrix en `/stack`; etapa x capa y anillos de progreso (ampliando `public/path.js`, ≤15 KB gzip) en `/path`; espina del libro en `/bok`; atlas en `/figures`; espina mini en `/figures/[id]`; regenerar las capturas de `/stack` y `/role`; tests de sincronía y de `/path` con y sin JavaScript
+- [x] 4.6 Fusionar los cinco bloques por rutas en `feat/page-visuals-t3` y quitar sus worktrees
 
 ## 5. Integración y revisión
 
