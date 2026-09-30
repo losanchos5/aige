@@ -19,6 +19,7 @@ import { layers } from '../data/stack';
 import { schemaOrder } from '../data/templates';
 import { getSchemas, type SchemaSummary } from './schemas-library';
 import { crosswalkFor, euArticles, frameworkOf } from './obligations';
+import { glyph as kitGlyph, type GlyphKind } from './charts/glyphs';
 
 export type ChainKind = 'clause' | 'holder' | 'date' | 'artefact' | 'layer' | 'evidence';
 
@@ -210,24 +211,20 @@ export function chainFor(row: Obligation): Chain {
 const esc = (text: string) =>
   text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
+/** The glyph of each node kind, from the chart kit's shared vocabulary
+ *  (charts/glyphs.ts, VISUAL-GUIDE §1.7), so the chain primitives there
+ *  (bowTie, controlChain) and this chain draw a concept the same way. */
+const GLYPH: Record<ChainKind, GlyphKind> = {
+  clause: 'building',
+  holder: 'person',
+  date: 'calendar',
+  artefact: 'package',
+  layer: 'layers',
+  evidence: 'evidence',
+};
+
 /** The glyph of a node, drawn in a 24 × 24 box at (x, y) with currentColor. */
-function glyph(kind: ChainKind, x: number, y: number): string {
-  const t = (d: string, cls = 'glyph') => `<path class="${cls}" d="${d}" transform="translate(${x} ${y})"/>`;
-  switch (kind) {
-    case 'clause': // the regulator's building
-      return t('M2 9 L12 2 L22 9 Z M5 11 v8 M10 11 v8 M14 11 v8 M19 11 v8 M3 21 h18');
-    case 'holder': // a person
-      return `<circle class="glyph" cx="${x + 12}" cy="${y + 7}" r="4"/>${t('M4 22 c0 -6 3.5 -9 8 -9 s8 3 8 9')}`;
-    case 'date': // a calendar
-      return t('M3 5 h18 v16 h-18 Z M3 10 h18 M8 2 v5 M16 2 v5');
-    case 'artefact': // a build artefact: a package
-      return t('M3 7 L12 3 L21 7 V17 L12 21 L3 17 Z M3 7 L12 11 L21 7 M12 11 V21');
-    case 'layer': // stacked layers
-      return t('M4 5 h16 M4 12 h16 M4 19 h16');
-    case 'evidence': // a document with a check
-      return `${t('M5 2 h10 l5 5 v15 h-15 Z M15 2 v5 h5')}${t('M8 14 l3 3 l6 -7', 'glyph-check')}`;
-  }
-}
+const glyph = (kind: ChainKind, x: number, y: number): string => kitGlyph(GLYPH[kind], x, y);
 
 export interface ChainSvgOptions {
   /** 'row' reads left to right (wide screens); 'column' top to bottom. */
