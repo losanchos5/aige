@@ -2,7 +2,8 @@
 // /controls: the open control profiles (src/data/controls), the landing that
 // explains what a profile is and lists the profiles. The chain from a concept
 // to the evidence a control leaves (FlowDiagram), the seven properties every
-// control is written to meet, one card per profile with its state and counts,
+// control is written to meet, a mosaic of every control by profile, layer and
+// failure response (ControlMosaic), one card per profile with its state and counts,
 // every control by its home layer of the stack, how the profiles relate to
 // certification schemes and frameworks, how to adopt one and how to review a
 // control. Every number is computed from the registry.
@@ -17,6 +18,7 @@ import PageHero from '../../components/PageHero.astro';
 import Section from '../../components/Section.astro';
 import RegisterList from '../../components/RegisterList.astro';
 import FlowDiagram from '../../components/FlowDiagram.astro';
+import ControlMosaic from '../../components/ControlMosaic.astro';
 import StatusLine from '../../components/StatusLine.astro';
 import ContributeCta from '../../components/ContributeCta.astro';
 import CtaBand from '../../components/CtaBand.astro';
@@ -176,6 +178,7 @@ const jsonLd = collectionPage({
     title="Profiles."
     lede={`${controls.length} reference controls across ${profiles.length} profiles, all drafts open for technical review.`}
   >
+    <ControlMosaic />
     <ul class="cp-cards" role="list">
       {
         profileCards.map((card) => (

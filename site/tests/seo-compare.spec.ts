@@ -80,7 +80,8 @@ const words = (s: string) => s.trim().split(/\s+/).length;
 
 /** The <table> element carrying `marker`, whole. */
 function table(page: string, marker: string): string {
-  const start = page.indexOf(marker);
+  // The attribute itself, not a longer one it prefixes (data-cmp-overlap-summary).
+  const start = page.search(new RegExp(`\\s${marker}[\\s>=]`));
   expect(start, `no table ${marker}`).toBeGreaterThan(-1);
   const open = page.lastIndexOf('<table', start);
   return page.slice(open, page.indexOf('</table>', start) + '</table>'.length);

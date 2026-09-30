@@ -103,6 +103,7 @@ export const figures: readonly FigureDef[] = [
     description:
       'Three panels, one per question. What AI is running? Answered by Layer 02 Inventory & Transparency: the inventory and the agent registry, fed by a runtime data path. What is it allowed to do? Answered by Layer 01 Govern-as-Code and Layer 04 Runtime Controls & Observability: identity before autonomy, scope before action. What evidence proves it? Answered by Layer 03 Evals & Red Teaming as Evidence and Layer 05 Assurance & Continuous Compliance: evidence as a by-product of the build.',
     placements: [{ chapter: 'definition', section: 'The three questions', at: 'head' }],
+    pages: ['/stack'],
   },
   {
     id: 'values-principles',
@@ -131,6 +132,7 @@ export const figures: readonly FigureDef[] = [
         at: 'head',
       },
     ],
+    pages: ['/stack'],
   },
   {
     id: 'maturity-grid',
@@ -228,6 +230,7 @@ export const figures: readonly FigureDef[] = [
     description:
       "A procured system (SaaS with an embedded LLM, an API-only foundation model, or an agent inside a vendor's product) first passes a due-diligence gate, the Vendor / Model Due-Diligence Gate pattern. Layer 02 Inventory & Transparency grows: the vendor's system still needs a registry entry, an owner and a scope. Layer 03 Evals & Red Teaming as Evidence shrinks to boundary evals of the vendor's system as a black box and reliance on the vendor's own evidence. Layer 04 Runtime Controls & Observability shrinks to the perimeter you control: the tool scopes you grant, the identity you issue the vendor's agent and the traffic you can observe. Layer 05 Assurance & Continuous Compliance grows: supplier documentation, model card and any AIBOM become evidence you collect rather than produce. The less of the model you own, the more of your control budget moves from testing it to bounding it and evidencing the supplier.",
     placements: [{ chapter: 'the-stack', section: 'Third-party and procured AI', at: 'head' }],
+    pages: ['/toolkit/vendor-due-diligence'],
   },
   {
     id: 'enforcement-map',
@@ -327,6 +330,7 @@ export const figures: readonly FigureDef[] = [
     description:
       "One event can start several clocks. First reports, counted from awareness unless noted, as of 2026-09-24: DORA Art. 19, within 4 hours of classification as major and no later than 24 hours from awareness, or within 4 hours of a classification made after those 24 hours; NIS2 Art. 23, an early warning within 24 hours and a notification within 72 hours; the Cyber Resilience Act Art. 14, an early warning within 24 hours and a notification within 72 hours; California SB 53, within 15 days of discovery, or within 24 hours on an imminent risk of death or serious physical injury; EU AI Act Art. 73, no later than 2 days (widespread infringement or critical infrastructure), 10 days (death) or 15 days (other); the GPAI Code of Practice under Art. 55, 2, 5, 10 or 15 days depending on the harm; GDPR Art. 33, where feasible within 72 hours; the New York RAISE Act, within 72 hours of a determination, effective 1 Jan 2027. Follow-up and final reports, the deployer's duty under Art. 26(5), GDPR Art. 34 and the voluntary OECD framework are in the table. The engineering answer is one incident record that holds the facts once, with a timer per regime, and a pipeline that alerts on the nearest deadline.",
     placements: [{ chapter: 'incidents', section: 'The overlapping clocks', at: 'head' }],
+    pages: ['/toolkit/incident-clock'],
   },
   // Block w2-fig-concepts (v0.5.0): concept figures for chapters 12, 13, 16,
   // 21, 22 and 23, drawn only from what those chapters and their data modules
@@ -358,6 +362,7 @@ export const figures: readonly FigureDef[] = [
         at: 'head',
       },
     ],
+    pages: ['/ai-governance'],
   },
   {
     id: 'harm-levels',
@@ -375,6 +380,7 @@ export const figures: readonly FigureDef[] = [
         at: 'foot',
       },
     ],
+    pages: ['/resources/harms'],
   },
   {
     id: 'explanation-techniques',
@@ -468,6 +474,7 @@ export const figures: readonly FigureDef[] = [
     description:
       'Ask every question for one system: roles name tasks, not organisations, so one organisation can hold several. Provider (Art. 3(3)): develops an AI system, or has it developed, and places it on the market or into service under its own name; Arts. 8 to 17, 43 to 49, 72 and 73, and 50(1) and 50(2); produces technical documentation, QMS records, eval results and the declaration. GPAI provider (Art. 53): places a general-purpose AI model on the market; Arts. 53 to 55; produces model documentation, the training summary and the copyright policy. Product manufacturer (Art. 25(3)): places a high-risk AI safety component on the market with its Annex I, Section A product under its own name, and carries the provider duties of Art. 16. Importer (Art. 3(6)): established in the EU, places on the market a system bearing the name of a provider established outside it; Art. 23; keeps an import verification record. Distributor (Art. 3(7)): makes a system available on the EU market without being its provider or importer; Art. 24; keeps a distribution check record. Authorised representative (Art. 3(5)): established in the EU under a written mandate from a provider outside it; Arts. 22 and 54; keeps the mandate and document copies. Deployer (Art. 3(4)): uses a system under its own authority, other than for a purely personal, non-professional activity; Arts. 26, 27, 50(3), 50(4) and 86; keeps use logs, the oversight roster, the FRIA and notices. The Article 25 loop: a distributor, importer, deployer or other third party becomes the provider of a high-risk system, with all Art. 16 duties, when it puts its name or trademark on a high-risk system already on the market, makes a substantial modification to a high-risk system that stays high-risk, or changes the intended purpose of a system, including a general-purpose AI system, so that it becomes high-risk. The initial provider must cooperate (Art. 25(2)), and a written agreement fixes the information and access (Art. 25(4)). The answers end in a registry entry that records the roles per system as a list, such as ["provider", "deployer"]. If no role applies, the organisation is not an operator for that system; an affected person holds protections, not duties (Art. 2(1)(g)). A reading aid, not legal advice; illustrative, not a claim of conformity.',
     placements: [{ chapter: 'eu-ai-act', section: 'Who you are in the value chain', at: 'head' }],
+    pages: ['/toolkit/ai-act-triage'],
     kind: 'poster',
     asOf: '2026-09-24',
     reviewBy: '2027-03-24',
@@ -481,6 +488,7 @@ export const figures: readonly FigureDef[] = [
     description:
       'Twenty jurisdictions, one equal tile each, in rough geographic order, as of 2026-09-24. Binding, horizontal (a statute in force that applies across sectors): the European Union, South Korea, Japan (a promotional act with no penalties) and Italy. Binding, targeted (rules limited to a use, a sector, a class of developer or the public sector): the United States federal agencies, Canada\'s directive, China\'s departmental rules and, in the United States inset, California, Colorado, Illinois, New York, Texas, Utah and New York City. Voluntary (frameworks and guidance with no penalty attached): the United Kingdom, India, Singapore and Australia. Bill (not law yet): Brazil and Spain\'s national AI bill. The status is a reading aid, not legal advice; the table lists each jurisdiction\'s main instrument and its key date.',
     placements: [{ chapter: 'ai-laws-worldwide', section: 'The landscape at a glance', at: 'head' }],
+    pages: ['/ai-governance'],
     kind: 'data-viz',
     // Statuses move monthly: re-check against chapter 21 and jurisdictions.ts.
     asOf: '2026-09-24',

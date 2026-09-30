@@ -12,13 +12,15 @@
 
 ## 2. Tanda 1: victorias rápidas (PR B)
 
-- [ ] 2.1 Bloque catálogos: `/controls` (mosaico con estado «por especificar»), `/resources/contracts` (cláusula x norma), `/resources/dpia-lists` (país x Anexo III, tira de adopción, barras por método)
-- [ ] 2.2 Bloque crosswalk: `/resources/crosswalk` (Venn3 `.chart`, UpSet a 390 px) y las tres comparativas `resources/crosswalk/*` (mariposa por tema + barra 100 %)
-- [ ] 2.3 Bloque resources y plazos: `/resources` (corpus en puntos, `.chart`), `/resources/ai-act-deadlines` y `/es/...` (dumbbell del Omnibus), `/cases` (cronología beeswarm, `.chart`), `/resources/harms` (incrustar harm-levels)
-- [ ] 2.4 Bloque toolkit: `/toolkit/policy-card` (Lanes), `/toolkit/ai-act-triage` (Ladder con isla cliente + incrustar eu-ai-act-operator-roles), `/toolkit/vendor-due-diligence` e `/toolkit/incident-clock` (incrustar figuras y diagramas existentes)
-- [ ] 2.5 Bloque narrativa: `/mcp` (arquitectura FlowDiagram), `/stack` (minimum-viable-stack y three-questions), `/ai-governance` (jurisdiction-tiles, governance-operating-model, MaturityLadder), `/for/certifications` (dos carriles); ampliar `pages` en `figures.ts`
-- [ ] 2.6 Tests de sincronía por visual bajo test-audit; build, `npm test`, a11y completo de las páginas tocadas, perf.spec
+- [x] 2.1 Bloque catálogos: `/controls` (mosaico con estado «por especificar»), `/resources/contracts` (cláusula x norma), `/resources/dpia-lists` (país x Anexo III, tira de adopción, barras por método)
+- [x] 2.2 Bloque crosswalk: `/resources/crosswalk` (Venn3 `.chart`, UpSet a 390 px) y las tres comparativas `resources/crosswalk/*` (mariposa por tema + barra 100 %)
+- [x] 2.3 Bloque resources y plazos: `/resources` (corpus en puntos, `.chart`), `/resources/ai-act-deadlines` y `/es/...` (dumbbell del Omnibus), `/cases` (cronología beeswarm, `.chart`), `/resources/harms` (incrustar harm-levels)
+- [x] 2.4 Bloque toolkit: `/toolkit/policy-card` (Lanes), `/toolkit/ai-act-triage` (Ladder con isla cliente + incrustar eu-ai-act-operator-roles), `/toolkit/vendor-due-diligence` e `/toolkit/incident-clock` (incrustar figuras y diagramas existentes)
+- [x] 2.5 Bloque narrativa: `/mcp` (arquitectura FlowDiagram), `/stack` (minimum-viable-stack y three-questions), `/ai-governance` (jurisdiction-tiles, governance-operating-model, MaturityLadder), `/for/certifications` (dos carriles); ampliar `pages` en `figures.ts`
+- [x] 2.6 Tests de sincronía por visual bajo test-audit; build, `npm test`, a11y completo de las páginas tocadas, perf.spec
 - [ ] 2.7 Revisión (code-reviewer + a11y/CSP/perf adversarial), capturas 390/1440 claro/oscuro, commit por ruta, PR B, CI verde
+  - [x] Revisión hecha y hallazgos corregidos (CRITICAL/HIGH/MEDIUM y los LOW baratos): estado "por especificar" del mosaico, totales del grid DPIA, carril de certificación, marco de matriz compartido, impresión y forced-colors de los visuales HTML, línea de fecha del dumbbell estrecho, `.mono` sin tocar el texto SVG; build, `npm test` y axe de las rutas tocadas en verde
+  - [ ] PR B y CI verde
 
 ## 3. Tanda 2: tiempo y plantillas por ítem (PR C)
 

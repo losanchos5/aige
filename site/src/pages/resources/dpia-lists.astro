@@ -3,12 +3,16 @@
 // register, the items that catch what AI systems do, and where those items
 // overlap the EU AI Act Annex III high-risk areas. Data: src/data/dpia-lists.ts;
 // the same rows are the dpia-lists dataset of the open API (src/lib/api.ts).
+// Three charts from the same rows (lib/page-visuals/dpia-visuals.ts): the
+// Annex III overlap grid, the adoption timeline and list size by method.
 import Base from '../../layouts/Base.astro';
 import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import CitedText from '../../components/CitedText.astro';
 import SourceList from '../../components/SourceList.astro';
+import Chart from '../../components/Chart.astro';
+import { annexChart, timelineChart, sizesChart } from '../../lib/page-visuals/dpia-visuals';
 import { site } from '../../data/site';
 import {
   lists,
@@ -63,6 +67,12 @@ const updated = updatedAfter2019();
 const overlaps = annexIIICounts();
 const noOverlap = annexIIIOrder.filter((a) => !overlaps.some((o) => o.area === a));
 const methods = methodCounts();
+// The size chart's key, worded from the counts: one list or several per method.
+const sizesCaption = `Items or criteria in each list, largest first: ${
+  methods.enumerated === 1 ? 'the solid bar enumerates' : 'solid bars enumerate'
+} processing types, ${methods.scored === 1 ? 'the hatched bar scores' : 'hatched bars score'} criteria and ${
+  methods.mixed === 1 ? 'the outlined bar mixes' : 'outlined bars mix'
+} both. Select a country to read its items below.`;
 const itemCount = allItems().length;
 const totalItems = lists.reduce((sum, l) => sum + l.itemCount, 0);
 const fmtDate = (iso: string) => {
@@ -93,6 +103,13 @@ const overlapRest = joinAnd(
 );
 const noOverlapText = joinAnd(noOverlap.map(areaName), 'or');
 const updatedText = joinAnd(updated.map((l) => `${l.country} (${fmtDate(l.lastUpdate!)})`));
+
+// The three charts (lib/page-visuals/dpia-visuals.ts), each a wide/narrow pair.
+const annex = annexChart();
+const timeline = timelineChart();
+const sizes = sizesChart();
+const adoptedYears = [range.first.adopted, range.last.adopted].map((d) => d.slice(0, 4));
+const adoptedSpan = adoptedYears[0] === adoptedYears[1] ? adoptedYears[0] : `${adoptedYears[0]} and ${adoptedYears[1]}`;
 
 const seoTitle = 'GDPR DPIA lists by country, mapped to the AI Act';
 const description = `The ${lists.length} national GDPR Art. 35(4) DPIA lists in the EDPB register, read in full: which name AI, profiling, scoring or biometrics, mapped to AI Act Annex III.`;
@@ -318,6 +335,15 @@ const jsonLd = [
       </div>
     </section>
 
+    <div class="res-section">
+      <Chart
+        chart={annex.wide}
+        narrow={annex.narrow}
+        title="Annex III overlaps, list by list"
+        caption="Each dot counts the items of a national list that overlap an EU AI Act Annex III area. The bars above total them per area; the Total column counts each list's overlapping items once, so an item that touches two areas sits in both columns but once in its total. Where a list already makes a DPIA mandatory for an Annex III use, the fundamental rights impact assessment can point to that record."
+      />
+    </div>
+
     <section class="res-section prose" aria-labelledby="dl-findings">
       <h2 id="dl-findings">What the lists show</h2>
       <ul>
@@ -371,6 +397,21 @@ const jsonLd = [
         </li>
       </ul>
     </section>
+
+    <div class="res-section">
+      <Chart
+        chart={timeline.wide}
+        narrow={timeline.narrow}
+        title="The lists predate the AI Act"
+        caption={`One dot per dated event: each list's adoption, the EDPB opinion on its draft and any change dated after adoption, set against the day the EU AI Act entered into force. Every list was adopted between ${adoptedSpan} and only ${count(updated.length, 'shows', 'show')} a dated change after 2019, so read each one as written before the AI Act.`}
+      />
+      <Chart
+        chart={sizes.wide}
+        narrow={sizes.narrow}
+        title="List size and method"
+        caption={sizesCaption}
+      />
+    </div>
 
     <section class="res-section" aria-labelledby="dl-items">
       <div class="res-section-head">

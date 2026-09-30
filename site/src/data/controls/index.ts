@@ -258,6 +258,16 @@ export interface Control {
 /** Alias kept for callers that name the definition rather than the record. */
 export type ControlDef = Control;
 
+/**
+ * True when a control's failure response is still to be specified: its source
+ * material states none, so the profile files a placeholder alert. Each profile
+ * words that default its own way (agent runtime "To be specified.", assurance
+ * and evidence "To be specified: the source material states no ..."), so the
+ * test is the shared opening words, not one exact string.
+ */
+export const isResponseToSpecify = (response: Control['failureResponse']): boolean =>
+  /^To be specified\b/.test(response.text.trim());
+
 // ---------------------------------------------------------------------------
 // Local label maps
 

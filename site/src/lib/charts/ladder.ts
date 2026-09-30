@@ -23,6 +23,10 @@ export interface LadderStep {
   label: string;
   detail?: string;
   href?: string;
+  /** Optional hook, [a-z][a-z0-9-]*: wraps the step's marks in
+   *  <g data-step="key"> so a page script can light the step (the triage
+   *  ladder); a step without a key is drawn exactly as before. */
+  key?: string;
 }
 
 export interface LadderInput extends ChartBase {
@@ -47,10 +51,18 @@ export function ladder(input: LadderInput): ChartOutput {
   if (input.highlight !== undefined && !(input.highlight >= 0 && input.highlight < n)) {
     throw new Error(`charts(ladder ${input.id}): highlight ${input.highlight} is not a step`);
   }
+  for (const step of input.steps) {
+    if (step.key !== undefined && !/^[a-z][a-z0-9-]*$/.test(step.key)) {
+      throw new Error(`charts(ladder ${input.id}): step key "${step.key}" is not [a-z][a-z0-9-]*`);
+    }
+  }
   const vertical = input.orientation === 'vertical';
   const W = input.width ?? (vertical ? 340 : 640);
   const w = words(input.lang);
   const out: string[] = [];
+  // The marks of one step, grouped when the step has a key.
+  const push = (step: LadderStep, els: string[]) =>
+    out.push(step.key ? `<g data-step="${step.key}">${els.join('')}</g>` : els.join(''));
   let bottom: number;
   if (!vertical) {
     const gap = 6;
@@ -69,23 +81,25 @@ export function ladder(input: LadderInput): ChartOutput {
       const h = textH + 16 + i * rise;
       const y = baseY - h;
       const hi = input.highlight === i;
-      out.push(`<rect x="${r1(x)}" y="${r1(y)}" width="${r1(stepW)}" height="${r1(h)}" rx="6" class="${hi ? 'mk mk-hi' : 'panel'}"/>`);
+      const els: string[] = [];
+      els.push(`<rect x="${r1(x)}" y="${r1(y)}" width="${r1(stepW)}" height="${r1(h)}" rx="6" class="${hi ? 'mk mk-hi' : 'panel'}"/>`);
       const tx = x + 8;
       let ty = y + 18;
-      out.push(text(tx, ty, pad2(i + 1), { size: 12, cls: hi ? 'mono on-ink' : 'mono muted', where: 'step index' }));
+      els.push(text(tx, ty, pad2(i + 1), { size: 12, cls: hi ? 'mono on-ink' : 'mono muted', where: 'step index' }));
       const nameEls = blocks[i].name.map((line) => {
         ty += 16;
         return text(tx, ty, line, { size: 13.5, weight: 600, cls: hi ? 'on-ink' : '', where: 'step label' });
       });
-      out.push(step.href ? linkText(nameEls.join(''), step.label, step.href) : nameEls.join(''));
+      els.push(step.href ? linkText(nameEls.join(''), step.label, step.href) : nameEls.join(''));
       if (blocks[i].detail.length) ty += 6;
       for (const line of blocks[i].detail) {
         ty += 15;
-        out.push(text(tx, ty, line, { size: 12.5, cls: hi ? 'on-ink' : 'ink2', where: 'step detail' }));
+        els.push(text(tx, ty, line, { size: 12.5, cls: hi ? 'on-ink' : 'ink2', where: 'step detail' }));
       }
       if (hi && input.highlightLabel) {
-        out.push(text(x + stepW / 2, y - 8, input.highlightLabel, { size: 12, cls: 'mono', anchor: 'middle', where: 'highlight label' }));
+        els.push(text(x + stepW / 2, y - 8, input.highlightLabel, { size: 12, cls: 'mono', anchor: 'middle', where: 'highlight label' }));
       }
+      push(step, els);
     });
     out.push(`<line class="axis" x1="${L}" y1="${r1(baseY)}" x2="${W - L}" y2="${r1(baseY)}"/>`);
     bottom = baseY;
@@ -102,26 +116,28 @@ export function ladder(input: LadderInput): ChartOutput {
       const detail = step.detail ? wrapText(step.detail, W - L - tx - 8, 12.5, 'body', 3, 'step detail') : [];
       const extra = hi && input.highlightLabel ? 1 : 0;
       const h = 14 + (name.length + extra) * 16 + detail.length * 15 + (detail.length ? 4 : 0);
-      if (hi) out.push(`<rect x="${L - 6}" y="${r1(y)}" width="${W - 2 * L + 12}" height="${r1(h)}" rx="6" class="panel"/>`);
+      const els: string[] = [];
+      if (hi) els.push(`<rect x="${L - 6}" y="${r1(y)}" width="${W - 2 * L + 12}" height="${r1(h)}" rx="6" class="panel"/>`);
       for (let k = 0; k < n; k += 1) {
         const cls = k <= i ? (hi ? 'mk mk-hi' : markClass('filled', 0)) : markClass('outline', 0);
-        out.push(`<rect x="${L + k * (seg + 3)}" y="${r1(y + 10)}" width="${seg}" height="14" rx="1.5" class="${cls}"/>`);
+        els.push(`<rect x="${L + k * (seg + 3)}" y="${r1(y + 10)}" width="${seg}" height="14" rx="1.5" class="${cls}"/>`);
       }
       let ty = y + 8;
       const nameEls = name.map((line) => {
         ty += 16;
         return text(tx, ty, line, { size: 13.5, weight: hi ? 700 : 600, where: 'step label' });
       });
-      out.push(step.href ? linkText(nameEls.join(''), step.label, step.href) : nameEls.join(''));
+      els.push(step.href ? linkText(nameEls.join(''), step.label, step.href) : nameEls.join(''));
       if (extra) {
         ty += 16;
-        out.push(text(tx, ty, input.highlightLabel!, { size: 12, cls: 'mono', where: 'highlight label' }));
+        els.push(text(tx, ty, input.highlightLabel!, { size: 12, cls: 'mono', where: 'highlight label' }));
       }
       if (detail.length) ty += 4;
       for (const line of detail) {
         ty += 15;
-        out.push(text(tx, ty, line, { size: 12.5, cls: 'ink2', where: 'step detail' }));
+        els.push(text(tx, ty, line, { size: 12.5, cls: 'ink2', where: 'step detail' }));
       }
+      push(step, els);
       y += h + 6;
     });
     bottom = y - 6;

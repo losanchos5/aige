@@ -7,6 +7,7 @@ import Base from '../layouts/Base.astro';
 import '../styles/reading.css';
 import PageHero from '../components/PageHero.astro';
 import Callout from '../components/Callout.astro';
+import FlowDiagram from '../components/FlowDiagram.astro';
 import { site } from '../data/site';
 import { obligations } from '../data/frameworks';
 import { patterns } from '../data/patterns';
@@ -38,6 +39,22 @@ const tools = [
   { name: 'get_template', what: 'One template or schema with the content of its files.', ask: 'Give me the incident record schema and an example.' },
 ];
 
+// "From your question to the source": the path an answer takes, drawn from
+// the facts this page states (the clients it names, the tool table, the
+// datasets and the provenance every answer carries). The server step says it
+// stores nothing: it reads the same open data API as the site.
+const flow = [
+  { label: 'Your question', sub: `“${tools[1].ask}”` },
+  { label: 'MCP client', sub: 'Claude, Claude Code, Cursor, VS Code or an agent you build', href: '#mcp-connect' },
+  { label: 'The MCP server', sub: `${tools.length} read-only tools; no account, no key, nothing stored`, href: '#mcp-tools' },
+  {
+    label: 'Open data API',
+    sub: `${obligations.length} obligations, ${patterns.length} patterns, ${getGlossary().length} glossary terms, the same data as these pages`,
+    href: '/resources/data',
+  },
+  { label: 'Sourced answer', sub: `The canonical page, its dataset, BoK v${site.bokVersion}, CC BY 4.0` },
+];
+
 const jsonLd = [
   {
     '@type': 'WebPage',
@@ -63,6 +80,15 @@ const jsonLd = [
   />
 
   <div class="container res-page">
+    <div class="mcp-flow">
+      <FlowDiagram
+        id="mcp-flow"
+        steps={flow}
+        title="From your question to the source"
+        desc="The server holds nothing of its own: it reads the open data API behind these pages, so every answer names the page it was read from."
+      />
+    </div>
+
     <section class="res-section" aria-labelledby="mcp-endpoint">
       <div class="res-section-head">
         <h2 id="mcp-endpoint">The endpoint</h2>
@@ -161,3 +187,64 @@ const jsonLd = [
     </section>
   </div>
 </Base>
+
+<style>
+  /* The endpoint snippet sits outside .prose, so it gets the scroll region's
+     own overflow here; without it the URL widens a 390 px page by 10 px. */
+  pre {
+    overflow-x: auto;
+  }
+
+  /* The answer path as a framed band under the hero: the caption above the
+     chain as its heading, numbered steps (the number is decoration: empty
+     alt text) and the sourced answer, where the chain ends, in solid ink. */
+  .mcp-flow {
+    margin-block: var(--s-6) var(--s-7);
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--ink);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+    box-shadow: var(--shadow-1);
+  }
+
+  .mcp-flow :global(.flow) {
+    flex-direction: column-reverse;
+    margin: 0;
+  }
+
+  .mcp-flow :global(.flow-title) {
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+  }
+
+  .mcp-flow :global(.flow-steps) {
+    counter-reset: mcp-step;
+  }
+
+  .mcp-flow :global(.flow-step) {
+    counter-increment: mcp-step;
+  }
+
+  .mcp-flow :global(.flow-label::before) {
+    content: counter(mcp-step, decimal-leading-zero) / '';
+    display: block;
+    margin-bottom: var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .mcp-flow :global(.flow-step:last-child .flow-node) {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .mcp-flow :global(.flow-step:last-child .flow-sub),
+  .mcp-flow :global(.flow-step:last-child .flow-label::before) {
+    color: var(--bg);
+  }
+</style>

@@ -12,6 +12,11 @@
 // from roles.ts and frameworks.ts: the tool never asserts what the chapter
 // does not.
 import ToolShell from '../../components/toolkit/ToolShell.astro';
+import Chart from '../../components/Chart.astro';
+import Figure from '../../components/Figure.astro';
+import { ladder, type LadderStep } from '../../lib/charts';
+import { getFigure } from '../../data/figures';
+import rolesPosterSvg from '../../figures/eu-ai-act-operator-roles.svg?raw';
 import { toolById, tools, toolNotice } from '../../data/toolkit';
 import {
   questionSet,
@@ -71,6 +76,72 @@ for (const id of classOrder) {
 const sectionHref = (heading: string) => `${chapterHref}#${headingSlugs.get(heading)}`;
 const planner = tools.find((entry) => entry.id === 'obligations-planner');
 
+// The risk ladder and the GPAI track, drawn from classLabels. The rungs are
+// the four tiers of chapter 18, lowest first; the two high-risk classes
+// (Annex I and Annex III) share one rung, as the chapter's ladder does. Each
+// step carries a key so public/toolkit/ai-act-triage-ladder.js can light the
+// rungs the engine gives (the same rungs travel in the JSON island).
+type Rung = { key: string; label: string; classes: (typeof classOrder)[number][]; detail: string };
+const cl = classLabels;
+const from = (id: keyof typeof classLabels) => `From ${cl[id].appliesNote}.`;
+const named = (id: keyof typeof classLabels) =>
+  cl[id].label.includes(cl[id].article) ? cl[id].label : `${cl[id].label} (${cl[id].article})`;
+const annexOf = (id: keyof typeof classLabels) => /\((Annex [IV]+)\)/.exec(cl[id].label)?.[1] ?? cl[id].label;
+const rung = (key: string, id: keyof typeof classLabels): Rung => ({ key, label: named(id), classes: [id], detail: from(id) });
+const ladderRungs: Rung[] = [
+  rung('minimal', 'minimal'),
+  rung('transparency', 'transparency-art50'),
+  {
+    key: 'high-risk',
+    label: 'High-risk (Art. 6)',
+    classes: ['high-risk-annex-iii', 'high-risk-annex-i'],
+    detail: `${(['high-risk-annex-iii', 'high-risk-annex-i'] as const)
+      .map((id) => `${annexOf(id)} from ${cl[id].appliesNote}`)
+      .join('; ')}.`,
+  },
+  rung('prohibited', 'prohibited'),
+];
+const gpaiRungs: Rung[] = [rung('gpai', 'gpai'), rung('gpai-systemic', 'gpai-systemic')];
+// Every class of the triage sits on exactly one rung.
+const placed = [...ladderRungs, ...gpaiRungs].flatMap((r) => r.classes);
+if (placed.length !== classOrder.length || classOrder.some((id) => !placed.includes(id))) {
+  throw new Error('ai-act-triage: the risk ladder must place every class of classOrder exactly once');
+}
+const steps4 = (rungs: Rung[]): LadderStep[] => rungs.map(({ key, label, detail }) => ({ key, label, detail }));
+const ladderBase = {
+  title: 'The EU AI Act risk ladder',
+  desc: 'The four risk tiers of the EU AI Act for an AI system, lowest first, with the articles and the dates they apply from; one system can sit on more than one rung.',
+  source: 'chapter 18 [1]',
+  asOf: questionSet.asOf,
+  stepHeader: 'Rung',
+  steps: steps4(ladderRungs),
+};
+const gpaiBase = {
+  title: 'The GPAI model track',
+  desc: 'The separate track for general-purpose AI models: a GPAI model, and a GPAI model with systemic risk, with their articles and dates.',
+  source: 'chapter 18 [1]',
+  asOf: questionSet.asOf,
+  stepHeader: 'Track',
+  steps: steps4(gpaiRungs),
+  width: 340,
+};
+// Two copies: the live one in the result (lit by the script) and the neutral
+// one in the written-out rules, which is the whole picture without JavaScript.
+// The live copy shares the result's row with the GPAI track, so it is drawn
+// narrower than the guide's, which has the prose column to itself.
+const ladderCharts = (prefix: string, width: number) => ({
+  wide: ladder({ ...ladderBase, id: `${prefix}-w`, width }),
+  narrow: ladder({ ...ladderBase, id: `${prefix}-n`, width: 340, orientation: 'vertical' }),
+  gpai: ladder({ ...gpaiBase, id: `${prefix}-gpai` }),
+});
+const liveLadder = ladderCharts('tri-lad', 560);
+const guideLadder = ladderCharts('tri-ladg', 640);
+const ladderCaption =
+  'The tiers the Act sets for an AI system, lowest first; classes stack, so one system can sit on two rungs at once. Read the outcome off the rungs, then the reasons in the list.';
+const gpaiCaption =
+  'General-purpose AI models run on their own track, next to the ladder. A system built on your own GPAI model has both.';
+const rolesPoster = getFigure('eu-ai-act-operator-roles')!;
+
 // Everything the client needs, as data (no markup): the JSON island.
 const data = {
   ...triageModel(sectionHref),
@@ -79,6 +150,7 @@ const data = {
   chapter: new URL(chapterHref, site.url).href,
   planner: { href: '/toolkit/obligations-planner', live: planner?.status === 'live' },
   registerHref: '/obligations',
+  ladder: [...ladderRungs, ...gpaiRungs].map(({ key, label, classes }) => ({ key, label, classes })),
 };
 
 const stepNumber = new Map(steps.map((step, i) => [step.id, i + 1]));
@@ -428,6 +500,31 @@ const sources = [
       <ul class="tri-reasons" data-tri-scope-reasons></ul>
     </div>
 
+    <div class="tri-map" data-tri-ladder>
+      <h3>Where it sits on the ladder</h3>
+      <p class="tri-lad-reading" data-tri-lad-reading>
+        The rungs the answers give are drawn solid; the rest stay outlined.
+      </p>
+      <p class="visually-hidden" aria-live="polite" data-tri-lad-live></p>
+      <div class="tri-map-grid">
+        <Chart
+          id="tri-ladder"
+          chart={liveLadder.wide}
+          narrow={liveLadder.narrow}
+          title="The risk ladder"
+          caption={ladderCaption}
+          tableLabel="The rungs, as a table"
+        />
+        <Chart
+          id="tri-gpai"
+          chart={liveLadder.gpai}
+          title="The GPAI model track"
+          caption={gpaiCaption}
+          tableLabel="The track, as a table"
+        />
+      </div>
+    </div>
+
     <div class="tri-columns">
       <div>
         <h3>Roles</h3>
@@ -583,6 +680,21 @@ const sources = [
       }
     </ul>
     <h3 id="tri-rules-classes">Classes</h3>
+    <Chart
+      id="tri-ladder-guide"
+      chart={guideLadder.wide}
+      narrow={guideLadder.narrow}
+      title="The risk ladder"
+      caption={ladderCaption}
+      tableLabel="The rungs, as a table"
+    />
+    <Chart
+      id="tri-gpai-guide"
+      chart={guideLadder.gpai}
+      title="The GPAI model track"
+      caption={gpaiCaption}
+      tableLabel="The track, as a table"
+    />
     <ul>
       {
         classRuleGroups.map((group) => (
@@ -601,6 +713,14 @@ const sources = [
       }
     </ul>
     <h3 id="tri-rules-roles">Roles</h3>
+    <Figure
+      id="eu-ai-act-operator-roles"
+      title={rolesPoster.title}
+      caption={rolesPoster.caption}
+      description={rolesPoster.description}
+    >
+      <Fragment set:html={rolesPosterSvg} />
+    </Figure>
     <ul>
       {
         roleRuleGroups.map((group) => (
@@ -801,6 +921,71 @@ const sources = [
   .tri-scope-status {
     font-weight: 600;
     color: var(--ink);
+  }
+
+  /* The live ladder: the script sets data-state on each rung's group
+     (public/toolkit/ai-act-triage-ladder.js). A rung the answers give turns
+     solid ink with ground-colour text (the ladder's own highlight); a rung the
+     answers would give if the system were in scope gets a dashed outline.
+     Without a state, the ladder is the neutral one of the written-out rules. */
+  .tri-map > * + * {
+    margin-top: var(--s-3);
+  }
+
+  .tri-map-grid {
+    display: grid;
+    gap: 0 var(--s-5);
+    align-items: start;
+  }
+
+  @media (min-width: 1000px) {
+    .tri-map-grid {
+      grid-template-columns: minmax(0, 1fr) 24rem;
+    }
+  }
+
+  .tri-map-grid > :global(.chart-fig) {
+    margin: var(--s-3) 0 0;
+  }
+
+  .tri-lad-reading {
+    max-width: var(--prose);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .tri-map :global(svg:not(.ch-vertical) g[data-state='given'] > rect) {
+    fill: var(--ink);
+    stroke: var(--ink);
+  }
+
+  .tri-map :global(svg:not(.ch-vertical) g[data-state='given'] text) {
+    fill: var(--bg);
+  }
+
+  .tri-map :global(svg.ch-vertical g[data-state='given'] rect) {
+    fill: var(--ink);
+    stroke: var(--ink);
+  }
+
+  .tri-map :global(svg.ch-vertical g[data-state='given'] text) {
+    font-weight: 700;
+  }
+
+  .tri-map :global(g[data-state='if'] rect) {
+    stroke: var(--ink);
+    stroke-width: 2;
+    stroke-dasharray: 5 3;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .tri-map :global(svg:not(.ch-vertical) g[data-step]) {
+      transition: transform var(--dur) var(--ease);
+    }
+
+    .tri-map :global(svg:not(.ch-vertical) g[data-state='given']) {
+      transform: translateY(-6px);
+    }
   }
 
   .tri-columns {

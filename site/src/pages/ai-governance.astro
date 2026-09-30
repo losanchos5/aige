@@ -30,6 +30,12 @@ import { breadcrumbJsonLd, type Crumb } from '../lib/breadcrumbs';
 import { renderDiagramFigure } from '../lib/diagrams';
 import { getGlossaryEntry } from '../lib/glossary';
 import { glossaryLinks } from '../data/glossary-links';
+import Figure from '../components/Figure.astro';
+import MaturityLadder from '../components/MaturityLadder.astro';
+import { getFigure } from '../data/figures';
+import { levels } from '../data/maturity';
+import jurisdictionSvg from '../figures/jurisdiction-tiles.svg?raw';
+import operatingModelSvg from '../figures/governance-operating-model.svg?raw';
 
 const SOURCE = 'guides/ai-governance.md';
 const FIGURE_ID = 'the-stack-layers';
@@ -66,6 +72,34 @@ if (sectionAt < 0) throw new Error(`${SOURCE}: no H2 #${FIGURE_SECTION} to place
 const nextH2 = html.indexOf('<h2', sectionAt + 1);
 const insertAt = nextH2 < 0 ? html.length : nextH2;
 const body = `${html.slice(0, insertAt)}${renderDiagramFigure(FIGURE_ID)}${html.slice(insertAt)}`;
+
+// The page visuals, each at the head of the section it illustrates, right
+// after the section's opening answer (the passage an answer engine quotes stays
+// first under its H2): the jurisdiction tiles and the operating model (figures
+// of chapters 21 and 12, listed with this page in figures.ts) and the maturity
+// ladder. The body is cut into segments there, so the template can place the
+// components between them. A moved or missing anchor is a build error.
+function afterOpeningAnswer(slug: string): number {
+  const at = body.indexOf(`<h2 id="${slug}"`);
+  if (at < 0) throw new Error(`${SOURCE}: no H2 #${slug} to place a page visual under`);
+  const end = body.indexOf('</p>', at);
+  const next = body.indexOf('<h2', at + 1);
+  if (end < 0 || (next >= 0 && end > next)) {
+    throw new Error(`${SOURCE}: the section #${slug} does not open with a paragraph`);
+  }
+  return end + '</p>'.length;
+}
+const cuts = [
+  afterOpeningAnswer('which-ai-regulations-apply-by-jurisdiction'),
+  afterOpeningAnswer('who-is-responsible-for-ai-governance'),
+  afterOpeningAnswer('what-are-the-levels-of-ai-governance-maturity'),
+];
+if (cuts.some((cut, i) => i > 0 && cut <= cuts[i - 1])) {
+  throw new Error(`${SOURCE}: the page visuals' sections are out of order`);
+}
+const segments = [0, ...cuts].map((from, i) => body.slice(from, cuts[i] ?? body.length));
+const jurisdictionFigure = getFigure('jurisdiction-tiles')!;
+const operatingModelFigure = getFigure('governance-operating-model')!;
 
 // The on-this-page rail lists the question H2s only; the FAQ's H3s stay in the body.
 const headings = pillar.getHeadings().filter((heading) => heading.depth === 2);
@@ -217,7 +251,37 @@ if (emitDiagramScript) Astro.locals.diagramScript = true;
             <span>Updated <time datetime={updated}>{proseDate(updated)}</time></span>
             <span>{site.license}</span>
           </p>
-          <Fragment set:html={body} />
+          <Fragment set:html={segments[0]} />
+          <Figure
+            id="jurisdiction-tiles"
+            title={jurisdictionFigure.title}
+            caption={jurisdictionFigure.caption}
+            description={jurisdictionFigure.description}
+          >
+            <Fragment set:html={jurisdictionSvg} />
+          </Figure>
+          <Fragment set:html={segments[1]} />
+          <Figure
+            id="governance-operating-model"
+            title={operatingModelFigure.title}
+            caption={operatingModelFigure.caption}
+            description={operatingModelFigure.description}
+          >
+            <Fragment set:html={operatingModelSvg} />
+          </Figure>
+          <Fragment set:html={segments[2]} />
+          <figure class="pillar-ladder" id="maturity-ladder">
+            <MaturityLadder levels={levels} nameTag="p" />
+            <figcaption class="pillar-ladder-cap">
+              <span class="pillar-ladder-title">The five levels of maturity</span>
+              <span class="pillar-ladder-desc">
+                From paper to production, each level proven by what the running systems can show.
+                Assess each layer, then read the floor: a function sits at the level of its
+                weakest layer. Drawn from chapter 07.
+              </span>
+            </figcaption>
+          </figure>
+          <Fragment set:html={segments[3]} />
         </article>
 
         <footer class="pillar-foot">
@@ -302,6 +366,76 @@ if (emitDiagramScript) Astro.locals.diagramScript = true;
     margin: 0;
     font-size: var(--fs-label);
     color: var(--ink-2);
+  }
+
+  /* The maturity ladder, framed like the figures around it and as wide as
+     the well (the figures' centred breakout, .pillar-main is the container).
+     Inside the prose, whose list rules would push every step after the
+     first down a line, the steps keep the ladder's own spacing; five in a
+     row need a wide well, so a narrower one keeps two per row. */
+  .prose > .pillar-ladder {
+    width: 100cqw;
+    margin-inline: calc(50% - 50cqw);
+    margin-block: var(--s-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .pillar-ladder :global(.ladder) {
+    padding: 0;
+  }
+
+  .pillar-ladder :global(.name) {
+    color: var(--ink);
+  }
+
+  .pillar-ladder :global(.maturity-step + .maturity-step),
+  .pillar-ladder :global(.signals li + li) {
+    margin-top: 0;
+  }
+
+  /* The table under the ladder lists the evidence per level, so the ladder
+     keeps the climb (index, meter, name, summary) and drops its signals. */
+  .pillar-ladder :global(.signals) {
+    display: none;
+  }
+
+  @container (max-width: 959px) {
+    .pillar-ladder :global(.ladder) {
+      grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    }
+  }
+
+  /* Five in a row: a staircase, each level one step above the last. */
+  @container (min-width: 960px) {
+    .pillar-ladder :global(.ladder) {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      align-items: stretch;
+    }
+
+    .pillar-ladder :global(.maturity-step:nth-child(1)) { margin-top: calc(4 * var(--s-6)); }
+    .pillar-ladder :global(.maturity-step:nth-child(2)) { margin-top: calc(3 * var(--s-6)); }
+    .pillar-ladder :global(.maturity-step:nth-child(3)) { margin-top: calc(2 * var(--s-6)); }
+    .pillar-ladder :global(.maturity-step:nth-child(4)) { margin-top: var(--s-6); }
+  }
+
+  .pillar-ladder-cap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    font-size: var(--fs-small);
+  }
+
+  .pillar-ladder-title {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .pillar-ladder-desc {
+    max-width: 72ch;
+    color: var(--muted);
+    text-wrap: pretty;
   }
 
   .pillar-toc {

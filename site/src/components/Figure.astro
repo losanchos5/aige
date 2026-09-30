@@ -33,21 +33,38 @@ interface Props {
 
 const { title, caption, description, class: className, id, permalink = true } = Astro.props;
 const known = id !== undefined && getFigure(id) !== undefined && hasFigureArt(id);
+// A poster (kind 'poster', 1000 units wide) gets the chapter's poster canvas
+// (src/lib/rehype-diagrams.ts): it keeps a legible width and scrolls sideways
+// inside a focusable, labelled region on a narrow screen (figures.css).
+const poster = known && getFigure(id!)!.kind === 'poster';
 ---
 
 <figure
-  class:list={['figure', 'figure--infographic', className]}
+  class:list={['figure', 'figure--infographic', poster && 'figure--poster', className]}
   id={known ? `figure-${id}` : undefined}
   data-figure={id}
 >
-  <div class="figure-canvas"><slot /></div>
+  {
+    poster ? (
+      <div
+        class="figure-canvas figure-canvas--poster"
+        tabindex="0"
+        role="region"
+        aria-label={`${title}: poster, scroll sideways on a narrow screen`}
+      >
+        <slot />
+      </div>
+    ) : (
+      <div class="figure-canvas"><slot /></div>
+    )
+  }
   <figcaption class="figure-figcaption">
     <span class="figure-fig-title">{title}</span>
     {caption && <span class="figure-fig-desc">{caption}</span>}
     {
       known && permalink && (
-        <a class="figure-permalink" href={`/figures/${id}`}>
-          Permalink, downloads and citation
+        <a class:list={['figure-permalink', poster && 'figure-poster-link']} href={`/figures/${id}`}>
+          {poster ? 'Full-size poster, downloads and citation' : 'Permalink, downloads and citation'}
         </a>
       )
     }

@@ -27,9 +27,15 @@
 /* Text helpers */
 .mono {
   font-family: var(--font-mono);
-  font-size: var(--fs-label);
   letter-spacing: var(--tracking-label);
   text-transform: uppercase;
+}
+
+/* The label size is for HTML only: on SVG text any CSS font-size beats the
+   font-size attribute the figure sets, so a 16-unit poster label would shrink
+   to 12 units. :where() keeps the specificity of the plain class. */
+.mono:where(:not(text, tspan)) {
+  font-size: var(--fs-label);
 }
 
 .muted {

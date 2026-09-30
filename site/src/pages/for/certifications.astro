@@ -12,6 +12,7 @@
  */
 import Doc from '../../layouts/Doc.astro';
 import SourceList from '../../components/SourceList.astro';
+import FlowDiagram from '../../components/FlowDiagram.astro';
 import { aigpBok, aigpDomains, aigpIndicators, rangeText } from '../../data/aigp';
 import { gitDate } from '../../lib/reading';
 import type { Source } from '../../lib/sources';
@@ -132,6 +133,44 @@ const sources: Source[] = [
 
 const cite = (n: number) => `#src-${n}`;
 
+// "Two kinds of certificate" as two parallel lanes, one per object certified,
+// with the standard each certifying body works to. Only what the page states,
+// with its source numbers: a person's certificate (scheme owner, assessment,
+// ISO/IEC 17024 [4]) against an organisation's AIMS certificate (external
+// certification body [3], ISO/IEC 42006 on ISO/IEC 17021-1 [5], audit against
+// ISO/IEC 42001 [6], no presumption of AI Act conformity, chapter 07).
+const certificateLanes = [
+  {
+    key: 'person',
+    object: 'The person',
+    title: 'Certificate of a person',
+    // An option, not a rule: a person-certifying body can work to 17024, and
+    // not every scheme is accredited under it (AIGP is not [2]).
+    standardsLabel: 'Standard a body can work to',
+    standards: [{ name: 'ISO/IEC 17024', source: 4 }],
+    steps: [
+      { label: 'Scheme owner', sub: 'sets the assessment against a blueprint it revises' },
+      { label: 'Assessment', sub: 'a person passes it' },
+      { label: 'Personal certificate', sub: 'knowledge at a point in time, not a working control' },
+    ],
+  },
+  {
+    key: 'organisation',
+    object: 'The organisation',
+    title: 'Certificate of a management system',
+    standardsLabel: 'Standard for the body',
+    standards: [
+      { name: 'ISO/IEC 42006', source: 5 },
+      { name: 'ISO/IEC 17021-1', source: 5 },
+    ],
+    steps: [
+      { label: 'Certification body', sub: 'external: ISO issues no certificates' },
+      { label: 'AIMS audit', sub: "against ISO/IEC 42001, of the organisation's AI management system" },
+      { label: 'AIMS certificate', sub: 'evidences a management system; no presumption of AI Act conformity' },
+    ],
+  },
+];
+
 const headings = [
   { depth: 2, slug: 'how-to-read-this-page', text: 'How to read this page' },
   { depth: 2, slug: 'two-kinds-of-certificate', text: 'Two kinds of certificate' },
@@ -197,6 +236,55 @@ const updated = gitDate('src/pages/for/certifications.astro');
   </p>
 
   <h2 id="two-kinds-of-certificate">Two kinds of certificate</h2>
+  <figure class="cert-lanes" id="certificate-lanes">
+    <div class="cert-grid">
+      {
+        certificateLanes.map((lane) => (
+          <div class="cert-lane" data-lane={lane.key}>
+            <p class="cert-object">
+              <svg class="cert-glyph" viewBox="0 0 24 24" aria-hidden="true">
+                {lane.key === 'person' ? (
+                  <>
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 21a8 7 0 0 1 16 0" />
+                  </>
+                ) : (
+                  <>
+                    <path d="M4 21V5l8-3 8 3v16" />
+                    <path d="M9 21v-5h6v5M8 9h2M14 9h2M8 13h2M14 13h2" />
+                  </>
+                )}
+              </svg>
+              {lane.object}
+            </p>
+            <FlowDiagram steps={lane.steps} title={lane.title} />
+            <p class="cert-standards">
+              <span class="cert-standards-label">{lane.standardsLabel}</span>
+              {lane.standards.map((standard) => (
+                <span class="cert-standard">
+                  {standard.name}
+                  <sup><a class="cite" href={cite(standard.source)}>{standard.source}</a></sup>
+                </span>
+              ))}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+    <p class="cert-trap">
+      <span class="cert-trap-label">Easy to confuse</span>
+      Some personal schemes carry the standard's name: an ISO/IEC 42001 Lead Implementer or Lead
+      Auditor certificate is a certificate of a person, not of a management system.
+    </p>
+    <figcaption class="cert-cap">
+      <span class="cert-cap-title">Two kinds of certificate</span>
+      <span class="cert-cap-desc">
+        Who certifies what, and to which standard: a person passes a scheme owner's assessment, while
+        a certification body audits an organisation's AI management system against ISO/IEC 42001.
+        Check which of the two a certificate names before you rely on it.
+      </span>
+    </figcaption>
+  </figure>
   <p>
     A <strong>certificate of a person</strong> says that someone passed an assessment set by a
     scheme owner. A <strong>certificate of a management system</strong> says that a certification
@@ -443,3 +531,182 @@ const updated = gitDate('src/pages/for/certifications.astro');
   <h2 id="sources">Sources</h2>
   <SourceList sources={sources} />
 </Doc>
+
+<style>
+  /* Two kinds of certificate: two lanes side by side where the figure is wide
+     enough, each a FlowDiagram (a vertical chain here, its caption moved above
+     the steps as the lane's name) framed as a card, the certificate at the end
+     of each chain drawn as the terminal node. The figure takes the reading
+     well's full width (the figures' centred breakout; .doc-main is the query
+     container) and is a container itself, so the lanes follow its width. */
+  :global(.prose) > .cert-lanes {
+    width: 100cqw;
+    margin-inline: calc(50% - 50cqw);
+    margin-block: var(--s-6);
+  }
+
+  .cert-lanes {
+    container: cert / inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+  }
+
+  .cert-grid {
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  @container cert (min-width: 640px) {
+    .cert-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .cert-lane {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding: var(--s-4) var(--s-4) var(--s-5);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--ink);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+    box-shadow: var(--shadow-1);
+  }
+
+  :global(.prose) .cert-object {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+
+  .cert-glyph {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* The lane's FlowDiagram: its caption (the lane's name) above the steps,
+     no outer margin, and none of the prose list spacing between steps. */
+  .cert-lane :global(.flow) {
+    flex-direction: column-reverse;
+    gap: var(--s-4);
+    margin: 0;
+  }
+
+  .cert-lane :global(.flow-step + .flow-step) {
+    margin-top: 0;
+  }
+
+  .cert-lane :global(.flow-title) {
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    line-height: 1.2;
+  }
+
+  /* Numbered steps (the number is decoration: empty alt text), and the
+     certificate, the end of each chain, in solid ink. */
+  .cert-lane :global(.flow-steps) {
+    counter-reset: cert-step;
+  }
+
+  .cert-lane :global(.flow-step) {
+    counter-increment: cert-step;
+  }
+
+  .cert-lane :global(.flow-label::before) {
+    content: counter(cert-step, decimal-leading-zero) / '';
+    display: block;
+    margin-bottom: var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  .cert-lane :global(.flow-step:last-child .flow-node) {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .cert-lane :global(.flow-step:last-child .flow-sub),
+  .cert-lane :global(.flow-step:last-child .flow-label::before) {
+    color: var(--bg);
+  }
+
+  :global(.prose) .cert-standards {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2);
+    margin: auto 0 0;
+    padding-top: var(--s-2);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .cert-standards-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .cert-standard {
+    padding: 2px var(--s-2);
+    border: 1px solid var(--ink);
+    border-radius: var(--r-sm);
+    font-family: var(--font-mono);
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  :global(.prose) .cert-trap {
+    margin: 0;
+    padding: var(--s-3) var(--s-4);
+    border: 1px dashed var(--ink-2);
+    border-radius: var(--r-sm);
+    font-size: var(--fs-small);
+    color: var(--ink);
+  }
+
+  .cert-trap-label {
+    margin-right: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .cert-cap {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    font-size: var(--fs-small);
+  }
+
+  .cert-cap-title {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .cert-cap-desc {
+    max-width: 72ch;
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+</style>

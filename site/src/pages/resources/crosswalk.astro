@@ -5,6 +5,8 @@ import Callout from '../../components/Callout.astro';
 import CrosswalkMatrix from '../../components/CrosswalkMatrix.astro';
 import CrosswalkDrawer from '../../components/CrosswalkDrawer.astro';
 import ObligationLookup from '../../components/ObligationLookup.astro';
+import Chart from '../../components/Chart.astro';
+import { venn3, type VennSet } from '../../lib/charts';
 import { site } from '../../data/site';
 import { disclaimer } from '../../data/frameworks';
 import {
@@ -58,6 +60,36 @@ const inAllThree = overlapRows.filter((row) => row.cells.every((cell) => cell.le
 const actWithoutIso = overlapRows.filter((_, i) => euCells[i].length > 0 && isoCells[i].length === 0).length;
 const actWithoutNist = overlapRows.filter((_, i) => euCells[i].length > 0 && nistCells[i].length === 0).length;
 const OVERLAP_SHOWN = 2;
+
+// The same overlap as a Venn (wide) and an UpSet (narrow): a topic belongs to
+// an instrument's set when that instrument files at least one clause there,
+// the rule inAllThree counts by. 'chart' mode: this page links no figures.css
+// (tests/perf.spec.ts).
+const VENN_LABEL: Record<string, string> = {
+  'eu-ai-act': 'EU AI Act',
+  'iso-42001': 'ISO/IEC 42001',
+  'nist-ai-rmf': 'NIST AI RMF',
+};
+const vennSets = overlapFws.map((fw) => ({ key: fw.id, label: VENN_LABEL[fw.id] })) as [VennSet, VennSet, VennSet];
+const vennBase = {
+  title: 'Where the three overlap',
+  desc: `The ${topics.length} crosswalk topics by which of the EU AI Act, ISO/IEC 42001 and the NIST AI RMF file a clause there: ${inAllThree} in all three.`,
+  source: 'the topic × framework crosswalk on this page',
+  asOf: crosswalkAsOf,
+  mode: 'chart' as const,
+  sets: vennSets,
+  items: overlapRows.map((row) => ({
+    label: row.topic.name,
+    sets: overlapFws.filter((_, i) => row.cells[i].length > 0).map((fw) => fw.id),
+  })),
+  unit: 'topics',
+  unitOne: 'topic',
+  itemHeader: 'Topic',
+  tableCaption: 'Crosswalk topics with a clause in each of the three instruments',
+};
+const vennWide = venn3({ ...vennBase, id: 'cw-venn-w', layout: 'venn', width: 560, callouts: 5 });
+const vennNarrow = venn3({ ...vennBase, id: 'cw-venn-n', layout: 'upset', width: 340 });
+const outsideIso = topics.length - overlapRows.filter((_, i) => isoCells[i].length > 0).length;
 
 // The explorer's defaults, mirrored in public/crosswalk-explorer.js.
 const DEFAULT_SOURCE = 'eu-ai-act';
@@ -153,6 +185,13 @@ const jsonLd = [
           <a href="/ai-governance">AI governance and its main frameworks</a>.
         </p>
       </div>
+      <Chart
+        id="cw-venn"
+        chart={vennWide}
+        narrow={vennNarrow}
+        title="Where the three overlap"
+        caption={`A topic counts for an instrument when it files at least one clause there: ${inAllThree} topics have a clause in all three, and the data table names the topics of every group. Start a gap review from the ${outsideIso} topics with no ISO/IEC 42001 clause, reading each as a gap in this mapping, not proof the standard ignores it.`}
+      />
       <div class="res-tablewrap">
         <table class="res-table cw-overlap-table">
           <caption class="visually-hidden">

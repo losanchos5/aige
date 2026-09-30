@@ -400,7 +400,9 @@ export function divergingBars(input: DivergingBarsInput): ChartOutput {
 
 export interface DumbbellInput extends ChartBase {
   /** from and to are YYYY-MM-DD dates. */
-  items: { label: string; from: string; to: string; href?: string }[];
+  /** `note` (optional) is printed beside the later dot, e.g. the delay
+   *  ("+16 months"), and fills a table column headed `noteHeader`. */
+  items: { label: string; from: string; to: string; href?: string; note?: string }[];
   /** Legend and table words for the two ends ("Original date", "New date"). */
   fromLabel: string;
   toLabel: string;
@@ -410,6 +412,9 @@ export interface DumbbellInput extends ChartBase {
   today?: string;
   todayLabel?: string;
   itemHeader?: string;
+  /** Table heading of the note column (default "Note"); used only when an
+   *  item has a note. */
+  noteHeader?: string;
   /** Wide label column width (default 40 % of the width, at most 260: the
    *  dates need less room than a value axis). Labels take up to three lines. */
   labelWidth?: number;
@@ -443,9 +448,12 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
   const gridTop = y - 2;
   const rows: string[] = [];
   const H = 16;
+  // Narrow: the mark band of each row, for a today line that skips the labels.
+  const markBands: [number, number][] = [];
   for (const item of input.items) {
     const { barY } = itemLabel(rows, f, item.label, y, H, item.href, 3);
     const cy = barY + H / 2;
+    markBands.push([barY - 3, barY + H + 3]);
     const xa = ts.map(item.from);
     const xb = ts.map(item.to);
     if (Math.abs(xb - xa) > 12) {
@@ -455,6 +463,17 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
     }
     rows.push(shape('circle', xa, cy, 5.5, `class="${markClass('outline', 0)}"`, tip(`${item.label} · ${input.fromLabel}: ${item.from}`)));
     rows.push(shape('circle', xb, cy, 5.5, `class="${markClass('filled', 0)}"`, tip(`${item.label} · ${input.toLabel}: ${item.to}`)));
+    if (item.note) {
+      // Beside the later dot when it fits, else before the earlier one.
+      const nw = textWidth(item.note, 12, 'mono');
+      const after = Math.max(xa, xb) + 10;
+      const before = Math.min(xa, xb) - 10 - nw;
+      if (after + nw > W - L && before < f.x0) {
+        throw new Error(`charts(dumbbell ${input.id}): note "${item.note}" fits neither after nor before "${item.label}"; shorten the wording`);
+      }
+      const nx = after + nw <= W - L ? after : before;
+      rows.push(text(nx, cy + 4, item.note, { size: 12, cls: 'mono', weight: 600, where: 'dumbbell note' }));
+    }
     y = barY + H + 10;
   }
   for (const t of ts.ticks) {
@@ -463,7 +482,13 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
   }
   if (input.today) {
     const x = r1(ts.map(input.today));
-    out.push(`<line class="today" x1="${x}" y1="${r1(gridTop - 4)}" x2="${x}" y2="${r1(y - 4)}"/>`);
+    if (f.wide) {
+      out.push(`<line class="today" x1="${x}" y1="${r1(gridTop - 4)}" x2="${x}" y2="${r1(y - 4)}"/>`);
+    } else {
+      // Narrow: the labels sit above their rows across the plot, so the line
+      // is drawn only across each row's marks, never through a label.
+      out.push(`<path class="today" d="${markBands.map(([a, b]) => `M${x} ${r1(a)}V${r1(b)}`).join('')}"/>`);
+    }
     const label = `${input.todayLabel ?? w.today} ${input.today}`;
     fitText(label, W - 2 * L, 12, 'mono', 'today label');
     out.push(text(besideLine(x, textWidth(label, 12, 'mono'), W, L), y + 10, label, { size: 12, cls: 'mono', where: 'today label' }));
@@ -479,12 +504,13 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
     role: input.items.some((i) => i.href) ? 'group' : 'img',
     cls: 'ch-dumbbell',
   });
+  const noted = input.items.some((i) => i.note);
   return {
     svg,
     table: table(
       input.tableCaption ?? input.title,
-      [input.itemHeader ?? w.item, input.fromLabel, input.toLabel],
-      input.items.map((i) => [i.label, i.from, i.to]),
+      [input.itemHeader ?? w.item, input.fromLabel, input.toLabel, ...(noted ? [input.noteHeader ?? w.note] : [])],
+      input.items.map((i) => [i.label, i.from, i.to, ...(noted ? [i.note ?? ''] : [])]),
     ),
     width: W,
     height,

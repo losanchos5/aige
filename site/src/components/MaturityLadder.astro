@@ -14,9 +14,14 @@ import { slugify } from '../lib/md-parse';
 
 interface Props {
   levels: readonly MaturityLevel[];
+  /** Element of each level name: 'h3' (default) where the ladder is a section
+   *  of its own; 'p' inside a figure in running prose, where five headings
+   *  would split the section the figure illustrates. */
+  nameTag?: 'h3' | 'p';
 }
 
-const { levels } = Astro.props;
+const { levels, nameTag = 'h3' } = Astro.props;
+const Name = nameTag;
 const pad = (n: number) => String(n).padStart(2, '0');
 
 // The chapter-05 pattern whose adoption gets a function to each level. Level 1
@@ -50,7 +55,7 @@ const patternHref = (name: string) => `/bok/patterns#${slugify(`Pattern: ${name}
             ))}
           </span>
         </div>
-        <h3 class="name">{level.name}</h3>
+        <Name class="name">{level.name}</Name>
         <p class="summary">{level.summary}</p>
         <ul class="signals">
           {level.signals.map((s) => (
