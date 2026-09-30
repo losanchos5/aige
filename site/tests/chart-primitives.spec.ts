@@ -561,6 +561,32 @@ test('Venn3 upset layout draws bars, not circles', () => {
   expect(make('upset')).not.toContain('class="venn"');
 });
 
+test('Venn3 euler layout nests strictly nested sets with no empty region, and is the Venn otherwise', () => {
+  const make = (layout: 'venn' | 'euler', items: { label: string; sets: string[] }[]) =>
+    venn3({ ...base, id: 'ch-v', title, desc, unit: 'topics', sets, items, layout }).svg;
+  // ISO inside NIST inside the EU AI Act, each ring holding one topic.
+  const nested = [
+    { label: 'Risk management', sets: ['eu', 'iso', 'nist'] },
+    { label: 'Measurement', sets: ['eu', 'nist'] },
+    { label: 'CE marking', sets: ['eu'] },
+    { label: 'Unfiled topic', sets: [] },
+  ];
+  const svg = make('euler', nested);
+  expect((svg.match(/<ellipse class="venn"/g) ?? []).length).toBe(3);
+  expect(svg).not.toContain('<circle class="venn"');
+  const counts = [...svg.matchAll(/class="disp num">(\d+)<title>([^<:]+):/g)].map((m) => [m[2], Number(m[1])]);
+  expect(counts).toEqual([
+    ['EU AI Act only', 1],
+    ['EU AI Act and NIST AI RMF only', 1],
+    ['All three', 1],
+  ]);
+  // Not nested, or two sets alike (an empty ring): the Venn, unchanged.
+  const alike = nested.map((i) => (i.label === 'Measurement' ? { ...i, sets: ['eu', 'iso', 'nist'] } : i));
+  for (const items of [vennItems, alike]) {
+    expect(make('euler', items)).toBe(make('venn', items));
+  }
+});
+
 test('vertical ladder stacks the steps top to bottom in one column', () => {
   const { svg } = ladder({ ...base, id: 'ch-n', title, desc, steps, highlight: 1, orientation: 'vertical' });
   const at = ['01 Minimal risk', '02 Transparency', '03 High risk'].map((l) => textAt(svg, l)!);

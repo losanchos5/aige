@@ -64,9 +64,11 @@
 //     Swimlane: columns = enforcement points, rows = items, shape = effect;
 //     'vertical' (narrow) stacks the lanes as bands, each listing its items.
 //
-//   venn3({ sets: [A, B, C], items: [{ label, sets: string[] }], layout: 'venn' | 'upset',
+//   venn3({ sets: [A, B, C], items: [{ label, sets: string[] }], layout: 'venn' | 'euler' | 'upset',
 //           unit, callouts? })
-//     Three-set overlap; 'upset' is the narrow variant (same table).
+//     Three-set overlap; 'upset' is the narrow variant (same table). 'euler'
+//     draws nested ellipses when nestedChain(sets, items) finds the sets
+//     strictly nested (no empty region), and the Venn otherwise.
 //
 //   ladder({ steps: [{ label, detail?, href?, key? }], highlight?, highlightLabel?, orientation? })
 //     Ascending steps; 'vertical' is the narrow variant.
@@ -165,7 +167,7 @@ export {
   type TimeStripInput,
 } from './timeaxis';
 export { lanes, type LaneMark, type LanesInput } from './lanes';
-export { venn3, type Venn3Input, type VennSet } from './venn';
+export { venn3, nestedChain, type Venn3Input, type VennSet } from './venn';
 export { ladder, type LadderInput, type LadderStep } from './ladder';
 export { relationRadial, radialLabelWidth, RADIAL_MIN_RELATIONS, type RelationFamily, type RelationItem, type RelationRadialInput, type RelationStrength } from './radial';
 export {

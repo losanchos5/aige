@@ -1,10 +1,12 @@
 // venn.ts: Venn3, the overlap of three sets, with an UpSet layout for narrow
-// widths. Input is the items and the sets each belongs to; the seven regions
-// and their counts are computed here. The Venn draws three outlined circles
-// (a faint fill, so overlaps read darker) with the count in each region and a
-// tooltip listing its items; the UpSet draws one bar per non-empty region,
-// largest first, with a three-dot membership mark. Both return the same table:
-// one row per item, Yes/No per set.
+// widths and an Euler layout for sets that nest. Input is the items and the
+// sets each belongs to; the seven regions and their counts are computed here.
+// The Venn draws three outlined circles (a faint fill, so overlaps read darker)
+// with the count in each region and a tooltip listing its items; the Euler
+// draws the sets as nested ellipses when each lies strictly inside the next
+// (so no region is empty), and falls back to the Venn when they do not; the
+// UpSet draws one bar per non-empty region, largest first, with a three-dot
+// membership mark. All return the same table: one row per item, Yes/No per set.
 import {
   assemble,
   fitText,
@@ -30,12 +32,13 @@ export interface Venn3Input extends ChartBase {
   sets: [VennSet, VennSet, VennSet];
   /** Every item with the keys of the sets it belongs to (may be none). */
   items: { label: string; sets: string[] }[];
-  /** 'venn' (wide) or 'upset' (narrow). */
-  layout: 'venn' | 'upset';
+  /** 'venn' (wide), 'euler' (wide; the Venn unless the sets nest, see
+   *  nestedChain) or 'upset' (narrow). */
+  layout: 'venn' | 'euler' | 'upset';
   /** Plural noun for counts ("topics") and its singular ("topic"). */
   unit: string;
   unitOne?: string;
-  /** Venn only: under the diagram, name the items of every region holding
+  /** Venn and Euler: under the diagram, name the items of every region holding
    *  1 to `callouts` items (default 0: counts only). */
   callouts?: number;
   itemHeader?: string;
@@ -44,6 +47,22 @@ export interface Venn3Input extends ChartBase {
 const L = 12;
 /** Region bit masks: 1 = first set, 2 = second, 4 = third. Drawing order. */
 const MASKS = [7, 3, 5, 6, 1, 2, 4] as const;
+
+/**
+ * The sets from outermost to innermost when each lies strictly inside the next
+ * larger one (every item of an inner set is in the outer, and the outer holds
+ * at least one item more), so a nested Euler has no empty region; otherwise
+ * null. An inner set must hold at least one item.
+ */
+export function nestedChain(sets: readonly VennSet[], items: Venn3Input['items']): VennSet[] | null {
+  const members = (key: string) => new Set(items.filter((i) => i.sets.includes(key)).map((i) => i.label));
+  const chain = sets.map((set) => ({ set, in: members(set.key) })).sort((a, b) => b.in.size - a.in.size);
+  for (let j = 1; j < chain.length; j++) {
+    const [outer, inner] = [chain[j - 1].in, chain[j].in];
+    if (inner.size === 0 || inner.size === outer.size || [...inner].some((label) => !outer.has(label))) return null;
+  }
+  return chain.map((c) => c.set);
+}
 
 export function venn3(input: Venn3Input): ChartOutput {
   nonEmpty(input.items, 'items', `venn3 ${input.id}`);
@@ -78,7 +97,63 @@ export function venn3(input: Venn3Input): ChartOutput {
   const out: string[] = [];
   let W: number;
   let bottom: number;
-  if (input.layout === 'venn') {
+  const chain = input.layout === 'euler' ? nestedChain(input.sets, input.items) : null;
+  const callouts = () => {
+    const shown = input.callouts ?? 0;
+    for (const m of MASKS) {
+      const list = regions.get(m)!;
+      if (!list.length || list.length > shown) continue;
+      const lines = wrapText(`${regionName(m)}: ${list.join(', ')}`, W - 2 * L, 12.5, 'body', 3, 'callout');
+      bottom += 6;
+      for (const line of lines) {
+        bottom += 16;
+        out.push(text(L, bottom, line, { size: 12.5, cls: 'ink2', where: 'callout' }));
+      }
+    }
+  };
+  if (chain) {
+    // Nested ellipses, the outermost set first. Each inner ellipse starts BAND
+    // below the top of the one around it and ends GAP above its bottom, so the
+    // top band of every ring holds its set name, its count and its region name;
+    // the innermost holds them at its centre.
+    W = input.width ?? 560;
+    const BAND = 92;
+    const GAP = 8;
+    const k = chain.length;
+    const rx0 = (W - 2 * L) / 2;
+    const rxIn = Math.min(140, rx0 / 2);
+    const ry0 = 65 + (k - 1) * ((BAND + GAP) / 2);
+    const cx = W / 2;
+    const rings = chain.map((_, j) => ({
+      rx: rx0 - (j * (rx0 - rxIn)) / (k - 1),
+      ry: ry0 - (j * (BAND + GAP)) / 2,
+      cy: 8 + ry0 + (j * (BAND - GAP)) / 2,
+    }));
+    rings.forEach((e) => out.push(`<ellipse class="venn" cx="${r1(cx)}" cy="${r1(e.cy)}" rx="${r1(e.rx)}" ry="${r1(e.ry)}"/>`));
+    /** Width of ring j at height y, less a 16 px margin each side. */
+    const room = (j: number, y: number) => {
+      const e = rings[j];
+      const t = (y - e.cy) / e.ry;
+      return 2 * e.rx * Math.sqrt(Math.max(0, 1 - t * t)) - 32;
+    };
+    const keyIndex = (set: VennSet) => keys.indexOf(set.key);
+    chain.forEach((set, j) => {
+      const e = rings[j];
+      const inner = j === k - 1;
+      const m = chain.slice(0, j + 1).reduce((acc, s) => acc | (1 << keyIndex(s)), 0);
+      const n = regions.get(m)!.length;
+      const [yName, yCount, yRegion] = inner ? [e.cy - 22, e.cy + 6, e.cy + 28] : [e.cy - e.ry + 24, e.cy - e.ry + 50, e.cy - e.ry + 72];
+      fitText(set.label, room(j, yName - 10), 13.5, 'body', 'set label');
+      out.push(text(cx, yName, set.label, { size: 13.5, weight: 600, anchor: 'middle', where: 'set label' }));
+      out.push(
+        `<text x="${r1(cx)}" y="${r1(yCount)}" font-size="18" text-anchor="middle" class="disp num">${n}${tip(regionTip(m))}</text>`,
+      );
+      fitText(regionName(m), room(j, yRegion), 12.5, 'body', 'region label');
+      out.push(text(cx, yRegion, regionName(m), { size: 12.5, cls: 'ink2', anchor: 'middle', where: 'region label' }));
+    });
+    bottom = rings[0].cy + rings[0].ry + 8;
+    callouts();
+  } else if (input.layout !== 'upset') {
     W = input.width ?? 480;
     const R = Math.min(96, (W - 2 * L) * 0.2);
     const d = R * 0.62;
@@ -130,17 +205,7 @@ export function venn3(input: Venn3Input): ChartOutput {
       );
     }
     bottom = cy + 1.155 * d + R + 20;
-    const shown = input.callouts ?? 0;
-    for (const m of MASKS) {
-      const list = regions.get(m)!;
-      if (!list.length || list.length > shown) continue;
-      const lines = wrapText(`${regionName(m)}: ${list.join(', ')}`, W - 2 * L, 12.5, 'body', 3, 'callout');
-      bottom += 6;
-      for (const line of lines) {
-        bottom += 16;
-        out.push(text(L, bottom, line, { size: 12.5, cls: 'ink2', where: 'callout' }));
-      }
-    }
+    callouts();
   } else {
     W = input.width ?? 340;
     const rows = MASKS.filter((m) => regions.get(m)!.length > 0).sort((a, b) => regions.get(b)!.length - regions.get(a)!.length);
@@ -183,7 +248,7 @@ export function venn3(input: Venn3Input): ChartOutput {
     bottom += 20;
     out.push(text(L, bottom, line, { size: 12.5, cls: 'ink2', where: 'none line' }));
   }
-  const { svg, height } = assemble({ base: input, width: W, bottom, body: out, cls: input.layout === 'venn' ? 'ch-venn' : 'ch-upset' });
+  const { svg, height } = assemble({ base: input, width: W, bottom, body: out, cls: chain ? 'ch-euler' : input.layout === 'upset' ? 'ch-upset' : 'ch-venn' });
   const w = words(input.lang);
   return {
     svg,
