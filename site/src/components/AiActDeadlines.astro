@@ -62,9 +62,10 @@ const UI = {
     newDate: 'New date',
     moveTitle: 'What the Omnibus moved',
     moveCaption:
-      `Each date the Digital Omnibus deferred, from the date in the original text to the date that applies now, with the delay in months; the dashed line is today, as of the last check of this page. The table below adds the dates the Omnibus created.`,
+      `Each date the Digital Omnibus deferred, from the date in the original text to the date that applies now, with the delay in months; the dashed line marks the date of the last check of this page. The table below adds the dates the Omnibus created.`,
     moveDesc: (n: number) => `${n} AI Act dates the Digital Omnibus deferred, each drawn from its original date to the date that applies now, with the delay in months.`,
     moveDelay: 'Delay',
+    moveAsOf: 'As of',
     months: (n: number) => `+${n} ${n === 1 ? 'month' : 'months'}`,
     moveSource: 'Regulation (EU) 2026/1744 [2]',
     moveTable: 'The deferred dates',
@@ -113,9 +114,10 @@ const UI = {
     newDate: 'Fecha nueva',
     moveTitle: 'Lo que movió el Omnibus',
     moveCaption:
-      `Cada fecha que el Digital Omnibus aplazó, desde la fecha del texto original hasta la que se aplica ahora, con el retraso en meses; la línea discontinua es hoy, a fecha de la última revisión de esta página. La tabla de abajo añade las fechas que creó el Omnibus.`,
+      `Cada fecha que el Digital Omnibus aplazó, desde la fecha del texto original hasta la que se aplica ahora, con el retraso en meses; la línea discontinua marca la fecha de la última revisión de esta página. La tabla de abajo añade las fechas que creó el Omnibus.`,
     moveDesc: (n: number) => `${n} fechas del Reglamento de IA que el Digital Omnibus aplazó, cada una desde su fecha original hasta la que se aplica ahora, con el retraso en meses.`,
     moveDelay: 'Retraso',
+    moveAsOf: 'A fecha de',
     months: (n: number) => `+${n} ${n === 1 ? 'mes' : 'meses'}`,
     moveSource: 'Reglamento (UE) 2026/1744 [2]',
     moveTable: 'Las fechas aplazadas',
@@ -196,7 +198,9 @@ const moveChart = moves.length
       toLabel: UI.colTo,
       itemHeader: UI.colWhat,
       noteHeader: UI.moveDelay,
+      // The line is the page's check date, not the reader's today.
       today: AI_ACT_TIMELINE_AS_OF,
+      todayLabel: UI.moveAsOf,
       tableCaption: UI.moveTable,
     }
   : undefined;

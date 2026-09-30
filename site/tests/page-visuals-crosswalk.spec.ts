@@ -132,7 +132,7 @@ test.describe('comparison pages: overlap bar and clause butterfly', () => {
           // Markup order: label, side a, side b.
           const [, a, b] = li.split(/data-side="[ab]"/);
           const side = (part: string) => {
-            return { core: (part.match(/class="cb-sq cb-core"/g) ?? []).length, related: (part.match(/class="cb-sq cb-rel"/g) ?? []).length };
+            return { core: (part.match(/class="cb-sq cb-core\b/g) ?? []).length, related: (part.match(/class="cb-sq cb-rel\b/g) ?? []).length };
           };
           return { id: /data-topic="([^"]+)"/.exec(li)?.[1], level: g[1], a: side(a), b: side(b) };
         }),

@@ -3,7 +3,10 @@
 // run of dots where one dot stands for `unit` records, and the count. The dots
 // are one rect per row filled with a dot pattern, so a remainder shows as a
 // partial dot (the Isotype convention) and the SVG stays small whatever the
-// counts. Each row's tone is the swatch of its card on the hub.
+// counts. A remainder too small to show ink (a dot's disc starts a tenth of
+// the pitch in) still gets a sliver of MIN_INK, so a row of one record never
+// looks empty; its count is printed beside it. Each row's tone is the swatch
+// of its card on the hub.
 //
 // Built on the chart kit's shell and helpers (src/lib/charts/core.ts); the
 // classes are the kit's, so it renders in 'chart' mode on /resources, which
@@ -55,6 +58,8 @@ const COUNT_PX = 12;
 const MAX_PITCH = 14;
 /** Below this pitch the dots stop reading as dots: raise the unit. */
 const MIN_PITCH = 6;
+/** Least ink a partial dot shows, in units. */
+const MIN_INK = 3;
 
 /** Largest first; equal counts by name, independent of locale. */
 const byWeight = (a: CorpusRow, b: CorpusRow) => b.count - a.count || (a.label < b.label ? -1 : a.label > b.label ? 1 : 0);
@@ -109,7 +114,11 @@ export function corpusIsotype(input: CorpusIsotypeInput): ChartOutput {
   let y = 34;
   for (const row of rows) {
     const name = `${row.label}: ${countText(row)}`;
-    const dotsW = (row.count / input.unit) * pitch;
+    // Whole dots, then the remainder; the disc of a dot spans 0.1 to 0.9 of
+    // its pitch, so a remainder under MIN_INK of ink is widened to it.
+    const whole = Math.floor(row.count / input.unit);
+    const rest = ((row.count % input.unit) / input.unit) * pitch;
+    const dotsW = whole * pitch + (rest > 0 ? Math.max(rest, pitch * 0.1 + MIN_INK) : 0);
     fitText(row.label, wide ? labelW : W - 2 * L - countW - 12, LABEL_PX, 'body', 'resource name');
     const parts: string[] = [];
     let dotsY: number;

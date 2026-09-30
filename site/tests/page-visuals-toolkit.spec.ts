@@ -7,14 +7,13 @@
 //    and neutral without JavaScript and carry the dates of classLabels; with
 //    JavaScript, the rungs light up from the engine's outcome (classes stack,
 //    out of scope shows what would follow) and a live edit is announced;
-// 3. the registered figures embedded on toolkit pages are listed on their
-//    permalink (figures.ts pages[]), and the operator-roles poster keeps its
-//    legible width inside a scroll region on a phone.
+// 3. the operator-roles poster keeps its legible width inside a scroll region
+//    on a phone (where each embedded figure appears is checked, for every
+//    page, by page-visuals-w1e.spec.ts).
 import { test, expect, type Page } from '@playwright/test';
 
 import { policyCardTemplates, type EnforcementPoint } from '../src/data/policy-card';
 import { classLabels, classOrder, triageModel } from '../src/data/triage';
-import { getFigure } from '../src/data/figures';
 import { evaluate, cleanMeta, stateToParams } from '../public/toolkit/ai-act-triage-engine.js';
 import { encodeFragment } from '../public/toolkit/lib.js';
 
@@ -171,29 +170,11 @@ test.describe('/toolkit/ai-act-triage ladder', () => {
   });
 });
 
-// ---- 3. Registered figures on toolkit pages ---------------------------------
+// ---- 3. The operator-roles poster on a phone ---------------------------------
 
-test.describe('registered figures embedded on toolkit pages', () => {
-  const embeds = [
-    { id: 'eu-ai-act-operator-roles', route: TRIAGE },
-    { id: 'procured-ai-control', route: '/toolkit/vendor-due-diligence' },
-    { id: 'incident-clocks', route: '/toolkit/incident-clock' },
-  ];
-  for (const { id, route } of embeds) {
-    test(`${id} is on ${route} and its permalink lists that page`, async ({ page }) => {
-      expect(getFigure(id)?.pages).toContain(route);
-      await page.goto(route);
-      await expect(page.locator(`figure#figure-${id} svg[role="img"]`)).toHaveCount(1);
-      await page.goto(`/figures/${id}`);
-      await expect(page.locator(`a[href="${route}"]`).first()).toBeAttached();
-    });
-  }
-
-  test('the vendor due-diligence gate diagram is on the vendor tool', async ({ page }) => {
-    await page.goto('/toolkit/vendor-due-diligence');
-    await expect(page.locator('[data-diagram="vendor-due-diligence-gate"], #diagram-vendor-due-diligence-gate').first()).toBeAttached();
-  });
-
+test.describe('the operator-roles poster on the triage tool', () => {
+  // Placement of every embedded figure (pages[] and the permalink's back
+  // link) is owned by the generic checks of page-visuals-w1e.spec.ts.
   test('on a phone the operator-roles poster keeps its width inside a scroll region, not the page', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(TRIAGE);

@@ -57,6 +57,25 @@ test.describe('embedded figures and their pages[]', () => {
     expect(unlisted).toEqual([]);
   });
 
+  test('the permalink of every figure with pages[] links each of those pages', () => {
+    const unlinked: string[] = [];
+    let checked = 0;
+    for (const figure of figures) {
+      const routes = (figure.pages ?? []).filter((route) => !placedRoute(route));
+      if (!routes.length) continue;
+      const html = readFileSync(join('dist', 'figures', `${figure.id}.html`), 'utf8');
+      // Only the "Where it appears" list: the site nav links some routes on every page.
+      const start = html.indexOf('id="appears"');
+      const places = start < 0 ? '' : html.slice(start, html.indexOf('</section>', start));
+      for (const route of routes) {
+        checked += 1;
+        if (!places.includes(`href="${route}"`)) unlinked.push(`/figures/${figure.id} lacks ${route}`);
+      }
+    }
+    expect(checked).toBeGreaterThan(0);
+    expect(unlinked).toEqual([]);
+  });
+
   test('every page a figure lists in pages[] shows it', () => {
     const missing: string[] = [];
     for (const figure of figures) {

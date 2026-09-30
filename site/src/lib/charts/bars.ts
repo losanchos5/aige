@@ -448,9 +448,12 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
   const gridTop = y - 2;
   const rows: string[] = [];
   const H = 16;
+  // Narrow: the mark band of each row, for a today line that skips the labels.
+  const markBands: [number, number][] = [];
   for (const item of input.items) {
     const { barY } = itemLabel(rows, f, item.label, y, H, item.href, 3);
     const cy = barY + H / 2;
+    markBands.push([barY - 3, barY + H + 3]);
     const xa = ts.map(item.from);
     const xb = ts.map(item.to);
     if (Math.abs(xb - xa) > 12) {
@@ -479,7 +482,13 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
   }
   if (input.today) {
     const x = r1(ts.map(input.today));
-    out.push(`<line class="today" x1="${x}" y1="${r1(gridTop - 4)}" x2="${x}" y2="${r1(y - 4)}"/>`);
+    if (f.wide) {
+      out.push(`<line class="today" x1="${x}" y1="${r1(gridTop - 4)}" x2="${x}" y2="${r1(y - 4)}"/>`);
+    } else {
+      // Narrow: the labels sit above their rows across the plot, so the line
+      // is drawn only across each row's marks, never through a label.
+      out.push(`<path class="today" d="${markBands.map(([a, b]) => `M${x} ${r1(a)}V${r1(b)}`).join('')}"/>`);
+    }
     const label = `${input.todayLabel ?? w.today} ${input.today}`;
     fitText(label, W - 2 * L, 12, 'mono', 'today label');
     out.push(text(besideLine(x, textWidth(label, 12, 'mono'), W, L), y + 10, label, { size: 12, cls: 'mono', where: 'today label' }));

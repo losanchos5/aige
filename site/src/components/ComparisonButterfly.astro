@@ -17,8 +17,9 @@
  * in full ink; no script. Motion: the bars grow out of the axis on scroll,
  * transform only, only where scroll timelines exist and motion is allowed.
  */
-import { levelLabel, type Comparison, type OverlapLevel, type SideRef } from '../lib/comparisons';
+import { levelGloss, levelLabel, type Comparison, type OverlapLevel, type SideRef } from '../lib/comparisons';
 import '../styles/chart.css';
+import '../styles/overlap-marks.css';
 
 interface Props {
   cmp: Comparison;
@@ -34,12 +35,6 @@ const ORDER: OverlapLevel[] = ['strong', 'partial', 'a-only', 'b-only'];
 // The group's swatch: the same state the overlap bar at the top of the page
 // draws for that level.
 const SWATCH: Record<OverlapLevel, string> = { strong: 'fill', partial: 'hatch', 'a-only': 'line', 'b-only': 'dash' };
-const GLOSS: Record<OverlapLevel, string> = {
-  strong: 'a core clause on each side',
-  partial: 'both file a clause, at least one side only related ones',
-  'a-only': `no ${def.bName} clause mapped`,
-  'b-only': `no ${def.aName} clause mapped`,
-};
 
 const split = (list: SideRef[]) => {
   const core = list.filter((s) => s.ref.strength === 'core').length;
@@ -54,10 +49,14 @@ const groups = ORDER.map((level) => ({
 })).filter((group) => group.rows.length > 0);
 
 const topicsWord = (n: number) => (n === 1 ? 'topic' : 'topics');
+// Mid-sentence: "strong" and "partial" in lower case, an instrument's name as
+// written ("EU AI Act only").
+const levelWords = (level: OverlapLevel) =>
+  level === 'strong' || level === 'partial' ? levelLabel(level, cmp).toLowerCase() : levelLabel(level, cmp);
 const title = 'Clauses per topic, side by side';
 const name =
   `${def.aName} clauses (left) and ${def.bName} clauses (right) for each of the ${rows.length} crosswalk topics either reaches, ` +
-  `core and related, grouped by overlap level: ${groups.map((g) => `${g.rows.length} ${levelLabel(g.level, cmp).toLowerCase()}`).join(', ')}.`;
+  `core and related, grouped by overlap level: ${groups.map((g) => `${g.rows.length} ${levelWords(g.level)}`).join(', ')}.`;
 const caption =
   `Each square is one clause the crosswalk files under the topic: solid for a core clause, hatched for a related one. ` +
   `Look for the long one-sided rows and the groups at the bottom: that is where one instrument asks for more, or alone.`;
@@ -77,8 +76,8 @@ const squares = (n: { core: number; related: number }) => [
       <div class="cb-head" aria-hidden="true">
         <span class="cb-side-name cb-a">{def.aName}</span>
         <span class="cb-legend">
-          <span class="cb-key"><span class="cb-sq cb-core"></span>Core clause</span>
-          <span class="cb-key"><span class="cb-sq cb-rel"></span>Related clause</span>
+          <span class="cb-key"><span class="cb-sq cb-core ov-fill"></span>Core clause</span>
+          <span class="cb-key"><span class="cb-sq cb-rel ov-hatch"></span>Related clause</span>
         </span>
         <span class="cb-side-name cb-b">{def.bName}</span>
       </div>
@@ -86,12 +85,12 @@ const squares = (n: { core: number; related: number }) => [
         groups.map((g) => (
           <div class="cb-group" data-level={g.level}>
             <p class="cb-group-head">
-              <span class:list={['cb-sw', `cb-sw-${SWATCH[g.level]}`]} />
+              <span class:list={['cb-sw', `ov-${SWATCH[g.level]}`]} />
               <span class="cb-group-name">{levelLabel(g.level, cmp)}</span>
               <span class="cb-group-count">
                 {g.rows.length} {topicsWord(g.rows.length)}
               </span>
-              <span class="cb-group-gloss">{GLOSS[g.level]}</span>
+              <span class="cb-group-gloss">{levelGloss(g.level, cmp)}</span>
             </p>
             <ul class="cb-rows">
               {g.rows.map(({ row, a, b }) => (
@@ -108,7 +107,7 @@ const squares = (n: { core: number; related: number }) => [
                         <>
                           <span class="cb-bar">
                             {squares(n).map((kind) => (
-                              <span class:list={['cb-sq', kind === 'core' ? 'cb-core' : 'cb-rel']} />
+                              <span class:list={['cb-sq', kind === 'core' ? 'cb-core ov-fill' : 'cb-rel ov-hatch']} />
                             ))}
                           </span>
                           <span class="cb-n">{n.core + n.related}</span>
@@ -255,28 +254,6 @@ const squares = (n: { core: number; related: number }) => [
     height: 12px;
     border-radius: 2px;
     box-sizing: border-box;
-  }
-
-  .cb-sw-fill,
-  .cb-core {
-    background: color-mix(in srgb, var(--ink) 55%, var(--bg));
-    border: 1.25px solid var(--ink-2);
-  }
-
-  .cb-sw-hatch,
-  .cb-rel {
-    background: repeating-linear-gradient(45deg, var(--ink-2) 0 1.6px, var(--bg) 1.6px 4px);
-    border: 1.25px solid var(--ink);
-  }
-
-  .cb-sw-line {
-    background: var(--bg);
-    border: 1.5px solid var(--ink);
-  }
-
-  .cb-sw-dash {
-    background: var(--bg);
-    border: 1.5px dashed var(--ink);
   }
 
   .cb-rows {
@@ -426,9 +403,10 @@ const squares = (n: { core: number; related: number }) => [
 
   /* The bars grow out of their axis as the row scrolls in: transform only
      (axe blends fractional opacity into contrast), only with scroll timelines
-     and when motion is allowed; everyone else sees them drawn. */
+     and when motion is allowed on a screen; everyone else, print included,
+     sees them drawn. */
   @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
+    @media screen and (prefers-reduced-motion: no-preference) {
       .cb-bar {
         animation: cb-grow linear both;
         animation-timeline: view();
@@ -444,6 +422,13 @@ const squares = (n: { core: number; related: number }) => [
           transform: none;
         }
       }
+    }
+  }
+
+  @media print {
+    .cb-bar {
+      animation: none;
+      transform: none;
     }
   }
 </style>

@@ -20,6 +20,17 @@ async function chartTable(page: Page, title: string): Promise<string[][]> {
 }
 
 test.describe('/controls mosaic', () => {
+  // A failure response the source material does not state is its own hatched
+  // state, never an alert. Each profile words that default its own way (agent
+  // runtime "To be specified.", assurance and evidence "To be specified: the
+  // source material states no ..."); both begin with the same words.
+  const stateOf = (control: (typeof controls)[number]) =>
+    control.failureResponse.text.trim().startsWith('To be specified')
+      ? 'tbs'
+      : control.failureResponse.effect === 'alert'
+        ? 'alert'
+        : 'hold';
+
   test('one square per control, linked to it, in its profile, layer and failure-response state', async ({ page }) => {
     await page.goto('/controls');
     const cells = await page.locator('.cmo-cell').evaluateAll((els) =>
@@ -38,16 +49,24 @@ test.describe('/controls mosaic', () => {
       const profile = profiles.find((p) => p.slug === control.profile)!;
       expect(cell!.profile.startsWith(`${profile.shortTitle}:`), control.id).toBe(true);
       expect(cell!.cls, control.id).toContain(`cmo-l${control.layer}`);
-      // The unspecified default of the derived controls is its own hatched
-      // state, never drawn as an alert.
-      const state =
-        control.failureResponse.text === 'To be specified.'
-          ? 'cmo-tbs'
-          : control.failureResponse.effect === 'alert'
-            ? 'cmo-alert'
-            : 'cmo-hold';
-      expect(cell!.cls.split(/\s+/), control.id).toContain(state);
+      expect(cell!.cls.split(/\s+/), control.id).toContain(`cmo-${stateOf(control)}`);
     }
+  });
+
+  test('the headline and the legend count each failure-response state of the data', async ({ page }) => {
+    await page.goto('/controls');
+    const count = (state: string) => controls.filter((c) => stateOf(c) === state).length;
+    const kpi = page.locator('.cmo-kpis > div', { has: page.locator('dt', { hasText: 'Response to be specified' }) });
+    await expect(kpi.locator('dd')).toHaveText(String(count('tbs')));
+    const legend = page.locator('ul[aria-label="Drawing: failure response"] li');
+    await expect(legend).toHaveCount(3);
+    const drawn = await legend.evaluateAll((items) =>
+      items.map((li) => ({
+        state: [...(li.querySelector('.cmo-swatch')?.classList ?? [])].find((c) => /^cmo-(hold|alert|tbs)$/.test(c)) ?? '',
+        n: Number(li.querySelector('.cmo-key-n')?.textContent),
+      })),
+    );
+    expect(drawn).toEqual(['hold', 'alert', 'tbs'].map((state) => ({ state: `cmo-${state}`, n: count(state) })));
   });
 });
 
@@ -83,11 +102,15 @@ test.describe('/resources/dpia-lists charts', () => {
       expect(row, list.id).toBeDefined();
       const expected = annexIIIOrder.map((area) => list.items.filter((i) => i.annexIII.includes(area)).length);
       expect(row!.slice(1, -1).map(Number), list.id).toEqual(expected);
+      // The total counts items, not overlaps: an item that touches two areas
+      // is in both columns but once in its list's total.
+      expect(Number(row!.at(-1)), list.id).toBe(list.items.filter((i) => i.annexIII.length > 0).length);
     }
     const totals = rows[rows.length - 1];
     for (const { area, items } of annexIIICounts()) {
       expect(Number(totals[1 + annexIIIOrder.indexOf(area)]), area).toBe(items);
     }
+    expect(Number(totals.at(-1))).toBe(lists.flatMap((l) => l.items).filter((i) => i.annexIII.length > 0).length);
   });
 
   test('the timeline dates every adoption and EDPB opinion of the data', async ({ page }) => {

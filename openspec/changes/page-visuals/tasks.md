@@ -19,6 +19,8 @@
 - [x] 2.5 Bloque narrativa: `/mcp` (arquitectura FlowDiagram), `/stack` (minimum-viable-stack y three-questions), `/ai-governance` (jurisdiction-tiles, governance-operating-model, MaturityLadder), `/for/certifications` (dos carriles); ampliar `pages` en `figures.ts`
 - [x] 2.6 Tests de sincronía por visual bajo test-audit; build, `npm test`, a11y completo de las páginas tocadas, perf.spec
 - [ ] 2.7 Revisión (code-reviewer + a11y/CSP/perf adversarial), capturas 390/1440 claro/oscuro, commit por ruta, PR B, CI verde
+  - [x] Revisión hecha y hallazgos corregidos (CRITICAL/HIGH/MEDIUM y los LOW baratos): estado "por especificar" del mosaico, totales del grid DPIA, carril de certificación, marco de matriz compartido, impresión y forced-colors de los visuales HTML, línea de fecha del dumbbell estrecho, `.mono` sin tocar el texto SVG; build, `npm test` y axe de las rutas tocadas en verde
+  - [ ] PR B y CI verde
 
 ## 3. Tanda 2: tiempo y plantillas por ítem (PR C)
 

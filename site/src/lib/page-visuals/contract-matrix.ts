@@ -12,7 +12,9 @@
 // shell, measured text that throws instead of cutting a label, mark classes of
 // both style modes and the Source / As of stamp. From width 860 the grid gets a
 // wider pitch and label column; the same call at width 340 gives the phone
-// variant: each clause's name on its own line above its dots.
+// variant: each clause's name on its own line above its dots. The column
+// heads, row bands, guides and total bars are the shared frame of
+// matrix-frame.ts.
 import {
   assemble,
   fitText,
@@ -23,11 +25,11 @@ import {
   table,
   text,
   textWidth,
-  tip,
   wrapText,
   type ChartMode,
   type ChartOutput,
 } from '../charts/core';
+import { bandPath, columnHeads, rowBarPath, underlay } from './matrix-frame';
 
 export interface MatrixClause {
   id: string;
@@ -142,26 +144,26 @@ export function contractMatrix(input: ContractMatrixInput): ChartOutput {
   });
   y += headH + 14;
 
-  // Column totals: a bar per instrument, its count above; the busiest is the accent.
+  // Column totals: a bar per instrument, its count above; the busiest is the
+  // accent. Then the vertical column labels, bottom-aligned on the grid.
   const colTotals = cols.map((c) => rows.filter((row) => row.mapsTo.includes(c.ref)).length);
-  const maxCol = Math.max(...colTotals);
-  const barH = 36;
-  y += 14;
-  cols.forEach((c, i) => {
-    const h = Math.max(2, (colTotals[i] / maxCol) * barH);
-    const x = colX(i);
-    const bw = Math.min(14, pitch - 8);
-    const cls = colTotals[i] === maxCol ? 'mk mk-hi' : markClass('filled', 0);
-    out.push(`<rect x="${r1(x - bw / 2)}" y="${r1(y + barH - h)}" width="${r1(bw)}" height="${r1(h)}" class="${cls}">${tip(`${colLabel(c)}: ${colTotals[i]} clause${colTotals[i] === 1 ? '' : 's'}`)}</rect>`);
-    out.push(text(x, y + barH - h - 4, fmt(colTotals[i]), { size: 12, cls: 'num', anchor: 'middle', where: 'column total' }));
+  const colHeads = columnHeads({
+    where,
+    columns: cols.map((c, i) => ({
+      label: colLabel(c),
+      total: colTotals[i],
+      tip: `${colLabel(c)}: ${colTotals[i]} clause${colTotals[i] === 1 ? '' : 's'}`,
+    })),
+    colX,
+    pitch,
+    y,
+    barH: 36,
+    barMaxW: 14,
+    gapAfterBars: 6,
+    maxLabelH: 160,
   });
-  y += barH + 6;
-
-  // Vertical column labels, bottom-aligned on the grid.
-  const labelH = Math.ceil(Math.max(...cols.map((c) => textWidth(colLabel(c), 12.5)))) + 4;
-  if (labelH > 160) throw new Error(`charts(${where}): a column label needs ${labelH}px of height; shorten it`);
-  cols.forEach((c, i) => out.push(text(colX(i) + 4.5, y + labelH, colLabel(c), { size: 12.5, rotate: -90, where: 'column label' })));
-  y += labelH + 8;
+  out.push(...colHeads.marks);
+  y = colHeads.y;
 
   // Rows.
   const rowTotals = rows.map((row) => row.mapsTo.length);
@@ -187,7 +189,7 @@ export function contractMatrix(input: ContractMatrixInput): ChartOutput {
       dotY = y + lines.length * 15 + 14;
       rowH = lines.length * 15 + 28;
     }
-    if (ri % 2 === 0) bands.push(`M${L - 4} ${r1(y)}h${r1(width - 2 * L + 8)}v${r1(rowH)}h${r1(-(width - 2 * L + 8))}z`);
+    if (ri % 2 === 0) bands.push(bandPath(L, y, rowH, width));
     // Dots carry no tooltip of their own (the 12 KB budget): their row and
     // column labels name them, and the table lists every mapping.
     cols.forEach((c, i) => {
@@ -196,14 +198,13 @@ export function contractMatrix(input: ContractMatrixInput): ChartOutput {
     if (wide) {
       const bx = gridRight + 10;
       const bw = (rowTotals[ri] / maxRow) * (totalsW - 30);
-      totalBars.push(`M${r1(bx)} ${r1(dotY - 5)}h${r1(bw)}v10h${r1(-bw)}z`);
+      totalBars.push(rowBarPath(bx, dotY, bw));
       out.push(text(bx + bw + 5, dotY + 4.5, fmt(rowTotals[ri]), { size: 12, cls: 'num', where: 'row total' }));
     }
     y += rowH;
   });
   // Row bands, then the column guides over them, both under the dots.
-  const guides = cols.map((_, i) => `M${r1(colX(i))} ${r1(gridTop)}V${r1(y)}`).join('');
-  out.unshift(`<path class="cell-empty" d="${bands.join('')}"/>`, `<path class="rule" d="${guides}"/>`);
+  out.unshift(...underlay(bands, cols.map((_, i) => colX(i)), gridTop, y));
   // Marks inherit fill and stroke from their group's mark class.
   out.push(`<g class="${markClass('filled', 0)}">${dots.law.join('')}</g>`, `<g class="${markClass('outline', 0)}">${dots.soft.join('')}</g>`);
   if (totalBars.length) out.push(`<path class="${markClass('filled', 0)}" d="${totalBars.join('')}"/>`);

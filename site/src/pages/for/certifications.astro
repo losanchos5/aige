@@ -144,6 +144,9 @@ const certificateLanes = [
     key: 'person',
     object: 'The person',
     title: 'Certificate of a person',
+    // An option, not a rule: a person-certifying body can work to 17024, and
+    // not every scheme is accredited under it (AIGP is not [2]).
+    standardsLabel: 'Standard a body can work to',
     standards: [{ name: 'ISO/IEC 17024', source: 4 }],
     steps: [
       { label: 'Scheme owner', sub: 'sets the assessment against a blueprint it revises' },
@@ -155,6 +158,7 @@ const certificateLanes = [
     key: 'organisation',
     object: 'The organisation',
     title: 'Certificate of a management system',
+    standardsLabel: 'Standard for the body',
     standards: [
       { name: 'ISO/IEC 42006', source: 5 },
       { name: 'ISO/IEC 17021-1', source: 5 },
@@ -255,7 +259,7 @@ const updated = gitDate('src/pages/for/certifications.astro');
             </p>
             <FlowDiagram steps={lane.steps} title={lane.title} />
             <p class="cert-standards">
-              <span class="cert-standards-label">Standard for the body</span>
+              <span class="cert-standards-label">{lane.standardsLabel}</span>
               {lane.standards.map((standard) => (
                 <span class="cert-standard">
                   {standard.name}

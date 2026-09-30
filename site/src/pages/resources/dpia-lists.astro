@@ -67,6 +67,12 @@ const updated = updatedAfter2019();
 const overlaps = annexIIICounts();
 const noOverlap = annexIIIOrder.filter((a) => !overlaps.some((o) => o.area === a));
 const methods = methodCounts();
+// The size chart's key, worded from the counts: one list or several per method.
+const sizesCaption = `Items or criteria in each list, largest first: ${
+  methods.enumerated === 1 ? 'the solid bar enumerates' : 'solid bars enumerate'
+} processing types, ${methods.scored === 1 ? 'the hatched bar scores' : 'hatched bars score'} criteria and ${
+  methods.mixed === 1 ? 'the outlined bar mixes' : 'outlined bars mix'
+} both. Select a country to read its items below.`;
 const itemCount = allItems().length;
 const totalItems = lists.reduce((sum, l) => sum + l.itemCount, 0);
 const fmtDate = (iso: string) => {
@@ -334,7 +340,7 @@ const jsonLd = [
         chart={annex.wide}
         narrow={annex.narrow}
         title="Annex III overlaps, list by list"
-        caption="Each dot counts the items of a national list that overlap an EU AI Act Annex III area; the bars above total them per area and the bars on the right per country. Where a list already makes a DPIA mandatory for an Annex III use, the fundamental rights impact assessment can point to that record."
+        caption="Each dot counts the items of a national list that overlap an EU AI Act Annex III area. The bars above total them per area; the Total column counts each list's overlapping items once, so an item that touches two areas sits in both columns but once in its total. Where a list already makes a DPIA mandatory for an Annex III use, the fundamental rights impact assessment can point to that record."
       />
     </div>
 
@@ -403,7 +409,7 @@ const jsonLd = [
         chart={sizes.wide}
         narrow={sizes.narrow}
         title="List size and method"
-        caption="Items or criteria in each list, largest first: solid bars enumerate processing types, hatched bars score criteria and the outlined bar mixes both. Select a country to read its items below."
+        caption={sizesCaption}
       />
     </div>
 

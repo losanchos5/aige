@@ -5,9 +5,9 @@
  * the control's home stack layer (--lN fill, --lN-ink stroke) and its drawing
  * is its failure response, so state never rests on colour: solid when the
  * control denies the action or holds it for a human decision, outlined when it
- * raises an alert, hatched when the response is still "To be specified" (the
- * default of the controls derived for the agent runtime profile,
- * data/controls/agent-runtime.ts). reviewerStatus is the same for every
+ * raises an alert, hatched when the response is still to be specified (the
+ * placeholder alert a profile files when its source states no response,
+ * isResponseToSpecify in data/controls). reviewerStatus is the same for every
  * control, so it is not drawn.
  *
  * HTML and CSS, not an SVG: 93 linked squares with their names pass the 12 KB
@@ -22,15 +22,15 @@
  * profile names are plain text: the profile cards under the mosaic link them.
  */
 import '../styles/chart.css';
-import { controls, profiles, controlPath, CONTROLS_AS_OF, type Control } from '../data/controls';
+import { controls, profiles, controlPath, isResponseToSpecify, CONTROLS_AS_OF, type Control } from '../data/controls';
 import { layers } from '../data/stack';
 
 type Response = 'hold' | 'alert' | 'tbs';
 
-/** The drawing of a control: its failure response, with the unspecified
- *  default of the derived controls as a third state rather than an alert. */
+/** The drawing of a control: its failure response, with a response still to
+ *  be specified as a third state rather than an alert. */
 const responseOf = (c: Pick<Control, 'failureResponse'>): Response =>
-  c.failureResponse.text.trim() === 'To be specified.'
+  isResponseToSpecify(c.failureResponse)
     ? 'tbs'
     : c.failureResponse.effect === 'alert'
       ? 'alert'
@@ -290,12 +290,26 @@ const tableCaption = 'Every control by profile, with its home layer and failure 
     background: color-mix(in srgb, var(--k) 60%, var(--p));
   }
 
+  /* --hole: the inside of an outlined or hatched square, the page ground. */
   .cmo-alert {
-    background: var(--bg);
+    background: var(--hole, var(--bg));
   }
 
   .cmo-tbs {
-    background: repeating-linear-gradient(-45deg, var(--k) 0 1.5px, var(--bg) 1.5px 5px);
+    background: repeating-linear-gradient(-45deg, var(--k) 0 1.5px, var(--hole, var(--bg)) 1.5px 5px);
+  }
+
+  /* Dark: the layer inks are pastels of one lightness, so an outline alone
+     barely tells the layers apart; the square's inside takes the layer's dark
+     tint instead of the ground. Legend swatches keep the plain ground. */
+  :global(:root[data-theme='dark']) .cmo-cell {
+    --hole: var(--p);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .cmo-cell {
+      --hole: var(--p);
+    }
   }
 
   .cmo-cell:focus-visible {
@@ -434,9 +448,10 @@ const tableCaption = 'Every control by profile, with its home layer and failure 
     color: var(--muted);
   }
 
-  /* Motion: transform only, never on reduced motion. The columns rise from
-     their baseline as the chart scrolls in; a square grows under the pointer. */
-  @media (prefers-reduced-motion: no-preference) {
+  /* Motion: transform only, on screen only, never on reduced motion. The
+     columns rise from their baseline as the chart scrolls in; a square grows
+     under the pointer. Print has no scroll timeline, so it gets no motion. */
+  @media screen and (prefers-reduced-motion: no-preference) {
     .cmo-cell {
       transition: transform var(--dur, 160ms) var(--ease, ease-out);
     }
@@ -465,6 +480,48 @@ const tableCaption = 'Every control by profile, with its home layer and failure 
 
     to {
       transform: none;
+    }
+  }
+
+  /* Print: the squares at full height and their fills kept, since solid,
+     outlined and hatched carry the response. */
+  @media print {
+    .cmo-cells {
+      animation: none;
+      transform: none;
+    }
+
+    .cmo-cell,
+    .cmo-swatch {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+
+  /* Forced colours drop backgrounds, and with them the drawing of the state:
+     keep solid, outlined and hatched in system colours (the layer colour
+     cannot survive; the name and the table still give it). */
+  @media (forced-colors: active) {
+    .cmo-cell,
+    .cmo-swatch {
+      forced-color-adjust: none;
+      border-color: CanvasText;
+    }
+
+    .cmo-hold {
+      background: CanvasText;
+    }
+
+    .cmo-alert {
+      background: Canvas;
+    }
+
+    .cmo-tbs {
+      background: repeating-linear-gradient(-45deg, CanvasText 0 1.5px, Canvas 1.5px 5px);
+    }
+
+    .cmo-cell:focus-visible {
+      outline-color: Highlight;
     }
   }
 </style>

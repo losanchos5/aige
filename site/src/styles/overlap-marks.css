@@ -1,0 +1,60 @@
+/* overlap-marks.css: the four drawings of the overlap levels on the
+   "<A> vs <B>" pages, shared by the headline tiles (ComparisonPage.astro) and
+   the butterfly (ComparisonButterfly.astro): fill = strong, hatch = partial,
+   line = A only, dash = B only, the same states the overlap bar draws. The
+   butterfly's clause squares reuse fill (core) and hatch (related). Sizes stay
+   with each component; these rules give only the drawing. */
+.ov-fill {
+  background: color-mix(in srgb, var(--ink) 55%, var(--bg));
+  border: 1.25px solid var(--ink-2);
+}
+
+.ov-hatch {
+  background: repeating-linear-gradient(45deg, var(--ink-2) 0 1.6px, var(--bg) 1.6px 4px);
+  border: 1.25px solid var(--ink);
+}
+
+.ov-line {
+  background: var(--bg);
+  border: 1.5px solid var(--ink);
+}
+
+.ov-dash {
+  background: var(--bg);
+  border: 1.5px dashed var(--ink);
+}
+
+/* Print keeps the fills: they are the data, not decoration. */
+@media print {
+  .ov-fill,
+  .ov-hatch,
+  .ov-line,
+  .ov-dash {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Forced colours drop backgrounds: redraw the four states in system colours. */
+@media (forced-colors: active) {
+  .ov-fill,
+  .ov-hatch,
+  .ov-line,
+  .ov-dash {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+  }
+
+  .ov-fill {
+    background: CanvasText;
+  }
+
+  .ov-hatch {
+    background: repeating-linear-gradient(45deg, CanvasText 0 1.6px, Canvas 1.6px 4px);
+  }
+
+  .ov-line,
+  .ov-dash {
+    background: Canvas;
+  }
+}

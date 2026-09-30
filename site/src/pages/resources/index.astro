@@ -238,6 +238,10 @@ const records: Record<string, { count: number; noun: string }> = {
   'Open data & API': { count: datasets.length, noun: 'datasets' },
   'Research notes': { count: writtenThemes().length, noun: writtenThemes().length === 1 ? 'note' : 'notes' },
 };
+// A row keyed by a title no card carries (a renamed card) would drop out of
+// the chart unseen: stop the build instead.
+const unmatched = Object.keys(records).filter((title) => !entries.some((entry) => entry.title === title));
+if (unmatched.length) throw new Error(`resources: corpus rows name no hub card: ${unmatched.join(', ')}`);
 const corpusRows: CorpusRow[] = entries.flatMap((entry) => {
   const r = records[entry.title];
   if (!r || r.count === 0) return [];

@@ -7,11 +7,15 @@
 // over the column labels (the largest is the one accent, solid ink), row
 // totals are bars (wide) or numbers (narrow) at the end of each row. Row
 // labels may link. Used by /resources/dpia-lists (country x Annex III area).
+// A record may fall in several columns (an item that overlaps two areas):
+// pass `rowTotals` to count each row's records once rather than summing its
+// cells.
 //
 // Built on the chart kit's helpers (src/lib/charts/core.ts): measured labels
 // that throw instead of cutting, token classes of both style modes, the
 // accessible shell and the Source / As of stamp. Width 340 is the phone
-// variant (narrower cells, row totals as numbers).
+// variant (narrower cells, row totals as numbers). The column heads, row
+// bands, guides and total bars are the shared frame of matrix-frame.ts.
 import {
   assemble,
   fmt,
@@ -21,11 +25,11 @@ import {
   table,
   text,
   textWidth,
-  tip,
   wrapText,
   type ChartMode,
   type ChartOutput,
 } from '../charts/core';
+import { bandPath, columnHeads, rowBarPath, underlay } from './matrix-frame';
 
 export interface CountGridInput {
   id: string;
@@ -44,6 +48,10 @@ export interface CountGridInput {
   columnNames?: string[];
   /** Noun of a count ("items"), for the totals' tooltips. */
   unit: string;
+  /** Total of each row when a record may count in several columns (the
+   *  distinct records of the row); default: the sum of the row's cells. The
+   *  grand total is their sum. */
+  rowTotals?: number[];
   tableCaption?: string;
 }
 
@@ -77,35 +85,29 @@ export function countGrid(input: CountGridInput): ChartOutput {
   // Area grows with the count: r = sqrt(v / max) * rMax, never under rMin.
   const radius = (v: number) => Math.max(rMin, Math.sqrt(v / max) * rMax);
 
-  const out: string[] = [];
-  let y = 8;
+  if (input.rowTotals && (input.rowTotals.length !== rows.length || input.rowTotals.some((t) => !Number.isInteger(t) || t < 0))) {
+    throw new Error(`charts(${where}): rowTotals needs a whole count for each of the ${rows.length} rows`);
+  }
 
   // Column totals: bars with their value above; the largest is the accent.
   const colTotals = columns.map((_, c) => rows.reduce((s, r) => s + r.values[c], 0));
-  const colMax = Math.max(1, ...colTotals);
-  const barH = 40;
-  y += 14;
-  columns.forEach((col, c) => {
-    const h = colTotals[c] ? Math.max(2, (colTotals[c] / colMax) * barH) : 0;
-    const bw = Math.min(16, pitch - 8);
-    const name = `${(input.columnNames ?? columns)[c]}: ${colTotals[c]} ${input.unit}`;
-    if (h) {
-      const cls = colTotals[c] === colMax ? 'mk mk-hi' : markClass('filled', 0);
-      out.push(`<rect x="${r1(colX(c) - bw / 2)}" y="${r1(y + barH - h)}" width="${r1(bw)}" height="${r1(h)}" class="${cls}">${tip(name)}</rect>`);
-    } else {
-      out.push(`<line class="axis" x1="${r1(colX(c) - bw / 2)}" y1="${r1(y + barH)}" x2="${r1(colX(c) + bw / 2)}" y2="${r1(y + barH)}"/>`);
-    }
-    out.push(text(colX(c), y + barH - h - 4, fmt(colTotals[c]), { size: 12, cls: 'num', anchor: 'middle', where: 'column total' }));
+  const names = input.columnNames ?? columns;
+  const heads = columnHeads({
+    where,
+    columns: columns.map((label, c) => ({ label, total: colTotals[c], tip: `${names[c]}: ${colTotals[c]} ${input.unit}` })),
+    colX,
+    pitch,
+    y: 8,
+    barH: 40,
+    barMaxW: 16,
+    gapAfterBars: 8,
+    maxLabelH: 170,
   });
-  y += barH + 8;
-
-  const labelH = Math.ceil(Math.max(...columns.map((c) => textWidth(c, 12.5)))) + 4;
-  if (labelH > 170) throw new Error(`charts(${where}): a column label needs ${labelH}px of height; shorten it`);
-  columns.forEach((col, c) => out.push(text(colX(c) + 4.5, y + labelH, col, { size: 12.5, rotate: -90, where: 'column label' })));
-  y += labelH + 8;
+  const out: string[] = [...heads.marks];
+  let y = heads.y;
 
   const gridTop = y;
-  const rowTotals = rows.map((r) => r.values.reduce((a, b) => a + b, 0));
+  const rowTotals = input.rowTotals ?? rows.map((r) => r.values.reduce((a, b) => a + b, 0));
   const rowMax = Math.max(1, ...rowTotals);
   const bands: string[] = [];
   const dots: string[] = [];
@@ -113,7 +115,7 @@ export function countGrid(input: CountGridInput): ChartOutput {
   const bars: string[] = [];
   rows.forEach((row, ri) => {
     const cy = y + rowH / 2;
-    if (ri % 2 === 0) bands.push(`M${L - 4} ${r1(y)}h${r1(width - 2 * L + 8)}v${rowH}h${r1(-(width - 2 * L + 8))}z`);
+    if (ri % 2 === 0) bands.push(bandPath(L, y, rowH, width));
     wrapText(row.label, LW - 10, labelFont, 'body', 1, 'row label');
     const label = text(L, cy + 4.5, row.label, { size: labelFont, where: 'row label' });
     out.push(row.href ? linkText(label, row.label, row.href) : label);
@@ -124,15 +126,14 @@ export function countGrid(input: CountGridInput): ChartOutput {
     });
     if (wide) {
       const bw = (rowTotals[ri] / rowMax) * (totalsW - 32);
-      if (bw > 0) bars.push(`M${r1(gridRight + 10)} ${r1(cy - 5)}h${r1(bw)}v10h${r1(-bw)}z`);
+      if (bw > 0) bars.push(rowBarPath(gridRight + 10, cy, bw));
       out.push(text(gridRight + 14 + bw, cy + 4.5, fmt(rowTotals[ri]), { size: 12, cls: 'num', where: 'row total' }));
     } else {
       out.push(text(width - L, cy + 4.5, fmt(rowTotals[ri]), { size: 12, cls: 'num', anchor: 'end', where: 'row total' }));
     }
     y += rowH;
   });
-  const guides = columns.map((_, c) => `M${r1(colX(c))} ${r1(gridTop)}V${r1(y)}`).join('');
-  out.unshift(`<path class="cell-empty" d="${bands.join('')}"/>`, `<path class="rule" d="${guides}"/>`);
+  out.unshift(...underlay(bands, columns.map((_, c) => colX(c)), gridTop, y));
   // Dots inherit the accent fill from their group; the counts sit on top.
   out.push(`<g class="mk mk-hi">${dots.join('')}</g>`, ...nums);
   if (bars.length) out.push(`<path class="${markClass('filled', 0)}" d="${bars.join('')}"/>`);
@@ -146,7 +147,6 @@ export function countGrid(input: CountGridInput): ChartOutput {
     role: rows.some((r) => r.href) ? 'group' : 'img',
     cls: 'ch-matrix',
   });
-  const names = input.columnNames ?? columns;
   return {
     svg,
     table: table(

@@ -4,8 +4,9 @@
 // year, shaped and filled by the strength of its record, each a link to the
 // case. The case records carry a year, not a date, so the chart places cases
 // by year and never invents a day. Optionally one year is the accent (its
-// filled glyphs in solid ink on a faint band), and in the wide variant the
-// last year's glyphs are named beside their column.
+// column on a faint band, its year label in bold; its glyphs keep the fill of
+// their evidence class, so the legend reads for every year), and in the wide
+// variant the last year's glyphs are named beside their column.
 //
 // Built on the chart kit's shell and helpers (src/lib/charts/core.ts), in
 // 'chart' mode for /cases (tests/perf.spec.ts keeps figures.css off it).
@@ -46,7 +47,7 @@ export interface CaseYearsInput extends ChartBase {
   to: number;
   /** Wording of each evidence class, for the legend, tooltips and table. */
   evidenceLabels: Record<CaseEvidenceClass, string>;
-  /** The year the caption is about: filled glyphs in solid ink on a band. */
+  /** The year the caption is about: its column on a band, its year in bold. */
   highlightYear?: number;
   /** Wide only: name the glyphs of the last year beside its column. */
   nameLastYear?: boolean;
@@ -125,7 +126,7 @@ export function caseYears(input: CaseYearsInput): ChartOutput {
       const x = cx(i);
       const cy = base - 4 - PITCH / 2 - k * PITCH;
       const mark = EVIDENCE_MARK[c.evidence];
-      const cls = accent && mark.state === 'filled' ? 'class="mk mk-hi"' : marks.attrs(mark.state, 0);
+      const cls = marks.attrs(mark.state, 0);
       const name = `${c.label} (${year}; ${input.evidenceLabels[c.evidence]})`;
       const box: Box = shapeBox(mark.shape, x, cy, r);
       const label = named && year === input.to;

@@ -1,7 +1,8 @@
 // page-visuals-rdc.spec.ts: data parity of the wave-1 page visuals of block
 // resources-deadlines-cases (OpenSpec change page-visuals): the corpus isotype
-// on /resources, the Omnibus dumbbell on both AI Act deadlines pages, the case
-// timeline on /cases and the harm-levels figure on /resources/harms. Each test
+// on /resources, the Omnibus dumbbell on both AI Act deadlines pages and the
+// case timeline on /cases (the harm-levels figure on /resources/harms is
+// placed by figures.ts pages[], checked in page-visuals-w1e.spec). Each test
 // checks that what the chart draws (its marks and its table) equals the
 // dataset it comes from, so a count wired to the wrong list, a dropped row or
 // a mark that no longer matches its record fails here. Owned elsewhere: the
@@ -60,6 +61,8 @@ test.describe('/resources: the corpus in dots', () => {
 
     // The visible wide SVG: one linked row per table row, in the same order,
     // each drawing count / unit dots (dot pitch = the pattern tile).
+    // Whole dots are exact; a remainder is never drawn short and is widened
+    // by less than half a dot, so a row of one record still shows ink.
     const svg = page.locator(`${FIG} .chart-w svg`);
     const unit = Number((await svg.locator('text').first().textContent())?.match(/= (\d+)/)?.[1]);
     expect(unit).toBeGreaterThan(0);
@@ -74,7 +77,12 @@ test.describe('/resources: the corpus in dots', () => {
       }),
     );
     expect(drawn.map((d) => d.name.split(':')[0])).toEqual(rows.map((r) => r[0]));
-    drawn.forEach((d, i) => expect(d.dots, d.name).toBeCloseTo(Number(rows[i][1]) / unit, 1));
+    drawn.forEach((d, i) => {
+      const expected = Number(rows[i][1]) / unit;
+      expect(Math.floor(d.dots + 1e-6), d.name).toBe(Math.floor(expected));
+      expect(d.dots, d.name).toBeGreaterThanOrEqual(expected - 0.05);
+      expect(d.dots - expected, d.name).toBeLessThan(0.5);
+    });
   });
 });
 
@@ -149,14 +157,5 @@ test.describe('/cases: cases by year', () => {
       .evaluateAll((ts) => ts.map((t) => Number(t.textContent)));
     const years = [...perYear.keys()].sort();
     expect(counts).toEqual(years.map((y) => perYear.get(y)));
-  });
-});
-
-test.describe('/resources/harms: the harm-levels figure', () => {
-  test('is embedded on the page and its permalink lists the page', async ({ page }) => {
-    await page.goto('/resources/harms');
-    await expect(page.locator('figure#figure-harm-levels svg')).toHaveCount(1);
-    await page.goto('/figures/harm-levels');
-    await expect(page.locator('main a[href="/resources/harms"]')).not.toHaveCount(0);
   });
 });

@@ -259,6 +259,21 @@ export function levelLabel(
   }
 }
 
+/** What an overlap level means for this pair, in a few words, shared by the
+ *  headline tiles and the butterfly's group headings. */
+export function levelGloss(level: OverlapLevel, c: Pick<Comparison, 'def'>): string {
+  switch (level) {
+    case 'strong':
+      return 'both file a core clause';
+    case 'partial':
+      return 'both file a clause, at least one side only related ones';
+    case 'a-only':
+      return `no ${c.def.bName} clause mapped`;
+    case 'b-only':
+      return `no ${c.def.aName} clause mapped`;
+  }
+}
+
 /** A short name as it reads mid-sentence: "the EU AI Act", but "ISO 42001". */
 export function inSentence(name: string): string {
   return name.startsWith('ISO') ? name : `the ${name}`;

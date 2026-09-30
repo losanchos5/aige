@@ -120,9 +120,15 @@ const lanesNarrow = lanes({ ...lanesInput, id: 'pc-lanes-n', width: 340, orienta
 const effectTally = usedEffects
   .map((effect) => {
     const n = curated.filter((template) => template.effect === effect).length;
-    return `${countWord(n).toLowerCase()} ${effect}`;
+    return `${countWord(n).toLowerCase()} ${effectName(effect).toLowerCase()}`;
   })
   .join(', ');
+// A lane no template uses stays in the chart (the card supports it); the
+// caption says why it is empty.
+const emptyLanes = points.filter((point) => !curated.some((template) => template.enforcementPoints.includes(point)));
+const emptyNote = emptyLanes.length
+  ? ` The ${emptyLanes.map((point) => laneNames[point]).join(' and ')} ${emptyLanes.length === 1 ? 'lane stays' : 'lanes stay'} empty: none of the templates acts there.`
+  : '';
 
 // Everything the client needs, as data (no markup): the JSON island.
 const data = {
@@ -566,7 +572,7 @@ const cite = (n: number) => `#src-${n}`;
       chart={lanesWide}
       narrow={lanesNarrow}
       title={lanesInput.title}
-      caption={`Where each rule template acts, from the pull request to the schedule, and with what effect (${effectTally}). Pick a template by the point you need to guard, then open it below.`}
+      caption={`Where each rule template acts, from the pull request to the schedule, and with what effect (${effectTally}).${emptyNote} Pick a template by the point you need to guard, then open it below.`}
       tableLabel="The rules and where they act, as a table"
     />
     <div class="pc-guide-list">

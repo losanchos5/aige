@@ -3,7 +3,9 @@
 //
 //   annex     country x EU AI Act Annex III area: how many of a list's items
 //             overlap each area (countGrid), with the totals per area and per
-//             country. Areas no item touches keep their empty column.
+//             country. A country's total counts its overlapping items once,
+//             so an item in two areas is in both columns but once in the
+//             total. Areas no item touches keep their empty column.
 //   timeline  one dot per dated event (beeswarm): each list's adoption, the
 //             EDPB opinion on its draft and any later dated change, against
 //             the AI Act's entry into force (data/ai-act-timeline.ts).
@@ -53,20 +55,23 @@ const itemsLink = (l: DpiaList) => `#${listAnchor(l)}-items`;
 /** Items of a list that overlap an Annex III area. */
 export const areaCount = (l: DpiaList, area: AnnexIIIArea): number => l.items.filter((i) => i.annexIII.includes(area)).length;
 
+/** Items of a list that overlap any Annex III area, each counted once. */
+export const overlappingItems = (l: DpiaList): number => l.items.filter((i) => i.annexIII.length > 0).length;
+
 export function annexChart(): Pair {
-  const rows = listsByCountry()
-    .map((l) => ({ label: l.country, href: itemsLink(l), values: annexIIIOrder.map((a) => areaCount(l, a)) }))
-    .map((r, i) => ({ r, i, total: r.values.reduce((a, b) => a + b, 0) }))
-    .sort((a, b) => b.total - a.total || a.i - b.i)
-    .map(({ r }) => r);
+  const ordered = listsByCountry()
+    .map((l, i) => ({ l, i, total: overlappingItems(l) }))
+    .sort((a, b) => b.total - a.total || a.i - b.i);
+  const rows = ordered.map(({ l }) => ({ label: l.country, href: itemsLink(l), values: annexIIIOrder.map((a) => areaCount(l, a)) }));
   const base = {
     title: 'Annex III overlaps, list by list',
-    desc: `For each of the ${lists.length} national DPIA lists, how many of its items overlap each EU AI Act Annex III high-risk area, with totals per area and per country.`,
+    desc: `For each of the ${lists.length} national DPIA lists, how many of its items overlap each EU AI Act Annex III high-risk area, with totals per area and, each item once, per country.`,
     source: SOURCE,
     asOf: DPIA_AS_OF,
     mode: MODE,
     rowHeader: 'Country',
     rows,
+    rowTotals: ordered.map(({ total }) => total),
     columns: annexIIIOrder.map((a) => `${annexIII[a].point} ${AREA_SHORT[a]}`),
     columnNames: annexIIIOrder.map((a) => annexIIILabel(a)),
     unit: 'items',
