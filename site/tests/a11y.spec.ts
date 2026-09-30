@@ -7,7 +7,7 @@
 // Lives in the `a11y` Playwright project (see playwright.config.ts) so it is
 // kept out of the default `npm test`; run it with `npm run test:a11y`.
 //
-// Sampling: a parent path with more than SAMPLE_OVER pages (the glossary terms,
+// Sampling: a parent path below the root with more than SAMPLE_OVER pages (the glossary terms,
 // the obligation pages) is one template filled from data, so axe on every page
 // re-checks the same markup. Unless A11Y_FULL=1, such a group is reduced to its
 // largest pages (the ones rendering the most optional sections), its smallest
@@ -57,8 +57,9 @@ function sample(all: typeof pages): string[] {
     groups.set(parent, [...(groups.get(parent) ?? []), p]);
   }
   const keep = new Set<string>();
-  for (const group of groups.values()) {
-    if (group.length <= SAMPLE_OVER) {
+  for (const [parent, group] of groups) {
+    // Top-level pages are each their own template: never sampled.
+    if (parent === '/' || group.length <= SAMPLE_OVER) {
       group.forEach((p) => keep.add(p.route));
       continue;
     }
