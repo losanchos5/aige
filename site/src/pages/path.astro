@@ -11,21 +11,30 @@
  * starts at, plus the AIGP coverage map for readers studying from the blueprint.
  */
 import Marketing from '../layouts/Marketing.astro';
+import '../styles/figures.css';
 import '../styles/pages.css';
 import PageHero from '../components/PageHero.astro';
 import Section from '../components/Section.astro';
 import PathMap from '../components/PathMap.astro';
 import PathDrawer from '../components/PathDrawer.astro';
+import PathRings from '../components/PathRings.astro';
+import LayerMatrix from '../components/LayerMatrix.astro';
 import CtaBand from '../components/CtaBand.astro';
 import { stages, nodes, entries, crossStageEdges } from '../data/path';
 import { audiences, audiencePath } from '../data/audiences';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
+import { pathStageLayerMatrix } from '../lib/page-visuals/layer-matrix';
 import { fitsSiteSuffix } from '../lib/seo-title';
 
 // Search title (SXO-N3, 2026-09-25 audit): the query first; the H1 stays.
 const seoTitle = 'AI governance learning path: four stages';
 
 const edges = crossStageEdges();
+
+// Stage x layer (page-visuals-2, block E): where each stage's nodes sit in the
+// stack, one glyph per node by kind; a cell links to its first node.
+const stageLayer = pathStageLayerMatrix();
+const crossCutting = nodes.filter((node) => node.layerN === undefined).length;
 
 // The key: each kind and state with a small sample drawn in its real node
 // treatment (see PathNode.astro): solid ink, plain line + kind pill, dashed
@@ -106,7 +115,26 @@ const legend = [
     </div>
   </Section>
 
+  <Section
+    tone="plain"
+    id="stage-by-layer"
+    title="How the path climbs the stack."
+    lede="The early stages teach the discipline and the layers that see and rule; the later ones test, contain and prove."
+  >
+    <LayerMatrix
+      data={stageLayer}
+      title="Path nodes by stage and layer"
+      caption={`The ${nodes.length} nodes of the path by stage and by the stack layer each teaches; the ${crossCutting} that teach no single layer are cross-cutting. A cell opens its first node.`}
+      legend={[
+        { kind: 'core', label: 'Core' },
+        { kind: 'alternative', label: 'Alternative' },
+        { kind: 'optional', label: 'Optional' },
+      ]}
+    />
+  </Section>
+
   <Section tone="plain" title="Four stages, from foundations to proof.">
+    <PathRings />
     <PathMap stages={stages} nodes={nodes} edges={edges} entries={entries} />
   </Section>
 

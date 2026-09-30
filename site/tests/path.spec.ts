@@ -5,13 +5,16 @@
 // localStorage['aige.path'], the stage + total meters, the two-step reset, an
 // axe sweep with the drawer open, the no-JS <details> fallback, the on-demand
 // cross-stage connectors (hidden until a node is engaged), and the "Builds on"
-// drawer link opening its target node. Runs in the default Playwright project
-// against the preview server (baseURL from config).
+// drawer link opening its target node, and the progress rings over the map
+// (a mark moves its stage's ring and the whole path's at once, skipped nodes
+// leave the count, the change is announced politely; without JavaScript the
+// rings show each stage's node totals by kind). Runs in the default
+// Playwright project against the preview server (baseURL from config).
 
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { assertChapterLinksResolve } from './helpers/links';
-import { nodes } from '../src/data/path';
+import { nodes, stages } from '../src/data/path';
 
 const KEY = 'aige.path';
 
@@ -239,4 +242,66 @@ test('drawer: a "Builds on" link opens that node and resets the previous opener'
     'aria-expanded',
     'true',
   );
+});
+
+test('progress rings: a mark moves its stage ring and the total, skips leave the count, and it is announced', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const stage = stages[0];
+  const inStage = nodes.filter((n) => n.stage === stage.id);
+  const rings = page.locator('[data-path-rings] .chart-w');
+  const ring = (key: string) => ({
+    arc: rings.locator(`circle[data-ring="${key}"]`),
+    pct: rings.locator(`[data-ring-label="${key}"]`),
+    count: rings.locator(`[data-ring-count="${key}"]`),
+  });
+  const pct = (done: number, of: number) => Math.round((done / of) * 100);
+  const live = page.locator('[data-ring-live]');
+  await expect(live).toHaveAttribute('aria-live', 'polite');
+
+  const mark = async (id: string, state: 'done' | 'skipped') => {
+    await page.locator(`li[data-node="${id}"] .pn-btn`).click();
+    await page.locator(`#path-drawer [data-path-state="${state}"]`).click();
+    await page.keyboard.press('Escape');
+  };
+
+  await mark(inStage[0].id, 'done');
+  const s1 = pct(1, inStage.length);
+  const t1 = pct(1, nodes.length);
+  await expect(ring(stage.id).count).toHaveText(`1/${inStage.length}`);
+  await expect(ring(stage.id).pct).toHaveText(`${s1}%`);
+  await expect(ring(stage.id).arc).toHaveAttribute('stroke-dasharray', `${s1} 100`);
+  await expect(ring('total').count).toHaveText(`1/${nodes.length}`);
+  await expect(ring('total').pct).toHaveText(`${t1}%`);
+  await expect(live).toContainText(`${stage.title} ${s1}%`);
+  await expect(live).toContainText(`whole path ${t1}%`);
+  // The other stages did not move.
+  await expect(ring(stages[1].id).count).toHaveText(`0/${nodes.filter((n) => n.stage === stages[1].id).length}`);
+
+  // A skipped node leaves the denominator of its stage and of the path.
+  await mark(inStage[1].id, 'skipped');
+  await expect(ring(stage.id).count).toHaveText(`1/${inStage.length - 1}`);
+  await expect(ring(stage.id).pct).toHaveText(`${pct(1, inStage.length - 1)}%`);
+  await expect(ring('total').count).toHaveText(`1/${nodes.length - 1}`);
+});
+
+test('progress rings without JavaScript: each stage shows its node totals, by kind', async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false, baseURL, viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
+  try {
+    await page.goto('/path');
+    const box = page.locator('[data-path-rings]');
+    for (const stage of stages) {
+      const here = nodes.filter((n) => n.stage === stage.id);
+      await expect(box.locator(`.chart-w [data-ring-count="${stage.id}"]`)).toHaveText(`0/${here.length}`);
+      const kinds = (['core', 'alternative', 'optional'] as const)
+        .map((k) => `${here.filter((n) => n.kind === k).length} ${k}`)
+        .join(', ');
+      await expect(box.locator('.prg-kinds li', { hasText: stage.title })).toContainText(`${here.length} nodes: ${kinds}`);
+    }
+    await expect(box.locator('.chart-w [data-ring-count="total"]')).toHaveText(`0/${nodes.length}`);
+  } finally {
+    await context.close();
+  }
 });
