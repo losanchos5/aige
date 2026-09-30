@@ -1,0 +1,295 @@
+---
+/**
+ * ControlsCrosswalkIndex: the framework index of /controls/crosswalk#frameworks
+ * as a heat map, framework (row) x profile (column), each cell the number of
+ * mappings (clause and control pairs) that profile's controls make to that
+ * framework (lib/page-visuals/controls-flows.ts crosswalkIndex). It replaces
+ * the plain list of anchors: each row still links to its framework's table
+ * (#<framework id>), each column head to the profile's reverse view
+ * (#by-profile-<slug>), and the obligation register's instruments stay
+ * grouped under a link to #obligations.
+ *
+ * A cell is an ink square whose area grows with the count, the count printed
+ * beside it in full ink (the encoding of ControlCoverage on the profile
+ * pages), so nothing rests on shade alone; an empty cell is a small dot. The
+ * last column and the foot are the totals.
+ *
+ * A real HTML table (it is the data, so no second table), not the kit's
+ * heatGrid: 31 x 5 cells with their tooltips come to about 36 KB of SVG, three
+ * times the 12 KB budget of an inline chart. It scrolls sideways inside a
+ * labelled, focusable region with the framework column sticky, as the
+ * framework tables below it do. Frame: chart.css.
+ */
+import '../../styles/chart.css';
+import { CONTROLS_AS_OF } from '../../data/controls';
+import { crosswalkIndex } from '../../lib/page-visuals/controls-flows';
+
+const { profiles, rows } = crosswalkIndex();
+const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
+const obligations = rows.filter((r) => r.obligation);
+const others = rows.filter((r) => !r.obligation);
+const colTotals = profiles.map((_, c) => sum(rows.map((r) => r.values[c])));
+const grand = sum(colTotals);
+const max = Math.max(1, ...rows.flatMap((r) => r.values));
+/** Side of the square: area proportional to the count, 6 to 18 px. */
+const side = (n: number) => Math.round((6 + 12 * Math.sqrt(n / max)) * 10) / 10;
+const onlyOne = rows.filter((r) => r.values.filter((v) => v > 0).length === 1).length;
+const all = rows.filter((r) => r.values.every((v) => v > 0)).length;
+const span = profiles.length + 2;
+
+const title = 'Frameworks by profile';
+const caption = `The mappings each profile's controls make to each framework; the rows link to the framework's table. ${onlyOne} of ${rows.length} frameworks are reached by one profile only and ${all === 0 ? 'none by all' : `${all} by all`} ${profiles.length}.`;
+const groups = [
+  ...(obligations.length > 0 ? [{ label: 'Obligation register', href: '#obligations', rows: obligations }] : []),
+  ...(others.length > 0 ? [{ label: 'Other frameworks', href: undefined, rows: others }] : []),
+];
+---
+
+<figure class="chart-fig cwx" aria-labelledby="cwx-title" data-pagefind-ignore>
+  <div class="chart-canvas cwx-canvas">
+    <div class="cwx-scroll" role="region" tabindex="0" aria-label="Frameworks by profile, scrolls sideways">
+      <table class="cwx-table">
+        <caption class="visually-hidden">Mappings per framework and profile, with totals</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="cwx-corner">Framework</th>
+            {
+              profiles.map((p) => (
+                <th scope="col" class="cwx-col">
+                  <a href={`#by-profile-${p.slug}`}>{p.shortTitle}</a>
+                </th>
+              ))
+            }
+            <th scope="col" class="cwx-col">Total</th>
+          </tr>
+        </thead>
+        {
+          groups.map((g) => (
+            <tbody>
+              <tr class="cwx-group">
+                <th scope="colgroup" colspan={span}>
+                  {g.href ? <a href={g.href}>{g.label}</a> : g.label}
+                </th>
+              </tr>
+              {g.rows.map((r) => (
+                <tr data-framework={r.fw.id}>
+                  <th scope="row" class="cwx-row">
+                    <a href={`#${r.fw.id}`}>{r.fw.name}</a>
+                  </th>
+                  {r.values.map((n) =>
+                    n > 0 ? (
+                      <td class="cwx-cell cwx-n" style={`--sq:${side(n)}px`}>
+                        {n}
+                      </td>
+                    ) : (
+                      <td class="cwx-cell cwx-zero">
+                        <span class="visually-hidden">0</span>
+                      </td>
+                    ),
+                  )}
+                  <td class="cwx-cell cwx-total">{sum(r.values)}</td>
+                </tr>
+              ))}
+            </tbody>
+          ))
+        }
+        <tfoot>
+          <tr>
+            <th scope="row" class="cwx-row">All frameworks</th>
+            {colTotals.map((t) => <td class="cwx-cell cwx-total">{t}</td>)}
+            <td class="cwx-cell cwx-total">{grand}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="cwx-key">
+      <span class="cwx-sq" style={`--sq:${side(1)}px`} aria-hidden="true"></span>
+      <span class="cwx-sq" style={`--sq:${side(max)}px`} aria-hidden="true"></span>
+      Square area grows with the mappings (1 to {max}); the count is printed beside it.
+    </p>
+    <p class="cwx-stamp">Source: open control profiles (data/controls) · As of {CONTROLS_AS_OF}</p>
+  </div>
+  <figcaption class="chart-caption">
+    <span class="chart-title" id="cwx-title">{title}</span>
+    <span class="chart-desc">{caption}</span>
+  </figcaption>
+</figure>
+
+<style>
+  /* Positioned, so the visually hidden zeros (absolute) scroll with the
+     table instead of widening the page. */
+  .cwx-scroll {
+    position: relative;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  .cwx-scroll:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .cwx-table {
+    width: 100%;
+    min-width: 42rem;
+    margin: 0;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: var(--fs-small);
+  }
+
+  /* Undo the prose table look: this grid draws its own rules. */
+  .cwx-table :is(th, td) {
+    position: static;
+    padding: 0;
+    border: 0;
+    background: none;
+    vertical-align: middle;
+    text-align: left;
+    color: var(--ink);
+  }
+
+  /* The framework column stays in view while the counts scroll under it. */
+  .cwx-table .cwx-corner,
+  .cwx-table .cwx-row,
+  .cwx-table .cwx-group th {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--bg);
+  }
+
+  .cwx-table .cwx-corner,
+  .cwx-table .cwx-col {
+    padding: 0 var(--s-2) var(--s-2);
+    border-bottom: 2px solid var(--ink);
+    vertical-align: bottom;
+    font-weight: 600;
+    line-height: 1.2;
+    font-size: var(--fs-label);
+  }
+
+  .cwx-table .cwx-corner {
+    width: 12rem;
+    padding-left: 0;
+    color: var(--ink-2);
+  }
+
+  /* Chromium drops a width mixing % and length on a table column, so the
+     framework column is 12rem on a phone and 38 % once the figure is wide. */
+  @container (min-width: 640px) {
+    .cwx-table .cwx-corner {
+      width: 38%;
+    }
+  }
+
+  .cwx-col a,
+  .cwx-row a,
+  .cwx-group a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    color: var(--ink);
+  }
+
+  .cwx-table .cwx-group th {
+    padding: var(--s-4) 0 var(--s-1);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    color: var(--ink-2);
+    border-bottom: 1px solid var(--ink);
+  }
+
+  .cwx-table .cwx-row {
+    padding: 2px var(--s-3) 2px 0;
+    font-weight: 400;
+    line-height: 1.25;
+    border-top: 1px solid var(--line);
+  }
+
+  .cwx-table .cwx-cell {
+    height: 28px;
+    padding: 0 var(--s-2);
+    border-top: 1px solid var(--line);
+    border-left: 1px dashed var(--line);
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cwx-table .cwx-total {
+    font-weight: 600;
+  }
+
+  .cwx-table tfoot :is(th, td) {
+    border-top: 2px solid var(--ink);
+    font-weight: 600;
+  }
+
+  /* The mark is drawn before the count: an ink square of side --sq (area
+     grows with the count); an empty cell is a small dot, its 0 for assistive
+     tech. */
+  .cwx-n::before,
+  .cwx-sq {
+    content: '';
+    display: inline-block;
+    width: var(--sq);
+    height: var(--sq);
+    margin-right: 4px;
+    vertical-align: middle;
+    border-radius: 1.5px;
+    background: var(--ink);
+  }
+
+  .cwx-zero::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    vertical-align: middle;
+    border-radius: 50%;
+    background: var(--ink-2);
+  }
+
+  .cwx-key {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2);
+    margin: var(--s-4) 0 0;
+    font-size: var(--fs-small);
+    color: var(--ink);
+  }
+
+  .cwx-key .cwx-sq {
+    margin-right: 0;
+  }
+
+  .cwx-stamp {
+    margin: var(--s-3) 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  @media print {
+    .cwx-n::before,
+    .cwx-sq,
+    .cwx-zero::before {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+
+  /* Forced colours: the squares are backgrounds; keep them solid. */
+  @media (forced-colors: active) {
+    .cwx-n::before,
+    .cwx-sq,
+    .cwx-zero::before {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+  }
+</style>
