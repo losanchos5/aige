@@ -1,0 +1,470 @@
+---
+/**
+ * ControlMosaic: every control of the open control profiles as one square,
+ * grouped by profile, for the head of /controls#profiles. A square's colour is
+ * the control's home stack layer (--lN fill, --lN-ink stroke) and its drawing
+ * is its failure response, so state never rests on colour: solid when the
+ * control denies the action or holds it for a human decision, outlined when it
+ * raises an alert, hatched when the response is still "To be specified" (the
+ * default of the controls derived for the agent runtime profile,
+ * data/controls/agent-runtime.ts). reviewerStatus is the same for every
+ * control, so it is not drawn.
+ *
+ * HTML and CSS, not an SVG: 93 linked squares with their names pass the 12 KB
+ * budget of an inline chart. The frame reuses the chart kit's frame classes
+ * (chart.css: chart-fig, chart-canvas, chart-caption, chart-alt, chart-table),
+ * so the table alternative reads like every other chart. Wide, each profile is
+ * a column that stacks from the baseline (a skyline, home layer 01 at the
+ * foot); narrow, each profile is a row that wraps. Every square is a link to
+ * its control (controlPath) named by its id, title, layer and response; the
+ * pitch is at least 25 px, the pointer-target spacing of WCAG 2.5.8. Motion is
+ * transform only and only under prefers-reduced-motion: no-preference. The
+ * profile names are plain text: the profile cards under the mosaic link them.
+ */
+import '../styles/chart.css';
+import { controls, profiles, controlPath, CONTROLS_AS_OF, type Control } from '../data/controls';
+import { layers } from '../data/stack';
+
+type Response = 'hold' | 'alert' | 'tbs';
+
+/** The drawing of a control: its failure response, with the unspecified
+ *  default of the derived controls as a third state rather than an alert. */
+const responseOf = (c: Pick<Control, 'failureResponse'>): Response =>
+  c.failureResponse.text.trim() === 'To be specified.'
+    ? 'tbs'
+    : c.failureResponse.effect === 'alert'
+      ? 'alert'
+      : 'hold';
+
+const responseText: Record<Response, string> = {
+  hold: 'Denies or holds the action',
+  alert: 'Raises an alert',
+  tbs: 'Response to be specified',
+};
+const effectWord = (c: Control) =>
+  responseOf(c) === 'tbs'
+    ? 'To be specified'
+    : ({ deny: 'Deny', require_approval: 'Require approval', alert: 'Alert', allow: 'Allow' } as const)[
+        c.failureResponse.effect
+      ];
+const stateRank: Record<Response, number> = { hold: 0, alert: 1, tbs: 2 };
+const pad = (n: number) => String(n).padStart(2, '0');
+const layerName = (n: number) => layers.find((l) => l.n === n)?.name ?? '';
+const layerWord = (n: number) => `Layer ${pad(n)} ${layerName(n)}`;
+
+const groups = profiles.map((profile) => ({
+  profile,
+  items: controls
+    .filter((c) => c.profile === profile.slug)
+    .sort((a, b) => a.layer - b.layer || stateRank[responseOf(a)] - stateRank[responseOf(b)] || a.id.localeCompare(b.id, 'en')),
+}));
+const counts = {
+  hold: controls.filter((c) => responseOf(c) === 'hold').length,
+  alert: controls.filter((c) => responseOf(c) === 'alert').length,
+  tbs: controls.filter((c) => responseOf(c) === 'tbs').length,
+};
+const byLayer = layers.map((l) => ({ n: l.n, count: controls.filter((c) => c.layer === l.n).length }));
+const top = [...byLayer].sort((a, b) => b.count - a.count)[0];
+const largest = [...groups].sort((a, b) => b.items.length - a.items.length)[0];
+
+const title = `${controls.length} controls, ${profiles.length} profiles`;
+const caption =
+  'One square per control, grouped by profile and coloured by the stack layer it lives in; solid squares deny or hold the action when the control fails, outlined ones raise an alert and hatched ones have a failure response still to be specified. Read where the catalogue is thick and where it is thin, then select a square to open its control.';
+const tableCaption = 'Every control by profile, with its home layer and failure response';
+---
+
+<figure class="chart-fig cmo" aria-labelledby="cmo-title">
+  <div class="chart-canvas cmo-canvas">
+    <dl class="cmo-kpis">
+      <div><dt>Controls</dt><dd class="cmo-kpi">{controls.length}</dd></div>
+      <div><dt>Largest profile, {largest.profile.shortTitle}</dt><dd class="cmo-kpi">{largest.items.length}</dd></div>
+      <div><dt>At {layerWord(top.n)}</dt><dd class="cmo-kpi">{top.count}</dd></div>
+      <div><dt>Response to be specified</dt><dd class="cmo-kpi">{counts.tbs}</dd></div>
+    </dl>
+    <ol class="cmo-cols" role="list" style={`--cols: ${groups.length}`}>
+      {
+        groups.map(({ profile, items }) => (
+          <li class="cmo-col">
+            <div class="cmo-stack">
+              <span class="cmo-n" aria-hidden="true">
+                {items.length}
+              </span>
+              <ul class="cmo-cells" role="list" aria-label={`${profile.shortTitle}: ${items.length} controls`}>
+                {items.map((c) => {
+                  const name = `${c.id} ${c.title}. ${layerWord(c.layer)}. ${responseText[responseOf(c)]}.`;
+                  return (
+                    <li>
+                      <a
+                        class:list={['cmo-cell', `cmo-l${c.layer}`, `cmo-${responseOf(c)}`]}
+                        href={controlPath(c)}
+                        aria-label={name}
+                        title={name}
+                      />
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+            <p class="cmo-name">
+              <span>{profile.shortTitle}</span>
+              <span class="cmo-name-n">{items.length}</span>
+            </p>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="cmo-legend">
+      <ul class="cmo-key" role="list" aria-label="Colour: home stack layer">
+        {
+          byLayer.map((l) => (
+            <li>
+              <span class:list={['cmo-swatch', `cmo-l${l.n}`, 'cmo-hold']} aria-hidden="true" />
+              {layerWord(l.n)} <span class="cmo-key-n">{l.count}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="cmo-key" role="list" aria-label="Drawing: failure response">
+        {
+          (['hold', 'alert', 'tbs'] as const).map((r) => (
+            <li>
+              <span class:list={['cmo-swatch', 'cmo-l0', `cmo-${r}`]} aria-hidden="true" />
+              {responseText[r]} <span class="cmo-key-n">{counts[r]}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <p class="cmo-stamp">Source: open control profiles (data/controls) · As of {CONTROLS_AS_OF}</p>
+  </div>
+  <figcaption class="chart-caption">
+    <span class="chart-title" id="cmo-title">{title}</span>
+    <span class="chart-desc">{caption}</span>
+  </figcaption>
+  <details class="chart-alt">
+    <summary class="chart-alt-summary" data-pagefind-ignore>Data table</summary>
+    <div class="chart-table-wrap" role="region" tabindex="0" aria-label={tableCaption}>
+      <table class="chart-table">
+        <caption>{tableCaption}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Control</th>
+            <th scope="col">Title</th>
+            <th scope="col">Profile</th>
+            <th scope="col">Layer</th>
+            <th scope="col">Failure response</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            groups.flatMap(({ profile, items }) =>
+              items.map((c) => (
+                <tr>
+                  <th scope="row">{c.id}</th>
+                  <td>{c.title}</td>
+                  <td>{profile.shortTitle}</td>
+                  <td>{layerWord(c.layer)}</td>
+                  <td>{effectWord(c)}</td>
+                </tr>
+              )),
+            )
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+</figure>
+
+<style>
+  /* Squares: --k is the layer ink (stroke, hatch), --p its pastel. */
+  .cmo {
+    --cell: 22px;
+    --gap: 4px;
+  }
+
+  .cmo-l0 { --k: var(--ink); --p: var(--ink-2); }
+  .cmo-l1 { --k: var(--l1-ink); --p: var(--l1); }
+  .cmo-l2 { --k: var(--l2-ink); --p: var(--l2); }
+  .cmo-l3 { --k: var(--l3-ink); --p: var(--l3); }
+  .cmo-l4 { --k: var(--l4-ink); --p: var(--l4); }
+  .cmo-l5 { --k: var(--l5-ink); --p: var(--l5); }
+
+  .cmo-canvas {
+    padding: var(--s-5);
+  }
+
+  @container (max-width: 479px) {
+    .cmo-canvas {
+      padding: var(--s-3);
+    }
+  }
+
+  /* Headline numbers above the chart. */
+  .cmo-kpis {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-3) var(--s-5);
+    margin: 0 0 var(--s-6);
+  }
+
+  .cmo-kpis > div {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--s-1);
+    border-top: 2px solid var(--ink);
+    padding-top: var(--s-2);
+  }
+
+  .cmo-kpis dt {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .cmo-kpis dd {
+    margin: 0;
+  }
+
+  .cmo-kpi {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @container (min-width: 760px) {
+    .cmo-kpis {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  /* Narrow: one profile per row, the squares wrapping under its name. */
+  .cmo-cols {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-5);
+  }
+
+  .cmo-col {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--s-2);
+    min-width: 0;
+  }
+
+  .cmo-n {
+    display: none;
+  }
+
+  .cmo-cells {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--gap);
+  }
+
+  .cmo-cells li {
+    display: block;
+    width: var(--cell);
+    height: var(--cell);
+  }
+
+  .cmo-cell,
+  .cmo-swatch {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border-radius: 3px;
+    border: 2px solid var(--k);
+  }
+
+  .cmo-hold {
+    background: color-mix(in srgb, var(--k) 60%, var(--p));
+  }
+
+  .cmo-alert {
+    background: var(--bg);
+  }
+
+  .cmo-tbs {
+    background: repeating-linear-gradient(-45deg, var(--k) 0 1.5px, var(--bg) 1.5px 5px);
+  }
+
+  .cmo-cell:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .cmo-name {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    margin: 0;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .cmo-name-n {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+
+  /* Wide: a skyline. Each profile a column of five squares a row, stacked
+     from the baseline, its count on top and its name under the rule. */
+  @container (min-width: 760px) {
+    .cmo {
+      --cell: 20px;
+      --gap: 5px;
+    }
+
+    .cmo-cols {
+      display: grid;
+      grid-template-columns: repeat(var(--cols, 5), max-content);
+      grid-template-rows: auto auto;
+      justify-content: space-between;
+      column-gap: var(--s-4);
+      row-gap: 0;
+    }
+
+    .cmo-col {
+      display: grid;
+      grid-row: span 2;
+      grid-template-rows: subgrid;
+      gap: 0;
+    }
+
+    .cmo-stack {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      gap: var(--s-2);
+      padding-bottom: var(--s-3);
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .cmo-n {
+      display: block;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.75rem;
+      line-height: 1;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cmo-cells {
+      width: calc(5 * var(--cell) + 4 * var(--gap));
+      flex-wrap: wrap-reverse;
+    }
+
+    .cmo-name {
+      max-width: calc(5 * var(--cell) + 4 * var(--gap));
+      padding-top: var(--s-2);
+      font-size: var(--fs-small);
+      line-height: 1.3;
+    }
+
+    .cmo-name-n {
+      display: none;
+    }
+  }
+
+  @container (min-width: 1000px) {
+    .cmo {
+      --cell: 28px;
+      --gap: 6px;
+    }
+
+    .cmo-name {
+      font-size: var(--fs-body, 1rem);
+    }
+  }
+
+  .cmo-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3) var(--s-7);
+    margin-top: var(--s-6);
+  }
+
+  .cmo-key {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    font-size: var(--fs-small);
+    color: var(--ink);
+  }
+
+  .cmo-key li {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .cmo-swatch {
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
+
+  .cmo-key-n {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-2);
+  }
+
+  .cmo-stamp {
+    margin: var(--s-5) 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* Motion: transform only, never on reduced motion. The columns rise from
+     their baseline as the chart scrolls in; a square grows under the pointer. */
+  @media (prefers-reduced-motion: no-preference) {
+    .cmo-cell {
+      transition: transform var(--dur, 160ms) var(--ease, ease-out);
+    }
+
+    .cmo-cell:hover,
+    .cmo-cell:focus-visible {
+      transform: scale(1.25);
+    }
+
+    @supports (animation-timeline: view()) {
+      @container (min-width: 760px) {
+        .cmo-cells {
+          transform-origin: 50% 100%;
+          animation: cmo-rise linear both;
+          animation-timeline: view();
+          animation-range: entry 10% cover 40%;
+        }
+      }
+    }
+  }
+
+  @keyframes cmo-rise {
+    from {
+      transform: scaleY(0.1);
+    }
+
+    to {
+      transform: none;
+    }
+  }
+</style>

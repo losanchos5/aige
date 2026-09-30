@@ -2,6 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
+import Chart from '../../components/Chart.astro';
+import { contractMatrix } from '../../lib/page-visuals/contract-matrix';
 import {
   clauses,
   licenceTypes,
@@ -15,6 +17,24 @@ import '../../styles/resources.css';
 import '../../styles/pages.css';
 
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Contracts' }];
+
+// Clause x instrument dot matrix (lib/page-visuals/contract-matrix.ts), wide and
+// narrow, in chart mode: this page does not load figures.css.
+const matrixBase = {
+  title: 'Which instruments each clause answers',
+  desc: `Each of the ${clauses.length} contract clauses against the instruments it maps to, EU legislation apart from model clauses and standards, with the count per clause and per instrument.`,
+  source: 'chapter 15, the contract clause checklist',
+  asOf: '2026-09-24',
+  mode: 'chart' as const,
+  clauses,
+  references,
+  href: (row: { id: string }) => `#clause-${row.id}`,
+  tableCaption: 'The instruments each contract clause maps to',
+};
+const matrix = {
+  wide: contractMatrix({ ...matrixBase, id: 'ct-matrix-w', width: 860 }),
+  narrow: contractMatrix({ ...matrixBase, id: 'ct-matrix-n', width: 340 }),
+};
 const description =
   'The clauses to check before you deploy a third-party AI system: what each governs, the red flag, a fallback position and the evidence to keep.';
 
@@ -78,6 +98,12 @@ const jsonLd = [
           <a href="/resources/frameworks">frameworks and obligations</a>.
         </p>
       </div>
+      <Chart
+        chart={matrix.wide}
+        narrow={matrix.narrow}
+        title="Which instruments each clause answers"
+        caption="One row per clause, one dot per instrument it maps to: filled for EU legislation, outlined for model clauses and standards, clauses answering the most instruments first. Start with the clauses near the top; a clause with outlined dots only rests on model clauses and standards, not on the EU legislation mapped here."
+      />
       <div class="res-tablewrap">
         <table class="res-table ct-table">
           <caption class="visually-hidden">
