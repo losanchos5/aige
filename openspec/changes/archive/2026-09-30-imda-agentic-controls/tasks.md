@@ -48,5 +48,5 @@
   agents y api. Verificación: todos en verde.
 - [x] 6.2 Revisión (`code-reviewer`) y verificación de citas IMDA contra `pages.txt`; aplicar los
   arreglos. Verificación: sin hallazgos CRITICAL ni HIGH abiertos.
-- [ ] 6.3 `openspec validate imda-agentic-controls --strict`, commit y PR con CI en verde.
+- [x] 6.3 `openspec validate imda-agentic-controls --strict`, commit y PR con CI en verde.
   Verificación: el PR enlazado y los checks en verde.
