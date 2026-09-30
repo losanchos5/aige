@@ -241,6 +241,11 @@ export const nav: NavGroup[] = [
         description: 'One governance topic per row, across the instruments that bind it.',
       },
       {
+        label: 'Frontier safety crosswalk',
+        href: '/resources/frontier-safety-crosswalk',
+        description: 'Three frontier safety frameworks mapped to NIST AI RMF and ISO/IEC 42001.',
+      },
+      {
         label: 'National DPIA lists',
         href: '/resources/dpia-lists',
         description: 'The GDPR Art. 35(4) lists by country, read for AI and mapped to Annex III.',

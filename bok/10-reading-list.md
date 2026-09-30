@@ -293,6 +293,9 @@ tags, is on the site's resources page. No commercial study guide for any certifi
   levels and mitigations; the page states version 3.1, updated 17 April 2026. `https://deepmind.google/discover/blog/strengthening-our-frontier-safety-framework/`
   (verified: primary) (audience: governance, research; jurisdiction: global)
 
+The [frontier safety frameworks crosswalk](/resources/frontier-safety-crosswalk) maps these three
+frameworks to the NIST AI RMF and ISO/IEC 42001 across 13 governance dimensions.
+
 ## Papers (machine-readable evidence and agent governance)
 
 - **"Making AI Compliance Evidence Machine-Readable" (arXiv 2604.13767)**: extends `OSCAL` for AI and

@@ -19,32 +19,48 @@
  * paint; the column chooser (revealed and driven by public/crosswalk.js, choice
  * remembered per browser) shows or hides any column, so the grid stays usable
  * at 390 px. Without JavaScript the <noscript> rule shows every column.
+ *
+ * The frontier safety crosswalk reuses the grid with its own matrix, its own
+ * `caption` and `chooser={false}`: every column shows and no chooser is
+ * rendered, so public/crosswalk.js never applies the general crosswalk's
+ * remembered column choice to it.
  */
 import { topicMatrix, chipLabel, frameworkById } from '../data/crosswalk';
 import type { ColumnGroup } from '../data/crosswalk';
 
 interface Props {
   matrix?: ReturnType<typeof topicMatrix>;
+  /** Figcaption text; the default describes the general crosswalk. */
+  caption?: string;
+  /** Accessible name of the sideways-scrolling region. */
+  regionLabel?: string;
+  /** Render the column chooser (default true). */
+  chooser?: boolean;
 }
 
-const { matrix = topicMatrix() } = Astro.props;
+const {
+  matrix = topicMatrix(),
+  caption = 'One topic per row, one framework family per column. Select a topic or a cell to read the mapped references.',
+  regionLabel = 'Topic by framework crosswalk (scrolls sideways on small screens)',
+  chooser = true,
+} = Astro.props;
 const { columns, rows } = matrix;
 
 const groups: { id: ColumnGroup; label: string }[] = [
   { id: 'law', label: 'Law' },
+  { id: 'labs', label: 'Frontier lab policies' },
   { id: 'codes', label: 'Codes and frameworks' },
   { id: 'standards', label: 'Standards and controls' },
 ];
+// Only the groups this matrix has columns in: an empty fieldset would show a bare legend.
+const usedGroups = groups.filter((g) => columns.some((c) => c.group === g.id));
 const defaultCount = columns.filter((c) => c.defaultVisible).length;
 ---
 
 <figure class="cw" aria-labelledby="cw-cap">
   <figcaption id="cw-cap" class="cw-cap">
     <span class="mono">Crosswalk</span>
-    <span class="cw-cap-text"
-      >One topic per row, one framework family per column. Select a topic or a
-      cell to read the mapped references.</span
-    >
+    <span class="cw-cap-text">{caption}</span>
   </figcaption>
 
   <ul class="cw-key" aria-label="Chip key">
@@ -62,6 +78,7 @@ const defaultCount = columns.filter((c) => c.defaultVisible).length;
     </li>
   </ul>
 
+  {chooser && (
   <div class="cw-cols" data-cw-cols hidden>
     <details class="cw-cols-d">
       <summary class="cw-cols-sum">
@@ -71,7 +88,7 @@ const defaultCount = columns.filter((c) => c.defaultVisible).length;
       </summary>
       <div class="cw-cols-body">
         {
-          groups.map((group) => (
+          usedGroups.map((group) => (
             <fieldset class="cw-cols-group">
               <legend>{group.label}</legend>
               {columns
@@ -98,13 +115,14 @@ const defaultCount = columns.filter((c) => c.defaultVisible).length;
       </div>
     </details>
   </div>
+  )}
 
   <p class="cw-hint">Scroll the grid sideways, or read each topic below.</p>
 
   <div
     class="cw-scroll"
     role="region"
-    aria-label="Topic by framework crosswalk (scrolls sideways on small screens)"
+    aria-label={regionLabel}
     tabindex="0"
   >
     <table class="cw-grid" data-cw-grid>

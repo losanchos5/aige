@@ -16,6 +16,7 @@ const HUB = [
   '/resources/frameworks',
   '/obligations',
   '/resources/crosswalk',
+  '/resources/frontier-safety-crosswalk',
   '/resources/harms',
   '/cases',
   '/controls',

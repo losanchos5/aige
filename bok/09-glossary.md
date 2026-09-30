@@ -191,6 +191,11 @@ profiles, temporal profiles (a current and a target profile whose gap guides the
 cross-sectoral profiles such as NIST AI 600-1 for generative AI [30]. See [ch. 22, Profiles and the
 Generative AI Profile](/bok/principles-and-standards#profiles-and-the-generative-ai-profile). (ch. 22)
 
+**AI Safety Level (ASL).** Anthropic's name for tiers of safeguards in its Responsible Scaling
+Policy. In version 3.4 the policy keeps ASLs only to describe the protections in place today, and
+sets its requirements through a table of capability thresholds instead [143]. See [the frontier
+safety frameworks crosswalk](/resources/frontier-safety-crosswalk#topic-thresholds). (ch. 10)
+
 **AI system.** For governance, the object the AI definition brings into scope. Under the EU AI Act,
 a machine-based system designed to operate with some autonomy, possibly adaptive after deployment,
 that infers from its input how to generate outputs that can influence physical or virtual
@@ -558,6 +563,12 @@ fairness eval suite. Contrast with [Counterfactual fairness](/glossary/counterfa
 fairness](/bok/fairness-and-explainability#individual-and-counterfactual-fairness); [ch. 05,
 Pattern: Fairness Eval Suite](/patterns/fairness-eval-suite). (ch. 05, 16)
 
+**Critical Capability Level (CCL).** In Google DeepMind's Frontier Safety Framework, a capability
+level at which a model may pose a heightened risk of severe harm without mitigations; reaching one
+calls for security and deployment mitigations and a decision that the residual risk is acceptable.
+Version 3.1 adds lower Tracked Capability Levels [145]. See [the frontier safety frameworks
+crosswalk](/resources/frontier-safety-crosswalk#topic-thresholds). (ch. 10)
+
 ## D
 
 **Data card.** Structured, versioned documentation of a dataset (provenance, lawful basis, rights,
@@ -909,6 +920,12 @@ operations [14]. Frontier-developer laws ask for a published safety framework an
 training data and frontier
 developers](/bok/ai-laws-worldwide#provenance-training-data-and-frontier-developers); [ch. 08,
 Frontier-developer laws](/bok/regulatory-map#frontier-developer-laws). (ch. 08, 21)
+
+**Frontier Safety Framework.** Google DeepMind's published policy for severe risks from its most
+capable models: Critical Capability Levels for misuse, machine learning R&D and misalignment,
+early-warning evaluations, and security and deployment mitigations, reviewed at least once a year.
+Version 3.1 is dated 17 Apr 2026 [145]. See [the frontier safety frameworks crosswalk](/resources/frontier-safety-crosswalk).
+(ch. 10)
 
 **Fulfilment record.** The per-request record of how a data-subject request was honoured wherever
 the person's data sits, from source systems, snapshots, retrieval indexes, logs and eval sets to
@@ -1518,6 +1535,11 @@ error rates by subgroup, with a decision threshold someone owns. Also called dis
 Contrast with [Generative AI](/glossary/generative-ai). See [ch. 11, Predictive versus
 generative](/bok/ai-defined#predictive-versus-generative). (ch. 11)
 
+**Preparedness Framework.** OpenAI's published policy for frontier capabilities that could cause
+severe harm: Tracked Categories with High and Critical thresholds, Safeguards Reports, and a Safety
+Advisory Group that recommends while OpenAI Leadership decides. Version 2 is dated 15 Apr 2025
+[144]. See [the frontier safety frameworks crosswalk](/resources/frontier-safety-crosswalk). (ch. 10)
+
 **Presumption of conformity.** The legal effect under AI Act Article 40: a high-risk system or GPAI
 model that conforms with OJ-cited harmonised standards is presumed to meet the requirements those
 standards cover, and no others [2]. Unavailable until a standard is cited, which as of 2026-09-24
@@ -1707,6 +1729,11 @@ rating credits only controls whose evidence is current. Contrast with [Inherent
 risk](/glossary/inherent-risk) and [Risk tolerance](/glossary/risk-tolerance). See [ch. 13, Inherent
 risk, residual risk and who accepts
 it](/bok/risk-management#inherent-risk-residual-risk-and-who-accepts-it). (ch. 13)
+
+**Responsible Scaling Policy (RSP).** Anthropic's published policy for catastrophic risks from its
+models: capability thresholds with planned safeguards, periodic Risk Reports, a Responsible Scaling
+Officer, external review and a change log. Version 3.4 took effect on 8 Jul 2026 [143]. See [the
+frontier safety frameworks crosswalk](/resources/frontier-safety-crosswalk). (ch. 10)
 
 **Responsible-AI licence (OpenRAIL).** A licence that grants open, royalty-free access to an AI
 artefact while attaching prohibited uses that every redistribution and derivative must carry forward
@@ -2292,3 +2319,6 @@ Runtime Controls & Observability](/bok/the-stack#layer-04-runtime-controls--obse
 [140] "Ensuring and facilitating the exercise of data subjects' rights" (AI how-to sheet; retraining; output filters accepted if shown sufficiently effective and robust, based on general rules rather than lists of people). CNIL. 2026-01-05. https://www.cnil.fr/en/respect-and-facilitate-exercise-data-subjects-rights (verified: primary)
 [141] Authorization (Cedar Policy Language Reference Guide) (no request is allowed unless a permit policy grants it, so the default decision is Deny; any satisfied forbid overrides every permit). Cedar. n.d. (accessed 2026-09-25). https://docs.cedarpolicy.com/auth/authorization.html (verified: primary)
 [142] SB 53, Transparency in Frontier Artificial Intelligence Act (Chapter 138, Statutes of 2025, approved and filed 29 Sep 2025; a regular-session statute, in force from 1 Jan 2026 under Cal. Const. art. IV, §8(c)(1); frontier model > 10^26 operations; large frontier developer > USD 500M revenue; frontier AI framework; transparency report; critical safety incidents to the Office of Emergency Services within 15 days). California Legislature. 2025-09-29. https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB53 (verified: primary)
+[143] Responsible Scaling Policy, Version 3.4 (effective 2026-07-08; capability-threshold table, Risk Reports, Appendix B on AI Safety Levels). Anthropic. 2026-07-08. https://www-cdn.anthropic.com/files/4zrzovbb/website/0bacdc8440ea96e62a8766d99ebe1d4eea6d5f3a.pdf (verified: primary)
+[144] Preparedness Framework, Version 2 (last updated 2025-04-15; Tracked Categories, High and Critical thresholds, Safeguards Reports, Safety Advisory Group). OpenAI. 2025-04-15. https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf (verified: primary)
+[145] Frontier Safety Framework, Version 3.1 (Critical and Tracked Capability Levels, security and deployment mitigations, annual review). Google DeepMind. 2026-04-17. https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/strengthening-our-frontier-safety-framework/frontier-safety-framework_3-1.pdf (verified: primary)

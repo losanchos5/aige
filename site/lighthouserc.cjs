@@ -28,6 +28,7 @@ module.exports = {
         '/map',
         '/bok/glossary',
         '/resources/crosswalk',
+        '/resources/frontier-safety-crosswalk',
         '/obligations',
         '/patterns',
         '/figures',
