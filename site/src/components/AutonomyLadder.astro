@@ -1,0 +1,70 @@
+---
+/**
+ * AutonomyLadder: the five autonomy levels of chapter 23 ("Autonomy is a
+ * design decision") as a cumulative ladder (design D7 of OpenSpec
+ * page-visuals-2): lowest autonomy first, each rung naming what the person
+ * does and the nearest ATF tier, and listing the minimum controls it adds to
+ * the rungs below. Drawn from data/tool-agent-controls.ts (autonomyLevels,
+ * agentControls) by the chart kit's ladder, 'figc' mode (the page loads
+ * reading.css), with a NARROW_WIDTH variant for phones.
+ *
+ * One component on /agents and on /toolkit/agent-control-profile. Each rung is
+ * a <g data-step="<level id>">; on the toolkit page its own client module
+ * (public/toolkit/agent-control-profile.js) sets data-state="chosen" on the
+ * level the reader picks, and the page's CSS lights it. Without a script the
+ * ladder is whole and neutral. Chapter 23 has no heading per level, so every
+ * rung links to the chapter's "Autonomy is a design decision" section.
+ *
+ * The rungs are the five user roles of Feng, McDonald and Zhang, not the 0 to
+ * 4 registry scale of chapter 11 ("From definition element to registry
+ * field"); the caption says so, so the two numberings are not read as one.
+ */
+import Chart from './Chart.astro';
+import { NARROW_WIDTH, ladder, type LadderStep } from '../lib/charts';
+import { agentAnchors, agentChapter, agentControls, autonomyLevels } from '../data/tool-agent-controls';
+
+interface Props {
+  /** Id prefix of the two SVGs, unique on the page. */
+  id?: string;
+  class?: string;
+}
+
+const { id = 'autonomy-ladder', class: className } = Astro.props;
+
+const titleOf = new Map(agentControls.map((c) => [c.id, c.title]));
+const href = `${agentChapter}#${agentAnchors.autonomy}`;
+const steps: LadderStep[] = autonomyLevels.map((level) => ({
+  key: level.id,
+  label: level.name,
+  detail: `${level.person}. ATF tier: ${level.atf}.`,
+  href,
+  adds: level.adds.map((control) => {
+    const title = titleOf.get(control);
+    if (!title) throw new Error(`AutonomyLadder: level ${level.id} adds unknown control ${control}`);
+    return title;
+  }),
+}));
+
+const base = {
+  title: 'Autonomy levels and the controls each adds',
+  desc: `The ${steps.length} autonomy levels of chapter 23, from the person taking every action to the person auditing after the fact, each adding minimum controls to the levels below it.`,
+  source: 'chapter 23, "Autonomy is a design decision"',
+  mode: 'figc' as const,
+  steps,
+  stepHeader: 'User role',
+  addsHeader: 'Minimum controls it adds',
+  cumulative: true,
+  tableCaption: 'Each autonomy level with what the person does, the nearest ATF tier and the minimum controls it adds',
+};
+const wide = ladder({ ...base, id: `${id}-w`, width: 900 });
+const narrow = ladder({ ...base, id: `${id}-n`, width: NARROW_WIDTH, orientation: 'vertical' });
+---
+
+<Chart
+  id={id}
+  class:list={['autonomy-ladder', className]}
+  title="Autonomy is bought with controls"
+  caption="Five levels by the role the person plays (Feng, McDonald and Zhang), not the 0 to 4 registry scale of chapter 11: each level keeps every control below it and adds its own. Choose the lowest level the task allows."
+  chart={wide}
+  narrow={narrow}
+/>

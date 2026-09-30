@@ -1,0 +1,80 @@
+---
+/**
+ * EvalBoundary: the evaluation environment as rings around the model under
+ * test, with the nine controls of the Evaluation Environment Control Profile
+ * pinned in the ring they guard (design D8 of OpenSpec page-visuals-2). One
+ * component, placed at the head of /frontier #evaluation-environments and of
+ * the research note "The evaluation environment is part of the system".
+ *
+ * Rings and the control in each come from data/eval-boundary.ts (the note's
+ * "Five things inside the boundary", then the record of the run); every mark
+ * is a control of data/controls/evaluation-environment.ts in its stack-layer
+ * colour, hatched when its failure response is still to be specified
+ * (isResponseToSpecify), and links to its section of the profile page. The
+ * key under the rings names each ring's controls (keyMarks). Drawn by the
+ * chart kit's concentricRings, 'figc' mode (the page loads reading.css); a
+ * NARROW_WIDTH variant for phones. Not registered in figures.ts (tanda 4).
+ */
+import Chart from './Chart.astro';
+import { NARROW_WIDTH, concentricRings, type RingMark, type Tone } from '../lib/charts';
+import {
+  CONTROLS_AS_OF,
+  controlAnchorPath,
+  controlsIn,
+  isResponseToSpecify,
+} from '../data/controls';
+import { EVAL_PROFILE, evalBoundaryProblems, evalBoundaryRings } from '../data/eval-boundary';
+
+interface Props {
+  /** Id prefix of the two SVGs, unique on the page. */
+  id?: string;
+  class?: string;
+}
+
+const { id = 'eval-boundary', class: className } = Astro.props;
+
+const problems = evalBoundaryProblems();
+if (problems.length) throw new Error(problems.join('\n'));
+
+const controls = controlsIn(EVAL_PROFILE);
+const short = (controlId: string) => controlId.replace(/^AIGE-CTL-/, '');
+const ringOf = new Map(evalBoundaryRings.flatMap((r) => r.controls.map((c) => [c, r.key] as const)));
+const marks: RingMark[] = controls.map((c) => {
+  const tbs = isResponseToSpecify(c.failureResponse);
+  return {
+    label: short(c.id),
+    ring: ringOf.get(c.id)!,
+    tone: c.layer as Tone,
+    state: tbs ? 'hatched' : 'filled',
+    ...(tbs ? { status: 'To be specified' } : {}),
+    href: controlAnchorPath(c),
+  };
+});
+const layersUsed = [...new Set(controls.map((c) => c.layer))].sort();
+
+const base = {
+  title: 'The evaluation environment, ring by ring',
+  desc: `The model or agent under test at the centre, ${evalBoundaryRings.length} rings of its evaluation environment around it, and the ${controls.length} evaluation environment controls, each in the ring it guards.`,
+  source: 'Evaluation Environment Control Profile; research note on the evaluation environment',
+  asOf: CONTROLS_AS_OF,
+  mode: 'figc' as const,
+  rings: evalBoundaryRings.map(({ key, label }) => ({ key, label })),
+  marks,
+  centre: { label: 'Model or agent' },
+  keyMarks: true,
+  legend: layersUsed.map((n) => ({ label: `Layer 0${n}`, tone: n as Tone })),
+  itemHeader: 'Control',
+  tableCaption: 'Each evaluation environment control with the ring of the environment it guards and its stack layer',
+};
+const wide = concentricRings({ ...base, id: `${id}-w`, width: 640 });
+const narrow = concentricRings({ ...base, id: `${id}-n`, width: NARROW_WIDTH });
+---
+
+<Chart
+  id={id}
+  class:list={['eval-boundary', className]}
+  title="Inside the evaluation boundary"
+  caption={`Everything around the model is part of what an evaluation measures: the harness, tools, credentials, network, delegation and the record of the run. Each dot is one of the ${controls.length} evaluation environment controls, in the colour of its stack layer; select one to open its section of the profile.`}
+  chart={wide}
+  narrow={narrow}
+/>

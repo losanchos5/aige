@@ -8,6 +8,8 @@
  * incident material, and a pointer from the control plane to the toolkit
  * profile and the open agent runtime control profile. The reasoning and every source live in chapter 23
  * (bok/23-governing-agents.md); this page only routes the reader there.
+ * Two tanda-3 visuals (OpenSpec page-visuals-2): the AutonomyLadder in #why
+ * and the threat-to-pattern flow over the threat table (data/agent-threats.ts).
  */
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/reading.css';
@@ -18,10 +20,15 @@ import ResourceCard from '../components/ResourceCard.astro';
 import Callout from '../components/Callout.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Figure from '../components/Figure.astro';
+import Chart from '../components/Chart.astro';
+import AutonomyLadder from '../components/AutonomyLadder.astro';
 import { getFigure } from '../data/figures';
 import controlPlaneSvg from '../figures/agent-control-plane.svg?raw';
 import { layers } from '../data/stack';
 import { agentControls } from '../data/tool-agent-controls';
+import { AGENT_THREATS_AS_OF, agentThreats, type AgentThreat } from '../data/agent-threats';
+import { patterns as patternDefs } from '../data/patterns';
+import { FLOW_MAX_NODES, NARROW_WIDTH, flow, type SankeyLink, type SankeyNode, type Tone } from '../lib/charts';
 import { slugify } from '../lib/md-parse';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 import '../styles/pages.css';
@@ -171,71 +178,71 @@ const patterns = [
   },
 ];
 
-// OWASP Top 10 for Agentic Applications 2026 (official entry names), with the
-// control and pattern chapter 23 assigns to each. Keep in step with the
-// chapter's "Threats mapped to controls" table.
-const threats = [
-  {
-    id: 'ASI01',
-    name: 'Agent Goal Hijack',
-    control: 'Instruction provenance; checkpoints before writes; trajectory evals',
-    pattern: 'Runtime Guardrail',
-  },
-  {
-    id: 'ASI02',
-    name: 'Tool Misuse and Exploitation',
-    control: 'Tool allow-list; per-tool rate, egress and budgets',
-    pattern: 'Runtime Guardrail',
-  },
-  {
-    id: 'ASI03',
-    name: 'Identity and Privilege Abuse',
-    control: 'Workload identity; short-lived delegated tokens; audience checks',
-    pattern: 'Agent Identity & Scoped Credentials',
-  },
-  {
-    id: 'ASI04',
-    name: 'Agentic Supply Chain Vulnerabilities',
-    control: 'MCP server admission; pinned tool definitions',
-    pattern: 'AIBOM',
-  },
-  {
-    id: 'ASI05',
-    name: 'Unexpected Code Execution (RCE)',
-    control: 'Sandboxed execution; deny by default',
-    pattern: 'Runtime Guardrail',
-  },
-  {
-    id: 'ASI06',
-    name: 'Memory & Context Poisoning',
-    control: 'Memory write gate; isolation; rollback',
-    pattern: 'Runtime Guardrail',
-  },
-  {
-    id: 'ASI07',
-    name: 'Insecure Inter-Agent Communication',
-    control: 'Mutual authentication; signed Agent Cards; peer allow-list',
-    pattern: 'Agent Identity & Scoped Credentials',
-  },
-  {
-    id: 'ASI08',
-    name: 'Cascading Failures',
-    control: 'Depth and fan-out limits; per-agent breakers',
-    pattern: 'Kill Switch / Circuit Breaker',
-  },
-  {
-    id: 'ASI09',
-    name: 'Human-Agent Trust Exploitation',
-    control: 'Approvals that show the raw call; oversight metrics',
-    pattern: 'Human-in-the-loop Gate',
-  },
-  {
-    id: 'ASI10',
-    name: 'Rogue Agents',
-    control: 'Registry with expiry; discovery; drilled kill switch',
-    pattern: 'Agent Registry',
-  },
-];
+// The ten threats flowing to the pattern chapter 23 assigns each (the
+// Pattern column of the table under it), each pattern in its stack-layer
+// colour. Ten threats are one more than a flow column holds
+// (FLOW_MAX_NODES), so threats that share their one pattern merge into one
+// node, the smallest such group first, until the column fits: today that is
+// ASI03 and ASI07 (both Agent Identity & Scoped Credentials), while the four
+// threats of Runtime Guardrail keep their own ribbons.
+const patternOf = (title: string) => {
+  const def = patternDefs.find((p) => p.title === title);
+  if (!def) throw new Error(`agents: threat pattern "${title}" is not in data/patterns.ts`);
+  return def;
+};
+const threatsBy = new Map<string, AgentThreat[]>();
+for (const t of agentThreats) threatsBy.set(t.pattern, [...(threatsBy.get(t.pattern) ?? []), t]);
+const mergedPatterns = new Set<string>();
+let threatNodes = agentThreats.length;
+for (const [pattern, list] of [...threatsBy]
+  .filter(([, list]) => list.length > 1)
+  .sort((a, b) => a[1].length - b[1].length || agentThreats.indexOf(a[1][0]) - agentThreats.indexOf(b[1][0]))) {
+  if (threatNodes <= FLOW_MAX_NODES) break;
+  mergedPatterns.add(pattern);
+  threatNodes -= list.length - 1;
+}
+const threatAnchor = (t: AgentThreat) => `#threat-${t.id.toLowerCase()}`;
+const flowNodes: SankeyNode[] = [];
+const flowLinks: SankeyLink[] = [];
+for (const t of agentThreats) {
+  const group = mergedPatterns.has(t.pattern) ? threatsBy.get(t.pattern)! : [t];
+  if (group[0] !== t) continue;
+  const nodeId = `t-${t.id.toLowerCase()}`;
+  flowNodes.push({
+    id: nodeId,
+    column: 'threat',
+    label: group.length > 1 ? group.map((g) => g.id).join(' + ') : `${t.id} ${t.name}`,
+    name: group.map((g) => `${g.id} ${g.name}`).join('; '),
+    href: threatAnchor(t),
+  });
+  flowLinks.push({ from: nodeId, to: `p-${patternOf(t.pattern).slug}`, value: group.length });
+}
+for (const title of threatsBy.keys()) {
+  const def = patternOf(title);
+  flowNodes.push({ id: `p-${def.slug}`, column: 'pattern', label: title, tone: def.layer as Tone, href: patternHref(title) });
+}
+const threatFlowBase = {
+  title: 'Ten agentic threats and the pattern that holds each',
+  desc: `The ten OWASP agentic threats, each flowing to the one pattern chapter 23 assigns it; ${threatsBy.size} patterns, each in its stack-layer colour.`,
+  source: 'chapter 23, "Threats mapped to controls"',
+  asOf: AGENT_THREATS_AS_OF,
+  mode: 'figc' as const,
+  columns: [
+    { key: 'threat', label: 'OWASP agentic threat' },
+    { key: 'pattern', label: 'Pattern' },
+  ],
+  nodes: flowNodes,
+  links: flowLinks,
+  unit: 'threats',
+  unitOne: 'threat',
+  fromHeader: 'Threat',
+  toHeader: 'Pattern',
+  valueHeader: 'Threats',
+  tableCaption: 'Each OWASP agentic threat with the pattern chapter 23 assigns it',
+};
+const threatFlowWide = flow({ ...threatFlowBase, id: 'ag-threat-flow-w', width: 760 });
+const threatFlowNarrow = flow({ ...threatFlowBase, id: 'ag-threat-flow-n', width: NARROW_WIDTH });
+const topPattern = [...threatsBy].sort((a, b) => b[1].length - a[1].length)[0];
 
 const crossRefs = [
   {
@@ -348,6 +355,9 @@ const description =
       OWASP’s agentic list names the first principle <strong>least agency</strong>: avoid autonomy
       the task does not need. The cheapest agent control is the agent you did not build.
     </p>
+    <div class="ag-ladder">
+      <AutonomyLadder id="ag-autonomy" />
+    </div>
     <p class="section-foot">
       <a class="chapter-link" href={ch('What makes an agent a governance object')}>
         Autonomy levels and minimum controls in chapter 23 <span class="arrow" aria-hidden="true">→</span>
@@ -408,6 +418,15 @@ const description =
     title="Ten agentic threats, and the control for each."
     lede="The OWASP Top 10 for Agentic Applications 2026, each threat mapped to the control that contains it and the pattern that implements the control."
   >
+    <div class="ag-flow">
+      <Chart
+        id="ag-threat-flow"
+        title="Which pattern holds which threat"
+        caption={`Each threat flows to the one pattern chapter 23 assigns it; the width is the number of threats, the colour the pattern's stack layer. ${topPattern[0]} holds ${topPattern[1].length} of the ${agentThreats.length}. Select a threat for its row in the table below.`}
+        chart={threatFlowWide}
+        narrow={threatFlowNarrow}
+      />
+    </div>
     <div class="res-tablewrap">
       <table class="res-table ag-table">
         <caption class="visually-hidden">
@@ -422,7 +441,7 @@ const description =
         </thead>
         <tbody>
           {
-            threats.map((t) => (
+            agentThreats.map((t) => (
               <tr id={`threat-${t.id.toLowerCase()}`}>
                 <td class="c-name" data-label="Threat">
                   <span class="ag-id">{t.id}</span> {t.name}
@@ -439,7 +458,7 @@ const description =
     </div>
     <div class="ag-callout">
       <Callout kind="note" title="Illustrative, not a claim of conformity">
-        <p>The mappings are the book’s reading of the threats, reviewed as of 2026-09-24. The
+        <p>The mappings are the book’s reading of the threats, reviewed as of {AGENT_THREATS_AS_OF}. The
         full table in chapter 23 adds the related OWASP LLM 2026 entries, example MITRE ATLAS
         techniques and the stack layer, with sources.</p>
       </Callout>
@@ -537,6 +556,19 @@ const description =
 
   .ag-callout {
     margin-top: var(--s-5);
+  }
+
+  .ag-ladder {
+    margin-top: var(--s-6);
+  }
+
+  .ag-flow {
+    margin-bottom: var(--s-6);
+  }
+
+  .ag-ladder > :global(figure),
+  .ag-flow > :global(figure) {
+    margin: 0;
   }
 
   /* The control plane: the portrait figure beside the ten components it draws

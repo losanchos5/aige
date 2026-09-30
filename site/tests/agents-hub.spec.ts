@@ -99,7 +99,7 @@ test.describe('/agents hub', () => {
     await page.goto('/agents');
     await expect(page.locator('#patterns [data-resource-card]')).toHaveCount(6);
 
-    const rows = page.locator('#threats tbody tr');
+    const rows = page.locator('#threats table.ag-table tbody tr');
     await expect(rows).toHaveCount(10);
     await expect(rows.first()).toContainText('ASI01');
     await expect(rows.last()).toContainText('ASI10');

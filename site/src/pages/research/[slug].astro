@@ -13,6 +13,7 @@ import StatusLine from '../../components/StatusLine.astro';
 import PillarLink from '../../components/PillarLink.astro';
 import ContributeCta from '../../components/ContributeCta.astro';
 import Citation from '../../components/Citation.astro';
+import EvalBoundary from '../../components/EvalBoundary.astro';
 import { site } from '../../data/site';
 import { controlById, controlHref } from '../../data/controls';
 import { getPatternBySlug, patternPath } from '../../data/patterns';
@@ -59,6 +60,21 @@ const controls = d.relatedControls.map((id) => controlById(id)).filter((c) => c 
 const patternRows = d.relatedPatterns
   .map((slug) => getPatternBySlug(slug))
   .filter((p) => p !== undefined);
+
+// The EvalBoundary rings (the same figure as /frontier) head the section
+// "Five things inside the boundary" of the evaluation-environment note: its
+// rendered HTML is split after that H2 and the component set between the two
+// halves. Any other note, or this one without the heading, renders whole.
+const EVAL_NOTE = 'the-evaluation-environment-is-part-of-the-system';
+const noteHtml = theme.slug === EVAL_NOTE ? (entry.rendered?.html ?? '') : '';
+const boundaryH2 = /<h2\b[^>]*\sid="five-things-inside-the-boundary"[^>]*>[\s\S]*?<\/h2>/.exec(noteHtml);
+const boundarySplit =
+  boundaryH2 && !noteHtml.includes('__ASTRO_IMAGE_')
+    ? [noteHtml.slice(0, boundaryH2.index + boundaryH2[0].length), noteHtml.slice(boundaryH2.index + boundaryH2[0].length)]
+    : null;
+if (theme.slug === EVAL_NOTE && !boundarySplit) {
+  throw new Error(`research/${EVAL_NOTE}: no "Five things inside the boundary" heading to set the EvalBoundary figure under`);
+}
 
 const crumbs = [{ label: 'Research notes', href: '/research' }, { label: d.title }];
 
@@ -125,7 +141,17 @@ const jsonLd = [
   <StatusLine version={d.version} status={d.status} reviewers={reviewers} />
   {/* Hub and spoke: each note points at the /ai-governance pillar once. */}
   <PillarLink lead="A technical note on one open question of" anchor="AI governance engineering" />
-  <Content />
+  {
+    boundarySplit ? (
+      <>
+        <Fragment set:html={boundarySplit[0]} />
+        <EvalBoundary id="rn-eval-boundary" />
+        <Fragment set:html={boundarySplit[1]} />
+      </>
+    ) : (
+      <Content />
+    )
+  }
   {
     controls.length > 0 && (
       <section aria-labelledby="related-controls">

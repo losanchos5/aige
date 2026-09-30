@@ -357,7 +357,7 @@ export const frontierOpenQuestions: readonly string[] = [
 // ---------------------------------------------------------------------------
 // Checks.
 
-const LAB_NAMES = /\b(OpenAI|Anthropic|DeepMind|Google|Meta|xAI)\b/;
+export const LAB_NAMES = /\b(OpenAI|Anthropic|DeepMind|Google|Meta|xAI)\b/;
 
 /** Every string of copy rendered outside the source list. */
 export function frontierCopy(): string[] {
