@@ -1,0 +1,528 @@
+---
+/**
+ * AiActDeadlines: the body of /resources/ai-act-deadlines (English) and of its
+ * hand-written Spanish twin /es/resources/ai-act-deadlines. Everything dated
+ * comes from src/data/ai-act-timeline.ts; the interface strings below are
+ * written in both languages by hand, not machine-translated. No script.
+ */
+import CitedText from './CitedText.astro';
+import SourceList from './SourceList.astro';
+import {
+  AI_ACT_TIMELINE_AS_OF,
+  AI_ACT_TIMELINE_REVIEW_BY,
+  aiActMilestones,
+  nextMilestones,
+  spain,
+  timelineSources,
+  updates,
+  type SpainStatus,
+  type TimelineMilestone,
+} from '../data/ai-act-timeline';
+import {
+  DEADLINES_ICS_PATH,
+  DEADLINES_JSON_PATH,
+  DEADLINES_PATH,
+  milestoneAnchor,
+  milestoneObligations,
+  type DeadlinesLang,
+} from '../lib/ai-act-deadlines';
+import { formatDate, formatDateEs } from '../lib/applies-now';
+
+interface Props {
+  lang: DeadlinesLang;
+}
+
+const { lang } = Astro.props;
+const es = lang === 'es';
+const fmt = (iso: string) => (es ? formatDateEs(iso) : formatDate(iso));
+
+const UI = {
+  en: {
+    notice: 'Indicative, not legal advice',
+    noticeBody: `Dates as Regulation (EU) 2024/1689 states them after the Digital Omnibus, Regulation (EU) 2026/1744. The page was last checked on ${formatDate(AI_ACT_TIMELINE_AS_OF)} and is due for review on ${formatDate(AI_ACT_TIMELINE_REVIEW_BY)}.`,
+    next: 'Next deadline',
+    nextNone: 'Every milestone on this page has passed.',
+    asOf: `as of ${formatDate(AI_ACT_TIMELINE_AS_OF)}`,
+    timeline: 'The timeline',
+    timelineLede: 'Every date on which something under the AI Act starts to apply, from entry into force to the last transitional deadline.',
+    applied: 'Applies',
+    upcoming: 'Upcoming',
+    articles: 'Articles',
+    who: 'Who',
+    rows: 'In the register',
+    moved: 'Moved by the Omnibus from',
+    changed: 'What changed with the Digital Omnibus',
+    changedLede: 'The Omnibus moved the high-risk dates and added new ones. Earlier dates in the original text are shown next to the dates that now apply.',
+    colWhat: 'What',
+    colFrom: 'Original date',
+    colTo: 'Date now',
+    colBasis: 'Basis',
+    newDate: 'New date',
+    spain: 'Spain: supervisor, sandbox and a bill',
+    spainLede: 'Spain has a working AI supervisor and a sandbox, and a national AI bill that is still in parliament.',
+    status: { bill: 'Bill, not law', 'in-force': 'In force', call: 'Open call', guidance: 'Guidance' } as Record<SpainStatus, string>,
+    updated: 'How this page is updated',
+    updatedBody: `The page is updated by milestone: when a date passes, the milestone is checked against its sources, marked as applying and dated. The site's test suite fails if a milestone passes without that check, so the page cannot quietly go stale. Last checked ${formatDate(AI_ACT_TIMELINE_AS_OF)}; next review ${formatDate(AI_ACT_TIMELINE_REVIEW_BY)}.`,
+    changelog: 'Changelog',
+    downloads: 'Downloads',
+    json: 'All milestones as JSON (English and Spanish)',
+    ics: 'Upcoming milestones as a calendar (.ics)',
+    related: 'Related',
+    sources: 'Sources',
+    source: (n: number) => `Source ${n}`,
+    other: 'Leer en español',
+    otherLang: 'es',
+    links: [
+      { href: '/obligations', label: 'The obligation register' },
+      { href: '/toolkit/obligations-planner', label: 'Obligations and deadlines planner' },
+      { href: '/figures/eu-ai-act-timeline', label: 'The EU AI Act timeline poster' },
+      { href: '/bok/eu-ai-act#the-post-omnibus-timeline', label: 'Chapter 18: the post-Omnibus timeline' },
+      { href: '/bok/ai-laws-worldwide#spain-aesia-the-sandbox-and-a-bill', label: 'Chapter 21: Spain' },
+    ],
+  },
+  es: {
+    notice: 'Orientativo, no es asesoramiento jurídico',
+    noticeBody: `Fechas tal como las fija el Reglamento (UE) 2024/1689 tras el Digital Omnibus, el Reglamento (UE) 2026/1744. La página se revisó por última vez el ${formatDateEs(AI_ACT_TIMELINE_AS_OF)} y toca revisarla el ${formatDateEs(AI_ACT_TIMELINE_REVIEW_BY)}.`,
+    next: 'Próximo plazo',
+    nextNone: 'Todos los hitos de esta página ya han pasado.',
+    asOf: `a ${formatDateEs(AI_ACT_TIMELINE_AS_OF)}`,
+    timeline: 'La línea temporal',
+    timelineLede: 'Cada fecha en la que empieza a aplicarse algo del Reglamento de IA, desde la entrada en vigor hasta el último plazo transitorio.',
+    applied: 'Se aplica',
+    upcoming: 'Pendiente',
+    articles: 'Artículos',
+    who: 'A quién',
+    rows: 'En el registro',
+    moved: 'Trasladado por el Omnibus desde el',
+    changed: 'Qué cambió con el Digital Omnibus',
+    changedLede: 'El Omnibus retrasó las fechas de alto riesgo y añadió otras nuevas. Junto a cada fecha vigente se muestra la del texto original.',
+    colWhat: 'Qué',
+    colFrom: 'Fecha original',
+    colTo: 'Fecha actual',
+    colBasis: 'Base',
+    newDate: 'Fecha nueva',
+    spain: 'España: autoridad, entorno de pruebas y un proyecto de ley',
+    spainLede: 'España tiene una autoridad de supervisión de la IA en marcha y un entorno de pruebas, y un proyecto de ley de IA que sigue en tramitación parlamentaria.',
+    status: { bill: 'Proyecto, no es ley', 'in-force': 'En vigor', call: 'Convocatoria abierta', guidance: 'Guías' } as Record<SpainStatus, string>,
+    updated: 'Cómo se actualiza esta página',
+    updatedBody: `La página se actualiza por hitos: cuando pasa una fecha, el hito se contrasta con sus fuentes, se marca como aplicable y se fecha. Las pruebas del sitio fallan si un hito pasa sin esa revisión, así que la página no puede quedarse desfasada sin que se note. Última revisión: ${formatDateEs(AI_ACT_TIMELINE_AS_OF)}; próxima: ${formatDateEs(AI_ACT_TIMELINE_REVIEW_BY)}.`,
+    changelog: 'Registro de cambios',
+    downloads: 'Descargas',
+    json: 'Todos los hitos en JSON (inglés y español)',
+    ics: 'Hitos pendientes como calendario (.ics)',
+    related: 'Relacionado',
+    sources: 'Fuentes',
+    source: (n: number) => `Fuente ${n}`,
+    other: 'Read in English',
+    otherLang: 'en',
+    links: [
+      { href: '/obligations', label: 'El registro de obligaciones (en inglés)' },
+      { href: '/toolkit/obligations-planner', label: 'Planificador de obligaciones y plazos (en inglés)' },
+      { href: '/figures/eu-ai-act-timeline-es', label: 'El póster de la línea temporal del Reglamento' },
+      { href: '/bok/eu-ai-act#the-post-omnibus-timeline', label: 'Capítulo 18: la línea temporal tras el Omnibus (en inglés)' },
+      { href: '/bok/ai-laws-worldwide#spain-aesia-the-sandbox-and-a-bill', label: 'Capítulo 21: España (en inglés)' },
+    ],
+  },
+}[lang];
+
+// Read from the as-of date, like the applied/upcoming badges, so the callout
+// and the timeline always agree (the site is only rebuilt on push).
+const next = nextMilestones(AI_ACT_TIMELINE_AS_OF, 1)[0];
+
+const cites = (m: { sources: readonly number[] }) => m.sources.map((n) => `[${n}]`).join('');
+
+// The "what changed" table: every date the Omnibus moved, then every date it
+// created (basis 'omnibus' with no earlier date).
+const shifted = aiActMilestones.flatMap((m) => (m.changed ?? []).map((shift) => ({ m, from: shift.from })));
+const created = aiActMilestones.filter((m) => m.basis === 'omnibus' && !(m.changed ?? []).length);
+const basisLabel = (m: TimelineMilestone) =>
+  m.basis === 'omnibus' ? (es ? 'Reglamento (UE) 2026/1744' : 'Regulation (EU) 2026/1744') : (es ? 'Reglamento (UE) 2024/1689' : 'Regulation (EU) 2024/1689');
+---
+
+<div class="aad">
+  <p class="aad-switch">
+    <a href={DEADLINES_PATH[UI.otherLang as DeadlinesLang]} hreflang={UI.otherLang} lang={UI.otherLang}>{UI.other}</a>
+  </p>
+
+  <section class="res-section aad-top" aria-labelledby="aad-next">
+    <div class="aad-next">
+      <h2 id="aad-next" class="aad-eyebrow">{UI.next}</h2>
+      {
+        next ? (
+          <p class="aad-next-body">
+            <a href={`#${milestoneAnchor(next)}`} class="aad-next-date">
+              <time datetime={next.date}>{fmt(next.date)}</time>
+            </a>
+            <span class="aad-next-days">{UI.asOf}</span>
+            <span class="aad-next-title">{next.title[lang]}</span>
+          </p>
+        ) : (
+          <p>{UI.nextNone}</p>
+        )
+      }
+    </div>
+    <div class="aad-notice">
+      <p class="aad-eyebrow">{UI.notice}</p>
+      <p>{UI.noticeBody}</p>
+    </div>
+  </section>
+
+  <section class="res-section" aria-labelledby="aad-timeline">
+    <div class="res-section-head">
+      <h2 id="aad-timeline">{UI.timeline}</h2>
+      <p>{UI.timelineLede}</p>
+    </div>
+    <ol class="aad-timeline prose">
+      {
+        aiActMilestones.map((m) => {
+          const rows = milestoneObligations(m);
+          return (
+            <li id={milestoneAnchor(m)} class:list={['aad-m', `aad-m--${m.status}`]}>
+              <div class="aad-m-head">
+                <time datetime={m.date} class="aad-m-date">{fmt(m.date)}</time>
+                <span class:list={['badge', 'aad-badge', `aad-badge--${m.status}`]}>
+                  {m.status === 'applied' ? UI.applied : UI.upcoming}
+                </span>
+              </div>
+              <h3 class="aad-m-title">{m.title[lang]}</h3>
+              <p>
+                <CitedText text={`${m.applies[lang]} ${cites(m)}`} prefix="aad-src" label={UI.source} />
+              </p>
+              {(m.changed ?? []).map((shift) => (
+                <p class="aad-m-moved">
+                  {UI.moved} <time datetime={shift.from}>{fmt(shift.from)}</time>. {shift.note[lang]}
+                </p>
+              ))}
+              <dl class="aad-m-meta">
+                <div>
+                  <dt>{UI.articles}</dt>
+                  <dd>{m.articles.join(' · ')}</dd>
+                </div>
+                {m.who && (
+                  <div>
+                    <dt>{UI.who}</dt>
+                    <dd>{m.who[lang]}</dd>
+                  </div>
+                )}
+                {rows.length > 0 && (
+                  <div>
+                    <dt>{UI.rows}</dt>
+                    <dd>
+                      {rows.map((row, i) => (
+                        <>
+                          {i > 0 && ', '}
+                          <a href={row.href} aria-label={`${row.label}: ${row.name}`}>{row.label}</a>
+                        </>
+                      ))}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            </li>
+          );
+        })
+      }
+    </ol>
+  </section>
+
+  <section class="res-section" aria-labelledby="aad-changed">
+    <div class="res-section-head">
+      <h2 id="aad-changed">{UI.changed}</h2>
+      <p>{UI.changedLede}</p>
+    </div>
+    <div class="res-tablewrap">
+      <table class="res-table aad-table">
+        <thead>
+          <tr>
+            <th scope="col">{UI.colWhat}</th>
+            <th scope="col">{UI.colFrom}</th>
+            <th scope="col">{UI.colTo}</th>
+            <th scope="col">{UI.colBasis}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            shifted.map(({ m, from }) => (
+              <tr>
+                <td data-label={UI.colWhat}><a href={`#${milestoneAnchor(m)}`}>{m.title[lang]}</a></td>
+                <td data-label={UI.colFrom}><time datetime={from}>{fmt(from)}</time></td>
+                <td data-label={UI.colTo}><time datetime={m.date}>{fmt(m.date)}</time></td>
+                <td data-label={UI.colBasis}>{basisLabel(m)}, {m.articles[0]}</td>
+              </tr>
+            ))
+          }
+          {
+            created.map((m) => (
+              <tr>
+                <td data-label={UI.colWhat}><a href={`#${milestoneAnchor(m)}`}>{m.title[lang]}</a></td>
+                <td data-label={UI.colFrom}>{UI.newDate}</td>
+                <td data-label={UI.colTo}><time datetime={m.date}>{fmt(m.date)}</time></td>
+                <td data-label={UI.colBasis}>{basisLabel(m)}, {m.articles[0]}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="res-section" aria-labelledby="aad-spain" id="spain">
+    <div class="res-section-head">
+      <h2 id="aad-spain">{UI.spain}</h2>
+      <p>{UI.spainLede}</p>
+    </div>
+    <ul class="aad-spain prose">
+      {
+        spain.map((entry) => (
+          <li class:list={['aad-card', `aad-card--${entry.status}`]} id={`es-${entry.id}`}>
+            <p class="aad-card-head">
+              <span class="badge">{UI.status[entry.status]}</span>
+              {entry.date && <time datetime={entry.date}>{fmt(entry.date)}</time>}
+            </p>
+            <h3>{entry.title[lang]}</h3>
+            <p>
+              <CitedText text={`${entry.body[lang]} ${cites(entry)}`} prefix="aad-src" label={UI.source} />
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="res-section prose" aria-labelledby="aad-updated">
+    <h2 id="aad-updated">{UI.updated}</h2>
+    <p>{UI.updatedBody}</p>
+    <h3>{UI.changelog}</h3>
+    <ul class="aad-log">
+      {
+        [...updates].reverse().map((u) => (
+          <li>
+            <time datetime={u.date}>{fmt(u.date)}</time>: {u.note[lang]}
+          </li>
+        ))
+      }
+    </ul>
+    <h3>{UI.downloads}</h3>
+    <ul>
+      <li><a href={DEADLINES_JSON_PATH} download data-umami-event="download" data-umami-event-file="ai-act-deadlines.json">{UI.json}</a></li>
+      <li><a href={DEADLINES_ICS_PATH[lang]} download data-umami-event="download" data-umami-event-file={`ai-act-deadlines-${lang}.ics`}>{UI.ics}</a></li>
+    </ul>
+    <h3>{UI.related}</h3>
+    <ul>
+      {UI.links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+    </ul>
+  </section>
+
+  <section class="res-section prose" aria-labelledby="aad-sources">
+    <h2 id="aad-sources">{UI.sources}</h2>
+    <SourceList sources={timelineSources} prefix="aad-src" />
+  </section>
+</div>
+
+<style>
+  .aad-switch {
+    margin: 0 0 var(--s-4);
+    font-size: var(--fs-small);
+  }
+
+  .aad-top {
+    display: grid;
+    gap: var(--s-5);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (min-width: 900px) {
+    .aad-top {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+
+  .aad-eyebrow {
+    margin: 0 0 var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 400;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .aad-next,
+  .aad-notice {
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+  }
+
+  .aad-notice p:last-child {
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  .aad-next-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-3);
+    margin: 0;
+  }
+
+  .aad-next-date {
+    font-family: var(--font-display);
+    font-size: var(--fs-h2);
+    font-weight: 600;
+    letter-spacing: var(--tracking-display);
+    color: var(--ink);
+  }
+
+  .aad-next-days {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .aad-next-title {
+    flex-basis: 100%;
+    color: var(--ink-2);
+  }
+
+  .aad-timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+  }
+
+  .aad-m {
+    position: relative;
+    margin: 0;
+    padding: 0 0 var(--s-6) var(--s-6);
+    border-left: 2px solid var(--line);
+    scroll-margin-top: var(--anchor-offset);
+  }
+
+  .aad-m::before {
+    content: '';
+    position: absolute;
+    top: 0.45em;
+    left: -7px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    background: var(--bg);
+  }
+
+  .aad-m--applied::before {
+    background: var(--ink);
+  }
+
+  .aad-m:last-child {
+    padding-bottom: 0;
+  }
+
+  .aad-m-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-3);
+  }
+
+  .aad-m-date {
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .aad-badge--applied {
+    border-color: var(--ok);
+    color: var(--ok);
+  }
+
+  .aad-m-title {
+    margin: var(--s-2) 0 var(--s-2);
+  }
+
+  .aad-m-moved {
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .aad-m-meta {
+    display: grid;
+    gap: var(--s-1);
+    margin: var(--s-3) 0 0;
+    font-size: var(--fs-small);
+  }
+
+  .aad-m-meta div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-2);
+  }
+
+  .aad-m-meta dt {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
+    line-height: 1.9;
+  }
+
+  .aad-m-meta dd {
+    margin: 0;
+    color: var(--ink-2);
+  }
+
+  .aad-spain {
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: minmax(0, 1fr);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: none;
+  }
+
+  @media (min-width: 900px) {
+    .aad-spain {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  .aad-card {
+    margin: 0;
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    scroll-margin-top: var(--anchor-offset);
+  }
+
+  .aad-card h3 {
+    margin: var(--s-2) 0;
+  }
+
+  .aad-card p:last-child {
+    margin-bottom: 0;
+  }
+
+  .aad-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-3);
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+
+  .aad-card--bill .badge {
+    border-color: var(--block);
+    color: var(--block);
+  }
+</style>

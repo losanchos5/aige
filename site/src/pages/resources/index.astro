@@ -24,6 +24,7 @@ import { countWord } from '../../data/parts';
 import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { fitsSiteSuffix } from '../../lib/seo-title';
+import { aiActMilestones } from '../../data/ai-act-timeline';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
 
@@ -59,6 +60,14 @@ const entries = [
     description:
       'Every obligation the book maps, one page each: a stable id, the duty holder, the date it applies from, its status, the artefact that evidences it and its stack layer.',
     count: `${obligations.length} obligation pages · ${instrumentCount} instruments`,
+  },
+  {
+    title: 'AI Act deadlines',
+    href: '/resources/ai-act-deadlines',
+    swatch: 'var(--l2)',
+    description:
+      'What applies when under the EU AI Act after the Digital Omnibus, with the Spanish supervisor, sandbox and bill, in English and Spanish, updated by milestone.',
+    count: `${aiActMilestones.length} milestones · EN and ES`,
   },
   {
     title: 'Crosswalk',

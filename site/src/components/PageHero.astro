@@ -31,9 +31,11 @@ interface Props {
   /** Draw the gradient mesh layer (default true; false on Lighthouse routes). */
   mesh?: boolean;
   variant?: 'page' | 'res';
+  /** Page language, for the breadcrumb landmark's name. */
+  lang?: string;
 }
 
-const { title, lede, crumbs, related, mesh = true, variant = 'page' } = Astro.props;
+const { title, lede, crumbs, related, mesh = true, variant = 'page', lang = 'en' } = Astro.props;
 
 const landing = variant === 'page';
 ---
@@ -47,7 +49,7 @@ const landing = variant === 'page';
       {
         crumbs && (
           <div class="hero-eyebrow">
-            <Breadcrumb items={crumbs} />
+            <Breadcrumb items={crumbs} lang={lang} />
           </div>
         )
       }

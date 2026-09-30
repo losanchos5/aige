@@ -35,6 +35,18 @@ export function formatDate(iso: string): string {
   return `${d} ${MONTHS[m - 1]} ${y}`;
 }
 
+const MESES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+];
+
+/** `2026-12-02` -> `2 de diciembre de 2026`, the Spanish prose date. */
+export function formatDateEs(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number);
+  if (!y || !m || !d) throw new Error(`applies-now: not an ISO date: "${iso}"`);
+  return `${d} de ${MESES[m - 1]} de ${y}`;
+}
+
 /** The EU AI Act rows of the register, in register order. */
 export function euRows(): Obligation[] {
   return obligations.filter((row) => row.frameworkId === EU_ID);

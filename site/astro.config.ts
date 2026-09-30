@@ -223,6 +223,24 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
     '/obligations',
     ['src/pages/obligations/index.astro', 'src/data/frameworks.ts', 'src/lib/obligations.ts'],
   ],
+  // Hito 2 (ai-act-deadlines): the AI Act deadlines page, EN and hand-written ES,
+  // both built from the one bilingual timeline.
+  [
+    '/resources/ai-act-deadlines',
+    [
+      'src/pages/resources/ai-act-deadlines.astro',
+      'src/components/AiActDeadlines.astro',
+      'src/data/ai-act-timeline.ts',
+    ],
+  ],
+  [
+    '/es/resources/ai-act-deadlines',
+    [
+      'src/pages/es/resources/ai-act-deadlines.astro',
+      'src/components/AiActDeadlines.astro',
+      'src/data/ai-act-timeline.ts',
+    ],
+  ],
   ['/resources/data', ['src/pages/resources/data.astro', 'src/lib/api.ts']],
   ['/mcp', ['src/pages/mcp.astro']],
   // One page per incident case, all rendered from the same template and dataset.
@@ -560,7 +578,8 @@ export default defineConfig({
       // the pages' hreflang tags and the language switcher use, so the sitemap
       // and the HTML always agree (and x-default is included); the home and the
       // /<lang> landings are not translations of each other and get none. With
-      // the machine translations switched off, only /thesis and /es/thesis pair.
+      // the machine translations switched off, only the hand-written pairs
+      // (HAND_TRANSLATED_ES: /thesis and /resources/ai-act-deadlines) pair.
       i18n: {
         defaultLocale: DEFAULT_LOCALE,
         locales: Object.fromEntries(LOCALES.map((lang) => [lang, lang])),

@@ -12,9 +12,11 @@ interface Props {
   text: string;
   /** The id prefix of the source list rows (`<prefix>-<n>`). */
   prefix?: string;
+  /** Accessible name of chip `n` (default `Source n`), for pages in another language. */
+  label?: (n: number) => string;
 }
 
-const { text, prefix = 'src' } = Astro.props;
+const { text, prefix = 'src', label = (n: number) => `Source ${n}` } = Astro.props;
 const segments = citeSegments(text);
 ---
 
@@ -22,7 +24,7 @@ const segments = citeSegments(text);
   segments.map((segment) =>
     'cite' in segment ? (
       <sup>
-        <a class="cite" href={`#${prefix}-${segment.cite}`} aria-label={`Source ${segment.cite}`}>
+        <a class="cite" href={`#${prefix}-${segment.cite}`} aria-label={label(segment.cite)}>
           {segment.cite}
         </a>
       </sup>

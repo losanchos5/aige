@@ -1,6 +1,13 @@
 import { test, expect } from '@playwright/test';
 
-const paths = ['/', '/bok', '/bok/the-stack', '/thesis'];
+const paths = [
+  '/',
+  '/bok',
+  '/bok/the-stack',
+  '/thesis',
+  '/resources/ai-act-deadlines',
+  '/es/resources/ai-act-deadlines',
+];
 
 for (const path of paths) {
   test(`${path} returns 200 and renders an <h1>`, async ({ page }) => {

@@ -30,6 +30,7 @@ module.exports = {
         '/resources/crosswalk',
         '/resources/frontier-safety-crosswalk',
         '/obligations',
+        '/resources/ai-act-deadlines',
         '/patterns',
         '/figures',
         '/toolkit',

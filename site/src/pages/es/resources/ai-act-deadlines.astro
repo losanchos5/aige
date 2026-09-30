@@ -1,0 +1,82 @@
+---
+// /es/resources/ai-act-deadlines: the Spanish page of the AI Act deadlines,
+// written by hand (not a machine translation), from the same bilingual data
+// as /resources/ai-act-deadlines. Like /es/thesis it is always published and
+// pairs with the English page through HAND_TRANSLATED_ES (lib/i18n-content.ts).
+import Base from '../../../layouts/Base.astro';
+import '../../../styles/reading.css';
+import PageHero from '../../../components/PageHero.astro';
+import AiActDeadlines from '../../../components/AiActDeadlines.astro';
+import { site } from '../../../data/site';
+import { AI_ACT_TIMELINE_AS_OF, aiActMilestones } from '../../../data/ai-act-timeline';
+import { DEADLINES_PATH } from '../../../lib/ai-act-deadlines';
+import { breadcrumbJsonLd } from '../../../lib/breadcrumbs';
+import { alternatesFor } from '../../../lib/i18n-content';
+import { fitsSiteSuffix } from '../../../lib/seo-title';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../../lib/jsonld';
+import '../../../styles/resources.css';
+import '../../../styles/pages.css';
+
+const seoTitle = 'Plazos del Reglamento de IA';
+const description =
+  'Todas las fechas de aplicación del Reglamento europeo de IA tras el Digital Omnibus, con sus artículos, y la AESIA, el sandbox y el proyecto de ley español.';
+const crumbs = [{ label: 'Recursos', href: '/resources' }, { label: 'Plazos del AI Act' }];
+
+const pageUrl = new URL(DEADLINES_PATH.es, site.url).href;
+const enUrl = new URL(DEADLINES_PATH.en, site.url).href;
+// breadcrumbJsonLd opens every trail with an English "Home"; this page is in
+// Spanish, so its first crumb reads "Inicio" (as on /es/thesis).
+const crumbList = breadcrumbJsonLd(crumbs);
+const breadcrumb = {
+  ...crumbList,
+  itemListElement: (crumbList.itemListElement as Record<string, unknown>[]).map((item, i) =>
+    i === 0 ? { ...item, name: 'Inicio' } : item,
+  ),
+};
+const jsonLd = [
+  {
+    '@type': 'TechArticle',
+    '@id': `${pageUrl}#article`,
+    headline: 'Plazos del AI Act tras el Digital Omnibus: qué se aplica y cuándo',
+    description,
+    url: pageUrl,
+    inLanguage: 'es',
+    dateModified: AI_ACT_TIMELINE_AS_OF,
+    image: new URL('/og/ai-act-deadlines.png', site.url).href,
+    author: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    translationOfWork: { '@id': `${enUrl}#article` },
+    about: ['Reglamento (UE) 2024/1689', 'Reglamento (UE) 2026/1744'],
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+  },
+  ...authorNodes,
+  breadcrumb,
+];
+---
+
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/ai-act-deadlines.png"
+  imageAlt={`Tarjeta de «EU AI Act deadlines», en inglés · ${site.name}`}
+  jsonLd={jsonLd}
+  alternates={alternatesFor(DEADLINES_PATH.es)}
+  article={{ modifiedTime: `${AI_ACT_TIMELINE_AS_OF}T00:00:00Z` }}
+  lang="es"
+  locale="es_ES"
+>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    mesh={false}
+    lang="es"
+    title="Plazos del AI Act tras el Digital Omnibus: qué se aplica y cuándo"
+    lede={`Las ${aiActMilestones.length} fechas en las que empieza a aplicarse algo del Reglamento (UE) 2024/1689, tal como las dejó el Reglamento (UE) 2026/1744, con los artículos que activa cada una, a quién afecta y qué trasladó el Omnibus. Para España: la autoridad de supervisión, el entorno de pruebas y el proyecto de ley de IA, que sigue en tramitación parlamentaria.`}
+  />
+
+  <div class="container res-page">
+    <AiActDeadlines lang="es" />
+  </div>
+</Base>

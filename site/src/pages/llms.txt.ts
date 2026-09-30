@@ -17,6 +17,7 @@ import { chaptersOrdered, chapterParts } from '../data/chapters';
 import { patternPath } from '../data/patterns';
 import { site } from '../data/site';
 import { obligations, obligationPath } from '../data/frameworks';
+import { aiActMilestones } from '../data/ai-act-timeline';
 import { figures } from '../data/figures';
 import { cases } from '../data/cases';
 import { comparisons, comparisonPath } from '../data/comparisons';
@@ -148,6 +149,11 @@ export const GET: APIRoute = async (context) => {
         'The same register as one row per obligation.',
       ),
       page('Obligation register (JSON)', '/resources/obligations.json', 'The same register as JSON.'),
+      page(
+        'EU AI Act deadlines',
+        '/resources/ai-act-deadlines',
+        `What applies when under the EU AI Act after the Digital Omnibus (Regulation (EU) 2026/1744): ${aiActMilestones.length} dated milestones with the articles they switch on, what the Omnibus moved, and the Spanish supervisor (AESIA), sandbox and national AI bill (not yet law). Updated by milestone; also in Spanish at /es/resources/ai-act-deadlines, with JSON and ICS downloads. Indicative, not legal advice.`,
+      ),
       page(
         'Frameworks',
         '/resources/frameworks',

@@ -11,6 +11,7 @@ export const OG_ROUTE_TITLES: Readonly<Record<string, string>> = {
   // The pillar page's own card: it names the query the page answers.
   'ai-governance': 'What is AI governance?',
   thesis: 'The Thesis',
+  'ai-act-deadlines': 'EU AI Act deadlines',
   bok: 'Body of Knowledge',
   role: 'The AI Governance Engineer',
   stack: 'The five-layer stack',

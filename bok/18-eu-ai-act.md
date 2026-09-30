@@ -727,6 +727,10 @@ their design changes significantly after that date (`Art. 111(2)` as amended) [2
 change in design" is therefore an event the pipeline should log, with the reasoning, every time a
 legacy system is modified.
 
+The [AI Act deadlines](/resources/ai-act-deadlines) page keeps this table current by milestone, in
+English and [Spanish](/es/resources/ai-act-deadlines), with the articles each date switches on and a
+calendar file to subscribe to.
+
 ## What you can do this week
 
 1. **Add three fields to every registry entry:** `eu_roles` (a list, per system), `risk_rung` with
