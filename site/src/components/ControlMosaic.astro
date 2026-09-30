@@ -473,9 +473,11 @@ const tableCaption = 'Every control by profile, with its home layer and failure 
     }
   }
 
+  /* A translate, not a scaleY: a squashed square is a 2 px link target, which
+     Lighthouse's target-size audit measures mid-animation below the fold. */
   @keyframes cmo-rise {
     from {
-      transform: scaleY(0.1);
+      transform: translateY(1.5rem);
     }
 
     to {
