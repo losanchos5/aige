@@ -2,14 +2,14 @@
 /**
  * RegulatoryClock: when a set of register rows starts to apply, as a wide
  * staircase (560) and a narrow agenda (340) in one Chart, drawn by
- * lib/page-visuals/obligation-clock.ts from the rows' own dates, statuses and
+ * lib/page-visuals/register-clock-rows.ts from the rows' own dates, statuses and
  * steps, against the newest review date among them (never the build clock).
  * Renders nothing when no row has a date. Per-item template (pattern and
  * audience pages): not registered in figures.ts. The page must load
  * figures.css (reading.css), as the SVGs are in 'figc' mode.
  */
 import Chart from './Chart.astro';
-import { obligationClock } from '../lib/page-visuals/obligation-clock';
+import { obligationClock } from '../lib/page-visuals/register-clock-rows';
 import type { Obligation } from '../data/frameworks';
 import '../styles/time-charts.css';
 

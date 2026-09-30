@@ -3,8 +3,12 @@
    /obligations (HTML squares) and the forced-colours and print rules of the
    application clock (/obligations) and the application strip
    (/obligations/<id>), which are SVGs of the kit's classes in either style
-   mode. Colours only through tokens; status is a drawing (solid, half, outline,
-   hatched, dashed, dotted), never a colour. */
+   mode. Colours only through tokens; status is a drawing, never a colour. The
+   squares restate the site-wide status encoding (appliesStatusMark in
+   data/frameworks.ts) on a square: the drawing is the mark's (solid, outline,
+   dashed, hatched) and a triangle is the square's lower-left half, cut on the
+   diagonal (solid for grace, a dashed square split by its diagonal for draft
+   or proposed). */
 
 /* ---- Status squares (ObligationIsotype.astro) ------------------------------ */
 .obi-sq,
@@ -23,7 +27,7 @@
   border-color: var(--ink-2);
 }
 
-/* In force, softened by a grace period: half solid, like the clock's triangle. */
+/* In force, softened by a grace period: a filled triangle, half solid. */
 :is(.obi-sq, .obi-swatch).st-grace {
   background: linear-gradient(135deg, color-mix(in srgb, var(--ink) 55%, var(--bg)) 0 50%, var(--bg) 50% 100%);
 }
@@ -40,9 +44,15 @@
   border-style: dashed;
 }
 
+/* Draft or proposed: a dashed triangle, the dashed square cut by its diagonal. */
 :is(.obi-sq, .obi-swatch).st-pending {
-  border-style: dotted;
-  border-width: 2px;
+  border-style: dashed;
+  background: linear-gradient(
+    135deg,
+    var(--bg) calc(50% - 0.75px),
+    var(--ink) calc(50% - 0.75px) calc(50% + 0.75px),
+    var(--bg) calc(50% + 0.75px)
+  );
 }
 
 @media print {
@@ -206,7 +216,8 @@
 
 /* ---- Forced colours --------------------------------------------------------- */
 /* Backgrounds and authored SVG colours give way to the system palette; keep
-   solid, half, outlined, hatched, dashed and dotted in system colours. */
+   solid, half, outlined, hatched, dashed and the cut dashed square in system
+   colours. */
 @media (forced-colors: active) {
   .obi-sq,
   .obi-swatch {
@@ -225,6 +236,15 @@
 
   :is(.obi-sq, .obi-swatch).st-deferred {
     background: repeating-linear-gradient(-45deg, CanvasText 0 1.4px, Canvas 1.4px 3.6px);
+  }
+
+  :is(.obi-sq, .obi-swatch).st-pending {
+    background: linear-gradient(
+      135deg,
+      Canvas calc(50% - 0.75px),
+      CanvasText calc(50% - 0.75px) calc(50% + 0.75px),
+      Canvas calc(50% + 0.75px)
+    );
   }
 
   svg:is(.ch-obclock, .ch-obstrip) {

@@ -42,7 +42,7 @@ const base = {
 const wide = controlChain({ ...base, id: 'ctl-anatomy-w', ...anatomyInput(c, 'row', 870) });
 const narrow = controlChain({ ...base, id: 'ctl-anatomy-n', ...anatomyInput(c, 'column', 340) });
 const caption =
-  'Read left to right: what failing looks like, where on the pipeline the control acts, how a third party checks it, what happens when it fails and the record it leaves. The full wording is in the table and in the record below.';
+  'Read the steps in order: what failing looks like, where on the pipeline the control acts, how a third party checks it, what happens when it fails and the record it leaves. The full wording is in the table and in the record below.';
 ---
 
 <Chart class="ctl-anatomy" chart={wide} narrow={narrow} title={title} caption={caption} tableLabel="Every step in full" />

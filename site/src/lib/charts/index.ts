@@ -81,6 +81,8 @@
 //     relations (RADIAL_MIN_RELATIONS): skip the figure, keep the lists.
 //     'list' (default under 480 wide) is the narrow variant. Table: Family |
 //     Item | Relation, every relation (a family draws at most 6, then "+N more").
+//     radialLabelWidth(width, layout, centre) is the room a node label gets,
+//     for callers that shorten their labels to fit.
 //
 //   bowTie({ preventive, event, detective?, responsive?, harms, evidence, kickers?,
 //            orientation?: 'row' | 'column', maxItems? })
@@ -165,7 +167,7 @@ export {
 export { lanes, type LaneMark, type LanesInput } from './lanes';
 export { venn3, type Venn3Input, type VennSet } from './venn';
 export { ladder, type LadderInput, type LadderStep } from './ladder';
-export { relationRadial, RADIAL_MIN_RELATIONS, type RelationFamily, type RelationItem, type RelationRadialInput, type RelationStrength } from './radial';
+export { relationRadial, radialLabelWidth, RADIAL_MIN_RELATIONS, type RelationFamily, type RelationItem, type RelationRadialInput, type RelationStrength } from './radial';
 export {
   bowTie,
   controlChain,

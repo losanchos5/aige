@@ -12,7 +12,11 @@
 //     milestones a few days apart never collide.
 //   vertical (narrow, 340): time top to bottom; labels right of the axis,
 //     pushed down with a leader when they would overlap; the as-of line runs
-//     across and is named in a key above the axis.
+//     across and is named in a key above the axis. Marks too close in time to
+//     sit apart on the axis take the next lane to its right.
+//
+// No two marks may overlap: the layout keeps them apart and a final check
+// throws, naming them, if they ever do.
 //
 // The labels are the links (to the milestone's anchor on the page), each
 // target 24 px or more tall; the marks carry a tooltip. Table: Date |
@@ -74,6 +78,20 @@ const ROWS = 4;
 const SHAPE: Record<'a' | 'b', Shape> = { a: 'circle', b: 'square' };
 
 const byCode = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
+/** Mark size (half-size 6) and the least gap between two marks. */
+const MARK = 12;
+const MARK_GAP = 2;
+
+/** Throws when two mark boxes (centre, MARK wide) come closer than `gap`. */
+function marksApart(where: string, placed: { m: AxisMilestone; cx: number; cy: number }[], gap: number): void {
+  placed.forEach((a, i) => {
+    for (const b of placed.slice(i + 1)) {
+      if (Math.abs(a.cx - b.cx) < MARK + gap && Math.abs(a.cy - b.cy) < MARK + gap) {
+        throw new Error(`charts(${where}): the marks of ${a.m.date} and ${b.m.date} overlap`);
+      }
+    }
+  });
+}
 
 export function milestoneAxis(input: MilestoneAxisInput): ChartOutput {
   const where = `milestoneAxis ${input.id}`;
@@ -214,9 +232,9 @@ export function milestoneAxis(input: MilestoneAxisInput): ChartOutput {
       const x = ts.map(t.date);
       out.push(`<line class="tick" x1="${r1(x)}" y1="${r1(axisY - 4)}" x2="${r1(x)}" y2="${r1(axisY + 4)}"/>`);
     }
-    for (const t of ts.ticks) out.push(text(ts.map(t.date), axisY + 19, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
     const labels: string[] = [];
     const marksOut: string[] = [];
+    const drawnMarks: { m: AxisMilestone; cx: number; cy: number }[] = [];
     for (const p of placed) {
       // Label baseline: rows grow away from the axis (below, under the years).
       const ly = p.above ? axisY - 36 - p.row * PITCH : axisY + BELOW + p.row * PITCH;
@@ -227,6 +245,18 @@ export function milestoneAxis(input: MilestoneAxisInput): ChartOutput {
       out.push(`<path class="tick" d="M${r1(p.x)} ${r1(p.above ? my - 7 : my + 7)}V${r1(y1)}"/>`);
       labels.push(label(p.m, p.left, ly, 'stack'));
       marksOut.push(mark(p.m, p.x, my));
+      drawnMarks.push({ m: p.m, cx: p.x, cy: my });
+    }
+    marksApart(where, drawnMarks, 0);
+    // The year labels sit over the leaders of the labels below the axis: a
+    // year a leader would cross gets a ground-coloured mask, so the leader
+    // passes behind it.
+    for (const t of ts.ticks) {
+      const tx = ts.map(t.date);
+      const half = textWidth(t.label, 12, 'mono') / 2 + 2;
+      const crossed = placed.some((p) => !p.above && Math.abs(p.x - tx) <= half);
+      if (crossed) out.push(`<rect class="hatch-bg" x="${r1(tx - half)}" y="${r1(axisY + 8)}" width="${r1(2 * half)}" height="15"/>`);
+      out.push(text(tx, axisY + 19, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
     }
     out.push(...labels, ...marksOut);
     bottom = Math.max(axisY + 20, axisY + BELOW - 20 + rowsBelow * PITCH);
@@ -237,9 +267,20 @@ export function milestoneAxis(input: MilestoneAxisInput): ChartOutput {
     out.push(text(L + 28, y + 14, todayText, { size: 12, cls: 'mono', where: 'today label' }));
     y += 34;
     const axisX = L + 44;
-    const labelX = axisX + 22;
     const len = Math.max(480, items.length * 36);
     const ts = timeScale(from, to, [y, y + len]);
+    // Lanes: a mark closer in time to an earlier one than a mark and a gap
+    // takes the next lane right of the axis; the labels start after the last.
+    const LANE = MARK + MARK_GAP;
+    const lanes: number[] = [];
+    items.forEach((m, i) => {
+      const ty = ts.map(m.date);
+      let k = 0;
+      while (items.slice(0, i).some((o, j) => lanes[j] === k && Math.abs(ts.map(o.date) - ty) < LANE)) k += 1;
+      lanes.push(k);
+    });
+    const laneX = (i: number) => axisX + lanes[i] * LANE;
+    const labelX = axisX + 22 + Math.max(...lanes) * LANE;
     out.push(`<line class="axis" x1="${axisX}" y1="${r1(y)}" x2="${axisX}" y2="${r1(y + len)}"/>`);
     for (const t of ts.ticks) {
       const ty = ts.map(t.date);
@@ -255,26 +296,20 @@ export function milestoneAxis(input: MilestoneAxisInput): ChartOutput {
     let prev = -Infinity;
     const labels: string[] = [];
     const room = W - L - labelX;
-    for (const m of items) {
+    items.forEach((m, i) => {
       const ty = ts.map(m.date);
       const one = textWidth(m.date, 12, 'mono') + 8 + labelW(m) <= room;
       if (!one) fitText(m.label, room, LABEL_PX, 'body', 'milestone label');
       const ly = Math.max(ty + 4, prev + 26);
-      if (ly - 4 > ty + 2) out.push(`<path class="tick" fill="none" d="M${axisX + 7} ${r1(ty)}L${labelX - 5} ${r1(ly - 4)}"/>`);
-      else out.push(`<line class="tick" x1="${axisX + 7}" y1="${r1(ty)}" x2="${labelX - 5}" y2="${r1(ty)}"/>`);
+      const x0 = laneX(i) + 7;
+      if (ly - 4 > ty + 2) out.push(`<path class="tick" fill="none" d="M${x0} ${r1(ty)}L${labelX - 5} ${r1(ly - 4)}"/>`);
+      else out.push(`<line class="tick" x1="${x0}" y1="${r1(ty)}" x2="${labelX - 5}" y2="${r1(ty)}"/>`);
       labels.push(label(m, labelX, ly, one ? 'line' : 'pair'));
       prev = ly + (one ? 0 : 15);
-    }
-    // Marks a few days apart would hide each other: every other one steps
-    // 8 px right (the left of the axis holds the years).
-    out.push(
-      ...labels,
-      ...items.map((m, i) => {
-        const ty = ts.map(m.date);
-        const near = items.some((o) => o !== m && Math.abs(ts.map(o.date) - ty) < 12);
-        return mark(m, axisX + (near && i % 2 ? 8 : 0), ty);
-      }),
-    );
+    });
+    const drawnMarks = items.map((m, i) => ({ m, cx: laneX(i), cy: ts.map(m.date) }));
+    marksApart(where, drawnMarks, MARK_GAP);
+    out.push(...labels, ...drawnMarks.map((d) => mark(d.m, d.cx, d.cy)));
     bottom = Math.max(y + len + 4, prev + 10);
   }
 

@@ -89,6 +89,23 @@ const HEAD = 22;
 const FAMILY_GAP = 10;
 /** Code-unit order, so the layout never depends on the build machine's locale. */
 const byCode = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
+/** Radial layout: the edge span from the centre box to the dots. */
+const SPAN = 48;
+/** List layout: the dots' x from the left margin. */
+const LIST_DOT = 40;
+
+/** Width of the radial centre box: it fits the label's longest word (an id
+ *  such as AIGE-CTL-AR-012), between 132 and 200. */
+const centreBoxW = (label: string): number =>
+  Math.round(Math.min(200, Math.max(132, Math.max(...label.split(/\s+/).map((word) => textWidth(word, 13.5))) + 20)));
+
+/** The room a node label gets in a relationRadial of this width, layout and
+ *  centre label: callers that shorten labels to fit cut them to it (a longer
+ *  one throws). */
+export function radialLabelWidth(width: number, layout: 'radial' | 'list', centre: string): number {
+  if (layout === 'list') return width - L - (L + LIST_DOT + 10);
+  return width / 2 - centreBoxW(centre) / 2 - SPAN - 10 - L;
+}
 
 /**
  * The ego network of one item, or null when it has fewer than three
@@ -121,7 +138,8 @@ export function relationRadial(input: RelationRadialInput): ChartOutput | null {
       return { f, words, items, shown, extra: items.length - shown.length };
     });
   type Fam = (typeof families)[number];
-  const strengths = new Set(families.flatMap((x) => x.items.map((i) => i.strength ?? 'core')));
+  // Only the edge styles drawn: items hidden behind "+N more" draw no edge.
+  const strengths = new Set(families.flatMap((x) => x.shown.map((i) => i.strength ?? 'core')));
   const out: string[] = [];
   const solid: string[] = [];
   const dashed: string[] = [];
@@ -166,12 +184,10 @@ export function relationRadial(input: RelationRadialInput): ChartOutput | null {
     // Two columns of sectors either side of the centre box.
     // The centre box fits its longest word (an id such as AIGE-CTL-AR-012),
     // between 132 and 200 wide; the label columns take the rest.
-    const longest = Math.max(...input.centre.label.split(/\s+/).map((word) => textWidth(word, 13.5)));
-    const boxW = Math.round(Math.min(200, Math.max(132, longest + 20)));
-    const span = 48;
+    const boxW = centreBoxW(input.centre.label);
     const cx = W / 2;
-    const dotR = cx + boxW / 2 + span;
-    const dotL = cx - boxW / 2 - span;
+    const dotR = cx + boxW / 2 + SPAN;
+    const dotL = cx - boxW / 2 - SPAN;
     const labelW = dotL - 10 - L;
     if (labelW < 100) throw new Error(`charts(${where}): width ${W} leaves ${Math.floor(labelW)}px per label column; use layout 'list'`);
     const sides: { fams: Fam[]; rows: number }[] = [
@@ -226,7 +242,7 @@ export function relationRadial(input: RelationRadialInput): ChartOutput | null {
     out.push(`<rect x="${L}" y="${r1(y)}" width="${W - 2 * L}" height="${r1(boxH)}" rx="8" class="mk mk-hi"/>`);
     lines.forEach((line, i) => out.push(text(L + 8, y + 8 + 13 + i * 17, line, { size: 13.5, weight: 600, cls: 'on-ink', where: 'centre label' })));
     const spineX = L + 10;
-    const dotX = L + 40;
+    const dotX = L + LIST_DOT;
     const labelX = dotX + 10;
     const labelW = W - L - labelX;
     let ty = y + boxH + 6;

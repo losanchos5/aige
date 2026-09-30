@@ -597,14 +597,56 @@ test('relationRadial draws nothing under three relations, so the page keeps its 
   expect(make(3)).not.toBeNull();
 });
 
+/** One element of an SVG: tag, attributes, parent (index, -1 at the root)
+ *  and its own text. */
+interface SvgEl {
+  tag: string;
+  attr: Record<string, string>;
+  parent: number;
+  text: string;
+}
+const unescape = (t: string) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+/** The SVG's elements in document order, parsed once, so the checks below
+ *  read elements, classes and parents, not the order of the serialisation. */
+function parseSvg(svg: string): SvgEl[] {
+  const els: SvgEl[] = [];
+  const open: number[] = [];
+  for (const m of svg.matchAll(/<(\/?)([a-zA-Z]+)((?:\s+[^\s=>/]+="[^"]*")*)\s*(\/?)>|([^<]+)/g)) {
+    if (m[5] !== undefined) {
+      if (open.length) els[open[open.length - 1]].text += unescape(m[5]);
+    } else if (m[1]) {
+      open.pop();
+    } else {
+      const attr = Object.fromEntries([...m[3].matchAll(/([^\s=]+)="([^"]*)"/g)].map((a) => [a[1], unescape(a[2])]));
+      els.push({ tag: m[2], attr, parent: open.length ? open[open.length - 1] : -1, text: '' });
+      if (!m[4]) open.push(els.length - 1);
+    }
+  }
+  return els;
+}
+const titleOf = (els: SvgEl[], i: number) => els.find((e) => e.parent === i && e.tag === 'title')?.text;
+
 /** Each node's drawing, keyed by its <title> (linked nodes carry it on the <a>). */
 const radialNodes = (svg: string) => {
+  const els = parseSvg(svg);
   const nodes = new Map<string, { state: string; tone: number }>();
-  for (const m of svg.matchAll(/<title>([^<]+)<\/title><circle[^>]*class="mk mk-(\w+)-(\d)"/g)) nodes.set(m[1], { state: m[2], tone: Number(m[3]) });
-  for (const m of svg.matchAll(/<circle[^>]*class="mk mk-(\w+)-(\d)"[^>]*><title>([^<]+)<\/title>/g)) nodes.set(m[3], { state: m[1], tone: Number(m[2]) });
+  els.forEach((e, i) => {
+    const m = e.tag === 'circle' ? /^mk mk-(\w+)-(\d)$/.exec(e.attr.class ?? '') : null;
+    const name = m && (titleOf(els, i) ?? (els[e.parent]?.tag === 'a' ? titleOf(els, e.parent) : undefined));
+    if (m && name) nodes.set(name, { state: m[1], tone: Number(m[2]) });
+  });
   return nodes;
 };
-const edges = (svg: string, cls: string) => (new RegExp(`<path class="${cls}" d="([^"]+)"`).exec(svg)?.[1].match(/L/g) ?? []).length;
+/** Straight segments drawn by the edge path of class `cls`. */
+const edges = (svg: string, cls: string) =>
+  (parseSvg(svg).find((e) => e.tag === 'path' && e.attr.class === cls)?.attr.d.match(/L/g) ?? []).length;
+/** Closed four-point paths shaped as a rhombus (top, right, bottom, left). */
+const diamondsIn = (svg: string) =>
+  parseSvg(svg).filter((e) => {
+    if (e.tag !== 'path' || !/Z\s*$/.test(e.attr.d ?? '') || /[CQAHV]/i.test(e.attr.d)) return false;
+    const pts = [...e.attr.d.matchAll(/[ML]\s*([\d.]+)[\s,]+([\d.]+)/g)].map((m) => [Number(m[1]), Number(m[2])]);
+    return pts.length === 4 && pts[0][0] === pts[2][0] && pts[1][1] === pts[3][1] && pts[1][0] > pts[3][0] && pts[2][1] > pts[0][1];
+  }).length;
 
 for (const layout of ['radial', 'list'] as const) {
   test(`relationRadial (${layout}): core relations are solid edges to filled nodes, related ones dashed to outlined nodes, layer tone only in a layered family`, () => {
@@ -666,9 +708,7 @@ for (const c of CHAINS) {
       expect(check, 'layer-coloured check').not.toBeNull();
       const [gx, gy] = [Number(check![1]), Number(check![2])];
       expect(gx >= last.x && gx + 24 <= last.x + last.w && gy >= last.y && gy + 24 <= last.y + last.h, 'glyph inside the terminal panel').toBe(true);
-      // A diamond: a closed path of four straight edges and nothing else.
-      const diamonds = svg.match(/d="M ?[\d.]+ [\d.]+ ?L ?[\d.]+ [\d.]+ ?L ?[\d.]+ [\d.]+ ?L ?[\d.]+ [\d.]+ ?Z"/g) ?? [];
-      expect(diamonds, 'the gate is the only diamond').toHaveLength(1);
+      expect(diamondsIn(svg), 'the gate is the only diamond').toBe(1);
       // Every hatch the chart uses has its pattern in the chart's own <defs>.
       for (const m of svg.matchAll(/url\(#([^)]+)\)/g)) expect(svg).toContain(`<pattern id="${m[1]}"`);
     }
@@ -691,7 +731,15 @@ for (const c of CHAINS) {
 
 test('controlChain lights exactly the enforcement points it is given on the four-stage track', () => {
   const { svg } = controlChain({ ...base, id: 'ch-p', title, desc, ...anatomy });
-  const lit = [...svg.matchAll(/class="mk mk-(fill|line)-0"\/><text[^>]*>(pre_merge|deploy|runtime|periodic)<\/text>/g)];
-  expect(lit.map((m) => m[2])).toEqual(['pre_merge', 'deploy', 'runtime', 'periodic']);
-  expect(lit.filter((m) => m[1] === 'fill').map((m) => m[2])).toEqual(anatomy.enforcement);
+  const els = parseSvg(svg);
+  const STAGES = ['pre_merge', 'deploy', 'runtime', 'periodic'];
+  // Each stage label and the mark drawn just before it in the same group.
+  const stages = els.flatMap((e, i) => {
+    if (e.tag !== 'text' || !STAGES.includes(e.text)) return [];
+    const mark = els.slice(0, i).reverse().find((o) => o.parent === e.parent && o.tag !== 'title');
+    return [{ stage: e.text, cls: mark?.attr.class ?? '' }];
+  });
+  expect(stages.map((x) => x.stage)).toEqual(STAGES);
+  expect(stages.filter((x) => /(^| )mk-fill-/.test(x.cls)).map((x) => x.stage)).toEqual(anatomy.enforcement);
+  expect(stages.filter((x) => /(^| )mk-line-/.test(x.cls)).map((x) => x.stage)).toEqual(STAGES.filter((k) => !anatomy.enforcement.includes(k as never)));
 });

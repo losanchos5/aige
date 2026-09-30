@@ -8,10 +8,9 @@
 // wrong as-of date or a stale link fails here. Owned elsewhere: the chart
 // kit's contract (chart-primitives.spec), the per-SVG byte budget and unique
 // ids (Chart.astro fails the build), axe in both themes (a11y.spec).
-import { readFileSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
 
-import { appliesStatusLabels, obligationPath, obligations, type Obligation } from '../src/data/frameworks';
+import { appliesStatusLabels, obligationPath, obligations, registerAsOf, type Obligation } from '../src/data/frameworks';
 import { patterns } from '../src/data/patterns';
 import { audiences } from '../src/data/audiences';
 import { controlHref, controls } from '../src/data/controls';
@@ -25,15 +24,16 @@ async function tableRows(page: Page, figure: string): Promise<string[][]> {
     .evaluateAll((trs) => trs.map((tr) => [...tr.children].map((cell) => (cell.textContent ?? '').trim())));
 }
 
-const newest = (rows: readonly Obligation[]) => rows.reduce((max, r) => (r.reviewed > max ? r.reviewed : max), '');
 const firstDate = (r: Obligation) => r.appliesFrom ?? [...(r.milestones ?? [])].map((m) => m.date).sort()[0];
 
 /**
  * The clock of `rows` on the page at `path`: one table row per first date
  * and per later step with the register's date, step and status (undated rows
- * as "No date"); every chip linked to its row and drawn in the fill the
- * legend gives its status; the as-of date is the newest review date of the
- * rows; the two counts split the dated rows at that date.
+ * as "No date"); every chip linked to its row and drawn in the mark the
+ * legend gives its status; later steps solid only once their date is on or
+ * before the as-of date (the square's meaning on /obligations too); the as-of
+ * date is the newest review date of the rows; the two counts split the dated
+ * rows at that date.
  */
 async function checkClock(page: Page, path: string, rows: readonly Obligation[]) {
   const FIG = '.chart-fig:has(svg.ch-clock)';
@@ -56,7 +56,7 @@ async function checkClock(page: Page, path: string, rows: readonly Obligation[])
   const key = (t: string[]) => t.join(' | ');
   expect(drawn.map(key).sort(), path).toEqual(expected.map(key).sort());
 
-  const asOf = newest(rows);
+  const asOf = registerAsOf(rows);
   const now = dated.filter((r) => firstDate(r)! <= asOf).length;
   const byHref = new Map(rows.map((r) => [obligationPath(r), r]));
   for (const variant of ['.chart-w', '.chart-n']) {
@@ -64,27 +64,56 @@ async function checkClock(page: Page, path: string, rows: readonly Obligation[])
     const texts = await svg.locator('text').allTextContents();
     expect(texts, `${path} ${variant}: as-of date`).toContain(`As of ${asOf}`);
     const counts = texts.join(' ');
-    if (now) expect(counts, `${path} ${variant}`).toContain(`${now} already apply`);
+    if (now) expect(counts, `${path} ${variant}`).toContain(`${now} ${now === 1 ? 'already applies' : 'already apply'}`);
     if (dated.length - now) expect(counts, `${path} ${variant}`).toContain(`${dated.length - now} still to come`);
 
-    // The legend: each status's label and the class of its swatch.
+    // The legend: each entry's label and the look (element and class) of its swatch.
     const legend = await svg.evaluate((el) => {
       const out: Record<string, string> = {};
       const labels = [...el.querySelectorAll(':scope > text')];
       for (const t of labels) {
         const prev = t.previousElementSibling;
-        if (prev && prev.tagName === 'circle') out[t.textContent ?? ''] = (prev.getAttribute('class') ?? '').replace(/-\d$/, '');
+        if (prev && prev.matches('[class~="mk"]')) out[t.textContent ?? ''] = `${prev.tagName} ${(prev.getAttribute('class') ?? '').replace(/-\d$/, '')}`;
       }
       return out;
     });
     const chips = await svg.locator('a').evaluateAll((as) =>
-      as.map((a) => ({ href: a.getAttribute('href') ?? '', cls: (a.querySelector('[class~="mk"]')?.getAttribute('class') ?? '').replace(/-\d$/, '') })),
+      as.map((a) => {
+        const mark = a.querySelector('[class~="mk"]');
+        return { href: a.getAttribute('href') ?? '', cls: mark ? `${mark.tagName} ${(mark.getAttribute('class') ?? '').replace(/-\d$/, '')}` : '' };
+      }),
     );
     expect(chips.length, `${path} ${variant}: chips`).toBeGreaterThan(0);
     for (const chip of chips) {
       const row = byHref.get(chip.href);
       expect(row, `${path} ${variant}: chip ${chip.href} links a row of the clock`).toBeTruthy();
       expect(chip.cls, `${path} ${variant}: ${row!.id} drawn as its status`).toBe(legend[appliesStatusLabels[row!.appliesStatus]]);
+    }
+    // No two statuses share a swatch.
+    const statusLooks = Object.values(appliesStatusLabels).filter((l) => legend[l]).map((l) => legend[l]);
+    expect(new Set(statusLooks).size, `${path} ${variant}: distinct status marks`).toBe(statusLooks.length);
+
+    // Later steps: solid once reached, outlined while ahead. Squares are the
+    // steps' marks (and the two step swatches of the legend); a station of
+    // more than six chips hides some behind "+N more".
+    const steps = rows.flatMap((r) => r.milestones ?? []);
+    const reached = steps.filter((m) => m.date <= asOf).length;
+    const ahead = steps.length - reached;
+    const squares = await svg.evaluate((el) => {
+      const all = [...el.querySelectorAll('rect[class~="mk"]')].map((r) => r.getAttribute('class') ?? '');
+      return { fill: all.filter((c) => c.includes('mk-fill-')).length, line: all.filter((c) => c.includes('mk-line-')).length };
+    });
+    const events = rows.flatMap((r) => [...(r.appliesFrom ? [r.appliesFrom] : []), ...(r.milestones ?? []).map((m) => m.date)]);
+    const station = (d: string) => (d < '2024-01-01' ? 'before' : d);
+    const crowded = [...new Set(events.map(station))].some((st) => events.filter((d) => station(d) === st).length > 6);
+    const drawnReached = squares.fill - (reached ? 1 : 0);
+    const drawnAhead = squares.line - (ahead ? 1 : 0);
+    if (crowded) {
+      expect(drawnReached, `${path} ${variant}: reached steps`).toBeLessThanOrEqual(reached);
+      expect(drawnAhead, `${path} ${variant}: steps ahead`).toBeLessThanOrEqual(ahead);
+    } else {
+      expect(drawnReached, `${path} ${variant}: reached steps`).toBe(reached);
+      expect(drawnAhead, `${path} ${variant}: steps ahead`).toBe(ahead);
     }
   }
 }
@@ -127,16 +156,25 @@ test.describe('pattern neighbourhood', () => {
   const REL = { core: 'Names this pattern', related: 'Related pattern' };
   for (const p of patterns) {
     test(`/patterns/${p.slug}: related patterns, obligations, controls and cases`, async ({ page }) => {
-      const md = readFileSync(`../bok/patterns/${p.slug}.md`, 'utf8');
-      const section = md.split(/^## Related patterns\s*$/m)[1]?.split(/^(?:## |\*\*Maps to)/m)[0] ?? '';
-      const related = [...new Set([...section.matchAll(/\]\(\/patterns\/([a-z0-9-]+)\)/g)].map((m) => m[1]))]
+      await page.goto(`/patterns/${p.slug}`);
+      // The related patterns the page's own prose links under "Related
+      // patterns" (the list the figure summarises), read from the page.
+      const linked = await page.evaluate(() => {
+        const head = [...document.querySelectorAll('h2')].find((h) => (h.textContent ?? '').trim() === 'Related patterns');
+        const hrefs: string[] = [];
+        for (let el = head?.nextElementSibling; el && el.tagName !== 'H2'; el = el.nextElementSibling) {
+          if (!el.matches('p, ul, ol')) continue;
+          for (const a of el.querySelectorAll('a[href^="/patterns/"]')) hrefs.push(a.getAttribute('href') ?? '');
+        }
+        return hrefs;
+      });
+      const related = [...new Set(linked.map((href) => href.replace(/^\/patterns\//, '').replace(/[/#].*$/, '')))]
         .map((slug) => patterns.find((q) => q.slug === slug)!)
         .filter((q) => q && q.slug !== p.slug);
       const evid = obligations.filter((r) => r.patterns?.includes(p.id));
       const ctl = controls.filter((c) => c.patterns.includes(p.slug));
       const cs = cases.filter((c) => c.control.controls.some((x) => x.patternId === p.id));
       const total = related.length + evid.length + ctl.length + cs.length;
-      await page.goto(`/patterns/${p.slug}`);
       const FIG = '.pp-hood .chart-fig';
       if (total < 3) {
         await expect(page.locator(FIG)).toHaveCount(0);

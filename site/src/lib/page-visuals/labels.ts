@@ -1,8 +1,10 @@
 // labels.ts: short drawn labels for the per-item visuals, taken from the
 // record's own words (VISUAL-GUIDE §1.4: node labels of at most four words,
-// nouns). The full wording always stays in the item's name (its tooltip and
-// link name) and in the chart's table; nothing here types a word by hand.
-import { textWidth } from '../charts';
+// nouns), and the one shortener and centre-box check every per-item radial
+// and chain uses. The full wording always stays in the item's name (its
+// tooltip and link name) and in the chart's table; nothing here types a word
+// by hand.
+import { textWidth, wrapText, type Face } from '../charts';
 
 /** Words that open a qualifier: the head phrase ends before them. */
 const STOP = new Set([
@@ -55,3 +57,60 @@ export function fitName(name: string, maxPx: number, px = 13): string {
   if (gloss && /^[A-Z][A-Z0-9-]*$/.test(gloss[1]) && fits(gloss[1])) return gloss[1];
   return headPhrase(bare);
 }
+
+/** Words a cut label never ends on before its ellipsis. */
+const DANGLING = new Set(['of', 'and', 'the', 'for', 'with', 'from', 'to', 'a', 'an', 'in', 'on', 'per', 'that', 'by', 'or', 'as', 'its', 'is', '&']);
+
+/** `text` when `ok`; else without a trailing "(...)" gloss; else the longest
+ *  word-boundary prefix with an ellipsis that is `ok`, trailing function
+ *  words and punctuation dropped first; undefined when none is. */
+function cutUntil(text: string, ok: (s: string) => boolean): string | undefined {
+  const whole = text.replace(/\s+/g, ' ').trim();
+  if (ok(whole)) return whole;
+  const bare = whole.replace(/\s*\([^)]*\)$/, '');
+  if (bare && bare !== whole && ok(bare)) return bare;
+  const words = bare.split(' ');
+  for (let n = words.length - 1; n >= 1; n -= 1) {
+    const cut = words.slice(0, n);
+    while (cut.length > 1 && DANGLING.has(cut[cut.length - 1].replace(/[,;:.]+$/, '').toLowerCase())) cut.pop();
+    const candidate = `${cut.join(' ').replace(/[,;:.]+$/, '')}…`;
+    if (ok(candidate)) return candidate;
+  }
+  return undefined;
+}
+
+const wraps = (s: string, maxPx: number, px: number, lines: number, face: Face): boolean => {
+  try {
+    wrapText(s, maxPx, px, face, lines, 'cut');
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * The one shortener of the per-item visuals: `text` when it wraps into
+ * `lines` lines of `maxPx` at `px` (measured by the kit's own wrapText);
+ * else without a trailing "(...)" gloss; else the longest word-boundary
+ * prefix that fits with an ellipsis. Throws when not even the first word fits.
+ */
+export function shortenToFit(text: string, maxPx: number, px = 13, lines = 1, face: Face = 'body'): string {
+  const out = cutUntil(text, (s) => wraps(s, maxPx, px, lines, face));
+  if (out === undefined) throw new Error(`labels: "${text.split(/\s+/)[0]}" does not fit ${maxPx}px at ${px}px`);
+  return out;
+}
+
+/** relationRadial's centre box: it fits the label's longest word, 132 to 200
+ *  wide (rounded), less 8 px of padding a side, three lines of 13.5 px. */
+const CENTRE = { size: 13.5, lines: 3 };
+const centreRoom = (label: string): number =>
+  Math.round(Math.min(200, Math.max(132, Math.max(...label.split(/\s+/).map((word) => textWidth(word, CENTRE.size))) + 20))) - 16;
+
+/** True when `label` fits the radial centre box. */
+export function fitsCentre(label: string): boolean {
+  return wraps(label, centreRoom(label), CENTRE.size, CENTRE.lines, 'body');
+}
+
+/** A title for the radial centre: whole when it fits, else shortened (the
+ *  full title stays in the page heading). */
+export const centreLabel = (title: string): string => cutUntil(title, fitsCentre) ?? title;

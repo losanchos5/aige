@@ -11,7 +11,7 @@
 // themes (a11y.spec).
 import { test, expect, type Page } from '@playwright/test';
 
-import { obligations, obligationPath, appliesStatusLabels, type Obligation } from '../src/data/frameworks';
+import { obligations, obligationPath, appliesStatusLabels, registerAsOf, type Obligation } from '../src/data/frameworks';
 import { patterns, patternPath } from '../src/data/patterns';
 import { controls } from '../src/data/controls';
 import { casesFor, crosswalkFor } from '../src/lib/obligations';
@@ -24,7 +24,7 @@ async function tableRows(page: Page, figure: string): Promise<string[][]> {
 }
 
 /** The register's as-of date: the latest date a row was checked. */
-const asOf = obligations.map((row) => row.reviewed).sort().at(-1)!;
+const asOf = registerAsOf();
 const STEP_REACHED = 'Later step, reached';
 const STEP_AHEAD = 'Later step, ahead';
 
@@ -139,6 +139,11 @@ test.describe('/obligations/<id>: the application strip', () => {
       for (const m of row.milestones ?? []) expect(rows.find((r) => r[0] === m.date)![2]).toBe(m.note);
       for (const variant of ['.chart-w', '.chart-n']) {
         await expect(page.locator(`.chart-fig.obs ${variant} svg text`, { hasText: `As of ${row.reviewed}` })).toHaveCount(1);
+        // A date before 2024 sits in the Earlier slot; the axis keeps the 2024 window.
+        const ticks = (await page.locator(`.chart-fig.obs ${variant} svg text.num`).allTextContents()).map((t) => t.trim());
+        const years = ticks.filter((t) => /^\d{4}$/.test(t)).map(Number);
+        expect(Math.min(...years), variant).toBeGreaterThanOrEqual(2024);
+        expect(ticks.includes('Earlier'), variant).toBe([row.appliesFrom!, ...(row.milestones ?? []).map((m) => m.date)].some((d) => d < '2024-01-01'));
       }
     });
   }

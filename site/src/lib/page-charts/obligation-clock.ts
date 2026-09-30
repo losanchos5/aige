@@ -44,6 +44,7 @@ import {
   type MarkState,
   type Shape,
 } from '../charts/core';
+import { appliesStatusMark } from '../../data/frameworks';
 
 /** How a dot is drawn: the row's status on its first date, or a later step. */
 export type ClockStyle =
@@ -68,15 +69,11 @@ export const CLOCK_STYLES: readonly ClockStyle[] = [
   'step-ahead',
 ];
 
-/** Shape and drawing of each style. A first date is a circle (a triangle when
- *  the row is in force but softened, or not final); a later step a square. */
-export const CLOCK_MARK: Record<ClockStyle, { shape: Shape; state: MarkState }> = {
-  'in-force': { shape: 'circle', state: 'filled' },
-  grace: { shape: 'triangle', state: 'filled' },
-  'applies-later': { shape: 'circle', state: 'outline' },
-  deferred: { shape: 'circle', state: 'hatched' },
-  voluntary: { shape: 'circle', state: 'dashed' },
-  pending: { shape: 'triangle', state: 'dashed' },
+/** Shape and drawing of each style: a first date in the site-wide status
+ *  encoding (appliesStatusMark in data/frameworks.ts); a later step a square,
+ *  filled once reached. */
+export const CLOCK_MARK: Readonly<Record<ClockStyle, { shape: Shape; state: MarkState }>> = {
+  ...appliesStatusMark,
   'step-reached': { shape: 'square', state: 'filled' },
   'step-ahead': { shape: 'square', state: 'outline' },
 };
@@ -312,17 +309,19 @@ export function obligationClock(input: ObligationClockInput): ChartOutput {
     out.push(...dots);
     bottom = axisY + 19;
   } else {
-    // One row per year: the year, the dots wrapping, the year's count.
-    const yearW = 44;
-    const countW = 30;
-    const dx = L + yearW;
-    const perLine = Math.floor((W - L - countW - dx) / PITCH);
+    // One row per year: the year, the dots wrapping, the year's count. The
+    // label column is as wide as its widest label ("Earlier" is wider than a
+    // year), so no label runs under the first dot.
     const lastYear = Math.max(...onAxis.map((p) => Number(p.date.slice(0, 4))), fromYear);
     const buckets: { label: string; points: ClockPoint[] }[] = [];
     if (earlier.length) buckets.push({ label: 'Earlier', points: earlier });
     for (let year = fromYear; year <= lastYear; year += 1) {
       buckets.push({ label: String(year), points: onAxis.filter((p) => Number(p.date.slice(0, 4)) === year) });
     }
+    const yearW = Math.max(44, ...buckets.map((b) => Math.ceil(textWidth(b.label, 12, 'mono')) + 8));
+    const countW = 30;
+    const dx = L + yearW;
+    const perLine = Math.floor((W - L - countW - dx) / PITCH);
     const markerYear = input.marker.slice(0, 4);
     y += 24;
     const asOfLabel = `As of ${input.marker} (dashed line)`;
@@ -344,6 +343,7 @@ export function obligationClock(input: ObligationClockInput): ChartOutput {
       const lines = Math.max(1, Math.ceil(slots / perLine));
       const top = y + 6;
       const rowH = lines * PITCH;
+      fitText(b.label, yearW - 6, 12, 'mono', 'year');
       out.push(text(L, top + 9.5, b.label, { size: 12, cls: 'num muted', where: 'year' }));
       out.push(text(W - L, top + 9.5, b.points.length, { size: 12, cls: 'num', anchor: 'end', where: 'year count' }));
       let k = 0;

@@ -198,7 +198,7 @@ const obligationName = (o: (typeof obligations)[number]) =>
         rows={obligations.map((o) => o.row)}
         id="au-clock"
         title="What switches on, and when"
-        caption="The obligations of this route on the date each first applies and on its later dated steps, drawn by status; the dashed line is the date the rows were last reviewed. Treat what sits left of the line as work for now, and read the right side as the time left to prepare."
+        caption="The obligations of this route on the date each first applies, drawn by status, and on its later dated steps (a square, filled once reached); the dashed line is the date the rows were last reviewed. Treat what comes before the line as work for now, and read what comes after it as the time left to prepare."
         desc={`The obligations that matter most on the ${a.label} route, on the dates they first apply and on their later steps, against the register's review date.`}
         tableCaption={`When the obligations on the ${a.label} route apply`}
       />

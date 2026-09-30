@@ -1,8 +1,11 @@
 // regulatory-clock.ts: when a set of obligations starts to bite, drawn from
 // their own dates. Each date is a station; each obligation is a chip (a mark
-// and a short label) at the station of the date it first applies (circle)
-// and of each later dated step (square). The mark's fill carries the row's
-// status (solid, outlined, dashed or hatched, never colour alone). A dashed
+// and a short label) at the station of the date it first applies and of each
+// later dated step. The first-date mark carries the row's status as a shape
+// and a drawing (the site-wide encoding the caller passes in, as on the
+// /obligations clock: never colour alone); a later step is a square, filled
+// once its date is on or before the as-of date and outlined while ahead, the
+// same meaning the square has on /obligations and /obligations/<id>. A dashed
 // line marks the as-of date of the data (never the build clock), and the two
 // counts beside it say how many obligations already apply and how many are
 // still to come. Rows without a date are counted on a line of their own and
@@ -25,7 +28,7 @@
 // tall, so linked chips keep the WCAG 2.5.8 pointer-target size.
 //
 // Built on the chart kit's shell and helpers (src/lib/charts/core.ts); no
-// runtime imports and no data imports (src/lib/page-visuals/obligation-clock.ts
+// runtime imports and no data imports (src/lib/page-visuals/register-clock-rows.ts
 // maps register rows onto it).
 import { legendGroups } from './legend-groups';
 import {
@@ -56,6 +59,8 @@ export interface ClockRow {
   href?: string;
   /** The row's status as a mark state (legend: `statuses`). */
   state: MarkState;
+  /** The row's status as a first-date shape (default circle; legend: `statuses`). */
+  shape?: 'circle' | 'triangle';
   /** Wording of the status ("Deferred"). */
   status: string;
   /** YYYY-MM-DD the row first applies; undefined: no date. */
@@ -69,9 +74,9 @@ export interface RegulatoryClockInput extends ChartBase {
   /** The as-of date of the data: the dashed line, labelled "<todayLabel> <today>". */
   today: string;
   todayLabel?: string;
-  /** The legend of fills, in order; only the statuses of dated rows are drawn,
-   *  and two of them on one fill throw. */
-  statuses: { state: MarkState; label: string }[];
+  /** The legend of first-date marks, in order; only the statuses of dated
+   *  rows are drawn, and two of them on one shape and fill throw. */
+  statuses: { state: MarkState; shape?: 'circle' | 'triangle'; label: string }[];
   /** Dates before it share the "Before YYYY" station. */
   windowFrom?: string;
   orientation?: 'horizontal' | 'vertical';
@@ -89,12 +94,12 @@ export const CLOCK_LABEL_MAX = 132;
 const WORDS = {
   first: 'Applies from',
   step: 'Later step',
-  firstShape: 'First applies',
-  stepShape: 'Later step',
-  statusHead: 'Status',
-  markHead: 'Date',
+  firstHead: 'First applies',
+  stepHead: 'Later step',
+  reached: 'Reached',
+  ahead: 'Ahead',
   before: (d: string) => `Before ${d.slice(0, 4)}`,
-  now: 'already apply',
+  now: (n: number) => (n === 1 ? 'already applies' : 'already apply'),
   later: 'still to come',
   undated: (n: number) => `${n} without a date`,
   more: (n: number) => `+${n} more`,
@@ -168,18 +173,28 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
   if (!events.length) throw new Error(`charts(${where}): no row has a date; draw no clock`);
   const undated = input.rows.filter((r) => !r.first && !(r.steps ?? []).length);
   const drawn = input.rows.filter((r) => !undated.includes(r));
-  // The legend names the fills the chips use; two statuses on one fill would
-  // make it ambiguous, so that throws.
+  // The legend names the marks the first dates use; two statuses on one
+  // shape and fill would make it ambiguous, so that throws.
+  const look = (x: { shape?: 'circle' | 'triangle'; state: MarkState }) => `${x.state} ${x.shape ?? 'circle'}`;
   for (const r of drawn) {
-    if (!input.statuses.some((s) => s.state === r.state && s.label === r.status)) {
-      throw new Error(`charts(${where}): status "${r.status}" (${r.state}) of "${r.label}" is not in the legend`);
+    if (!input.statuses.some((s) => look(s) === look(r) && s.label === r.status)) {
+      throw new Error(`charts(${where}): status "${r.status}" (${look(r)}) of "${r.label}" is not in the legend`);
     }
   }
   const used = input.statuses.filter((s) => drawn.some((r) => r.status === s.label));
-  const fills = new Map<MarkState, string>();
+  const fills = new Map<string, string>();
   for (const s of used) {
-    if (fills.has(s.state)) throw new Error(`charts(${where}): statuses "${fills.get(s.state)}" and "${s.label}" share the ${s.state} fill`);
-    fills.set(s.state, s.label);
+    if (fills.has(look(s))) throw new Error(`charts(${where}): statuses "${fills.get(look(s))}" and "${s.label}" share the ${look(s)} mark`);
+    fills.set(look(s), s.label);
+  }
+  // Two rows with one label at one station could not be told apart.
+  for (const s of stations) {
+    const seen = new Map<string, ClockRow>();
+    for (const e of s.events) {
+      const other = seen.get(e.row.label);
+      if (other && other !== e.row) throw new Error(`charts(${where}): two rows at ${s.head} share the chip label "${e.row.label}"`);
+      seen.set(e.row.label, e.row);
+    }
   }
   const undatedLine = () => {
     const statuses = input.statuses.map((s) => s.label).filter((label, i, all) => all.indexOf(label) === i && undated.some((r) => r.status === label));
@@ -191,16 +206,21 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
   const hits = targets(where);
   const out: string[] = [];
 
-  // Legend: the fills in use (status), then the two shapes (which date).
-  const kinds = new Set(events.map((e) => e.kind));
+  // A later step is solid once its date is on or before the as-of date.
+  const reached = (e: Event) => e.date <= input.today;
+  const stepState = (e: Event): MarkState => (reached(e) ? 'filled' : 'outline');
+  // Legend: the first-date marks in use (the status), then the later-step
+  // squares in use (reached or ahead).
+  const steps = events.filter((e) => e.kind === 'step');
+  const firsts = used.filter((s) => events.some((e) => e.kind === 'first' && e.row.status === s.label));
   const lg = legendGroups(
     [
-      { head: WORDS.statusHead, entries: used.map((s) => ({ label: s.label, shape: 'circle' as const, state: s.state })) },
+      { head: WORDS.firstHead, entries: firsts.map((s) => ({ label: s.label, shape: s.shape ?? ('circle' as const), state: s.state })) },
       {
-        head: WORDS.markHead,
+        head: WORDS.stepHead,
         entries: [
-          ...(kinds.has('first') ? [{ label: WORDS.firstShape, shape: 'circle' as const, state: 'outline' as const }] : []),
-          ...(kinds.has('step') ? [{ label: WORDS.stepShape, shape: 'square' as const, state: 'outline' as const }] : []),
+          ...(steps.some(reached) ? [{ label: WORDS.reached, shape: 'square' as const, state: 'filled' as const }] : []),
+          ...(steps.some((e) => !reached(e)) ? [{ label: WORDS.ahead, shape: 'square' as const, state: 'outline' as const }] : []),
         ],
       },
     ],
@@ -230,8 +250,8 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
    *  keeps per-item pages light. */
   const chip = (e: Event, x: number, cy: number) => {
     fitText(e.row.label, CLOCK_LABEL_MAX, CHIP_PX, 'body', 'chip label');
-    const kind = e.kind === 'first' ? 'circle' : 'square';
-    const attrs = marks.attrs(e.row.state, 0);
+    const kind = e.kind === 'first' ? (e.row.shape ?? 'circle') : 'square';
+    const attrs = marks.attrs(e.kind === 'first' ? e.row.state : stepState(e), 0);
     const w = chipW(e);
     const mask = maskAt !== undefined && maskAt > x - 2 && maskAt < x + w + 2 ? `<rect class="hatch-bg" x="${r1(x - 2)}" y="${r1(cy - 9)}" width="${r1(w + 4)}" height="18"/>` : '';
     const draw = (inner: string) => mask + shape(kind, x + 6, cy, 5.5, attrs, inner) + text(x + 16, cy + 4.5, e.row.label, { size: CHIP_PX, where: 'chip label' });
@@ -291,8 +311,8 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
     // The two counts, either side of the as-of line.
     y += 22;
     if (nNow > 0) {
-      const fits = headW(nNow, WORDS.now) <= asX - 8 - L;
-      out.push(sideHead(nNow, WORDS.now, fits ? asX - 8 : L, y, fits ? 'end' : 'start'));
+      const fits = headW(nNow, WORDS.now(nNow)) <= asX - 8 - L;
+      out.push(sideHead(nNow, WORDS.now(nNow), fits ? asX - 8 : L, y, fits ? 'end' : 'start'));
     }
     if (nLater > 0) {
       const fits = headW(nLater, WORDS.later) <= W - L - (asX + 8);
@@ -302,10 +322,17 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
     // The axis on top: years, ticks down into the rows.
     y += 26;
     const axisY = y;
-    for (const t of ts.ticks) out.push(text(ts.map(t.date), axisY - 6, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+    // The break before the window (when a Before station exists) sits just
+    // left of the axis start: a tick label that would reach over it starts at
+    // its tick instead of centring on it.
+    const bx = ax0 - 11;
+    for (const t of ts.ticks) {
+      const tx = ts.map(t.date);
+      const clash = hasEarlier && tx - textWidth(t.label, 12, 'mono') / 2 < bx + 10;
+      out.push(text(tx, axisY - 6, t.label, { size: 12, cls: 'num muted', anchor: clash ? 'start' : 'middle', where: 'tick' }));
+    }
     out.push(`<line class="axis" x1="${r1(ax0)}" y1="${r1(axisY)}" x2="${r1(ax1)}" y2="${r1(axisY)}"/>`);
     if (hasEarlier) {
-      const bx = ax0 - 11;
       out.push(`<line class="axis" x1="${r1(x0)}" y1="${r1(axisY)}" x2="${r1(bx - 4)}" y2="${r1(axisY)}"/>`);
       out.push(`<path class="axis" d="M${r1(bx - 7)} ${r1(axisY + 5)}L${r1(bx - 1)} ${r1(axisY - 5)}M${r1(bx + 1)} ${r1(axisY + 5)}L${r1(bx + 7)} ${r1(axisY - 5)}"/>`);
     }
@@ -393,7 +420,7 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
     };
     // The as-of line always sits between the two sides (on top when nothing
     // applies yet, at the foot when everything already does).
-    if (nNow > 0) headRow(nNow, WORDS.now);
+    if (nNow > 0) headRow(nNow, WORDS.now(nNow));
     stations.filter((s) => s.now).forEach(block);
     y += 14;
     out.push(`<line class="today" x1="${L}" y1="${r1(y)}" x2="${r1(W - L)}" y2="${r1(y)}"/>`);

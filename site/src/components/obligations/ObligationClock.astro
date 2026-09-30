@@ -13,13 +13,13 @@
  * one row per year.
  */
 import Chart from '../Chart.astro';
-import { obligations, appliesStatusLabels } from '../../data/frameworks';
+import { obligations, appliesStatusLabels, registerAsOf } from '../../data/frameworks';
 import { obligationGroups } from '../../lib/obligations';
 import { obligationClock, type ClockPoint, type ClockStyle } from '../../lib/page-charts/obligation-clock';
 import '../../styles/obligation-visuals.css';
 
 /** The register's as-of date: the latest date a row was checked. */
-const asOf = obligations.reduce((latest, row) => (row.reviewed > latest ? row.reviewed : latest), obligations[0].reviewed);
+const asOf = registerAsOf();
 const anchorOf = new Map(obligationGroups().map((g) => [g.framework, `#${g.anchor}`]));
 
 const points: ClockPoint[] = obligations.flatMap((row) => {

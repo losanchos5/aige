@@ -16,9 +16,9 @@
 //
 // Labels drawn in an SVG must fit their box (the kit throws otherwise), so the
 // long registry wording (failure modes of 60 to 190 characters, artefacts,
-// case titles) is cut at a word boundary with an ellipsis, the evidence-chain
-// convention (lib/evidence-chain.ts shortLabel); the full wording stays in the
-// chart's table, the node's accessible name and the record on the page.
+// case titles) is cut at a word boundary with an ellipsis by the shared
+// shortener (labels.ts shortenToFit); the full wording stays in the chart's
+// table, the node's accessible name and the record on the page.
 import {
   controlAnchor,
   isResponseToSpecify,
@@ -35,7 +35,8 @@ import { getPatternBySlug, patternPath } from '../../data/patterns';
 import { casesForControl } from '../cross-links';
 import { casePath } from '../llms';
 import { getSchemas } from '../schemas-library';
-import { wrapText, type Face, type MarkState, type Tone } from '../charts';
+import { type MarkState, type Tone } from '../charts';
+import { shortenToFit } from './labels';
 import type { ControlChainInput, EvidenceItem, FlowItem, PipelineStage, RelationFamily } from '../charts';
 
 // ---- enforcement points and failure responses ------------------------------
@@ -88,37 +89,6 @@ export const responseState: Readonly<Record<Response, MarkState>> = {
   tbs: 'hatched',
 };
 
-// ---- label cutting -----------------------------------------------------------
-
-const STOP = new Set(['of', 'and', 'the', 'for', 'with', 'from', 'to', 'a', 'an', 'in', 'on', 'per', 'that', 'by', 'or', 'as', 'its', 'is']);
-
-/**
- * The longest word-boundary prefix of `text` that wraps into `lines` lines of
- * `maxPx` at `px` (measured by the kit's own wrapText), with an ellipsis when
- * cut; trailing stop words and punctuation are dropped before the ellipsis.
- * Throws when not even the first word fits.
- */
-export function cutToFit(text: string, maxPx: number, px: number, lines = 1, face: Face = 'body'): string {
-  const fits = (s: string) => {
-    try {
-      wrapText(s, maxPx, px, face, lines, 'cut');
-      return true;
-    } catch {
-      return false;
-    }
-  };
-  const whole = text.replace(/\s+/g, ' ').trim();
-  if (fits(whole)) return whole;
-  const words = whole.split(' ');
-  for (let n = words.length - 1; n >= 1; n -= 1) {
-    const cut = words.slice(0, n);
-    while (cut.length > 1 && STOP.has(cut[cut.length - 1].toLowerCase())) cut.pop();
-    const candidate = `${cut.join(' ').replace(/[,;:.]+$/, '')}…`;
-    if (fits(candidate)) return candidate;
-  }
-  throw new Error(`control-visuals: "${words[0]}" does not fit ${maxPx}px at ${px}px`);
-}
-
 // ---- the anatomy chain (controlChain) ---------------------------------------
 
 /** Text width of an item in a controlChain panel (flow.ts: 12 px margins,
@@ -157,7 +127,7 @@ export function anatomyInput(
 ): Omit<ControlChainInput, 'id' | 'title' | 'desc' | 'source' | 'asOf' | 'mode'> {
   const itemW = chainItemWidth(width, orientation, false);
   const chipW = chainItemWidth(width, orientation, true);
-  const cut = (text: string, w = itemW) => cutToFit(text, w, 13, 2);
+  const cut = (text: string, w = itemW) => shortenToFit(text, w, 13, 2);
   const failureModes: FlowItem[] = c.failureModes.map((f) => ({ label: cut(f), name: f }));
   const verification: FlowItem[] = verificationKinds(c).map(({ kind, steps }) => ({
     label: steps.length > 1 ? `${verificationLabels[kind]} (${steps.length} steps)` : verificationLabels[kind],
@@ -192,25 +162,18 @@ export function anatomyInput(
 
 // ---- the traceability constellation (relationRadial) ------------------------
 
-/** Node label width in a relationRadial (radial.ts: the centre box fits its
- *  longest word, 132 to 200 wide, then a 48 px span, a 10 px gap to the label
- *  and the 12 px margin; 'list' puts labels 62 px in). */
-export function radialLabelWidth(width: number, layout: 'radial' | 'list', centre: string, textWidthOf: (s: string, px: number) => number): number {
-  if (layout === 'list') return width - 12 - 62 - 1;
-  const longest = Math.max(...centre.split(/\s+/).map((word) => textWidthOf(word, 13.5)));
-  const boxW = Math.round(Math.min(200, Math.max(132, longest + 20)));
-  return width / 2 - boxW / 2 - 48 - 10 - 12 - 1;
-}
-
 /**
  * The relations of a control, as relationRadial families (at most six): the
  * incident cases that name it, its patterns (layer colour), the obligations
  * it maps to, the threat rows (OWASP and ATLAS), the standards (ISO/IEC 42001
- * Annex A, NIST AI RMF, AIUC-1) and its IMDA Agentic AI cross-reference, whose
- * fit is the edge: direct solid, partial dashed. Labels are cut to `labelW`.
+ * Annex A, NIST AI RMF, AIUC-1, CSA AICM and every `other` mapping: NIST SP
+ * 800-53, ATLAS mitigations, RFCs...) and its IMDA Agentic AI cross-reference,
+ * whose fit is the edge: direct solid, partial dashed. The IMDA entry that
+ * withImdaAgentic adds to `other` is drawn by its own family, not twice.
+ * Labels are cut to `labelW`.
  */
 export function constellationFamilies(c: Control, labelW: number): RelationFamily[] {
-  const cut = (text: string) => cutToFit(text, labelW, 13, 1);
+  const cut = (text: string) => shortenToFit(text, labelW, 13, 1);
   const m = c.mappings;
   const threats = [...m.owasp, ...(m.atlas ?? [])].flatMap((id) => {
     const t = threatById(id);
@@ -245,6 +208,8 @@ export function constellationFamilies(c: Control, labelW: number): RelationFamil
         ...m.iso42001.map((id) => ({ label: cut(`ISO 42001 ${id}`), name: `ISO/IEC 42001 ${id} ${iso42001Controls[id] ?? ''}`.trim() })),
         ...m.nistAiRmf.map((id) => ({ label: cut(`NIST AI RMF ${id}`), name: `NIST AI RMF ${id} ${nistAiRmfSubcategories[id] ?? ''}`.trim() })),
         ...(m.aiuc1 ?? []).map((id) => ({ label: cut(`AIUC-1 ${id}`), name: `AIUC-1 ${id}` })),
+        ...(m.csaAicm ?? []).map((id) => ({ label: cut(`CSA AICM ${id}`), name: `CSA AICM ${id}` })),
+        ...otherMappings(c).map((o) => ({ label: cut(`${o.framework} ${o.ref}`), name: `${o.framework} ${o.ref}` })),
       ],
     },
     {
@@ -259,7 +224,12 @@ export function constellationFamilies(c: Control, labelW: number): RelationFamil
 
 // ---- framework coverage (ControlCoverage) -----------------------------------
 
-export type CoverageKey = 'obligations' | 'iso42001' | 'nistAiRmf' | 'owasp' | 'atlas' | 'aiuc1';
+/** The control's `other` mappings, less the IMDA Agentic AI entry that
+ *  withImdaAgentic appends (the visuals draw that fit on its own). */
+export const otherMappings = (c: Pick<Control, 'mappings'>): NonNullable<Control['mappings']['other']> =>
+  (c.mappings.other ?? []).filter((o) => o.framework !== IMDA_AGENTIC_FRAMEWORK);
+
+export type CoverageKey = 'obligations' | 'iso42001' | 'nistAiRmf' | 'owasp' | 'atlas' | 'aiuc1' | 'other';
 
 /** The counted framework columns of the coverage grid; IMDA is its own
  *  column, drawn by fit rather than counted. */
@@ -270,10 +240,13 @@ export const COVERAGE_COLUMNS: readonly { key: CoverageKey; label: string; short
   { key: 'owasp', label: 'OWASP', short: 'OWASP' },
   { key: 'atlas', label: 'MITRE ATLAS', short: 'ATLAS' },
   { key: 'aiuc1', label: 'AIUC-1', short: 'AIUC-1' },
+  { key: 'other', label: 'Other frameworks (CSA AICM, NIST SP 800-53, ATLAS mitigations, RFCs...)', short: 'Other' },
 ];
 
-/** Ids a control maps to in one framework column. */
-export const coverageCount = (c: Pick<Control, 'mappings'>, key: CoverageKey): number => (c.mappings[key] ?? []).length;
+/** Ids a control maps to in one framework column; 'other' gathers the CSA
+ *  AICM ids and the `other` mappings (less IMDA, which has its own column). */
+export const coverageCount = (c: Pick<Control, 'mappings'>, key: CoverageKey): number =>
+  key === 'other' ? (c.mappings.csaAicm ?? []).length + otherMappings(c).length : (c.mappings[key] ?? []).length;
 
 /** The control's IMDA Agentic AI fit, if it has a cross-reference. */
 export const imdaFit = (c: Pick<Control, 'id'>): 'direct' | 'partial' | undefined => imdaAgenticXrefs[c.id]?.fit;

@@ -811,8 +811,14 @@
     width: 4rem;
   }
 
+  /* Hidden to the eye only: the title stays the row link's accessible name. */
   .ccv .ccv-title {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
   .ccv .ccv-h {

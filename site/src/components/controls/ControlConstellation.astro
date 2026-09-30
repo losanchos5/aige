@@ -5,7 +5,8 @@
  * it stay as the detail). The control at the centre; around it the incident
  * cases that name it, the patterns that implement it (in their layer colour),
  * the obligations it maps to, the threat rows it answers (OWASP and ATLAS),
- * the standards (ISO/IEC 42001 Annex A, NIST AI RMF, AIUC-1) and its IMDA
+ * the standards (ISO/IEC 42001 Annex A, NIST AI RMF, AIUC-1, CSA AICM and the
+ * other mappings: NIST SP 800-53, ATLAS mitigations, RFCs) and its IMDA
  * Agentic AI cross-reference, whose fit is the edge: solid direct, dashed
  * partial. Drawn by the chart kit's relationRadial from
  * lib/page-visuals/control-visuals.ts (constellationFamilies); with fewer
@@ -16,8 +17,8 @@
  * phones; at the top level of the prose it breaks out to the reading well.
  */
 import Chart from '../Chart.astro';
-import { relationRadial, textWidth } from '../../lib/charts';
-import { constellationFamilies, radialLabelWidth } from '../../lib/page-visuals/control-visuals';
+import { relationRadial, radialLabelWidth } from '../../lib/charts';
+import { constellationFamilies } from '../../lib/page-visuals/control-visuals';
 import { CONTROLS_AS_OF, type Control, type ControlProfile } from '../../data/controls';
 
 interface Props {
@@ -39,8 +40,8 @@ const base = {
   tableCaption: `${c.id}: cases, patterns, obligations, threats, standards and IMDA fit`,
   relationLabels: { core: 'Mapped', related: 'Partial fit' },
 };
-const familiesWide = constellationFamilies(c, radialLabelWidth(WIDE, 'radial', centre.label, textWidth));
-const familiesNarrow = constellationFamilies(c, radialLabelWidth(NARROW, 'list', centre.label, textWidth));
+const familiesWide = constellationFamilies(c, radialLabelWidth(WIDE, 'radial', centre.label) - 1);
+const familiesNarrow = constellationFamilies(c, radialLabelWidth(NARROW, 'list', centre.label) - 1);
 const total = familiesWide.reduce((s, f) => s + f.items.length, 0);
 const touched = familiesWide.filter((f) => f.items.length > 0).length;
 const desc = `${c.id} at the centre of ${total} relations in ${touched} families.`;

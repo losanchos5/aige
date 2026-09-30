@@ -3,8 +3,9 @@
  * ObligationTimeline: the application line of one register row, under the
  * evidence chain of /obligations/<id>. The date the row first applies, in its
  * status, and each later dated step with the system class it concerns and the
- * chapter's note, on a 2024 to 2031 axis (wider when the row's dates reach
- * further), against the row's review date as the dashed "As of" line: never
+ * chapter's note, on a 2024 to 2031 axis (later when the row's dates reach
+ * further; an earlier date sits in an "Earlier" slot behind a break), against
+ * the row's review date as the dashed "As of" line: never
  * the build clock. A row with no date draws nothing. The facts list keeps
  * every date in text. Generated per page (lib/page-charts/obligation-strip.ts),
  * not registered in figures.ts; 'figc' mode, as the page loads figures.css
@@ -46,7 +47,7 @@ const base = events.length
       desc: `${events.length === 1 ? 'The date' : `${events.length} dates`} of ${row.id} on a time axis, against its review date ${row.reviewed}.`,
       source: 'Obligation register (chapter 08)',
       events,
-      from: `${Math.min(2024, ...years)}-01-01`,
+      from: '2024-01-01',
       to: `${Math.max(2031, Math.max(...years) + 1)}-01-01`,
       marker: row.reviewed,
       tableCaption: `Dates of ${row.id}`,

@@ -65,7 +65,7 @@ const quietest = [...stages].sort((a, b) => a.rows.length - b.rows.length)[0];
 
 const markName = (c: Control) => `${c.id} ${c.title}: ${responseWords[responseOf(c)]}`;
 const title = 'Where the controls act';
-const caption = `One mark per control in each lane where it is enforced, its shape the failure response and its colour the home layer. ${busiest.rows.length} controls act at ${busiest.label.toLowerCase()} and ${quietest.rows.length} on a ${quietest.label.toLowerCase()}; ${multi} act at two points, so the lanes add up to more than ${controls.length}.`;
+const caption = `One mark per control in each lane where it is enforced, its shape the failure response and its colour the home layer. ${busiest.rows.length} controls act at ${busiest.label.toLowerCase()} and ${quietest.rows.length} on a ${quietest.label.toLowerCase()}; ${multi} act at more than one point, so the lanes add up to more than ${controls.length}.`;
 const tableCaption = 'Every control by profile and enforcement point, with its failure response';
 ---
 

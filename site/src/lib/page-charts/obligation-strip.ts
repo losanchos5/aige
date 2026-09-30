@@ -1,12 +1,15 @@
 // obligation-strip.ts: the application line of one register row, for
-// /obligations/<id>. A compact time axis (2024 to 2031 unless the row's dates
-// reach further) with the date the row first applies, drawn in the row's
+// /obligations/<id>. A compact time axis (2024 to 2031, later when the row's
+// dates reach further) with the date the row first applies, drawn in the row's
 // status as on the application clock of /obligations (CLOCK_MARK), and each
 // later dated step as a square, filled once its date is on or before the as-of
 // date, outlined while ahead. Every date carries its own words (the status or
 // the system class it concerns, and the chapter's note) in a block joined to
 // its mark, so the strip needs no legend. A dashed line marks the as-of date,
-// the row's own review date (never the build clock), labelled "As of".
+// the row's own review date (never the build clock), labelled "As of". A date
+// before `from` (a 1938 statute) sits in an "Earlier" slot behind a break at
+// the start of the axis, as on the /obligations clock, so it never squashes
+// the window; its block still gives the real date.
 //
 // Wide (>= 480): time left to right, the blocks in a row above the axis.
 // Narrow: time top to bottom, the blocks right of the axis, pushed down with a
@@ -72,6 +75,14 @@ export function obligationStrip(input: ObligationStripInput): ChartOutput {
   const out: string[] = [];
   const asOf = `As of ${input.marker}`;
   parseDay(input.marker, 'strip marker');
+  if (input.marker < input.from) throw new Error(`charts(${where}): marker ${input.marker} falls before ${input.from}`);
+  const earlier = (e: StripEvent) => e.date < input.from;
+  const hasEarlier = events.some(earlier);
+  const EARLIER = 'Earlier';
+  /** The events in the Earlier slot sit side by side, one mark apart. */
+  const early = events.filter(earlier);
+  const EARLY_STEP = 16;
+  const slot = (e: StripEvent) => early.indexOf(e);
 
   /** The lines of one block: "date · heading", then the detail. */
   const block = (e: StripEvent, bw: number, maxLines: number) => {
@@ -92,13 +103,16 @@ export function obligationStrip(input: ObligationStripInput): ChartOutput {
 
   let bottom: number;
   if (wide) {
-    const x0 = L + 8;
+    // The Earlier slot and its break, as on the /obligations clock.
+    const span = (early.length - 1) * EARLY_STEP;
+    const x0 = hasEarlier ? L + 78 + span : L + 8;
+    const ex = L + 26;
     const x1 = W - L - 8;
     const ts = timeScale(input.from, input.to, [x0, x1]);
     const xm = ts.map(input.marker);
     const n = events.length;
     const bw = Math.min(n === 1 ? 320 : 280, (W - 2 * L - (n - 1) * 16) / n);
-    const blocks = events.map((e) => ({ e, x: ts.map(e.date), b: block(e, bw, 5) }));
+    const blocks = events.map((e) => ({ e, x: earlier(e) ? ex + slot(e) * EARLY_STEP : ts.map(e.date), b: block(e, bw, 5) }));
     // Left edges: as close to the mark as the neighbours allow.
     const lefts = blocks.map(({ x }) => x - 10);
     for (let i = 0; i < n; i += 1) lefts[i] = Math.max(lefts[i], L, i ? lefts[i - 1] + bw + 16 : L);
@@ -126,6 +140,11 @@ export function obligationStrip(input: ObligationStripInput): ChartOutput {
       out.push(`<line class="tick" x1="${r1(x)}" y1="${r1(axisY)}" x2="${r1(x)}" y2="${r1(axisY + 5)}"/>`);
       out.push(text(x, axisY + 19, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
     }
+    if (hasEarlier) {
+      out.push(`<line class="axis" x1="${ex - 10}" y1="${r1(axisY)}" x2="${ex + span + 10}" y2="${r1(axisY)}"/>`);
+      out.push(`<path class="rule" fill="none" d="M${x0 - 16} ${r1(axisY + 5)}l6 -10M${x0 - 11} ${r1(axisY + 5)}l6 -10"/>`);
+      out.push(text(ex + span / 2, axisY + 19, EARLIER, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+    }
     out.push(`<line class="today" x1="${r1(xm)}" y1="${r1(axisY - 14)}" x2="${r1(xm)}" y2="${r1(axisY + 26)}"/>`);
     fitText(asOf, W - 2 * L, 12, 'mono', 'as-of label');
     out.push(text(besideLine(xm, textWidth(asOf, 12, 'mono'), W, L), axisY + 38, asOf, { size: 12, cls: 'mono', where: 'as-of label' }));
@@ -135,15 +154,25 @@ export function obligationStrip(input: ObligationStripInput): ChartOutput {
     // The as-of key over the axis, then time top to bottom.
     out.push(`<line class="today" x1="${L}" y1="14" x2="${L + 22}" y2="14"/>`);
     out.push(text(L + 28, 18, asOf, { size: 12, cls: 'mono', where: 'as-of label' }));
-    const axisX = L + 44;
+    // Room left of the axis for the widest tick label ("Earlier" or a year).
+    const axisX = L + Math.max(44, Math.ceil(textWidth(hasEarlier ? EARLIER : '2024', 12, 'mono')) + 16);
     const labelX = axisX + 22;
     const bw = W - L - labelX;
     const blocks = events.map((e) => ({ e, b: block(e, bw, 6) }));
     const need = blocks.reduce((sum, { b }) => sum + (b.head.length + b.detail.length) * LINE + 10, 0);
-    const start = 40;
+    // The Earlier slot sits above the axis start, behind a break.
+    const ey = 44;
+    const eSpan = (early.length - 1) * EARLY_STEP;
+    const start = hasEarlier ? ey + eSpan + 32 : 40;
     const len = Math.max(220, need);
     const ts = timeScale(input.from, input.to, [start, start + len]);
+    const yOf = (e: StripEvent) => (earlier(e) ? ey + slot(e) * EARLY_STEP : ts.map(e.date));
     out.push(`<line class="axis" x1="${axisX}" y1="${start}" x2="${axisX}" y2="${r1(start + len)}"/>`);
+    if (hasEarlier) {
+      out.push(`<line class="axis" x1="${axisX}" y1="${ey - 8}" x2="${axisX}" y2="${ey + eSpan + 8}"/>`);
+      out.push(`<path class="rule" fill="none" d="M${axisX - 5} ${start - 9}l10 -6M${axisX - 5} ${start - 14}l10 -6"/>`);
+      out.push(text(axisX - 12, ey + 4, EARLIER, { size: 12, cls: 'num muted', anchor: 'end', where: 'tick' }));
+    }
     for (const t of ts.ticks) {
       const ty = ts.map(t.date);
       out.push(`<line class="tick" x1="${axisX - 5}" y1="${r1(ty)}" x2="${axisX}" y2="${r1(ty)}"/>`);
@@ -154,14 +183,14 @@ export function obligationStrip(input: ObligationStripInput): ChartOutput {
     let prev = -Infinity;
     const leaders: string[] = [];
     for (const { e, b } of blocks) {
-      const ty = ts.map(e.date);
+      const ty = yOf(e);
       const blockTop = Math.max(ty - 12, prev + 10);
       if (blockTop > ty - 10) leaders.push(`M${axisX + 8} ${r1(ty)}L${labelX - 4} ${r1(blockTop + 8)}`);
       drawBlock(labelX, blockTop, b);
       prev = blockTop + 12 + (b.head.length + b.detail.length - 1) * LINE + 4;
     }
     if (leaders.length) out.push(`<path class="rule" fill="none" d="${leaders.join('')}"/>`);
-    for (const { e } of blocks) out.push(mark(e, axisX, ts.map(e.date)));
+    for (const { e } of blocks) out.push(mark(e, axisX, yOf(e)));
     bottom = Math.max(start + len + 4, prev);
   }
   const [cDate, cStep, cDetail] = input.columns ?? ['Date', 'Step', 'Detail'];

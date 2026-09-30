@@ -3,10 +3,12 @@
  * ObligationIsotype: every row of the register as one square, grouped by the
  * instrument heading chapter 08 files it under (obligationGroups, register
  * order), for the head of the /obligations index. A square's drawing is the
- * row's status on its review date (solid in force, half solid grace period,
- * outlined applies later, hatched deferred, dashed voluntary, dotted draft or
- * proposed), so the weight of each regime and its maturity read before the
- * filters are used. Every square is ink: instruments are not stack layers.
+ * row's status on its review date, in the site-wide status encoding
+ * (appliesStatusMark, as on the clocks and strips): solid in force, half solid
+ * grace period (the filled triangle), outlined applies later, hatched deferred,
+ * dashed voluntary, dashed and cut on the diagonal draft or proposed (the
+ * dashed triangle), so the weight of each regime and its maturity read before
+ * the filters are used. Every square is ink: instruments are not stack layers.
  *
  * HTML and CSS, not an SVG: 182 squares with their names pass the 12 KB budget
  * of an inline chart (the ControlMosaic pattern). The squares are not links:
@@ -21,12 +23,12 @@
  */
 import '../../styles/chart.css';
 import '../../styles/obligation-visuals.css';
-import { obligations, appliesStatusLabels, type AppliesStatus } from '../../data/frameworks';
+import { obligations, appliesStatusLabels, registerAsOf, type AppliesStatus } from '../../data/frameworks';
 import { obligationGroups } from '../../lib/obligations';
 
 const ORDER: AppliesStatus[] = ['in-force', 'grace', 'applies-later', 'deferred', 'voluntary', 'pending'];
 const statuses = ORDER.filter((s) => obligations.some((row) => row.appliesStatus === s));
-const asOf = obligations.reduce((latest, row) => (row.reviewed > latest ? row.reviewed : latest), obligations[0].reviewed);
+const asOf = registerAsOf();
 const groups = obligationGroups().map((g) => ({
   ...g,
   // Within a group, the statuses in legend order, then register order.

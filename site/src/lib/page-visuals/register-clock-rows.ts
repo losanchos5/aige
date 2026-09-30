@@ -1,59 +1,74 @@
-// obligation-clock.ts: register rows (src/data/frameworks.ts) as the input of
-// the regulatory clock (src/lib/page-charts/regulatory-clock.ts), for the
+// register-clock-rows.ts: register rows (src/data/frameworks.ts) as the input
+// of the regulatory clock (src/lib/page-charts/regulatory-clock.ts), for the
 // per-pattern clock on /patterns/<slug> and the audience calendar on
 // /for/<slug>. Every date, status and step is the row's own; the as-of date
-// is the newest `reviewed` date among the rows drawn, so the chart moves only
-// when the register does, never with the build clock.
+// is registerAsOf of the rows drawn (their newest `reviewed` date), so the
+// chart moves only when the register does, never with the build clock.
 //
-//   state by status: in force solid, grace period dashed, applies later
-//   outlined, deferred hatched (voluntary outlined and draft dashed too; the
-//   clock throws if two statuses on one fill ever meet in one chart).
+// A first date is drawn in the site-wide status encoding (appliesStatusMark:
+// the same shape and drawing as on the /obligations clock and isotype and
+// the /obligations/<id> strip), so no two statuses ever share a mark.
 import { regulatoryClock, CLOCK_LABEL_MAX, type ClockRow } from '../page-charts/regulatory-clock';
-import { textWidth, type ChartOutput, type MarkState } from '../charts/core';
-import { appliesStatusLabels, obligationPath, type AppliesStatus, type Obligation } from '../../data/frameworks';
+import { textWidth, type ChartOutput } from '../charts/core';
+import {
+  appliesStatusLabels,
+  appliesStatusMark,
+  obligationPath,
+  registerAsOf,
+  type AppliesStatus,
+  type Obligation,
+} from '../../data/frameworks';
 import { frameworkOf } from '../obligations';
 import { instrumentClause, obligationHeading } from '../obligation-title';
-
-/** Fill of each status, in the legend's order. */
-export const CLOCK_STATE: Readonly<Record<AppliesStatus, MarkState>> = {
-  'in-force': 'filled',
-  grace: 'dashed',
-  'applies-later': 'outline',
-  deferred: 'hatched',
-  voluntary: 'outline',
-  pending: 'dashed',
-};
 
 /** Dates before it share the "Before 2024" column: the AI Act entered into
  *  force on 2024-08-01, and the window keeps its dates legible. */
 export const CLOCK_WINDOW_FROM = '2024-01-01';
 
 const EU = 'eu-ai-act';
+const fits = (label: string) => textWidth(label, 12.5) <= CLOCK_LABEL_MAX;
 
 /** The chip label: the clause for an EU AI Act row, else instrument and
  *  clause, or the instrument alone when that does not fit a chip. */
 export function clockLabel(row: Obligation): string {
   if (row.frameworkId === EU) return row.clause;
   const full = instrumentClause(row);
-  return textWidth(full, 12.5) <= CLOCK_LABEL_MAX ? full : frameworkOf(row).short;
+  return fits(full) ? full : frameworkOf(row).short;
+}
+
+/** The dates a row is drawn at (its first date and its steps). */
+const datesOf = (row: Obligation): string[] => [...(row.appliesFrom ? [row.appliesFrom] : []), ...(row.milestones ?? []).map((m) => m.date)];
+
+/**
+ * The chip labels of `rows`: clockLabel, except where two rows would show the
+ * same label on one date (two clauses of one instrument cut to its short
+ * name). Those fall back to the instrument's first word and the clause
+ * ("Korea Art. 31(1)"), then to the clause alone.
+ */
+function labelsOf(rows: readonly Obligation[]): string[] {
+  const labels = rows.map(clockLabel);
+  const clashing = rows.map((row, i) =>
+    rows.some((other, j) => j !== i && labels[j] === labels[i] && datesOf(other).some((d) => datesOf(row).includes(d))),
+  );
+  return rows.map((row, i) => {
+    if (!clashing[i]) return labels[i];
+    const head = frameworkOf(row).short.split(/\s+/)[0];
+    return [`${head} ${row.clause}`, row.clause].find(fits) ?? labels[i];
+  });
 }
 
 export function clockRows(rows: readonly Obligation[]): ClockRow[] {
-  return rows.map((row) => ({
-    label: clockLabel(row),
+  const labels = labelsOf(rows);
+  return rows.map((row, i) => ({
+    label: labels[i],
     name: obligationHeading(row),
     short: instrumentClause(row),
     href: obligationPath(row),
-    state: CLOCK_STATE[row.appliesStatus],
+    ...appliesStatusMark[row.appliesStatus],
     status: appliesStatusLabels[row.appliesStatus],
     first: row.appliesFrom,
     steps: row.milestones?.map((m) => ({ date: m.date, note: m.note })),
   }));
-}
-
-/** The newest review date among the rows: the clock's as-of date. */
-export function clockAsOf(rows: readonly Obligation[]): string {
-  return rows.reduce((max, row) => (row.reviewed > max ? row.reviewed : max), '');
 }
 
 /** True when at least one row has a date to draw. */
@@ -72,14 +87,15 @@ export interface ClockCopy {
 /** The wide and narrow clock of `rows`, or null when no row has a date. */
 export function obligationClock(rows: readonly Obligation[], copy: ClockCopy): { wide: ChartOutput; narrow: ChartOutput } | null {
   if (!hasClock(rows)) return null;
-  const statuses = (Object.keys(appliesStatusLabels) as AppliesStatus[]).map((s) => ({ state: CLOCK_STATE[s], label: appliesStatusLabels[s] }));
+  const statuses = (Object.keys(appliesStatusLabels) as AppliesStatus[]).map((s) => ({ ...appliesStatusMark[s], label: appliesStatusLabels[s] }));
+  const asOf = registerAsOf(rows);
   const base = {
     title: copy.title,
     desc: copy.desc,
     tableCaption: copy.tableCaption,
     source: 'the obligation register (/obligations)',
-    asOf: clockAsOf(rows),
-    today: clockAsOf(rows),
+    asOf,
+    today: asOf,
     rows: clockRows(rows),
     statuses,
     windowFrom: CLOCK_WINDOW_FROM,

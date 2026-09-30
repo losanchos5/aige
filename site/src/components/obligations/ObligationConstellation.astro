@@ -17,7 +17,8 @@
  * needs a 306 px label column); narrow, the list layout.
  */
 import Chart from '../Chart.astro';
-import { relationRadial, textWidth, wrapText, type RelationFamily, type Tone } from '../../lib/charts';
+import { relationRadial, radialLabelWidth, type RelationFamily, type Tone } from '../../lib/charts';
+import { fitsCentre, shortenToFit } from '../../lib/page-visuals/labels';
 import { patternPath, type PatternDef } from '../../data/patterns';
 import { controlHref, type Control } from '../../data/controls';
 import type { IncidentCase } from '../../data/cases';
@@ -36,15 +37,12 @@ interface Props {
 
 const { row, patterns, controls, cases, topics } = Astro.props;
 
-/** Node labels share one budget, the narrow layout's label column (266 px at
- *  13 px), so both variants print the same words. */
-const LABEL_PX = 266;
-const fits = (label: string) => textWidth(label, 13) <= LABEL_PX;
-/** Pattern names too long for a node, shortened by hand (the full name stays
- *  in the node's title and the table). A new long name fails the build. */
-const SHORT_PATTERN: Record<string, string> = {
-  'deactivation-localisation-retirement-runbook': 'Deactivation & Retirement Runbook',
-};
+/** Node labels share one budget, the narrow layout's label column (at 13 px),
+ *  so both variants print the same words; a longer name is shortened by the
+ *  shared shortener (the full name and the control id stay in the node's
+ *  title and the table). */
+const LABEL_PX = radialLabelWidth(340, 'list', '') - 1;
+const short = (label: string) => shortenToFit(label, LABEL_PX, 13);
 
 // The other frameworks under the row's topics: one node each, core when any
 // of its clauses is core to a shared topic; the link goes to the first topic
@@ -64,7 +62,7 @@ const families: RelationFamily[] = [
     label: 'Patterns',
     layered: true,
     items: patterns.map((p) => ({
-      label: fits(p.title) ? p.title : (SHORT_PATTERN[p.slug] ?? p.title),
+      label: short(p.title),
       name: p.title,
       href: patternPath(p),
       tone: p.layer as Tone,
@@ -74,7 +72,7 @@ const families: RelationFamily[] = [
     label: 'Open controls',
     layered: true,
     items: controls.map((c) => ({
-      label: fits(c.title) ? c.title : c.id,
+      label: short(c.title),
       name: `${c.id} ${c.title}`,
       href: controlHref(c.id),
       tone: c.layer as Tone,
@@ -100,15 +98,7 @@ const count = families.reduce((sum, f) => sum + f.items.length, 0);
 // The centre box of the wide layout is at least 132 wide (116 px of text) and
 // holds three lines: the instrument and clause, else the clause alone, else
 // the instrument's short name.
-const inBox = (label: string) => {
-  try {
-    wrapText(label, 116, 13.5, 'body', 3, 'centre label');
-    return true;
-  } catch {
-    return false;
-  }
-};
-const centre = [instrumentClause(row), row.clause, frameworkOf(row).short].find(inBox) ?? row.id;
+const centre = [instrumentClause(row), row.clause, frameworkOf(row).short].find(fitsCentre) ?? row.id;
 const base = {
   title: 'What this obligation connects to',
   desc: `${centre} and its ${count} relations: ${families
