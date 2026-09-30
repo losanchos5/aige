@@ -98,6 +98,16 @@ const mechFlow = harmFlow();
 const busiest = [...groups].sort((a, b) => b.rows.length - a.rows.length).slice(0, 2);
 const twoDomains = harms.filter((h) => new Set(h.mitTaxonomy.map((c) => c.split('.')[0])).size > 1).length;
 const mechanismPairs = harms.reduce((sum, h) => sum + h.mechanism.length, 0);
+// The level blocks of the flow that read more than their harms: a block counts
+// the larger of its harm-mechanism and harm-layer pairs.
+const pairsAt = (rows: readonly (typeof harms)[number][]) =>
+  Math.max(
+    rows.reduce((sum, h) => sum + h.mechanism.length, 0),
+    rows.reduce((sum, h) => sum + h.layerN.length, 0),
+  );
+const overCounted = groups
+  .filter((g) => pairsAt(g.rows) > g.rows.length)
+  .map((g) => `${levelLabel[g.level]}'s reads ${pairsAt(g.rows)} for its ${g.rows.length} harms`);
 
 const filters = [
   { id: 'hf-all', label: 'All levels', count: harms.length },
@@ -174,7 +184,7 @@ const filters = [
         chart={mechFlow.wide}
         narrow={mechFlow.narrow}
         title="Mechanism, level and layer"
-        caption={`How each mechanism leads to the levels harm lands on, and which layer's controls catch those harms. A harm can have two mechanisms, so the left-hand links count ${mechanismPairs} harm-mechanism pairs for ${harms.length} harms, and a level's block counts the larger of its two sides.`}
+        caption={`How each mechanism leads to the levels harm lands on, and which layer's controls catch those harms. A harm can have two mechanisms, so the left-hand links count ${mechanismPairs} harm-mechanism pairs for ${harms.length} harms, and a level's block counts the larger of its two sides${overCounted.length ? `: ${overCounted.join(', ')}` : ''}. The target above counts each harm once.`}
       />
 
       <div class="hm-list" data-pagefind-body>

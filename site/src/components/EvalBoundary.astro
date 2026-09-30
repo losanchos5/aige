@@ -51,6 +51,8 @@ const marks: RingMark[] = controls.map((c) => {
   };
 });
 const layersUsed = [...new Set(controls.map((c) => c.layer))].sort();
+/** The outermost ring: the controls the note's list of five leaves out. */
+const recordRing = evalBoundaryRings[evalBoundaryRings.length - 1];
 
 const base = {
   title: 'The evaluation environment, ring by ring',
@@ -74,7 +76,7 @@ const narrow = concentricRings({ ...base, id: `${id}-n`, width: NARROW_WIDTH });
   id={id}
   class:list={['eval-boundary', className]}
   title="Inside the evaluation boundary"
-  caption={`Everything around the model is part of what an evaluation measures: the harness, tools, credentials, network, delegation and the record of the run. Each dot is one of the ${controls.length} evaluation environment controls, in the colour of its stack layer; select one to open its section of the profile.`}
+  caption={`Everything around the model is part of what an evaluation measures: the harness, tools, credentials, network, delegation and the record of the run. Each dot is one of the ${controls.length} evaluation environment controls, in the colour of its stack layer; select one to open its section of the profile. The rings are our reading of the research note: its "Five things inside the boundary", nested in the order it lists them from the harness out, then the record of the run, where we place the ${recordRing.controls.length} controls that list leaves out.`}
   chart={wide}
   narrow={narrow}
 />

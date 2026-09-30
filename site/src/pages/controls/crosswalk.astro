@@ -112,7 +112,7 @@ const top = topClauses();
 const clauseItems = top.map((c) => ({ label: clauseLabel(c.fw, c.row, LOLLIPOP_LABEL), value: c.controls, href: `#${clauseAnchor(c.fw, c.row)}` }));
 const clauseChart = {
   title: 'The most covered clauses',
-  desc: `The ${TOP_CLAUSES} clauses or ids that the most controls map to, largest first.`,
+  desc: `The ${TOP_CLAUSES} clauses or ids that the most controls map to, largest first, ties in the order of the framework tables.`,
   source: 'Open control profiles (data/controls)',
   asOf: CONTROLS_AS_OF,
   items: clauseItems,
@@ -121,7 +121,7 @@ const clauseChart = {
 };
 const clausesWide = lollipop({ ...clauseChart, id: 'cw-top-w', width: 640, labelWidth: 260 });
 const clausesNarrow = lollipop({ ...clauseChart, id: 'cw-top-n', width: NARROW_WIDTH });
-const clauseCaption = `The ${TOP_CLAUSES} clauses or ids with the most controls mapped to them; each links to its row in the framework tables below.`;
+const clauseCaption = `The ${TOP_CLAUSES} clauses or ids with the most controls mapped to them, ties in the order of the framework tables below; each links to its row in those tables.`;
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
 // The dataset and schema links, with the Umami attributes the profile pages use.

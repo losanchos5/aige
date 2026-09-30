@@ -8,8 +8,8 @@
 // The build fails if any row names a pattern, obligation, control id or related
 // row that does not exist (threatProblems()). Where an open control profile
 // maps a threat (lib/cross-links.ts controlsForThreat), the Control entry links it.
-// Two charts (lib/page-visuals/risk-visuals.ts): the catalogue, layer and test
-// tool flow heads the rows, and a catalogue x framework-id grid (CSA AICM or,
+// Two charts (lib/page-visuals/risk-visuals.ts): the catalogue, stack layers
+// and test route flow heads the rows, and a catalogue x framework-id grid (CSA AICM or,
 // by a CSS-only radio pair, ISO/IEC 42001) sits in the frameworks section.
 import Base from '../../layouts/Base.astro';
 import '../../styles/reading.css';
@@ -118,10 +118,14 @@ for (const n of LAYERS) {
 }
 const shortOf = (t: ThreatTaxonomyId | 'all') => (t === 'all' ? 'any catalogue' : taxonomies.find((x) => x.id === t)!.short);
 
-// Charts. The flow counts pairs (see risk-visuals.ts); the caption states the
-// one number a reader acts on, the rows whose test is one you write.
+// Charts. The flow counts each threat once (see risk-visuals.ts); the caption
+// states the number a reader acts on: the rows only a test you write covers,
+// and those that pair a harness check with one.
 const flowPair = threatFlow();
-const writeOwn = threats.filter((r) => r.evals.some((e) => e.tool === 'custom')).length;
+const ownOnly = threats.filter((r) => r.evals.every((e) => e.tool === 'custom')).length;
+const ownToo = threats.filter((r) => r.evals.some((e) => e.tool === 'custom')).length - ownOnly;
+const twoLayers = threats.find((r) => r.layers.length > 1);
+const setExample = twoLayers ? ` (${[...twoLayers.layers].sort((a, b) => a - b).map((n) => `L${n}`).join(' + ')} is one set)` : '';
 const maxIds = (pick: (r: Threat) => readonly string[]) => Math.max(...threats.map((r) => pick(r).length));
 const grids = [
   { key: 'aicm', label: 'CSA AICM v1.1', noun: 'domain', ...threatGrid('aicm'), most: maxIds((r) => r.aicm) },
@@ -205,8 +209,8 @@ const ticksLabel = (layers: readonly number[]) =>
       <Chart
         chart={flowPair.wide}
         narrow={flowPair.narrow}
-        title="Catalogue, layer and test tool"
-        caption={`Where the threats of each catalogue are controlled in the stack, and which harness tests that control. Counts are pairs: a threat whose control spans two layers flows into both, and one tested in two tools reaches each; ${writeOwn} of the ${threats.length} threats name a test you write, because no public harness ships a check for them.`}
+        title="Catalogue, stack layers and test route"
+        caption={`Each threat runs once from its catalogue to the set of stack layers its control spans${setExample}, then to how it is tested, so every block counts distinct threats and a catalogue's block matches its filter below. ${ownOnly} of the ${threats.length} threats rely only on a test you write, because no public harness ships a check for them; ${ownToo} more pair a harness check with a test you write.`}
       />
 
       <div class="tb-index">

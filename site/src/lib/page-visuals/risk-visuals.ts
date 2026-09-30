@@ -3,17 +3,19 @@
 // here is typed by hand but the column headings.
 //
 // /resources/threats
-//   threatFlow  catalogue -> stack layer -> test tool (flow, three columns).
-//               A row may sit in two layers and name checks in two tools, so
-//               the flow counts pairs, not rows:
-//                 catalogue -> layer: one pair per (threat, layer), so a
-//                   threat whose control spans two layers flows into both;
-//                 layer -> tool: one pair per (threat, layer, tool), the
-//                   threats of that layer that name at least one check in
-//                   that tool (two checks in the same tool count once).
-//               A block's count is the larger of its in and out pairs; the
-//               table lists every link with its pairs. Order is the data's
-//               (catalogues as listed, layers 1 to 5, tools as EvalTool).
+//   threatFlow  catalogue -> stack layers -> test route (flow, three columns).
+//               Every block counts distinct threats, so a catalogue's block
+//               reads what its filter chip on the page reads. The flow kit
+//               sizes and labels a block by the larger of its in and out
+//               ribbons, so a threat must take one path only: a row whose
+//               control spans two layers flows into one node for that set of
+//               layers ("L3 + L4"), not into each layer, and a row that names
+//               checks in several tools flows into one test route, from its
+//               tools: a public harness only (Inspect, promptfoo, garak), a
+//               harness check and a test you write, or only a test you write.
+//               Layer sets are in stack order (by their lowest layer, then the
+//               next); past nine the smallest merge into "Other (N)". Order is
+//               the data's (catalogues as listed, routes as above).
 //   threatGrid  catalogue x control-framework id (heatGrid): the threats of
 //               each catalogue that name each CSA AICM domain or each ISO/IEC
 //               42001 Annex A control of the lookup table. Only the ids some
@@ -38,6 +40,7 @@
 //               their harms (ties in data order), levels and layers keep their
 //               own order.
 import {
+  FLOW_MAX_NODES,
   NARROW_WIDTH,
   concentricRings,
   flow,
@@ -54,7 +57,6 @@ import {
   aicmDomains,
   iso42001Controls,
   THREATS_AS_OF,
-  type EvalTool,
   type Threat,
 } from '../../data/threats';
 import { harms, levelOrder, levelLabel, mechanismLabel, mitDomains, type HarmMechanism } from '../../data/harms';
@@ -68,13 +70,18 @@ export interface Pair {
 const MODE: ChartMode = 'figc';
 const WIDE = 720;
 const LAYERS = [1, 2, 3, 4, 5] as const;
-const TOOLS: readonly EvalTool[] = ['Inspect', 'promptfoo', 'garak', 'custom'];
-const TOOL_LABEL: Readonly<Record<EvalTool, string>> = {
-  Inspect: 'Inspect',
-  promptfoo: 'promptfoo',
-  garak: 'garak',
-  custom: 'Write your own',
-};
+/** How a threat's control is tested, from the tools its evals name. */
+type Route = 'harness' | 'both' | 'own';
+const ROUTES: readonly { key: Route; label: string; name: string }[] = [
+  { key: 'harness', label: 'Harness check', name: 'Public harness check only' },
+  { key: 'both', label: 'Harness + own test', name: 'Harness check and own test' },
+  { key: 'own', label: 'Own test only', name: 'Only a test you write' },
+];
+/** The route of a threat: 'own' when every eval is custom, 'harness' when none is. */
+function threatRoute(t: Threat): Route {
+  const custom = t.evals.filter((e) => e.tool === 'custom').length;
+  return custom === t.evals.length ? 'own' : custom === 0 ? 'harness' : 'both';
+}
 
 const layerOf = (n: number) => layers.find((l) => l.n === n)!;
 /** "L2 Inventory": the layer's name up to its first " & ", so it fits a block. */
@@ -105,10 +112,12 @@ function flowPair(base: {
   nodes: SankeyNode[];
   links: SankeyLink[];
   tableCaption: string;
+  unit?: string;
+  unitOne?: string;
 }): Pair {
-  const { id, ...rest } = base;
+  const { id, unit = 'pairs', unitOne = 'pair', ...rest } = base;
   const used = new Set(rest.links.flatMap((l) => [l.from, l.to]));
-  const common = { ...rest, nodes: rest.nodes.filter((n) => used.has(n.id)), unit: 'pairs', unitOne: 'pair', mode: MODE, order: 'input' as const };
+  const common = { ...rest, nodes: rest.nodes.filter((n) => used.has(n.id)), unit, unitOne, mode: MODE, order: 'input' as const };
   return {
     wide: flow({ ...common, id: `${id}-w`, width: WIDE, layout: 'wide' }),
     narrow: flow({ ...common, id: `${id}-n`, width: NARROW_WIDTH, layout: 'narrow' }),
@@ -118,27 +127,53 @@ function flowPair(base: {
 // ------------------------------------------------------------- threats -- //
 
 export function threatFlow(): Pair {
-  const stage1 = tally(threats.flatMap((t) => t.layers.map((n) => `c-${t.taxonomy}>l-${n}`)));
-  const stage2 = tally(threats.flatMap((t) => t.layers.flatMap((n) => [...new Set(t.evals.map((e) => e.tool))].map((tool) => `l-${n}>t-${tool}`))));
+  // Layer sets in stack order: [1, 4] before [2], [2] before [2, 3].
+  const setKey = (t: Threat) => [...t.layers].sort((a, b) => a - b).join('-');
+  const sets = [...new Set(threats.map(setKey))].sort((a, b) => {
+    const x = a.split('-').map(Number);
+    const y = b.split('-').map(Number);
+    for (let i = 0; i < Math.max(x.length, y.length); i += 1) {
+      if (x[i] === undefined) return -1;
+      if (y[i] === undefined) return 1;
+      if (x[i] !== y[i]) return x[i] - y[i];
+    }
+    return 0;
+  });
+  // Past nine sets, the largest eight stay (ties in stack order), the rest merge.
+  const size = (key: string) => threats.filter((t) => setKey(t) === key).length;
+  const kept = sets.length > FLOW_MAX_NODES ? [...sets].sort((a, b) => size(b) - size(a) || sets.indexOf(a) - sets.indexOf(b)).slice(0, FLOW_MAX_NODES - 1) : sets;
+  const rest = sets.filter((k) => !kept.includes(k));
+  const setNode = (t: Threat) => (kept.includes(setKey(t)) ? `s-${setKey(t)}` : 's-other');
+  const stage1 = tally(threats.map((t) => `c-${t.taxonomy}>${setNode(t)}`));
+  const stage2 = tally(threats.map((t) => `${setNode(t)}>r-${threatRoute(t)}`));
+  // Short names throughout (the catalogue's short label, "L3 + L4"): every
+  // ribbon's tooltip repeats both ends, and the full names pass the 12 KB
+  // budget; the page names the catalogues and layers in full.
+  const setLabel = (key: string) => key.split('-').map((n) => `L${n}`).join(' + ');
   const nodes: SankeyNode[] = [
-    ...taxonomies.map((t) => ({ id: `c-${t.id}`, column: 'catalogue', label: t.short, name: t.name, href: `#tb-${t.id}` })),
-    ...LAYERS.map((n) => ({ id: `l-${n}`, column: 'layer', label: layerLabel(n), name: layerName(n), tone: n as Tone })),
-    ...TOOLS.map((tool) => ({ id: `t-${tool}`, column: 'tool', label: TOOL_LABEL[tool] })),
+    ...taxonomies.map((t) => ({ id: `c-${t.id}`, column: 'catalogue', label: t.short, href: `#tb-${t.id}` })),
+    ...sets
+      .filter((k) => kept.includes(k))
+      .map((k) => ({ id: `s-${k}`, column: 'layers', label: setLabel(k) })),
+    ...(rest.length ? [{ id: 's-other', column: 'layers', label: `Other (${rest.length})`, name: `Other layer sets: ${rest.map(setLabel).join('; ')}` }] : []),
+    ...ROUTES.map((r) => ({ id: `r-${r.key}`, column: 'route', label: r.label, name: r.name })),
   ];
   return flowPair({
     id: 'tb-flow',
-    title: 'Catalogue, layer and test tool',
-    desc: `The ${threats.length} threat rows flow from their catalogue to the stack layers their controls live in, then to the tools that test them, counted as pairs.`,
+    title: 'Catalogue, stack layers and test route',
+    desc: `The ${threats.length} threat rows, each once, from their catalogue to the set of stack layers their control spans, then to whether a public harness tests them.`,
     source: 'threat bridge rows on this page',
     asOf: THREATS_AS_OF,
     columns: [
       { key: 'catalogue', label: 'Catalogue' },
-      { key: 'layer', label: 'Stack layer' },
-      { key: 'tool', label: 'Test tool' },
+      { key: 'layers', label: 'Stack layers' },
+      { key: 'route', label: 'Test route' },
     ],
     nodes,
     links: [...toLinks(stage1), ...toLinks(stage2)],
-    tableCaption: 'Threat-layer pairs per catalogue and threat-layer-tool pairs per layer',
+    unit: 'threats',
+    unitOne: 'threat',
+    tableCaption: 'Threats per catalogue and set of stack layers, and per set of layers and test route',
   });
 }
 

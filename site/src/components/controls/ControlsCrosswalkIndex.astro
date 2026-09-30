@@ -31,7 +31,9 @@ const others = rows.filter((r) => !r.obligation);
 const colTotals = profiles.map((_, c) => sum(rows.map((r) => r.values[c])));
 const grand = sum(colTotals);
 const max = Math.max(1, ...rows.flatMap((r) => r.values));
-/** Side of the square: area proportional to the count, 6 to 18 px. */
+/** Side of the square: 6 px plus 12 px times the square root of the count's
+ *  share of the largest, so it runs 6 to 18 px and the area grows with the
+ *  count (not in proportion: the 6 px floor keeps a count of 1 visible). */
 const side = (n: number) => Math.round((6 + 12 * Math.sqrt(n / max)) * 10) / 10;
 const onlyOne = rows.filter((r) => r.values.filter((v) => v > 0).length === 1).length;
 const all = rows.filter((r) => r.values.every((v) => v > 0)).length;

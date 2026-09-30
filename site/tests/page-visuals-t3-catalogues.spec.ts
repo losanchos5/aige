@@ -8,10 +8,12 @@
 // - /resources/frameworks: one tile per instrument with obligation rows, its
 //   size the rows filed under it, grouped by type; the rest named under it;
 // - /resources/templates: every schema once in its lifecycle stage with its
-//   fields and share required; the record x instrument matrix counts every
-//   x-evidences mark of each schema file under the instrument it cites;
+//   fields and share required; the record x instrument matrix counts the
+//   distinct x-evidences references of each schema file under the instrument
+//   each cites;
 // - /for/aigp: each competency sized by its range midpoint with its share
-//   taught; each domain's ribbons count the indicators that link a chapter;
+//   taught; each domain's ribbons count the indicators that link a chapter,
+//   and its block names what it counts: indicator links, not indicators;
 // and every in-page link a chart draws lands on an element of the page.
 import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -123,9 +125,9 @@ test.describe('/resources/templates records ring and evidence matrix', () => {
     }
   });
 
-  test('the matrix counts every x-evidences mark of a schema under the instrument it cites', () => {
+  test('the matrix counts the distinct x-evidences references of a schema under the instrument each cites', () => {
     const page = html('/resources/templates');
-    const { rows, columns, svgs } = chart(page, 'Evidence marks, record by instrument');
+    const { rows, columns, svgs } = chart(page, 'Evidence references, record by instrument');
     const instruments = columns.slice(1, -1);
     // Each column is an instrument of the frameworks index, by its short name.
     for (const label of instruments) expect(frameworks.some((fw) => fw.short === label), label).toBe(true);
@@ -135,15 +137,17 @@ test.describe('/resources/templates records ring and evidence matrix', () => {
       instruments.filter((label) => mark.replace(/^ISO\/IEC /, 'ISO ').startsWith(label)).sort((a, b) => b.length - a.length)[0];
     const records = rows.slice(0, -1);
     expect(records.map((r) => r[0]).sort()).toEqual([...byTitle.keys()].sort());
+    // A reference marked on several fields of one schema counts once.
+    const refsIn = (schema: unknown) => [...new Set(marksIn(schema))];
     for (const row of records) {
-      const marks = marksIn(byTitle.get(row[0]));
+      const marks = refsIn(byTitle.get(row[0]));
       expect(Number(row.at(-1)), `${row[0]} total`).toBe(marks.length);
       instruments.forEach((label, i) => {
         expect(Number(row[i + 1]), `${row[0]} x ${label}`).toBe(marks.filter((m) => instrumentOf(m) === label).length);
       });
     }
     const totals = rows.at(-1)!;
-    expect(Number(totals.at(-1))).toBe(files.reduce((n, s) => n + marksIn(s).length, 0));
+    expect(Number(totals.at(-1))).toBe(files.reduce((n, s) => n + refsIn(s).length, 0));
     expectAnchorsResolve(page, svgs);
   });
 });
@@ -197,6 +201,10 @@ test.describe('/for/aigp exam weight and domains to chapters', () => {
       if (inRest) expected.set(other!, inRest);
       const got = new Map(rows.filter((r) => r[0] === `Domain ${d.code}: ${d.title}`).map((r) => [r[1], Number(r[2])]));
       expect(got, `domain ${d.code}`).toEqual(expected);
+      // An indicator linking two chapters counts in both, so the domain's
+      // block is a count of indicator links and must not call them indicators.
+      const links = [...expected.values()].reduce((a, b) => a + b, 0);
+      expect(decode(svgs), `domain ${d.code} block`).toContain(`Domain ${d.code}: ${d.title}: ${links} indicator links`);
     }
     expectAnchorsResolve(page, svgs);
   });

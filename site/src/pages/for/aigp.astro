@@ -104,6 +104,10 @@ const heatmapDescription = [
 // chapters their indicators link to.
 const weight = examWeight();
 const toChapters = domainChapters();
+// The caption's counts: each domain's indicators, read from the data.
+const [firstDomain, ...otherDomains] = aigpDomains.map((d) => ({ code: d.code, n: d.competencies.reduce((n, c) => n + c.indicators.length, 0) }));
+const domainCounts = `Domain ${firstDomain.code} holds ${firstDomain.n} indicators, ${otherDomains.map((d, i) => `${i === otherDomains.length - 1 ? 'and ' : ''}${d.code} ${d.n}`).join(', ')}`;
+const flowCaption = `Each ribbon runs from a domain to a chapter, as wide as the number of the domain's indicators that link into that chapter. An indicator that links two chapters counts in both, so a domain's block counts indicator links, not indicators: ${domainCounts}.${toChapters.grouped ? ` The ${toChapters.drawn} chapters drawn are those the most indicators of any single domain link into (ties by their total links, then chapter order); the other ${toChapters.grouped} are grouped as Other, where each domain's ribbon counts an indicator once even when it links several of them.` : ''} The table lists every pair drawn.`;
 
 // Study paths: the first link of each indicator, per domain, repeats merged.
 const paths = aigpDomains.map((domain) => ({
@@ -296,7 +300,7 @@ const jsonLd = [
       </div>
       <Chart
         title="From the domains to the chapters"
-        caption="Each ribbon runs from a domain to a chapter, as wide as the number of the domain's indicators that link into that chapter; an indicator that links two chapters counts in both. The chapters with fewer links are grouped as Other; the table lists every pair drawn."
+        caption={flowCaption}
         chart={toChapters.wide}
         narrow={toChapters.narrow}
       />

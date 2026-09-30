@@ -137,7 +137,10 @@ const evidenceNarrow = flow({ ...evidenceChart, id: 'cp-evidence-n', width: NARR
 const artefacts = evidence.links.reduce((n, l) => n + l.value, 0);
 const stay = evidence.links.filter((l) => l.from.slice(1) === l.to.slice(1)).reduce((n, l) => n + l.value, 0);
 const toTop = evidence.links.filter((l) => l.to === 'e5').reduce((n, l) => n + l.value, 0);
-const evidenceCaption = `Each band is the evidence artefacts that the controls of one home layer leave in a layer of the stack. Of ${artefacts} artefacts, ${stay} stay in their control's home layer and ${toTop} are kept in layer 05, ${layers[4].name}; the controls of each layer are listed under the chart.`;
+const toTopFromOthers = evidence.links.filter((l) => l.to === 'e5' && l.from !== 'c5').reduce((n, l) => n + l.value, 0);
+// The two counts overlap (layer 05 controls keep their evidence at home), so
+// the caption says how many of layer 05's artefacts come from other layers.
+const evidenceCaption = `Each band is the evidence artefacts that the controls of one home layer leave in a layer of the stack. Of ${artefacts} artefacts, ${stay} stay in their control's home layer and ${artefacts - stay} move to another. Layer 05, ${layers[4].name}, keeps ${toTop}, ${toTopFromOthers} of them from controls of other layers; the controls of each layer are listed under the chart.`;
 
 const jsonLd = collectionPage({
   path: '/controls',

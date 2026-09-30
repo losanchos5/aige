@@ -2,6 +2,7 @@
 // and the /agents hub (OpenSpec change bok-ch23-governing-agents). Request and
 // DOM checks only; no screenshots.
 import { test, expect } from '@playwright/test';
+import { agentThreats } from '../src/data/agent-threats';
 
 const CHAPTER = '/bok/governing-agents';
 
@@ -103,8 +104,9 @@ test.describe('/agents hub', () => {
     await expect(rows).toHaveCount(10);
     await expect(rows.first()).toContainText('ASI01');
     await expect(rows.last()).toContainText('ASI10');
-    for (let i = 0; i < 10; i++) {
-      await expect(rows.nth(i).locator('a[href^="/bok/patterns#pattern-"]')).toHaveCount(1);
+    // Each row links the patterns chapter 23 gives its threat (two for ASI10).
+    for (const [i, t] of agentThreats.entries()) {
+      await expect(rows.nth(i).locator('a[href^="/bok/patterns#pattern-"]'), t.id).toHaveCount(t.patterns.length);
     }
     await expect(page.locator('#threats')).toContainText('not a claim of conformity');
   });

@@ -178,34 +178,39 @@ const patterns = [
   },
 ];
 
-// The ten threats flowing to the pattern chapter 23 assigns each (the
-// Pattern column of the table under it), each pattern in its stack-layer
-// colour. Ten threats are one more than a flow column holds
-// (FLOW_MAX_NODES), so threats that share their one pattern merge into one
-// node, the smallest such group first, until the column fits: today that is
-// ASI03 and ASI07 (both Agent Identity & Scoped Credentials), while the four
-// threats of Runtime Guardrail keep their own ribbons.
+// The ten threats flowing to the patterns chapter 23 assigns each (the
+// Pattern column of the table under it): one ribbon per threat and pattern,
+// so ASI10, which the chapter gives Agent Registry and Shadow-AI Discovery,
+// flows to both. Each pattern node is in its stack-layer colour and opens with
+// its layer ("L4 · "), so the colour is never the only cue. Ten threats are
+// one more than a flow column holds (FLOW_MAX_NODES), so threats that share
+// the same patterns merge into one node, the smallest such group first, until
+// the column fits: today that is ASI03 and ASI07 (both Agent Identity &
+// Scoped Credentials), while the four threats of Runtime Guardrail keep their
+// own ribbons. A merged node links to its first threat's row.
 const patternOf = (title: string) => {
   const def = patternDefs.find((p) => p.title === title);
   if (!def) throw new Error(`agents: threat pattern "${title}" is not in data/patterns.ts`);
   return def;
 };
-const threatsBy = new Map<string, AgentThreat[]>();
-for (const t of agentThreats) threatsBy.set(t.pattern, [...(threatsBy.get(t.pattern) ?? []), t]);
-const mergedPatterns = new Set<string>();
+const patternsKey = (t: AgentThreat) => t.patterns.join(' | ');
+const sharing = new Map<string, AgentThreat[]>();
+for (const t of agentThreats) sharing.set(patternsKey(t), [...(sharing.get(patternsKey(t)) ?? []), t]);
+const mergedKeys = new Set<string>();
 let threatNodes = agentThreats.length;
-for (const [pattern, list] of [...threatsBy]
+for (const [key, list] of [...sharing]
   .filter(([, list]) => list.length > 1)
   .sort((a, b) => a[1].length - b[1].length || agentThreats.indexOf(a[1][0]) - agentThreats.indexOf(b[1][0]))) {
   if (threatNodes <= FLOW_MAX_NODES) break;
-  mergedPatterns.add(pattern);
+  mergedKeys.add(key);
   threatNodes -= list.length - 1;
 }
+const mergedGroups = [...mergedKeys].map((key) => sharing.get(key)!);
 const threatAnchor = (t: AgentThreat) => `#threat-${t.id.toLowerCase()}`;
 const flowNodes: SankeyNode[] = [];
 const flowLinks: SankeyLink[] = [];
 for (const t of agentThreats) {
-  const group = mergedPatterns.has(t.pattern) ? threatsBy.get(t.pattern)! : [t];
+  const group = mergedKeys.has(patternsKey(t)) ? sharing.get(patternsKey(t))! : [t];
   if (group[0] !== t) continue;
   const nodeId = `t-${t.id.toLowerCase()}`;
   flowNodes.push({
@@ -215,15 +220,19 @@ for (const t of agentThreats) {
     name: group.map((g) => `${g.id} ${g.name}`).join('; '),
     href: threatAnchor(t),
   });
-  flowLinks.push({ from: nodeId, to: `p-${patternOf(t.pattern).slug}`, value: group.length });
+  for (const title of t.patterns) flowLinks.push({ from: nodeId, to: `p-${patternOf(title).slug}`, value: group.length });
 }
+// Threats per pattern, patterns in the order the threats first name them.
+const threatsBy = new Map<string, AgentThreat[]>();
+for (const t of agentThreats) for (const title of t.patterns) threatsBy.set(title, [...(threatsBy.get(title) ?? []), t]);
 for (const title of threatsBy.keys()) {
   const def = patternOf(title);
-  flowNodes.push({ id: `p-${def.slug}`, column: 'pattern', label: title, tone: def.layer as Tone, href: patternHref(title) });
+  flowNodes.push({ id: `p-${def.slug}`, column: 'pattern', label: `L${def.layer} · ${title}`, name: title, tone: def.layer as Tone, href: patternHref(title) });
 }
+const twoPatterns = agentThreats.filter((t) => t.patterns.length > 1);
 const threatFlowBase = {
-  title: 'Ten agentic threats and the pattern that holds each',
-  desc: `The ten OWASP agentic threats, each flowing to the one pattern chapter 23 assigns it; ${threatsBy.size} patterns, each in its stack-layer colour.`,
+  title: 'Ten agentic threats and the patterns that hold them',
+  desc: `The ten OWASP agentic threats, each flowing to the pattern or patterns chapter 23 assigns it; ${threatsBy.size} patterns, each in its stack-layer colour and named with its layer.`,
   source: 'chapter 23, "Threats mapped to controls"',
   asOf: AGENT_THREATS_AS_OF,
   mode: 'figc' as const,
@@ -233,16 +242,23 @@ const threatFlowBase = {
   ],
   nodes: flowNodes,
   links: flowLinks,
-  unit: 'threats',
-  unitOne: 'threat',
+  unit: 'threat-pattern pairs',
+  unitOne: 'threat-pattern pair',
   fromHeader: 'Threat',
   toHeader: 'Pattern',
   valueHeader: 'Threats',
-  tableCaption: 'Each OWASP agentic threat with the pattern chapter 23 assigns it',
+  tableCaption: 'Each OWASP agentic threat with the pattern or patterns chapter 23 assigns it',
 };
 const threatFlowWide = flow({ ...threatFlowBase, id: 'ag-threat-flow-w', width: 760 });
 const threatFlowNarrow = flow({ ...threatFlowBase, id: 'ag-threat-flow-n', width: NARROW_WIDTH });
 const topPattern = [...threatsBy].sort((a, b) => b[1].length - a[1].length)[0];
+const idList = (list: readonly AgentThreat[]) => list.map((t) => t.id).join(' and ');
+const threatFlowCaption = [
+  `Each threat flows to the pattern chapter 23 assigns it; a pattern's width is the number of its threats, its colour and its "L" prefix the pattern's stack layer. ${topPattern[0]} holds ${topPattern[1].length} of the ${agentThreats.length}.`,
+  ...twoPatterns.map((t) => `${t.id} flows to both patterns the chapter gives it, ${t.patterns.join(' and ')}, so its block counts ${t.patterns.length}.`),
+  ...mergedGroups.map((g) => `${idList(g)} share one block, as both go to ${g[0].patterns.join(' and ')}; it opens ${g[0].id}'s row.`),
+  'Select a threat for its row in the table below.',
+].join(' ');
 
 const crossRefs = [
   {
@@ -422,7 +438,7 @@ const description =
       <Chart
         id="ag-threat-flow"
         title="Which pattern holds which threat"
-        caption={`Each threat flows to the one pattern chapter 23 assigns it; the width is the number of threats, the colour the pattern's stack layer. ${topPattern[0]} holds ${topPattern[1].length} of the ${agentThreats.length}. Select a threat for its row in the table below.`}
+        caption={threatFlowCaption}
         chart={threatFlowWide}
         narrow={threatFlowNarrow}
       />
@@ -448,7 +464,12 @@ const description =
                 </td>
                 <td class="c-summary" data-label="Control">{t.control}</td>
                 <td data-label="Pattern">
-                  <a href={patternHref(t.pattern)}>{t.pattern}</a>
+                  {t.patterns.map((title, i) => (
+                    <>
+                      {i > 0 && '; '}
+                      <a href={patternHref(title)}>{title}</a>
+                    </>
+                  ))}
                 </td>
               </tr>
             ))
