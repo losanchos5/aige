@@ -33,5 +33,5 @@
       temas y 390 px: barrido a11y existente (filtrado a las dos rutas en local, completo en CI)
 - [x] 4.2 Fact-check por subagente aparte → `aige-wt/handoffs/plazos-factcheck.md`; corregir
 - [x] 4.3 `code-reviewer`; arreglar CRITICAL/HIGH
-- [ ] 4.4 Build con `aige-wt/build.sh`, `PW_PORT=4452 npm test`, spec nuevo
-- [ ] 4.5 Commit por ruta, PR con el token de losanchos5, CI verde, merge coordinado, deploy, smoke
+- [x] 4.4 Build con `aige-wt/build.sh`, `PW_PORT=4452 npm test`, spec nuevo
+- [x] 4.5 Commit por ruta, PR con el token de losanchos5, CI verde, merge coordinado, deploy, smoke

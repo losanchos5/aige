@@ -33,3 +33,11 @@ son enlaces, contraste AA en bandas tintadas).
 #### Scenario: Edición paralela de la portada
 - **WHEN** otro bloque edita la portada al mismo tiempo
 - **THEN** el conflicto se limita a una línea de import y una línea de uso
+
+### Requirement: Enlace a la línea temporal completa
+La banda "What applies now" SHALL enlazar la página de plazos `/resources/ai-act-deadlines` ("Full
+timeline") junto a sus enlaces al registro y al capítulo 18.
+
+#### Scenario: Enlace presente
+- **WHEN** se abre `/`
+- **THEN** la sección `what-applies-now` contiene un enlace a `/resources/ai-act-deadlines`
