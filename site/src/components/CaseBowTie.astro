@@ -1,0 +1,50 @@
+---
+/**
+ * CaseBowTie: the incident bow-tie at the head of a /cases/<id> page, between
+ * "In short" and "What happened" (OpenSpec page-visuals, wave 2). Generated
+ * per case from its record (lib/page-visuals/case-bowtie.ts), not registered
+ * in data/figures.ts. The wide row needs the full page container, so from
+ * the width at which the container stops growing the figure leaves the
+ * reading column; below it the narrow column (the phone variant) shows.
+ * The page loads figures.css (reading.css), so the chart keeps 'figc' mode.
+ */
+import Chart from './Chart.astro';
+import { caseBowTie } from '../lib/page-visuals/case-bowtie';
+import type { IncidentCase } from '../data/cases';
+
+interface Props {
+  entry: IncidentCase;
+}
+
+const { entry } = Astro.props;
+const { wide, narrow, byMoment } = caseBowTie(entry);
+// The figure's width once it leaves the column: the wide row at 1:1 plus the
+// canvas padding and border, and at least 1000, Chart's widest switch point.
+const outWidth = `--bt-w: ${Math.max(1000, wide.width + 28)}px`;
+const title = byMoment ? 'Before, during and after the incident' : 'What would have caught it';
+const caption = byMoment
+  ? 'The controls that act before the failure, the incident, the controls that notice and contain it, the harms it caused and the evidence each control leaves. Check that the controls you run leave the artefacts of the last panel.'
+  : 'The patterns that would have caught the incident, the incident, the harms it caused and the evidence an auditor could have read. Check that the controls you run leave the artefacts of the last panel.';
+---
+
+<div class="cs-bowtie" style={outWidth}>
+  <Chart chart={wide} narrow={narrow} title={title} caption={caption} tableLabel="Bow-tie as a table" />
+</div>
+
+<style>
+  .cs-bowtie {
+    margin-block: var(--s-6);
+  }
+
+  .cs-bowtie :global(.chart-fig) {
+    margin: 0;
+  }
+
+  /* The container is at its full width (var(--container)) from here: the
+     figure leaves the 72ch reading column, so the wide row shows at 1:1. */
+  @media (min-width: 1240px) {
+    .cs-bowtie {
+      width: min(var(--bt-w), calc(var(--container) - 2 * var(--s-4)));
+    }
+  }
+</style>

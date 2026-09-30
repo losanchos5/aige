@@ -17,6 +17,9 @@ import CitedText from '../../components/CitedText.astro';
 import ContrastCards from '../../components/ContrastCards.astro';
 import TermCitation from '../../components/TermCitation.astro';
 import Byline from '../../components/Byline.astro';
+import TermFootprint from '../../components/TermFootprint.astro';
+import TermNeighbourhood from '../../components/TermNeighbourhood.astro';
+import { termNeighbourhood } from '../../lib/page-visuals/term-visuals';
 import { site } from '../../data/site';
 import { chaptersOrdered } from '../../data/chapters';
 import {
@@ -96,6 +99,8 @@ const compared = comparisonsForTerm(entry.slug);
 const pairs = contrastPairsFor(entry.slug);
 const usage = termUsage(entry.slug);
 const related = relatedTerms(entry.slug).filter((r) => !entry.contrast.includes(r.slug));
+// The term's neighbourhood (page-visuals wave 2): null under three relations.
+const neighbourhood = termNeighbourhood(entry);
 const chapterLinks = entry.chapterRefs
   .map((ref) => chaptersOrdered.find((c) => c.order === Number(ref)))
   .filter((c) => c !== undefined)
@@ -320,13 +325,25 @@ const jsonLd = [
           <h2 id="where-used">Where it is used</h2>
           {
             usage.length > 0 ? (
-              <>
-                <p>
-                  {usage.length === 1
-                    ? 'One chapter of the Body of Knowledge uses the term.'
-                    : `${usage.length} chapters of the Body of Knowledge use the term.`}{' '}
-                  Each link opens the first section that does.
-                </p>
+              <p>
+                {usage.length === 1
+                  ? 'One chapter of the Body of Knowledge uses the term.'
+                  : `${usage.length} chapters of the Body of Knowledge use the term.`}{' '}
+                Each link opens the first section that does.
+              </p>
+            ) : (
+              <p>
+                The term is not used under this name in running prose; the sections listed under
+                "Developed in" treat it.
+              </p>
+            )
+          }
+        </div>
+        {
+          usage.length > 0 && (
+            <>
+              <TermFootprint entry={entry} />
+              <div class="prose">
                 <ul class="gt-usage">
                   {usage.map((use) => (
                     <li>
@@ -340,15 +357,10 @@ const jsonLd = [
                     </li>
                   ))}
                 </ul>
-              </>
-            ) : (
-              <p>
-                The term is not used under this name in running prose; the sections listed under
-                "Developed in" treat it.
-              </p>
-            )
-          }
-        </div>
+              </div>
+            </>
+          )
+        }
       </section>
 
       {
@@ -379,19 +391,22 @@ const jsonLd = [
       }
 
       {
-        related.length > 0 && (
+        (related.length > 0 || neighbourhood) && (
           <section class="gt-section" aria-labelledby="related-terms">
             <div class="prose">
               <h2 id="related-terms">Related terms</h2>
             </div>
-            <ul class="gt-related">
-              {related.map((other) => (
-                <li>
-                  <a href={other.url}>{other.term}</a>
-                  <p>{firstSentence(other.definition, 160)}</p>
-                </li>
-              ))}
-            </ul>
+            {neighbourhood && <TermNeighbourhood chart={neighbourhood} />}
+            {related.length > 0 && (
+              <ul class="gt-related">
+                {related.map((other) => (
+                  <li>
+                    <a href={other.url}>{other.term}</a>
+                    <p>{firstSentence(other.definition, 160)}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         )
       }
