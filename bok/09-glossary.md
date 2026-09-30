@@ -563,12 +563,12 @@ fairness eval suite. Contrast with [Counterfactual fairness](/glossary/counterfa
 fairness](/bok/fairness-and-explainability#individual-and-counterfactual-fairness); [ch. 05,
 Pattern: Fairness Eval Suite](/patterns/fairness-eval-suite). (ch. 05, 16)
 
-
 **Critical Capability Level (CCL).** In Google DeepMind's Frontier Safety Framework, a capability
 level at which a model may pose a heightened risk of severe harm without mitigations; reaching one
 calls for security and deployment mitigations and a decision that the residual risk is acceptable.
 Version 3.1 adds lower Tracked Capability Levels [145]. See [the frontier safety frameworks
 crosswalk](/resources/frontier-safety-crosswalk#topic-thresholds). (ch. 10)
+
 ## D
 
 **Data card.** Structured, versioned documentation of a dataset (provenance, lawful basis, rights,
