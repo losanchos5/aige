@@ -6,6 +6,13 @@
 //
 // Lives in the `a11y` Playwright project (see playwright.config.ts) so it is
 // kept out of the default `npm test`; run it with `npm run test:a11y`.
+//
+// Sampling: a parent path below the root with more than SAMPLE_OVER pages (the glossary terms,
+// the obligation pages) is one template filled from data, so axe on every page
+// re-checks the same markup. Unless A11Y_FULL=1, such a group is reduced to its
+// largest pages (the ones rendering the most optional sections), its smallest
+// page and every SAMPLE_STRIDE-th page. CI sets A11Y_FULL=1 on pushes to main,
+// which do not gate the deploy, so every page is still swept after each merge.
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readdirSync, statSync } from 'node:fs';
@@ -31,10 +38,40 @@ function toRoute(file: string): string {
   return route === '' ? '/' : route;
 }
 
-const routes = htmlFiles(DIST)
-  .map(toRoute)
-  .filter((route) => !route.startsWith('/og/') && !route.startsWith('/diagrams/'))
-  .sort();
+const SAMPLE_OVER = 40;
+const SAMPLE_STRIDE = 20;
+const SAMPLE_LARGEST = 3;
+const FULL = process.env.A11Y_FULL === '1';
+
+const pages = htmlFiles(DIST)
+  .map((file) => ({ route: toRoute(file), size: statSync(file).size }))
+  .filter(({ route }) => !route.startsWith('/og/') && !route.startsWith('/diagrams/'))
+  .sort((a, b) => a.route.localeCompare(b.route));
+
+/** Keeps every page, or a deterministic sample of each large data-filled group. */
+function sample(all: typeof pages): string[] {
+  if (FULL) return all.map((p) => p.route);
+  const groups = new Map<string, typeof pages>();
+  for (const p of all) {
+    const parent = p.route.slice(0, p.route.lastIndexOf('/')) || '/';
+    groups.set(parent, [...(groups.get(parent) ?? []), p]);
+  }
+  const keep = new Set<string>();
+  for (const [parent, group] of groups) {
+    // Top-level pages are each their own template: never sampled.
+    if (parent === '/' || group.length <= SAMPLE_OVER) {
+      group.forEach((p) => keep.add(p.route));
+      continue;
+    }
+    const bySize = [...group].sort((a, b) => b.size - a.size || a.route.localeCompare(b.route));
+    bySize.slice(0, SAMPLE_LARGEST).forEach((p) => keep.add(p.route));
+    keep.add(bySize[bySize.length - 1].route);
+    group.forEach((p, i) => i % SAMPLE_STRIDE === 0 && keep.add(p.route));
+  }
+  return all.map((p) => p.route).filter((r) => keep.has(r));
+}
+
+const routes = sample(pages);
 
 const schemes = ['light', 'dark'] as const;
 const widths = [1440, 390];

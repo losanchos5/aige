@@ -9,7 +9,16 @@ on:
 permissions:
   contents: read
 
+# A new push to the same PR cancels the run it supersedes; main runs to the end.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  # One build, shared by the test jobs below through an artifact. Besides dist,
+  # the artifact carries what the prebuild writes under src/ (the diagram
+  # manifest and SVGs, the figures and their render cache), which specs import
+  # or check with figures-build --check. The public/ outputs are already in dist.
   build:
     runs-on: ubuntu-latest
     defaults:
@@ -40,26 +49,90 @@ jobs:
           key: archify-v2.16.0
       # `build` runs astro check + build, content-lint over dist, then Pagefind.
       - run: npm run build
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: site-build
+          path: |
+            site/dist
+            site/src/generated
+            site/src/figures
+            site/.figures-cache
+          retention-days: 1
+          include-hidden-files: true
+
+  # Playwright suites against the shared build. `default` is the behavioural
+  # suite (npm test); `a11y` is the axe sweep plus orp-a11y. Each is split in
+  # shards that run on separate runners. On pull requests the axe sweep samples
+  # the large data-filled groups (see tests/a11y.spec.ts); pushes to main set
+  # A11Y_FULL=1 and sweep every page, without blocking the deploy.
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { project: default, shard: 1, of: 2 }
+          - { project: default, shard: 2, of: 2 }
+          - { project: a11y, shard: 1, of: 4 }
+          - { project: a11y, shard: 2, of: 4 }
+          - { project: a11y, shard: 3, of: 4 }
+          - { project: a11y, shard: 4, of: 4 }
+    name: test (${{ matrix.project }} ${{ matrix.shard }}/${{ matrix.of }})
+    defaults:
+      run:
+        working-directory: site
+    env:
+      A11Y_FULL: ${{ github.event_name == 'push' && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0 # seo-infra.spec compares sitemap lastmod with git log dates
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: site-build
+          path: site
       - run: npx playwright install --with-deps chromium
-      # Default project excludes the purely-visual screenshot specs (see playwright.config.ts).
-      - run: npm test -- --reporter=html
-      # The axe sweep discovers routes from dist and asserts zero violations.
-      - run: npm run test:a11y
+      - run: npx playwright test --project=${{ matrix.project }} --shard=${{ matrix.shard }}/${{ matrix.of }} --reporter=list,html
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.project }}-${{ matrix.shard }}
           path: site/playwright-report
           retention-days: 7
-      # Lighthouse CI runs LAST: `lhci autorun` starts its own `astro preview`
-      # server (see lighthouserc.cjs) and uses the runner's system Chrome, but its
-      # collection wipes dist/pagefind, so no Playwright step may follow it.
-      # Non-blocking: a score regression should not fail the build. The SEO
-      # category's checks are mirrored as blocking assertions in
-      # site/tests/seo-basics.spec.ts, which the `npm test` step above runs.
+
+  # Lighthouse CI, in its own job so it no longer sits at the end of the test
+  # chain. `lhci autorun` starts its own `astro preview` server (see
+  # lighthouserc.cjs) and uses the runner's system Chrome. Non-blocking: a score
+  # regression should not fail the build. The SEO category's checks are
+  # mirrored as blocking assertions in site/tests/seo-basics.spec.ts.
+  lighthouse:
+    needs: build
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: site-build
+          path: site
       - name: Lighthouse CI
         run: npm run lhci
-        continue-on-error: true
 
   # The read-only MCP server (tools/mcp-server) has its own package and unit
   # tests (fixtures, no network). They run only when the server, the schemas it
