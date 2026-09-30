@@ -369,6 +369,16 @@ function init(app, model) {
   const importInput = app.querySelector('[data-acp-import]');
   const addButton = form.querySelector('[data-acp-add]');
   let shown = false;
+  const ladderBox = app.querySelector('[data-acp-ladder]');
+
+  /** Light the chosen level on the autonomy ladder (the page draws one
+   *  <g data-step="<level id>"> per level; its CSS draws data-state). */
+  function lightLadder(level) {
+    for (const group of ladderBox?.querySelectorAll('g[data-step]') ?? []) {
+      if (level && group.getAttribute('data-step') === level) group.setAttribute('data-state', 'chosen');
+      else group.removeAttribute('data-state');
+    }
+  }
 
   const params = () => ({ v: String(VERSION), ...readForm(form) });
 
@@ -534,6 +544,7 @@ function init(app, model) {
   });
   form.addEventListener('change', () => {
     const p = params();
+    lightLadder(p.al);
     if (shown && complete(p)) {
       render(p);
       sync();
@@ -552,6 +563,7 @@ function init(app, model) {
 
   form.querySelector('[data-acp-reset]')?.addEventListener('click', () => {
     applyForm(form, {});
+    lightLadder('');
     clearFieldErrors(form);
     showErrorSummary(summary, []);
     result.hidden = true;
@@ -578,6 +590,7 @@ function init(app, model) {
       if (ext.version !== VERSION) throw new Error(`That entry is version ${ext.version}; this tool reads version ${VERSION}.`);
       const p = pickParams(ext.inputs, PARAM_KEYS);
       applyForm(form, p);
+      lightLadder(p.al);
       showRows();
       if (!complete(params())) throw new Error('The description in that file is incomplete.');
       render(params());
@@ -598,6 +611,7 @@ function init(app, model) {
     const state = pickParams(readFragment(), PARAM_KEYS);
     if (!state.aid && !state.al) return;
     applyForm(form, state);
+    lightLadder(state.al);
     showRows();
     if (!complete(params())) return;
     const profile = render(params());
