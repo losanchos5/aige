@@ -49,15 +49,15 @@ aparecer en el sitemap con su par hreflang.
 
 #### Scenario: Par de idiomas
 - **WHEN** se abre `/es/resources/ai-act-deadlines`
-- **THEN** el documento es `lang="es"`, el H1 dice "Plazos del AI Act tras el Digital Omnibus: qué se
-  aplica y cuándo" y un enlace lleva a `/resources/ai-act-deadlines`
+- **THEN** el documento es `lang="es"`, el H1 dice "Plazos del Reglamento de IA (AI Act) tras el Digital
+  Omnibus: qué se aplica y cuándo" y un enlace lleva a `/resources/ai-act-deadlines`
 
 #### Scenario: Línea temporal completa
 - **WHEN** se abre cualquiera de las dos páginas
 - **THEN** hay tantos `<time datetime>` en la línea temporal como hitos tiene el dato
 
 ### Requirement: Estado español prudente
-Las entradas de España SHALL cubrir AESIA, el entorno controlado de pruebas del RD 817/2023 y el
+Las entradas de España SHALL cubrir AESIA, el espacio controlado de pruebas del RD 817/2023 y el
 Proyecto de Ley Orgánica para el buen uso y la gobernanza de la IA. El proyecto de ley MUST aparecer
 siempre como proyecto en tramitación parlamentaria, nunca como ley adoptada, en los dos idiomas, y
 cada entrada MUST llevar fuente. content-lint MUST seguir rechazando "Spanish AI law" sin calificar.
@@ -79,7 +79,7 @@ completo por hito pendiente, con UID estable. Ambos formatos MUST parsear.
 ### Requirement: Descubrimiento
 La página inglesa SHALL enlazarse desde el grupo Reference de la navegación (tras Obligations), el
 índice de recursos, `llms.txt`, el capítulo 18 (§ "The post-Omnibus timeline") y el capítulo 21 (§
-Spain); la española desde el pie ("Plazos del AI Act (español)"). Ambas SHALL llevar JSON-LD
+Spain); la española desde el pie ("Plazos del Reglamento de IA (español)"). Ambas SHALL llevar JSON-LD
 `TechArticle` (con `inLanguage` y la relación de traducción entre ellas) y `BreadcrumbList`, y una
 tarjeta OG propia.
 

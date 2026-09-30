@@ -228,7 +228,7 @@ export const aiActMilestones: readonly TimelineMilestone[] = [
     title: { en: 'The AI Act enters into force', es: 'Entrada en vigor del Reglamento de IA' },
     applies: {
       en: 'Regulation (EU) 2024/1689 enters into force. Nothing applies yet: every obligation has a later application date.',
-      es: 'Entra en vigor el Reglamento (UE) 2024/1689. Aún no se aplica nada: cada obligación tiene una fecha de aplicación posterior.',
+      es: 'Entra en vigor el Reglamento (UE) 2024/1689. Todavía no se aplica ninguna obligación: cada una tiene una fecha de aplicación posterior.',
     },
     articles: ['Art. 113'],
     basis: 'ai-act',
@@ -346,11 +346,11 @@ export const aiActMilestones: readonly TimelineMilestone[] = [
     date: '2027-08-02',
     title: {
       en: 'Earlier general-purpose AI models and national sandboxes',
-      es: 'Modelos de uso general anteriores y espacios controlados nacionales',
+      es: 'Modelos de uso general anteriores y espacios controlados de pruebas nacionales',
     },
     applies: {
       en: 'General-purpose AI models placed on the market before 2 Aug 2025 must comply; each Member State must have at least one AI regulatory sandbox operational; the delegated acts limiting duties for Annex I, Section A products are due.',
-      es: 'Los modelos de IA de uso general introducidos en el mercado antes del 2 de agosto de 2025 deben cumplir; cada Estado miembro debe tener operativo al menos un espacio controlado de pruebas para la IA; vencen los actos delegados que limitan obligaciones para los productos del anexo I, sección A.',
+      es: 'Los modelos de IA de uso general introducidos en el mercado antes del 2 de agosto de 2025 deben cumplir; cada Estado miembro debe tener operativo al menos un espacio controlado de pruebas para la IA; termina el plazo para los actos delegados que limitan obligaciones para los productos del anexo I, sección A.',
     },
     who: {
       en: 'Providers of earlier general-purpose AI models; Member States; the Commission.',
@@ -486,7 +486,7 @@ export const aiActMilestones: readonly TimelineMilestone[] = [
     date: '2030-08-02',
     title: {
       en: 'Earlier high-risk systems used by public authorities',
-      es: 'Sistemas de alto riesgo anteriores usados por autoridades públicas',
+      es: 'Sistemas de alto riesgo ya en uso por autoridades públicas',
     },
     applies: {
       en: 'High-risk systems already on the market and intended for use by public authorities must comply.',
@@ -494,7 +494,7 @@ export const aiActMilestones: readonly TimelineMilestone[] = [
     },
     who: {
       en: 'Providers and public-authority deployers of those systems.',
-      es: 'Proveedores y autoridades públicas que despliegan esos sistemas.',
+      es: 'Proveedores y autoridades públicas responsables del despliegue.',
     },
     articles: ['Art. 111(2)'],
     systemClasses: ['high-risk-annex-iii', 'high-risk-annex-i'],
@@ -531,7 +531,7 @@ export const spain: readonly SpainEntry[] = [
     title: { en: 'AESIA, the Spanish AI supervisor', es: 'AESIA, la autoridad española de supervisión de la IA' },
     body: {
       en: "The Spanish Agency for the Supervision of Artificial Intelligence, seated in A Coruña, has its statute in Royal Decree 729/2023. The Commission lists it as Spain's single point of contact under the AI Act, with the designation pending final adoption: the bill would make it the single point of contact and main market surveillance authority. Its 16 sandbox guides are not binding and predate the Omnibus.",
-      es: 'La Agencia Española de Supervisión de la Inteligencia Artificial, con sede en A Coruña, tiene su estatuto en el Real Decreto 729/2023. La Comisión la recoge como punto de contacto único de España con arreglo al Reglamento de IA, con la designación pendiente de adopción definitiva: el proyecto de ley la convertiría en punto de contacto único y principal autoridad de vigilancia del mercado. Sus 16 guías del entorno de pruebas no son vinculantes y son anteriores al Omnibus.',
+      es: 'La Agencia Española de Supervisión de la Inteligencia Artificial, con sede en A Coruña, tiene su estatuto en el Real Decreto 729/2023. La Comisión la recoge como punto de contacto único de España con arreglo al Reglamento de IA, con la designación pendiente de adopción definitiva: el proyecto de ley la convertiría en punto de contacto único y principal autoridad de vigilancia del mercado. Sus 16 guías del espacio controlado de pruebas no son vinculantes y son anteriores al Omnibus.',
     },
     status: 'in-force',
     sources: [6, 5, 13, 10],
@@ -539,10 +539,10 @@ export const spain: readonly SpainEntry[] = [
   {
     id: 'sandbox',
     date: '2023-11-09',
-    title: { en: 'The sandbox, Royal Decree 817/2023', es: 'El entorno de pruebas, Real Decreto 817/2023' },
+    title: { en: 'The sandbox, Royal Decree 817/2023', es: 'El espacio controlado de pruebas, Real Decreto 817/2023' },
     body: {
       en: 'Royal Decree 817/2023 set up a controlled testing environment for AI Act compliance. Its first call, published on 20 Dec 2024, sought up to 12 high-risk systems for about 12 months; 44 applied and 12 were selected. No second call had been published by 30 Sep 2026. The bill would have AESIA run the sandbox every Member State must have operational by 2 Aug 2027, and would repeal the decree.',
-      es: 'El Real Decreto 817/2023 creó un entorno controlado de pruebas para el cumplimiento del Reglamento de IA. Su primera convocatoria, publicada el 20 de diciembre de 2024, buscaba hasta 12 sistemas de alto riesgo durante unos 12 meses; se presentaron 44 y se seleccionaron 12. A 30 de septiembre de 2026 no se había publicado una segunda convocatoria. El proyecto de ley encargaría a la AESIA el espacio controlado de pruebas que cada Estado miembro debe tener operativo antes del 2 de agosto de 2027, y derogaría el real decreto.',
+      es: 'El Real Decreto 817/2023 creó un espacio controlado de pruebas para el cumplimiento del Reglamento de IA. Su primera convocatoria, publicada el 20 de diciembre de 2024, buscaba hasta 12 sistemas de alto riesgo durante unos 12 meses; se presentaron 44 y se seleccionaron 12. A 30 de septiembre de 2026 no se había publicado una segunda convocatoria. El proyecto de ley encargaría a la AESIA el espacio controlado de pruebas que cada Estado miembro debe tener operativo antes del 2 de agosto de 2027, y derogaría el real decreto.',
     },
     status: 'in-force',
     sources: [7, 8, 9, 13, 2],
@@ -568,7 +568,7 @@ export const updates: readonly TimelineUpdate[] = [
     date: '2026-09-30',
     note: {
       en: 'First version: 13 milestones from chapter 18, checked against Regulations (EU) 2024/1689 and 2026/1744 and the consolidated text; the Spanish supervisor, sandbox and bill checked against the BOE, the Council of Ministers, the Congreso and AESIA.',
-      es: 'Primera versión: 13 hitos del capítulo 18, contrastados con los Reglamentos (UE) 2024/1689 y 2026/1744 y el texto consolidado; la autoridad, el entorno de pruebas y el proyecto de ley españoles, contrastados con el BOE, el Consejo de Ministros, el Congreso y la AESIA.',
+      es: 'Primera versión: 13 hitos del capítulo 18, contrastados con los Reglamentos (UE) 2024/1689 y 2026/1744 y el texto consolidado; la autoridad, el espacio controlado de pruebas y el proyecto de ley españoles, contrastados con el BOE, el Consejo de Ministros, el Congreso y la AESIA.',
     },
   },
 ];

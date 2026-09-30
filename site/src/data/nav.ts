@@ -241,7 +241,7 @@ export const nav: NavGroup[] = [
         description: 'What applies when under the EU AI Act after the Digital Omnibus, updated by milestone.',
       },
       {
-        label: 'Plazos del AI Act (español)',
+        label: 'Plazos del Reglamento de IA (español)',
         href: '/es/resources/ai-act-deadlines',
         description: 'The AI Act deadlines in Spanish.',
         placement: 'footer',

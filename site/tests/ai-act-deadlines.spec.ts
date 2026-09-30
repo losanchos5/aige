@@ -56,7 +56,7 @@ const PAGES = [
   {
     path: '/es/resources/ai-act-deadlines',
     lang: 'es',
-    h1: 'Plazos del AI Act tras el Digital Omnibus: qué se aplica y cuándo',
+    h1: 'Plazos del Reglamento de IA (AI Act) tras el Digital Omnibus: qué se aplica y cuándo',
     other: '/resources/ai-act-deadlines',
   },
 ] as const;
