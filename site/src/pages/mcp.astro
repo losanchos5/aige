@@ -189,6 +189,12 @@ const jsonLd = [
 </Base>
 
 <style>
+  /* The endpoint snippet sits outside .prose, so it gets the scroll region's
+     own overflow here; without it the URL widens a 390 px page by 10 px. */
+  pre {
+    overflow-x: auto;
+  }
+
   /* The answer path as a framed band under the hero: the caption above the
      chain as its heading, numbered steps (the number is decoration: empty
      alt text) and the sourced answer, where the chain ends, in solid ink. */
