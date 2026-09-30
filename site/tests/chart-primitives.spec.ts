@@ -17,28 +17,39 @@ import { resolve } from 'node:path';
 
 import {
   beeswarm,
+  bookSpine,
   bowTie,
+  concentricRings,
   controlChain,
   divergingBars,
   dotMatrix,
   dumbbell,
+  flow,
   heatGrid,
   ladder,
   lanes,
+  lifecycleRing,
   linearScale,
   lollipop,
+  progressRing,
   rankedBars,
   relationRadial,
   stacked100,
   stackedBars,
   timeLanes,
   timeStrip,
+  treemap,
   venn3,
   type Cell,
   type ChartOutput,
   type RelationFamily,
+  type SpinePart,
+  type TreemapGroup,
 } from '../src/lib/charts';
 import { enforcementLabels } from '../src/data/policy-card';
+import { harms, levelLabel, levelOrder, mitDomains } from '../src/data/harms';
+import { frameworks, obligations } from '../src/data/frameworks';
+import { chapterParts, chaptersOrdered } from '../src/data/chapters';
 
 const base = { source: 'chapter 08 [3]', asOf: '2026-09-30' };
 const title = 'A chart';
@@ -143,6 +154,123 @@ const anatomy = {
   decision: { label: 'To be specified', state: 'hatched' as const },
   evidence: [{ label: 'Admission record', layer: 4 as const, href: '/resources/templates#schema-admission' }],
 };
+
+// Flow, rings, treemap and spine (wave 3).
+const flowColumns = [
+  { key: 'p', label: 'Profile' },
+  { key: 'f', label: 'Framework' },
+];
+const flowNodes = [
+  { id: 'ar', column: 'p', label: 'Agent runtime', href: '/controls/agent-runtime' },
+  { id: 'ev', column: 'p', label: 'Evals' },
+  { id: 'eu', column: 'f', label: 'EU AI Act' },
+  { id: 'iso', column: 'f', label: 'ISO 42001', name: 'ISO/IEC 42001 Annex A' },
+  { id: 'asi', column: 'f', label: 'OWASP ASI' },
+];
+const flowLinks = [
+  { from: 'ar', to: 'eu', value: 5 },
+  { from: 'ar', to: 'asi', value: 9 },
+  { from: 'ev', to: 'eu', value: 3 },
+  { from: 'ev', to: 'iso', value: 4 },
+];
+const flowInput = { columns: flowColumns, nodes: flowNodes, links: flowLinks, unit: 'pairs', order: 'input' as const };
+const flowRows = [
+  ['Agent runtime', 'EU AI Act', 5],
+  ['Agent runtime', 'OWASP ASI', 9],
+  ['Evals', 'EU AI Act', 3],
+  ['Evals', 'ISO/IEC 42001 Annex A', 4],
+];
+const ringInput = {
+  rings: [
+    { key: 'individual', label: 'Individual' },
+    { key: 'organisation', label: 'Organisation', href: '/resources/harms#organisation' },
+    { key: 'society', label: 'Society' },
+  ],
+  sectors: [
+    { key: 'privacy', label: 'Privacy' },
+    { key: 'misuse', label: 'Misuse' },
+    { key: 'safety', label: 'System safety' },
+  ],
+  marks: [
+    { label: 'Re-identification', ring: 'individual', sector: 'privacy', tone: 2 as const, href: '/resources/harms#harm-reid' },
+    { label: 'Data breach', ring: 'organisation', sector: 'privacy', tone: 2 as const },
+    { label: 'Model theft', ring: 'organisation', sector: 'privacy', tone: 4 as const, state: 'hatched' as const, status: 'To be specified' },
+    { label: 'Fraud at scale', ring: 'society', sector: 'misuse', tone: 4 as const },
+    { label: 'Outage', ring: 'organisation', sector: 'safety', shape: 'square' as const, tone: 3 as const },
+  ],
+  centre: { label: 'Harm' },
+};
+const ringRows = ringInput.marks.map((m) => [
+  m.label,
+  ringInput.rings.find((r) => r.key === m.ring)!.label,
+  ringInput.sectors.find((s) => s.key === m.sector)!.label,
+  `Layer 0${m.tone}`,
+  m.status ?? '',
+]);
+const lifecycleInput = {
+  stages: [
+    { key: 'build', label: 'Build' },
+    { key: 'test', label: 'Test' },
+    { key: 'operate', label: 'Operate', href: '/resources/templates#operate' },
+  ],
+  nodes: [
+    { label: 'model-card', stage: 'build', size: 40, fill: 0.25, href: '/resources/templates#schema-model-card' },
+    { label: 'eval-report', stage: 'test', size: 10, fill: 1 },
+    { label: 'incident-record', stage: 'operate', size: 22, fill: 0.5 },
+  ],
+  centre: { label: 'Whole organisation', nodes: [{ label: 'policy-card', size: 16, fill: 0 }] },
+  sizeLabel: 'Fields',
+  fillLabel: 'Required (%)',
+};
+const lifecycleRows = [
+  ['Build', 'model-card', 40, 25],
+  ['Test', 'eval-report', 10, 100],
+  ['Operate', 'incident-record', 22, 50],
+  ['Whole organisation', 'policy-card', 16, 0],
+];
+const progressItems = [
+  { key: 'foundations', label: 'Foundations', done: 3, total: 8 },
+  { key: 'proof', label: 'Proof', done: 0, total: 0 },
+  { key: 'total', label: 'Total', done: 5, total: 12 },
+];
+const pctOf = (p: { done: number; total: number }) => (p.total ? Math.round((100 * p.done) / p.total) : 0);
+const tmGroups: TreemapGroup[] = [
+  {
+    label: 'Law',
+    href: '/resources/frameworks#law',
+    items: [
+      { label: 'EU AI Act', value: 50, href: '/resources/frameworks#fw-eu-ai-act' },
+      { label: 'GDPR', value: 15, state: 'hatched', status: 'Draft' },
+    ],
+  },
+  { label: 'Standard', items: [{ label: 'ISO 42001', value: 20, fill: 0.5 }] },
+];
+const tmRows = [
+  ['Law', 'EU AI Act', 50, '', ''],
+  ['Law', 'GDPR', 15, '', 'Draft'],
+  ['Standard', 'ISO 42001', 20, 50, ''],
+];
+const spineParts: SpinePart[] = [
+  {
+    label: 'The discipline',
+    chapters: [
+      { num: 0, label: 'Preface', value: 6, href: '/bok/preface', marks: [{ shape: 'circle', label: 'Infographic', count: 2 }] },
+      { num: 1, label: 'Definition', value: 11, marks: [{ shape: 'square', label: 'Data-viz', count: 1 }], highlight: true },
+    ],
+  },
+  { label: 'Reference', chapters: [{ num: 8, label: 'Regulatory Map', value: 24, href: '/bok/regulatory-map' }] },
+];
+const spineBarRows = [
+  ['The discipline', '00 Preface', 6, 'No'],
+  ['The discipline', '01 Definition', 11, 'Yes'],
+  ['Reference', '08 Regulatory Map', 24, 'No'],
+];
+const spineDotRows = [
+  ['The discipline', '00 Preface', 2, 0, 2, 'No'],
+  ['The discipline', '01 Definition', 0, 1, 1, 'Yes'],
+  ['Reference', '08 Regulatory Map', 0, 0, 0, 'No'],
+];
+const spineMiniRows = spineBarRows.map((r) => [r[0], r[1], r[3]]);
 
 interface Case {
   name: string;
@@ -299,6 +427,79 @@ const CASES: Case[] = [
       ['Evidence', 'Admission record', 'Layer 04'],
     ],
   },
+  {
+    name: 'flow',
+    make: (id) => flow({ ...base, id, title, desc, ...flowInput }),
+    rows: flowRows,
+  },
+  {
+    name: 'flow (narrow)',
+    make: (id) => flow({ ...base, id, title, desc, ...flowInput, layout: 'narrow' }),
+    rows: flowRows,
+  },
+  {
+    name: 'concentricRings',
+    make: (id) => concentricRings({ ...base, id, title, desc, ...ringInput }),
+    marks: 1,
+    rows: ringRows,
+  },
+  {
+    name: 'concentricRings (narrow)',
+    make: (id) => concentricRings({ ...base, id, title, desc, ...ringInput, layout: 'narrow' }),
+    marks: 1,
+    rows: ringRows,
+  },
+  {
+    name: 'lifecycleRing',
+    make: (id) => lifecycleRing({ ...base, id, title, desc, ...lifecycleInput }),
+    marks: 1,
+    rows: lifecycleRows,
+  },
+  {
+    name: 'lifecycleRing (list)',
+    make: (id) => lifecycleRing({ ...base, id, title, desc, ...lifecycleInput, layout: 'list' }),
+    marks: 1,
+    rows: lifecycleRows,
+  },
+  {
+    name: 'progressRing',
+    make: (id) => progressRing({ ...base, id, title, desc, items: progressItems }),
+    rows: progressItems.map((p) => [p.label, p.done, p.total, pctOf(p)]),
+  },
+  {
+    name: 'treemap',
+    make: (id) => treemap({ ...base, id, title, desc, groups: tmGroups, unit: 'obligations' }),
+    rows: tmRows,
+  },
+  {
+    name: 'treemap (narrow)',
+    make: (id) => treemap({ ...base, id, title, desc, groups: tmGroups, unit: 'obligations', layout: 'narrow' }),
+    rows: tmRows,
+  },
+  {
+    name: 'bookSpine',
+    make: (id) => bookSpine({ ...base, id, title, desc, parts: spineParts, encoding: 'bars', unit: 'min' }),
+    marks: 1,
+    rows: spineBarRows,
+  },
+  {
+    name: 'bookSpine (vertical)',
+    make: (id) => bookSpine({ ...base, id, title, desc, parts: spineParts, encoding: 'bars', unit: 'min', orientation: 'vertical' }),
+    marks: 1,
+    rows: spineBarRows,
+  },
+  {
+    name: 'bookSpine (dots)',
+    make: (id) => bookSpine({ ...base, id, title, desc, parts: spineParts, encoding: 'dots', unit: 'figures' }),
+    marks: 1,
+    rows: spineDotRows,
+  },
+  {
+    name: 'bookSpine (mini)',
+    make: (id) => bookSpine({ ...base, id, title, desc, parts: spineParts, unit: 'figures', mini: true }),
+    marks: 1,
+    rows: spineMiniRows,
+  },
 ];
 
 // ---- helpers ---------------------------------------------------------------
@@ -434,6 +635,39 @@ const THROWS: { name: string; run: () => unknown; label: RegExp }[] = [
     label: /label ".*Extraordinarily/,
   },
   {
+    name: 'a flow column of ten nodes (the caller groups the tail)',
+    run: () =>
+      flow({
+        ...base,
+        id: 'ch-x',
+        title,
+        desc,
+        ...flowInput,
+        nodes: [...flowNodes, ...Array.from({ length: 7 }, (_, i) => ({ id: `x${i}`, column: 'f', label: `Clause ${i}` }))],
+        links: [...flowLinks, ...Array.from({ length: 7 }, (_, i) => ({ from: 'ev', to: `x${i}`, value: 1 }))],
+      }),
+    label: /column "Framework" has 10 nodes, at most 9 fit/,
+  },
+  {
+    name: 'a ring cell that cannot hold its marks',
+    run: () =>
+      concentricRings({
+        ...base,
+        id: 'ch-x',
+        title,
+        desc,
+        ...ringInput,
+        layout: 'narrow',
+        marks: Array.from({ length: 40 }, (_, i) => ({ label: `Harm ${i}`, ring: 'individual', sector: 'privacy' })),
+      }),
+    label: /40 marks do not fit ring "Individual", sector "Privacy"/,
+  },
+  {
+    name: 'a treemap item without a positive value',
+    run: () => treemap({ ...base, id: 'ch-x', title, desc, unit: 'obligations', groups: [{ label: 'Law', items: [{ label: 'GDPR', value: 0 }] }] }),
+    label: /item "GDPR" has value 0/,
+  },
+  {
     name: 'a heat grid with no rows',
     run: () => heatGrid({ ...base, id: 'ch-x', title, desc, rowHeader: 'Country', unit: 'entries', rows: [], columns: heat.columns, values: [] }),
     label: /heatGrid ch-x\): no rows to draw/,
@@ -469,6 +703,9 @@ test("lang 'es' leaves no English chrome in the SVG or the table", () => {
   expect(grid.table.rows[0]).toEqual(['Spain', 3, 0, 'no aplica', 3]);
   expect(grid.svg).toContain('<title>Spain: 3 entradas en total</title>');
   expect(grid.svg).not.toMatch(/not applicable|in total|Source:|As of/);
+  expect(flow({ ...es, id: 'ch-f', ...flowInput }).table.columns.slice(0, 2)).toEqual(['Origen', 'Destino']);
+  expect(concentricRings({ ...es, id: 'ch-g', ...ringInput }).table.columns).toEqual(['Elemento', 'Anillo', 'Sector', 'Capa', 'Estado']);
+  expect(bookSpine({ ...es, id: 'ch-k', parts: spineParts, unit: 'min' }).table.columns).toEqual(['Parte', 'Capítulo', 'Min', 'Destacado']);
 });
 
 test('heatGrid builds its sticky pair only when read, so a stamp that fits the whole SVG never throws for an unused pair', () => {
@@ -768,4 +1005,288 @@ test('controlChain lights exactly the enforcement points it is given on the four
   expect(stages.map((x) => x.stage)).toEqual(STAGES);
   expect(stages.filter((x) => /(^| )mk-fill-/.test(x.cls)).map((x) => x.stage)).toEqual(anatomy.enforcement);
   expect(stages.filter((x) => /(^| )mk-line-/.test(x.cls)).map((x) => x.stage)).toEqual(STAGES.filter((k) => !anatomy.enforcement.includes(k as never)));
+});
+
+// ---- 8. flow, rings, treemap, spine and the cumulative ladder -------------
+/** The <title> naming element i: its own, or its parent link's. */
+const nameOf = (els: SvgEl[], i: number) => titleOf(els, i) ?? (els[els[i].parent]?.tag === 'a' ? titleOf(els, els[i].parent) : undefined);
+const linkedEl = (els: SvgEl[], i: number) => els[els[i].parent]?.tag === 'a';
+
+test("flow: each ribbon's thickness is its value on one scale and each node's ribbons tile its block, so the drawn sums per node are the table's", () => {
+  const nodes3 = [...flowNodes, { id: 'pf', column: 't', label: 'promptfoo' }, { id: 'ga', column: 't', label: 'garak' }];
+  const links3 = [
+    ...flowLinks,
+    { from: 'eu', to: 'pf', value: 6 },
+    { from: 'eu', to: 'ga', value: 1 },
+    { from: 'asi', to: 'ga', value: 9 },
+    { from: 'iso', to: 'pf', value: 2 },
+  ];
+  const inputs = [flowInput, { ...flowInput, columns: [...flowColumns, { key: 't', label: 'Tool' }], nodes: nodes3, links: links3, order: 'barycentre' as const }];
+  for (const input of inputs) {
+    const { svg, table } = flow({ ...base, id: 'ch-f', title, desc, ...input });
+    const els = parseSvg(svg);
+    // Ribbon d: M x0 ya C xm ya xm yb x1 yb V yb2 C xm yb2 xm ya2 x0 ya2 Z.
+    const ribbons = els.flatMap((e, i) => {
+      if (e.tag !== 'path' || !/C/.test(e.attr.d ?? '')) return [];
+      const m = /^(.+) to (.+): (\d+) /.exec(nameOf(els, i) ?? '')!;
+      const n = e.attr.d.match(/-?[\d.]+/g)!.map(Number);
+      return [{ from: m[1], to: m[2], value: Number(m[3]), x0: n[0], ya: n[1], x1: n[6], yb: n[7], t: n[8] - n[7], ya2: n[12] }];
+    });
+    expect(ribbons.map((r) => [r.from, r.to, r.value]).sort()).toEqual([...table.rows].sort());
+    const k = ribbons.reduce((a, r) => a + r.t, 0) / ribbons.reduce((a, r) => a + r.value, 0);
+    for (const r of ribbons) expect(Math.abs(r.t - r.value * k), `${r.from} to ${r.to}`).toBeLessThanOrEqual(0.15);
+    const blocks = new Map(
+      els.flatMap((e, i) => (e.tag === 'rect' && /panel|sk-node/.test(e.attr.class ?? '') ? [[nameOf(els, i)!.split(': ')[0], ['x', 'y', 'width', 'height'].map((a) => Number(e.attr[a]))]] : [])),
+    );
+    const sums = (side: 0 | 1) => {
+      const out = new Map<string, number>();
+      for (const row of table.rows) out.set(String(row[side]), (out.get(String(row[side])) ?? 0) + Number(row[2]));
+      return out;
+    };
+    for (const [side, total] of [[0, sums(0)], [1, sums(1)]] as const) {
+      for (const [node, sum] of total) {
+        const [x, y, w, h] = blocks.get(node)!;
+        const own = ribbons.filter((r) => (side ? r.to : r.from) === node).sort((a, b) => (side ? a.yb - b.yb : a.ya - b.ya));
+        const spans = own.map((r) => (side ? [r.yb, r.yb + r.t] : [r.ya, r.ya2]));
+        for (const r of own) expect(side ? r.x1 : r.x0, `${node} edge`).toBeCloseTo(side ? x : x + w, 0);
+        expect(spans[0][0], `${node} inside its block`).toBeGreaterThanOrEqual(y - 0.15);
+        expect(spans[spans.length - 1][1], `${node} inside its block`).toBeLessThanOrEqual(y + h + 0.15);
+        spans.slice(1).forEach(([start], i) => expect(Math.abs(start - spans[i][1]), `${node} ribbons contiguous`).toBeLessThanOrEqual(0.15));
+        expect(Math.abs(spans[spans.length - 1][1] - spans[0][0] - sum * k), `${node} sum`).toBeLessThanOrEqual(0.3);
+      }
+    }
+  }
+});
+
+test('flow (narrow) lists each source with a bar per destination and draws no ribbon', () => {
+  const { svg } = flow({ ...base, id: 'ch-n', title, desc, ...flowInput, layout: 'narrow' });
+  const els = parseSvg(svg);
+  expect(els.some((e) => e.tag === 'path' && /C/.test(e.attr.d ?? ''))).toBe(false);
+  expect(els.filter((e) => e.tag === 'rect' && /^mk mk-fill-/.test(e.attr.class ?? ''))).toHaveLength(flowLinks.length);
+});
+
+test('concentricRings: every harm sits inside its level ring and its MIT domain sector, clear of every other mark, wide and narrow', () => {
+  const rings = levelOrder.map((l) => ({ key: l, label: levelLabel[l] }));
+  const sectors = Object.entries(mitDomains).map(([key, label]) => ({ key, label }));
+  const domainOf = (h: (typeof harms)[number]) => h.mitTaxonomy[0].split('.')[0];
+  const marks = harms.map((h) => ({ label: h.harmType, ring: h.level, sector: domainOf(h), tone: h.layerN[0], href: `/resources/harms#harm-${h.id}` }));
+  for (const layout of ['wide', 'narrow'] as const) {
+    const { svg } = concentricRings({ ...base, id: 'ch-g', title, desc, rings, sectors, marks, centre: { label: 'Harm' }, layout, width: layout === 'wide' ? 720 : undefined });
+    const els = parseSvg(svg);
+    const centre = els.find((e) => e.tag === 'circle' && e.attr.class === 'mk-hi')!;
+    const [cx, cy, c0] = ['cx', 'cy', 'r'].map((a) => Number(centre.attr[a]));
+    const edges = [c0, ...els.filter((e) => e.tag === 'circle' && /^rg-/.test(e.attr.class ?? '')).map((e) => Number(e.attr.r)).sort((a, b) => a - b)];
+    const angle = (x: number, y: number) => (Math.atan2(x - cx, cy - y) + 2 * Math.PI) % (2 * Math.PI);
+    const rule = els.find((e) => e.tag === 'path' && e.attr.class === 'rule')!;
+    const bounds = [...rule.attr.d.matchAll(/L([\d.]+) ([\d.]+)/g)].map((m) => angle(Number(m[1]), Number(m[2])));
+    const drawn = els.flatMap((e, i) => {
+      if (!/^mk mk-/.test(e.attr.class ?? '')) return [];
+      const x = e.tag === 'circle' ? Number(e.attr.cx) : Number(e.attr.x) + Number(e.attr.width) / 2;
+      const y = e.tag === 'circle' ? Number(e.attr.cy) : Number(e.attr.y) + Number(e.attr.height) / 2;
+      return [{ label: nameOf(els, i)!.split(' · ')[0], x, y }];
+    });
+    expect(drawn.map((d) => d.label).sort(), layout).toEqual(harms.map((h) => h.harmType).sort());
+    for (const d of drawn) {
+      const h = harms.find((x) => x.harmType === d.label)!;
+      const ri = levelOrder.indexOf(h.level);
+      const si = sectors.findIndex((x) => x.key === domainOf(h));
+      const r = Math.hypot(d.x - cx, d.y - cy);
+      const a = angle(d.x, d.y);
+      expect(r > edges[ri] && r < edges[ri + 1], `${d.label} in ring ${h.level} (${layout})`).toBe(true);
+      expect(a > bounds[si] && a < bounds[si + 1], `${d.label} in sector ${si + 1} (${layout})`).toBe(true);
+    }
+    for (const [i, p] of drawn.entries()) {
+      for (const q of drawn.slice(i + 1)) expect(Math.hypot(p.x - q.x, p.y - q.y), `${p.label} / ${q.label}`).toBeGreaterThan(10);
+    }
+  }
+});
+
+test("lifecycleRing: a record's circle area is its size and its inner disc the filled share, in the ring and the list", () => {
+  const records = [...lifecycleInput.nodes, ...lifecycleInput.centre.nodes];
+  for (const layout of ['ring', 'list'] as const) {
+    const els = parseSvg(lifecycleRing({ ...base, id: 'ch-y', title, desc, ...lifecycleInput, layout }).svg);
+    const glyphs = els.flatMap((e, i) => {
+      const name = e.tag === 'circle' && e.attr.class === 'mk mk-line-0' ? nameOf(els, i) : undefined;
+      if (!name) return [];
+      const disc = els.find((o, j) => j > i && o.tag === 'circle' && o.attr.class === 'mk-hi' && o.attr.cx === e.attr.cx && o.attr.cy === e.attr.cy);
+      return [{ label: name.split(':')[0], r: Number(e.attr.r), inner: disc ? Number(disc.attr.r) : 0 }];
+    });
+    expect(glyphs.map((g) => g.label)).toEqual(records.map((r) => r.label));
+    const k = glyphs[0].r ** 2 / records[0].size;
+    glyphs.forEach((g, i) => {
+      expect(Math.abs(g.r ** 2 / records[i].size / k - 1), `${g.label} area`).toBeLessThan(0.05);
+      expect(Math.abs((g.inner / g.r) ** 2 - records[i].fill), `${g.label} fill`).toBeLessThan(0.03);
+    });
+  }
+});
+
+test('progressRing: each arc and label carries the hooks a page script updates, set at build to the share done', () => {
+  const els = parseSvg(progressRing({ ...base, id: 'ch-q', title, desc, items: progressItems }).svg);
+  for (const p of progressItems) {
+    const arcs = els.filter((e) => e.attr['data-ring'] === p.key);
+    expect(arcs, p.key).toHaveLength(1);
+    expect(arcs[0].attr.pathLength).toBe('100');
+    expect(arcs[0].attr['stroke-dasharray']).toBe(`${pctOf(p)} 100`);
+    expect(els.find((e) => e.attr['data-ring-label'] === p.key)?.text).toBe(`${pctOf(p)}%`);
+    expect(els.find((e) => e.attr['data-ring-count'] === p.key)?.text).toBe(`${p.done}/${p.total}`);
+  }
+});
+
+test('treemap: tile areas are proportional to the obligations per instrument, no tile overlaps, and tiles under 24 px merge into an unlinked-or-full "+N"', () => {
+  const counts = new Map<string, number>();
+  for (const o of obligations) counts.set(o.frameworkId, (counts.get(o.frameworkId) ?? 0) + 1);
+  const groups = [...new Set(frameworks.map((f) => f.type))]
+    .map((type) => ({
+      label: type,
+      href: `/resources/frameworks#type-${type}`,
+      items: frameworks.filter((f) => f.type === type && counts.get(f.id)).map((f) => ({ label: f.short, name: f.id, value: counts.get(f.id)!, href: `/resources/frameworks#fw-${f.id}` })),
+    }))
+    .filter((g) => g.items.length);
+  const valueOf = new Map(groups.flatMap((g) => g.items.map((it) => [it.name, it.value])));
+  const groupOf = new Map(groups.flatMap((g) => g.items.map((it) => [it.name, g.label])));
+  for (const layout of ['wide', 'narrow'] as const) {
+    const els = parseSvg(treemap({ ...base, id: 'ch-t', title, desc, groups, unit: 'obligations', layout }).svg);
+    const box = (e: SvgEl) => ['x', 'y', 'width', 'height'].map((a) => Number(e.attr[a]));
+    const tiles = els.flatMap((e, i) => {
+      if (e.tag !== 'rect' || !/^(tm( |$)|tm-hatch$)/.test(e.attr.class ?? '')) return [];
+      const name = nameOf(els, i)!;
+      const merged = /^\+(\d+), (\d+) \w+: (.+)$/.exec(name);
+      const members = merged ? merged[3].split(', ') : [name.split(': ')[0]];
+      return [{ members, merged: !!merged, value: merged ? Number(merged[2]) : valueOf.get(members[0])!, linked: linkedEl(els, i), b: box(e) }];
+    });
+    expect(tiles.flatMap((t) => t.members).sort(), `every instrument once (${layout})`).toEqual([...valueOf.keys()].sort());
+    for (const t of tiles.filter((x) => x.merged)) expect(t.value).toBe(t.members.reduce((a, m) => a + valueOf.get(m)!, 0));
+    const k = tiles.reduce((a, t) => a + t.b[2] * t.b[3], 0) / tiles.reduce((a, t) => a + t.value, 0);
+    for (const t of tiles) {
+      const [, , w, h] = t.b;
+      expect(t.value * k, `${t.members[0]} area (${layout})`).toBeGreaterThanOrEqual((w - 1) * (h - 1));
+      expect(t.value * k, `${t.members[0]} area (${layout})`).toBeLessThanOrEqual((w + 1) * (h + 1));
+      const small = w < 23.95 || h < 23.95;
+      if (small) expect(t.linked, `${t.members[0]} is small, so unlinked`).toBe(false);
+    }
+    const heads = els.filter((e) => e.tag === 'rect' && e.attr.class === 'tm-gh').map(box);
+    const rects = [...tiles.map((t) => t.b), ...heads];
+    rects.forEach((a, i) =>
+      rects.slice(i + 1).forEach((b) => {
+        const ix = Math.min(a[0] + a[2], b[0] + b[2]) - Math.max(a[0], b[0]);
+        const iy = Math.min(a[1] + a[3], b[1] + b[3]) - Math.max(a[1], b[1]);
+        expect(ix <= 0.2 || iy <= 0.2, `overlap (${layout})`).toBe(true);
+      }),
+    );
+    for (const g of groups) {
+      const own = tiles.filter((t) => !t.merged && groupOf.get(t.members[0]) === g.label);
+      const smallOwn = own.filter((t) => t.b[2] < 23.95 || t.b[3] < 23.95).length;
+      const hasMerged = tiles.some((t) => t.merged && groupOf.get(t.members[0]) === g.label);
+      expect(smallOwn, `${g.label}: small tiles merge (${layout})`).toBeLessThanOrEqual(hasMerged ? 0 : 1);
+    }
+  }
+});
+
+test('bookSpine: the chapters in book order grouped by part, one neutral tint per part alternating, and no layer class', () => {
+  const parts: SpinePart[] = chapterParts.map((p) => ({
+    label: p.title,
+    chapters: chaptersOrdered
+      .filter((c) => c.part === p.id)
+      .map((c) => ({ num: c.order, label: c.shortTitle, href: `/bok/${c.slug}`, value: c.order + 1, marks: [{ shape: 'circle' as const, label: 'Figure', count: c.order % 3 }] })),
+  }));
+  const expected = parts.flatMap((p) => p.chapters.map((c) => `${String(c.num).padStart(2, '0')} ${c.label}`));
+  const LAYER = /^(mk-(fill|line|dash|hatch)-[1-5]|l[1-5]-(bg|st)|heat-[1-5]|hatch-[1-5]|tm-[1-5]|sk-[1-5])$/;
+  for (const encoding of ['bars', 'dots'] as const) {
+    for (const orientation of ['horizontal', 'vertical'] as const) {
+      const { svg } = bookSpine({ ...base, id: 'ch-s', title, desc, parts, encoding, unit: 'min', orientation });
+      const els = parseSvg(svg);
+      const cols = els.flatMap((e, i) => {
+        if (e.tag !== 'a') return [];
+        const first = els.find((o, j) => j > i && o.parent === i && o.tag === 'rect')!;
+        return [{ name: titleOf(els, i)!.split(':')[0], x: Number(first.attr.x), y: Number(first.attr.y), cls: first.attr.class }];
+      });
+      const where = `${encoding}, ${orientation}`;
+      expect(cols.map((c) => c.name), where).toEqual(expected);
+      const along = cols.map((c) => (orientation === 'horizontal' ? c.x : c.y));
+      along.slice(1).forEach((v, i) => expect(v, where).toBeGreaterThan(along[i]));
+      expect(innerClasses(svg).filter((c) => LAYER.test(c)), where).toEqual([]);
+      if (encoding === 'bars') {
+        let at = 0;
+        const tints = parts.map((p) => {
+          const own = new Set(cols.slice(at, (at += p.chapters.length)).map((c) => c.cls));
+          expect(own.size, `${p.label}: one tint`).toBe(1);
+          return [...own][0];
+        });
+        tints.slice(1).forEach((t, i) => expect(t, `${parts[i + 1].label} differs from ${parts[i].label}`).not.toBe(tints[i]));
+      }
+    }
+  }
+});
+
+test('ladder: cumulative steps list what each adds, every step after the first opening with "Previous, plus:"', () => {
+  const adding = [
+    { label: 'Operator', key: 'operator', adds: ['Kill switch'] },
+    { label: 'Collaborator', key: 'collaborator', adds: ['Tool allowlist', 'Audit log'] },
+    { label: 'Observer', key: 'observer', adds: ['Rollback plan'] },
+  ];
+  for (const orientation of ['horizontal', 'vertical'] as const) {
+    const { svg, table } = ladder({ ...base, id: 'ch-c', title, desc, steps: adding, cumulative: true, orientation });
+    const els = parseSvg(svg);
+    const textIn = (key: string) => {
+      const g = els.findIndex((e) => e.tag === 'g' && e.attr['data-step'] === key);
+      const inside = (i: number) => {
+        for (let p = els[i].parent; p >= 0; p = els[p].parent) if (p === g) return true;
+        return false;
+      };
+      return els.filter((e, i) => e.tag === 'text' && inside(i)).map((e) => e.text);
+    };
+    adding.forEach((step, i) => {
+      const lines = textIn(step.key);
+      for (const add of step.adds) expect(lines, `${step.label} (${orientation})`).toContain(`+ ${add}`);
+      expect(lines.includes('Previous, plus:'), `${step.label} (${orientation})`).toBe(i > 0);
+    });
+    expect(table.columns).toEqual(['Level', 'Step', 'Adds']);
+    expect(table.rows).toEqual(adding.map((s, i) => [i + 1, s.label, s.adds.join('; ')]));
+  }
+});
+
+test('realistic loads stay within the 12 KB per SVG that Chart.astro enforces', () => {
+  const names = ['Agent runtime', 'Model lifecycle', 'Data governance', 'Inventory', 'Evaluations', 'Supply chain', 'Incident response', 'Human oversight', 'Other (4)'];
+  const targetsOf = ['EU AI Act', 'ISO 42001 Annex A', 'NIST AI RMF', 'OWASP ASI/LLM', 'IMDA agentic', 'AIUC-1', 'NIST SP 800-53', 'MITRE ATLAS', 'Other (22)'];
+  const nodes = [
+    ...names.map((label, i) => ({ id: `a${i}`, column: 'p', label, href: `/controls#a${i}` })),
+    ...targetsOf.map((label, i) => ({ id: `b${i}`, column: 'f', label, href: `/controls/crosswalk#b${i}` })),
+  ];
+  const links = Array.from({ length: 81 }, (_, n) => ({ from: `a${Math.floor(n / 9)}`, to: `b${n % 9}`, value: 1 + ((n * 37) % 60) }))
+    .filter((_, n) => n % 2 === 0)
+    .slice(0, 40);
+  const big = { columns: flowColumns, nodes, links, unit: 'pairs' };
+  const harmRings = levelOrder.map((l) => ({ key: l, label: levelLabel[l] }));
+  const harmSectors = Object.entries(mitDomains).map(([key, label]) => ({ key, label }));
+  const harmMarks = harms.map((h) => ({ label: h.harmType, ring: h.level, sector: h.mitTaxonomy[0].split('.')[0], tone: h.layerN[0], href: `/resources/harms#harm-${h.id}` }));
+  const rings = { rings: harmRings, sectors: harmSectors, marks: harmMarks, centre: { label: 'Harm' } };
+  const counts = new Map<string, number>();
+  for (const o of obligations) counts.set(o.frameworkId, (counts.get(o.frameworkId) ?? 0) + 1);
+  const tm = [...new Set(frameworks.map((f) => f.type))].map((type) => ({
+    label: type,
+    href: `/resources/frameworks#type-${type}`,
+    items: frameworks.filter((f) => f.type === type && counts.get(f.id)).map((f) => ({ label: f.short, name: f.name, value: counts.get(f.id)!, href: `#fw-${f.id}` })),
+  }));
+  const parts: SpinePart[] = chapterParts.map((p) => ({
+    label: p.title,
+    chapters: chaptersOrdered.filter((c) => c.part === p.id).map((c) => ({ num: c.order, label: c.shortTitle, href: `/bok/${c.slug}`, value: 10 + c.order, marks: [{ shape: 'circle' as const, label: 'Infographic', count: c.order % 4 }, { shape: 'diamond' as const, label: 'Diagram', count: c.order % 3 }] })),
+  }));
+  const stages = ['Intake', 'Build', 'Test', 'Release', 'Operate', 'Retire'].map((label) => ({ key: label.toLowerCase(), label }));
+  const records = Array.from({ length: 20 }, (_, i) => ({ label: `record-schema-${i + 1}`, stage: stages[i % 6].key, size: 6 + i, fill: (i % 5) / 5, href: `/resources/templates#schema-${i}` }));
+  const centre = { label: 'Whole organisation', nodes: ['policy-card', 'training-record', 'evidence-record', 'control-observation'].map((label, i) => ({ label, size: 10 + i, fill: 0.5, href: `#c${i}` })) };
+  const LOADS: [string, () => ChartOutput][] = [
+    ['flow 9 + 9 nodes, 40 links', () => flow({ ...base, id: 'ch-b', title, desc, ...big })],
+    ['flow narrow', () => flow({ ...base, id: 'ch-b', title, desc, ...big, layout: 'narrow' })],
+    ['rings, 25 harms', () => concentricRings({ ...base, id: 'ch-b', title, desc, ...rings })],
+    ['rings narrow', () => concentricRings({ ...base, id: 'ch-b', title, desc, ...rings, layout: 'narrow' })],
+    ['lifecycle, 24 records', () => lifecycleRing({ ...base, id: 'ch-b', title, desc, stages, nodes: records, centre })],
+    ['lifecycle list', () => lifecycleRing({ ...base, id: 'ch-b', title, desc, stages, nodes: records, centre, layout: 'list' })],
+    // Every instrument linked at 24 px passes the budget: the long tail merges
+    // sooner with minTile, the lever the kit gives for this.
+    ['treemap, every instrument', () => treemap({ ...base, id: 'ch-b', title, desc, groups: tm, unit: 'obligations', minTile: 36 })],
+    ['treemap narrow', () => treemap({ ...base, id: 'ch-b', title, desc, groups: tm, unit: 'obligations', layout: 'narrow' })],
+    ['spine bars, 24 chapters', () => bookSpine({ ...base, id: 'ch-b', title, desc, parts, unit: 'min' })],
+    ['spine dots vertical', () => bookSpine({ ...base, id: 'ch-b', title, desc, parts, encoding: 'dots', unit: 'figures', orientation: 'vertical' })],
+  ];
+  for (const [name, make] of LOADS) expect(Buffer.byteLength(make().svg), name).toBeLessThanOrEqual(12 * 1024);
 });

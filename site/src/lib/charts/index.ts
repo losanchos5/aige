@@ -70,9 +70,13 @@
 //     draws nested ellipses when nestedChain(sets, items) finds the sets
 //     strictly nested (no empty region), and the Venn otherwise.
 //
-//   ladder({ steps: [{ label, detail?, href?, key? }], highlight?, highlightLabel?, orientation? })
+//   ladder({ steps: [{ label, detail?, href?, key?, adds? }], highlight?, highlightLabel?,
+//            orientation?, cumulative? })
 //     Ascending steps; 'vertical' is the narrow variant.
 //     A step key wraps its marks in <g data-step> for a page script to light.
+//     `adds` lists what a step adds ("+ item" lines, and an Adds table
+//     column); `cumulative` opens each later step's list with "Previous,
+//     plus:" (AutonomyLadder).
 //
 //   relationRadial({ centre: { label }, families: [{ label, layered?, relationLabels?,
 //                    items: [{ label, name?, href?, strength?: 'core' | 'related', tone? }] }],
@@ -98,6 +102,57 @@
 //     diamond is the gate: the bow-tie's event, the control's decision (its
 //     state from the caller: hatched for "to be specified", decided by
 //     isResponseToSpecify). Table: Step | Item | Detail.
+//
+//   flow({ columns: [{ key, label }] (2 or 3), nodes: [{ id, column, label, name?, tone?, href? }],
+//          links: [{ from, to, value }], unit, unitOne?, layout?: 'wide' | 'narrow',
+//          order?: 'barycentre' | 'input', plotHeight? })
+//     Sankey / alluvial laid out at build: node blocks sized by max(in, out),
+//     24 high at least, 8 apart, label and count inside; cubic ribbons
+//     between consecutive columns (fill-opacity, no text on them), a <g> per
+//     node with its outgoing ribbons for the CSS hover. At most 9 nodes a
+//     column (FLOW_MAX_NODES; group the tail as "Other (N)"). 'narrow' (280,
+//     default under 480 wide) lists each source with bars of its
+//     destinations. Table: From | To | value, one row per link.
+//
+//   concentricRings({ rings: [{ key, label, href? }] (inside out), sectors?: [{ key, label }],
+//                     marks: [{ label, ring, sector?, shape?, state?, tone?, status?, href? }],
+//                     centre: { label }, layout?: 'wide' | 'narrow', keyMarks?, legend? })
+//     Containment target (harm levels x MIT domains; EvalBoundary): marks
+//     spread in their ring x sector cell without overlap (24 px pitch when
+//     linked), ring numbers in the top gap with a numbered key, sector labels
+//     around the circle or lettered with a key. 'narrow' (280) keeps the
+//     rings and both keys; marks there do not link. Table: Item | Ring |
+//     Sector | Layer | Status (the last three when used).
+//   lifecycleRing({ stages: [{ key, label, href? }], nodes: [{ label, stage, size?, fill?, href? }],
+//                   centre: { label, nodes? }, layout?: 'ring' | 'list', sizeLabel?, fillLabel? })
+//     Cycle of stages (the records ring): numbered arcs, each stage's records
+//     beside the ring, the centre's inside; circle area = size, inner disc =
+//     fill (0 to 1). 'list' (280, narrow) is one list per stage. Table:
+//     Stage | Record | size | fill (%).
+//   progressRing({ items: [{ key, label, done, total }] })
+//     Share done per item; a page script updates it in place (no animation):
+//     <circle data-ring="key" pathLength="100" stroke-dasharray="pct 100">,
+//     <text data-ring-label="key">pct%</text>, <text data-ring-count="key">.
+//
+//   treemap({ groups: [{ label, href?, items: [{ label, value, name?, state?, tone?, status?,
+//             fill?, href? }] }], unit, unitOne?, layout?: 'wide' | 'narrow', plotHeight?,
+//             fillHeader?, minTile? })
+//     Squarified (Bruls) by group, then within the group under a header
+//     strip; tile area = value x one scale. Tiles under 24 x 24 merge into
+//     "+N" (linked to the group href when a full target); a label only when
+//     it fits; state by pattern; fill = a bar along the foot. 'narrow' (280)
+//     stacks the groups as bands. `minTile` (default 24) merges a long tail
+//     sooner when the SVG would pass 12 KB (every framework linked: 36).
+//     Table: Group | Item | value | fill | status.
+//
+//   bookSpine({ parts: [{ label, chapters: [{ num, label, href?, value?, marks?: [{ shape,
+//               count, label, state? }], highlight? }] }], encoding?: 'bars' | 'dots', unit,
+//               mini?, orientation?: 'horizontal' | 'vertical' })
+//     The chapters in order grouped by part, in neutral part tints (never
+//     layer colours): bars (reading minutes) or dots (one per figure, shape =
+//     kind); 'vertical' (280, narrow) stacks the chapters as rows; `mini` is
+//     a compact strip with the highlighted chapters listed as links under it.
+//     Table: Part | Chapter | value, or one column per kind and Total.
 //
 //   glyph(kind, x, y, { tone? }): the §1.7 glyph vocabulary in a 24 px box
 //     (building, person, calendar, package, layers, evidence, card, gate,
@@ -183,3 +238,20 @@ export {
   type PipelineStage,
 } from './flow';
 export { glyph, type GlyphKind, type GlyphOptions } from './glyphs';
+export { flow, FLOW_MAX_NODES, type SankeyColumn, type SankeyInput, type SankeyLink, type SankeyNode } from './sankey';
+export {
+  concentricRings,
+  lifecycleRing,
+  progressRing,
+  type ConcentricRingsInput,
+  type LifecycleNode,
+  type LifecycleRecord,
+  type LifecycleRingInput,
+  type ProgressItem,
+  type ProgressRingInput,
+  type RingDef,
+  type RingMark,
+  type RingSector,
+} from './rings';
+export { treemap, type TreemapGroup, type TreemapInput, type TreemapItem } from './treemap';
+export { bookSpine, type BookSpineInput, type SpineChapter, type SpineMark, type SpinePart } from './spine';

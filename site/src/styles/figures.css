@@ -521,3 +521,76 @@
   .figc:is(.ch-flow, .ch-radial) [class*="hatch-"]:not(.hatch-bg):not([class*="mk-"]) { stroke: CanvasText; }
   .figc:is(.ch-flow, .ch-radial) a:focus-visible { outline-color: Highlight; }
 }
+
+/* Flow, rings, treemap and book spine (sankey.ts, rings.ts, treemap.ts,
+   spine.ts). Sankey ribbons are fills at a fill-opacity with no text on
+   them, in the source node's layer ink (or ink); hovering or focusing a node
+   group lights its ribbons and dims the rest (CSS only, no transition).
+   Ring bands are two opaque neutral tints; treemap tiles take a light fill
+   (a layer pastel only with a tone) so their ink labels keep full contrast,
+   with a ground-coloured seam; book parts alternate two neutral ink tints,
+   never a layer colour (audit SL-06). The progress arc is a plain stroke a
+   page script redraws by attribute, so nothing here animates it. */
+.figc .sk-g > path { fill-opacity: 0.22; }
+.figc .sk-0 > path { fill: var(--ink); }
+.figc .sk-1 > path { fill: var(--l1-ink); }
+.figc .sk-2 > path { fill: var(--l2-ink); }
+.figc .sk-3 > path { fill: var(--l3-ink); }
+.figc .sk-4 > path { fill: var(--l4-ink); }
+.figc .sk-5 > path { fill: var(--l5-ink); }
+.figc .sk-g:is(:hover, :focus-within) > path { fill-opacity: 0.5; }
+.figc:has(.sk-g:is(:hover, :focus-within)) .sk-g:not(:hover, :focus-within) > path { fill-opacity: 0.08; }
+.figc .sk-node { stroke-width: 1; }
+.figc .rg-a { fill: color-mix(in srgb, var(--ink) 4%, var(--bg)); stroke: var(--line); stroke-width: 1; }
+.figc .rg-b { fill: color-mix(in srgb, var(--ink) 10%, var(--bg)); stroke: var(--line); stroke-width: 1; }
+.figc .lc-arc { fill: none; stroke: color-mix(in srgb, var(--ink) 30%, var(--bg)); stroke-width: 6; stroke-linecap: round; }
+.figc .pr-track { fill: none; stroke: color-mix(in srgb, var(--ink) 12%, var(--bg)); stroke-width: 7; }
+.figc .pr-arc { fill: none; stroke: var(--ink); stroke-width: 7; }
+.figc .tm { stroke: var(--bg); stroke-width: 1.5; }
+.figc .tm-0 { fill: color-mix(in srgb, var(--ink) 10%, var(--bg)); }
+.figc .tm-1 { fill: var(--l1); }
+.figc .tm-2 { fill: var(--l2); }
+.figc .tm-3 { fill: var(--l3); }
+.figc .tm-4 { fill: var(--l4); }
+.figc .tm-5 { fill: var(--l5); }
+.figc .tm-line { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5; }
+.figc .tm-dash { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.figc .tm-hatch { stroke: var(--bg); stroke-width: 1.5; }
+.figc .tm-gh { fill: color-mix(in srgb, var(--ink) 18%, var(--bg)); stroke: var(--bg); stroke-width: 1.5; }
+.figc .tm-track { fill: var(--bg); stroke: var(--ink-2); stroke-width: 0.75; }
+.figc .tm-bar { fill: var(--ink); }
+.figc .tm-lbg { fill: var(--bg); }
+.figc .sp-p0 { fill: color-mix(in srgb, var(--ink) 55%, var(--bg)); stroke: var(--ink-2); }
+.figc .sp-p1 { fill: color-mix(in srgb, var(--ink) 28%, var(--bg)); stroke: var(--ink-2); }
+.figc .sp-off { fill: var(--bg); stroke: var(--ink-2); stroke-width: 1; }
+.figc .sp-col { fill: color-mix(in srgb, var(--ink) 3%, var(--bg)); }
+
+/* Forced colours: the same four primitives in system colours, the encoding
+   kept by outline, dash, hatch and the alternation of fills. */
+@media (forced-colors: active) {
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) {
+    forced-color-adjust: none;
+  }
+
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) text { fill: CanvasText; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) a text { fill: LinkText; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) .on-ink { fill: Canvas; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is(.panel, .rg-a, .rg-b, .tm, .tm-line, .tm-dash, .tm-hatch, .tm-gh, .tm-track, .sp-off, .sp-p1, .sp-col, .l1-bg, .l2-bg, .l3-bg, .l4-bg, .l5-bg) { fill: Canvas; stroke: CanvasText; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is(.tm-lbg, .hatch-bg) { fill: Canvas; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is(.rule, .axis, .lc-arc, .pr-arc) { stroke: CanvasText; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) .pr-track { stroke: GrayText; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) .sk-g > path { fill: CanvasText; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is([class*="mk-fill-"], .mk-hi, .sp-p0, .tm-bar) { fill: CanvasText; stroke: CanvasText; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is([class*="mk-line-"], [class*="mk-dash-"]) { fill: Canvas; stroke: CanvasText; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) [class*="mk-hatch-"] { stroke: CanvasText; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) [class*="hatch-"]:not(.hatch-bg):not([class*="mk-"]):not(.tm-hatch) { stroke: CanvasText; }
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) a:focus-visible { outline-color: Highlight; }
+}
+
+/* Print keeps the drawn fills (ribbons, bands, tiles, part tints). */
+@media print {
+  .figc:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
