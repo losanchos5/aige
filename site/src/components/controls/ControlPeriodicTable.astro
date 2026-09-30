@@ -1,0 +1,160 @@
+---
+/**
+ * ControlPeriodicTable: the whole profile on one screen, for the head of a
+ * profile page (/controls/<profile>, after #scope). One tile per control, in
+ * id order like the elements of a periodic table: its number, a bar and a
+ * label of its home stack layer, its title, four pips for the enforcement
+ * points it acts at (pull request, deploy, runtime, periodic, lit or not) and
+ * its failure-response mark (control-marks.css: diamond deny, square hold for
+ * approval, ring alert, hatched square still to be specified, decided by
+ * isResponseToSpecify). The tile's border is its depth: solid specified,
+ * dashed derived from site material, dotted draft outline.
+ *
+ * Every tile links to the control's section below (#aige-ctl-...), so the
+ * figure is also a visual index; its accessible name is the visible number and
+ * title followed by the same facts in words. Tiles are at least 96 px square,
+ * well past the WCAG 2.5.8 target size. Hover and focus lift a tile
+ * (transform only, on screen, not on reduced motion). HTML and CSS; the frame
+ * comes from chart.css. At the top level of the prose it breaks out to the
+ * reading well, like the chapter figures.
+ */
+import '../../styles/chart.css';
+import '../../styles/control-marks.css';
+import '../../styles/control-visuals.css';
+import { controlsIn, depthLabels, CONTROLS_AS_OF, type Control, type ControlDepth, type ControlProfile } from '../../data/controls';
+import { layers } from '../../data/stack';
+import { STAGES, RESPONSES, responseOf, responseWords, responseClass, tileHref } from '../../lib/page-visuals/control-visuals';
+
+interface Props {
+  profile: ControlProfile;
+}
+
+const { profile } = Astro.props;
+const rows = controlsIn(profile.slug);
+const pad = (n: number) => String(n).padStart(2, '0');
+const layerName = (n: number) => layers.find((l) => l.n === n)?.name ?? '';
+const acts = (c: Control) => STAGES.filter((s) => (c.enforcementPoints as readonly string[]).includes(s.key));
+const facts = (c: Control) =>
+  `. Layer ${pad(c.layer)} ${layerName(c.layer)}. Acts at ${acts(c)
+    .map((s) => s.label.toLowerCase())
+    .join(' and ')}. ${responseWords[responseOf(c)]}. ${depthLabels[c.depth]}.`;
+
+const count = <T,>(values: T[], v: T) => values.filter((x) => x === v).length;
+const responses = RESPONSES.map((r) => ({ r, n: count(rows.map(responseOf), r) })).filter((x) => x.n > 0);
+const depths = (['specified', 'derived', 'stub'] as ControlDepth[])
+  .map((d) => ({ d, n: count(rows.map((c) => c.depth), d) }))
+  .filter((x) => x.n > 0);
+const layerCounts = layers.map((l) => ({ n: l.n, count: count(rows.map((c) => c.layer as number), l.n) })).filter((l) => l.count > 0);
+const topStage = STAGES.map((s) => ({ ...s, n: rows.filter((c) => (c.enforcementPoints as readonly string[]).includes(s.key)).length })).sort(
+  (a, b) => b.n - a.n,
+)[0];
+const tbs = count(rows.map(responseOf), 'tbs');
+
+const title = `${profile.shortTitle}: ${rows.length} controls at a glance`;
+const caption = `One tile per control in id order: number, home layer, title, the enforcement points it acts at and its failure response. ${topStage.n} of ${rows.length} act at ${topStage.label.toLowerCase()}${tbs > 0 ? `, and ${tbs} still have a failure response to be specified` : ''}. Select a tile to read the control.`;
+const tableCaption = `The ${profile.shortTitle.toLowerCase()} controls with their layer, enforcement points, failure response and depth`;
+---
+
+<figure class="chart-fig cpt" aria-labelledby="cpt-title" data-pagefind-ignore>
+  <div class="chart-canvas cpt-canvas">
+    <ol class="cpt-grid" role="list">
+      {
+        rows.map((c) => (
+          <li>
+            <a class:list={['cpt-tile', `cvm-l${c.layer}`, `cpt-${c.depth}`]} href={tileHref(c)}>
+              <span class="cpt-top">
+                <span class="cpt-num">{c.id.slice(-3)}</span>
+                <span class="cpt-layer">L{pad(c.layer)}</span>
+              </span>
+              <span class="cpt-title">{c.title}</span>
+              <span class="cpt-foot" aria-hidden="true">
+                <span class="cpt-pips">
+                  {STAGES.map((s) => (
+                    <span class:list={['cpt-pip', (c.enforcementPoints as readonly string[]).includes(s.key) && 'cpt-on']} />
+                  ))}
+                </span>
+                <span class:list={['cvm', `cvm-l${c.layer}`, responseClass[responseOf(c)]]} />
+              </span>
+              <span class="visually-hidden">{facts(c)}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="cpt-legend">
+      <p class="cpt-key-pips">
+        <span class="cpt-pips cpt-pips-key" aria-hidden="true">
+          <span class="cpt-pip cpt-on" /><span class="cpt-pip" /><span class="cpt-pip" /><span class="cpt-pip" />
+        </span>
+        Pips, left to right: {STAGES.map((s) => s.label.toLowerCase()).join(', ')}; lit where the control acts
+      </p>
+      <ul class="cpt-key" role="list" aria-label="Mark: failure response">
+        {
+          responses.map((x) => (
+            <li>
+              <span class:list={['cvm', responseClass[x.r]]} aria-hidden="true" />
+              {responseWords[x.r]} <span class="cpt-key-n">{x.n}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="cpt-key" role="list" aria-label="Border: depth">
+        {
+          depths.map((x) => (
+            <li>
+              <span class:list={['cpt-swatch', `cpt-${x.d}`]} aria-hidden="true" />
+              {depthLabels[x.d]} <span class="cpt-key-n">{x.n}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <ul class="cpt-key" role="list" aria-label="Bar: home stack layer">
+        {
+          layerCounts.map((l) => (
+            <li>
+              <span class:list={['cpt-bar-key', `cvm-l${l.n}`]} aria-hidden="true" />
+              Layer {pad(l.n)} {layerName(l.n)} <span class="cpt-key-n">{l.count}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <p class="cpt-stamp">Source: {profile.title} v{profile.version} (data/controls) · As of {CONTROLS_AS_OF}</p>
+  </div>
+  <figcaption class="chart-caption">
+    <span class="chart-title" id="cpt-title">{title}</span>
+    <span class="chart-desc">{caption}</span>
+  </figcaption>
+  <details class="chart-alt">
+    <summary class="chart-alt-summary">Data table</summary>
+    <div class="chart-table-wrap" role="region" tabindex="0" aria-label={tableCaption}>
+      <table class="chart-table">
+        <caption>{tableCaption}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Control</th>
+            <th scope="col">Title</th>
+            <th scope="col">Layer</th>
+            <th scope="col">Enforcement points</th>
+            <th scope="col">Failure response</th>
+            <th scope="col">Depth</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((c) => (
+              <tr>
+                <th scope="row">{c.id}</th>
+                <td>{c.title}</td>
+                <td>Layer {pad(c.layer)} {layerName(c.layer)}</td>
+                <td>{acts(c).map((s) => s.label).join(', ')}</td>
+                <td>{responseWords[responseOf(c)]}</td>
+                <td>{depthLabels[c.depth]}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+</figure>

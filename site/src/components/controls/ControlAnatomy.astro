@@ -1,0 +1,55 @@
+---
+/**
+ * ControlAnatomy: the hero figure of a control's own page, before the record
+ * (#record). The control read as one mechanism, from failure to evidence
+ * (VISUAL-GUIDE §1.5): its failure modes, the enforcement points it acts at
+ * lit on the four-stage pipeline, its verification by kind, the decision it
+ * takes when it fails (the gate diamond: solid deny or hold, outlined alert,
+ * hatched when the response is still to be specified, isResponseToSpecify),
+ * and the evidence it leaves as the terminal panel, with the
+ * document-with-check glyph in the colour of the first artefact's layer. Drawn
+ * by the chart kit's controlChain on the evidence-chain engine; the input is
+ * built in lib/page-visuals/control-visuals.ts (anatomyInput), which cuts the
+ * long wording at a word with an ellipsis: the table and the record below
+ * keep every word. Evidence with a record schema links to it.
+ *
+ * Per-item template, not registered in figures.ts. 'figc' mode: the page loads
+ * figures.css through the reading layout. A 870-wide row with a 340-wide
+ * column for phones (the Chart pair); at the top level of the prose the
+ * figure breaks out to the reading well so the row shows at 1:1 on desktop.
+ */
+import Chart from '../Chart.astro';
+import { controlChain } from '../../lib/charts';
+import { anatomyInput } from '../../lib/page-visuals/control-visuals';
+import { CONTROLS_AS_OF, type Control, type ControlProfile } from '../../data/controls';
+
+interface Props {
+  control: Control;
+  profile: ControlProfile;
+}
+
+const { control: c, profile } = Astro.props;
+const title = 'From failure to evidence';
+const desc = `How ${c.id} works: ${c.failureModes.length} failure modes, ${c.enforcementPoints.length} enforcement point${c.enforcementPoints.length === 1 ? '' : 's'}, its verification, the decision on failure and ${c.evidence.length} evidence artefacts.`;
+const base = {
+  title,
+  desc,
+  source: `${profile.shortTitle} v${profile.version}, ${c.id}`,
+  asOf: CONTROLS_AS_OF,
+  mode: 'figc' as const,
+  tableCaption: `${c.id}: failure modes, enforcement, verification, decision and evidence`,
+};
+const wide = controlChain({ ...base, id: 'ctl-anatomy-w', ...anatomyInput(c, 'row', 870) });
+const narrow = controlChain({ ...base, id: 'ctl-anatomy-n', ...anatomyInput(c, 'column', 340) });
+const caption =
+  'Read left to right: what failing looks like, where on the pipeline the control acts, how a third party checks it, what happens when it fails and the record it leaves. The full wording is in the table and in the record below.';
+---
+
+<Chart class="ctl-anatomy" chart={wide} narrow={narrow} title={title} caption={caption} tableLabel="Every step in full" />
+
+<style>
+  :global(.doc-main .prose > .chart-fig.ctl-anatomy) {
+    width: 100cqw;
+    margin-inline: calc(50% - 50cqw);
+  }
+</style>

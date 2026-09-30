@@ -1,0 +1,175 @@
+---
+/**
+ * ControlLanes: where the controls act, for /controls#where. The four
+ * enforcement points run as a pipeline of lanes (pull request, deploy,
+ * runtime, periodic) and every profile is a row; a control sits as one mark in
+ * each lane it acts in, so a control enforced at two points is in two lanes
+ * and the lanes add up to more than the control count (the caption says how
+ * many). The mark's shape is the failure response (control-marks.css:
+ * diamond deny, square hold for approval, ring alert) and a hatched square is
+ * a response still to be specified (isResponseToSpecify), never counted as an
+ * alert; its colour is the home layer, as in the mosaic beside it (which
+ * groups the same controls by layer and response, not by where they act).
+ *
+ * HTML and CSS, not an SVG: 126 marks with their names pass the 12 KB budget
+ * of an inline chart. The marks are not links (the mosaic already links every
+ * control): each lane cell states its count and responses in words, the marks
+ * are its drawing, and the table lists every control by lane. Wide, the lanes
+ * are columns under a chevron pipeline; narrow, each profile is a card with
+ * its four lanes as rows. Frame: chart.css (chart-fig, chart-canvas,
+ * chart-caption, chart-alt, chart-table).
+ */
+import '../../styles/chart.css';
+import '../../styles/control-marks.css';
+import '../../styles/control-visuals.css';
+import { controls, profiles, profilePath, CONTROLS_AS_OF, type Control } from '../../data/controls';
+import {
+  STAGES,
+  RESPONSES,
+  responseOf,
+  responseWords,
+  responseClass,
+  type Response,
+} from '../../lib/page-visuals/control-visuals';
+
+const rank = (r: Response) => RESPONSES.indexOf(r);
+const order = (a: Control, b: Control) => rank(responseOf(a)) - rank(responseOf(b)) || a.layer - b.layer || (a.id < b.id ? -1 : 1);
+const actsAt = (c: Control, stage: string) => (c.enforcementPoints as readonly string[]).includes(stage);
+
+/** "12 controls: 5 deny, 7 to be specified" */
+const mixOf = (rows: Control[]) =>
+  RESPONSES.map((r) => ({ r, n: rows.filter((c) => responseOf(c) === r).length })).filter((x) => x.n > 0);
+const mixText = (rows: Control[]) =>
+  mixOf(rows)
+    .map((x) => `${x.n} ${responseWords[x.r].toLowerCase()}`)
+    .join(', ');
+const summary = (rows: Control[]) =>
+  rows.length === 0 ? 'no controls' : `${rows.length} control${rows.length === 1 ? '' : 's'}: ${mixText(rows)}`;
+
+const stages = STAGES.map((s) => {
+  const rows = controls.filter((c) => actsAt(c, s.key));
+  return { ...s, rows, mix: mixOf(rows) };
+});
+const groups = profiles.map((profile) => {
+  const rows = controls.filter((c) => c.profile === profile.slug);
+  return {
+    profile,
+    total: rows.length,
+    cells: STAGES.map((s) => ({ ...s, rows: rows.filter((c) => actsAt(c, s.key)).sort(order) })),
+  };
+});
+const present = RESPONSES.filter((r) => controls.some((c) => responseOf(c) === r));
+const multi = controls.filter((c) => c.enforcementPoints.length > 1).length;
+const busiest = [...stages].sort((a, b) => b.rows.length - a.rows.length)[0];
+const quietest = [...stages].sort((a, b) => a.rows.length - b.rows.length)[0];
+
+const markName = (c: Control) => `${c.id} ${c.title}: ${responseWords[responseOf(c)]}`;
+const title = 'Where the controls act';
+const caption = `One mark per control in each lane where it is enforced, its shape the failure response and its colour the home layer. ${busiest.rows.length} controls act at ${busiest.label.toLowerCase()} and ${quietest.rows.length} on a ${quietest.label.toLowerCase()}; ${multi} act at two points, so the lanes add up to more than ${controls.length}.`;
+const tableCaption = 'Every control by profile and enforcement point, with its failure response';
+---
+
+<figure class="chart-fig clx" aria-labelledby="clx-title">
+  <div class="chart-canvas clx-canvas">
+    <div class="clx-grid">
+      <ol class="clx-stages" role="list" aria-label="Enforcement points, in pipeline order">
+        {
+          stages.map((s) => (
+            <li class="clx-stage">
+              <span class="clx-stage-name">{s.label}</span>
+              <span class="clx-stage-key">{s.key}</span>
+              <span class="clx-stage-n">
+                {s.rows.length}
+                <span class="visually-hidden"> controls: {mixText(s.rows)}</span>
+              </span>
+              <span class="clx-mix" aria-hidden="true">
+                {s.mix.map((x) => (
+                  <span class="clx-mix-i">
+                    <span class:list={['cvm', responseClass[x.r]]} />
+                    {x.n}
+                  </span>
+                ))}
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+      <ol class="clx-rows" role="list">
+        {
+          groups.map((g) => (
+            <li class="clx-row">
+              <p class="clx-name">
+                <a href={profilePath(g.profile)}>{g.profile.shortTitle}</a>
+                <span class="clx-name-n">{g.total}</span>
+              </p>
+              <ul class="clx-cells" role="list" aria-label={`${g.profile.shortTitle} by enforcement point`}>
+                {g.cells.map((cell) => (
+                  <li class:list={['clx-cell', cell.rows.length === 0 && 'clx-empty']}>
+                    <span class="clx-k">{cell.label}</span>
+                    <span class="clx-count" aria-hidden="true">
+                      {cell.rows.length}
+                    </span>
+                    <span class="visually-hidden">: {summary(cell.rows)}.</span>
+                    <span class="clx-marks" aria-hidden="true">
+                      {cell.rows.map((c) => (
+                        <span class:list={['cvm', `cvm-l${c.layer}`, responseClass[responseOf(c)]]} title={markName(c)} />
+                      ))}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <ul class="clx-key" role="list" aria-label="Shape: failure response">
+      {
+        present.map((r) => (
+          <li>
+            <span class:list={['cvm', responseClass[r]]} aria-hidden="true" />
+            {responseWords[r]} <span class="clx-key-n">{controls.filter((c) => responseOf(c) === r).length}</span>
+          </li>
+        ))
+      }
+      <li class="clx-key-note">Colour: home stack layer, as in the mosaic below</li>
+    </ul>
+    <p class="clx-stamp">Source: open control profiles (data/controls) · As of {CONTROLS_AS_OF}</p>
+  </div>
+  <figcaption class="chart-caption">
+    <span class="chart-title" id="clx-title">{title}</span>
+    <span class="chart-desc">{caption}</span>
+  </figcaption>
+  <details class="chart-alt">
+    <summary class="chart-alt-summary" data-pagefind-ignore>Data table</summary>
+    <div class="chart-table-wrap" role="region" tabindex="0" aria-label={tableCaption}>
+      <table class="chart-table">
+        <caption>{tableCaption}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Control</th>
+            <th scope="col">Profile</th>
+            {STAGES.map((s) => <th scope="col">{s.label}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            groups.flatMap((g) =>
+              controls
+                .filter((c) => c.profile === g.profile.slug)
+                .map((c) => (
+                  <tr>
+                    <th scope="row">{c.id}</th>
+                    <td>{g.profile.shortTitle}</td>
+                    {STAGES.map((s) => (
+                      <td>{actsAt(c, s.key) ? responseWords[responseOf(c)] : ''}</td>
+                    ))}
+                  </tr>
+                )),
+            )
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+</figure>
