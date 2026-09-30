@@ -31,6 +31,8 @@
 - [x] 3.5 Bloque controles: `/controls` (carriles de aplicación), `/controls/[profile]` (tabla periódica + heatmap de cobertura), `/controls/[profile]/[control]` (anatomía + pass/fail + constelación)
 - [x] 3.6 Tests de sincronía, build, `npm test`, a11y completo (A11Y_FULL=1), perf.spec
 - [ ] 3.7 Revisión, capturas, commit por ruta, PR C, CI verde
+  - [x] Revisión de la tanda 2 hecha y sus hallazgos corregidos: relaciones `other` de los controles en la constelación y la rejilla, una sola codificación de estado (`appliesStatusMark`), una sola fecha de corte (`registerAsOf`), cuadrado de paso relleno solo si ya se alcanzó, solapes del eje del AI Act, etiqueta "Earlier" del reloj estrecho, hueco "Earlier" en la tira, un solo acortador de etiquetas (`labels.ts`) y tests que leen los datos, no la lógica del componente
+  - [ ] Capturas, PR C, CI verde. La descripción del PR C lista los cambios del kit de la tanda 2: `lib/charts/radial.ts`, `flow.ts`, `glyphs.ts`, `index.ts`, `chart.css`, `figures.css` y `lib/evidence-chain.ts` (3.1), más `radialLabelWidth` y la leyenda de aristas dibujadas en `radial.ts` (revisión), con sus casos en `tests/chart-primitives.spec.ts`
 
 ## 4. Cierre
 
