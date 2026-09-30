@@ -1,0 +1,116 @@
+---
+/**
+ * ObligationIsotype: every row of the register as one square, grouped by the
+ * instrument heading chapter 08 files it under (obligationGroups, register
+ * order), for the head of the /obligations index. A square's drawing is the
+ * row's status on its review date (solid in force, half solid grace period,
+ * outlined applies later, hatched deferred, dashed voluntary, dotted draft or
+ * proposed), so the weight of each regime and its maturity read before the
+ * filters are used. Every square is ink: instruments are not stack layers.
+ *
+ * HTML and CSS, not an SVG: 182 squares with their names pass the 12 KB budget
+ * of an inline chart (the ControlMosaic pattern). The squares are not links:
+ * the rows below link every row, and each group's name links to its group.
+ * Placed inside .obx-index, the page's status and layer radios (pure CSS)
+ * shrink the squares they filter out, so the isotype previews the filter; the
+ * shrink is a transform and only animates under prefers-reduced-motion:
+ * no-preference, on screen. The frame reuses the chart kit's frame classes
+ * (chart.css), so its table alternative reads like every other chart; its own
+ * rules live in styles/obligation-visuals.css (unscoped, so 182 squares carry
+ * no scope attribute).
+ */
+import '../../styles/chart.css';
+import '../../styles/obligation-visuals.css';
+import { obligations, appliesStatusLabels, type AppliesStatus } from '../../data/frameworks';
+import { obligationGroups } from '../../lib/obligations';
+
+const ORDER: AppliesStatus[] = ['in-force', 'grace', 'applies-later', 'deferred', 'voluntary', 'pending'];
+const statuses = ORDER.filter((s) => obligations.some((row) => row.appliesStatus === s));
+const asOf = obligations.reduce((latest, row) => (row.reviewed > latest ? row.reviewed : latest), obligations[0].reviewed);
+const groups = obligationGroups().map((g) => ({
+  ...g,
+  // Within a group, the statuses in legend order, then register order.
+  squares: [...g.rows].sort((a, b) => ORDER.indexOf(a.appliesStatus) - ORDER.indexOf(b.appliesStatus)),
+  counts: statuses.map((s) => ({ s, n: g.rows.filter((row) => row.appliesStatus === s).length })),
+}));
+const total = (s: AppliesStatus) => obligations.filter((row) => row.appliesStatus === s).length;
+const summary = (g: (typeof groups)[number]) =>
+  `${g.framework}: ${g.rows.length} ${g.rows.length === 1 ? 'row' : 'rows'}; ${g.counts
+    .filter((c) => c.n > 0)
+    .map((c) => `${c.n} ${appliesStatusLabels[c.s].toLowerCase()}`)
+    .join(', ')}`;
+
+const title = `${obligations.length} rows, ${groups.length} instrument groups`;
+const caption =
+  'One square per register row, grouped by the instrument heading it sits under; the drawing is the status on the row\'s review date. Pick a status or a layer below and the squares it leaves out shrink, then read the rows in the list.';
+const tableCaption = 'Register rows by instrument group and status';
+---
+
+<figure class="chart-fig obi" aria-labelledby="obi-title">
+  <div class="chart-canvas obi-canvas">
+    <ul class="obi-key" role="list" aria-label="Drawing: status on the review date">
+      {
+        statuses.map((s) => (
+          <li>
+            <span class:list={['obi-swatch', `st-${s}`]} aria-hidden="true" />
+            <span>{appliesStatusLabels[s]}</span>
+            <span class="obi-key-n">{total(s)}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <ol class="obi-groups" role="list">
+      {
+        groups.map((g) => (
+          <li class="obi-group">
+            <a class="obi-name" href={`#${g.anchor}`}>
+              <span>{g.framework}</span>
+              <span class="obi-n">{g.rows.length}</span>
+            </a>
+            <span class="obi-cells" role="img" aria-label={summary(g)}>
+              {g.squares.map((row) => (
+                <span
+                  class:list={['obi-sq', `st-${row.appliesStatus}`, ...row.layerN.map((n) => `has-l${n}`)]}
+                  title={`${row.id} · ${appliesStatusLabels[row.appliesStatus]}`}
+                />
+              ))}
+            </span>
+          </li>
+        ))
+      }
+    </ol>
+    <p class="obi-stamp">Source: obligation register (chapter 08) · As of {asOf}</p>
+  </div>
+  <figcaption class="chart-caption">
+    <span class="chart-title" id="obi-title">{title}</span>
+    <span class="chart-desc">{caption}</span>
+  </figcaption>
+  <details class="chart-alt">
+    <summary class="chart-alt-summary" data-pagefind-ignore>Data table</summary>
+    <div class="chart-table-wrap" role="region" tabindex="0" aria-label={tableCaption}>
+      <table class="chart-table">
+        <caption>{tableCaption}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Instrument group</th>
+            {statuses.map((s) => <th scope="col">{appliesStatusLabels[s]}</th>)}
+            <th scope="col">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            groups.map((g) => (
+              <tr>
+                <th scope="row">{g.framework}</th>
+                {g.counts.map((c) => (
+                  <td class="num">{c.n}</td>
+                ))}
+                <td class="num">{g.rows.length}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </details>
+</figure>

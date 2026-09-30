@@ -1,0 +1,73 @@
+---
+/**
+ * ObligationClock: the application clock at the head of /obligations. Every
+ * date the register states, as one dot: the date each row first applies, in
+ * the row's status, and each later dated step (milestone) as a square, filled
+ * once its date is on or before the as-of date and outlined while ahead. The
+ * as-of date is the register's latest review date (never the build clock), so
+ * the page renders the same on every build. Rows without a date are counted in
+ * a line of the chart and a row of its table. The chart itself is
+ * lib/page-charts/obligation-clock.ts, framed by Chart.astro in 'chart' mode
+ * (the page loads no figures.css): wide, time left to right with the tallest
+ * towers labelled and linked to their instrument's group in the list; narrow,
+ * one row per year.
+ */
+import Chart from '../Chart.astro';
+import { obligations, appliesStatusLabels } from '../../data/frameworks';
+import { obligationGroups } from '../../lib/obligations';
+import { obligationClock, type ClockPoint, type ClockStyle } from '../../lib/page-charts/obligation-clock';
+import '../../styles/obligation-visuals.css';
+
+/** The register's as-of date: the latest date a row was checked. */
+const asOf = obligations.reduce((latest, row) => (row.reviewed > latest ? row.reviewed : latest), obligations[0].reviewed);
+const anchorOf = new Map(obligationGroups().map((g) => [g.framework, `#${g.anchor}`]));
+
+const points: ClockPoint[] = obligations.flatMap((row) => {
+  const at = { group: row.framework, groupHref: anchorOf.get(row.framework) };
+  return [
+    ...(row.appliesFrom ? [{ date: row.appliesFrom, style: row.appliesStatus as ClockStyle, ...at }] : []),
+    ...(row.milestones ?? []).map((m) => ({
+      date: m.date,
+      style: (m.date <= asOf ? 'step-reached' : 'step-ahead') as ClockStyle,
+      ...at,
+    })),
+  ];
+});
+const undated: Partial<Record<ClockStyle, number>> = {};
+for (const row of obligations) {
+  if (!row.appliesFrom) undated[row.appliesStatus] = (undated[row.appliesStatus] ?? 0) + 1;
+}
+const styleLabels: Record<ClockStyle, string> = {
+  ...appliesStatusLabels,
+  'step-reached': 'Later step, reached',
+  'step-ahead': 'Later step, ahead',
+};
+const steps = points.filter((p) => p.style === 'step-reached' || p.style === 'step-ahead').length;
+const dated = points.length - steps;
+const deferred = points.filter((p) => p.style === 'deferred').length;
+
+const base = {
+  title: 'When every obligation applies',
+  desc: `${dated} dates on which a register row first applies and ${steps} later dated steps, on a time axis with the as-of date ${asOf}; the table counts them by year and status.`,
+  source: 'Obligation register (chapter 08)',
+  mode: 'chart' as const,
+  points,
+  from: '2018-01-01',
+  to: '2031-01-01',
+  marker: asOf,
+  styleLabels,
+  undated,
+  tableCaption: 'Application dates and later steps of the register, by year and status',
+};
+const wide = obligationClock({ ...base, id: 'obc-w', width: 880 });
+const narrow = obligationClock({ ...base, id: 'obc-n', width: 340 });
+---
+
+<Chart
+  class="obc"
+  chart={wide}
+  narrow={narrow}
+  title="When every obligation applies"
+  caption={`One dot per date the register states: circles and triangles are the dates rows first apply, drawn in their status (hatched: the ${deferred} rows an amending act deferred), squares the later steps, filled once reached. Read which dates are behind the dashed as-of line and which are still to come, then follow a tower's label to its instrument in the list below.`}
+  tableLabel="Data table: dates by year and status"
+/>

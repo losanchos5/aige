@@ -5,10 +5,15 @@
 // an article" box (ObligationLookup.astro) jumps straight to a row by its
 // clause; two pure-CSS radio filters (status and layer; no JavaScript,
 // CSP-safe) narrow the list; the combined rules live in styles/obligations.css.
+// The application clock (obligations/ObligationClock.astro) plots every date
+// the register states; the status isotype (obligations/ObligationIsotype.astro)
+// heads the list and shrinks the squares the radio filters leave out.
 import Base from '../../layouts/Base.astro';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import ObligationLookup from '../../components/ObligationLookup.astro';
+import ObligationClock from '../../components/obligations/ObligationClock.astro';
+import ObligationIsotype from '../../components/obligations/ObligationIsotype.astro';
 import { site } from '../../data/site';
 import {
   obligations,
@@ -130,6 +135,18 @@ const jsonLd = [
       <ObligationLookup />
     </div>
 
+    <section class="res-section" aria-labelledby="obc-heading">
+      <div class="res-section-head">
+        <h2 id="obc-heading">When the obligations apply</h2>
+        <p>
+          Every date the register states, from every instrument: the day each row first applies
+          and the later steps chapter 08 dates. The dashed line is the register's latest review
+          date.
+        </p>
+      </div>
+      <ObligationClock />
+    </section>
+
     <section class="res-section" aria-labelledby="obx-heading">
       <div class="res-section-head">
         <h2 id="obx-heading">{obligations.length} obligations, {instrumentCount} instruments</h2>
@@ -163,6 +180,8 @@ const jsonLd = [
       </div>
 
       <div class="obx-index">
+        <ObligationIsotype />
+
         <fieldset class="ob-filter">
           <legend>Filter by status</legend>
           <div class="ob-chips">
