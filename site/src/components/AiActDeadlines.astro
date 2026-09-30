@@ -7,6 +7,8 @@
  */
 import CitedText from './CitedText.astro';
 import SourceList from './SourceList.astro';
+import Chart from './Chart.astro';
+import { dumbbell } from '../lib/charts';
 import {
   AI_ACT_TIMELINE_AS_OF,
   AI_ACT_TIMELINE_REVIEW_BY,
@@ -58,6 +60,14 @@ const UI = {
     colTo: 'Date now',
     colBasis: 'Basis',
     newDate: 'New date',
+    moveTitle: 'What the Omnibus moved',
+    moveCaption:
+      `Each date the Digital Omnibus deferred, from the date in the original text to the date that applies now, with the delay in months; the dashed line is today, as of the last check of this page. The table below adds the dates the Omnibus created.`,
+    moveDesc: (n: number) => `${n} AI Act dates the Digital Omnibus deferred, each drawn from its original date to the date that applies now, with the delay in months.`,
+    moveDelay: 'Delay',
+    months: (n: number) => `+${n} ${n === 1 ? 'month' : 'months'}`,
+    moveSource: 'Regulation (EU) 2026/1744 [2]',
+    moveTable: 'The deferred dates',
     spain: 'Spain: supervisor, sandbox and a bill',
     spainLede: 'Spain has a working AI supervisor and a sandbox, and a national AI bill that is still in parliament.',
     status: { bill: 'Bill, not law', 'in-force': 'In force', call: 'Open call', guidance: 'Guidance' } as Record<SpainStatus, string>,
@@ -101,6 +111,14 @@ const UI = {
     colTo: 'Fecha actual',
     colBasis: 'Base',
     newDate: 'Fecha nueva',
+    moveTitle: 'Lo que movió el Omnibus',
+    moveCaption:
+      `Cada fecha que el Digital Omnibus aplazó, desde la fecha del texto original hasta la que se aplica ahora, con el retraso en meses; la línea discontinua es hoy, a fecha de la última revisión de esta página. La tabla de abajo añade las fechas que creó el Omnibus.`,
+    moveDesc: (n: number) => `${n} fechas del Reglamento de IA que el Digital Omnibus aplazó, cada una desde su fecha original hasta la que se aplica ahora, con el retraso en meses.`,
+    moveDelay: 'Retraso',
+    months: (n: number) => `+${n} ${n === 1 ? 'mes' : 'meses'}`,
+    moveSource: 'Reglamento (UE) 2026/1744 [2]',
+    moveTable: 'Las fechas aplazadas',
     spain: 'España: autoridad, espacio controlado de pruebas y un proyecto de ley',
     spainLede: 'España tiene una autoridad de supervisión de la IA en marcha y un espacio controlado de pruebas, y un proyecto de ley de IA que sigue en tramitación parlamentaria.',
     status: { bill: 'Proyecto, no es ley', 'in-force': 'En vigor', call: 'Convocatoria abierta', guidance: 'Guías' } as Record<SpainStatus, string>,
@@ -135,6 +153,56 @@ const cites = (m: { sources: readonly number[] }) => m.sources.map((n) => `[${n}
 // created (basis 'omnibus' with no earlier date).
 const shifted = aiActMilestones.flatMap((m) => (m.changed ?? []).map((shift) => ({ m, from: shift.from })));
 const created = aiActMilestones.filter((m) => m.basis === 'omnibus' && !(m.changed ?? []).length);
+// "What the Omnibus moved": the same `shifted` rows as a dumbbell, from the
+// original date to the date now, with the delay in whole months. The labels
+// are shorter than the milestone titles (the chart throws on a label that does
+// not fit) and name what moved: for the sandboxes milestone only the sandbox
+// deadline moved (its note), not the earlier GPAI models' date. A milestone
+// missing here falls back to its title.
+const moveLabels: Record<string, { en: string; es: string }> = {
+  '2027-08-02-legacy-gpai-sandboxes': { en: 'National AI sandboxes', es: 'Espacios de pruebas nacionales' },
+  '2027-09-02-pmm-template': { en: 'Post-market monitoring template', es: 'Plantilla de vigilancia poscomercial' },
+  '2027-12-02-high-risk-annex-iii': { en: 'High-risk, Annex III', es: 'Alto riesgo, anexo III' },
+  '2028-08-02-high-risk-annex-i': { en: 'High-risk, Annex I', es: 'Alto riesgo, anexo I' },
+};
+/** Whole months from `from` to `to` (YYYY-MM-DD), counting a month only once
+ *  its day is reached. */
+const monthsBetween = (from: string, to: string) => {
+  const [y0, m0, d0] = from.split('-').map(Number);
+  const [y1, m1, d1] = to.split('-').map(Number);
+  return (y1 - y0) * 12 + (m1 - m0) - (d1 < d0 ? 1 : 0);
+};
+const moves = shifted.map(({ m, from }) => ({
+  label: moveLabels[m.id]?.[lang] ?? m.title[lang],
+  from,
+  to: m.date,
+  href: `#${milestoneAnchor(m)}`,
+  note: UI.months(monthsBetween(from, m.date)),
+}));
+// The axis runs half a year past the last new date, so its delay label fits
+// beside it rather than before the original date.
+const moveYears = moves.flatMap((mv) => [mv.from, mv.to]).map((d) => Number(d.slice(0, 4)));
+const moveDomain: [string, string] = [`${Math.min(...moveYears)}-01-01`, `${Math.max(...moveYears) + 1}-07-01`];
+const moveChart = moves.length
+  ? {
+      domain: moveDomain,
+      title: UI.moveTitle,
+      desc: UI.moveDesc(moves.length),
+      source: UI.moveSource,
+      asOf: AI_ACT_TIMELINE_AS_OF,
+      lang,
+      items: moves,
+      fromLabel: UI.colFrom,
+      toLabel: UI.colTo,
+      itemHeader: UI.colWhat,
+      noteHeader: UI.moveDelay,
+      today: AI_ACT_TIMELINE_AS_OF,
+      tableCaption: UI.moveTable,
+    }
+  : undefined;
+const moveWide = moveChart && dumbbell({ ...moveChart, id: `aad-moved-w-${lang}`, width: 640 });
+const moveNarrow = moveChart && dumbbell({ ...moveChart, id: `aad-moved-n-${lang}`, width: 340 });
+
 const basisLabel = (m: TimelineMilestone) =>
   m.basis === 'omnibus' ? (es ? 'Reglamento (UE) 2026/1744' : 'Regulation (EU) 2026/1744') : (es ? 'Reglamento (UE) 2024/1689' : 'Regulation (EU) 2024/1689');
 ---
@@ -230,6 +298,17 @@ const basisLabel = (m: TimelineMilestone) =>
       <h2 id="aad-changed">{UI.changed}</h2>
       <p>{UI.changedLede}</p>
     </div>
+    {
+      moveWide && moveNarrow && (
+        <Chart
+          chart={moveWide}
+          narrow={moveNarrow}
+          title={UI.moveTitle}
+          caption={UI.moveCaption}
+          tableLabel={UI.moveTable}
+        />
+      )
+    }
     <div class="res-tablewrap">
       <table class="res-table aad-table">
         <thead>

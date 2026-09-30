@@ -4,6 +4,8 @@ import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import FlowDiagram from '../../components/FlowDiagram.astro';
 import ContributeCta from '../../components/ContributeCta.astro';
+import Chart from '../../components/Chart.astro';
+import { caseYears } from '../../lib/page-charts/case-years';
 import { site } from '../../data/site';
 import { cases, caseEvidenceLabel, casesDisclaimer } from '../../data/cases';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
@@ -57,6 +59,36 @@ const incidentToControl = [
   },
 ] as const;
 
+// The case timeline: one glyph per case by the year of its record, shaped by
+// the strength of that record, each a link to the case. The span and the
+// accent year (the latest) come from the data.
+const caseYearList = cases.map((c) => Number(c.year));
+const firstYear = Math.min(...caseYearList);
+const lastYear = Math.max(...caseYearList);
+const latest = cases.filter((c) => Number(c.year) === lastYear);
+// The caption names the latest year's field only while every case in it
+// comes from AI development or model evaluation (sector wording in cases.ts).
+const latestInAiDev = latest.every((c) => /^AI development:|AI model evaluation$/.test(c.sector));
+const timeline = {
+  title: `Cases by year, ${firstYear} to ${lastYear}`,
+  desc: `${cases.length} cases placed by year from ${firstYear} to ${lastYear}, shaped by the strength of their record; ${latest.length} date from ${lastYear}.`,
+  source: 'the incident record cited on each case page',
+  mode: 'chart' as const,
+  from: firstYear,
+  to: lastYear,
+  evidenceLabels: caseEvidenceLabel,
+  highlightYear: lastYear,
+  cases: cases.map((c) => ({
+    label: c.short,
+    year: Number(c.year),
+    evidence: c.evidence,
+    sector: c.sector,
+    href: `/cases/${c.id}`,
+  })),
+};
+const timelineWide = caseYears({ ...timeline, id: 'cs-years-w', width: 720, nameLastYear: true });
+const timelineNarrow = caseYears({ ...timeline, id: 'cs-years-n', width: 340 });
+
 const jsonLd = [
   {
     '@type': 'CollectionPage',
@@ -107,6 +139,14 @@ const jsonLd = [
         href="/bok/patterns">the catalogue</a>, the engineering side of <a
         href="/ai-governance">AI governance in practice</a>.</p>
       </div>
+
+      <Chart
+        chart={timelineWide}
+        narrow={timelineNarrow}
+        title={`Cases by year, ${firstYear} to ${lastYear}`}
+        caption={`One glyph per case, by the year of its record and shaped by how strong that record is. ${latest.length} of the ${cases.length} date from ${lastYear}${latestInAiDev ? ', every one from AI development or model evaluation' : ''}; open any glyph for its post-mortem.`}
+        tableLabel="Cases by year"
+      />
 
       <ul class="cs-cards">
         {
