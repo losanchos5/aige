@@ -20,8 +20,8 @@
 ## 4. Tests y verificación
 
 - [x] 4.1 `site/tests/frontier-crosswalk.spec.ts` bajo test-audit (invariantes, 5×N, drawer con foco, exports, anclas sin JS, axe ambos temas, 390 px); verificar con PW_PORT=4451
-- [ ] 4.2 Fact-check independiente (handoffs/labs-factcheck.md) y corrección; 0 verified:false en columnas de labs o listadas con nota
-- [ ] 4.3 code-reviewer y arreglo de CRITICAL/HIGH; `npm test` completo en verde con PW_PORT=4451
+- [x] 4.2 Fact-check independiente (handoffs/labs-factcheck.md) y corrección; 0 verified:false en columnas de labs o listadas con nota
+- [x] 4.3 code-reviewer y arreglo de CRITICAL/HIGH; `npm test` completo en verde con PW_PORT=4451
 
 ## 5. Entrega
 
