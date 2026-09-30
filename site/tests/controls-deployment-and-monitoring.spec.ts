@@ -1,5 +1,5 @@
 // controls-deployment-and-monitoring.spec.ts: the Deployment and Monitoring
-// Control Profile v0.1 (src/data/controls/deployment-and-monitoring.ts). Pure
+// Control Profile v0.2 (src/data/controls/deployment-and-monitoring.ts). Pure
 // Node over the data, plus reads of dist/ for the pattern pages and the profile
 // page anchors (run after the build). Block orp2-deploy
 // (open-reference-project-2, wave 1).
@@ -15,7 +15,7 @@ const EM_DASH = String.fromCharCode(0x2014);
 const SLUG = 'deployment-and-monitoring';
 const rows = controlsIn(SLUG);
 const MIN = 10;
-const MAX = 15;
+const MAX = 18;
 
 /** rehype-slug ids of every heading in a chapter file (github-slugger, as the site renders them). */
 function headingAnchors(file: string): Set<string> {
@@ -32,7 +32,7 @@ function headingAnchors(file: string): Set<string> {
 }
 
 test.describe('deployment and monitoring profile data', () => {
-  test('the profile is registered, with 10 to 15 controls and contiguous ids', () => {
+  test('the profile is registered, with 10 to 18 controls and contiguous ids', () => {
     expect(profileBySlug(SLUG)).toBe(deploymentAndMonitoringProfile);
     expect(rows.length).toBeGreaterThanOrEqual(MIN);
     expect(rows.length).toBeLessThanOrEqual(MAX);
@@ -92,6 +92,7 @@ test.describe('deployment and monitoring profile data', () => {
       'governing-deployment': '15-governing-deployment.md',
       'fairness-and-explainability': '16-fairness-explainability.md',
       incidents: '17-incidents.md',
+      'governing-agents': '23-governing-agents.md',
     };
     const anchors = Object.fromEntries(Object.entries(files).map(([slug, file]) => [slug, headingAnchors(file)]));
     for (const row of rows) {
@@ -117,9 +118,10 @@ test.describe('deployment and monitoring profile data', () => {
 
   test('the profile is an honest draft with no reviewer', () => {
     expect(deploymentAndMonitoringProfile.title).toBe('Deployment and Monitoring Control Profile');
-    expect(deploymentAndMonitoringProfile.version).toBe('0.1');
+    expect(deploymentAndMonitoringProfile.version).toBe('0.2');
     expect(deploymentAndMonitoringProfile.reviewers).toEqual([]);
     expect(deploymentAndMonitoringProfile.changelog).toEqual([
+      expect.objectContaining({ version: '0.2', date: '2026-09-29' }),
       expect.objectContaining({ version: '0.1', date: '2026-09-26' }),
     ]);
   });

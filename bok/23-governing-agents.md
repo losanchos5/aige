@@ -179,6 +179,10 @@ at the end of the task [6]. Singapore asks that authorisations be "time- or sess
 non-transferable", least privilege by default and never greater than what the authorising human may
 do [3].
 
+Some secrets should never reach the agent at all. Where a task needs a password or an API key typed
+in, Singapore's framework asks that the agent "let user take over control when keying in sensitive
+data" (p.34) [3]: the person types it, and it never enters the agent's context, memory or traces.
+
 ### Delegation without impersonation
 
 When an agent acts for a user, two identities are in play, and the log must keep both. OAuth 2.0
@@ -258,6 +262,15 @@ AI Agent Tool Invocation" (`AML.T0086`) and "Data Destruction via AI Agent Tool 
 (`AML.T0101`) [10]. Rate and egress bounds therefore apply to every tool, including the ones nobody
 worries about.
 
+An allow-list is a claim until something tries to break it. Among what Singapore suggests testing
+before deployment are policy compliance, whether the agent "routes for human approval when
+required", and tool calling, whether it calls the right tools "with the right permissions" (p.38)
+[3]; IMDA's own worked example
+goes further and, before deployment, attempts "disallowed actions to ensure restrictions work"
+(p.14) [3]. Make that a suite: a tool off the list, a scope beyond the grant and an irreversible call
+with no approval, each expected to be denied or routed to a person, rerun whenever the allow-list or
+the checkpoints change.
+
 > **Example (illustrative)** The allow-list as a deny-by-default policy the tool gateway evaluates
 > on every call, reading the registry as data. The rate check is omitted for brevity.
 
@@ -323,6 +336,18 @@ atypical behaviour, and user-defined boundaries [3].
 | **User-defined** | A purchase above the user's own limit | The user | Consent record |
 | **Scope elevation** | A step-up request for a new scope | The agent's owner | Elevation event |
 
+Singapore's framework refines the table in three places. For a complex task the most useful
+checkpoint can come before the first action: "it may be more productive for the human to edit the
+plan before giving the agent the go-ahead", with the plan and the reasoning logged for the user to
+verify (pp.29, 34) [3]. The plan that runs is then the plan that was approved, and a changed plan
+needs a new approval. Users who delegate to an agent may set "their own approval thresholds and
+boundaries for agent actions", such as approval for purchases above an amount, on top of the limits
+the organisation defined (pp.29, 47) [3]: the gateway enforces a user's threshold like any other
+checkpoint, and a user setting can add a check but never remove one the organisation set. And where
+the agent handles a financial transaction, Singapore asks for standardised protocols where they
+apply, naming agentic commerce protocols (p.34) [3]. A protocol settles how the payment is expressed
+and authorised, not whether it needed a person, so the checkpoint on pay-class calls still applies.
+
 ### What a good approval looks like
 
 The AI Act describes the overseer the design must serve. For a high-risk system they must be able to
@@ -341,13 +366,24 @@ Trusted Output Components Manipulation" (`AML.T0067`) [10]. The rules that follo
 
 1. **The gate lives outside the model.** The tool gateway holds the call until approval arrives; the
    prompt does not decide whether to ask.
-2. **Show the call, not the story.** The approver sees the tool, the parameters and the target as
-   the gateway will execute them, then the agent's reason, the risk and what happens on rejection.
-3. **Bind the approval.** An approval is single-use and bound to a hash of the parameters; a changed
+2. **Show the raw call first, in short form.** The approver sees the tool, the target and the key
+   parameters as the gateway will execute them, in a line or two, then the agent's reason, the risk
+   and what happens on rejection. Singapore asks that a request stay "short and clear, instead of
+   providing long logs or raw data that may be challenging to decipher", while carrying useful data
+   "such as the associated risk with the action or a confidence score" (p.29) [3]. The exact call is
+   not a log dump, and it is the one thing a persuasive summary cannot fake.
+3. **Ask for the input the decision needs.** A simple action is approved or rejected; a plan can be
+   edited before the go-ahead; for a high-risk action Singapore suggests requiring "an additional
+   written justification before approving or rejecting" (p.29) [3].
+4. **Bind the approval.** An approval is single-use and bound to a hash of the parameters; a changed
    amount needs a new approval.
-4. **Time out closed.** No answer means no action.
-5. **Measure the oversight.** Approval rate, time to decide and override rate, as [designing human
-   oversight](/bok/the-stack#designing-human-oversight-article-14) describes.
+5. **Time out closed.** No answer means no action.
+6. **Measure the oversight, per approver too.** Approval rate, time to decide and override rate, as
+   [designing human oversight](/bok/the-stack#designing-human-oversight-article-14) describes.
+   Singapore reads a low override rate as a possible sign of rubber-stamping and a short response
+   time as a possible sign of automation bias or fatigue, and suggests analytics to find approvers
+   "whose decision patterns deviate significantly from the norm", which may indicate compromised
+   oversight (p.30) [3]. Review what an outlier approved, not only the outlier.
 
 > **Anti-pattern** A checkpoint that fires 200 times a day on a person with other work. It becomes a
 > rubber stamp within a week, and the approval log then launders the decisions it was meant to
@@ -356,8 +392,8 @@ Trusted Output Components Manipulation" (`AML.T0067`) [10]. The rules that follo
 > **In practice (illustrative)**
 > A payments team found its reviewers approving almost every agent refund request within seconds.
 > Two changes fixed it: only irreversible, high-value refunds now reach a person, which cut the
-> volume by an order of magnitude, and the approval screen shows the raw tool call first, with the
-> agent's explanation below it. Overrides rose from almost none to a rate worth investigating, and
+> volume by an order of magnitude, and the approval screen shows the exact tool call first, in one
+> line, with the agent's explanation below it. Overrides rose from almost none to a rate worth investigating, and
 > two of the first exposed a prompt-injection path through customer notes.
 
 ## Runtime guardrails for tool calls
@@ -516,6 +552,14 @@ risk [23].
 | **Peers** | Only registered agents with verified, signed cards | Peer allow-list |
 | **Third parties** | A contract names who answers for a remote agent | Clause reference in the registry |
 
+Singapore's framework adds two design rules and a test. Agents should "communicate through
+structured schemas such as typed function calls rather than free text, to reduce unintended
+instructions passing between agents", and shared memory access between agents should be limited
+(p.34) [3]. Testing should reach the multi-agent system level, including "the impact on other agents
+when one agent has been compromised" (p.38) [3]. A free-text message from a peer is untrusted
+content, like a retrieved document: validate it against its schema, and do not let it write to
+memory without the gate.
+
 Two standards efforts address the hard part, carrying identity and authorisation context through a
 call chain. The OAuth working group's Transaction Tokens draft (revision 11, 30 Jul 2026, awaiting
 its write-up) is designed "to maintain and propagate user identity, workload identity and
@@ -544,6 +588,14 @@ configuration under change control, like infrastructure code:
    [substantial modification](/bok/governing-development#substantial-modification) and, under
    [Article 25](/bok/eu-ai-act#article-25-when-someone-else-becomes-the-provider), can make the
    deployer the provider.
+
+Singapore's framework allows more latitude: "Minor changes such as prompt refinements may follow
+lighter review processes", with a full governance review kept for material changes such as model
+updates or autonomy adjustments (p.45) [3]. This book keeps every prompt change on the regression
+suite and the canary. A small edit to a prompt can change behaviour as much as a large one, and the
+suite is the cheap part of the review. What Singapore adds that applies in full is the list of
+triggers for a change review: technical (model updates, tool modifications), environmental,
+performance and regulatory (p.45) [3].
 
 A system prompt is configuration, not a secret and not a control. The 2026 OWASP list renamed system
 prompt leakage to **Hidden Context Exposure** (`LLM08:2026`) and advises that "Practitioners should
@@ -598,6 +650,13 @@ out](/bok/incidents#a-severity-scale-mapped-to-the-clocks).
 | **Runaway or rogue** | Activity out of scope, after expiry or past budget | Calls after expiry; spend spike | Revoke; verify the stop held | `ASI10`; `AML.T0034.002` |
 | **Exfiltration through a tool** | Data encoded into a legitimate write | Egress to an unknown destination | Block egress; trip the breaker | `ASI02`; `AML.T0086` |
 
+Detection can itself be an agent. Singapore lists "Using agents to monitor other agents" among the
+ways to escalate unexpected behaviour, and asks that such agents flag "any anomalies or
+inconsistencies" in real time (pp.30, 44) [3]. A monitoring agent is a governed agent like any
+other: its own identity, scope and stop; read access to the traces it watches and none to the tools
+of the agents it watches; and flags that go to a person or to the breaker, not back to the agent it
+flagged.
+
 ### Telemetry with the OpenTelemetry GenAI conventions
 
 The OpenTelemetry generative-AI semantic conventions now live in their own repository and are in
@@ -614,7 +673,10 @@ verdict, approval ID, delegation chain): add them in your own namespace and map 
 on argument and result capture may capture personal data, so it needs its own retention and access
 rules. And the logs are evidence: high-risk systems must record events over their lifetime (`Art.
 12`), and deployers must keep the logs under their control for at least six months (`Art. 26(6)`)
-[5]. The [incident record](/bok/incidents#the-incident-record) of chapter 17 is where the trace ends
+[5]. Evidence has to survive the incident it records: Singapore asks for "log immutability", so that
+"problematic agent trajectories and failures cannot be deleted" (p.44) [3]. Keep traces
+append-only, so that no one, the agent included, can delete or edit one within its retention period.
+The [incident record](/bok/incidents#the-incident-record) of chapter 17 is where the trace ends
 up.
 
 ## Threats mapped to controls
@@ -645,6 +707,14 @@ Context Exposure in the treatment of prompts. Use the ATLAS IDs to tag test case
 from technique to control to the eval that now guards it. The site's
 [threat bridge](/resources/threats) carries the same rows as data. Mappings are illustrative, not a
 claim of conformity.
+
+The table is generic; each agent needs its own. Singapore treats threat modelling as what makes the
+risk assessment "more rigorous", recommends taint tracing "to track how untrusted data can move
+through the system", and adds that "the threat model should be regularly updated" (p.17) [3]. Write
+the agent's [threat model](/patterns/ai-threat-model) before production, trace where untrusted
+content can enter (retrieved documents, tool outputs, peer messages, memory) and which tools it can
+reach from there, and update both when the agent gains a tool, a memory store, a peer or a level of
+autonomy.
 
 ## Frameworks written for agents
 
@@ -703,6 +773,69 @@ gate](/patterns/vendor-model-due-diligence-gate); chapter 18 covers [the GPAI
 duties](/bok/eu-ai-act#general-purpose-ai-models). The Code is a voluntary tool. Mappings are
 illustrative, not a claim of conformity.
 
+## Putting agents in front of people
+
+Singapore's fourth dimension is the one most control lists leave out: "end users are the ones who
+use and rely on agents, and human accountability also extends to these users" (p.46) [3]. The
+controls above bound what the agent can do. This section is about the people who use it, answer for
+it and learn from it.
+
+### Telling people what the agent can do
+
+Telling people they are dealing with an AI system is the floor (`Art. 50(1)`, above). Singapore asks
+for more: inform users of "the range of actions and decisions that the agent is authorised to
+perform and make", be clear on "how user data is collected, stored, and used by the agents", and
+give them "the respective human contact points who are responsible for the agents" for when it
+malfunctions or they dispute a decision (p.47) [3]. Put the notice where the agent is used, not only
+in a policy page, and keep it in step with the allow-list: a new tool that changes what the agent
+may do changes the notice.
+
+### Training users and keeping the manual path
+
+For people who work with an agent every day, Singapore layers education on top: the agent's range
+of actions, common failure modes "like hallucinations", usage policies for data, and how to report
+an override or a wrong action (pp.46-47) [3]. It also names a slower risk. As agents take over
+entry-level work, "users may no longer know how to perform critical processes manually when agents
+malfunction or become unavailable", so organisations should keep the core skills of each job alive
+through training and work exposure (p.47) [3]. Keep the training on record, as a [training
+record](/resources/templates#schema-training-record), and for each critical process the agent runs,
+keep a manual procedure and people who can still run it: the [degraded
+modes](/bok/governing-deployment#graduated-degradation) of chapter 15 assume that a person can do
+the work.
+
+### Rolling out by users, tools and systems
+
+Singapore stages an agent's rollout along three lines: "Users of agents e.g. rolling out to trained
+or experienced users first"; "Tools and protocols available to agent", starting with more secure,
+whitelisted MCP servers; and "Systems exposed to agent", starting with lower-risk internal systems
+(p.42) [3]. That complements the traffic stages of [progressive
+delivery](/bok/governing-deployment#progressive-delivery-as-a-control): a canary limits how many
+requests see a change, and these three limit what an agent can touch while it earns trust. Widen one
+line at a time, with the criteria for each step written before the step starts.
+
+### Named responsibilities
+
+An agent's owner in the registry is one name, but running an agent takes several teams. Singapore
+sketches an allocation of responsibilities "across the agent lifecycle": leaders set the goals, the
+permitted use cases and the limits on data access; product teams design, test, roll out and monitor
+the agent and educate its users; security teams set baseline guardrails and run red teaming and
+threat modelling; users follow the usage policies and report issues (p.26) [3]. Outside the
+organisation, contracts should clarify how obligations are shared with model developers, agent
+providers and hosts of MCP servers or tools (p.28) [3]. Write the allocation down per agent, starting
+from the [lifecycle RACI](/resources/templates#kit-raci), link it from the registry entry, and name a
+person for each duty.
+
+### Learning from use
+
+Monitoring that only raises alerts wastes what it finds. Singapore asks for feedback loops that
+"feed monitoring insights back into training datasets and evaluation frameworks" (p.44) [3], and for
+users to be able to report when they override an agent or spot a wrong action, so that the report
+"can be used to improve the agent processes" (p.47) [3]. Turn each confirmed alert, incident and
+reported override into a test case in the agent's regression suite, so the next change is tested
+against what went wrong in use; the [post-market monitoring
+plan](/resources/templates#schema-post-market-monitoring-plan) names the channels the findings come
+through.
+
 ## What you can do this week
 
 1. **Find your agents.** Run a discovery sweep that includes coding agents and local MCP server
@@ -728,7 +861,7 @@ of conformity.
 
 [1] OWASP Top 10 for Agentic Applications 2026 (ASI01 Agent Goal Hijack; ASI02 Tool Misuse and Exploitation, per-tool least-privilege profiles, auto-approved ping tool used for DNS exfiltration; ASI03 Identity and Privilege Abuse; ASI04 Agentic Supply Chain Vulnerabilities; ASI05 Unexpected Code Execution (RCE); ASI06 Memory & Context Poisoning; ASI07 Insecure Inter-Agent Communication; ASI08 Cascading Failures; ASI09 Human-Agent Trust Exploitation; ASI10 Rogue Agents; "Least-Agency"). OWASP GenAI Security Project. 2025-12-09. https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/ (verified: primary)
 [2] "Levels of Autonomy for AI Agents" (K. J. Kevin Feng, David W. McDonald, Amy X. Zhang; arXiv 2506.12469; five levels by user role: operator, collaborator, consultant, approver, observer; autonomy as a design decision separate from capability). Knight First Amendment Institute at Columbia University / arXiv. 2025-06-14 (v2 2025-07-28). https://arxiv.org/abs/2506.12469 (verified: primary)
-[3] Model AI Governance Framework for Agentic AI, version 1.5 (published 2026-05-20, updated 2026-06-05; four levels of human involvement; agent identity unique, cryptographically verifiable, accounted for, differentiated by capacity, catalogued and centrally managed; authorisations scoped, time- or session-bound, non-transferable, bounded by the authorising human; significant checkpoints for high-stakes, irreversible, outlier and user-defined actions; approvals contextual and digestible; human approval enforced through system-level controls). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)
+[3] Model AI Governance Framework for Agentic AI, version 1.5 (published 2026-05-20, updated 2026-06-05; four levels of human involvement; agent identity unique, cryptographically verifiable, accounted for, differentiated by capacity, catalogued and centrally managed; authorisations scoped, time- or session-bound, non-transferable, bounded by the authorising human; significant checkpoints for high-stakes, irreversible, outlier and user-defined actions; approvals contextual and digestible; human approval enforced through system-level controls; threat modelling with taint tracing, regularly updated (p.17); IMDA's own worked example attempting disallowed actions before deployment (p.14); responsibilities allocated across teams and in contracts (pp.26, 28); plan editing before the go-ahead, short requests without long logs or raw data, written justification for high-risk actions (p.29); override rate and response time, outlier approvers, agents monitoring other agents (p.30); typed inter-agent messages, limited shared memory, user takeover when keying in sensitive data, agentic commerce protocols (p.34); policy-compliance, tool-permission and multi-agent system testing (p.38); gradual rollout by users, tools and systems (p.42); log immutability and feedback loops into evaluation (p.44); lighter review for prompt refinements and change-review triggers (p.45); end-user transparency, education, own approval thresholds, contact points and retained manual skills (pp.46-47)). IMDA. 2026-06-05. https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf (verified: primary)
 [4] Agentic Trust Framework, v1 (zero-trust governance for AI agents; five elements: identity, behaviour, data governance, segmentation, incident response; autonomy tiers Intern, Junior, Senior, Principal; promotion criteria; CC BY 4.0; released February 2026). CSAI Foundation / Cloud Security Alliance. 2026-02. https://agentictrustframework.ai/ (verified: primary)
 [5] Regulation (EU) 2024/1689 (AI Act), consolidated text of 2026-07-27 as amended by Regulation (EU) 2026/1744: Art. 12 record-keeping; Art. 14(3)–(4) human oversight commensurate with risks, level of autonomy and context of use, automation bias, override, "stop" button; Art. 15(4)–(5) robustness, feedback loops, cybersecurity; Art. 25 responsibilities along the value chain; Art. 26(1)–(2), (5)–(6) deployer obligations; Art. 50(1) transparency for systems interacting with natural persons; Arts. 53 and 55 GPAI providers; Art. 113 application dates as amended (Annex III high-risk from 2 December 2027, Annex I from 2 August 2028). Publications Office of the EU (EUR-Lex). 2026-07-27. https://eur-lex.europa.eu/eli/reg/2024/1689/2026-07-27/eng (verified: primary)
 [6] AI Safety Governance Framework 3.0 (人工智能安全治理框架3.0), Appendix 2 agentic AI risk management (II.2 unique identity and minimum permissions by decision mode, credentials revoked at task end; II.3 human control checkpoints, tamper-proof approval logs, deny by default when approval fails or no rule exists; II.5 execution limits, memory retention and isolation, no credentials in memory; II.7 decommissioning). TC260 / CAC. 2026-09-14. https://www.cac.gov.cn/rootimages/uploadimg/1791137114683961/1791137114683961.pdf (verified: primary)

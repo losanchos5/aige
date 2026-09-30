@@ -1,5 +1,5 @@
-// controls/agent-runtime.ts: the Agent Runtime Control Profile, v0.1 (draft).
-// Thirty-one reference controls, AIGE-CTL-AGENT-001 to 031, one per agent
+// controls/agent-runtime.ts: the Agent Runtime Control Profile, v0.2 (draft).
+// Forty-two reference controls, AIGE-CTL-AGENT-001 to 042, one per agent
 // control of chapter 23 (bok/23-governing-agents.md) as ../tool-agent-controls.ts
 // restates them, in the same order. Each record is derived from its seed and
 // adds nothing that chapter 23, the mapped threats or a cited source does not
@@ -31,13 +31,20 @@
 // the chapter cites it; a second chapter section where a rule or a note comes
 // from it.
 //
-// Layer: 4 (runtime), except registry and identity seeds and MCP server
-// admission (2, the layer the chapter's threat table gives server admission),
-// trajectory evals (3) and telemetry and evidence seeds (5). Enforcement point:
-// runtime, except the registry entry, data classes and MCP admission (deploy),
-// trajectory evals (pre_merge), prompt change control (pre_merge and deploy),
-// and the drilled kill switch and local MCP servers, which add scheduled drills
-// and discovery sweeps (periodic). No verification procedure: the derivation
+// Layer: 4 (runtime), except registry and identity seeds, MCP server admission
+// (2, the layer the chapter's threat table gives server admission) and user
+// information (2, transparency), trajectory evals, tests that attempt what is
+// denied and the threat model (3), and telemetry, evidence and per-approver
+// oversight seeds (5). Enforcement point: runtime, except the registry entry,
+// data classes, MCP admission and user information (deploy), trajectory evals
+// (pre_merge), prompt change control and the denied-action tests (pre_merge and
+// deploy), the threat model (deploy and periodic), per-approver oversight
+// (periodic), and the drilled kill switch and local MCP servers, which add
+// scheduled drills and discovery sweeps (periodic).
+//
+// Seeds 032 to 042 come from the recommendations of Singapore's agentic
+// framework (IMDA v1.5) that chapter 23 took in on 2026-09-29; they are
+// appended, so no earlier id moves. No verification procedure: the derivation
 // invents no test, so every control is a draft that needs technical review and
 // says so in its open questions.
 //
@@ -58,18 +65,23 @@ export const agentRuntimeProfile: ControlProfile = {
   slug: PROFILE,
   title: 'Agent Runtime Control Profile',
   shortTitle: 'Agent runtime',
-  version: '0.1',
+  version: '0.2',
   status: 'draft',
   reviewerStatus: 'open',
   summary:
-    'Reference controls for AI agents at runtime, derived from the 31 agent controls of chapter 23. Every control is a draft: it restates the chapter, carries no verification procedure yet and is open for technical review.',
+    'Reference controls for AI agents at runtime, derived from the 42 agent controls of chapter 23. Every control is a draft: it restates the chapter, carries no verification procedure yet and is open for technical review.',
   scope:
     'Agents that call tools, in production and in evaluation harnesses, from registration to retirement: their identity, tools, memory, delegation, checkpoints, stop handles and telemetry. The environment an agent is evaluated in is covered by the evaluation environment profile.',
   published: '2026-09-26',
-  updated: '2026-09-26',
+  updated: '2026-09-29',
   authors: ['jorge-garcia-aibar'],
   reviewers: [],
   changelog: [
+    {
+      version: '0.2',
+      date: '2026-09-29',
+      note: "Eleven controls added, AIGE-CTL-AGENT-032 to 042, from the recommendations of Singapore's Model AI Governance Framework for Agentic AI v1.5 that no control covered, now written into chapter 23: plan review, readable approval requests, oversight audited per approver, monitoring agents, typed messages between agents, user entry of secrets, payment protocols, tests that attempt what is denied, user information, user-set approval thresholds and a threat model per agent. AIGE-CTL-AGENT-004 now keeps traces append-only.",
+    },
     {
       version: '0.1',
       date: '2026-09-26',
@@ -104,6 +116,7 @@ const anchorHeadings: Readonly<Record<AnchorKey, string>> = {
   telemetry: 'Telemetry with the OpenTelemetry GenAI conventions',
   threats: 'Threats mapped to controls',
   euAiAct: 'EU AI Act hooks for agents',
+  people: 'Telling people what the agent can do',
 };
 
 /** Exported for tests: every heading must exist in bok/23-governing-agents.md. */
@@ -169,6 +182,16 @@ export const KEPT_VERBATIM: ReadonlySet<string> = new Set([
   'sandbox',
   'memory-governance',
   'hop-accountability',
+  'plan-review',
+  'approval-request',
+  'monitoring-agents',
+  'inter-agent-messages',
+  'user-enters-secrets',
+  'payment-protocols',
+  'restrictions-tested',
+  'user-information',
+  'user-thresholds',
+  'agent-threat-model',
 ]);
 
 /** The other rules, restated as the outcome the rule produces; same content, no new requirement. */
@@ -178,7 +201,7 @@ const OBJECTIVES: Readonly<Record<string, string>> = {
   'own-identity':
     'Each agent has a unique, attributable workload identity under which its actions are logged and its access can be revoked; channel authentication is not taken for agent identity.',
   traces:
-    "The agent's trajectory is traced, not only its answer: every plan, tool call and memory operation is recorded with the agent id and version.",
+    "The agent's trajectory is traced, not only its answer: every plan, tool call and memory operation is recorded with the agent id and version, and the traces are append-only, so no one, the agent included, can delete or edit one within its retention period.",
   'tool-allow-list':
     'The agent can call only the tools granted on its allow-list, which the gateway evaluates on every call; each entry fixes the tool identity with a pinned definition hash, the operation class, resource scope, rate and volume, egress, data classes and checkpoint.',
   'guardrail-every-call':
@@ -219,6 +242,8 @@ const OBJECTIVES: Readonly<Record<string, string>> = {
     "An agent, classified by its intended purpose, that serves an Annex III purpose keeps event logs over its lifetime (Art. 12), has oversight commensurate with its autonomy level (Art. 14(3)-(4)) and competent overseers with authority (Art. 26(2)), and its logs stay under the deployer's control for at least six months (Art. 26(6)).",
   'ai-disclosure':
     'People who receive the messages, calls and chats the agent sends are told they are interacting with an AI system, unless that is obvious (Art. 50(1), from 2 Aug 2026).',
+  'approver-outliers':
+    'Oversight is measured per approver as well as overall: a low override rate or a short time to decide is flagged as possible rubber-stamping or fatigue, approvers whose decisions deviate significantly from the norm are flagged, and what an outlier approved is reviewed.',
 };
 
 // ---------------------------------------------------------------------------
@@ -327,7 +352,7 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     secondaryLayers: [5],
     failureResponse: { effect: 'deny', text: 'No answer means no action: an approval request that times out closes without the call.' },
     implementationNotes: [
-      "Show the call, not the story: the approver sees the tool, the parameters and the target as the gateway will execute them, then the agent's reason, the risk and what happens on rejection.",
+      "Show the raw call first, in short form: the approver sees the tool, the target and the key parameters as the gateway will execute them, in a line or two and never as a log dump, then the agent's reason, the risk and what happens on rejection (AIGE-CTL-AGENT-033 sets out the request).",
       'Send to a person only the actions that need one: a checkpoint that fires hundreds of times a day on someone with other work becomes a rubber stamp, and its log then launders the decisions it was meant to examine.',
     ],
   },
@@ -525,6 +550,108 @@ const DERIVATION: Readonly<Record<string, Derivation>> = {
     ],
     openQuestions: [OBLIGATION_QUESTION],
   },
+  'plan-review': {
+    scope: 'Agents whose tasks a person approves, where the task is complex enough that the agent plans it before acting.',
+    failureModes: [
+      'A plan runs that the person never saw, or a different plan runs from the one approved.',
+      'The person can only approve or reject a plan they would have corrected, so a flawed plan runs or the task is lost.',
+    ],
+    failureResponse: {
+      effect: 'require_approval',
+      text: 'The task waits at its plan until a person approves it, as proposed or edited; a changed plan needs a new approval.',
+    },
+  },
+  'approval-request': {
+    failureModes: [
+      "An approval request shows a long log or a raw data dump, or only the agent's summary, so the approver cannot see what will run.",
+      'A high-risk action is approved with no written justification on record.',
+    ],
+  },
+  'approver-outliers': {
+    layer: 5,
+    secondaryLayers: [4],
+    enforcementPoints: ['periodic'],
+    failureModes: [
+      'An approver approves almost every request within seconds, and no one reviews their decisions.',
+      'Oversight metrics exist only in aggregate, so one approver whose decisions deviate from the norm goes unnoticed.',
+    ],
+  },
+  'monitoring-agents': {
+    scope: 'Agents that monitor other agents in real time.',
+    extraAnchors: ['limits'],
+    failureModes: [
+      'A monitoring agent can call the tools of an agent it watches, or runs with no identity, scope or stop of its own.',
+      "A monitoring agent's flag goes back to the agent it flagged and reaches no person and no breaker.",
+    ],
+  },
+  'inter-agent-messages': {
+    scope: 'Agents that exchange messages or memory with other agents.',
+    extraAnchors: ['multiAgent', 'memory'],
+    failureModes: [
+      'Agents pass free-text instructions to each other that no schema checks.',
+      'The agents were tested one by one but never together, or never with one of them compromised.',
+    ],
+  },
+  'user-enters-secrets': {
+    scope: 'Agents that work in a session where a person may have to key in a password, an API key or other sensitive data.',
+    failureModes: ["A password or API key the person typed appears in the agent's context, memory or traces."],
+  },
+  'payment-protocols': {
+    scope: 'Agents with pay-class tools that handle financial transactions.',
+    extraAnchors: ['allowList'],
+    failureModes: [
+      'A payment goes through on a protocol path that bypasses the pay-class checkpoint.',
+      'An agent handles payments on an ad hoc integration where a standardised agentic commerce protocol applies.',
+    ],
+    failureResponse: {
+      effect: 'require_approval',
+      text: 'Pay-class calls wait for approval, whatever protocol carries them.',
+    },
+  },
+  'restrictions-tested': {
+    layer: 3,
+    enforcementPoints: ['pre_merge', 'deploy'],
+    extraAnchors: ['threats'],
+    failureModes: [
+      'A disallowed tool call, an out-of-scope call or an unapproved irreversible call succeeds in testing, or was never tried.',
+      'The allow-list or the checkpoints change and the tests that attempt what is denied are not rerun.',
+    ],
+    implementationNotes: [
+      'Keep the attempts in the red-team suite, tagged with their MITRE ATLAS technique ids, so a failed denial traces to the control it breaks.',
+    ],
+  },
+  'user-information': {
+    layer: 2,
+    enforcementPoints: ['deploy'],
+    scope: 'Agents that people use directly, inside or outside the organisation.',
+    extraAnchors: ['euAiAct'],
+    failureModes: [
+      'People using the agent cannot find out what it may do, how it uses their data or whom to alert when it malfunctions.',
+      'The agent gains a tool that changes what it may do, and the notice stays the same.',
+    ],
+    implementationNotes: [
+      'This goes beyond the AI Act disclosure of AIGE-CTL-AGENT-031: that one says the person is dealing with an AI system, this one says what the agent may do and who answers for it.',
+    ],
+  },
+  'user-thresholds': {
+    scope: 'Agents that act on behalf of users.',
+    failureModes: [
+      "A user's own approval threshold is recorded but not enforced at the gateway.",
+      'A user setting removes or loosens a checkpoint the organisation set.',
+    ],
+    failureResponse: {
+      effect: 'require_approval',
+      text: "A call above the user's own threshold waits for the user's approval.",
+    },
+  },
+  'agent-threat-model': {
+    layer: 3,
+    enforcementPoints: ['deploy', 'periodic'],
+    failureModes: [
+      'An agent reaches production with no threat model, or with one that does not trace where untrusted content can enter.',
+      'The agent gains a tool, a memory store, a peer or a level of autonomy, and its threat model keeps its old date.',
+    ],
+  },
 };
 
 const VERIFICATION_TODO = 'Verification procedure and evidence schema to be specified; requires technical review.';
@@ -570,7 +697,7 @@ function derive(seed: AgentControl, index: number): Control {
     id: `AIGE-CTL-AGENT-${String(index + 1).padStart(3, '0')}`,
     profile: PROFILE,
     title: seed.title,
-    version: '0.1',
+    version: agentRuntimeProfile.version,
     status: 'draft',
     reviewerStatus: 'open',
     depth: 'derived',

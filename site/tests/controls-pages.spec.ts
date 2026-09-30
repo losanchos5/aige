@@ -32,7 +32,7 @@ test('the registry keeps its first two profiles, and their titles', () => {
   expect(TITLES['evaluation-environment']).toBe('AI evaluation environment controls');
   expect(TITLES['agent-runtime']).toBe('AI agent runtime controls');
   expect(controlsIn('evaluation-environment')).toHaveLength(9);
-  expect(controlsIn('agent-runtime')).toHaveLength(31);
+  expect(controlsIn('agent-runtime')).toHaveLength(42);
 });
 
 for (const profile of profiles) {

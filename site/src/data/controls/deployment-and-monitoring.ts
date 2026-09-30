@@ -1,15 +1,17 @@
 // controls/deployment-and-monitoring.ts: the Deployment and Monitoring Control
-// Profile, v0.1 (draft). Fifteen reference controls, AIGE-CTL-DEPLOY-001 to
-// 015, for AI systems from the decision to use them to the day they are
+// Profile, v0.2 (draft). Eighteen reference controls, AIGE-CTL-DEPLOY-001 to
+// 018, for AI systems from the decision to use them to the day they are
 // retired: the deployment decision, the go-live review, staged rollout,
 // oversight, monitoring, incidents, discovery, the sanctioned gateway,
-// deactivation and retirement. Each control is `derived`: it restates material
+// deactivation and retirement, plus three for the people around an agent
+// (016 to 018, from chapter 23's section on putting agents in front of people). Each control is `derived`: it restates material
 // the site already publishes and adds nothing that material does not say.
 //
 //   derivedFrom -> the patterns (bok/patterns/<slug>.md) and record schemas
 //                  (public/schemas/<id>.v1.json) a control restates, plus the
 //                  chapter it comes from (15 governing-deployment, 16
-//                  fairness-and-explainability, 17 incidents)
+//                  fairness-and-explainability, 17 incidents, 23
+//                  governing-agents)
 //   objective   -> the pattern's solution, the schema's required fields or the
 //                  chapter's rule, restated as an outcome
 //   evidence    -> the record schema the source names (schemaId), where it
@@ -54,18 +56,23 @@ export const deploymentAndMonitoringProfile: ControlProfile = {
   slug: PROFILE,
   title: 'Deployment and Monitoring Control Profile',
   shortTitle: 'Deployment and monitoring',
-  version: '0.1',
+  version: '0.2',
   status: 'draft',
   reviewerStatus: 'open',
   summary:
-    'Reference controls for AI systems in use, from the deployment decision and the go-live review to staged rollout, monitoring, incident reporting, deactivation and retirement. Every control is a draft derived from the site\'s patterns, record schemas and chapters 15 to 17, open for technical review.',
+    'Reference controls for AI systems in use, from the deployment decision and the go-live review to staged rollout, monitoring, incident reporting, deactivation and retirement. Every control is a draft derived from the site\'s patterns, record schemas and chapters 15 to 17 and 23, open for technical review.',
   scope:
     'AI systems an organisation puts to use, built or procured, from the decision to use them to the day they are retired, including staff use of AI tools and AI running outside the registry. How the system is built and evaluated before release, and the runtime controls specific to agents, are covered by other profiles.',
   published: '2026-09-26',
-  updated: '2026-09-26',
+  updated: '2026-09-29',
   authors: ['jorge-garcia-aibar'],
   reviewers: [],
   changelog: [
+    {
+      version: '0.2',
+      date: '2026-09-29',
+      note: "Three controls added from chapter 23's section on putting agents in front of people, written from Singapore's Model AI Governance Framework for Agentic AI v1.5: AIGE-CTL-DEPLOY-016 (training and the manual path), 017 (findings and overrides fed back into evaluation) and 018 (named responsibilities per team). AIGE-CTL-DEPLOY-005 now also stages an agent's rollout by users, tools and systems exposed.",
+    },
     {
       version: '0.1',
       date: '2026-09-26',
@@ -127,6 +134,16 @@ const CH15 = {
 
 const CH16 = {
   monitoring: ch16('monitoring-fairness-in-production', 'Monitoring fairness in production'),
+} as const;
+
+const ch23 = (anchor: string, heading: string) =>
+  chapter('governing-agents', '23', 'Governing AI agents', anchor, heading);
+
+const CH23 = {
+  rollout: ch23('rolling-out-by-users-tools-and-systems', 'Rolling out by users, tools and systems'),
+  training: ch23('training-users-and-keeping-the-manual-path', 'Training users and keeping the manual path'),
+  responsibilities: ch23('named-responsibilities', 'Named responsibilities'),
+  learning: ch23('learning-from-use', 'Learning from use'),
 } as const;
 
 const CH17 = {
@@ -208,7 +225,7 @@ const GDPR_ART_33: Source = {
 const NIST_RMF: Source = {
   title: 'Artificial Intelligence Risk Management Framework (AI RMF 1.0), NIST AI 100-1',
   gloss:
-    'subcategories cited by id: GOVERN 1.6, 1.7, 2.2, 6.1; MAP 1.1, 3.5; MEASURE 2.3, 2.4, 2.11, 3.1; MANAGE 1.1, 2.4, 3.1, 4.1, 4.3',
+    'subcategories cited by id: GOVERN 1.6, 1.7, 2.1, 2.2, 6.1; MAP 1.1, 3.5; MEASURE 2.3, 2.4, 2.11, 3.1, 3.3; MANAGE 1.1, 2.4, 3.1, 4.1, 4.3',
   publisher: 'NIST',
   date: '2023-01-26',
   url: 'https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf',
@@ -259,7 +276,7 @@ function derived(n: number, fields: DerivedFields): Control {
   return {
     id: `AIGE-CTL-DEPLOY-${String(n).padStart(3, '0')}`,
     profile: PROFILE,
-    version: '0.1',
+    version: deploymentAndMonitoringProfile.version,
     status: 'draft',
     reviewerStatus: 'open',
     depth: 'derived',
@@ -468,7 +485,7 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
   derived(5, {
     title: 'Staged rollout with pre-registered rollback criteria',
     objective:
-      'Every change to a deployed AI system (a new model, a retrain, a prompt or corpus change, a new vendor model version) reaches production through shadow, pilot, canary and general availability stages, each with rollback criteria signed before it starts and evaluated by the pipeline, which writes a promote, hold or roll-back verdict per stage to the assurance store.',
+      'Every change to a deployed AI system (a new model, a retrain, a prompt or corpus change, a new vendor model version) reaches production through shadow, pilot, canary and general availability stages, each with rollback criteria signed before it starts and evaluated by the pipeline, which writes a promote, hold or roll-back verdict per stage to the assurance store; an agent is also staged by users, tools and systems exposed.',
     failureModes: [
       'A change goes from the eval harness to all traffic at once, so the first evidence about live behaviour is the harm itself.',
       'A rollback criterion is written or loosened after the metric moved, or a threshold is edited on a dashboard rather than through a reviewed diff with an approver.',
@@ -495,6 +512,7 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
       { kind: 'pattern', ref: 'staged-rollout-rollback-criteria' },
       { kind: 'schema', ref: 'go-no-go' },
       { kind: 'chapter', ref: 'governing-deployment' },
+      { kind: 'chapter', ref: 'governing-agents' },
     ],
     mappings: {
       obligations: ['AIGE-OBL-EUAIA-ART26-5'],
@@ -502,9 +520,10 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
       nistAiRmf: ['MANAGE 1.1', 'MEASURE 2.3', 'MANAGE 2.4'],
       owasp: [],
     },
-    references: [PATTERN.rollout, CH15.progressive, SRE_CANARY, ART[26], AI_ACT_OJ, ISO_SOURCE, NIST_RMF],
+    references: [PATTERN.rollout, CH15.progressive, CH23.rollout, SRE_CANARY, ART[26], AI_ACT_OJ, ISO_SOURCE, NIST_RMF],
     implementationNotes: [
       'Give each stage a purpose: shadow proves behaviour on real traffic, a pilot with trained users proves oversight works, and a canary against a control group proves no regression at scale.',
+      'For an agent, a canary limits how many requests see a change, and the three lines of chapter 23 limit what it can touch while it earns trust: trained or experienced users first, the more secure allow-listed tools and protocols first, lower-risk internal systems first. Widen one line at a time, with the criteria for each step written before it starts.',
       'Each stage lists metric, comparison, threshold, window and the group breakdowns that matter; where outcome labels arrive after the stage ends, lean on proxies such as disagreement, overrides, complaints and groundedness.',
       'Review the criteria with their owners on the maintenance calendar: criteria that are too tight produce rollback fatigue.',
       'A provider or prospective provider that pilots an Annex III system with real users before placing it on the market is testing in real-world conditions, which Art. 60 governs; that pre-market pilot is outside this control, which covers changes to systems already in use.',
@@ -995,6 +1014,136 @@ export const deploymentAndMonitoringControls: readonly Control[] = [
     ],
     openQuestions: [
       'The source material leaves the length of the evidence archive to the retention schedule and maps retirement to several record-keeping articles; the obligation mapping of this control awaits review.',
+    ],
+  }),
+
+  derived(16, {
+    title: 'People who work with agents trained, and the manual path kept',
+    objective:
+      'People who work with an agent every day are trained, on record, on its range of actions, its common failure modes, the usage policies for data and how to report an override or a wrong action, and each critical process the agent runs keeps a manual procedure and people who can still run it when the agent malfunctions or is unavailable.',
+    failureModes: [
+      'People work with an agent they were never trained on, or no training record shows who was trained on what and when.',
+      'The agent malfunctions or is unavailable and no one can still run a critical process it took over by hand.',
+      'Users do not know how to report an override or a wrong action, so what they see never reaches the agent\'s owners.',
+    ],
+    scope:
+      'AI agents that people use as part of their work, and the critical processes those agents run. The overseers who approve agent actions are covered by AIGE-CTL-DEPLOY-003.',
+    enforcementPoints: ['deploy', 'periodic'],
+    evidence: [
+      {
+        artefact: 'Training records per user and module; the manual procedure for each critical process the agent runs, with the people who can run it',
+        schemaId: 'training-record',
+        layer: 4,
+      },
+    ],
+    failureResponse: {
+      effect: 'alert',
+      text: 'A user with no current training record, or a critical process with no manual procedure or no one able to run it, is raised to the agent\'s owner.',
+    },
+    layer: 4,
+    patterns: [],
+    derivedFrom: [
+      { kind: 'schema', ref: 'training-record' },
+      { kind: 'chapter', ref: 'governing-agents' },
+    ],
+    mappings: {
+      obligations: ['AIGE-OBL-EUAIA-ART4'],
+      iso42001: [],
+      nistAiRmf: ['GOVERN 2.2'],
+      owasp: [],
+    },
+    references: [CH23.training, CH15.degradation, ART[4], NIST_RMF],
+    implementationNotes: [
+      'The degraded modes of chapter 15 assume that a person can do the work: keep the manual procedure next to the agent\'s deactivation policy, and the people who can run it on the roster.',
+    ],
+    openQuestions: [
+      'How often a manual procedure must be exercised to count as kept is left open: the source material asks that core skills be retained through training and work exposure, without a frequency.',
+    ],
+  }),
+
+  derived(17, {
+    title: 'Monitoring findings and user overrides fed back into evaluation',
+    objective:
+      'Confirmed monitoring alerts, incidents and the overrides and wrong actions users report reach the agent\'s owners through channels named in the monitoring plan, and each becomes a test case in the agent\'s regression suite, so the next change is tested against what went wrong in use.',
+    failureModes: [
+      'An incident or a confirmed alert is closed and the regression suite never gains a case for it, so the same failure can ship again.',
+      'Users override the agent or spot wrong actions and have no channel to report them, or their reports never reach the evaluation owners.',
+    ],
+    scope: 'AI agents in use, from the first rollout stage to retirement.',
+    enforcementPoints: ['runtime', 'pre_merge'],
+    evidence: [
+      {
+        artefact: 'Monitoring plan naming the feedback channels; the test cases each finding produced, linked to the alert, incident or report that raised it',
+        schemaId: 'post-market-monitoring-plan',
+        layer: 5,
+      },
+    ],
+    failureResponse: {
+      effect: 'alert',
+      text: 'A confirmed finding with no linked test case after its review is raised to the evaluation owner.',
+    },
+    layer: 5,
+    patterns: [],
+    derivedFrom: [
+      { kind: 'schema', ref: 'post-market-monitoring-plan' },
+      { kind: 'chapter', ref: 'governing-agents' },
+    ],
+    mappings: {
+      obligations: [],
+      iso42001: [],
+      nistAiRmf: ['MEASURE 3.3'],
+      owasp: [],
+    },
+    references: [CH23.learning, NIST_RMF],
+    implementationNotes: [
+      'Link each new test case to the finding that raised it, so a later failure traces back to what was already seen in use.',
+    ],
+    openQuestions: [
+      'Whether findings also feed training data, which the source material mentions alongside evaluation, is outside this control: most deployers do not train the model their agent runs on.',
+    ],
+  }),
+
+  derived(18, {
+    title: 'Named responsibilities per team for each agent',
+    objective:
+      'For each agent, responsibilities are written down by team across its lifecycle (leaders, product, security and users), a person is named for each duty, the allocation is linked from the registry entry, and contracts with model developers, agent providers and hosts of MCP servers or tools state how obligations are shared.',
+    failureModes: [
+      'An agent has an owner in the registry and no written allocation of the other duties, so no one answers for red teaming, user education or monitoring.',
+      'A duty is assigned to a team with no named person.',
+      'A contract with an agent provider or an MCP server host is silent on who answers for security, performance or data protection.',
+    ],
+    scope: 'AI agents an organisation builds, buys or runs, including agents from external providers and the MCP servers or tools they use.',
+    enforcementPoints: ['deploy', 'periodic'],
+    evidence: [
+      {
+        artefact: 'Responsibility allocation per agent (the lifecycle RACI), linked from the agent\'s registry entry; contract clauses for external parties',
+        schemaId: 'agent-register-entry',
+        layer: 2,
+      },
+    ],
+    failureResponse: {
+      effect: 'alert',
+      text: "An agent with no responsibility allocation linked from its registry entry, or a duty with no named person, is raised to the agent's owner.",
+    },
+    layer: 2,
+    patterns: [],
+    derivedFrom: [
+      { kind: 'schema', ref: 'agent-register-entry' },
+      { kind: 'chapter', ref: 'governing-agents' },
+    ],
+    mappings: {
+      obligations: [],
+      iso42001: [],
+      nistAiRmf: ['GOVERN 2.1'],
+      owasp: [],
+    },
+    references: [CH23.responsibilities, NIST_RMF],
+    implementationNotes: [
+      'Allocate as chapter 23 sketches it: leaders set the goals, the permitted use cases and the limits on data access; product teams design, test, roll out, monitor and educate users; security teams set baseline guardrails and run red teaming and threat modelling; users follow the usage policies and report issues.',
+      'Start from the lifecycle RACI template and keep one allocation per agent.',
+    ],
+    openQuestions: [
+      'The agent register entry has an owner field but no field for the allocation itself; whether it belongs in the entry or in an extension awaits review.',
     ],
   }),
 ];

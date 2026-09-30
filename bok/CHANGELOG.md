@@ -6,9 +6,10 @@ a completed, reviewed core (1.0).
 
 ## Unreleased
 
-Open reference project, second iteration (OpenSpec change `open-reference-project-2`). Nothing
-below is released yet. The control catalogue grows to five draft profiles and 79 reference
-controls, every one open for technical review and none reviewed yet.
+Open reference project, second iteration (OpenSpec change `open-reference-project-2`), and the
+IMDA agentic controls (OpenSpec change `imda-agentic-controls`). Nothing below is released yet.
+The control catalogue grows to five draft profiles and 93 reference controls, every one open for
+technical review and none reviewed yet.
 
 ### Added
 - Three derived profiles, v0.1: `/controls/data-admission-and-privacy` (12 controls),
@@ -44,11 +45,26 @@ controls, every one open for technical review and none reviewed yet.
   where one of IMDA's official 2025 crosswalks (NIST Generative AI Profile, G7 Code of Conduct,
   ISO/IEC 42001) cites the check.
 - Singapore's Model AI Governance Framework for Agentic AI v1.5 as a page-cited source in 21
-  patterns and as a cross-reference on 55 reference controls (direct or partial fit, stated per
+  patterns and as a cross-reference on 69 reference controls (direct or partial fit, stated per
   control). It never uses the terms kill switch, circuit breaker or registry, and the site does not
   attribute them to it.
+- Chapter 23 takes in the sixteen recommendations of Singapore's agentic framework that no control
+  covered, each cited by page: plan review, readable approval requests, oversight audited per
+  approver, monitoring agents, typed messages between agents, secrets keyed in by the person,
+  payment protocols, tests that attempt what is denied, user-set approval thresholds, append-only
+  traces and a threat model per agent, plus a new section, "Putting agents in front of people", on user information, training and
+  the manual path, rollout by users, tools and systems, named responsibilities and learning from
+  use. Fourteen controls derive from it: AIGE-CTL-AGENT-032 to 042 and AIGE-CTL-DEPLOY-016 to 018,
+  each with a direct or partial IMDA cross-reference; the agent control profile tool selects the
+  new ones.
 
 ### Changed
+- Agent Runtime profile v0.2 (42 controls) and Deployment and Monitoring profile v0.2 (18
+  controls). AIGE-CTL-AGENT-004 keeps traces append-only and AIGE-CTL-DEPLOY-005 stages an
+  agent's rollout by users, tools and systems exposed. Two tensions with IMDA are settled in
+  chapter 23: an approval shows the raw call in short form, never a log dump (AIGE-CTL-AGENT-009),
+  and every prompt change still runs the regression suite although IMDA allows lighter review for
+  prompt refinements (AIGE-CTL-AGENT-028, stricter by design).
 - Evaluation Environment profile v0.2: controls 001, 004, 005, 007, 008 and 009 are now specified
   in full (all nine are), each with verification steps, evidence, notes and two example
   observations, after a source-by-source review.

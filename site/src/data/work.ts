@@ -49,9 +49,9 @@ export const work: readonly WorkItem[] = [
     title: 'Agent Runtime Control Profile',
     href: '/controls/agent-runtime',
     status: 'draft',
-    note: 'Thirty-one reference controls derived from the agent controls of chapter 23; every control is a draft.',
-    version: '0.1',
-    updated: '2026-09-26',
+    note: 'Forty-two reference controls derived from the agent controls of chapter 23; every control is a draft.',
+    version: '0.2',
+    updated: '2026-09-29',
   },
   {
     id: 'evaluation-environment-note',
