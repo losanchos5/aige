@@ -1,0 +1,36 @@
+/* time-charts.css: link and forced-colours rules for the two time charts built on the
+   chart kit outside it, the regulatory clock (.ch-clock, lib/page-charts/
+   regulatory-clock.ts) and the milestone axis (.ch-miles, lib/page-charts/
+   milestone-axis.ts). Their light and dark colours come from the kit's mark
+   classes in figures.css and chart.css; here, under forced colours, they are
+   redrawn in system colours so the encoding survives: solid, outlined,
+   dashed and hatched marks stay solid, outlined, dashed and hatched, the
+   as-of line stays dashed, and the label masks keep the canvas colour. The
+   charts carry no motion, so print keeps them as drawn.
+
+   Links: the clock sits inside .prose on pattern pages, whose link underline
+   would reach the SVG labels; like every chart link, a label underlines only
+   on hover and keyboard focus. */
+:is(.figc, .chart):is(.ch-clock, .ch-miles) a {
+  text-decoration: none;
+}
+
+:is(.figc, .chart):is(.ch-clock, .ch-miles) a:is(:hover, :focus-visible) text {
+  text-decoration: underline;
+}
+
+@media (forced-colors: active) {
+  :is(.figc, .chart):is(.ch-clock, .ch-miles) {
+    forced-color-adjust: none;
+  }
+
+  :is(.figc, .chart):is(.ch-clock, .ch-miles) text { fill: CanvasText; }
+  :is(.figc, .chart):is(.ch-clock, .ch-miles) a text { fill: LinkText; }
+  :is(.figc, .chart):is(.ch-clock, .ch-miles) :is(.panel, .hatch-bg) { fill: Canvas; stroke: none; }
+  :is(.figc, .chart):is(.ch-clock, .ch-miles) :is(.rule, .tick, .axis, .today) { stroke: CanvasText; }
+  :is(.figc, .chart):is(.ch-clock, .ch-miles) :is([class*="mk-fill-"], .mk-hi) { fill: CanvasText; stroke: CanvasText; }
+  :is(.figc, .chart):is(.ch-clock, .ch-miles) :is([class*="mk-line-"], [class*="mk-dash-"]) { fill: Canvas; stroke: CanvasText; }
+  :is(.figc, .chart):is(.ch-clock, .ch-miles) [class*="mk-hatch-"] { stroke: CanvasText; }
+  :is(.figc, .chart):is(.ch-clock, .ch-miles) [class*="hatch-"]:not(.hatch-bg):not([class*="mk-"]) { stroke: CanvasText; }
+  :is(.figc, .chart):is(.ch-clock, .ch-miles) a:focus-visible { outline-color: Highlight; }
+}

@@ -160,10 +160,11 @@ test.describe('audience hubs: pages', () => {
 
       await expect(page.locator('#questions .au-q')).toHaveCount(3);
       await expect(page.locator('#this-week li')).toHaveCount(a.thisWeek.length);
-      await expect(page.locator('#obligations tbody tr')).toHaveCount(a.obligations.length);
+      // The register table (the section's regulatory clock has a table of its own).
+      await expect(page.locator('#obligations .au-table tbody tr')).toHaveCount(a.obligations.length);
       for (const id of a.obligations) {
         await expect(
-          page.locator(`#obligations a[href="/obligations/${id.toLowerCase()}"]`),
+          page.locator(`#obligations .au-table a[href="/obligations/${id.toLowerCase()}"]`),
         ).toHaveCount(1);
       }
       await expect(page.locator('#obligations')).toContainText(

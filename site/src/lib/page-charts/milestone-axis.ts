@@ -1,0 +1,300 @@
+// milestone-axis.ts: a run of dated milestones on one time axis, for the AI
+// Act deadlines page (English and Spanish). Every milestone is a mark on the
+// axis at its true date and a label (a short title over its date) joined to
+// it by a leader. The mark's fill says where it stands on the as-of date
+// (solid: applies; outlined: upcoming) and its shape which act set the date
+// (circle or square, named by the legend), so neither rests on colour. One
+// accent: the next milestone after the as-of date has its label in bold. A
+// dashed line marks the as-of date of the data, never the build clock.
+//
+//   horizontal (wide, 640): time left to right; labels take the lowest free
+//     row above or below the axis (alternating, at most four each side), so
+//     milestones a few days apart never collide.
+//   vertical (narrow, 340): time top to bottom; labels right of the axis,
+//     pushed down with a leader when they would overlap; the as-of line runs
+//     across and is named in a key above the axis.
+//
+// The labels are the links (to the milestone's anchor on the page), each
+// target 24 px or more tall; the marks carry a tooltip. Table: Date |
+// Milestone | Status | Basis, with the full titles.
+//
+// Built on the chart kit's shell and helpers (src/lib/charts/core.ts); no
+// runtime or data imports.
+import { legendGroups } from './legend-groups';
+import {
+  assemble,
+  fitText,
+  markStyles,
+  nonEmpty,
+  parseDay,
+  r1,
+  shape,
+  table,
+  targets,
+  text,
+  textWidth,
+  timeScale,
+  words,
+  type ChartBase,
+  type ChartOutput,
+  type Shape,
+} from '../charts/core';
+
+export interface AxisMilestone {
+  date: string;
+  /** Drawn label: short, one line. */
+  label: string;
+  /** Full title, for the tooltip and the table. */
+  name: string;
+  href?: string;
+  applied: boolean;
+  /** Which act set the date: the legend key of its shape. */
+  basis: 'a' | 'b';
+}
+
+export interface MilestoneAxisInput extends ChartBase {
+  items: AxisMilestone[];
+  /** The as-of date of the data. */
+  today: string;
+  /** Wording of the page's language. */
+  copy: {
+    applied: string;
+    upcoming: string;
+    /** Legend and table wording of each basis. */
+    basis: { a: string; b: string };
+    milestone: string;
+    basisHead: string;
+  };
+  orientation?: 'horizontal' | 'vertical';
+}
+
+const L = 12;
+const LABEL_PX = 12.5;
+const ROWS = 4;
+const SHAPE: Record<'a' | 'b', Shape> = { a: 'circle', b: 'square' };
+
+const byCode = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
+
+export function milestoneAxis(input: MilestoneAxisInput): ChartOutput {
+  const where = `milestoneAxis ${input.id}`;
+  nonEmpty(input.items, 'milestones', where);
+  parseDay(input.today, 'axis today');
+  const w = words(input.lang);
+  const vertical = input.orientation === 'vertical';
+  const W = input.width ?? (vertical ? 340 : 640);
+  const items = [...input.items].sort((a, b) => byCode(a.date, b.date) || byCode(a.label, b.label));
+  const next = items.find((m) => m.date > input.today);
+  const marks = markStyles(input.id);
+  const hits = targets(where);
+  const out: string[] = [];
+  const todayText = `${w.asOf} ${input.today}`;
+  const status = (m: AxisMilestone) => (m.applied ? input.copy.applied : input.copy.upcoming);
+
+  // Two headed groups, so an outlined circle is read once as "upcoming"
+  // (status) and once as a shape (basis), never mixed up.
+  const lg = legendGroups(
+    [
+      {
+        head: w.status,
+        entries: [
+          { label: input.copy.applied, shape: 'circle', state: 'filled' },
+          { label: input.copy.upcoming, shape: 'circle', state: 'outline' },
+        ],
+      },
+      {
+        head: input.copy.basisHead,
+        entries: (['a', 'b'] as const).filter((k) => items.some((m) => m.basis === k)).map((k) => ({ label: input.copy.basis[k], shape: SHAPE[k], state: 'outline' as const })),
+      },
+    ],
+    L,
+    16,
+    W - L,
+    marks,
+  );
+  out.push(...lg.els);
+  let y = lg.bottom + 12;
+
+  const years = [...items.map((m) => m.date), input.today].map((d) => Number(d.slice(0, 4)));
+  const from = `${Math.min(...years)}-01-01`;
+  const to = `${Math.max(...years) + 1}-01-01`;
+  const mark = (m: AxisMilestone, cx: number, cy: number) =>
+    hits.mark((inner) => shape(SHAPE[m.basis], cx, cy, 6, marks.attrs(m.applied ? 'filled' : 'outline', 0), inner), `${m.date} · ${m.name} · ${status(m)}`, { x: cx - 6, y: cy - 6, w: 12, h: 12 });
+  /** A label at `x` (start), first baseline `ly`: the short title over its
+   *  date ('stack'), the date then the title on one line ('line'), or the
+   *  date over the title ('pair'). The link's target is the whole block,
+   *  on a ground-coloured mask so the as-of line passes behind it. */
+  const label = (m: AxisMilestone, x: number, ly: number, form: 'stack' | 'line' | 'pair') => {
+    const weight = m === next ? 700 : 400;
+    const dateW = textWidth(m.date, 12, 'mono');
+    const title = (tx: number, ty: number) => text(tx, ty, m.label, { size: LABEL_PX, weight, where: 'milestone label' });
+    const date = (tx: number, ty: number) => text(tx, ty, m.date, { size: 12, cls: 'num ink2', where: 'milestone date' });
+    const lw = form === 'line' ? dateW + 8 + labelW(m) : Math.max(labelW(m), dateW);
+    const h = form === 'line' ? 24 : 34;
+    const top = form === 'line' ? ly - 16 : ly - 14;
+    const draw = () =>
+      `<rect class="hatch-bg" x="${r1(x - 3)}" y="${r1(top)}" width="${r1(lw + 6)}" height="${h}"/>` +
+      (form === 'stack' ? title(x, ly) + date(x, ly + 15) : form === 'line' ? date(x, ly) + title(x + dateW + 8, ly) : date(x, ly) + title(x, ly + 15));
+    return hits.mark(draw, `${m.name} · ${m.date} · ${status(m)}`, { x: x - 3, y: top, w: lw + 6, h }, { href: m.href });
+  };
+  /** Width of the title (bold for the next milestone). */
+  const labelW = (m: AxisMilestone) => textWidth(m.label, LABEL_PX) * (m === next ? 1.06 : 1);
+  const blockW = (m: AxisMilestone) => Math.max(labelW(m), textWidth(m.date, 12, 'mono'));
+
+  let bottom: number;
+  if (!vertical) {
+    const ts = timeScale(from, to, [L + 10, W - L - 10]);
+    // Sides alternate in date order (so marks a few days apart part ways);
+    // on each side a label takes the lowest row where it clears its row's
+    // labels by 12 px, its leader crosses no label nearer the axis, and no
+    // leader from further out crosses it. A side is laid out in date order or
+    // in reverse, preferring labels centred on the mark, starting at it or
+    // ending at it (a staircase climbs away from the axis that way); the
+    // layout with the fewest rows wins, in that order on a tie.
+    type Placed = { m: AxisMilestone; x: number; left: number; lw: number; above: boolean; row: number };
+    const layoutSide = (list: AxisMilestone[], above: boolean): Placed[] => {
+      let best: Placed[] | null = null;
+      for (const order of [list, [...list].reverse()]) {
+        for (const prefer of [[0, 1, 2], [2, 0, 1], [1, 0, 2]]) {
+          const done: Placed[] = [];
+          order.forEach((m, i) => {
+            if (done.length < i) return;
+            const x = ts.map(m.date);
+            const lw = blockW(m);
+            fitText(m.label, W - 2 * L, LABEL_PX, 'body', 'milestone label');
+            const lefts = [x - lw / 2, x - 6, x + 6 - lw].map((l) => Math.max(L, Math.min(l, W - L - lw)));
+            // Marks still to place on this side: a label over one of them would
+            // block its leader, so such a label is the last resort.
+            const later = order.slice(i + 1).map((o) => ts.map(o.date));
+            let found: Placed | undefined;
+            for (const strict of [true, false]) {
+              for (let row = 0; row < ROWS && !found; row++) {
+                for (const k of prefer) {
+                  const c: Placed = { m, x, left: lefts[k], lw, above, row };
+                  const ok =
+                    (!strict || later.every((lx) => lx < c.left - 4 || lx > c.left + c.lw + 4)) &&
+                    done.every((p) => p.row !== c.row || c.left >= p.left + p.lw + 12 || c.left + c.lw + 12 <= p.left) &&
+                    done.every((p) => p.row >= c.row || c.x < p.left - 4 || c.x > p.left + p.lw + 4) &&
+                    done.every((p) => p.row <= c.row || p.x < c.left - 4 || p.x > c.left + c.lw + 4);
+                  if (ok) {
+                    found = c;
+                    break;
+                  }
+                }
+              }
+              if (found) break;
+            }
+            if (found) done.push(found);
+          });
+          const rows = (t: Placed[]) => Math.max(0, ...t.map((p) => p.row + 1));
+          if (done.length === list.length && (!best || rows(done) < rows(best))) best = done;
+        }
+      }
+      if (!best) throw new Error(`charts(${where}): the milestone labels ${above ? 'above' : 'below'} the axis find no free rows; shorten the labels`);
+      return best;
+    };
+    const placed = [
+      ...layoutSide(items.filter((_, i) => i % 2 === 0), true),
+      ...layoutSide(items.filter((_, i) => i % 2 === 1), false),
+    ];
+    const rowsAbove = Math.max(0, ...placed.filter((p) => p.above).map((p) => p.row + 1));
+    const rowsBelow = Math.max(0, ...placed.filter((p) => !p.above).map((p) => p.row + 1));
+    const PITCH = 40;
+    const BELOW = 48;
+    const axisY = y + 14 + rowsAbove * PITCH + 12;
+    // The as-of line and its label (in the band above the top row of labels).
+    const asX = ts.map(input.today);
+    out.push(`<line class="today" x1="${r1(asX)}" y1="${r1(y + 4)}" x2="${r1(asX)}" y2="${r1(axisY + BELOW - 16 + rowsBelow * PITCH)}"/>`);
+    const tw = textWidth(todayText, 12, 'mono');
+    fitText(todayText, W - 2 * L, 12, 'mono', 'today label');
+    out.push(text(asX + 6 + tw <= W - L ? asX + 6 : asX - 6 - tw, y + 4, todayText, { size: 12, cls: 'mono', where: 'today label' }));
+    out.push(`<line class="axis" x1="${L}" y1="${r1(axisY)}" x2="${r1(W - L)}" y2="${r1(axisY)}"/>`);
+    // The time already elapsed, as a solid bar along the axis.
+    out.push(`<rect class="mk-hi" x="${L}" y="${r1(axisY - 2)}" width="${r1(asX - L)}" height="4"/>`);
+    for (const t of ts.ticks) {
+      const x = ts.map(t.date);
+      out.push(`<line class="tick" x1="${r1(x)}" y1="${r1(axisY - 4)}" x2="${r1(x)}" y2="${r1(axisY + 4)}"/>`);
+    }
+    for (const t of ts.ticks) out.push(text(ts.map(t.date), axisY + 19, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+    const labels: string[] = [];
+    const marksOut: string[] = [];
+    for (const p of placed) {
+      // Label baseline: rows grow away from the axis (below, under the years).
+      const ly = p.above ? axisY - 36 - p.row * PITCH : axisY + BELOW + p.row * PITCH;
+      const y1 = p.above ? ly + 20 : ly - 16;
+      // Marks a few days apart would hide each other: each steps 6 px
+      // towards its label.
+      const my = axisY + (placed.some((q) => q !== p && Math.abs(q.x - p.x) < 12) ? (p.above ? -6 : 6) : 0);
+      out.push(`<path class="tick" d="M${r1(p.x)} ${r1(p.above ? my - 7 : my + 7)}V${r1(y1)}"/>`);
+      labels.push(label(p.m, p.left, ly, 'stack'));
+      marksOut.push(mark(p.m, p.x, my));
+    }
+    out.push(...labels, ...marksOut);
+    bottom = Math.max(axisY + 20, axisY + BELOW - 20 + rowsBelow * PITCH);
+  } else {
+    // Key for the as-of line above the axis.
+    out.push(`<line class="today" x1="${L}" y1="${r1(y + 10)}" x2="${L + 22}" y2="${r1(y + 10)}"/>`);
+    fitText(todayText, W - 2 * L - 28, 12, 'mono', 'today label');
+    out.push(text(L + 28, y + 14, todayText, { size: 12, cls: 'mono', where: 'today label' }));
+    y += 34;
+    const axisX = L + 44;
+    const labelX = axisX + 22;
+    const len = Math.max(480, items.length * 36);
+    const ts = timeScale(from, to, [y, y + len]);
+    out.push(`<line class="axis" x1="${axisX}" y1="${r1(y)}" x2="${axisX}" y2="${r1(y + len)}"/>`);
+    for (const t of ts.ticks) {
+      const ty = ts.map(t.date);
+      out.push(`<line class="tick" x1="${axisX - 5}" y1="${r1(ty)}" x2="${axisX}" y2="${r1(ty)}"/>`);
+      out.push(text(axisX - 8, ty + 4, t.label, { size: 12, cls: 'num muted', anchor: 'end', where: 'tick' }));
+    }
+    const asY = ts.map(input.today);
+    out.push(`<line class="today" x1="${axisX - 5}" y1="${r1(asY)}" x2="${W - L}" y2="${r1(asY)}"/>`);
+    out.push(`<rect class="mk-hi" x="${axisX - 2}" y="${r1(y)}" width="4" height="${r1(asY - y)}"/>`);
+    // Labels right of the axis: "date title" on one line, or the date over
+    // the title when that does not fit; pushed down (with a leader) so linked
+    // blocks stay 26 px apart.
+    let prev = -Infinity;
+    const labels: string[] = [];
+    const room = W - L - labelX;
+    for (const m of items) {
+      const ty = ts.map(m.date);
+      const one = textWidth(m.date, 12, 'mono') + 8 + labelW(m) <= room;
+      if (!one) fitText(m.label, room, LABEL_PX, 'body', 'milestone label');
+      const ly = Math.max(ty + 4, prev + 26);
+      if (ly - 4 > ty + 2) out.push(`<path class="tick" fill="none" d="M${axisX + 7} ${r1(ty)}L${labelX - 5} ${r1(ly - 4)}"/>`);
+      else out.push(`<line class="tick" x1="${axisX + 7}" y1="${r1(ty)}" x2="${labelX - 5}" y2="${r1(ty)}"/>`);
+      labels.push(label(m, labelX, ly, one ? 'line' : 'pair'));
+      prev = ly + (one ? 0 : 15);
+    }
+    // Marks a few days apart would hide each other: every other one steps
+    // 8 px right (the left of the axis holds the years).
+    out.push(
+      ...labels,
+      ...items.map((m, i) => {
+        const ty = ts.map(m.date);
+        const near = items.some((o) => o !== m && Math.abs(ts.map(o.date) - ty) < 12);
+        return mark(m, axisX + (near && i % 2 ? 8 : 0), ty);
+      }),
+    );
+    bottom = Math.max(y + len + 4, prev + 10);
+  }
+
+  const { svg, height } = assemble({
+    base: input,
+    width: W,
+    bottom,
+    body: out,
+    defs: marks.defs(),
+    role: items.some((m) => m.href) ? 'group' : 'img',
+    cls: vertical ? 'ch-miles ch-vertical' : 'ch-miles',
+  });
+  return {
+    svg,
+    table: table(
+      input.tableCaption ?? input.title,
+      [w.date, input.copy.milestone, w.status, input.copy.basisHead],
+      items.map((m) => [m.date, m.name, status(m), input.copy.basis[m.basis]]),
+    ),
+    width: W,
+    height,
+  };
+}
