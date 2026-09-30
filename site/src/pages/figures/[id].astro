@@ -13,6 +13,9 @@ import Figure from '../../components/Figure.astro';
 import Callout from '../../components/Callout.astro';
 import Byline from '../../components/Byline.astro';
 import FigureCite from '../../components/FigureCite.astro';
+import Chart from '../../components/Chart.astro';
+import { bookSpine } from '../../lib/charts';
+import { figureSpineParts } from '../../lib/page-visuals/book-spine';
 import { site } from '../../data/site';
 import { figures, figureKind, figureLicense, type FigureDef } from '../../data/figures';
 import {
@@ -52,6 +55,20 @@ const license = figureLicense(figure);
 const svg = permalinkSvg(figure);
 const downloads = figureDownloads(figure);
 const places = figurePlaces(figure);
+// Where it appears, on the book's spine (page-visuals-2, block E): the
+// chapters that carry the figure, highlighted; none for a figure no chapter
+// places.
+const spineParts = figureSpineParts(figure);
+const spine = spineParts
+  ? bookSpine({
+      id: 'fg-spine',
+      title: 'Chapters that carry this figure',
+      desc: `The chapters of the Body of Knowledge in order, with the ones that carry "${figure.title}" highlighted.`,
+      parts: spineParts,
+      mini: true,
+      unit: 'chapters',
+    })
+  : undefined;
 const credit = figureCredit(figure, downloads);
 const pageUrl = figureUrl(figure.id);
 const description = figureMetaDescription(figure);
@@ -324,6 +341,16 @@ const facts: [string, string][] = [
 
         <section class="res-section" aria-labelledby="appears">
           <h2 id="appears" class="fg-h2">Where it appears</h2>
+          {
+            spine && (
+              <Chart
+                class="fg-spine"
+                chart={spine}
+                title="Its chapters in the book"
+                caption="The book's chapters in order, grouped by part; the chapters that carry this figure are solid and listed under the strip."
+              />
+            )
+          }
           <ul class="fg-places">
             {
               places.map((place) => (
