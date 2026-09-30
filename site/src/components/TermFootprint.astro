@@ -1,0 +1,71 @@
+---
+/**
+ * TermFootprint: the head figure of "Where it is used" on /glossary/<slug>
+ * (OpenSpec page-visuals, wave 2): the term's mentions per chapter of the
+ * Body of Knowledge, one bar per chapter, each a link to the first section
+ * that uses the term; the list under it stays the text form. Generated per
+ * term (lib/page-visuals/term-visuals.ts), not registered in data/figures.ts.
+ * Renders nothing when no chapter names the term. 'figc' mode: the page
+ * loads figures.css (reading.css).
+ */
+import Chart from './Chart.astro';
+import { termFootprintChart } from '../lib/page-visuals/term-visuals';
+import type { GlossaryEntry } from '../lib/glossary';
+
+interface Props {
+  entry: GlossaryEntry;
+}
+
+const { entry } = Astro.props;
+const chart = termFootprintChart(entry);
+---
+
+{
+  chart && (
+    <Chart
+      class="gt-footprint"
+      chart={chart.wide}
+      narrow={chart.narrow}
+      title="Mentions per chapter"
+      caption="How often each chapter names the term, with the chapters the glossary cross-references drawn solid. A tall bar is where to read the term in use; a spread of bars marks a term that runs through the discipline."
+      tableLabel="Mentions as a table"
+    />
+  )
+}
+
+<style>
+  /* Forced colours drop the token fills: keep the three bar states (solid,
+     outlined, dashed stub) by shape, in system colours, as the kit does for
+     its chain and radial primitives. */
+  @media (forced-colors: active) {
+    :global(.figc.ch-footprint) {
+      forced-color-adjust: none;
+    }
+
+    :global(.figc.ch-footprint text) {
+      fill: CanvasText;
+    }
+
+    :global(.figc.ch-footprint a text) {
+      fill: LinkText;
+    }
+
+    :global(.figc.ch-footprint .axis) {
+      stroke: CanvasText;
+    }
+
+    :global(.figc.ch-footprint [class*='mk-fill-']) {
+      fill: CanvasText;
+      stroke: CanvasText;
+    }
+
+    :global(.figc.ch-footprint :is([class*='mk-line-'], [class*='mk-dash-'])) {
+      fill: Canvas;
+      stroke: CanvasText;
+    }
+
+    :global(.figc.ch-footprint a:focus-visible) {
+      outline-color: Highlight;
+    }
+  }
+</style>
