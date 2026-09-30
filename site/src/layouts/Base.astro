@@ -85,7 +85,9 @@ const cfBeaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
 // runs with data-exclude-hash and data-exclude-search: the /toolkit tools keep
 // a reader's answers in the URL fragment, and the notice on every tool promises
 // that nothing entered leaves the browser, so neither the fragment nor the
-// query string is ever sent.
+// query string is ever sent. data-performance turns on the tracker's Web Vitals
+// report (LCP, INP, CLS, FCP, TTFB) for the Umami Performance view; it goes
+// through the same URL scrubbing.
 const umamiWebsiteId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
 const umamiSrc = 'https://admin.stocktcg.net/script.js';
 
@@ -212,6 +214,7 @@ const theme = themeScript();
           data-website-id={umamiWebsiteId}
           data-exclude-hash="true"
           data-exclude-search="true"
+          data-performance="true"
         />
       )
     }
