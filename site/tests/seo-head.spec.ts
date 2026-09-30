@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { documentTitle, metaDescription, MAX_DESCRIPTION, MIN_DESCRIPTION } from '../src/lib/meta';
 import { getGlossary } from '../src/lib/glossary';
 import { chaptersOrdered } from '../src/data/chapters';
+import { HAND_TRANSLATED_ES } from '../src/lib/i18n-content';
 
 // Mirrors src/data/site.ts. Hardcoded on purpose: a test that imported the same
 // constant it asserts on would pass however the value drifted.
@@ -194,16 +195,20 @@ test.describe('every built page', () => {
     expect(checked).toBeGreaterThan(20);
   });
 
-  test('the Thesis pair names the other language as og:locale:alternate, and only it', () => {
+  test('each hand-written pair names the other language as og:locale:alternate, and only they do', () => {
     const byRoute = new Map(pages);
-    const en = byRoute.get('/thesis') ?? '';
-    const es = byRoute.get('/es/thesis') ?? '';
-    expect(metaOf(en, 'property', 'og:locale')).toBe('en_US');
-    expect(metaOf(en, 'property', 'og:locale:alternate')).toBe('es_ES');
-    expect(metaOf(es, 'property', 'og:locale')).toBe('es_ES');
-    expect(metaOf(es, 'property', 'og:locale:alternate')).toBe('en_US');
+    const paired = new Set<string>();
+    for (const english of HAND_TRANSLATED_ES) {
+      const en = byRoute.get(english) ?? '';
+      const es = byRoute.get(`/es${english}`) ?? '';
+      expect(metaOf(en, 'property', 'og:locale'), english).toBe('en_US');
+      expect(metaOf(en, 'property', 'og:locale:alternate'), english).toBe('es_ES');
+      expect(metaOf(es, 'property', 'og:locale'), `/es${english}`).toBe('es_ES');
+      expect(metaOf(es, 'property', 'og:locale:alternate'), `/es${english}`).toBe('en_US');
+      paired.add(english).add(`/es${english}`);
+    }
     const others = pages
-      .filter(([route]) => route !== '/thesis' && route !== '/es/thesis')
+      .filter(([route]) => !paired.has(route))
       .filter(([, html]) => html.includes('og:locale:alternate'))
       .map(([route]) => route);
     expect(others).toEqual([]);
