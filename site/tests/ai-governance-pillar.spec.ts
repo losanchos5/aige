@@ -94,7 +94,7 @@ test.describe('the pillar page', () => {
     }
   });
 
-  test(`runs to ${MIN_WORDS}-${MAX_WORDS} words with ${MIN_TABLES} tables and a figure`, async ({
+  test(`runs to ${MIN_WORDS}-${MAX_WORDS} words with ${MIN_TABLES} tables and its figures`, async ({
     page,
   }) => {
     const article = page.locator('article.prose');
@@ -108,7 +108,9 @@ test.describe('the pillar page', () => {
     expect(words, `the pillar body is ${words} words`).toBeLessThanOrEqual(MAX_WORDS);
 
     expect(await article.locator('table').count()).toBeGreaterThanOrEqual(MIN_TABLES);
-    await expect(article.locator('figure')).toHaveCount(1);
+    // The stack-layers diagram, the jurisdiction tiles, the operating model and
+    // the maturity ladder (the page visuals, placed in page-visuals-w1e.spec.ts).
+    await expect(article.locator('figure')).toHaveCount(4);
   });
 
   test('asks its sections as questions and closes with a numbered source list', async ({

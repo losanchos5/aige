@@ -6,6 +6,7 @@
  * section links back to its heading in chapter 04.
  */
 import Marketing from '../layouts/Marketing.astro';
+import '../styles/figures.css';
 import '../styles/pages.css';
 import PageHero from '../components/PageHero.astro';
 import Section from '../components/Section.astro';
@@ -16,6 +17,10 @@ import StackFlow from '../components/StackFlow.astro';
 import ToolsTable from '../components/ToolsTable.astro';
 import Callout from '../components/Callout.astro';
 import CtaBand from '../components/CtaBand.astro';
+import Figure from '../components/Figure.astro';
+import { getFigure } from '../data/figures';
+import threeQuestionsSvg from '../figures/three-questions.svg?raw';
+import minimumStackSvg from '../figures/minimum-viable-stack.svg?raw';
 import {
   frameworkAnswer,
   frameworkComponents,
@@ -27,6 +32,10 @@ import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 import { fitsSiteSuffix } from '../lib/seo-title';
 
 const tools = toolsByCategory();
+// Two figures of the chapters drawn beside the lists they illustrate (both list
+// /stack in their pages[] in figures.ts, so their permalinks link back here).
+const threeQuestions = getFigure('three-questions')!;
+const minimumStack = getFigure('minimum-viable-stack')!;
 const stackHref = (anchor: string) => `/bok/the-stack#${anchor}`;
 
 // Reading notes, not layers: no swatch, so RegisterList draws no layer tick.
@@ -88,7 +97,17 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
   </Section>
 
   <Section tone="plain" title="A build order, from policy to proof.">
-    <div class="well reveal"><RegisterList items={howToRead} /></div>
+    <div class="fig-split">
+      <Figure
+        id="three-questions"
+        title={threeQuestions.title}
+        caption={threeQuestions.caption}
+        description={threeQuestions.description}
+      >
+        <Fragment set:html={threeQuestionsSvg} />
+      </Figure>
+      <div class="well reveal"><RegisterList items={howToRead} /></div>
+    </div>
     <p class="section-foot">
       <a class="chapter-link" href={stackHref('how-to-read-the-stack')}>
         Read in chapter 04 <span class="arrow" aria-hidden="true">→</span>
@@ -163,7 +182,17 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
 
   <Section tone="plain" title="The minimum viable stack, for a team of one.">
     <p class="lede well">{minimumViableStack.intro}</p>
-    <div class="well mvs reveal"><RegisterList items={mvsItems} /></div>
+    <div class="fig-split mvs">
+      <Figure
+        id="minimum-viable-stack"
+        title={minimumStack.title}
+        caption={minimumStack.caption}
+        description={minimumStack.description}
+      >
+        <Fragment set:html={minimumStackSvg} />
+      </Figure>
+      <div class="well reveal"><RegisterList items={mvsItems} /></div>
+    </div>
     <p class="section-foot">
       <a class="chapter-link" href={stackHref(minimumViableStack.anchor)}>
         Read in chapter 04 <span class="arrow" aria-hidden="true">→</span>
@@ -295,12 +324,29 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
     margin-top: var(--s-5);
   }
 
+  /* A chapter figure beside the list it draws: stacked on a phone, figure
+     first; side by side from 900px, both from the top. */
+  .fig-split {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .fig-split > :global(.figure--infographic) {
+    margin: 0;
+  }
+
   .framework-more {
     color: var(--ink-2);
     text-wrap: pretty;
   }
 
   @media (min-width: 900px) {
+    .fig-split {
+      grid-template-columns: minmax(0, 26rem) minmax(0, 1fr);
+      align-items: start;
+      gap: var(--s-7);
+    }
+
     .split {
       grid-template-columns: minmax(0, 20rem) 1fr;
       align-items: start;
