@@ -22,6 +22,7 @@
 // more. Both layouts return the same table: From | To | value, one row per
 // link, stage by stage in the drawn order.
 import {
+  NARROW_WIDTH,
   assemble,
   fitText,
   fmt,
@@ -99,7 +100,6 @@ const FLOW_WORDS = {
 };
 
 const L = 12;
-const NARROW_W = 280;
 const MIN_H = 24;
 const GAP = 8;
 const SPAN_MIN = 64;
@@ -197,7 +197,7 @@ export function flow(input: SankeyInput): ChartOutput {
   const unitOf = (v: number) => (v === 1 && input.unitOne ? input.unitOne : input.unit);
   const nameOf = (n: SankeyNode) => n.name ?? n.label;
   const narrow = (input.layout ?? ((input.width ?? 640) < 480 ? 'narrow' : 'wide')) === 'narrow';
-  const W = input.width ?? (narrow ? NARROW_W : 640);
+  const W = input.width ?? (narrow ? NARROW_WIDTH : 640);
   const hits = targets(where);
   const out: string[] = [];
   let bottom: number;

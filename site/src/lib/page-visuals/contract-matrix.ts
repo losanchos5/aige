@@ -11,11 +11,12 @@
 // Built with the chart kit's helpers (src/lib/charts/core.ts): the accessible
 // shell, measured text that throws instead of cutting a label, mark classes of
 // both style modes and the Source / As of stamp. From width 860 the grid gets a
-// wider pitch and label column; the same call at width 340 gives the phone
+// wider pitch and label column; the same call at NARROW_WIDTH gives the phone
 // variant: each clause's name on its own line above its dots. The column
 // heads, row bands, guides and total bars are the shared frame of
 // matrix-frame.ts.
 import {
+  minText,
   assemble,
   fitText,
   fmt,
@@ -97,6 +98,7 @@ export function matrixOrder(clauses: readonly MatrixClause[], instruments = CONT
 export function contractMatrix(input: ContractMatrixInput): ChartOutput {
   const where = `contractMatrix ${input.id}`;
   const W = input.width ?? 760;
+  const sm = minText(W);
   const wide = W >= 480;
   const cols = CONTRACT_INSTRUMENTS;
   const known = new Set(cols.map((c) => c.ref));
@@ -119,7 +121,9 @@ export function contractMatrix(input: ContractMatrixInput): ChartOutput {
   const totalsW = wide ? 64 : 0;
   const x0 = L + LW;
   const pitch = wide ? (roomy ? 36 : 30) : Math.floor((W - 2 * L - GROUP_GAP) / cols.length);
-  if (pitch < 20) throw new Error(`charts(${where}): ${cols.length} columns need ${cols.length * 20 + GROUP_GAP + 2 * L}px; widen the chart`);
+  // 18 px holds a 13 px dot with a gap and a rotated 12.5 px column label
+  // (the dots are not links; the row labels are).
+  if (pitch < 18) throw new Error(`charts(${where}): ${cols.length} columns need ${cols.length * 18 + GROUP_GAP + 2 * L}px; widen the chart`);
   const colX = (i: number) => x0 + i * pitch + (i >= lawCols ? GROUP_GAP : 0) + pitch / 2;
   const gridRight = colX(cols.length - 1) + pitch / 2;
   const width = wide ? Math.max(W, Math.ceil(gridRight + totalsW + L)) : W;
@@ -134,12 +138,21 @@ export function contractMatrix(input: ContractMatrixInput): ChartOutput {
     { kind: 'law', from: 0, to: lawCols - 1 },
     { kind: 'soft', from: lawCols, to: cols.length - 1 },
   ];
-  const headLines = heads.map((h) => wrapText(KIND_LABEL[h.kind], colX(h.to) - colX(h.from) + pitch - 4, 12.5, 'body', 2, 'group heading'));
+  const span = (h: (typeof heads)[number]) => colX(h.to) - colX(h.from) + pitch - 4;
+  const lawLines = wrapText(KIND_LABEL.law, span(heads[0]), 12.5, 'body', 2, 'group heading');
+  // Narrow: the second heading, flush right on its bracket, may reach left
+  // over the first group's columns up to the first heading's text.
+  const lawEnd = colX(0) - pitch / 2 + 2 + Math.max(...lawLines.map((line) => textWidth(line, 12.5)));
+  const softRoom = wide ? span(heads[1]) : colX(heads[1].to) + pitch / 2 - 2 - (lawEnd + 12);
+  const headLines = [lawLines, wrapText(KIND_LABEL.soft, softRoom, 12.5, 'body', 2, 'group heading')];
   const headH = Math.max(...headLines.map((l) => l.length)) * 15;
   heads.forEach((h, i) => {
     const a = colX(h.from) - pitch / 2 + 2;
     const b = colX(h.to) + pitch / 2 - 2;
-    headLines[i].forEach((line, k) => out.push(text(a, y + 13 + k * 15, line, { size: 12.5, weight: 600, where: 'group heading' })));
+    const right = !wide && i === 1;
+    headLines[i].forEach((line, k) =>
+      out.push(text(right ? b : a, y + 13 + k * 15, line, { size: 12.5, weight: 600, anchor: right ? 'end' : 'start', where: 'group heading' })),
+    );
     out.push(`<path class="axis" d="M${r1(a)} ${r1(y + headH + 8)}V${r1(y + headH + 4)}H${r1(b)}V${r1(y + headH + 8)}"/>`);
   });
   y += headH + 14;
@@ -148,6 +161,7 @@ export function contractMatrix(input: ContractMatrixInput): ChartOutput {
   // accent. Then the vertical column labels, bottom-aligned on the grid.
   const colTotals = cols.map((c) => rows.filter((row) => row.mapsTo.includes(c.ref)).length);
   const colHeads = columnHeads({
+    totalPx: sm,
     where,
     columns: cols.map((c, i) => ({
       label: colLabel(c),
@@ -199,7 +213,7 @@ export function contractMatrix(input: ContractMatrixInput): ChartOutput {
       const bx = gridRight + 10;
       const bw = (rowTotals[ri] / maxRow) * (totalsW - 30);
       totalBars.push(rowBarPath(bx, dotY, bw));
-      out.push(text(bx + bw + 5, dotY + 4.5, fmt(rowTotals[ri]), { size: 12, cls: 'num', where: 'row total' }));
+      out.push(text(bx + bw + 5, dotY + 4.5, fmt(rowTotals[ri]), { size: sm, cls: 'num', where: 'row total' }));
     }
     y += rowH;
   });
@@ -229,9 +243,9 @@ export function contractMatrix(input: ContractMatrixInput): ChartOutput {
   }
   if (wide) {
     const note = 'Bars: instruments per clause, clauses per instrument';
-    fitText(note, width - 2 * L, 12, 'body', 'legend');
+    fitText(note, width - 2 * L, sm, 'body', 'legend');
     y += 20;
-    out.push(text(L, y, note, { size: 12, cls: 'ink2', where: 'legend' }));
+    out.push(text(L, y, note, { size: sm, cls: 'ink2', where: 'legend' }));
   }
 
   const { svg, height } = assemble({

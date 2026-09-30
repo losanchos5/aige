@@ -15,6 +15,7 @@
 // returns the same table: Part | Chapter | the value (bars) or one column per
 // kind and a total (dots) | Highlighted (when any chapter is).
 import {
+  NARROW_WIDTH,
   assemble,
   fitText,
   fmt,
@@ -83,7 +84,6 @@ export interface BookSpineInput extends ChartBase {
 }
 
 const L = 12;
-const NARROW_W = 280;
 const SPINE_WORDS = {
   en: { part: 'Part', chapter: 'Chapter' },
   es: { part: 'Parte', chapter: 'Capítulo' },
@@ -113,7 +113,7 @@ export function bookSpine(input: BookSpineInput): ChartOutput {
   const w = words(input.lang);
   const sw = SPINE_WORDS[input.lang === 'es' ? 'es' : 'en'];
   const vertical = !input.mini && (input.orientation ?? ((input.width ?? 720) < 480 ? 'vertical' : 'horizontal')) === 'vertical';
-  const W = input.width ?? (input.mini || vertical ? NARROW_W : 720);
+  const W = input.width ?? (input.mini || vertical ? NARROW_WIDTH : 720);
   const marks = markStyles(input.id);
   const hits = targets(where);
   const tint = (pi: number, c: SpineChapter) => (c.highlight ? 'mk-hi' : `sp-p${pi % 2}`);

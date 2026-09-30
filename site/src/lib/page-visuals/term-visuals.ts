@@ -12,7 +12,7 @@
 //   patterns that use it most (layer colour), from relatedTerms, the entry's
 //   contrast list and patternsUsingTerm. Null under three relations, so the
 //   page keeps its list only.
-import { relationRadial, textWidth, wrapText, type ChartOutput } from '../charts';
+import { NARROW_WIDTH, radialLabelWidth, relationRadial, textWidth, wrapText, type ChartOutput } from '../charts';
 import { termFootprint, type FootprintChapter } from '../page-charts/term-footprint';
 import { chaptersOrdered } from '../../data/chapters';
 import { patternPath } from '../../data/patterns';
@@ -32,10 +32,10 @@ export const FOOTPRINT_WIDE = 600;
 /** The neighbourhood's wide variant: two label columns of at least
  *  NODE_LABEL_PX; the page lets it out of the reading column. */
 export const NEIGHBOURHOOD_WIDE = 880;
-export const NARROW = 340;
-/** One node label line: the label column of the narrow list (340 wide), which
+export const NARROW = NARROW_WIDTH;
+/** One node label line: the label column of the narrow list (NARROW_WIDTH), which
  *  the wide layout at NEIGHBOURHOOD_WIDE also clears. */
-const NODE_LABEL_PX = 266;
+const NODE_LABEL_PX = radialLabelWidth(NARROW_WIDTH, 'list', '');
 /** The centre box of the wide layout at its narrowest (132) less its
  *  padding: the term wraps to at most three lines of it. */
 const CENTRE_PX = 116;

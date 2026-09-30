@@ -16,6 +16,7 @@
 // small tiles merge sooner. Same table: Group | Item | value | fill (%) |
 // status, one row per item in input order, merged ones included.
 import {
+  NARROW_WIDTH,
   assemble,
   fmt,
   markStyles,
@@ -87,7 +88,6 @@ interface Rect {
 }
 
 const L = 12;
-const NARROW_W = 280;
 const HEAD = 20;
 const MIN_TILE = 24;
 
@@ -150,7 +150,7 @@ export function treemap(input: TreemapInput): ChartOutput {
     }
   }
   const narrow = (input.layout ?? ((input.width ?? 640) < 480 ? 'narrow' : 'wide')) === 'narrow';
-  const W = input.width ?? (narrow ? NARROW_W : 640);
+  const W = input.width ?? (narrow ? NARROW_WIDTH : 640);
   const fs = narrow ? 12.5 : 13;
   const vs = narrow ? 12.5 : 12;
   const w = words(input.lang);

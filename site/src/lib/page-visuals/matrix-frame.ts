@@ -41,6 +41,8 @@ export interface ColumnHeadsInput {
   gapAfterBars: number;
   /** Tallest a vertical label may be before the chart throws. */
   maxLabelH: number;
+  /** Size of the column totals (the chart's minText; default 12). */
+  totalPx?: number;
 }
 
 /** Total bars and vertical labels over the columns; returns the marks and the grid's top y. */
@@ -59,7 +61,7 @@ export function columnHeads(input: ColumnHeadsInput): { marks: string[]; y: numb
     } else {
       marks.push(`<line class="axis" x1="${r1(x - bw / 2)}" y1="${r1(y + barH)}" x2="${r1(x + bw / 2)}" y2="${r1(y + barH)}"/>`);
     }
-    marks.push(text(x, y + barH - h - 4, fmt(col.total), { size: 12, cls: 'num', anchor: 'middle', where: 'column total' }));
+    marks.push(text(x, y + barH - h - 4, fmt(col.total), { size: input.totalPx ?? 12, cls: 'num', anchor: 'middle', where: 'column total' }));
   });
   y += barH + input.gapAfterBars;
 

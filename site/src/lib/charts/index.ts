@@ -8,9 +8,10 @@
 //   mode     'figc' (default; page must load figures.css, e.g. via reading.css)
 //            or 'chart' (chart.css only; required on /, /resources,
 //            /resources/crosswalk, /cases and /patterns, see tests/perf.spec.ts)
-//   width    viewBox width; 340 gives the phone variant (1:1 text at 390 px)
+//   width    viewBox width; NARROW_WIDTH (280) gives the phone variant, whose
+//            text is at least NARROW_TEXT (12.5; minText(W) picks the size)
 //   lang     'es' prints every fixed word in Spanish ("A fecha de", "Fuente:",
-//            "Hoy", table headings such as "Fecha", "Total", "no aplica")
+//            table headings such as "Fecha", "Total", "no aplica")
 // and returns ChartOutput { svg, table, width, height } where table is
 // { caption, columns, rows } holding exactly the data drawn.
 //
@@ -25,7 +26,9 @@
 // 24 px pitch when marks link), else the build throws naming both marks.
 // Chart.astro enforces the rest at the page: a wide chart over 360 units needs
 // a narrow variant or scroll, a pair must share one table, ids are unique on
-// the page, and every rendered SVG stays within 12 KB (VISUAL-GUIDE §1.12).
+// the page, every rendered SVG stays within 12 KB (VISUAL-GUIDE §1.12), and
+// the SVG a phone shows keeps its smallest text at 12 px or more on a 320 px
+// screen (the narrow one at NARROW_WIDTH with text of 12.5 passes).
 //
 // Primitives (see each module's interface for every option):
 //
@@ -52,6 +55,8 @@
 //     label column defaults to 40 % of the width (at most 260).
 //
 //   timeStrip({ from, to, events: TimePoint[], today?, orientation? })
+//     `today` (here and in dumbbell) is the data's as-of date, drawn by
+//     asOfMark: a dashed line.today labelled "As of YYYY-MM-DD".
 //   beeswarm({ from, to, points: TimePoint[], today?, orientation?, legend? })
 //   timeLanes({ from, to, lanes: [{ label, items: [{ label, start, end?, ... }] }], today?,
 //               labels?: 'inline' (default, label next to each mark) | 'none' })
@@ -96,7 +101,7 @@
 //                  stageLabels?, verification, decision: { label, state? }, evidence, kickers?,
 //                  orientation?, maxItems? })
 //     Chains on the evidence-chain engine: one panel per stage, 'row' (900
-//     wide) or 'column' (340, narrow); items are { label, name?, href?, detail? }
+//     wide) or 'column' (NARROW_WIDTH, narrow); items are { label, name?, href?, detail? }
 //     and evidence items add layer (1-5). The terminal panel is always the
 //     evidence (document-with-check glyph in the layer colour); the one
 //     diamond is the gate: the bow-tie's event, the control's decision (its
@@ -159,8 +164,11 @@
 //     warning, pipeline, magnifier), shared with lib/evidence-chain.ts.
 //
 // Helpers for new primitives: linearScale, timeScale, textWidth, fitText,
-// wrapText, open, close, assemble, markStyles, shape, targets, words.
+// wrapText, open, close, assemble, markStyles, shape, targets, words, minText,
+// and asOfMark(scale, asOf, lang, { width, axis }) for the as-of line of any
+// time chart (asOfLabel for one drawn without a scale).
 export type {
+  AsOfMark,
   Box,
   Cell,
   ChartBase,
@@ -176,6 +184,11 @@ export type {
   Words,
 } from './core';
 export {
+  AS_OF_KEY_H,
+  NARROW_TEXT,
+  NARROW_WIDTH,
+  asOfLabel,
+  asOfMark,
   assemble,
   claimIds,
   close,
@@ -184,6 +197,7 @@ export {
   linearScale,
   markClass,
   markStyles,
+  minText,
   open,
   parseDay,
   shape,

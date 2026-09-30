@@ -13,11 +13,11 @@
  * than three relations it draws nothing and the page keeps its lists.
  *
  * Per-item template, not registered in figures.ts; 'figc' mode (the reading
- * layout loads figures.css). A 860-wide radial with a 340-wide list for
+ * layout loads figures.css). A 860-wide radial with a NARROW_WIDTH list for
  * phones; at the top level of the prose it breaks out to the reading well.
  */
 import Chart from '../Chart.astro';
-import { relationRadial, radialLabelWidth } from '../../lib/charts';
+import { NARROW_WIDTH, relationRadial, radialLabelWidth } from '../../lib/charts';
 import { constellationFamilies } from '../../lib/page-visuals/control-visuals';
 import { CONTROLS_AS_OF, type Control, type ControlProfile } from '../../data/controls';
 
@@ -28,7 +28,7 @@ interface Props {
 
 const { control: c, profile } = Astro.props;
 const WIDE = 860;
-const NARROW = 340;
+const NARROW = NARROW_WIDTH;
 const centre = { label: c.title };
 const title = 'What this control traces to';
 const base = {

@@ -14,7 +14,7 @@
 import ToolShell from '../../components/toolkit/ToolShell.astro';
 import Chart from '../../components/Chart.astro';
 import Figure from '../../components/Figure.astro';
-import { ladder, type LadderStep } from '../../lib/charts';
+import { NARROW_WIDTH, ladder, type LadderStep } from '../../lib/charts';
 import { getFigure } from '../../data/figures';
 import rolesPosterSvg from '../../figures/eu-ai-act-operator-roles.svg?raw';
 import { toolById, tools, toolNotice } from '../../data/toolkit';
@@ -123,7 +123,9 @@ const gpaiBase = {
   asOf: questionSet.asOf,
   stepHeader: 'Track',
   steps: steps4(gpaiRungs),
-  width: 340,
+  // A phone-width chart alone: its two steps stacked top to bottom.
+  width: NARROW_WIDTH,
+  orientation: 'vertical' as const,
 };
 // Two copies: the live one in the result (lit by the script) and the neutral
 // one in the written-out rules, which is the whole picture without JavaScript.
@@ -131,7 +133,7 @@ const gpaiBase = {
 // narrower than the guide's, which has the prose column to itself.
 const ladderCharts = (prefix: string, width: number) => ({
   wide: ladder({ ...ladderBase, id: `${prefix}-w`, width }),
-  narrow: ladder({ ...ladderBase, id: `${prefix}-n`, width: 340, orientation: 'vertical' }),
+  narrow: ladder({ ...ladderBase, id: `${prefix}-n`, width: NARROW_WIDTH, orientation: 'vertical' }),
   gpai: ladder({ ...gpaiBase, id: `${prefix}-gpai` }),
 });
 const liveLadder = ladderCharts('tri-lad', 560);

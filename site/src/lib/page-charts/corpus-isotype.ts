@@ -14,6 +14,7 @@
 // a column left of the dots; narrow puts the name and count on one line and
 // the dots under it.
 import {
+  minText,
   assemble,
   esc,
   fitText,
@@ -53,7 +54,6 @@ export interface CorpusIsotypeInput extends ChartBase {
 const L = 12;
 const WIDE_AT = 480;
 const LABEL_PX = 13;
-const COUNT_PX = 12;
 /** Largest dot pitch; smaller when the longest row needs it. */
 const MAX_PITCH = 14;
 /** Below this pitch the dots stop reading as dots: raise the unit. */
@@ -74,6 +74,7 @@ export function corpusIsotype(input: CorpusIsotypeInput): ChartOutput {
     }
   }
   const W = input.width ?? 640;
+  const COUNT_PX = minText(W);
   const wide = W >= WIDE_AT;
   const rows = [...input.rows].sort(byWeight);
   const countText = (row: CorpusRow) => `${row.count} ${row.noun}`;
@@ -119,7 +120,10 @@ export function corpusIsotype(input: CorpusIsotypeInput): ChartOutput {
     const whole = Math.floor(row.count / input.unit);
     const rest = ((row.count % input.unit) / input.unit) * pitch;
     const dotsW = whole * pitch + (rest > 0 ? Math.max(rest, pitch * 0.1 + MIN_INK) : 0);
-    fitText(row.label, wide ? labelW : W - 2 * L - countW - 12, LABEL_PX, 'body', 'resource name');
+    // Narrow: the name and its count on one line, or the count on the line
+    // under the name when both do not fit.
+    const beside = wide || textWidth(row.label, LABEL_PX) <= W - 2 * L - countW - 12;
+    fitText(row.label, wide ? labelW : beside ? W - 2 * L - countW - 12 : W - 2 * L, LABEL_PX, 'body', 'resource name');
     const parts: string[] = [];
     let dotsY: number;
     if (wide) {
@@ -131,6 +135,7 @@ export function corpusIsotype(input: CorpusIsotypeInput): ChartOutput {
       y += 26;
     } else {
       parts.push(text(L, y + 13, row.label, { size: LABEL_PX, where: 'resource name' }));
+      if (!beside) y += 16;
       parts.push(text(W - L, y + 13, countText(row), { size: COUNT_PX, cls: 'mono', anchor: 'end', where: 'count' }));
       dotsY = y + 20;
       y = dotsY + pitch + 9;

@@ -29,6 +29,7 @@
 // <text data-ring-count="<key>">; the script changes those attributes and
 // texts. Table: Item | Done | Total | Percent.
 import {
+  NARROW_WIDTH,
   assemble,
   esc,
   fitText,
@@ -57,7 +58,6 @@ import {
 } from './core';
 
 const L = 12;
-const NARROW_W = 280;
 const KEY = /^[a-z][a-z0-9-]*$/;
 
 const RING_WORDS = {
@@ -143,7 +143,7 @@ export function concentricRings(input: ConcentricRingsInput): ChartOutput {
     }
   }
   const narrow = (input.layout ?? ((input.width ?? 640) < 480 ? 'narrow' : 'wide')) === 'narrow';
-  const W = input.width ?? (narrow ? NARROW_W : 640);
+  const W = input.width ?? (narrow ? NARROW_WIDTH : 640);
   const fs = narrow ? 12.5 : 13;
   const rw = ringWords(input.lang);
   const w = words(input.lang);
@@ -434,7 +434,7 @@ export function lifecycleRing(input: LifecycleRingInput): ChartOutput {
     if (n.fill !== undefined && !(n.fill >= 0 && n.fill <= 1)) throw new Error(`charts(${where}): record "${n.label}" has fill ${n.fill}; fills run from 0 to 1`);
   }
   const list = (input.layout ?? ((input.width ?? 640) < 480 ? 'list' : 'ring')) === 'list';
-  const W = input.width ?? (list ? NARROW_W : 640);
+  const W = input.width ?? (list ? NARROW_WIDTH : 640);
   const fs = list ? 12.5 : 13;
   const rw = ringWords(input.lang);
   const hits = targets(where);
@@ -646,7 +646,7 @@ export function progressRing(input: ProgressRingInput): ChartOutput {
       throw new Error(`charts(${where}): item "${p.label}" has ${p.done} of ${p.total}; counts are whole, done at most total`);
     }
   }
-  const W = input.width ?? Math.min(640, Math.max(NARROW_W, items.length * 104 + 2 * L));
+  const W = input.width ?? Math.min(640, Math.max(NARROW_WIDTH, items.length * 104 + 2 * L));
   const rw = ringWords(input.lang);
   const w = words(input.lang);
   const perRow = Math.max(1, Math.min(items.length, Math.floor((W - 2 * L) / 84)));

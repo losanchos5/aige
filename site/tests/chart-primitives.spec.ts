@@ -31,6 +31,7 @@ import {
   lifecycleRing,
   linearScale,
   lollipop,
+  NARROW_WIDTH,
   progressRing,
   rankedBars,
   relationRadial,
@@ -695,9 +696,9 @@ test("lang 'es' leaves no English chrome in the SVG or the table", () => {
   const es = { ...base, lang: 'es' as const, title, desc };
   const strip = timeStrip({ ...es, ...timeDomain, id: 'ch-s', events: points });
   expect(strip.table.columns).toEqual(['Fecha', 'Elemento', 'Estado']);
-  expect(strip.svg).toContain('>Hoy 2026-09-30<');
+  expect(strip.svg).toContain('>A fecha de 2026-09-30<');
   const bell = dumbbell({ ...es, id: 'ch-d', fromLabel: 'Fecha original', toLabel: 'Nueva fecha', today: '2026-09-30', items: moves });
-  expect(bell.svg).toContain('>Hoy 2026-09-30<');
+  expect(bell.svg).toContain('>A fecha de 2026-09-30<');
   expect(bell.table.columns[0]).toBe('Elemento');
   const grid = heatGrid({ ...es, id: 'ch-h', rowHeader: 'País', unit: 'entradas', marginals: true, ...heat });
   expect(grid.table.rows[0]).toEqual(['Spain', 3, 0, 'no aplica', 3]);
@@ -792,6 +793,34 @@ for (const p of TIME_PAIRS) {
   });
 }
 
+// ---- the as-of mark: one helper for every time chart ------------------------
+test('timeStrip, beeswarm, timeLanes and dumbbell draw the same as-of mark from the input date, in both orientations and languages', () => {
+  // A date unlike the stamp's (base.asOf) and far from the build clock, so
+  // the mark can only come from the input.
+  const asOf = '2021-03-15';
+  const dom = { from: timeDomain.from, to: timeDomain.to, today: asOf };
+  for (const lang of ['en', 'es'] as const) {
+    const common = { ...base, lang, title, desc };
+    const charts: [string, ChartOutput][] = [
+      ['timeStrip', timeStrip({ ...common, ...dom, id: 'ch-s', events: points })],
+      ['timeStrip vertical', timeStrip({ ...common, ...dom, id: 'ch-s', events: points, orientation: 'vertical' })],
+      ['beeswarm', beeswarm({ ...common, ...dom, id: 'ch-b', points })],
+      ['beeswarm vertical', beeswarm({ ...common, ...dom, id: 'ch-b', points, orientation: 'vertical' })],
+      ['timeLanes', timeLanes({ ...common, ...dom, id: 'ch-l', lanes: timeLaneData })],
+      ['timeLanes vertical', timeLanes({ ...common, ...dom, id: 'ch-l', lanes: timeLaneData, orientation: 'vertical' })],
+      ['dumbbell', dumbbell({ ...common, id: 'ch-d', fromLabel: 'From', toLabel: 'To', domain: [dom.from, dom.to] as [string, string], today: asOf, items: moves })],
+      ['dumbbell narrow', dumbbell({ ...common, id: 'ch-d', fromLabel: 'From', toLabel: 'To', domain: [dom.from, dom.to] as [string, string], today: asOf, items: moves, width: NARROW_WIDTH })],
+    ];
+    const label = `${lang === 'es' ? 'A fecha de' : 'As of'} ${asOf}`;
+    for (const [name, chart] of charts) {
+      const els = parseSvg(chart.svg);
+      const marks = els.filter((e) => e.tag === 'text' && e.text === label);
+      expect(marks.map((e) => e.attr.class), `${name} (${lang}): one "${label}" in mono`).toEqual(['mono']);
+      expect(els.some((e) => (e.tag === 'line' || e.tag === 'path') && e.attr.class === 'today'), `${name} (${lang}): a dashed today line`).toBe(true);
+    }
+  }
+});
+
 test('Venn3 upset layout draws bars, not circles', () => {
   const make = (layout: 'venn' | 'upset') => venn3({ ...base, id: 'ch-v', title, desc, unit: 'topics', sets, items: vennItems, layout }).svg;
   expect((make('venn').match(/class="venn"/g) ?? []).length).toBe(3);
@@ -841,10 +870,10 @@ test('narrow ranked bars put each label above its bar, wide ones beside it', () 
   }
 });
 
-test('vertical lanes fit the real enforcement-point labels at 340 and list each item in every lane it acts in', () => {
+test('vertical lanes fit the real enforcement-point labels at the narrow width and list each item in every lane it acts in', () => {
   const columns = laneColumns.map((c) => ({ key: c.key, label: enforcementLabels[c.key as keyof typeof enforcementLabels] }));
   const narrow = lanes({ ...base, id: 'ch-n', title, desc, rowHeader: 'Control', columns, rows: laneRows, orientation: 'vertical' });
-  expect(narrow.width).toBe(340);
+  expect(narrow.width).toBe(NARROW_WIDTH);
   for (const c of laneColumns) {
     // Each lane heads its own band with its full label, from the left edge.
     expect(narrow.svg).toMatch(new RegExp(`<text x="12" y="[\\d.]+" font-size="13" font-weight="600">${c.key}:`));
@@ -977,10 +1006,10 @@ for (const c of CHAINS) {
     }
   });
 
-  test(`${c.name}: the row reads left to right, the column (narrow, 340) top to bottom`, () => {
+  test(`${c.name}: the row reads left to right, the column (narrow) top to bottom`, () => {
     const row = c.make('ch-w', 'row');
     const column = c.make('ch-n', 'column');
-    expect(column.width).toBe(340);
+    expect(column.width).toBe(NARROW_WIDTH);
     const at = (svg: string) => c.kickers.map((k) => textAt(svg, k)!);
     const r = at(row.svg);
     const col = at(column.svg);

@@ -11,20 +11,20 @@ módulos de datos, no del componente.
 
 ## 2. Kit K1: primitivas nuevas (implementador, PW_PORT 4462)
 
-- [ ] 2.1 `sankey.ts` (Flow de 2 o 3 columnas, D1) con variante estrecha en lista; verificar en `chart-primitives.spec.ts` que las sumas por nodo igualan la tabla y que una columna de 10 nodos falla
-- [ ] 2.2 `rings.ts` (concentricRings, lifecycleRing, progressRing, D2); verificar que cada marca cae en su anillo y sector y que la tabla lista todas
-- [ ] 2.3 `treemap.ts` (squarified agrupado, D3); verificar áreas proporcionales con margen de 1 px, sin solapes y teselas menores de 24 px agrupadas
-- [ ] 2.4 `spine.ts` (BookSpine y variante mini, D4); verificar orden por capítulo, grupos por parte y que no usa clases de capa
-- [ ] 2.5 Exportar todo en `index.ts` con su JSDoc y las clases en `chart.css` y `figures.css`; verificar build y `chart-primitives.spec.ts` en verde
+- [x] 2.1 `sankey.ts` (Flow de 2 o 3 columnas, D1) con variante estrecha en lista; verificar en `chart-primitives.spec.ts` que las sumas por nodo igualan la tabla y que una columna de 10 nodos falla
+- [x] 2.2 `rings.ts` (concentricRings, lifecycleRing, progressRing, D2); verificar que cada marca cae en su anillo y sector y que la tabla lista todas
+- [x] 2.3 `treemap.ts` (squarified agrupado, D3); verificar áreas proporcionales con margen de 1 px, sin solapes y teselas menores de 24 px agrupadas
+- [x] 2.4 `spine.ts` (BookSpine y variante mini, D4); verificar orden por capítulo, grupos por parte y que no usa clases de capa
+- [x] 2.5 Exportar todo en `index.ts` con su JSDoc y las clases en `chart.css` y `figures.css`; verificar build y `chart-primitives.spec.ts` en verde
 
 ## 3. Kit K2: legibilidad y deudas (implementador, PW_PORT 4463)
 
-- [ ] 3.1 `NARROW_WIDTH = 280`, texto mínimo 12,5 en estrecho y la comprobación de Chart.astro (D5); verificar que la build falla con un gráfico de prueba a 340 con texto de 12
-- [ ] 3.2 Migrar los ~20 sitios que dibujan el estrecho a 340 y ajustar etiquetas hasta que la build pase; verificar sin scroll horizontal a 320 en las páginas afectadas
-- [ ] 3.3 Helper `asOfMark` en core usado por timeStrip, beeswarm, timeLanes y dumbbell (D6); verificar con un test que las cuatro dibujan la misma marca
-- [ ] 3.4 Mariposa: la trama solo para «related» (D6); verificar en `page-visuals-crosswalk.spec.ts`
-- [ ] 3.5 `jurisdiction-tiles` y `governance-operating-model` sin texto de 11 px a 390; verificar con `figures*.spec.ts`
-- [ ] 3.6 Fusionar K1 y K2 en `feat/page-visuals-t3`, build y `chart-primitives.spec.ts`; quitar los worktrees con `rm-worktree.sh`
+- [x] 3.1 `NARROW_WIDTH = 280`, texto mínimo 12,5 en estrecho y la comprobación de Chart.astro (D5); verificar que la build falla con un gráfico de prueba a 340 con texto de 12
+- [x] 3.2 Migrar los ~20 sitios que dibujan el estrecho a 340 y ajustar etiquetas hasta que la build pase; verificar sin scroll horizontal a 320 en las páginas afectadas
+- [x] 3.3 Helper `asOfMark` en core usado por timeStrip, beeswarm, timeLanes y dumbbell (D6); verificar con un test que las cuatro dibujan la misma marca
+- [x] 3.4 Mariposa: la trama solo para «related» (D6); verificar en `page-visuals-crosswalk.spec.ts`
+- [x] 3.5 `jurisdiction-tiles` y `governance-operating-model` sin texto de 11 px a 390; verificar con `figures*.spec.ts`
+- [x] 3.6 Fusionar K1 y K2 en `feat/page-visuals-t3`, build y `chart-primitives.spec.ts`; quitar los worktrees con `rm-worktree.sh`
 
 ## 4. Páginas (cinco implementadores en paralelo, un worktree por bloque)
 

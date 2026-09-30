@@ -460,6 +460,12 @@
 .figc .mk-dash-3 { fill: var(--bg); stroke: var(--l3-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
 .figc .mk-dash-4 { fill: var(--bg); stroke: var(--l4-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
 .figc .mk-dash-5 { fill: var(--bg); stroke: var(--l5-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
+.figc .mk-dot-0 { fill: var(--bg); stroke: var(--ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
+.figc .mk-dot-1 { fill: var(--bg); stroke: var(--l1-ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
+.figc .mk-dot-2 { fill: var(--bg); stroke: var(--l2-ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
+.figc .mk-dot-3 { fill: var(--bg); stroke: var(--l3-ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
+.figc .mk-dot-4 { fill: var(--bg); stroke: var(--l4-ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
+.figc .mk-dot-5 { fill: var(--bg); stroke: var(--l5-ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
 .figc .mk-hatch-0 { stroke: var(--ink); }
 .figc .mk-hatch-1 { stroke: var(--l1-ink); }
 .figc .mk-hatch-2 { stroke: var(--l2-ink); }
@@ -516,7 +522,7 @@
   .figc:is(.ch-flow, .ch-radial) :is(.l1-bg, .l2-bg, .l3-bg, .l4-bg, .l5-bg, .hatch-bg) { fill: Canvas; }
   .figc:is(.ch-flow, .ch-radial) .arrow { fill: CanvasText; }
   .figc:is(.ch-flow, .ch-radial) :is([class*="mk-fill-"], .mk-hi) { fill: CanvasText; stroke: CanvasText; }
-  .figc:is(.ch-flow, .ch-radial) :is([class*="mk-line-"], [class*="mk-dash-"]) { fill: Canvas; stroke: CanvasText; }
+  .figc:is(.ch-flow, .ch-radial) :is([class*="mk-line-"], [class*="mk-dash-"], [class*="mk-dot-"]) { fill: Canvas; stroke: CanvasText; }
   .figc:is(.ch-flow, .ch-radial) [class*="mk-hatch-"] { stroke: CanvasText; }
   .figc:is(.ch-flow, .ch-radial) [class*="hatch-"]:not(.hatch-bg):not([class*="mk-"]) { stroke: CanvasText; }
   .figc:is(.ch-flow, .ch-radial) a:focus-visible { outline-color: Highlight; }

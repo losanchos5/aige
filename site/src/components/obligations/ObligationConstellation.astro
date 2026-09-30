@@ -17,7 +17,7 @@
  * needs a 306 px label column); narrow, the list layout.
  */
 import Chart from '../Chart.astro';
-import { relationRadial, radialLabelWidth, type RelationFamily, type Tone } from '../../lib/charts';
+import { NARROW_WIDTH, relationRadial, radialLabelWidth, type RelationFamily, type Tone } from '../../lib/charts';
 import { fitsCentre, shortenToFit } from '../../lib/page-visuals/labels';
 import { patternPath, type PatternDef } from '../../data/patterns';
 import { controlHref, type Control } from '../../data/controls';
@@ -41,7 +41,7 @@ const { row, patterns, controls, cases, topics } = Astro.props;
  *  so both variants print the same words; a longer name is shortened by the
  *  shared shortener (the full name and the control id stay in the node's
  *  title and the table). */
-const LABEL_PX = radialLabelWidth(340, 'list', '') - 1;
+const LABEL_PX = radialLabelWidth(NARROW_WIDTH, 'list', '') - 1;
 const short = (label: string) => shortenToFit(label, LABEL_PX, 13);
 
 // The other frameworks under the row's topics: one node each, core when any
@@ -81,13 +81,13 @@ const families: RelationFamily[] = [
   {
     label: 'Cases',
     relationLabels: { core: 'Core', related: 'Cites the article' },
-    items: cases.map((c) => ({ label: c.short, name: c.title, href: `/cases/${c.id}`, strength: 'related' as const })),
+    items: cases.map((c) => ({ label: short(c.short), name: c.title, href: `/cases/${c.id}`, strength: 'related' as const })),
   },
   {
     label: 'Same crosswalk topic',
     relationLabels: { core: 'Core clause', related: 'Related clause' },
     items: [...byFramework.entries()].map(([framework, e]) => ({
-      label: framework,
+      label: short(framework),
       name: `${framework} ${e.clauses.join(', ')}`,
       href: `#topic-${e.topic}`,
       strength: e.core ? ('core' as const) : ('related' as const),
@@ -112,7 +112,7 @@ const base = {
   tableCaption: `Relations of ${row.id}`,
 };
 const wide = relationRadial({ ...base, id: 'obn-w', width: 960 });
-const narrow = relationRadial({ ...base, id: 'obn-n', width: 340 });
+const narrow = relationRadial({ ...base, id: 'obn-n', width: NARROW_WIDTH });
 ---
 
 {

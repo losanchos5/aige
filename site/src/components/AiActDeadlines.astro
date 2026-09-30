@@ -8,7 +8,7 @@
 import CitedText from './CitedText.astro';
 import SourceList from './SourceList.astro';
 import Chart from './Chart.astro';
-import { dumbbell } from '../lib/charts';
+import { NARROW_WIDTH, dumbbell } from '../lib/charts';
 import { milestoneAxis } from '../lib/page-charts/milestone-axis';
 import { deadlineAxisItems } from '../lib/page-visuals/deadline-axis';
 import '../styles/time-charts.css';
@@ -219,12 +219,11 @@ const moveChart = moves.length
       noteHeader: UI.moveDelay,
       // The line is the page's check date, not the reader's today.
       today: AI_ACT_TIMELINE_AS_OF,
-      todayLabel: UI.moveAsOf,
       tableCaption: UI.moveTable,
     }
   : undefined;
 const moveWide = moveChart && dumbbell({ ...moveChart, id: `aad-moved-w-${lang}`, width: 640 });
-const moveNarrow = moveChart && dumbbell({ ...moveChart, id: `aad-moved-n-${lang}`, width: 340 });
+const moveNarrow = moveChart && dumbbell({ ...moveChart, id: `aad-moved-n-${lang}`, width: NARROW_WIDTH });
 
 // "The AI Act on one axis": every milestone at its date, applied solid and
 // upcoming outlined, square where the Omnibus set or moved the date, against
@@ -249,7 +248,7 @@ const axisChart = {
   },
 };
 const axisWide = milestoneAxis({ ...axisChart, id: `aad-axis-w-${lang}`, width: 640 });
-const axisNarrow = milestoneAxis({ ...axisChart, id: `aad-axis-n-${lang}`, width: 340, orientation: 'vertical' });
+const axisNarrow = milestoneAxis({ ...axisChart, id: `aad-axis-n-${lang}`, width: NARROW_WIDTH, orientation: 'vertical' });
 
 const basisLabel = (m: TimelineMilestone) =>
   m.basis === 'omnibus' ? (es ? 'Reglamento (UE) 2026/1744' : 'Regulation (EU) 2026/1744') : (es ? 'Reglamento (UE) 2024/1689' : 'Regulation (EU) 2024/1689');

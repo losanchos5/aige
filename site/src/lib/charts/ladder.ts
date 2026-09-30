@@ -12,6 +12,8 @@
 // anterior, más:"), so each step reads as everything below it and more. The
 // table then gains an Adds column (the step's own additions, "; "-joined).
 import {
+  NARROW_WIDTH,
+  minText,
   assemble,
   fitText,
   linkText,
@@ -87,7 +89,8 @@ export function ladder(input: LadderInput): ChartOutput {
     return lines;
   };
   const vertical = input.orientation === 'vertical';
-  const W = input.width ?? (vertical ? 340 : 640);
+  const W = input.width ?? (vertical ? NARROW_WIDTH : 640);
+  const sm = minText(W);
   const w = words(input.lang);
   const out: string[] = [];
   // The marks of one step, grouped when the step has a key.
@@ -145,7 +148,7 @@ export function ladder(input: LadderInput): ChartOutput {
     const seg = 8;
     const meterW = n * (seg + 3) - 3;
     const tx = L + meterW + 12;
-    if (input.highlightLabel) fitText(input.highlightLabel, W - L - tx - 8, 12, 'mono', 'highlight label');
+    if (input.highlightLabel) fitText(input.highlightLabel, W - L - tx - 8, sm, 'mono', 'highlight label');
     let y = 8;
     input.steps.forEach((step, i) => {
       const hi = input.highlight === i;
@@ -169,7 +172,7 @@ export function ladder(input: LadderInput): ChartOutput {
       els.push(step.href ? linkText(nameEls.join(''), step.label, step.href) : nameEls.join(''));
       if (extra) {
         ty += 16;
-        els.push(text(tx, ty, input.highlightLabel!, { size: 12, cls: 'mono', where: 'highlight label' }));
+        els.push(text(tx, ty, input.highlightLabel!, { size: sm, cls: 'mono', where: 'highlight label' }));
       }
       if (detail.length) ty += 4;
       for (const line of detail) {

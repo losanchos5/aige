@@ -11,11 +11,11 @@
 //   dumbbell      a date-to-date move per item (outline = from, filled = to)
 //
 // Wide (width >= 480) puts the item label in a column left of the bars; narrow
-// puts it on its own line above the bar, so the same call at width 340 gives
-// the phone variant.
+// puts it on its own line above the bar, so the same call at NARROW_WIDTH
+// gives the phone variant.
 import {
+  asOfMark,
   assemble,
-  besideLine,
   fitText,
   fmt,
   legend,
@@ -23,6 +23,7 @@ import {
   linkText,
   markClass,
   markStyles,
+  minText,
   nonEmpty,
   r1,
   shape,
@@ -72,20 +73,21 @@ interface Frame {
   x0: number; // zero of the value axis
   x1: number; // end of the value axis
   labelW: number;
+  sm: number; // smallest text (core minText)
 }
 
 function frame(W: number, labelWidth: number | undefined): Frame {
   const wide = W >= WIDE_AT;
   const labelW = wide ? (labelWidth ?? Math.min(200, Math.round(W * 0.3))) : W - 2 * L - 6;
   const x0 = wide ? L + labelW + 8 : L;
-  return { wide, x0, x1: W - L - VALUE_W, labelW };
+  return { wide, x0, x1: W - L - VALUE_W, labelW, sm: minText(W) };
 }
 
 /** Axis title, tick labels and the gridlines' top; returns the first row y. */
 function axisTop(out: string[], f: Frame, ticks: { at: number; label: string }[], unit: string, y: number): number {
-  out.push(text(f.x0, y, unit, { size: 12, cls: 'mono muted', where: 'axis title' }));
+  out.push(text(f.x0, y, unit, { size: f.sm, cls: 'mono muted', where: 'axis title' }));
   y += 17;
-  for (const t of ticks) out.push(text(t.at, y, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+  for (const t of ticks) out.push(text(t.at, y, t.label, { size: f.sm, cls: 'num muted', anchor: 'middle', where: 'tick' }));
   return y + 8;
 }
 
@@ -330,11 +332,12 @@ export function divergingBars(input: DivergingBarsInput): ChartOutput {
     y = lg.bottom;
   }
   y += 22;
-  out.push(text(L, y, input.unit, { size: 12, cls: 'mono muted', where: 'axis title' }));
+  const sm = minText(W);
+  out.push(text(L, y, input.unit, { size: sm, cls: 'mono muted', where: 'axis title' }));
   y += 17;
   for (const t of s.ticks) {
-    out.push(text(lz - s.map(t), y, fmt(t), { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
-    if (wide || t !== 0) out.push(text(rz + s.map(t), y, fmt(t), { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+    out.push(text(lz - s.map(t), y, fmt(t), { size: sm, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+    if (wide || t !== 0) out.push(text(rz + s.map(t), y, fmt(t), { size: sm, cls: 'num muted', anchor: 'middle', where: 'tick' }));
   }
   y += 8;
   const gridTop = y - 2;
@@ -343,11 +346,11 @@ export function divergingBars(input: DivergingBarsInput): ChartOutput {
   for (const item of items) {
     const lines = wrapText(item.label, LW, 13, 'body', 2, 'item label');
     const all = item.note ? [...lines, item.note] : lines;
-    if (item.note) fitText(item.note, LW, 12, 'body', 'item note');
+    if (item.note) fitText(item.note, LW, sm, 'body', 'item note');
     const labelEls = all.map((line, i) => {
       const isNote = item.note !== undefined && i === all.length - 1;
       const ly = wide ? y + BAR_H / 2 + 4.5 - ((all.length - 1) * 15) / 2 + i * 15 : y + 13 + i * 15;
-      return text(cx, ly, line, { size: isNote ? 12 : 13, cls: isNote ? 'ink2' : '', anchor: 'middle', where: 'item label' });
+      return text(cx, ly, line, { size: isNote ? sm : 13, cls: isNote ? 'ink2' : '', anchor: 'middle', where: 'item label' });
     });
     rows.push(item.href ? linkText(labelEls.join(''), item.label, item.href) : labelEls.join(''));
     const barY = wide ? y + Math.max(0, ((all.length - 1) * 15) / 2) : y + all.length * 15 + 5;
@@ -408,9 +411,9 @@ export interface DumbbellInput extends ChartBase {
   toLabel: string;
   /** Time domain (default: 1 January of the first year to 1 January after the last). */
   domain?: [string, string];
-  /** A dashed "today" line (YYYY-MM-DD, inside the domain). */
+  /** The data's as-of date (YYYY-MM-DD, inside the domain): a dashed line
+   *  labelled "As of <date>" (core asOfMark), never the build clock. */
   today?: string;
-  todayLabel?: string;
   itemHeader?: string;
   /** Table heading of the note column (default "Note"); used only when an
    *  item has a note. */
@@ -443,12 +446,13 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
   );
   out.push(...lg.els);
   let y = lg.bottom + 22;
-  for (const t of ts.ticks) out.push(text(ts.map(t.date), y, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+  const mark = input.today ? asOfMark(ts, input.today, input.lang, { width: W, axis: 'x', pad: L }) : undefined;
+  for (const t of ts.ticks) out.push(text(ts.map(t.date), y, t.label, { size: f.sm, cls: 'num muted', anchor: 'middle', where: 'tick' }));
   y += 8;
   const gridTop = y - 2;
   const rows: string[] = [];
   const H = 16;
-  // Narrow: the mark band of each row, for a today line that skips the labels.
+  // Narrow: the mark band of each row, for an as-of line that skips the labels.
   const markBands: [number, number][] = [];
   for (const item of input.items) {
     const { barY } = itemLabel(rows, f, item.label, y, H, item.href, 3);
@@ -465,14 +469,14 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
     rows.push(shape('circle', xb, cy, 5.5, `class="${markClass('filled', 0)}"`, tip(`${item.label} · ${input.toLabel}: ${item.to}`)));
     if (item.note) {
       // Beside the later dot when it fits, else before the earlier one.
-      const nw = textWidth(item.note, 12, 'mono');
+      const nw = textWidth(item.note, f.sm, 'mono');
       const after = Math.max(xa, xb) + 10;
       const before = Math.min(xa, xb) - 10 - nw;
       if (after + nw > W - L && before < f.x0) {
         throw new Error(`charts(dumbbell ${input.id}): note "${item.note}" fits neither after nor before "${item.label}"; shorten the wording`);
       }
       const nx = after + nw <= W - L ? after : before;
-      rows.push(text(nx, cy + 4, item.note, { size: 12, cls: 'mono', weight: 600, where: 'dumbbell note' }));
+      rows.push(text(nx, cy + 4, item.note, { size: f.sm, cls: 'mono', weight: 600, where: 'dumbbell note' }));
     }
     y = barY + H + 10;
   }
@@ -480,18 +484,10 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
     const x = r1(ts.map(t.date));
     out.push(`<line class="rule" x1="${x}" y1="${r1(gridTop)}" x2="${x}" y2="${r1(y - 4)}"/>`);
   }
-  if (input.today) {
-    const x = r1(ts.map(input.today));
-    if (f.wide) {
-      out.push(`<line class="today" x1="${x}" y1="${r1(gridTop - 4)}" x2="${x}" y2="${r1(y - 4)}"/>`);
-    } else {
-      // Narrow: the labels sit above their rows across the plot, so the line
-      // is drawn only across each row's marks, never through a label.
-      out.push(`<path class="today" d="${markBands.map(([a, b]) => `M${x} ${r1(a)}V${r1(b)}`).join('')}"/>`);
-    }
-    const label = `${input.todayLabel ?? w.today} ${input.today}`;
-    fitText(label, W - 2 * L, 12, 'mono', 'today label');
-    out.push(text(besideLine(x, textWidth(label, 12, 'mono'), W, L), y + 10, label, { size: 12, cls: 'mono', where: 'today label' }));
+  if (mark) {
+    // Narrow: the labels sit above their rows across the plot, so the line
+    // is drawn only across each row's marks, never through a label.
+    out.push(mark.line(f.wide ? [[gridTop - 4, y - 4]] : markBands), mark.beside(y + 10));
     y += 14;
   }
   out.push(...rows);

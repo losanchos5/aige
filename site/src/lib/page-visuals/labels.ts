@@ -45,8 +45,9 @@ export function headPhrase(label: string): string {
  * A name drawn on one line of `maxPx` at `px` (body face): the name itself
  * when it fits; else without its trailing "(...)" gloss ("Records of
  * processing activities"); else that gloss when it is an acronym ("RLHF");
- * else its head phrase ("OECD Framework"). The caller's primitive still
- * throws when even that does not fit.
+ * else its head phrase ("OECD Framework"); else that phrase cut at a word
+ * with an ellipsis ("Disclosure & Notification…"). The caller's primitive
+ * still throws when even that does not fit.
  */
 export function fitName(name: string, maxPx: number, px = 13): string {
   const fits = (s: string) => textWidth(s, px) <= maxPx;
@@ -55,7 +56,8 @@ export function fitName(name: string, maxPx: number, px = 13): string {
   const bare = gloss ? name.slice(0, gloss.index) : name;
   if (fits(bare)) return bare;
   if (gloss && /^[A-Z][A-Z0-9-]*$/.test(gloss[1]) && fits(gloss[1])) return gloss[1];
-  return headPhrase(bare);
+  const head = headPhrase(bare);
+  return fits(head) ? head : (cutUntil(head, fits) ?? head);
 }
 
 /** Words a cut label never ends on before its ellipsis. */
