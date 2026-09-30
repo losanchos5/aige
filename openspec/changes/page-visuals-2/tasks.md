@@ -37,9 +37,9 @@ módulos de datos, no del componente.
 
 ## 5. Integración y revisión
 
-- [ ] 5.1 Una build y la suite completa (`npm test`) una sola vez en `pv3`; verificar verde
-- [ ] 5.2 Axe con `A11Y_FULL=1` en las 16 rutas tocadas; verificar sin violaciones serious ni critical
-- [ ] 5.3 Revisión de fidelidad de datos (cada cifra dibujada frente a su módulo) y revisión a11y y visual adversarial con capturas a 390 y 1440 en claro, oscuro, print y forced-colors; en paralelo
+- [x] 5.1 Una build y la suite completa (`npm test`) una sola vez en `pv3`; verificar verde
+- [x] 5.2 Axe con `A11Y_FULL=1` en las 16 rutas tocadas; verificar sin violaciones serious ni critical
+- [x] 5.3 Revisión de fidelidad de datos (cada cifra dibujada frente a su módulo) y revisión a11y y visual adversarial con capturas a 390 y 1440 en claro, oscuro, print y forced-colors; en paralelo
 - [ ] 5.4 Arreglar lo que salga de 5.3 y repetir los tests afectados
 - [ ] 5.5 `PW_PORT=4461 npm run lhci` en local; verificar aserciones en verde
 - [ ] 5.6 Abrir la PR de la tanda 3 con las capturas regeneradas listadas; tras la fusión de Jordi, esperar a `deploy.yml` y hacer curl a producción de cada ruta tocada
