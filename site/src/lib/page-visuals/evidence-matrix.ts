@@ -45,8 +45,10 @@ export interface EvidenceMatrixInput {
   rows: { label: string; href?: string; values: number[] }[];
   /** Column labels, drawn vertically and used in the table. */
   columns: string[];
-  /** Noun of a count ("marks"), for the column-total tooltips. */
+  /** Noun of a count ("marks"), for the column-total tooltips, and its
+   *  singular for a total of 1 (default: the noun). */
   unit: string;
+  unitOne?: string;
   tableCaption?: string;
 }
 
@@ -85,7 +87,7 @@ export function evidenceMatrix(input: EvidenceMatrixInput): ChartOutput {
   const heads = columnHeads({
     totalPx: sm,
     where,
-    columns: columns.map((label, c) => ({ label, total: colTotals[c], tip: `${label}: ${colTotals[c]} ${input.unit}` })),
+    columns: columns.map((label, c) => ({ label, total: colTotals[c], tip: `${label}: ${colTotals[c]} ${colTotals[c] === 1 && input.unitOne ? input.unitOne : input.unit}` })),
     colX,
     pitch,
     y: 8,

@@ -45,7 +45,7 @@ import {
 import { machineLinks, machineEvent, CONTROLS_DATASET_PATH, CONTROLS_SCHEMA_PATH } from '../../lib/controls-md';
 import { collectionPage } from '../../lib/jsonld';
 import { flow, lollipop, NARROW_WIDTH } from '../../lib/charts';
-import { clauseAnchor, clauseLabel, profileFlow, topClauses, FLOW_FRAMEWORKS, TOP_CLAUSES } from '../../lib/page-visuals/controls-flows';
+import { clauseAnchor, clauseLabel, clauseName, profileFlow, topClauses, FLOW_FRAMEWORKS, TOP_CLAUSES } from '../../lib/page-visuals/controls-flows';
 import '../../styles/resources.css';
 
 // Literals, so lib/llms-routes.ts can read them; they must equal the lib's.
@@ -100,7 +100,9 @@ const flowChart = {
   asOf: CONTROLS_AS_OF,
 };
 const flowWide = flow({ ...flowChart, id: 'cw-flow-w', width: 640, layout: 'wide' });
-const flowNarrow = flow({ ...flowChart, id: 'cw-flow-n', width: NARROW_WIDTH, layout: 'narrow' });
+// The narrow rows are named as printed ("Agent runtime to AIUC-1: 14"): the
+// full framework names under every profile pass the 12 KB budget.
+const flowNarrow = flow({ ...flowChart, id: 'cw-flow-n', width: NARROW_WIDTH, layout: 'narrow', rowNames: 'short' });
 const otherCount = crosswalk.frameworks.length - FLOW_FRAMEWORKS;
 const flowCaption = `Each band is the mappings the controls of one profile make to one framework. The ${FLOW_FRAMEWORKS} frameworks with the most mappings are drawn by name${
   otherCount > 0 ? `, the other ${otherCount} together` : ''
@@ -109,7 +111,12 @@ const flowCaption = `Each band is the mappings the controls of one profile make 
 // The clauses with the most controls (after the index, before #obligations).
 const LOLLIPOP_LABEL = NARROW_WIDTH - 30;
 const top = topClauses();
-const clauseItems = top.map((c) => ({ label: clauseLabel(c.fw, c.row, LOLLIPOP_LABEL), value: c.controls, href: `#${clauseAnchor(c.fw, c.row)}` }));
+const clauseItems = top.map((c) => ({
+  label: clauseLabel(c.fw, c.row, LOLLIPOP_LABEL),
+  name: clauseName(c.fw, c.row),
+  value: c.controls,
+  href: `#${clauseAnchor(c.fw, c.row)}`,
+}));
 const clauseChart = {
   title: 'The most covered clauses',
   desc: `The ${TOP_CLAUSES} clauses or ids that the most controls map to, largest first, ties in the order of the framework tables.`,

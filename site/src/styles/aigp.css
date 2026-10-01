@@ -97,6 +97,11 @@
   max-width: 760px;
 }
 
+/* The heatmap is two images (domains I and II, III and IV), one under the other. */
+.ag-figure .figure-canvas > svg + svg {
+  margin-top: var(--s-4);
+}
+
 /* ---- Study paths ------------------------------------------------------------ */
 .ag-notice {
   max-width: var(--prose);

@@ -22,7 +22,7 @@ import {
   studyPath,
 } from '../src/data/aigp';
 import { aigpMapProblems, resolveAigpLink, resolvedAigpMap } from '../src/lib/aigp-coverage';
-import { aigpHeatmapSvg } from '../src/lib/aigp-heatmap';
+import { aigpHeatmapSvgs } from '../src/lib/aigp-heatmap';
 
 // The em dash, built from its code point so this file never contains one.
 const EM_DASH = String.fromCharCode(0x2014);
@@ -149,43 +149,50 @@ test.describe('AIGP coverage map', () => {
   });
 
   test('the heatmap draws one cell per indicator and keeps the figure contract', () => {
-    const alt =
-      'Heatmap of the 58 AIGP performance indicators in 13 competencies, each cell marked taught or partly taught on this site.';
-    expect(alt.length).toBeGreaterThanOrEqual(50);
-    expect(alt.length).toBeLessThanOrEqual(160);
-    const svg = aigpHeatmapSvg(aigpDomains, {
+    const svgs = aigpHeatmapSvgs(aigpDomains, {
       id: 't',
       title: 'AIGP coverage heatmap',
-      alt,
+      alt: (part) =>
+        `Heatmap of the ${part.indicators} AIGP indicators of domains ${part.codes.join(' and ')}, each cell marked taught or partly taught on this site.`,
       asOf: aigpAsOf,
       bokVersion: aigpBok.version,
       bokEffective: aigpBok.effective,
     });
-    expect(svg).toContain('role="img"');
-    expect(svg).toContain('aria-labelledby="fig-t-t fig-t-d"');
-    expect(svg).toContain(`As of ${aigpAsOf}`);
-    expect(svg).toContain('Source: AIGP BoK v2.1');
-    const cells = (group: string) =>
-      (new RegExp(`<g class="${group}">(.*?)</g>`).exec(svg)?.[1].match(/<rect /g) ?? []).length;
+    // Two standalone images of two domains each (the 58 full cell names do
+    // not fit one 12 KB SVG).
+    expect(svgs).toHaveLength(2);
+    const ticks = (svg: string) => /<g class="mono muted" font-size="12" text-anchor="middle">(.*?)<\/g>/.exec(svg)?.[1];
+    svgs.forEach((svg, k) => {
+      const codes = aigpDomains.slice(k * 2, k * 2 + 2).map((d) => d.code);
+      expect(svg).toContain('role="img"');
+      expect(svg).toContain(`aria-labelledby="fig-t-${k + 1}-t fig-t-${k + 1}-d"`);
+      expect(svg).toContain(`<title id="fig-t-${k + 1}-t">AIGP coverage heatmap, domains ${codes.join(' and ')}</title>`);
+      const desc = /<desc id="[^"]+">([^<]*)<\/desc>/.exec(svg)![1];
+      expect(desc.length, desc).toBeGreaterThanOrEqual(50);
+      expect(desc.length, desc).toBeLessThanOrEqual(160);
+      expect(svg).toContain(`As of ${aigpAsOf}`);
+      expect(svg).toContain('Source: AIGP BoK v2.1');
+      expect(svg.includes(EM_DASH)).toBe(false);
+      expect(Buffer.byteLength(svg, 'utf8'), `part ${k + 1}`).toBeLessThanOrEqual(12 * 1024);
+      // Both parts draw their bars on one question axis, so they compare.
+      expect(ticks(svg), `part ${k + 1} axis`).toBe(ticks(svgs[0]));
+    });
+    const group = (name: string) => svgs.map((svg) => new RegExp(`<g class="${name}">(.*?)</g>`).exec(svg)?.[1] ?? '').join('');
+    const cells = (name: string) => (group(name).match(/<rect /g) ?? []).length;
     const partly = aigpIndicators().filter(({ indicator }) => indicator.status === 'partly-taught');
     expect(cells('ag-hm-taught') + cells('ag-hm-partly')).toBe(58);
     expect(cells('ag-hm-partly')).toBe(partly.length);
-    // Each cell's <title> (its chart tooltip) names its domain, its indicator
-    // and the status it is drawn in, in register order within each drawing.
-    const titles = (group: string) =>
-      [...(new RegExp(`<g class="${group}">(.*?)</g>`).exec(svg)?.[1] ?? '').matchAll(/<rect [^>]*><title>([^<]*)<\/title><\/rect>/g)].map((m) => m[1]);
-    for (const [group, status] of [['ag-hm-taught', 'taught'], ['ag-hm-partly', 'partly-taught']] as const) {
-      const expected = aigpIndicators().filter(({ indicator }) => indicator.status === status);
-      const drawn = titles(group);
-      expect(drawn, group).toHaveLength(expected.length);
-      expected.forEach(({ domain, indicator }, i) => {
-        expect(drawn[i]).toContain(`Domain ${domain.code}`);
-        expect(drawn[i]).toContain(indicator.id);
-        expect(drawn[i].endsWith(`: ${statusLabel[status]}`), drawn[i]).toBe(true);
-      });
+    // Each cell's <title> (its chart tooltip) names its indicator by id and
+    // paraphrase and the status it is drawn in, in register order within
+    // each drawing.
+    const decode = (t: string) => t.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+    const titles = (name: string) => [...group(name).matchAll(/<rect [^>]*><title>([^<]*)<\/title><\/rect>/g)].map((m) => decode(m[1]));
+    for (const [name, status] of [['ag-hm-taught', 'taught'], ['ag-hm-partly', 'partly-taught']] as const) {
+      const expected = aigpIndicators()
+        .filter(({ indicator }) => indicator.status === status)
+        .map(({ indicator }) => `${indicator.id} ${indicator.paraphrase}: ${statusLabel[status]}`);
+      expect(titles(name), name).toEqual(expected);
     }
-    expect(svg.includes(EM_DASH)).toBe(false);
-    expect(Buffer.byteLength(svg, 'utf8')).toBeLessThanOrEqual(12 * 1024);
     // Bar widths follow the range midpoint: IV.C (9-11) is 10 wide, II.D (3-5) is 4.
     expect(rangeMidpoint({ min: 9, max: 11 })).toBe(10);
     expect(rangeMidpoint({ min: 3, max: 5 })).toBe(4);

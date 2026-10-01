@@ -56,19 +56,25 @@
 //     /resources corpus, /obligations status isotype.
 //
 //   heatGrid({ rowHeader, rows: [{ label, name?, href? }], columns: [{ label, name? }],
-//              values: (number|null)[][], unit, tone?, showValues?, marginals? })
+//              values: (number|null)[][], unit, unitOne?, tone?, showValues?, marginals? })
 //     Count heatmap, neutral fill-opacity ramp, null = hatched n/a; returns
 //     `sticky` { head, body } for a sticky label column (Chart scroll).
 //     Use for clause x standard dot matrices as well (showValues: false).
 //     `name` is the full name in cell tooltips when the label is a code
 //     (columns [{ label: 'A.6.2.4', name: 'A.6.2.4 AI system ...' }]).
+//     `unitOne` is the singular for a value of 1 ("1 threat", as flow has).
 //
-//   rankedBars / lollipop({ items: [{ label, value, tone?, state?, highlight?, href? }],
+//   rankedBars / lollipop({ items: [{ label, name?, value, tone?, state?, highlight?, href? }],
 //                          unit, percent?, sort? })
 //     A linked item is one whole-row target (label, mark, value), 24 high or
-//     more; value labels step past a gridline they would sit on.
-//   stackedBars / stacked100({ series: [{ label, tone?, state? }],
-//                              items: [{ label, values: number[] }], unit })
+//     more; value labels step past a gridline they would sit on. `name` is
+//     the full name in the mark's tooltip and the row link when `label` (the
+//     drawn text and the table cell) is shortened.
+//   stackedBars / stacked100({ series: [{ label, name?, tone?, state? }],
+//                              items: [{ label, values: number[] }], unit, countUnit?, unitOne? })
+//     Segment names read "Item · Series: 13 topics (52%)": a series `name`
+//     drops what its label adds (a count), `countUnit` is the noun of a raw
+//     count when `unit` names a share, `unitOne` its singular.
 //   divergingBars({ left: { label }, right: { label },
 //                   items: [{ label, left, right, note? }], segments?, unit })
 //     Butterfly; left/right may be [core, related] with segments: ['core','related'].
@@ -117,7 +123,7 @@
 //     relations (RADIAL_MIN_RELATIONS): skip the figure, keep the lists.
 //     'list' (default under 480 wide) is the narrow variant. Table: Family |
 //     Item | Relation, every relation (a family draws at most 6, then "+N more",
-//     named after the items it hides).
+//     named after the full names of the items it hides).
 //     radialLabelWidth(width, layout, centre) is the room a node label gets,
 //     for callers that shorten their labels to fit.
 //
@@ -135,7 +141,7 @@
 //     isResponseToSpecify). Table: Step | Item | Detail.
 //
 //   flow({ columns: [{ key, label }] (2 or 3), nodes: [{ id, column, label, name?, tone?, href? }],
-//          links: [{ from, to, value }], unit, unitOne?, layout?: 'wide' | 'narrow',
+//          links: [{ from, to, value }], unit, unitOne?, layout?: 'wide' | 'narrow', rowNames?,
 //          order?: 'barycentre' | 'input', plotHeight? })
 //     Sankey / alluvial laid out at build: node blocks sized by max(in, out),
 //     24 high at least, 8 apart, label and count inside; cubic ribbons
@@ -144,7 +150,10 @@
 //     node with its outgoing ribbons for the CSS hover. At most 9 nodes a
 //     column (FLOW_MAX_NODES; group the tail as "Other (N)"). 'narrow' (280,
 //     default under 480 wide) lists each source with bars of its
-//     destinations. Table: From | To | value, one row per link.
+//     destinations; a linked destination row is named as its wide ribbon,
+//     "Source to Destination: n units" (rowNames 'short': by the printed
+//     labels, "Source to Destination: n", where full names pass the budget).
+//     Table: From | To | value, one row per link.
 //
 //   concentricRings({ rings: [{ key, label, href? }] (inside out), sectors?: [{ key, label }],
 //                     marks: [{ label, name?, ring, sector?, shape?, state?, tone?, status?, href? }],

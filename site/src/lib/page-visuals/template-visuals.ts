@@ -131,6 +131,7 @@ export function recordInstrumentGrid(): Pair {
     rows: schemas.map((s, i) => ({ label: s.title, href: schemaHref(s), values: ids.map((id) => perSchema[i].get(id) ?? 0) })),
     columns: ids.map(short),
     unit: 'references',
+    unitOne: 'reference',
     tableCaption: 'Distinct x-evidences references per record schema and instrument',
   };
   return {
