@@ -1,6 +1,7 @@
 // chart-primitives.spec.ts: the contract of the build-time chart kit
 // (src/lib/charts/) that the page visuals of waves 1 and 2 rely on, checked
-// on the modules directly (pure Node, no browser): the same input gives the
+// on the modules directly (pure Node; only the pointer-target sizes are
+// measured in a browser, from the SVG alone): the same input gives the
 // same SVG; the SVG carries the accessible shell (role, <title>, <desc>) and
 // its provenance lines, no hex colour and no em dash; every class it emits is
 // styled in both style modes (figures.css for .figc, chart.css for .chart);
@@ -49,7 +50,7 @@ import {
 } from '../src/lib/charts';
 import { enforcementLabels } from '../src/data/policy-card';
 import { harms, levelLabel, levelOrder, mitDomains } from '../src/data/harms';
-import { frameworks, obligations } from '../src/data/frameworks';
+import { frameworks, obligations, type FrameworkType } from '../src/data/frameworks';
 import { chapterParts, chaptersOrdered } from '../src/data/chapters';
 
 const base = { source: 'chapter 08 [3]', asOf: '2026-09-30' };
@@ -1127,6 +1128,12 @@ test('concentricRings: every harm sits inside its level ring and its MIT domain 
     for (const [i, p] of drawn.entries()) {
       for (const q of drawn.slice(i + 1)) expect(Math.hypot(p.x - q.x, p.y - q.y), `${p.label} / ${q.label}`).toBeGreaterThan(10);
     }
+    // Drawn (so tabbed) from the inside out, then clockwise from the top.
+    const order = drawn.map((d) => [levelOrder.indexOf(harms.find((x) => x.harmType === d.label)!.level), angle(d.x, d.y)]);
+    order.slice(1).forEach(([ri, a], i) => {
+      const [pr, pa] = order[i];
+      expect(ri > pr || (ri === pr && a > pa), `${drawn[i + 1].label} after ${drawn[i].label} (${layout})`).toBe(true);
+    });
   }
 });
 
@@ -1161,21 +1168,31 @@ test('progressRing: each arc and label carries the hooks a page script updates, 
   }
 });
 
-test('treemap: tile areas are proportional to the obligations per instrument, no tile overlaps, and tiles under 24 px merge into an unlinked-or-full "+N"', () => {
+test('treemap: tile areas are proportional to the obligations per instrument, no tile overlaps, every tile and group header is labelled, and small or unlabelled tiles merge into an unlinked-or-full "+N"', () => {
   const counts = new Map<string, number>();
   for (const o of obligations) counts.set(o.frameworkId, (counts.get(o.frameworkId) ?? 0) + 1);
+  // The page's group names and sizes (/resources/frameworks): "Control sets"
+  // is the narrow group whose header once cut to its total.
+  const NAME: Record<FrameworkType, string> = { law: 'Laws', standard: 'Standards', framework: 'Frameworks', code: 'Codes', controls: 'Control sets' };
   const groups = [...new Set(frameworks.map((f) => f.type))]
     .map((type) => ({
-      label: type,
+      label: NAME[type],
       href: `/resources/frameworks#type-${type}`,
       items: frameworks.filter((f) => f.type === type && counts.get(f.id)).map((f) => ({ label: f.short, name: f.id, value: counts.get(f.id)!, href: `/resources/frameworks#fw-${f.id}` })),
     }))
     .filter((g) => g.items.length);
   const valueOf = new Map(groups.flatMap((g) => g.items.map((it) => [it.name, it.value])));
+  const shortOf = new Map(groups.flatMap((g) => g.items.map((it) => [it.name, it.label])));
   const groupOf = new Map(groups.flatMap((g) => g.items.map((it) => [it.name, g.label])));
-  for (const layout of ['wide', 'narrow'] as const) {
-    const els = parseSvg(treemap({ ...base, id: 'ch-t', title, desc, groups, unit: 'obligations', layout }).svg);
+  const total = (g: (typeof groups)[number]) => g.items.reduce((a, it) => a + it.value, 0);
+  const LAYOUTS = [
+    { layout: 'wide' as const, width: 760, plotHeight: 520 },
+    { layout: 'narrow' as const, width: NARROW_WIDTH, plotHeight: 560 },
+  ];
+  for (const { layout, width, plotHeight } of LAYOUTS) {
+    const els = parseSvg(treemap({ ...base, id: 'ch-t', title, desc, groups, unit: 'obligations', layout, width, plotHeight, minTile: 40 }).svg);
     const box = (e: SvgEl) => ['x', 'y', 'width', 'height'].map((a) => Number(e.attr[a]));
+    const texts = els.filter((e) => e.tag === 'text').map((e) => ({ x: Number(e.attr.x), y: Number(e.attr.y), text: e.text }));
     const tiles = els.flatMap((e, i) => {
       if (e.tag !== 'rect' || !/^(tm( |$)|tm-hatch$)/.test(e.attr.class ?? '')) return [];
       const name = nameOf(els, i)!;
@@ -1185,13 +1202,31 @@ test('treemap: tile areas are proportional to the obligations per instrument, no
     });
     expect(tiles.flatMap((t) => t.members).sort(), `every instrument once (${layout})`).toEqual([...valueOf.keys()].sort());
     for (const t of tiles.filter((x) => x.merged)) expect(t.value).toBe(t.members.reduce((a, m) => a + valueOf.get(m)!, 0));
-    const k = tiles.reduce((a, t) => a + t.b[2] * t.b[3], 0) / tiles.reduce((a, t) => a + t.value, 0);
+    // No mute tile: each prints its instrument's short name, or "+N".
     for (const t of tiles) {
+      const [x, y, w, h] = t.b;
+      const want = t.merged ? `+${t.members.length}` : shortOf.get(t.members[0]);
+      const inside = texts.filter((p) => p.x > x && p.x < x + w && p.y > y && p.y < y + h).map((p) => p.text);
+      expect(inside.join(' '), `${want} labelled (${layout})`).toContain(want!);
+    }
+    // One area scale, except a narrow band too thin to label (drawn 24 high).
+    const bandOf = (label: string) => {
+      const own = tiles.filter((t) => groupOf.get(t.members[0]) === label).map((t) => t.b);
+      const y0 = Math.min(...own.map((b) => b[1]));
+      return { h: Math.max(...own.map((b) => b[1] + b[3])) - y0, w: Math.max(...own.map((b) => b[0] + b[2])) - Math.min(...own.map((b) => b[0])) };
+    };
+    const floored = new Set(layout === 'narrow' ? groups.filter((g) => Math.abs(bandOf(g.label).h - 24) < 0.2).map((g) => g.label) : []);
+    const scaled = tiles.filter((t) => !floored.has(groupOf.get(t.members[0])!));
+    const k = scaled.reduce((a, t) => a + t.b[2] * t.b[3], 0) / scaled.reduce((a, t) => a + t.value, 0);
+    for (const t of scaled) {
       const [, , w, h] = t.b;
       expect(t.value * k, `${t.members[0]} area (${layout})`).toBeGreaterThanOrEqual((w - 1) * (h - 1));
       expect(t.value * k, `${t.members[0]} area (${layout})`).toBeLessThanOrEqual((w + 1) * (h + 1));
-      const small = w < 23.95 || h < 23.95;
-      if (small) expect(t.linked, `${t.members[0]} is small, so unlinked`).toBe(false);
+    }
+    for (const label of floored) expect((total(groups.find((g) => g.label === label)!) * k) / bandOf(label).w, `${label} needed the floor`).toBeLessThan(24);
+    for (const t of tiles) {
+      const [, , w, h] = t.b;
+      if (w < 23.95 || h < 23.95) expect(t.linked, `${t.members[0]} is small, so unlinked`).toBe(false);
     }
     const heads = els.filter((e) => e.tag === 'rect' && e.attr.class === 'tm-gh').map(box);
     const rects = [...tiles.map((t) => t.b), ...heads];
@@ -1202,11 +1237,13 @@ test('treemap: tile areas are proportional to the obligations per instrument, no
         expect(ix <= 0.2 || iy <= 0.2, `overlap (${layout})`).toBe(true);
       }),
     );
+    // Every group header names its group (stacked over lines when narrow).
+    const mono = els.filter((e) => e.tag === 'text' && e.attr.class === 'mono').map((e) => e.text).join(' ');
+    for (const g of groups) expect(mono, `${g.label} header (${layout})`).toContain(`${g.label} (${total(g)})`);
     for (const g of groups) {
       const own = tiles.filter((t) => !t.merged && groupOf.get(t.members[0]) === g.label);
-      const smallOwn = own.filter((t) => t.b[2] < 23.95 || t.b[3] < 23.95).length;
-      const hasMerged = tiles.some((t) => t.merged && groupOf.get(t.members[0]) === g.label);
-      expect(smallOwn, `${g.label}: small tiles merge (${layout})`).toBeLessThanOrEqual(hasMerged ? 0 : 1);
+      const smallOwn = own.filter((t) => t.b[2] < 40 || t.b[3] < 40).length;
+      expect(smallOwn, `${g.label}: small tiles merge (${layout})`).toBeLessThanOrEqual(own.length === 1 && !tiles.some((t) => t.merged && groupOf.get(t.members[0]) === g.label) ? 1 : 0);
     }
   }
 });
@@ -1274,48 +1311,118 @@ test('ladder: cumulative steps list what each adds, every step after the first o
   }
 });
 
-test('realistic loads stay within the 12 KB per SVG that Chart.astro enforces', () => {
-  const names = ['Agent runtime', 'Model lifecycle', 'Data governance', 'Inventory', 'Evaluations', 'Supply chain', 'Incident response', 'Human oversight', 'Other (4)'];
-  const targetsOf = ['EU AI Act', 'ISO 42001 Annex A', 'NIST AI RMF', 'OWASP ASI/LLM', 'IMDA agentic', 'AIUC-1', 'NIST SP 800-53', 'MITRE ATLAS', 'Other (22)'];
-  const nodes = [
-    ...names.map((label, i) => ({ id: `a${i}`, column: 'p', label, href: `/controls#a${i}` })),
-    ...targetsOf.map((label, i) => ({ id: `b${i}`, column: 'f', label, href: `/controls/crosswalk#b${i}` })),
+// WCAG 2.5.8 measured where it applies: the links' boxes in a browser (with
+// figures.css, which sizes the full-width row targets), the SVG drawn at the width a 320 px phone gives a narrow chart (274 px, the
+// 0.98 scale of Chart.astro CANVAS_320) or at 1:1 for a wide one.
+const TARGET_CASES: { name: string; px: number; make: () => ChartOutput }[] = [
+  {
+    name: 'lifecycleRing list, every stage and record linked',
+    px: 274,
+    make: () =>
+      lifecycleRing({
+        ...base,
+        id: 'ch-y',
+        title,
+        desc,
+        ...lifecycleInput,
+        stages: lifecycleInput.stages.map((s) => ({ ...s, href: `#stage-${s.key}` })),
+        nodes: lifecycleInput.nodes.map((n) => ({ ...n, href: `#schema-${n.label}` })),
+        layout: 'list',
+      }),
+  },
+  {
+    name: 'lifecycleRing ring, every stage and record linked',
+    px: 640,
+    make: () =>
+      lifecycleRing({
+        ...base,
+        id: 'ch-y',
+        title,
+        desc,
+        ...lifecycleInput,
+        stages: lifecycleInput.stages.map((s) => ({ ...s, href: `#stage-${s.key}` })),
+        nodes: lifecycleInput.nodes.map((n) => ({ ...n, href: `#schema-${n.label}` })),
+        layout: 'ring',
+      }),
+  },
+  ...([640, NARROW_WIDTH] as const).map((width) => ({
+    name: `lollipop ${width}, one- and two-line labels linked`,
+    px: width === NARROW_WIDTH ? 274 : 640,
+    make: () =>
+      lollipop({
+        ...base,
+        id: 'ch-l',
+        title,
+        desc,
+        width,
+        labelWidth: width === 640 ? 260 : undefined,
+        unit: 'controls',
+        items: [
+          { label: 'OWASP Agentic Top 10: Top 10 for Agentic Applications 2026', value: 31, href: '#a' },
+          { label: 'EU AI Act Art. 14 human oversight', value: 17, href: '#b' },
+          { label: 'ISO 42001 Annex A A.6.2.5: AI system deployment', value: 14, href: '#c' },
+          { label: 'NIST AI RMF: MANAGE', value: 9, href: '#d' },
+        ],
+      }),
+  })),
+  {
+    name: 'flow narrow, every node linked',
+    px: 274,
+    make: () => flow({ ...base, id: 'ch-f', title, desc, ...flowInput, nodes: flowNodes.map((n) => ({ ...n, href: `#node-${n.id}` })), layout: 'narrow' }),
+  },
+  {
+    name: 'concentricRings narrow, linked ring key',
+    px: 274,
+    make: () => concentricRings({ ...base, id: 'ch-g', title, desc, ...ringInput, rings: ringInput.rings.map((r) => ({ ...r, href: `#ring-${r.key}` })), layout: 'narrow' }),
+  },
+];
+for (const c of TARGET_CASES) {
+  test(`${c.name}: every link is a pointer target 24 px or more, none overlapping (WCAG 2.5.8)`, async ({ page }) => {
+    await page.setContent(`<style>${figuresCss}</style><div style="width:${c.px}px">${c.make().svg.replace('<svg ', '<svg style="display:block;width:100%;height:auto" ')}</div>`);
+    const boxes = await page.$$eval('svg a', (links) => links.map((a) => a.getBoundingClientRect()).map((r) => ({ x: r.x, y: r.y, w: r.width, h: r.height })));
+    expect(boxes.length).toBeGreaterThan(2);
+    boxes.forEach((b, i) => {
+      expect(Math.min(b.w, b.h), `link ${i}`).toBeGreaterThanOrEqual(24);
+      boxes.slice(i + 1).forEach((o, j) => {
+        const ix = Math.min(b.x + b.w, o.x + o.w) - Math.max(b.x, o.x);
+        const iy = Math.min(b.y + b.h, o.y + o.h) - Math.max(b.y, o.y);
+        expect(ix <= 0.5 || iy <= 0.5, `links ${i} and ${i + j + 1} overlap`).toBe(true);
+      });
+    });
+  });
+}
+
+test('flow: a ribbon thinner than 2 units keeps its exact thickness and is the one class the sheets stroke 2 wide', () => {
+  const links = [
+    { from: 'ar', to: 'eu', value: 200 },
+    { from: 'ar', to: 'iso', value: 1 },
+    { from: 'ev', to: 'iso', value: 2 },
   ];
-  const links = Array.from({ length: 81 }, (_, n) => ({ from: `a${Math.floor(n / 9)}`, to: `b${n % 9}`, value: 1 + ((n * 37) % 60) }))
-    .filter((_, n) => n % 2 === 0)
-    .slice(0, 40);
-  const big = { columns: flowColumns, nodes, links, unit: 'pairs' };
-  const harmRings = levelOrder.map((l) => ({ key: l, label: levelLabel[l] }));
-  const harmSectors = Object.entries(mitDomains).map(([key, label]) => ({ key, label }));
-  const harmMarks = harms.map((h) => ({ label: h.harmType, ring: h.level, sector: h.mitTaxonomy[0].split('.')[0], tone: h.layerN[0], href: `/resources/harms#harm-${h.id}` }));
-  const rings = { rings: harmRings, sectors: harmSectors, marks: harmMarks, centre: { label: 'Harm' } };
-  const counts = new Map<string, number>();
-  for (const o of obligations) counts.set(o.frameworkId, (counts.get(o.frameworkId) ?? 0) + 1);
-  const tm = [...new Set(frameworks.map((f) => f.type))].map((type) => ({
-    label: type,
-    href: `/resources/frameworks#type-${type}`,
-    items: frameworks.filter((f) => f.type === type && counts.get(f.id)).map((f) => ({ label: f.short, name: f.name, value: counts.get(f.id)!, href: `#fw-${f.id}` })),
-  }));
-  const parts: SpinePart[] = chapterParts.map((p) => ({
-    label: p.title,
-    chapters: chaptersOrdered.filter((c) => c.part === p.id).map((c) => ({ num: c.order, label: c.shortTitle, href: `/bok/${c.slug}`, value: 10 + c.order, marks: [{ shape: 'circle' as const, label: 'Infographic', count: c.order % 4 }, { shape: 'diamond' as const, label: 'Diagram', count: c.order % 3 }] })),
-  }));
-  const stages = ['Intake', 'Build', 'Test', 'Release', 'Operate', 'Retire'].map((label) => ({ key: label.toLowerCase(), label }));
-  const records = Array.from({ length: 20 }, (_, i) => ({ label: `record-schema-${i + 1}`, stage: stages[i % 6].key, size: 6 + i, fill: (i % 5) / 5, href: `/resources/templates#schema-${i}` }));
-  const centre = { label: 'Whole organisation', nodes: ['policy-card', 'training-record', 'evidence-record', 'control-observation'].map((label, i) => ({ label, size: 10 + i, fill: 0.5, href: `#c${i}` })) };
-  const LOADS: [string, () => ChartOutput][] = [
-    ['flow 9 + 9 nodes, 40 links', () => flow({ ...base, id: 'ch-b', title, desc, ...big })],
-    ['flow narrow', () => flow({ ...base, id: 'ch-b', title, desc, ...big, layout: 'narrow' })],
-    ['rings, 25 harms', () => concentricRings({ ...base, id: 'ch-b', title, desc, ...rings })],
-    ['rings narrow', () => concentricRings({ ...base, id: 'ch-b', title, desc, ...rings, layout: 'narrow' })],
-    ['lifecycle, 24 records', () => lifecycleRing({ ...base, id: 'ch-b', title, desc, stages, nodes: records, centre })],
-    ['lifecycle list', () => lifecycleRing({ ...base, id: 'ch-b', title, desc, stages, nodes: records, centre, layout: 'list' })],
-    // Every instrument linked at 24 px passes the budget: the long tail merges
-    // sooner with minTile, the lever the kit gives for this.
-    ['treemap, every instrument', () => treemap({ ...base, id: 'ch-b', title, desc, groups: tm, unit: 'obligations', minTile: 36 })],
-    ['treemap narrow', () => treemap({ ...base, id: 'ch-b', title, desc, groups: tm, unit: 'obligations', layout: 'narrow' })],
-    ['spine bars, 24 chapters', () => bookSpine({ ...base, id: 'ch-b', title, desc, parts, unit: 'min' })],
-    ['spine dots vertical', () => bookSpine({ ...base, id: 'ch-b', title, desc, parts, encoding: 'dots', unit: 'figures', orientation: 'vertical' })],
-  ];
-  for (const [name, make] of LOADS) expect(Buffer.byteLength(make().svg), name).toBeLessThanOrEqual(12 * 1024);
+  const { svg } = flow({ ...base, id: 'ch-f', title, desc, ...flowInput, nodes: flowNodes.filter((n) => n.id !== 'asi'), links });
+  const ribbons = parseSvg(svg).flatMap((e) => {
+    if (e.tag !== 'path' || !/C/.test(e.attr.d ?? '')) return [];
+    const n = e.attr.d.match(/-?[\d.]+/g)!.map(Number);
+    return [{ t: n[8] - n[7], thin: e.attr.class === 'sk-thin' }];
+  });
+  const k = ribbons[0].t / 200;
+  expect(ribbons.map((r) => r.t / k)).toEqual([200, 1, 2].map((v) => expect.closeTo(v, 0)));
+  expect(ribbons.filter((r) => r.thin).length).toBeGreaterThan(0);
+  for (const r of ribbons) expect(r.thin, `thin iff under 2 (${r.t})`).toBe(r.t < 2);
+});
+
+test('ranked bars and lollipops keep each value label clear of the gridlines', () => {
+  const values = [31, 28, 23, 17, 14, 14, 13, 11, 11, 9, 9, 8, 8];
+  for (const make of [rankedBars, lollipop]) {
+    for (const width of [640, NARROW_WIDTH]) {
+      const els = parseSvg(make({ ...base, id: 'ch-v', title, desc, width, unit: 'controls', items: values.map((value, i) => ({ label: `Clause ${i + 1}`, value })) }).svg);
+      const grid = els.filter((e) => e.tag === 'line' && e.attr.class === 'rule').map((e) => Number(e.attr.x1));
+      const labels = els.filter((e) => e.tag === 'text' && e.attr.class === 'num' && e.attr['text-anchor'] === undefined && Number(e.attr['font-size']) === 12.5);
+      expect(labels.map((e) => Number(e.text))).toEqual(values);
+      for (const l of labels) {
+        const x = Number(l.attr.x);
+        const w = l.text.length * 12.5 * 0.6;
+        for (const g of grid) expect(g <= x - 1 || g >= x + w + 1, `${make.name} ${width}: "${l.text}" at ${x} on the gridline at ${g}`).toBe(true);
+      }
+    }
+  }
 });

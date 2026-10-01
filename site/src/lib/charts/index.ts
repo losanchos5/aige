@@ -45,6 +45,8 @@
 //
 //   rankedBars / lollipop({ items: [{ label, value, tone?, state?, highlight?, href? }],
 //                          unit, percent?, sort? })
+//     A linked item is one whole-row target (label, mark, value), 24 high or
+//     more; value labels step past a gridline they would sit on.
 //   stackedBars / stacked100({ series: [{ label, tone?, state? }],
 //                              items: [{ label, values: number[] }], unit })
 //   divergingBars({ left: { label }, right: { label },
@@ -71,7 +73,8 @@
 //
 //   venn3({ sets: [A, B, C], items: [{ label, sets: string[] }], layout: 'venn' | 'euler' | 'upset',
 //           unit, callouts? })
-//     Three-set overlap; 'upset' is the narrow variant (same table). 'euler'
+//     Three-set overlap; 'upset' is the narrow variant (same table, a key
+//     saying filled dot = in the set, hollow = not). 'euler'
 //     draws nested ellipses when nestedChain(sets, items) finds the sets
 //     strictly nested (no empty region), and the Venn otherwise.
 //
@@ -113,7 +116,8 @@
 //          order?: 'barycentre' | 'input', plotHeight? })
 //     Sankey / alluvial laid out at build: node blocks sized by max(in, out),
 //     24 high at least, 8 apart, label and count inside; cubic ribbons
-//     between consecutive columns (fill-opacity, no text on them), a <g> per
+//     between consecutive columns (fill-opacity, no text on them; one under
+//     2 units stroked up to 2 so it stays visible), a <g> per
 //     node with its outgoing ribbons for the CSS hover. At most 9 nodes a
 //     column (FLOW_MAX_NODES; group the tail as "Other (N)"). 'narrow' (280,
 //     default under 480 wide) lists each source with bars of its
@@ -132,7 +136,8 @@
 //                   centre: { label, nodes? }, layout?: 'ring' | 'list', sizeLabel?, fillLabel? })
 //     Cycle of stages (the records ring): numbered arcs, each stage's records
 //     beside the ring, the centre's inside; circle area = size, inner disc =
-//     fill (0 to 1). 'list' (280, narrow) is one list per stage. Table:
+//     fill (0 to 1), the legend showing both on a scale; a linked row is one
+//     26-high target. 'list' (280, narrow) is one list per stage. Table:
 //     Stage | Record | size | fill (%).
 //   progressRing({ items: [{ key, label, done, total }] })
 //     Share done per item; a page script updates it in place (no animation):
@@ -143,10 +148,11 @@
 //             fill?, href? }] }], unit, unitOne?, layout?: 'wide' | 'narrow', plotHeight?,
 //             fillHeader?, minTile? })
 //     Squarified (Bruls) by group, then within the group under a header
-//     strip; tile area = value x one scale. Tiles under 24 x 24 merge into
-//     "+N" (linked to the group href when a full target); a label only when
-//     it fits; state by pattern; fill = a bar along the foot. 'narrow' (280)
-//     stacks the groups as bands. `minTile` (default 24) merges a long tail
+//     strip (stacked over up to three lines when narrow); tile area = value x
+//     one scale. Tiles under 24 x 24, or too small for their label, merge
+//     into "+N" (linked to the group href when a full target), so every tile
+//     is labelled; state by pattern; fill = a bar along the foot. 'narrow'
+//     (280) stacks the groups as bands, each at least 24 high. `minTile` (default 24) merges a long tail
 //     sooner when the SVG would pass 12 KB (every framework linked: 36).
 //     Table: Group | Item | value | fill | status.
 //
@@ -164,7 +170,8 @@
 //     warning, pipeline, magnifier), shared with lib/evidence-chain.ts.
 //
 // Helpers for new primitives: linearScale, timeScale, textWidth, fitText,
-// wrapText, open, close, assemble, markStyles, shape, targets, words, minText,
+// wrapText, open, close, assemble, markStyles, shape, targets, hitRect (a
+// whole-row pointer target inside a link), words, minText,
 // and asOfMark(scale, asOf, lang, { width, axis }) for the as-of line of any
 // time chart (asOfLabel for one drawn without a scale).
 export type {
@@ -194,6 +201,7 @@ export {
   close,
   esc,
   fitText,
+  hitRect,
   linearScale,
   markClass,
   markStyles,

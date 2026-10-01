@@ -238,6 +238,12 @@
 
 /* Links inside a chart: the label is the visible text, the whole <a> is the
    target. Keep the ink colour; underline on hover/focus. */
+/* The site underlines links; in an SVG the underline takes the <a>'s own
+   fill, black by default and so invisible in dark: give it the ink. */
+.chart a {
+  fill: var(--ink);
+}
+
 .chart a text {
   fill: var(--ink);
   text-decoration: none;
@@ -266,18 +272,18 @@
 .chart .mk-line-3 { fill: var(--bg); stroke: var(--l3-ink); stroke-width: 1.5; }
 .chart .mk-line-4 { fill: var(--bg); stroke: var(--l4-ink); stroke-width: 1.5; }
 .chart .mk-line-5 { fill: var(--bg); stroke: var(--l5-ink); stroke-width: 1.5; }
-.chart .mk-dash-0 { fill: var(--bg); stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
-.chart .mk-dash-1 { fill: var(--bg); stroke: var(--l1-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
-.chart .mk-dash-2 { fill: var(--bg); stroke: var(--l2-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
-.chart .mk-dash-3 { fill: var(--bg); stroke: var(--l3-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
-.chart .mk-dash-4 { fill: var(--bg); stroke: var(--l4-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
-.chart .mk-dash-5 { fill: var(--bg); stroke: var(--l5-ink); stroke-width: 1.5; stroke-dasharray: 3 2; }
-.chart .mk-dot-0 { fill: var(--bg); stroke: var(--ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
-.chart .mk-dot-1 { fill: var(--bg); stroke: var(--l1-ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
-.chart .mk-dot-2 { fill: var(--bg); stroke: var(--l2-ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
-.chart .mk-dot-3 { fill: var(--bg); stroke: var(--l3-ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
-.chart .mk-dot-4 { fill: var(--bg); stroke: var(--l4-ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
-.chart .mk-dot-5 { fill: var(--bg); stroke: var(--l5-ink); stroke-width: 2; stroke-dasharray: 0.1 3.4; stroke-linecap: round; }
+.chart .mk-dash-0 { fill: var(--bg); stroke: var(--ink); stroke-width: 2; stroke-dasharray: 5 2.5; }
+.chart .mk-dash-1 { fill: var(--bg); stroke: var(--l1-ink); stroke-width: 2; stroke-dasharray: 5 2.5; }
+.chart .mk-dash-2 { fill: var(--bg); stroke: var(--l2-ink); stroke-width: 2; stroke-dasharray: 5 2.5; }
+.chart .mk-dash-3 { fill: var(--bg); stroke: var(--l3-ink); stroke-width: 2; stroke-dasharray: 5 2.5; }
+.chart .mk-dash-4 { fill: var(--bg); stroke: var(--l4-ink); stroke-width: 2; stroke-dasharray: 5 2.5; }
+.chart .mk-dash-5 { fill: var(--bg); stroke: var(--l5-ink); stroke-width: 2; stroke-dasharray: 5 2.5; }
+.chart .mk-dot-0 { fill: var(--bg); stroke: var(--ink); stroke-width: 2.25; stroke-dasharray: 0 3.75; stroke-linecap: round; }
+.chart .mk-dot-1 { fill: var(--bg); stroke: var(--l1-ink); stroke-width: 2.25; stroke-dasharray: 0 3.75; stroke-linecap: round; }
+.chart .mk-dot-2 { fill: var(--bg); stroke: var(--l2-ink); stroke-width: 2.25; stroke-dasharray: 0 3.75; stroke-linecap: round; }
+.chart .mk-dot-3 { fill: var(--bg); stroke: var(--l3-ink); stroke-width: 2.25; stroke-dasharray: 0 3.75; stroke-linecap: round; }
+.chart .mk-dot-4 { fill: var(--bg); stroke: var(--l4-ink); stroke-width: 2.25; stroke-dasharray: 0 3.75; stroke-linecap: round; }
+.chart .mk-dot-5 { fill: var(--bg); stroke: var(--l5-ink); stroke-width: 2.25; stroke-dasharray: 0 3.75; stroke-linecap: round; }
 .chart .mk-hatch-0 { stroke: var(--ink); }
 .chart .mk-hatch-1 { stroke: var(--l1-ink); }
 .chart .mk-hatch-2 { stroke: var(--l2-ink); }
@@ -307,6 +313,9 @@
 .chart .venn { fill: var(--ink); fill-opacity: 0.05; stroke: var(--ink); stroke-width: 1.5; }
 .chart .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: normal; text-transform: none; }
 .chart .mk-focus:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+/* A whole-row pointer target (core hitRect): painted, never seen. */
+.chart .hit { fill: transparent; stroke: none; }
+.chart .hit-w { fill: transparent; stroke: none; width: 100%; }
 
 /* Chain and radial primitives (flow.ts, radial.ts, glyphs.ts): the glyph
    vocabulary of VISUAL-GUIDE §1.7, the layer fills and strokes of the
@@ -357,6 +366,7 @@
   }
 
   .chart:is(.ch-flow, .ch-radial) text { fill: CanvasText; }
+  .chart:is(.ch-flow, .ch-radial) a { fill: LinkText; }
   .chart:is(.ch-flow, .ch-radial) a text { fill: LinkText; }
   .chart:is(.ch-flow, .ch-radial) .on-ink { fill: Canvas; }
   .chart:is(.ch-flow, .ch-radial) :is(.panel, .panel-end) { fill: Canvas; stroke: CanvasText; }
@@ -374,24 +384,38 @@
    spine.ts). Sankey ribbons are fills at a fill-opacity with no text on
    them, in the source node's layer ink (or ink); hovering or focusing a node
    group lights its ribbons and dims the rest (CSS only, no transition).
-   Ring bands are two opaque neutral tints; treemap tiles take a light fill
+   Ring bands are two opaque neutral tints edged in --muted (3:1: the ring
+   is data, WCAG 1.4.11); treemap tiles take a light fill
    (a layer pastel only with a tone) so their ink labels keep full contrast,
    with a ground-coloured seam; book parts alternate two neutral ink tints,
    never a layer colour (audit SL-06). The progress arc is a plain stroke a
    page script redraws by attribute, so nothing here animates it. */
 .chart .sk-g > path { fill-opacity: 0.22; }
+/* A ribbon thinner than 2 units keeps its exact geometry (thickness =
+   value) and gets a 2-unit stroke of its own colour, so it stays visible. */
+.chart .sk-thin { stroke-width: 2; stroke-opacity: 0.22; }
 .chart .sk-0 > path { fill: var(--ink); }
+.chart .sk-0 > .sk-thin { stroke: var(--ink); }
 .chart .sk-1 > path { fill: var(--l1-ink); }
+.chart .sk-1 > .sk-thin { stroke: var(--l1-ink); }
 .chart .sk-2 > path { fill: var(--l2-ink); }
+.chart .sk-2 > .sk-thin { stroke: var(--l2-ink); }
 .chart .sk-3 > path { fill: var(--l3-ink); }
+.chart .sk-3 > .sk-thin { stroke: var(--l3-ink); }
 .chart .sk-4 > path { fill: var(--l4-ink); }
+.chart .sk-4 > .sk-thin { stroke: var(--l4-ink); }
 .chart .sk-5 > path { fill: var(--l5-ink); }
-.chart .sk-g:is(:hover, :focus-within) > path { fill-opacity: 0.5; }
-.chart:has(.sk-g:is(:hover, :focus-within)) .sk-g:not(:hover, :focus-within) > path { fill-opacity: 0.08; }
+.chart .sk-5 > .sk-thin { stroke: var(--l5-ink); }
+.chart .sk-g:is(:hover, :focus-within) > path { fill-opacity: 0.5; stroke-opacity: 0.5; }
+.chart:has(.sk-g:is(:hover, :focus-within)) .sk-g:not(:hover, :focus-within) > path { fill-opacity: 0.08; stroke-opacity: 0.08; }
 .chart .sk-node { stroke-width: 1; }
-.chart .rg-a { fill: color-mix(in srgb, var(--ink) 4%, var(--bg)); stroke: var(--line); stroke-width: 1; }
-.chart .rg-b { fill: color-mix(in srgb, var(--ink) 10%, var(--bg)); stroke: var(--line); stroke-width: 1; }
+/* Node corners from the sheet, not an rx on every block (the 12 KB budget). */
+.chart.ch-sankey :is(.panel, .sk-node) { rx: 3px; }
+.chart .rg-a { fill: color-mix(in srgb, var(--ink) 4%, var(--bg)); stroke: var(--muted); stroke-width: 1; }
+.chart .rg-b { fill: color-mix(in srgb, var(--ink) 10%, var(--bg)); stroke: var(--muted); stroke-width: 1; }
+.chart .rg-num { paint-order: stroke; stroke: var(--bg); stroke-width: 3px; stroke-linejoin: round; }
 .chart .lc-arc { fill: none; stroke: color-mix(in srgb, var(--ink) 30%, var(--bg)); stroke-width: 6; stroke-linecap: round; }
+.chart .pr-rim { fill: none; stroke: none; stroke-width: 9; }
 .chart .pr-track { fill: none; stroke: color-mix(in srgb, var(--ink) 12%, var(--bg)); stroke-width: 7; }
 .chart .pr-arc { fill: none; stroke: var(--ink); stroke-width: 7; }
 .chart .tm { stroke: var(--bg); stroke-width: 1.5; }
@@ -414,22 +438,28 @@
 .chart .sp-col { fill: color-mix(in srgb, var(--ink) 3%, var(--bg)); }
 
 /* Forced colours: the same four primitives in system colours, the encoding
-   kept by outline, dash, hatch and the alternation of fills. */
+   kept by outline, dash and hatch. Every book-spine mark is solid CanvasText
+   (the parts stay apart by their rules and headings, a hollow part would read
+   as a state); ribbons are GrayText edged in CanvasText; the progress track
+   is Canvas between two GrayText rims under a CanvasText arc. */
 @media (forced-colors: active) {
   .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) {
     forced-color-adjust: none;
   }
 
   .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) text { fill: CanvasText; }
+  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) a { fill: LinkText; }
   .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) a text { fill: LinkText; }
   .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) .on-ink { fill: Canvas; }
-  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is(.panel, .rg-a, .rg-b, .tm, .tm-line, .tm-dash, .tm-hatch, .tm-gh, .tm-track, .sp-off, .sp-p1, .sp-col, .l1-bg, .l2-bg, .l3-bg, .l4-bg, .l5-bg) { fill: Canvas; stroke: CanvasText; }
+  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) .rg-num { stroke: Canvas; }
+  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is(.panel, .rg-a, .rg-b, .tm, .tm-line, .tm-dash, .tm-hatch, .tm-gh, .tm-track, .sp-off, .sp-col, .l1-bg, .l2-bg, .l3-bg, .l4-bg, .l5-bg) { fill: Canvas; stroke: CanvasText; }
   .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is(.tm-lbg, .hatch-bg) { fill: Canvas; }
   .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is(.rule, .axis, .lc-arc, .pr-arc) { stroke: CanvasText; }
-  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) .pr-track { stroke: GrayText; }
-  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) .sk-g > path { fill: CanvasText; }
-  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is([class*="mk-fill-"], .mk-hi, .sp-p0, .tm-bar) { fill: CanvasText; stroke: CanvasText; }
-  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is([class*="mk-line-"], [class*="mk-dash-"]) { fill: Canvas; stroke: CanvasText; }
+  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) .pr-track { stroke: Canvas; }
+  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) .pr-rim { stroke: GrayText; }
+  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) .sk-g > path { fill: GrayText; fill-opacity: 0.35; stroke: CanvasText; stroke-width: 0.75; stroke-opacity: 1; }
+  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is([class*="mk-fill-"], .mk-hi, .sp-p0, .sp-p1, .tm-bar) { fill: CanvasText; stroke: CanvasText; }
+  .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) :is([class*="mk-line-"], [class*="mk-dash-"], [class*="mk-dot-"]) { fill: Canvas; stroke: CanvasText; }
   .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) [class*="mk-hatch-"] { stroke: CanvasText; }
   .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) [class*="hatch-"]:not(.hatch-bg):not([class*="mk-"]):not(.tm-hatch) { stroke: CanvasText; }
   .chart:is(.ch-sankey, .ch-rings, .ch-treemap, .ch-spine) a:focus-visible { outline-color: Highlight; }

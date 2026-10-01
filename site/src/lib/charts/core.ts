@@ -118,6 +118,9 @@ export interface Words {
   dashed: string;
   dotted: string;
   hatched: string;
+  /** Keys of a membership dot: filled = in the set, hollow = not in it. */
+  inSet: string;
+  notInSet: string;
 }
 
 const WORDS: Record<'en' | 'es', Words> = {
@@ -152,6 +155,8 @@ const WORDS: Record<'en' | 'es', Words> = {
     dashed: 'Dashed',
     dotted: 'Dotted',
     hatched: 'Hatched',
+    inSet: 'filled: in the set',
+    notInSet: 'hollow: not in it',
   },
   es: {
     source: 'Fuente',
@@ -184,6 +189,8 @@ const WORDS: Record<'en' | 'es', Words> = {
     dashed: 'Discontinuo',
     dotted: 'Punteado',
     hatched: 'Rayado',
+    inSet: 'relleno: en el conjunto',
+    notInSet: 'hueco: fuera de él',
   },
 };
 
@@ -535,6 +542,16 @@ export const tip = (value: string): string => {
  *  its name (a wrapped label is split over several <text> elements). */
 export const linkText = (els: string, label: string, href: string): string =>
   `<a href="${esc(href)}" aria-label="${esc(label)}">${els}</a>`;
+
+/** An invisible rect that makes a whole row (glyph, label, value) one pointer
+ *  target: put it first inside the row's <a> so the link's box is the row,
+ *  24 px high or more (WCAG 2.5.8), not the 15 px of its text. Without x and
+ *  w it spans the chart's width (class hit-w, width from the sheet), which
+ *  keeps a long linked list inside the 12 KB budget. */
+export const hitRect = (y: number, h: number, x?: number, w?: number): string =>
+  x === undefined || w === undefined
+    ? `<rect class="hit-w" y="${r1(y)}" height="${r1(h)}"/>`
+    : `<rect class="hit" x="${r1(x)}" y="${r1(y)}" width="${r1(w)}" height="${r1(h)}"/>`;
 
 export interface Box {
   x: number;

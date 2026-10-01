@@ -6,14 +6,16 @@
 // draws the sets as nested ellipses when each lies strictly inside the next
 // (so no region is empty), and falls back to the Venn when they do not; the
 // UpSet draws one bar per non-empty region, largest first, with a three-dot
-// membership mark. All return the same table: one row per item, Yes/No per set.
+// membership mark, keyed (filled = in the set, hollow = not). All return the same table: one row per item, Yes/No per set.
 import {
   NARROW_WIDTH,
   minText,
   assemble,
   fitText,
+  legend,
   linearScale,
   markClass,
+  markStyles,
   nonEmpty,
   r1,
   table,
@@ -218,7 +220,20 @@ export function venn3(input: Venn3Input): ChartOutput {
       y += 16;
       out.push(text(L, y, line, { size: minText(W), cls: 'ink2', where: 'dot key' }));
     }
-    y += 10;
+    // What a dot's fill means: filled = in that set, hollow = not in it.
+    const vw = words(input.lang);
+    const fillKey = legend(
+      [
+        { label: vw.inSet, shape: 'circle', state: 'filled' },
+        { label: vw.notInSet, shape: 'circle', state: 'outline' },
+      ],
+      L,
+      y + 20,
+      W - L,
+      markStyles(input.id),
+    );
+    out.push(...fillKey.els);
+    y = fillKey.bottom + 10;
     const x0 = L + 52;
     const x1 = W - L - 36;
     const s = linearScale(rows.map((m) => regions.get(m)!.length), [x0, x1], { integer: true, maxTicks: 5 });
