@@ -32,8 +32,9 @@
 // updatable in place by a page script (no animation): each arc is a <circle
 // pathLength="100" data-ring="<key>"> whose stroke-dasharray is "<pct> 100",
 // the percentage a <text data-ring-label="<key>"> and the count a
-// <text data-ring-count="<key>">; the script changes those attributes and
-// texts. Table: Item | Done | Total | Percent.
+// <text data-ring-count="<key>">, and each ring's group is named by a
+// <title data-ring-title="<key>"> ("Stage: 3 of 7 done (43%)"); the script
+// changes those attributes and texts. Table: Item | Done | Total | Percent.
 import {
   NARROW_WIDTH,
   assemble,
@@ -85,6 +86,7 @@ const RING_WORDS = {
     record: 'Record',
     size: 'Size',
     done: 'Done',
+    progress: (d: number, n: number, pc: number) => `${d} of ${n} done (${pc}%)`,
     percent: 'Percent',
     rings: 'Rings, from the centre out',
     sectors: 'Sectors',
@@ -98,6 +100,7 @@ const RING_WORDS = {
     record: 'Registro',
     size: 'Tamaño',
     done: 'Hechos',
+    progress: (d: number, n: number, pc: number) => `${d} de ${n} hechos (${pc} %)`,
     percent: 'Porcentaje',
     rings: 'Anillos, del centro hacia fuera',
     sectors: 'Sectores',
@@ -125,8 +128,12 @@ export interface RingSector {
 }
 
 export interface RingMark {
-  /** Name in the table and the mark's tooltip. */
+  /** Short name: the table row and the key (keyMarks). */
   label: string;
+  /** Full name for the mark's <title> (its tooltip and accessible name),
+   *  when the label is a code: "EVAL-001 Isolate the harness" (default: the
+   *  label). */
+  name?: string;
   /** Key of its ring. */
   ring: string;
   /** Key of its sector (required when the chart has sectors). */
@@ -334,8 +341,11 @@ export function concentricRings(input: ConcentricRingsInput): ChartOutput {
   const out: string[] = [];
 
   // Bands from the outside in (each disc covers the next), then the centre.
+  // Each band is named by its ring ("Ring 2: Tools"), the number printed in
+  // the gap; one name per ring, not per sector cell (the 12 KB budget).
   for (let i = rings.length - 1; i >= 0; i--) {
-    out.push(`<circle cx="${r1(cx)}" cy="${r1(cy)}" r="${r1(c0 + (i + 1) * t)}" class="${i % 2 ? 'rg-b' : 'rg-a'}"/>`);
+    const band = tip(`${rw.ring} ${i + 1}: ${rings[i].label}`);
+    out.push(`<circle cx="${r1(cx)}" cy="${r1(cy)}" r="${r1(c0 + (i + 1) * t)}" class="${i % 2 ? 'rg-b' : 'rg-a'}">${band}</circle>`);
   }
   out.push(`<circle cx="${r1(cx)}" cy="${r1(cy)}" r="${r1(c0)}" class="mk-hi"/>`);
   centreLines.forEach((line, i) =>
@@ -380,7 +390,7 @@ export function concentricRings(input: ConcentricRingsInput): ChartOutput {
     const kind = m.shape ?? 'circle';
     const x = cx + s.x;
     const y = cy + s.y;
-    const parts = [m.label, rings[ringIdx.get(m.ring)!].label, ...(m.sector ? [sectors[secIdx.get(m.sector)!].label] : []), ...(m.status ? [m.status] : [])];
+    const parts = [m.name ?? m.label, rings[ringIdx.get(m.ring)!].label, ...(m.sector ? [sectors[secIdx.get(m.sector)!].label] : []), ...(m.status ? [m.status] : [])];
     const name = parts.join(' · ');
     const attrs = marksCls.attrs(m.state, m.tone ?? 0);
     if (linked && m.href) {
@@ -778,8 +788,11 @@ export function progressRing(input: ProgressRingInput): ChartOutput {
     const cy = top + R + 4;
     const pc = percent(p);
     const hook = (el: string, attr: string) => el.replace('<text ', `<text ${attr}="${esc(p.key)}" `);
-    // The rim (no paint on screen) edges the track in forced colours, where the
-    // track turns Canvas and the arc CanvasText.
+    // One group per ring, named "<label>: <done> of <total> done (<pct>%)";
+    // its <title> carries data-ring-title for the page script that updates
+    // the counts. The rim (no paint on screen) edges the track in forced
+    // colours, where the track turns Canvas and the arc CanvasText.
+    out.push(`<g><title data-ring-title="${esc(p.key)}">${esc(`${p.label}: ${rw.progress(p.done, p.total, pc)}`)}</title>`);
     out.push(`<circle cx="${r1(cx)}" cy="${r1(cy)}" r="${R}" class="pr-rim"/>`);
     out.push(`<circle cx="${r1(cx)}" cy="${r1(cy)}" r="${R}" class="pr-track"/>`);
     out.push(
@@ -788,6 +801,7 @@ export function progressRing(input: ProgressRingInput): ChartOutput {
     out.push(hook(text(cx, cy + 1, `${pc}%`, { size: 13, weight: 600, cls: 'num', anchor: 'middle', where: 'percent' }), 'data-ring-label'));
     out.push(hook(text(cx, cy + 15, `${p.done}/${p.total}`, { size: 12.5, cls: 'num', anchor: 'middle', where: 'count' }), 'data-ring-count'));
     labels[i].forEach((line, k) => out.push(text(cx, cy + R + 20 + k * 16, line, { size: 12.5, anchor: 'middle', where: 'item label' })));
+    out.push('</g>');
     bottom = Math.max(bottom, cy + R + 20 + (labels[i].length - 1) * 16);
   });
   const { svg, height } = assemble({ base: input, width: W, bottom, body: out, role: 'img', cls: 'ch-rings ch-progress' });

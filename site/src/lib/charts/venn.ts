@@ -1,8 +1,9 @@
 // venn.ts: Venn3, the overlap of three sets, with an UpSet layout for narrow
 // widths and an Euler layout for sets that nest. Input is the items and the
 // sets each belongs to; the seven regions and their counts are computed here.
-// The Venn draws three outlined circles (a faint fill, so overlaps read darker)
-// with the count in each region and a tooltip listing its items; the Euler
+// The Venn draws three outlined circles (a faint fill, so overlaps read darker),
+// each named after its set and total, with the count in each region and a
+// tooltip listing its items; the Euler
 // draws the sets as nested ellipses when each lies strictly inside the next
 // (so no region is empty), and falls back to the Venn when they do not; the
 // UpSet draws one bar per non-empty region, largest first, with a three-dot
@@ -94,6 +95,12 @@ export function venn3(input: Venn3Input): ChartOutput {
     const inside = names.filter((_, i) => m & (1 << i));
     return es ? `Solo ${inside.join(' y ')}` : `${inside.join(' and ')} only`;
   };
+  // A set's circle or ellipse is named after the set and its total
+  // ("ISO/IEC 42001: 12 topics").
+  const setTip = (key: string, label: string) => {
+    const n = input.items.filter((i) => i.sets.includes(key)).length;
+    return tip(`${label}: ${n} ${noun(n)}`);
+  };
   const regionTip = (m: number) => {
     const list = regions.get(m)!;
     return `${regionName(m)}: ${list.length} ${noun(list.length)}${list.length ? `: ${list.join(', ')}` : ''}`;
@@ -133,7 +140,9 @@ export function venn3(input: Venn3Input): ChartOutput {
       ry: ry0 - (j * (BAND + GAP)) / 2,
       cy: 8 + ry0 + (j * (BAND - GAP)) / 2,
     }));
-    rings.forEach((e) => out.push(`<ellipse class="venn" cx="${r1(cx)}" cy="${r1(e.cy)}" rx="${r1(e.rx)}" ry="${r1(e.ry)}"/>`));
+    rings.forEach((e, j) =>
+      out.push(`<ellipse class="venn" cx="${r1(cx)}" cy="${r1(e.cy)}" rx="${r1(e.rx)}" ry="${r1(e.ry)}">${setTip(chain[j].key, chain[j].label)}</ellipse>`),
+    );
     /** Width of ring j at height y, less a 16 px margin each side. */
     const room = (j: number, y: number) => {
       const e = rings[j];
@@ -172,7 +181,7 @@ export function venn3(input: Venn3Input): ChartOutput {
       const n = Math.hypot(x, y) || 1;
       return [x / n, y / n];
     };
-    centres.forEach(([x, y]) => out.push(`<circle class="venn" cx="${r1(x)}" cy="${r1(y)}" r="${r1(R)}"/>`));
+    centres.forEach(([x, y], i) => out.push(`<circle class="venn" cx="${r1(x)}" cy="${r1(y)}" r="${r1(R)}">${setTip(keys[i], names[i])}</circle>`));
     // Set labels outside their circle, away from the centre of the figure.
     names.forEach((name, i) => {
       const [x, y] = centres[i];

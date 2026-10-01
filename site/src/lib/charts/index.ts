@@ -33,6 +33,12 @@
 // the area counts (areaKey), what "+N" is and what the foot bar measures
 // (fillKey); lifecycleRing names its channels ("Circle area: Fields"); the
 // chains name the evidence chips' layers and the enforcement track's states.
+// Every mark is named (its <title>, or aria-label on a link) by what it
+// stands for, and a linked label or row carries the same name as its mark
+// ("Label: 12 units"); /chart-tip.js shows that name as the tooltip on hover,
+// focus and tap. Names come from the input only; an optional `name` gives the
+// full name where the printed label is a code (concentricRings marks,
+// heatGrid rows and columns, radial items, flow and treemap nodes).
 // Marks with an href are links named by their <title>; linked marks must keep
 // the 24 px pointer-target spacing of WCAG 2.5.8 (the primitives default to a
 // 24 px pitch when marks link), else the build throws naming both marks.
@@ -49,11 +55,13 @@
 //     Waffle / isotype: one cell per record, grouped. /controls mosaic,
 //     /resources corpus, /obligations status isotype.
 //
-//   heatGrid({ rowHeader, rows: [{ label, href? }], columns: [{ label }],
+//   heatGrid({ rowHeader, rows: [{ label, name?, href? }], columns: [{ label, name? }],
 //              values: (number|null)[][], unit, tone?, showValues?, marginals? })
 //     Count heatmap, neutral fill-opacity ramp, null = hatched n/a; returns
 //     `sticky` { head, body } for a sticky label column (Chart scroll).
 //     Use for clause x standard dot matrices as well (showValues: false).
+//     `name` is the full name in cell tooltips when the label is a code
+//     (columns [{ label: 'A.6.2.4', name: 'A.6.2.4 AI system ...' }]).
 //
 //   rankedBars / lollipop({ items: [{ label, value, tone?, state?, highlight?, href? }],
 //                          unit, percent?, sort? })
@@ -85,14 +93,16 @@
 //
 //   venn3({ sets: [A, B, C], items: [{ label, sets: string[] }], layout: 'venn' | 'euler' | 'upset',
 //           unit, callouts? })
-//     Three-set overlap; 'upset' is the narrow variant (same table, a key
+//     Three-set overlap, each set's shape named "Set: N unit"; 'upset' is the
+//     narrow variant (same table, a key
 //     saying filled dot = in the set, hollow = not). 'euler'
 //     draws nested ellipses when nestedChain(sets, items) finds the sets
 //     strictly nested (no empty region), and the Venn otherwise.
 //
 //   ladder({ steps: [{ label, detail?, href?, key?, adds? }], highlight?, highlightLabel?,
 //            orientation?, cumulative? })
-//     Ascending steps; 'vertical' is the narrow variant.
+//     Ascending steps; 'vertical' is the narrow variant. A linked step is
+//     named "label: detail" when it has a detail.
 //     A step key wraps its marks in <g data-step> for a page script to light.
 //     `adds` lists what a step adds ("+ item" lines, and an Adds table
 //     column); `cumulative` opens each later step's list with "Previous,
@@ -106,7 +116,8 @@
 //     related; layer tone only in a layered family. Returns null under three
 //     relations (RADIAL_MIN_RELATIONS): skip the figure, keep the lists.
 //     'list' (default under 480 wide) is the narrow variant. Table: Family |
-//     Item | Relation, every relation (a family draws at most 6, then "+N more").
+//     Item | Relation, every relation (a family draws at most 6, then "+N more",
+//     named after the items it hides).
 //     radialLabelWidth(width, layout, centre) is the room a node label gets,
 //     for callers that shorten their labels to fit.
 //
@@ -136,14 +147,15 @@
 //     destinations. Table: From | To | value, one row per link.
 //
 //   concentricRings({ rings: [{ key, label, href? }] (inside out), sectors?: [{ key, label }],
-//                     marks: [{ label, ring, sector?, shape?, state?, tone?, status?, href? }],
+//                     marks: [{ label, name?, ring, sector?, shape?, state?, tone?, status?, href? }],
 //                     centre: { label }, layout?: 'wide' | 'narrow', keyMarks?, legend? })
 //     Containment target (harm levels x MIT domains; EvalBoundary): marks
 //     spread in their ring x sector cell without overlap (24 px pitch when
 //     linked), ring numbers in the top gap with a numbered key, sector labels
 //     around the circle or lettered with a key. 'narrow' (280) keeps the
-//     rings and both keys; marks there do not link. Table: Item | Ring |
-//     Sector | Layer | Status (the last three when used).
+//     rings and both keys; marks there do not link. A mark's `name` (default
+//     its label) heads its tooltip; each ring band is named "Ring 2: <label>".
+//     Table: Item | Ring | Sector | Layer | Status (the last three when used).
 //   lifecycleRing({ stages: [{ key, label, href? }], nodes: [{ label, stage, size?, fill?, href? }],
 //                   centre: { label, nodes? }, layout?: 'ring' | 'list', sizeLabel?, fillLabel? })
 //     Cycle of stages (the records ring): numbered arcs, each stage's records
@@ -154,7 +166,9 @@
 //   progressRing({ items: [{ key, label, done, total }] })
 //     Share done per item; a page script updates it in place (no animation):
 //     <circle data-ring="key" pathLength="100" stroke-dasharray="pct 100">,
-//     <text data-ring-label="key">pct%</text>, <text data-ring-count="key">.
+//     <text data-ring-label="key">pct%</text>, <text data-ring-count="key">,
+//     and each ring named by <title data-ring-title="key">"label: 3 of 7
+//     done (43%)"</title> (Spanish: "3 de 7 hechos (43 %)").
 //
 //   treemap({ groups: [{ label, href?, items: [{ label, value, name?, state?, tone?, status?,
 //             fill?, href? }] }], unit, unitOne?, layout?: 'wide' | 'narrow', plotHeight?,

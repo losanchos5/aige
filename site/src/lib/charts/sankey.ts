@@ -339,7 +339,10 @@ export function flow(input: SankeyInput): ChartOutput {
         const headH = Math.max(NARROW_TARGET, 9 + lines.length * 17);
         if (tone) out.push(`<rect x="${L}" y="${r1(y + 9)}" width="10" height="10" rx="2" class="${markClass('filled', tone)}"/>`);
         const els = lines.map((line, i) => text(tx, y + 18 + i * 17, line, { size: 13.5, weight: 600, where: 'node label' }));
-        out.push(src.href ? linkText(hitRect(y, headH) + els.join(''), nameOf(src), src.href) : els.join(''));
+        // Linked heading and rows are named as printed, with the full node
+        // name: "Source name (12)", "Destination name: 3" (the 12 KB budget
+        // leaves no room to repeat the source in every row).
+        out.push(src.href ? linkText(hitRect(y, headH) + els.join(''), `${nameOf(src)} (${fmt(total)})`, src.href) : els.join(''));
         y += headH;
         for (const l of own) {
           const dst = byId.get(l.to)!;
@@ -349,7 +352,7 @@ export function flow(input: SankeyInput): ChartOutput {
           const els2 =
             rows.map((line, i) => text(barX, y + 14 + i * 16, line, { size: 12.5, where: 'destination label' })).join('') +
             `<rect x="${barX}" y="${r1(y + 4 + rows.length * 16)}" width="${r1(bw)}" height="6" class="${markClass('filled', dst.tone ?? 0)}"/>`;
-          out.push(dst.href ? linkText(hitRect(y, rowH) + els2, nameOf(dst), dst.href) : els2);
+          out.push(dst.href ? linkText(hitRect(y, rowH) + els2, `${nameOf(dst)}: ${fmt(l.value)}`, dst.href) : els2);
           y += rowH;
         }
       }

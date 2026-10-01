@@ -14,14 +14,14 @@ que usan los dos bloques.
 
 ## 2. Bloque A: isla, estilos y kit
 
-- [ ] 2.1 Implementar `public/chart-tip.js` según design D1 a D6 (fuentes del nombre, apartar y
+- [x] 2.1 Implementar `public/chart-tip.js` según design D1 a D6 (fuentes del nombre, apartar y
   restaurar `<title>`/`title`, hover con gracia, focus, Esc, toque con retención solo en enlaces que
   navegan, marca más cercana a 12 px, posición con vuelta y sujeción, recolocación en scroll).
   Verificar: `gzip -c public/chart-tip.js | wc -c` ≤ 4096 (techo 15 KB) y los tests de 2.4.
-- [ ] 2.2 Estilos `.ctip` y `.ctip-on` en `src/styles/chart.css` con tokens claro/oscuro,
+- [x] 2.2 Estilos `.ctip` y `.ctip-on` en `src/styles/chart.css` con tokens claro/oscuro,
   `forced-colors` (Canvas, CanvasText, borde), `print` oculto y `prefers-reduced-motion`; sin rayas
   U+2014 ni opacidad en texto. Verificar: `perf.spec.ts` y `content-lint` verdes.
-- [ ] 2.3 Kit, nombres que faltan (design D8): `progressRing`, conjuntos del Venn/Euler, bandas de
+- [x] 2.3 Kit, nombres que faltan (design D8): `progressRing`, conjuntos del Venn/Euler, bandas de
   `concentricRings`, fila «+N» del radial, `detail` en pasos de `ladder`, `linkText()` con el nombre
   completo de la marca en barras, heatgrid, lanes, sankey y spine. Verificar: casos nuevos en
   `tests/chart-primitives.spec.ts` (puerta test-audit; lo esperado sale de la entrada del caso) en verde.

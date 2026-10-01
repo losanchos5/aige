@@ -472,3 +472,76 @@
     -webkit-print-color-adjust: exact;
   }
 }
+
+/* ---------------------------------------------------------- chart tips -- */
+/* The tooltip of public/chart-tip.js: one div.ctip in <body>, fixed, holding
+   the hovered, focused or tapped mark's name. Inverted ink on ground so it
+   reads over any chart in both themes; full opacity always (the entry moves
+   only, it never fades). It takes the pointer, so the reader can move onto it
+   (WCAG 1.4.13). .ctip-on marks the mark a tap selected. */
+.ctip {
+  position: fixed;
+  z-index: 60;
+  left: 0;
+  top: 0;
+  box-sizing: border-box;
+  max-width: min(20rem, calc(100% - 16px));
+  padding: 6px 10px;
+  border: 1px solid var(--ink);
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: var(--shadow-2);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.ctip[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ctip {
+    animation: ctip-in var(--dur) var(--ease);
+  }
+}
+
+@keyframes ctip-in {
+  from {
+    transform: translateY(4px);
+  }
+}
+
+[data-ctip] .ctip-on {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+[data-ctip] svg .ctip-on:is(rect, circle, ellipse, path) {
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+@media (forced-colors: active) {
+  .ctip {
+    forced-color-adjust: none;
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+    box-shadow: none;
+  }
+
+  [data-ctip] .ctip-on {
+    outline-color: Highlight;
+  }
+}
+
+@media print {
+  .ctip {
+    display: none;
+  }
+}

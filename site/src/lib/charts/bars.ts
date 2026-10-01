@@ -94,15 +94,25 @@ function axisTop(out: string[], f: Frame, ticks: { at: number; label: string }[]
   return y + 8;
 }
 
-/** Item label: beside the bar (wide) or above it (narrow), up to `maxLines`. */
-function itemLabel(out: string[], f: Frame, label: string, y: number, barH: number, href?: string, maxLines = 2): { rowTop: number; barY: number } {
+/** Item label: beside the bar (wide) or above it (narrow), up to `maxLines`;
+ *  with `href` a link named `name` (the row's marks, e.g. "Label: 12 units"). */
+function itemLabel(
+  out: string[],
+  f: Frame,
+  label: string,
+  y: number,
+  barH: number,
+  href?: string,
+  maxLines = 2,
+  name = label,
+): { rowTop: number; barY: number } {
   const lines = wrapText(label, f.labelW, 13, 'body', maxLines, 'item label');
   const els = lines.map((line, i) =>
     f.wide
       ? text(L, y + barH / 2 + 4.5 - ((lines.length - 1) * 15) / 2 + i * 15, line, { size: 13, where: 'item label' })
       : text(f.x0 + 6, y + 13 + i * 15, line, { size: 13, where: 'item label' }),
   );
-  out.push(href ? linkText(els.join(''), label, href) : els.join(''));
+  out.push(href ? linkText(els.join(''), name, href) : els.join(''));
   if (f.wide) return { rowTop: y, barY: y + Math.max(0, ((lines.length - 1) * 15) / 2) };
   return { rowTop: y, barY: y + lines.length * 15 + 5 };
 }
@@ -168,7 +178,7 @@ function rankedCore(input: RankedBarsInput, style: 'bar' | 'lollipop'): ChartOut
     const next = barY + BAR_H + 10;
     // The value sits outside the <a> (over its row target) so the link's
     // underline marks the label, not the number.
-    rows.push((item.href ? linkText(hitRect(y - 8, next - y) + own.join(''), item.label, item.href) : own.join('')) + valueEl);
+    rows.push((item.href ? linkText(hitRect(y - 8, next - y) + own.join(''), name, item.href) : own.join('')) + valueEl);
     y = next;
   }
   gridlines(out, s.ticks, s.map, gridTop, y - 4);
@@ -259,7 +269,11 @@ function stackedCore(input: StackedBarsInput, percent: boolean): ChartOutput {
   const rows: string[] = [];
   const BAR_H = 18;
   input.items.forEach((item, i) => {
-    const { barY } = itemLabel(rows, f, item.label, y, BAR_H, item.href);
+    // A linked row is named by its parts, as its segments are.
+    const rowName = `${item.label}: ${input.series
+      .flatMap((sr, k) => (item.values[k] ? [`${sr.label} ${fmt(item.values[k])}`] : []))
+      .join(', ')} ${input.unit}`;
+    const { barY } = itemLabel(rows, f, item.label, y, BAR_H, item.href, 2, rowName);
     let acc = 0;
     item.values.forEach((v, k) => {
       const share = percent ? (totals[i] ? (v / totals[i]) * 100 : 0) : v;
@@ -382,7 +396,9 @@ export function divergingBars(input: DivergingBarsInput): ChartOutput {
       const ly = wide ? y + BAR_H / 2 + 4.5 - ((all.length - 1) * 15) / 2 + i * 15 : y + 13 + i * 15;
       return text(cx, ly, line, { size: isNote ? sm : 13, cls: isNote ? 'ink2' : '', anchor: 'middle', where: 'item label' });
     });
-    rows.push(item.href ? linkText(labelEls.join(''), item.label, item.href) : labelEls.join(''));
+    // A linked row is named by both sides, as its bars are.
+    const rowName = `${item.label}: ${input.left.label} ${fmt(sum(item.l))}, ${input.right.label} ${fmt(sum(item.r))} ${input.unit}`;
+    rows.push(item.href ? linkText(labelEls.join(''), rowName, item.href) : labelEls.join(''));
     const barY = wide ? y + Math.max(0, ((all.length - 1) * 15) / 2) : y + all.length * 15 + 5;
     const side = (vals: number[], dir: -1 | 1, zero: number, tone: Tone | undefined, who: string) => {
       let acc = 0;
@@ -485,7 +501,8 @@ export function dumbbell(input: DumbbellInput): ChartOutput {
   // Narrow: the mark band of each row, for an as-of line that skips the labels.
   const markBands: [number, number][] = [];
   for (const item of input.items) {
-    const { barY } = itemLabel(rows, f, item.label, y, H, item.href, 3);
+    const rowName = `${item.label}: ${input.fromLabel} ${item.from}, ${input.toLabel} ${item.to}`;
+    const { barY } = itemLabel(rows, f, item.label, y, H, item.href, 3, rowName);
     const cy = barY + H / 2;
     markBands.push([barY - 3, barY + H + 3]);
     const xa = ts.map(item.from);

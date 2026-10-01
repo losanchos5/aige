@@ -16,7 +16,8 @@
 // sectors under the centre as branches off one spine, text at 1:1 on a phone.
 // Node labels are one line and throw, naming the label, when they do not fit.
 // A family draws at most `maxPerFamily` nodes (default 6) and a "+N more"
-// line; the table lists every relation: Family | Item | Relation.
+// line named after the items it hides; the table lists every relation:
+// Family | Item | Relation.
 //
 // Fewer than three relations draw nothing: relationRadial returns null and the
 // page keeps its lists (spec per-item-visuals, "Pocas relaciones").
@@ -193,8 +194,13 @@ export function relationRadial(input: RelationRadialInput): ChartOutput | null {
   const edge = (item: RelationItem, x1: number, y1: number, x2: number, y2: number) => {
     (item.strength === 'related' ? dashed : solid).push(`M${r1(x1)} ${r1(y1)}L${r1(x2)} ${r1(y2)}`);
   };
-  const more = (x: Fam, tx: number, cy: number, anchor: 'start' | 'end') =>
-    text(tx, cy + 4.5, `+${x.extra} ${lw.more}`, { size: 12.5, cls: 'ink2', anchor, where: 'more' });
+  // The "+N more" line is named after the items it stands for, by their
+  // drawn labels ("+3 more: P-07, P-12, P-15").
+  const more = (x: Fam, tx: number, cy: number, anchor: 'start' | 'end') => {
+    const label = `+${x.extra} ${lw.more}`;
+    const name = `${label}: ${x.items.slice(x.shown.length).map((i) => i.label).join(', ')}`;
+    return text(tx, cy + 4.5, label, { size: 12.5, cls: 'ink2', anchor, where: 'more' }).replace('</text>', `${tip(name)}</text>`);
+  };
 
   let bottom: number;
   if (!list) {

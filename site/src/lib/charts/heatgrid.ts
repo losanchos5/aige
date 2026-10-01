@@ -38,8 +38,13 @@ import {
 export interface HeatGridInput extends ChartBase {
   /** Table heading of the row-label column ("Country"). */
   rowHeader: string;
-  rows: { label: string; href?: string }[];
-  columns: { label: string }[];
+  /** `name`: the full name in tooltips and the row link, when the printed
+   *  label is a code or short form (default: the label). */
+  rows: { label: string; name?: string; href?: string }[];
+  /** `name`: the full name in cell and column-total tooltips, when the
+   *  printed label is a code ("A.6.2.4 AI system verification and
+   *  validation" for "A.6.2.4"; default: the label). */
+  columns: { label: string; name?: string }[];
   /** values[row][column]; null = not applicable (hatched). */
   values: (number | null)[][];
   /** Unit of a cell value, for tooltips ("clauses"). */
@@ -89,6 +94,7 @@ export function heatGrid(input: HeatGridInput): ChartOutput {
   const rowTotals = values.map((r) => r.reduce<number>((s, v) => s + (v ?? 0), 0));
   const colTotals = columns.map((_, c) => values.reduce<number>((s, r) => s + (r[c] ?? 0), 0));
   const interactive = rows.some((r) => r.href);
+  const rowTotal = (r: number) => `${rows[r].name ?? rows[r].label}: ${fmt(rowTotals[r])} ${input.unit} ${w.inTotal}`;
 
   // Grid coordinates start at x = 0; the label column is drawn separately.
   // Column-total bars (with their value above) sit over the column labels.
@@ -105,7 +111,7 @@ export function heatGrid(input: HeatGridInput): ChartOutput {
       const h = (t / cmax) * MARGIN_H;
       const x = c * cell + cell * 0.2;
       grid.push(
-        `<rect x="${r1(x)}" y="${r1(mTop + MARGIN_H - h)}" width="${r1(cell * 0.6)}" height="${r1(h)}" class="${markClass('filled', tone)}">${tip(`${columns[c].label}: ${fmt(t)} ${input.unit} ${w.inTotal}`)}</rect>`,
+        `<rect x="${r1(x)}" y="${r1(mTop + MARGIN_H - h)}" width="${r1(cell * 0.6)}" height="${r1(h)}" class="${markClass('filled', tone)}">${tip(`${columns[c].name ?? columns[c].label}: ${fmt(t)} ${input.unit} ${w.inTotal}`)}</rect>`,
       );
       grid.push(text(c * cell + cell / 2, mTop + MARGIN_H - h - 4, fmt(t), { size: 12, cls: 'num', anchor: 'middle', where: 'column total' }));
     });
@@ -119,7 +125,7 @@ export function heatGrid(input: HeatGridInput): ChartOutput {
     columns.forEach((col, c) => {
       const v = values[r][c];
       const x = c * cell;
-      const name = `${row.label} · ${col.label}: ${v === null ? w.notApplicable : `${fmt(v)} ${input.unit}`}`;
+      const name = `${row.name ?? row.label} · ${col.name ?? col.label}: ${v === null ? w.notApplicable : `${fmt(v)} ${input.unit}`}`;
       let mark: string;
       if (v === null) {
         mark = `<rect x="${x + 1}" y="${y + 1}" width="${cell - 2}" height="${cell - 2}" ${marks.attrs('hatched', 0)}>${tip(name)}</rect>`;
@@ -139,13 +145,14 @@ export function heatGrid(input: HeatGridInput): ChartOutput {
       const rmax = Math.max(1, ...rowTotals);
       const bw = (rowTotals[r] / rmax) * (MARGIN_W - 28);
       grid.push(
-        `<rect x="${r1(gridW + 8)}" y="${r1(y + cell * 0.25)}" width="${r1(bw)}" height="${r1(cell * 0.5)}" class="${markClass('filled', tone)}">${tip(`${row.label}: ${fmt(rowTotals[r])} ${input.unit} ${w.inTotal}`)}</rect>`,
+        `<rect x="${r1(gridW + 8)}" y="${r1(y + cell * 0.25)}" width="${r1(bw)}" height="${r1(cell * 0.5)}" class="${markClass('filled', tone)}">${tip(rowTotal(r))}</rect>`,
       );
       grid.push(text(gridW + 12 + bw, y + cell / 2 + 4, fmt(rowTotals[r]), { size: 12, cls: 'num', where: 'row total' }));
     }
     if (row.href) {
-      // The row label links to the row's page (grid coordinates are separate).
-      labels[labels.length - 1] = linkText(labels[labels.length - 1], row.label, row.href);
+      // The row label links to the row's page (grid coordinates are separate),
+      // named like the row's total: "Row: 12 units in total".
+      labels[labels.length - 1] = linkText(labels[labels.length - 1], rowTotal(r), row.href);
     }
   });
   const gridBottom = gridTop + rows.length * cell;
