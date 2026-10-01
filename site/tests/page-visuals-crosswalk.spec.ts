@@ -5,8 +5,10 @@
 // references (src/data/crosswalk.ts refs), never from the page, the chart kit
 // or src/lib/comparisons.ts, so a chart wired to the wrong sets, sides, levels
 // or strengths fails:
-// - the Venn (wide) and the UpSet (narrow) name the same seven regions with the
-//   topics each holds, and the centre is the "overlap on N" the prose states;
+// - the Euler or Venn (wide) and the UpSet (narrow) name the same non-empty
+//   regions with the topics each holds, and the centre is the "overlap on N"
+//   the prose states; while the three sets nest, the wide variant draws them
+//   nested and prints no empty region;
 // - the overlap bar's four counts, the numbers its series labels print and
 //   the headline tiles above it;
 // - the butterfly's rows: one per topic either side reaches, in the group of
@@ -46,7 +48,7 @@ function clauses(topic: string, framework: string) {
 }
 const reaches = (topic: string, framework: string) => refs.some((r) => r.topic === topic && r.framework === framework);
 
-test.describe('/resources/crosswalk Venn of the three instruments', () => {
+test.describe('/resources/crosswalk overlap of the three instruments', () => {
   const SETS = [
     ['eu-ai-act', 'EU AI Act'],
     ['iso-42001', 'ISO/IEC 42001'],
@@ -79,6 +81,17 @@ test.describe('/resources/crosswalk Venn of the three instruments', () => {
       const svg = slice(figure, `aria-labelledby="${variant}-t`, '</svg>');
       expect(regions(svg), variant).toEqual(expected);
     }
+  });
+
+  test('while the sets nest, the wide variant draws them nested and every region it prints holds a topic', () => {
+    const inSet = (id: string) => topics.filter((t) => reaches(t.id, id)).map((t) => t.id);
+    const bySize = SETS.map(([id]) => inSet(id)).sort((a, b) => b.length - a.length);
+    const nests = bySize.every((set, i) => i === 0 || (set.length > 0 && set.length < bySize[i - 1].length && set.every((t) => bySize[i - 1].includes(t))));
+    test.skip(!nests, 'the three sets no longer nest: the wide variant is the Venn');
+    const svg = slice(slice(html('/resources/crosswalk'), 'id="cw-venn"', '</figure>'), 'aria-labelledby="cw-venn-w-t', '</svg>');
+    expect((svg.match(/<ellipse class="venn"/g) ?? []).length).toBe(3);
+    const counts = [...svg.matchAll(/class="disp num[^"]*">(\d+)</g)].map((m) => Number(m[1]));
+    expect(counts.sort((a, b) => a - b)).toEqual([...expected.values()].map((r) => r.n).sort((a, b) => a - b));
   });
 
   test('the centre is the overlap the section prose states, and the table marks each topic per instrument', () => {
