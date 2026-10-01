@@ -72,10 +72,16 @@ test.describe('/resources/crosswalk overlap of the three instruments', () => {
   const regions = (svg: string) => {
     const out = new Map<string, { n: number; list: string }>();
     for (const m of svg.matchAll(/<title>([^<]+?): (\d+) topics?(?:: ([^<]*))?<\/title>/g)) {
-      if (Number(m[2]) > 0) out.set(decode(m[1]), { n: Number(m[2]), list: decode(m[3] ?? '') });
+      const name = decode(m[1]);
+      // A set's own circle is named "EU AI Act: 25 topics"; regions end in "only" or read "All three".
+      if (!/ only$|^All three$/.test(name)) continue;
+      if (Number(m[2]) > 0) out.set(name, { n: Number(m[2]), list: decode(m[3] ?? '') });
     }
     return out;
   };
+  /** The set circles' tooltips of one SVG: "EU AI Act: 25 topics". */
+  const setTotals = (svg: string) =>
+    new Map([...svg.matchAll(/<title>([^<:]+): (\d+) topics?<\/title>/g)].filter((m) => SETS.some(([, l]) => l === decode(m[1]))).map((m) => [decode(m[1]), Number(m[2])]));
 
   test('both variants name every non-empty region with exactly its topics', () => {
     const page = html('/resources/crosswalk');
@@ -83,6 +89,7 @@ test.describe('/resources/crosswalk overlap of the three instruments', () => {
     for (const variant of ['cw-venn-w', 'cw-venn-n']) {
       const svg = slice(figure, `aria-labelledby="${variant}-t`, '</svg>');
       expect(regions(svg), variant).toEqual(expected);
+      expect(setTotals(svg), `${variant} set totals`).toEqual(new Map(SETS.map(([id, label]) => [label, topics.filter((t) => reaches(t.id, id)).length])));
     }
   });
 
