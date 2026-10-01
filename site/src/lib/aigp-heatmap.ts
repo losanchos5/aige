@@ -153,7 +153,7 @@ function partSvg(domains: readonly AigpDomain[], axisMax: number, id: string, op
       );
       competency.indicators.forEach((indicator, i) => {
         const x = BAR_X + i * (cellW + CELL_GAP);
-        const name = `${indicator.id} ${indicator.paraphrase}: ${STATUS[indicator.status]}`;
+        const name = `${indicator.id} ${indicator.paraphrase.replace(/\.$/, '')}: ${STATUS[indicator.status]}`;
         const rect = `<rect x="${round(x)}" y="${top}" width="${round(cellW)}" height="${ROW_H}" rx="3"><title>${esc(name)}</title></rect>`;
         (indicator.status === 'taught' ? taught : partly).push(rect);
         numbers.push(`<text x="${round(x + cellW / 2)}" y="${top + 16.5}">${i + 1}</text>`);

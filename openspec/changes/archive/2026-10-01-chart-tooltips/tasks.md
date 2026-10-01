@@ -61,5 +61,5 @@ que usan los dos bloques.
   a11y/móvil adversarial con capturas e interacción real a 320, 390 y 1440, claro, oscuro y
   forced-colors, ratón, teclado y táctil emulado. Verificar: informe de cada revisión con hallazgos.
 - [x] 4.3 Pase de arreglos de los hallazgos CRITICAL y HIGH y repetición de 4.1. Verificar: verde.
-- [ ] 4.4 PR a main (la fusiona Jordi con `! gh pr merge <n> --merge`); tras la fusión, esperar
+- [x] 4.4 PR a main (la fusiona Jordi con `! gh pr merge <n> --merge`); tras la fusión, esperar
   `deploy.yml` y comprobar con curl en producción cada ruta tocada (200 y un único `chart-tip.js`).

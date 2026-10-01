@@ -190,7 +190,7 @@ test.describe('AIGP coverage map', () => {
     for (const [name, status] of [['ag-hm-taught', 'taught'], ['ag-hm-partly', 'partly-taught']] as const) {
       const expected = aigpIndicators()
         .filter(({ indicator }) => indicator.status === status)
-        .map(({ indicator }) => `${indicator.id} ${indicator.paraphrase}: ${statusLabel[status]}`);
+        .map(({ indicator }) => `${indicator.id} ${indicator.paraphrase.replace(/\.$/, '')}: ${statusLabel[status]}`);
       expect(titles(name), name).toEqual(expected);
     }
     // Bar widths follow the range midpoint: IV.C (9-11) is 10 wide, II.D (3-5) is 4.
