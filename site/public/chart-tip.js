@@ -270,11 +270,20 @@
 
   on('click', (e) => {
     const t = e.target;
-    // Only a real tap: a touch pointerdown on this element just before; never a
-    // keyboard or AT click (detail 0).
-    if (!(e.detail > 0 && down && down.pointerType === 'touch' && down.target === t && e.timeStamp - down.timeStamp < TAP)) return;
+    // Only a real tap: a touch pointerdown just before; never a keyboard or AT
+    // click (detail 0). The click may land on another element than the
+    // pointerdown (the browser adjusts touch points), so either may be the mark.
+    if (!(e.detail > 0 && down && down.pointerType === 'touch' && e.timeStamp - down.timeStamp < TAP)) return;
     if (inTip(t)) return;
     let m = markOf(t);
+    // The browser may move a tap on a mark that is not clickable onto a nearby
+    // link (touch adjustment, events and target alike): the element really
+    // under the finger tells which mark the reader tapped.
+    const from = markOf(doc.elementFromPoint(down.clientX, down.clientY));
+    if (from && from !== m) {
+      e.preventDefault();
+      m = from;
+    }
     const hit = !!m;
     if (!m) {
       const root = t.closest && !t.closest(SKIP) && t.closest('[data-ctip]');

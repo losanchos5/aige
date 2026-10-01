@@ -74,9 +74,12 @@ gráfico), `figcaption`, `details.chart-alt`, la leyenda y todo lo que lleve `da
 - Teclado: `focusin` abre anclado a la caja de la marca; `focusout` cierra. `keydown` Esc cierra sin
   mover foco y deja la marca «descartada» hasta que el puntero o el foco salgan de ella.
 - Toque: `pointerdown` guarda el evento. Un `click` en fase de captura cuenta como toque solo si es un
-  toque real: `detail > 0` y el último `pointerdown` fue `touch`, sobre el mismo elemento y hace menos
-  de 800 ms; cualquier tecla borra ese estado. Un clic de teclado o de tecnología de apoyo
-  (`detail` 0) nunca se retiene. Con un toque real:
+  toque real: `detail > 0` y el último `pointerdown` fue `touch` hace menos de 800 ms; cualquier tecla
+  borra ese estado. Un clic de teclado o de tecnología de apoyo (`detail` 0) nunca se retiene. El
+  navegador puede desplazar un toque sobre una marca no clicable (un cuadro del isotipo) hasta un
+  enlace vecino, tanto el objetivo del `pointerdown` como el del `click` (ajuste táctil de Chrome); por
+  eso la marca tocada es la que `elementFromPoint` encuentra en el punto del `pointerdown`, y si difiere
+  de la del `click`, el clic desplazado se retiene. Con un toque real:
   - si la marca es un `<a href>` que navega y no es la marca abierta, `preventDefault()` (nunca
     `stopPropagation()`), abre el tooltip y marca la marca con `.ctip-on`; el segundo toque pasa;
   - si la marca es un botón, un `[data-cw-open]` o cualquier elemento con su propio comportamiento de
