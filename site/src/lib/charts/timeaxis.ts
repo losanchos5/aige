@@ -22,7 +22,9 @@ import {
   NARROW_WIDTH,
   assemble,
   fitText,
+  autoLegend,
   legend,
+  legendBlocks,
   markStyles,
   minText,
   nonEmpty,
@@ -41,6 +43,7 @@ import {
   wrapText,
   type ChartBase,
   type ChartOutput,
+  type LegendMark,
   type MarkState,
   type Shape,
   type TimeScale,
@@ -63,7 +66,8 @@ export interface TimeBase extends ChartBase {
   orientation?: 'horizontal' | 'vertical';
   /** Vertical only: length of the time axis in px (default 480). */
   length?: number;
-  /** Legend entries (shape and state swatches). */
+  /** Legend entries (shape and state swatches; heading: legendHeading); with
+   *  none, the auto legend of the marks' layers and states. */
   legend?: { label: string; shape?: Shape; state?: MarkState; tone?: Tone }[];
 }
 
@@ -91,9 +95,11 @@ function chrono<T extends { label: string }>(items: T[], date: (t: T) => string)
   });
 }
 
-function legendBlock(input: TimeBase, W: number, marks: ReturnType<typeof markStyles>, out: string[], y: number): number {
-  if (!input.legend?.length) return y;
-  const lg = legend(input.legend, L, y + 14, W - L, marks);
+function legendBlock(input: TimeBase, W: number, marks: ReturnType<typeof markStyles>, out: string[], y: number, drawn: LegendMark[]): number {
+  const lg = input.legend?.length
+    ? legend(input.legend, L, y + 14, W - L, marks, input.legendHeading)
+    : legendBlocks(autoLegend(drawn, input, { shape: 'circle' }), L, y + 14, W - L, marks);
+  if (!lg.els.length) return y;
   out.push(...lg.els);
   return lg.bottom + 12;
 }
@@ -137,7 +143,7 @@ export function beeswarm(input: BeeswarmInput): ChartOutput {
   const hits = targets(where);
   const out: string[] = [];
   const sm = minText(W);
-  let y = legendBlock(input, W, marks, out, 4);
+  let y = legendBlock(input, W, marks, out, 4, input.points);
   const keyAt = y;
   if (input.today) y += vertical ? AS_OF_KEY_H : 20;
   const axisLen = vertical ? (input.length ?? 480) : W - 2 * L - 16;
@@ -219,7 +225,7 @@ export function timeStrip(input: TimeStripInput): ChartOutput {
   const hits = targets(where);
   const out: string[] = [];
   const sm = minText(W);
-  let y = legendBlock(input, W, marks, out, 2);
+  let y = legendBlock(input, W, marks, out, 2, input.events);
   const events = chrono(input.events, (e) => e.date);
   const R = 5.5;
   const point = (e: TimePoint, cx: number, cy: number) => {
@@ -340,7 +346,7 @@ export function timeLanes(input: TimeLanesInput): ChartOutput {
   const hits = targets(where);
   const out: string[] = [];
   const sm = minText(W);
-  let y = legendBlock(input, W, marks, out, 4);
+  let y = legendBlock(input, W, marks, out, 4, input.lanes.flatMap((lane) => lane.items));
   const itemName = (lane: string, it: TimeLaneItem) =>
     `${lane} · ${it.label} · ${it.start}${it.end ? ` ${w.to} ${it.end}` : ''}${statusOf(it, input.lang) ? ` · ${statusOf(it, input.lang)}` : ''}`;
   for (const lane of input.lanes) {

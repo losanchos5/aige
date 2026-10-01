@@ -18,9 +18,13 @@
 // empty. Each panel draws at most `maxItems` items (default 3) and a "+N more"
 // line; the table lists every item. Item labels wrap to two lines and throw,
 // naming the label, when they still do not fit; linked items keep the 24 px
-// pointer-target spacing. No runtime imports.
+// pointer-target spacing. A legend under the panels names the layer colour of
+// each artefact chip drawn (core autoLegend) and, on a control chain, what a
+// solid and an outlined stage of the track mean.
 import {
   assemble,
+  autoLegend,
+  legendBlocks,
   markStyles,
   minText,
   NARROW_WIDTH,
@@ -113,6 +117,10 @@ const FLOW_WORDS = {
     verification: 'Verification',
     decision: 'Decision',
     more: 'more',
+    layer: 'Colour: layer that keeps the artefact',
+    track: 'Enforcement track',
+    on: 'Acts here',
+    off: 'Does not act here',
   },
   es: {
     preventive: 'Preventivos',
@@ -126,6 +134,10 @@ const FLOW_WORDS = {
     verification: 'Verificación',
     decision: 'Decisión',
     more: 'más',
+    layer: 'Color: capa que guarda el artefacto',
+    track: 'Pista de aplicación',
+    on: 'Actúa aquí',
+    off: 'No actúa aquí',
   },
 };
 
@@ -155,7 +167,8 @@ function flow(input: FlowBase, panels: Panel[], cls: string, where: string): Cha
   const W = input.width ?? (row ? 900 : NARROW_WIDTH);
   const sm = minText(W);
   const w = words(input.lang);
-  const more = FLOW_WORDS[input.lang === 'es' ? 'es' : 'en'].more;
+  const fw = FLOW_WORDS[input.lang === 'es' ? 'es' : 'en'];
+  const more = fw.more;
   const max = input.maxItems ?? 3;
   const n = panels.length;
   const gap = row ? 26 : 22;
@@ -238,7 +251,7 @@ function flow(input: FlowBase, panels: Panel[], cls: string, where: string): Cha
     });
     if (x.extra > 0) out.push(text(ix, ty + 12, `+${x.extra} ${more}`, { size: 12.5, cls: 'ink2', where: 'more' }));
   });
-  const bottom = row ? top + rowH : boxes[boxes.length - 1].y + boxes[boxes.length - 1].h;
+  let bottom = row ? top + rowH : boxes[boxes.length - 1].y + boxes[boxes.length - 1].h;
 
   // One arrow between consecutive panels.
   for (let i = 0; i < n - 1; i += 1) {
@@ -257,6 +270,24 @@ function flow(input: FlowBase, panels: Panel[], cls: string, where: string): Cha
         `<path class="arrow" d="M${ax - 5} ${r1(ay + gap - 8)} l5 7 l5 -7 z"/>`,
       );
     }
+  }
+
+  // Legend: the layer chips drawn, then (a control chain) the track states drawn.
+  const chips = laid.flatMap((x) => (x.p.tones ? x.blocks.map((_, j) => ({ tone: x.p.tones![j] })) : []));
+  const blocks = autoLegend(chips, { ...input, legendTitles: { layer: fw.layer, ...input.legendTitles } });
+  const track = panels.find((p) => p.track)?.track ?? [];
+  if (track.length && input.autoLegend !== false) {
+    blocks.push({
+      heading: fw.track,
+      entries: [true, false]
+        .filter((on) => track.some((t) => t.on === on))
+        .map((on) => ({ label: on ? fw.on : fw.off, state: on ? ('filled' as const) : ('outline' as const), tone: 0 as Tone, swatch: 'bar' as const })),
+    });
+  }
+  if (blocks.length) {
+    const lg = legendBlocks(blocks, L, bottom + 24, W - L, marks);
+    out.push(...lg.els);
+    bottom = lg.bottom;
   }
 
   const rows = panels.flatMap(

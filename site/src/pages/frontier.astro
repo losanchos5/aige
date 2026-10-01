@@ -153,6 +153,7 @@ const caseBase = {
       .map((k) => ({ label: caseLabel(k), status: 'Names the control', href: `/cases/${k.id}` })),
   })),
   groupHeader: 'Control',
+  unit: 'cases',
   tableCaption: 'Each evaluation environment control with the incident cases that name it',
 };
 const caseWide = dotMatrix({ ...caseBase, id: 'fr-cases-w', width: 480 });
@@ -186,10 +187,7 @@ const aiucBase = {
   })),
   unit: 'requirements',
   groupHeader: 'Domain',
-  legend: [
-    { label: 'Listed', state: 'filled' as const },
-    { label: 'Retired', state: 'outline' as const },
-  ],
+  legendTitles: { state: 'One square per requirement, drawn by its status in the index' },
   tableCaption: 'Each AIUC-1 requirement by domain, listed or retired',
 };
 const aiucWide = dotMatrix({ ...aiucBase, id: 'fr-aiuc-w', width: 640 });

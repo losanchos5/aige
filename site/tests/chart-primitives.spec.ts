@@ -52,6 +52,7 @@ import { enforcementLabels } from '../src/data/policy-card';
 import { harms, levelLabel, levelOrder, mitDomains } from '../src/data/harms';
 import { frameworks, obligations, type FrameworkType } from '../src/data/frameworks';
 import { chapterParts, chaptersOrdered } from '../src/data/chapters';
+import { layers } from '../src/data/stack';
 
 const base = { source: 'chapter 08 [3]', asOf: '2026-09-30' };
 const title = 'A chart';
@@ -1109,11 +1110,13 @@ test('concentricRings: every harm sits inside its level ring and its MIT domain 
     const angle = (x: number, y: number) => (Math.atan2(x - cx, cy - y) + 2 * Math.PI) % (2 * Math.PI);
     const rule = els.find((e) => e.tag === 'path' && e.attr.class === 'rule')!;
     const bounds = [...rule.attr.d.matchAll(/L([\d.]+) ([\d.]+)/g)].map((m) => angle(Number(m[1]), Number(m[2])));
+    // A mark is named (its <title> or link); the legend's swatches are not.
     const drawn = els.flatMap((e, i) => {
-      if (!/^mk mk-/.test(e.attr.class ?? '')) return [];
+      const name = nameOf(els, i);
+      if (!/^mk mk-/.test(e.attr.class ?? '') || !name) return [];
       const x = e.tag === 'circle' ? Number(e.attr.cx) : Number(e.attr.x) + Number(e.attr.width) / 2;
       const y = e.tag === 'circle' ? Number(e.attr.cy) : Number(e.attr.y) + Number(e.attr.height) / 2;
-      return [{ label: nameOf(els, i)!.split(' · ')[0], x, y }];
+      return [{ label: name.split(' · ')[0], x, y }];
     });
     expect(drawn.map((d) => d.label).sort(), layout).toEqual(harms.map((h) => h.harmType).sort());
     for (const d of drawn) {
@@ -1426,3 +1429,103 @@ test('ranked bars and lollipops keep each value label clear of the gridlines', (
     }
   }
 });
+
+// ---- legends: every encoding a primitive draws is named, and nothing else ---
+// Marks in layers 2 and 4, filled ("In force") or hatched ("To be specified").
+// Whatever primitive draws them, its legend names exactly those two layers
+// (as data/stack names them, up to the first " & ") and, where state is
+// drawn, exactly those two status words: never a phantom layer or state.
+const legendMarks = [
+  { tone: 2 as const, state: 'filled' as const, status: 'In force' },
+  { tone: 4 as const, state: 'hatched' as const, status: 'To be specified' },
+  { tone: 4 as const, state: 'filled' as const, status: 'In force' },
+];
+const layerShort = (n: number) => `0${n} ${layers.find((l) => l.n === n)!.name.split(' & ')[0]}`;
+const LEGEND_CASES: { name: string; make: (width: number) => ChartOutput; states: string[] | null }[] = [
+  {
+    name: 'dotMatrix',
+    make: (width) => dotMatrix({ ...base, id: 'lg', title, desc, width, groups: [{ label: 'Rows', items: legendMarks.map((m, i) => ({ label: `Row ${i}`, ...m })) }] }),
+    states: ['In force', 'To be specified'],
+  },
+  {
+    name: 'lanes',
+    make: (width) =>
+      lanes({
+        ...base, id: 'lg', title, desc, width, orientation: width < 480 ? 'vertical' : 'horizontal', columns: laneColumns, rowHeader: 'Rule',
+        rows: legendMarks.map((m, i) => ({ label: `Rule ${i}`, marks: [{ column: 'deploy', shape: 'circle' as const, ...m }] })),
+      }),
+    states: ['In force', 'To be specified'],
+  },
+  {
+    name: 'beeswarm',
+    make: (width) => beeswarm({ ...base, ...timeDomain, id: 'lg', title, desc, width, orientation: width < 480 ? 'vertical' : 'horizontal', points: legendMarks.map((m, i) => ({ date: '2026-08-02', label: `Point ${i}`, ...m })) }),
+    states: ['In force', 'To be specified'],
+  },
+  {
+    name: 'timeStrip',
+    make: (width) => timeStrip({ ...base, ...timeDomain, id: 'lg', title, desc, width, orientation: width < 480 ? 'vertical' : 'horizontal', events: legendMarks.map((m, i) => ({ date: `202${i}-03-01`, label: `Event ${i}`, ...m })) }),
+    states: ['In force', 'To be specified'],
+  },
+  {
+    name: 'timeLanes',
+    make: (width) =>
+      timeLanes({ ...base, ...timeDomain, id: 'lg', title, desc, width, orientation: width < 480 ? 'vertical' : 'horizontal', lanes: [{ label: 'Lane', items: legendMarks.map((m, i) => ({ label: `Item ${i}`, start: `202${i}-03-01`, ...m })) }] }),
+    states: ['In force', 'To be specified'],
+  },
+  {
+    name: 'concentricRings',
+    make: (width) =>
+      concentricRings({
+        ...base, id: 'lg', title, desc, width, centre: { label: 'System' },
+        rings: [{ key: 'in', label: 'Inner' }, { key: 'out', label: 'Outer' }],
+        marks: legendMarks.map((m, i) => ({ label: `Mark ${i}`, ring: i ? 'out' : 'in', ...m })),
+      }),
+    states: ['In force', 'To be specified'],
+  },
+  {
+    name: 'treemap',
+    make: (width) => treemap({ ...base, id: 'lg', title, desc, width, unit: 'rows', groups: [{ label: 'Group', items: legendMarks.map((m, i) => ({ label: `Tile ${i}`, value: 20 + 10 * i, ...m })) }] }),
+    states: ['In force', 'To be specified'],
+  },
+  ...[rankedBars, lollipop].map((make) => ({
+    name: make.name,
+    // A bar carries no status word: its state is named by the kit's word.
+    make: (width: number) => make({ ...base, id: 'lg', title, desc, width, unit: 'rows', items: legendMarks.map((m, i) => ({ label: `Bar ${i}`, value: 3 + i, tone: m.tone, state: m.state })) }),
+    states: ['Filled', 'Hatched'],
+  })),
+  {
+    name: 'relationRadial',
+    make: (width) =>
+      relationRadial({
+        ...base, id: 'lg', title, desc, width, centre: { label: 'Centre' },
+        families: [{ label: 'Patterns', layered: true, items: legendMarks.map((m, i) => ({ label: `Pattern ${i}`, tone: m.tone })) }],
+      })!,
+    states: null,
+  },
+  {
+    name: 'bowTie',
+    make: (width) => bowTie({ ...base, id: 'lg', title, desc, width: width < 480 ? width : 900, orientation: width < 480 ? 'column' : 'row', ...bow, evidence: legendMarks.map((m, i) => ({ label: `Record ${i}`, layer: m.tone })) }),
+    states: null,
+  },
+  {
+    name: 'controlChain',
+    make: (width) => controlChain({ ...base, id: 'lg', title, desc, width: width < 480 ? width : 900, orientation: width < 480 ? 'column' : 'row', ...anatomy, evidence: legendMarks.map((m, i) => ({ label: `Record ${i}`, layer: m.tone })) }),
+    states: null,
+  },
+];
+for (const c of LEGEND_CASES) {
+  test(`${c.name}: the legend names exactly the layers and states drawn, wide and narrow`, () => {
+    for (const width of [640, NARROW_WIDTH]) {
+      const texts = parseSvg(c.make(width).svg)
+        .filter((e) => e.tag === 'text')
+        .map((e) => e.text);
+      for (const n of [1, 2, 3, 4, 5]) {
+        expect(texts.includes(layerShort(n)), `${width}: layer ${n}`).toBe(n === 2 || n === 4);
+      }
+      if (c.states) {
+        for (const word of c.states) expect(texts, `${width}: state "${word}"`).toContain(word);
+        for (const word of ['Outline', 'Dashed', 'Dotted']) expect(texts, `${width}: no "${word}" swatch`).not.toContain(word);
+      }
+    }
+  });
+}

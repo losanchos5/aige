@@ -266,6 +266,7 @@ export function bookSpine(input: BookSpineInput): ChartOutput {
       bottom + 26,
       W - L,
       marks,
+      input.legendHeading,
     );
     out.push(...lg.els);
     bottom = lg.bottom;

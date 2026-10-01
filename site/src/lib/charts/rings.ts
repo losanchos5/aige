@@ -40,9 +40,11 @@ import {
   esc,
   fitText,
   fmt,
+  autoLegend,
   hitRect,
   layerWord,
   legend,
+  legendBlocks,
   linkText,
   markStyles,
   nonEmpty,
@@ -76,8 +78,32 @@ const LC_MIN_R = 4;
 const LC_TEXT_X = 2 * LC_MAX_R + 6;
 
 const RING_WORDS = {
-  en: { ring: 'Ring', sector: 'Sector', stage: 'Stage', record: 'Record', size: 'Size', done: 'Done', percent: 'Percent' },
-  es: { ring: 'Anillo', sector: 'Sector', stage: 'Etapa', record: 'Registro', size: 'Tamaño', done: 'Hechos', percent: 'Porcentaje' },
+  en: {
+    ring: 'Ring',
+    sector: 'Sector',
+    stage: 'Stage',
+    record: 'Record',
+    size: 'Size',
+    done: 'Done',
+    percent: 'Percent',
+    rings: 'Rings, from the centre out',
+    sectors: 'Sectors',
+    area: 'Circle area',
+    disc: 'Inner disc',
+  },
+  es: {
+    ring: 'Anillo',
+    sector: 'Sector',
+    stage: 'Etapa',
+    record: 'Registro',
+    size: 'Tamaño',
+    done: 'Hechos',
+    percent: 'Porcentaje',
+    rings: 'Anillos, del centro hacia fuera',
+    sectors: 'Sectores',
+    area: 'Área del círculo',
+    disc: 'Disco interior',
+  },
 };
 const ringWords = (lang?: 'en' | 'es') => RING_WORDS[lang === 'es' ? 'es' : 'en'];
 
@@ -127,8 +153,15 @@ export interface ConcentricRingsInput extends ChartBase {
   layout?: 'wide' | 'narrow';
   /** Name each ring's marks after it in the key ("1 Harness: EVAL-008"). */
   keyMarks?: boolean;
-  /** Swatches under the key (e.g. the layer colours of the marks). */
+  /** Swatches under the key; by default the auto legend of the marks'
+   *  layers and states (core autoLegend). */
   legend?: { label: string; shape?: Shape; state?: MarkState; tone?: Tone }[];
+  /** What the rings are, above their numbered key (default "Rings, from
+   *  the centre out"): "Rings: the level a harm lands on, from the person out". */
+  ringsTitle?: string;
+  /** What the sectors are, above their key (or alone, when the labels go
+   *  around the circle): "Sectors: MIT AI risk domain". Default "Sectors". */
+  sectorsTitle?: string;
   itemHeader?: string;
   ringHeader?: string;
   sectorHeader?: string;
@@ -363,6 +396,12 @@ export function concentricRings(input: ConcentricRingsInput): ChartOutput {
   // A linked key row is one target its full height (26 or more) and the
   // key's width, like the lifecycle rows.
   const pitchKey = rings.some((r) => r.href) ? 26 : 20;
+  const keyTitle = (label: string) => {
+    for (const line of wrapText(label, W - 2 * L, 12.5, 'body', 3, 'key heading')) {
+      out.push(text(L, y, line, { size: 12.5, weight: 600, where: 'key heading' }));
+      y += 18;
+    }
+  };
   const keyRow = (tag: string, label: string, href?: string) => {
     const lines = wrapText(label, W - L - (L + 24), fs, 'body', 3, 'key label');
     out.push(text(L, y, tag, { size: narrow ? 12.5 : 12, cls: 'mono', where: 'key tag' }));
@@ -371,16 +410,29 @@ export function concentricRings(input: ConcentricRingsInput): ChartOutput {
     out.push(href ? linkText(hit + els.join(''), label, href) : els.join(''));
     y += (lines.length - 1) * 16 + pitchKey;
   };
+  keyTitle(input.ringsTitle ?? rw.rings);
   rings.forEach((r, i) => {
     const own = input.keyMarks ? marks.filter((m) => m.ring === r.key).map((m) => m.label) : [];
     keyRow(String(i + 1), own.length ? `${r.label}: ${own.join(', ')}` : r.label, r.href);
   });
-  if (sectors.length && !outside) sectors.forEach((s, i) => keyRow(letter(i), s.label));
+  if (sectors.length) {
+    y += 8;
+    keyTitle(input.sectorsTitle ?? rw.sectors);
+    if (!outside) sectors.forEach((s, i) => keyRow(letter(i), s.label));
+    else y += pitchKey - 18;
+  }
   let bottom = y - pitchKey;
   if (input.legend?.length) {
-    const lg = legend(input.legend, L, bottom + 26, W - L, marksCls);
+    const lg = legend(input.legend, L, bottom + 26, W - L, marksCls, input.legendHeading);
     out.push(...lg.els);
     bottom = lg.bottom;
+  } else {
+    const blocks = autoLegend(marks, input, { shape: 'circle' });
+    if (blocks.length) {
+      const lg = legendBlocks(blocks, L, bottom + 30, W - L, marksCls);
+      out.push(...lg.els);
+      bottom = lg.bottom;
+    }
   }
 
   const withTone = marks.some((m) => m.tone);
@@ -608,30 +660,42 @@ export function lifecycleRing(input: LifecycleRingInput): ChartOutput {
   }
   // Legend with a scale, one key per row: the size key draws the smallest and
   // largest circle with their values, the fill key the disc at 0, 50 and 100 %,
-  // so both encodings read at their true size.
+  // so both encodings read at their true size. Each key names its channel
+  // ("Circle area: Fields"); a key too wide for one row puts its label over
+  // its samples.
   const keys = [
-    ...(input.sizeLabel && maxSize ? [{ label: input.sizeLabel, samples: [...new Set([Math.min(...sizes), maxSize])].map((s) => ({ r: radiusOf(s), fill: 0, value: fmt(s) })) }] : []),
-    ...(input.fillLabel ? [{ label: input.fillLabel, samples: [0, 0.5, 1].map((f) => ({ r: LC_MAX_R, fill: f, value: String(f * 100) })) }] : []),
+    ...(input.sizeLabel && maxSize ? [{ label: `${rw.area}: ${input.sizeLabel}`, samples: [...new Set([Math.min(...sizes), maxSize])].map((s) => ({ r: radiusOf(s), fill: 0, value: fmt(s) })) }] : []),
+    ...(input.fillLabel ? [{ label: `${rw.disc}: ${input.fillLabel}`, samples: [0, 0.5, 1].map((f) => ({ r: LC_MAX_R, fill: f, value: String(f * 100) })) }] : []),
   ];
   let ly = bottom + 8;
+  const keyEls: string[] = [];
   for (const k of keys) {
-    const cy = ly + LC_MAX_R + 2;
-    const need = textWidth(k.label, 12.5) + 10 + k.samples.reduce((s, p) => s + 2 * LC_MAX_R + 4 + textWidth(p.value, 12.5, 'mono') + 12, 0);
-    if (need > W - 2 * L + 0.5) {
-      throw new Error(`charts(${where}): legend "${k.label}" with its scale is ${Math.ceil(need)}px wide, the width allows ${W - 2 * L}px; shorten the label`);
+    const scaleW = k.samples.reduce((s, p) => s + 2 * LC_MAX_R + 4 + textWidth(p.value, 12.5, 'mono') + 12, 0);
+    const labelW = textWidth(k.label, 12.5);
+    const inline = labelW + 10 + scaleW <= W - 2 * L + 0.5;
+    if (!inline && (labelW > W - 2 * L + 0.5 || scaleW > W - 2 * L + 0.5)) {
+      throw new Error(`charts(${where}): legend "${k.label}" or its scale is wider than the ${W - 2 * L}px the width allows; shorten the label`);
     }
-    out.push(text(L, cy + 4.5, k.label, { size: 12.5, where: 'legend' }));
-    let lx = L + textWidth(k.label, 12.5) + 10;
+    if (!inline) {
+      keyEls.push(text(L, ly + 14, k.label, { size: 12.5, where: 'legend' }));
+      ly += 18;
+    }
+    const cy = ly + LC_MAX_R + 2;
+    if (inline) keyEls.push(text(L, cy + 4.5, k.label, { size: 12.5, where: 'legend' }));
+    let lx = inline ? L + labelW + 10 : L;
     for (const p of k.samples) {
       const gx = lx + LC_MAX_R;
-      out.push(`<circle cx="${r1(gx)}" cy="${r1(cy)}" r="${r1(p.r)}" class="mk mk-line-0"/>`);
-      if (p.fill) out.push(`<circle cx="${r1(gx)}" cy="${r1(cy)}" r="${r1(p.r * Math.sqrt(p.fill))}" class="mk-hi"/>`);
-      out.push(text(gx + LC_MAX_R + 4, cy + 4.5, p.value, { size: 12.5, cls: 'num', where: 'legend value' }));
+      keyEls.push(`<circle cx="${r1(gx)}" cy="${r1(cy)}" r="${r1(p.r)}" class="mk mk-line-0"/>`);
+      if (p.fill) keyEls.push(`<circle cx="${r1(gx)}" cy="${r1(cy)}" r="${r1(p.r * Math.sqrt(p.fill))}" class="mk-hi"/>`);
+      keyEls.push(text(gx + LC_MAX_R + 4, cy + 4.5, p.value, { size: 12.5, cls: 'num', where: 'legend value' }));
       lx = gx + LC_MAX_R + 4 + textWidth(p.value, 12.5, 'mono') + 12;
     }
     ly += 2 * LC_MAX_R + 8;
   }
-  if (keys.length) bottom = ly - 4;
+  if (keys.length) {
+    out.push(...keyEls);
+    bottom = ly - 4;
+  }
 
   const { svg, height } = assemble({
     base: input,

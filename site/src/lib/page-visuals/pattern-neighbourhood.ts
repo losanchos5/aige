@@ -91,6 +91,7 @@ export function patternNeighbourhood(def: PatternDef, body: string): { wide: Cha
     source: 'the pattern catalogue, the obligation register, the open controls and the cases',
     centre: { label: centreLabel(def.title) },
     relationLabels: { core: 'Names this pattern', related: 'Related pattern' },
+    legendTitles: { layer: 'Colour: stack layer of the related pattern' },
   };
   const wide = relationRadial({ ...base, id: 'pp-hood-w', families: neighbourhoodFamilies(def, body) });
   if (!wide) return null;

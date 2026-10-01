@@ -19,7 +19,9 @@ import {
   fitText,
   fmt,
   hitRect,
+  autoLegend,
   legend,
+  legendBlocks,
   linearScale,
   linkText,
   markClass,
@@ -171,6 +173,16 @@ function rankedCore(input: RankedBarsInput, style: 'bar' | 'lollipop'): ChartOut
   }
   gridlines(out, s.ticks, s.map, gridTop, y - 4);
   out.push(...rows);
+  // The layers and states the bars use (a highlighted bar is the accent).
+  const lg = legendBlocks(
+    autoLegend(items.filter((i) => !i.highlight), input, style === 'lollipop' ? { shape: 'circle' } : {}),
+    L,
+    y + 14,
+    W - L,
+    marks,
+  );
+  out.push(...lg.els);
+  if (lg.els.length) y = lg.bottom + 4;
   const { svg, height } = assemble({
     base: input,
     width: W,

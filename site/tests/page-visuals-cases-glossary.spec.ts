@@ -95,8 +95,10 @@ test.describe('/cases/<id>: the incident bow-tie', () => {
       expect([...hrefs].sort(), c.id).toEqual([...expected].sort());
 
       // The evidence is the terminal panel: one layer chip per artefact, in
-      // the artefact's layer colour, in record order.
-      expect(await toneOf(page, svg, 'fill'), c.id).toEqual(c.evidenceArtefacts.map((a) => a.layerN));
+      // the artefact's layer colour, in record order; then the legend's one
+      // swatch per layer used, in stack order.
+      const chips = c.evidenceArtefacts.map((a) => a.layerN);
+      expect(await toneOf(page, svg, 'fill'), c.id).toEqual([...chips, ...[...new Set(chips)].sort((a, b) => a - b)]);
     }
   });
 });

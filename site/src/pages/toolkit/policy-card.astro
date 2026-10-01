@@ -114,6 +114,7 @@ const lanesInput = {
     })),
   })),
   legend: usedEffects.map((effect) => ({ label: effectName(effect), shape: effectShape[effect] })),
+  legendHeading: "Shape: the rule's effect on the action",
 };
 const lanesWide = lanes({ ...lanesInput, id: 'pc-lanes-w', width: 640 });
 const lanesNarrow = lanes({ ...lanesInput, id: 'pc-lanes-n', width: NARROW_WIDTH, orientation: 'vertical' });

@@ -14,7 +14,9 @@
 import {
   NARROW_WIDTH,
   assemble,
+  autoLegend,
   legend,
+  legendBlocks,
   linkText,
   markStyles,
   nonEmpty,
@@ -47,7 +49,8 @@ export interface LanesInput extends ChartBase {
   rows: { label: string; href?: string; marks: LaneMark[] }[];
   /** Table heading of the row-label column ("Control"). */
   rowHeader: string;
-  /** Legend entries, usually one per shape. */
+  /** Legend entries, usually one per shape (heading: legendHeading); with
+   *  none, the auto legend of the marks' layers and states. */
   legend?: { label: string; shape: Shape; state?: MarkState; tone?: Tone }[];
   /** Horizontal: column width (default: the room left after the label column, at least 56). */
   columnWidth?: number;
@@ -73,8 +76,10 @@ export function lanes(input: LanesInput): ChartOutput {
   const marks = markStyles(input.id);
   const out: string[] = [];
   let y = 4;
-  if (input.legend?.length) {
-    const lg = legend(input.legend, L, y + 14, W - L, marks);
+  const lg = input.legend?.length
+    ? legend(input.legend, L, y + 14, W - L, marks, input.legendHeading)
+    : legendBlocks(autoLegend(input.rows.flatMap((r) => r.marks), input), L, y + 14, W - L, marks);
+  if (lg.els.length) {
     out.push(...lg.els);
     y = lg.bottom + 12;
   }

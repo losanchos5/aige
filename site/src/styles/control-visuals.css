@@ -29,6 +29,7 @@
 .clx .clx-stages,
 .clx .clx-rows,
 .clx .clx-cells,
+.clx .clx-marks,
 .clx .clx-key {
   margin: 0;
   padding: 0;
@@ -77,24 +78,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.clx .clx-mix {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-1) var(--s-3);
-  margin-top: var(--s-1);
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  color: var(--ink);
-  --cvm: 11px;
-}
-
-.clx .clx-mix-i {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-
 .clx .clx-rows {
   display: flex;
   flex-direction: column;
@@ -114,8 +97,7 @@
 }
 
 .clx .clx-name-n,
-.clx .clx-count,
-.clx .clx-key-n {
+.clx .clx-count {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
   font-weight: 400;
@@ -151,8 +133,25 @@
 .clx .clx-marks {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  padding-block: 2px;
+  /* Each mark links to its control: the gap makes a 24 px pitch, the
+     pointer-target spacing of WCAG 2.5.8, whatever the mark's size. */
+  gap: calc(24px - var(--cvm));
+  padding: 4px;
+}
+
+.clx .clx-marks li {
+  display: block;
+  width: var(--cvm);
+  height: var(--cvm);
+}
+
+.clx .clx-marks a.cvm {
+  display: block;
+}
+
+.clx .clx-marks a.cvm:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
 }
 
 /* Wide: a pipeline of chevrons over four lanes, the profiles as rows. */
@@ -260,19 +259,36 @@
   .clx {
     --cvm: 16px;
   }
+}
 
-  .clx .clx-marks {
-    gap: 5px;
-  }
+/* The key: a reading line, then one set per channel, each opening with the
+   question it answers. */
+.clx .clx-legend {
+  margin-top: var(--s-5);
+  font-size: var(--fs-small);
+  color: var(--ink);
+}
+
+.clx .clx-read {
+  margin: 0 0 var(--s-4);
+  max-width: 62ch;
+}
+
+.clx .clx-keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-4) var(--s-7);
+}
+
+.clx .clx-key-h {
+  margin: 0 0 var(--s-2);
+  font-weight: 600;
 }
 
 .clx .clx-key {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-2) var(--s-5);
-  margin-top: var(--s-5);
-  font-size: var(--fs-small);
-  color: var(--ink);
+  flex-direction: column;
+  gap: var(--s-2);
 }
 
 .clx .clx-key li {
@@ -281,8 +297,8 @@
   gap: var(--s-2);
 }
 
-.clx .clx-key-note {
-  color: var(--ink-2);
+.clx .clx-key strong {
+  font-weight: 600;
 }
 
 .clx .clx-stamp {
@@ -296,6 +312,17 @@
    slide in along the pipeline as the chart scrolls into view (transform
    only). Print has no scroll timeline and keeps the final state. */
 @media screen and (prefers-reduced-motion: no-preference) {
+  /* A mark grows under the pointer or focus, as the mosaic's squares do
+     (the scale property composes with the diamond's own rotation). */
+  .clx .clx-marks a.cvm {
+    transition: scale var(--dur, 160ms) var(--ease, ease-out);
+  }
+
+  .clx .clx-marks a.cvm:hover,
+  .clx .clx-marks a.cvm:focus-visible {
+    scale: 1.35;
+  }
+
   @supports (animation-timeline: view()) {
     @container (min-width: 760px) {
       .clx .clx-marks {
@@ -339,6 +366,10 @@
 
   .clx .clx-stage + .clx-stage {
     margin-left: 0;
+  }
+
+  .clx .clx-marks a.cvm:focus-visible {
+    outline-color: Highlight;
   }
 }
 
@@ -520,6 +551,10 @@
   display: flex;
   flex-direction: column;
   gap: var(--s-2);
+}
+
+.cpt .cpt-key .cpt-key-h {
+  font-weight: 600;
 }
 
 .cpt .cpt-key li {
@@ -880,6 +915,15 @@
 
 .ccv .ccv-key .ccv-sq {
   margin-right: 0;
+}
+
+/* The key's sample of a hatched row (a control with no verified mapping). */
+.ccv .ccv-voidkey {
+  flex: none;
+  width: 28px;
+  height: 16px;
+  border: 1px solid var(--line);
+  background: repeating-linear-gradient(-45deg, var(--line) 0 1px, transparent 1px 6px);
 }
 
 .ccv .ccv-stamp {

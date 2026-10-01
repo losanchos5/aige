@@ -12,8 +12,10 @@
 // colours only through classes (never a hex), state by fill, outline, dash or
 // hatch (never colour alone), text at 12 px or more and never dimmed with
 // opacity, no U+2014 in any label, deterministic output (no clock, no random,
-// no locale-dependent sort). No runtime imports, so Astro and
-// scripts/lib/load-ts.mjs can both load it.
+// no locale-dependent sort). One runtime import: the layer names of
+// data/stack (a pure module), for the swatches of the auto legend, so a
+// legend never spells a layer differently from the rest of the site.
+import { layers } from '../../data/stack';
 
 /** 0 = ink (not a layer); 1 to 5 = the stack layers (--l1..--l5). */
 export type Tone = 0 | 1 | 2 | 3 | 4 | 5;
@@ -70,6 +72,16 @@ export interface ChartBase {
   width?: number;
   /** Caption of the table alternative (default: the title). */
   tableCaption?: string;
+  /** The questions the auto legend's blocks answer (autoLegend): `layer`
+   *  ("Colour: layer of the control that catches it") and `state`
+   *  ("Drawing: failure response"). */
+  legendTitles?: { layer?: string; state?: string };
+  /** false: draw no auto legend (the page shows its own key beside the
+   *  chart). Default true. */
+  autoLegend?: boolean;
+  /** The question an explicit `legend` list answers ("Effect when the rule
+   *  fails"), printed above its swatches. */
+  legendHeading?: string;
 }
 
 /** viewBox width of the narrow variant of a pair. A 320 px phone gives the
@@ -840,16 +852,36 @@ export function claimIds(page: object, svgs: string[], title: string): void {
   for (const id of here) seen.set(id, title);
 }
 
+export interface LegendEntry {
+  label: string;
+  shape?: Shape;
+  state?: MarkState;
+  tone?: Tone;
+  /** 'bar': a square swatch; 'pin': the solid date pin of a time chart. */
+  swatch?: 'bar' | 'pin';
+}
+
 /** A legend row: swatches (shape or bar) with their labels, wrapping onto new
- *  rows when the width runs out. Returns the elements and the bottom y. */
+ *  rows when the width runs out. `heading` (the question the swatches answer,
+ *  "Colour: layer of the control that catches it") goes on its own line(s)
+ *  above them. Returns the elements and the bottom y (the baseline of the
+ *  last row). */
 export function legend(
-  entries: { label: string; shape?: Shape; state?: MarkState; tone?: Tone; swatch?: 'bar' }[],
+  entries: LegendEntry[],
   x0: number,
   y: number,
   maxX: number,
   marks: ReturnType<typeof markStyles>,
+  heading?: string,
 ): { els: string[]; bottom: number } {
   const els: string[] = [];
+  if (heading) {
+    for (const line of wrapText(heading, maxX - x0, 12.5, 'body', 3, 'legend heading')) {
+      els.push(text(x0, y, line, { size: 12.5, weight: 600, where: 'legend heading' }));
+      y += 16;
+    }
+    y += 2;
+  }
   let x = x0;
   for (const e of entries) {
     const w = 18 + textWidth(e.label, 12.5) + 16;
@@ -860,12 +892,94 @@ export function legend(
     fitText(e.label, maxX - x0 - 18, 12.5, 'body', 'legend');
     const a = marks.attrs(e.state, e.tone);
     els.push(
-      e.swatch === 'bar' || !e.shape
-        ? `<rect x="${r1(x)}" y="${r1(y - 10)}" width="12" height="12" rx="2" ${a}/>`
-        : shape(e.shape, x + 6, y - 4, 5, a),
+      e.swatch === 'pin'
+        ? `<rect x="${r1(x + 4.5)}" y="${r1(y - 12)}" width="3" height="16" class="mk-hi"/>`
+        : e.swatch === 'bar' || !e.shape
+          ? `<rect x="${r1(x)}" y="${r1(y - 10)}" width="12" height="12" rx="2" ${a}/>`
+          : shape(e.shape, x + 6, y - 4, 5, a),
     );
     els.push(text(x + 18, y, e.label, { size: 12.5, where: 'legend' }));
     x += w;
   }
+  if (!entries.length && heading) y -= 18;
   return { els, bottom: y };
+}
+
+// ------------------------------------------------------- auto legends -- //
+
+/** The short name of a stack layer for a legend swatch: "03 Evals" (the
+ *  name of data/stack up to its first " & "). */
+export function layerName(tone: Tone): string {
+  const layer = layers.find((l) => l.n === tone);
+  if (!layer) throw new Error(`charts(legend): no stack layer ${tone}`);
+  return `0${tone} ${layer.name.split(' & ')[0]}`;
+}
+
+/** What a mark encodes, as an auto legend reads it. */
+export interface LegendMark {
+  tone?: Tone;
+  state?: MarkState;
+  /** The status word the mark's state stands for ("To be specified"). */
+  status?: string;
+}
+
+const STATE_ORDER: MarkState[] = ['filled', 'outline', 'dashed', 'dotted', 'hatched'];
+const AUTO_TITLES = {
+  en: { layer: 'Colour: stack layer', state: 'Drawing: status' },
+  es: { layer: 'Color: capa de la pila', state: 'Trazo: estado' },
+};
+
+/**
+ * The legend blocks a chart's marks call for, derived from the marks drawn:
+ * one block of layer swatches when any mark carries a layer tone (only the
+ * layers used, in stack order, named as in data/stack), and one block of
+ * drawing swatches when any mark is drawn other than filled (only the states
+ * used, each named by the status of its first mark, else the state word).
+ * Each block opens with its question (base.legendTitles, else a default);
+ * `base.autoLegend: false` returns none (the page has its own key).
+ */
+export function autoLegend(
+  items: LegendMark[],
+  base: Pick<ChartBase, 'lang' | 'legendTitles' | 'autoLegend'>,
+  o: { shape?: Shape } = {},
+): { heading: string; entries: LegendEntry[] }[] {
+  if (base.autoLegend === false) return [];
+  const titles = { ...AUTO_TITLES[base.lang === 'es' ? 'es' : 'en'], ...base.legendTitles };
+  const blocks: { heading: string; entries: LegendEntry[] }[] = [];
+  const tones = [...new Set(items.map((m) => m.tone ?? 0))].filter((t) => t > 0).sort((a, b) => a - b);
+  if (tones.length) {
+    blocks.push({ heading: titles.layer, entries: tones.map((t) => ({ label: layerName(t), tone: t, swatch: 'bar' as const })) });
+  }
+  const states = STATE_ORDER.filter((s) => items.some((m) => (m.state ?? 'filled') === s));
+  if (states.some((s) => s !== 'filled')) {
+    blocks.push({
+      heading: titles.state,
+      entries: states.map((s) => ({
+        label: items.find((m) => (m.state ?? 'filled') === s && m.status)?.status ?? stateWord(s, base.lang),
+        state: s,
+        tone: 0 as Tone,
+        ...(o.shape ? { shape: o.shape } : { swatch: 'bar' as const }),
+      })),
+    });
+  }
+  return blocks;
+}
+
+/** Draw legend blocks one under the other from baseline `y` (the first
+ *  block's first line); returns the elements and the last baseline. */
+export function legendBlocks(
+  blocks: { heading?: string; entries: LegendEntry[] }[],
+  x0: number,
+  y: number,
+  maxX: number,
+  marks: ReturnType<typeof markStyles>,
+): { els: string[]; bottom: number } {
+  const els: string[] = [];
+  let bottom = y - 22;
+  for (const b of blocks) {
+    const lg = legend(b.entries, x0, bottom + 22, maxX, marks, b.heading);
+    els.push(...lg.els);
+    bottom = lg.bottom;
+  }
+  return { els, bottom };
 }

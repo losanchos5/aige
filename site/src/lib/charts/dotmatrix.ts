@@ -10,7 +10,9 @@ import {
   assemble,
   fitText,
   layerWord,
+  autoLegend,
   legend,
+  legendBlocks,
   markStyles,
   nonEmpty,
   rect,
@@ -48,7 +50,8 @@ export interface DotMatrixInput extends ChartBase {
    *  when any cell links (a 24 px pitch). */
   cell?: number;
   gap?: number;
-  /** Legend under the cells (state and tone swatches). */
+  /** Legend under the cells (state and tone swatches); by default the auto
+   *  legend of the layers and states the cells use (core autoLegend). */
   legend?: { label: string; state?: MarkState; tone?: Tone; shape?: Shape }[];
   /** Cells take keyboard focus (role group); links always do. */
   focusable?: boolean;
@@ -94,8 +97,10 @@ export function dotMatrix(input: DotMatrixInput): ChartOutput {
     const rows = Math.max(1, Math.ceil(n / perRow));
     y += rows * (cell + gap) - gap + 10;
   }
-  if (input.legend?.length) {
-    const lg = legend(input.legend, L, y + 16, W - L, marks);
+  const lg = input.legend?.length
+    ? legend(input.legend, L, y + 16, W - L, marks, input.legendHeading)
+    : legendBlocks(autoLegend(input.groups.flatMap((g) => g.items), input), L, y + 16, W - L, marks);
+  if (lg.els.length) {
     body.push(...lg.els);
     y = lg.bottom + 4;
   }

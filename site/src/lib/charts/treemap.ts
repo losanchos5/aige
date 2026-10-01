@@ -18,11 +18,16 @@
 // Narrow ('narrow', 280, and under 480 wide): the groups stacked as full-width
 // bands, each under its header, the same squarify inside each band, so the
 // small tiles merge sooner; a band is at least 24 high (a tiny group then
-// overstates its area; its header prints the total). Same table: Group | Item | value | fill (%) |
+// overstates its area; its header prints the total). A legend under the
+// tiles says what the area counts, what a "+N" tile is, what the foot bar
+// measures, and the layers and states the tiles use (core autoLegend), each
+// only when drawn. Same table: Group | Item | value | fill (%) |
 // status, one row per item in input order, merged ones included.
 import {
   NARROW_WIDTH,
   assemble,
+  autoLegend,
+  legendBlocks,
   fmt,
   markStyles,
   nonEmpty,
@@ -79,6 +84,12 @@ export interface TreemapInput extends ChartBase {
   valueHeader?: string;
   /** Heading of the fill column and word in tooltips ("Taught"). */
   fillHeader?: string;
+  /** What the foot bar measures, for the legend ("share of its indicators
+   *  taught"; default: the fill header in lower case). */
+  fillKey?: string;
+  /** What a tile's area counts, for the legend ("obligation rows per
+   *  instrument"; default: the unit). */
+  areaKey?: string;
   /** Tiles narrower or shorter than this merge into "+N" (default and
    *  floor 24, the pointer-target size); raise it to merge a long tail
    *  sooner when the SVG would pass the 12 KB budget. */
@@ -94,6 +105,10 @@ interface Rect {
 
 const L = 12;
 const HEAD = 20;
+const TM_WORDS = {
+  en: { area: (unit: string) => `Tile area: ${unit}`, plus: '+N: smaller tiles together', bar: (what: string) => `Bar along the foot: ${what}, 0 to 100 %`, share: 'share' },
+  es: { area: (unit: string) => `Área de cada tesela: ${unit}`, plus: '+N: teselas pequeñas juntas', bar: (what: string) => `Barra al pie: ${what}, de 0 a 100 %`, share: 'proporción' },
+};
 const MIN_TILE = 24;
 
 /** Squarified layout of `values` (sorted largest first) in `r`; one rect per value. */
@@ -239,9 +254,13 @@ export function treemap(input: TreemapInput): ChartOutput {
     }
   };
 
+  // What the tiles drew, for the legend: "+N" tiles, foot bars, the items.
+  const drawn = { merged: false, bar: false, items: [] as TreemapItem[] };
   const drawTile = (g: TreemapGroup, tile: Tile, r: Rect) => {
     const els: string[] = [];
     const first = tile.items[0];
+    if (tile.merged) drawn.merged = true;
+    else drawn.items.push(first);
     const tone = tile.merged ? 0 : (first.tone ?? 0);
     const state = tile.merged ? 'outline' : (first.state ?? 'filled');
     const full = r.w >= MIN_TILE && r.h >= MIN_TILE;
@@ -261,6 +280,7 @@ export function treemap(input: TreemapInput): ChartOutput {
     const { bar, lines, lw, value, vw, showLabel, showValue, inlineValue } = face(tile, r);
     els.push(`<rect x="${r1(r.x)}" y="${r1(r.y)}" width="${r1(r.w)}" height="${r1(r.h)}" ${cls}/>`);
     if (bar) {
+      drawn.bar = true;
       els.push(`<rect x="${r1(r.x + 4)}" y="${r1(r.y + r.h - 7)}" width="${r1(r.w - 8)}" height="4" class="tm-track"/>`);
       if (first.fill) els.push(`<rect x="${r1(r.x + 4)}" y="${r1(r.y + r.h - 7)}" width="${r1((r.w - 8) * first.fill)}" height="4" class="tm-bar"/>`);
     }
@@ -348,6 +368,30 @@ export function treemap(input: TreemapInput): ChartOutput {
       y += h + 4;
     }
     bottom = y - 4;
+  }
+
+  // Legend: the area, "+N" and the foot bar when drawn, then layers and states.
+  const tw = TM_WORDS[input.lang === 'es' ? 'es' : 'en'];
+  const lg = legendBlocks(
+    [
+      { heading: tw.area(input.areaKey ?? input.unit), entries: drawn.merged ? [{ label: tw.plus, state: 'outline' as const, tone: 0 as Tone, swatch: 'bar' as const }] : [] },
+      ...autoLegend(drawn.items, input),
+    ],
+    L,
+    bottom + 24,
+    W - L,
+    marks,
+  );
+  out.push(...lg.els);
+  bottom = lg.bottom;
+  if (drawn.bar) {
+    const y = bottom + 22;
+    const lines = wrapText(tw.bar(input.fillKey ?? input.fillHeader?.toLowerCase() ?? tw.share), W - 2 * L - 46, 12.5, 'body', 3, 'legend heading');
+    out.push(
+      `<rect x="${L}" y="${y - 6}" width="36" height="4" class="tm-track"/><rect x="${L}" y="${y - 6}" width="18" height="4" class="tm-bar"/>` +
+        lines.map((line, i) => text(L + 46, y + i * 16, line, { size: 12.5, weight: 600, where: 'legend heading' })).join(''),
+    );
+    bottom = y + (lines.length - 1) * 16;
   }
 
   const withFill = groups.some((g) => g.items.some((it) => it.fill !== undefined));

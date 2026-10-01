@@ -11,7 +11,8 @@
  * is a control of data/controls/evaluation-environment.ts in its stack-layer
  * colour, hatched when its failure response is still to be specified
  * (isResponseToSpecify), and links to its section of the profile page. The
- * key under the rings names each ring's controls (keyMarks). Drawn by the
+ * key under the rings says what the rings are and names each ring's controls
+ * (keyMarks); the kit's auto legend names the layers (and states) drawn. Drawn by the
  * chart kit's concentricRings, 'figc' mode (the page loads reading.css); a
  * NARROW_WIDTH variant for phones. Not registered in figures.ts (tanda 4).
  */
@@ -50,7 +51,6 @@ const marks: RingMark[] = controls.map((c) => {
     href: controlAnchorPath(c),
   };
 });
-const layersUsed = [...new Set(controls.map((c) => c.layer))].sort();
 /** The outermost ring: the controls the note's list of five leaves out. */
 const recordRing = evalBoundaryRings[evalBoundaryRings.length - 1];
 
@@ -64,7 +64,8 @@ const base = {
   marks,
   centre: { label: 'Model or agent' },
   keyMarks: true,
-  legend: layersUsed.map((n) => ({ label: `Layer 0${n}`, tone: n as Tone })),
+  ringsTitle: 'Rings: what surrounds the model under test, from the harness out, with the controls that guard each',
+  legendTitles: { layer: 'Colour: stack layer of the control', state: 'Drawing: failure response' },
   itemHeader: 'Control',
   tableCaption: 'Each evaluation environment control with the ring of the environment it guards and its stack layer',
 };

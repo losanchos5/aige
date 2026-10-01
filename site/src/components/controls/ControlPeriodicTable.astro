@@ -88,7 +88,8 @@ const tableCaption = `The ${profile.shortTitle.toLowerCase()} controls with thei
         </span>
         Pips, left to right: {STAGES.map((s) => s.label.toLowerCase()).join(', ')}; lit where the control acts
       </p>
-      <ul class="cpt-key" role="list" aria-label="Mark: failure response">
+      <ul class="cpt-key" role="list" aria-label="Corner mark: what happens when the control fails">
+        <li class="cpt-key-h" aria-hidden="true">Corner mark: what happens when the control fails</li>
         {
           responses.map((x) => (
             <li>
@@ -98,7 +99,8 @@ const tableCaption = `The ${profile.shortTitle.toLowerCase()} controls with thei
           ))
         }
       </ul>
-      <ul class="cpt-key" role="list" aria-label="Border: depth">
+      <ul class="cpt-key" role="list" aria-label="Border: how far the control is written">
+        <li class="cpt-key-h" aria-hidden="true">Border: how far the control is written</li>
         {
           depths.map((x) => (
             <li>
@@ -108,7 +110,8 @@ const tableCaption = `The ${profile.shortTitle.toLowerCase()} controls with thei
           ))
         }
       </ul>
-      <ul class="cpt-key" role="list" aria-label="Bar: home stack layer">
+      <ul class="cpt-key" role="list" aria-label="Colour: the control's home stack layer">
+        <li class="cpt-key-h" aria-hidden="true">Colour: the control's home stack layer</li>
         {
           layerCounts.map((l) => (
             <li>
