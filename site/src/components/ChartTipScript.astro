@@ -1,0 +1,12 @@
+---
+/**
+ * ChartTipScript: emits the /chart-tip.js island at most once per page. Use it
+ * next to every chart-tip root (an element with data-ctip: Chart.astro's
+ * figure, the HTML chart grids, the AIGP heat map), guarded by
+ * Astro.locals.chartTipScript like Diagram.astro's diagramScript.
+ */
+const emit = !Astro.locals.chartTipScript;
+if (emit) Astro.locals.chartTipScript = true;
+---
+
+{emit && <script is:inline src="/chart-tip.js" defer></script>}
