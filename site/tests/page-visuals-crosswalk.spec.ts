@@ -179,6 +179,29 @@ test.describe('comparison pages: overlap bar and clause butterfly', () => {
       const order = ['strong', 'partial', 'a-only', 'b-only'];
       const sorted = [...rows].sort((x, y) => order.indexOf(x.level!) - order.indexOf(y.level!));
       expect(drawn).toEqual(sorted.map(({ id, level, a, b }) => ({ id, level, a, b })));
+      // Each square is named for its tooltip by its instrument, clause and
+      // strength, and the strength in its name is the one it is drawn in.
+      for (const li of figure.split('<li class="cb-row"').slice(1)) {
+        const topic = /data-topic="([^"]+)"/.exec(li)?.[1];
+        const [, a, b] = li.split(/data-side="[ab]"/);
+        for (const [part, fw, name] of [
+          [a, c.a, c.aName],
+          [b, c.b, c.bName],
+        ] as const) {
+          const squares = [...part.matchAll(/class="cb-sq (cb-core|cb-rel)[^"]*" data-tip="([^"]*)"/g)].map((m) => ({
+            core: m[1] === 'cb-core',
+            tip: decode(m[2]),
+          }));
+          const list = refs.filter((r) => r.topic === topic && r.framework === fw);
+          expect(squares, `${topic} ${fw}`).toHaveLength(list.length);
+          for (const r of list) {
+            const strength = r.strength === 'core' ? 'core' : 'related';
+            const named = squares.filter((s) => s.tip.startsWith(`${name} ${r.ref} `) && s.tip.endsWith(`(${strength} clause)`));
+            expect(named.length, `${topic} ${fw} ${r.ref}`).toBeGreaterThan(0);
+            expect(named.every((s) => s.core === (strength === 'core')), `${topic} ${fw} ${r.ref}`).toBe(true);
+          }
+        }
+      }
     });
   }
 });

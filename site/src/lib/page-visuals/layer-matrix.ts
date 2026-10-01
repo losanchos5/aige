@@ -38,8 +38,9 @@ export interface MatrixCell {
   value: number;
   /** The filtered view or the first record of the cell; none when empty. */
   href?: string;
-  /** What the number counts, for the cell's accessible name
-   *  ("obligations in layer 01"): "<value> <label>". */
+  /** What the number counts, naming the cell's row and column, for its
+   *  accessible name and tooltip ("obligations in layer 01 Govern-as-Code"):
+   *  "<value> <label>". */
   label: string;
   /** Unit glyphs in reading order (path nodes by kind); a bar otherwise. */
   marks?: PathKind[];
@@ -54,6 +55,8 @@ export interface LayerMatrixData {
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');
+/** "layer 01 Govern-as-Code": a stack layer by number and name (data/stack). */
+const layerWords = (n: LayerNumber) => `layer ${pad(n)} ${layers.find((l) => l.n === n)?.name ?? ''}`.trim();
 const LAYERS: readonly LayerNumber[] = [1, 2, 3, 4, 5];
 const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
@@ -129,7 +132,7 @@ export function stackLayerMatrix(): LayerMatrixData {
         return {
           value,
           href: value > 0 && c.href ? c.href(layer.n) : undefined,
-          label: `${plural(value, c.one, c.many)} in layer ${pad(layer.n)}`,
+          label: `${plural(value, c.one, c.many)} in ${layerWords(layer.n)}`,
         };
       }),
     ),
@@ -167,7 +170,7 @@ export function pathStageLayerMatrix(): LayerMatrixData {
     cells: stages.map((stage) =>
       columns.map((column) => {
         const here = nodes.filter((node) => node.stage === stage.id && node.layerN === column.layer);
-        const where = column.layer ? `layer ${pad(column.layer)}` : 'no layer (cross-cutting)';
+        const where = column.layer ? layerWords(column.layer) : 'no layer (cross-cutting)';
         const kinds = KINDS.map((k) => [k, here.filter((node) => node.kind === k).length] as const)
           .filter(([, n]) => n > 0)
           .map(([k, n]) => `${n} ${KIND_WORD[k][n === 1 ? 0 : 1]}`);

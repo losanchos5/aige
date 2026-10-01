@@ -10,10 +10,15 @@
 // are styled in src/styles/aigp.css), text of 12 px or more at 390 px, the
 // source line and "As of <date>" inside the image (VISUAL-GUIDE.md §4.4-4.5).
 //
+// The root is a chart-tip root (data-ctip; the page loads ChartTipScript):
+// every cell carries a <title> naming its domain, competency and indicator and
+// its status, which public/chart-tip.js shows at once on hover and tap, and
+// the browser natively without JavaScript.
+//
 // No runtime imports (types only), so a build script can load this module with
 // scripts/lib/load-ts.mjs and write the same SVG to src/figures if the heatmap
 // ever joins the figures gallery.
-import type { AigpDomain, QuestionRange } from '../data/aigp';
+import type { AigpDomain, AigpIndicator, QuestionRange } from '../data/aigp';
 
 export interface HeatmapOptions {
   /** Id suffix for the <title>/<desc> ids. */
@@ -31,6 +36,13 @@ const esc = (value: string | number): string =>
 
 const mid = (range: QuestionRange): number => (range.min + range.max) / 2;
 const round = (n: number): number => Math.round(n * 10) / 10;
+
+/** The legend's words for a cell's status (src/data/aigp.ts statusLabel; not
+ *  imported: this module keeps no runtime imports). */
+const STATUS: Readonly<Record<AigpIndicator['status'], string>> = {
+  taught: 'Taught',
+  'partly-taught': 'Partly taught',
+};
 
 const W = 360;
 const LEFT = 16;
@@ -105,7 +117,8 @@ export function aigpHeatmapSvg(domains: readonly AigpDomain[], options: HeatmapO
       );
       competency.indicators.forEach((indicator, i) => {
         const x = BAR_X + i * (cellW + CELL_GAP);
-        const rect = `<rect x="${round(x)}" y="${top}" width="${round(cellW)}" height="${ROW_H}" rx="3"/>`;
+        const name = `Domain ${domain.code} · ${indicator.id}: ${STATUS[indicator.status]}`;
+        const rect = `<rect x="${round(x)}" y="${top}" width="${round(cellW)}" height="${ROW_H}" rx="3"><title>${esc(name)}</title></rect>`;
         (indicator.status === 'taught' ? taught : partly).push(rect);
         numbers.push(`<text x="${round(x + cellW / 2)}" y="${top + 16.5}">${i + 1}</text>`);
       });
@@ -148,7 +161,7 @@ export function aigpHeatmapSvg(domains: readonly AigpDomain[], options: HeatmapO
 
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" class="figc ag-hm" ` +
-    `role="img" aria-labelledby="fig-${esc(options.id)}-t fig-${esc(options.id)}-d">` +
+    `role="img" aria-labelledby="fig-${esc(options.id)}-t fig-${esc(options.id)}-d" data-ctip>` +
     `<title id="fig-${esc(options.id)}-t">${esc(options.title)}</title>` +
     `<desc id="fig-${esc(options.id)}-d">${esc(options.alt)}</desc>` +
     body.join('') +

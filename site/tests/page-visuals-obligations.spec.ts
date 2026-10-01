@@ -68,11 +68,11 @@ test.describe('/obligations: the application clock', () => {
     for (const p of points) expected.set(p.word, (expected.get(p.word) ?? 0) + 1);
     for (const variant of ['.chart-w', '.chart-n']) {
       const svg = page.locator(`${FIG} ${variant} svg`);
-      // A run of dots is titled "<dates> · <count> · <status>".
+      // A run of dots is titled "<dates> · <count> date(s) · <status>".
       const titles = await svg.locator('g > title').allTextContents();
       const drawn = new Map<string, number>();
       for (const t of titles) {
-        const m = /· (\d+) · (.+)$/.exec(t);
+        const m = /· (\d+) dates? · (.+)$/.exec(t);
         if (m) drawn.set(m[2], (drawn.get(m[2]) ?? 0) + Number(m[1]));
       }
       expect(drawn, variant).toEqual(expected);

@@ -117,8 +117,9 @@ const stackRows = layers.map((layer) => ({
 // one square per case that names it, the cases always in the order of
 // data/cases.ts; each square links
 // to its case, named as #incidents lists it (the page's neutral labels, no
-// lab named) or else neutrally (caseLabel). The controls are linked in the key
-// under the chart. A HeatGrid of every case x control cell would pass the
+// lab named) or else neutrally (caseLabel), with the control it names (short
+// id and title) as its status, so the tooltip says which control. The
+// controls are linked in the key under the chart. A HeatGrid of every case x control cell would pass the
 // 12 KB budget of one SVG (a tooltip per cell), so the waffle draws only the
 // named pairs.
 const evalControls = controlsIn('evaluation-environment');
@@ -150,7 +151,7 @@ const caseBase = {
     label: shortId(c.id),
     items: matrixCases
       .filter((k) => casesOf.get(c.id)!.has(k.id))
-      .map((k) => ({ label: caseLabel(k), status: 'Names the control', href: `/cases/${k.id}` })),
+      .map((k) => ({ label: caseLabel(k), status: `Names ${shortId(c.id)} ${c.title}`, href: `/cases/${k.id}` })),
   })),
   groupHeader: 'Control',
   unit: 'cases',

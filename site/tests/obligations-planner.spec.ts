@@ -572,7 +572,7 @@ test.describe('obligation page chain figure', () => {
     await expect(figure).toBeVisible();
     await expect(figure.locator('svg.ob-chain-row')).toBeVisible();
     await expect(figure.locator('svg.ob-chain-column')).toBeHidden();
-    await expect(figure.locator('svg.ob-chain-row title')).toHaveText('From clause to evidence');
+    await expect(figure.locator('svg.ob-chain-row > title')).toHaveText('From clause to evidence');
     // Labels wrap into separate <text> lines on the wide layout.
     await expect(figure.locator('svg.ob-chain-row text', { hasText: 'Risk register' }).first()).toBeVisible();
     await expect(figure.locator('svg.ob-chain-row text', { hasText: 'Evidence record' })).toHaveCount(1);

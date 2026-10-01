@@ -9,11 +9,15 @@
  * the SVGs' <desc> nor the text alternative repeats it (audit C10: the same
  * words three times made obligation pages near-duplicates of each other): the
  * text alternative reads the figure's own labels, with links to the record
- * schemas.
+ * schemas. The figure is a chart-tip root (data-ctip, ChartTipScript): each
+ * node's <title> (its kicker and uncut value) shows at once on hover and tap
+ * (the tooltip's styles come from chart.css).
  */
 import type { Obligation } from '../../data/frameworks';
 import { chainFor, chainSvg } from '../../lib/evidence-chain';
 import { instrumentClause } from '../../lib/obligation-title';
+import ChartTipScript from '../ChartTipScript.astro';
+import '../../styles/chart.css';
 
 interface Props {
   row: Obligation;
@@ -28,7 +32,7 @@ const wide = chainSvg(chain, { layout: 'row', idPrefix: `${base}-row`, title, de
 const narrow = chainSvg(chain, { layout: 'column', idPrefix: `${base}-col`, title, desc });
 ---
 
-<figure class="figure--infographic ob-chain" aria-labelledby={`${base}-caption`}>
+<figure class="figure--infographic ob-chain" aria-labelledby={`${base}-caption`} data-ctip>
   <div class="figure-canvas">
     <Fragment set:html={wide} />
     <Fragment set:html={narrow} />
@@ -82,6 +86,7 @@ const narrow = chainSvg(chain, { layout: 'column', idPrefix: `${base}-col`, titl
     </ul>
   </details>
 </figure>
+<ChartTipScript />
 
 <style>
   .ob-chain {

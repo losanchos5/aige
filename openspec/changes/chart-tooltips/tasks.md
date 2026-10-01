@@ -31,23 +31,24 @@ que usan los dos bloques.
 
 ## 3. Bloque B: rejillas HTML y nombres de páginas
 
-- [ ] 3.1 Raíces `data-ctip` y `<ChartTipScript />` en ControlMosaic, ControlLanes,
+- [x] 3.1 Raíces `data-ctip` y `<ChartTipScript />` en ControlMosaic, ControlLanes,
   ControlsCrosswalkIndex, CoverageMap, CrosswalkMatrix, LayerMatrix, ObligationMatrix,
   ObligationIsotype, ControlCoverage y ComparisonButterfly; importar `chart.css` en CoverageMap,
   CrosswalkMatrix y ObligationMatrix. Verificar: build verde, `perf.spec.ts` verde y cada ruta de
   esas rejillas carga la isla una vez.
-- [ ] 3.2 Nombres en rejillas: LayerMatrix (celda con fila, columna y recuento), ComparisonButterfly
+- [x] 3.2 Nombres en rejillas: LayerMatrix (celda con fila, columna y recuento), ComparisonButterfly
   (cada cuadro con su cláusula, desde los datos de la comparativa), ControlsCrosswalkIndex (celda con
   perfil, marco y recuento). Verificar: axe A11Y_FULL de `/stack`, `/path`, `/controls/crosswalk` y una
   comparativa sin violaciones nuevas.
-- [ ] 3.3 Mapa de calor AIGP (`src/lib/aigp-heatmap.ts`): `<title>` por celda (dominio, capítulo,
+- [x] 3.3 Mapa de calor AIGP (`src/lib/aigp-heatmap.ts`): `<title>` por celda (dominio, capítulo,
   valor) y raíz `data-ctip`; su página carga la isla. Verificar: SVG ≤ 12 KB y test de `/for/aigp`
   existente en verde.
-- [ ] 3.4 Nombres pobres en páginas (design D8), siempre desde los módulos de datos: `threatGrid` de
+- [x] 3.4 Nombres pobres en páginas (design D8), siempre desde los módulos de datos: `threatGrid` de
   `risk-visuals.ts`, Sankeys de `risk-visuals.ts` (capas y taxonomías), `EvalBoundary.astro`,
   `/frontier` casos x control, `/agents` (capa en el nombre), `toolkit/policy-card` (`effectName`),
   `PathRings.astro`, y revisión de `src/lib/page-charts/*` y `term-visuals.ts`, que no se auditaron.
   Verificar: los specs `page-visuals-*` afectados en verde y ningún SVG pasa de 12 KB en build.
+  (`threatGrid` y `EvalBoundary.astro` quedan en el bloque A.)
 
 ## 4. Integración y revisión
 

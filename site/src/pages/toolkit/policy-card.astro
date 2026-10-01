@@ -110,7 +110,7 @@ const lanesInput = {
     marks: template.enforcementPoints.map((point) => ({
       column: point,
       shape: effectShape[template.effect],
-      status: template.effect,
+      status: effectName(template.effect),
     })),
   })),
   legend: usedEffects.map((effect) => ({ label: effectName(effect), shape: effectShape[effect] })),

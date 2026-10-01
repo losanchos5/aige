@@ -18,6 +18,7 @@ import {
   aigpReviewBy,
   indicatorAnchor,
   rangeMidpoint,
+  statusLabel,
   studyPath,
 } from '../src/data/aigp';
 import { aigpMapProblems, resolveAigpLink, resolvedAigpMap } from '../src/lib/aigp-coverage';
@@ -169,6 +170,20 @@ test.describe('AIGP coverage map', () => {
     const partly = aigpIndicators().filter(({ indicator }) => indicator.status === 'partly-taught');
     expect(cells('ag-hm-taught') + cells('ag-hm-partly')).toBe(58);
     expect(cells('ag-hm-partly')).toBe(partly.length);
+    // Each cell's <title> (its chart tooltip) names its domain, its indicator
+    // and the status it is drawn in, in register order within each drawing.
+    const titles = (group: string) =>
+      [...(new RegExp(`<g class="${group}">(.*?)</g>`).exec(svg)?.[1] ?? '').matchAll(/<rect [^>]*><title>([^<]*)<\/title><\/rect>/g)].map((m) => m[1]);
+    for (const [group, status] of [['ag-hm-taught', 'taught'], ['ag-hm-partly', 'partly-taught']] as const) {
+      const expected = aigpIndicators().filter(({ indicator }) => indicator.status === status);
+      const drawn = titles(group);
+      expect(drawn, group).toHaveLength(expected.length);
+      expected.forEach(({ domain, indicator }, i) => {
+        expect(drawn[i]).toContain(`Domain ${domain.code}`);
+        expect(drawn[i]).toContain(indicator.id);
+        expect(drawn[i].endsWith(`: ${statusLabel[status]}`), drawn[i]).toBe(true);
+      });
+    }
     expect(svg.includes(EM_DASH)).toBe(false);
     expect(Buffer.byteLength(svg, 'utf8')).toBeLessThanOrEqual(12 * 1024);
     // Bar widths follow the range midpoint: IV.C (9-11) is 10 wide, II.D (3-5) is 4.

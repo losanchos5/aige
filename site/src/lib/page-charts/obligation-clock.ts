@@ -14,7 +14,7 @@
 // hatched), never a colour. 221 titled dots would pass the 12 KB budget of an
 // inline chart, so a run of dots of one style in one bin is one rect filled
 // with a pattern of that dot (the corpus-isotype technique), titled with its
-// dates and count. The dots are not links (221 links at the 24 px pointer
+// dates, count and style. The dots are not links (221 links at the 24 px pointer
 // spacing would need a chart ten times taller); the tallest towers carry a
 // label that links to their instrument's group in the list below.
 //
@@ -192,7 +192,11 @@ export function obligationClock(input: ObligationClockInput): ChartOutput {
   /** A run of `n` dots in one style drawn from (x, y) along one line. */
   const strip = (s: ClockStyle, x: number, top: number, w: number, h: number) =>
     `<g transform="translate(${r1(x)} ${r1(top)})"><rect width="${r1(w)}" height="${r1(h)}" fill="url(#${pat(s)})"/></g>`;
-  const runName = (run: Run) => `${span(run.points.map((p) => p.date))} · ${run.points.length} · ${input.styleLabels[run.style]}`;
+  // A run's name: its dates, how many and their style ("2018-05-25 · 15 dates
+  // · In force"); the instrument groups would pass the 12 KB budget, and the
+  // tower labels and the list below name them.
+  const runName = (run: Run) =>
+    `${span(run.points.map((p) => p.date))} · ${run.points.length} ${run.points.length === 1 ? 'date' : 'dates'} · ${input.styleLabels[run.style]}`;
 
   let bottom: number;
   if (wide) {

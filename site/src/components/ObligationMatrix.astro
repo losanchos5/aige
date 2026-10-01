@@ -14,8 +14,16 @@
  * index. The join back to the table rows is by obligation
  * text, carried in a JSON payload matrix.js reads: the table markup is left
  * untouched (it already carries the obligation text and its layer classes).
+ *
+ * The figure is a chart-tip root (data-ctip, ChartTipScript; chart.css carries
+ * the tooltip's styles): a cell's aria-label (framework, layer number and name,
+ * count) shows at once on hover, focus and tap. The row and column filter
+ * buttons are axes, data-ctip-skip, and the grid takes its name by
+ * aria-labelledby so the matrix's own name is never a tooltip.
  */
 import type { Framework, Obligation, StackLayer } from '../data/frameworks';
+import ChartTipScript from './ChartTipScript.astro';
+import '../styles/chart.css';
 
 interface Props {
   frameworks: readonly Framework[];
@@ -130,7 +138,7 @@ const rowsWithFlags = rows.map((r) => {
 });
 ---
 
-<figure class="mx" aria-labelledby="mx-cap">
+<figure class="mx" aria-labelledby="mx-cap" data-ctip>
   <figcaption id="mx-cap" class="mx-cap">
     <span class="mono">Heat index</span>
     <span class="mx-cap-text"
@@ -139,14 +147,15 @@ const rowsWithFlags = rows.map((r) => {
     >
   </figcaption>
 
-  <div class="mx-scroll" role="group" aria-label="Obligation heat matrix">
+  <div class="mx-scroll" role="group" aria-labelledby="mx-name">
+    <span class="visually-hidden" id="mx-name">Obligation heat matrix</span>
     <table class="mx-grid" data-mx-grid>
       <thead>
         <tr>
           <th class="mx-corner" scope="col"><span class="mono">Framework</span></th>
           {
             layers.map((l, i) => (
-              <th class="mx-colh-cell" scope="col" data-l={l}>
+              <th class="mx-colh-cell" scope="col" data-l={l} data-ctip-skip>
                 <button
                   type="button"
                   class="mx-colh"
@@ -166,7 +175,7 @@ const rowsWithFlags = rows.map((r) => {
         {
           rowsWithFlags.map((r) => (
             <tr class:list={['mx-row', r.bandStart && 'mx-band-start']}>
-              <th scope="row" class="mx-rowh-cell">
+              <th scope="row" class="mx-rowh-cell" data-ctip-skip>
                 <button
                   type="button"
                   class="mx-rowh"
@@ -185,7 +194,7 @@ const rowsWithFlags = rows.map((r) => {
                     data-mx-fw={r.id}
                     data-mx-layer={layers[i]}
                     aria-pressed="false"
-                    aria-label={`${r.name}, layer ${layers[i]}: ${n} ${n === 1 ? 'obligation' : 'obligations'}`}
+                    aria-label={`${r.name}, layer ${pad(layers[i])} ${layerNames[i]}: ${n} ${n === 1 ? 'obligation' : 'obligations'}`}
                     style={`background:${n > 0 ? `color-mix(in srgb, var(--l${layers[i]}) ${fillPct(n)}%, transparent)` : 'transparent'}`}
                   >
                     <span class="mx-n" aria-hidden="true">{n > 0 ? n : ''}</span>
@@ -211,6 +220,7 @@ const rowsWithFlags = rows.map((r) => {
     set:html={JSON.stringify(index)}
   />
 </figure>
+<ChartTipScript />
 
 <style>
   .mx {
