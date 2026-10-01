@@ -84,6 +84,15 @@ export function lanes(input: LanesInput): ChartOutput {
     y = lg.bottom + 12;
   }
   const markName = (row: { label: string }, col: { label: string }, m: LaneMark) => `${row.label} · ${col.label}: ${m.status}`;
+  // A linked row label is named like the marks beside it: every column the
+  // row acts in (horizontal), or the one lane it is listed under (vertical).
+  const rowName = (row: LanesInput['rows'][number], cols: LanesInput['columns']) => {
+    const parts = cols.flatMap((col) => {
+      const st = row.marks.filter((m) => m.column === col.key).map((m) => m.status);
+      return st.length ? [`${col.label}: ${st.join(', ')}`] : [];
+    });
+    return parts.length ? `${row.label} · ${parts.join('; ')}` : row.label;
+  };
   if (!vertical) {
     const colW = input.columnWidth ?? Math.max(56, Math.min(120, Math.floor((W - 2 * L) * 0.55 / input.columns.length)));
     const gridW = colW * input.columns.length;
@@ -105,7 +114,7 @@ export function lanes(input: LanesInput): ChartOutput {
       const lines = wrapText(row.label, LW, 13, 'body', 2, 'row label');
       const h = Math.max(26, lines.length * 15 + 10);
       const els = lines.map((line, i) => text(L, y + h / 2 + 4.5 - ((lines.length - 1) * 15) / 2 + i * 15, line, { size: 13, where: 'row label' }));
-      rows.push(row.href ? linkText(els.join(''), row.label, row.href) : els.join(''));
+      rows.push(row.href ? linkText(els.join(''), rowName(row, input.columns), row.href) : els.join(''));
       input.columns.forEach((col, i) => {
         const here = row.marks.filter((m) => m.column === col.key);
         here.forEach((m, k) => {
@@ -145,7 +154,7 @@ export function lanes(input: LanesInput): ChartOutput {
         const h = Math.max(24, lines.length * 15 + 9);
         ms.forEach((m, k) => out.push(shape(m.shape, L + 10 + k * 16, y + 13, 6, marks.attrs(m.state, m.tone), tip(markName(row, col, m)))));
         const els = lines.map((line, i) => text(lx, y + 17.5 + i * 15, line, { size: 13, where: 'row label' }));
-        out.push(row.href ? linkText(els.join(''), row.label, row.href) : els.join(''));
+        out.push(row.href ? linkText(els.join(''), rowName(row, [col]), row.href) : els.join(''));
         y += h;
       }
     });

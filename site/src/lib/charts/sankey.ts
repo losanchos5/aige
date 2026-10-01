@@ -89,6 +89,12 @@ export interface SankeyInput extends ChartBase {
   order?: 'barycentre' | 'input';
   /** Wide only: height of the node area (default max(200, 44 per node of the tallest column)). */
   plotHeight?: number;
+  /** Narrow only: how a linked destination row is named. 'full' (default):
+   *  as its wide ribbon, "Source name to Destination name: 3 units". 'short':
+   *  as printed under its source as printed, "Source label to Destination
+   *  label: 3" (a label cut with an ellipsis gives way to the full name), for
+   *  a chart whose full names do not fit the 12 KB budget. */
+  rowNames?: 'full' | 'short';
   /** Table headings (default From, To and the unit). */
   fromHeader?: string;
   toHeader?: string;
@@ -203,6 +209,8 @@ export function flow(input: SankeyInput): ChartOutput {
   const fw = FLOW_WORDS[input.lang === 'es' ? 'es' : 'en'];
   const unitOf = (v: number) => (v === 1 && input.unitOne ? input.unitOne : input.unit);
   const nameOf = (n: SankeyNode) => n.name ?? n.label;
+  /** The drawn label, unless it was cut with an ellipsis. */
+  const shortOf = (n: SankeyNode) => (n.label.includes('…') ? nameOf(n) : n.label);
   const narrow = (input.layout ?? ((input.width ?? 640) < 480 ? 'narrow' : 'wide')) === 'narrow';
   const W = input.width ?? (narrow ? NARROW_WIDTH : 640);
   const hits = targets(where);
@@ -339,7 +347,11 @@ export function flow(input: SankeyInput): ChartOutput {
         const headH = Math.max(NARROW_TARGET, 9 + lines.length * 17);
         if (tone) out.push(`<rect x="${L}" y="${r1(y + 9)}" width="10" height="10" rx="2" class="${markClass('filled', tone)}"/>`);
         const els = lines.map((line, i) => text(tx, y + 18 + i * 17, line, { size: 13.5, weight: 600, where: 'node label' }));
-        out.push(src.href ? linkText(hitRect(y, headH) + els.join(''), nameOf(src), src.href) : els.join(''));
+        // Linked heading and rows are named with the full node names: the
+        // heading "Source name (12)", each row as its wide ribbon is,
+        // "Source name to Destination name: 3 units", since one destination
+        // repeats under several sources ('short' rowNames: as printed).
+        out.push(src.href ? linkText(hitRect(y, headH) + els.join(''), `${nameOf(src)} (${fmt(total)})`, src.href) : els.join(''));
         y += headH;
         for (const l of own) {
           const dst = byId.get(l.to)!;
@@ -349,7 +361,11 @@ export function flow(input: SankeyInput): ChartOutput {
           const els2 =
             rows.map((line, i) => text(barX, y + 14 + i * 16, line, { size: 12.5, where: 'destination label' })).join('') +
             `<rect x="${barX}" y="${r1(y + 4 + rows.length * 16)}" width="${r1(bw)}" height="6" class="${markClass('filled', dst.tone ?? 0)}"/>`;
-          out.push(dst.href ? linkText(hitRect(y, rowH) + els2, nameOf(dst), dst.href) : els2);
+          const rowName =
+            input.rowNames === 'short'
+              ? `${shortOf(src)} ${w.to} ${shortOf(dst)}: ${fmt(l.value)}`
+              : `${nameOf(src)} ${w.to} ${nameOf(dst)}: ${fmt(l.value)} ${unitOf(l.value)}`;
+          out.push(dst.href ? linkText(hitRect(y, rowH) + els2, rowName, dst.href) : els2);
           y += rowH;
         }
       }

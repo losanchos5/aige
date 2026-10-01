@@ -159,7 +159,7 @@ export function bookSpine(input: BookSpineInput): ChartOutput {
     for (const { c } of all.filter((x) => x.c.highlight)) {
       const lines = wrapText(`${numOf(c)} ${c.label}`, W - 2 * L, 12.5, 'body', 2, 'chapter label');
       const els = lines.map((line, i) => text(L, y + 24 + i * 16, line, { size: 12.5, weight: 600, where: 'chapter label' }));
-      out.push(c.href ? linkText(els.join(''), `${numOf(c)} ${c.label}`, c.href) : els.join(''));
+      out.push(c.href ? linkText(els.join(''), nameOf(c), c.href) : els.join(''));
       y += 24 + (lines.length - 1) * 16;
     }
     bottom = y;

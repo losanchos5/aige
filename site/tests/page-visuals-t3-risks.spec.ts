@@ -86,10 +86,12 @@ test.describe('/resources/threats charts', () => {
       expect(out.get(t.short), t.short).toBe(Number(chip));
       expect(decode(fig), `${t.short} block`).toContain(`${t.short}: ${chip} threats`);
     }
-    // The layer sets that hold a layer add up to the threats of that layer.
+    // The layer sets that hold a layer add up to the threats of that layer; a
+    // set is named by its layers' short names ("L2 Inventory + L3 Evals").
     const into = sums(stage1, 1);
+    const layerShort = (n: number) => `L${n} ${layers.find((l) => l.n === n)!.name.split(' & ')[0]}`;
     for (const n of [1, 2, 3, 4, 5]) {
-      const drawn = [...into].filter(([set]) => set.split(' + ').includes(`L${n}`)).reduce((sum, [, v]) => sum + v, 0);
+      const drawn = [...into].filter(([set]) => set.split(' + ').includes(layerShort(n))).reduce((sum, [, v]) => sum + v, 0);
       expect(drawn, `L${n}`).toBe(threats.filter((r) => r.layers.includes(n as Threat['layers'][number])).length);
     }
     // The own-test route holds the rows whose every eval is custom, and the

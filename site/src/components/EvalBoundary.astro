@@ -44,6 +44,7 @@ const marks: RingMark[] = controls.map((c) => {
   const tbs = isResponseToSpecify(c.failureResponse);
   return {
     label: short(c.id),
+    name: `${short(c.id)} ${c.title}`,
     ring: ringOf.get(c.id)!,
     tone: c.layer as Tone,
     state: tbs ? 'hatched' : 'filled',

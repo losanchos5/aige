@@ -12,8 +12,10 @@
  *  - 'chart': styled by chart.css alone, for /, /resources,
  *    /resources/crosswalk, /cases and /patterns (tests/perf.spec.ts).
  * The frame itself (chart-* classes) always comes from chart.css, which never
- * opens a .figc, .prose or .diagram rule. No script: tooltips are native
- * <title>s, marks with an href are links.
+ * opens a .figc, .prose or .diagram rule. The figure is a chart-tip root
+ * (data-ctip): ChartTipScript loads /chart-tip.js once per page, which shows
+ * each mark's name (its <title>) at once on hover, focus and tap; without JS
+ * the native <title> stays. Marks with an href are links.
  *
  *   const wide = dotMatrix({ id: 'cm-w', ... });
  *   const narrow = dotMatrix({ id: 'cm-n', width: NARROW_WIDTH, ... });
@@ -25,6 +27,7 @@
  */
 import { claimIds, NARROW_WIDTH, type ChartOutput } from '../lib/charts';
 import '../styles/chart.css';
+import ChartTipScript from './ChartTipScript.astro';
 
 interface Props {
   /** The chart, or the wide variant of a pair. */
@@ -109,7 +112,7 @@ const isNum = (value: string | number) => typeof value === 'number';
 const cap = (width: number) => `max-width: ${Math.ceil(width)}px`;
 ---
 
-<figure class:list={['chart-fig', className]} data-chart-mode={mode} id={id}>
+<figure class:list={['chart-fig', className]} data-chart-mode={mode} data-ctip id={id}>
   <div class:list={['chart-canvas', narrow && ['chart-pair', `chart-sw-${switchAt}`]]}>
     {
       narrow && (
@@ -170,3 +173,4 @@ const cap = (width: number) => `max-width: ${Math.ceil(width)}px`;
     </div>
   </details>
 </figure>
+<ChartTipScript />

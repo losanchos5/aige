@@ -29,6 +29,7 @@ import {
 
 export interface LadderStep {
   label: string;
+  /** Printed under the label; a linked step's name adds it ("Label: detail"). */
   detail?: string;
   href?: string;
   /** Optional hook, [a-z][a-z0-9-]*: wraps the step's marks in
@@ -93,6 +94,8 @@ export function ladder(input: LadderInput): ChartOutput {
   const sm = minText(W);
   const w = words(input.lang);
   const out: string[] = [];
+  // A linked step's name: its label and, when given, its detail.
+  const stepName = (step: LadderStep) => (step.detail ? `${step.label}: ${step.detail}` : step.label);
   // The marks of one step, grouped when the step has a key.
   const push = (step: LadderStep, els: string[]) =>
     out.push(step.key ? `<g data-step="${step.key}">${els.join('')}</g>` : els.join(''));
@@ -126,7 +129,7 @@ export function ladder(input: LadderInput): ChartOutput {
         ty += 16;
         return text(tx, ty, line, { size: 13.5, weight: 600, cls: hi ? 'on-ink' : '', where: 'step label' });
       });
-      els.push(step.href ? linkText(nameEls.join(''), step.label, step.href) : nameEls.join(''));
+      els.push(step.href ? linkText(nameEls.join(''), stepName(step), step.href) : nameEls.join(''));
       if (blocks[i].detail.length) ty += 6;
       for (const line of blocks[i].detail) {
         ty += 15;
@@ -169,7 +172,7 @@ export function ladder(input: LadderInput): ChartOutput {
         ty += 16;
         return text(tx, ty, line, { size: 13.5, weight: hi ? 700 : 600, where: 'step label' });
       });
-      els.push(step.href ? linkText(nameEls.join(''), step.label, step.href) : nameEls.join(''));
+      els.push(step.href ? linkText(nameEls.join(''), stepName(step), step.href) : nameEls.join(''));
       if (extra) {
         ty += 16;
         els.push(text(tx, ty, input.highlightLabel!, { size: sm, cls: 'mono', where: 'highlight label' }));

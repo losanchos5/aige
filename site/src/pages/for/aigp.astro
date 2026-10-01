@@ -19,6 +19,7 @@ import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import Figure from '../../components/Figure.astro';
 import Chart from '../../components/Chart.astro';
+import ChartTipScript from '../../components/ChartTipScript.astro';
 import SourceList from '../../components/SourceList.astro';
 import { site } from '../../data/site';
 import { chaptersOrdered } from '../../data/chapters';
@@ -36,7 +37,7 @@ import {
   studyPath,
 } from '../../data/aigp';
 import { resolvedAigpMap, resolveAigpLink } from '../../lib/aigp-coverage';
-import { aigpHeatmapSvg } from '../../lib/aigp-heatmap';
+import { aigpHeatmapSvgs } from '../../lib/aigp-heatmap';
 import { domainChapters, examWeight } from '../../lib/page-visuals/aigp-visuals';
 import { breadcrumbJsonLd, type Crumb } from '../../lib/breadcrumbs';
 import { fitsSiteSuffix } from '../../lib/seo-title';
@@ -71,13 +72,14 @@ const competencyCount = domains.reduce((sum, domain) => sum + domain.competencie
 const domainMin = domains.reduce((sum, domain) => sum + domain.questions.min, 0);
 const domainMax = domains.reduce((sum, domain) => sum + domain.questions.max, 0);
 
-// Heatmap: drawn from the same data, at build.
+// Heatmap: drawn from the same data, at build, as two images of two domains
+// each on one question axis (lib/aigp-heatmap.ts says why).
 const heatmapTitle = 'AIGP coverage heatmap';
-const heatmapAlt = `Heatmap of the ${indicatorCount} AIGP performance indicators in ${competencyCount} competencies, each cell marked taught or partly taught on this site.`;
-const heatmap = aigpHeatmapSvg(aigpDomains, {
+const heatmap = aigpHeatmapSvgs(aigpDomains, {
   id: 'aigp-coverage',
   title: heatmapTitle,
-  alt: heatmapAlt,
+  alt: (part) =>
+    `Heatmap of the ${part.indicators} AIGP indicators of domains ${part.codes.join(' and ')}, in ${part.competencies} competencies, each cell marked taught or partly taught on this site.`,
   asOf: aigpAsOf,
   bokVersion: aigpBok.version,
   bokEffective: aigpBok.effective,
@@ -286,8 +288,9 @@ const jsonLd = [
         id="aigp-coverage"
         class="ag-figure"
       >
-        <Fragment set:html={heatmap} />
+        <Fragment set:html={heatmap.join('')} />
       </Figure>
+      <ChartTipScript />
     </section>
 
     <section class="res-section" aria-labelledby="domain-chapters">

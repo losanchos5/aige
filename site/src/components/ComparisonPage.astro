@@ -144,12 +144,16 @@ const barBase = {
   source: 'the topic × framework crosswalk',
   asOf: crosswalkAsOf,
   unit: 'share of topics',
+  countUnit: 'topics',
+  unitOne: 'topic',
   itemHeader: 'Topics',
+  // Each legend label carries its count; the segment names give it once, as
+  // the segment's value ("Strong: 13 topics (52%)").
   series: [
-    { label: `Strong: ${counts.strong}` },
-    { label: `Partial: ${partial}`, state: 'outline' as const },
-    { label: `${def.aName} only: ${counts.aOnly}${passingNote(counts.aPassing)}`, state: 'dashed' as const },
-    { label: `${def.bName} only: ${counts.bOnly}${passingNote(counts.bPassing)}`, state: 'dotted' as const },
+    { label: `Strong: ${counts.strong}`, name: 'Strong' },
+    { label: `Partial: ${partial}`, name: 'Partial', state: 'outline' as const },
+    { label: `${def.aName} only: ${counts.aOnly}${passingNote(counts.aPassing)}`, name: `${def.aName} only${passingNote(counts.aPassing)}`, state: 'dashed' as const },
+    { label: `${def.bName} only: ${counts.bOnly}${passingNote(counts.bPassing)}`, name: `${def.bName} only${passingNote(counts.bPassing)}`, state: 'dotted' as const },
   ],
   items: [
     {

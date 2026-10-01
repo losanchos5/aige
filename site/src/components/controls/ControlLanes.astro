@@ -25,11 +25,15 @@
  * its count and responses in words and the table lists every control by lane.
  * Wide, the lanes are columns under a chevron pipeline; narrow, each profile
  * is a card with its four lanes as rows. Frame: chart.css (chart-fig,
- * chart-canvas, chart-caption, chart-alt, chart-table).
+ * chart-canvas, chart-caption, chart-alt, chart-table). The figure is a
+ * chart-tip root (data-ctip, ChartTipScript): a mark's name, and a lane cell's
+ * profile, lane and count, show at once on hover, focus and tap; the lane
+ * heads are data-ctip-skip.
  */
 import '../../styles/chart.css';
 import '../../styles/control-marks.css';
 import '../../styles/control-visuals.css';
+import ChartTipScript from '../ChartTipScript.astro';
 import { controls, profiles, profilePath, controlPath, CONTROLS_AS_OF, type Control } from '../../data/controls';
 import { layers } from '../../data/stack';
 import { layerName } from '../../lib/charts/core';
@@ -90,10 +94,10 @@ const caption = `One mark per control in each lane where it is enforced, its sha
 const tableCaption = 'Every control by profile and enforcement point, with its failure response';
 ---
 
-<figure class="chart-fig clx" aria-labelledby="clx-title">
+<figure class="chart-fig clx" aria-labelledby="clx-title" data-ctip>
   <div class="chart-canvas clx-canvas">
     <div class="clx-grid">
-      <ol class="clx-stages" role="list" aria-label="Enforcement points, in pipeline order">
+      <ol class="clx-stages" role="list" aria-label="Enforcement points, in pipeline order" data-ctip-skip>
         {
           stages.map((s) => (
             <li class="clx-stage">
@@ -117,7 +121,10 @@ const tableCaption = 'Every control by profile and enforcement point, with its f
               </p>
               <ul class="clx-cells" role="list" aria-label={`${g.profile.shortTitle} by enforcement point`}>
                 {g.cells.map((cell) => (
-                  <li class:list={['clx-cell', cell.rows.length === 0 && 'clx-empty']}>
+                  <li
+                    class:list={['clx-cell', cell.rows.length === 0 && 'clx-empty']}
+                    data-tip={`${g.profile.shortTitle}, ${cell.label}: ${summary(cell.rows)}`}
+                  >
                     <span class="clx-k">{cell.label}</span>
                     <span class="clx-count" aria-hidden="true">
                       {cell.rows.length}
@@ -220,3 +227,4 @@ const tableCaption = 'Every control by profile and enforcement point, with its f
     </div>
   </details>
 </figure>
+<ChartTipScript />

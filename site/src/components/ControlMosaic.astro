@@ -20,8 +20,11 @@
  * pitch is at least 25 px, the pointer-target spacing of WCAG 2.5.8. Motion is
  * transform only and only under prefers-reduced-motion: no-preference. The
  * profile names are plain text: the profile cards under the mosaic link them.
+ * The figure is a chart-tip root (data-ctip, ChartTipScript): a square's name
+ * shows at once on hover, focus and tap; the legend is data-ctip-skip.
  */
 import '../styles/chart.css';
+import ChartTipScript from './ChartTipScript.astro';
 import { controls, profiles, controlPath, isResponseToSpecify, CONTROLS_AS_OF, type Control } from '../data/controls';
 import { layers } from '../data/stack';
 
@@ -73,7 +76,7 @@ const caption =
 const tableCaption = 'Every control by profile, with its home layer and failure response';
 ---
 
-<figure class="chart-fig cmo" aria-labelledby="cmo-title">
+<figure class="chart-fig cmo" aria-labelledby="cmo-title" data-ctip>
   <div class="chart-canvas cmo-canvas">
     <dl class="cmo-kpis">
       <div><dt>Controls</dt><dd class="cmo-kpi">{controls.length}</dd></div>
@@ -113,7 +116,7 @@ const tableCaption = 'Every control by profile, with its home layer and failure 
         ))
       }
     </ol>
-    <div class="cmo-legend">
+    <div class="cmo-legend" data-ctip-skip>
       <ul class="cmo-key" role="list" aria-label="Colour: home stack layer">
         {
           byLayer.map((l) => (
@@ -174,6 +177,7 @@ const tableCaption = 'Every control by profile, with its home layer and failure 
     </div>
   </details>
 </figure>
+<ChartTipScript />
 
 <style>
   /* Squares: --k is the layer ink (stroke, hatch), --p its pastel. */

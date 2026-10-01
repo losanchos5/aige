@@ -59,12 +59,15 @@ const wideSvg = (fig: string) => fig.slice(fig.indexOf('class="chart-w"'), fig.i
 const sum = (values: number[]) => values.reduce((a, b) => a + b, 0);
 
 test.describe('/controls: the evidence climbs the stack', () => {
-  const layerName = (n: number) => `Layer ${n}: ${layers.find((l) => l.n === n)!.name}`;
+  // Both columns hold the same layers, so each node names its side.
+  const layerTitle = (n: number) => layers.find((l) => l.n === n)!.name;
+  const homeName = (n: number) => `Control home layer ${n}: ${layerTitle(n)}`;
+  const keeperName = (n: number) => `Evidence layer ${n}: ${layerTitle(n)}`;
   // (home layer, evidence layer) -> artefacts, straight from the registry.
   const expected = new Map<string, number>();
   for (const c of controls) {
     for (const e of c.evidence) {
-      const key = `${layerName(c.layer)} > ${layerName(e.layer)}`;
+      const key = `${homeName(c.layer)} > ${keeperName(e.layer)}`;
       expected.set(key, (expected.get(key) ?? 0) + 1);
     }
   }
@@ -81,9 +84,11 @@ test.describe('/controls: the evidence climbs the stack', () => {
     for (const l of layers) {
       const out = controls.filter((c) => c.layer === l.n).reduce((n, c) => n + c.evidence.length, 0);
       const kept = controls.reduce((n, c) => n + c.evidence.filter((e) => e.layer === l.n).length, 0);
-      const titles = [...svg.matchAll(/<title>([^<]+)<\/title>/g)].map((m) => decode(m[1])).filter((t) => t.startsWith(`${layerName(l.n)}: `));
-      // The source node first (left column), then the keeper (right column).
-      expect(titles, layerName(l.n)).toEqual([`${layerName(l.n)}: ${out} artefacts`, `${layerName(l.n)}: ${kept} artefacts`]);
+      const titles = [...svg.matchAll(/<title>([^<]+)<\/title>/g)].map((m) => decode(m[1]));
+      const node = (name: string) => titles.filter((t) => t.startsWith(`${name}: `));
+      // One source node (left column) and one keeper (right column).
+      expect(node(homeName(l.n)), homeName(l.n)).toEqual([`${homeName(l.n)}: ${out} artefacts`]);
+      expect(node(keeperName(l.n)), keeperName(l.n)).toEqual([`${keeperName(l.n)}: ${kept} artefacts`]);
     }
   });
 
@@ -154,6 +159,15 @@ test.describe('/controls/crosswalk: profiles, frameworks and clauses', () => {
       expect(r.row.includes(`href="#${r.id}"`), `row links #${r.id}`).toBe(true);
       const expected = profiles.map((p) => pairs(r.id, p.slug));
       expect(r.counts, r.id).toEqual([...expected, sum(expected)]);
+      // Each profile cell, zeros included, is named for its tooltip by its
+      // profile, its framework and its count.
+      const fw = crosswalk.frameworks.find((f) => f.id === r.id)!;
+      const tips = [...r.row.matchAll(/<td[^>]*data-tip="([^"]*)"/g)].map((m) => decode(m[1]));
+      expect(tips, r.id).toHaveLength(profiles.length);
+      profiles.forEach((p, i) => {
+        expect(tips[i].startsWith(`${p.shortTitle}, ${fw.name}`), tips[i]).toBe(true);
+        expect(tips[i].endsWith(`: ${expected[i]} ${expected[i] === 1 ? 'mapping' : 'mappings'}`), tips[i]).toBe(true);
+      });
     }
     // The register's instruments stay grouped under a link to #obligations.
     expect(table.includes('href="#obligations"')).toBe(true);

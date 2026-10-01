@@ -10,17 +10,41 @@
 // are styled in src/styles/aigp.css), text of 12 px or more at 390 px, the
 // source line and "As of <date>" inside the image (VISUAL-GUIDE.md §4.4-4.5).
 //
+// The root is a chart-tip root (data-ctip; the page loads ChartTipScript):
+// every cell carries a <title> naming its indicator by id and paraphrase, and
+// its status ("I.A.2 Name the harms AI can do to ...: Taught"), which
+// public/chart-tip.js shows at once on hover and tap, and the browser
+// natively without JavaScript.
+//
+// Two images, not one: the 58 full names do not fit one SVG in the 12 KB
+// budget (about 15 KB). The tip island reads a name only from the mark itself
+// (data-tip, aria-label, <title>, title), so there is no compact shared form;
+// the competency title in place of the paraphrase still came to about 13 KB
+// and says less. So aigpHeatmapSvgs splits the domains into two parts (I and
+// II, III and IV), each a standalone figure SVG of about 8 KB with its own
+// title, desc, legend and source, on one shared question axis so the bars of
+// both parts compare.
+//
 // No runtime imports (types only), so a build script can load this module with
 // scripts/lib/load-ts.mjs and write the same SVG to src/figures if the heatmap
 // ever joins the figures gallery.
-import type { AigpDomain, QuestionRange } from '../data/aigp';
+import type { AigpDomain, AigpIndicator, QuestionRange } from '../data/aigp';
+
+/** The domains one image of the heatmap draws. */
+export interface HeatmapPart {
+  /** Domain codes, in order ("I", "II"). */
+  codes: string[];
+  competencies: number;
+  indicators: number;
+}
 
 export interface HeatmapOptions {
-  /** Id suffix for the <title>/<desc> ids. */
+  /** Id suffix for the <title>/<desc> ids; part k (from 1) adds "-k". */
   id: string;
+  /** Each part's title adds its domains ("..., domains I and II"). */
   title: string;
-  /** One sentence, 50-160 characters: the SVG <desc>. */
-  alt: string;
+  /** The <desc> of one part: one sentence, 50-160 characters. */
+  alt: (part: HeatmapPart) => string;
   asOf: string;
   bokVersion: string;
   bokEffective: string;
@@ -32,6 +56,13 @@ const esc = (value: string | number): string =>
 const mid = (range: QuestionRange): number => (range.min + range.max) / 2;
 const round = (n: number): number => Math.round(n * 10) / 10;
 
+/** The legend's words for a cell's status (src/data/aigp.ts statusLabel; not
+ *  imported: this module keeps no runtime imports). */
+const STATUS: Readonly<Record<AigpIndicator['status'], string>> = {
+  taught: 'Taught',
+  'partly-taught': 'Partly taught',
+};
+
 const W = 360;
 const LEFT = 16;
 const RIGHT = 344;
@@ -40,23 +71,40 @@ const ROW_H = 24;
 const ROW_GAP = 8;
 const CELL_GAP = 2;
 
-/** The heatmap as a standalone inline SVG string. */
-export function aigpHeatmapSvg(domains: readonly AigpDomain[], options: HeatmapOptions): string {
+/** Domains per image: the first part draws I and II, the second III and IV. */
+const PER_PART = 2;
+
+/** The heatmap as standalone inline SVG strings, one per part of
+ *  PER_PART domains, all on the question axis of the widest bar. */
+export function aigpHeatmapSvgs(domains: readonly AigpDomain[], options: HeatmapOptions): string[] {
   const maxMid = Math.max(
     ...domains.flatMap((domain) => domain.competencies.map((c) => mid(c.questions))),
   );
   // Axis: whole questions, ticks every two, from zero to the widest bar.
   const axisMax = Math.ceil(maxMid / 2) * 2;
+  const parts: string[] = [];
+  for (let i = 0; i < domains.length; i += PER_PART) {
+    parts.push(partSvg(domains.slice(i, i + PER_PART), axisMax, `${options.id}-${parts.length + 1}`, options));
+  }
+  return parts;
+}
+
+function partSvg(domains: readonly AigpDomain[], axisMax: number, id: string, options: HeatmapOptions): string {
   const unit = (RIGHT - BAR_X) / axisMax;
-  const indicatorCount = domains.reduce(
-    (sum, domain) => sum + domain.competencies.reduce((n, c) => n + c.indicators.length, 0),
-    0,
-  );
+  const part: HeatmapPart = {
+    codes: domains.map((domain) => domain.code),
+    competencies: domains.reduce((sum, domain) => sum + domain.competencies.length, 0),
+    indicators: domains.reduce(
+      (sum, domain) => sum + domain.competencies.reduce((n, c) => n + c.indicators.length, 0),
+      0,
+    ),
+  };
+  const codes = part.codes.join(' and ');
 
   const out: string[] = [];
   let y = 20;
   out.push(
-    `<text class="disp" x="${LEFT}" y="${y}" font-size="14.5">AIGP BoK v${esc(options.bokVersion)} · ${indicatorCount} indicators</text>`,
+    `<text class="disp" x="${LEFT}" y="${y}" font-size="14.5">AIGP domains ${esc(codes)} · ${part.indicators} indicators</text>`,
   );
   y += 19;
   out.push(
@@ -105,7 +153,8 @@ export function aigpHeatmapSvg(domains: readonly AigpDomain[], options: HeatmapO
       );
       competency.indicators.forEach((indicator, i) => {
         const x = BAR_X + i * (cellW + CELL_GAP);
-        const rect = `<rect x="${round(x)}" y="${top}" width="${round(cellW)}" height="${ROW_H}" rx="3"/>`;
+        const name = `${indicator.id} ${indicator.paraphrase}: ${STATUS[indicator.status]}`;
+        const rect = `<rect x="${round(x)}" y="${top}" width="${round(cellW)}" height="${ROW_H}" rx="3"><title>${esc(name)}</title></rect>`;
         (indicator.status === 'taught' ? taught : partly).push(rect);
         numbers.push(`<text x="${round(x + cellW / 2)}" y="${top + 16.5}">${i + 1}</text>`);
       });
@@ -148,9 +197,9 @@ export function aigpHeatmapSvg(domains: readonly AigpDomain[], options: HeatmapO
 
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" class="figc ag-hm" ` +
-    `role="img" aria-labelledby="fig-${esc(options.id)}-t fig-${esc(options.id)}-d">` +
-    `<title id="fig-${esc(options.id)}-t">${esc(options.title)}</title>` +
-    `<desc id="fig-${esc(options.id)}-d">${esc(options.alt)}</desc>` +
+    `role="img" aria-labelledby="fig-${esc(id)}-t fig-${esc(id)}-d" data-ctip>` +
+    `<title id="fig-${esc(id)}-t">${esc(`${options.title}, domains ${codes}`)}</title>` +
+    `<desc id="fig-${esc(id)}-d">${esc(options.alt(part))}</desc>` +
     body.join('') +
     `</svg>`
   );

@@ -560,9 +560,11 @@ for (const c of CASES.filter((x) => x.rows)) {
     for (const row of table.rows) expect(row).toHaveLength(table.columns.length);
     expect(table.caption).toBe(title);
     if (c.marks) {
-      // Mark tooltips are bare <title>s (the chart's own carries an id): a
+      // Mark tooltips are bare <title>s (the chart's own carries an id; the
+      // ring bands of concentricRings, named by ring, are not rows): a
       // dropped or skipped mark leaves the table and the drawing apart.
-      expect((svg.match(/<title>/g) ?? []).length, 'one titled mark per row').toBe(table.rows.length * c.marks);
+      const marks = (svg.match(/<title>/g) ?? []).length - (svg.match(/class="rg-[ab]"><title>/g) ?? []).length;
+      expect(marks, 'one titled mark per row').toBe(table.rows.length * c.marks);
     }
   });
 }
@@ -1529,3 +1531,199 @@ for (const c of LEGEND_CASES) {
     }
   });
 }
+
+// ---- names: every mark says what it is, and a link is named like its mark --
+// (OpenSpec chart-tooltips, chart-primitives "Cada marca dice qué es"; the
+// tooltip island shows these names). Expected names are built from each
+// case's own input; the check is which element carries them.
+/** Every named element: its tag, class and name (<title> child or aria-label). */
+const namedEls = (svg: string) => {
+  const els = parseSvg(svg);
+  return els.flatMap((e, i) => {
+    const name = e.attr['aria-label'] ?? titleOf(els, i);
+    return name !== undefined && e.tag !== 'svg' ? [{ tag: e.tag, cls: e.attr.class ?? '', name, i }] : [];
+  });
+};
+const linkNames = (svg: string) => namedEls(svg).filter((n) => n.tag === 'a').map((n) => n.name);
+
+test('progressRing names each ring with its item and progress, in English and Spanish, on the group that holds its arc', () => {
+  for (const lang of ['en', 'es'] as const) {
+    const els = parseSvg(progressRing({ ...base, id: 'ch-q', title, desc, lang, items: progressItems }).svg);
+    for (const p of progressItems) {
+      const t = els.findIndex((e) => e.tag === 'title' && e.attr['data-ring-title'] === p.key);
+      const want =
+        lang === 'es' ? `${p.label}: ${p.done} de ${p.total} hechos (${pctOf(p)} %)` : `${p.label}: ${p.done} of ${p.total} done (${pctOf(p)}%)`;
+      expect(els[t]?.text, `${lang} ${p.key}`).toBe(want);
+      const group = els[t].parent;
+      expect(els.some((e) => e.parent === group && e.attr['data-ring'] === p.key), `${lang} ${p.key}: the arc is in the named group`).toBe(true);
+    }
+  }
+});
+
+test('venn3 names each set circle (venn) and ellipse (euler) after the set and its total', () => {
+  const nested = [
+    { label: 'Risk management', sets: ['eu', 'iso', 'nist'] },
+    { label: 'Measurement', sets: ['eu', 'nist'] },
+    { label: 'CE marking', sets: ['eu'] },
+  ];
+  for (const [layout, items, tag] of [
+    ['venn', vennItems, 'circle'],
+    ['euler', nested, 'ellipse'],
+  ] as const) {
+    const shapes = namedEls(venn3({ ...base, id: 'ch-v', title, desc, unit: 'topics', unitOne: 'topic', sets, items, layout }).svg).filter(
+      (n) => n.cls === 'venn',
+    );
+    const want = sets.map((s) => {
+      const n = items.filter((i) => i.sets.includes(s.key)).length;
+      return `${s.label}: ${n} ${n === 1 ? 'topic' : 'topics'}`;
+    });
+    expect(shapes.map((s) => s.tag), layout).toEqual([tag, tag, tag]);
+    expect(shapes.map((s) => s.name).sort(), layout).toEqual(want.sort());
+  }
+});
+
+test('concentricRings names each ring band by number and label, and a mark by its name over its label', () => {
+  const marks = ringInput.marks.map((m) => ({ ...m, name: `${m.label} in full` }));
+  for (const width of [640, NARROW_WIDTH]) {
+    const named = namedEls(concentricRings({ ...base, id: 'ch-r', title, desc, width, ...ringInput, marks }).svg);
+    const bands = named.filter((n) => /^rg-[ab]$/.test(n.cls)).map((n) => n.name);
+    expect(bands.sort(), `${width}: bands`).toEqual(ringInput.rings.map((r, i) => `Ring ${i + 1}: ${r.label}`).sort());
+    const names = named.map((n) => n.name);
+    for (const m of marks) {
+      const ring = ringInput.rings.find((r) => r.key === m.ring)!.label;
+      const sector = ringInput.sectors.find((s) => s.key === m.sector)!.label;
+      expect(names, `${width}: ${m.label}`).toContain([m.name, ring, sector, ...(m.status ? [m.status] : [])].join(' · '));
+    }
+  }
+});
+
+test('heatGrid names cells and column totals by the column name over its code, and a row link like its row total', () => {
+  const columns = heat.columns.map((c, i) => ({ label: `C${i}`, name: `C${i} ${c.label}` }));
+  const rows = heat.rows.map((r, i) => ({ ...r, href: `/rows/${i}` }));
+  const rowTotal = (r: number) => heat.values[r].reduce<number>((s, v) => s + (v ?? 0), 0);
+  const make = (marginals: boolean) =>
+    heatGrid({ ...base, id: 'ch-h', title, desc, rowHeader: 'Country', unit: 'entries', unitOne: 'entry', ...heat, rows, columns, marginals }).svg;
+  const names = namedEls(make(true)).map((n) => n.name);
+  // The fixture has a cell of 1, named in the singular ("1 entry").
+  expect(heat.values.flat()).toContain(1);
+  heat.rows.forEach((row, r) => {
+    columns.forEach((col, c) => {
+      const v = heat.values[r][c];
+      expect(names).toContain(`${row.label} · ${col.name}: ${v === null ? 'not applicable' : `${v} ${v === 1 ? 'entry' : 'entries'}`}`);
+    });
+    expect(names.filter((n) => n === `${row.label}: ${rowTotal(r)} entries in total`), `${row.label}: the total bar and the row link`).toHaveLength(2);
+  });
+  columns.forEach((col, c) => {
+    const total = heat.values.reduce<number>((s, row) => s + (row[c] ?? 0), 0);
+    expect(names).toContain(`${col.name}: ${total} entries in total`);
+  });
+  expect(linkNames(make(false))).toEqual(heat.rows.map((row, r) => `${row.label}: ${rowTotal(r)} entries in total`));
+});
+
+test('stacked100 names a segment by its series name and its raw count in the count noun (singular for 1), with its share', () => {
+  // Legend labels that carry their count, as the comparison pages draw them.
+  const counted = [
+    { label: 'Strong: 3', name: 'Strong' },
+    { label: 'Partial: 1', name: 'Partial', state: 'outline' as const },
+  ];
+  const item = { label: 'All 4 topics', values: [3, 1] };
+  const total = item.values[0] + item.values[1];
+  const svg = stacked100({ ...base, id: 'ch-s1', title, desc, unit: 'share of topics', countUnit: 'topics', unitOne: 'topic', series: counted, items: [item] }).svg;
+  const names = namedEls(svg).filter((n) => n.tag === 'rect').map((n) => n.name);
+  expect(names).toEqual(
+    counted.map((sr, k) => `${item.label} · ${sr.name}: ${item.values[k]} ${item.values[k] === 1 ? 'topic' : 'topics'} (${(item.values[k] / total) * 100}%)`),
+  );
+});
+
+test('relationRadial names its "+N more" line after the full names of the items it hides, in both layouts', () => {
+  // The drawn labels are short forms; the line names the hidden items in full.
+  const full = (label: string) => `${label} AI system impact assessment`;
+  const fams: RelationFamily[] = [
+    { label: 'Clauses', items: ['A.3', 'A.1', 'A.4', 'A.2'].map((label) => ({ label, name: full(label) })) },
+    { label: 'Cases', items: [{ label: 'Chatbot refund' }] },
+  ];
+  for (const layout of ['radial', 'list'] as const) {
+    const width = layout === 'list' ? NARROW_WIDTH : 640;
+    const out = relationRadial({ ...base, id: 'ch-m', title, desc, layout, width, centre: { label: 'Item' }, families: fams, maxPerFamily: 2 })!;
+    const more = namedEls(out.svg).filter((n) => n.tag === 'text');
+    expect(more.map((n) => n.name), layout).toEqual([`+2 more: ${full('A.3')}, ${full('A.4')}`]);
+  }
+});
+
+test('ladder names a linked step after its label and its detail', () => {
+  const linked = steps.map((s, i) => ({ ...s, href: `/tiers/${i}` }));
+  for (const orientation of ['horizontal', 'vertical'] as const) {
+    const width = orientation === 'vertical' ? NARROW_WIDTH : 640;
+    const svg = ladder({ ...base, id: 'ch-l', title, desc, steps: linked, orientation, width }).svg;
+    expect(linkNames(svg), orientation).toEqual(steps.map((s) => (s.detail ? `${s.label}: ${s.detail}` : s.label)));
+  }
+});
+
+test('a linked label or row carries the same name as the mark it goes with', () => {
+  const sum = (v: number[]) => v.reduce((a, b) => a + b, 0);
+  // A shortened drawn label: the mark and its row link take the full name.
+  const fullName = (label: string) => `${label}, the instrument in full`;
+  const linkedRanked = ranked.map((r, i) => ({ ...r, name: fullName(r.label), href: `/r/${i}` }));
+  for (const make of [rankedBars, lollipop]) {
+    const els = parseSvg(make({ ...base, id: 'ch-b', title, desc, unit: 'obligations', items: linkedRanked }).svg);
+    const links = els.flatMap((e, i) => (e.tag === 'a' ? [i] : []));
+    expect(links).toHaveLength(ranked.length);
+    for (const a of links) {
+      const mark = els.findIndex((e, i) => e.parent === a && titleOf(els, i) !== undefined);
+      expect(els[a].attr['aria-label'], make.name).toBe(titleOf(els, mark));
+    }
+    expect(links.map((a) => els[a].attr['aria-label']).sort(), make.name).toEqual(ranked.map((r) => `${fullName(r.label)}: ${r.value} obligations`).sort());
+  }
+
+  const stackLinked = stackItems.map((s, i) => ({ ...s, href: `/s/${i}` }));
+  expect(linkNames(stackedBars({ ...base, id: 'ch-s', title, desc, unit: 'tools', series, items: stackLinked }).svg)).toEqual(
+    stackItems.map((s) => `${s.label}: ${s.values.flatMap((v, k) => (v ? [`${series[k].label} ${v}`] : [])).join(', ')} tools`),
+  );
+  const divLinked = divItems.map((d, i) => ({ ...d, href: `/d/${i}` }));
+  const div = divergingBars({ ...base, id: 'ch-d', title, desc, unit: 'duties', left: { label: 'EU' }, right: { label: 'US' }, segments: ['core', 'related'], items: divLinked });
+  expect(linkNames(div.svg)).toEqual(divItems.map((d) => `${d.label}: EU ${sum(d.left)}, US ${sum(d.right)} duties`));
+  const movesLinked = moves.map((m, i) => ({ ...m, href: `/m/${i}` }));
+  expect(linkNames(dumbbell({ ...base, id: 'ch-db', title, desc, fromLabel: 'Was', toLabel: 'Now', items: movesLinked }).svg)).toEqual(
+    moves.map((m) => `${m.label}: Was ${m.from}, Now ${m.to}`),
+  );
+
+  const lanesLinked = laneRows.map((r, i) => ({ ...r, href: `/l/${i}` }));
+  const colLabel = (key: string) => laneColumns.find((c) => c.key === key)!.label;
+  const laneBase = { ...base, id: 'ch-ln', title, desc, rowHeader: 'Control', columns: laneColumns, rows: lanesLinked };
+  expect(linkNames(lanes(laneBase).svg)).toEqual(
+    laneRows.map((r) => `${r.label} · ${laneColumns.flatMap((c) => r.marks.filter((m) => m.column === c.key).map((m) => `${c.label}: ${m.status}`)).join('; ')}`),
+  );
+  expect(linkNames(lanes({ ...laneBase, orientation: 'vertical' }).svg).sort()).toEqual(
+    laneRows.flatMap((r) => r.marks.map((m) => `${r.label} · ${colLabel(m.column)}: ${m.status}`)).sort(),
+  );
+
+  const nodes = flowNodes.map((n) => ({ ...n, href: `/n/${n.id}` }));
+  const nodeName = (id: string) => {
+    const n = flowNodes.find((x) => x.id === id)!;
+    return n.name ?? n.label;
+  };
+  const sources = [...new Set(flowLinks.map((l) => l.from))];
+  expect(linkNames(flow({ ...base, id: 'ch-f', title, desc, ...flowInput, nodes, layout: 'narrow' }).svg)).toEqual(
+    sources.flatMap((s) => {
+      const own = flowLinks.filter((l) => l.from === s);
+      // A destination row is named as its wide ribbon, source included, since
+      // one destination (EU AI Act) sits under two sources.
+      return [`${nodeName(s)} (${sum(own.map((l) => l.value))})`, ...own.map((l) => `${nodeName(s)} to ${nodeName(l.to)}: ${l.value} pairs`)];
+    }),
+  );
+  // rowNames 'short' names a row as printed, under its source as printed.
+  const label = (id: string) => flowNodes.find((x) => x.id === id)!.label;
+  expect(linkNames(flow({ ...base, id: 'ch-f', title, desc, ...flowInput, nodes, layout: 'narrow', rowNames: 'short' }).svg)).toEqual(
+    sources.flatMap((s) => {
+      const own = flowLinks.filter((l) => l.from === s);
+      return [`${nodeName(s)} (${sum(own.map((l) => l.value))})`, ...own.map((l) => `${label(s)} to ${label(l.to)}: ${l.value}`)];
+    }),
+  );
+
+  const miniParts = spineParts.map((p) => ({ ...p, chapters: p.chapters.map((c) => ({ ...c, highlight: !!c.href })) }));
+  const mini = namedEls(bookSpine({ ...base, id: 'ch-sp', title, desc, unit: 'minutes', parts: miniParts, mini: true }).svg);
+  const cells = mini.filter((n) => n.tag === 'rect').map((n) => n.name);
+  const miniLinks = mini.filter((n) => n.tag === 'a').map((n) => n.name);
+  expect(miniLinks.length).toBeGreaterThan(0);
+  for (const name of miniLinks) expect(cells, name).toContain(name);
+});

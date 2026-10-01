@@ -263,10 +263,13 @@ test.describe('controls crosswalk in dist', () => {
     }
     expect(main).toContain('Each mapping is illustrative, not a claim of conformity');
     expect(main).toContain('not affiliated with AIUC');
-    // No client script of the page's own: the layout's deferred files follow the article.
+    // No client script of the page's own: the layout's deferred files follow the
+    // article, and the one shared island is the charts' tooltip, loaded once.
     const article = main.slice(main.indexOf('<article'), main.indexOf('</article>'));
     expect(article.length).toBeGreaterThan(0);
-    expect(article).not.toMatch(/<script/i);
+    const chartTip = /<script[^>]*src="\/chart-tip\.js"[^>]*><\/script>/g;
+    expect(article.match(chartTip) ?? []).toHaveLength(1);
+    expect(article.replace(chartTip, '')).not.toMatch(/<script/i);
   });
 
   test('metadata: title, description, one CollectionPage, twin with canonical', () => {

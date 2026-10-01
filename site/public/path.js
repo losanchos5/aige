@@ -138,6 +138,10 @@
         var tds = tr.querySelectorAll('td');
         for (var t = 0; t < tds.length && t < 3; t++) tds[t].textContent = String(r[t]);
       }
+      // The ring's name (its tooltip), worded as the kit's progressRing.
+      each('data-ring-title', function (el) {
+        el.textContent = (names[key] || key) + ': ' + r[0] + ' of ' + r[1] + ' done (' + r[2] + '%)';
+      });
       if (shown && shown[key] !== r[2] && key !== 'total') moved.push(names[key] + ' ' + r[2] + '%');
     }
     var live = ringBox.querySelector('[data-ring-live]');

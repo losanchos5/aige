@@ -40,13 +40,16 @@ async function chartTable(page: Page, title: string): Promise<string[][]> {
   );
 }
 
-/** A LayerMatrix's cells, row by row: the printed count, the link and the glyphs by kind. */
+/** A LayerMatrix's cells, row by row: the printed count, the link, the name
+ *  the chart tooltip shows (the link's aria-label, else the cell's data-tip)
+ *  and the glyphs by kind. */
 async function matrixCells(page: Page, sectionId: string) {
   return page.locator(`#${sectionId} .lmx-table tbody tr`).evaluateAll((rows) =>
     rows.map((row) =>
       [...row.querySelectorAll('td')].map((td) => ({
         n: Number(td.querySelector('.lmx-n')?.textContent),
         href: td.querySelector('a')?.getAttribute('href') ?? null,
+        name: td.querySelector('a')?.getAttribute('aria-label') ?? td.querySelector('.lmx-cell')?.getAttribute('data-tip') ?? '',
         kinds: [...td.querySelectorAll('.lmx-m')].map((m) => m.getAttribute('data-kind')),
       })),
     ),
@@ -69,10 +72,17 @@ test.describe('/stack: what fills each layer', () => {
     workflows.filter((w) => w.layerN === layer.n || w.layerN === 'all').length,
   ]);
 
-  test('five layers x six registers, each count the data gives', async ({ page }) => {
+  test('five layers x six registers, each count the data gives, named with its layer', async ({ page }) => {
     await page.goto('/stack');
     const cells = await matrixCells(page, 'what-fills-each-layer');
     expect(cells.map((row) => row.map((c) => c.n))).toEqual(expected);
+    // A cell's name (its tooltip) is its count and its layer by number and name.
+    cells.forEach((row, r) =>
+      row.forEach((c, i) => {
+        expect(c.name.startsWith(`${expected[r][i]} `), c.name).toBe(true);
+        expect(c.name).toContain(`layer ${pad(layers[r].n)} ${layers[r].name}`);
+      }),
+    );
   });
 
   test('every count links to its layer in a list that exists, and path nodes and workflows do not link', async ({
@@ -114,6 +124,11 @@ test.describe('/path: stage x layer', () => {
         expect(cell.n, at).toBe(here.length);
         expect(cell.kinds, at).toEqual(here.map((node) => node.kind));
         expect(cell.href, at).toBe(here.length ? `/path#node-${here[0].id}` : null);
+        // Its name (its tooltip) is its count, its stage and its layer by number and name.
+        const where = layer ? `layer ${pad(layer)} ${layers.find((l) => l.n === layer)?.name}` : 'cross-cutting';
+        expect(cell.name.startsWith(`${here.length} `), at).toBe(true);
+        expect(cell.name, at).toContain(stage.title);
+        expect(cell.name, at).toContain(where);
       });
     });
     // The grid accounts for every node exactly once.

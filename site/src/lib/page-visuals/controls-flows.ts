@@ -55,16 +55,19 @@ export function evidenceFlow(rows: readonly Control[] = controls): Omit<SankeyIn
   });
   const used = new Set(links.flatMap((l) => [l.from, l.to]));
   const label = (n: number, name: string) => `L${n} ${fitName(name, 250)}`;
+  // Both columns hold the same five layers, so each name says its side in
+  // the words of the table headings below ("Control home layer 5: ...",
+  // "Evidence layer 5: ...") and a ribbon never reads "Layer 5 to Layer 5".
   const nodes = [
     ...layers.map((l) => ({
       id: `c${l.n}`,
       column: 'control',
       label: label(l.n, l.name),
-      name: `Layer ${l.n}: ${l.name}`,
+      name: `Control home layer ${l.n}: ${l.name}`,
       tone: l.n as Tone,
       href: `#layer-${l.n}`,
     })),
-    ...layers.map((l) => ({ id: `e${l.n}`, column: 'evidence', label: label(l.n, l.name), name: `Layer ${l.n}: ${l.name}`, tone: l.n as Tone })),
+    ...layers.map((l) => ({ id: `e${l.n}`, column: 'evidence', label: label(l.n, l.name), name: `Evidence layer ${l.n}: ${l.name}`, tone: l.n as Tone })),
   ].filter((n) => used.has(n.id));
   return {
     columns: [
@@ -201,18 +204,21 @@ export function topClauses(n = TOP_CLAUSES) {
     .slice(0, n);
 }
 
-/** A clause's drawn label, cut to at most two lines of `maxPx`: a register
- *  row's own title when it opens with its instrument ("EU AI Act Art. 14
- *  human oversight"), else the instrument's short name and the title
- *  ("NIST AI RMF: MANAGE"); any other clause is the framework's short name,
- *  the clause id and its name ("ISO 42001 Annex A A.6.2.6: AI system ..."). */
-export function clauseLabel(fw: CrosswalkFramework, row: CrosswalkRow, maxPx: number): string {
+/** A clause's full name: a register row's own title when it opens with its
+ *  instrument ("EU AI Act Art. 14 human oversight"), else the instrument's
+ *  short name and the title ("NIST AI RMF: MANAGE"); any other clause is the
+ *  framework's short name, the clause id and its name ("ISO 42001 Annex A
+ *  A.6.2.6: AI system verification and validation"). The chart's mark and
+ *  row link are named with it. */
+export function clauseName(fw: CrosswalkFramework, row: CrosswalkRow): string {
   const base = shortBase(fw);
   const first = (s: string) => s.split(/\s+/)[0];
-  const full = !isObligationFramework(fw)
-    ? `${base} ${row.ref}: ${row.name}`
-    : first(row.name) === first(base)
-      ? row.name
-      : `${base}: ${row.name}`;
-  return shortenToFit(full, maxPx, 13, 2);
+  if (!isObligationFramework(fw)) return `${base} ${row.ref}: ${row.name}`;
+  return first(row.name) === first(base) ? row.name : `${base}: ${row.name}`;
+}
+
+/** A clause's drawn label: its full name (clauseName) cut to at most two
+ *  lines of `maxPx`. */
+export function clauseLabel(fw: CrosswalkFramework, row: CrosswalkRow, maxPx: number): string {
+  return shortenToFit(clauseName(fw, row), maxPx, 13, 2);
 }

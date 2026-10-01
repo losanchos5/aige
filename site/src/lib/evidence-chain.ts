@@ -12,7 +12,10 @@
 // colours only through the .figc token classes (layer chips use --lN/--lN-ink);
 // the glyph vocabulary of §1.7 (building = the regulator's clause, person = the
 // duty holder, document with a check = the evidence record); "As of" printed in
-// the image; nothing the row does not state.
+// the image; nothing the row does not state. Each node is a group named by its
+// <title> (its kicker and its value uncut, never the requirement the page's
+// lede states), which public/chart-tip.js shows at once on hover and tap: the
+// figure is a chart-tip root (EvidenceChain.astro).
 import type { Obligation } from '../data/frameworks';
 import { appliesStatusLabels } from '../data/frameworks';
 import { layers } from '../data/stack';
@@ -29,6 +32,8 @@ export interface ChainNode {
   kicker: string;
   /** The value, cut for the figure (at most four words per line). */
   lines: string[];
+  /** The kicker and the value uncut, for the node's <title> (the tooltip). */
+  name: string;
   /** One sentence in the row's own words, for the text alternative. */
   full: string;
 }
@@ -164,12 +169,14 @@ export function chainFor(row: Obligation): Chain {
       kind: 'clause',
       kicker: 'Clause',
       lines: [fw.short, shortLabel(row.clause, 4)],
+      name: `Clause: ${fw.name}, ${row.clause}`,
       full: `Clause: ${fw.name}, ${row.clause}. It asks for: ${row.requirement}.`,
     },
     {
       kind: 'holder',
       kicker: 'Duty holder',
       lines: [holder ? shortLabel(holder, 4) : 'Not stated'],
+      name: `Duty holder: ${holder ?? 'not stated'}`,
       full: holder
         ? `Duty holder: ${holder}${row.authority ? `; supervised by ${row.authority}` : ''}.`
         : 'Duty holder: the register states none; the instrument binds only those who adopt it.',
@@ -178,18 +185,21 @@ export function chainFor(row: Obligation): Chain {
       kind: 'date',
       kicker: 'Applies from',
       lines: [row.appliesFrom ?? 'No date', status],
+      name: `Applies from: ${row.appliesFrom ?? 'no date'} (${status})`,
       full: `Applies from: ${row.appliesFrom ?? 'no date'} (${status}${row.appliesNote ? `; ${row.appliesNote}` : ''})${later.length ? `; later dates ${later.join('; ')}` : ''}.`,
     },
     {
       kind: 'artefact',
       kicker: 'Artefact',
       lines: [shortLabel(row.artefact, 4)],
+      name: `Artefact: ${row.artefact}`,
       full: `Artefact that evidences it: ${row.artefact}.`,
     },
     {
       kind: 'layer',
       kicker: row.layerN.length > 1 ? 'Layers' : 'Layer',
       lines: row.layerN.map((n) => (row.layerN.length > 1 ? `Layer 0${n}` : layerFull(n))),
+      name: `${row.layerN.length > 1 ? 'Layers' : 'Layer'}: ${row.layerN.map(layerFull).join(' and ')}`,
       full: `Stack ${row.layerN.length > 1 ? 'layers' : 'layer'}: ${row.layerN.map(layerFull).join(' and ')}.`,
     },
     {
@@ -198,6 +208,9 @@ export function chainFor(row: Obligation): Chain {
       lines: records.length
         ? [shortLabel(records[0].title, 4), ...(records.length > 1 ? [`+${records.length - 1} more`] : [])]
         : ['Evidence record v1'],
+      name: records.length
+        ? `Evidence record: ${records.map((r) => r.title).join(', ')}`
+        : 'Evidence record: the common evidence record (Evidence record v1)',
       full: records.length
         ? `Evidence record: filed as ${records.map((r) => r.title).join(', ')} (JSON Schemas whose x-evidences names this clause).`
         : 'Evidence record: the common evidence record every control writes, with this clause in its obligation field.',
@@ -262,6 +275,7 @@ export function chainSvg(chain: Chain, { layout, idPrefix, title, desc }: ChainS
     const y = tops[i];
     const terminal = node.kind === 'evidence';
     out.push(
+      `<g><title>${esc(node.name)}</title>`,
       `<rect class="panel" x="${x}" y="${y}" width="${nodeW}" height="${heights[i]}" rx="8"${terminal ? ' style="stroke:var(--ink);stroke-width:2"' : ''}/>`,
       glyph(node.kind, x + 10, y + (row ? 10 : 16)),
     );
@@ -282,6 +296,7 @@ export function chainSvg(chain: Chain, { layout, idPrefix, title, desc }: ChainS
         const lines = row ? wrap(name, 16, 3) : [name];
         lines.forEach((line, j) => text(row ? x + 10 : kx, row ? y + 93 + j * 14 : y + 68, line, '', 12.5, 600));
       }
+      out.push('</g>');
       return;
     }
     const lines = row
@@ -291,6 +306,7 @@ export function chainSvg(chain: Chain, { layout, idPrefix, title, desc }: ChainS
       const secondary = node.kind === 'date' ? j > 0 : node.kind === 'evidence' ? line.startsWith('+') : false;
       text(row ? x + 10 : kx, row ? y + 72 + j * 18 : y + 44, line, secondary ? 'ink2' : '', 13, secondary ? 400 : 600);
     });
+    out.push('</g>');
   });
 
   // The edges: one arrow between consecutive nodes.

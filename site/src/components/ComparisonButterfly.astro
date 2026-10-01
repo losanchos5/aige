@@ -16,10 +16,16 @@
  * (chart.css frame classes); state by fill or hatch, never colour alone; text
  * in full ink; no script. Motion: the bars grow out of the axis on scroll,
  * transform only, only where scroll timelines exist and motion is allowed.
+ * The figure is a chart-tip root (data-ctip, ChartTipScript): inside the role
+ * img plot, names go in data-tip, never aria-label (the plot's one sentence is
+ * its accessible name): each square names its clause (instrument, chip label,
+ * title, core or related) and each side its topic and count. The head with the
+ * key, the group heads, the topic labels and the stamp are data-ctip-skip.
  */
 import { levelGloss, levelLabel, type Comparison, type OverlapLevel, type SideRef } from '../lib/comparisons';
 import '../styles/chart.css';
 import '../styles/overlap-marks.css';
+import ChartTipScript from './ChartTipScript.astro';
 
 interface Props {
   cmp: Comparison;
@@ -65,16 +71,24 @@ const tableRows = groups.flatMap((g) =>
   g.rows.map(({ row, a, b }) => [row.topic.name, a.core, a.related, b.core, b.related, levelLabel(row.level, cmp, row.passing)]),
 );
 const columns = ['Topic', `${def.aName} core`, `${def.aName} related`, `${def.bName} core`, `${def.bName} related`, 'Overlap'];
-const squares = (n: { core: number; related: number }) => [
-  ...Array.from({ length: n.core }, () => 'core'),
-  ...Array.from({ length: n.related }, () => 'rel'),
-];
+// One square per clause, the core clauses first (the order of split()), each
+// named for the tooltip by its instrument, chip label, title and strength.
+const squares = (list: SideRef[], side: string) =>
+  [...list.filter((s) => s.ref.strength === 'core'), ...list.filter((s) => s.ref.strength !== 'core')].map((s) => ({
+    kind: s.ref.strength === 'core' ? 'core' : 'rel',
+    tip: `${side} ${s.label} ${s.title} (${s.ref.strength === 'core' ? 'core' : 'related'} clause)`,
+  }));
+const clausesWord = (n: number) => (n === 1 ? 'clause' : 'clauses');
+const sideTip = (topic: string, side: string, n: { core: number; related: number }) =>
+  n.core + n.related === 0
+    ? `${topic}: ${side} not mapped`
+    : `${topic}: ${side} ${n.core + n.related} ${clausesWord(n.core + n.related)} (${n.core} core, ${n.related} related)`;
 ---
 
-<figure class="chart-fig cb" id={id} data-cmp-butterfly>
+<figure class="chart-fig cb" id={id} data-cmp-butterfly data-ctip>
   <div class="chart-canvas">
     <div class="cb-plot" role="img" aria-label={name}>
-      <div class="cb-head" aria-hidden="true">
+      <div class="cb-head" aria-hidden="true" data-ctip-skip>
         <span class="cb-side-name cb-a">{def.aName}</span>
         <span class="cb-legend">
           <span class="cb-key"><span class="cb-sq cb-core ov-fill"></span>Core clause</span>
@@ -85,7 +99,7 @@ const squares = (n: { core: number; related: number }) => [
       {
         groups.map((g) => (
           <div class="cb-group" data-level={g.level}>
-            <p class="cb-group-head">
+            <p class="cb-group-head" data-ctip-skip>
               <span class:list={['cb-sw', `ov-${SWATCH[g.level]}`]} />
               <span class="cb-group-name">{levelLabel(g.level, cmp)}</span>
               <span class="cb-group-count">
@@ -96,19 +110,26 @@ const squares = (n: { core: number; related: number }) => [
             <ul class="cb-rows">
               {g.rows.map(({ row, a, b }) => (
                 <li class="cb-row" data-topic={row.topic.id}>
-                  <span class="cb-label">
+                  <span class="cb-label" data-ctip-skip>
                     <span class="cb-topic">{row.topic.name}</span>
                     {row.passing && <span class="cb-note">in passing</span>}
                   </span>
                   {[a, b].map((n, i) => (
-                    <span class:list={['cb-side', i === 0 ? 'cb-a' : 'cb-b']} data-side={i === 0 ? 'a' : 'b'}>
+                    <span
+                      class:list={['cb-side', i === 0 ? 'cb-a' : 'cb-b']}
+                      data-side={i === 0 ? 'a' : 'b'}
+                      data-tip={sideTip(row.topic.name, i === 0 ? def.aName : def.bName, n)}
+                    >
                       {n.core + n.related === 0 ? (
                         <span class="cb-none">not mapped</span>
                       ) : (
                         <>
                           <span class="cb-bar">
-                            {squares(n).map((kind) => (
-                              <span class:list={['cb-sq', kind === 'core' ? 'cb-core ov-fill' : 'cb-rel ov-hatch']} />
+                            {squares(i === 0 ? row.a : row.b, i === 0 ? def.aName : def.bName).map((sq) => (
+                              <span
+                                class:list={['cb-sq', sq.kind === 'core' ? 'cb-core ov-fill' : 'cb-rel ov-hatch']}
+                                data-tip={sq.tip}
+                              />
                             ))}
                           </span>
                           <span class="cb-n">{n.core + n.related}</span>
@@ -122,7 +143,7 @@ const squares = (n: { core: number; related: number }) => [
           </div>
         ))
       }
-      <p class="cb-stamp">
+      <p class="cb-stamp" data-ctip-skip>
         <span>Source: the topic × framework crosswalk, {counts.topics} topics</span>
         <span>As of {asOf}</span>
       </p>
@@ -155,6 +176,7 @@ const squares = (n: { core: number; related: number }) => [
     </div>
   </details>
 </figure>
+<ChartTipScript />
 
 <style>
   /* Wide: A's bar | topic | B's bar, the two axes at the inner edges of the

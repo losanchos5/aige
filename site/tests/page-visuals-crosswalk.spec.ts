@@ -72,10 +72,16 @@ test.describe('/resources/crosswalk overlap of the three instruments', () => {
   const regions = (svg: string) => {
     const out = new Map<string, { n: number; list: string }>();
     for (const m of svg.matchAll(/<title>([^<]+?): (\d+) topics?(?:: ([^<]*))?<\/title>/g)) {
-      if (Number(m[2]) > 0) out.set(decode(m[1]), { n: Number(m[2]), list: decode(m[3] ?? '') });
+      const name = decode(m[1]);
+      // A set's own circle is named "EU AI Act: 25 topics"; regions end in "only" or read "All three".
+      if (!/ only$|^All three$/.test(name)) continue;
+      if (Number(m[2]) > 0) out.set(name, { n: Number(m[2]), list: decode(m[3] ?? '') });
     }
     return out;
   };
+  /** The set circles' tooltips of one SVG: "EU AI Act: 25 topics". */
+  const setTotals = (svg: string) =>
+    new Map([...svg.matchAll(/<title>([^<:]+): (\d+) topics?<\/title>/g)].filter((m) => SETS.some(([, l]) => l === decode(m[1]))).map((m) => [decode(m[1]), Number(m[2])]));
 
   test('both variants name every non-empty region with exactly its topics', () => {
     const page = html('/resources/crosswalk');
@@ -84,6 +90,9 @@ test.describe('/resources/crosswalk overlap of the three instruments', () => {
       const svg = slice(figure, `aria-labelledby="${variant}-t`, '</svg>');
       expect(regions(svg), variant).toEqual(expected);
     }
+    // The wide variant draws a circle per set, named with its total (the narrow upset has none).
+    const wide = slice(figure, 'aria-labelledby="cw-venn-w-t', '</svg>');
+    expect(setTotals(wide), 'set totals').toEqual(new Map(SETS.map(([id, label]) => [label, topics.filter((t) => reaches(t.id, id)).length])));
   });
 
   test('while the sets nest, the wide variant draws them nested and every region it prints holds a topic', () => {
@@ -179,6 +188,29 @@ test.describe('comparison pages: overlap bar and clause butterfly', () => {
       const order = ['strong', 'partial', 'a-only', 'b-only'];
       const sorted = [...rows].sort((x, y) => order.indexOf(x.level!) - order.indexOf(y.level!));
       expect(drawn).toEqual(sorted.map(({ id, level, a, b }) => ({ id, level, a, b })));
+      // Each square is named for its tooltip by its instrument, clause and
+      // strength, and the strength in its name is the one it is drawn in.
+      for (const li of figure.split('<li class="cb-row"').slice(1)) {
+        const topic = /data-topic="([^"]+)"/.exec(li)?.[1];
+        const [, a, b] = li.split(/data-side="[ab]"/);
+        for (const [part, fw, name] of [
+          [a, c.a, c.aName],
+          [b, c.b, c.bName],
+        ] as const) {
+          const squares = [...part.matchAll(/class="cb-sq (cb-core|cb-rel)[^"]*" data-tip="([^"]*)"/g)].map((m) => ({
+            core: m[1] === 'cb-core',
+            tip: decode(m[2]),
+          }));
+          const list = refs.filter((r) => r.topic === topic && r.framework === fw);
+          expect(squares, `${topic} ${fw}`).toHaveLength(list.length);
+          for (const r of list) {
+            const strength = r.strength === 'core' ? 'core' : 'related';
+            const named = squares.filter((s) => s.tip.startsWith(`${name} ${r.ref} `) && s.tip.endsWith(`(${strength} clause)`));
+            expect(named.length, `${topic} ${fw} ${r.ref}`).toBeGreaterThan(0);
+            expect(named.every((s) => s.core === (strength === 'core')), `${topic} ${fw} ${r.ref}`).toBe(true);
+          }
+        }
+      }
     });
   }
 });

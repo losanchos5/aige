@@ -17,10 +17,19 @@
  * reveals; it sets data-lens on the root and coverage-map.css does the rest.
  * Cells the "Labs vs standards" lens points at carry data-div; the rows it
  * marks carry data-divergence.
+ *
+ * The root is a chart-tip root (data-ctip, ChartTipScript; chart.css carries
+ * the tooltip's styles): a cell's aria-label, and the consensus and total
+ * counts' own words (data-tip), show at once on hover, focus and tap. The key,
+ * the column heads, the corners and the row labels (their visible text is the
+ * dimension's full name) are data-ctip-skip, and the grid takes its name by
+ * aria-labelledby so the map's own name is never a tooltip.
  */
 import { computeCoverage, type CoverageCell, type CoverageGap } from '../lib/coverage';
 import type { CrosswalkColumn, CrosswalkRef, Topic } from '../data/crosswalk';
+import '../styles/chart.css';
 import '../styles/coverage-map.css';
+import ChartTipScript from './ChartTipScript.astro';
 
 interface Props {
   topics: readonly Topic[];
@@ -71,7 +80,7 @@ const divergenceLabel: Record<string, string> = {
 };
 ---
 
-<div class="cov" id="coverage-map" data-coverage-map data-lens="all" style={`--cov-cols: ${n}`}>
+<div class="cov" id="coverage-map" data-coverage-map data-lens="all" data-ctip style={`--cov-cols: ${n}`}>
   <fieldset class="cov-lenses" data-cov-lenses hidden>
     <legend class="cov-lenses-legend">Lens</legend>
     <label><input type="radio" name="cov-lens" value="all" checked /> All</label>
@@ -89,15 +98,16 @@ const divergenceLabel: Record<string, string> = {
     </p>
   </fieldset>
 
-  <ul class="cov-key" aria-label="Key">
+  <ul class="cov-key" aria-label="Key" data-ctip-skip>
     <li><span class="cov-swatch" data-state="core" data-level="1" aria-hidden="true">1</span><span class="cov-swatch" data-state="core" data-level="2" aria-hidden="true">2</span><span class="cov-swatch" data-state="core" data-level="3" aria-hidden="true">3</span> Sections mainly about the dimension</li>
     <li><span class="cov-swatch" data-state="related" aria-hidden="true">rel</span> Only sections that touch it</li>
     <li><span class="cov-swatch" data-state="gap" aria-hidden="true">gap</span> Documented gap</li>
     <li><span class="cov-count" aria-hidden="true">4/5</span> Documents with a section mainly about it (“Main in”)</li>
   </ul>
 
-  <div class="cov-grid" role="group" aria-label={label}>
-    <div class="cov-row cov-head" aria-hidden="true">
+  <div class="cov-grid" role="group" aria-labelledby="coverage-map-name">
+    <span class="visually-hidden" id="coverage-map-name">{label}</span>
+    <div class="cov-row cov-head" aria-hidden="true" data-ctip-skip>
       <span class="cov-corner">Dimension</span>
       {
         columns.map((c) => (
@@ -116,7 +126,7 @@ const divergenceLabel: Record<string, string> = {
           const name = topicName.get(row.topic) ?? row.topic;
           return (
             <li class="cov-row" data-topic={row.topic} data-divergence={row.divergence.join(' ') || undefined}>
-              <a class="cov-label" href={`#topic-${row.topic}`} data-cw-open={row.topic}>
+              <a class="cov-label" href={`#topic-${row.topic}`} data-cw-open={row.topic} data-ctip-skip>
                 {name}
                 {row.divergence.map((d) => (
                   <span class="cov-divmark" data-kind={d}>
@@ -138,7 +148,7 @@ const divergenceLabel: Record<string, string> = {
                   <span aria-hidden="true">{shown(cell)}</span>
                 </a>
               ))}
-              <span class="cov-consensus">
+              <span class="cov-consensus" data-tip={`${name}: a section mainly about it in ${row.consensus} of ${n} documents`}>
                 <span class="cov-dots" aria-hidden="true">
                   {row.cells.map((cell) => (
                     <span class="cov-dot" data-on={cell.state === 'core' ? '' : undefined} />
@@ -156,10 +166,14 @@ const divergenceLabel: Record<string, string> = {
     </ol>
 
     <div class="cov-row cov-foot">
-      <span class="cov-corner">Dimensions covered</span>
+      <span class="cov-corner" data-ctip-skip>Dimensions covered</span>
       {
         totals.map((t, i) => (
-          <span class="cov-total" data-col={t.col}>
+          <span
+            class="cov-total"
+            data-col={t.col}
+            data-tip={`${columns[i].label}: ${t.covered} of ${rows.length} dimensions covered, ${t.core} with a section mainly about them`}
+          >
             <span aria-hidden="true">{t.covered}/{rows.length}</span>
             <span class="visually-hidden">
               {columns[i].label}: {t.covered} of {rows.length} dimensions covered, {t.core} with a
@@ -168,7 +182,8 @@ const divergenceLabel: Record<string, string> = {
           </span>
         ))
       }
-      <span class="cov-conshead" aria-hidden="true"></span>
+      <span class="cov-conshead" aria-hidden="true" data-ctip-skip></span>
     </div>
   </div>
 </div>
+<ChartTipScript />
