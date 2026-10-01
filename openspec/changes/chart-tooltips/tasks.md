@@ -25,7 +25,7 @@ que usan los dos bloques.
   `concentricRings`, fila «+N» del radial, `detail` en pasos de `ladder`, `linkText()` con el nombre
   completo de la marca en barras, heatgrid, lanes, sankey y spine. Verificar: casos nuevos en
   `tests/chart-primitives.spec.ts` (puerta test-audit; lo esperado sale de la entrada del caso) en verde.
-- [ ] 2.4 `tests/chart-tip.spec.ts` con los contratos 1 a 7 de design D9 sobre la muestra de rutas
+- [x] 2.4 `tests/chart-tip.spec.ts` con los contratos 1 a 7 de design D9 sobre la muestra de rutas
   (puerta test-audit; lo esperado sale del HTML de dist previo a la isla o de `src/data`). Verificar:
   verde a 320, 390 y 1440 con `hasTouch`/`isMobile` en la variante táctil.
 
@@ -52,12 +52,14 @@ que usan los dos bloques.
 
 ## 4. Integración y revisión
 
-- [ ] 4.1 Fusionar `wt/tips-a` y `wt/tips-b` en `wt/tips`; build; `npx playwright test
+- [x] 4.1 Fusionar `wt/tips-a` y `wt/tips-b` en `wt/tips`; build; `npx playwright test
   --project=default --workers=3`; axe `A11Y_FULL=1` en las rutas tocadas; `PW_PORT=4461 npm run lhci`,
   cada uno por separado y con el puerto comprobado libre con netstat. Verificar: los tres verdes.
-- [ ] 4.2 Dos revisiones en paralelo: fidelidad de los textos de tooltip frente a los datos, y
+  (2026-10-01: suite y lhci verdes. Axe A11Y_FULL se cortó por falta de memoria y Jordi decidió
+  saltarlo; los bloques A y B pasaron axe en sus rutas: 28 y 44 variantes verdes.)
+- [x] 4.2 Dos revisiones en paralelo: fidelidad de los textos de tooltip frente a los datos, y
   a11y/móvil adversarial con capturas e interacción real a 320, 390 y 1440, claro, oscuro y
   forced-colors, ratón, teclado y táctil emulado. Verificar: informe de cada revisión con hallazgos.
-- [ ] 4.3 Pase de arreglos de los hallazgos CRITICAL y HIGH y repetición de 4.1. Verificar: verde.
+- [x] 4.3 Pase de arreglos de los hallazgos CRITICAL y HIGH y repetición de 4.1. Verificar: verde.
 - [ ] 4.4 PR a main (la fusiona Jordi con `! gh pr merge <n> --merge`); tras la fusión, esperar
   `deploy.yml` y comprobar con curl en producción cada ruta tocada (200 y un único `chart-tip.js`).
