@@ -7,9 +7,11 @@
 //           circle area = its fields, inner disc = the share of them that is
 //           required; the 'organisation' stage, which spans every stage, sits
 //           in the centre. Wide ring and a narrow list per stage.
-//   matrix  record x instrument: how many x-evidences marks each schema
-//           carries per instrument, the record's own and its fields' together
-//           (SchemaSummary.evidenceMarks), rows in the page's reading order,
+//   matrix  record x instrument: how many distinct references each schema
+//           cites per instrument, from its x-evidences marks, the record's own
+//           and its fields' together (SchemaSummary.evidenceMarks); a
+//           reference repeated on several fields counts once; rows in the
+//           page's reading order,
 //           each linked to its row in the table, with totals per row and per
 //           instrument. Drawn with evidenceMatrix (./evidence-matrix.ts): the
 //           kit's heatGrid gives each of the 24 x 7 cells its own rect and
@@ -104,13 +106,13 @@ export function recordInstrumentGrid(): Pair {
   const schemas = ordered();
   const perSchema = schemas.map((s) => {
     const counts = new Map<string, number>();
-    for (const mark of s.evidenceMarks) {
+    for (const mark of new Set(s.evidenceMarks)) {
       const id = instrumentOf(mark);
       counts.set(id, (counts.get(id) ?? 0) + 1);
     }
     return counts;
   });
-  // Columns: the instruments cited, most marks first, ties in listing order.
+  // Columns: the instruments cited, most references first, ties in listing order.
   const listed = Object.values(INSTRUMENT_PREFIXES);
   const total = (id: string) => perSchema.reduce((sum, c) => sum + (c.get(id) ?? 0), 0);
   const ids = listed.filter((id) => total(id) > 0).sort((a, b) => total(b) - total(a) || listed.indexOf(a) - listed.indexOf(b));
@@ -119,17 +121,17 @@ export function recordInstrumentGrid(): Pair {
     if (!fw) throw new Error(`template-visuals: no framework "${id}" in data/frameworks.ts`);
     return fw.short;
   };
-  const marks = perSchema.reduce((sum, c) => sum + [...c.values()].reduce((a, b) => a + b, 0), 0);
+  const refs = perSchema.reduce((sum, c) => sum + [...c.values()].reduce((a, b) => a + b, 0), 0);
   const base = {
-    title: 'Evidence marks, record by instrument',
-    desc: `How many x-evidences marks each of the ${schemas.length} record schemas carries for each of ${ids.length} instruments, ${marks} in all, the record's own and its fields' counted together.`,
+    title: 'Evidence references, record by instrument',
+    desc: `How many distinct references each of the ${schemas.length} record schemas cites from each of ${ids.length} instruments in its x-evidences marks, ${refs} in all, a reference repeated on several fields counted once.`,
     source: SOURCE,
     mode: MODE,
     rowHeader: 'Record',
     rows: schemas.map((s, i) => ({ label: s.title, href: schemaHref(s), values: ids.map((id) => perSchema[i].get(id) ?? 0) })),
     columns: ids.map(short),
-    unit: 'marks',
-    tableCaption: 'x-evidences marks per record schema and instrument',
+    unit: 'references',
+    tableCaption: 'Distinct x-evidences references per record schema and instrument',
   };
   return {
     wide: evidenceMatrix({ ...base, id: 'tpl-matrix-w', width: 640 }),

@@ -568,8 +568,11 @@ const sources: ToolSource[] = [
 <style>
   /* The autonomy ladder under the level choice: the tool's script sets
      data-state="chosen" on the level the reader picks
-     (public/toolkit/agent-control-profile.js), drawn as the ladder's own
-     highlight (solid ink, ground-colour text). Without a choice, or without
+     (public/toolkit/agent-control-profile.js). Wide, it is drawn as the
+     ladder's own highlight (solid ink, ground-colour text). Narrow, the row's
+     pips are its level (filled up to it, outlined past it), so the choice
+     keeps them: the filled pips darken to solid ink, the outlined ones take a
+     heavier outline, and the label turns bold. Without a choice, or without
      JavaScript, the ladder stays whole and neutral. */
   .acp-ladder > :global(figure) {
     margin: 0;
@@ -584,9 +587,13 @@ const sources: ToolSource[] = [
     fill: var(--bg);
   }
 
-  .acp-ladder :global(svg.ch-vertical g[data-state='chosen'] rect) {
+  .acp-ladder :global(svg.ch-vertical g[data-state='chosen'] rect[class*='mk-fill']) {
     fill: var(--ink);
     stroke: var(--ink);
+  }
+
+  .acp-ladder :global(svg.ch-vertical g[data-state='chosen'] rect[class*='mk-line']) {
+    stroke-width: 2.5;
   }
 
   .acp-ladder :global(svg.ch-vertical g[data-state='chosen'] text) {

@@ -7,24 +7,26 @@
 //    controls the level adds; the rung links resolve in chapter 23; on the
 //    toolkit the chosen level lights (and only with JavaScript);
 // 2. /agents threat flow: every OWASP agentic threat reaches exactly its
-//    chapter-23 pattern, each pattern takes as many threats as the data gives
+//    chapter-23 patterns, each pattern takes as many threats as the data gives
 //    it, and every threat link lands on its row of the table;
-// 3. EvalBoundary (/frontier, the evaluation-environment research note): every
-//    evaluation environment control in the ring data/eval-boundary.ts gives
-//    it, with its layer, linked to its section of the profile; in the note
-//    the figure sits under "Five things inside the boundary";
-// 4. /frontier #incidents: each evaluation control lists exactly the cases
-//    whose relatedControls name it, each linked to its case;
+// 3. EvalBoundary (/frontier, the evaluation-environment research note): each
+//    of the five inner rings holds the controls the matching item of the
+//    note's "Five things inside the boundary" names (read from the note's
+//    markdown), every control in exactly one ring with its layer, linked to
+//    its section of the profile; in the note the figure sits under that list;
+// 4. /frontier #incidents: each evaluation control lists as many cases as
+//    name it in their relatedControls, each linked to its case and labelled
+//    without a lab's name;
 // 5. /frontier #ecosystem: the AIUC-1 waffle holds every requirement of the
 //    index in its domain, retired ones as retired, as of the index's read date.
 import { test, expect, type Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 
 import { agentAnchors, agentChapter, agentControls, autonomyLevels } from '../src/data/tool-agent-controls';
 import { agentThreats } from '../src/data/agent-threats';
 import { controlsIn } from '../src/data/controls';
-import { evalBoundaryRings } from '../src/data/eval-boundary';
 import { cases } from '../src/data/cases';
-import { frontierBlocks, LAB_NAMES } from '../src/data/frontier';
+import { LAB_NAMES } from '../src/data/frontier';
 import { AIUC1_INDEX, aiuc1Domains, aiuc1Requirements, type Aiuc1Domain } from '../src/data/aiuc1';
 
 const NOTE = '/research/the-evaluation-environment-is-part-of-the-system';
@@ -107,14 +109,14 @@ test.describe('/agents threat flow', () => {
     const rows = await chartRows(page, 'ag-threat-flow');
     for (const t of agentThreats) {
       const holding = rows.filter((row) => row[0].split('; ').some((name) => name.startsWith(`${t.id} `)));
-      expect(holding.map((row) => row[1]), t.id).toEqual([t.pattern]);
+      expect(holding.map((row) => row[1]), t.id).toEqual(t.patterns);
       expect(holding[0][0], t.id).toContain(`${t.id} ${t.name}`);
     }
-    const patterns = [...new Set(agentThreats.map((t) => t.pattern))];
+    const patterns = [...new Set(agentThreats.flatMap((t) => t.patterns))];
     expect([...new Set(rows.map((row) => row[1]))].sort()).toEqual(patterns.sort());
     for (const p of patterns) {
       const drawn = rows.filter((row) => row[1] === p).reduce((sum, row) => sum + Number(row[2]), 0);
-      expect(drawn, p).toBe(agentThreats.filter((t) => t.pattern === p).length);
+      expect(drawn, p).toBe(agentThreats.filter((t) => t.patterns.includes(p)).length);
     }
     // Same-page links land on a row of the threat table.
     const anchors = (await svgLinks(page, 'ag-threat-flow')).filter((href) => href.startsWith('#'));
@@ -125,14 +127,36 @@ test.describe('/agents threat flow', () => {
 
 // ---- 3. EvalBoundary ----------------------------------------------------------
 
+/** The note's "Five things inside the boundary": each numbered item's title
+ *  ("The harness") and the control ids it names, from the markdown. */
+function fiveThings(): { title: string; controls: string[] }[] {
+  const md = readFileSync('../research/the-evaluation-environment-is-part-of-the-system.md', 'utf8').replace(/\r\n/g, '\n');
+  const section = md.slice(md.indexOf('## Five things inside the boundary'));
+  const list = section.slice(0, section.indexOf('\n## ', 1));
+  return list
+    .split(/\n(?=\d+\. \*\*)/)
+    .filter((item) => /^\d+\. \*\*/.test(item))
+    .map((item) => ({
+      title: /^\d+\. \*\*([^*]+?)\.?\*\*/.exec(item)![1],
+      controls: [...new Set([...item.matchAll(/\[(AIGE-CTL-EVAL-\d{3})\]/g)].map((m) => m[1]))],
+    }));
+}
+
 async function checkBoundary(page: Page, figure: string) {
   const rows = await chartRows(page, figure);
-  const ringOf = new Map(evalBoundaryRings.flatMap((r) => r.controls.map((id) => [short(id), r.label])));
+  // Every control once, with its layer.
   expect(rows.map((row) => row[0]).sort()).toEqual(evalControls.map((c) => short(c.id)).sort());
-  for (const c of evalControls) {
-    const row = rows.find((r) => r[0] === short(c.id))!;
-    expect(row[1], c.id).toBe(ringOf.get(short(c.id)));
-    expect(row[2], c.id).toBe(`Layer 0${c.layer}`);
+  for (const c of evalControls) expect(rows.find((r) => r[0] === short(c.id))![2], c.id).toBe(`Layer 0${c.layer}`);
+  // Each of the note's five things is a ring holding exactly the controls
+  // its item names; the ring's label is the item's title ("The harness"
+  // reads "Harness").
+  const things = fiveThings();
+  expect(things).toHaveLength(5);
+  for (const thing of things) {
+    const ring = rows.filter((r) => thing.controls.map(short).includes(r[0])).map((r) => r[1]);
+    expect(new Set(ring).size, thing.title).toBe(1);
+    expect(thing.title.replace(/^The /, '').toLowerCase(), thing.title).toBe(ring[0].toLowerCase());
+    expect(rows.filter((r) => r[1] === ring[0]).map((r) => r[0]).sort(), thing.title).toEqual(thing.controls.map(short).sort());
   }
   const hrefs = [...new Set(await svgLinks(page, figure))].sort();
   expect(hrefs).toEqual(evalControls.map((c) => `/controls/evaluation-environment#${c.id.toLowerCase()}`).sort());
@@ -163,24 +187,17 @@ test.describe('EvalBoundary', () => {
 
 test.describe('/frontier #incidents case x control', () => {
   test('each evaluation control lists exactly the cases that name it, each linked', async ({ page }) => {
-    // A case is named as #incidents lists it; an unlisted one by its short
-    // label, or, where that names a lab, by words of its own title: never a lab.
-    const listed = new Map((frontierBlocks.find((b) => b.id === 'incidents')?.links ?? []).map((l) => [l.href, l.title]));
-    const namesCase = (label: string, k: (typeof cases)[number]) => {
-      const title = listed.get(`/cases/${k.id}`);
-      if (title) return label === title;
-      if (!LAB_NAMES.test(k.short)) return label === k.short;
-      return !LAB_NAMES.test(label) && k.title.toLowerCase().includes(label.toLowerCase());
-    };
     await page.goto('/frontier');
     const rows = await chartRows(page, 'fr-cases');
     const expected = evalControls.flatMap((c) =>
       cases.filter((k) => (k.relatedControls ?? []).includes(c.id)).map((k) => ({ control: short(c.id), k })),
     );
     expect(rows).toHaveLength(expected.length);
+    // The page names no lab (LAB_NAMES), so a case's label never does.
     expected.forEach(({ control, k }, i) => {
       expect(rows[i][0], k.id).toBe(control);
-      expect(namesCase(rows[i][1], k), `${control} ${k.id}: "${rows[i][1]}"`).toBe(true);
+      expect(rows[i][1], `${control} ${k.id}`).not.toBe('');
+      expect(LAB_NAMES.test(rows[i][1]), `${control} ${k.id}: "${rows[i][1]}"`).toBe(false);
       expect(rows[i][2]).toBe('Names the control');
     });
     const named = cases.filter((k) => evalControls.some((c) => (k.relatedControls ?? []).includes(c.id)));

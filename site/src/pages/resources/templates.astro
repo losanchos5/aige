@@ -273,13 +273,14 @@ const jsonLd = [
     <section class="res-section" aria-labelledby="tpl-marks">
       <div class="res-section-head">
         <h2 id="tpl-marks">Which record evidences which instrument</h2>
-        <p>Every <code>x-evidences</code> mark in the schemas above, on the record or on one of its
-        fields, counted by the instrument it cites. Read down the column of the instrument you answer
-        to for the records its marks rest on, and start with those.</p>
+        <p>The <code>x-evidences</code> marks in the schemas above, on the record or on its fields,
+        counted as the distinct references each record cites from each instrument. Read down the
+        column of the instrument you answer to for the records its references rest on, and start
+        with those.</p>
       </div>
       <Chart
-        title="Evidence marks, record by instrument"
-        caption="One row per record, one column per instrument its marks cite, with the count of marks in each cell and the totals at the ends. A record name links to its row in the tables above."
+        title="Evidence references, record by instrument"
+        caption="One row per record, one column per instrument its marks cite; each cell counts the distinct references the record cites from that instrument, so a reference marked on several fields counts once. The totals are at the ends. A record name links to its row in the tables above."
         chart={matrix.wide}
         narrow={matrix.narrow}
       />

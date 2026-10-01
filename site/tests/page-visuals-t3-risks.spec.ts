@@ -1,20 +1,23 @@
 // page-visuals-t3-risks.spec.ts: the wave-3 visuals of /resources/threats and
 // /resources/harms (OpenSpec page-visuals-2, "Recuentos coherentes") draw the
 // counts of their data modules. Read from dist, like
-// page-visuals-crosswalk.spec.ts; every expected value is recomputed here from
-// the raw rows (src/data/threats.ts, src/data/harms.ts), never from the page
-// or lib/page-visuals/risk-visuals.ts, so a chart wired to the wrong field,
-// a dropped second layer or mechanism, or a count of eval rows instead of
-// tools fails:
-// - the threat flow: catalogue -> layer counts (threat, layer) pairs, layer ->
-//   tool counts the threats of a layer that name a check in the tool;
+// page-visuals-crosswalk.spec.ts; every expected value comes from the raw rows
+// (src/data/threats.ts, src/data/harms.ts) or from the page's own filter
+// chips, never from lib/page-visuals/risk-visuals.ts, and the flows are
+// checked by invariants a reader can check against the page, not by
+// recounting their links the way the generator does:
+// - the threat flow: each column carries every threat once; a catalogue's
+//   block reads the count its filter chip prints; the layer sets that hold a
+//   layer add up to the threats of that layer; the "only a test you write"
+//   route holds the rows whose every eval is custom, the number the caption
+//   states;
 // - the framework grids: each catalogue x id cell counts the rows naming the
 //   id, and every id of the lookup table is either a column or listed under
 //   "No row names" (so all 18 CSA AICM domains are accounted for);
 // - the harms target: each harm in its level's ring and its first MIT code's
 //   domain, in its control's layer, its mark linking to its card;
-// - the harms flow: mechanism -> level counts (harm, mechanism) pairs, level
-//   -> layer counts (harm, layer) pairs;
+// - the harms flow: each mechanism sends as many ribbons' worth as the harms
+//   that name it, and each layer receives the harms its controls catch;
 // - every in-page link the four charts draw lands on an id of the page.
 import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
@@ -57,36 +60,44 @@ function tableOf(fig: string): { head: string[]; rows: string[][] } {
 const layerName = (n: number) => `L${n} ${layers.find((l) => l.n === n)!.name}`;
 const byLink = (a: string[], b: string[]) => (a[0] + a[1]).localeCompare(b[0] + b[1]);
 
-/** Links as [from, to, count] from a key -> count map, for comparing with a table. */
-function links(counts: Map<string, number>, name: (key: string) => string): string[][] {
-  return [...counts].map(([key, n]) => {
-    const [from, to] = key.split('\u0000');
-    return [name(from), name(to), String(n)];
-  });
-}
-function count(keys: string[]): Map<string, number> {
+/** Sum of the table's link values, grouped by the column `at` (0 From, 1 To). */
+function sums(rows: string[][], at: 0 | 1): Map<string, number> {
   const out = new Map<string, number>();
-  for (const k of keys) out.set(k, (out.get(k) ?? 0) + 1);
+  for (const row of rows) out.set(row[at], (out.get(row[at]) ?? 0) + Number(row[2]));
   return out;
 }
-const pair = (a: string, b: string) => `${a}\u0000${b}`;
 
 test.describe('/resources/threats charts', () => {
-  test('the flow counts threat-layer pairs per catalogue and, per layer, the threats each tool tests', () => {
-    const toolName = (tool: string) => (tool === 'custom' ? 'Write your own' : tool);
-    const names = new Map<string, string>([
-      ...taxonomies.map((t) => [`c:${t.id}`, t.name] as const),
-      ...[1, 2, 3, 4, 5].map((n) => [`l:${n}`, layerName(n)] as const),
-      ...threats.flatMap((t) => t.evals.map((e) => [`t:${e.tool}`, toolName(e.tool)] as const)),
-    ]);
-    const stage1 = count(threats.flatMap((t) => t.layers.map((n) => pair(`c:${t.taxonomy}`, `l:${n}`))));
-    const stage2 = count(
-      threats.flatMap((t) => t.layers.flatMap((n) => [...new Set(t.evals.map((e) => e.tool))].map((tool) => pair(`l:${n}`, `t:${tool}`)))),
-    );
-    const expected = [...links(stage1, (k) => names.get(k)!), ...links(stage2, (k) => names.get(k)!)].sort(byLink);
-    const { head, rows } = tableOf(figure(html('/resources/threats'), 'tb-flow-w'));
-    expect(head).toEqual(['From', 'To', 'Pairs']);
-    expect([...rows].sort(byLink)).toEqual(expected);
+  test('the flow counts each threat once: blocks match the filter chips, the layers and the caption', () => {
+    const page = html('/resources/threats');
+    const fig = figure(page, 'tb-flow-w');
+    const { head, rows } = tableOf(fig);
+    expect(head).toEqual(['From', 'To', 'Threats']);
+    const catalogueNames = new Set(taxonomies.map((t) => t.short));
+    const stage1 = rows.filter((r) => catalogueNames.has(r[0]));
+    const stage2 = rows.filter((r) => !catalogueNames.has(r[0]));
+    // Every column carries every threat once.
+    for (const stage of [stage1, stage2]) expect(stage.reduce((n, r) => n + Number(r[2]), 0)).toBe(threats.length);
+    // A catalogue's ribbons and its block read what its filter chip prints.
+    const out = sums(stage1, 0);
+    for (const t of taxonomies) {
+      const chip = new RegExp(String.raw`for="tb-t-${t.id}"[^>]*>[^<]*<span class="tb-count"[^>]*>\((\d+)\)`).exec(page)?.[1];
+      expect(chip, `chip of ${t.short}`).toBe(String(threats.filter((r) => r.taxonomy === t.id).length));
+      expect(out.get(t.short), t.short).toBe(Number(chip));
+      expect(decode(fig), `${t.short} block`).toContain(`${t.short}: ${chip} threats`);
+    }
+    // The layer sets that hold a layer add up to the threats of that layer.
+    const into = sums(stage1, 1);
+    for (const n of [1, 2, 3, 4, 5]) {
+      const drawn = [...into].filter(([set]) => set.split(' + ').includes(`L${n}`)).reduce((sum, [, v]) => sum + v, 0);
+      expect(drawn, `L${n}`).toBe(threats.filter((r) => r.layers.includes(n as Threat['layers'][number])).length);
+    }
+    // The own-test route holds the rows whose every eval is custom, and the
+    // caption states that number.
+    const ownOnly = threats.filter((r) => r.evals.every((e) => e.tool === 'custom')).length;
+    const routes = sums(stage2, 1);
+    expect(routes.get('Only a test you write')).toBe(ownOnly);
+    expect(decode(fig)).toContain(`${ownOnly} of the ${threats.length} threats rely only on a test you write`);
   });
 
   for (const fw of [
@@ -127,18 +138,19 @@ test.describe('/resources/harms charts', () => {
     expect(new Map(harms.map((h) => [h.id, `${h.harmType} · ${levelLabel[h.level]} · ${domainOf(h)}`]))).toEqual(marks);
   });
 
-  test('the flow counts harm-mechanism pairs per level and harm-layer pairs per level', () => {
-    const names = (key: string) => {
-      const [kind, id] = key.split(':');
-      if (kind === 'm') return mechanismLabel[id as keyof typeof mechanismLabel];
-      if (kind === 'v') return levelLabel[id as keyof typeof levelLabel];
-      return layerName(Number(id));
-    };
-    const stage1 = count(harms.flatMap((h) => h.mechanism.map((m) => pair(`m:${m}`, `v:${h.level}`))));
-    const stage2 = count(harms.flatMap((h) => h.layerN.map((n) => pair(`v:${h.level}`, `l:${n}`))));
+  test('each mechanism sends as many harms as name it, and each layer receives the harms it catches', () => {
     const { head, rows } = tableOf(figure(html('/resources/harms'), 'hm-flow-w'));
     expect(head).toEqual(['From', 'To', 'Pairs']);
-    expect([...rows].sort(byLink)).toEqual([...links(stage1, names), ...links(stage2, names)].sort(byLink));
+    const mechanisms = new Map(Object.entries(mechanismLabel).map(([id, label]) => [label, id]));
+    const out = sums(rows.filter((r) => mechanisms.has(r[0])), 0);
+    for (const [label, id] of mechanisms) {
+      const n = harms.filter((h) => h.mechanism.includes(id as (typeof h.mechanism)[number])).length;
+      expect(out.get(label) ?? 0, label).toBe(n);
+    }
+    const into = sums(rows.filter((r) => !mechanisms.has(r[0])), 1);
+    for (const n of [1, 2, 3, 4, 5]) {
+      expect(into.get(layerName(n)) ?? 0, `L${n}`).toBe(harms.filter((h) => h.layerN.includes(n as (typeof h.layerN)[number])).length);
+    }
   });
 });
 

@@ -156,7 +156,10 @@ const caseBase = {
   tableCaption: 'Each evaluation environment control with the incident cases that name it',
 };
 const caseWide = dotMatrix({ ...caseBase, id: 'fr-cases-w', width: 480 });
-const caseNarrow = dotMatrix({ ...caseBase, id: 'fr-cases-n', width: NARROW_WIDTH });
+// Narrow, the SVG scales a little under 1 on a 320 px screen, so the default
+// 24-unit pitch lands under the 24 px of WCAG 2.5.8: a 28-unit pitch keeps
+// the squares' centres 24 px apart down to 0.86 scale.
+const caseNarrow = dotMatrix({ ...caseBase, id: 'fr-cases-n', width: NARROW_WIDTH, cell: 20, gap: 8 });
 const busiest = [...evalControls].sort((a, b) => casesOf.get(b.id)!.size - casesOf.get(a.id)!.size)[0];
 
 // #ecosystem: the AIUC-1 requirements by domain, one square each, the
@@ -243,7 +246,7 @@ const aiucNarrow = dotMatrix({ ...aiucBase, id: 'fr-aiuc-n', width: NARROW_WIDTH
           <div class="fr-figure">
             <Chart
               id="fr-cases"
-              title="Which case tests which control"
+              title="Which case names which control"
               caption={`One row per evaluation environment control, one square per public incident case that names it; the number is how many cases name the control. ${shortId(busiest.id)} ${busiest.title} is named by ${casesOf.get(busiest.id)!.size} of the ${matrixCases.length} cases; select a square to open the case.`}
               chart={caseWide}
               narrow={caseNarrow}

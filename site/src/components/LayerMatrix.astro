@@ -7,8 +7,9 @@
  *  - a bar per cell, its length the count against the largest in its column
  *    (/stack, what fills each layer), in the row's layer colour;
  *  - one glyph per record when a cell carries `marks` (/path, stage x layer):
- *    core filled, alternative outlined, optional dashed (state by form, never
- *    colour alone), under a layer-coloured top rule.
+ *    core a filled square, alternative an outlined square, optional an
+ *    outlined circle (state by shape and fill, never colour alone), 12 px so
+ *    the three read apart, under a layer-coloured top rule.
  * Layer colours follow the kit: --lN fills, --lN-ink strokes.
  * The number is always printed in full ink; each cell's link is named by its
  * own text ("12 obligations in layer 01"), so it reads the same whether the
@@ -246,8 +247,8 @@ const toneOf = (tone?: number) => (tone ? `--lc: var(--l${tone}); --lc-ink: var(
 
   .lmx-m {
     display: inline-block;
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     flex: none;
     border: 1.5px solid var(--ink);
     border-radius: 2px;
@@ -261,8 +262,7 @@ const toneOf = (tone?: number) => (tone ? `--lc: var(--l${tone}); --lc-ink: var(
   }
 
   .lmx-m[data-kind='optional'] {
-    border-style: dashed;
-    border-color: var(--ink-2);
+    border-radius: 50%;
   }
 
   .lmx-legend {

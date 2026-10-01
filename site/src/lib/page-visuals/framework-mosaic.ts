@@ -8,7 +8,7 @@
 // An instrument with no obligation row has no area to draw: a tile of any
 // size would claim rows it does not have. It stays out of the treemap and
 // the page lists it in one line under the chart (withoutObligations()).
-// minTile 36 merges the long tail of one-row instruments sooner, which keeps
+// minTile 40 merges the long tail of one-row instruments sooner, which keeps
 // every linked tile inside the 12 KB SVG budget.
 import { NARROW_WIDTH, treemap, type ChartMode, type ChartOutput } from '../charts';
 import { frameworks, obligations, type Framework, type FrameworkType } from '../../data/frameworks';

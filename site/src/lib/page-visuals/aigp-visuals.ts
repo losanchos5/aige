@@ -9,12 +9,13 @@
 //   flow    domains to chapters (flow): ribbon width = the number of a
 //           domain's indicators that link into a chapter (indicators[].links
 //           under /bok/<slug>); an indicator that links two chapters counts
-//           once in each. At most nine chapter nodes: past nine, eight stay,
-//           ranked by the most indicators any one domain sends them (so each
-//           domain keeps the chapters that carry it), then by their total,
-//           then by chapter number; the rest merge into "Other (N)", N
+//           once in each, so a block counts indicator links, not indicators
+//           (the unit says so). At most nine chapter nodes: past nine, eight
+//           stay, ranked by the most indicators any one domain sends them (so
+//           each domain keeps the chapters that carry it), then by their
+//           total, then by chapter number; the rest merge into "Other (N)", N
 //           chapters, where each domain's ribbon counts its indicators that
-//           link any of them, once.
+//           link any of them, once. `drawn` and `grouped` give the caption both counts.
 import { NARROW_WIDTH, flow, treemap, type ChartMode, type ChartOutput, type SankeyLink, type SankeyNode } from '../charts';
 import { aigpAsOf, aigpBok, aigpDomains, rangeMidpoint, type AigpDomain } from '../../data/aigp';
 import { chapters, type Chapter } from '../../data/chapters';
@@ -22,6 +23,13 @@ import { chapters, type Chapter } from '../../data/chapters';
 export interface Pair {
   wide: ChartOutput;
   narrow: ChartOutput;
+}
+
+export interface FlowPair extends Pair {
+  /** Chapters drawn as their own node. */
+  drawn: number;
+  /** Chapters merged into "Other (N)": N, 0 when every chapter is drawn. */
+  grouped: number;
 }
 
 const MODE: ChartMode = 'figc';
@@ -92,7 +100,7 @@ function domainChapterIndicators(domain: AigpDomain): Map<Chapter, Set<string>> 
 
 const num = (c: Chapter) => c.id.slice(0, 2);
 
-export function domainChapters(): Pair {
+export function domainChapters(): FlowPair {
   const perDomain = aigpDomains.map((d) => ({ domain: d, map: domainChapterIndicators(d) }));
   const reached = [...new Set(perDomain.flatMap(({ map }) => [...map.keys()]))];
   const total = (c: Chapter) => perDomain.reduce((n, { map }) => n + (map.get(c)?.size ?? 0), 0);
@@ -123,7 +131,7 @@ export function domainChapters(): Pair {
   });
   const base = {
     title: 'From the AIGP domains to the chapters',
-    desc: `For each of the four AIGP domains, how many of its indicators link into each chapter of the body of knowledge; an indicator that links two chapters counts in both.`,
+    desc: `For each of the four AIGP domains, how many of its indicators link into each chapter of the body of knowledge; an indicator that links two chapters counts in both, so a domain's block counts indicator links.`,
     source: SOURCE,
     asOf: aigpAsOf,
     mode: MODE,
@@ -133,8 +141,8 @@ export function domainChapters(): Pair {
     ],
     nodes,
     links,
-    unit: 'indicators',
-    unitOne: 'indicator',
+    unit: 'indicator links',
+    unitOne: 'indicator link',
     fromHeader: 'Domain',
     toHeader: 'Chapter',
     valueHeader: 'Indicators',
@@ -143,5 +151,7 @@ export function domainChapters(): Pair {
   return {
     wide: flow({ ...base, id: 'aigp-flow-w', width: 760 }),
     narrow: flow({ ...base, id: 'aigp-flow-n', width: NARROW_WIDTH, layout: 'narrow' }),
+    drawn: kept.length,
+    grouped: rest.length,
   };
 }
