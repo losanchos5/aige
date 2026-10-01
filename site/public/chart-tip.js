@@ -60,9 +60,19 @@
   }
 
   // Containers are never marks, even when labelled: the root, an <svg>, a
-  // scroll region, a list (a legend, or the cells of a grid row).
+  // scroll region, a list (a legend, or the cells of a grid row), and any
+  // element that is not focusable but holds named marks (a role="img" plot of
+  // named squares): hovering the gaps between marks names nothing.
   const CONTAINER = /^(svg|ul|ol|dl|table)$/;
-  const notMark = (el, root) => el === root || CONTAINER.test(el.localName) || /^(region|list)$/.test(el.getAttribute('role'));
+  const holdsMarks = (el) => {
+    for (const n of el.querySelectorAll(NAMED)) if (n.localName !== 'title' || n.parentElement !== el) return true;
+    return false;
+  };
+  const notMark = (el, root) =>
+    el === root ||
+    CONTAINER.test(el.localName) ||
+    /^(region|list)$/.test(el.getAttribute('role')) ||
+    (!el.matches(FOCUSABLE) && holdsMarks(el));
 
   function markOf(target) {
     if (!target || !target.closest) return null;

@@ -285,7 +285,7 @@ test('/controls mosaic: hovering a tile names its control by id and title', asyn
 for (const { route, sel } of [
   { route: '/controls', sel: '[data-ctip] .clx-marks a' },
   { route: '/resources/frontier-safety-crosswalk', sel: '[data-ctip] [data-cw-open]' },
-  { route: '/obligations', sel: '[data-ctip] [title], [data-ctip] [aria-label]' },
+  { route: '/obligations', sel: '[data-ctip] .obi-sq' },
   { route: '/resources/crosswalk', sel: '[data-ctip] [data-cw-open]' },
 ]) {
   test(`${route} grid: hover shows the cell's name`, async ({ page }) => {
