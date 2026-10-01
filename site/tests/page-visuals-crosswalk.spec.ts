@@ -89,8 +89,10 @@ test.describe('/resources/crosswalk overlap of the three instruments', () => {
     for (const variant of ['cw-venn-w', 'cw-venn-n']) {
       const svg = slice(figure, `aria-labelledby="${variant}-t`, '</svg>');
       expect(regions(svg), variant).toEqual(expected);
-      expect(setTotals(svg), `${variant} set totals`).toEqual(new Map(SETS.map(([id, label]) => [label, topics.filter((t) => reaches(t.id, id)).length])));
     }
+    // The wide variant draws a circle per set, named with its total (the narrow upset has none).
+    const wide = slice(figure, 'aria-labelledby="cw-venn-w-t', '</svg>');
+    expect(setTotals(wide), 'set totals').toEqual(new Map(SETS.map(([id, label]) => [label, topics.filter((t) => reaches(t.id, id)).length])));
   });
 
   test('while the sets nest, the wide variant draws them nested and every region it prints holds a topic', () => {
