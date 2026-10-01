@@ -204,6 +204,7 @@ export function threatGrid(framework: Framework): FrameworkGrid {
     columns: ids.map((id) => ({ label: id, name: `${id} ${lookup[id]}` })),
     values: taxonomies.map((t) => ids.map((id) => threats.filter((row) => row.taxonomy === t.id && named(row).includes(id)).length)),
     unit: 'threats',
+    unitOne: 'threat',
     tableCaption: `Threat rows of each catalogue that name each ${label}`,
   });
   const unnamed = Object.keys(lookup)

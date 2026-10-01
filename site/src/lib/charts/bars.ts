@@ -48,7 +48,12 @@ const VALUE_W = 52; // room for the value label after the longest bar
 const WIDE_AT = 480;
 
 export interface BarItem {
+  /** Drawn label (wraps to two lines) and the table cell. */
   label: string;
+  /** Full name in the mark's tooltip and the row link, when the label is a
+   *  shortened form ("ISO 42001 Annex A A.6.2.6: AI system ...";
+   *  default: the label). */
+  name?: string;
   value: number;
   tone?: Tone;
   state?: MarkState;
@@ -161,7 +166,7 @@ function rankedCore(input: RankedBarsInput, style: 'bar' | 'lollipop'): ChartOut
     const own: string[] = [];
     const { barY } = itemLabel(own, f, item.label, y, BAR_H);
     const w = s.map(item.value) - s.map(0);
-    const name = `${item.label}: ${fmt(item.value)}${unitSuffix} ${input.percent ? '' : input.unit}`.trim();
+    const name = `${item.name ?? item.label}: ${fmt(item.value)}${unitSuffix} ${input.percent ? '' : input.unit}`.trim();
     const attrs = item.highlight ? 'class="mk mk-hi"' : marks.attrs(item.state, item.tone);
     if (style === 'bar') {
       own.push(`<rect x="${r1(s.map(0))}" y="${r1(barY)}" width="${r1(w)}" height="${BAR_H}" ${attrs}>${tip(name)}</rect>`);
@@ -219,6 +224,10 @@ export const lollipop = (input: RankedBarsInput): ChartOutput => rankedCore(inpu
 
 export interface StackSeries {
   label: string;
+  /** Name in the segment tooltips and the row link when the drawn label
+   *  carries more, such as its count ("Strong" for "Strong: 13"; default:
+   *  the label). */
+  name?: string;
   tone?: Tone;
   state?: MarkState;
 }
@@ -228,7 +237,13 @@ export interface StackedBarsInput extends ChartBase {
   series: StackSeries[];
   /** values[i] belongs to series[i]. */
   items: { label: string; values: number[]; href?: string }[];
+  /** Axis quantity ("items or criteria"; stacked100 adds ", %"). */
   unit: string;
+  /** Noun of a raw count in the tooltips when `unit` names a share
+   *  ("topics" for "share of topics"; default: the unit), and its singular
+   *  for a value of 1. */
+  countUnit?: string;
+  unitOne?: string;
   itemHeader?: string;
   labelWidth?: number;
 }
@@ -249,6 +264,9 @@ function stackedCore(input: StackedBarsInput, percent: boolean): ChartOutput {
     ? linearScale([0, 100], [f.x0, f.x1], { integer: true, maxTicks: 5 })
     : linearScale(totals, [f.x0, f.x1], { integer: input.items.every((i) => i.values.every(Number.isInteger)) });
   const marks = markStyles(input.id);
+  const countUnit = input.countUnit ?? input.unit;
+  const unitOf = (v: number) => (v === 1 && input.unitOne ? input.unitOne : countUnit);
+  const seriesName = (sr: StackSeries) => sr.name ?? sr.label;
   const out: string[] = [];
   const lg = legend(
     input.series.map((sr) => ({ label: sr.label, state: sr.state, tone: sr.tone, swatch: 'bar' as const })),
@@ -271,8 +289,8 @@ function stackedCore(input: StackedBarsInput, percent: boolean): ChartOutput {
   input.items.forEach((item, i) => {
     // A linked row is named by its parts, as its segments are.
     const rowName = `${item.label}: ${input.series
-      .flatMap((sr, k) => (item.values[k] ? [`${sr.label} ${fmt(item.values[k])}`] : []))
-      .join(', ')} ${input.unit}`;
+      .flatMap((sr, k) => (item.values[k] ? [`${seriesName(sr)} ${fmt(item.values[k])}`] : []))
+      .join(', ')} ${countUnit}`;
     const { barY } = itemLabel(rows, f, item.label, y, BAR_H, item.href, 2, rowName);
     let acc = 0;
     item.values.forEach((v, k) => {
@@ -282,7 +300,7 @@ function stackedCore(input: StackedBarsInput, percent: boolean): ChartOutput {
       acc += share;
       if (v === 0) return;
       const sr = input.series[k];
-      const name = `${item.label} · ${sr.label}: ${fmt(v)} ${input.unit}${percent ? ` (${fmt(share)}%)` : ''}`;
+      const name = `${item.label} · ${seriesName(sr)}: ${fmt(v)} ${unitOf(v)}${percent ? ` (${fmt(share)}%)` : ''}`;
       rows.push(`<rect x="${r1(xa)}" y="${r1(barY)}" width="${r1(xb - xa)}" height="${BAR_H}" ${marks.attrs(sr.state, sr.tone)}>${tip(name)}</rect>`);
     });
     if (!percent) {

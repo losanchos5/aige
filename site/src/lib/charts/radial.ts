@@ -194,11 +194,12 @@ export function relationRadial(input: RelationRadialInput): ChartOutput | null {
   const edge = (item: RelationItem, x1: number, y1: number, x2: number, y2: number) => {
     (item.strength === 'related' ? dashed : solid).push(`M${r1(x1)} ${r1(y1)}L${r1(x2)} ${r1(y2)}`);
   };
-  // The "+N more" line is named after the items it stands for, by their
-  // drawn labels ("+3 more: P-07, P-12, P-15").
+  // The "+N more" line is named after the items it stands for, by their full
+  // names (the table's words, never a shortened drawn label): "+3 more: P-07,
+  // P-12, P-15".
   const more = (x: Fam, tx: number, cy: number, anchor: 'start' | 'end') => {
     const label = `+${x.extra} ${lw.more}`;
-    const name = `${label}: ${x.items.slice(x.shown.length).map((i) => i.label).join(', ')}`;
+    const name = `${label}: ${x.items.slice(x.shown.length).map((i) => i.name ?? i.label).join(', ')}`;
     return text(tx, cy + 4.5, label, { size: 12.5, cls: 'ink2', anchor, where: 'more' }).replace('</text>', `${tip(name)}</text>`);
   };
 

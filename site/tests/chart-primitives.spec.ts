@@ -1602,12 +1602,14 @@ test('heatGrid names cells and column totals by the column name over its code, a
   const rows = heat.rows.map((r, i) => ({ ...r, href: `/rows/${i}` }));
   const rowTotal = (r: number) => heat.values[r].reduce<number>((s, v) => s + (v ?? 0), 0);
   const make = (marginals: boolean) =>
-    heatGrid({ ...base, id: 'ch-h', title, desc, rowHeader: 'Country', unit: 'entries', ...heat, rows, columns, marginals }).svg;
+    heatGrid({ ...base, id: 'ch-h', title, desc, rowHeader: 'Country', unit: 'entries', unitOne: 'entry', ...heat, rows, columns, marginals }).svg;
   const names = namedEls(make(true)).map((n) => n.name);
+  // The fixture has a cell of 1, named in the singular ("1 entry").
+  expect(heat.values.flat()).toContain(1);
   heat.rows.forEach((row, r) => {
     columns.forEach((col, c) => {
       const v = heat.values[r][c];
-      expect(names).toContain(`${row.label} · ${col.name}: ${v === null ? 'not applicable' : `${v} entries`}`);
+      expect(names).toContain(`${row.label} · ${col.name}: ${v === null ? 'not applicable' : `${v} ${v === 1 ? 'entry' : 'entries'}`}`);
     });
     expect(names.filter((n) => n === `${row.label}: ${rowTotal(r)} entries in total`), `${row.label}: the total bar and the row link`).toHaveLength(2);
   });
@@ -1618,16 +1620,33 @@ test('heatGrid names cells and column totals by the column name over its code, a
   expect(linkNames(make(false))).toEqual(heat.rows.map((row, r) => `${row.label}: ${rowTotal(r)} entries in total`));
 });
 
-test('relationRadial names its "+N more" line after the items it hides, in both layouts', () => {
+test('stacked100 names a segment by its series name and its raw count in the count noun (singular for 1), with its share', () => {
+  // Legend labels that carry their count, as the comparison pages draw them.
+  const counted = [
+    { label: 'Strong: 3', name: 'Strong' },
+    { label: 'Partial: 1', name: 'Partial', state: 'outline' as const },
+  ];
+  const item = { label: 'All 4 topics', values: [3, 1] };
+  const total = item.values[0] + item.values[1];
+  const svg = stacked100({ ...base, id: 'ch-s1', title, desc, unit: 'share of topics', countUnit: 'topics', unitOne: 'topic', series: counted, items: [item] }).svg;
+  const names = namedEls(svg).filter((n) => n.tag === 'rect').map((n) => n.name);
+  expect(names).toEqual(
+    counted.map((sr, k) => `${item.label} · ${sr.name}: ${item.values[k]} ${item.values[k] === 1 ? 'topic' : 'topics'} (${(item.values[k] / total) * 100}%)`),
+  );
+});
+
+test('relationRadial names its "+N more" line after the full names of the items it hides, in both layouts', () => {
+  // The drawn labels are short forms; the line names the hidden items in full.
+  const full = (label: string) => `${label} AI system impact assessment`;
   const fams: RelationFamily[] = [
-    { label: 'Clauses', items: ['A.3', 'A.1', 'A.4', 'A.2'].map((label) => ({ label })) },
+    { label: 'Clauses', items: ['A.3', 'A.1', 'A.4', 'A.2'].map((label) => ({ label, name: full(label) })) },
     { label: 'Cases', items: [{ label: 'Chatbot refund' }] },
   ];
   for (const layout of ['radial', 'list'] as const) {
     const width = layout === 'list' ? NARROW_WIDTH : 640;
     const out = relationRadial({ ...base, id: 'ch-m', title, desc, layout, width, centre: { label: 'Item' }, families: fams, maxPerFamily: 2 })!;
     const more = namedEls(out.svg).filter((n) => n.tag === 'text');
-    expect(more.map((n) => n.name), layout).toEqual(['+2 more: A.3, A.4']);
+    expect(more.map((n) => n.name), layout).toEqual([`+2 more: ${full('A.3')}, ${full('A.4')}`]);
   }
 });
 
@@ -1642,7 +1661,9 @@ test('ladder names a linked step after its label and its detail', () => {
 
 test('a linked label or row carries the same name as the mark it goes with', () => {
   const sum = (v: number[]) => v.reduce((a, b) => a + b, 0);
-  const linkedRanked = ranked.map((r, i) => ({ ...r, href: `/r/${i}` }));
+  // A shortened drawn label: the mark and its row link take the full name.
+  const fullName = (label: string) => `${label}, the instrument in full`;
+  const linkedRanked = ranked.map((r, i) => ({ ...r, name: fullName(r.label), href: `/r/${i}` }));
   for (const make of [rankedBars, lollipop]) {
     const els = parseSvg(make({ ...base, id: 'ch-b', title, desc, unit: 'obligations', items: linkedRanked }).svg);
     const links = els.flatMap((e, i) => (e.tag === 'a' ? [i] : []));
@@ -1651,6 +1672,7 @@ test('a linked label or row carries the same name as the mark it goes with', () 
       const mark = els.findIndex((e, i) => e.parent === a && titleOf(els, i) !== undefined);
       expect(els[a].attr['aria-label'], make.name).toBe(titleOf(els, mark));
     }
+    expect(links.map((a) => els[a].attr['aria-label']).sort(), make.name).toEqual(ranked.map((r) => `${fullName(r.label)}: ${r.value} obligations`).sort());
   }
 
   const stackLinked = stackItems.map((s, i) => ({ ...s, href: `/s/${i}` }));
@@ -1684,7 +1706,17 @@ test('a linked label or row carries the same name as the mark it goes with', () 
   expect(linkNames(flow({ ...base, id: 'ch-f', title, desc, ...flowInput, nodes, layout: 'narrow' }).svg)).toEqual(
     sources.flatMap((s) => {
       const own = flowLinks.filter((l) => l.from === s);
-      return [`${nodeName(s)} (${sum(own.map((l) => l.value))})`, ...own.map((l) => `${nodeName(l.to)}: ${l.value}`)];
+      // A destination row is named as its wide ribbon, source included, since
+      // one destination (EU AI Act) sits under two sources.
+      return [`${nodeName(s)} (${sum(own.map((l) => l.value))})`, ...own.map((l) => `${nodeName(s)} to ${nodeName(l.to)}: ${l.value} pairs`)];
+    }),
+  );
+  // rowNames 'short' names a row as printed, under its source as printed.
+  const label = (id: string) => flowNodes.find((x) => x.id === id)!.label;
+  expect(linkNames(flow({ ...base, id: 'ch-f', title, desc, ...flowInput, nodes, layout: 'narrow', rowNames: 'short' }).svg)).toEqual(
+    sources.flatMap((s) => {
+      const own = flowLinks.filter((l) => l.from === s);
+      return [`${nodeName(s)} (${sum(own.map((l) => l.value))})`, ...own.map((l) => `${label(s)} to ${label(l.to)}: ${l.value}`)];
     }),
   );
 
