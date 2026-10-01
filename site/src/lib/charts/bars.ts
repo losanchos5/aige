@@ -18,6 +18,7 @@ import {
   assemble,
   fitText,
   fmt,
+  hitRect,
   legend,
   linearScale,
   linkText,
@@ -104,6 +105,17 @@ function itemLabel(out: string[], f: Frame, label: string, y: number, barH: numb
   return { rowTop: y, barY: y + lines.length * 15 + 5 };
 }
 
+/** x of a value label that starts at `x`: moved just past any gridline
+ *  (other than zero) it would sit on, so the line never runs through it. */
+function clearOfGrid(x: number, label: string, ticks: number[], map: (v: number) => number): number {
+  const w = textWidth(label, 12.5, 'mono');
+  for (const t of ticks) {
+    const g = map(t);
+    if (t !== 0 && g > x - 3 && g < x + w + 3) return g + 4;
+  }
+  return x;
+}
+
 function gridlines(out: string[], ticks: number[], map: (v: number) => number, y0: number, y1: number) {
   for (const t of ticks) {
     const x = r1(map(t));
@@ -132,24 +144,30 @@ function rankedCore(input: RankedBarsInput, style: 'bar' | 'lollipop'): ChartOut
   const rows: string[] = [];
   const BAR_H = 16;
   for (const item of items) {
-    const { barY } = itemLabel(rows, f, item.label, y, BAR_H, item.href);
+    // A linked item is one target, the whole row (label, bar and value) and
+    // at least 24 high: its label alone is one 16 px line (WCAG 2.5.8).
+    const own: string[] = [];
+    const { barY } = itemLabel(own, f, item.label, y, BAR_H);
     const w = s.map(item.value) - s.map(0);
     const name = `${item.label}: ${fmt(item.value)}${unitSuffix} ${input.percent ? '' : input.unit}`.trim();
     const attrs = item.highlight ? 'class="mk mk-hi"' : marks.attrs(item.state, item.tone);
     if (style === 'bar') {
-      rows.push(`<rect x="${r1(s.map(0))}" y="${r1(barY)}" width="${r1(w)}" height="${BAR_H}" ${attrs}>${tip(name)}</rect>`);
+      own.push(`<rect x="${r1(s.map(0))}" y="${r1(barY)}" width="${r1(w)}" height="${BAR_H}" ${attrs}>${tip(name)}</rect>`);
     } else {
-      rows.push(`<line class="stem" x1="${r1(s.map(0))}" y1="${r1(barY + BAR_H / 2)}" x2="${r1(s.map(item.value))}" y2="${r1(barY + BAR_H / 2)}"/>`);
-      rows.push(shape('circle', s.map(item.value), barY + BAR_H / 2, 6, attrs, tip(name)));
+      own.push(`<line class="stem" x1="${r1(s.map(0))}" y1="${r1(barY + BAR_H / 2)}" x2="${r1(s.map(item.value))}" y2="${r1(barY + BAR_H / 2)}"/>`);
+      own.push(shape('circle', s.map(item.value), barY + BAR_H / 2, 6, attrs, tip(name)));
     }
-    rows.push(
-      text(s.map(item.value) + (style === 'bar' ? 6 : 11), barY + BAR_H / 2 + 4.5, `${fmt(item.value)}${unitSuffix}`, {
-        size: 12.5,
-        cls: 'num',
-        where: 'value label',
-      }),
-    );
-    y = barY + BAR_H + 10;
+    const valueText = `${fmt(item.value)}${unitSuffix}`;
+    const valueEl = text(clearOfGrid(s.map(item.value) + (style === 'bar' ? 6 : 11), valueText, s.ticks, s.map), barY + BAR_H / 2 + 4.5, valueText, {
+      size: 12.5,
+      cls: 'num',
+      where: 'value label',
+    });
+    const next = barY + BAR_H + 10;
+    // The value sits outside the <a> (over its row target) so the link's
+    // underline marks the label, not the number.
+    rows.push((item.href ? linkText(hitRect(y - 8, next - y) + own.join(''), item.label, item.href) : own.join('')) + valueEl);
+    y = next;
   }
   gridlines(out, s.ticks, s.map, gridTop, y - 4);
   out.push(...rows);

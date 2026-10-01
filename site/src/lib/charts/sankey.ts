@@ -11,6 +11,8 @@
 // the value-weighted mean rank of its neighbours, ties kept in input order
 // (`order: 'input'` skips the sweeps, e.g. for layers L1 to L5). Node blocks
 // are at least 24 high (a linked block is a full pointer target), 8 apart.
+// A ribbon under 2 units keeps its geometry and is stroked 2 wide in its own
+// colour (.sk-thin), so a one-row link never vanishes.
 // Each node is one <g>: a source node's group holds its outgoing ribbons, so
 // CSS (:hover, :focus-within, no script) lights one node's flows and dims the
 // rest. More than nine nodes in a column throws, naming the column: the caller
@@ -19,13 +21,15 @@
 // Narrow ('narrow', 280 wide by default, and whenever the width is under
 // 480): no ribbons, since a Sankey does not read at 280. One list per stage,
 // each source node heading the bars of its destinations, text at 12.5 or
-// more. Both layouts return the same table: From | To | value, one row per
+// more; a linked heading or destination row is one full-width target 26 or
+// more high (WCAG 2.5.8 on a 320 phone). Both layouts return the same table: From | To | value, one row per
 // link, stage by stage in the drawn order.
 import {
   NARROW_WIDTH,
   assemble,
   fitText,
   fmt,
+  hitRect,
   linkText,
   markClass,
   nonEmpty,
@@ -103,6 +107,9 @@ const L = 12;
 const MIN_H = 24;
 const GAP = 8;
 const SPAN_MIN = 64;
+const MIN_RIBBON = 2;
+/** Height of a linked block in the narrow list: 24 px at a 320 phone's 0.98. */
+const NARROW_TARGET = 26;
 
 interface Placed {
   node: SankeyNode;
@@ -277,7 +284,10 @@ export function flow(input: SankeyInput): ChartOutput {
         `M${x0} ${r1(ya)}C${xm} ${r1(ya)} ${xm} ${r1(yb)} ${x1} ${r1(yb)}V${r1(yb + t)}` +
         `C${xm} ${r1(yb + t)} ${xm} ${r1(ya + t)} ${x0} ${r1(ya + t)}Z`;
       const list = ribbons.get(l.from) ?? [];
-      list.push(`<path d="${d}">${tip(`${nameOf(a.node)} ${w.to} ${nameOf(b.node)}: ${fmt(l.value)} ${unitOf(l.value)}`)}</path>`);
+      // Under 2 units a ribbon keeps its exact thickness (the sums hold) and
+      // .sk-thin strokes it 2 wide in its colour, so it shows at 2 or more.
+      const thin = t < MIN_RIBBON ? ' class="sk-thin"' : '';
+      list.push(`<path d="${d}"${thin}>${tip(`${nameOf(a.node)} ${w.to} ${nameOf(b.node)}: ${fmt(l.value)} ${unitOf(l.value)}`)}</path>`);
       ribbons.set(l.from, list);
     }
     byCol.forEach((list) => {
@@ -291,7 +301,7 @@ export function flow(input: SankeyInput): ChartOutput {
         const b = bw[p.col];
         const ty = p.y + p.h / 2 + 4.5;
         const draw = (inner: string) =>
-          `<rect x="${r1(p.x)}" y="${r1(p.y)}" width="${b}" height="${r1(p.h)}" rx="3" class="${cls}"${inner ? `>${inner}</rect>` : '/>'}` +
+          `<rect x="${r1(p.x)}" y="${r1(p.y)}" width="${b}" height="${r1(p.h)}" class="${cls}"${inner ? `>${inner}</rect>` : '/>'}` +
           text(p.x + 8, ty, node.label, { size: 13, where: 'node label' }) +
           text(p.x + b - 8, ty, count, { size: 12, cls: 'num', anchor: 'end', where: 'node count' });
         const mark = node.href
@@ -322,20 +332,25 @@ export function flow(input: SankeyInput): ChartOutput {
         const tone = src.tone ?? 0;
         const tx = tone ? L + 16 : L;
         const lines = wrapText(`${src.label} (${fmt(total)})`, W - L - tx, 13.5, 'body', 2, 'node label');
-        y += 8;
-        if (tone) out.push(`<rect x="${L}" y="${r1(y + 5)}" width="10" height="10" rx="2" class="${markClass('filled', tone)}"/>`);
-        const els = lines.map((line, i) => text(tx, y + 16 + i * 17, line, { size: 13.5, weight: 600, where: 'node label' }));
-        out.push(src.href ? linkText(els.join(''), nameOf(src), src.href) : els.join(''));
-        y += 6 + lines.length * 17;
+        y += 4;
+        // The source heading and each destination row are separate blocks,
+        // each 26 high or more; a linked one is a single target that high and
+        // the full width, so neighbours keep the 24 px of WCAG 2.5.8.
+        const headH = Math.max(NARROW_TARGET, 9 + lines.length * 17);
+        if (tone) out.push(`<rect x="${L}" y="${r1(y + 9)}" width="10" height="10" rx="2" class="${markClass('filled', tone)}"/>`);
+        const els = lines.map((line, i) => text(tx, y + 18 + i * 17, line, { size: 13.5, weight: 600, where: 'node label' }));
+        out.push(src.href ? linkText(hitRect(y, headH) + els.join(''), nameOf(src), src.href) : els.join(''));
+        y += headH;
         for (const l of own) {
           const dst = byId.get(l.to)!;
           const rows = wrapText(`${dst.label}: ${fmt(l.value)}`, barW, 12.5, 'body', 2, 'destination label');
-          const els2 = rows.map((line, i) => text(barX, y + 14 + i * 16, line, { size: 12.5, where: 'destination label' }));
-          out.push(dst.href ? linkText(els2.join(''), nameOf(dst), dst.href) : els2.join(''));
-          y += 4 + rows.length * 16;
+          const rowH = 16 + rows.length * 16;
           const bw = Math.max(1, (l.value / maxV) * barW);
-          out.push(`<rect x="${barX}" y="${r1(y)}" width="${r1(bw)}" height="6" class="${markClass('filled', dst.tone ?? 0)}"/>`);
-          y += 12;
+          const els2 =
+            rows.map((line, i) => text(barX, y + 14 + i * 16, line, { size: 12.5, where: 'destination label' })).join('') +
+            `<rect x="${barX}" y="${r1(y + 4 + rows.length * 16)}" width="${r1(bw)}" height="6" class="${markClass('filled', dst.tone ?? 0)}"/>`;
+          out.push(dst.href ? linkText(hitRect(y, rowH) + els2, nameOf(dst), dst.href) : els2);
+          y += rowH;
         }
       }
       y += 10;

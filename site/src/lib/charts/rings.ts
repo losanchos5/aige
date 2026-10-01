@@ -7,7 +7,10 @@
 // Marks in one cell are spread evenly along the cell's arc, one or more rows
 // deep, at least one pitch apart (24 when marks link, else 16; 12 narrow), so
 // they never overlap; a cell that cannot hold its marks throws, naming it.
-// Ring numbers sit in a gap at the top and the rings are named in a numbered
+// Ring edges are drawn in --muted (3:1 on the ground, both themes: the ring is
+// data), linked marks are drawn (and tabbed) from the inside out and
+// clockwise. Ring numbers sit in a gap at the top (alternating either side of
+// it on thin rings) and the rings are named in a numbered
 // key under the circle; sector labels go around the circle when they fit,
 // else as letters with a lettered key. Narrow ('narrow', 280, and whenever the
 // width is under 480): the same rings at 280 with both keys, marks unlinked
@@ -18,7 +21,10 @@
 // clockwise from the top), their records listed beside the ring (first half
 // on the right, top to bottom, the rest on the left, bottom to top), and the
 // records that span every stage inside the centre. A record's circle area is
-// its size (fields) and its inner disc the filled share (required fields).
+// its size (fields) and its inner disc the filled share (required fields);
+// the legend draws both on a scale (smallest and largest circle; the disc at
+// 0, 50 and 100 %). Rows and stage headings are 26 high and a linked one is
+// a single target that high (glyph and name), for WCAG 2.5.8 on a phone.
 // Narrow ('list', 280, and under 480 wide): one list per stage, then the
 // centre. Table: Stage | Record | size | share (%).
 //
@@ -34,6 +40,7 @@ import {
   esc,
   fitText,
   fmt,
+  hitRect,
   layerWord,
   legend,
   linkText,
@@ -59,6 +66,14 @@ import {
 
 const L = 12;
 const KEY = /^[a-z][a-z0-9-]*$/;
+// lifecycleRing rows and stage headings: 26 high, so a linked one stays a
+// 24 px target even at the 0.98 scale of a 320 px phone (WCAG 2.5.8). Record
+// circles run from LC_MIN_R to LC_MAX_R (area = size), legible at 1:1.
+const LC_ROW = 26;
+const LC_HEAD = 26;
+const LC_MAX_R = 10.5;
+const LC_MIN_R = 4;
+const LC_TEXT_X = 2 * LC_MAX_R + 6;
 
 const RING_WORDS = {
   en: { ring: 'Ring', sector: 'Sector', stage: 'Stage', record: 'Record', size: 'Size', done: 'Done', percent: 'Percent' },
@@ -205,12 +220,21 @@ export function concentricRings(input: ConcentricRingsInput): ChartOutput {
     }
     return { c0, t, gap, spots };
   };
+  // The ring numbers need about 17 units of ring width to clear each other
+  // and the centre disc; narrow rings take that width whenever it fits.
   const layoutAt = (rMax: number): Geometry | null => {
+    for (const tMin of [...new Set([Math.max(pitch + 2, 17), pitch + 2])]) {
+      const g = layoutFrom(rMax, tMin);
+      if (g) return g;
+    }
+    return null;
+  };
+  function layoutFrom(rMax: number, tMin: number): Geometry | null {
     let best: Geometry | null = null;
     const size = (g: Geometry) => g.c0 + rings.length * g.t;
-    for (let c0 = r0; c0 + rings.length * (pitch + 2) <= rMax; c0 += 2) {
-      if (best && c0 + rings.length * (pitch + 2) >= size(best)) break;
-      for (let t = pitch + 2; c0 + rings.length * t <= rMax && (!best || c0 + rings.length * t < size(best)); t++) {
+    for (let c0 = r0; c0 + rings.length * tMin <= rMax; c0 += 2) {
+      if (best && c0 + rings.length * tMin >= size(best)) break;
+      for (let t = tMin; c0 + rings.length * t <= rMax && (!best || c0 + rings.length * t < size(best)); t++) {
         const g = tryAt(c0, t);
         if (g) {
           best = g;
@@ -219,7 +243,7 @@ export function concentricRings(input: ConcentricRingsInput): ChartOutput {
       }
     }
     return best;
-  };
+  }
 
   // Sector labels around the circle when they fit (wide only), else letters.
   const half = (W - 2 * L) / 2;
@@ -294,8 +318,14 @@ export function concentricRings(input: ConcentricRingsInput): ChartOutput {
     })
     .join('');
   out.push(`<path class="rule" d="${d}"/>`);
-  // Ring numbers in the gap at the top.
-  rings.forEach((_, i) => out.push(text(cx, cy - (c0 + (i + 0.5) * t) + 4.5, i + 1, { size: narrow ? 12.5 : 12, cls: 'mono', anchor: 'middle', where: 'ring number' })));
+  // Ring numbers in the gap at the top; on thin rings they alternate either
+  // side of the gap's centre line so neighbours never touch.
+  // A ground-coloured halo (rg-num) keeps each digit clear of the ring edges
+  // and the centre disc it sits between.
+  const zig = t < 24 ? 7 : 0;
+  rings.forEach((_, i) =>
+    out.push(text(cx + (i % 2 ? zig : -zig), cy - (c0 + (i + 0.5) * t) + 4.5, i + 1, { size: narrow ? 12.5 : 12, cls: 'mono rg-num', anchor: 'middle', where: 'ring number' })),
+  );
   // Sector labels or letters.
   const letter = (i: number) => String.fromCharCode(65 + i);
   if (outside) {
@@ -308,8 +338,11 @@ export function concentricRings(input: ConcentricRingsInput): ChartOutput {
       out.push(text(x, y + 4.5, letter(i), { size: narrow ? 12.5 : 12, cls: 'mono', anchor: 'middle', where: 'sector letter' }));
     });
   }
-  // Marks.
-  for (const s of geo.spots) {
+  // Marks, in spatial order (ring from the inside out, then clockwise from
+  // the top), so the tab order of linked marks follows the drawing, not the data.
+  const clockwise = (s: Cellspot) => (Math.atan2(s.x, -s.y) + 2 * Math.PI) % (2 * Math.PI);
+  const spatial = [...geo.spots].sort((a, b) => ringIdx.get(a.mark.ring)! - ringIdx.get(b.mark.ring)! || clockwise(a) - clockwise(b));
+  for (const s of spatial) {
     const m = s.mark;
     const kind = m.shape ?? 'circle';
     const x = cx + s.x;
@@ -327,12 +360,15 @@ export function concentricRings(input: ConcentricRingsInput): ChartOutput {
   // Keys under the circle: numbered rings, lettered sectors.
   const below = outside ? Math.max(rOut, ...labelBoxes.map((b) => b.by + b.bh)) : rOut;
   let y = cy + below + (sectors.length && !outside ? 28 : 18);
-  const pitchKey = rings.some((r) => r.href) ? 24 : 20;
+  // A linked key row is one target its full height (26 or more) and the
+  // key's width, like the lifecycle rows.
+  const pitchKey = rings.some((r) => r.href) ? 26 : 20;
   const keyRow = (tag: string, label: string, href?: string) => {
     const lines = wrapText(label, W - L - (L + 24), fs, 'body', 3, 'key label');
     out.push(text(L, y, tag, { size: narrow ? 12.5 : 12, cls: 'mono', where: 'key tag' }));
     const els = lines.map((line, i) => text(L + 24, y + i * 16, line, { size: fs, where: 'key label' }));
-    out.push(href ? linkText(els.join(''), label, href) : els.join(''));
+    const hit = hitRect(y - 17.5, (lines.length - 1) * 16 + pitchKey);
+    out.push(href ? linkText(hit + els.join(''), label, href) : els.join(''));
     y += (lines.length - 1) * 16 + pitchKey;
   };
   rings.forEach((r, i) => {
@@ -440,8 +476,10 @@ export function lifecycleRing(input: LifecycleRingInput): ChartOutput {
   const hits = targets(where);
   const out: string[] = [];
   const groups = stages.map((s) => input.nodes.filter((n) => n.stage === s.key));
-  const maxSize = Math.max(...[...input.nodes, ...centreNodes].map((n) => n.size ?? 0), 0);
-  const radius = (n: LifecycleRecord) => (maxSize && n.size !== undefined ? Math.max(3, 9 * Math.sqrt(n.size / maxSize)) : 6);
+  const sizes = [...input.nodes, ...centreNodes].flatMap((n) => (n.size === undefined ? [] : [n.size]));
+  const maxSize = Math.max(...sizes, 0);
+  const radiusOf = (size: number) => Math.max(LC_MIN_R, LC_MAX_R * Math.sqrt(size / maxSize));
+  const radius = (n: LifecycleRecord) => (maxSize && n.size !== undefined ? radiusOf(n.size) : 7);
   const pct = (n: LifecycleRecord) => Math.round((n.fill ?? 0) * 100);
   const nameOf = (n: LifecycleRecord) => {
     const bits = [
@@ -450,22 +488,27 @@ export function lifecycleRing(input: LifecycleRingInput): ChartOutput {
     ];
     return bits.length ? `${n.name ?? n.label}: ${bits.join(', ')}` : (n.name ?? n.label);
   };
-  // One record row: its glyph (outer circle = size, inner disc = fill) and label.
-  const row = (n: LifecycleRecord, x: number, y: number, labelW: number) => {
-    fitText(n.label, labelW, fs, 'body', 'record label');
+  // One record row, LC_ROW high from `top`: its glyph (outer circle = size,
+  // inner disc = fill) and label. A linked row is one target the full row
+  // high and `w` wide (glyph and name), not the 15 px of its text.
+  const row = (n: LifecycleRecord, x: number, top: number, w: number) => {
+    fitText(n.label, w - LC_TEXT_X, fs, 'body', 'record label');
+    const y = top + LC_ROW / 2;
     const r = radius(n);
     const inner = n.fill ? r * Math.sqrt(n.fill) : 0;
     const draw = (tipEl: string) =>
-      `<circle cx="${r1(x + 10)}" cy="${r1(y)}" r="${r1(r)}" class="mk mk-line-0"${tipEl ? `>${tipEl}</circle>` : '/>'}` +
-      (inner ? `<circle cx="${r1(x + 10)}" cy="${r1(y)}" r="${r1(inner)}" class="mk-hi"/>` : '') +
-      text(x + 26, y + 4.5, n.label, { size: fs, where: 'record label' });
+      `<circle cx="${r1(x + LC_MAX_R)}" cy="${r1(y)}" r="${r1(r)}" class="mk mk-line-0"${tipEl ? `>${tipEl}</circle>` : '/>'}` +
+      (inner ? `<circle cx="${r1(x + LC_MAX_R)}" cy="${r1(y)}" r="${r1(inner)}" class="mk-hi"/>` : '') +
+      text(x + LC_TEXT_X, y + 4.5, n.label, { size: fs, where: 'record label' });
     const name = nameOf(n);
-    return n.href ? hits.mark(() => draw(''), name, { x, y: y - 12, w: 26 + textWidth(n.label, fs), h: 24 }, { href: n.href }) : draw(tip(name));
+    const box = { x, y: top, w, h: LC_ROW };
+    return n.href ? hits.mark(() => (list ? hitRect(box.y, box.h) : hitRect(box.y, box.h, box.x, box.w)) + draw(''), name, box, { href: n.href }) : draw(tip(name));
   };
-  const header = (label: string, x: number, y: number, labelW: number, href?: string) => {
-    fitText(label, labelW, 12.5, 'mono', 'stage label');
-    const el = text(x, y, label, { size: 12.5, cls: 'mono muted', where: 'stage label' });
-    return href ? linkText(el, label, href) : el;
+  // A stage heading, LC_HEAD high from `top`; a linked one is a full target.
+  const header = (label: string, x: number, top: number, w: number, href?: string) => {
+    fitText(label, w, 12.5, 'mono', 'stage label');
+    const el = text(x, top + LC_HEAD / 2 + 4.5, label, { size: 12.5, cls: 'mono muted', where: 'stage label' });
+    return href ? linkText((list ? hitRect(top, LC_HEAD) : hitRect(top, LC_HEAD, x, w)) + el, label, href) : el;
   };
   let bottom: number;
 
@@ -474,11 +517,11 @@ export function lifecycleRing(input: LifecycleRingInput): ChartOutput {
     const half = Math.ceil(stages.length / 2);
     const right = stages.map((_, i) => i).slice(0, half);
     const left = stages.map((_, i) => i).slice(half).reverse();
-    const blockH = (i: number) => 20 + groups[i].length * 24;
+    const blockH = (i: number) => LC_HEAD + groups[i].length * LC_ROW;
     const colH = (ids: number[]) => ids.reduce((s, i) => s + blockH(i), 0) + Math.max(0, ids.length - 1) * 14;
     const centreLines = wrapText(input.centre.label, 150, 13.5, 'body', 2, 'centre label');
-    const centreH = centreLines.length * 17 + centreNodes.length * 24;
-    const centreW = Math.max(...centreLines.map((l) => textWidth(l, 13.5)), ...centreNodes.map((n) => 26 + textWidth(n.label, fs)));
+    const centreH = centreLines.length * 17 + centreNodes.length * LC_ROW;
+    const centreW = Math.max(...centreLines.map((l) => textWidth(l, 13.5)), ...centreNodes.map((n) => LC_TEXT_X + textWidth(n.label, fs)));
     let R = 80;
     const inner = () => R - 20;
     const fitsCentre = () => {
@@ -512,8 +555,8 @@ export function lifecycleRing(input: LifecycleRingInput): ChartOutput {
       let y = cy - colH(ids) / 2;
       for (const i of ids) {
         blockY.set(i, y);
-        out.push(header(`${i + 1} ${stages[i].label}`, x, y + 14, colW, stages[i].href));
-        groups[i].forEach((node, k) => out.push(row(node, x, y + 20 + k * 24 + 12, colW - 26)));
+        out.push(header(`${i + 1} ${stages[i].label}`, x, y, colW, stages[i].href));
+        groups[i].forEach((node, k) => out.push(row(node, x, y + LC_HEAD + k * LC_ROW, colW)));
         y += blockH(i) + 14;
       }
     };
@@ -530,7 +573,7 @@ export function lifecycleRing(input: LifecycleRingInput): ChartOutput {
       const [ox, oy] = polar(cx, cy, R + 12, a);
       const onRight = right.includes(i);
       const ex = onRight ? xr - 6 : xl + colW + 6;
-      leaders.push(`M${r1(ox)} ${r1(oy)}L${r1(ex)} ${r1(blockY.get(i)! + 10)}`);
+      leaders.push(`M${r1(ox)} ${r1(oy)}L${r1(ex)} ${r1(blockY.get(i)! + LC_HEAD / 2)}`);
       badges.push(`<circle cx="${r1(bx)}" cy="${r1(by)}" r="11" class="mk-hi"/>`);
       badges.push(text(bx, by + 4.5, i + 1, { size: 12, cls: 'mono on-ink', anchor: 'middle', where: 'stage number' }));
     });
@@ -544,44 +587,51 @@ export function lifecycleRing(input: LifecycleRingInput): ChartOutput {
     });
     const x0 = cx - centreW / 2;
     centreNodes.forEach((node) => {
-      out.push(row(node, x0, y + 12, centreW));
-      y += 24;
+      out.push(row(node, x0, y, centreW));
+      y += LC_ROW;
     });
     bottom = top + H;
   } else {
-    let y = 0;
+    let y = 4;
     const block = (label: string, nodes: LifecycleRecord[], href?: string) => {
-      y += 22;
       out.push(header(label, L, y, W - 2 * L, href));
-      y += 6;
+      y += LC_HEAD;
       for (const node of nodes) {
-        out.push(row(node, L, y + 12, W - 2 * L - 26));
-        y += 24;
+        out.push(row(node, L, y, W - 2 * L));
+        y += LC_ROW;
       }
+      y += 6;
     };
     stages.forEach((s, i) => block(`${i + 1} ${s.label}`, groups[i], s.href));
     if (centreNodes.length) block(input.centre.label, centreNodes);
-    bottom = y;
+    bottom = y - 6;
   }
-  // Legend: what the circle and its disc mean, side by side when they fit.
+  // Legend with a scale, one key per row: the size key draws the smallest and
+  // largest circle with their values, the fill key the disc at 0, 50 and 100 %,
+  // so both encodings read at their true size.
   const keys = [
-    ...(input.sizeLabel ? [{ label: input.sizeLabel, disc: false }] : []),
-    ...(input.fillLabel ? [{ label: input.fillLabel, disc: true }] : []),
+    ...(input.sizeLabel && maxSize ? [{ label: input.sizeLabel, samples: [...new Set([Math.min(...sizes), maxSize])].map((s) => ({ r: radiusOf(s), fill: 0, value: fmt(s) })) }] : []),
+    ...(input.fillLabel ? [{ label: input.fillLabel, samples: [0, 0.5, 1].map((f) => ({ r: LC_MAX_R, fill: f, value: String(f * 100) })) }] : []),
   ];
-  let lx = L;
-  let ly = bottom + 24;
+  let ly = bottom + 8;
   for (const k of keys) {
-    fitText(k.label, W - 2 * L - 20, 12.5, 'body', 'legend');
-    if (lx > L && lx + 20 + textWidth(k.label, 12.5) > W - L) {
-      lx = L;
-      ly += 20;
+    const cy = ly + LC_MAX_R + 2;
+    const need = textWidth(k.label, 12.5) + 10 + k.samples.reduce((s, p) => s + 2 * LC_MAX_R + 4 + textWidth(p.value, 12.5, 'mono') + 12, 0);
+    if (need > W - 2 * L + 0.5) {
+      throw new Error(`charts(${where}): legend "${k.label}" with its scale is ${Math.ceil(need)}px wide, the width allows ${W - 2 * L}px; shorten the label`);
     }
-    out.push(`<circle cx="${lx + 7}" cy="${ly - 4}" r="7" class="mk mk-line-0"/>`);
-    if (k.disc) out.push(`<circle cx="${lx + 7}" cy="${ly - 4}" r="4.9" class="mk-hi"/>`);
-    out.push(text(lx + 20, ly, k.label, { size: 12.5, where: 'legend' }));
-    lx += 20 + textWidth(k.label, 12.5) + 18;
+    out.push(text(L, cy + 4.5, k.label, { size: 12.5, where: 'legend' }));
+    let lx = L + textWidth(k.label, 12.5) + 10;
+    for (const p of k.samples) {
+      const gx = lx + LC_MAX_R;
+      out.push(`<circle cx="${r1(gx)}" cy="${r1(cy)}" r="${r1(p.r)}" class="mk mk-line-0"/>`);
+      if (p.fill) out.push(`<circle cx="${r1(gx)}" cy="${r1(cy)}" r="${r1(p.r * Math.sqrt(p.fill))}" class="mk-hi"/>`);
+      out.push(text(gx + LC_MAX_R + 4, cy + 4.5, p.value, { size: 12.5, cls: 'num', where: 'legend value' }));
+      lx = gx + LC_MAX_R + 4 + textWidth(p.value, 12.5, 'mono') + 12;
+    }
+    ly += 2 * LC_MAX_R + 8;
   }
-  if (keys.length) bottom = ly;
+  if (keys.length) bottom = ly - 4;
 
   const { svg, height } = assemble({
     base: input,
@@ -664,6 +714,9 @@ export function progressRing(input: ProgressRingInput): ChartOutput {
     const cy = top + R + 4;
     const pc = percent(p);
     const hook = (el: string, attr: string) => el.replace('<text ', `<text ${attr}="${esc(p.key)}" `);
+    // The rim (no paint on screen) edges the track in forced colours, where the
+    // track turns Canvas and the arc CanvasText.
+    out.push(`<circle cx="${r1(cx)}" cy="${r1(cy)}" r="${R}" class="pr-rim"/>`);
     out.push(`<circle cx="${r1(cx)}" cy="${r1(cy)}" r="${R}" class="pr-track"/>`);
     out.push(
       `<circle cx="${r1(cx)}" cy="${r1(cy)}" r="${R}" class="pr-arc" pathLength="100" stroke-dasharray="${pc} 100" transform="rotate(-90 ${r1(cx)} ${r1(cy)})" data-ring="${esc(p.key)}"/>`,

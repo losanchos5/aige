@@ -3,8 +3,9 @@
 // width). A cell's tone is its stack layer (or ink), its state is how it is
 // drawn: filled, outline, dashed or hatched, so state never rests on colour.
 // Cells can link (href) or take focus, and always carry a native tooltip. With
-// links the default pitch is 24 px (cell 18 + gap 6), the pointer-target
-// spacing of WCAG 2.5.8; a smaller pitch with links throws.
+// links the default pitch is 24 px (cell 18 + gap 6; 25 under 480 wide, so it
+// holds at the 0.98 scale of a 320 phone), the pointer-target spacing of
+// WCAG 2.5.8; a smaller pitch with links throws.
 import {
   assemble,
   fitText,
@@ -64,7 +65,8 @@ export function dotMatrix(input: DotMatrixInput): ChartOutput {
   const W = input.width ?? 640;
   const linked = input.groups.some((g) => g.items.some((i) => i.href));
   const cell = input.cell ?? (linked ? 18 : 14);
-  const gap = input.gap ?? (linked ? 6 : 4);
+  // A narrow chart shows at 0.98 on a 320 phone: 25 units keep 24 px there.
+  const gap = input.gap ?? (linked ? (W < 480 ? 7 : 6) : 4);
   const perRow = Math.max(1, Math.floor((W - 2 * L + gap) / (cell + gap)));
   const marks = markStyles(input.id);
   const hits = targets(where);

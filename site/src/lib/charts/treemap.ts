@@ -7,13 +7,18 @@
 // merge into one "+N" tile (area = their sum, <title> naming them), linked to
 // the group's href when it is itself a full target (WCAG 2.5.8); `minTile`
 // raises that size to merge a long tail sooner (the 12 KB budget). A label is
-// drawn inside a tile only when it fits (never shrunk, never cut); a tile
-// without one keeps its <title>. State by pattern (filled, outline, dashed,
+// drawn inside a tile only when it fits (never shrunk, never cut). State by pattern (filled, outline, dashed,
 // hatched); `fill` (0 to 1) draws a bar along the tile's foot.
+//
+// Every tile shows a label: a tile whose label does not fit merges into "+N"
+// like a small one, and a "+N" prints its total beside its count when there
+// is no room under it. A group header too wide for its strip stacks over up
+// to three lines, the strip growing to hold them.
 //
 // Narrow ('narrow', 280, and under 480 wide): the groups stacked as full-width
 // bands, each under its header, the same squarify inside each band, so the
-// small tiles merge sooner. Same table: Group | Item | value | fill (%) |
+// small tiles merge sooner; a band is at least 24 high (a tiny group then
+// overstates its area; its header prints the total). Same table: Group | Item | value | fill (%) |
 // status, one row per item in input order, merged ones included.
 import {
   NARROW_WIDTH,
@@ -172,8 +177,37 @@ export function treemap(input: TreemapInput): ChartOutput {
   const top = 8;
   const out: string[] = [];
 
-  // The items of one group in `r`: squarify, then merge the small tiles into
-  // "+N" and lay out again until no new small tile appears.
+  // What a tile draws: its label when the label fits (never shrunk, never
+  // cut; over two lines when one is too wide and the tile is tall enough),
+  // the value under it with room, else beside it on the same line.
+  const face = (tile: Tile, r: Rect) => {
+    const first = tile.items[0];
+    const bar = !tile.merged && first.fill !== undefined && r.w >= 16 && r.h >= 12;
+    const room = r.h - (bar ? 8 : 0);
+    const label = tile.merged ? `+${tile.items.length}` : first.label;
+    let lines = [label];
+    if (textWidth(label, fs) > r.w - 10 && room >= 36) {
+      try {
+        lines = wrapText(label, r.w - 10, fs, 'body', 2, 'tile label');
+      } catch {
+        // One word wider than the tile: the label does not fit.
+      }
+    }
+    const lw = Math.max(...lines.map((l) => textWidth(l, fs)));
+    const labelH = 16 * lines.length;
+    const value = fmt(tile.value);
+    const vw = textWidth(value, vs, 'mono');
+    const showLabel = lw <= r.w - 10 && room >= labelH + 4;
+    const showValue = showLabel && room >= labelH + 20 && vw <= r.w - 10;
+    const inlineValue = showLabel && !showValue && lines.length === 1 && lw + 8 + vw <= r.w - 10;
+    return { bar, lines, lw, value, vw, showLabel, showValue, inlineValue };
+  };
+
+  // The items of one group in `r`: squarify, then merge into "+N" the tiles
+  // under minTile and those whose label does not fit (no tile stays mute),
+  // and lay out again until every tile is labelled or all are merged. A lone
+  // such tile merges with the smallest labelled one; a "+N" too small for its
+  // own label takes the next smallest tile.
   const tilesIn = (g: TreemapGroup, r: Rect): { tile: Tile; rect: Rect }[] => {
     const merged = new Set<TreemapItem>();
     for (;;) {
@@ -184,9 +218,21 @@ export function treemap(input: TreemapInput): ChartOutput {
         tiles.map((t) => t.value),
         r,
       );
-      const small = tiles.filter((t, i) => !t.merged && (rects[i].w < minTile || rects[i].h < minTile));
-      if (small.length >= 2 || (small.length && rest.length)) {
-        for (const t of small) merged.add(t.items[0]);
+      const bad = tiles.filter((t, i) => !t.merged && (rects[i].w < minTile || rects[i].h < minTile || !face(t, rects[i]).showLabel));
+      const plus = tiles.findIndex((t) => t.merged);
+      // The smallest own tile not already in `bad` (tiles run largest first).
+      const smallest = [...tiles].reverse().find((t) => !t.merged && !bad.includes(t));
+      if (bad.length >= 2 || (bad.length && rest.length)) {
+        for (const t of bad) merged.add(t.items[0]);
+        continue;
+      }
+      if (bad.length === 1 && smallest) {
+        merged.add(bad[0].items[0]);
+        merged.add(smallest.items[0]);
+        continue;
+      }
+      if (plus >= 0 && !face(tiles[plus], rects[plus]).showLabel && smallest) {
+        merged.add(smallest.items[0]);
         continue;
       }
       return tiles.map((tile, i) => ({ tile, rect: rects[i] }));
@@ -212,13 +258,7 @@ export function treemap(input: TreemapInput): ChartOutput {
         (first.fill !== undefined ? `, ${input.fillHeader ? `${input.fillHeader.toLowerCase()} ` : ''}${pct(first)}%` : '') +
         (first.status ? ` · ${first.status}` : '');
     const href = tile.merged ? g.href : first.href;
-    const bar = !tile.merged && first.fill !== undefined && r.w >= 16 && r.h >= 12;
-    const room = r.h - (bar ? 8 : 0);
-    const label = tile.merged ? `+${tile.items.length}` : first.label;
-    const lw = textWidth(label, fs);
-    const showLabel = lw <= r.w - 10 && room >= 20;
-    const value = fmt(tile.value);
-    const showValue = showLabel && room >= 36 && textWidth(value, vs, 'mono') <= r.w - 10;
+    const { bar, lines, lw, value, vw, showLabel, showValue, inlineValue } = face(tile, r);
     els.push(`<rect x="${r1(r.x)}" y="${r1(r.y)}" width="${r1(r.w)}" height="${r1(r.h)}" ${cls}/>`);
     if (bar) {
       els.push(`<rect x="${r1(r.x + 4)}" y="${r1(r.y + r.h - 7)}" width="${r1(r.w - 8)}" height="4" class="tm-track"/>`);
@@ -226,49 +266,68 @@ export function treemap(input: TreemapInput): ChartOutput {
     }
     if (showLabel) {
       if (state === 'hatched') {
-        const bw = Math.max(lw, showValue ? textWidth(value, vs, 'mono') : 0) + 6;
-        els.push(`<rect x="${r1(r.x + 2)}" y="${r1(r.y + 3)}" width="${r1(bw)}" height="${showValue ? 34 : 18}" class="tm-lbg"/>`);
+        const bw = inlineValue ? r.w - 4 : Math.max(lw, showValue ? vw : 0) + 6;
+        els.push(`<rect x="${r1(r.x + 2)}" y="${r1(r.y + 3)}" width="${r1(bw)}" height="${16 * lines.length + (showValue ? 18 : 2)}" class="tm-lbg"/>`);
       }
-      els.push(text(r.x + 5, r.y + 16, label, { size: fs, weight: 600, where: 'tile label' }));
-      if (showValue) els.push(text(r.x + 5, r.y + 32, value, { size: vs, cls: 'num', where: 'tile value' }));
+      lines.forEach((line, i) => els.push(text(r.x + 5, r.y + 16 + 16 * i, line, { size: fs, weight: 600, where: 'tile label' })));
+      if (showValue) els.push(text(r.x + 5, r.y + 16 + 16 * lines.length, value, { size: vs, cls: 'num', where: 'tile value' }));
+      if (inlineValue) els.push(text(r.x + r.w - 5, r.y + 16, value, { size: vs, cls: 'num', anchor: 'end', where: 'tile value' }));
     }
     const draw = (inner: string) => els.join('').replace('/>', inner ? `>${inner}</rect>` : '/>');
     return href && full ? hits.mark(() => draw(''), name, r, { href }) : draw(tip(name));
   };
 
-  // Group header: "label (total)", else the label, else the total, else none.
+  // Group header: "label (total)" on one line, else stacked over up to
+  // three lines (the strip grows to hold them), else the label, else the
+  // total. A narrow group keeps its name ("Control sets" over "(3)").
   const headerText = (g: TreemapGroup, room: number) => {
     for (const t of [`${g.label} (${fmt(totalOf(g))})`, g.label, fmt(totalOf(g))]) {
       if (textWidth(t, 12.5, 'mono') <= room) return t;
     }
     return '';
   };
+  const headLines = (g: TreemapGroup, w: number): string[] => {
+    const full = `${g.label} (${fmt(totalOf(g))})`;
+    if (textWidth(full, 12.5, 'mono') <= w - 8) return [full];
+    try {
+      return wrapText(full, w - 8, 12.5, 'mono', 3, 'group header');
+    } catch {
+      const one = headerText(g, w - 8);
+      return one ? [one] : [];
+    }
+  };
+  const headH = (lines: string[]) => Math.max(HEAD, lines.length * 15 + 5);
 
   let bottom: number;
   if (!narrow) {
     const order = byInput(groups, totalOf);
     const area = Wp * Hp;
     let widths = order.map((g) => Math.sqrt((area * totalOf(g)) / T));
+    let heads = order.map(() => HEAD);
     let k = 0;
     let rects: Rect[] = [];
-    // Fixed point: group areas = total x k + a header strip across the width
-    // the layout gives them.
-    for (let it = 0; it < 12; it++) {
-      k = (area - HEAD * widths.reduce((s, x) => s + x, 0)) / T;
+    // Fixed point: group areas = total x k + a header strip (one to three
+    // lines high) across the width the layout gives them.
+    for (let it = 0; it < 16; it++) {
+      k = (area - widths.reduce((s, x, i) => s + heads[i] * x, 0)) / T;
       if (k <= 0) throw new Error(`charts(${where}): ${groups.length} group headers leave no room at plotHeight ${Hp}; raise it`);
       rects = squarify(
-        order.map((g, i) => totalOf(g) * k + HEAD * widths[i]),
+        order.map((g, i) => totalOf(g) * k + heads[i] * widths[i]),
         { x: L, y: top, w: Wp, h: Hp },
       );
       widths = rects.map((r) => r.w);
+      heads = order.map((g, i) => headH(headLines(g, widths[i])));
     }
     order.forEach((g, i) => {
       const r = rects[i];
       const head = (r.w * r.h - totalOf(g) * k) / r.w;
       if (head < 14) throw new Error(`charts(${where}): group "${g.label}" is too small for its header; raise plotHeight`);
-      const label = headerText(g, r.w - 8);
+      let lines = headLines(g, r.w);
+      if (lines.length * 15 + 3 > head) lines = head >= 17 && headerText(g, r.w - 8) ? [headerText(g, r.w - 8)] : [];
       out.push(`<rect x="${r1(r.x)}" y="${r1(r.y)}" width="${r1(r.w)}" height="${r1(head)}" class="tm-gh">${tip(`${g.label}: ${fmt(totalOf(g))} ${unitOf(totalOf(g))}`)}</rect>`);
-      if (label && head >= 17) out.push(text(r.x + 4, r.y + head / 2 + 4.5, label, { size: 12.5, cls: 'mono', where: 'group header' }));
+      lines.forEach((line, j) =>
+        out.push(text(r.x + 4, r.y + head / 2 + 4.5 + (j - (lines.length - 1) / 2) * 15, line, { size: 12.5, cls: 'mono', where: 'group header' })),
+      );
       for (const { tile, rect } of tilesIn(g, { x: r.x, y: r.y + head, w: r.w, h: r.h - head })) out.push(drawTile(g, tile, rect));
     });
     bottom = top + Hp;
@@ -282,7 +341,9 @@ export function treemap(input: TreemapInput): ChartOutput {
         out.push(text(L, y, line, { size: 12.5, cls: 'mono', where: 'group header' }));
       });
       y += 6;
-      const h = (totalOf(g) * k) / Wp;
+      // A band too thin to label its tile is drawn MIN_TILE high: its area
+      // then overstates it, so the header above prints its total.
+      const h = Math.max(MIN_TILE, (totalOf(g) * k) / Wp);
       for (const { tile, rect } of tilesIn(g, { x: L, y, w: Wp, h })) out.push(drawTile(g, tile, rect));
       y += h + 4;
     }
