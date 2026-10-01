@@ -1,30 +1,17 @@
 // chart-tip: instant tooltips for chart marks (openspec chart-tooltips).
 // Loaded once per page by src/components/ChartTipScript.astro.
 //
-// Roots are the elements with data-ctip (Chart.astro's figure, the HTML chart
-// grids, the AIGP heat map). A mark is the closest ancestor of the event
-// target, inside a root, that has a name: data-tip, aria-label, a direct
-// <title> child (SVG) or a title attribute, in that order. Containers (the
-// <svg>, whose <title> is the chart's; role="region" scroll wrappers; lists,
-// such as an HTML legend) are never marks, and nothing under figcaption,
-// details.chart-alt or [data-ctip-skip] is.
-//
-// One div.ctip in <body>, aria-hidden: its text is the mark's accessible name,
-// which assistive technology already reads from the mark (design D1). While it
-// is open the mark's <title> leaves the DOM and its title attribute moves to
-// data-ctip-title, so the browser shows no native tooltip on top; a focusable
-// mark without aria-label gets one with the same name meanwhile. Everything is
-// restored on close and on pagehide (D3).
-//
-// Mouse and pen: hover opens, the tooltip follows the pointer, and leaving the
-// mark for the tooltip keeps it open (150 ms grace). Keyboard: focus opens it
-// beside the mark, blur closes it, Escape closes it without moving focus.
-// Touch: only click opens, so a drag that scrolls never does. The first tap on
-// a linked mark shows its name without following the link (preventDefault,
-// never stopPropagation, so other islands still hear the click); the second
-// tap follows it. Buttons and [data-cw-open] cells keep their click and show
-// the tooltip too. A tap between marks opens the nearest one within 12 px; a
-// tap elsewhere closes.
+// Roots: elements with data-ctip. A mark: the closest ancestor of the target,
+// inside a root, named by data-tip, aria-label, a <title> child or a title
+// attribute (design D1, D4); containers (svg, lists, regions, non-focusable
+// holders of marks) and anything under figcaption, details.chart-alt or
+// [data-ctip-skip] never are. One aria-hidden div.ctip shows the name.
+// While open, native tooltip sources from the mark up to its root step aside
+// and come back on close and pagehide (D3). Pointer: follows the pointer on
+// the mark, freezes once it leaves so it can be reached, closes 150 ms after
+// leaving both. Keyboard: focus opens, blur and Escape close; a focused mark
+// off screen keeps it open with the box hidden. Touch: a tap opens; the first
+// tap on a link is held, the second follows it (D5).
 (() => {
   if (window.__ctip) return;
   window.__ctip = true;
@@ -37,16 +24,18 @@
   const GRACE = 150;
   const GAP = 12;
   const EDGE = 8;
+  const TAP = 800; // longest ms from a touch pointerdown to its click
 
   let tip = null; // the div.ctip, made on first use
   let cur = null; // the open mark
-  let saved = null; // what the open mark lent: { t, next, a, l }
+  let lent = []; // what the open mark and its ancestors lent: { el, t, next, a, l }
+  let parks = []; // the <defs> made to hold lent <title>s
   let anchored = false; // placed by the mark's box (focus, touch), not the pointer
   let px = 0;
   let py = 0;
   let timer = 0;
   let frame = 0;
-  let lastType = '';
+  let down = null; // the last pointerdown, until a key is pressed
   let dismissed = null; // closed with Escape, until pointer or focus leaves it
 
   const ownTitle = (el) => {
@@ -103,18 +92,55 @@
     return best;
   }
 
+  // <title> children move into a <defs> of their svg (ids still resolve, so
+  // aria-labelledby names hold; a title in defs is no element's tooltip), title
+  // attributes into data-ctip-title. Whoever loses its name so gets aria-label.
+  function lend(mark) {
+    const root = mark.closest('[data-ctip]');
+    for (let el = mark; el; el = el.parentElement) {
+      const t = el instanceof SVGElement && ownTitle(el);
+      const a = el.getAttribute('title');
+      if (t || a !== null) {
+        const e = { el, t, next: t && t.nextSibling, a, l: false };
+        if (!el.hasAttribute('aria-label') && !el.hasAttribute('aria-labelledby') && (t || el.matches(FOCUSABLE))) {
+          el.setAttribute('aria-label', (t ? t.textContent : a).trim());
+          e.l = true;
+        }
+        if (t) {
+          const svg = el.closest('svg');
+          let d = svg.querySelector(':scope>defs.ctip-park');
+          if (!d) {
+            d = svg.appendChild(doc.createElementNS(svg.namespaceURI, 'defs'));
+            d.setAttribute('class', 'ctip-park');
+            parks.push(d);
+          }
+          d.appendChild(t);
+        }
+        if (a !== null) {
+          el.setAttribute('data-ctip-title', a);
+          el.removeAttribute('title');
+        }
+        lent.push(e);
+      }
+      if (el === root) break;
+    }
+  }
+
   function release() {
     if (!cur) return;
-    const s = saved;
-    if (s.t) cur.insertBefore(s.t, s.next && s.next.parentNode === cur ? s.next : null);
-    if (s.a !== null) {
-      cur.setAttribute('title', s.a);
-      cur.removeAttribute('data-ctip-title');
+    for (const { el, t, next, a, l } of lent.reverse()) {
+      if (t) el.insertBefore(t, next && next.parentNode === el ? next : null);
+      if (a !== null) {
+        el.setAttribute('title', a);
+        el.removeAttribute('data-ctip-title');
+      }
+      if (l) el.removeAttribute('aria-label');
     }
-    if (s.l) cur.removeAttribute('aria-label');
+    for (const d of parks) d.remove();
+    lent = [];
+    parks = [];
     cur.classList.remove('ctip-on');
     cur = null;
-    saved = null;
   }
 
   function hide() {
@@ -130,17 +156,7 @@
       const name = nameOf(mark);
       release();
       cur = mark;
-      const t = ownTitle(mark);
-      saved = { t, next: t && t.nextSibling, a: mark.getAttribute('title'), l: false };
-      if (t) t.remove();
-      if (saved.a !== null) {
-        mark.setAttribute('data-ctip-title', saved.a);
-        mark.removeAttribute('title');
-      }
-      if (!mark.hasAttribute('aria-label') && mark.matches(FOCUSABLE)) {
-        mark.setAttribute('aria-label', name);
-        saved.l = true;
-      }
+      lend(mark);
       if (!tip) {
         tip = doc.createElement('div');
         tip.className = 'ctip';
@@ -149,33 +165,41 @@
       }
       tip.textContent = name;
     }
-    tip.hidden = false;
     place();
   }
 
   function place() {
     frame = 0;
     if (!cur) return;
-    const vw = doc.documentElement.clientWidth;
-    const vh = doc.documentElement.clientHeight;
+    // The screen is the visual viewport (a phone page that overflows is wider).
+    const de = doc.documentElement;
+    const v = self.visualViewport || { offsetLeft: 0, offsetTop: 0, width: de.clientWidth, height: de.clientHeight };
+    const x0 = v.offsetLeft;
+    const y0 = v.offsetTop;
+    const vw = v.width;
+    const vh = v.height;
     let ax = px;
     let above = py - GAP;
     let below = py + GAP + 8;
     if (anchored) {
       const r = cur.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > vh || r.right < 0 || r.left > vw) return hide();
+      // Off screen: hide the box, keep the mark open; a scroll brings it back.
+      tip.hidden = r.bottom < y0 || r.top > y0 + vh || r.right < x0 || r.left > x0 + vw;
+      if (tip.hidden) return;
       ax = r.left + r.width / 2;
       above = r.top - EDGE;
       below = r.bottom + EDGE;
     }
+    tip.hidden = false;
     // Measure at the left edge, where the box has the whole width to wrap in.
+    tip.style.maxWidth = `min(20rem, ${vw - 2 * EDGE}px)`;
     tip.style.left = '0px';
     const w = tip.offsetWidth;
     const h = tip.offsetHeight;
     let y = above - h;
-    if (y < EDGE) y = below;
-    if (y + h > vh - EDGE) y = Math.max(EDGE, vh - EDGE - h);
-    const x = Math.max(EDGE, Math.min(ax - w / 2, vw - EDGE - w));
+    if (y < y0 + EDGE) y = below;
+    if (y + h > y0 + vh - EDGE) y = Math.max(y0 + EDGE, y0 + vh - EDGE - h);
+    const x = Math.max(x0 + EDGE, Math.min(ax - w / 2, x0 + vw - EDGE - w));
     tip.style.left = `${Math.round(x)}px`;
     tip.style.top = `${Math.round(y)}px`;
   }
@@ -188,11 +212,10 @@
   const passive = { capture: true, passive: true };
 
   on('pointerdown', (e) => {
-    lastType = e.pointerType;
+    down = e;
   }, passive);
 
   on('pointerover', (e) => {
-    lastType = e.pointerType;
     if (e.pointerType === 'touch') return;
     if (inTip(e.target)) return clearTimeout(timer);
     const m = markOf(e.target);
@@ -212,8 +235,9 @@
     timer = setTimeout(hide, GRACE);
   }, passive);
 
+  // Follow the pointer only on the mark, so it can step onto the tooltip.
   on('pointermove', (e) => {
-    if (!cur || anchored || e.pointerType === 'touch' || inTip(e.target)) return;
+    if (!cur || anchored || e.pointerType === 'touch' || markOf(e.target) !== cur) return;
     px = e.clientX;
     py = e.clientY;
     queue();
@@ -225,7 +249,7 @@
     try {
       keyboard = t.matches(':focus-visible');
     } catch (err) {
-      keyboard = lastType !== 'touch';
+      keyboard = !down || down.pointerType !== 'touch';
     }
     const m = keyboard && markOf(t);
     if (m && m !== dismissed) show(m, true);
@@ -238,14 +262,17 @@
   });
 
   on('keydown', (e) => {
+    down = null;
     if (e.key !== 'Escape' || !cur) return;
     dismissed = cur;
     hide();
   });
 
   on('click', (e) => {
-    if (lastType !== 'touch') return;
     const t = e.target;
+    // Only a real tap: a touch pointerdown on this element just before; never a
+    // keyboard or AT click (detail 0).
+    if (!(e.detail > 0 && down && down.pointerType === 'touch' && down.target === t && e.timeStamp - down.timeStamp < TAP)) return;
     if (inTip(t)) return;
     let m = markOf(t);
     const hit = !!m;
@@ -261,10 +288,10 @@
     m.classList.add('ctip-on');
   }, true);
 
-  // Only a scroll that moves the mark counts (the page, or a box around it);
-  // another box scrolling on its own (a table of contents) leaves it be. A
-  // tooltip that follows the pointer stays while the mark is still under it.
-  addEventListener('scroll', (e) => {
+  // Only a scroll that moves the mark counts (the page, or a box around it). A
+  // pointer tooltip stays while the mark is under the pointer; an anchored one
+  // shows again when its mark is back in view.
+  const scrolled = (e) => {
     const t = e.target;
     if (!cur || (t !== doc && !(t.contains && t.contains(cur)))) return;
     if (!anchored) {
@@ -272,7 +299,9 @@
       if (!under || (!inTip(under) && markOf(under) !== cur)) return hide();
     }
     queue();
-  }, passive);
+  };
+  addEventListener('scroll', scrolled, passive);
+  addEventListener('scrollend', scrolled, passive);
   addEventListener('resize', () => {
     if (cur) queue();
   }, { passive: true });

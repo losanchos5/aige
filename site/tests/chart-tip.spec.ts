@@ -75,10 +75,13 @@ async function marksInView(page: Page, sel: string): Promise<Mark[]> {
 
 const tip = (page: Page) => page.locator('.ctip');
 
+/** The tooltip's box and the visible screen (the visual viewport, which on a
+ *  phone can differ from the layout width when a page overflows). */
 async function tipBox(page: Page) {
   return page.evaluate(() => {
     const r = document.querySelector('.ctip')!.getBoundingClientRect();
-    return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, vw: document.documentElement.clientWidth, vh: document.documentElement.clientHeight };
+    const v = visualViewport!;
+    return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, x0: v.offsetLeft, y0: v.offsetTop, vw: v.offsetLeft + v.width, vh: v.offsetTop + v.height };
   });
 }
 
@@ -112,6 +115,29 @@ test('keyboard focus on a kit link shows its name beside it', async ({ page }) =
   }
 });
 
+test('Tab to a mosaic tile below the fold shows its name once the smooth scroll brings it in', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/controls');
+  const sel = '[data-ctip] .cmo-cells a';
+  // Focus the first tile without scrolling, go back to the top, then Tab on to
+  // the second one: the browser scrolls it in smoothly after focusin.
+  const start = await page.evaluate((s) => {
+    const [a, b] = [...document.querySelectorAll<HTMLElement>(s)];
+    a.focus({ preventScroll: true });
+    scrollTo({ top: 0, behavior: 'instant' });
+    return { href: b.getAttribute('href'), below: b.getBoundingClientRect().top > innerHeight, smooth: getComputedStyle(document.documentElement).scrollBehavior };
+  }, sel);
+  expect(start.smooth, 'the page scrolls smoothly').toBe('smooth');
+  expect(start.below, 'the tile starts off screen').toBe(true);
+  const c = controls.find((x) => controlPath(x) === start.href)!;
+  expect(c, start.href ?? '').toBeTruthy();
+  await page.keyboard.press('Tab');
+  expect(await page.evaluate(() => document.activeElement?.getAttribute('href'))).toBe(start.href);
+  await expect(tip(page)).toBeVisible();
+  await expect(tip(page)).toContainText(c.id);
+  await expect(tip(page)).toContainText(c.title);
+});
+
 test('a tap on a kit mark shows its name', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 390, height: 800 }, hasTouch: true, isMobile: true });
   const page = await context.newPage();
@@ -132,20 +158,36 @@ for (const width of [320, 390, 1440]) {
     const touch = width < 1000;
     const context = await browser.newContext({ viewport: { width, height: 800 }, hasTouch: touch, isMobile: touch });
     const page = await context.newPage();
-    for (const route of ['/controls/crosswalk', '/agents']) {
+    // /obligations overflows a 320 px phone (its search box), so the screen is
+    // wider than the layout viewport there.
+    for (const { route, sel } of [
+      { route: '/controls/crosswalk', sel: KIT_MARK },
+      { route: '/agents', sel: KIT_MARK },
+      { route: '/obligations', sel: '[data-ctip] .obi-sq' },
+    ]) {
       await page.goto(route);
-      const marks = await marksInView(page, KIT_MARK);
+      const marks0 = await marksInView(page, sel);
+      // Only marks on the screen, the visual viewport, which can sit inside a
+      // larger layout viewport; touch input is in its coordinates.
+      const vv = await page.evaluate(() => {
+        const v = visualViewport!;
+        return { x: v.offsetLeft, y: v.offsetTop, w: v.offsetLeft + v.width, h: v.offsetTop + v.height };
+      });
+      const marks = marks0.filter((m) => m.x > vv.x && m.x < vv.w && m.y > vv.y && m.y < vv.h);
       expect(marks.length, `${route}: kit marks in view`).toBeGreaterThan(0);
       const byX = [...marks].sort((a, b) => a.box.left - b.box.left);
       for (const m of [byX[0], byX[byX.length - 1]]) {
-        if (touch) await page.touchscreen.tap(m.x, m.y);
+        if (touch) await page.touchscreen.tap(m.x - vv.x, m.y - vv.y);
         else await page.mouse.move(m.x, m.y);
         await expect(tip(page)).toHaveText(m.name);
         const b = await tipBox(page);
-        expect(b.left, `${route} ${m.name}: left edge`).toBeGreaterThanOrEqual(0);
+        expect(b.left, `${route} ${m.name}: left edge`).toBeGreaterThanOrEqual(b.x0);
         expect(b.right, `${route} ${m.name}: right edge`).toBeLessThanOrEqual(b.vw);
-        expect(b.top, `${route} ${m.name}: top edge`).toBeGreaterThanOrEqual(0);
+        expect(b.top, `${route} ${m.name}: top edge`).toBeGreaterThanOrEqual(b.y0);
         expect(b.bottom, `${route} ${m.name}: bottom edge`).toBeLessThanOrEqual(b.vh);
+        // Close it, so it does not cover the next mark.
+        await page.keyboard.press('Escape');
+        await expect(tip(page)).toBeHidden();
       }
     }
     await context.close();
@@ -185,6 +227,29 @@ test('the first tap on a kit link shows its name without leaving, the second fol
   await context.close();
 });
 
+test('after a tap, a keyboard Enter on a tile with its tooltip closed still follows the link', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 800 }, hasTouch: true, isMobile: true });
+  const page = await context.newPage();
+  await page.goto('/controls');
+  const sel = '[data-ctip] .cmo-cells a';
+  const tiles = await marksInView(page, sel);
+  await page.touchscreen.tap(tiles[0].x, tiles[0].y);
+  await expect(tip(page)).toHaveText(tiles[0].name);
+  await page.keyboard.press('Tab');
+  const next = await page.evaluate((s) => {
+    const el = document.activeElement!;
+    return { tile: el.matches(s), href: el.getAttribute('href') };
+  }, sel);
+  expect(next.tile, 'Tab lands on a tile').toBe(true);
+  // Escape closes the tooltip, so the tile is not the open mark when Enter comes.
+  await page.keyboard.press('Escape');
+  await expect(tip(page)).toBeHidden();
+  const before = page.url();
+  await page.keyboard.press('Enter');
+  await page.waitForURL(new URL(next.href!, before).href);
+  await context.close();
+});
+
 test('a tap on a crosswalk matrix cell still opens its drawer', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 390, height: 800 }, hasTouch: true, isMobile: true });
   const page = await context.newPage();
@@ -196,30 +261,42 @@ test('a tap on a crosswalk matrix cell still opens its drawer', async ({ browser
   await context.close();
 });
 
-// ---- 5. no native tooltip while open, <title> back after ---------------------
-test('while open a mark lends its <title> and gets it back on close', async ({ page }) => {
+// ---- 5. no native tooltip while open, every <title> back after ----------------
+test('while open nothing from a mark up to its chart svg offers a native tooltip, the svg keeps its name, and all comes back on close', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/agents');
   const marks = await marksInView(page, KIT_TITLED);
   const m = marks[0];
   const mark = page.locator(KIT_TITLED).nth(m.i);
-  const before = await mark.evaluate((el) => el.outerHTML);
+  const svg = mark.locator('xpath=ancestor::*[local-name()="svg"][last()]');
+  const before = await svg.evaluate((el) => el.outerHTML);
+  // The chart's name from the static HTML: its aria-labelledby targets' text.
+  const html = await (await page.request.get(page.url())).text();
+  const ids = (await svg.getAttribute('aria-labelledby'))?.split(/\s+/) ?? [];
+  expect(ids.length, 'the chart svg is named by aria-labelledby').toBeGreaterThan(0);
+  const name = await page.evaluate(
+    ([html, ids]) => {
+      const d = new DOMParser().parseFromString(html, 'text/html');
+      return ids.map((id) => d.getElementById(id)?.textContent ?? '').join(' ').replace(/\s+/g, ' ').trim();
+    },
+    [html, ids] as const,
+  );
   await page.mouse.move(m.x, m.y);
   await expect(tip(page)).toHaveText(m.name);
-  // Nothing from the pointer up to the figure is a native tooltip source now.
   const native = await page.evaluate(([x, y]) => {
     let el = document.elementFromPoint(x, y);
     const out: string[] = [];
     for (; el && !el.matches('figure'); el = el.parentElement) {
-      if ([...el.children].some((c) => c.localName === 'title') && el.localName !== 'svg') out.push(el.localName);
+      if ([...el.children].some((c) => c.localName === 'title')) out.push(el.localName);
       if (el.hasAttribute('title')) out.push(`${el.localName}[title]`);
     }
     return out;
   }, [m.x, m.y] as const);
-  expect(native, 'no native tooltip source above the pointer').toEqual([]);
+  expect(native, 'no native tooltip source from the pointer up to the figure').toEqual([]);
+  await expect(svg).toHaveAccessibleName(name);
   await page.mouse.move(1, 1);
   await expect(tip(page)).toBeHidden();
-  expect(await page.locator(KIT_TITLED).nth(m.i).evaluate((el) => el.outerHTML)).toBe(before);
+  expect(await svg.evaluate((el) => el.outerHTML)).toBe(before);
 });
 
 // ---- 6. without JavaScript nothing breaks ------------------------------------
@@ -280,6 +357,33 @@ test('/controls mosaic: hovering a tile names its control by id and title', asyn
   await expect(tip(page)).toBeHidden();
   const first = page.locator(sel).nth(tiles[0].i);
   expect(await first.getAttribute('title')).toBe(tiles[0].name);
+});
+
+test('/controls mosaic: the pointer reaches a tile tooltip in 2 px steps and it stays open (WCAG 1.4.13)', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/controls');
+  const sel = '[data-ctip] .cmo-cells a';
+  const tiles = await marksInView(page, sel);
+  // A tile with no other tile in the 20 px above it, so the pointer crosses
+  // nothing named on its way to the tooltip.
+  const clear = await page.evaluate(
+    ([sel, boxes]) => boxes.map((b) => [...Array(20)].every((_, k) => !document.elementFromPoint((b.left + b.right) / 2, b.top - 1 - k)?.closest(sel))),
+    [sel, tiles.map((t) => t.box)] as const,
+  );
+  const m = { ...tiles[clear.indexOf(true)] };
+  expect(m.name, 'a tile with open space above').toBeTruthy();
+  m.x = (m.box.left + m.box.right) / 2;
+  await page.mouse.move(m.x, m.box.top + 1);
+  await expect(tip(page)).toHaveText(m.name);
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  // Straight up, out of the tile (a hovered tile grows a little) and across the
+  // 12 px gap, 2 px at a time.
+  const end = m.box.top - 21;
+  await page.mouse.move(m.x, end, { steps: 11 });
+  await page.waitForTimeout(400);
+  await expect(tip(page)).toBeVisible();
+  const over = await page.evaluate(([x, y]) => !!document.elementFromPoint(x, y)?.closest('.ctip'), [m.x, end] as const);
+  expect(over, 'the pointer is on the tooltip').toBe(true);
 });
 
 for (const { route, sel } of [

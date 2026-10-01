@@ -48,10 +48,16 @@ La isla lee el `<title>` hijo. Así el presupuesto de 12 KB por SVG solo crece d
 nombres (D8). *Alternativa descartada:* que `tip()` emita también `data-tip`, que duplica cada nombre.
 
 ### D3. Ocultar el tooltip nativo solo mientras el nuestro está abierto
-Al abrir sobre una marca, la isla aparta su `<title>` (lo saca del DOM y guarda la referencia) o su
-atributo `title` (lo pasa a `data-ctip-title`); si la marca es enfocable y no tiene `aria-label`, le pone
-`aria-label` con el mismo texto mientras dura, para que su nombre accesible no cambie. Al cerrar, lo
-restaura todo. *Alternativa descartada:* convertirlo todo al cargar (cambiaría el árbol de
+Al abrir sobre una marca, la isla aparta toda fuente de tooltip nativo desde la marca hasta su raíz
+`data-ctip`, no solo la de la marca: si no, el navegador enseña el `<title>` del ancestro más cercano
+que lo tenga (el del `<svg>` raíz, p. ej. «The evidence climbs the stack»). Cada `<title>` hijo directo
+pasa a un `<defs class="ctip-park">` del mismo `<svg>` (sigue en el documento, así que el
+`aria-labelledby` del `<svg>` raíz resuelve igual, y un `<title>` dentro de `defs` no es tooltip de
+nadie); cada atributo `title` pasa a `data-ctip-title`. Si el elemento pierde así la fuente de su nombre
+(no tiene `aria-label` ni `aria-labelledby` y apartamos su `<title>`, o es enfocable y apartamos su
+`title`), recibe `aria-label` con el mismo texto mientras dura. Al cerrar, y en `pagehide`, cada
+`<title>` vuelve a su sitio (antes de su hermano siguiente original), se quitan los `defs` añadidos y se
+restaura todo lo demás. *Alternativa descartada:* convertirlo todo al cargar (cambiaría el árbol de
 accesibilidad de cada gráfico de forma permanente y rompería la degradación sin JS en caché).
 
 ### D4. Qué es una marca
@@ -62,11 +68,15 @@ gráfico), `figcaption`, `details.chart-alt`, la leyenda y todo lo que lleve `da
 
 ### D5. Eventos
 - Ratón y lápiz: `pointerover`/`pointerout` delegados abren y cierran; `pointermove` (con
-  `requestAnimationFrame`) recoloca a 12 px del puntero. Al salir hacia el propio tooltip no se cierra;
-  al salir de ambos se cierra tras 150 ms de gracia para cruzar el hueco.
+  `requestAnimationFrame`) recoloca a 12 px del puntero solo mientras el puntero sigue sobre la marca:
+  al salir, el tooltip se queda quieto para que se pueda alcanzar a pasos cortos (WCAG 1.4.13). Al
+  entrar en el propio tooltip no se cierra; al salir de ambos se cierra tras 150 ms de gracia.
 - Teclado: `focusin` abre anclado a la caja de la marca; `focusout` cierra. `keydown` Esc cierra sin
   mover foco y deja la marca «descartada» hasta que el puntero o el foco salgan de ella.
-- Toque: `pointerdown` guarda `pointerType`. En `click` en fase de captura y con `touch`:
+- Toque: `pointerdown` guarda el evento. Un `click` en fase de captura cuenta como toque solo si es un
+  toque real: `detail > 0` y el último `pointerdown` fue `touch`, sobre el mismo elemento y hace menos
+  de 800 ms; cualquier tecla borra ese estado. Un clic de teclado o de tecnología de apoyo
+  (`detail` 0) nunca se retiene. Con un toque real:
   - si la marca es un `<a href>` que navega y no es la marca abierta, `preventDefault()` (nunca
     `stopPropagation()`), abre el tooltip y marca la marca con `.ctip-on`; el segundo toque pasa;
   - si la marca es un botón, un `[data-cw-open]` o cualquier elemento con su propio comportamiento de
@@ -75,12 +85,22 @@ gráfico), `figcaption`, `details.chart-alt`, la leyenda y todo lo que lleve `da
     px o menos del punto y se abre esa (sin retener el clic);
   - un toque fuera de toda marca cierra.
   Como solo se escucha `click`, arrastrar para desplazar nunca abre nada ni bloquea el scroll.
-- `scroll` y `resize`: si el tooltip está anclado a una marca (teclado o toque), se recoloca; si la
-  marca sale del viewport, se cierra.
+  Un toque en un disparador de cajón (`[data-cw-open]`) abre el cajón y el tooltip; el tooltip se cierra
+  cuando el foco entra en el cajón (aceptado).
+- `scroll`, `scrollend` y `resize`: si el tooltip está anclado a una marca (teclado o toque), se
+  recoloca; mientras la marca está fuera del viewport (un scroll suave aún la está trayendo tras el
+  foco, o el lector la ha desplazado fuera) la marca sigue abierta con la caja oculta, y la caja
+  vuelve al volver la marca. Solo cierran `focusout`, la salida del puntero, Esc y un toque fuera.
+- Marcas no enfocables (conjuntos del Venn, anillos de `/path`, celdas de LayerMatrix, isotipo,
+  mariposa, celdas del índice del crosswalk): sin tooltip de teclado por diseño. Sus nombres están en
+  la tabla de datos alternativa, que es el camino de teclado y de lector de pantalla.
 
 ### D6. Posición
-Un único `div.ctip` en `body`, `position: fixed`, `max-width: min(20rem, 100vw - 16px)`. Se coloca
+Un único `div.ctip` en `body`, `position: fixed`, `max-width: min(20rem, ancho - 16px)`. Se coloca
 encima del punto de anclaje; si no cabe, debajo; en horizontal se centra y se sujeta a `[8, ancho - 8]`.
+El ancho y el alto son los del `visualViewport` (con su `offsetLeft`/`offsetTop`), no `clientWidth`:
+en un móvil cuya página desborda (p. ej. `/obligations` a 320 px) la pantalla es más ancha que el
+viewport de diseño. La isla fija `max-width` en línea con ese ancho antes de medir.
 Con teclado y toque el anclaje es la caja de la marca. Animación: entrada con `opacity` y `transform`
 del contenedor, 0 ms con `prefers-reduced-motion`; texto siempre a opacidad plena (el contenedor
 anima su opacidad solo en la entrada y nunca hay texto atenuado en reposo).
