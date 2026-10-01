@@ -131,6 +131,13 @@ const caption = `The number of ids each control maps to in each framework, and i
       </li>
       <li><span class="ccv-glyph ccv-direct" aria-hidden="true" /> IMDA direct fit (D)</li>
       <li><span class="ccv-glyph ccv-partial" aria-hidden="true" /> IMDA partial fit (P)</li>
+      {
+        empty > 0 && (
+          <li>
+            <span class="ccv-voidkey" aria-hidden="true" /> Hatched row: no verified mapping yet
+          </li>
+        )
+      }
     </ul>
     <p class="ccv-stamp">Source: {profile.title} v{profile.version} mappings (data/controls) · As of {CONTROLS_AS_OF}</p>
   </div>

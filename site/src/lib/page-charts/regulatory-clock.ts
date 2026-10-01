@@ -100,6 +100,8 @@ const WORDS = {
   step: 'Later step',
   firstHead: 'First applies',
   stepHead: 'Later step',
+  pinHead: 'Date',
+  pin: 'its place on the time axis',
   reached: 'Reached',
   ahead: 'Ahead',
   before: (d: string) => `Before ${d.slice(0, 4)}`,
@@ -228,6 +230,8 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
           ...(steps.some((e) => !reached(e)) ? [{ label: WORDS.ahead, shape: 'square' as const, state: 'outline' as const }] : []),
         ],
       },
+      // The staircase pins each date on the time axis with a solid bar.
+      { head: WORDS.pinHead, entries: vertical ? [] : [{ label: WORDS.pin, swatch: 'pin' as const }] },
     ],
     L,
     16,

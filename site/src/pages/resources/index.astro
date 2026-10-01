@@ -218,8 +218,9 @@ const cardCount = countWord(cards.length);
 
 // "The corpus in dots": the weight of each resource that counts records, from
 // the same numbers as the cards above (the MCP server and the map count tools
-// and branches, not records, so they have no row). Name, link and tone come
-// from the card, so a row cannot drift from it.
+// and branches, not records, so they have no row). Name and link come from
+// the card, so a row cannot drift from it. The dots are ink: a card's swatch
+// is the hub's accent, not a category the chart could name in a legend.
 const records: Record<string, { count: number; noun: string }> = {
   Frameworks: { count: frameworks.length, noun: 'frameworks' },
   'Obligation register': { count: obligations.length, noun: 'obligations' },
@@ -246,8 +247,7 @@ if (unmatched.length) throw new Error(`resources: corpus rows name no hub card: 
 const corpusRows: CorpusRow[] = entries.flatMap((entry) => {
   const r = records[entry.title];
   if (!r || r.count === 0) return [];
-  const tone = Number(/--l([1-5])/.exec(entry.swatch)?.[1] ?? 0) as Tone;
-  return [{ label: entry.title, href: entry.href, tone, ...r }];
+  return [{ label: entry.title, href: entry.href, tone: 0 as Tone, ...r }];
 });
 const corpusTotal = corpusRows.reduce((n, row) => n + row.count, 0);
 // Records per dot: the smallest round unit that keeps the longest row within

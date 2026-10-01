@@ -64,6 +64,7 @@ export function frameworkMosaic(): Pair {
     groupHeader: 'Type',
     itemHeader: 'Instrument',
     valueHeader: 'Obligations',
+    areaKey: 'obligation rows of the instrument',
     minTile: 40,
     tableCaption: 'Obligation rows per instrument, by type',
   };

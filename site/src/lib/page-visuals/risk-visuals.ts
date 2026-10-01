@@ -215,7 +215,6 @@ export function threatGrid(framework: Framework): FrameworkGrid {
 const mitKey = (code: string) => `mit-${code.split('.')[0]}`;
 
 export function harmTarget(): Pair {
-  const used = [...new Set(harms.map((h) => h.layerN[0]))].sort((a, b) => a - b);
   const base = {
     title: 'Where each harm lands',
     desc: `The ${harms.length} harms of the atlas, each in the ring of the level it lands on and the sector of its MIT AI Risk Repository domain, coloured by the stack layer of the control that catches it.`,
@@ -231,7 +230,9 @@ export function harmTarget(): Pair {
       href: `#harm-${h.id}`,
     })),
     centre: { label: 'AI system' },
-    legend: used.map((n) => ({ label: layerLabel(n), tone: n as Tone })),
+    ringsTitle: 'Rings: the level the harm lands on, from the individual out',
+    sectorsTitle: 'Sectors: MIT AI Risk Repository domain',
+    legendTitles: { layer: 'Colour: stack layer of the control that catches it' },
     itemHeader: 'Harm',
     ringHeader: 'Level',
     sectorHeader: 'MIT domain',

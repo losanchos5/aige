@@ -39,6 +39,7 @@ const base = {
   mode: 'figc' as const,
   tableCaption: `${c.id}: cases, patterns, obligations, threats, standards and IMDA fit`,
   relationLabels: { core: 'Mapped', related: 'Partial fit' },
+  legendTitles: { layer: 'Colour: stack layer of the pattern' },
 };
 const familiesWide = constellationFamilies(c, radialLabelWidth(WIDE, 'radial', centre.label) - 1);
 const familiesNarrow = constellationFamilies(c, radialLabelWidth(NARROW, 'list', centre.label) - 1);

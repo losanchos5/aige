@@ -21,6 +21,18 @@
 // 'circle' | 'square' | 'diamond' | 'triangle'. Any label that does not fit
 // its box throws at build, naming the label: shorten the wording. An em dash
 // (U+2014) in any label throws too, and so does an empty input (no items).
+// Legends: every primitive that colours marks by layer or draws them in more
+// than one state adds an auto legend (core autoLegend) of exactly the layers
+// and states drawn: layer swatches named as in data/stack ("03 Evals"), state
+// swatches named by the marks' own status words, each block opening with the
+// question it answers (ChartBase legendTitles: { layer, state }, with
+// defaults "Colour: stack layer" and "Drawing: status"). An explicit `legend`
+// list replaces it (its question in legendHeading); autoLegend: false drops
+// it when the page shows its own key.
+// concentricRings heads its keys (ringsTitle, sectorsTitle); treemap says what
+// the area counts (areaKey), what "+N" is and what the foot bar measures
+// (fillKey); lifecycleRing names its channels ("Circle area: Fields"); the
+// chains name the evidence chips' layers and the enforcement track's states.
 // Marks with an href are links named by their <title>; linked marks must keep
 // the 24 px pointer-target spacing of WCAG 2.5.8 (the primitives default to a
 // 24 px pitch when marks link), else the build throws naming both marks.

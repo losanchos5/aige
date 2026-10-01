@@ -5,8 +5,8 @@
 // partial dot (the Isotype convention) and the SVG stays small whatever the
 // counts. A remainder too small to show ink (a dot's disc starts a tenth of
 // the pitch in) still gets a sliver of MIN_INK, so a row of one record never
-// looks empty; its count is printed beside it. Each row's tone is the swatch
-// of its card on the hub.
+// looks empty; its count is printed beside it. A row's tone is ink unless
+// the caller has a category to name (the hub passes ink).
 //
 // Built on the chart kit's shell and helpers (src/lib/charts/core.ts); the
 // classes are the kit's, so it renders in 'chart' mode on /resources, which

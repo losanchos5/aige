@@ -64,6 +64,8 @@ export function examWeight(): Pair {
     itemHeader: 'Competency',
     valueHeader: 'Questions (midpoint)',
     fillHeader: 'Taught',
+    areaKey: 'exam questions, midpoint of the range',
+    fillKey: 'share of its indicators taught here',
     tableCaption: 'AIGP competencies by the midpoint of their question range, with the share of indicators taught (%)',
   };
   return {

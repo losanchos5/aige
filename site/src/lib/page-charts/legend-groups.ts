@@ -7,7 +7,7 @@ import { legend, text, textWidth, type MarkState, type Shape, type Tone, markSty
 
 export interface LegendGroup {
   head: string;
-  entries: { label: string; shape?: Shape; state?: MarkState; tone?: Tone }[];
+  entries: { label: string; shape?: Shape; state?: MarkState; tone?: Tone; swatch?: 'bar' | 'pin' }[];
 }
 
 /** Draw the groups from (x0, y), the first baseline, with the heads at `size`

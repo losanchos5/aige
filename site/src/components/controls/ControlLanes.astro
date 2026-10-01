@@ -8,21 +8,31 @@
  * many). The mark's shape is the failure response (control-marks.css:
  * diamond deny, square hold for approval, ring alert) and a hatched square is
  * a response still to be specified (isResponseToSpecify), never counted as an
- * alert; its colour is the home layer, as in the mosaic beside it (which
- * groups the same controls by layer and response, not by where they act).
+ * alert; its colour is the home layer.
+ *
+ * The key under the lanes explains every channel in place, never by pointing
+ * at another chart: a reading line (one mark per control and lane, so a
+ * control enforced at two points appears twice), the shapes with the question
+ * they answer (what happens when the control fails) and the colour swatches
+ * of the layers drawn, named as in data/stack.
  *
  * HTML and CSS, not an SVG: 126 marks with their names pass the 12 KB budget
- * of an inline chart. The marks are not links (the mosaic already links every
- * control): each lane cell states its count and responses in words, the marks
- * are its drawing, and the table lists every control by lane. Wide, the lanes
- * are columns under a chevron pipeline; narrow, each profile is a card with
- * its four lanes as rows. Frame: chart.css (chart-fig, chart-canvas,
- * chart-caption, chart-alt, chart-table).
+ * of an inline chart. Every mark is a link to its control (controlPath), named
+ * by its id, title, layer, response and lane, as the squares of the mosaic
+ * below are; a mark is --cvm (14 to 16 px) with the gap making a 24 px pitch,
+ * the pointer-target spacing of WCAG 2.5.8, and grows under the pointer or
+ * focus (transform only, never on reduced motion). Each lane cell also states
+ * its count and responses in words and the table lists every control by lane.
+ * Wide, the lanes are columns under a chevron pipeline; narrow, each profile
+ * is a card with its four lanes as rows. Frame: chart.css (chart-fig,
+ * chart-canvas, chart-caption, chart-alt, chart-table).
  */
 import '../../styles/chart.css';
 import '../../styles/control-marks.css';
 import '../../styles/control-visuals.css';
-import { controls, profiles, profilePath, CONTROLS_AS_OF, type Control } from '../../data/controls';
+import { controls, profiles, profilePath, controlPath, CONTROLS_AS_OF, type Control } from '../../data/controls';
+import { layers } from '../../data/stack';
+import { layerName } from '../../lib/charts/core';
 import {
   STAGES,
   RESPONSES,
@@ -48,7 +58,7 @@ const summary = (rows: Control[]) =>
 
 const stages = STAGES.map((s) => {
   const rows = controls.filter((c) => actsAt(c, s.key));
-  return { ...s, rows, mix: mixOf(rows) };
+  return { ...s, rows };
 });
 const groups = profiles.map((profile) => {
   const rows = controls.filter((c) => c.profile === profile.slug);
@@ -59,11 +69,22 @@ const groups = profiles.map((profile) => {
   };
 });
 const present = RESPONSES.filter((r) => controls.some((c) => responseOf(c) === r));
+/** What each response does to the action, for the shape key. */
+const responseMeaning: Record<Response, string> = {
+  deny: 'blocks the action',
+  require_approval: 'holds it for a human decision',
+  alert: 'lets it through and raises an alert',
+  allow: 'permits only what is listed',
+  tbs: 'the profile states no response yet',
+};
+const layersDrawn = layers.filter((l) => controls.some((c) => c.layer === l.n));
 const multi = controls.filter((c) => c.enforcementPoints.length > 1).length;
 const busiest = [...stages].sort((a, b) => b.rows.length - a.rows.length)[0];
 const quietest = [...stages].sort((a, b) => a.rows.length - b.rows.length)[0];
 
-const markName = (c: Control) => `${c.id} ${c.title}: ${responseWords[responseOf(c)]}`;
+const fullLayer = (n: number) => `Layer 0${n} ${layers.find((l) => l.n === n)?.name ?? ''}`;
+const markName = (c: Control, lane: string) =>
+  `${c.id} ${c.title}. ${fullLayer(c.layer)}. When it fails: ${responseWords[responseOf(c)].toLowerCase()}. Enforced at ${lane.toLowerCase()}.`;
 const title = 'Where the controls act';
 const caption = `One mark per control in each lane where it is enforced, its shape the failure response and its colour the home layer. ${busiest.rows.length} controls act at ${busiest.label.toLowerCase()} and ${quietest.rows.length} on a ${quietest.label.toLowerCase()}; ${multi} act at more than one point, so the lanes add up to more than ${controls.length}.`;
 const tableCaption = 'Every control by profile and enforcement point, with its failure response';
@@ -81,14 +102,6 @@ const tableCaption = 'Every control by profile and enforcement point, with its f
               <span class="clx-stage-n">
                 {s.rows.length}
                 <span class="visually-hidden"> controls: {mixText(s.rows)}</span>
-              </span>
-              <span class="clx-mix" aria-hidden="true">
-                {s.mix.map((x) => (
-                  <span class="clx-mix-i">
-                    <span class:list={['cvm', responseClass[x.r]]} />
-                    {x.n}
-                  </span>
-                ))}
               </span>
             </li>
           ))
@@ -110,11 +123,20 @@ const tableCaption = 'Every control by profile and enforcement point, with its f
                       {cell.rows.length}
                     </span>
                     <span class="visually-hidden">: {summary(cell.rows)}.</span>
-                    <span class="clx-marks" aria-hidden="true">
-                      {cell.rows.map((c) => (
-                        <span class:list={['cvm', `cvm-l${c.layer}`, responseClass[responseOf(c)]]} title={markName(c)} />
-                      ))}
-                    </span>
+                    {cell.rows.length > 0 && (
+                      <ul class="clx-marks" role="list" aria-label={`${g.profile.shortTitle}, ${cell.label}: controls`}>
+                        {cell.rows.map((c) => (
+                          <li>
+                            <a
+                              class:list={['cvm', `cvm-l${c.layer}`, responseClass[responseOf(c)]]}
+                              href={controlPath(c)}
+                              aria-label={markName(c, cell.label)}
+                              title={markName(c, cell.label)}
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -123,17 +145,42 @@ const tableCaption = 'Every control by profile and enforcement point, with its f
         }
       </ol>
     </div>
-    <ul class="clx-key" role="list" aria-label="Shape: failure response">
-      {
-        present.map((r) => (
-          <li>
-            <span class:list={['cvm', responseClass[r]]} aria-hidden="true" />
-            {responseWords[r]} <span class="clx-key-n">{controls.filter((c) => responseOf(c) === r).length}</span>
-          </li>
-        ))
-      }
-      <li class="clx-key-note">Colour: home stack layer, as in the mosaic below</li>
-    </ul>
+    <div class="clx-legend">
+      <p class="clx-read">
+        Each mark is one control, drawn in every lane where it is enforced: a control enforced at two points appears
+        twice. Select a mark to open its control.
+      </p>
+      <div class="clx-keys">
+        <div class="clx-keyset">
+          <p class="clx-key-h" id="clx-key-shape">Shape: what happens when the control fails</p>
+          <ul class="clx-key" role="list" aria-labelledby="clx-key-shape">
+            {
+              present.map((r) => (
+                <li>
+                  <span class:list={['cvm', responseClass[r]]} aria-hidden="true" />
+                  <span>
+                    <strong>{responseWords[r]}</strong>: {responseMeaning[r]}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div class="clx-keyset">
+          <p class="clx-key-h" id="clx-key-colour">Colour: the control's home stack layer</p>
+          <ul class="clx-key" role="list" aria-labelledby="clx-key-colour">
+            {
+              layersDrawn.map((l) => (
+                <li>
+                  <span class:list={['cvm', `cvm-l${l.n}`]} aria-hidden="true" />
+                  {layerName(l.n as 1 | 2 | 3 | 4 | 5)}
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
     <p class="clx-stamp">Source: open control profiles (data/controls) · As of {CONTROLS_AS_OF}</p>
   </div>
   <figcaption class="chart-caption">

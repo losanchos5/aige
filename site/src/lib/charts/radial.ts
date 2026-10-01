@@ -20,10 +20,11 @@
 //
 // Fewer than three relations draw nothing: relationRadial returns null and the
 // page keeps its lists (spec per-item-visuals, "Pocas relaciones").
-// No runtime imports.
 import {
   assemble,
+  autoLegend,
   fitText,
+  legendBlocks,
   markStyles,
   minText,
   r1,
@@ -145,18 +146,33 @@ export function relationRadial(input: RelationRadialInput): ChartOutput | null {
   const solid: string[] = [];
   const dashed: string[] = [];
 
-  // Legend: the two edge styles, only those drawn.
+  // Legend: the two edge styles, only those drawn; the second wraps under
+  // the first when both do not fit one row (a narrow chart).
   let y = 6;
   let lx = L;
   for (const s of ['core', 'related'] as const) {
     if (!strengths.has(s)) continue;
     const word = s === 'core' ? (input.relationLabels?.core ?? lw.core) : (input.relationLabels?.related ?? lw.related);
+    if (lx > L && lx + 34 + textWidth(word, 12.5) > W - L) {
+      lx = L;
+      y += 22;
+    }
     (s === 'core' ? solid : dashed).push(`M${lx} ${y + 10}h18`);
     out.push(`<circle cx="${lx + 24}" cy="${y + 10}" r="4.5" ${marks.attrs(s === 'core' ? 'filled' : 'outline', 0)}/>`);
     out.push(text(lx + 34, y + 14.5, word, { size: 12.5, where: 'legend' }));
     lx += 34 + textWidth(word, 12.5) + 18;
   }
   y += 30;
+  // Layer colours of the layered family's drawn nodes, only those used.
+  const layered = autoLegend(
+    families.filter((x) => x.f.layered).flatMap((x) => x.shown.map((i) => ({ tone: i.tone }))),
+    input,
+  );
+  if (layered.length) {
+    const lg = legendBlocks(layered, L, y + 4, W - L, marks);
+    out.push(...lg.els);
+    y = lg.bottom + 18;
+  }
 
   const rowsOf = (x: Fam) => x.shown.length + (x.extra > 0 ? 1 : 0);
   const node = (x: Fam, item: RelationItem, dotX: number, cy: number, labelX: number, anchor: 'start' | 'end', labelW: number) => {

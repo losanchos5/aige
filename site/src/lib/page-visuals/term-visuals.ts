@@ -122,6 +122,7 @@ export function termNeighbourhood(entry: GlossaryEntry): TermVisual | null {
     tableCaption: `Neighbourhood of ${entry.term}`,
     centre: { label: centreLabel(entry.term) },
     relationLabels: { core: 'Related', related: 'Contrast' },
+    legendTitles: { layer: 'Colour: stack layer of the pattern' },
     maxPerFamily: MAX_NODES,
     families: [
       { label: 'Related terms', items: related },
