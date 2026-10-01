@@ -3,7 +3,7 @@
 // obligation evidence chain (src/lib/evidence-chain.ts): one panel per stage,
 // each with its glyph (glyphs.ts, §1.7), a kicker and its items, one arrow
 // between consecutive panels; 'row' reads left to right (wide), 'column' top
-// to bottom (narrow, 340). The terminal panel is always the evidence: a
+// to bottom (narrow, NARROW_WIDTH). The terminal panel is always the evidence: a
 // heavier outline, the document-with-check glyph in the layer colour of the
 // first artefact, and a layer chip before each artefact. The one diamond of
 // the figure is its gate: the event of a bow-tie, the decision of a control.
@@ -22,6 +22,8 @@
 import {
   assemble,
   markStyles,
+  minText,
+  NARROW_WIDTH,
   nonEmpty,
   r1,
   shape,
@@ -56,7 +58,7 @@ export interface EvidenceItem extends FlowItem {
 }
 
 export interface FlowBase extends ChartBase {
-  /** 'row' (default, 900 wide) or 'column' (the narrow variant, 340 wide). */
+  /** 'row' (default, 900 wide) or 'column' (the narrow variant, NARROW_WIDTH wide). */
   orientation?: 'row' | 'column';
   /** Items drawn per panel before a "+N more" line (default 3). */
   maxItems?: number;
@@ -150,7 +152,8 @@ const TRACK = 18;
 
 function flow(input: FlowBase, panels: Panel[], cls: string, where: string): ChartOutput {
   const row = input.orientation !== 'column';
-  const W = input.width ?? (row ? 900 : 340);
+  const W = input.width ?? (row ? 900 : NARROW_WIDTH);
+  const sm = minText(W);
   const w = words(input.lang);
   const more = FLOW_WORDS[input.lang === 'es' ? 'es' : 'en'].more;
   const max = input.maxItems ?? 3;
@@ -167,7 +170,7 @@ function flow(input: FlowBase, panels: Panel[], cls: string, where: string): Cha
 
   // Measure every panel first: in a row all panels share the tallest height.
   const laid = panels.map((p) => {
-    const kicker = wrapText(p.kicker, innerW, 12, 'mono', 2, 'kicker');
+    const kicker = wrapText(p.kicker, innerW, sm, 'mono', 2, 'kicker');
     const chip = p.tones ? 14 : 0;
     const shown = p.items.slice(0, max);
     const blocks = shown.map((item) => {
@@ -200,7 +203,7 @@ function flow(input: FlowBase, panels: Panel[], cls: string, where: string): Cha
     );
     const kx = row ? px + 10 : px + inset;
     let ty = row ? py + 50 : py + 24;
-    x.kicker.forEach((line, j) => out.push(text(kx, ty + j * 14, line, { size: 12, cls: 'mono muted', where: 'kicker' })));
+    x.kicker.forEach((line, j) => out.push(text(kx, ty + j * 14, line, { size: sm, cls: 'mono muted', where: 'kicker' })));
     ty += (x.kicker.length - 1) * 14 + (row ? 10 : 12);
     const ix = kx;
     if (x.p.track) {
@@ -211,7 +214,7 @@ function flow(input: FlowBase, panels: Panel[], cls: string, where: string): Cha
         const cy = first + j * TRACK;
         out.push(
           `<rect x="${r1(ix)}" y="${r1(cy - 5)}" width="10" height="10" rx="2" ${marks.attrs(stage.on ? 'filled' : 'outline', 0)}/>`,
-          text(ix + 16, cy + 4, stage.label, { size: 12, cls: stage.on ? 'mono' : 'mono ink2', weight: stage.on ? 600 : 400, where: 'stage label' }),
+          text(ix + 16, cy + 4, stage.label, { size: sm, cls: stage.on ? 'mono' : 'mono ink2', weight: stage.on ? 600 : 400, where: 'stage label' }),
         );
       });
       return;

@@ -10,17 +10,31 @@ export interface LegendGroup {
   entries: { label: string; shape?: Shape; state?: MarkState; tone?: Tone }[];
 }
 
-/** Draw the groups from (x0, y), the first baseline; returns the elements and
- *  the baseline of the last row. */
-export function legendGroups(groups: LegendGroup[], x0: number, y: number, maxX: number, marks: ReturnType<typeof markStyles>): { els: string[]; bottom: number } {
+/** Draw the groups from (x0, y), the first baseline, with the heads at `size`
+ *  (the chart's minText); returns the elements and the baseline of the last row. */
+export function legendGroups(
+  groups: LegendGroup[],
+  x0: number,
+  y: number,
+  maxX: number,
+  marks: ReturnType<typeof markStyles>,
+  size = 12,
+): { els: string[]; bottom: number } {
   const els: string[] = [];
   let row = y;
   groups
     .filter((g) => g.entries.length)
     .forEach((g, i) => {
       if (i) row += 20;
-      els.push(text(x0, row, g.head, { size: 12, cls: 'mono muted', where: 'legend head' }));
-      const lg = legend(g.entries, x0 + textWidth(g.head, 12, 'mono') + 10, row, maxX, marks);
+      els.push(text(x0, row, g.head, { size, cls: 'mono muted', where: 'legend head' }));
+      // Entries beside the head; on the row under it (from x0) when one of
+      // them would not fit beside it (a narrow chart).
+      let at = x0 + textWidth(g.head, size, 'mono') + 10;
+      if (g.entries.some((e) => 18 + textWidth(e.label, 12.5) > maxX - at)) {
+        at = x0;
+        row += 20;
+      }
+      const lg = legend(g.entries, at, row, maxX, marks);
       els.push(...lg.els);
       row = lg.bottom;
     });

@@ -6,7 +6,7 @@ import CrosswalkMatrix from '../../components/CrosswalkMatrix.astro';
 import CrosswalkDrawer from '../../components/CrosswalkDrawer.astro';
 import ObligationLookup from '../../components/ObligationLookup.astro';
 import Chart from '../../components/Chart.astro';
-import { venn3, nestedChain, type VennSet } from '../../lib/charts';
+import { NARROW_WIDTH, venn3, nestedChain, type VennSet } from '../../lib/charts';
 import { site } from '../../data/site';
 import { disclaimer } from '../../data/frameworks';
 import {
@@ -94,7 +94,7 @@ const vennBase = {
   tableCaption: 'Crosswalk topics with a clause in each of the three instruments',
 };
 const vennWide = venn3({ ...vennBase, id: 'cw-venn-w', layout: 'euler', width: 560, callouts: 5 });
-const vennNarrow = venn3({ ...vennBase, id: 'cw-venn-n', layout: 'upset', width: 340 });
+const vennNarrow = venn3({ ...vennBase, id: 'cw-venn-n', layout: 'upset', width: NARROW_WIDTH });
 const outsideIso = topics.length - overlapRows.filter((_, i) => isoCells[i].length > 0).length;
 
 // The explorer's defaults, mirrored in public/crosswalk-explorer.js.

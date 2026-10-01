@@ -6,12 +6,14 @@
 // failure response (ControlMosaic), where the controls act on the pipeline by
 // profile, enforcement point and response (ControlLanes), one card per profile
 // with its state and counts,
-// every control by its home layer of the stack, how the profiles relate to
+// how the evidence the controls leave climbs the stack (a flow from home layer to
+// evidence layer) with every control by its home layer under it, how the profiles relate to
 // certification schemes and frameworks, how to adopt one and how to review a
 // control. Every number is computed from the registry.
 //
 // Anchors other pages link to: intro, chain, properties, where, profiles, by-layer
-// (h3 layer-1..layer-5), ecosystem, adoption, how-to-review. The build fails on
+// (the evidence flow, then h3 layer-1..layer-5 in a <details> the browser
+// opens on a #layer-N link), ecosystem, adoption, how-to-review. The build fails on
 // any broken reference in the registry (controlProblems). The controls dataset
 // and the observation schema, example and template links and their Umami
 // events come from lib/controls-md.ts (machineLinks, machineEvent).
@@ -25,6 +27,7 @@ import ControlLanes from '../../components/controls/ControlLanes.astro';
 import StatusLine from '../../components/StatusLine.astro';
 import ContributeCta from '../../components/ContributeCta.astro';
 import CtaBand from '../../components/CtaBand.astro';
+import Chart from '../../components/Chart.astro';
 import {
   profiles,
   controls,
@@ -35,13 +38,17 @@ import {
   controlsUpdated,
   profilePath,
   depthLabels,
+  CONTROLS_AS_OF,
 } from '../../data/controls';
 import { layers } from '../../data/stack';
 import { site } from '../../data/site';
 import { depthCounts, derivedPhrase, profileReviewers, machineLinks, machineEvent } from '../../lib/controls-md';
 import { collectionPage } from '../../lib/jsonld';
 import { fitsSiteSuffix } from '../../lib/seo-title';
+import { flow, NARROW_WIDTH } from '../../lib/charts';
+import { evidenceFlow } from '../../lib/page-visuals/controls-flows';
 import '../../styles/pages.css';
+import '../../styles/figures.css';
 
 const seoTitle = 'Open AI governance controls';
 const description =
@@ -114,6 +121,26 @@ const profileCards = profiles.map((profile) => {
 });
 
 const byLayer = layers.map((layer) => ({ layer, rows: controlsForLayer(layer.n) }));
+
+// The evidence climbs the stack (#by-layer): home layer to evidence layer,
+// one unit per artefact (lib/page-visuals/controls-flows.ts).
+const evidence = evidenceFlow();
+const evidenceTitle = 'The evidence climbs the stack';
+const evidenceChart = {
+  ...evidence,
+  title: evidenceTitle,
+  desc: "A flow from each control's home layer of the stack to the layer that keeps each evidence artefact it leaves.",
+  asOf: CONTROLS_AS_OF,
+};
+const evidenceWide = flow({ ...evidenceChart, id: 'cp-evidence-w', width: 720, layout: 'wide' });
+const evidenceNarrow = flow({ ...evidenceChart, id: 'cp-evidence-n', width: NARROW_WIDTH, layout: 'narrow' });
+const artefacts = evidence.links.reduce((n, l) => n + l.value, 0);
+const stay = evidence.links.filter((l) => l.from.slice(1) === l.to.slice(1)).reduce((n, l) => n + l.value, 0);
+const toTop = evidence.links.filter((l) => l.to === 'e5').reduce((n, l) => n + l.value, 0);
+const toTopFromOthers = evidence.links.filter((l) => l.to === 'e5' && l.from !== 'c5').reduce((n, l) => n + l.value, 0);
+// The two counts overlap (layer 05 controls keep their evidence at home), so
+// the caption says how many of layer 05's artefacts come from other layers.
+const evidenceCaption = `Each band is the evidence artefacts that the controls of one home layer leave in a layer of the stack. Of ${artefacts} artefacts, ${stay} stay in their control's home layer and ${artefacts - stay} move to another. Layer 05, ${layers[4].name}, keeps ${toTop}, ${toTopFromOthers} of them from controls of other layers; the controls of each layer are listed under the chart.`;
 
 const jsonLd = collectionPage({
   path: '/controls',
@@ -218,35 +245,39 @@ const jsonLd = collectionPage({
   <Section
     tone="plain"
     id="by-layer"
-    title="Controls by stack layer."
-    lede="Each control has one home layer of the stack, where it is enforced or where its evidence is kept."
+    title="The evidence climbs the stack."
+    lede="Each control has one home layer of the stack, where it is enforced; the artefacts it leaves are kept in a layer too, often a higher one."
   >
-    {
-      byLayer.map(({ layer, rows }) => (
-        <div class="cp-layer" style={`--cp-l: var(${layer.colorVar})`}>
-          <h3 id={`layer-${layer.n}`} class="cp-layer-title">
-            <span class="cp-swatch" aria-hidden="true" />
-            Layer {pad(layer.n)}: {layer.name}
-          </h3>
-          {rows.length > 0 ? (
-            <ul class="cp-layer-list">
-              {rows.map((c) => (
-                <li>
-                  <a href={controlPath(c)}>
-                    <span class="cp-id">{c.id}</span> {c.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p class="cp-layer-empty">
-              No control has this layer as its home layer yet. Read{' '}
-              <a href={`/bok/the-stack#${layer.chapterAnchor}`}>layer {pad(layer.n)} in chapter 04</a>.
-            </p>
-          )}
-        </div>
-      ))
-    }
+    <Chart title={evidenceTitle} caption={evidenceCaption} chart={evidenceWide} narrow={evidenceNarrow} />
+    <details class="cp-layers">
+      <summary class="cp-layers-summary">Controls by home layer ({controls.length})</summary>
+      {
+        byLayer.map(({ layer, rows }) => (
+          <div class="cp-layer" style={`--cp-l: var(${layer.colorVar})`}>
+            <h3 id={`layer-${layer.n}`} class="cp-layer-title">
+              <span class="cp-swatch" aria-hidden="true" />
+              Layer {pad(layer.n)}: {layer.name}
+            </h3>
+            {rows.length > 0 ? (
+              <ul class="cp-layer-list">
+                {rows.map((c) => (
+                  <li>
+                    <a href={controlPath(c)}>
+                      <span class="cp-id">{c.id}</span> {c.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p class="cp-layer-empty">
+                No control has this layer as its home layer yet. Read{' '}
+                <a href={`/bok/the-stack#${layer.chapterAnchor}`}>layer {pad(layer.n)} in chapter 04</a>.
+              </p>
+            )}
+          </div>
+        ))
+      }
+    </details>
   </Section>
 
   <Section tone="tint" id="ecosystem" title="How these profiles relate to certifications and frameworks.">
@@ -415,6 +446,25 @@ const jsonLd = collectionPage({
 
   .cp-card-count {
     font-size: var(--fs-small);
+  }
+
+  .cp-layers {
+    margin-top: var(--s-5);
+  }
+
+  .cp-layers-summary {
+    padding: var(--s-2) 0;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .cp-layers-summary:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .cp-layers[open] .cp-layers-summary {
+    margin-bottom: var(--s-4);
   }
 
   .cp-layer + .cp-layer {

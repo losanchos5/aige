@@ -19,7 +19,7 @@
 //     Dates before `windowFrom` share one "Before YYYY" row whose dot sits
 //     behind a break at the start of the axis, so a 1938 statute does not
 //     squash the 2024 to 2030 window into a sliver.
-//   vertical (narrow, 340): the same stations as an agenda, chips flowing in
+//   vertical (narrow, NARROW_WIDTH): the same stations as an agenda, chips flowing in
 //     rows under each date, the as-of line between the two sides.
 //
 // A station draws at most `maxPerStation` chips, then a "+N more" line; the
@@ -32,6 +32,10 @@
 // maps register rows onto it).
 import { legendGroups } from './legend-groups';
 import {
+  NARROW_WIDTH,
+  asOfLabel,
+  asOfMark,
+  minText,
   assemble,
   fitText,
   markStyles,
@@ -71,9 +75,9 @@ export interface ClockRow {
 
 export interface RegulatoryClockInput extends ChartBase {
   rows: ClockRow[];
-  /** The as-of date of the data: the dashed line, labelled "<todayLabel> <today>". */
+  /** The as-of date of the data: the dashed line, labelled "As of <today>"
+   *  (core asOfMark). */
   today: string;
-  todayLabel?: string;
   /** The legend of first-date marks, in order; only the statuses of dated
    *  rows are drawn, and two of them on one shape and fill throw. */
   statuses: { state: MarkState; shape?: 'circle' | 'triangle'; label: string }[];
@@ -166,7 +170,8 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
   nonEmpty(input.rows, 'rows', where);
   parseDay(input.today, 'clock today');
   const vertical = input.orientation === 'vertical';
-  const W = input.width ?? (vertical ? 340 : 560);
+  const W = input.width ?? (vertical ? NARROW_WIDTH : 560);
+  const sm = minText(W);
   const max = input.maxPerStation ?? 6;
   const stations = stationsOf(input);
   const events = stations.flatMap((s) => s.events);
@@ -228,6 +233,7 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
     16,
     W - L,
     marks,
+    sm,
   );
   out.push(...lg.els);
   let y = lg.bottom + 10;
@@ -237,8 +243,8 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
   const firstDate = (r: ClockRow) => r.first ?? [...(r.steps ?? [])].map((s) => s.date).sort(byCode)[0];
   const nNow = drawn.filter((r) => firstDate(r)! <= input.today).length;
   const nLater = drawn.length - nNow;
-  const todayText = `${input.todayLabel ?? 'As of'} ${input.today}`;
-  fitText(todayText, W - 2 * L, 12, 'mono', 'today label');
+  const todayText = asOfLabel(input.today, input.lang);
+  fitText(todayText, W - 2 * L, sm, 'mono', 'as-of label');
 
   const chipW = (e: Event) => 16 + textWidth(e.row.label, CHIP_PX);
   const tipOf = (e: Event) => `${e.row.short ?? e.row.label} · ${WORDS.first.toLowerCase()} ${e.date} · ${e.row.status}`;
@@ -298,13 +304,14 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
   let bottom: number;
   if (!vertical) {
     const hasEarlier = stations[0].earlier;
-    const dateW = Math.max(...stations.map((s) => textWidth(s.head, 12, 'mono'))) + 14;
+    const dateW = Math.max(...stations.map((s) => textWidth(s.head, sm, 'mono'))) + 14;
     const x0 = L + dateW; // start of the time area
     const ax0 = x0 + (hasEarlier ? 22 : 8);
     const ax1 = W - L - 6;
     const years = [...stations.filter((s) => !s.earlier).map((s) => s.at), input.today].map((d) => Number(d.slice(0, 4)));
     const ts = timeScale(`${Math.min(...years)}-01-01`, `${Math.max(...years) + 1}-01-01`, [ax0, ax1]);
-    const asX = ts.map(input.today);
+    const asOf = asOfMark(ts, input.today, input.lang, { width: W, axis: 'x', pad: L });
+    const asX = asOf.at;
     maskAt = asX;
     const dotX = (s: Station) => (s.earlier ? x0 + 7 : ts.map(s.at));
 
@@ -328,8 +335,8 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
     const bx = ax0 - 11;
     for (const t of ts.ticks) {
       const tx = ts.map(t.date);
-      const clash = hasEarlier && tx - textWidth(t.label, 12, 'mono') / 2 < bx + 10;
-      out.push(text(tx, axisY - 6, t.label, { size: 12, cls: 'num muted', anchor: clash ? 'start' : 'middle', where: 'tick' }));
+      const clash = hasEarlier && tx - textWidth(t.label, sm, 'mono') / 2 < bx + 10;
+      out.push(text(tx, axisY - 6, t.label, { size: sm, cls: 'num muted', anchor: clash ? 'start' : 'middle', where: 'tick' }));
     }
     out.push(`<line class="axis" x1="${r1(ax0)}" y1="${r1(axisY)}" x2="${r1(ax1)}" y2="${r1(axisY)}"/>`);
     if (hasEarlier) {
@@ -365,9 +372,9 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
       });
       const rowH = (side === 'under' ? 1 : 0) * PITCH + lines.length * PITCH;
       const dy = top + PITCH / 2;
-      rowsOut.push(text(L, dy + 4, s.head, { size: 12, cls: 'mono', weight: 600, where: 'station date' }));
+      rowsOut.push(text(L, dy + 4, s.head, { size: sm, cls: 'mono', weight: 600, where: 'station date' }));
       // A leader from the date to the dot, then the dot on the axis's time.
-      const lead0 = L + textWidth(s.head, 12, 'mono') + 6;
+      const lead0 = L + textWidth(s.head, sm, 'mono') + 6;
       const lead1 = side === 'left' ? Math.min(dx - 12 - (lines[0].reduce((sum, it) => sum + it.w, 0) + (lines[0].length - 1) * GAP), dx) - 4 : dx - 6;
       if (lead1 > lead0 + 4) rowsOut.push(`<line class="rule" x1="${r1(lead0)}" y1="${r1(dy)}" x2="${r1(lead1)}" y2="${r1(dy)}"/>`);
       // The date's pin on the time axis: a short solid bar, unlike any chip.
@@ -381,12 +388,9 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
     // the text over it keeps full contrast).
     if (nNow > 0) rules.unshift(`<rect x="${r1(x0)}" y="${r1(axisY)}" width="${r1(asX - x0)}" height="${r1(y - 3 - axisY)}" class="panel"/>`);
     // The as-of line from the counts to below the rows, with its label.
-    const todayLine = `<line class="today" x1="${r1(asX)}" y1="${r1(axisY - 44)}" x2="${r1(asX)}" y2="${r1(y + 4)}"/>`;
-    out.push(...rules, todayLine, ...rowsOut, ...chips);
-    const tw = textWidth(todayText, 12, 'mono');
-    const tx = asX + 6 + tw <= W - L ? asX + 6 : Math.max(L, asX - 6 - tw);
+    out.push(...rules, asOf.line([[axisY - 44, y + 4]]), ...rowsOut, ...chips);
     y += 18;
-    out.push(text(tx, y, todayText, { size: 12, cls: 'mono', where: 'today label' }));
+    out.push(asOf.beside(y));
     bottom = y;
   } else {
     // The agenda: a spine, one block per station, chips flowing in lines.
@@ -406,7 +410,7 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
       y += 22;
       out.push(`<circle cx="${spineX}" cy="${r1(y - 4)}" r="4" class="mk mk-hi"/>`);
       lastDot = y - 4;
-      out.push(text(x0, y, s.head, { size: 12, cls: 'mono', weight: 600, where: 'station date' }));
+      out.push(text(x0, y, s.head, { size: sm, cls: 'mono', weight: 600, where: 'station date' }));
       const lines = flow(items(s), room);
       if (!lines) throw new Error(`charts(${where}): a chip of ${s.head} is wider than ${room}px`);
       lines.forEach((line, i) => {
@@ -424,7 +428,7 @@ export function regulatoryClock(input: RegulatoryClockInput): ChartOutput {
     stations.filter((s) => s.now).forEach(block);
     y += 14;
     out.push(`<line class="today" x1="${L}" y1="${r1(y)}" x2="${r1(W - L)}" y2="${r1(y)}"/>`);
-    out.push(text(L, y + 16, todayText, { size: 12, cls: 'mono', where: 'today label' }));
+    out.push(text(L, y + 16, todayText, { size: sm, cls: 'mono', where: 'as-of label' }));
     y += 20;
     if (nLater > 0) headRow(nLater, WORDS.later);
     stations.filter((s) => !s.now).forEach(block);

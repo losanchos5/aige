@@ -333,3 +333,18 @@
 .tb-sources-wrap {
   max-width: var(--prose);
 }
+
+/* Framework grid (CSA AICM or ISO/IEC 42001): a CSS-only radio pair shows
+   one panel; without :has() support both stay visible. */
+.tb-fw-view:has(#tb-fw-aicm:checked) .tb-fw-panel[data-fw='iso'],
+.tb-fw-view:has(#tb-fw-iso:checked) .tb-fw-panel[data-fw='aicm'] {
+  display: none;
+}
+.tb-fw-key {
+  margin-top: var(--s-2);
+  max-width: 72ch;
+  font-size: var(--fs-small);
+}
+.tb-fw-key-h {
+  font-weight: 600;
+}

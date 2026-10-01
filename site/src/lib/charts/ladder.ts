@@ -5,7 +5,15 @@
 // text. Vertical (narrow): one row per step, top to bottom, each with an
 // n-of-N meter that fills as the steps climb, so the ascent survives the
 // change of direction.
+//
+// Cumulative steps (design D7, the AutonomyLadder): a step may list what it
+// `adds` over the steps below, one "+ item" line each; with `cumulative`,
+// every step after the first opens that list with "Previous, plus:" ("Lo
+// anterior, más:"), so each step reads as everything below it and more. The
+// table then gains an Adds column (the step's own additions, "; "-joined).
 import {
+  NARROW_WIDTH,
+  minText,
   assemble,
   fitText,
   linkText,
@@ -27,6 +35,8 @@ export interface LadderStep {
    *  <g data-step="key"> so a page script can light the step (the triage
    *  ladder); a step without a key is drawn exactly as before. */
   key?: string;
+  /** What this step adds over the steps below, one line each. */
+  adds?: string[];
 }
 
 export interface LadderInput extends ChartBase {
@@ -40,7 +50,17 @@ export interface LadderInput extends ChartBase {
   orientation?: 'horizontal' | 'vertical';
   /** Table heading of the name column (default "Step"). */
   stepHeader?: string;
+  /** Open each step's adds after the first with "Previous, plus:" (or the
+   *  words given), so the ladder reads cumulatively. */
+  cumulative?: boolean | string;
+  /** Table heading of the adds column (default "Adds"). */
+  addsHeader?: string;
 }
+
+const LADDER_WORDS = {
+  en: { previous: 'Previous, plus:', adds: 'Adds' },
+  es: { previous: 'Lo anterior, más:', adds: 'Añade' },
+};
 
 const L = 12;
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -56,8 +76,21 @@ export function ladder(input: LadderInput): ChartOutput {
       throw new Error(`charts(ladder ${input.id}): step key "${step.key}" is not [a-z][a-z0-9-]*`);
     }
   }
+  const lw = LADDER_WORDS[input.lang === 'es' ? 'es' : 'en'];
+  const previous = typeof input.cumulative === 'string' ? input.cumulative : input.cumulative ? lw.previous : '';
+  /** The add lines of step i at `px` wide: the "previous" line (cumulative,
+   *  after the first step), then "+ item" per addition, wrapped. */
+  const addLines = (i: number, px: number): { line: string; lead: boolean }[] => {
+    const adds = input.steps[i].adds ?? [];
+    if (!adds.length) return [];
+    const lines: { line: string; lead: boolean }[] = [];
+    if (previous && i > 0) lines.push(...wrapText(previous, px, 12.5, 'mono', 2, 'step adds').map((line) => ({ line, lead: true })));
+    for (const add of adds) lines.push(...wrapText(`+ ${add}`, px, 12.5, 'body', 3, 'step adds').map((line) => ({ line, lead: false })));
+    return lines;
+  };
   const vertical = input.orientation === 'vertical';
-  const W = input.width ?? (vertical ? 340 : 640);
+  const W = input.width ?? (vertical ? NARROW_WIDTH : 640);
+  const sm = minText(W);
   const w = words(input.lang);
   const out: string[] = [];
   // The marks of one step, grouped when the step has a key.
@@ -72,7 +105,10 @@ export function ladder(input: LadderInput): ChartOutput {
       name: wrapText(s.label, stepW - 16, 13.5, 'body', 3, 'step label'),
       detail: s.detail ? wrapText(s.detail, stepW - 16, 12.5, 'body', 4, 'step detail') : [],
     }));
-    const textH = Math.max(...blocks.map((b) => 22 + b.name.length * 16 + (b.detail.length ? 6 + b.detail.length * 15 : 0)));
+    const adds = input.steps.map((_, i) => addLines(i, stepW - 16));
+    const textH = Math.max(
+      ...blocks.map((b, i) => 22 + b.name.length * 16 + (b.detail.length ? 6 + b.detail.length * 15 : 0) + (adds[i].length ? 6 + adds[i].length * 15 : 0)),
+    );
     const rise = 22;
     const top = 24 + (input.highlightLabel ? 18 : 0);
     const baseY = top + textH + 16 + (n - 1) * rise;
@@ -96,6 +132,11 @@ export function ladder(input: LadderInput): ChartOutput {
         ty += 15;
         els.push(text(tx, ty, line, { size: 12.5, cls: hi ? 'on-ink' : 'ink2', where: 'step detail' }));
       }
+      if (adds[i].length) ty += 6;
+      for (const a of adds[i]) {
+        ty += 15;
+        els.push(text(tx, ty, a.line, { size: 12.5, cls: hi ? (a.lead ? 'mono on-ink' : 'on-ink') : a.lead ? 'mono muted' : '', where: 'step adds' }));
+      }
       if (hi && input.highlightLabel) {
         els.push(text(x + stepW / 2, y - 8, input.highlightLabel, { size: 12, cls: 'mono', anchor: 'middle', where: 'highlight label' }));
       }
@@ -107,15 +148,16 @@ export function ladder(input: LadderInput): ChartOutput {
     const seg = 8;
     const meterW = n * (seg + 3) - 3;
     const tx = L + meterW + 12;
-    if (input.highlightLabel) fitText(input.highlightLabel, W - L - tx - 8, 12, 'mono', 'highlight label');
+    if (input.highlightLabel) fitText(input.highlightLabel, W - L - tx - 8, sm, 'mono', 'highlight label');
     let y = 8;
     input.steps.forEach((step, i) => {
       const hi = input.highlight === i;
       const head = `${pad2(i + 1)} ${step.label}`;
       const name = wrapText(head, W - L - tx - 8, 13.5, 'body', 2, 'step label');
       const detail = step.detail ? wrapText(step.detail, W - L - tx - 8, 12.5, 'body', 3, 'step detail') : [];
+      const adds = addLines(i, W - L - tx - 8);
       const extra = hi && input.highlightLabel ? 1 : 0;
-      const h = 14 + (name.length + extra) * 16 + detail.length * 15 + (detail.length ? 4 : 0);
+      const h = 14 + (name.length + extra) * 16 + detail.length * 15 + (detail.length ? 4 : 0) + adds.length * 15 + (adds.length ? 4 : 0);
       const els: string[] = [];
       if (hi) els.push(`<rect x="${L - 6}" y="${r1(y)}" width="${W - 2 * L + 12}" height="${r1(h)}" rx="6" class="panel"/>`);
       for (let k = 0; k < n; k += 1) {
@@ -130,12 +172,17 @@ export function ladder(input: LadderInput): ChartOutput {
       els.push(step.href ? linkText(nameEls.join(''), step.label, step.href) : nameEls.join(''));
       if (extra) {
         ty += 16;
-        els.push(text(tx, ty, input.highlightLabel!, { size: 12, cls: 'mono', where: 'highlight label' }));
+        els.push(text(tx, ty, input.highlightLabel!, { size: sm, cls: 'mono', where: 'highlight label' }));
       }
       if (detail.length) ty += 4;
       for (const line of detail) {
         ty += 15;
         els.push(text(tx, ty, line, { size: 12.5, cls: 'ink2', where: 'step detail' }));
+      }
+      if (adds.length) ty += 4;
+      for (const a of adds) {
+        ty += 15;
+        els.push(text(tx, ty, a.line, { size: 12.5, cls: a.lead ? 'mono muted' : '', where: 'step adds' }));
       }
       push(step, els);
       y += h + 6;
@@ -143,6 +190,7 @@ export function ladder(input: LadderInput): ChartOutput {
     bottom = y - 6;
   }
   const withDetail = input.steps.some((s) => s.detail);
+  const withAdds = input.steps.some((s) => s.adds?.length);
   const hiCol = input.highlight !== undefined;
   const { svg, height } = assemble({
     base: input,
@@ -156,11 +204,18 @@ export function ladder(input: LadderInput): ChartOutput {
     svg,
     table: table(
       input.tableCaption ?? input.title,
-      [w.level, input.stepHeader ?? w.step, ...(withDetail ? [w.detail] : []), ...(hiCol ? [w.highlighted] : [])],
+      [
+        w.level,
+        input.stepHeader ?? w.step,
+        ...(withDetail ? [w.detail] : []),
+        ...(withAdds ? [input.addsHeader ?? lw.adds] : []),
+        ...(hiCol ? [w.highlighted] : []),
+      ],
       input.steps.map((s, i) => [
         i + 1,
         s.label,
         ...(withDetail ? [s.detail ?? ''] : []),
+        ...(withAdds ? [(s.adds ?? []).join('; ')] : []),
         ...(hiCol ? [input.highlight === i ? input.highlightLabel ?? w.yes : ''] : []),
       ]),
     ),

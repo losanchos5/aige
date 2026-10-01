@@ -12,7 +12,10 @@
 // through <Section tone="tint">, so --muted stays AA there (DESIGN.md hard
 // constraint 3). The anchors other pages link to are fixed: who,
 // evaluation-environments, runtime-safeguards, assurance, incidents,
-// stack-map, open-questions and sources.
+// stack-map, open-questions and sources. Three chart-kit figures (OpenSpec
+// page-visuals-2, design D8): EvalBoundary at the head of
+// #evaluation-environments, the case x control matrix in #incidents and the
+// AIUC-1 waffle in #ecosystem.
 import Marketing from '../layouts/Marketing.astro';
 import '../styles/reading.css';
 import PageHero from '../components/PageHero.astro';
@@ -23,6 +26,8 @@ import SourceList from '../components/SourceList.astro';
 import FlowDiagram from '../components/FlowDiagram.astro';
 import ContributeCta from '../components/ContributeCta.astro';
 import CtaBand from '../components/CtaBand.astro';
+import Chart from '../components/Chart.astro';
+import EvalBoundary from '../components/EvalBoundary.astro';
 import { site } from '../data/site';
 import { layers } from '../data/stack';
 import {
@@ -36,8 +41,14 @@ import {
   frontierRoles,
   frontierSources,
   frontierStackMap,
+  LAB_NAMES,
   type FrontierLink,
 } from '../data/frontier';
+import { cases } from '../data/cases';
+import { CONTROLS_AS_OF, controlAnchorPath, controlsIn } from '../data/controls';
+import { AIUC1_INDEX, aiuc1Domains, aiuc1Requirements, type Aiuc1Domain } from '../data/aiuc1';
+import { casesForControl } from '../lib/cross-links';
+import { NARROW_WIDTH, dotMatrix } from '../lib/charts';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
 import { authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../lib/jsonld';
 import { fitsSiteSuffix } from '../lib/seo-title';
@@ -100,6 +111,89 @@ const stackRows = layers.map((layer) => ({
   href: `/bok/the-stack#${layer.chapterAnchor}`,
   swatch: `var(${layer.colorVar})`,
 }));
+
+// #incidents: which public cases name which evaluation environment control
+// (casesForControl, from each case's relatedControls). One row per control,
+// one square per case that names it, the cases always in the order of
+// data/cases.ts; each square links
+// to its case, named as #incidents lists it (the page's neutral labels, no
+// lab named) or else neutrally (caseLabel). The controls are linked in the key
+// under the chart. A HeatGrid of every case x control cell would pass the
+// 12 KB budget of one SVG (a tooltip per cell), so the waffle draws only the
+// named pairs.
+const evalControls = controlsIn('evaluation-environment');
+const shortId = (id: string) => id.replace(/^AIGE-CTL-/, '');
+const casesOf = new Map(evalControls.map((c) => [c.id, new Set(casesForControl(c.id).map((k) => k.id))]));
+const matrixCases = cases.filter((k) => evalControls.some((c) => casesOf.get(c.id)!.has(k.id)));
+const incidentTitles = new Map(
+  (frontierBlocks.find((b) => b.id === 'incidents')?.links ?? []).map((l) => [l.href, l.title]),
+);
+// A case the block does not list keeps its short label, unless that names a
+// lab (LAB_NAMES, the page's rule): then the part of its title after the
+// colon, which describes the failure.
+const caseLabel = (k: (typeof cases)[number]) => {
+  const listed = incidentTitles.get(`/cases/${k.id}`);
+  if (listed) return listed;
+  if (!LAB_NAMES.test(k.short)) return k.short;
+  const rest = k.title.split(': ').slice(1).join(': ');
+  const label = rest.charAt(0).toUpperCase() + rest.slice(1);
+  if (!rest || LAB_NAMES.test(label)) throw new Error(`frontier: no neutral label for case ${k.id}`);
+  return label;
+};
+const caseBase = {
+  title: 'Public cases by the evaluation control they name',
+  desc: `The ${evalControls.length} evaluation environment controls, each with one square per incident case that names it among its related controls; ${matrixCases.length} cases name at least one.`,
+  source: 'incident cases; Evaluation Environment Control Profile',
+  asOf: CONTROLS_AS_OF,
+  mode: 'figc' as const,
+  groups: evalControls.map((c) => ({
+    label: shortId(c.id),
+    items: matrixCases
+      .filter((k) => casesOf.get(c.id)!.has(k.id))
+      .map((k) => ({ label: caseLabel(k), status: 'Names the control', href: `/cases/${k.id}` })),
+  })),
+  groupHeader: 'Control',
+  tableCaption: 'Each evaluation environment control with the incident cases that name it',
+};
+const caseWide = dotMatrix({ ...caseBase, id: 'fr-cases-w', width: 480 });
+// Narrow, the SVG scales a little under 1 on a 320 px screen, so the default
+// 24-unit pitch lands under the 24 px of WCAG 2.5.8: a 28-unit pitch keeps
+// the squares' centres 24 px apart down to 0.86 scale.
+const caseNarrow = dotMatrix({ ...caseBase, id: 'fr-cases-n', width: NARROW_WIDTH, cell: 20, gap: 8 });
+const busiest = [...evalControls].sort((a, b) => casesOf.get(b.id)!.size - casesOf.get(a.id)!.size)[0];
+
+// #ecosystem: the AIUC-1 requirements by domain, one square each, the
+// retired ones in outline, as the public index listed them when it was read.
+// The squares do not link: 53 links to the requirements' public pages pass
+// the 12 KB budget of one SVG, so the index itself is linked under the chart.
+const domainKeys = Object.keys(aiuc1Domains) as Aiuc1Domain[];
+const aiucRetired = aiuc1Requirements.filter((r) => r.retired).length;
+const aiucBase = {
+  title: 'AIUC-1 requirements by domain',
+  desc: `The ${aiuc1Requirements.length} requirements of the AIUC-1 public index in its ${domainKeys.length} domains, ${aiucRetired} marked retired.`,
+  source: 'AIUC-1 public index',
+  asOf: AIUC1_INDEX.read,
+  mode: 'figc' as const,
+  groups: domainKeys.map((d) => ({
+    label: `${d} ${aiuc1Domains[d]}`,
+    items: aiuc1Requirements
+      .filter((r) => r.domain === d)
+      .map((r) => ({
+        label: `${r.id} ${r.title}`,
+        state: r.retired ? ('outline' as const) : ('filled' as const),
+        status: r.retired ? 'Retired' : 'Listed',
+      })),
+  })),
+  unit: 'requirements',
+  groupHeader: 'Domain',
+  legend: [
+    { label: 'Listed', state: 'filled' as const },
+    { label: 'Retired', state: 'outline' as const },
+  ],
+  tableCaption: 'Each AIUC-1 requirement by domain, listed or retired',
+};
+const aiucWide = dotMatrix({ ...aiucBase, id: 'fr-aiuc-w', width: 640 });
+const aiucNarrow = dotMatrix({ ...aiucBase, id: 'fr-aiuc-n', width: NARROW_WIDTH });
 ---
 
 <Marketing
@@ -136,6 +230,11 @@ const stackRows = layers.map((layer) => ({
   {
     frontierBlocks.map((block, i) => (
       <Section tone={blockTone(i)} id={block.id} title={block.title} lede={block.lede}>
+        {block.id === 'evaluation-environments' && (
+          <div class="fr-figure fr-figure-head">
+            <EvalBoundary id="fr-eval-boundary" />
+          </div>
+        )}
         <div class="prose fr-prose" data-pagefind-body>
           {block.paragraphs.map((p) => (
             <p>
@@ -143,6 +242,43 @@ const stackRows = layers.map((layer) => ({
             </p>
           ))}
         </div>
+        {block.id === 'incidents' && (
+          <div class="fr-figure">
+            <Chart
+              id="fr-cases"
+              title="Which case names which control"
+              caption={`One row per evaluation environment control, one square per public incident case that names it; the number is how many cases name the control. ${shortId(busiest.id)} ${busiest.title} is named by ${casesOf.get(busiest.id)!.size} of the ${matrixCases.length} cases; select a square to open the case.`}
+              chart={caseWide}
+              narrow={caseNarrow}
+            />
+            <p class="fr-key">
+              The controls:{' '}
+              {evalControls.map((c, k) => (
+                <>
+                  <a href={controlAnchorPath(c)}>
+                    {shortId(c.id)} {c.title}
+                  </a>
+                  {k < evalControls.length - 1 ? '; ' : '.'}
+                </>
+              ))}
+            </p>
+          </div>
+        )}
+        {block.id === 'ecosystem' && (
+          <div class="fr-figure">
+            <Chart
+              id="fr-aiuc"
+              title="AIUC-1 at a glance"
+              caption={`One square per requirement of the public index, by domain; the ${aiucRetired} retired ones in outline. Where the standard is thick and where it is thin, as its own index lists it.`}
+              chart={aiucWide}
+              narrow={aiucNarrow}
+            />
+            <p class="fr-key">
+              Each requirement's own page is listed in the{' '}
+              <a href={AIUC1_INDEX.url}>AIUC-1 public index</a>, read on {AIUC1_INDEX.read}.
+            </p>
+          </div>
+        )}
         <div class="well fr-links">
           <RegisterList items={toRows(block.links)} />
         </div>
@@ -221,6 +357,30 @@ const stackRows = layers.map((layer) => ({
 
   .fr-links {
     margin-top: var(--s-6);
+  }
+
+  .fr-figure {
+    margin-top: var(--s-6);
+  }
+
+  .fr-figure-head {
+    margin: 0 0 var(--s-6);
+  }
+
+  .fr-figure > :global(figure) {
+    margin: 0;
+  }
+
+  .fr-key {
+    max-width: var(--prose);
+    margin: var(--s-3) 0 0;
+    color: var(--ink-2);
+  }
+
+  .fr-key a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
   }
 
   .fr-questions > * + * {

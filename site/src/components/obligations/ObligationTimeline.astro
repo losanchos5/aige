@@ -15,6 +15,7 @@ import Chart from '../Chart.astro';
 import { appliesStatusLabels, systemClassLabels, type Obligation } from '../../data/frameworks';
 import { obligationStrip, type StripEvent } from '../../lib/page-charts/obligation-strip';
 import '../../styles/obligation-visuals.css';
+import { NARROW_WIDTH } from '../../lib/charts';
 
 interface Props {
   row: Obligation;
@@ -54,7 +55,7 @@ const base = events.length
     }
   : undefined;
 const wide = base && obligationStrip({ ...base, id: 'obs-w', width: 720 });
-const narrow = base && obligationStrip({ ...base, id: 'obs-n', width: 340 });
+const narrow = base && obligationStrip({ ...base, id: 'obs-n', width: NARROW_WIDTH });
 ---
 
 {

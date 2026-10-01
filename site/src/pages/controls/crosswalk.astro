@@ -6,7 +6,11 @@
 // once control pages exist), then the reverse view: each profile's controls
 // with their ids per framework. The Markdown twin (/controls/crosswalk.md) and
 // the `crosswalk` key of /api/v1/controls.json are built from the same
-// function. Static: no client script, the framework index is plain anchors.
+// function. Static: no client script. Three visuals read the same crosswalk
+// (lib/page-visuals/controls-flows.ts): the flow from the profiles to the
+// frameworks after #about, the framework index as a framework x profile heat
+// map (ControlsCrosswalkIndex, every row a link to its table) and the clauses
+// with the most controls, each linked to its row (id <framework>--<ref>).
 //
 // Illustrative, not a claim of conformity. The tables reuse the mobile card
 // pattern of the profile pages (res-table, `data-label` cells).
@@ -14,7 +18,10 @@ import Doc from '../../layouts/Doc.astro';
 import Byline from '../../components/Byline.astro';
 import Callout from '../../components/Callout.astro';
 import ContributeCta from '../../components/ContributeCta.astro';
+import Chart from '../../components/Chart.astro';
+import ControlsCrosswalkIndex from '../../components/controls/ControlsCrosswalkIndex.astro';
 import {
+  CONTROLS_AS_OF,
   type Control,
   controlById,
   controlPath,
@@ -37,6 +44,8 @@ import {
 } from '../../lib/controls-crosswalk';
 import { machineLinks, machineEvent, CONTROLS_DATASET_PATH, CONTROLS_SCHEMA_PATH } from '../../lib/controls-md';
 import { collectionPage } from '../../lib/jsonld';
+import { flow, lollipop, NARROW_WIDTH } from '../../lib/charts';
+import { clauseAnchor, clauseLabel, profileFlow, topClauses, FLOW_FRAMEWORKS, TOP_CLAUSES } from '../../lib/page-visuals/controls-flows';
 import '../../styles/resources.css';
 
 // Literals, so lib/llms-routes.ts can read them; they must equal the lib's.
@@ -70,6 +79,49 @@ function control(id: string): Control {
 
 const external = (url: string) => (/^https?:\/\//.test(url) ? { rel: 'noopener' } : {});
 const pairsOf = (fw: CrosswalkFramework) => fw.rows.reduce((n, r) => n + r.controls.length, 0);
+
+// Every clause row carries an id so the lollipop (and anyone) can link to it.
+const anchors = new Set<string>();
+for (const fw of crosswalk.frameworks) {
+  for (const r of fw.rows) {
+    const id = clauseAnchor(fw, r);
+    if (anchors.has(id)) throw new Error(`controls/crosswalk: two clause rows share the anchor ${id}`);
+    anchors.add(id);
+  }
+}
+
+// The profiles to the frameworks (hero, after #about).
+const profileFlowInput = profileFlow();
+const flowTitle = 'From the profiles to the frameworks';
+const flowChart = {
+  ...profileFlowInput,
+  title: flowTitle,
+  desc: 'A flow from each control profile to the frameworks its controls map to, band width the number of mappings.',
+  asOf: CONTROLS_AS_OF,
+};
+const flowWide = flow({ ...flowChart, id: 'cw-flow-w', width: 640, layout: 'wide' });
+const flowNarrow = flow({ ...flowChart, id: 'cw-flow-n', width: NARROW_WIDTH, layout: 'narrow' });
+const otherCount = crosswalk.frameworks.length - FLOW_FRAMEWORKS;
+const flowCaption = `Each band is the mappings the controls of one profile make to one framework. The ${FLOW_FRAMEWORKS} frameworks with the most mappings are drawn by name${
+  otherCount > 0 ? `, the other ${otherCount} together` : ''
+}; each links to its table below.`;
+
+// The clauses with the most controls (after the index, before #obligations).
+const LOLLIPOP_LABEL = NARROW_WIDTH - 30;
+const top = topClauses();
+const clauseItems = top.map((c) => ({ label: clauseLabel(c.fw, c.row, LOLLIPOP_LABEL), value: c.controls, href: `#${clauseAnchor(c.fw, c.row)}` }));
+const clauseChart = {
+  title: 'The most covered clauses',
+  desc: `The ${TOP_CLAUSES} clauses or ids that the most controls map to, largest first, ties in the order of the framework tables.`,
+  source: 'Open control profiles (data/controls)',
+  asOf: CONTROLS_AS_OF,
+  items: clauseItems,
+  unit: 'controls',
+  itemHeader: 'Clause or id',
+};
+const clausesWide = lollipop({ ...clauseChart, id: 'cw-top-w', width: 640, labelWidth: 260 });
+const clausesNarrow = lollipop({ ...clauseChart, id: 'cw-top-n', width: NARROW_WIDTH });
+const clauseCaption = `The ${TOP_CLAUSES} clauses or ids with the most controls mapped to them, ties in the order of the framework tables below; each links to its row in those tables.`;
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
 // The dataset and schema links, with the Umami attributes the profile pages use.
@@ -149,30 +201,11 @@ const jsonLd = collectionPage({
     <a href="/resources/crosswalk">the framework crosswalk</a>.
   </p>
 
+  <Chart title={flowTitle} caption={flowCaption} chart={flowWide} narrow={flowNarrow} />
+
   <h2 id="frameworks">Frameworks</h2>
-  <ul class="cw-index">
-    {
-      obligationFrameworks.length > 0 && (
-        <li>
-          <a href="#obligations">Obligation register</a>
-          <ul>
-            {obligationFrameworks.map((fw) => (
-              <li>
-                <a href={`#${fw.id}`}>{fw.name}</a> <span class="cw-count">({plural(fw.rows.length, 'id')})</span>
-              </li>
-            ))}
-          </ul>
-        </li>
-      )
-    }
-    {
-      otherFrameworks.map((fw) => (
-        <li>
-          <a href={`#${fw.id}`}>{fw.name}</a> <span class="cw-count">({plural(fw.rows.length, 'id')})</span>
-        </li>
-      ))
-    }
-  </ul>
+  <ControlsCrosswalkIndex />
+  <Chart title={clauseChart.title} caption={clauseCaption} chart={clausesWide} narrow={clausesNarrow} />
 
   {
     sections.map(({ fw, level }, i) => {
@@ -219,7 +252,7 @@ const jsonLd = collectionPage({
                 </thead>
                 <tbody>
                   {fw.rows.map((r) => (
-                    <tr>
+                    <tr id={clauseAnchor(fw, r)}>
                       <td class="c-name" data-label="Clause or id">
                         <span>
                           <span class="cp-ids">
@@ -361,11 +394,6 @@ const jsonLd = collectionPage({
     margin-top: 0;
   }
 
-  .cw-index ul {
-    margin-top: var(--s-2);
-  }
-
-  .cw-count,
   .cw-meta {
     color: var(--ink-2);
   }

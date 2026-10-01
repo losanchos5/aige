@@ -31,6 +31,7 @@ import { fitsSiteSuffix } from '../../lib/seo-title';
 import { aiActMilestones } from '../../data/ai-act-timeline';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
+import { NARROW_WIDTH } from '../../lib/charts';
 
 // The catalogue counts every tool once, the curated indexes included, so the
 // card matches the lede of /resources/tools.
@@ -262,7 +263,7 @@ const corpus = {
   rows: corpusRows,
 };
 const corpusWide = corpusIsotype({ ...corpus, id: 'rc-corpus-w', width: 760 });
-const corpusNarrow = corpusIsotype({ ...corpus, id: 'rc-corpus-n', width: 340 });
+const corpusNarrow = corpusIsotype({ ...corpus, id: 'rc-corpus-n', width: NARROW_WIDTH });
 
 // Home > Resources, as on the sibling hubs (/toolkit, /bok, /resources/*):
 // the same crumbs drive the visible trail and the BreadcrumbList, which

@@ -33,8 +33,9 @@ const { def, rows, counts } = cmp;
 
 const ORDER: OverlapLevel[] = ['strong', 'partial', 'a-only', 'b-only'];
 // The group's swatch: the same state the overlap bar at the top of the page
-// draws for that level.
-const SWATCH: Record<OverlapLevel, string> = { strong: 'fill', partial: 'hatch', 'a-only': 'line', 'b-only': 'dash' };
+// draws for that level. Never the hatch: in this figure it means a related
+// clause, so a level drawn hatched would read as two things.
+const SWATCH: Record<OverlapLevel, string> = { strong: 'fill', partial: 'line', 'a-only': 'dash', 'b-only': 'dot' };
 
 const split = (list: SideRef[]) => {
   const core = list.filter((s) => s.ref.strength === 'core').length;
@@ -250,8 +251,8 @@ const squares = (n: { core: number; related: number }) => [
   .cb-sw {
     align-self: center;
     display: inline-block;
-    width: 22px;
-    height: 12px;
+    width: 28px;
+    height: 18px;
     border-radius: 2px;
     box-sizing: border-box;
   }
@@ -398,6 +399,19 @@ const squares = (n: { core: number; related: number }) => [
 
     .cb-side.cb-a {
       border-right: 0;
+    }
+  }
+
+  /* A 320 px phone: nine squares a side must fit half the card. */
+  @container (max-width: 359px) {
+    .cb-plot {
+      --sq: 9px;
+      --sq-gap: 2px;
+    }
+
+    .cb-side {
+      gap: 4px;
+      padding: 0 4px;
     }
   }
 

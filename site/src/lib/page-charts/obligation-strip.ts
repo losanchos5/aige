@@ -18,8 +18,9 @@
 // the wording, never cut it). Built on the chart kit's shell and helpers
 // (src/lib/charts/core.ts); per-item, so nothing is registered in figures.ts.
 import {
+  asOfMark,
+  minText,
   assemble,
-  besideLine,
   fitText,
   markStyles,
   nonEmpty,
@@ -70,10 +71,10 @@ export function obligationStrip(input: ObligationStripInput): ChartOutput {
   nonEmpty(input.events, 'events', where);
   const W = input.width ?? 720;
   const wide = W >= WIDE_AT;
+  const sm = minText(W);
   const events = [...input.events].sort(chrono);
   const marks = markStyles(input.id);
   const out: string[] = [];
-  const asOf = `As of ${input.marker}`;
   parseDay(input.marker, 'strip marker');
   if (input.marker < input.from) throw new Error(`charts(${where}): marker ${input.marker} falls before ${input.from}`);
   const earlier = (e: StripEvent) => e.date < input.from;
@@ -109,7 +110,8 @@ export function obligationStrip(input: ObligationStripInput): ChartOutput {
     const ex = L + 26;
     const x1 = W - L - 8;
     const ts = timeScale(input.from, input.to, [x0, x1]);
-    const xm = ts.map(input.marker);
+    const asOf = asOfMark(ts, input.marker, input.lang, { width: W, axis: 'x', pad: L });
+    const xm = asOf.at;
     const n = events.length;
     const bw = Math.min(n === 1 ? 320 : 280, (W - 2 * L - (n - 1) * 16) / n);
     const blocks = events.map((e) => ({ e, x: earlier(e) ? ex + slot(e) * EARLY_STEP : ts.map(e.date), b: block(e, bw, 5) }));
@@ -138,24 +140,21 @@ export function obligationStrip(input: ObligationStripInput): ChartOutput {
     for (const t of ts.ticks) {
       const x = ts.map(t.date);
       out.push(`<line class="tick" x1="${r1(x)}" y1="${r1(axisY)}" x2="${r1(x)}" y2="${r1(axisY + 5)}"/>`);
-      out.push(text(x, axisY + 19, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+      out.push(text(x, axisY + 19, t.label, { size: sm, cls: 'num muted', anchor: 'middle', where: 'tick' }));
     }
     if (hasEarlier) {
       out.push(`<line class="axis" x1="${ex - 10}" y1="${r1(axisY)}" x2="${ex + span + 10}" y2="${r1(axisY)}"/>`);
       out.push(`<path class="rule" fill="none" d="M${x0 - 16} ${r1(axisY + 5)}l6 -10M${x0 - 11} ${r1(axisY + 5)}l6 -10"/>`);
-      out.push(text(ex + span / 2, axisY + 19, EARLIER, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+      out.push(text(ex + span / 2, axisY + 19, EARLIER, { size: sm, cls: 'num muted', anchor: 'middle', where: 'tick' }));
     }
-    out.push(`<line class="today" x1="${r1(xm)}" y1="${r1(axisY - 14)}" x2="${r1(xm)}" y2="${r1(axisY + 26)}"/>`);
-    fitText(asOf, W - 2 * L, 12, 'mono', 'as-of label');
-    out.push(text(besideLine(xm, textWidth(asOf, 12, 'mono'), W, L), axisY + 38, asOf, { size: 12, cls: 'mono', where: 'as-of label' }));
+    out.push(asOf.line([[axisY - 14, axisY + 26]]), asOf.beside(axisY + 38));
     for (const { e, x } of blocks) out.push(mark(e, x, axisY));
     bottom = axisY + 38;
   } else {
-    // The as-of key over the axis, then time top to bottom.
-    out.push(`<line class="today" x1="${L}" y1="14" x2="${L + 22}" y2="14"/>`);
-    out.push(text(L + 28, 18, asOf, { size: 12, cls: 'mono', where: 'as-of label' }));
+    // The as-of key over the axis (drawn once the scale exists), then time
+    // top to bottom.
     // Room left of the axis for the widest tick label ("Earlier" or a year).
-    const axisX = L + Math.max(44, Math.ceil(textWidth(hasEarlier ? EARLIER : '2024', 12, 'mono')) + 16);
+    const axisX = L + Math.max(44, Math.ceil(textWidth(hasEarlier ? EARLIER : '2024', sm, 'mono')) + 16);
     const labelX = axisX + 22;
     const bw = W - L - labelX;
     const blocks = events.map((e) => ({ e, b: block(e, bw, 6) }));
@@ -171,15 +170,15 @@ export function obligationStrip(input: ObligationStripInput): ChartOutput {
     if (hasEarlier) {
       out.push(`<line class="axis" x1="${axisX}" y1="${ey - 8}" x2="${axisX}" y2="${ey + eSpan + 8}"/>`);
       out.push(`<path class="rule" fill="none" d="M${axisX - 5} ${start - 9}l10 -6M${axisX - 5} ${start - 14}l10 -6"/>`);
-      out.push(text(axisX - 12, ey + 4, EARLIER, { size: 12, cls: 'num muted', anchor: 'end', where: 'tick' }));
+      out.push(text(axisX - 12, ey + 4, EARLIER, { size: sm, cls: 'num muted', anchor: 'end', where: 'tick' }));
     }
     for (const t of ts.ticks) {
       const ty = ts.map(t.date);
       out.push(`<line class="tick" x1="${axisX - 5}" y1="${r1(ty)}" x2="${axisX}" y2="${r1(ty)}"/>`);
-      out.push(text(axisX - 8, ty + 4, t.label, { size: 12, cls: 'num muted', anchor: 'end', where: 'tick' }));
+      out.push(text(axisX - 8, ty + 4, t.label, { size: sm, cls: 'num muted', anchor: 'end', where: 'tick' }));
     }
-    const ym = ts.map(input.marker);
-    out.push(`<line class="today" x1="${axisX - 8}" y1="${r1(ym)}" x2="${labelX - 6}" y2="${r1(ym)}"/>`);
+    const asOf = asOfMark(ts, input.marker, input.lang, { width: W, axis: 'y', pad: L });
+    out.push(...asOf.key(4).els, asOf.line([[axisX - 8, labelX - 6]]));
     let prev = -Infinity;
     const leaders: string[] = [];
     for (const { e, b } of blocks) {

@@ -17,7 +17,7 @@
 // in the table. A harm or an artefact is drawn by its head phrase
 // (labels.ts), so "Policy card for the risk model listing ..." draws "Policy
 // card". Nothing is typed by hand: every word comes from the record.
-import { bowTie, type ChartOutput, type EvidenceItem, type FlowItem } from '../charts';
+import { NARROW_WIDTH, bowTie, type ChartOutput, type EvidenceItem, type FlowItem } from '../charts';
 import { layerWord } from '../charts/core';
 import { harms, levelLabel, type ControlRef } from '../../data/harms';
 import { patternPath } from '../../data/patterns';
@@ -31,7 +31,7 @@ import { headPhrase } from './labels';
  *  spread thin. Narrow: the phone column, also shown in the reading column
  *  below that width. */
 export const bowTieWidth = (panels: number): number => Math.max(900, 500 + 100 * panels);
-export const BOWTIE_NARROW = 340;
+export const BOWTIE_NARROW = NARROW_WIDTH;
 /** Items drawn per panel: every item the cases record today (at most five
  *  controls or artefacts), so the evidence panel shows every artefact. */
 const MAX_ITEMS = 5;

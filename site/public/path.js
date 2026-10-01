@@ -86,6 +86,7 @@
       tSkip += skip;
       var denom = sNodes.length - skip;
       var pct = denom > 0 ? done / denom : 0;
+      rings[sid] = [done, denom, Math.round(pct * 100)];
       setMeter(stage.querySelector('[data-stage-meter="' + esc(sid) + '"]'), pct);
       var txt = stage.querySelector('[data-stage-progress="' + esc(sid) + '"]');
       if (txt) txt.textContent = Math.round(pct * 100) + '%';
@@ -95,6 +96,55 @@
     setMeter(root.querySelector('[data-path-total]'), tPct);
     var tTxt = root.querySelector('[data-path-total-text]');
     if (tTxt) tTxt.textContent = Math.round(tPct * 100) + '%';
+    rings.total = [tDone, tDenom, Math.round(tPct * 100)];
+    applyRings();
+  }
+
+  /* ---- progress rings (PathRings.astro, above the map) ----
+     Each ring is set in place, never animated: the arc's stroke-dasharray
+     (pathLength 100), its percentage and done/counted texts, and the row of
+     the table under it (same order as the arcs). A change after the first
+     pass is announced in the polite live region: the stages that moved, then
+     the whole path. */
+  var ringBox = document.querySelector('[data-path-rings]');
+  var rings = {};
+  var shown = null;
+  function applyRings() {
+    if (!ringBox) return;
+    var keys = [], moved = [], names = {};
+    var arcs = ringBox.querySelectorAll('.chart-w [data-ring]');
+    for (var i = 0; i < arcs.length; i++) keys.push(arcs[i].getAttribute('data-ring'));
+    var trs = ringBox.querySelectorAll('.chart-table tbody tr');
+    for (var k = 0; k < keys.length; k++) {
+      var key = keys[k], r = rings[key];
+      if (!r) continue;
+      var sel = '="' + esc(key) + '"]';
+      var each = function (attr, fn) {
+        var els = ringBox.querySelectorAll('[' + attr + sel);
+        for (var j = 0; j < els.length; j++) fn(els[j]);
+      };
+      each('data-ring', function (el) {
+        el.setAttribute('stroke-dasharray', r[2] + ' 100');
+      });
+      each('data-ring-label', function (el) {
+        el.textContent = r[2] + '%';
+      });
+      each('data-ring-count', function (el) {
+        el.textContent = r[0] + '/' + r[1];
+      });
+      var tr = trs[k];
+      if (tr) {
+        names[key] = tr.firstElementChild ? tr.firstElementChild.textContent : key;
+        var tds = tr.querySelectorAll('td');
+        for (var t = 0; t < tds.length && t < 3; t++) tds[t].textContent = String(r[t]);
+      }
+      if (shown && shown[key] !== r[2] && key !== 'total') moved.push(names[key] + ' ' + r[2] + '%');
+    }
+    var live = ringBox.querySelector('[data-ring-live]');
+    if (live && shown && rings.total && shown.total !== rings.total[2]) moved.push('whole path ' + rings.total[2] + '%');
+    if (live && moved.length) live.textContent = 'Progress: ' + moved.join(', ') + ' done.';
+    shown = {};
+    for (var s in rings) shown[s] = rings[s][2];
   }
 
   /* ---- drawer (focus trap ported from public/ui-doc.js) ---- */

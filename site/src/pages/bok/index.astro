@@ -4,6 +4,9 @@ import Base from '../../layouts/Base.astro';
 import '../../styles/reading.css';
 import Figure from '../../components/Figure.astro';
 import SignNote from '../../components/SignNote.astro';
+import Chart from '../../components/Chart.astro';
+import { bookSpine, NARROW_WIDTH } from '../../lib/charts';
+import { bokSpineParts } from '../../lib/page-visuals/book-spine';
 import { site } from '../../data/site';
 import { chaptersOrdered, getChapter } from '../../data/chapters';
 import { bookParts, chapterNum, countWord } from '../../data/parts';
@@ -15,6 +18,21 @@ import { fitsSiteSuffix } from '../../lib/seo-title';
 
 const entries = await getCollection('bok');
 const minutes = new Map(entries.map((entry) => [entry.id, readingTime(entry.body ?? '')]));
+
+// The book's spine (page-visuals-2, block E): one bar per chapter, its length
+// the reading minutes the chapter cards print, grouped by part.
+const spineParts = bokSpineParts(minutes);
+const totalMinutes = [...minutes.values()].reduce((sum, m) => sum + m, 0);
+const spineBase = {
+  title: 'Reading minutes per chapter',
+  desc: 'The chapters of the Body of Knowledge in order, grouped by part, each bar its reading time in minutes.',
+  parts: spineParts,
+  encoding: 'bars' as const,
+  unit: 'min',
+  valueHeader: 'Minutes',
+};
+const spineWide = bookSpine({ ...spineBase, id: 'bok-spine-w' });
+const spineNarrow = bookSpine({ ...spineBase, id: 'bok-spine-n', width: NARROW_WIDTH, orientation: 'vertical' });
 
 const preface = getChapter('00-preface');
 const intro =
@@ -146,6 +164,14 @@ const jsonLd = [
         </ol>
       </nav>
     </header>
+
+    <Chart
+      class="bok-spine"
+      chart={spineWide}
+      narrow={spineNarrow}
+      title="The book at a glance"
+      caption={`${chapterCount} chapters in ${partsWord} parts, about ${totalMinutes} minutes of reading in all; each bar is one chapter's reading time. Select a bar to open the chapter.`}
+    />
 
     {
       bookParts.map((part) => (

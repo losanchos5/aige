@@ -8,9 +8,10 @@
 //   mode     'figc' (default; page must load figures.css, e.g. via reading.css)
 //            or 'chart' (chart.css only; required on /, /resources,
 //            /resources/crosswalk, /cases and /patterns, see tests/perf.spec.ts)
-//   width    viewBox width; 340 gives the phone variant (1:1 text at 390 px)
+//   width    viewBox width; NARROW_WIDTH (280) gives the phone variant, whose
+//            text is at least NARROW_TEXT (12.5; minText(W) picks the size)
 //   lang     'es' prints every fixed word in Spanish ("A fecha de", "Fuente:",
-//            "Hoy", table headings such as "Fecha", "Total", "no aplica")
+//            table headings such as "Fecha", "Total", "no aplica")
 // and returns ChartOutput { svg, table, width, height } where table is
 // { caption, columns, rows } holding exactly the data drawn.
 //
@@ -25,7 +26,9 @@
 // 24 px pitch when marks link), else the build throws naming both marks.
 // Chart.astro enforces the rest at the page: a wide chart over 360 units needs
 // a narrow variant or scroll, a pair must share one table, ids are unique on
-// the page, and every rendered SVG stays within 12 KB (VISUAL-GUIDE §1.12).
+// the page, every rendered SVG stays within 12 KB (VISUAL-GUIDE §1.12), and
+// the SVG a phone shows keeps its smallest text at 12 px or more on a 320 px
+// screen (the narrow one at NARROW_WIDTH with text of 12.5 passes).
 //
 // Primitives (see each module's interface for every option):
 //
@@ -42,6 +45,8 @@
 //
 //   rankedBars / lollipop({ items: [{ label, value, tone?, state?, highlight?, href? }],
 //                          unit, percent?, sort? })
+//     A linked item is one whole-row target (label, mark, value), 24 high or
+//     more; value labels step past a gridline they would sit on.
 //   stackedBars / stacked100({ series: [{ label, tone?, state? }],
 //                              items: [{ label, values: number[] }], unit })
 //   divergingBars({ left: { label }, right: { label },
@@ -52,6 +57,8 @@
 //     label column defaults to 40 % of the width (at most 260).
 //
 //   timeStrip({ from, to, events: TimePoint[], today?, orientation? })
+//     `today` (here and in dumbbell) is the data's as-of date, drawn by
+//     asOfMark: a dashed line.today labelled "As of YYYY-MM-DD".
 //   beeswarm({ from, to, points: TimePoint[], today?, orientation?, legend? })
 //   timeLanes({ from, to, lanes: [{ label, items: [{ label, start, end?, ... }] }], today?,
 //               labels?: 'inline' (default, label next to each mark) | 'none' })
@@ -66,13 +73,18 @@
 //
 //   venn3({ sets: [A, B, C], items: [{ label, sets: string[] }], layout: 'venn' | 'euler' | 'upset',
 //           unit, callouts? })
-//     Three-set overlap; 'upset' is the narrow variant (same table). 'euler'
+//     Three-set overlap; 'upset' is the narrow variant (same table, a key
+//     saying filled dot = in the set, hollow = not). 'euler'
 //     draws nested ellipses when nestedChain(sets, items) finds the sets
 //     strictly nested (no empty region), and the Venn otherwise.
 //
-//   ladder({ steps: [{ label, detail?, href?, key? }], highlight?, highlightLabel?, orientation? })
+//   ladder({ steps: [{ label, detail?, href?, key?, adds? }], highlight?, highlightLabel?,
+//            orientation?, cumulative? })
 //     Ascending steps; 'vertical' is the narrow variant.
 //     A step key wraps its marks in <g data-step> for a page script to light.
+//     `adds` lists what a step adds ("+ item" lines, and an Adds table
+//     column); `cumulative` opens each later step's list with "Previous,
+//     plus:" (AutonomyLadder).
 //
 //   relationRadial({ centre: { label }, families: [{ label, layered?, relationLabels?,
 //                    items: [{ label, name?, href?, strength?: 'core' | 'related', tone? }] }],
@@ -92,20 +104,78 @@
 //                  stageLabels?, verification, decision: { label, state? }, evidence, kickers?,
 //                  orientation?, maxItems? })
 //     Chains on the evidence-chain engine: one panel per stage, 'row' (900
-//     wide) or 'column' (340, narrow); items are { label, name?, href?, detail? }
+//     wide) or 'column' (NARROW_WIDTH, narrow); items are { label, name?, href?, detail? }
 //     and evidence items add layer (1-5). The terminal panel is always the
 //     evidence (document-with-check glyph in the layer colour); the one
 //     diamond is the gate: the bow-tie's event, the control's decision (its
 //     state from the caller: hatched for "to be specified", decided by
 //     isResponseToSpecify). Table: Step | Item | Detail.
 //
+//   flow({ columns: [{ key, label }] (2 or 3), nodes: [{ id, column, label, name?, tone?, href? }],
+//          links: [{ from, to, value }], unit, unitOne?, layout?: 'wide' | 'narrow',
+//          order?: 'barycentre' | 'input', plotHeight? })
+//     Sankey / alluvial laid out at build: node blocks sized by max(in, out),
+//     24 high at least, 8 apart, label and count inside; cubic ribbons
+//     between consecutive columns (fill-opacity, no text on them; one under
+//     2 units stroked up to 2 so it stays visible), a <g> per
+//     node with its outgoing ribbons for the CSS hover. At most 9 nodes a
+//     column (FLOW_MAX_NODES; group the tail as "Other (N)"). 'narrow' (280,
+//     default under 480 wide) lists each source with bars of its
+//     destinations. Table: From | To | value, one row per link.
+//
+//   concentricRings({ rings: [{ key, label, href? }] (inside out), sectors?: [{ key, label }],
+//                     marks: [{ label, ring, sector?, shape?, state?, tone?, status?, href? }],
+//                     centre: { label }, layout?: 'wide' | 'narrow', keyMarks?, legend? })
+//     Containment target (harm levels x MIT domains; EvalBoundary): marks
+//     spread in their ring x sector cell without overlap (24 px pitch when
+//     linked), ring numbers in the top gap with a numbered key, sector labels
+//     around the circle or lettered with a key. 'narrow' (280) keeps the
+//     rings and both keys; marks there do not link. Table: Item | Ring |
+//     Sector | Layer | Status (the last three when used).
+//   lifecycleRing({ stages: [{ key, label, href? }], nodes: [{ label, stage, size?, fill?, href? }],
+//                   centre: { label, nodes? }, layout?: 'ring' | 'list', sizeLabel?, fillLabel? })
+//     Cycle of stages (the records ring): numbered arcs, each stage's records
+//     beside the ring, the centre's inside; circle area = size, inner disc =
+//     fill (0 to 1), the legend showing both on a scale; a linked row is one
+//     26-high target. 'list' (280, narrow) is one list per stage. Table:
+//     Stage | Record | size | fill (%).
+//   progressRing({ items: [{ key, label, done, total }] })
+//     Share done per item; a page script updates it in place (no animation):
+//     <circle data-ring="key" pathLength="100" stroke-dasharray="pct 100">,
+//     <text data-ring-label="key">pct%</text>, <text data-ring-count="key">.
+//
+//   treemap({ groups: [{ label, href?, items: [{ label, value, name?, state?, tone?, status?,
+//             fill?, href? }] }], unit, unitOne?, layout?: 'wide' | 'narrow', plotHeight?,
+//             fillHeader?, minTile? })
+//     Squarified (Bruls) by group, then within the group under a header
+//     strip (stacked over up to three lines when narrow); tile area = value x
+//     one scale. Tiles under 24 x 24, or too small for their label, merge
+//     into "+N" (linked to the group href when a full target), so every tile
+//     is labelled; state by pattern; fill = a bar along the foot. 'narrow'
+//     (280) stacks the groups as bands, each at least 24 high. `minTile` (default 24) merges a long tail
+//     sooner when the SVG would pass 12 KB (every framework linked: 36).
+//     Table: Group | Item | value | fill | status.
+//
+//   bookSpine({ parts: [{ label, chapters: [{ num, label, href?, value?, marks?: [{ shape,
+//               count, label, state? }], highlight? }] }], encoding?: 'bars' | 'dots', unit,
+//               mini?, orientation?: 'horizontal' | 'vertical' })
+//     The chapters in order grouped by part, in neutral part tints (never
+//     layer colours): bars (reading minutes) or dots (one per figure, shape =
+//     kind); 'vertical' (280, narrow) stacks the chapters as rows; `mini` is
+//     a compact strip with the highlighted chapters listed as links under it.
+//     Table: Part | Chapter | value, or one column per kind and Total.
+//
 //   glyph(kind, x, y, { tone? }): the §1.7 glyph vocabulary in a 24 px box
 //     (building, person, calendar, package, layers, evidence, card, gate,
 //     warning, pipeline, magnifier), shared with lib/evidence-chain.ts.
 //
 // Helpers for new primitives: linearScale, timeScale, textWidth, fitText,
-// wrapText, open, close, assemble, markStyles, shape, targets, words.
+// wrapText, open, close, assemble, markStyles, shape, targets, hitRect (a
+// whole-row pointer target inside a link), words, minText,
+// and asOfMark(scale, asOf, lang, { width, axis }) for the as-of line of any
+// time chart (asOfLabel for one drawn without a scale).
 export type {
+  AsOfMark,
   Box,
   Cell,
   ChartBase,
@@ -121,14 +191,21 @@ export type {
   Words,
 } from './core';
 export {
+  AS_OF_KEY_H,
+  NARROW_TEXT,
+  NARROW_WIDTH,
+  asOfLabel,
+  asOfMark,
   assemble,
   claimIds,
   close,
   esc,
   fitText,
+  hitRect,
   linearScale,
   markClass,
   markStyles,
+  minText,
   open,
   parseDay,
   shape,
@@ -183,3 +260,20 @@ export {
   type PipelineStage,
 } from './flow';
 export { glyph, type GlyphKind, type GlyphOptions } from './glyphs';
+export { flow, FLOW_MAX_NODES, type SankeyColumn, type SankeyInput, type SankeyLink, type SankeyNode } from './sankey';
+export {
+  concentricRings,
+  lifecycleRing,
+  progressRing,
+  type ConcentricRingsInput,
+  type LifecycleNode,
+  type LifecycleRecord,
+  type LifecycleRingInput,
+  type ProgressItem,
+  type ProgressRingInput,
+  type RingDef,
+  type RingMark,
+  type RingSector,
+} from './rings';
+export { treemap, type TreemapGroup, type TreemapInput, type TreemapItem } from './treemap';
+export { bookSpine, type BookSpineInput, type SpineChapter, type SpineMark, type SpinePart } from './spine';

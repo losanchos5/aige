@@ -16,20 +16,20 @@
  * <title>s, marks with an href are links.
  *
  *   const wide = dotMatrix({ id: 'cm-w', ... });
- *   const narrow = dotMatrix({ id: 'cm-n', width: 340, ... });
+ *   const narrow = dotMatrix({ id: 'cm-n', width: NARROW_WIDTH, ... });
  *   <Chart title="93 controls, 5 profiles" caption="..." chart={wide} narrow={narrow} />
  *
  * `scroll` (the region's accessible name) lets a dense chart scroll sideways
  * inside a focusable region instead of shrinking; with a HeatGrid (which
  * returns `sticky`) the row labels stay in view.
  */
-import { claimIds, type ChartOutput } from '../lib/charts';
+import { claimIds, NARROW_WIDTH, type ChartOutput } from '../lib/charts';
 import '../styles/chart.css';
 
 interface Props {
   /** The chart, or the wide variant of a pair. */
   chart: ChartOutput;
-  /** The narrow variant (drawn about 340 wide), shown below the switch point. */
+  /** The narrow variant (drawn NARROW_WIDTH, 280, wide), shown below the switch point. */
   narrow?: ChartOutput;
   /** Short title (at most six words) for the figcaption. */
   title: string;
@@ -74,6 +74,32 @@ for (const svg of rendered) {
   }
 }
 claimIds(Astro.request, rendered, title);
+// Phone legibility (spec "Texto legible en la variante estrecha"): a 320 px
+// screen gives the canvas CANVAS_320 px (measured with Playwright on the
+// built site: 274 at 320, 314 at 360, 344 at 390), so the SVG a phone shows
+// (the narrow one, or the chart alone unless it scrolls) must print its
+// smallest text at 12 px or more there. The narrow variant grows up to
+// NARROW_GROW times its width (it fills the 344 px canvas of a 390 px phone);
+// a chart alone never grows past 1:1.
+const CANVAS_320 = 274;
+const NARROW_GROW = 1.25;
+const phone = narrow ?? (scroll ? undefined : chart);
+if (phone) {
+  const shown = Math.min(CANVAS_320, phone.width * (narrow ? NARROW_GROW : 1));
+  let min = Infinity;
+  let label = '';
+  for (const m of phone.svg.matchAll(/<(\w+)[^>]*\sfont-size="([\d.]+)"[^>]*>([^<]*)/g)) {
+    const size = Number(m[2]);
+    if (size < min) [min, label] = [size, m[3]];
+  }
+  const px = (min * shown) / phone.width;
+  if (px < 12) {
+    throw new Error(
+      `Chart "${title}": the label "${label}" (font-size ${min} in a ${phone.width}-wide SVG) reads at ${px.toFixed(1)} px on a 320 px phone; ` +
+        `draw the phone variant ${NARROW_WIDTH} wide with text of 12.5 or more`,
+    );
+  }
+}
 // First switch point where the canvas (container minus padding and border)
 // shows the wide SVG at 1:1 or larger.
 const STEPS = [480, 560, 640, 720, 800, 900, 1000];
@@ -87,7 +113,7 @@ const cap = (width: number) => `max-width: ${Math.ceil(width)}px`;
   <div class:list={['chart-canvas', narrow && ['chart-pair', `chart-sw-${switchAt}`]]}>
     {
       narrow && (
-        <div class="chart-n" style={cap(narrow.width * 1.15)}>
+        <div class="chart-n" style={cap(narrow.width * NARROW_GROW)}>
           <Fragment set:html={narrow.svg} />
         </div>
       )

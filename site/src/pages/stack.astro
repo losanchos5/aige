@@ -18,6 +18,7 @@ import ToolsTable from '../components/ToolsTable.astro';
 import Callout from '../components/Callout.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Figure from '../components/Figure.astro';
+import LayerMatrix from '../components/LayerMatrix.astro';
 import { getFigure } from '../data/figures';
 import threeQuestionsSvg from '../figures/three-questions.svg?raw';
 import minimumStackSvg from '../figures/minimum-viable-stack.svg?raw';
@@ -29,6 +30,7 @@ import {
   toolsByCategory,
 } from '../data/stack';
 import { breadcrumbJsonLd } from '../lib/breadcrumbs';
+import { stackLayerMatrix, stackMatrixTotals } from '../lib/page-visuals/layer-matrix';
 import { fitsSiteSuffix } from '../lib/seo-title';
 
 const tools = toolsByCategory();
@@ -63,6 +65,11 @@ const howToRead = [
 // before the stack is drawn, then sends the reader to the pillar and to /bok.
 const seoTitle = 'AI governance framework as a stack: five layers';
 
+// What fills each layer (page-visuals-2, block E): the five layers x six kinds
+// of record, counted from their registers (lib/page-visuals/layer-matrix.ts).
+const layerMatrix = stackLayerMatrix();
+const lmTotals = stackMatrixTotals;
+
 const mvsItems = minimumViableStack.steps.map((step) => ({
   title: step.title,
   description: step.summary,
@@ -94,6 +101,19 @@ const mvsItems = minimumViableStack.steps.map((step) => ({
 
   <Section tone="plain" rule title="Follow one artefact from policy to proof.">
     <div class="reveal"><StackFlow /></div>
+  </Section>
+
+  <Section
+    tone="plain"
+    id="what-fills-each-layer"
+    title="What fills each layer."
+    lede="The site's registers, counted layer by layer: the obligations an artefact answers, the patterns and controls that build it, the tools that run it, the learning-path nodes that teach it and the role's workflows that own it."
+  >
+    <LayerMatrix
+      data={layerMatrix}
+      title="Records per stack layer"
+      caption={`${lmTotals.obligations} obligations, ${lmTotals.patterns} patterns, ${lmTotals.controls} controls, ${lmTotals.tools} tools, ${lmTotals.nodes} path nodes and ${lmTotals.workflows} workflows; each bar is a share of the largest count in its column. Patterns and controls count in their home layer; obligations and tools count in every layer they name, the workflow that spans all five counts in each, and the ${lmTotals.crossCuttingNodes} cross-cutting path nodes count in none. A number links to that layer's list where one exists.`}
+    />
   </Section>
 
   <Section tone="plain" title="A build order, from policy to proof.">

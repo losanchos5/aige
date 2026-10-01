@@ -8,12 +8,17 @@
 // The build fails if any row names a pattern, obligation, control id or related
 // row that does not exist (threatProblems()). Where an open control profile
 // maps a threat (lib/cross-links.ts controlsForThreat), the Control entry links it.
+// Two charts (lib/page-visuals/risk-visuals.ts): the catalogue, stack layers
+// and test route flow heads the rows, and a catalogue x framework-id grid (CSA AICM or,
+// by a CSS-only radio pair, ISO/IEC 42001) sits in the frameworks section.
 import Base from '../../layouts/Base.astro';
 import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import CitedText from '../../components/CitedText.astro';
 import SourceList from '../../components/SourceList.astro';
+import Chart from '../../components/Chart.astro';
+import { threatFlow, threatGrid } from '../../lib/page-visuals/risk-visuals';
 import { site } from '../../data/site';
 import { obligationById, obligationPath } from '../../data/frameworks';
 import { getPatternBySlug, patternPath } from '../../data/patterns';
@@ -113,6 +118,24 @@ for (const n of LAYERS) {
 }
 const shortOf = (t: ThreatTaxonomyId | 'all') => (t === 'all' ? 'any catalogue' : taxonomies.find((x) => x.id === t)!.short);
 
+// Charts. The flow counts each threat once (see risk-visuals.ts); the caption
+// states the number a reader acts on: the rows only a test you write covers,
+// and those that pair a harness check with one.
+const flowPair = threatFlow();
+const ownOnly = threats.filter((r) => r.evals.every((e) => e.tool === 'custom')).length;
+const ownToo = threats.filter((r) => r.evals.some((e) => e.tool === 'custom')).length - ownOnly;
+const twoLayers = threats.find((r) => r.layers.length > 1);
+const setExample = twoLayers ? ` (${[...twoLayers.layers].sort((a, b) => a - b).map((n) => `L${n}`).join(' + ')} is one set)` : '';
+const maxIds = (pick: (r: Threat) => readonly string[]) => Math.max(...threats.map((r) => pick(r).length));
+const grids = [
+  { key: 'aicm', label: 'CSA AICM v1.1', noun: 'domain', ...threatGrid('aicm'), most: maxIds((r) => r.aicm) },
+  { key: 'iso', label: 'ISO/IEC 42001 Annex A', noun: 'control', ...threatGrid('iso'), most: maxIds((r) => r.iso42001) },
+].map((g) => {
+  // Drawn columns (ids some row names), with the titles the cards print.
+  const lookup: Readonly<Record<string, string>> = g.key === 'aicm' ? aicmDomains : iso42001Controls;
+  return { ...g, columns: g.chart.table.columns.slice(1).map((id) => ({ id: String(id), name: lookup[String(id)] })) };
+});
+
 const toolClass = (tool: string) => `tb-tool tb-tool--${tool.toLowerCase()}`;
 const ticksLabel = (layers: readonly number[]) =>
   `Layers: ${layers.map((n) => `${n} ${layerName(n)}`).join(', ')}`;
@@ -182,6 +205,13 @@ const ticksLabel = (layers: readonly number[]) =>
           <a class="ob-dl" href="/resources/threats.csv" download>Download CSV</a>
         </p>
       </div>
+
+      <Chart
+        chart={flowPair.wide}
+        narrow={flowPair.narrow}
+        title="Catalogue, stack layers and test route"
+        caption={`Each threat runs once from its catalogue to the set of stack layers its control spans${setExample}, then to how it is tested, so every block counts distinct threats and a catalogue's block matches its filter below. ${ownOnly} of the ${threats.length} threats rely only on a test you write, because no public harness ships a check for them; ${ownToo} more pair a harness check with a test you write.`}
+      />
 
       <div class="tb-index">
         <fieldset class="ob-filter">
@@ -431,6 +461,55 @@ const ticksLabel = (layers: readonly number[]) =>
             prefix="ts"
           />
         </p>
+      </div>
+      <div class="tb-fw-view">
+        <fieldset class="ob-filter">
+          <legend>Show the grid for</legend>
+          <div class="ob-chips">
+            {
+              grids.map((g, i) => (
+                <span>
+                  <input class="ob-radio" type="radio" name="tb-fw" id={`tb-fw-${g.key}`} checked={i === 0} />
+                  <label class="ob-chip" for={`tb-fw-${g.key}`}>
+                    {g.label}
+                  </label>
+                </span>
+              ))
+            }
+          </div>
+        </fieldset>
+        {
+          grids.map((g) => (
+            <div class="tb-fw-panel" data-fw={g.key}>
+              <Chart
+                chart={g.chart}
+                scroll={`${g.chart.table.caption} (scrolls sideways)`}
+                title={g.key === 'aicm' ? 'Threats per CSA AICM domain' : 'Threats per ISO/IEC 42001 control'}
+                caption={`Each cell counts the threat rows of one catalogue that name the ${g.noun}; a row names up to ${g.most}, so a catalogue's cells can add up to more than its rows. Read down a column to see which catalogues a review of that ${g.noun} reaches.`}
+              />
+              <p class="tb-fw-key">
+                <span class="tb-fw-key-h">Columns:</span>{' '}
+                {g.columns.map((c, i) => (
+                  <>
+                    {i > 0 && ' · '}
+                    <code>{c.id}</code> {c.name}
+                  </>
+                ))}
+              </p>
+              {g.unnamed.length > 0 && (
+                <p class="tb-fw-key">
+                  <span class="tb-fw-key-h">No row names:</span>{' '}
+                  {g.unnamed.map((c, i) => (
+                    <>
+                      {i > 0 && ' · '}
+                      <code>{c.id}</code> {c.name}
+                    </>
+                  ))}
+                </p>
+              )}
+            </div>
+          ))
+        }
       </div>
     </section>
 

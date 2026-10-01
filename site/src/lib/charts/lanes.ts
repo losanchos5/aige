@@ -7,11 +7,12 @@
 // Horizontal (default): lanes are columns, their labels wrapped to two lines
 // inside the column; row labels wrap to two lines inside the label column.
 // Four lanes need about 640 units and short lane labels ("Pull request").
-// Vertical (the narrow variant, width 340 by default): the lanes stack top to
+// Vertical (the narrow variant, NARROW_WIDTH by default): the lanes stack top to
 // bottom as bands, each headed by its full label on its own line(s), listing
 // the items that act in it (marker, then the item label). Same table.
 // A label that cannot fit throws, naming it.
 import {
+  NARROW_WIDTH,
   assemble,
   legend,
   linkText,
@@ -61,7 +62,7 @@ export function lanes(input: LanesInput): ChartOutput {
   nonEmpty(input.columns, 'columns', where);
   nonEmpty(input.rows, 'rows', where);
   const vertical = input.orientation === 'vertical';
-  const W = input.width ?? (vertical ? 340 : 640);
+  const W = input.width ?? (vertical ? NARROW_WIDTH : 640);
   const keys = input.columns.map((c) => c.key);
   if (new Set(keys).size !== keys.length) throw new Error(`charts(${where}): duplicate column keys`);
   for (const row of input.rows) {

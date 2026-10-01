@@ -8,7 +8,7 @@
 // the three states never rest on colour. Ink only: chapters are not layers.
 //
 // Wide (from 480 units): columns left to right, the chapter number under each.
-// Narrow (the 340 phone variant): one row per chapter that names or
+// Narrow (the NARROW_WIDTH phone variant): one row per chapter that names or
 // cross-references the term, bars left to right, and a closing line counting
 // the chapters with neither. Both variants return the same table: every
 // chapter, its mentions and whether the entry cross-references it.
@@ -16,6 +16,7 @@
 // Built on the chart kit's shell and helpers (src/lib/charts/core.ts), like
 // the other page charts; no runtime imports.
 import {
+  minText,
   assemble,
   fitText,
   legend,
@@ -50,7 +51,6 @@ export interface TermFootprintInput extends ChartBase {
 }
 
 const L = 12;
-const COUNT_PX = 12;
 const BAR_H = 110;
 const ROW = 24;
 
@@ -68,6 +68,7 @@ export function termFootprint(input: TermFootprintInput): ChartOutput {
   nonEmpty(input.chapters, 'chapters', where);
   if (!input.chapters.some((c) => c.count > 0)) throw new Error(`charts(${where}): no chapter names the term; draw no footprint`);
   const W = input.width ?? 600;
+  const COUNT_PX = minText(W);
   const wide = W >= 480;
   const marks = markStyles(input.id);
   const hits = targets(where);
@@ -96,7 +97,7 @@ export function termFootprint(input: TermFootprintInput): ChartOutput {
       const cx = L + (i + 0.5) * pitch;
       const state = stateOf(c);
       const num = text(cx, base + 17, c.number, {
-        size: 12,
+        size: COUNT_PX,
         cls: c.referenced ? 'mono' : 'mono muted',
         anchor: 'middle',
         weight: c.referenced ? 700 : 400,

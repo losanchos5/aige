@@ -1,0 +1,354 @@
+---
+/**
+ * LayerMatrix: a small-multiples count grid as a real HTML <table> (rows x
+ * columns, one count per cell), for grids whose every cell links somewhere:
+ * the kit's heatGrid links only its row labels. Two encodings, from the data
+ * (src/lib/page-visuals/layer-matrix.ts):
+ *  - a bar per cell, its length the count against the largest in its column
+ *    (/stack, what fills each layer), in the row's layer colour;
+ *  - one glyph per record when a cell carries `marks` (/path, stage x layer):
+ *    core a filled square, alternative an outlined square, optional an
+ *    outlined circle (state by shape and fill, never colour alone), 12 px so
+ *    the three read apart, under a layer-coloured top rule.
+ * Layer colours follow the kit: --lN fills, --lN-ink strokes.
+ * The number is always printed in full ink; each cell's link is named by its
+ * own text ("12 obligations in layer 01"), so it reads the same whether the
+ * table keeps its semantics or not. Under 640 px the rows become cards: the
+ * row heading on top, the cells three to a line with their column label. The
+ * frame (chart-fig, chart-canvas, chart-caption) is the chart kit's. No script.
+ */
+import type { LayerMatrixData } from '../lib/page-visuals/layer-matrix';
+import '../styles/chart.css';
+
+interface Props {
+  data: LayerMatrixData;
+  /** Short title (the table's caption and the figcaption). */
+  title: string;
+  /** Two sentences: what it shows, how it counts. */
+  caption: string;
+  /** Glyph key, for the marks encoding. */
+  legend?: { kind: 'core' | 'alternative' | 'optional'; label: string }[];
+  id?: string;
+  class?: string;
+}
+
+const { data, title, caption, legend, id, class: className } = Astro.props;
+const { rows, columns, cells } = data;
+if (cells.length !== rows.length || cells.some((row) => row.length !== columns.length)) {
+  throw new Error(`LayerMatrix "${title}": cells must be ${rows.length} rows of ${columns.length}`);
+}
+const colMax = columns.map((_, c) => Math.max(1, ...cells.map((row) => row[c].value)));
+const toneOf = (tone?: number) => (tone ? `--lc: var(--l${tone}); --lc-ink: var(--l${tone}-ink)` : undefined);
+---
+
+<figure class:list={['chart-fig lmx', className]} id={id}>
+  <div class="chart-canvas lmx-canvas">
+    <table class="lmx-table">
+      <caption class="visually-hidden">{title}</caption>
+      <thead>
+        <tr>
+          <th scope="col" class="lmx-corner">{data.rowHeader}</th>
+          {
+            columns.map((column) => (
+              <th scope="col" class="lmx-ch" style={toneOf(column.tone)}>
+                {column.label}
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row, r) => (
+            <tr style={toneOf(row.tone)}>
+              <th scope="row" class:list={['lmx-rh', row.tone && 'lmx-rh--tone']}>
+                {row.num && <span class="lmx-num">{row.num}</span>}
+                <span class="lmx-rl">{row.label}</span>
+              </th>
+              {cells[r].map((cell, c) => {
+                const body = (
+                  <>
+                    <span class="lmx-k" aria-hidden="true">
+                      {columns[c].label}
+                    </span>
+                    <span class="lmx-n">{cell.value}</span>
+                    <span class="visually-hidden"> {cell.label}</span>
+                    {cell.marks ? (
+                      <span class="lmx-marks" aria-hidden="true">
+                        {cell.marks.map((kind) => (
+                          <span class="lmx-m" data-kind={kind} />
+                        ))}
+                      </span>
+                    ) : (
+                      <span class="lmx-bar" aria-hidden="true">
+                        <span style={`--v: ${(cell.value / colMax[c]).toFixed(3)}`} />
+                      </span>
+                    )}
+                  </>
+                );
+                return (
+                  <td
+                    class:list={['lmx-td', cell.marks && 'lmx-td--marks', cell.value === 0 && 'lmx-td--zero']}
+                    style={cell.marks ? toneOf(columns[c].tone) : undefined}
+                  >
+                    {cell.href ? (
+                      <a class="lmx-cell" href={cell.href}>
+                        {body}
+                      </a>
+                    ) : (
+                      <span class="lmx-cell">{body}</span>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    {
+      legend && (
+        <ul class="lmx-legend" aria-label="Key">
+          {legend.map((item) => (
+            <li>
+              <span class="lmx-m" data-kind={item.kind} aria-hidden="true" />
+              {item.label}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+  <figcaption class="chart-caption">
+    <span class="chart-title">{title}</span>
+    <span class="chart-desc">{caption}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .lmx-canvas {
+    padding: var(--s-4);
+  }
+
+  .lmx-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 4px;
+    font-size: var(--fs-small);
+  }
+
+  .lmx-table th {
+    color: var(--ink);
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .lmx-corner,
+  .lmx-ch {
+    padding: 0 var(--s-2) var(--s-2);
+    vertical-align: bottom;
+    line-height: 1.25;
+  }
+
+  .lmx-corner {
+    width: 26%;
+  }
+
+  .lmx-rh {
+    padding: var(--s-2) var(--s-3) var(--s-2) var(--s-2);
+    vertical-align: middle;
+    line-height: 1.3;
+    text-wrap: pretty;
+  }
+
+  .lmx-rh--tone {
+    border-left: 4px solid var(--lc-ink);
+  }
+
+  .lmx-num {
+    display: block;
+    font-family: var(--font-mono);
+    font-weight: 400;
+    color: var(--ink-2);
+  }
+
+  .lmx-td {
+    padding: 0;
+    vertical-align: top;
+  }
+
+  .lmx-td--marks {
+    border-top: 3px solid var(--lc-ink, var(--line));
+  }
+
+  .lmx-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 48px;
+    height: 100%;
+    padding: var(--s-2);
+    border-radius: var(--r-sm);
+    background: color-mix(in srgb, var(--ink) 3%, var(--bg));
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  a.lmx-cell .lmx-n {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
+  }
+
+  a.lmx-cell:hover {
+    background: color-mix(in srgb, var(--ink) 9%, var(--bg));
+  }
+
+  a.lmx-cell:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .lmx-n {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: var(--fs-body);
+    line-height: 1.1;
+  }
+
+  .lmx-k {
+    display: none;
+  }
+
+  .lmx-bar {
+    display: block;
+    height: 10px;
+    box-shadow: inset 0 -1px 0 var(--line);
+  }
+
+  .lmx-bar > span {
+    display: block;
+    height: 100%;
+    width: calc(var(--v) * 100%);
+    border-radius: 2px;
+    background: var(--lc, var(--ink));
+    box-shadow: inset 0 0 0 1px var(--lc-ink, var(--ink));
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .lmx-marks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+
+  .lmx-m {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    flex: none;
+    border: 1.5px solid var(--ink);
+    border-radius: 2px;
+    background: var(--bg);
+  }
+
+  .lmx-m[data-kind='core'] {
+    background: var(--ink);
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .lmx-m[data-kind='optional'] {
+    border-radius: 50%;
+  }
+
+  .lmx-legend {
+    list-style: none;
+    margin: var(--s-3) 0 0;
+    padding: 0 var(--s-2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+    font-size: var(--fs-small);
+    color: var(--ink);
+  }
+
+  .lmx-legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  /* Phones: one card per row, the cells three to a line, each with its
+     column label (the column heads stay in the accessibility tree). */
+  @media (max-width: 639.98px) {
+    .lmx-canvas {
+      padding: var(--s-3);
+    }
+
+    .lmx-table,
+    .lmx-table tbody,
+    .lmx-table th,
+    .lmx-table td {
+      display: block;
+    }
+
+    .lmx-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    .lmx-table tbody tr {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 4px;
+      margin-bottom: var(--s-4);
+    }
+
+    .lmx-table tbody tr:last-child {
+      margin-bottom: 0;
+    }
+
+    .lmx-rh {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: baseline;
+      gap: var(--s-2);
+    }
+
+    .lmx-num {
+      display: inline;
+    }
+
+    .lmx-k {
+      display: block;
+      font-size: var(--fs-label);
+      line-height: 1.25;
+      color: var(--ink-2);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .lmx-bar {
+      border: 1px solid CanvasText;
+    }
+
+    .lmx-bar > span,
+    .lmx-m[data-kind='core'] {
+      forced-color-adjust: none;
+      background: CanvasText;
+    }
+
+    .lmx-rh--tone,
+    .lmx-td--marks {
+      border-color: CanvasText;
+    }
+  }
+</style>

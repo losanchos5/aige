@@ -10,6 +10,9 @@ import Base from '../../layouts/Base.astro';
 import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
+import Chart from '../../components/Chart.astro';
+import { bookSpine, NARROW_WIDTH } from '../../lib/charts';
+import { figureAtlasParts, galleryGroupId } from '../../lib/page-visuals/book-spine';
 import { site } from '../../data/site';
 import { chapterParts, chaptersOrdered, type Chapter } from '../../data/chapters';
 import { diagrams, type DiagramDef } from '../../data/diagrams';
@@ -62,6 +65,20 @@ const diagramCount = parts.reduce(
   (n, part) => n + part.chapters.reduce((m, group) => m + group.diagrams.length, 0),
   0,
 );
+// The atlas (page-visuals-2, block E): one mark per figure and diagram on the
+// book's spine, filed by chapter as the groups below are; a chapter with any
+// links to its group.
+const atlasBase = {
+  title: 'Figures and diagrams per chapter',
+  desc: 'The chapters of the Body of Knowledge in order, grouped by part, with one mark per figure (shape by kind) and per interactive diagram.',
+  parts: figureAtlasParts(),
+  encoding: 'dots' as const,
+  unit: 'visuals',
+  unitOne: 'visual',
+};
+const atlasWide = bookSpine({ ...atlasBase, id: 'fg-atlas-w' });
+const atlasNarrow = bookSpine({ ...atlasBase, id: 'fg-atlas-n', width: NARROW_WIDTH, orientation: 'vertical' });
+
 const kindLabel = { infographic: 'Infographic', 'data-viz': 'Data visualisation', poster: 'Poster' };
 
 // Search title and description (SXO-R2-07, 2026-09-25 round 2): the query
@@ -111,6 +128,16 @@ const jsonLd = [
   />
 
   <div class="container res-page fg-page" data-pagefind-body>
+    <div class="res-section">
+      <Chart
+        class="fg-atlas"
+        chart={atlasWide}
+        narrow={atlasNarrow}
+        title="Where the book is illustrated"
+        caption={`The figures and diagrams of each chapter, filed under the chapter where each first appears, as the gallery below files them${acrossBook.length ? `; the ${acrossBook.length} figures no chapter places sit apart, under Across the book` : ''}. Select a chapter to jump to its figures.`}
+      />
+    </div>
+
     <div class="res-section">
       <Callout kind="note" title={`Free to reuse under ${site.license}`}>
         <p>
@@ -167,7 +194,7 @@ const jsonLd = [
             <h2 id={`fg-part-${part.id}`}>{part.title}</h2>
           </div>
           {part.chapters.map((group) => (
-            <div class="fg-chapter">
+            <div class="fg-chapter" id={galleryGroupId(group.chapter.slug)}>
               <h3 class="fg-chapter-title">
                 <a href={`/bok/${group.chapter.slug}`}>{group.chapter.title}</a>
               </h3>

@@ -14,12 +14,12 @@
  * keep every word. Evidence with a record schema links to it.
  *
  * Per-item template, not registered in figures.ts. 'figc' mode: the page loads
- * figures.css through the reading layout. A 870-wide row with a 340-wide
+ * figures.css through the reading layout. A 870-wide row with a NARROW_WIDTH
  * column for phones (the Chart pair); at the top level of the prose the
  * figure breaks out to the reading well so the row shows at 1:1 on desktop.
  */
 import Chart from '../Chart.astro';
-import { controlChain } from '../../lib/charts';
+import { NARROW_WIDTH, controlChain } from '../../lib/charts';
 import { anatomyInput } from '../../lib/page-visuals/control-visuals';
 import { CONTROLS_AS_OF, type Control, type ControlProfile } from '../../data/controls';
 
@@ -40,7 +40,7 @@ const base = {
   tableCaption: `${c.id}: failure modes, enforcement, verification, decision and evidence`,
 };
 const wide = controlChain({ ...base, id: 'ctl-anatomy-w', ...anatomyInput(c, 'row', 870) });
-const narrow = controlChain({ ...base, id: 'ctl-anatomy-n', ...anatomyInput(c, 'column', 340) });
+const narrow = controlChain({ ...base, id: 'ctl-anatomy-n', ...anatomyInput(c, 'column', NARROW_WIDTH) });
 const caption =
   'Read the steps in order: what failing looks like, where on the pipeline the control acts, how a third party checks it, what happens when it fails and the record it leaves. The full wording is in the table and in the record below.';
 ---

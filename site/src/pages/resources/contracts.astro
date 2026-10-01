@@ -15,6 +15,7 @@ import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { collectionPage, lastModified } from '../../lib/jsonld';
 import '../../styles/resources.css';
 import '../../styles/pages.css';
+import { NARROW_WIDTH } from '../../lib/charts';
 
 const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Contracts' }];
 
@@ -33,7 +34,7 @@ const matrixBase = {
 };
 const matrix = {
   wide: contractMatrix({ ...matrixBase, id: 'ct-matrix-w', width: 860 }),
-  narrow: contractMatrix({ ...matrixBase, id: 'ct-matrix-n', width: 340 }),
+  narrow: contractMatrix({ ...matrixBase, id: 'ct-matrix-n', width: NARROW_WIDTH }),
 };
 const description =
   'The clauses to check before you deploy a third-party AI system: what each governs, the red flag, a fallback position and the evidence to keep.';

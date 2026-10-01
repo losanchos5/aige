@@ -196,7 +196,20 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ],
   ['/resources/tools', ['src/pages/resources/tools.astro', 'src/data/stack.ts']],
   ['/role', ['src/pages/role.astro', 'src/data/role.ts', 'src/data/maturity.ts']],
-  ['/stack', ['src/pages/stack.astro', 'src/data/stack.ts']],
+  // The layer matrix on /stack also counts obligations, patterns, controls,
+  // path nodes and workflows per layer.
+  [
+    '/stack',
+    [
+      'src/pages/stack.astro',
+      'src/data/stack.ts',
+      'src/data/frameworks.ts',
+      'src/data/patterns.ts',
+      'src/data/controls',
+      'src/data/path.ts',
+      'src/data/role.ts',
+    ],
+  ],
   // Block b-toolkit-foundation: the /toolkit index (registry) and its first tool,
   // whose criteria come from maturity.ts and whose client code lives in public/toolkit.
   ['/toolkit', ['src/pages/toolkit/index.astro', 'src/data/toolkit.ts']],

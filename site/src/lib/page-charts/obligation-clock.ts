@@ -24,6 +24,9 @@
 // (src/lib/charts/core.ts); the classes are the kit's, so it renders in both
 // style modes.
 import {
+  asOfLabel,
+  asOfMark,
+  minText,
   assemble,
   fitText,
   legend,
@@ -131,6 +134,7 @@ export function obligationClock(input: ObligationClockInput): ChartOutput {
   nonEmpty(input.points, 'points', where);
   const W = input.width ?? 880;
   const wide = W >= WIDE_AT;
+  const sm = minText(W);
   const t0 = parseDay(input.from, 'clock from');
   const t1 = parseDay(input.to, 'clock to');
   const tm = parseDay(input.marker, 'clock marker');
@@ -208,11 +212,10 @@ export function obligationClock(input: ObligationClockInput): ChartOutput {
     const maxStack = Math.max(...columns.map((c) => c.points.length));
 
     // Header: the as-of label over its line, the counts either side of it.
-    const xm = ts.map(input.marker);
-    const asOfLabel = `As of ${input.marker}`;
-    const asOfW = textWidth(asOfLabel, 12, 'mono');
+    const asOf = asOfMark(ts, input.marker, input.lang, { width: W, axis: 'x', pad: L });
+    const xm = asOf.at;
     y += 26;
-    out.push(text(Math.max(L, Math.min(xm - asOfW / 2, W - L - asOfW)), y, asOfLabel, { size: 12, cls: 'mono', where: 'as-of label' }));
+    out.push(asOf.centred(y));
     y += 18;
     const left = `${behind} dates on or before`;
     const right = `${ahead} dates after`;
@@ -223,7 +226,7 @@ export function obligationClock(input: ObligationClockInput): ChartOutput {
     // Room above the tallest tower for its label.
     const plotTop = y + 12;
     const axisY = plotTop + 62 + maxStack * PITCH;
-    out.push(`<line class="today" x1="${r1(xm)}" y1="${r1(plotTop - 6)}" x2="${r1(xm)}" y2="${r1(axisY + 5)}"/>`);
+    out.push(asOf.line([[plotTop - 6, axisY + 5]]));
 
     const dots: string[] = [];
     // Obstacles for the tower labels: every tower, and the as-of line.
@@ -252,13 +255,13 @@ export function obligationClock(input: ObligationClockInput): ChartOutput {
     for (const t of ts.ticks) {
       const x = ts.map(t.date);
       out.push(`<line class="tick" x1="${r1(x)}" y1="${r1(axisY)}" x2="${r1(x)}" y2="${r1(axisY + 6)}"/>`);
-      out.push(text(x, axisY + 19, t.label, { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+      out.push(text(x, axisY + 19, t.label, { size: sm, cls: 'num muted', anchor: 'middle', where: 'tick' }));
     }
     if (earlier.length) {
       const ex = L + 26;
       out.push(`<line class="axis" x1="${ex - 10}" y1="${r1(axisY)}" x2="${ex + 10}" y2="${r1(axisY)}"/>`);
       out.push(`<path class="rule" fill="none" d="M${x0 - 16} ${r1(axisY + 5)}l6 -10M${x0 - 11} ${r1(axisY + 5)}l6 -10"/>`);
-      out.push(text(ex, axisY + 19, 'Earlier', { size: 12, cls: 'num muted', anchor: 'middle', where: 'tick' }));
+      out.push(text(ex, axisY + 19, 'Earlier', { size: sm, cls: 'num muted', anchor: 'middle', where: 'tick' }));
     }
 
     // Tower labels: the tallest columns. Where one instrument holds most of a
@@ -318,15 +321,15 @@ export function obligationClock(input: ObligationClockInput): ChartOutput {
     for (let year = fromYear; year <= lastYear; year += 1) {
       buckets.push({ label: String(year), points: onAxis.filter((p) => Number(p.date.slice(0, 4)) === year) });
     }
-    const yearW = Math.max(44, ...buckets.map((b) => Math.ceil(textWidth(b.label, 12, 'mono')) + 8));
+    const yearW = Math.max(44, ...buckets.map((b) => Math.ceil(textWidth(b.label, sm, 'mono')) + 8));
     const countW = 30;
     const dx = L + yearW;
     const perLine = Math.floor((W - L - countW - dx) / PITCH);
     const markerYear = input.marker.slice(0, 4);
     y += 24;
-    const asOfLabel = `As of ${input.marker} (dashed line)`;
-    fitText(asOfLabel, W - 2 * L, 12, 'mono', 'as-of label');
-    out.push(text(L, y, asOfLabel, { size: 12, cls: 'mono', where: 'as-of label' }));
+    const asOfLine = `${asOfLabel(input.marker, input.lang)} (dashed line)`;
+    fitText(asOfLine, W - 2 * L, sm, 'mono', 'as-of label');
+    out.push(text(L, y, asOfLine, { size: sm, cls: 'mono', where: 'as-of label' }));
     y += 17;
     const counts = `${behind} dates on or before, ${ahead} after`;
     fitText(counts, W - 2 * L, 12.5, 'body', 'as-of count');
@@ -343,9 +346,9 @@ export function obligationClock(input: ObligationClockInput): ChartOutput {
       const lines = Math.max(1, Math.ceil(slots / perLine));
       const top = y + 6;
       const rowH = lines * PITCH;
-      fitText(b.label, yearW - 6, 12, 'mono', 'year');
-      out.push(text(L, top + 9.5, b.label, { size: 12, cls: 'num muted', where: 'year' }));
-      out.push(text(W - L, top + 9.5, b.points.length, { size: 12, cls: 'num', anchor: 'end', where: 'year count' }));
+      fitText(b.label, yearW - 6, sm, 'mono', 'year');
+      out.push(text(L, top + 9.5, b.label, { size: sm, cls: 'num muted', where: 'year' }));
+      out.push(text(W - L, top + 9.5, b.points.length, { size: sm, cls: 'num', anchor: 'end', where: 'year count' }));
       let k = 0;
       const place = (runs: Run[]) => {
         for (const run of runs) {

@@ -9,6 +9,7 @@
 import ToolShell from '../../components/toolkit/ToolShell.astro';
 import ToolTerms from '../../components/toolkit/ToolTerms.astro';
 import ToolSourceList from '../../components/toolkit/ToolSourceList.astro';
+import AutonomyLadder from '../../components/AutonomyLadder.astro';
 import type { ToolSource } from '../../components/toolkit/ToolSourceList.astro';
 import { toolById, toolNotice } from '../../data/toolkit';
 import {
@@ -177,6 +178,10 @@ const sources: ToolSource[] = [
         }
       </ul>
     </fieldset>
+
+    <div class="acp-ladder" data-acp-ladder>
+      <AutonomyLadder id="acp-ladder" />
+    </div>
 
     <fieldset class="tool-fieldset" id="acp-tools" data-field data-hint-id="acp-tools-hint" aria-describedby="acp-tools-hint">
       <legend class="tool-legend">Tools and MCP servers</legend>
@@ -559,3 +564,55 @@ const sources: ToolSource[] = [
 
   <ToolSourceList slot="sources" sources={sources} />
 </ToolShell>
+
+<style>
+  /* The autonomy ladder under the level choice: the tool's script sets
+     data-state="chosen" on the level the reader picks
+     (public/toolkit/agent-control-profile.js). Wide, it is drawn as the
+     ladder's own highlight (solid ink, ground-colour text). Narrow, the row's
+     pips are its level (filled up to it, outlined past it), so the choice
+     keeps them: the filled pips darken to solid ink, the outlined ones take a
+     heavier outline, and the label turns bold. Without a choice, or without
+     JavaScript, the ladder stays whole and neutral. */
+  .acp-ladder > :global(figure) {
+    margin: 0;
+  }
+
+  .acp-ladder :global(svg:not(.ch-vertical) g[data-state='chosen'] > rect) {
+    fill: var(--ink);
+    stroke: var(--ink);
+  }
+
+  .acp-ladder :global(svg:not(.ch-vertical) g[data-state='chosen'] text) {
+    fill: var(--bg);
+  }
+
+  .acp-ladder :global(svg.ch-vertical g[data-state='chosen'] rect[class*='mk-fill']) {
+    fill: var(--ink);
+    stroke: var(--ink);
+  }
+
+  .acp-ladder :global(svg.ch-vertical g[data-state='chosen'] rect[class*='mk-line']) {
+    stroke-width: 2.5;
+  }
+
+  .acp-ladder :global(svg.ch-vertical g[data-state='chosen'] text) {
+    font-weight: 700;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .acp-ladder :global(svg:not(.ch-vertical) g[data-step]) {
+      transition: transform var(--dur) var(--ease);
+    }
+
+    .acp-ladder :global(svg:not(.ch-vertical) g[data-state='chosen']) {
+      transform: translateY(-6px);
+    }
+  }
+
+  @media print {
+    .acp-ladder {
+      break-inside: avoid;
+    }
+  }
+</style>

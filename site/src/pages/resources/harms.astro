@@ -1,4 +1,8 @@
 ---
+// /resources/harms: the harms atlas (src/data/harms.ts). The chapter 13 figure
+// leads in; the atlas section opens with two charts (lib/page-visuals/
+// risk-visuals.ts), the target of levels x MIT domains and the mechanism,
+// level and layer flow, then the CSS-only level filter and the cards.
 import Base from '../../layouts/Base.astro';
 import '../../styles/reading.css';
 import PageHero from '../../components/PageHero.astro';
@@ -8,6 +12,8 @@ import { getFigure } from '../../data/figures';
 import harmLevelsSvg from '../../figures/harm-levels.svg?raw';
 import CitedText from '../../components/CitedText.astro';
 import SourceList from '../../components/SourceList.astro';
+import Chart from '../../components/Chart.astro';
+import { harmFlow, harmTarget } from '../../lib/page-visuals/risk-visuals';
 import { site } from '../../data/site';
 import { layers } from '../../data/stack';
 import {
@@ -86,6 +92,23 @@ const jsonLd = [
   breadcrumbJsonLd(crumbs),
 ];
 
+// Charts, and the numbers their captions state, from the rows.
+const target = harmTarget();
+const mechFlow = harmFlow();
+const busiest = [...groups].sort((a, b) => b.rows.length - a.rows.length).slice(0, 2);
+const twoDomains = harms.filter((h) => new Set(h.mitTaxonomy.map((c) => c.split('.')[0])).size > 1).length;
+const mechanismPairs = harms.reduce((sum, h) => sum + h.mechanism.length, 0);
+// The level blocks of the flow that read more than their harms: a block counts
+// the larger of its harm-mechanism and harm-layer pairs.
+const pairsAt = (rows: readonly (typeof harms)[number][]) =>
+  Math.max(
+    rows.reduce((sum, h) => sum + h.mechanism.length, 0),
+    rows.reduce((sum, h) => sum + h.layerN.length, 0),
+  );
+const overCounted = groups
+  .filter((g) => pairsAt(g.rows) > g.rows.length)
+  .map((g) => `${levelLabel[g.level]}'s reads ${pairsAt(g.rows)} for its ${g.rows.length} harms`);
+
 const filters = [
   { id: 'hf-all', label: 'All levels', count: harms.length },
   ...groups.map((g) => ({ id: `hf-${g.level}`, label: levelLabel[g.level], count: g.rows.length })),
@@ -150,6 +173,19 @@ const filters = [
             data-umami-event-location="harms">Download JSON</a>
         </p>
       </div>
+
+      <Chart
+        chart={target.wide}
+        narrow={target.narrow}
+        title="Where each harm lands"
+        caption={`One dot per harm, in the ring of the level it lands on and the sector of its MIT AI Risk Repository domain, coloured by the stack layer of the control that catches it; select a dot to open its card. ${busiest.map((g) => `${levelLabel[g.level]} holds ${g.rows.length}`).join(' and ')}; the ${twoDomains} harms filed under two MIT domains sit in the first their row lists.`}
+      />
+      <Chart
+        chart={mechFlow.wide}
+        narrow={mechFlow.narrow}
+        title="Mechanism, level and layer"
+        caption={`How each mechanism leads to the levels harm lands on, and which layer's controls catch those harms. A harm can have two mechanisms, so the left-hand links count ${mechanismPairs} harm-mechanism pairs for ${harms.length} harms, and a level's block counts the larger of its two sides${overCounted.length ? `: ${overCounted.join(', ')}` : ''}. The target above counts each harm once.`}
+      />
 
       <div class="hm-list" data-pagefind-body>
         <fieldset class="ob-filter">

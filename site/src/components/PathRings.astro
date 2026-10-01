@@ -1,0 +1,111 @@
+---
+/**
+ * PathRings: the reader's progress on /path as one progress ring per stage and
+ * one for the whole path (the kit's progressRing), at the head of the map.
+ *
+ * Built, the rings stand at 0 of each stage's node count, and the list under
+ * them gives each stage's core, alternative and optional nodes: that is what a
+ * reader without JavaScript sees, with the table. public/path.js, which keeps
+ * the marks in localStorage, then sets every ring in place from them (no
+ * animation): the arc's stroke-dasharray (pathLength 100), its percentage and
+ * its done/counted text, and the table's rows, with skipped nodes out of the
+ * count. It announces the change through the polite live region here.
+ */
+import Chart from './Chart.astro';
+import { NARROW_WIDTH, progressRing, type ProgressItem } from '../lib/charts';
+import { nodes, stages, type PathKind } from '../data/path';
+
+const KINDS: readonly PathKind[] = ['core', 'alternative', 'optional'];
+const items: ProgressItem[] = [
+  ...stages.map((stage) => ({
+    key: stage.id,
+    label: stage.title,
+    done: 0,
+    total: nodes.filter((node) => node.stage === stage.id).length,
+  })),
+  { key: 'total', label: 'All stages', done: 0, total: nodes.length },
+];
+const kinds = stages.map((stage) => {
+  const here = nodes.filter((node) => node.stage === stage.id);
+  return {
+    stage,
+    total: here.length,
+    counts: KINDS.map((kind) => ({ kind, n: here.filter((node) => node.kind === kind).length })),
+  };
+});
+
+const base = {
+  title: 'Progress by stage',
+  desc: 'One ring per stage of the learning path and one for the whole path: the share of nodes marked done, skipped nodes left out of the count.',
+  items,
+  doneHeader: 'Done',
+  totalHeader: 'Counted',
+};
+const wide = progressRing({ ...base, id: 'path-rings-w' });
+const narrow = progressRing({ ...base, id: 'path-rings-n', width: NARROW_WIDTH });
+---
+
+<div class="prg" data-path-rings>
+  <Chart
+    chart={wide}
+    narrow={narrow}
+    title="Your progress, stage by stage"
+    caption="Each ring fills with the nodes you mark done in this browser; a node you skip leaves its stage's count. The list below gives the nodes each stage holds, by kind."
+    tableLabel="Progress table"
+  />
+  <ul class="prg-kinds" aria-label="Nodes per stage, by kind">
+    {
+      kinds.map(({ stage, total, counts }) => (
+        <li>
+          <span class="prg-stage">{stage.title}</span>
+          <span class="prg-counts">
+            {total} nodes: {counts.map(({ kind, n }) => `${n} ${kind}`).join(', ')}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="visually-hidden" aria-live="polite" data-ring-live></p>
+</div>
+
+<style>
+  .prg {
+    margin-bottom: var(--s-6);
+  }
+
+  .prg :global(.chart-fig) {
+    margin-top: 0;
+  }
+
+  .prg-kinds {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-2) var(--s-5);
+    font-size: var(--fs-small);
+  }
+
+  @media (min-width: 720px) {
+    .prg-kinds {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .prg-kinds li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-2);
+  }
+
+  .prg-stage {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .prg-counts {
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums;
+  }
+</style>
