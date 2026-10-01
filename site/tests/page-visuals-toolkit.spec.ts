@@ -33,12 +33,13 @@ test.describe('/toolkit/policy-card lanes', () => {
     const curated = policyCardTemplates.filter((template) => template.id !== 'custom');
     await page.goto('/toolkit/policy-card');
 
-    // The table: one row per curated template, the effect under each point it is enforced at.
+    // The table: one row per curated template, the effect under each point it
+    // is enforced at, in words ("Require approval" for require_approval).
     const rows = await chartRows(page, 'pc-lanes');
     expect(rows.map((row) => row[0])).toEqual(curated.map((template) => template.title));
     curated.forEach((template, i) => {
-      const expected = POINTS.map((point) => (template.enforcementPoints.includes(point) ? template.effect : ''));
-      expect(rows[i].slice(1), template.id).toEqual(expected);
+      const expected = POINTS.map((point) => (template.enforcementPoints.includes(point) ? template.effect.replace('_', ' ') : ''));
+      expect(rows[i].slice(1).map((cell) => cell.toLowerCase()), template.id).toEqual(expected);
     });
 
     // The SVGs draw one titled marker per (template, point), in both variants.
@@ -46,7 +47,7 @@ test.describe('/toolkit/policy-card lanes', () => {
     for (const svg of ['#pc-lanes-w-t', '#pc-lanes-n-t']) {
       const root = page.locator(`svg:has(> title${svg})`);
       const titles = await root.locator('title').allTextContents();
-      expect(titles.filter((t) => /: (deny|allow|require_approval|alert)$/.test(t)), svg).toHaveLength(marks);
+      expect(titles.filter((t) => /: (deny|allow|require approval|alert)$/i.test(t)), svg).toHaveLength(marks);
     }
 
     // The row labels link the templates' entries in "The six rule templates",

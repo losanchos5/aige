@@ -19,12 +19,15 @@
  * no-preference, on screen. The frame reuses the chart kit's frame classes
  * (chart.css), so its table alternative reads like every other chart; its own
  * rules live in styles/obligation-visuals.css (unscoped, so 182 squares carry
- * no scope attribute).
+ * no scope attribute). The figure is a chart-tip root (data-ctip,
+ * ChartTipScript): a square's title (the row's id, its obligation and its
+ * status) shows at once on hover and tap; the status key is data-ctip-skip.
  */
 import '../../styles/chart.css';
 import '../../styles/obligation-visuals.css';
 import { obligations, appliesStatusLabels, registerAsOf, type AppliesStatus } from '../../data/frameworks';
 import { obligationGroups } from '../../lib/obligations';
+import ChartTipScript from '../ChartTipScript.astro';
 
 const ORDER: AppliesStatus[] = ['in-force', 'grace', 'applies-later', 'deferred', 'voluntary', 'pending'];
 const statuses = ORDER.filter((s) => obligations.some((row) => row.appliesStatus === s));
@@ -48,9 +51,9 @@ const caption =
 const tableCaption = 'Register rows by instrument group and status';
 ---
 
-<figure class="chart-fig obi" aria-labelledby="obi-title">
+<figure class="chart-fig obi" aria-labelledby="obi-title" data-ctip>
   <div class="chart-canvas obi-canvas">
-    <ul class="obi-key" role="list" aria-label="Drawing: status on the review date">
+    <ul class="obi-key" role="list" aria-label="Drawing: status on the review date" data-ctip-skip>
       {
         statuses.map((s) => (
           <li>
@@ -73,7 +76,7 @@ const tableCaption = 'Register rows by instrument group and status';
               {g.squares.map((row) => (
                 <span
                   class:list={['obi-sq', `st-${row.appliesStatus}`, ...row.layerN.map((n) => `has-l${n}`)]}
-                  title={`${row.id} · ${appliesStatusLabels[row.appliesStatus]}`}
+                  title={`${row.id} ${row.obligation} · ${appliesStatusLabels[row.appliesStatus]}`}
                 />
               ))}
             </span>
@@ -116,3 +119,4 @@ const tableCaption = 'Register rows by instrument group and status';
     </div>
   </details>
 </figure>
+<ChartTipScript />

@@ -11,14 +11,18 @@
  *    outlined circle (state by shape and fill, never colour alone), 12 px so
  *    the three read apart, under a layer-coloured top rule.
  * Layer colours follow the kit: --lN fills, --lN-ink strokes.
- * The number is always printed in full ink; each cell's link is named by its
- * own text ("12 obligations in layer 01"), so it reads the same whether the
- * table keeps its semantics or not. Under 640 px the rows become cards: the
- * row heading on top, the cells three to a line with their column label. The
- * frame (chart-fig, chart-canvas, chart-caption) is the chart kit's. No script.
+ * The number is always printed in full ink; each cell is named by its count
+ * and what it counts, which names its row and column ("12 obligations in layer
+ * 01 Govern-as-Code"): the link's aria-label, or the data-tip of a cell without
+ * a link, so it reads the same whether the table keeps its semantics or not and
+ * the chart tooltip shows it. Under 640 px the rows become cards: the row
+ * heading on top, the cells three to a line with their column label. The frame
+ * (chart-fig, chart-canvas, chart-caption) is the chart kit's; the figure is a
+ * chart-tip root (data-ctip, ChartTipScript), its glyph key data-ctip-skip.
  */
 import type { LayerMatrixData } from '../lib/page-visuals/layer-matrix';
 import '../styles/chart.css';
+import ChartTipScript from './ChartTipScript.astro';
 
 interface Props {
   data: LayerMatrixData;
@@ -41,7 +45,7 @@ const colMax = columns.map((_, c) => Math.max(1, ...cells.map((row) => row[c].va
 const toneOf = (tone?: number) => (tone ? `--lc: var(--l${tone}); --lc-ink: var(--l${tone}-ink)` : undefined);
 ---
 
-<figure class:list={['chart-fig lmx', className]} id={id}>
+<figure class:list={['chart-fig lmx', className]} id={id} data-ctip>
   <div class="chart-canvas lmx-canvas">
     <table class="lmx-table">
       <caption class="visually-hidden">{title}</caption>
@@ -66,6 +70,7 @@ const toneOf = (tone?: number) => (tone ? `--lc: var(--l${tone}); --lc-ink: var(
                 <span class="lmx-rl">{row.label}</span>
               </th>
               {cells[r].map((cell, c) => {
+                const name = `${cell.value} ${cell.label}`;
                 const body = (
                   <>
                     <span class="lmx-k" aria-hidden="true">
@@ -92,11 +97,13 @@ const toneOf = (tone?: number) => (tone ? `--lc: var(--l${tone}); --lc-ink: var(
                     style={cell.marks ? toneOf(columns[c].tone) : undefined}
                   >
                     {cell.href ? (
-                      <a class="lmx-cell" href={cell.href}>
+                      <a class="lmx-cell" href={cell.href} aria-label={name}>
                         {body}
                       </a>
                     ) : (
-                      <span class="lmx-cell">{body}</span>
+                      <span class="lmx-cell" data-tip={name}>
+                        {body}
+                      </span>
                     )}
                   </td>
                 );
@@ -108,7 +115,7 @@ const toneOf = (tone?: number) => (tone ? `--lc: var(--l${tone}); --lc-ink: var(
     </table>
     {
       legend && (
-        <ul class="lmx-legend" aria-label="Key">
+        <ul class="lmx-legend" aria-label="Key" data-ctip-skip>
           {legend.map((item) => (
             <li>
               <span class="lmx-m" data-kind={item.kind} aria-hidden="true" />
@@ -124,6 +131,7 @@ const toneOf = (tone?: number) => (tone ? `--lc: var(--l${tone}); --lc-ink: var(
     <span class="chart-desc">{caption}</span>
   </figcaption>
 </figure>
+<ChartTipScript />
 
 <style>
   .lmx-canvas {

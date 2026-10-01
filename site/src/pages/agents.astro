@@ -227,7 +227,14 @@ const threatsBy = new Map<string, AgentThreat[]>();
 for (const t of agentThreats) for (const title of t.patterns) threatsBy.set(title, [...(threatsBy.get(title) ?? []), t]);
 for (const title of threatsBy.keys()) {
   const def = patternOf(title);
-  flowNodes.push({ id: `p-${def.slug}`, column: 'pattern', label: `L${def.layer} · ${title}`, name: title, tone: def.layer as Tone, href: patternHref(title) });
+  flowNodes.push({
+    id: `p-${def.slug}`,
+    column: 'pattern',
+    label: `L${def.layer} · ${title}`,
+    name: `Layer ${String(def.layer).padStart(2, '0')} · ${title}`,
+    tone: def.layer as Tone,
+    href: patternHref(title),
+  });
 }
 const twoPatterns = agentThreats.filter((t) => t.patterns.length > 1);
 const threatFlowBase = {

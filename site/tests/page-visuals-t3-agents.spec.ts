@@ -7,8 +7,9 @@
 //    controls the level adds; the rung links resolve in chapter 23; on the
 //    toolkit the chosen level lights (and only with JavaScript);
 // 2. /agents threat flow: every OWASP agentic threat reaches exactly its
-//    chapter-23 patterns, each pattern takes as many threats as the data gives
-//    it, and every threat link lands on its row of the table;
+//    chapter-23 patterns, each named with its stack layer, each pattern takes
+//    as many threats as the data gives it, and every threat link lands on its
+//    row of the table;
 // 3. EvalBoundary (/frontier, the evaluation-environment research note): each
 //    of the five inner rings holds the controls the matching item of the
 //    note's "Five things inside the boundary" names (read from the note's
@@ -24,6 +25,7 @@ import { readFileSync } from 'node:fs';
 
 import { agentAnchors, agentChapter, agentControls, autonomyLevels } from '../src/data/tool-agent-controls';
 import { agentThreats } from '../src/data/agent-threats';
+import { patterns as patternDefs } from '../src/data/patterns';
 import { controlsIn } from '../src/data/controls';
 import { cases } from '../src/data/cases';
 import { LAB_NAMES } from '../src/data/frontier';
@@ -107,15 +109,18 @@ test.describe('/agents threat flow', () => {
   test('every threat reaches its chapter-23 pattern, and links its table row', async ({ page }) => {
     await page.goto('/agents');
     const rows = await chartRows(page, 'ag-threat-flow');
+    // A pattern is named with its home layer, as the site writes a layer ("Layer 04").
+    const layerOf = (title: string) => patternDefs.find((p) => p.title === title)?.layer;
+    const patternName = (title: string) => `Layer ${String(layerOf(title)).padStart(2, '0')} · ${title}`;
     for (const t of agentThreats) {
       const holding = rows.filter((row) => row[0].split('; ').some((name) => name.startsWith(`${t.id} `)));
-      expect(holding.map((row) => row[1]), t.id).toEqual(t.patterns);
+      expect(holding.map((row) => row[1]), t.id).toEqual(t.patterns.map(patternName));
       expect(holding[0][0], t.id).toContain(`${t.id} ${t.name}`);
     }
     const patterns = [...new Set(agentThreats.flatMap((t) => t.patterns))];
-    expect([...new Set(rows.map((row) => row[1]))].sort()).toEqual(patterns.sort());
+    expect([...new Set(rows.map((row) => row[1]))].sort()).toEqual(patterns.map(patternName).sort());
     for (const p of patterns) {
-      const drawn = rows.filter((row) => row[1] === p).reduce((sum, row) => sum + Number(row[2]), 0);
+      const drawn = rows.filter((row) => row[1] === patternName(p)).reduce((sum, row) => sum + Number(row[2]), 0);
       expect(drawn, p).toBe(agentThreats.filter((t) => t.patterns.includes(p)).length);
     }
     // Same-page links land on a row of the threat table.
@@ -190,15 +195,16 @@ test.describe('/frontier #incidents case x control', () => {
     await page.goto('/frontier');
     const rows = await chartRows(page, 'fr-cases');
     const expected = evalControls.flatMap((c) =>
-      cases.filter((k) => (k.relatedControls ?? []).includes(c.id)).map((k) => ({ control: short(c.id), k })),
+      cases.filter((k) => (k.relatedControls ?? []).includes(c.id)).map((k) => ({ control: short(c.id), title: c.title, k })),
     );
     expect(rows).toHaveLength(expected.length);
     // The page names no lab (LAB_NAMES), so a case's label never does.
-    expected.forEach(({ control, k }, i) => {
+    expected.forEach(({ control, title, k }, i) => {
       expect(rows[i][0], k.id).toBe(control);
       expect(rows[i][1], `${control} ${k.id}`).not.toBe('');
       expect(LAB_NAMES.test(rows[i][1]), `${control} ${k.id}: "${rows[i][1]}"`).toBe(false);
-      expect(rows[i][2]).toBe('Names the control');
+      // The state names the control, so a square's tooltip says which one.
+      expect(rows[i][2]).toBe(`Names ${control} ${title}`);
     });
     const named = cases.filter((k) => evalControls.some((c) => (k.relatedControls ?? []).includes(c.id)));
     expect([...new Set(await svgLinks(page, 'fr-cases'))].sort()).toEqual(named.map((k) => `/cases/${k.id}`).sort());

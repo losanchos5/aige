@@ -30,6 +30,7 @@ import { imdaAgenticXrefs, IMDA_AGENTIC_FRAMEWORK } from '../../data/controls/im
 import type { EnforcementPoint, PolicyEffect } from '../../data/policy-card';
 import { iso42001Controls, obligationLabel, threatAnchor, threatById } from '../../data/threats';
 import { nistAiRmfSubcategories } from '../../data/nist-ai-rmf';
+import { aiuc1ById } from '../../data/aiuc1';
 import { obligationPath } from '../../data/frameworks';
 import { getPatternBySlug, patternPath } from '../../data/patterns';
 import { casesForControl } from '../cross-links';
@@ -207,7 +208,7 @@ export function constellationFamilies(c: Control, labelW: number): RelationFamil
       items: [
         ...m.iso42001.map((id) => ({ label: cut(`ISO 42001 ${id}`), name: `ISO/IEC 42001 ${id} ${iso42001Controls[id] ?? ''}`.trim() })),
         ...m.nistAiRmf.map((id) => ({ label: cut(`NIST AI RMF ${id}`), name: `NIST AI RMF ${id} ${nistAiRmfSubcategories[id] ?? ''}`.trim() })),
-        ...(m.aiuc1 ?? []).map((id) => ({ label: cut(`AIUC-1 ${id}`), name: `AIUC-1 ${id}` })),
+        ...(m.aiuc1 ?? []).map((id) => ({ label: cut(`AIUC-1 ${id}`), name: `AIUC-1 ${id} ${aiuc1ById(id)?.title ?? ''}`.trim() })),
         ...(m.csaAicm ?? []).map((id) => ({ label: cut(`CSA AICM ${id}`), name: `CSA AICM ${id}` })),
         ...otherMappings(c).map((o) => ({ label: cut(`${o.framework} ${o.ref}`), name: `${o.framework} ${o.ref}` })),
       ],

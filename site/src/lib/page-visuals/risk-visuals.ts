@@ -146,15 +146,17 @@ export function threatFlow(): Pair {
   const setNode = (t: Threat) => (kept.includes(setKey(t)) ? `s-${setKey(t)}` : 's-other');
   const stage1 = tally(threats.map((t) => `c-${t.taxonomy}>${setNode(t)}`));
   const stage2 = tally(threats.map((t) => `${setNode(t)}>r-${threatRoute(t)}`));
-  // Short names throughout (the catalogue's short label, "L3 + L4"): every
-  // ribbon's tooltip repeats both ends, and the full names pass the 12 KB
-  // budget; the page names the catalogues and layers in full.
+  // Short names (the catalogue's short label; a layer set drawn "L3 + L4" and
+  // named by the layers' short names, "L3 Evals + L4 Runtime Controls"): every ribbon's
+  // tooltip repeats both ends, and the full names pass the 12 KB budget; the
+  // page names the catalogues and layers in full.
   const setLabel = (key: string) => key.split('-').map((n) => `L${n}`).join(' + ');
+  const setName = (key: string) => key.split('-').map((n) => layerLabel(Number(n))).join(' + ');
   const nodes: SankeyNode[] = [
     ...taxonomies.map((t) => ({ id: `c-${t.id}`, column: 'catalogue', label: t.short, href: `#tb-${t.id}` })),
     ...sets
       .filter((k) => kept.includes(k))
-      .map((k) => ({ id: `s-${k}`, column: 'layers', label: setLabel(k) })),
+      .map((k) => ({ id: `s-${k}`, column: 'layers', label: setLabel(k), name: setName(k) })),
     ...(rest.length ? [{ id: 's-other', column: 'layers', label: `Other (${rest.length})`, name: `Other layer sets: ${rest.map(setLabel).join('; ')}` }] : []),
     ...ROUTES.map((r) => ({ id: `r-${r.key}`, column: 'route', label: r.label, name: r.name })),
   ];
@@ -257,7 +259,13 @@ export function harmFlow(): Pair {
     .map((x) => x.m);
   const nodes: SankeyNode[] = [
     ...mechanisms.map((m) => ({ id: `m-${m}`, column: 'mechanism', label: mechanismLabel[m] })),
-    ...levelOrder.map((level) => ({ id: `v-${level}`, column: 'level', label: levelLabel[level], href: `#level-${level}` })),
+    ...levelOrder.map((level) => ({
+      id: `v-${level}`,
+      column: 'level',
+      label: levelLabel[level],
+      name: `${levelLabel[level]} level`,
+      href: `#level-${level}`,
+    })),
     ...LAYERS.map((n) => ({ id: `l-${n}`, column: 'layer', label: layerLabel(n), name: layerName(n), tone: n as Tone })),
   ];
   return flowPair({

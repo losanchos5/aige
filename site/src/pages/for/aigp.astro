@@ -19,6 +19,7 @@ import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import Figure from '../../components/Figure.astro';
 import Chart from '../../components/Chart.astro';
+import ChartTipScript from '../../components/ChartTipScript.astro';
 import SourceList from '../../components/SourceList.astro';
 import { site } from '../../data/site';
 import { chaptersOrdered } from '../../data/chapters';
@@ -288,6 +289,7 @@ const jsonLd = [
       >
         <Fragment set:html={heatmap} />
       </Figure>
+      <ChartTipScript />
     </section>
 
     <section class="res-section" aria-labelledby="domain-chapters">

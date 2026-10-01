@@ -18,9 +18,12 @@
  * heatGrid: 31 x 5 cells with their tooltips come to about 36 KB of SVG, three
  * times the 12 KB budget of an inline chart. It scrolls sideways inside a
  * labelled, focusable region with the framework column sticky, as the
- * framework tables below it do. Frame: chart.css.
+ * framework tables below it do. Frame: chart.css. The figure is a chart-tip
+ * root (data-ctip, ChartTipScript): each count cell's data-tip names its
+ * profile, framework and count, zeros included, shown at once on hover and tap.
  */
 import '../../styles/chart.css';
+import ChartTipScript from '../ChartTipScript.astro';
 import { CONTROLS_AS_OF } from '../../data/controls';
 import { crosswalkIndex } from '../../lib/page-visuals/controls-flows';
 
@@ -38,6 +41,11 @@ const side = (n: number) => Math.round((6 + 12 * Math.sqrt(n / max)) * 10) / 10;
 const onlyOne = rows.filter((r) => r.values.filter((v) => v > 0).length === 1).length;
 const all = rows.filter((r) => r.values.every((v) => v > 0)).length;
 const span = profiles.length + 2;
+// The framework as the profile flow names it: the register's copy of a
+// framework that is also a catalogue carries its group.
+const fwName = (r: (typeof rows)[number]) => (r.obligation ? `${r.fw.name} (obligation register)` : r.fw.name);
+const cellTip = (r: (typeof rows)[number], c: number) =>
+  `${profiles[c].shortTitle}, ${fwName(r)}: ${r.values[c]} ${r.values[c] === 1 ? 'mapping' : 'mappings'}`;
 
 const title = 'Frameworks by profile';
 const caption = `The mappings each profile's controls make to each framework; the rows link to the framework's table. ${onlyOne} of ${rows.length} frameworks are reached by one profile only and ${all === 0 ? 'none by all' : `${all} by all`} ${profiles.length}.`;
@@ -47,7 +55,7 @@ const groups = [
 ];
 ---
 
-<figure class="chart-fig cwx" aria-labelledby="cwx-title" data-pagefind-ignore>
+<figure class="chart-fig cwx" aria-labelledby="cwx-title" data-pagefind-ignore data-ctip>
   <div class="chart-canvas cwx-canvas">
     <div class="cwx-scroll" role="region" tabindex="0" aria-label="Frameworks by profile, scrolls sideways">
       <table class="cwx-table">
@@ -78,13 +86,13 @@ const groups = [
                   <th scope="row" class="cwx-row">
                     <a href={`#${r.fw.id}`}>{r.fw.name}</a>
                   </th>
-                  {r.values.map((n) =>
+                  {r.values.map((n, c) =>
                     n > 0 ? (
-                      <td class="cwx-cell cwx-n" style={`--sq:${side(n)}px`}>
+                      <td class="cwx-cell cwx-n" style={`--sq:${side(n)}px`} data-tip={cellTip(r, c)}>
                         {n}
                       </td>
                     ) : (
-                      <td class="cwx-cell cwx-zero">
+                      <td class="cwx-cell cwx-zero" data-tip={cellTip(r, c)}>
                         <span class="visually-hidden">0</span>
                       </td>
                     ),
@@ -116,6 +124,7 @@ const groups = [
     <span class="chart-desc">{caption}</span>
   </figcaption>
 </figure>
+<ChartTipScript />
 
 <style>
   /* Positioned, so the visually hidden zeros (absolute) scroll with the

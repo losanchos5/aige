@@ -154,6 +154,15 @@ test.describe('/controls/crosswalk: profiles, frameworks and clauses', () => {
       expect(r.row.includes(`href="#${r.id}"`), `row links #${r.id}`).toBe(true);
       const expected = profiles.map((p) => pairs(r.id, p.slug));
       expect(r.counts, r.id).toEqual([...expected, sum(expected)]);
+      // Each profile cell, zeros included, is named for its tooltip by its
+      // profile, its framework and its count.
+      const fw = crosswalk.frameworks.find((f) => f.id === r.id)!;
+      const tips = [...r.row.matchAll(/<td[^>]*data-tip="([^"]*)"/g)].map((m) => decode(m[1]));
+      expect(tips, r.id).toHaveLength(profiles.length);
+      profiles.forEach((p, i) => {
+        expect(tips[i].startsWith(`${p.shortTitle}, ${fw.name}`), tips[i]).toBe(true);
+        expect(tips[i].endsWith(`: ${expected[i]} ${expected[i] === 1 ? 'mapping' : 'mappings'}`), tips[i]).toBe(true);
+      });
     }
     // The register's instruments stay grouped under a link to #obligations.
     expect(table.includes('href="#obligations"')).toBe(true);

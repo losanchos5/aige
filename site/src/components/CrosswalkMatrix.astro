@@ -24,8 +24,15 @@
  * `caption` and `chooser={false}`: every column shows and no chooser is
  * rendered, so public/crosswalk.js never applies the general crosswalk's
  * remembered column choice to it.
+ *
+ * The figure is a chart-tip root (data-ctip, ChartTipScript; chart.css carries
+ * the tooltip's styles): a cell's aria-label shows at once on hover, focus and
+ * tap, and an unverified chip names its clause, topic and column (data-tip)
+ * rather than its state alone. The chip key is data-ctip-skip.
  */
 import { topicMatrix, chipLabel, frameworkById } from '../data/crosswalk';
+import ChartTipScript from './ChartTipScript.astro';
+import '../styles/chart.css';
 import type { ColumnGroup } from '../data/crosswalk';
 
 interface Props {
@@ -57,13 +64,13 @@ const usedGroups = groups.filter((g) => columns.some((c) => c.group === g.id));
 const defaultCount = columns.filter((c) => c.defaultVisible).length;
 ---
 
-<figure class="cw" aria-labelledby="cw-cap">
+<figure class="cw" aria-labelledby="cw-cap" data-ctip>
   <figcaption id="cw-cap" class="cw-cap">
     <span class="mono">Crosswalk</span>
     <span class="cw-cap-text">{caption}</span>
   </figcaption>
 
-  <ul class="cw-key" aria-label="Chip key">
+  <ul class="cw-key" aria-label="Chip key" data-ctip-skip>
     <li>
       <span class="cw-chip" aria-hidden="true">clause</span>
       <span>Solid: maps to</span>
@@ -192,6 +199,13 @@ const defaultCount = columns.filter((c) => c.defaultVisible).length;
                               ? 'Not yet verified against the source'
                               : undefined
                           }
+                          data-tip={
+                            r.verified === false
+                              ? `${topic.name}, ${columns[i].label}: ${chipLabel(r)}${
+                                  r.strength === 'related' ? ' (related)' : ''
+                                }, not yet verified against the source`
+                              : undefined
+                          }
                         >
                           {chipLabel(r)}
                           {r.verified === false ? ' ?' : ''}
@@ -213,6 +227,7 @@ const defaultCount = columns.filter((c) => c.defaultVisible).length;
     </table>
   </div>
 </figure>
+<ChartTipScript />
 
 <noscript>
   <style is:inline>

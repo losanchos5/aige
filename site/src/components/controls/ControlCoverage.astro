@@ -16,10 +16,15 @@
  * mappings table under it keeps the ids themselves. Row headers link to the
  * control's section (#aige-ctl-...), 28 px apart. Narrow, the headers stand
  * vertical and a row shows only the control number; it fits a phone with no
- * sideways scroll. HTML and CSS; the frame comes from chart.css.
+ * sideways scroll. HTML and CSS; the frame comes from chart.css. The figure
+ * is a chart-tip root (data-ctip, ChartTipScript): each cell's data-tip names
+ * its control (id and title), framework and count, or the IMDA fit, shown at
+ * once on hover and tap; the column heads (axes, with their native title)
+ * are data-ctip-skip.
  */
 import '../../styles/chart.css';
 import '../../styles/control-visuals.css';
+import ChartTipScript from '../ChartTipScript.astro';
 import { controlsIn, CONTROLS_AS_OF, type ControlProfile } from '../../data/controls';
 import { COVERAGE_COLUMNS, coverageCount, imdaFit, tileHref } from '../../lib/page-visuals/control-visuals';
 
@@ -41,6 +46,7 @@ const foot = COVERAGE_COLUMNS.map((_, i) => ({
 const imdaFoot = { direct: fits.filter((f) => f === 'direct').length, partial: fits.filter((f) => f === 'partial').length };
 const empty = rows.filter((_, i) => counts[i].every((n) => n === 0) && !fits[i]).length;
 const fitWord = { direct: 'Direct fit', partial: 'Partial fit' } as const;
+const idsWord = (n: number) => `${n} ${n === 1 ? 'id' : 'ids'} mapped`;
 
 const title = 'Framework coverage, control by control';
 const caption = `The number of ids each control maps to in each framework, and its IMDA Agentic AI fit. ${
@@ -48,13 +54,13 @@ const caption = `The number of ids each control maps to in each framework, and i
 }; pale columns are frameworks the profile barely touches.`;
 ---
 
-<figure class="chart-fig ccv" aria-labelledby="ccv-title" data-pagefind-ignore>
+<figure class="chart-fig ccv" aria-labelledby="ccv-title" data-pagefind-ignore data-ctip>
   <div class="chart-canvas ccv-canvas">
     <table class="ccv-table">
       <caption class="visually-hidden">
         {profile.title}: ids mapped per control and framework, and the IMDA Agentic AI fit
       </caption>
-      <thead>
+      <thead data-ctip-skip>
         <tr>
           <th scope="col" class="ccv-corner">Control</th>
           {
@@ -79,14 +85,17 @@ const caption = `The number of ids each control maps to in each framework, and i
                   <span class="ccv-title">{c.title}</span>
                 </a>
               </th>
-              {counts[r].map((n) =>
+              {counts[r].map((n, i) =>
                 n > 0 ? (
-                  <td class="ccv-cell ccv-n" style={`--sq:${side(n)}px`}>{n}</td>
+                  <td class="ccv-cell ccv-n" style={`--sq:${side(n)}px`} data-tip={`${c.id} ${c.title}, ${COVERAGE_COLUMNS[i].label}: ${idsWord(n)}`}>{n}</td>
                 ) : (
-                  <td class="ccv-cell ccv-zero"><span class="visually-hidden">0</span></td>
+                  <td class="ccv-cell ccv-zero" data-tip={`${c.id} ${c.title}, ${COVERAGE_COLUMNS[i].label}: ${idsWord(0)}`}><span class="visually-hidden">0</span></td>
                 ),
               )}
-              <td class:list={['ccv-cell', fits[r] ? `ccv-fit ccv-${fits[r]}` : 'ccv-zero']}>
+              <td
+                class:list={['ccv-cell', fits[r] ? `ccv-fit ccv-${fits[r]}` : 'ccv-zero']}
+                data-tip={`${c.id} ${c.title}, IMDA Agentic AI: ${fits[r] ? fitWord[fits[r]!] : 'None'}`}
+              >
                 <span class="visually-hidden">{fits[r] ? fitWord[fits[r]!] : 'None'}</span>
               </td>
             </tr>
@@ -146,3 +155,4 @@ const caption = `The number of ids each control maps to in each framework, and i
     <span class="chart-desc">{caption}</span>
   </figcaption>
 </figure>
+<ChartTipScript />
