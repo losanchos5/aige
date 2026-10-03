@@ -17,6 +17,7 @@ Learn more about our Spring 2026 Cyber AI Profile Virtual Working Sessions (Apri
 Author(s)
 Katerina Megas (NIST), Barbara Cuthill (NIST), Marissa Dotter (MITRE), Michael Garris (MITRE), Ishika Khemani (MITRE), Bronwyn Patrick (MITRE), Noah Schiro (MITRE), Julie Nethery Snyder (MITRE), Mohammad Zarei (MITRE)
 Announcement
+Per the Sept. 29, 2026, Executive Order on Inaugurating the Era of Super Intelligence, NIST is working to update its communications to incorporate the term “super intelligence” as directed.
 Draft for Public Comment
 AI has become a driving force behind today’s technological development, transforming industries and redefining how society operates. Advancements in AI technology introduce both cybersecurity opportunities and challenges to organizations.
 NIST’s preliminary draft Cyber AI Profile can help organizations strategically adopt AI while addressing and prioritizing cybersecurity risks stemming from its advancements.
