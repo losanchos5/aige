@@ -9,10 +9,10 @@ Download
 Additional Resources
 September 1, 2026
 Resources
-GenAI Security Industry Framework Crosswalk
+Agent Control Standard (ACS)
 September 1, 2026
 Resources
-Agent Control Standard (ACS)
+GenAI Security Industry Framework Crosswalk
 August 3, 2026
 Resources
 OWASP GenAI LLM Top 10 2026

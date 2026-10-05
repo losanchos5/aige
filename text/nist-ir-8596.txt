@@ -57,6 +57,6 @@ Topics
 Security and Privacy
 risk management
 Technologies
-artificial intelligence
+machine learning
 Applications
 cybersecurity framework
