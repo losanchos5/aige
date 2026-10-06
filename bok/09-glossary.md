@@ -312,6 +312,15 @@ base of adversary tactics and techniques against AI, including agent-specific te
 system](/bok/governing-deployment#threat-modelling-the-deployed-system); [ch. 23, Threats mapped to
 controls](/bok/governing-agents#threats-mapped-to-controls). (ch. 05, 10, 15, 23)
 
+**Attestation.** A formal statement by an accountable person or body that specified requirements
+have been fulfilled [146]. While conformity assessment is the broader process of evaluating
+conformity, an attestation is the formal statement expressing its result. It is distinct from device
+attestation, a technical security mechanism that cryptographically verifies hardware or platform
+integrity. Contrast with [Conformity assessment](/glossary/conformity-assessment). See [ch. 03,
+Evidence comes from runtime, not from a point-in-time
+attestation](/bok/values-and-principles#3-evidence-comes-from-runtime-not-from-a-point-in-time-attestation).
+(ch. 03, 04, 05, 06, 08, 12, 15, 22)
+
 **Audit-ready evidence.** Evidence emitted as a by-product of the build in a form an auditor can
 read directly (machine-readable, signed, timestamped), so the audit is a query, not a collection
 project. See [ch. 01, Three clarifiers](/bok/definition#three-clarifiers). (ch. 01, 04)
@@ -2322,3 +2331,4 @@ Runtime Controls & Observability](/bok/the-stack#layer-04-runtime-controls--obse
 [143] Responsible Scaling Policy, Version 3.4 (effective 2026-07-08; capability-threshold table, Risk Reports, Appendix B on AI Safety Levels). Anthropic. 2026-07-08. https://www-cdn.anthropic.com/files/4zrzovbb/website/0bacdc8440ea96e62a8766d99ebe1d4eea6d5f3a.pdf (verified: primary)
 [144] Preparedness Framework, Version 2 (last updated 2025-04-15; Tracked Categories, High and Critical thresholds, Safeguards Reports, Safety Advisory Group). OpenAI. 2025-04-15. https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf (verified: primary)
 [145] Frontier Safety Framework, Version 3.1 (Critical and Tracked Capability Levels, security and deployment mitigations, annual review). Google DeepMind. 2026-04-17. https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/strengthening-our-frontier-safety-framework/frontier-safety-framework_3-1.pdf (verified: primary)
+[146] ISO/IEC 17000:2020, Conformity assessment: Vocabulary and general principles (clause 7.3: issue of a statement of conformity based on a decision following review, that fulfilment of specified requirements has been demonstrated). ISO/IEC. 2020-05. https://www.iso.org/standard/73963.html (verified: primary)
