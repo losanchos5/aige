@@ -369,6 +369,7 @@ v0.5.0 the catalogue and the pattern pages number their own lists (see the secti
 | 143 | effective 2026-07-08; capability-threshold table, Risk Reports, Appendix B on AI Safety Levels | Responsible Scaling Policy, Version 3.4 | Anthropic | 2026-07-08 | https://www-cdn.anthropic.com/files/4zrzovbb/website/0bacdc8440ea96e62a8766d99ebe1d4eea6d5f3a.pdf | primary | Glossary (AI Safety Level, Responsible Scaling Policy) |
 | 144 | last updated 2025-04-15; Tracked Categories, High and Critical thresholds, Safeguards Reports, Safety Advisory Group | Preparedness Framework, Version 2 | OpenAI | 2025-04-15 | https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf | primary | Glossary (Preparedness Framework) |
 | 145 | Critical and Tracked Capability Levels, security and deployment mitigations, annual review | Frontier Safety Framework, Version 3.1 | Google DeepMind | 2026-04-17 | https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/strengthening-our-frontier-safety-framework/frontier-safety-framework_3-1.pdf | primary | Glossary (Critical Capability Level, Frontier Safety Framework) |
+| 146 | clause 7.3: issue of a statement of conformity based on a decision following review, that fulfilment of specified requirements has been demonstrated | ISO/IEC 17000:2020, Conformity assessment: Vocabulary and general principles | ISO/IEC | 2020-05 | https://www.iso.org/standard/73963.html | primary | Glossary (Attestation) |
 
 ### bok/10-reading-list.md
 
