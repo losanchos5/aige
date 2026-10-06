@@ -33,9 +33,9 @@
       "observedAt": "2026-09-26T11:28:20Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 0,
-      "failingSince": null,
-      "lastError": null
+      "failures": 1,
+      "failingSince": "2026-10-06T13:21:23Z",
+      "lastError": "HTTP 403"
     },
     "ca-sb-53": {
       "url": "https://leginfo.legislature.ca.gov/faces/billNavClient.xhtml?bill_id=202520260SB53",
@@ -45,9 +45,9 @@
       "observedAt": "2026-09-26T11:28:19Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 0,
-      "failingSince": null,
-      "lastError": null
+      "failures": 1,
+      "failingSince": "2026-10-06T13:21:23Z",
+      "lastError": "HTTP 403"
     },
     "cen-cenelec-jtc21-qms": {
       "url": "https://www.cencenelec.eu/news-events/news/2026/en-in-the-spotlight/2026-07-30-ai-quality-management/",
@@ -189,7 +189,7 @@
       "observedAt": "2026-09-26T11:27:35Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 2,
+      "failures": 3,
       "failingSince": "2026-10-04T12:24:24Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -201,7 +201,7 @@
       "observedAt": "2026-09-26T11:27:34Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 2,
+      "failures": 3,
       "failingSince": "2026-10-04T12:24:24Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -213,7 +213,7 @@
       "observedAt": "2026-09-26T11:27:36Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 2,
+      "failures": 3,
       "failingSince": "2026-10-04T12:24:25Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -342,7 +342,7 @@
       "fingerprint": "e588314ac823c9b6",
       "kind": null,
       "sha256": null,
-      "failures": 10,
+      "failures": 11,
       "failingSince": "2026-09-26T11:28:22Z",
       "lastError": "HTTP 403"
     },
@@ -351,7 +351,7 @@
       "fingerprint": "10d744b170c204fe",
       "kind": null,
       "sha256": null,
-      "failures": 10,
+      "failures": 11,
       "failingSince": "2026-09-26T11:28:21Z",
       "lastError": "HTTP 403"
     },
