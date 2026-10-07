@@ -38,6 +38,7 @@ Mistral AI
 Open Hippo
 OpenAI
 Pleias
+Reflection AI, Inc.
 ServiceNow
 WRITER
 In addition, xAI signed up to the Safety and Security Chapter; this means that it will have to demonstrate compliance with the AI Act’s obligations concerning transparency and copyright via alternative adequate means.
