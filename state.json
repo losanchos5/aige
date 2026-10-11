@@ -33,7 +33,7 @@
       "observedAt": "2026-09-26T11:28:20Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 5,
+      "failures": 6,
       "failingSince": "2026-10-06T13:21:23Z",
       "lastError": "HTTP 403"
     },
@@ -45,7 +45,7 @@
       "observedAt": "2026-09-26T11:28:19Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 5,
+      "failures": 6,
       "failingSince": "2026-10-06T13:21:23Z",
       "lastError": "HTTP 403"
     },
@@ -342,7 +342,7 @@
       "fingerprint": "e588314ac823c9b6",
       "kind": null,
       "sha256": null,
-      "failures": 15,
+      "failures": 16,
       "failingSince": "2026-09-26T11:28:22Z",
       "lastError": "HTTP 403"
     },
@@ -351,7 +351,7 @@
       "fingerprint": "10d744b170c204fe",
       "kind": null,
       "sha256": null,
-      "failures": 15,
+      "failures": 16,
       "failingSince": "2026-09-26T11:28:21Z",
       "lastError": "HTTP 403"
     },
