@@ -33,7 +33,7 @@
       "observedAt": "2026-09-26T11:28:20Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 9,
+      "failures": 10,
       "failingSince": "2026-10-06T13:21:23Z",
       "lastError": "HTTP 403"
     },
@@ -45,7 +45,7 @@
       "observedAt": "2026-09-26T11:28:19Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 9,
+      "failures": 10,
       "failingSince": "2026-10-06T13:21:23Z",
       "lastError": "HTTP 403"
     },
@@ -69,9 +69,9 @@
       "observedAt": "2026-09-26T11:27:52Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 0,
-      "failingSince": null,
-      "lastError": null
+      "failures": 1,
+      "failingSince": "2026-10-15T11:33:12Z",
+      "lastError": "HTTP 503"
     },
     "co-sb26-189": {
       "url": "https://leg.colorado.gov/bills/sb26-189",
@@ -189,7 +189,7 @@
       "observedAt": "2026-09-26T11:27:35Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 3,
+      "failures": 4,
       "failingSince": "2026-10-12T15:29:42Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -201,7 +201,7 @@
       "observedAt": "2026-09-26T11:27:34Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 3,
+      "failures": 4,
       "failingSince": "2026-10-12T15:29:42Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -213,7 +213,7 @@
       "observedAt": "2026-09-26T11:27:36Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 3,
+      "failures": 4,
       "failingSince": "2026-10-12T15:29:43Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -273,9 +273,9 @@
       "observedAt": "2026-09-26T11:28:00Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 0,
-      "failingSince": null,
-      "lastError": null
+      "failures": 1,
+      "failingSince": "2026-10-15T11:33:27Z",
+      "lastError": "Network error: UND_ERR_CONNECT_TIMEOUT"
     },
     "kr-ai-basic-act-decree": {
       "url": "https://www.law.go.kr/LSW/lsInfoP.do?efYd=20260122&lsiSeq=282879",
@@ -285,9 +285,9 @@
       "observedAt": "2026-09-26T11:28:08Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 0,
-      "failingSince": null,
-      "lastError": null
+      "failures": 1,
+      "failingSince": "2026-10-15T11:34:05Z",
+      "lastError": "Network error: UND_ERR_CONNECT_TIMEOUT"
     },
     "nist-ai-800-1": {
       "url": "https://www.nist.gov/news-events/news/2025/01/updated-guidelines-managing-misuse-risk-dual-use-foundation-models",
@@ -342,7 +342,7 @@
       "fingerprint": "e588314ac823c9b6",
       "kind": null,
       "sha256": null,
-      "failures": 19,
+      "failures": 20,
       "failingSince": "2026-09-26T11:28:22Z",
       "lastError": "HTTP 403"
     },
@@ -351,7 +351,7 @@
       "fingerprint": "10d744b170c204fe",
       "kind": null,
       "sha256": null,
-      "failures": 19,
+      "failures": 20,
       "failingSince": "2026-09-26T11:28:21Z",
       "lastError": "HTTP 403"
     },
