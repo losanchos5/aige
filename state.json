@@ -33,7 +33,7 @@
       "observedAt": "2026-09-26T11:28:20Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 19,
+      "failures": 20,
       "failingSince": "2026-10-06T13:21:23Z",
       "lastError": "HTTP 403"
     },
@@ -45,7 +45,7 @@
       "observedAt": "2026-09-26T11:28:19Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 19,
+      "failures": 20,
       "failingSince": "2026-10-06T13:21:23Z",
       "lastError": "HTTP 403"
     },
@@ -93,7 +93,7 @@
       "observedAt": "2026-10-19T13:20:50Z",
       "previousSha256": "37d0cbd353330fc8750aa445479da0871f167ac72331d2137d057ce886e1da46",
       "changedAt": "2026-10-19T13:20:50Z",
-      "failures": 3,
+      "failures": 4,
       "failingSince": "2026-10-22T11:56:01Z",
       "lastError": "HTTP 403"
     },
@@ -105,7 +105,7 @@
       "observedAt": "2026-09-28T13:59:15Z",
       "previousSha256": "7ea2e7fda2a0df9bdf12d19f4a41074bef22934f4f939e92584dfc53a15e4b8d",
       "changedAt": "2026-09-28T13:59:15Z",
-      "failures": 3,
+      "failures": 4,
       "failingSince": "2026-10-22T11:56:06Z",
       "lastError": "HTTP 403"
     },
@@ -117,7 +117,7 @@
       "observedAt": "2026-10-07T13:27:38Z",
       "previousSha256": "796cb9b6eac9ea541fe337cc562da49be610e743434b57166c18125843eb13f9",
       "changedAt": "2026-10-07T13:27:38Z",
-      "failures": 3,
+      "failures": 4,
       "failingSince": "2026-10-22T11:56:03Z",
       "lastError": "HTTP 403"
     },
@@ -129,7 +129,7 @@
       "observedAt": "2026-09-26T11:27:41Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 3,
+      "failures": 4,
       "failingSince": "2026-10-22T11:56:04Z",
       "lastError": "HTTP 403"
     },
@@ -141,7 +141,7 @@
       "observedAt": "2026-09-26T11:27:40Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 3,
+      "failures": 4,
       "failingSince": "2026-10-22T11:56:03Z",
       "lastError": "HTTP 403"
     },
@@ -153,7 +153,7 @@
       "observedAt": "2026-09-28T13:59:13Z",
       "previousSha256": "b966058ed84075ab3586b55b88d991a312392f4bdf1bc5996e9336dd39cbc74e",
       "changedAt": "2026-09-28T13:59:13Z",
-      "failures": 3,
+      "failures": 4,
       "failingSince": "2026-10-22T11:56:05Z",
       "lastError": "HTTP 403"
     },
@@ -165,7 +165,7 @@
       "observedAt": "2026-09-26T11:27:44Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 3,
+      "failures": 4,
       "failingSince": "2026-10-22T11:56:07Z",
       "lastError": "HTTP 403"
     },
@@ -189,7 +189,7 @@
       "observedAt": "2026-09-26T11:27:35Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 6,
+      "failures": 7,
       "failingSince": "2026-10-19T13:20:48Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -201,7 +201,7 @@
       "observedAt": "2026-09-26T11:27:34Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 6,
+      "failures": 7,
       "failingSince": "2026-10-19T13:20:48Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -213,7 +213,7 @@
       "observedAt": "2026-09-26T11:27:36Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 6,
+      "failures": 7,
       "failingSince": "2026-10-19T13:20:49Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -342,7 +342,7 @@
       "fingerprint": "e588314ac823c9b6",
       "kind": null,
       "sha256": null,
-      "failures": 29,
+      "failures": 30,
       "failingSince": "2026-09-26T11:28:22Z",
       "lastError": "HTTP 403"
     },
@@ -351,7 +351,7 @@
       "fingerprint": "10d744b170c204fe",
       "kind": null,
       "sha256": null,
-      "failures": 29,
+      "failures": 30,
       "failingSince": "2026-09-26T11:28:21Z",
       "lastError": "HTTP 403"
     },
