@@ -74,7 +74,7 @@ test.describe('visible byline', () => {
 
   test('the co-authored Thesis carries no single-author byline', async ({ page }) => {
     await page.goto('/thesis');
-    await expect(page.locator('.ch-meta a[rel="author"]')).toHaveCount(0);
+    await expect(page.locator('.chapter-header a[rel="author"]')).toHaveCount(0);
   });
 });
 

@@ -20,6 +20,7 @@ import Base from '../layouts/Base.astro';
 import '../styles/reading.css';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import ChapterHeader from '../components/ChapterHeader.astro';
+import AuthorBadge from '../components/AuthorBadge.astro';
 import Toc from '../components/Toc.astro';
 import EditOnGitHub from '../components/EditOnGitHub.astro';
 import * as pillar from '../../../guides/ai-governance.md';
@@ -246,10 +247,11 @@ if (emitDiagramScript) Astro.locals.diagramScript = true;
         <article class="prose" data-pagefind-body>
           <ChapterHeader title={h1} summary={answer} />
           <p class="byline" data-testid="byline">
-            <span>By <a href="/about" rel="author">{author}</a></span>
-            <span>Published <time datetime={published}>{proseDate(published)}</time></span>
-            <span>Updated <time datetime={updated}>{proseDate(updated)}</time></span>
-            <span>{site.license}</span>
+            <AuthorBadge placement="chapter">
+              <span>Published <time datetime={published}>{proseDate(published)}</time></span>
+              <span>Updated <time datetime={updated}>{proseDate(updated)}</time></span>
+              <span>{site.license}</span>
+            </AuthorBadge>
           </p>
           <Fragment set:html={segments[0]} />
           <Figure
@@ -330,23 +332,8 @@ if (emitDiagramScript) Astro.locals.diagramScript = true;
   }
 
   .byline {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-2) var(--s-3);
     margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    color: var(--ink-2);
-  }
-
-  .byline span + span::before {
-    content: '·';
-    margin-right: var(--s-3);
-  }
-
-  .byline a {
-    color: var(--ink);
-    font-weight: 600;
+    line-height: 1.5;
   }
 
   .pillar-foot {

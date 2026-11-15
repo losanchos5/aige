@@ -131,7 +131,34 @@ test.describe('/about', () => {
     const person = graph(html('/about')).find((node) => node['@id'] === PERSON_ID);
     expect(person).toBeTruthy();
     expect(person!.knowsAbout).toEqual(expect.arrayContaining(NEW_SUBJECTS));
+    expect(person!.image).toBe('https://aigovernanceengineer.com/images/author/jorge-garcia-aibar.jpg');
   });
+});
+
+// The author byline (OpenSpec change author-byline): the LinkedIn button is the
+// contact path on every page where readers land, and its placement attribute is
+// what tells the analytics where a contact came from. One row per placement.
+test.describe('author byline LinkedIn button', () => {
+  const LINKEDIN = 'https://www.linkedin.com/in/jorgara';
+  const rows: [route: string, placement: string][] = [
+    ['/glossary/huderia', 'byline'],
+    ['/bok/the-stack', 'chapter'],
+    ['/ai-governance', 'chapter'],
+    ['/about', 'about'],
+  ];
+  for (const [route, placement] of rows) {
+    test(`${route}: one LinkedIn button, placement ${placement}`, () => {
+      const buttons = [...html(route).matchAll(/<a\b[^>]*data-umami-event="linkedin-click"[^>]*>/g)].map(
+        (m) => m[0],
+      );
+      expect(buttons).toHaveLength(1);
+      const tag = buttons[0];
+      expect(tag).toContain(`href="${LINKEDIN}"`);
+      expect(tag).toContain('rel="noopener noreferrer"');
+      expect(tag).toContain('aria-label="Jorge García Aibar on LinkedIn"');
+      expect(tag).toContain(`data-umami-event-placement="${placement}"`);
+    });
+  }
 });
 
 test.describe('/about/methodology', () => {
