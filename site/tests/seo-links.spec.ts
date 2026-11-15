@@ -232,7 +232,7 @@ test.describe('"AI governance engineer": /role is the landing', () => {
   test('/role carries a visible byline under its H1', () => {
     const main = mainContent(html('/role'));
     const byline = /<p class="byline"[^>]*data-byline[^>]*>([\s\S]*?)<\/p>/.exec(main)?.[1] ?? '';
-    expect(byline).toMatch(/By <a rel="author" href="\/about"[^>]*>/);
+    expect(byline).toMatch(/<a\b[^>]*rel="author" href="\/about"[^>]*>/);
     expect(byline).toMatch(/<time datetime="\d{4}-\d{2}-\d{2}"[^>]*>/);
     expect(main.indexOf('data-byline')).toBeGreaterThan(main.indexOf('<h1'));
   });

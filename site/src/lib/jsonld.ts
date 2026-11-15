@@ -4,7 +4,7 @@
 // the site and the WebSite itself) and merges whatever a page contributes into
 // that same @graph, so no component ever emits a second block.
 //
-// Person nodes carry only what data/site.ts states: name, url, sameAs, and the
+// Person nodes carry only what data/site.ts states: name, url, sameAs, image, and the
 // jobTitle, description and knowsAbout restated from the preface. Never
 // worksFor: the preface names no employer, and nothing is claimed beyond it.
 import { site } from '../data/site';
@@ -41,6 +41,7 @@ export const authorNodes: readonly Record<string, unknown>[] = site.authorDetail
     name: author.name,
     ...(author.url ? { url: author.url } : {}),
     ...(author.jobTitle ? { jobTitle: author.jobTitle } : {}),
+    ...(author.image ? { image: new URL(author.image, origin).href } : {}),
     ...(author.description ? { description: author.description } : {}),
     ...(author.knowsAbout && author.knowsAbout.length
       ? { knowsAbout: [...author.knowsAbout] }

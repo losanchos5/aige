@@ -4,10 +4,11 @@
 // line. No eyebrow above the H1 (audit SL-04): a chapter's book and number are
 // already in the breadcrumb above the header. Everything sits in a full-bleed
 // band (.ch-band), neutral unless Doc.astro passes the layer of a chapter that is
-// about one stack layer (chapters.ts `layer`). The meta line opens with the
-// author byline (audit C4/V2): the name the JSON-LD Person node carries, linked
-// to /about with rel="author".
+// about one stack layer (chapters.ts `layer`). Above the meta line sits the
+// author byline (audit C4/V2) as AuthorBadge: photo, the name the JSON-LD
+// Person node carries linked to /about with rel="author", LinkedIn, title.
 import { site } from '../data/site';
+import AuthorBadge from './AuthorBadge.astro';
 import { intlLocale, translator } from '../i18n/ui';
 
 interface Props {
@@ -24,7 +25,7 @@ interface Props {
   mesh?: 'a' | 'b' | 'c' | 'd' | 'e';
   /** Page language, passed down by Doc; drives the meta line's labels. */
   lang?: string;
-  /** Show the author in the meta line. Default: on every dated page except the
+  /** Show the author byline. Default: on every dated page except the
       Thesis (/thesis and its translations), which is co-authored and states
       its own authorship. */
   byline?: boolean;
@@ -67,13 +68,8 @@ interface MetaBit {
   text: string;
   /** YYYY-MM-DD for the <time datetime> attribute; omitted on plain bits. */
   datetime?: string;
-  /** Render the bit as the author byline: `text` is the "By" label. */
-  author?: boolean;
 }
 const metaBits: MetaBit[] = [];
-// "By" is written here only in English: the UI strings carry no label for it, so
-// a translated page shows the linked name alone.
-if (byline) metaBits.push({ text: lang === 'en' ? 'By' : '', author: true });
 if (updated && siteVersion) metaBits.push({ text: `v${site.bokVersion}` });
 if (updated) metaBits.push({ text: labels.updated, datetime: updated });
 if (minutes && words)
@@ -99,17 +95,19 @@ if (updated) metaBits.push({ text: site.license });
     {
       metaBits.length > 0 && (
         <ul class="ch-meta">
+          {
+            byline && (
+              <li class="ch-author">
+                <AuthorBadge placement="chapter" lang={lang} />
+              </li>
+            )
+          }
           {metaBits.map((bit) => (
             <li>
               {/* The <li> is a flex container, so the label and the <time> are
                   kept in one inline wrapper: as two bare flex items the space
                   between them would be dropped. */}
-              {bit.author ? (
-                <span class="ch-byline">
-                  {bit.text && `${bit.text} `}
-                  <a rel="author" href="/about">{site.authors[0]}</a>
-                </span>
-              ) : bit.datetime ? (
+              {bit.datetime ? (
                 <span>
                   {bit.text} <time datetime={bit.datetime}>{bit.datetime}</time>
                 </span>
@@ -244,16 +242,44 @@ if (updated) metaBits.push({ text: site.license });
     margin: 0;
   }
 
-  /* The author link: --ink on the band, underlined, never dimmed. */
-  .ch-byline a {
-    color: var(--ink);
-    text-decoration: underline;
-    text-decoration-color: var(--line);
-    text-underline-offset: 0.18em;
+  /* The author is the first meta item. From 540px up it takes a row of its
+     own with the full badge; on phones it shrinks to photo, name and LinkedIn
+     and flows inline with the meta bits, as the old "By" bit did, so the
+     header grows no taller (the /bok/glossary A-Z row must stay on the first
+     screen at 390px). */
+  .ch-meta > .ch-author {
+    flex-basis: 100%;
+    margin-bottom: var(--s-2);
   }
 
-  .ch-byline a:hover {
-    text-decoration-color: currentColor;
+  .ch-meta > .ch-author + li::before {
+    content: none;
+  }
+
+  @media (max-width: 539px) {
+    .ch-meta > .ch-author {
+      flex-basis: auto;
+      margin-bottom: 0;
+    }
+
+    .ch-meta > .ch-author + li::before {
+      content: '·' / '';
+    }
+
+    .ch-author :global(.ab) {
+      grid-template-columns: auto auto;
+      column-gap: var(--s-2);
+    }
+
+    .ch-author :global(.ab-photo) {
+      grid-row: auto;
+      width: 24px;
+      height: 24px;
+    }
+
+    .ch-author :global(.ab-sub) {
+      display: none;
+    }
   }
 
   /* Middot separators between the meta bits (kept at --ink-2 so the tinted band

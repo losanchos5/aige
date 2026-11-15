@@ -4,6 +4,7 @@ import { resolve } from 'node:path';
 import Doc from '../../layouts/Doc.astro';
 import NewsletterForm from '../../components/NewsletterForm.astro';
 import OpenWork from '../../components/OpenWork.astro';
+import AuthorBadge from '../../components/AuthorBadge.astro';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import {
   authorRefs,
@@ -87,6 +88,11 @@ const jsonLd = [
   image="/og/about.png"
   jsonLd={jsonLd}
 >
+  {/* The person first: a reader who lands here wants to know who writes this. */}
+  <div class="about-author">
+    <AuthorBadge size="lg" placement="about" />
+  </div>
+
   <p>
     <strong>{site.name}</strong> is the home of <em>AI Governance Engineering: The Thesis &amp; Body
     of Knowledge</em>, a founding text and working reference for turning AI governance obligations
@@ -158,7 +164,7 @@ const jsonLd = [
     any of these, compare notes with me.
   </p>
   <p>
-    Email me at <a href={`mailto:${site.email}`}>{site.email}</a> or{' '}
+    Email me at <a href={`mailto:${site.email}`} data-umami-event="contact-email">{site.email}</a> or{' '}
     <a href={site.linkedin} target="_blank" rel="noopener noreferrer">contact me on LinkedIn</a>.
     For public questions or proposals about the Body of Knowledge, start a{' '}
     <a href={`${site.github}/discussions`} target="_blank" rel="noopener noreferrer">GitHub discussion</a>.
@@ -245,7 +251,7 @@ const jsonLd = [
 
   <h2>Contact</h2>
   <p>
-    Email: <a href={`mailto:${site.email}`}>{site.email}</a>.{' '}
+    Email: <a href={`mailto:${site.email}`} data-umami-event="contact-email">{site.email}</a>.{' '}
     Discuss the discipline on{' '}
     <a href={site.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn</a>, or on{' '}
     <a href={site.github} target="_blank" rel="noopener noreferrer">GitHub</a>.
@@ -267,6 +273,10 @@ const jsonLd = [
   :global(.prose) > p,
   :global(.prose) > ul {
     color: var(--ink-2);
+  }
+
+  .about-author {
+    margin: 0 0 var(--s-6);
   }
 
   /* The author facts: label and value on one row where there is room. */

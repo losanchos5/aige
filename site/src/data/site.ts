@@ -11,6 +11,11 @@ export interface Author {
   sameAs?: readonly string[];
   /** The role the site states for the author (bok/00-preface.md). */
   jobTitle?: string;
+  /** The short title the visible byline prints under the name. The JSON-LD
+      keeps the longer `jobTitle`. */
+  headline?: string;
+  /** Site-relative path of the author photo (byline, /about, Person `image`). */
+  image?: string;
   /** One or two sentences, restating only what the preface and /about say. */
   description?: string;
   /** Subjects the author's stated work covers (schema.org `knowsAbout`). */
@@ -70,6 +75,8 @@ export const site: SiteConfig = {
       // Role, experience and subjects as bok/00-preface.md ("Who wrote it, and
       // from what") states them; nothing beyond that.
       jobTitle: 'AI Governance & Privacy Engineer',
+      headline: 'AI Governance Engineer',
+      image: '/images/author/jorge-garcia-aibar.jpg',
       description:
         'AI Governance & Privacy Engineer. Two and a half years designing and operating an AI governance framework inside a large telco, between Legal, Security and Engineering. Author of the AI Governance Engineering Body of Knowledge and co-author of its Thesis.',
       knowsAbout: [

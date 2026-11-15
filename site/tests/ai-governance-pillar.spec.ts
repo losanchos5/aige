@@ -83,8 +83,8 @@ test.describe('the pillar page', () => {
     expect(wordsIn(definition), definition).toBeLessThanOrEqual(25);
 
     const byline = page.getByTestId('byline');
-    await expect(byline).toContainText(`By ${AUTHOR}`);
-    await expect(byline.getByRole('link', { name: AUTHOR })).toHaveAttribute('href', '/about');
+    await expect(byline).toContainText('AI Governance Engineer');
+    await expect(byline.getByRole('link', { name: AUTHOR, exact: true })).toHaveAttribute('href', '/about');
     const times = byline.locator('time');
     await expect(times).toHaveCount(2);
     for (const datetime of await times.evaluateAll((els) =>
