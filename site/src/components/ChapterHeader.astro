@@ -93,15 +93,15 @@ if (updated) metaBits.push({ text: site.license });
     <h1 data-pagefind-meta="title">{title}</h1>
     {summary && <p class="lede">{summary}</p>}
     {
-      byline && (
-        <p class="ch-author">
-          <AuthorBadge placement="chapter" lang={lang} />
-        </p>
-      )
-    }
-    {
       metaBits.length > 0 && (
         <ul class="ch-meta">
+          {
+            byline && (
+              <li class="ch-author">
+                <AuthorBadge placement="chapter" lang={lang} />
+              </li>
+            )
+          }
           {metaBits.map((bit) => (
             <li>
               {/* The <li> is a flex container, so the label and the <time> are
@@ -242,14 +242,44 @@ if (updated) metaBits.push({ text: site.license });
     margin: 0;
   }
 
-  .ch-author {
-    margin: var(--s-5) 0 0;
-    line-height: 1.5;
+  /* The author is the first meta item. From 540px up it takes a row of its
+     own with the full badge; on phones it shrinks to photo, name and LinkedIn
+     and flows inline with the meta bits, as the old "By" bit did, so the
+     header grows no taller (the /bok/glossary A-Z row must stay on the first
+     screen at 390px). */
+  .ch-meta > .ch-author {
+    flex-basis: 100%;
+    margin-bottom: var(--s-2);
   }
 
-  /* With the byline above it, the meta line sits closer. */
-  .ch-author + .ch-meta {
-    margin-top: var(--s-3);
+  .ch-meta > .ch-author + li::before {
+    content: none;
+  }
+
+  @media (max-width: 539px) {
+    .ch-meta > .ch-author {
+      flex-basis: auto;
+      margin-bottom: 0;
+    }
+
+    .ch-meta > .ch-author + li::before {
+      content: '·' / '';
+    }
+
+    .ch-author :global(.ab) {
+      grid-template-columns: auto auto;
+      column-gap: var(--s-2);
+    }
+
+    .ch-author :global(.ab-photo) {
+      grid-row: auto;
+      width: 24px;
+      height: 24px;
+    }
+
+    .ch-author :global(.ab-sub) {
+      display: none;
+    }
   }
 
   /* Middot separators between the meta bits (kept at --ink-2 so the tinted band

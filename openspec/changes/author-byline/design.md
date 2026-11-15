@@ -28,6 +28,7 @@ Ver proposal.md (Why). Hoy hay dos sitios que pintan al autor: `Byline.astro` (`
 5. **Foto en `public/images/author/`**: JPG 400 px original (para `Person.image` y uso futuro), WebP 96 px (firma a 2x) y WebP 320 px (`/about` a 2x), ya generados en escala de grises. `<img>` con `width`/`height`, `loading="lazy"` en la firma salvo que esté sobre el pliegue (la firma está bajo el H1, así que `loading="eager"` y `decoding="async"`); `alt=""` porque el nombre está al lado. Alternativa descartada: `astro:assets` (añadir pipeline para dos imágenes fijas).
 6. **Logo de LinkedIn**: SVG inline del glifo "in" (`currentColor`, `aria-hidden="true"`) dentro de un `<a>` con `aria-label` desde i18n (`author.linkedin`: "{name} on LinkedIn"; traducciones es/fr/de/pt). Hit area 28 px. Hover/focus usan los tokens existentes; foco con el anillo global del sitio.
 7. **`ChapterHeader`**: se quita el `MetaBit` de autor y se renderiza `<AuthorBadge size="sm" placement="chapter" />` encima de `ul.ch-meta` cuando `byline` es verdadero. El "By" desaparece en todos los idiomas.
+   Ajuste tras CI: el badge es el primer `li` de `ul.ch-meta`. Desde 540 px ocupa su propia fila con el título; en móvil se reduce a foto de 24 px, nombre y LinkedIn en línea con la meta (sin título), para que la fila A-Z de `/bok/glossary` siga en la primera pantalla a 390 px (`seo-glossary-terms.spec.ts`).
 8. **JSON-LD**: `authorDetails[0].image = '/images/author/jorge-garcia-aibar.jpg'`; `jsonld.ts` lo emite como URL absoluta sobre `site.url` cuando existe.
 
 ## Risks / Trade-offs
