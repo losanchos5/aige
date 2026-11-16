@@ -29,24 +29,15 @@ arte. La animación del primer viewport MUST ser solo de transform.
 - **THEN** la lede y los enlaces nuevos pasan el umbral de contraste y `HeroStrip` es visible
 
 ### Requirement: Banda "Where AI Governance Engineering operates"
-La portada SHALL incluir, tras la banda del loop y antes de Values, una sección con id
-`where-it-operates` y título "Where AI Governance Engineering operates.", con `tone="mesh"`,
-`mesh="c"` y `meshK` 0.4, una lede que nombra las tres superficies (el gate de evaluación, el control
-en runtime y el registro de assurance) y tres tarjetas Evals (capa 3), Runtime (capa 4) y Assurance
-(capa 5), cada una con su párrafo y enlaces a su perfil o patrón y a su capa en `/bok/the-stack`, más
-un pie hacia `/controls` y `/frontier`. Las tarjetas MUST NOT llevar `.lift` (la tarjeta no es un
-enlace). La banda MUST respetar las reglas de bandas de `site/tests/loop.spec.ts`: ninguna banda con
-`tone="plain"`, variantes de mesh distintas entre vecinas y solo la banda del rol con deriva. Las
-secciones `.hero--field` y `.loop-sec` MUST seguir adyacentes.
-
-#### Scenario: Tono y variante de la banda
-- **WHEN** se ejecuta `site/tests/loop.spec.ts`
-- **THEN** la banda "Where AI Governance Engineering operates" tiene tono `mesh`, variante `c` y
-  opacidad 0.4, y ninguna vecina usa la variante `c`
+La portada SHALL incluir, dentro de la sección del stack y tras las filas de las cinco capas, un bloque con id `where-it-operates` y título "Where AI Governance Engineering operates.", con una lede que nombra las tres superficies (el gate de evaluación, el control en runtime y el registro de assurance) y tres filas Evals (capa 3), Runtime (capa 4) y Assurance (capa 5), cada una con su párrafo y enlaces a su perfil o patrón y a su capa en `/bok/the-stack`, más un pie hacia `/controls` y `/frontier`. El bloque SHALL ir sobre papel, con el título y la lede en la columna izquierda y las filas a la derecha. La sección de la hero y la sección del bucle MUST seguir adyacentes.
 
 #### Scenario: Tres superficies
 - **WHEN** se ejecuta `site/tests/home.spec.ts`
-- **THEN** la banda tiene tres `.card` y enlaza `/controls/evaluation-environment`
+- **THEN** el bloque `#where-it-operates` tiene tres filas y enlaza `/controls/evaluation-environment`
+
+#### Scenario: Tono y variante de la banda
+- **WHEN** se carga `/`
+- **THEN** el bloque `#where-it-operates` no contiene capa de mesh ni fondo de color
 
 ### Requirement: Trabajo abierto en la portada
 La banda "Follow the changes" (`.nl-sec`) SHALL mostrar junto al formulario de suscripción una lista
@@ -59,14 +50,15 @@ su pie SHALL enlazar `/contribute`. Los estados MUST ser verdaderos (`draft`, `i
 - **THEN** `.nl-sec .work-list > li` tiene tantos elementos como `work`
 
 ### Requirement: Tiles de la portada y pie del loop
-Los tiles de la portada SHALL incluir "Open controls" (hacia `/controls`, en segunda posición) y
-"Research notes" (hacia `/research`, antes de Reading list), y el pie de la banda del loop SHALL
-enlazar `/controls`. `site/DESIGN.md` SHALL documentar la lede, los CTAs, los enlaces, el botón
-secundario y la secuencia de bandas con la nueva banda `c` 0.4.
+La sección de recursos de la portada SHALL mostrar cuatro tarjetas con cuadro y el resto de recursos como filas, y entre todos SHALL incluir "Open controls" (hacia `/controls`) y "Research notes" (hacia `/research`). El pie de la figura del bucle SHALL enlazar `/controls`. `site/DESIGN.md` SHALL documentar la lede, los CTAs, los enlaces, el botón secundario y la secuencia de secciones de la portada.
 
 #### Scenario: Tiles nuevos
 - **WHEN** se abre `/`
-- **THEN** el segundo tile enlaza `/controls` y un tile anterior a Reading list enlaza `/research`
+- **THEN** la sección de recursos enlaza `/controls` y `/research`, y contiene cuatro tarjetas con imagen
+
+#### Scenario: Pie del bucle
+- **WHEN** se abre `/`
+- **THEN** la sección del bucle contiene un enlace a `/controls`
 
 ### Requirement: Tile del buscador por artículo
 Los tiles de la portada SHALL incluir "Look up an article", con la pregunta "What does Article X

@@ -44,3 +44,5 @@
 - [x] 8.1 Ejecutar `npm run build`, después `npm test` y el proyecto `a11y` completo, en verde. Resultado del 2026-09-27: default 2172 en verde (las capturas I caídas por falta de memoria se repitieron y pasan) y a11y 2688/2688.
 - [x] 8.2 Pasar lhci en las 18 URLs con perf ≥ 0.95 y a11y, best practices y SEO = 1.
 - [ ] 8.3 Commit por ruta, sin PNG regenerados, sin el PDF AIGP y sin dumps, y abrir el PR a `main` para que Jordi lo mergee.
+
+> Nota (2026-11-16): el cambio `editorial-restraint` (archivado) retira el mesh, los tintes de banda y el panel pause. Las tareas abiertas de este cambio que dependan de ellos quedan sustituidas por ese cambio.
