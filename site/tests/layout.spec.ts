@@ -16,8 +16,9 @@ const VIEWPORTS = [
   { w: 900, h: 800 },
 ];
 
-const CHAPTER_PAGES = ['/bok/why-now', '/bok/the-stack'];
-const OTHER_PAGES = ['/thesis', '/about', '/resources/glossary', '/map'];
+// The Thesis reads in the same rail layout as the chapters (reading-layout).
+const CHAPTER_PAGES = ['/bok/why-now', '/bok/the-stack', '/thesis'];
+const OTHER_PAGES = ['/about', '/resources/glossary', '/map'];
 
 // Phone width for the Resources section. /resources/frameworks used to measure
 // 408px here: the visually hidden table head kept `position: sticky` and its th
@@ -90,7 +91,7 @@ for (const path of CHAPTER_PAGES) {
       expect(m.nav).not.toBeNull();
       expect(m.nav!.sw).toBe(m.nav!.cw);
 
-      // Where the TOC is present (>=1100px) the well clears it with a >=24px gap.
+      // Where the TOC column is present (>=1280px) the well clears it with a >=24px gap.
       if (m.tocLeft !== null) {
         expect(m.proseRight).not.toBeNull();
         expect(m.proseRight!).toBeLessThanOrEqual(m.tocLeft - 24);
@@ -98,6 +99,15 @@ for (const path of CHAPTER_PAGES) {
     });
   }
 }
+
+// reading-layout "Thesis con índices": the Thesis used to be a wide page with
+// no rails; it now shows the on-this-page TOC beside the prose (the gap is
+// held by the loop above).
+test('the Thesis shows its on-this-page TOC at 1440', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/thesis');
+  await expect(page.locator('.doc-toc nav.toc')).toBeVisible();
+});
 
 for (const path of OTHER_PAGES) {
   for (const { w, h } of VIEWPORTS) {

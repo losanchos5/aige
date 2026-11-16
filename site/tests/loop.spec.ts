@@ -1,10 +1,9 @@
 import { test, expect, type Page } from '@playwright/test';
 import { mkdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { chaptersOrdered } from '../src/data/chapters';
 
-// The home governance loop (GovernanceLoop.astro + public/loop.js) and the
-// home's section backgrounds. The loop replaced an archify figure whose hover
+// The home governance loop (GovernanceLoop.astro + public/loop.js). The loop
+// replaced an archify figure whose hover
 // note, drawn over the diagram, covered the step under the pointer and made it
 // flicker; the first block below is the regression test for that.
 
@@ -314,76 +313,6 @@ test.describe('governance loop: motion', () => {
     );
     expect(states.length).toBeGreaterThan(0);
     expect(states.every((s) => s === 'paused')).toBe(true);
-  });
-});
-
-test.describe('home section backgrounds', () => {
-  test('no body section sits on the bare ground and neighbours differ', async ({ page }) => {
-    await page.emulateMedia({ colorScheme: 'light', reducedMotion: 'reduce' });
-    await page.goto('/');
-    const sections = await page.locator('main section.sec').evaluateAll((els) =>
-      els.map((el) => {
-        const mesh = el.querySelector(':scope > .bg-mesh');
-        const variant = mesh
-          ? (['b', 'c', 'd', 'e'].find((k) => mesh.classList.contains(`bg-mesh--${k}`)) ?? 'a')
-          : null;
-        return {
-          title: el.querySelector('.sec-title')?.textContent?.trim() ?? '',
-          tone: [...el.classList].find((c) => c.startsWith('sec--'))?.slice(5),
-          hue: (el as HTMLElement).dataset.hue ?? null,
-          variant,
-          opacity: mesh ? Number(getComputedStyle(mesh).opacity) : null,
-        };
-      }),
-    );
-    const find = (start: string) => sections.find((s) => s.title.startsWith(start))!;
-    expect(find('The discipline, defined')).toMatchObject({ tone: 'mesh', variant: 'b', opacity: 0.85 });
-    expect(find('Three questions')).toMatchObject({ tone: 'tint', hue: 'l1', variant: 'd', opacity: 0.6 });
-    expect(find('A build order')).toMatchObject({ tone: 'mesh', variant: 'e', opacity: 0.8 });
-    // The deep band carries the dark token set, whose --mesh-alpha is 0.55:
-    // meshK 0.7 x 0.55.
-    expect(find('Where AI Governance Engineering operates')).toMatchObject({
-      tone: 'deep',
-      variant: 'c',
-      opacity: 0.385,
-    });
-    expect(find('Eight values')).toMatchObject({ tone: 'tint', hue: 'l4', variant: 'b', opacity: 0.5 });
-    expect(find('The role is')).toMatchObject({ tone: 'mesh', variant: 'a', opacity: 0.9 });
-    // The chapters section's title counts the chapters from the data.
-    expect(find(`${chaptersOrdered.length} chapters`)).toMatchObject({
-      tone: 'tint',
-      hue: 'l5',
-      variant: 'c',
-      opacity: 0.5,
-    });
-    expect(find('Curated resources')).toMatchObject({ tone: 'mesh', variant: 'd', opacity: 0.8 });
-    expect(find('What applies now')).toMatchObject({ tone: 'tint', hue: 'l3', variant: 'e', opacity: 0.5 });
-    expect(find('Follow the changes')).toMatchObject({ tone: 'mesh', variant: 'c', opacity: 0.75 });
-    // Neighbouring tint bands never share a tone, and a deep band never sits
-    // next to the dark verdict band.
-    for (let i = 1; i < sections.length; i++) {
-      const [a, b] = [sections[i - 1], sections[i]];
-      if (a.hue && b.hue) expect(a.hue, `${a.title} / ${b.title}`).not.toBe(b.hue);
-      const darkish = (t?: string) => t === 'dark' || t === 'deep';
-      expect(darkish(a.tone) && darkish(b.tone), `${a.title} / ${b.title}`).toBe(false);
-    }
-    // Only the dark verdict band has neither a tint nor a mesh.
-    expect(sections.filter((s) => s.tone === 'plain')).toHaveLength(0);
-    for (let i = 1; i < sections.length; i++) {
-      const [a, b] = [sections[i - 1], sections[i]];
-      if (a.variant && b.variant) expect(a.variant, `${a.title} / ${b.title}`).not.toBe(b.variant);
-    }
-  });
-
-  test('only the role mesh drifts', async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: 'no-preference' });
-    await page.goto('/');
-    const drifting = await page.locator('main section.sec > .bg-mesh').evaluateAll((els) =>
-      els
-        .filter((el) => getComputedStyle(el, '::before').animationName !== 'none')
-        .map((el) => el.parentElement?.querySelector('.sec-title')?.textContent?.trim()),
-    );
-    expect(drifting).toEqual(['The role is a capability first, a job title second.']);
   });
 });
 

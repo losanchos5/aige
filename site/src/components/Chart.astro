@@ -47,6 +47,9 @@ interface Props {
 }
 
 const { chart, narrow, title, caption, scroll, tableLabel = 'Data table', class: className, id } = Astro.props;
+// The caption's mono label: charts carry no number, so it names the kind, in
+// the page's language (the Spanish pages live under /es/).
+const kindLabel = Astro.url.pathname.startsWith('/es/') ? 'Gráfico' : 'Chart';
 
 const modeOf = (svg: string) => /^<svg[^>]*\sclass="(figc|chart)\b/.exec(svg)?.[1];
 const mode = modeOf(chart.svg);
@@ -103,10 +106,10 @@ if (phone) {
     );
   }
 }
-// First switch point where the canvas (container minus padding and border)
-// shows the wide SVG at 1:1 or larger.
+// First switch point where the canvas (container minus the frame's 20px
+// padding and 1px border on each side, chart.css) shows the wide SVG at 1:1 or larger.
 const STEPS = [480, 560, 640, 720, 800, 900, 1000];
-const switchAt = STEPS.find((step) => step >= chart.width + 26) ?? STEPS[STEPS.length - 1];
+const switchAt = STEPS.find((step) => step >= chart.width + 42) ?? STEPS[STEPS.length - 1];
 const { table } = chart;
 const isNum = (value: string | number) => typeof value === 'number';
 const cap = (width: number) => `max-width: ${Math.ceil(width)}px`;
@@ -143,6 +146,7 @@ const cap = (width: number) => `max-width: ${Math.ceil(width)}px`;
     </div>
   </div>
   <figcaption class="chart-caption">
+    <span class="chart-label" data-pagefind-ignore>{kindLabel}</span>
     <span class="chart-title">{title}</span>
     {caption && <span class="chart-desc">{caption}</span>}
   </figcaption>

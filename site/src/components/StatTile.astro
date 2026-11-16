@@ -59,29 +59,16 @@ const countup = match
     text-decoration: none;
   }
 
+  /* The figure is the one emphasis on the tile: solid accent, no gradient. */
   .value {
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 400;
     letter-spacing: var(--tracking-display);
     line-height: 1;
     font-size: var(--fs-h1);
     /* Tabular figures so the counting number keeps a steady width. */
     font-variant-numeric: tabular-nums;
-    /* Fallback: solid ink. The gradient below only applies where the text can
-       be clipped to it, so contrast never depends on the gradient. */
-    color: var(--ink);
-  }
-
-  /* Gradient value text, ink-derived so it stays high-contrast in both themes.
-     Guarded by @supports and paired with the --ink fallback above. */
-  @supports (background-clip: text) or (-webkit-background-clip: text) {
-    .value {
-      background-image: var(--grad-cta);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent;
-    }
+    color: var(--accent);
   }
 
   .label {
@@ -91,8 +78,8 @@ const countup = match
 
   .source {
     font-size: var(--fs-small);
-    /* --ink-2, not --muted: the tile also sits on mesh and tinted bands, where
-       --muted can drop below AA. Colour only, never opacity. */
+    /* --ink-2 at 14px for comfortable contrast on --panel. Colour only, never
+       opacity. */
     color: var(--ink-2);
     text-wrap: pretty;
   }

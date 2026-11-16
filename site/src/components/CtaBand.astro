@@ -1,10 +1,11 @@
 ---
 /**
- * CtaBand: a full-width closing band with a headline and up to two buttons.
- * Light theme: an ink block with ground-coloured text. Dark theme: the L1
- * layer's deep tone with the page's own ink (inverting there would make it a
- * cream slab, the brightest thing on the page). Primary = a solid fill in the
- * band's text colour, no halo; secondary = a quiet outline at the same height.
+ * CtaBand: the single dark closing band (editorial restraint). A --band
+ * ground with --band-ink text, a 1px --band-line hairline on top, a Newsreader
+ * sentence and one button; an optional secondary reads as a plain text link,
+ * not a second button. No mesh, glow or gradient.
+ * The named slot "art" sits behind the copy so a <Painting> can be dropped in
+ * later (the home PR); it is empty by default.
  * Place as a direct child of <main> (outside .container) so it spans full width.
  */
 interface Cta {
@@ -24,151 +25,132 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
 ---
 
 <section class:list={['band', className]}>
-  <div class="bg-mesh" aria-hidden="true"></div>
+  {Astro.slots.has('art') && <div class="art" aria-hidden="true"><slot name="art" /></div>}
   <div class="container inner">
     <div class="copy">
       <h2 class="title">{title}</h2>
       {sub && <p class="sub">{sub}</p>}
     </div>
     <div class="actions">
-      <a class="cta cta-primary" href={primary.href}>{primary.label}</a>
-      {secondary && <a class="cta cta-secondary" href={secondary.href}>{secondary.label}</a>}
+      <a class="cta" href={primary.href}>{primary.label}</a>
+      {secondary && <a class="link" href={secondary.href}>{secondary.label}</a>}
     </div>
   </div>
 </section>
 
 <style>
-  /* The band's colours live in three locals so the dark theme can swap them in
-     one place: --band-fill (ground), --band-text (title, labels, borders) and
-     --band-text-2 (the sub line). The Marketing rule draws the 1px hairline on
-     top like on every other section; the mesh clips itself. */
+  /* --band / --band-ink / --band-ink-2 / --band-line are theme tokens
+     (tokens.css), so the band needs no per-theme rules here. */
   .band {
-    --band-fill: var(--ink);
-    --band-text: var(--bg);
-    --band-text-2: color-mix(in srgb, var(--bg) 82%, var(--ink));
     position: relative;
     isolation: isolate;
-    background: var(--band-fill);
-    color: var(--band-text);
-    padding-block: clamp(48px, 7vw, 96px);
+    background: var(--band);
+    color: var(--band-ink);
+    border-top: 1px solid var(--band-line);
+    padding-block: clamp(72px, 9vw, 120px);
   }
 
-  /* Dark theme: the deep L1 tone (dark --l1) instead of the inverted ink, with
-     the page's --ink / --ink-2 on it. Same two selectors as tokens.css. */
-  :global(:root[data-theme='dark']) .band {
-    --band-fill: var(--l1);
-    --band-text: var(--ink);
-    --band-text-2: var(--ink-2);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light'])) .band {
-      --band-fill: var(--l1);
-      --band-text: var(--ink);
-      --band-text-2: var(--ink-2);
-    }
-  }
-
-  /* 2px gradient hairline along the top edge. */
-  .band::after {
-    content: '';
+  /* Painting layer: fills the band under the copy. */
+  .art {
     position: absolute;
-    inset: 0 0 auto;
-    height: 2px;
-    background: var(--grad-border);
-    z-index: 1;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
     pointer-events: none;
   }
 
-  /* Faint mesh behind the copy; --mesh-alpha dialled right down so it reads as
-     a whisper of depth, not colour. */
-  .band .bg-mesh {
-    --mesh-alpha: 0.25;
-    z-index: 0;
-  }
-
+  /* One column, as in the mockup: sentence, sub line, then the button. */
   .inner {
     position: relative;
     z-index: 1;
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--s-6);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 36px;
   }
 
+  /* anywhere: a word wider than a phone (text at 200%) breaks instead of
+     pushing the page sideways; at normal sizes no word reaches the edge. */
   .copy {
-    max-width: 40ch;
+    max-width: 56rem;
+    overflow-wrap: anywhere;
   }
 
   .title {
+    max-width: 22ch;
     margin: 0;
-    color: var(--band-text);
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: var(--fs-h2);
-    line-height: 1.1;
-    letter-spacing: var(--tracking-display);
+    color: var(--band-ink);
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: clamp(2.25rem, 1.5rem + 2.8vw, 3.75rem);
+    line-height: 1.05;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
   }
 
   .sub {
-    margin: var(--s-3) 0 0;
-    color: var(--band-text-2);
+    max-width: 56ch;
+    margin: 20px 0 0;
+    font-size: var(--fs-lede);
+    color: var(--band-ink-2);
   }
 
   .actions {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--s-3);
+    align-items: center;
+    gap: var(--s-3) var(--s-5);
   }
 
+  /* The one button: a band-ink fill with the light theme's ink as label
+     (the mockup's .band .btn), dark on light in both themes. */
   .cta {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 44px;
     padding: 0 var(--s-5);
-    border: 1px solid var(--band-text);
-    border-radius: var(--r-sm);
-    font-weight: 600;
+    border: 1px solid var(--band-ink);
+    border-radius: var(--r-ctl);
+    background: var(--band-ink);
+    color: #15171c;
+    font: 600 var(--fs-body) / 1 var(--font-body);
     text-decoration: none;
   }
 
-  /* Primary: a solid fill in the band's text colour with the band's ground
-     for the label. No coloured halo: the fill carries the weight. */
-  .cta-primary {
-    background: var(--band-text);
-    color: var(--band-fill);
+  .cta:hover {
+    background: color-mix(in srgb, var(--band-ink) 86%, var(--band));
   }
 
-  /* Secondary: an outline one weight down, the border is the text colour at
-     45%, so the label (full text colour) keeps its contrast. */
-  .cta-secondary {
-    background: transparent;
-    color: var(--band-text);
-    border-color: color-mix(in srgb, var(--band-text) 45%, transparent);
+  /* Secondary: a mono label link, never a second button. */
+  .link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--band-ink);
+    text-decoration: underline;
+    text-decoration-color: var(--band-line);
+    text-underline-offset: 0.35em;
   }
 
-  .cta:focus-visible {
-    outline: 2px solid var(--band-text);
+  .link:hover {
+    text-decoration-color: var(--band-ink);
+  }
+
+  .cta:focus-visible,
+  .link:focus-visible {
+    outline: 2px solid var(--band-ink);
     outline-offset: 2px;
   }
 
   @media (prefers-reduced-motion: no-preference) {
     .cta {
-      transition:
-        background-color var(--dur) var(--ease),
-        border-color var(--dur) var(--ease),
-        color var(--dur) var(--ease),
-        transform var(--dur) var(--ease);
+      transition: background-color var(--dur) var(--ease);
     }
-
-    .cta-primary:hover {
-      transform: translateY(-1px);
-    }
-  }
-
-  .cta-secondary:hover {
-    background: color-mix(in srgb, var(--band-text) 14%, transparent);
-    border-color: var(--band-text);
   }
 </style>

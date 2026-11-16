@@ -63,15 +63,59 @@ test('the chapter rail groups its rows by part', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/bok/the-stack');
   const rail = page.locator('nav.sidebar-nav');
-  for (const part of bookParts) {
-    const name = `${part.title} ${part.range}`;
-    await expect(rail.getByRole('list', { name, exact: true }), name).toHaveCount(1);
+  // Each part is a module named by its number, its title and its range (the
+  // parts other than the current one start folded, hence includeHidden).
+  for (const [i, part] of bookParts.entries()) {
+    const name = `${String(i + 1).padStart(2, '0')} ${part.title} ${part.range}`;
+    await expect(
+      rail.getByRole('list', { name, exact: true, includeHidden: true }),
+      name,
+    ).toHaveCount(1);
   }
   await expect(rail.locator('a[data-chapter-slug]')).toHaveCount(chaptersOrdered.length);
-  await expect(rail.locator('a[aria-current="page"]')).toHaveAttribute(
-    'href',
-    '/bok/the-stack',
-  );
+  const current = rail.locator('a[aria-current="page"]');
+  await expect(current).toHaveAttribute('href', '/bok/the-stack');
+
+  // The current row is marked by more than colour: its own fill and a heavier
+  // weight than a sibling row of the same part.
+  const look = (el: Element) => ({
+    bg: getComputedStyle(el).backgroundColor,
+    weight: Number(getComputedStyle(el).fontWeight),
+  });
+  const here = await current.evaluate(look);
+  const sibling = await rail
+    .locator('details:has(a[aria-current="page"]) a[data-chapter-slug]:not([aria-current])')
+    .first()
+    .evaluate(look);
+  expect(here.bg).not.toBe(sibling.bg);
+  expect(here.weight).toBeGreaterThan(sibling.weight);
+});
+
+// A nav-group rail (About, controls, research, certifications) in the phone
+// drawer: the dialog takes the group's name, the page's row is current, and
+// a folded part's summary stays in the drawer's Tab cycle (the focus trap once
+// skipped <summary>, so a folded part could not be reopened by keyboard).
+test('the About rail opens as a named drawer whose folded part stays reachable by Tab', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/about/methodology');
+  await page.locator('[data-drawer-open]').click();
+  const drawer = page.getByRole('dialog', { name: 'About', exact: true });
+  await expect(drawer).toBeVisible();
+  await expect(drawer.locator('a[aria-current="page"]')).toHaveAttribute('href', '/about/methodology');
+
+  const summary = drawer.locator('details.part > summary');
+  await summary.click();
+  await expect(drawer.locator('details.part')).not.toHaveAttribute('open', '');
+  await drawer.locator('button, a[href]').first().focus();
+  let reached = false;
+  for (let i = 0; i < 8 && !reached; i++) {
+    await page.keyboard.press('Tab');
+    reached = await summary.evaluate((el) => el === document.activeElement);
+  }
+  expect(reached, 'Tab reaches the folded part').toBe(true);
+  // The folded part is the last stop: Tab wraps inside the drawer, not out of it.
+  await page.keyboard.press('Tab');
+  expect(await drawer.evaluate((el) => el.contains(document.activeElement))).toBe(true);
 });
 
 test('every chapter closes on the newsletter form, outside the search index', async ({ page }) => {
@@ -143,7 +187,8 @@ test.describe('declarative Umami events', () => {
 test.describe('methodology page', () => {
   test('is linked from About and states version, DOI and forms', async ({ page }) => {
     await page.goto('/about');
-    await expect(page.locator('main a[href="/about/methodology"]')).toHaveCount(1);
+    // In the page's own text (the About rail links it too).
+    await expect(page.locator('main article a[href="/about/methodology"]')).toHaveCount(1);
 
     await page.goto('/about/methodology');
     await expect(page.locator('h1')).toHaveText('Methodology');

@@ -188,8 +188,10 @@ test.describe('_headers: machine files, font preloads, framing', () => {
       expect(h, path).toContain('X-Frame-Options: DENY');
       expect(h.some((line) => line.startsWith('Content-Security-Policy:')), path).toBe(true);
     }
-    // The home also preloads the hero serif.
-    expect(headersFor('/').filter((line) => PRELOAD.test(line)).length).toBe(4);
+    // The home also preloads the hero's italic serif.
+    expect(headersFor('/').filter((line) => PRELOAD.test(line)).length).toBe(3);
+    // Bricolage Grotesque is retired: the edge never preloads it.
+    expect(headersFor('/bok/eu-ai-act').join('\n')).not.toContain('bricolage');
   });
 
   test('figure downloads stay indexable for image search', () => {

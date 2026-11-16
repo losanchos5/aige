@@ -304,11 +304,14 @@ const NGA_URL = 'https://www.nga.gov/collection/art-object-page.46655.html';
 
   /* The fixed kicker: a mono label parted from the moving window by a rule;
      the window's edge fade makes the items slip behind it. */
+  /* Shrinks (and wraps) only when it cannot fit its row: text at 200% on a
+     phone would otherwise push the page sideways (WCAG 1.4.4). */
   .strip-kicker {
-    flex: none;
+    flex: 0 1 auto;
+    min-width: 0;
     margin: 0;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: var(--fs-label);
     letter-spacing: var(--tracking-label);
     line-height: 1.3;
     text-transform: uppercase;

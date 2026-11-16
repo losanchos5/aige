@@ -197,6 +197,15 @@ test('the chapter rail and the TOC stay in view deep into a chapter', async ({ p
   // and the entries before it marked as read.
   await expect(page.locator('nav.toc a[aria-current]')).toHaveCount(1);
   expect(await page.locator('nav.toc a.is-past').count()).toBeGreaterThanOrEqual(1);
+  // The current entry is marked by more than colour: it is heavier than the rest.
+  const entries = await page.locator('nav.toc a').evaluateAll((els) =>
+    els.map((el) => ({
+      current: el.hasAttribute('aria-current'),
+      weight: Number(getComputedStyle(el).fontWeight),
+    })),
+  );
+  const currentWeight = entries.find((e) => e.current)!.weight;
+  expect(entries.filter((e) => !e.current).every((e) => e.weight < currentWeight)).toBe(true);
 });
 
 test('opening "Cite this chapter" on a phone adds no horizontal scroll', async ({ page }) => {
@@ -260,7 +269,7 @@ test('search results are styled and a single Escape closes the dialog', async ({
     };
   });
   expect(styles.linkDecoration).toBe('none');
-  expect(styles.titleFont).toContain('Bricolage');
+  expect(styles.titleFont).toContain('Newsreader');
   expect(styles.markBg, 'a match is highlighted').not.toBeNull();
   expect(styles.markBg).not.toBe('rgb(255, 255, 0)');
 
@@ -269,15 +278,18 @@ test('search results are styled and a single Escape closes the dialog', async ({
   await expect(page.locator('#search-input')).toHaveValue('');
 });
 
-// SL-04 / SL-06: the chapter header opens on its H1 (the crumb above already says
-// "Body of Knowledge › 04 · The Stack"), and no chapter header takes a layer
-// colour unless the chapter is about one layer (none is today).
-test('chapter headers carry no eyebrow and stay neutral', async ({ page }) => {
-  for (const chapter of chaptersOrdered) {
+// reading-layout "Píldora de posición": the chapter header sits on the paper
+// (no mesh band) and opens on a pill with the chapter's place in the book,
+// the total counted from the data. The first and last chapters bound the count
+// (no chapter is translated yet; add one here when a /<lang>/bok page exists).
+test('chapter headers show their position in the book, without a mesh band', async ({ page }) => {
+  for (const chapter of [chaptersOrdered[0], chaptersOrdered[chaptersOrdered.length - 1]]) {
     await page.goto(`/bok/${chapter.slug}`);
-    const band = page.locator('.chapter-header .ch-band');
-    await expect(band).toHaveCount(1);
-    await expect(band.locator('.ch-kicker, .ch-kicker-num')).toHaveCount(0);
-    expect(await band.getAttribute('data-layer')).toBe(chapter.layer ? `l${chapter.layer}` : null);
+    const header = page.locator('.chapter-header');
+    const num = String(chapter.order).padStart(2, '0');
+    await expect(header.locator('.ch-pill')).toHaveText(
+      `Chapter ${num} of ${chaptersOrdered.length}`,
+    );
+    await expect(header.locator('.bg-mesh')).toHaveCount(0);
   }
 });

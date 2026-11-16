@@ -338,7 +338,7 @@ const sectionsOf = (group: NavGroup) =>
     justify-content: center;
     width: 44px;
     height: 44px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--line-strong);
     border-radius: var(--r-sm);
     background: transparent;
     color: var(--ink);
@@ -346,7 +346,7 @@ const sectionsOf = (group: NavGroup) =>
   }
 
   .mnav-close:hover {
-    border-color: var(--ink-2);
+    background: var(--hover);
   }
 
   /* ---------- Group rows ---------- */
@@ -381,7 +381,7 @@ const sectionsOf = (group: NavGroup) =>
   }
 
   .mnav-row:hover {
-    background: var(--tint-bg);
+    background: var(--hover);
   }
 
   .mnav-row:focus-visible {
@@ -395,7 +395,7 @@ const sectionsOf = (group: NavGroup) =>
     top: var(--mnav-bar-h);
     z-index: 1;
     border-bottom: 1px solid var(--line);
-    background: var(--tint-bg);
+    background: var(--panel);
   }
 
   .mnav-text {
@@ -407,11 +407,13 @@ const sectionsOf = (group: NavGroup) =>
   }
 
   .mnav-label {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.1875rem;
-    line-height: 1.2;
-    letter-spacing: -0.01em;
+    /* Mono uppercase, tracked, like the desktop bar's labels. */
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
   }
 
   .mnav-hint {
@@ -437,7 +439,7 @@ const sectionsOf = (group: NavGroup) =>
 
   /* The group holding the current page: an ink bar on its row's left edge. */
   .mnav-group[data-current] > .mnav-row {
-    box-shadow: inset 3px 0 0 var(--hero-ink);
+    box-shadow: inset 3px 0 0 var(--accent);
   }
 
   /* ---------- An open group's items ---------- */
@@ -489,7 +491,7 @@ const sectionsOf = (group: NavGroup) =>
   }
 
   .mnav-item:hover {
-    background: var(--tint-bg);
+    background: var(--hover);
   }
 
   .mnav-item:hover .mnav-item-label {
@@ -512,8 +514,8 @@ const sectionsOf = (group: NavGroup) =>
   }
 
   .mnav-item[aria-current='page'] {
-    background: var(--tint-bg);
-    box-shadow: inset 3px 0 0 var(--hero-ink);
+    background: var(--accent-soft);
+    box-shadow: inset 3px 0 0 var(--accent);
     font-weight: 600;
   }
 

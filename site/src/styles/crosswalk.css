@@ -196,7 +196,7 @@
 }
 
 /* ---- Chips ---------------------------------------------------------------- */
-/* One neutral chip for every framework type: a --tint-bg fill, a 1px --line
+/* One neutral chip for every framework type: a --panel fill, a 1px --line
    hairline and --ink-2 text (≥ 4.5:1 in light and dark). The layer colours are
    kept for the layer ticks and codes (audit SL-06): the chip label and the
    column head name the framework, so its type is not coded in colour. Related
@@ -209,7 +209,7 @@
   padding: 0.15em 0.5em;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
-  background: var(--tint-bg);
+  background: var(--panel);
   color: var(--ink-2);
   font-family: var(--font-mono);
   font-size: var(--fs-label);

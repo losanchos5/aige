@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 // diagrams-build: turn every archify diagram IR (site/diagrams/<id>.<type>.json)
-// into (1) the full standalone viewer at site/public/diagrams/<id>.html and
-// (2) a namespaced inline SVG at site/src/generated/diagrams/<id>.svg, plus a
-// manifest.json describing each diagram for the Astro build.
+// into (1) the full standalone viewer at site/public/diagrams/<id>.html (archify)
+// and (2) a namespaced inline SVG at site/src/generated/diagrams/<id>.svg, laid
+// out for the reading column by diagrams-readable.mjs, plus a manifest.json
+// describing each diagram for the Astro build. diagrams/emphasis.json names the
+// one emphasis node of each diagram.
 //
 //   npm run diagrams:build              # fetch the CLI, then (re)build changed diagrams
 //   node scripts/diagrams-build.mjs --force   # rebuild every diagram
 //   node scripts/diagrams-build.mjs --check   # verify outputs are up to date (no writes)
+//   node scripts/diagrams-build.mjs --force --only=a,b   # rebuild only diagrams a and b
 //
 // The <type> is the penultimate dotted segment of the filename, e.g.
 // `stack-flow.architecture.json` -> id "stack-flow", type "architecture".
@@ -15,6 +18,7 @@ import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { ensureArchify, ARCHIFY_BIN, ARCHIFY_VERSION_FILE } from './archify-fetch.mjs';
+import { renderReadable } from './diagrams-readable.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SITE = resolve(HERE, '..');
@@ -26,6 +30,11 @@ const MANIFEST = join(SVG_OUT, 'manifest.json');
 const args = process.argv.slice(2);
 const CHECK = args.includes('--check');
 const FORCE = args.includes('--force');
+// --only=a,b limits the build to those ids; the manifest keeps the others' entries.
+const ONLY = args.find((a) => a.startsWith('--only='))?.slice('--only='.length).split(',') ?? null;
+const EMPHASIS_FILE = join(SRC_DIR, 'emphasis.json');
+// The inline layout depends on the renderer and the emphasis map as much as on the IR.
+const RENDERER_FILES = [join(HERE, 'diagrams-readable.mjs'), join(HERE, 'diagrams-build.mjs'), EMPHASIS_FILE];
 
 const TYPES = new Set(['architecture', 'workflow', 'sequence', 'dataflow', 'lifecycle']);
 // The top-level IR array that holds a diagram's nodes, keyed by diagram type.
@@ -173,7 +182,8 @@ function isFresh(id, jsonPath) {
   if (!existsSync(html) || !existsSync(svg)) return false;
   const srcMtime = statSync(jsonPath).mtimeMs;
   const versionMtime = existsSync(ARCHIFY_VERSION_FILE) ? statSync(ARCHIFY_VERSION_FILE).mtimeMs : 0;
-  const floor = Math.max(srcMtime, versionMtime);
+  const rendererMtime = Math.max(...RENDERER_FILES.filter(existsSync).map((f) => statSync(f).mtimeMs));
+  const floor = Math.max(srcMtime, versionMtime, rendererMtime);
   return statSync(html).mtimeMs >= floor && statSync(svg).mtimeMs >= floor;
 }
 
@@ -191,13 +201,18 @@ async function main() {
   const diagrams = [];
   for (const name of files) {
     if (name.endsWith('.notes.json')) continue; // per-node note sidecars, read by src/lib/diagrams.ts
+    if (name === 'emphasis.json') continue; // emphasis node per diagram, read below
     const parsed = parseName(name);
+    if (parsed && ONLY && !ONLY.includes(parsed.id)) continue;
     if (!parsed) {
       console.warn(`diagrams-build: skipping ${name} (not <id>.<type>.json with a known type)`);
       continue;
     }
     diagrams.push({ ...parsed, path: join(SRC_DIR, name) });
   }
+
+  const unknown = (ONLY ?? []).filter((id) => !diagrams.some((d) => d.id === id));
+  if (unknown.length) throw new Error(`diagrams-build: --only names unknown diagram id(s): ${unknown.join(', ')}`);
 
   if (!diagrams.length) {
     console.warn(`diagrams-build: ${SRC_DIR} has no <id>.<type>.json diagrams; nothing to build.`);
@@ -209,6 +224,7 @@ async function main() {
     mkdirSync(SVG_OUT, { recursive: true });
   }
 
+  const emphasis = JSON.parse(readFileSync(EMPHASIS_FILE, 'utf8'));
   const manifest = [];
   let built = 0;
   let skipped = 0;
@@ -217,6 +233,11 @@ async function main() {
     validate(type, jsonPath);
 
     const ir = JSON.parse(readFileSync(jsonPath, 'utf8'));
+    const nodeIds = (ir[NODE_KEY[type]] ?? []).map((n) => n.id);
+    if (!nodeIds.includes(emphasis[id])) {
+      console.error(`diagrams-build: diagrams/emphasis.json must name one node of "${id}" (one of: ${nodeIds.join(', ')})`);
+      process.exit(1);
+    }
 
     if (isFresh(id, jsonPath)) {
       // Still surface the diagram in the manifest from the existing SVG.
@@ -243,7 +264,7 @@ async function main() {
     const html = dedash(readFileSync(htmlTmp, 'utf8'));
     let svg;
     try {
-      svg = transformSvg(html, id);
+      svg = transformSvg(dedash(renderReadable(ir, type, emphasis[id])), id);
     } catch (err) {
       unlinkSync(htmlTmp);
       console.error(err.message ?? err);
@@ -258,6 +279,12 @@ async function main() {
     built++;
   }
 
+  // --only keeps the other diagrams' existing manifest entries.
+  if (ONLY && existsSync(MANIFEST)) {
+    for (const old of JSON.parse(readFileSync(MANIFEST, 'utf8'))) {
+      if (!manifest.some((m) => m.id === old.id)) manifest.push(old);
+    }
+  }
   manifest.sort((a, b) => a.id.localeCompare(b.id));
   emit(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
 
@@ -276,9 +303,14 @@ async function main() {
   // src/lib/rehype-diagrams.ts), and Astro caches compiled content keyed on the
   // Markdown source, not on the SVG. Whenever a diagram was (re)built, drop that
   // cache so an incremental `astro build` picks up the new figure markup.
+  // ASTRO_CACHE_DIR (read by astro.config) moves that cache out of
+  // node_modules, which worktrees may share through a junction. Only the
+  // content data store goes: the directory is whatever the env names, so it is
+  // never removed itself.
   if (built > 0) {
-    for (const stale of [join(SITE, '.astro', 'data-store.json'), join(SITE, 'node_modules', '.astro')]) {
-      if (existsSync(stale)) rmSync(stale, { recursive: true, force: true });
+    const cacheDir = process.env.ASTRO_CACHE_DIR ? resolve(SITE, process.env.ASTRO_CACHE_DIR) : join(SITE, 'node_modules', '.astro');
+    for (const stale of [join(SITE, '.astro', 'data-store.json'), join(cacheDir, 'data-store.json')]) {
+      if (existsSync(stale)) rmSync(stale, { force: true });
     }
   }
 }

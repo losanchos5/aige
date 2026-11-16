@@ -1,20 +1,37 @@
-/* diagrams.css: style the generated archify SVGs and the figure that wraps
-   them. The inline SVGs ship semantic class names but NO styles of their own
-   (the build strips the renderer's stylesheet), so every fill/stroke/colour
-   below maps an archify class to a site token. Dark mode falls out of the
-   tokens. Loaded through reading.css by the pages that render prose, figures
-   or diagrams, not by Base.astro.
+/* diagrams.css: the figure frame, caption and inline SVG of the archify
+   diagrams. scripts/diagrams-readable.mjs lays every diagram out for the reading
+   column with short semantic classes and no styles of its own; every colour and
+   type size below maps those classes to site tokens, so dark mode falls out of
+   the tokens. Loaded through reading.css by the pages that render prose,
+   figures or diagrams, not by Base.astro.
+
+   One look for every diagram: paper nodes with a thin ink line, at most one
+   emphasis node in the accent, thin ink edges, mono headers over a hairline.
+   Layer colour appears only as a small swatch where a node, lane or row names a
+   stack layer. --panel, --accent, --accent-soft and --accent-line come from
+   tokens.css; the fallbacks keep a branch without them legible.
 
    public/diagram.js adds `.diagram-js` to each figure and toggles `.has-active`
    plus `.is-lit`/`.is-dim` on nodes ([data-node-id]) and edges ([data-edge-id]);
    without JS every node and edge is static and legible. */
 
 /* ---------------------------------------------------------------- figure -- */
+/* One figure count per page, shared with the infographic figures so the mono
+   "Fig. NN" label follows reading order across both families. */
+body {
+  counter-reset: figure;
+}
+
+.figure {
+  counter-increment: figure;
+}
+
 .diagram {
   margin: var(--s-6) 0;
   display: flex;
   flex-direction: column;
   gap: var(--s-4);
+  counter-increment: figure;
 }
 
 /* Full-bleed within the reading well: the chapter/thesis prose stays at 72ch
@@ -28,42 +45,47 @@
   margin-inline: calc(50% - 50cqw);
 }
 
+/* The frame: plain panel, 1px line, one radius, no shadow. The SVG never
+   shrinks below --min-w (its smallest label at 12px, set by the build on the
+   <svg>); a narrower frame scrolls sideways instead of shrinking the text. */
 .diagram-canvas {
   position: relative;
-  padding: var(--s-4);
-  background: var(--bg);
+  padding: 20px;
+  background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  overflow: hidden;
-}
-
-/* Framed like a card-lum for in-prose chapter/thesis figures. Scoped to .prose
-   so bare page figures and the enlarge dialog (appended to <body>) keep their
-   own chrome. */
-.prose .diagram:not(.diagram--bare) .diagram-canvas {
-  box-shadow: var(--shadow-1);
+  border-radius: var(--r-blk);
+  box-shadow: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
 }
 
 .diagram-canvas svg {
   width: 100%;
+  min-width: var(--min-w, 0);
   height: auto;
   display: block;
 }
 
-/* Cap the SVG at its natural pixel width (--vb-w on the figure) so a well wider
-   than the diagram centres it rather than upscaling its text past 1:1. The bare
-   hero frame opts out (the host page sizes it). The enlarge dialog re-opens the
-   cap below so the SVG can fill/scroll at natural width. */
+/* Cap the SVG at its natural width (--vb-w on the figure) so a wide well
+   centres it rather than upscaling its text past 1:1. The bare hero frame opts
+   out (the host page sizes it). */
 .diagram:not(.diagram--bare) .diagram-canvas svg {
   max-width: calc(var(--vb-w, 100000) * 1px);
   margin-inline: auto;
 }
 
+@media (max-width: 559px) {
+  .diagram-canvas {
+    padding: var(--s-3);
+  }
+}
+
 /* Bare variant: frame-only figure (canvas + note, no figcaption/dialog) for a
-   host that supplies its own chrome. Strip the canvas frame and figure margin so
-   the SVG sits flush. */
+   host that supplies its own chrome. Strip the frame and figure margin so the
+   SVG sits flush. */
 .diagram--bare {
   margin: 0;
+  counter-increment: none;
 }
 
 .diagram--bare .diagram-canvas {
@@ -82,7 +104,7 @@
   padding: var(--s-3) var(--s-4);
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
-  background: var(--surface);
+  background: var(--panel);
 }
 
 .diagram-note[hidden] {
@@ -107,256 +129,242 @@
   text-wrap: pretty;
 }
 
+/* --------------------------------------------------------------- caption -- */
 .diagram-figcaption {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-2);
+  display: grid;
+  gap: 6px;
+}
+
+/* Mono figure label, numbered across the page's figures. */
+.diagram-fig-label,
+.diagram-link {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.diagram-fig-label {
+  color: var(--accent);
+}
+
+.diagram-fig-label::after {
+  content: '\00a0' counter(figure, decimal-leading-zero);
 }
 
 .diagram-fig-title {
   font-weight: 600;
+  line-height: 1.4;
   color: var(--ink);
 }
 
 .diagram-fig-desc {
-  max-width: 70ch;
+  max-width: 68ch;
   font-size: var(--fs-small);
+  line-height: 1.55;
   color: var(--muted);
   text-wrap: pretty;
 }
 
-/* Secondary bordered mono link to the full viewer (models .drawer-btn). */
-.diagram-open {
-  align-self: flex-start;
-  padding: var(--s-2) var(--s-4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  color: var(--ink);
+/* One interaction hint, only where diagram.js made the figure interactive. */
+.diagram-fig-hint {
+  display: none;
+  font-size: var(--fs-small);
+  color: var(--ink-2);
+}
+
+.diagram-js .diagram-fig-hint {
+  display: block;
+}
+
+.diagram-fig-hint::before {
+  content: '\2192\00a0';
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  text-decoration: none;
+  color: var(--accent);
 }
 
-.diagram-open:hover {
-  border-color: var(--ink-2);
+.diagram-fig-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 22px;
+  margin-top: 6px;
 }
 
-.diagram-open:focus-visible {
+/* Secondary controls: mono uppercase text links, one style for link and button. */
+.diagram-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--accent-line);
+  text-underline-offset: 0.35em;
+  cursor: pointer;
+}
+
+.diagram-link:hover {
+  text-decoration-color: currentColor;
+}
+
+.diagram-link:focus-visible {
   outline: 2px solid var(--ink);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
+/* The enlarge button ships hidden until diagram.js reveals it; the inline
+   display of .diagram-link would beat the [hidden] UA rule. */
+.diagram-enlarge[hidden] {
+  display: none;
+}
+
+/* "(opens in a new tab)" is for screen readers; the link reads clean on screen. */
 .diagram-open-hint {
-  color: var(--muted);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-/* --------------------------------------------- archify class -> site tokens */
+/* --------------------------------------------------------- diagram svg -- */
+/* Sizes are in SVG units and must match FS in scripts/diagrams-readable.mjs,
+   which measures text against them. */
 .diagram svg text {
   font-family: var(--font-body);
 }
 
-/* Background grid + node backing mask. */
-.diagram svg .c-grid {
-  stroke: var(--line);
+.diagram svg :is(.t3, .h, .el, .gl) {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.diagram svg .t1 {
+  font-size: 14.5px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.diagram svg .t2 {
+  font-size: 13px;
+  fill: var(--muted);
+}
+
+.diagram svg .t3 {
+  fill: var(--ink-2);
+}
+
+.diagram svg .h {
+  font-weight: 500;
+  fill: var(--muted);
+}
+
+.diagram svg .hn {
+  fill: var(--accent);
+}
+
+.diagram svg .gl {
+  fill: var(--muted);
+}
+
+.diagram svg .el {
+  fill: var(--muted);
+}
+
+.diagram svg .hr {
+  stroke: color-mix(in srgb, var(--ink) 22%, var(--panel));
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.diagram svg .bk {
+  fill: var(--panel);
+}
+
+/* Nodes: paper and a thin ink line; one emphasis node in the accent. */
+.diagram svg .n {
+  fill: var(--panel);
+  stroke: var(--ink-2);
+  stroke-width: 1;
+}
+
+.diagram svg .em .n {
+  fill: var(--accent-soft);
+  stroke: var(--accent);
+  stroke-width: 1.5;
+}
+
+.diagram svg .em .t1 {
+  fill: var(--accent);
+}
+
+/* --muted on the accent tint falls under 4.5:1; the node's sublabel takes ink-2. */
+.diagram svg .em .t2 {
+  fill: var(--ink-2);
+}
+
+/* Group frames (workflow groups, architecture boundaries). */
+.diagram svg .gf {
   fill: none;
-  opacity: 0.5;
+  stroke: color-mix(in srgb, var(--ink) 22%, var(--panel));
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
 }
 
-.diagram svg .c-mask {
-  fill: var(--bg);
-  stroke: none;
+/* Sequence lifelines. */
+.diagram svg .ll {
+  stroke: color-mix(in srgb, var(--ink) 22%, var(--panel));
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
 }
 
-/* Node fills/strokes, mapped to the five stack pastels + their inks. Lifecycle
-   states and sequence participants render with these same classes. */
-.diagram svg .c-frontend {
-  fill: var(--l1);
-  stroke: var(--l1-ink);
+/* Edges: thin ink; the emphasis path in the accent; dashed for optional or
+   returning flows, long dashes for security-relevant ones. */
+.diagram svg .e {
+  fill: none;
+  stroke: var(--ink-2);
+  stroke-width: 1.2;
 }
 
-.diagram svg .c-backend {
-  fill: var(--l2);
-  stroke: var(--l2-ink);
+.diagram svg .e-em {
+  stroke: var(--accent);
+  stroke-width: 1.8;
 }
 
-.diagram svg .c-database {
-  fill: var(--l3);
-  stroke: var(--l3-ink);
+.diagram svg .e-d {
+  stroke-dasharray: 4 3;
 }
 
-.diagram svg .c-security {
-  fill: var(--l4);
-  stroke: var(--l4-ink);
-}
-
-.diagram svg .c-cloud,
-.diagram svg .c-messagebus {
-  fill: var(--l5);
-  stroke: var(--l5-ink);
-}
-
-.diagram svg .c-external {
-  fill: var(--bg);
-  stroke: var(--muted);
-}
-
-/* Structural frames: translucent fill + dashed rule. */
-.diagram svg .c-region {
-  fill: color-mix(in srgb, var(--l5) 20%, transparent);
-  stroke: var(--muted);
-  stroke-dasharray: 9 4;
-}
-
-.diagram svg .c-security-group {
-  fill: color-mix(in srgb, var(--l4) 16%, transparent);
-  stroke: var(--l4-ink);
-  stroke-dasharray: 4 4;
-}
-
-.diagram svg .c-lane {
-  fill: color-mix(in srgb, var(--ink) 3%, transparent);
-  stroke: var(--line);
+.diagram svg .e-s {
   stroke-dasharray: 7 3;
 }
 
-/* Text helpers. */
-.diagram svg .t-primary {
-  fill: var(--ink);
-}
-
-.diagram svg .t-muted {
-  fill: var(--muted);
-}
-
-.diagram svg .t-dim {
-  fill: color-mix(in srgb, var(--muted) 70%, var(--bg));
-}
-
-.diagram svg .t-frontend {
-  fill: var(--l1-ink);
-}
-
-.diagram svg .t-backend {
-  fill: var(--l2-ink);
-}
-
-.diagram svg .t-database {
-  fill: var(--l3-ink);
-}
-
-.diagram svg .t-security {
-  fill: var(--l4-ink);
-}
-
-.diagram svg .t-cloud {
-  fill: var(--l5-ink);
-}
-
-.diagram svg .t-messagebus {
-  fill: var(--l5-ink);
-}
-
-.diagram svg .t-external {
-  fill: var(--muted);
-}
-
-/* Edges. */
-.diagram svg .a-default {
-  stroke: var(--muted);
-  fill: none;
-}
-
-.diagram svg .a-emphasis {
-  stroke: var(--ink);
-  fill: none;
-}
-
-.diagram svg .a-security {
-  stroke: var(--l4-ink);
-  fill: none;
-  stroke-dasharray: 5 5;
-}
-
-.diagram svg .a-dashed {
-  stroke: var(--muted);
-  fill: none;
-  stroke-dasharray: 4 4;
-}
-
-/* Arrowhead markers. The class colours are a fallback; context-stroke makes the
-   head follow its own edge's stroke (so lit edges get lit heads) where the
-   engine supports it, and is ignored where it does not. */
-.diagram svg .m-default {
-  fill: var(--muted);
-}
-
-.diagram svg .m-emphasis {
-  fill: var(--ink);
-}
-
-.diagram svg .m-security {
-  fill: var(--l4-ink);
-}
-
-.diagram svg .m-dashed {
-  fill: var(--muted);
-}
-
-.diagram svg .m-default,
-.diagram svg .m-emphasis,
-.diagram svg .m-security,
-.diagram svg .m-dashed {
+/* Arrowheads follow their own edge's stroke (so lit edges get lit heads) where
+   context-stroke is supported; the class fills are the fallback. */
+.diagram svg .m {
+  fill: var(--ink-2);
   fill: context-stroke;
 }
 
-/* Semantic sigils: small authored role stamps stroked in the node's ink. */
-.diagram svg .semantic-sigil {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.35;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: 0.76;
-  pointer-events: none;
+.diagram svg .m-em {
+  fill: var(--accent);
+  fill: context-stroke;
 }
 
-.diagram svg .semantic-sigil > * {
-  vector-effect: non-scaling-stroke;
+/* Layer swatches: the only place the five layer colours appear. */
+.diagram svg .sw {
+  stroke-width: 1;
 }
 
-.diagram svg .semantic-sigil .sigil-fill {
-  fill: currentColor;
-  stroke: none;
-}
-
-.diagram svg .s-frontend {
-  color: var(--l1-ink);
-}
-
-.diagram svg .s-backend {
-  color: var(--l2-ink);
-}
-
-.diagram svg .s-database {
-  color: var(--l3-ink);
-}
-
-.diagram svg .s-security {
-  color: var(--l4-ink);
-}
-
-.diagram svg .s-cloud {
-  color: var(--l5-ink);
-}
-
-.diagram svg .s-messagebus {
-  color: var(--l5-ink);
-}
-
-.diagram svg .s-external {
-  color: var(--muted);
-}
+.diagram svg .sw-l1 { fill: var(--l1); stroke: var(--l1-ink); }
+.diagram svg .sw-l2 { fill: var(--l2); stroke: var(--l2-ink); }
+.diagram svg .sw-l3 { fill: var(--l3); stroke: var(--l3-ink); }
+.diagram svg .sw-l4 { fill: var(--l4); stroke: var(--l4-ink); }
+.diagram svg .sw-l5 { fill: var(--l5); stroke: var(--l5-ink); }
 
 /* ---------------------------------------------------- interactive states -- */
 .diagram [data-node-id] {
@@ -372,29 +380,32 @@
   outline-offset: 2px;
 }
 
-/* Dim everything not related to the active node. */
-.diagram.has-active [data-node-id].is-dim,
-.diagram.has-active [data-edge-id].is-dim {
-  opacity: 0.4;
+/* Dim everything not related to the active node: strokes recede to --line and
+   text to --muted (never opacity, which drops text under its contrast); the
+   lit set keeps ink at 2px, so the state is carried by weight too. */
+.diagram.has-active [data-node-id].is-dim .n,
+.diagram.has-active path[data-edge-id].is-dim {
+  stroke: var(--line);
+}
+
+.diagram.has-active :is([data-node-id], [data-edge-id]).is-dim text {
+  fill: var(--muted);
 }
 
 /* Light the active node and its neighbours: an ink outline on the node body,
    an ink 2px stroke on the connecting edges (and their heads via context-stroke). */
-.diagram [data-node-id].is-lit rect:not(.c-mask) {
+.diagram [data-node-id].is-lit .n {
   stroke: var(--ink);
   stroke-width: 2;
 }
 
-/* Edge groups wrap both the route and its label: stroke only the route
-   geometry, and keep the label as plain ink text (a stroked label smears). */
-.diagram [data-edge-id].is-lit :is(path, polyline, line) {
+.diagram path[data-edge-id].is-lit {
   stroke: var(--ink);
   stroke-width: 2;
 }
 
 .diagram [data-edge-id].is-lit text {
   fill: var(--ink);
-  stroke: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -402,59 +413,16 @@
   .diagram.diagram-js [data-node-id] rect,
   .diagram.diagram-js [data-edge-id] {
     transition:
-      opacity var(--dur) var(--ease),
+      fill var(--dur) var(--ease),
       stroke var(--dur) var(--ease),
       stroke-width var(--dur) var(--ease);
   }
 }
 
 /* --------------------------------------------------------- enlarge dialog -- */
-/* Even in the widened well a large SVG can still read below 1:1, and on mobile
-   it shrinks hard. The Enlarge button (revealed by diagram.js) opens a near
-   full-screen <dialog> and moves the canvas into it at natural pixel width, so
-   the text reads at 1:1 on desktop and scrolls horizontally on mobile. The
-   button overlays the canvas top-right; styled to match the secondary
-   .diagram-open link. */
-.diagram-enlarge {
-  position: absolute;
-  top: var(--s-3);
-  right: var(--s-3);
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--s-2);
-  padding: var(--s-2) var(--s-3);
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  color: var(--ink);
-  font-family: var(--font-mono);
-  font-size: 0.8125rem;
-  cursor: pointer;
-}
-
-/* The inline-flex display would beat the [hidden] UA rule, so guard it (the
-   button ships hidden until diagram.js reveals it). */
-.diagram-enlarge[hidden] {
-  display: none;
-}
-
-.diagram-enlarge:hover {
-  border-color: var(--ink-2);
-}
-
-.diagram-enlarge:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-}
-
-.diagram-enlarge-icon {
-  font-size: 1.05em;
-  line-height: 1;
-}
-
-/* Inside the dialog the canvas already fills the screen, so the overlaid button
-   (moved in with the canvas) is redundant, and would sit over the SVG. */
+/* The Enlarge control (revealed by diagram.js) opens a near full-screen
+   <dialog> and moves the canvas into it, larger than the column allows; it
+   scrolls on a small screen. */
 .diagram-dialog .diagram-enlarge {
   display: none;
 }
@@ -466,8 +434,8 @@
   max-height: 92vh;
   padding: 0;
   border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  background: var(--bg);
+  border-radius: var(--r-blk);
+  background: var(--panel);
   color: var(--ink);
   overflow: hidden;
 }
@@ -490,7 +458,6 @@
   gap: var(--s-4);
   padding: var(--s-3) var(--s-4);
   border-bottom: 1px solid var(--line);
-  background: var(--surface);
 }
 
 .diagram-dialog-title {
@@ -498,30 +465,35 @@
   color: var(--ink);
 }
 
-/* Secondary button, matching .diagram-open / .diagram-enlarge. */
 .diagram-dialog-close {
   flex: 0 0 auto;
-  padding: var(--s-2) var(--s-4);
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  background: var(--bg);
-  color: var(--ink);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--accent-line);
+  text-underline-offset: 0.35em;
   cursor: pointer;
 }
 
 .diagram-dialog-close:hover {
-  border-color: var(--ink-2);
+  text-decoration-color: currentColor;
 }
 
 .diagram-dialog-close:focus-visible {
   outline: 2px solid var(--ink);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
-/* Canvas fills the rest and scrolls; the SVG renders at natural width (--vb-w,
-   set on the figure by renderDiagramFigure) but never below the viewport. */
+/* Canvas fills the rest and scrolls; the SVG renders at up to 1.5x its natural
+   width, never below its 12px min width. */
 .diagram-dialog .diagram-canvas {
   flex: 1 1 auto;
   min-height: 0;
@@ -531,9 +503,10 @@
 }
 
 .diagram-dialog .diagram-canvas svg {
-  width: max(100%, calc(var(--vb-w, 0) * 1px));
+  width: min(100%, calc(var(--vb-w, 100000) * 1.5px));
   max-width: none;
   height: auto;
+  margin-inline: auto;
 }
 
 /* Note panel sits under the canvas inside the dialog. */

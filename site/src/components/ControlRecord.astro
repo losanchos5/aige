@@ -85,7 +85,7 @@ const pagePath = standalone ? null : controlPagePath(c);
 ---
 
 <section class="ctl" data-control={c.id} data-depth={c.depth} data-index={position}>
-  {standalone ? <h2 id="record">The control record</h2> : <h2 id={controlAnchor(c)}>{number} {c.title}</h2>}
+  {standalone ? <h2 id="record">The control record</h2> : <h2 class="ctl-title" id={controlAnchor(c)}>{number} {c.title}</h2>}
   {c.depth === 'stub' && <p class="ctl-state">{stubNote}</p>}
   {
     c.depth === 'derived' && (

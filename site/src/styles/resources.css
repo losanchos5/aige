@@ -187,7 +187,7 @@
 
 /* ---- Type tag (frameworks + crosswalk column heads) ----------------------- */
 /* One neutral tag for every framework type, like .cw-chip in crosswalk.css: a
-   --tint-bg fill, a 1px --line hairline and --ink-2 text (≥ 4.5:1 in light and
+   --panel fill, a 1px --line hairline and --ink-2 text (≥ 4.5:1 in light and
    dark), never dimmed. The type reads from the word itself; the layer colours
    stay reserved for the five stack layers (audit SL-06). */
 .type-tag {
@@ -195,7 +195,7 @@
   padding: 0.3em 0.6em;
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
-  background: var(--tint-bg);
+  background: var(--panel);
   color: var(--ink-2);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
@@ -846,32 +846,18 @@
   border-color: var(--ink-2);
 }
 
-/* ---- Reference pages in bands (visual-rhythm) ----
-   On a page still built as one .res-page column, every second top-level
-   block becomes a full-bleed tinted band (the .bleed technique from
-   effects.css, inlined here because the blocks are page markup), the tones
-   turning blue, amber, sage, rose so no two bands repeat. A tint is not a
-   mesh, so tables may sit on it. The detail pages close on a band too: the
-   "more cases / more obligations / more figures" navigation. */
+/* ---- Reference page rhythm (editorial restraint) ----
+   No tinted bands: every second top-level block, and the closing "more
+   cases / more obligations / more figures" navigation, opens on a 1px --line
+   hairline on the paper ground. */
 .res-page > .res-section:nth-child(even of .res-section),
 .res-page .cs-nav,
 .res-page .fg-pager {
-  --band-fill: var(--tint-l1);
-  --muted: var(--ink-2);
   padding-block: var(--s-6);
-  border-image: conic-gradient(var(--band-fill) 0 0) fill 0 / / 0 100vmax;
-}
-
-.res-page > .res-section:nth-child(4n of .res-section) {
-  --band-fill: var(--tint-l4);
-}
-
-.res-page > .res-section:nth-child(6n of .res-section) {
-  --band-fill: var(--tint-l2);
+  border-top: 1px solid var(--line);
 }
 
 .res-page .cs-nav,
 .res-page .fg-pager {
-  --band-fill: var(--tint-l3);
   margin-top: var(--s-7);
 }

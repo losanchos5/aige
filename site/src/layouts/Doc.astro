@@ -1,9 +1,13 @@
 ---
 // Doc: the reading layout for the Thesis, the Body of Knowledge and the meta
-// pages. Wraps Base and lays out a chapter rail, the prose well and an
-// on-this-page TOC: three columns ≥1100px, two ≥840px, one below with the
-// rail as an off-canvas drawer. All behaviour lives in /ui-doc.js (CSP-safe).
-// The search dialog now lives in Base, so it is available on every page.
+// pages. Wraps Base. With the rail (`sidebar`, the default) it lays out three
+// columns ≥1280px (the rail, a 44rem reading column, the on-this-page TOC with
+// the cite card), two ≥840px (the TOC folds into a disclosure under the
+// header) and one below, with the rail as an off-canvas drawer. The rail lists
+// the book's parts, or one nav.ts group (`navGroup`). Without the rail the
+// page keeps the wide well with a TOC column ≥1100px (index and tool pages).
+// All behaviour lives in /ui-doc.js (CSP-safe). The search dialog lives in
+// Base, so it is available on every page.
 import type { MarkdownHeading } from 'astro';
 import Base from './Base.astro';
 import '../styles/reading.css';
@@ -17,6 +21,7 @@ import PrevNext from '../components/PrevNext.astro';
 import EditOnGitHub from '../components/EditOnGitHub.astro';
 import Citation from '../components/Citation.astro';
 import { getChapterBySlug } from '../data/chapters';
+import { nav, type NavGroup } from '../data/nav';
 import { readSource } from '../lib/md-parse';
 import { fitsSiteSuffix } from '../lib/seo-title';
 import { wordCount, readingTime } from '../lib/reading';
@@ -81,6 +86,8 @@ interface Props {
   /** Show the site's BoK version in the header's meta line (default true);
       see ChapterHeader. */
   siteVersion?: boolean;
+  /** Fill the rail with this nav.ts group instead of the book's parts. */
+  navGroup?: NavGroup['id'];
 }
 
 const {
@@ -114,6 +121,7 @@ const {
   sidebarLinks,
   thesisHref,
   siteVersion = true,
+  navGroup,
 } = Astro.props;
 const t = translator(lang);
 // Open Graph locale: given, or the page language's (English pages keep Seo's default).
@@ -121,7 +129,10 @@ const ogLocale = locale ?? (isLocale(lang) && lang !== 'en' ? LOCALE_INFO[lang].
 
 const withSidebar = sidebar && !wide;
 const withToc = !wide && headings.some((h) => h.depth === 2 || h.depth === 3);
+const withCite = cite && Boolean(slug);
 const mode = wide ? 'wide' : withSidebar ? 'chapter' : 'doc';
+// The drawer button names what the rail holds: the book's chapters or the group.
+const railLabel = navGroup ? nav.find((g) => g.id === navGroup)?.label : t('doc.chapters');
 
 // The page's own nodes plus, unless the page already carries one, the
 // BreadcrumbList for the visible trail. Seo.astro merges these into the single
@@ -136,22 +147,10 @@ const graphNodes = [
 let words: number | undefined;
 let minutes: number | undefined;
 const statsChapter = slug ? getChapterBySlug(slug) : undefined;
-// A layer colour means that layer and nothing else (audit SL-06): the
-// ChapterHeader band, the crumb square and the reading chrome take a layer's
-// colour only when the chapter is about one stack layer (chapters.ts `layer`).
-// Every other page (most chapters, the Thesis, the meta pages) stays neutral.
+// A layer colour means that layer and nothing else (audit SL-06): the crumb
+// square takes a layer's colour only when the chapter is about one stack layer
+// (chapters.ts `layer`).
 const headerLayer = statsChapter?.layer ? `l${statsChapter.layer}` : undefined;
-// The ink that colours the reading chrome (prose.css reads it for the h2 dash).
-// Set on the layout root so the prose and both rails inherit it: the layer's ink
-// when there is one, the neutral --ink otherwise.
-const chapterInk =
-  `--chapter-ink: var(--${headerLayer ? `${headerLayer}-ink` : 'ink'})` +
-  (headerLayer ? '' : '; --chapter-dash: linear-gradient(90deg, var(--l1-ink), var(--l3-ink), var(--l4-ink))');
-// The header mesh of a band without a layer: one composition per part of the
-// book, so each part has its own mood without a layer colour (SL-06). Pages
-// outside the book (Thesis, patterns, About) take composition a.
-const partMesh = { discipline: 'a', foundations: 'c', lifecycle: 'b', law: 'd', reference: 'e' } as const;
-const headerMesh = statsChapter ? partMesh[statsChapter.part] : 'a';
 if (statsChapter) {
   try {
     const markdown = markdownProp ?? readSource(`bok/${statsChapter.id}.md`);
@@ -177,7 +176,7 @@ if (statsChapter) {
 >
   <div class="doc-progress" data-doc-progress aria-hidden="true"></div>
 
-  <div class="doc container" data-mode={mode} style={chapterInk}>
+  <div class="doc container" data-mode={mode}>
     {
       withSidebar && (
         <div class="doc-drawerbar">
@@ -188,7 +187,7 @@ if (statsChapter) {
             aria-expanded="false"
             aria-controls="doc-sidebar"
           >
-            {t('doc.chapters')}
+            {railLabel}
           </button>
           <button
             type="button"
@@ -213,6 +212,7 @@ if (statsChapter) {
               lang={lang}
               links={sidebarLinks}
               thesisHref={thesisHref}
+              group={navGroup}
             />
           </div>
         )
@@ -230,27 +230,6 @@ if (statsChapter) {
             </div>
           )
         }
-        {/* The compact on-this-page list precedes the <h1> in the source order,
-            so it carries data-nosnippet: a crawler must not open a chapter's
-            search snippet with its navigation. The position is deliberate (the
-            layout puts it above the prose on narrow viewports), so the markup
-            itself is not moved. */}
-        {
-          withToc && (
-            <details class="doc-toc-m" data-toc-mobile data-pagefind-ignore data-nosnippet>
-              <summary>{t('doc.onThisPage')}</summary>
-              <ul>
-                {headings
-                  .filter((h) => h.depth === 2 || h.depth === 3)
-                  .map((h) => (
-                    <li class={`toc-m-h${h.depth}`}>
-                      <a href={`#${h.slug}`}>{h.text}</a>
-                    </li>
-                  ))}
-              </ul>
-            </details>
-          )
-        }
 
         <article class="prose" data-pagefind-body>
           <ChapterHeader
@@ -259,27 +238,43 @@ if (statsChapter) {
             updated={updated}
             words={words}
             minutes={minutes}
-            layer={headerLayer}
-            mesh={headerMesh}
+            chapterSlug={statsChapter?.slug}
             lang={lang}
             siteVersion={siteVersion}
-          />
+          >
+            {/* The compact on-this-page list for the widths without the TOC
+                column, under the header's meta line. It carries data-nosnippet
+                so a crawler never quotes the navigation as chapter text. */}
+            {
+              withToc && (
+                <details
+                  class="doc-toc-m"
+                  data-toc-mobile
+                  data-pagefind-ignore
+                  data-nosnippet
+                  slot="toc"
+                >
+                  <summary>{t('doc.onThisPage')}</summary>
+                  <ol>
+                    {headings
+                      .filter((h) => h.depth === 2 || h.depth === 3)
+                      .map((h) => (
+                        <li class={`toc-m-h${h.depth}`}>
+                          <a href={`#${h.slug}`}>{h.text}</a>
+                        </li>
+                      ))}
+                  </ol>
+                </details>
+              )
+            }
+          </ChapterHeader>
           <slot />
         </article>
 
         {
-          (editPath || (cite && slug)) && (
+          editPath && (
             <footer class="doc-foot">
-              {editPath && <EditOnGitHub path={editPath} lang={lang} />}
-              {cite && slug && (
-                <Citation
-                  title={title}
-                  slug={slug}
-                  url={citeUrl}
-                  kind={citeUrl ? 'chapter' : undefined}
-                  lang={lang}
-                />
-              )}
+              <EditOnGitHub path={editPath} lang={lang} />
             </footer>
           )
         }
@@ -287,17 +282,31 @@ if (statsChapter) {
         {(prev || next) && <PrevNext prev={prev} next={next} base={pagerBase} lang={lang} />}
       </div>
 
+      {/* The right column: the TOC and the cite card. Below the column's
+          breakpoint it dissolves (display: contents): the TOC hides, since the
+          disclosure in the header takes over, and the cite card falls under
+          the article in the reading column. */}
       {
-        withToc && (
+        (withToc || withCite) && (
           <aside class="doc-toc" aria-label={t('doc.onThisPage')} data-pagefind-ignore data-nosnippet>
-            <Toc headings={headings} lang={lang} />
+            {withToc && <Toc headings={headings} lang={lang} />}
+            {withCite && (
+              <Citation
+                title={title}
+                slug={slug}
+                url={citeUrl}
+                kind={citeUrl ? 'chapter' : undefined}
+                lang={lang}
+                card
+              />
+            )}
           </aside>
         )
       }
     </div>
   </div>
 
-  {/* Full-width bands after the reading layout (a closing mesh band with the
+  {/* Full-width bands after the reading layout (a closing band with the
       related links and the sign-up): outside the grid, so they span the page. */}
   <slot name="after" />
 
@@ -320,8 +329,9 @@ if (statsChapter) {
 </Base>
 
 <style>
-  /* Per-page reading hairline: pinned just under the sticky header (ui-doc.js
-     sets `top` to the header height) and scaled on scroll to the read fraction. */
+  /* Per-page reading progress: a flat 2px accent bar pinned just under the
+     sticky header (ui-doc.js sets `top` to the header height) and scaled on
+     scroll to the read fraction. */
   .doc-progress {
     position: fixed;
     left: 0;
@@ -329,7 +339,7 @@ if (statsChapter) {
     z-index: 19;
     width: 100%;
     height: 2px;
-    background: linear-gradient(to right, var(--l1-ink), var(--l5-ink));
+    background: var(--accent);
     transform: scaleX(0);
     transform-origin: left;
     will-change: transform;
@@ -367,13 +377,19 @@ if (statsChapter) {
   }
 
   .drawer-btn {
-    padding: var(--s-2) var(--s-4);
-    border: 1px solid var(--line);
-    border-radius: var(--r-sm);
-    background: var(--surface);
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-ctl);
+    background: var(--bg);
     color: var(--ink);
     font-family: var(--font-mono);
-    font-size: 0.8125rem;
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
     cursor: pointer;
   }
 
@@ -382,16 +398,15 @@ if (statsChapter) {
   }
 
   .doc-layout {
-    /* Max width of the central reading well on desktop. The prose column stays
-       at 72ch inside it; the extra room is what lets a diagram figure break out
-       (see .diagram in diagrams.css). Only consumed by the ≥1100px rules. */
+    /* Max width of the wide well of the pages without a rail (index and tool
+       pages); the prose stays at 72ch inside it. */
     --doc-well: min(1100px, 100%);
-    /* Where the sticky rails (chapter sidebar, TOC) settle: just under the
-       sticky site header, like the in-page anchors. */
+    /* Where the sticky TOC of those pages settles: just under the sticky site
+       header, like the in-page anchors. */
     --doc-rail-top: calc(var(--anchor-offset) + var(--s-3));
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--s-6);
+    gap: 2.5rem;
     align-items: start;
   }
 
@@ -402,16 +417,12 @@ if (statsChapter) {
 
   .doc-main {
     min-width: 0;
-    /* Query container for the full-bleed diagram breakout: the figure reads the
-       well width from here, so the prose can stay narrow while the figure widens.
-       .doc-main always stretches to fill its grid track: the 72ch reading
-       measure is capped on the prose/footer/pager inside, NOT here, because auto
-       margins on a size-contained (container-type) box collapse it to zero width. */
+    /* Query container for the figures. It always stretches to fill its grid
+       track: the measure is capped inside, because auto margins on a
+       size-contained box collapse it to zero width. */
     container-type: inline-size;
   }
 
-  /* The reading chrome (footer, pager) tracks the 72ch prose measure, centred in
-     the well, so it does not stretch to the full breakout width on desktop. */
   .doc-foot {
     display: flex;
     flex-wrap: wrap;
@@ -430,28 +441,46 @@ if (statsChapter) {
     margin-inline: auto;
   }
 
-  /* On-this-page: only from 1100px up. */
+  /* The right column dissolves below its breakpoint: the TOC hides and the
+     cite card becomes a block in the reading column, after the article. */
   .doc-toc {
+    display: contents;
+  }
+
+  .doc-toc :global(nav.toc) {
     display: none;
   }
 
-  /* Compact, collapsible on-this-page for narrow viewports (below 1100px, where
-     the sidebar TOC is hidden). Pure HTML/CSS via <details>; hidden once the
-     sticky sidebar TOC takes over. */
+  .doc-toc :global(.cite-wrap) {
+    grid-column: -2 / -1;
+    min-width: 0;
+  }
+
+  /* Compact, collapsible on-this-page in the header, for the widths without
+     the TOC column. */
   .doc-toc-m {
-    margin-bottom: var(--s-5);
+    margin: 28px 0 0;
     border: 1px solid var(--line);
-    border-radius: var(--r-sm);
-    background: var(--surface);
+    border-radius: var(--r-blk);
+    background: var(--panel);
+  }
+
+  /* Phones: the tighter header stack (ChapterHeader) keeps the lede and the
+     glossary's A-Z row inside the first screen. */
+  @media (max-width: 639px) {
+    .doc-toc-m {
+      margin-top: 16px;
+    }
   }
 
   .doc-toc-m > summary {
-    padding: var(--s-3) var(--s-4);
+    padding: 12px 16px;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
     text-transform: uppercase;
-    color: var(--ink-2);
+    color: var(--ink);
     cursor: pointer;
     list-style: none;
   }
@@ -460,11 +489,11 @@ if (statsChapter) {
     display: none;
   }
 
-  .doc-toc-m ul {
+  .doc-toc-m ol {
     list-style: none;
-    margin: 0;
-    padding: 0 var(--s-4) var(--s-4);
-    border-top: 1px solid var(--line);
+    margin: 0 16px 14px;
+    padding: 0;
+    border-left: 1px solid var(--line);
   }
 
   .doc-toc-m li {
@@ -473,10 +502,11 @@ if (statsChapter) {
 
   .doc-toc-m a {
     display: block;
-    padding: var(--s-2) 0;
+    padding: 5px 0 5px 12px;
+    font-size: var(--fs-small);
+    line-height: 1.4;
     color: var(--ink-2);
     text-decoration: none;
-    line-height: 1.35;
   }
 
   .doc-toc-m a:hover {
@@ -484,24 +514,25 @@ if (statsChapter) {
   }
 
   .doc-toc-m .toc-m-h3 a {
-    padding-left: var(--s-4);
-    font-size: 0.9375rem;
+    padding-left: 28px;
+    font-size: 0.8125rem;
   }
 
-  /* Chapter rail: off-canvas drawer below 840px. Closed, it is also
-     visibility: hidden, so its links leave the tab order and the accessibility
-     tree instead of sitting off-screen as invisible tab stops. The hide waits
-     one --dur so the slide-out still plays. */
+  /* Rail: off-canvas drawer below 840px. Closed, it is also visibility:
+     hidden, so its links leave the tab order and the accessibility tree
+     instead of sitting off-screen as invisible tab stops. The hide waits one
+     transition so the slide-out still plays. */
   .doc-sidebar {
     position: fixed;
     inset: 0 auto 0 0;
     z-index: 40;
-    width: min(320px, 86vw);
-    padding: var(--s-6) var(--s-5);
+    width: min(320px, 88vw);
+    padding: 20px 20px 48px;
     background: var(--bg);
     border-right: 1px solid var(--line);
     overflow-y: auto;
-    transform: translateX(-100%);
+    overscroll-behavior: contain;
+    transform: translateX(-102%);
     visibility: hidden;
   }
 
@@ -513,13 +544,13 @@ if (statsChapter) {
   @media (prefers-reduced-motion: no-preference) {
     .doc-sidebar {
       transition:
-        transform var(--dur) var(--ease),
-        visibility 0s linear var(--dur);
+        transform 240ms var(--ease),
+        visibility 0s linear 240ms;
     }
 
     .doc-sidebar.is-open {
       transition:
-        transform var(--dur) var(--ease),
+        transform 240ms var(--ease),
         visibility 0s;
     }
   }
@@ -528,7 +559,19 @@ if (statsChapter) {
     position: fixed;
     inset: 0;
     z-index: 39;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgb(10 12 15 / 0.45);
+  }
+
+  /* ---- With the rail (chapter mode): the reading grid ---- */
+  .doc[data-mode='chapter'] {
+    padding-top: var(--s-5);
+  }
+
+  /* The column is the measure: prose, footer and pager fill it. */
+  .doc[data-mode='chapter'] .doc-main :global(.prose),
+  .doc[data-mode='chapter'] .doc-foot,
+  .doc[data-mode='chapter'] .doc-main :global(.pager) {
+    max-width: none;
   }
 
   @media (min-width: 840px) {
@@ -536,20 +579,25 @@ if (statsChapter) {
       display: none;
     }
 
+    .doc[data-mode='chapter'] {
+      padding-top: 0;
+    }
+
+    .doc[data-mode='chapter'] .doc-main {
+      padding-top: 32px;
+    }
+
     /* `inset` goes before `top`: written after it, it reset `top` to auto and
-       the rail scrolled away with the page instead of sticking. No mask at the
-       foot either (it made the last chapter read as dimmed text); the bottom
-       padding keeps the last row clear of the edge when the rail scrolls. */
+       the rail scrolled away with the page instead of sticking. */
     .doc-sidebar {
       position: sticky;
       inset: auto;
-      top: var(--doc-rail-top);
+      top: var(--header-h);
       z-index: auto;
       width: auto;
-      max-height: calc(100dvh - var(--doc-rail-top) - var(--s-5));
-      padding: 0 0 var(--s-5);
+      max-height: calc(100dvh - var(--header-h));
+      padding: 28px 20px 48px 0;
       background: none;
-      border-right: 0;
       transform: none;
       visibility: visible;
       transition: none;
@@ -560,16 +608,55 @@ if (statsChapter) {
     }
 
     [data-mode='chapter'] .doc-layout {
-      grid-template-columns: 240px minmax(0, 1fr);
+      grid-template-columns: 260px minmax(0, 44rem);
+      justify-content: center;
     }
   }
 
+  @media (min-width: 1024px) {
+    .doc[data-mode='chapter'] .doc-main {
+      padding-top: 48px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    /* Grow the container past the 1200px site width so the three columns fit
+       at their full widths; the site header stays at 1200px. */
+    .doc[data-mode='chapter'] {
+      max-width: calc(280px + 44rem + 13rem + 5rem + 2 * var(--s-6));
+      padding-inline: var(--s-6);
+    }
+
+    [data-mode='chapter'] .doc-layout {
+      grid-template-columns: 280px minmax(0, 44rem) 13rem;
+    }
+
+    [data-mode='chapter'] .doc-toc {
+      display: block;
+      position: sticky;
+      top: var(--header-h);
+      align-self: start;
+      max-height: calc(100dvh - var(--header-h));
+      overflow-y: auto;
+      padding: 52px var(--s-1) var(--s-5);
+    }
+
+    [data-mode='chapter'] .doc-toc :global(nav.toc) {
+      display: block;
+    }
+
+    [data-mode='chapter'] .doc-toc :global(nav.toc + .cite-wrap) {
+      margin-top: var(--s-6);
+    }
+
+    [data-mode='chapter'] .doc-toc-m {
+      display: none;
+    }
+  }
+
+  /* ---- Without the rail (doc and wide modes): the wide well ---- */
   @media (min-width: 1100px) {
-    /* The TOC column sticks as a whole (align-self: start keeps the grid item
-       at its content height, so it has the whole row to travel). A TOC taller
-       than the viewport scrolls inside; the inline padding leaves room for the
-       links' focus ring and hover nudge inside that scroll box. */
-    .doc-toc {
+    [data-mode='doc'] .doc-toc {
       display: block;
       position: sticky;
       top: var(--doc-rail-top);
@@ -579,21 +666,20 @@ if (statsChapter) {
       padding: 0 var(--s-2) var(--s-2);
     }
 
-    /* The sticky sidebar TOC takes over here. */
-    .doc-toc-m {
+    [data-mode='doc'] .doc-toc :global(nav.toc) {
+      display: block;
+    }
+
+    [data-mode='doc'] .doc-toc :global(nav.toc + .cite-wrap) {
+      margin-top: var(--s-6);
+    }
+
+    [data-mode='doc'] .doc-toc-m {
       display: none;
     }
 
-    /* Grow the reading container past the 1200px site width so the rails leave a
-       real well for a full-bleed figure (well ≈ 1440 − 260 − 220 − gaps ≈ 880px
-       in chapter mode). The site header stays at 1200px, which is accepted. */
-    .doc {
+    .doc:not([data-mode='chapter']) {
       max-width: 1440px;
-    }
-
-    [data-mode='chapter'] .doc-layout {
-      grid-template-columns: 260px minmax(0, var(--doc-well)) 220px;
-      justify-content: center;
     }
 
     [data-mode='doc'] .doc-layout {
@@ -601,23 +687,20 @@ if (statsChapter) {
       justify-content: center;
     }
 
-    /* Wide pages (the Thesis) have no rails: the single track carries the well
-       and is centred in the container, so .doc-main fills it (stretched, not
-       auto-margined: see .doc-main) and the prose still holds at 72ch inside. */
+    /* Wide pages have no rails: the single track carries the well, centred,
+       and the prose still holds at 72ch inside it. */
     [data-mode='wide'] .doc-layout {
       grid-template-columns: minmax(0, var(--doc-well));
       justify-content: center;
     }
   }
 
-  /* On large desktops grow container and well once more so a chapter figure
-     reaches its natural width (~1200px): 1680 − 260 − 220 − gaps ≈ 1130px. */
   @media (min-width: 1600px) {
-    .doc {
+    .doc:not([data-mode='chapter']) {
       max-width: 1680px;
     }
 
-    .doc-layout {
+    .doc:not([data-mode='chapter']) .doc-layout {
       --doc-well: min(1300px, 100%);
     }
   }

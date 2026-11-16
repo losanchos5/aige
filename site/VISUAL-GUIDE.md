@@ -39,13 +39,13 @@ content; a figure never adds facts, numbers, dates or vendors that the chapter d
 9. **Tokens, not colours.** No hard-coded hex in infographics: `currentColor`, `var(--fg)`,
    `var(--muted)`, `var(--l1)`…; fonts `var(--font-body)` and `var(--font-mono)` for identifiers.
    Never dim text with opacity (the contrast gate fails). Both themes must read well.
-   Figures stay flat: shadows and gradients on the site come only through the
-   `effects.css` tokens (page chrome), never baked into a figure.
+   Figures stay flat: no shadow, gradient, mesh or halo is baked into a figure or drawn
+   around it (see 15).
 10. **Accessibility.** `role="img"` with `aria-labelledby` pointing at an SVG `<title>` and
     `<desc>`; a visible or `<details>` text alternative that lets a screen-reader user answer the
     same question the figure answers. Minimum rendered text size 12 px at 390 px width.
 11. **Mobile.** Every figure is checked at 390, 834 and 1440 px. Infographics wrap to one column;
-    workflows go vertical; nothing scrolls horizontally.
+    workflows go vertical; the page never scrolls horizontally (a frame may, see 15).
 12. **Weight.** Archify SVGs are inlined: keep node counts down. Budgets by `kind` in
     `figures.ts` (`figureBudgetKb`, enforced by `scripts/figures-build.mjs`): infographic and
     data-viz SVGs ≤ 12 KB each, posters ≤ 48 KB; widget scripts ≤ 15 KB gzip (§6). If a chapter
@@ -58,6 +58,19 @@ content; a figure never adds facts, numbers, dates or vendors that the chapter d
 14. **Every figure is citable.** Each `figures.ts` entry gets a permalink at `/figures/<id>` and
     versioned downloads (§5). Its `title`, `caption`, `alt` and `description` are reused there
     and in the JSON-LD, so write them to stand alone, outside the chapter.
+15. **One frame, one caption.** Archify diagrams, infographics and charts share one frame: a flat
+    `--panel` ground, a 1px `--line` border, the block radius `--r-blk` (10 px), 20 px padding
+    (12 px under 560 px; a chart's phone canvas keeps 6 px so its 12 px text floor holds), no
+    shadow. There is no outer panel: the former `.pause` mesh panel with its gradient ring is gone,
+    and no figure sits in a second card. Inside the frame `--bg` is the panel, so the paper fills an
+    SVG draws (masks, hollow marks) match the ground in both themes. A figure too wide for its text
+    to stay at 12 px scrolls sideways inside its frame, never the page. The caption under the frame
+    is always, in order: a mono uppercase label in the accent (the figure number when the pipeline
+    has one; today figures carry none, so the label names the kind: "Figure", "Chart", "Poster"),
+    the title at weight 600, the description in `--muted` (never opacity), then the secondary
+    controls ("Data table", "Text description", the permalink, "Open interactive diagram") as mono
+    uppercase text links in the accent with a hairline underline. An interactive figure adds one
+    help sentence in the same style.
 
 ## 2. Briefs per figure
 
@@ -382,7 +395,8 @@ deadlines, shares. It is held to everything in §1, plus these rules.
    Time runs left to right. No dual axes, no 3D, no pie with more than four slices.
 3. **Scales.** Linear unless the axis label says "log scale". Colour encodes a category only when
    the category is a stack layer (`--l1`…`--l5`); otherwise ink for the data and one accent for
-   the value the caption is about. Never colour alone: label series directly on the chart, and
+   the value the caption is about, in the site accent (`--accent`, the kit's `mk-hi`). A layer
+   colour on a series that is not a layer is a bug. Never colour alone: label series directly on the chart, and
    use a legend only when direct labels would collide.
 4. **Source line.** Inside the image, bottom left, mono, muted, at least 12 px at 390 px:
    "Source: chapter NN [n]" (the chapter's own reference numbers). A reader who crops the chart

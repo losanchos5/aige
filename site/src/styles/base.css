@@ -14,6 +14,8 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* Newsreader ships at weight 400 only: never fake a bold from it. */
+  font-synthesis-weight: none;
   /* 100vw includes the vertical scrollbar, so .full-bleed sections overflow the
      viewport by its width. Clip the axis (not hidden: sticky keeps working). */
   overflow-x: clip;
@@ -48,19 +50,30 @@ select {
 }
 
 a {
-  color: var(--l1-ink);
+  color: var(--accent);
   text-decoration-thickness: from-font;
   text-underline-offset: 0.15em;
 }
 
+/* Newsreader for h1 and h2; h3 and h4 stay in Instrument Sans. */
 h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-display);
   line-height: 1.15;
-  font-weight: 600;
   text-wrap: balance;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+h3,
+h4 {
+  font-family: var(--font-body);
+  font-weight: 600;
 }
 
 code,
@@ -80,7 +93,7 @@ samp {
 
 /* Focus ring */
 :focus-visible {
-  outline: 2px solid var(--l1-ink);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: var(--r-sm);
 }
@@ -176,7 +189,7 @@ samp {
   outline-offset: 2px;
 }
 
-/* Anchor targets: clear the sticky header, and flash a pastel highlight when a
+/* Anchor targets: clear the sticky header, and flash an accent highlight when a
    fragment link lands on them. The scroll offset is a token so prose headings,
    marketing headings and source anchors all clear the same amount. */
 :where(h1, h2, h3, h4, h5, h6, [id]) {
@@ -190,7 +203,7 @@ samp {
 
   @keyframes target-flash {
     from {
-      background-color: color-mix(in srgb, var(--l1) 65%, transparent);
+      background-color: var(--accent-soft);
     }
     to {
       background-color: transparent;

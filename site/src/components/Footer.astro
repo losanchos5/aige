@@ -192,35 +192,21 @@ const about = byId('about');
 
     <p class="meta">{site.license} · v{site.bokVersion} · {domain}</p>
 
-    <p class="foot-wordmark" aria-hidden="true">{site.name}</p>
+    <p class="foot-wordmark" aria-hidden="true" data-text={site.name}></p>
   </div>
 </footer>
 
 <style>
+  /* Paper ground (the page grain shows through), a 1px --line hairline on top;
+     no tint, no texture. */
   .site-footer {
     position: relative;
-    isolation: isolate;
     overflow: hidden;
     border-top: 1px solid var(--line);
     margin-top: clamp(64px, 10vw, 128px);
-    padding-block: var(--s-7);
-    background: color-mix(in srgb, var(--l2) 18%, var(--bg));
+    padding-block: var(--s-7) 96px;
     color: var(--muted);
     font-size: var(--fs-small);
-  }
-
-  /* Faint 48px grid over the band, behind the content and dimmer in dark. */
-  .site-footer::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background-image:
-      linear-gradient(to right, var(--tex-line) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--tex-line) 1px, transparent 1px);
-    background-size: 48px 48px;
-    opacity: var(--texture-alpha);
-    pointer-events: none;
   }
 
   /* Query container for the wordmark below: its font-size is sized in cqw so
@@ -412,6 +398,19 @@ const about = byId('about');
     padding: 2px 0;
   }
 
+  /* With text at 200% on a phone a long single word ("Development") is wider
+     than its half-width column: the grid tracks and the label may shrink and
+     break inside the word rather than push the page sideways. */
+  .sitemap > .col,
+  .fchap a > span:last-child {
+    min-width: 0;
+  }
+
+  .sitemap a,
+  .fpart-title {
+    overflow-wrap: anywhere;
+  }
+
   /* --ink-2, not --muted: --muted fell to ~3.8:1 on the tinted band where it
      crosses the grid lines (audit SL-17); --ink-2 clears 4.5:1 in both themes. */
   .num {
@@ -451,7 +450,12 @@ const about = byId('about');
 
   /* Big display wordmark as a faint watermark closing the footer. aria-hidden
      and decorative. Sized in container-query units against .container so the
-     whole name always fits its width; overflow:hidden + nowrap as a safety net. */
+     whole name always fits its width; overflow:hidden + nowrap as a safety net.
+     The name is generated content, not DOM text: pure decoration is exempt
+     from WCAG 1.4.3, and on the flat paper footer axe would flag DOM text. */
+  .foot-wordmark::before {
+    content: attr(data-text);
+  }
   .foot-wordmark {
     margin: var(--s-6) 0 0;
     font-family: var(--font-display);
