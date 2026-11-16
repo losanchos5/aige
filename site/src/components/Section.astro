@@ -71,11 +71,7 @@ const hasHead = Boolean(hasLabel || title || lede);
               {label}
             </p>
           )}
-          {title && (
-            <h2 class="sec-title display">
-              {emAt < 0 ? title : <>{title.slice(0, emAt)}<em>{titleEm}</em>{title.slice(emAt + titleEm!.length)}</>}
-            </h2>
-          )}
+          {title && <h2 class="sec-title display">{emAt < 0 ? title : <>{title.slice(0, emAt)}<em>{titleEm}</em>{title.slice(emAt + titleEm!.length)}</>}</h2>}
           {lede && <p class="sec-lede lede">{lede}</p>}
         </div>
       )
