@@ -33,7 +33,7 @@ const langs = (['es', 'fr', 'de', 'pt'] as const).filter((lang) => translationIn
 
 const domain = new URL(site.url).host;
 // The colophon credits every painting the site shows (data/paintings.ts).
-const ARTIST = 'Claude Monet';
+const artists = [...new Set(Object.values(paintings).map((p) => p.artist))].join(', ');
 const paintingList = Object.values(paintings)
   .map((p) => `${p.title} (${p.year})`)
   .join(', ');
@@ -198,7 +198,7 @@ const about = byId('about');
 
     <p class="meta">{site.license} · v{site.bokVersion} · {domain}</p>
     <p class="colophon" data-testid="colophon">
-      Paintings by {ARTIST}, all public domain: {paintingList}.{' '}
+      Paintings by {artists}, all public domain: {paintingList}.{' '}
       <a href={`${site.github}/blob/main/site/public/paintings/CREDITS.md`}>Sources and licences</a>
     </p>
 

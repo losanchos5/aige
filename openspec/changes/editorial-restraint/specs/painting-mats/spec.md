@@ -18,11 +18,11 @@ El color decorativo del sitio SHALL venir solo de cuadros de dominio público. U
 - **THEN** la banda de cierre muestra un cuadro velado detrás del texto
 
 ### Requirement: Alternancia en la portada
-En la portada, las secciones con imagen SHALL alternarse con secciones de filas sin imagen; dos secciones con imagen MUST NOT ser contiguas, salvo la hero y la primera sección.
+En la portada, los bloques con cuadro SHALL alternarse con bloques de filas sin imagen, de modo que entre dos cuadros consecutivos haya siempre contenido en filas. Una sección puede contener un bloque con cuadro seguido de bloques de filas.
 
 #### Scenario: Orden alterno
-- **WHEN** se recorren las secciones de `/` bajo la primera
-- **THEN** ninguna sección con cuadro sigue inmediatamente a otra sección con cuadro
+- **WHEN** se recorren en orden los bloques de contenido de `/` bajo la hero
+- **THEN** entre dos cuadros consecutivos hay al menos un bloque de filas sin imagen
 
 ### Requirement: Texto legible junto a un cuadro
 Ningún texto SHALL colocarse directamente sobre un cuadro sin un panel opaco o un velo que garantice un contraste de al menos 4.5:1. En tema oscuro los cuadros SHALL llevar un velo que evite el deslumbramiento sin dejarlos sin color.

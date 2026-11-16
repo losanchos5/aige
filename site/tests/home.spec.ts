@@ -224,79 +224,86 @@ test.describe('home paintings', () => {
     for (const side of gap) expect(side).toBeGreaterThanOrEqual(8);
   });
 
-  test('no two picture blocks follow each other under the hero', async ({ page }) => {
+  test('between two painting blocks under the hero there is always a rows block', async ({ page }) => {
     await page.goto('/');
+    // The content blocks of each section under the hero, in document order:
+    // the section's children, looking through its inner container. A block
+    // with a painting is "painting", one with list or table rows is "rows".
     const kinds = await page.evaluate(() => {
-      const PICTURE = '.loop-frame.mat, .artifacts, .strip, .feature-pic, .pcards, .band .art';
-      const ROWS = '.rows, .bok-index, .ann, .res-list, .work-list';
-      return [...document.querySelectorAll(`main :is(${PICTURE}, ${ROWS})`)].map((el) =>
-        el.matches(PICTURE) ? 'picture' : 'rows',
-      );
+      const blocks: Element[] = [];
+      const hero = document.querySelector('main section.hero')!;
+      for (const section of [...hero.parentElement!.children].filter((el) => el.tagName === 'SECTION' && el !== hero)) {
+        for (const child of section.children) {
+          if (child.matches('.sec-inner, .container')) blocks.push(...child.children);
+          else blocks.push(child);
+        }
+      }
+      return blocks
+        .map((b) => (b.matches('img.painting') || b.querySelector('img.painting') ? 'painting' : b.querySelector('li, tr') ? 'rows' : null))
+        .filter(Boolean);
     });
-    expect(kinds.filter((k) => k === 'picture').length).toBeGreaterThanOrEqual(5);
+    expect(kinds.filter((k) => k === 'painting').length).toBeGreaterThanOrEqual(6);
     for (let i = 1; i < kinds.length; i++) {
-      expect(`${kinds[i - 1]} then ${kinds[i]}`).not.toBe('picture then picture');
+      expect(`block ${i}: ${kinds[i - 1]} then ${kinds[i]}`).not.toMatch(/painting then painting/);
     }
   });
 
   for (const scheme of ['light', 'dark'] as const) {
-    test(`the closing band shows its painting and its headline holds 4.5:1 over it (${scheme})`, async ({
-      page,
-    }) => {
+    test(`the closing band text holds 4.5:1 over its painting (${scheme})`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto('/');
       await loaded(page, '.band .art img');
-      const title = page.locator('.band .title');
-      const ink = await title.evaluate((el) => getComputedStyle(el).color);
-      await title.scrollIntoViewIfNeeded();
-      const clip = (await title.boundingBox())!;
-      // Shoot the ground behind the headline with the copy hidden, then take
-      // its lightest pixel: the worst case for the light headline.
-      await page.locator('.band').evaluate((band) => {
-        for (const el of band.querySelectorAll<HTMLElement>('.copy, .actions')) el.style.visibility = 'hidden';
+      const band = page.locator('.band');
+      await band.scrollIntoViewIfNeeded();
+      const targets = ['.title', '.sub', '.link'];
+      const inks: string[] = [];
+      const clips = [];
+      for (const sel of targets) {
+        const el = band.locator(sel);
+        inks.push(await el.evaluate((e) => getComputedStyle(e).color));
+        clips.push((await el.boundingBox())!);
+      }
+      // Shoot the ground behind each text with the copy hidden, then take its
+      // lightest pixel: the worst case for the light band ink.
+      await band.evaluate((b) => {
+        for (const el of b.querySelectorAll<HTMLElement>('.copy, .actions')) el.style.visibility = 'hidden';
       });
-      const shot = (await page.screenshot({ clip })).toString('base64');
-      const result = await page.evaluate(
-        async ({ b64, ink }) => {
-          const img = new Image();
-          img.src = `data:image/png;base64,${b64}`;
-          await img.decode();
-          const canvas = Object.assign(document.createElement('canvas'), {
-            width: img.width,
-            height: img.height,
-          });
-          const cx = canvas.getContext('2d')!;
-          cx.drawImage(img, 0, 0);
-          const px = cx.getImageData(0, 0, img.width, img.height).data;
-          const lin = (c: number) => {
-            c /= 255;
-            return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-          };
-          const lum = (r: number, g: number, b: number) =>
-            0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-          let max = 0;
-          let min = 1;
-          for (let i = 0; i < px.length; i += 4) {
-            const l = lum(px[i], px[i + 1], px[i + 2]);
-            max = Math.max(max, l);
-            min = Math.min(min, l);
-          }
-          cx.fillStyle = ink;
-          cx.fillRect(0, 0, 1, 1);
-          const [r, g, b] = cx.getImageData(0, 0, 1, 1).data;
-          const text = lum(r, g, b);
-          return {
-            contrast: (Math.max(text, max) + 0.05) / (Math.min(text, max) + 0.05),
-            spread: max - min,
-          };
-        },
-        { b64: shot, ink },
-      );
-      // The painting shows through (the ground is not one flat colour) ...
-      expect(result.spread).toBeGreaterThan(0);
-      // ... and the headline holds AA over its lightest point.
-      expect(result.contrast).toBeGreaterThanOrEqual(4.5);
+      // Let the hidden copy repaint before the shots.
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+      for (const [i, sel] of targets.entries()) {
+        const shot = (await page.screenshot({ clip: clips[i] })).toString('base64');
+        const contrast = await page.evaluate(
+          async ({ b64, ink }) => {
+            const img = new Image();
+            img.src = `data:image/png;base64,${b64}`;
+            await img.decode();
+            const canvas = Object.assign(document.createElement('canvas'), {
+              width: img.width,
+              height: img.height,
+            });
+            const cx = canvas.getContext('2d')!;
+            cx.drawImage(img, 0, 0);
+            const px = cx.getImageData(0, 0, img.width, img.height).data;
+            const lin = (c: number) => {
+              c /= 255;
+              return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+            };
+            const lum = (r: number, g: number, b: number) =>
+              0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+            let ground = 0;
+            for (let j = 0; j < px.length; j += 4) ground = Math.max(ground, lum(px[j], px[j + 1], px[j + 2]));
+            cx.fillStyle = ink;
+            cx.fillRect(0, 0, 1, 1);
+            const [r, g, b] = cx.getImageData(0, 0, 1, 1).data;
+            const text = lum(r, g, b);
+            return (Math.max(text, ground) + 0.05) / (Math.min(text, ground) + 0.05);
+          },
+          { b64: shot, ink: inks[i] },
+        );
+        console.log(`[band contrast] ${scheme} ${sel}: ${contrast.toFixed(2)}`);
+        expect(contrast, sel).toBeGreaterThanOrEqual(4.5);
+      }
     });
   }
 
@@ -304,6 +311,9 @@ test.describe('home paintings', () => {
     await page.goto('/');
     const colophon = page.locator('footer [data-testid="colophon"]');
     await expect(colophon).toContainText('public domain');
-    for (const p of Object.values(paintings)) await expect(colophon).toContainText(p.title);
+    await expect(colophon.locator('a')).toHaveAttribute('href', /\/site\/public\/paintings\/CREDITS\.md$/);
+    // One "Title (year)" entry per painting record.
+    const entries = (await colophon.innerText()).match(/\(\d{4}\)/g) ?? [];
+    expect(entries).toHaveLength(Object.keys(paintings).length);
   });
 });

@@ -415,13 +415,14 @@ const SIZES_HALF = '(min-width: 1200px) 572px, (min-width: 720px) 48vw, calc(100
     num="02"
     label="The stack"
     title="A build order, from policy to proof."
+    titleEm="proof"
     lede="The stack is five layers that answer the three questions. Evidence is produced at the bottom and flows up; three layers are established engineering practice, two are new to AI."
   >
     <div class="sec-wide artifacts">
       <div class="mat mat--art">
         <Painting id="pourville-misty-morning" sizes={SIZES_WIDE} />
         <div class="art-grid">
-          {/* bok/12-governance-program.md (package aip07), the AIP-07 injection floor; the exception call's arguments are elided. */}
+          {/* bok/12-governance-program.md (package aip07, l.580-590), the deny rule verbatim; the exception_active helper below it is left out. */}
           <div class="art-panel" role="group" aria-labelledby="art-rule">
             <p class="art-head"><span class="sw sw-1" aria-hidden="true" />aip07.rego</p>
             <pre class="art-code"><span class="k">package</span> aip07
@@ -433,19 +434,25 @@ const SIZES_HALF = '(min-width: 1200px) 572px, (min-width: 720px) 48vw, calc(100
   r := input.evals[
     "injection-resistance.v4"]
   r.score &lt; <span class="v">0.95</span>
-  <span class="k">not</span> exception_active(…)
+  <span class="k">not</span> exception_active(
+    input.system.id,
+    "eval.injection-floor.v4")
+  msg := sprintf(
+    "AIP-07 eval.injection-floor.v4: %s scored %v, below 0.95",
+    [input.system.id, r.score])
 {"}"}</pre>
           </div>
-          {/* bok/04-the-stack.md (layer 03 eval-gate result) and bok/patterns/continuous-assurance-telemetry.md (pii_leak_rate 0.004, threshold 0.0, decision alert). */}
+          {/* Two eval-gate results for the same model version: bok/04-the-stack.md l.504 and bok/19-privacy-and-ai.md l.488. */}
           <div class="art-panel" role="group" aria-labelledby="art-gate">
-            <p class="art-head"><span class="sw sw-3" aria-hidden="true" />eval gate · csa-01</p>
-            <table class="art-table">
+            <p class="art-head"><span class="sw sw-3" aria-hidden="true" />eval gate · csa-01@2026-09-18</p>
+            <table class="art-table art-gate">
+              <thead><tr><th><span class="visually-hidden">Suite</span></th><th>Score</th><th>Threshold</th><th><span class="visually-hidden">Result</span></th></tr></thead>
               <tbody>
-                <tr><td>injection-resistance.v4</td><td>0.982</td><td><span class="vd vd-pass">Pass</span></td></tr>
-                <tr><td>guardrail.output.<wbr />pii.v2</td><td>0.004</td><td><span class="vd vd-block">Alert</span></td></tr>
+                <tr><td>injection-<wbr />resistance.v4</td><td>0.982</td><td>≥ 0.95</td><td><span class="vd vd-pass">Pass</span></td></tr>
+                <tr><td>privacy.membership-<wbr />inference.v2</td><td>0.52</td><td>≤ 0.55</td><td><span class="vd vd-pass">Pass</span></td></tr>
               </tbody>
             </table>
-            <p class="art-foot">threshold ≥ 0.95 · pii = 0</p>
+            <p class="art-foot">canary extraction 0/500 · result: pass</p>
           </div>
           {/* bok/patterns/continuous-assurance-telemetry.md, the evidence record (signature as the chapter elides it). */}
           <div class="art-panel" role="group" aria-labelledby="art-record">
@@ -604,18 +611,17 @@ const SIZES_HALF = '(min-width: 1200px) 572px, (min-width: 720px) 48vw, calc(100
     <ul class="sec-wide pcards tiles">
       {
         resourceCards.map((card) => (
-          <li>
-            <a class="pcard" href={card.href}>
-              <span class="paint paint--card">
-                <Painting id={card.painting} sizes={SIZES_HALF} />
-              </span>
-              <span class="pcard-body">
-                <span class="label pcard-k">{card.kicker}</span>
-                <span class="pcard-t">{card.label}</span>
-                <span class="pcard-d">{card.desc}</span>
-                <span class="credit">{credit(card.painting)}</span>
-              </span>
-            </a>
+          <li class="pcard">
+            <span class="paint paint--card">
+              <Painting id={card.painting} sizes={SIZES_HALF} />
+            </span>
+            <span class="pcard-body">
+              <span class="label pcard-k">{card.kicker}</span>
+              {/* The title link stretches over the whole card (::after), so the card stays one target and the link name stays the title. */}
+              <a class="pcard-t" href={card.href}>{card.label}</a>
+              <span class="pcard-d">{card.desc}</span>
+              <span class="credit">{credit(card.painting)}</span>
+            </span>
           </li>
         ))
       }
@@ -669,10 +675,12 @@ const SIZES_HALF = '(min-width: 1200px) 572px, (min-width: 720px) 48vw, calc(100
 
   <CtaBand
     title="Open, versioned, contributable."
+    titleEm="contributable"
     sub="The Thesis and Body of Knowledge are CC BY 4.0. Read them, use them, send a pull request."
     primary={{ label: 'Contribute on GitHub', href: site.github }}
     secondary={{ label: 'Follow on LinkedIn', href: site.linkedin }}
   >
+    {/* Under-fetch on purpose: the band veils the painting to about a fifth, so a smaller file than the full width reads the same. */}
     <Painting slot="art" id="seine-giverny" sizes="(min-width: 1200px) 60vw, 100vw" />
   </CtaBand>
 </Marketing>
@@ -1396,9 +1404,14 @@ const SIZES_HALF = '(min-width: 1200px) 572px, (min-width: 720px) 48vw, calc(100
     text-align: right;
   }
 
-  .art-matrix th {
+  .art-table th {
     font: 500 var(--fs-label) / 1.3 var(--font-mono);
     color: var(--muted);
+  }
+
+  .art-gate td:nth-child(3) {
+    font-family: var(--font-mono);
+    white-space: nowrap;
   }
 
   .art-matrix :is(td, th) {
@@ -1591,6 +1604,7 @@ const SIZES_HALF = '(min-width: 1200px) 572px, (min-width: 720px) 48vw, calc(100
   }
 
   .pcard {
+    position: relative;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -1602,7 +1616,7 @@ const SIZES_HALF = '(min-width: 1200px) 572px, (min-width: 720px) 48vw, calc(100
     text-decoration: none;
   }
 
-  .pcard:is(:hover, :focus-visible) {
+  .pcard:is(:hover, :focus-within) {
     border-color: var(--accent-line);
     box-shadow: var(--lift);
   }
@@ -1615,7 +1629,7 @@ const SIZES_HALF = '(min-width: 1200px) 572px, (min-width: 720px) 48vw, calc(100
         border-color var(--dur) var(--ease);
     }
 
-    .pcard:is(:hover, :focus-visible) {
+    .pcard:is(:hover, :focus-within) {
       transform: translateY(-1px);
     }
   }
@@ -1638,6 +1652,23 @@ const SIZES_HALF = '(min-width: 1200px) 572px, (min-width: 720px) 48vw, calc(100
   .pcard-t {
     font: 400 1.75rem / 1.15 var(--font-serif);
     color: var(--ink);
+    text-decoration: none;
+  }
+
+  /* The stretched link: its box covers the whole card. */
+  .pcard-t::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .pcard-t:focus-visible {
+    outline: none;
+  }
+
+  .pcard:has(.pcard-t:focus-visible) {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 
   .pcard:hover .pcard-t {

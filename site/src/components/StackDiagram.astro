@@ -1,29 +1,20 @@
 ---
 /**
- * StackDiagram: the five-layer stack, in two modes.
- *
- * `static`, a large, RegisterMark-style graphic: five inline-SVG bars, each
- *   filled with its layer pastel and hairline-outlined, labelled with the mono
- *   index and layer name. A subtle, staggered draw-in plays on load (CSS only,
- *   reduced-motion safe). On /stack, public/stack.js swaps that draw-in for a
- *   scroll-triggered stagger (see `[data-layer-bars]` below).
- *
- * `interactive`: five register rows (index, name, tagline, artefact chips).
- *   Hovering or focusing a row tints its index cell with the layer pastel and,
- *   via `:has()`, highlights the matching bar in a small side mark. A thin
- *   vertical rule with an arrowhead reads "Evidence flows up". Pure CSS.
+ * StackDiagram: the five-layer stack as a large, RegisterMark-style graphic:
+ * five inline-SVG bars, each filled with its layer pastel and hairline-outlined,
+ * labelled with the mono index and layer name. A subtle, staggered draw-in plays
+ * on load (CSS only, reduced-motion safe). On /stack, public/stack.js swaps that
+ * draw-in for a scroll-triggered stagger (see `[data-layer-bars]` below).
  */
 import { layers } from '../data/stack';
-import { chip } from '../lib/artefact-chip';
 
 interface Props {
-  mode?: 'static' | 'interactive';
   class?: string;
-  /** Pass-through attributes (e.g. `data-story-mark`) forwarded to the root. */
+  /** Pass-through attributes forwarded to the root. */
   [key: string]: unknown;
 }
 
-const { mode = 'static', class: className, ...rest } = Astro.props;
+const { class: className, ...rest } = Astro.props;
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
@@ -34,78 +25,33 @@ const WIDTH = 460;
 const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
 ---
 
-{
-  mode === 'static' ? (
-    <svg
-      class:list={['diagram-static', className]}
-      viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-      role="img"
-      aria-label="The five-layer AI governance engineering stack, from Govern-as-Code to Assurance."
-      preserveAspectRatio="xMidYMid meet"
-      data-layer-bars
-      {...rest}
+<svg
+  class:list={['diagram-static', className]}
+  viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+  role="img"
+  aria-label="The five-layer AI governance engineering stack, from Govern-as-Code to Assurance."
+  preserveAspectRatio="xMidYMid meet"
+  data-layer-bars
+  {...rest}
+>
+  {layers.map((layer, i) => (
+    <g
+      class="bar"
+      data-n={layer.n}
+      style={`--i:${i}; --fill:var(${layer.colorVar}); --lk:var(${layer.colorVar}-ink)`}
     >
-      {layers.map((layer, i) => (
-        <g
-          class="bar"
-          data-n={layer.n}
-          style={`--i:${i}; --fill:var(${layer.colorVar}); --lk:var(${layer.colorVar}-ink)`}
-        >
-          <rect x="0" y={i * PITCH} width={WIDTH} height={BAR_H} rx="6" />
-          <text class="b-idx" x="18" y={i * PITCH + BAR_H / 2}>
-            {pad(layer.n)}
-          </text>
-          <text class="b-name" x="58" y={i * PITCH + BAR_H / 2}>
-            {layer.name}
-          </text>
-        </g>
-      ))}
-    </svg>
-  ) : (
-    <div class:list={['diagram-int', className]}>
-      <span class="d-flow-label" aria-hidden="true">Evidence flows up</span>
-      <ol class="rows">
-        {layers.map((layer, i) => (
-          <li
-            class="drow"
-            data-layer={layer.n}
-            data-testid="stack-row"
-            data-story-row
-            data-n={layer.n}
-            style={`--i:${i}; --tint:var(${layer.colorVar}); --tint-ink:var(${layer.colorVar}-ink)`}
-          >
-            <span class="d-idx" aria-hidden="true">
-              {i === 0 && <span class="d-arrow" />}
-              <span class="d-bar" />
-              <span class="d-num">{pad(layer.n)}</span>
-            </span>
-            <span class="d-body">
-              <span class="d-head">
-                <span class="d-name">{layer.name}</span>
-                <span
-                  class="d-flag"
-                  title={layer.inherited ? 'Established engineering practice' : 'New to AI governance engineering'}
-                >
-                  {layer.inherited ? 'established' : 'new'}
-                </span>
-              </span>
-              <span class="d-tagline">{layer.tagline}</span>
-              <span class="d-chips">
-                {layer.artefacts.map((artefact) => (
-                  <span class="chip">{chip(artefact)}</span>
-                ))}
-              </span>
-            </span>
-          </li>
-        ))}
-      </ol>
-      <span class="d-pulse" data-testid="stack-pulse" aria-hidden="true"></span>
-    </div>
-  )
-}
+      <rect x="0" y={i * PITCH} width={WIDTH} height={BAR_H} rx="6" />
+      <text class="b-idx" x="18" y={i * PITCH + BAR_H / 2}>
+        {pad(layer.n)}
+      </text>
+      <text class="b-name" x="58" y={i * PITCH + BAR_H / 2}>
+        {layer.name}
+      </text>
+    </g>
+  ))}
+</svg>
 
 <style>
-  /* ---- static ---- */
   .diagram-static {
     width: 100%;
     height: auto;
@@ -122,7 +68,7 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
     dominant-baseline: middle;
   }
 
-  /* Story link: as the reader scrolls the interactive rows, story.js writes
+  /* Story link: as the reader scrolls the page's story rows, story.js writes
      [data-active="N"] on the [data-story] host; the matching bar in this static
      mark gets an ink outline. The ancestor is a page element, so it is left
      global; only .bar/rect stay component-scoped. */
@@ -188,289 +134,6 @@ const HEIGHT = layers.length * BAR_H + (layers.length - 1) * (PITCH - BAR_H);
 
     .diagram-static.is-staggered.is-parked .bar {
       transform: translateY(16px);
-    }
-  }
-
-  /* ---- interactive ---- */
-  .diagram-int {
-    position: relative;
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 560px) {
-    .diagram-int {
-      grid-template-columns: 18px 1fr;
-      gap: var(--s-4);
-      align-items: stretch;
-    }
-  }
-
-  /* "Evidence flows up": a mono label rotated up the left gutter, paired with
-     the arrowed axis that threads the five row marks. Hidden on the narrowest
-     screens, where the gutter would crowd the rows. */
-  .d-flow-label {
-    display: none;
-  }
-
-  @media (min-width: 560px) {
-    .d-flow-label {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
-      font-family: var(--font-mono);
-      font-size: var(--fs-label);
-      letter-spacing: var(--tracking-label);
-      text-transform: uppercase;
-      color: var(--muted);
-      white-space: nowrap;
-    }
-  }
-
-  .rows {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .drow {
-    position: relative;
-    border-top: 1px solid var(--line);
-    display: grid;
-    grid-template-columns: 56px 1fr;
-    align-items: stretch;
-    gap: var(--s-4);
-    padding: var(--s-4) var(--s-2) var(--s-4) 0;
-  }
-
-  /* Left cell: the row's register mark (a pastel bar) joined with its mono
-     index, both centred; a hairline axis threads vertically through every cell
-     so the five read as one arrowed 5-bar mark. */
-  .d-idx {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--s-2);
-    border-radius: var(--r-sm);
-  }
-
-  .d-idx::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    transform: translateX(-50%);
-    background: var(--line);
-  }
-
-  .d-arrow {
-    position: absolute;
-    top: -3px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-bottom: 6px solid var(--muted);
-  }
-
-  .d-bar {
-    position: relative;
-    z-index: 1;
-    width: 40px;
-    height: 8px;
-    border-radius: 3px;
-    background: color-mix(in srgb, var(--tint) 55%, var(--bg));
-    border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
-  }
-
-  /* Evidence-pulse fill: a layer-ink overlay on the bar, briefly raised to
-     opacity as the axis pulse passes this row. Independent of the hover tint
-     (which drives .d-bar's own background), so hovering still works. */
-  .d-bar::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: var(--tint-ink);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  /* Evidence pulse: a 6px ink square that travels up the row axis from 05 to
-     01. Positioned on the axis (centred in the 56px index column) and hidden by
-     default so reduced-motion users see a static register. */
-  .d-pulse {
-    position: absolute;
-    left: 28px;
-    top: 0;
-    width: 6px;
-    height: 6px;
-    background: var(--ink);
-    transform: translate(-50%, -50%);
-    display: none;
-    z-index: 3;
-    pointer-events: none;
-  }
-
-  @media (min-width: 560px) {
-    .d-pulse {
-      left: 62px;
-    }
-  }
-
-  .d-num {
-    position: relative;
-    z-index: 1;
-    padding: 0 var(--s-1);
-    background: var(--bg);
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    color: var(--muted);
-  }
-
-  .d-body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
-    min-width: 0;
-    padding-block: var(--s-1);
-  }
-
-  .d-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--s-2) var(--s-3);
-  }
-
-  .d-name {
-    font-weight: 600;
-    line-height: 1.25;
-  }
-
-  .d-flag {
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--muted);
-    cursor: help;
-  }
-
-  .d-tagline {
-    font-size: var(--fs-small);
-    color: var(--ink-2);
-  }
-
-  .d-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-2);
-    margin-top: var(--s-1);
-  }
-
-  .chip {
-    padding: 2px var(--s-2);
-    border: 1px solid var(--line);
-    border-radius: var(--r-sm);
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    letter-spacing: 0.02em;
-    color: var(--muted);
-    white-space: nowrap;
-  }
-
-  /* With text zoomed to 200% on a phone a long chip ("Incident and reporting
-     plumbing") is wider than the row and pushed the page sideways (TC-11): it
-     may wrap once it would overflow. */
-  @media (max-width: 479px) {
-    .chip {
-      max-width: 100%;
-      white-space: normal;
-    }
-  }
-
-  /* Row-local tint on hover/focus: the left cell and its bar take the layer
-     pastel. */
-  .drow:hover .d-idx,
-  .drow:focus-within .d-idx {
-    background: color-mix(in srgb, var(--tint) 40%, var(--bg));
-  }
-
-  .drow:hover .d-num,
-  .drow:focus-within .d-num {
-    background: transparent;
-    color: var(--ink);
-  }
-
-  .drow:hover .d-bar,
-  .drow:focus-within .d-bar {
-    background: var(--tint);
-    border-color: color-mix(in srgb, var(--ink) 24%, transparent);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .d-idx,
-    .d-bar,
-    .d-num {
-      transition:
-        background-color var(--dur) var(--ease),
-        border-color var(--dur) var(--ease),
-        color var(--dur) var(--ease);
-    }
-
-    /* One 4s cycle: the pulse climbs from below row 05 (top: 100%) to the
-       arrowhead above row 01 (top: 0%), fading in and out at the ends. */
-    .d-pulse {
-      display: block;
-      animation: pulse-up 4s linear infinite;
-    }
-
-    @keyframes pulse-up {
-      0% {
-        top: 100%;
-        opacity: 0;
-      }
-      6% {
-        opacity: 1;
-      }
-      92% {
-        opacity: 1;
-      }
-      100% {
-        top: 0%;
-        opacity: 0;
-      }
-    }
-
-    /* Each bar flashes its ink colour as the pulse reaches its row. The delay
-       (4.5 - row index) * 0.8s aligns the flash with the pulse's top position:
-       row 05 (--i:4) at 0.4s, row 01 (--i:0) at 3.6s. */
-    .d-bar::after {
-      animation: bar-flash 4s var(--ease) infinite;
-      animation-delay: calc((4.5 - var(--i)) * 0.8s);
-    }
-
-    @keyframes bar-flash {
-      0% {
-        opacity: 0.9;
-      }
-      14% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 0;
-      }
     }
   }
 </style>

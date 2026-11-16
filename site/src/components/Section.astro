@@ -22,6 +22,8 @@ interface Props {
   label?: string;
   /** Section title (H2). */
   title?: string;
+  /** One word of the title to set in italic (its first occurrence), as the hero sets "run". */
+  titleEm?: string;
   /** Lede paragraph under the title. */
   lede?: string;
   /** Title scale: `md` (H2, default) or `xl` (H1 scale). */
@@ -39,6 +41,7 @@ const {
   num,
   label,
   title,
+  titleEm,
   lede,
   headSize = 'md',
   rule = false,
@@ -46,6 +49,7 @@ const {
 } = Astro.props;
 
 const hasLabel = Boolean(num || label);
+const emAt = title && titleEm ? title.indexOf(titleEm) : -1;
 const hasHead = Boolean(hasLabel || title || lede);
 ---
 
@@ -67,7 +71,11 @@ const hasHead = Boolean(hasLabel || title || lede);
               {label}
             </p>
           )}
-          {title && <h2 class="sec-title display">{title}</h2>}
+          {title && (
+            <h2 class="sec-title display">
+              {emAt < 0 ? title : <>{title.slice(0, emAt)}<em>{titleEm}</em>{title.slice(emAt + titleEm!.length)}</>}
+            </h2>
+          )}
           {lede && <p class="sec-lede lede">{lede}</p>}
         </div>
       )

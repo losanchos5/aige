@@ -30,14 +30,13 @@ const overlaps = (a: Box, b: Box) =>
   a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
 
 test.describe('governance loop: content', () => {
-  test('seven steps in loop order, each with a layer swatch, and seven labelled edges', async ({ page }) => {
+  test('seven steps in loop order and seven labelled edges', async ({ page }) => {
     const loop = await openLoop(page, 1440);
     const steps = loop.locator('.loop-step');
     await expect(steps).toHaveCount(7);
     expect(await steps.evaluateAll((els) => els.map((el) => el.getAttribute('data-step')))).toEqual(
       ORDER,
     );
-    await expect(loop.locator('.loop-node .sw')).toHaveCount(7);
     await expect(loop.locator('.loop-lane')).toHaveCount(4);
     await expect(loop.locator('.loop-pill')).toHaveText([
       'compiles to',

@@ -170,7 +170,8 @@ needs no pause control; it also pauses while a step is active, and is absent und
   `plain`; `mesh`, `hue` and `meshK` are accepted and ignored so older callers keep building.
   `tone="dark"` re-scopes the dark token set on `--band` (the closing band, the only dark band on a
   page); `tone="deep"` is the same set on the navy.
-- **Section head** (`Section.astro` props `num`, `label`, `title`, `lede`; styles in `effects.css`):
+- **Section head** (`Section.astro` props `num`, `label`, `title`, `titleEm`, `lede`; styles in `effects.css`;
+  `titleEm` sets one word of the title in italic, as the hero sets "run"; `CtaBand` takes it too):
   the one head pattern. A mono `.label` with its two-digit `.num` in the accent, the Newsreader
   `.sec-title` in the accent at `--fs-h2-display`, and a `.sec-lede` at `--fs-lede`. From 900px a
   labelled head sets the label in columns 1 to 3 of a 12-column grid and the title and lede from
@@ -259,7 +260,7 @@ columns 1 to 4, hairline rows in 5 to 12 (a 1px ink rule on top, `--line` betwee
    labels, one hint line, the canvas from a 700px panel and the stacked list below it; then
    "Three questions define the discipline." as a split (links: What is AI governance?, Open the
    Body of Knowledge, See the open controls).
-2. **02 The stack** (`#stack`): four real artefacts (the AIP-07 Rego rule, an eval gate result,
+2. **02 The stack** (`#stack`): four real artefacts (the AIP-07 Rego rule, two eval gate results,
    an evidence record, a crosswalk slice) as paper panels on one mat (Misty Morning at Pourville)
    with captions under it; "Build order." with the five layer rows (tagline, artefact chips,
    Established or New pill); then `#where-it-operates`, three rows (Evals L3, Runtime L4,
@@ -271,7 +272,8 @@ columns 1 to 4, hairline rows in 5 to 12 (a 1px ink rule on top, `--line` betwee
 5. **04 What applies now** (`WhatAppliesNow`): announcement rows, mono date on the left and the
    obligation with its linked clauses on the right.
 6. **05 Resources**: four painting-topped cards (Frameworks, Open controls, Obligation register,
-   MCP server; hover lift only) and the other eight references as numbered rows, both `.tiles`.
+   MCP server; the title is a link stretched over the card, the credit sits outside it; hover
+   lift only) and the other eight references as numbered rows, both `.tiles`.
 7. **06 Follow the changes**: `NewsletterForm` on the left, `OpenWork` as announcement rows on the
    right, then RSS, changelog and contribute links.
 8. **Closing band** (`CtaBand`): "Open, versioned, contributable." with the hero painting veiled
