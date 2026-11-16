@@ -1,6 +1,6 @@
 // loop.ts: the governance loop on the home page (GovernanceLoop.astro). Seven
 // steps from the obligation to the auditor across four lanes, the edges that
-// join them and the icon for each step. One source for the figure's canvas,
+// join them and their labels. One source for the figure's canvas,
 // its stacked phone layout, its detail strip and its screen-reader text.
 //
 // Geometry lives in one user space (LOOP_VIEW). The canvas keeps that aspect
@@ -13,10 +13,6 @@
 //          closes along a channel at y 64
 // Each edge label sits left of its vertical run, in lane space no step uses;
 // "closes the loop" sits on its own dashed channel.
-//
-// Icons: paths from Lucide (https://lucide.dev), ISC License,
-// Copyright (c) Lucide Contributors 2022; Feather portions MIT, Copyright (c)
-// 2013-2022 Cole Bemis. Drawn in a 24 x 24 box, stroked with currentColor.
 
 export const LOOP_VIEW = { w: 1000, h: 436 } as const;
 
@@ -26,8 +22,6 @@ const STEP_W = 200;
 const STEP_H = 100;
 const INSET = (LANE_W - STEP_W) / 2;
 const ROW_Y = { top: 96, mid: 204, bottom: 312 } as const;
-
-export type LoopIcon = 'scale' | 'code' | 'package' | 'flask' | 'shield' | 'archive' | 'badge';
 
 export interface LoopLane {
   n: string;
@@ -44,7 +38,6 @@ export interface LoopStep {
   /** Stack layer 1..5; null for the law and the auditor. */
   layer: 1 | 2 | 3 | 4 | 5 | null;
   lane: 0 | 1 | 2 | 3;
-  icon: LoopIcon;
   /** An example value from one run, shown in the detail only. */
   sample: string;
   note: string;
@@ -90,7 +83,6 @@ const stepSeeds: readonly StepSeed[] = [
     layer: null,
     lane: 0,
     row: 'mid',
-    icon: 'scale',
     sample: 'risk management obligation',
     note: "The EU AI Act's Article 9 risk-management duty is the obligation the loop exists to answer: a legal requirement stated in prose, not yet anything a running system can enforce.",
   },
@@ -101,7 +93,6 @@ const stepSeeds: readonly StepSeed[] = [
     layer: 1,
     lane: 1,
     row: 'top',
-    icon: 'code',
     sample: 'deny model.deploy unless eval.safety ≥ 0.95',
     note: 'Policy-as-code compiles that obligation into an executable rule, so the requirement becomes a gate the pipeline applies rather than a paragraph someone must remember.',
   },
@@ -112,7 +103,6 @@ const stepSeeds: readonly StepSeed[] = [
     layer: 2,
     lane: 1,
     row: 'bottom',
-    icon: 'package',
     sample: 'agent: support-bot · owner: platform',
     note: 'The inventory is the registry of what is actually running, here the support-bot agent owned by the platform team, so every control and every piece of evidence attaches to a named, owned system.',
   },
@@ -123,7 +113,6 @@ const stepSeeds: readonly StepSeed[] = [
     layer: 3,
     lane: 2,
     row: 'top',
-    icon: 'flask',
     sample: 'eval.safety 0.97 ≥ 0.95',
     note: 'The eval gate runs the safety evaluation and checks the result against the policy threshold, which turns a measurement into a pass/fail decision the build must respect.',
   },
@@ -134,7 +123,6 @@ const stepSeeds: readonly StepSeed[] = [
     layer: 4,
     lane: 2,
     row: 'bottom',
-    icon: 'shield',
     sample: 'guardrails on · tools scoped · trace ok',
     note: 'Runtime controls keep the governed behaviour true after deploy (guardrails on, tools scoped, traces intact), so the promise made at the gate holds while the agent is live, not only at release.',
   },
@@ -145,7 +133,6 @@ const stepSeeds: readonly StepSeed[] = [
     layer: 5,
     lane: 3,
     row: 'top',
-    icon: 'archive',
     sample: 'attestation issued · signed',
     note: 'The evidence store captures the signed attestation as a machine-readable record produced as a by-product of the build, so the proof that the controls fired exists before anyone asks for it.',
   },
@@ -156,7 +143,6 @@ const stepSeeds: readonly StepSeed[] = [
     layer: null,
     lane: 3,
     row: 'bottom',
-    icon: 'badge',
     sample: 'audit = a query',
     note: 'For the auditor the whole loop collapses to a query against that evidence: assurance becomes something a regulator can read as data, not a screenshot reassembled after the fact.',
   },
@@ -340,20 +326,3 @@ export function loopVerb(stepId: string): string | undefined {
 }
 
 export const loopLaneName = (step: LoopStep): string => loopLanes[step.lane].name;
-
-/** Inner SVG markup of each icon (24 x 24 box, stroke only). */
-export const loopIcons: Record<LoopIcon, string> = {
-  scale:
-    '<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>',
-  code: '<path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/>',
-  package:
-    '<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.7 4.73a2 2 0 0 0 2 0L20.7 7"/><path d="m7.5 4.27 9 5.15"/>',
-  flask:
-    '<path d="M14 2v6a2 2 0 0 0 .25.96l5.5 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.75-2.96l5.5-10.08A2 2 0 0 0 10 8V2"/><path d="M6.45 15h11.1"/><path d="M8.5 2h7"/>',
-  shield:
-    '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
-  archive:
-    '<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
-  badge:
-    '<path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"/><path d="m9 12 2 2 4-4"/>',
-};

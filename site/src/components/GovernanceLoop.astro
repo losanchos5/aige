@@ -2,189 +2,181 @@
 /**
  * GovernanceLoop: the home page's governance loop, from the obligation to the
  * auditor across four lanes (data in src/data/loop.ts). One DOM, two layouts,
- * picked by the figure's own width (a container query, not the viewport):
+ * picked by the panel's own width (a container query, not the viewport):
  *
- *   canvas (760px and up): a fixed-aspect canvas in the loop's user space.
- *     Lanes, steps and edge labels sit in percent of that space and the SVG
- *     wires fill it, so everything lines up at any width. A beam walks the
- *     edges in loop order; the step it reaches rings once. The detail strip
- *     under the canvas shows the active step: every panel is stacked in one
- *     grid cell, so the strip is always as tall as its tallest panel and
- *     switching steps never moves the page. Nothing is drawn over a step:
- *     lanes, wires, beams and labels take no pointer events.
+ *   canvas (700px and up): a fixed-aspect canvas in the loop's user space.
+ *     Lanes (columns split by hairlines), steps and edge labels sit in percent
+ *     of that space and the SVG wires fill it, so everything lines up at any
+ *     width. A beam walks the edges in loop order; the step it reaches rings
+ *     once. The detail strip under the canvas shows the active step: every
+ *     panel is stacked in one grid cell, so the strip is always as tall as its
+ *     tallest panel and switching steps never moves the page. Nothing is drawn
+ *     over a step: lanes, wires, beams and labels take no pointer events.
  *   list (narrower): the same ordered list, stacked, with each edge's verb
  *     on a rail between the steps; a tap opens a step's note in line.
+ *
+ * Flat, editorial style: paper steps on a 1px border, a mono tag with a small
+ * layer swatch (the only layer colour), thin ink wires with mono labels, no
+ * shadow. The figure is an opaque paper panel; the optional "mat" slot takes a
+ * <Painting> that fills the frame around it (the panel floats on the painting).
  *
  * public/loop.js keeps one state, the active step, as data-active on the
  * figure (hover and focus on the canvas, click or tap to pin, Escape or a
  * press outside to release) and plays the beam's single lap (under 5 s, WCAG
  * 2.2.2) each time the figure comes into view. Without it the figure is
  * complete and static. Every animation is gated on prefers-reduced-motion:
- * no-preference, and none of them changes a text's opacity. Each step button is described by its note, so a screen
- * reader gets the detail the strip shows; the strip itself is aria-hidden.
+ * no-preference, and none of them changes a text's opacity. Each step button
+ * is described by its note, so a screen reader gets the detail the strip
+ * shows; the strip itself is aria-hidden.
  *
- * Slot: the figure caption.
+ * Slots: default (the figure caption), "mat" (the painting behind the panel).
  */
-import {
-  LOOP_VIEW,
-  loopEdges,
-  loopIcons,
-  loopLaneName,
-  loopLanes,
-  loopSteps,
-  loopVerb,
-} from '../data/loop';
+import { LOOP_VIEW, loopEdges, loopLaneName, loopLanes, loopSteps, loopVerb } from '../data/loop';
 
 const { w: W, h: H } = LOOP_VIEW;
 const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`;
+const hasMat = Astro.slots.has('mat');
 ---
 
 <figure class="loop" data-loop>
-  <div class="loop-panel">
-    <div class="loop-canvas" data-loop-canvas style={`--ar:${W} / ${H}`}>
-      <div class="loop-lanes" aria-hidden="true">
-        {
-          loopLanes.map((lane, i) => (
-            <div
-              class="loop-lane"
-              data-lane={i}
-              style={`--x:${px(lane.x, W)};--w:${px(lane.w, W)}`}
+  <div class:list={['loop-frame', { mat: hasMat }]}>
+    <slot name="mat" />
+    <div class="loop-panel">
+      <div class="loop-canvas" data-loop-canvas style={`--ar:${W} / ${H}`}>
+        <div class="loop-lanes" aria-hidden="true">
+          {
+            loopLanes.map((lane, i) => (
+              <div class="loop-lane" data-lane={i} style={`--x:${px(lane.x, W)};--w:${px(lane.w, W)}`}>
+                <span class="loop-lane-head">
+                  <span class="loop-lane-n">{lane.n}</span> {lane.name}
+                </span>
+              </div>
+            ))
+          }
+        </div>
+
+        <svg class="loop-wires" viewBox={`0 0 ${W} ${H}`} aria-hidden="true" focusable="false">
+          <defs>
+            <marker
+              id="loop-tip"
+              viewBox="0 0 10 10"
+              refX="10"
+              refY="5"
+              markerWidth="8"
+              markerHeight="8"
+              markerUnits="userSpaceOnUse"
+              orient="auto"
             >
-              <span class="loop-lane-head">
-                {lane.n} / {lane.name}
+              <path class="loop-tip" d="M0 0.5 10 5 0 9.5Z"></path>
+            </marker>
+            <marker
+              id="loop-tip-lit"
+              viewBox="0 0 10 10"
+              refX="10"
+              refY="5"
+              markerWidth="9"
+              markerHeight="9"
+              markerUnits="userSpaceOnUse"
+              orient="auto"
+            >
+              <path class="loop-tip loop-tip--lit" d="M0 0.5 10 5 0 9.5Z"></path>
+            </marker>
+          </defs>
+          {
+            loopEdges.map((edge) => (
+              <g
+                class="loop-edge"
+                data-from={edge.from}
+                data-to={edge.to}
+                data-loop-edge={edge.loop ? '' : undefined}
+                style={`--slot:${edge.slot};--beats:${edge.beats ?? 1};--len:${edge.len}`}
+              >
+                <path class="loop-wire" d={edge.d} />
+                <path class="loop-beam" d={edge.d} pathLength={edge.len} />
+              </g>
+            ))
+          }
+        </svg>
+
+        <ol class="loop-steps" role="list">
+          {
+            loopSteps.map((step, i) => {
+              const verb = loopVerb(step.id);
+              return (
+                <li
+                  class="loop-step"
+                  data-step={step.id}
+                  data-lane={step.lane}
+                  data-layer={step.layer ?? 'none'}
+                  style={`--x:${px(step.x, W)};--y:${px(step.y, H)};--w:${px(step.w, W)};--h:${px(step.h, H)};--slot:${i}`}
+                >
+                  <button
+                    type="button"
+                    class="loop-node"
+                    data-step={step.id}
+                    aria-expanded="false"
+                    aria-describedby={`loop-note-${step.id}`}
+                  >
+                    <span class="loop-meta">
+                      <span class:list={['sw', step.layer ? `sw-${step.layer}` : 'sw-none']} aria-hidden="true" />
+                      <span class="loop-tag">{step.tag}</span>
+                      <span class="loop-lane-name"> · {loopLaneName(step)}</span>
+                    </span>
+                    <span class="loop-label">{step.label}</span>
+                  </button>
+                  <div class="loop-note" id={`loop-note-${step.id}`}>
+                    <code class="loop-sample">{step.sample}</code>
+                    <p class="loop-note-text">{step.note}</p>
+                  </div>
+                  {verb && <p class="loop-verb">{verb}</p>}
+                </li>
+              );
+            })
+          }
+        </ol>
+        <p class="loop-return">
+          <svg class="loop-return-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+          Evidence closes the loop, back to the obligation.
+        </p>
+
+        <div class="loop-pills" aria-hidden="true">
+          {
+            loopEdges.map((edge) => (
+              <span
+                class="loop-pill"
+                data-from={edge.from}
+                data-to={edge.to}
+                data-align={edge.at.align}
+                style={`--x:${px(edge.at.x, W)};--y:${px(edge.at.y, H)}`}
+              >
+                {edge.label}
               </span>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="loop-detail" aria-hidden="true">
+        <p class="loop-detail-k">Step</p>
+        <p class="loop-detail-panel loop-detail-idle is-shown" data-for="">
+          Hover or focus a step to see what it does; click it to keep it open.
+        </p>
+        {
+          loopSteps.map((step) => (
+            <div class="loop-detail-panel" data-for={step.id}>
+              <p class="loop-detail-head">
+                <span class="loop-detail-label">{step.label}</span>
+                <span class="loop-detail-tag">{step.tag}</span>
+                <code class="loop-sample">{step.sample}</code>
+              </p>
+              <p class="loop-detail-note">{step.note}</p>
             </div>
           ))
         }
       </div>
-
-      <svg
-        class="loop-wires"
-        viewBox={`0 0 ${W} ${H}`}
-        aria-hidden="true"
-        focusable="false"
-      >
-        <defs>
-          <marker
-            id="loop-tip"
-            viewBox="0 0 10 10"
-            refX="10"
-            refY="5"
-            markerWidth="9"
-            markerHeight="9"
-            markerUnits="userSpaceOnUse"
-            orient="auto"
-          >
-            <path class="loop-tip" d="M0 0.5 10 5 0 9.5Z"></path>
-          </marker>
-          <marker
-            id="loop-tip-lit"
-            viewBox="0 0 10 10"
-            refX="10"
-            refY="5"
-            markerWidth="10"
-            markerHeight="10"
-            markerUnits="userSpaceOnUse"
-            orient="auto"
-          >
-            <path class="loop-tip loop-tip--lit" d="M0 0.5 10 5 0 9.5Z"></path>
-          </marker>
-        </defs>
-        {
-          loopEdges.map((edge) => (
-            <g
-              class="loop-edge"
-              data-from={edge.from}
-              data-to={edge.to}
-              data-loop-edge={edge.loop ? '' : undefined}
-              style={`--slot:${edge.slot};--beats:${edge.beats ?? 1};--len:${edge.len}`}
-            >
-              <path class="loop-wire" d={edge.d} />
-              <path class="loop-beam" d={edge.d} pathLength={edge.len} />
-            </g>
-          ))
-        }
-      </svg>
-
-      <ol class="loop-steps" role="list">
-        {
-          loopSteps.map((step, i) => {
-            const verb = loopVerb(step.id);
-            return (
-              <li
-                class="loop-step"
-                data-step={step.id}
-                data-lane={step.lane}
-                data-layer={step.layer ?? 'none'}
-                style={`--x:${px(step.x, W)};--y:${px(step.y, H)};--w:${px(step.w, W)};--h:${px(step.h, H)};--slot:${i}`}
-              >
-                <button
-                  type="button"
-                  class="loop-node"
-                  data-step={step.id}
-                  aria-expanded="false"
-                  aria-describedby={`loop-note-${step.id}`}
-                >
-                  <span class="loop-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" focusable="false" set:html={loopIcons[step.icon]} />
-                  </span>
-                  <span class="loop-label">{step.label}</span>
-                  <span class="loop-meta">
-                    <span class="loop-tag">{step.tag}</span>
-                    <span class="loop-lane-name"> · {loopLaneName(step)}</span>
-                  </span>
-                </button>
-                <div class="loop-note" id={`loop-note-${step.id}`}>
-                  <code class="loop-sample">{step.sample}</code>
-                  <p class="loop-note-text">{step.note}</p>
-                </div>
-                {verb && <p class="loop-verb">{verb}</p>}
-              </li>
-            );
-          })
-        }
-      </ol>
-      <p class="loop-return">
-        <svg class="loop-return-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-          <path d="M3 3v5h5"></path>
-        </svg>
-        Evidence closes the loop, back to the obligation.
-      </p>
-
-      <div class="loop-pills" aria-hidden="true">
-        {
-          loopEdges.map((edge) => (
-            <span
-              class="loop-pill"
-              data-from={edge.from}
-              data-to={edge.to}
-              data-align={edge.at.align}
-              style={`--x:${px(edge.at.x, W)};--y:${px(edge.at.y, H)}`}
-            >
-              {edge.label}
-            </span>
-          ))
-        }
-      </div>
-    </div>
-
-    <div class="loop-detail" aria-hidden="true">
-      <p class="loop-detail-panel loop-detail-idle is-shown" data-for="">
-        Hover or focus a step to see what it does; click it to keep it open.
-      </p>
-      {
-        loopSteps.map((step) => (
-          <div class="loop-detail-panel" data-for={step.id} data-layer={step.layer ?? 'none'}>
-            <p class="loop-detail-head">
-              <span class="loop-detail-label">{step.label}</span>
-              <span class="loop-detail-tag">{step.tag}</span>
-              <code class="loop-sample">{step.sample}</code>
-            </p>
-            <p class="loop-detail-note">{step.note}</p>
-          </div>
-        ))
-      }
     </div>
   </div>
 
@@ -196,70 +188,36 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
 <style>
   /* ---------------------------------------------------------------- Shell */
   .loop {
-    container: loop / inline-size;
     display: flex;
     flex-direction: column;
     gap: var(--s-4);
     margin: 0;
-    /* Opaque ground (the panel, and the label chips that mask the dashed
-       return edge), an opaque wire ink (3:1 on the panel and the lanes, both
-       themes) so arrow tips never double up, and the beam in the L1 ink. */
-    --loop-ground: linear-gradient(var(--surface), var(--surface)), var(--bg);
-    --loop-wire: color-mix(in srgb, var(--ink) 55%, var(--bg));
-    --loop-beam: var(--l1-ink);
+    /* The wire ink (3:1 on the paper panel, both themes), the beam and the
+       lit state in the one accent. */
+    --loop-wire: var(--ink-2);
+    --loop-beam: var(--accent);
     /* One lap: six one-beat edges and the two-beat return, 8 x 0.6s = 4.8s. */
     --loop-beat: 0.6s;
   }
 
+  /* On a painting mat the frame shows the painting on all four sides; the
+     panel above it is opaque paper. The padding steps down with the width so
+     the canvas keeps its 700px at an 800px window. */
+  .loop-frame.mat {
+    padding: clamp(12px, 5vw - 20px, 48px);
+  }
+
   .loop-panel {
-    --muted: var(--ink-2);
-    padding: var(--s-4);
+    container: loop / inline-size;
+    position: relative;
+    padding: clamp(12px, 3vw - 12px, 24px);
     border: 1px solid var(--line);
-    border-radius: 16px;
-    background: var(--loop-ground);
-    box-shadow: var(--shadow-2);
+    border-radius: var(--r-blk);
+    background: var(--panel);
   }
 
   .loop-caption {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 0.3em;
     margin: 0;
-    font-size: var(--fs-small);
-    color: var(--ink-2);
-    text-wrap: pretty;
-  }
-
-  /* Layer colour: each step (and its detail panel) carries its stack layer;
-     the law and the auditor stay neutral. */
-  [data-layer] {
-    --layer: color-mix(in srgb, var(--ink) 8%, var(--bg));
-    --layer-ink: var(--ink-2);
-  }
-
-  [data-layer='1'] {
-    --layer: var(--l1);
-    --layer-ink: var(--l1-ink);
-  }
-
-  [data-layer='2'] {
-    --layer: var(--l2);
-    --layer-ink: var(--l2-ink);
-  }
-
-  [data-layer='3'] {
-    --layer: var(--l3);
-    --layer-ink: var(--l3-ink);
-  }
-
-  [data-layer='4'] {
-    --layer: var(--l4);
-    --layer-ink: var(--l4-ink);
-  }
-
-  [data-layer='5'] {
-    --layer: var(--l5);
-    --layer-ink: var(--l5-ink);
   }
 
   /* ------------------------------------------------- Steps (both layouts) */
@@ -272,42 +230,40 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
   .loop-node {
     position: relative;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
     grid-template-areas:
-      'icon label'
-      'icon meta';
-    column-gap: var(--s-3);
-    row-gap: 2px;
-    align-items: center;
+      'meta'
+      'label';
+    row-gap: var(--s-2);
+    align-content: center;
     width: 100%;
-    padding: var(--s-3);
-    border: 1px solid color-mix(in srgb, var(--layer-ink) 24%, var(--line));
-    border-radius: 12px;
-    background: color-mix(in srgb, var(--layer) 30%, var(--bg));
-    box-shadow: var(--shadow-1);
+    padding: var(--s-3) 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-sm);
+    background: var(--panel);
     color: var(--ink);
     font: inherit;
     text-align: left;
     cursor: pointer;
     transition:
       border-color var(--dur) var(--ease),
-      box-shadow var(--dur) var(--ease);
+      background-color var(--dur) var(--ease);
   }
 
   .loop-node:hover,
   .loop-step.is-active .loop-node {
-    border-color: var(--ink);
-    box-shadow:
-      0 0 0 3px color-mix(in srgb, var(--ink) 12%, transparent),
-      var(--shadow-2);
+    border-color: var(--accent);
+    background: var(--accent-soft);
   }
 
-  /* A pinned step keeps a solid ink ring, so it reads apart from a hover. */
+  .loop-node:hover .loop-label,
+  .loop-step.is-active .loop-label {
+    color: var(--accent);
+  }
+
+  /* A pinned step keeps a 2px accent border, so it reads apart from a hover. */
   .loop-step.is-pinned .loop-node {
-    border-color: var(--ink);
-    box-shadow:
-      0 0 0 2px var(--ink),
-      var(--shadow-2);
+    border-color: var(--accent);
+    box-shadow: inset 0 0 0 1px var(--accent);
   }
 
   /* The ring the beam leaves as it reaches a step (animated below). A border
@@ -322,47 +278,33 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
     pointer-events: none;
   }
 
-  .loop-icon {
-    grid-area: icon;
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: var(--layer);
-    color: var(--layer-ink);
-  }
-
-  .loop-icon svg,
-  .loop-return-icon {
-    width: 20px;
-    height: 20px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 1.75;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  .loop-meta {
+    grid-area: meta;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--muted);
   }
 
   .loop-label {
     grid-area: label;
     font-weight: 600;
     line-height: 1.25;
-  }
-
-  .loop-meta {
-    grid-area: meta;
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    line-height: 1.35;
-    color: var(--layer-ink);
+    transition: color var(--dur) var(--ease);
   }
 
   .loop-sample {
     display: inline-block;
     padding: 1px 8px;
     border-radius: var(--r-sm);
-    background: color-mix(in srgb, var(--layer) 55%, var(--bg));
+    background: var(--hover);
     font-size: var(--fs-label);
     line-height: 1.6;
     color: var(--ink);
@@ -381,9 +323,9 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
     display: none;
     margin-top: var(--s-2);
     padding: var(--s-3);
-    border: 1px solid color-mix(in srgb, var(--layer-ink) 18%, var(--line));
-    border-radius: 10px;
-    background: color-mix(in srgb, var(--layer) 16%, var(--bg));
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
   }
 
   .loop-step.is-active .loop-note {
@@ -397,35 +339,36 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
     color: var(--ink-2);
   }
 
-  /* The rail between two steps: a line down from the icon's centre (padding
-     12 + border 1 + half the 36px chip = 31px) with the edge's verb beside it. */
+  /* The rail between two steps: a 1px line down from the swatch's centre
+     (padding 14 + border 1 + half the 10px swatch = 20px) with the edge's
+     verb beside it. */
   .loop-verb {
     position: relative;
     display: flex;
     align-items: center;
     min-height: 40px;
     margin: 0;
-    padding-left: 52px;
+    padding-left: 36px;
     font-family: var(--font-mono);
     font-size: var(--fs-label);
+    line-height: 1.3;
     color: var(--ink-2);
   }
 
   .loop-verb::before {
     content: '';
     position: absolute;
-    left: 30px;
+    left: 19.5px;
     top: 4px;
     bottom: 8px;
-    width: 2px;
-    border-radius: 1px;
+    width: 1px;
     background: var(--loop-wire);
   }
 
   .loop-verb::after {
     content: '';
     position: absolute;
-    left: 27px;
+    left: 16px;
     bottom: 4px;
     width: 8px;
     height: 5px;
@@ -440,10 +383,11 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
     margin: var(--s-4) 0 0;
     padding: var(--s-2) var(--s-3);
     border: 1px dashed var(--loop-wire);
-    border-radius: 999px;
+    border-radius: var(--r-pill);
     width: fit-content;
     font-family: var(--font-mono);
     font-size: var(--fs-label);
+    line-height: 1.3;
     color: var(--ink-2);
   }
 
@@ -451,14 +395,15 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
     flex: none;
     width: 16px;
     height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   /* --------------------------------------------------------- Canvas layout */
-  @container loop (min-width: 760px) {
-    .loop-panel {
-      padding: var(--s-5);
-    }
-
+  @container loop (min-width: 700px) {
     .loop-canvas {
       position: relative;
       aspect-ratio: var(--ar);
@@ -482,26 +427,37 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
       pointer-events: none;
     }
 
+    /* Lanes are columns: a hairline on the left of every lane but the first. */
     .loop-lane {
       position: absolute;
       top: 0;
       bottom: 0;
       left: var(--x);
       width: var(--w);
-      border: 1px solid color-mix(in srgb, var(--ink) 7%, transparent);
-      border-radius: 14px;
-      background: color-mix(in srgb, var(--ink) 2.5%, transparent);
+      border-left: 1px solid var(--line);
+    }
+
+    .loop-lane[data-lane='0'] {
+      border-left-color: transparent;
     }
 
     .loop-lane-head {
       position: absolute;
-      top: clamp(8px, 1.1cqi, 12px);
+      top: 0;
       left: clamp(10px, 1.4cqi, 16px);
       font-family: var(--font-mono);
       font-size: var(--fs-label);
+      font-weight: 500;
       line-height: 1.3;
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
       white-space: nowrap;
       color: var(--ink-2);
+    }
+
+    .loop-lane-n {
+      margin-right: 0.5em;
+      color: var(--accent);
     }
 
     .loop-steps {
@@ -519,37 +475,15 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
       pointer-events: auto;
     }
 
-    /* Icon and tag on top, the name along the foot. */
+    /* Tag on top, the name under it. */
     .loop-node {
       height: 100%;
-      grid-template-columns: auto minmax(0, 1fr);
-      grid-template-areas:
-        'icon meta'
-        'label label';
-      align-content: space-between;
-      align-items: start;
-      padding: clamp(10px, 1.2cqi, 14px);
-      border-radius: 14px;
-    }
-
-    .loop-icon {
-      width: clamp(28px, 3.2cqi, 38px);
-      height: clamp(28px, 3.2cqi, 38px);
-      border-radius: 9px;
-    }
-
-    .loop-icon svg {
-      width: 58%;
-      height: 58%;
-    }
-
-    .loop-meta {
-      justify-self: end;
-      text-align: right;
+      row-gap: clamp(4px, 1cqi, 10px);
+      padding: clamp(10px, 1.4cqi, 16px);
     }
 
     .loop-label {
-      font-size: clamp(0.875rem, 1.42cqi, 1.0625rem);
+      font-size: clamp(0.875rem, 1.75cqi, 1.1875rem);
       line-height: 1.2;
     }
 
@@ -573,18 +507,18 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
       display: none;
     }
 
-    /* Wires: one opaque ink, a solid tip; the return edge dashed. */
+    /* Wires: one thin ink, a solid tip; the return edge dashed. */
     .loop-wire {
       fill: none;
       stroke: var(--loop-wire);
-      stroke-width: 1.5;
+      stroke-width: 1.25;
       stroke-linecap: round;
       stroke-linejoin: round;
       marker-end: url(#loop-tip);
     }
 
     .loop-edge[data-loop-edge] .loop-wire {
-      stroke-dasharray: 5 6;
+      stroke-dasharray: 5 5;
     }
 
     .loop-tip {
@@ -592,11 +526,11 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
     }
 
     .loop-tip--lit {
-      fill: var(--ink);
+      fill: var(--accent);
     }
 
     .loop-edge.is-lit .loop-wire {
-      stroke: var(--ink);
+      stroke: var(--accent);
       stroke-width: 2;
       marker-end: url(#loop-tip-lit);
     }
@@ -605,25 +539,21 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
       display: none;
     }
 
-    /* Edge labels: small chips beside their runs, on the panel's ground (the
-       return edge's chip sits on its own dashed channel and masks it). */
+    /* Edge labels: plain mono beside their runs, on the panel's paper (the
+       return edge's label sits on its own dashed channel and masks it). */
     .loop-pill {
       position: absolute;
       left: var(--x);
       top: var(--y);
       translate: -100% -50%;
-      padding: 2px 8px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: var(--loop-ground);
+      padding: 0 6px;
+      background: var(--panel);
       font-family: var(--font-mono);
       font-size: var(--fs-label);
       line-height: 1.4;
       white-space: nowrap;
       color: var(--ink-2);
-      transition:
-        border-color var(--dur) var(--ease),
-        color var(--dur) var(--ease);
+      transition: color var(--dur) var(--ease);
     }
 
     .loop-pill[data-align='center'] {
@@ -631,17 +561,31 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
     }
 
     .loop-pill.is-lit {
-      border-color: var(--ink);
-      color: var(--ink);
+      color: var(--accent);
     }
 
-    /* The detail strip: every panel in one cell, only the active one shown. */
+    /* The detail strip: a mono key, then every panel in one cell, only the
+       active one shown. */
     .loop-detail {
       display: grid;
-      grid-template-areas: 'panel';
-      margin-top: var(--s-5);
+      grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+      grid-template-areas: 'key panel';
+      column-gap: var(--s-5);
+      margin-top: var(--s-4);
       padding-top: var(--s-4);
       border-top: 1px solid var(--line);
+    }
+
+    .loop-detail-k {
+      grid-area: key;
+      margin: 0;
+      padding-top: 3px;
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      font-weight: 500;
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+      color: var(--muted);
     }
 
     .loop-detail-panel {
@@ -656,7 +600,6 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
 
     .loop-detail-idle {
       align-self: start;
-      font-size: var(--fs-small);
       color: var(--ink-2);
     }
 
@@ -676,7 +619,9 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
     .loop-detail-tag {
       font-family: var(--font-mono);
       font-size: var(--fs-label);
-      color: var(--layer-ink);
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+      color: var(--muted);
     }
 
     .loop-detail-note {
@@ -701,12 +646,12 @@ const px = (value: number, of: number) => `${+((value / of) * 100).toFixed(4)}%`
       animation-delay: calc(var(--slot) * var(--loop-beat));
     }
 
-    @container loop (min-width: 760px) {
+    @container loop (min-width: 700px) {
       .loop-beam {
         display: inline;
         fill: none;
         stroke: var(--loop-beam);
-        stroke-width: 3;
+        stroke-width: 2.5;
         stroke-linecap: round;
         stroke-dasharray: 36 4000;
         stroke-dashoffset: 36;

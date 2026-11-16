@@ -3,7 +3,7 @@
 ## ADDED Requirements
 
 ### Requirement: Secciones de la home sobre papel
-Todas las secciones de la home bajo la hero SHALL pintarse sobre el fondo de papel de la página, separadas por una línea de 1px y abiertas por una etiqueta mono numerada. Solo la banda de cierre SHALL usar un fondo oscuro. Ninguna sección SHALL pintar mesh de halos ni un tinte de capa.
+Todas las secciones de la home bajo la hero SHALL pintarse sobre el fondo de papel de la página, separadas por una línea de 1px y abiertas por una etiqueta mono, numerada en las secciones de contenido (el bloque del veredicto lleva etiqueta sin número). Solo la banda de cierre SHALL usar un fondo oscuro. Ninguna sección SHALL pintar mesh de halos ni un tinte de capa.
 
 #### Scenario: Sin capas de mesh
 - **WHEN** se carga `/`

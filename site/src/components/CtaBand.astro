@@ -4,8 +4,8 @@
  * ground with --band-ink text, a 1px --band-line hairline on top, a Newsreader
  * sentence and one button; an optional secondary reads as a plain text link,
  * not a second button. No mesh, glow or gradient.
- * The named slot "art" sits behind the copy so a <Painting> can be dropped in
- * later (the home PR); it is empty by default.
+ * The named slot "art" sits behind the copy: a <Painting> there covers the
+ * band under a flat veil (the home's closing band); it is empty by default.
  * Place as a direct child of <main> (outside .container) so it spans full width.
  */
 interface Cta {
@@ -15,20 +15,26 @@ interface Cta {
 
 interface Props {
   title: string;
+  /** One word of the title to set in italic (its first occurrence). */
+  titleEm?: string;
   sub?: string;
   primary: Cta;
   secondary?: Cta;
   class?: string;
 }
 
-const { title, sub, primary, secondary, class: className } = Astro.props;
+const { title, titleEm, sub, primary, secondary, class: className } = Astro.props;
+const emAt = titleEm ? title.indexOf(titleEm) : -1;
+const hasArt = Astro.slots.has('art');
 ---
 
-<section class:list={['band', className]}>
-  {Astro.slots.has('art') && <div class="art" aria-hidden="true"><slot name="art" /></div>}
+<section class:list={['band', { 'band--art': hasArt }, className]}>
+  {hasArt && <div class="art" aria-hidden="true"><slot name="art" /></div>}
   <div class="container inner">
     <div class="copy">
-      <h2 class="title">{title}</h2>
+      <h2 class="title">
+        {emAt < 0 ? title : <>{title.slice(0, emAt)}<em>{titleEm}</em>{title.slice(emAt + titleEm!.length)}</>}
+      </h2>
       {sub && <p class="sub">{sub}</p>}
     </div>
     <div class="actions">
@@ -151,6 +157,36 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
   @media (prefers-reduced-motion: no-preference) {
     .cta {
       transition: background-color var(--dur) var(--ease);
+    }
+  }
+
+  /* A painting in the art slot covers the band under a flat veil of the band
+     colour (about a quarter of it shows): even over a white patch the band
+     ink stays above 7:1, in both themes. */
+  .art :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+  }
+
+  .art::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--band) 74%, transparent);
+  }
+
+  /* Over the painting the secondary texts take the full band ink: --band-ink-2
+     drops toward 4.5:1 over the pale patches of the veiled painting. */
+  .band--art .sub,
+  .band--art .link {
+    color: var(--band-ink);
+  }
+
+  @media (forced-colors: active) {
+    .art {
+      display: none;
     }
   }
 </style>

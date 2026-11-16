@@ -1,18 +1,16 @@
 ---
 /**
- * WhatAppliesNow: the home page's compact "What applies now" band. It reads
- * the EU AI Act rows of the obligation register (src/data/frameworks.ts)
- * through src/lib/applies-now.ts: one line of what already applies, then the
- * next three dates on which something switches on, each with the register's
- * own note and the clauses it concerns, every clause linked to its
- * /obligations/<id> page. Nothing here is typed by hand, so the band cannot
+ * WhatAppliesNow: the home page's "What applies now" section. It reads the EU
+ * AI Act rows of the obligation register (src/data/frameworks.ts) through
+ * src/lib/applies-now.ts: one row of what already applies, then the next
+ * three dates on which something switches on, each with the register's own
+ * note and the clauses it concerns, every clause linked to its
+ * /obligations/<id> page. Nothing here is typed by hand, so the section cannot
  * drift from the register; a date that has passed drops out on the next build.
  *
- * Self-contained: one <Section> on mesh composition `a`, the one its home
- * neighbours (the resources tint on `b`, the newsletter on `c`) do not use,
- * laid over a tint band so it stays still (only the role section's mesh
- * drifts), its own scoped styles, no script. Flat cards (no lift: they are
- * not links).
+ * Self-contained: one <Section> on the paper ground, announcement rows (mono
+ * date on the left, the obligation on the right, hairlines between), its own
+ * scoped styles, no script.
  */
 import Section from './Section.astro';
 import {
@@ -27,9 +25,12 @@ import {
 interface Props {
   /** Reference date (YYYY-MM-DD); defaults to the build date. */
   today?: string;
+  /** Section number for the mono label (e.g. "04"). */
+  num?: string;
+  class?: string;
 }
 
-const { today = isoToday() } = Astro.props;
+const { today = isoToday(), num, class: className } = Astro.props;
 const now = clauseLinks(inForce(today));
 const dates = nextDates(today, 3).map((d) => ({
   ...d,
@@ -42,146 +43,155 @@ const art = (n: number) => (n === 1 ? 'Art.' : 'Arts.');
 
 <Section
   id="what-applies-now"
-  class="wan-sec"
+  class={['wan-sec', className].filter(Boolean).join(' ')}
+  num={num}
+  label="What applies now"
   title="What applies now."
   lede="The EU AI Act, read from the obligation register: what already applies, and the next three dates with what each one switches on."
 >
-  <p class="wan-now">
-    <span class="wan-cap">Applies today</span>
-    <span class="wan-refs">
-      {/* One line: a line break between a link and its comma renders as a space. */}
-      {art(now.length)}{' '}{now.map((link, i) => (<>{i > 0 ? ', ' : ''}<a href={link.href} aria-label={`${link.label}: ${link.name}`}>{link.label}</a></>))}
-    </span>
-  </p>
-
-  <ol class="wan-dates">
-    {
-      dates.map((d) => (
-        <li class="wan-date card-lum">
-          <p class="wan-when">
-            <time datetime={d.date}>{d.label}</time>
+  <div class="sec-body">
+    <ol class="ann">
+      <li class="ann-row">
+        <p class="ann-meta">
+          <span class="ann-date">In force</span>
+          <span class="ann-cat">Applies today</span>
+        </p>
+        <div>
+          <p class="ann-t">Already in force</p>
+          <p class="wan-refs">
+            {/* One line: a line break between a link and its comma renders as a space. */}
+            {art(now.length)}{' '}{now.map((link, i) => (<>{i > 0 ? ', ' : ''}<a href={link.href} aria-label={`${link.label}: ${link.name}`}>{link.label}</a></>))}
           </p>
-          <ul class="wan-items">
-            {d.items.map((item) => (
-              <li>
-                <span class="wan-note">{item.note}</span>
-                <span class="wan-refs">
-                  {art(item.links.length)}{' '}{item.links.map((link, i) => (<>{i > 0 ? ', ' : ''}<a href={link.href} aria-label={`${link.label}: ${link.name}`}>{link.label}</a></>))}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </li>
-      ))
-    }
-  </ol>
+        </div>
+      </li>
+      {
+        dates.map((d) => (
+          <li class="ann-row wan-date">
+            <p class="ann-meta">
+              <time class="ann-date" datetime={d.date}>
+                {d.label}
+              </time>
+            </p>
+            <ul class="wan-items">
+              {d.items.map((item) => (
+                <li>
+                  <p class="ann-t">{item.note}</p>
+                  <p class="wan-refs">
+                    {art(item.links.length)}{' '}{item.links.map((link, i) => (<>{i > 0 ? ', ' : ''}<a href={link.href} aria-label={`${link.label}: ${link.name}`}>{link.label}</a></>))}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ol>
 
-  <p class="wan-foot">
-    Dates as the register states them, last reviewed {reviewed}. Indicative, not legal advice and
-    not a claim of conformity.
-  </p>
+    <p class="wan-foot">
+      Dates as the register states them, last reviewed {reviewed}. Indicative, not legal advice and
+      not a claim of conformity.
+    </p>
+  </div>
 
-  <p class="sec-link" slot="foot">
-    <a href="/obligations">The obligation register →</a>
-    <span class="sec-link-sep" aria-hidden="true">·</span>
-    <a href="/resources/ai-act-deadlines">Full timeline →</a>
-    <span class="sec-link-sep" aria-hidden="true">·</span>
-    <a href="/bok/eu-ai-act#the-post-omnibus-timeline">The post-Omnibus timeline →</a>
-    <span class="sec-link-sep" aria-hidden="true">·</span>
-    <a href="/for">Routes by audience →</a>
+  <p class="sec-foot" slot="foot">
+    <a class="tlink" href="/obligations">The obligation register</a>
+    <a class="tlink" href="/resources/ai-act-deadlines">Full timeline</a>
+    <a class="tlink" href="/bok/eu-ai-act#the-post-omnibus-timeline">The post-Omnibus timeline</a>
+    <a class="tlink" href="/for">Routes by audience</a>
   </p>
 </Section>
 
 <style>
-  .wan-now {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: var(--s-2) var(--s-4);
-    margin: 0 0 var(--s-5);
+  .ann {
+    margin: 56px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
   }
 
-  .wan-cap {
+  .ann-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-2) 32px;
+    padding: var(--s-5) 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  @media (min-width: 720px) {
+    .ann-row {
+      grid-template-columns: minmax(0, 12rem) minmax(0, 1fr);
+      align-items: baseline;
+    }
+  }
+
+  .ann-meta {
+    display: grid;
+    gap: var(--s-1);
+    margin: 0;
+  }
+
+  .ann-date,
+  .ann-cat {
     font-family: var(--font-mono);
-    font-size: var(--fs-small);
-    color: var(--ink-2);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .ann-date {
+    font-size: 0.8125rem;
+    color: var(--accent);
+  }
+
+  .ann-cat {
+    font-size: var(--fs-label);
+    color: var(--muted);
+  }
+
+  .ann-t {
+    margin: 0;
+    font-size: 1.1875rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+
+  .wan-items {
+    display: grid;
+    gap: var(--s-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   .wan-refs {
+    margin: 6px 0 0;
     font-family: var(--font-mono);
-    font-size: var(--fs-small);
-    color: var(--ink-2);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--muted);
   }
 
   /* Inline links in a run of text: underlined, so they read as links without
      relying on colour (WCAG 1.4.1). */
   .wan-refs a {
-    color: var(--ink);
+    color: var(--ink-2);
     text-decoration: underline;
-    text-underline-offset: 0.15em;
-    text-decoration-thickness: 1px;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 0.2em;
   }
 
   .wan-refs a:hover {
-    text-decoration-thickness: 2px;
-  }
-
-  .wan-dates {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: var(--s-4);
-    grid-template-columns: 1fr;
-  }
-
-  @media (min-width: 960px) {
-    .wan-dates {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  .wan-date {
-    padding: var(--s-5);
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-3);
-  }
-
-  .wan-when {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: var(--fs-h3);
-    font-weight: 600;
-    line-height: 1.2;
-    color: var(--ink);
-  }
-
-  .wan-items {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-3);
-  }
-
-  .wan-items > li {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-1);
-  }
-
-  .wan-note {
-    color: var(--ink);
-    line-height: 1.4;
-    text-wrap: pretty;
+    color: var(--accent);
+    text-decoration-color: currentColor;
   }
 
   .wan-foot {
-    max-width: 72ch;
-    margin: var(--s-5) 0 0;
+    max-width: 70ch;
+    margin: 20px 0 0;
     font-size: var(--fs-small);
-    color: var(--ink-2);
+    color: var(--muted);
   }
 </style>
