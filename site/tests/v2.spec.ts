@@ -1,5 +1,5 @@
-// v2.spec.ts: Block V2, the /stack interactive layer-flow diagram and the
-// home "The stack" evidence pulse. Structural/interaction assertions; the
+// v2.spec.ts: Block V2, the /stack interactive layer-flow diagram.
+// Structural/interaction assertions; the
 // review screenshots live in v2.screenshots.spec.ts (the `visual` project).
 import { test, expect } from '@playwright/test';
 
@@ -41,13 +41,5 @@ test.describe('/stack layer-flow diagram', () => {
     for (const n of [2, 3, 4, 5]) {
       await expect(page.locator(`.flow-panel[data-panel="${n}"]`)).toBeHidden();
     }
-  });
-});
-
-test.describe('home "The stack" evidence pulse', () => {
-  test('the interactive register carries a pulse element', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.locator('.diagram-int [data-testid="stack-pulse"]')).toHaveCount(1);
-    await expect(page.locator('[data-testid="stack-row"]')).toHaveCount(5);
   });
 });

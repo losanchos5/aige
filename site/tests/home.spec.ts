@@ -1,6 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { chaptersOrdered } from '../src/data/chapters';
 import { bookParts, countWord } from '../src/data/parts';
+import { paintings } from '../src/data/paintings';
 import { work } from '../src/data/work';
 
 test.describe('home page', () => {
@@ -11,11 +12,9 @@ test.describe('home page', () => {
       page.getByRole('link', { name: 'Read the Thesis', exact: true }),
     ).toBeVisible();
     await expect(
-      page.locator('.loop-sec').getByRole('link', { name: 'Open the Body of Knowledge →' }),
+      page.locator('.loop-sec').getByRole('link', { name: 'Open the Body of Knowledge', exact: true }),
     ).toHaveAttribute('href', '/bok');
-    await expect(
-      page.locator('.loop-sec .sec-link a[href="/controls"]'),
-    ).toHaveCount(1);
+    await expect(page.locator('.loop-sec a[href="/controls"]')).toHaveCount(1);
   });
 
   test('the hero carries its lede, two CTAs and two text links', async ({ page }) => {
@@ -43,25 +42,22 @@ test.describe('home page', () => {
     ).toHaveAttribute('href', '/frontier');
   });
 
-  test('"Where it operates" follows the stack with three surfaces and their links', async ({
+  test('"Where it operates" follows the stack rows with three surfaces and their links', async ({
     page,
   }) => {
     await page.goto('/');
-    const band = page.locator('#where-it-operates');
-    await expect(band.locator('.sec-title')).toHaveText('Where AI Governance Engineering operates.');
-    await expect(band.locator('.card')).toHaveCount(3);
-    await expect(band.locator('.card .title')).toHaveText(['Evals', 'Runtime', 'Assurance']);
-    // Link cards only take .lift; these cards are not links.
-    await expect(band.locator('.card.lift')).toHaveCount(0);
-    await expect(band.locator('a[href="/controls/evaluation-environment"]')).toHaveCount(1);
-    await expect(band.locator('a[href="/controls/agent-runtime"]')).toHaveCount(1);
-    await expect(band.locator('.sec-link a[href="/controls"]')).toHaveCount(1);
-    await expect(band.locator('.sec-link a[href="/frontier"]')).toHaveCount(1);
-    // It sits between the stack and the values.
-    const titles = await page.locator('main section.sec .sec-title').allTextContents();
-    const at = titles.findIndex((t) => t.startsWith('Where AI Governance Engineering'));
-    expect(titles[at - 1]).toMatch(/^A build order/);
-    expect(titles[at + 1]).toMatch(/^Eight values/);
+    const block = page.locator('#where-it-operates');
+    await expect(block.locator('.subhead')).toHaveText('Where AI Governance Engineering operates.');
+    await expect(block.locator('.rows > li')).toHaveCount(3);
+    await expect(block.locator('.row-t')).toHaveText(['Evals', 'Runtime', 'Assurance']);
+    await expect(block.locator('a[href="/controls/evaluation-environment"]')).toHaveCount(1);
+    await expect(block.locator('a[href="/controls/agent-runtime"]')).toHaveCount(1);
+    await expect(block.locator('a[href="/controls"]')).toHaveCount(1);
+    await expect(block.locator('a[href="/frontier"]')).toHaveCount(1);
+    // Inside the stack section, right after the five layer rows.
+    await expect(
+      page.locator('#stack .split:has([data-testid="stack-row"]) + #where-it-operates'),
+    ).toHaveCount(1);
   });
 
   test('the loop section, under the hero, holds the governance loop', async ({ page }) => {
@@ -89,9 +85,10 @@ test.describe('home page', () => {
 
   test('the loop figure carries no simulated run telemetry', async ({ page }) => {
     await page.goto('/');
-    // No run bar, no PASS stamp, no attestation number around the figure.
+    // No run bar, no PASS stamp, no attestation number around the figure
+    // ("the running system" in the caption is a lane name, not a run).
     await expect(page.locator('.loop-sec .stamp')).toHaveCount(0);
-    await expect(page.locator('.loop-sec figcaption')).not.toContainText(/#\d|run|attestation/i);
+    await expect(page.locator('.loop-sec figcaption')).not.toContainText(/#\d|\brun\b|attestation/i);
   });
 
   test('the hero figure links to the chapter that explains the loop', async ({ page }) => {
@@ -108,12 +105,7 @@ test.describe('home page', () => {
     await expect(page.locator('[data-testid="stack-row"]')).toHaveCount(5);
   });
 
-  test('values render eight over/under pairs', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.locator('[data-testid="value-pair"]')).toHaveCount(8);
-  });
-
-  test('the Body of Knowledge renders one card per part and links every chapter', async ({
+  test('the Body of Knowledge renders one group per part and links every chapter', async ({
     page,
   }) => {
     await page.goto('/');
@@ -122,18 +114,19 @@ test.describe('home page', () => {
     await expect(section.locator('.sec-title')).toHaveText(
       `${chaptersOrdered.length} chapters in ${countWord(bookParts.length)} parts, versioned and open.`,
     );
-    await expect(section.locator('[data-testid="part-card"]')).toHaveCount(bookParts.length);
+    await expect(section.locator('[data-testid="book-part"]')).toHaveCount(bookParts.length);
     await expect(section.locator('[data-testid="chapter-link"]')).toHaveCount(
       chaptersOrdered.length,
     );
     for (const chapter of chaptersOrdered) {
       await expect(section.locator(`a[href="/bok/${chapter.slug}"]`)).toHaveCount(1);
     }
-    // Each part title opens that part on the /bok index.
     for (const part of bookParts) {
+      // Each part title opens that part on the /bok index, beside its range.
       await expect(
         section.getByRole('link', { name: part.title, exact: true }),
       ).toHaveAttribute('href', `/bok#part-${part.id}`);
+      await expect(section.locator(`[data-part="${part.id}"] .part-r`)).toHaveText(part.range);
     }
     // The newer parts are named in the lede.
     for (const id of ['foundations', 'lifecycle', 'law']) {
@@ -142,10 +135,12 @@ test.describe('home page', () => {
     }
   });
 
-  test('the resource tiles include the topic crosswalk, the map, the controls and the research notes', async ({
+  test('the resources show four painting cards, then rows, with the controls and the research notes', async ({
     page,
   }) => {
     await page.goto('/');
+    await expect(page.locator('.res-sec .pcard')).toHaveCount(4);
+    await expect(page.locator('.res-sec .pcard .paint img')).toHaveCount(4);
     const tiles = page.locator('.tiles');
     await expect(tiles.locator('a[href="/resources/crosswalk"]')).toHaveCount(1);
     await expect(tiles.locator('a[href="/map"]')).toHaveCount(1);
@@ -172,36 +167,16 @@ test.describe('home page', () => {
     await expect(page.locator('.nl-sec + .band')).toHaveCount(1);
   });
 
-  test('the newsletter band lists the open work and links /contribute', async ({ page }) => {
+  test('the newsletter section lists the open work and links /contribute', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('.nl-sec .work-list > li')).toHaveCount(work.length);
     for (const item of work) {
       await expect(page.locator(`.nl-sec .work-list a[href="${item.href}"]`).first()).toBeVisible();
     }
-    await expect(page.locator('.nl-sec .sec-link a[href="/contribute"]')).toHaveCount(1);
+    await expect(page.locator('.nl-sec a[href="/contribute"]')).toHaveCount(1);
   });
 
-  test('value cards are flat: no resting shadow and no lift (they are not links)', async ({ page }) => {
-    await page.goto('/');
-    const cards = page.locator('.pair-bento');
-    await expect(cards).toHaveCount(8);
-    const styles = await cards.evaluateAll((els) =>
-      els.map((el) => ({ shadow: getComputedStyle(el).boxShadow, lift: el.classList.contains('lift') })),
-    );
-    for (const s of styles) {
-      expect(s.shadow).toBe('none');
-      expect(s.lift).toBe(false);
-    }
-  });
-
-  test('the verdict ticker carries no run numbers', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.locator('.vt-list')).not.toContainText(/#\d/);
-  });
-
-  test('in the dark theme the verdict beat and the closing band are dark, visible bands', async ({
-    page,
-  }) => {
+  test('in the dark theme the closing band is a dark, visible band', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/');
     const lum = (sel: string) =>
@@ -219,23 +194,116 @@ test.describe('home page', () => {
         return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
       });
     const page0 = await lum('body');
-    const verdict = await lum('.verdict-beat');
     const band = await lum('.band');
     // Not the cream slab: the closing band stays a dark ground.
     expect(band).toBeLessThan(0.1);
-    // Both bands read apart from the #121417 page (> 1.1:1).
-    expect((verdict + 0.05) / (page0 + 0.05)).toBeGreaterThan(1.1);
+    // It reads apart from the #121417 page (> 1.1:1).
     expect((band + 0.05) / (page0 + 0.05)).toBeGreaterThan(1.1);
   });
+});
 
-  test('every market stat tile carries a source', async ({ page }) => {
+// Scroll a painting into view and wait for it, so a lazy image has loaded.
+async function loaded(page: Page, selector: string) {
+  const img = page.locator(selector).first();
+  await img.scrollIntoViewIfNeeded();
+  await expect
+    .poll(() => img.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0))
+    .toBe(true);
+}
+
+test.describe('home paintings', () => {
+  test('the loop panel floats on its painting, the mat showing on all four sides', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
-    const tiles = page.locator('.stats-row .tile');
-    const count = await tiles.count();
-    expect(count).toBeGreaterThan(0);
-    await expect(page.locator('.stats-row .tile .source')).toHaveCount(count);
-    for (let i = 0; i < count; i++) {
-      await expect(tiles.nth(i).locator('.source')).not.toBeEmpty();
+    await loaded(page, '.loop-sec .loop-frame > img');
+    const gap = await page.locator('.loop-sec .loop-frame').evaluate((frame) => {
+      const f = frame.getBoundingClientRect();
+      const p = frame.querySelector('.loop-panel')!.getBoundingClientRect();
+      return [p.top - f.top, f.right - p.right, f.bottom - p.bottom, p.left - f.left];
+    });
+    for (const side of gap) expect(side).toBeGreaterThanOrEqual(8);
+  });
+
+  test('no two picture blocks follow each other under the hero', async ({ page }) => {
+    await page.goto('/');
+    const kinds = await page.evaluate(() => {
+      const PICTURE = '.loop-frame.mat, .artifacts, .strip, .feature-pic, .pcards, .band .art';
+      const ROWS = '.rows, .bok-index, .ann, .res-list, .work-list';
+      return [...document.querySelectorAll(`main :is(${PICTURE}, ${ROWS})`)].map((el) =>
+        el.matches(PICTURE) ? 'picture' : 'rows',
+      );
+    });
+    expect(kinds.filter((k) => k === 'picture').length).toBeGreaterThanOrEqual(5);
+    for (let i = 1; i < kinds.length; i++) {
+      expect(`${kinds[i - 1]} then ${kinds[i]}`).not.toBe('picture then picture');
     }
+  });
+
+  for (const scheme of ['light', 'dark'] as const) {
+    test(`the closing band shows its painting and its headline holds 4.5:1 over it (${scheme})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto('/');
+      await loaded(page, '.band .art img');
+      const title = page.locator('.band .title');
+      const ink = await title.evaluate((el) => getComputedStyle(el).color);
+      await title.scrollIntoViewIfNeeded();
+      const clip = (await title.boundingBox())!;
+      // Shoot the ground behind the headline with the copy hidden, then take
+      // its lightest pixel: the worst case for the light headline.
+      await page.locator('.band').evaluate((band) => {
+        for (const el of band.querySelectorAll<HTMLElement>('.copy, .actions')) el.style.visibility = 'hidden';
+      });
+      const shot = (await page.screenshot({ clip })).toString('base64');
+      const result = await page.evaluate(
+        async ({ b64, ink }) => {
+          const img = new Image();
+          img.src = `data:image/png;base64,${b64}`;
+          await img.decode();
+          const canvas = Object.assign(document.createElement('canvas'), {
+            width: img.width,
+            height: img.height,
+          });
+          const cx = canvas.getContext('2d')!;
+          cx.drawImage(img, 0, 0);
+          const px = cx.getImageData(0, 0, img.width, img.height).data;
+          const lin = (c: number) => {
+            c /= 255;
+            return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+          };
+          const lum = (r: number, g: number, b: number) =>
+            0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+          let max = 0;
+          let min = 1;
+          for (let i = 0; i < px.length; i += 4) {
+            const l = lum(px[i], px[i + 1], px[i + 2]);
+            max = Math.max(max, l);
+            min = Math.min(min, l);
+          }
+          cx.fillStyle = ink;
+          cx.fillRect(0, 0, 1, 1);
+          const [r, g, b] = cx.getImageData(0, 0, 1, 1).data;
+          const text = lum(r, g, b);
+          return {
+            contrast: (Math.max(text, max) + 0.05) / (Math.min(text, max) + 0.05),
+            spread: max - min,
+          };
+        },
+        { b64: shot, ink },
+      );
+      // The painting shows through (the ground is not one flat colour) ...
+      expect(result.spread).toBeGreaterThan(0);
+      // ... and the headline holds AA over its lightest point.
+      expect(result.contrast).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+
+  test('the footer colophon credits every painting as public domain', async ({ page }) => {
+    await page.goto('/');
+    const colophon = page.locator('footer [data-testid="colophon"]');
+    await expect(colophon).toContainText('public domain');
+    for (const p of Object.values(paintings)) await expect(colophon).toContainText(p.title);
   });
 });

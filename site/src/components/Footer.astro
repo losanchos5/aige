@@ -11,6 +11,7 @@ import RegisterMark from './RegisterMark.astro';
 import { site } from '../data/site';
 import { nav, feeds, project, type NavGroup } from '../data/nav';
 import { bookParts } from '../data/parts';
+import { paintings } from '../data/paintings';
 import { translator, type UiKey } from '../i18n/ui';
 import { LOCALE_INFO } from '../i18n/locales';
 import { translationIndex } from '../lib/i18n-content';
@@ -31,6 +32,11 @@ const partLabel = (id: string, fallback: string) =>
 const langs = (['es', 'fr', 'de', 'pt'] as const).filter((lang) => translationIndex().langs.has(lang));
 
 const domain = new URL(site.url).host;
+// The colophon credits every painting the site shows (data/paintings.ts).
+const ARTIST = 'Claude Monet';
+const paintingList = Object.values(paintings)
+  .map((p) => `${p.title} (${p.year})`)
+  .join(', ');
 const byId = (id: NavGroup['id']) => nav.find((g) => g.id === id)!;
 const thesis = byId('thesis');
 const bok = byId('bok');
@@ -191,6 +197,10 @@ const about = byId('about');
     </nav>
 
     <p class="meta">{site.license} · v{site.bokVersion} · {domain}</p>
+    <p class="colophon" data-testid="colophon">
+      Paintings by {ARTIST}, all public domain: {paintingList}.{' '}
+      <a href={`${site.github}/blob/main/site/public/paintings/CREDITS.md`}>Sources and licences</a>
+    </p>
 
     <p class="foot-wordmark" aria-hidden="true" data-text={site.name}></p>
   </div>
@@ -446,6 +456,22 @@ const about = byId('about');
     text-transform: none;
     /* --ink-2, not --muted: the footer is a tinted band. */
     color: var(--ink-2);
+  }
+
+  /* The painting credits: mono at the label size, under the meta line. */
+  .colophon {
+    max-width: 120ch;
+    margin: var(--s-3) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .colophon a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
 
   /* Big display wordmark as a faint watermark closing the footer. aria-hidden

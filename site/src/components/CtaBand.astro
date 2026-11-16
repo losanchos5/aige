@@ -4,8 +4,8 @@
  * ground with --band-ink text, a 1px --band-line hairline on top, a Newsreader
  * sentence and one button; an optional secondary reads as a plain text link,
  * not a second button. No mesh, glow or gradient.
- * The named slot "art" sits behind the copy so a <Painting> can be dropped in
- * later (the home PR); it is empty by default.
+ * The named slot "art" sits behind the copy: a <Painting> there covers the
+ * band under a flat veil (the home's closing band); it is empty by default.
  * Place as a direct child of <main> (outside .container) so it spans full width.
  */
 interface Cta {
@@ -151,6 +151,29 @@ const { title, sub, primary, secondary, class: className } = Astro.props;
   @media (prefers-reduced-motion: no-preference) {
     .cta {
       transition: background-color var(--dur) var(--ease);
+    }
+  }
+
+  /* A painting in the art slot covers the band under a flat veil of the band
+     colour (about a quarter of it shows): even over a white patch the band
+     ink stays above 7:1, in both themes. */
+  .art :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+  }
+
+  .art::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--band) 74%, transparent);
+  }
+
+  @media (forced-colors: active) {
+    .art {
+      display: none;
     }
   }
 </style>

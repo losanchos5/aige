@@ -41,9 +41,8 @@ for (const scheme of schemes) {
 
 // Targeted below-the-fold shots in dark, where the trickiest surfaces live.
 const spots = [
-  { name: 'home-stack', path: '/', sel: '.diagram-int' },
+  { name: 'home-stack', path: '/', sel: '#stack .artifacts' },
   { name: 'home-cta', path: '/', sel: '.band' },
-  { name: 'home-verdict', path: '/', sel: '.verdict-beat' },
   { name: 'stack-citations', path: '/bok/the-stack', sel: 'a.cite' },
 ];
 

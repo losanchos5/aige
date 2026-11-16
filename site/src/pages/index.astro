@@ -3,47 +3,49 @@
  * Home: the discipline, defined. A full-viewport hero (the headline over a
  * painting, one supporting sentence, two CTAs to the Stack and the open
  * controls, two text links to the Thesis and the frontier route, a strip of
- * frameworks and figures), the definition with the governance loop, the three
- * questions, the five-layer stack, where the discipline operates (evals,
- * runtime, assurance), the eight values, the role, a verdict beat, the Body of
- * Knowledge by part, the resources, the newsletter beside the open work and a
- * closing CTA. All copy and every figure come from the typed
- * content modules; no number appears here that a primary source does not carry,
- * and every count is computed from the data.
+ * frameworks and figures), then six numbered sections, a feature and a
+ * closing band, in the editorial-restraint system (one 12-column grid, paper
+ * ground, hairline rows, Monet paintings as the only decorative colour):
  *
- * The body sections are built on <Section>, which supplies the tinted/mesh/dark
- * bands and the shared heads; no body section sits on the bare page ground
- * (each mesh takes its own composition and strength, so neighbours differ).
- * The hero keeps its own scoped layout (the painting or the field, the centred
- * headline and the strip; see the <style>) and the loop is <GovernanceLoop>.
+ *   01 The discipline: the definition, the governance loop as a paper panel
+ *      on a painting mat, then the three questions as hairline rows.
+ *   02 The stack: four real artefacts on one painting mat, the five layer
+ *      rows, then where the discipline operates (evals, runtime, assurance).
+ *   03 Body of Knowledge: a wide painting strip over the chapters by part.
+ *   The verdict: a painting beside the verdict sentence and the role links.
+ *   04 What applies now: the AI Act dates from the obligation register.
+ *   05 Resources: four painting cards, then the other references as rows.
+ *   06 Follow the changes: the newsletter beside the open work.
+ *   The closing band, with the hero painting veiled behind it.
+ *
+ * Sections with a picture alternate with rows: after a full-width picture the
+ * next block puts its sub heading in columns 1 to 4 and its rows in 5 to 12.
+ * All copy and every figure come from the typed content modules; no number
+ * appears here that a primary source does not carry, and every count is
+ * computed from the data. The hero keeps its own scoped layout (the painting
+ * or the field, the centred headline and the strip; see the <style>).
  */
 import Marketing from '../layouts/Marketing.astro';
 import Section from '../components/Section.astro';
-import RegisterList from '../components/RegisterList.astro';
-import StatTile from '../components/StatTile.astro';
-import VerdictStamp from '../components/VerdictStamp.astro';
 import CtaBand from '../components/CtaBand.astro';
-import StackDiagram from '../components/StackDiagram.astro';
 import GovernanceLoop from '../components/GovernanceLoop.astro';
-import VerdictTicker from '../components/VerdictTicker.astro';
-import DefinitionCards from '../components/DefinitionCards.astro';
-import ValuePair from '../components/ValuePair.astro';
 import BookParts from '../components/BookParts.astro';
-import ResourceTiles from '../components/ResourceTiles.astro';
 import NewsletterForm from '../components/NewsletterForm.astro';
 import WhatAppliesNow from '../components/WhatAppliesNow.astro';
 import HeroStrip from '../components/HeroStrip.astro';
-import SurfaceCards, { type SurfaceItem } from '../components/SurfaceCards.astro';
 import OpenWork from '../components/OpenWork.astro';
+import Painting from '../components/Painting.astro';
 import { site } from '../data/site';
 import { WEBSITE_ID } from '../lib/jsonld';
+import { chip } from '../lib/artefact-chip';
 import { definition, values } from '../data/values';
-import { capabilityStatement, workflows, market } from '../data/role';
+import { workflows } from '../data/role';
 import { chaptersOrdered } from '../data/chapters';
 import { bookParts, countWord } from '../data/parts';
 import { layers } from '../data/stack';
 import { frameworks } from '../data/frameworks';
 import { patterns } from '../data/patterns';
+import { paintings, type PaintingId } from '../data/paintings';
 
 // The home title already names the site, so Seo appends no ` · {site.name}`
 // suffix (titleSuffix={false} on <Marketing> below); it uses the same ` · `
@@ -76,19 +78,19 @@ const questions = [
     index: '01',
     title: 'What AI is running?',
     body: 'A runtime-aware registry of every model, service and agent (each with an owner, a scope and a status), written by the deployment pipeline, not typed into a spreadsheet.',
-    swatch: 'var(--l2)',
+    layer: 2,
   },
   {
     index: '02',
     title: 'What is it allowed to do?',
     body: "Governance rules written as executable policy and enforced at runtime, under each agent's own identity and scope, so a bad release or an out-of-scope call is blocked at the earliest point it can be, not discouraged in a review.",
-    swatch: 'var(--l1)',
+    layer: 1,
   },
   {
     index: '03',
     title: 'What evidence proves it?',
     body: 'Structured eval results and machine-readable evidence emitted as the build runs, so assurance is a live query rather than a point-in-time attestation assembled by hand.',
-    swatch: 'var(--l3)',
+    layer: 3,
   },
 ];
 
@@ -96,12 +98,12 @@ const questions = [
 // layers 03, 04 and 05 of the stack, each with its swatch, one sentence and
 // the pages that carry it (the control profile or pattern, then the layer in
 // chapter 04). The anchors are the chapter's own heading ids.
-const surfaces: SurfaceItem[] = [
+const surfaces = [
   {
-    index: 'Layer 03',
+    index: 'L03',
     title: 'Evals',
     body: 'Evaluation results become evidence when the metrics and thresholds are fixed before the run and a failure blocks the release.',
-    swatch: 'var(--l3)',
+    layer: 3,
     links: [
       { label: 'Evaluation environment controls', href: '/controls/evaluation-environment' },
       { label: 'Pattern: Eval Gate in CI', href: '/patterns/eval-gate-in-ci' },
@@ -109,10 +111,10 @@ const surfaces: SurfaceItem[] = [
     ],
   },
   {
-    index: 'Layer 04',
+    index: 'L04',
     title: 'Runtime',
     body: 'Every model, tool call and agent runs under an identity, a scope and a stop handle, enforced at the point where it acts.',
-    swatch: 'var(--l4)',
+    layer: 4,
     links: [
       { label: 'Agent runtime controls', href: '/controls/agent-runtime' },
       { label: 'Pattern: Kill Switch / Circuit Breaker', href: '/patterns/kill-switch-circuit-breaker' },
@@ -120,10 +122,10 @@ const surfaces: SurfaceItem[] = [
     ],
   },
   {
-    index: 'Layer 05',
+    index: 'L05',
     title: 'Assurance',
     body: 'Controls emit structured records as they run, so conformity is a query over evidence rather than a document assembled by hand.',
-    swatch: 'var(--l5)',
+    layer: 5,
     links: [
       { label: 'Pattern: Machine-Readable Evidence', href: '/patterns/machine-readable-evidence-oscal' },
       { label: 'Open data and schemas', href: '/resources/data' },
@@ -132,15 +134,13 @@ const surfaces: SurfaceItem[] = [
   },
 ];
 
-// Seven workflows as a register list: index (auto), name and the layer tick
-// colour. 'all' (regulatory translation) carries the neutral ink tick.
-const workflowItems = workflows.map((workflow) => ({
-  title: workflow.name,
-  swatch: workflow.layerN === 'all' ? 'var(--ink)' : `var(--l${workflow.layerN})`,
-}));
+const pad = (n: number) => String(n).padStart(2, '0');
 
-// Only primary-sourced figures are tile-safe (the +150% demand signal is not).
-const primaryStats = market.filter((stat) => stat.primary);
+// The mono credit printed beside each painting: artist, title, year.
+const credit = (id: PaintingId) => {
+  const p = paintings[id];
+  return `${p.artist}, ${p.title}, ${p.year}`;
+};
 
 // The hero's figures strip: label | value pairs, every value counted from (or
 // read off) the content modules, so the strip can never drift from the site.
@@ -193,6 +193,7 @@ const heroArt = {
 const HERO_LQIP =
   'data:image/webp;base64,UklGRo4AAABXRUJQVlA4IIIAAABQBQCdASoYABMAPt1grE8opSSiKAqpEBuJYwCdABESxiiKM5K4GrqF079X3VsoyOKMQgAA/ucYZcdQIZ8gekDbR1k7VvcRFIQ/ZIQYi+x9ea0U0cIbGZDEOt8DambczfYpv6oAY/f8GquG9A8BTdvMuIXzdeLpWyfUssgFbKUsoAAA';
 
+
 // The chapters section: its title counts chapters and parts from the data, and
 // its lede names the three parts that carry the discipline from what an AI
 // system is to the law (their titles from chapterParts, never retyped here).
@@ -200,24 +201,42 @@ const partTitle = (id: string) => bookParts.find((part) => part.id === id)?.titl
 const chaptersTitle = `${chaptersOrdered.length} chapters in ${countWord(bookParts.length)} parts, versioned and open.`;
 const chaptersLede = `The Body of Knowledge is at v${site.bokVersion} and published under ${site.license}. ${partTitle('foundations')}, ${partTitle('lifecycle')}, and ${partTitle('law')} carry the discipline from what an AI system is, through its life, to the law that binds it.`;
 
-// Twelve tiles on the four-column bento: the references a reader reaches for
-// first, the open controls second. The hub (/resources) lists every one.
-const resources = [
+// Resources: four cards with a painting on top (the references a reader
+// reaches for first, the open controls second), then the rest as numbered
+// rows. Together they keep the twelve the home has always linked; the hub
+// (/resources) lists every one.
+const resourceCards: { label: string; href: string; kicker: string; desc: string; painting: PaintingId }[] = [
   {
     label: 'Frameworks',
     href: '/resources/frameworks',
+    kicker: `Reference · ${frameworks.length} frameworks`,
     desc: 'The obligations (EU AI Act, ISO/IEC 42001, NIST AI RMF) mapped to the artefacts that satisfy them.',
+    painting: 'vetheuil-fog',
   },
   {
     label: 'Open controls',
     href: '/controls',
+    kicker: 'Practice · control profiles',
     desc: 'Control profiles with the evidence each control leaves, versioned and reviewed in the open.',
+    painting: 'vernon-church-fog',
+  },
+  {
+    label: 'Obligation register',
+    href: '/obligations',
+    kicker: 'Reference · stable ids',
+    desc: 'Every obligation with a stable id, its duty holder, date, status, artefact and stack layer.',
+    painting: 'morning-seine-giverny',
   },
   {
     label: 'MCP server',
     href: '/mcp',
+    kicker: 'Tool · MCP',
     desc: 'Ask Claude or any MCP client and get answers read from this Body of Knowledge, each with its source page.',
+    painting: 'antibes-morning',
   },
+];
+
+const resourceRows = [
   {
     label: 'Topic crosswalk',
     href: '/resources/crosswalk',
@@ -244,11 +263,6 @@ const resources = [
     desc: 'AI harms by level, each with its failure mode, the control that catches it and real incidents.',
   },
   {
-    label: 'Obligation register',
-    href: '/obligations',
-    desc: 'Every obligation with a stable id, its duty holder, date, status, artefact and stack layer.',
-  },
-  {
     label: 'AI Act deadlines',
     href: '/resources/ai-act-deadlines',
     desc: 'What applies when under the EU AI Act after the Digital Omnibus, in English and Spanish, updated by milestone.',
@@ -264,6 +278,12 @@ const resources = [
     desc: 'Technical notes on the open questions: what is assumed, what the evidence shows, what would settle it.',
   },
 ];
+const moreRefsTitle = `${countWord(resourceRows.length).replace(/^./, (c) => c.toUpperCase())} more references.`;
+
+// Painting slots: the width each image is drawn at, for the srcset pick.
+const SIZES_WIDE = '(min-width: 1200px) 1168px, calc(100vw - 32px)';
+const SIZES_BODY = '(min-width: 1200px) 870px, (min-width: 900px) 72vw, calc(100vw - 32px)';
+const SIZES_HALF = '(min-width: 1200px) 572px, (min-width: 720px) 48vw, calc(100vw - 32px)';
 ---
 
 <Marketing
@@ -333,162 +353,317 @@ const resources = [
   </section>
 
   <Section
-    class="loop-sec"
+    class="home-sec loop-sec"
+    num="01"
+    label="The discipline"
     title="The discipline, defined."
     lede={definition}
   >
-    <GovernanceLoop>
-      Seven steps, from obligation to auditor.
-      <a href="/bok/the-stack#how-to-read-the-stack">Read how the governance loop works</a>
-    </GovernanceLoop>
-    <p class="sec-link" slot="foot">
-      <a href="/ai-governance">What is AI governance? →</a>
-      <span class="sec-link-sep" aria-hidden="true">·</span>
-      <a href="/bok">Open the Body of Knowledge →</a>
-      <span class="sec-link-sep" aria-hidden="true">·</span>
-      <a href="/controls">See the open controls →</a>
-    </p>
-    <script is:inline defer src="/countup.js"></script>
+    <div class="sec-wide">
+      <GovernanceLoop>
+        <Painting slot="mat" id="charing-cross-bridge" sizes={SIZES_WIDE} />
+        <div class="fig-cap">
+          <div>
+            <p class="label fig-n">Fig. 01</p>
+            <p class="fig-title">The governance loop</p>
+            <p class="fig-desc">
+              Seven steps, from obligation to auditor, in four lanes: the obligation, the rules as
+              code, the running system and the proof.
+            </p>
+          </div>
+          <p class="fig-actions">
+            <a class="tlink" href="/bok/the-stack#how-to-read-the-stack">Read how the governance loop works</a>
+          </p>
+          <p class="credit">Mat: {credit('charing-cross-bridge')}</p>
+        </div>
+      </GovernanceLoop>
+    </div>
+
+    <div class="split">
+      <div class="split-head">
+        <h3 class="subhead">Three questions define the discipline.</h3>
+        <p class="subhead-lede">
+          Legacy AI governance leaves them unanswered because nothing is connected to production.
+          The engineer answers all three from the running system.
+        </p>
+        <p class="split-links">
+          <a class="tlink" href="/ai-governance">What is AI governance?</a>
+          <a class="tlink" href="/bok">Open the Body of Knowledge</a>
+          <a class="tlink" href="/controls">See the open controls</a>
+        </p>
+      </div>
+      <ol class="split-body rows">
+        {
+          questions.map((q) => (
+            <li class="row">
+              <span class="row-n">{q.index}</span>
+              <p class="row-t">
+                <span class={`sw sw-${q.layer}`} aria-hidden="true" />
+                {q.title}
+              </p>
+              <p class="row-b">{q.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
   </Section>
 
   <Section
-    title="Three questions define the discipline."
-    lede="Legacy AI governance leaves them unanswered because nothing is connected to production. The engineer answers all three from the running system."
-  >
-    <DefinitionCards items={questions} class="reveal-stagger" />
-  </Section>
-
-  <Section
-    headSize="xl"
+    id="stack"
+    class="home-sec stack-sec"
+    num="02"
+    label="The stack"
     title="A build order, from policy to proof."
     lede="The stack is five layers that answer the three questions. Evidence is produced at the bottom and flows up; three layers are established engineering practice, two are new to AI."
   >
-    <div class="story" data-story>
-      <div class="story-pin stack-pin">
-        <p class="mono-label">Build order</p>
-        <StackDiagram mode="static" data-story-mark class="stack-mark" />
+    <div class="sec-wide artifacts">
+      <div class="mat mat--art">
+        <Painting id="pourville-misty-morning" sizes={SIZES_WIDE} />
+        <div class="art-grid">
+          {/* bok/12-governance-program.md (package aip07), the AIP-07 injection floor; the exception call's arguments are elided. */}
+          <div class="art-panel" role="group" aria-labelledby="art-rule">
+            <p class="art-head"><span class="sw sw-1" aria-hidden="true" />aip07.rego</p>
+            <pre class="art-code"><span class="k">package</span> aip07
+
+<span class="k">import</span> rego.v1
+
+<span class="k">deny</span> contains msg <span class="k">if</span> {"{"}
+  input.system.tier in {"{"}2, 3{"}"}
+  r := input.evals[
+    "injection-resistance.v4"]
+  r.score &lt; <span class="v">0.95</span>
+  <span class="k">not</span> exception_active(…)
+{"}"}</pre>
+          </div>
+          {/* bok/04-the-stack.md (layer 03 eval-gate result) and bok/patterns/continuous-assurance-telemetry.md (pii_leak_rate 0.004, threshold 0.0, decision alert). */}
+          <div class="art-panel" role="group" aria-labelledby="art-gate">
+            <p class="art-head"><span class="sw sw-3" aria-hidden="true" />eval gate · csa-01</p>
+            <table class="art-table">
+              <tbody>
+                <tr><td>injection-resistance.v4</td><td>0.982</td><td><span class="vd vd-pass">Pass</span></td></tr>
+                <tr><td>guardrail.output.<wbr />pii.v2</td><td>0.004</td><td><span class="vd vd-block">Alert</span></td></tr>
+              </tbody>
+            </table>
+            <p class="art-foot">threshold ≥ 0.95 · pii = 0</p>
+          </div>
+          {/* bok/patterns/continuous-assurance-telemetry.md, the evidence record (signature as the chapter elides it). */}
+          <div class="art-panel" role="group" aria-labelledby="art-record">
+            <p class="art-head"><span class="sw sw-5" aria-hidden="true" />evidence-record.v1</p>
+            <dl class="art-kv">
+              <dt>control_id</dt><dd>guardrail.output.<wbr />pii.v2</dd>
+              <dt>subject</dt><dd>csa-01@2026-09-18</dd>
+              <dt>decision</dt><dd>alert</dd>
+              <dt>obligation</dt><dd>EU AI Act Art. 15</dd>
+              <dt>timestamp</dt><dd>2026-09-18T14:31:52Z</dd>
+              <dt>signature</dt><dd>ed25519:5a…</dd>
+            </dl>
+          </div>
+          {/* src/data/crosswalk.ts: risk-management, logging-traceability and human-oversight, core or related refs. */}
+          <div class="art-panel" role="group" aria-labelledby="art-map">
+            <p class="art-head"><span class="sw sw-1" aria-hidden="true" />crosswalk · 3 topics</p>
+            <table class="art-table art-matrix">
+              <thead><tr><th><span class="visually-hidden">Topic</span></th><th>AI Act</th><th>42001</th><th>RMF</th></tr></thead>
+              <tbody>
+                <tr><td>Risk</td><td>Art. 9</td><td>6.1.2</td><td>MAP 1</td></tr>
+                <tr><td>Logging</td><td>Art. 12</td><td>A.6</td><td>MANAGE 4</td></tr>
+                <tr><td>Oversight</td><td>Art. 14</td><td>A.9</td><td>MANAGE 2.4</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-      <div class="stack-rows reveal-stagger">
-        <StackDiagram mode="interactive" />
+      <ul class="art-caps">
+        <li><p class="label">Layer 01 · Rule</p><p class="art-t" id="art-rule">Policy as code</p><p class="art-d">An obligation compiled into a check the pipeline runs: AIP-07, the injection floor.</p></li>
+        <li><p class="label">Layer 03 · Gate</p><p class="art-t" id="art-gate">Eval gate result</p><p class="art-d">Thresholds fixed before the run; a failure blocks the release.</p></li>
+        <li><p class="label">Layer 05 · Record</p><p class="art-t" id="art-record">Evidence record</p><p class="art-d">The signed record every control writes to the assurance store.</p></li>
+        <li><p class="label">Layer 01 · Map</p><p class="art-t" id="art-map">Topic crosswalk</p><p class="art-d">One topic per row, read across the instruments that bind it.</p></li>
+      </ul>
+      <p class="credit">Mat: {credit('pourville-misty-morning')}</p>
+    </div>
+
+    <div class="split">
+      <div class="split-head">
+        <h3 class="subhead">Build order.</h3>
+        <p class="subhead-lede">
+          Evidence flows up: three layers are established engineering practice, two are new to AI.
+        </p>
+        <p class="split-links"><a class="tlink" href="/stack">Explore the stack</a></p>
       </div>
+      <ol class="split-body rows">
+        {
+          layers.map((layer) => (
+            <li class="row layer-row" data-testid="stack-row">
+              <span class="row-n">{pad(layer.n)}</span>
+              <p class="row-t">
+                <span class={`sw sw-${layer.n}`} aria-hidden="true" />
+                {layer.name}
+              </p>
+              <p class="row-b">
+                {layer.tagline}
+                <small>{layer.artefacts.map(chip).join(' · ')}</small>
+              </p>
+              <span class:list={['pill', 'row-tag', { 'pill-accent': !layer.inherited }]}>
+                {layer.inherited ? 'Established' : 'New'}
+              </span>
+            </li>
+          ))
+        }
+      </ol>
     </div>
-    <p class="sec-link" slot="foot"><a href="/stack">Explore the stack →</a></p>
-  </Section>
-  <script is:inline defer src="/story.js"></script>
 
-  <Section
-    tone="deep"
-    id="where-it-operates"
-    class="operate-sec"
-    title="Where AI Governance Engineering operates."
-    lede="Three surfaces where a governance claim becomes something that runs: the evaluation gate, the runtime control and the assurance record."
-  >
-    <SurfaceCards items={surfaces} class="reveal-stagger" />
-    <p class="sec-link" slot="foot">
-      <a href="/controls">Browse the open controls →</a>
-      <span class="sec-link-sep" aria-hidden="true">·</span>
-      <a href="/frontier">For frontier labs and evaluators →</a>
-    </p>
-  </Section>
-
-  <Section
-    title="Eight values, each a commitment made on purpose."
-  >
-    <div class="bento reveal-stagger">
-      {
-        values.map((value) => (
-          <ValuePair
-            value={value}
-            variant="bento"
-            class={value.n === 1 ? 'bento-2x bento-2y' : value.n === 6 ? 'bento-2x' : undefined}
-          />
-        ))
-      }
-    </div>
-    <p class="sec-link" slot="foot"><a href="/thesis#principles">Read the principles →</a></p>
-  </Section>
-
-  <Section
-    class="role-sec"
-    title="The role is a capability first, a job title second."
-  >
-    <blockquote class="pullquote display">{capabilityStatement}</blockquote>
-    <div class="role-flows">
-      <p class="mono-label flows-label">Seven workflows</p>
-      <RegisterList items={workflowItems} />
-    </div>
-    <div class="stats-row">
-      {
-        primaryStats.map((stat) => (
-          <StatTile
-            value={stat.value}
-            label={stat.label}
-            source={stat.source}
-            href={stat.sourceUrl}
-          />
-        ))
-      }
-    </div>
-    <p class="sec-link" slot="foot">
-      <a href="/role">What an AI governance engineer does →</a>
-      <span class="sec-link-sep" aria-hidden="true">·</span>
-      <a href="/path">Start the learning path →</a>
-      <span class="sec-link-sep" aria-hidden="true">·</span>
-      <a href="/map">See the whole map →</a>
-    </p>
-  </Section>
-
-  <Section tone="dark" class="verdict-beat">
-    <div class="vb-inner">
-      <p class="vb-line display">
-        Every control on this site can fail a build, block a release, or sign an attestation.
-      </p>
-      <div class="vb-stamps">
-        <VerdictStamp verdict="block" />
-        <VerdictStamp verdict="pass" />
+    <div class="split" id="where-it-operates">
+      <div class="split-head">
+        <h3 class="subhead">Where AI Governance Engineering operates.</h3>
+        <p class="subhead-lede">
+          Three surfaces where a governance claim becomes something that runs: the evaluation gate,
+          the runtime control and the assurance record.
+        </p>
+        <p class="split-links">
+          <a class="tlink" href="/controls">Browse the open controls</a>
+          <a class="tlink" href="/frontier">For frontier labs and evaluators</a>
+        </p>
       </div>
-    </div>
-    <div class="full-bleed vb-ticker">
-      <VerdictTicker size="lg" />
+      <ol class="split-body rows">
+        {
+          surfaces.map((s) => (
+            <li class="row surface-row">
+              <span class="row-n">{s.index}</span>
+              <p class="row-t">
+                <span class={`sw sw-${s.layer}`} aria-hidden="true" />
+                {s.title}
+              </p>
+              <div class="row-b">
+                <p>{s.body}</p>
+                <ul class="link-list">
+                  {s.links.map((link) => (
+                    <li>
+                      <a href={link.href}>{link.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
     </div>
   </Section>
 
   <Section
-    class="parts-sec"
+    class="home-sec parts-sec"
+    num="03"
+    label="Body of Knowledge"
     title={chaptersTitle}
     lede={chaptersLede}
   >
-    <BookParts class="reveal-stagger" />
-    <p class="sec-link" slot="foot"><a href="/bok">Browse the chapters by part →</a></p>
+    <figure class="sec-body strip">
+      <span class="paint paint--strip">
+        <Painting id="ice-floes" sizes={SIZES_BODY} />
+      </span>
+      <figcaption class="credit">{credit('ice-floes')}</figcaption>
+    </figure>
+    <BookParts class="sec-body" />
+    <p class="sec-foot"><a class="tlink" href="/bok">Browse the chapters by part</a></p>
   </Section>
 
+  <Section class="home-sec feature-sec">
+    <p class="label feature-label">The verdict</p>
+    <div class="feature">
+      <figure class="feature-pic">
+        <span class="paint paint--feature">
+          <Painting id="pourville-cliff-morning" sizes={SIZES_HALF} />
+        </span>
+        <figcaption class="credit">{credit('pourville-cliff-morning')}</figcaption>
+      </figure>
+      <div class="feature-copy">
+        <h2 class="feature-title">
+          Every control on this site can fail a build, block a release, or sign an <em>attestation</em>.
+        </h2>
+        <p class="feature-text">
+          The role is a capability first, a job title second: seven workflows that turn a legal
+          requirement into a check that runs, and the check into a record an auditor can query.
+        </p>
+        <ul class="feature-links">
+          <li><a class="tlink" href="/role">What an AI governance engineer does</a></li>
+          <li><a class="tlink" href="/path">Start the learning path</a></li>
+          <li><a class="tlink" href="/map">See the whole map</a></li>
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <WhatAppliesNow num="04" class="home-sec" />
+
   <Section
+    class="home-sec res-sec"
+    num="05"
+    label="Resources"
     title="Curated resources, cross-referenced, in the open."
   >
-    <ResourceTiles tiles={resources} class="reveal-stagger" />
-    <p class="sec-link" slot="foot"><a href="/resources">All resources →</a></p>
+    <ul class="sec-wide pcards tiles">
+      {
+        resourceCards.map((card) => (
+          <li>
+            <a class="pcard" href={card.href}>
+              <span class="paint paint--card">
+                <Painting id={card.painting} sizes={SIZES_HALF} />
+              </span>
+              <span class="pcard-body">
+                <span class="label pcard-k">{card.kicker}</span>
+                <span class="pcard-t">{card.label}</span>
+                <span class="pcard-d">{card.desc}</span>
+                <span class="credit">{credit(card.painting)}</span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="split">
+      <div class="split-head">
+        <h3 class="subhead">{moreRefsTitle}</h3>
+        <p class="subhead-lede">Crosswalks, the map, schemas, harms, deadlines and the open research notes.</p>
+        <p class="split-links"><a class="tlink" href="/resources">All resources</a></p>
+      </div>
+      <ul class="split-body res-list tiles">
+        {
+          resourceRows.map((row, i) => (
+            <li>
+              <a href={row.href}>
+                <span class="n" aria-hidden="true">{pad(resourceCards.length + i + 1)}</span>
+                <b>{row.label}</b>
+                <span class="arrow" aria-hidden="true">→</span>
+                <span class="d">{row.desc}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </Section>
 
-  <WhatAppliesNow />
-
   <Section
-    class="nl-sec"
+    class="home-sec nl-sec"
+    num="06"
+    label="Follow the changes"
     title="Follow the changes."
     lede="Every chapter shows the date it last changed, and every release is written up in the changelog. Get an email when a chapter changes, or follow the feed."
   >
-    <div class="nl-grid">
-      <NewsletterForm location="home" />
-      <div class="nl-work">
-        <h3 class="nl-work-title">Open work</h3>
+    <div class="split">
+      <div class="split-head">
+        <NewsletterForm location="home" />
+      </div>
+      <div class="split-body">
+        <h3 class="label work-k">Open work</h3>
         <OpenWork />
       </div>
     </div>
-    <p class="sec-link" slot="foot">
-      <a href="/rss.xml">RSS feed →</a>
-      <span class="sec-link-sep" aria-hidden="true">·</span>
-      <a href="/about/changelog">Changelog →</a>
-      <span class="sec-link-sep" aria-hidden="true">·</span>
-      <a href="/contribute">Contribute →</a>
+    <p class="sec-foot" slot="foot">
+      <a class="tlink" href="/rss.xml">RSS feed</a>
+      <a class="tlink" href="/about/changelog">Changelog</a>
+      <a class="tlink" href="/contribute">Contribute</a>
     </p>
   </Section>
 
@@ -497,7 +672,9 @@ const resources = [
     sub="The Thesis and Body of Knowledge are CC BY 4.0. Read them, use them, send a pull request."
     primary={{ label: 'Contribute on GitHub', href: site.github }}
     secondary={{ label: 'Follow on LinkedIn', href: site.linkedin }}
-  />
+  >
+    <Painting slot="art" id="seine-giverny" sizes="(min-width: 1200px) 60vw, 100vw" />
+  </CtaBand>
 </Marketing>
 
 <style>
@@ -875,124 +1052,692 @@ const resources = [
     }
   }
 
-  /* The two in-section captions ("Build order", "Seven workflows"): plain mono
-     at the small size, sentence case, no dot. --ink-2 holds AA on the tint and
-     over the role section's mesh. */
-  .mono-label {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: var(--fs-small);
-    line-height: 1.4;
-    color: var(--ink-2);
+  /* ------------------------------------------------ Sections under the hero
+     One rhythm for every section: a 1px rule over the numbered mono label,
+     the same padding below each. The heads are Section's own (a 12-column
+     grid from 900px, the label in columns 1 to 3, the title from column 4).
+     Section's root and inner box are its own elements, hence :global. */
+  :global(.section.home-sec) {
+    --sec-pad: clamp(72px, 9vw, 112px);
+    padding-block: 0 var(--sec-pad);
   }
 
-  /* Follow the changes: the newsletter form, then the open work under it at
-     every width. Side by side, the list (six rows) left the form's column
-     half empty on desktop; stacked, each row's note keeps one line. The
-     column is minmax(0, 1fr): an auto track grows to its widest unbreakable
-     line and pushed the page sideways at 390px with text at 200%. */
-  .nl-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--s-6);
-    align-items: start;
+  :global(.hero--field + .section.home-sec) {
+    padding-top: var(--sec-pad);
   }
 
-  @media (min-width: 960px) {
-    .nl-grid {
-      gap: var(--s-7);
+  /* The rule spans the content width, not the window: it replaces the
+     full-bleed one Marketing draws between sections. */
+  :global(.marketing > section.home-sec.section) {
+    border-top: 0;
+  }
+
+  :global(.home-sec > .sec-inner::before) {
+    content: '';
+    display: block;
+    height: 1px;
+    margin-bottom: 22px;
+    background: var(--line);
+  }
+
+  :global(.home-sec .sec-head) {
+    margin-bottom: 0;
+  }
+
+  /* Full-width blocks (figures, the artefacts, the cards). */
+  .sec-wide {
+    margin-top: 64px;
+    min-width: 0;
+  }
+
+  @media (max-width: 899px) {
+    .sec-wide {
+      margin-top: 40px;
     }
   }
 
-  .nl-work-title {
-    margin: 0 0 var(--s-3);
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: var(--fs-h3);
-    line-height: 1.2;
-    letter-spacing: var(--tracking-display);
-  }
-
-  /* Stack story: the static mark and its caption pin on the left; the
-     interactive rows scroll on the right. Grid + sticky live in effects.css. */
-  .stack-pin {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-4);
-  }
-
-  .stack-mark {
-    width: 100%;
-    max-width: 460px;
-  }
-
-  /* Values live in the bento grid (effects.css); the reveal cascades by index. */
-
-  /* The capability statement, set as a display-weight quote on the content
-     edge. No side stripe: the type carries the emphasis. */
-  .pullquote {
-    margin: 0 0 var(--s-6);
-    font-weight: 600;
-    font-size: var(--fs-h3);
-    line-height: 1.3;
-    color: var(--ink);
-    max-width: 46ch;
-    text-wrap: pretty;
-  }
-
-  .flows-label {
-    margin-bottom: var(--s-3);
-  }
-
-  .role-flows {
-    max-width: 72ch;
-    margin-bottom: var(--s-6);
-  }
-
-  .stats-row {
+  /* ----------------------------------------------------- Figure caption */
+  .fig-cap {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--s-4);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px 32px;
   }
 
   @media (min-width: 720px) {
-    .stats-row {
-      grid-template-columns: repeat(3, 1fr);
+    .fig-cap {
+      grid-template-columns: minmax(0, 1fr) auto;
     }
   }
 
-  /* Verdict beat: a dark band (tone="dark" re-scopes the dark tokens). The
-     sentence and stamps sit in the container; the ticker breaks full-bleed.
-     In the dark theme the default --band-bg (#0b0d10) all but vanishes on the
-     #121417 page, so the band takes the L1 layer's deep tone instead (the same
-     ground as the dark CtaBand); every text token on it stays >= 4.5:1. The
-     class sits on Section's root, hence :global. */
-  :global(:root[data-theme='dark'] .verdict-beat) {
-    background: var(--l1);
+  .fig-cap p {
+    margin: 0;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light']) .verdict-beat) {
-      background: var(--l1);
+  .fig-n {
+    color: var(--accent);
+  }
+
+  .fig-title {
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--ink);
+  }
+
+  .fig-desc {
+    max-width: 68ch;
+    font-size: var(--fs-small);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .fig-cap .credit {
+    grid-column: 1 / -1;
+  }
+
+  /* ------------------------------------------------------- Split blocks
+     After a full-width block the next one shares the left edge: sub heading,
+     lede and links in columns 1 to 4, the rows in 5 to 12. */
+  .split {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    margin-top: 88px;
+    min-width: 0;
+  }
+
+  .split-head {
+    grid-column: 1 / 5;
+    min-width: 0;
+  }
+
+  .split-body {
+    grid-column: 5 / -1;
+    min-width: 0;
+  }
+
+  .split + .split {
+    margin-top: 80px;
+  }
+
+  @media (max-width: 899px) {
+    .split {
+      margin-top: 64px;
+    }
+
+    .split-head,
+    .split-body {
+      grid-column: 1 / -1;
+    }
+
+    .split-body {
+      margin-top: var(--s-5);
     }
   }
-  .vb-inner {
+
+  .subhead {
+    margin: 0 0 var(--s-2);
+    padding-top: 18px;
+    font-family: var(--font-body);
+    font-size: var(--fs-h3);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: normal;
+    color: var(--ink);
+  }
+
+  .subhead-lede {
+    max-width: 34ch;
+    margin: 0;
+    font-size: var(--fs-small);
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .split-links {
+    display: grid;
+    justify-items: start;
+    gap: var(--s-3);
+    margin: var(--s-5) 0 0;
+  }
+
+  /* --------------------------------------------------- Hairline rows */
+  .rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--ink);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: var(--s-2) var(--s-5);
+    align-items: baseline;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .row > :nth-child(n + 3) {
+    grid-column: 2;
+  }
+
+  @media (min-width: 720px) {
+    .row {
+      grid-template-columns: 2.75rem minmax(0, 15rem) minmax(0, 1fr);
+    }
+
+    .row > :nth-child(n + 3) {
+      grid-column: auto;
+    }
+
+    .layer-row {
+      grid-template-columns: 2.75rem minmax(0, 15rem) minmax(0, 1fr) auto;
+    }
+
+    .row-tag {
+      justify-self: end;
+    }
+  }
+
+  .row-tag {
+    justify-self: start;
+  }
+
+  .row-n {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: var(--tracking-label);
+    color: var(--accent);
+  }
+
+  .row-t {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+
+  .row-b,
+  .row-b p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--ink-2);
+    text-wrap: pretty;
+  }
+
+  .row-b small {
+    display: block;
+    margin-top: 6px;
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .link-list {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--s-5) var(--s-6);
-    padding-bottom: var(--s-6);
+    gap: 6px 18px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-small);
   }
 
-  .vb-line {
-    margin: 0;
-    font-size: var(--fs-h2);
-    max-width: 24ch;
+  .link-list a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 0.25em;
   }
 
-  .vb-stamps {
+  .link-list a:hover {
+    color: var(--accent);
+    text-decoration-color: currentColor;
+  }
+
+  /* ------------------------------------------- 02: artefacts on one mat */
+  .mat--art {
+    padding: clamp(16px, 3vw, 40px);
+  }
+
+  .art-grid,
+  .art-caps {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-4);
+  }
+
+  @media (min-width: 640px) {
+    .art-grid,
+    .art-caps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .art-grid,
+    .art-caps {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .art-panel {
+    min-width: 0;
+    padding: 14px 16px 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--r-blk);
+    background: var(--panel);
+    font-size: var(--fs-label);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .art-head {
     display: flex;
-    gap: var(--s-3);
+    align-items: center;
+    gap: var(--s-2);
+    margin: 0 0 var(--s-3);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    font: 500 var(--fs-label) / 1.3 var(--font-mono);
+    color: var(--ink);
+  }
+
+  .art-code {
+    margin: 0;
+    font: 400 var(--fs-label) / 1.6 var(--font-mono);
+    color: var(--ink-2);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .art-code .k {
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .art-code .v {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .art-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .art-table :is(td, th) {
+    padding: 7px 10px 7px 0;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .art-table tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .art-table :is(td, th):last-child {
+    padding-right: 0;
+  }
+
+  .art-table td:first-child {
+    color: var(--ink);
+  }
+
+  .art-table td:nth-child(2) {
+    font-family: var(--font-mono);
+  }
+
+  .art-table td:last-child {
+    text-align: right;
+  }
+
+  .art-matrix th {
+    font: 500 var(--fs-label) / 1.3 var(--font-mono);
+    color: var(--muted);
+  }
+
+  .art-matrix :is(td, th) {
+    padding-right: 6px;
+  }
+
+  .art-matrix td {
+    font-family: var(--font-mono);
+    white-space: nowrap;
+  }
+
+  .art-matrix td:first-child {
+    font-family: var(--font-body);
+  }
+
+  .art-matrix td:last-child {
+    text-align: left;
+  }
+
+  .art-foot {
+    margin: var(--s-2) 0 0;
+    font: 400 var(--fs-label) / 1.4 var(--font-mono);
+    color: var(--muted);
+  }
+
+  .vd {
+    display: inline-block;
+    padding: 0 7px;
+    border: 1px solid var(--accent-line);
+    border-radius: var(--r-pill);
+    font: 600 var(--fs-label) / 1.5 var(--font-mono);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .vd-pass {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .vd-block {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .art-kv {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--s-1) 10px;
+    margin: 0;
+    font-family: var(--font-mono);
+  }
+
+  .art-kv dt {
+    color: var(--muted);
+  }
+
+  .art-kv dd {
+    margin: 0;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  .art-caps {
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 640px) {
+    .art-caps {
+      padding: 0 clamp(16px, 3vw, 40px);
+    }
+  }
+
+  .art-caps .label {
+    color: var(--accent);
+  }
+
+  .art-t {
+    margin: 6px 0 var(--s-1);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .art-d {
+    margin: 0;
+    font-size: var(--fs-small);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  /* ------------------------------------------------ 03: painting strip */
+  .strip {
+    margin-block: 56px 0;
+    margin-right: 0;
+  }
+
+  .paint--strip {
+    aspect-ratio: 21 / 6;
+  }
+
+  :global(.parts-sec .bok-index) {
+    margin-top: 48px;
+  }
+
+  /* ----------------------------------------------- The verdict: feature */
+  .feature-label {
+    margin: 0;
+  }
+
+  .feature {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    align-items: center;
+    margin-top: 28px;
+  }
+
+  .feature-pic {
+    grid-column: 1 / 7;
+    margin: 0;
+  }
+
+  .paint--feature {
+    aspect-ratio: 5 / 4;
+  }
+
+  .feature-copy {
+    grid-column: 8 / -1;
+  }
+
+  @media (max-width: 899px) {
+    .feature-pic,
+    .feature-copy {
+      grid-column: 1 / -1;
+    }
+
+    .feature-copy {
+      margin-top: var(--s-6);
+    }
+  }
+
+  .feature-title {
+    margin: 0;
+    font: 400 clamp(2rem, 1.4rem + 1.7vw, 2.875rem) / 1.1 var(--font-serif);
+    letter-spacing: -0.012em;
+    color: var(--accent);
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+  }
+
+  .feature-title em {
+    font-style: italic;
+  }
+
+  .feature-text {
+    max-width: 46ch;
+    margin: var(--s-5) 0 0;
+    font-size: var(--fs-lede);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .feature-links {
+    display: grid;
+    justify-items: start;
+    gap: 14px;
+    margin: var(--s-6) 0 0;
+    padding: var(--s-5) 0 0;
+    list-style: none;
+    border-top: 1px solid var(--line);
+  }
+
+  /* ------------------------------------------ 05: painting-topped cards */
+  .pcards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-4);
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 720px) {
+    .pcards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--s-5);
+    }
+  }
+
+  .pcard {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--r-blk);
+    background: var(--panel);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .pcard:is(:hover, :focus-visible) {
+    border-color: var(--accent-line);
+    box-shadow: var(--lift);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .pcard {
+      transition:
+        transform var(--dur) var(--ease),
+        box-shadow var(--dur) var(--ease),
+        border-color var(--dur) var(--ease);
+    }
+
+    .pcard:is(:hover, :focus-visible) {
+      transform: translateY(-1px);
+    }
+  }
+
+  .paint--card {
+    aspect-ratio: 16 / 7;
+    border-radius: 0;
+  }
+
+  .pcard-body {
+    display: grid;
+    gap: var(--s-2);
+    padding: var(--s-5) 28px 28px;
+  }
+
+  .pcard-k {
+    color: var(--accent);
+  }
+
+  .pcard-t {
+    font: 400 1.75rem / 1.15 var(--font-serif);
+    color: var(--ink);
+  }
+
+  .pcard:hover .pcard-t {
+    color: var(--accent);
+  }
+
+  .pcard-d {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  .pcard-body .credit {
+    margin: 0;
+  }
+
+  @media (max-width: 719px) {
+    .pcard-body {
+      padding: 20px;
+    }
+  }
+
+  .pcards + .split {
+    margin-top: 72px;
+  }
+
+  /* Reference rows: numbered, a title and one line, two columns when wide. */
+  .res-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 40px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--ink);
+  }
+
+  @media (min-width: 1100px) {
+    .res-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .res-list a {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    align-content: start;
+    gap: 2px var(--s-2);
+    height: 100%;
+    padding: 18px 4px 18px 0;
+    border-bottom: 1px solid var(--line);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .res-list .n {
+    grid-row: 1 / 3;
+    padding-top: 4px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--muted);
+  }
+
+  .res-list b {
+    grid-column: 2;
+    grid-row: 1;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .res-list .d {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: var(--fs-small);
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+
+  .res-list .arrow {
+    grid-column: 3;
+    grid-row: 1;
+    font-family: var(--font-mono);
+    color: var(--accent);
+    visibility: hidden;
+  }
+
+  .res-list a:is(:hover, :focus-visible) b {
+    color: var(--accent);
+  }
+
+  .res-list a:is(:hover, :focus-visible) .arrow {
+    visibility: visible;
+  }
+
+  /* ---------------------------------------------- 06: follow the changes */
+  :global(.nl-sec) .split {
+    margin-top: 56px;
+  }
+
+  .work-k {
+    margin: 0 0 14px;
   }
 </style>

@@ -176,7 +176,8 @@ needs no pause control; it also pauses while a step is active, and is absent und
   labelled head sets the label in columns 1 to 3 of a 12-column grid and the title and lede from
   column 4.
 - **Section rule** (`site/src/layouts/Marketing.astro`): a plain 1px `--line` top border between
-  adjacent `<section>` siblings inside `.marketing`.
+  adjacent `<section>` siblings inside `.marketing` (the home draws its own content-width rule
+  instead; see Home sequence).
 - **`.card-lum`** (`effects.css`): a flat panel card, the opaque `--panel` fill on a 1px `--line`,
   `--r-lg`, no shadow and no ring.
 - **`.lift`** (`effects.css`), hover elevation for cards that are links only: it acts on `a.lift`
@@ -200,9 +201,21 @@ needs no pause control; it also pauses while a step is active, and is absent und
 - **Reading rhythm** (`prose.css`): callouts and top-level tables are `--panel` surfaces on a 1px
   hairline with 32px above and below; h2 carries a hairline and a mono counter; inline code sits on
   `--accent-soft`.
-- **Paintings** (public-domain Monet, credits in the footer): the only source of decorative colour.
-  A paper panel floating over a painting, painting-topped cards, a strip over the BoK index, the
-  closing band veiled with `--band`. Images ship optimised (`srcset`, lazy, `width`/`height`).
+- **Paintings** (public-domain Monet, `data/paintings.ts`, always through `<Painting>`): the only
+  source of decorative colour. A paper panel floating over a painting (`.mat`), painting-topped
+  cards and boxed images (`.paint`), a strip over the BoK index, the closing band veiled with
+  `--band` (CtaBand's `art` slot, a flat 74% veil). Both frames live in `effects.css`: the image
+  covers the box at `scale(1.06)` so no scanned frame edge shows, and a `::after` veil of `--band`
+  at `--veil` (0 in light, 0.22 in dark) keeps them from glaring on the dark ground. Every painting
+  is lazy, with `width`/`height` and a `sizes` that matches its slot; none is preloaded. Each one
+  carries a mono `.credit` (artist, title, year) beside it, and the footer colophon lists them all
+  as public domain with a link to `public/paintings/CREDITS.md`. Text never sits on a painting
+  without an opaque panel or a veil that holds 4.5:1.
+- **`.sw`** (`effects.css`), the 10px layer swatch (`.sw-1` to `.sw-5`, `.sw-none` for outside the
+  stack): the only form the layer colours take on the home. **`.tlink`**, the mono uppercase text
+  link in the accent, the one secondary control. **`.pill`** / **`.pill-accent`**, a mono tag.
+- **`.sec-body`** / **`.sec-foot`** (`effects.css`): blocks and link rows that start at the head's
+  text edge (column 4 of 12) from 900px.
 - **BookParts**, **CtaBand**, **ChapterHeader**, **type chips**: follow the rules above. Chips and
   type tags are neutral (`--line` border, `--ink-2` text); the five layer colours appear only as a
   swatch on an element that belongs to one layer.
@@ -231,6 +244,39 @@ needs no pause control; it also pauses while a step is active, and is absent und
   ground, blur, hairline or shadow, `--muted` re-scoped to `--ink-2`) until `.is-scrolled` (`ui.js`,
   >8px), when it falls back to the normal solid bar.
 
+### Home sequence
+
+`site/src/pages/index.astro`, under the unchanged hero. One 12-column grid; every section is a
+`<Section class="home-sec">` with the same padding below it, opened by a content-width 1px rule and
+the numbered mono label (Marketing's full-bleed rule is off on these). After any full-width block
+the next one is a `.split`: sub heading (Instrument Sans, `--fs-h3`), a short lede and `.tlink`s in
+columns 1 to 4, hairline rows in 5 to 12 (a 1px ink rule on top, `--line` between rows, a mono
+`.row-n` in the accent). Picture blocks and row blocks alternate; two picture blocks never touch.
+
+1. **01 The discipline**: the definition as lede; the governance loop (`GovernanceLoop`) as an
+   opaque paper panel on a painting mat (Charing Cross Bridge), lanes as columns split by
+   hairlines, paper steps on a 1px border with a mono tag and a swatch, thin ink wires with mono
+   labels, one hint line, the canvas from a 700px panel and the stacked list below it; then
+   "Three questions define the discipline." as a split (links: What is AI governance?, Open the
+   Body of Knowledge, See the open controls).
+2. **02 The stack** (`#stack`): four real artefacts (the AIP-07 Rego rule, an eval gate result,
+   an evidence record, a crosswalk slice) as paper panels on one mat (Misty Morning at Pourville)
+   with captions under it; "Build order." with the five layer rows (tagline, artefact chips,
+   Established or New pill); then `#where-it-operates`, three rows (Evals L3, Runtime L4,
+   Assurance L5) with their links, and `/controls` and `/frontier` in its head.
+3. **03 Body of Knowledge**: a 21:6 painting strip (Ice Floes) with its credit, then `BookParts`,
+   the five parts as an index of numbered hairline rows; title, ranges and counts from the data.
+4. **The verdict** (no number): a painting (A Cliff at Pourville) beside the verdict sentence in
+   Newsreader, one paragraph on the role and three `.tlink`s (/role, /path, /map).
+5. **04 What applies now** (`WhatAppliesNow`): announcement rows, mono date on the left and the
+   obligation with its linked clauses on the right.
+6. **05 Resources**: four painting-topped cards (Frameworks, Open controls, Obligation register,
+   MCP server; hover lift only) and the other eight references as numbered rows, both `.tiles`.
+7. **06 Follow the changes**: `NewsletterForm` on the left, `OpenWork` as announcement rows on the
+   right, then RSS, changelog and contribute links.
+8. **Closing band** (`CtaBand`): "Open, versioned, contributable." with the hero painting veiled
+   behind it; one button (Contribute on GitHub) and a mono secondary link (LinkedIn).
+
 ### Open reference primitives
 
 Shared by `/controls`, the control profiles, `/frontier`, `/research`, `/contribute` and `/cases`
@@ -254,8 +300,9 @@ Shared by `/controls`, the control profiles, `/frontier`, `/research`, `/contrib
   form for its `kind` (control, assumption, implementation, mapping, note, incident) with the
   title prefilled, plus a text link to `/contribute`. No heading. An `<aside aria-label>` by
   default; `landmark={false}` renders a `<div>` where the call repeats per record.
-- **`OpenWork`** (`OpenWork.astro`), `ol.work-list` from `data/work.ts`: title link, state with a
-  dot, version, date, one sentence; text in `--ink-2`, so it reads on any ground. Only true states.
+- **`OpenWork`** (`OpenWork.astro`), `ol.work-list` from `data/work.ts` as announcement rows: the
+  date in mono accent and the state with its version on the left, the title link and one sentence
+  on the right, hairlines between. Only true states.
 - **`ControlRecord`** (`ControlRecord.astro`), one control as `section.ctl[data-control]` with the
   anchor on its H2 (inside `.prose`, for the TOC) and the record as a `dl.cs-facts` (case-page
   style from `styles/harms.css`); the foot links the control's JSON

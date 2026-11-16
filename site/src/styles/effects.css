@@ -162,6 +162,23 @@
   margin-top: var(--s-6);
 }
 
+/* Body and foot rows that share the head's text edge (column 4 of 12) from
+   900px; full width below. */
+@media (min-width: 900px) {
+  .sec-body,
+  .sec-foot {
+    margin-left: calc((100% + var(--col-gap)) * 3 / 12);
+  }
+}
+
+/* A row of mono text links under a section. */
+.sec-foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-3) 28px;
+  margin-top: 40px;
+}
+
 .sec-link a {
   font-family: var(--font-mono);
   font-size: var(--fs-small);
@@ -328,4 +345,121 @@
 .hero--page,
 .hero--field {
   --muted: var(--ink-2);
+}
+
+/* ------------------------------------------------- Swatches, links, pills */
+
+/* Layer swatch: the only place the five layer colours appear, a 10px square
+   with a hairline in the layer ink. .sw-none is an empty square (outside the
+   stack: the law, the auditor). */
+.sw {
+  display: inline-block;
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--sw);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sw-ink) 40%, transparent);
+}
+.sw-1 { --sw: var(--l1); --sw-ink: var(--l1-ink); }
+.sw-2 { --sw: var(--l2); --sw-ink: var(--l2-ink); }
+.sw-3 { --sw: var(--l3); --sw-ink: var(--l3-ink); }
+.sw-4 { --sw: var(--l4); --sw-ink: var(--l4-ink); }
+.sw-5 { --sw: var(--l5); --sw-ink: var(--l5-ink); }
+.sw-none {
+  --sw: transparent;
+  box-shadow: inset 0 0 0 1px var(--ink-2);
+}
+
+/* Mono text link: the one secondary control style. */
+.tlink {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--accent-line);
+  text-underline-offset: 0.35em;
+}
+.tlink:hover {
+  text-decoration-color: currentColor;
+}
+
+/* Pill: a mono tag on a hairline; .pill-accent on the accent wash. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.pill-accent {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------- Painting frames */
+
+/* A painting in a box (.paint) or behind a paper panel (.mat). The <img>
+   (Painting.astro) covers the box and is scaled 6% so the frame edge some
+   scans carry never shows; the ::after veil is 0 in light and --veil of the
+   band colour in dark, so no painting glares on the dark ground. */
+.paint,
+.mat {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--r-blk);
+  background: var(--line);
+}
+.paint > img,
+.mat > img {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  transform: scale(1.06);
+}
+.paint::after,
+.mat::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--band) calc(var(--veil) * 100%), transparent);
+}
+
+/* The mono credit beside every painting: title and year. */
+.credit {
+  margin: 10px 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+@media (forced-colors: active) {
+  .paint > img,
+  .mat > img,
+  .paint::after,
+  .mat::after {
+    display: none;
+  }
 }

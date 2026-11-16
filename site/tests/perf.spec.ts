@@ -67,6 +67,22 @@ test.describe('home hero image', () => {
     expect(widths).toEqual([1200, 1600, 1920, 2400]);
   });
 
+  test('the paintings under the hero load lazily, declare their size and are not preloaded', () => {
+    const html = read('index.html');
+    const imgs = html.match(/<img\b[^>]*class="painting[^"]*"[^>]*>/g) ?? [];
+    expect(imgs.length).toBeGreaterThanOrEqual(8);
+    for (const img of imgs) {
+      expect(img, img).toContain('loading="lazy"');
+      expect(img, img).toMatch(/\bwidth="\d+"/);
+      expect(img, img).toMatch(/\bheight="\d+"/);
+      expect(img, img).toMatch(/\bsizes="[^"]+"/);
+    }
+    // The one image preload is the hero's.
+    const preloads = html.match(/<link\b[^>]*rel="preload"[^>]*as="image"[^>]*>/g) ?? [];
+    expect(preloads).toHaveLength(1);
+    expect(preloads[0]).not.toContain('/paintings/');
+  });
+
   test('a 1920px window at DPR 1 takes the 1920w file, not the 2400w', async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
     const page = await context.newPage();

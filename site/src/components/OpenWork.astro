@@ -1,10 +1,10 @@
 ---
 /**
- * OpenWork: the project's open work (src/data/work.ts) as an ordered list: the
- * artefact linked, its state with a dot, its version, one sentence and the
- * date it last changed. Every state is the real one; nothing is shown as
- * reviewed or published before it is. Text in --ink-2, so the list reads on a
- * plain, tinted or mesh ground.
+ * OpenWork: the project's open work (src/data/work.ts) as announcement rows:
+ * the date it last changed and its state (with the version) in mono on the
+ * left, the artefact linked and one sentence on the right, hairlines between.
+ * Every state is the real one; nothing is shown as reviewed or published
+ * before it is. Used on the home and on /about.
  */
 import { work as allWork, WORK_STATUS_LABEL, workProblems, type WorkItem } from '../data/work';
 import { formatDate } from '../lib/applies-now';
@@ -26,24 +26,21 @@ const { items = allWork } = Astro.props;
   {
     items.map((item) => (
       <li class="work-item" data-status={item.status}>
-        <a class="work-title" href={item.href}>
-          {item.title}
-        </a>
         <p class="work-meta">
-          <span class="work-dot" aria-hidden="true" />
-          <span>{WORK_STATUS_LABEL[item.status]}</span>
-          {item.version && (
-            <>
-              <span aria-hidden="true">·</span>
-              <span>v{item.version}</span>
-            </>
-          )}
-          <span aria-hidden="true">·</span>
-          <span>
-            Updated <time datetime={item.updated}>{formatDate(item.updated)}</time>
+          <time class="work-date" datetime={item.updated}>
+            {formatDate(item.updated)}
+          </time>
+          <span class="work-state">
+            {WORK_STATUS_LABEL[item.status]}
+            {item.version && <> · v{item.version}</>}
           </span>
         </p>
-        <p class="work-note">{item.note}</p>
+        <div class="work-body">
+          <a class="work-title" href={item.href}>
+            {item.title}
+          </a>
+          <p class="work-note">{item.note}</p>
+        </div>
       </li>
     ))
   }
@@ -51,71 +48,68 @@ const { items = allWork } = Astro.props;
 
 <style>
   .work-list {
-    display: grid;
-    gap: 0;
     margin: 0;
     padding: 0;
     list-style: none;
+    border-top: 1px solid var(--line);
   }
 
   .work-item {
     display: grid;
-    gap: var(--s-1);
-    padding: var(--s-3) 0;
-    border-top: 1px solid var(--line);
-  }
-
-  .work-item:last-child {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--s-2) 32px;
+    margin: 0;
+    padding: 20px 0;
     border-bottom: 1px solid var(--line);
   }
 
-  .work-title {
-    font-weight: 600;
-    color: var(--ink);
-    text-decoration: underline;
-    text-decoration-color: var(--line);
-    text-underline-offset: 0.18em;
-  }
-
-  .work-title:hover {
-    text-decoration-color: currentColor;
+  @media (min-width: 720px) {
+    .work-item {
+      grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+      align-items: baseline;
+    }
   }
 
   .work-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s-1) var(--s-2);
+    display: grid;
+    gap: var(--s-1);
     margin: 0;
     font-family: var(--font-mono);
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .work-date {
+    font-size: 0.8125rem;
+    color: var(--accent);
+  }
+
+  .work-state {
     font-size: var(--fs-label);
-    color: var(--ink-2);
+    color: var(--muted);
   }
 
-  .work-dot {
-    flex: none;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--l4-ink);
+  .work-title {
+    font-size: 1.125rem;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--line-strong);
+    text-underline-offset: 0.2em;
   }
 
-  .work-item[data-status='in-review'] .work-dot {
-    background: var(--l1-ink);
-  }
-
-  .work-item[data-status='in-progress'] .work-dot {
-    background: var(--l2-ink);
-  }
-
-  .work-item[data-status='planned'] .work-dot {
-    background: transparent;
-    border: 1px solid var(--ink-2);
+  .work-title:hover {
+    color: var(--accent);
+    text-decoration-color: currentColor;
   }
 
   .work-note {
-    margin: 0;
+    margin: 6px 0 0;
     font-size: var(--fs-small);
+    line-height: 1.55;
     color: var(--ink-2);
   }
 </style>
