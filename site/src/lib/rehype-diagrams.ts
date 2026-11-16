@@ -38,6 +38,7 @@ import {
 } from '../data/diagrams';
 import { figures, figuresForChapter, type FigureDef } from '../data/figures';
 import { diagramIds, renderDiagramFigure } from './diagrams';
+import { FIGURE_LABEL } from './figure-reuse';
 import { classifyFile } from './i18n-content';
 
 // The hand-made infographic SVGs live under site/src/figures, resolved from the
@@ -165,6 +166,7 @@ function renderFigureFigure(def: FigureDef): string {
     `<figure class="figure figure--infographic${poster ? ' figure--poster' : ''}" id="figure-${def.id}" data-figure="${def.id}">` +
     canvas +
     `<figcaption class="figure-figcaption">` +
+    `<span class="figure-fig-label" data-pagefind-ignore>${FIGURE_LABEL[def.kind ?? 'infographic']}</span>` +
     `<span class="figure-fig-title">${escapeHtml(def.title)}</span>` +
     `<span class="figure-fig-desc">${escapeHtml(def.caption)}</span>` +
     `<a class="figure-permalink${poster ? ' figure-poster-link' : ''}" href="/figures/${def.id}">${permalinkText}</a>` +

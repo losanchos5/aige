@@ -1,9 +1,16 @@
 ---
-// SidebarNav: the chapter rail. The Thesis on top, then every BoK chapter with
-// its mono two-digit index, grouped under a caption per part of the book (from
-// data/parts.ts). The active row carries aria-current and shows a neutral ink
-// tick. No per-row layer colour: chapters are not layers (SL-06).
-import { bookParts, chapterNum } from '../data/parts';
+// SidebarNav: the reading rail. The search button, a lead link (the Thesis, or
+// the nav group's landing page), then numbered modules: by default the five
+// parts of the Body of Knowledge (data/parts.ts), or, with `group`, the one
+// module of a nav.ts group (Reference for the research notes, Practice for the
+// controls, About, For you). Each module is a <details> with a large mono
+// number, its title and its range over a tree of rows: a 1px rail with a tick
+// per row and an L at the last one. The current row carries aria-current and
+// shows a soft accent fill, a 1px ring and a heavier weight (never colour
+// alone). Book rows keep the per-chapter reading register (.nav-track), which
+// ui-doc.js fills as the chapter is read.
+import { bookParts, chapterNum, formatRange } from '../data/parts';
+import { nav, type NavGroup } from '../data/nav';
 import { translator, type UiKey } from '../i18n/ui';
 
 interface Props {
@@ -15,127 +22,163 @@ interface Props {
   links?: Record<string, { href: string; label: string }>;
   /** The Thesis link (default /thesis). */
   thesisHref?: string;
+  /** Render this nav.ts group instead of the book's parts. */
+  group?: NavGroup['id'];
 }
 
-const { activeSlug, activeThesis = false, lang = 'en', links, thesisHref = '/thesis' } = Astro.props;
+const { activeSlug, activeThesis = false, lang = 'en', links, thesisHref = '/thesis', group } = Astro.props;
 const t = translator(lang);
 // On a translated page an English chapter title is marked as English.
 const englishLang = lang === 'en' ? undefined : 'en';
+
+interface Row {
+  href: string;
+  num: string;
+  label: string;
+  lang?: string;
+  slug?: string;
+  current: boolean;
+}
+interface Module {
+  key: string;
+  num: string;
+  title: string;
+  range: string;
+  open: boolean;
+  rows: Row[];
+}
+
+let label: string;
+let lead: { href: string; label: string; current: boolean } | undefined;
+let modules: Module[];
+
+const navGroup = group ? nav.find((g) => g.id === group) : undefined;
+if (group && !navGroup) throw new Error(`SidebarNav: no nav group "${group}"`);
+
+if (navGroup) {
+  // The static build renders /about as /about.html; compare without either suffix.
+  const here = Astro.url.pathname.replace(/(\.html|\/)$/, '') || '/';
+  const owns = (href: string) => here === href || here.startsWith(`${href}/`);
+  const items = navGroup.items.filter((item) => !item.external && item.placement !== 'footer');
+  label = navGroup.label;
+  lead = navGroup.href ? { href: navGroup.href, label: navGroup.label, current: here === navGroup.href } : undefined;
+  modules = [
+    {
+      key: navGroup.id,
+      num: chapterNum(nav.indexOf(navGroup) + 1),
+      title: navGroup.label,
+      range: formatRange(items.map((_, i) => i + 1)),
+      open: true,
+      rows: items.map((item, i) => ({
+        href: item.href,
+        num: chapterNum(i + 1),
+        label: item.label,
+        current: owns(item.href),
+      })),
+    },
+  ];
+} else {
+  label = t('sidebar.chapters');
+  lead = { href: thesisHref, label: t('sidebar.thesis'), current: activeThesis };
+  modules = bookParts.map((part, i) => {
+    const rows = part.chapters.map((chapter) => ({
+      href: links?.[chapter.slug]?.href ?? `/bok/${chapter.slug}`,
+      num: chapterNum(chapter.order),
+      label: links?.[chapter.slug]?.label ?? chapter.shortTitle,
+      lang: links?.[chapter.slug] ? undefined : englishLang,
+      slug: chapter.slug,
+      current: activeSlug === chapter.slug,
+    }));
+    return {
+      key: part.id,
+      num: chapterNum(i + 1),
+      title: t(`part.${part.id}` as UiKey),
+      range: part.range,
+      open: rows.some((row) => row.current),
+      rows,
+    };
+  });
+}
 ---
 
-<nav class="sidebar-nav" aria-label={t('sidebar.chapters')}>
-  <span class="nav-rail" data-nav-rail aria-hidden="true"></span>
-
-  <div class="sidebar-tools">
-    <button
-      type="button"
-      class="sidebar-search"
-      data-search-open
-      data-umami-event="search-open"
-      data-umami-event-location="sidebar"
-    >
-      <span>{t('sidebar.search')}</span>
-      <kbd>Ctrl K</kbd>
-    </button>
-  </div>
-
-  <a
-    href={thesisHref}
-    class="nav-item nav-thesis"
-    aria-current={activeThesis ? 'page' : undefined}
+<nav class="sidebar-nav" aria-label={label}>
+  <button
+    type="button"
+    class="sidebar-search"
+    data-search-open
+    data-umami-event="search-open"
+    data-umami-event-location="sidebar"
   >
-    <span class="nav-num">§</span>
-    <span class="nav-title">{t('sidebar.thesis')}</span>
-  </a>
+    <span class="ss-glyph" aria-hidden="true">&gt;</span>
+    <span class="ss-text">{t('sidebar.search')}</span>
+    <kbd>Ctrl K</kbd>
+  </button>
 
-  <p class="nav-label">{t('sidebar.bok')}</p>
   {
-    bookParts.map((part) => (
-      <Fragment>
-        <p class="nav-part" id={`sb-part-${part.id}`}>
-          {t(`part.${part.id}` as UiKey)} <span class="nav-part-range">{part.range}</span>
-        </p>
-        <ol class="nav-list" aria-labelledby={`sb-part-${part.id}`}>
-          {part.chapters.map((chapter) => (
+    lead && (
+      <a href={lead.href} class="rail-link" aria-current={lead.current ? 'page' : undefined}>
+        <span>{lead.label}</span>
+        <span aria-hidden="true">→</span>
+      </a>
+    )
+  }
+
+  {
+    modules.map((m) => (
+      <details class="part" open={m.open}>
+        <summary>
+          <span class="pn" id={`sb-${m.key}-n`}>{m.num}</span>
+          <span class="part-title" id={`sb-${m.key}-t`}>{m.title}</span>
+          <span class="pr" id={`sb-${m.key}-r`}>{m.range}</span>
+          <span class="chev" aria-hidden="true" />
+        </summary>
+        <ol class="tree" aria-labelledby={`sb-${m.key}-n sb-${m.key}-t sb-${m.key}-r`}>
+          {m.rows.map((row) => (
             <li>
               <a
-                href={links?.[chapter.slug]?.href ?? `/bok/${chapter.slug}`}
+                href={row.href}
                 class="nav-item"
-                data-chapter-slug={chapter.slug}
-                aria-current={activeSlug === chapter.slug ? 'page' : undefined}
+                data-chapter-slug={row.slug}
+                aria-current={row.current ? 'page' : undefined}
               >
-                <span class="nav-track" aria-hidden="true">
-                  <span class="nav-fill" />
-                </span>
-                <span class="nav-num">{chapterNum(chapter.order)}</span>
-                {links?.[chapter.slug] ? (
-                  <span class="nav-title">{links[chapter.slug].label}</span>
-                ) : (
-                  <span class="nav-title" lang={englishLang}>{chapter.shortTitle}</span>
+                {row.slug && (
+                  <span class="nav-track" aria-hidden="true">
+                    <span class="nav-fill" />
+                  </span>
                 )}
+                <span class="nav-num">{row.num}</span>
+                <span class="nav-title" lang={row.lang}>{row.label}</span>
               </a>
             </li>
           ))}
         </ol>
-      </Fragment>
+      </details>
     ))
   }
 </nav>
 
 <style>
   .sidebar-nav {
-    position: relative;
-    font-size: 0.9375rem;
-    /* Absorb the rows' negative inline margins (their active/hover fill bleeds
-       to the rail edge) so nothing extends past the nav box and forces a
-       horizontal scrollbar on the sticky sidebar. */
-    padding-inline: var(--s-2);
+    font-size: var(--fs-small);
   }
 
-  /* A single accent that ui-doc.js slides onto the current row (mirrors the TOC
-     marker). Sits at the rows' left bleed edge (x=0 of the nav's border box, so
-     it never widens the box: layout.spec forbids horizontal overflow here) and
-     takes the current layer's ink. Transform and background are set by JS
-     (translateY to the row, scaleY to its height over this box's height), so it
-     moves without animating layout; with no JS it stays at scaleY(0) and the
-     active row's fill carries the state. */
-  .nav-rail {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 2px;
-    height: var(--s-6);
-    border-radius: 2px;
-    background: var(--ink);
-    box-shadow: 0 0 6px color-mix(in srgb, var(--ink) 35%, transparent);
-    transform: scaleY(0);
-    transform-origin: top;
-    pointer-events: none;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .nav-rail {
-      transition: transform var(--dur) var(--ease);
-    }
-  }
-
-  .sidebar-tools {
-    margin-bottom: var(--s-4);
-  }
-
+  /* The search opener, drawn as the mockup's mono field: a prompt glyph, the
+     label and the shortcut. It opens the site search dialog (Base). */
   .sidebar-search {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--s-3);
+    gap: var(--s-2);
     width: 100%;
-    padding: var(--s-2) var(--s-3);
-    border: 1px solid var(--line);
-    border-radius: var(--r-sm);
-    background: var(--surface);
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-ctl);
+    background: transparent;
     color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    text-align: left;
     cursor: pointer;
-    font-size: var(--fs-small);
     transition: border-color var(--dur) var(--ease);
   }
 
@@ -144,80 +187,212 @@ const englishLang = lang === 'en' ? undefined : 'en';
     color: var(--ink);
   }
 
+  .ss-glyph {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .ss-text {
+    flex: 1;
+  }
+
   .sidebar-search kbd {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    padding: 2px 6px;
-    border: 1px solid var(--line);
-    border-radius: var(--r-sm);
-  }
-
-  /* Section kicker: the site's label register (mono, --fs-label, label
-     tracking) in --ink-2, matching the TOC's "On this page" label. */
-  .nav-label {
-    margin: var(--s-5) 0 var(--s-3);
-    font-family: var(--font-mono);
+    padding: 1px 6px;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    font: inherit;
     font-size: var(--fs-label);
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
-    color: var(--ink-2);
   }
 
-  .nav-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* One caption per part of the book, naming the list under it: sentence-case
-     mono in --ink-2 (never --muted), the chapter range beside it. */
-  .nav-part {
-    margin: var(--s-4) 0 var(--s-1);
+  .rail-link {
+    display: flex;
+    justify-content: space-between;
+    margin: var(--s-4) 0 var(--s-2);
+    padding: 10px;
+    border-radius: var(--r-ctl);
     font-family: var(--font-mono);
     font-size: var(--fs-label);
     font-weight: 600;
-    color: var(--ink-2);
-  }
-
-  .nav-label + .nav-part {
-    margin-top: 0;
-  }
-
-  .nav-part-range {
-    font-weight: 400;
-  }
-
-  /* --layer-ink is the row's accent, used by the hover tint and copied onto the
-     rail by ui-doc.js when the row is current. Neutral on every row: the rail
-     rotated the five layer inks by index, which read as a layer code. */
-  .nav-item {
-    --layer-ink: var(--ink-2);
-    position: relative;
-    display: flex;
-    align-items: baseline;
-    gap: var(--s-3);
-    padding: var(--s-2) var(--s-2) var(--s-2) var(--s-3);
-    margin-inline: calc(var(--s-2) * -1);
-    border-radius: var(--r-sm);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink);
     text-decoration: none;
+  }
+
+  .rail-link:hover {
+    background: var(--hover);
+    color: var(--accent);
+  }
+
+  .rail-link[aria-current='page'] {
+    background: var(--accent-soft);
+    box-shadow: inset 0 0 0 1px var(--accent-line);
+    color: var(--accent);
+  }
+
+  /* One module per part: large mono number in the accent, mono title, range. */
+  .part {
+    border-top: 1px solid var(--line);
+  }
+
+  .part summary {
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: var(--s-2);
+    padding: 14px 10px 14px 0;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .part summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .pn {
+    font-family: var(--font-mono);
+    font-size: 1.375rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  .part-title {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    line-height: 1.35;
     color: var(--ink-2);
+  }
+
+  .part[open] .part-title,
+  .part summary:hover .part-title {
+    color: var(--ink);
+  }
+
+  .part:has([aria-current='page']) .part-title {
+    color: var(--accent);
+  }
+
+  .pr {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--muted);
+  }
+
+  /* Open or closed is shown by shape, not colour alone: the chevron points
+     right when closed and down when open. */
+  .chev {
+    width: 7px;
+    height: 7px;
+    margin: 0 2px 0 4px;
+    border-right: 1.5px solid var(--ink-2);
+    border-bottom: 1.5px solid var(--ink-2);
+    transform: rotate(-45deg);
+  }
+
+  .part[open] .chev {
+    transform: rotate(45deg);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .chev {
+      transition: transform var(--dur) var(--ease);
+    }
+  }
+
+  /* The tree: a 1px rail down every row (half a row on the last, the L) and a
+     tick into each row. */
+  .tree {
+    margin: 0 0 14px 11px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tree li {
+    position: relative;
+    margin: 0;
+    padding-left: 16px;
+  }
+
+  .tree li::before,
+  .tree li::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    background: var(--line-strong);
+  }
+
+  .tree li::before {
+    top: 0;
+    bottom: 0;
+    width: 1px;
+  }
+
+  .tree li:last-child::before {
+    bottom: 50%;
+  }
+
+  .tree li::after {
+    top: 50%;
+    width: 10px;
+    height: 1px;
+  }
+
+  .nav-item {
+    display: grid;
+    grid-template-columns: 1.9rem minmax(0, 1fr);
+    gap: var(--s-1);
+    padding: 6px 10px;
+    border-radius: var(--r-ctl);
+    line-height: 1.4;
+    color: var(--ink-2);
+    text-decoration: none;
     transition:
       color var(--dur) var(--ease),
       background-color var(--dur) var(--ease);
   }
 
+  .nav-num {
+    padding-top: 1px;
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    color: var(--muted);
+  }
 
-  /* Reading "register": a 3px track per chapter row. The current page fills as
-     it is read; chapters marked read in localStorage show a muted full bar. */
+  .nav-item:hover {
+    background: var(--hover);
+    color: var(--accent);
+  }
+
+  .nav-item:hover .nav-num,
+  .nav-item[aria-current='page'] .nav-num {
+    color: var(--accent);
+  }
+
+  .nav-item[aria-current='page'] {
+    background: var(--accent-soft);
+    box-shadow: inset 0 0 0 1px var(--accent-line);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* Reading register: the row's stretch of the rail, positioned on the <li>
+     (the link is not a containing block). The current chapter fills in the
+     accent as it is read; chapters marked read in localStorage show it full. */
   .nav-track {
     position: absolute;
-    left: var(--s-1);
-    top: var(--s-1);
-    bottom: var(--s-1);
-    width: 3px;
-    border-radius: 2px;
-    background: color-mix(in srgb, var(--ink) 8%, transparent);
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
     overflow: hidden;
+  }
+
+  .tree li:last-child .nav-track {
+    bottom: 50%;
   }
 
   .nav-fill {
@@ -226,7 +401,7 @@ const englishLang = lang === 'en' ? undefined : 'en';
     height: 100%;
     transform: scaleY(var(--np, 0));
     transform-origin: top;
-    background: var(--ink);
+    background: var(--accent);
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -239,44 +414,4 @@ const englishLang = lang === 'en' ? undefined : 'en';
     transform: scaleY(1);
     background: var(--muted);
   }
-
-  .nav-item:hover {
-    color: var(--ink);
-    background: color-mix(in srgb, var(--layer-ink) 10%, transparent);
-  }
-
-  /* On the tinted hover fill --muted drops under AA; step the index up to
-     --ink-2 there (the same re-scope every non-flat surface gets). */
-  .nav-item:hover .nav-num {
-    color: var(--ink-2);
-  }
-
-  .nav-num {
-    flex: none;
-    width: 1.75rem;
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    color: var(--muted);
-  }
-
-  .nav-title {
-    line-height: 1.3;
-  }
-
-  .nav-thesis {
-    --layer-ink: var(--ink);
-    font-family: var(--font-display);
-    font-weight: 600;
-    color: var(--ink);
-  }
-
-  /* The current row: a soft fill and heavier weight (the no-JS active state);
-     the sliding .nav-rail is layered on top when JS runs. */
-  .nav-item[aria-current='page'] {
-    color: var(--ink);
-    font-weight: 600;
-    background: var(--surface);
-  }
-
-  .nav-item[aria-current='page'] .nav-num { color: var(--ink); }
 </style>

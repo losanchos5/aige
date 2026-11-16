@@ -5,7 +5,8 @@
  * (photo, name linked to /about with rel="author", LinkedIn button, title)
  * with the dates the page already knows, in <time datetime>, after the title.
  * Chapters carry the same badge through ChapterHeader. English only: the
- * reference pages it sits on are English. The <p class="byline" data-byline>
+ * reference pages it sits on are English. The badge sits in its painting mat
+ * (AuthorBadge `framed`). The <p class="byline" data-byline>
  * wrapper is what the SEO tests and crawlers key on, so it stays.
  */
 import AuthorBadge from './AuthorBadge.astro';
@@ -23,7 +24,7 @@ const { date, dateLabel = 'Updated', published } = Astro.props;
 ---
 
 <p class="byline" data-byline>
-  <AuthorBadge placement="byline">
+  <AuthorBadge placement="byline" framed>
     {
       date && (
         <span>

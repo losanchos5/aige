@@ -1,194 +1,53 @@
-/* effects.css: the Editorial+ depth layer. Every value comes from a token in
+/* effects.css: the editorial-restraint surface layer. One paper ground with a
+   faint grain, flat opaque panels on 1px hairlines, one accent, no resting
+   shadow, no gradient mesh, glow or ring. Every value comes from a token in
    tokens.css so light and dark both follow, and every decorative surface is
-   inert (aria-hidden in markup, pointer-events:none here). No `filter: blur()`
-   anywhere: the mesh reads soft because its gradient stops are soft, and it
-   only drifts via translate/scale under prefers-reduced-motion: no-preference.
-   Imported after utilities.css so it can layer on the flat base. */
+   inert (aria-hidden in markup, pointer-events:none here). Imported after
+   utilities.css so it can layer on the flat base. */
 
-/* ---------------------------------------------------------------- Backgrounds */
+/* ---------------------------------------------------------------- Page grain */
 
-/* Gradient mesh: five soft radial glows split across two pseudo-elements that
-   drift slowly. Absolute, contained and inert; the host clips the overflow.
-   Each glow's colour and centre is a custom property, so a section can pick a
-   composition: the default (a) is the role section's, which drifts; b mirrors
-   it and c turns it around, and both stay still, as does any mesh laid over a
-   tint band (one drifting mesh per screen is enough, and a still one is a
-   single paint). --mesh-k scales the strength per section (Section's meshK). */
-.bg-mesh {
-  --m1: var(--glow-1);
-  --m1-at: 15% 20%;
-  --m2: var(--glow-3);
-  --m2-at: 82% 15%;
-  --m3: var(--glow-5);
-  --m3-at: 58% 88%;
-  --m4: var(--glow-4);
-  --m4-at: 86% 68%;
-  --m5: var(--glow-2);
-  --m5-at: 22% 82%;
-  position: absolute;
+/* Single-tone fractal noise on a fixed layer under all content (Base.astro
+   renders it, aria-hidden). z-index -1 paints above the canvas ground and below
+   every box, so opaque grounds (the hero painting, the dark band, panels) cover
+   it and it never sits on the painting. Light multiplies the paper about 3%
+   darker; dark screens it about as much lighter. The CSP allows data: images. */
+.page-grain {
+  position: fixed;
   inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  contain: strict;
-  opacity: calc(var(--mesh-alpha) * var(--mesh-k, 1));
+  z-index: -1;
   pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  mix-blend-mode: var(--grain-blend);
+  opacity: var(--grain-opacity);
 }
 
-.bg-mesh--b {
-  --m1-at: 84% 22%;
-  --m2-at: 16% 14%;
-  --m3-at: 40% 90%;
-  --m4-at: 12% 66%;
-  --m5-at: 80% 84%;
-}
-
-.bg-mesh--c {
-  --m1: var(--glow-4);
-  --m1-at: 78% 82%;
-  --m2: var(--glow-2);
-  --m2-at: 20% 16%;
-  --m3: var(--glow-1);
-  --m3-at: 46% 10%;
-  --m4: var(--glow-3);
-  --m4-at: 12% 74%;
-  --m5: var(--glow-5);
-  --m5-at: 88% 30%;
-}
-
-/* d and e: two more still compositions, so the chapter headers of the five
-   parts of the book (ChapterHeader) and longer runs of mesh bands never repeat
-   a neighbour. d leans cool (blue, sage, lime), e warm (peach, rose). */
-.bg-mesh--d {
-  --m1: var(--glow-2);
-  --m1-at: 10% 30%;
-  --m2: var(--glow-1);
-  --m2-at: 70% 8%;
-  --m3: var(--glow-5);
-  --m3-at: 92% 70%;
-  --m4: var(--glow-1);
-  --m4-at: 40% 96%;
-  --m5: var(--glow-4);
-  --m5-at: 60% 50%;
-}
-
-.bg-mesh--e {
-  --m1: var(--glow-4);
-  --m1-at: 90% 18%;
-  --m2: var(--glow-3);
-  --m2-at: 30% 8%;
-  --m3: var(--glow-4);
-  --m3-at: 12% 86%;
-  --m4: var(--glow-2);
-  --m4-at: 78% 92%;
-  --m5: var(--glow-1);
-  --m5-at: 48% 46%;
-}
-
-.bg-mesh::before,
-.bg-mesh::after {
-  content: '';
-  position: absolute;
-  inset: -20%;
-  background-repeat: no-repeat;
-}
-
-.bg-mesh::before {
-  background-image:
-    radial-gradient(40% 50% at var(--m1-at), var(--m1), transparent 70%),
-    radial-gradient(45% 55% at var(--m2-at), var(--m2), transparent 70%),
-    radial-gradient(52% 52% at var(--m3-at), var(--m3), transparent 72%);
-}
-
-.bg-mesh::after {
-  background-image:
-    radial-gradient(42% 46% at var(--m4-at), var(--m4), transparent 70%),
-    radial-gradient(46% 50% at var(--m5-at), var(--m5), transparent 72%);
-}
-
-/* A section's mesh fades out over its top and bottom tenth, so two mesh
-   sections in a row (or a mesh next to the page ground) meet without a seam. */
-.sec > .bg-mesh {
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 10%, #000 90%, transparent);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .bg-mesh:not(.bg-mesh--b, .bg-mesh--c, .bg-mesh--d, .bg-mesh--e, .bg-mesh--still, .sec--tint > *)::before {
-    animation: mesh-drift-a 34s ease-in-out infinite alternate;
-  }
-  .bg-mesh:not(.bg-mesh--b, .bg-mesh--c, .bg-mesh--d, .bg-mesh--e, .bg-mesh--still, .sec--tint > *)::after {
-    animation: mesh-drift-b 42s ease-in-out infinite alternate;
-  }
-
-  @keyframes mesh-drift-a {
-    from {
-      translate: -2% -1%;
-      scale: 1;
-    }
-    to {
-      translate: 2% 1%;
-      scale: 1.06;
-    }
-  }
-
-  @keyframes mesh-drift-b {
-    from {
-      translate: 1% 2%;
-      scale: 1.04;
-    }
-    to {
-      translate: -1% -2%;
-      scale: 1;
-    }
+@media print {
+  .page-grain {
+    display: none;
   }
 }
 
 /* --------------------------------------------------------------------- Cards */
 
-/* Luminous card, flat: a 1px --line hairline on the --surface fill and no
-   resting shadow; a gradient border ring fades in on hover/focus-within.
-   isolation keeps the ring's stacking local. */
+/* Flat panel card: the opaque --panel surface on a 1px --line hairline, no
+   resting shadow and no ring. */
 .card-lum {
   position: relative;
-  isolation: isolate;
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
-  background: var(--surface);
+  background: var(--panel);
   transition:
     box-shadow var(--dur) var(--ease),
     border-color var(--dur) var(--ease);
 }
 
-.card-lum::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: var(--grad-border);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity var(--dur) var(--ease);
-  pointer-events: none;
-}
-
-.card-lum:hover::before,
-.card-lum:focus-within::before {
-  opacity: 1;
-}
-
 /* Hover lift, for cards that are links only (an <a>, or a .card-link the
-   caller opts into): a 3px rise, plus the --shadow-2 elevation on .card-lum.
-   A non-link card that carries .lift stays flat. Motion only; border-color
-   rides along so a card that tints its border on hover keeps all three
-   transitions without re-declaring the list. */
+   caller opts into): a 3px rise, plus the --lift shadow on .card-lum (the only
+   shadow the system allows, and only on hover). A non-link card that carries
+   .lift stays flat. border-color rides along so a card that tints its border
+   on hover keeps all three transitions without re-declaring the list. */
 @media (prefers-reduced-motion: no-preference) {
   :is(a, .card-link).lift {
     transition:
@@ -200,25 +59,24 @@
     transform: translateY(-3px);
   }
   :is(a, .card-link).card-lum.lift:hover {
-    box-shadow: var(--shadow-2);
+    box-shadow: var(--lift);
   }
 }
 
 /* --------------------------------------------------------------------- Button */
 
-/* Gradient CTA: composes with .btn/.btn-primary. The ink-derived gradient fill
-   alone carries the weight (no coloured halo); the label keeps --bg over it
-   (same as .btn-primary). Hover is a 1px lift. */
+/* Primary CTA: composes with .btn/.btn-primary. A flat fill in the one accent;
+   hover is a 1px lift. */
 .btn-glow {
-  background: var(--grad-cta);
-  border-color: transparent;
-  color: var(--bg);
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .btn-glow:hover {
-    background: var(--grad-cta);
-    border-color: transparent;
+    background: var(--accent);
+    border-color: var(--accent);
     transform: translateY(-1px);
   }
 }
@@ -248,21 +106,56 @@
 }
 
 /* ------------------------------------------------------------- Section heads */
-/* The head Section.astro renders (title + lede) and the trailing .sec-link
-   row, global so every landing page shares them. */
+/* The one section head Section.astro renders: a mono numbered label, a
+   Newsreader title in the accent and a lede; plus the trailing .sec-link row.
+   Global so every landing page shares them. From 900px, a head with a label
+   sets it in columns 1 to 3 and the title and lede from column 4. */
 .sec-head {
   max-width: 62ch;
   margin-bottom: var(--s-6);
 }
 
+.sec-head > .label {
+  margin-bottom: var(--s-4);
+}
+
 .sec-title {
-  font-size: var(--fs-h2);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-h2-display);
+  line-height: 1.06;
+  letter-spacing: -0.012em;
+  color: var(--accent);
   max-width: 22ch;
-  margin: var(--s-3) 0 0;
+  margin: 0;
+  /* The display size doubles at 200% text: a long word ("contributable")
+     breaks instead of pushing a phone page sideways (WCAG 1.4.4). */
+  overflow-wrap: anywhere;
 }
 
 .sec-lede {
-  margin-top: var(--s-4);
+  margin-top: var(--s-5);
+  font-size: var(--fs-lede);
+  line-height: 1.55;
+  max-width: 62ch;
+  text-wrap: pretty;
+}
+
+@media (min-width: 900px) {
+  .sec-head--labelled {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    max-width: none;
+  }
+  .sec-head--labelled > .label {
+    grid-column: 1 / 4;
+    margin: 0;
+    padding-top: 0.9rem;
+  }
+  .sec-head--labelled > :is(.sec-title, .sec-lede) {
+    grid-column: 4 / 12;
+  }
 }
 
 .sec-link {
@@ -353,8 +246,9 @@
 
 /* ------------------------------------------------------ Section tones (Section.astro) */
 
-/* Every Section is a positioning context; its background layers sit at z-index
-   0 and the content wrapper at 1. */
+/* Every Section is a positioning context; the content wrapper sits at 1. Plain
+   sections are transparent, so the page grain shows; only the closing band is
+   dark. */
 .sec {
   position: relative;
 }
@@ -368,36 +262,30 @@
   max-width: 1360px;
 }
 
-.sec--tint {
-  background: var(--tint-bg);
-  /* Muted text drops below AA on the tint (as on .sec--dark): re-scope it.
-     Lives here, not in pages.css, so the home page gets it too. */
-  --muted: var(--ink-2);
-}
-
-/* A tint band in one tone (Section `hue`): a stronger, coloured ground than the
-   default pale blue, so consecutive bands read as distinct rooms. */
-.sec--tint[data-hue='l1'] { --tint-bg: var(--tint-l1); }
-.sec--tint[data-hue='l2'] { --tint-bg: var(--tint-l2); }
-.sec--tint[data-hue='l3'] { --tint-bg: var(--tint-l3); }
-.sec--tint[data-hue='l4'] { --tint-bg: var(--tint-l4); }
-.sec--tint[data-hue='l5'] { --tint-bg: var(--tint-l5); }
-
-/* Dark band. Re-scopes the full dark token set (surfaces, ink, lines, the five
-   layers and their inks, plus the effect tokens) so children render with the
+/* Dark band. Re-scopes the full dark token set (surfaces, ink, lines, the
+   accent, the five layers and their inks) so children render with the
    already-audited dark contrast regardless of the page's own theme. The band
-   itself follows --band-bg (deep slate on light pages, near-black on dark). */
+   itself is --band (ink on light pages, deep navy on dark ones). */
 .sec--dark,
 .sec--deep {
-  background: var(--band-bg);
+  background: var(--band);
   color: var(--ink);
 
   --bg: #121417;
   --surface: rgba(255, 255, 255, 0.04);
+  --panel: #171a1e;
   --line: #2a2d33;
+  --line-strong: color-mix(in srgb, #eceae3 22%, #121417);
   --ink: #eceae3;
   --ink-2: #c5c3bc;
-  --muted: #8e9199;
+  /* #8e9199 is under AA on the dark theme's navy band: secondary text takes
+     --ink-2, as the mockup's --band-ink-2. */
+  --muted: #c5c3bc;
+  --hover: color-mix(in srgb, #eceae3 5%, #121417);
+  --accent: #cbd8f0;
+  --accent-soft: color-mix(in srgb, #cbd8f0 7%, #121417);
+  --accent-line: color-mix(in srgb, #cbd8f0 25%, #121417);
+  --on-accent: #121417;
 
   --l1: color-mix(in srgb, #1f3a63 45%, #121417);
   --l1-ink: #cbd8f0;
@@ -410,30 +298,17 @@
   --l5: color-mix(in srgb, #2e4a22 45%, #121417);
   --l5-ink: #d1e4bc;
 
-  --glow-1: color-mix(in srgb, var(--l1-ink) 38%, transparent);
-  --glow-2: color-mix(in srgb, var(--l2-ink) 38%, transparent);
-  --glow-3: color-mix(in srgb, var(--l3-ink) 38%, transparent);
-  --glow-4: color-mix(in srgb, var(--l4-ink) 38%, transparent);
-  --glow-5: color-mix(in srgb, var(--l5-ink) 38%, transparent);
-  --mesh-alpha: 0.55;
   --shadow-1: 0 1px 2px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.5);
   --shadow-2: 0 2px 6px rgb(0 0 0 / 0.55), 0 10px 28px rgb(0 0 0 / 0.6);
   --shadow-3: 0 6px 16px rgb(0 0 0 / 0.6), 0 22px 56px rgb(0 0 0 / 0.7);
-  --grad-border: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--l1-ink) 45%, transparent),
-    color-mix(in srgb, var(--l3-ink) 45%, transparent),
-    color-mix(in srgb, var(--l4-ink) 45%, transparent)
-  );
-  --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
+  --lift: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 18px rgb(0 0 0 / 0.45);
 }
 
 /* Deep band: the dark token set on the L1 navy instead of slate, a colour
    field for one statement per page. --muted (#8e9199) is 3.6:1 on the navy,
-   so it takes --ink-2 like every other tinted surface. */
+   so it takes --ink-2. */
 .sec--deep {
   background: var(--deep-bg);
-  --muted: var(--ink-2);
   --line: color-mix(in srgb, #eceae3 18%, transparent);
   --surface: rgba(255, 255, 255, 0.06);
   /* The layer fills go back to the pastels: the dark set's fills are deep
@@ -445,113 +320,12 @@
   --l5: #d1e4bc;
 }
 
-/* ------------------------------------------------ Muted text over the mesh */
+/* --------------------------------------------- Muted text over the hero art */
 
-/* --muted drops below AA over the gradient mesh too (12px mono labels on the
-   glows: kicker, breadcrumb, .meta, hero notes), as it does on .sec--tint.
-   Re-scope it to --ink-2 on every mesh-backed surface: mesh sections, the page
-   heroes and the home hero's gradient field (a tint band with a mesh is
-   covered by .sec--tint, and the loop figure's panel re-scopes its own).
-   --ink-2 follows the theme, so one rule serves light and dark. Leaves the
-   mesh itself untouched. */
-.sec--mesh,
+/* --muted drops below AA over the page heroes and the home hero's painting
+   (12px mono labels: kicker, breadcrumb, .meta, hero notes). Re-scope it to
+   --ink-2, which follows the theme, so one rule serves light and dark. */
 .hero--page,
 .hero--field {
   --muted: var(--ink-2);
-}
-
-/* ------------------------------------------------------------------- Pauses */
-
-/* A pause panel: the rest between runs of text. Figures, the At a glance box
-   and closing asides sit on a rounded panel of the faint --pause-bg under a
-   still, soft mesh painted in the panel's own background (no pseudo-element,
-   no animation, one paint). The content inside keeps its own opaque frame, so
-   no mesh ever sits directly under a figure's nodes or a table. --muted is
-   re-scoped as on every other tinted surface. .pause--alt turns the mesh
-   around, so two pauses in a row do not look alike. */
-.pause,
-.prose > :is(.diagram, .figure--infographic) {
-  --pause-g1: var(--glow-1);
-  --pause-g2: var(--glow-4);
-  --pause-g3: var(--glow-3);
-  --muted: var(--ink-2);
-  border: 1px solid transparent;
-  border-radius: var(--r-lg);
-  /* The mesh layers and the ground fill the padding box; the gradient ring
-     (--grad-ring) shows through the transparent 1px border. */
-  background:
-    radial-gradient(55% 70% at 6% 0%, color-mix(in srgb, var(--pause-g1) 75%, transparent), transparent 72%) padding-box,
-    radial-gradient(50% 70% at 98% 100%, color-mix(in srgb, var(--pause-g2) 70%, transparent), transparent 72%) padding-box,
-    radial-gradient(40% 55% at 80% 6%, color-mix(in srgb, var(--pause-g3) 55%, transparent), transparent 70%) padding-box,
-    linear-gradient(var(--pause-bg), var(--pause-bg)) padding-box,
-    var(--grad-ring) border-box;
-}
-
-.pause--alt,
-.prose > :is(.diagram, .figure--infographic):nth-of-type(even) {
-  --pause-g1: var(--glow-2);
-  --pause-g2: var(--glow-3);
-  --pause-g3: var(--glow-5);
-}
-
-/* In the reading well the figure itself becomes the pause: it already breaks
-   out to the well (diagrams.css, figures.css), so it only gains the padding. */
-.prose > :is(.diagram, .figure--infographic) {
-  padding: var(--s-3);
-}
-
-@media (min-width: 840px) {
-  .prose > :is(.diagram, .figure--infographic) {
-    padding: var(--s-5);
-  }
-}
-
-/* --------------------------------------------------- Full-bleed bands (CSS) */
-
-/* A band behind a block that lives inside a centred container, painted with
-   the border-image trick: a solid border image, filled, with a 100vmax
-   horizontal outset. Outset border images are ink overflow, so the band
-   reaches both viewport edges without widening the page (no horizontal
-   scroll) and without any markup change. Used where the page is not built
-   from <Section>s: the reference pages' .res-section blocks, the detail
-   pages' closing navigation and the marketing layout's plain bands.
-   --band-fill picks the colour; --muted is re-scoped as on every tint. */
-.bleed {
-  --band-fill: var(--tint-l1);
-  --muted: var(--ink-2);
-  border-image: conic-gradient(var(--band-fill) 0 0) fill 0 / / 0 100vmax;
-}
-
-/* ------------------------------------------ Marketing bands (visual-rhythm) */
-
-/* Landing pages alternate plain and tint Sections. Without markup changes:
-   a tint band that names no hue takes one in turn (blue, amber, sage), and a
-   plain band gets a soft two-glow wash in the padding box, alternating two
-   pairs of tones, so no band on a landing is bare cream. The home page names
-   every hue and has no plain band, so these rules leave it alone. */
-.marketing > .sec--tint:not([data-hue]):nth-child(3n + 1 of .sec--tint:not([data-hue])) {
-  --tint-bg: var(--tint-l1);
-}
-
-.marketing > .sec--tint:not([data-hue]):nth-child(3n + 2 of .sec--tint:not([data-hue])) {
-  --tint-bg: var(--tint-l4);
-}
-
-.marketing > .sec--tint:not([data-hue]):nth-child(3n of .sec--tint:not([data-hue])) {
-  --tint-bg: var(--tint-l2);
-}
-
-.marketing > .sec--plain {
-  --wash-1: var(--glow-1);
-  --wash-2: var(--glow-4);
-  --muted: var(--ink-2);
-  background:
-    radial-gradient(48% 70% at 0% 0%, color-mix(in srgb, var(--wash-1) 55%, transparent), transparent 72%),
-    radial-gradient(44% 64% at 100% 100%, color-mix(in srgb, var(--wash-2) 50%, transparent), transparent 72%),
-    var(--bg);
-}
-
-.marketing > .sec--plain:nth-child(even of .sec--plain) {
-  --wash-1: var(--glow-2);
-  --wash-2: var(--glow-3);
 }

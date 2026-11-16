@@ -27,9 +27,34 @@
   --ok: var(--l5-ink);
   --block: var(--l3-ink);
 
-  /* Radii */
+  /* Editorial restraint: one accent (the hero navy), hairlines, flat panels.
+     Layer colours above are swatches only; paintings carry all other colour. */
+  --line-strong: color-mix(in srgb, var(--ink) 22%, var(--bg)); /* node and control borders */
+  --accent: #1F3A63;
+  --accent-soft: color-mix(in srgb, var(--accent) 7%, var(--bg));
+  --accent-line: color-mix(in srgb, var(--accent) 25%, var(--bg));
+  --on-accent: #F6F4EE;
+  /* Page = grain, panel = plain: every panel (callouts, tables, figure
+     frames, cards) is an opaque flat surface, so the grain never shows
+     through text blocks. */
+  --panel: #FBFAF6;
+  --veil: 0; /* painting veil strength; dark raises it */
+  --hover: color-mix(in srgb, var(--ink) 5%, var(--bg));
+  /* The single dark band (closing CTA) */
+  --band: #15171C;
+  --band-ink: #F6F4EE;
+  --band-ink-2: #C5C3BC;
+  --band-line: #33363D;
+  --lift: 0 1px 2px rgb(21 23 28 / 0.06), 0 6px 18px rgb(21 23 28 / 0.07); /* hover only */
+  --grain-opacity: 0.26;
+  --grain-blend: multiply;
+
+  /* Radii: nothing else is allowed */
   --r-lg: 10px;
   --r-sm: 6px;
+  --r-ctl: var(--r-sm);
+  --r-blk: var(--r-lg);
+  --r-pill: 999px;
 
   /* Spacing scale */
   --s-1: 4px;
@@ -49,11 +74,12 @@
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 
   /* Typography */
-  --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
+  /* Newsreader for h1, h2 and quotes; Instrument Sans for body, h3 and h4;
+     JetBrains Mono for labels, numbers, chips and the TOC (never sentences). */
+  --font-serif: 'Newsreader Display', Georgia, 'Times New Roman', serif;
+  --font-display: var(--font-serif);
   --font-body: 'Instrument Sans Variable', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
-  /* The home hero's headline only (see fonts.css). */
-  --font-serif: 'Newsreader Display', Georgia, 'Times New Roman', serif;
 
   /* Type scale (fluid). Ranges match the design brief in px. */
   --fs-display: clamp(3.25rem, 2.72rem + 2.25vw, 4.75rem); /* 52 -> 76 */
@@ -62,52 +88,27 @@
   --fs-h3: clamp(1.25rem, 1.21rem + 0.19vw, 1.375rem); /* 20 -> 22 */
   --fs-body: 1.0625rem; /* 17 */
   --fs-small: 0.875rem; /* 14 */
-  --fs-label: 0.75rem; /* 12, mono uppercase labels */
+  --fs-label: 0.75rem; /* 12, mono uppercase labels: the floor for any text */
+  --fs-lede: 1.1875rem; /* 19 */
+  /* Section titles (the mockup's --fs-h2; --fs-h2 itself stays the prose h2). */
+  --fs-h2-display: clamp(2.375rem, 1.5rem + 3.2vw, 4.25rem); /* 38 -> 68 */
+  --fs-h1-doc: clamp(2.5rem, 1.9rem + 2.4vw, 3.75rem);
 
   /* Display lettering defaults */
   --tracking-display: -0.02em;
-  --tracking-label: 0.1em;
+  --tracking-label: 0.07em;
   --leading-display: 1.05;
 
-  /* Depth & effects (Editorial+; consumed by effects.css). Light: soft pastel
-     glows from the layer fills, faint ink shadows, ink-derived textures. */
-  --glow-1: color-mix(in srgb, var(--l1) 85%, transparent);
-  --glow-2: color-mix(in srgb, var(--l2) 85%, transparent);
-  --glow-3: color-mix(in srgb, var(--l3) 85%, transparent);
-  --glow-4: color-mix(in srgb, var(--l4) 85%, transparent);
-  --glow-5: color-mix(in srgb, var(--l5) 85%, transparent);
-  --mesh-alpha: 1;
-  --texture-alpha: 1;
+  /* Layout */
+  --col-gap: 24px;
+  --header-h: 64px;
+
+  /* Shadows (light: faint ink). */
   --shadow-1: 0 1px 2px rgb(21 23 28 / 0.05), 0 2px 8px rgb(21 23 28 / 0.06);
   --shadow-2: 0 2px 6px rgb(21 23 28 / 0.06), 0 10px 28px rgb(21 23 28 / 0.09);
   --shadow-3: 0 6px 16px rgb(21 23 28 / 0.08), 0 22px 56px rgb(21 23 28 / 0.13);
-  --grad-border: linear-gradient(135deg, var(--l1), var(--l3), var(--l4));
-  --grad-cta: linear-gradient(135deg, var(--l1-ink), var(--ink));
-  /* The resting gradient frame of the reading pauses (figures, At a glance,
-     callout bands, tables): the three identity tones pushed a third of the way
-     to their inks, so the ring reads on the ground. Declared once: var()
-     resolves per theme, so dark gets mid tones from its own fills and inks. */
-  --grad-ring: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--l1-ink) 35%, var(--l1)),
-    color-mix(in srgb, var(--l3-ink) 30%, var(--l3)),
-    color-mix(in srgb, var(--l4-ink) 30%, var(--l4))
-  );
-  --tint-bg: color-mix(in srgb, var(--l1) 18%, var(--bg));
-  /* Tinted bands by tone (Section `hue`) and the deep colour band (Section
-     tone="deep"). A tone tint is a mood, not a layer claim: it never labels a
-     layer, so it may sit behind any content (SL-06 governs the layer swatches). */
-  --tint-l1: color-mix(in srgb, var(--l1) 42%, var(--bg));
-  --tint-l2: color-mix(in srgb, var(--l2) 48%, var(--bg));
-  --tint-l3: color-mix(in srgb, var(--l3) 42%, var(--bg));
-  --tint-l4: color-mix(in srgb, var(--l4) 40%, var(--bg));
-  --tint-l5: color-mix(in srgb, var(--l5) 42%, var(--bg));
+  /* The deep colour band (Section tone="deep"). */
   --deep-bg: var(--l1-ink);
-  /* Pause panels (figures, the At a glance box, closing asides): a faint ink
-     ground under a still, soft mesh. */
-  --pause-bg: color-mix(in srgb, var(--ink) 3%, var(--bg));
-  --band-bg: #15171c;
-  --tex-line: color-mix(in srgb, var(--ink) 9%, transparent);
 
   /* Home hero field: the moving gradient behind the headline (public/
      hero-field.js, and the static CSS fallback under it). Three tones on the
@@ -141,35 +142,26 @@
   --l5: color-mix(in srgb, #2E4A22 45%, #121417);
   --l5-ink: #D1E4BC;
 
-  /* Depth & effects (dark): glows come from the layer inks (the bright pastels
-     in dark), shadows go opaque-black, textures dim. */
-  --glow-1: color-mix(in srgb, var(--l1-ink) 38%, transparent);
-  --glow-2: color-mix(in srgb, var(--l2-ink) 38%, transparent);
-  --glow-3: color-mix(in srgb, var(--l3-ink) 38%, transparent);
-  --glow-4: color-mix(in srgb, var(--l4-ink) 38%, transparent);
-  --glow-5: color-mix(in srgb, var(--l5-ink) 38%, transparent);
-  --mesh-alpha: 0.55;
-  --texture-alpha: 0.5;
+  /* Shadows (dark): opaque black. */
   --shadow-1: 0 1px 2px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.5);
   --shadow-2: 0 2px 6px rgb(0 0 0 / 0.55), 0 10px 28px rgb(0 0 0 / 0.6);
   --shadow-3: 0 6px 16px rgb(0 0 0 / 0.6), 0 22px 56px rgb(0 0 0 / 0.7);
-  --grad-border: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--l1-ink) 45%, transparent),
-    color-mix(in srgb, var(--l3-ink) 45%, transparent),
-    color-mix(in srgb, var(--l4-ink) 45%, transparent)
-  );
-  --grad-cta: linear-gradient(135deg, var(--l1-ink), var(--ink));
-  --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
-  --tint-l1: color-mix(in srgb, var(--l1-ink) 13%, var(--bg));
-  --tint-l2: color-mix(in srgb, var(--l2-ink) 12%, var(--bg));
-  --tint-l3: color-mix(in srgb, var(--l3-ink) 12%, var(--bg));
-  --tint-l4: color-mix(in srgb, var(--l4-ink) 11%, var(--bg));
-  --tint-l5: color-mix(in srgb, var(--l5-ink) 11%, var(--bg));
   --deep-bg: #1f3a63;
-  --pause-bg: color-mix(in srgb, var(--ink) 4%, var(--bg));
-  --band-bg: #0b0d10;
-  --tex-line: color-mix(in srgb, var(--ink) 8%, transparent);
+
+  /* Editorial restraint (dark): the accent is the pale L1 ink. --line-strong,
+     --accent-soft, --accent-line and --hover come from :root, whose var()
+     resolves against these values on the same element. */
+  --accent: #CBD8F0;
+  --on-accent: #121417;
+  --panel: #171A1E;
+  --veil: 0.22;
+  --band: #1C2F4D;
+  --band-ink: #F6F4EE;
+  --band-ink-2: #D3D9E4;
+  --band-line: #34496B;
+  --lift: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 18px rgb(0 0 0 / 0.45);
+  --grain-opacity: 0.16;
+  --grain-blend: screen;
 
   /* Home hero field (dark): deep tones that keep the light inks >= AA. */
   --hero-ink: var(--ink);
@@ -200,34 +192,23 @@
     --l5: color-mix(in srgb, #2E4A22 45%, #121417);
     --l5-ink: #D1E4BC;
 
-    /* Depth & effects (dark): mirror the [data-theme='dark'] block. */
-    --glow-1: color-mix(in srgb, var(--l1-ink) 38%, transparent);
-    --glow-2: color-mix(in srgb, var(--l2-ink) 38%, transparent);
-    --glow-3: color-mix(in srgb, var(--l3-ink) 38%, transparent);
-    --glow-4: color-mix(in srgb, var(--l4-ink) 38%, transparent);
-    --glow-5: color-mix(in srgb, var(--l5-ink) 38%, transparent);
-    --mesh-alpha: 0.55;
-    --texture-alpha: 0.5;
+    /* Mirror the [data-theme='dark'] block. */
     --shadow-1: 0 1px 2px rgb(0 0 0 / 0.5), 0 2px 8px rgb(0 0 0 / 0.5);
     --shadow-2: 0 2px 6px rgb(0 0 0 / 0.55), 0 10px 28px rgb(0 0 0 / 0.6);
     --shadow-3: 0 6px 16px rgb(0 0 0 / 0.6), 0 22px 56px rgb(0 0 0 / 0.7);
-    --grad-border: linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--l1-ink) 45%, transparent),
-      color-mix(in srgb, var(--l3-ink) 45%, transparent),
-      color-mix(in srgb, var(--l4-ink) 45%, transparent)
-    );
-    --grad-cta: linear-gradient(135deg, var(--l1-ink), var(--ink));
-    --tint-bg: color-mix(in srgb, var(--l1-ink) 10%, var(--bg));
-    --tint-l1: color-mix(in srgb, var(--l1-ink) 13%, var(--bg));
-    --tint-l2: color-mix(in srgb, var(--l2-ink) 12%, var(--bg));
-    --tint-l3: color-mix(in srgb, var(--l3-ink) 12%, var(--bg));
-    --tint-l4: color-mix(in srgb, var(--l4-ink) 11%, var(--bg));
-    --tint-l5: color-mix(in srgb, var(--l5-ink) 11%, var(--bg));
     --deep-bg: #1f3a63;
-    --pause-bg: color-mix(in srgb, var(--ink) 4%, var(--bg));
-    --band-bg: #0b0d10;
-    --tex-line: color-mix(in srgb, var(--ink) 8%, transparent);
+
+    --accent: #CBD8F0;
+    --on-accent: #121417;
+    --panel: #171A1E;
+    --veil: 0.22;
+    --band: #1C2F4D;
+    --band-ink: #F6F4EE;
+    --band-ink-2: #D3D9E4;
+    --band-line: #34496B;
+    --lift: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 18px rgb(0 0 0 / 0.45);
+    --grain-opacity: 0.16;
+    --grain-blend: screen;
 
     --hero-ink: var(--ink);
     --field-1: #1F3A63;

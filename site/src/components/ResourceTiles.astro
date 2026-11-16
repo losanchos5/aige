@@ -56,6 +56,8 @@ const { tiles, class: className } = Astro.props;
     padding: var(--s-5);
     color: var(--ink);
     text-decoration: none;
+    /* A long word at 200% text breaks instead of widening the one-column grid. */
+    overflow-wrap: anywhere;
   }
 
   .label {

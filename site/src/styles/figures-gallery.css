@@ -48,7 +48,7 @@
 }
 
 .fg-card--diagram {
-  background: var(--tint-bg);
+  background: var(--panel);
 }
 
 /* Decorative preview: the chapter's own SVG, letterboxed in a fixed-height

@@ -19,11 +19,20 @@ import {
   figureLicense,
   type FigureDef,
   type FigureExport,
+  type FigureKind,
 } from '../data/figures';
 import { getHeadings, readSource, stripInline } from './md-parse';
 
 const FIGURES_DIR = resolve(process.cwd(), 'src/figures');
 const PUBLIC_DIR = resolve(process.cwd(), 'public');
+
+/** The caption's mono label per kind (Figure.astro and rehype-diagrams):
+ *  figures carry no number, so the label names the kind. */
+export const FIGURE_LABEL: Readonly<Record<FigureKind, string>> = {
+  infographic: 'Figure',
+  'data-viz': 'Chart',
+  poster: 'Poster',
+};
 
 /** Attribution name used in every credit line (the site's author). */
 export const FIGURE_AUTHOR = site.authors[0];

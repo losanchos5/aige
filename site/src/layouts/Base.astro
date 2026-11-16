@@ -96,6 +96,8 @@ const umamiSrc = 'https://admin.stocktcg.net/script.js';
 // hash in public/_headers is stale).
 const theme = themeScript();
 
+const DISPLAY_FONT = '/fonts/newsreader-latin-display-normal.woff2';
+
 // The page language drives the chrome's strings (src/i18n/ui.ts) in the
 // header, footer and search dialog; the alternates feed the header's language
 // switcher, which shows only when the page exists in two languages.
@@ -151,9 +153,10 @@ const theme = themeScript();
       type="font/woff2"
       crossorigin
     />
+    {/* Newsreader sets every h1 and h2 (--font-display), so every page needs it. */}
     <link
       rel="preload"
-      href="/fonts/bricolage-grotesque-latin-wght-normal.woff2"
+      href={DISPLAY_FONT}
       as="font"
       type="font/woff2"
       crossorigin
@@ -171,7 +174,7 @@ const theme = themeScript();
       crossorigin
     />
     {
-      preloadFonts.map((href) => (
+      preloadFonts.filter((href) => href !== DISPLAY_FONT).map((href) => (
         <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />
       ))
     }
@@ -220,6 +223,8 @@ const theme = themeScript();
     }
   </head>
   <body>
+    <!-- The paper grain under every page (styles/effects.css): decorative. -->
+    <div class="page-grain" aria-hidden="true"></div>
     <a class="skip-link" href="#main">{t('a11y.skip', lang)}</a>
 
     <Header overlay={overlayHeader} lang={lang} alternates={alternates} />

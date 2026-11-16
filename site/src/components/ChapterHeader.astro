@@ -1,15 +1,17 @@
 ---
-// ChapterHeader: the register that opens every Doc page, the H1 (the page's
-// only H1, since remark-lead strips the Markdown one), a summary lede and a meta
-// line. No eyebrow above the H1 (audit SL-04): a chapter's book and number are
-// already in the breadcrumb above the header. Everything sits in a full-bleed
-// band (.ch-band), neutral unless Doc.astro passes the layer of a chapter that is
-// about one stack layer (chapters.ts `layer`). Above the meta line sits the
-// author byline (audit C4/V2) as AuthorBadge: photo, the name the JSON-LD
-// Person node carries linked to /about with rel="author", LinkedIn, title.
+// ChapterHeader: the register that opens every Doc page, on the paper with no
+// band. On a chapter, a mono pill with its position in the book ("Chapter 02 of
+// 24", the total counted from the data) and its part; then the H1 (the page's
+// only H1, since remark-lead strips the Markdown one) in the display serif; the
+// author byline in its painting frame (AuthorBadge: photo, the name the JSON-LD
+// Person node carries linked to /about with rel="author", LinkedIn, title);
+// the meta line as mono chips; the compact on-this-page list Doc passes in the
+// `toc` slot; and the summary lede. A hairline closes the meta line.
 import { site } from '../data/site';
+import { chaptersOrdered, getChapterBySlug } from '../data/chapters';
+import { bookParts, chapterNum } from '../data/parts';
 import AuthorBadge from './AuthorBadge.astro';
-import { intlLocale, translator } from '../i18n/ui';
+import { intlLocale, translator, type UiKey } from '../i18n/ui';
 
 interface Props {
   title: string;
@@ -17,12 +19,8 @@ interface Props {
   updated?: string;
   words?: number;
   minutes?: number;
-  /** Layer key (l1..l5) that tints the band; omit for a neutral band. */
-  layer?: string;
-  /** Mesh composition (a..e) under a band without a layer. Doc picks it from
-      the chapter's part of the book, so the five parts each get their own mood
-      without claiming a layer colour (SL-06). Omit for composition a. */
-  mesh?: 'a' | 'b' | 'c' | 'd' | 'e';
+  /** A Body of Knowledge chapter's slug: shows its position pill and part. */
+  chapterSlug?: string;
   /** Page language, passed down by Doc; drives the meta line's labels. */
   lang?: string;
   /** Show the author byline. Default: on every dated page except the
@@ -41,8 +39,7 @@ const {
   updated,
   words,
   minutes,
-  layer,
-  mesh = 'a',
+  chapterSlug,
   lang = 'en',
   siteVersion = true,
 } = Astro.props;
@@ -61,7 +58,21 @@ const labels = {
   locale: intlLocale(lang),
 };
 
-// One meta line, joined into list items: version/date, reading estimate, licence.
+// Position in the book. The words "Chapter" and "Part" have no UI string yet,
+// so a translated chapter shows the numbers alone.
+const chapter = chapterSlug ? getChapterBySlug(chapterSlug) : undefined;
+const partIndex = chapter ? bookParts.findIndex((part) => part.id === chapter.part) : -1;
+const position = chapter
+  ? {
+      pill:
+        lang === 'en'
+          ? `Chapter ${chapterNum(chapter.order)} of ${chaptersOrdered.length}`
+          : `${chapterNum(chapter.order)} / ${chaptersOrdered.length}`,
+      part: `${lang === 'en' ? 'Part ' : ''}${chapterNum(partIndex + 1)} · ${t(`part.${chapter.part}` as UiKey)}`,
+    }
+  : undefined;
+
+// One meta line, joined into chips: reading estimate, version, date, licence.
 // The date bit carries the machine-readable value so it renders inside a <time>
 // element; every other bit is plain text.
 interface MetaBit {
@@ -70,56 +81,52 @@ interface MetaBit {
   datetime?: string;
 }
 const metaBits: MetaBit[] = [];
-if (updated && siteVersion) metaBits.push({ text: `v${site.bokVersion}` });
-if (updated) metaBits.push({ text: labels.updated, datetime: updated });
 if (minutes && words)
   metaBits.push(
     { text: `${minutes} ${labels.read}` },
     { text: `${words.toLocaleString(labels.locale)} ${labels.words}` },
   );
+if (updated && siteVersion) metaBits.push({ text: `v${site.bokVersion}` });
+if (updated) metaBits.push({ text: labels.updated, datetime: updated });
 if (updated) metaBits.push({ text: site.license });
 ---
 
 <header class="chapter-header">
-  <div class="ch-band" data-layer={layer}>
-    {
-      !layer && (
-        <div
-          class:list={['bg-mesh', 'ch-mesh', mesh === 'a' ? 'bg-mesh--still' : `bg-mesh--${mesh}`]}
-          aria-hidden="true"
-        />
-      )
-    }
-    <h1 data-pagefind-meta="title">{title}</h1>
-    {summary && <p class="lede">{summary}</p>}
-    {
-      metaBits.length > 0 && (
-        <ul class="ch-meta">
-          {
-            byline && (
-              <li class="ch-author">
-                <AuthorBadge placement="chapter" lang={lang} />
-              </li>
-            )
-          }
-          {metaBits.map((bit) => (
-            <li>
-              {/* The <li> is a flex container, so the label and the <time> are
-                  kept in one inline wrapper: as two bare flex items the space
-                  between them would be dropped. */}
-              {bit.datetime ? (
-                <span>
-                  {bit.text} <time datetime={bit.datetime}>{bit.datetime}</time>
-                </span>
-              ) : (
-                bit.text
-              )}
-            </li>
-          ))}
-        </ul>
-      )
-    }
-  </div>
+  {
+    position && (
+      <p class="ch-pos">
+        <span class="ch-pill">{position.pill}</span>
+        <span class="ch-part">{position.part}</span>
+      </p>
+    )
+  }
+  <h1 data-pagefind-meta="title">{title}</h1>
+  {
+    byline && (
+      <div class="ch-byline">
+        <AuthorBadge placement="chapter" lang={lang} framed />
+      </div>
+    )
+  }
+  {
+    metaBits.length > 0 && (
+      <ul class="ch-meta">
+        {metaBits.map((bit) => (
+          <li>
+            {bit.datetime ? (
+              <span>
+                {bit.text} <time datetime={bit.datetime}>{bit.datetime}</time>
+              </span>
+            ) : (
+              bit.text
+            )}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+  <slot name="toc" />
+  {summary && <p class="lede">{summary}</p>}
 </header>
 
 <style>
@@ -127,166 +134,105 @@ if (updated) metaBits.push({ text: site.license });
     margin-bottom: var(--s-6);
   }
 
-  /* Register band. A soft radial glow lives in an inert pseudo-element behind
-     the text (negative z-index inside an isolated stacking context). Neutral by
-     default; the data-layer rules below swap in the layer's tint and glow, and
-     only a chapter about one stack layer gets one (SL-06). No dot texture
-     (SL-18). */
-  .ch-band {
-    --ch-tint: color-mix(in srgb, var(--ink) 4%, var(--bg));
-    --ch-glow: transparent;
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    padding: var(--s-6) var(--s-5);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--ch-tint);
+  .ch-pos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3);
+    margin: 0 0 22px;
   }
 
-  /* From tablet up the band gets even padding on all four sides. */
-  @media (min-width: 840px) {
-    .ch-band {
-      padding: var(--s-6);
-    }
+  .ch-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding: 0 10px;
+    border-radius: var(--r-pill);
+    background: var(--accent-soft);
+    box-shadow: inset 0 0 0 1px var(--accent-line);
+    color: var(--accent);
+    white-space: nowrap;
   }
 
-  /* In a chapter, break out to the reading well, exactly like .prose > .glance /
-     .diagram: the prose stays at 72ch but .doc-main is a container, so the band
-     widens to the whole well and lines up with the crumbs and the At a glance
-     box. Off a container the cq units resolve to the column and nothing moves,
-     and the band never exceeds .doc-main, so no page-level scroll. The Thesis
-     and the meta pages have no crumbs or glance box: there the band keeps the
-     prose column, so the header, the lede and the text share one left edge. */
-  :global([data-mode='chapter'] .prose) > .chapter-header .ch-band {
-    width: 100cqw;
-    margin-inline: calc(50% - 50cqw);
+  .ch-pill,
+  .ch-part,
+  .ch-meta li {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
   }
 
-  .ch-band[data-layer='l1'] {
-    --ch-tint: color-mix(in srgb, var(--l1) 22%, var(--bg));
-    --ch-glow: var(--glow-1);
-  }
-  .ch-band[data-layer='l2'] {
-    --ch-tint: color-mix(in srgb, var(--l2) 22%, var(--bg));
-    --ch-glow: var(--glow-2);
-  }
-  .ch-band[data-layer='l3'] {
-    --ch-tint: color-mix(in srgb, var(--l3) 22%, var(--bg));
-    --ch-glow: var(--glow-3);
-  }
-  .ch-band[data-layer='l4'] {
-    --ch-tint: color-mix(in srgb, var(--l4) 22%, var(--bg));
-    --ch-glow: var(--glow-4);
-  }
-  .ch-band[data-layer='l5'] {
-    --ch-tint: color-mix(in srgb, var(--l5) 22%, var(--bg));
-    --ch-glow: var(--glow-5);
-  }
-
-  /* The still mesh of a band without a layer: behind the text inside the
-     band's isolated stacking context, a little softer than a section mesh so
-     the H1 keeps the page's strongest contrast. --muted is re-scoped as on
-     every mesh surface. */
-  .ch-mesh {
-    z-index: -1;
-    --mesh-k: 0.8;
-  }
-
-  .ch-band:has(.ch-mesh) {
-    --muted: var(--ink-2);
-  }
-
-  /* Radial glow, anchored top-right. */
-  .ch-band::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: radial-gradient(70% 90% at 88% 12%, var(--ch-glow), transparent 72%);
-    pointer-events: none;
+  .ch-part {
+    color: var(--muted);
   }
 
   .chapter-header h1 {
     margin: 0;
     font-family: var(--font-display);
-    font-size: var(--fs-h1);
-    line-height: 1.1;
+    font-size: var(--fs-h1-doc);
+    font-weight: 400;
+    line-height: 1.04;
+    letter-spacing: -0.015em;
     color: var(--ink);
+    text-wrap: balance;
+    overflow-wrap: break-word;
   }
 
-  .lede {
-    margin-top: var(--s-4);
-    max-width: 60ch;
-    font-size: var(--fs-h3);
-    line-height: 1.5;
-    color: var(--ink-2);
+  .ch-byline {
+    margin-top: 28px;
   }
 
   .ch-meta {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s-2) var(--s-3);
-    margin: var(--s-5) 0 0;
-    padding: 0;
+    gap: var(--s-2);
+    margin: 20px 0 0;
+    padding: 0 0 28px;
     list-style: none;
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    color: var(--ink-2);
+    border-bottom: 1px solid var(--line);
   }
 
   .ch-meta li {
-    display: flex;
+    display: inline-flex;
     align-items: center;
+    min-height: 24px;
     margin: 0;
-  }
-
-  /* The author is the first meta item. From 540px up it takes a row of its
-     own with the full badge; on phones it shrinks to photo, name and LinkedIn
-     and flows inline with the meta bits, as the old "By" bit did, so the
-     header grows no taller (the /bok/glossary A-Z row must stay on the first
-     screen at 390px). */
-  .ch-meta > .ch-author {
-    flex-basis: 100%;
-    margin-bottom: var(--s-2);
-  }
-
-  .ch-meta > .ch-author + li::before {
-    content: none;
-  }
-
-  @media (max-width: 539px) {
-    .ch-meta > .ch-author {
-      flex-basis: auto;
-      margin-bottom: 0;
-    }
-
-    .ch-meta > .ch-author + li::before {
-      content: '·' / '';
-    }
-
-    .ch-author :global(.ab) {
-      grid-template-columns: auto auto;
-      column-gap: var(--s-2);
-    }
-
-    .ch-author :global(.ab-photo) {
-      grid-row: auto;
-      width: 24px;
-      height: 24px;
-    }
-
-    .ch-author :global(.ab-sub) {
-      display: none;
-    }
-  }
-
-  /* Middot separators between the meta bits (kept at --ink-2 so the tinted band
-     never carries dimmed text). */
-  .ch-meta li + li::before {
-    content: '·';
-    margin-right: var(--s-3);
+    padding: 0 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-pill);
     color: var(--ink-2);
+    white-space: nowrap;
+  }
+
+  .lede {
+    margin-top: 32px;
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+
+  /* Phones: a tighter stack, so the lede (and the glossary's A-Z row) start
+     inside the first screen. */
+  @media (max-width: 639px) {
+    .ch-pos {
+      margin-bottom: 14px;
+    }
+
+    .ch-byline {
+      margin-top: 20px;
+    }
+
+    .ch-meta {
+      margin-top: 14px;
+      padding-bottom: 18px;
+    }
+
+    .lede {
+      margin-top: 20px;
+      font-size: 1.125rem;
+    }
   }
 </style>

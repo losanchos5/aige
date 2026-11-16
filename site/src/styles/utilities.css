@@ -38,13 +38,32 @@
   font-size: var(--fs-label);
 }
 
+/* Mono label: the 12px uppercase chrome (section numbers, kickers, chips).
+   The .num inside it takes the accent: the repeated 01, 02... motif. */
+.label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.label .num {
+  margin-right: 0.9em;
+  color: var(--accent);
+}
+
 .muted {
   color: var(--muted);
 }
 
+/* Newsreader ships one weight (400): display lines never go bold. */
 .display {
   font-family: var(--font-display);
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: var(--tracking-display);
   line-height: var(--leading-display);
   text-wrap: balance;

@@ -3,12 +3,14 @@
    list, scrollable tables). Tokens only, so light and dark both follow.
    Loaded through reading.css by the pages that render prose, figures or
    diagrams, not by Base.astro; the print rules every page needs are in
-   print.css. */
+   print.css. One accent, hairlines for separation and opaque --panel
+   surfaces for the blocks (callouts, tables) so the page grain never shows
+   under text. */
 
 .prose {
   max-width: 72ch;
-  /* Centre the reading column inside .doc-main, which on desktop widens past
-     72ch to give diagram figures room to break out (see Doc.astro). */
+  /* Centre the reading column where the container is wider than the measure
+     (the pages without the reading rail; see Doc.astro). */
   margin-inline: auto;
   color: var(--ink);
   font-family: var(--font-body);
@@ -17,14 +19,22 @@
      28–34, with no in-between literals. Only decorative glyphs and the
      em-relative inline code keep their own sizes. */
   font-size: var(--fs-body); /* 17px */
-  line-height: 1.6;
+  line-height: 1.75;
   /* Long unbreakable tokens (bare URLs in citations, identifiers) break rather
      than push the reading well past its column and under the TOC. */
   overflow-wrap: break-word;
+  /* Every H2 prints its two-digit number (see .prose h2::before). */
+  counter-reset: h2;
 }
 
 .prose > * + * {
-  margin-top: var(--s-4);
+  margin-top: 1.25em;
+}
+
+/* Block panels keep 2rem above and below; between siblings the margins
+   collapse to the larger value, so the space is the same whatever follows. */
+.prose > :is(.callout, .table-scroll, pre, blockquote) {
+  margin-block: 2rem;
 }
 
 /* ---- Headings (content H1 is lifted out by remark-lead) ---- */
@@ -32,44 +42,79 @@
 .prose h3,
 .prose h4 {
   color: var(--ink);
-  font-family: var(--font-display);
   scroll-margin-top: var(--anchor-offset);
 }
 
+/* H2: a hairline above and the section's number in a mono accent chip. Only
+   the unclassed H2s (Markdown's, and the pages' own sections) are counted:
+   component headings (a control record, the deadlines eyebrow) carry a class
+   and their own numbering, and Toc.astro numbers the same set. */
 .prose h2 {
-  margin-top: var(--s-7);
-  padding-top: var(--s-5);
+  margin-top: 3.5rem;
+  padding-top: 1.75rem;
   border-top: 1px solid var(--line);
+  font-family: var(--font-display);
   font-size: var(--fs-h2); /* 28–34px */
-  line-height: 1.15;
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  /* At 200% text a long word would push the page sideways, so it may break
+     anywhere. */
+  overflow-wrap: anywhere;
 }
 
-/* A short dash above each section title, under the register rule.
-   --chapter-ink is set by Doc.astro: the layer's ink for a chapter about one
-   stack layer (the same one that tints its header band), --ink everywhere else
-   (audit SL-06). Without a layer, Doc sets --chapter-dash to the site's
-   three-ink gradient instead: colour without a layer claim. The fallback
-   serves prose outside Doc. */
-.prose h2::before {
-  content: '';
-  display: block;
-  width: 40px;
-  height: 3px;
-  margin-bottom: var(--s-3);
-  border-radius: 2px;
-  background: var(--chapter-dash, var(--chapter-ink, var(--ink)));
+.prose h2:not([class]) {
+  counter-increment: h2;
 }
 
+/* The chip is inline: the H2 stays one block of text (a flex H2 would split
+   its inline children into separate items). */
+.prose h2:not([class])::before {
+  content: counter(h2, decimal-leading-zero);
+  display: inline-block;
+  margin-right: 14px;
+  vertical-align: 0.35em;
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent-line);
+  font: 500 var(--fs-label) / 1.3 var(--font-mono);
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+
+/* H3: the body face at weight 600 after a small accent square. */
 .prose h3 {
-  margin-top: var(--s-6);
-  margin-bottom: var(--s-3);
+  position: relative;
+  margin-top: 2.5rem;
+  padding-left: 18px;
+  font-family: var(--font-body);
   font-size: var(--fs-h3); /* 20–22px */
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.prose h3::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+}
+
+.prose > h3 + * {
+  margin-top: 0.6em;
 }
 
 .prose h4 {
   margin-top: var(--s-5);
   margin-bottom: var(--s-2);
+  font-family: var(--font-body);
   font-size: var(--fs-body);
+  font-weight: 600;
 }
 
 /* rehype-autolink-headings (behavior: 'wrap') wraps heading text in an <a>. */
@@ -96,11 +141,19 @@
 /* ---- Body copy ---- */
 .prose p {
   color: var(--ink-2);
+  text-wrap: pretty;
 }
 
+/* Bold as a marker stroke in the accent under the lower part of the words. */
 .prose strong {
   color: var(--ink);
   font-weight: 600;
+  background: linear-gradient(
+    transparent 62%,
+    color-mix(in srgb, var(--accent) 16%, transparent) 62%
+  );
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .prose em {
@@ -111,24 +164,24 @@
   color: var(--ink);
   text-decoration: underline;
   text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--muted);
+  text-underline-offset: 0.22em;
+  text-decoration-color: var(--accent-line);
 }
 
 .prose a:hover {
-  text-decoration-thickness: 2px;
+  color: var(--accent);
   text-decoration-color: currentColor;
 }
 
 /* ---- Lists ---- */
 .prose ul,
 .prose ol {
-  padding-left: var(--s-5);
+  padding-left: 1.2em;
   color: var(--ink-2);
 }
 
 .prose li + li {
-  margin-top: var(--s-2);
+  margin-top: 0.5em;
 }
 
 .prose li > ul,
@@ -137,39 +190,25 @@
 }
 
 .prose li::marker {
-  color: var(--muted);
+  color: var(--accent);
 }
 
 /* ---- Callouts (aside.callout[data-kind]) ----
-   A framed card with a soft shadow, a full 1px --line frame (no side rail: the
-   tint and the label already tell the kinds apart) and a mono glyph in the
-   gutter via ::before content, both keyed to the kind (--callout-ink). */
+   One opaque panel for every kind, framed by a hairline; the mono title in
+   the accent names the kind, so no tint or glyph is needed. */
 .prose .callout {
-  --callout-ink: var(--ink-2);
-  --callout-glyph: '•';
-  position: relative;
-  margin-top: var(--s-5);
-  padding: var(--s-4) var(--s-4) var(--s-4) var(--s-6);
+  padding: 22px 24px;
   border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  background: var(--surface);
-  box-shadow: var(--shadow-1);
-}
-
-.prose .callout::before {
-  content: var(--callout-glyph);
-  position: absolute;
-  left: var(--s-3);
-  top: var(--s-4);
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  line-height: 1.2;
-  color: var(--callout-ink);
-  pointer-events: none;
+  border-radius: var(--r-blk);
+  background: var(--panel);
 }
 
 .prose .callout > * + * {
-  margin-top: var(--s-3);
+  margin-top: 0.8em;
+}
+
+.prose .callout > :first-child {
+  margin-top: 0;
 }
 
 .prose .callout p {
@@ -179,159 +218,39 @@
 .prose .callout-title {
   font-family: var(--font-mono);
   font-size: var(--fs-label); /* 12px */
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  color: var(--ink);
+  color: var(--accent);
 }
 
-.prose .callout[data-kind='practice'] {
-  --callout-ink: var(--l2-ink);
-  --callout-glyph: '✓';
-  background: color-mix(in srgb, var(--l2) 45%, var(--bg));
-}
-.prose .callout[data-kind='example'] {
-  --callout-ink: var(--l1-ink);
-  --callout-glyph: '→';
-  background: color-mix(in srgb, var(--l1) 45%, var(--bg));
-}
-.prose .callout[data-kind='anti'] {
-  --callout-ink: var(--l3-ink);
-  --callout-glyph: '✕';
-  background: color-mix(in srgb, var(--l3) 45%, var(--bg));
-}
-.prose .callout[data-kind='note'] {
-  --callout-ink: var(--ink-2);
-  --callout-glyph: '§';
-  background: var(--surface);
-}
-/* "In short": the chapter's self-contained answer, right under the abstract.
-   Plain surface like a note; the body keeps full --ink, never dimmed. */
-.prose .callout[data-kind='summary'] {
-  --callout-ink: var(--l4-ink);
-  --callout-glyph: '¶';
-  background: var(--surface);
-}
+/* "In short": the chapter's self-contained answer; the body keeps full ink. */
 .prose .callout[data-kind='summary'] p {
   color: var(--ink);
 }
 
-.prose .callout[data-kind='practice'] .callout-title { color: var(--l2-ink); }
-.prose .callout[data-kind='example'] .callout-title { color: var(--l1-ink); }
-.prose .callout[data-kind='anti'] .callout-title { color: var(--l3-ink); }
-
-/* ---- Callout bands (visual-rhythm) ----
-   The three worked kinds (practice, example, anti) are the chapter's rests:
-   at the top level of the prose they break out to the whole reading well,
-   like the figures, on a stronger tint of their kind with a soft glow and the
-   gradient ring, while their text keeps the prose column's measure (the extra
-   width goes into the inline padding: 50cqw - 50% is half the well's surplus
-   over the column, since % padding resolves against the column). Off a
-   chapter, or on a phone, the well is the column and the band is a card.
-   The note and "In short" kinds stay in the column and only take the ring. */
-.prose > .callout[data-kind] {
-  border: 1px solid transparent;
-  border-radius: var(--r-lg);
-  box-shadow: none;
-  background:
-    linear-gradient(var(--surface), var(--surface)) padding-box,
-    linear-gradient(var(--bg), var(--bg)) padding-box,
-    var(--grad-ring) border-box;
-}
-
-.prose > .callout:is([data-kind='practice'], [data-kind='example'], [data-kind='anti']) {
-  --co-tint: var(--l2);
-  --co-glow: var(--glow-2);
-  --co-extra: 0px;
-  margin-block: var(--s-6);
-  padding-block: var(--s-5);
-  padding-inline: calc(var(--co-extra) + var(--s-6)) calc(var(--co-extra) + var(--s-5));
-  background:
-    radial-gradient(60% 120% at 100% 0%, var(--co-glow), transparent 70%) padding-box,
-    linear-gradient(
-        color-mix(in srgb, var(--co-tint) 62%, var(--bg)),
-        color-mix(in srgb, var(--co-tint) 62%, var(--bg))
-      )
-      padding-box,
-    var(--grad-ring) border-box;
-}
-
-/* The breakout itself only inside a query container (Doc's .doc-main, the
-   pillar's .pillar-main): elsewhere cq units would fall back to the viewport. */
-:is(.doc-main, .pillar-main)
-  .prose
-  > .callout:is([data-kind='practice'], [data-kind='example'], [data-kind='anti']) {
-  --co-extra: calc(50cqw - 50%);
-  width: 100cqw;
-  margin-inline: calc(50% - 50cqw);
-}
-
-.prose > .callout:is([data-kind='practice'], [data-kind='example'], [data-kind='anti'])::before {
-  left: calc(var(--co-extra) + var(--s-3));
-  top: var(--s-5);
-}
-
-.prose > .callout[data-kind='example'] {
-  --co-tint: var(--l1);
-  --co-glow: var(--glow-1);
-}
-
-.prose > .callout[data-kind='anti'] {
-  --co-tint: var(--l3);
-  --co-glow: var(--glow-3);
-}
-
-/* ---- Table frames (visual-rhythm) ----
-   A table at the top level of the prose takes the whole well (room for its
-   columns, and a rest for the eye) on an opaque ground inside the gradient
-   ring: never a mesh under a table. */
-.prose > .table-scroll {
-  margin-block: var(--s-6);
-  border: 1px solid transparent;
-  border-radius: var(--r-lg);
-  background:
-    linear-gradient(var(--bg), var(--bg)) padding-box,
-    var(--grad-ring) border-box;
-}
-
-:is(.doc-main, .pillar-main) .prose > .table-scroll {
-  width: 100cqw;
-  margin-inline: calc(50% - 50cqw);
-}
-
-/* The ring is the table's outer edge: drop the cells' outer borders. */
-.prose > .table-scroll :is(th, td):first-child {
-  border-left: 0;
-}
-.prose > .table-scroll :is(th, td):last-child {
-  border-right: 0;
-}
-.prose > .table-scroll table > :first-child > tr:first-child > :is(th, td) {
-  border-top: 0;
-}
-.prose > .table-scroll table > :last-child > tr:last-child > td {
-  border-bottom: 0;
-}
-
 /* ---- "Maps to:" register line ---- */
 .prose .maps-to {
-  margin-top: var(--s-5);
-  padding-top: var(--s-3);
+  padding-top: 18px;
   border-top: 1px solid var(--line);
-  font-family: var(--font-mono);
   font-size: var(--fs-small); /* 14px */
-  line-height: 1.5;
+  line-height: 1.65;
   color: var(--muted);
 }
 
 .prose .maps-to strong {
   color: var(--ink-2);
-  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  background: none;
 }
 
 /* ---- Inline citations (sup > a.cite) ---- */
-/* The <sup> is a neutral wrapper: line-height 0 keeps the raised chip from
-   growing the line box, and the chip itself carries the superscript offset. */
+/* The <sup> is a neutral wrapper: line-height 0 keeps the raised mark from
+   growing the line box, and the mark itself carries the superscript offset. */
 .prose sup:has(> .cite) {
   vertical-align: baseline;
   line-height: 0;
@@ -340,20 +259,17 @@
 
 .prose .cite {
   display: inline-block;
-  padding: 2px;
-  border: 1px solid color-mix(in srgb, var(--l1-ink) 30%, transparent);
-  border-radius: var(--r-sm);
-  background: color-mix(in srgb, var(--l1) 55%, var(--bg));
-  color: var(--l1-ink);
+  padding: 2px 1px;
+  color: var(--muted);
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1;
   text-decoration: none;
   vertical-align: super;
 }
 
-/* Grouped citations: adjacent chips (one <sup>, or adjacent <sup>s from a
+/* Grouped citations: adjacent marks (one <sup>, or adjacent <sup>s from a
    [1][2] run split across text nodes) keep a 2px gap. */
 .prose .cite + .cite,
 .prose sup:has(> .cite) + sup:has(> .cite) {
@@ -362,19 +278,19 @@
 
 .prose .cite:hover,
 .prose .cite:focus-visible {
-  background: var(--l1);
+  color: var(--accent);
   text-decoration: none;
 }
 
 /* ---- Source list (## Sources -> ol.sources) ---- */
 .prose .sources {
   list-style: none;
-  margin-top: var(--s-5);
   padding-left: 0;
   font-size: var(--fs-small);
 }
 
 .prose .sources li {
+  margin-top: 0;
   padding: var(--s-2) 0;
   border-top: 1px solid var(--line);
   color: var(--ink-2);
@@ -382,7 +298,7 @@
 }
 
 .prose .sources li:target {
-  background: color-mix(in srgb, var(--l4) 45%, var(--bg));
+  background: var(--accent-soft);
   border-radius: var(--r-sm);
   padding-inline: var(--s-3);
   margin-inline: calc(var(--s-3) * -1);
@@ -403,28 +319,13 @@
 
 /* ---- Pull-quote blockquotes (non-callout) ---- */
 .prose blockquote {
-  position: relative;
-  margin-top: var(--s-5);
-  padding-left: var(--s-6);
-  border-left: 3px solid var(--l3-ink);
+  padding: 4px 0 4px 24px;
+  border-left: 2px solid var(--accent);
   font-family: var(--font-display);
-  font-size: var(--fs-h3);
-  line-height: 1.4;
+  font-size: clamp(1.5rem, 1.25rem + 0.9vw, 1.875rem);
+  line-height: 1.3;
   color: var(--ink);
-}
-
-/* Oversized decorative opening quote in the layer pastel (ornamental, not the
-   quote's text: that stays --ink below). */
-.prose blockquote::before {
-  content: '\201C';
-  position: absolute;
-  left: var(--s-3);
-  top: 0.05em;
-  font-family: var(--font-display);
-  font-size: 2.75rem;
-  line-height: 1;
-  color: var(--l3);
-  pointer-events: none;
+  text-wrap: balance;
 }
 
 .prose blockquote p {
@@ -434,21 +335,23 @@
 /* ---- Code ---- */
 .prose code {
   font-family: var(--font-mono);
-  font-size: 0.875em;
-  padding: 0.15em 0.4em;
-  border: 1px solid color-mix(in srgb, var(--l1-ink) 18%, transparent);
-  border-radius: var(--r-sm);
-  background: color-mix(in srgb, var(--l1) 40%, var(--bg));
-  color: var(--ink);
+  font-size: 0.86em;
+  padding: 0.08em 0.4em;
+  border: 1px solid var(--accent-line);
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
+/* Code blocks: Shiki paints its own dark ground inline (its token colours are
+   tuned for it), which wins over the panel; a plain <pre> takes the panel. */
 .prose pre {
   position: relative;
   padding: var(--s-4);
   overflow-x: auto;
-  background: var(--surface);
+  background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-blk);
 }
 
 /* Language chip, top-right, from Shiki's data-language (omitted for plaintext).
@@ -492,20 +395,21 @@
 }
 
 /* ---- Tables (rehype-tables -> div.table-scroll > table) ----
-   The scroll region already carries tabindex/role=region (rehype-tables), so
-   capping its height and letting it scroll vertically adds no new unlabelled
-   scroller; the thead sticks to its top as rows scroll under it. */
+   An opaque panel framed by a hairline. The scroll region already carries
+   tabindex/role=region (rehype-tables), so capping its height and letting it
+   scroll vertically adds no new unlabelled scroller; the thead sticks to its
+   top as rows scroll under it. */
 .prose .table-scroll {
-  margin-top: var(--s-5);
   max-height: 70dvh;
   overflow-x: auto;
   overflow-y: auto;
   border: 1px solid var(--line);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-blk);
+  background: var(--panel);
 }
 
 .prose .table-scroll:focus-visible {
-  outline: 2px solid var(--l1-ink);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
@@ -513,33 +417,35 @@
   width: 100%;
   border-collapse: collapse;
   font-size: var(--fs-small); /* 14px */
+  line-height: 1.55;
 }
 
 .prose th,
 .prose td {
-  padding: var(--s-2) var(--s-3);
-  border: 1px solid var(--line);
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
 }
 
-/* Column heads in sentence case (audit SL-05): the body face at the table's
-   size, set apart by weight, the --ink colour (cells are --ink-2) and the
-   opaque head fill rather than by mono capitals. */
+/* Column heads in the mono label register, on the opaque panel so scrolled
+   rows never show through the sticky header. */
 .prose thead th {
   position: sticky;
   top: 0;
   z-index: 1;
-  font-family: var(--font-body);
-  font-size: inherit;
-  font-weight: 600;
-  color: var(--ink);
-  /* Opaque so scrolled rows never show through the sticky header. */
-  background: color-mix(in srgb, var(--ink) 4%, var(--bg));
+  border-bottom-color: var(--line-strong);
+  background: var(--panel);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--muted);
 }
 
-.prose tbody tr:nth-child(even) {
-  background: color-mix(in srgb, var(--ink) 3%, transparent);
+.prose tbody tr:last-child > :is(th, td) {
+  border-bottom: 0;
 }
 
 .prose td {
@@ -567,7 +473,7 @@
   max-width: 22rem;
   width: max-content;
   padding: var(--s-3) var(--s-4);
-  background: var(--bg);
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--r-sm);
   color: var(--ink-2);

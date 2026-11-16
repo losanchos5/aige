@@ -11,7 +11,7 @@
  * when, against the rows' review date), the sources, the other routes and a
  * closing band.
  *
- * No script. Every tinted band goes through <Section tone="tint">, so --muted
+ * No script. Every tinted band goes through <Section>, so --muted
  * stays AA there (DESIGN.md hard constraint 3). The question cards are flat
  * (.card-lum, no lift) because they are not links.
  */
@@ -112,7 +112,6 @@ const obligationName = (o: (typeof obligations)[number]) =>
   </Section>
 
   <Section
-    tone="tint"
     id="questions"
     title="Three questions you bring."
     lede="Each one answered in brief here, and in full in the Body of Knowledge."
@@ -167,7 +166,7 @@ const obligationName = (o: (typeof obligations)[number]) =>
     </div>
   </Section>
 
-  <Section tone="tint" id="this-week" title="Start this week.">
+  <Section id="this-week" title="Start this week.">
     <ol class="au-week" data-pagefind-body>
       {
         a.thisWeek.map((w, i) => (
@@ -256,7 +255,7 @@ const obligationName = (o: (typeof obligations)[number]) =>
     </p>
   </Section>
 
-  <Section tone="tint" id="sources" title="Sources">
+  <Section id="sources" title="Sources">
     <div class="prose au-sources">
       <SourceList sources={a.sources} />
     </div>

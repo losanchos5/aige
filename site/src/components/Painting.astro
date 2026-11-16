@@ -1,0 +1,57 @@
+---
+/**
+ * Painting: one Monet from src/data/paintings.ts as a responsive <img>. The
+ * image covers its box (the caller sizes the box), shows the painting's mean
+ * colour until the file arrives, and loads lazily unless `eager` is set. A
+ * decorative painting (the default, alt="") is also hidden from assistive
+ * technology. `crop` picks the tight crop made for a thin frame (byline, cite
+ * card). No client JS.
+ */
+import { paintings, type CropName, type Painting, type PaintingId } from '../data/paintings';
+
+interface Props {
+  id: PaintingId;
+  /** The slot width the browser picks a file for, as in the <img> sizes attribute. */
+  sizes: string;
+  crop?: CropName;
+  /** Empty (the default) when the painting is decoration. */
+  alt?: string;
+  /** For a painting above the fold: load now, at high priority. */
+  eager?: boolean;
+  /** With `eager`: false loads now without claiming high priority (a small byline crop, not the LCP). */
+  highPriority?: boolean;
+  /** Overrides the record's object-position. */
+  objectPosition?: string;
+  class?: string;
+}
+
+const { id, sizes, crop, alt = '', eager = false, highPriority = eager, objectPosition, class: className } = Astro.props;
+const painting: Painting = paintings[id];
+const cropped = crop ? painting.crops?.[crop] : undefined;
+if (crop && !cropped) throw new Error(`Painting "${id}" has no "${crop}" crop`);
+
+const file = crop ? `${painting.dir}/${painting.file}-crop-${crop}` : `${painting.dir}/${painting.file}`;
+const variants = (cropped ?? painting).variants;
+const srcset = variants.map((v) => `${file}-${v.width}.webp ${v.width}w`).join(', ');
+// The plain src only serves a browser without srcset: the second width, not the largest.
+const fallback = variants[Math.min(1, variants.length - 1)];
+// Intrinsic size of the largest file; the CSS sizes the image, these give the aspect ratio.
+const largest = variants[variants.length - 1];
+const position = objectPosition ?? (cropped ?? painting).objectPosition;
+const color = (cropped ?? painting).color;
+---
+
+<img
+  class:list={['painting', className]}
+  src={`${file}-${fallback.width}.webp`}
+  srcset={srcset}
+  sizes={sizes}
+  width={largest.width}
+  height={largest.height}
+  alt={alt}
+  aria-hidden={alt === '' ? 'true' : undefined}
+  loading={eager ? 'eager' : 'lazy'}
+  fetchpriority={eager && highPriority ? 'high' : undefined}
+  decoding="async"
+  style={`object-fit: cover; object-position: ${position}; background-color: ${color};`}
+/>

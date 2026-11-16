@@ -270,50 +270,19 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     position: sticky;
     top: 0;
     z-index: 20;
-    /* Frosted bar: translucent ground + backdrop blur. The hairline + the
-       --shadow-1 elevation are held back until the page is scrolled past 8px
-       (initHeader in ui.js: passive, rAF-throttled). The 1px border is always
-       present but transparent so the bar height never shifts. */
-    background: color-mix(in srgb, var(--bg) 82%, transparent);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid transparent;
+    /* Paper bar: the opaque page ground and a 1px --line hairline, no blur and
+       no shadow (editorial restraint). */
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
   }
 
-  /* The blur is re-rendered on every scrolled frame, which low-end phones pay
-     for; below the desktop breakpoint, and whenever the user asks for less
-     transparency, the bar is a near-solid ground with no backdrop-filter.
-     Written as an override so browsers without prefers-reduced-transparency
-     keep the frosted desktop bar. */
-  @media (max-width: 839px), (prefers-reduced-transparency: reduce) {
-    .site-header {
-      background: color-mix(in srgb, var(--bg) 94%, transparent);
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
-    }
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .site-header {
-      transition:
-        border-color var(--dur) var(--ease),
-        box-shadow var(--dur) var(--ease);
-    }
-  }
-
-  .site-header.is-scrolled {
-    border-bottom-color: var(--line);
-    box-shadow: var(--shadow-1);
-  }
-
-  /* Overlay (the home): the bar floats over the hero's gradient field, so the
-     hero starts at the top of the viewport and the brand sits on the field.
-     Unscrolled it has no ground, blur, hairline or elevation (the field keeps
-     the links >= 4.5:1 under the bar, see hero-field.js); once scrolled it
-     falls back to the rules above, frosted on desktop and near-solid below
-     840px or under prefers-reduced-transparency. Fixed, not sticky, so it takes
-     no room in the flow; its height is unchanged. The selector outranks the
-     narrow/reduced-transparency override. */
+  /* Overlay (the home): the bar floats over the hero painting, so the hero
+     starts at the top of the viewport and the brand sits on the art.
+     Unscrolled it has no ground or hairline (the hero keeps the links
+     >= 4.5:1 under the bar, see tests/hero-art.spec.ts); once scrolled past
+     8px (initHeader in ui.js toggles .is-scrolled) it takes the paper bar
+     above. Fixed, not sticky, so it takes no room in the flow; its height is
+     unchanged. */
   .site-header[data-overlay] {
     position: fixed;
     inset: 0 0 auto;
@@ -321,8 +290,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
 
   .site-header[data-overlay]:not(.is-scrolled) {
     background: transparent;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
+    border-bottom-color: transparent;
   }
 
   /* On the bare field the chevrons (--muted) step up to --ink-2, as muted
@@ -335,8 +303,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     .site-header[data-overlay] {
       transition:
         background-color var(--dur) var(--ease),
-        border-color var(--dur) var(--ease),
-        box-shadow var(--dur) var(--ease);
+        border-color var(--dur) var(--ease);
     }
   }
 
@@ -359,9 +326,9 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
   /* break-word, not anywhere: it leaves the min-content width at the longest
      word, which is what tells the phone bar below to wrap. */
   .wordmark {
-    font-family: var(--font-display);
+    font-family: var(--font-body);
     font-weight: 600;
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
     letter-spacing: -0.01em;
     line-height: 1;
     overflow-wrap: break-word;
@@ -439,31 +406,34 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    /* A 25px hit area (WCAG 2.5.8 asks 24) around the 15px label: the
-       padding grows the box, the equal negative margin keeps the bar's
-       layout exactly as it was. */
-    margin: -5px 0;
-    padding: 5px 0;
+    /* A 24px+ hit area (WCAG 2.5.8) around the 12px label: the padding grows
+       the box, the equal negative margin keeps the bar's layout unchanged. */
+    margin: -7px 0;
+    padding: 7px 0;
     border: 0;
     background: none;
     color: var(--ink-2);
-    font-family: inherit;
-    font-size: 0.9375rem;
+    /* Mono uppercase labels at the 12px floor, tracked (the mockup's .nav a). */
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
     line-height: 1;
+    white-space: nowrap;
     text-decoration: none;
     cursor: pointer;
   }
 
   .nav-link:hover,
   .nav-trigger:hover {
-    color: var(--ink);
+    color: var(--accent);
   }
 
   .nav-link[aria-current='page'],
   .nav-item[data-current] .nav-link,
   .nav-group[data-current] .nav-trigger {
-    color: var(--ink);
-    font-weight: 600;
+    color: var(--accent);
   }
 
   /* Group chevron: flips to point up while its panel is open (aria-expanded). */
@@ -491,9 +461,9 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     left: 0;
     right: 0;
     /* 6px under the label, as before the hit-area padding (5px of it). */
-    bottom: -1px;
-    height: 2px;
-    background: var(--ink);
+    bottom: 1px;
+    height: 1px;
+    background: currentColor;
     transform: scaleX(0);
     transform-origin: left;
   }
@@ -525,8 +495,8 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     top: 100%;
     z-index: 30;
     background: var(--bg);
+    border-top: 1px solid var(--line);
     border-bottom: 1px solid var(--line);
-    box-shadow: 0 12px 32px color-mix(in srgb, var(--ink) 8%, transparent);
     padding-block: var(--s-5) var(--s-6);
     /* The Body of Knowledge panel lists every chapter: on a short window it
        scrolls inside itself rather than running off the bottom of the screen
@@ -557,12 +527,10 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     }
   }
 
-  /* The panel: a card on the left carries the group's name and one-line
-     description on a static cut of the home hero's gradient field (the same
-     --field-1..3 tokens), fading to the page ground where the text sits so
-     it reads as it does on the plain panel; the group's links fill the
-     column on the right. The card is the lead link when the group has a
-     landing page (its whole face is clickable). */
+  /* The panel: a flat --panel card on the left carries the group's name and
+     one-line description; the group's links fill the column on the right.
+     The card is the lead link when the group has a landing page (its whole
+     face is clickable). */
   .nav-menu-in {
     display: grid;
     grid-template-columns: minmax(220px, 288px) minmax(0, 1fr);
@@ -580,12 +548,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     padding: var(--s-5);
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
-    background:
-      linear-gradient(to bottom, transparent 8%, var(--bg) 60%),
-      radial-gradient(60% 80% at 100% 0%, var(--field-1), transparent 72%),
-      radial-gradient(70% 85% at 60% 0%, var(--field-2), transparent 72%),
-      radial-gradient(80% 95% at 0% 0%, var(--field-3), transparent 72%),
-      var(--bg);
+    background: var(--panel);
     overflow: hidden;
   }
 
@@ -596,7 +559,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
   }
 
   .nav-card[data-lead]:hover {
-    border-color: color-mix(in srgb, var(--hero-ink) 35%, var(--line));
+    border-color: var(--accent-line);
   }
 
   .nav-menu-body {
@@ -608,9 +571,9 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     display: inline-block;
     margin: 0;
     font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.125rem;
-    color: var(--hero-ink);
+    font-weight: 400;
+    font-size: 1.375rem;
+    color: var(--accent);
     text-decoration: none;
   }
 
@@ -645,7 +608,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
 
   .nav-menu-list li:hover,
   .nav-menu-list li:focus-within {
-    background: var(--tint-bg);
+    background: var(--hover);
   }
 
   .nav-menu-list a {
@@ -702,7 +665,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
 
   .nav-menu-chapters a:hover,
   .nav-menu-chapters a:focus-visible {
-    background: var(--tint-bg);
+    background: var(--hover);
   }
 
   .nav-menu-chapters a:hover .ch-label {
@@ -719,7 +682,7 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     font-family: var(--font-mono);
     font-size: var(--fs-label);
     font-weight: 500;
-    color: var(--hero-ink);
+    color: var(--accent);
   }
 
   /* The Body of Knowledge by part: one named list per part, the parts flowed
@@ -774,15 +737,15 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
     justify-content: center;
     width: 44px;
     height: 44px;
-    border: 1px solid var(--line);
-    border-radius: var(--r-sm);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-ctl);
     background: transparent;
     color: var(--ink);
     cursor: pointer;
   }
 
   .icon-btn:hover {
-    border-color: var(--ink-2);
+    background: var(--hover);
   }
 
   .burger {
@@ -800,6 +763,58 @@ const isDirect = (group: NavGroup) => panelItems(group).length === 0;
       display: block;
     }
     .burger {
+      display: none;
+    }
+  }
+
+  /* The tracked mono labels need more room than the old sans ones: between
+     840 and 1279px the bar tightens step by step (gaps, then tracking, then
+     the wordmark may wrap to two lines) so it never scrolls sideways. The
+     labels stay at 12px. */
+  @media (min-width: 840px) and (max-width: 1279px) {
+    .nav-top {
+      gap: var(--s-4);
+    }
+    .nav-link,
+    .nav-trigger {
+      letter-spacing: 0.04em;
+    }
+  }
+
+  @media (min-width: 840px) and (max-width: 1099px) {
+    .bar,
+    .right {
+      gap: var(--s-2) var(--s-3);
+    }
+    .nav-top {
+      gap: var(--s-3);
+    }
+    .nav-link,
+    .nav-trigger {
+      gap: 2px;
+      letter-spacing: 0.02em;
+    }
+    .brand {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    .nav-desktop {
+      min-width: 0;
+    }
+  }
+
+  /* Narrowest desktop band: seven labels and two buttons leave no room for the
+     wordmark, so the bar keeps only the mark (the brand link is still named
+     by its aria-label), as at 320px. */
+  @media (min-width: 840px) and (max-width: 959px) {
+    .nav-top {
+      gap: var(--s-2);
+    }
+    .nav-link,
+    .nav-trigger {
+      letter-spacing: 0;
+    }
+    .wordmark {
       display: none;
     }
   }

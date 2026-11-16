@@ -9,7 +9,7 @@
 //
 // Copy, link lists and sources live in src/data/frontier.ts; the build throws
 // on any problem frontierProblems() reports. No script. Every tinted band goes
-// through <Section tone="tint">, so --muted stays AA there (DESIGN.md hard
+// through <Section>, so --muted stays AA there (DESIGN.md hard
 // constraint 3). The anchors other pages link to are fixed: who,
 // evaluation-environments, runtime-safeguards, assurance, incidents,
 // stack-map, open-questions and sources. Three chart-kit figures (OpenSpec
@@ -98,12 +98,6 @@ const toRows = (links: readonly FrontierLink[]) =>
     ...(l.layer ? { swatch: `var(--l${l.layer})` } : {}),
     ...(docsEvent(l.href) ? { attrs: docsEvent(l.href) } : {}),
   }));
-
-// Plain and tinted bands alternate: #who is plain, so the blocks start tinted.
-const blockTone = (i: number): 'plain' | 'tint' => (i % 2 === 0 ? 'tint' : 'plain');
-const stackTone = blockTone(frontierBlocks.length);
-const questionsTone = blockTone(frontierBlocks.length + 1);
-const sourcesTone = blockTone(frontierBlocks.length + 2);
 
 const stackRows = layers.map((layer) => ({
   title: `Layer ${String(layer.n).padStart(2, '0')}: ${layer.name}`,
@@ -228,7 +222,7 @@ const aiucNarrow = dotMatrix({ ...aiucBase, id: 'fr-aiuc-n', width: NARROW_WIDTH
 
   {
     frontierBlocks.map((block, i) => (
-      <Section tone={blockTone(i)} id={block.id} title={block.title} lede={block.lede}>
+      <Section id={block.id} title={block.title} lede={block.lede}>
         {block.id === 'evaluation-environments' && (
           <div class="fr-figure fr-figure-head">
             <EvalBoundary id="fr-eval-boundary" />
@@ -286,7 +280,6 @@ const aiucNarrow = dotMatrix({ ...aiucBase, id: 'fr-aiuc-n', width: NARROW_WIDTH
   }
 
   <Section
-    tone={stackTone}
     id="stack-map"
     title="Where it sits on the stack."
     lede="The same five layers as every other route, read for frontier evaluation and deployment."
@@ -294,7 +287,7 @@ const aiucNarrow = dotMatrix({ ...aiucBase, id: 'fr-aiuc-n', width: NARROW_WIDTH
     <div class="well"><RegisterList items={stackRows} /></div>
   </Section>
 
-  <Section tone={questionsTone} id="open-questions" title="Open questions.">
+  <Section id="open-questions" title="Open questions.">
     <div class="well fr-questions" data-pagefind-body>
       <ol class="fr-qlist">
         {frontierOpenQuestions.map((q) => <li>{q}</li>)}
@@ -308,7 +301,7 @@ const aiucNarrow = dotMatrix({ ...aiucBase, id: 'fr-aiuc-n', width: NARROW_WIDTH
     </div>
   </Section>
 
-  <Section tone={sourcesTone} id="sources" title="Sources">
+  <Section id="sources" title="Sources">
     <div class="prose fr-sources">
       <SourceList sources={frontierSources} />
     </div>

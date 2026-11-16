@@ -53,7 +53,7 @@
 
 .cov-lenses label:has(input:checked) {
   border-color: var(--ink);
-  background: var(--tint-bg);
+  background: var(--accent-soft);
 }
 
 .cov-lenses label:has(input:focus-visible) {
@@ -238,7 +238,7 @@
 
 /* Crosshair: the row by :has(), the column by .is-col-hot (coverage-map.js). */
 .cov-rows > .cov-row:has(a:hover, a:focus-visible) {
-  background: var(--pause-bg);
+  background: var(--hover);
   box-shadow: 0 0 0 1px var(--line);
   border-radius: var(--r-sm);
 }

@@ -17,9 +17,12 @@
   function focusables() {
     if (!sidebar) return [];
     var nodes = sidebar.querySelectorAll(
-      'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      'a[href], summary, button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
     );
+    // A link inside a folded <details> keeps its client rects but cannot take
+    // focus, so it may not stand as the trap's last stop.
     return Array.prototype.filter.call(nodes, function (el) {
+      if (el.tagName !== 'SUMMARY' && el.closest('details:not([open])')) return false;
       return el.getClientRects().length > 0;
     });
   }
@@ -53,17 +56,18 @@
     }
   }
 
-  // Open, the drawer is a named modal dialog with the page behind it inert;
-  // closed (and on the desktop rail) it is a plain <div> whose inner
-  // <nav aria-label="Chapters"> is the landmark (an <aside> may not take
-  // role="dialog"). The CSS hides the closed drawer with visibility, which
-  // also takes its links out of the tab order.
+  // Open, the drawer is a modal dialog named like its inner <nav> (the book's
+  // chapters or a nav group), with the page behind it inert; closed (and on
+  // the desktop rail) it is a plain <div> whose inner <nav> is the landmark
+  // (an <aside> may not take role="dialog"). The CSS hides the closed drawer
+  // with visibility, which also takes its links out of the tab order.
   function openDrawer() {
     if (!sidebar) return;
     lastFocused = document.activeElement;
+    var railNav = sidebar.querySelector('nav');
     sidebar.setAttribute('role', 'dialog');
     sidebar.setAttribute('aria-modal', 'true');
-    sidebar.setAttribute('aria-label', 'Chapters');
+    sidebar.setAttribute('aria-label', (railNav && railNav.getAttribute('aria-label')) || 'Chapters');
     sidebar.classList.add('is-open');
     if (scrim) scrim.hidden = false;
     if (openBtn) openBtn.setAttribute('aria-expanded', 'true');
@@ -119,8 +123,6 @@
   var headings = Array.prototype.slice.call(
     document.querySelectorAll('.prose h2[id], .prose h3[id]'),
   );
-  var tocMarker = document.querySelector('[data-toc-marker]');
-  var tocList = document.querySelector('.toc-list');
   var tocBox = document.querySelector('.doc-toc');
 
   // Index of a heading id within the document-order headings list (-1 if none).
@@ -142,38 +144,8 @@
     });
   }
 
-  // The TOC marker and the sidebar rail used to be placed before their CSS
-  // transition could apply; placed after the first frame they would slide in
-  // from the top. Their transition is held off until the first placement has
-  // been painted, so they still simply appear in place.
-  function holdTransition(el) {
-    if (el) el.style.transition = 'none';
-  }
-
-  function releaseTransition(el) {
-    if (!el || !window.requestAnimationFrame) return;
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        el.style.transition = '';
-      });
-    });
-  }
-
   if (links.size && headings.length && 'IntersectionObserver' in window) {
     var visible = new Set();
-
-    // Slide the 2px marker to the active entry and size it to that entry, with
-    // transform only: scaleY stretches the marker's CSS height to the entry's.
-    function moveMarker(activeId) {
-      if (!tocMarker || !tocList || !activeId) return;
-      var link = links.get(activeId);
-      if (!link) return;
-      var lr = link.getBoundingClientRect();
-      var cr = tocList.getBoundingClientRect();
-      var base = tocMarker.offsetHeight || 1;
-      tocMarker.style.transform =
-        'translateY(' + (lr.top - cr.top) + 'px) scaleY(' + (lr.height / base).toFixed(4) + ')';
-    }
 
     // A TOC taller than the viewport scrolls inside its sticky column: keep the
     // current entry in view there. Only the column scrolls, never the page.
@@ -209,7 +181,6 @@
         if (activeIdx !== -1 && idx !== -1 && idx < activeIdx) a.classList.add('is-past');
         else a.classList.remove('is-past');
       });
-      moveMarker(activeId);
       revealActive(activeId);
     }
 
@@ -228,11 +199,7 @@
     headings.forEach(function (h) {
       io.observe(h);
     });
-    holdTransition(tocMarker);
-    afterFirstFrame(function () {
-      setActive();
-      releaseTransition(tocMarker);
-    });
+    afterFirstFrame(setActive);
   }
 
   /* ---- Copy citation ---- */
@@ -255,32 +222,7 @@
     });
   });
 
-  /* ---- Sidebar rail: slide an accent onto the current chapter row ---- */
-  (function () {
-    var nav = document.querySelector('.sidebar-nav');
-    var rail = nav && nav.querySelector('[data-nav-rail]');
-    var currentRow = nav && nav.querySelector('.nav-item[aria-current="page"]');
-    if (!nav || !rail || !currentRow) return;
-
-    function placeRail() {
-      var nr = nav.getBoundingClientRect();
-      var cr = currentRow.getBoundingClientRect();
-      var base = rail.offsetHeight || 1;
-      rail.style.transform =
-        'translateY(' + (cr.top - nr.top) + 'px) scaleY(' + (cr.height / base).toFixed(4) + ')';
-      var ink = getComputedStyle(currentRow).getPropertyValue('--layer-ink').trim();
-      if (ink) rail.style.background = ink;
-    }
-
-    holdTransition(rail);
-    afterFirstFrame(function () {
-      placeRail();
-      releaseTransition(rail);
-    });
-    window.addEventListener('resize', placeRail, { passive: true });
-  })();
-
-  /* ---- Reading progress: top hairline, sidebar register, read state ---- */
+  /* ---- Reading progress: top bar, sidebar register, read state ---- */
   (function () {
     var article = document.querySelector('.prose');
     var bar = document.querySelector('[data-doc-progress]');

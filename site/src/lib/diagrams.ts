@@ -159,16 +159,14 @@ export function renderDiagramFigure(id: string, opts?: { bare?: boolean }): stri
   const notesScript = `<script type="application/json" data-diagram-notes>${notesJson}</script>`;
 
   // Enlarge is a no-op without JS (a bare button with no target), so it ships
-  // hidden; public/diagram.js reveals it and moves the canvas (button and all)
-  // into the dialog, where diagrams.css hides the button again. It overlays the
-  // canvas top-right, so it lives inside .diagram-canvas: the frame-only `bare`
-  // variant leaves it out and lets the host page own the enlarge chrome.
-  // data-pagefind-ignore keeps the UI label ("⤢ Enlarge") out of search excerpts.
+  // hidden; public/diagram.js finds it anywhere in the figure, reveals it and
+  // moves the canvas into the dialog. It sits with the other secondary controls
+  // in the caption; the frame-only `bare` variant has no caption and leaves it
+  // out. data-pagefind-ignore keeps UI labels out of search excerpts.
   const enlargeBtn =
-    `<button type="button" class="diagram-enlarge" aria-haspopup="dialog" hidden data-pagefind-ignore>` +
-    `<span class="diagram-enlarge-icon" aria-hidden="true">⤢</span> Enlarge` +
+    `<button type="button" class="diagram-enlarge diagram-link" aria-haspopup="dialog" hidden>` +
+    `Enlarge` +
     `</button>`;
-  const canvasWithEnlarge = `<div class="diagram-canvas">${svg}${enlargeBtn}</div>`;
 
   // Bare: frame only, canvas, note panel and the notes payload, no figcaption
   // and no enlarge dialog. The host page owns the caption/enlarge chrome.
@@ -178,16 +176,21 @@ export function renderDiagramFigure(id: string, opts?: { bare?: boolean }): stri
 
   return (
     openTag +
-    canvasWithEnlarge +
+    canvas +
     notePanel +
     `<figcaption class="diagram-figcaption">` +
+    `<span class="diagram-fig-label" data-pagefind-ignore>Diagram</span>` +
     `<span class="diagram-fig-title">${escapeHtml(title)}</span>` +
     `<span class="diagram-fig-desc">${escapeHtml(caption)}</span>` +
+    `<span class="diagram-fig-hint" data-pagefind-ignore>Hover or focus a node to trace its edges.</span>` +
+    `<span class="diagram-fig-actions" data-pagefind-ignore>` +
     // Extensionless: the host serves /diagrams/<id> from diagrams/<id>.html, so
     // linking the bare path avoids a 308 redirect on every in-content link.
-    `<a class="diagram-open" href="/diagrams/${id}" target="_blank" rel="noopener" data-pagefind-ignore>` +
+    `<a class="diagram-open diagram-link" href="/diagrams/${id}" target="_blank" rel="noopener">` +
     `Open interactive diagram<span class="diagram-open-hint"> (opens in a new tab)</span>` +
     `</a>` +
+    enlargeBtn +
+    `</span>` +
     `</figcaption>` +
     notesScript +
     // Empty enlarge dialog; diagram.js relocates .diagram-canvas and .diagram-note

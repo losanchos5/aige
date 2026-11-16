@@ -3,16 +3,16 @@
  * PageHero: the single full-bleed page hero shared by the editorial landings
  * (/role, /stack, /path, /map) and the reference pages (/resources and its
  * sub-pages). It renders a `<section>` that is a direct child of <main>/.marketing,
- * so its inert gradient mesh (defined in effects.css) sits at inset:0 and
- * reaches both viewport edges, while the content stays inside the centred
- * `.container`. No `100vw`, so no horizontal scroll (layout.spec guards this).
+ * so it sits on the page's paper and its closing 1px hairline reaches both
+ * viewport edges, while the content stays inside the centred `.container`. No
+ * mesh layer and no `100vw`, so no horizontal scroll (layout.spec guards this).
  *
  * Two variants that read differently at a glance:
- * - `page` (landing): a display-size title on a tall ~40vh band over the full
- *   mesh, with no eyebrow above it; `related` adds a small line under the lede
- *   linking the related chapter.
- * - `res` (reference): an H1-scale title on a tight band under a faint mesh,
- *   with a Breadcrumb (`crumbs`) above the title.
+ * - `page` (landing): a display-size title on a tall ~40vh band, with no
+ *   eyebrow above it; `related` adds a small line under the lede linking the
+ *   related chapter.
+ * - `res` (reference): an H1-scale title on a tight band, with a Breadcrumb
+ *   (`crumbs`) above the title.
  * There is no kicker and no dot texture (audit SL-04, SL-18). The `lede` and
  * `note` slots take copy that carries inline markup.
  */
@@ -28,14 +28,14 @@ interface Props {
   crumbs?: Crumb[];
   /** A small line under the lede linking the related chapter (landings). */
   related?: { label: string; href: string };
-  /** Draw the gradient mesh layer (default true; false on Lighthouse routes). */
+  /** No effect: the hero has no mesh any more. Kept so existing callers compile. */
   mesh?: boolean;
   variant?: 'page' | 'res';
   /** Page language, for the breadcrumb landmark's name. */
   lang?: string;
 }
 
-const { title, lede, crumbs, related, mesh = true, variant = 'page', lang = 'en' } = Astro.props;
+const { title, lede, crumbs, related, variant = 'page', lang = 'en' } = Astro.props;
 
 const landing = variant === 'page';
 ---
@@ -43,7 +43,6 @@ const landing = variant === 'page';
 <section
   class:list={['hero', 'section', 'hero--page', landing ? 'hero--landing' : 'hero--res']}
 >
-  {mesh && <div class="bg-mesh" aria-hidden="true"></div>}
   <div class="container">
     <header class="hero-head hero-in">
       {
@@ -75,17 +74,13 @@ const landing = variant === 'page';
 </section>
 
 <style>
-  /* The full-bleed band: relative + isolated so the inert mesh stays
-     behind the raised content. A softer mesh runs via a local --mesh-alpha
-     override. The band itself does not clip: .bg-mesh clips its own drifting
-     glows (overflow + contain in effects.css), so text enlarged to 200% wraps
-     inside the band instead of being cut at its edge (WCAG 1.4.4). (Moved here
-     from the .hero--page / .res-hero rules that used to live in pages.css.) */
+  /* The full-bleed band on the paper, closed by a hairline across the whole
+     viewport. It does not clip, so text enlarged to 200% wraps inside the band
+     instead of being cut at its edge (WCAG 1.4.4). */
   .hero--page {
     position: relative;
-    isolation: isolate;
     min-height: 40vh;
-    --mesh-alpha: 0.7;
+    border-bottom: 1px solid var(--line);
   }
 
   .hero--page > .container {
@@ -114,7 +109,7 @@ const landing = variant === 'page';
   .hero-title {
     margin: 0;
     font-family: var(--font-display);
-    font-weight: 700;
+    font-weight: 400;
     font-size: var(--fs-display);
     line-height: var(--leading-display);
     letter-spacing: var(--tracking-display);
@@ -175,15 +170,11 @@ const landing = variant === 'page';
     margin-top: var(--s-3);
   }
 
-  /* Reference variant: dense pages get an H1-scale title, a tighter band
-     (--s-6 against the landing's --s-8) and a soft wash of mesh. (Moved here
-     from .res-hero / .res-head / .res-title in the page and resources
-     stylesheets.) The wash went from .35 to .65 (visual-rhythm): at .35 the
-     reference pages read as cream from the first screen. */
+  /* Reference variant: dense pages get an H1-scale title and a tighter band
+     (--s-6 against the landing's --s-8). */
   .hero--res {
     min-height: 0;
     padding-block: var(--s-6) var(--s-5);
-    --mesh-alpha: 0.65;
   }
 
   .hero--res .hero-title {

@@ -7,7 +7,7 @@ import VerdictStamp from '../components/VerdictStamp.astro';
 <Base title="Verdict: BLOCK" description="This route is not registered." noindex>
   {/* Section's own head renders an H2; the 404 needs the page H1, so the head is
       slotted here with the shared .sec-head classes instead of the title prop. */}
-  <Section tone="mesh" class="notfound">
+  <Section class="notfound">
     <div class="sec-head sec-head--xl nf-head">
       <h1 class="sec-title display nf-title">
         Verdict: <VerdictStamp verdict="block" />

@@ -94,7 +94,8 @@ const crumbs = [{ label: 'Open control profiles', href: '/controls' }, { label: 
 const headings = [
   { depth: 2, slug: 'scope', text: 'Scope' },
   { depth: 2, slug: 'how-to-read-a-control', text: 'How to read a control' },
-  ...rows.map((c) => ({ depth: 2, slug: controlAnchor(c), text: controlHeading(c) })),
+  // The records print their own control number, so the TOC leaves them unnumbered.
+  ...rows.map((c) => ({ depth: 2, slug: controlAnchor(c), text: controlHeading(c), numbered: false })),
   { depth: 2, slug: 'mappings', text: 'Mappings' },
   { depth: 2, slug: 'open-questions', text: 'Open questions' },
   { depth: 2, slug: 'changelog', text: 'Changelog' },
@@ -166,7 +167,7 @@ const jsonLd = [
   description={description}
   crumbs={crumbs}
   headings={headings}
-  sidebar={false}
+  navGroup="practice"
   siteVersion={false}
   image="/og/controls.png"
   jsonLd={jsonLd}

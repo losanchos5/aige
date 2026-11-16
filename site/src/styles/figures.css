@@ -24,15 +24,24 @@
   margin-inline: calc(50% - 50cqw);
 }
 
-/* Framed like a card-lum: a 1px line and a soft shadow from the tokens. The
-   canvas keeps the --bg fill the SVGs are drawn against (not --surface). */
+/* The one figure frame (VISUAL-GUIDE §1.15), shared with .chart-canvas and the
+   archify .diagram-canvas: a flat --panel ground, a 1px line, the block radius,
+   no shadow and no outer panel. Inside it --bg is the panel, so every paper
+   fill the SVGs draw (masks, hollow marks, chip grounds) follows the frame. */
 .figure--infographic .figure-canvas {
-  padding: var(--s-3);
+  --bg: var(--panel);
+  padding: 20px;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-1);
+  border-radius: var(--r-blk);
+  box-shadow: none;
   overflow: hidden;
+}
+
+@media (max-width: 559px) {
+  .figure--infographic .figure-canvas {
+    padding: var(--s-3);
+  }
 }
 
 /* Cap the SVG near its natural width so a wide well centres it instead of
@@ -83,41 +92,59 @@
   outline-offset: 2px;
 }
 
-.figure-poster-link {
-  font-size: var(--fs-small);
-  color: var(--ink-2);
-}
-
+/* The one caption: a mono kind label in the accent, the title at 600, the
+   description in --muted, then the secondary controls (permalink, text
+   description) as mono uppercase text links. Same rules as .chart-caption. */
 .figure-figcaption {
   display: flex;
   flex-direction: column;
-  gap: var(--s-2);
+  gap: 6px;
+}
+
+.figure-fig-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
 .figure-fig-title {
   font-weight: 600;
+  line-height: 1.4;
   color: var(--ink);
 }
 
 .figure-fig-desc {
-  max-width: 72ch;
+  max-width: 68ch;
   font-size: var(--fs-small);
+  line-height: 1.55;
   color: var(--muted);
   text-wrap: pretty;
 }
 
 /* The caption's link to the figure's permalink page (downloads, embed snippets
-   and citation). --ink-2 keeps AA on every figure frame in both themes. */
-.figure-permalink {
+   and citation) and the text-description summary: one mono text-link style. */
+.figure-permalink,
+.figure-alt-summary {
   align-self: flex-start;
-  font-size: var(--fs-small);
-  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent);
   text-decoration: underline;
-  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--accent-line);
+  text-underline-offset: 0.35em;
 }
 
-.figure-permalink:hover {
-  color: var(--ink);
+.figure-permalink:hover,
+.figure-alt-summary:hover {
+  text-decoration-color: currentColor;
 }
 
 .figure-permalink:focus-visible {
@@ -132,17 +159,8 @@
 
 /* Text alternative: a plain, collapsible full description in the chapter's
    words for anyone the graphic does not reach. */
-.figure-alt {
-  border-top: 1px solid var(--line);
-  padding-top: var(--s-3);
-}
-
 .figure-alt-summary {
-  font-family: var(--font-mono);
-  font-size: var(--fs-label);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--muted);
+  width: fit-content;
   cursor: pointer;
 }
 
@@ -408,7 +426,7 @@
   font-weight: 600;
   text-align: center;
   /* Neutral: a chapter number is not a layer, so no layer colour (SL-06). */
-  background: var(--tint-bg);
+  background: var(--panel);
   color: var(--ink-2);
 }
 
@@ -485,8 +503,8 @@
 .figc .hatch-3 { stroke: var(--l3-ink); stroke-width: 1.6; }
 .figc .hatch-4 { stroke: var(--l4-ink); stroke-width: 1.6; }
 .figc .hatch-5 { stroke: var(--l5-ink); stroke-width: 1.6; }
-/* The one accent: the value the caption is about, in solid ink. */
-.figc .mk-hi { fill: var(--ink); stroke: var(--ink); }
+/* The one accent: the value the caption is about, in the site accent. */
+.figc .mk-hi { fill: var(--accent); stroke: var(--accent); }
 .figc .heat-0 { fill: var(--ink); }
 .figc .heat-1 { fill: var(--l1-ink); }
 .figc .heat-2 { fill: var(--l2-ink); }

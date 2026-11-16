@@ -69,9 +69,8 @@ const jsonLd = [
   headings={headings}
   editPath="THESIS.es.md"
   updated={updated}
-  sidebar={false}
-  wide={true}
   activeThesis={true}
+  thesisHref="/es/thesis"
   image="/og/thesis.png"
   imageAlt={`Tarjeta de «The Thesis», en inglés · ${site.name}`}
   jsonLd={jsonLd}
@@ -116,8 +115,8 @@ const jsonLd = [
     padding: var(--s-3) var(--s-4);
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
-    /* Same as SignNote: a neutral tint and the body size. */
-    background: var(--tint-bg);
+    /* Same as SignNote: a --panel surface and the body size. */
+    background: var(--panel);
     font-size: var(--fs-body);
   }
 

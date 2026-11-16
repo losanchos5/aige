@@ -1,5 +1,5 @@
 // page-hero.spec.ts: the shared full-bleed PageHero and the Breadcrumb trail.
-// (a) the hero's inert mesh reaches both viewport edges with no page-level
+// (a) the hero reaches both viewport edges with no page-level
 // horizontal scroll, and no hero or section carries an eyebrow/kicker or a
 // dot/grid texture any more (audit SL-04, SL-18); (b) breadcrumbs render the
 // right trail, mark the current page and emit exactly one BreadcrumbList JSON-LD
@@ -7,7 +7,7 @@
 // no longer attributes itself to chapter 06.
 import { test, expect } from '@playwright/test';
 
-/** Geometry of a hero background layer plus the document's scroll/client width. */
+/** Geometry of a hero element plus the document's scroll/client width. */
 async function layer(page: import('@playwright/test').Page, selector: string) {
   return page.evaluate((sel) => {
     const el = document.querySelector(sel);
@@ -22,18 +22,22 @@ async function layer(page: import('@playwright/test').Page, selector: string) {
   }, selector);
 }
 
-// ---- (a) full-bleed background layers --------------------------------------
+// ---- (a) full-bleed heroes -------------------------------------------------
 
-test('resources sub-page hero mesh spans the viewport at 1440x900', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/resources/frameworks');
-  const m = await layer(page, '.hero .bg-mesh');
-  expect(m).not.toBeNull();
-  expect(m!.left).toBe(0);
-  expect(m!.width).toBe(m!.clientWidth);
-  // No page-level horizontal scroll (the 100vw trap layout.spec also guards).
-  expect(m!.scrollW).toBe(m!.clientWidth);
-});
+for (const path of ['/resources/frameworks', '/role']) {
+  test(`${path} hero spans the viewport at 1440x900`, async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(path);
+    // On the paper: no mesh layer behind the title (page-hero spec).
+    await expect(page.locator('.hero .bg-mesh')).toHaveCount(0);
+    const m = await layer(page, '.hero');
+    expect(m).not.toBeNull();
+    expect(m!.left).toBe(0);
+    expect(m!.width).toBe(m!.clientWidth);
+    // No page-level horizontal scroll (the 100vw trap layout.spec also guards).
+    expect(m!.scrollW).toBe(m!.clientWidth);
+  });
+}
 
 test('glossary hero has neither a mesh nor a texture layer', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -42,16 +46,6 @@ test('glossary hero has neither a mesh nor a texture layer', async ({ page }) =>
   await expect(page.locator('.hero .hero-tex, .hero .bg-dots, .hero .bg-grid')).toHaveCount(0);
   const m = await layer(page, '.hero');
   expect(m).not.toBeNull();
-  expect(m!.scrollW).toBe(m!.clientWidth);
-});
-
-test('landing hero mesh spans the viewport on /role', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/role');
-  const m = await layer(page, '.hero .bg-mesh');
-  expect(m).not.toBeNull();
-  expect(m!.left).toBe(0);
-  expect(m!.width).toBe(m!.clientWidth);
   expect(m!.scrollW).toBe(m!.clientWidth);
 });
 

@@ -69,10 +69,13 @@ const { skills } = Astro.props;
     color: var(--ink-2); /* --muted fails AA on the mixed header bg */
   }
 
+  /* anywhere: a long term ("Observability/OpenTelemetry") at 200% text breaks
+     instead of widening the row past a phone screen (WCAG 1.4.4). */
   .srow {
     display: grid;
     gap: var(--s-3);
     padding: var(--s-5);
+    overflow-wrap: anywhere;
   }
 
   .srow + .srow {

@@ -10,7 +10,7 @@
  * light and dark both follow the tokens.
  */
 import { getFigure } from '../data/figures';
-import { hasFigureArt } from '../lib/figure-reuse';
+import { FIGURE_LABEL, hasFigureArt } from '../lib/figure-reuse';
 
 interface Props {
   /** Short title (≤ 6 words) shown in the figcaption. */
@@ -37,6 +37,8 @@ const known = id !== undefined && getFigure(id) !== undefined && hasFigureArt(id
 // (src/lib/rehype-diagrams.ts): it keeps a legible width and scrolls sideways
 // inside a focusable, labelled region on a narrow screen (figures.css).
 const poster = known && getFigure(id!)!.kind === 'poster';
+// The caption's mono label: figures carry no number, so it names the kind.
+const label = known ? FIGURE_LABEL[getFigure(id!)!.kind ?? 'infographic'] : FIGURE_LABEL.infographic;
 ---
 
 <figure
@@ -59,6 +61,7 @@ const poster = known && getFigure(id!)!.kind === 'poster';
     )
   }
   <figcaption class="figure-figcaption">
+    <span class="figure-fig-label" data-pagefind-ignore>{label}</span>
     <span class="figure-fig-title">{title}</span>
     {caption && <span class="figure-fig-desc">{caption}</span>}
     {

@@ -7,12 +7,14 @@
 // Coverage: presence of every figure at every placement, the standalone viewer,
 // the strict-CSP promise (no inline JS), unique element ids on the page that
 // carries three figures, the highlight/pin/escape interaction (incl. reduced
-// motion), the insertion point on a pattern page, and an axe sweep of two
-// diagram pages. The pattern diagrams live on the pattern pages
+// motion), the insertion point on a pattern page, an axe sweep of two diagram
+// pages, the 12px text floor (figure-frame spec) and, for every diagram, the
+// same nodes, edges and notes as its IR. The pattern diagrams live on the pattern pages
 // (/patterns/<slug>, placed by data/diagrams.ts `pattern`), not in the chapter 05
 // catalogue. Runs in the `default` project against dist/ served by preview.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { readdirSync, readFileSync } from 'node:fs';
 import { inlineScriptAllowed } from './helpers/csp';
 
 // id -> curated title shown in the figure caption (src/data/diagrams.ts).
@@ -227,10 +229,12 @@ test.describe('lead placement', () => {
   }
 });
 
-// ---- 6c. Desktop breakout / mobile parity ----------------------------------
-// On desktop the figure breaks out of the 72ch reading column to fill the well
-// without colliding with the on-this-page TOC rail; the thesis figure renders
-// wide; and on a narrow phone the figure never exceeds the article width.
+// ---- 6c. Desktop width / mobile parity -------------------------------------
+// Editorial restraint (figure-frame spec): a figure fills the reading column,
+// laid out for it at 12px text, and scrolls inside its frame when it needs
+// more; it never breaks out. On desktop it fills the column without colliding
+// with the on-this-page TOC rail, the thesis figure too; on a narrow phone it
+// never exceeds the article width.
 function rectsIntersect(
   a: { x: number; y: number; width: number; height: number },
   b: { x: number; y: number; width: number; height: number },
@@ -244,9 +248,7 @@ function rectsIntersect(
 }
 
 test.describe('breakout', () => {
-  test('the pattern figure is wider than the reading column and clears the TOC', async ({
-    page,
-  }) => {
+  test('the pattern figure fills the reading column and clears the TOC', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/patterns/eval-gate-in-ci');
 
@@ -254,9 +256,9 @@ test.describe('breakout', () => {
     await expect(figure).toBeVisible();
     const figBox = await figure.boundingBox();
 
-    // The figure breaks out past the 72ch reading column (article.prose).
+    // The figure takes the whole reading column (article.prose), not less.
     const proseBox = await page.locator('article.prose').boundingBox();
-    expect(figBox!.width).toBeGreaterThan(proseBox!.width);
+    expect(figBox!.width).toBeGreaterThanOrEqual(proseBox!.width - 1);
 
     // The figure must not overlap the on-this-page TOC rail.
     const toc = page.locator('.doc-toc');
@@ -265,7 +267,7 @@ test.describe('breakout', () => {
     expect(rectsIntersect(figBox!, tocBox!), 'figure overlaps the TOC rail').toBe(false);
   });
 
-  test('the thesis figure canvas renders wide', async ({ page }) => {
+  test('the thesis figure canvas fills the reading column', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/thesis');
     const canvas = page.locator(
@@ -273,7 +275,8 @@ test.describe('breakout', () => {
     );
     await expect(canvas).toBeVisible();
     const box = await canvas.boundingBox();
-    expect(box!.width).toBeGreaterThanOrEqual(1000);
+    const proseBox = await page.locator('article.prose').boundingBox();
+    expect(box!.width).toBeGreaterThanOrEqual(proseBox!.width - 1);
   });
 
   test('on a narrow phone the figure is not wider than the article', async ({ page }) => {
@@ -368,4 +371,61 @@ test.describe('enlarge', () => {
     // Focus returns to the Enlarge button.
     await expect(enlarge).toBeFocused();
   });
+});
+
+// ---- 9. Text floor (figure-frame spec) --------------------------------------
+// No diagram text renders under 12px: the SVG keeps a min width and its frame
+// scrolls sideways instead of shrinking it, without scrolling the page.
+for (const width of [1440, 390]) {
+  test(`at ${width}px the smallest diagram label is 12px or more, no page scroll`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/patterns/eval-gate-in-ci');
+    const figure = page.locator('figure.diagram[data-diagram="eval-gate-ci"]');
+    await expect(figure).toBeVisible();
+    const { smallest, pageScroll } = await figure.evaluate((fig) => {
+      const svg = fig.querySelector('svg') as SVGSVGElement;
+      const scale = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width;
+      const sizes = Array.from(svg.querySelectorAll('text'))
+        .filter((t) => (t.textContent || '').trim())
+        .map((t) => parseFloat(getComputedStyle(t).fontSize) * scale);
+      const root = document.documentElement;
+      return { smallest: Math.min(...sizes), pageScroll: root.scrollWidth > root.clientWidth };
+    });
+    expect(smallest).toBeGreaterThanOrEqual(11.95);
+    expect(pageScroll, 'the page scrolls sideways').toBe(false);
+  });
+}
+
+// ---- 10. Content preserved ---------------------------------------------------
+// Every regenerated inline SVG carries exactly its IR's nodes and edges (one
+// drawn path per IR edge, same endpoints, a unique id each so diagram.js can
+// light it), and every note in its sidecar names one of those nodes.
+const IR_DIR = 'diagrams';
+const NODE_KEY: Record<string, string> = { architecture: 'components', workflow: 'nodes', sequence: 'participants', dataflow: 'nodes', lifecycle: 'states' };
+const EDGE_KEY: Record<string, string> = { architecture: 'connections', workflow: 'edges', sequence: 'messages', dataflow: 'flows', lifecycle: 'transitions' };
+test('every diagram keeps its IR nodes, edges and notes', () => {
+  const irs = readdirSync(IR_DIR).filter((f) => /\.(architecture|workflow|sequence|dataflow|lifecycle)\.json$/.test(f));
+  expect(irs.length).toBeGreaterThan(0);
+  for (const file of irs) {
+    const [id, type] = file.split('.');
+    const ir = JSON.parse(readFileSync(`${IR_DIR}/${file}`, 'utf8'));
+    const svg = readFileSync(`src/generated/diagrams/${id}.svg`, 'utf8');
+    const ids = (attr: string) => new Set(Array.from(svg.matchAll(new RegExp(`${attr}="([^"]+)"`, 'g')), (m) => m[1]));
+    const nodes = (ir[NODE_KEY[type]] as Array<{ id: string }>).map((n) => n.id).sort();
+    const edges = (ir[EDGE_KEY[type]] as Array<{ from: string; to: string }>).map((e) => `${e.from}>${e.to}`).sort();
+    // Each drawn edge's attributes as a map, whatever order the renderer writes them in.
+    const paths = Array.from(svg.matchAll(/<path\b([^>]*)>/g), (m) =>
+      Object.fromEntries(Array.from(m[1].matchAll(/([\w-]+)="([^"]*)"/g), (a) => [a[1], a[2]])),
+    ).filter((a) => a['data-edge-id']);
+    expect([...ids('data-node-id')].sort(), `${id}: nodes`).toEqual(nodes);
+    expect(paths.map((a) => `${a['data-edge-from']}>${a['data-edge-to']}`).sort(), `${id}: edges`).toEqual(edges);
+    expect(new Set(paths.map((a) => a['data-edge-id'])).size, `${id}: duplicate edge ids`).toBe(paths.length);
+    let notes: Record<string, string> = {};
+    try {
+      notes = JSON.parse(readFileSync(`${IR_DIR}/${id}.notes.json`, 'utf8'));
+    } catch {
+      continue; // no sidecar: notes fall back to the IR's own text
+    }
+    for (const key of Object.keys(notes)) expect(nodes, `${id}: note for unknown node "${key}"`).toContain(key);
+  }
 });

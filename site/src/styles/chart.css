@@ -24,16 +24,21 @@
   container-type: inline-size;
 }
 
+/* The one figure frame, as .figure-canvas in figures.css: a flat --panel
+   ground, a 1px line, the block radius, no shadow. Inside it --bg is the
+   panel, so the paper fills the marks draw follow the frame. */
 .chart-canvas {
-  padding: var(--s-3);
+  --bg: var(--panel);
+  padding: 20px;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-1);
+  border-radius: var(--r-blk);
+  box-shadow: none;
 }
 
 /* A phone gives the canvas about 344px: a narrow SVG drawn 340 wide keeps its
-   12px text at 1:1. */
+   12px text at 1:1. Chart.astro's CANVAS_320 is measured with this 6px pad,
+   so it stays under the frame's 12px phone pad (the 12px text floor wins). */
 @container (max-width: 479px) {
   .chart-canvas {
     padding: 6px;
@@ -100,37 +105,57 @@
   background: var(--bg);
 }
 
+/* The one caption, as .figure-figcaption in figures.css: a mono kind label in
+   the accent, the title at 600, the description in --muted, then the data
+   table summary as a mono uppercase text link. */
 .chart-caption {
   display: flex;
   flex-direction: column;
-  gap: var(--s-2);
+  gap: 6px;
+}
+
+.chart-label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
 .chart-title {
   font-weight: 600;
+  line-height: 1.4;
   color: var(--ink);
 }
 
 .chart-desc {
-  max-width: 72ch;
+  max-width: 68ch;
   font-size: var(--fs-small);
+  line-height: 1.55;
   color: var(--muted);
   text-wrap: pretty;
 }
 
 /* The table alternative: the same rows the chart draws. */
-.chart-alt {
-  border-top: 1px solid var(--line);
-  padding-top: var(--s-3);
-}
-
 .chart-alt-summary {
+  width: fit-content;
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  letter-spacing: 0.04em;
+  font-weight: 500;
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--accent-line);
+  text-underline-offset: 0.35em;
   cursor: pointer;
+}
+
+.chart-alt-summary:hover {
+  text-decoration-color: currentColor;
 }
 
 .chart-table-wrap {
@@ -297,8 +322,8 @@
 .chart .hatch-3 { stroke: var(--l3-ink); stroke-width: 1.6; }
 .chart .hatch-4 { stroke: var(--l4-ink); stroke-width: 1.6; }
 .chart .hatch-5 { stroke: var(--l5-ink); stroke-width: 1.6; }
-/* The one accent: the value the caption is about, in solid ink. */
-.chart .mk-hi { fill: var(--ink); stroke: var(--ink); }
+/* The one accent: the value the caption is about, in the site accent. */
+.chart .mk-hi { fill: var(--accent); stroke: var(--accent); }
 .chart .heat-0 { fill: var(--ink); }
 .chart .heat-1 { fill: var(--l1-ink); }
 .chart .heat-2 { fill: var(--l2-ink); }
@@ -475,8 +500,10 @@
 
 /* ---------------------------------------------------------- chart tips -- */
 /* The tooltip of public/chart-tip.js: one div.ctip in <body>, fixed, holding
-   the hovered, focused or tapped mark's name. Inverted ink on ground so it
-   reads over any chart in both themes; full opacity always (the entry moves
+   the hovered, focused or tapped mark's name. A panel with a hairline, like
+   the figure frame, ink text with tabular figures (the tip is one string, so
+   its numbers cannot take the mono face alone without a script change); the
+   small shadow only lifts it off the frame. Full opacity always (the entry moves
    only, it never fades). It takes the pointer, so the reader can move onto it
    (WCAG 1.4.13). .ctip-on marks the mark a tap selected. */
 .ctip {
@@ -487,14 +514,15 @@
   box-sizing: border-box;
   max-width: min(20rem, calc(100% - 16px));
   padding: 6px 10px;
-  border: 1px solid var(--ink);
-  border-radius: var(--r-sm);
-  background: var(--ink);
-  color: var(--bg);
-  box-shadow: var(--shadow-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-ctl);
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: var(--shadow-1);
   font-family: var(--font-body);
   font-size: 0.875rem;
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
   line-height: 1.4;
   text-align: left;
   overflow-wrap: anywhere;
