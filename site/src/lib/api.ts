@@ -51,6 +51,13 @@ import {
   frontierCrosswalkSources,
 } from '../data/frontier-crosswalk';
 import {
+  FRONTIER_CHANGES_AS_OF,
+  FRONTIER_CHANGES_PATH,
+  frontierChangeSources,
+  frontierChangesPayload,
+  frontierChangesSchemaVersion,
+} from '../data/frontier-changes';
+import {
   lists as dpiaLists,
   topicOrder as dpiaTopicOrder,
   topicLabel as dpiaTopicLabel,
@@ -1825,6 +1832,118 @@ export const datasets: readonly Dataset[] = [
           note: s.str('Why no section of the framework maps to the dimension.'),
         }),
         'Cells with no reference, each with the reason.',
+      ),
+      sources: s.arr(
+        s.obj({
+          n: s.int('Source number.', 1),
+          text: s.str('Source in the house format.'),
+          url: s.uri('Source URL.'),
+          verified: s.enumOf(['primary', 'secondary', 'reported'], 'Verification tag.'),
+        }),
+        'Numbered sources.',
+      ),
+    },
+  },
+  {
+    name: 'frontier-changes',
+    title: 'Frontier safety frameworks: versions and changes',
+    description:
+      'The published versions of the Anthropic, OpenAI and Google DeepMind frontier safety frameworks with their dates and file hashes, the revisions between consecutive versions, which are covered, and the material changes recorded for the covered ones, with quotes and the lab's own change notes. A description of published documents, not a claim about any lab's conduct.',
+    schemaVersion: frontierChangesSchemaVersion,
+    page: FRONTIER_CHANGES_PATH,
+    build: () => {
+      const p = frontierChangesPayload();
+      return {
+        asOf: FRONTIER_CHANGES_AS_OF,
+        ...p,
+        sources: frontierChangeSources.map((source, i) => ({
+          n: i + 1,
+          text: sourceText(source),
+          url: source.url,
+          verified: source.verified,
+        })),
+      };
+    },
+    properties: {
+      asOf: s.date('Date of the last pass over every version, hash and recorded change.'),
+      versions: s.arr(
+        s.obj({
+          framework: s.str('Framework id.'),
+          version: s.str('Version as the document prints it.'),
+          short: s.str('Short form used in ids.'),
+          date: s.date('Date of the version.'),
+          dateKind: s.enumOf(['effective', 'published'], 'What the date is.'),
+          labelSource: s.intOrNull('Source number of the page the label comes from, when the document prints none.', 1),
+          note: s.strOrNull('Note on the version.'),
+          files: s.arr(
+            s.obj({
+              sha256: s.str('SHA-256 of the file retrieved on the date given.'),
+              url: s.uriOrNull('Official URL while the lab serves the file.'),
+              archiveUrl: s.uriOrNull('Archived copy.'),
+              retrieved: s.date('Date the file was retrieved.'),
+              verified: s.enumOf(['primary', 'secondary'], 'primary: downloaded by this project; secondary: hash from a third party.'),
+              source: s.int('Source number.', 1),
+              note: s.strOrNull('Note on the file.'),
+            }),
+            'The files of the version; empty when the document was not recovered.',
+          ),
+        }),
+        'Every version of the three frameworks.',
+      ),
+      transitions: s.arr(
+        s.obj({
+          id: s.str('Transition id: framework, earlier version, later version.'),
+          framework: s.str('Framework id.'),
+          from: s.str('Short form of the earlier version.'),
+          to: s.str('Short form of the later version.'),
+          covered: s.bool('Whether the changes of this revision are recorded.'),
+          recorded: s.dateOrNull('Day the changes were recorded.'),
+          changeNotes: s.enumOf(
+            ['itemised', 'narrative', 'redline', 'none', 'not-assessed'],
+            'Form of the lab's own account of the changes; not-assessed when not covered.',
+          ),
+          changeNotesUrl: s.uriOrNull('The lab's change notes or marked-up version.'),
+          noteSources: s.arr(s.int('Source number.', 1), 'Sources of the lab's change-note pages.'),
+          thirdParty: s.arr(s.int('Source number.', 1), 'Sources of third-party analyses of the revision.'),
+        }),
+        'Every revision between consecutive versions.',
+      ),
+      changes: s.arr(
+        s.obj({
+          id: s.str('Change id.'),
+          transition: s.str('Transition id.'),
+          kind: s.enumOf(['added', 'removed', 'modified', 'relocated'], 'Kind of change.'),
+          section: s.str('Section of the document.'),
+          summary: s.str('What the text said before and what it says after.'),
+          before: {
+            type: ['object', 'null'],
+            description: 'The text in the earlier version; null when the kind has none.',
+            additionalProperties: false,
+            required: ['quote', 'url'],
+            properties: {
+              quote: s.str('Verbatim, at most 25 words.'),
+              url: s.uri('Page of the earlier version.'),
+            },
+          },
+          after: {
+            type: ['object', 'null'],
+            description: 'The text in the later version; null when the kind has none.',
+            additionalProperties: false,
+            required: ['quote', 'url'],
+            properties: {
+              quote: s.str('Verbatim, at most 25 words.'),
+              url: s.uri('Page of the later version.'),
+            },
+          },
+          movedTo: s.strOrNull('Where a relocated text went.'),
+          dimensions: s.arr(s.str('Dimension id of the frontier crosswalk.'), 'Dimensions affected.'),
+          disclosure: s.enumOf(
+            ['listed', 'partly-listed', 'not-listed', 'no-changelog'],
+            'Whether the lab's own change notes mention the change.',
+          ),
+          verified: s.enumOf(['primary', 'secondary'], 'Verification of the record.'),
+        }),
+        'The material changes of the covered revisions.',
       ),
       sources: s.arr(
         s.obj({
