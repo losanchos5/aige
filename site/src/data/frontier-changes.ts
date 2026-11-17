@@ -285,6 +285,7 @@ const PAPER = 1;
 const CORPUS = 2;
 const ANTHROPIC_PAGE = 18;
 const GDM_BLOG = 19;
+const OPENAI_V2 = 13;
 
 /** The versions, oldest first within each framework. */
 export const frontierVersions: readonly FrontierVersion[] = [
@@ -480,7 +481,7 @@ export const frontierVersions: readonly FrontierVersion[] = [
         url: 'https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf',
         retrieved: RETRIEVED,
         verified: 'primary',
-        source: 13,
+        source: OPENAI_V2,
         note: 'The corpus records this file as identical to a re-upload of June 2025 under the same version label (entry v2-reupload-20250611).',
       },
       {
@@ -580,6 +581,9 @@ export const frontierVersions: readonly FrontierVersion[] = [
   },
 ];
 
+// Pairs listed in the corpus's pairs.csv (checked 2026-11-17): all twelve.
+const IN_CORPUS = [PAPER, CORPUS];
+
 const trans = (
   framework: string,
   from: string,
@@ -592,22 +596,22 @@ const trans = (
   to,
   covered: false,
   changeNotes: 'not-assessed',
-  thirdParty: [PAPER, CORPUS],
   ...extra,
 });
 
 /** One per pair of consecutive versions, oldest first within each framework. */
 export const frontierTransitions: readonly FrontierTransition[] = [
-  trans('anthropic-rsp', '1.0', '2.0'),
-  trans('anthropic-rsp', '2.0', '2.1'),
-  trans('anthropic-rsp', '2.1', '2.2'),
-  trans('anthropic-rsp', '2.2', '3.0'),
+  trans('anthropic-rsp', '1.0', '2.0', { thirdParty: IN_CORPUS }),
+  trans('anthropic-rsp', '2.0', '2.1', { thirdParty: IN_CORPUS }),
+  trans('anthropic-rsp', '2.1', '2.2', { thirdParty: IN_CORPUS }),
+  trans('anthropic-rsp', '2.2', '3.0', { thirdParty: IN_CORPUS }),
   trans('anthropic-rsp', '3.0', '3.1', {
     covered: true,
     recorded: '2026-11-17',
     changeNotes: 'redline',
     changeNotesUrl: 'https://assets.claude.com/64cb0ac5eb0f8030187131f490827323e3d53308.pdf',
     noteSources: [ANTHROPIC_PAGE],
+    thirdParty: IN_CORPUS,
   }),
   trans('anthropic-rsp', '3.1', '3.2', {
     covered: true,
@@ -615,6 +619,7 @@ export const frontierTransitions: readonly FrontierTransition[] = [
     changeNotes: 'redline',
     changeNotesUrl: 'https://assets.claude.com/7c534a9e7a82d4411dd568d85ffbcd14ac243a62.pdf',
     noteSources: [ANTHROPIC_PAGE],
+    thirdParty: IN_CORPUS,
   }),
   trans('anthropic-rsp', '3.2', '3.3', {
     covered: true,
@@ -622,6 +627,7 @@ export const frontierTransitions: readonly FrontierTransition[] = [
     changeNotes: 'redline',
     changeNotesUrl: 'https://assets.claude.com/dd0ec579bee2cd144069c478ede3e35ea080ad02.pdf',
     noteSources: [ANTHROPIC_PAGE],
+    thirdParty: IN_CORPUS,
   }),
   trans('anthropic-rsp', '3.3', '3.4', {
     covered: true,
@@ -629,27 +635,30 @@ export const frontierTransitions: readonly FrontierTransition[] = [
     changeNotes: 'redline',
     changeNotesUrl: 'https://assets.claude.com/fbfdce5e4e825a3e089085205a842a9ae8ffac99.pdf',
     noteSources: [ANTHROPIC_PAGE],
+    thirdParty: IN_CORPUS,
   }),
   trans('openai-preparedness', 'beta', '2', {
     covered: true,
     recorded: '2026-11-17',
     changeNotes: 'itemised',
     changeNotesUrl: 'https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf#page=15',
-    noteSources: [13],
+    noteSources: [OPENAI_V2],
+    thirdParty: IN_CORPUS,
   }),
-  trans('deepmind-fsf', '1.0', '2.0'),
-  trans('deepmind-fsf', '2.0', '3.0'),
+  trans('deepmind-fsf', '1.0', '2.0', { thirdParty: IN_CORPUS }),
+  trans('deepmind-fsf', '2.0', '3.0', { thirdParty: IN_CORPUS }),
   trans('deepmind-fsf', '3.0', '3.1', {
     covered: true,
     recorded: '2026-11-17',
     changeNotes: 'itemised',
     changeNotesUrl: 'https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/strengthening-our-frontier-safety-framework/frontier-safety-framework_3-1.pdf#page=17',
     noteSources: [GDM_BLOG],
+    thirdParty: IN_CORPUS,
   }),
 ];
 
 /** The recorded changes of the covered transitions, in document order within each. */
-export const frontierChanges: FrontierChange[] = [
+export const frontierChanges: readonly FrontierChange[] = [
   {
     id: 'anthropic-rsp-3.0-3.1-01',
     transition: 'anthropic-rsp-3.0-3.1',
@@ -2062,13 +2071,14 @@ export function crosswalkVersionStatus(): {
 
 const wordCount = (s: string): number => s.trim().split(/\s+/).filter(Boolean).length;
 
-// Evaluative words banned in summaries (whole words, case-insensitive).
-const BANNED = [
-  'weaken', 'weakened', 'weaker', 'strengthen', 'strengthened', 'stronger', 'water down', 'watered',
-  'loophole', 'backtrack', 'backslide', 'walk back', 'improve', 'improved', 'worse', 'better',
-  'dilute', 'diluted', 'gut', 'gutted', 'quietly', 'silently',
-];
-const BANNED_RE = new RegExp(`\\b(?:${BANNED.map((w) => w.replace(' ', '\\s+')).join('|')})\\b`, 'i');
+// Evaluative words banned in summaries: stems, so inflections are caught
+// ("weakens", "improving", "loopholes"). "Self-improvement" is an OpenAI
+// category name and is the only allowed exception.
+const BANNED_RE =
+  /\b(?:weak|strengthen|stronger|water[\s-]+down|watered|loophole|backtrack|backslid|backslide|walk[\s-]+back|improv|worse|better|dilut|gut(?:s|ted|ting)?\b|quiet|silent)\w*/gi;
+const ALLOWED_RE = /self-improvement/gi;
+
+const today = (): string => new Date().toISOString().slice(0, 10);
 
 const isDate = (d: string): boolean => {
   const t = new Date(`${d}T00:00:00Z`);
@@ -2090,10 +2100,15 @@ export function frontierChangeProblems(): string[] {
     cited.add(n0);
     if (!Number.isInteger(n0) || n0 < 1 || n0 > n) problems.push(`${at}: source [${n0}] does not exist`);
   };
-  const checkDate = (d: string, at: string) => {
+  // A date may follow the as-of date only for an announced effective date.
+  const checkDate = (d: string, at: string, mayFollowAsOf = false) => {
     if (!isDate(d)) problems.push(`${at}: invalid date ${d}`);
-    else if (d > FRONTIER_CHANGES_AS_OF) problems.push(`${at}: date ${d} is after the as-of date ${FRONTIER_CHANGES_AS_OF}`);
+    else if (!mayFollowAsOf && d > FRONTIER_CHANGES_AS_OF) problems.push(`${at}: date ${d} is after the as-of date ${FRONTIER_CHANGES_AS_OF}`);
   };
+  if (!isDate(FRONTIER_CHANGES_AS_OF)) problems.push(`as-of date ${FRONTIER_CHANGES_AS_OF} is not a date`);
+  else if (FRONTIER_CHANGES_AS_OF > today()) problems.push(`as-of date ${FRONTIER_CHANGES_AS_OF} is after today`);
+  const sourceVerified = (n0: number) => frontierChangeSources[n0 - 1]?.verified;
+  const hashes = new Set<string>();
 
   // Versions
   const vKeys = new Set<string>();
@@ -2103,12 +2118,21 @@ export function frontierChangeProblems(): string[] {
     if (vKeys.has(at)) problems.push(`${at}: duplicate version`);
     vKeys.add(at);
     if (!v.version.trim() || !v.short.trim()) problems.push(`${at}: empty label or short form`);
-    checkDate(v.date, at);
+    checkDate(v.date, at, v.dateKind === 'effective');
+    if (frontierVersions.some((w) => w !== v && w.framework === v.framework && w.date === v.date)) {
+      problems.push(`${at}: another version of ${v.framework} has the same date ${v.date}`);
+    }
     if (v.labelSource !== undefined) checkSource(v.labelSource, `${at} label`);
     v.files.forEach((f, i) => {
       const fat = `${at} file ${i + 1}`;
       if (!/^[0-9a-f]{64}$/.test(f.sha256)) problems.push(`${fat}: sha256 is not 64 lowercase hex characters`);
+      if (hashes.has(f.sha256)) problems.push(`${fat}: sha256 repeats another file's`);
+      hashes.add(f.sha256);
       if (!f.url && !f.archiveUrl) problems.push(`${fat}: neither url nor archiveUrl`);
+      if (!f.url && f.verified !== 'secondary') problems.push(`${fat}: a capture without the lab's URL must be marked secondary`);
+      if (f.verified === 'secondary' && sourceVerified(f.source) !== 'secondary') {
+        problems.push(`${fat}: a secondary hash must cite a secondary source, [${f.source}] is not`);
+      }
       for (const u of [f.url, f.archiveUrl]) if (u && !u.startsWith('https://')) problems.push(`${fat}: url not https`);
       checkDate(f.retrieved, fat);
       checkSource(f.source, fat);
@@ -2127,6 +2151,7 @@ export function frontierChangeProblems(): string[] {
     if (t.covered && !t.recorded) problems.push(`${at}: covered without a recorded date`);
     if (t.recorded) checkDate(t.recorded, `${at} recorded`);
     if (t.covered && t.changeNotes === 'not-assessed') problems.push(`${at}: covered but changeNotes is not-assessed`);
+    if (t.covered && t.changeNotes !== 'none' && !t.changeNotesUrl) problems.push(`${at}: the lab publishes change notes but changeNotesUrl is missing`);
     if (!t.covered && t.changeNotes !== 'not-assessed') problems.push(`${at}: not covered but changeNotes is ${t.changeNotes}`);
     if (t.changeNotesUrl && !t.changeNotesUrl.startsWith('https://')) problems.push(`${at}: changeNotesUrl not https`);
     for (const s of t.thirdParty ?? []) checkSource(s, at);
@@ -2144,6 +2169,7 @@ export function frontierChangeProblems(): string[] {
   }
 
   // Changes
+  const fileUrls = new Set(frontierVersions.flatMap((v) => v.files.flatMap((f) => (f.url ? [f.url] : []))));
   const cIds = new Set<string>();
   for (const c of frontierChanges) {
     const at = `change ${c.id}`;
@@ -2159,8 +2185,11 @@ export function frontierChangeProblems(): string[] {
     for (const d of c.dimensions) if (!dimIds.has(d)) problems.push(`${at}: unknown dimension ${d}`);
     if (!c.section.trim()) problems.push(`${at}: empty section`);
     if (!c.summary.trim()) problems.push(`${at}: empty summary`);
-    const banned = BANNED_RE.exec(c.summary);
+    const banned = c.summary.replace(ALLOWED_RE, ' ').match(BANNED_RE);
     if (banned) problems.push(`${at}: summary uses the banned word "${banned[0]}"`);
+    if (t && (c.disclosure === 'no-changelog') !== (t.changeNotes === 'none')) {
+      problems.push(`${at}: disclosure ${c.disclosure} does not match changeNotes ${t.changeNotes} of ${t.id}`);
+    }
     if ((c.kind === 'modified' || c.kind === 'removed' || c.kind === 'relocated') && !c.before) {
       problems.push(`${at}: ${c.kind} without a before quote`);
     }
@@ -2171,7 +2200,8 @@ export function frontierChangeProblems(): string[] {
       if (!q.quote.trim()) problems.push(`${at}: empty ${side} quote`);
       if (wordCount(q.quote) > 25) problems.push(`${at}: ${side} quote over 25 words`);
       if (!q.url.startsWith('https://')) problems.push(`${at}: ${side} url not https`);
-      if (q.url.includes('.pdf') && !/#page=\d+$/.test(q.url)) problems.push(`${at}: ${side} PDF url without #page=`);
+      const base = q.url.split('#')[0];
+      if ((base.includes('.pdf') || fileUrls.has(base)) && !/#page=\d+$/.test(q.url)) problems.push(`${at}: ${side} PDF url without #page=`);
     }
   }
 
