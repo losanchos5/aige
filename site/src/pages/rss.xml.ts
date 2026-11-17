@@ -1,15 +1,24 @@
-// rss.xml: the site feed. It carries two kinds of items, newest first:
+// rss.xml: the site feed. It carries three kinds of items, newest first:
 //   - one per released version in bok/CHANGELOG.md (`## [x.y] - date` headings),
 //     each linking to its anchor on the /about/changelog page;
 //   - one per Body of Knowledge chapter (data/chapters.ts), linking to the
 //     chapter page, dated by the last git commit that touched the chapter source
-//     (reading.ts `gitDate`) so an edit resurfaces the chapter as a fresh item.
+//     (reading.ts `gitDate`) so an edit resurfaces the chapter as a fresh item;
+//   - one per covered transition of the frontier safety frameworks, linking to
+//     its anchor on /resources/frontier-framework-changes.
 // Changelog anchors are slugified with the same slugger rehype-slug uses, so the
 // link resolves to the real heading id on that page.
 import rss from '@astrojs/rss';
 import type { RSSFeedItem } from '@astrojs/rss';
 import type { APIRoute } from 'astro';
 import { chaptersOrdered } from '../data/chapters';
+import {
+  FRONTIER_CHANGES_PATH,
+  changesFor,
+  frontierTransitions,
+  versionsFor,
+} from '../data/frontier-changes';
+import { frontierDocById } from '../data/frontier-crosswalk';
 import { site } from '../data/site';
 import { readSource, slugify, stripInline } from '../lib/md-parse';
 import { gitDate } from '../lib/reading';
@@ -127,7 +136,28 @@ export const GET: APIRoute = (context) => {
     };
   });
 
-  const items = [...versionEntries, ...chapterEntries]
+  // One item per covered transition of the frontier frameworks, dated by the day
+  // it was recorded (not the lab's version date, so feed readers do not bury it);
+  // the link, which rss uses as the guid, is the transition's anchor.
+  const frontierEntries: FeedEntry[] = frontierTransitions
+    .filter((t) => t.covered)
+    .map((t) => {
+      const versions = versionsFor(t.framework);
+      const from = versions.find((v) => v.short === t.from);
+      const to = versions.find((v) => v.short === t.to);
+      const date = new Date(t.recorded as string);
+      return {
+        date,
+        item: {
+          title: `Frontier framework change: ${frontierDocById(t.framework)?.short ?? t.framework} ${from?.version ?? t.from} to ${to?.version ?? t.to}`,
+          link: `${FRONTIER_CHANGES_PATH}#${t.id}`,
+          pubDate: date,
+          description: `${to?.version ?? t.to} is dated ${to?.date ?? ''}. ${changesFor(t.id).length} changes recorded against ${from?.version ?? t.from}.`,
+        },
+      };
+    });
+
+  const items = [...versionEntries, ...chapterEntries, ...frontierEntries]
     .sort((a, b) => b.date.getTime() - a.date.getTime())
     .map((entry) => entry.item);
 
