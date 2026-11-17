@@ -54,6 +54,7 @@ import {
   FRONTIER_CHANGES_AS_OF,
   FRONTIER_CHANGES_PATH,
   frontierChangeSources,
+  frontierChangesNotice,
   frontierChangesPayload,
   frontierChangesSchemaVersion,
 } from '../data/frontier-changes';
@@ -1851,6 +1852,10 @@ export const datasets: readonly Dataset[] = [
       "The published versions of the Anthropic, OpenAI and Google DeepMind frontier safety frameworks with their dates and file hashes, the revisions between consecutive versions, which are covered, and the material changes recorded for the covered ones, with quotes and the lab's own change notes. A description of published documents, not a claim about any lab's conduct.",
     schemaVersion: frontierChangesSchemaVersion,
     page: FRONTIER_CHANGES_PATH,
+    extra: () => ({ disclaimer: frontierChangesNotice(site.bokVersion) }),
+    extraSchema: {
+      disclaimer: s.str('What this dataset is: a description of published documents, not a claim about the conduct of any lab.'),
+    },
     build: () => {
       const p = frontierChangesPayload();
       return {
@@ -1877,7 +1882,11 @@ export const datasets: readonly Dataset[] = [
           note: s.strOrNull('Note on the version.'),
           files: s.arr(
             s.obj({
-              sha256: s.str('SHA-256 of the file retrieved on the date given.'),
+              sha256: {
+                type: 'string',
+                pattern: '^[0-9a-f]{64}$',
+                description: 'SHA-256 of the file retrieved on the date given.',
+              },
               url: s.uriOrNull('Official URL while the lab serves the file.'),
               archiveUrl: s.uriOrNull('Archived copy.'),
               retrieved: s.date('Date the file was retrieved.'),

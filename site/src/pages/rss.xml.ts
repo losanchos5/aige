@@ -19,6 +19,7 @@ import {
   versionsFor,
 } from '../data/frontier-changes';
 import { frontierDocById } from '../data/frontier-crosswalk';
+import { formatDate } from '../lib/applies-now';
 import { site } from '../data/site';
 import { readSource, slugify, stripInline } from '../lib/md-parse';
 import { gitDate } from '../lib/reading';
@@ -152,7 +153,7 @@ export const GET: APIRoute = (context) => {
           title: `Frontier framework change: ${frontierDocById(t.framework)?.short ?? t.framework} ${from?.version ?? t.from} to ${to?.version ?? t.to}`,
           link: `${FRONTIER_CHANGES_PATH}#${t.id}`,
           pubDate: date,
-          description: `${to?.version ?? t.to} is dated ${to?.date ?? ''}. ${changesFor(t.id).length} changes recorded against ${from?.version ?? t.from}.`,
+          description: `${to?.version ?? t.to} is dated ${to ? formatDate(to.date) : ''}. ${changesFor(t.id).length} changes recorded against ${from?.version ?? t.from}.`,
         },
       };
     });

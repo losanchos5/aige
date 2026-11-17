@@ -1,6 +1,6 @@
 // /resources/frontier-framework-changes.csv: one row per recorded change, after
 // a first row carrying the notice (published documents, not any lab's conduct;
-// schema and as-of date). Same records as the JSON.
+// schema, as-of date, licence and citation). Same records as the JSON.
 import type { APIRoute } from 'astro';
 import { frontierChangeExportRows, frontierChangesNotice } from '../../data/frontier-changes';
 import { site } from '../../data/site';
@@ -27,7 +27,9 @@ export const GET: APIRoute = () => {
     'Framework ID',
   ];
   const lines = [
-    csvRow([frontierChangesNotice(site.bokVersion)]),
+    csvRow([
+      `${frontierChangesNotice(site.bokVersion)}; licence ${site.license}; cite ${site.authors.join(', ')}, AI Governance Engineering: The Thesis & Body of Knowledge, https://doi.org/${site.conceptDoi}`,
+    ]),
     csvRow(header),
     ...frontierChangeExportRows().map((r) =>
       csvRow([
