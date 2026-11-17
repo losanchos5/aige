@@ -104,6 +104,10 @@ interface FrontierChange {
 }
 ```
 
+Durante la carga se añadieron dos campos opcionales: `FrontierVersion.labelSource` (fuente de la
+etiqueta cuando la portada del documento no la imprime) y `FrontierTransition.noteSources` (fuentes
+de las notas de versión del lab). Los números de fuente son de base 1, como en el crosswalk.
+
 Las invariantes van en `frontierChangeProblems()` y la página lanza si devuelve algo, igual que
 `frontierProblems()`. Comprueba: ids únicos; versiones, transiciones y dimensiones existentes;
 transiciones entre versiones consecutivas; citas según el tipo y de 25 palabras como máximo;
