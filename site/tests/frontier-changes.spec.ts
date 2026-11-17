@@ -10,9 +10,11 @@ import AxeBuilder from '@axe-core/playwright';
 import {
   FRONTIER_CHANGES_PATH,
   frontierChanges,
+  frontierChangesSchemaVersion,
   frontierTransitions,
   frontierVersions,
 } from '../src/data/frontier-changes';
+import { frontierDocById } from '../src/data/frontier-crosswalk';
 
 const PAGE = FRONTIER_CHANGES_PATH;
 
@@ -56,12 +58,28 @@ function parseCsv(text: string): string[][] {
 }
 
 test.describe('frontier framework changes: page', () => {
-  test('a change permalink lands on that change, inside its transition', async ({ page }) => {
+  test('a change permalink lands below the sticky header and names its framework and versions', async ({ page }) => {
+    // Reduced motion turns off the site's smooth scroll, so the jump is instant.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     const change = frontierChanges[frontierChanges.length - 1];
+    const transition = frontierTransitions.find((t) => t.id === change.transition)!;
+    const label = (short: string) =>
+      frontierVersions.find((v) => v.framework === transition.framework && v.short === short)!.version;
     await page.goto(`${PAGE}#${change.id}`);
     const target = page.locator(`[id="${change.id}"]`);
-    await expect(target).toBeInViewport();
+    const header = (await page.locator('.site-header').boundingBox())!;
+    const headerBottom = header.y + header.height;
+    const viewportHeight = page.viewportSize()!.height;
+    await expect
+      .poll(async () => {
+        const box = await target.boundingBox();
+        return box !== null && box.y >= headerBottom && box.y < viewportHeight;
+      })
+      .toBe(true);
     await expect(target).toContainText(change.section);
+    await expect(target).toContainText(frontierDocById(transition.framework)!.name);
+    await expect(target).toContainText(label(transition.from));
+    await expect(target).toContainText(label(transition.to));
     await expect(target.locator(`xpath=ancestor::article[@id="${change.transition}"]`)).toHaveCount(1);
   });
 
@@ -110,7 +128,7 @@ test.describe('frontier framework changes: exports', () => {
     const jsonRes = await request.get(`${PAGE}.json`);
     expect(jsonRes.status()).toBe(200);
     const json = JSON.parse(await jsonRes.text());
-    expect(json.schemaVersion).toBe(1);
+    expect(json.schemaVersion).toBe(frontierChangesSchemaVersion);
     expect(json.notice).toContain("not a claim about any lab's conduct");
     expect(json.versions).toHaveLength(frontierVersions.length);
     expect(json.transitions).toHaveLength(frontierTransitions.length);
@@ -124,5 +142,20 @@ test.describe('frontier framework changes: exports', () => {
     expect(rows[0]).toHaveLength(1);
     const [, header, ...data] = rows;
     for (const r of data) expect(r).toHaveLength(header.length);
+  });
+
+  test('the API dataset carries the same changes as the export, and the dataset notice', async ({ request }) => {
+    const exported = JSON.parse(await (await request.get(`${PAGE}.json`)).text());
+    const apiRes = await request.get('/api/v1/frontier-changes.json');
+    expect(apiRes.status()).toBe(200);
+    const api = JSON.parse(await apiRes.text());
+    expect(api.changes).toEqual(exported.changes);
+    expect(api.disclaimer).toContain("not a claim about any lab's conduct");
+  });
+
+  test('the feed has an item that links to the anchor of a covered transition', async ({ request }) => {
+    const covered = frontierTransitions.find((t) => t.covered)!;
+    const xml = await (await request.get('/rss.xml')).text();
+    expect(xml).toContain(`${PAGE}#${covered.id}`);
   });
 });
