@@ -142,11 +142,12 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'intake-and-classification',
     rung: 3,
-    can: 'Owns intake for every team: one risk taxonomy and one intake path that teams adopt, with a tracked list of exceptions.',
-    evidence: 'A dashboard of intake coverage against the registry, with every exception listed and dated.',
+    can: 'Owns intake for every team: one risk taxonomy and one intake path that every team adopts as the standard template.',
+    evidence: 'Every registry entry traced to an intake record, and median days from intake to go or no-go, by tier, computed from the intake workflow.',
     links: [
-      pattern('framework-crosswalk', 'Framework crosswalk'),
-      bok('maturity-model', 'the-five-levels', 'Ch. 07: the five levels'),
+      pattern('use-case-intake-risk-tiering', 'Use-case intake and risk tiering'),
+      bok('governance-program', 'kpis-and-kris-for-leadership-and-the-board', 'Ch. 12: KPIs and KRIs for the board'),
+      node('risk-tiers-intake', 'Path: risk tiers and intake'),
     ],
   },
   {
@@ -155,7 +156,8 @@ export const competencyCells: readonly CompetencyCell[] = [
     can: 'Decides how risk tiers map to required controls and who may change the mapping, so every workflow routes by the same rule.',
     evidence: 'A versioned tier-to-controls mapping with its change history, read by intake, gates and registry.',
     links: [
-      bok('the-stack', 'how-to-read-the-stack', 'Ch. 04: how to read the stack'),
+      pattern('use-case-intake-risk-tiering', 'Use-case intake and risk tiering'),
+      bok('governance-program', 'policy-as-code-one-source-two-outputs', 'Ch. 12: policy as code, one source, two outputs'),
       node('stack-overview', 'Path: the five-layer stack'),
     ],
   },
@@ -186,10 +188,11 @@ export const competencyCells: readonly CompetencyCell[] = [
     workflow: 'inventory-and-registry',
     rung: 3,
     can: 'Owns the inventory for the whole organisation: the registry is the path every team deploys through, and discovery covers the estate.',
-    evidence: 'A deploy gate that refuses a system with no registry entry, and a discovery report listing unregistered systems found and closed.',
+    evidence: 'A deploy gate that refuses any system with no registry entry, and registry coverage and unregistered AI found computed from discovery across the estate.',
     links: [
-      pattern('sanctioned-ai-gateway', 'Sanctioned AI gateway'),
-      pattern('aibom', 'AI bill of materials'),
+      pattern('agent-registry', 'Agent registry'),
+      pattern('shadow-ai-discovery', 'Shadow AI discovery'),
+      bok('governance-program', 'kpis-and-kris-for-leadership-and-the-board', 'Ch. 12: registry coverage'),
     ],
   },
   {
@@ -241,7 +244,7 @@ export const competencyCells: readonly CompetencyCell[] = [
     workflow: 'evals-and-red-teaming',
     rung: 4,
     can: 'Decides what counts as a valid eval: the validity standard, how thresholds trace to failure modes, and who may change a threshold.',
-    evidence: 'A written validity standard, and every gating threshold traced to a named failure mode in version control.',
+    evidence: 'A written eval validity standard that every gate reads, the checks a run must pass before its result counts, and the rule for changing a threshold.',
     links: [
       control('AIGE-CTL-EVAL-009', 'Control: evaluation validity checks'),
       bok('governing-development', 'statistical-validity-of-evals', 'Ch. 14: statistical validity of evals'),
@@ -279,13 +282,13 @@ export const competencyCells: readonly CompetencyCell[] = [
     links: [
       node('policy-cards', 'Path: policy cards'),
       bok('governance-program', 'risk-acceptance-and-exceptions', 'Ch. 12: risk acceptance and exceptions'),
-      pattern('human-in-the-loop-gate', 'Human-in-the-loop gate'),
+      bok('governance-program', 'policy-as-code-one-source-two-outputs', 'Ch. 12: policy as code, one source, two outputs'),
     ],
   },
   {
     workflow: 'policy-as-code-and-gates',
     rung: 4,
-    can: 'Decides where each rule is enforced across the five layers (CI, admission, runtime) and how policy, gate and exception fit together.',
+    can: 'Decides where each rule is enforced (CI, admission or runtime) and how policy, gate and exception fit together across the five layers.',
     evidence: 'A reference enforcement map that gives each control class its enforcement point and its exception path.',
     links: [
       bok('maturity-model', 'observable-criteria-by-layer-and-level', 'Ch. 07: observable criteria by layer'),
@@ -298,7 +301,7 @@ export const competencyCells: readonly CompetencyCell[] = [
     workflow: 'runtime-monitoring-and-incidents',
     rung: 1,
     can: 'Runs existing monitors: triages guardrail and drift alerts, files incidents in the pipeline and takes part in kill-switch drills.',
-    evidence: 'Triaged alerts with an incident record opened for each, and a drill record for every agent.',
+    evidence: 'Triaged alerts, each closed with a reason or linked to the incident record it opened, and kill-switch drill records that name them as a participant.',
     links: [
       pattern('kill-switch-circuit-breaker', 'Kill switch and circuit breaker'),
       pattern('incident-pipeline', 'Incident pipeline'),
@@ -381,7 +384,6 @@ export const competencyCells: readonly CompetencyCell[] = [
     links: [
       control('AIGE-CTL-ASSURE-004', 'Control: common signed evidence record'),
       control('AIGE-CTL-ASSURE-008', 'Control: evidence retention code'),
-      control('AIGE-CTL-ASSURE-003', 'Control: signed test report against plan'),
     ],
   },
 
@@ -411,7 +413,7 @@ export const competencyCells: readonly CompetencyCell[] = [
     workflow: 'regulatory-translation',
     rung: 3,
     can: 'Owns translation across the organisation: the obligation register and the crosswalk stay current as law and frameworks change, and teams build from them.',
-    evidence: 'A versioned crosswalk with a dated review for each framework, and registry fields that carry obligation ids.',
+    evidence: 'A versioned crosswalk with a dated review for each framework, and controls built by other teams that cite obligation register entries.',
     links: [
       page('/resources/crosswalk', 'Crosswalk'),
       pattern('framework-crosswalk', 'Framework crosswalk'),
@@ -433,19 +435,19 @@ export const competencyCells: readonly CompetencyCell[] = [
 export const functionStatements: readonly FunctionStatement[] = [
   {
     can: 'Owns the AI governance engineering function and shares ownership of the controls with engineering.',
-    evidence: 'Control ownership recorded per team in the registry, with engineering teams named as co-owners of their gates.',
+    evidence: 'Every gate and control in the repository names an engineering team as owner, and no gate is maintained by governance alone.',
   },
   {
     can: 'Sets the priorities of the function by realised risk reduction, not by the number of controls that stopped something.',
-    evidence: 'A risk-reduction report built from incidents, near misses and evidence freshness, reviewed on a fixed cadence.',
+    evidence: 'A realised risk reduction indicator, the change in the rate of named failure modes in production, computed from live data and used to rank the work.',
   },
   {
     can: 'Decides which of the seven workflows the function builds itself and which engineering teams own, so the paved path of each has an owner.',
     evidence: 'A published ownership map of the seven workflows with a named owner for each.',
   },
   {
-    can: 'Reports the state of AI governance to the committee from the running systems, not from documents.',
-    evidence: 'A committee pack generated from the evidence store, with every figure traceable to a query.',
+    can: 'Reports the state of AI governance to the board and the AI governance committee from the running systems, not from documents.',
+    evidence: 'A one-page board pack generated by a query from live systems, with every figure traceable to its source data.',
   },
 ];
 
