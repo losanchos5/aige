@@ -36,11 +36,11 @@
 ## 6. Verificación
 
 - [x] 6.1 Verificación adversarial, por un revisor distinto del autor, de cada cambio, cita, página, hash, fecha y valor de divulgación contra los PDF; verificar con un informe `tracker-factcheck.md` sin discrepancias abiertas
-- [ ] 6.2 Escribir `site/tests/frontier-changes.spec.ts` según D11, pasando antes la puerta de `test-audit`; verificar que pasa
-- [ ] 6.3 Construir con `bash D:/Documents/aige-wt/build.sh` y pasar las specs afectadas (`frontier-changes`, `frontier-crosswalk`, `api`, `resources`, `nav`, `geo`, `seo-schema`, `block-f-feed`, `infra`) con un `PW_PORT` propio; verificar que todas pasan y que no queda ninguna captura regenerada en `git status`
+- [x] 6.2 Escribir `site/tests/frontier-changes.spec.ts` según D11, pasando antes la puerta de `test-audit`; verificar que pasa
+- [x] 6.3 Construir con `bash D:/Documents/aige-wt/build.sh` y pasar las specs afectadas (`frontier-changes`, `frontier-crosswalk`, `api`, `resources`, `nav`, `geo`, `seo-schema`, `block-f-feed`, `infra`) con un `PW_PORT` propio; verificar que todas pasan y que no queda ninguna captura regenerada en `git status`
 - [x] 6.4 Revisión de código del diff completo; verificar que no quedan hallazgos críticos ni altos abiertos
 
 ## 7. Entrega
 
-- [ ] 7.1 Abrir el PR y esperar la CI; verificar que termina en verde
-- [ ] 7.2 Tras el merge (lo hace Jordi), comprobar en producción la página, el JSON, el CSV, los dos conjuntos de la API y las entradas de `/rss.xml`; verificar con respuestas 200 y los recuentos esperados
+- [x] 7.1 Abrir el PR y esperar la CI; verificar que termina en verde
+- [x] 7.2 Tras el merge (lo hace Jordi), comprobar en producción la página, el JSON, el CSV, los dos conjuntos de la API y las entradas de `/rss.xml`; verificar con respuestas 200 y los recuentos esperados
