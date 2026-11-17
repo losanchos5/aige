@@ -7,13 +7,8 @@ import type { APIRoute } from 'astro';
 import {
   FRONTIER_CROSSWALK_AS_OF,
   FRONTIER_CROSSWALK_PATH,
-  dimensions,
-  frontierColumns,
+  frontierCrosswalkPayload,
   frontierCrosswalkSchemaVersion,
-  frontierCrosswalkSources,
-  frontierDocs,
-  frontierExportRows,
-  frontierGaps,
   frontierNotice,
 } from '../../data/frontier-crosswalk';
 import { site } from '../../data/site';
@@ -32,24 +27,7 @@ export const GET: APIRoute = () => {
       parentDoi: `https://doi.org/${site.doi}`,
       conceptDoi: `https://doi.org/${site.conceptDoi}`,
     },
-    documents: frontierDocs.map((d) => ({
-      framework: d.frameworkId,
-      name: d.name,
-      short: d.short,
-      issuer: d.issuer,
-      version: d.version,
-      effective: d.effective,
-      url: d.url,
-      pdfUrl: d.pdfUrl ?? null,
-      companion: d.companion
-        ? { name: d.companion.name, date: d.companion.date, url: d.companion.url, note: d.companion.note }
-        : null,
-    })),
-    columns: frontierColumns.map((c) => ({ id: c.id, label: c.label, group: c.group, frameworks: c.frameworks })),
-    dimensions: dimensions.map((d) => ({ id: d.id, name: d.name, question: d.question, summary: d.summary })),
-    references: frontierExportRows(),
-    gaps: frontierGaps.map((g) => ({ dimension: g.topic, framework: g.framework, note: g.note })),
-    sources: frontierCrosswalkSources.map((s, i) => ({ n: i + 1, ...s })),
+    ...frontierCrosswalkPayload(),
   };
 
   return new Response(`${JSON.stringify(payload, null, 2)}\n`, {
