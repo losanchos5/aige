@@ -298,6 +298,11 @@ export const GET: APIRoute = async (context) => {
     section('Interactive views', [
       described('/stack', 'The stack'),
       described('/role', 'The role'),
+      page(
+        'Competency matrix',
+        '/role/competencies',
+        "A competency matrix for the AI governance engineer: the seven workflows of the role by four rungs of the career ladder in chapter 06, each cell with what a person can own and the evidence that shows it. The author's model, not an industry standard.",
+      ),
       described('/path', 'The learning path'),
       page(
         'Discipline map',

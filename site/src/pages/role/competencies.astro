@@ -1,0 +1,365 @@
+---
+// /role/competencies: the competency matrix of the AI governance engineer, the
+// seven workflows of /role by the first four rungs of the career ladder in
+// chapter 06, plus a function-level band for rung five. Content comes from
+// src/data/competencies.ts (OpenSpec change competency-matrix). It is the
+// author's model: no score, no form, no stored state, and no client script, so
+// everything is in the HTML without JavaScript. Every workflow is an
+// <article id="<workflow id>"> and every cell a <section id="<workflow id>-r<n>">:
+// stable permalinks. The page throws at build time when the data is incoherent.
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import Citation from '../../components/Citation.astro';
+import SkillsTable from '../../components/SkillsTable.astro';
+import { site } from '../../data/site';
+import { workflows } from '../../data/role';
+import {
+  COMPETENCIES_PATH,
+  competenciesDisclaimer,
+  competencyCells,
+  competencyProblems,
+  functionStatements,
+  rungs,
+  skillsFor,
+} from '../../data/competencies';
+import { breadcrumbId, breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorNodes, authorRefs, lastModified, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { fitsSiteSuffix } from '../../lib/seo-title';
+import '../../styles/reading.css';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+
+const problems = competencyProblems();
+if (problems.length > 0) {
+  throw new Error(`competencies.ts invariants failed:\n${problems.join('\n')}`);
+}
+
+const seoTitle = 'AI governance engineer competency matrix';
+const description =
+  'A competency matrix for the AI governance engineer: seven workflows by four rungs of the career ladder, each cell with the evidence that shows it.';
+const crumbs = [{ label: 'The role', href: '/role' }, { label: 'Competency matrix' }];
+const pageUrl = new URL(COMPETENCIES_PATH, site.url).href;
+const updated = lastModified(
+  'src/pages/role/competencies.astro',
+  'src/data/competencies.ts',
+  'src/data/role.ts',
+);
+
+const jsonLd = [
+  {
+    '@type': 'WebPage',
+    '@id': `${pageUrl}#page`,
+    name: seoTitle,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    isPartOf: { '@id': WEBSITE_ID },
+    publisher: { '@id': ORG_ID },
+    author: [...authorRefs],
+    dateModified: updated,
+    breadcrumb: { '@id': breadcrumbId(pageUrl) },
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs, pageUrl),
+];
+
+const cellOf = (workflow: string, rung: number) => {
+  const cell = competencyCells.find((c) => c.workflow === workflow && c.rung === rung);
+  if (!cell) throw new Error(`competencies page: no cell for ${workflow} rung ${rung}`);
+  return cell;
+};
+const cellId = (workflow: string, rung: number) => `${workflow}-r${rung}`;
+const layerLabel = (n: number | 'all') => (n === 'all' ? 'All layers' : `Layer ${n}`);
+const matrixRungs = rungs.filter((r) => r.n <= 4);
+const top = rungs[rungs.length - 1];
+---
+
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/role-competencies.png"
+  jsonLd={jsonLd}
+>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="What an AI governance engineer can own, rung by rung"
+    lede="Seven workflows by four rungs of the career ladder: for each cell, what a person can take on end to end and the artefact in the systems that shows it."
+  />
+
+  <div class="container res-page">
+    <section class="res-section prose" aria-labelledby="cm-short-heading">
+      <h2 id="cm-short-heading">In short</h2>
+      <p>
+        The matrix crosses the seven workflows of the AI governance engineer role with the first four
+        rungs of the career ladder in chapter 06 of the Body of Knowledge: associate, AI governance
+        engineer, senior, and staff or principal. Each of the 28 cells says what a person can own end to
+        end at that rung and which artefact, visible in the systems and not in a title, shows it. A fifth
+        band describes the head of the function. It is the author's model, not an industry standard.
+      </p>
+    </section>
+
+    <section class="res-section" aria-labelledby="cm-table-heading">
+      <div class="res-section-head">
+        <h2 id="cm-table-heading">The matrix</h2>
+        <p>
+          Rows are the workflows, with the stack layer each maps to. Columns are the rungs. Select a cell
+          for its evidence and the places on this site where it is learned.
+        </p>
+      </div>
+      <table class="cm-table">
+        <caption class="visually-hidden">
+          Competency matrix: what a person can own, by workflow and rung
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Workflow</th>
+            {
+              matrixRungs.map((r) => (
+                <th scope="col">
+                  <span class="cm-rung">Rung {r.n}</span>
+                  {r.name}
+                </th>
+              ))
+            }
+          </tr>
+        </thead>
+        <tbody>
+          {
+            workflows.map((w) => (
+              <tr>
+                <th scope="row">
+                  <a href={`#${w.id}`}>{w.name}</a>
+                  <span class="cm-note">{layerLabel(w.layerN)}</span>
+                </th>
+                {matrixRungs.map((r) => (
+                  <td data-label={`Rung ${r.n}: ${r.name}`}>
+                    <a href={`#${cellId(w.id, r.n)}`}>{cellOf(w.id, r.n).can}</a>
+                  </td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+      <p class="cm-note">
+        The fifth rung, {top.name}, is not split by workflow: <a href="#function">see the function band</a>.
+      </p>
+    </section>
+
+    <section class="res-section" aria-labelledby="cm-detail-heading">
+      <div class="res-section-head">
+        <h2 id="cm-detail-heading">Detail by workflow</h2>
+        <p>
+          Each workflow with the skills <a href="/role">the role page</a> assigns it, then its four cells in
+          full: what the person can own, the evidence, and where to learn it.
+        </p>
+      </div>
+      {
+        workflows.map((w) => (
+          <article id={w.id} class="cm-wf" aria-labelledby={`${w.id}-h`}>
+            <h3 id={`${w.id}-h`}>{w.name}</h3>
+            <p class="cm-note">{layerLabel(w.layerN)}</p>
+            <SkillsTable skills={[skillsFor(w.id)]} />
+            {matrixRungs.map((r) => {
+              const cell = cellOf(w.id, r.n);
+              return (
+                <section id={cellId(w.id, r.n)} class="cm-cell" aria-labelledby={`${cellId(w.id, r.n)}-h`}>
+                  <h4 id={`${cellId(w.id, r.n)}-h`}>
+                    {w.name}, rung {r.n}: {r.name}
+                  </h4>
+                  <p>{cell.can}</p>
+                  <p>
+                    <span class="cm-label mono">Evidence</span>
+                    {cell.evidence}
+                  </p>
+                  <p>
+                    <span class="cm-label mono">Learn it</span>
+                    {cell.links.map((l, i) => (
+                      <>
+                        {i > 0 && ' · '}
+                        <a href={l.href}>{l.label}</a>
+                      </>
+                    ))}
+                  </p>
+                </section>
+              );
+            })}
+          </article>
+        ))
+      }
+    </section>
+
+    <section id="function" class="res-section" aria-labelledby="cm-function-heading">
+      <div class="res-section-head">
+        <h2 id="cm-function-heading">Rung 5: {top.name}</h2>
+        <p>{top.scope} This rung is described for the function as a whole, not workflow by workflow.</p>
+      </div>
+      <ol class="cm-function" role="list">
+        {
+          functionStatements.map((s, i) => (
+            <li id={`function-${i + 1}`} class="cm-cell">
+              <p>{s.can}</p>
+              <p>
+                <span class="cm-label mono">Evidence</span>
+                {s.evidence}
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="cm-use-heading">
+      <h2 id="cm-use-heading">How to use it</h2>
+      <h3>To hire</h3>
+      <p>
+        Pick the one or two workflows the first hire will own and the rung you need. Ask the candidate to
+        show the evidence in the cell, such as a gate they built or a record they kept, and look at the
+        artefact itself. The three ways people come into the role, and what each brings, are on the{' '}
+        <a href="/role#ways-in">role page</a>.
+      </p>
+      <h3>To prepare for the role</h3>
+      <p>
+        Choose a workflow and read its rung 1 and rung 2 cells. Each links to the pattern, tool or path
+        node where you do the work, and the rung 2 evidence is a good target for a first project. The
+        <a href="/path">learning path</a> orders the same material in four stages.
+      </p>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="cm-method-heading">
+      <h2 id="cm-method-heading">Method and limits</h2>
+      <p>
+        The rows are the seven workflows that <a href="/role">the role page</a> publishes. The columns are the
+        career ladder of <a href="/bok/the-role">chapter 06</a>. Each cell was written from what this site
+        already teaches, and each links to it.
+      </p>
+      <ul>
+        <li>{competenciesDisclaimer}</li>
+        <li>There is no score, no form and no stored state. The page does not tell you your level.</li>
+        <li>
+          Evidence is an artefact you can show in the systems. A certificate is not evidence of a
+          competency, and neither is a title.
+        </li>
+        <li>The matrix is not mapped to any certification or to any third-party competency framework.</li>
+        <li>Rungs 1 to 4 are split by workflow. Rung 5 describes the function and is not.</li>
+      </ul>
+      <Callout kind="note" title="A model, not a standard">
+        <p>
+          It is a published professional position of the author, open to correction.
+          <a href={`${site.github}/issues/new?template=report-an-error.yml`} rel="noopener">Report a problem on GitHub</a>.
+        </p>
+      </Callout>
+    </section>
+
+    <div class="obx-cite">
+      <Citation title="AI governance engineer competency matrix" url={COMPETENCIES_PATH} kind="page" />
+    </div>
+  </div>
+
+  <script is:inline defer src="/cite.js"></script>
+</Base>
+
+<style>
+  .cm-note {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+  .cm-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .cm-table th,
+  .cm-table td {
+    text-align: left;
+    vertical-align: top;
+    padding: var(--s-3) var(--s-3) var(--s-3) 0;
+    border-top: 1px solid var(--line);
+    font-size: var(--fs-small);
+  }
+  .cm-table thead th {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .cm-rung {
+    display: block;
+  }
+  .cm-table tbody th {
+    font-weight: 600;
+  }
+  .cm-wf {
+    margin-block: var(--s-6);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--line);
+  }
+  .cm-wf h3 {
+    margin: 0;
+  }
+  .cm-cell {
+    margin-block: var(--s-4);
+    padding: var(--s-3) var(--s-4);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    background: var(--bg);
+  }
+  .cm-cell:target {
+    border-color: var(--ink);
+  }
+  .cm-cell h4 {
+    margin: 0 0 var(--s-2);
+  }
+  .cm-cell p {
+    margin: var(--s-2) 0 0;
+    overflow-wrap: anywhere;
+  }
+  .cm-function {
+    list-style: none;
+    margin: var(--s-4) 0 0;
+    padding: 0;
+  }
+  .cm-label {
+    font-size: var(--fs-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin-right: var(--s-2);
+  }
+  @media (max-width: 40rem) {
+    .cm-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+    .cm-table,
+    .cm-table tbody,
+    .cm-table tr,
+    .cm-table th,
+    .cm-table td {
+      display: block;
+      width: 100%;
+    }
+    .cm-table tr {
+      border-top: 1px solid var(--line);
+      padding-block: var(--s-3);
+    }
+    .cm-table th,
+    .cm-table td {
+      border-top: 0;
+      padding: var(--s-1) 0;
+    }
+    .cm-table td::before {
+      content: attr(data-label);
+      display: block;
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      text-transform: uppercase;
+      color: var(--ink-2);
+    }
+  }
+</style>

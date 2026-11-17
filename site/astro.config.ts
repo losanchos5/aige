@@ -200,6 +200,7 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   ],
   ['/resources/tools', ['src/pages/resources/tools.astro', 'src/data/stack.ts']],
   ['/role', ['src/pages/role.astro', 'src/data/role.ts', 'src/data/maturity.ts']],
+  ['/role/competencies', ['src/pages/role/competencies.astro', 'src/data/competencies.ts', 'src/data/role.ts']],
   // The layer matrix on /stack also counts obligations, patterns, controls,
   // path nodes and workflows per layer.
   [

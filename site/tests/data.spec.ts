@@ -17,6 +17,7 @@ import {
   TOOLS_LAST_CHECKED,
 } from '../src/data/stack';
 import { workflows, market } from '../src/data/role';
+import { rungs } from '../src/data/competencies';
 import { levels } from '../src/data/maturity';
 import {
   frameworks,
@@ -190,6 +191,17 @@ test('every role workflow anchor exists as a heading in chapter 06', () => {
   for (const workflow of workflows) {
     expect(slugs.has(workflow.anchor)).toBe(true);
   }
+});
+
+test('the competency rungs are the numbered career ladder of chapter 06, in order', () => {
+  const chapter = readSource('bok/06-the-role.md');
+  const section = chapter.split(/^## The career ladder\s*$/m)[1]?.split(/^## /m)[0] ?? '';
+  const ladder = [...section.matchAll(/^\d+\. \*\*(.+?)\*\*/gm)].map((m) => m[1].replace(/\.$/, ''));
+  expect(ladder.length, 'career ladder list found').toBeGreaterThan(0);
+  rungs.forEach((rung, i) => {
+    expect(rung.name, `rung ${rung.n} against ladder item ${i + 1}`).toBe(ladder[i]);
+  });
+  expect(rungs.map((r) => r.n)).toEqual(ladder.map((_, i) => i + 1));
 });
 
 test('every market stat has a non-empty source', () => {

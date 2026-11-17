@@ -126,6 +126,11 @@ export const nav: NavGroup[] = [
         description: 'What an AI Governance Engineer does: seven workflows, skills, market.',
       },
       {
+        label: 'Competency matrix',
+        href: '/role/competencies',
+        description: 'Seven workflows by four rungs: what a person can own, with the evidence.',
+      },
+      {
         label: 'The Stack',
         href: '/stack',
         description: 'Five layers, one evidence chain: the reference architecture.',
