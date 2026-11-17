@@ -257,6 +257,11 @@ export const nav: NavGroup[] = [
         description: 'Three frontier safety frameworks mapped to NIST AI RMF and ISO/IEC 42001.',
       },
       {
+        label: 'Frontier framework changes',
+        href: '/resources/frontier-framework-changes',
+        description: 'Version history of the three frontier safety frameworks and what changed between versions.',
+      },
+      {
         label: 'National DPIA lists',
         href: '/resources/dpia-lists',
         description: 'The GDPR Art. 35(4) lists by country, read for AI and mapped to Annex III.',

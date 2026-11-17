@@ -30,6 +30,7 @@ export const OG_ROUTE_TITLES: Readonly<Record<string, string>> = {
   controls: 'Open AI governance controls',
   'controls-crosswalk': 'AI governance controls crosswalk',
   'frontier-safety-crosswalk': 'Frontier safety crosswalk',
+  'frontier-framework-changes': 'Frontier framework changes',
   frontier: 'Engineering assurance for frontier AI',
   research: 'Research and technical notes',
   contribute: 'Contribute to the project',
