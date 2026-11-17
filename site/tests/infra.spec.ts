@@ -166,7 +166,15 @@ test('umami-guard.js cancels the Umami send for automation and passes the payloa
   await page.goto('/404');
   await page.addScriptTag({ url: '/umami-guard.js' });
   const payload = { url: '/', title: 'x' };
-  const run = () => page.evaluate((p) => (window as any).umamiBeforeSend('event', p), payload);
+  const run = () =>
+    page.evaluate(
+      (p) =>
+        (window as unknown as { umamiBeforeSend: (type: string, payload: unknown) => unknown }).umamiBeforeSend(
+          'event',
+          p,
+        ),
+      payload,
+    );
   // Playwright's Chromium reports navigator.webdriver === true.
   expect(await run()).toBeFalsy();
   await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', { get: () => false }));
