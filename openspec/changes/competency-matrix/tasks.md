@@ -20,7 +20,7 @@
 
 - [x] 4.1 Añadir a `site/tests/data.spec.ts` la prueba que compara los peldaños con la lista de "The career ladder" del capítulo 06, pasando antes la puerta de `test-audit`; verificar que pasa y que falla al cambiar un nombre en local
 - [x] 4.2 Escribir `site/tests/competencies.spec.ts` según D11, pasando antes la puerta de `test-audit`; verificar que pasa
-- [ ] 4.3 Construir con `bash D:/Documents/aige-wt/build.sh` y pasar las specs afectadas (`competencies`, `data`, `api`, `nav`, `geo`, `seo-infra`, `stack-role`, `seo-role-next`, `path`, `infra`), o dejarlas a la CI del PR si la máquina no tiene memoria; verificar que todas pasan y que no queda ninguna captura regenerada en `git status`
+- [x] 4.3 Construir con `bash D:/Documents/aige-wt/build.sh` y pasar las specs afectadas (`competencies`, `data`, `api`, `nav`, `geo`, `seo-infra`, `stack-role`, `seo-role-next`, `path`, `infra`), o dejarlas a la CI del PR si la máquina no tiene memoria; verificar que todas pasan y que no queda ninguna captura regenerada en `git status`
 - [x] 4.4 Revisión de código del diff completo; verificar que no quedan hallazgos críticos ni altos abiertos
 
 ## 5. Entrega
