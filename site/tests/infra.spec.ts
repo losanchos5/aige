@@ -161,3 +161,14 @@ test.describe('same-origin scripts and CSP', () => {
     expect(cspLines(readFileSync(join('dist', '_headers'), 'utf8'))).toEqual(source);
   });
 });
+
+test('umami-guard.js cancels the Umami send for automation and passes the payload otherwise', async ({ page }) => {
+  await page.goto('/404');
+  await page.addScriptTag({ url: '/umami-guard.js' });
+  const payload = { url: '/', title: 'x' };
+  const run = () => page.evaluate((p) => (window as any).umamiBeforeSend('event', p), payload);
+  // Playwright's Chromium reports navigator.webdriver === true.
+  expect(await run()).toBeFalsy();
+  await page.evaluate(() => Object.defineProperty(navigator, 'webdriver', { get: () => false }));
+  expect(await run()).toEqual(payload);
+});

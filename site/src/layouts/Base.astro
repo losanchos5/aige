@@ -210,15 +210,19 @@ const DISPLAY_FONT = '/fonts/newsreader-latin-display-normal.woff2';
 
     {
       umamiWebsiteId && (
-        <script
-          is:inline
-          defer
-          src={umamiSrc}
-          data-website-id={umamiWebsiteId}
-          data-exclude-hash="true"
-          data-exclude-search="true"
-          data-performance="true"
-        />
+        <>
+          <script is:inline defer src="/umami-guard.js" />
+          <script
+            is:inline
+            defer
+            src={umamiSrc}
+            data-website-id={umamiWebsiteId}
+            data-before-send="umamiBeforeSend"
+            data-exclude-hash="true"
+            data-exclude-search="true"
+            data-performance="true"
+          />
+        </>
       )
     }
   </head>
