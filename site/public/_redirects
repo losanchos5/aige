@@ -6,6 +6,10 @@ https://www.aigovernanceengineer.com/* https://aigovernanceengineer.com/:splat 3
 # Block orp-shell (open reference project): the nav calls the cases Incidents; /incidents redirects to them.
 /incidents /cases 301
 /incidents/* /cases/:splat 301
+# The API root has no index.html, so /api/v1/ was a 404; the index document is index.json.
+# Exact paths: /api/v1/index.json and the other files under /api/v1/ are not matched.
+/api/v1 /api/v1/index.json 301
+/api/v1/ /api/v1/index.json 301
 # Machine translations hidden on 2026-09-25 (PUBLISHED_TRANSLATED_LOCALES in
 # src/i18n/locales.ts is empty): their old URLs go to the English page, with a
 # 302 because they will come back. /es/thesis, the hand translation, stays live
