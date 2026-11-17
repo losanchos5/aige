@@ -33,6 +33,16 @@ import { patterns, patternPath, getPatternBySlug } from '../data/patterns';
 import { topics, columns, refs, chipLabel, refObligation } from '../data/crosswalk';
 import { levels } from '../data/maturity';
 import { stages, nodes, entries } from '../data/path';
+import {
+  COMPETENCIES_PATH,
+  competenciesDisclaimer,
+  competencyCellId,
+  competencyCells,
+  functionStatements,
+  rungs,
+  skillsFor,
+} from '../data/competencies';
+import { workflows } from '../data/role';
 import { chapters, chapterParts, chaptersOrdered } from '../data/chapters';
 import { jurisdictions, statusLabels as jurisdictionStatusLabels } from '../data/jurisdictions';
 import {
@@ -1001,6 +1011,82 @@ export const datasets: readonly Dataset[] = [
           startAt: s.arr(s.str('Node id.'), 'Nodes to start at.'),
         }),
         'Ways in.',
+      ),
+    },
+  },
+  {
+    name: 'competencies',
+    title: 'Competency matrix',
+    description:
+      "The competency matrix of the AI governance engineer: the seven workflows by the first four rungs of the career ladder, each cell with what the person can own and the evidence that shows it, plus the function-level statements for the fifth rung. The author's model, not an industry standard.",
+    schemaVersion: 1,
+    page: COMPETENCIES_PATH,
+    extra: () => ({ disclaimer: competenciesDisclaimer }),
+    extraSchema: {
+      disclaimer: s.str("What this dataset is: the author's model, not a standard, not validated by a survey, not a score."),
+    },
+    build: () => ({
+      rungs: rungs.map((r) => ({ n: r.n, name: r.name, scope: r.scope })),
+      workflows: workflows.map((w) => {
+        const sk = skillsFor(w.id);
+        return {
+          id: w.id,
+          name: w.name,
+          layer: w.layerN === 'all' ? null : w.layerN,
+          skills: { core: [...sk.core], supporting: [...sk.supporting] },
+        };
+      }),
+      cells: competencyCells.map((c) => ({
+        workflow: c.workflow,
+        rung: c.rung,
+        can: c.can,
+        evidence: c.evidence,
+        links: c.links.map((l) => ({ label: l.label, url: abs(l.href) })),
+        url: abs(`${COMPETENCIES_PATH}#${competencyCellId(c.workflow, c.rung)}`),
+      })),
+      function: functionStatements.map((f) => ({ can: f.can, evidence: f.evidence })),
+    }),
+    properties: {
+      rungs: s.arr(
+        s.obj({
+          n: s.int('Rung number.', 1, 5),
+          name: s.str('Rung name, as chapter 06 lists it.'),
+          scope: s.str('What the rung owns, in one sentence.'),
+        }),
+        'The five rungs of the career ladder.',
+      ),
+      workflows: s.arr(
+        s.obj({
+          id: s.str('Workflow id.'),
+          name: s.str('Workflow name.'),
+          layer: s.intOrNull('Stack layer the workflow maps to; null for regulatory translation, which spans all.', 1, 5),
+          skills: s.obj({
+            core: s.arr(s.str('Skill.'), 'Core skills of the workflow.'),
+            supporting: s.arr(s.str('Skill.'), 'Supporting skills of the workflow.'),
+          }),
+        }),
+        'The seven workflows.',
+      ),
+      cells: s.arr(
+        s.obj({
+          workflow: s.str('Workflow id.'),
+          rung: s.int('Rung number.', 1, 4),
+          can: s.str('What the person can own end to end at this rung.'),
+          evidence: s.str('The artefact visible in the systems that shows it.'),
+          links: s.arr(
+            s.obj({ label: s.str('Link label.'), url: s.uri('Where the site teaches it.') }),
+            'One to four places on the site.',
+          ),
+          url: s.uri('The cell on the competency page.'),
+        }),
+        'Workflow by rung, 28 cells.',
+      ),
+      function: s.arr(
+        s.obj({
+          can: s.str('What the head of the function owns.'),
+          evidence: s.str('The artefact that shows it.'),
+        }),
+        'Rung five, stated for the function as a whole.',
       ),
     },
   },
