@@ -18,6 +18,7 @@ const HUB = [
   '/resources/ai-act-deadlines',
   '/resources/crosswalk',
   '/resources/frontier-safety-crosswalk',
+  '/resources/frontier-framework-changes',
   '/resources/harms',
   '/cases',
   '/controls',

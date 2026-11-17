@@ -179,6 +179,11 @@ export const GET: APIRoute = async (context) => {
         '/resources/frontier-safety-crosswalk',
         'Three published frontier safety frameworks (Anthropic RSP, OpenAI Preparedness Framework, Google DeepMind Frontier Safety Framework) mapped to NIST AI RMF and ISO/IEC 42001 across 13 governance dimensions. A coverage map, not a conformity claim. Also as .csv and .json.',
       ),
+      page(
+        'Frontier framework changes',
+        '/resources/frontier-framework-changes',
+        "The published versions of the same three frontier safety frameworks, each with its date and file hash, and the material changes between consecutive versions, described from the text of the documents. Not exhaustive, and no claim about any lab's conduct. Also as .csv and .json.",
+      ),
       described('/resources/dpia-lists', 'National DPIA lists and the EU AI Act'),
       page(
         'AI contract and licence clauses',

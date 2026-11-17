@@ -165,6 +165,10 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       'src/data/nist-ai-rmf.ts',
     ],
   ],
+  [
+    '/resources/frontier-framework-changes',
+    ['src/pages/resources/frontier-framework-changes.astro', 'src/data/frontier-changes.ts'],
+  ],
   // The "<A> vs <B>" comparison pages, dated by the files that also date their byline.
   ['/resources/crosswalk/iso-42001-vs-eu-ai-act', comparisonSourceFiles('iso-42001-vs-eu-ai-act')],
   ['/resources/crosswalk/nist-ai-rmf-vs-iso-42001', comparisonSourceFiles('nist-ai-rmf-vs-iso-42001')],

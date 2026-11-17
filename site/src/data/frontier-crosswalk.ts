@@ -2060,3 +2060,30 @@ export function frontierExportRows(): {
     url: r.url ?? null,
   }));
 }
+
+/**
+ * The data part of frontier-safety-crosswalk.json and of the open-data API
+ * dataset of the same content (the callers add the envelope around it).
+ */
+export function frontierCrosswalkPayload() {
+  return {
+    documents: frontierDocs.map((d) => ({
+      framework: d.frameworkId,
+      name: d.name,
+      short: d.short,
+      issuer: d.issuer,
+      version: d.version,
+      effective: d.effective,
+      url: d.url,
+      pdfUrl: d.pdfUrl ?? null,
+      companion: d.companion
+        ? { name: d.companion.name, date: d.companion.date, url: d.companion.url, note: d.companion.note }
+        : null,
+    })),
+    columns: frontierColumns.map((c) => ({ id: c.id, label: c.label, group: c.group, frameworks: c.frameworks })),
+    dimensions: dimensions.map((d) => ({ id: d.id, name: d.name, question: d.question, summary: d.summary })),
+    references: frontierExportRows(),
+    gaps: frontierGaps.map((g) => ({ dimension: g.topic, framework: g.framework, note: g.note })),
+    sources: frontierCrosswalkSources.map((s, i) => ({ n: i + 1, ...s })),
+  };
+}

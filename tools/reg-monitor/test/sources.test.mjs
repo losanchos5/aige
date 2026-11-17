@@ -28,6 +28,7 @@ test('the list covers the jurisdictions and families the brief names', () => {
     'airc.nist.gov', 'csrc.nist.gov/pubs/ir/8596', 'genai.owasp.org', 'law.go.kr', 'leginfo.legislature.ca.gov',
     'nysenate.gov', 'leg.colorado.gov', 'capitol.texas.gov', 'edpb.europa.eu', 'ico.org.uk', 'cnil.fr',
     'iapp.org/certify/aigp', 'internationalaisafetyreport.org',
+    'anthropic.com/responsible-scaling-policy', 'deepmind.google/frontier-safety/', 'preparedness-framework-v2.pdf',
   ]) {
     assert.ok(urls.includes(needle), `missing a source for ${needle}`);
   }

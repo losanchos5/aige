@@ -33,6 +33,7 @@ import {
   gapsFor,
 } from '../../data/frontier-crosswalk';
 import { chipLabel } from '../../data/crosswalk';
+import { FRONTIER_CHANGES_PATH, crosswalkVersionStatus } from '../../data/frontier-changes';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
 import { fitsSiteSuffix } from '../../lib/seo-title';
@@ -109,6 +110,7 @@ const proseDate = (iso: string): string => {
   const [y, m, d] = iso.split('-').map(Number);
   return `${d} ${MONTHS[m - 1]} ${y}`;
 };
+const versionStatus = new Map(crosswalkVersionStatus().map((s) => [s.framework, s]));
 const fwShort = (id: string): string => frontierFrameworkById(id)?.short ?? id;
 ---
 
@@ -133,7 +135,8 @@ const fwShort = (id: string): string => frontierFrameworkById(id)?.short ?? id;
         <p>
           As of {proseDate(FRONTIER_CROSSWALK_AS_OF)}. Each policy is versioned by its lab; a new
           version can move, rename or drop a section, so every cell below names the version it was
-          read in.
+          read in. The <a href={FRONTIER_CHANGES_PATH}>version history</a> lists every published
+          version of the three policies and what changed between them.
         </p>
       </div>
       <ul class="fs-docs" role="list">
@@ -153,6 +156,14 @@ const fwShort = (id: string): string => frontierFrameworkById(id)?.short ?? id;
                   </>
                 )}
               </p>
+              {versionStatus.get(doc.frameworkId) && !versionStatus.get(doc.frameworkId)?.isLatest && (
+                <p class="fs-doc-comp">
+                  A later version exists: {versionStatus.get(doc.frameworkId)?.latest}.{' '}
+                  <a href={`${FRONTIER_CHANGES_PATH}#${versionStatus.get(doc.frameworkId)?.nextTransition}`}>
+                    What changed after this version
+                  </a>
+                </p>
+              )}
               {doc.companion && (
                 <p class="fs-doc-comp">
                   Companion: <a href={doc.companion.url} rel="noopener">{doc.companion.name}</a> (

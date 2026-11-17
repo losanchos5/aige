@@ -1,0 +1,700 @@
+---
+// /resources/frontier-framework-changes: the version history of the three
+// frontier safety frameworks the frontier crosswalk maps, and the material
+// changes between consecutive versions, from src/data/frontier-changes.ts
+// (OpenSpec change frontier-framework-changes). Descriptive only: it never
+// scores a change and says nothing about what a lab does in practice. Every
+// transition has an <article id="<transition id>"> and every change an
+// <li id="<change id>">: stable permalinks, and everything is in the HTML
+// without JavaScript. The page throws at build time when the data is incoherent.
+import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import Callout from '../../components/Callout.astro';
+import SourceList from '../../components/SourceList.astro';
+import CitedText from '../../components/CitedText.astro';
+import Citation from '../../components/Citation.astro';
+import { site } from '../../data/site';
+import {
+  FRONTIER_CHANGES_AS_OF,
+  FRONTIER_CHANGES_PATH,
+  changesFor,
+  crosswalkVersionStatus,
+  frontierChangeFrameworks,
+  frontierChangeProblems,
+  frontierChangeSources,
+  frontierChanges,
+  frontierChangesSchemaVersion,
+  frontierTransitions,
+  transitionsFor,
+  versionsFor,
+  type ChangeKind,
+  type ChangeNotes,
+  type Disclosure,
+} from '../../data/frontier-changes';
+import { FRONTIER_CROSSWALK_PATH, dimensions, frontierDocById } from '../../data/frontier-crosswalk';
+import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
+import { authorNodes, authorRefs, ORG_ID, WEBSITE_ID } from '../../lib/jsonld';
+import { fitsSiteSuffix } from '../../lib/seo-title';
+import { formatDate as proseDate } from '../../lib/applies-now';
+import '../../styles/reading.css';
+import '../../styles/resources.css';
+import '../../styles/pages.css';
+
+const problems = frontierChangeProblems();
+if (problems.length > 0) {
+  throw new Error(`frontier-changes.ts invariants failed:\n${problems.join('\n')}`);
+}
+
+const P = 'fc';
+const seoTitle = 'Frontier framework changes';
+const description =
+  "Version history of Anthropic's RSP, OpenAI's Preparedness Framework and Google DeepMind's FSF: dates, file hashes and the changes between versions.";
+const crumbs = [{ label: 'Resources', href: '/resources' }, { label: 'Frontier framework changes' }];
+const pageUrl = new URL(FRONTIER_CHANGES_PATH, site.url).href;
+const jsonUrl = `${FRONTIER_CHANGES_PATH}.json`;
+const csvUrl = `${FRONTIER_CHANGES_PATH}.csv`;
+
+const jsonLd = [
+  {
+    '@type': 'Dataset',
+    '@id': `${pageUrl}#dataset`,
+    name: `Frontier framework changes · ${site.name}`,
+    description,
+    url: pageUrl,
+    inLanguage: 'en',
+    version: site.bokVersion,
+    dateModified: FRONTIER_CHANGES_AS_OF,
+    keywords: [
+      'frontier AI safety',
+      'Responsible Scaling Policy',
+      'Preparedness Framework',
+      'Frontier Safety Framework',
+      'version history',
+      'framework changes',
+    ],
+    creator: [...authorRefs],
+    publisher: { '@id': ORG_ID },
+    isPartOf: { '@id': WEBSITE_ID },
+    ...(site.licenseUrl ? { license: site.licenseUrl } : {}),
+    distribution: [
+      {
+        '@type': 'DataDownload',
+        name: 'Frontier framework changes (CSV)',
+        encodingFormat: 'text/csv',
+        contentUrl: new URL(csvUrl, site.url).href,
+      },
+      {
+        '@type': 'DataDownload',
+        name: 'Frontier framework changes (JSON)',
+        encodingFormat: 'application/json',
+        contentUrl: new URL(jsonUrl, site.url).href,
+      },
+    ],
+  },
+  ...authorNodes,
+  breadcrumbJsonLd(crumbs),
+];
+
+const kindLabel: Record<ChangeKind, string> = {
+  added: 'Added',
+  removed: 'Removed',
+  modified: 'Modified',
+  relocated: 'Relocated',
+};
+const disclosureLabel: Record<Disclosure, string> = {
+  listed: "Listed in the lab's change notes",
+  'partly-listed': "Partly listed in the lab's change notes",
+  'not-listed': "Not listed in the lab's change notes",
+  'no-changelog': 'The lab published no change notes',
+};
+// What the link to the lab's own account of a revision says it is.
+const notesLabel: Record<ChangeNotes, string> = {
+  itemised: "The lab's change list",
+  narrative: "The lab's description of the changes",
+  redline: "The lab's marked-up version (PDF)",
+  none: 'The lab published no change notes',
+  'not-assessed': '',
+};
+const dateKindLabel = { effective: 'Effective', published: 'Published' } as const;
+/** Page number of a quote URL, from its #page=N. */
+const pageOf = (url: string): string | undefined => /#page=(\d+)$/.exec(url)?.[1];
+const sourceOf = (n: number) => frontierChangeSources[n - 1];
+const versionStatus = new Map(crosswalkVersionStatus().map((x) => [x.framework, x]));
+
+const dimName = (id: string): string => dimensions.find((d) => d.id === id)?.name ?? id;
+const labelOf = (framework: string, short: string): string =>
+  versionsFor(framework).find((v) => v.short === short)?.version ?? short;
+const dateOf = (framework: string, short: string): string =>
+  versionsFor(framework).find((v) => v.short === short)?.date ?? '';
+
+const frameworks = frontierChangeFrameworks.map((id) => ({
+  id,
+  name: frontierDocById(id)?.name ?? id,
+  mapped: frontierDocById(id)?.version,
+  versions: versionsFor(id),
+  transitions: transitionsFor(id),
+}));
+
+const coveredCount = frontierTransitions.filter((t) => t.covered).length;
+const versionCount = frontierChangeFrameworks.reduce((n, id) => n + versionsFor(id).length, 0);
+---
+
+<Base
+  title={seoTitle}
+  titleSuffix={fitsSiteSuffix(seoTitle)}
+  description={description}
+  image="/og/frontier-framework-changes.png"
+  jsonLd={jsonLd}
+>
+  <PageHero
+    variant="res"
+    crumbs={crumbs}
+    title="How the frontier safety frameworks changed, version by version"
+    lede="Anthropic, OpenAI and Google DeepMind revise the policy that decides when a model is too capable to train or ship as is. This page lists each published version with its date and file hash, and records what the text said before and after each revision."
+  />
+
+  <div class="container res-page">
+    <section class="res-section prose" aria-labelledby="fc-lead-heading">
+      <h2 id="fc-lead-heading">What this is</h2>
+      <p>
+        Last checked <time datetime={FRONTIER_CHANGES_AS_OF}>{proseDate(FRONTIER_CHANGES_AS_OF)}</time>.
+        {versionCount} versions of three frameworks, {frontierTransitions.length} revisions between them,
+        {coveredCount} of them compared so far.
+      </p>
+      <p>
+        The page describes published documents. It is not exhaustive, and it makes no claim about
+        how any lab applies its framework or whether it conforms to any rule. Where a revision has
+        not been compared, it is listed as such and shows no changes.
+      </p>
+      <p>
+        <a href={csvUrl}>CSV</a> · <a href={jsonUrl}>JSON</a> · the frameworks themselves, mapped to
+        NIST AI RMF and ISO/IEC 42001, are in the <a href={FRONTIER_CROSSWALK_PATH}
+        >frontier safety crosswalk</a>.
+      </p>
+    </section>
+
+    <section class="res-section" aria-labelledby="fc-versions-heading">
+      <div class="res-section-head">
+        <h2 id="fc-versions-heading">Versions</h2>
+        <p>
+          Each framework, newest version first. Labels and dates are as the document prints them.
+          A hash is the SHA-256 of a file. "First-hand" means this project downloaded the file on the
+          date shown as "Retrieved". "Third party" means the hash comes from the cited source, and
+          its date, shown as "Captured", is the day that source recorded the archived copy.
+        </p>
+      </div>
+      {
+        frameworks.map((fw) => (
+          <div class="fc-fw">
+            <h3 id={`versions-${fw.id}`}>{fw.name}</h3>
+            <table class="fc-table">
+              <caption class="visually-hidden">{fw.name}: versions, newest first</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Version</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Files</th>
+                </tr>
+              </thead>
+              <tbody>
+                {fw.versions.map((v) => (
+                  <tr>
+                    <th scope="row" data-label="Version">
+                      <span class="fc-version">{v.version}</span>
+                    </th>
+                    <td data-label="Date">
+                      <time datetime={v.date}>{proseDate(v.date)}</time>
+                      <span class="fc-note">{dateKindLabel[v.dateKind]} date</span>
+                    </td>
+                    <td data-label="Files">
+                      {v.version === fw.mapped && (
+                        <span class="fc-note">
+                          Mapped by the <a href={FRONTIER_CROSSWALK_PATH}>frontier safety crosswalk</a>.
+                          {versionStatus.get(fw.id)?.isLatest === false && (
+                            <>
+                              {' '}
+                              A later version exists:{' '}
+                              <a href={`#${versionStatus.get(fw.id)?.nextTransition}`}>what changed after this one</a>.
+                            </>
+                          )}
+                        </span>
+                      )}
+                      {v.labelSource !== undefined && (
+                        <span class="fc-note">
+                          Label from <CitedText text={`[${v.labelSource}]`} prefix={P} />, as the document prints none.
+                        </span>
+                      )}
+                      {v.note && <span class="fc-note">{v.note}</span>}
+                      {v.files.length === 0 ? (
+                        <span class="fc-note">Not recovered: no file and no hash.</span>
+                      ) : (
+                        <ul class="fc-files" role="list">
+                          {v.files.map((f) => (
+                            <li>
+                              <code class="fc-hash">{f.sha256}</code>
+                              <span class="fc-note">
+                                {f.verified === 'primary' ? 'Retrieved' : 'Captured'}{' '}
+                                <time datetime={f.retrieved}>{proseDate(f.retrieved)}</time>
+                                {' · '}
+                                {f.verified === 'primary' ? 'first-hand' : 'third party'}
+                                {' · '}
+                                {f.url && (
+                                  <>
+                                    <a href={f.url} rel="noopener">
+                                      {v.version}, the lab's file<span aria-hidden="true"> ↗</span>
+                                    </a>
+                                  </>
+                                )}
+                                {f.url && f.archiveUrl && ' · '}
+                                {f.archiveUrl && (
+                                  <a href={f.archiveUrl} rel="noopener">
+                                    {v.version}, archived copy<span aria-hidden="true"> ↗</span>
+                                  </a>
+                                )}
+                                {' · '}
+                                <CitedText text={`[${f.source}]`} prefix={P} />
+                                {f.note && ` · ${f.note}`}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="res-section" aria-labelledby="fc-changes-heading">
+      <div class="res-section-head">
+        <h2 id="fc-changes-heading">Changes by revision</h2>
+        <p>
+          Each revision between two consecutive versions, newest first. A revision not yet compared
+          says so and shows no changes. Jump to one:
+        </p>
+      </div>
+      <nav id="fc-revisions" aria-label="Revisions" class="fc-jump">
+        {
+          frameworks.map((fw) => (
+            <div>
+              <p class="fc-jump-title">{fw.name}</p>
+              <ul role="list">
+                {fw.transitions.map((t) => (
+                  <li>
+                    <a href={`#${t.id}`}>
+                      {labelOf(fw.id, t.from)} to {labelOf(fw.id, t.to)}
+                    </a>
+                    <span class="fc-note">
+                      {' '}
+                      {t.covered ? `${changesFor(t.id).length} changes` : 'not compared'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </nav>
+
+      {
+        frameworks.map((fw) => (
+          <div class="fc-fw">
+            <h3 id={`changes-${fw.id}`}>{fw.name}</h3>
+            {fw.transitions.map((t) => {
+              const changes = changesFor(t.id);
+              return (
+                <article id={t.id} class="fc-trans">
+                  <h4>
+                    {labelOf(fw.id, t.from)} to {labelOf(fw.id, t.to)}
+                  </h4>
+                  <p class="fc-meta">
+                    <time datetime={dateOf(fw.id, t.from)}>{proseDate(dateOf(fw.id, t.from))}</time> to{' '}
+                    <time datetime={dateOf(fw.id, t.to)}>{proseDate(dateOf(fw.id, t.to))}</time>
+                    {' · '}
+                    {t.covered
+                      ? `Compared on ${proseDate(t.recorded as string)}: ${changes.length} changes recorded`
+                      : 'Not covered: this revision has not been compared yet, so no changes are listed.'}
+                  </p>
+                  {t.covered && (
+                    <p class="fc-meta">
+                      {t.changeNotesUrl ? (
+                        <a href={t.changeNotesUrl} rel="noopener">
+                          {notesLabel[t.changeNotes]}
+                          <span aria-hidden="true"> ↗</span>
+                        </a>
+                      ) : (
+                        notesLabel[t.changeNotes]
+                      )}
+                      {(t.noteSources ?? []).length > 0 && (
+                        <>
+                          {' · Lab pages with change notes: '}
+                          {(t.noteSources ?? []).map((n, i) => (
+                            <>
+                              {i > 0 && ', '}
+                              <a href={sourceOf(n).url} rel="noopener">{sourceOf(n).title}</a>
+                              <CitedText text={`[${n}]`} prefix={P} />
+                            </>
+                          ))}
+                        </>
+                      )}
+                    </p>
+                  )}
+                  {(t.thirdParty ?? []).length > 0 && (
+                    <p class="fc-meta">
+                      Also in the Silent Revision corpus:{' '}
+                      {(t.thirdParty ?? []).map((n, i) => (
+                        <>
+                          {i > 0 && ', '}
+                          <a href={sourceOf(n).url} rel="noopener">{sourceOf(n).title}</a>
+                          <CitedText text={`[${n}]`} prefix={P} />
+                        </>
+                      ))}
+                    </p>
+                  )}
+                  {changes.length > 0 && (
+                    <ol class="fc-changes" role="list">
+                      {changes.map((c, ci) => (
+                        <li id={c.id} class="fc-change">
+                          <p class="fc-change-head">
+                            <span class="fc-kind mono">{kindLabel[c.kind]}</span>
+                            <span class="fc-section">{c.section}</span>
+                          </p>
+                          <p class="fc-summary">{c.summary}</p>
+                          <p class="fc-permalink mono">
+                            <a href={`#${c.id}`}>
+                              {fw.name}, {labelOf(fw.id, t.from)} to {labelOf(fw.id, t.to)}, change {ci + 1} of {changes.length}
+                            </a>
+                          </p>
+                          {c.before && (
+                            <p class="fc-quote">
+                              <span class="fc-qlabel mono">Before</span>
+                              <q cite={c.before.url}>{c.before.quote}</q>{' '}
+                              <a href={c.before.url} rel="noopener">
+                                {labelOf(fw.id, t.from)}
+                                {pageOf(c.before.url) ? `, page ${pageOf(c.before.url)}` : ''}
+                                <span aria-hidden="true"> ↗</span>
+                              </a>
+                            </p>
+                          )}
+                          {c.after && (
+                            <p class="fc-quote">
+                              <span class="fc-qlabel mono">After</span>
+                              <q cite={c.after.url}>{c.after.quote}</q>{' '}
+                              <a href={c.after.url} rel="noopener">
+                                {labelOf(fw.id, t.to)}
+                                {pageOf(c.after.url) ? `, page ${pageOf(c.after.url)}` : ''}
+                                <span aria-hidden="true"> ↗</span>
+                              </a>
+                            </p>
+                          )}
+                          {c.movedTo && (
+                            <p class="fc-meta">
+                              <span class="fc-qlabel mono">Moved to</span>
+                              {c.movedTo}
+                            </p>
+                          )}
+                          <p class="fc-meta">
+                            <span class="fc-qlabel mono">Dimensions</span>
+                            {c.dimensions.map((d, i) => (
+                              <>
+                                {i > 0 && ' · '}
+                                <a href={`${FRONTIER_CROSSWALK_PATH}#topic-${d}`}>{dimName(d)}</a>
+                              </>
+                            ))}
+                          </p>
+                          <p class="fc-meta">
+                            <span class="fc-qlabel mono">Lab's notes</span>
+                            {disclosureLabel[c.disclosure]}
+                          </p>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                  {t.covered && (
+                    <p class="fc-back">
+                      <a href="#fc-revisions">Back to the list of revisions</a>
+                    </p>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="res-section prose" aria-labelledby="fc-method-heading">
+      <h2 id="fc-method-heading">Method</h2>
+      <p>
+        {frontierTransitions.length} revisions are listed, {coveredCount} are covered, and {frontierChanges.length}
+        changes are recorded. A revision that is not covered has not been compared: it is not a
+        statement that nothing changed.
+      </p>
+      <p>
+        A change is material when it alters a commitment, a threshold, a trigger, a safeguard, a role,
+        a reporting duty or a definition. Changes of formatting, numbering or spelling are not
+        recorded. The text of two consecutive versions was compared section by section and each
+        candidate was checked against the document itself. Where the lab publishes a marked-up
+        version or a list of changes, it guided the comparison; it was not the only input. Where a
+        revision rewrote a document entirely, each item in the lab's own list was checked, plus the
+        changes found outside it.
+      </p>
+      <p>
+        Each summary says what the text said before and what it says after. Quotes are verbatim, at
+        most 25 words, each with a link to the page it comes from.
+      </p>
+      <h3>Kinds of change</h3>
+      <p>
+        The kinds and the disclosure values follow the codebook of the study{' '}
+        <CitedText text="[1]" prefix={P} /> so the two datasets can be read together.
+      </p>
+      <ul>
+        <li><strong>Added</strong>: text with no counterpart in the earlier version (codebook A).</li>
+        <li><strong>Removed</strong>: text with no counterpart in the later version (codebook X).</li>
+        <li><strong>Relocated</strong>: text moved to another document (codebook L).</li>
+        <li>
+          <strong>Modified</strong>: text present in both versions that says something different (this
+          groups the codebook's S and W, without saying which).
+        </li>
+      </ul>
+      <h3>Disclosure by the lab</h3>
+      <ul>
+        <li><strong>{disclosureLabel.listed}</strong> (codebook ANN).</li>
+        <li><strong>{disclosureLabel['partly-listed']}</strong> (codebook ANN-P).</li>
+        <li><strong>{disclosureLabel['not-listed']}</strong> (codebook SIL).</li>
+        <li><strong>{disclosureLabel['no-changelog']}</strong> (codebook NCL).</li>
+      </ul>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="fc-limits-heading">
+      <h2 id="fc-limits-heading">Limits</h2>
+      <ul>
+        <li>The record is not exhaustive. The comparison can miss a change, and it covers only the revisions marked as covered above.</li>
+        <li>Quotes are short excerpts, not the documents. The documents are the labs' own; follow the link to read a passage in context.</li>
+        <li>A hash describes the file retrieved on the date shown. If the lab later replaces the file under the same address, the hash will differ; that says the file changed, not what changed.</li>
+        <li>
+          "Not listed" means only that the lab's change notes cited for that revision do not mention the
+          change. A lab's change notes need not claim to be complete (OpenAI's, for example, open with
+          "Key changes include that we:"), so "not listed" is not a claim that anything was concealed.
+        </li>
+        <li>The page says nothing about how a lab applies its framework, and it does not rate any change.</li>
+      </ul>
+      <Callout kind="note" title="Published documents, not conduct">
+        <p>
+          This is a description of published text from the AI Governance Engineer Body of Knowledge.
+          It makes no claim about any lab's conduct or conformity with any rule.
+        </p>
+      </Callout>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="fc-corrections-heading">
+      <h2 id="fc-corrections-heading">Corrections</h2>
+      <p>
+        Found a wrong date, hash, quote or reading? <a
+          href={`${site.github}/issues/new?template=report-an-error.yml`}
+          rel="noopener">Report it on GitHub</a>, with the change id (for example the anchor in the
+        page address). See <a href="/contribute">how to contribute</a> for how reports are handled.
+      </p>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="fc-sources-heading">
+      <h2 id="fc-sources-heading">Sources</h2>
+      <SourceList sources={frontierChangeSources} prefix={P} />
+    </section>
+
+    <section class="res-section prose" aria-labelledby="fc-cite-heading">
+      <h2 id="fc-cite-heading">Download and cite</h2>
+      <p>
+        The dataset is <a href={jsonUrl}>JSON</a> and <a href={csvUrl}>CSV</a>, schema version {frontierChangesSchemaVersion}, with
+        a notice inside each file that it describes published documents and not any lab's conduct. It
+        is part of the archived Body of Knowledge, not a separate deposit: cite the concept DOI{' '}
+        <a href={`https://doi.org/${site.conceptDoi}`} rel="noopener">{site.conceptDoi}</a>, this page and the date
+        you fetched it. Attribution under {site.license}: {site.authors.join(', ')}.
+      </p>
+    </section>
+
+    <div class="obx-cite">
+      <Citation title="Frontier framework changes" url={FRONTIER_CHANGES_PATH} kind="dataset" />
+    </div>
+  </div>
+
+  <script is:inline defer src="/cite.js"></script>
+</Base>
+
+<style>
+  .fc-fw {
+    margin-block: var(--s-5);
+  }
+  .fc-note {
+    display: block;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+  .fc-note :global(a) {
+    overflow-wrap: anywhere;
+  }
+  .fc-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .fc-table th,
+  .fc-table td {
+    text-align: left;
+    vertical-align: top;
+    padding: var(--s-3) var(--s-3) var(--s-3) 0;
+    border-top: 1px solid var(--line);
+  }
+  .fc-table thead th {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .fc-table tbody th {
+    font-weight: normal;
+  }
+  .fc-version {
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+  }
+  .fc-files {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+  .fc-hash {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--fs-small);
+    overflow-wrap: anywhere;
+    word-break: break-all;
+    user-select: all;
+  }
+  .fc-jump {
+    display: grid;
+    gap: var(--s-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    margin-block: var(--s-4);
+  }
+  .fc-jump ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .fc-jump li {
+    padding-block: var(--s-1);
+  }
+  .fc-jump .fc-note {
+    display: inline;
+  }
+  .fc-jump-title {
+    font-size: var(--fs-label);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin: 0 0 var(--s-2);
+  }
+  .fc-trans {
+    margin-block: var(--s-5);
+    padding-top: var(--s-3);
+    border-top: 1px solid var(--line);
+  }
+  .fc-trans h4 {
+    margin: 0 0 var(--s-2);
+  }
+  .fc-meta {
+    margin: var(--s-1) 0;
+    font-size: var(--fs-small);
+    color: var(--ink-2);
+  }
+  .fc-meta :global(a) {
+    overflow-wrap: anywhere;
+  }
+  .fc-changes {
+    list-style: none;
+    margin: var(--s-4) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--s-3);
+  }
+  .fc-change {
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: var(--s-3) var(--s-4);
+    background: var(--bg);
+  }
+  .fc-change:target {
+    border-color: var(--ink);
+  }
+  .fc-change p {
+    margin: var(--s-2) 0 0;
+    overflow-wrap: anywhere;
+  }
+  .fc-change-head {
+    margin-top: 0 !important;
+  }
+  .fc-kind,
+  .fc-qlabel {
+    font-size: var(--fs-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+    margin-right: var(--s-2);
+  }
+  .fc-kind {
+    color: var(--ink);
+  }
+  .fc-permalink {
+    font-size: var(--fs-label);
+    color: var(--ink-2);
+  }
+  .fc-back {
+    margin: var(--s-3) 0 0;
+    font-size: var(--fs-small);
+  }
+  .fc-section {
+    font-weight: 600;
+  }
+  .fc-quote {
+    font-size: var(--fs-small);
+  }
+  @media (max-width: 40rem) {
+    .fc-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+    .fc-table,
+    .fc-table tbody,
+    .fc-table tr,
+    .fc-table th,
+    .fc-table td {
+      display: block;
+      width: 100%;
+    }
+    .fc-table tr {
+      border-top: 1px solid var(--line);
+      padding-block: var(--s-3);
+    }
+    .fc-table th,
+    .fc-table td {
+      border-top: 0;
+      padding: var(--s-1) 0;
+    }
+    .fc-table td::before {
+      content: attr(data-label);
+      display: block;
+      font-family: var(--font-mono);
+      font-size: var(--fs-label);
+      text-transform: uppercase;
+      color: var(--ink-2);
+    }
+  }
+</style>
