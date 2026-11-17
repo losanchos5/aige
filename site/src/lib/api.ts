@@ -44,6 +44,13 @@ import {
 } from '../data/harms';
 import { cases, casesForHarm } from '../data/cases';
 import {
+  FRONTIER_CROSSWALK_AS_OF,
+  FRONTIER_CROSSWALK_PATH,
+  frontierCrosswalkPayload,
+  frontierCrosswalkSchemaVersion,
+  frontierCrosswalkSources,
+} from '../data/frontier-crosswalk';
+import {
   lists as dpiaLists,
   topicOrder as dpiaTopicOrder,
   topicLabel as dpiaTopicLabel,
@@ -1727,6 +1734,107 @@ export const datasets: readonly Dataset[] = [
       profiles: s.arr(controlProfileSchema, 'The control profiles.'),
       controls: s.arr(controlSchema, 'Every control, in profile and id order.'),
       crosswalk: crosswalkSchema,
+    },
+  },
+  {
+    name: 'frontier-crosswalk',
+    title: 'Frontier safety frameworks crosswalk',
+    description:
+      'The Anthropic, OpenAI and Google DeepMind frontier safety frameworks, with NIST AI RMF and ISO/IEC 42001, mapped to 13 dimensions of a frontier safety regime: the documents and versions mapped, the references with their quotes, the documented gaps and the sources. Illustrative coverage, not a claim of conformity.',
+    schemaVersion: frontierCrosswalkSchemaVersion,
+    page: FRONTIER_CROSSWALK_PATH,
+    build: () => {
+      const p = frontierCrosswalkPayload();
+      return {
+        asOf: FRONTIER_CROSSWALK_AS_OF,
+        ...p,
+        sources: frontierCrosswalkSources.map((source, i) => ({
+          n: i + 1,
+          text: sourceText(source),
+          url: source.url,
+          verified: source.verified,
+        })),
+      };
+    },
+    properties: {
+      asOf: s.date('Date of the last pass over every document and reference.'),
+      documents: s.arr(
+        s.obj({
+          framework: s.str('Framework id.'),
+          name: s.str('Document name.'),
+          short: s.str('Short label.'),
+          issuer: s.str('Issuing body.'),
+          version: s.str('Version as the document states it.'),
+          effective: s.date('Effective or last-updated date as the document states it.'),
+          url: s.uri('Landing page.'),
+          pdfUrl: s.uriOrNull('The document itself, where it is a PDF.'),
+          companion: {
+            type: ['object', 'null'],
+            description: 'A related compliance document, when there is one.',
+            additionalProperties: false,
+            required: ['name', 'date', 'url', 'note'],
+            properties: {
+              name: s.str('Companion document name.'),
+              date: s.date('Companion document date.'),
+              url: s.uri('Companion document page.'),
+              note: s.str('How the companion relates to the document.'),
+            },
+          },
+        }),
+        'The documents mapped, with the version each one is read at.',
+      ),
+      columns: s.arr(
+        s.obj({
+          id: s.str('Column id.'),
+          label: s.str('Column label.'),
+          group: s.enumOf(['law', 'labs', 'codes', 'standards'], 'Chooser group.'),
+          frameworks: s.arr(s.str('Framework id.'), 'Frameworks that share the column.'),
+        }),
+        'The crosswalk columns.',
+      ),
+      dimensions: s.arr(
+        s.obj({
+          id: s.str('Dimension id.'),
+          name: s.str('Dimension name.'),
+          question: s.str('The question the row answers.'),
+          summary: s.str('What the dimension covers.'),
+        }),
+        'The 13 dimensions (rows), in display order.',
+      ),
+      references: s.arr(
+        s.obj({
+          dimension: s.str('Dimension id.'),
+          dimensionName: s.str('Dimension name.'),
+          framework: s.str('Framework id.'),
+          frameworkName: s.str('Framework name.'),
+          column: s.str('Column id.'),
+          reference: s.str('Section, page, clause or subcategory as the document prints it.'),
+          title: s.str('Title of the section or statement.'),
+          strength: s.enumOf(['core', 'related'], 'core: primarily about the dimension; related: touches it.'),
+          verified: s.bool('Whether the reference was checked against the primary text.'),
+          quote: s.strOrNull('Verbatim quote, at most 25 words; null for ISO text, which is not quoted.'),
+          note: s.strOrNull('Note on the reference.'),
+          url: s.uriOrNull('Page of the document.'),
+        }),
+        'One record per reference: a section of a document that speaks to a dimension.',
+      ),
+      gaps: s.arr(
+        s.obj({
+          dimension: s.str('Dimension id.'),
+          framework: s.str('Framework id.'),
+          note: s.str('Why no section of the framework maps to the dimension.'),
+        }),
+        'Cells with no reference, each with the reason.',
+      ),
+      sources: s.arr(
+        s.obj({
+          n: s.int('Source number.', 1),
+          text: s.str('Source in the house format.'),
+          url: s.uri('Source URL.'),
+          verified: s.enumOf(['primary', 'secondary', 'reported'], 'Verification tag.'),
+        }),
+        'Numbered sources.',
+      ),
     },
   },
 ];
