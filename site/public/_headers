@@ -18,6 +18,9 @@
 /pagefind/*
   ! Link
   Cache-Control: public, max-age=3600
+/umami-guard.js
+  ! Link
+  Cache-Control: public, max-age=3600
 /og/*
   ! Link
   Cache-Control: public, max-age=86400
