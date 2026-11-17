@@ -8,6 +8,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {
   COMPETENCIES_PATH,
+  competencyCellId,
   competencyCells,
   functionStatements,
   rungs,
@@ -23,8 +24,9 @@ test.describe('competency matrix: page', () => {
     const cell = competencyCells[competencyCells.length - 6];
     const workflow = workflows.find((w) => w.id === cell.workflow)!;
     const rung = rungs.find((r) => r.n === cell.rung)!;
-    await page.goto(`${PAGE}#${cell.workflow}-r${cell.rung}`);
-    const target = page.locator(`[id="${cell.workflow}-r${cell.rung}"]`);
+    const id = competencyCellId(cell.workflow, cell.rung);
+    await page.goto(`${PAGE}#${id}`);
+    const target = page.locator(`[id="${id}"]`);
     const header = (await page.locator('.site-header').boundingBox())!;
     const headerBottom = header.y + header.height;
     const viewportHeight = page.viewportSize()!.height;
@@ -49,6 +51,7 @@ test.describe('competency matrix: page', () => {
   });
 
   for (const scheme of ['light', 'dark'] as const) {
+    // Stays beside a11y.spec.ts: that one is stricter (any impact) and runs on the default project only.
     test(`axe WCAG 2.1 AA, ${scheme}`, async ({ page }) => {
       await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
       await page.goto(PAGE);
@@ -66,9 +69,8 @@ test.describe('competency matrix: without JavaScript', () => {
   test('the table, all 28 cells and the function band are in the HTML', async ({ page }) => {
     await page.goto(PAGE);
     await expect(page.locator('table').first()).toBeVisible();
-    expect(competencyCells).toHaveLength(28);
     for (const cell of competencyCells) {
-      await expect(page.locator(`[id="${cell.workflow}-r${cell.rung}"]`), `${cell.workflow} r${cell.rung}`).toHaveCount(1);
+      await expect(page.locator(`[id="${competencyCellId(cell.workflow, cell.rung)}"]`), `${cell.workflow} r${cell.rung}`).toHaveCount(1);
     }
     const body = (await page.locator('main').textContent()) ?? '';
     for (const f of functionStatements) expect(body).toContain(f.can);
@@ -76,12 +78,19 @@ test.describe('competency matrix: without JavaScript', () => {
 });
 
 test.describe('competency matrix: API dataset', () => {
-  test('carries every cell and the same function statements as the data module', async ({ request }) => {
+  test('every cell url and function statement resolves on the page', async ({ request, page }) => {
     const res = await request.get('/api/v1/competencies.json');
     expect(res.status()).toBe(200);
     const api = JSON.parse(await res.text());
-    expect(api.cells).toHaveLength(competencyCells.length);
-    expect(api.function).toEqual(functionStatements.map((f) => ({ can: f.can, evidence: f.evidence })));
     expect(api.disclaimer).toContain('not an industry standard');
+    expect(api.cells).toHaveLength(competencyCells.length);
+    expect(api.function).toHaveLength(functionStatements.length);
+    await page.goto(PAGE);
+    for (const c of api.cells as { url: string }[]) {
+      const id = new URL(c.url).hash.slice(1);
+      await expect(page.locator(`[id="${id}"]`), c.url).toHaveCount(1);
+    }
+    const body = (await page.locator('main').textContent()) ?? '';
+    for (const f of api.function as { can: string }[]) expect(body).toContain(f.can);
   });
 });

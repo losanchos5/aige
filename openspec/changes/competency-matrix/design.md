@@ -83,7 +83,7 @@ se renombra ni se generaliza el resolvedor en este cambio.
 celda de la tabla muestra el enunciado corto y enlaza a su detalle. Por debajo de 640 px cada flujo
 pasa a tarjeta con sus cuatro peldaños, como hace la página del historial de marcos con sus tablas.
 El detalle por flujo reutiliza `SkillsTable` filtrada a ese flujo si sus props lo permiten; si no,
-una lista simple.
+una lista simple. La tabla muestra el texto completo de `can` como texto del enlace (sin campo corto aparte) para mantener una sola fuente de verdad.
 
 **D7. Anclas.** `#<workflow-id>` para el flujo y `#<workflow-id>-r<n>` para la celda. Se deja que
 actúe la regla del sitio para `scroll-margin-top` (no se redefine en la página).

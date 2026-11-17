@@ -17,6 +17,7 @@ import { workflows } from '../../data/role';
 import {
   COMPETENCIES_PATH,
   competenciesDisclaimer,
+  competencyCellId,
   competencyCells,
   competencyProblems,
   functionStatements,
@@ -35,7 +36,7 @@ if (problems.length > 0) {
   throw new Error(`competencies.ts invariants failed:\n${problems.join('\n')}`);
 }
 
-const seoTitle = 'AI governance engineer competency matrix';
+const seoTitle = 'Competency matrix for the AI governance engineer';
 const description =
   'A competency matrix for the AI governance engineer: seven workflows by four rungs of the career ladder, each cell with the evidence that shows it.';
 const crumbs = [{ label: 'The role', href: '/role' }, { label: 'Competency matrix' }];
@@ -69,7 +70,6 @@ const cellOf = (workflow: string, rung: number) => {
   if (!cell) throw new Error(`competencies page: no cell for ${workflow} rung ${rung}`);
   return cell;
 };
-const cellId = (workflow: string, rung: number) => `${workflow}-r${rung}`;
 const layerLabel = (n: number | 'all') => (n === 'all' ? 'All layers' : `Layer ${n}`);
 const matrixRungs = rungs.filter((r) => r.n <= 4);
 const top = rungs[rungs.length - 1];
@@ -109,16 +109,16 @@ const top = rungs[rungs.length - 1];
           for its evidence and the places on this site where it is learned.
         </p>
       </div>
-      <table class="cm-table">
+      <table class="cm-table" role="table">
         <caption class="visually-hidden">
           Competency matrix: what a person can own, by workflow and rung
         </caption>
-        <thead>
-          <tr>
-            <th scope="col">Workflow</th>
+        <thead role="rowgroup">
+          <tr role="row">
+            <th scope="col" role="columnheader">Workflow</th>
             {
               matrixRungs.map((r) => (
-                <th scope="col">
+                <th scope="col" role="columnheader">
                   <span class="cm-rung">Rung {r.n}</span>
                   {r.name}
                 </th>
@@ -126,17 +126,17 @@ const top = rungs[rungs.length - 1];
             }
           </tr>
         </thead>
-        <tbody>
+        <tbody role="rowgroup">
           {
             workflows.map((w) => (
-              <tr>
-                <th scope="row">
+              <tr role="row">
+                <th scope="row" role="rowheader">
                   <a href={`#${w.id}`}>{w.name}</a>
                   <span class="cm-note">{layerLabel(w.layerN)}</span>
                 </th>
                 {matrixRungs.map((r) => (
-                  <td data-label={`Rung ${r.n}: ${r.name}`}>
-                    <a href={`#${cellId(w.id, r.n)}`}>{cellOf(w.id, r.n).can}</a>
+                  <td role="cell" data-label={`Rung ${r.n}: ${r.name}`}>
+                    <a href={`#${competencyCellId(w.id, r.n)}`}>{cellOf(w.id, r.n).can}</a>
                   </td>
                 ))}
               </tr>
@@ -166,8 +166,8 @@ const top = rungs[rungs.length - 1];
             {matrixRungs.map((r) => {
               const cell = cellOf(w.id, r.n);
               return (
-                <section id={cellId(w.id, r.n)} class="cm-cell" aria-labelledby={`${cellId(w.id, r.n)}-h`}>
-                  <h4 id={`${cellId(w.id, r.n)}-h`}>
+                <section id={competencyCellId(w.id, r.n)} class="cm-cell" aria-labelledby={`${competencyCellId(w.id, r.n)}-h`}>
+                  <h4 id={`${competencyCellId(w.id, r.n)}-h`}>
                     {w.name}, rung {r.n}: {r.name}
                   </h4>
                   <p>{cell.can}</p>
@@ -254,8 +254,8 @@ const top = rungs[rungs.length - 1];
       </Callout>
     </section>
 
-    <div class="obx-cite">
-      <Citation title="AI governance engineer competency matrix" url={COMPETENCIES_PATH} kind="page" />
+    <div class="cm-cite">
+      <Citation title="Competency matrix for the AI governance engineer" url={COMPETENCIES_PATH} kind="page" />
     </div>
   </div>
 
@@ -263,6 +263,9 @@ const top = rungs[rungs.length - 1];
 </Base>
 
 <style>
+  .cm-cite {
+    margin-top: var(--s-6);
+  }
   .cm-note {
     display: block;
     font-size: var(--fs-small);
@@ -274,6 +277,7 @@ const top = rungs[rungs.length - 1];
   }
   .cm-table th,
   .cm-table td {
+    overflow-wrap: anywhere;
     text-align: left;
     vertical-align: top;
     padding: var(--s-3) var(--s-3) var(--s-3) 0;

@@ -456,8 +456,11 @@ export const functionStatements: readonly FunctionStatement[] = [
 const MAX_CAN_WORDS = 40;
 const MAX_EVIDENCE_WORDS = 30;
 const EM_DASH = String.fromCharCode(0x2014);
-const FORBIDDEN_EVIDENCE = /\b(certificate|certification|certified|years|self-assessment)\b/i;
+const FORBIDDEN_EVIDENCE = /\b(certif\w*|years?|self[- ]?(assess|rat)\w*)\b/i;
 const words = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
+
+/** Anchor id of a matrix cell, shared by the page, the API and the tests. */
+export const competencyCellId = (workflow: string, rung: number) => `${workflow}-r${rung}`;
 
 /** Every problem with the matrix, as readable lines. An empty list means it is sound. */
 export function competencyProblems(): string[] {

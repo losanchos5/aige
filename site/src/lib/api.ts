@@ -36,6 +36,7 @@ import { stages, nodes, entries } from '../data/path';
 import {
   COMPETENCIES_PATH,
   competenciesDisclaimer,
+  competencyCellId,
   competencyCells,
   functionStatements,
   rungs,
@@ -1041,7 +1042,7 @@ export const datasets: readonly Dataset[] = [
         can: c.can,
         evidence: c.evidence,
         links: c.links.map((l) => ({ label: l.label, url: abs(l.href) })),
-        url: abs(`${COMPETENCIES_PATH}#${c.workflow}-r${c.rung}`),
+        url: abs(`${COMPETENCIES_PATH}#${competencyCellId(c.workflow, c.rung)}`),
       })),
       function: functionStatements.map((f) => ({ can: f.can, evidence: f.evidence })),
     }),

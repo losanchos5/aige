@@ -691,6 +691,7 @@ export function roleDoc(): CorpusDoc {
       ),
     ].join('\n'),
     `Read in chapter 06: ${chapter('skills-by-workflow')}`,
+    `The competency matrix, what each workflow asks at four rungs: ${abs('/role/competencies')}`,
     '## One line separates the two',
     analystDistinction,
     [
