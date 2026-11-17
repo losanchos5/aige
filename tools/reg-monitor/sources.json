@@ -477,6 +477,64 @@
         "linkPattern": "/sites/default/files/.+\\.pdf$"
       },
       "notes": "Only the header (title, date, language downloads) is read, not the full report text on the page."
+    },
+    {
+      "id": "anthropic-rsp",
+      "name": "Anthropic: Responsible Scaling Policy (page with versions, dated updates and PDFs)",
+      "url": "https://www.anthropic.com/responsible-scaling-policy",
+      "jurisdiction": "International",
+      "category": "framework",
+      "hints": {
+        "select": [
+          "main"
+        ],
+        "linkPattern": "assets\\.claude\\.com/.+\\.pdf",
+        "dropLines": [
+          "^(?!Version \\d+\\.\\d+ [\\[(]|Last updated|Redacted Risk Report|Read ).*$"
+        ],
+        "minChars": 100
+      },
+      "notes": "Only the lines that name a version, the last-updated date, the risk reports and the current-version link are kept; the long update notes are dropped. The normaliser replaces PDF hashes with a placeholder, so a new PDF at a new address is seen through its version line."
+    },
+    {
+      "id": "anthropic-rsp-3-4-pdf",
+      "name": "Anthropic: Responsible Scaling Policy, Version 3.4 (PDF)",
+      "url": "https://www-cdn.anthropic.com/files/4zrzovbb/website/0bacdc8440ea96e62a8766d99ebe1d4eea6d5f3a.pdf",
+      "jurisdiction": "International",
+      "category": "framework",
+      "notes": "The stored host serves the same file as the assets.claude.com link on the page (SHA-256 checked 2026-11-17). A re-upload under the same URL is seen; a new version at a new URL is seen only through the anthropic-rsp page."
+    },
+    {
+      "id": "deepmind-fsf",
+      "name": "Google DeepMind: Frontier Safety Framework (page listing every version and its PDF)",
+      "url": "https://deepmind.google/frontier-safety/",
+      "jurisdiction": "International",
+      "category": "framework",
+      "hints": {
+        "select": [
+          "main"
+        ],
+        "linkPattern": "frontier-safety-framework|fsf-technical-report",
+        "dropLines": [
+          "^(?!Version \\d+\\.\\d+ \\(|\\[https).*$"
+        ]
+      }
+    },
+    {
+      "id": "deepmind-fsf-3-1-pdf",
+      "name": "Google DeepMind: Frontier Safety Framework, Version 3.1 (PDF)",
+      "url": "https://storage.googleapis.com/deepmind-media/DeepMind.com/Blog/strengthening-our-frontier-safety-framework/frontier-safety-framework_3-1.pdf",
+      "jurisdiction": "International",
+      "category": "framework",
+      "notes": "A re-upload under the same URL is seen; a new version at a new URL is seen only through the deepmind-fsf page."
+    },
+    {
+      "id": "openai-preparedness-v2-pdf",
+      "name": "OpenAI: Preparedness Framework, Version 2 (PDF)",
+      "url": "https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf",
+      "jurisdiction": "International",
+      "category": "framework",
+      "notes": "The announcement page https://openai.com/index/updating-our-preparedness-framework/ answers HTTP 403 to automated clients, so it is not watched. A new version published at a new URL would not be detected; check the OpenAI page by hand."
     }
   ]
 }
