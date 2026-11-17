@@ -108,6 +108,13 @@ Durante la carga se añadieron dos campos opcionales: `FrontierVersion.labelSour
 etiqueta cuando la portada del documento no la imprime) y `FrontierTransition.noteSources` (fuentes
 de las notas de versión del lab). Los números de fuente son de base 1, como en el crosswalk.
 
+Tras la revisión de código se endurecieron las invariantes: la lista vetada casa raíces y flexiones
+(con el nombre propio "Self-improvement" como única excepción); una URL de cita es de PDF si
+coincide con la de un fichero de versión, aunque no termine en `.pdf`; la fecha de comprobación no
+puede ser posterior al día de la build, y solo una fecha de versión de tipo `effective` puede ser
+posterior a ella; un cambio es `no-changelog` si y solo si su transición no tiene notas del lab; y
+una transición cubierta con notas debe enlazarlas.
+
 Las invariantes van en `frontierChangeProblems()` y la página lanza si devuelve algo, igual que
 `frontierProblems()`. Comprueba: ids únicos; versiones, transiciones y dimensiones existentes;
 transiciones entre versiones consecutivas; citas según el tipo y de 25 palabras como máximo;

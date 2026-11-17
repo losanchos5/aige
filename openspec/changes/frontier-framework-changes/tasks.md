@@ -17,15 +17,15 @@
 
 ## 3. Página, exports y registros
 
-- [ ] 3.1 Crear `site/src/pages/resources/frontier-framework-changes.astro` con los componentes del crosswalk (`Base`, `PageHero`, `SourceList`, `Citation`, `Callout`): última comprobación, versiones por marco, cambios por transición con anclas, método, límites, fuentes, descarga y cita; verificar que la página se construye y que lanza si `frontierChangeProblems()` no está vacío
-- [ ] 3.2 Crear los exports `.json.ts` y `.csv.ts` con el mismo sobre que el crosswalk; verificar que los recuentos coinciden con el módulo de datos
-- [ ] 3.3 Registrar la página en `SOURCE_BY_PATH`, `nav.ts`, el pie, `llms.txt.ts`, las tarjetas OG y `resources/index.astro`; verificar que pasan `nav.spec.ts`, `geo.spec.ts` y `resources.spec.ts` con la lista del índice actualizada
-- [ ] 3.4 Añadir a `rss.xml.ts` una entrada por transición cubierta según D9; verificar que `/rss.xml` las contiene y que pasa `block-f-feed.spec.ts`
-- [ ] 3.5 Enlazar el historial desde la sección de versiones del crosswalk y mostrar el aviso de versión superada cuando proceda; verificar que hoy no aparece aviso y que aparece al añadir en local una versión ficticia posterior, que luego se retira
+- [x] 3.1 Crear `site/src/pages/resources/frontier-framework-changes.astro` con los componentes del crosswalk (`Base`, `PageHero`, `SourceList`, `Citation`, `Callout`): última comprobación, versiones por marco, cambios por transición con anclas, método, límites, fuentes, descarga y cita; verificar que la página se construye y que lanza si `frontierChangeProblems()` no está vacío
+- [x] 3.2 Crear los exports `.json.ts` y `.csv.ts` con el mismo sobre que el crosswalk; verificar que los recuentos coinciden con el módulo de datos
+- [x] 3.3 Registrar la página en `SOURCE_BY_PATH`, `nav.ts`, el pie, `llms.txt.ts`, las tarjetas OG y `resources/index.astro`; verificar que pasan `nav.spec.ts`, `geo.spec.ts` y `resources.spec.ts` con la lista del índice actualizada
+- [x] 3.4 Añadir a `rss.xml.ts` una entrada por transición cubierta según D9; verificar que `/rss.xml` las contiene y que pasa `block-f-feed.spec.ts`
+- [x] 3.5 Enlazar el historial desde la sección de versiones del crosswalk y mostrar el aviso de versión superada cuando proceda; verificar que hoy no aparece aviso y que aparece al añadir en local una versión ficticia posterior, que luego se retira
 
 ## 4. API
 
-- [ ] 4.1 Añadir `frontier-crosswalk` y `frontier-changes` a `datasets` en `site/src/lib/api.ts` con sus esquemas; verificar que `api.spec.ts` pasa y que `/api/v1/index.json` lista 18 conjuntos
+- [x] 4.1 Añadir `frontier-crosswalk` y `frontier-changes` a `datasets` en `site/src/lib/api.ts` con sus esquemas; verificar que `api.spec.ts` pasa y que `/api/v1/index.json` lista 18 conjuntos
 
 ## 5. Monitor
 
@@ -35,10 +35,10 @@
 
 ## 6. Verificación
 
-- [ ] 6.1 Verificación adversarial, por un revisor distinto del autor, de cada cambio, cita, página, hash, fecha y valor de divulgación contra los PDF; verificar con un informe `tracker-factcheck.md` sin discrepancias abiertas
+- [x] 6.1 Verificación adversarial, por un revisor distinto del autor, de cada cambio, cita, página, hash, fecha y valor de divulgación contra los PDF; verificar con un informe `tracker-factcheck.md` sin discrepancias abiertas
 - [ ] 6.2 Escribir `site/tests/frontier-changes.spec.ts` según D11, pasando antes la puerta de `test-audit`; verificar que pasa
 - [ ] 6.3 Construir con `bash D:/Documents/aige-wt/build.sh` y pasar las specs afectadas (`frontier-changes`, `frontier-crosswalk`, `api`, `resources`, `nav`, `geo`, `seo-schema`, `block-f-feed`, `infra`) con un `PW_PORT` propio; verificar que todas pasan y que no queda ninguna captura regenerada en `git status`
-- [ ] 6.4 Revisión de código del diff completo; verificar que no quedan hallazgos críticos ni altos abiertos
+- [x] 6.4 Revisión de código del diff completo; verificar que no quedan hallazgos críticos ni altos abiertos
 
 ## 7. Entrega
 
